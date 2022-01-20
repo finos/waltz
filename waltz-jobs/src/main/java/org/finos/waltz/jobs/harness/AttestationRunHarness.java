@@ -21,6 +21,8 @@ package org.finos.waltz.jobs.harness;
 import org.finos.waltz.data.attestation.AttestationRunDao;
 import org.finos.waltz.model.attestation.AttestationRunResponseSummary;
 import org.finos.waltz.service.DIConfiguration;
+import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -34,8 +36,10 @@ public class AttestationRunHarness {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
         AttestationRunDao attestationRunDao = ctx.getBean(AttestationRunDao.class);
+        DSLContext dsl = ctx.getBean(DSLContext.class);
 
-        List<AttestationRunResponseSummary> responseRates = attestationRunDao.findResponseSummaries();
+
+//        List<AttestationRunResponseSummary> responseRates = attestationRunDao.findResponseSummaries();
 
         System.out.println("done");
     }

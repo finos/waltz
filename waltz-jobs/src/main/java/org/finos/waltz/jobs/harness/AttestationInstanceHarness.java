@@ -18,22 +18,10 @@
 
 package org.finos.waltz.jobs.harness;
 
-import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.data.attestation.AttestationInstanceDao;
-import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.IdSelectionOptions;
-import org.finos.waltz.model.attestation.*;
+import org.finos.waltz.model.attestation.AttestationSyncRecipientsResponse;
 import org.finos.waltz.service.DIConfiguration;
-import org.finos.waltz.service.attestation.AttestationInstanceService;
-import org.jooq.Record1;
-import org.jooq.Select;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import java.util.Set;
-
-import static org.finos.waltz.common.FunctionUtilities.time;
-import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 
 
 public class AttestationInstanceHarness {
@@ -42,37 +30,11 @@ public class AttestationInstanceHarness {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
-        AttestationInstanceDao attestationInstanceDao = ctx.getBean(AttestationInstanceDao.class);
-        AttestationInstanceService svc = ctx.getBean(AttestationInstanceService.class);
+        AttestationInstanceDao dao = ctx.getBean(AttestationInstanceDao.class);
 
-        IdSelectionOptions opts = mkOpts(mkRef(EntityKind.APPLICATION, 20506L));
-        IdSelectionOptions group = mkOpts(mkRef(EntityKind.APP_GROUP, 433L));
-        IdSelectionOptions org = mkOpts(mkRef(EntityKind.ORG_UNIT, 6811));
-        ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
-        Select<Record1<Long>> appIds = applicationIdSelectorFactory.apply(opts);
+        AttestationSyncRecipientsResponse records = dao.getCountsOfRecipientsToReassign();
 
-        long st = System.currentTimeMillis();
-        System.out.println("-- start");
-
-        ApplicationAttestationSummaryFilters filters = ImmutableApplicationAttestationSummaryFilters.builder()
-                .build();
-
-        ImmutableApplicationAttestationInstanceInfo info = ImmutableApplicationAttestationInstanceInfo.builder()
-                .filters(filters)
-                .selectionOptions(org)
-                .build();
-
-        Set<ApplicationAttestationInstanceSummary> sumaries = time("instacnes", () -> svc.findApplicationAttestationInstancesForKindAndSelector(
-                EntityKind.LOGICAL_DATA_FLOW,
-                null,
-                info));
-
-        System.out.println(sumaries);
-
-        Set<ApplicationAttestationSummaryCounts> summary = time("summary", () -> svc
-                .findAttestationInstanceSummaryForSelector(info));
-
-        System.out.println(summary);
+        System.out.println(records);
 
     }
 

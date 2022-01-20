@@ -26,9 +26,30 @@ export function mkAttestationInstanceStore() {
                 {force});
     };
 
+
+    const reassignRecipients = () => {
+        return remote.execute(
+            "POST",
+            "api/attestation-instance/reassign-recipients",
+            null)
+    }
+
+
+    const getCountsOfRecipientsToReassign = (force = false) => {
+        return remote
+            .fetchViewData(
+                "GET",
+                "api/attestation-instance/reassign-counts",
+                null,
+                null,
+                {force})
+    }
+
     return {
         findByEntityRef,
-        findLatestMeasurableAttestations
+        findLatestMeasurableAttestations,
+        reassignRecipients,
+        getCountsOfRecipientsToReassign
     };
 }
 
