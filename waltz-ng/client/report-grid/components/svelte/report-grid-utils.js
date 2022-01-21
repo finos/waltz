@@ -62,19 +62,19 @@ export const columnUsageKind = {
 
 const nameCol = mkEntityLinkGridCell(
     "Name",
-    "application",
+    "subject.entityReference",
     "none",
     "right",
-    { pinnedLeft:true, width: 200});
+    {pinnedLeft: true, width: 200});
 
-const extIdCol = { field: "application.externalId", displayName: "Ext. Id", width: 100, pinnedLeft:true};
+const extIdCol = {field: "subject.entityReference.externalId", displayName: "Ext. Id", width: 100, pinnedLeft: true};
 
 const lifecyclePhaseCol = {
-    field: "application.lifecyclePhase",
+    field: "subject.lifecyclePhase",
     displayName: "Lifecycle Phase",
     width: 100,
     pinnedLeft: true,
-    cellTemplate:`
+    cellTemplate: `
         <div class="waltz-grid-report-cell"
             <span ng-bind="COL_FIELD | toDisplayName:'lifecyclePhase'"></span>
         </div>`
@@ -100,14 +100,14 @@ export function mkPropNameForCellRef(x) {
 }
 
 
-function initialiseDataForRow(application, columnRefs) {
+function initialiseDataForRow(subject, columnRefs) {
     return _.reduce(
         columnRefs,
         (acc, c) => {
             acc[c] = unknownRating;
             return acc;
         },
-        {application});
+        {subject});
 }
 
 
@@ -207,12 +207,12 @@ function mkPopoverHtml(cellData, ratingSchemeItem) {
 
 
 export function prepareTableData(gridData) {
-    const appsById = _.keyBy(gridData.instance.applications, d => d.id);
+    const appsById = _.keyBy(gridData.instance.subjects, d => d.entityReference.id);
     const ratingSchemeItemsById = _
         .chain(gridData.instance.ratingSchemeItems)
         .map(d => {
             const c = rgb(d.color);
-            return Object.assign({}, d, { fontColor: determineForegroundColor(c.r, c.g, c.b)})
+            return Object.assign({}, d, {fontColor: determineForegroundColor(c.r, c.g, c.b)})
         })
         .keyBy(d => d.id)
         .value();
@@ -257,7 +257,7 @@ export function prepareTableData(gridData) {
                 return acc;
             },
             initialiseDataForRow(appsById[k], columnRefs)))
-        .orderBy(d => d.application.name)
+        .orderBy(d => d.subject.name)
         .value();
 }
 
@@ -268,7 +268,7 @@ export function prepareTableData(gridData) {
  * @returns {boolean}
  */
 function isSummarisableProperty(k) {
-    return ! (k === "application"
+    return !(k === "subject"
         || k === "$$hashKey"
         || k === "visible"
         || k === _.startsWith("COST_KIND"));

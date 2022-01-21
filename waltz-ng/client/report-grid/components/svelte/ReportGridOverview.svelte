@@ -11,6 +11,7 @@
     import toasts from "../../../svelte-stores/toast-store";
     import Icon from "../../../common/svelte/Icon.svelte";
     import _ from "lodash";
+    import {entity} from "../../../common/services/enums/entity";
 
     export let onGridSelect = () => console.log("selecting grid");
 
@@ -42,7 +43,8 @@
             name: grid.name,
             description: grid.description,
             externalId: toUpperSnakeCase(grid.name),
-            kind: grid.kind
+            kind: grid.kind,
+            subjectKind: grid.subjectKind
         }
 
         let savePromise = reportGridStore.create(createCmd);
@@ -133,6 +135,10 @@
                 <table class="table table-condensed small">
                     <tbody>
                     <tr>
+                        <td>Subject Kind</td>
+                        <td>{_.get(entity[$selectedGrid?.definition?.subjectKind], 'name', 'Unknown Kind')}</td>
+                    </tr>
+                    <tr>
                         <td>Kind</td>
                         <td>{_.get(reportGridKinds[$selectedGrid?.definition?.kind], 'name', 'Unknown Kind')}</td>
                     </tr>
@@ -142,7 +148,7 @@
                             {#if !_.isEmpty(gridOwners)}
                                 <ul>
                                     {#each _.orderBy(gridOwners, d => d.userId) as owner}
-                                    <li>
+                                        <li>
                                         {owner.userId}
                                     </li>
                                     {/each}

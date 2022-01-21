@@ -17,6 +17,8 @@
  */
 package org.finos.waltz.web.endpoints.extracts;
 
+import org.finos.waltz.model.application.LifecyclePhase;
+import org.finos.waltz.model.report_grid.*;
 import org.finos.waltz.service.report_grid.ReportGridService;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -27,13 +29,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.NameProvider;
-import org.finos.waltz.model.application.Application;
 import org.finos.waltz.model.external_identifier.ExternalIdValue;
 import org.finos.waltz.model.rating.RatingSchemeItem;
-import org.finos.waltz.model.report_grid.ReportGrid;
-import org.finos.waltz.model.report_grid.ReportGridCell;
-import org.finos.waltz.model.report_grid.ReportGridColumnDefinition;
-import org.finos.waltz.model.report_grid.ReportGridDefinition;
 import org.finos.waltz.web.WebUtilities;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
@@ -95,7 +92,7 @@ public class ReportGridExtractor implements DataExtractor {
                 gridId,
                 selectionOptions);
 
-        List<Tuple2<Application, ArrayList<Object>>> reportRows = prepareReportRows(reportGrid);
+        List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows = prepareReportRows(reportGrid);
 
         return formatReport(
                 format,
@@ -129,29 +126,30 @@ public class ReportGridExtractor implements DataExtractor {
     }
 
 
-    private List<Tuple2<Application, ArrayList<Object>>> prepareReportRows(ReportGrid reportGrid) {
+    private List<Tuple2<ReportSubject, ArrayList<Object>>> prepareReportRows(ReportGrid reportGrid) {
 
         Set<ReportGridCell> tableData = reportGrid.instance().cellData();
 
-        Map<Long, Application> applicationsById = indexById(reportGrid.instance().applications());
+        Map<Long, ReportSubject> subjectsById = indexBy(d -> d.entityReference().id(), reportGrid.instance().subjects());
         Map<Long, RatingSchemeItem> ratingsById = indexById(reportGrid.instance().ratingSchemeItems());
 
-        Map<Long, Collection<ReportGridCell>> tableDataByAppId = groupBy(
+        Map<Long, Collection<ReportGridCell>> tableDataBySubjectId = groupBy(
                 tableData,
                 ReportGridCell::subjectId);
 
-        return tableDataByAppId
+        return tableDataBySubjectId
                 .entrySet()
                 .stream()
                 .map(r -> {
-                    Long appId = r.getKey();
-                    Application app = applicationsById.getOrDefault(appId, null);
+                    Long subjectId = r.getKey();
+
+                    ReportSubject subject = subjectsById.getOrDefault(subjectId, null);
 
                     ArrayList<Object> reportRow = new ArrayList<>();
 
                     Collection<ReportGridCell> cells = r.getValue();
 
-                    Map<Tuple2<Long, EntityKind>, Object> callValuesByColumnRefForApp = indexBy(
+                    Map<Tuple2<Long, EntityKind>, Object> callValuesByColumnRefForSubject = indexBy(
                             cells,
                             k -> tuple(k.columnEntityId(), k.columnEntityKind()),
                             v -> getValueFromReportRow(ratingsById, v));
@@ -160,14 +158,14 @@ public class ReportGridExtractor implements DataExtractor {
                     reportGrid.definition()
                             .columnDefinitions()
                             .forEach(colDef -> reportRow.add(
-                                    callValuesByColumnRefForApp.getOrDefault(
+                                    callValuesByColumnRefForSubject.getOrDefault(
                                             tuple(
-                                                colDef.columnEntityReference().id(),
-                                                colDef.columnEntityReference().kind()),
+                                                    colDef.columnEntityReference().id(),
+                                                    colDef.columnEntityReference().kind()),
                                             null)));
-                    return tuple(app, reportRow);
+                    return tuple(subject, reportRow);
                 })
-                .sorted(Comparator.comparing(t -> t.v1.name()))
+                .sorted(Comparator.comparing(t -> t.v1.entityReference().name().get()))
                 .collect(toList());
     }
 
@@ -194,7 +192,7 @@ public class ReportGridExtractor implements DataExtractor {
     private Tuple3<ExtractFormat, String, byte[]> formatReport(ExtractFormat format,
                                                                String reportName,
                                                                List<ReportGridColumnDefinition> columnDefinitions,
-                                                               List<Tuple2<Application, ArrayList<Object>>> reportRows) throws IOException {
+                                                               List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows) throws IOException {
         switch (format) {
             case XLSX:
                 return tuple(format, reportName, mkExcelReport(reportName, columnDefinitions, reportRows));
@@ -207,7 +205,7 @@ public class ReportGridExtractor implements DataExtractor {
 
 
     private byte[] mkCSVReport(List<ReportGridColumnDefinition> columnDefinitions,
-                               List<Tuple2<Application, ArrayList<Object>>> reportRows) throws IOException {
+                               List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows) throws IOException {
         List<String> headers = mkHeaderStrings(columnDefinitions);
 
         StringWriter writer = new StringWriter();
@@ -221,11 +219,11 @@ public class ReportGridExtractor implements DataExtractor {
     }
 
 
-    private List<Object> simplify(Tuple2<Application, ArrayList<Object>> row) {
+    private List<Object> simplify(Tuple2<ReportSubject, ArrayList<Object>> row) {
 
         long appId = row.v1.entityReference().id();
-        String appName = row.v1.name();
-        Optional<ExternalIdValue> assetCode = row.v1.assetCode();
+        String appName = row.v1.entityReference().name().get();
+        Optional<String> assetCode = row.v1.entityReference().externalId();
 
         List<Object> appInfo = asList(appId, appName, assetCode);
 
@@ -242,7 +240,7 @@ public class ReportGridExtractor implements DataExtractor {
 
     private byte[] mkExcelReport(String reportName,
                                  List<ReportGridColumnDefinition> columnDefinitions,
-                                 List<Tuple2<Application, ArrayList<Object>>> reportRows) throws IOException {
+                                 List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows) throws IOException {
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet(ExtractorUtilities.sanitizeSheetName(reportName));
 
@@ -264,17 +262,18 @@ public class ReportGridExtractor implements DataExtractor {
     }
 
 
-    private int writeExcelBody(List<Tuple2<Application, ArrayList<Object>>> reportRows, XSSFSheet sheet) {
+    private int writeExcelBody(List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows, XSSFSheet sheet) {
         AtomicInteger rowNum = new AtomicInteger(1);
         reportRows.forEach(r -> {
 
-            long appId = r.v1.entityReference().id();
-            String appName = r.v1.name();
-            Optional<ExternalIdValue> assetCode = r.v1.assetCode();
+            long subjectId = r.v1.entityReference().id();
+            String subjectName = r.v1.entityReference().name().get();
+            Optional<String> subjectExtId = r.v1.entityReference().externalId();
+            LifecyclePhase subjectLifecyclePhase = r.v1.lifecyclePhase();
 
-            List<Object> appInfo = asList(appId, appName, assetCode);
+            List<Object> subjectInfo = asList(subjectId, subjectName, subjectExtId, subjectLifecyclePhase);
 
-            List<Object> values = concat(appInfo, r.v2);
+            List<Object> values = concat(subjectInfo, r.v2);
 
             Row row = sheet.createRow(rowNum.getAndIncrement());
             AtomicInteger colNum = new AtomicInteger(0);
