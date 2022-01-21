@@ -138,7 +138,7 @@ public class ReportGridExtractor implements DataExtractor {
 
         Map<Long, Collection<ReportGridCell>> tableDataByAppId = groupBy(
                 tableData,
-                ReportGridCell::applicationId);
+                ReportGridCell::subjectId);
 
         return tableDataByAppId
                 .entrySet()

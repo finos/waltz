@@ -249,7 +249,7 @@ export function prepareTableData(gridData) {
 
     return _
         .chain(gridData.instance.cellData)
-        .groupBy(d => d.applicationId)
+        .groupBy(d => d.subjectId)
         .map((xs, k) => _.reduce(
             xs,
             (acc, x) => {

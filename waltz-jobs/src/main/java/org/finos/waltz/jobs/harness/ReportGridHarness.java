@@ -19,6 +19,8 @@
 package org.finos.waltz.jobs.harness;
 
 import org.finos.waltz.common.FunctionUtilities;
+import org.finos.waltz.data.GenericSelector;
+import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.data.report_grid.ReportGridDao;
 import org.finos.waltz.model.EntityKind;
@@ -29,6 +31,7 @@ import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import javax.swing.text.html.parser.Entity;
 import java.util.Set;
 
 import static org.finos.waltz.common.CollectionUtilities.first;
@@ -54,7 +57,8 @@ public class ReportGridHarness {
         EntityReference flowDiagram = mkRef(EntityKind.FLOW_DIAGRAM, 1);
         EntityReference mgr = mkRef(EntityKind.PERSON, 1);
 
-        Select<Record1<Long>> selector = new ApplicationIdSelectorFactory().apply(mkOpts(infra));
+        GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
+        GenericSelector selector = genericSelectorFactory.applyForKind(EntityKind.APPLICATION, mkOpts(orgUnit));
 
         System.out.println("Made selector");
 

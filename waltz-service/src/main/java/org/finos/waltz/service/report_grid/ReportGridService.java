@@ -20,6 +20,8 @@ package org.finos.waltz.service.report_grid;
 
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.common.exception.NotFoundException;
+import org.finos.waltz.data.GenericSelector;
+import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.application.ApplicationDao;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.data.report_grid.ReportGridDao;
@@ -53,8 +55,7 @@ public class ReportGridService {
     private final ReportGridMemberService reportGridMemberService;
     private final ChangeLogService changeLogService;
 
-    private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
-
+    private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
 
     @Autowired
     public ReportGridService(ReportGridDao reportGridDao,
@@ -90,23 +91,25 @@ public class ReportGridService {
             long id,
             IdSelectionOptions idSelectionOptions) {
 
+
         // WARNING:  The grid computation is very slow if given a large person tree.
         //    Therefore we restrict it to EXACT only behaviour.
         //    If you are changing this please ensure you have tested with realistic test data.
 
         IdSelectionOptions opts = idSelectionOptions.entityReference().kind() == EntityKind.PERSON
                 ? ImmutableIdSelectionOptions
-                    .copyOf(idSelectionOptions)
-                    .withScope(HierarchyQueryScope.EXACT)
+                .copyOf(idSelectionOptions)
+                .withScope(HierarchyQueryScope.EXACT)
                 : idSelectionOptions;
 
         ReportGridDefinition definition = reportGridDao.getGridDefinitionById(id);
 
-        if(definition == null){
+        if (definition == null) {
             return null;
         }
 
-        ReportGridInstance instance = mkInstance(id, opts);
+        EntityKind targetKind = definition.subjectKind();
+        ReportGridInstance instance = mkInstance(id, opts, targetKind);
 
         return ImmutableReportGrid
                 .builder()
@@ -116,10 +119,12 @@ public class ReportGridService {
     }
 
 
-    private ReportGridInstance mkInstance(long id, IdSelectionOptions idSelectionOptions) {
-        Select<Record1<Long>> appSelector = applicationIdSelectorFactory.apply(idSelectionOptions);
-        Set<ReportGridCell> cellData = reportGridDao.findCellDataByGridId(id, appSelector);
-        List<Application> apps = applicationDao.findByAppIdSelector(appSelector);
+    private ReportGridInstance mkInstance(long id, IdSelectionOptions idSelectionOptions, EntityKind targetKind) {
+
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, idSelectionOptions);
+        Set<ReportGridCell> cellData = reportGridDao.findCellDataByGridId(id, genericSelector);
+
+        List<Application> apps = applicationDao.findByAppIdSelector(genericSelector.selector());
 
         Set<RatingSchemeItem> ratingSchemeItems = ratingSchemeService.findRatingSchemeItemsByIds(map(
                 cellData,
@@ -131,6 +136,7 @@ public class ReportGridService {
                 .cellData(cellData)
                 .ratingSchemeItems(ratingSchemeItems)
                 .build();
+
         return instance;
     }
 

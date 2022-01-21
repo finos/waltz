@@ -21,6 +21,7 @@ package org.finos.waltz.data.report_grid;
 
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.SetUtilities;
+import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -111,14 +112,14 @@ public class ReportGridDao {
 
 
     public Set<ReportGridCell> findCellDataByGridId(long id,
-                                                    Select<Record1<Long>> appSelector) {
-        return findCellDataByGridCondition(rg.ID.eq(id), appSelector);
+                                                    GenericSelector genericSelector) {
+        return findCellDataByGridCondition(rg.ID.eq(id), genericSelector);
     }
 
 
-    public Set<ReportGridCell> findCellDataByGridExternalId(String  externalId,
-                                                            Select<Record1<Long>> appSelector) {
-        return findCellDataByGridCondition(rg.EXTERNAL_ID.eq(externalId), appSelector);
+    public Set<ReportGridCell> findCellDataByGridExternalId(String externalId,
+                                                            GenericSelector genericSelector) {
+        return findCellDataByGridCondition(rg.EXTERNAL_ID.eq(externalId), genericSelector);
     }
 
 
@@ -166,6 +167,7 @@ public class ReportGridDao {
         record.setLastUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
         record.setLastUpdatedBy(username);
         record.setProvenance("waltz");
+        record.setSubjectKind(createCommand.subjectKind().name());
         record.setKind(createCommand.kind().name());
 
         int insert = record.insert();
@@ -279,13 +281,12 @@ public class ReportGridDao {
     }
 
 
-
     private Set<ReportGridCell> findCellDataByGridCondition(Condition gridCondition,
-                                                            Select<Record1<Long>> appSelector) {
+                                                            GenericSelector genericSelector) {
 
         ReportGridDefinition gridDefn = getGridDefinitionByCondition(gridCondition);
 
-        if(gridDefn == null ){
+        if (gridDefn == null) {
             return emptySet();
 
         } else {
@@ -328,17 +329,17 @@ public class ReportGridDao {
 
 
             return union(
-                    fetchSummaryMeasurableData(appSelector, summaryMeasurableIdsUsingHighest, summaryMeasurableIdsUsingLowest),
-                    fetchAssessmentData(appSelector, requiredAssessmentDefinitions),
-                    fetchExactMeasurableData(appSelector, exactMeasurableIds),
-                    fetchCostData(appSelector, requiredCostKinds),
-                    fetchInvolvementData(appSelector, requiredInvolvementKinds),
-                    fetchSurveyQuestionResponseData(appSelector, requiredSurveyQuestionIds));
+                    fetchSummaryMeasurableData(genericSelector, summaryMeasurableIdsUsingHighest, summaryMeasurableIdsUsingLowest),
+                    fetchAssessmentData(genericSelector, requiredAssessmentDefinitions),
+                    fetchExactMeasurableData(genericSelector, exactMeasurableIds),
+                    fetchCostData(genericSelector, requiredCostKinds),
+                    fetchInvolvementData(genericSelector, requiredInvolvementKinds),
+                    fetchSurveyQuestionResponseData(genericSelector, requiredSurveyQuestionIds));
         }
     }
 
 
-    private Set<ReportGridCell> fetchInvolvementData(Select<Record1<Long>> appSelector,
+    private Set<ReportGridCell> fetchInvolvementData(GenericSelector selector,
                                                      Set<Long> requiredInvolvementKinds) {
         if (requiredInvolvementKinds.size() == 0) {
             return emptySet();
@@ -350,13 +351,13 @@ public class ReportGridDao {
                             p.EMAIL)
                     .from(inv)
                     .innerJoin(p).on(p.EMPLOYEE_ID.eq(inv.EMPLOYEE_ID))
-                    .where(inv.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                    .and(inv.ENTITY_ID.in(appSelector))
+                    .where(inv.ENTITY_KIND.eq(selector.kind().name()))
+                    .and(inv.ENTITY_ID.in(selector.selector()))
                     .and(inv.KIND_ID.in(requiredInvolvementKinds))
                     .and(p.IS_REMOVED.isFalse())
                     .fetchSet(r -> ImmutableReportGridCell
                             .builder()
-                            .applicationId(r.get(inv.ENTITY_ID))
+                            .subjectId(r.get(inv.ENTITY_ID))
                             .columnEntityId(r.get(inv.KIND_ID))
                             .columnEntityKind(EntityKind.INVOLVEMENT_KIND)
                             .text(r.get(p.EMAIL))
@@ -364,7 +365,7 @@ public class ReportGridDao {
                     // we now convert to a map so we can merge text values of cells with the same coordinates (appId, entId)
                     .stream()
                     .collect(toMap(
-                            c -> tuple(c.applicationId(), c.columnEntityId()),
+                            c -> tuple(c.subjectId(), c.columnEntityId()),
                             identity(),
                             (a, b) -> ImmutableReportGridCell
                                     .copyOf(a)
@@ -375,7 +376,7 @@ public class ReportGridDao {
     }
 
 
-    private Set<ReportGridCell> fetchCostData(Select<Record1<Long>> appSelector,
+    private Set<ReportGridCell> fetchCostData(GenericSelector selector,
                                               Set<Long> requiredCostKinds) {
 
         if (requiredCostKinds.size() == 0) {
@@ -385,8 +386,8 @@ public class ReportGridDao {
             SelectHavingStep<Record2<Long, Integer>> costKindLastestYear = dsl
                     .select(COST.COST_KIND_ID, DSL.max(COST.YEAR).as("latest_year"))
                     .from(COST)
-                    .where(dsl.renderInlined(COST.ENTITY_ID.in(appSelector)
-                            .and(COST.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))))
+                    .where(dsl.renderInlined(COST.ENTITY_ID.in(selector.selector())
+                            .and(COST.ENTITY_KIND.eq(selector.kind().name()))))
                     .groupBy(COST.COST_KIND_ID);
 
             Condition latestYearForKind = c.COST_KIND_ID.eq(costKindLastestYear.field(COST.COST_KIND_ID))
@@ -399,10 +400,10 @@ public class ReportGridDao {
                     .from(c)
                     .innerJoin(costKindLastestYear).on(latestYearForKind)
                     .where(dsl.renderInlined(c.COST_KIND_ID.in(requiredCostKinds)
-                            .and(c.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                            .and(c.ENTITY_ID.in(appSelector))))
+                            .and(c.ENTITY_KIND.eq(selector.kind().name()))
+                            .and(c.ENTITY_ID.in(selector.selector()))))
                     .fetchSet(r -> ImmutableReportGridCell.builder()
-                            .applicationId(r.get(c.ENTITY_ID))
+                            .subjectId(r.get(c.ENTITY_ID))
                             .columnEntityId(r.get(c.COST_KIND_ID))
                             .columnEntityKind(EntityKind.COST_KIND)
                             .value(r.get(c.AMOUNT))
@@ -411,11 +412,11 @@ public class ReportGridDao {
     }
 
 
-    private Set<ReportGridCell> fetchSummaryMeasurableData(Select<Record1<Long>> appSelector,
+    private Set<ReportGridCell> fetchSummaryMeasurableData(GenericSelector selector,
                                                            Set<Long> measurableIdsUsingHighest,
                                                            Set<Long> measurableIdsUsingLowest) {
 
-        if (measurableIdsUsingHighest.size() == 0 && measurableIdsUsingLowest.size() == 0){
+        if (measurableIdsUsingHighest.size() == 0 && measurableIdsUsingLowest.size() == 0) {
             return emptySet();
         }
 
@@ -439,22 +440,22 @@ public class ReportGridDao {
                         ratingSchemeItems.field("rsiName", String.class))
                 .from(m)
                 .innerJoin(eh)
-                    .on(eh.ANCESTOR_ID.eq(m.ID))
-                    .and(eh.KIND.eq(EntityKind.MEASURABLE.name()))
+                .on(eh.ANCESTOR_ID.eq(m.ID))
+                .and(eh.KIND.eq(EntityKind.MEASURABLE.name()))
                 .innerJoin(mr)
-                    .on(mr.MEASURABLE_ID.eq(eh.ID))
+                .on(mr.MEASURABLE_ID.eq(eh.ID))
                 .innerJoin(ratingSchemeItems)
-                    .on(m.MEASURABLE_CATEGORY_ID.eq(ratingSchemeItems.field("mcId", Long.class)))
-                    .and(mr.RATING.eq(ratingSchemeItems.field("rsiCode", String.class)))
-                .where(mr.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                .and(mr.ENTITY_ID.in(appSelector))
+                .on(m.MEASURABLE_CATEGORY_ID.eq(ratingSchemeItems.field("mcId", Long.class)))
+                .and(mr.RATING.eq(ratingSchemeItems.field("rsiCode", String.class)))
+                .where(mr.ENTITY_KIND.eq(selector.kind().name()))
+                .and(mr.ENTITY_ID.in(selector.selector()))
                 .and(m.ID.in(union(measurableIdsUsingHighest, measurableIdsUsingLowest)));
 
         return dsl
                 .resultQuery(dsl.renderInlined(ratings))
                 .fetchGroups(
                         r -> tuple(
-                                mkRef(EntityKind.APPLICATION, r.get(mr.ENTITY_ID)),
+                                mkRef(selector.kind(), r.get(mr.ENTITY_ID)),
                                 r.get(m.ID)),
                         r -> tuple(
                                 r.get("rsiId", Long.class),
@@ -463,9 +464,10 @@ public class ReportGridDao {
                 .entrySet()
                 .stream()
                 .map(e -> {
+
                     Tuple2<EntityReference, Long> entityAndMeasurable = e.getKey();
                     Long measurableId = entityAndMeasurable.v2();
-                    long applicationId = entityAndMeasurable.v1().id();
+                    long entityId = entityAndMeasurable.v1().id();
                     List<Tuple3<Long, Integer, String>> ratingsForEntityAndMeasurable = e.getValue();
 
                     ToIntFunction<Tuple3<Long, Integer, String>> compareByPositionAsc = t -> t.v2;
@@ -483,7 +485,7 @@ public class ReportGridDao {
                             .min(cmp)
                             .map(t -> ImmutableReportGridCell
                                     .builder()
-                                    .applicationId(applicationId)
+                                    .subjectId(entityId)
                                     .columnEntityId(measurableId)
                                     .columnEntityKind(EntityKind.MEASURABLE)
                                     .ratingId(t.v1)
@@ -495,7 +497,7 @@ public class ReportGridDao {
     }
 
 
-    private Set<ReportGridCell> fetchExactMeasurableData(Select<Record1<Long>> appSelector,
+    private Set<ReportGridCell> fetchExactMeasurableData(GenericSelector selector,
                                                          Set<Long> exactMeasurableIds) {
 
         if (exactMeasurableIds.size() == 0) {
@@ -512,13 +514,13 @@ public class ReportGridDao {
                 .innerJoin(mc).on(mc.ID.eq(m.MEASURABLE_CATEGORY_ID))
                 .innerJoin(rsi).on(rsi.CODE.eq(mr.RATING)).and(rsi.SCHEME_ID.eq(mc.RATING_SCHEME_ID))
                 .where(mr.MEASURABLE_ID.in(exactMeasurableIds))
-                .and(mr.ENTITY_ID.in(appSelector))
-                .and(mr.ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+                .and(mr.ENTITY_ID.in(selector.selector()))
+                .and(mr.ENTITY_KIND.eq(selector.kind().name()));
 
         return  dsl
                 .resultQuery(dsl.renderInlined(qry))
                 .fetchSet(r -> ImmutableReportGridCell.builder()
-                        .applicationId(r.get(mr.ENTITY_ID))
+                        .subjectId(r.get(mr.ENTITY_ID))
                         .columnEntityId(r.get(mr.MEASURABLE_ID))
                         .columnEntityKind(EntityKind.MEASURABLE)
                         .ratingId(r.get(rsi.ID))
@@ -527,7 +529,7 @@ public class ReportGridDao {
     }
 
 
-    private Set<ReportGridCell> fetchAssessmentData(Select<Record1<Long>> appSelector,
+    private Set<ReportGridCell> fetchAssessmentData(GenericSelector selector,
                                                     Set<Long> requiredAssessmentDefinitionIds) {
         if (requiredAssessmentDefinitionIds.size() == 0) {
             return emptySet();
@@ -539,10 +541,10 @@ public class ReportGridDao {
                             ar.DESCRIPTION)
                     .from(ar)
                     .where(ar.ASSESSMENT_DEFINITION_ID.in(requiredAssessmentDefinitionIds)
-                            .and(ar.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                            .and(ar.ENTITY_ID.in(appSelector)))
+                            .and(ar.ENTITY_KIND.eq(selector.kind().name()))
+                            .and(ar.ENTITY_ID.in(selector.selector())))
                     .fetchSet(r -> ImmutableReportGridCell.builder()
-                            .applicationId(r.get(ar.ENTITY_ID))
+                            .subjectId(r.get(ar.ENTITY_ID))
                             .columnEntityId(r.get(ar.ASSESSMENT_DEFINITION_ID))
                             .columnEntityKind(EntityKind.ASSESSMENT_DEFINITION)
                             .ratingId(r.get(ar.RATING_ID))
@@ -552,7 +554,7 @@ public class ReportGridDao {
     }
 
 
-    private Set<ReportGridCell> fetchSurveyQuestionResponseData(Select<Record1<Long>> appSelector,
+    private Set<ReportGridCell> fetchSurveyQuestionResponseData(GenericSelector selector,
                                                                 Set<Long> requiredSurveyQuestionIds) {
         if (requiredSurveyQuestionIds.size() == 0) {
             return emptySet();
@@ -587,8 +589,8 @@ public class ReportGridDao {
                     .on(SURVEY_QUESTION_RESPONSE.SURVEY_INSTANCE_ID.eq(SURVEY_INSTANCE.ID))
                     .where(SURVEY_INSTANCE.STATUS.in(APPROVED.name(), COMPLETED.name())
                             .and(SURVEY_QUESTION.ID.in(requiredSurveyQuestionIds))
-                            .and(SURVEY_INSTANCE.ENTITY_ID.in(appSelector))
-                            .and(SURVEY_INSTANCE.ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
+                            .and(SURVEY_INSTANCE.ENTITY_ID.in(selector.selector()))
+                            .and(SURVEY_INSTANCE.ENTITY_KIND.eq(selector.kind().name())))
                     .asTable();
 
 
@@ -599,8 +601,8 @@ public class ReportGridDao {
                     .from(SURVEY_QUESTION_LIST_RESPONSE)
                     .innerJoin(SURVEY_INSTANCE).on(SURVEY_QUESTION_LIST_RESPONSE.SURVEY_INSTANCE_ID.eq(SURVEY_INSTANCE.ID))
                     .where(SURVEY_QUESTION_LIST_RESPONSE.QUESTION_ID.in(requiredSurveyQuestionIds))
-                    .and(SURVEY_INSTANCE.ENTITY_ID.in(appSelector))
-                    .and(SURVEY_INSTANCE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                    .and(SURVEY_INSTANCE.ENTITY_ID.in(selector.selector()))
+                    .and(SURVEY_INSTANCE.ENTITY_KIND.eq(selector.kind().name()))
                     .fetchGroups(
                             k -> tuple(k.get(SURVEY_QUESTION_LIST_RESPONSE.SURVEY_INSTANCE_ID), k.get(SURVEY_QUESTION_LIST_RESPONSE.QUESTION_ID)),
                             v -> v.get(SURVEY_QUESTION_LIST_RESPONSE.RESPONSE));
@@ -623,7 +625,7 @@ public class ReportGridDao {
                         List<String> listResponses = responsesByInstanceQuestionKey.getOrDefault(tuple(instanceId, questionId), emptyList());
 
                         return ImmutableReportGridCell.builder()
-                                .applicationId(r.get(SURVEY_INSTANCE.ENTITY_ID))
+                                .subjectId(r.get(SURVEY_INSTANCE.ENTITY_ID))
                                 .columnEntityId(questionId)
                                 .columnEntityKind(EntityKind.SURVEY_QUESTION)
                                 .text(determineDisplayText(fieldType, entityName, response, listResponses))
@@ -662,6 +664,7 @@ public class ReportGridDao {
                 .lastUpdatedAt(toLocalDateTime(r.get(rg.LAST_UPDATED_AT)))
                 .lastUpdatedBy(r.get(rg.LAST_UPDATED_BY))
                 .columnDefinitions(getColumnDefinitions(condition))
+                .subjectKind(EntityKind.valueOf(r.get(rg.SUBJECT_KIND)))
                 .kind(ReportGridKind.valueOf(r.get(rg.KIND)))
                 .build();
     }

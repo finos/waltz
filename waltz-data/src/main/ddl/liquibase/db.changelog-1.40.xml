@@ -1,0 +1,57 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="db.changelog-1.40.xml">
+
+    <changeSet id="v1-38-tag"
+               author="woodjes">
+        <tagDatabase tag="v1.39"/> <!-- tag the current db version, i.e. the last  -->
+    </changeSet>
+
+    <changeSet id="20220121-5847-1"
+               author="woodjes">
+        <comment>5847: support for change initiatives in report grids</comment>
+        <addColumn tableName="report_grid">
+            <column name="subject_kind"
+                    type="${external-id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20220121-5847-2"
+               author="woodjes">
+        <comment>5847: support for change initiatives in report grids</comment>
+        <update tableName="report_grid">
+            <column name="subject_kind"
+                    value="APPLICATION"/>
+        </update>
+    </changeSet>
+
+    <changeSet id="20220121-5847-3"
+               author="woodjes">
+        <comment>5847: support for change initiatives in report grids</comment>
+        <addNotNullConstraint columnDataType="${external-id.type}"
+                              columnName="subject_kind"
+                              tableName="report_grid"/>
+    </changeSet>
+
+</databaseChangeLog>

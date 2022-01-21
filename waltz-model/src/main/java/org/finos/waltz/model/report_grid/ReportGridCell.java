@@ -35,7 +35,7 @@ public abstract class ReportGridCell implements CommentProvider {
     public abstract EntityKind columnEntityKind();  // x
     public abstract long columnEntityId();  // x
 
-    public abstract long applicationId(); // y
+    public abstract long subjectId(); // y
 
     @Nullable
     public abstract Long ratingId();
