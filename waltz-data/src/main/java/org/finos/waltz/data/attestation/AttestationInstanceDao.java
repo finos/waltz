@@ -301,7 +301,9 @@ public class AttestationInstanceDao {
                             .withRecursive(attestationRunsWithInvKind)
                             .with(runWithRequiredPeople)
                             .with(missingRecipients)
-                            .selectFrom(missingRecipients)
+                            .select(missingRecipients.field("instance_id", Long.class),
+                                    missingRecipients.field("user_id", String.class))
+                            .from(missingRecipients)
                             .fetch();
 
                     Result<Record1<Long>> toRemove = tx
@@ -309,7 +311,8 @@ public class AttestationInstanceDao {
                             .with(runWithRequiredPeople)
                             .with(recipientsToRemove)
                             .with(attestationRecipientIds)
-                            .selectFrom(attestationRecipientIds)
+                            .select(attestationRecipientIds.field("id", Long.class))
+                            .from(attestationRecipientIds)
                             .fetch();
 
                     return ImmutableAttestationSyncRecipientsResponse.builder()
