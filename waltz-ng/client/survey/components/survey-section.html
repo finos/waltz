@@ -159,11 +159,11 @@
                             </div>
                         </div>
 
-                        <!-- DUE DATE -->
+                        <!-- SUBMISSION DUE DATE -->
                         <div class="row">
                             <div class="col-md-3">
                                 <label>
-                                    Due date
+                                    Submission due date
                                     <span class="text-danger">*</span>
                                 </label>
                             </div>
@@ -176,6 +176,27 @@
                                 </waltz-date-picker-form-input>
                                 <div class="small help-block">
                                     When does this survey need to be completed by?
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- APPROVAL DUE DATE -->
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label>
+                                    Approval due date
+                                </label>
+                            </div>
+                            <div class="col-md-3">
+                                <waltz-date-picker-form-input id="approvalDueDate"
+                                                              required="false"
+                                                              place-holder="yyyy-MM-dd"
+                                                              format="yyyy-MM-dd"
+                                                              min-date="$ctrl.surveyRunForm.dueDate"
+                                                              model="$ctrl.surveyRunForm.approvalDueDate">
+                                </waltz-date-picker-form-input>
+                                <div class="small help-block">
+                                    When does this survey need to approved by an owner.  If not specified the submission due date will be used.
                                 </div>
                             </div>
                         </div>

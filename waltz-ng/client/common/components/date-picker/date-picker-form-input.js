@@ -23,7 +23,7 @@ import template from "./date-picker-form-input.html";
 const bindings = {
     id: "@?",
     placeHolder: "@",
-    required: "@?",
+    required: "<?",
     format: "@?",
     allowPastDates: "@?",
     model: "=",
@@ -41,6 +41,7 @@ const initialState = {
         formatYear: "yyyy",
         startingDay: 1
     },
+    required: false,
     format: "yyyy-MM-dd",
     datePickerOpened: false,
     placeHolder: "",
