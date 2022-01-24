@@ -17,10 +17,8 @@
  */
 
 import {initialiseData} from "../common";
-import * as SurveyUtils from "./survey-utils";
 import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
 import template from "./survey-instance-response-view.html";
-import {CORE_API} from "../common/services/core-api-utils";
 import SurveyViewer from "./components/svelte/inline-panel/SurveyViewer.svelte"
 
 

@@ -11,7 +11,14 @@
     import DataExtractLink from "../../../../common/svelte/DataExtractLink.svelte";
     import {createEventDispatcher} from "svelte";
 
+    const Modes = {
+        VIEW: "VIEW",
+        EDIT: "EDIT"
+    };
+
     export let instanceId;
+    export let additionalFooterActions = [];
+    export let mode = Modes.VIEW;
 
     let dispatch = createEventDispatcher();
 
@@ -59,6 +66,22 @@
         dispatch("showCloneWidget");
     }
 
+    let additionalViewActions = [
+        {
+            name: "Edit",
+            icon: "pencil",
+            state: "main.survey.instance.edit",
+            requiredPermission: "canEdit"
+        }];
+
+    let additionalEditActions = [
+        {
+            name: "View",
+            icon: "pencil",
+            state: "main.survey.instance.view"
+        }
+    ];
+
 </script>
 
 
@@ -68,6 +91,9 @@
     <div slot="post-title">
         <div class="mini-section">
             <SurveyActions on:action={onAction}
+                           additionalLinkActions={mode === Modes.EDIT
+                                ? additionalEditActions
+                                : additionalViewActions}
                            {survey}
                            {questionsWithResponse}/>
         </div>
@@ -137,12 +163,17 @@
                                  extractUrl="survey-run-response/instance/{survey?.surveyInstance.id}"
                                  styling="button"/>
             </div>
-            <div class="small" style="display: inline-block">
-                <button class="btn btn-info btn-xs"
-                        on:click={() => copyResponses()}>
-                    <Icon name="clone"/> Copy responses
-                </button>
-            </div>
+
+            {#each additionalFooterActions as action}
+                <div class="small"
+                     style="display: inline-block">
+                    <button class="btn btn-info btn-xs"
+                            on:click={action.onClick}>
+                        <Icon name={action.icon}/>
+                        {action.name}
+                    </button>
+                </div>
+            {/each}
 
         </div>
     </div>

@@ -104,6 +104,12 @@ function controller(serviceBroker, userService) {
         vm.visibility.showIssueSurveyBtn = isSurveyTargetKind(vm.parentEntityRef.kind);
     };
 
+    function toDate(fieldRef) {
+        return fieldRef
+            ? timeFormat("%Y-%m-%d")(fieldRef)
+            : null
+    }
+
     function save () {
         const recipientIds = _.map(vm.surveyRunForm.recipients, "id");
 
@@ -111,6 +117,8 @@ function controller(serviceBroker, userService) {
             toasts.error("Please provide at least one recipient");
             return;
         }
+        const submissionDueDate = toDate(vm.surveyRunForm.dueDate) ;
+        const approvalDueDate = toDate(vm.surveyRunForm.approvalDueDate) || submissionDueDate;
         const command = {
             name: vm.surveyRunForm.name,
             description: vm.surveyRunForm.description,
@@ -121,7 +129,8 @@ function controller(serviceBroker, userService) {
             },
             involvementKindIds: [],
             issuanceKind: vm.surveyRunForm.issuanceKind,
-            dueDate: vm.surveyRunForm.dueDate ? timeFormat("%Y-%m-%d")(vm.surveyRunForm.dueDate) : null,
+            dueDate: submissionDueDate,
+            approvalDueDate: approvalDueDate,
             contactEmail: vm.surveyRunForm.contactEmail
         };
 
