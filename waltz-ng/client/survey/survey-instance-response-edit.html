@@ -156,7 +156,6 @@
                                 </div>
                                 <div class="pull-right" style="padding-right: 1em;">
 
-
                                     <div ng-if="surveyResponseForm.$invalid"
                                          class="help-block">
                                         <waltz-icon name="warning"></waltz-icon>
@@ -171,6 +170,7 @@
             </div>
             <div class="col-md-4">
                 <waltz-svelte-component component="ctrl.SurveyViewerContextPanel"
+                                        mode="ctrl.mode"
                                         instance-id="ctrl.entityReference.id">
                 </waltz-svelte-component>
             </div>

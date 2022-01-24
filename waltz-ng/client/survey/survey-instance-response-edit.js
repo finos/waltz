@@ -34,7 +34,8 @@ const initialState = {
     surveyResponses: {},
     user: {},
     dropdownEntriesByQuestionId: {},
-    SurveyViewerContextPanel
+    SurveyViewerContextPanel,
+    mode: "EDIT"
 };
 
 const submissionConfirmationPrompt = `The survey cannot be edited once submitted.

@@ -11,8 +11,14 @@
     import DataExtractLink from "../../../../common/svelte/DataExtractLink.svelte";
     import {createEventDispatcher} from "svelte";
 
+    const Modes = {
+        VIEW: "VIEW",
+        EDIT: "EDIT"
+    };
+
     export let instanceId;
     export let additionalFooterActions = [];
+    export let mode = Modes.VIEW;
 
     let dispatch = createEventDispatcher();
 
@@ -60,6 +66,22 @@
         dispatch("showCloneWidget");
     }
 
+    let additionalViewActions = [
+        {
+            name: "Edit",
+            icon: "pencil",
+            state: "main.survey.instance.edit",
+            requiredPermission: "canEdit"
+        }];
+
+    let additionalEditActions = [
+        {
+            name: "View",
+            icon: "pencil",
+            state: "main.survey.instance.view"
+        }
+    ];
+
 </script>
 
 
@@ -69,6 +91,9 @@
     <div slot="post-title">
         <div class="mini-section">
             <SurveyActions on:action={onAction}
+                           additionalLinkActions={mode === Modes.EDIT
+                                ? additionalEditActions
+                                : additionalViewActions}
                            {survey}
                            {questionsWithResponse}/>
         </div>

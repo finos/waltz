@@ -107,6 +107,7 @@
          style="padding-left: 0">
         {#if activeMode === Modes.CONTEXT}
             <SurveyViewerContextPanel on:select={onChangeInstance}
+                                      mode="VIEW"
                                       {additionalFooterActions}
                                       instanceId={primaryEntityRef.id}/>
         {:else if activeMode === Modes.COPY_RESPONSES}
