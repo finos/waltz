@@ -14,6 +14,7 @@
     import {surveyInstanceViewStore} from "../../../../svelte-stores/survey-instance-view-store";
     import {surveyInstanceStore} from "../../../../svelte-stores/survey-instance-store";
     import CopySurveyResponsesPanel from "./CopySurveyResponsesPanel.svelte";
+    import Icon from "../../../../widgets/icon";
 
     export let primaryEntityRef;
 
@@ -23,6 +24,14 @@
     }
 
     let activeMode = Modes.CONTEXT
+
+    let additionalFooterActions = [
+        {
+            name: "Copy Responses",
+            icon: "clone",
+            onClick: () => activeMode = Modes.COPY_RESPONSES
+        }
+    ];
 
     let instanceCall, formDetailsCall, responsesCall;
 
@@ -98,7 +107,7 @@
          style="padding-left: 0">
         {#if activeMode === Modes.CONTEXT}
             <SurveyViewerContextPanel on:select={onChangeInstance}
-                                      on:showCloneWidget={() => activeMode = Modes.COPY_RESPONSES}
+                                      {additionalFooterActions}
                                       instanceId={primaryEntityRef.id}/>
         {:else if activeMode === Modes.COPY_RESPONSES}
             <CopySurveyResponsesPanel on:cancel={() => activeMode = Modes.CONTEXT}/>

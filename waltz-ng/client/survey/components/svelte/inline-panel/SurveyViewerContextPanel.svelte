@@ -12,6 +12,7 @@
     import {createEventDispatcher} from "svelte";
 
     export let instanceId;
+    export let additionalFooterActions = [];
 
     let dispatch = createEventDispatcher();
 
@@ -137,12 +138,17 @@
                                  extractUrl="survey-run-response/instance/{survey?.surveyInstance.id}"
                                  styling="button"/>
             </div>
-            <div class="small" style="display: inline-block">
-                <button class="btn btn-info btn-xs"
-                        on:click={() => copyResponses()}>
-                    <Icon name="clone"/> Copy responses
-                </button>
-            </div>
+
+            {#each additionalFooterActions as action}
+                <div class="small"
+                     style="display: inline-block">
+                    <button class="btn btn-info btn-xs"
+                            on:click={action.onClick}>
+                        <Icon name={action.icon}/>
+                        {action.name}
+                    </button>
+                </div>
+            {/each}
 
         </div>
     </div>
