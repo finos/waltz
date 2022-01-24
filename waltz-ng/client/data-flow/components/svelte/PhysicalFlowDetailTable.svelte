@@ -31,33 +31,33 @@
                 Clear all filters.
             </button>
         </NoData>
-    {:else}
-        <div class:waltz-scroll-region-250={_.size(filteredFlows) > 6}>
-            <table class="table table-condensed small">
-                <colgroup>
-                    <col style="width: 40%;">
-                    <col style="width: 30%;">
-                    <col style="width: 30%;">
-                </colgroup>
-                <thead>
-                <tr>
-                    <th>Physical Flow</th>
-                    <th>External Id</th>
-                    <th>Criticality</th>
-                </tr>
-                </thead>
-                <tbody>
-                {#each filteredFlows as physFlow}
-                    <tr>
-                        <td title={physFlow.specification}>
-                            <EntityLink ref={Object.assign({}, physFlow.specification, { name: truncate(physFlow.specification.name, 12) || "-" })}/>
-                        </td>
-                        <td title={physFlow.physicalFlowExternalId}>{truncate(physFlow.physicalFlowExternalId, 12)}</td>
-                        <td title={physFlow.criticality}>{physFlow.criticality}</td>
-                    </tr>
-                {/each}
-                </tbody>
-            </table>
-        </div>
     {/if}
+    <div class:waltz-scroll-region-250={_.size(filteredFlows) > 6}>
+        <table class="table table-condensed small">
+            <colgroup>
+                <col style="width: 40%;">
+                <col style="width: 30%;">
+                <col style="width: 30%;">
+            </colgroup>
+            <thead>
+            <tr>
+                <th>Physical Flow</th>
+                <th>External Id</th>
+                <th>Criticality</th>
+            </tr>
+            </thead>
+            <tbody>
+            {#each filteredFlows as physFlow}
+                <tr>
+                    <td title={physFlow.specification}>
+                        <EntityLink
+                            ref={Object.assign({}, physFlow.specification, { name: truncate(physFlow.specification.name, 12) || "-" })}/>
+                    </td>
+                    <td title={physFlow.physicalFlowExternalId}>{truncate(physFlow.physicalFlowExternalId, 12)}</td>
+                    <td title={physFlow.criticality}>{physFlow.criticality}</td>
+                </tr>
+            {/each}
+            </tbody>
+        </table>
+    </div>
 {/if}
