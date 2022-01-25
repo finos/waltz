@@ -34,35 +34,43 @@
 
 </script>
 
-<div style="margin-bottom: 1em;">
-    <h4>Flow Detail for: <EntityLink ref={$selectedClient}/></h4>
-    <div class="help-block small">
-        <Icon name="info-circle"/>Select a data type in the list below to filter the physical flows which share that data type.
-    </div>
-    <DataTypeDetailTable on:selectDecorator={focusOnDataType}
-                         {logicalFlowId}/>
-    <br>
-    <PhysicalFlowDetailTable {parentEntity}
+
+{#if logicalFlowId}
+    <div style="margin-bottom: 1em;">
+        <h4>Flow Detail for:
+            <EntityLink ref={$selectedClient}/>
+        </h4>
+        <div class="help-block small">
+            <Icon name="info-circle"/>
+            Select a data type in the list below to filter the physical flows which share that data type.
+        </div>
+        <DataTypeDetailTable on:selectDecorator={focusOnDataType}
                              {logicalFlowId}/>
-</div>
+        <br>
+        <PhysicalFlowDetailTable {parentEntity}
+                                 {logicalFlowId}/>
+    </div>
 
-<br>
+    <br>
 
-<div style="border-top: 1px dotted #eee; padding-top: 0.2em; margin-top: 0.2em">
-    <ul>
-        <li>
-            <button class="btn btn-skinny" on:click={() => focusOnEntity($selectedClient)}>
-                <Icon name="dot-circle-o"/>Focus diagram on {$selectedClient?.name}
-            </button>
-        </li>
-        <li>
-            <button class="btn btn-skinny"
-                     on:click={() => cancel()}>
-                <Icon name="times"/>Cancel
-            </button>
-        </li>
-    </ul>
-</div>
+    <div style="border-top: 1px dotted #eee; padding-top: 0.2em; margin-top: 0.2em">
+        <ul>
+            <li>
+                <button class="btn btn-skinny" on:click={() => focusOnEntity($selectedClient)}>
+                    <Icon name="dot-circle-o"/>
+                    Focus diagram on {$selectedClient?.name}
+                </button>
+            </li>
+            <li>
+                <button class="btn btn-skinny"
+                        on:click={() => cancel()}>
+                    <Icon name="times"/>
+                    Cancel
+                </button>
+            </li>
+        </ul>
+    </div>
+{/if}
 
 
 <style>
