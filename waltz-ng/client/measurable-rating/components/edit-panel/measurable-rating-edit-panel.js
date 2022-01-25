@@ -309,13 +309,13 @@ function controller($q,
     };
 
     vm.onRemoveAll = (categoryId) => {
-        if (confirm("Do you really want to remove all ratings in this category ?")) {
+        if (confirm("Do you really want to remove all ratings in this category which are not read-only?")) {
             serviceBroker
                 .execute(
                     CORE_API.MeasurableRatingStore.removeByCategory,
                     [vm.parentEntityRef, categoryId])
                 .then(r => {
-                    toasts.info("Removed all ratings for category");
+                    toasts.info("Removed all ratings for category which are not read-only");
                     vm.ratings = r.data;
                     recalcTabs();
                 })
