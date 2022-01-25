@@ -70,9 +70,12 @@
             role: member.role
         }
 
-        reportGridMemberStore.deleteRole(reportGridMember);
-        reloadMembers();
-        selectedMember = null;
+        let deletePromise = reportGridMemberStore.deleteRole(reportGridMember);
+        Promise.resolve(deletePromise)
+            .then(r => {
+                reloadMembers();
+                selectedMember = null;
+            })
     }
 
     function cancel(){
@@ -98,7 +101,7 @@
                 reloadMembers();
                 activeMode = Modes.VIEW;
             })
-            .catch(e => toasts.error(`Could not add ${p.name} as a subscriber to this grid.`))
+            .catch(e => toasts.error(`Could not add ${p.name} as a subscriber to this grid.` + e.error))
     }
 
 </script>
