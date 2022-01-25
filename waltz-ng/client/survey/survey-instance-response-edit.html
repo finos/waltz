@@ -42,139 +42,144 @@
     </waltz-page-header>
 
     <div class="waltz-page-summary waltz-page-summary-attach">
-        <waltz-survey-instance-summary instance-id="ctrl.surveyDetails.instance.id">
-        </waltz-survey-instance-summary>
-    </div>
+        <div class="row">
+            <div class="col-md-8">
 
-    <br>
-    <br>
+                <div class="alert alert-warning"
+                     ng-if="ctrl.surveyDetails.instance.status === 'EXPIRED'">
+                    <h4>Survey Expired</h4>
+                    <p>This survey response has been expired without being submitted.</p>
+                </div>
 
-    <waltz-section name="Responses"
-                   icon="pencil-square"
-                   ng-if="ctrl.surveyDetails.permissions.isParticipant && ctrl.instanceCanBeEdited">
-        <form name="surveyResponseForm"
-              class="form-horizontal waltz-survey-form"
-              role="form"
-              novalidate>
-            <div ng-repeat="groupedQuestion in ctrl.groupedQuestions track by groupedQuestion.sectionName"
-                 class="waltz-survey-question-section">
+                <div class="alert alert-warning"
+                     ng-if="ctrl.surveyDetails.instance.status === 'COMPLETED' || ctrl.surveyDetails.instance.status === 'APPROVED'">
+                    <h4>Survey Completed</h4>
+                    <p>
+                        This survey response has been completed and is no longer can be edited. Please follow this
+                        <a ui-sref="main.survey.instance.response.view ({ id: ctrl.surveyDetails.instance.id })">link</a>
+                        to view the responses.
+                    </p>
+                </div>
 
-                <h4 ng-bind="groupedQuestion.sectionName"
-                    class="text-muted">
-                </h4>
-                <hr>
+                <div class="alert alert-warning"
+                     ng-if="!ctrl.surveyDetails.permissions.isParticipant">
+                    <h4>Permission Denied</h4>
+                    <p>You don't have permission to respond to this survey.</p>
+                </div>
 
-                <div ng-repeat="question in groupedQuestion.questions track by question.id"
-                     class="waltz-survey-question-edit-row row">
-                    <div ng-attr-for="{{ question.id }}"
-                           class="col-md-3">
-                        <span ng-bind="question.questionText">
-                        </span>
-                        <span ng-if="question.isMandatory"
-                              class="text-danger">
-                            *
-                        </span>
-                        <!-- help text -->
-                        <waltz-markdown text="question.helpText"
-                                        style="display: block;"
-                                        class='small text-muted'>
-                        </waltz-markdown>
-                    </div>
+                <div ng-if="ctrl.surveyDetails.permissions.isParticipant && ctrl.instanceCanBeEdited">
+                    <form name="surveyResponseForm"
+                          class="form-horizontal waltz-survey-form"
+                          role="form"
+                          novalidate>
+                        <div ng-repeat="groupedQuestion in ctrl.groupedQuestions track by groupedQuestion.sectionName"
+                             class="waltz-survey-question-section">
 
-                    <!-- MAIN QUESTION INPUT -->
-                    <div class="col-md-9">
+                            <h4 ng-bind="groupedQuestion.sectionName"
+                                class="text-muted">
+                            </h4>
+                            <hr>
+
+                            <div ng-repeat="question in groupedQuestion.questions track by question.id"
+                                 class="waltz-survey-question-edit-row row">
+                                <div ng-attr-for="{{ question.id }}"
+                                     class="col-md-3">
+                            <span ng-bind="question.questionText">
+                            </span>
+                                    <span ng-if="question.isMandatory"
+                                          class="text-danger">
+                                *
+                            </span>
+                                    <!-- help text -->
+                                    <waltz-markdown text="question.helpText"
+                                                    style="display: block;"
+                                                    class='small text-muted'>
+                                    </waltz-markdown>
+                                </div>
+
+                                <!-- MAIN QUESTION INPUT -->
+                                <div class="col-md-9">
+                                    <div class="row">
+                                        <div ng-class="{
+                                        'col-md-12': !question.subQuestions,
+                                        'col-md-4': question.subQuestions
+                                     }">
+                                            <waltz-survey-response-input response="ctrl.surveyResponses[question.id]"
+                                                                         question="question"
+                                                                         options="ctrl.dropdownEntriesByQuestionId[question.id]"
+                                                                         instance-id="ctrl.surveyDetails.instance.id"
+                                                                         save-comment="ctrl.saveComment"
+                                                                         save-string-response="ctrl.saveStringResponse"
+                                                                         save-number-response="ctrl.saveNumberResponse"
+                                                                         save-boolean-response="ctrl.saveBooleanResponse"
+                                                                         save-entity-response="ctrl.saveEntityResponse"
+                                                                         save-entity-list-response="ctrl.saveEntityListResponse"
+                                                                         save-list-response="ctrl.saveListResponse"
+                                                                         save-date-response="ctrl.saveDateResponse">
+                                            </waltz-survey-response-input>
+                                        </div>
+
+                                        <!-- (optional) SUB QUESTION INPUTS -->
+                                        <div class="col-md-4"
+                                             ng-repeat="sq in question.subQuestions">
+                                            <waltz-survey-response-input response="ctrl.surveyResponses[sq.id]"
+                                                                         question="sq"
+                                                                         options="ctrl.dropdownEntriesByQuestionId[sq.id]"
+                                                                         instance-id="ctrl.surveyDetails.instance.id"
+                                                                         save-comment="ctrl.saveComment"
+                                                                         save-string-response="ctrl.saveStringResponse"
+                                                                         save-number-response="ctrl.saveNumberResponse"
+                                                                         save-boolean-response="ctrl.saveBooleanResponse"
+                                                                         save-entity-response="ctrl.saveEntityResponse"
+                                                                         save-entity-list-response="ctrl.saveEntityListResponse"
+                                                                         save-list-response="ctrl.saveListResponse"
+                                                                         save-date-response="ctrl.saveDateResponse">
+                                            </waltz-survey-response-input>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="row">
-                            <div ng-class="{
-                                    'col-md-12': !question.subQuestions,
-                                    'col-md-4': question.subQuestions
-                                 }">
-                                <waltz-survey-response-input response="ctrl.surveyResponses[question.id]"
-                                                             question="question"
-                                                             options="ctrl.dropdownEntriesByQuestionId[question.id]"
-                                                             instance-id="ctrl.surveyDetails.instance.id"
-                                                             save-comment="ctrl.saveComment"
-                                                             save-string-response="ctrl.saveStringResponse"
-                                                             save-number-response="ctrl.saveNumberResponse"
-                                                             save-boolean-response="ctrl.saveBooleanResponse"
-                                                             save-entity-response="ctrl.saveEntityResponse"
-                                                             save-entity-list-response="ctrl.saveEntityListResponse"
-                                                             save-list-response="ctrl.saveListResponse"
-                                                             save-date-response="ctrl.saveDateResponse">
-                                </waltz-survey-response-input>
-                            </div>
+                            <div class="col-sm-12">
+                                <div class="pull-right">
+                            <span ng-repeat="action in ctrl.availableStatusActions" >
+                                <a class="btn btn-xs"
+                                   ng-if="action.type.includes('response')"
+                                   ng-disabled="action.isDisabled(surveyResponseForm)"
+                                   ng-class="'btn-{{action.severity}}'"
+                                   ng-click="!action.isDisabled(surveyResponseForm) && ctrl.invokeStatusAction(action, ctrl.surveyDetails.instance.id)">
+                                    <span ng-bind="action.name"></span>
+                                </a>
+                            </span>
+                                </div>
+                                <div class="pull-right" style="padding-right: 1em;">
 
-                            <!-- (optional) SUB QUESTION INPUTS -->
-                            <div class="col-md-4"
-                                 ng-repeat="sq in question.subQuestions">
-                                <waltz-survey-response-input response="ctrl.surveyResponses[sq.id]"
-                                                             question="sq"
-                                                             options="ctrl.dropdownEntriesByQuestionId[sq.id]"
-                                                             instance-id="ctrl.surveyDetails.instance.id"
-                                                             save-comment="ctrl.saveComment"
-                                                             save-string-response="ctrl.saveStringResponse"
-                                                             save-number-response="ctrl.saveNumberResponse"
-                                                             save-boolean-response="ctrl.saveBooleanResponse"
-                                                             save-entity-response="ctrl.saveEntityResponse"
-                                                             save-entity-list-response="ctrl.saveEntityListResponse"
-                                                             save-list-response="ctrl.saveListResponse"
-                                                             save-date-response="ctrl.saveDateResponse">
-                                </waltz-survey-response-input>
+                                    <div ng-if="surveyResponseForm.$invalid"
+                                         class="help-block">
+                                        <waltz-icon name="warning"></waltz-icon>
+                                        Cannot submit until all mandatory questions are answered
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
-
-            <div class="row">
-                <div class="col-sm-12">
-                    <div class="pull-right">
-                        <span ng-repeat="action in ctrl.availableStatusActions" >
-                            <a class="btn btn-xs"
-                                ng-if="action.type.includes('response')"
-                                ng-disabled="action.isDisabled(surveyResponseForm)"
-                                ng-class="'btn-{{action.severity}}'"
-                                ng-click="!action.isDisabled(surveyResponseForm) && ctrl.invokeStatusAction(action, ctrl.surveyDetails.instance.id)">
-                                <span ng-bind="action.name"></span>
-                            </a>
-                        </span>
-                    </div>
-                    <div class="pull-right" style="padding-right: 1em;">
-
-
-                        <div ng-if="surveyResponseForm.$invalid"
-                             class="help-block">
-                            <waltz-icon name="warning"></waltz-icon>
-                            Cannot submit until all mandatory questions are answered
-                        </div>
-                    </div>
-
-                </div>
+            <div class="col-md-4">
+                <waltz-svelte-component component="ctrl.SurveyViewerContextPanel"
+                                        mode="ctrl.mode"
+                                        instance-id="ctrl.entityReference.id">
+                </waltz-svelte-component>
             </div>
+        </div>
 
-        </form>
-    </waltz-section>
-
-    <div class="alert alert-warning"
-         ng-if="ctrl.surveyDetails.instance.status === 'EXPIRED'">
-        <h4>Survey Expired</h4>
-        <p>This survey response has been expired without being submitted.</p>
     </div>
 
-    <div class="alert alert-warning"
-         ng-if="ctrl.surveyDetails.instance.status === 'COMPLETED' || ctrl.surveyDetails.instance.status === 'APPROVED'">
-        <h4>Survey Completed</h4>
-        <p>
-            This survey response has been completed and is no longer can be edited. Please follow this
-            <a ui-sref="main.survey.instance.response.view ({ id: ctrl.surveyDetails.instance.id })">link</a>
-            to view the responses.
-        </p>
-    </div>
-
-    <div class="alert alert-warning"
-         ng-if="!ctrl.surveyDetails.permissions.isParticipant">
-        <h4>Permission Denied</h4>
-        <p>You don't have permission to respond to this survey.</p>
-    </div>
+    <br>
+    <br>
 
     <!-- CHANGE LOG -->
     <waltz-dynamic-section-wrapper section="ctrl.changeLogSection"

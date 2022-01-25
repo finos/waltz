@@ -3,12 +3,36 @@
     import _ from "lodash";
     import {termSearch} from "../index";
     import Icon from "./Icon.svelte";
+    import {truncateMiddle} from "../string-utils";
 
     export let columnDefs = [];
     export let rowData = [];
     export let onSelectRow = () => console.log("selecting row")
 
     let qry = null;
+
+
+    function getColVal(col, row) {
+        const rawVal = _.get(
+            row,
+            col.field.split("."),
+            "-");
+
+        return col.maxLength
+            ? truncateMiddle(rawVal, col.maxLength)
+            : rawVal;
+    }
+
+
+    function getColTitle(col, row) {
+        return col.maxLength
+            ? _.get(
+                row,
+                col.field.split("."),
+                "-")
+            : null; // not truncated, therefore no title needed
+    }
+
 
     $: filteredRows = _.isEmpty(qry)
         ? rowData
@@ -61,7 +85,9 @@
                     <tr class="clickable"
                         on:click={() => onSelectRow(row)}>
                         {#each columnDefs as col}
-                            <td>{_.get(row, col.field.split("."), "-") || "-"}</td>
+                            <td title={getColTitle(col, row)}>
+                                {getColVal(col, row)}
+                            </td>
                         {/each}
                     </tr>
                 {/each}

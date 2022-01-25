@@ -103,7 +103,26 @@
             </td>
         </tr>
     {/if}
+    {#if !permissions?.isMetaEdit}
+        <tr>
+            <td colspan="2">
+                <span>
+                    <Icon name="info-circle"/>
+                    You do not have permissions to edit the recipients or owners of this survey.
+                    To make changes please contact:
+                </span>
+                <ul class="list-inline" style="display: inline-block">
+                    {#each owners as owner}
+                        <li>
+                            <a href="mailto:{owner.email}">
+                                {owner.email}
+                                <Icon name="envelope-o"/>
+                            </a>
+                        </li>
+                    {/each}
+                </ul>
+            </td>
+        </tr>
+    {/if}
     </tbody>
 </table>
-
-

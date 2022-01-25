@@ -15,40 +15,26 @@
  * See the License for the specific
  *
  */
+import template from "./reassign-recipients-view.html";
 
+import ReassignRecipientsView from "./svelte/recipients/ReassignRecipientsView.svelte"
 import {initialiseData} from "../common";
-import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
-import template from "./survey-instance-response-view.html";
-import SurveyViewer from "./components/svelte/inline-panel/SurveyViewer.svelte"
 
 
 const initialState = {
-    changeLogSection: dynamicSections.changeLogSection,
-    SurveyViewer
+    ReassignRecipientsView
 };
 
 
-function controller($stateParams) {
-
-    const vm = initialiseData(this, initialState);
-    const id = $stateParams.id;
-
-    vm.entityReference = {
-        id,
-        kind: "SURVEY_INSTANCE"
-    };
+function controller() {
+    initialiseData(this, initialState);
 }
 
-
-controller.$inject = [
-    "$stateParams",
-];
-
-
-const view = {
+const page = {
     controller,
-    controllerAs: "ctrl",
-    template
+    template,
+    controllerAs: "$ctrl"
 };
 
-export default view;
+
+export default page;
