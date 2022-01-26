@@ -69,6 +69,7 @@
             .then(r => {
                 toasts.success("Grid updated successfully")
                 selectGrid(r.data);
+                reportGridCall = reportGridStore.findForUser(true);
             })
             .catch(e => toasts.error("Could not update grid"));
     }
