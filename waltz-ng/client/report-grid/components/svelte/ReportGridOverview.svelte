@@ -65,7 +65,7 @@
                 selectGrid(r.data);
                 reportGridCall = reportGridStore.findForUser(true);
             })
-            .catch(e => toasts.error("Could not update grid"));
+            .catch(e => toasts.error("Could not update grid. " + e.error));
     }
 
     function remove(grid){

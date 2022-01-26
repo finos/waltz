@@ -3,6 +3,7 @@
     import {reportGridKinds} from "./report-grid-utils";
     import _ from "lodash";
     import {userStore} from "../../../svelte-stores/user-store";
+    import roles from "../../../user/system-roles";
 
     export let grid;
     export let doCancel = () => console.log("Cancel");
@@ -13,7 +14,7 @@
     $: userCall = userStore.load();
     $: user = $userCall.data;
 
-    $: isAdmin = _.includes(user?.roles, "ADMIN");
+    $: isGridAdmin = _.includes(user?.roles, roles.REPORT_GRID_ADMIN.key);
 
     function noChange(workingCopy) {
         return workingCopy?.name === grid?.name
@@ -55,7 +56,7 @@
             <label>
                 <input type="radio"
                        style="display: block"
-                       disabled={!isAdmin}
+                       disabled={!isGridAdmin}
                        checked={workingCopy.kind === reportGridKinds.PRIVATE.key}
                        bind:group={workingCopy.kind}
                        value={reportGridKinds.PRIVATE.key}>
@@ -66,7 +67,7 @@
             <label>
                 <input type="radio"
                        style="display: block;"
-                       disabled={!isAdmin}
+                       disabled={!isGridAdmin}
                        checked={workingCopy.kind === reportGridKinds.PUBLIC.key}
                        bind:group={workingCopy.kind}
                        value={reportGridKinds.PUBLIC.key}>
