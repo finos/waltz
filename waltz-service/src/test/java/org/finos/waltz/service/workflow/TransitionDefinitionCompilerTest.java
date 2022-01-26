@@ -1,13 +1,16 @@
 package org.finos.waltz.service.workflow;
 
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.finos.waltz.common.CollectionUtilities.find;
 import static org.finos.waltz.common.ListUtilities.asList;
-import static org.junit.Assert.*;
+import static org.finos.waltz.service.TestingUtilities.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 public class TransitionDefinitionCompilerTest {
 
@@ -43,22 +46,22 @@ public class TransitionDefinitionCompilerTest {
 
         List<CompiledTransitionDefinition> compiledDefns = TransitionDefinitionCompiler.compile(defns);
 
-        assertThrows("Definitions with invalid predicates should throw IllegalArgumentException",
-                IllegalArgumentException.class,
-                () -> TransitionDefinitionCompiler.compile(defnsWithError));
+        assertThrows(IllegalArgumentException.class,
+                () -> TransitionDefinitionCompiler.compile(defnsWithError),
+                "Definitions with invalid predicates should throw IllegalArgumentException");
 
         Optional<CompiledTransitionDefinition> compTrans1 = find(compiledDefns, d -> d.name().equalsIgnoreCase("transition1"));
         Optional<CompiledTransitionDefinition> compTrans2 = find(compiledDefns, d -> d.name().equalsIgnoreCase("transition2"));
 
         compTrans1
                 .ifPresent(d -> assertTrue(
-                        "Predicate for transition1 should compile and evaluate as true",
-                        (boolean) d.test(null)));
+                        (boolean) d.test(null),
+                        "Predicate for transition1 should compile and evaluate as true"));
 
         compTrans2
                 .ifPresent(d -> assertFalse(
-                        "Predicate for transition2 should compile and evaluate as false",
-                        (boolean) d.test(null)));
+                        (boolean) d.test(null),
+                        "Predicate for transition2 should compile and evaluate as false"));
 
     }
 

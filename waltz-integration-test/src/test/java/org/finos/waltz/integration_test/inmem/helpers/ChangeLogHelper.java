@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.finos.waltz.common.CollectionUtilities.find;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Service
 public class ChangeLogHelper {

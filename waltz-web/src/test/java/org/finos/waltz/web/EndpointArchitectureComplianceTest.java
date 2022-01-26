@@ -21,7 +21,7 @@ package org.finos.waltz.web;
 import org.finos.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.web.endpoints.extracts.DataExtractor;
 import com.tngtech.archunit.lang.ArchRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.stereotype.Service;
 
 import static com.tngtech.archunit.core.domain.JavaModifier.ABSTRACT;

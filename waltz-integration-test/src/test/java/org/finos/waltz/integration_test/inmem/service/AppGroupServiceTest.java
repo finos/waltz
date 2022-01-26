@@ -25,7 +25,7 @@ import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import org.finos.waltz.model.app_group.*;
 import org.finos.waltz.service.app_group.AppGroupService;
 import org.finos.waltz.service.app_group.AppGroupSubscription;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
@@ -33,7 +33,7 @@ import java.util.Set;
 
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkUserId;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class AppGroupServiceTest extends BaseInMemoryIntegrationTest {
 
@@ -44,7 +44,7 @@ public class AppGroupServiceTest extends BaseInMemoryIntegrationTest {
     @Test
     public void getGroupDetailByIdReturnsNullIfNotFound() {
         AppGroupDetail grp = appGroupSvc.getGroupDetailById(-1);
-        assertNull("expect null if group does not exist", grp);
+        assertNull(grp, "expect null if group does not exist");
     }
 
 
@@ -52,20 +52,22 @@ public class AppGroupServiceTest extends BaseInMemoryIntegrationTest {
     public void checkingDefaultsInNewlyCreatedGroup() {
         String userId = mkUserId("agtest");
         Long gid = appGroupSvc.createNewGroup(userId);
-        assertNotNull("Creating a new group gives it an id", gid);
+        assertNotNull(gid,"Creating a new group gives it an id");
 
         AppGroupDetail grp = appGroupSvc.getGroupDetailById(gid);
-        assertTrue("Newly created group has no applications", grp.applications().isEmpty());
-        assertTrue("Newly created group has no ou's", grp.organisationalUnits().isEmpty());
-        assertEquals("Groups are private by default", AppGroupKind.PRIVATE, grp.appGroup().appGroupKind());
-        assertEquals("Newly created group has one member", 1, grp.members().size());
+        assertTrue(grp.applications().isEmpty(),"Newly created group has no applications");
+        assertTrue(grp.organisationalUnits().isEmpty(),"Newly created group has no ou's");
+        assertEquals(AppGroupKind.PRIVATE, grp.appGroup().appGroupKind(),"Groups are private by default");
+        assertEquals(1, grp.members().size(),
+                "Newly created group has one member");
         AppGroupMember expectedMember = ImmutableAppGroupMember
                 .builder()
                 .groupId(gid)
                 .userId(userId)
                 .role(AppGroupMemberRole.OWNER)
                 .build();
-        assertEquals("Newly created group has owner as a member", ListUtilities.asList(expectedMember), grp.members());
+        assertEquals(ListUtilities.asList(expectedMember), grp.members(),
+                "Newly created group has owner as a member");
     }
 
 
@@ -84,10 +86,12 @@ public class AppGroupServiceTest extends BaseInMemoryIntegrationTest {
 
         AppGroupDetail updatedGrp = appGroupSvc.updateOverview(userId, newInfo);
 
-        assertEquals("Name can be updated", "new group name", updatedGrp.appGroup().name());
-        assertEquals("Description can be updated", "new group desc", updatedGrp.appGroup().description());
-        assertEquals("Group kind can be updated", AppGroupKind.PUBLIC, updatedGrp.appGroup().appGroupKind());
-        assertEquals("External id can be updated", Optional.of("agExtId"), updatedGrp.appGroup().externalId());
+        assertEquals("new group name", updatedGrp.appGroup().name(), "Name can be updated");
+        assertEquals("new group desc", updatedGrp.appGroup().description(), "Description can be updated");
+        assertEquals(AppGroupKind.PUBLIC, updatedGrp.appGroup().appGroupKind(),
+                "Group kind can be updated");
+        assertEquals(Optional.of("agExtId"), updatedGrp.appGroup().externalId(),
+                "External id can be updated");
     }
 
 
@@ -104,14 +108,14 @@ public class AppGroupServiceTest extends BaseInMemoryIntegrationTest {
                 .withName("new group name");
 
         assertThrows(
-                "cannot update if not an owner",
                 InsufficientPrivelegeException.class,
-                () -> appGroupSvc.updateOverview(delegateUserId, newInfo));
+                () -> appGroupSvc.updateOverview(delegateUserId, newInfo),
+                "cannot update if not an owner");
 
         assertThrows(
-                "non-owner cannot update owner list",
                 InsufficientPrivelegeException.class,
-                () -> appGroupSvc.addOwner(delegateUserId, gid, mkUserId("wibble")));
+                () -> appGroupSvc.addOwner(delegateUserId, gid, mkUserId("wibble")),
+                "non-owner cannot update owner list");
 
         appGroupSvc.addOwner(userId, gid, delegateUserId);
         appGroupSvc.updateOverview(delegateUserId, newInfo);
@@ -125,8 +129,10 @@ public class AppGroupServiceTest extends BaseInMemoryIntegrationTest {
                 .role(AppGroupMemberRole.OWNER)
                 .build();
 
-        assertTrue("delegate has been added", updatedGrpDetails.members().contains(delegateMember));
-        assertEquals("name has been updated", "new group name", updatedGrpDetails.appGroup().name());
+        assertTrue(updatedGrpDetails.members().contains(delegateMember),
+                "delegate has been added");
+        assertEquals( "new group name", updatedGrpDetails.appGroup().name(),
+                "name has been updated");
     }
 
 
@@ -134,7 +140,7 @@ public class AppGroupServiceTest extends BaseInMemoryIntegrationTest {
     public void removingAnOwnerDowngradesThemToViewer() throws InsufficientPrivelegeException {
         String userId = mkUserId("agtest");
         Long gid = appGroupSvc.createNewGroup(userId);
-        assertTrue("cannot remove owner", appGroupSvc.removeOwner(userId, gid, userId));
+        assertTrue(appGroupSvc.removeOwner(userId, gid, userId),"cannot remove owner");
 
         AppGroupMember viewer = ImmutableAppGroupMember
                 .builder()
@@ -143,7 +149,7 @@ public class AppGroupServiceTest extends BaseInMemoryIntegrationTest {
                 .role(AppGroupMemberRole.VIEWER)
                 .build();
 
-        assertEquals("still has self as viewer", asSet(viewer), appGroupSvc.getMembers(gid));
+        assertEquals(asSet(viewer), appGroupSvc.getMembers(gid),"still has self as viewer");
     }
 
 
@@ -157,7 +163,7 @@ public class AppGroupServiceTest extends BaseInMemoryIntegrationTest {
         appGroupSvc.removeOwner(userId, gid3, userId);  // downgrade to viewer
 
         Set<AppGroupSubscription> subs = appGroupSvc.findGroupSubscriptionsForUser(userId);
-        assertEquals("Expected 3 subscriptions for user", 3, subs.size());
+        assertEquals(3, subs.size(),"Expected 3 subscriptions for user");
         assertEquals(asSet(gid1, gid2, gid3), SetUtilities.map(subs, d -> d.appGroup().id().get()));
     }
 }

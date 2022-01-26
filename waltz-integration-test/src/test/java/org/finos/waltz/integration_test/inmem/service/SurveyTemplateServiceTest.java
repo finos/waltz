@@ -11,8 +11,8 @@ import org.finos.waltz.model.survey.*;
 import org.finos.waltz.service.survey.SurveyQuestionService;
 import org.finos.waltz.service.survey.SurveyTemplateService;
 import org.jooq.DSLContext;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +26,7 @@ import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkUserId
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.schema.tables.SurveyQuestion.SURVEY_QUESTION;
 import static org.finos.waltz.schema.tables.SurveyTemplate.SURVEY_TEMPLATE;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Service
 public class SurveyTemplateServiceTest extends BaseInMemoryIntegrationTest {
@@ -53,9 +53,9 @@ public class SurveyTemplateServiceTest extends BaseInMemoryIntegrationTest {
     @Test
     public void cannotFindAllIfNoMatchingPersonForUser() {
         assertThrows(
-                "should fail if no matching person",
                 IllegalArgumentException.class,
-                () -> surveyTemplateService.findAll("foo"));
+                () -> surveyTemplateService.findAll("foo"),
+                "should fail if no matching person");
     }
 
 
@@ -180,19 +180,19 @@ public class SurveyTemplateServiceTest extends BaseInMemoryIntegrationTest {
 
         long cloneId = surveyTemplateService.clone(userId, templateId);
 
-        assertTrue("clone id should be different", cloneId != templateId);
+        assertTrue(cloneId != templateId, "clone id should be different");
 
         SurveyTemplate cloned = surveyTemplateService.getById(cloneId);
 
-        assertEquals("status should have reset to DRAFT", ReleaseLifecycleStatus.DRAFT, cloned.status());
+        assertEquals(ReleaseLifecycleStatus.DRAFT, cloned.status(), "status should have reset to DRAFT");
         assertTrue(cloned.name().contains(templateName));
         assertTrue(lower(cloned.name()).contains("clone"));
 
-        assertEquals("Should have copied the question", 1, surveyQuestionService.findForSurveyTemplate(cloneId).size());
+        assertEquals(1, surveyQuestionService.findForSurveyTemplate(cloneId).size(), "Should have copied the question");
     }
 
 
-    @After
+    @AfterEach
     public void teardown() {
         dsl.deleteFrom(SURVEY_QUESTION).execute();
         dsl.deleteFrom(SURVEY_TEMPLATE).execute();

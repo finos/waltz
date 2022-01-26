@@ -32,8 +32,8 @@ import org.finos.waltz.model.attestation.*;
 import org.finos.waltz.service.attestation.AttestationInstanceService;
 import org.finos.waltz.service.attestation.AttestationRunService;
 import org.jooq.DSLContext;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -46,7 +46,7 @@ import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkUserId
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 import static org.finos.waltz.schema.tables.AttestationInstance.ATTESTATION_INSTANCE;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
 
@@ -103,7 +103,7 @@ public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void basicRetrieval() {
 
         long invId = involvementHelper.mkInvolvementKind(mkName("basicRetrieval"));
@@ -147,9 +147,9 @@ public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
                 .build();
 
         assertThrows(
-                "Should not be able to attest as user not associated to app",
                 UpdateFailedException.class,
-                () -> aiSvc.attestForEntity(user, cmd));
+                () -> aiSvc.attestForEntity(user, cmd),
+                "Should not be able to attest as user not associated to app");
     }
 
 
@@ -171,9 +171,9 @@ public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
                 .build();
 
         assertThrows(
-                "Should not be able to attest as no flows",
                 Exception.class,
-                () -> aiSvc.attestForEntity(user, cmd));
+                () -> aiSvc.attestForEntity(user, cmd),
+                "Should not be able to attest as no flows");
     }
 
 
@@ -212,13 +212,15 @@ public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
 
         resp.id().ifPresent(runId -> {
             List<AttestationInstance> instances = aiSvc.findByRunId(runId);
-            assertEquals("expected only one instance", 1, instances.size());
+            assertEquals( 1, instances.size(),"expected only one instance");
 
             AttestationInstance instance = first(instances);
             assertEquals(app, instance.parentEntity());
             assertEquals(EntityKind.LOGICAL_DATA_FLOW, instance.attestedEntityKind());
-            assertTrue("Should not have been attested", OptionalUtilities.isEmpty(instance.attestedAt()));
-            assertTrue("Should not have been attested", OptionalUtilities.isEmpty(instance.attestedBy()));
+            assertTrue(OptionalUtilities.isEmpty(instance.attestedAt()),
+                    "Should not have been attested");
+            assertTrue(OptionalUtilities.isEmpty(instance.attestedBy()),
+                    "Should not have been attested");
             assertEquals(runId, instance.attestationRunId());
 
             assertTrue(instance.id().isPresent());
@@ -240,7 +242,7 @@ public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
             assertEquals(instanceForApp, attestedInstance);
 
             List<AttestationRun> runsForApp = arSvc.findByEntityReference(app);
-            assertEquals("Can find runs via entity refs, e.g. for apps", 1, runsForApp.size());
+            assertEquals(1, runsForApp.size(), "Can find runs via entity refs, e.g. for apps");
             AttestationRun runForApp = first(runsForApp);
             assertEquals(Optional.of(runId), runForApp.id());
             assertEquals(runCreationUser, runForApp.issuedBy());

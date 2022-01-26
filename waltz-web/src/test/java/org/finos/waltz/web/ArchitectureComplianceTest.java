@@ -19,7 +19,8 @@
 package org.finos.waltz.web;
 
 import com.tngtech.archunit.library.GeneralCodingRules;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
 
 import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
 

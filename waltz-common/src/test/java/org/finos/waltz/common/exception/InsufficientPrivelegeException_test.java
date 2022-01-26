@@ -1,21 +1,20 @@
 package org.finos.waltz.common.exception;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class InsufficientPrivelegeException_test {
 
-    @Rule
-    public ExpectedException expectedEx = ExpectedException.none();
 
     @Test
     public void insufficientPrivelegeExceptionMessage() throws Exception {
-        expectedEx.expect(InsufficientPrivelegeException.class);
-        expectedEx.expectMessage("Insuffcient Privelege");
+        Throwable exception = assertThrows(InsufficientPrivelegeException.class, () -> {
+            System.out.println("=======Starting Exception process=======");
+            throw new InsufficientPrivelegeException("Insuffcient Privelege");
+        });
+        assertEquals(exception.getMessage(), "Insuffcient Privelege");
 
-        // do something that should throw the exception...
-        System.out.println("=======Starting Exception process=======");
-        throw new InsufficientPrivelegeException("Insuffcient Privelege");
     }
 }

@@ -18,10 +18,9 @@
 
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ArrayUtilities_mapTest {
 
@@ -39,17 +38,17 @@ public class ArrayUtilities_mapTest {
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void mapOverANullArrayThrowsException() {
-        ArrayUtilities.map(null, x -> x + "!");
+        assertThrows(IllegalArgumentException.class, ()
+                -> ArrayUtilities.map(null, x -> x + "!"));
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void notGivingAMapperThrowsException() {
         String[] xs = {};
-        ArrayUtilities.map(xs, null);
+        assertThrows(IllegalArgumentException.class, ()
+                -> ArrayUtilities.map(xs, null));
     }
-
-
 }

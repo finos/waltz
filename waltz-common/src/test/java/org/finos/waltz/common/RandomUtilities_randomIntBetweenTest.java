@@ -1,8 +1,11 @@
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertTrue;
+import java.util.Collections;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RandomUtilities_randomIntBetweenTest {
     @Test
@@ -11,18 +14,23 @@ public class RandomUtilities_randomIntBetweenTest {
         assertTrue(val<1);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void toggleRandomIntBetween(){
-        RandomUtilities.randomIntBetween(1,0);
+        assertThrows(IllegalArgumentException.class,
+                ()-> RandomUtilities.randomIntBetween(1,0));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void randomIntBetweenAllZero(){
-        RandomUtilities.randomIntBetween(0,0);
+
+        assertThrows(IllegalArgumentException.class,
+                ()-> RandomUtilities.randomIntBetween(0,0));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void randomIntBetweenAllOne(){
-        RandomUtilities.randomIntBetween(1,1);
+
+        assertThrows(IllegalArgumentException.class,
+                ()-> RandomUtilities.randomIntBetween(1,1));
     }
 }

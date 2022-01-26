@@ -39,5 +39,4 @@ These two requirements may not be easily met within corporate environments, henc
  Running the tests uses the standard way for executing unit tests.  The tests _will_
  take longer than typical tests, especially on the first run when Docker images
  are downloaded.
- 
   
