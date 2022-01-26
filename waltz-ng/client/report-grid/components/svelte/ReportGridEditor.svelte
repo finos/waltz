@@ -2,6 +2,7 @@
 
     import {reportGridKinds} from "./report-grid-utils";
     import _ from "lodash";
+    import {userStore} from "../../../svelte-stores/user-store";
 
     export let grid;
     export let doCancel = () => console.log("Cancel");
@@ -9,13 +10,18 @@
 
     let workingCopy = Object.assign({}, grid, {kind: grid?.kind || reportGridKinds.PRIVATE.key});
 
+    $: userCall = userStore.load();
+    $: user = $userCall.data;
+
+    $: isAdmin = _.includes(user?.roles, "ADMIN");
+
     function noChange(workingCopy) {
         return workingCopy?.name === grid?.name
             && workingCopy?.description === grid?.description
             && workingCopy?.kind === grid?.kind
     }
 
-    function notSubmittable(){
+    function notSubmittable() {
         return _.isEmpty(workingCopy?.name)
             || _.isEmpty(workingCopy?.name.trim())
             || _.isNull(workingCopy?.kind);
@@ -49,6 +55,7 @@
             <label>
                 <input type="radio"
                        style="display: block"
+                       disabled={!isAdmin}
                        checked={workingCopy.kind === reportGridKinds.PRIVATE.key}
                        bind:group={workingCopy.kind}
                        value={reportGridKinds.PRIVATE.key}>
@@ -59,11 +66,14 @@
             <label>
                 <input type="radio"
                        style="display: block;"
+                       disabled={!isAdmin}
                        checked={workingCopy.kind === reportGridKinds.PUBLIC.key}
                        bind:group={workingCopy.kind}
                        value={reportGridKinds.PUBLIC.key}>
                 {reportGridKinds.PUBLIC.name}
-                <div class="help-block small">Public - These grids can be viewed by everyone</div>
+                <div class="help-block small">Public - These grids can be viewed by everyone, please contact an Admin to
+                    set this grid to 'Public'
+                </div>
             </label>
         </div>
     </div>
