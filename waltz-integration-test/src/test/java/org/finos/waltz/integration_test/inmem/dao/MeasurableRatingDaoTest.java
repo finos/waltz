@@ -28,8 +28,8 @@ import org.finos.waltz.model.measurable_rating.ImmutableSaveMeasurableRatingComm
 import org.finos.waltz.model.measurable_rating.MeasurableRating;
 import org.finos.waltz.schema.Tables;
 import org.jooq.DSLContext;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -40,7 +40,7 @@ import static org.finos.waltz.common.CollectionUtilities.first;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 import static org.finos.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MeasurableRatingDaoTest extends BaseInMemoryIntegrationTest {
 
@@ -56,7 +56,7 @@ public class MeasurableRatingDaoTest extends BaseInMemoryIntegrationTest {
     @Autowired
     private DSLContext dsl;
 
-    @Before
+    @BeforeEach
     public void beforeMeasurableRatingTests() {
         dsl.deleteFrom(Tables.MEASURABLE_RATING).execute();
         dsl.deleteFrom(Tables.APPLICATION).execute();

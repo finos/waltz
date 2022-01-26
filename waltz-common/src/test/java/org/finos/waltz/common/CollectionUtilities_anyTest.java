@@ -18,7 +18,7 @@
 
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.List;
@@ -26,8 +26,7 @@ import java.util.function.Predicate;
 
 import static org.finos.waltz.common.CollectionUtilities.any;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CollectionUtilities_anyTest {
 
@@ -50,15 +49,15 @@ public class CollectionUtilities_anyTest {
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void anyOnANullCollectionThrowsIllegalArgException() {
-        any(null, x -> true);
+        assertThrows(IllegalArgumentException.class, () -> any(null, x -> true));
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void anyWithoutAPredicatedThrowsIllegalArgumentException() {
-        any(words, null);
+        assertThrows(IllegalArgumentException.class, () -> any(words, null));
     }
 
 }

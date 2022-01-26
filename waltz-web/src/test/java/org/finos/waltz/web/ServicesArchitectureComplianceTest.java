@@ -19,7 +19,7 @@
 package org.finos.waltz.web;
 
 import com.tngtech.archunit.lang.ArchRule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.stereotype.Service;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;

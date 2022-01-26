@@ -18,14 +18,14 @@
 
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.finos.waltz.common.CollectionUtilities.head;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CollectionUtilities_headTest {
 

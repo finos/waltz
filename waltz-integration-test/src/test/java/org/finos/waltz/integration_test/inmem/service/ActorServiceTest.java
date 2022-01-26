@@ -25,15 +25,18 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.actor.Actor;
 import org.finos.waltz.service.actor.ActorService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
+
 import static org.finos.waltz.common.CollectionUtilities.first;
 import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 
 public class ActorServiceTest extends BaseInMemoryIntegrationTest {
@@ -67,8 +70,10 @@ public class ActorServiceTest extends BaseInMemoryIntegrationTest {
         System.out.println("After creation: "+ svc.findAll());
         boolean deleted = svc.delete(id);
 
-        assertTrue("Actor should be deleted as not used in flows", deleted);
-        assertEquals("After deletion the count of actors should be the same as before the actor was added", preCount, svc.findAll().size());
+        assertTrue(deleted,
+                "Actor should be deleted as not used in flows");
+        assertEquals(preCount, svc.findAll().size(),
+                "After deletion the count of actors should be the same as before the actor was added");
     }
 
 
@@ -84,8 +89,10 @@ public class ActorServiceTest extends BaseInMemoryIntegrationTest {
         int preCount = svc.findAll().size();
         boolean wasDeleted = svc.delete(idA);
 
-        assertFalse("Actor should not be deleted as used in a flow", wasDeleted);
-        assertEquals("After attempted deletion the count of actors should be the same", preCount, svc.findAll().size());
+        assertFalse(wasDeleted,
+                "Actor should not be deleted as used in a flow");
+        assertEquals(preCount, svc.findAll().size(),
+                "After attempted deletion the count of actors should be the same");
     }
 
 

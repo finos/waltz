@@ -30,8 +30,8 @@ import org.finos.waltz.schema.Tables;
 import org.finos.waltz.service.attestation.AttestationPreCheckService;
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.jooq.DSLContext;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -40,8 +40,8 @@ import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static org.finos.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
 import static org.finos.waltz.schema.tables.DataType.DATA_TYPE;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AttestationPreCheckServiceTest extends BaseInMemoryIntegrationTest {
 
@@ -83,10 +83,10 @@ public class AttestationPreCheckServiceTest extends BaseInMemoryIntegrationTest 
         lfHelper.createLogicalFlowDecorators(flow.entityReference(), asSet(unkId));
 
         List<String> aResult = aipcSvc.calcLogicalFlowPreCheckFailures(aRef);
-        assertTrue("ok as unknown is outgoing", aResult.isEmpty());
+        assertTrue(aResult.isEmpty(),"ok as unknown is outgoing");
 
         List<String> bResult = aipcSvc.calcLogicalFlowPreCheckFailures(bRef);
-        assertFalse("should fail as unknown is incoming", bResult.isEmpty());
+        assertFalse(bResult.isEmpty(),"should fail as unknown is incoming");
     }
 
 
@@ -101,10 +101,10 @@ public class AttestationPreCheckServiceTest extends BaseInMemoryIntegrationTest 
         lfHelper.createLogicalFlowDecorators(flow.entityReference(), asSet(deprecatedTypeId));
 
         List<String> aResult = aipcSvc.calcLogicalFlowPreCheckFailures(aRef);
-        assertTrue("ok as deprecated is outgoing", aResult.isEmpty());
+        assertTrue(aResult.isEmpty(),"ok as deprecated is outgoing");
 
         List<String> bResult = aipcSvc.calcLogicalFlowPreCheckFailures(bRef);
-        assertFalse("should fail as deprecated is incoming", bResult.isEmpty());
+        assertFalse(bResult.isEmpty(),"should fail as deprecated is incoming");
     }
 
 
@@ -123,7 +123,7 @@ public class AttestationPreCheckServiceTest extends BaseInMemoryIntegrationTest 
                 bRef);
 
         List<String> bResult = aipcSvc.calcLogicalFlowPreCheckFailures(bRef);
-        assertTrue("should pass as target app is in exemption from deprecated flows group", bResult.isEmpty());
+        assertTrue(bResult.isEmpty(), "should pass as target app is in exemption from deprecated flows group");
     }
 
 
@@ -142,7 +142,7 @@ public class AttestationPreCheckServiceTest extends BaseInMemoryIntegrationTest 
                 bRef);
 
         List<String> bResult = aipcSvc.calcLogicalFlowPreCheckFailures(bRef);
-        assertTrue("should pass as target app is in exemption from unknown flows group", bResult.isEmpty());
+        assertTrue(bResult.isEmpty(), "should pass as target app is in exemption from unknown flows group");
     }
 
 
@@ -156,7 +156,7 @@ public class AttestationPreCheckServiceTest extends BaseInMemoryIntegrationTest 
 
         List<String> result = aipcSvc.calcLogicalFlowPreCheckFailures(appRef);
 
-        assertTrue("should be allowed to attest as in the no-flows exemption group", result.isEmpty());
+        assertTrue(result.isEmpty(),"should be allowed to attest as in the no-flows exemption group");
     }
 
 
@@ -178,7 +178,7 @@ public class AttestationPreCheckServiceTest extends BaseInMemoryIntegrationTest 
     }
 
 
-    @After
+    @AfterEach
     public void removeExemptionGroups() {
         dsl.deleteFrom(Tables.APPLICATION_GROUP)
                 .where(APPLICATION_GROUP.EXTERNAL_ID.eq(AttestationPreCheckDao.GROUP_LOGICAL_FLOW_ATTESTATION_EXEMPT_FROM_FLOW_COUNT_CHECK))

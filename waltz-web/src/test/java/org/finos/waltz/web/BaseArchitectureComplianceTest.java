@@ -26,7 +26,8 @@ import com.tngtech.archunit.lang.ArchCondition;
 import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
 import org.finos.waltz.common.SetUtilities;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
+
 
 import java.util.Collection;
 import java.util.Map;
@@ -46,7 +47,7 @@ public class BaseArchitectureComplianceTest {
     static JavaClasses waltzAndJavaUtilClasses = null;
     static JavaClasses waltzOnlyClasses = null;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeClass() {
         configureLogging();
         waltzAndJavaUtilClasses = new ClassFileImporter().importPackages("org.finos", "java.util");

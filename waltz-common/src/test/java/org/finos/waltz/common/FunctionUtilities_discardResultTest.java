@@ -1,6 +1,6 @@
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class FunctionUtilities_discardResultTest {
     @Test

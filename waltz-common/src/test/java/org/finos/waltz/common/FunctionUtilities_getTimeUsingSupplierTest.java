@@ -19,9 +19,10 @@
 package org.finos.waltz.common;
 
 import org.jooq.lambda.Unchecked;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static junit.framework.TestCase.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 public class FunctionUtilities_getTimeUsingSupplierTest {
 

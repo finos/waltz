@@ -6,15 +6,15 @@ import org.apache.commons.jexl3.JexlExpression;
 import org.apache.commons.jexl3.MapContext;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 
 import static org.finos.waltz.common.SetUtilities.asSet;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PredicateEvaluatorTest {
 
@@ -61,10 +61,10 @@ public class PredicateEvaluatorTest {
 
         MapContext ctx = createContext(contextVariables);
 
-        assertTrue("pred1Expr should evaluate true, rating equals A", evaluatePredicate(pred1Expr, ctx));
-        assertTrue("pred2Expr should evaluate true, survey value equals 'yes", evaluatePredicate(pred2Expr, ctx));
-        assertFalse("pred3Expr should evaluate false, rating equals A", evaluatePredicate(pred3Expr, ctx));
-        assertFalse("Invalid expressions should return false", evaluatePredicate(invalidExpr, ctx));
+        assertTrue(evaluatePredicate(pred1Expr, ctx), "pred1Expr should evaluate true, rating equals A");
+        assertTrue(evaluatePredicate(pred2Expr, ctx), "pred2Expr should evaluate true, survey value equals 'yes");
+        assertFalse(evaluatePredicate(pred3Expr, ctx), "pred3Expr should evaluate false, rating equals A");
+        assertFalse(evaluatePredicate(invalidExpr, ctx), "Invalid expressions should return false");
 
         Object evaluate = invalidExpr.evaluate(ctx);
 

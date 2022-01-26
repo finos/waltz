@@ -36,7 +36,7 @@ import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.finos.waltz.service.physical_flow.PhysicalFlowService;
 import org.finos.waltz.service.physical_specification.PhysicalSpecificationService;
 import org.finos.waltz.service.physical_specification_definition.PhysicalSpecDefinitionService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;
@@ -53,7 +53,7 @@ import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 import static org.finos.waltz.model.entity_search.EntitySearchOptions.mkForEntity;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTest {
 
@@ -84,25 +84,25 @@ public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTes
     public void getById() {
 
         PhysicalSpecification unknownId = psSvc.getById(-1);
-        assertNull("If unknown id returns null", unknownId);
+        assertNull(unknownId, "If unknown id returns null");
 
         EntityReference a = appHelper.createNewApp("a", ouIds.a);
         Long specId = psHelper.createPhysicalSpec(a, "getById");
 
         PhysicalSpecification spec = psSvc.getById(specId);
 
-        assertEquals("getById returns correct physical specification with correct owning entity", a, spec.owningEntity());
-        assertTrue("getById returns correct physical specification", spec.name().startsWith("getById"));
+        assertEquals(a, spec.owningEntity(), "getById returns correct physical specification with correct owning entity");
+        assertTrue(spec.name().startsWith("getById"), "getById returns correct physical specification");
     }
 
     @Test
     public void findByEntityReference() {
-        assertThrows("Throws exception if entity reference is null",
-                IllegalArgumentException.class,
-                () -> psSvc.findByEntityReference(null));
+        assertThrows(IllegalArgumentException.class,
+                () -> psSvc.findByEntityReference(null),
+                "Throws exception if entity reference is null");
 
         Set<PhysicalSpecification> whereEntityUnrelated = psSvc.findByEntityReference(mkRef(EntityKind.COST_KIND, -1));
-        assertEquals("Returns an empty set where entity is not related", emptySet(), whereEntityUnrelated);
+        assertEquals(emptySet(), whereEntityUnrelated, "Returns an empty set where entity is not related");
 
         EntityReference a = appHelper.createNewApp("a", ouIds.a);
         EntityReference b = appHelper.createNewApp("b", ouIds.a1);
@@ -112,19 +112,19 @@ public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTes
 
         Set<PhysicalSpecification> returnsAsSetEvenIfMultipleLinksToSpec = psSvc.findByEntityReference(a);
 
-        assertEquals("Should return if no flows but is owning entity",
-                asSet(a.id()),
-                map(returnsAsSetEvenIfMultipleLinksToSpec, d -> d.owningEntity().id()));
+        assertEquals(asSet(a.id()),
+                map(returnsAsSetEvenIfMultipleLinksToSpec, d -> d.owningEntity().id()),
+                "Should return if no flows but is owning entity");
 
         Set<PhysicalSpecification> noFlows = psSvc.findByEntityReference(b);
-        assertEquals("Should return empty set for an application if not owner or linked by flow", emptySet(), noFlows);
+        assertEquals(emptySet(), noFlows, "Should return empty set for an application if not owner or linked by flow");
 
         PhysicalFlowCreateCommandResponse physFlow = pfHelper.createPhysicalFlow(flow.entityReference().id(), specId, mkName("findByEntityReference"));
 
         Set<PhysicalSpecification> linkedByPhysFlow = psSvc.findByEntityReference(b);
-        assertEquals("Should return specs for an application if linked to a flow",
-                asSet(specId),
-                map(linkedByPhysFlow, d -> d.entityReference().id()));
+        assertEquals(asSet(specId),
+                map(linkedByPhysFlow, d -> d.entityReference().id()),
+                "Should return specs for an application if linked to a flow");
     }
 
 
@@ -133,15 +133,15 @@ public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTes
 
         String username = mkName("markRemovedIfUnused");
 
-        assertThrows("Throws exception if entity reference is null",
-                IllegalArgumentException.class,
-                () -> psSvc.markRemovedIfUnused(null, username));
+        assertThrows(IllegalArgumentException.class,
+                () -> psSvc.markRemovedIfUnused(null, username),
+                "Throws exception if entity reference is null");
 
         ImmutablePhysicalSpecificationDeleteCommand noSpecCmd = ImmutablePhysicalSpecificationDeleteCommand.builder().specificationId(-1L).build();
 
         CommandResponse<PhysicalSpecificationDeleteCommand> responseNoSpec = psSvc.markRemovedIfUnused(noSpecCmd, username);
-        assertEquals("Fails to mark removed if spec not found", CommandOutcome.FAILURE, responseNoSpec.outcome());
-        assertEquals("Should inform of reason for failure", "Specification not found", responseNoSpec.message().get());
+        assertEquals(CommandOutcome.FAILURE, responseNoSpec.outcome(), "Fails to mark removed if spec not found");
+        assertEquals("Specification not found", responseNoSpec.message().get(), "Should inform of reason for failure");
 
         EntityReference a = appHelper.createNewApp("a", ouIds.a);
         EntityReference b = appHelper.createNewApp("b", ouIds.a1);
@@ -152,21 +152,21 @@ public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTes
 
         ImmutablePhysicalSpecificationDeleteCommand deleteCmd = ImmutablePhysicalSpecificationDeleteCommand.builder().specificationId(specId).build();
         CommandResponse<PhysicalSpecificationDeleteCommand> responseWithUnderlyingFlows = psSvc.markRemovedIfUnused(deleteCmd, username);
-        assertEquals("Should not remove spec if underlying flows", CommandOutcome.FAILURE, responseWithUnderlyingFlows.outcome());
-        assertEquals("Should inform of reason for failure", "This specification cannot be deleted as it is being referenced by one or more physical flows", responseWithUnderlyingFlows.message().get());
+        assertEquals(CommandOutcome.FAILURE, responseWithUnderlyingFlows.outcome(), "Should not remove spec if underlying flows");
+        assertEquals("This specification cannot be deleted as it is being referenced by one or more physical flows", responseWithUnderlyingFlows.message().get(), "Should inform of reason for failure");
 
         pfHelper.deletePhysicalFlow(physicalFlow.entityReference().id());
 
         CommandResponse<PhysicalSpecificationDeleteCommand> responseWithNoUnderlyingFlows = psSvc.markRemovedIfUnused(deleteCmd, username);
-        assertEquals("Should not remove spec if underlying flows", CommandOutcome.SUCCESS, responseWithNoUnderlyingFlows.outcome());
+        assertEquals(CommandOutcome.SUCCESS, responseWithNoUnderlyingFlows.outcome(), "Should not remove spec if underlying flows");
     }
 
 
     @Test
     public void findByIds(){
-        assertEquals("Returns empty list if id list is null", emptyList(), psSvc.findByIds(null));
-        assertEquals("Returns empty list if empty list provided", emptyList(), psSvc.findByIds(emptyList()));
-        assertEquals("Returns empty set if empty ids cannot be found", emptyList(), psSvc.findByIds(asList(-1L)));
+        assertEquals(emptyList(), psSvc.findByIds(null), "Returns empty list if id list is null");
+        assertEquals(emptyList(), psSvc.findByIds(emptyList()), "Returns empty list if empty list provided");
+        assertEquals(emptyList(), psSvc.findByIds(asList(-1L)), "Returns empty set if empty ids cannot be found");
 
         EntityReference a = appHelper.createNewApp("a", ouIds.a);
         EntityReference b = appHelper.createNewApp("b", ouIds.a1);
@@ -175,39 +175,39 @@ public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTes
         Long specId2 = psHelper.createPhysicalSpec(b, "findByEntityReference");
 
         Collection<PhysicalSpecification> specs = psSvc.findByIds(asList(specId, specId2));
-        assertEquals("Returns correct list of ids", asSet(specId, specId2), map(specs, d -> d.entityReference().id()));
+        assertEquals(asSet(specId, specId2), map(specs, d -> d.entityReference().id()), "Returns correct list of ids");
 
         psHelper.removeSpec(specId2);
         Collection<PhysicalSpecification> specsAfterRemoval = psSvc.findByIds(asList(specId, specId2));
-        assertEquals("Returns all specs by id, even if removed", asSet(specId, specId2), map(specsAfterRemoval, d -> d.entityReference().id()));
+        assertEquals(asSet(specId, specId2), map(specsAfterRemoval, d -> d.entityReference().id()), "Returns all specs by id, even if removed");
 
         Collection<PhysicalSpecification> withNullInList = psSvc.findByIds(asList(specId, null));
-        assertEquals("Returns specs for all ids that are not null", asSet(specId), map(withNullInList, d -> d.entityReference().id()));
+        assertEquals(asSet(specId), map(withNullInList, d -> d.entityReference().id()), "Returns specs for all ids that are not null");
     }
 
 
     @Test
     public void updateExternalId() {
-        assertThrows("Should throw exception if spec id is null",
-                IllegalArgumentException.class,
-                () -> psSvc.updateExternalId(null, null));
+        assertThrows(IllegalArgumentException.class,
+                () -> psSvc.updateExternalId(null, null),
+                "Should throw exception if spec id is null");
 
         EntityReference a = appHelper.createNewApp("a", ouIds.a);
 
         Long specId = psHelper.createPhysicalSpec(a, "findByEntityReference");
 
-        assertThrows("Throws exception if new external id is null",
-                IllegalArgumentException.class,
-                () -> psSvc.updateExternalId(specId, null));
+        assertThrows(IllegalArgumentException.class,
+                () -> psSvc.updateExternalId(specId, null),
+                "Throws exception if new external id is null");
 
         int unknownSpec = psSvc.updateExternalId(-1L, "UPDATED");
-        assertEquals("Should be no updates where unknown spec", 0, unknownSpec);
+        assertEquals(0, unknownSpec, "Should be no updates where unknown spec");
 
         int updatedSpecCount = psSvc.updateExternalId(specId, "UPDATED");
-        assertEquals("Should be one update where spec exists", 1, updatedSpecCount);
+        assertEquals(1, updatedSpecCount, "Should be one update where spec exists");
 
         PhysicalSpecification updatedSpec = psSvc.getById(specId);
-        assertEquals("Spec id should be updated", "UPDATED", updatedSpec.externalId().get());
+        assertEquals("UPDATED", updatedSpec.externalId().get(), "Spec id should be updated");
     }
 
 
@@ -215,23 +215,23 @@ public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTes
     public void makeActive() {
         String username = mkName("makeActive");
 
-        assertThrows("Should throw exception if spec id is null",
-                IllegalArgumentException.class,
-                () -> psSvc.makeActive(null, username));
+        assertThrows(IllegalArgumentException.class,
+                () -> psSvc.makeActive(null, username),
+                "Should throw exception if spec id is null");
 
         EntityReference a = appHelper.createNewApp("a", ouIds.a);
         Long specId = psHelper.createPhysicalSpec(a, "findByEntityReference");
 
         int active = psSvc.makeActive(specId, username);
-        assertEquals("Will still update even if the spec is already active", 1, active);
+        assertEquals(1, active, "Will still update even if the spec is already active");
 
         psHelper.removeSpec(specId);
         int madeActive = psSvc.makeActive(specId, username);
-        assertEquals("Will update removed flows to active", 1, madeActive);
+        assertEquals(1, madeActive, "Will update removed flows to active");
 
-        assertThrows("Should throw exception if username is null as cannot be logged",
-                IllegalArgumentException.class,
-                () -> psSvc.makeActive(specId, null));
+        assertThrows(IllegalArgumentException.class,
+                () -> psSvc.makeActive(specId, null),
+                "Should throw exception if username is null as cannot be logged");
 
     }
 
@@ -247,9 +247,9 @@ public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTes
         Long specId = psHelper.createPhysicalSpec(a, "findByEntityReference");
         pfHelper.createPhysicalFlow(flow.entityReference().id(), specId, username);
 
-        assertThrows("Should throw exception if username is null as cannot be logged",
-                IllegalArgumentException.class,
-                () -> psSvc.propagateDataTypesToLogicalFlows(null, specId));
+        assertThrows(IllegalArgumentException.class,
+                () -> psSvc.propagateDataTypesToLogicalFlows(null, specId),
+                "Should throw exception if username is null as cannot be logged");
 
         Long dt1Id = dtHelper.createDataType("dt1");
         Long dt2Id = dtHelper.createDataType("dt2");
@@ -258,24 +258,24 @@ public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTes
         psSvc.propagateDataTypesToLogicalFlows(username, specId);
 
         List<DataTypeDecorator> lfDecorators = lfHelper.fetchDecoratorsForFlow(flow.entityReference().id());
-        assertEquals("Propagating does not remove data types from the logical",
-                asSet(dt1Id),
-                map(lfDecorators, DataTypeDecorator::dataTypeId));
+        assertEquals(asSet(dt1Id),
+                map(lfDecorators, DataTypeDecorator::dataTypeId),
+                "Propagating does not remove data types from the logical");
 
         dtdSvc.updateDecorators(username, mkRef(EntityKind.PHYSICAL_SPECIFICATION, specId), asSet(dt1Id), emptySet());
         psSvc.propagateDataTypesToLogicalFlows(username, specId);
 
-        assertEquals("Can handle data types that already exist on the logical flow",
-                asSet(dt1Id),
-                map(lfDecorators, DataTypeDecorator::dataTypeId));
+        assertEquals(asSet(dt1Id),
+                map(lfDecorators, DataTypeDecorator::dataTypeId),
+                "Can handle data types that already exist on the logical flow");
 
         dtdSvc.updateDecorators(username, mkRef(EntityKind.PHYSICAL_SPECIFICATION, specId), asSet(dt2Id), emptySet());
         psSvc.propagateDataTypesToLogicalFlows(username, specId);
         List<DataTypeDecorator> lfDecoratorsWithSpecDts = lfHelper.fetchDecoratorsForFlow(flow.entityReference().id());
 
-        assertEquals("Adds data types that are not currently on the logical flow",
-                asSet(dt1Id, dt2Id),
-                map(lfDecoratorsWithSpecDts, DataTypeDecorator::dataTypeId));
+        assertEquals(asSet(dt1Id, dt2Id),
+                map(lfDecoratorsWithSpecDts, DataTypeDecorator::dataTypeId),
+                "Adds data types that are not currently on the logical flow");
     }
 
 
@@ -283,9 +283,9 @@ public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTes
     public void create(){
         String username = mkName("create");
 
-        assertThrows("Should throw exception if create command is null",
-                IllegalArgumentException.class,
-                () -> psSvc.create(null));
+        assertThrows(IllegalArgumentException.class,
+                () -> psSvc.create(null),
+                "Should throw exception if create command is null");
 
         EntityReference a = appHelper.createNewApp("a", ouIds.a);
 
@@ -305,21 +305,21 @@ public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTes
         Long specId = psSvc.create(createCommand);
 
         PhysicalSpecification spec = psSvc.getById(specId);
-        assertEquals("Spec id should be created", specId, spec.id().get());
-        assertEquals("Spec id should be have the same externalId", name, spec.name());
+        assertEquals(specId, spec.id().get(), "Spec id should be created");
+        assertEquals(name, spec.name(), "Spec id should be have the same externalId");
 
-        assertThrows("Cannot create a specification with an id that exists",
-                IllegalArgumentException.class,
-                () -> psSvc.create(ImmutablePhysicalSpecification.copyOf(spec)));
+        assertThrows(IllegalArgumentException.class,
+                () -> psSvc.create(ImmutablePhysicalSpecification.copyOf(spec)),
+                "Cannot create a specification with an id that exists");
 
     }
 
 
     @Test
     public void isUsed() {
-        assertThrows("Specification id must not be null",
-                IllegalArgumentException.class,
-                () -> psSvc.isUsed(null));
+        assertThrows(IllegalArgumentException.class,
+                () -> psSvc.isUsed(null),
+                "Specification id must not be null");
 
         String username = mkName("propagateDataTypesToLogicalFlows");
         EntityReference a = appHelper.createNewApp("a", ouIds.a);
@@ -328,21 +328,21 @@ public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTes
         LogicalFlow flow = lfHelper.createLogicalFlow(a, b);
         Long specId = psHelper.createPhysicalSpec(a, "findByEntityReference");
 
-        assertFalse("Should return false when so physical flows", psSvc.isUsed(specId));
+        assertFalse(psSvc.isUsed(specId), "Should return false when so physical flows");
 
         PhysicalFlowCreateCommandResponse physicalFlow = pfHelper.createPhysicalFlow(flow.entityReference().id(), specId, username);
-        assertTrue("Should return false when associated physical flows", psSvc.isUsed(specId));
+        assertTrue(psSvc.isUsed(specId), "Should return false when associated physical flows");
 
         pfHelper.deletePhysicalFlow(physicalFlow.entityReference().id());
-        assertFalse("Should return false when all physical flows are removed", psSvc.isUsed(specId));
+        assertFalse(psSvc.isUsed(specId), "Should return false when all physical flows are removed");
     }
 
 
     @Test
     public void findBySelector() {
-        assertThrows("Options cannot be null",
-                IllegalArgumentException.class,
-                () -> psSvc.findBySelector(null));
+        assertThrows(IllegalArgumentException.class,
+                () -> psSvc.findBySelector(null),
+                "Options cannot be null");
 
         EntityReference a = appHelper.createNewApp("a", ouIds.a);
         Long specId = psHelper.createPhysicalSpec(a, "findByEntityReference");
@@ -350,8 +350,8 @@ public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTes
         IdSelectionOptions specOpts = mkOpts(mkRef(EntityKind.PHYSICAL_SPECIFICATION, specId));
 
         Collection<PhysicalSpecification> specs = psSvc.findBySelector(specOpts);
-        assertEquals("When selector is a spec only returns one result", 1, specs.size());
-        assertEquals("Returns spec when using spec selector", specId, first(specs).id().get());
+        assertEquals(1, specs.size(), "When selector is a spec only returns one result");
+        assertEquals(specId, first(specs).id().get(), "Returns spec when using spec selector");
 
         EntityReference b = appHelper.createNewApp("b", ouIds.a1);
         LogicalFlow flow = lfHelper.createLogicalFlow(a, b);
@@ -364,55 +364,55 @@ public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTes
                 .createPhysicalFlow(flow.entityReference().id(), specId2, mkName("findBySelector"));
 
         IdSelectionOptions appOpts = mkOpts(mkRef(EntityKind.APPLICATION, b.id()));
-        assertThrows("Throws exception  for unsupported entity kinds",
-                UnsupportedOperationException.class,
-                () -> psSvc.findBySelector(appOpts));
+        assertThrows(UnsupportedOperationException.class,
+                () -> psSvc.findBySelector(appOpts),
+                "Throws exception  for unsupported entity kinds");
 
         IdSelectionOptions flowOpts = mkOpts(mkRef(EntityKind.LOGICAL_DATA_FLOW, flow.entityReference().id()));
         Collection<PhysicalSpecification> specsForFlow = psSvc.findBySelector(flowOpts);
-        assertEquals("Returns all specs linked to a flow", 2, specsForFlow.size());
-        assertEquals("Returns all specs linked to a flow",
-                asSet(specId, specId2),
-                map(specsForFlow, d -> d.entityReference().id()));
+        assertEquals(2, specsForFlow.size(), "Returns all specs linked to a flow");
+        assertEquals(asSet(specId, specId2),
+                map(specsForFlow, d -> d.entityReference().id()),
+                "Returns all specs linked to a flow");
 
         pfHelper.deletePhysicalFlow(physFlow2.entityReference().id());
         psHelper.removeSpec(specId2);
 
         Collection<PhysicalSpecification> activeSpecsForFlow = psSvc.findBySelector(flowOpts);
-        assertEquals("Returns all specs linked to a flow", 1, activeSpecsForFlow.size());
-        assertEquals("Returns only active specs linked to a flow",
-                asSet(specId),
-                map(activeSpecsForFlow, d -> d.entityReference().id()));
+        assertEquals(1, activeSpecsForFlow.size(), "Returns all specs linked to a flow");
+        assertEquals(asSet(specId),
+                map(activeSpecsForFlow, d -> d.entityReference().id()),
+                "Returns only active specs linked to a flow");
     }
 
 
     @Test
     public void search() {
-        assertThrows("Search options cannot be null",
-                IllegalArgumentException.class,
-                () -> psSvc.search(null));
+        assertThrows(IllegalArgumentException.class,
+                () -> psSvc.search(null),
+                "Search options cannot be null");
 
         List<PhysicalSpecification> emptyQry = psSvc.search(mkForEntity(EntityKind.PHYSICAL_SPECIFICATION, ""));
-        assertEquals("Entity qry should return empty results", emptyList(), emptyQry);
+        assertEquals(emptyList(), emptyQry, "Entity qry should return empty results");
 
 
         List<PhysicalSpecification> noResults = psSvc.search(mkForEntity(EntityKind.PHYSICAL_SPECIFICATION, "search"));
-        assertEquals("Entity qry should return empty results", emptyList(), noResults);
+        assertEquals(emptyList(), noResults, "Entity qry should return empty results");
 
         EntityReference a = appHelper.createNewApp("a", ouIds.a);
         Long specId = psHelper.createPhysicalSpec(a, "search");
 
         List<PhysicalSpecification> result = psSvc.search(mkForEntity(EntityKind.PHYSICAL_SPECIFICATION, "search"));
-        assertEquals("Entity qry should return results which match",
-                asSet(specId),
-                map(result, r -> r.entityReference().id()));
+        assertEquals(asSet(specId),
+                map(result, r -> r.entityReference().id()),
+                "Entity qry should return results which match");
 
         Long specId2 = psHelper.createPhysicalSpec(a, "search");
 
         List<PhysicalSpecification> multipleSpecs = psSvc.search(mkForEntity(EntityKind.PHYSICAL_SPECIFICATION, "search"));
-        assertEquals("Entity qry should return results which match",
-                asSet(specId, specId2), map(multipleSpecs,
-                        r -> r.entityReference().id()));
+        assertEquals(asSet(specId, specId2),
+                map(multipleSpecs,
+                        r -> r.entityReference().id()), "Entity qry should return results which match");
 
     }
 

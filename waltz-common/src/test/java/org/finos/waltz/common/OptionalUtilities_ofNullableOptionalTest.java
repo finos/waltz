@@ -18,16 +18,18 @@
 
 package org.finos.waltz.common;
 
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class OptionalUtilities_ofNullableOptionalTest {
 
     @Test
     public void givingNullReturnsEmpty() {
-        Assert.assertEquals(
+        assertEquals(
                 Optional.empty(),
                 OptionalUtilities.ofNullableOptional(null));
     }
@@ -35,7 +37,7 @@ public class OptionalUtilities_ofNullableOptionalTest {
 
     @Test
     public void givingEmptyReturnsEmpty() {
-        Assert.assertEquals(
+        assertEquals(
                 Optional.empty(),
                 OptionalUtilities.ofNullableOptional(Optional.empty()));
     }
@@ -43,7 +45,7 @@ public class OptionalUtilities_ofNullableOptionalTest {
 
     @Test
     public void givingSomethingReturnsTheSameSomething() {
-        Assert.assertEquals(
+        assertEquals(
                 Optional.of("hello"),
                 OptionalUtilities.ofNullableOptional(Optional.of("hello")));
     }

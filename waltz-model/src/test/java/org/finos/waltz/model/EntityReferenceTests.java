@@ -18,43 +18,48 @@
 
 package org.finos.waltz.model;
 
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 public class EntityReferenceTests {
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void ThrowsWhenMapIsNull() {
-        EntityReference.mkRef(null);
+        assertThrows(IllegalArgumentException.class,
+                () -> EntityReference.mkRef(null));
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void ThrowsWhenMapMissingKind() {
         Map map = new HashMap();
         map.put("id", 5);
-        EntityReference.mkRef(map);
+        assertThrows(IllegalArgumentException.class,
+                () -> EntityReference.mkRef(map));
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void ThrowsWhenMapMissingId() {
         Map map = new HashMap();
         map.put("kind", "APPLICATION");
-        EntityReference.mkRef(map);
+        assertThrows(IllegalArgumentException.class,
+                () -> EntityReference.mkRef(map));
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void ThrowsWhenIdNull() {
         Map map = new HashMap();
         map.put("kind", "APPLICATION");
         map.put("id", null);
-
-        EntityReference.mkRef(map);
+        assertThrows(IllegalArgumentException.class,
+                () -> EntityReference.mkRef(map));
     }
 
 
@@ -65,10 +70,10 @@ public class EntityReferenceTests {
         map.put("id", 5);
 
         EntityReference entityRef = EntityReference.mkRef(map);
-        Assert.assertTrue(entityRef.id() == 5);
-        Assert.assertTrue(entityRef.kind() == EntityKind.APPLICATION);
-        Assert.assertFalse(entityRef.name().isPresent());
-        Assert.assertNull(entityRef.description());
+        assertTrue(entityRef.id() == 5);
+        assertTrue(entityRef.kind() == EntityKind.APPLICATION);
+        assertFalse(entityRef.name().isPresent());
+        assertNull(entityRef.description());
     }
 
 
@@ -81,14 +86,14 @@ public class EntityReferenceTests {
         map.put("description", "Kangaroo is an application");
 
         EntityReference entityRef = EntityReference.mkRef(map);
-        Assert.assertTrue(entityRef.id() == 5);
-        Assert.assertTrue(entityRef.kind() == EntityKind.APPLICATION);
+        assertEquals(5, entityRef.id());
+        assertSame(entityRef.kind(), EntityKind.APPLICATION);
 
-        Assert.assertTrue(entityRef.name().isPresent());
-        Assert.assertTrue(entityRef.name().get() == "Kangaroo");
+        assertTrue(entityRef.name().isPresent());
+        assertSame("Kangaroo", entityRef.name().get());
 
-        Assert.assertNotNull(entityRef.description());
-        Assert.assertTrue(entityRef.description() == "Kangaroo is an application");
+        assertNotNull(entityRef.description());
+        assertSame("Kangaroo is an application", entityRef.description());
     }
 
 
@@ -100,9 +105,9 @@ public class EntityReferenceTests {
         map.put("name", null);
 
         EntityReference entityRef = EntityReference.mkRef(map);
-        Assert.assertTrue(entityRef.id() == 5);
-        Assert.assertTrue(entityRef.kind() == EntityKind.APPLICATION);
+        assertTrue(entityRef.id() == 5);
+        assertTrue(entityRef.kind() == EntityKind.APPLICATION);
 
-        Assert.assertFalse(entityRef.name().isPresent());
+        assertFalse(entityRef.name().isPresent());
     }
 }

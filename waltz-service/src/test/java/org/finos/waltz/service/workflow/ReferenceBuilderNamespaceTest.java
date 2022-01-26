@@ -5,7 +5,8 @@ import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlExpression;
 import org.apache.commons.jexl3.MapContext;
 import org.finos.waltz.model.EntityKind;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
 
 import java.io.IOException;
 import java.util.Optional;
@@ -16,8 +17,8 @@ import static org.finos.waltz.common.IOUtilities.getFileResource;
 import static org.finos.waltz.common.IOUtilities.readAsString;
 import static org.finos.waltz.common.MapUtilities.newHashMap;
 import static org.finos.waltz.service.workflow.ContextVariableReference.mkVarRef;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ReferenceBuilderNamespaceTest {
 
