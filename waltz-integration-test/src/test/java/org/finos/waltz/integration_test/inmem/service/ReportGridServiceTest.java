@@ -11,7 +11,7 @@ import org.finos.waltz.service.report_grid.ReportGridMemberService;
 import org.finos.waltz.service.report_grid.ReportGridService;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
