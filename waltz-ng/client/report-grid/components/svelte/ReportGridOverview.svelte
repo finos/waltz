@@ -40,23 +40,17 @@
         onGridSelect(grid, isNew);
     }
 
-
-    function mkGridExtId(gridName, personId) {
-        return `${toUpperSnakeCase(gridName)}_${personId}`;
-    }
-
     function create(grid) {
         const createCmd = {
             name: grid.name,
             description: grid.description,
-            externalId: mkGridExtId(grid.name, _.get(person, 'id', 'UNKNOWN')),
             kind: grid.kind
-        }
+        };
 
         let savePromise = reportGridStore.create(createCmd);
         Promise.resolve(savePromise)
             .then(r => {
-                toasts.success("Grid created successfully")
+                toasts.success("Grid created successfully");
                 selectGrid(r.data, true);
                 reportGridCall = reportGridStore.findForUser(true);
             })

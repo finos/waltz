@@ -170,11 +170,11 @@ public class Main {
         });
 
         EndpointUtilities.addExceptionHandler(DataIntegrityViolationException.class, (e, req, res) -> {
-            String message = "Duplicate detected: " + e.getMessage();
+            String message = "Data integrity violation detected: " + e.getMessage();
             LOG.error(message);
             reportException(
                     HttpStatus.CONFLICT_409,
-                    "DUPLICATE",
+                    "DATA_INTEGRITY",
                     message,
                     res,
                     LOG);

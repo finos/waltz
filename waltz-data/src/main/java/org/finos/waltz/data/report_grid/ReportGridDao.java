@@ -163,7 +163,7 @@ public class ReportGridDao {
     public long create(ReportGridCreateCommand createCommand, String username) {
         ReportGridRecord record = dsl.newRecord(rg);
         record.setName(createCommand.name());
-        record.setExternalId(createCommand.externalId());
+        record.setExternalId(createCommand.toExtId(username));
         record.setDescription(createCommand.description());
         record.setLastUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
         record.setLastUpdatedBy(username);
