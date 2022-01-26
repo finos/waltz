@@ -5,14 +5,11 @@
     import {ownedReportIds, selectedGrid} from "./report-grid-store";
     import {reportGridKinds} from "./report-grid-utils";
     import ReportGridEditor from "./ReportGridEditor.svelte";
-    import {toUpperSnakeCase} from "../../../common/string-utils";
     import {reportGridMemberStore} from "../../../svelte-stores/report-grid-member-store";
     import {reportGridStore} from "../../../svelte-stores/report-grid-store";
     import toasts from "../../../svelte-stores/toast-store";
     import Icon from "../../../common/svelte/Icon.svelte";
     import _ from "lodash";
-    import {userStore} from "../../../svelte-stores/user-store";
-    import {personStore} from "../../../svelte-stores/person-store";
 
     export let onGridSelect = () => console.log("selecting grid");
 
@@ -24,9 +21,6 @@
 
     let activeMode = Modes.VIEW;
     let grids = [];
-
-    $: personCall = personStore.getSelf();
-    $: person = $personCall.data;
 
     $: reportGridCall = reportGridStore.findForUser(true);
     $: grids = $reportGridCall.data;
