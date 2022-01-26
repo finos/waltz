@@ -105,6 +105,9 @@ function controller($scope, serviceBroker, localStorageService) {
     };
 
     vm.onGridSelect = (grid) => {
+        if (! grid) {
+            return;
+        }
         $scope.$applyAsync(() => {
             localStorageService.set(localStorageKey, grid.id);
             vm.gridId = grid.id;

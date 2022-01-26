@@ -18,7 +18,10 @@
         dispatch('select', selectedEntity.detail);
     }
 
-    onMount(() => ToastStore.info("This is a beta view, we'd love to hear feedback!"));
+    onMount(() => {
+        ToastStore.info("This is a beta view, we'd love to hear feedback!");
+        $contextPanelMode = Modes.DEFAULT;
+    })
 
 </script>
 

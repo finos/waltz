@@ -18,7 +18,6 @@
 
 package org.finos.waltz.data.attestation;
 
-import org.finos.waltz.schema.tables.records.AttestationInstanceRecord;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.Criticality;
 import org.finos.waltz.model.EntityKind;
@@ -27,11 +26,14 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.application.ApplicationKind;
 import org.finos.waltz.model.application.LifecyclePhase;
 import org.finos.waltz.model.attestation.*;
+import org.finos.waltz.schema.tables.records.AttestationInstanceRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
 import org.jooq.lambda.tuple.Tuple4;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -42,17 +44,21 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.finos.waltz.schema.Tables.*;
-import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static java.lang.String.format;
 import static java.util.stream.Collectors.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.common.StringUtilities.splitThenMap;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 
 @Repository
 public class AttestationInstanceDao {
+
+    private static final Logger LOG = LoggerFactory.getLogger(AttestationInstanceDao.class);
 
     private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             ATTESTATION_INSTANCE.PARENT_ENTITY_ID,
@@ -231,6 +237,109 @@ public class AttestationInstanceDao {
     }
 
 
+    public AttestationSyncRecipientsResponse reassignRecipients() {
+
+        Set<Tuple2<Long, Long>> runIdToInvKindId = getAttestationRunIdToInvKindId();
+
+        CommonTableExpression<Record2<Long, String>> runWithRequiredPeople = getRunsWithRequiredPeopleCTE(runIdToInvKindId);
+        CommonTableExpression<Record2<Long, String>> missingRecipients = getMissingRecipientsCTE(runWithRequiredPeople);
+        CommonTableExpression<Record2<Long, String>> recipientsToRemove = getRecipientsToRemoveCTE(runWithRequiredPeople);
+        CommonTableExpression<Record1<Long>> attestationRecipientIds = getIdsForAttestationsToRemoveCTE(recipientsToRemove);
+
+        return dsl
+                .transactionResult(ctx -> {
+                    DSLContext tx = ctx.dsl();
+
+                    int addedRecipients = tx
+                            .with(runWithRequiredPeople)
+                            .with(missingRecipients)
+                            .insertInto(ATTESTATION_INSTANCE_RECIPIENT)
+                            .columns(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID, ATTESTATION_INSTANCE_RECIPIENT.USER_ID)
+                            .select(DSL
+                                    .select(missingRecipients.field("instance_id", Long.class),
+                                            missingRecipients.field(missingRecipients.field("user_id", String.class)))
+                                    .from(missingRecipients))
+                            .execute();
+
+                    int removedRecipients = tx
+                            .with(runWithRequiredPeople)
+                            .with(recipientsToRemove)
+                            .with(attestationRecipientIds)
+                            .delete(ATTESTATION_INSTANCE_RECIPIENT)
+                            .where(ATTESTATION_INSTANCE_RECIPIENT.ID.in(DSL
+                                    .select(attestationRecipientIds.field("id", Long.class))
+                                    .from(attestationRecipientIds)))
+                            .execute();
+
+                    LOG.info(format("Reassigning recipients for attestations: %d recipients added, %d recipients removed",
+                            addedRecipients,
+                            removedRecipients));
+
+                    return ImmutableAttestationSyncRecipientsResponse.builder()
+                            .recipientsRemovedCount(Long.valueOf(removedRecipients))
+                            .recipientsCreatedCount(Long.valueOf(addedRecipients))
+                            .build();
+                });
+    }
+
+    private Set<Tuple2<Long, Long>> getAttestationRunIdToInvKindId() {
+        return dsl
+                .select(ATTESTATION_RUN.ID, ATTESTATION_RUN.INVOLVEMENT_KIND_IDS)
+                .from(ATTESTATION_RUN)
+                .where(ATTESTATION_RUN.INVOLVEMENT_KIND_IDS.isNotNull())
+                .and(ATTESTATION_RUN.INVOLVEMENT_KIND_IDS.ne(""))
+                .fetch()
+                .stream()
+                .flatMap(r -> {
+                    Long runId = r.get(ATTESTATION_RUN.ID);
+                    String invKinds = r.get(ATTESTATION_RUN.INVOLVEMENT_KIND_IDS);
+                    return splitThenMap(
+                            invKinds,
+                            ";",
+                            d -> tuple(runId, Long.valueOf(d.trim())))
+                            .stream();
+                })
+                .collect(toSet());
+    }
+
+
+    public AttestationSyncRecipientsResponse getCountsOfRecipientsToReassign() {
+
+        Set<Tuple2<Long, Long>> runIdToInvKindId = getAttestationRunIdToInvKindId();
+
+        CommonTableExpression<Record2<Long, String>> runWithRequiredPeople = getRunsWithRequiredPeopleCTE(runIdToInvKindId);
+        CommonTableExpression<Record2<Long, String>> missingRecipients = getMissingRecipientsCTE(runWithRequiredPeople);
+        CommonTableExpression<Record2<Long, String>> recipientsToRemove = getRecipientsToRemoveCTE(runWithRequiredPeople);
+        CommonTableExpression<Record1<Long>> attestationRecipientIds = getIdsForAttestationsToRemoveCTE(recipientsToRemove);
+
+        return dsl
+                .transactionResult(ctx -> {
+                    DSLContext tx = ctx.dsl();
+
+                    Result<Record2<Long, String>> toAdd = tx
+                            .with(runWithRequiredPeople)
+                            .with(missingRecipients)
+                            .select(missingRecipients.field("instance_id", Long.class),
+                                    missingRecipients.field("user_id", String.class))
+                            .from(missingRecipients)
+                            .fetch();
+
+                    Result<Record1<Long>> toRemove = tx
+                            .with(runWithRequiredPeople)
+                            .with(recipientsToRemove)
+                            .with(attestationRecipientIds)
+                            .select(attestationRecipientIds.field("id", Long.class))
+                            .from(attestationRecipientIds)
+                            .fetch();
+
+                    return ImmutableAttestationSyncRecipientsResponse.builder()
+                            .recipientsRemovedCount(Long.valueOf(toRemove.size()))
+                            .recipientsCreatedCount(Long.valueOf(toAdd.size()))
+                            .build();
+        });
+    }
+
+
     public List<AttestationInstance> findForEntityByRecipient(AttestEntityCommand command,
                                                               String userId,
                                                               boolean unattestedOnly) {
@@ -268,7 +377,6 @@ public class AttestationInstanceDao {
                 .innerJoin(ATTESTATION_RUN)
                 .on(ATTESTATION_RUN.ID.eq(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID))
                 .where(ATTESTATION_INSTANCE.ID.in(selector))
-                .and(ATTESTATION_INSTANCE.ATTESTED_AT.isNotNull())
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -512,4 +620,85 @@ public class AttestationInstanceDao {
                 .where(attestations.field(latest_attestation).eq(attestations.field("instance_id", Long.class)))
                 .asTable();
     }
+
+
+    private CommonTableExpression<Record1<Long>> getIdsForAttestationsToRemoveCTE(CommonTableExpression<Record2<Long, String>> recipientsToRemove) {
+        return DSL
+                .name("attestationRecipientIds")
+                .fields("id")
+                .as(DSL
+                        .select(ATTESTATION_INSTANCE_RECIPIENT.ID)
+                        .from(ATTESTATION_INSTANCE_RECIPIENT)
+                        .innerJoin(recipientsToRemove)
+                        .on(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID.eq(recipientsToRemove.field("instance_id", Long.class))
+                                .and(ATTESTATION_INSTANCE_RECIPIENT.USER_ID.eq(recipientsToRemove.field("user_id", String.class)))));
+    }
+
+
+    private CommonTableExpression<Record2<Long, String>> getRecipientsToRemoveCTE(CommonTableExpression<Record2<Long, String>> runWithRequiredPeople) {
+        return DSL
+                .name("recipientsToRemove")
+                .fields("instance_id", "user_id")
+                .as(DSL
+                        .select(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID,
+                                ATTESTATION_INSTANCE_RECIPIENT.USER_ID)
+                        .from(ATTESTATION_INSTANCE_RECIPIENT)
+                        .innerJoin(ATTESTATION_INSTANCE)
+                        .on(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID.eq(ATTESTATION_INSTANCE.ID))
+                        .where(ATTESTATION_INSTANCE.ATTESTED_AT.isNull())
+                        .except(DSL
+                                .select(runWithRequiredPeople.field("instance_id", Long.class),
+                                        runWithRequiredPeople.field("user_id", String.class))
+                                .from(runWithRequiredPeople)));
+    }
+
+
+    private CommonTableExpression<Record2<Long, String>> getMissingRecipientsCTE(CommonTableExpression<Record2<Long, String>> runWithRequiredPeople) {
+        return DSL
+                .name("missingRecipients")
+                .fields("instance_id", "user_id")
+                .as(DSL
+                        .select(runWithRequiredPeople.field("instance_id", Long.class),
+                                runWithRequiredPeople.field("user_id", String.class))
+                        .from(runWithRequiredPeople)
+                        .except(DSL
+                                .select(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID,
+                                        ATTESTATION_INSTANCE_RECIPIENT.USER_ID)
+                                .from(ATTESTATION_INSTANCE_RECIPIENT)));
+    }
+
+
+    private CommonTableExpression<Record2<Long, String>> getRunsWithRequiredPeopleCTE(Set<Tuple2<Long, Long>> attestationRunsWithInvKind) {
+
+        Field<Long> runId = DSL.field("runId", Long.class);
+        Field<Long> kindId = DSL.field("kindId", Long.class);
+
+        Row2<Long, Long>[] rows = attestationRunsWithInvKind
+                .stream()
+                .map(t -> DSL.row(t.v1, t.v2))
+                .collect(toSet())
+                .toArray(new Row2[0]);
+
+        Table<Record2<Long, Long>> runToKindId = DSL
+                .select(runId, kindId)
+                .from(DSL
+                        .values(rows).as("runToKind", "runId", "kindId"))
+                .asTable();
+
+        return DSL
+                .name("runWithRequiredPeople")
+                .fields("instance_id", "user_id")
+                .as(DSL
+                        .selectDistinct(ATTESTATION_INSTANCE.ID, PERSON.EMAIL)
+                        .from(ATTESTATION_INSTANCE)
+                        .innerJoin(INVOLVEMENT)
+                        .on(ATTESTATION_INSTANCE.PARENT_ENTITY_ID.eq(INVOLVEMENT.ENTITY_ID)
+                                .and(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND.eq(INVOLVEMENT.ENTITY_KIND)))
+                        .innerJoin(PERSON).on(INVOLVEMENT.EMPLOYEE_ID.eq(PERSON.EMPLOYEE_ID)
+                                .and(PERSON.IS_REMOVED.isFalse()))
+                        .innerJoin(runToKindId).on(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID.eq(runToKindId.field(runId)))
+                        .and(INVOLVEMENT.KIND_ID.eq(runToKindId.field(kindId)))
+                        .where(ATTESTATION_INSTANCE.ATTESTED_AT.isNull()));
+    }
+
 }

@@ -114,8 +114,12 @@
 
 {#if $hasChanged}
     <NoData type="warning">
-        The columns for this report grid have been modified, to keep the changes please
-        <button class="btn btn-skinny"
+        <div>
+            The columns for this report grid have been modified, to keep the changes please save this report.
+        </div>
+
+        <button style="margin-top: 1em;"
+                class="btn btn-success"
                 on:click={() => saveColumnDefs($columnDefs)}>
             <Icon name="floppy-o"/>Save this report
         </button>

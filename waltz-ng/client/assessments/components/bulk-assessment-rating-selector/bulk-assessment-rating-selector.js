@@ -55,9 +55,25 @@ const initialState = {
 
 
 function mkSummary(searchResults = []) {
+    const basicStats = {
+        total: searchResults.length,
+        removedEntityCount: _
+            .chain(searchResults)
+            .filter(r => _.get(r, ["entityRef", "entityLifecycleStatus"]) === 'REMOVED')
+            .size()
+            .value()
+    };
+
+    const countsByFoundStatus = _.countBy(
+        searchResults,
+        r => r.entityRef == null || r.rating === undefined
+                    ? "notFound"
+                    : "found");
+
     return Object.assign(
-        { total: searchResults.length },
-        _.countBy(searchResults, r => r.entityRef == null || r.rating === undefined ? "notFound" : "found"));
+        {},
+        basicStats,
+        countsByFoundStatus);
 }
 
 

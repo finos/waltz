@@ -70,7 +70,7 @@ public class SlowQueryListener extends DefaultExecuteListener {
                     // ... and the flag for pretty-printing
                     new Settings().withRenderFormatted(true));
 
-            LOG.warn(String.format("Slow SQL executed in %d seconds", TimeUnit.NANOSECONDS.toSeconds(split)), new SQLPerformanceWarning(context.renderInlined(ctx.query())));
+            LOG.info(String.format("Slow SQL executed in %d seconds", TimeUnit.NANOSECONDS.toSeconds(split)), new SQLPerformanceWarning(context.renderInlined(ctx.query())));
         }
     }
 }

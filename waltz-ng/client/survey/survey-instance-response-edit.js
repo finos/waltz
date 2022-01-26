@@ -25,6 +25,7 @@ import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
 import template from "./survey-instance-response-edit.html";
 import * as actions from "./survey-actions";
 import toasts from "../svelte-stores/toast-store";
+import SurveyViewerContextPanel from "./components/svelte/inline-panel/SurveyViewerContextPanel.svelte";
 
 const initialState = {
     changeLogSection: dynamicSections.changeLogSection,
@@ -32,7 +33,9 @@ const initialState = {
     groupedQuestions: [],
     surveyResponses: {},
     user: {},
-    dropdownEntriesByQuestionId: {}
+    dropdownEntriesByQuestionId: {},
+    SurveyViewerContextPanel,
+    mode: "EDIT"
 };
 
 const submissionConfirmationPrompt = `The survey cannot be edited once submitted.

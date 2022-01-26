@@ -5,6 +5,8 @@
     import {selectedGrid} from "./report-grid-store";
     import SearchInput from "../../../common/svelte/SearchInput.svelte";
     import {termSearch} from "../../../common";
+    import {truncateMiddle} from "../../../common/string-utils";
+
 
     export let onGridSelect = () => "selecting grid";
     export let onCreate = () => "creating grid";
@@ -69,7 +71,9 @@
                                 </button>
                             </td>
                             <td>
-                                <span class:text-muted={!grid?.description}>{grid?.description || "No description"}</span>
+                                <span class:text-muted={!grid?.description}>
+                                    {truncateMiddle(grid?.description, 300) || "No description"}
+                                </span>
                             </td>
                         </tr>
                     {/each}

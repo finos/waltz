@@ -98,9 +98,9 @@ public class ApplicationDao {
 
 
     public List<Application> findAll() {
-        return dsl.select()
+        return dsl
+                .select()
                 .from(APPLICATION)
-                .where(IS_ACTIVE)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -128,7 +128,7 @@ public class ApplicationDao {
                 dsl,
                 APPLICATION,
                 APPLICATION.KIND,
-                IS_ACTIVE.and(APPLICATION.ID.in(selector)));
+                APPLICATION.ID.in(selector));
     }
 
 

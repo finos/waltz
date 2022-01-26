@@ -526,7 +526,7 @@ public class SurveyRunService {
         SurveyInstanceCreateCommand instanceCreateCommand = ImmutableSurveyInstanceCreateCommand
                 .builder()
                 .dueDate(run.dueDate())
-                .approvalDueDate(run.dueDate())
+                .approvalDueDate(run.approvalDueDate())
                 .entityReference(entityRef)
                 .surveyRunId(run.id().get())
                 .status(SurveyInstanceStatus.NOT_STARTED)
