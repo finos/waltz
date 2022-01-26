@@ -11,6 +11,8 @@
     import toasts from "../../../svelte-stores/toast-store";
     import Icon from "../../../common/svelte/Icon.svelte";
     import _ from "lodash";
+    import {userStore} from "../../../svelte-stores/user-store";
+    import {personStore} from "../../../svelte-stores/person-store";
 
     export let onGridSelect = () => console.log("selecting grid");
 
@@ -21,12 +23,13 @@
     };
 
     let activeMode = Modes.VIEW;
-
-
     let grids = [];
+
+    $: personCall = personStore.getSelf();
+    $: person = $personCall.data;
+
     $: reportGridCall = reportGridStore.findForUser(true);
     $: grids = $reportGridCall.data;
-
 
     $: gridOwnersCall = $selectedGrid?.definition?.id && reportGridMemberStore.findByGridId($selectedGrid?.definition?.id);
     $: gridOwners = $gridOwnersCall?.data || [];
@@ -37,11 +40,16 @@
         onGridSelect(grid, isNew);
     }
 
-    function create(grid){
+
+    function mkGridExtId(gridName, personId) {
+        return `${toUpperSnakeCase(gridName)}_${personId}`;
+    }
+
+    function create(grid) {
         const createCmd = {
             name: grid.name,
             description: grid.description,
-            externalId: toUpperSnakeCase(grid.name),
+            externalId: mkGridExtId(grid.name, _.get(person, 'id', 'UNKNOWN')),
             kind: grid.kind
         }
 
@@ -52,7 +60,7 @@
                 selectGrid(r.data, true);
                 reportGridCall = reportGridStore.findForUser(true);
             })
-            .catch(e => toasts.error("Could not create grid"));
+            .catch(e => toasts.error("Could not create report grid. " + e.error));
     }
 
     function update(grid){

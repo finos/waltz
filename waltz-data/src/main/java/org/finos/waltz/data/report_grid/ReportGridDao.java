@@ -33,6 +33,7 @@ import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
 
 import java.util.Comparator;
@@ -41,6 +42,7 @@ import java.util.function.Function;
 import java.util.function.ToIntFunction;
 import java.util.stream.IntStream;
 
+import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.function.Function.identity;
@@ -168,9 +170,14 @@ public class ReportGridDao {
         record.setProvenance("waltz");
         record.setKind(createCommand.kind().name());
 
-        int insert = record.insert();
-
-        return record.getId();
+        try {
+            int insert = record.insert();
+            return record.getId();
+        } catch (DataIntegrityViolationException exception) {
+            throw new DataIntegrityViolationException(format(
+                    "Grid already exists with the name: %s for user.",
+                    createCommand.name()));
+        }
     }
 
     public long update(long id, ReportGridUpdateCommand updateCommand, String username) {
