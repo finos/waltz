@@ -5,7 +5,6 @@
     import {ownedReportIds, selectedGrid} from "./report-grid-store";
     import {reportGridKinds} from "./report-grid-utils";
     import ReportGridEditor from "./ReportGridEditor.svelte";
-    import {toUpperSnakeCase} from "../../../common/string-utils";
     import {reportGridMemberStore} from "../../../svelte-stores/report-grid-member-store";
     import {reportGridStore} from "../../../svelte-stores/report-grid-store";
     import toasts from "../../../svelte-stores/toast-store";
@@ -21,12 +20,10 @@
     };
 
     let activeMode = Modes.VIEW;
-
-
     let grids = [];
+
     $: reportGridCall = reportGridStore.findForUser(true);
     $: grids = $reportGridCall.data;
-
 
     $: gridOwnersCall = $selectedGrid?.definition?.id && reportGridMemberStore.findByGridId($selectedGrid?.definition?.id);
     $: gridOwners = $gridOwnersCall?.data || [];
@@ -37,22 +34,21 @@
         onGridSelect(grid, isNew);
     }
 
-    function create(grid){
+    function create(grid) {
         const createCmd = {
             name: grid.name,
             description: grid.description,
-            externalId: toUpperSnakeCase(grid.name),
             kind: grid.kind
-        }
+        };
 
         let savePromise = reportGridStore.create(createCmd);
         Promise.resolve(savePromise)
             .then(r => {
-                toasts.success("Grid created successfully")
+                toasts.success("Grid created successfully");
                 selectGrid(r.data, true);
                 reportGridCall = reportGridStore.findForUser(true);
             })
-            .catch(e => toasts.error("Could not create grid"));
+            .catch(e => toasts.error("Could not create report grid. " + e.error));
     }
 
     function update(grid){
@@ -67,8 +63,9 @@
             .then(r => {
                 toasts.success("Grid updated successfully")
                 selectGrid(r.data);
+                reportGridCall = reportGridStore.findForUser(true);
             })
-            .catch(e => toasts.error("Could not update grid"));
+            .catch(e => toasts.error("Could not update grid. " + e.error));
     }
 
     function remove(grid){

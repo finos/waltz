@@ -18,6 +18,7 @@
 
 package org.finos.waltz.web;
 
+import org.eclipse.jetty.http.HttpStatus;
 import org.finos.waltz.service.DIConfiguration;
 import org.finos.waltz.service.settings.SettingsService;
 import org.finos.waltz.web.endpoints.Endpoint;
@@ -33,6 +34,7 @@ import org.jooq.exception.DataAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.dao.DataIntegrityViolationException;
 import spark.Request;
 import spark.Response;
 import spark.Spark;
@@ -132,13 +134,13 @@ public class Main {
     private void registerExceptionHandlers() {
 
         EndpointUtilities.addExceptionHandler(InsufficientPrivelegeException.class, (e, req, resp) ->
-                reportException(403, "NOT_AUTHORIZED", e.getMessage(), resp, LOG));
+                reportException(HttpStatus.UNAUTHORIZED_401, "NOT_AUTHORIZED", e.getMessage(), resp, LOG));
 
         EndpointUtilities.addExceptionHandler(NotFoundException.class, (e, req, res) -> {
             String message = "Not found exception" + e.getMessage();
             LOG.error(message);
             reportException(
-                    404,
+                    HttpStatus.NOT_FOUND_404,
                     e.getCode(),
                     message,
                     res,
@@ -149,7 +151,7 @@ public class Main {
             String message = "Update failed exception:" + e.getMessage();
             LOG.error(message);
             reportException(
-                    400,
+                    HttpStatus.BAD_REQUEST_400,
                     e.getCode(),
                     message,
                     res,
@@ -160,8 +162,19 @@ public class Main {
             String message = "Duplicate detected: " + e.getMessage();
             LOG.error(message);
             reportException(
-                    500,
+                    HttpStatus.CONFLICT_409,
                     "DUPLICATE",
+                    message,
+                    res,
+                    LOG);
+        });
+
+        EndpointUtilities.addExceptionHandler(DataIntegrityViolationException.class, (e, req, res) -> {
+            String message = "Data integrity violation detected: " + e.getMessage();
+            LOG.error(message);
+            reportException(
+                    HttpStatus.CONFLICT_409,
+                    "DATA_INTEGRITY",
                     message,
                     res,
                     LOG);
@@ -171,7 +184,7 @@ public class Main {
             String message = "Exception: " + e.getCause().getMessage();
             LOG.error(message);
             reportException(
-                    400,
+                    HttpStatus.BAD_REQUEST_400,
                     e.sqlState(),
                     message,
                     resp,
@@ -182,7 +195,7 @@ public class Main {
             String message = "Illegal Argument Exception: " + e.getMessage();
             LOG.error(message);
             reportException(
-                    400,
+                    HttpStatus.BAD_REQUEST_400,
                     "ILLEGAL ARGUMENT",
                     message,
                     resp,
@@ -193,7 +206,7 @@ public class Main {
             String message = "Web exception: " + e.getMessage();
             LOG.error(message);
             reportException(
-                    500,
+                    HttpStatus.INTERNAL_SERVER_ERROR_500,
                     e.getCode(),
                     message,
                     res,
@@ -204,7 +217,7 @@ public class Main {
             String message = "Generic Exception: " + e.getMessage() + " / " + e.getClass().getCanonicalName();
             LOG.error(message, e);
             reportException(
-                    500,
+                    HttpStatus.INTERNAL_SERVER_ERROR_500,
                     "unknown",
                     message,
                     res,
