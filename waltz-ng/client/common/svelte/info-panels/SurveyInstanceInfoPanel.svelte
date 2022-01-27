@@ -63,7 +63,6 @@
         ? {entity: survey.surveyInstance.surveyEntity, instance: survey.surveyInstance}
         : null;
 
-    $: console.log({permissions});
 </script>
 
 
