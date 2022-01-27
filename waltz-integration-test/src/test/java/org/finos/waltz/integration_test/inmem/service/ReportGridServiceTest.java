@@ -112,7 +112,6 @@ public class ReportGridServiceTest extends BaseInMemoryIntegrationTest {
     private ReportGridDefinition mkGrid() throws InsufficientPrivelegeException {
         ReportGridCreateCommand cmd = ImmutableReportGridCreateCommand.builder()
                 .name(mkName("testReport"))
-                .externalId(mkName("extId"))
                 .build();
 
         String admin = mkName("admin");

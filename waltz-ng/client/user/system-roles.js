@@ -72,22 +72,27 @@ export default {
         name: "Logical flow editor",
         description: "Can update logical flows"
     },
-    "ORG_UNIT_EDITOR" : {
+    "ORG_UNIT_EDITOR": {
         key: "ORG_UNIT_EDITOR",
         name: "Org Unit editor",
         description: "Can modify org units"
     },
-    "RATING_EDITOR" : {
+    "RATING_EDITOR": {
         key: "RATING_EDITOR",
         name: "Rating edit",
         description: "Can assign ratings to applications"
     },
-    "SCENARIO_ADMIN" : {
+    "REPORT_GRID_ADMIN": {
+        key: "REPORT_GRID_ADMIN",
+        name: "Report Grid Admin",
+        description: "Can update report grid kind"
+    },
+    "SCENARIO_ADMIN": {
         key: "SCENARIO_ADMIN",
         name: "Scenario Admin",
         description: "Can create roadmaps and scenarios"
     },
-    "SCENARIO_EDITOR" : {
+    "SCENARIO_EDITOR": {
         key: "SCENARIO_EDITOR",
         name: "Scenario edit",
         description: "Can modify the contents of roadmap scenarios"
