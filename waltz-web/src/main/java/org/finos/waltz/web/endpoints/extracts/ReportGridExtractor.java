@@ -17,13 +17,12 @@
  */
 package org.finos.waltz.web.endpoints.extracts;
 
-import org.finos.waltz.service.report_grid.ReportGridService;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.streaming.SXSSFSheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.NameProvider;
@@ -34,6 +33,7 @@ import org.finos.waltz.model.report_grid.ReportGrid;
 import org.finos.waltz.model.report_grid.ReportGridCell;
 import org.finos.waltz.model.report_grid.ReportGridColumnDefinition;
 import org.finos.waltz.model.report_grid.ReportGridDefinition;
+import org.finos.waltz.service.report_grid.ReportGridService;
 import org.finos.waltz.web.WebUtilities;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
@@ -243,8 +243,8 @@ public class ReportGridExtractor implements DataExtractor {
     private byte[] mkExcelReport(String reportName,
                                  List<ReportGridColumnDefinition> columnDefinitions,
                                  List<Tuple2<Application, ArrayList<Object>>> reportRows) throws IOException {
-        XSSFWorkbook workbook = new XSSFWorkbook();
-        XSSFSheet sheet = workbook.createSheet(ExtractorUtilities.sanitizeSheetName(reportName));
+        SXSSFWorkbook workbook = new SXSSFWorkbook(2000);
+        SXSSFSheet sheet = workbook.createSheet(ExtractorUtilities.sanitizeSheetName(reportName));
 
         int colCount = writeExcelHeader(columnDefinitions, sheet);
         writeExcelBody(reportRows, sheet);
@@ -256,7 +256,7 @@ public class ReportGridExtractor implements DataExtractor {
     }
 
 
-    private byte[] convertExcelToByteArray(XSSFWorkbook workbook) throws IOException {
+    private byte[] convertExcelToByteArray(SXSSFWorkbook workbook) throws IOException {
         ByteArrayOutputStream outByteStream = new ByteArrayOutputStream();
         workbook.write(outByteStream);
         workbook.close();
@@ -264,7 +264,7 @@ public class ReportGridExtractor implements DataExtractor {
     }
 
 
-    private int writeExcelBody(List<Tuple2<Application, ArrayList<Object>>> reportRows, XSSFSheet sheet) {
+    private int writeExcelBody(List<Tuple2<Application, ArrayList<Object>>> reportRows, SXSSFSheet sheet) {
         AtomicInteger rowNum = new AtomicInteger(1);
         reportRows.forEach(r -> {
 
@@ -304,7 +304,7 @@ public class ReportGridExtractor implements DataExtractor {
     }
 
 
-    private int writeExcelHeader(List<ReportGridColumnDefinition> columnDefinitions, XSSFSheet sheet) {
+    private int writeExcelHeader(List<ReportGridColumnDefinition> columnDefinitions, SXSSFSheet sheet) {
         Row headerRow = sheet.createRow(0);
         AtomicInteger colNum = new AtomicInteger();
 
