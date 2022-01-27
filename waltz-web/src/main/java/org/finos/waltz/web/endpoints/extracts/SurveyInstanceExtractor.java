@@ -22,20 +22,25 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.streaming.SXSSFSheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.finos.waltz.common.FunctionUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.data.survey.SurveyQuestionDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.survey.SurveyInstanceStatus;
 import org.finos.waltz.model.survey.SurveyQuestion;
+import org.finos.waltz.service.DIConfiguration;
 import org.finos.waltz.web.WebUtilities;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Service;
 import org.supercsv.io.CsvListWriter;
 import org.supercsv.prefs.CsvPreference;
@@ -48,12 +53,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
-import static org.finos.waltz.schema.tables.SurveyInstance.SURVEY_INSTANCE;
-import static org.finos.waltz.schema.tables.SurveyQuestion.SURVEY_QUESTION;
-import static org.finos.waltz.schema.tables.SurveyQuestionResponse.SURVEY_QUESTION_RESPONSE;
-import static org.finos.waltz.schema.tables.SurveyRun.SURVEY_RUN;
-import static org.finos.waltz.schema.tables.SurveyTemplate.SURVEY_TEMPLATE;
-import static org.finos.waltz.web.endpoints.extracts.ExtractorUtilities.sanitizeSheetName;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.CollectionUtilities.first;
@@ -63,6 +62,12 @@ import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.common.SetUtilities.fromArray;
 import static org.finos.waltz.common.StringUtilities.mkSafe;
+import static org.finos.waltz.schema.tables.SurveyInstance.SURVEY_INSTANCE;
+import static org.finos.waltz.schema.tables.SurveyQuestion.SURVEY_QUESTION;
+import static org.finos.waltz.schema.tables.SurveyQuestionResponse.SURVEY_QUESTION_RESPONSE;
+import static org.finos.waltz.schema.tables.SurveyRun.SURVEY_RUN;
+import static org.finos.waltz.schema.tables.SurveyTemplate.SURVEY_TEMPLATE;
+import static org.finos.waltz.web.endpoints.extracts.ExtractorUtilities.sanitizeSheetName;
 import static org.jooq.lambda.fi.util.function.CheckedConsumer.unchecked;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 import static spark.Spark.get;
@@ -78,6 +83,7 @@ public class SurveyInstanceExtractor implements DataExtractor {
     private final org.finos.waltz.schema.tables.SurveyInstance si = SURVEY_INSTANCE.as("si");
     private final org.finos.waltz.schema.tables.SurveyQuestion sq = SURVEY_QUESTION.as("sq");
     private final org.finos.waltz.schema.tables.SurveyQuestionResponse sqr = SURVEY_QUESTION_RESPONSE.as("sqr");
+    private static final Logger LOG = LoggerFactory.getLogger(SurveyInstanceExtractor.class);
 
     private final Field<String> subjectNameField = InlineSelectFieldFactory.mkNameField(
             si.ENTITY_ID,
@@ -192,6 +198,9 @@ public class SurveyInstanceExtractor implements DataExtractor {
                                                                String reportName,
                                                                List<SurveyQuestion> questions,
                                                                List<List<Object>> reportRows) throws IOException {
+
+        LOG.info("Formatting {} rows of data into {} format", reportRows.size(), format.name());
+
         switch (format) {
             case XLSX:
                 return tuple(format, reportName, mkExcelReport(reportName, questions, reportRows));
@@ -263,8 +272,8 @@ public class SurveyInstanceExtractor implements DataExtractor {
 
 
     private byte[] mkExcelReport(String reportName, List<SurveyQuestion> questions, List<List<Object>> reportRows) throws IOException {
-        XSSFWorkbook workbook = new XSSFWorkbook();
-        XSSFSheet sheet = workbook.createSheet(sanitizeSheetName(reportName));
+        SXSSFWorkbook workbook = new SXSSFWorkbook(4000);
+        SXSSFSheet sheet = workbook.createSheet(sanitizeSheetName(reportName));
 
         int colCount = writeExcelHeader(questions, sheet);
         writeExcelBody(reportRows, sheet);
@@ -276,7 +285,7 @@ public class SurveyInstanceExtractor implements DataExtractor {
     }
 
 
-    private byte[] convertExcelToByteArray(XSSFWorkbook workbook) throws IOException {
+    private byte[] convertExcelToByteArray(SXSSFWorkbook workbook) throws IOException {
         ByteArrayOutputStream outByteStream = new ByteArrayOutputStream();
         workbook.write(outByteStream);
         workbook.close();
@@ -284,7 +293,7 @@ public class SurveyInstanceExtractor implements DataExtractor {
     }
 
 
-    private int writeExcelBody(List<List<Object>> reportRows, XSSFSheet sheet) {
+    private int writeExcelBody(List<List<Object>> reportRows, SXSSFSheet sheet) {
         AtomicInteger rowNum = new AtomicInteger(1);
         reportRows.forEach(values -> {
             Row row = sheet.createRow(rowNum.getAndIncrement());
@@ -312,7 +321,7 @@ public class SurveyInstanceExtractor implements DataExtractor {
     }
 
 
-    private int writeExcelHeader(List<SurveyQuestion> questions, XSSFSheet sheet) {
+    private int writeExcelHeader(List<SurveyQuestion> questions, SXSSFSheet sheet) {
         Row headerRow = sheet.createRow(0);
         AtomicInteger colNum = new AtomicInteger();
 
@@ -330,7 +339,7 @@ public class SurveyInstanceExtractor implements DataExtractor {
 
     private List<List<Object>> prepareReportRowsForTemplate(List<SurveyQuestion> questions, long templateId, Set<SurveyInstanceStatus> statuses) {
 
-        Condition condition = sr.SURVEY_TEMPLATE_ID.eq(templateId)
+        Condition condition = st.ID.eq(templateId)
                 .and(si.STATUS.in(names(statuses)));
 
         return prepareReportRows(questions, condition);
@@ -350,20 +359,35 @@ public class SurveyInstanceExtractor implements DataExtractor {
     private List<List<Object>> prepareReportRows(List<SurveyQuestion> questions, Condition condition) {
 
         SelectConditionStep<Record> extractAnswersQuery = dsl
-                .selectDistinct(sr.NAME, sr.ID, st.STATUS)
-                .select(subjectNameField, subjectExtIdField)
-                .select(si.ID, si.STATUS, si.APPROVED_AT, si.APPROVED_BY, si.SUBMITTED_AT, si.SUBMITTED_BY)
-                .select(sqr.QUESTION_ID, sqr.COMMENT)
-                .select(sqr.STRING_RESPONSE, sqr.NUMBER_RESPONSE, sqr.DATE_RESPONSE, sqr.BOOLEAN_RESPONSE, sqr.LIST_RESPONSE_CONCAT)
-                .select(responseNameField, responseExtIdField)
-                .select(DSL.when(si.ORIGINAL_INSTANCE_ID.isNull(), "Yes").else_("No").as("Latest"))
+                .selectDistinct(
+                        sr.NAME,
+                        sr.ID,
+                        sr.STATUS.as("run_status"))
+                .select(subjectNameField,
+                        subjectExtIdField)
+                .select(si.ID,
+                        si.STATUS.as("instance_status"),
+                        si.APPROVED_AT,
+                        si.APPROVED_BY,
+                        si.SUBMITTED_AT,
+                        si.SUBMITTED_BY)
+                .select(sqr.QUESTION_ID,
+                        sqr.COMMENT)
+                .select(sqr.STRING_RESPONSE,
+                        sqr.NUMBER_RESPONSE,
+                        sqr.DATE_RESPONSE,
+                        sqr.BOOLEAN_RESPONSE,
+                        sqr.LIST_RESPONSE_CONCAT)
+                .select(responseNameField,
+                        responseExtIdField)
+                .select(DSL.when(si.ORIGINAL_INSTANCE_ID.isNull(), "Yes").else_("No").as("Latest"))  //Could always just return latest instance
                 .select(st.EXTERNAL_ID)
                 .from(st)
                 .innerJoin(sr).on(sr.SURVEY_TEMPLATE_ID.eq(st.ID))
                 .innerJoin(si).on(si.SURVEY_RUN_ID.eq(sr.ID))
                 .innerJoin(sq).on(sq.SURVEY_TEMPLATE_ID.eq(st.ID))
-                .leftJoin(sqr).on(sqr.SURVEY_INSTANCE_ID.eq(si.ID).and(sqr.QUESTION_ID.eq(sq.ID)))
-                .where(condition);
+                .innerJoin(sqr).on(sqr.SURVEY_INSTANCE_ID.eq(si.ID).and(sqr.QUESTION_ID.eq(sq.ID)))
+                .where(dsl.renderInlined(condition));
 
         Result<Record> results = extractAnswersQuery.fetch();
 
@@ -373,12 +397,15 @@ public class SurveyInstanceExtractor implements DataExtractor {
                     .stream()
                     .map(answersForInstance -> {
                         ArrayList<Object> reportRow = new ArrayList<>();
+
+                        //These fields are shared between all the questions for a survey but
+                        // aiming for only one row per instance so only need to take one row
                         Record firstAnswer = first(answersForInstance);
                         reportRow.add(firstAnswer.get(sr.NAME));
                         reportRow.add(firstAnswer.get(sr.ID));
-                        reportRow.add(firstAnswer.get(sr.STATUS));
+                        reportRow.add(firstAnswer.get("run_status", String.class));
                         reportRow.add(firstAnswer.get(si.ID));
-                        reportRow.add(firstAnswer.get(si.STATUS));
+                        reportRow.add(firstAnswer.get("instance_status", String.class));
                         reportRow.add(firstAnswer.get(subjectNameField));
                         reportRow.add(firstAnswer.get(subjectExtIdField));
                         reportRow.add(firstAnswer.get(si.SUBMITTED_AT));
