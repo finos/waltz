@@ -19,7 +19,6 @@
 package org.finos.waltz.web.endpoints.extracts;
 
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
-import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.web.WebUtilities;
@@ -29,13 +28,11 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 
-import static org.finos.waltz.schema.Tables.LICENCE;
-import static org.finos.waltz.schema.tables.Application.APPLICATION;
-import static org.finos.waltz.schema.tables.SoftwareUsage.SOFTWARE_USAGE;
-import static org.finos.waltz.schema.tables.SoftwareVersionLicence.SOFTWARE_VERSION_LICENCE;
-import static org.finos.waltz.web.WebUtilities.getEntityReference;
 import static java.lang.String.format;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
+import static org.finos.waltz.schema.Tables.LICENCE;
+import static org.finos.waltz.schema.tables.SoftwareUsage.SOFTWARE_USAGE;
+import static org.finos.waltz.schema.tables.SoftwareVersionLicence.SOFTWARE_VERSION_LICENCE;
 import static spark.Spark.get;
 
 
@@ -61,7 +58,8 @@ public class LicencesExtractor extends DirectQueryBasedDataExtractor {
             Select<Record1<Long>> appIdSelector = applicationIdSelectorFactory.apply(selectionOptions);
 
             SelectConditionStep<Record8<Long, String, String, String, String, Timestamp, String, String>> qry = dsl
-                    .selectDistinct(LICENCE.ID.as("Licence Id"),
+                    .selectDistinct(
+                            LICENCE.ID.as("Licence Id"),
                             LICENCE.NAME.as("Licence Name"),
                             LICENCE.DESCRIPTION.as("Description"),
                             LICENCE.EXTERNAL_ID.as("External Id"),
@@ -69,15 +67,12 @@ public class LicencesExtractor extends DirectQueryBasedDataExtractor {
                             LICENCE.LAST_UPDATED_AT.as("Last Updated At"),
                             LICENCE.LAST_UPDATED_BY.as("Last Updated By"),
                             LICENCE.PROVENANCE.as("Provenance"))
-                    .from(LICENCE)
+                    .from(SOFTWARE_USAGE)
                     .innerJoin(SOFTWARE_VERSION_LICENCE)
-                    .on(SOFTWARE_VERSION_LICENCE.LICENCE_ID.eq(LICENCE.ID))
-                    .innerJoin(SOFTWARE_USAGE)
-                    .on(SOFTWARE_VERSION_LICENCE.SOFTWARE_VERSION_ID.eq(SOFTWARE_USAGE.SOFTWARE_VERSION_ID))
-                    .innerJoin(APPLICATION).on(SOFTWARE_USAGE.APPLICATION_ID.eq(APPLICATION.ID))
-                    .where(dsl.renderInlined(SOFTWARE_USAGE.APPLICATION_ID.in(appIdSelector)
-                            .and(APPLICATION.ENTITY_LIFECYCLE_STATUS.notEqual(EntityLifecycleStatus.REMOVED.name())
-                                    .and(APPLICATION.IS_REMOVED.isFalse()))));
+                        .on(SOFTWARE_VERSION_LICENCE.SOFTWARE_VERSION_ID.eq(SOFTWARE_USAGE.SOFTWARE_VERSION_ID))
+                    .innerJoin(LICENCE)
+                        .on(LICENCE.ID.eq(SOFTWARE_VERSION_LICENCE.LICENCE_ID))
+                    .where(dsl.renderInlined(SOFTWARE_USAGE.APPLICATION_ID.in(appIdSelector)));
 
             String filename = format("licences-%s/%s", entityRef.kind(), entityRef.id());
 
