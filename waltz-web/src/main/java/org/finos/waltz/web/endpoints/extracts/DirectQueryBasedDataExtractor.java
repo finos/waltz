@@ -22,8 +22,8 @@ package org.finos.waltz.web.endpoints.extracts;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.streaming.SXSSFSheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.eclipse.jetty.http.MimeTypes;
 import org.jooq.DSLContext;
 import org.jooq.Result;
@@ -74,11 +74,11 @@ public abstract class DirectQueryBasedDataExtractor implements DataExtractor {
                                                 String suggestedFilenameStem,
                                                 Response response,
                                                 Tuple2<String, Select<?>>... sheetDefinitions) {
-        XSSFWorkbook workbook = new XSSFWorkbook();
+        SXSSFWorkbook workbook = new SXSSFWorkbook();
 
         for (Tuple2<String, Select<?>> sheetDef : sheetDefinitions) {
             time("preparing excel sheet: " + sheetDef.v1, () -> {
-                XSSFSheet sheet = workbook.createSheet(ExtractorUtilities.sanitizeSheetName(sheetDef.v1));
+                SXSSFSheet sheet = workbook.createSheet(ExtractorUtilities.sanitizeSheetName(sheetDef.v1));
                 writeExcelHeader(sheetDef.v2, sheet);
                 time("writing body", () -> writeExcelBody(sheetDef.v2, sheet, dsl));
 
@@ -101,8 +101,8 @@ public abstract class DirectQueryBasedDataExtractor implements DataExtractor {
     private static Object writeAsExcel(String suggestedFilenameStem,
                                        Select<?> qry,
                                        Response response) throws IOException {
-        XSSFWorkbook workbook = new XSSFWorkbook();
-        XSSFSheet sheet = workbook.createSheet(ExtractorUtilities.sanitizeSheetName(suggestedFilenameStem));
+        SXSSFWorkbook workbook = new SXSSFWorkbook();
+        SXSSFSheet sheet = workbook.createSheet(ExtractorUtilities.sanitizeSheetName(suggestedFilenameStem));
 
         writeExcelHeader(qry, sheet);
         writeExcelBody(qry, sheet, null);
@@ -120,7 +120,7 @@ public abstract class DirectQueryBasedDataExtractor implements DataExtractor {
 
     private static HttpServletResponse writeExcelToResponse(String suggestedFilenameStem,
                                                             Response response,
-                                                            XSSFWorkbook workbook) throws IOException {
+                                                            SXSSFWorkbook workbook) throws IOException {
         byte[] bytes = ExtractorUtilities.convertExcelToByteArray(workbook);
 
         HttpServletResponse httpResponse = response.raw();
@@ -149,7 +149,7 @@ public abstract class DirectQueryBasedDataExtractor implements DataExtractor {
 
 
     private static void writeExcelBody(Select<?> qry,
-                                       XSSFSheet sheet,
+                                       SXSSFSheet sheet,
                                        DSLContext dsl) {
         AtomicInteger rowCounter = new AtomicInteger(1);
         Result<?> records = dsl == null
@@ -173,7 +173,7 @@ public abstract class DirectQueryBasedDataExtractor implements DataExtractor {
     }
 
 
-    private static void writeExcelHeader(Select<?> qry, XSSFSheet sheet) {
+    public static void writeExcelHeader(Select<?> qry, SXSSFSheet sheet) {
         Row headerRow = sheet.createRow(0);
         AtomicInteger colNum = new AtomicInteger();
         qry.fieldStream().forEach(f -> {
