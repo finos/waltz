@@ -231,7 +231,7 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
     private byte[] mkExcelReport(String reportName,
                                  List<String> columnDefinitions,
                                  Set<ApplicationAttestationInstanceSummary> reportRows) throws IOException {
-        SXSSFWorkbook workbook = new SXSSFWorkbook();
+        SXSSFWorkbook workbook = new SXSSFWorkbook(2000);
         SXSSFSheet sheet = workbook.createSheet(sanitizeSheetName(reportName));
 
         int colCount = writeExcelHeader(columnDefinitions, sheet);
