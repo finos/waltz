@@ -5,7 +5,7 @@
 
     export let response;
 
-    $: booleanResponse = response?.booleanResponse === "null"
+    $: booleanResponse = _.isNil(response?.booleanResponse) || response?.booleanResponse === "null"
         ? null
         : stringToBoolean(response?.booleanResponse);
 

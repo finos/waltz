@@ -9,7 +9,7 @@
     let selectedTab = 'completions';
 
     let surveyInstanceCall = surveyInstanceViewStore.findForUser();
-    $: surveyInstances = $surveyInstanceCall.data;
+    $: surveyInstances = $surveyInstanceCall?.data;
 
     $: surveysByInvolvementKind = _.keyBy(surveyInstances, d => d.surveyInvolvementKind);
 
