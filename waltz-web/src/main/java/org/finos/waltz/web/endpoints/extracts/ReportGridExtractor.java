@@ -23,6 +23,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.NameProvider;
@@ -34,6 +35,7 @@ import org.finos.waltz.model.report_grid.ReportGridCell;
 import org.finos.waltz.model.report_grid.ReportGridColumnDefinition;
 import org.finos.waltz.model.report_grid.ReportGridDefinition;
 import org.finos.waltz.service.report_grid.ReportGridService;
+import org.finos.waltz.service.settings.SettingsService;
 import org.finos.waltz.web.WebUtilities;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
@@ -62,10 +64,14 @@ public class ReportGridExtractor implements DataExtractor {
 
     public static final String BASE_URL = WebUtilities.mkPath("data-extract", "report-grid");
     private final ReportGridService reportGridService;
+    private final SettingsService settingsService;
 
     @Autowired
-    public ReportGridExtractor(ReportGridService reportGridService) {
+    public ReportGridExtractor(ReportGridService reportGridService,
+                               SettingsService settingsService) {
+
         this.reportGridService = reportGridService;
+        this.settingsService = settingsService;
     }
 
 
@@ -140,6 +146,11 @@ public class ReportGridExtractor implements DataExtractor {
                 tableData,
                 ReportGridCell::applicationId);
 
+        boolean allowCostsExport = settingsService
+                .getValue(settingsService.ALLOW_COST_EXPORTS_KEY)
+                .map(r -> StringUtilities.isEmpty(r) || Boolean.parseBoolean(r))
+                .orElse(true);
+
         return tableDataByAppId
                 .entrySet()
                 .stream()
@@ -159,12 +170,22 @@ public class ReportGridExtractor implements DataExtractor {
                     //find data for columns
                     reportGrid.definition()
                             .columnDefinitions()
-                            .forEach(colDef -> reportRow.add(
-                                    callValuesByColumnRefForApp.getOrDefault(
+                            .forEach(colDef -> {
+
+                                boolean isCostColumn = colDef.columnEntityReference().kind().equals(EntityKind.COST_KIND);
+
+                                if (!allowCostsExport && isCostColumn) {
+                                    reportRow.add("REDACTED");
+                                } else {
+                                    Object value = callValuesByColumnRefForApp.getOrDefault(
                                             tuple(
-                                                colDef.columnEntityReference().id(),
-                                                colDef.columnEntityReference().kind()),
-                                            null)));
+                                                    colDef.columnEntityReference().id(),
+                                                    colDef.columnEntityReference().kind()),
+                                            null);
+
+                                    reportRow.add(value);
+                                }
+                            });
                     return tuple(app, reportRow);
                 })
                 .sorted(Comparator.comparing(t -> t.v1.name()))
