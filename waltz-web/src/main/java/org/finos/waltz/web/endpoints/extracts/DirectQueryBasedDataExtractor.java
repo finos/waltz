@@ -74,7 +74,7 @@ public abstract class DirectQueryBasedDataExtractor implements DataExtractor {
                                                 String suggestedFilenameStem,
                                                 Response response,
                                                 Tuple2<String, Select<?>>... sheetDefinitions) {
-        SXSSFWorkbook workbook = new SXSSFWorkbook();
+        SXSSFWorkbook workbook = new SXSSFWorkbook(2000);
 
         for (Tuple2<String, Select<?>> sheetDef : sheetDefinitions) {
             time("preparing excel sheet: " + sheetDef.v1, () -> {
@@ -101,7 +101,7 @@ public abstract class DirectQueryBasedDataExtractor implements DataExtractor {
     private static Object writeAsExcel(String suggestedFilenameStem,
                                        Select<?> qry,
                                        Response response) throws IOException {
-        SXSSFWorkbook workbook = new SXSSFWorkbook();
+        SXSSFWorkbook workbook = new SXSSFWorkbook(2000);
         SXSSFSheet sheet = workbook.createSheet(ExtractorUtilities.sanitizeSheetName(suggestedFilenameStem));
 
         writeExcelHeader(qry, sheet);

@@ -272,7 +272,7 @@ public class SurveyInstanceExtractor implements DataExtractor {
 
 
     private byte[] mkExcelReport(String reportName, List<SurveyQuestion> questions, List<List<Object>> reportRows) throws IOException {
-        SXSSFWorkbook workbook = new SXSSFWorkbook(4000);
+        SXSSFWorkbook workbook = new SXSSFWorkbook(2000);
         SXSSFSheet sheet = workbook.createSheet(sanitizeSheetName(reportName));
 
         int colCount = writeExcelHeader(questions, sheet);
