@@ -18,7 +18,7 @@
         .value()
 
     const columnDefs = [
-        { field: "name", name: "Involvement Kind", width: "30%"},
+        { field: "name", name: "Assessment Definition", width: "30%"},
         { field: "description", name: "Description", width: "70%", maxLength: 300},
     ];
 

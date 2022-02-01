@@ -12,13 +12,15 @@
     let selectedEntityKind = null;
     let showDropdown = false;
 
-    const entityKinds = _.orderBy([
-        entity["INVOLVEMENT_KIND"],
-        entity["COST_KIND"],
-        entity["SURVEY_QUESTION"],
-        entity["ASSESSMENT_DEFINITION"],
-        entity["MEASURABLE"],
-    ], d => d.name);
+    const entityKinds = _.orderBy(
+        [
+            entity.INVOLVEMENT_KIND,
+            entity.COST_KIND,
+            entity.SURVEY_QUESTION,
+            entity.ASSESSMENT_DEFINITION,
+            entity.MEASURABLE,
+        ],
+        d => d.name);
 
     function toggleDropdown() {
         showDropdown = !showDropdown

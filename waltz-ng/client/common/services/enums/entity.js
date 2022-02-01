@@ -332,6 +332,13 @@ export const entity = {
         description: null,
         position: 258
     },
+    SURVEY_TEMPLATE: {
+        key: "SURVEY_TEMPLATE",
+        name: "Survey Template",
+        icon: "wpforms",
+        description: null,
+        position: 259
+    },
     SYSTEM: {
         key: "SYSTEM",
         name: "System",

@@ -16,7 +16,7 @@
         const rawVal = _.get(
             row,
             col.field.split("."),
-            "-");
+            "-") || "-";
 
         return col.maxLength
             ? truncateMiddle(rawVal, col.maxLength)

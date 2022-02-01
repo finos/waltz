@@ -3,7 +3,8 @@ import _ from "lodash";
 import {rgb} from "d3-color";
 import {determineForegroundColor} from "../../../common/colors";
 import {scaleLinear} from "d3-scale";
-import extent from "d3-array/src/extent";
+import {extent} from "d3-array";
+
 
 export const reportGridMember = {
     OWNER: {
@@ -14,7 +15,7 @@ export const reportGridMember = {
         key: "VIEWER",
         name: "Viewer"
     }
-}
+};
 
 
 export const reportGridKinds = {
@@ -26,7 +27,8 @@ export const reportGridKinds = {
         key: "PRIVATE",
         name: "Private"
     }
-}
+};
+
 
 export const ratingRollupRule = {
     NONE: {
@@ -45,6 +47,17 @@ export const ratingRollupRule = {
 
     }
 };
+
+
+export function determineDefaultRollupRule(d) {
+    const isMeasurable = _.get(d, "kind") === "MEASURABLE";
+
+    if (isMeasurable) {
+        return ratingRollupRule.PICK_HIGHEST;
+    } else {
+        return ratingRollupRule.NONE;
+    }
+}
 
 
 export const columnUsageKind = {
@@ -67,7 +80,14 @@ const nameCol = mkEntityLinkGridCell(
     "right",
     { pinnedLeft:true, width: 200});
 
-const extIdCol = { field: "application.externalId", displayName: "Ext. Id", width: 100, pinnedLeft:true};
+
+const extIdCol = {
+    field: "application.externalId",
+    displayName: "Ext. Id",
+    width: 100,
+    pinnedLeft:true
+};
+
 
 const lifecyclePhaseCol = {
     field: "application.lifecyclePhase",
@@ -79,6 +99,7 @@ const lifecyclePhaseCol = {
             <span ng-bind="COL_FIELD | toDisplayName:'lifecyclePhase'"></span>
         </div>`
 };
+
 
 const unknownRating = {
     id: -1,
