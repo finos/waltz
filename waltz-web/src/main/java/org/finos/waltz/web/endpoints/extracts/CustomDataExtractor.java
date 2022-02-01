@@ -73,7 +73,7 @@ public abstract class CustomDataExtractor implements DataExtractor {
 
 
     private byte[] mkExcelReport(String reportName, List<List<Object>> reportRows, List<String> headers) throws IOException {
-        SXSSFWorkbook workbook = new SXSSFWorkbook();
+        SXSSFWorkbook workbook = new SXSSFWorkbook(2000);
         SXSSFSheet sheet = workbook.createSheet(sanitizeSheetName(reportName));
 
         int colCount = writeExcelHeader(sheet, headers);
