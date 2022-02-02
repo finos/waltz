@@ -20,17 +20,43 @@
     function moveColumn(positionCount, column) {
         const reorderedList = move($columnDefs, _.indexOf($columnDefs, column), positionCount);
         $lastMovedColumn = column;
-        $columnDefs = _.map(reorderedList,
+
+        $columnDefs = recalcPositions(reorderedList, $selectedGrid.definition.columnDefinitions);
+
+    }
+
+    function recalcPositions(reorderedList, originalList) {
+        return _.map(reorderedList,
             d => Object.assign(
                 {},
                 d,
                 {
-                    position:  _.indexOf(reorderedList, d),
-                    originalPosition: _.findIndex($selectedGrid.definition.columnDefinitions, r => sameRef(d.columnEntityReference, r.columnEntityReference))
+                    position: _.indexOf(reorderedList, d),
+                    originalPosition: _.findIndex(originalList, r => sameRef(d.columnEntityReference, r.columnEntityReference))
                 }));
     }
 
     $: maxPos = _.maxBy($columnDefs, d => d.position);
+
+    function moveToTop(column) {
+        const columnTail = _.reject($columnDefs, column);
+        const reorderedColumns = _.concat([column], columnTail);
+        $columnDefs = recalcPositions(reorderedColumns, $selectedGrid.definition.columnDefinitions)
+    }
+
+    function moveToBottom(column) {
+        const columnHead = _.reject($columnDefs, column);
+        const reorderedColumns = _.concat(columnHead, [column]);
+        $columnDefs = recalcPositions(reorderedColumns, $selectedGrid.definition.columnDefinitions)
+    }
+
+    function moveUp(column) {
+        moveColumn(-1, column);
+    }
+
+    function moveDown(column) {
+        moveColumn(1, column);
+    }
 
 </script>
 
@@ -40,22 +66,25 @@
             <table class="table table-condensed small">
                 <colgroup>
                     <col width="60%">
-                    <col width="10%">
-                    <col width="10%">
+                    <col width="5%">
+                    <col width="5%">
+                    <col width="5%">
+                    <col width="5%">
                     <col width="10%">
                     <col width="10%">
                 </colgroup>
                 <thead>
                     <tr>
                         <th>Entity</th>
-                        <th colspan="2">Position</th>
+                        <th colspan="4">Position</th>
                         <th colspan="2">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {#each _.orderBy($columnDefs, d => d.position) as column}
                         <tr class:selected={$selectedColumn && sameRef(column.columnEntityReference, $selectedColumn?.columnEntityReference)}
-                            class:last-moved={$lastMovedColumn && sameRef(column.columnEntityReference, $lastMovedColumn?.columnEntityReference)}>
+                            class:last-moved={$lastMovedColumn && sameRef(column.columnEntityReference, $lastMovedColumn?.columnEntityReference)}
+                            class="waltz-visibility-parent">
                             <td>
                                 <Icon name={getIcon(column?.columnEntityReference?.kind)}/>
                                 <span>{column?.displayName || column?.columnEntityReference?.name}</span>
@@ -66,30 +95,52 @@
                             </td>
                             <td>
                                 <span style="text-align: center">
-                                    <button class="btn btn-skinny"
+                                    <button class="btn btn-skinny waltz-visibility-child-50"
+                                            title="move to top"
                                             disabled={column.position === 0}
-                                            on:click={() => moveColumn(-1, column)}>
+                                            on:click={() => moveToTop(column)}>
+                                        <Icon name="step-forward" rotate="270"/>
+                                    </button>
+                                </span>
+                            </td>
+                            <td>
+                                <span style="text-align: center">
+                                    <button class="btn btn-skinny waltz-visibility-child-50"
+                                            title="move up"
+                                            disabled={column.position === 0}
+                                            on:click={() => moveUp(column)}>
                                         <Icon name="arrow-up"/>
                                     </button>
                                 </span>
                             </td>
                             <td>
                                 <span style="text-align: center">
-                                    <button class="btn btn-skinny"
+                                    <button class="btn btn-skinny waltz-visibility-child-50"
+                                            title="move down"
                                             disabled={column.position === _.maxBy($columnDefs, d => d.position)?.position}
-                                            on:click={() => moveColumn(1, column)}>
+                                            on:click={() => moveDown(column)}>
                                         <Icon name="arrow-down"/>
                                     </button>
                                 </span>
                             </td>
                             <td>
-                                <button class="btn btn-skinny"
+                                <span style="text-align: center">
+                                    <button class="btn btn-skinny waltz-visibility-child-50"
+                                            title="move to bottom"
+                                            disabled={column.position === _.maxBy($columnDefs, d => d.position)?.position}
+                                            on:click={() => moveToBottom(column)}>
+                                        <Icon name="step-forward" rotate="90"/>
+                                    </button>
+                                </span>
+                            </td>
+                            <td>
+                                <button class="btn btn-skinny waltz-visibility-child-50"
                                         on:click={() => onEdit(column)}>
                                     <Icon name="pencil"/>
                                 </button>
                             </td>
                             <td>
-                                <button class="btn btn-skinny"
+                                <button class="btn btn-skinny waltz-visibility-child-50"
                                         on:click={() => onRemove(column)}>
                                     <Icon name="trash"/>
                                 </button>
