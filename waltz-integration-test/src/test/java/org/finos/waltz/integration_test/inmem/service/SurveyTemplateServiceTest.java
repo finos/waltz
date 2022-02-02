@@ -11,7 +11,6 @@ import org.finos.waltz.model.survey.*;
 import org.finos.waltz.service.survey.SurveyQuestionService;
 import org.finos.waltz.service.survey.SurveyTemplateService;
 import org.jooq.DSLContext;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -194,9 +193,4 @@ public class SurveyTemplateServiceTest extends BaseInMemoryIntegrationTest {
     }
 
 
-    @AfterEach
-    public void teardown() {
-        dsl.deleteFrom(SURVEY_QUESTION).execute();
-        dsl.deleteFrom(SURVEY_TEMPLATE).execute();
-    }
 }
