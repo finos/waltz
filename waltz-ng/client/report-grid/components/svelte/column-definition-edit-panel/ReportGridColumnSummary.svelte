@@ -57,7 +57,12 @@
                         <tr class:selected={$selectedColumn && sameRef(column.columnEntityReference, $selectedColumn?.columnEntityReference)}
                             class:last-moved={$lastMovedColumn && sameRef(column.columnEntityReference, $lastMovedColumn?.columnEntityReference)}>
                             <td>
-                                <Icon name={getIcon(column?.columnEntityReference?.kind)}/> {column?.columnEntityReference?.name || column?.columnEntityReference?.questionText}
+                                <Icon name={getIcon(column?.columnEntityReference?.kind)}/>
+                                <span>{column?.displayName || column?.columnEntityReference?.name}</span>
+                                {#if column?.displayName}
+                                    <div title="This is the original name which has been overridden"
+                                         class="help-block small">{column?.columnEntityReference?.name}</div>
+                                {/if}
                             </td>
                             <td>
                                 <span style="text-align: center">
