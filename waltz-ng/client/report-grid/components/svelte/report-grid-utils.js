@@ -134,11 +134,21 @@ export function prepareColumnDefs(gridData) {
                     allowSummary: false,
                     width: 150,
                     toSearchTerm: d => _.get(d, [mkPropNameForRef(c.columnEntityReference), "text"], ""),
-                    cellTemplate:`
+                    cellTemplate: `
                         <div class="waltz-grid-report-cell"
-                             ng-class="{'wgrc-involvement-cell': COL_FIELD.text && ${c.columnEntityReference.kind === 'INVOLVEMENT_KIND'},
-                                        'wgrc-survey-question-cell': COL_FIELD.text && ${c.columnEntityReference.kind === 'SURVEY_QUESTION'},
+                             uib-popover-html="COL_FIELD.comment"
+                             popover-trigger="mouseenter"
+                             popover-enable="COL_FIELD.comment != null"
+                             popover-popup-delay="500"
+                             popover-append-to-body="true"
+                             popover-placement="left"
+                             ng-class="{'wgrc-involvement-cell': COL_FIELD.text && ${c.columnEntityReference.kind === "INVOLVEMENT_KIND"},
+                                        'wgrc-survey-question-cell': COL_FIELD.text && ${c.columnEntityReference.kind === "SURVEY_QUESTION"},
                                         'wgrc-no-data-cell': !COL_FIELD.text}"
+                             ng-style="{
+                                'border-bottom-right-radius': COL_FIELD.comment ? '15% 50%' : 0,
+                                'background-color': COL_FIELD.color,
+                                'color': COL_FIELD.fontColor}">
                             <span ng-bind="COL_FIELD.text || '-'"
                                   ng-attr-title="{{COL_FIELD.text}}">
                             </span>
@@ -239,13 +249,15 @@ export function prepareTableData(gridData) {
             case "INVOLVEMENT_KIND":
             case "SURVEY_QUESTION":
                 return {
-                    text: x.text };
+                    text: x.text,
+                    comment: x.comment
+                };
             default:
                 const ratingSchemeItem = ratingSchemeItemsById[x.ratingId];
                 const popoverHtml = mkPopoverHtml(x, ratingSchemeItem);
-
-                return Object.assign({}, ratingSchemeItem, { comment: popoverHtml });
-        }}
+                return Object.assign({}, ratingSchemeItem, {comment: popoverHtml});
+        }
+    }
 
     return _
         .chain(gridData.instance.cellData)

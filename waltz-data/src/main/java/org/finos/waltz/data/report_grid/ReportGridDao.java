@@ -583,7 +583,9 @@ public class ReportGridDao {
                     .select(SURVEY_QUESTION_RESPONSE.COMMENT)
                     .select(DSL.coalesce(
                             SURVEY_QUESTION_RESPONSE.STRING_RESPONSE,
-                            DSL.cast(SURVEY_QUESTION_RESPONSE.BOOLEAN_RESPONSE, String.class),
+                            DSL.when(SURVEY_QUESTION_RESPONSE.BOOLEAN_RESPONSE.isNull(), DSL.castNull(String.class))
+                                    .when(SURVEY_QUESTION_RESPONSE.BOOLEAN_RESPONSE.isTrue(), DSL.val("true"))
+                                    .otherwise(DSL.val("false")),
                             DSL.cast(SURVEY_QUESTION_RESPONSE.NUMBER_RESPONSE, String.class),
                             DSL.cast(SURVEY_QUESTION_RESPONSE.DATE_RESPONSE, String.class),
                             DSL.cast(SURVEY_QUESTION_RESPONSE.LIST_RESPONSE_CONCAT, String.class)).as("response")) // for entity responses need to join entity name field
