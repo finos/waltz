@@ -28,6 +28,7 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.NameProvider;
 import org.finos.waltz.model.application.Application;
+import org.finos.waltz.model.application.LifecyclePhase;
 import org.finos.waltz.model.external_identifier.ExternalIdValue;
 import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.model.report_grid.ReportGrid;
@@ -123,7 +124,8 @@ public class ReportGridExtractor implements DataExtractor {
         List<String> staticHeaders = newArrayList(
                 "Application Id",
                 "Application Name",
-                "Application Asset Code");
+                "Application Asset Code",
+                "Application Lifecycle Phase");
 
         List<String> columnHeaders = map(
                 columnDefinitions,
@@ -247,8 +249,9 @@ public class ReportGridExtractor implements DataExtractor {
         long appId = row.v1.entityReference().id();
         String appName = row.v1.name();
         Optional<ExternalIdValue> assetCode = row.v1.assetCode();
+        LifecyclePhase lifecyclePhase = row.v1.lifecyclePhase();
 
-        List<Object> appInfo = asList(appId, appName, assetCode);
+        List<Object> appInfo = asList(appId, appName, assetCode, lifecyclePhase.name());
 
         return map(concat(appInfo, row.v2), value -> {
             if (value == null) return null;
@@ -292,8 +295,9 @@ public class ReportGridExtractor implements DataExtractor {
             long appId = r.v1.entityReference().id();
             String appName = r.v1.name();
             Optional<ExternalIdValue> assetCode = r.v1.assetCode();
+            LifecyclePhase lifecyclePhase = r.v1.lifecyclePhase();
 
-            List<Object> appInfo = asList(appId, appName, assetCode);
+            List<Object> appInfo = asList(appId, appName, assetCode, lifecyclePhase.name());
 
             List<Object> values = concat(appInfo, r.v2);
 
