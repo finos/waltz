@@ -444,18 +444,18 @@ public class ReportGridDao {
                         ratingSchemeItems.field("rsiId", Long.class),
                         ratingSchemeItems.field("rsiPos", Integer.class),
                         ratingSchemeItems.field("rsiName", String.class))
-                .from(m)
+                .from(mr)
                 .innerJoin(eh)
-                    .on(eh.ANCESTOR_ID.eq(m.ID))
-                    .and(eh.KIND.eq(EntityKind.MEASURABLE.name()))
-                .innerJoin(mr)
-                    .on(mr.MEASURABLE_ID.eq(eh.ID))
+                .on(eh.ID.eq(mr.MEASURABLE_ID))
+                .and(eh.KIND.eq(EntityKind.MEASURABLE.name()))
+                .innerJoin(m)
+                .on(eh.ANCESTOR_ID.eq(m.ID))
                 .innerJoin(ratingSchemeItems)
-                    .on(m.MEASURABLE_CATEGORY_ID.eq(ratingSchemeItems.field("mcId", Long.class)))
-                    .and(mr.RATING.eq(ratingSchemeItems.field("rsiCode", String.class)))
-                .where(mr.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                .and(mr.ENTITY_ID.in(appSelector))
-                .and(m.ID.in(union(measurableIdsUsingHighest, measurableIdsUsingLowest)));
+                .on(m.MEASURABLE_CATEGORY_ID.eq(ratingSchemeItems.field("mcId", Long.class)))
+                .and(mr.RATING.eq(ratingSchemeItems.field("rsiCode", String.class)))
+                .where(mr.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                        .and(mr.ENTITY_ID.in(appSelector))
+                        .and(m.ID.in(union(measurableIdsUsingHighest, measurableIdsUsingLowest))));
 
         return dsl
                 .resultQuery(dsl.renderInlined(ratings))
@@ -583,15 +583,17 @@ public class ReportGridDao {
                     .select(SURVEY_QUESTION_RESPONSE.COMMENT)
                     .select(DSL.coalesce(
                             SURVEY_QUESTION_RESPONSE.STRING_RESPONSE,
-                            DSL.cast(SURVEY_QUESTION_RESPONSE.BOOLEAN_RESPONSE, String.class),
+                            DSL.when(SURVEY_QUESTION_RESPONSE.BOOLEAN_RESPONSE.isNull(), DSL.castNull(String.class))
+                                    .when(SURVEY_QUESTION_RESPONSE.BOOLEAN_RESPONSE.isTrue(), DSL.val("true"))
+                                    .otherwise(DSL.val("false")),
                             DSL.cast(SURVEY_QUESTION_RESPONSE.NUMBER_RESPONSE, String.class),
                             DSL.cast(SURVEY_QUESTION_RESPONSE.DATE_RESPONSE, String.class),
                             DSL.cast(SURVEY_QUESTION_RESPONSE.LIST_RESPONSE_CONCAT, String.class)).as("response")) // for entity responses need to join entity name field
-                    .from(SURVEY_QUESTION)
-                    .innerJoin(SURVEY_QUESTION_RESPONSE)
-                    .on(SURVEY_QUESTION.ID.eq(SURVEY_QUESTION_RESPONSE.QUESTION_ID))
+                    .from(SURVEY_QUESTION_RESPONSE)
                     .innerJoin(SURVEY_INSTANCE)
                     .on(SURVEY_QUESTION_RESPONSE.SURVEY_INSTANCE_ID.eq(SURVEY_INSTANCE.ID))
+                    .innerJoin(SURVEY_QUESTION)
+                    .on(SURVEY_QUESTION.ID.eq(SURVEY_QUESTION_RESPONSE.QUESTION_ID))
                     .where(SURVEY_INSTANCE.STATUS.in(APPROVED.name(), COMPLETED.name())
                             .and(SURVEY_QUESTION.ID.in(requiredSurveyQuestionIds))
                             .and(SURVEY_INSTANCE.ENTITY_ID.in(appSelector))
