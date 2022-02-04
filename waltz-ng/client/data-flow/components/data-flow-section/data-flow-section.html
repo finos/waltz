@@ -258,17 +258,19 @@
 
         <div class="wt-tab wt-active"
              ng-if="$ctrl.activeTab.id === 'LOGICAL_FLOW_SCROLL'">
-            <waltz-svelte-component component="$ctrl.LogicalFlowScrollPanel"
-                                    primary-entity-ref="$ctrl.parentEntityRef">
-            </waltz-svelte-component>
+            <div ng-if="!isEmpty($ctrl.parentEntityRef.id)">
+                <waltz-svelte-component component="$ctrl.LogicalFlowScrollPanel"
+                                        primary-entity-ref="$ctrl.parentEntityRef">
+                </waltz-svelte-component>
 
-            <p class="help-block">
-                This diagram shows inbound or outbound flows categorized by data type to this application
-            </p>
-            <p class="help-block">
-                Legend:
-                <waltz-svelte-component component="$ctrl.FlowClassificationLegend"></waltz-svelte-component>
-            </p>
+                <p class="help-block">
+                    This diagram shows inbound or outbound flows categorized by data type to this application
+                </p>
+                <p class="help-block">
+                    Legend:
+                    <waltz-svelte-component component="$ctrl.FlowClassificationLegend"></waltz-svelte-component>
+                </p>
+            </div>
         </div>
     </div>
 </div>

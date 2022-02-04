@@ -18,23 +18,24 @@
 
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ArrayUtilities_initialTest {
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void askingForTheInitialPartOfAnEmptyArrayThrowsException() {
         String[] xs = {};
-        ArrayUtilities.initial(xs);
+        assertThrows(IllegalArgumentException.class, ()
+                -> ArrayUtilities.initial(xs));
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void askingForTheInitialPartOfANullArrayThrowsException() {
-        ArrayUtilities.initial(null);
+        assertThrows(IllegalArgumentException.class, ()
+                -> ArrayUtilities.initial(null));
     }
 
 

@@ -3,7 +3,8 @@ import _ from "lodash";
 import {rgb} from "d3-color";
 import {determineForegroundColor} from "../../../common/colors";
 import {scaleLinear} from "d3-scale";
-import extent from "d3-array/src/extent";
+import {extent} from "d3-array";
+
 
 export const reportGridMember = {
     OWNER: {
@@ -14,7 +15,7 @@ export const reportGridMember = {
         key: "VIEWER",
         name: "Viewer"
     }
-}
+};
 
 
 export const reportGridKinds = {
@@ -26,7 +27,8 @@ export const reportGridKinds = {
         key: "PRIVATE",
         name: "Private"
     }
-}
+};
+
 
 export const ratingRollupRule = {
     NONE: {
@@ -45,6 +47,17 @@ export const ratingRollupRule = {
 
     }
 };
+
+
+export function determineDefaultRollupRule(d) {
+    const isMeasurable = _.get(d, "kind") === "MEASURABLE";
+
+    if (isMeasurable) {
+        return ratingRollupRule.PICK_HIGHEST;
+    } else {
+        return ratingRollupRule.NONE;
+    }
+}
 
 
 export const columnUsageKind = {
@@ -67,7 +80,12 @@ const nameCol = mkEntityLinkGridCell(
     "right",
     {pinnedLeft: true, width: 200});
 
-const extIdCol = {field: "subject.entityReference.externalId", displayName: "Ext. Id", width: 100, pinnedLeft: true};
+const extIdCol = {
+    field: "subject.entityReference.externalId",
+    displayName: "Ext. Id",
+    width: 100,
+    pinnedLeft: true
+};
 
 const lifecyclePhaseCol = {
     field: "subject.lifecyclePhase",
@@ -79,6 +97,7 @@ const lifecyclePhaseCol = {
             <span ng-bind="COL_FIELD | toDisplayName:'lifecyclePhase'"></span>
         </div>`
 };
+
 
 const unknownRating = {
     id: -1,
@@ -134,11 +153,21 @@ export function prepareColumnDefs(gridData) {
                     allowSummary: false,
                     width: 150,
                     toSearchTerm: d => _.get(d, [mkPropNameForRef(c.columnEntityReference), "text"], ""),
-                    cellTemplate:`
+                    cellTemplate: `
                         <div class="waltz-grid-report-cell"
-                             ng-class="{'wgrc-involvement-cell': COL_FIELD.text && ${c.columnEntityReference.kind === 'INVOLVEMENT_KIND'},
-                                        'wgrc-survey-question-cell': COL_FIELD.text && ${c.columnEntityReference.kind === 'SURVEY_QUESTION'},
+                             uib-popover-html="COL_FIELD.comment"
+                             popover-trigger="mouseenter"
+                             popover-enable="COL_FIELD.comment != null"
+                             popover-popup-delay="500"
+                             popover-append-to-body="true"
+                             popover-placement="left"
+                             ng-class="{'wgrc-involvement-cell': COL_FIELD.text && ${c.columnEntityReference.kind === "INVOLVEMENT_KIND"},
+                                        'wgrc-survey-question-cell': COL_FIELD.text && ${c.columnEntityReference.kind === "SURVEY_QUESTION"},
                                         'wgrc-no-data-cell': !COL_FIELD.text}"
+                             ng-style="{
+                                'border-bottom-right-radius': COL_FIELD.comment ? '15% 50%' : 0,
+                                'background-color': COL_FIELD.color,
+                                'color': COL_FIELD.fontColor}">
                             <span ng-bind="COL_FIELD.text || '-'"
                                   ng-attr-title="{{COL_FIELD.text}}">
                             </span>
@@ -235,17 +264,20 @@ export function prepareTableData(gridData) {
                 const color = costColorScalesByColumnEntityId[x.columnEntityId](x.value);
                 return {
                     color: color,
-                    value: x.value };
+                    value: x.value
+                };
             case "INVOLVEMENT_KIND":
             case "SURVEY_QUESTION":
                 return {
-                    text: x.text };
+                    text: x.text,
+                    comment: x.comment
+                };
             default:
                 const ratingSchemeItem = ratingSchemeItemsById[x.ratingId];
                 const popoverHtml = mkPopoverHtml(x, ratingSchemeItem);
-
-                return Object.assign({}, ratingSchemeItem, { comment: popoverHtml });
-        }}
+                return Object.assign({}, ratingSchemeItem, {comment: popoverHtml});
+        }
+    }
 
     return _
         .chain(gridData.instance.cellData)

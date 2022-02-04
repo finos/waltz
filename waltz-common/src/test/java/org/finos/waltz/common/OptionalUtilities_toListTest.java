@@ -1,11 +1,12 @@
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class OptionalUtilities_toListTest {
     @Test
@@ -32,10 +33,11 @@ public class OptionalUtilities_toListTest {
         assertEquals(0, result.size());
     }
 
-    @Test(expected = NullPointerException.class)
-    public void simpleToListWithOneNullEle(){
+    @Test
+    public void simpleToListWithOneNullEle() {
         Optional<String> ele1 = Optional.of("a");
         Optional<String> ele2 = null;
-        OptionalUtilities.toList(ele1, ele2);
+        assertThrows(NullPointerException.class,
+                () -> OptionalUtilities.toList(ele1, ele2));
     }
 }

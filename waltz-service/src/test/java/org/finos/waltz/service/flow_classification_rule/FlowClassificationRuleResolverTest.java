@@ -25,8 +25,8 @@ import org.finos.waltz.model.ImmutableEntityReference;
 import org.finos.waltz.model.flow_classification_rule.FlowClassificationRuleVantagePoint;
 import org.finos.waltz.model.flow_classification_rule.ImmutableFlowClassificationRuleVantagePoint;
 import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +34,7 @@ import java.util.Optional;
 
 import static org.finos.waltz.service.flow_classification_rule.FlowClassificationRuleResolver.getMostSpecificRanked;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class FlowClassificationRuleResolverTest {
 
@@ -57,7 +58,7 @@ public class FlowClassificationRuleResolverTest {
 
         AuthoritativenessRatingValue rating = flowClassificationRuleResolver.resolve(vantagePoint, sourceApp, 20L);
 
-        Assert.assertEquals(AuthoritativenessRatingValue.NO_OPINION, rating);
+        assertEquals(AuthoritativenessRatingValue.NO_OPINION, rating);
     }
 
 
@@ -79,7 +80,7 @@ public class FlowClassificationRuleResolverTest {
 
         AuthoritativenessRatingValue rating = flowClassificationRuleResolver.resolve(vantagePoint, sourceApp, 20L);
 
-        Assert.assertEquals(AuthoritativenessRatingValue.NO_OPINION, rating);
+        assertEquals(AuthoritativenessRatingValue.NO_OPINION, rating);
     }
 
 
@@ -102,7 +103,7 @@ public class FlowClassificationRuleResolverTest {
 
         AuthoritativenessRatingValue rating = flowClassificationRuleResolver.resolve(vantagePoint, sourceApp, 20L);
 
-        Assert.assertEquals(AuthoritativenessRatingValue.DISCOURAGED, rating);
+        assertEquals(AuthoritativenessRatingValue.DISCOURAGED, rating);
     }
 
 
@@ -136,7 +137,7 @@ public class FlowClassificationRuleResolverTest {
 
         AuthoritativenessRatingValue rating = flowClassificationRuleResolver.resolve(vantagePoint, sourceApp, 20L);
 
-        Assert.assertEquals(AuthoritativenessRatingValue.of("SECONDARY"), rating);
+        assertEquals(AuthoritativenessRatingValue.of("SECONDARY"), rating);
 
     }
 
@@ -161,11 +162,11 @@ public class FlowClassificationRuleResolverTest {
         Optional<FlowClassificationRuleVantagePoint> bestRankedOrgUnit = getMostSpecificRanked(newArrayList(rank12, rank22));
         Optional<FlowClassificationRuleVantagePoint> bestRankedDataType = getMostSpecificRanked(newArrayList(rank12, rank11));
 
-        Assert.assertTrue(bestRankedOrgUnit.isPresent());
-        Assert.assertEquals(rank22, bestRankedOrgUnit.get());
+        assertTrue(bestRankedOrgUnit.isPresent());
+        assertEquals(rank22, bestRankedOrgUnit.get());
 
-        Assert.assertTrue(bestRankedDataType.isPresent());
-        Assert.assertEquals(rank12, bestRankedDataType.get());
+        assertTrue(bestRankedDataType.isPresent());
+        assertEquals(rank12, bestRankedDataType.get());
     }
 
 
@@ -175,7 +176,7 @@ public class FlowClassificationRuleResolverTest {
 
         Optional<FlowClassificationRuleVantagePoint> bestRanked = getMostSpecificRanked(newArrayList());
 
-        Assert.assertFalse(bestRanked.isPresent());
+        assertFalse(bestRanked.isPresent());
     }
 
 }

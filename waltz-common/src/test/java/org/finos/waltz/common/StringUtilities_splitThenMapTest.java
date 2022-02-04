@@ -1,10 +1,12 @@
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.finos.waltz.common.RandomUtilities.randomPick;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class StringUtilities_splitThenMapTest {
 
@@ -15,10 +17,11 @@ public class StringUtilities_splitThenMapTest {
         assertEquals(expectedList, StringUtilities.splitThenMap(str,",",x->x));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void simpleSplitThenMapWithNullTrans(){
+    @Test
+    public void simpleSplitThenMapWithNullTrans() {
         String str = "a,b,c";
-        StringUtilities.splitThenMap(str,",",null);
+        assertThrows(IllegalArgumentException.class,
+                () -> StringUtilities.splitThenMap(str, ",", null));
     }
 
     @Test

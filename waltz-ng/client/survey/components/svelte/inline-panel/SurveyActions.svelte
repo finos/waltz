@@ -11,6 +11,7 @@
     import StaticPanels from "../../../../common/svelte/StaticPanels.svelte";
 
     export let survey;
+    export let additionalLinkActions = [];
 
     const Modes = {
         LIST: "LIST",
@@ -56,14 +57,25 @@
         const updateCmd = {action: name, reason: reason};
 
         return Promise
-                .resolve(surveyInstanceStore.updateStatus(surveyInstanceId, updateCmd))
-                .then(() => {
-                    toasts.success("Survey response " + verb + " successfully");
-                    findPossibleActionsCall = surveyInstanceStore.findPossibleActions(surveyInstanceId, true);
-                    dispatch("action", surveyInstanceId);
-                    onCancelAction();
-                })
-                .catch(e => displayError("Unable to update status of survey. " + e.error, e));
+            .resolve(surveyInstanceStore.updateStatus(surveyInstanceId, updateCmd))
+            .then(() => {
+                toasts.success("Survey response " + verb + " successfully");
+                findPossibleActionsCall = surveyInstanceStore.findPossibleActions(surveyInstanceId, true);
+                dispatch("action", surveyInstanceId);
+                onCancelAction();
+            })
+            .catch(e => displayError("Unable to update status of survey. " + e.error, e));
+    }
+
+    function mkConfirmationKey(templateExtId, surveyAction) {
+        return `CONFIRMATION.SURVEY_ACTION.${templateExtId}.${surveyAction}`;
+    }
+
+    function hasPermission(permissions, action) {
+        const requiredPermission = action.requiredPermission;
+
+        return _.isEmpty(requiredPermission) ||
+            _.get(permissions, [action.requiredPermission], false);
     }
 
 
@@ -95,11 +107,8 @@
 
     $: hasMandatoryQuestionsWithoutResponse = ! _.isEmpty($missingMandatoryQuestionIds);
 
-    function mkConfirmationKey(templateExtId, surveyAction) {
-        return `CONFIRMATION.SURVEY_ACTION.${templateExtId}.${surveyAction}`;
-    }
-
     $: confirmationGroupKey = mkConfirmationKey(survey?.surveyTemplateRef?.externalId, activeAction?.name);
+
 
 </script>
 
@@ -113,18 +122,20 @@
         </h5>
         <div class="actions">
             <ul class="list-inline">
-                {#if permissions?.canEdit}
-                    <li>
-                        <ViewLink state="main.survey.instance.edit"
-                                  ctx={{id: instanceId}}>
-                            <button class="btn btn-xs btn-primary"
-                                    title="Edit survey responses">
-                                <Icon name="pencil"/>
-                                Edit
-                            </button>
-                        </ViewLink>
-                    </li>
-                {/if}
+                {#each additionalLinkActions as action}
+                    {#if hasPermission(permissions, action)}
+                        <li>
+                            <ViewLink state={action.state}
+                                      ctx={{id: instanceId}}>
+                                <button class="btn btn-xs btn-primary"
+                                        title="Edit survey responses">
+                                    <Icon name={action.icon}/>
+                                    {action.name}
+                                </button>
+                            </ViewLink>
+                        </li>
+                    {/if}
+                {/each}
                 {#each actionList as action}
                     <li>
                         <button class={mkButtonClasses(action)}

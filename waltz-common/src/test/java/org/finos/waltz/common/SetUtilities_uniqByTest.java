@@ -1,11 +1,13 @@
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 public class SetUtilities_uniqByTest {
@@ -34,10 +36,11 @@ public class SetUtilities_uniqByTest {
         assertEquals(0, result.size());
     }
 
-    @Test(expected = NullPointerException.class)
-    public void simpleUniqByWithNullElement(){
+    @Test
+    public void simpleUniqByWithNullElement() {
         Collection<String> ele = null;
-        SetUtilities.uniqBy(ele, x->x);
+        assertThrows(NullPointerException.class,
+                () -> SetUtilities.uniqBy(ele, x -> x));
     }
 
 }

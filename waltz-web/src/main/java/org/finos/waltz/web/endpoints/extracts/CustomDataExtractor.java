@@ -22,8 +22,8 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.streaming.SXSSFSheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.jooq.lambda.tuple.Tuple3;
 import org.springframework.stereotype.Service;
 import org.supercsv.io.CsvListWriter;
@@ -36,9 +36,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.finos.waltz.common.ListUtilities.map;
 import static org.finos.waltz.web.endpoints.extracts.ExtractorUtilities.convertExcelToByteArray;
 import static org.finos.waltz.web.endpoints.extracts.ExtractorUtilities.sanitizeSheetName;
-import static org.finos.waltz.common.ListUtilities.map;
 import static org.jooq.lambda.fi.util.function.CheckedConsumer.unchecked;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
@@ -73,8 +73,8 @@ public abstract class CustomDataExtractor implements DataExtractor {
 
 
     private byte[] mkExcelReport(String reportName, List<List<Object>> reportRows, List<String> headers) throws IOException {
-        XSSFWorkbook workbook = new XSSFWorkbook();
-        XSSFSheet sheet = workbook.createSheet(sanitizeSheetName(reportName));
+        SXSSFWorkbook workbook = new SXSSFWorkbook(2000);
+        SXSSFSheet sheet = workbook.createSheet(sanitizeSheetName(reportName));
 
         int colCount = writeExcelHeader(sheet, headers);
         writeExcelBody(reportRows, sheet);
@@ -86,7 +86,7 @@ public abstract class CustomDataExtractor implements DataExtractor {
     }
 
 
-    private int writeExcelHeader(XSSFSheet sheet, List<String> headers) {
+    private int writeExcelHeader(SXSSFSheet sheet, List<String> headers) {
         Row headerRow = sheet.createRow(0);
         AtomicInteger colNum = new AtomicInteger();
 
@@ -100,7 +100,7 @@ public abstract class CustomDataExtractor implements DataExtractor {
         cell.setCellValue(text);
     }
 
-    private int writeExcelBody(List<List<Object>> reportRows, XSSFSheet sheet) {
+    private int writeExcelBody(List<List<Object>> reportRows, SXSSFSheet sheet) {
         AtomicInteger rowNum = new AtomicInteger(1);
         reportRows.forEach(values -> {
             Row row = sheet.createRow(rowNum.getAndIncrement());

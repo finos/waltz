@@ -70,7 +70,8 @@ public class SurveyInstanceOwnerDao {
                 .where(SURVEY_INSTANCE_OWNER.SURVEY_INSTANCE_ID.eq(surveyInstanceId)
                         .and(SURVEY_INSTANCE_OWNER.PERSON_ID.eq(personId))));
 
-        return dsl.select(DSL.when(recipientExists, true).otherwise(false))
+        return dsl
+                .select(DSL.when(recipientExists, true).otherwise(false))
                 .fetchOne(Record1::value1);
     }
 

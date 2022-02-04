@@ -18,13 +18,14 @@
 
 package org.finos.waltz.service.user_contribution;
 
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.finos.waltz.service.user_contribution.UserContributionUtilities.findWindow;
 import static org.finos.waltz.common.ListUtilities.asList;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 public class UserContributionUtilitiesTest {
 
@@ -34,10 +35,10 @@ public class UserContributionUtilitiesTest {
 
         List<Integer> startBoundaryWindow = findWindow(list, 1, 10);
 
-        Assert.assertArrayEquals(
-                "Start boundary window is incorrect",
+        assertArrayEquals(
                 new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
-                startBoundaryWindow.toArray());
+                startBoundaryWindow.toArray(),
+                "Start boundary window is incorrect");
     }
 
 
@@ -47,10 +48,10 @@ public class UserContributionUtilitiesTest {
 
         List<Integer> endBoundaryWindow = findWindow(list, 8, 10);
 
-        Assert.assertArrayEquals(
-                "Middle boundary window is incorrect",
+        assertArrayEquals(
                 new Integer[]{4, 5, 6, 7, 8, 9, 10, 11, 12, 13},
-                endBoundaryWindow.toArray());
+                endBoundaryWindow.toArray(),
+                "Middle boundary window is incorrect");
     }
 
 
@@ -60,10 +61,10 @@ public class UserContributionUtilitiesTest {
 
         List<Integer> endBoundaryWindow = findWindow(list, 15, 10);
 
-        Assert.assertArrayEquals(
-                "End boundary window is incorrect",
+        assertArrayEquals(
                 new Integer[]{6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
-                endBoundaryWindow.toArray());
+                endBoundaryWindow.toArray(),
+                "End boundary window is incorrect");
     }
 
 
@@ -73,10 +74,10 @@ public class UserContributionUtilitiesTest {
 
         List<Integer> endBoundaryWindow = findWindow(list, 3, 10);
 
-        Assert.assertArrayEquals(
-                "Near start boundary window is incorrect",
+        assertArrayEquals(
                 new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
-                endBoundaryWindow.toArray());
+                endBoundaryWindow.toArray(),
+                "Near start boundary window is incorrect");
     }
 
 
@@ -86,10 +87,10 @@ public class UserContributionUtilitiesTest {
 
         List<Integer> endBoundaryWindow = findWindow(list, 12, 10);
 
-        Assert.assertArrayEquals(
-                "Near end boundary window is incorrect",
+        assertArrayEquals(
                 new Integer[]{6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
-                endBoundaryWindow.toArray());
+                endBoundaryWindow.toArray(),
+                "Near end boundary window is incorrect");
     }
 
 
@@ -99,10 +100,10 @@ public class UserContributionUtilitiesTest {
 
         List<Integer> endBoundaryWindow = findWindow(list, 8, 5);
 
-        Assert.assertArrayEquals(
-                "Odd window size does not return correctly",
+        assertArrayEquals(
                 new Integer[]{6, 7, 8, 9, 10},
-                endBoundaryWindow.toArray());
+                endBoundaryWindow.toArray(),
+                "Odd window size does not return correctly");
     }
 
 
@@ -112,10 +113,10 @@ public class UserContributionUtilitiesTest {
 
         List<Integer> endBoundaryWindow = findWindow(list, 8, 20);
 
-        Assert.assertArrayEquals(
-                "window size is greater than the length of the list",
+        assertArrayEquals(
                 new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15},
-                endBoundaryWindow.toArray());
+                endBoundaryWindow.toArray(),
+                "window size is greater than the length of the list");
     }
 
 

@@ -18,13 +18,12 @@
 
 package org.finos.waltz.web.endpoints.extracts;
 
-import org.finos.waltz.service.attestation.AttestationInstanceService;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.streaming.SXSSFSheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.model.EntityKind;
@@ -32,6 +31,7 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.attestation.ApplicationAttestationInstanceInfo;
 import org.finos.waltz.model.attestation.ApplicationAttestationInstanceSummary;
 import org.finos.waltz.model.external_identifier.ExternalIdValue;
+import org.finos.waltz.service.attestation.AttestationInstanceService;
 import org.finos.waltz.web.WebUtilities;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -49,15 +49,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static java.lang.String.format;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.ListUtilities.asList;
 import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static org.finos.waltz.schema.tables.AttestationInstance.ATTESTATION_INSTANCE;
 import static org.finos.waltz.schema.tables.AttestationInstanceRecipient.ATTESTATION_INSTANCE_RECIPIENT;
 import static org.finos.waltz.schema.tables.AttestationRun.ATTESTATION_RUN;
 import static org.finos.waltz.web.endpoints.extracts.ExtractorUtilities.convertExcelToByteArray;
 import static org.finos.waltz.web.endpoints.extracts.ExtractorUtilities.sanitizeSheetName;
-import static java.lang.String.format;
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.ListUtilities.asList;
 import static org.jooq.lambda.fi.util.function.CheckedConsumer.unchecked;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 import static spark.Spark.get;
@@ -231,8 +231,8 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
     private byte[] mkExcelReport(String reportName,
                                  List<String> columnDefinitions,
                                  Set<ApplicationAttestationInstanceSummary> reportRows) throws IOException {
-        XSSFWorkbook workbook = new XSSFWorkbook();
-        XSSFSheet sheet = workbook.createSheet(sanitizeSheetName(reportName));
+        SXSSFWorkbook workbook = new SXSSFWorkbook(2000);
+        SXSSFSheet sheet = workbook.createSheet(sanitizeSheetName(reportName));
 
         int colCount = writeExcelHeader(columnDefinitions, sheet);
         writeExcelBody(reportRows, sheet);
@@ -244,7 +244,7 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
     }
 
 
-    private int writeExcelBody(Set<ApplicationAttestationInstanceSummary> reportRows, XSSFSheet sheet) {
+    private int writeExcelBody(Set<ApplicationAttestationInstanceSummary> reportRows, SXSSFSheet sheet) {
         AtomicInteger rowNum = new AtomicInteger(1);
         reportRows.forEach(r -> {
 
@@ -286,7 +286,7 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
     }
 
 
-    private int writeExcelHeader(List<String> columnDefinitions, XSSFSheet sheet) {
+    private int writeExcelHeader(List<String> columnDefinitions, SXSSFSheet sheet) {
         org.apache.poi.ss.usermodel.Row headerRow = sheet.createRow(0);
         AtomicInteger colNum = new AtomicInteger();
 

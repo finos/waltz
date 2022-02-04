@@ -46,7 +46,7 @@ import java.util.List;
 
 import static org.finos.waltz.schema.Tables.*;
 
-
+@SuppressWarnings("deprecation")
 public class AllocationHarness {
 
     private static final String PROVENANCE = "TEST_DATA_321";

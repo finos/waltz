@@ -18,38 +18,44 @@
 
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 public class Checks_checkAllTest {
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void mustBeGivenAnArray() {
-        Checks.checkAll((Object[]) null, x -> true, "test");
+        assertThrows(IllegalArgumentException.class, ()
+                -> Checks.checkAll((Object[]) null, x -> true, "test"));
     }
 
-    
-    @Test(expected = IllegalArgumentException.class)
+
+    @Test
     public void mustBeGivenACollection() {
-        Checks.checkAll((Collection<?>) null, x -> true, "test");
+        assertThrows(IllegalArgumentException.class,
+                () -> Checks.checkAll((Collection<?>) null, x -> true, "test"));
     }
 
-    
-    @Test(expected = IllegalArgumentException.class)
+
+    @Test
     public void mustBeGivenAPredicate() {
-        Checks.checkAll(new String[]{}, null, "test");
+        assertThrows(IllegalArgumentException.class,
+                () -> Checks.checkAll(new String[]{}, null, "test"));
     }
 
 
     @Test
     public void passesIfPredicateIsTrueForAll() {
-        Checks.checkAll(new Integer[]{1, 3, 5}, x -> (x.intValue() % 2) == 1, "test");
+        Checks.checkAll(new Integer[]{1, 3, 5}, x -> (x % 2) == 1, "test");
     }
 
-    
-    @Test(expected = IllegalArgumentException.class)
+
+    @Test
     public void throwsIfPredicateIsFalseForAny() {
-        Checks.checkAll(new Integer[]{1, 4, 5}, x -> (x.intValue() % 2) == 1, "test");
+        assertThrows(IllegalArgumentException.class,
+                () -> Checks.checkAll(new Integer[]{1, 4, 5}, x -> (x % 2) == 1, "test"));
     }
 }

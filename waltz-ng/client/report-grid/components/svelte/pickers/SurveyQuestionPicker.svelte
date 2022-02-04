@@ -12,7 +12,11 @@
     let selectedTemplate = null;
 
     $: templatesCall = surveyTemplateStore.findAll();
-    $: templates = _.orderBy($templatesCall.data, d => d.name);
+    $: templates = _
+        .chain($templatesCall.data)
+        .filter(selectionFilter)
+        .orderBy(d => d.name)
+        .value();
 
     $: questionsCall = selectedTemplate && surveyQuestionStore.findQuestionsForTemplate(selectedTemplate?.id)
     $: questions = $questionsCall?.data || [];
@@ -20,14 +24,14 @@
     $: rowData = _.filter(questions, selectionFilter)
 
     const columnDefs = [
-        { field: "questionText", name: "Question", width: "40%"},
-        { field: "label", name: "Label", width: "40%"},
-        { field: "fieldType", name: "Type", width: "20%"},
+        {field: "questionText", name: "Question", width: "40%"},
+        {field: "label", name: "Label", width: "40%"},
+        {field: "fieldType", name: "Type", width: "20%"},
     ];
 
     const templateColumnDefs = [
-        { field: "name", name: "Name", width: "40%"},
-        { field: "description", name: "Description", width: "60%", maxLength: 300},
+        {field: "name", name: "Survey Name", width: "40%"},
+        {field: "description", name: "Description", width: "60%", maxLength: 300},
     ];
 
     function selectTemplate(template) {

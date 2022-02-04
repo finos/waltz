@@ -156,10 +156,10 @@ public class MeasurableRatingService {
                 measurableCategoryDao.getById(categoryId),
                 "Cannot find category: %d", categoryId);
 
-        measurableRatingDao.removeForCategory(ref, categoryId);
+        int removedCount = measurableRatingDao.removeForCategory(ref, categoryId);
 
         changeLogService.write(ImmutableChangeLog.builder()
-                .message(format("Removed all ratings for category: %s", category.name()))
+                .message(format("Removed all (%d) ratings for category: %s which are not read-only", removedCount, category.name()))
                 .parentReference(ref)
                 .userId(username)
                 .createdAt(DateTimeUtilities.nowUtc())

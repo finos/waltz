@@ -18,12 +18,11 @@
 
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ListUtilities_compactTest {
 
@@ -43,9 +42,10 @@ public class ListUtilities_compactTest {
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void aNullCollectionWillThrowIllegalArgException() {
-        ListUtilities.compact(null);
+        assertThrows(IllegalArgumentException.class,
+                () -> ListUtilities.compact(null));
     }
 
 }

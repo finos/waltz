@@ -18,7 +18,7 @@
 
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -27,8 +27,7 @@ import java.util.function.Function;
 
 import static org.finos.waltz.common.CollectionUtilities.map;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CollectionUtilities_mapTest {
 
@@ -52,16 +51,17 @@ public class CollectionUtilities_mapTest {
         assertTrue(uppercased.contains("WORLD"));
     }
 
-
-    @Test(expected = IllegalArgumentException.class)
-    public void mappinhANullCollectionThrowsIllegalArgException() {
-        map(null, Function.identity());
+    @Test
+    public void mappingANullCollectionThrowsIllegalArgException() {
+        assertThrows(IllegalArgumentException.class,
+                () -> map(null, Function.identity()));
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void mappingWithoutAFunctionThrowsIllegalArgumentException() {
-        map(words, null);
+        assertThrows(IllegalArgumentException.class,
+                () -> map(words, null));
     }
 
 }

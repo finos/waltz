@@ -18,23 +18,24 @@
 
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.finos.waltz.common.ArrayUtilities.all;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ArrayUtilities_allTest {
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void arrayMustNotBeNull() {
-        all(null, d -> true);
+        assertThrows(IllegalArgumentException.class, ()
+                -> all(null, d -> true));
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void predicateMustNotBeNull() {
-        all(new Object[] {}, null);
+        assertThrows(IllegalArgumentException.class, ()
+                -> all(new Object[]{}, null));
     }
 
 

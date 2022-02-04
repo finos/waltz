@@ -1,21 +1,20 @@
 package org.finos.waltz.common.exception;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class UpdateFailedException_test {
 
-    @Rule
-    public ExpectedException expectedEx = ExpectedException.none();
 
     @Test
     public void updateFailedExceptionMessage() throws Exception {
-        expectedEx.expect(UpdateFailedException.class);
-        expectedEx.expectMessage("Update Failed");
-
-        // do something that should throw the exception...
-        System.out.println("=======Starting Exception process=======");
-        throw new UpdateFailedException("500","Update Failed");
+        Throwable exception = assertThrows(UpdateFailedException.class, () -> {
+            System.out.println("=======Starting Exception process=======");
+            throw new UpdateFailedException("500", "Update Failed");
+        });
+        assertEquals(exception.getMessage(), "Update Failed");
     }
 }

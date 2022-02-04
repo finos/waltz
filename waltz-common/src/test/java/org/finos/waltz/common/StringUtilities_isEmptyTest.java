@@ -18,12 +18,12 @@
 
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static java.util.function.Function.identity;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class StringUtilities_isEmptyTest {
 
@@ -57,9 +57,10 @@ public class StringUtilities_isEmptyTest {
         assertTrue(StringUtilities.isEmpty(Optional.of("")));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void optionalEmptyTrueIfNull() {
-        assertTrue(StringUtilities.isEmpty(Optional.of(null)));
+        assertThrows(NullPointerException.class,
+                () -> StringUtilities.isEmpty(Optional.of(null)));
     }
 
     @Test

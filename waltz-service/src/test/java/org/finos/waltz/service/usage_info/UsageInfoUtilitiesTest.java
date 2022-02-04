@@ -24,14 +24,15 @@ import org.finos.waltz.model.usage_info.ImmutableUsageInfo;
 import org.finos.waltz.model.usage_info.UsageInfo;
 import org.finos.waltz.model.usage_info.UsageKind;
 import org.jooq.tools.json.ParseException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
 
 import java.util.Set;
 
 import static org.finos.waltz.model.usage_info.UsageInfoUtilities.mkChangeSet;
 import static org.finos.waltz.model.usage_info.UsageKind.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class UsageInfoUtilitiesTest {

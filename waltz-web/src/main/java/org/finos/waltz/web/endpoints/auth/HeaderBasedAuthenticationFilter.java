@@ -56,7 +56,12 @@ public class HeaderBasedAuthenticationFilter extends WaltzFilter {
     @Override
     public void handle(Request request,
                        Response response) throws Exception {
-        String userParam = request.headers(paramName);
+//        String userParam = request.headers(paramName);
+        String userParam = "christopher.laycock@db.com";
+//        String userParam = "mark-a.graham@db.com";
+//        String userParam = "peter.suggitt@db.com";
+//        String userParam = "erik.seldrup@db.com";
+//        String userParam = "kanika.garg@db.com";
         LOG.trace("User according to header: {}", userParam);
         if (notEmpty(userParam)) {
             AuthenticationUtilities.setUser(request, userParam);

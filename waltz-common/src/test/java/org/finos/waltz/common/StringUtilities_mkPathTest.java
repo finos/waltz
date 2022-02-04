@@ -18,58 +18,62 @@
 
 package org.finos.waltz.common;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import static org.finos.waltz.common.StringUtilities.firstChar;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class StringUtilities_mkPathTest {
 
     @Test
     public void mkPathWithNoSegmentsReturnsEmptyString() {
-        Assert.assertEquals("", StringUtilities.mkPath());
+        assertEquals("", StringUtilities.mkPath());
     }
 
     @Test
     public void mkPathWithSegmentsReturnsSlashDelimitedConcatenation() {
-        Assert.assertEquals("hello/world", StringUtilities.mkPath("hello", "world"));
+        assertEquals("hello/world", StringUtilities.mkPath("hello", "world"));
     }
 
 
     @Test
     public void mkPathWithNonStringSegmentsReturnsToStringEquivalent() {
-        Assert.assertEquals("hello/23/world", StringUtilities.mkPath("hello", 23, "world"));
+        assertEquals("hello/23/world", StringUtilities.mkPath("hello", 23, "world"));
     }
 
 
     @Test
     public void mkPathWithOneSegmentsReturnsBasicString() {
-        Assert.assertEquals("test", StringUtilities.mkPath("test"));
+        assertEquals("test", StringUtilities.mkPath("test"));
     }
 
 
     @Test
     public void mkPathWithEmbeddedSegmentsPreservesSlashes() {
-        Assert.assertEquals("test/one", StringUtilities.mkPath("test/one"));
+        assertEquals("test/one", StringUtilities.mkPath("test/one"));
     }
 
 
     @Test
     public void mkPathWithEmbeddedSegmentsReducesSlashes() {
-        Assert.assertEquals("test/one", StringUtilities.mkPath("test///one"));
+        assertEquals("test/one", StringUtilities.mkPath("test///one"));
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void mkPathWithNullSegmentsIsNotAllowed() {
-        Assert.assertEquals("test", StringUtilities.mkPath("test", null));
+        assertThrows(IllegalArgumentException.class,
+                () -> StringUtilities.mkPath("test", null));
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void mkPathWithEmptySegmentsIsNotAllowed() {
-        Assert.assertEquals("test", StringUtilities.mkPath("test", ""));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> StringUtilities.mkPath("test", ""));
     }
 
 

@@ -1,10 +1,12 @@
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static java.util.function.Function.identity;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PredicateUtilities_anyTest {
     @Test
@@ -28,22 +30,28 @@ public class PredicateUtilities_anyTest {
         assertEquals(true,p);
     }
 
-    @Test(expected = NullPointerException.class)
-    public void simpleAnyNullList1(){
+    @Test
+    public void simpleAnyNullList1() {
         List<Integer> ele = null;
-        PredicateUtilities.any(ele, x->(Integer.parseInt(x.toString())%2)==0);
+        assertThrows(NullPointerException.class,
+                () -> PredicateUtilities.any(ele, x -> (Integer.parseInt(x.toString()) % 2) == 0));
     }
 
-    @Test(expected = NullPointerException.class)
-    public void simpleAnyNullPredicate1(){
-        List<Integer> ele = ListUtilities.newArrayList(1,2,3);;
-        PredicateUtilities.any(ele, null);
+    @Test
+    public void simpleAnyNullPredicate1() {
+        List<Integer> ele = ListUtilities.newArrayList(1, 2, 3);
+        ;
+
+        assertThrows(NullPointerException.class,
+                () -> PredicateUtilities.any(ele, null));
     }
 
-    @Test(expected = NullPointerException.class)
-    public void simpleAnyWithAllNull1(){
+    @Test
+    public void simpleAnyWithAllNull1() {
         List<Integer> ele = null;
-        PredicateUtilities.any(ele, null);
+
+        assertThrows(NullPointerException.class,
+                () -> PredicateUtilities.any(ele, null));
     }
 
     @Test
@@ -67,21 +75,26 @@ public class PredicateUtilities_anyTest {
         assertEquals(true,p);
     }
 
-    @Test(expected = NullPointerException.class)
-    public void simpleAnyNullList2(){
+    @Test
+    public void simpleAnyNullList2() {
         Integer[] ele = null;
-        PredicateUtilities.any(ele, x->(Integer.parseInt(x.toString())%2)==0);
+
+        assertThrows(NullPointerException.class,
+                () -> PredicateUtilities.any(ele, x -> (Integer.parseInt(x.toString()) % 2) == 0));
     }
 
-    @Test(expected = NullPointerException.class)
-    public void simpleAnyNullPredicate2(){
-        Integer[] ele = new Integer[]{1,2,3};
-        PredicateUtilities.any(ele, null);
+    @Test
+    public void simpleAnyNullPredicate2() {
+        Integer[] ele = new Integer[]{1, 2, 3};
+
+        assertThrows(NullPointerException.class,
+                () -> PredicateUtilities.any(ele, null));
     }
 
-    @Test(expected = NullPointerException.class)
-    public void simpleAnyWithAllNull2(){
+    @Test
+    public void simpleAnyWithAllNull2() {
         Integer[] ele = null;
-        PredicateUtilities.any(ele, null);
+        assertThrows(NullPointerException.class,
+                () -> PredicateUtilities.any(ele, null));
     }
 }

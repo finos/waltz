@@ -18,36 +18,39 @@
 
 package org.finos.waltz.web;
 
-import org.junit.Assert;
-import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class WebUtilities_mkPathTest {
 
     @Test
     public void oneSegment() {
-        Assert.assertEquals("bob", WebUtilities.mkPath("bob"));
+        assertEquals("bob", WebUtilities.mkPath("bob"));
     }
 
     @Test
     public void zeroSegments() {
-        Assert.assertEquals("", WebUtilities.mkPath());
+        assertEquals("", WebUtilities.mkPath());
     }
 
     @Test
     public void multipleSegments() {
-        Assert.assertEquals("ay/bee/cee", WebUtilities.mkPath("ay", "bee", "cee"));
+        assertEquals("ay/bee/cee", WebUtilities.mkPath("ay", "bee", "cee"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void emptySegmentsThrowException() {
-        WebUtilities.mkPath("ay", "", "cee");
+        assertThrows(IllegalArgumentException.class,
+                () -> WebUtilities.mkPath("ay", "", "cee"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void cannotMkPathIfItContainsNullSegments() {
-        WebUtilities.mkPath("bob", null, "jones");
+        assertThrows(IllegalArgumentException.class,
+                () -> WebUtilities.mkPath("bob", null, "jones"));
     }
 
 }

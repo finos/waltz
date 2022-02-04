@@ -1,10 +1,11 @@
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class StringUtilities_joinTest {
 
@@ -32,10 +33,12 @@ public class StringUtilities_joinTest {
         assertEquals("", StringUtilities.join(coll,","));
     }
 
-    @Test(expected = NullPointerException.class)
-    public void simpleJoinWithNullColl(){
+    @Test
+    public void simpleJoinWithNullColl() {
         Collection coll = null;
-        StringUtilities.join(coll,",");
+
+        assertThrows(NullPointerException.class,
+                () -> StringUtilities.join(coll, ","));
     }
 
     @Test
@@ -44,9 +47,11 @@ public class StringUtilities_joinTest {
         assertEquals("", StringUtilities.join(coll,""));
     }
 
-    @Test(expected = NullPointerException.class)
-    public void simpleJoinWithBothNull(){
+    @Test
+    public void simpleJoinWithBothNull() {
         Collection coll = null;
-        assertEquals("", StringUtilities.join(coll,null));
+
+        assertThrows(NullPointerException.class,
+                () -> StringUtilities.join(coll, null));
     }
 }

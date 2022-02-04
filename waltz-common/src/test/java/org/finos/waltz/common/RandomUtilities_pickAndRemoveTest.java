@@ -19,7 +19,7 @@
 package org.finos.waltz.common;
 
 import org.jooq.lambda.tuple.Tuple2;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -27,19 +27,22 @@ import java.util.List;
 
 import static org.finos.waltz.common.ListUtilities.asList;
 import static org.finos.waltz.common.RandomUtilities.pickAndRemove;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class RandomUtilities_pickAndRemoveTest {
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void cannotPickAndRemoveFromNull() {
-        pickAndRemove(null);
+        assertThrows(IllegalArgumentException.class,
+                () -> pickAndRemove(null));
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void cannotPickAndRemoveFromEmpty() {
-        pickAndRemove(Collections.emptyList());
+
+        assertThrows(IllegalArgumentException.class,
+                () -> pickAndRemove(Collections.emptyList()));
     }
 
 

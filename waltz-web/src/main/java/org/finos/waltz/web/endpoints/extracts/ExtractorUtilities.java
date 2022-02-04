@@ -1,7 +1,7 @@
 package org.finos.waltz.web.endpoints.extracts;
 
 
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import spark.Request;
 
 import java.io.ByteArrayOutputStream;
@@ -14,7 +14,7 @@ import static org.finos.waltz.common.StringUtilities.mkSafe;
 public class ExtractorUtilities {
 
 
-    public static byte[] convertExcelToByteArray(XSSFWorkbook workbook) throws IOException {
+    public static byte[] convertExcelToByteArray(SXSSFWorkbook workbook) throws IOException {
         ByteArrayOutputStream outByteStream = new ByteArrayOutputStream();
         workbook.write(outByteStream);
         workbook.close();

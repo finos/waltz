@@ -1,17 +1,19 @@
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DebugUtilities_dumpMapTest {
-    @Test(expected = NullPointerException.class)
-    public void dumpNullMap(){
-        Map m = null;
-        DebugUtilities.dump(m);
+    @Test
+    public void dumpNullMap() {
+        Map m = null;  // Weird test, we test that we get a NullPointerException??
+        assertThrows(NullPointerException.class,
+                () -> DebugUtilities.dump(m));
     }
 
     @Test

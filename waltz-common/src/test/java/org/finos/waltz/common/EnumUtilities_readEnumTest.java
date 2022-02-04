@@ -18,14 +18,14 @@
 
 package org.finos.waltz.common;
 
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
 
+import org.junit.jupiter.api.Test;
+
+import static org.finos.waltz.common.EnumUtilities.parseEnumWithAliases;
 import static org.finos.waltz.common.EnumUtilities.readEnum;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+
 public class EnumUtilities_readEnumTest {
 
     private enum MyEnum {
@@ -44,13 +44,7 @@ public class EnumUtilities_readEnumTest {
     @Test
     public void defaultValueUsedIfNoMatch() {
         assertEquals(MyEnum.A, readEnum("Z", MyEnum.class, (s) -> MyEnum.A));
-        assertEquals(null, readEnum("Z", MyEnum.class, (s) -> null));
-    }
-
-
-    @Test(expected = IllegalArgumentException.class)
-    public void badIfNoEnumClass() {
-        readEnum("A", null, (s) -> MyEnum.A);
+        assertNull(readEnum("Z", MyEnum.class, (s) -> null));
     }
 
 }

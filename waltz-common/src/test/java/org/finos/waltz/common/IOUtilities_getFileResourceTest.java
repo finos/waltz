@@ -1,11 +1,11 @@
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.io.Resource;
 
 import java.io.IOException;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class IOUtilities_getFileResourceTest {
     @Test
@@ -30,8 +30,9 @@ public class IOUtilities_getFileResourceTest {
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void nullNameThrowsException() throws IOException {
-        IOUtilities.getFileResource(null);
+        assertThrows(IllegalArgumentException.class,
+                () -> IOUtilities.getFileResource(null));
     }
 }

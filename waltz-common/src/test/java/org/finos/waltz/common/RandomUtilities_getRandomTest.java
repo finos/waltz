@@ -1,11 +1,11 @@
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.finos.waltz.common.RandomUtilities.pickAndRemove;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class RandomUtilities_getRandomTest {
     @Test
@@ -14,9 +14,11 @@ public class RandomUtilities_getRandomTest {
         assertEquals(0, result.nextInt(1));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void simpleGetRandomForZero(){
+    @Test
+    public void simpleGetRandomForZero() {
         Random result = RandomUtilities.getRandom();
-        result.nextInt(0);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> result.nextInt(0));
     }
 }

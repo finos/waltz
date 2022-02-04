@@ -18,11 +18,11 @@
 
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class RangeBandTest {
 
@@ -32,9 +32,10 @@ public class RangeBandTest {
     public static final RangeBand<Integer> rangeNull_20 = new RangeBand<>(null, 20);
     public static final RangeBand<Integer> range10_Null = new RangeBand<>(10, null);
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void lowAndHighCannotBeNull() {
-        new RangeBand<>(null, null);
+        assertThrows(IllegalArgumentException.class,
+                () -> new RangeBand<>(null, null));
     }
 
     @Test
@@ -156,9 +157,10 @@ public class RangeBandTest {
         assertFalse(noHighBound.test(-1));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void lowCannotBeHigherThanHigh() {
-        new RangeBand<>(10, 5);
+        assertThrows(IllegalArgumentException.class,
+                () -> new RangeBand<>(10, 5));
     }
 
 

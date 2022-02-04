@@ -2,6 +2,8 @@
 
     import {reportGridKinds} from "./report-grid-utils";
     import _ from "lodash";
+    import {userStore} from "../../../svelte-stores/user-store";
+    import roles from "../../../user/system-roles";
     import {entity} from "../../../common/services/enums/entity";
 
     export let grid;
@@ -13,6 +15,11 @@
         subjectKind: grid.subjectKind || entity.APPLICATION.key
     });
 
+    $: userCall = userStore.load();
+    $: user = $userCall.data;
+
+    $: isGridAdmin = _.includes(user?.roles, roles.REPORT_GRID_ADMIN.key);
+
     function noChange(workingCopy) {
         return workingCopy?.name === grid?.name
             && workingCopy?.description === grid?.description
@@ -20,7 +27,7 @@
             && workingCopy?.subjectKind === grid?.subjectKind
     }
 
-    function notSubmittable(){
+    function notSubmittable() {
         return _.isEmpty(workingCopy?.name)
             || _.isEmpty(workingCopy?.name.trim())
             || _.isNull(workingCopy?.kind)
@@ -80,6 +87,7 @@
             <label>
                 <input type="radio"
                        style="display: block"
+                       disabled={!isGridAdmin}
                        checked={workingCopy.kind === reportGridKinds.PRIVATE.key}
                        bind:group={workingCopy.kind}
                        value={reportGridKinds.PRIVATE.key}>
@@ -92,11 +100,14 @@
             <label>
                 <input type="radio"
                        style="display: block;"
+                       disabled={!isGridAdmin}
                        checked={workingCopy.kind === reportGridKinds.PUBLIC.key}
                        bind:group={workingCopy.kind}
                        value={reportGridKinds.PUBLIC.key}>
                 {reportGridKinds.PUBLIC.name}
-                <div class="help-block small">Public - These grids can be viewed by everyone</div>
+                <div class="help-block small">Public - These grids can be viewed by everyone, please contact an Admin to
+                    set this grid to 'Public'
+                </div>
             </label>
         </div>
     </div>

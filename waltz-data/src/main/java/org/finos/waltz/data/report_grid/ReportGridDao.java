@@ -34,6 +34,7 @@ import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
 
 import java.util.Comparator;
@@ -42,6 +43,7 @@ import java.util.function.Function;
 import java.util.function.ToIntFunction;
 import java.util.stream.IntStream;
 
+import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.function.Function.identity;
@@ -162,7 +164,7 @@ public class ReportGridDao {
     public long create(ReportGridCreateCommand createCommand, String username) {
         ReportGridRecord record = dsl.newRecord(rg);
         record.setName(createCommand.name());
-        record.setExternalId(createCommand.externalId());
+        record.setExternalId(createCommand.toExtId(username));
         record.setDescription(createCommand.description());
         record.setLastUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
         record.setLastUpdatedBy(username);
@@ -170,9 +172,14 @@ public class ReportGridDao {
         record.setSubjectKind(createCommand.subjectKind().name());
         record.setKind(createCommand.kind().name());
 
-        int insert = record.insert();
-
-        return record.getId();
+        try {
+            int insert = record.insert();
+            return record.getId();
+        } catch (DataIntegrityViolationException exception) {
+            throw new DataIntegrityViolationException(format(
+                    "Grid already exists with the name: %s for user.",
+                    createCommand.name()));
+        }
     }
 
     public long update(long id, ReportGridUpdateCommand updateCommand, String username) {
@@ -438,18 +445,18 @@ public class ReportGridDao {
                         ratingSchemeItems.field("rsiId", Long.class),
                         ratingSchemeItems.field("rsiPos", Integer.class),
                         ratingSchemeItems.field("rsiName", String.class))
-                .from(m)
+                .from(mr)
                 .innerJoin(eh)
-                .on(eh.ANCESTOR_ID.eq(m.ID))
+                .on(eh.ID.eq(mr.MEASURABLE_ID))
                 .and(eh.KIND.eq(EntityKind.MEASURABLE.name()))
-                .innerJoin(mr)
-                .on(mr.MEASURABLE_ID.eq(eh.ID))
+                .innerJoin(m)
+                .on(eh.ANCESTOR_ID.eq(m.ID))
                 .innerJoin(ratingSchemeItems)
                 .on(m.MEASURABLE_CATEGORY_ID.eq(ratingSchemeItems.field("mcId", Long.class)))
                 .and(mr.RATING.eq(ratingSchemeItems.field("rsiCode", String.class)))
-                .where(mr.ENTITY_KIND.eq(selector.kind().name()))
-                .and(mr.ENTITY_ID.in(selector.selector()))
-                .and(m.ID.in(union(measurableIdsUsingHighest, measurableIdsUsingLowest)));
+                .where(mr.ENTITY_KIND.eq(selector.kind().name())
+                        .and(mr.ENTITY_ID.in(selector.selector()))
+                        .and(m.ID.in(union(measurableIdsUsingHighest, measurableIdsUsingLowest))));
 
         return dsl
                 .resultQuery(dsl.renderInlined(ratings))
@@ -578,15 +585,17 @@ public class ReportGridDao {
                     .select(SURVEY_QUESTION_RESPONSE.COMMENT)
                     .select(DSL.coalesce(
                             SURVEY_QUESTION_RESPONSE.STRING_RESPONSE,
-                            DSL.cast(SURVEY_QUESTION_RESPONSE.BOOLEAN_RESPONSE, String.class),
+                            DSL.when(SURVEY_QUESTION_RESPONSE.BOOLEAN_RESPONSE.isNull(), DSL.castNull(String.class))
+                                    .when(SURVEY_QUESTION_RESPONSE.BOOLEAN_RESPONSE.isTrue(), DSL.val("true"))
+                                    .otherwise(DSL.val("false")),
                             DSL.cast(SURVEY_QUESTION_RESPONSE.NUMBER_RESPONSE, String.class),
                             DSL.cast(SURVEY_QUESTION_RESPONSE.DATE_RESPONSE, String.class),
                             DSL.cast(SURVEY_QUESTION_RESPONSE.LIST_RESPONSE_CONCAT, String.class)).as("response")) // for entity responses need to join entity name field
-                    .from(SURVEY_QUESTION)
-                    .innerJoin(SURVEY_QUESTION_RESPONSE)
-                    .on(SURVEY_QUESTION.ID.eq(SURVEY_QUESTION_RESPONSE.QUESTION_ID))
+                    .from(SURVEY_QUESTION_RESPONSE)
                     .innerJoin(SURVEY_INSTANCE)
                     .on(SURVEY_QUESTION_RESPONSE.SURVEY_INSTANCE_ID.eq(SURVEY_INSTANCE.ID))
+                    .innerJoin(SURVEY_QUESTION)
+                    .on(SURVEY_QUESTION.ID.eq(SURVEY_QUESTION_RESPONSE.QUESTION_ID))
                     .where(SURVEY_INSTANCE.STATUS.in(APPROVED.name(), COMPLETED.name())
                             .and(SURVEY_QUESTION.ID.in(requiredSurveyQuestionIds))
                             .and(SURVEY_INSTANCE.ENTITY_ID.in(selector.selector()))

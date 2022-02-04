@@ -26,7 +26,8 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdProvider;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
@@ -35,8 +36,8 @@ import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.HierarchyQueryScope.CHILDREN;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class LogicalFlowTest extends BaseInMemoryIntegrationTest {
 
@@ -63,23 +64,23 @@ public class LogicalFlowTest extends BaseInMemoryIntegrationTest {
         LogicalFlow ad = helper.createLogicalFlow(a, d);
 
         assertEquals(
-                "Can see flow associated to 'a'",
                 asSet(ab.id(), ad.id()),
-                map(lfDao.findByEntityReference(a), IdProvider::id));
+                map(lfDao.findByEntityReference(a), IdProvider::id),
+                "Can see flow associated to 'a'");
 
         assertEquals(
-                "Can sees flows associated to 'b'",
                 asSet(ab.id()),
-                map(lfDao.findByEntityReference(b), IdProvider::id));
+                map(lfDao.findByEntityReference(b), IdProvider::id),
+                "Can sees flows associated to 'b'");
 
         assertEquals(
-                "Can sees flows associated to 'd'",
                 asSet(ad.id()),
-                map(lfDao.findByEntityReference(d), IdProvider::id));
+                map(lfDao.findByEntityReference(d), IdProvider::id),
+                "Can sees flows associated to 'd'");
 
         assertTrue(
-                "Can sees nothing associated to 'c'",
-                isEmpty(lfDao.findByEntityReference(c)));
+                isEmpty(lfDao.findByEntityReference(c)),
+                "Can sees nothing associated to 'c'");
     }
 
 
@@ -95,21 +96,23 @@ public class LogicalFlowTest extends BaseInMemoryIntegrationTest {
         LogicalFlow ab = helper.createLogicalFlow(a, b);
         LogicalFlow ac = helper.createLogicalFlow(a, c);
 
-        assertEquals("find by root ou gives all",
+        assertEquals(
                 asSet(ab.id(), ac.id()),
                 map(lfDao.findBySelector(logicalFlowIdSelectorFactory.apply(
-                        mkOpts(
-                            mkRef(EntityKind.ORG_UNIT, ouIds.root),
-                            CHILDREN))),
-                    IdProvider::id));
+                                mkOpts(
+                                        mkRef(EntityKind.ORG_UNIT, ouIds.root),
+                                        CHILDREN))),
+                        IdProvider::id)
+                , "find by root ou gives all");
 
-        assertEquals("find by ou 'b' gives only one flow",
+        assertEquals(
                 asSet(ac.id()),
                 map(lfDao.findBySelector(logicalFlowIdSelectorFactory.apply(
-                            mkOpts(
-                                mkRef(EntityKind.ORG_UNIT, ouIds.b),
-                                CHILDREN))),
-                        IdProvider::id));
+                                mkOpts(
+                                        mkRef(EntityKind.ORG_UNIT, ouIds.b),
+                                        CHILDREN))),
+                        IdProvider::id),
+                "find by ou 'b' gives only one flow");
     }
 
 }

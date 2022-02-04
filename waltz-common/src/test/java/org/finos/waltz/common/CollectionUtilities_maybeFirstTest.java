@@ -18,50 +18,53 @@
 
 package org.finos.waltz.common;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 import java.util.Optional;
 
+import static org.finos.waltz.common.CollectionUtilities.map;
 import static org.finos.waltz.common.CollectionUtilities.maybeFirst;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class CollectionUtilities_maybeFirstTest {
 
     @Test
     public void callingOnNullCollectionGivesEmpty() {
-        Assert.assertEquals(CollectionUtilities.maybeFirst(null), Optional.empty());
+        assertEquals(CollectionUtilities.maybeFirst(null), Optional.empty());
     }
 
 
     @Test
     public void callingOnEmptyCollectionGivesEmpty() {
-        Assert.assertEquals(CollectionUtilities.maybeFirst(ListUtilities.newArrayList()), Optional.empty());
+        assertEquals(CollectionUtilities.maybeFirst(ListUtilities.newArrayList()), Optional.empty());
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void callingOnCollectionWithNullPredicateThrows() {
-        Assert.assertEquals(CollectionUtilities.maybeFirst(ListUtilities.newArrayList(), null), Optional.empty());
+        assertThrows(IllegalArgumentException.class,
+                () -> CollectionUtilities.maybeFirst(ListUtilities.newArrayList(), null));
     }
 
 
     @Test
     public void callingOnNullCollectionWithPredicateGivesEmpty() {
-        Assert.assertEquals(CollectionUtilities.maybeFirst((Collection<Integer>) null, x -> x > 10), Optional.empty());
+        assertEquals(CollectionUtilities.maybeFirst((Collection<Integer>) null, x -> x > 10), Optional.empty());
     }
 
 
     @Test
     public void givesEmptyIfNoElementsPassPredicate () {
-        Assert.assertEquals(CollectionUtilities.maybeFirst(ListUtilities.newArrayList(1,2,3), x -> x > 10), Optional.empty());
+        assertEquals(CollectionUtilities.maybeFirst(ListUtilities.newArrayList(1, 2, 3), x -> x > 10), Optional.empty());
     }
 
 
     @Test
     public void givesFirstPassingElement () {
-        Assert.assertEquals(CollectionUtilities.maybeFirst(ListUtilities.newArrayList(1,20,3), x -> x > 10), Optional.of(20));
+        assertEquals(CollectionUtilities.maybeFirst(ListUtilities.newArrayList(1, 20, 3), x -> x > 10), Optional.of(20));
     }
 
 

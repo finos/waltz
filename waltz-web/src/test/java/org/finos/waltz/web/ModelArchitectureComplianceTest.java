@@ -20,7 +20,7 @@ package org.finos.waltz.web;
 
 import com.tngtech.archunit.lang.ArchRule;
 import org.finos.waltz.model.command.Command;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 

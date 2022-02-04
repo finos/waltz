@@ -1,12 +1,13 @@
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.*;
 import java.util.function.BinaryOperator;
 
 import static java.util.function.Function.identity;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MapUtilities_indexByTest {
 
@@ -20,56 +21,66 @@ public class MapUtilities_indexByTest {
         assertEquals("b", result.get(2));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void simpleIndexByWithNulllist() {
         List<String> xs = null;
-        Map result = MapUtilities.indexBy(xs, x ->  xs.indexOf(x));
+        assertThrows(IllegalArgumentException.class,
+                () -> MapUtilities.indexBy(xs, x -> xs.indexOf(x)));
+
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void simpleIndexByWithNullFunc() {
-        List<String> xs = ListUtilities.newArrayList("aa", "bb", "b" );
-        Map result = MapUtilities.indexBy(xs, null);
+        List<String> xs = ListUtilities.newArrayList("aa", "bb", "b");
+        assertThrows(IllegalArgumentException.class,
+                () -> MapUtilities.indexBy(xs, null));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void simpleIndexByWithAllNullParams() {
         List<String> xs = null;
-        Map result = MapUtilities.indexBy(xs, null);
+        assertThrows(IllegalArgumentException.class,
+                () -> MapUtilities.indexBy(xs, null));
     }
 
     @Test
     public void indexByToggledParams() {
-        List<String> xs = ListUtilities.newArrayList("aa", "bb", "b" );
-        Map result = MapUtilities.indexBy(x ->  xs.indexOf(x), identity(), xs);
+        List<String> xs = ListUtilities.newArrayList("aa", "bb", "b");
+        Map result = MapUtilities.indexBy(xs::indexOf, identity(), xs);
         assertEquals(3, result.size());
         assertEquals("aa", result.get(0));
         assertEquals("bb", result.get(1));
         assertEquals("b", result.get(2));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void indexByToggledParamsWithNullList() {
         List<String> xs = null;
-        Map result = MapUtilities.indexBy(x ->  xs.indexOf(x), identity(), xs);
+        assertThrows(IllegalArgumentException.class,
+                () -> MapUtilities.indexBy(x -> xs.indexOf(x), identity(), xs));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void indexByToggledParamsWithNullKeyFn() {
-        List<String> xs = ListUtilities.newArrayList("aa", "bb", "b" );
-        Map result = MapUtilities.indexBy(null, identity(), xs);
+        List<String> xs = ListUtilities.newArrayList("aa", "bb", "b");
+
+        assertThrows(IllegalArgumentException.class,
+                () -> MapUtilities.indexBy(null, identity(), xs));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void indexByToggledParamsWithNullValFn() {
         List<String> xs = ListUtilities.newArrayList("aa", "bb", "b");
-        Map result = MapUtilities.indexBy(x -> xs.indexOf(x), null, xs);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> MapUtilities.indexBy(xs::indexOf, null, xs));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void indexByToggledParamsWithAllNullParams() {
         List<String> xs = null;
-        Map result = MapUtilities.indexBy(null, null, xs);
+        assertThrows(IllegalArgumentException.class,
+                () -> MapUtilities.indexBy(null, null, xs));
     }
 
     @Test
@@ -85,31 +96,35 @@ public class MapUtilities_indexByTest {
     @Test
     public void indexByDifferentParamsWithEmptyList() {
         List<String> xs = new ArrayList();
-        Map result = MapUtilities.indexBy(x ->  xs.indexOf(x), identity(), xs, BinaryOperator.maxBy(Comparator.naturalOrder()));
+        Map result = MapUtilities.indexBy(xs::indexOf, identity(), xs, BinaryOperator.maxBy(Comparator.naturalOrder()));
         assertEquals(0, result.size());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void indexByDifferentParamsWithNullList() {
         List<String> xs = null;
-        Map result = MapUtilities.indexBy(x ->  xs.indexOf(x), identity(), xs, BinaryOperator.maxBy(Comparator.naturalOrder()));
+        assertThrows(IllegalArgumentException.class,
+                () -> MapUtilities.indexBy(x -> xs.indexOf(x), identity(), xs, BinaryOperator.maxBy(Comparator.naturalOrder())));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void indexByDifferentParamsWithNullKeyFn() {
-        List<String> xs = ListUtilities.newArrayList("bb", "aa", "b" );
-        Map result = MapUtilities.indexBy(null, identity(), xs, BinaryOperator.maxBy(Comparator.naturalOrder()));
+        List<String> xs = ListUtilities.newArrayList("bb", "aa", "b");
+        assertThrows(IllegalArgumentException.class,
+                () -> MapUtilities.indexBy(null, identity(), xs, BinaryOperator.maxBy(Comparator.naturalOrder())));
     }
 
-   @Test(expected = NullPointerException.class)
+    @Test
     public void indexByDifferentParamsWithNullBinFn() {
-        List<String> xs = ListUtilities.newArrayList("bb", "aa", "b" );
-        Map result = MapUtilities.indexBy(x ->  xs.indexOf(x), identity(), xs, null);
+        List<String> xs = ListUtilities.newArrayList("bb", "aa", "b");
+        assertThrows(NullPointerException.class,
+                () -> MapUtilities.indexBy(x -> xs.indexOf(x), identity(), xs, null));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void indexByDifferentParamsWithAllNullParams() {
         List<String> xs = null;
-        Map result = MapUtilities.indexBy(null, null, xs, null);
+        assertThrows(IllegalArgumentException.class,
+                () -> MapUtilities.indexBy(null, null, xs, null));
     }
 }

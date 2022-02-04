@@ -18,15 +18,14 @@
 
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 import java.util.List;
 
 import static org.finos.waltz.common.CollectionUtilities.filter;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CollectionUtilities_filterTest {
 
@@ -50,15 +49,17 @@ public class CollectionUtilities_filterTest {
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void filteringANullCollectionThrowsIllegalArgException() {
-        filter(null, x -> true);
+        assertThrows(IllegalArgumentException.class,
+                () -> filter(null, x -> true));
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void filteringWithoutAFilterPredicatedThrowsIllegalArgumentException() {
-        filter(words, null);
+        assertThrows(IllegalArgumentException.class,
+                () -> filter(words, null));
     }
 
 }

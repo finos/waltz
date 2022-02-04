@@ -18,15 +18,16 @@
 
 package org.finos.waltz.common;
 
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runners.MethodSorters;
+
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+
 
 import static org.finos.waltz.common.SetUtilities.asSet;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@TestMethodOrder(MethodOrderer.MethodName.class)
 public class EnumUtilities_namesTest {
 
     private enum MyEnum {
@@ -47,9 +48,10 @@ public class EnumUtilities_namesTest {
         assertEquals(asSet("A", "D"), EnumUtilities.names(MyEnum.A, MyEnum.D));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void namesWithNullValues() {
-        EnumUtilities.names((Enum) null);
+        assertThrows(NullPointerException.class,
+                () -> EnumUtilities.names((Enum) null));
     }
 
     @Test

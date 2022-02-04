@@ -1,13 +1,12 @@
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MapUtilities_countByTest {
 
@@ -37,10 +36,11 @@ public class MapUtilities_countByTest {
         assertTrue(result.isEmpty());
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void simpleCountByWithNullFunc() {
-        List<String> xs = ListUtilities.newArrayList("aa", "bb", "b" , "ccc");
-        Map<Object, Long> result = MapUtilities.countBy(null, xs);
+        List<String> xs = ListUtilities.newArrayList("aa", "bb", "b", "ccc");
+        assertThrows(NullPointerException.class,
+                () -> MapUtilities.countBy(null, xs));
     }
 
     @Test

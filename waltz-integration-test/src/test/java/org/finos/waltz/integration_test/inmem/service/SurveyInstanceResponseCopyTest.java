@@ -10,7 +10,7 @@ import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.survey.*;
 import org.finos.waltz.service.survey.SurveyInstanceService;
 import org.finos.waltz.service.survey.SurveyRunService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;

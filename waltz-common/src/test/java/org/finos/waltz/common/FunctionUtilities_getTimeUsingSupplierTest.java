@@ -19,15 +19,19 @@
 package org.finos.waltz.common;
 
 import org.jooq.lambda.Unchecked;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static junit.framework.TestCase.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 public class FunctionUtilities_getTimeUsingSupplierTest {
 
     @Test
     public void timeChecksHowLongAFunctionRunsFor() {
-        String result = FunctionUtilities.time("foo", Unchecked.supplier(() -> { Thread.sleep(500); return "a"; }));
+        String result = FunctionUtilities.time("foo", Unchecked.supplier(() -> {
+            Thread.sleep(500);
+            return "a";
+        }));
         assertEquals("a", result);
     }
 

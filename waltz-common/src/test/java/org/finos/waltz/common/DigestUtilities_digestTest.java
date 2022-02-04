@@ -1,16 +1,16 @@
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.security.NoSuchAlgorithmException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DigestUtilities_digestTest {
-    @Test(expected = NullPointerException.class)
-    public void digestNull() throws NoSuchAlgorithmException {
-        DigestUtilities.digest(null);
+    @Test
+    public void digestNull() {
+        assertThrows(NullPointerException.class,
+                () -> DigestUtilities.digest(null));
     }
 
     @Test
@@ -19,7 +19,7 @@ public class DigestUtilities_digestTest {
         String myHash = "W6k8nbDP+T9StSHXQg5D9u2ieE8=";
         String result = DigestUtilities.digest(b);
         assertNotNull(result);
-        assertEquals( myHash, result);
+        assertEquals(myHash, result);
     }
 
     @Test

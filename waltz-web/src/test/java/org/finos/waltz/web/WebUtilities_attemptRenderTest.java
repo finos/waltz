@@ -18,12 +18,15 @@
 
 package org.finos.waltz.web;
 
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 import spark.RequestResponseFactory;
 import spark.Response;
 
 import javax.servlet.http.HttpServletResponse;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class WebUtilities_attemptRenderTest {
 
@@ -32,21 +35,24 @@ public class WebUtilities_attemptRenderTest {
     private Response resp = RequestResponseFactory.create((HttpServletResponse) null);
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void mustProvideResponseObj() {
-        WebUtilities.attemptRender(null, "foo", LOG);
+        assertThrows(IllegalArgumentException.class,
+                () -> WebUtilities.attemptRender(null, "foo", LOG));
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void mustProvideObjToRender() {
-        WebUtilities.attemptRender(resp, null, LOG);
+        assertThrows(IllegalArgumentException.class,
+                () -> WebUtilities.attemptRender(resp, null, LOG));
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void mustProvideLogger() {
-        WebUtilities.attemptRender(resp, "foo", null);
+        assertThrows(IllegalArgumentException.class,
+                () -> WebUtilities.attemptRender(resp, "foo", null));
     }
 
 }

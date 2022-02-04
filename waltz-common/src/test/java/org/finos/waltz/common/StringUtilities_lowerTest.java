@@ -1,8 +1,9 @@
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class StringUtilities_lowerTest {
 
@@ -27,9 +28,11 @@ public class StringUtilities_lowerTest {
         assertEquals(expected, StringUtilities.lower(str));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void simpleLowerWithNullStr(){
+    @Test
+    public void simpleLowerWithNullStr() {
         String str = null;
-        StringUtilities.lower(str);
+        assertThrows(IllegalArgumentException.class,
+                () -> StringUtilities.lower(str));
+
     }
 }

@@ -18,7 +18,7 @@
 
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 import java.util.List;
@@ -26,6 +26,7 @@ import java.util.Objects;
 
 import static org.finos.waltz.common.CollectionUtilities.all;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class CollectionUtilities_allTest {
 
@@ -37,15 +38,17 @@ public class CollectionUtilities_allTest {
     private static final List<String> empty = newArrayList();
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void throwsExceptionIfCollectionIsNull() {
-        all((Collection<String>) null, StringUtilities::isEmpty);
+        assertThrows(IllegalArgumentException.class,
+                () -> all((Collection<String>) null, StringUtilities::isEmpty));
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void throwsExceptionIfPredicateIsNull() {
-        all(words, null);
+        assertThrows(IllegalArgumentException.class,
+                () -> all(words, null));
     }
 
 

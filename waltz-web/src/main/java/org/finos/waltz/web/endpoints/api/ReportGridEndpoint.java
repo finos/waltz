@@ -96,8 +96,7 @@ public class ReportGridEndpoint implements Endpoint {
 
     public ReportGridDefinition createRoute(Request req,
                                             Response resp) throws IOException {
-        return reportGridService.
-                create(readBody(req, ReportGridCreateCommand.class), getUsername(req));
+        return reportGridService.create(readBody(req, ReportGridCreateCommand.class), getUsername(req));
     }
 
 

@@ -18,13 +18,11 @@
 
 package org.finos.waltz.common;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SetUtilities_intersectionTest {
 
@@ -42,33 +40,36 @@ public class SetUtilities_intersectionTest {
 
     @Test
     public void intersectionOfSetsGivesOnlyElementsThatAreInBoth() {
-        Assert.assertEquals(
-                "partial intersection",
+        assertEquals(
+                //"partial intersection",
                 SetUtilities.asSet("b"),
                 SetUtilities.intersection(SetUtilities.asSet("a", "b"), SetUtilities.asSet("b", "c")));
 
-        Assert.assertEquals(
-                "total intersection",
+        assertEquals(
+                //"total intersection",
                 SetUtilities.asSet("a", "b"),
                 SetUtilities.intersection(SetUtilities.asSet("a", "b"), SetUtilities.asSet("b", "c", "a")));
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void cannotIntersectNulls_both() {
-        SetUtilities.intersection(null, null);
+        assertThrows(IllegalArgumentException.class,
+                () -> SetUtilities.intersection(null, null));
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void cannotIntersectNulls_first() {
-        SetUtilities.intersection(null, Collections.emptySet());
+        assertThrows(IllegalArgumentException.class,
+                () -> SetUtilities.intersection(null, Collections.emptySet()));
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void cannotIntersectNulls_second() {
-        SetUtilities.intersection(Collections.emptySet(), null);
+        assertThrows(IllegalArgumentException.class,
+                () -> SetUtilities.intersection(Collections.emptySet(), null));
     }
 
 }

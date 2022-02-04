@@ -1,25 +1,24 @@
 package org.finos.waltz.common;
 
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CollectionUtilities_sumIntsTest {
 
     @Test
-    public void sendEmptyList(){
-        Collection<Integer> element = new ArrayList();
-        Assert.assertEquals(0, CollectionUtilities.sumInts(element).longValue());
+    public void sendEmptyList() {
+        assertEquals(0, CollectionUtilities.sumInts(new ArrayList<>()).longValue());
     }
 
     @Test
     public void sendOne(){
-        Collection<Integer> element = new ArrayList();
+        Collection<Integer> element = new ArrayList<>();
         element.add(1);
-        Assert.assertEquals(1, CollectionUtilities.sumInts(element).longValue());
+        assertEquals(1, CollectionUtilities.sumInts(element).longValue());
     }
 }

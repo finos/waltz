@@ -30,8 +30,8 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.app_group.AppGroupEntry;
 import org.finos.waltz.model.application.Application;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;
@@ -43,8 +43,8 @@ import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AppGroupDaoTest extends BaseInMemoryIntegrationTest {
 
@@ -68,7 +68,7 @@ public class AppGroupDaoTest extends BaseInMemoryIntegrationTest {
     private EntityReference raa3;
 
 
-    @Before
+    @BeforeEach
     public void before() {
         Long rootOu = createOrgUnit("r", null);
         raOu = createOrgUnit("ra", rootOu);
@@ -129,9 +129,8 @@ public class AppGroupDaoTest extends BaseInMemoryIntegrationTest {
     private void checkAppIdSelectorForRef(EntityReference selectorRef,
                                           EntityReference... expectedRefs) {
         List<Application> result = appDao.findByAppIdSelector(idSelectorFactory.apply(mkOpts(selectorRef)));
-        assertEquals(
-                format("Expected %d apps, but got %d", expectedRefs.length, result.size()),
-                expectedRefs.length, result.size());
+        assertEquals(expectedRefs.length, result.size(),
+                format("Expected %d apps, but got %d", expectedRefs.length, result.size()));
         checkHasApps(result, expectedRefs);
     }
 
@@ -139,9 +138,9 @@ public class AppGroupDaoTest extends BaseInMemoryIntegrationTest {
     private void checkHasApps(Collection<Application> results,
                             EntityReference... refs) {
         newArrayList(refs).forEach(
-            r -> assertTrue(
-                    format("Cannot find %s in %s", r, results),
-                    any(results, d -> d.entityReference().equals(r))));
+                r -> assertTrue(
+                        any(results, d -> d.entityReference().equals(r)),
+                        format("Cannot find %s in %s", r, results)));
     }
 
 }

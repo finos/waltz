@@ -18,19 +18,19 @@
 
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
 import static org.finos.waltz.common.RandomUtilities.randomPick;
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class RandomUtilities_randomPickTest {
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void simpleRandomPickArray() {
-        randomPick();
+        assertThrows(IllegalArgumentException.class,
+                RandomUtilities::randomPick);
     }
 
 
@@ -46,16 +46,18 @@ public class RandomUtilities_randomPickTest {
                 .contains(randomPick("a", "b")));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void randomPickArrayFromNull() {
         String[] str = null;
-        randomPick(str);
+        assertThrows(IllegalArgumentException.class,
+                () -> randomPick(str));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void simpleRandomPickCollection() {
-        Collection<String> ele = new ArrayList();
-        randomPick(ele);
+        Collection<String> ele = new ArrayList<>();
+        assertThrows(IllegalArgumentException.class,
+                () -> randomPick(ele));
     }
 
 
@@ -67,8 +69,7 @@ public class RandomUtilities_randomPickTest {
 
     @Test
     public void randomPickCollFromString() {
-        Collection ele = Collections.singleton("a");
-        assertEquals("a", randomPick(ele));
+        assertEquals("a", randomPick(Collections.singleton("a")));
     }
 
 
@@ -79,17 +80,18 @@ public class RandomUtilities_randomPickTest {
                 .contains(randomPick(ele)));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void randomPickCollFromNull() {
         Collection<String> str = null;
-        randomPick(str);
+        assertThrows(IllegalArgumentException.class,
+                () -> randomPick(str));
     }
 
-    //===
+
     @Test
     public void randomPickWithHowManyEmptyColl() {
-        Collection<String> ele = new ArrayList();
-        List result = randomPick(ele,1);
+        Collection<String> ele = new ArrayList<>();
+        List result = randomPick(ele, 1);
         assertEquals(0,result.size());
     }
 
@@ -138,10 +140,11 @@ public class RandomUtilities_randomPickTest {
         assertEquals(0,result.size());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void randomPickWithEmptyList() {
-        List ele = new ArrayList();
-        randomPick(ele);
+        List ele = new ArrayList<>();
+        assertThrows(IllegalArgumentException.class,
+                () -> randomPick(ele));
     }
 
 
@@ -160,9 +163,10 @@ public class RandomUtilities_randomPickTest {
         assertTrue(ele.contains(result));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void randomPickWithListNull() {
         List<String> str = null;
-        randomPick(str);
+        assertThrows(NullPointerException.class,
+                () -> randomPick(str));
     }
 }

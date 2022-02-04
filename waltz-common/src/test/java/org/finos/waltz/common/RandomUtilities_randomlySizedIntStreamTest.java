@@ -1,11 +1,10 @@
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.stream.IntStream;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class RandomUtilities_randomlySizedIntStreamTest {
     @Test
@@ -20,18 +19,23 @@ public class RandomUtilities_randomlySizedIntStreamTest {
         assertEquals(1, val.count());
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void toggleRandomlySizedIntStream(){
-        RandomUtilities.randomlySizedIntStream(1,0);
+    @Test
+    public void toggleRandomlySizedIntStream() {
+        assertThrows(IllegalArgumentException.class,
+                () -> RandomUtilities.randomlySizedIntStream(1, 0));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void randomlySizedIntStreamAllZero(){
-        RandomUtilities.randomlySizedIntStream(0,0);
+    @Test
+    public void randomlySizedIntStreamAllZero() {
+
+        assertThrows(IllegalArgumentException.class,
+                () -> RandomUtilities.randomlySizedIntStream(0, 0));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void randomlySizedIntStreamAllOne(){
-        RandomUtilities.randomlySizedIntStream(1,1);
+    @Test
+    public void randomlySizedIntStreamAllOne() {
+
+        assertThrows(IllegalArgumentException.class,
+                () -> RandomUtilities.randomlySizedIntStream(1, 1));
     }
 }

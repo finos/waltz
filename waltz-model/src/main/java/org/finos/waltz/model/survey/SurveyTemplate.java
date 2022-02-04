@@ -28,9 +28,10 @@ import java.time.LocalDateTime;
 @Value.Immutable
 @JsonSerialize(as = ImmutableSurveyTemplate.class)
 @JsonDeserialize(as = ImmutableSurveyTemplate.class)
-public abstract class SurveyTemplate implements IdProvider, NameProvider, DescriptionProvider, ExternalIdProvider {
+public abstract class SurveyTemplate implements IdProvider, NameProvider, DescriptionProvider, ExternalIdProvider, EntityKindProvider {
 
     public abstract EntityKind targetEntityKind();
+
     public abstract Long ownerId();
 
 
@@ -43,5 +44,10 @@ public abstract class SurveyTemplate implements IdProvider, NameProvider, Descri
     @Value.Default
     public ReleaseLifecycleStatus status() {
         return ReleaseLifecycleStatus.ACTIVE;
+    }
+
+    @Value.Default
+    public EntityKind kind() {
+        return EntityKind.SURVEY_TEMPLATE;
     }
 }

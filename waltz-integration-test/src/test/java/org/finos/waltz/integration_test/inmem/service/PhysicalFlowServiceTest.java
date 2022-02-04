@@ -35,7 +35,7 @@ import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.finos.waltz.service.physical_flow.PhysicalFlowService;
 import org.finos.waltz.service.physical_specification.PhysicalSpecificationService;
 import org.finos.waltz.service.physical_specification_definition.PhysicalSpecDefinitionService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;
@@ -50,7 +50,7 @@ import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
 
@@ -86,7 +86,7 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
 
         PhysicalFlow unknownId = pfSvc.getById(-1);
 
-        assertNull("If unknown id returns null", unknownId);
+        assertNull(unknownId, "If unknown id returns null");
 
         EntityReference a = appHelper.createNewApp("a", ouIds.a);
         EntityReference b = appHelper.createNewApp("b", ouIds.a1);
@@ -102,7 +102,7 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
 
         PhysicalFlow physicalFlow = pfSvc.getById(physicalFlowResponse.entityReference().id());
 
-        assertEquals("getById returns correct physical flow", physicalFlowResponse.entityReference().id(), physicalFlow.entityReference().id());
+        assertEquals(physicalFlowResponse.entityReference().id(), physicalFlow.entityReference().id(), "getById returns correct physical flow");
     }
 
 
@@ -110,10 +110,10 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
     public void findByExternalId() {
 
         List<PhysicalFlow> listFromNullExtId = pfSvc.findByExternalId(null);
-        assertEquals("If null ext id returns empty list", emptyList(), listFromNullExtId);
+        assertEquals(emptyList(), listFromNullExtId, "If null ext id returns empty list");
 
         List<PhysicalFlow> listFromUnknownExtId = pfSvc.findByExternalId(mkName("findByExternalId"));
-        assertEquals("If ext id doesn't exist returns empty list", emptyList(), listFromUnknownExtId);
+        assertEquals(emptyList(), listFromUnknownExtId, "If ext id doesn't exist returns empty list");
 
         EntityReference a = appHelper.createNewApp("a", ouIds.a);
         EntityReference b = appHelper.createNewApp("b", ouIds.a1);
@@ -129,10 +129,10 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
         extIdHelper.createExtId(physicalFlowResponse.entityReference(), "findByExternalId", mkName("findByExternalId"));
         List<PhysicalFlow> physicalFlows = pfSvc.findByExternalId("findByExternalId");
 
-        assertEquals("findByExternalIds returns correct number of physical flows", 1, physicalFlows.size());
-        assertEquals("findByExternalIds returns correct physical flows",
-                asSet(physicalFlowResponse.entityReference().id()),
-                map(physicalFlows, d -> d.entityReference().id()));
+        assertEquals(1, physicalFlows.size(), "findByExternalIds returns correct number of physical flows");
+        assertEquals(asSet(physicalFlowResponse.entityReference().id()),
+                map(physicalFlows, d -> d.entityReference().id()),
+                "findByExternalIds returns correct physical flows");
 
         Long specId2 = psHelper.createPhysicalSpec(a, "findByExternalId2");
 
@@ -144,19 +144,19 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
         extIdHelper.createExtId(physicalFlowResponse2.entityReference(), "findByExternalId", mkName("findByExternalId2"));
         List<PhysicalFlow> twoPhysicalFlows = pfSvc.findByExternalId("findByExternalId");
 
-        assertEquals("findByExternalIds returns correct number of physical flows", 2, twoPhysicalFlows.size());
-        assertEquals("findByExternalIds returns correct physical flows",
-                asSet(physicalFlowResponse.entityReference().id(), physicalFlowResponse2.entityReference().id()),
-                map(twoPhysicalFlows, d -> d.entityReference().id()));
+        assertEquals(2, twoPhysicalFlows.size(), "findByExternalIds returns correct number of physical flows");
+        assertEquals(asSet(physicalFlowResponse.entityReference().id(), physicalFlowResponse2.entityReference().id()),
+                map(twoPhysicalFlows, d -> d.entityReference().id()),
+                "findByExternalIds returns correct physical flows");
     }
 
 
     @Test
     public void findByEntityReference() {
 
-        assertThrows("Null entity reference throws an IllegalArgumentException",
-                IllegalArgumentException.class,
-                () -> pfSvc.findByEntityReference(null));
+        assertThrows(IllegalArgumentException.class,
+                () -> pfSvc.findByEntityReference(null),
+                "Null entity reference throws an IllegalArgumentException");
 
         EntityReference a = appHelper.createNewApp("a", ouIds.a);
         EntityReference b = appHelper.createNewApp("b", ouIds.a1);
@@ -178,30 +178,30 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 mkName("findByExternalId"));
 
         List<PhysicalFlow> entityNotExists = pfSvc.findByEntityReference(mkRef(EntityKind.APPLICATION, -1));
-        assertEquals("Returns empty list when entity doesn't exist", emptyList(), entityNotExists);
+        assertEquals(emptyList(), entityNotExists, "Returns empty list when entity doesn't exist");
 
         List<PhysicalFlow> entityExists = pfSvc.findByEntityReference(mkRef(EntityKind.APPLICATION, a.id()));
-        assertEquals("Returns correct number of flows for entity", 2, entityExists.size());
-        assertEquals("Returns correct flows for entity",
-                asSet(physicalFlowResponse1.entityReference().id(), physicalFlowResponse2.entityReference().id()),
-                map(entityExists, d -> d.entityReference().id()));
+        assertEquals(2, entityExists.size(), "Returns correct number of flows for entity");
+        assertEquals(asSet(physicalFlowResponse1.entityReference().id(), physicalFlowResponse2.entityReference().id()),
+                map(entityExists, d -> d.entityReference().id()),
+                "Returns correct flows for entity");
 
         List<PhysicalFlow> correctFlowsForEntity = pfSvc.findByEntityReference(mkRef(EntityKind.APPLICATION, b.id()));
-        assertEquals("Returns correct number of flows for entity", 1, correctFlowsForEntity.size());
-        assertEquals("Returns correct flows for entity",
-                asSet(physicalFlowResponse1.entityReference().id()),
-                map(correctFlowsForEntity, d -> d.entityReference().id()));
+        assertEquals(1, correctFlowsForEntity.size(), "Returns correct number of flows for entity");
+        assertEquals(asSet(physicalFlowResponse1.entityReference().id()),
+                map(correctFlowsForEntity, d -> d.entityReference().id()),
+                "Returns correct flows for entity");
     }
 
     @Test
     public void findByProducerEntityReference() {
 
-        assertThrows("Null entity reference throws an IllegalArgumentException",
-                IllegalArgumentException.class,
-                () -> pfSvc.findByProducerEntityReference(null));
+        assertThrows(IllegalArgumentException.class,
+                () -> pfSvc.findByProducerEntityReference(null),
+                "Null entity reference throws an IllegalArgumentException");
 
         List<PhysicalFlow> entityNotExists = pfSvc.findByProducerEntityReference(mkRef(EntityKind.APPLICATION, -1));
-        assertEquals("Returns empty list when entity doesn't exist", emptyList(), entityNotExists);
+        assertEquals(emptyList(), entityNotExists, "Returns empty list when entity doesn't exist");
 
         EntityReference a = appHelper.createNewApp("a", ouIds.a);
         EntityReference b = appHelper.createNewApp("b", ouIds.a1);
@@ -229,32 +229,32 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 mkName("findByProducerEntityReference"));
 
         List<PhysicalFlow> physicalsDownstreamOfA = pfSvc.findByProducerEntityReference(a);
-        assertEquals("Returns all flows downstream of a but not upstream flows", 2, physicalsDownstreamOfA.size());
-        assertEquals("Returns expected flows downstream of a",
-                asSet(physicalFlowResponse1.entityReference().id(), physicalFlowResponse2.entityReference().id()),
-                map(physicalsDownstreamOfA, d -> d.entityReference().id()));
+        assertEquals(2, physicalsDownstreamOfA.size(), "Returns all flows downstream of a but not upstream flows");
+        assertEquals(asSet(physicalFlowResponse1.entityReference().id(), physicalFlowResponse2.entityReference().id()),
+                map(physicalsDownstreamOfA, d -> d.entityReference().id()),
+                "Returns expected flows downstream of a");
 
         List<PhysicalFlow> physicalsDownstreamOfC = pfSvc.findByProducerEntityReference(c);
-        assertEquals("Returns expected flows downstream of c",
-                asSet(physicalFlowResponse3.entityReference().id()),
-                map(physicalsDownstreamOfC, d -> d.entityReference().id()));
+        assertEquals(asSet(physicalFlowResponse3.entityReference().id()),
+                map(physicalsDownstreamOfC, d -> d.entityReference().id()),
+                "Returns expected flows downstream of c");
 
         List<PhysicalFlow> physicalsDownstreamOfB = pfSvc.findByProducerEntityReference(b);
-        assertEquals("Returns expected flows downstream of b",
-                emptySet(),
-                map(physicalsDownstreamOfB, d -> d.entityReference().id()));
+        assertEquals(emptySet(),
+                map(physicalsDownstreamOfB, d -> d.entityReference().id()),
+                "Returns expected flows downstream of b");
     }
 
 
     @Test
     public void findByConsumerEntityReference() {
 
-        assertThrows("Null entity reference throws an IllegalArgumentException",
-                IllegalArgumentException.class,
-                () -> pfSvc.findByConsumerEntityReference(null));
+        assertThrows(IllegalArgumentException.class,
+                () -> pfSvc.findByConsumerEntityReference(null),
+                "Null entity reference throws an IllegalArgumentException");
 
         List<PhysicalFlow> entityNotExists = pfSvc.findByConsumerEntityReference(mkRef(EntityKind.APPLICATION, -1));
-        assertEquals("Returns empty list when entity doesn't exist", emptyList(), entityNotExists);
+        assertEquals(emptyList(), entityNotExists, "Returns empty list when entity doesn't exist");
 
         EntityReference a = appHelper.createNewApp("a", ouIds.a);
         EntityReference b = appHelper.createNewApp("b", ouIds.a1);
@@ -282,27 +282,27 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 mkName("findByConsumerEntityReference"));
 
         List<PhysicalFlow> physicalsUpstreamOfA = pfSvc.findByConsumerEntityReference(a);
-        assertEquals("Returns expected flows upstream of a",
-                emptySet(),
-                map(physicalsUpstreamOfA, d -> d.entityReference().id()));
+        assertEquals(emptySet(),
+                map(physicalsUpstreamOfA, d -> d.entityReference().id()),
+                "Returns expected flows upstream of a");
 
         List<PhysicalFlow> physicalsUpstreamOfC = pfSvc.findByConsumerEntityReference(c);
-        assertEquals("Returns all flows upstream of a but not downstream flows", 2, physicalsUpstreamOfC.size());
-        assertEquals("Returns expected flows upstream of c",
-                asSet(physicalFlowResponse2.entityReference().id(), physicalFlowResponse3.entityReference().id()),
-                map(physicalsUpstreamOfC, d -> d.entityReference().id()));
+        assertEquals(2, physicalsUpstreamOfC.size(), "Returns all flows upstream of a but not downstream flows");
+        assertEquals(asSet(physicalFlowResponse2.entityReference().id(), physicalFlowResponse3.entityReference().id()),
+                map(physicalsUpstreamOfC, d -> d.entityReference().id()),
+                "Returns expected flows upstream of c");
 
         List<PhysicalFlow> physicalsDownstreamOfB = pfSvc.findByConsumerEntityReference(b);
-        assertEquals("Returns expected flows upstream of b",
-                asSet(physicalFlowResponse1.entityReference().id()),
-                map(physicalsDownstreamOfB, d -> d.entityReference().id()));
+        assertEquals(asSet(physicalFlowResponse1.entityReference().id()),
+                map(physicalsDownstreamOfB, d -> d.entityReference().id()),
+                "Returns expected flows upstream of b");
     }
 
     @Test
     public void findBySpecificationId() {
 
         List<PhysicalFlow> unknownSpecId = pfSvc.findBySpecificationId(-1);
-        assertEquals("If unknown spec id returns empty list", emptyList(), unknownSpecId);
+        assertEquals(emptyList(), unknownSpecId, "If unknown spec id returns empty list");
 
         EntityReference a = appHelper.createNewApp("a", ouIds.a);
         EntityReference b = appHelper.createNewApp("b", ouIds.a1);
@@ -321,9 +321,9 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 mkName("findBySpecificationId"));
 
         List<PhysicalFlow> physicalFlows = pfSvc.findBySpecificationId(specId);
-        assertEquals("findBySpecificationId returns correct physical flows",
-                asSet(physicalFlowResponse.entityReference().id()),
-                map(physicalFlows, d -> d.entityReference().id()));
+        assertEquals(asSet(physicalFlowResponse.entityReference().id()),
+                map(physicalFlows, d -> d.entityReference().id()),
+                "findBySpecificationId returns correct physical flows");
 
         PhysicalFlowCreateCommandResponse physicalFlowResponse2 = pfHelper.createPhysicalFlow(
                 bc.entityReference().id(),
@@ -336,26 +336,26 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 mkName("findBySpecificationId"));
 
         List<PhysicalFlow> physicalFlows2 = pfSvc.findBySpecificationId(specId);
-        assertEquals("findBySpecificationId returns only physical flows with that spec",
-                asSet(physicalFlowResponse.entityReference().id(), physicalFlowResponse2.entityReference().id()),
-                map(physicalFlows2, d -> d.entityReference().id()));
+        assertEquals(asSet(physicalFlowResponse.entityReference().id(), physicalFlowResponse2.entityReference().id()),
+                map(physicalFlows2, d -> d.entityReference().id()),
+                "findBySpecificationId returns only physical flows with that spec");
     }
 
     @Test
     public void findBySelector() {
 
         assertThrows(
-                "Null selection options should throw IllegalArgumentException",
-                IllegalArgumentException.class, () -> pfSvc.findBySelector(null));
+                IllegalArgumentException.class,
+                () -> pfSvc.findBySelector(null), "Null selection options should throw IllegalArgumentException");
 
         assertThrows(
-                "Null entity reference should throw NullPointerException when constructing options",
-                NullPointerException.class, () -> pfSvc.findBySelector(mkOpts(null)));
+                NullPointerException.class,
+                () -> pfSvc.findBySelector(mkOpts(null)), "Null entity reference should throw NullPointerException when constructing options");
 
         EntityReference a = appHelper.createNewApp("a", ouIds.a);
 
         Collection<PhysicalFlow> bySelectorWithNoFlows = pfSvc.findBySelector(mkOpts(a));
-        assertEquals("Returns empty list when no flows for selector", emptyList(), bySelectorWithNoFlows);
+        assertEquals(emptyList(), bySelectorWithNoFlows, "Returns empty list when no flows for selector");
 
         EntityReference b = appHelper.createNewApp("b", ouIds.a1);
         LogicalFlow ab = lfHelper.createLogicalFlow(a, b);
@@ -366,9 +366,9 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 mkName("findBySpecificationId"));
 
         Collection<PhysicalFlow> bySelectorWithFlows = pfSvc.findBySelector(mkOpts(a));
-        assertEquals("Returns correct flows for selector",
-                asSet(physicalFlowResponse.entityReference().id()),
-                map(bySelectorWithFlows, d -> d.entityReference().id()));
+        assertEquals(asSet(physicalFlowResponse.entityReference().id()),
+                map(bySelectorWithFlows, d -> d.entityReference().id()),
+                "Returns correct flows for selector");
 
         EntityReference c = appHelper.createNewApp("c", ouIds.b);
         LogicalFlow bc = lfHelper.createLogicalFlow(b, c);
@@ -378,14 +378,14 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 mkName("findBySpecificationId"));
 
         Collection<PhysicalFlow> bySpecSelectorWithRelatedFlows = pfSvc.findBySelector(mkOpts(mkRef(EntityKind.PHYSICAL_SPECIFICATION, specId)));
-        assertEquals("Returns correct flows for spec selector",
-                asSet(physicalFlowResponse.entityReference().id(), otherFlowLinkedToSpec.entityReference().id()),
-                map(bySpecSelectorWithRelatedFlows, d -> d.entityReference().id()));
+        assertEquals(asSet(physicalFlowResponse.entityReference().id(), otherFlowLinkedToSpec.entityReference().id()),
+                map(bySpecSelectorWithRelatedFlows, d -> d.entityReference().id()),
+                "Returns correct flows for spec selector");
 
         Collection<PhysicalFlow> byLogFlowSelectorWithRelatedFlows = pfSvc.findBySelector(mkOpts(ab.entityReference()));
-        assertEquals("Returns correct flows for log flow selector",
-                asSet(physicalFlowResponse.entityReference().id()),
-                map(byLogFlowSelectorWithRelatedFlows, d -> d.entityReference().id()));
+        assertEquals(asSet(physicalFlowResponse.entityReference().id()),
+                map(byLogFlowSelectorWithRelatedFlows, d -> d.entityReference().id()),
+                "Returns correct flows for log flow selector");
 
     }
 
@@ -404,16 +404,16 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 specId,
                 mkName("delete"));
 
-        assertThrows("Should throw exception if passed in a null phys flow id",
-                IllegalArgumentException.class,
-                () -> pfSvc.delete(null, mkName("deletingFlow")));
+        assertThrows(IllegalArgumentException.class,
+                () -> pfSvc.delete(null, mkName("deletingFlow")),
+                "Should throw exception if passed in a null phys flow id");
 
         PhysicalFlowDeleteCommandResponse invalidFlowIdResp = pfSvc.delete(ImmutablePhysicalFlowDeleteCommand.builder()
                         .flowId(-1)
                         .build(),
                 mkName("deletingFlow"));
 
-        assertEquals("Should return failure if the flow does not exist", CommandOutcome.FAILURE, invalidFlowIdResp.outcome());
+        assertEquals(CommandOutcome.FAILURE, invalidFlowIdResp.outcome(), "Should return failure if the flow does not exist");
 
         PhysicalFlowDeleteCommandResponse deletedFlowResp = pfSvc.delete(ImmutablePhysicalFlowDeleteCommand.builder()
                         .flowId(physFlow.entityReference().id())
@@ -422,17 +422,17 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
 
         PhysicalFlow physicalFlowAfterDeletion = pfSvc.getById(physFlow.entityReference().id());
 
-        assertEquals("Should be successful if flow was deleted", CommandOutcome.SUCCESS, deletedFlowResp.outcome());
-        assertTrue("Physical flow should be soft deleted with isRemoved set true", physicalFlowAfterDeletion.isRemoved());
+        assertEquals(CommandOutcome.SUCCESS, deletedFlowResp.outcome(), "Should be successful if flow was deleted");
+        assertTrue(physicalFlowAfterDeletion.isRemoved(), "Physical flow should be soft deleted with isRemoved set true");
 
         PhysicalFlowDeleteCommandResponse reDeletingFlowResp = pfSvc.delete(ImmutablePhysicalFlowDeleteCommand.builder()
                         .flowId(physFlow.entityReference().id())
                         .build(),
                 mkName("deletingFlow"));
 
-        assertEquals("Should fail when trying to delete a flow that is already removed",
-                CommandOutcome.FAILURE,
-                reDeletingFlowResp.outcome());
+        assertEquals(CommandOutcome.FAILURE,
+                reDeletingFlowResp.outcome(),
+                "Should fail when trying to delete a flow that is already removed");
     }
 
 
@@ -457,9 +457,9 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                         .build(),
                 mkName("deleteReadOnly"));
 
-        assertEquals("Physical flow should not be deleted if marked read only",
-                CommandOutcome.FAILURE,
-                deletedFlowResp.outcome());
+        assertEquals(CommandOutcome.FAILURE,
+                deletedFlowResp.outcome(),
+                "Physical flow should not be deleted if marked read only");
     }
 
 
@@ -473,9 +473,9 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
         Long specId = psHelper.createPhysicalSpec(a, mkName("delete"));
         PhysicalSpecification spec = psSvc.getById(specId);
 
-        assertThrows("Should throw exception if null object passed into create",
-                IllegalArgumentException.class,
-                () -> pfSvc.create(null, mkName("create")));
+        assertThrows(IllegalArgumentException.class,
+                () -> pfSvc.create(null, mkName("create")),
+                "Should throw exception if null object passed into create");
 
 
         ImmutableFlowAttributes flowAttrs = ImmutableFlowAttributes.builder()
@@ -498,11 +498,11 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 .build();
 
         PhysicalFlowCreateCommandResponse createResp = pfSvc.create(createCommand, mkName("create"));
-        assertEquals("Can successfully create physical flows", CommandOutcome.SUCCESS, createResp.outcome());
+        assertEquals(CommandOutcome.SUCCESS, createResp.outcome(), "Can successfully create physical flows");
 
-        assertThrows("Throws an exception when trying to create a physical flow for an invalid logical flow id",
-                IllegalArgumentException.class,
-                () -> pfSvc.create(createCommandInvalidFlowId, mkName("create")));
+        assertThrows(IllegalArgumentException.class,
+                () -> pfSvc.create(createCommandInvalidFlowId, mkName("create")),
+                "Throws an exception when trying to create a physical flow for an invalid logical flow id");
 
     }
 
@@ -517,9 +517,9 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
         Long specId = psHelper.createPhysicalSpec(a, mkName("delete"));
         PhysicalSpecification spec = psSvc.getById(specId);
 
-        assertThrows("Should throw exception if null object passed into create",
-                IllegalArgumentException.class,
-                () -> pfSvc.create(null, mkName("create")));
+        assertThrows(IllegalArgumentException.class,
+                () -> pfSvc.create(null, mkName("create")),
+                "Should throw exception if null object passed into create");
 
 
         ImmutableFlowAttributes flowAttrs = ImmutableFlowAttributes.builder()
@@ -538,10 +538,10 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
         lfSvc.removeFlow(ab.entityReference().id(), mkName("create"));
 
         PhysicalFlowCreateCommandResponse createRespWithRemovedFlow = pfSvc.create(createCommand, mkName("create"));
-        assertEquals("Should restore removed logical flows and create physical", CommandOutcome.SUCCESS, createRespWithRemovedFlow.outcome());
+        assertEquals(CommandOutcome.SUCCESS, createRespWithRemovedFlow.outcome(), "Should restore removed logical flows and create physical");
 
         LogicalFlow abAfterFlowAdded = lfSvc.getById(ab.entityReference().id());
-        assertFalse("Logical flows should be active if physicals have been added", abAfterFlowAdded.isRemoved());
+        assertFalse(abAfterFlowAdded.isRemoved(), "Logical flows should be active if physicals have been added");
     }
 
 
@@ -555,9 +555,9 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
         Long specId = psHelper.createPhysicalSpec(a, mkName("delete"));
         PhysicalSpecification spec = psSvc.getById(specId);
 
-        assertThrows("Should throw exception if null object passed into create",
-                IllegalArgumentException.class,
-                () -> pfSvc.create(null, mkName("create")));
+        assertThrows(IllegalArgumentException.class,
+                () -> pfSvc.create(null, mkName("create")),
+                "Should throw exception if null object passed into create");
 
 
         ImmutableFlowAttributes flowAttrs = ImmutableFlowAttributes.builder()
@@ -580,12 +580,12 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
         PhysicalFlow pf1 = pfSvc.getById(firstCreateResp.entityReference().id());
         PhysicalFlow pf2 = pfSvc.getById(secondCreateResp.entityReference().id());
 
-        assertTrue("First flows should remain removed", pf1.isRemoved());
-        assertFalse("Second flow should be active", pf2.isRemoved());
+        assertTrue(pf1.isRemoved(), "First flows should remain removed");
+        assertFalse(pf2.isRemoved(), "Second flow should be active");
 
-        assertEquals("Can successfully create physical flows sharing attributes if the first physical similar was removed",
-                CommandOutcome.SUCCESS,
-                secondCreateResp.outcome());
+        assertEquals(CommandOutcome.SUCCESS,
+                secondCreateResp.outcome(),
+                "Can successfully create physical flows sharing attributes if the first physical similar was removed");
     }
 
 
@@ -627,13 +627,13 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
 
         PhysicalFlowCreateCommandResponse firstCreateResp = pfSvc.create(createCommand, username);
 
-        assertEquals("Successfully creates flow when new spec needs to be created", CommandOutcome.SUCCESS, firstCreateResp.outcome());
+        assertEquals(CommandOutcome.SUCCESS, firstCreateResp.outcome(), "Successfully creates flow when new spec needs to be created");
 
         PhysicalFlow newPhysFlow = pfSvc.getById(firstCreateResp.entityReference().id());
         PhysicalSpecification createdSpec = psSvc.getById(newPhysFlow.specificationId());
 
-        assertEquals("Specification associated to new flow has the correct external id", specExtId, createdSpec.externalId().get());
-        assertEquals("Specification associated to flow has the correct user against it", username, createdSpec.created().get().by());
+        assertEquals(specExtId, createdSpec.externalId().get(), "Specification associated to new flow has the correct external id");
+        assertEquals(username, createdSpec.created().get().by(), "Specification associated to flow has the correct user against it");
     }
 
     @Test
@@ -655,7 +655,7 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 username);
 
         PhysicalSpecification specOnceRemoved = psSvc.getById(specId);
-        assertTrue("Specification is only soft deleted prior to reactivation", specOnceRemoved.isRemoved());
+        assertTrue(specOnceRemoved.isRemoved(), "Specification is only soft deleted prior to reactivation");
 
         ImmutableFlowAttributes flowAttrs = ImmutableFlowAttributes.builder()
                 .frequency(FrequencyKind.DAILY)
@@ -671,13 +671,13 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 .build();
 
         PhysicalFlowCreateCommandResponse createResp = pfSvc.create(createCommand, username);
-        assertEquals("Successfully creates flow when spec needs to be reactivated", CommandOutcome.SUCCESS, createResp.outcome());
+        assertEquals(CommandOutcome.SUCCESS, createResp.outcome(), "Successfully creates flow when spec needs to be reactivated");
 
         PhysicalFlow newPhysFlow = pfSvc.getById(createResp.entityReference().id());
         PhysicalSpecification reactivatedSpec = psSvc.getById(newPhysFlow.specificationId());
 
-        assertFalse("Specification is active after new flow is created", reactivatedSpec.isRemoved());
-        assertEquals("Specification associated to flow has the correct id", specId, Long.valueOf(reactivatedSpec.entityReference().id()));
+        assertFalse(reactivatedSpec.isRemoved(), "Specification is active after new flow is created");
+        assertEquals(specId, Long.valueOf(reactivatedSpec.entityReference().id()), "Specification associated to flow has the correct id");
     }
 
 
@@ -714,15 +714,15 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 .build();
 
         PhysicalFlowCreateCommandResponse firstCreateResp = pfSvc.create(createCommand, username);
-        assertEquals("Successfully creates flow when new", CommandOutcome.SUCCESS, firstCreateResp.outcome());
+        assertEquals(CommandOutcome.SUCCESS, firstCreateResp.outcome(), "Successfully creates flow when new");
 
         PhysicalFlowCreateCommandResponse secondCreateResp = pfSvc.create(createCommand2, username);
-        assertEquals("Fails to create flow when a similar one is already active", CommandOutcome.FAILURE, secondCreateResp.outcome());
+        assertEquals(CommandOutcome.FAILURE, secondCreateResp.outcome(), "Fails to create flow when a similar one is already active");
 
-        assertTrue("Failure message advises user that there is an existing flow",
-                secondCreateResp.message()
+        assertTrue(secondCreateResp.message()
                         .map(msg -> msg.equalsIgnoreCase("Duplicate with existing flow"))
-                        .orElse(false));
+                        .orElse(false),
+                "Failure message advises user that there is an existing flow");
     }
 
 
@@ -748,21 +748,21 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
 
         PhysicalFlowCreateCommandResponse flowCreateResp = pfHelper.createPhysicalFlow(ab.entityReference().id(), specId, mkName("updateSpecDefinitionId"));
         PhysicalFlow physicalFlow = pfSvc.getById(flowCreateResp.entityReference().id());
-        assertEquals("Check the physical flow has been created without correct spec id", Optional.empty(), physicalFlow.specificationDefinitionId());
+        assertEquals(Optional.empty(), physicalFlow.specificationDefinitionId(), "Check the physical flow has been created without correct spec id");
 
-        assertThrows("Should throw an IllegalArgumentException if the update command is null",
-                IllegalArgumentException.class,
-                () -> pfSvc.updateSpecDefinitionId(mkName("updateSpecDefinitionId"), physicalFlow.id().get(), null));
+        assertThrows(IllegalArgumentException.class,
+                () -> pfSvc.updateSpecDefinitionId(mkName("updateSpecDefinitionId"), physicalFlow.id().get(), null),
+                "Should throw an IllegalArgumentException if the update command is null");
 
         int updated = pfSvc.updateSpecDefinitionId(
                 mkName("updateSpecDefinitionId"),
                 physicalFlow.id().get(),
                 ImmutablePhysicalFlowSpecDefinitionChangeCommand.builder().newSpecDefinitionId(specDefnId).build());
 
-        assertEquals("Should successfully update the specification id to the new spec", 1, updated);
+        assertEquals(1, updated, "Should successfully update the specification id to the new spec");
 
         PhysicalFlow flowWithNewSpec = pfSvc.getById(flowCreateResp.entityReference().id());
-        assertEquals("Should successfully update the specification id to the new spec", Long.valueOf(specDefnId), flowWithNewSpec.specificationDefinitionId().get());
+        assertEquals(Long.valueOf(specDefnId), flowWithNewSpec.specificationDefinitionId().get(), "Should successfully update the specification id to the new spec");
     }
 
     @Test
@@ -786,13 +786,13 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
         List<PhysicalFlow> flowsWithMergeExtId = pfSvc.findByExternalId("merge");
         PhysicalFlow firstFlowAfterUpdate = pfSvc.getById(firstFlowCreateResp.entityReference().id());
 
-        assertTrue("Once merged the original flow should no longer be active", firstFlowAfterUpdate.isRemoved());
+        assertTrue(firstFlowAfterUpdate.isRemoved(), "Once merged the original flow should no longer be active");
 
-        assertTrue("Once merged the second flow should have the external id of the original",
-                map(flowsWithMergeExtId, d -> d.entityReference().id()).contains(secondFlowCreateResp.entityReference().id()));
+        assertTrue(map(flowsWithMergeExtId, d -> d.entityReference().id()).contains(secondFlowCreateResp.entityReference().id()),
+                "Once merged the second flow should have the external id of the original");
 
         PhysicalSpecification specAfterUpdate = psSvc.getById(specId);
-        assertTrue("If last remaining flow spec should be removed", specAfterUpdate.isRemoved());
+        assertTrue(specAfterUpdate.isRemoved(), "If last remaining flow spec should be removed");
     }
 
 
@@ -816,7 +816,7 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
         boolean merge = pfSvc.merge(firstFlowCreateResp.entityReference().id(), thirdFlowCreateResp.entityReference().id(), mkName("merge"));
 
         PhysicalSpecification specAfterUpdate = psSvc.getById(specId);
-        assertFalse("If other flows share the spec it should not be removed after the merge", specAfterUpdate.isRemoved());
+        assertFalse(specAfterUpdate.isRemoved(), "If other flows share the spec it should not be removed after the merge");
     }
 
 
@@ -842,9 +842,9 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
         PhysicalFlow firstFlowAfterUpdate = pfSvc.getById(firstFlowCreateResp.entityReference().id());
         PhysicalFlow secondFlowAfterUpdate = pfSvc.getById(secondFlowCreateResp.entityReference().id());
 
-        assertTrue("If the target flow already had an ext Id this is retained", secondFlowAfterUpdate.externalId().map(extId -> extId.equalsIgnoreCase("merge2")).orElse(false));
-        assertTrue("Once merged the second flow should have the external id of the original",
-                map(flowsWithMergeExtId, d -> d.entityReference().id()).contains(secondFlowCreateResp.entityReference().id()));
+        assertTrue(secondFlowAfterUpdate.externalId().map(extId -> extId.equalsIgnoreCase("merge2")).orElse(false), "If the target flow already had an ext Id this is retained");
+        assertTrue(map(flowsWithMergeExtId, d -> d.entityReference().id()).contains(secondFlowCreateResp.entityReference().id()),
+                "Once merged the second flow should have the external id of the original");
 
     }
 
@@ -875,15 +875,15 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
 
         PhysicalFlowCreateCommandResponse flowResp = pfSvc.create(createCmd, mkName("updateAttribute"));
 
-        assertThrows("If attribute name is not recognised throw exception",
-                UnsupportedOperationException.class,
+        assertThrows(UnsupportedOperationException.class,
                 () -> pfSvc.updateAttribute(
                         mkName("updateAttribute"),
                         ImmutableSetAttributeCommand.builder()
                                 .name("invalidAttr")
                                 .entityReference(flowResp.entityReference())
                                 .value("invalid")
-                                .build()));
+                                .build()),
+                "If attribute name is not recognised throw exception");
 
         pfSvc.updateAttribute(
                 mkName("updateAttribute"),
@@ -935,12 +935,12 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
 
         PhysicalFlow physFlowAfterUpdates = pfSvc.getById(flowResp.entityReference().id());
 
-        assertEquals("Description should be updated after updateAttribute", "after", physFlowAfterUpdates.description());
-        assertEquals("Frequency should be updated after updateAttribute", FrequencyKind.MONTHLY, physFlowAfterUpdates.frequency());
-        assertEquals("Transport should be updated after updateAttribute", TransportKindValue.of("OTHER"), physFlowAfterUpdates.transport());
-        assertEquals("Basis offset should be updated after updateAttribute", 0, physFlowAfterUpdates.basisOffset());
-        assertEquals("EntityLifecycleStatus should be updated after updateAttribute", EntityLifecycleStatus.REMOVED, physFlowAfterUpdates.entityLifecycleStatus());
-        assertEquals("Criticality should be updated after updateAttribute", Criticality.LOW, physFlowAfterUpdates.criticality());
+        assertEquals("after", physFlowAfterUpdates.description(), "Description should be updated after updateAttribute");
+        assertEquals(FrequencyKind.MONTHLY, physFlowAfterUpdates.frequency(), "Frequency should be updated after updateAttribute");
+        assertEquals(TransportKindValue.of("OTHER"), physFlowAfterUpdates.transport(), "Transport should be updated after updateAttribute");
+        assertEquals(0, physFlowAfterUpdates.basisOffset(), "Basis offset should be updated after updateAttribute");
+        assertEquals(EntityLifecycleStatus.REMOVED, physFlowAfterUpdates.entityLifecycleStatus(), "EntityLifecycleStatus should be updated after updateAttribute");
+        assertEquals(Criticality.LOW, physFlowAfterUpdates.criticality(), "Criticality should be updated after updateAttribute");
     }
 
 
@@ -948,10 +948,10 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
     public void findUnderlyingPhysicalFlows() {
 
         Collection<PhysicalFlowInfo> underlyingPhysicalFlowsWhenLogicalNull = pfSvc.findUnderlyingPhysicalFlows(null);
-        assertTrue("If null logical flow id then returns empty list", isEmpty(underlyingPhysicalFlowsWhenLogicalNull));
+        assertTrue(isEmpty(underlyingPhysicalFlowsWhenLogicalNull), "If null logical flow id then returns empty list");
 
         Collection<PhysicalFlowInfo> underlyingPhysicalFlowsWhenLogicalDoesntExist = pfSvc.findUnderlyingPhysicalFlows(-1L);
-        assertTrue("If invalid logical flow id then returns empty list", isEmpty(underlyingPhysicalFlowsWhenLogicalDoesntExist));
+        assertTrue(isEmpty(underlyingPhysicalFlowsWhenLogicalDoesntExist), "If invalid logical flow id then returns empty list");
 
         EntityReference a = appHelper.createNewApp(mkName("a"), ouIds.a);
         EntityReference b = appHelper.createNewApp(mkName("b"), ouIds.a1);
@@ -959,7 +959,7 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
         LogicalFlow ab = lfHelper.createLogicalFlow(a, b);
 
         Collection<PhysicalFlowInfo> noPhysicalsAssociated = pfSvc.findUnderlyingPhysicalFlows(ab.entityReference().id());
-        assertTrue("If no physicals associated to the logical then returns empty list", isEmpty(noPhysicalsAssociated));
+        assertTrue(isEmpty(noPhysicalsAssociated), "If no physicals associated to the logical then returns empty list");
 
         Long specId = psHelper.createPhysicalSpec(a, mkName("updateAttribute"));
         PhysicalFlowCreateCommandResponse flowCreateResp = pfHelper.createPhysicalFlow(
@@ -968,12 +968,12 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 mkName("findUnderlyingPhysicalFlows"));
 
         Collection<PhysicalFlowInfo> physicalAssociated = pfSvc.findUnderlyingPhysicalFlows(ab.entityReference().id());
-        assertEquals("Returns correct number of underlying physical flows for that logical", 1, physicalAssociated.size());
+        assertEquals(1, physicalAssociated.size(), "Returns correct number of underlying physical flows for that logical");
 
         pfHelper.deletePhysicalFlow(flowCreateResp.entityReference().id());
 
         Collection<PhysicalFlowInfo> noActivePhysicals = pfSvc.findUnderlyingPhysicalFlows(ab.entityReference().id());
-        assertTrue("If no active physicals associated to the logical then returns empty list", isEmpty(noActivePhysicals));
+        assertTrue(isEmpty(noActivePhysicals), "If no active physicals associated to the logical then returns empty list");
 
         PhysicalFlowCreateCommandResponse flowCreateResp2 = pfHelper.createPhysicalFlow(
                 ab.entityReference().id(),
@@ -981,11 +981,11 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 mkName("findUnderlyingPhysicalFlows"));
 
         Collection<PhysicalFlowInfo> physicalAssociated2 = pfSvc.findUnderlyingPhysicalFlows(ab.entityReference().id());
-        assertEquals("Returns correct number of underlying physical flows for that logical", 1, physicalAssociated2.size());
+        assertEquals(1, physicalAssociated2.size(), "Returns correct number of underlying physical flows for that logical");
 
         lfSvc.removeFlow(ab.entityReference().id(), mkName("findUnderlyingPhysicalFlows"));
 
         Collection<PhysicalFlowInfo> underlyingPhysicalsForRemovedLogical = pfSvc.findUnderlyingPhysicalFlows(ab.entityReference().id());
-        assertTrue("Returns empty list of the logical flow is removed", isEmpty(underlyingPhysicalsForRemovedLogical));
+        assertTrue(isEmpty(underlyingPhysicalsForRemovedLogical), "Returns empty list of the logical flow is removed");
     }
 }

@@ -1,11 +1,11 @@
 package org.finos.waltz.common;
 
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.finos.waltz.common.EnumUtilities.parseEnumWithAliases;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class EnumUtilities_parseEnumWithAliasesTest {
 
@@ -17,30 +17,31 @@ public class EnumUtilities_parseEnumWithAliasesTest {
     private Aliases<MyEnum> al = new Aliases();
 
 
-    @Before
+    @BeforeEach
     public void before() {
         al.register(MyEnum.A, "a", "synonym-for-a");
         al.register(MyEnum.B, "b");
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
-    public void parseWithNullValue(){
-        assertNull(parseEnumWithAliases(null, MyEnum.class, null, al));
+    @Test
+    public void parseWithNullValue() {
+        assertThrows(IllegalArgumentException.class,
+                () -> parseEnumWithAliases(null, MyEnum.class, null, al));
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
-    public void parseWithEmptyValue(){
-        assertNull(parseEnumWithAliases("", MyEnum.class, null, al));
+    @Test
+    public void parseWithEmptyValue() {
+        assertThrows(IllegalArgumentException.class,
+                () -> parseEnumWithAliases("", MyEnum.class, null, al));
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
-    public void parseWithNullEnumClass(){
-        assertEquals(
-                MyEnum.A,
-                parseEnumWithAliases("a", null, null, al));
+    @Test
+    public void parseWithNullEnumClass() {
+        assertThrows(IllegalArgumentException.class,
+                () -> parseEnumWithAliases("a", null, null, al));
     }
 
 
@@ -51,16 +52,17 @@ public class EnumUtilities_parseEnumWithAliasesTest {
                 parseEnumWithAliases("a", MyEnum.class, null, null));
     }
 
+    public void parseWithAllNullParams() {
+        assertThrows(IllegalArgumentException.class,
+                () -> parseEnumWithAliases(null, null, null, null));
 
-    @Test(expected = IllegalArgumentException.class)
-    public void parseWithAllNullParams(){
-        parseEnumWithAliases(null, null, null, null);
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
-    public void parseWithEmptyValAndNullOtherParams(){
-        parseEnumWithAliases("", null, null, null);
+    @Test
+    public void parseWithEmptyValAndNullOtherParams() {
+        assertThrows(IllegalArgumentException.class,
+                () -> parseEnumWithAliases("", null, null, null));
     }
 
 

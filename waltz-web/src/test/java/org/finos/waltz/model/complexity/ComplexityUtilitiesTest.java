@@ -20,27 +20,30 @@ package org.finos.waltz.model.complexity;
 
 import org.finos.waltz.model.tally.ImmutableTally;
 import org.finos.waltz.model.tally.Tally;
-import org.junit.Test;
+import org.finos.waltz.web.WebUtilities;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-/**
- * Created by dwatkins on 25/01/2016.
- */
+
 public class ComplexityUtilitiesTest {
 
     private final Tally<Long> tally = ImmutableTally.<Long>builder().id(1L).count(10).build();
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void mustSupplyATally() {
-        ComplexityUtilities.tallyToComplexityScore(ComplexityType.CONNECTION, null, 10);
+        assertThrows(IllegalArgumentException.class,
+                () -> ComplexityUtilities.tallyToComplexityScore(ComplexityType.CONNECTION, null, 10));
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void negativeMaximumsAreIllegal() {
-        ComplexityUtilities.tallyToComplexityScore(ComplexityType.CONNECTION, tally, -1);
+        assertThrows(IllegalArgumentException.class,
+                () -> ComplexityUtilities.tallyToComplexityScore(ComplexityType.CONNECTION, tally, -1));
+
     }
 
 

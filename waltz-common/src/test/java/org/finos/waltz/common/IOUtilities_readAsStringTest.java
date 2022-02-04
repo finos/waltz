@@ -1,11 +1,12 @@
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class IOUtilities_readAsStringTest {
     @Test
@@ -22,9 +23,10 @@ public class IOUtilities_readAsStringTest {
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void nullStreamThrowsException() throws IOException {
-        IOUtilities.readAsString(null);
+        assertThrows(IllegalArgumentException.class,
+                () -> IOUtilities.readAsString(null));
     }
 
 

@@ -30,7 +30,7 @@ import org.finos.waltz.model.logical_flow.ImmutableAddLogicalFlowCommand;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.jooq.lambda.tuple.Tuple2;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;
@@ -46,7 +46,7 @@ import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.HierarchyQueryScope.CHILDREN;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 import static org.jooq.lambda.tuple.Tuple.tuple;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
 
@@ -76,23 +76,23 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
         LogicalFlow ad = helper.createLogicalFlow(a, d);
 
         assertEquals(
-                "Can see flow associated to 'a'",
                 asSet(ab.id(), ad.id()),
-                map(lfSvc.findByEntityReference(a), IdProvider::id));
+                map(lfSvc.findByEntityReference(a), IdProvider::id),
+                "Can see flow associated to 'a'");
 
         assertEquals(
-                "Can sees flows associated to 'b'",
                 asSet(ab.id()),
-                map(lfSvc.findByEntityReference(b), IdProvider::id));
+                map(lfSvc.findByEntityReference(b), IdProvider::id),
+                "Can sees flows associated to 'b'");
 
         assertEquals(
-                "Can sees flows associated to 'd'",
                 asSet(ad.id()),
-                map(lfSvc.findByEntityReference(d), IdProvider::id));
+                map(lfSvc.findByEntityReference(d), IdProvider::id),
+                "Can sees flows associated to 'd'");
 
         assertTrue(
-                "Can sees nothing associated to 'c'",
-                isEmpty(lfSvc.findByEntityReference(c)));
+                isEmpty(lfSvc.findByEntityReference(c)),
+                "Can sees nothing associated to 'c'");
     }
 
 
@@ -108,24 +108,24 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
         LogicalFlow ab = helper.createLogicalFlow(a, b);
         LogicalFlow ac = helper.createLogicalFlow(a, c);
 
-        assertEquals("find by root ou gives all",
-                asSet(ab.id(), ac.id()),
+        assertEquals(asSet(ab.id(), ac.id()),
                 map(lfSvc.findBySelector(mkOpts(
-                        mkRef(EntityKind.ORG_UNIT, ouIds.root),
-                        CHILDREN)),
-                    IdProvider::id));
+                                mkRef(EntityKind.ORG_UNIT, ouIds.root),
+                                CHILDREN)),
+                        IdProvider::id),
+                "find by root ou gives all");
 
-        assertEquals("find by ou 'b' gives only one flow",
-                asSet(ac.id()),
+        assertEquals(asSet(ac.id()),
                 map(lfSvc.findBySelector(mkOpts(
-                        mkRef(EntityKind.ORG_UNIT, ouIds.b),
-                        CHILDREN)),
-                    IdProvider::id));
+                                mkRef(EntityKind.ORG_UNIT, ouIds.b),
+                                CHILDREN)),
+                        IdProvider::id),
+                "find by ou 'b' gives only one flow");
     }
 
 
     @Test
-    public void getByIdTest(){
+    public void getByIdTest() {
 
         EntityReference a = appHelper.createNewApp("a", ouIds.a);
         EntityReference b = appHelper.createNewApp("b", ouIds.a1);
@@ -135,17 +135,17 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
 
         LogicalFlow logFlow = lfSvc.getById(ab.id().get());
 
-        assertEquals("Retrieved flow has correct source", ab.source(), logFlow.source());
-        assertEquals("Retrieved flow has correct target", ab.target(), logFlow.target());
+        assertEquals(ab.source(), logFlow.source(), "Retrieved flow has correct source");
+        assertEquals(ab.target(), logFlow.target(), "Retrieved flow has correct target");
 
         LogicalFlow impossibleIdFlow = lfSvc.getById(-1L);
 
-        assertNull("Returns null if id not found", impossibleIdFlow);
+        assertNull(impossibleIdFlow, "Returns null if id not found");
     }
 
 
     @Test
-    public void removeFlowTest(){
+    public void removeFlowTest() {
         EntityReference a = appHelper.createNewApp("a", ouIds.a);
         EntityReference b = appHelper.createNewApp("b", ouIds.a1);
         EntityReference c = appHelper.createNewApp("c", ouIds.b);
@@ -154,12 +154,12 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
         LogicalFlow ab = helper.createLogicalFlow(a, b);
         LogicalFlow ac = helper.createLogicalFlow(a, b);
 
-        assertThrows("Expect no flows to be removed where id cannot be found",
-                IllegalArgumentException.class,
-                () -> lfSvc.removeFlow(-1L, "logicalFlowServiceTestRemoveFlow"));
+        assertThrows(IllegalArgumentException.class,
+                () -> lfSvc.removeFlow(-1L, "logicalFlowServiceTestRemoveFlow"),
+                "Expect no flows to be removed where id cannot be found");
 
         int removedForExistingIdCount = lfSvc.removeFlow(ab.id().get(), "logicalFlowServiceTestRemoveFlow");
-        assertEquals("Expect only one flow to be removed", 1, removedForExistingIdCount);
+        assertEquals(1, removedForExistingIdCount, "Expect only one flow to be removed");
 
     }
 
@@ -186,8 +186,8 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
         Set<Long> activeFlowIds = map(activeFlows, r -> r.id().get());
 
         assertEquals(activeFlows.size(), 2);
-        assertEquals("", asSet(ad.id().get(), ac.id().get()), activeFlowIds);
-        assertEquals("", asSet(ac.id().get(), ad.id().get()), activeFlowIds);
+        assertEquals(asSet(ad.id().get(), ac.id().get()), activeFlowIds);
+        assertEquals(asSet(ac.id().get(), ad.id().get()), activeFlowIds);
     }
 
 
@@ -241,15 +241,15 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 .build();
 
         assertThrows(
-                "If source and target are the same, flow rejected and exception thrown",
                 IllegalArgumentException.class,
-                () -> lfSvc.addFlow(createLoopCommand, "addFlowTest"));
+                () -> lfSvc.addFlow(createLoopCommand, "addFlowTest"),
+                "If source and target are the same, flow rejected and exception thrown");
 
 
         LogicalFlow newFlow = lfSvc.addFlow(createCommand, "addFlowTest");
-        assertEquals("Flow created should have the same source as in the create command", a, newFlow.source());
-        assertEquals("Flow created should have the same target as in the create command", b, newFlow.target());
-        assertEquals("Flow created should have the user as the last updated by value", "addFlowTest", newFlow.lastUpdatedBy());
+        assertEquals(a, newFlow.source(), "Flow created should have the same source as in the create command");
+        assertEquals(b, newFlow.target(), "Flow created should have the same target as in the create command");
+        assertEquals("addFlowTest", newFlow.lastUpdatedBy(), "Flow created should have the user as the last updated by value");
 
     }
 
@@ -284,31 +284,31 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 .build();
 
         List<LogicalFlow> noCreateCommands = lfSvc.addFlows(emptyList(), "addFlowTest");
-        assertEquals("If no list provided returns empty list", emptyList(), noCreateCommands);
+        assertEquals(emptyList(), noCreateCommands, "If no list provided returns empty list");
 
         assertThrows(
-                "If contains invalid flow (same src and trg) throws exception",
                 IllegalArgumentException.class,
-                () -> lfSvc.addFlows(asList(createLoopCommand, abCreateCommand), "addFlowTest"));
+                () -> lfSvc.addFlows(asList(createLoopCommand, abCreateCommand), "addFlowTest"),
+                "If contains invalid flow (same src and trg) throws exception");
 
         List<LogicalFlow> newFlows = lfSvc.addFlows(asList(abCreateCommand, baCreateCommand), "addFlowsTest");
-        assertEquals("2 valid create commands should create 2 flows", 2, newFlows.size());
+        assertEquals(2, newFlows.size(), "2 valid create commands should create 2 flows");
 
-        assertEquals("Source and targets in returned set match",
-                asSet(tuple(a, b), tuple(b, a)),
-                map(newFlows, f -> tuple(f.source(), f.target())));
+        assertEquals(asSet(tuple(a, b), tuple(b, a)),
+                map(newFlows, f -> tuple(f.source(), f.target())),
+                "Source and targets in returned set match");
 
         List<LogicalFlow> duplicatedFlows = lfSvc.addFlows(asList(bcCreateCommand, bcCreateCommand), "addFlowsTest");
-        assertEquals("multiple create commands for same source and target should not create multiple flows",
-                1,
-                duplicatedFlows.size());
+        assertEquals(1,
+                duplicatedFlows.size(),
+                "multiple create commands for same source and target should not create multiple flows");
 
-        assertEquals("multiple create commands for same source and target should not create multiple flows",
-                asSet(tuple(b, c)),
-                map(duplicatedFlows, f -> tuple(f.source(), f.target())));
+        assertEquals(asSet(tuple(b, c)),
+                map(duplicatedFlows, f -> tuple(f.source(), f.target())),
+                "multiple create commands for same source and target should not create multiple flows");
 
         List<LogicalFlow> existingFlows = lfSvc.addFlows(asList(bcCreateCommand, abCreateCommand), "addFlowsTest");
-        assertTrue("should not create flow if flow already exists", existingFlows.isEmpty());
+        assertTrue(existingFlows.isEmpty(), "should not create flow if flow already exists");
     }
 
 
@@ -325,10 +325,10 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
 
         boolean restoreInvalid = lfSvc.restoreFlow(-1, "restoreFlowTest");
 
-        assertFalse("Cannot restore a flow that doesn't exist", restoreInvalid);
+        assertFalse(restoreInvalid, "Cannot restore a flow that doesn't exist");
 
         boolean restoredFlow = lfSvc.restoreFlow(ab.id().get(), "restoreFlowTest");
-        assertTrue("Restores flow if exists", restoredFlow);
+        assertTrue(restoredFlow, "Restores flow if exists");
 
         LogicalFlow flow = lfSvc.getById(ab.id().get());
 
@@ -337,9 +337,9 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 EntityLifecycleStatus.REMOVED.name(),
                 flow.entityLifecycleStatus().name());
 
-        assertFalse("Restored flow should not be removed", flow.isRemoved());
+        assertFalse(flow.isRemoved(), "Restored flow should not be removed");
 
-        assertEquals("Restored flow should have last updated by user", "restoreFlowTest", flow.lastUpdatedBy());
+        assertEquals("restoreFlowTest", flow.lastUpdatedBy(), "Restored flow should have last updated by user");
     }
 
 
@@ -358,21 +358,21 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
 
         int flowsRemoved = lfSvc.cleanupOrphans();
 
-        assertEquals("No flows removed if all apps are active", 0, flowsRemoved);
+        assertEquals(0, flowsRemoved, "No flows removed if all apps are active");
 
         appHelper.removeApp(c.id());
 
         int flowsRemovedAfterAppRemoved = lfSvc.cleanupOrphans();
 
-        assertEquals("Flows removed where either source or target is retired",
-                2,
-                flowsRemovedAfterAppRemoved);
+        assertEquals(2,
+                flowsRemovedAfterAppRemoved,
+                "Flows removed where either source or target is retired");
 
         LogicalFlow flowWhereTargetRemoved = lfSvc.getById(ac.id().get());
 
-        assertEquals("If target removed, flow still exists but has entity lifecycle status of 'REMOVED'",
-                EntityLifecycleStatus.REMOVED,
-                flowWhereTargetRemoved.entityLifecycleStatus());
+        assertEquals(EntityLifecycleStatus.REMOVED,
+                flowWhereTargetRemoved.entityLifecycleStatus(),
+                "If target removed, flow still exists but has entity lifecycle status of 'REMOVED'");
     }
 
 
@@ -385,21 +385,21 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
         EntityReference b = appHelper.createNewApp("b", ouIds.a1);
 
         int removedFlows = lfSvc.cleanupSelfReferencingFlows();
-        assertEquals("Nothing removed if no logical flows", 0, removedFlows);
+        assertEquals(0, removedFlows, "Nothing removed if no logical flows");
 
         LogicalFlow ab = helper.createLogicalFlow(a, b);
 
         int removedWhereNoSelfReferencingFlows = lfSvc.cleanupSelfReferencingFlows();
-        assertEquals("Nothing removed if no self-referencing logical flows", 0, removedWhereNoSelfReferencingFlows);
+        assertEquals(0, removedWhereNoSelfReferencingFlows, "Nothing removed if no self-referencing logical flows");
 
         LogicalFlow aa = helper.createLogicalFlow(a, a);
         LogicalFlow bb = helper.createLogicalFlow(b, b);
 
         int removedAllWhereSelfReferencingFlows = lfSvc.cleanupSelfReferencingFlows();
-        assertEquals("Removed all self-referencing logical flows", 2, removedAllWhereSelfReferencingFlows);
+        assertEquals(2, removedAllWhereSelfReferencingFlows, "Removed all self-referencing logical flows");
 
         LogicalFlow aaFlow = lfSvc.getById(aa.id().get());
-        assertEquals("Self referencing flow still exists but is removed", EntityLifecycleStatus.REMOVED, aaFlow.entityLifecycleStatus());
+        assertEquals(EntityLifecycleStatus.REMOVED, aaFlow.entityLifecycleStatus(), "Self referencing flow still exists but is removed");
     }
 
 
@@ -420,13 +420,13 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
 
         Collection<LogicalFlow> upstreamFlowsForEmptyList = lfSvc.findUpstreamFlowsForEntityReferences(emptyList());
 
-        assertTrue("No upstreams when no ref provided", isEmpty(upstreamFlowsForEmptyList));
+        assertTrue(isEmpty(upstreamFlowsForEmptyList), "No upstreams when no ref provided");
 
         Collection<LogicalFlow> upstreamsWhereOnlySource = lfSvc.findUpstreamFlowsForEntityReferences(asList(a));
-        assertEquals("No upstreams when all refs are only targets", 0, upstreamsWhereOnlySource.size());
+        assertEquals(0, upstreamsWhereOnlySource.size(), "No upstreams when all refs are only targets");
 
         Collection<LogicalFlow> allUpstreams = lfSvc.findUpstreamFlowsForEntityReferences(asList(b, c));
-        assertEquals("Returns all upstreams but not downstreams", 3, allUpstreams.size());
+        assertEquals(3, allUpstreams.size(), "Returns all upstreams but not downstreams");
     }
 
 }

@@ -18,11 +18,12 @@
 
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 public class MapBuilderTest {
@@ -63,10 +64,10 @@ public class MapBuilderTest {
         assertEquals(Integer.valueOf(1), n.get("a"));
     }
 
-    @Test(expected = NullPointerException.class)
-    public void createMapFromNullMap(){
-        Map<String, Integer> m =  null;
-        Map<String, Integer> n = new MapBuilder<String, Integer>().from(m).build();
+    @Test
+    public void createMapFromNullMap() {
+        assertThrows(NullPointerException.class,
+                () -> new MapBuilder<String, Integer>().from(null).build());
     }
 
     @Test

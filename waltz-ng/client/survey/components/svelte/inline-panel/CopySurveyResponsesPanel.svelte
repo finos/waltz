@@ -6,11 +6,13 @@
     import {surveyInstanceViewStore} from "../../../../svelte-stores/survey-instance-view-store";
     import _ from "lodash";
     import {surveyInstanceStore} from "../../../../svelte-stores/survey-instance-store";
-    import {isEmpty} from "../../../../common";
+    import {isEmpty, termSearch} from "../../../../common";
     import NoData from "../../../../common/svelte/NoData.svelte";
     import toasts from "../../../../svelte-stores/toast-store";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import EntityLink from "../../../../common/svelte/EntityLink.svelte";
+    import SearchInput from "../../../../common/svelte/SearchInput.svelte";
+    import {truncate} from "../../../../common/string-utils";
 
     let dispatch = createEventDispatcher();
 
@@ -19,6 +21,8 @@
     let overrideExistingResponses = false;
     let surveysWithCopiedAnswers = [];
     let showRecentlyAltered = false;
+
+    let qry = "";
 
     function cancel() {
         dispatch("cancel");
@@ -31,13 +35,12 @@
         if ($surveyDetails) {
             userSurveysCall = surveyInstanceViewStore.findForUser(); // find for recipient or owner
             responsesCall = surveyInstanceStore.findResponses($surveyDetails?.surveyInstance?.id);
-
         }
     }
 
-    $: responses = $responsesCall.data;
+    $: responses = $responsesCall?.data;
     $: questionsWithResponse = _.map(responses, d => d.questionResponse.questionId)
-    $: usersSurveys = $userSurveysCall.data;
+    $: usersSurveys = $userSurveysCall?.data;
 
     $: templateId = $surveyDetails?.surveyTemplateRef?.id;
 
@@ -112,6 +115,21 @@
         }
     }
 
+    function clearSelectedSurveys() {
+        selectedSurveys = [];
+    }
+
+    $: filteredSurveys = _.isEmpty(qry)
+        ? incompleteSurveys
+        : termSearch(
+            incompleteSurveys,
+            qry,
+            [
+                'surveyRun.name',
+                'surveyInstance.surveyEntity.name',
+                'surveyInstance.surveyEntityExternalId'
+            ]);
+
 </script>
 
 
@@ -169,30 +187,47 @@
             </div>
         </NoData>
     {:else}
+        {#if _.size(incompleteSurveys) > 10}
+            <SearchInput bind:value={qry}/>
+        {/if}
+
         <div class:waltz-scroll-region-250={_.size(incompleteSurveys) > 10}>
             <table class="table table-condensed table-hover small">
                 <colgroup>
-                    <col width="50%">
-                    <col width="50%">
+                    <col width="40%">
+                    <col width="40%">
+                    <col width="20%">
                 </colgroup>
                 <thead>
-                    <tr>
-                        <th>Survey Run</th>
-                        <th>Entity</th>
-                    </tr>
+                <tr>
+                    <th>Survey Run</th>
+                    <th>Entity</th>
+                    <th>External Id</th>
+                </tr>
                 </thead>
                 <tbody>
-                    {#each incompleteSurveys as survey}
-                        <tr class="clickable"
-                            class:selected={_.includes(selectedSurveys, survey)}
-                            on:click={() => selectSurvey(survey)}
-                            title={mkRoleTitle(survey)}>
-                            <td>{survey.surveyRun.name}</td>
-                            <td>{survey.surveyInstance.surveyEntity.name || '-'}</td>
-                        </tr>
-                    {/each}
+                {#each filteredSurveys as survey}
+                    <tr class="clickable"
+                        class:selected={_.includes(selectedSurveys, survey)}
+                        on:click={() => selectSurvey(survey)}
+                        title={mkRoleTitle(survey)}>
+                        <td title={survey.surveyRun.name}>{truncate(survey.surveyRun.name, 30)}</td>
+                        <td title={survey.surveyInstance.surveyEntity.name}>{truncate(survey.surveyInstance.surveyEntity.name || '-', 30)}</td>
+                        <td>{survey.surveyInstance.surveyEntityExternalId || '-'}</td>
+                    </tr>
+                {/each}
                 </tbody>
             </table>
+        </div>
+    {/if}
+
+    {#if !_.isEmpty(selectedSurveys)}
+        <div class="small help-block" style="color: red">
+            You have selected {_.size(selectedSurveys)} survey/s.
+            <button class="btn btn-skinny"
+                    on:click={() => clearSelectedSurveys()}>
+                <span class="small">Clear all <Icon name="times"/></span>
+            </button>
         </div>
     {/if}
 

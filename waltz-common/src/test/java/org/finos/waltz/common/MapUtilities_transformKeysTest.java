@@ -1,10 +1,10 @@
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MapUtilities_transformKeysTest {
 
@@ -17,22 +17,25 @@ public class MapUtilities_transformKeysTest {
         assertTrue(result.containsKey(4));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void simpleTransformKeysWithNullMap() {
         Map original = null;
-        MapUtilities.transformKeys(original, x -> Integer.parseInt(x.toString())*2);
+        assertThrows(NullPointerException.class,
+                () -> MapUtilities.transformKeys(original, x -> Integer.parseInt(x.toString()) * 2));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void simpleTransformKeysWithNullFunction() {
-        Map original = MapUtilities.newHashMap(1,'a',2,'b');
-        MapUtilities.transformKeys(original, null);
+        Map original = MapUtilities.newHashMap(1, 'a', 2, 'b');
+        assertThrows(NullPointerException.class,
+                () -> MapUtilities.transformKeys(original, null));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void simpleTransformKeysWithAllNull() {
         Map original = null;
-        MapUtilities.transformKeys(original, null);
+        assertThrows(NullPointerException.class,
+                () -> MapUtilities.transformKeys(original, null));
     }
 
     @Test

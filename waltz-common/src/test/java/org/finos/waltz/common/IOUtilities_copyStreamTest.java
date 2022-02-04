@@ -1,11 +1,11 @@
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.finos.waltz.common.EnumUtilities.parseEnumWithAliases;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class IOUtilities_copyStreamTest {
     @Test
@@ -20,19 +20,22 @@ public class IOUtilities_copyStreamTest {
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void nullInputStreamThrowsException() throws IOException {
-        IOUtilities.copyStream(null, getOutputStream());
+        assertThrows(IllegalArgumentException.class,
+                () -> IOUtilities.copyStream(null, getOutputStream()));
     }
 
     @Test
     public void nullOutputStreamThrowsException() throws IOException {
-        IOUtilities.copyStream(getInputStream("empty.txt"), null);
+        assertThrows(IllegalArgumentException.class,
+                () -> IOUtilities.copyStream(getInputStream("empty.txt"), null));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void nullStreamsThrowsException() throws IOException {
-        IOUtilities.copyStream(null, null);
+        assertThrows(IllegalArgumentException.class,
+                () -> IOUtilities.copyStream(null, null));
     }
 
 
@@ -41,7 +44,6 @@ public class IOUtilities_copyStreamTest {
     }
 
     private OutputStream getOutputStream() throws FileNotFoundException {
-        OutputStream output = new FileOutputStream("output.txt");
-        return output;
+        return new FileOutputStream("output.txt");
     }
 }

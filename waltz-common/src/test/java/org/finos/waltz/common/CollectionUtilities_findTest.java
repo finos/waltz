@@ -18,12 +18,14 @@
 
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
+import static org.finos.waltz.common.CollectionUtilities.filter;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class CollectionUtilities_findTest {
 
@@ -33,15 +35,17 @@ public class CollectionUtilities_findTest {
             "world");
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void predicateCannotBeNull() {
-        CollectionUtilities.find(null, words);
+        assertThrows(IllegalArgumentException.class,
+                () -> CollectionUtilities.find(null, words));
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void collectionCannotBeNull() {
-        CollectionUtilities.find(d -> true, null);
+        assertThrows(IllegalArgumentException.class,
+                () -> CollectionUtilities.find(d -> true, null));
     }
 
 

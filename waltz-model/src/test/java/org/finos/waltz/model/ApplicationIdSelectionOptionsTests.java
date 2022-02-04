@@ -23,8 +23,10 @@ import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.model.application.ApplicationIdSelectionOptions;
 import org.finos.waltz.model.application.ApplicationKind;
 import org.finos.waltz.model.application.ImmutableApplicationIdSelectionOptions;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 public class ApplicationIdSelectionOptionsTests {
 
@@ -39,8 +41,8 @@ public class ApplicationIdSelectionOptionsTests {
 
         ApplicationIdSelectionOptions convertedAppOptions = ApplicationIdSelectionOptions.mkOpts(appOptions);
 
-        Assert.assertEquals(appOptions, convertedAppOptions);
-        Assert.assertEquals(SetUtilities.fromArray(ApplicationKind.CUSTOMISED, ApplicationKind.EUC), convertedAppOptions.applicationKinds());
+        assertEquals(appOptions, convertedAppOptions);
+        assertEquals(SetUtilities.fromArray(ApplicationKind.CUSTOMISED, ApplicationKind.EUC), convertedAppOptions.applicationKinds());
     }
 
 
@@ -61,7 +63,7 @@ public class ApplicationIdSelectionOptionsTests {
                 .applicationKinds(SetUtilities.fromArray(ApplicationKind.values()))
                 .build();
 
-        Assert.assertEquals(targetAppOptions, convertedOptions);
+        assertEquals(targetAppOptions, convertedOptions);
     }
 
 
@@ -74,11 +76,11 @@ public class ApplicationIdSelectionOptionsTests {
                 .scope(HierarchyQueryScope.CHILDREN)
                 .build();
 
-        Assert.assertEquals(targetOptions, optionsWithScope);
+        assertEquals(targetOptions, optionsWithScope);
 
         ApplicationIdSelectionOptions optionsNoScope = ApplicationIdSelectionOptions.mkOpts(EntityReference.mkRef(EntityKind.ORG_UNIT, 1));
 
-        Assert.assertEquals(targetOptions, optionsNoScope);
+        assertEquals(targetOptions, optionsNoScope);
     }
 
 }

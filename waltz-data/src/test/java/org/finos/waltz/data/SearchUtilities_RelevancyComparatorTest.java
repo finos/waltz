@@ -19,7 +19,7 @@
 package org.finos.waltz.data;
 
 import org.finos.waltz.common.ListUtilities;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.function.Function;

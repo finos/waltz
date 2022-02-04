@@ -34,6 +34,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
 
 import javax.sql.DataSource;
 
@@ -117,7 +118,8 @@ public class DIBaseConfiguration {
                 .set(dataSource)
                 .set(SQLDialect.valueOf(dialect))
                 .set(dslSettings)
-                .set(new SlowQueryListener(databasePerformanceQuerySlowThreshold));
+                .set(new SlowQueryListener(databasePerformanceQuerySlowThreshold))
+                .set(new SpringExceptionTranslationExecuteListener(new SQLStateSQLExceptionTranslator()));
 
         return DSL.using(configuration);
     }

@@ -1,10 +1,11 @@
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class StringUtilities_joinUsingTest {
 
@@ -32,10 +33,11 @@ public class StringUtilities_joinUsingTest {
         assertEquals("", StringUtilities.joinUsing(coll, x->x.toString()+x.toString(),","));
     }
 
-    @Test(expected = NullPointerException.class)
-    public void simpleJoinUsingWithNullColl(){
+    @Test
+    public void simpleJoinUsingWithNullColl() {
         Collection coll = null;
-        StringUtilities.joinUsing(coll, x->x.toString()+x.toString(),",");
+        assertThrows(NullPointerException.class,
+                () -> StringUtilities.joinUsing(coll, x -> x.toString() + x.toString(), ","));
     }
 
     @Test
@@ -44,15 +46,17 @@ public class StringUtilities_joinUsingTest {
         assertEquals("", StringUtilities.joinUsing(coll, x->x.toString()+x.toString(),""));
     }
 
-    @Test(expected = NullPointerException.class)
-    public void simpleJoinUsingWithTwoNull(){
+    @Test
+    public void simpleJoinUsingWithTwoNull() {
         Collection coll = null;
-       StringUtilities.joinUsing(coll, x->x.toString()+x.toString(),null);
+        assertThrows(NullPointerException.class,
+                () -> StringUtilities.joinUsing(coll, x -> x.toString() + x.toString(), null));
     }
 
-    @Test(expected = NullPointerException.class)
-    public void simpleJoinUsingWithAllNull(){
+    @Test
+    public void simpleJoinUsingWithAllNull() {
         Collection coll = null;
-        StringUtilities.joinUsing(coll, null,null);
+        assertThrows(NullPointerException.class,
+                () -> StringUtilities.joinUsing(coll, null, null));
     }
 }

@@ -1,37 +1,41 @@
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+
 import static org.finos.waltz.common.CollectionUtilities.sort;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class CollectionUtilities_sort_two_paramsTest {
 
-    @Test(expected = IllegalArgumentException.class)
-    public void sortNullCollection(){
-        CollectionUtilities.sort(null, Comparator.naturalOrder());
+    @Test
+    public void sortNullCollection() {
+        assertThrows(IllegalArgumentException.class,
+                () -> CollectionUtilities.sort(null, Comparator.naturalOrder()));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void sortWithNullComparator(){
-        List<String> elements = new ArrayList();
+    @Test
+    public void sortWithNullComparator() {
+        List<String> elements = new ArrayList<>();
         elements.add("x");
         elements.add("a");
-        CollectionUtilities.sort(elements, null);
-
+        assertThrows(IllegalArgumentException.class,
+                () -> CollectionUtilities.sort(elements, null));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void sortNullCollectionWithNullComparator(){
-        CollectionUtilities.sort(null, null);
+    @Test
+    public void sortNullCollectionWithNullComparator() {
+        assertThrows(IllegalArgumentException.class,
+                () -> CollectionUtilities.sort(null, null));
     }
 
     @Test
     public void sortElements(){
-        List<String> elements = new ArrayList();
+        List<String> elements = new ArrayList<>();
         elements.add("x");
         elements.add("a");
         List<String> result = CollectionUtilities.sort(elements, Comparator.naturalOrder());
@@ -42,7 +46,7 @@ public class CollectionUtilities_sort_two_paramsTest {
 
     @Test
     public void sortEmptyElements(){
-        List<String> elements = new ArrayList();
+        List<String> elements = new ArrayList<>();
         elements.add("");
         elements.add("");
         List<String> result = CollectionUtilities.sort(elements, Comparator.naturalOrder());

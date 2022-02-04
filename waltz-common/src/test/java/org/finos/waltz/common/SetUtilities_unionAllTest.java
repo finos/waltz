@@ -18,14 +18,13 @@
 
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SetUtilities_unionAllTest {
 
@@ -35,9 +34,10 @@ public class SetUtilities_unionAllTest {
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void cannotUnionAllNull() {
-        SetUtilities.unionAll(null);
+        assertThrows(IllegalArgumentException.class,
+                () -> SetUtilities.unionAll(null));
     }
 
 

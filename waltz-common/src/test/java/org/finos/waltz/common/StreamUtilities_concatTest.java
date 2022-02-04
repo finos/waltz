@@ -1,11 +1,12 @@
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 import java.util.stream.Stream;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class StreamUtilities_concatTest {
     @Test
@@ -22,10 +23,11 @@ public class StreamUtilities_concatTest {
         assertEquals(0, t.count());
     }
 
-    @Test(expected = NullPointerException.class)
-    public void simpleConcatWithNullColl(){
+    @Test
+    public void simpleConcatWithNullColl() {
         Collection<String> elements = null;
         Stream t = StreamUtilities.concat(elements);
-        assertEquals(0, t.count());
+        assertThrows(NullPointerException.class,
+                () -> t.count());
     }
 }

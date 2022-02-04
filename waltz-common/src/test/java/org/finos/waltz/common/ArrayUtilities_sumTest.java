@@ -18,15 +18,17 @@
 
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static junit.framework.TestCase.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ArrayUtilities_sumTest {
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void cannotSumNull() {
-        ArrayUtilities.sum(null);
+        assertThrows(IllegalArgumentException.class, ()
+                -> ArrayUtilities.sum(null));
     }
 
 

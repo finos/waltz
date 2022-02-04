@@ -18,14 +18,14 @@
 
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
 import static org.finos.waltz.common.SetUtilities.*;
 import static java.util.Collections.emptySet;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SetUtilities_minusTest {
 
@@ -37,14 +37,13 @@ public class SetUtilities_minusTest {
 
     @Test
     public void emptySetMinusEmptySetIsEmpty() {
-        assertTrue("Empty set minus empty set should be an empty set",
-                minus(emptySet(), emptySet()).isEmpty());
+        assertTrue(minus(emptySet(), emptySet()).isEmpty());
     }
 
 
     @Test
     public void setMinusItselfIsEmpty() {
-        assertTrue("Set minus itself should be an empty set", minus(abcSet, abcSet).isEmpty());
+        assertTrue(minus(abcSet, abcSet).isEmpty());
     }
 
 

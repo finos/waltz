@@ -1,10 +1,9 @@
 <script>
-
     import EntitySelector from "./EntitySelector.svelte";
     import _ from "lodash";
     import {mkRef, sameRef} from "../../../../common/entity-utils";
     import ReportGridColumnSummary from "./ReportGridColumnSummary.svelte";
-    import {columnUsageKind, ratingRollupRule} from "../report-grid-utils";
+    import {columnUsageKind, determineDefaultRollupRule, ratingRollupRule} from "../report-grid-utils";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import {reportGridStore} from "../../../../svelte-stores/report-grid-store";
     import toasts from "../../../../svelte-stores/toast-store";
@@ -12,10 +11,13 @@
     import NoData from "../../../../common/svelte/NoData.svelte";
     import {columnDefs, hasChanged, selectedColumn, lastMovedColumn} from "../report-grid-store";
     import ColumnRemovalConfirmation from "./ColumnRemovalConfirmation.svelte";
+    import {entity} from "../../../../common/services/enums/entity";
+
 
     export let gridId;
     export let onSave = () => console.log("Saved report grid");
 
+    const gridKind = entity.APPLICATION.key;
 
     const Modes = {
         VIEW: "VIEW",
@@ -31,24 +33,28 @@
         const column = {
             columnEntityReference: mkRef(d.kind, d.id, d.name || d.questionText, d.description),
             usageKind: columnUsageKind.NONE.key,
-            ratingRollupRule: ratingRollupRule.NONE.key,
+            ratingRollupRule: determineDefaultRollupRule(d).key,
             position: 0,
-        }
+        };
 
-        const newList = _.concat(column, $columnDefs);
+        const newList = _.concat(
+            $columnDefs,
+            column);
 
         $columnDefs = _.map(
             newList,
             d => Object.assign(
                 {},
                 d,
-                { position: _.indexOf(newList, d) }));
+                {position: _.indexOf(newList, d)}));
     }
 
     function deleteColumn(d) {
         $columnDefs = _.reject(
-           $columnDefs,
-            r => sameRef(r.columnEntityReference, d.columnEntityReference));
+            $columnDefs,
+            r => sameRef(
+                r.columnEntityReference,
+                d.columnEntityReference));
         cancel();
     }
 
@@ -84,9 +90,20 @@
     }
 
     $: canBeAdded = (d) => {
-        return !_.some(
+        const notAlreadyAdded = !_.some(
             $columnDefs,
             r => sameRef(r.columnEntityReference, d));
+
+        switch (d.kind) {
+            case entity.ASSESSMENT_DEFINITION.key:
+                const assessmentAllowableForThisGrid = _.get(d, ["entityKind"]) === gridKind;
+                return notAlreadyAdded && assessmentAllowableForThisGrid;
+            case entity.SURVEY_TEMPLATE.key:
+                const templateAllowableForThisGrid = _.get(d, ["targetEntityKind"]) === gridKind;
+                return templateAllowableForThisGrid;
+            default:
+                return notAlreadyAdded;
+        }
     }
 
     function editColumn(column){

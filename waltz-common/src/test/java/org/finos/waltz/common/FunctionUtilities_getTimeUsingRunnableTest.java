@@ -1,7 +1,7 @@
 package org.finos.waltz.common;
 
 import org.jooq.lambda.Unchecked;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class FunctionUtilities_getTimeUsingRunnableTest {
 

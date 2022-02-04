@@ -33,8 +33,12 @@ import org.finos.waltz.model.application.Application;
 import org.finos.waltz.model.change_initiative.ChangeInitiative;
 import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.model.report_grid.*;
+import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.rating_scheme.RatingSchemeService;
+import org.finos.waltz.service.user.UserRoleService;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,6 +49,7 @@ import java.util.Set;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.model.EntityReference.mkRef;
 
@@ -57,6 +62,7 @@ public class ReportGridService {
     private final ReportGridDao reportGridDao;
     private final ReportGridMemberService reportGridMemberService;
     private final ChangeLogService changeLogService;
+    private final UserRoleService userRoleService;
 
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
 
@@ -66,12 +72,14 @@ public class ReportGridService {
                              RatingSchemeService ratingSchemeService,
                              ReportGridMemberService reportGridMemberService,
                              ChangeLogService changeLogService,
+                             UserRoleService userRoleService,
                              ChangeInitiativeDao changeInitiativeDao) {
         checkNotNull(reportGridDao, "reportGridDao cannot be null");
         checkNotNull(reportGridMemberService, "reportGridMemberService cannot be null");
         checkNotNull(applicationDao, "applicationDao cannot be null");
         checkNotNull(ratingSchemeService, "ratingSchemeService cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
+        checkNotNull(userRoleService, "userRoleService cannot be null");
 
         this.reportGridDao = reportGridDao;
         this.reportGridMemberService = reportGridMemberService;
@@ -79,6 +87,7 @@ public class ReportGridService {
         this.ratingSchemeService = ratingSchemeService;
         this.changeLogService = changeLogService;
         this.changeInititativeDao = changeInitiativeDao;
+        this.userRoleService = userRoleService;
     }
 
 
@@ -95,7 +104,6 @@ public class ReportGridService {
     public ReportGrid getByIdAndSelectionOptions(
             long id,
             IdSelectionOptions idSelectionOptions) {
-
 
         // WARNING:  The grid computation is very slow if given a large person tree.
         //    Therefore we restrict it to EXACT only behaviour.
@@ -201,6 +209,13 @@ public class ReportGridService {
                                        ReportGridUpdateCommand updateCommand,
                                        String username) throws InsufficientPrivelegeException {
         checkIsOwner(id, username);
+        ReportGridDefinition defn = reportGridDao.getGridDefinitionById(id);
+
+        if (defn.kind() != updateCommand.kind()) {
+            checkTrue(userRoleService.hasRole(username, SystemRole.REPORT_GRID_ADMIN),
+                    "You do not have permission to change the kind of a report grid");
+        }
+
         long gridId = reportGridDao.update(id, updateCommand, username);
         return reportGridDao.getGridDefinitionById(id);
     }

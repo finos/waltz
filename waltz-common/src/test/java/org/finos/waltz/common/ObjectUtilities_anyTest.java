@@ -1,8 +1,8 @@
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ObjectUtilities_anyTest {
 
@@ -10,41 +10,43 @@ public class ObjectUtilities_anyTest {
     public void simpleAny() {
         String[] ele = {"a", "bb"};
         boolean result = ObjectUtilities.any(x->x.length()==1, ele);
-        assertEquals(true, result);
+        assertTrue(result);
     }
 
     @Test
     public void simpleAnyNoMatch() {
         String[] ele = {"aa", "bb"};
         boolean result = ObjectUtilities.any(x->x.length()==1, ele);
-        assertEquals(false, result);
+        assertFalse(result);
     }
 
     @Test
     public void simpleAnyEmptyArray() {
         String[] ele = {};
         boolean result = ObjectUtilities.any(x->x.length()==1, ele);
-        assertEquals(false, result);
+        assertFalse(result);
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void simpleAnyNullArray() {
         String[] ele = null;
-        boolean result = ObjectUtilities.any(x->x.length()==1, ele);
-        assertEquals(false, result);
+        assertThrows(NullPointerException.class,
+                () -> ObjectUtilities.any(x -> x.length() == 1, ele));
+
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void simpleAnyNullPredicate() {
         String[] ele = {"aa", "bb"};
-        boolean result = ObjectUtilities.any(null, ele);
-        assertEquals(false, result);
+        assertThrows(NullPointerException.class,
+                () -> ObjectUtilities.any(null, ele));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void simpleAnyAllNull() {
         String[] ele = null;
-        boolean result = ObjectUtilities.any(null, ele);
-        assertEquals(false, result);
+        assertThrows(NullPointerException.class,
+                () -> ObjectUtilities.any(null, ele));
+
     }
 }
