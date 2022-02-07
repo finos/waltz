@@ -25,6 +25,7 @@ import org.finos.waltz.model.ReleaseLifecycleStatus;
 import org.finos.waltz.model.survey.ImmutableSurveyTemplate;
 import org.finos.waltz.model.survey.SurveyTemplate;
 import org.finos.waltz.model.survey.SurveyTemplateChangeCommand;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
@@ -94,14 +95,20 @@ public class SurveyTemplateDao {
     /**
      * @param ownerId
      * @return Returns all 'ACTIVE' templates (owned by any user)
-     *          and all 'DRAFT' templates owned by the specified user
+     * and all 'DRAFT' templates owned by the specified user
      */
-    public List<SurveyTemplate> findAll(long ownerId) {
-        return dsl.select()
-                .from(SURVEY_TEMPLATE)
-                .where(SURVEY_TEMPLATE.STATUS.eq(ReleaseLifecycleStatus.ACTIVE.name()))
+    public List<SurveyTemplate> findAll(Long ownerId) {
+
+        Condition canViewSurveyCondition = ownerId != null
+                ? SURVEY_TEMPLATE.STATUS.eq(ReleaseLifecycleStatus.ACTIVE.name())
                 .or(SURVEY_TEMPLATE.STATUS.eq(ReleaseLifecycleStatus.DRAFT.name())
                         .and(SURVEY_TEMPLATE.OWNER_ID.eq(ownerId)))
+                : SURVEY_TEMPLATE.STATUS.eq(ReleaseLifecycleStatus.ACTIVE.name());
+
+        return dsl
+                .select()
+                .from(SURVEY_TEMPLATE)
+                .where(canViewSurveyCondition)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 

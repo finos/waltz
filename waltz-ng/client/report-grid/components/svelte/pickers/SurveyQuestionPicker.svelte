@@ -12,8 +12,9 @@
     let selectedTemplate = null;
 
     $: templatesCall = surveyTemplateStore.findAll();
+
     $: templates = _
-        .chain($templatesCall.data)
+        .chain($templatesCall?.data)
         .filter(selectionFilter)
         .orderBy(d => d.name)
         .value();
