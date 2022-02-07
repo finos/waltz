@@ -380,13 +380,13 @@ public class SurveyInstanceExtractor implements DataExtractor {
                         sqr.LIST_RESPONSE_CONCAT)
                 .select(responseNameField,
                         responseExtIdField)
-                .select(DSL.when(si.ORIGINAL_INSTANCE_ID.isNull(), "Yes").else_("No").as("Latest"))  //Could always just return latest instance
+                .select(DSL.when(si.ORIGINAL_INSTANCE_ID.isNull(), "Yes").otherwise("No").as("Latest"))
                 .select(st.EXTERNAL_ID)
-                .from(sqr)
-                .innerJoin(sq).on(sqr.QUESTION_ID.eq(sq.ID))
-                .innerJoin(si).on(sqr.SURVEY_INSTANCE_ID.eq(si.ID))
-                .innerJoin(sr).on(sr.ID.eq(si.SURVEY_RUN_ID))
-                .innerJoin(st).on(st.ID.eq(sr.SURVEY_TEMPLATE_ID))
+                .from(st)
+                .innerJoin(sr).on(sr.SURVEY_TEMPLATE_ID.eq(st.ID))
+                .innerJoin(si).on(si.SURVEY_RUN_ID.eq(sr.ID))
+                .innerJoin(sq).on(sq.SURVEY_TEMPLATE_ID.eq(st.ID))
+                .leftJoin(sqr).on(sqr.SURVEY_INSTANCE_ID.eq(si.ID).and(sqr.QUESTION_ID.eq(sq.ID)))
                 .where(dsl.renderInlined(condition));
 
         Result<Record> results = extractAnswersQuery.fetch();
