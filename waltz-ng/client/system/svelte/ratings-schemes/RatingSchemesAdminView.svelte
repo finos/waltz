@@ -6,6 +6,7 @@
     import SchemeEditor from "./SchemeEditor.svelte";
     import ItemsView from "./ItemsView.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
+    import toasts from "../../../svelte-stores/toast-store"
 
     import {ratingSchemeStore} from "../../../svelte-stores/rating-schemes";
     import {termSearch} from "../../../common";
@@ -20,8 +21,8 @@
         DELETE: "delete"
     };
 
-    const loadSchemeCall = ratingSchemeStore.loadAll();
-    const usageCall = ratingSchemeStore.calcRatingUsageStats();
+    const loadSchemeCall = ratingSchemeStore.loadAll(true);
+    const usageCall = ratingSchemeStore.calcRatingUsageStats(true);
 
     $: usageCountsBySchemeId = countUsageStatsBy($usageCall.data, d => d.schemeId);
 
@@ -52,42 +53,62 @@
 
 
     function doSaveScheme(scheme) {
-        return ratingSchemeStore
-            .save(scheme)
+        const savePromise = ratingSchemeStore
+            .save(scheme);
+
+        return Promise
+            .resolve(savePromise)
             .then(() => {
                 activeScheme = null;
                 activeMode = Modes.LIST;
                 ratingSchemeStore.loadAll(true);
-            });
+                toasts.success("Successfully saved rating scheme")
+            })
+            .catch(e => toasts.error("Unable to save rating scheme. " + e.error));
     }
 
 
     function doSaveItem(item) {
-        return ratingSchemeStore
-            .saveItem(item)
+        const saveItemPromise = ratingSchemeStore
+            .saveItem(item);
+
+        return Promise
+            .resolve(saveItemPromise)
             .then(() => {
                 ratingSchemeStore.loadAll(true);
-            });
+                toasts.success("Successfully saved rating scheme item")
+            })
+            .catch(e => toasts.error("Unable to save rating scheme item. " + e.error));
     }
 
 
     function doRemoveItem(itemId) {
-        return ratingSchemeStore
-            .removeItem(itemId)
+        const removeItemPromise = ratingSchemeStore
+            .removeItem(itemId);
+
+        return Promise
+            .resolve(removeItemPromise)
             .then(() => {
                 ratingSchemeStore.loadAll(true);
-            });
+                toasts.success("Successfully removed rating scheme item")
+            })
+            .catch(e => toasts.error("Unable to remove rating scheme item. " + e.error));
     }
 
 
     function doRemoveScheme(schemeId) {
-        return ratingSchemeStore
-            .removeScheme(schemeId)
+        const removePromise = ratingSchemeStore
+            .removeScheme(schemeId);
+
+        return Promise
+            .resolve(removePromise)
             .then(() => {
                 activeScheme = null;
                 activeMode = Modes.LIST;
                 ratingSchemeStore.loadAll(true);
-            });
+                toasts.success("Successfully removed rating scheme")
+            })
+            .catch(e => toasts.error("Unable to remove rating scheme. " + e.error));
     }
 
 

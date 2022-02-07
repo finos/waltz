@@ -18,8 +18,15 @@
     let workingCopy = _.cloneDeep(definition);
     let savePromise = null;
 
-    $: ratingCall = assessmentRatingStore.findByDefinitionId(definition.id);
-    $: ratings = $ratingCall.data;
+    let ratingCall;
+
+    $: {
+        if (definition.id) {
+            ratingCall = assessmentRatingStore.findByDefinitionId(definition.id);
+        }
+    }
+
+    $: ratings = $ratingCall?.data || [];
     $: hasRatings = ratings.length > 0;
 
     $: possibleRatingSchemes = _.sortBy($ratingSchemesCall.data, d => d.name);
@@ -29,6 +36,7 @@
     function save() {
         savePromise = doSave(workingCopy);
     }
+
 </script>
 
 
@@ -37,7 +45,7 @@
 
     <div class="row">
         <div class="col-md-12">
-            <h3>{definition.name || "NEW"}</h3>
+            <h3>{definition.name || "Creating New Assessment Definition"}</h3>
         </div>
     </div>
 
