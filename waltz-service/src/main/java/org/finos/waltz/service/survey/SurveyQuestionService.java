@@ -25,9 +25,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
+import static java.util.Collections.emptySet;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkTrue;
+import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 
 @Service
 public class SurveyQuestionService {
@@ -84,4 +87,12 @@ public class SurveyQuestionService {
             throw new IllegalArgumentException("There are responses to this question so it cannot be deleted");
         }
     }
+
+
+    public Set<SurveyQuestion> findForIds(Set<Long> surveyQuestionsIds) {
+        return isEmpty(surveyQuestionsIds)
+                ? emptySet()
+                : surveyQuestionDao.findForIds(surveyQuestionsIds);
+    }
+
 }
