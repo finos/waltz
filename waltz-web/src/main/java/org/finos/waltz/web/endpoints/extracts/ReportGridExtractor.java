@@ -25,18 +25,18 @@ import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.NameProvider;
 import org.finos.waltz.model.application.Application;
 import org.finos.waltz.model.application.LifecyclePhase;
 import org.finos.waltz.model.external_identifier.ExternalIdValue;
 import org.finos.waltz.model.rating.RatingSchemeItem;
-import org.finos.waltz.model.report_grid.ReportGrid;
-import org.finos.waltz.model.report_grid.ReportGridCell;
-import org.finos.waltz.model.report_grid.ReportGridColumnDefinition;
-import org.finos.waltz.model.report_grid.ReportGridDefinition;
+import org.finos.waltz.model.report_grid.*;
+import org.finos.waltz.model.survey.SurveyQuestion;
 import org.finos.waltz.service.report_grid.ReportGridService;
 import org.finos.waltz.service.settings.SettingsService;
+import org.finos.waltz.service.survey.SurveyQuestionService;
 import org.finos.waltz.web.WebUtilities;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
@@ -50,11 +50,14 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.ListUtilities.*;
 import static org.finos.waltz.common.MapUtilities.*;
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.utils.IdUtilities.indexById;
 import static org.jooq.lambda.fi.util.function.CheckedConsumer.unchecked;
 import static org.jooq.lambda.tuple.Tuple.tuple;
@@ -65,13 +68,16 @@ public class ReportGridExtractor implements DataExtractor {
 
     public static final String BASE_URL = WebUtilities.mkPath("data-extract", "report-grid");
     private final ReportGridService reportGridService;
+    private final SurveyQuestionService surveyQuestionService;
     private final SettingsService settingsService;
 
     @Autowired
     public ReportGridExtractor(ReportGridService reportGridService,
+                               SurveyQuestionService surveyQuestionService,
                                SettingsService settingsService) {
 
         this.reportGridService = reportGridService;
+        this.surveyQuestionService = surveyQuestionService;
         this.settingsService = settingsService;
     }
 
@@ -102,13 +108,41 @@ public class ReportGridExtractor implements DataExtractor {
                 gridId,
                 selectionOptions);
 
-        List<Tuple2<Application, ArrayList<Object>>> reportRows = prepareReportRows(reportGrid);
+        Set<Tuple2<ReportGridColumnDefinition, Boolean>> colsWithCommentRequirement = enrichColsWithCommentRequirement(reportGrid);
+
+        List<Tuple2<Application, ArrayList<Object>>> reportRows = prepareReportRows(colsWithCommentRequirement, reportGrid.instance());
 
         return formatReport(
                 format,
                 mkReportName(reportGrid.definition(), selectionOptions),
-                reportGrid.definition().columnDefinitions(),
+                colsWithCommentRequirement,
                 reportRows);
+    }
+
+
+    private Set<Tuple2<ReportGridColumnDefinition, Boolean>> enrichColsWithCommentRequirement(ReportGrid reportGrid) {
+        Set<Long> surveyQuestionsIds = reportGrid
+                .definition()
+                .columnDefinitions()
+                .stream()
+                .map(ReportGridColumnDefinition::columnEntityReference)
+                .filter(r -> r.kind() == EntityKind.SURVEY_QUESTION)
+                .map(EntityReference::id)
+                .collect(toSet());
+
+        Set<EntityReference> colsNeedingComments = surveyQuestionService
+                .findForIds(surveyQuestionsIds)
+                .stream()
+                .filter(SurveyQuestion::allowComment)
+                .map(q -> mkRef(q.kind(), q.id().get()))
+                .collect(toSet());
+
+        return reportGrid
+                .definition()
+                .columnDefinitions()
+                .stream()
+                .map(cd -> tuple(cd, colsNeedingComments.contains(cd.columnEntityReference())))
+                .collect(toSet());
     }
 
 
@@ -120,16 +154,27 @@ public class ReportGridExtractor implements DataExtractor {
     }
 
 
-    private List<String> mkHeaderStrings(List<ReportGridColumnDefinition> columnDefinitions) {
+    private List<String> mkHeaderStrings(Set<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions) {
         List<String> staticHeaders = newArrayList(
                 "Application Id",
                 "Application Name",
                 "Application Asset Code",
                 "Application Lifecycle Phase");
 
-        List<String> columnHeaders = map(
-                columnDefinitions,
-                r -> r.columnEntityReference().name().get());
+        List<String> columnHeaders = columnDefinitions
+                .stream()
+                .flatMap(r -> {
+                    String name = r.v1.columnEntityReference().name().orElse("?");
+                    Boolean needsComment = r.v2;
+                    return Stream.of(
+                            name,
+                            needsComment
+                                ? String.format("%s: comment", name)
+                                : null);
+
+                })
+                .filter(Objects::nonNull)
+                .collect(toList());
 
         return concat(
                 staticHeaders,
@@ -137,19 +182,20 @@ public class ReportGridExtractor implements DataExtractor {
     }
 
 
-    private List<Tuple2<Application, ArrayList<Object>>> prepareReportRows(ReportGrid reportGrid) {
+    private List<Tuple2<Application, ArrayList<Object>>> prepareReportRows(Set<Tuple2<ReportGridColumnDefinition, Boolean>> colsWithCommentRequirement,
+                                                                           ReportGridInstance reportGridInstance) {
 
-        Set<ReportGridCell> tableData = reportGrid.instance().cellData();
+        Set<ReportGridCell> tableData = reportGridInstance.cellData();
 
-        Map<Long, Application> applicationsById = indexById(reportGrid.instance().applications());
-        Map<Long, RatingSchemeItem> ratingsById = indexById(reportGrid.instance().ratingSchemeItems());
+        Map<Long, Application> applicationsById = indexById(reportGridInstance.applications());
+        Map<Long, RatingSchemeItem> ratingsById = indexById(reportGridInstance.ratingSchemeItems());
 
         Map<Long, Collection<ReportGridCell>> tableDataByAppId = groupBy(
                 tableData,
                 ReportGridCell::applicationId);
 
         boolean allowCostsExport = settingsService
-                .getValue(settingsService.ALLOW_COST_EXPORTS_KEY)
+                .getValue(SettingsService.ALLOW_COST_EXPORTS_KEY)
                 .map(r -> StringUtilities.isEmpty(r) || Boolean.parseBoolean(r))
                 .orElse(true);
 
@@ -164,28 +210,30 @@ public class ReportGridExtractor implements DataExtractor {
 
                     Collection<ReportGridCell> cells = r.getValue();
 
-                    Map<Tuple2<Long, EntityKind>, Object> callValuesByColumnRefForApp = indexBy(
+                    Map<Tuple2<Long, EntityKind>, ReportGridCell> cellValuesByColumnRefForApp = indexBy(
                             cells,
-                            k -> tuple(k.columnEntityId(), k.columnEntityKind()),
-                            v -> getValueFromReportRow(ratingsById, v));
+                            k -> tuple(k.columnEntityId(), k.columnEntityKind()));
 
                     //find data for columns
-                    reportGrid.definition()
-                            .columnDefinitions()
-                            .forEach(colDef -> {
+                    colsWithCommentRequirement
+                            .forEach(t -> {
+                                ReportGridColumnDefinition colDef = t.v1;
+                                Boolean needsComment = t.v2;
 
-                                boolean isCostColumn = colDef.columnEntityReference().kind().equals(EntityKind.COST_KIND);
+                                EntityReference colRef = colDef.columnEntityReference();
+                                boolean isCostColumn = colRef.kind().equals(EntityKind.COST_KIND);
 
                                 if (!allowCostsExport && isCostColumn) {
                                     reportRow.add("REDACTED");
                                 } else {
-                                    Object value = callValuesByColumnRefForApp.getOrDefault(
-                                            tuple(
-                                                    colDef.columnEntityReference().id(),
-                                                    colDef.columnEntityReference().kind()),
+                                    ReportGridCell cell = cellValuesByColumnRefForApp.getOrDefault(
+                                            tuple(colRef.id(), colRef.kind()),
                                             null);
 
-                                    reportRow.add(value);
+                                    reportRow.add(getValueFromReportCell(ratingsById, cell));
+                                    if (needsComment) {
+                                        reportRow.add(getCommentFromCell(cell));
+                                    }
                                 }
                             });
                     return tuple(app, reportRow);
@@ -195,8 +243,19 @@ public class ReportGridExtractor implements DataExtractor {
     }
 
 
-    private Object getValueFromReportRow(Map<Long, RatingSchemeItem> ratingsById,
-                                         ReportGridCell reportGridCell) {
+    private Object getCommentFromCell(ReportGridCell reportGridCell) {
+        if (reportGridCell == null) {
+            return null;
+        }
+        return reportGridCell.comment();
+    }
+
+
+    private Object getValueFromReportCell(Map<Long, RatingSchemeItem> ratingsById,
+                                          ReportGridCell reportGridCell) {
+        if (reportGridCell == null) {
+            return null;
+        }
         switch (reportGridCell.columnEntityKind()){
             case COST_KIND:
                 return reportGridCell.value();
@@ -216,7 +275,7 @@ public class ReportGridExtractor implements DataExtractor {
 
     private Tuple3<ExtractFormat, String, byte[]> formatReport(ExtractFormat format,
                                                                String reportName,
-                                                               List<ReportGridColumnDefinition> columnDefinitions,
+                                                               Set<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions,
                                                                List<Tuple2<Application, ArrayList<Object>>> reportRows) throws IOException {
         switch (format) {
             case XLSX:
@@ -229,7 +288,7 @@ public class ReportGridExtractor implements DataExtractor {
     }
 
 
-    private byte[] mkCSVReport(List<ReportGridColumnDefinition> columnDefinitions,
+    private byte[] mkCSVReport(Set<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions,
                                List<Tuple2<Application, ArrayList<Object>>> reportRows) throws IOException {
         List<String> headers = mkHeaderStrings(columnDefinitions);
 
@@ -265,7 +324,7 @@ public class ReportGridExtractor implements DataExtractor {
 
 
     private byte[] mkExcelReport(String reportName,
-                                 List<ReportGridColumnDefinition> columnDefinitions,
+                                 Set<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions,
                                  List<Tuple2<Application, ArrayList<Object>>> reportRows) throws IOException {
         SXSSFWorkbook workbook = new SXSSFWorkbook(2000);
         SXSSFSheet sheet = workbook.createSheet(ExtractorUtilities.sanitizeSheetName(reportName));
@@ -329,7 +388,7 @@ public class ReportGridExtractor implements DataExtractor {
     }
 
 
-    private int writeExcelHeader(List<ReportGridColumnDefinition> columnDefinitions, SXSSFSheet sheet) {
+    private int writeExcelHeader(Set<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions, SXSSFSheet sheet) {
         Row headerRow = sheet.createRow(0);
         AtomicInteger colNum = new AtomicInteger();
 

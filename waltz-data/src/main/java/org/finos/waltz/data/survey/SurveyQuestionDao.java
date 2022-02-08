@@ -32,6 +32,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
 import static org.finos.waltz.schema.Tables.*;
@@ -186,5 +187,14 @@ public class SurveyQuestionDao {
                 .where(SURVEY_QUESTION.SURVEY_TEMPLATE_ID.in(templateIdSelector))
                 .orderBy(SURVEY_QUESTION.POSITION.asc(), SURVEY_QUESTION.QUESTION_TEXT)
                 .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public Set<SurveyQuestion> findForIds(Set<Long> surveyQuestionsIds) {
+        return dsl
+                .select(SURVEY_QUESTION.fields())
+                .from(SURVEY_QUESTION)
+                .where(SURVEY_QUESTION.ID.in(surveyQuestionsIds))
+                .fetchSet(TO_DOMAIN_MAPPER);
     }
 }
