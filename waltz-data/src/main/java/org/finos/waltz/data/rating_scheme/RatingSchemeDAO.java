@@ -213,6 +213,7 @@ public class RatingSchemeDAO {
                 .map(id -> {
                     r.setId(id);
                     r.changed(RATING_SCHEME_ITEM.ID, false);
+                    r.store();
                     return id;
                 })
                 .orElseGet(() -> {

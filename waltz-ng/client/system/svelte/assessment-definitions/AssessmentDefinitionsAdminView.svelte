@@ -5,6 +5,7 @@
     import SearchInput from "../../../common/svelte/SearchInput.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
     import AssessmentDefinitionEditor from "./AssessmentDefinitionEditor.svelte";
+    import toasts from "../../../svelte-stores/toast-store"
 
     import {termSearch} from "../../../common";
     import {assessmentDefinitionStore} from "../../../svelte-stores/assessment-definition.js";
@@ -46,23 +47,33 @@
 
 
     function doSave(d) {
-        return assessmentDefinitionStore
-            .save(d)
+        const savePromise = assessmentDefinitionStore
+            .save(d);
+
+        return Promise
+            .resolve(savePromise)
             .then(() => {
                 selectedDefinition = null;
                 activeMode = Modes.LIST;
                 assessmentDefinitionStore.loadAll(true);
-            });
+                toasts.success("Successfully saved assessment definition");
+            })
+            .catch(e => toasts.error("Could not save assessment definition. " + e.error));
     }
 
     function doRemove(id) {
-        return assessmentDefinitionStore
-            .remove(id)
+        const removePromise = assessmentDefinitionStore
+            .remove(id);
+
+        return Promise
+            .resolve(removePromise)
             .then(() => {
                 selectedDefinition = null;
                 activeMode = Modes.LIST;
                 assessmentDefinitionStore.loadAll(true);
-            });
+                toasts.success("Successfully removed assessment definition")
+            })
+            .catch(e => toasts.error("Could not remove assessment definition. " + e.error));
     }
 
 
