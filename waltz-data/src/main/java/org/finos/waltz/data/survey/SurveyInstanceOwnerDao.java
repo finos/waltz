@@ -64,13 +64,17 @@ public class SurveyInstanceOwnerDao {
 
 
     public boolean isPersonInstanceOwner(long personId, long surveyInstanceId) {
-        Condition recipientExists = DSL.exists(DSL
-                .select(SURVEY_INSTANCE_OWNER.ID)
-                .from(SURVEY_INSTANCE_OWNER)
-                .where(SURVEY_INSTANCE_OWNER.SURVEY_INSTANCE_ID.eq(surveyInstanceId)
-                        .and(SURVEY_INSTANCE_OWNER.PERSON_ID.eq(personId))));
+        Condition recipientExists = DSL
+                .exists(DSL
+                    .select(SURVEY_INSTANCE_OWNER.ID)
+                    .from(SURVEY_INSTANCE_OWNER)
+                    .where(SURVEY_INSTANCE_OWNER.SURVEY_INSTANCE_ID.eq(surveyInstanceId)
+                            .and(SURVEY_INSTANCE_OWNER.PERSON_ID.eq(personId))));
 
-        return dsl.select(DSL.when(recipientExists, true).otherwise(false))
+        return dsl
+                .select(DSL
+                        .when(recipientExists, true)
+                        .otherwise(false))
                 .fetchOne(Record1::value1);
     }
 
