@@ -477,7 +477,7 @@ public class SurveyInstanceService {
         boolean isAdmin = userRoleService.hasRole(userName, SystemRole.SURVEY_ADMIN);
         boolean isParticipant = surveyInstanceRecipientDao.isPersonInstanceRecipient(person.id().get(), instanceId);
         boolean isOwner = person.id()
-                .map(pid -> surveyInstanceOwnerDao.isPersonInstanceOwner(instanceId, pid) || Objects.equals(run.ownerId(), pid))
+                .map(pid -> surveyInstanceOwnerDao.isPersonInstanceOwner(pid, instanceId) || Objects.equals(run.ownerId(), pid))
                 .orElse(false);
         boolean hasOwningRole = userRoleService.hasRole(person.email(), instance.owningRole());
         boolean isLatest = instance.originalInstanceId() == null;
