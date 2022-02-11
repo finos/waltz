@@ -33,7 +33,12 @@ import java.math.BigDecimal;
 public abstract class ReportGridCell implements CommentProvider {
 
     public abstract EntityKind columnEntityKind();  // x
-    public abstract long columnEntityId();  // x
+
+    @Nullable
+    public abstract Long columnEntityId();  // x
+
+    @Nullable
+    public abstract Long entityFieldReferenceId();  // x
 
     public abstract long applicationId(); // y
 

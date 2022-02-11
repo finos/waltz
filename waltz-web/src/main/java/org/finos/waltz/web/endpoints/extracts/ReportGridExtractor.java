@@ -125,23 +125,22 @@ public class ReportGridExtractor implements DataExtractor {
                 .definition()
                 .columnDefinitions()
                 .stream()
-                .map(ReportGridColumnDefinition::columnEntityReference)
-                .filter(r -> r.kind() == EntityKind.SURVEY_QUESTION)
-                .map(EntityReference::id)
+                .filter(r -> r.columnEntityKind() == EntityKind.SURVEY_QUESTION)
+                .map(ReportGridColumnDefinition::columnEntityId)
                 .collect(toSet());
 
-        Set<EntityReference> colsNeedingComments = surveyQuestionService
+        Set<Long> colsNeedingComments = surveyQuestionService
                 .findForIds(surveyQuestionsIds)
                 .stream()
                 .filter(SurveyQuestion::allowComment)
-                .map(q -> mkRef(q.kind(), q.id().get()))
+                .map(q -> q.id().get())
                 .collect(toSet());
 
         return reportGrid
                 .definition()
                 .columnDefinitions()
                 .stream()
-                .map(cd -> tuple(cd, colsNeedingComments.contains(cd.columnEntityReference())))
+                .map(cd -> tuple(cd, cd.columnEntityKind().equals(EntityKind.SURVEY_QUESTION) && colsNeedingComments.contains(cd.columnEntityId())))
                 .collect(toSet());
     }
 
@@ -164,7 +163,7 @@ public class ReportGridExtractor implements DataExtractor {
         List<String> columnHeaders = columnDefinitions
                 .stream()
                 .flatMap(r -> {
-                    String name = r.v1.columnEntityReference().name().orElse("?");
+                    String name = r.v1.columnName() != null ? r.v1.columnName() : "?";
                     Boolean needsComment = r.v2;
                     return Stream.of(
                             name,
@@ -220,14 +219,13 @@ public class ReportGridExtractor implements DataExtractor {
                                 ReportGridColumnDefinition colDef = t.v1;
                                 Boolean needsComment = t.v2;
 
-                                EntityReference colRef = colDef.columnEntityReference();
-                                boolean isCostColumn = colRef.kind().equals(EntityKind.COST_KIND);
+                                boolean isCostColumn = colDef.columnEntityKind().equals(EntityKind.COST_KIND);
 
                                 if (!allowCostsExport && isCostColumn) {
                                     reportRow.add("REDACTED");
                                 } else {
                                     ReportGridCell cell = cellValuesByColumnRefForApp.getOrDefault(
-                                            tuple(colRef.id(), colRef.kind()),
+                                            tuple(colDef.columnEntityId(), colDef.columnEntityKind()),
                                             null);
 
                                     reportRow.add(getValueFromReportCell(ratingsById, cell));
