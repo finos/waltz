@@ -1,15 +1,15 @@
 <script>
     import EntitySelector from "./EntitySelector.svelte";
     import _ from "lodash";
-    import {mkRef, sameRef} from "../../../../common/entity-utils";
+    import {mkRef} from "../../../../common/entity-utils";
     import ReportGridColumnSummary from "./ReportGridColumnSummary.svelte";
-    import {columnUsageKind, determineDefaultRollupRule, ratingRollupRule} from "../report-grid-utils";
+    import {columnUsageKind, determineDefaultRollupRule, sameColumnRef} from "../report-grid-utils";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import {reportGridStore} from "../../../../svelte-stores/report-grid-store";
     import toasts from "../../../../svelte-stores/toast-store";
     import ColumnDetailsEditor from "./ColumnDetailsEditor.svelte";
     import NoData from "../../../../common/svelte/NoData.svelte";
-    import {columnDefs, hasChanged, selectedColumn, lastMovedColumn} from "../report-grid-store";
+    import {columnDefs, hasChanged, lastMovedColumn, selectedColumn} from "../report-grid-store";
     import ColumnRemovalConfirmation from "./ColumnRemovalConfirmation.svelte";
     import {entity} from "../../../../common/services/enums/entity";
 
@@ -52,16 +52,16 @@
     function deleteColumn(d) {
         $columnDefs = _.reject(
             $columnDefs,
-            r => sameRef(
-                r.columnEntityReference,
-                d.columnEntityReference));
+            r => sameColumnRef(
+                r,
+                d));
         cancel();
     }
 
     function deleteEntity(d) {
         $columnDefs = _.reject(
-           $columnDefs,
-            r => sameRef(r.columnEntityReference, d));
+            $columnDefs,
+            r => sameColumnRef(r, d));
         cancel();
     }
 
@@ -70,10 +70,12 @@
         const columnDefs = _.map(
             columns,
             d => ({
-                columnEntityReference: d.columnEntityReference,
+                columnEntityKind: d.columnEntityKind,
+                columnEntityId: d.columnEntityId,
                 position: d.position,
                 usageKind: d.usageKind,
                 ratingRollupRule: d.ratingRollupRule,
+                entityFieldReference: d.entityFieldReference,
                 displayName: d.displayName
             }));
 
@@ -92,7 +94,7 @@
     $: canBeAdded = (d) => {
         const notAlreadyAdded = !_.some(
             $columnDefs,
-            r => sameRef(r.columnEntityReference, d));
+            r => sameColumnRef(r, d));
 
         switch (d.kind) {
             case entity.ASSESSMENT_DEFINITION.key:

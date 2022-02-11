@@ -2,7 +2,7 @@
     import _ from "lodash";
     import NoData from "../../../common/svelte/NoData.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
-    import {mkPropNameForColumnDefinition} from "./report-grid-utils";
+    import {getDisplayNameForColumn, mkPropNameForColumnDefinition} from "./report-grid-utils";
     import {activeSummaryColRefs, filters, selectedGrid, summaries} from "./report-grid-store";
     import {mkChunks} from "../../../common/list-utils";
 
@@ -72,7 +72,7 @@
             {#each row as summary}
                 <div class="col-sm-3">
                     <h5 class="waltz-visibility-parent">
-                        <span>{summary.column.columnEntityReference.name}</span>
+                        <span>{getDisplayNameForColumn(summary.column)}</span>
                         <button class="btn btn-skinny waltz-visibility-child-30 clickable pull-right"
                                 on:click={() => onRemoveSummary(summary)}>
                             <Icon name="close"/>

@@ -149,6 +149,10 @@ public class ReportGridDao {
         int[] columnsUpdated = columnDefinitions
                 .stream()
                 .map(d -> {
+                    Long fieldReferenceId = d.entityFieldReference() == null
+                            ? null
+                            : d.entityFieldReference().id().orElse(null);
+
                     ReportGridColumnDefinitionRecord record = dsl.newRecord(rgcd);
                     record.setReportGridId(gridId);
                     record.setColumnEntityId(d.columnEntityId());
@@ -157,6 +161,7 @@ public class ReportGridDao {
                     record.setRatingRollupRule(d.ratingRollupRule().name());
                     record.setPosition(Long.valueOf(d.position()).intValue());
                     record.setDisplayName(d.displayName());
+                    record.setEntityFieldReferenceId(fieldReferenceId);
                     return record;
                 })
                 .collect(collectingAndThen(toSet(), d -> dsl.batchInsert(d).execute()));
@@ -347,8 +352,8 @@ public class ReportGridDao {
                     gridDefn.columnDefinitions(),
                     d -> d.entityFieldReference() == null);
 
-            Collection<ReportGridColumnDefinition> simpleGridDefs = gridDefinitionsByContainingFieldRef.get(true);
-            Collection<ReportGridColumnDefinition> complexGridDefs = gridDefinitionsByContainingFieldRef.get(false);
+            Collection<ReportGridColumnDefinition> simpleGridDefs = gridDefinitionsByContainingFieldRef.getOrDefault(true, Collections.emptyList());
+            Collection<ReportGridColumnDefinition> complexGridDefs = gridDefinitionsByContainingFieldRef.getOrDefault(false, Collections.emptyList());
 
             // SIMPLE GRID DEFS
 

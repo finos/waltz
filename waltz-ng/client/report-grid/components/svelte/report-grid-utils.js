@@ -132,10 +132,29 @@ function initialiseDataForRow(application, columnRefs) {
 }
 
 
+export function getDisplayNameForColumn(c) {
+
+    let entityFieldName = _.get(c, ["entityFieldReference", "displayName"], null);
+
+    if (c.displayName != null) {
+        return c.displayName;
+
+    } else {
+        return _.chain([])
+            .concat(entityFieldName)
+            .concat(c.columnName)
+            .compact()
+            .join(" / ")
+            .value();
+    }
+
+}
+
+
 export function prepareColumnDefs(gridData) {
     const colDefs = _.get(gridData, ["definition", "columnDefinitions"], []);
 
-    const mkColumnCustomProps = (c) =>  {
+    const mkColumnCustomProps = (c) => {
         switch (c.columnEntityKind) {
             case "COST_KIND":
                 return {
@@ -198,24 +217,6 @@ export function prepareColumnDefs(gridData) {
                 };
         }
     };
-
-
-    function getDisplayNameForColumn(c) {
-
-        let entityFieldName = _.get(c, ["entityFieldReference", "displayName"], null);
-
-        if (c.displayName != null) {
-            return c.displayName;
-
-        } else {
-            return _.chain([])
-                .concat(entityFieldName)
-                .concat(c.columnName)
-                .compact()
-                .join(" / ")
-                .value();
-        }
-    }
 
     const additionalColumns = _
         .chain(colDefs)
@@ -404,4 +405,11 @@ export function mkRowFilter(filters = []) {
             const propRating = _.get(td, [prop, "id"], null);
             return _.some(filtersForProp, f => propRating === f.ratingId);
         });
+}
+
+
+export function sameColumnRef(v1, v2) {
+    return v1?.columnEntityKind === v2?.columnEntityKind
+        && v1?.columnEntityId === v2?.columnEntityId
+        && v1?.entityFieldReference?.id === v2?.entityFieldReference?.id;
 }
