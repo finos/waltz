@@ -452,12 +452,18 @@ public class ReportGridDao {
                             .map(fieldName -> {
                                 ReportGridColumnDefinition colDefn = columnDefinitionsByFieldReference.get(fieldName);
 
+                                Object value = appRecord.get(APPLICATION.field(fieldName));
+
+                                if (value == null) {
+                                    return null;
+                                }
+
                                 return ImmutableReportGridCell
                                         .builder()
                                         .applicationId(appRecord.get(APPLICATION.ID))
                                         .columnEntityId(colDefn.columnEntityId())
                                         .columnEntityKind(EntityKind.APPLICATION)
-                                        .text(String.valueOf(appRecord.get(APPLICATION.field(fieldName))))
+                                        .text(String.valueOf(value))
                                         .entityFieldReferenceId(colDefn.entityFieldReference().id().get())
                                         .build();
                             }))
@@ -498,15 +504,24 @@ public class ReportGridDao {
                         return fieldReferencesByTemplateId
                                 .getOrDefault(templateId, emptySet())
                                 .stream()
-                                .map(fieldRef -> ImmutableReportGridCell
-                                        .builder()
-                                        .applicationId(surveyRecord.get(SURVEY_INSTANCE.ENTITY_ID))
-                                        .columnEntityId(templateId)
-                                        .columnEntityKind(EntityKind.SURVEY_TEMPLATE)
-                                        .text(String.valueOf(surveyRecord.get(SURVEY_INSTANCE.field(fieldRef.fieldName()))))
-                                        .entityFieldReferenceId(fieldRef.id().get())
-                                        .build());
+                                .map(fieldRef -> {
+                                    Object value = surveyRecord.get(SURVEY_INSTANCE.field(fieldRef.fieldName()));
+
+                                    if (value == null) {
+                                        return null;
+                                    }
+
+                                    return ImmutableReportGridCell
+                                            .builder()
+                                            .applicationId(surveyRecord.get(SURVEY_INSTANCE.ENTITY_ID))
+                                            .columnEntityId(templateId)
+                                            .columnEntityKind(EntityKind.SURVEY_TEMPLATE)
+                                            .text(String.valueOf(value))
+                                            .entityFieldReferenceId(fieldRef.id().get())
+                                            .build();
+                                });
                     })
+                    .filter(Objects::nonNull)
                     .collect(toSet());
         }
     }
