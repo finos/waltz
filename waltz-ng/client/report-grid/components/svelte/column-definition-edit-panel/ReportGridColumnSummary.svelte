@@ -58,11 +58,15 @@
         moveColumn(1, column);
     }
 
+    function mkColumnName(column) {
+        return _.join(_.compact([column.entityFieldReference?.displayName, column.columnName]), ' / ');
+    }
+
     function determineColumnName(column) {
         if (column.displayName) {
             return column.displayName;
         } else {
-            return _.join(_.compact([column.entityFieldReference?.displayName, column.columnName]), ' / ');
+            return mkColumnName(column);
         }
     }
 
@@ -98,7 +102,7 @@
                                 <span>{determineColumnName(column)}</span>
                                 {#if column?.displayName}
                                     <div title="This is the original name which has been overridden"
-                                         class="help-block small">{column?.columnName}</div>
+                                         class="help-block small">{mkColumnName(column)}</div>
                                 {/if}
                             </td>
                             <td>
