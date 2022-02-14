@@ -29,7 +29,6 @@
             d => _.includes($activeSummaryColRefs, mkPropNameForColumnDefinition(d.column))),
         4);
 
-
     $: $activeSummaryColRefs = _
         .chain($selectedGrid?.definition.columnDefinitions)
         .filter(d => d.usageKind === "SUMMARY")

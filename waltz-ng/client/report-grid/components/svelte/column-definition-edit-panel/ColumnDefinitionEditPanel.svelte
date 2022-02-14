@@ -1,7 +1,6 @@
 <script>
     import EntitySelector from "./EntitySelector.svelte";
     import _ from "lodash";
-    import {mkRef} from "../../../../common/entity-utils";
     import ReportGridColumnSummary from "./ReportGridColumnSummary.svelte";
     import {columnUsageKind, determineDefaultRollupRule, sameColumnRef} from "../report-grid-utils";
     import Icon from "../../../../common/svelte/Icon.svelte";
@@ -31,7 +30,11 @@
 
     function onSelect(d) {
         const column = {
-            columnEntityReference: mkRef(d.kind, d.id, d.name || d.questionText, d.description),
+            columnEntityId: d.columnEntityId,
+            columnEntityKind: d.columnEntityKind,
+            entityFieldReference: d.entityFieldReference,
+            columnName: d.columnName,
+            columnDescription: d.columnDesciption,
             usageKind: columnUsageKind.NONE.key,
             ratingRollupRule: determineDefaultRollupRule(d).key,
             position: 0,
@@ -101,8 +104,7 @@
                 const assessmentAllowableForThisGrid = _.get(d, ["entityKind"]) === gridKind;
                 return notAlreadyAdded && assessmentAllowableForThisGrid;
             case entity.SURVEY_TEMPLATE.key:
-                const templateAllowableForThisGrid = _.get(d, ["targetEntityKind"]) === gridKind;
-                return templateAllowableForThisGrid;
+                return _.get(d, ["targetEntityKind"]) === gridKind;
             default:
                 return notAlreadyAdded;
         }
@@ -148,7 +150,9 @@
 <div class="row">
     <div class="col-sm-4">
         <div style="padding-bottom: 1em">
-            <strong>Add a column</strong> to the report grid, you can construct a grid from a combination of entities. e.g. viewpoints, assessments, survey question responses etc.
+            <strong>Add a column</strong> to the report grid, you can construct a grid from a combination of entities:
+            e.g. viewpoints, assessments, survey question responses, or fields:
+            e.g. application kind, survey due date etc.
         </div>
         <EntitySelector onSelect={onSelect}
                         onDeselect={deleteEntity}
