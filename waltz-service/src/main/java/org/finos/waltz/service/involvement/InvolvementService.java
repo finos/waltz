@@ -18,6 +18,9 @@
 
 package org.finos.waltz.service.involvement;
 
+import org.finos.waltz.common.Checks;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.involvement_kind.InvolvementKindService;
 import org.finos.waltz.data.EntityReferenceNameResolver;
@@ -25,15 +28,12 @@ import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.involvement.InvolvementDao;
 import org.finos.waltz.data.person.PersonDao;
-import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.EntityReferenceUtilities;
-import org.finos.waltz.model.IdSelectionOptions;
-import org.finos.waltz.model.NameProvider;
 import org.finos.waltz.model.application.Application;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.involvement.EntityInvolvementChangeCommand;
 import org.finos.waltz.model.involvement.Involvement;
 import org.finos.waltz.model.person.Person;
+import org.finos.waltz.service.user.UserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -58,6 +58,7 @@ public class InvolvementService {
     private final EntityReferenceNameResolver entityReferenceNameResolver;
     private final InvolvementKindService involvementKindService;
     private final PersonDao personDao;
+    private final UserRoleService userRoleService;
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
 
     private Map<Long, String> involvementKindIdToNameMap;
@@ -68,17 +69,20 @@ public class InvolvementService {
                               InvolvementDao dao,
                               EntityReferenceNameResolver entityReferenceNameResolver,
                               InvolvementKindService involvementKindService,
-                              PersonDao personDao) {
+                              PersonDao personDao,
+                              UserRoleService userRoleService) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(dao, "involvementDao must not be null");
         checkNotNull(entityReferenceNameResolver, "entityReferenceNameResolver cannot be null");
         checkNotNull(involvementKindService, "involvementKindService cannot be null");
+        checkNotNull(userRoleService, "userRoleService cannot be null");
         checkNotNull(personDao, "personDao cannot be null");
 
         this.changeLogService = changeLogService;
         this.involvementDao = dao;
         this.entityReferenceNameResolver = entityReferenceNameResolver;
         this.involvementKindService = involvementKindService;
+        this.userRoleService = userRoleService;
         this.personDao = personDao;
     }
 
@@ -159,6 +163,18 @@ public class InvolvementService {
                 .apply(selectionOptions);
         return involvementDao
                 .deleteByGenericEntitySelector(genericSelector);
+    }
+
+
+    public int findOrphanInvolvementCountForKind(EntityKind entityKind) {
+        return involvementDao.findOrphanInvolvementCountForKind(entityKind);
+    }
+
+
+    public int cleanupInvolvementsForKind(String userName, EntityKind entityKind) {
+        boolean isAdmin = userRoleService.hasRole(userName, SystemRole.ADMIN);
+        Checks.checkTrue(isAdmin, "Must be an admin to bulk remove involvements");
+        return involvementDao.cleanupInvolvementsForKind(entityKind);
     }
 
 
