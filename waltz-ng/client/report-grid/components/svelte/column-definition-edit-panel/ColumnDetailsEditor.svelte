@@ -5,8 +5,7 @@
     import Icon from "../../../../common/svelte/Icon.svelte";
     import {columnDefs, selectedGrid} from "../report-grid-store";
     import {sameRef} from "../../../../common/entity-utils";
-    import DescriptionFade from "../../../../common/svelte/DescriptionFade.svelte";
-    import EntityInfoPanel from "../../../../common/svelte/info-panels/EntityInfoPanel.svelte";
+    import ColumnDefinitionHeader from "./ColumnDefinitionHeader.svelte";
 
     export let column;
     export let onCancel = () => console.log("Close");
@@ -29,18 +28,26 @@
 
     function selectRollupKind(rollupKind, column) {
         const originalColumn = _.find($selectedGrid.definition.columnDefinitions, d => sameRef(d.columnEntityReference, column.columnEntityReference));
-        const newColumn = Object.assign({},
+        const newColumn = Object.assign(
+            {},
             column,
-            {ratingRollupRule: rollupKind?.key, ratingRollupRuleChanged: rollupKind?.key !== originalColumn?.ratingRollupRule})
+            {
+                ratingRollupRule: rollupKind?.key,
+                ratingRollupRuleChanged: rollupKind?.key !== originalColumn?.ratingRollupRule
+            })
         const columnsWithoutCol = _.reject($columnDefs, d => sameRef(d.columnEntityReference, column.columnEntityReference));
         $columnDefs = _.concat(columnsWithoutCol, newColumn);
     }
 
     function updateDisplayName(workingDisplayName, column) {
         const originalColumn = _.find($selectedGrid.definition.columnDefinitions, d => sameRef(d.columnEntityReference, column.columnEntityReference));
-        const newColumn = Object.assign({},
+        const newColumn = Object.assign(
+            {},
             column,
-            {displayName: workingDisplayName, ratingRollupRuleChanged: workingDisplayName !== originalColumn.displayName})
+            {
+                displayName: workingDisplayName,
+                ratingRollupRuleChanged: workingDisplayName !== originalColumn.displayName
+            })
         const columnsWithoutCol = _.reject($columnDefs, d => sameRef(d.columnEntityReference, column.columnEntityReference));
         $columnDefs = _.concat(columnsWithoutCol, newColumn);
     }
@@ -50,13 +57,8 @@
 
 </script>
 
-<h4>{column?.columnEntityReference?.name}</h4>
-<div class="help-block small">
-    <DescriptionFade text={column?.columnEntityReference?.description || ''}/>
-</div>
+<ColumnDefinitionHeader {column}/>
 
-<EntityInfoPanel primaryEntityRef={column?.columnEntityReference}>
-</EntityInfoPanel>
 <table class="table table-condensed small">
     <colgroup>
         <col width="50%">

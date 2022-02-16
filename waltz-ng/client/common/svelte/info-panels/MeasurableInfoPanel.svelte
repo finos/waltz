@@ -15,20 +15,17 @@
     let orgUnit = null;
     let orgUnitCall;
     let measurableCall;
-    let categoryCall;
 
     $: {
         if (primaryEntityRef) {
             measurableCall = measurableStore.getById(primaryEntityRef.id);
         }
-        if (measurable) {
-            categoryCall = measurableCategoryStore.getById(measurable?.categoryId);
-            orgUnitCall = measurable?.organisationalUnitId && orgUnitStore.getById(measurable?.organisationalUnitId);
+        if (measurable?.organisationalUnitId) {
+            orgUnitCall = orgUnitStore.getById(measurable?.organisationalUnitId);
         }
     }
 
     $: measurable = $measurableCall?.data;
-    $: category = $categoryCall?.data;
     $: orgUnit = $orgUnitCall?.data;
 
 </script>
@@ -37,10 +34,6 @@
     <h4><EntityLink ref={measurable}/></h4>
     <table class="table table-condensed small">
         <tbody>
-        <tr>
-            <td width="50%">Category</td>
-            <td width="50%">{category?.name}</td>
-        </tr>
         <tr>
             <td width="50%">External Id</td>
             <td width="50%">{measurable.externalId}</td>

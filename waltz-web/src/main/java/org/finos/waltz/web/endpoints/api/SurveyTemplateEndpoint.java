@@ -18,29 +18,30 @@
 
 package org.finos.waltz.web.endpoints.api;
 
-import org.finos.waltz.service.person.PersonService;
-import org.finos.waltz.service.survey.SurveyTemplateService;
-import org.finos.waltz.service.user.UserRoleService;
-import org.finos.waltz.web.DatumRoute;
-import org.finos.waltz.web.ListRoute;
-import org.finos.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.model.ReleaseLifecycleStatusChangeCommand;
 import org.finos.waltz.model.person.Person;
 import org.finos.waltz.model.survey.SurveyTemplate;
 import org.finos.waltz.model.survey.SurveyTemplateChangeCommand;
 import org.finos.waltz.model.user.SystemRole;
+import org.finos.waltz.service.person.PersonService;
+import org.finos.waltz.service.survey.SurveyTemplateService;
+import org.finos.waltz.service.user.UserRoleService;
+import org.finos.waltz.web.DatumRoute;
+import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.WebUtilities;
-import org.finos.waltz.web.endpoints.EndpointUtilities;
+import org.finos.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.web.WebUtilities.*;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 
 @Service
 public class SurveyTemplateEndpoint implements Endpoint {
 
-    private static final String BASE_URL = WebUtilities.mkPath("api", "survey-template");
+    private static final String BASE_URL = mkPath("api", "survey-template");
 
     private final SurveyTemplateService surveyTemplateService;
     private final UserRoleService userRoleService;
@@ -64,65 +65,70 @@ public class SurveyTemplateEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        String getByIdPath = WebUtilities.mkPath(BASE_URL, ":id");
-        String updateStatusPath = WebUtilities.mkPath(BASE_URL, ":id", "status");
-        String clonePath = WebUtilities.mkPath(BASE_URL, ":id", "clone");
+        String getByIdPath = mkPath(BASE_URL, ":id");
+        String getByQuestionIdPath = mkPath(BASE_URL, "question-id", ":id");
+        String updateStatusPath = mkPath(BASE_URL, ":id", "status");
+        String clonePath = mkPath(BASE_URL, ":id", "clone");
 
         DatumRoute<SurveyTemplate> getByIdRoute = (request, response) ->
-                surveyTemplateService.getById(WebUtilities.getId(request));
+                surveyTemplateService.getById(getId(request));
+
+        DatumRoute<SurveyTemplate> getByQuestionIdRoute = (request, response) ->
+                surveyTemplateService.getByQuestionId(getId(request));
 
         ListRoute<SurveyTemplate> findAllRoute = (request, response) ->
-                surveyTemplateService.findAll(WebUtilities.getUsername(request));
+                surveyTemplateService.findAll(getUsername(request));
 
         DatumRoute<Long> createRoute =
                 (req, res) -> {
                     ensureUserHasAdminRights(req);
                     return surveyTemplateService.create(
-                            WebUtilities.getUsername(req),
-                            WebUtilities.readBody(req, SurveyTemplateChangeCommand.class));
+                            getUsername(req),
+                            readBody(req, SurveyTemplateChangeCommand.class));
                 };
 
         DatumRoute<Integer> updateRoute =
                 (req, res) -> {
                     ensureUserHasAdminRights(req);
                     return surveyTemplateService.update(
-                            WebUtilities.getUsername(req),
-                            WebUtilities.readBody(req, SurveyTemplateChangeCommand.class));
+                            getUsername(req),
+                            readBody(req, SurveyTemplateChangeCommand.class));
                 };
 
         DatumRoute<Integer> updateStatusRoute =
                 (req, res) -> {
                     ensureUserHasAdminRights(req);
                     return surveyTemplateService.updateStatus(
-                            WebUtilities.getUsername(req),
-                            WebUtilities.getId(req),
-                            WebUtilities.readBody(req, ReleaseLifecycleStatusChangeCommand.class));
+                            getUsername(req),
+                            getId(req),
+                            readBody(req, ReleaseLifecycleStatusChangeCommand.class));
                 };
 
         DatumRoute<Long> cloneRoute =
                 (req, res) -> {
                     ensureUserHasAdminRights(req);
                     return surveyTemplateService.clone(
-                            WebUtilities.getUsername(req),
-                            WebUtilities.getId(req));
+                            getUsername(req),
+                            getId(req));
         };
 
         DatumRoute<Boolean> deleteRoute =
                 (req, res) -> {
-                    String username = WebUtilities.getUsername(req);
-                    long templateId = WebUtilities.getId(req);
+                    String username = getUsername(req);
+                    long templateId = getId(req);
                     ensureUserIsOwnerOrAdmin(req, templateId, username);
                     return surveyTemplateService.delete(templateId);
-        };
+                };
 
 
-        EndpointUtilities.getForList(BASE_URL, findAllRoute);
-        EndpointUtilities.getForDatum(getByIdPath, getByIdRoute);
-        EndpointUtilities.postForDatum(BASE_URL, createRoute);
-        EndpointUtilities.postForDatum(clonePath, cloneRoute);
-        EndpointUtilities.putForDatum(BASE_URL, updateRoute);
-        EndpointUtilities.putForDatum(updateStatusPath, updateStatusRoute);
-        EndpointUtilities.deleteForDatum(WebUtilities.mkPath(BASE_URL, ":id"), deleteRoute);
+        getForList(BASE_URL, findAllRoute);
+        getForDatum(getByIdPath, getByIdRoute);
+        getForDatum(getByQuestionIdPath, getByQuestionIdRoute);
+        postForDatum(BASE_URL, createRoute);
+        postForDatum(clonePath, cloneRoute);
+        putForDatum(BASE_URL, updateRoute);
+        putForDatum(updateStatusPath, updateStatusRoute);
+        deleteForDatum(mkPath(BASE_URL, ":id"), deleteRoute);
     }
 
 

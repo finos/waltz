@@ -202,12 +202,17 @@ public class SurveyTemplateService {
     public Boolean delete(long id) {
         List<SurveyRunWithOwnerAndStats> runs = surveyRunService.findByTemplateId(id);
 
-        if(isEmpty(runs)){
+        if (isEmpty(runs)) {
             surveyQuestionDropdownEntryDao.deleteForTemplate(id);
             surveyQuestionDao.deleteForTemplate(id);
             return surveyTemplateDao.delete(id);
         } else {
             throw new IllegalArgumentException("Cannot delete a template that has runs");
         }
+    }
+
+
+    public SurveyTemplate getByQuestionId(long questionId) {
+        return surveyTemplateDao.getByQuestionId(questionId);
     }
 }

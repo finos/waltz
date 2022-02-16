@@ -58,10 +58,6 @@
         moveColumn(1, column);
     }
 
-    function determineTitle(column) {
-        console.log({column});
-    }
-
 </script>
 
 <div class="row">
@@ -91,7 +87,7 @@
                             class="waltz-visibility-parent">
                             <td>
                                 <Icon name={getIcon(column?.columnEntityReference?.kind)}/>
-                                <span title={determineTitle(column)}>
+                                <span>
                                     {column?.displayName || column?.columnEntityReference?.name}
                                 </span>
                                 {#if column?.displayName}
