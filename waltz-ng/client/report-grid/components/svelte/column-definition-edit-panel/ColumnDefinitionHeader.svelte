@@ -13,10 +13,12 @@
     let surveyTemplateCall;
 
     $: {
-        if (column?.columnEntityReference?.id && column?.columnEntityReference?.kind === entity.MEASURABLE.key) {
-            measurableCall = measurableStore.getById(column?.columnEntityReference?.id);
-        } else if (column?.columnEntityReference?.id && column?.columnEntityReference?.kind === entity.SURVEY_QUESTION.key) {
-            surveyTemplateCall = surveyTemplateStore.getByQuestionId(column?.columnEntityReference?.id);
+        if (column?.columnEntityReference?.id) {
+            if (column?.columnEntityReference?.kind === entity.MEASURABLE.key) {
+                measurableCall = measurableStore.getById(column?.columnEntityReference?.id);
+            } else if (column?.columnEntityReference?.kind === entity.SURVEY_QUESTION.key) {
+                surveyTemplateCall = surveyTemplateStore.getByQuestionId(column?.columnEntityReference?.id);
+            }
         }
     }
 
