@@ -8,6 +8,7 @@
     import LogicalDataFlowPanel from "./LogicalDataFlowInfoPanel.svelte"
     import SurveyInstanceInfoPanel from "./SurveyInstanceInfoPanel.svelte";
     import PersonInfoPanel from "./PersonInfoPanel.svelte";
+    import AssessmentDefinitionInfoPanel from "./AssessmentDefinitionInfoPanel.svelte";
 
     export let primaryEntityRef;
 
@@ -17,6 +18,8 @@
                 return ActorInfoPanel;
             case "APPLICATION":
                 return ApplicationInfoPanel;
+            case "ASSESSMENT_DEFINITION":
+                return AssessmentDefinitionInfoPanel;
             case "CHANGE_INITIATIVE":
                 return ChangeInitiativeInfoPanel;
             case "DATA_TYPE":

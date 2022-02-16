@@ -6,6 +6,7 @@
     import {columnDefs, selectedGrid} from "../report-grid-store";
     import {sameRef} from "../../../../common/entity-utils";
     import DescriptionFade from "../../../../common/svelte/DescriptionFade.svelte";
+    import EntityInfoPanel from "../../../../common/svelte/info-panels/EntityInfoPanel.svelte";
 
     export let column;
     export let onCancel = () => console.log("Close");
@@ -51,19 +52,21 @@
 
 <h4>{column?.columnEntityReference?.name}</h4>
 <div class="help-block small">
-    <DescriptionFade text={column?.columnEntityReference?.description}/>
+    <DescriptionFade text={column?.columnEntityReference?.description || ''}/>
 </div>
 
+<EntityInfoPanel primaryEntityRef={column?.columnEntityReference}>
+</EntityInfoPanel>
 <table class="table table-condensed small">
     <colgroup>
         <col width="50%">
         <col width="50%">
     </colgroup>
     <tbody>
-        <tr>
-            <td>
-                <div>Usage Kind</div>
-                <div class="small help-text">
+    <tr>
+        <td>
+            <div>Usage Kind</div>
+            <div class="small help-text">
                     Select summary for columns to appear in the filter list.
                 </div>
             </td>

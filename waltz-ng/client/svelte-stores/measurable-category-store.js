@@ -9,8 +9,16 @@ export function mkMeasurableCategoryStore() {
             null,
             {force});
 
+    const getById = (id, force) => remote
+        .fetchViewDatum(
+            "GET",
+            `api/measurable-category/id/${id}`,
+            null,
+            {force});
+
     return {
         findAll,
+        getById
     };
 }
 

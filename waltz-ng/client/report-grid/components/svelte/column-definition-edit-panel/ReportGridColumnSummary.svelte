@@ -58,6 +58,10 @@
         moveColumn(1, column);
     }
 
+    function determineTitle(column) {
+        console.log({column});
+    }
+
 </script>
 
 <div class="row">
@@ -87,7 +91,9 @@
                             class="waltz-visibility-parent">
                             <td>
                                 <Icon name={getIcon(column?.columnEntityReference?.kind)}/>
-                                <span>{column?.displayName || column?.columnEntityReference?.name}</span>
+                                <span title={determineTitle(column)}>
+                                    {column?.displayName || column?.columnEntityReference?.name}
+                                </span>
                                 {#if column?.displayName}
                                     <div title="This is the original name which has been overridden"
                                          class="help-block small">{column?.columnEntityReference?.name}</div>
