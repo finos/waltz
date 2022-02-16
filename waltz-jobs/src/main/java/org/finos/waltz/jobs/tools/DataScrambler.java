@@ -4,6 +4,7 @@ import io.codearte.jfairy.Fairy;
 import io.codearte.jfairy.producer.person.Person;
 import org.finos.waltz.common.IOUtilities;
 import org.finos.waltz.schema.tables.records.ApplicationRecord;
+import org.finos.waltz.schema.tables.records.ChangeInitiativeRecord;
 import org.finos.waltz.schema.tables.records.CostRecord;
 import org.finos.waltz.schema.tables.records.PersonRecord;
 import org.finos.waltz.service.DIConfiguration;
@@ -20,6 +21,7 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.RandomUtilities.randomPick;
+import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.schema.Tables.*;
 
 public class DataScrambler {
@@ -38,10 +40,49 @@ public class DataScrambler {
             scrambleApplicationNames(tx);
             scramblePersonNames(tx);
             scrambleCosts(tx);
+            scrambleChangeInitiativeNames(tx);
 
 //            throw new IllegalArgumentException("BbbooooOOOOOOoommmmMM!!!");
 
         });
+    }
+
+
+    private static void scrambleChangeInitiativeNames(DSLContext tx) {
+
+        Set<String> namePt1 = asSet(
+                "Change", "Enhance", "Deliver", "Adapt to", "Meet",
+                "Invest in", "Perform", "Undertake", "Manage",
+                "Analyze", "Restructure", "Lead", "Prioritise",
+                "Reduce", "Lower");
+
+        Set<String> namePt2 = asSet(
+                "Regulatory", "Compliance", "Market",
+                "Global", "Regional", "Tactical", "Enterprise",
+                "Industry", "Governance", "Auditor",
+                "Business", "Customer");
+
+        Set<String> namePt3 = asSet(
+                "Processes", "Standards", "Trends",
+                "Initiatives", "Reporting", "Operations", "Aggregation",
+                "Structures");
+
+        Set<ChangeInitiativeRecord> changeInitiativeRecords = tx
+                .select()
+                .from(CHANGE_INITIATIVE)
+                .fetchSet(r -> r.into(CHANGE_INITIATIVE));
+
+        int[] updates = changeInitiativeRecords
+                .stream()
+                .map(r -> {
+                    String name = format("%s %s %s", randomPick(namePt1), randomPick(namePt2), randomPick(namePt3));
+                    r.setName(name);
+                    return r;
+                })
+                .collect(collectingAndThen(toSet(), d -> tx.batchUpdate(d).execute()));
+
+        System.out.println(format("Updated %d change initiative records with a random name", IntStream.of(updates).sum()));
+
     }
 
 
