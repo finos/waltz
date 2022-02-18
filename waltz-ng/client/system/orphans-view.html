@@ -34,11 +34,15 @@
         <div class="row">
             <div class="col-md-8">
                 <table class="table table-condensed table-striped">
+                    <colgroup>
+                        <col width="80%">
+                        <col width="20%">
+                    </colgroup>
                     <thead>
-                        <tr>
-                            <th>Description</th>
-                            <th>Count</th>
-                        </tr>
+                    <tr>
+                        <th>Description</th>
+                        <th>Count</th>
+                    </tr>
                     </thead>
                     <tbody>
                     <tr ng-repeat="orphan in ctrl.orphans">
@@ -156,6 +160,55 @@
                 <button class="btn btn-primary"
                         ng-click="ctrl.cleanupAttestations()">
                     Cleanup Attestations
+                </button>
+
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="row">
+            <div class="col-md-12">
+                <h4>Cleanup Involvements</h4>
+                <p class="small text-muted">
+                    Remove involvements where the entity no longer exists.
+                </p>
+            </div>
+
+            <div class="col-md-8">
+                <table class="table table-condensed table-striped">
+                    <colgroup>
+                        <col width="80%">
+                        <col width="20%">
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Count</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="involvementCount in ctrl.involvementOrphanCounts">
+                        <td ng-bind="involvementCount.description"></td>
+                        <td>
+                            <kbd ng-bind="involvementCount.count"
+                                 ng-style="{ 'background-color': (involvementCount.count > 0 ? 'red' : 'green')}">
+                            </kbd>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="col-md-12">
+                <button class="btn btn-primary"
+                        ng-click="ctrl.cleanupInvolvements('CHANGE_INITIATIVE')">
+                    Cleanup Change Initiative Involvements
+                </button>
+
+                <button class="btn btn-primary"
+                        ng-click="ctrl.cleanupInvolvements('END_USER_APPLICATION')">
+                    Cleanup End User Application Involvements
                 </button>
             </div>
         </div>

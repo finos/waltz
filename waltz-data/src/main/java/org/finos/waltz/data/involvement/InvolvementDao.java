@@ -45,6 +45,8 @@ import static java.util.stream.Collectors.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.data.application.ApplicationDao.IS_ACTIVE;
+import static org.finos.waltz.schema.Tables.CHANGE_INITIATIVE;
+import static org.finos.waltz.schema.Tables.END_USER_APPLICATION;
 import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static org.finos.waltz.schema.tables.Person.PERSON;
@@ -283,4 +285,54 @@ public class InvolvementDao {
                 .and(INVOLVEMENT.ENTITY_ID.in(genericSelector.selector()))
                 .execute();
     }
+
+
+    public int findOrphanInvolvementCountForKind(EntityKind entityKind) {
+
+        Select<Record1<Long>> invalidInvolvementIds = findInvalidInvolvementsForKind(entityKind);
+
+        return dsl
+                .fetchCount(dsl
+                        .select()
+                        .from(INVOLVEMENT)
+                        .where(INVOLVEMENT.ENTITY_ID.in(invalidInvolvementIds)
+                                .and(INVOLVEMENT.ENTITY_KIND.eq(entityKind.name()))));
+    }
+
+
+    public int cleanupInvolvementsForKind(EntityKind entityKind) {
+
+        Select<Record1<Long>> invalidInvolvementIds = findInvalidInvolvementsForKind(entityKind);
+
+        return dsl
+                .deleteFrom(INVOLVEMENT)
+                .where(INVOLVEMENT.ENTITY_ID.in(invalidInvolvementIds)
+                        .and(INVOLVEMENT.ENTITY_KIND.eq(entityKind.name())))
+                .execute();
+    }
+
+
+    private Select<Record1<Long>> findInvalidInvolvementsForKind(EntityKind entityKind) {
+        switch (entityKind) {
+            case CHANGE_INITIATIVE:
+                return findInvalidInvolvements(EntityKind.CHANGE_INITIATIVE, CHANGE_INITIATIVE, CHANGE_INITIATIVE.ID);
+            case END_USER_APPLICATION:
+                return findInvalidInvolvements(EntityKind.END_USER_APPLICATION, END_USER_APPLICATION, END_USER_APPLICATION.ID);
+            default:
+                throw new UnsupportedOperationException("Cannot remove involvements for kind: " + entityKind);
+        }
+    }
+
+
+    private Select<Record1<Long>> findInvalidInvolvements(EntityKind entityKind,
+                                                          Table<?> t,
+                                                          TableField<? extends Record, Long> id) {
+        return dsl
+                .select(INVOLVEMENT.ENTITY_ID)
+                .from(INVOLVEMENT)
+                .leftJoin(t).on(INVOLVEMENT.ENTITY_ID.eq(id))
+                .where(INVOLVEMENT.ENTITY_KIND.eq(entityKind.name())
+                        .and(id.isNull()));
+    }
+
 }
