@@ -55,9 +55,13 @@ function buildAppInvolvementSummary(apps = [], involvements = [], involvementKin
         .groupBy("entityReference.id")
         .map((grp, key) => {
             let app = appsById[key];
-            app = _.assign(app, {roles: _.map(grp, g => involvementKindsById[g.kindId] )});
-            return app;
+            if (app == null) {
+                return null;
+            } else {
+                return Object.assign({}, app, {roles: _.map(grp, g => involvementKindsById[g.kindId])});
+            }
         })
+        .compact()
         .value();
 
     const indirectAppInvolvements = _.map(indirectlyInvolvedAppIds, id => appsById[id]);

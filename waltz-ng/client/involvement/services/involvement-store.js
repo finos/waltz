@@ -72,6 +72,20 @@ function store($http, BaseApiUrl) {
     };
 
 
+    const findOrphanInvolvementCountForKind = (entityKind) => {
+        return $http
+            .get(`${BASE}/entity-kind/${entityKind}/orphan-count`, entityKind)
+            .then(r => r.data);
+    };
+
+
+    const cleanupOrphansForKind = (entityKind) => {
+        return $http
+            .delete(`${BASE}/entity-kind/${entityKind}/cleanup-orphans`, entityKind)
+            .then(r => r.data);
+    };
+
+
     return {
         findAppsForEmployeeId,
         findByEmployeeId,
@@ -79,7 +93,9 @@ function store($http, BaseApiUrl) {
         findBySelector,
         findPeopleByEntityReference,
         findPeopleBySelector,
-        changeInvolvement
+        changeInvolvement,
+        findOrphanInvolvementCountForKind,
+        cleanupOrphansForKind
     };
 }
 
@@ -125,6 +141,16 @@ export const InvolvementStore_API = {
         serviceName,
         serviceFnName: "changeInvolvement",
         description: "change person involvement for a given entity reference"
+    },
+    findOrphanInvolvementCountForKind: {
+        serviceName,
+        serviceFnName: "findOrphanInvolvementCountForKind",
+        description: "find count of involvements where entity no longer exists for a given entity kind"
+    },
+    cleanupOrphansForKind: {
+        serviceName,
+        serviceFnName: "cleanupOrphansForKind",
+        description: "cleanup involvements for a given entity kind"
     }
 };
 
