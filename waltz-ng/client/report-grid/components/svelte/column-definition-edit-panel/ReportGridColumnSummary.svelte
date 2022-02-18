@@ -87,7 +87,9 @@
                             class="waltz-visibility-parent">
                             <td>
                                 <Icon name={getIcon(column?.columnEntityReference?.kind)}/>
-                                <span>{column?.displayName || column?.columnEntityReference?.name}</span>
+                                <span>
+                                    {column?.displayName || column?.columnEntityReference?.name}
+                                </span>
                                 {#if column?.displayName}
                                     <div title="This is the original name which has been overridden"
                                          class="help-block small">{column?.columnEntityReference?.name}</div>

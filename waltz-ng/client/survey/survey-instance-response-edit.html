@@ -84,17 +84,24 @@
                                  class="waltz-survey-question-edit-row row">
                                 <div ng-attr-for="{{ question.id }}"
                                      class="col-md-3">
-                            <span ng-bind="question.questionText">
-                            </span>
-                                    <span ng-if="question.isMandatory"
-                                          class="text-danger">
-                                *
-                            </span>
-                                    <!-- help text -->
-                                    <waltz-markdown text="question.helpText"
-                                                    style="display: block;"
-                                                    class='small text-muted'>
-                                    </waltz-markdown>
+                                    <div>
+                                        <span ng-bind="question.questionText">
+                                        </span>
+                                        <span ng-if="question.isMandatory"
+                                              class="text-danger">
+                                            *
+                                        </span>
+                                    </div>
+                                    <div ng-if="question.externalId" class="text-muted">
+                                        (<span ng-bind="question.externalId"></span>)
+                                    </div>
+                                    <div style="padding-top: 1em">
+                                        <!-- help text -->
+                                        <waltz-markdown text="question.helpText"
+                                                        style="display: block;"
+                                                        class='small text-muted'>
+                                        </waltz-markdown>
+                                    </div>
                                 </div>
 
                                 <!-- MAIN QUESTION INPUT -->

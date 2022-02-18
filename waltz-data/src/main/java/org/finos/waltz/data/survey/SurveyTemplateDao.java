@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+import static org.finos.waltz.schema.Tables.SURVEY_QUESTION;
 import static org.finos.waltz.schema.tables.SurveyTemplate.SURVEY_TEMPLATE;
 import static org.finos.waltz.common.Checks.checkNotNull;
 
@@ -158,5 +159,16 @@ public class SurveyTemplateDao {
                 .where(SURVEY_TEMPLATE.ID.eq(id))
                 .and(SURVEY_TEMPLATE.STATUS.eq(ReleaseLifecycleStatus.DRAFT.name()))
                 .execute() == 1;
+    }
+
+
+    public SurveyTemplate getByQuestionId(long questionId) {
+        return dsl
+                .select()
+                .from(SURVEY_TEMPLATE)
+                .innerJoin(SURVEY_QUESTION)
+                .on(SURVEY_TEMPLATE.ID.eq(SURVEY_QUESTION.SURVEY_TEMPLATE_ID))
+                .where(SURVEY_QUESTION.ID.eq(questionId))
+                .fetchOne(TO_DOMAIN_MAPPER);
     }
 }
