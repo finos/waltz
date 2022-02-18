@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.IdProvider;
-import org.finos.waltz.model.LevelProvider;
 import org.finos.waltz.model.ParentIdProvider;
 import org.immutables.value.Value;
 
@@ -32,8 +31,9 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutableEntityHierarchyItem.class)
 public abstract class EntityHierarchyItem implements
         IdProvider,
-        LevelProvider,
         ParentIdProvider
 {
     public abstract EntityKind kind();
+    public abstract int descendantLevel();
+    public abstract int ancestorLevel();
 }

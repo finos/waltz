@@ -53,11 +53,15 @@ public class EntityHierarchyDao {
     private static final Function<EntityHierarchyItem, EntityHierarchyRecord> ITEM_TO_RECORD_MAPPER =
             item -> item
                     .id()
-                    .map(id -> new EntityHierarchyRecord(
-                        item.kind().name(),
-                        id,
-                        item.parentId().orElse(null),
-                        item.level()))
+                    .map(id -> {
+                        EntityHierarchyRecord r = new EntityHierarchyRecord();
+                        r.setKind(item.kind().name());
+                        r.setId(id);
+                        r.setAncestorId(item.parentId().orElse(null));
+                        r.setLevel(item.ancestorLevel());
+                        r.setDescendantLevel(item.descendantLevel());
+                        return r;
+                    })
                     .orElseThrow(() -> new IllegalArgumentException("Cannot convert an item without an id to a hierarchy record"));
 
     public static final RecordMapper<Record, EntityHierarchyItem> TO_DOMAIN_MAPPER = record -> {
@@ -66,7 +70,8 @@ public class EntityHierarchyDao {
                 .id(ehRecord.getId())
                 .kind(Enum.valueOf(EntityKind.class, ehRecord.getKind()))
                 .parentId(ehRecord.getAncestorId())
-                .level(ehRecord.getLevel())
+                .ancestorLevel(ehRecord.getLevel())
+                .descendantLevel(ehRecord.getDescendantLevel())
                 .build();
     };
 
@@ -80,25 +85,38 @@ public class EntityHierarchyDao {
     }
 
 
-    public int replaceHierarchy(EntityKind kind, List<EntityHierarchyItem> hierarchyItems, Condition deleteFilter) {
+    /**
+     * Replaces an entity hierarch with a given set of hierarchy items.
+     * Partial replacements are possible using the deletion filter.
+     *
+     * A common use of a partial replacement is when rebuilding
+     * for a single measurable category.
+     *
+     * @param kind  then entity kind of the hierarchy to create
+     * @param hierarchyItems  the items making up the hierarchy
+     * @param deleteFilter  Any additional deletion restrictions
+     * @return number of hierarchy records created
+     */
+    public int replaceHierarchy(EntityKind kind,
+                                List<EntityHierarchyItem> hierarchyItems,
+                                Condition deleteFilter) {
         checkNotNull(kind, "kind cannot be null");
         checkNotNull(hierarchyItems, "hierarchyItems cannot be null");
 
         List<EntityHierarchyRecord> records = map(hierarchyItems, ITEM_TO_RECORD_MAPPER);
 
         LOG.info("Replacing hierarchy items for kind: {}, inserting new record (#{})", kind, hierarchyItems.size());
-        dsl.transaction(configuration -> {
+        return dsl.transactionResult(configuration -> {
             DSLContext txDsl = DSL.using(configuration);
             txDsl.deleteFrom(ENTITY_HIERARCHY)
                     .where(ENTITY_HIERARCHY.KIND.eq(kind.name()))
                     .and(deleteFilter)
                     .execute();
-            txDsl.batchInsert(records)
-                    .execute();
+            return txDsl
+                    .batchInsert(records)
+                    .execute()
+                    .length;
         });
-
-        return records.size();
-
     }
 
 

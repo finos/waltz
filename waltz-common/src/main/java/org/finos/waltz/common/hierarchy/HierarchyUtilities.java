@@ -32,7 +32,6 @@ import static java.util.stream.Collectors.toMap;
 
 public class HierarchyUtilities {
 
-
     /**
      * Given a set of flat nodes, will construct a hierarchy and
      * return a tuple of a map of all nodes, and the collection
@@ -41,7 +40,7 @@ public class HierarchyUtilities {
      * @param flatNodes collection of flat nodes which will be used to construct the forest
      * @param <T> type of the node data
      * @param <K> type of the node key
-     * @return
+     * @return Forest built from the given flat nodes
      */
     public static <T, K> Forest<T, K> toForest(Collection<FlatNode<T, K>> flatNodes) {
         Collection<FlatNode<T, K>> sanitizedFlatNodes = sanitizeFlatNodes(flatNodes);
@@ -49,13 +48,13 @@ public class HierarchyUtilities {
         List<K> rootNodeIds = sanitizedFlatNodes
                 .stream()
                 .filter(n -> ! n.getParentId().isPresent())
-                .map(n -> n.getId())
+                .map(FlatNode::getId)
                 .collect(Collectors.toList());
 
         Map<K, Node<T, K>> allById = sanitizedFlatNodes
                 .stream()
                 .collect(toMap(
-                        n -> n.getId(),
+                        FlatNode::getId,
                         n -> new Node<>(n.getId(), n.getData()),
                         (n1, n2) -> n1));
 
@@ -75,19 +74,31 @@ public class HierarchyUtilities {
 
         Set<Node<T, K>> rootNodes = rootNodeIds
                 .stream()
-                .map(id -> allById.get(id))
+                .map(allById::get)
                 .collect(Collectors.toSet());
 
-        return new Forest(allById, rootNodes);
+        return new Forest<>(allById, rootNodes);
     }
 
 
+    /**
+     * Takes a collection of flat nodes and ensures that:
+     *
+     * - none of them have a parent id the same as their id
+     *
+     * A new collection of flat nodes is returned
+     *
+     * @param flatNodes  Collection of unsanitized flat nodes
+     * @param <T>  The type of the node content
+     * @param <K>  The type of the key used to reference nodes
+     * @return  collection of sanitized flat nodes
+     */
     private static <T, K> Collection<FlatNode<T, K>> sanitizeFlatNodes(Collection<FlatNode<T, K>> flatNodes) {
-        return CollectionUtilities.map(flatNodes, n ->
-                    n.getParentId()
-                        .map(pId -> pId.equals(n.getId())
-                                ? new FlatNode<>(n.getId(), Optional.empty(), n.getData())
-                                : n)
+        return CollectionUtilities.map(
+                flatNodes,
+                n -> n.getParentId()
+                        .filter(pId -> pId.equals(n.getId()))
+                        .map(pId -> new FlatNode<>(n.getId(), Optional.empty(), n.getData()))
                         .orElse(n));
     }
 
@@ -142,7 +153,8 @@ public class HierarchyUtilities {
     }
 
 
-    private static <T, K> Map<K, Integer> assignDepths(Collection<Node<T, K>> nodes, int level) {
+    private static <T, K> Map<K, Integer> assignDepths(Collection<Node<T, K>> nodes,
+                                                       int level) {
         Map<K, Integer> result = new HashMap<>();
 
         for (Node<T, K> node : nodes) {

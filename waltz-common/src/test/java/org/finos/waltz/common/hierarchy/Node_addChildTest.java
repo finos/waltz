@@ -8,10 +8,15 @@ public class Node_addChildTest {
 
     @Test
     public void simpleAddChild(){
-        Node n = new Node("a",1);
+        Node<Long, String> n = mkNode("a", 1L);
         n.setParent(n);
-        n.addChild(new Node("b",2));
+        n.addChild(mkNode("b",2L));
         assertEquals("a", n.getParent().getId());
-        System.out.println(n.getChildren());
+    }
+
+
+    private Node<Long, String> mkNode(String id,
+                                      Long data) {
+        return new Node<>(id, data);
     }
 }

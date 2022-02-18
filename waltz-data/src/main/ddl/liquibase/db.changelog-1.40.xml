@@ -1,0 +1,101 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="db.changelog-1.40.xml">
+
+    <changeSet id="v1-39-2-tag"
+               author="davidwatkins73">
+        <tagDatabase tag="v1.39.2"/> <!-- tag the current db version, i.e. the last  -->
+    </changeSet>
+
+
+    <changeSet id="20220218-5916-1"
+               author="davidwatkins73">
+        <comment>5916: add entity level to entity_hierarchy</comment>
+        <addColumn tableName="entity_hierarchy">
+            <column name="descendant_level"
+                    defaultValueNumeric="0"
+                    type="${int.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20220218-5916-2"
+               author="davidwatkins73">
+        <setTableRemarks tableName="entity_hierarchy"
+                         remarks="a bridge (or closure) table which stores information for quick hierarchy traversals"/>
+        <setColumnRemarks tableName="entity_hierarchy"
+                          columnName="kind"
+                          remarks="type of entity this record represents (ORG_UNIT, MEASURABLE, etc)"/>
+        <setColumnRemarks tableName="entity_hierarchy"
+                          columnName="id"
+                          remarks="the id of the descendant (lower) entity in the hierarchy"/>
+        <setColumnRemarks tableName="entity_hierarchy"
+                          columnName="ancestor_id"
+                          remarks="the id of the ancestor (higher) entity in the hierarchy"/>
+        <setColumnRemarks tableName="entity_hierarchy"
+                          columnName="level"
+                          remarks="the depth of the ancestor"/>
+        <setColumnRemarks tableName="entity_hierarchy"
+                          columnName="descendant_level"
+                          remarks="the depth of the descendant"/>
+    </changeSet>
+
+    <changeSet id="20220218-5916-3a"
+               dbms="postgresql"
+               author="davidwatkins73">
+        <sql>
+            update entity_hierarchy a
+            set descendant_level = (
+                select b.level
+                from entity_hierarchy b
+                where b.id = a.id
+                  and b.ancestor_id = a.id
+                  and b.kind = a.kind);
+        </sql>
+    </changeSet>
+
+    <changeSet id="20220218-5916-3b"
+               dbms="mssql"
+               author="davidwatkins73">
+        <sql>
+            with
+                a as (
+                    select *
+                    from entity_hierarchy
+                )
+            update a
+            set
+                descendant_level = (
+                    select b.level
+                    from entity_hierarchy b
+                    where (
+                                      b.id = a.id
+                                  and b.ancestor_id = a.id
+                                  and b.kind = a.kind
+                              )
+                )
+        </sql>
+    </changeSet>
+
+
+</databaseChangeLog>

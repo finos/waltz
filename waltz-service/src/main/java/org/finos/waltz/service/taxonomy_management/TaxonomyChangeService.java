@@ -18,11 +18,6 @@
 
 package org.finos.waltz.service.taxonomy_management;
 
-import org.finos.waltz.service.client_cache_key.ClientCacheKeyService;
-import org.finos.waltz.service.entity_hierarchy.EntityHierarchyService;
-import org.finos.waltz.service.measurable.MeasurableService;
-import org.finos.waltz.service.measurable_category.MeasurableCategoryService;
-import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.data.taxonomy_management.TaxonomyChangeDao;
@@ -33,6 +28,13 @@ import org.finos.waltz.model.measurable.Measurable;
 import org.finos.waltz.model.measurable_category.MeasurableCategory;
 import org.finos.waltz.model.taxonomy_management.*;
 import org.finos.waltz.model.user.SystemRole;
+import org.finos.waltz.service.client_cache_key.ClientCacheKeyService;
+import org.finos.waltz.service.entity_hierarchy.EntityHierarchyService;
+import org.finos.waltz.service.measurable.MeasurableService;
+import org.finos.waltz.service.measurable_category.MeasurableCategoryService;
+import org.finos.waltz.service.user.UserRoleService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +48,8 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Service
 public class TaxonomyChangeService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(TaxonomyChangeService.class);
 
     private final TaxonomyChangeDao taxonomyChangeDao;
     private final Map<TaxonomyChangeType, TaxonomyCommandProcessor> processorsByType;
@@ -133,7 +137,12 @@ public class TaxonomyChangeService {
         // rebuild measurable hierarchy
         if (command.changeDomain().kind() == EntityKind.MEASURABLE_CATEGORY
                 && isHierarchyChange(command)) {
-            entityHierarchyService.buildForMeasurableByCategory(command.changeDomain().id());
+            long categoryId = command.changeDomain().id();
+            int insertCount = entityHierarchyService.buildForMeasurableByCategory(categoryId);
+            LOG.info(
+                    "Rebuilt measurable category: {},  inserted {} new records",
+                    categoryId,
+                    insertCount);
         }
 
         return updatedCommand;

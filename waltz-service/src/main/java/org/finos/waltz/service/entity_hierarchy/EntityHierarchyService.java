@@ -144,7 +144,7 @@ public class EntityHierarchyService {
             int[] rc = personHierarchyService.build();
             return rc.length;
         } else {
-            Table table = determineTableToRebuild(kind);
+            Table<?> table = determineTableToRebuild(kind);
             return buildFor(table, kind, DSL.trueCondition(), DSL.trueCondition());
         }
     }
@@ -160,7 +160,7 @@ public class EntityHierarchyService {
     }
 
 
-    private int buildFor(Table table,
+    private int buildFor(Table<?> table,
                          EntityKind kind,
                          Condition selectFilter,
                          Condition deleteFilter) {
@@ -171,14 +171,16 @@ public class EntityHierarchyService {
     }
 
 
-    private List<FlatNode<Long, Long>> fetchFlatNodes(Table table, Condition selectFilter) {
+    private List<FlatNode<Long, Long>> fetchFlatNodes(Table<?> table,
+                                                      Condition selectFilter) {
         Field<Long> idField = table.field("id", Long.class);
         Field<Long> parentIdField = table.field("parent_id", Long.class);
 
         checkNotNull(idField, "cannot find id column");
         checkNotNull(parentIdField, "cannot find parent_id column");
 
-        return dsl.select(idField, parentIdField)
+        return dsl
+                .select(idField, parentIdField)
                 .from(table)
                 .where(selectFilter)
                 .fetch(r -> new FlatNode<>(
@@ -188,9 +190,9 @@ public class EntityHierarchyService {
     }
 
 
-    private List<EntityHierarchyItem> convertFlatNodesToHierarchyItems(EntityKind kind, Collection<FlatNode<Long, Long>> flatNodes) {
+    private List<EntityHierarchyItem> convertFlatNodesToHierarchyItems(EntityKind kind,
+                                                                       Collection<FlatNode<Long, Long>> flatNodes) {
         Forest<Long, Long> forest = HierarchyUtilities.toForest(flatNodes);
-        Node<Long, Long> r = forest.getAllNodes().get(811L);
         Map<Long, Integer> idToLevel = HierarchyUtilities.assignDepths(forest);
 
         return forest.getAllNodes()
@@ -201,39 +203,47 @@ public class EntityHierarchyService {
     }
 
 
-    private Function<Node<Long, Long>, Stream<? extends EntityHierarchyItem>> streamItemsForNode(EntityKind kind, Map<Long, Integer> idToLevel) {
-        return node -> Stream.concat(
-                streamAncestors(kind, idToLevel, node),
-                streamSelf(kind, idToLevel, node));
+    private Function<Node<Long, Long>, Stream<? extends EntityHierarchyItem>> streamItemsForNode(EntityKind kind,
+                                                                                                 Map<Long, Integer> idToLevel) {
+        return node -> Stream
+                .concat(
+                    streamAncestors(kind, idToLevel, node),
+                    streamSelf(kind, idToLevel, node));
     }
 
 
-    private Stream<EntityHierarchyItem> streamSelf(EntityKind kind, Map<Long, Integer> idToLevel, Node<Long, Long> node) {
+    private Stream<EntityHierarchyItem> streamSelf(EntityKind kind,
+                                                   Map<Long, Integer> idToLevel,
+                                                   Node<Long, Long> node) {
         Long nodeId = node.getId();
         Integer level = idToLevel.get(nodeId);
         ImmutableEntityHierarchyItem selfAsEntityHierarchyItem = ImmutableEntityHierarchyItem.builder()
                 .id(nodeId)
                 .parentId(nodeId)
-                .level(level == null ? -1 : level)
+                .ancestorLevel(level == null ? -1 : level)
                 .kind(kind)
                 .build();
         return Stream.of(selfAsEntityHierarchyItem);
     }
 
 
-    private Stream<EntityHierarchyItem> streamAncestors(EntityKind kind, Map<Long, Integer> idToLevel, Node<Long, Long> node) {
-        return HierarchyUtilities.parents(node)
+    private Stream<EntityHierarchyItem> streamAncestors(EntityKind kind,
+                                                        Map<Long, Integer> idToLevel,
+                                                        Node<Long, Long> node) {
+        return HierarchyUtilities
+            .parents(node)
             .stream()
             .map(p -> ImmutableEntityHierarchyItem.builder()
                     .id(node.getId())
                     .parentId(p.getId())
-                    .level(idToLevel.get(p.getId()))
+                    .ancestorLevel(idToLevel.get(p.getId()))
+                    .descendantLevel(idToLevel.get(node.getId()))
                     .kind(kind)
                     .build());
     }
 
 
-    private Table determineTableToRebuild(EntityKind kind) {
+    private Table<?> determineTableToRebuild(EntityKind kind) {
         switch (kind) {
             case CHANGE_INITIATIVE:
                 return Tables.CHANGE_INITIATIVE;
