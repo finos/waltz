@@ -19,6 +19,7 @@ import angular from "angular";
 import {registerComponents, registerStores} from "../common/module-utils";
 
 import SurveyInstanceStore from "./services/survey-instance-store";
+import SurveyInstanceViewStore from "./services/survey-instance-view-store";
 import SurveyRunStore from "./services/survey-run-store";
 import SurveyTemplateStore from "./services/survey-template-store";
 
@@ -64,6 +65,7 @@ export default () => {
 
     registerStores(module, [
         SurveyInstanceStore,
+        SurveyInstanceViewStore,
         SurveyQuestionStore,
         SurveyRunStore,
         SurveyTemplateStore

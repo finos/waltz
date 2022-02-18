@@ -50,13 +50,34 @@ const statusesWhichSupportEditing = [
 ];
 
 
+function determineName(surveyInstance) {
+    return "Edit - "
+        + _.get(surveyInstance, ["surveyInstance", "surveyEntity", "name"], "Unknown")
+        + " - "
+        + _.get(surveyInstance, ["surveyRun", "name"], "Survey");
+}
+
+
+const addToHistory = (historyStore, surveyInstance) => {
+    if (!surveyInstance) {
+        return;
+    }
+    historyStore.put(
+        determineName(surveyInstance),
+        "SURVEY_INSTANCE",
+        "main.survey.instance.response.edit",
+        {id: surveyInstance.surveyInstance.id});
+};
+
+
 function controller($location,
                     $q,
                     $state,
                     $stateParams,
                     $timeout,
                     serviceBroker,
-                    userService) {
+                    userService,
+                    historyStore) {
 
     const vm = initialiseData(this, initialState);
 
@@ -66,6 +87,17 @@ function controller($location,
         id,
         kind: "SURVEY_INSTANCE"
     };
+
+
+    vm.$onInit = () => {
+        serviceBroker
+            .loadViewData(CORE_API.SurveyInstanceViewStore.getById, [id])
+            .then(result => {
+                const surveyInstanceInfo = result.data;
+                addToHistory(historyStore, surveyInstanceInfo)
+            });
+    }
+
 
     function reload() {
         const responsePromise = serviceBroker
@@ -206,7 +238,8 @@ controller.$inject = [
     "$stateParams",
     "$timeout",
     "ServiceBroker",
-    "UserService"
+    "UserService",
+    "HistoryStore"
 ];
 
 

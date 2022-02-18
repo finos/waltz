@@ -56,6 +56,8 @@
         primaryEntityRef = Object.assign({}, primaryEntityRef, {id: d.detail});
     }
 
+    $: console.log({sectionsToShow})
+
 </script>
 
 
@@ -70,10 +72,15 @@
                 {#each section?.questions as question}
                     <div class="row section-question">
                         <div class="col-md-6 help-block">
-                            {question?.questionText}
-                            {#if question?.isMandatory}
-                            <span class="mandatory"
-                                  title="This question is mandatory">*</span>
+                            <div>
+                                {question?.questionText}
+                                {#if question?.isMandatory}
+                                    <span class="mandatory"
+                                          title="This question is mandatory">*</span>
+                                {/if}
+                            </div>
+                            {#if question?.externalId}
+                                <div class="text-muted small">({question?.externalId})</div>
                             {/if}
                         </div>
                         <div class:col-md-6={_.isEmpty(question?.subQuestions)}

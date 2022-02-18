@@ -16,27 +16,41 @@
  *
  */
 
-import {remote} from "./remote";
-import {CORE_API} from "../common/services/core-api-utils";
+function store($http, baseApiUrl) {
 
-export function mkSurveyTemplateStore() {
+    const base = `${baseApiUrl}/survey-instance-view`;
 
-    const findAll = (force = false) => remote.fetchViewList(
-        "GET",
-        "api/survey-template",
-        [],
-        {force});
-
-    const getByQuestionId = (id, force = false) => remote.fetchViewDatum(
-        "GET",
-        `api/survey-template/question-id/${id}`,
-        [],
-        {force});
+    const getById = (id) => {
+        return $http
+            .get(`${base}/id/${id}`)
+            .then(result => result.data);
+    };
 
     return {
-        findAll,
-        getByQuestionId
+        getById
     };
 }
 
-export const surveyTemplateStore = mkSurveyTemplateStore();
+
+store.$inject = [
+    "$http",
+    "BaseApiUrl"
+];
+
+
+const serviceName = "SurveyInstanceViewStore";
+
+
+export const SurveyInstanceViewStore_API = {
+    getById: {
+        serviceName,
+        serviceFnName: "getById",
+        description: "get survey instance info for a given id"
+    }
+};
+
+
+export default {
+    store,
+    serviceName
+};

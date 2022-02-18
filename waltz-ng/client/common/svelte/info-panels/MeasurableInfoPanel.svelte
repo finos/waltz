@@ -8,16 +8,25 @@
     import DescriptionFade from "../DescriptionFade.svelte";
     import {measurableStore} from "../../../svelte-stores/measurables";
     import {orgUnitStore} from "../../../svelte-stores/org-unit-store";
+    import {measurableCategoryStore} from "../../../svelte-stores/measurable-category-store";
 
     export let primaryEntityRef;
 
     let orgUnit = null;
+    let orgUnitCall;
+    let measurableCall;
 
-    $: measurableCall = measurableStore.getById(primaryEntityRef.id);
-    $: measurable = $measurableCall.data;
+    $: {
+        if (primaryEntityRef) {
+            measurableCall = measurableStore.getById(primaryEntityRef.id);
+        }
+        if (measurable?.organisationalUnitId) {
+            orgUnitCall = orgUnitStore.getById(measurable?.organisationalUnitId);
+        }
+    }
 
-    $: orgUnitCall = measurable.organisationalUnitId && orgUnitStore.getById(measurable.organisationalUnitId);
-    $: orgUnit = orgUnitCall && $orgUnitCall.data;
+    $: measurable = $measurableCall?.data;
+    $: orgUnit = $orgUnitCall?.data;
 
 </script>
 
@@ -25,26 +34,29 @@
     <h4><EntityLink ref={measurable}/></h4>
     <table class="table table-condensed small">
         <tbody>
-            <tr>
-                <td width="50%">External Id</td>
-                <td width="50%">{measurable.externalId}</td>
-            </tr>
-            <tr>
-                <td width="50%">Concrete</td>
-                <td width="50%">{measurable.concrete ? 'Yes' : 'No'}</td>
-            </tr>
-            {#if !_.isNull(measurable.organisationalUnitId)}
+        <tr>
+            <td width="50%">External Id</td>
+            <td width="50%">{measurable.externalId}</td>
+        </tr>
+        <tr>
+            <td width="50%">Concrete</td>
+            <td width="50%">{measurable.concrete ? 'Yes' : 'No'}</td>
+        </tr>
+        {#if !_.isNull(measurable.organisationalUnitId)}
             <tr>
                 <td width="50%">Owning Org Unit</td>
                 <td width="50%">
                     <EntityLink ref={orgUnit}/>
                 </td>
             </tr>
-            {/if}
+        {/if}
         </tbody>
     </table>
 
-    <DescriptionFade text={measurable.description}/>
+    <div class="help-block small">
+        <DescriptionFade text={measurable.description}/>
+    </div>
+
     <br>
 
     <slot name="post-header"/>
