@@ -88,11 +88,11 @@ function controller($q,
 
         const eudaPromise = serviceBroker
             .loadViewData(CORE_API.InvolvementStore
-                .findOrphanInvolvementCountForKind, [entity.END_USER_APPLICATION.key]);
+                .countOrphanInvolvementsForKind, [entity.END_USER_APPLICATION.key]);
 
         const ciPromise = serviceBroker
             .loadViewData(CORE_API.InvolvementStore
-                .findOrphanInvolvementCountForKind, [entity.CHANGE_INITIATIVE.key]);
+                .countOrphanInvolvementsForKind, [entity.CHANGE_INITIATIVE.key]);
 
         $q
             .all([eudaPromise, ciPromise])

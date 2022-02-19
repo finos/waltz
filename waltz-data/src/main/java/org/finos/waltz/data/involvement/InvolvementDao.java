@@ -287,7 +287,7 @@ public class InvolvementDao {
     }
 
 
-    public int findOrphanInvolvementCountForKind(EntityKind entityKind) {
+    public int countOrphanInvolvementsForKind(EntityKind entityKind) {
 
         Select<Record1<Long>> invalidInvolvementIds = findInvalidInvolvementsForKind(entityKind);
 
