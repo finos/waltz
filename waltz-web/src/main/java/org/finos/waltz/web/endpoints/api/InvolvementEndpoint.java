@@ -65,7 +65,7 @@ public class InvolvementEndpoint implements Endpoint {
 
         String findBySelectorPath = mkPath(BASE_URL, "selector", "involvement");
         String findPeopleBySelectorPath = mkPath(BASE_URL, "selector", "people");
-        String findOrphanInvolvementCountForKindPath = mkPath(BASE_URL, "entity-kind", ":kind", "orphan-count");
+        String countOrphanInvolvementsForKindPath = mkPath(BASE_URL, "entity-kind", ":kind", "orphan-count");
         String cleanupInvalidInvolvementsForEntityPath = mkPath(BASE_URL, "entity-kind", ":kind", "cleanup-orphans");
 
         String updateForEntityRefPath = mkPath(BASE_URL, "entity", ":kind", ":id");
@@ -105,9 +105,9 @@ public class InvolvementEndpoint implements Endpoint {
             return service.findPeopleByGenericEntitySelector(selectionOptions);
         };
 
-        DatumRoute<Integer> findOrphanInvolvementCountForKindRoute = (request, response) -> {
+        DatumRoute<Integer> countOrphanInvolvementsForKindRoute = (request, response) -> {
             EntityKind kind = getKind(request);
-            return service.findOrphanInvolvementCountForKind(kind);
+            return service.countOrphanInvolvementsForKind(kind);
         };
 
         DatumRoute<Integer> cleanupInvalidInvolvementsForKindRoute = (request, response) -> {
@@ -121,7 +121,7 @@ public class InvolvementEndpoint implements Endpoint {
         getForList(findDirectAppsByEmployeePath, findDirectAppsByEmployeeRoute);
         getForList(findAllAppsByEmployeePath, findAllAppsByEmployeeRoute);
         getForList(findByEntityRefPath, findByEntityRefRoute);
-        getForDatum(findOrphanInvolvementCountForKindPath, findOrphanInvolvementCountForKindRoute);
+        getForDatum(countOrphanInvolvementsForKindPath, countOrphanInvolvementsForKindRoute);
         postForList(findBySelectorPath, findBySelectorRoute);
         getForList(findPeopleByEntityRefPath, findPeopleByEntityRefRoute);
         deleteForDatum(cleanupInvalidInvolvementsForEntityPath, cleanupInvalidInvolvementsForKindRoute);
