@@ -78,24 +78,37 @@
                dbms="mssql"
                author="davidwatkins73">
         <sql>
-            with
-                a as (
-                    select *
-                    from entity_hierarchy
-                )
+            with a as (
+                select *
+                from entity_hierarchy
+            )
             update a
-            set
-                descendant_level = (
-                    select b.level
-                    from entity_hierarchy b
-                    where (
-                                      b.id = a.id
-                                  and b.ancestor_id = a.id
-                                  and b.kind = a.kind
-                              )
-                )
+            set descendant_level = (
+                select b.level
+                from entity_hierarchy b
+                where b.id = a.id
+                  and b.ancestor_id = a.id
+                  and b.kind = a.kind);
         </sql>
     </changeSet>
 
+
+    <changeSet id="20220218-5916-4"
+               author="davidwatkins73">
+        <setTableRemarks tableName="settings"
+                         remarks="contains configuration data which controls the operation of Waltz."/>
+        <setColumnRemarks tableName="settings"
+                          columnName="name"
+                          remarks="the key name of the setting, often uses dotted notation.  Strongly recommended to put client specific settings under their own namespace (i.e. mycorp.somesetting)"/>
+        <setColumnRemarks tableName="settings"
+                          columnName="value"
+                          remarks="the value of the setting, if the setting is a boolean it should be entered as lowercase"/>
+        <setColumnRemarks tableName="settings"
+                          columnName="restricted"
+                          remarks="restricted settings are internal to Waltz and not available via API/external calls"/>
+        <setColumnRemarks tableName="settings"
+                          columnName="description"
+                          remarks="optional comment to describe this setting"/>
+    </changeSet>
 
 </databaseChangeLog>
