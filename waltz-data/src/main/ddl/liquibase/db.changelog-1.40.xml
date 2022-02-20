@@ -111,4 +111,79 @@
                           remarks="optional comment to describe this setting"/>
     </changeSet>
 
+    <changeSet id="20220218-5916-5"
+               author="davidwatkins73">
+        <setTableRemarks tableName="access_log"
+                         remarks="logs user page and section views"/>
+        <setColumnRemarks tableName="access_log"
+                          columnName="user_id"
+                          remarks="identifier of the user accessing the page or section"/>
+        <setColumnRemarks tableName="access_log"
+                          columnName="state"
+                          remarks="identifier of the page  plus optionally a section identifier (format: state|section)"/>
+        <setColumnRemarks tableName="access_log"
+                          columnName="params"
+                          remarks="additional params provided to page/section"/>
+    </changeSet>
+
+    <changeSet id="20220218-5916-6"
+               author="davidwatkins73">
+        <setTableRemarks tableName="actor"
+                         remarks="represents a non application entity, typically used in flows.  Examples include exchanges, departments, counterpart organisations"/>
+        <setColumnRemarks tableName="actor"
+                          columnName="name"
+                          remarks="short name identifying the actor (i.e. Bank of England)"/>
+        <setColumnRemarks tableName="actor"
+                          columnName="description"
+                          remarks="longer textual description of the actor"/>
+        <setColumnRemarks tableName="actor"
+                          columnName="is_external"
+                          remarks="flag to indicate whether this is an internal actor (e.g. Chief Risk Officer) or external actor (e.g. Bank of England)"/>
+        <setColumnRemarks tableName="actor"
+                          columnName="provenance"
+                          remarks="where did this actor record originate, will be 'waltz' if provided via the UI"/>
+        <setColumnRemarks tableName="actor"
+                          columnName="external_id"
+                          remarks="identifier this actor is known by externally.  Should not change, unlike the name which may change."/>
+    </changeSet>
+
+    <changeSet id="20220218-5916-7"
+               author="davidwatkins73">
+        <setTableRemarks tableName="allocation"
+                         remarks="allocations are used to apportion shares of a particular scheme (i.e. TCO) against an entity (e.g. applications) and measurable.  The total for a given scheme and entity should be lte 100"/>
+        <setColumnRemarks tableName="allocation"
+                          columnName="allocation_scheme_id"
+                          remarks="identifier (and fk) to a particular allocation scheme"/>
+        <setColumnRemarks tableName="allocation"
+                          columnName="entity_id"
+                          remarks="identifier of the entity this allocation refers to"/>
+        <setColumnRemarks tableName="allocation"
+                          columnName="entity_kind"
+                          remarks="kind of the entity (e.g. APPLICATION) this allocation refers to"/>
+        <setColumnRemarks tableName="allocation"
+                          columnName="measurable_id"
+                          remarks="which measurable is being given an allocation for this entity"/>
+        <setColumnRemarks tableName="allocation"
+                          columnName="allocation_percentage"
+                          remarks="the allocation percentage given to this entity/measurable"/>
+    </changeSet>
+
+    <changeSet id="20220218-5916-8"
+               author="davidwatkins73">
+        <setTableRemarks tableName="allocation_scheme"
+                         remarks="allocation_schemes provide a named definition which allows entities to record allocations against a particular measurable category. (e.g. the 'Function Cost Shred' would be for applications to record allocations against their Functional Taxonomy measurable mappings)"/>
+        <setColumnRemarks tableName="allocation_scheme"
+                          columnName="name"
+                          remarks="short name describing this allocation scheme (i.e. 'Function Cost Shred') "/>
+        <setColumnRemarks tableName="allocation_scheme"
+                          columnName="description"
+                          remarks="longer description to provide more information about this allocation scheme"/>
+        <setColumnRemarks tableName="allocation_scheme"
+                          columnName="measurable_category_id"
+                          remarks="defines the category of measurables this allocation scheme refers to"/>
+        <setColumnRemarks tableName="allocation_scheme"
+                          columnName="external_id"
+                          remarks="typically used when setting allocations via external batch processes (e.g. 'FT_COST')"/>
+    </changeSet>
+
 </databaseChangeLog>
