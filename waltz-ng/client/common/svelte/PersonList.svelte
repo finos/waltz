@@ -4,6 +4,7 @@
     import EntitySearchSelector from "./EntitySearchSelector.svelte";
     import {personStore} from "../../svelte-stores/person-store";
     import {mayRemove} from "./person-list-utils";
+    import _ from "lodash";
 
     const Modes = {
         ADD: "add",
@@ -40,8 +41,14 @@
         people,
         p => ({
             person: p,
-            isRemovable: mayRemove(p, self, { canRemove, canRemoveSelf})
+            isRemovable: mayRemove(p, self, {canRemove, canRemoveSelf})
         }));
+
+    $: peopleIds = _.map(people, d => d.id);
+
+    function notAlreadyPicked(d) {
+        return !_.includes(peopleIds, d.id);
+    }
 
 </script>
 
@@ -91,7 +98,8 @@
     <strong>Add additional person</strong>
 
     <EntitySearchSelector entityKinds={searchKinds}
-                          on:select={doAdd}/>
+                          on:select={doAdd}
+                          selectionFilter={notAlreadyPicked}/>
     <button class="btn-link"
             on:click={() => mode = Modes.LIST}>
         Cancel
