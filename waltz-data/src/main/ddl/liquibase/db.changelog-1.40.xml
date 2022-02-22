@@ -186,4 +186,55 @@
                           remarks="typically used when setting allocations via external batch processes (e.g. 'FT_COST')"/>
     </changeSet>
 
+    <changeSet id="20220218-5916-9"
+               author="davidwatkins73">
+        <setTableRemarks tableName="application"
+                         remarks="represents an application (with an entity_kind of 'APPLICATION')"/>
+        <setColumnRemarks tableName="application"
+                          columnName="name"
+                          remarks="name of this application (aliases can be added in the entity_alias table)"/>
+        <setColumnRemarks tableName="application"
+                          columnName="description"
+                          remarks="longer description to provide more information about this application.  Markdown is supported"/>
+        <setColumnRemarks tableName="application"
+                          columnName="asset_code"
+                          remarks="external identifier representing this application"/>
+        <setColumnRemarks tableName="application"
+                          columnName="organisational_unit_id"
+                          remarks="reference to the owning org unit"/>
+        <setColumnRemarks tableName="application"
+                          columnName="kind"
+                          remarks="broad category of this application (e.g. IN_HOUSE, EXTERNALLY_HOSTED, THIRD_PARTY, EUC, etc)"/>
+        <setColumnRemarks tableName="application"
+                          columnName="lifecycle_phase"
+                          remarks="the current application lifecycle state of this application (one of: CONCEPTUAL, DEVELOPMENT, PRODUCTION, RETIRED)"/>
+        <setColumnRemarks tableName="application"
+                          columnName="parent_asset_code"
+                          remarks="asset code of any parent application"/>
+        <setColumnRemarks tableName="application"
+                          columnName="overall_rating"
+                          remarks="investment rating scheme (one of: R, A, G, Z / which equates to Disinvest, Maintain, Invest, Unknown)"/>
+        <setColumnRemarks tableName="application"
+                          columnName="provenance"
+                          remarks="origination of this application record.  Will be 'waltz' if entered via the UI"/>
+        <setColumnRemarks tableName="application"
+                          columnName="business_criticality"
+                          remarks="business criticality of this application (one of: LOW, MEDIUM, HIGH, VERY_HIGH, NONE, UNKNOWN)"/>
+        <setColumnRemarks tableName="application"
+                          columnName="is_removed"
+                          remarks="should this record logically be treated as if it has been physically deleted"/>
+        <setColumnRemarks tableName="application"
+                          columnName="entity_lifecycle_phase"
+                          remarks="the lifecycle state of this entity record, slightly different from is_removed as does not imply the record is 'gone'  (one of: ACTIVE, PENDING, REMOVED)"/>
+        <setColumnRemarks tableName="application"
+                          columnName="planned_retirement_date"
+                          remarks="date when this application is (or was) planning to retire"/>
+        <setColumnRemarks tableName="application"
+                          columnName="actual_retirement_date"
+                          remarks="date when this application actually retired from production, null if not planned"/>
+        <setColumnRemarks tableName="application"
+                          columnName="commission_date"
+                          remarks="when was this application commissioned, null if unknown"/>
+    </changeSet>
+
 </databaseChangeLog>
