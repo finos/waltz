@@ -68,6 +68,12 @@
                            icon="qrcode"
                            small="Types"
                            id="data-types-tree-section">
+                <waltz-section-actions>
+                    <waltz-data-extract-link name="Export"
+                                             extract="data-types">
+                    </waltz-data-extract-link>
+                </waltz-section-actions>
+
                 <waltz-data-type-usage-count-tree on-selection="ctrl.nodeSelected">
                 </waltz-data-type-usage-count-tree>
             </waltz-section>
