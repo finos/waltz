@@ -210,13 +210,6 @@ public class SurveyViewDao {
                 .and(SURVEY_INSTANCE.STATUS.ne(SurveyInstanceStatus.WITHDRAWN.name()))
                 .and(SURVEY_TEMPLATE.STATUS.eq(ReleaseLifecycleStatus.ACTIVE.name()));
 
-        Set<String> userRoles = dsl
-                .select(USER_ROLE.ROLE)
-                .from(PERSON)
-                .innerJoin(USER_ROLE).on(PERSON.EMAIL.eq(USER_ROLE.USER_NAME))
-                .where(PERSON.ID.eq(personId))
-                .fetchSet(r -> r.get(USER_ROLE.ROLE));
-
         SelectConditionStep<Record> selectSurveysByOwningRole = dsl
                 .select(SURVEY_INSTANCE.fields())
                 .select(SURVEY_RUN.fields())
@@ -233,10 +226,20 @@ public class SurveyViewDao {
                 .where(IS_ORIGINAL_INSTANCE_CONDITION)
                 .and(SURVEY_INSTANCE.STATUS.ne(SurveyInstanceStatus.WITHDRAWN.name()))
                 .and(SURVEY_TEMPLATE.STATUS.eq(ReleaseLifecycleStatus.ACTIVE.name()))
-                .and(SURVEY_INSTANCE.OWNING_ROLE.in(userRoles));
+                .and(SURVEY_INSTANCE.OWNING_ROLE.in(fetchUserRoles(personId)));
 
         return selectSurveysByOwningInvolvement
                 .union(selectSurveysByOwningRole)
                 .fetchSet(TO_DOMAIN_MAPPER);
+    }
+
+
+    private Set<String> fetchUserRoles(Long personId) {
+        return dsl
+                .select(USER_ROLE.ROLE)
+                .from(PERSON)
+                .innerJoin(USER_ROLE).on(PERSON.EMAIL.eq(USER_ROLE.USER_NAME))
+                .where(PERSON.ID.eq(personId))
+                .fetchSet(r -> r.get(USER_ROLE.ROLE));
     }
 }
