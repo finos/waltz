@@ -187,7 +187,11 @@ public class SurveyViewDao {
 
 
     public Set<SurveyInstanceInfo> findForOwner(Long personId) {
-        return dsl.select(SURVEY_INSTANCE.fields())
+
+        Condition isRunOwnerOrHasOwnerInvolvement = SURVEY_INSTANCE_OWNER.PERSON_ID.eq(personId).or(SURVEY_RUN.OWNER_ID.eq(personId));
+
+        SelectConditionStep<Record> selectSurveysByOwningInvolvement = dsl
+                .select(SURVEY_INSTANCE.fields())
                 .select(SURVEY_RUN.fields())
                 .select(SURVEY_TEMPLATE.NAME,
                         SURVEY_TEMPLATE.ID,
@@ -201,10 +205,38 @@ public class SurveyViewDao {
                 .on(SURVEY_INSTANCE_OWNER.SURVEY_INSTANCE_ID.eq(SURVEY_INSTANCE.ID))
                 .innerJoin(SURVEY_RUN).on(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(SURVEY_RUN.ID))
                 .innerJoin(SURVEY_TEMPLATE).on(SURVEY_RUN.SURVEY_TEMPLATE_ID.eq(SURVEY_TEMPLATE.ID))
-                .where(SURVEY_INSTANCE_OWNER.PERSON_ID.eq(personId))
+                .where(isRunOwnerOrHasOwnerInvolvement)
                 .and(IS_ORIGINAL_INSTANCE_CONDITION)
                 .and(SURVEY_INSTANCE.STATUS.ne(SurveyInstanceStatus.WITHDRAWN.name()))
+                .and(SURVEY_TEMPLATE.STATUS.eq(ReleaseLifecycleStatus.ACTIVE.name()));
+
+        Set<String> userRoles = dsl
+                .select(USER_ROLE.ROLE)
+                .from(PERSON)
+                .innerJoin(USER_ROLE).on(PERSON.EMAIL.eq(USER_ROLE.USER_NAME))
+                .where(PERSON.ID.eq(personId))
+                .fetchSet(r -> r.get(USER_ROLE.ROLE));
+
+        SelectConditionStep<Record> selectSurveysByOwningRole = dsl
+                .select(SURVEY_INSTANCE.fields())
+                .select(SURVEY_RUN.fields())
+                .select(SURVEY_TEMPLATE.NAME,
+                        SURVEY_TEMPLATE.ID,
+                        SURVEY_TEMPLATE.DESCRIPTION,
+                        SURVEY_TEMPLATE.EXTERNAL_ID)
+                .select(ENTITY_NAME_FIELD)
+                .select(QUALIFIER_NAME_FIELD)
+                .select(EXTERNAL_ID_FIELD)
+                .from(SURVEY_INSTANCE)
+                .innerJoin(SURVEY_RUN).on(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(SURVEY_RUN.ID))
+                .innerJoin(SURVEY_TEMPLATE).on(SURVEY_RUN.SURVEY_TEMPLATE_ID.eq(SURVEY_TEMPLATE.ID))
+                .where(IS_ORIGINAL_INSTANCE_CONDITION)
+                .and(SURVEY_INSTANCE.STATUS.ne(SurveyInstanceStatus.WITHDRAWN.name()))
                 .and(SURVEY_TEMPLATE.STATUS.eq(ReleaseLifecycleStatus.ACTIVE.name()))
+                .and(SURVEY_INSTANCE.OWNING_ROLE.in(userRoles));
+
+        return selectSurveysByOwningInvolvement
+                .union(selectSurveysByOwningRole)
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
 }
