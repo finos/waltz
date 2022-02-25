@@ -364,7 +364,7 @@
                           columnName="is_removed"
                           remarks="should this record logically be treated as if it has been physically deleted"/>
         <setColumnRemarks tableName="application"
-                          columnName="entity_lifecycle_phase"
+                          columnName="entity_lifecycle_status"
                           remarks="the lifecycle state of this entity record, slightly different from is_removed as does not imply the record is 'gone'  (one of: ACTIVE, PENDING, REMOVED)"/>
         <setColumnRemarks tableName="application"
                           columnName="planned_retirement_date"
