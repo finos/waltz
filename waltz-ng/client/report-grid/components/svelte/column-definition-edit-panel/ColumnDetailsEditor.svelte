@@ -1,7 +1,7 @@
 <script>
     import DropdownPicker from "./DropdownPicker.svelte";
     import _ from "lodash";
-    import {columnUsageKind, ratingRollupRule} from "../report-grid-utils";
+    import {columnUsageKind, ratingRollupRule, sameColumnRef} from "../report-grid-utils";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import {columnDefs, selectedGrid} from "../report-grid-store";
     import {sameRef} from "../../../../common/entity-utils";
@@ -18,29 +18,35 @@
     }
 
     function selectSummary(usageKind, column) {
-        const originalColumn = _.find($selectedGrid.definition.columnDefinitions, d => sameRef(d.columnEntityReference, column.columnEntityReference));
+        const originalColumn = _.find($selectedGrid.definition.columnDefinitions, d => sameColumnRef(d, column));
         const newColumn = Object.assign({},
             column,
             {usageKind: usageKind?.key, usageKindChanged: usageKind?.key !== originalColumn?.usageKind})
-        const columnsWithoutCol = _.reject($columnDefs, d => sameRef(d.columnEntityReference, column.columnEntityReference));
+        const columnsWithoutCol = _.reject($columnDefs, d => sameColumnRef(d, column));
         $columnDefs = _.concat(columnsWithoutCol, newColumn);
     }
 
     function selectRollupKind(rollupKind, column) {
-        const originalColumn = _.find($selectedGrid.definition.columnDefinitions, d => sameRef(d.columnEntityReference, column.columnEntityReference));
+        const originalColumn = _.find($selectedGrid.definition.columnDefinitions, d => sameColumnRef(d, column));
         const newColumn = Object.assign({},
             column,
-            {ratingRollupRule: rollupKind?.key, ratingRollupRuleChanged: rollupKind?.key !== originalColumn?.ratingRollupRule})
-        const columnsWithoutCol = _.reject($columnDefs, d => sameRef(d.columnEntityReference, column.columnEntityReference));
+            {
+                ratingRollupRule: rollupKind?.key,
+                ratingRollupRuleChanged: rollupKind?.key !== originalColumn?.ratingRollupRule
+            })
+        const columnsWithoutCol = _.reject($columnDefs, d => sameColumnRef(d, column));
         $columnDefs = _.concat(columnsWithoutCol, newColumn);
     }
 
     function updateDisplayName(workingDisplayName, column) {
-        const originalColumn = _.find($selectedGrid.definition.columnDefinitions, d => sameRef(d.columnEntityReference, column.columnEntityReference));
+        const originalColumn = _.find($selectedGrid.definition.columnDefinitions, d => sameColumnRef(d, column));
         const newColumn = Object.assign({},
             column,
-            {displayName: workingDisplayName, ratingRollupRuleChanged: workingDisplayName !== originalColumn.displayName})
-        const columnsWithoutCol = _.reject($columnDefs, d => sameRef(d.columnEntityReference, column.columnEntityReference));
+            {
+                displayName: workingDisplayName,
+                ratingRollupRuleChanged: workingDisplayName !== originalColumn.displayName
+            })
+        const columnsWithoutCol = _.reject($columnDefs, d => sameColumnRef(d, column));
         $columnDefs = _.concat(columnsWithoutCol, newColumn);
     }
 
@@ -49,9 +55,14 @@
 
 </script>
 
-<h4>{column?.columnEntityReference?.name}</h4>
+<h4>
+    {#if column.entityFieldReference }
+        {column.entityFieldReference.displayName} /
+    {/if}
+    {column?.columnName}
+</h4>
 <div class="help-block small">
-    <DescriptionFade text={column?.columnEntityReference?.description}/>
+    <DescriptionFade text={column?.columnDescription}/>
 </div>
 
 <table class="table table-condensed small">

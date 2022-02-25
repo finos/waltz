@@ -121,7 +121,8 @@ public class ReportGridServiceTest extends BaseInMemoryIntegrationTest {
 
         ReportGridColumnDefinition colDef = ImmutableReportGridColumnDefinition
                 .builder()
-                .columnEntityReference(EntityReference.mkRef(EntityKind.INVOLVEMENT_KIND, invKind))
+                .columnEntityKind(EntityKind.INVOLVEMENT_KIND)
+                .columnEntityId(invKind)
                 .position(10)
                 .build();
 

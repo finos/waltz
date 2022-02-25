@@ -43,6 +43,7 @@ public enum EntityKind {
     DATABASE_USAGE("Database Usage"),
     DATA_TYPE("Datatype"),
     END_USER_APPLICATION("End user application"),
+    ENTITY_FIELD_REFERENCE("Entity field reference"),
     ENTITY_HIERARCHY("Entity hierarchy"),
     ENTITY_NAMED_NOTE("Entity named note"),
     ENTITY_NAMED_NOTE_TYPE("Entity named note type"),

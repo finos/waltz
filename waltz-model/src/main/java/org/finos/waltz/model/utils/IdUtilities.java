@@ -18,7 +18,9 @@
 
 package org.finos.waltz.model.utils;
 
+import org.finos.waltz.common.OptionalUtilities;
 import org.finos.waltz.model.IdProvider;
+import org.finos.waltz.model.entity_field_reference.EntityFieldReference;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -91,4 +93,11 @@ public class IdUtilities {
         return indexBy(t -> t.id().get(), ts);
     }
 
+
+    public static Long getIdOrDefault(IdProvider d, Long dfltValue) {
+        return d == null
+                ? dfltValue
+                : d.id().orElse(dfltValue);
+
+    }
 }
