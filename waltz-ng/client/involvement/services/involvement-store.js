@@ -72,7 +72,7 @@ function store($http, BaseApiUrl) {
     };
 
 
-    const findOrphanInvolvementCountForKind = (entityKind) => {
+    const countOrphanInvolvementsForKind = (entityKind) => {
         return $http
             .get(`${BASE}/entity-kind/${entityKind}/orphan-count`, entityKind)
             .then(r => r.data);
@@ -94,7 +94,7 @@ function store($http, BaseApiUrl) {
         findPeopleByEntityReference,
         findPeopleBySelector,
         changeInvolvement,
-        findOrphanInvolvementCountForKind,
+        countOrphanInvolvementsForKind,
         cleanupOrphansForKind
     };
 }
@@ -142,10 +142,10 @@ export const InvolvementStore_API = {
         serviceFnName: "changeInvolvement",
         description: "change person involvement for a given entity reference"
     },
-    findOrphanInvolvementCountForKind: {
+    countOrphanInvolvementsForKind: {
         serviceName,
-        serviceFnName: "findOrphanInvolvementCountForKind",
-        description: "find count of involvements where entity no longer exists for a given entity kind"
+        serviceFnName: "countOrphanInvolvementsForKind",
+        description: "count of involvements where entity no longer exists for a given entity kind"
     },
     cleanupOrphansForKind: {
         serviceName,

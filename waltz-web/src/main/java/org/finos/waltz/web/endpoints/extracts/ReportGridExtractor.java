@@ -23,6 +23,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.finos.waltz.common.CollectionUtilities;
+import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -30,10 +32,12 @@ import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.NameProvider;
 import org.finos.waltz.model.application.Application;
 import org.finos.waltz.model.application.LifecyclePhase;
+import org.finos.waltz.model.entity_field_reference.EntityFieldReference;
 import org.finos.waltz.model.external_identifier.ExternalIdValue;
 import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.model.report_grid.*;
 import org.finos.waltz.model.survey.SurveyQuestion;
+import org.finos.waltz.model.utils.IdUtilities;
 import org.finos.waltz.service.report_grid.ReportGridService;
 import org.finos.waltz.service.settings.SettingsService;
 import org.finos.waltz.service.survey.SurveyQuestionService;
@@ -50,6 +54,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
@@ -58,6 +63,7 @@ import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.ListUtilities.*;
 import static org.finos.waltz.common.MapUtilities.*;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.utils.IdUtilities.getIdOrDefault;
 import static org.finos.waltz.model.utils.IdUtilities.indexById;
 import static org.jooq.lambda.fi.util.function.CheckedConsumer.unchecked;
 import static org.jooq.lambda.tuple.Tuple.tuple;
@@ -125,23 +131,22 @@ public class ReportGridExtractor implements DataExtractor {
                 .definition()
                 .columnDefinitions()
                 .stream()
-                .map(ReportGridColumnDefinition::columnEntityReference)
-                .filter(r -> r.kind() == EntityKind.SURVEY_QUESTION)
-                .map(EntityReference::id)
+                .filter(r -> r.columnEntityKind() == EntityKind.SURVEY_QUESTION)
+                .map(ReportGridColumnDefinition::columnEntityId)
                 .collect(toSet());
 
-        Set<EntityReference> colsNeedingComments = surveyQuestionService
+        Set<Long> colsNeedingComments = surveyQuestionService
                 .findForIds(surveyQuestionsIds)
                 .stream()
                 .filter(SurveyQuestion::allowComment)
-                .map(q -> mkRef(q.kind(), q.id().get()))
+                .map(q -> q.id().get())
                 .collect(toSet());
 
         return reportGrid
                 .definition()
                 .columnDefinitions()
                 .stream()
-                .map(cd -> tuple(cd, colsNeedingComments.contains(cd.columnEntityReference())))
+                .map(cd -> tuple(cd, cd.columnEntityKind().equals(EntityKind.SURVEY_QUESTION) && colsNeedingComments.contains(cd.columnEntityId())))
                 .collect(toSet());
     }
 
@@ -164,13 +169,13 @@ public class ReportGridExtractor implements DataExtractor {
         List<String> columnHeaders = columnDefinitions
                 .stream()
                 .flatMap(r -> {
-                    String name = r.v1.columnEntityReference().name().orElse("?");
+                    String name = getColumnName(r.v1);
                     Boolean needsComment = r.v2;
                     return Stream.of(
                             name,
                             needsComment
                                 ? String.format("%s: comment", name)
-                                : null);
+                                    : null);
 
                 })
                 .filter(Objects::nonNull)
@@ -179,6 +184,22 @@ public class ReportGridExtractor implements DataExtractor {
         return concat(
                 staticHeaders,
                 columnHeaders);
+    }
+
+    private String getColumnName(ReportGridColumnDefinition column) {
+        if (column.displayName() != null) {
+            return column.displayName();
+        } else {
+            String fieldName = Optional
+                    .ofNullable(column.entityFieldReference())
+                    .map(EntityFieldReference::displayName)
+                    .orElse(null);
+
+            return ListUtilities.asList(fieldName, column.columnName())
+                    .stream()
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.joining(" / "));
+        }
     }
 
 
@@ -210,9 +231,9 @@ public class ReportGridExtractor implements DataExtractor {
 
                     Collection<ReportGridCell> cells = r.getValue();
 
-                    Map<Tuple2<Long, EntityKind>, ReportGridCell> cellValuesByColumnRefForApp = indexBy(
+                    Map<Tuple3<Long, EntityKind, Long>, ReportGridCell> cellValuesByColumnRefForApp = indexBy(
                             cells,
-                            k -> tuple(k.columnEntityId(), k.columnEntityKind()));
+                            k -> tuple(k.columnEntityId(), k.columnEntityKind(), k.entityFieldReferenceId()));
 
                     //find data for columns
                     colsWithCommentRequirement
@@ -220,14 +241,16 @@ public class ReportGridExtractor implements DataExtractor {
                                 ReportGridColumnDefinition colDef = t.v1;
                                 Boolean needsComment = t.v2;
 
-                                EntityReference colRef = colDef.columnEntityReference();
-                                boolean isCostColumn = colRef.kind().equals(EntityKind.COST_KIND);
+                                boolean isCostColumn = colDef.columnEntityKind().equals(EntityKind.COST_KIND);
 
                                 if (!allowCostsExport && isCostColumn) {
                                     reportRow.add("REDACTED");
                                 } else {
                                     ReportGridCell cell = cellValuesByColumnRefForApp.getOrDefault(
-                                            tuple(colRef.id(), colRef.kind()),
+                                            tuple(
+                                                    colDef.columnEntityId(),
+                                                    colDef.columnEntityKind(),
+                                                    getIdOrDefault(colDef.entityFieldReference(), null)),
                                             null);
 
                                     reportRow.add(getValueFromReportCell(ratingsById, cell));
@@ -256,10 +279,12 @@ public class ReportGridExtractor implements DataExtractor {
         if (reportGridCell == null) {
             return null;
         }
-        switch (reportGridCell.columnEntityKind()){
+        switch (reportGridCell.columnEntityKind()) {
             case COST_KIND:
                 return reportGridCell.value();
             case INVOLVEMENT_KIND:
+            case SURVEY_TEMPLATE:
+            case APPLICATION:
             case SURVEY_QUESTION:
                 return Optional.ofNullable(reportGridCell.text()).orElse("-");
             case MEASURABLE:

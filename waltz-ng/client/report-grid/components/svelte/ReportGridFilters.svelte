@@ -2,11 +2,11 @@
     import _ from "lodash";
     import NoData from "../../../common/svelte/NoData.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
-    import {mkPropNameForRef} from "./report-grid-utils";
-    import {filters, selectedGrid, summaries, activeSummaryColRefs} from "./report-grid-store";
+    import {getDisplayNameForColumn, mkPropNameForColumnDefinition} from "./report-grid-utils";
+    import {activeSummaryColRefs, filters, selectedGrid, summaries} from "./report-grid-store";
     import {mkChunks} from "../../../common/list-utils";
 
-    function isSelectedCounter (cId) {
+    function isSelectedCounter(cId) {
         return _.some($filters, f => f.counterId === cId);
     }
 
@@ -26,18 +26,17 @@
     $: chunkedSummaryData = mkChunks(
         _.filter(
             $summaries,
-            d => _.includes($activeSummaryColRefs, mkPropNameForRef(d.column.columnEntityReference))),
+            d => _.includes($activeSummaryColRefs, mkPropNameForColumnDefinition(d.column))),
         4);
 
-
-    $: $activeSummaryColRefs =  _
+    $: $activeSummaryColRefs = _
         .chain($selectedGrid?.definition.columnDefinitions)
         .filter(d => d.usageKind === "SUMMARY")
-        .map(d => mkPropNameForRef(d.columnEntityReference))
+        .map(d => mkPropNameForColumnDefinition(d))
         .value();
 
     function onRemoveSummary(summary) {
-        const refToRemove = mkPropNameForRef(summary.column.columnEntityReference);
+        const refToRemove = mkPropNameForColumnDefinition(summary.column);
         $activeSummaryColRefs = _.reject($activeSummaryColRefs, ref => ref === refToRemove);
         // remove any filters which refer to the property used by this summary
         $filters = _.reject($filters, f => f.propName === refToRemove);
@@ -72,7 +71,7 @@
             {#each row as summary}
                 <div class="col-sm-3">
                     <h5 class="waltz-visibility-parent">
-                        <span>{summary.column.columnEntityReference.name}</span>
+                        <span>{getDisplayNameForColumn(summary.column)}</span>
                         <button class="btn btn-skinny waltz-visibility-child-30 clickable pull-right"
                                 on:click={() => onRemoveSummary(summary)}>
                             <Icon name="close"/>

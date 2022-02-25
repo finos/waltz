@@ -22,8 +22,13 @@ import {mkSelectionOptions} from "../../../common/selector-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
 import ReportGridControlPanel from "../svelte/ReportGridControlPanel.svelte";
-import {activeSummaryColRefs, filters, selectedGrid, columnDefs} from "../svelte/report-grid-store";
-import {mkPropNameForRef, mkRowFilter, prepareColumnDefs, prepareTableData} from "../svelte/report-grid-utils";
+import {activeSummaryColRefs, columnDefs, filters, selectedGrid} from "../svelte/report-grid-store";
+import {
+    mkPropNameForColumnDefinition,
+    mkRowFilter,
+    prepareColumnDefs,
+    prepareTableData
+} from "../svelte/report-grid-utils";
 import {displayError} from "../../../common/error-utils";
 
 const bindings = {
@@ -116,7 +121,7 @@ function controller($scope, serviceBroker, localStorageService) {
     };
 
     vm.onAddSummary = (c) => {
-        const colRef = mkPropNameForRef(c.columnDef.columnEntityReference);
+        const colRef = mkPropNameForColumnDefinition(c.columnDef);
         const newActiveList = _.concat(vm.summaryCols, [colRef]);
         activeSummaryColRefs.set(newActiveList);
     };

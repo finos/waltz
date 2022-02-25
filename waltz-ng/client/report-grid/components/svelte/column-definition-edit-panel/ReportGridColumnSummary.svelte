@@ -4,9 +4,9 @@
     import Icon from "../../../../common/svelte/Icon.svelte";
     import _ from "lodash"
     import {entity} from "../../../../common/services/enums/entity";
-    import {columnDefs, selectedColumn, selectedGrid, lastMovedColumn} from "../report-grid-store";
+    import {columnDefs, lastMovedColumn, selectedColumn, selectedGrid} from "../report-grid-store";
     import {move} from "../../../../common/list-utils";
-    import {sameRef} from "../../../../common/entity-utils";
+    import {sameColumnRef} from "../report-grid-utils";
 
     export let onRemove = () => console.log("Removing entity")
     export let onEdit = () => console.log("Editing entity")
@@ -32,7 +32,7 @@
                 d,
                 {
                     position: _.indexOf(reorderedList, d),
-                    originalPosition: _.findIndex(originalList, r => sameRef(d.columnEntityReference, r.columnEntityReference))
+                    originalPosition: _.findIndex(originalList, r => sameColumnRef(d, r))
                 }));
     }
 
@@ -56,6 +56,18 @@
 
     function moveDown(column) {
         moveColumn(1, column);
+    }
+
+    function mkColumnName(column) {
+        return _.join(_.compact([column.entityFieldReference?.displayName, column.columnName]), ' / ');
+    }
+
+    function determineColumnName(column) {
+        if (column.displayName) {
+            return column.displayName;
+        } else {
+            return mkColumnName(column);
+        }
     }
 
 </script>
@@ -82,17 +94,15 @@
                 </thead>
                 <tbody>
                     {#each _.orderBy($columnDefs, d => d.position) as column}
-                        <tr class:selected={$selectedColumn && sameRef(column.columnEntityReference, $selectedColumn?.columnEntityReference)}
-                            class:last-moved={$lastMovedColumn && sameRef(column.columnEntityReference, $lastMovedColumn?.columnEntityReference)}
+                        <tr class:selected={$selectedColumn && sameColumnRef(column, $selectedColumn)}
+                            class:last-moved={$lastMovedColumn && sameColumnRef(column, $lastMovedColumn)}
                             class="waltz-visibility-parent">
                             <td>
-                                <Icon name={getIcon(column?.columnEntityReference?.kind)}/>
-                                <span>
-                                    {column?.displayName || column?.columnEntityReference?.name}
-                                </span>
+                                <Icon name={getIcon(column?.columnEntityKind)}/>
+                                <span>{determineColumnName(column)}</span>
                                 {#if column?.displayName}
                                     <div title="This is the original name which has been overridden"
-                                         class="help-block small">{column?.columnEntityReference?.name}</div>
+                                         class="help-block small">{mkColumnName(column)}</div>
                                 {/if}
                             </td>
                             <td>

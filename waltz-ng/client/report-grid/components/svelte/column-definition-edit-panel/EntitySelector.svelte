@@ -19,6 +19,8 @@
             entity.SURVEY_QUESTION,
             entity.ASSESSMENT_DEFINITION,
             entity.MEASURABLE,
+            entity.SURVEY_INSTANCE,
+            entity.APPLICATION
         ],
         d => d.name);
 

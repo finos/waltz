@@ -166,8 +166,8 @@ public class InvolvementService {
     }
 
 
-    public int findOrphanInvolvementCountForKind(EntityKind entityKind) {
-        return involvementDao.findOrphanInvolvementCountForKind(entityKind);
+    public int countOrphanInvolvementsForKind(EntityKind entityKind) {
+        return involvementDao.countOrphanInvolvementsForKind(entityKind);
     }
 
 
