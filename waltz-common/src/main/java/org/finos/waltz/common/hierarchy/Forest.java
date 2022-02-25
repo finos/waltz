@@ -21,6 +21,8 @@ package org.finos.waltz.common.hierarchy;
 import java.util.Map;
 import java.util.Set;
 
+import static java.lang.String.format;
+
 
 public class Forest<T, K> {
 
@@ -46,10 +48,9 @@ public class Forest<T, K> {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("Forest{");
-        sb.append("#allNodes=").append(allNodes.size());
-        sb.append(", rootNodes=").append(rootNodes);
-        sb.append('}');
-        return sb.toString();
+        return format(
+                "Forest{#allNodes=%d, rootNodes=%s}",
+                allNodes.size(),
+                rootNodes);
     }
 }

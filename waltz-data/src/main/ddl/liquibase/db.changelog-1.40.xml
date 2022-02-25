@@ -21,11 +21,13 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
                    logicalFilePath="db.changelog-1.40.xml">
 
-    <changeSet id="v1-39.1-tag"
-               author="woodjes">
-        <tagDatabase tag="v1.39.1"/> <!-- tag the current db version, i.e. the last  -->
+    <changeSet id="v1-39-2-tag"
+               author="davidwatkins73">
+        <tagDatabase tag="v1.39.2"/> <!-- tag the current db version, i.e. the last  -->
     </changeSet>
 
+
+    
     <changeSet id="20220209-2505-1"
                author="woodjes">
         <comment>2505: support entity attributes in report grids</comment>
@@ -163,6 +165,216 @@
             <column name="entity_field_reference_id"
                     type="${id.type}"/>
         </createIndex>
+    </changeSet>
+  
+    <changeSet id="20220218-5916-1"
+               author="davidwatkins73">
+        <comment>5916: add entity level to entity_hierarchy</comment>
+        <addColumn tableName="entity_hierarchy">
+            <column name="descendant_level"
+                    defaultValueNumeric="0"
+                    type="${int.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20220218-5916-2"
+               author="davidwatkins73">
+        <setTableRemarks tableName="entity_hierarchy"
+                         remarks="a bridge (or closure) table which stores information for quick hierarchy traversals"/>
+        <setColumnRemarks tableName="entity_hierarchy"
+                          columnName="kind"
+                          remarks="type of entity this record represents (ORG_UNIT, MEASURABLE, etc)"/>
+        <setColumnRemarks tableName="entity_hierarchy"
+                          columnName="id"
+                          remarks="the id of the descendant (lower) entity in the hierarchy"/>
+        <setColumnRemarks tableName="entity_hierarchy"
+                          columnName="ancestor_id"
+                          remarks="the id of the ancestor (higher) entity in the hierarchy"/>
+        <setColumnRemarks tableName="entity_hierarchy"
+                          columnName="level"
+                          remarks="the depth of the ancestor"/>
+        <setColumnRemarks tableName="entity_hierarchy"
+                          columnName="descendant_level"
+                          remarks="the depth of the descendant"/>
+    </changeSet>
+
+    <changeSet id="20220218-5916-3a"
+               dbms="postgresql"
+               author="davidwatkins73">
+        <sql>
+            update entity_hierarchy a
+            set descendant_level = (
+                select b.level
+                from entity_hierarchy b
+                where b.id = a.id
+                  and b.ancestor_id = a.id
+                  and b.kind = a.kind);
+        </sql>
+    </changeSet>
+
+    <changeSet id="20220218-5916-3b"
+               dbms="mssql"
+               author="davidwatkins73">
+        <sql>
+            with a as (
+                select *
+                from entity_hierarchy
+            )
+            update a
+            set descendant_level = (
+                select b.level
+                from entity_hierarchy b
+                where b.id = a.id
+                  and b.ancestor_id = a.id
+                  and b.kind = a.kind);
+        </sql>
+    </changeSet>
+
+
+    <changeSet id="20220218-5916-4"
+               author="davidwatkins73">
+        <setTableRemarks tableName="settings"
+                         remarks="contains configuration data which controls the operation of Waltz."/>
+        <setColumnRemarks tableName="settings"
+                          columnName="name"
+                          remarks="the key name of the setting, often uses dotted notation.  Strongly recommended to put client specific settings under their own namespace (i.e. mycorp.somesetting)"/>
+        <setColumnRemarks tableName="settings"
+                          columnName="value"
+                          remarks="the value of the setting, if the setting is a boolean it should be entered as lowercase"/>
+        <setColumnRemarks tableName="settings"
+                          columnName="restricted"
+                          remarks="restricted settings are internal to Waltz and not available via API/external calls"/>
+        <setColumnRemarks tableName="settings"
+                          columnName="description"
+                          remarks="optional comment to describe this setting"/>
+    </changeSet>
+
+    <changeSet id="20220218-5916-5"
+               author="davidwatkins73">
+        <setTableRemarks tableName="access_log"
+                         remarks="logs user page and section views"/>
+        <setColumnRemarks tableName="access_log"
+                          columnName="user_id"
+                          remarks="identifier of the user accessing the page or section"/>
+        <setColumnRemarks tableName="access_log"
+                          columnName="state"
+                          remarks="identifier of the page  plus optionally a section identifier (format: state|section)"/>
+        <setColumnRemarks tableName="access_log"
+                          columnName="params"
+                          remarks="additional params provided to page/section"/>
+    </changeSet>
+
+    <changeSet id="20220218-5916-6"
+               author="davidwatkins73">
+        <setTableRemarks tableName="actor"
+                         remarks="represents a non application entity, typically used in flows.  Examples include exchanges, departments, counterpart organisations"/>
+        <setColumnRemarks tableName="actor"
+                          columnName="name"
+                          remarks="short name identifying the actor (i.e. Bank of England)"/>
+        <setColumnRemarks tableName="actor"
+                          columnName="description"
+                          remarks="longer textual description of the actor"/>
+        <setColumnRemarks tableName="actor"
+                          columnName="is_external"
+                          remarks="flag to indicate whether this is an internal actor (e.g. Chief Risk Officer) or external actor (e.g. Bank of England)"/>
+        <setColumnRemarks tableName="actor"
+                          columnName="provenance"
+                          remarks="where did this actor record originate, will be 'waltz' if provided via the UI"/>
+        <setColumnRemarks tableName="actor"
+                          columnName="external_id"
+                          remarks="identifier this actor is known by externally.  Should not change, unlike the name which may change."/>
+    </changeSet>
+
+    <changeSet id="20220218-5916-7"
+               author="davidwatkins73">
+        <setTableRemarks tableName="allocation"
+                         remarks="allocations are used to apportion shares of a particular scheme (i.e. TCO) against an entity (e.g. applications) and measurable.  The total for a given scheme and entity should be lte 100"/>
+        <setColumnRemarks tableName="allocation"
+                          columnName="allocation_scheme_id"
+                          remarks="identifier (and fk) to a particular allocation scheme"/>
+        <setColumnRemarks tableName="allocation"
+                          columnName="entity_id"
+                          remarks="identifier of the entity this allocation refers to"/>
+        <setColumnRemarks tableName="allocation"
+                          columnName="entity_kind"
+                          remarks="kind of the entity (e.g. APPLICATION) this allocation refers to"/>
+        <setColumnRemarks tableName="allocation"
+                          columnName="measurable_id"
+                          remarks="which measurable is being given an allocation for this entity"/>
+        <setColumnRemarks tableName="allocation"
+                          columnName="allocation_percentage"
+                          remarks="the allocation percentage given to this entity/measurable"/>
+    </changeSet>
+
+    <changeSet id="20220218-5916-8"
+               author="davidwatkins73">
+        <setTableRemarks tableName="allocation_scheme"
+                         remarks="allocation_schemes provide a named definition which allows entities to record allocations against a particular measurable category. (e.g. the 'Function Cost Shred' would be for applications to record allocations against their Functional Taxonomy measurable mappings)"/>
+        <setColumnRemarks tableName="allocation_scheme"
+                          columnName="name"
+                          remarks="short name describing this allocation scheme (i.e. 'Function Cost Shred') "/>
+        <setColumnRemarks tableName="allocation_scheme"
+                          columnName="description"
+                          remarks="longer description to provide more information about this allocation scheme"/>
+        <setColumnRemarks tableName="allocation_scheme"
+                          columnName="measurable_category_id"
+                          remarks="defines the category of measurables this allocation scheme refers to"/>
+        <setColumnRemarks tableName="allocation_scheme"
+                          columnName="external_id"
+                          remarks="typically used when setting allocations via external batch processes (e.g. 'FT_COST')"/>
+    </changeSet>
+
+    <changeSet id="20220218-5916-9"
+               author="davidwatkins73">
+        <setTableRemarks tableName="application"
+                         remarks="represents an application (with an entity_kind of 'APPLICATION')"/>
+        <setColumnRemarks tableName="application"
+                          columnName="name"
+                          remarks="name of this application (aliases can be added in the entity_alias table)"/>
+        <setColumnRemarks tableName="application"
+                          columnName="description"
+                          remarks="longer description to provide more information about this application.  Markdown is supported"/>
+        <setColumnRemarks tableName="application"
+                          columnName="asset_code"
+                          remarks="external identifier representing this application"/>
+        <setColumnRemarks tableName="application"
+                          columnName="organisational_unit_id"
+                          remarks="reference to the owning org unit"/>
+        <setColumnRemarks tableName="application"
+                          columnName="kind"
+                          remarks="broad category of this application (e.g. IN_HOUSE, EXTERNALLY_HOSTED, THIRD_PARTY, EUC, etc)"/>
+        <setColumnRemarks tableName="application"
+                          columnName="lifecycle_phase"
+                          remarks="the current application lifecycle state of this application (one of: CONCEPTUAL, DEVELOPMENT, PRODUCTION, RETIRED)"/>
+        <setColumnRemarks tableName="application"
+                          columnName="parent_asset_code"
+                          remarks="asset code of any parent application"/>
+        <setColumnRemarks tableName="application"
+                          columnName="overall_rating"
+                          remarks="investment rating scheme (one of: R, A, G, Z / which equates to Disinvest, Maintain, Invest, Unknown)"/>
+        <setColumnRemarks tableName="application"
+                          columnName="provenance"
+                          remarks="origination of this application record.  Will be 'waltz' if entered via the UI"/>
+        <setColumnRemarks tableName="application"
+                          columnName="business_criticality"
+                          remarks="business criticality of this application (one of: LOW, MEDIUM, HIGH, VERY_HIGH, NONE, UNKNOWN)"/>
+        <setColumnRemarks tableName="application"
+                          columnName="is_removed"
+                          remarks="should this record logically be treated as if it has been physically deleted"/>
+        <setColumnRemarks tableName="application"
+                          columnName="entity_lifecycle_phase"
+                          remarks="the lifecycle state of this entity record, slightly different from is_removed as does not imply the record is 'gone'  (one of: ACTIVE, PENDING, REMOVED)"/>
+        <setColumnRemarks tableName="application"
+                          columnName="planned_retirement_date"
+                          remarks="date when this application is (or was) planning to retire"/>
+        <setColumnRemarks tableName="application"
+                          columnName="actual_retirement_date"
+                          remarks="date when this application actually retired from production, null if not planned"/>
+        <setColumnRemarks tableName="application"
+                          columnName="commission_date"
+                          remarks="when was this application commissioned, null if unknown"/>
     </changeSet>
 
 </databaseChangeLog>

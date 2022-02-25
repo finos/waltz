@@ -24,13 +24,16 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import static java.lang.String.format;
+
 
 public class Node<T, K> {
 
     private final K id;
     private final T data;
+    private final Set<Node<T, K>> children = new HashSet<>();
+
     private Node<T, K> parent = null;
-    private Set<Node<T, K>> children = new HashSet<>();
 
 
     public Node(K id, T data) {
@@ -53,14 +56,15 @@ public class Node<T, K> {
         return Collections.unmodifiableSet(children);
     }
 
-    public Node addChild(Node childNode) {
+
+    public Node<T, K> addChild(Node<T, K> childNode) {
         Checks.checkNotNull(childNode, "childNode must not be null");
         children.add(childNode);
         return this;
     }
 
 
-    public Node setParent(Node<T, K> parent) {
+    public Node<T, K> setParent(Node<T, K> parent) {
         this.parent = parent;
         return this;
     }
@@ -73,10 +77,9 @@ public class Node<T, K> {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("Node{");
-        sb.append("id=").append(id);
-        sb.append(", #children=").append(children.size());
-        sb.append('}');
-        return sb.toString();
+        return format(
+                "Node{id=%s, #children=%d}",
+                id,
+                children.size());
     }
 }

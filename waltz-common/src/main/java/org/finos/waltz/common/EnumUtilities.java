@@ -72,6 +72,7 @@ public class EnumUtilities {
      * @param <T> Type of enum values
      * @return Set of names associated to the given enum
      */
+    @SafeVarargs
     public static <T extends Enum<?>> Set<String> names(T... enums) {
         return Stream
                 .of(enums)
