@@ -377,4 +377,144 @@
                           remarks="when was this application commissioned, null if unknown"/>
     </changeSet>
 
+
+    <changeSet id="20220224-5935-1"
+               author="davidwatkins73">
+        <setTableRemarks tableName="application_group"
+                         remarks="represents an ad-hoc collection of applications"/>
+        <setColumnRemarks tableName="application_group"
+                          columnName="name"
+                          remarks="display name for the group"/>
+        <setColumnRemarks tableName="application_group"
+                          columnName="kind"
+                          remarks="the type of group (one of: PUBLIC, PRIVATE).  Note, private groups can still be seen, they are merely unlisted in the UI"/>
+        <setColumnRemarks tableName="application_group"
+                          columnName="description"
+                          remarks="longer description of the group, supports markdown"/>
+        <setColumnRemarks tableName="application_group"
+                          columnName="external_id"
+                          remarks="external identifier, typically used when creating/syncing groups via external jobs"/>
+        <setColumnRemarks tableName="application_group"
+                          columnName="is_removed"
+                          remarks="flag indicating if the group has been deleted"/>
+        <setColumnRemarks tableName="application_group"
+                          columnName="is_favourite_group"
+                          remarks="a favourite group is assigned to each user to allow them to quickly bookmark apps and populate the change calendar on the homepage"/>
+    </changeSet>
+
+    <changeSet id="20220224-5935-2"
+               author="davidwatkins73">
+        <setTableRemarks tableName="application_group_entry"
+                         remarks="a reference to a specific application in a group"/>
+        <setColumnRemarks tableName="application_group_entry"
+                          columnName="group_id"
+                          remarks="reference to the group this entry belongs to"/>
+        <setColumnRemarks tableName="application_group_entry"
+                          columnName="application_id"
+                          remarks="reference to the application this entry refers to"/>
+        <setColumnRemarks tableName="application_group_entry"
+                          columnName="is_readonly"
+                          remarks="flag to indicate that the value is readonly.  Typically set if group entries are added by external jobs"/>
+        <setColumnRemarks tableName="application_group_entry"
+                          columnName="provenance"
+                          remarks="indicates where this record originated. Will be 'waltz' if created via the UI"/>
+        <setColumnRemarks tableName="application_group_entry"
+                          columnName="created_at"
+                          remarks="the date this entry was created, sometimes used to 'age' entries out the group, i.e. in exception lists"/>
+    </changeSet>
+
+    <changeSet id="20220224-5935-3"
+               author="davidwatkins73">
+        <setTableRemarks tableName="application_group_member"
+                         remarks="users granted viewer or ownership rights to app groups"/>
+        <setColumnRemarks tableName="application_group_member"
+                          columnName="group_id"
+                          remarks="reference to the group this member belongs to"/>
+        <setColumnRemarks tableName="application_group_member"
+                          columnName="user_id"
+                          remarks="reference to the user id of the group member"/>
+        <setColumnRemarks tableName="application_group_member"
+                          columnName="role"
+                          remarks="the role of the user in the group (one of: VIEWER, OWNER)"/>
+    </changeSet>
+
+    <changeSet id="20220224-5935-4"
+               author="davidwatkins73">
+        <setTableRemarks tableName="application_group_ou_entry"
+                         remarks="app groups can include reference to org units. Apps associated to the org unit are included in the group at runtime"/>
+        <setColumnRemarks tableName="application_group_ou_entry"
+                          columnName="group_id"
+                          remarks="reference to the group this entry belongs to"/>
+        <setColumnRemarks tableName="application_group_ou_entry"
+                          columnName="org_unit_id"
+                          remarks="reference to the org unit this entry belongs to"/>
+        <setColumnRemarks tableName="application_group_ou_entry"
+                          columnName="is_readonly"
+                          remarks="flag to indicate that the value is readonly.  Typically set if group entries are added by external jobs"/>
+        <setColumnRemarks tableName="application_group_ou_entry"
+                          columnName="provenance"
+                          remarks="indicates where this record originated. Will be 'waltz' if created via the UI"/>
+        <setColumnRemarks tableName="application_group_ou_entry"
+                          columnName="created_at"
+                          remarks="the date this entry was created"/>
+    </changeSet>
+
+
+    <changeSet id="20220224-5935-5"
+               author="davidwatkins73">
+        <setTableRemarks tableName="assessment_definition"
+                         remarks="assessments are used to record enumerated data points against apps. The definition describes each type of definition, linking to the applicable entity types and possible values."/>
+        <setColumnRemarks tableName="assessment_definition"
+                          columnName="name"
+                          remarks="display name for this assessment definition"/>
+        <setColumnRemarks tableName="assessment_definition"
+                          columnName="external_id"
+                          remarks="external identifier, typically used when external jobs are updating the associated ratings"/>
+        <setColumnRemarks tableName="assessment_definition"
+                          columnName="rating_scheme_id"
+                          remarks="reference to the rating scheme which provides the acceptable values for this assessment"/>
+        <setColumnRemarks tableName="assessment_definition"
+                          columnName="entity_kind"
+                          remarks="the kind of entity the assessment can be associated with (typically the _main_ entities: APPLICATION, CHANGE_INITIATIVE, etc"/>
+        <setColumnRemarks tableName="assessment_definition"
+                          columnName="description"
+                          remarks="longer description of this assessment.  Markdown is supported"/>
+        <setColumnRemarks tableName="assessment_definition"
+                          columnName="permitted_role"
+                          remarks="if defined, only users with this role can update the definition"/>
+        <setColumnRemarks tableName="assessment_definition"
+                          columnName="is_readonly"
+                          remarks="flag inidcating that the record is read only.  Typically set if the assessment values are mastered outside of Waltz and updated via an external job"/>
+        <setColumnRemarks tableName="assessment_definition"
+                          columnName="provenance"
+                          remarks="where this definition came from.  Will be 'waltz' if created via the UI"/>
+        <setColumnRemarks tableName="assessment_definition"
+                          columnName="visibility"
+                          remarks="indicates if this assessment should be included in the users primary, short-list by default (permissible values are: PRIMARY, SECONDARY).  Note: users are free to remove assessments from their short lists."/>
+    </changeSet>
+
+    <changeSet id="20220224-5935-6"
+               author="davidwatkins73">
+        <setTableRemarks tableName="assessment_rating"
+                         remarks="an individual rating, linking an entity (e.g. app) to an assessment and value"/>
+        <setColumnRemarks tableName="assessment_rating"
+                          columnName="entity_kind"
+                          remarks="the entity kind of the entity being assessed and rated (typically APPLICATION or CHANGE_INITIATVE)"/>
+        <setColumnRemarks tableName="assessment_rating"
+                          columnName="entity_id"
+                          remarks="the entity id of the entity being assessed and rated"/>
+        <setColumnRemarks tableName="assessment_rating"
+                          columnName="assessment_definition_id"
+                          remarks="reference to the assessment definition being assessed for this rating record"/>
+        <setColumnRemarks tableName="assessment_rating"
+                          columnName="rating_id"
+                          remarks="reference to the rating scheme item, providing the value of this assessment rating. Note: this should be one of the scheme items defined within the rating scheme of the assessment definition"/>
+        <setColumnRemarks tableName="assessment_rating"
+                          columnName="description"
+                          remarks="optional user provided comment"/>
+        <setColumnRemarks tableName="assessment_rating"
+                          columnName="provenance"
+                          remarks="where this rating came from.  Will be 'waltz' if created via the UI"/>
+    </changeSet>
+
 </databaseChangeLog>
