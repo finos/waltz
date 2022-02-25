@@ -16,7 +16,7 @@ However, in this post we wish to focus on how we are improving our documentation
 
 # Database documentation
 
-## Liquibase
+### Liquibase
 
 Beginning in Waltz 1.40 we are adding table and columns level documentation to our database definitions.  To add this documentation we will be using two features of [Liquibase](https://liquibase.org/):
 
@@ -31,7 +31,7 @@ Liquibase transforms these commands to the appropriate dbms specific statements.
 
 ![table](/blog/assets/images/database-remarks/table.png)
 
-## jOOQ Codegen
+### jOOQ Codegen
 
 One unexpected benefit of documenting our database objects is that [jOOQ](https://www.jooq.org/) is taking the table and column docs and including them in the generated code.    
 
@@ -44,7 +44,7 @@ As you can see this will be a great help in the dev process, especially when dea
 
 The above screenshots were taken whilst working on the issue:  [Entity Hierarchy: show level of both ancestor and descendant node #5916](https://github.com/finos/waltz/issues/5916).  This issue adds a new (non-nullable) column to our entity hierarchy table to represent the level of the descendant node.  We wished to ensure that Waltz correctly updates this column for any pre-existing data.  The update is performed by another Liquibase task which can run arbitrary sql.  However, the syntax of the update statements varies between database vendors so we need a few variants of the statement (these appropriate variant is selected by Liquibase  via the `dbms` attribute on _changesets_).  
 
-## jOOQ Translate
+### jOOQ Translate
  
 Luckily the jOOQ website has a [superb page](https://www.jooq.org/translate/) which translates SQL statement written in one dialect to another.  Keen to give this a try we wrote the migration script for Postgres (1) and requested a translation to SQL Server (2).  We quickly tested the resultant statement to ensure it worked and included it in our liquibase script.   
 
