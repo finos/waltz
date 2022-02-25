@@ -20,6 +20,8 @@ import {initialiseData} from "../common";
 import {CORE_API} from "../common/services/core-api-utils";
 import template from "./orphans-view.html";
 import toasts from "../svelte-stores/toast-store";
+import {involvementStore} from "../svelte-stores/involvement-store";
+import {entity} from "../common/services/enums/entity";
 
 const initialState = {
     orphans: [],
@@ -27,8 +29,8 @@ const initialState = {
 
 
 function controller($q,
-                    orphanStore,
-                    serviceBroker) {
+                    serviceBroker,
+                    orphanStore) {
 
     const vm = initialiseData(this, initialState);
 
@@ -40,7 +42,8 @@ function controller($q,
 
     const loadOrphans = () => {
         $q
-            .all([orphanStore.findAppsWithNonExistentOrgUnits(),
+            .all([
+                orphanStore.findAppsWithNonExistentOrgUnits(),
                 orphanStore.findOrphanMeasurableRatings(),
                 orphanStore.findOrphanFlowClassificationRulesByOrgUnit(),
                 orphanStore.findOrphanFlowClassificationRulesByApp(),
@@ -65,17 +68,51 @@ function controller($q,
                     {description: "Application Measurable Ratings mapping to non-existent Measurables or Apps", values: measurableRatings},
                     {description: "Flow Classification Rules with non-existent Org Unit", values: authSourcesByOrgUnit},
                     {description: "Flow Classification Rules with non-existent Application", values: authSourcesByApp},
-                    {description: "Flow Classification Rules with non-existent Data Type", values: authSourcesByDataType},
+                    {
+                        description: "Flow Classification Rules with non-existent Data Type",
+                        values: authSourcesByDataType
+                    },
                     {description: "Change Initiatives with non-existent parent", values: changeInitiatives},
                     {description: "Logical Flows referencing non-existent applications", values: logicalFlows},
-                    {description: "Physical Flows referencing non-existent logical flows or specifications", values: physicalFlows},
+                    {
+                        description: "Physical Flows referencing non-existent logical flows or specifications",
+                        values: physicalFlows
+                    },
                     {description: "Attestations referencing non-existent applications", values: attestations}
                 ];
             });
 
     };
 
+    const loadInvolvementOrphanCounts = () => {
+
+        const eudaPromise = serviceBroker
+            .loadViewData(CORE_API.InvolvementStore
+                .countOrphanInvolvementsForKind, [entity.END_USER_APPLICATION.key]);
+
+        const ciPromise = serviceBroker
+            .loadViewData(CORE_API.InvolvementStore
+                .countOrphanInvolvementsForKind, [entity.CHANGE_INITIATIVE.key]);
+
+        $q
+            .all([eudaPromise, ciPromise])
+            .then(([endUserAppCount, changeInitiativeCount]) => {
+                vm.involvementOrphanCounts = [
+                    {
+                        description: "Involvements referencing non-existent end user applications",
+                        count: endUserAppCount.data
+                    },
+                    {
+                        description: "Involvements referencing non-existent change initiatives",
+                        count: changeInitiativeCount.data
+                    }
+                ];
+            });
+
+    };
+
     loadOrphans();
+    loadInvolvementOrphanCounts();
 
     vm.cleanupLogicalFlows = () => {
         serviceBroker
@@ -104,18 +141,26 @@ function controller($q,
             .then(r => toasts.success(`Cleaned up ${r.data} auth sources/s`));
     };
 
+
     vm.cleanupAttestations = () => {
         serviceBroker
             .execute(CORE_API.AttestationInstanceStore.cleanupOrphans, [])
             .then(r => toasts.success(`Cleaned up ${r.data} attestations/s`));
+    };
+
+
+    vm.cleanupInvolvements = (entityKind) => {
+        serviceBroker
+            .execute(CORE_API.InvolvementStore.cleanupOrphansForKind, [entityKind])
+            .then(r => toasts.success(`Cleaned up ${r.data} change initiative involvement/s`));
     };
 }
 
 
 controller.$inject = [
     "$q",
-    "OrphanStore",
-    "ServiceBroker"
+    "ServiceBroker",
+    "OrphanStore"
 ];
 
 

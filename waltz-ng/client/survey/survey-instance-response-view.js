@@ -20,6 +20,8 @@ import {initialiseData} from "../common";
 import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
 import template from "./survey-instance-response-view.html";
 import SurveyViewer from "./components/svelte/inline-panel/SurveyViewer.svelte"
+import {CORE_API} from "../common/services/core-api-utils";
+import _ from "lodash";
 
 
 const initialState = {
@@ -28,7 +30,7 @@ const initialState = {
 };
 
 
-function controller($stateParams) {
+function controller($stateParams, historyStore, serviceBroker) {
 
     const vm = initialiseData(this, initialState);
     const id = $stateParams.id;
@@ -37,11 +39,41 @@ function controller($stateParams) {
         id,
         kind: "SURVEY_INSTANCE"
     };
+
+    vm.$onInit = () => {
+        serviceBroker
+            .loadViewData(CORE_API.SurveyInstanceViewStore.getById, [id])
+            .then(result => {
+                const surveyInstanceInfo = result.data;
+                addToHistory(historyStore, surveyInstanceInfo)
+            });
+    }
+
 }
+
+function determineName(surveyInstance) {
+    return _.get(surveyInstance, ["surveyInstance", "surveyEntity", "name"], "Unknown")
+        + " - "
+        + _.get(surveyInstance, ["surveyRun", "name"], "Survey");
+}
+
+
+const addToHistory = (historyStore, surveyInstance) => {
+    if (!surveyInstance) {
+        return;
+    }
+    historyStore.put(
+        determineName(surveyInstance),
+        "SURVEY_INSTANCE",
+        "main.survey.instance.response.view",
+        {id: surveyInstance.surveyInstance.id});
+};
 
 
 controller.$inject = [
     "$stateParams",
+    "HistoryStore",
+    "ServiceBroker"
 ];
 
 

@@ -3,11 +3,19 @@ import {remote} from "./remote";
 
 export function mkAssessmentDefinitionStore() {
     const loadAll = (force) => remote
-        .fetchViewList(
+        .fetchAppList(
             "GET",
-            `api/assessment-definition`,
+            "api/assessment-definition",
             null,
             {force});
+
+    const getById = (id, force) => remote
+        .fetchViewDatum(
+            "GET",
+            `api/assessment-definition/id/${id}`,
+            null,
+            {force});
+
     const save = (def) => remote
         .execute(
             "PUT",
@@ -21,6 +29,7 @@ export function mkAssessmentDefinitionStore() {
 
     return {
         loadAll,
+        getById,
         save,
         remove,
     };

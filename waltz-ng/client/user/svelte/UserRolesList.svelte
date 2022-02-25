@@ -118,7 +118,7 @@
             </tr>
             </thead>
             <tbody>
-            {#each displayedRoles as role}
+            {#each _.orderBy(displayedRoles, d => _.toLower(d.name)) as role}
                 <tr>
                     <td>
                         <input type="checkbox"

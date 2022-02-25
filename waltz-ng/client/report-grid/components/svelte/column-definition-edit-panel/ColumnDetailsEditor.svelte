@@ -5,7 +5,7 @@
     import Icon from "../../../../common/svelte/Icon.svelte";
     import {columnDefs, selectedGrid} from "../report-grid-store";
     import {sameRef} from "../../../../common/entity-utils";
-    import DescriptionFade from "../../../../common/svelte/DescriptionFade.svelte";
+    import ColumnDefinitionHeader from "./ColumnDefinitionHeader.svelte";
 
     export let column;
     export let onCancel = () => console.log("Close");
@@ -28,7 +28,8 @@
 
     function selectRollupKind(rollupKind, column) {
         const originalColumn = _.find($selectedGrid.definition.columnDefinitions, d => sameColumnRef(d, column));
-        const newColumn = Object.assign({},
+        const newColumn = Object.assign(
+            {},
             column,
             {
                 ratingRollupRule: rollupKind?.key,
@@ -40,7 +41,8 @@
 
     function updateDisplayName(workingDisplayName, column) {
         const originalColumn = _.find($selectedGrid.definition.columnDefinitions, d => sameColumnRef(d, column));
-        const newColumn = Object.assign({},
+        const newColumn = Object.assign(
+            {},
             column,
             {
                 displayName: workingDisplayName,
@@ -71,10 +73,10 @@
         <col width="50%">
     </colgroup>
     <tbody>
-        <tr>
-            <td>
-                <div>Usage Kind</div>
-                <div class="small help-text">
+    <tr>
+        <td>
+            <div>Usage Kind</div>
+            <div class="small help-text">
                     Select summary for columns to appear in the filter list.
                 </div>
             </td>

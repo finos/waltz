@@ -65,6 +65,8 @@ public class InvolvementEndpoint implements Endpoint {
 
         String findBySelectorPath = mkPath(BASE_URL, "selector", "involvement");
         String findPeopleBySelectorPath = mkPath(BASE_URL, "selector", "people");
+        String countOrphanInvolvementsForKindPath = mkPath(BASE_URL, "entity-kind", ":kind", "orphan-count");
+        String cleanupInvalidInvolvementsForEntityPath = mkPath(BASE_URL, "entity-kind", ":kind", "cleanup-orphans");
 
         String updateForEntityRefPath = mkPath(BASE_URL, "entity", ":kind", ":id");
 
@@ -73,7 +75,7 @@ public class InvolvementEndpoint implements Endpoint {
             return service.findByEmployeeId(employeeId);
         };
 
-        ListRoute<Application>  findDirectAppsByEmployeeRoute = (request, response) -> {
+        ListRoute<Application> findDirectAppsByEmployeeRoute = (request, response) -> {
             String employeeId = request.params("employeeId");
             return service.findDirectApplicationsByEmployeeId(employeeId);
         };
@@ -93,14 +95,24 @@ public class InvolvementEndpoint implements Endpoint {
             return service.findByGenericEntitySelector(selectionOptions);
         };
 
-        ListRoute<Person>  findPeopleByEntityRefRoute = (request, response) -> {
+        ListRoute<Person> findPeopleByEntityRefRoute = (request, response) -> {
             EntityReference entityReference = getEntityReference(request);
             return service.findPeopleByEntityReference(entityReference);
         };
 
-        ListRoute<Person>  findPeopleBySelectorRoute = (request, response) -> {
+        ListRoute<Person> findPeopleBySelectorRoute = (request, response) -> {
             IdSelectionOptions selectionOptions = readIdSelectionOptionsFromBody(request);
             return service.findPeopleByGenericEntitySelector(selectionOptions);
+        };
+
+        DatumRoute<Integer> countOrphanInvolvementsForKindRoute = (request, response) -> {
+            EntityKind kind = getKind(request);
+            return service.countOrphanInvolvementsForKind(kind);
+        };
+
+        DatumRoute<Integer> cleanupInvalidInvolvementsForKindRoute = (request, response) -> {
+            EntityKind kind = getKind(request);
+            return service.cleanupInvolvementsForKind(getUsername(request), kind);
         };
 
         DatumRoute<Boolean> updateForEntityRefRoute = (request, response) -> updateEntityInvolvement(request);
@@ -109,8 +121,10 @@ public class InvolvementEndpoint implements Endpoint {
         getForList(findDirectAppsByEmployeePath, findDirectAppsByEmployeeRoute);
         getForList(findAllAppsByEmployeePath, findAllAppsByEmployeeRoute);
         getForList(findByEntityRefPath, findByEntityRefRoute);
+        getForDatum(countOrphanInvolvementsForKindPath, countOrphanInvolvementsForKindRoute);
         postForList(findBySelectorPath, findBySelectorRoute);
         getForList(findPeopleByEntityRefPath, findPeopleByEntityRefRoute);
+        deleteForDatum(cleanupInvalidInvolvementsForEntityPath, cleanupInvalidInvolvementsForKindRoute);
         postForList(findPeopleBySelectorPath, findPeopleBySelectorRoute);
         postForDatum(updateForEntityRefPath, updateForEntityRefRoute);
     }

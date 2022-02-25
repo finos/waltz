@@ -6,12 +6,13 @@
     export let entityKinds;
     export let placeholder = "Search...";
     export let showClear = true;
+    export let selectionFilter = () => true;
 
     const dispatch = createEventDispatcher();
 
     async function search(qry){
         const response = await entitySearchStore.search(qry, entityKinds);
-        return response.data;
+        return _.filter(response.data, selectionFilter);
     }
 
     let selectedItem = null;
