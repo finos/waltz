@@ -111,13 +111,13 @@ const unknownRating = {
 };
 
 
-export function mkPropNameForRef(ref) {
-    return `${ref.kind}_${ref.id}`;
+export function mkPropNameForColumnDefinition(columnDefn) {
+    return `${columnDefn.columnEntityKind}/${columnDefn.columnEntityId}/${_.get(columnDefn.entityFieldReference, ["id"], null)}`;
 }
 
 
 export function mkPropNameForCellRef(x) {
-    return `${x.columnEntityKind}_${x.columnEntityId}`;
+    return `${x.columnEntityKind}/${x.columnEntityId}/${x.entityFieldReferenceId}`;
 }
 
 
@@ -132,15 +132,34 @@ function initialiseDataForRow(application, columnRefs) {
 }
 
 
+export function getDisplayNameForColumn(c) {
+
+    let entityFieldName = _.get(c, ["entityFieldReference", "displayName"], null);
+
+    if (c.displayName != null) {
+        return c.displayName;
+
+    } else {
+        return _.chain([])
+            .concat(entityFieldName)
+            .concat(c.columnName)
+            .compact()
+            .join(" / ")
+            .value();
+    }
+
+}
+
+
 export function prepareColumnDefs(gridData) {
     const colDefs = _.get(gridData, ["definition", "columnDefinitions"], []);
 
-    const mkColumnCustomProps = (c) =>  {
-        switch (c.columnEntityReference.kind) {
+    const mkColumnCustomProps = (c) => {
+        switch (c.columnEntityKind) {
             case "COST_KIND":
                 return {
                     allowSummary: false,
-                    cellTemplate:`
+                    cellTemplate: `
                         <div class="waltz-grid-report-cell"
                              style="text-align: right"
                              ng-style="{
@@ -150,11 +169,13 @@ export function prepareColumnDefs(gridData) {
                         </div>`
                 };
             case "INVOLVEMENT_KIND":
+            case "SURVEY_TEMPLATE":
+            case "APPLICATION":
             case "SURVEY_QUESTION":
                 return {
                     allowSummary: false,
                     width: 150,
-                    toSearchTerm: d => _.get(d, [mkPropNameForRef(c.columnEntityReference), "text"], ""),
+                    toSearchTerm: d => _.get(d, [mkPropNameForColumnDefinition(c), "text"], ""),
                     cellTemplate: `
                         <div class="waltz-grid-report-cell"
                              uib-popover-html="COL_FIELD.comment"
@@ -163,8 +184,8 @@ export function prepareColumnDefs(gridData) {
                              popover-popup-delay="500"
                              popover-append-to-body="true"
                              popover-placement="left"
-                             ng-class="{'wgrc-involvement-cell': COL_FIELD.text && ${c.columnEntityReference.kind === "INVOLVEMENT_KIND"},
-                                        'wgrc-survey-question-cell': COL_FIELD.text && ${c.columnEntityReference.kind === "SURVEY_QUESTION"},
+                             ng-class="{'wgrc-involvement-cell': COL_FIELD.text && ${c.columnEntityKind === "INVOLVEMENT_KIND"},
+                                        'wgrc-survey-question-cell': COL_FIELD.text && ${c.columnEntityKind === "SURVEY_QUESTION"},
                                         'wgrc-no-data-cell': !COL_FIELD.text}"
                              ng-style="{
                                 'border-bottom-right-radius': COL_FIELD.comment ? '15% 50%' : 0,
@@ -178,7 +199,7 @@ export function prepareColumnDefs(gridData) {
             default:
                 return {
                     allowSummary: true,
-                    toSearchTerm: d => _.get(d, [mkPropNameForRef(c.columnEntityReference), "name"], ""),
+                    toSearchTerm: d => _.get(d, [mkPropNameForColumnDefinition(c), "name"], ""),
                     cellTemplate:
                         `<div class="waltz-grid-report-cell"
                               ng-bind="COL_FIELD.name"
@@ -202,11 +223,11 @@ export function prepareColumnDefs(gridData) {
         .map(c => {
             return Object.assign(
                 {
-                    field: mkPropNameForRef(c.columnEntityReference),
-                    displayName: c.displayName || c.columnEntityReference.name,
+                    field: mkPropNameForColumnDefinition(c),
+                    displayName: getDisplayNameForColumn(c),
                     columnDef: c,
                     width: 100,
-                    headerTooltip: c.columnEntityReference.description,
+                    headerTooltip: c.columnDescription,
                     enableSorting: false
                 },
                 mkColumnCustomProps(c));
@@ -249,7 +270,7 @@ export function prepareTableData(gridData) {
         .value();
 
     const colDefs = _.get(gridData, ["definition", "columnDefinitions"], []);
-    const columnRefs = _.map(colDefs, c => mkPropNameForRef(c.columnEntityReference));
+    const columnRefs = _.map(colDefs, c => mkPropNameForColumnDefinition(c));
 
     const costColorScalesByColumnEntityId = _
         .chain(gridData.instance.cellData)
@@ -261,13 +282,16 @@ export function prepareTableData(gridData) {
         .value();
 
     function mkTableCell(x) {
-        switch(x.columnEntityKind) {
+        switch (x.columnEntityKind) {
             case "COST_KIND":
                 const color = costColorScalesByColumnEntityId[x.columnEntityId](x.value);
                 return {
                     color: color,
-                    value: x.value };
+                    value: x.value
+                };
             case "INVOLVEMENT_KIND":
+            case "SURVEY_TEMPLATE":
+            case "APPLICATION":
             case "SURVEY_QUESTION":
                 return {
                     text: x.text,
@@ -334,7 +358,7 @@ export function refreshSummaries(tableData, columnDefinitions, ratingSchemeItems
     };
 
     const ratingSchemeItemsById = _.keyBy(ratingSchemeItems, d => d.id);
-    const columnsByRef = _.keyBy(columnDefinitions, d => mkPropNameForRef(d.columnEntityReference));
+    const columnsByRef = _.keyBy(columnDefinitions, d => mkPropNameForColumnDefinition(d));
 
     return _
         .chain(tableData)
@@ -357,7 +381,7 @@ export function refreshSummaries(tableData, columnDefinitions, ratingSchemeItems
         }))
         .orderBy([  // order the summaries so they reflect the column order
             d => d.column.position,
-            d => d.column.columnEntityReference.name
+            d => d.column.columnName
         ])
         .value();
 }
@@ -381,4 +405,11 @@ export function mkRowFilter(filters = []) {
             const propRating = _.get(td, [prop, "id"], null);
             return _.some(filtersForProp, f => propRating === f.ratingId);
         });
+}
+
+
+export function sameColumnRef(v1, v2) {
+    return v1?.columnEntityKind === v2?.columnEntityKind
+        && v1?.columnEntityId === v2?.columnEntityId
+        && v1?.entityFieldReference?.id === v2?.entityFieldReference?.id;
 }
