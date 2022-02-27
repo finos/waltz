@@ -517,4 +517,88 @@
                           remarks="where this rating came from.  Will be 'waltz' if created via the UI"/>
     </changeSet>
 
+    <changeSet id="20220226-5935-7"
+               author="davidwatkins73">
+        <setTableRemarks tableName="attestation_instance"
+                         remarks="a specific attestation of an entity for a particular kind (e.g. an APPLICATION for LOGICAL_FLOWs)"/>
+        <setColumnRemarks tableName="attestation_instance"
+                          columnName="attestation_run_id"
+                          remarks="reference to the attestation run which owns this instance"/>
+        <setColumnRemarks tableName="attestation_instance"
+                          columnName="parent_entity_id"
+                          remarks="the identifier of the entity being attested"/>
+        <setColumnRemarks tableName="attestation_instance"
+                          columnName="parent_entity_kind"
+                          remarks="the type of entity being attested"/>
+        <setColumnRemarks tableName="attestation_instance"
+                          columnName="attested_at"
+                          remarks="the date/time the attestation occured"/>
+        <setColumnRemarks tableName="attestation_instance"
+                          columnName="attested_by"
+                          remarks="who initiated the attestation"/>
+        <setColumnRemarks tableName="attestation_instance"
+                          columnName="attested_entity_kind"
+                          remarks="what was being attested for the parent entity (typically: MEASURABLE, LOGICAL_FLOW, PHYSICAL_FLOW)"/>
+    </changeSet>
+
+    <changeSet id="20220226-5935-8"
+               author="davidwatkins73">
+        <setTableRemarks tableName="attestation_instance_recipient"
+                         remarks="associates an attestation instance to a user who is responsible for doing the attestation"/>
+        <setColumnRemarks tableName="attestation_instance_recipient"
+                          columnName="attestation_instance_id"
+                          remarks="reference to the attestation instance"/>
+        <setColumnRemarks tableName="attestation_instance_recipient"
+                          columnName="user_id"
+                          remarks="the user responsible for doing the attestations"/>
+    </changeSet>
+
+    <changeSet id="20220226-5935-9"
+               author="davidwatkins73">
+        <setTableRemarks tableName="attestation_run"
+                         remarks="an attestation run defines the parameters needed to orchestrate an attestation cycle against multiple entities"/>
+        <setColumnRemarks tableName="attestation_run"
+                          columnName="target_entity_kind"
+                          remarks="the kind of entities which are being attested (i.e. APPLICATION or CHANGE_INITIAIVE)"/>
+        <setColumnRemarks tableName="attestation_run"
+                          columnName="name"
+                          remarks="display name for the run"/>
+        <setColumnRemarks tableName="attestation_run"
+                          columnName="description"
+                          remarks="descriptive text for the run. Markdown is supported"/>
+        <setColumnRemarks tableName="attestation_run"
+                          columnName="selector_entity_kind"
+                          remarks="the selector defines which entity is used to derive the set of entities (e.g. apps) being attested. This is the kind of that selector entity (e.g. ORG_UNIT)"/>
+        <setColumnRemarks tableName="attestation_run"
+                          columnName="selector_entity_id"
+                          remarks="the selector defines which entity is used to derive the set of entities (e.g. apps) being attested. This is the id of that selector entity (e.g. 32)"/>
+        <setColumnRemarks tableName="attestation_run"
+                          columnName="selector_hierarchy_scope"
+                          remarks="if the selector points at a hierarchical entity, this part indicates whether to match against EXACT, CHILDREN, or PARENT entities"/>
+        <setColumnRemarks tableName="attestation_run"
+                          columnName="involvement_kind_ids"
+                          remarks="attestation instances are issued against individuals via their involvement roles. This is a delimited list containing the involvement_kind identifiers"/>
+        <setColumnRemarks tableName="attestation_run"
+                          columnName="issued_by"
+                          remarks="user id of the issuer"/>
+        <setColumnRemarks tableName="attestation_run"
+                          columnName="issued_on"
+                          remarks="the date the attestation was issued"/>
+        <setColumnRemarks tableName="attestation_run"
+                          columnName="due_date"
+                          remarks="the date the attestations should be completed by"/>
+        <setColumnRemarks tableName="attestation_run"
+                          columnName="attested_entity_kind"
+                          remarks="indicates what releated entity is being attestated for the target entity kind.  e.g. LOGICAL_FLOW, MEASURABLE_CATEGORY"/>
+        <setColumnRemarks tableName="attestation_run"
+                          columnName="attested_entity_id"
+                          remarks="if the attested entity kind needs a qualifier then this optional identifier provides that (e.g. category 12)"/>
+        <setColumnRemarks tableName="attestation_run"
+                          columnName="status"
+                          remarks="status of the attestation run (one of: DRAFT, PENDING, ISSUING, ISSUED, INVALID)"/>
+        <setColumnRemarks tableName="attestation_run"
+                          columnName="provenance"
+                          remarks="where this run came from.  Will be 'waltz' if created via the UI"/>
+    </changeSet>
+
 </databaseChangeLog>
