@@ -7,7 +7,7 @@ body:
     attributes:
       label: Description
       description: "Please be as specific as possible to help us answer your questions"
-      placeholder: "e.g.: refresh java libs, update build etc."
+      placeholder: "e.g.: how do I ... ? , does Waltz support ... ?"
     validations:
       required: true
   
