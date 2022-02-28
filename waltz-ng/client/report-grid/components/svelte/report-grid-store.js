@@ -32,16 +32,19 @@ export let usageKindChanged = derived(columnDefs, ($columnDefs) => {
 });
 
 export let ratingRollupRuleChanged = derived(columnDefs,
-    ($columnDefs) =>  _.some($columnDefs, d => d.ratingRollupRuleChanged));
+    ($columnDefs) => _.some($columnDefs, d => d.ratingRollupRuleChanged));
+
+export let displayNameChanged = derived(columnDefs,
+    ($columnDefs) => _.some($columnDefs, d => d.displayNameChanged));
 
 export let positionChanged = derived(columnDefs, ($columnDefs) => {
-    return  _.some($columnDefs, d => d.originalPosition && d.originalPosition !== d.position);
+    return _.some($columnDefs, d => d.originalPosition && d.originalPosition !== d.position);
 });
 
 export let hasChanged = derived(
-    [columnsChanged, usageKindChanged, ratingRollupRuleChanged, positionChanged],
-    ([$columnsChanged, $usageKindChanged, $ratingRollupRuleChanged, $positionChanged]) => {
-        return $columnsChanged || $usageKindChanged || $ratingRollupRuleChanged || $positionChanged;
+    [columnsChanged, usageKindChanged, ratingRollupRuleChanged, displayNameChanged, positionChanged],
+    ([$columnsChanged, $usageKindChanged, $ratingRollupRuleChanged, $displayNameChanged, $positionChanged]) => {
+        return $columnsChanged || $usageKindChanged || $ratingRollupRuleChanged || $displayNameChanged || $positionChanged;
     })
 
 export const summaries = derived([selectedGrid, filters], ([$selectedGrid, $filters]) => {

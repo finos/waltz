@@ -22,7 +22,20 @@
     $: questionsCall = selectedTemplate && surveyQuestionStore.findQuestionsForTemplate(selectedTemplate?.id)
     $: questions = $questionsCall?.data || [];
 
-    $: rowData = _.filter(questions, selectionFilter)
+    $: rowData = _
+        .chain(questions)
+        .map(d => Object.assign(
+            {},
+            d,
+            {
+                columnEntityId: d.id,
+                columnEntityKind: d.kind,
+                entityFieldReference: null,
+                columnName: d.questionText,
+                displayName: null
+            }))
+        .filter(selectionFilter)
+        .value()
 
     const columnDefs = [
         {field: "questionText", name: "Question", width: "40%"},

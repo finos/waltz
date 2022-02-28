@@ -16,6 +16,5 @@ public abstract class ReportGridInstance {
     public abstract Set<ReportSubject> subjects();  // rows
 
     public abstract Set<RatingSchemeItem> ratingSchemeItems();  // color scheme
-
     public abstract Set<ReportGridCell> cellData();  // raw cell data
 }

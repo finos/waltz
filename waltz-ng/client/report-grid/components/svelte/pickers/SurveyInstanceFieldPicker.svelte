@@ -34,6 +34,7 @@
                 columnEntityKind: entity.SURVEY_TEMPLATE.key,
                 entityFieldReference: d,
                 columnName: selectedTemplate?.name,
+                displayName: null
             }))
         .orderBy(d => d.displayName)
         .value();
@@ -41,8 +42,8 @@
     $: rowData = _.filter(fieldReferences, selectionFilter)
 
     const columnDefs = [
-        {field: "displayName", name: "Field", width: "30%"},
-        {field: "description", name: "Description", width: "70%"},
+        {field: "entityFieldReference.displayName", name: "Field", width: "30%"},
+        {field: "entityFieldReference.description", name: "Description", width: "70%"},
     ];
 
     const templateColumnDefs = [

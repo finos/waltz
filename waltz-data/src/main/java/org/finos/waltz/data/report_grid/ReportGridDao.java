@@ -430,14 +430,13 @@ public class ReportGridDao {
                     fetchCostData(genericSelector, requiredCostKinds),
                     fetchInvolvementData(genericSelector, requiredInvolvementKinds),
                     fetchSurveyQuestionResponseData(genericSelector, requiredSurveyQuestionIds),
-                    fetchSurveyFieldReferenceData(appSelector, requiredSurveyTemplateIds),
-                    fetchApplicationFieldReferenceData(appSelector, requiredApplicationColumns));
-            ;
+                    fetchSurveyFieldReferenceData(genericSelector, requiredSurveyTemplateIds),
+                    fetchApplicationFieldReferenceData(genericSelector, requiredApplicationColumns));
         }
     }
 
 
-    public Set<ReportGridCell> fetchApplicationFieldReferenceData(Select<Record1<Long>> appSelector,
+    public Set<ReportGridCell> fetchApplicationFieldReferenceData(GenericSelector selector,
                                                                   Set<Tuple2<ReportGridColumnDefinition, EntityFieldReference>> requiredApplicationColumns) {
 
         if (requiredApplicationColumns.size() == 0) {
@@ -453,7 +452,7 @@ public class ReportGridDao {
             return dsl
                     .select(APPLICATION.fields())
                     .from(APPLICATION)
-                    .where(APPLICATION.ID.in(appSelector))
+                    .where(APPLICATION.ID.in(selector.selector()))
                     .fetch()
                     .stream()
                     .flatMap(appRecord -> fields
@@ -469,7 +468,7 @@ public class ReportGridDao {
 
                                 return ImmutableReportGridCell
                                         .builder()
-                                        .applicationId(appRecord.get(APPLICATION.ID))
+                                        .subjectId(appRecord.get(APPLICATION.ID))
                                         .columnEntityId(colDefn.columnEntityId())
                                         .columnEntityKind(EntityKind.APPLICATION)
                                         .text(String.valueOf(value))
@@ -482,7 +481,7 @@ public class ReportGridDao {
     }
 
 
-    public Set<ReportGridCell> fetchSurveyFieldReferenceData(Select<Record1<Long>> appSelector,
+    public Set<ReportGridCell> fetchSurveyFieldReferenceData(GenericSelector selector,
                                                              Set<Tuple2<ReportGridColumnDefinition, EntityFieldReference>> surveyInstanceInfo) {
         if (surveyInstanceInfo.size() == 0) {
             return emptySet();
@@ -500,9 +499,10 @@ public class ReportGridDao {
                     .select(SURVEY_RUN.SURVEY_TEMPLATE_ID)
                     .from(SURVEY_INSTANCE)
                     .innerJoin(SURVEY_RUN).on(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(SURVEY_RUN.ID))
-                    .where(SURVEY_INSTANCE.ENTITY_ID.in(appSelector)
-                            .and(SURVEY_RUN.SURVEY_TEMPLATE_ID.in(surveyTemplateIds)
-                                    .and(SURVEY_INSTANCE.ORIGINAL_INSTANCE_ID.isNull())));
+                    .where(SURVEY_INSTANCE.ENTITY_ID.in(selector.selector())
+                            .and(SURVEY_INSTANCE.ENTITY_KIND.eq(selector.kind().name())
+                                    .and(SURVEY_RUN.SURVEY_TEMPLATE_ID.in(surveyTemplateIds)
+                                            .and(SURVEY_INSTANCE.ORIGINAL_INSTANCE_ID.isNull()))));
 
             return qry
                     .fetch()
@@ -522,7 +522,7 @@ public class ReportGridDao {
 
                                     return ImmutableReportGridCell
                                             .builder()
-                                            .applicationId(surveyRecord.get(SURVEY_INSTANCE.ENTITY_ID))
+                                            .subjectId(surveyRecord.get(SURVEY_INSTANCE.ENTITY_ID))
                                             .columnEntityId(templateId)
                                             .columnEntityKind(EntityKind.SURVEY_TEMPLATE)
                                             .text(String.valueOf(value))

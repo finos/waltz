@@ -32,10 +32,11 @@
             columnEntityKind: d.columnEntityKind,
             entityFieldReference: d.entityFieldReference,
             columnName: d.columnName,
-            columnDescription: d.columnDesciption,
+            columnDescription: d.columnDescription,
             usageKind: columnUsageKind.NONE.key,
             ratingRollupRule: determineDefaultRollupRule(d).key,
-            position: 0,
+            displayName: d.displayName,
+            position: 0
         };
 
         const newList = _.concat(
@@ -102,8 +103,7 @@
                 const assessmentAllowableForThisGrid = _.get(d, ["entityKind"]) === $selectedGrid?.definition?.subjectKind;
                 return notAlreadyAdded && assessmentAllowableForThisGrid;
             case entity.SURVEY_TEMPLATE.key:
-                const templateAllowableForThisGrid = _.get(d, ["targetEntityKind"]) === $selectedGrid?.definition?.subjectKind;
-                return templateAllowableForThisGrid;
+                return _.get(d, ["targetEntityKind"]) === $selectedGrid?.definition?.subjectKind;
             default:
                 return notAlreadyAdded;
         }

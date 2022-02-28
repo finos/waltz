@@ -24,6 +24,7 @@
                 columnEntityKind: entity.APPLICATION.key,
                 entityFieldReference: d,
                 columnName: entity.APPLICATION.name,
+                displayName: null
             }))
         .value();
 
@@ -34,8 +35,8 @@
         .value();
 
     const columnDefs = [
-        {field: "displayName", name: "Field", width: "30%"},
-        {field: "description", name: "Description", width: "70%"},
+        {field: "entityFieldReference.displayName", name: "Field", width: "30%"},
+        {field: "entityFieldReference.description", name: "Description", width: "70%"},
     ];
 
 </script>

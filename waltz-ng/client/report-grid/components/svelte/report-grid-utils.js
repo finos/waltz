@@ -130,20 +130,22 @@ function initialiseDataForRow(subject, columnRefs) {
 }
 
 
-export function getDisplayNameForColumn(c) {
-
+export function getColumnName(c) {
     let entityFieldName = _.get(c, ["entityFieldReference", "displayName"], null);
 
+    return _.chain([])
+        .concat(entityFieldName)
+        .concat(c.columnName)
+        .compact()
+        .join(" / ")
+        .value();
+}
+
+export function getDisplayNameForColumn(c) {
     if (c.displayName != null) {
         return c.displayName;
-
     } else {
-        return _.chain([])
-            .concat(entityFieldName)
-            .concat(c.columnName)
-            .compact()
-            .join(" / ")
-            .value();
+        return getColumnName(c);
     }
 
 }
