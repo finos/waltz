@@ -8,10 +8,10 @@ Logical flows represent the existance of a data flow between two entities  (curr
 ![Schema Diagram](images/logical_flows_schema.png)
 [Source](https://app.quickdatabasediagrams.com/#/schema/v2wanPo1hUWpGz0Uk9j2Jg)
 
-### Logical FLow
+### Logical Flow
 
-|Column|Type|Description|
-|--|--|--|
+Column|Type|Description
+|---|---|---|
 |`id`|Long|Identifier|
 |`source_entity_kind`|String - `APPLICATION` or `ACTOR`|Kind of the source entity|
 |`source_entity_id`|Long|Identifier of ths source entity|
@@ -25,7 +25,7 @@ Logical flows represent the existance of a data flow between two entities  (curr
 ### Logical Flow Decorator
 
 |Column|Type|Description|
-|--|--|--|
+|---|---|---|
 |`logical_flow_id`|Long|Identifier of the decorated logical flow|
 |`decorator_entity_kind`|String - `DATA_TYPE`|Kind of the decorating entity, currently only data types are supported|
 |`decorator_entity_id`|Long|Identifier of ths decorator entity|
