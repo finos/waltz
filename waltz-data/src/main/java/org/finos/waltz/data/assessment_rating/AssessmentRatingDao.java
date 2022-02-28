@@ -19,6 +19,7 @@
 package org.finos.waltz.data.assessment_rating;
 
 
+import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.schema.tables.records.AssessmentRatingRecord;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.InlineSelectFieldFactory;
@@ -58,7 +59,17 @@ public class AssessmentRatingDao {
     private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             ASSESSMENT_RATING.ENTITY_ID,
             ASSESSMENT_RATING.ENTITY_KIND,
-            newArrayList(EntityKind.values()));
+            newArrayList(EntityKind.values())).as("entity_name");
+
+    private static final Field<String> ENTITY_LIFECYCLE_FIELD = InlineSelectFieldFactory.mkEntityLifecycleField(
+            ASSESSMENT_RATING.ENTITY_ID,
+            ASSESSMENT_RATING.ENTITY_KIND,
+            newArrayList(EntityKind.values())).as("entity_lifecycle_status");
+
+    private static final Field<String> ENTITY_EXTID_FIELD = InlineSelectFieldFactory.mkExternalIdField(
+            ASSESSMENT_RATING.ENTITY_ID,
+            ASSESSMENT_RATING.ENTITY_KIND,
+            newArrayList(EntityKind.values())).as("entity_external_id");
 
     private static final RecordMapper<? super Record, AssessmentRating> TO_DOMAIN_MAPPER = r -> {
         AssessmentRatingRecord record = r.into(ASSESSMENT_RATING);
@@ -93,6 +104,10 @@ public class AssessmentRatingDao {
                         .kind(EntityKind.valueOf(record.getEntityKind()))
                         .id(record.getEntityId())
                         .name(ofNullable(r.getValue(ENTITY_NAME_FIELD)))
+                        .entityLifecycleStatus(ofNullable(r.getValue(ENTITY_LIFECYCLE_FIELD))
+                                .map(EntityLifecycleStatus::valueOf)
+                                .orElse(EntityLifecycleStatus.ACTIVE))
+                        .externalId(ofNullable(r.getValue(ENTITY_EXTID_FIELD)))
                         .build())
                 .assessmentDefinitionId(record.getAssessmentDefinitionId())
                 .ratingId(record.getRatingId())
@@ -144,6 +159,8 @@ public class AssessmentRatingDao {
         return dsl
                 .select(ASSESSMENT_RATING.fields())
                 .select(ENTITY_NAME_FIELD)
+                .select(ENTITY_LIFECYCLE_FIELD)
+                .select(ENTITY_EXTID_FIELD)
                 .from(ASSESSMENT_RATING)
                 .innerJoin(ASSESSMENT_DEFINITION).on(ASSESSMENT_DEFINITION.ID.eq(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID))
                 .where(ASSESSMENT_RATING.ENTITY_KIND.eq(kind.name()))
@@ -155,6 +172,8 @@ public class AssessmentRatingDao {
         return dsl
                 .select(ASSESSMENT_RATING.fields())
                 .select(ENTITY_NAME_FIELD)
+                .select(ENTITY_LIFECYCLE_FIELD)
+                .select(ENTITY_EXTID_FIELD)
                 .from(ASSESSMENT_RATING)
                 .innerJoin(ASSESSMENT_DEFINITION).on(ASSESSMENT_DEFINITION.ID.eq(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID))
                 .and(ASSESSMENT_DEFINITION.ID.eq(definitionId))

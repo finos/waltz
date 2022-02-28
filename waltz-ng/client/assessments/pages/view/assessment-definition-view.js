@@ -36,6 +36,10 @@ const initialState = {
     columnDefs: [
         mkEntityLinkGridCell("Entity", "entityRef", "none", "right"),
         {
+            field: "entityRef.externalId",
+            name: "External Identifier"
+        },
+        {
             field: "rating",
             width: "30%",
             name: "Assessment Rating",
@@ -76,12 +80,14 @@ function controller($q,
             .then(([ratings, ratingSchemeItems]) => {
                 const itemsById = _.keyBy(ratingSchemeItems, "id");
                 vm.ratingSchemeItems = ratingSchemeItems;
-                vm.appRatings = _.map(ratings, r =>
-                    Object.assign(r, {
-                        entityRef: r.entityReference,
-                        rating: itemsById[r.ratingId],
-                        comment: r.comment
-                    }));
+                vm.appRatings = _.map(ratings, r => Object
+                    .assign(
+                        {},
+                        {
+                            entityRef: r.entityReference,
+                            rating: itemsById[r.ratingId],
+                            comment: r.comment
+                        }));
             });
     };
 
