@@ -405,4 +405,27 @@
                               tableName="report_grid"/>
     </changeSet>
 
+    <changeSet id="20220228-2404-1"
+               author="woodjes">
+        <insert tableName="entity_field_reference">
+            <column name="entity_kind" value="CHANGE_INITIATIVE"/>
+            <column name="field_name" value="kind"/>
+            <column name="display_name" value="Kind"/>
+            <column name="description" value="The kind of the change initiative"/>
+        </insert>
+        <insert tableName="entity_field_reference">
+            <column name="entity_kind" value="CHANGE_INITIATIVE"/>
+            <column name="field_name" value="start_date"/>
+            <column name="display_name" value="Start Date"/>
+            <column name="description" value="The start date of the change initiative"/>
+        </insert>
+        <insert tableName="entity_field_reference">
+            <column name="entity_kind" value="CHANGE_INITIATIVE"/>
+            <column name="field_name" value="end_date"/>
+            <column name="display_name" value="End Date"/>
+            <column name="description" value="The end date of the change initiative"/>
+        </insert>
+    </changeSet>
+
+
 </databaseChangeLog>

@@ -86,6 +86,7 @@ public class ReportGridDao {
     private final org.finos.waltz.schema.tables.EntityFieldReference efr = ENTITY_FIELD_REFERENCE.as("efr");
     private final org.finos.waltz.schema.tables.SurveyTemplate st = SURVEY_TEMPLATE.as("st");
     private final org.finos.waltz.schema.tables.Application a = APPLICATION.as("a");
+    private final org.finos.waltz.schema.tables.ChangeInitiative ci = CHANGE_INITIATIVE.as("ci");
 
     private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
                     SURVEY_QUESTION_RESPONSE.ENTITY_RESPONSE_ID,
@@ -273,6 +274,14 @@ public class ReportGridDao {
                 a.DESCRIPTION,
                 condition);
 
+        SelectConditionStep<Record13<String, String, Long, String, String, Integer, String, String, Long, String, String, String, String>> changeInitiativeMetaColumns = mkColumnDefinitionQuery(
+                EntityKind.CHANGE_INITIATIVE,
+                ci,
+                ci.ID,
+                ci.NAME,
+                ci.DESCRIPTION,
+                condition);
+
         return assessmentDefinitionColumns
                 .unionAll(measurableColumns)
                 .unionAll(costKindColumns)
@@ -280,6 +289,7 @@ public class ReportGridDao {
                 .unionAll(surveyQuestionColumns)
                 .unionAll(surveyMetaColumns)
                 .unionAll(applicationMetaColumns)
+                .unionAll(changeInitiativeMetaColumns)
                 .orderBy(rgcd.POSITION, DSL.field("name", String.class))
                 .fetch(r -> {
 
@@ -423,6 +433,9 @@ public class ReportGridDao {
             Set<Tuple2<ReportGridColumnDefinition, EntityFieldReference>> requiredApplicationColumns = complexColsByKind
                     .getOrDefault(EntityKind.APPLICATION, emptySet());
 
+            Set<Tuple2<ReportGridColumnDefinition, EntityFieldReference>> requiredChangeInitiativeColumns = complexColsByKind
+                    .getOrDefault(EntityKind.CHANGE_INITIATIVE, emptySet());
+
             return union(
                     fetchSummaryMeasurableData(genericSelector, summaryMeasurableIdsUsingHighest, summaryMeasurableIdsUsingLowest),
                     fetchAssessmentData(genericSelector, requiredAssessmentDefinitions),
@@ -431,7 +444,8 @@ public class ReportGridDao {
                     fetchInvolvementData(genericSelector, requiredInvolvementKinds),
                     fetchSurveyQuestionResponseData(genericSelector, requiredSurveyQuestionIds),
                     fetchSurveyFieldReferenceData(genericSelector, requiredSurveyTemplateIds),
-                    fetchApplicationFieldReferenceData(genericSelector, requiredApplicationColumns));
+                    fetchApplicationFieldReferenceData(genericSelector, requiredApplicationColumns),
+                    fetchChangeInitiativeFieldReferenceData(genericSelector, requiredChangeInitiativeColumns));
         }
     }
 
@@ -471,6 +485,51 @@ public class ReportGridDao {
                                         .subjectId(appRecord.get(APPLICATION.ID))
                                         .columnEntityId(colDefn.columnEntityId())
                                         .columnEntityKind(EntityKind.APPLICATION)
+                                        .text(String.valueOf(value))
+                                        .entityFieldReferenceId(colDefn.entityFieldReference().id().get())
+                                        .build();
+                            }))
+                    .filter(Objects::nonNull)
+                    .collect(toSet());
+        }
+    }
+
+
+    public Set<ReportGridCell> fetchChangeInitiativeFieldReferenceData(GenericSelector selector,
+                                                                       Set<Tuple2<ReportGridColumnDefinition, EntityFieldReference>> requiredChangeInitiativeColumns) {
+
+        if (requiredChangeInitiativeColumns.size() == 0) {
+            return emptySet();
+        } else {
+
+            Set<String> fields = map(requiredChangeInitiativeColumns, d -> d.v2.fieldName());
+
+            Map<String, ReportGridColumnDefinition> columnDefinitionsByFieldReference = requiredChangeInitiativeColumns
+                    .stream()
+                    .collect(toMap(k -> k.v2.fieldName(), v -> v.v1));
+
+            return dsl
+                    .select(CHANGE_INITIATIVE.fields())
+                    .from(CHANGE_INITIATIVE)
+                    .where(CHANGE_INITIATIVE.ID.in(selector.selector()))
+                    .fetch()
+                    .stream()
+                    .flatMap(ciRecord -> fields
+                            .stream()
+                            .map(fieldName -> {
+                                ReportGridColumnDefinition colDefn = columnDefinitionsByFieldReference.get(fieldName);
+
+                                Object value = ciRecord.get(CHANGE_INITIATIVE.field(fieldName));
+
+                                if (value == null) {
+                                    return null;
+                                }
+
+                                return ImmutableReportGridCell
+                                        .builder()
+                                        .subjectId(ciRecord.get(CHANGE_INITIATIVE.ID))
+                                        .columnEntityId(colDefn.columnEntityId())
+                                        .columnEntityKind(EntityKind.CHANGE_INITIATIVE)
                                         .text(String.valueOf(value))
                                         .entityFieldReferenceId(colDefn.entityFieldReference().id().get())
                                         .build();

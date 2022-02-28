@@ -171,6 +171,7 @@ export function prepareColumnDefs(gridData) {
             case "INVOLVEMENT_KIND":
             case "SURVEY_TEMPLATE":
             case "APPLICATION":
+            case "CHANGE_INITIATIVE":
             case "SURVEY_QUESTION":
                 return {
                     allowSummary: false,
@@ -259,7 +260,7 @@ function mkPopoverHtml(cellData, ratingSchemeItem) {
 
 
 export function prepareTableData(gridData) {
-    const appsById = _.keyBy(gridData.instance.subjects, d => d.entityReference.id);
+    const subjectsById = _.keyBy(gridData.instance.subjects, d => d.entityReference.id);
     const ratingSchemeItemsById = _
         .chain(gridData.instance.ratingSchemeItems)
         .map(d => {
@@ -292,6 +293,7 @@ export function prepareTableData(gridData) {
             case "INVOLVEMENT_KIND":
             case "SURVEY_TEMPLATE":
             case "APPLICATION":
+            case "CHANGE_INITIATIVE":
             case "SURVEY_QUESTION":
                 return {
                     text: x.text,
@@ -313,7 +315,7 @@ export function prepareTableData(gridData) {
                 acc[mkPropNameForCellRef(x)] = mkTableCell(x);
                 return acc;
             },
-            initialiseDataForRow(appsById[k], columnRefs)))
+            initialiseDataForRow(subjectsById[k], columnRefs)))
         .orderBy(d => d.subject.name)
         .value();
 }
