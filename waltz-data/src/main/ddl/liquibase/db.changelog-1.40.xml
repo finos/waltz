@@ -27,7 +27,7 @@
     </changeSet>
 
 
-    
+
     <changeSet id="20220209-2505-1"
                author="woodjes">
         <comment>2505: support entity attributes in report grids</comment>
@@ -166,7 +166,7 @@
                     type="${id.type}"/>
         </createIndex>
     </changeSet>
-  
+
     <changeSet id="20220218-5916-1"
                author="davidwatkins73">
         <comment>5916: add entity level to entity_hierarchy</comment>
@@ -375,6 +375,34 @@
         <setColumnRemarks tableName="application"
                           columnName="commission_date"
                           remarks="when was this application commissioned, null if unknown"/>
+    </changeSet>
+
+    <changeSet id="20220121-5847-1"
+               author="woodjes">
+        <comment>5847: support for change initiatives in report grids</comment>
+        <addColumn tableName="report_grid">
+            <column name="subject_kind"
+                    type="${external-id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20220121-5847-2"
+               author="woodjes">
+        <comment>5847: support for change initiatives in report grids</comment>
+        <update tableName="report_grid">
+            <column name="subject_kind"
+                    value="APPLICATION"/>
+        </update>
+    </changeSet>
+
+    <changeSet id="20220121-5847-3"
+               author="woodjes">
+        <comment>5847: support for change initiatives in report grids</comment>
+        <addNotNullConstraint columnDataType="${external-id.type}"
+                              columnName="subject_kind"
+                              tableName="report_grid"/>
     </changeSet>
 
 </databaseChangeLog>

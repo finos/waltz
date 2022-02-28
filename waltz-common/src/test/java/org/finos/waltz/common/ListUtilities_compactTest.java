@@ -45,7 +45,7 @@ public class ListUtilities_compactTest {
     @Test
     public void aNullCollectionWillThrowIllegalArgException() {
         assertThrows(IllegalArgumentException.class,
-                ()->ListUtilities.compact(null));
+                () -> ListUtilities.compact(null));
     }
 
 }

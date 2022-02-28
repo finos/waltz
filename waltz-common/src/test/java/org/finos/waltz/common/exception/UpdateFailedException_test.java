@@ -13,7 +13,7 @@ public class UpdateFailedException_test {
     public void updateFailedExceptionMessage() throws Exception {
         Throwable exception = assertThrows(UpdateFailedException.class, () -> {
             System.out.println("=======Starting Exception process=======");
-            throw new UpdateFailedException("500","Update Failed");
+            throw new UpdateFailedException("500", "Update Failed");
         });
         assertEquals(exception.getMessage(), "Update Failed");
     }

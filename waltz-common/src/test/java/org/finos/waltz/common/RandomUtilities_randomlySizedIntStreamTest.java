@@ -20,22 +20,22 @@ public class RandomUtilities_randomlySizedIntStreamTest {
     }
 
     @Test
-    public void toggleRandomlySizedIntStream(){
+    public void toggleRandomlySizedIntStream() {
         assertThrows(IllegalArgumentException.class,
-                ()-> RandomUtilities.randomlySizedIntStream(1,0));
+                () -> RandomUtilities.randomlySizedIntStream(1, 0));
     }
 
     @Test
-    public void randomlySizedIntStreamAllZero(){
+    public void randomlySizedIntStreamAllZero() {
 
         assertThrows(IllegalArgumentException.class,
-                ()-> RandomUtilities.randomlySizedIntStream(0,0));
+                () -> RandomUtilities.randomlySizedIntStream(0, 0));
     }
 
     @Test
-    public void randomlySizedIntStreamAllOne(){
+    public void randomlySizedIntStreamAllOne() {
 
         assertThrows(IllegalArgumentException.class,
-                ()-> RandomUtilities.randomlySizedIntStream(1,1));
+                () -> RandomUtilities.randomlySizedIntStream(1, 1));
     }
 }

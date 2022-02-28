@@ -21,21 +21,21 @@ public class MapUtilities_transformKeysTest {
     public void simpleTransformKeysWithNullMap() {
         Map original = null;
         assertThrows(NullPointerException.class,
-                ()-> MapUtilities.transformKeys(original, x -> Integer.parseInt(x.toString())*2) );
+                () -> MapUtilities.transformKeys(original, x -> Integer.parseInt(x.toString()) * 2));
     }
 
     @Test
     public void simpleTransformKeysWithNullFunction() {
-        Map original = MapUtilities.newHashMap(1,'a',2,'b');
+        Map original = MapUtilities.newHashMap(1, 'a', 2, 'b');
         assertThrows(NullPointerException.class,
-                ()-> MapUtilities.transformKeys(original, null) );
+                () -> MapUtilities.transformKeys(original, null));
     }
 
     @Test
     public void simpleTransformKeysWithAllNull() {
         Map original = null;
         assertThrows(NullPointerException.class,
-                ()-> MapUtilities.transformKeys(original, null));
+                () -> MapUtilities.transformKeys(original, null));
     }
 
     @Test

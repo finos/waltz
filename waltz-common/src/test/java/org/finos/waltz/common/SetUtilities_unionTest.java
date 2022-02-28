@@ -31,11 +31,11 @@ public class SetUtilities_unionTest {
     }
 
     @Test
-    public void simpleUnionWithOneNullColl(){
+    public void simpleUnionWithOneNullColl() {
         Collection<String> coll1 = ListUtilities.newArrayList("a");
         Collection<String> coll2 = null;
         assertThrows(NullPointerException.class,
-                ()->  SetUtilities.union(coll1,coll2));
+                () -> SetUtilities.union(coll1, coll2));
     }
 
     @Test
@@ -47,11 +47,11 @@ public class SetUtilities_unionTest {
     }
 
     @Test
-    public void simpleUnionWithTwoNullColl(){
+    public void simpleUnionWithTwoNullColl() {
         Collection<String> coll1 = null;
         Collection<String> coll2 = null;
         assertThrows(NullPointerException.class,
-                ()->  SetUtilities.union(coll1,coll2));
+                () -> SetUtilities.union(coll1, coll2));
     }
 
 }

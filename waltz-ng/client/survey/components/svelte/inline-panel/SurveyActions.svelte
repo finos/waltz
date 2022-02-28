@@ -57,14 +57,14 @@
         const updateCmd = {action: name, reason: reason};
 
         return Promise
-                .resolve(surveyInstanceStore.updateStatus(surveyInstanceId, updateCmd))
-                .then(() => {
-                    toasts.success("Survey response " + verb + " successfully");
-                    findPossibleActionsCall = surveyInstanceStore.findPossibleActions(surveyInstanceId, true);
-                    dispatch("action", surveyInstanceId);
-                    onCancelAction();
-                })
-                .catch(e => displayError("Unable to update status of survey. " + e.error, e));
+            .resolve(surveyInstanceStore.updateStatus(surveyInstanceId, updateCmd))
+            .then(() => {
+                toasts.success("Survey response " + verb + " successfully");
+                findPossibleActionsCall = surveyInstanceStore.findPossibleActions(surveyInstanceId, true);
+                dispatch("action", surveyInstanceId);
+                onCancelAction();
+            })
+            .catch(e => displayError("Unable to update status of survey. " + e.error, e));
     }
 
     function mkConfirmationKey(templateExtId, surveyAction) {

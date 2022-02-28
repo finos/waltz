@@ -55,21 +55,21 @@ public class SetUtilities_intersectionTest {
     @Test
     public void cannotIntersectNulls_both() {
         assertThrows(IllegalArgumentException.class,
-                ()-> SetUtilities.intersection(null, null));
+                () -> SetUtilities.intersection(null, null));
     }
 
 
     @Test
     public void cannotIntersectNulls_first() {
         assertThrows(IllegalArgumentException.class,
-                ()-> SetUtilities.intersection(null, Collections.emptySet()));
+                () -> SetUtilities.intersection(null, Collections.emptySet()));
     }
 
 
     @Test
     public void cannotIntersectNulls_second() {
         assertThrows(IllegalArgumentException.class,
-                ()-> SetUtilities.intersection(Collections.emptySet(), null));
+                () -> SetUtilities.intersection(Collections.emptySet(), null));
     }
 
 }

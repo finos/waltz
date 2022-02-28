@@ -31,26 +31,27 @@ public class PredicateUtilities_anyTest {
     }
 
     @Test
-    public void simpleAnyNullList1(){
+    public void simpleAnyNullList1() {
         List<Integer> ele = null;
         assertThrows(NullPointerException.class,
-                ()-> PredicateUtilities.any(ele, x->(Integer.parseInt(x.toString())%2)==0));
+                () -> PredicateUtilities.any(ele, x -> (Integer.parseInt(x.toString()) % 2) == 0));
     }
 
     @Test
-    public void simpleAnyNullPredicate1(){
-        List<Integer> ele = ListUtilities.newArrayList(1,2,3);;
+    public void simpleAnyNullPredicate1() {
+        List<Integer> ele = ListUtilities.newArrayList(1, 2, 3);
+        ;
 
         assertThrows(NullPointerException.class,
-                ()-> PredicateUtilities.any(ele, null));
+                () -> PredicateUtilities.any(ele, null));
     }
 
     @Test
-    public void simpleAnyWithAllNull1(){
+    public void simpleAnyWithAllNull1() {
         List<Integer> ele = null;
 
         assertThrows(NullPointerException.class,
-                ()-> PredicateUtilities.any(ele, null));
+                () -> PredicateUtilities.any(ele, null));
     }
 
     @Test
@@ -75,25 +76,25 @@ public class PredicateUtilities_anyTest {
     }
 
     @Test
-    public void simpleAnyNullList2(){
+    public void simpleAnyNullList2() {
         Integer[] ele = null;
 
         assertThrows(NullPointerException.class,
-                ()->  PredicateUtilities.any(ele, x->(Integer.parseInt(x.toString())%2)==0));
+                () -> PredicateUtilities.any(ele, x -> (Integer.parseInt(x.toString()) % 2) == 0));
     }
 
     @Test
-    public void simpleAnyNullPredicate2(){
-        Integer[] ele = new Integer[]{1,2,3};
+    public void simpleAnyNullPredicate2() {
+        Integer[] ele = new Integer[]{1, 2, 3};
 
         assertThrows(NullPointerException.class,
-                ()-> PredicateUtilities.any(ele, null));
+                () -> PredicateUtilities.any(ele, null));
     }
 
     @Test
-    public void simpleAnyWithAllNull2(){
+    public void simpleAnyWithAllNull2() {
         Integer[] ele = null;
         assertThrows(NullPointerException.class,
-                ()-> PredicateUtilities.any(ele, null));
+                () -> PredicateUtilities.any(ele, null));
     }
 }

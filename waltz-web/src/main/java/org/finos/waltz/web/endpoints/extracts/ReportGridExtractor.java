@@ -17,6 +17,9 @@
  */
 package org.finos.waltz.web.endpoints.extracts;
 
+import org.finos.waltz.model.application.LifecyclePhase;
+import org.finos.waltz.model.report_grid.*;
+import org.finos.waltz.service.report_grid.ReportGridService;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
@@ -116,7 +119,7 @@ public class ReportGridExtractor implements DataExtractor {
 
         Set<Tuple2<ReportGridColumnDefinition, Boolean>> colsWithCommentRequirement = enrichColsWithCommentRequirement(reportGrid);
 
-        List<Tuple2<Application, ArrayList<Object>>> reportRows = prepareReportRows(colsWithCommentRequirement, reportGrid.instance());
+        List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows = prepareReportRows(colsWithCommentRequirement, reportGrid.instance());
 
         return formatReport(
                 format,
@@ -202,230 +205,233 @@ public class ReportGridExtractor implements DataExtractor {
         }
     }
 
+    private List<Tuple2<ReportSubject, ArrayList<Object>>> prepareReportRows(ReportGrid reportGrid) {
 
-    private List<Tuple2<Application, ArrayList<Object>>> prepareReportRows(Set<Tuple2<ReportGridColumnDefinition, Boolean>> colsWithCommentRequirement,
-                                                                           ReportGridInstance reportGridInstance) {
+        private List<Tuple2<Application, ArrayList<Object>>> prepareReportRows
+        (Set < Tuple2 < ReportGridColumnDefinition, Boolean >> colsWithCommentRequirement,
+                ReportGridInstance reportGridInstance){
 
-        Set<ReportGridCell> tableData = reportGridInstance.cellData();
+            Set<ReportGridCell> tableData = reportGridInstance.cellData();
 
-        Map<Long, Application> applicationsById = indexById(reportGridInstance.applications());
-        Map<Long, RatingSchemeItem> ratingsById = indexById(reportGridInstance.ratingSchemeItems());
+            Map<Long, Application> applicationsById = indexById(reportGridInstance.subjects());
+            Map<Long, RatingSchemeItem> ratingsById = indexById(reportGridInstance.ratingSchemeItems());
 
-        Map<Long, Collection<ReportGridCell>> tableDataByAppId = groupBy(
-                tableData,
-                ReportGridCell::applicationId);
+            Map<Long, Collection<ReportGridCell>> tableDataBySubjectId = groupBy(
+                    tableData,
+                    ReportGridCell::subjectId);
 
-        boolean allowCostsExport = settingsService
-                .getValue(SettingsService.ALLOW_COST_EXPORTS_KEY)
-                .map(r -> StringUtilities.isEmpty(r) || Boolean.parseBoolean(r))
-                .orElse(true);
+            boolean allowCostsExport = settingsService
+                    .getValue(SettingsService.ALLOW_COST_EXPORTS_KEY)
+                    .map(r -> StringUtilities.isEmpty(r) || Boolean.parseBoolean(r))
+                    .orElse(true);
 
-        return tableDataByAppId
-                .entrySet()
-                .stream()
-                .map(r -> {
-                    Long appId = r.getKey();
-                    Application app = applicationsById.getOrDefault(appId, null);
+            return tableDataBySubjectId
+                    .entrySet()
+                    .stream()
+                    .map(r -> {
+                        Long subjectId = r.getKey();
 
-                    ArrayList<Object> reportRow = new ArrayList<>();
+                        ReportSubject subject = subjectsById.getOrDefault(subjectId, null);
 
-                    Collection<ReportGridCell> cells = r.getValue();
+                        ArrayList<Object> reportRow = new ArrayList<>();
 
-                    Map<Tuple3<Long, EntityKind, Long>, ReportGridCell> cellValuesByColumnRefForApp = indexBy(
-                            cells,
-                            k -> tuple(k.columnEntityId(), k.columnEntityKind(), k.entityFieldReferenceId()));
+                        Collection<ReportGridCell> cells = r.getValue();
 
-                    //find data for columns
-                    colsWithCommentRequirement
-                            .forEach(t -> {
-                                ReportGridColumnDefinition colDef = t.v1;
-                                Boolean needsComment = t.v2;
+                        Map<Tuple3<Long, EntityKind, Long>, ReportGridCell> callValuesByColumnRefForSubject = indexBy(
+                                cells,
+                                k -> tuple(k.columnEntityId(), k.columnEntityKind(), k.entityFieldReferenceId()));
 
-                                boolean isCostColumn = colDef.columnEntityKind().equals(EntityKind.COST_KIND);
+                        //find data for columns
+                        colsWithCommentRequirement
+                                .forEach(t -> {
+                                    ReportGridColumnDefinition colDef = t.v1;
+                                    Boolean needsComment = t.v2;
 
-                                if (!allowCostsExport && isCostColumn) {
-                                    reportRow.add("REDACTED");
-                                } else {
-                                    ReportGridCell cell = cellValuesByColumnRefForApp.getOrDefault(
-                                            tuple(
-                                                    colDef.columnEntityId(),
-                                                    colDef.columnEntityKind(),
-                                                    getIdOrDefault(colDef.entityFieldReference(), null)),
-                                            null);
+                                    boolean isCostColumn = colDef.columnEntityKind().equals(EntityKind.COST_KIND);
 
-                                    reportRow.add(getValueFromReportCell(ratingsById, cell));
-                                    if (needsComment) {
-                                        reportRow.add(getCommentFromCell(cell));
+                                    if (!allowCostsExport && isCostColumn) {
+                                        reportRow.add("REDACTED");
+                                    } else {
+                                        ReportGridCell cell = callValuesByColumnRefForSubject.getOrDefault(
+                                                tuple(
+                                                        colDef.columnEntityId(),
+                                                        colDef.columnEntityKind(),
+                                                        getIdOrDefault(colDef.entityFieldReference(), null)),
+                                                null);
+
+                                        reportRow.add(getValueFromReportCell(ratingsById, cell));
+                                        if (needsComment) {
+                                            reportRow.add(getCommentFromCell(cell));
+                                        }
                                     }
-                                }
-                            });
-                    return tuple(app, reportRow);
-                })
-                .sorted(Comparator.comparing(t -> t.v1.name()))
-                .collect(toList());
-    }
-
-
-    private Object getCommentFromCell(ReportGridCell reportGridCell) {
-        if (reportGridCell == null) {
-            return null;
+                                });
+                        return tuple(subject, reportRow);
+                    })
+                    .sorted(Comparator.comparing(t -> t.v1.entityReference().name().get()))
+                    .collect(toList());
         }
-        return reportGridCell.comment();
-    }
 
 
-    private Object getValueFromReportCell(Map<Long, RatingSchemeItem> ratingsById,
-                                          ReportGridCell reportGridCell) {
-        if (reportGridCell == null) {
-            return null;
-        }
-        switch (reportGridCell.columnEntityKind()) {
-            case COST_KIND:
-                return reportGridCell.value();
-            case INVOLVEMENT_KIND:
-            case SURVEY_TEMPLATE:
-            case APPLICATION:
-            case SURVEY_QUESTION:
-                return Optional.ofNullable(reportGridCell.text()).orElse("-");
-            case MEASURABLE:
-            case ASSESSMENT_DEFINITION:
-                return maybeGet(ratingsById, reportGridCell.ratingId())
-                        .map(NameProvider::name)
-                        .orElse(null);
-            default:
-                throw new IllegalArgumentException("This report does not support export with column of type: " + reportGridCell.columnEntityKind().name());
-        }
-    }
-
-
-    private Tuple3<ExtractFormat, String, byte[]> formatReport(ExtractFormat format,
-                                                               String reportName,
-                                                               Set<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions,
-                                                               List<Tuple2<Application, ArrayList<Object>>> reportRows) throws IOException {
-        switch (format) {
-            case XLSX:
-                return tuple(format, reportName, mkExcelReport(reportName, columnDefinitions, reportRows));
-            case CSV:
-                return tuple(format, reportName, mkCSVReport(columnDefinitions, reportRows));
-            default:
-                throw new UnsupportedOperationException("This report does not support export format: " + format);
-        }
-    }
-
-
-    private byte[] mkCSVReport(Set<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions,
-                               List<Tuple2<Application, ArrayList<Object>>> reportRows) throws IOException {
-        List<String> headers = mkHeaderStrings(columnDefinitions);
-
-        StringWriter writer = new StringWriter();
-        CsvListWriter csvWriter = new CsvListWriter(writer, CsvPreference.EXCEL_PREFERENCE);
-
-        csvWriter.write(headers);
-        reportRows.forEach(unchecked(row -> csvWriter.write(simplify(row))));
-        csvWriter.flush();
-
-        return writer.toString().getBytes();
-    }
-
-
-    private List<Object> simplify(Tuple2<Application, ArrayList<Object>> row) {
-
-        long appId = row.v1.entityReference().id();
-        String appName = row.v1.name();
-        Optional<ExternalIdValue> assetCode = row.v1.assetCode();
-        LifecyclePhase lifecyclePhase = row.v1.lifecyclePhase();
-
-        List<Object> appInfo = asList(appId, appName, assetCode, lifecyclePhase.name());
-
-        return map(concat(appInfo, row.v2), value -> {
-            if (value == null) return null;
-            if (value instanceof Optional) {
-                return ((Optional<?>) value).orElse(null);
-            } else {
-                return value;
+        private Object getCommentFromCell(ReportGridCell reportGridCell) {
+            if (reportGridCell == null) {
+                return null;
             }
-        });
-    }
+            return reportGridCell.comment();
+        }
 
 
-    private byte[] mkExcelReport(String reportName,
-                                 Set<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions,
-                                 List<Tuple2<Application, ArrayList<Object>>> reportRows) throws IOException {
-        SXSSFWorkbook workbook = new SXSSFWorkbook(2000);
-        SXSSFSheet sheet = workbook.createSheet(ExtractorUtilities.sanitizeSheetName(reportName));
+        private Object getValueFromReportCell(Map<Long, RatingSchemeItem> ratingsById,
+                ReportGridCell reportGridCell) {
+            if (reportGridCell == null) {
+                return null;
+            }
+            switch (reportGridCell.columnEntityKind()) {
+                case COST_KIND:
+                    return reportGridCell.value();
+                case INVOLVEMENT_KIND:
+                case SURVEY_TEMPLATE:
+                case APPLICATION:
+                case SURVEY_QUESTION:
+                    return Optional.ofNullable(reportGridCell.text()).orElse("-");
+                case MEASURABLE:
+                case ASSESSMENT_DEFINITION:
+                    return maybeGet(ratingsById, reportGridCell.ratingId())
+                            .map(NameProvider::name)
+                            .orElse(null);
+                default:
+                    throw new IllegalArgumentException("This report does not support export with column of type: " + reportGridCell.columnEntityKind().name());
+            }
+        }
 
-        int colCount = writeExcelHeader(columnDefinitions, sheet);
-        writeExcelBody(reportRows, sheet);
 
-        sheet.setAutoFilter(new CellRangeAddress(0, 0, 0, colCount - 1));
-        sheet.createFreezePane(0, 1);
-
-        return convertExcelToByteArray(workbook);
-    }
-
-
-    private byte[] convertExcelToByteArray(SXSSFWorkbook workbook) throws IOException {
-        ByteArrayOutputStream outByteStream = new ByteArrayOutputStream();
-        workbook.write(outByteStream);
-        workbook.close();
-        return outByteStream.toByteArray();
-    }
+        private Tuple3<ExtractFormat, String, byte[]> formatReport (ExtractFormat format,
+                String reportName,
+                Set < Tuple2 < ReportGridColumnDefinition, Boolean >> columnDefinitions,
+                List < Tuple2 < ReportSubject, ArrayList < Object >>> reportRows) throws IOException {
+            switch (format) {
+                case XLSX:
+                    return tuple(format, reportName, mkExcelReport(reportName, columnDefinitions, reportRows));
+                case CSV:
+                    return tuple(format, reportName, mkCSVReport(columnDefinitions, reportRows));
+                default:
+                    throw new UnsupportedOperationException("This report does not support export format: " + format);
+            }
+        }
 
 
-    private int writeExcelBody(List<Tuple2<Application, ArrayList<Object>>> reportRows, SXSSFSheet sheet) {
-        AtomicInteger rowNum = new AtomicInteger(1);
-        reportRows.forEach(r -> {
+        private byte[] mkCSVReport (Set < Tuple2 < ReportGridColumnDefinition, Boolean >> columnDefinitions,
+                List < Tuple2 < ReportSubject, ArrayList < Object >>> reportRows) throws IOException {
+            List<String> headers = mkHeaderStrings(columnDefinitions);
 
-            long appId = r.v1.entityReference().id();
-            String appName = r.v1.name();
-            Optional<ExternalIdValue> assetCode = r.v1.assetCode();
-            LifecyclePhase lifecyclePhase = r.v1.lifecyclePhase();
+            StringWriter writer = new StringWriter();
+            CsvListWriter csvWriter = new CsvListWriter(writer, CsvPreference.EXCEL_PREFERENCE);
+
+            csvWriter.write(headers);
+            reportRows.forEach(unchecked(row -> csvWriter.write(simplify(row))));
+            csvWriter.flush();
+
+            return writer.toString().getBytes();
+        }
+
+
+        private List<Object> simplify (Tuple2 < ReportSubject, ArrayList < Object >> row){
+
+            long appId = row.v1.entityReference().id();
+            String appName = row.v1.entityReference().name().get();
+            Optional<String> assetCode = row.v1.entityReference().externalId();
+            LifecyclePhase lifecyclePhase = row.v1.lifecyclePhase();
 
             List<Object> appInfo = asList(appId, appName, assetCode, lifecyclePhase.name());
 
-            List<Object> values = concat(appInfo, r.v2);
-
-            Row row = sheet.createRow(rowNum.getAndIncrement());
-            AtomicInteger colNum = new AtomicInteger(0);
-            for (Object value : values) {
-                Object v = value instanceof Optional
-                        ? ((Optional<?>) value).orElse(null)
-                        : value;
-
-                int nextColNum = colNum.getAndIncrement();
-
-                if (v == null) {
-                    row.createCell(nextColNum);
-                } else if (v instanceof Number) {
-                    Cell cell = row.createCell(nextColNum, CellType.NUMERIC);
-                    cell.setCellValue(((Number) v).doubleValue());
-                } else if (v instanceof ExternalIdValue) {
-                    Cell cell = row.createCell(nextColNum, CellType.STRING);
-                    cell.setCellValue(((ExternalIdValue) v).value());
+            return map(concat(appInfo, row.v2), value -> {
+                if (value == null) return null;
+                if (value instanceof Optional) {
+                    return ((Optional<?>) value).orElse(null);
                 } else {
-                    Cell cell = row.createCell(nextColNum);
-                    cell.setCellValue(Objects.toString(v));
+                    return value;
                 }
+            });
+        }
 
-            }
-        });
-        return rowNum.get();
+
+        private byte[] mkExcelReport (String reportName,
+                Set < Tuple2 < ReportGridColumnDefinition, Boolean >> columnDefinitions,
+                List < Tuple2 < ReportSubject, ArrayList < Object >>> reportRows) throws IOException {
+            SXSSFWorkbook workbook = new SXSSFWorkbook(2000);
+            SXSSFSheet sheet = workbook.createSheet(ExtractorUtilities.sanitizeSheetName(reportName));
+
+            int colCount = writeExcelHeader(columnDefinitions, sheet);
+            writeExcelBody(reportRows, sheet);
+
+            sheet.setAutoFilter(new CellRangeAddress(0, 0, 0, colCount - 1));
+            sheet.createFreezePane(0, 1);
+
+            return convertExcelToByteArray(workbook);
+        }
+
+
+        private byte[] convertExcelToByteArray (SXSSFWorkbook workbook) throws IOException {
+            ByteArrayOutputStream outByteStream = new ByteArrayOutputStream();
+            workbook.write(outByteStream);
+            workbook.close();
+            return outByteStream.toByteArray();
+        }
+
+
+        private int writeExcelBody (List < Tuple2 < ReportSubject, ArrayList < Object >>> reportRows, SXSSFSheet sheet){
+            AtomicInteger rowNum = new AtomicInteger(1);
+            reportRows.forEach(r -> {
+
+                long appId = r.v1.entityReference().id();
+                String appName = r.v1.entityReference().name().get();
+                Optional<String> assetCode = r.v1.entityReference().externalId();
+                LifecyclePhase lifecyclePhase = r.v1.lifecyclePhase();
+
+                List<Object> subjectInfo = asList(appId, appName, assetCode, lifecyclePhase.name());
+
+                List<Object> values = concat(subjectInfo, r.v2);
+
+                Row row = sheet.createRow(rowNum.getAndIncrement());
+                AtomicInteger colNum = new AtomicInteger(0);
+                for (Object value : values) {
+                    Object v = value instanceof Optional
+                            ? ((Optional<?>) value).orElse(null)
+                            : value;
+
+                    int nextColNum = colNum.getAndIncrement();
+
+                    if (v == null) {
+                        row.createCell(nextColNum);
+                    } else if (v instanceof Number) {
+                        Cell cell = row.createCell(nextColNum, CellType.NUMERIC);
+                        cell.setCellValue(((Number) v).doubleValue());
+                    } else if (v instanceof ExternalIdValue) {
+                        Cell cell = row.createCell(nextColNum, CellType.STRING);
+                        cell.setCellValue(((ExternalIdValue) v).value());
+                    } else {
+                        Cell cell = row.createCell(nextColNum);
+                        cell.setCellValue(Objects.toString(v));
+                    }
+
+                }
+            });
+            return rowNum.get();
+        }
+
+
+        private int writeExcelHeader(Set<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions, SXSSFSheet sheet) {
+            Row headerRow = sheet.createRow(0);
+            AtomicInteger colNum = new AtomicInteger();
+
+            mkHeaderStrings(columnDefinitions).forEach(hdr -> writeExcelHeaderCell(headerRow, colNum, hdr));
+
+            return colNum.get();
+        }
+
+
+        private void writeExcelHeaderCell(Row headerRow, AtomicInteger colNum, String text) {
+            Cell cell = headerRow.createCell(colNum.getAndIncrement());
+            cell.setCellValue(text);
+        }
+
     }
-
-
-    private int writeExcelHeader(Set<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions, SXSSFSheet sheet) {
-        Row headerRow = sheet.createRow(0);
-        AtomicInteger colNum = new AtomicInteger();
-
-        mkHeaderStrings(columnDefinitions).forEach(hdr -> writeExcelHeaderCell(headerRow, colNum, hdr));
-
-        return colNum.get();
-    }
-
-
-    private void writeExcelHeaderCell(Row headerRow, AtomicInteger colNum, String text) {
-        Cell cell = headerRow.createCell(colNum.getAndIncrement());
-        cell.setCellValue(text);
-    }
-
-}

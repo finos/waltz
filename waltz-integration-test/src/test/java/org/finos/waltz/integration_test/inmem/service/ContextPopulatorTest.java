@@ -165,7 +165,7 @@ public class ContextPopulatorTest extends BaseInMemoryIntegrationTest {
                 maybeVar.isPresent());
         maybeVar.ifPresent(v ->
                 assertTrue(valueChecker.test(v.value()),
-                format("Could not find var with name: %s for app: %s", varName, refDesc)));
+                        format("Could not find var with name: %s for app: %s", varName, refDesc)));
     }
 
 }

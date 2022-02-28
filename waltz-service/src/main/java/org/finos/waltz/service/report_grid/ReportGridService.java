@@ -20,14 +20,17 @@ package org.finos.waltz.service.report_grid;
 
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.common.exception.NotFoundException;
+import org.finos.waltz.data.GenericSelector;
+import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.application.ApplicationDao;
-import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
+import org.finos.waltz.data.change_initiative.ChangeInitiativeDao;
 import org.finos.waltz.data.report_grid.ReportGridDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.HierarchyQueryScope;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.ImmutableIdSelectionOptions;
 import org.finos.waltz.model.application.Application;
+import org.finos.waltz.model.change_initiative.ChangeInitiative;
 import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.model.report_grid.*;
 import org.finos.waltz.model.user.SystemRole;
@@ -39,6 +42,8 @@ import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -46,19 +51,20 @@ import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.common.SetUtilities.map;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 @Service
 public class ReportGridService {
 
     private final RatingSchemeService ratingSchemeService;
     private final ApplicationDao applicationDao;
+    private final ChangeInitiativeDao changeInititativeDao;
     private final ReportGridDao reportGridDao;
     private final ReportGridMemberService reportGridMemberService;
     private final ChangeLogService changeLogService;
     private final UserRoleService userRoleService;
 
-    private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
-
+    private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
 
     @Autowired
     public ReportGridService(ReportGridDao reportGridDao,
@@ -66,7 +72,8 @@ public class ReportGridService {
                              RatingSchemeService ratingSchemeService,
                              ReportGridMemberService reportGridMemberService,
                              ChangeLogService changeLogService,
-                             UserRoleService userRoleService) {
+                             UserRoleService userRoleService,
+                             ChangeInitiativeDao changeInitiativeDao) {
         checkNotNull(reportGridDao, "reportGridDao cannot be null");
         checkNotNull(reportGridMemberService, "reportGridMemberService cannot be null");
         checkNotNull(applicationDao, "applicationDao cannot be null");
@@ -79,6 +86,7 @@ public class ReportGridService {
         this.applicationDao = applicationDao;
         this.ratingSchemeService = ratingSchemeService;
         this.changeLogService = changeLogService;
+        this.changeInititativeDao = changeInitiativeDao;
         this.userRoleService = userRoleService;
     }
 
@@ -103,17 +111,18 @@ public class ReportGridService {
 
         IdSelectionOptions opts = idSelectionOptions.entityReference().kind() == EntityKind.PERSON
                 ? ImmutableIdSelectionOptions
-                    .copyOf(idSelectionOptions)
-                    .withScope(HierarchyQueryScope.EXACT)
+                .copyOf(idSelectionOptions)
+                .withScope(HierarchyQueryScope.EXACT)
                 : idSelectionOptions;
 
         ReportGridDefinition definition = reportGridDao.getGridDefinitionById(id);
 
-        if(definition == null){
+        if (definition == null) {
             return null;
         }
 
-        ReportGridInstance instance = mkInstance(id, opts);
+        EntityKind targetKind = definition.subjectKind();
+        ReportGridInstance instance = mkInstance(id, opts, targetKind);
 
         return ImmutableReportGrid
                 .builder()
@@ -123,10 +132,11 @@ public class ReportGridService {
     }
 
 
-    private ReportGridInstance mkInstance(long id, IdSelectionOptions idSelectionOptions) {
-        Select<Record1<Long>> appSelector = applicationIdSelectorFactory.apply(idSelectionOptions);
-        Set<ReportGridCell> cellData = reportGridDao.findCellDataByGridId(id, appSelector);
-        List<Application> apps = applicationDao.findByAppIdSelector(appSelector);
+    private ReportGridInstance mkInstance(long id, IdSelectionOptions idSelectionOptions, EntityKind targetKind) {
+
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, idSelectionOptions);
+        Set<ReportGridCell> cellData = reportGridDao.findCellDataByGridId(id, genericSelector);
+        Set<ReportSubject> subjects = getReportSubjects(genericSelector);
 
         Set<RatingSchemeItem> ratingSchemeItems = ratingSchemeService.findRatingSchemeItemsByIds(map(
                 cellData,
@@ -134,11 +144,47 @@ public class ReportGridService {
 
         ReportGridInstance instance = ImmutableReportGridInstance
                 .builder()
-                .applications(apps)
+                .subjects(subjects)
                 .cellData(cellData)
                 .ratingSchemeItems(ratingSchemeItems)
                 .build();
+
         return instance;
+    }
+
+
+    private Set<ReportSubject> getReportSubjects(GenericSelector genericSelector) {
+
+        if (genericSelector.kind().equals(EntityKind.APPLICATION)) {
+            List<Application> apps = applicationDao.findByAppIdSelector(genericSelector.selector());
+
+            return map(apps, d -> ImmutableReportSubject
+                    .builder()
+                    .entityReference(mkRef(
+                            EntityKind.APPLICATION,
+                            d.entityReference().id(),
+                            d.name(),
+                            d.description(),
+                            d.externalId().get()))
+                    .lifecyclePhase(d.lifecyclePhase())
+                    .build());
+
+        } else if (genericSelector.kind().equals(EntityKind.CHANGE_INITIATIVE)) {
+            Collection<ChangeInitiative> changeInitiatives = changeInititativeDao.findForSelector(genericSelector.selector());
+
+            return map(changeInitiatives, d -> ImmutableReportSubject
+                    .builder()
+                    .entityReference(mkRef(
+                            EntityKind.CHANGE_INITIATIVE,
+                            d.entityReference().id(),
+                            d.name(),
+                            d.description(),
+                            d.externalId().get()))
+                    .lifecyclePhase(d.lifecyclePhase())
+                    .build());
+        } else {
+            return Collections.emptySet();
+        }
     }
 
 

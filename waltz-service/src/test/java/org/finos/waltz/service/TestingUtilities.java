@@ -42,7 +42,7 @@ public class TestingUtilities {
             if (matchingText != null) {
                 assertTrue(
                         lower(e.getMessage()).contains(lower(matchingText)),
-                        "Exception message should have contained: " + matchingText + " but was: "+e.getMessage());
+                        "Exception message should have contained: " + matchingText + " but was: " + e.getMessage());
             }
         }
     };
@@ -64,7 +64,7 @@ public class TestingUtilities {
             BigDecimal actualValue = actual.get(i);
             BigDecimal actualValueHigh = actualValue.add(toleranceDec);
             BigDecimal actualValueLow = actualValue.subtract(toleranceDec);
-            String formattedMessage= String.format(
+            String formattedMessage = String.format(
                     message + ": Expected value of [%s] is not equal to the actual value of [%s] at offset [%d] (with tolerance: %s)",
                     expectedValue,
                     actualValue,

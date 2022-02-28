@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class CollectionUtilities_sumIntsTest {
 
     @Test
-    public void sendEmptyList(){
+    public void sendEmptyList() {
         assertEquals(0, CollectionUtilities.sumInts(new ArrayList<>()).longValue());
     }
 

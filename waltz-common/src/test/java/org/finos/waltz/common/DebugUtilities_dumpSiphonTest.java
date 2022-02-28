@@ -7,9 +7,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class DebugUtilities_dumpSiphonTest {
     @Test
-    public void dumpNullSiphon(){
+    public void dumpNullSiphon() {
         assertThrows(NullPointerException.class,
-                ()->DebugUtilities.dump("aaa",null));
+                () -> DebugUtilities.dump("aaa", null));
     }
 
     @Test

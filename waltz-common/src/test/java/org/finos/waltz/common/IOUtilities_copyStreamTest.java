@@ -23,19 +23,19 @@ public class IOUtilities_copyStreamTest {
     @Test
     public void nullInputStreamThrowsException() throws IOException {
         assertThrows(IllegalArgumentException.class,
-                ()->IOUtilities.copyStream(null, getOutputStream()));
+                () -> IOUtilities.copyStream(null, getOutputStream()));
     }
 
     @Test
     public void nullOutputStreamThrowsException() throws IOException {
         assertThrows(IllegalArgumentException.class,
-                ()->IOUtilities.copyStream(getInputStream("empty.txt"), null));
+                () -> IOUtilities.copyStream(getInputStream("empty.txt"), null));
     }
 
     @Test
     public void nullStreamsThrowsException() throws IOException {
         assertThrows(IllegalArgumentException.class,
-                ()->IOUtilities.copyStream(null, null));
+                () -> IOUtilities.copyStream(null, null));
     }
 
 

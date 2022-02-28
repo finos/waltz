@@ -15,10 +15,10 @@ public class RandomUtilities_getRandomTest {
     }
 
     @Test
-    public void simpleGetRandomForZero(){
+    public void simpleGetRandomForZero() {
         Random result = RandomUtilities.getRandom();
 
         assertThrows(IllegalArgumentException.class,
-                ()->  result.nextInt(0));
+                () -> result.nextInt(0));
     }
 }

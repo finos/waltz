@@ -4,12 +4,16 @@
     import _ from "lodash";
     import {userStore} from "../../../svelte-stores/user-store";
     import roles from "../../../user/system-roles";
+    import {entity} from "../../../common/services/enums/entity";
 
     export let grid;
     export let doCancel = () => console.log("Cancel");
     export let doSave = () => console.log("Saving");
 
-    let workingCopy = Object.assign({}, grid, {kind: grid?.kind || reportGridKinds.PRIVATE.key});
+    let workingCopy = Object.assign({}, grid, {
+        kind: grid?.kind || reportGridKinds.PRIVATE.key,
+        subjectKind: grid.subjectKind || entity.APPLICATION.key
+    });
 
     $: userCall = userStore.load();
     $: user = $userCall.data;
@@ -20,12 +24,14 @@
         return workingCopy?.name === grid?.name
             && workingCopy?.description === grid?.description
             && workingCopy?.kind === grid?.kind
+            && workingCopy?.subjectKind === grid?.subjectKind
     }
 
     function notSubmittable() {
         return _.isEmpty(workingCopy?.name)
             || _.isEmpty(workingCopy?.name.trim())
-            || _.isNull(workingCopy?.kind);
+            || _.isNull(workingCopy?.kind)
+            || _.isNull(workingCopy?.subjectKind);
     }
 
 </script>
@@ -49,6 +55,31 @@
     </div>
 
 
+    <label for="subject">Subject Kind</label>
+    <div id="subject"
+         class="form-group">
+        <div class="radio">
+            <label>
+                <input type="radio"
+                       style="display: block"
+                       checked={workingCopy.subjectKind === entity.APPLICATION.key}
+                       bind:group={workingCopy.subjectKind}
+                       value={entity.APPLICATION.key}>
+                {entity.APPLICATION.name}
+            </label>
+            <br>
+            <label>
+                <input type="radio"
+                       style="display: block;"
+                       checked={workingCopy.subjectKind === entity.CHANGE_INITIATIVE.key}
+                       bind:group={workingCopy.subjectKind}
+                       value={entity.CHANGE_INITIATIVE.key}>
+                {entity.CHANGE_INITIATIVE.name}
+            </label>
+        </div>
+    </div>
+
+
     <label for="kind">Kind</label>
     <div id="kind"
          class="form-group">
@@ -61,7 +92,9 @@
                        bind:group={workingCopy.kind}
                        value={reportGridKinds.PRIVATE.key}>
                 {reportGridKinds.PRIVATE.name}
-                <div class="help-block small">Private - (Recommended) - These grids can only be viewed if you are an owner or are subscribed to the group</div>
+                <div class="help-block small">Private - (Recommended) - These grids can only be viewed if you are an
+                    owner or are subscribed to the group
+                </div>
             </label>
             <br>
             <label>

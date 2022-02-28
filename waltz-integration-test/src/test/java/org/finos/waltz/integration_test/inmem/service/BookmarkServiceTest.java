@@ -156,9 +156,9 @@ public class BookmarkServiceTest extends BaseInMemoryIntegrationTest {
         createBookmark(appRef2, "c");
 
         int numRemoved = svc.deleteByBookmarkIdSelector(a1_opts);
-        assertEquals(2, numRemoved,"both app1 bookmarks should have been removed");
-        assertEquals(emptySet(), svc.findByBookmarkIdSelector(a1_opts),"no app1 bookmarks should be left");
-        assertEquals(1, svc.findByBookmarkIdSelector(a2_opts).size(),"the app2 bookmark should remain");
+        assertEquals(2, numRemoved, "both app1 bookmarks should have been removed");
+        assertEquals(emptySet(), svc.findByBookmarkIdSelector(a1_opts), "no app1 bookmarks should be left");
+        assertEquals(1, svc.findByBookmarkIdSelector(a2_opts).size(), "the app2 bookmark should remain");
     }
 
 

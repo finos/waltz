@@ -37,10 +37,10 @@ public class SetUtilities_uniqByTest {
     }
 
     @Test
-    public void simpleUniqByWithNullElement(){
+    public void simpleUniqByWithNullElement() {
         Collection<String> ele = null;
         assertThrows(NullPointerException.class,
-                ()-> SetUtilities.uniqBy(ele, x->x));
+                () -> SetUtilities.uniqBy(ele, x -> x));
     }
 
 }

@@ -60,7 +60,7 @@ public class StringUtilities_isEmptyTest {
     @Test
     public void optionalEmptyTrueIfNull() {
         assertThrows(NullPointerException.class,
-                ()-> StringUtilities.isEmpty(Optional.of(null)));
+                () -> StringUtilities.isEmpty(Optional.of(null)));
     }
 
     @Test

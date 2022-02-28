@@ -10,10 +10,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class DebugUtilities_dumpMapTest {
     @Test
-    public void dumpNullMap(){
+    public void dumpNullMap() {
         Map m = null;  // Weird test, we test that we get a NullPointerException??
         assertThrows(NullPointerException.class,
-                ()->DebugUtilities.dump(m));
+                () -> DebugUtilities.dump(m));
     }
 
     @Test

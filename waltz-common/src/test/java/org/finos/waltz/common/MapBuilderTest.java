@@ -65,9 +65,9 @@ public class MapBuilderTest {
     }
 
     @Test
-    public void createMapFromNullMap(){
+    public void createMapFromNullMap() {
         assertThrows(NullPointerException.class,
-                ()->new MapBuilder<String, Integer>().from(null).build());
+                () -> new MapBuilder<String, Integer>().from(null).build());
     }
 
     @Test

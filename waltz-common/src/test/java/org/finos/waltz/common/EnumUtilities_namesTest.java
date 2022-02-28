@@ -51,7 +51,7 @@ public class EnumUtilities_namesTest {
     @Test
     public void namesWithNullValues() {
         assertThrows(NullPointerException.class,
-                ()->EnumUtilities.names((Enum) null));
+                () -> EnumUtilities.names((Enum) null));
     }
 
     @Test

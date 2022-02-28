@@ -34,10 +34,10 @@ public class OptionalUtilities_toListTest {
     }
 
     @Test
-    public void simpleToListWithOneNullEle(){
+    public void simpleToListWithOneNullEle() {
         Optional<String> ele1 = Optional.of("a");
         Optional<String> ele2 = null;
         assertThrows(NullPointerException.class,
-                ()->OptionalUtilities.toList(ele1, ele2));
+                () -> OptionalUtilities.toList(ele1, ele2));
     }
 }

@@ -6,6 +6,7 @@
     import SearchInput from "../../../common/svelte/SearchInput.svelte";
     import {termSearch} from "../../../common";
     import {truncateMiddle} from "../../../common/string-utils";
+    import {entity} from "../../../common/services/enums/entity";
 
 
     export let onGridSelect = () => "selecting grid";
@@ -28,6 +29,10 @@
     $: gridList = _.isEmpty(qry)
         ? grids
         : termSearch(grids, qry, ['name', 'description']);
+
+    function determineSubjectIcon(gridSubjectKind) {
+        return _.get(entity[gridSubjectKind], "icon", "fw");
+    }
 
 </script>
 
@@ -67,7 +72,7 @@
                             <td>
                                 <button on:click={() => onSelect(grid)}
                                         class="btn btn-skinny">
-                                    {grid?.name}
+                                    <Icon name={determineSubjectIcon(grid?.subjectKind)}/> {grid?.name}
                                 </button>
                             </td>
                             <td>

@@ -99,18 +99,18 @@ public class LogicalFlowTest extends BaseInMemoryIntegrationTest {
         assertEquals(
                 asSet(ab.id(), ac.id()),
                 map(lfDao.findBySelector(logicalFlowIdSelectorFactory.apply(
-                        mkOpts(
-                            mkRef(EntityKind.ORG_UNIT, ouIds.root),
-                            CHILDREN))),
-                    IdProvider::id)
-                ,"find by root ou gives all");
+                                mkOpts(
+                                        mkRef(EntityKind.ORG_UNIT, ouIds.root),
+                                        CHILDREN))),
+                        IdProvider::id)
+                , "find by root ou gives all");
 
         assertEquals(
                 asSet(ac.id()),
                 map(lfDao.findBySelector(logicalFlowIdSelectorFactory.apply(
-                            mkOpts(
-                                mkRef(EntityKind.ORG_UNIT, ouIds.b),
-                                CHILDREN))),
+                                mkOpts(
+                                        mkRef(EntityKind.ORG_UNIT, ouIds.b),
+                                        CHILDREN))),
                         IdProvider::id),
                 "find by ou 'b' gives only one flow");
     }

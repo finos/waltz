@@ -49,7 +49,7 @@ public class MapUtilities_groupByTest {
         List<String> xs = null;
 
         assertThrows(IllegalArgumentException.class,
-                ()->  MapUtilities.groupBy(x -> x.length(), xs));
+                () -> MapUtilities.groupBy(x -> x.length(), xs));
 
     }
 
@@ -65,7 +65,7 @@ public class MapUtilities_groupByTest {
     public void simpleGroupNullFunc() {
         List<String> xs = new ArrayList();
         assertThrows(IllegalArgumentException.class,
-                ()->  MapUtilities.groupBy(null, xs));
+                () -> MapUtilities.groupBy(null, xs));
     }
 
     @Test
@@ -90,7 +90,7 @@ public class MapUtilities_groupByTest {
         List<String> xs = null;
 
         assertThrows(IllegalArgumentException.class,
-                ()->  MapUtilities.groupBy(x -> x.length(), x -> x.toUpperCase(), xs));
+                () -> MapUtilities.groupBy(x -> x.length(), x -> x.toUpperCase(), xs));
     }
 
     @Test

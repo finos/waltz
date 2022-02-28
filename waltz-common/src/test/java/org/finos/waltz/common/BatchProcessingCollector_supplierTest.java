@@ -13,7 +13,7 @@ public class BatchProcessingCollector_supplierTest {
     @Test
     public void canGetSupplier() throws Exception {
         List<String> elements = ListUtilities.newArrayList("a", "b");
-        Consumer display = a -> System.out.println("Consumed: "+a);
+        Consumer display = a -> System.out.println("Consumed: " + a);
         display.accept(elements);
         BatchProcessingCollector batch = new BatchProcessingCollector(10, display);
         Supplier<List<Throwable>> sup = batch.supplier();

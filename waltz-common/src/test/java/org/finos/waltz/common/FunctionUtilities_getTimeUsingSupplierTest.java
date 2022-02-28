@@ -28,7 +28,10 @@ public class FunctionUtilities_getTimeUsingSupplierTest {
 
     @Test
     public void timeChecksHowLongAFunctionRunsFor() {
-        String result = FunctionUtilities.time("foo", Unchecked.supplier(() -> { Thread.sleep(500); return "a"; }));
+        String result = FunctionUtilities.time("foo", Unchecked.supplier(() -> {
+            Thread.sleep(500);
+            return "a";
+        }));
         assertEquals("a", result);
     }
 

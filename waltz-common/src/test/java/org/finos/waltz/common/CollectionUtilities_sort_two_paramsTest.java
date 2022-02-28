@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+
 import static org.finos.waltz.common.CollectionUtilities.sort;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -12,24 +13,24 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class CollectionUtilities_sort_two_paramsTest {
 
     @Test
-    public void sortNullCollection(){
+    public void sortNullCollection() {
         assertThrows(IllegalArgumentException.class,
-                ()->CollectionUtilities.sort(null, Comparator.naturalOrder()));
+                () -> CollectionUtilities.sort(null, Comparator.naturalOrder()));
     }
 
     @Test
-    public void sortWithNullComparator(){
+    public void sortWithNullComparator() {
         List<String> elements = new ArrayList<>();
         elements.add("x");
         elements.add("a");
         assertThrows(IllegalArgumentException.class,
-                ()->CollectionUtilities.sort(elements, null));
+                () -> CollectionUtilities.sort(elements, null));
     }
 
     @Test
-    public void sortNullCollectionWithNullComparator(){
+    public void sortNullCollectionWithNullComparator() {
         assertThrows(IllegalArgumentException.class,
-                ()->CollectionUtilities.sort(null, null));
+                () -> CollectionUtilities.sort(null, null));
     }
 
     @Test

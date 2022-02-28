@@ -50,14 +50,14 @@ public class RandomUtilities_randomPickTest {
     public void randomPickArrayFromNull() {
         String[] str = null;
         assertThrows(IllegalArgumentException.class,
-                ()->randomPick(str));
+                () -> randomPick(str));
     }
 
     @Test
     public void simpleRandomPickCollection() {
         Collection<String> ele = new ArrayList<>();
         assertThrows(IllegalArgumentException.class,
-                ()-> randomPick(ele));
+                () -> randomPick(ele));
     }
 
 
@@ -84,14 +84,14 @@ public class RandomUtilities_randomPickTest {
     public void randomPickCollFromNull() {
         Collection<String> str = null;
         assertThrows(IllegalArgumentException.class,
-                ()-> randomPick(str));
+                () -> randomPick(str));
     }
 
 
     @Test
     public void randomPickWithHowManyEmptyColl() {
         Collection<String> ele = new ArrayList<>();
-        List result = randomPick(ele,1);
+        List result = randomPick(ele, 1);
         assertEquals(0,result.size());
     }
 
@@ -144,7 +144,7 @@ public class RandomUtilities_randomPickTest {
     public void randomPickWithEmptyList() {
         List ele = new ArrayList<>();
         assertThrows(IllegalArgumentException.class,
-                ()-> randomPick(ele));
+                () -> randomPick(ele));
     }
 
 
@@ -167,6 +167,6 @@ public class RandomUtilities_randomPickTest {
     public void randomPickWithListNull() {
         List<String> str = null;
         assertThrows(NullPointerException.class,
-                ()->  randomPick(str));
+                () -> randomPick(str));
     }
 }

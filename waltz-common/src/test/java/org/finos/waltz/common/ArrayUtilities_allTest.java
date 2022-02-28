@@ -35,7 +35,7 @@ public class ArrayUtilities_allTest {
     @Test
     public void predicateMustNotBeNull() {
         assertThrows(IllegalArgumentException.class, ()
-                -> all(new Object[] {}, null));
+                -> all(new Object[]{}, null));
     }
 
 

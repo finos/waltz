@@ -110,14 +110,14 @@ function controller(serviceBroker, userService) {
             : null
     }
 
-    function save () {
+    function save() {
         const recipientIds = _.map(vm.surveyRunForm.recipients, "id");
 
         if (_.isEmpty(recipientIds)) {
             toasts.error("Please provide at least one recipient");
             return;
         }
-        const submissionDueDate = toDate(vm.surveyRunForm.dueDate) ;
+        const submissionDueDate = toDate(vm.surveyRunForm.dueDate);
         const approvalDueDate = toDate(vm.surveyRunForm.approvalDueDate) || submissionDueDate;
         const command = {
             name: vm.surveyRunForm.name,

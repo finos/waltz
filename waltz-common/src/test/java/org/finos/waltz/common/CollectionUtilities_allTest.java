@@ -41,14 +41,14 @@ public class CollectionUtilities_allTest {
     @Test
     public void throwsExceptionIfCollectionIsNull() {
         assertThrows(IllegalArgumentException.class,
-                ()->all((Collection<String>) null, StringUtilities::isEmpty));
+                () -> all((Collection<String>) null, StringUtilities::isEmpty));
     }
 
 
     @Test
     public void throwsExceptionIfPredicateIsNull() {
         assertThrows(IllegalArgumentException.class,
-                ()->all(words, null));
+                () -> all(words, null));
     }
 
 

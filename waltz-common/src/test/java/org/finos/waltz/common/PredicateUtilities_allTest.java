@@ -29,24 +29,24 @@ public class PredicateUtilities_allTest {
     }
 
     @Test
-    public void simpleAllNullList1(){
+    public void simpleAllNullList1() {
         List<Integer> ele = null;
         assertThrows(NullPointerException.class,
-                ()-> PredicateUtilities.all(ele, x->(Integer.parseInt(x.toString())%2)==0));
+                () -> PredicateUtilities.all(ele, x -> (Integer.parseInt(x.toString()) % 2) == 0));
     }
 
     @Test
-    public void simpleAllNullPredicate1(){
-        List<Integer> ele = ListUtilities.newArrayList(1,2,3);
+    public void simpleAllNullPredicate1() {
+        List<Integer> ele = ListUtilities.newArrayList(1, 2, 3);
         assertThrows(NullPointerException.class,
-                ()-> PredicateUtilities.all(ele, null));
+                () -> PredicateUtilities.all(ele, null));
     }
 
     @Test
-    public void simpleAllNull1(){
+    public void simpleAllNull1() {
         List<Integer> ele = null;
         assertThrows(NullPointerException.class,
-                ()-> PredicateUtilities.all(ele, null));
+                () -> PredicateUtilities.all(ele, null));
     }
 
     @Test
@@ -70,24 +70,24 @@ public class PredicateUtilities_allTest {
     }
 
     @Test
-    public void simpleAllNullList2(){
+    public void simpleAllNullList2() {
         Integer[] ele = null;
         assertThrows(NullPointerException.class,
-                ()->  PredicateUtilities.all(ele, x->(Integer.parseInt(x.toString())%2)==0));
+                () -> PredicateUtilities.all(ele, x -> (Integer.parseInt(x.toString()) % 2) == 0));
     }
 
     @Test
-    public void simpleAllNullPredicate2(){
-        Integer[] ele = new Integer[]{1,2,3};
+    public void simpleAllNullPredicate2() {
+        Integer[] ele = new Integer[]{1, 2, 3};
         assertThrows(NullPointerException.class,
-                ()->  PredicateUtilities.all(ele, null));
+                () -> PredicateUtilities.all(ele, null));
 
     }
 
     @Test
-    public void simpleAllNull2(){
+    public void simpleAllNull2() {
         Integer[] ele = null;
         assertThrows(NullPointerException.class,
-                ()-> PredicateUtilities.all(ele, null));
+                () -> PredicateUtilities.all(ele, null));
     }
 }

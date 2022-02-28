@@ -72,14 +72,14 @@ public class DataTypeDecoratorServiceTest extends BaseInMemoryIntegrationTest {
         Collection<DataTypeDecorator> lfDecs = dtdSvc.findByFlowIds(emptyList(), EntityKind.LOGICAL_DATA_FLOW);
         Collection<DataTypeDecorator> psDecs = dtdSvc.findByFlowIds(emptyList(), EntityKind.PHYSICAL_SPECIFICATION);
 
-        assertEquals(emptyList(), lfDecs,"If empty id list provided returns empty list");
-        assertEquals(emptyList(), psDecs,"If empty id list provided returns empty list");
+        assertEquals(emptyList(), lfDecs, "If empty id list provided returns empty list");
+        assertEquals(emptyList(), psDecs, "If empty id list provided returns empty list");
 
         Collection<DataTypeDecorator> invalidId = dtdSvc.findByFlowIds(asList(-1L), EntityKind.LOGICAL_DATA_FLOW);
-        assertEquals(emptyList(), invalidId,"If flow id doesn't exist returns empty list");
+        assertEquals(emptyList(), invalidId, "If flow id doesn't exist returns empty list");
 
         assertThrows(IllegalArgumentException.class,
-                () ->  dtdSvc.findByFlowIds(asList(-1L), EntityKind.APPLICATION),
+                () -> dtdSvc.findByFlowIds(asList(-1L), EntityKind.APPLICATION),
                 "If unsupported kind id throws exception");
 
         EntityReference a = appHelper.createNewApp("a", ouIds.a);
@@ -97,7 +97,7 @@ public class DataTypeDecoratorServiceTest extends BaseInMemoryIntegrationTest {
         dtdSvc.updateDecorators(username, flow.entityReference(), asSet(dtId), emptySet());
 
         Collection<DataTypeDecorator> flowDecorators = dtdSvc.findByFlowIds(asList(flow.entityReference().id()), EntityKind.LOGICAL_DATA_FLOW);
-        assertEquals(1, flowDecorators.size(),"Flow with one datatype associated returns a set with one decorator");
+        assertEquals(1, flowDecorators.size(), "Flow with one datatype associated returns a set with one decorator");
         assertEquals(dtId, Long.valueOf(first(flowDecorators).dataTypeId()),
                 "Returns the correct datatype id on the decorator");
 
@@ -127,13 +127,13 @@ public class DataTypeDecoratorServiceTest extends BaseInMemoryIntegrationTest {
 
         assertThrows(
                 IllegalArgumentException.class,
-                () ->  dtdSvc.getByEntityRefAndDataTypeId(a, 1L),
+                () -> dtdSvc.getByEntityRefAndDataTypeId(a, 1L),
                 "If unsupported kind id throws exception");
 
         LogicalFlow flow = lfHelper.createLogicalFlow(a, b);
 
         DataTypeDecorator noDt = dtdSvc.getByEntityRefAndDataTypeId(flow.entityReference(), -1L);
-        assertNull(noDt,"Returns null no match for dt on flow");
+        assertNull(noDt, "Returns null no match for dt on flow");
 
         Long dtId = dataTypeHelper.createDataType("getByEntityRefAndDataTypeId");
 
@@ -153,7 +153,7 @@ public class DataTypeDecoratorServiceTest extends BaseInMemoryIntegrationTest {
 
 
     @Test
-    public void findByEntityId(){
+    public void findByEntityId() {
 
         String username = mkName("getByEntityRefAndDataTypeId");
 
@@ -161,7 +161,7 @@ public class DataTypeDecoratorServiceTest extends BaseInMemoryIntegrationTest {
         EntityReference b = appHelper.createNewApp("b", ouIds.a1);
 
         assertThrows(IllegalArgumentException.class,
-                () ->  dtdSvc.findByEntityId(a),
+                () -> dtdSvc.findByEntityId(a),
                 "If unsupported kind id throws exception");
 
         LogicalFlow flow = lfHelper.createLogicalFlow(a, b);
@@ -190,7 +190,7 @@ public class DataTypeDecoratorServiceTest extends BaseInMemoryIntegrationTest {
 
 
     @Test
-    public void findByEntityIdSelector(){
+    public void findByEntityIdSelector() {
 
         String username = mkName("findByEntityIdSelector");
 
@@ -229,7 +229,7 @@ public class DataTypeDecoratorServiceTest extends BaseInMemoryIntegrationTest {
 
 
     @Test
-    public void updateDecorators(){
+    public void updateDecorators() {
 
         String username = mkName("updateDecorators");
 
