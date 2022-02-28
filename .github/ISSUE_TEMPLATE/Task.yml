@@ -1,0 +1,23 @@
+name: Task
+description: Non feature related issue
+labels: [ "task" ]
+body:
+  - type: textarea
+    id: desc
+    attributes:
+      label: Description
+      description: "Please provide an overview of the task you would like preformed"
+      placeholder: "e.g.: refresh java libs, update build etc."
+    validations:
+      required: true
+  - type: dropdown
+    id: resourcing
+    attributes:
+      label: Resourcing
+      description: Are you able/planning to contribute the feature to Waltz
+      options:
+        - We would like to add this request to the Waltz team's task backlog
+        - We would like to collaborate on this task
+        - We intend to implement this task
+    validations:
+      required: true
