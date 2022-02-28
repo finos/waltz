@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.function.Function;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SearchUtilities_RelevancyComparatorTest {
 
@@ -41,7 +41,7 @@ public class SearchUtilities_RelevancyComparatorTest {
                 "");
 
         String term = "sap";
-        Function<String, String> extractor = x -> x.toString();
+        Function<String, String> extractor = x -> x;
         list.sort(SearchUtilities.mkRelevancyComparator(extractor, term));
 
         // -- check results
