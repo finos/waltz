@@ -546,6 +546,14 @@ public class ReportGridDao {
             return emptySet();
         } else {
 
+            Field<Long> latest_instance = DSL
+                    .firstValue(SURVEY_INSTANCE.ID)
+                    .over()
+                    .partitionBy(SURVEY_INSTANCE.ENTITY_ID, SURVEY_INSTANCE.ENTITY_KIND, SURVEY_RUN.SURVEY_TEMPLATE_ID)
+                    .orderBy(SURVEY_INSTANCE.SUBMITTED_AT.desc().nullsLast())
+                    .as("latest_instance");
+
+
             Map<Long, Collection<EntityFieldReference>> fieldReferencesByTemplateId = groupBy(
                     surveyInstanceInfo,
                     r -> r.v1.columnEntityId(),
@@ -553,17 +561,34 @@ public class ReportGridDao {
 
             Set<Long> surveyTemplateIds = map(surveyInstanceInfo, d -> d.v1.columnEntityId());
 
-            SelectConditionStep<Record> qry = dsl
-                    .select(SURVEY_INSTANCE.fields())
+            Table<Record> surveyInfo = dsl
+                    .select(latest_instance)
+                    .select(SURVEY_INSTANCE.ID.as("sid"),
+                            SURVEY_INSTANCE.STATUS,
+                            SURVEY_INSTANCE.APPROVED_AT,
+                            SURVEY_INSTANCE.APPROVED_BY,
+                            SURVEY_INSTANCE.SUBMITTED_AT,
+                            SURVEY_INSTANCE.SUBMITTED_BY,
+                            SURVEY_INSTANCE.DUE_DATE,
+                            SURVEY_INSTANCE.APPROVAL_DUE_DATE,
+                            SURVEY_INSTANCE.ENTITY_ID,
+                            SURVEY_INSTANCE.ENTITY_KIND)
                     .select(SURVEY_RUN.SURVEY_TEMPLATE_ID)
                     .from(SURVEY_INSTANCE)
                     .innerJoin(SURVEY_RUN).on(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(SURVEY_RUN.ID))
                     .where(SURVEY_INSTANCE.ENTITY_ID.in(selector.selector())
                             .and(SURVEY_INSTANCE.ENTITY_KIND.eq(selector.kind().name())
                                     .and(SURVEY_RUN.SURVEY_TEMPLATE_ID.in(surveyTemplateIds)
-                                            .and(SURVEY_INSTANCE.ORIGINAL_INSTANCE_ID.isNull()))));
+                                            .and(SURVEY_INSTANCE.ORIGINAL_INSTANCE_ID.isNull()))))
+                    .asTable();
 
-            return qry
+            SelectConditionStep<Record> surveyInfoForLatestInstance = dsl
+                    .select(surveyInfo.fields())
+                    .from(surveyInfo)
+                    .where(surveyInfo.field(latest_instance)
+                            .eq(surveyInfo.field("sid", Long.class)));
+
+            return surveyInfoForLatestInstance
                     .fetch()
                     .stream()
                     .flatMap(surveyRecord -> {
@@ -825,7 +850,7 @@ public class ReportGridDao {
                     .firstValue(SURVEY_INSTANCE.ID)
                     .over()
                     .partitionBy(SURVEY_INSTANCE.ENTITY_ID, SURVEY_INSTANCE.ENTITY_KIND, SURVEY_QUESTION.ID)
-                    .orderBy(SURVEY_INSTANCE.APPROVED_AT.desc().nullsLast())
+                    .orderBy(SURVEY_INSTANCE.SUBMITTED_AT.desc().nullsLast())
                     .as("latest_instance");
 
             Table<Record> responsesWithQuestionTypeAndEntity = dsl

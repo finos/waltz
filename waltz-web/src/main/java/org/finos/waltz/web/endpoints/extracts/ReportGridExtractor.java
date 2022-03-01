@@ -236,7 +236,7 @@ public class ReportGridExtractor implements DataExtractor {
 
                     Collection<ReportGridCell> cells = r.getValue();
 
-                    Map<Tuple3<Long, EntityKind, Long>, ReportGridCell> callValuesByColumnRefForSubject = indexBy(
+                    Map<Tuple3<Long, EntityKind, Long>, ReportGridCell> cellValuesByColumnRefForSubject = indexBy(
                             cells,
                             k -> tuple(k.columnEntityId(), k.columnEntityKind(), k.entityFieldReferenceId()));
 
@@ -251,7 +251,7 @@ public class ReportGridExtractor implements DataExtractor {
                                 if (!allowCostsExport && isCostColumn) {
                                     reportRow.add("REDACTED");
                                 } else {
-                                    ReportGridCell cell = callValuesByColumnRefForSubject.getOrDefault(
+                                    ReportGridCell cell = cellValuesByColumnRefForSubject.getOrDefault(
                                             tuple(
                                                     colDef.columnEntityId(),
                                                     colDef.columnEntityKind(),
@@ -290,6 +290,7 @@ public class ReportGridExtractor implements DataExtractor {
             case INVOLVEMENT_KIND:
             case SURVEY_TEMPLATE:
             case APPLICATION:
+            case CHANGE_INITIATIVE:
             case SURVEY_QUESTION:
                 return Optional.ofNullable(reportGridCell.text()).orElse("-");
             case MEASURABLE:
