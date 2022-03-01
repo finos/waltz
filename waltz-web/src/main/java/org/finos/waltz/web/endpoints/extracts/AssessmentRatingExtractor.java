@@ -21,13 +21,9 @@ package org.finos.waltz.web.endpoints.extracts;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.data.assessment_definition.AssessmentDefinitionDao;
 import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.web.WebUtilities;
-import org.jooq.DSLContext;
-import org.jooq.Field;
-import org.jooq.Record10;
-import org.jooq.SelectConditionStep;
+import org.jooq.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +31,8 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 
-import static org.finos.waltz.schema.Tables.*;
 import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.schema.Tables.*;
 import static spark.Spark.post;
 
 
@@ -83,13 +79,14 @@ public class AssessmentRatingExtractor extends DirectQueryBasedDataExtractor {
     }
 
 
-    private SelectConditionStep<Record10<Long, String, String, String, String, String, String, Timestamp, String, String>> prepareExtractQuery(Long definitionId) {
+    private SelectConditionStep<Record11<Long, String, String, String, String, String, String, String, Timestamp, String, String>> prepareExtractQuery(Long definitionId) {
 
         return dsl
                 .selectDistinct(
                         ASSESSMENT_RATING.ENTITY_ID.as("Waltz Id"),
                         entityExtIdField.as("External Id"),
                         entityNameField.as("Name"),
+                        entityLifecycleField.as("Lifecycle status"),
                         RATING_SCHEME_ITEM.CODE.as("Code"),
                         RATING_SCHEME_ITEM.NAME.as("Rating Name"),
                         RATING_SCHEME_ITEM.DESCRIPTION.as("Comment"),
@@ -102,7 +99,6 @@ public class AssessmentRatingExtractor extends DirectQueryBasedDataExtractor {
                 .on(ASSESSMENT_RATING.RATING_ID.eq(RATING_SCHEME_ITEM.ID))
                 .innerJoin(ASSESSMENT_DEFINITION)
                 .on(ASSESSMENT_DEFINITION.ID.eq(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID))
-                .where(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID.eq(definitionId))
-                .and(entityLifecycleField.ne(EntityLifecycleStatus.REMOVED.name()));
+                .where(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID.eq(definitionId));
     }
 }
