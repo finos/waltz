@@ -37,6 +37,7 @@ import java.util.List;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static org.finos.waltz.common.CollectionUtilities.first;
+import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 import static org.finos.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
@@ -56,14 +57,6 @@ public class MeasurableRatingDaoTest extends BaseInMemoryIntegrationTest {
     @Autowired
     private DSLContext dsl;
 
-    @BeforeEach
-    public void beforeMeasurableRatingTests() {
-        dsl.deleteFrom(Tables.MEASURABLE_RATING).execute();
-        dsl.deleteFrom(Tables.APPLICATION).execute();
-        dsl.deleteFrom(Tables.MEASURABLE).execute();
-        dsl.deleteFrom(Tables.MEASURABLE_CATEGORY).execute();
-    }
-
 
     @Test
     public void ratingsAreEmptyIfNoneAreAssociatedToAnApp() {
@@ -74,8 +67,8 @@ public class MeasurableRatingDaoTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void ratingsCanBeSaved() {
-        long categoryId = measurableHelper.createMeasurableCategory("mc");
-        long m1Id = measurableHelper.createMeasurable("m1", categoryId);
+        long categoryId = measurableHelper.createMeasurableCategory(mkName("mc"));
+        long m1Id = measurableHelper.createMeasurable(mkName("m1"), categoryId);
 
         EntityReference appRef = mkNewAppRef();
         mkRatings(appRef, m1Id);
@@ -88,8 +81,8 @@ public class MeasurableRatingDaoTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void readOnlyRatingsCannotBeSaved() {
-        long categoryId = measurableHelper.createMeasurableCategory("mc");
-        long m1Id = measurableHelper.createMeasurable("m1", categoryId);
+        long categoryId = measurableHelper.createMeasurableCategory(mkName("mc"));
+        long m1Id = measurableHelper.createMeasurable(mkName("m1"), categoryId);
 
         EntityReference appRef = mkNewAppRef();
         mkRatings(appRef, m1Id);
@@ -120,9 +113,9 @@ public class MeasurableRatingDaoTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void multipleRatingsCanBeSaved() {
-        long categoryId = measurableHelper.createMeasurableCategory("mc");
-        long m1Id = measurableHelper.createMeasurable("m1", categoryId);
-        long m2Id = measurableHelper.createMeasurable("m2", categoryId);
+        long categoryId = measurableHelper.createMeasurableCategory(mkName("mc"));
+        long m1Id = measurableHelper.createMeasurable(mkName("m1"), categoryId);
+        long m2Id = measurableHelper.createMeasurable(mkName("m2"), categoryId);
 
         EntityReference app1Ref = mkNewAppRef();
         mkRatings(app1Ref, m1Id, m2Id);
@@ -138,14 +131,14 @@ public class MeasurableRatingDaoTest extends BaseInMemoryIntegrationTest {
     @Test
     public void multipleRatingsCanRetrievedBySelectors() {
 
-        long categoryId = measurableHelper.createMeasurableCategory("mc");
-        long m1Id = measurableHelper.createMeasurable("m1", categoryId);
-        long m2Id = measurableHelper.createMeasurable("m2", categoryId);
+        long categoryId = measurableHelper.createMeasurableCategory(mkName("mc"));
+        long m1Id = measurableHelper.createMeasurable(mkName("m1"), categoryId);
+        long m2Id = measurableHelper.createMeasurable(mkName("m2"), categoryId);
 
-        EntityReference app1Ref = appHelper.createNewApp("a1", null);
+        EntityReference app1Ref = appHelper.createNewApp(mkName("a1"), null);
         mkRatings(app1Ref, m1Id, m2Id);
 
-        EntityReference app2Ref = appHelper.createNewApp("a2", null);
+        EntityReference app2Ref = appHelper.createNewApp(mkName("a2"), null);
         mkRatings(app2Ref, m1Id);
 
         rebuildHierarchy(EntityKind.MEASURABLE);
@@ -178,11 +171,11 @@ public class MeasurableRatingDaoTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void ratingsCanBeBulkRemovedByCategoryForAGivenApp() {
-        long categoryId = measurableHelper.createMeasurableCategory("mc");
-        long m1Id = measurableHelper.createMeasurable("m1", categoryId);
-        long m2Id = measurableHelper.createMeasurable("m2", categoryId);
+        long categoryId = measurableHelper.createMeasurableCategory(mkName("mc"));
+        long m1Id = measurableHelper.createMeasurable(mkName("m1"), categoryId);
+        long m2Id = measurableHelper.createMeasurable(mkName("m2"), categoryId);
 
-        EntityReference app1Ref = appHelper.createNewApp("a1", null);
+        EntityReference app1Ref = appHelper.createNewApp(mkName("a1"), null);
         mkRatings(app1Ref, m1Id, m2Id);
 
         assertEquals(

@@ -15,12 +15,8 @@ public class PersonHelper {
 
     private static final AtomicLong ctr = new AtomicLong();
 
-    private final DSLContext dsl;
-
     @Autowired
-    public PersonHelper(DSLContext dsl) {
-        this.dsl = dsl;
-    }
+    private DSLContext dsl;
 
 
     public Long createPerson(String name) {
