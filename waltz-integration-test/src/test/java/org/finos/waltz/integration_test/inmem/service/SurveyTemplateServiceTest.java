@@ -7,7 +7,9 @@ import org.finos.waltz.integration_test.inmem.helpers.SurveyTemplateHelper;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.ReleaseLifecycleStatus;
-import org.finos.waltz.model.survey.*;
+import org.finos.waltz.model.survey.ImmutableSurveyTemplateChangeCommand;
+import org.finos.waltz.model.survey.SurveyTemplate;
+import org.finos.waltz.model.survey.SurveyTemplateChangeCommand;
 import org.finos.waltz.service.survey.SurveyQuestionService;
 import org.finos.waltz.service.survey.SurveyTemplateService;
 import org.jooq.DSLContext;
@@ -17,15 +19,15 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.CollectionUtilities.find;
 import static org.finos.waltz.common.StringUtilities.lower;
 import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkUserId;
 import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.finos.waltz.schema.Tables.SURVEY_QUESTION_RESPONSE;
-import static org.finos.waltz.schema.tables.SurveyQuestion.SURVEY_QUESTION;
-import static org.finos.waltz.schema.tables.SurveyTemplate.SURVEY_TEMPLATE;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Service
@@ -51,11 +53,13 @@ public class SurveyTemplateServiceTest extends BaseInMemoryIntegrationTest {
 
 
     @Test
-    public void cannotFindAllIfNoMatchingPersonForUser() {
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> surveyTemplateService.findAll("foo"),
-                "should fail if no matching person");
+    public void ifCannotFindPersonMustOnlyReturnActiveTemplates() {
+        List<SurveyTemplate> surveys = surveyTemplateService.findAll("foo");
+        Set<SurveyTemplate> nonActiveTemplates = surveys
+                .stream()
+                .filter(r -> r.status().equals(ReleaseLifecycleStatus.ACTIVE))
+                .collect(toSet());
+        assertEquals(emptySet(), nonActiveTemplates, "all templates should be active if user cannot be found");
     }
 
 
