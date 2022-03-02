@@ -82,9 +82,12 @@ public class SurveyTemplateService {
         checkNotNull(userName, "userName cannot be null");
 
         Person owner = personDao.getActiveByUserEmail(userName);
-        checkNotNull(owner, "userName " + userName + " cannot be resolved");
 
-        return surveyTemplateDao.findAll(owner.id().get());
+        if (owner == null) {
+            return surveyTemplateDao.findAll(null);
+        } else {
+            return surveyTemplateDao.findAll(owner.id().orElse(null));
+        }
     }
 
 

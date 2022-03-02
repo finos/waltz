@@ -9,15 +9,15 @@ import static org.junit.jupiter.api.Assertions.*;
 public class DebugUtilities_logValueFromResultFuncTest {
 
     @Test
-    public void logNullMessage(){
+    public void logNullMessage() {
         assertThrows(NullPointerException.class,
-                ()->DebugUtilities.logValue(null, "aaa"));
+                () -> DebugUtilities.logValue(null, "aaa"));
     }
 
     @Test
-    public void logNullResultAndMessage(){
+    public void logNullResultAndMessage() {
         assertThrows(NullPointerException.class,
-                ()->DebugUtilities.logValue(null, null));
+                () -> DebugUtilities.logValue(null, null));
     }
 
     @Test

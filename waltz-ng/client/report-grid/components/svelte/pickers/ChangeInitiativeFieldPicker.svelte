@@ -7,7 +7,7 @@
     import {entity} from "../../../../common/services/enums/entity";
     import NoData from "../../../../common/svelte/NoData.svelte";
 
-    export let onSelect = () => console.log("Selecting application field");
+    export let onSelect = () => console.log("Selecting change initiative field");
     export let selectionFilter = () => true;
 
     $: entityFieldReferenceCall = entityFieldReferenceStore.findAll();
@@ -15,15 +15,15 @@
 
     $: fieldReferences = _
         .chain(entityFieldReferences)
-        .filter(d => d.entityKind === "APPLICATION")
+        .filter(d => d.entityKind === "CHANGE_INITIATIVE")
         .map(d => Object.assign(
             {},
             d,
             {
                 columnEntityId: null,
-                columnEntityKind: entity.APPLICATION.key,
+                columnEntityKind: entity.CHANGE_INITIATIVE.key,
                 entityFieldReference: d,
-                columnName: entity.APPLICATION.name,
+                columnName: entity.CHANGE_INITIATIVE.name,
                 displayName: null
             }))
         .value();
@@ -43,7 +43,7 @@
 
 <div class="help-block small">
     <Icon name="info-circle"/>
-    Select an application field from the list below, you can filter the list using the search bar.
+    Select a change initiative field from the list below, you can filter the list using the search bar.
 </div>
 <br>
 {#if _.isEmpty(rowData)}

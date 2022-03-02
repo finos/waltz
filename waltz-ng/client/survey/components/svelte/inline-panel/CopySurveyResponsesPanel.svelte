@@ -200,10 +200,10 @@
                 </colgroup>
                 <thead>
                 <tr>
-                        <th>Survey Run</th>
-                        <th>Entity</th>
+                    <th>Survey Run</th>
+                    <th>Entity</th>
                     <th>External Id</th>
-                    </tr>
+                </tr>
                 </thead>
                 <tbody>
                 {#each filteredSurveys as survey}

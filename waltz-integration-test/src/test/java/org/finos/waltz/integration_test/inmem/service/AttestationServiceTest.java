@@ -213,7 +213,7 @@ public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
 
         resp.id().ifPresent(runId -> {
             List<AttestationInstance> instances = aiSvc.findByRunId(runId);
-            assertEquals( 1, instances.size(),"expected only one instance");
+            assertEquals(1, instances.size(), "expected only one instance");
 
             AttestationInstance instance = first(instances);
             assertEquals(app, instance.parentEntity());

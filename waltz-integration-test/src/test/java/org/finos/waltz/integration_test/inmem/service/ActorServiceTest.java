@@ -67,7 +67,7 @@ public class ActorServiceTest extends BaseInMemoryIntegrationTest {
         int preCount = svc.findAll().size();
         Long id = helper.createActor(mkName("canBeDeletedTest"));
 
-        System.out.println("After creation: "+ svc.findAll());
+        System.out.println("After creation: " + svc.findAll());
         boolean deleted = svc.delete(id);
 
         assertTrue(deleted,

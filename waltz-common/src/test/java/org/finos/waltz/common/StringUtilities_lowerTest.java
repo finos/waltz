@@ -29,10 +29,10 @@ public class StringUtilities_lowerTest {
     }
 
     @Test
-    public void simpleLowerWithNullStr(){
+    public void simpleLowerWithNullStr() {
         String str = null;
         assertThrows(IllegalArgumentException.class,
-                ()->  StringUtilities.lower(str));
+                () -> StringUtilities.lower(str));
 
     }
 }

@@ -40,9 +40,9 @@ public class MapUtilities_composeTest {
     @Test
     public void simpleComposeWithNullMap1() {
         Map map1 = null;
-        Map map2 = MapUtilities.newHashMap(1,'a',2,'b');
+        Map map2 = MapUtilities.newHashMap(1, 'a', 2, 'b');
         assertThrows(NullPointerException.class,
-                ()-> MapUtilities.compose(map1, map2));
+                () -> MapUtilities.compose(map1, map2));
     }
 
     @Test
@@ -57,10 +57,10 @@ public class MapUtilities_composeTest {
 
     @Test
     public void simpleComposeWithNullMap2() {
-        Map map1 = MapUtilities.newHashMap(1,1,2,2);
+        Map map1 = MapUtilities.newHashMap(1, 1, 2, 2);
         Map map2 = null;
         assertThrows(NullPointerException.class,
-                ()-> MapUtilities.compose(map1, map2));
+                () -> MapUtilities.compose(map1, map2));
     }
 
     @Test
@@ -76,6 +76,6 @@ public class MapUtilities_composeTest {
         Map map1 = null;
         Map map2 = null;
         assertThrows(NullPointerException.class,
-                ()-> MapUtilities.compose(map1, map2));
+                () -> MapUtilities.compose(map1, map2));
     }
 }

@@ -65,7 +65,7 @@ public class StringUtilities_mkPathTest {
     @Test
     public void mkPathWithNullSegmentsIsNotAllowed() {
         assertThrows(IllegalArgumentException.class,
-                ()-> StringUtilities.mkPath("test", null));
+                () -> StringUtilities.mkPath("test", null));
     }
 
 
@@ -73,7 +73,7 @@ public class StringUtilities_mkPathTest {
     public void mkPathWithEmptySegmentsIsNotAllowed() {
 
         assertThrows(IllegalArgumentException.class,
-                ()-> StringUtilities.mkPath("test", ""));
+                () -> StringUtilities.mkPath("test", ""));
     }
 
 

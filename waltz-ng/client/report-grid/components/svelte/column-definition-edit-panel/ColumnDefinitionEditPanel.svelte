@@ -8,15 +8,13 @@
     import toasts from "../../../../svelte-stores/toast-store";
     import ColumnDetailsEditor from "./ColumnDetailsEditor.svelte";
     import NoData from "../../../../common/svelte/NoData.svelte";
-    import {columnDefs, hasChanged, lastMovedColumn, selectedColumn} from "../report-grid-store";
+    import {columnDefs, hasChanged, selectedColumn, lastMovedColumn, selectedGrid} from "../report-grid-store";
     import ColumnRemovalConfirmation from "./ColumnRemovalConfirmation.svelte";
     import {entity} from "../../../../common/services/enums/entity";
 
 
     export let gridId;
     export let onSave = () => console.log("Saved report grid");
-
-    const gridKind = entity.APPLICATION.key;
 
     const Modes = {
         VIEW: "VIEW",
@@ -34,10 +32,11 @@
             columnEntityKind: d.columnEntityKind,
             entityFieldReference: d.entityFieldReference,
             columnName: d.columnName,
-            columnDescription: d.columnDesciption,
+            columnDescription: d.columnDescription,
             usageKind: columnUsageKind.NONE.key,
             ratingRollupRule: determineDefaultRollupRule(d).key,
-            position: 0,
+            displayName: d.displayName,
+            position: 0
         };
 
         const newList = _.concat(
@@ -101,10 +100,10 @@
 
         switch (d.kind) {
             case entity.ASSESSMENT_DEFINITION.key:
-                const assessmentAllowableForThisGrid = _.get(d, ["entityKind"]) === gridKind;
+                const assessmentAllowableForThisGrid = _.get(d, ["entityKind"]) === $selectedGrid?.definition?.subjectKind;
                 return notAlreadyAdded && assessmentAllowableForThisGrid;
             case entity.SURVEY_TEMPLATE.key:
-                return _.get(d, ["targetEntityKind"]) === gridKind;
+                return _.get(d, ["targetEntityKind"]) === $selectedGrid?.definition?.subjectKind;
             default:
                 return notAlreadyAdded;
         }

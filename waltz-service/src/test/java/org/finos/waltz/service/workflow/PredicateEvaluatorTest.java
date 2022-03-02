@@ -54,7 +54,7 @@ public class PredicateEvaluatorTest {
         JexlBuilder builder = new JexlBuilder();
         JexlEngine jexl = builder.create();
 
-        JexlExpression pred1Expr = jexl.createExpression( "assessmentVar.ratingCode == 'A'");
+        JexlExpression pred1Expr = jexl.createExpression("assessmentVar.ratingCode == 'A'");
         JexlExpression pred2Expr = jexl.createExpression("assessmentVar.ratingCode == 'C' || surveyVar.value == 'yes'");
         JexlExpression pred3Expr = jexl.createExpression("assessmentVar.ratingCode == 'C'");
         JexlExpression invalidExpr = jexl.createExpression("foo?.bar");

@@ -38,21 +38,21 @@ public class WebUtilities_attemptRenderTest {
     @Test
     public void mustProvideResponseObj() {
         assertThrows(IllegalArgumentException.class,
-                ()->WebUtilities.attemptRender(null, "foo", LOG));
+                () -> WebUtilities.attemptRender(null, "foo", LOG));
     }
 
 
     @Test
     public void mustProvideObjToRender() {
         assertThrows(IllegalArgumentException.class,
-                ()->WebUtilities.attemptRender(resp, null, LOG));
+                () -> WebUtilities.attemptRender(resp, null, LOG));
     }
 
 
     @Test
     public void mustProvideLogger() {
         assertThrows(IllegalArgumentException.class,
-                ()->WebUtilities.attemptRender(resp, "foo", null));
+                () -> WebUtilities.attemptRender(resp, "foo", null));
     }
 
 }

@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class StreamUtilities_ofNullableArrayTest {
     @Test
-    public void simpleOfNullableArray1(){
+    public void simpleOfNullableArray1() {
         String[] elements = {"a", "b"};
         Stream t = StreamUtilities.ofNullableArray(elements);
         assertEquals(2, t.count());

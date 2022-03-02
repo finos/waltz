@@ -75,26 +75,24 @@ export const columnUsageKind = {
 
 const nameCol = mkEntityLinkGridCell(
     "Name",
-    "application",
+    "subject.entityReference",
     "none",
     "right",
-    { pinnedLeft:true, width: 200});
-
+    {pinnedLeft: true, width: 200});
 
 const extIdCol = {
-    field: "application.externalId",
+    field: "subject.entityReference.externalId",
     displayName: "Ext. Id",
     width: 100,
-    pinnedLeft:true
+    pinnedLeft: true
 };
 
-
 const lifecyclePhaseCol = {
-    field: "application.lifecyclePhase",
+    field: "subject.lifecyclePhase",
     displayName: "Lifecycle Phase",
     width: 100,
     pinnedLeft: true,
-    cellTemplate:`
+    cellTemplate: `
         <div class="waltz-grid-report-cell"
             <span ng-bind="COL_FIELD | toDisplayName:'lifecyclePhase'"></span>
         </div>`
@@ -121,31 +119,33 @@ export function mkPropNameForCellRef(x) {
 }
 
 
-function initialiseDataForRow(application, columnRefs) {
+function initialiseDataForRow(subject, columnRefs) {
     return _.reduce(
         columnRefs,
         (acc, c) => {
             acc[c] = unknownRating;
             return acc;
         },
-        {application});
+        {subject});
 }
 
 
-export function getDisplayNameForColumn(c) {
-
+export function getColumnName(c) {
     let entityFieldName = _.get(c, ["entityFieldReference", "displayName"], null);
 
+    return _.chain([])
+        .concat(entityFieldName)
+        .concat(c.columnName)
+        .compact()
+        .join(" / ")
+        .value();
+}
+
+export function getDisplayNameForColumn(c) {
     if (c.displayName != null) {
         return c.displayName;
-
     } else {
-        return _.chain([])
-            .concat(entityFieldName)
-            .concat(c.columnName)
-            .compact()
-            .join(" / ")
-            .value();
+        return getColumnName(c);
     }
 
 }
@@ -171,6 +171,7 @@ export function prepareColumnDefs(gridData) {
             case "INVOLVEMENT_KIND":
             case "SURVEY_TEMPLATE":
             case "APPLICATION":
+            case "CHANGE_INITIATIVE":
             case "SURVEY_QUESTION":
                 return {
                     allowSummary: false,
@@ -259,12 +260,12 @@ function mkPopoverHtml(cellData, ratingSchemeItem) {
 
 
 export function prepareTableData(gridData) {
-    const appsById = _.keyBy(gridData.instance.applications, d => d.id);
+    const subjectsById = _.keyBy(gridData.instance.subjects, d => d.entityReference.id);
     const ratingSchemeItemsById = _
         .chain(gridData.instance.ratingSchemeItems)
         .map(d => {
             const c = rgb(d.color);
-            return Object.assign({}, d, { fontColor: determineForegroundColor(c.r, c.g, c.b)})
+            return Object.assign({}, d, {fontColor: determineForegroundColor(c.r, c.g, c.b)})
         })
         .keyBy(d => d.id)
         .value();
@@ -292,6 +293,7 @@ export function prepareTableData(gridData) {
             case "INVOLVEMENT_KIND":
             case "SURVEY_TEMPLATE":
             case "APPLICATION":
+            case "CHANGE_INITIATIVE":
             case "SURVEY_QUESTION":
                 return {
                     text: x.text,
@@ -306,15 +308,15 @@ export function prepareTableData(gridData) {
 
     return _
         .chain(gridData.instance.cellData)
-        .groupBy(d => d.applicationId)
+        .groupBy(d => d.subjectId)
         .map((xs, k) => _.reduce(
             xs,
             (acc, x) => {
                 acc[mkPropNameForCellRef(x)] = mkTableCell(x);
                 return acc;
             },
-            initialiseDataForRow(appsById[k], columnRefs)))
-        .orderBy(d => d.application.name)
+            initialiseDataForRow(subjectsById[k], columnRefs)))
+        .orderBy(d => d.subject.name)
         .value();
 }
 
@@ -325,7 +327,7 @@ export function prepareTableData(gridData) {
  * @returns {boolean}
  */
 function isSummarisableProperty(k) {
-    return ! (k === "application"
+    return !(k === "subject"
         || k === "$$hashKey"
         || k === "visible"
         || k === _.startsWith("COST_KIND"));

@@ -13,13 +13,23 @@
 
     $: rowData = _
         .chain(assessmentDefintions)
+        .map(d => Object.assign(
+            {},
+            d,
+            {
+                columnEntityId: d.id,
+                columnEntityKind: d.kind,
+                entityFieldReference: null,
+                columnName: d.name,
+                displayName: null
+            }))
         .filter(selectionFilter)
         .orderBy(d => d.name)
         .value()
 
     const columnDefs = [
-        { field: "name", name: "Assessment Definition", width: "30%"},
-        { field: "description", name: "Description", width: "70%", maxLength: 300},
+        {field: "name", name: "Assessment Definition", width: "30%"},
+        {field: "description", name: "Description", width: "70%", maxLength: 300},
     ];
 
 </script>

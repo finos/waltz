@@ -34,11 +34,11 @@ public class StringUtilities_joinTest {
     }
 
     @Test
-    public void simpleJoinWithNullColl(){
+    public void simpleJoinWithNullColl() {
         Collection coll = null;
 
         assertThrows(NullPointerException.class,
-                ()->  StringUtilities.join(coll,","));
+                () -> StringUtilities.join(coll, ","));
     }
 
     @Test
@@ -48,10 +48,10 @@ public class StringUtilities_joinTest {
     }
 
     @Test
-    public void simpleJoinWithBothNull(){
+    public void simpleJoinWithBothNull() {
         Collection coll = null;
 
         assertThrows(NullPointerException.class,
-                ()-> StringUtilities.join(coll,null));
+                () -> StringUtilities.join(coll, null));
     }
 }

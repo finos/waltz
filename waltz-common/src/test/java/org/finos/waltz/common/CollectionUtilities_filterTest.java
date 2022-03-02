@@ -52,14 +52,14 @@ public class CollectionUtilities_filterTest {
     @Test
     public void filteringANullCollectionThrowsIllegalArgException() {
         assertThrows(IllegalArgumentException.class,
-                ()-> filter(null, x -> true));
+                () -> filter(null, x -> true));
     }
 
 
     @Test
     public void filteringWithoutAFilterPredicatedThrowsIllegalArgumentException() {
         assertThrows(IllegalArgumentException.class,
-                ()-> filter(words,null));
+                () -> filter(words, null));
     }
 
 }

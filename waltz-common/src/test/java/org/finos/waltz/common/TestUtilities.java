@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TestUtilities {
 
     public static void assertLength(String message, Collection<String> xs, int expected) {
-        assertEquals(expected, xs.size(),message);
+        assertEquals(expected, xs.size(), message);
     }
 
     public static void assertLength(Collection<String> xs, int expected) {

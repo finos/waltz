@@ -35,14 +35,14 @@ public class ComplexityUtilitiesTest {
     @Test
     public void mustSupplyATally() {
         assertThrows(IllegalArgumentException.class,
-                ()-> ComplexityUtilities.tallyToComplexityScore(ComplexityType.CONNECTION, null, 10));
+                () -> ComplexityUtilities.tallyToComplexityScore(ComplexityType.CONNECTION, null, 10));
     }
 
 
     @Test
     public void negativeMaximumsAreIllegal() {
         assertThrows(IllegalArgumentException.class,
-                ()-> ComplexityUtilities.tallyToComplexityScore(ComplexityType.CONNECTION, tally, -1));
+                () -> ComplexityUtilities.tallyToComplexityScore(ComplexityType.CONNECTION, tally, -1));
 
     }
 

@@ -29,8 +29,8 @@ public class OptionalUtilities_contentsEqualTest {
     }
 
     @Test
-    public void simpleContentsEqualWhenAllNull(){
+    public void simpleContentsEqualWhenAllNull() {
         assertThrows(IllegalArgumentException.class,
-                ()->  OptionalUtilities.contentsEqual(null,null));
+                () -> OptionalUtilities.contentsEqual(null, null));
     }
 }

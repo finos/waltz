@@ -29,24 +29,24 @@ public class PredicateUtilities_noneTest {
     }
 
     @Test
-    public void simpleNoneNullList1(){
+    public void simpleNoneNullList1() {
         List<Integer> ele = null;
         assertThrows(NullPointerException.class,
-                ()-> PredicateUtilities.none(ele, x->(Integer.parseInt(x.toString())%2)==0));
+                () -> PredicateUtilities.none(ele, x -> (Integer.parseInt(x.toString()) % 2) == 0));
     }
 
     @Test
-    public void simpleNoneNullPredicate1(){
-        List<Integer> ele = ListUtilities.newArrayList(1,2,3);
+    public void simpleNoneNullPredicate1() {
+        List<Integer> ele = ListUtilities.newArrayList(1, 2, 3);
         assertThrows(NullPointerException.class,
-                ()-> PredicateUtilities.none(ele, null));
+                () -> PredicateUtilities.none(ele, null));
     }
 
     @Test
-    public void simpleNoneWithAllNull1(){
+    public void simpleNoneWithAllNull1() {
         List<Integer> ele = null;
         assertThrows(NullPointerException.class,
-                ()-> PredicateUtilities.none(ele, null));
+                () -> PredicateUtilities.none(ele, null));
     }
 
     @Test
@@ -71,25 +71,25 @@ public class PredicateUtilities_noneTest {
     }
 
     @Test
-    public void simpleNoneNullList2(){
+    public void simpleNoneNullList2() {
         Integer[] ele = null;
 
         assertThrows(NullPointerException.class,
-                ()-> PredicateUtilities.none(ele, x->(Integer.parseInt(x.toString())%2)==0));
+                () -> PredicateUtilities.none(ele, x -> (Integer.parseInt(x.toString()) % 2) == 0));
     }
 
     @Test
-    public void simpleNoneNullPredicate2(){
-        Integer[] ele = new Integer[]{1,2,3};
+    public void simpleNoneNullPredicate2() {
+        Integer[] ele = new Integer[]{1, 2, 3};
 
         assertThrows(NullPointerException.class,
-                ()-> PredicateUtilities.none(ele, null));
+                () -> PredicateUtilities.none(ele, null));
     }
 
     @Test
-    public void simpleNoneWithAllNull2(){
+    public void simpleNoneWithAllNull2() {
         Integer[] ele = null;
         assertThrows(NullPointerException.class,
-                ()-> PredicateUtilities.none(ele, null));
+                () -> PredicateUtilities.none(ele, null));
     }
 }

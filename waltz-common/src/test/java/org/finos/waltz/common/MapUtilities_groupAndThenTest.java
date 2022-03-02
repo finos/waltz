@@ -24,28 +24,28 @@ public class MapUtilities_groupAndThenTest {
     @Test
     public void groupAndThenWithNullList() {
         assertThrows(IllegalArgumentException.class,
-                ()->  MapUtilities.groupAndThen(x ->  x, identity(), null));
+                () -> MapUtilities.groupAndThen(x -> x, identity(), null));
     }
 
     @Test
     public void groupAndThenWithNullValueFn() {
-        List<String> xs = ListUtilities.newArrayList("aa", "bb", "b" );
+        List<String> xs = ListUtilities.newArrayList("aa", "bb", "b");
         assertThrows(IllegalArgumentException.class,
-                ()-> MapUtilities.groupAndThen(x ->  x, null, xs));
+                () -> MapUtilities.groupAndThen(x -> x, null, xs));
     }
 
     @Test
     public void groupAndThenWithNullKeyFn() {
-        List<String> xs = ListUtilities.newArrayList("aa", "bb", "b" );
+        List<String> xs = ListUtilities.newArrayList("aa", "bb", "b");
         assertThrows(IllegalArgumentException.class,
-                ()-> MapUtilities.groupAndThen(null, identity(), xs));
+                () -> MapUtilities.groupAndThen(null, identity(), xs));
     }
 
-   @Test
+    @Test
     public void groupAndThenWithAllNull() {
         List<String> xs = null;
         assertThrows(IllegalArgumentException.class,
-               ()-> MapUtilities.groupAndThen(null, null, xs));
+                () -> MapUtilities.groupAndThen(null, null, xs));
     }
 
     @Test

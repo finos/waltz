@@ -25,27 +25,27 @@ public class MapUtilities_indexByTest {
     public void simpleIndexByWithNulllist() {
         List<String> xs = null;
         assertThrows(IllegalArgumentException.class,
-                ()->MapUtilities.indexBy(xs, x ->  xs.indexOf(x)));
+                () -> MapUtilities.indexBy(xs, x -> xs.indexOf(x)));
 
     }
 
     @Test
     public void simpleIndexByWithNullFunc() {
-        List<String> xs = ListUtilities.newArrayList("aa", "bb", "b" );
+        List<String> xs = ListUtilities.newArrayList("aa", "bb", "b");
         assertThrows(IllegalArgumentException.class,
-                ()->MapUtilities.indexBy(xs, null));
+                () -> MapUtilities.indexBy(xs, null));
     }
 
     @Test
     public void simpleIndexByWithAllNullParams() {
         List<String> xs = null;
         assertThrows(IllegalArgumentException.class,
-                ()-> MapUtilities.indexBy(xs, null));
+                () -> MapUtilities.indexBy(xs, null));
     }
 
     @Test
     public void indexByToggledParams() {
-        List<String> xs = ListUtilities.newArrayList("aa", "bb", "b" );
+        List<String> xs = ListUtilities.newArrayList("aa", "bb", "b");
         Map result = MapUtilities.indexBy(xs::indexOf, identity(), xs);
         assertEquals(3, result.size());
         assertEquals("aa", result.get(0));
@@ -57,15 +57,15 @@ public class MapUtilities_indexByTest {
     public void indexByToggledParamsWithNullList() {
         List<String> xs = null;
         assertThrows(IllegalArgumentException.class,
-                ()->MapUtilities.indexBy(x ->  xs.indexOf(x), identity(), xs));
+                () -> MapUtilities.indexBy(x -> xs.indexOf(x), identity(), xs));
     }
 
     @Test
     public void indexByToggledParamsWithNullKeyFn() {
-        List<String> xs = ListUtilities.newArrayList("aa", "bb", "b" );
+        List<String> xs = ListUtilities.newArrayList("aa", "bb", "b");
 
         assertThrows(IllegalArgumentException.class,
-                ()-> MapUtilities.indexBy(null, identity(), xs));
+                () -> MapUtilities.indexBy(null, identity(), xs));
     }
 
     @Test
@@ -73,14 +73,14 @@ public class MapUtilities_indexByTest {
         List<String> xs = ListUtilities.newArrayList("aa", "bb", "b");
 
         assertThrows(IllegalArgumentException.class,
-                ()-> MapUtilities.indexBy(xs::indexOf, null, xs));
+                () -> MapUtilities.indexBy(xs::indexOf, null, xs));
     }
 
     @Test
     public void indexByToggledParamsWithAllNullParams() {
         List<String> xs = null;
         assertThrows(IllegalArgumentException.class,
-                ()-> MapUtilities.indexBy(null, null, xs));
+                () -> MapUtilities.indexBy(null, null, xs));
     }
 
     @Test
@@ -104,27 +104,27 @@ public class MapUtilities_indexByTest {
     public void indexByDifferentParamsWithNullList() {
         List<String> xs = null;
         assertThrows(IllegalArgumentException.class,
-                ()-> MapUtilities.indexBy(x ->  xs.indexOf(x), identity(), xs, BinaryOperator.maxBy(Comparator.naturalOrder())));
+                () -> MapUtilities.indexBy(x -> xs.indexOf(x), identity(), xs, BinaryOperator.maxBy(Comparator.naturalOrder())));
     }
 
     @Test
     public void indexByDifferentParamsWithNullKeyFn() {
-        List<String> xs = ListUtilities.newArrayList("bb", "aa", "b" );
+        List<String> xs = ListUtilities.newArrayList("bb", "aa", "b");
         assertThrows(IllegalArgumentException.class,
-                ()-> MapUtilities.indexBy(null, identity(), xs, BinaryOperator.maxBy(Comparator.naturalOrder())));
+                () -> MapUtilities.indexBy(null, identity(), xs, BinaryOperator.maxBy(Comparator.naturalOrder())));
     }
 
-   @Test
+    @Test
     public void indexByDifferentParamsWithNullBinFn() {
-        List<String> xs = ListUtilities.newArrayList("bb", "aa", "b" );
+        List<String> xs = ListUtilities.newArrayList("bb", "aa", "b");
         assertThrows(NullPointerException.class,
-               ()-> MapUtilities.indexBy(x ->  xs.indexOf(x), identity(), xs, null));
+                () -> MapUtilities.indexBy(x -> xs.indexOf(x), identity(), xs, null));
     }
 
     @Test
     public void indexByDifferentParamsWithAllNullParams() {
         List<String> xs = null;
         assertThrows(IllegalArgumentException.class,
-                ()->  MapUtilities.indexBy(null, null, xs, null));
+                () -> MapUtilities.indexBy(null, null, xs, null));
     }
 }

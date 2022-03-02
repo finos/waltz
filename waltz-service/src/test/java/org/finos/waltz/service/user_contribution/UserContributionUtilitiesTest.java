@@ -19,7 +19,6 @@
 package org.finos.waltz.service.user_contribution;
 
 
-
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

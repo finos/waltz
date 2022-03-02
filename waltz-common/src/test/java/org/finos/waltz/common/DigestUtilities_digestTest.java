@@ -8,9 +8,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class DigestUtilities_digestTest {
     @Test
-    public void digestNull(){
+    public void digestNull() {
         assertThrows(NullPointerException.class,
-                ()-> DigestUtilities.digest(null));
+                () -> DigestUtilities.digest(null));
     }
 
     @Test
@@ -19,7 +19,7 @@ public class DigestUtilities_digestTest {
         String myHash = "W6k8nbDP+T9StSHXQg5D9u2ieE8=";
         String result = DigestUtilities.digest(b);
         assertNotNull(result);
-        assertEquals( myHash, result);
+        assertEquals(myHash, result);
     }
 
     @Test

@@ -31,14 +31,14 @@ public class SetUtilities_complementTest {
     @Test
     public void twoNullSets() {
         assertThrows(IllegalArgumentException.class,
-                ()-> complement(null,null));
+                () -> complement(null, null));
     }
 
     @Test
     public void oneNullSet() {
         Set<String> abcSet = asSet("a", "b", "c");
         assertThrows(IllegalArgumentException.class,
-                ()-> complement(abcSet,null));
+                () -> complement(abcSet, null));
     }
 
     @Test

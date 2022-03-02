@@ -35,7 +35,7 @@ public class RangeBandTest {
     @Test
     public void lowAndHighCannotBeNull() {
         assertThrows(IllegalArgumentException.class,
-                ()->  new RangeBand<>(null, null));
+                () -> new RangeBand<>(null, null));
     }
 
     @Test
@@ -160,7 +160,7 @@ public class RangeBandTest {
     @Test
     public void lowCannotBeHigherThanHigh() {
         assertThrows(IllegalArgumentException.class,
-                ()->new RangeBand<>(10, 5));
+                () -> new RangeBand<>(10, 5));
     }
 
 

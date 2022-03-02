@@ -47,7 +47,7 @@ public class IOUtilities_readLinesTest {
     @Test
     public void nullStreamThrowsException() throws IOException {
         assertThrows(IllegalArgumentException.class,
-                ()->IOUtilities.readLines(null));
+                () -> IOUtilities.readLines(null));
     }
 
 

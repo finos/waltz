@@ -58,13 +58,13 @@ public class CollectionUtilities_maybeFirstTest {
 
     @Test
     public void givesEmptyIfNoElementsPassPredicate () {
-        assertEquals(CollectionUtilities.maybeFirst(ListUtilities.newArrayList(1,2,3), x -> x > 10), Optional.empty());
+        assertEquals(CollectionUtilities.maybeFirst(ListUtilities.newArrayList(1, 2, 3), x -> x > 10), Optional.empty());
     }
 
 
     @Test
     public void givesFirstPassingElement () {
-        assertEquals(CollectionUtilities.maybeFirst(ListUtilities.newArrayList(1,20,3), x -> x > 10), Optional.of(20));
+        assertEquals(CollectionUtilities.maybeFirst(ListUtilities.newArrayList(1, 20, 3), x -> x > 10), Optional.of(20));
     }
 
 

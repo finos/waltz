@@ -15,22 +15,22 @@ public class RandomUtilities_randomIntBetweenTest {
     }
 
     @Test
-    public void toggleRandomIntBetween(){
+    public void toggleRandomIntBetween() {
         assertThrows(IllegalArgumentException.class,
-                ()-> RandomUtilities.randomIntBetween(1,0));
+                () -> RandomUtilities.randomIntBetween(1, 0));
     }
 
     @Test
-    public void randomIntBetweenAllZero(){
+    public void randomIntBetweenAllZero() {
 
         assertThrows(IllegalArgumentException.class,
-                ()-> RandomUtilities.randomIntBetween(0,0));
+                () -> RandomUtilities.randomIntBetween(0, 0));
     }
 
     @Test
-    public void randomIntBetweenAllOne(){
+    public void randomIntBetweenAllOne() {
 
         assertThrows(IllegalArgumentException.class,
-                ()-> RandomUtilities.randomIntBetween(1,1));
+                () -> RandomUtilities.randomIntBetween(1, 1));
     }
 }

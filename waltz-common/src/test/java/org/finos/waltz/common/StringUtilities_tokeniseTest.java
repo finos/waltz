@@ -24,10 +24,10 @@ public class StringUtilities_tokeniseTest {
     }
 
     @Test
-    public void simpleTokeniseWithNullStr(){
+    public void simpleTokeniseWithNullStr() {
         String str = null;
 
         assertThrows(IllegalArgumentException.class,
-                ()-> StringUtilities.tokenise(str));
+                () -> StringUtilities.tokenise(str));
     }
 }

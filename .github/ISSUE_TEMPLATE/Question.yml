@@ -1,6 +1,6 @@
-name: Question 
-description: General enquiry 
-labels: ["enquiry"]
+name: Question
+description: General enquiry
+labels: [ "enquiry" ]
 body:
   - type: textarea
     id: desc

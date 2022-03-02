@@ -29,21 +29,21 @@ public class Checks_checkAllTest {
     @Test
     public void mustBeGivenAnArray() {
         assertThrows(IllegalArgumentException.class, ()
-                ->Checks.checkAll((Object[]) null, x -> true, "test"));
+                -> Checks.checkAll((Object[]) null, x -> true, "test"));
     }
 
-    
+
     @Test
     public void mustBeGivenACollection() {
         assertThrows(IllegalArgumentException.class,
-                ()->Checks.checkAll((Collection<?>) null, x -> true, "test"));
+                () -> Checks.checkAll((Collection<?>) null, x -> true, "test"));
     }
 
-    
+
     @Test
     public void mustBeGivenAPredicate() {
         assertThrows(IllegalArgumentException.class,
-                ()->Checks.checkAll(new String[]{}, null, "test"));
+                () -> Checks.checkAll(new String[]{}, null, "test"));
     }
 
 
@@ -52,10 +52,10 @@ public class Checks_checkAllTest {
         Checks.checkAll(new Integer[]{1, 3, 5}, x -> (x % 2) == 1, "test");
     }
 
-    
+
     @Test
     public void throwsIfPredicateIsFalseForAny() {
         assertThrows(IllegalArgumentException.class,
-                ()->Checks.checkAll(new Integer[]{1, 4, 5}, x -> (x % 2) == 1, "test"));
+                () -> Checks.checkAll(new Integer[]{1, 4, 5}, x -> (x % 2) == 1, "test"));
     }
 }

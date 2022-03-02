@@ -38,9 +38,9 @@ public class MapUtilities_countByTest {
 
     @Test
     public void simpleCountByWithNullFunc() {
-        List<String> xs = ListUtilities.newArrayList("aa", "bb", "b" , "ccc");
+        List<String> xs = ListUtilities.newArrayList("aa", "bb", "b", "ccc");
         assertThrows(NullPointerException.class,
-                ()-> MapUtilities.countBy(null, xs));
+                () -> MapUtilities.countBy(null, xs));
     }
 
     @Test

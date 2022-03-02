@@ -97,7 +97,7 @@ export default {
         name: "Scenario edit",
         description: "Can modify the contents of roadmap scenarios"
     },
-    "SURVEY_ADMIN" : {
+    "SURVEY_ADMIN": {
         key: "SURVEY_ADMIN",
         name: "Survey Admin",
         description: "Can administer survey runs"

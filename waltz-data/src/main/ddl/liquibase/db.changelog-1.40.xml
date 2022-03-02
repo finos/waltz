@@ -27,7 +27,6 @@
     </changeSet>
 
 
-    
     <changeSet id="20220209-2505-1"
                author="woodjes">
         <comment>2505: support entity attributes in report grids</comment>
@@ -166,7 +165,7 @@
                     type="${id.type}"/>
         </createIndex>
     </changeSet>
-  
+
     <changeSet id="20220218-5916-1"
                author="davidwatkins73">
         <comment>5916: add entity level to entity_hierarchy</comment>
@@ -600,5 +599,56 @@
                           columnName="provenance"
                           remarks="where this run came from.  Will be 'waltz' if created via the UI"/>
     </changeSet>
+
+    <changeSet id="20220121-5847-1"
+               author="woodjes">
+        <comment>5847: support for change initiatives in report grids</comment>
+        <addColumn tableName="report_grid">
+            <column name="subject_kind"
+                    type="${external-id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20220121-5847-2"
+               author="woodjes">
+        <comment>5847: support for change initiatives in report grids</comment>
+        <update tableName="report_grid">
+            <column name="subject_kind"
+                    value="APPLICATION"/>
+        </update>
+    </changeSet>
+
+    <changeSet id="20220121-5847-3"
+               author="woodjes">
+        <comment>5847: support for change initiatives in report grids</comment>
+        <addNotNullConstraint columnDataType="${external-id.type}"
+                              columnName="subject_kind"
+                              tableName="report_grid"/>
+    </changeSet>
+
+    <changeSet id="20220228-2404-1"
+               author="woodjes">
+        <insert tableName="entity_field_reference">
+            <column name="entity_kind" value="CHANGE_INITIATIVE"/>
+            <column name="field_name" value="kind"/>
+            <column name="display_name" value="Kind"/>
+            <column name="description" value="The kind of the change initiative"/>
+        </insert>
+        <insert tableName="entity_field_reference">
+            <column name="entity_kind" value="CHANGE_INITIATIVE"/>
+            <column name="field_name" value="start_date"/>
+            <column name="display_name" value="Start Date"/>
+            <column name="description" value="The start date of the change initiative"/>
+        </insert>
+        <insert tableName="entity_field_reference">
+            <column name="entity_kind" value="CHANGE_INITIATIVE"/>
+            <column name="field_name" value="end_date"/>
+            <column name="display_name" value="End Date"/>
+            <column name="description" value="The end date of the change initiative"/>
+        </insert>
+    </changeSet>
+
 
 </databaseChangeLog>

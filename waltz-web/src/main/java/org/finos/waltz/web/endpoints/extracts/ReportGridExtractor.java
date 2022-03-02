@@ -17,28 +17,24 @@
  */
 package org.finos.waltz.web.endpoints.extracts;
 
+import org.finos.waltz.model.application.LifecyclePhase;
+import org.finos.waltz.model.report_grid.*;
+import org.finos.waltz.service.report_grid.ReportGridService;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.finos.waltz.common.CollectionUtilities;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.NameProvider;
-import org.finos.waltz.model.application.Application;
-import org.finos.waltz.model.application.LifecyclePhase;
 import org.finos.waltz.model.entity_field_reference.EntityFieldReference;
 import org.finos.waltz.model.external_identifier.ExternalIdValue;
 import org.finos.waltz.model.rating.RatingSchemeItem;
-import org.finos.waltz.model.report_grid.*;
 import org.finos.waltz.model.survey.SurveyQuestion;
-import org.finos.waltz.model.utils.IdUtilities;
-import org.finos.waltz.service.report_grid.ReportGridService;
 import org.finos.waltz.service.settings.SettingsService;
 import org.finos.waltz.service.survey.SurveyQuestionService;
 import org.finos.waltz.web.WebUtilities;
@@ -114,9 +110,9 @@ public class ReportGridExtractor implements DataExtractor {
                 gridId,
                 selectionOptions);
 
-        Set<Tuple2<ReportGridColumnDefinition, Boolean>> colsWithCommentRequirement = enrichColsWithCommentRequirement(reportGrid);
+        List<Tuple2<ReportGridColumnDefinition, Boolean>> colsWithCommentRequirement = enrichColsWithCommentRequirement(reportGrid);
 
-        List<Tuple2<Application, ArrayList<Object>>> reportRows = prepareReportRows(colsWithCommentRequirement, reportGrid.instance());
+        List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows = prepareReportRows(colsWithCommentRequirement, reportGrid.instance());
 
         return formatReport(
                 format,
@@ -126,7 +122,7 @@ public class ReportGridExtractor implements DataExtractor {
     }
 
 
-    private Set<Tuple2<ReportGridColumnDefinition, Boolean>> enrichColsWithCommentRequirement(ReportGrid reportGrid) {
+    private List<Tuple2<ReportGridColumnDefinition, Boolean>> enrichColsWithCommentRequirement(ReportGrid reportGrid) {
         Set<Long> surveyQuestionsIds = reportGrid
                 .definition()
                 .columnDefinitions()
@@ -147,7 +143,8 @@ public class ReportGridExtractor implements DataExtractor {
                 .columnDefinitions()
                 .stream()
                 .map(cd -> tuple(cd, cd.columnEntityKind().equals(EntityKind.SURVEY_QUESTION) && colsNeedingComments.contains(cd.columnEntityId())))
-                .collect(toSet());
+                .sorted(Comparator.comparingLong(r -> r.v1.position()))
+                .collect(toList());
     }
 
 
@@ -159,15 +156,16 @@ public class ReportGridExtractor implements DataExtractor {
     }
 
 
-    private List<String> mkHeaderStrings(Set<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions) {
+    private List<String> mkHeaderStrings(List<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions) {
         List<String> staticHeaders = newArrayList(
-                "Application Id",
-                "Application Name",
-                "Application Asset Code",
-                "Application Lifecycle Phase");
+                "Subject Id",
+                "Subject Name",
+                "Subject External Id",
+                "Subject Lifecycle Phase");
 
         List<String> columnHeaders = columnDefinitions
                 .stream()
+                .sorted(Comparator.comparingLong(r -> r.v1.position()))
                 .flatMap(r -> {
                     String name = getColumnName(r.v1);
                     Boolean needsComment = r.v2;
@@ -203,35 +201,36 @@ public class ReportGridExtractor implements DataExtractor {
     }
 
 
-    private List<Tuple2<Application, ArrayList<Object>>> prepareReportRows(Set<Tuple2<ReportGridColumnDefinition, Boolean>> colsWithCommentRequirement,
-                                                                           ReportGridInstance reportGridInstance) {
+    private List<Tuple2<ReportSubject, ArrayList<Object>>> prepareReportRows(List<Tuple2<ReportGridColumnDefinition, Boolean>> colsWithCommentRequirement,
+                                                                             ReportGridInstance reportGridInstance) {
 
         Set<ReportGridCell> tableData = reportGridInstance.cellData();
 
-        Map<Long, Application> applicationsById = indexById(reportGridInstance.applications());
+        Map<Long, ReportSubject> subjectsById = indexBy(reportGridInstance.subjects(), d -> d.entityReference().id());
         Map<Long, RatingSchemeItem> ratingsById = indexById(reportGridInstance.ratingSchemeItems());
 
-        Map<Long, Collection<ReportGridCell>> tableDataByAppId = groupBy(
+        Map<Long, Collection<ReportGridCell>> tableDataBySubjectId = groupBy(
                 tableData,
-                ReportGridCell::applicationId);
+                ReportGridCell::subjectId);
 
         boolean allowCostsExport = settingsService
                 .getValue(SettingsService.ALLOW_COST_EXPORTS_KEY)
                 .map(r -> StringUtilities.isEmpty(r) || Boolean.parseBoolean(r))
                 .orElse(true);
 
-        return tableDataByAppId
+        return tableDataBySubjectId
                 .entrySet()
                 .stream()
                 .map(r -> {
-                    Long appId = r.getKey();
-                    Application app = applicationsById.getOrDefault(appId, null);
+                    Long subjectId = r.getKey();
+
+                    ReportSubject subject = subjectsById.getOrDefault(subjectId, null);
 
                     ArrayList<Object> reportRow = new ArrayList<>();
 
                     Collection<ReportGridCell> cells = r.getValue();
 
-                    Map<Tuple3<Long, EntityKind, Long>, ReportGridCell> cellValuesByColumnRefForApp = indexBy(
+                    Map<Tuple3<Long, EntityKind, Long>, ReportGridCell> cellValuesByColumnRefForSubject = indexBy(
                             cells,
                             k -> tuple(k.columnEntityId(), k.columnEntityKind(), k.entityFieldReferenceId()));
 
@@ -246,7 +245,7 @@ public class ReportGridExtractor implements DataExtractor {
                                 if (!allowCostsExport && isCostColumn) {
                                     reportRow.add("REDACTED");
                                 } else {
-                                    ReportGridCell cell = cellValuesByColumnRefForApp.getOrDefault(
+                                    ReportGridCell cell = cellValuesByColumnRefForSubject.getOrDefault(
                                             tuple(
                                                     colDef.columnEntityId(),
                                                     colDef.columnEntityKind(),
@@ -259,9 +258,10 @@ public class ReportGridExtractor implements DataExtractor {
                                     }
                                 }
                             });
-                    return tuple(app, reportRow);
+
+                    return tuple(subject, reportRow);
                 })
-                .sorted(Comparator.comparing(t -> t.v1.name()))
+                .sorted(Comparator.comparing(t -> t.v1.entityReference().name().get()))
                 .collect(toList());
     }
 
@@ -285,6 +285,7 @@ public class ReportGridExtractor implements DataExtractor {
             case INVOLVEMENT_KIND:
             case SURVEY_TEMPLATE:
             case APPLICATION:
+            case CHANGE_INITIATIVE:
             case SURVEY_QUESTION:
                 return Optional.ofNullable(reportGridCell.text()).orElse("-");
             case MEASURABLE:
@@ -300,8 +301,8 @@ public class ReportGridExtractor implements DataExtractor {
 
     private Tuple3<ExtractFormat, String, byte[]> formatReport(ExtractFormat format,
                                                                String reportName,
-                                                               Set<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions,
-                                                               List<Tuple2<Application, ArrayList<Object>>> reportRows) throws IOException {
+                                                               List<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions,
+                                                               List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows) throws IOException {
         switch (format) {
             case XLSX:
                 return tuple(format, reportName, mkExcelReport(reportName, columnDefinitions, reportRows));
@@ -313,8 +314,8 @@ public class ReportGridExtractor implements DataExtractor {
     }
 
 
-    private byte[] mkCSVReport(Set<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions,
-                               List<Tuple2<Application, ArrayList<Object>>> reportRows) throws IOException {
+    private byte[] mkCSVReport(List<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions,
+                               List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows) throws IOException {
         List<String> headers = mkHeaderStrings(columnDefinitions);
 
         StringWriter writer = new StringWriter();
@@ -328,11 +329,11 @@ public class ReportGridExtractor implements DataExtractor {
     }
 
 
-    private List<Object> simplify(Tuple2<Application, ArrayList<Object>> row) {
+    private List<Object> simplify(Tuple2<ReportSubject, ArrayList<Object>> row) {
 
         long appId = row.v1.entityReference().id();
-        String appName = row.v1.name();
-        Optional<ExternalIdValue> assetCode = row.v1.assetCode();
+        String appName = row.v1.entityReference().name().get();
+        Optional<String> assetCode = row.v1.entityReference().externalId();
         LifecyclePhase lifecyclePhase = row.v1.lifecyclePhase();
 
         List<Object> appInfo = asList(appId, appName, assetCode, lifecyclePhase.name());
@@ -349,8 +350,8 @@ public class ReportGridExtractor implements DataExtractor {
 
 
     private byte[] mkExcelReport(String reportName,
-                                 Set<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions,
-                                 List<Tuple2<Application, ArrayList<Object>>> reportRows) throws IOException {
+                                 List<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions,
+                                 List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows) throws IOException {
         SXSSFWorkbook workbook = new SXSSFWorkbook(2000);
         SXSSFSheet sheet = workbook.createSheet(ExtractorUtilities.sanitizeSheetName(reportName));
 
@@ -372,18 +373,18 @@ public class ReportGridExtractor implements DataExtractor {
     }
 
 
-    private int writeExcelBody(List<Tuple2<Application, ArrayList<Object>>> reportRows, SXSSFSheet sheet) {
+    private int writeExcelBody(List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows, SXSSFSheet sheet) {
         AtomicInteger rowNum = new AtomicInteger(1);
         reportRows.forEach(r -> {
 
-            long appId = r.v1.entityReference().id();
-            String appName = r.v1.name();
-            Optional<ExternalIdValue> assetCode = r.v1.assetCode();
+            long subjectId = r.v1.entityReference().id();
+            String subjectName = r.v1.entityReference().name().get();
+            Optional<String> externalId = r.v1.entityReference().externalId();
             LifecyclePhase lifecyclePhase = r.v1.lifecyclePhase();
 
-            List<Object> appInfo = asList(appId, appName, assetCode, lifecyclePhase.name());
+            List<Object> subjectInfo = asList(subjectId, subjectName, externalId, lifecyclePhase.name());
 
-            List<Object> values = concat(appInfo, r.v2);
+            List<Object> values = concat(subjectInfo, r.v2);
 
             Row row = sheet.createRow(rowNum.getAndIncrement());
             AtomicInteger colNum = new AtomicInteger(0);
@@ -413,7 +414,7 @@ public class ReportGridExtractor implements DataExtractor {
     }
 
 
-    private int writeExcelHeader(Set<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions, SXSSFSheet sheet) {
+    private int writeExcelHeader(List<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions, SXSSFSheet sheet) {
         Row headerRow = sheet.createRow(0);
         AtomicInteger colNum = new AtomicInteger();
 

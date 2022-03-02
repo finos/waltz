@@ -20,8 +20,10 @@ public abstract class ReportGridDefinition implements
 
     public abstract List<ReportGridColumnDefinition> columnDefinitions();  // columns
 
+    public abstract EntityKind subjectKind();
+
     @Value.Default
-    public ReportGridKind kind(){
+    public ReportGridKind kind() {
         return ReportGridKind.PUBLIC;
     }
 }

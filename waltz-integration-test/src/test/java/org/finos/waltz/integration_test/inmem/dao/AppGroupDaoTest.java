@@ -138,9 +138,9 @@ public class AppGroupDaoTest extends BaseInMemoryIntegrationTest {
     private void checkHasApps(Collection<Application> results,
                             EntityReference... refs) {
         newArrayList(refs).forEach(
-            r -> assertTrue(
-                    any(results, d -> d.entityReference().equals(r)),
-                    format("Cannot find %s in %s", r, results)));
+                r -> assertTrue(
+                        any(results, d -> d.entityReference().equals(r)),
+                        format("Cannot find %s in %s", r, results)));
     }
 
 }

@@ -44,13 +44,13 @@ public class WebUtilities_mkPathTest {
     @Test
     public void emptySegmentsThrowException() {
         assertThrows(IllegalArgumentException.class,
-                ()->WebUtilities.mkPath("ay", "", "cee"));
+                () -> WebUtilities.mkPath("ay", "", "cee"));
     }
 
     @Test
     public void cannotMkPathIfItContainsNullSegments() {
         assertThrows(IllegalArgumentException.class,
-                ()->WebUtilities.mkPath("bob", null, "jones"));
+                () -> WebUtilities.mkPath("bob", null, "jones"));
     }
 
 }
