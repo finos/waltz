@@ -1,10 +1,9 @@
 package org.finos.waltz.service.permission;
 
+import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.permission_group.CheckPermissionCommand;
-import org.finos.waltz.model.permission_group.ImmutablePermission;
-import org.finos.waltz.model.permission_group.Permission;
+import org.finos.waltz.model.permission_group.*;
 import org.finos.waltz.schema.tables.PermissionGroupInvolvement;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -14,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.finos.waltz.common.SetUtilities.minus;
 import static org.finos.waltz.schema.Tables.*;
 import static org.finos.waltz.schema.tables.PermissionGroup.PERMISSION_GROUP;
 import static org.finos.waltz.schema.tables.PermissionGroupEntry.PERMISSION_GROUP_ENTRY;
@@ -38,6 +38,9 @@ public class PermissionGroupDao {
                 .isDefault(isDefault)
                 .build();
     };
+
+    private static final Set<Long> ALL_USERS_ALLOWED = SetUtilities.asSet((Long) null);
+
 
     public PermissionGroupDao(DSLContext dsl) {
         this.dsl = dsl;
@@ -83,7 +86,7 @@ public class PermissionGroupDao {
     }
 
 
-    public Set<Long> findRequiredInvolvements(CheckPermissionCommand permissionCommand) {
+    public RequiredInvolvementsResult findRequiredInvolvements(CheckPermissionCommand permissionCommand) {
 
         Condition groupCondition = PERMISSION_GROUP.ID.in(permissionGroupSelector(permissionCommand.parentEntityRef()))
                 .or(PERMISSION_GROUP.IS_DEFAULT.isTrue());
@@ -107,8 +110,14 @@ public class PermissionGroupDao {
                 .and(qualifierKindCondition)
                 .and(qualifierIdCondition);
 
-        return qry
+        Set<Long> requiredInvolvementIds = qry
                 .fetchSet(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_KIND_ID);
+
+        return ImmutableRequiredInvolvementsResult
+                .builder()
+                .areAllUsersAllowed(requiredInvolvementIds.equals(ALL_USERS_ALLOWED))
+                .requiredInvolvementKindIds(minus(requiredInvolvementIds, ALL_USERS_ALLOWED))
+                .build();
     }
 
 

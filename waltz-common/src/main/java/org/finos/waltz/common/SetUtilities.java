@@ -134,4 +134,10 @@ public class SetUtilities {
         return minus(union(xs,ys), intersection(xs,ys));
 
     }
+
+
+    public static <T> boolean hasIntersection(Set<Long> xs,
+                                              Set<Long> ys) {
+        return ! intersection(xs, ys).isEmpty();
+    }
 }

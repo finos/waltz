@@ -8,7 +8,6 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.permission_group.CheckPermissionCommand;
 import org.finos.waltz.model.permission_group.ImmutableCheckPermissionCommand;
-import org.finos.waltz.schema.tables.PermissionGroupInvolvement;
 import org.finos.waltz.schema.tables.records.*;
 import org.finos.waltz.service.permission.PermissionGroupService;
 import org.jooq.DSLContext;
@@ -74,14 +73,13 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
     }
 
     private CheckPermissionCommand mkCommand(String u1, EntityReference appA) {
-        CheckPermissionCommand cmd = ImmutableCheckPermissionCommand
+        return ImmutableCheckPermissionCommand
                 .builder()
                 .parentEntityRef(appA)
                 .subjectKind(EntityKind.ATTESTATION)
                 .qualifierKind(EntityKind.LOGICAL_DATA_FLOW)
                 .user(u1)
                 .build();
-        return cmd;
     }
 
 
