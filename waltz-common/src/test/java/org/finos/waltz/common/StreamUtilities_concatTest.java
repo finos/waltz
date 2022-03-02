@@ -24,10 +24,10 @@ public class StreamUtilities_concatTest {
     }
 
     @Test
-    public void simpleConcatWithNullColl(){
+    public void simpleConcatWithNullColl() {
         Collection<String> elements = null;
         Stream t = StreamUtilities.concat(elements);
         assertThrows(NullPointerException.class,
-                ()->  t.count());
+                () -> t.count());
     }
 }

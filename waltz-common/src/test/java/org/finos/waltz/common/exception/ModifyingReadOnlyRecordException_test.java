@@ -14,7 +14,7 @@ public class ModifyingReadOnlyRecordException_test {
     public void modifyingReadOnlyRecordExceptionMessage() throws Exception {
         Throwable exception = assertThrows(ModifyingReadOnlyRecordException.class, () -> {
             System.out.println("=======Starting Exception process=======");
-            throw new ModifyingReadOnlyRecordException("503","Modifying Read Only Record");
+            throw new ModifyingReadOnlyRecordException("503", "Modifying Read Only Record");
         });
         assertEquals(exception.getMessage(), "Modifying Read Only Record");
     }

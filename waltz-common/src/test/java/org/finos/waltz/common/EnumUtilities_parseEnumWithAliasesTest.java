@@ -25,23 +25,23 @@ public class EnumUtilities_parseEnumWithAliasesTest {
 
 
     @Test
-    public void parseWithNullValue(){
+    public void parseWithNullValue() {
         assertThrows(IllegalArgumentException.class,
-                ()->parseEnumWithAliases(null, MyEnum.class, null, al));
+                () -> parseEnumWithAliases(null, MyEnum.class, null, al));
     }
 
 
     @Test
-    public void parseWithEmptyValue(){
+    public void parseWithEmptyValue() {
         assertThrows(IllegalArgumentException.class,
-                ()->parseEnumWithAliases("", MyEnum.class, null, al));
+                () -> parseEnumWithAliases("", MyEnum.class, null, al));
     }
 
 
     @Test
-    public void parseWithNullEnumClass(){
+    public void parseWithNullEnumClass() {
         assertThrows(IllegalArgumentException.class,
-                ()->parseEnumWithAliases("a", null, null, al));
+                () -> parseEnumWithAliases("a", null, null, al));
     }
 
 
@@ -52,17 +52,17 @@ public class EnumUtilities_parseEnumWithAliasesTest {
                 parseEnumWithAliases("a", MyEnum.class, null, null));
     }
 
-    public void parseWithAllNullParams(){
+    public void parseWithAllNullParams() {
         assertThrows(IllegalArgumentException.class,
-                ()->parseEnumWithAliases(null, null, null, null));
+                () -> parseEnumWithAliases(null, null, null, null));
 
     }
 
 
     @Test
-    public void parseWithEmptyValAndNullOtherParams(){
+    public void parseWithEmptyValAndNullOtherParams() {
         assertThrows(IllegalArgumentException.class,
-                ()->parseEnumWithAliases("", null, null, null));
+                () -> parseEnumWithAliases("", null, null, null));
     }
 
 

@@ -27,7 +27,7 @@ public class IOUtilities_streamLinesTest {
     @Test
     public void nullStreamThrowsException() throws IOException {
         assertThrows(IllegalArgumentException.class,
-                ()->IOUtilities.streamLines(null));
+                () -> IOUtilities.streamLines(null));
     }
 
 

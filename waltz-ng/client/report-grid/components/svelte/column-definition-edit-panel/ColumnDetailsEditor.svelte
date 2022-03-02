@@ -46,7 +46,7 @@
             column,
             {
                 displayName: workingDisplayName,
-                ratingRollupRuleChanged: workingDisplayName !== originalColumn.displayName
+                displayNameChanged: workingDisplayName !== originalColumn?.displayName
             })
         const columnsWithoutCol = _.reject($columnDefs, d => sameColumnRef(d, column));
         $columnDefs = _.concat(columnsWithoutCol, newColumn);
@@ -54,18 +54,11 @@
 
     $: summaryItems = _.values(columnUsageKind);
     $: rollupKinds = _.values(ratingRollupRule);
-
 </script>
 
 <h4>
-    {#if column.entityFieldReference }
-        {column.entityFieldReference.displayName} /
-    {/if}
-    {column?.columnName}
+    <ColumnDefinitionHeader {column}/>
 </h4>
-<div class="help-block small">
-    <DescriptionFade text={column?.columnDescription}/>
-</div>
 
 <table class="table table-condensed small">
     <colgroup>
@@ -95,7 +88,7 @@
                 </div>
             </td>
             <td>
-                {#if column?.columnEntityReference?.kind === 'MEASURABLE'}
+                {#if column?.columnEntityKind === 'MEASURABLE'}
                     <DropdownPicker items={rollupKinds}
                                     onSelect={(d) => selectRollupKind(d, column)}
                                     defaultMessage="Select rollup kind"

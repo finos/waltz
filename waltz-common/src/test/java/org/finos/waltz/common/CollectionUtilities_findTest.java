@@ -38,14 +38,14 @@ public class CollectionUtilities_findTest {
     @Test
     public void predicateCannotBeNull() {
         assertThrows(IllegalArgumentException.class,
-                ()->  CollectionUtilities.find(null, words));
+                () -> CollectionUtilities.find(null, words));
     }
 
 
     @Test
     public void collectionCannotBeNull() {
         assertThrows(IllegalArgumentException.class,
-                ()->  CollectionUtilities.find(d -> true, null));
+                () -> CollectionUtilities.find(d -> true, null));
     }
 
 

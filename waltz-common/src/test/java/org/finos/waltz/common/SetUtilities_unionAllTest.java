@@ -37,7 +37,7 @@ public class SetUtilities_unionAllTest {
     @Test
     public void cannotUnionAllNull() {
         assertThrows(IllegalArgumentException.class,
-                ()-> SetUtilities.unionAll(null));
+                () -> SetUtilities.unionAll(null));
     }
 
 

@@ -54,7 +54,7 @@ public class CollectionUtilities_mapTest {
     @Test
     public void mappingANullCollectionThrowsIllegalArgException() {
         assertThrows(IllegalArgumentException.class,
-                () ->  map(null, Function.identity()));
+                () -> map(null, Function.identity()));
     }
 
 

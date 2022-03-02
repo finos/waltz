@@ -9,14 +9,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class Checks_checkNotEmptyTest {
 
     @Test
-    public void sendNull(){
+    public void sendNull() {
         String element = null;
         assertThrows(IllegalArgumentException.class, ()
                 -> Checks.checkNotEmpty(element, "Test"));
     }
 
     @Test
-    public void sendEmpty(){
+    public void sendEmpty() {
         String element = "";
         assertThrows(IllegalArgumentException.class, ()
                 -> Checks.checkNotEmpty(element, "Test"));

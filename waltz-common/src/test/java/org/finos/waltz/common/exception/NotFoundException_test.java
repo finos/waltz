@@ -12,7 +12,7 @@ public class NotFoundException_test {
     public void notFoundExceptionMessage() throws Exception {
         Throwable exception = assertThrows(NotFoundException.class, () -> {
             System.out.println("=======Starting Exception process=======");
-            throw new NotFoundException("404","Not Found");
+            throw new NotFoundException("404", "Not Found");
         });
         assertEquals(exception.getMessage(), "Not Found");
     }

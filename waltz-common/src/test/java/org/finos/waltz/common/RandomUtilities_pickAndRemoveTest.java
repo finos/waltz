@@ -34,7 +34,7 @@ public class RandomUtilities_pickAndRemoveTest {
     @Test
     public void cannotPickAndRemoveFromNull() {
         assertThrows(IllegalArgumentException.class,
-                ()-> pickAndRemove(null));
+                () -> pickAndRemove(null));
     }
 
 
@@ -42,7 +42,7 @@ public class RandomUtilities_pickAndRemoveTest {
     public void cannotPickAndRemoveFromEmpty() {
 
         assertThrows(IllegalArgumentException.class,
-                ()-> pickAndRemove(Collections.emptyList()));
+                () -> pickAndRemove(Collections.emptyList()));
     }
 
 

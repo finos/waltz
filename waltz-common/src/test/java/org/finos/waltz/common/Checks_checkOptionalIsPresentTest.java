@@ -24,17 +24,17 @@ public class Checks_checkOptionalIsPresentTest {
     }
 
     @Test
-    public void sendNull(){
+    public void sendNull() {
         Optional element = Optional.ofNullable(null);
         assertThrows(IllegalArgumentException.class,
-                ()->Checks.checkOptionalIsPresent(element,"Test"));
+                () -> Checks.checkOptionalIsPresent(element, "Test"));
 
     }
 
     @Test
-    public void sendNothing(){
+    public void sendNothing() {
         Optional element = Optional.empty();
         assertThrows(IllegalArgumentException.class,
-                ()->Checks.checkOptionalIsPresent(element,"Test"));
+                () -> Checks.checkOptionalIsPresent(element, "Test"));
     }
 }

@@ -110,22 +110,22 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
 
         assertEquals(asSet(ab.id(), ac.id()),
                 map(lfSvc.findBySelector(mkOpts(
-                        mkRef(EntityKind.ORG_UNIT, ouIds.root),
-                        CHILDREN)),
-                    IdProvider::id),
+                                mkRef(EntityKind.ORG_UNIT, ouIds.root),
+                                CHILDREN)),
+                        IdProvider::id),
                 "find by root ou gives all");
 
         assertEquals(asSet(ac.id()),
                 map(lfSvc.findBySelector(mkOpts(
-                        mkRef(EntityKind.ORG_UNIT, ouIds.b),
-                        CHILDREN)),
-                    IdProvider::id),
+                                mkRef(EntityKind.ORG_UNIT, ouIds.b),
+                                CHILDREN)),
+                        IdProvider::id),
                 "find by ou 'b' gives only one flow");
     }
 
 
     @Test
-    public void getByIdTest(){
+    public void getByIdTest() {
 
         EntityReference a = appHelper.createNewApp("a", ouIds.a);
         EntityReference b = appHelper.createNewApp("b", ouIds.a1);
@@ -145,7 +145,7 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
 
 
     @Test
-    public void removeFlowTest(){
+    public void removeFlowTest() {
         EntityReference a = appHelper.createNewApp("a", ouIds.a);
         EntityReference b = appHelper.createNewApp("b", ouIds.a1);
         EntityReference c = appHelper.createNewApp("c", ouIds.b);

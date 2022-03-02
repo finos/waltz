@@ -20,7 +20,8 @@
             entity.ASSESSMENT_DEFINITION,
             entity.MEASURABLE,
             entity.SURVEY_INSTANCE,
-            entity.APPLICATION
+            entity.APPLICATION,
+            entity.CHANGE_INITIATIVE
         ],
         d => d.name);
 

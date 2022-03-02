@@ -31,7 +31,7 @@ public class ObjectUtilities_anyTest {
     public void simpleAnyNullArray() {
         String[] ele = null;
         assertThrows(NullPointerException.class,
-                ()->  ObjectUtilities.any(x->x.length()==1, ele));
+                () -> ObjectUtilities.any(x -> x.length() == 1, ele));
 
     }
 
@@ -39,14 +39,14 @@ public class ObjectUtilities_anyTest {
     public void simpleAnyNullPredicate() {
         String[] ele = {"aa", "bb"};
         assertThrows(NullPointerException.class,
-                ()->  ObjectUtilities.any(null, ele));
+                () -> ObjectUtilities.any(null, ele));
     }
 
     @Test
     public void simpleAnyAllNull() {
         String[] ele = null;
         assertThrows(NullPointerException.class,
-                ()->  ObjectUtilities.any(null, ele));
+                () -> ObjectUtilities.any(null, ele));
 
     }
 }

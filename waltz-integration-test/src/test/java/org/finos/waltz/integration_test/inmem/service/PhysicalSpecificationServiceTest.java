@@ -129,7 +129,7 @@ public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTes
 
 
     @Test
-    public void markRemovedIfUnused(){
+    public void markRemovedIfUnused() {
 
         String username = mkName("markRemovedIfUnused");
 
@@ -163,7 +163,7 @@ public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTes
 
 
     @Test
-    public void findByIds(){
+    public void findByIds() {
         assertEquals(emptyList(), psSvc.findByIds(null), "Returns empty list if id list is null");
         assertEquals(emptyList(), psSvc.findByIds(emptyList()), "Returns empty list if empty list provided");
         assertEquals(emptyList(), psSvc.findByIds(asList(-1L)), "Returns empty set if empty ids cannot be found");
@@ -280,7 +280,7 @@ public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTes
 
 
     @Test
-    public void create(){
+    public void create() {
         String username = mkName("create");
 
         assertThrows(IllegalArgumentException.class,

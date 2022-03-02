@@ -1,5 +1,8 @@
-import {determineDefaultRollupRule, ratingRollupRule} from "../../client/report-grid/components/svelte/report-grid-utils";
-import { assert } from "chai";
+import {
+    determineDefaultRollupRule,
+    ratingRollupRule
+} from "../../client/report-grid/components/svelte/report-grid-utils";
+import {assert} from "chai";
 
 
 describe("report-grid/report-grid-utils", () => {

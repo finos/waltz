@@ -11,9 +11,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class CollectionUtilities_firstTest {
 
     @Test
-    public void sendNull(){
+    public void sendNull() {
         assertThrows(IllegalArgumentException.class,
-                () ->  CollectionUtilities.first(null));
+                () -> CollectionUtilities.first(null));
     }
 
     @Test

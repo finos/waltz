@@ -13,6 +13,16 @@
 
     $: rowData = _
         .chain(involvementKinds)
+        .map(d => Object.assign(
+            {},
+            d,
+            {
+                columnEntityId: d.id,
+                columnEntityKind: d.kind,
+                entityFieldReference: null,
+                columnName: d.name,
+                displayName: null
+            }))
         .filter(selectionFilter)
         .orderBy(d => d.name)
         .value();

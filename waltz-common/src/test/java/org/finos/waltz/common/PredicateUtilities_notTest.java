@@ -20,8 +20,8 @@ public class PredicateUtilities_notTest {
     }
 
     @Test
-    public void simpleNotNullPredicate(){
+    public void simpleNotNullPredicate() {
         assertThrows(NullPointerException.class,
-                ()-> PredicateUtilities.not(null));
+                () -> PredicateUtilities.not(null));
     }
 }

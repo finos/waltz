@@ -18,10 +18,10 @@ public class StringUtilities_splitThenMapTest {
     }
 
     @Test
-    public void simpleSplitThenMapWithNullTrans(){
+    public void simpleSplitThenMapWithNullTrans() {
         String str = "a,b,c";
         assertThrows(IllegalArgumentException.class,
-                ()->  StringUtilities.splitThenMap(str,",",null));
+                () -> StringUtilities.splitThenMap(str, ",", null));
     }
 
     @Test

@@ -10,9 +10,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class CollectionUtilities_sort_one_paramTest {
     @Test
-    public void sortNullCollection(){
+    public void sortNullCollection() {
         assertThrows(IllegalArgumentException.class,
-                () ->  CollectionUtilities.sort(null));
+                () -> CollectionUtilities.sort(null));
     }
 
     @Test

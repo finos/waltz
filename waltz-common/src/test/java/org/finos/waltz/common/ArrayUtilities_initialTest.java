@@ -19,6 +19,7 @@
 package org.finos.waltz.common;
 
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ArrayUtilities_initialTest {
@@ -34,7 +35,7 @@ public class ArrayUtilities_initialTest {
     @Test
     public void askingForTheInitialPartOfANullArrayThrowsException() {
         assertThrows(IllegalArgumentException.class, ()
-                ->  ArrayUtilities.initial(null));
+                -> ArrayUtilities.initial(null));
     }
 
 

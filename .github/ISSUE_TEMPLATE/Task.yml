@@ -1,6 +1,6 @@
-name: Task 
+name: Task
 description: Non feature related issue
-labels: ["task"]
+labels: [ "task" ]
 body:
   - type: textarea
     id: desc

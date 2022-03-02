@@ -33,6 +33,6 @@ public class IOUtilities_getFileResourceTest {
     @Test
     public void nullNameThrowsException() throws IOException {
         assertThrows(IllegalArgumentException.class,
-                ()->IOUtilities.getFileResource(null));
+                () -> IOUtilities.getFileResource(null));
     }
 }

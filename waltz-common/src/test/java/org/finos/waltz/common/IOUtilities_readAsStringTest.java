@@ -26,7 +26,7 @@ public class IOUtilities_readAsStringTest {
     @Test
     public void nullStreamThrowsException() throws IOException {
         assertThrows(IllegalArgumentException.class,
-                ()->IOUtilities.readAsString(null));
+                () -> IOUtilities.readAsString(null));
     }
 
 

@@ -31,6 +31,7 @@ import java.time.LocalDateTime;
 public abstract class SurveyTemplate implements IdProvider, NameProvider, DescriptionProvider, ExternalIdProvider, EntityKindProvider {
 
     public abstract EntityKind targetEntityKind();
+
     public abstract Long ownerId();
 
 

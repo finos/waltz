@@ -19,20 +19,32 @@
     $: measurablesCall = selectedCategory && measurableStore.findMeasurablesBySelector(mkSelectionOptions(selectedCategory));
     $: measurables = $measurablesCall?.data || [];
 
+    $: measurableColumns = _.map(measurables, d => Object.assign(
+        {},
+        d,
+        {
+            columnEntityId: d.id,
+            columnEntityKind: d.kind,
+            entityFieldReference: null,
+            columnName: d.name,
+            displayName: null
+        }));
+
     let selectedCategory = null;
     let rowData;
     let selected = [];
 
-    $: [rowData, selected] = _.partition(measurables, selectionFilter);
+    $: [rowData, selected] = _.partition(measurableColumns, selectionFilter);
+
     $: selectedIds = _.map(selected, d => d.id);
 
     const categoryColumnDefs = [
-        { field: "name", name: "Measurable Category", width: "30%"},
-        { field: "description", name: "Description", width: "70%"},
+        {field: "name", name: "Measurable Category", width: "30%"},
+        {field: "description", name: "Description", width: "70%"},
     ];
 
     const columnDefs = [
-        { field: "name", name: "Name", width: "30%"},
+        {field: "name", name: "Name", width: "30%"},
         { field: "description", name: "Description", width: "70%"},
     ];
 
@@ -60,7 +72,7 @@
         </span>
     </div>
     <p>Measurables for category: <strong>{selectedCategory.name}</strong></p>
-    <MeasurableTreeSelector measurables={measurables}
+    <MeasurableTreeSelector measurables={measurableColumns}
                             selected={selected}
                             {onSelect}
                             {onDeselect}/>

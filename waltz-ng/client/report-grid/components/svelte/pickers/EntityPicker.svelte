@@ -7,6 +7,7 @@
     import MeasurablePicker from "./MeasurablePicker.svelte";
     import SurveyInstanceFieldPicker from "./SurveyInstanceFieldPicker.svelte";
     import ApplicationFieldPicker from "./ApplicationFieldPicker.svelte";
+    import ChangeInitiativeFieldPicker from "./ChangeInitiativeFieldPicker.svelte";
 
     export let onSelect = (d) => console.log("Selecting an entity", d);
     export let onDeselect = (d) => console.log("Deselecting an entity", d);
@@ -29,6 +30,8 @@
                 return SurveyInstanceFieldPicker;
             case "APPLICATION":
                 return ApplicationFieldPicker;
+            case "CHANGE_INITIATIVE":
+                return ChangeInitiativeFieldPicker;
             default:
                 throw "Cannot find picker for kind: " + entityKind;
         }

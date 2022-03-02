@@ -69,9 +69,9 @@ public class LicencesExtractor extends DirectQueryBasedDataExtractor {
                             LICENCE.PROVENANCE.as("Provenance"))
                     .from(SOFTWARE_USAGE)
                     .innerJoin(SOFTWARE_VERSION_LICENCE)
-                        .on(SOFTWARE_VERSION_LICENCE.SOFTWARE_VERSION_ID.eq(SOFTWARE_USAGE.SOFTWARE_VERSION_ID))
+                    .on(SOFTWARE_VERSION_LICENCE.SOFTWARE_VERSION_ID.eq(SOFTWARE_USAGE.SOFTWARE_VERSION_ID))
                     .innerJoin(LICENCE)
-                        .on(LICENCE.ID.eq(SOFTWARE_VERSION_LICENCE.LICENCE_ID))
+                    .on(LICENCE.ID.eq(SOFTWARE_VERSION_LICENCE.LICENCE_ID))
                     .where(dsl.renderInlined(SOFTWARE_USAGE.APPLICATION_ID.in(appIdSelector)));
 
             String filename = format("licences-%s/%s", entityRef.kind(), entityRef.id());

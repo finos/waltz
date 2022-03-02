@@ -39,6 +39,6 @@ public class ObjectUtilities_firstNotNullTest {
     public void firstNotNullWithNullArray() {
         String[] ele = null;
         assertThrows(NullPointerException.class,
-                ()-> ObjectUtilities.firstNotNull(ele));
+                () -> ObjectUtilities.firstNotNull(ele));
     }
 }
