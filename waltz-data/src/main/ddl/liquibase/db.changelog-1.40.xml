@@ -653,7 +653,7 @@
 
     <changeSet id="20220303-5954-1"
                author="davdwatkins73">
-        <comment>5847: support for change initiatives in report grids</comment>
+        <comment>5954:  add user selectable flag to involvement kind</comment>
         <addColumn tableName="involvement_kind">
             <column name="user_selectable"
                     type="BOOLEAN"
