@@ -40,7 +40,6 @@ import java.util.Random;
 import static org.finos.waltz.common.IOUtilities.readLines;
 import static org.finos.waltz.common.RandomUtilities.randomPick;
 import static org.finos.waltz.schema.tables.Application.APPLICATION;
-import static org.finos.waltz.schema.tables.AuthoritativeSource.AUTHORITATIVE_SOURCE;
 
 
 public class AppGenerator implements SampleDataGenerator {
@@ -96,7 +95,6 @@ public class AppGenerator implements SampleDataGenerator {
     @Override
     public boolean remove(ApplicationContext ctx) {
         DSLContext dsl = getDsl(ctx);
-        dsl.deleteFrom(AUTHORITATIVE_SOURCE).execute();
         dsl.deleteFrom(APPLICATION).execute();
         return true;
     }

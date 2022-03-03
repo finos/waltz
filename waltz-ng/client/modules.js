@@ -41,7 +41,6 @@ import AllocationScheme from "./allocation-scheme";
 import Applications from "./applications";
 import AppGroups from "./app-groups";
 import Assessments from "./assessments";
-import AssetCost from "./asset-cost";
 import Attestation from "./attestation";
 import AttributeChange from "./attribute-change";
 import Bookmarks from "./bookmarks";
@@ -151,7 +150,6 @@ const dependencies = [
     Applications(),
     AppGroups(),
     Assessments(),
-    AssetCost(),
     Attestation(),
     AttributeChange(),
     Bookmarks(),

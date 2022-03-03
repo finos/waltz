@@ -652,7 +652,7 @@
 
 
     <changeSet id="20220303-5954-1"
-               author="davdwatkins73">
+               author="davidwatkins73">
         <comment>5954:  add user selectable flag to involvement kind</comment>
         <addColumn tableName="involvement_kind">
             <column name="user_selectable"
@@ -664,7 +664,7 @@
     </changeSet>
 
     <changeSet id="20220303-5954-2"
-               author="davdwatkins73">
+               author="davidwatkins73">
         <setTableRemarks tableName="involvement_kind" remarks="defines a particular type of involvement a person may have in relation to an entity (e.g. IT Owner for an APPLICATION)"/>
         <setColumnRemarks tableName="involvement_kind" columnName="name" remarks="display name for the involvement kind"/>
         <setColumnRemarks tableName="involvement_kind" columnName="description" remarks="longer textual description of the involvement"/>
@@ -673,7 +673,7 @@
     </changeSet>
 
     <changeSet id="20220303-5954-3"
-               author="davdwatkins73">
+               author="davidwatkins73">
         <setTableRemarks tableName="involvement" remarks="defines a specific instance of an involvement kind between a person and an entity (e.g. 'User X' is 'IT Owner' for 'APPLICATION/32')"/>
         <setColumnRemarks tableName="involvement" columnName="provenance" remarks="where did this involvement record originate, will be 'waltz' if provided via the UI"/>
         <setColumnRemarks tableName="involvement" columnName="entity_id" remarks="the identifier of the entity the person is involved with"/>
@@ -682,5 +682,42 @@
         <setColumnRemarks tableName="involvement" columnName="kind_id" remarks="the type of involvement between the person and the entity (e.g. 'IT Owner')"/>
         <setColumnRemarks tableName="involvement" columnName="is_readonly" remarks="can this involvement be edited/removed by users (e.g. set to true if externally mastered)"/>
     </changeSet>
+
+    <changeSet id="20220303-5939-1"
+               author="davidwatkins73"
+               failOnError="false">
+        <dropTable tableName="process"/>
+    </changeSet>
+
+    <changeSet id="20220303-5939-2"
+               author="davidwatkins73"
+               failOnError="false">
+        <dropTable tableName="complexity_score"/>
+    </changeSet>
+
+    <changeSet id="20220303-5939-3"
+               author="davidwatkins73"
+               failOnError="false">
+        <dropTable tableName="database_information_1_34"/>
+    </changeSet>
+
+    <changeSet id="20220303-5939-4"
+               author="davidwatkins73"
+               failOnError="false">
+        <dropTable tableName="authoritative_source"/>
+    </changeSet>
+
+    <changeSet id="20220303-5939-5"
+               author="davidwatkins73"
+               failOnError="false">
+        <dropTable tableName="asset_cost"/>
+    </changeSet>
+
+    <changeSet id="20220303-5939-6"
+               author="davidwatkins73"
+               failOnError="false">
+        <dropTable tableName="database_information_1_33"/>
+    </changeSet>
+
 
 </databaseChangeLog>
