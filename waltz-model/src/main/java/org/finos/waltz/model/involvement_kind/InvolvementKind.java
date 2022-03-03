@@ -37,4 +37,10 @@ public abstract class InvolvementKind implements
     public EntityKind kind() {
         return EntityKind.INVOLVEMENT_KIND;
     }
+
+    @Value.Default
+    public boolean userSelectable() {
+        return true;
+    };
+
 }

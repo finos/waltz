@@ -60,6 +60,7 @@ public class InvolvementKindDao {
                 .externalId(Optional.ofNullable(record.getExternalId()))
                 .lastUpdatedAt(DateTimeUtilities.toLocalDateTime(record.getLastUpdatedAt()))
                 .lastUpdatedBy(record.getLastUpdatedBy())
+                .userSelectable(record.getUserSelectable())
                 .build();
     };
 
@@ -71,6 +72,7 @@ public class InvolvementKindDao {
         record.setDescription(ik.description());
         record.setLastUpdatedAt(Timestamp.valueOf(ik.lastUpdatedAt()));
         record.setLastUpdatedBy(ik.lastUpdatedBy());
+        record.setUserSelectable(ik.userSelectable());
 
         ik.externalId().ifPresent(record::setExternalId);
         ik.id().ifPresent(record::setId);
@@ -91,14 +93,16 @@ public class InvolvementKindDao {
 
 
     public List<InvolvementKind> findAll() {
-        return dsl.select(involvementKind.fields())
+        return dsl
+                .select(involvementKind.fields())
                 .from(involvementKind)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
 
     public InvolvementKind getById(long id) {
-        InvolvementKindRecord record = dsl.select(INVOLVEMENT_KIND.fields())
+        InvolvementKindRecord record = dsl
+                .select(INVOLVEMENT_KIND.fields())
                 .from(INVOLVEMENT_KIND)
                 .where(INVOLVEMENT_KIND.ID.eq(id))
                 .fetchOneInto(InvolvementKindRecord.class);
@@ -150,7 +154,7 @@ public class InvolvementKindDao {
         command.name().ifPresent(change -> record.setName(change.newVal()));
         command.description().ifPresent(change -> record.setDescription(change.newVal()));
 
-        UserTimestamp lastUpdate = command.lastUpdate().get();
+        UserTimestamp lastUpdate = command.lastUpdate().orElseThrow(() -> new IllegalStateException("InvolvementChangeCommand must have a last update timestamp"));
         record.setLastUpdatedAt(Timestamp.valueOf(lastUpdate.at()));
         record.setLastUpdatedBy(lastUpdate.by());
 
@@ -159,7 +163,8 @@ public class InvolvementKindDao {
 
 
     public boolean deleteIfNotUsed(long id) {
-        return dsl.deleteFrom(INVOLVEMENT_KIND)
+        return dsl
+                .deleteFrom(INVOLVEMENT_KIND)
                 .where(INVOLVEMENT_KIND.ID.eq(id))
                 .and(DSL.notExists(DSL
                         .select(INVOLVEMENT.fields())
@@ -167,6 +172,5 @@ public class InvolvementKindDao {
                         .where(INVOLVEMENT.KIND_ID.eq(id))))
                 .execute() > 0;
     }
-
 
 }

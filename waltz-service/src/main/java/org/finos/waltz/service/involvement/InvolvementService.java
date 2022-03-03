@@ -20,6 +20,7 @@ package org.finos.waltz.service.involvement;
 
 import org.finos.waltz.common.Checks;
 import org.finos.waltz.model.*;
+import org.finos.waltz.model.involvement_kind.InvolvementKind;
 import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.involvement_kind.InvolvementKindService;
@@ -42,8 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.finos.waltz.common.Checks.checkNotEmpty;
-import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.*;
 import static org.finos.waltz.common.FunctionUtilities.time;
 import static org.finos.waltz.common.ListUtilities.applyToFirst;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
@@ -131,6 +131,9 @@ public class InvolvementService {
     public boolean addEntityInvolvement(String userId,
                                         EntityReference entityReference,
                                         EntityInvolvementChangeCommand command) {
+
+        checkInvolvementKindIsUserSelectable(command);
+
         Involvement involvement = mkInvolvement(entityReference, command);
         boolean result = involvementDao.save(involvement) == 1;
         if (result) {
@@ -234,4 +237,11 @@ public class InvolvementService {
                 .stream()
                 .collect(Collectors.toMap(ik -> ik.id().get(), NameProvider::name));
     }
+
+
+    private void checkInvolvementKindIsUserSelectable(EntityInvolvementChangeCommand command) {
+        InvolvementKind involvementKind = involvementKindService.getById(command.involvementKindId());
+        checkTrue(involvementKind.userSelectable(), "Involvement kind '%s' is not user selectable", involvementKind.name());
+    }
+
 }

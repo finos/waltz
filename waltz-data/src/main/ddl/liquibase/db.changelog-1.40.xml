@@ -628,7 +628,7 @@
                               tableName="report_grid"/>
     </changeSet>
 
-    <changeSet id="20220228-2404-1"
+    <changeSet id="20220228-5847-1"
                author="woodjes">
         <insert tableName="entity_field_reference">
             <column name="entity_kind" value="CHANGE_INITIATIVE"/>
@@ -650,5 +650,37 @@
         </insert>
     </changeSet>
 
+
+    <changeSet id="20220303-5954-1"
+               author="davdwatkins73">
+        <comment>5847: support for change initiatives in report grids</comment>
+        <addColumn tableName="involvement_kind">
+            <column name="user_selectable"
+                    type="BOOLEAN"
+                    defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20220303-5954-2"
+               author="davdwatkins73">
+        <setTableRemarks tableName="involvement_kind" remarks="defines a particular type of involvement a person may have in relation to an entity (e.g. IT Owner for an APPLICATION)"/>
+        <setColumnRemarks tableName="involvement_kind" columnName="name" remarks="display name for the involvement kind"/>
+        <setColumnRemarks tableName="involvement_kind" columnName="description" remarks="longer textual description of the involvement"/>
+        <setColumnRemarks tableName="involvement_kind" columnName="user_selectable" remarks="flag to allow users to add people to an entity with this involvement (set to false to restrict usage, i.e. if involvement is mastered in another system)"/>
+        <setColumnRemarks tableName="involvement_kind" columnName="external_id" remarks="external identifier, typically used when external jobs are updating the associated involvements"/>
+    </changeSet>
+
+    <changeSet id="20220303-5954-3"
+               author="davdwatkins73">
+        <setTableRemarks tableName="involvement" remarks="defines a specific instance of an involvement kind between a person and an entity (e.g. 'User X' is 'IT Owner' for 'APPLICATION/32')"/>
+        <setColumnRemarks tableName="involvement" columnName="provenance" remarks="where did this involvement record originate, will be 'waltz' if provided via the UI"/>
+        <setColumnRemarks tableName="involvement" columnName="entity_id" remarks="the identifier of the entity the person is involved with"/>
+        <setColumnRemarks tableName="involvement" columnName="entity_kind" remarks="the kind of entity the person is involved with"/>
+        <setColumnRemarks tableName="involvement" columnName="employee_id" remarks="reference to the person involved with the entity"/>
+        <setColumnRemarks tableName="involvement" columnName="kind_id" remarks="the type of involvement between the person and the entity (e.g. 'IT Owner')"/>
+        <setColumnRemarks tableName="involvement" columnName="is_readonly" remarks="can this involvement be edited/removed by users (e.g. set to true if externally mastered)"/>
+    </changeSet>
 
 </databaseChangeLog>

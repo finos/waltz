@@ -87,7 +87,8 @@ function mkGridData(involvements = [], displayNameService, descriptionService) {
                 description: descriptionService.lookup("involvementKind", pInv.kindId)
             }));
 
-            const rolesDisplayName = _.chain(roles)
+            const rolesDisplayName = _
+                .chain(roles)
                 .map("displayName")
                 .join(", ")
                 .value();
@@ -162,6 +163,12 @@ function controller($q, displayNameService, descriptionService, serviceBroker, i
                 vm.gridData = mkGridData(aggInvolvements, displayNameService, descriptionService);
                 vm.currentInvolvements = mkCurrentInvolvements(aggInvolvements);
                 vm.involvementKinds = involvementKinds;
+
+                vm.allowedInvolvements = _
+                    .chain(involvementKinds)
+                    .filter(ik => ik.userSelectable)
+                    .map(ik => ({ value: ik.id, name: ik.name }))
+                    .value();
             });
     };
 
@@ -171,9 +178,7 @@ function controller($q, displayNameService, descriptionService, serviceBroker, i
             refresh();
         }
 
-        vm.allowedInvolvements = _.map(
-            displayNameService.getAllByType("involvementKind"),
-            (name, id) => ({ value: +id, name }));
+
     };
 
 
@@ -183,14 +188,14 @@ function controller($q, displayNameService, descriptionService, serviceBroker, i
 
 
     vm.onAdd = (entityInvolvement) => {
-        involvedSectionService
+        return involvedSectionService
             .addInvolvement(vm.parentEntityRef, entityInvolvement)
             .then(refresh);
     };
 
 
     vm.onRemove = (entityInvolvement) => {
-        involvedSectionService
+        return involvedSectionService
             .removeInvolvement(vm.parentEntityRef, entityInvolvement)
             .then(refresh);
     };
