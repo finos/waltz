@@ -29,7 +29,6 @@ import {AttestationInstanceStore_API as AttestationInstanceStore} from "../../at
 import {AttestationPreCheckStore_API as AttestationPreCheckStore} from "../../attestation/services/attestation-pre-check-store";
 import {AttestationRunStore_API as AttestationRunStore} from "../../attestation/services/attestation-run-store";
 import {AttributeChangeStore_API as AttributeChangeStore} from "../../attribute-change/services/attribute-change-store";
-import {AssetCostStore_API as AssetCostStore} from "../../asset-cost/services/asset-cost-store";
 import {BookmarkStore_API as BookmarkStore} from "../../bookmarks/services/bookmark-store";
 import {ChangeInitiativeStore_API as ChangeInitiativeStore} from "../../change-initiative/services/change-initiative-store";
 import {ChangeLogStore_API as ChangeLogStore} from "../../change-log/services/change-log-store";
@@ -129,7 +128,6 @@ export const CORE_API = {
     AttestationRunStore,
     AttestationPreCheckStore,
     AttributeChangeStore,
-    AssetCostStore,
     AssessmentDefinitionStore,
     AssessmentRatingStore,
     BookmarkStore,
