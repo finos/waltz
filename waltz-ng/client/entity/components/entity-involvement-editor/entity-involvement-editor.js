@@ -20,16 +20,17 @@ import {initialiseData, invokeFunction} from "../../../common";
 import {entity} from "../../../common/services/enums/entity";
 import {getEnumName} from "../../../common/services/enums";
 
-import template from './entity-involvement-editor.html';
+import template from "./entity-involvement-editor.html";
+import {displayError} from "../../../common/error-utils";
 
 const bindings = {
-    allowedInvolvements: '<',
-    currentInvolvements: '<',
-    parentEntityRef: '<',
-    targetEntityKind: '<',
+    allowedInvolvements: "<",
+    currentInvolvements: "<",
+    parentEntityRef: "<",
+    targetEntityKind: "<",
 
-    onAdd: '<',
-    onRemove: '<'
+    onAdd: "<",
+    onRemove: "<"
 };
 
 
@@ -67,7 +68,8 @@ function controller() {
 
     vm.onInvolvementAdd = () => {
         const currentInvolvement = vm.currentInvolvement;
-        invokeFunction(vm.onAdd, currentInvolvement);
+        invokeFunction(vm.onAdd, currentInvolvement)
+            .catch(e => displayError(`Could not add person with involvement`, e));
         vm.currentInvolvement = {};
     };
 
