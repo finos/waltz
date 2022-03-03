@@ -13,7 +13,10 @@ import java.util.Optional;
 public abstract class Permission {
 
     public abstract EntityKind subjectKind();
+
     public abstract EntityKind qualifierKind();
+
     public abstract Optional<Long> qualifierId();
-    public abstract Boolean isDefault();
+
+    public abstract RequiredInvolvementsResult requiredInvolvementsResult();
 }

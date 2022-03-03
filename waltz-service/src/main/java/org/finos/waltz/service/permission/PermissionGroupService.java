@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
+import static org.finos.waltz.common.SetUtilities.filter;
 
 @Service
 public class PermissionGroupService {
@@ -39,12 +40,12 @@ public class PermissionGroupService {
     }
 
     @Deprecated
-    public List<Permission> findPermissions(EntityReference parentEntityRef,
-                                            String username) {
+    public Set<Permission> findPermissions(EntityReference parentEntityRef,
+                                           String username) {
         Person person = personService.getPersonByUserId(username);
 
-        if (isNull(person)){
-            return Collections.emptyList();
+        if (isNull(person)) {
+            return Collections.emptySet();
         }
 
         List<Involvement> involvements =
@@ -54,11 +55,30 @@ public class PermissionGroupService {
                         .collect(Collectors.toList());
 
         if (involvements.isEmpty()) {
-            return Collections.emptyList();
+            return Collections.emptySet();
         }
 
         return permissionGroupDao.getDefaultPermissions();
     }
+
+
+    public Set<Permission> findPermissionsForSubjectKind(EntityReference parentEntityRef,
+                                                         EntityKind subjectKind,
+                                                         String username) {
+
+        Person person = personService.getPersonByUserId(username);
+
+        if (isNull(person)) {
+            return Collections.emptySet();
+        }
+
+        Set<Permission> permissions = permissionGroupDao.findPermissionsForEntityRefAndSubjectKind(parentEntityRef, subjectKind);
+
+        Set<Long> involvements = permissionGroupDao.findExistingInvolvementKindIdsForUser(parentEntityRef, username);
+
+        return filter(permissions, p -> p.requiredInvolvementsResult().isAllowed(involvements));
+    }
+
 
     @Deprecated
     public boolean hasPermission(EntityReference entityReference,
@@ -83,7 +103,9 @@ public class PermissionGroupService {
             return false;
         }
 
-        Set<Long> existingInvolvements = permissionGroupDao.findExistingInvolvementKindIdsForUser(permissionCommand);
+        Set<Long> existingInvolvements = permissionGroupDao.findExistingInvolvementKindIdsForUser(
+                permissionCommand.parentEntityRef(),
+                permissionCommand.user());
 
         return required.isAllowed(existingInvolvements);
     }

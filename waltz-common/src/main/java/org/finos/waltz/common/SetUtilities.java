@@ -20,6 +20,7 @@ package org.finos.waltz.common;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static java.util.stream.Collectors.toSet;
@@ -50,6 +51,13 @@ public class SetUtilities {
         if (xs == null || xs.isEmpty()) return new HashSet<>();
         return xs.stream()
                 .map(fn)
+                .collect(toSet());
+    }
+
+    public static <X> Set<X> filter(Collection<X> xs, Predicate<X> predicate) {
+        if (xs == null || xs.isEmpty()) return new HashSet<>();
+        return xs.stream()
+                .filter(predicate)
                 .collect(toSet());
     }
 
