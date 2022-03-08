@@ -19,6 +19,7 @@
 package org.finos.waltz.data.notification;
 
 import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.ReleaseLifecycleStatus;
 import org.finos.waltz.model.notification.ImmutableNotificationSummary;
 import org.finos.waltz.model.notification.NotificationSummary;
 import org.finos.waltz.model.survey.SurveyInstanceStatus;
@@ -77,11 +78,14 @@ public class NotificationDao {
                 .on(SURVEY_INSTANCE_RECIPIENT.SURVEY_INSTANCE_ID.eq(SURVEY_INSTANCE.ID))
                 .innerJoin(PERSON)
                 .on(PERSON.ID.eq(SURVEY_INSTANCE_RECIPIENT.PERSON_ID))
+                .innerJoin(SURVEY_RUN).on(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(SURVEY_RUN.ID))
+                .innerJoin(SURVEY_TEMPLATE).on(SURVEY_RUN.SURVEY_TEMPLATE_ID.eq(SURVEY_TEMPLATE.ID))
                 .where(PERSON.EMAIL.eq(userId))
                 .and(SURVEY_INSTANCE.ORIGINAL_INSTANCE_ID.isNull())
                 .and(SURVEY_INSTANCE.STATUS.in(asList(
                         SurveyInstanceStatus.NOT_STARTED.name(),
-                        SurveyInstanceStatus.IN_PROGRESS.name())));
+                        SurveyInstanceStatus.IN_PROGRESS.name())))
+                .and(SURVEY_TEMPLATE.STATUS.eq(ReleaseLifecycleStatus.ACTIVE.name()));
 
 
         Select<Record2<String, Integer>> qry = attestationCount
