@@ -44,35 +44,37 @@
 
     const tableHeaders = [
         {
-            class: "awaiting-approval",
+            cellClass: "awaiting-approval",
             name: "Awaiting Approval",
             longName: "Completed surveys - awaiting approval",
             description: "Completed and submitted surveys waiting approval by a survey owner",
             width: "20%",
             data: d => d.completed
-        },{
-            class: "overdue",
+        }, {
+            cellClass: "overdue",
             name: "Overdue",
             longName: "Overdue surveys",
             description: "Survey is past its submission due date within Waltz", // check approval or submission due date
             width: "20%",
             data: d => d.overdue
-        },{
-            class: "awaiting-completion",
+        }, {
+            cellClass: "awaiting-completion",
             name: "Awaiting Completion",
             longName: "Incomplete surveys - awaiting completion",
             description: "Surveys that will need approval once they have been submitted, this includes overdue surveys and those that have not passed their due date",
             width: "20%",
             data: d => d.incomplete
-        },{
-            class: "rejected",
+        }, {
+            cellClass: "rejected",
+            headerClass: "secondary",
             name: "Rejected",
             longName: "Rejected surveys",
             description: "Survey owner has rejected survey. Survey must be reopened then recipients are required to update and resubmit",
             width: "20%",
             data: d => d.rejected
-        },{
-            class: "approved",
+        }, {
+            cellClass: "approved",
+            headerClass: "secondary",
             longName: "Approved surveys",
             description: "Survey has been approved by the survey owner, no further action required",
             name: "Approved",
@@ -172,6 +174,7 @@
             <th width="30%">Survey Name</th>
             {#each tableHeaders as header}
                 <th width={`${70 / tableHeaders.length}%`}
+                    class={header.headerClass}
                     title={header.description}>
                     {header.name}
                 </th>
@@ -183,7 +186,7 @@
             <tr>
                 <td>{templateInfo.template.name}</td>
                 {#each tableHeaders as header}
-                    <td class={_.isEmpty(header.data(templateInfo)) ? "" : header.class}
+                    <td class={_.isEmpty(header.data(templateInfo)) ? "" : header.cellClass}
                         class:selected={$selectedSurveyStatusCell?.header === header && $selectedSurveyStatusCell?.templateInfo === templateInfo}>
                         {#if _.isEmpty(header.data(templateInfo))}
                             <div class="text-muted">0</div>
@@ -197,6 +200,15 @@
                 {/each}
             </tr>
         {/each}
+        <tr class="total-row">
+            <td>Total</td>
+            <td>
+                <span>{_.sumBy(templateSummaries, d => _.size(d.completed))}
+                </span>
+            </td>
+            <td colspan="3">
+            </td>
+        </tr>
         </tbody>
     </table>
 
@@ -313,6 +325,15 @@
 
     th {
         text-align: center;
+    }
+
+    th.secondary {
+        color: #777;
+    }
+
+    .total-row {
+        color: #777;
+        font-weight: bold
     }
 
 </style>
