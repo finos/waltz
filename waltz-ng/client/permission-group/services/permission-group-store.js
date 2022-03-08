@@ -21,11 +21,16 @@ function store($http, baseApiUrl) {
     const baseUrl = `${baseApiUrl}/permission-group`;
 
     const findByEntity = (ref) => $http
-            .get(`${baseUrl}/entity-ref/${ref.kind}/${ref.id}`)
-            .then(d => d.data);
+        .get(`${baseUrl}/entity-ref/${ref.kind}/${ref.id}`)
+        .then(d => d.data);
+
+    const findForEntityRefAndSubjectKind = (ref, subjectKind) => $http
+        .get(`${baseUrl}/entity-ref/${ref.kind}/${ref.id}/subject-kind/${subjectKind}`)
+        .then(d => d.data);
 
     return {
-        findByEntity
+        findByEntity,
+        findForEntityRefAndSubjectKind
     };
 }
 
@@ -48,5 +53,10 @@ export const PermissionGroupStore_API = {
         serviceName,
         serviceFnName: "findByEntity",
         description: "findByEntity [ref]"
+    },
+    findForEntityRefAndSubjectKind: {
+        serviceName,
+        serviceFnName: "findForEntityRefAndSubjectKind",
+        description: "findForEntityRefAndSubjectKind [ref, subjectKind]"
     }
 };

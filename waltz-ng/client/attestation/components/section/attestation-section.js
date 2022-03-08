@@ -24,6 +24,7 @@ import {attest} from "../../attestation-utils";
 import {displayError} from "../../../common/error-utils";
 import toasts from "../../../svelte-stores/toast-store";
 import MeasurableAttestationPanel from "../../components/svelte/MeasurableAttestationPanel.svelte"
+import {entity} from "../../../common/services/enums/entity";
 
 const bindings = {
     parentEntityRef: "<"
@@ -131,8 +132,8 @@ function controller($q,
 
         const permissionGroupPromise = serviceBroker
             .loadViewData(
-                CORE_API.PermissionGroupStore.findByEntity,
-                [entityReference])
+                CORE_API.PermissionGroupStore.findForEntityRefAndSubjectKind,
+                [entityReference, entity.ATTESTATION.key])
             .then(r => r.data);
 
         return $q
