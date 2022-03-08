@@ -19,20 +19,21 @@
 package org.finos.waltz.web.endpoints.api;
 
 
+import org.finos.waltz.model.permission_group.Permission;
 import org.finos.waltz.service.permission.PermissionGroupService;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.endpoints.Endpoint;
-import org.finos.waltz.model.permission_group.Permission;
-import org.finos.waltz.web.WebUtilities;
 import org.finos.waltz.web.endpoints.EndpointUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import static org.finos.waltz.web.WebUtilities.*;
 
 
 @Service
 public class PermissionGroupEndpoint implements Endpoint {
 
-    private static final String BASE_URL = WebUtilities.mkPath("api", "permission-group");
+    private static final String BASE_URL = mkPath("api", "permission-group");
 
     private final PermissionGroupService permissionGroupService;
 
@@ -44,16 +45,31 @@ public class PermissionGroupEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        String findByParentEntityRefPath = WebUtilities.mkPath(BASE_URL,
+        String findByParentEntityRefPath = mkPath(BASE_URL,
                 "entity-ref",
                 ":kind",
                 ":id");
 
+        String findPermissionsForSubjectKindPath = mkPath(BASE_URL,
+                "entity-ref",
+                ":kind",
+                ":id",
+                "subject-kind",
+                ":subjectKind");
+
         ListRoute<Permission> findByParentEntityRef = (request, response)
                 -> permissionGroupService.findPermissions(
-                WebUtilities.getEntityReference(request), WebUtilities.getUsername(request));
+                getEntityReference(request), getUsername(request));
+
+
+        ListRoute<Permission> findPermissionsForSubjectKindRoute = (request, response) -> permissionGroupService
+                .findPermissionsForSubjectKind(
+                        getEntityReference(request),
+                        getKind(request, "subjectKind"),
+                        getUsername(request));
 
         EndpointUtilities.getForList(findByParentEntityRefPath, findByParentEntityRef);
+        EndpointUtilities.getForList(findPermissionsForSubjectKindPath, findPermissionsForSubjectKindRoute);
 
     }
 

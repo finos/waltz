@@ -18,9 +18,6 @@
 
 package org.finos.waltz.service.attestation;
 
-import org.finos.waltz.service.application.ApplicationService;
-import org.finos.waltz.service.changelog.ChangeLogService;
-import org.finos.waltz.service.permission.PermissionGroupService;
 import org.finos.waltz.common.exception.UpdateFailedException;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
@@ -31,7 +28,11 @@ import org.finos.waltz.model.*;
 import org.finos.waltz.model.attestation.*;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.external_identifier.ExternalIdValue;
+import org.finos.waltz.model.permission_group.ImmutableCheckPermissionCommand;
 import org.finos.waltz.model.person.Person;
+import org.finos.waltz.service.application.ApplicationService;
+import org.finos.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.service.permission.PermissionGroupService;
 import org.jooq.Condition;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -44,13 +45,13 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Set;
 
-import static org.finos.waltz.schema.Tables.APPLICATION;
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.*;
 import static org.finos.waltz.common.CollectionUtilities.first;
 import static org.finos.waltz.common.CollectionUtilities.notEmpty;
 import static org.finos.waltz.common.DateTimeUtilities.*;
 import static org.finos.waltz.common.StringUtilities.join;
+import static org.finos.waltz.schema.Tables.APPLICATION;
 
 
 @Service
@@ -235,10 +236,15 @@ public class AttestationInstanceService {
 
 
     private void checkAttestationPermission(String username, AttestEntityCommand createCommand) {
-        boolean hasAttestationPermission = permissionGroupService.hasPermission(
-                createCommand.entityReference(),
-                createCommand.attestedEntityKind(),
-                username);
+
+        boolean hasAttestationPermission = permissionGroupService.hasPermission(ImmutableCheckPermissionCommand
+                .builder()
+                .parentEntityRef(createCommand.entityReference())
+                .subjectKind(EntityKind.ATTESTATION)
+                .qualifierKind(createCommand.attestedEntityKind())
+                .qualifierId(createCommand.attestedEntityId())
+                .user(username)
+                .build());
 
         if (!hasAttestationPermission) {
             throw new UpdateFailedException("ATTESTATION_FAILED",
