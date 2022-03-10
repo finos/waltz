@@ -102,8 +102,7 @@ public class SurveyTemplateDao {
 
         Condition canViewSurveyCondition = ownerId != null
                 ? SURVEY_TEMPLATE.STATUS.eq(ReleaseLifecycleStatus.ACTIVE.name())
-                .or(SURVEY_TEMPLATE.STATUS.eq(ReleaseLifecycleStatus.DRAFT.name())
-                        .and(SURVEY_TEMPLATE.OWNER_ID.eq(ownerId)))
+                .or(SURVEY_TEMPLATE.STATUS.eq(ReleaseLifecycleStatus.DRAFT.name()).and(SURVEY_TEMPLATE.OWNER_ID.eq(ownerId)))
                 : SURVEY_TEMPLATE.STATUS.eq(ReleaseLifecycleStatus.ACTIVE.name());
 
         return dsl

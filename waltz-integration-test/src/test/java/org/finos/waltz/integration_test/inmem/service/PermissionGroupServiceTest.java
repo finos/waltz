@@ -8,22 +8,29 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.permission_group.CheckPermissionCommand;
 import org.finos.waltz.model.permission_group.ImmutableCheckPermissionCommand;
-import org.finos.waltz.schema.tables.PermissionGroupInvolvement;
+import org.finos.waltz.model.permission_group.Permission;
 import org.finos.waltz.schema.tables.records.*;
 import org.finos.waltz.service.permission.PermissionGroupService;
+import org.finos.waltz.service.person.PersonService;
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+import java.util.Set;
+
+import static java.util.Collections.emptySet;
+import static org.finos.waltz.common.MapUtilities.indexBy;
+import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static org.finos.waltz.schema.tables.InvolvementGroup.INVOLVEMENT_GROUP;
 import static org.finos.waltz.schema.tables.InvolvementGroupEntry.INVOLVEMENT_GROUP_ENTRY;
 import static org.finos.waltz.schema.tables.PermissionGroup.PERMISSION_GROUP;
 import static org.finos.waltz.schema.tables.PermissionGroupEntry.PERMISSION_GROUP_ENTRY;
 import static org.finos.waltz.schema.tables.PermissionGroupInvolvement.PERMISSION_GROUP_INVOLVEMENT;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Service
 public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
@@ -73,15 +80,56 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
         assertFalse(permissionGroupService.hasPermission(mkCommand(u3, appB)), "u3 should not have access as they have the no privs");
     }
 
+
+    @Test
+    public void findPermissionsForSubjectKind() {
+
+        EntityReference appA = appHelper.createNewApp(mkName(stem, "appA"), ouIds.a);
+        String u1 = mkName(stem, "user1");
+
+        assertEquals(emptySet(),
+                permissionGroupService.findPermissionsForSubjectKind(appA, EntityKind.ATTESTATION, u1),
+                "if person does not exists, should return no permissions");
+
+        Long u1Id = personHelper.createPerson(u1);
+
+        long privKind = involvementHelper.mkInvolvementKind(mkName(stem, "privileged"));
+
+        Set<Permission> permissionsForSubjectKind = permissionGroupService.findPermissionsForSubjectKind(appA, EntityKind.ATTESTATION, u1);
+
+        assertEquals(
+                asSet(EntityKind.LOGICAL_DATA_FLOW, EntityKind.PHYSICAL_FLOW, EntityKind.MEASURABLE_CATEGORY),
+                map(permissionsForSubjectKind, Permission::qualifierKind),
+                "u1 should have default permissions for all attestation qualifiers");
+
+        setupSpecificPermissionGroupForApp(appA, privKind);
+
+        Set<Permission> userHasNoExtraPermissions = permissionGroupService.findPermissionsForSubjectKind(appA, EntityKind.ATTESTATION, u1);
+
+        Map<EntityKind, Permission> permissionsByKind = indexBy(userHasNoExtraPermissions, Permission::qualifierKind);
+
+        Permission logicalFlowPermission = permissionsByKind.get(EntityKind.LOGICAL_DATA_FLOW);
+        assertNull(logicalFlowPermission, "u1 should have no permissions for data flows as doesn't have the all involvements required");
+
+        involvementHelper.createInvolvement(u1Id, privKind, appA);
+
+        Set<Permission> withExtraPermissions = permissionGroupService.findPermissionsForSubjectKind(appA, EntityKind.ATTESTATION, u1);
+
+        assertEquals(
+                asSet(EntityKind.LOGICAL_DATA_FLOW, EntityKind.PHYSICAL_FLOW, EntityKind.MEASURABLE_CATEGORY),
+                map(withExtraPermissions, Permission::qualifierKind),
+                "u1 should all permissions as they have the extra involvement required for logical flows");
+    }
+
+
     private CheckPermissionCommand mkCommand(String u1, EntityReference appA) {
-        CheckPermissionCommand cmd = ImmutableCheckPermissionCommand
+        return ImmutableCheckPermissionCommand
                 .builder()
                 .parentEntityRef(appA)
                 .subjectKind(EntityKind.ATTESTATION)
                 .qualifierKind(EntityKind.LOGICAL_DATA_FLOW)
                 .user(u1)
                 .build();
-        return cmd;
     }
 
 
