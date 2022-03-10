@@ -19,6 +19,7 @@
             entity.SURVEY_QUESTION,
             entity.ASSESSMENT_DEFINITION,
             entity.MEASURABLE,
+            entity.APP_GROUP,
             entity.SURVEY_INSTANCE,
             entity.APPLICATION,
             entity.CHANGE_INITIATIVE
