@@ -39,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.Comparator;
 import java.util.*;
 import java.util.function.Function;
@@ -50,11 +51,11 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.*;
+import static org.finos.waltz.common.DateTimeUtilities.toLocalDate;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.MapUtilities.groupBy;
-import static org.finos.waltz.common.SetUtilities.map;
-import static org.finos.waltz.common.SetUtilities.union;
+import static org.finos.waltz.common.SetUtilities.*;
 import static org.finos.waltz.common.StringUtilities.join;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.survey.SurveyInstanceStatus.APPROVED;
@@ -83,6 +84,9 @@ public class ReportGridDao {
     private final org.finos.waltz.schema.tables.InvolvementKind ik = INVOLVEMENT_KIND.as("ik");
     private final org.finos.waltz.schema.tables.Person p = Tables.PERSON.as("p");
     private final org.finos.waltz.schema.tables.SurveyQuestion sq = SURVEY_QUESTION.as("sq");
+    private final org.finos.waltz.schema.tables.ApplicationGroup ag = APPLICATION_GROUP.as("ag");
+    private final org.finos.waltz.schema.tables.ApplicationGroupEntry age = APPLICATION_GROUP_ENTRY.as("age");
+    private final org.finos.waltz.schema.tables.ApplicationGroupOuEntry agoe = APPLICATION_GROUP_OU_ENTRY.as("agoe");
     private final org.finos.waltz.schema.tables.EntityFieldReference efr = ENTITY_FIELD_REFERENCE.as("efr");
     private final org.finos.waltz.schema.tables.SurveyTemplate st = SURVEY_TEMPLATE.as("st");
     private final org.finos.waltz.schema.tables.Application a = APPLICATION.as("a");
@@ -258,6 +262,14 @@ public class ReportGridDao {
                 sq.HELP_TEXT,
                 condition);
 
+        SelectConditionStep<Record13<String, String, Long, String, String, Integer, String, String, Long, String, String, String, String>> appGroupColumns = mkColumnDefinitionQuery(
+                EntityKind.APP_GROUP,
+                ag,
+                ag.ID,
+                ag.NAME,
+                ag.DESCRIPTION,
+                condition);
+
         SelectConditionStep<Record13<String, String, Long, String, String, Integer, String, String, Long, String, String, String, String>> surveyMetaColumns = mkColumnDefinitionQuery(
                 EntityKind.SURVEY_TEMPLATE,
                 st,
@@ -287,6 +299,7 @@ public class ReportGridDao {
                 .unionAll(costKindColumns)
                 .unionAll(involvementKindColumns)
                 .unionAll(surveyQuestionColumns)
+                .unionAll(appGroupColumns)
                 .unionAll(surveyMetaColumns)
                 .unionAll(applicationMetaColumns)
                 .unionAll(changeInitiativeMetaColumns)
@@ -405,6 +418,10 @@ public class ReportGridDao {
                     colsByKind.getOrDefault(EntityKind.SURVEY_QUESTION, emptySet()),
                     cd -> cd.columnEntityId());
 
+            Set<Long> requiredAppGroupIds = map(
+                    colsByKind.getOrDefault(EntityKind.APP_GROUP, emptySet()),
+                    cd -> cd.columnEntityId());
+
 
             // COMPLEX GRID DEFS
 
@@ -443,9 +460,68 @@ public class ReportGridDao {
                     fetchCostData(genericSelector, requiredCostKinds),
                     fetchInvolvementData(genericSelector, requiredInvolvementKinds),
                     fetchSurveyQuestionResponseData(genericSelector, requiredSurveyQuestionIds),
+                    fetchAppGroupData(genericSelector, requiredAppGroupIds),
                     fetchSurveyFieldReferenceData(genericSelector, requiredSurveyTemplateIds),
                     fetchApplicationFieldReferenceData(genericSelector, requiredApplicationColumns),
                     fetchChangeInitiativeFieldReferenceData(genericSelector, requiredChangeInitiativeColumns));
+        }
+    }
+
+
+    private Set<ReportGridCell> fetchAppGroupData(GenericSelector genericSelector,
+                                                  Set<Long> requiredAppGroupIds) {
+        if (requiredAppGroupIds.size() == 0) {
+            return emptySet();
+        } else {
+
+            SelectConditionStep<Record3<Long, Long, Timestamp>> directSelect = dsl
+                    .select(
+                            age.APPLICATION_ID.as("application_id"),
+                            ag.ID,
+                            age.CREATED_AT.as("created_at"))
+                    .from(ag)
+                    .innerJoin(age).on(ag.ID.eq(age.GROUP_ID))
+                    .where(age.APPLICATION_ID.in(genericSelector.selector()))
+                    .and(ag.ID.in(requiredAppGroupIds));
+
+            SelectConditionStep<Record3<Long, Long, Timestamp>> indirectSelect = dsl
+                    .select(
+                            a.ID.as("application_id"),
+                            ag.ID,
+                            agoe.CREATED_AT.as("created_at"))
+                    .from(ag)
+                    .innerJoin(agoe).on(ag.ID.eq(agoe.GROUP_ID))
+                    .innerJoin(eh).on(agoe.GROUP_ID.eq(eh.ANCESTOR_ID)
+                            .and(eh.KIND.eq(EntityKind.ORG_UNIT.name())))
+                    .innerJoin(a).on(eh.ID.eq(a.ORGANISATIONAL_UNIT_ID))
+                    .where(a.ID.in(genericSelector.selector()))
+                    .and(ag.ID.in(requiredAppGroupIds));
+
+            return fromCollection(directSelect.union(indirectSelect)
+                    .fetchSet(r -> {
+                        Long application_id = r.get("application_id", Long.class);
+                        Timestamp created_at = r.get("created_at", Timestamp.class);
+
+                        return ImmutableReportGridCell
+                                .builder()
+                                .subjectId(application_id)
+                                .columnEntityId(r.get(ag.ID))
+                                .columnEntityKind(EntityKind.APP_GROUP)
+                                .text("Y")
+                                .comment(toLocalDate(created_at).toString())
+                                .entityFieldReferenceId(null)
+                                .build();
+                    })
+                    // we now convert to a map so we can merge text values of cells with the same coordinates (appId, entId)
+                    .stream()
+                    .collect(toMap(
+                            c -> tuple(c.subjectId(), c.columnEntityId()),
+                            identity(),
+                            (a, b) -> ImmutableReportGridCell
+                                    .copyOf(a)
+                                    .withText(a.text() + "; " + b.text())))
+                    // and then we simply return the values of that temporary map.
+                    .values());
         }
     }
 
@@ -625,7 +701,7 @@ public class ReportGridDao {
         if (requiredInvolvementKinds.size() == 0) {
             return emptySet();
         } else {
-            return SetUtilities.fromCollection(dsl
+            return fromCollection(dsl
                     .select(
                             inv.ENTITY_ID,
                             inv.KIND_ID,
