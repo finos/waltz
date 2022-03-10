@@ -92,7 +92,7 @@ public class PermissionGroupService {
 
     public boolean hasPermission(CheckPermissionCommand permissionCommand) {
 
-        RequiredInvolvementsResult required = permissionGroupDao.findRequiredInvolvements(permissionCommand);
+        RequiredInvolvementsResult required = permissionGroupDao.getRequiredInvolvements(permissionCommand);
 
         if (required.areAllUsersAllowed()) {
             return true;

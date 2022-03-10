@@ -150,7 +150,7 @@ public class PermissionGroupDao {
     }
 
 
-    public RequiredInvolvementsResult findRequiredInvolvements(CheckPermissionCommand permissionCommand) {
+    public RequiredInvolvementsResult getRequiredInvolvements(CheckPermissionCommand permissionCommand) {
 
         Condition groupCondition = PERMISSION_GROUP.ID.in(permissionGroupSelector(permissionCommand.parentEntityRef()))
                 .or(PERMISSION_GROUP.IS_DEFAULT.isTrue());
