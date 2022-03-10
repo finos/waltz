@@ -491,7 +491,7 @@ public class ReportGridDao {
                             agoe.CREATED_AT.as("created_at"))
                     .from(ag)
                     .innerJoin(agoe).on(ag.ID.eq(agoe.GROUP_ID))
-                    .innerJoin(eh).on(agoe.GROUP_ID.eq(eh.ANCESTOR_ID)
+                    .innerJoin(eh).on(agoe.ORG_UNIT_ID.eq(eh.ANCESTOR_ID)
                             .and(eh.KIND.eq(EntityKind.ORG_UNIT.name())))
                     .innerJoin(a).on(eh.ID.eq(a.ORGANISATIONAL_UNIT_ID))
                     .where(a.ID.in(genericSelector.selector()))
