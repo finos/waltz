@@ -287,6 +287,7 @@ public class ReportGridExtractor implements DataExtractor {
             case APPLICATION:
             case CHANGE_INITIATIVE:
             case SURVEY_QUESTION:
+            case APP_GROUP:
                 return Optional.ofNullable(reportGridCell.text()).orElse("-");
             case MEASURABLE:
             case ASSESSMENT_DEFINITION:
