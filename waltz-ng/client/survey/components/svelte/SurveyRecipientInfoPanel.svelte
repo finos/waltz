@@ -38,49 +38,51 @@
 
     const tableHeaders = [
         {
-            class: "rejected",
+            cellClass: "rejected",
             name: "Rejected",
             longName: "Rejected surveys",
             description: "Survey owner has rejected survey. Survey must be reopened then recipients are required to update and resubmit",
             width: "10%",
             data: d => d.rejected
-        },{
-            class: "overdue",
+        }, {
+            cellClass: "overdue",
             name: "Overdue",
             longName: "Overdue surveys",
             description: "Survey is past its submission due date within Waltz",
             width: "10%",
             data: d => d.overdue
-        },{
-            class: "due-week",
+        }, {
+            cellClass: "due-week",
             name: "Due Week",
             longName: "Incomplete surveys - due within 7 days",
             description: "Survey is due to be submitted within 7 days",
             width: "10%",
             data: d => d.dueWeek
-        },{
-            class: "due-month",
+        }, {
+            cellClass: "due-month",
             name: "Due Month",
             longName: "Incomplete surveys - due within 30 days",
             description: "Survey is due to be submitted within 30 days",
             width: "10%",
             data: d => d.dueMonth
-        },{
-            class: "incomplete",
+        }, {
+            cellClass: "incomplete",
             name: "Total Outstanding",
             longName: "Total outstanding - all incomplete surveys",
             description: "All surveys requiring completion (sum of overdue, due week, due month and anything with a submission due date over a month)",
             width: "10%",
             data: d => d.incomplete
-        },{
-            class: "awaiting-approval",
+        }, {
+            cellClass: "awaiting-approval",
+            headerClass: "secondary",
             name: "Awaiting Approval",
             longName: "Completed surveys - awaiting approval",
             description: "Completed and submitted surveys waiting approval by a survey owner",
             width: "10%",
             data: d => d.completed
-        },{
-            class: "approved",
+        }, {
+            cellClass: "approved",
+            headerClass: "secondary",
             longName: "Approved surveys",
             description: "Survey has been approved by the survey owner, no further action required",
             name: "Approved",
@@ -107,7 +109,7 @@
 
     function determineClass(selectedHeader, header, templateInfo){
         return !_.isEmpty(header.data(templateInfo))
-            ? header.class
+            ? header.cellClass
             : "";
     }
 
@@ -184,11 +186,11 @@
             <th width="30%">Survey Name</th>
             {#each tableHeaders as header}
                 <th width={`${60 / tableHeaders.length}%`}
+                    class={header.headerClass}
                     title={header.description}>
                     {header.name}
                 </th>
             {/each}
-            <th width="10%">Total</th>
         </tr>
         </thead>
         <tbody>
@@ -209,9 +211,18 @@
                         {/if}
                     </td>
                 {/each}
-                <td><div>{_.size(byTemplateId[templateInfo.template.id])}</div></td>
             </tr>
         {/each}
+        <tr class="total-row">
+            <td>Total</td>
+            <td colspan="4">
+            </td>
+            <td>
+                <span>{_.sumBy(templateSummaries, d => _.size(d.incomplete))}
+                </span>
+            </td>
+            <td></td>
+        </tr>
         </tbody>
     </table>
 
@@ -326,6 +337,7 @@
         }
     }
 
+
     .approved {
         background-color: $waltz-green-background;
 
@@ -343,6 +355,15 @@
 
     th {
         text-align: center;
+    }
+
+    th.secondary {
+        color: #777;
+    }
+
+    .total-row {
+        color: #777;
+        font-weight: bold
     }
 
 </style>
