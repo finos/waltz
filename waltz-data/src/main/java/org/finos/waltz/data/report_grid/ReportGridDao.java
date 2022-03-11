@@ -20,7 +20,6 @@ package org.finos.waltz.data.report_grid;
 
 
 import org.finos.waltz.common.DateTimeUtilities;
-import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
@@ -91,6 +90,7 @@ public class ReportGridDao {
     private final org.finos.waltz.schema.tables.SurveyTemplate st = SURVEY_TEMPLATE.as("st");
     private final org.finos.waltz.schema.tables.Application a = APPLICATION.as("a");
     private final org.finos.waltz.schema.tables.ChangeInitiative ci = CHANGE_INITIATIVE.as("ci");
+    private final org.finos.waltz.schema.tables.EntityRelationship er = ENTITY_RELATIONSHIP.as("er");
 
     private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
                     SURVEY_QUESTION_RESPONSE.ENTITY_RESPONSE_ID,
@@ -476,7 +476,7 @@ public class ReportGridDao {
 
             SelectConditionStep<Record3<Long, Long, Timestamp>> directSelect = dsl
                     .select(
-                            age.APPLICATION_ID.as("application_id"),
+                            age.APPLICATION_ID.as("subject_id"),
                             ag.ID,
                             age.CREATED_AT.as("created_at"))
                     .from(ag)
@@ -486,7 +486,7 @@ public class ReportGridDao {
 
             SelectConditionStep<Record3<Long, Long, Timestamp>> indirectSelect = dsl
                     .select(
-                            a.ID.as("application_id"),
+                            a.ID.as("subject_id"),
                             ag.ID,
                             agoe.CREATED_AT.as("created_at"))
                     .from(ag)
@@ -497,18 +497,46 @@ public class ReportGridDao {
                     .where(a.ID.in(genericSelector.selector()))
                     .and(ag.ID.in(requiredAppGroupIds));
 
-            return fromCollection(directSelect.union(indirectSelect)
+            SelectConditionStep<Record3<Long, Long, Timestamp>> groupASelect = dsl
+                    .select(ci.ID.as("subject_id"),
+                            ag.ID,
+                            er.LAST_UPDATED_AT.as("created_at"))
+                    .from(ag)
+                    .innerJoin(er).on(ag.ID.eq(er.ID_A))
+                    .innerJoin(ci).on(er.ID_B.eq(ci.ID))
+                    .where(er.KIND_A.eq(EntityKind.APP_GROUP.name())
+                            .and(er.KIND_B.eq(EntityKind.CHANGE_INITIATIVE.name())))
+                    .and(ci.ID.in(genericSelector.selector()))
+                    .and(ag.ID.in(requiredAppGroupIds));
+
+            SelectConditionStep<Record3<Long, Long, Timestamp>> groupBSelect = dsl
+                    .select(ci.ID.as("subject_id"),
+                            ag.ID,
+                            er.LAST_UPDATED_AT.as("created_at"))
+                    .from(ag)
+                    .innerJoin(er).on(ag.ID.eq(er.ID_B))
+                    .innerJoin(ci).on(er.ID_A.eq(ci.ID))
+                    .where(er.KIND_B.eq(EntityKind.APP_GROUP.name())
+                            .and(er.KIND_A.eq(EntityKind.CHANGE_INITIATIVE.name())))
+                    .and(ci.ID.in(genericSelector.selector()))
+                    .and(ag.ID.in(requiredAppGroupIds));
+
+            SelectOrderByStep<Record3<Long, Long, Timestamp>> groupMembershipSelect = genericSelector.kind().equals(EntityKind.APPLICATION)
+                    ? directSelect.union(indirectSelect)
+                    : groupASelect.union(groupBSelect);
+
+            return fromCollection(groupMembershipSelect
                     .fetchSet(r -> {
-                        Long application_id = r.get("application_id", Long.class);
+                        Long subjectId = r.get("subject_id", Long.class);
                         Timestamp created_at = r.get("created_at", Timestamp.class);
 
                         return ImmutableReportGridCell
                                 .builder()
-                                .subjectId(application_id)
+                                .subjectId(subjectId)
                                 .columnEntityId(r.get(ag.ID))
                                 .columnEntityKind(EntityKind.APP_GROUP)
                                 .text("Y")
-                                .comment(toLocalDate(created_at).toString())
+                                .comment(format("Created at: %s", toLocalDate(created_at).toString()))
                                 .entityFieldReferenceId(null)
                                 .build();
                     })
