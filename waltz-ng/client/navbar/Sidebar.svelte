@@ -1,11 +1,15 @@
 <script>
-    import {sidebarExpanded} from "./sidebar-store";
-    import {activeSections, availableSections} from "../dynamic-section/section-store";
-    import Icon from "../common/svelte/Icon.svelte";
-
     import _ from "lodash";
     import {scaleLinear} from "d3-scale";
+
+    import logoWithText from "../../images/branding/waltz_badge+text_horizontal_negative_bw_145px.png";
+    import logoNoText from "../../images/branding/waltz_badge_negative_bw_32px.png";
+    import Icon from "../common/svelte/Icon.svelte";
+    import {sidebarExpanded} from "./sidebar-store";
+    import {activeSections, availableSections} from "../dynamic-section/section-store";
     import {yellow} from "../common/colors";
+    import {settingsStore} from "../svelte-stores/settings-store";
+    import ViewLink from "../common/svelte/ViewLink.svelte";
 
     let jumpOffset = 250;
 
@@ -29,21 +33,46 @@
         }
     }
 
-    $: jumpOffset = calcJumpOffset($activeSections.pageKind);
-
-    $: activeSectionIds = _.map($activeSections.sections, d => d.id);
-
     const colorScale = scaleLinear()
         .domain([-1, 0, 4])
         .range(['#ddd', yellow, '#e5e5e5'])
         .clamp(true);
 
+    $: jumpOffset = calcJumpOffset($activeSections.pageKind);
+
+    $: activeSectionIds = _.map($activeSections.sections, d => d.id);
+
+
+    $: settingsCall = settingsStore.loadAll();
+    $: settings = $settingsCall.data;
+
+    $: logoOverlayText = _.find(settings, d => d.name === "ui.logo.overlay.text");
+    $: logoOverlayColor = _.find(settings, d => d.name === "ui.logo.overlay.color");
+
+    $: logo = $sidebarExpanded ? logoWithText : logoNoText;
+
 </script>
 
 <div class={$sidebarExpanded ? "sidebar-expanded" : "sidebar-collapsed" }>
+    <div class="branding">
+        <ViewLink state="main">
+            <img height="32"
+                 src={logo}
+                 alt="Waltz logo">
+            {#if $sidebarExpanded}
+            <span class="overlay"
+                  style={`color: ${logoOverlayColor?.value}`}>
+                    {logoOverlayText?.value}
+            </span>
+            {/if}
+        </ViewLink>
+    </div>
+
     <ul class="list-unstyled">
         {#each $availableSections as section}
-            <li class={_.includes(activeSectionIds, section.id) ? "selected-sidenav" : "sidenav"}>
+            <li class={_.includes(activeSectionIds, section.id)
+                    ? "selected-sidenav"
+                    : "sidenav"}>
                 <button class="btn-skinny no-overflow"
                         title={section.description}
                         class:selected={_.includes(activeSections.sections, section)}
@@ -60,7 +89,9 @@
                 {#if section.children}
                     <ul class="child-list list-unstyled">
                         {#each section.children as child}
-                            <li class={_.includes(activeSectionIds, child.id) ? "selected-sidenav" : "sidenav"}>
+                            <li class={_.includes(activeSectionIds, child.id)
+                                    ? "selected-sidenav"
+                                    : "sidenav"}>
                                 <button class="btn-skinny no-overflow"
                                         title={child.description}
                                         on:click={() => activateSection(child, jumpOffset)}>
@@ -69,7 +100,9 @@
                                               name={child.icon}/>
                                     </span>
                                     <span class="section-name "
-                                          style={`opacity: ${$sidebarExpanded ? 1 : 0}`}>
+                                          style={`opacity: ${$sidebarExpanded
+                                            ? 1
+                                            : 0}`}>
                                         {child.name}
                                     </span>
                                 </button>
@@ -86,7 +119,9 @@
    style="margin-bottom: 1em"
    on:click={() => $sidebarExpanded = !$sidebarExpanded}>
     <Icon size="lg"
-          name={$sidebarExpanded ? 'angle-double-left' : 'angle-double-right'}>
+          name={$sidebarExpanded
+            ? 'angle-double-left'
+            : 'angle-double-right'}>
     </Icon>
 </button>
 
@@ -172,5 +207,25 @@
     /* When you mouse over the navigation links, change their color */
     .sidenav button:hover {
         color: $navbar-default-link-hover-color;
+    }
+
+    .branding {
+        img {
+            padding-left: 2em;
+            position: relative;
+            top: -6px;
+        }
+
+        padding-bottom: 2em;
+    }
+
+    .overlay {
+        display: inline;
+        position: absolute;
+        left: 76px;
+        top: 40px;
+        font-weight: bold;
+        font-style: italic;
+        white-space: nowrap
     }
 </style>

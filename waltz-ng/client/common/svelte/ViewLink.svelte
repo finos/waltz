@@ -90,20 +90,22 @@
     $: {
         path = _.get(routes, [state, "path"], () => "")(ctx);
         title = title || _.get(routes, [state, "title"], state);
+
     }
+    $: console.log({path, state, title, p: _.isNull(path)})
 
 </script>
 
-{#if path}
+{#if _.isNull(path)}
+    <span>
+        <slot/>
+    </span>
+{:else }
     <a href={path}
        class:secondary-link={isSecondaryLink}
        {title}>
         <slot></slot>
     </a>
-{:else }
-    <span>
-        <slot/>
-    </span>
 {/if}
 
 

@@ -40,7 +40,6 @@ $hiddenWidth: 8px;
     height: 100%; /* Full-height: remove this if you want "auto" height */
     position: fixed; /* Fixed Sidebar (stay in place on scroll) */
     z-index: 1000; /* Stay on top */
-    top: 50px; /* Stay at the top */
     left: 0;
     overflow-x: hidden; /* Truncates long section titles */
     padding-top: 20px;
@@ -79,6 +78,6 @@ $hiddenWidth: 8px;
 
 
 .under-header {
-    margin-top: 50px;
+    xx-margin-top: 50px;
     overflow-x: hidden; /* Disable horizontal scroll */
 }
