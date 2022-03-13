@@ -28,6 +28,7 @@ import org.finos.waltz.model.*;
 import org.finos.waltz.model.attestation.*;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.external_identifier.ExternalIdValue;
+import org.finos.waltz.model.permission_group.CheckPermissionCommand;
 import org.finos.waltz.model.permission_group.ImmutableCheckPermissionCommand;
 import org.finos.waltz.model.person.Person;
 import org.finos.waltz.service.application.ApplicationService;
@@ -188,7 +189,7 @@ public class AttestationInstanceService {
     public boolean attestForEntity(String username, AttestEntityCommand createCommand) {
         checkAttestationPermission(username, createCommand);
 
-        if(createCommand.attestedEntityKind().equals(EntityKind.LOGICAL_DATA_FLOW)){
+        if(createCommand.attestedEntityKind() == EntityKind.LOGICAL_DATA_FLOW){
             checkLogicalFlowsCanBeAttested(createCommand);
         }
 
@@ -237,16 +238,16 @@ public class AttestationInstanceService {
 
     private void checkAttestationPermission(String username, AttestEntityCommand createCommand) {
 
-        boolean hasAttestationPermission = permissionGroupService.hasPermission(ImmutableCheckPermissionCommand
+        CheckPermissionCommand checkPermissionCommand = ImmutableCheckPermissionCommand
                 .builder()
                 .parentEntityRef(createCommand.entityReference())
                 .subjectKind(EntityKind.ATTESTATION)
                 .qualifierKind(createCommand.attestedEntityKind())
                 .qualifierId(createCommand.attestedEntityId())
                 .user(username)
-                .build());
+                .build();
 
-        if (!hasAttestationPermission) {
+        if (! permissionGroupService.hasPermission(checkPermissionCommand)) {
             throw new UpdateFailedException("ATTESTATION_FAILED",
                     "user does not have permission to attest " + createCommand.attestedEntityKind().prettyName());
         }
