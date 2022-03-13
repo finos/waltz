@@ -138,23 +138,6 @@ public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
 
 
     @Test
-    public void cannotAttestIfNotAssociated() {
-        String user = mkUserId("cannotAttestIfNotAssociated");
-        EntityReference appRef = mkNewAppRef();
-
-        AttestEntityCommand cmd = ImmutableAttestEntityCommand.builder()
-                .attestedEntityKind(EntityKind.LOGICAL_DATA_FLOW)
-                .entityReference(appRef)
-                .build();
-
-        assertThrows(
-                UpdateFailedException.class,
-                () -> aiSvc.attestForEntity(user, cmd),
-                "Should not be able to attest as user not associated to app");
-    }
-
-
-    @Test
     public void cannotAttestIfNoFlows() {
         long invId = involvementHelper.mkInvolvementKind(mkName("cannotAttestIfNoFlows"));
         String user = mkUserId("cannotAttestIfNotAssociated");
@@ -172,7 +155,7 @@ public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
                 .build();
 
         assertThrows(
-                Exception.class,
+                IllegalArgumentException.class,
                 () -> aiSvc.attestForEntity(user, cmd),
                 "Should not be able to attest as no flows");
     }
