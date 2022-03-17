@@ -493,7 +493,6 @@ public class ReportGridDao {
                                 .entityFieldReferenceId(null)
                                 .build();
                     })
-                    // we now convert to a map so we can merge text values of cells with the same coordinates (appId, entId)
                     .collect(toSet());
         }
     }
