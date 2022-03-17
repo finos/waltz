@@ -172,6 +172,7 @@ export function prepareColumnDefs(gridData) {
             case "SURVEY_TEMPLATE":
             case "APPLICATION":
             case "CHANGE_INITIATIVE":
+            case "APP_GROUP":
             case "SURVEY_QUESTION":
                 return {
                     allowSummary: false,
@@ -187,6 +188,7 @@ export function prepareColumnDefs(gridData) {
                              popover-placement="left"
                              ng-class="{'wgrc-involvement-cell': COL_FIELD.text && ${c.columnEntityKind === "INVOLVEMENT_KIND"},
                                         'wgrc-survey-question-cell': COL_FIELD.text && ${c.columnEntityKind === "SURVEY_QUESTION"},
+                                        'wgrc-app-group-cell': COL_FIELD.text && ${c.columnEntityKind === "APP_GROUP"},
                                         'wgrc-no-data-cell': !COL_FIELD.text}"
                              ng-style="{
                                 'border-bottom-right-radius': COL_FIELD.comment ? '15% 50%' : 0,
@@ -294,6 +296,7 @@ export function prepareTableData(gridData) {
             case "SURVEY_TEMPLATE":
             case "APPLICATION":
             case "CHANGE_INITIATIVE":
+            case "APP_GROUP":
             case "SURVEY_QUESTION":
                 return {
                     text: x.text,

@@ -27,6 +27,7 @@
     let canBeAdded;
 
     function onSelect(d) {
+
         const column = {
             columnEntityId: d.columnEntityId,
             columnEntityKind: d.columnEntityKind,
@@ -38,6 +39,10 @@
             displayName: d.displayName,
             position: 0
         };
+
+        if (_.some($columnDefs, c => sameColumnRef(column, c))) {
+            return;
+        }
 
         const newList = _.concat(
             $columnDefs,
