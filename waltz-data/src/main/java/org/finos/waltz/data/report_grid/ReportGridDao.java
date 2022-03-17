@@ -474,59 +474,12 @@ public class ReportGridDao {
             return emptySet();
         } else {
 
-            SelectConditionStep<Record3<Long, Long, Timestamp>> directSelect = dsl
-                    .select(
-                            age.APPLICATION_ID.as("subject_id"),
-                            ag.ID,
-                            age.CREATED_AT.as("created_at"))
-                    .from(ag)
-                    .innerJoin(age).on(ag.ID.eq(age.GROUP_ID))
-                    .where(age.APPLICATION_ID.in(genericSelector.selector()))
-                    .and(ag.ID.in(requiredAppGroupIds));
+            SelectOrderByStep<Record3<Long, Long, Timestamp>> appGroupInfoSelect = determineAppGroupQuery(genericSelector, requiredAppGroupIds);
 
-            SelectConditionStep<Record3<Long, Long, Timestamp>> indirectSelect = dsl
-                    .select(
-                            a.ID.as("subject_id"),
-                            ag.ID,
-                            agoe.CREATED_AT.as("created_at"))
-                    .from(ag)
-                    .innerJoin(agoe).on(ag.ID.eq(agoe.GROUP_ID))
-                    .innerJoin(eh).on(agoe.ORG_UNIT_ID.eq(eh.ANCESTOR_ID)
-                            .and(eh.KIND.eq(EntityKind.ORG_UNIT.name())))
-                    .innerJoin(a).on(eh.ID.eq(a.ORGANISATIONAL_UNIT_ID))
-                    .where(a.ID.in(genericSelector.selector()))
-                    .and(ag.ID.in(requiredAppGroupIds));
-
-            SelectConditionStep<Record3<Long, Long, Timestamp>> groupASelect = dsl
-                    .select(ci.ID.as("subject_id"),
-                            ag.ID,
-                            er.LAST_UPDATED_AT.as("created_at"))
-                    .from(ag)
-                    .innerJoin(er).on(ag.ID.eq(er.ID_A))
-                    .innerJoin(ci).on(er.ID_B.eq(ci.ID))
-                    .where(er.KIND_A.eq(EntityKind.APP_GROUP.name())
-                            .and(er.KIND_B.eq(EntityKind.CHANGE_INITIATIVE.name())))
-                    .and(ci.ID.in(genericSelector.selector()))
-                    .and(ag.ID.in(requiredAppGroupIds));
-
-            SelectConditionStep<Record3<Long, Long, Timestamp>> groupBSelect = dsl
-                    .select(ci.ID.as("subject_id"),
-                            ag.ID,
-                            er.LAST_UPDATED_AT.as("created_at"))
-                    .from(ag)
-                    .innerJoin(er).on(ag.ID.eq(er.ID_B))
-                    .innerJoin(ci).on(er.ID_A.eq(ci.ID))
-                    .where(er.KIND_B.eq(EntityKind.APP_GROUP.name())
-                            .and(er.KIND_A.eq(EntityKind.CHANGE_INITIATIVE.name())))
-                    .and(ci.ID.in(genericSelector.selector()))
-                    .and(ag.ID.in(requiredAppGroupIds));
-
-            SelectOrderByStep<Record3<Long, Long, Timestamp>> groupMembershipSelect = genericSelector.kind().equals(EntityKind.APPLICATION)
-                    ? directSelect.union(indirectSelect)
-                    : groupASelect.union(groupBSelect);
-
-            return fromCollection(groupMembershipSelect
-                    .fetchSet(r -> {
+            return dsl
+                    .fetch(appGroupInfoSelect)
+                    .stream()
+                    .map(r -> {
                         Long subjectId = r.get("subject_id", Long.class);
                         Timestamp created_at = r.get("created_at", Timestamp.class);
 
@@ -541,16 +494,82 @@ public class ReportGridDao {
                                 .build();
                     })
                     // we now convert to a map so we can merge text values of cells with the same coordinates (appId, entId)
-                    .stream()
-                    .collect(toMap(
-                            c -> tuple(c.subjectId(), c.columnEntityId()),
-                            identity(),
-                            (a, b) -> ImmutableReportGridCell
-                                    .copyOf(a)
-                                    .withText(a.text() + "; " + b.text())))
-                    // and then we simply return the values of that temporary map.
-                    .values());
+                    .collect(toSet());
         }
+    }
+
+
+    private SelectOrderByStep<Record3<Long, Long, Timestamp>> determineAppGroupQuery(GenericSelector selector, Set<Long> requiredAppGroupIds) {
+
+        switch (selector.kind()) {
+            case APPLICATION:
+                return mkApplicationAppGroupSelect(selector, requiredAppGroupIds);
+            case CHANGE_INITIATIVE:
+                return mkChangeInitiativeAppGroupSelect(selector, requiredAppGroupIds);
+            default:
+                throw new UnsupportedOperationException("Cannot return app group selector for kind: " + selector.kind().name());
+        }
+
+    }
+
+
+    private SelectOrderByStep<Record3<Long, Long, Timestamp>> mkChangeInitiativeAppGroupSelect(GenericSelector selector, Set<Long> requiredAppGroupIds) {
+
+        SelectConditionStep<Record3<Long, Long, Timestamp>> groupASelect = dsl
+                .select(ci.ID.as("subject_id"),
+                        ag.ID,
+                        er.LAST_UPDATED_AT.as("created_at"))
+                .from(ag)
+                .innerJoin(er).on(ag.ID.eq(er.ID_A))
+                .innerJoin(ci).on(er.ID_B.eq(ci.ID))
+                .where(er.KIND_A.eq(EntityKind.APP_GROUP.name())
+                        .and(er.KIND_B.eq(EntityKind.CHANGE_INITIATIVE.name())))
+                .and(ci.ID.in(selector.selector()))
+                .and(ag.ID.in(requiredAppGroupIds));
+
+        SelectConditionStep<Record3<Long, Long, Timestamp>> groupBSelect = dsl
+                .select(ci.ID.as("subject_id"),
+                        ag.ID,
+                        er.LAST_UPDATED_AT.as("created_at"))
+                .from(ag)
+                .innerJoin(er).on(ag.ID.eq(er.ID_B))
+                .innerJoin(ci).on(er.ID_A.eq(ci.ID))
+                .where(er.KIND_B.eq(EntityKind.APP_GROUP.name())
+                        .and(er.KIND_A.eq(EntityKind.CHANGE_INITIATIVE.name())))
+                .and(ci.ID.in(selector.selector()))
+                .and(ag.ID.in(requiredAppGroupIds));
+
+
+        return groupASelect.union(groupBSelect);
+    }
+
+
+    private SelectOrderByStep<Record3<Long, Long, Timestamp>> mkApplicationAppGroupSelect(GenericSelector selector, Set<Long> requiredAppGroupIds) {
+
+        SelectConditionStep<Record3<Long, Long, Timestamp>> directSelect = DSL
+                .select(
+                        age.APPLICATION_ID.as("subject_id"),
+                        ag.ID,
+                        age.CREATED_AT.as("created_at"))
+                .from(ag)
+                .innerJoin(age).on(ag.ID.eq(age.GROUP_ID))
+                .where(age.APPLICATION_ID.in(selector.selector()))
+                .and(ag.ID.in(requiredAppGroupIds));
+
+        SelectConditionStep<Record3<Long, Long, Timestamp>> indirectSelect = DSL
+                .select(
+                        a.ID.as("subject_id"),
+                        ag.ID,
+                        agoe.CREATED_AT.as("created_at"))
+                .from(ag)
+                .innerJoin(agoe).on(ag.ID.eq(agoe.GROUP_ID))
+                .innerJoin(eh).on(agoe.ORG_UNIT_ID.eq(eh.ANCESTOR_ID)
+                        .and(eh.KIND.eq(EntityKind.ORG_UNIT.name())))
+                .innerJoin(a).on(eh.ID.eq(a.ORGANISATIONAL_UNIT_ID))
+                .where(a.ID.in(selector.selector()))
+                .and(ag.ID.in(requiredAppGroupIds));
+
+        return directSelect.union(indirectSelect);
     }
 
 
