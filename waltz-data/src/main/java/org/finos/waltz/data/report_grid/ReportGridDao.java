@@ -27,6 +27,7 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.entity_field_reference.EntityFieldReference;
 import org.finos.waltz.model.entity_field_reference.ImmutableEntityFieldReference;
 import org.finos.waltz.model.report_grid.*;
+import org.finos.waltz.model.usage_info.UsageKind;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.records.ReportGridColumnDefinitionRecord;
 import org.finos.waltz.schema.tables.records.ReportGridRecord;
@@ -50,6 +51,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.*;
+import static org.finos.waltz.common.CollectionUtilities.first;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDate;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
@@ -60,6 +62,8 @@ import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.survey.SurveyInstanceStatus.APPROVED;
 import static org.finos.waltz.model.survey.SurveyInstanceStatus.COMPLETED;
 import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.DataType.DATA_TYPE;
+import static org.finos.waltz.schema.tables.DataTypeUsage.DATA_TYPE_USAGE;
 import static org.finos.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
@@ -91,6 +95,8 @@ public class ReportGridDao {
     private final org.finos.waltz.schema.tables.Application a = APPLICATION.as("a");
     private final org.finos.waltz.schema.tables.ChangeInitiative ci = CHANGE_INITIATIVE.as("ci");
     private final org.finos.waltz.schema.tables.EntityRelationship er = ENTITY_RELATIONSHIP.as("er");
+    private final org.finos.waltz.schema.tables.DataTypeUsage dtu = DATA_TYPE_USAGE.as("dtu");
+    private final org.finos.waltz.schema.tables.DataType dt = DATA_TYPE.as("dt");
 
     private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
                     SURVEY_QUESTION_RESPONSE.ENTITY_RESPONSE_ID,
@@ -188,7 +194,7 @@ public class ReportGridDao {
         record.setKind(createCommand.kind().name());
 
         try {
-            int insert = record.insert();
+            record.insert();
             return record.getId();
         } catch (DataIntegrityViolationException exception) {
             throw new DataIntegrityViolationException(format(
@@ -208,6 +214,29 @@ public class ReportGridDao {
                 .where(rg.ID.eq(id))
                 .execute();
     }
+
+
+    public Set<ReportGridDefinition> findForOwner(String username) {
+        Condition isOwner = REPORT_GRID_MEMBER.USER_ID.eq(username)
+                .and(REPORT_GRID_MEMBER.ROLE.eq(ReportGridMemberRole.OWNER.name()));
+
+        return dsl
+                .select(rg.fields())
+                .from(rg)
+                .innerJoin(REPORT_GRID_MEMBER)
+                .on(rg.ID.eq(REPORT_GRID_MEMBER.GRID_ID))
+                .where(isOwner)
+                .fetchSet(r -> mkReportGridDefinition(rgcd.REPORT_GRID_ID.eq(r.get(rg.ID)), r.into(REPORT_GRID)));
+    }
+
+
+    public boolean remove(long gridId) {
+        return dsl
+                .deleteFrom(REPORT_GRID)
+                .where(REPORT_GRID.ID.eq(gridId))
+                .execute() == 1;
+    }
+
 
     // --- Helpers ---
 
@@ -294,6 +323,14 @@ public class ReportGridDao {
                 ci.DESCRIPTION,
                 condition);
 
+        SelectConditionStep<Record13<String, String, Long, String, String, Integer, String, String, Long, String, String, String, String>> dataTypeColumns = mkColumnDefinitionQuery(
+                EntityKind.DATA_TYPE,
+                dt,
+                dt.ID,
+                dt.NAME,
+                dt.DESCRIPTION,
+                condition);
+
         return assessmentDefinitionColumns
                 .unionAll(measurableColumns)
                 .unionAll(costKindColumns)
@@ -303,6 +340,7 @@ public class ReportGridDao {
                 .unionAll(surveyMetaColumns)
                 .unionAll(applicationMetaColumns)
                 .unionAll(changeInitiativeMetaColumns)
+                .unionAll(dataTypeColumns)
                 .orderBy(rgcd.POSITION, DSL.field("name", String.class))
                 .fetch(r -> {
 
@@ -318,7 +356,7 @@ public class ReportGridDao {
                             .description(r.get(efr.DESCRIPTION))
                             .build();
 
-                    ImmutableReportGridColumnDefinition defn = ImmutableReportGridColumnDefinition.builder()
+                    return ImmutableReportGridColumnDefinition.builder()
                             .columnEntityId(r.get(rgcd.COLUMN_ENTITY_ID))
                             .columnEntityKind(EntityKind.valueOf(r.get(rgcd.COLUMN_ENTITY_KIND)))
                             .columnName(r.get("name", String.class))
@@ -329,10 +367,9 @@ public class ReportGridDao {
                             .ratingRollupRule(RatingRollupRule.valueOf(r.get(rgcd.RATING_ROLLUP_RULE)))
                             .entityFieldReference(entityFieldReference)
                             .build();
-
-                    return defn;
                 });
     }
+
 
     private SelectConditionStep<Record13<String, String, Long, String, String, Integer, String, String, Long, String, String, String, String>> mkColumnDefinitionQuery(EntityKind entityKind,
                                                                                                                                                                        Table<?> t,
@@ -384,11 +421,11 @@ public class ReportGridDao {
 
             Map<EntityKind, Collection<ReportGridColumnDefinition>> colsByKind = groupBy(
                     simpleGridDefs,
-                    cd -> cd.columnEntityKind());
+                    ReportGridColumnDefinition::columnEntityKind);
 
             Set<Long> requiredAssessmentDefinitions = map(
                     colsByKind.getOrDefault(EntityKind.ASSESSMENT_DEFINITION, emptySet()),
-                    cd -> cd.columnEntityId());
+                    ReportGridColumnDefinition::columnEntityId);
 
             Map<RatingRollupRule, Collection<ReportGridColumnDefinition>> measurableColumnsByRollupKind = groupBy(
                     colsByKind.getOrDefault(EntityKind.MEASURABLE, emptySet()),
@@ -396,31 +433,44 @@ public class ReportGridDao {
 
             Set<Long> exactMeasurableIds = map(
                     measurableColumnsByRollupKind.get(RatingRollupRule.NONE),
-                    cd -> cd.columnEntityId());
+                    ReportGridColumnDefinition::columnEntityId);
 
             Set<Long> summaryMeasurableIdsUsingHighest = map(
                     measurableColumnsByRollupKind.get(RatingRollupRule.PICK_HIGHEST),
-                    cd -> cd.columnEntityId());
+                    ReportGridColumnDefinition::columnEntityId);
 
             Set<Long> summaryMeasurableIdsUsingLowest = map(
                     measurableColumnsByRollupKind.get(RatingRollupRule.PICK_LOWEST),
-                    cd -> cd.columnEntityId());
+                    ReportGridColumnDefinition::columnEntityId);
 
             Set<Long> requiredCostKinds = map(
                     colsByKind.getOrDefault(EntityKind.COST_KIND, emptySet()),
-                    cd -> cd.columnEntityId());
+                    ReportGridColumnDefinition::columnEntityId);
 
             Set<Long> requiredInvolvementKinds = map(
                     colsByKind.getOrDefault(EntityKind.INVOLVEMENT_KIND, emptySet()),
-                    cd -> cd.columnEntityId());
+                    ReportGridColumnDefinition::columnEntityId);
 
             Set<Long> requiredSurveyQuestionIds = map(
                     colsByKind.getOrDefault(EntityKind.SURVEY_QUESTION, emptySet()),
-                    cd -> cd.columnEntityId());
+                    ReportGridColumnDefinition::columnEntityId);
 
             Set<Long> requiredAppGroupIds = map(
                     colsByKind.getOrDefault(EntityKind.APP_GROUP, emptySet()),
-                    cd -> cd.columnEntityId());
+                    ReportGridColumnDefinition::columnEntityId);
+
+
+            Map<Boolean, Collection<ReportGridColumnDefinition>> dataTypeColumnsByIsExact = groupBy(
+                    colsByKind.getOrDefault(EntityKind.DATA_TYPE, emptySet()),
+                    d -> d.ratingRollupRule() == RatingRollupRule.NONE);
+
+            Set<Long> requiredExactDataTypeIds = map(
+                    dataTypeColumnsByIsExact.get(Boolean.TRUE),
+                    ReportGridColumnDefinition::columnEntityId);
+
+            Set<Long> requiredSummaryDataTypeIds = map(
+                    dataTypeColumnsByIsExact.get(Boolean.FALSE),
+                    ReportGridColumnDefinition::columnEntityId);
 
 
             // COMPLEX GRID DEFS
@@ -463,17 +513,96 @@ public class ReportGridDao {
                     fetchAppGroupData(genericSelector, requiredAppGroupIds),
                     fetchSurveyFieldReferenceData(genericSelector, requiredSurveyTemplateIds),
                     fetchApplicationFieldReferenceData(genericSelector, requiredApplicationColumns),
-                    fetchChangeInitiativeFieldReferenceData(genericSelector, requiredChangeInitiativeColumns));
+                    fetchChangeInitiativeFieldReferenceData(genericSelector, requiredChangeInitiativeColumns),
+                    fetchExactDataTypeData(genericSelector, requiredExactDataTypeIds),
+                    fetchSummaryDataTypeData(genericSelector, requiredSummaryDataTypeIds));
         }
+    }
+
+
+    private Set<ReportGridCell> fetchExactDataTypeData(GenericSelector genericSelector,
+                                                       Set<Long> requiredDataTypeIds) {
+        if (requiredDataTypeIds.isEmpty()) {
+            return Collections.emptySet();
+        } else {
+             return dsl
+                    .select(dtu.ENTITY_ID,
+                            dtu.DATA_TYPE_ID,
+                            dtu.USAGE_KIND)
+                    .from(dtu)
+                    .where(dtu.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                    .and(dtu.ENTITY_ID.in(genericSelector.selector()))
+                    .and(dtu.DATA_TYPE_ID.in(requiredDataTypeIds))
+                    .fetchGroups(r -> tuple(
+                            r.get(dtu.ENTITY_ID),
+                            r.get(dtu.DATA_TYPE_ID)))
+                     .entrySet()
+                     .stream()
+                     .map(entry -> {
+                         Set<UsageKind> usageKinds = map(
+                             entry.getValue(),
+                             d -> UsageKind.valueOf(d.get(dtu.USAGE_KIND)));
+
+                         return mkDataTypeUsageCell(entry.getKey(), usageKinds);
+                     })
+                    .collect(toSet());
+        }
+    }
+
+
+    private Set<ReportGridCell> fetchSummaryDataTypeData(GenericSelector genericSelector,
+                                                         Set<Long> requiredDataTypeIds) {
+        if (requiredDataTypeIds.isEmpty()) {
+            return Collections.emptySet();
+        } else {
+            return dsl
+                    .select(dtu.ENTITY_ID,
+                            dtu.DATA_TYPE_ID,
+                            dtu.USAGE_KIND,
+                            eh.ANCESTOR_ID)
+                    .from(dtu)
+                    .innerJoin(eh).on(eh.ID.eq(dtu.DATA_TYPE_ID)
+                            .and(eh.KIND.eq(EntityKind.DATA_TYPE.name())))
+                    .where(dtu.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                    .and(dtu.ENTITY_ID.in(genericSelector.selector()))
+                    .and(eh.ANCESTOR_ID.in(requiredDataTypeIds))
+                    .fetchGroups(r -> tuple(
+                            r.get(dtu.ENTITY_ID),
+                            r.get(eh.ANCESTOR_ID)))
+                    .entrySet()
+                    .stream()
+                    .map(entry -> {
+                        Set<UsageKind> usageKinds = map(
+                                entry.getValue(),
+                                d -> UsageKind.valueOf(d.get(dtu.USAGE_KIND)));
+
+                        return mkDataTypeUsageCell(entry.getKey(), usageKinds);
+                    })
+                    .collect(toSet());
+        }
+    }
+
+
+    private ImmutableReportGridCell mkDataTypeUsageCell(Tuple2<Long, Long> key,
+                                                        Set<UsageKind> usageKinds) {
+        UsageKind derivedUsage = deriveUsage(usageKinds);
+
+        return ImmutableReportGridCell
+                .builder()
+                .subjectId(key.v1)
+                .columnEntityId(key.v2)
+                .columnEntityKind(EntityKind.DATA_TYPE)
+                .text(derivedUsage.name())
+                .entityFieldReferenceId(null)
+                .build();
     }
 
 
     private Set<ReportGridCell> fetchAppGroupData(GenericSelector genericSelector,
                                                   Set<Long> requiredAppGroupIds) {
-        if (requiredAppGroupIds.size() == 0) {
+        if (requiredAppGroupIds.isEmpty()) {
             return emptySet();
         } else {
-
             SelectOrderByStep<Record3<Long, Long, Timestamp>> appGroupInfoSelect = determineAppGroupQuery(genericSelector, requiredAppGroupIds);
 
             return dsl
@@ -572,10 +701,10 @@ public class ReportGridDao {
     }
 
 
-    public Set<ReportGridCell> fetchApplicationFieldReferenceData(GenericSelector selector,
+    private Set<ReportGridCell> fetchApplicationFieldReferenceData(GenericSelector selector,
                                                                   Set<Tuple2<ReportGridColumnDefinition, EntityFieldReference>> requiredApplicationColumns) {
 
-        if (requiredApplicationColumns.size() == 0) {
+        if (requiredApplicationColumns.isEmpty()) {
             return emptySet();
         } else {
 
@@ -617,10 +746,10 @@ public class ReportGridDao {
     }
 
 
-    public Set<ReportGridCell> fetchChangeInitiativeFieldReferenceData(GenericSelector selector,
+    private Set<ReportGridCell> fetchChangeInitiativeFieldReferenceData(GenericSelector selector,
                                                                        Set<Tuple2<ReportGridColumnDefinition, EntityFieldReference>> requiredChangeInitiativeColumns) {
 
-        if (requiredChangeInitiativeColumns.size() == 0) {
+        if (requiredChangeInitiativeColumns.isEmpty()) {
             return emptySet();
         } else {
 
@@ -662,13 +791,13 @@ public class ReportGridDao {
     }
 
 
-    public Set<ReportGridCell> fetchSurveyFieldReferenceData(GenericSelector selector,
+    private Set<ReportGridCell> fetchSurveyFieldReferenceData(GenericSelector selector,
                                                              Set<Tuple2<ReportGridColumnDefinition, EntityFieldReference>> surveyInstanceInfo) {
-        if (surveyInstanceInfo.size() == 0) {
+        if (surveyInstanceInfo.isEmpty()) {
             return emptySet();
         } else {
 
-            Field<Long> latest_instance = DSL
+            Field<Long> latestInstance = DSL
                     .firstValue(SURVEY_INSTANCE.ID)
                     .over()
                     .partitionBy(SURVEY_INSTANCE.ENTITY_ID, SURVEY_INSTANCE.ENTITY_KIND, SURVEY_RUN.SURVEY_TEMPLATE_ID)
@@ -684,7 +813,7 @@ public class ReportGridDao {
             Set<Long> surveyTemplateIds = map(surveyInstanceInfo, d -> d.v1.columnEntityId());
 
             Table<Record> surveyInfo = dsl
-                    .select(latest_instance)
+                    .select(latestInstance)
                     .select(SURVEY_INSTANCE.ID.as("sid"),
                             SURVEY_INSTANCE.STATUS,
                             SURVEY_INSTANCE.APPROVED_AT,
@@ -707,7 +836,7 @@ public class ReportGridDao {
             SelectConditionStep<Record> surveyInfoForLatestInstance = dsl
                     .select(surveyInfo.fields())
                     .from(surveyInfo)
-                    .where(surveyInfo.field(latest_instance)
+                    .where(surveyInfo.field(latestInstance)
                             .eq(surveyInfo.field("sid", Long.class)));
 
             return surveyInfoForLatestInstance
@@ -744,7 +873,7 @@ public class ReportGridDao {
 
     private Set<ReportGridCell> fetchInvolvementData(GenericSelector selector,
                                                      Set<Long> requiredInvolvementKinds) {
-        if (requiredInvolvementKinds.size() == 0) {
+        if (requiredInvolvementKinds.isEmpty()) {
             return emptySet();
         } else {
             return fromCollection(dsl
@@ -783,7 +912,7 @@ public class ReportGridDao {
     private Set<ReportGridCell> fetchCostData(GenericSelector selector,
                                               Set<Long> requiredCostKinds) {
 
-        if (requiredCostKinds.size() == 0) {
+        if (requiredCostKinds.isEmpty()) {
             return emptySet();
         } else {
 
@@ -821,7 +950,7 @@ public class ReportGridDao {
                                                            Set<Long> measurableIdsUsingHighest,
                                                            Set<Long> measurableIdsUsingLowest) {
 
-        if (measurableIdsUsingHighest.size() == 0 && measurableIdsUsingLowest.size() == 0) {
+        if (measurableIdsUsingHighest.isEmpty() && measurableIdsUsingLowest.isEmpty()) {
             return emptySet();
         }
 
@@ -906,7 +1035,7 @@ public class ReportGridDao {
     private Set<ReportGridCell> fetchExactMeasurableData(GenericSelector selector,
                                                          Set<Long> exactMeasurableIds) {
 
-        if (exactMeasurableIds.size() == 0) {
+        if (exactMeasurableIds.isEmpty()) {
             return emptySet();
         }
 
@@ -938,7 +1067,7 @@ public class ReportGridDao {
 
     private Set<ReportGridCell> fetchAssessmentData(GenericSelector selector,
                                                     Set<Long> requiredAssessmentDefinitionIds) {
-        if (requiredAssessmentDefinitionIds.size() == 0) {
+        if (requiredAssessmentDefinitionIds.isEmpty()) {
             return emptySet();
         } else {
             return dsl
@@ -964,11 +1093,11 @@ public class ReportGridDao {
 
     private Set<ReportGridCell> fetchSurveyQuestionResponseData(GenericSelector selector,
                                                                 Set<Long> requiredSurveyQuestionIds) {
-        if (requiredSurveyQuestionIds.size() == 0) {
+        if (requiredSurveyQuestionIds.isEmpty()) {
             return emptySet();
         } else {
 
-            Field<Long> latest_instance = DSL
+            Field<Long> latestInstance = DSL
                     .firstValue(SURVEY_INSTANCE.ID)
                     .over()
                     .partitionBy(SURVEY_INSTANCE.ENTITY_ID, SURVEY_INSTANCE.ENTITY_KIND, SURVEY_QUESTION.ID)
@@ -976,7 +1105,7 @@ public class ReportGridDao {
                     .as("latest_instance");
 
             Table<Record> responsesWithQuestionTypeAndEntity = dsl
-                    .select(latest_instance)
+                    .select(latestInstance)
                     .select(SURVEY_INSTANCE.ID.as("sid"),
                             SURVEY_INSTANCE.ENTITY_ID,
                             SURVEY_INSTANCE.ENTITY_KIND,
@@ -1020,7 +1149,7 @@ public class ReportGridDao {
             SelectConditionStep<Record> qry = dsl
                     .select(responsesWithQuestionTypeAndEntity.fields())
                     .from(responsesWithQuestionTypeAndEntity)
-                    .where(responsesWithQuestionTypeAndEntity.field(latest_instance)
+                    .where(responsesWithQuestionTypeAndEntity.field(latestInstance)
                             .eq(responsesWithQuestionTypeAndEntity.field("sid", Long.class)));
 
             return qry
@@ -1081,25 +1210,20 @@ public class ReportGridDao {
     }
 
 
-    public Set<ReportGridDefinition> findForOwner(String username) {
-        Condition isOwner = REPORT_GRID_MEMBER.USER_ID.eq(username)
-                .and(REPORT_GRID_MEMBER.ROLE.eq(ReportGridMemberRole.OWNER.name()));
 
-        return dsl
-                .select(rg.fields())
-                .from(rg)
-                .innerJoin(REPORT_GRID_MEMBER)
-                .on(rg.ID.eq(REPORT_GRID_MEMBER.GRID_ID))
-                .where(isOwner)
-                .fetchSet(r -> mkReportGridDefinition(rgcd.REPORT_GRID_ID.eq(r.get(rg.ID)), r.into(REPORT_GRID)));
+
+    private UsageKind deriveUsage(Set<UsageKind> usageKinds) {
+        if (usageKinds.contains(UsageKind.MODIFIER)) {
+            return UsageKind.MODIFIER;
+        } else if (usageKinds.contains(UsageKind.DISTRIBUTOR)) {
+            return UsageKind.DISTRIBUTOR;
+        } else if (usageKinds.contains(UsageKind.CONSUMER) && usageKinds.contains(UsageKind.ORIGINATOR)) {
+            return UsageKind.DISTRIBUTOR;
+        } else {
+            // should be only one left (either CONSUMNER or ORIGINATOR)
+            return first(usageKinds);
+        }
     }
 
-
-    public boolean remove(long gridId) {
-        return dsl
-                .deleteFrom(REPORT_GRID)
-                .where(REPORT_GRID.ID.eq(gridId))
-                .execute() == 1;
-    }
 }
 

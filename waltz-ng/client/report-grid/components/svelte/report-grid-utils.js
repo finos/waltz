@@ -1,7 +1,7 @@
 import {mkEntityLinkGridCell} from "../../../common/grid-utils";
 import _ from "lodash";
 import {rgb} from "d3-color";
-import {determineForegroundColor} from "../../../common/colors";
+import {determineForegroundColor, amberBg, blueBg, pinkBg, greenBg, greyBg} from "../../../common/colors";
 import {scaleLinear} from "d3-scale";
 import {extent} from "d3-array";
 
@@ -173,6 +173,7 @@ export function prepareColumnDefs(gridData) {
             case "APPLICATION":
             case "CHANGE_INITIATIVE":
             case "APP_GROUP":
+            case "DATA_TYPE":
             case "SURVEY_QUESTION":
                 return {
                     allowSummary: false,
@@ -261,6 +262,23 @@ function mkPopoverHtml(cellData, ratingSchemeItem) {
 }
 
 
+function determineDataTypeUsageColor(usageKind) {
+    switch (usageKind) {
+        case "CONSUMER":
+            return amberBg
+        case "MODIFIER":
+            return pinkBg
+        case "DISTRIBUTOR":
+            return blueBg
+        case "ORIGINATOR":
+            return greenBg
+        default:
+            // should never be seen as above list is exhaustive
+            return greyBg;
+    }
+}
+
+
 export function prepareTableData(gridData) {
     const subjectsById = _.keyBy(gridData.instance.subjects, d => d.entityReference.id);
     const ratingSchemeItemsById = _
@@ -291,6 +309,12 @@ export function prepareTableData(gridData) {
                 return {
                     color: color,
                     value: x.value
+                };
+            case "DATA_TYPE":
+                return {
+                    color: determineDataTypeUsageColor(x.text),
+                    text: x.text,
+                    comment: x.comment
                 };
             case "INVOLVEMENT_KIND":
             case "SURVEY_TEMPLATE":

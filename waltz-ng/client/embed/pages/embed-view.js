@@ -20,8 +20,11 @@ import _ from "lodash";
 import {initialiseData} from "../../common";
 import {dynamicSections} from "../../dynamic-section/dynamic-section-definitions";
 import template from "./embed-view.html";
+import Toasts from "../../notification/components/toaster/Toasts.svelte";
 
-const initialState = {};
+const initialState = {
+    Toasts
+};
 
 function controller($stateParams) {
     const vm = initialiseData(this, initialState);

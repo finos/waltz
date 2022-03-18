@@ -17,9 +17,6 @@
  */
 package org.finos.waltz.web.endpoints.extracts;
 
-import org.finos.waltz.model.application.LifecyclePhase;
-import org.finos.waltz.model.report_grid.*;
-import org.finos.waltz.service.report_grid.ReportGridService;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
@@ -31,10 +28,13 @@ import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.NameProvider;
+import org.finos.waltz.model.application.LifecyclePhase;
 import org.finos.waltz.model.entity_field_reference.EntityFieldReference;
 import org.finos.waltz.model.external_identifier.ExternalIdValue;
 import org.finos.waltz.model.rating.RatingSchemeItem;
+import org.finos.waltz.model.report_grid.*;
 import org.finos.waltz.model.survey.SurveyQuestion;
+import org.finos.waltz.service.report_grid.ReportGridService;
 import org.finos.waltz.service.settings.SettingsService;
 import org.finos.waltz.service.survey.SurveyQuestionService;
 import org.finos.waltz.web.WebUtilities;
@@ -58,7 +58,6 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.ListUtilities.*;
 import static org.finos.waltz.common.MapUtilities.*;
-import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.utils.IdUtilities.getIdOrDefault;
 import static org.finos.waltz.model.utils.IdUtilities.indexById;
 import static org.jooq.lambda.fi.util.function.CheckedConsumer.unchecked;
@@ -287,6 +286,7 @@ public class ReportGridExtractor implements DataExtractor {
             case APPLICATION:
             case CHANGE_INITIATIVE:
             case SURVEY_QUESTION:
+            case DATA_TYPE:
             case APP_GROUP:
                 return Optional.ofNullable(reportGridCell.text()).orElse("-");
             case MEASURABLE:
