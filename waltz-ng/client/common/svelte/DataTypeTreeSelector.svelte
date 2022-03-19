@@ -5,7 +5,11 @@
     import SearchInput from "./SearchInput.svelte";
     import _ from "lodash";
 
+    export let multiSelect = false;
+    export let selectionFilter = () => true;
+
     const root = {name: "Root"};
+    
 
     function calcDisplayHierarchy(nodes, query) {
         const searchResult = _.map(
@@ -29,17 +33,19 @@
     $: searchNodes = prepareSearchNodes(dataTypes);
     $: displayedHierarchy = calcDisplayHierarchy(searchNodes, qry);
 
+    $: console.log("DTTS", {selectionFilter})
 </script>
 
 <SearchInput bind:value={qry}/>
 
 <div class="waltz-scroll-region-250">
-    <DataTypeTreeNode isRoot={true}
+    <DataTypeTreeNode {multiSelect}
+                      {selectionFilter}
+                      isRoot={true}
                       node={root}
                       childNodes={displayedHierarchy}
                       expanded={expanded}
-                      on:select>
-    </DataTypeTreeNode>
+                      on:select/>
 
 </div>
 

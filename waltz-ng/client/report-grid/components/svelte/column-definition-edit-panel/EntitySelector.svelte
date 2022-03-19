@@ -22,7 +22,8 @@
             entity.APP_GROUP,
             entity.SURVEY_INSTANCE,
             entity.APPLICATION,
-            entity.CHANGE_INITIATIVE
+            entity.CHANGE_INITIATIVE,
+            entity.DATA_TYPE
         ],
         d => d.name);
 

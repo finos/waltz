@@ -373,16 +373,16 @@ public class ReportGridDao {
 
     private SelectConditionStep<Record13<String, String, Long, String, String, Integer, String, String, Long, String, String, String, String>> mkColumnDefinitionQuery(EntityKind entityKind,
                                                                                                                                                                        Table<?> t,
-                                                                                                                                                                       TableField<? extends Record, Long> ID,
-                                                                                                                                                                       TableField<? extends Record, String> NAME,
-                                                                                                                                                                       TableField<? extends Record, String> DESCRIPTION,
+                                                                                                                                                                       TableField<? extends Record, Long> idField,
+                                                                                                                                                                       TableField<? extends Record, String> nameField,
+                                                                                                                                                                       TableField<? extends Record, String> descriptionField,
                                                                                                                                                                        Condition reportCondition) {
         return dsl
-                .select(DSL.coalesce(NAME, DSL.val(entityKind.prettyName())).as("name"),
+                .select(DSL.coalesce(nameField, DSL.val(entityKind.prettyName())).as("name"),
                         rgcd.DISPLAY_NAME,
                         rgcd.COLUMN_ENTITY_ID,
                         rgcd.COLUMN_ENTITY_KIND,
-                        DESCRIPTION.as("desc"),
+                        descriptionField.as("desc"),
                         rgcd.POSITION,
                         rgcd.COLUMN_USAGE_KIND,
                         rgcd.RATING_ROLLUP_RULE,
@@ -393,7 +393,7 @@ public class ReportGridDao {
                         efr.FIELD_NAME)
                 .from(rgcd)
                 .innerJoin(rg).on(rg.ID.eq(rgcd.REPORT_GRID_ID))
-                .leftJoin(t).on(ID.eq(rgcd.COLUMN_ENTITY_ID).and(rgcd.COLUMN_ENTITY_KIND.eq(entityKind.name())))
+                .leftJoin(t).on(idField.eq(rgcd.COLUMN_ENTITY_ID).and(rgcd.COLUMN_ENTITY_KIND.eq(entityKind.name())))
                 .leftJoin(efr).on(rgcd.ENTITY_FIELD_REFERENCE_ID.eq(efr.ID))
                 .where(reportCondition)
                 .and(rgcd.COLUMN_ENTITY_KIND.eq(entityKind.name()));
@@ -1220,7 +1220,7 @@ public class ReportGridDao {
         } else if (usageKinds.contains(UsageKind.CONSUMER) && usageKinds.contains(UsageKind.ORIGINATOR)) {
             return UsageKind.DISTRIBUTOR;
         } else {
-            // should be only one left (either CONSUMNER or ORIGINATOR)
+            // should be only one left (either CONSUMER or ORIGINATOR)
             return first(usageKinds);
         }
     }

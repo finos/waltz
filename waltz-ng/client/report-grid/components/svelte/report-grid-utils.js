@@ -50,13 +50,15 @@ export const ratingRollupRule = {
 
 
 export function determineDefaultRollupRule(d) {
-    const isMeasurable = _.get(d, "kind") === "MEASURABLE";
+    const typesWhichDefaultToRollingUp = ["MEASURABLE", "DATA_TYPE"];
 
-    if (isMeasurable) {
-        return ratingRollupRule.PICK_HIGHEST;
-    } else {
-        return ratingRollupRule.NONE;
-    }
+    const shouldRollup = _.includes(
+        typesWhichDefaultToRollingUp,
+        _.get(d, "columnEntityKind"));
+
+    return shouldRollup 
+        ? ratingRollupRule.PICK_HIGHEST
+        : ratingRollupRule.NONE;
 }
 
 
