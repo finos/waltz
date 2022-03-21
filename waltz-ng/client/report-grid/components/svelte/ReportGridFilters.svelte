@@ -3,8 +3,11 @@
     import NoData from "../../../common/svelte/NoData.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
     import {getDisplayNameForColumn, mkPropNameForColumnDefinition} from "./report-grid-utils";
-    import {activeSummaryColRefs, filters, selectedGrid, summaries} from "./report-grid-store";
-    import {mkChunks} from "../../../common/list-utils";
+    import {filters, selectedGrid, summaries} from "./report-grid-store";
+    import { mkChunks } from "../../../common/list-utils";
+    import {activeSummaries} from "./report-grid-filters-store";
+
+    let chunkedSummaryData = [];
 
     function isSelectedCounter(cId) {
         return _.some($filters, f => f.counterId === cId);
@@ -23,30 +26,35 @@
         }
     }
 
-    $: chunkedSummaryData = mkChunks(
-        _.filter(
-            $summaries,
-            d => _.includes($activeSummaryColRefs, mkPropNameForColumnDefinition(d.column))),
-        4);
-
-    $: $activeSummaryColRefs = _
-        .chain($selectedGrid?.definition.columnDefinitions)
-        .filter(d => d.usageKind === "SUMMARY")
-        .map(d => mkPropNameForColumnDefinition(d))
-        .value();
-
     function onRemoveSummary(summary) {
         const refToRemove = mkPropNameForColumnDefinition(summary.column);
-        $activeSummaryColRefs = _.reject($activeSummaryColRefs, ref => ref === refToRemove);
+        activeSummaries.remove(refToRemove);
         // remove any filters which refer to the property used by this summary
         $filters = _.reject($filters, f => f.propName === refToRemove);
+    }
+
+    function addToActiveSummaries(column) {
+        const colRef = mkPropNameForColumnDefinition(column);
+        activeSummaries.add(colRef);
+    }
+
+    $: {
+        const byPropName = _.keyBy($summaries, d => mkPropNameForColumnDefinition(d.column));
+        
+        const activeSummaryDefs = _
+            .chain($activeSummaries)
+            .map(d => byPropName[d])
+            .compact()
+            .value();
+
+        chunkedSummaryData = mkChunks(activeSummaryDefs, 3);
     }
 
 </script>
 
 <div>
     <!-- NO SUMMARIES -->
-    {#if _.isEmpty(chunkedSummaryData)}
+    {#if _.isEmpty($summaries)}
         <NoData class="small"
                style="display: inline-block; margin-bottom: 0.5em;">
                 <strong>No summaries selected</strong>
@@ -63,72 +71,132 @@
             Select a value in the summary tables to quickly filter the data.
             Select the row again to clear the filter.
             You can add more summaries using the column menu ('Add to summary').
+
         </p>
     {/if}
 
+
     <div class="row">
-        {#each chunkedSummaryData as row}
-            {#each row as summary}
-                <div class="col-sm-3">
-                    <h5 class="waltz-visibility-parent">
-                        <span>{getDisplayNameForColumn(summary.column)}</span>
-                        <button class="btn btn-skinny waltz-visibility-child-30 clickable pull-right"
-                                on:click={() => onRemoveSummary(summary)}>
-                            <Icon name="close"/>
-                        </button>
-                    </h5>
-                    <table class="table table-condensed small">
-                        <tbody>
-                        {#each summary.counters as counter}
-                            <tr class="clickable"
-                                class:waltz-highlighted-row={isSelectedCounter(counter.counterId)}
-                                class:text-muted={counter.counts.visible === 0}
-                                on:click={() => onToggleFilter(counter)}>
-                                <td>
-                                    <div style={`
-                                        display: inline-block;
-                                        height: 10px; width: 10px;
-                                        background-color: ${counter.rating.color}`}>
-                                    </div>
-                                    <span>{counter.rating.name}</span>
-                                </td>
-                                <!-- COUNTERS -->
-                                <td class="text-right">
-                                    <!-- TOTAL COUNTER -->
-                                    {#if counter.counts.total !== counter.counts.visible}
-                                    <span class="text-muted small">
-                                            (
-                                            <span>{counter.counts.total}</span>
-                                            )
-                                        </span>
-                                    {/if}
-                                    <!-- VISIBLE COUNTER -->
-                                    <span>{counter.counts.visible}</span>
-                                </td>
-                            </tr>
-                        {/each}
-                        </tbody>
-                        <!-- TOTAL -->
-                        <tbody>
-                        <tr>
-                            <td>
-                                <b>Total</b>
-                            </td>
-                            <td class="text-right">
-                                {#if summary.total !== summary.totalVisible}
-                                    <span class="text-muted small">
-                                        (
-                                        <span>{summary.total}</span>
-                                        )
-                                    </span>
-                                    <span>{summary.totalVisible}</span>
-                                {/if}
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+        <div class="col-md-8">
+            {#each chunkedSummaryData as row}
+                <div class="row">
+                {#each row as summary}
+                        <div class="col-sm-4">
+                            <h5 class="waltz-visibility-parent">
+                                <span>{getDisplayNameForColumn(summary?.column)}</span>
+                                <button class="btn btn-skinny waltz-visibility-child-30 clickable pull-right"
+                                        on:click={() => onRemoveSummary(summary)}>
+                                    <Icon name="close"/>
+                                </button>
+                            </h5>
+                            <table class="table table-condensed small">
+                                <tbody>
+                                {#each summary.counters as counter}
+                                    <tr class="clickable"
+                                        class:waltz-highlighted-row={isSelectedCounter(counter.counterId)}
+                                        class:text-muted={counter.counts.visible === 0}
+                                        on:click={() => onToggleFilter(counter)}>
+                                        <td>
+                                            <div style={`
+                                                display: inline-block;
+                                                height: 10px; width: 10px;
+                                                background-color: ${counter.rating.color}`}>
+                                            </div>
+                                            <span>{counter.rating.name}</span>
+                                        </td>
+                                        <!-- COUNTERS -->
+                                        <td class="text-right">
+                                            <!-- TOTAL COUNTER -->
+                                            {#if counter.counts.total !== counter.counts.visible}
+                                            <span class="text-muted small">
+                                                    (
+                                                    <span>{counter.counts.total}</span>
+                                                    )
+                                                </span>
+                                            {/if}
+                                            <!-- VISIBLE COUNTER -->
+                                            <span>{counter.counts.visible}</span>
+                                        </td>
+                                    </tr>
+                                {/each}
+                                </tbody>
+                                <!-- TOTAL -->
+                                <tbody>
+                                <tr>
+                                    <td>
+                                        <b>Total</b>
+                                    </td>
+                                    <td class="text-right">
+                                        {#if summary.total !== summary.totalVisible}
+                                            <span class="text-muted small">
+                                                (
+                                                <span>{summary.total}</span>
+                                                )
+                                            </span>
+                                            <span>{summary.totalVisible}</span>
+                                        {/if}
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    {/each}
                 </div>
             {/each}
-        {/each}
+        </div>
+        <div class="col-md-4">
+            <div class:waltz-scroll-region-350={_.size($summaries) > 10}>
+                <table class="table table-condensed small summary-table table-hover">
+                    <tbody>
+                    {#each $summaries as summary}
+                    <tr on:click={() => addToActiveSummaries(summary.column)}>
+                        <td>
+                            <Icon name="arrow-left"/>
+                            <span class="column-name">
+                                {getDisplayNameForColumn(summary.column)}
+                            </span>
+                            <ul style="display: inline-block"
+                                class="list-inline column-values-summary">
+                                {#each summary.counters as counter}
+                                <li title={counter.rating.name}>
+                                    <span style={`background-color: ${counter.rating.color}`}/>
+                                </li>
+                                {/each}
+                            </ul>
+                        </td>
+                    </tr>
+                    {/each}
+                    </tbody>
+                    
+                </table>
+            </div>
+            
+        </div>
     </div>
 </div>
+
+<style>
+    .column-name {
+        padding-right: 1em;
+    }
+
+    .column-values-summary {
+        margin-bottom: 0;
+    }
+  
+    .summary-table td {
+        padding: 2px;
+    }
+  
+    .column-values-summary li {
+        padding: 0.2em;
+    }
+  
+    .column-values-summary span {
+        border: 1px solid #ccc;
+        display: inline-block;
+        height: 1em; width: 1em;
+    }
+
+
+</style>

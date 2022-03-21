@@ -4,7 +4,6 @@ import {mkRowFilter, prepareTableData, refreshSummaries, sameColumnRef} from "./
 
 export const selectedGrid = writable(null);
 export let filters = writable([]);
-export let activeSummaryColRefs = writable([]);
 export let columnDefs = writable([]);
 export let selectedColumn = writable(null);
 export let lastMovedColumn = writable(null);

@@ -56,7 +56,7 @@ export function determineDefaultRollupRule(d) {
         typesWhichDefaultToRollingUp,
         _.get(d, "columnEntityKind"));
 
-    return shouldRollup 
+    return shouldRollup
         ? ratingRollupRule.PICK_HIGHEST
         : ratingRollupRule.NONE;
 }
@@ -391,7 +391,7 @@ export function refreshSummaries(tableData, columnDefinitions, ratingSchemeItems
     const ratingSchemeItemsById = _.keyBy(ratingSchemeItems, d => d.id);
     const columnsByRef = _.keyBy(columnDefinitions, d => mkPropNameForColumnDefinition(d));
 
-    return _
+    const result =  _
         .chain(tableData)
         .reduce(reducer, {})  // transform into a raw summary object for all rows
         .map((counts, k) => { // convert basic prop-val/count pairs in the summary object into a list of enriched objects
@@ -415,6 +415,8 @@ export function refreshSummaries(tableData, columnDefinitions, ratingSchemeItems
             d => d.column.columnName
         ])
         .value();
+
+        return console.log("refreshSummaries", { tableData, columnDefinitions, ratingSchemeItems, result}) || result;
 }
 
 
@@ -443,4 +445,9 @@ export function sameColumnRef(v1, v2) {
     return v1?.columnEntityKind === v2?.columnEntityKind
         && v1?.columnEntityId === v2?.columnEntityId
         && v1?.entityFieldReference?.id === v2?.entityFieldReference?.id;
+}
+
+
+export function mkLocalStorageFilterKey(gridId) {
+    return `waltz-report-grid-${gridId}-active-summaries`
 }

@@ -22,14 +22,19 @@ import {mkSelectionOptions} from "../../../common/selector-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
 import ReportGridControlPanel from "../svelte/ReportGridControlPanel.svelte";
-import {activeSummaryColRefs, columnDefs, filters, selectedGrid} from "../svelte/report-grid-store";
+import {columnDefs, filters, selectedGrid} from "../svelte/report-grid-store";
+import {activeSummaries} from "../svelte/report-grid-filters-store";
 import {
+    mkLocalStorageFilterKey,
     mkPropNameForColumnDefinition,
     mkRowFilter,
     prepareColumnDefs,
     prepareTableData
 } from "../svelte/report-grid-utils";
 import {displayError} from "../../../common/error-utils";
+import toasts from "../../../svelte-stores/toast-store";
+import {coalesceFns} from "../../../common/function-utils";
+
 
 const bindings = {
     parentEntityRef: "<",
@@ -47,43 +52,70 @@ function controller($scope, serviceBroker, localStorageService) {
 
     function refresh(filters = []) {
 
-        vm.columnDefs = _.map(vm.allColumnDefs, cd => {
-            if (cd.allowSummary){
-                return Object.assign(cd, { menuItems: [
-                    {
-                        title: "Add to summary",
-                        icon: "ui-grid-icon-info-circled",
-                        action: function() {
-                            vm.onAddSummary(cd);
-                        },
-                        context: vm
-                    }
-                ]})
-            } else {
-                return cd;
-            }
-        });
-
         const rowFilter = mkRowFilter(filters);
 
-        const workingTableData =  _.map(
+        const workingTableData = _.map(
             vm.allTableData,
             d => Object.assign({}, d, { visible: rowFilter(d) }));
 
         vm.tableData = _.filter(workingTableData, d => d.visible);
     }
 
+
+    function getDefaultSummaryColumns(columnDefs) {
+        const dfltFilters = _
+            .chain(columnDefs)
+            .filter(d => d.usageKind === "SUMMARY")
+            .map(d => mkPropNameForColumnDefinition(d))
+            .value();
+
+        if (!_.isEmpty(dfltFilters)) {
+            toasts.info("Using default filters for grid");
+        }
+
+        return dfltFilters;
+    }
+
+
+    function getSummaryColumnsFromLocalStorage(gridData) {
+
+        const key = mkLocalStorageFilterKey(gridData?.definition.id);
+        const value = localStorage.getItem(key);
+
+        try {
+            const summaries = JSON.parse(value)
+            return summaries
+        } catch (e) {
+            console.log("Cannot parse local storage value", { e, key, value });
+            return [];
+        }
+    }
+
+
+    function getSummaryColumns(gridData) {
+        return coalesceFns(
+            () => getSummaryColumnsFromLocalStorage(gridData),
+            () => getDefaultSummaryColumns(gridData?.definition.columnDefinitions));
+    }
+
+
     function loadGridData() {
         serviceBroker
             .loadViewData(
                 CORE_API.ReportGridStore.getViewById,
-                [vm.gridId, mkSelectionOptions(vm.parentEntityRef)], {force: true})
+                [vm.gridId, mkSelectionOptions(vm.parentEntityRef)], { force: true })
             .then(r => {
-                vm.loading = false;
-                vm.rawGridData = r.data;
 
-                selectedGrid.set(r.data);
-                columnDefs.set(r.data.definition.columnDefinitions);
+                const gridData = r.data;
+                vm.loading = false;
+
+                vm.rawGridData = gridData;
+
+                const summaries = getSummaryColumns(gridData);
+                activeSummaries.set(summaries);
+
+                selectedGrid.set(gridData);
+                columnDefs.set(gridData.definition.columnDefinitions);
 
                 vm.allTableData = prepareTableData(vm.rawGridData);
                 vm.allColumnDefs = prepareColumnDefs(vm.rawGridData);
@@ -99,7 +131,7 @@ function controller($scope, serviceBroker, localStorageService) {
 
         const lastUsedGridId = localStorageService.get(localStorageKey);
 
-        if (! vm.parentEntityRef) return;
+        if (!vm.parentEntityRef) return;
 
         if (lastUsedGridId) {
             vm.gridId = lastUsedGridId;
@@ -110,7 +142,7 @@ function controller($scope, serviceBroker, localStorageService) {
     };
 
     vm.onGridSelect = (grid) => {
-        if (! grid) {
+        if (!grid) {
             return;
         }
         $scope.$applyAsync(() => {
@@ -120,25 +152,19 @@ function controller($scope, serviceBroker, localStorageService) {
         });
     };
 
-    vm.onAddSummary = (c) => {
-        const colRef = mkPropNameForColumnDefinition(c.columnDef);
-        const newActiveList = _.concat(vm.summaryCols, [colRef]);
-        activeSummaryColRefs.set(newActiveList);
-    };
-
     vm.onUpdateColumns = () => {
         loadGridData();
     };
 
     filters.subscribe((f) => {
         $scope.$applyAsync(() => {
-            if(vm.rawGridData){
+            if (vm.rawGridData) {
                 refresh(f)
             }
         });
     })
 
-    activeSummaryColRefs.subscribe((d) => {
+    activeSummaries.subscribe((d) => {
         $scope.$applyAsync(() => {
             vm.summaryCols = d;
         });
