@@ -10,7 +10,7 @@
 
     let chunkedSummaryData = [];
 
-    const supportedColumnKinds = ["ASSESSMENT_DEFINITION", "MEASURABLE"];
+    const supportedColumnKinds = ["ASSESSMENT_DEFINITION", "MEASURABLE", "DATA_TYPE", "APP_GROUP"];
 
     function isSelectedCounter(cId) {
         return _.some($filters, f => f.counterId === cId);

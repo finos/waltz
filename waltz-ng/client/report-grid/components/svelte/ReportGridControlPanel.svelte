@@ -19,7 +19,7 @@
         PEOPLE: 'people'
     };
 
-    let selectedTab = tabs.OVERVIEW;
+    let selectedTab = tabs.FILTERS; // TODO change back to overview!!!!
 
     function handleGridSelect(selectedGrid, isNew) {
         if (isNew) {
