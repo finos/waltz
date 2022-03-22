@@ -6,8 +6,11 @@
     import {filters, selectedGrid, summaries} from "./report-grid-store";
     import { mkChunks } from "../../../common/list-utils";
     import {activeSummaries} from "./report-grid-filters-store";
+    import EntityIcon from "../../../common/svelte/EntityIcon.svelte";
 
     let chunkedSummaryData = [];
+
+    const supportedColumnKinds = ["ASSESSMENT_DEFINITION", "MEASURABLE"];
 
     function isSelectedCounter(cId) {
         return _.some($filters, f => f.counterId === cId);
@@ -26,7 +29,7 @@
         }
     }
 
-    function onRemoveSummary(summary) {
+    function removeSummary(summary) {
         const refToRemove = mkPropNameForColumnDefinition(summary.column);
         activeSummaries.remove(refToRemove);
         // remove any filters which refer to the property used by this summary
@@ -38,9 +41,23 @@
         activeSummaries.add(colRef);
     }
 
+    function addOrRemoveFromActiveSummaries(summary) {
+        if (isActive($activeSummaries, summary)) {
+            removeSummary(summary);
+        } else {
+            addToActiveSummaries(summary.column);
+        }
+    }
+
+
+    function isActive(activeSummaries, summary) {
+        return _.includes(activeSummaries, mkPropNameForColumnDefinition(summary.column))
+    }
+
+
     $: {
         const byPropName = _.keyBy($summaries, d => mkPropNameForColumnDefinition(d.column));
-        
+
         const activeSummaryDefs = _
             .chain($activeSummaries)
             .map(d => byPropName[d])
@@ -49,6 +66,10 @@
 
         chunkedSummaryData = mkChunks(activeSummaryDefs, 3);
     }
+
+
+    $: availableSummaries = _.filter($summaries, s => _.includes(supportedColumnKinds, s.column.columnEntityKind));
+
 
 </script>
 
@@ -83,9 +104,10 @@
                 {#each row as summary}
                         <div class="col-sm-4">
                             <h5 class="waltz-visibility-parent">
+                                <EntityIcon kind={summary.column.columnEntityKind}/>
                                 <span>{getDisplayNameForColumn(summary?.column)}</span>
                                 <button class="btn btn-skinny waltz-visibility-child-30 clickable pull-right"
-                                        on:click={() => onRemoveSummary(summary)}>
+                                        on:click={() => removeSummary(summary)}>
                                     <Icon name="close"/>
                                 </button>
                             </h5>
@@ -148,10 +170,12 @@
             <div class:waltz-scroll-region-350={_.size($summaries) > 10}>
                 <table class="table table-condensed small summary-table table-hover">
                     <tbody>
-                    {#each $summaries as summary}
-                    <tr on:click={() => addToActiveSummaries(summary.column)}>
+                    {#each availableSummaries as summary}
+                    <tr on:click={() => addOrRemoveFromActiveSummaries(summary)}
+                        class="clickable"
+                        class:isActiveFilter={isActive($activeSummaries, summary)}>
                         <td>
-                            <Icon name="arrow-left"/>
+                            <Icon name={isActive($activeSummaries, summary) ? 'check' : 'arrow-left'}/>
                             <span class="column-name">
                                 {getDisplayNameForColumn(summary.column)}
                             </span>
@@ -165,12 +189,20 @@
                             </ul>
                         </td>
                     </tr>
+                    {:else}
+                        <tr>
+                            <td>
+                                <NoData type="info">
+                                    <span>No columns available for use as filters</span>
+                                </NoData>
+                            </td>
+                        </tr>
                     {/each}
                     </tbody>
-                    
+
                 </table>
             </div>
-            
+
         </div>
     </div>
 </div>
@@ -183,19 +215,23 @@
     .column-values-summary {
         margin-bottom: 0;
     }
-  
+
     .summary-table td {
         padding: 2px;
     }
-  
+
     .column-values-summary li {
         padding: 0.2em;
     }
-  
+
     .column-values-summary span {
         border: 1px solid #ccc;
         display: inline-block;
         height: 1em; width: 1em;
+    }
+
+    .isActiveFilter {
+        background-color: #fdfde2;
     }
 
 
