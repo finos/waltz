@@ -432,7 +432,7 @@ export function refreshSummaries(tableData,
         ])
         .value();
 
-    return console.log("refreshSummaries", {tableData, columnDefinitions, result}) || result;
+    return result;
 }
 
 

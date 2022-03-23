@@ -67,8 +67,6 @@
         chunkedSummaryData = mkChunks(activeSummaryDefs, 3);
     }
 
-    $: console.log({summaries: $summaries});
-
     $: availableSummaries = _.filter($summaries, s => _.includes(supportedColumnKinds, s.column.columnEntityKind));
 
 </script>
@@ -156,8 +154,8 @@
                                                 <span>{summary.total}</span>
                                                 )
                                             </span>
-                                            <span>{summary.totalVisible}</span>
                                         {/if}
+                                        <span>{summary.totalVisible}</span>
                                     </td>
                                 </tr>
                                 </tbody>
