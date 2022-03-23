@@ -22,8 +22,7 @@ import {mkSelectionOptions} from "../../../common/selector-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
 import ReportGridControlPanel from "../svelte/ReportGridControlPanel.svelte";
-import {columnDefs, filters, selectedGrid} from "../svelte/report-grid-store";
-import {activeSummaries} from "../svelte/report-grid-filters-store";
+import {activeSummaries, columnDefs, filters, selectedGrid} from "../svelte/report-grid-store";
 import {
     mkLocalStorageFilterKey,
     mkPropNameForColumnDefinition,

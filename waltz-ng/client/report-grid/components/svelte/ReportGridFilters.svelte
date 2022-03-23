@@ -3,9 +3,8 @@
     import NoData from "../../../common/svelte/NoData.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
     import {getDisplayNameForColumn, mkPropNameForColumnDefinition} from "./report-grid-utils";
-    import {filters, selectedGrid, summaries} from "./report-grid-store";
+    import {activeSummaries, filters, selectedGrid, summaries} from "./report-grid-store";
     import {mkChunks} from "../../../common/list-utils";
-    import {activeSummaries} from "./report-grid-filters-store";
     import EntityIcon from "../../../common/svelte/EntityIcon.svelte";
 
     let chunkedSummaryData = [];
@@ -109,7 +108,7 @@
                                     <Icon name="close"/>
                                 </button>
                             </h5>
-                            <table class="table table-condensed small">
+                            <table class="table table-condensed small option-summary-table">
                                 <tbody>
                                 {#each summary.optionSummaries as optionSummary}
                                     <tr class="clickable"
@@ -175,10 +174,12 @@
                     <tbody>
                     {#each availableSummaries as summary}
                         <tr on:click={() => addOrRemoveFromActiveSummaries(summary)}
-                            class="clickable"
+                            class="clickable waltz-visibility-parent"
                             class:isActiveFilter={isActive($activeSummaries, summary)}>
                             <td>
-                                <Icon name={isActive($activeSummaries, summary) ? 'check' : 'arrow-left'}/>
+                                <span class="waltz-visibility-child-30">
+                                    <Icon name={isActive($activeSummaries, summary) ? 'check' : 'arrow-left'}/>
+                                </span>
                                 <span class="column-name">
                                 {getDisplayNameForColumn(summary.column)}
                             </span>
@@ -226,6 +227,14 @@
         padding: 2px;
     }
 
+    .option-summary-table tr {
+        transition: background-color 0.2s linear;
+      }
+
+    .summary-table tr {
+        transition: background-color 0.4s linear;
+      }
+
     .column-values-summary li {
         padding: 0.2em;
     }
@@ -235,6 +244,7 @@
         display: inline-block;
         height: 1em;
         width: 1em;
+        transition: opacity 0.3s linear;
     }
 
     .isActiveFilter {
@@ -244,6 +254,5 @@
     .undefined-option {
         font-style: italic;
     }
-
 
 </style>

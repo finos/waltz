@@ -40,6 +40,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.Comparator;
 import java.util.*;
 import java.util.function.Function;
@@ -725,9 +726,14 @@ public class ReportGridDao {
                             .map(fieldName -> {
                                 ReportGridColumnDefinition colDefn = columnDefinitionsByFieldReference.get(fieldName);
 
-                                Object value = appRecord.get(APPLICATION.field(fieldName));
+                                Field<?> field = APPLICATION.field(fieldName);
+                                Object rawValue = appRecord.get(field);
 
-                                if (value == null) {
+                                String textValue = isTimestampField(field)
+                                        ? String.valueOf(DateTimeUtilities.toLocalDate((Timestamp) rawValue))
+                                        : String.valueOf(rawValue);
+
+                                if (rawValue == null) {
                                     return null;
                                 }
 
@@ -736,7 +742,7 @@ public class ReportGridDao {
                                         .subjectId(appRecord.get(APPLICATION.ID))
                                         .columnEntityId(colDefn.columnEntityId())
                                         .columnEntityKind(EntityKind.APPLICATION)
-                                        .text(String.valueOf(value))
+                                        .text(textValue)
                                         .entityFieldReferenceId(colDefn.entityFieldReference().id().get())
                                         .build();
                             }))
@@ -745,9 +751,15 @@ public class ReportGridDao {
         }
     }
 
+    private boolean isTimestampField(Field<?> field) {
+        DataType<?> dataType = field.getDataType();
+        int sqlType = dataType.getSQLType();
+        return sqlType == Types.TIMESTAMP;
+    }
+
 
     private Set<ReportGridCell> fetchChangeInitiativeFieldReferenceData(GenericSelector selector,
-                                                                       Set<Tuple2<ReportGridColumnDefinition, EntityFieldReference>> requiredChangeInitiativeColumns) {
+                                                                        Set<Tuple2<ReportGridColumnDefinition, EntityFieldReference>> requiredChangeInitiativeColumns) {
 
         if (requiredChangeInitiativeColumns.isEmpty()) {
             return emptySet();
@@ -849,9 +861,15 @@ public class ReportGridDao {
                                 .getOrDefault(templateId, emptySet())
                                 .stream()
                                 .map(fieldRef -> {
-                                    Object value = surveyRecord.get(SURVEY_INSTANCE.field(fieldRef.fieldName()));
 
-                                    if (value == null) {
+                                    Field<?> field = SURVEY_INSTANCE.field(fieldRef.fieldName());
+                                    Object rawValue = surveyRecord.get(field);
+
+                                    String textValue = isTimestampField(field)
+                                            ? String.valueOf(DateTimeUtilities.toLocalDate((Timestamp) rawValue))
+                                            : String.valueOf(rawValue);
+
+                                    if (rawValue == null) {
                                         return null;
                                     }
 
@@ -860,7 +878,7 @@ public class ReportGridDao {
                                             .subjectId(surveyRecord.get(SURVEY_INSTANCE.ENTITY_ID))
                                             .columnEntityId(templateId)
                                             .columnEntityKind(EntityKind.SURVEY_TEMPLATE)
-                                            .text(String.valueOf(value))
+                                            .text(textValue)
                                             .entityFieldReferenceId(fieldRef.id().get())
                                             .build();
                                 });

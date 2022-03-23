@@ -1,14 +1,18 @@
 import {derived, writable} from "svelte/store";
 import _ from "lodash";
-import {mkRowFilter, prepareTableData, refreshSummaries, sameColumnRef} from "./report-grid-utils";
-import {activeSummaries} from "./report-grid-filters-store";
-
+import {
+    mkLocalStorageFilterKey,
+    mkRowFilter,
+    prepareTableData,
+    refreshSummaries,
+    sameColumnRef
+} from "./report-grid-utils";
 export const selectedGrid = writable(null);
-export let filters = writable([]);
-export let columnDefs = writable([]);
-export let selectedColumn = writable(null);
-export let lastMovedColumn = writable(null);
-export let ownedReportIds = writable([]);
+export const filters = writable([]);
+export const columnDefs = writable([]);
+export const selectedColumn = writable(null);
+export const lastMovedColumn = writable(null);
+export const ownedReportIds = writable([]);
 
 export let columnsChanged = derived([columnDefs, selectedGrid], ([$columnDefs, $selectedGrid]) => {
 
@@ -71,4 +75,38 @@ export const summaries = derived([selectedGrid, filters, tableData], ([$selected
             $selectedGrid?.definition.columnDefinitions,
             $selectedGrid?.instance.ratingSchemeItems);
     }
+});
+
+
+function createActiveSummariesStore() {
+    const {subscribe, set, update} = writable([]);
+
+    const add = (colRef) => {
+        update((all) => _.concat(all, [colRef]));
+    };
+
+    const remove = (colRef) => {
+        update((all) => all.filter((t) => t !== colRef));
+    };
+
+    return {
+        subscribe,
+        set,
+        add,
+        remove,
+    }
+}
+
+export const activeSummaries = createActiveSummariesStore();
+
+
+const saveSummariesToLocalStorage = derived([selectedGrid, activeSummaries], ([$selectedGrid, $activeSummaries]) => {
+
+    if (!$selectedGrid){
+        return;
+    }
+
+    const key = mkLocalStorageFilterKey($selectedGrid?.definition.id);
+    localStorage.setItem(key, JSON.stringify($activeSummaries));
 })
+.subscribe(() => {});
