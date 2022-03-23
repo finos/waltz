@@ -4,7 +4,7 @@
     import Icon from "../../../common/svelte/Icon.svelte";
     import {getDisplayNameForColumn, mkPropNameForColumnDefinition} from "./report-grid-utils";
     import {filters, selectedGrid, summaries} from "./report-grid-store";
-    import { mkChunks } from "../../../common/list-utils";
+    import {mkChunks} from "../../../common/list-utils";
     import {activeSummaries} from "./report-grid-filters-store";
     import EntityIcon from "../../../common/svelte/EntityIcon.svelte";
 
@@ -12,18 +12,20 @@
 
     const supportedColumnKinds = ["ASSESSMENT_DEFINITION", "MEASURABLE", "DATA_TYPE", "APP_GROUP"];
 
-    function isSelectedCounter(cId) {
-        return _.some($filters, f => f.counterId === cId);
+    function isSelectedSummary(cId) {
+        return _.some($filters, f => f.summaryId === cId);
     }
 
-    function onToggleFilter(counter) {
-        if (_.some($filters, f => f.counterId === counter.counterId)) {
-            $filters = _.reject($filters, f => f.counterId === counter.counterId);
+    function onToggleFilter(optionSummary) {
+        console.log({optionSummary});
+
+        if (_.some($filters, f => f.summaryId === optionSummary.summaryId)) {
+            $filters = _.reject($filters, f => f.summaryId === optionSummary.summaryId);
         } else {
             const newFilter = {
-                counterId: counter.counterId,
-                propName: counter.colRef,
-                ratingId: counter.rating.id
+                summaryId: optionSummary.summaryId,
+                propName: optionSummary.colRef,
+                optionCode: optionSummary.optionInfo.code
             };
             $filters = _.concat($filters, [newFilter]);
         }
@@ -67,9 +69,9 @@
         chunkedSummaryData = mkChunks(activeSummaryDefs, 3);
     }
 
+    $: console.log({summaries: $summaries});
 
     $: availableSummaries = _.filter($summaries, s => _.includes(supportedColumnKinds, s.column.columnEntityKind));
-
 
 </script>
 
@@ -98,10 +100,10 @@
 
 
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-sm-8">
             {#each chunkedSummaryData as row}
                 <div class="row">
-                {#each row as summary}
+                    {#each row as summary}
                         <div class="col-sm-4">
                             <h5 class="waltz-visibility-parent">
                                 <EntityIcon kind={summary.column.columnEntityKind}/>
@@ -113,31 +115,31 @@
                             </h5>
                             <table class="table table-condensed small">
                                 <tbody>
-                                {#each summary.counters as counter}
+                                {#each summary.optionSummaries as optionSummary}
                                     <tr class="clickable"
-                                        class:waltz-highlighted-row={isSelectedCounter(counter.counterId)}
-                                        class:text-muted={counter.counts.visible === 0}
-                                        on:click={() => onToggleFilter(counter)}>
+                                        class:waltz-highlighted-row={isSelectedSummary(optionSummary.summaryId)}
+                                        class:text-muted={optionSummary.counts.visible === 0}
+                                        on:click={() => onToggleFilter(optionSummary)}>
                                         <td>
                                             <div style={`
                                                 display: inline-block;
                                                 height: 10px; width: 10px;
-                                                background-color: ${counter.rating.color}`}>
+                                                background-color: ${optionSummary.optionInfo.color}`}>
                                             </div>
-                                            <span>{counter.rating.name}</span>
+                                            <span>{optionSummary.optionInfo.name}</span>
                                         </td>
                                         <!-- COUNTERS -->
                                         <td class="text-right">
                                             <!-- TOTAL COUNTER -->
-                                            {#if counter.counts.total !== counter.counts.visible}
+                                            {#if optionSummary.counts.total !== optionSummary.counts.visible}
                                             <span class="text-muted small">
                                                     (
-                                                    <span>{counter.counts.total}</span>
+                                                    <span>{optionSummary.counts.total}</span>
                                                     )
                                                 </span>
                                             {/if}
                                             <!-- VISIBLE COUNTER -->
-                                            <span>{counter.counts.visible}</span>
+                                            <span>{optionSummary.counts.visible}</span>
                                         </td>
                                     </tr>
                                 {/each}
@@ -166,28 +168,28 @@
                 </div>
             {/each}
         </div>
-        <div class="col-md-4">
+        <div class="col-sm-4">
             <div class:waltz-scroll-region-350={_.size($summaries) > 10}>
                 <table class="table table-condensed small summary-table table-hover">
                     <tbody>
                     {#each availableSummaries as summary}
-                    <tr on:click={() => addOrRemoveFromActiveSummaries(summary)}
-                        class="clickable"
-                        class:isActiveFilter={isActive($activeSummaries, summary)}>
-                        <td>
-                            <Icon name={isActive($activeSummaries, summary) ? 'check' : 'arrow-left'}/>
-                            <span class="column-name">
+                        <tr on:click={() => addOrRemoveFromActiveSummaries(summary)}
+                            class="clickable"
+                            class:isActiveFilter={isActive($activeSummaries, summary)}>
+                            <td>
+                                <Icon name={isActive($activeSummaries, summary) ? 'check' : 'arrow-left'}/>
+                                <span class="column-name">
                                 {getDisplayNameForColumn(summary.column)}
                             </span>
-                            <ul style="display: inline-block"
-                                class="list-inline column-values-summary">
-                                {#each summary.counters as counter}
-                                <li title={counter.rating.name}>
-                                    <span style={`background-color: ${counter.rating.color}`}/>
-                                </li>
-                                {/each}
-                            </ul>
-                        </td>
+                                <!--                            <ul style="display: inline-block"-->
+                                <!--                                class="list-inline column-values-summary">-->
+                                <!--                                {#each summary.counters as counter}-->
+                                <!--                                <li title={counter.rating.name}>-->
+                                <!--                                    <span style={`background-color: ${counter.rating.color}`}/>-->
+                                <!--                                </li>-->
+                                <!--                                {/each}-->
+                                <!--                            </ul>-->
+                            </td>
                     </tr>
                     {:else}
                         <tr>

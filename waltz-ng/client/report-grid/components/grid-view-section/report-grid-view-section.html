@@ -29,12 +29,15 @@
         <br>
         <!-- GRID -->
         <div ng-if="$ctrl.tableData.length > 0">
-            <waltz-grid-with-search column-defs="$ctrl.allColumnDefs" entries="$ctrl.tableData"
-                search-control-min-rows="1" class="small">
+            <waltz-grid-with-search column-defs="$ctrl.allColumnDefs"
+                                    entries="$ctrl.tableData"
+                                    search-control-min-rows="1"
+                                    class="small">
             </waltz-grid-with-search>
 
             <waltz-data-extract-link name="Export grid" styling="link" filename="report.csv"
-                extract="report-grid/id/{{$ctrl.gridId}}" method="POST" request-body="$ctrl.selectionOptions">
+                                     extract="report-grid/id/{{$ctrl.gridId}}" method="POST"
+                                     request-body="$ctrl.selectionOptions">
             </waltz-data-extract-link>
 
         </div>
