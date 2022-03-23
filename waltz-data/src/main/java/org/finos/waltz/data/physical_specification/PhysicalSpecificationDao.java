@@ -319,4 +319,23 @@ public class PhysicalSpecificationDao {
         });
     }
 
+
+    public int updateFormat(long specId, DataFormatKind format) {
+        return dsl
+                .update(PHYSICAL_SPECIFICATION)
+                .set(PHYSICAL_SPECIFICATION.FORMAT, format.name())
+                .where(PHYSICAL_SPECIFICATION.ID.eq(specId))
+                .execute();
+    }
+
+
+    public int updateDescription(long specId, String description) {
+        return dsl
+                .update(PHYSICAL_SPECIFICATION)
+                .set(PHYSICAL_SPECIFICATION.DESCRIPTION, description)
+                .where(PHYSICAL_SPECIFICATION.ID.eq(specId))
+                .execute();
+    }
+
+
 }

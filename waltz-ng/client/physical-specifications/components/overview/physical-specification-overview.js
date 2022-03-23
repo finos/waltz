@@ -21,13 +21,15 @@ import template from './physical-specification-overview.html';
 const bindings = {
     specification: '<',
     owningEntity: '<',
-    organisationalUnit: '<'
+    organisationalUnit: '<',
+    onSaveFormat: "<",
+    onSaveDescription: "<"
 };
 
 
 const component = {
-    template,
-    bindings
+    bindings,
+    template
 };
 
 export default component;

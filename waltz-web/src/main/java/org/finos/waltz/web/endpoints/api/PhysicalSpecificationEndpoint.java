@@ -18,25 +18,29 @@
 
 package org.finos.waltz.web.endpoints.api;
 
-import org.finos.waltz.service.physical_specification.PhysicalSpecificationService;
-import org.finos.waltz.service.user.UserRoleService;
-import org.finos.waltz.web.DatumRoute;
-import org.finos.waltz.web.ListRoute;
-import org.finos.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.SetAttributeCommand;
 import org.finos.waltz.model.command.CommandResponse;
 import org.finos.waltz.model.entity_search.ImmutableEntitySearchOptions;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecificationDeleteCommand;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
 import org.finos.waltz.model.physical_specification.PhysicalSpecificationDeleteCommand;
 import org.finos.waltz.model.user.SystemRole;
+import org.finos.waltz.service.physical_specification.PhysicalSpecificationService;
+import org.finos.waltz.service.user.UserRoleService;
+import org.finos.waltz.web.DatumRoute;
+import org.finos.waltz.web.ListRoute;
+import org.finos.waltz.web.WebUtilities;
+import org.finos.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
 import spark.Response;
 
+import java.io.IOException;
+
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.web.WebUtilities.*;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
-import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Service
 public class PhysicalSpecificationEndpoint implements Endpoint {
@@ -85,6 +89,12 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
         String deletePath = mkPath(BASE_URL,
                 ":id");
 
+        String updateAttributePath = WebUtilities.mkPath(
+                BASE_URL,
+                "id",
+                ":id",
+                "attribute");
+
         ListRoute<PhysicalSpecification> findBySelectorRoute =
                 (request, response) -> specificationService.findBySelector(readIdSelectionOptionsFromBody(request));
 
@@ -112,6 +122,7 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
         postForList(findByIdsPath, findByIdsRoute);
         postForList(searchPath, searchRoute);
         getForDatum(getByIdPath, getByIdRoute);
+        postForDatum(updateAttributePath, this::updateAttribute);
 
         deleteForDatum(deletePath, this::deleteSpecification);
     }
@@ -129,4 +140,15 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
 
         return specificationService.markRemovedIfUnused(deleteCommand, username);
     }
+
+
+    private int updateAttribute(Request request, Response response) throws IOException {
+        WebUtilities.requireRole(userRoleService, request, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
+        String username = WebUtilities.getUsername(request);
+        SetAttributeCommand command
+                = WebUtilities.readBody(request, SetAttributeCommand.class);
+
+        return specificationService.updateAttribute(username, command);
+    }
+
 }

@@ -18,7 +18,6 @@
 
 package org.finos.waltz.service.changelog;
 
-import org.finos.waltz.common.CollectionUtilities;
 import org.finos.waltz.data.DBExecutorPoolInterface;
 import org.finos.waltz.data.EntityReferenceNameResolver;
 import org.finos.waltz.data.GenericSelector;
@@ -41,16 +40,15 @@ import org.finos.waltz.model.measurable_rating_replacement.MeasurableRatingRepla
 import org.finos.waltz.model.physical_flow.PhysicalFlow;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
 import org.finos.waltz.model.tally.DateTally;
-import org.jooq.lambda.Unchecked;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.concurrent.Future;
 
 import static java.lang.String.format;
-import static org.finos.waltz.common.Checks.*;
+import static org.finos.waltz.common.Checks.checkNotEmpty;
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.SetUtilities.*;
 import static org.finos.waltz.model.EntityKind.*;
 import static org.finos.waltz.model.EntityReference.mkRef;
@@ -111,9 +109,6 @@ public class ChangeLogService {
                                                  Optional<Date> date,
                                                  Optional<Integer> limit) {
         checkNotNull(ref, "ref must not be null");
-        if(ref.kind() == EntityKind.PHYSICAL_FLOW) {
-            return findByParentReferenceForPhysicalFlow(ref, date, limit);
-        }
         return changeLogDao.findByParentReference(ref, date, limit);
     }
 
@@ -162,6 +157,10 @@ public class ChangeLogService {
                 PhysicalFlow physicalFlow = physicalFlowDao.getById(ref.id());
                 writeChangeLogEntries(physicalFlow, userId, postamble, operation);
                 break;
+            case PHYSICAL_SPECIFICATION:
+                PhysicalSpecification physicalSpec = physicalSpecificationDao.getById(ref.id());
+                writeChangeLogEntries(physicalSpec, userId, postamble, operation);
+                break;
             case LOGICAL_DATA_FLOW:
                 LogicalFlow logicalFlow = logicalFlowDao.getByFlowId(ref.id());
                 writeChangeLogEntries(logicalFlow, userId, postamble, operation);
@@ -197,6 +196,16 @@ public class ChangeLogService {
         writeChangeLogEntries(t.v2, message, operation, PHYSICAL_FLOW, userId);
     }
 
+
+    public void writeChangeLogEntries(PhysicalSpecification physicalSpec,
+                                      String userId,
+                                      String postamble,
+                                      Operation operation) {
+        Tuple2<String, Set<EntityReference>> t = preparePreambleAndEntitiesForChangeLogs(physicalSpec);
+        String message = format("%s: %s", t.v1, postamble);
+        writeChangeLogEntries(t.v2, message, operation, PHYSICAL_FLOW, userId);
+    }
+
     public void writeChangeLogEntries(MeasurableRatingReplacement measurableRatingReplacement,
                                       String userId,
                                       String postamble,
@@ -224,33 +233,6 @@ public class ChangeLogService {
         return changeLogSummariesDao.findCountByDateForParentKindBySelector(genericSelector, limit);
     }
 
-        ////////////////////// PRIVATE HELPERS //////////////////////////////////////////
-
-    private List<ChangeLog> findByParentReferenceForPhysicalFlow(EntityReference ref,
-                                                                 Optional<Date> date,
-                                                                 Optional<Integer> limit) {
-        checkNotNull(ref, "ref must not be null");
-        checkTrue(ref.kind() == EntityKind.PHYSICAL_FLOW, "ref should refer to a Physical Flow");
-
-        Future<List<ChangeLog>> flowLogsFuture = dbExecutorPool.submit(() -> changeLogDao.findByParentReference(ref, date, limit));
-
-        Future<List<ChangeLog>> specLogsFuture = dbExecutorPool.submit(() -> {
-            PhysicalFlow flow = physicalFlowDao.getById(ref.id());
-            return changeLogDao.findByParentReference(mkRef(EntityKind.PHYSICAL_SPECIFICATION, flow.specificationId()), date, limit);
-        });
-
-        return Unchecked.supplier(() -> {
-            List<ChangeLog> flowLogs = flowLogsFuture.get();
-            List<ChangeLog> specLogs = specLogsFuture.get();
-            List<ChangeLog> all = new ArrayList<>();
-            all.addAll(flowLogs);
-            all.addAll(specLogs);
-            return CollectionUtilities.sort(
-                    all,
-                    Comparator.comparing(ChangeLog::createdAt).reversed());
-        }).get();
-    }
-
 
     private void writeChangeLogEntries(Set<EntityReference> refs,
                                        String message,
@@ -270,6 +252,22 @@ public class ChangeLogService {
                         .build());
 
         write(changeLogEntries);
+    }
+
+
+    private Tuple2<String, Set<EntityReference>> preparePreambleAndEntitiesForChangeLogs(PhysicalSpecification physicalSpec) {
+        List<PhysicalFlow> physicalFlows = physicalFlowDao.findBySpecificationId(physicalSpec.id().get());
+
+        String messagePreamble = format(
+                "Physical spec: %s",
+                physicalSpec.name());
+
+        return tuple(
+                messagePreamble,
+                union(
+                        map(physicalFlows, d -> d.entityReference()),
+                        asSet(physicalSpec.entityReference())));
+
     }
 
 

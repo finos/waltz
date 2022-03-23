@@ -35,8 +35,12 @@
                 <div class="col-sm-4 waltz-display-field-label">
                     Format:
                 </div>
-                <div class="col-sm-8">
-                    <span ng-bind="$ctrl.specification.format"></span>
+                <div class="col-sm-4">
+                    <waltz-editable-enum initial-val="$ctrl.specification.format"
+                                         enum-kind="dataFormatKind"
+                                         on-save="$ctrl.onSaveFormat"
+                                         edit-role="LOGICAL_DATA_FLOW_EDITOR">
+                    </waltz-editable-enum>
                 </div>
             </div>
 
@@ -56,7 +60,11 @@
                     Description:
                 </div>
                 <div class="col-sm-8">
-                    <span ng-bind="$ctrl.specification.description"></span>
+                    <waltz-editable-field on-save="$ctrl.onSaveDescription"
+                                          field-type="textarea"
+                                          empty-label="Not provided"
+                                          initial-val="$ctrl.specification.description">
+                    </waltz-editable-field>
                 </div>
             </div>
 
