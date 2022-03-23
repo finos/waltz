@@ -274,8 +274,6 @@ function determineColorForKind(columnEntityKind) {
 }
 
 export function prepareTableData(gridData) {
-    console.log({gridData});
-
     const subjectsById = _.keyBy(gridData.instance.subjects, d => d.entityReference.id);
 
     const ratingSchemeItemsById = _
@@ -309,7 +307,7 @@ export function prepareTableData(gridData) {
             case "DATA_TYPE":
                 return Object.assign({}, baseCell, {
                     optionCode: x.text,
-                    optionText: x.text,
+                    optionText: _.capitalize(x.text),
                     color: determineDataTypeUsageColor(x.text),
                     text: x.text,
                     comment: x.comment
@@ -376,17 +374,13 @@ function isSummarisableProperty(k) {
         || k === "$$hashKey"
         || k === "visible"
         || k === _.startsWith("COST_KIND")
-        || k === _.startsWith("SURVEY_QUESTION")
-        || k === _.startsWith("INVOLVEMENT_KIND"));
+        || k === _.startsWith("SURVEY_QUESTION"));
 }
 
 
 export function refreshSummaries(tableData,
-                                 columnDefinitions,
-                                 ratingSchemeItems) {
+                                 columnDefinitions) {
 
-
-    console.log({tableData, columnDefinitions, ratingSchemeItems});
 
     // increments a pair of counters referenced by `prop` in the object `acc`
     const accInc = (acc, prop, visible, optionInfo) => {
@@ -429,7 +423,7 @@ export function refreshSummaries(tableData,
                 [
                     c => c.name
                 ]),
-            total: _.sumBy(optionSummaries, c => console.log({c}) || c.counts.total),
+            total: _.sumBy(optionSummaries, c => c.counts.total),
             totalVisible: _.sumBy(optionSummaries, c => c.counts.visible)
         }))
         .orderBy([  // order the summaries so they reflect the column order
@@ -438,7 +432,7 @@ export function refreshSummaries(tableData,
         ])
         .value();
 
-        return console.log("refreshSummaries", { tableData, columnDefinitions, ratingSchemeItems, result}) || result;
+    return console.log("refreshSummaries", {tableData, columnDefinitions, result}) || result;
 }
 
 
@@ -457,8 +451,7 @@ export function mkRowFilter(filters = []) {
     return row => _.every(
         filtersByPropName,
         (filtersForProp, prop) => {
-            const propOptionCode = _.get(row, [prop, "optionCode"], null);
-            console.log({td: row, filtersForProp, prop, propRating: propOptionCode});
+            const propOptionCode = _.get(row, [prop, "optionCode"], undefined);
             return _.some(filtersForProp, f => propOptionCode === f.optionCode);
         });
 }

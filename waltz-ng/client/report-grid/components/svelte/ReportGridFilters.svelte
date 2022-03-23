@@ -10,15 +10,13 @@
 
     let chunkedSummaryData = [];
 
-    const supportedColumnKinds = ["ASSESSMENT_DEFINITION", "MEASURABLE", "DATA_TYPE", "APP_GROUP"];
+    const supportedColumnKinds = ["ASSESSMENT_DEFINITION", "MEASURABLE", "DATA_TYPE", "APP_GROUP", "INVOLVEMENT_KIND", "COST_KIND"];
 
     function isSelectedSummary(cId) {
         return _.some($filters, f => f.summaryId === cId);
     }
 
     function onToggleFilter(optionSummary) {
-        console.log({optionSummary});
-
         if (_.some($filters, f => f.summaryId === optionSummary.summaryId)) {
             $filters = _.reject($filters, f => f.summaryId === optionSummary.summaryId);
         } else {
@@ -93,7 +91,7 @@
         <p class="help-block small">
             Select a value in the summary tables to quickly filter the data.
             Select the row again to clear the filter.
-            You can add more summaries using the column menu ('Add to summary').
+            You can add more filters using the list to the right.
 
         </p>
     {/if}
@@ -117,6 +115,7 @@
                                 <tbody>
                                 {#each summary.optionSummaries as optionSummary}
                                     <tr class="clickable"
+                                        class:undefined-option={optionSummary.optionInfo.code === undefined}
                                         class:waltz-highlighted-row={isSelectedSummary(optionSummary.summaryId)}
                                         class:text-muted={optionSummary.counts.visible === 0}
                                         on:click={() => onToggleFilter(optionSummary)}>
@@ -126,7 +125,7 @@
                                                 height: 10px; width: 10px;
                                                 background-color: ${optionSummary.optionInfo.color}`}>
                                             </div>
-                                            <span>{optionSummary.optionInfo.name}</span>
+                                            <span>{optionSummary.optionInfo.name || "Not Provided"}</span>
                                         </td>
                                         <!-- COUNTERS -->
                                         <td class="text-right">
@@ -169,6 +168,10 @@
             {/each}
         </div>
         <div class="col-sm-4">
+            <h5>
+                <Icon name="filter"/>
+                Filter Picker
+            </h5>
             <div class:waltz-scroll-region-350={_.size($summaries) > 10}>
                 <table class="table table-condensed small summary-table table-hover">
                     <tbody>
@@ -232,11 +235,16 @@
     .column-values-summary span {
         border: 1px solid #ccc;
         display: inline-block;
-        height: 1em; width: 1em;
+        height: 1em;
+        width: 1em;
     }
 
     .isActiveFilter {
         background-color: #fdfde2;
+    }
+
+    .undefined-option {
+        font-style: italic;
     }
 
 
