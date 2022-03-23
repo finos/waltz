@@ -113,3 +113,7 @@ export function reverse(array = []){
     const newArray = _.clone(array);
     return newArray.reverse();
 }
+
+export function coalesce(...xss) {
+    return _.find(xss, xs => !_.isEmpty(xs));
+}

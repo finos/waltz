@@ -98,3 +98,11 @@ export function firstToReturn(obj, fns = []) {
     }
     return result;
 }
+
+
+export function coalesceFns(...fns) {
+    for (const fn of fns) {
+        const res = fn(); 
+        if (!_.isEmpty(res)) return res;
+    }    
+}

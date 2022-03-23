@@ -9,6 +9,7 @@
     import ApplicationFieldPicker from "./ApplicationFieldPicker.svelte";
     import ChangeInitiativeFieldPicker from "./ChangeInitiativeFieldPicker.svelte";
     import AppGroupPicker from "./AppGroupPicker.svelte";
+    import DataTypePicker from "./DataTypePicker.svelte";
 
     export let onSelect = (d) => console.log("Selecting an entity", d);
     export let onDeselect = (d) => console.log("Deselecting an entity", d);
@@ -35,6 +36,8 @@
                 return ChangeInitiativeFieldPicker;
             case "APP_GROUP":
                 return AppGroupPicker;
+            case "DATA_TYPE":
+                return DataTypePicker;
             default:
                 throw "Cannot find picker for kind: " + entityKind;
         }
