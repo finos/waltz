@@ -1,10 +1,10 @@
 import {derived, writable} from "svelte/store";
 import _ from "lodash";
 import {mkRowFilter, prepareTableData, refreshSummaries, sameColumnRef} from "./report-grid-utils";
+import {activeSummaries} from "./report-grid-filters-store";
 
 export const selectedGrid = writable(null);
 export let filters = writable([]);
-export let activeSummaryColRefs = writable([]);
 export let columnDefs = writable([]);
 export let selectedColumn = writable(null);
 export let lastMovedColumn = writable(null);
@@ -45,18 +45,26 @@ export let hasChanged = derived(
     [columnsChanged, usageKindChanged, ratingRollupRuleChanged, displayNameChanged, positionChanged],
     ([$columnsChanged, $usageKindChanged, $ratingRollupRuleChanged, $displayNameChanged, $positionChanged]) => {
         return $columnsChanged || $usageKindChanged || $ratingRollupRuleChanged || $displayNameChanged || $positionChanged;
-    })
+    });
 
-export const summaries = derived([selectedGrid, filters], ([$selectedGrid, $filters]) => {
+export const tableData = derived(
+    [selectedGrid],
+    ([$selectedGrid]) => {
+        if ($selectedGrid) {
+            return prepareTableData($selectedGrid);
+        }
+    });
 
-    if(_.isEmpty($selectedGrid)) {
-        return []
+export const summaries = derived([selectedGrid, filters, tableData], ([$selectedGrid, $filters, $tableData]) => {
+
+    if (_.isEmpty($selectedGrid)) {
+        return [];
     } else {
         const rowFilter = mkRowFilter($filters);
 
-        const workingTableData =  _.map(
-            prepareTableData($selectedGrid),
-            d => Object.assign({}, d, { visible: rowFilter(d) }));
+        const workingTableData = _.map(
+            $tableData,
+            d => Object.assign({}, d, {visible: rowFilter(d)}));
 
         return refreshSummaries(
             workingTableData,

@@ -160,7 +160,8 @@
         </div>
         <EntitySelector onSelect={onSelect}
                         onDeselect={deleteEntity}
-                        selectionFilter={canBeAdded}/>
+                        selectionFilter={canBeAdded}
+                        subjectKind={$selectedGrid?.definition.subjectKind}/>
     </div>
 
     <div class="col-sm-4"

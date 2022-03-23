@@ -95,10 +95,13 @@ public class SurveyInstanceOwnerDao {
     }
 
 
-    public boolean delete(long surveyInstanceOwnerId) {
+    public boolean delete(long surveyInstanceId,
+                          long personId) {
 
-        return dsl.deleteFrom(SURVEY_INSTANCE_OWNER)
-                .where(SURVEY_INSTANCE_OWNER.ID.eq(surveyInstanceOwnerId))
+        return dsl
+                .deleteFrom(SURVEY_INSTANCE_OWNER)
+                .where(SURVEY_INSTANCE_OWNER.PERSON_ID.eq(personId))
+                .and(SURVEY_INSTANCE_OWNER.SURVEY_INSTANCE_ID.eq(surveyInstanceId))
                 .execute() == 1;
     }
 

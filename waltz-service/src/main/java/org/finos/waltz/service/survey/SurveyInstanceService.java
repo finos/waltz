@@ -401,13 +401,12 @@ public class SurveyInstanceService {
 
     public boolean deleteOwner(String username, long surveyInstanceId, long ownerId) {
         checkPersonIsOwnerOrAdmin(username, surveyInstanceId);
-        Long personId = surveyInstanceOwnerDao.getPersonIdForOwnerId(ownerId);
-        boolean rc = surveyInstanceOwnerDao.delete(ownerId);
+        boolean rc = surveyInstanceOwnerDao.delete(surveyInstanceId, ownerId);
 
         logPersonChange(
                 username,
                 surveyInstanceId,
-                personId,
+                ownerId,
                 Operation.REMOVE,
                 "Survey Instance: Removed %s as an owner");
 

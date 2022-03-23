@@ -33,6 +33,7 @@ export const amberHex = "#D9923F";
 export const redHex = "#DA524B";
 export const purpleHex = "#B687CC";
 export const pinkHex = "#FFCFFC";
+export const pinkBgHex = "#ffe9fd";
 export const greyBgHex = "#F5F5F5";
 export const amberBgHex = "#FCF2D7";
 export const greenBgHex = "#DFF1D2";
@@ -57,6 +58,7 @@ export const greenBg = rgb(greenBgHex);
 export const redBg = rgb(redBgHex);
 export const greyBg = rgb(greyBgHex);
 export const blueBg = rgb(blueBgHex);
+export const pinkBg = rgb(pinkBgHex);
 export const actorBg = rgb("#EDE5EE");
 
 
@@ -272,7 +274,7 @@ export function useBlackAsForeground(r, g, b) {
     }
     const brightness = (r * 299 + g * 587 + b * 114) / 1000;
 
-    return brightness > 123;
+    return brightness > 150;
 }
 
 

@@ -8,23 +8,25 @@
     export let onSelect = (d) => console.log("Selecting entity", d);
     export let onDeselect = (d) => console.log("Deselecting entity", d);
     export let selectionFilter = () => true;
+    export let subjectKind;
 
     let selectedEntityKind = null;
     let showDropdown = false;
 
-    const entityKinds = _.orderBy(
-        [
-            entity.INVOLVEMENT_KIND,
-            entity.COST_KIND,
-            entity.SURVEY_QUESTION,
-            entity.ASSESSMENT_DEFINITION,
-            entity.MEASURABLE,
-            entity.APP_GROUP,
-            entity.SURVEY_INSTANCE,
-            entity.APPLICATION,
-            entity.CHANGE_INITIATIVE
-        ],
-        d => d.name);
+    let baseKinds = [
+        entity.INVOLVEMENT_KIND,
+        entity.SURVEY_QUESTION,
+        entity.ASSESSMENT_DEFINITION,
+        entity.APP_GROUP,
+        entity.SURVEY_INSTANCE,
+    ];
+
+    $: entityKinds = entityKindsBySubjectKind[subjectKind] || baseKinds;
+
+    const entityKindsBySubjectKind = {
+        "APPLICATION": _.orderBy(_.concat(baseKinds, [entity.APPLICATION, entity.DATA_TYPE, entity.MEASURABLE, entity.COST_KIND]), d => d.name),
+        "CHANGE_INITIATIVE": _.orderBy(_.concat(baseKinds, [entity.CHANGE_INITIATIVE]), d => d.name)
+    };
 
     function toggleDropdown() {
         showDropdown = !showDropdown

@@ -98,7 +98,8 @@ export function doSearch(termStr = "", searchNodes = []) {
  * @returns {Array}
  */
 export function populateParents(nodes, parentsAsRefs = true) {
-    const byId = _.chain(_.cloneDeep(nodes))
+    const byId = _
+        .chain(_.cloneDeep(nodes))
         .map(u => _.merge(u, { children: [], parent: null }))
         .keyBy("id")
         .value();
