@@ -181,14 +181,17 @@
                                 <span class="column-name">
                                 {getDisplayNameForColumn(summary.column)}
                             </span>
-                                <!--                            <ul style="display: inline-block"-->
-                                <!--                                class="list-inline column-values-summary">-->
-                                <!--                                {#each summary.counters as counter}-->
-                                <!--                                <li title={counter.rating.name}>-->
-                                <!--                                    <span style={`background-color: ${counter.rating.color}`}/>-->
-                                <!--                                </li>-->
-                                <!--                                {/each}-->
-                                <!--                            </ul>-->
+                                <ul style="display: inline-block"
+                                    class="list-inline column-values-summary">
+                                    {#each summary.optionSummaries as option}
+                                        <li title={option.optionInfo.name}>
+                                            <span style={`
+                                                    background-color: ${option.optionInfo.color};
+                                                    opacity: ${option.counts.visible > 0 ? 1 : 0.2};
+                                            `}/>
+                                        </li>
+                                    {/each}
+                                </ul>
                             </td>
                     </tr>
                     {:else}

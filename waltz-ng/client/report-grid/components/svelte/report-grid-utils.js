@@ -454,11 +454,12 @@ export function refreshSummaries(tableData,
  */
 export function mkRowFilter(filters = []) {
     const filtersByPropName = _.groupBy(filters, f => f.propName);
-    return td => _.every(
+    return row => _.every(
         filtersByPropName,
         (filtersForProp, prop) => {
-            const propRating = _.get(td, [prop, "id"], null);
-            return _.some(filtersForProp, f => propRating === f.optionCode);
+            const propOptionCode = _.get(row, [prop, "optionCode"], null);
+            console.log({td: row, filtersForProp, prop, propRating: propOptionCode});
+            return _.some(filtersForProp, f => propOptionCode === f.optionCode);
         });
 }
 
