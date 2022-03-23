@@ -18,7 +18,6 @@
 
 package org.finos.waltz.service.physical_specification;
 
-import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.data.physical_specification.PhysicalSpecificationDao;
 import org.finos.waltz.data.physical_specification.PhysicalSpecificationIdSelectorFactory;
 import org.finos.waltz.data.physical_specification.search.PhysicalSpecificationSearchDao;
@@ -29,9 +28,11 @@ import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.command.CommandResponse;
 import org.finos.waltz.model.command.ImmutableCommandResponse;
 import org.finos.waltz.model.entity_search.EntitySearchOptions;
+import org.finos.waltz.model.physical_specification.DataFormatKind;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
 import org.finos.waltz.model.physical_specification.PhysicalSpecificationDeleteCommand;
+import org.finos.waltz.service.changelog.ChangeLogService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
@@ -193,4 +195,41 @@ public class PhysicalSpecificationService {
 
         return specificationDao.propagateDataTypesToLogicalFlows(userName, id);
     }
+
+
+
+    public int updateAttribute(String username, SetAttributeCommand command) {
+
+        int rc = doUpdateAttribute(command);
+
+        if (rc != 0) {
+            String postamble = format("Updated attribute %s to %s", command.name(), command.value());
+            changeLogService.writeChangeLogEntries(
+                    command.entityReference(),
+                    username,
+                    postamble,
+                    Operation.UPDATE);
+        }
+
+        return rc;
+    }
+
+
+    // -- HELPERS
+
+    private int doUpdateAttribute(SetAttributeCommand command) {
+        long flowId = command.entityReference().id();
+        switch(command.name()) {
+           case "description":
+                return specificationDao.updateDescription(flowId, command.value());
+            case "format":
+                return specificationDao.updateFormat(flowId, DataFormatKind.valueOf(command.value()));
+            default:
+                String errMsg = format(
+                        "Cannot update attribute %s on flow as unknown attribute name",
+                        command.name());
+                throw new UnsupportedOperationException(errMsg);
+        }
+    }
+
 }

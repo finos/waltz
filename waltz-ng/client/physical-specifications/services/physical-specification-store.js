@@ -60,6 +60,10 @@ export function store($http, baseApiUrl) {
             .delete(`${base}/${specificationId}`)
             .then(r => r.data);
 
+    const updateAttribute = (flowId, command) => $http
+            .post(`${base}/id/${flowId}/attribute`, command)
+            .then(r => r.data);
+
 
     return {
         findByEntityReference,
@@ -67,7 +71,8 @@ export function store($http, baseApiUrl) {
         findByIds,
         getById,
         deleteById,
-        search
+        search,
+        updateAttribute
     };
 }
 
@@ -112,4 +117,9 @@ export const PhysicalSpecificationStore_API = {
         serviceFnName: "search",
         description: "executes search"
     },
+    updateAttribute: {
+        serviceName,
+        serviceFnName: "updateAttribute",
+        description: "executes updateAttribute"
+    }
 };
