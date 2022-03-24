@@ -181,7 +181,7 @@
                 <Icon name="filter"/>
                 Filter Picker
             </h5>
-            <div class:waltz-scroll-region-350={_.size($summaries) > 10}>
+            <div class:waltz-scroll-region-350={_.size(availableSummaries) > 10}>
                 <table class="table table-condensed small summary-table table-hover">
                     <tbody>
                     {#each availableSummaries as summary}
