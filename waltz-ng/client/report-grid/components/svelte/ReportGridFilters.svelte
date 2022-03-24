@@ -40,6 +40,7 @@
         activeSummaries.add(colRef);
     }
 
+
     function addOrRemoveFromActiveSummaries(summary) {
         if (isActive($activeSummaries, summary)) {
             removeSummary(summary);
@@ -51,6 +52,17 @@
 
     function isActive(activeSummaries, summary) {
         return _.includes(activeSummaries, mkPropNameForColumnDefinition(summary.column))
+    }
+
+
+    function mkOptionSummaryTitle(option) {
+        const optionName = option.optionInfo.name || "Not Provided";
+
+        if (option.counts.total !== option.counts.visible){
+            return `${optionName}: (${option.counts.total}) ${option.counts.visible}`
+        } else {
+            return `${optionName}: ${option.counts.visible}`
+        }
     }
 
 
@@ -117,10 +129,10 @@
                                         class:text-muted={optionSummary.counts.visible === 0}
                                         on:click={() => onToggleFilter(optionSummary)}>
                                         <td>
-                                            <div style={`
-                                                display: inline-block;
-                                                height: 10px; width: 10px;
-                                                background-color: ${optionSummary.optionInfo.color}`}>
+                                            <div class="color-indicator"
+                                                 style={`
+                                                    opacity: ${optionSummary.counts.visible > 0 ? 1 : 0.2};
+                                                    background-color: ${optionSummary.optionInfo.color}`}>
                                             </div>
                                             <span>{optionSummary.optionInfo.name || "Not Provided"}</span>
                                         </td>
@@ -186,7 +198,7 @@
                                 <ul style="display: inline-block"
                                     class="list-inline column-values-summary">
                                     {#each summary.optionSummaries as option}
-                                        <li title={option.optionInfo.name}>
+                                        <li title={mkOptionSummaryTitle(option)}>
                                             <span style={`
                                                     background-color: ${option.optionInfo.color};
                                                     opacity: ${option.counts.visible > 0 ? 1 : 0.2};
@@ -253,6 +265,12 @@
 
     .undefined-option {
         font-style: italic;
+    }
+
+    .color-indicator {
+        display: inline-block;
+        height: 10px; width: 10px;
+        transition: opacity 0.3s linear;
     }
 
 </style>
