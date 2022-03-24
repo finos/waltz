@@ -40,6 +40,7 @@
         activeSummaries.add(colRef);
     }
 
+
     function addOrRemoveFromActiveSummaries(summary) {
         if (isActive($activeSummaries, summary)) {
             removeSummary(summary);
