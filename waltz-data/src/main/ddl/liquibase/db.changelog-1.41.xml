@@ -1,0 +1,300 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="db.changelog-1.41.xml">
+
+    <changeSet id="v1-40-tag"
+               author="woodjes">
+        <tagDatabase tag="v1.40"/> <!-- tag the current db version, i.e. the last  -->
+    </changeSet>
+
+
+    <changeSet id="20220325-5935-1"
+               author="woodjes">
+        <setTableRemarks tableName="change_initiative"
+                         remarks="represents an change initiative (with an entity_kind of 'CHANGE_INITIATIVE')"/>
+
+        <setColumnRemarks tableName="change_initiative"
+                          columnName="organisational_unit_id"
+                          remarks="reference to the owning organisational unit of this change initiative"/>
+        <setColumnRemarks tableName="change_initiative"
+                          columnName="start_date"
+                          remarks="the start date of this change initiative"/>
+        <setColumnRemarks tableName="change_initiative"
+                          columnName="external_id"
+                          remarks="external identifier for this change initiative"/>
+        <setColumnRemarks tableName="change_initiative"
+                          columnName="parent_id"
+                          remarks="the id of the parent change initiative"/>
+        <setColumnRemarks tableName="change_initiative"
+                          columnName="last_update"
+                          remarks="the date information in this change initiative record was last updated"/>
+        <setColumnRemarks tableName="change_initiative"
+                          columnName="lifecycle_phase"
+                          remarks="the current lifecycle phase of this change initiative (one of: CONCEPTUAL, DEVELOPMENT, PRODUCTION, RETIRED)"/>
+        <setColumnRemarks tableName="change_initiative"
+                          columnName="provenance"
+                          remarks="origination of this change initiative record"/>
+        <setColumnRemarks tableName="change_initiative"
+                          columnName="description"
+                          remarks="longer description to provide more information about this change initiative.  Markdown is supported"/>
+        <setColumnRemarks tableName="change_initiative"
+                          columnName="id"
+                          remarks="unique identifier for this change initiative within waltz"/>
+        <setColumnRemarks tableName="change_initiative"
+                          columnName="name"
+                          remarks="name of this change initiative"/>
+        <setColumnRemarks tableName="change_initiative"
+                          columnName="end_date"
+                          remarks="the end date of this change initiative"/>
+        <setColumnRemarks tableName="change_initiative"
+                          columnName="kind"
+                          remarks="the type of change initiative this is (one of: PROJECT, PROGRAMME, INITIATIVE)"/>
+    </changeSet>
+
+
+    <changeSet id="20220325-5935-2"
+               author="woodjes">
+        <setTableRemarks tableName="change_log"
+                         remarks="tracks all the data changes made within waltz"/>
+
+        <setColumnRemarks tableName="change_log"
+                          columnName="child_kind"
+                          remarks="the kind of entity this change relates to (e.g. LOGICAL_FLOW)"/>
+        <setColumnRemarks tableName="change_log"
+                          columnName="parent_kind"
+                          remarks="the kind of entity this change log belongs to"/>
+        <setColumnRemarks tableName="change_log"
+                          columnName="parent_id"
+                          remarks="the identifier of the entity this change log belongs to"/>
+        <setColumnRemarks tableName="change_log"
+                          columnName="message"
+                          remarks="a description of the change that has been made"/>
+        <setColumnRemarks tableName="change_log"
+                          columnName="user_id"
+                          remarks="the user responsible for making the change"/>
+        <setColumnRemarks tableName="change_log"
+                          columnName="severity"
+                          remarks="the severity of the change log (one of: INFORMATION, WARNING, ERROR)"/>
+        <setColumnRemarks tableName="change_log"
+                          columnName="id"
+                          remarks="unique identifier for this change log record within waltz"/>
+        <setColumnRemarks tableName="change_log"
+                          columnName="created_at"
+                          remarks="the datetime this entry was created"/>
+        <setColumnRemarks tableName="change_log"
+                          columnName="operation"
+                          remarks="what sort of change was made (one of: ADD, ATTEST, REMOVE, UPDATE, UNKNOWN)"/>
+    </changeSet>
+
+    <changeSet id="20220325-5935-3"
+               author="woodjes">
+        <setTableRemarks tableName="change_set"
+                         remarks="a logical grouping of smaller change units that belong to a parent entity"/>
+        <setColumnRemarks tableName="change_set"
+                          columnName="description"
+                          remarks="longer description to provide more information about this change set.  Markdown is supported"/>
+        <setColumnRemarks tableName="change_set"
+                          columnName="last_updated_at"
+                          remarks="the datetime this record was last updated"/>
+        <setColumnRemarks tableName="change_set"
+                          columnName="entity_lifecycle_status"
+                          remarks="the lifecycle state of this entity record (one of: ACTIVE, PENDING, REMOVED)"/>
+        <setColumnRemarks tableName="change_set"
+                          columnName="id"
+                          remarks="unique identifier for this change set record within waltz"/>
+        <setColumnRemarks tableName="change_set"
+                          columnName="provenance"
+                          remarks="origination of this change set record"/>
+        <setColumnRemarks tableName="change_set"
+                          columnName="external_id"
+                          remarks="external identifier for this change set"/>
+        <setColumnRemarks tableName="change_set"
+                          columnName="parent_entity_kind"
+                          remarks="the kind of entity that owns this change set"/>
+        <setColumnRemarks tableName="change_set"
+                          columnName="parent_entity_id"
+                          remarks="the identifier for the entity that owns this change set"/>
+        <setColumnRemarks tableName="change_set"
+                          columnName="planned_date"
+                          remarks="the planned date for the completion of the change set"/>
+        <setColumnRemarks tableName="change_set"
+                          columnName="name"
+                          remarks="the name of this change set"/>
+        <setColumnRemarks tableName="change_set"
+                          columnName="last_updated_by"
+                          remarks="the last user to update this change set record"/>
+    </changeSet>
+
+    <changeSet id="20220325-5935-4"
+               author="woodjes">
+        <setTableRemarks tableName="change_unit"
+                         remarks="a smaller unit of change that describes an activation, retirement or modification of an entity"/>
+        <setColumnRemarks tableName="change_unit"
+                          columnName="action"
+                          remarks="describes the type of change taking place (one of: ACTIVATE, RETIRE, MODIFY)"/>
+        <setColumnRemarks tableName="change_unit"
+                          columnName="subject_initial_status"
+                          remarks="the lifecycle status of the entity before the change (one of: ACTIVE, PENDING, REMOVED)"/>
+        <setColumnRemarks tableName="change_unit"
+                          columnName="subject_entity_id"
+                          remarks="the entity which is being changed"/>
+        <setColumnRemarks tableName="change_unit"
+                          columnName="subject_entity_kind"
+                          remarks="the kind of entity that is being changed"/>
+        <setColumnRemarks tableName="change_unit"
+                          columnName="change_set_id"
+                          remarks="the reference to the change set that this change unit belongs to"/>
+        <setColumnRemarks tableName="change_unit"
+                          columnName="last_updated_at"
+                          remarks="the datetime this change unit record was last updated"/>
+        <setColumnRemarks tableName="change_unit"
+                          columnName="execution_status"
+                          remarks="the state of the change unit (one of:  PENDING, COMPLETE, DISCARDED)"/>
+        <setColumnRemarks tableName="change_unit"
+                          columnName="id"
+                          remarks="unique identifier for this change unit record within waltz"/>
+        <setColumnRemarks tableName="change_unit"
+                          columnName="provenance"
+                          remarks="origination of this change unit record"/>
+        <setColumnRemarks tableName="change_unit"
+                          columnName="external_id"
+                          remarks="external identifier for this change unit"/>
+        <setColumnRemarks tableName="change_unit"
+                          columnName="last_updated_by"
+                          remarks="the last user to update this change unit record"/>
+        <setColumnRemarks tableName="change_unit"
+                          columnName="description"
+                          remarks="longer description to provide more information about this change set.  Markdown is supported"/>
+        <setColumnRemarks tableName="change_unit"
+                          columnName="name"
+                          remarks="the name of this change unit"/>
+    </changeSet>
+
+    <changeSet id="20220325-5935-5"
+               author="woodjes">
+        <setTableRemarks tableName="complexity"
+                         remarks="a score of a given complexity kind for an entity in waltz"/>
+        <setColumnRemarks tableName="complexity"
+                          columnName="score"
+                          remarks="the value of the complexity, the value should fall between 0 and 1 indicating proximity to a baseline (up to 3 decimal places)"/>
+        <setColumnRemarks tableName="complexity"
+                          columnName="last_updated_by"
+                          remarks="the last user to update this complexity record"/>
+        <setColumnRemarks tableName="complexity"
+                          columnName="id"
+                          remarks="unique identifier for this complexity record within waltz"/>
+        <setColumnRemarks tableName="complexity"
+                          columnName="provenance"
+                          remarks="origination of this change unit record"/>
+        <setColumnRemarks tableName="complexity"
+                          columnName="entity_kind"
+                          remarks="the kind of the entity this score belongs to"/>
+        <setColumnRemarks tableName="complexity"
+                          columnName="complexity_kind_id"
+                          remarks="the reference to the complexity kind that describes this score"/>
+        <setColumnRemarks tableName="complexity"
+                          columnName="entity_id"
+                          remarks="the identifier for the entity this score belongs to"/>
+        <setColumnRemarks tableName="complexity"
+                          columnName="last_updated_at"
+                          remarks="the datetime this complexity record was last updated"/>
+    </changeSet>
+
+
+    <changeSet id="20220325-5935-6"
+               author="woodjes">
+        <setTableRemarks tableName="complexity_kind"
+                         remarks="complexity can be used to give a decimal score for an entity in waltz against a complexity kind (e.g. Flow Complexity). The complexity kind describes the type of complexity being evaluated."/>
+        <setColumnRemarks tableName="complexity_kind"
+                          columnName="description"
+                          remarks="longer description to provide more information about this complexity kind"/>
+        <setColumnRemarks tableName="complexity_kind"
+                          columnName="name"
+                          remarks="the name of this complexity kind"/>
+        <setColumnRemarks tableName="complexity_kind"
+                          columnName="is_default"
+                          remarks="indicates the complexity kind to be shown on the entity overview by default"/>
+        <setColumnRemarks tableName="complexity_kind"
+                          columnName="external_id"
+                          remarks="external identifier for this complexity kind"/>
+        <setColumnRemarks tableName="complexity_kind"
+                          columnName="id"
+                          remarks="unique identifier for this complexity kind record within waltz"/>
+    </changeSet>
+
+
+    <changeSet id="20220325-5935-7"
+               author="woodjes">
+        <setTableRemarks tableName="cost"
+                         remarks="cost value belonging to an entity, given for a specified kind"/>
+        <setColumnRemarks tableName="cost"
+                          columnName="year"
+                          remarks="the year the cost value relates to"/>
+        <setColumnRemarks tableName="cost"
+                          columnName="entity_kind"
+                          remarks="the kind of entity the cost belongs to"/>
+        <setColumnRemarks tableName="cost"
+                          columnName="entity_id"
+                          remarks="the identifier for the entity the cost belongs to"/>
+        <setColumnRemarks tableName="cost"
+                          columnName="cost_kind_id"
+                          remarks="the type of cost the value relates to"/>
+        <setColumnRemarks tableName="cost"
+                          columnName="provenance"
+                          remarks="origination of this cost record"/>
+        <setColumnRemarks tableName="cost"
+                          columnName="last_updated_at"
+                          remarks="the datetime this cost record was last updated"/>
+        <setColumnRemarks tableName="cost"
+                          columnName="id"
+                          remarks="unique identifier for this cost record within waltz"/>
+        <setColumnRemarks tableName="cost"
+                          columnName="last_updated_by"
+                          remarks="the last user to update this cost record"/>
+        <setColumnRemarks tableName="cost"
+                          columnName="amount"
+                          remarks="the value of the cost (2 decimal places)"/>
+    </changeSet>
+
+
+    <changeSet id="20220325-5935-8"
+               author="woodjes">
+        <setTableRemarks tableName="cost_kind"
+                         remarks="different types of cost can be linked to an entity in waltz, the cost kind describes the type"/>
+        <setColumnRemarks tableName="cost_kind"
+                          columnName="external_id"
+                          remarks="external identifier for this cost kind"/>
+        <setColumnRemarks tableName="cost_kind"
+                          columnName="is_default"
+                          remarks="indicates the cost kind to be shown on the entity overview by default"/>
+        <setColumnRemarks tableName="cost_kind"
+                          columnName="description"
+                          remarks="longer description to provide more information about this cost kind"/>
+        <setColumnRemarks tableName="cost_kind"
+                          columnName="id"
+                          remarks="unique identifier for this cost kind record within waltz"/>
+        <setColumnRemarks tableName="cost_kind"
+                          columnName="name"
+                          remarks="the name of the cost kind"/>
+    </changeSet>
+
+</databaseChangeLog>
