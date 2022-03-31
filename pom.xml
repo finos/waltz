@@ -88,7 +88,7 @@
         <poi.version>4.1.2</poi.version>
         <slf4j.version>1.7.30</slf4j.version>
         <spark.version>2.9.1</spark.version> <!-- 2.9.3 causes issues with tomcat -->
-        <spring.version>5.3.5</spring.version>
+        <spring.version>5.3.18</spring.version>
         <super-csv.version>2.4.0</super-csv.version>
         <surefire.version>2.22.2</surefire.version>
         <commons-jexl3.version>3.2.1</commons-jexl3.version>
