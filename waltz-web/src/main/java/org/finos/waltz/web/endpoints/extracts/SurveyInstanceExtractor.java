@@ -24,14 +24,11 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.finos.waltz.common.FunctionUtilities;
 import org.finos.waltz.common.SetUtilities;
-import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.data.survey.SurveyQuestionDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.survey.SurveyInstanceStatus;
 import org.finos.waltz.model.survey.SurveyQuestion;
-import org.finos.waltz.service.DIConfiguration;
 import org.finos.waltz.web.WebUtilities;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -40,7 +37,6 @@ import org.jooq.lambda.tuple.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Service;
 import org.supercsv.io.CsvListWriter;
 import org.supercsv.prefs.CsvPreference;
@@ -55,15 +51,13 @@ import java.util.stream.Stream;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
-import static org.finos.waltz.common.CollectionUtilities.first;
 import static org.finos.waltz.common.EnumUtilities.names;
 import static org.finos.waltz.common.ListUtilities.*;
 import static org.finos.waltz.common.MapUtilities.indexBy;
-import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.common.SetUtilities.fromArray;
 import static org.finos.waltz.common.StringUtilities.mkSafe;
+import static org.finos.waltz.schema.Tables.*;
 import static org.finos.waltz.schema.tables.SurveyInstance.SURVEY_INSTANCE;
-import static org.finos.waltz.schema.tables.SurveyQuestion.SURVEY_QUESTION;
 import static org.finos.waltz.schema.tables.SurveyQuestionResponse.SURVEY_QUESTION_RESPONSE;
 import static org.finos.waltz.schema.tables.SurveyRun.SURVEY_RUN;
 import static org.finos.waltz.schema.tables.SurveyTemplate.SURVEY_TEMPLATE;
@@ -81,29 +75,19 @@ public class SurveyInstanceExtractor implements DataExtractor {
     private final org.finos.waltz.schema.tables.SurveyTemplate st = SURVEY_TEMPLATE.as("st");
     private final org.finos.waltz.schema.tables.SurveyRun sr = SURVEY_RUN.as("sr");
     private final org.finos.waltz.schema.tables.SurveyInstance si = SURVEY_INSTANCE.as("si");
-    private final org.finos.waltz.schema.tables.SurveyQuestion sq = SURVEY_QUESTION.as("sq");
     private final org.finos.waltz.schema.tables.SurveyQuestionResponse sqr = SURVEY_QUESTION_RESPONSE.as("sqr");
+    private final org.finos.waltz.schema.tables.Application app = APPLICATION.as("app");
+    private final org.finos.waltz.schema.tables.ChangeInitiative ci = CHANGE_INITIATIVE.as("ci");
+    private final org.finos.waltz.schema.tables.Application sqapp = APPLICATION.as("sqapp");
+    private final org.finos.waltz.schema.tables.Person sqp = PERSON.as("sqp");
+
     private static final Logger LOG = LoggerFactory.getLogger(SurveyInstanceExtractor.class);
 
-    private final Field<String> subjectNameField = InlineSelectFieldFactory.mkNameField(
-            si.ENTITY_ID,
-            si.ENTITY_KIND,
-            asSet(EntityKind.APPLICATION, EntityKind.CHANGE_INITIATIVE));
+    private final Field<String> subjectNameField =  DSL.coalesce(app.NAME, ci.NAME);
+    private final Field<String> subjectExtIdField = DSL.coalesce(app.ASSET_CODE, ci.EXTERNAL_ID);
 
-    private final Field<String> subjectExtIdField = InlineSelectFieldFactory.mkExternalIdField(
-            si.ENTITY_ID,
-            si.ENTITY_KIND,
-            asSet(EntityKind.APPLICATION, EntityKind.CHANGE_INITIATIVE));
-
-    private final Field<String> responseNameField = InlineSelectFieldFactory.mkNameField(
-            sqr.ENTITY_RESPONSE_ID,
-            sqr.ENTITY_RESPONSE_KIND,
-            asSet(EntityKind.APPLICATION, EntityKind.PERSON));
-
-    private final Field<String> responseExtIdField = InlineSelectFieldFactory.mkExternalIdField(
-            sqr.ENTITY_RESPONSE_ID,
-            sqr.ENTITY_RESPONSE_KIND,
-            asSet(EntityKind.APPLICATION, EntityKind.PERSON));
+    private final Field<String> responseNameField = DSL.coalesce(sqapp.NAME, sqp.DISPLAY_NAME);
+    private final Field<String> responseExtIdField = DSL.coalesce(sqapp.ASSET_CODE, sqp.EMPLOYEE_ID);
 
 
     @Autowired
@@ -124,8 +108,7 @@ public class SurveyInstanceExtractor implements DataExtractor {
 
     private void registerRunBasedExtract() {
         get(WebUtilities.mkPath(BASE_URL, "run-id", ":id"),
-            (request, response) ->
-                writeReportResults(
+            (request, response) -> writeReportResults(
                     response,
                     prepareInstancesOfRun(
                             parseExtractFormat(request),
@@ -137,8 +120,7 @@ public class SurveyInstanceExtractor implements DataExtractor {
 
     private void registerTemplateBasedExtract() {
         get(WebUtilities.mkPath(BASE_URL, "template-id", ":id"),
-            (request, response) ->
-                writeReportResults(
+            (request, response) -> writeReportResults(
                     response,
                     prepareInstancesOfTemplate(
                         parseExtractFormat(request),
@@ -358,9 +340,9 @@ public class SurveyInstanceExtractor implements DataExtractor {
 
     private List<List<Object>> prepareReportRows(List<SurveyQuestion> questions, Condition condition) {
 
-        SelectConditionStep<Record> extractAnswersQuery = dsl
-                .selectDistinct(
-                        sr.NAME,
+
+        SelectConditionStep<Record> instanceQuery = dsl
+                .select(sr.NAME,
                         sr.ID,
                         sr.STATUS.as("run_status"))
                 .select(subjectNameField,
@@ -371,6 +353,18 @@ public class SurveyInstanceExtractor implements DataExtractor {
                         si.APPROVED_BY,
                         si.SUBMITTED_AT,
                         si.SUBMITTED_BY)
+                .select(DSL.when(si.ORIGINAL_INSTANCE_ID.isNull(), "Yes").otherwise("No").as("Latest"))
+                .select(st.EXTERNAL_ID)
+                .from(st)
+                .innerJoin(sr).on(sr.SURVEY_TEMPLATE_ID.eq(st.ID))
+                .innerJoin(si).on(si.SURVEY_RUN_ID.eq(sr.ID))
+                .leftJoin(app).on(si.ENTITY_KIND.eq(EntityKind.APPLICATION.name()).and(si.ENTITY_ID.eq(app.ID)))
+                .leftJoin(ci).on(si.ENTITY_KIND.eq(EntityKind.CHANGE_INITIATIVE.name()).and(si.ENTITY_ID.eq(ci.ID)))
+                .where(dsl.renderInlined(condition));
+
+
+        SelectConditionStep<Record> responseQuery = dsl
+                .select(si.ID)
                 .select(sqr.QUESTION_ID,
                         sqr.COMMENT)
                 .select(sqr.STRING_RESPONSE,
@@ -380,54 +374,55 @@ public class SurveyInstanceExtractor implements DataExtractor {
                         sqr.LIST_RESPONSE_CONCAT)
                 .select(responseNameField,
                         responseExtIdField)
-                .select(DSL.when(si.ORIGINAL_INSTANCE_ID.isNull(), "Yes").otherwise("No").as("Latest"))
-                .select(st.EXTERNAL_ID)
                 .from(st)
                 .innerJoin(sr).on(sr.SURVEY_TEMPLATE_ID.eq(st.ID))
                 .innerJoin(si).on(si.SURVEY_RUN_ID.eq(sr.ID))
-                .innerJoin(sq).on(sq.SURVEY_TEMPLATE_ID.eq(st.ID))
-                .leftJoin(sqr).on(sqr.SURVEY_INSTANCE_ID.eq(si.ID).and(sqr.QUESTION_ID.eq(sq.ID)))
+                .leftJoin(sqr).on(sqr.SURVEY_INSTANCE_ID.eq(si.ID))
+                .leftJoin(sqapp).on(sqr.ENTITY_RESPONSE_KIND.eq(EntityKind.APPLICATION.name()).and(sqr.ENTITY_RESPONSE_ID.eq(sqapp.ID)))
+                .leftJoin(sqp).on(sqr.ENTITY_RESPONSE_KIND.eq(EntityKind.PERSON.name()).and(sqr.ENTITY_RESPONSE_ID.eq(sqp.ID)))
                 .where(dsl.renderInlined(condition));
 
-        Result<Record> results = extractAnswersQuery.fetch();
+        Result<Record> instanceResults = instanceQuery.fetch();
+        Map<Long, Result<Record>> responseResults = responseQuery.fetchGroups(si.ID);
 
-        return results
-                    .intoGroups(si.ID)
-                    .values()
+        return instanceResults
                     .stream()
-                    .map(answersForInstance -> {
+                    .map(instance -> {
                         ArrayList<Object> reportRow = new ArrayList<>();
 
                         //These fields are shared between all the questions for a survey but
                         // aiming for only one row per instance so only need to take one row
-                        Record firstAnswer = first(answersForInstance);
-                        reportRow.add(firstAnswer.get(sr.NAME));
-                        reportRow.add(firstAnswer.get(sr.ID));
-                        reportRow.add(firstAnswer.get("run_status", String.class));
-                        reportRow.add(firstAnswer.get(si.ID));
-                        reportRow.add(firstAnswer.get("instance_status", String.class));
-                        reportRow.add(firstAnswer.get(subjectNameField));
-                        reportRow.add(firstAnswer.get(subjectExtIdField));
-                        reportRow.add(firstAnswer.get(si.SUBMITTED_AT));
-                        reportRow.add(firstAnswer.get(si.SUBMITTED_BY));
-                        reportRow.add(firstAnswer.get(si.APPROVED_AT));
-                        reportRow.add(firstAnswer.get(si.APPROVED_BY));
-                        reportRow.add(firstAnswer.get("Latest"));
-                        reportRow.add(firstAnswer.get(st.EXTERNAL_ID));
+                        reportRow.add(instance.get(sr.NAME));
+                        reportRow.add(instance.get(sr.ID));
+                        reportRow.add(instance.get("run_status", String.class));
+                        reportRow.add(instance.get(si.ID));
+                        reportRow.add(instance.get("instance_status", String.class));
+                        reportRow.add(instance.get(subjectNameField));
+                        reportRow.add(instance.get(subjectExtIdField));
+                        reportRow.add(instance.get(si.SUBMITTED_AT));
+                        reportRow.add(instance.get(si.SUBMITTED_BY));
+                        reportRow.add(instance.get(si.APPROVED_AT));
+                        reportRow.add(instance.get(si.APPROVED_BY));
+                        reportRow.add(instance.get("Latest"));
+                        reportRow.add(instance.get(st.EXTERNAL_ID));
 
-                        Map<Long, Record> answersByQuestionId = indexBy(
-                                answersForInstance,
-                                a -> a.get(sqr.QUESTION_ID));
+                        List<Record> responsesForInstance = responseResults.get(instance.get(si.ID));
 
-                        questions
-                                .stream()
-                                .map(q -> tuple(q, answersByQuestionId.get(q.id().get())))
-                                .forEach(t -> {
-                                    reportRow.add(findValueInRecord(t.v1, t.v2));
-                                    if (t.v1.allowComment()) {
-                                        reportRow.add(getComment(t));
-                                    }
-                                });
+                        if (responsesForInstance != null) {
+                            Map<Long, Record> answersByQuestionId = indexBy(
+                                    responsesForInstance,
+                                    a -> a.get(sqr.QUESTION_ID));
+
+                            questions
+                                    .stream()
+                                    .map(q -> tuple(q, answersByQuestionId.get(q.id().get())))
+                                    .forEach(t -> {
+                                        reportRow.add(findValueInRecord(t.v1, t.v2));
+                                        if (t.v1.allowComment()) {
+                                            reportRow.add(getComment(t));
+                                        }
+                                    });
+                        }
 
                         return reportRow;
                     })
