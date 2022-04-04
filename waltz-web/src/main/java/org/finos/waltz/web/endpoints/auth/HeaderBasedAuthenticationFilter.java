@@ -18,6 +18,7 @@
 
 package org.finos.waltz.web.endpoints.auth;
 
+import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.service.settings.SettingsService;
 import org.finos.waltz.model.settings.NamedSettings;
 import org.slf4j.Logger;
@@ -38,6 +39,7 @@ public class HeaderBasedAuthenticationFilter extends WaltzFilter {
     private static final Logger LOG = LoggerFactory.getLogger(HeaderBasedAuthenticationFilter.class);
 
     private final String paramName;
+    private final String testingOverride = System.getProperty("waltz.test.user");
 
 
     public HeaderBasedAuthenticationFilter(SettingsService settingsService) {
