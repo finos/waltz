@@ -18,16 +18,16 @@
 
 package org.finos.waltz.web.endpoints.api;
 
-import org.finos.waltz.service.attestation.AttestationInstanceService;
-import org.finos.waltz.service.user.UserRoleService;
-import org.finos.waltz.web.DatumRoute;
-import org.finos.waltz.web.ListRoute;
-import org.finos.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.attestation.*;
 import org.finos.waltz.model.person.Person;
 import org.finos.waltz.model.user.SystemRole;
+import org.finos.waltz.service.attestation.AttestationInstanceService;
+import org.finos.waltz.service.user.UserRoleService;
+import org.finos.waltz.web.DatumRoute;
+import org.finos.waltz.web.ListRoute;
+import org.finos.waltz.web.endpoints.Endpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,11 +35,9 @@ import org.springframework.stereotype.Service;
 import spark.Request;
 import spark.Response;
 
-import java.io.IOException;
-
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.web.WebUtilities.*;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
-import static org.finos.waltz.common.Checks.checkNotNull;
 
 
 @Service
@@ -101,7 +99,7 @@ public class AttestationInstanceEndpoint implements Endpoint {
                 (req, res) -> attestationInstanceService.findByRunId(getId(req));
 
         ListRoute<Person> findPersonsByInstanceRoute = (request, response) -> {
-            long id = Long.valueOf(request.params("id"));
+            long id = Long.parseLong(request.params("id"));
             return attestationInstanceService.findPersonsByInstanceId(id);
         };
 
@@ -146,7 +144,7 @@ public class AttestationInstanceEndpoint implements Endpoint {
     }
 
 
-    private int cleanupOrphansRoute(Request request, Response response) throws IOException {
+    private int cleanupOrphansRoute(Request request, Response response) {
         requireRole(userRoleService, request, SystemRole.ADMIN);
 
         String username = getUsername(request);
