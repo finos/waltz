@@ -21,6 +21,11 @@
     </div>
     <div ng-if="$ctrl.heatmapData.length > 0">
 
+        <waltz-svelte-component component="$ctrl.CalendarHeatmap"
+                                data="$ctrl.heatmapData"
+                                on-select-date="$ctrl.onSelectDate">
+        </waltz-svelte-component>
+
         <waltz-calendar-heatmap data="$ctrl.heatmapData"
                                 on-select-date="$ctrl.onSelectDate">
         </waltz-calendar-heatmap>

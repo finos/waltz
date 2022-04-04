@@ -20,6 +20,7 @@ import {initialiseData} from "../../../common";
 import template from "./change-summaries-panel.html";
 import {mkSelectionOptions} from "../../../common/selector-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
+import CalendarHeatmap from "../../../common/svelte/calendar-heatmap/CalendarHeatmap.svelte"
 
 const modes = {
     LOADING: "LOADING",
@@ -39,7 +40,8 @@ const initialState = {
     mode: modes.NO_SELECTION,
     selectedDate: null,
     heatmapData: null,
-    summaries: []
+    summaries: [],
+    CalendarHeatmap
 };
 
 
