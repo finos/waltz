@@ -57,12 +57,6 @@ public class ChangeLogHarness {
 
         IdSelectionOptions idSelectionOptions = mkOpts(mkRef(EntityKind.APP_GROUP, 11874), HierarchyQueryScope.EXACT);
 
-        FunctionUtilities.time("test", () -> dao
-                .findCountByParentAndChildKindForDateBySelector(
-                        factory.applyForKind(EntityKind.APPLICATION, idSelectionOptions),
-                        DateTimeUtilities.toSqlDate(DateTimeUtilities.today()),
-                        Optional.of(10))
-        );
 
         System.out.println("done");
 

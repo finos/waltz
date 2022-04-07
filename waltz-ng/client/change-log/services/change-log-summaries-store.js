@@ -22,23 +22,15 @@ function store($http, BaseApiUrl) {
 
     const BASE = `${BaseApiUrl}/change-log-summaries`;
 
-    const findSummariesForKindBySelector = (kind, selector, date, limit) => {
-        checkIsIdSelector(selector);
-        return $http
-            .post(`${BASE}/kind/${kind}/selector`, selector, {params: {limit: limit, date: date}})
-            .then(result => result.data);
-    };
-
 
     const findSummariesForKindBySelectorForDateRange = (kind, selector, startDate, endDate, limit) => {
         checkIsIdSelector(selector);
         return $http
-            .post(`${BASE}/kind/${kind}/selector/date-range`, selector, {params: {limit, startDate, endDate}})
+            .post(`${BASE}/kind/${kind}/selector`, selector, {params: {limit, startDate, endDate}})
             .then(result => result.data);
     };
 
     return {
-        findSummariesForKindBySelector,
         findSummariesForKindBySelectorForDateRange
     };
 }
@@ -53,11 +45,6 @@ const serviceName = "ChangeLogSummariesStore";
 
 
 export const ChangeLogSummariesStore_API = {
-    findSummariesForKindBySelector: {
-        serviceName,
-        serviceFnName: "findSummariesForKindBySelector",
-        description: "finds changeLogTally for a given child kind and selector and date"
-    },
     findSummariesForKindBySelectorForDateRange: {
         serviceName,
         serviceFnName: "findSummariesForKindBySelectorForDateRange",

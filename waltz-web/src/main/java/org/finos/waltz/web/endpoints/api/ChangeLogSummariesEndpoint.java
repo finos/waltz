@@ -57,22 +57,7 @@ public class ChangeLogSummariesEndpoint implements Endpoint {
     @Override
     public void register() {
 
-        String findSummariesForDatePath = mkPath(BASE_URL, "kind", ":kind", "selector");
-        String findSummariesForDateRangePath = mkPath(BASE_URL, "kind", ":kind", "selector", "date-range");
-
-        ListRoute<ChangeLogTally> findSummariesForDateRoute = (request, response) -> {
-
-            IdSelectionOptions idSelectionOptions = readIdSelectionOptionsFromBody(request);
-
-            Date date = getDate(request);
-            Optional<Integer> limit = getLimit(request);
-
-            return changeLogSummariesService.findCountByParentAndChildKindForDateBySelector(
-                    getKind(request),
-                    idSelectionOptions,
-                    date,
-                    limit);
-        };
+        String findSummariesForDateRangePath = mkPath(BASE_URL, "kind", ":kind", "selector");
 
         ListRoute<ChangeLogTally> findSummariesForDateRangeRoute = (request, response) -> {
 
@@ -88,7 +73,6 @@ public class ChangeLogSummariesEndpoint implements Endpoint {
                     limit);
         };
 
-        postForList(findSummariesForDatePath, findSummariesForDateRoute);
         postForList(findSummariesForDateRangePath, findSummariesForDateRangeRoute);
     }
 

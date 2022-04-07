@@ -51,20 +51,6 @@ public class ChangeLogSummariesService {
         this.changeLogSummariesDao = changeLogSummariesDao;
     }
 
-
-    public List<ChangeLogTally> findCountByParentAndChildKindForDateBySelector(EntityKind targetKind,
-                                                                               IdSelectionOptions options,
-                                                                               Date date,
-                                                                               Optional<Integer> limit) {
-
-        GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, options);
-
-        return changeLogSummariesDao.findCountByParentAndChildKindForDateBySelector(
-                genericSelector,
-                date,
-                limit);
-    }
-
     public List<ChangeLogTally> findCountByParentAndChildKindForDateRangeBySelector(EntityKind targetKind,
                                                                                     IdSelectionOptions options,
                                                                                     Date startDate,
