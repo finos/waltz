@@ -28,7 +28,7 @@
     }
 
     function determineColumn(idx) {
-        return idx % dimensions.monthsPerLine + 1;
+        return idx % dimensions.monthsPerLine;
     }
 
     function setStartDate(date) {
@@ -45,13 +45,13 @@
 <CalendarHeatmapControlPanel {startDate} {endDate} {setStartDate} {setEndDate}/>
 
 <svg width={dimensions.diagram.width}
-     height={dimensions.monthHeight * diagramRows}
-     viewBox={`0 0 ${dimensions.diagram.width * (1 + 1/dimensions.monthsPerLine)} ${dimensions.monthHeight * diagramRows}`}>
+     height={dimensions.month.height * diagramRows}
+     viewBox={`0 0 ${dimensions.diagram.width * (1 + 1/dimensions.monthsPerLine)} ${dimensions.month.height * diagramRows}`}>
     <g>
         {#each months as monthData, idx}
-            <g transform={`translate(${determineColumn(idx) * dimensions.monthWidth}, ${determineRow(idx) * dimensions.monthHeight})`}>
+            <g transform={`translate(${determineColumn(idx) * dimensions.month.width}, ${determineRow(idx) * dimensions.month.height})`}>
                 <g>
-                    <rect width={dimensions.monthWidth}
+                    <rect width={dimensions.month.width}
                           height={30}
                           class="clickable"
                           on:mouseenter={() => hoveredMonth = idx}
@@ -60,9 +60,9 @@
                           on:click={() => onSelectMonth(_.map(monthData.days, d => d.date))}>
                     </rect>
                 </g>
-                <text transform={`translate(${7 * dimensions.dayWidth / 2})`}
+                <text transform={`translate(${7 * dimensions.day.width / 2})`}
                       text-anchor="middle"
-                      dx={dimensions.dayWidth /4}
+                      dx={dimensions.day.width /4}
                       dy="20"
                       fill="#aaa"
                       pointer-events="none">

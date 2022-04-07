@@ -73,7 +73,6 @@ function controller(serviceBroker) {
     };
 
     vm.onSelectDateRange = (dates) => {
-        console.log({dates});
         vm.startDate = moment(_.min(dates)).format("YYYY-MM-DD");
         vm.endDate = moment(_.max(dates)).format("YYYY-MM-DD");
         loadChangeSummariesForDateRange();

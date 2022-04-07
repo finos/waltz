@@ -41,15 +41,15 @@
 </script>
 
 {#each weeks as week}
-    <g transform={`translate(${dimensions.weekPadding / 2}, ${dimensions.dayWidth * (week)})`}>
+    <g transform={`translate(${dimensions.weekPadding / 2}, ${dimensions.day.width * (week)})`}>
         <rect fill={hoveredWeek === week ? "#eee" : "#fff"}
               class="clickable week"
               on:mouseenter={() => hoveredWeek = week}
               on:mouseleave={() => hoveredWeek = null}
               x={dimensions.weekPadding * -2}
-              y="{(dimensions.dayWidth / 2 * -1)}"
-              width={dimensions.dayWidth * 7 + dimensions.weekPadding}
-              height={dimensions.dayWidth}
+              y="{(dimensions.day.width / 2 * -1)}"
+              width={dimensions.day.width * 7 + dimensions.weekPadding}
+              height={dimensions.day.width}
               on:click={() => onSelectWeek(weekDayInfo[week])}>
         </rect>
     </g>

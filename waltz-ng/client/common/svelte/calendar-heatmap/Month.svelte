@@ -16,8 +16,8 @@
 
         const dayOffset = i + offset;
 
-        let dx = dayOffset % 7 * dimensions.dayWidth;
-        let dy = (Math.floor(dayOffset / 7)) * dimensions.dayWidth;
+        let dx = dayOffset % 7 * dimensions.day.width;
+        let dy = (Math.floor(dayOffset / 7)) * dimensions.day.width;
 
         return `translate(${dx}, ${dy})`
     }

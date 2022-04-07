@@ -77,9 +77,13 @@ export const dimensions = {
         width: 2400,
         height: 800
     },
-    dayWidth: 20,
-    monthWidth: 150,
-    monthHeight: 160,
+    day: {
+        width: 20
+    },
+    month: {
+        width: 150,
+        height: 160
+    },
     circleRadius: 8,
     weekPadding: 10,
     monthsPerLine: 6
