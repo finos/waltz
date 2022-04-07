@@ -1,54 +1,54 @@
 <script>
 
-    import {chunkMonths} from "./calendar-heatmap-utils";
-    import Day from "./Day.svelte";
+    import {dimensions, monthNames, prepareMonthData} from "./calendar-heatmap-utils";
     import Month from "./Month.svelte";
-    import {scaleLinear} from "d3";
+    import {scaleSqrt} from "d3-scale";
     import _ from "lodash";
 
     export let data = [];
     export let onSelectDate = (x) => console.log("selecting date", x);
+    export let onSelectWeek = (x) => console.log("selecting week", x);
+    export let onSelectMonth = (x) => console.log("selecting month", x);
 
+    $: colorScale = scaleSqrt().domain([0, maxValue?.count]).range(["#e7fae2", "#07ed4a"]);
 
-    $: console.log({data, onSelectDate});
-    let today = new Date();
-    chunkMonths(data, today, today)
+    let startDate = new Date("2021-08-01");
+    let endDate = new Date("2022-10-01");
 
+    $: maxValue = _.maxBy(data, d => d.count);
 
-    function mkVal() {
-        if (Math.random() > 0.7) {
-            return 0;
-        } else {
-            return Math.random() * 10;
-        }
+    $: months = prepareMonthData(data, startDate, endDate);
+
+    function determineRow(idx) {
+        return Math.floor(idx / dimensions.monthsPerLine);
     }
 
-    const colorScale = scaleLinear().domain([0, 10]).range(["yellow", "red"]);
-
-    function mkDays(numDays) {
-        return _.map(_.range(numDays), x => ({date: new Date(`2022-04-${x + 1}`), value: mkVal()}));
+    function determineColumn(idx) {
+        return idx % dimensions.monthsPerLine + 1;
     }
 
 
-    function daysInMonth(month, year) {
-        return new Date(year, month, 0).getDate();
-    }
-
-    const months = _.map(_.range(12), d => ({
-        startDate: new Date(`2022-${d + 1}-01`),
-        days: mkDays(daysInMonth(d + 1, 2022))
-    }));
-
-    $: console.log(_.map(months, d => d.days.length))
 </script>
 
 <h4>Hello there!</h4>
 
-<svg width="1000" height="100" viewBox="0 0 1800 200">
+<svg width="2400" height="800" viewBox="0 0 2400 800">
     <g>
         {#each months as monthData, idx}
-            <g transform={`translate(${idx * 150}, 0)`}>
-                <Month monthData={monthData} {colorScale}>
+            <g transform={`translate(${determineColumn(idx) * dimensions.monthWidth}, ${determineRow(idx) * dimensions.monthWidth})`}>
+                <text transform={`translate(${7 * dimensions.dayWidth / 2})`}
+                      class="clickable"
+                      text-anchor="middle"
+                      dx={dimensions.dayWidth}
+                      dy="25"
+                      fill="#aaa"
+                      on:click={() => onSelectMonth(_.map(monthData.days, d => d.date))}>
+                    {monthNames[monthData?.startDate.getMonth()]}
+                </text>
+                <Month monthData={monthData}
+                       {colorScale}
+                       {onSelectDate}
+                       {onSelectWeek}>
                 </Month>
             </g>
         {/each}

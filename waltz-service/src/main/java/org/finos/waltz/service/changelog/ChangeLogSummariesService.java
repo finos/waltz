@@ -64,4 +64,19 @@ public class ChangeLogSummariesService {
                 date,
                 limit);
     }
+
+    public List<ChangeLogTally> findCountByParentAndChildKindForDateRangeBySelector(EntityKind targetKind,
+                                                                                    IdSelectionOptions options,
+                                                                                    Date startDate,
+                                                                                    Date endDate,
+                                                                                    Optional<Integer> limit) {
+
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, options);
+
+        return changeLogSummariesDao.findCountByParentAndChildKindForDateRangeBySelector(
+                genericSelector,
+                startDate,
+                endDate,
+                limit);
+    }
 }

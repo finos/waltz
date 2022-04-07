@@ -44,7 +44,12 @@ import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+
+import java.sql.Date;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotEmpty;
@@ -105,8 +110,25 @@ public class ChangeLogService {
     }
 
 
+    public List<ChangeLog> findByParentReferenceForDateRange(EntityReference ref,
+                                                             Date startDate,
+                                                             Date endDate,
+                                                             Optional<Integer> limit) {
+        checkNotNull(ref, "ref must not be null");
+        return changeLogDao.findByParentReferenceForDateRange(ref, startDate, endDate, limit);
+    }
+
+
+    public List<ChangeLog> findByPersonReferenceForDateRange(EntityReference ref,
+                                                             Date startDate,
+                                                             Date endDate,
+                                                             Optional<Integer> limit) {
+        checkNotNull(ref, "ref must not be null");
+        return changeLogDao.findByPersonReferenceForDateRange(ref, startDate, endDate, limit);
+    }
+
     public List<ChangeLog> findByParentReference(EntityReference ref,
-                                                 Optional<Date> date,
+                                                 Optional<java.util.Date> date,
                                                  Optional<Integer> limit) {
         checkNotNull(ref, "ref must not be null");
         return changeLogDao.findByParentReference(ref, date, limit);
@@ -114,7 +136,7 @@ public class ChangeLogService {
 
 
     public List<ChangeLog> findByPersonReference(EntityReference ref,
-                                                 Optional<Date> date,
+                                                 Optional<java.util.Date> date,
                                                  Optional<Integer> limit) {
         checkNotNull(ref, "ref must not be null");
         return changeLogDao.findByPersonReference(ref, date, limit);

@@ -21,6 +21,8 @@ import template from "./change-summaries-panel.html";
 import {mkSelectionOptions} from "../../../common/selector-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import CalendarHeatmap from "../../../common/svelte/calendar-heatmap/CalendarHeatmap.svelte"
+import moment from "moment";
+import _ from "lodash";
 
 const modes = {
     LOADING: "LOADING",
@@ -63,22 +65,33 @@ function controller(serviceBroker) {
     };
 
     vm.onSelectDate = (date) => {
-        vm.selectedDate = date;
-        loadChangeSummaries();
+        const dateStr = moment(date).format("YYYY-MM-DD");
+        vm.startDate = dateStr;
+        vm.endDate = dateStr;
+        loadChangeSummariesForDateRange();
         vm.mode = modes.DATE_SELECTED;
     };
 
-    vm.onDetailSelect = (ref, date) => {
+    vm.onSelectDateRange = (dates) => {
+        console.log({dates});
+        vm.startDate = moment(_.min(dates)).format("YYYY-MM-DD");
+        vm.endDate = moment(_.max(dates)).format("YYYY-MM-DD");
+        loadChangeSummariesForDateRange();
+        vm.mode = modes.DATE_SELECTED;
+    };
+
+    vm.onDetailSelect = (ref, startDate, endDate) => {
         vm.mode = modes.LOADING;
         serviceBroker
             .loadViewData(
-                CORE_API.ChangeLogStore.findByEntityReferenceForDate,
-                [ref, date])
+                CORE_API.ChangeLogStore.findByEntityReferenceForDateRange,
+                [ref, startDate, endDate])
             .then(r => {
                 vm.detail = {
                     ref,
                     entries: r.data,
-                    date
+                    startDate,
+                    endDate
                 };
                 vm.mode = modes.DETAIL_SELECTED;
             })
@@ -97,12 +110,12 @@ function controller(serviceBroker) {
     };
 
 
-    function loadChangeSummaries() {
+    function loadChangeSummariesForDateRange() {
         vm.mode = modes.LOADING;
         serviceBroker
             .loadViewData(
-                CORE_API.ChangeLogSummariesStore.findSummariesForKindBySelector,
-                ["APPLICATION", mkSelectionOptions(vm.parentEntityRef), vm.selectedDate])
+                CORE_API.ChangeLogSummariesStore.findSummariesForKindBySelectorForDateRange,
+                ["APPLICATION", mkSelectionOptions(vm.parentEntityRef), vm.startDate, vm.endDate])
             .then(r => {
                 vm.summaries = r.data;
             });

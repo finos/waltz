@@ -123,8 +123,35 @@ public class ChangeLogSummariesDao {
                 .from(CHANGE_LOG)
                 .where(dsl
                         .renderInlined(CHANGE_LOG.PARENT_ID.in(genericSelector.selector())
-                        .and(CHANGE_LOG.PARENT_KIND.eq(genericSelector.kind().name()))
-                        .and(dateRangeCondition)))
+                                .and(CHANGE_LOG.PARENT_KIND.eq(genericSelector.kind().name()))
+                                .and(dateRangeCondition)))
+                .groupBy(CHANGE_LOG.PARENT_ID, CHANGE_LOG.PARENT_KIND, CHANGE_LOG.CHILD_KIND)
+                .orderBy(count.desc())
+                .limit(limit.orElse(Integer.MAX_VALUE))
+                .fetch(TO_CHANGE_LOG_TALLY_MAPPER);
+    }
+
+
+    public List<ChangeLogTally> findCountByParentAndChildKindForDateRangeBySelector(GenericSelector genericSelector,
+                                                                                    Date startDate,
+                                                                                    Date endDate,
+                                                                                    Optional<Integer> limit) {
+        checkNotNull(genericSelector, "genericSelector must not be null");
+
+        AggregateFunction<Integer> count = DSL.count(CHANGE_LOG.ID);
+        Condition dateRangeCondition = mkDateRangeCondition(CHANGE_LOG.CREATED_AT, startDate, endDate);
+
+        return dsl
+                .select(CHANGE_LOG.PARENT_ID,
+                        CHANGE_LOG.PARENT_KIND,
+                        ENTITY_NAME_FIELD,
+                        CHANGE_LOG.CHILD_KIND,
+                        count)
+                .from(CHANGE_LOG)
+                .where(dsl
+                        .renderInlined(CHANGE_LOG.PARENT_ID.in(genericSelector.selector())
+                                .and(CHANGE_LOG.PARENT_KIND.eq(genericSelector.kind().name()))
+                                .and(dateRangeCondition)))
                 .groupBy(CHANGE_LOG.PARENT_ID, CHANGE_LOG.PARENT_KIND, CHANGE_LOG.CHILD_KIND)
                 .orderBy(count.desc())
                 .limit(limit.orElse(Integer.MAX_VALUE))

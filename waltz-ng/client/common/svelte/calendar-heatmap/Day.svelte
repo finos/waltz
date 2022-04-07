@@ -1,10 +1,32 @@
 <script>
 
-    export let data;
-    export let color = "red";
+    import {dimensions} from "./calendar-heatmap-utils";
 
+    export let data;
+    export let color = "#E2F0FD";
+    export let stroke = "#1F7FE0";
+    export let onSelect = (x) => console.log("selecting date", x);
+
+    const today = new Date();
+    const noData = data.value === 0;
 
 </script>
 
 
-<circle on:mouseover={() => console.log({data})} r="10" fill={data.value === 0 ? "#ccc" : color}></circle>
+<circle class:future={data.date > today}
+        class="clickable"
+        r={dimensions.circleRadius}
+        fill={noData ? "#eee" : color}
+        stroke={noData ? "#bbb" : stroke}
+        on:click={() => onSelect(data.date)}>
+</circle>
+
+
+<style>
+
+    .future {
+        stroke-dasharray: 2, 2;
+        fill: #f9f9f9
+    }
+
+</style>
