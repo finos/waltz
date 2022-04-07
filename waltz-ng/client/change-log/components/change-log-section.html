@@ -18,36 +18,70 @@
 
 <div>
 
-    <div ng-if="$ctrl.entries.length > 0">
-        <waltz-change-log-table entries="$ctrl.entries"
-                                on-initialise="$ctrl.changeLogTableInitialised">
-        </waltz-change-log-table>
+    <div class="waltz-tabs col-md-12">
+        <!-- TAB HEADERS -->
+        <input type="radio"
+               value="table"
+               ng-model="$ctrl.activeTab"
+               id="table">
+        <label class="wt-label"
+               ng-model="$ctrl.activeTab"
+               for="table">
+            <span>Table</span>
+        </label>
 
-        <br>
+        <input type="radio"
+               value="calendar"
+               ng-model="$ctrl.activeTab"
+               id="calendar">
+        <label class="wt-label"
+               for="calendar">
+            <span>Change Calendar</span>
+        </label>
 
-        <div class="pull-right"
-             ng-if="$ctrl.parentEntityRef">
-            <a class="clickable"
-               ui-sref="main.change-log.view ($ctrl.parentEntityRef)">
-                Show all changes
-            </a>
-            |
-            <a class="clickable"
-               ng-click="$ctrl.refresh()">
-                Refresh now
-            </a>
-            |&nbsp;
-            <waltz-data-extract-link name="Export"
-                                     styling="link"
-                                     extract="change-log/{{$ctrl.parentEntityRef.kind}}/{{$ctrl.parentEntityRef.id}}"
-                                     method="POST">
-            </waltz-data-extract-link>
+        <div class="wt-tab wt-active">
+            <div ng-if="$ctrl.activeTab === 'calendar'"
+                 style="padding-top: 1em; padding-bottom: 0.7em; padding-left:1em">
+                <waltz-change-summaries-panel parent-entity-ref="$ctrl.parentEntityRef">
+                </waltz-change-summaries-panel>
+            </div>
+            <div ng-if="$ctrl.activeTab === 'table'"
+                 style="padding-top: 1em; padding-bottom: 0.7em; padding-left:1em">
+
+                <div ng-if="$ctrl.entries.length > 0">
+                    <waltz-change-log-table entries="$ctrl.entries"
+                                            on-initialise="$ctrl.changeLogTableInitialised">
+                    </waltz-change-log-table>
+
+                    <br>
+
+                    <div class="pull-right"
+                         ng-if="$ctrl.parentEntityRef">
+                        <a class="clickable"
+                           ui-sref="main.change-log.view ($ctrl.parentEntityRef)">
+                            Show all changes
+                        </a>
+                        |
+                        <a class="clickable"
+                           ng-click="$ctrl.refresh()">
+                            Refresh now
+                        </a>
+                        |&nbsp;
+                        <waltz-data-extract-link name="Export"
+                                                 styling="link"
+                                                 extract="change-log/{{$ctrl.parentEntityRef.kind}}/{{$ctrl.parentEntityRef.id}}"
+                                                 method="POST">
+                        </waltz-data-extract-link>
+                    </div>
+
+                </div>
+                <waltz-no-data ng-if="$ctrl.entries.length == 0">
+                    <message>
+                        <strong>No changes yet</strong>
+                    </message>
+                </waltz-no-data>
+            </div>
         </div>
 
     </div>
-    <waltz-no-data ng-if="$ctrl.entries.length == 0">
-        <message>
-            <strong>No changes yet</strong>
-        </message>
-    </waltz-no-data>
 </div>

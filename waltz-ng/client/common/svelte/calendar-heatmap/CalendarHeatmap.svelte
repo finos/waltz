@@ -4,6 +4,7 @@
     import Month from "./Month.svelte";
     import {scaleSqrt} from "d3-scale";
     import _ from "lodash";
+    import CalendarHeatmapControlPanel from "./CalendarHeatmapControlPanel.svelte";
 
     export let data = [];
     export let onSelectDate = (x) => console.log("selecting date", x);
@@ -12,12 +13,15 @@
 
     $: colorScale = scaleSqrt().domain([0, maxValue?.count]).range(["#e7fae2", "#07ed4a"]);
 
-    let startDate = new Date("2021-08-01");
-    let endDate = new Date("2022-10-01");
+    const today = new Date();
+
+    let startDate = new Date(today.getFullYear() - 1, today.getMonth() + 1, 1);
+    let endDate = today;
+    let hoveredMonth;
 
     $: maxValue = _.maxBy(data, d => d.count);
-
     $: months = prepareMonthData(data, startDate, endDate);
+    $: diagramRows = Math.ceil(months.length / dimensions.monthsPerLine);
 
     function determineRow(idx) {
         return Math.floor(idx / dimensions.monthsPerLine);
@@ -27,22 +31,41 @@
         return idx % dimensions.monthsPerLine + 1;
     }
 
+    function setStartDate(date) {
+        startDate = new Date(date);
+    }
+
+    function setEndDate(date) {
+        endDate = new Date(date);
+    }
+
 
 </script>
 
-<h4>Hello there!</h4>
+<CalendarHeatmapControlPanel {startDate} {endDate} {setStartDate} {setEndDate}/>
 
-<svg width="2400" height="800" viewBox="0 0 2400 800">
+<svg width={dimensions.diagram.width}
+     height={dimensions.monthHeight * diagramRows}
+     viewBox={`0 0 ${dimensions.diagram.width * (1 + 1/dimensions.monthsPerLine)} ${dimensions.monthHeight * diagramRows}`}>
     <g>
         {#each months as monthData, idx}
-            <g transform={`translate(${determineColumn(idx) * dimensions.monthWidth}, ${determineRow(idx) * dimensions.monthWidth})`}>
+            <g transform={`translate(${determineColumn(idx) * dimensions.monthWidth}, ${determineRow(idx) * dimensions.monthHeight})`}>
+                <g>
+                    <rect width={dimensions.monthWidth}
+                          height={30}
+                          class="clickable"
+                          on:mouseenter={() => hoveredMonth = idx}
+                          on:mouseleave={() => hoveredMonth = null}
+                          fill={hoveredMonth === idx ? "#eee" : "#fff"}
+                          on:click={() => onSelectMonth(_.map(monthData.days, d => d.date))}>
+                    </rect>
+                </g>
                 <text transform={`translate(${7 * dimensions.dayWidth / 2})`}
-                      class="clickable"
                       text-anchor="middle"
-                      dx={dimensions.dayWidth}
-                      dy="25"
+                      dx={dimensions.dayWidth /4}
+                      dy="20"
                       fill="#aaa"
-                      on:click={() => onSelectMonth(_.map(monthData.days, d => d.date))}>
+                      pointer-events="none">
                     {monthNames[monthData?.startDate.getMonth()]}
                 </text>
                 <Month monthData={monthData}

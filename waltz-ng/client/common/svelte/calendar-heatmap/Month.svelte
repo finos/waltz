@@ -24,7 +24,7 @@
 
 </script>
 
-<g transform="translate(20, 50)">
+<g transform="translate(15, 40)">
     <Weeks {onSelectWeek}
            {monthData}>
     </Weeks>

@@ -73,8 +73,13 @@ export function daysInMonth(month, year) {
 export const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 export const dimensions = {
+    diagram: {
+        width: 2400,
+        height: 800
+    },
     dayWidth: 20,
     monthWidth: 150,
+    monthHeight: 160,
     circleRadius: 8,
     weekPadding: 10,
     monthsPerLine: 6

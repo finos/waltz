@@ -28,11 +28,6 @@
                                 on-select-week="$ctrl.onSelectDateRange">
         </waltz-svelte-component>
 
-        <waltz-calendar-heatmap data="$ctrl.heatmapData"
-                                on-select-date="$ctrl.onSelectDate">
-        </waltz-calendar-heatmap>
-
-
         <div ng-switch="$ctrl.mode">
             <waltz-loading-notification ng-switch-when="LOADING"
                                         style="height: 200px"
@@ -40,7 +35,7 @@
             </waltz-loading-notification>
 
             <div ng-switch-when="NO_SELECTION" class="help-block">
-                Select a cell above to see a events that occurred on that day
+                Select a day, week or month above to see the events that occurred over that time period
             </div>
 
             <waltz-change-breakdown-table ng-switch-when="DATE_SELECTED"
