@@ -42,8 +42,6 @@
 
 </script>
 
-<CalendarHeatmapControlPanel {startDate} {endDate} {setStartDate} {setEndDate}/>
-
 <svg width={dimensions.diagram.width}
      height={dimensions.month.height * diagramRows}
      viewBox={`0 0 ${dimensions.diagram.width * (1 + 1/dimensions.monthsPerLine)} ${dimensions.month.height * diagramRows}`}>
@@ -77,3 +75,5 @@
         {/each}
     </g>
 </svg>
+
+<CalendarHeatmapControlPanel {startDate} {endDate} {setStartDate} {setEndDate}/>

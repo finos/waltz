@@ -5,6 +5,7 @@
 
     export let onSelectWeek = (d) => console.log("selecting week", d);
     export let monthData = [];
+    export let hoveredDay = null;
 
     let hoveredWeek = null;
 
@@ -38,11 +39,15 @@
         .mapValues(v => _.map(v, d => d.day.date))
         .value();
 
+    $: highlightedWeek = hoveredDay === null
+        ? hoveredWeek
+        : Math.floor((day + hoveredDay) / 7)
+
 </script>
 
 {#each weeks as week}
     <g transform={`translate(${dimensions.weekPadding / 2}, ${dimensions.day.width * (week)})`}>
-        <rect fill={hoveredWeek === week ? "#eee" : "#fff"}
+        <rect fill={highlightedWeek === week ? "#eee" : "#fff"}
               class="clickable week"
               on:mouseenter={() => hoveredWeek = week}
               on:mouseleave={() => hoveredWeek = null}

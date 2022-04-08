@@ -9,6 +9,8 @@
     export let onSelectDate = (x) => console.log("selecting date", x);
     export let onSelectWeek = (x) => console.log("selecting week", x);
 
+    let hoveredDay;
+
     $: offset = monthData?.startDate.getDay();
     $: month = monthData?.startDate.getMonth();
 
@@ -26,13 +28,16 @@
 
 <g transform="translate(15, 40)">
     <Weeks {onSelectWeek}
-           {monthData}>
+           {monthData}
+           {hoveredDay}>
     </Weeks>
     {#each monthData.days as day, i}
-        <g transform={mkTranslate(i)}>
+        <g on:mouseenter={() => hoveredDay = i}
+           on:mouseleave={() => hoveredDay = null}
+           transform={mkTranslate(i)}>
             <Day data={day}
                  color={colorScale(day.value)}
-                 stroke="#bbb"
+                 stroke={hoveredDay === i ? "black" : "#bbb"}
                  onSelect={onSelectDate}/>
         </g>
     {/each}

@@ -31,10 +31,10 @@
         <div class="col-sm-6"></div>
     </div>
     <div class="row">
-        <div class="col-sm-12">
+        <div class="col-sm-12" style="padding-bottom: 2em;">
             <button class="btn btn-skinny"
                     on:click={() => changeDateSelection = false}>
-                Cancel
+                Close
                 <Icon name="times"/>
             </button>
         </div>
