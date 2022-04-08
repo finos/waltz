@@ -22,6 +22,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import template from "./app-group-edit.html";
 import {mkSelectionOptions} from "../../../common/selector-utils";
 import toasts from "../../../svelte-stores/toast-store";
+import {displayError} from "../../../common/error-utils";
 
 const initialState = {
     changeInitiatives: [],
@@ -50,10 +51,6 @@ function setup(groupDetail) {
     };
 }
 
-
-function handleError(e) {
-    alert(e.data.message);
-}
 
 
 function navigateToLastView($state, historyStore) {
@@ -136,16 +133,18 @@ function controller($q,
         serviceBroker
             .execute(CORE_API.AppGroupStore.addApplication, [id, app.id])
             .then(r => r.data)
-            .then(apps => vm.applications = apps, e => handleError(e))
-            .then(() => toasts.success("Added: " + app.name));
+            .then(apps => vm.applications = apps)
+            .then(() => toasts.success("Added: " + app.name))
+            .catch(e => displayError("Could not add application", e));
     };
 
     vm.addToCIGroup = (ci) => {
         serviceBroker
             .execute(CORE_API.AppGroupStore.addChangeInitiative, [id, ci.id])
             .then(r => r.data)
-            .then(cis => vm.changeInitiatives = cis, e => handleError(e))
-            .then(() => toasts.success("Added: " + ci.name));
+            .then(cis => vm.changeInitiatives = cis)
+            .then(() => toasts.success("Added: " + ci.name))
+            .catch(e => displayError("Could not add change initiative", e));
     };
 
 
@@ -153,16 +152,20 @@ function controller($q,
         serviceBroker
             .execute(CORE_API.AppGroupStore.removeApplication, [id, app.id])
             .then(r => r.data)
-            .then(apps => vm.applications = apps, e => handleError(e))
-            .then(() => toasts.warning("Removed: " + app.name));
+            .then(apps => vm.applications = apps)
+            .then(() => toasts.warning("Removed: " + app.name))
+            .catch(e => toasts.error("Could not remove application: " + app.name, e))
+        ;
     };
 
     vm.addOrgUnitToGroup = (orgUnit) => {
         serviceBroker
             .execute(CORE_API.AppGroupStore.addOrganisationalUnit, [id, orgUnit.id])
             .then(r => r.data)
-            .then(orgUnits => vm.organisationalUnits = orgUnits, e => handleError(e))
-            .then(() => toasts.success("Added: " + orgUnit.name));
+            .then(orgUnits => vm.organisationalUnits = orgUnits)
+            .then(() => toasts.success("Added: " + orgUnit.name))
+            .catch(e => displayError("Could not add org unit", e));
+
     };
 
 
@@ -170,8 +173,9 @@ function controller($q,
         serviceBroker
             .execute(CORE_API.AppGroupStore.removeOrganisationalUnit, [id, orgUnit.id])
             .then(r => r.data)
-            .then(orgUnits => vm.organisationalUnits = orgUnits, e => handleError(e))
-            .then(() => toasts.warning("Removed: " + orgUnit.name));
+            .then(orgUnits => vm.organisationalUnits = orgUnits)
+            .then(() => toasts.warning("Removed: " + orgUnit.name))
+            .catch(e => displayError("Could not remove or unit", e));
     };
 
 
@@ -305,16 +309,19 @@ function controller($q,
                 .execute(CORE_API.AppGroupStore.addApplications,
                     [id, Object.assign({}, {applicationIds: appIdsToAdd, unknownIdentifiers: unknownIdentifiers})])
                 .then(r => r.data)
-                .then(apps => vm.applications = apps, e => handleError(e))
-                .then(() => toasts.success(`Added ${appIdsToAdd.length} applications`));
+                .then(apps => vm.applications = apps)
+                .then(() => toasts.success(`Added ${appIdsToAdd.length} applications`))
+                .catch(e => displayError("Could not add applications", e));
+
         }
 
         if (appIdsToRemove.length > 0) {
             serviceBroker
                 .execute(CORE_API.AppGroupStore.removeApplications, [id, appIdsToRemove])
                 .then(r => r.data)
-                .then(apps => vm.applications = apps, e => handleError(e))
-                .then(() => toasts.success(`Removed ${appIdsToRemove.length} applications`));
+                .then(apps => vm.applications = apps)
+                .then(() => toasts.success(`Removed ${appIdsToRemove.length} applications`))
+                .catch(e => displayError("Could not remove applications", e));
         }
 
         if (appIdsToRemove.length === 0 && appIdsToAdd.length === 0){
@@ -332,7 +339,8 @@ function controller($q,
             .then(() => {
                 removeFromHistory(historyStore, vm.appGroup);
                 navigateToLastView($state, historyStore);
-            });
+            })
+            .catch(e => displayError("Could not delete group", e));
     };
 
 
@@ -375,7 +383,8 @@ function controller($q,
                 .execute(CORE_API.AppGroupStore.addChangeInitiative, [id, changeInitiative.id])
                 .then(r => r.data)
                 .then(cis => vm.changeInitiatives = cis)
-                .then(() => toasts.success("Associated Change Initiative: " + changeInitiative.name));
+                .then(() => toasts.success("Associated Change Initiative: " + changeInitiative.name))
+                .catch(e => displayError("Could not add change initiative", e));
 
         });
 
@@ -383,7 +392,8 @@ function controller($q,
         .execute(CORE_API.AppGroupStore.removeChangeInitiative, [id, changeInitiative.id])
         .then(r => r.data)
         .then(cis => vm.changeInitiatives = cis)
-        .then(() => toasts.warning("Removed Change Initiative: " + changeInitiative.name));
+        .then(() => toasts.warning("Removed Change Initiative: " + changeInitiative.name))
+        .catch(e => displayError("Could not remove change initiative", e));
 
     vm.saveChangeInitiatives = (results) => {
         const changeInitiativeIdsToAdd = _.chain(results)
@@ -402,16 +412,18 @@ function controller($q,
                     CORE_API.AppGroupStore.addChangeInitiatives,
                     [id, Object.assign({}, {changeInitiativeIds: changeInitiativeIdsToAdd})])
                 .then(r => r.data)
-                .then(changeInitiatives => vm.changeInitiatives = changeInitiatives, e => handleError(e))
-                .then(() => toasts.success(`Added ${changeInitiativeIdsToAdd.length} change initiatives`));
+                .then(changeInitiatives => vm.changeInitiatives = changeInitiatives)
+                .then(() => toasts.success(`Added ${changeInitiativeIdsToAdd.length} change initiatives`))
+                .catch(e => displayError("Could not add change initiatives", e));
         }
 
         if (changeInitiativeIdsToRemove.length > 0) {
             serviceBroker
                 .execute(CORE_API.AppGroupStore.removeChangeInitiatives, [id, changeInitiativeIdsToRemove])
                 .then(r => r.data)
-                .then(changeInitiatives => vm.changeInitiatives = changeInitiatives, e => handleError(e))
-                .then(() => toasts.success(`Removed ${changeInitiativeIdsToRemove.length} change initiatives`));
+                .then(changeInitiatives => vm.changeInitiatives = changeInitiatives)
+                .then(() => toasts.success(`Removed ${changeInitiativeIdsToRemove.length} change initiatives`))
+                .catch(e => displayError("Could not remove change initiatives", e));
         }
 
         if (changeInitiativeIdsToAdd.length === 0 && changeInitiativeIdsToRemove.length === 0){
