@@ -344,7 +344,6 @@ function controller($q,
     };
 
 
-
     // add app via search
     vm.searchedApp = {};
 
@@ -355,12 +354,13 @@ function controller($q,
     }, true);
 
 
-    //add app via recently viewed
     vm.history = localStorageService
-        .get("history_2").filter(r => r.kind === "APPLICATION") || [];
+        .get("history_2") || [];
 
-    vm.changeInitiativeHistory = localStorageService
-        .get("history_2").filter(r => r.kind === "CHANGE_INITIATIVE") || [];
+
+    //add app via recently viewed
+    vm.applicationHistory = _.filter(vm.history, r => r.kind === "APPLICATION") || [];
+    vm.changeInitiativeHistory = _.filter(vm.history, r => r.kind === "CHANGE_INITIATIVE") || [];
 
     vm.addRecentViewed = (app) => {
         app.id = app.stateParams.id;

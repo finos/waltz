@@ -284,7 +284,7 @@
                         <!-- Recent selector -->
                         <div style="padding: 1em 0">
                             <ul class="list-unstyled">
-                                <li ng-repeat="app in ctrl.history">
+                                <li ng-repeat="app in ctrl.applicationHistory">
                                     <span ng-if="!ctrl.isAppInGroup(app.stateParams)"
                                           class='clickable'
                                           ng-click="ctrl.addRecentViewed(app)">
@@ -301,7 +301,7 @@
                                               style="text-decoration: line-through"></span>
                                     </span>
                                 </li>
-                                <waltz-no-data ng-if="ctrl.history.length == 0">
+                                <waltz-no-data ng-if="ctrl.applicationHistory.length == 0">
                                     <message>No information for this person</message>
                                 </waltz-no-data>
                             </ul>
