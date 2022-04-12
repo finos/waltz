@@ -37,6 +37,7 @@ import spark.Response;
 import spark.ResponseTransformer;
 
 import java.io.IOException;
+import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -355,7 +356,7 @@ public class WebUtilities {
     }
 
 
-    public static Optional<Date> getDateParam(Request request) {
+    public static Optional<java.util.Date> getDateParam(Request request) {
         String dateVal = request.queryParams("date");
         return Optional
                 .ofNullable(dateVal)

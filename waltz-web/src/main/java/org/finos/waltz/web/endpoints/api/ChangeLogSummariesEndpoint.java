@@ -57,28 +57,40 @@ public class ChangeLogSummariesEndpoint implements Endpoint {
     @Override
     public void register() {
 
-        String findSummariesForDatePath = mkPath(BASE_URL, "kind", ":kind", "selector");
+        String findSummariesForDateRangePath = mkPath(BASE_URL, "kind", ":kind", "selector");
 
-        ListRoute<ChangeLogTally> findSummariesForDateRoute = (request, response) -> {
+        ListRoute<ChangeLogTally> findSummariesForDateRangeRoute = (request, response) -> {
 
             IdSelectionOptions idSelectionOptions = readIdSelectionOptionsFromBody(request);
 
-            Date date = getDate(request);
             Optional<Integer> limit = getLimit(request);
 
-            return changeLogSummariesService.findCountByParentAndChildKindForDateBySelector(
+            return changeLogSummariesService.findCountByParentAndChildKindForDateRangeBySelector(
                     getKind(request),
                     idSelectionOptions,
-                    date,
+                    getStartDate(request),
+                    getEndDate(request),
                     limit);
         };
 
-        postForList(findSummariesForDatePath, findSummariesForDateRoute);
+        postForList(findSummariesForDateRangePath, findSummariesForDateRangeRoute);
     }
 
 
     private Date getDate(Request request) throws ParseException {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
         return toSqlDate(formatter.parse(request.queryParams("date")));
+    }
+
+
+    private Date getStartDate(Request request) throws ParseException {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        return toSqlDate(formatter.parse(request.queryParams("startDate")));
+    }
+
+
+    private Date getEndDate(Request request) throws ParseException {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        return toSqlDate(formatter.parse(request.queryParams("endDate")));
     }
 }

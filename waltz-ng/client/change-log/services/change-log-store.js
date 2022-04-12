@@ -36,6 +36,12 @@ function store($http, BaseApiUrl) {
             .then(result => result.data);
     };
 
+    const findByEntityReferenceForDateRange = (ref, startDate, endDate) => {
+        checkIsEntityRef(ref);
+        return $http
+            .get(`${BASE}/${ref.kind}/${ref.id}/date-range`, {params: {startDate, endDate}})
+            .then(result => result.data);
+    };
 
     const findUnattestedChangesByEntityReference = (ref) => {
         checkIsEntityRef(ref);
@@ -58,6 +64,7 @@ function store($http, BaseApiUrl) {
     return {
         findByEntityReference,
         findByEntityReferenceForDate,
+        findByEntityReferenceForDateRange,
         findUnattestedChangesByEntityReference,
         findForUserName,
         findSummaries,
@@ -83,6 +90,11 @@ export const ChangeLogStore_API = {
         serviceName,
         serviceFnName: "findByEntityReferenceForDate",
         description: "finds change log entries for a given entity reference and date"
+    },
+    findByEntityReferenceForDateRange: {
+        serviceName,
+        serviceFnName: "findByEntityReferenceForDateRange",
+        description: "finds change log entries for a given entity reference and date range"
     },
     findUnattestedChangesByEntityReference: {
         serviceName,

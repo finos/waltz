@@ -22,7 +22,8 @@ import {refToString} from "../../../common/entity-utils";
 
 const bindings = {
     summaries: "<",
-    selectedDate: "<?",
+    startDate: "<?",
+    endDate: "<?",
     onDismiss: "<?",
     onDetailSelect: "<?"
 };
@@ -96,7 +97,7 @@ function controller() {
 
     const vm = initialiseData(this, initialState);
 
-    vm.onRowSelect = (ref) => vm.onDetailSelect(ref, vm.selectedDate);
+    vm.onRowSelect = (ref) => vm.onDetailSelect(ref, vm.startDate, vm.endDate);
 
 
     vm.$onInit = () => {
