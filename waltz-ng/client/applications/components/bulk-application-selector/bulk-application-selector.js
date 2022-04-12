@@ -65,7 +65,7 @@ function mkSummary(searchResults = []) {
 
     const countsByFoundStatus = _.countBy(
         searchResults,
-        r => r.entityRef == null || r.rating === undefined
+        r => r.entityRef == null
             ? "notFound"
             : "found");
 
