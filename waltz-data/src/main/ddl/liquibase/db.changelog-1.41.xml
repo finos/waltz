@@ -297,4 +297,11 @@
                           remarks="the name of the cost kind"/>
     </changeSet>
 
+    <changeSet id="20220412-5998-1"
+               author="gerrian">
+        <comment>5998: Remove freshness indicator column from physical_flow table</comment>
+        <dropColumn tableName="physical_flow" columnName="freshness_indicator" />
+    </changeSet>
+
+
 </databaseChangeLog>
