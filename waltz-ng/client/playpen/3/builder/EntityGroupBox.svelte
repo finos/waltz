@@ -1,18 +1,16 @@
 <script>
 
     import GroupRow from "./GroupRow.svelte";
-    import {calcHeight} from "./overlay-diagram-utils";
+    import {calcHeight} from "./overlay-diagram-builder-utils";
 
     export let dimensions;
     export let group;
     export let height = 200;
     export let color;
-
-    $: console.log({color, group})
 </script>
 
 {#if dimensions}
-<g class="entity-group-box">
+<g class="entity-group-box"  data-group-id={group.id}>
     <rect class="outer"
           width={dimensions.w - (dimensions.padding + dimensions.group.padding) * 2}
           {height}>

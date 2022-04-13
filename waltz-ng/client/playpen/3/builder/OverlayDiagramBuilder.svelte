@@ -2,27 +2,29 @@
 
     import EntityGroupBox from "./EntityGroupBox.svelte";
     import {scaleLinear} from "d3-scale";
-    import {calcGroupHeight, calcHeight, calcTotalHeight, layout} from "./overlay-diagram-utils";
+    import {layout} from "./overlay-diagram-builder-utils";
 
 
 
-    const channels = { name: "Channels / Client Care" };
-    const cashManagement = { name: "Cash Management" };
-    const tradeFinance = { name: "Trade Finance" };
-    const securitiesServices = { name: "Securities Services" };
+    const channels = { id: "CHANNELS", name: "Channels / Client Care" };
+    const cashManagement = { id: "CASH_MGMT", name: "Cash Management" };
+    const tradeFinance = { id: "TRADE_FINANCE", name: "Trade Finance" };
+    const securitiesServices = { id: "SECURITIES", name: "Securities Services" };
 
-    const surveillance = { name: "Surveillance" };
-    const analytics = { name: "Analytics & Reporting" };
-    const controls = { name: "Controls" };
-    const billing = { name: "Billing" };
-    const informationManagement = { name: "Information Management" };
+    const surveillance = { id: "SURV", name: "Surveillance", associatedEntities: [{id: 19010, kind: "MEASURABLE"}] };
+    const analytics = { id: "REPORTING", name: "Analytics & Reporting" };
+    const controls = { id: "CONTROLS", name: "Controls" };
+    const billing = { id: "BILLING", name: "Billing" };
+    const informationManagement = { id:"INFO_MGMT", name: "Information Management" };
 
-    const afc = { name: "AFC" };
-    const compliance = { name: "Compliance" };
-    const finance = { name: "Finance" };
-    const risk = { name: "Risk" };
+    const afc = { id: "AFC", name: "Anti Financial Crime" };
+    const compliance = { id: "COMPLIANCE", name: "Compliance" };
+    const finance = { id: "FINANCE", name: "Finance" };
+    const risk = { id: "RISK", name: "Risk" };
+    const treasury = { id: "TREASURE", name: "Treasury" };
 
     const accessPoints = {
+        id: "ACCESS_POINTS",
         name: "Access Points & Business Lines",
         rows: [
             [ channels ],
@@ -31,6 +33,7 @@
     };
 
     const businessManagement = {
+        id: "BUS_MGMT",
         name: "Business Management & Operations",
         rows: [
             [ surveillance, analytics],
@@ -40,9 +43,10 @@
     };
 
     const controlFunctions = {
+        id: "CONTROL_FNS",
         name: "Control Functions / Service Integration",
         rows: [
-            [afc, compliance, finance, risk]
+            [afc, compliance, finance, risk/*, treasury*/]
         ]
     }
 
@@ -71,8 +75,6 @@
         .domain([0, data.length - 1])
         .range(["#DCEFEB", "#67B9A9"]);
 
-
-    console.log({dimensions, data});
 
 </script>
 

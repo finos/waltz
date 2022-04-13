@@ -10,9 +10,6 @@
 
 
     const cellWidth = rowWidth / row.length;
-
-
-    $: console.log({row, cellWidth});
 </script>
 
 

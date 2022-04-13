@@ -1,4 +1,4 @@
-import {toCumulativeCounts} from "../../common/list-utils";
+import {toCumulativeCounts} from "../../../common/list-utils";
 
 export function calcHeight(numRows, dimensions) {
     return numRows * dimensions.cell.height;
