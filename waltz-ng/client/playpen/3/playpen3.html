@@ -17,8 +17,22 @@
   -->
 
 <div>
-    <waltz-section>
-        <pre ng-bind="$ctrl.complexityKinds | json"></pre>
-        <pre ng-bind="$ctrl.complexities | json"></pre>
+
+    <waltz-section name="static"
+                   ng-if="$ctrl.svg">
+        <waltz-svelte-component component="$ctrl.OverlayDiagram"
+                                svg="$ctrl.svg">
+        </waltz-svelte-component>
     </waltz-section>
+
+    <waltz-section name="builder">
+        <waltz-svelte-component component="$ctrl.OverlayDiagramBuilder">
+        </waltz-svelte-component>
+    </waltz-section>
+
+    <waltz-section>
+        <waltz-svelte-component component="$ctrl.FlowVenn">
+        </waltz-svelte-component>
+    </waltz-section>
+
 </div>

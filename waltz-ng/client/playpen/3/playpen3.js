@@ -19,36 +19,36 @@
 import {initialiseData} from "../../common/index";
 import template from "./playpen3.html";
 import {CORE_API} from "../../common/services/core-api-utils";
+import FlowVenn from "../../logical-flow/svelte/flow-venn/FlowVenn.svelte";
+import OverlayDiagramBuilder from "./builder/OverlayDiagramBuilder.svelte";
+import OverlayDiagram from "./overlay/OverlayDiagram.svelte";
 
 
 const initialState = {
-    parentEntityRef: {
+    b: {
         id: 2732,
         kind: "ORG_UNIT",
         name: "A Group"
     },
-    parentEntityRef2: {
-        // id: 20506,
-        id: 20506,
-        kind: "APPLICATION",
-        name: "An app"
+    a: {
+        id: 2732,
+        kind: "ORG_UNIT",
+        name: "A Group"
     },
-    // schemeId: 2,
-    // selectedDate: null,
-    complexityKinds: []
+    FlowVenn,
+    OverlayDiagramBuilder,
+    OverlayDiagram
 };
 
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-
     serviceBroker
-        .loadViewData(CORE_API.ComplexityKindStore.findAll)
-        .then(r => vm.complexityKinds = r.data);
+        .loadViewData(CORE_API.SvgDiagramStore.findByGroup, ["STATIC_OVERLAY_1"])
+        .then(x => {
+            vm.svg = x.data[0].svg;
+        });
 
-    serviceBroker
-        .loadViewData(CORE_API.ComplexityStore.findByEntityReference, [vm.parentEntityRef2])
-        .then(r => vm.complexities = r.data);
 }
 
 controller.$inject = [
@@ -61,8 +61,7 @@ const view = {
     controller,
     controllerAs: "$ctrl",
     bindToController: true,
-    scope: {}
-};
+    scope: {}};
 
 
 export default view;
