@@ -37,8 +37,7 @@ import org.springframework.stereotype.Service;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.web.WebUtilities.*;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.getForDatum;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.postForList;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 
 @Service
 public class AggregateOverlayDiagramEndpoint implements Endpoint {
@@ -61,11 +60,17 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
     public void register() {
 
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
+        String findAllPath = mkPath(BASE_URL, "all");
         String findAppCountWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "app-count-widget");
         String findAppCostWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "app-cost-widget");
 
         DatumRoute<AggregateOverlayDiagram> getByIdRoute = (request, response) -> {
             return aggregateOverlayDiagramService.getById(getId(request));
+        };
+
+
+        ListRoute<AggregateOverlayDiagram> findAllRoute = (request, response) -> {
+            return aggregateOverlayDiagramService.findAll();
         };
 
 
@@ -88,6 +93,7 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
 
 
         getForDatum(getByIdPath, getByIdRoute);
+        getForList(findAllPath, findAllRoute);
         postForList(findAppCountWidgetDataPath, findAppCountWidgetDataRoute);
         postForList(findAppCostWidgetDataPath, findAppCostWidgetDataRoute);
     }

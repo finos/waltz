@@ -41,6 +41,11 @@ public class AggregateOverlayDiagramService {
     }
 
 
+    public Set<AggregateOverlayDiagram> findAll() {
+        return aggregateOverlayDiagramDao.findAll();
+    }
+
+
     public Set<CountWidgetDatum> findAppCountWidgetData(Long diagramId, IdSelectionOptions appSelectionOptions, LocalDate targetStateDate) {
 
         Select<Record1<Long>> applicationIdSelector = APPLICATION_ID_SELECTOR_FACTORY.apply(appSelectionOptions);

@@ -59,6 +59,14 @@ public class AggregateOverlayDiagramDao {
     }
 
 
+    public Set<AggregateOverlayDiagram> findAll() {
+        return dsl
+                .select(AGGREGATE_OVERLAY_DIAGRAM.fields())
+                .from(AGGREGATE_OVERLAY_DIAGRAM)
+                .fetchSet(TO_DOMAIN_MAPPER::map);
+    }
+
+
     protected Map<String, Set<Long>> fetchAndGroupAppIdsByCellId(Select<Record2<String, Long>> cellExtIdWithAppIdSelector) {
         return dsl
                 .selectQuery(cellExtIdWithAppIdSelector)

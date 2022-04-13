@@ -21,7 +21,7 @@
 
 
     onMount(() => {
-        svgCall = aggregateOverlayDiagramStore.getById(1);
+        svgCall = aggregateOverlayDiagramStore.getById(2);
     });
 
     $: diagram = $svgCall?.data;
