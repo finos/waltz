@@ -24,10 +24,14 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Request;
 
-import java.util.Date;
+import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Optional;
 
+import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
 import static org.finos.waltz.web.WebUtilities.*;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.getForList;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.postForList;
@@ -67,13 +71,28 @@ public class ChangeLogEndpoint implements Endpoint {
                 mkPath(BASE_URL, ":kind", ":id"),
                 (request, response) -> {
                     EntityReference ref = getEntityReference(request);
-                    Optional<Date> dateParam = getDateParam(request);
+                    Optional<java.util.Date> dateParam = getDateParam(request);
                     Optional<Integer> limitParam = getLimit(request);
 
-                    if(ref.kind() == EntityKind.PERSON) {
+                    if (ref.kind() == EntityKind.PERSON) {
                         return service.findByPersonReference(ref, dateParam, limitParam);
                     } else {
                         return service.findByParentReference(ref, dateParam, limitParam);
+                    }
+                });
+
+        getForList(
+                mkPath(BASE_URL, ":kind", ":id", "date-range"),
+                (request, response) -> {
+                    EntityReference ref = getEntityReference(request);
+                    java.sql.Date startDate = getStartDate(request);
+                    java.sql.Date endDate = getEndDate(request);
+                    Optional<Integer> limitParam = getLimit(request);
+
+                    if (ref.kind() == EntityKind.PERSON) {
+                        return service.findByPersonReferenceForDateRange(ref, startDate, endDate, limitParam);
+                    } else {
+                        return service.findByParentReferenceForDateRange(ref, startDate, endDate, limitParam);
                     }
                 });
 
@@ -85,5 +104,17 @@ public class ChangeLogEndpoint implements Endpoint {
                 });
 
 
+    }
+
+
+    private java.sql.Date getStartDate(Request request) throws ParseException {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        return toSqlDate(formatter.parse(request.queryParams("startDate")));
+    }
+
+
+    private java.sql.Date getEndDate(Request request) throws ParseException {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        return toSqlDate(formatter.parse(request.queryParams("endDate")));
     }
 }

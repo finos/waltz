@@ -321,15 +321,22 @@ public class JooqUtilities {
     }
 
 
+    public static Condition mkDateRangeCondition(TableField<ChangeLogRecord, Timestamp> field, java.sql.Date startDate, java.sql.Date endDate) {
+        long time = startDate.getTime();
+        Timestamp startOfStartDay = new Timestamp(time);
+
+        long startOfEndDate = endDate.getTime();
+        Timestamp startOfEndDay = new Timestamp(startOfEndDate);
+
+        long nextDay = getOneDayLater(startOfEndDay).getTime();
+        Timestamp startOfDayAfterEndDay = new Timestamp(nextDay);
+
+        return field.ge(startOfStartDay).and(field.lt(startOfDayAfterEndDay));
+    }
+
 
     public static Condition mkDateRangeCondition(TableField<ChangeLogRecord, Timestamp> field, java.sql.Date date) {
-        long time = date.getTime();
-        Timestamp startOfDay = new Timestamp(time);
-
-        long timeAfterDay = getOneDayLater(startOfDay).getTime();
-        Timestamp endOfDay = new Timestamp(timeAfterDay);
-
-        return field.ge(startOfDay).and(field.lt(endOfDay));
+        return mkDateRangeCondition(field, date, date);
     }
 
 

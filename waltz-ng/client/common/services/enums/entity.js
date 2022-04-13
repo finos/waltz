@@ -73,6 +73,13 @@ export const entity = {
         description: null,
         position: 62
     },
+    ASSESSMENT_RATING: {
+        key: "ASSESSMENT_RATING",
+        name: "Assessment Rating",
+        icon: "puzzle-piece",
+        description: null,
+        position: 63
+    },
     ATTESTATION: {
         key: "ATTESTATION",
         name: "Attestation",

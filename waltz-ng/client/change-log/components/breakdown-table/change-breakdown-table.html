@@ -17,16 +17,26 @@
   -->
 
 <div>
-    <div ng-if="$ctrl.selectedDate == null" class="text-muted">
+    <div ng-if="$ctrl.startDate == null" class="text-muted">
         <waltz-icon name="info-circle"></waltz-icon>
         <span>
             Select a date on the heatmap above to see the breakdown of changes across applications
         </span>
     </div>
-    <div ng-if="$ctrl.selectedDate">
+    <div ng-if="$ctrl.startDate">
         <h5>
-            <span ng-bind="$ctrl.selectedDate |  date:'yyyy-MM-dd'"></span>
-            changes
+            Changes
+            <span ng-if="$ctrl.startDate !== $ctrl.endDate">
+                between
+                <span ng-bind="$ctrl.startDate |  date:'yyyy-MM-dd'"></span>
+                and
+                <span ng-bind="$ctrl.endDate |  date:'yyyy-MM-dd'"></span>
+            </span>
+            <span ng-if="$ctrl.startDate == $ctrl.endDate">
+                on
+                <span ng-bind="$ctrl.startDate |  date:'yyyy-MM-dd'"></span>
+            </span>
+
             <span ng-if="$ctrl.total" class="text-muted">
                 ( Total: <span ng-bind="$ctrl.total"></span> )
             </span>

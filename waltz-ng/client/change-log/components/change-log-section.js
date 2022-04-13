@@ -28,7 +28,8 @@ const bindings = {
 
 
 const initialState = {
-    entries: []
+    entries: [],
+    activeTab: "table"
 };
 
 

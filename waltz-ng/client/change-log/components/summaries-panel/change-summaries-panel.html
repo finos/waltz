@@ -21,10 +21,12 @@
     </div>
     <div ng-if="$ctrl.heatmapData.length > 0">
 
-        <waltz-calendar-heatmap data="$ctrl.heatmapData"
-                                on-select-date="$ctrl.onSelectDate">
-        </waltz-calendar-heatmap>
-
+        <waltz-svelte-component component="$ctrl.CalendarHeatmap"
+                                data="$ctrl.heatmapData"
+                                on-select-date="$ctrl.onSelectDate"
+                                on-select-month="$ctrl.onSelectDateRange"
+                                on-select-week="$ctrl.onSelectDateRange">
+        </waltz-svelte-component>
 
         <div ng-switch="$ctrl.mode">
             <waltz-loading-notification ng-switch-when="LOADING"
@@ -33,22 +35,31 @@
             </waltz-loading-notification>
 
             <div ng-switch-when="NO_SELECTION" class="help-block">
-                Select a cell above to see a events that occurred on that day
+                Select a day, week or month above to see the events that occurred to applications over that time period
             </div>
 
             <waltz-change-breakdown-table ng-switch-when="DATE_SELECTED"
                                           summaries="$ctrl.summaries"
                                           on-dismiss="$ctrl.onClearSelectedDate"
                                           on-detail-select="$ctrl.onDetailSelect"
-                                          selected-date="$ctrl.selectedDate">
+                                          start-date="$ctrl.startDate"
+                                          end-date="$ctrl.endDate">
             </waltz-change-breakdown-table>
 
             <div ng-switch-when="DETAIL_SELECTED">
                 <h5>
                     Changes for
                     <waltz-entity-link entity-ref="$ctrl.detail.ref"></waltz-entity-link>
-                    on
-                    <span ng-bind="$ctrl.selectedDate |  date:'yyyy-MM-dd'"></span>
+                    <span ng-if="$ctrl.startDate === $ctrl.endDate">
+                        on
+                        <span ng-bind="$ctrl.startDate |  date:'yyyy-MM-dd'"></span>
+                    </span>
+                    <span ng-if="$ctrl.startDate !== $ctrl.endDate">
+                        between
+                        <span ng-bind="$ctrl.startDate |  date:'yyyy-MM-dd'"></span>
+                        and
+                        <span ng-bind="$ctrl.endDate |  date:'yyyy-MM-dd'"></span>
+                    </span>
                     :
                     <a class="pull-right clickable"
                        ng-click="$ctrl.onClearSelectedDetail()">
