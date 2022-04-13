@@ -21,7 +21,6 @@ import template from "./playpen3.html";
 import {CORE_API} from "../../common/services/core-api-utils";
 import FlowVenn from "../../logical-flow/svelte/flow-venn/FlowVenn.svelte";
 import OverlayDiagramBuilder from "./builder/OverlayDiagramBuilder.svelte";
-import OverlayDiagram from "./overlay/OverlayDiagram.svelte";
 
 
 const initialState = {
@@ -37,7 +36,6 @@ const initialState = {
     },
     FlowVenn,
     OverlayDiagramBuilder,
-    OverlayDiagram
 };
 
 function controller(serviceBroker) {

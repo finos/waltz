@@ -3,24 +3,23 @@
     import WidgetSelector from "./WidgetSelector.svelte";
 
     export let svg = "";
+    export let primaryEntityRef;
+    export let widgetComponent;
+    export let dataProvider;
 
     let svgHolderElem;
-    let dataProvider;
     let renderedWidgetRefs = {}; // this gets populated by the calls to `bind:this`
-    let widgetComponent;
 
-    function handleWidgetChange(e) {
-        widgetComponent = e.detail.widget;
-        dataProvider = e.detail.dataProvider;
-    }
+
+    $: console.log({primaryEntityRef});
 
     $: console.log({data: $dataProvider})
     $: cellDataByCellExtId = _.keyBy($dataProvider?.data, d => d.cellExternalId);
 
     $: {
         if (svgHolderElem && renderedWidgetRefs) {
-            _.each(renderedWidgetRefs, (v, k) =>{
-                if (! v) return;
+            _.each(renderedWidgetRefs, (v, k) => {
+                if (!v) return;
                 console.log({v, k})
                 const targetStatsBox = svgHolderElem.querySelector(`[data-cell-id=${k}] .statistics-box`);
 
@@ -36,8 +35,11 @@
                     return;
                 }
 
-                widgetRef.setAttribute("width", targetStatsBox.getAttribute("data-widget-width"));
-                widgetRef.setAttribute("height", targetStatsBox.getAttribute("data-widget-height"));
+                const statsBoundingBox = targetStatsBox.getBBox();
+                console.log({boundingBox: statsBoundingBox})
+
+                widgetRef.setAttribute("width", statsBoundingBox.width);
+                widgetRef.setAttribute("height", statsBoundingBox.height);
 
                 const existingWidget = targetStatsBox.querySelector(".widget");
                 if (existingWidget) {
@@ -51,15 +53,8 @@
 
 </script>
 
-<div class="row">
-    <div class="col-md-9">
-        <div bind:this={svgHolderElem}>
-            {@html svg}
-        </div>
-    </div>
-    <div class="col-md-3">
-        <WidgetSelector on:change={handleWidgetChange}/>
-    </div>
+<div bind:this={svgHolderElem}>
+    {@html svg}
 </div>
 
 {#key widgetComponent}  <!-- we want to destroy this section if the widget changes so the renderedWidgetRefs gets reset -->

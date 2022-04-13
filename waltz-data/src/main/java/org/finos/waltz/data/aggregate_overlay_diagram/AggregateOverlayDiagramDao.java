@@ -1,35 +1,61 @@
-package org.finos.waltz.data.overlay_diagram;
 
+package org.finos.waltz.data.aggregate_overlay_diagram;
+
+import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
-import org.jooq.DSLContext;
-import org.jooq.Record1;
-import org.jooq.Record2;
-import org.jooq.Select;
+import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
+import org.finos.waltz.model.aggregate_overlay_diagram.ImmutableAggregateOverlayDiagram;
+import org.finos.waltz.schema.tables.records.AggregateOverlayDiagramRecord;
+import org.jooq.*;
 import org.jooq.impl.DSL;
-import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.Map;
 import java.util.Set;
 
 import static java.util.stream.Collectors.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.data.JooqUtilities.readRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
-import static org.finos.waltz.schema.tables.JwsOverlayDiagramCellData.JWS_OVERLAY_DIAGRAM_CELL_DATA;
+import static org.finos.waltz.schema.Tables.AGGREGATE_OVERLAY_DIAGRAM;
+import static org.finos.waltz.schema.Tables.AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository
-public class OverlayDiagramDao {
+public class AggregateOverlayDiagramDao {
+
+    private static final RecordMapper<? super Record, ? extends AggregateOverlayDiagram> TO_DOMAIN_MAPPER = r -> {
+        AggregateOverlayDiagramRecord record = r.into(AGGREGATE_OVERLAY_DIAGRAM);
+        return ImmutableAggregateOverlayDiagram.builder()
+                .id(record.getId())
+                .name(record.getName())
+                .description(record.getDescription())
+                .svg(record.getSvg())
+                .lastUpdatedAt(toLocalDateTime(record.getLastUpdatedAt()))
+                .lastUpdatedBy(record.getLastUpdatedBy())
+                .provenance(record.getProvenance())
+                .build();
+    };
 
     protected final DSLContext dsl;
 
 
     @Autowired
-    public OverlayDiagramDao(DSLContext dsl) {
+    public AggregateOverlayDiagramDao(DSLContext dsl) {
         checkNotNull(dsl, "dsl must not be null");
         this.dsl = dsl;
+    }
+
+
+    public AggregateOverlayDiagram getById(Long diagramId) {
+        return dsl
+                .select(AGGREGATE_OVERLAY_DIAGRAM.fields())
+                .from(AGGREGATE_OVERLAY_DIAGRAM)
+                .where(AGGREGATE_OVERLAY_DIAGRAM.ID.eq(diagramId))
+                .fetchOne(TO_DOMAIN_MAPPER);
     }
 
 
@@ -66,21 +92,21 @@ public class OverlayDiagramDao {
         ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
 
         Set<Select<Record2<String, Long>>> stuffToUnion = dsl
-                .select(JWS_OVERLAY_DIAGRAM_CELL_DATA.CELL_EXTERNAL_ID,
-                        JWS_OVERLAY_DIAGRAM_CELL_DATA.RELATED_ENTITY_KIND,
-                        JWS_OVERLAY_DIAGRAM_CELL_DATA.RELATED_ENTITY_ID)
-                .from(JWS_OVERLAY_DIAGRAM_CELL_DATA)
-                .where(JWS_OVERLAY_DIAGRAM_CELL_DATA.DIAGRAM_ID.eq(diagramId))
+                .select(AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.CELL_EXTERNAL_ID,
+                        AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.RELATED_ENTITY_KIND,
+                        AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.RELATED_ENTITY_ID)
+                .from(AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA)
+                .where(AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.DIAGRAM_ID.eq(diagramId))
                 .fetchSet(r -> {
-                    r.get(JWS_OVERLAY_DIAGRAM_CELL_DATA.RELATED_ENTITY_KIND);
+                    r.get(AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.RELATED_ENTITY_KIND);
 
                     Select<Record1<Long>> appSelectorForRelatedEntity = applicationIdSelectorFactory.apply(mkOpts(readRef(
                             r,
-                            JWS_OVERLAY_DIAGRAM_CELL_DATA.RELATED_ENTITY_KIND,
-                            JWS_OVERLAY_DIAGRAM_CELL_DATA.RELATED_ENTITY_ID)));
+                            AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.RELATED_ENTITY_KIND,
+                            AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.RELATED_ENTITY_ID)));
 
                     return DSL
-                            .select(DSL.val(r.get(JWS_OVERLAY_DIAGRAM_CELL_DATA.CELL_EXTERNAL_ID)).as("cell_ext_id"),
+                            .select(DSL.val(r.get(AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.CELL_EXTERNAL_ID)).as("cell_ext_id"),
                                     appSelectorForRelatedEntity.field(0, Long.class))
                             .from(appSelectorForRelatedEntity);
                 });

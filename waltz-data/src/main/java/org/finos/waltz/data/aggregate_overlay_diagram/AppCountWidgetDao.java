@@ -1,4 +1,4 @@
-package org.finos.waltz.data.overlay_diagram;
+package org.finos.waltz.data.aggregate_overlay_diagram;
 
 import org.finos.waltz.model.overlay_diagram.CountWidgetDatum;
 import org.finos.waltz.model.overlay_diagram.ImmutableCountWidgetDatum;
@@ -19,7 +19,7 @@ import static org.finos.waltz.schema.Tables.APPLICATION;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository
-public class AppCountWidgetDao extends OverlayDiagramDao {
+public class AppCountWidgetDao extends AggregateOverlayDiagramDao {
 
     private static final Tuple2<Integer, Integer> ZERO_COUNT = tuple(0, 0);
 

@@ -4,11 +4,20 @@ import {checkIsEntityRef} from "../common/checks";
 
 export function mkOverlayDiagramStore() {
 
+    const getById = (id, force = false) => {
+        return remote
+            .fetchViewDatum(
+                "GET",
+                `api/aggregate-overlay-diagram/id/${id}`,
+                {force});
+    };
+
+
     const findAppCountsForDiagram = (diagramId, vantagePointRef, force = false) => {
         return remote
             .fetchViewList(
                 "POST",
-                `api/overlay-diagram/diagram-id/${diagramId}/app-count-widget`,
+                `api/aggregate-overlay-diagram/diagram-id/${diagramId}/app-count-widget`,
                 vantagePointRef,
                 {force});
     };
@@ -17,16 +26,17 @@ export function mkOverlayDiagramStore() {
         return remote
             .fetchViewList(
                 "POST",
-                `api/overlay-diagram/diagram-id/${diagramId}/app-cost-widget`,
+                `api/aggregate-overlay-diagram/diagram-id/${diagramId}/app-cost-widget`,
                 vantagePointRef,
                 {force});
     };
 
     return {
+        getById,
         findAppCountsForDiagram,
         findAppCostForDiagram
     };
 }
 
 
-export const overlayDiagramStore = mkOverlayDiagramStore();
+export const aggregateOverlayDiagramStore = mkOverlayDiagramStore();

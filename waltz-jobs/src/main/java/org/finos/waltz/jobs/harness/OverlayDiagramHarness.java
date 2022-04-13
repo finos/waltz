@@ -20,8 +20,8 @@ package org.finos.waltz.jobs.harness;
 
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
-import org.finos.waltz.data.overlay_diagram.AppCostWidgetDao;
-import org.finos.waltz.data.overlay_diagram.AppCountWidgetDao;
+import org.finos.waltz.data.aggregate_overlay_diagram.AppCostWidgetDao;
+import org.finos.waltz.data.aggregate_overlay_diagram.AppCountWidgetDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.overlay_diagram.CostWidgetDatum;

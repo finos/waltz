@@ -1,4 +1,4 @@
-package org.finos.waltz.data.overlay_diagram;
+package org.finos.waltz.data.aggregate_overlay_diagram;
 
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.overlay_diagram.CostWidgetDatum;
@@ -21,7 +21,7 @@ import static org.finos.waltz.schema.Tables.*;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository
-public class AppCostWidgetDao extends OverlayDiagramDao {
+public class AppCostWidgetDao extends AggregateOverlayDiagramDao {
 
     private static final Tuple2<BigDecimal, BigDecimal> ZERO_COST = tuple(BigDecimal.ZERO, BigDecimal.ZERO);
 

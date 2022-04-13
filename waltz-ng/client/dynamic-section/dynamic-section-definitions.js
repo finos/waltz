@@ -425,7 +425,16 @@ const entityAttestationSection = {
     id: 10001
 };
 
+const aggregateOverlayDiagramSection = {
+    componentId: "aggregate-overlay-diagram-section",
+    name: "Diagrams",
+    icon: "object-group",
+    description: "Static svg diagrams with waltz data overlays",
+    id: 270
+};
+
 export const dynamicSections = {
+    aggregateOverlayDiagramSection,
     appCostsSection,
     appCostsSummarySection,
     appComplexitySummarySection,
@@ -541,15 +550,16 @@ const changeInitiativeSections = [
 
 const orgUnitSections = [
     pack(appsSection,
-         [
-             appCostsSummarySection,
-             appComplexitySummarySection,
-             attestationSummarySection,
-             entityStatisticSummarySection,
-             measurableRatingsBrowserSection,
-             reportGridViewSection,
-             technologySummarySection,
-         ]),
+        [
+            appCostsSummarySection,
+            appComplexitySummarySection,
+            attestationSummarySection,
+            entityStatisticSummarySection,
+            measurableRatingsBrowserSection,
+            reportGridViewSection,
+            technologySummarySection,
+        ]),
+    aggregateOverlayDiagramSection,
     bookmarksSection,
     changeInitiativeSection,
     changeSetSection,
@@ -580,16 +590,17 @@ const measurableSections = [
 ];
 
 const personSections = [
+    aggregateOverlayDiagramSection,
     bookmarksSection,
     changeInitiativeSection,
     pack(logicalFlowsTabgroupSection, [flowClassificationRulesSection]),
     pack(personAppsSection,
-         [
-             appCostsSummarySection,
-             appComplexitySummarySection,
-             attestationSummarySection,
-             entityStatisticSummarySection,
-             measurableRatingsBrowserSection,
+        [
+            appCostsSummarySection,
+            appComplexitySummarySection,
+            attestationSummarySection,
+            entityStatisticSummarySection,
+            measurableRatingsBrowserSection,
              reportGridViewSection,
              technologySummarySection
          ]),
@@ -614,15 +625,16 @@ const dataTypeSections = [
 
 const appGroupSections = [
     pack(appsSection,
-         [
-             appCostsSummarySection,
-             appComplexitySummarySection,
-             attestationSummarySection,
-             entityStatisticSummarySection,
-             measurableRatingsBrowserSection,
-             reportGridViewSection,
-             technologySummarySection
-         ]),
+        [
+            appCostsSummarySection,
+            appComplexitySummarySection,
+            attestationSummarySection,
+            entityStatisticSummarySection,
+            measurableRatingsBrowserSection,
+            reportGridViewSection,
+            technologySummarySection
+        ]),
+    aggregateOverlayDiagramSection,
     bookmarksSection,
     changeInitiativeSection,
     changeSetSection,
