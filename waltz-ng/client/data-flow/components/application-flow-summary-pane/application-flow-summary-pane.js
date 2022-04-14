@@ -89,32 +89,6 @@ function calcStats(enrichedDecorators = []) {
     };
 }
 
-function getFreshnessSummaryConfig() {
-    return {
-        colorProvider: (d) => color(d.color),
-        valueProvider: (d) => d.count,
-        idProvider: (d) => d.key,
-        labelProvider: d => d.title,
-        size: 40
-    };
-}
-
-function getFreshnessSummaryData(logicalFlows, physicalFlows, enumValues) {
-    const logicalFlowIds = logicalFlows
-        .map(lf => lf.id);
-
-    const producerOrConsumerPhysicalFlows = physicalFlows
-        .filter(pf => logicalFlowIds.includes(pf.logicalFlowId));
-
-    const summaryData = tallyBy(
-        producerOrConsumerPhysicalFlows,
-        "freshnessIndicator");
-
-    _.each(summaryData, d => d.color = _.get(enumValues, [d.key, "data", "iconColor"], "none"));
-    _.each(summaryData, d => d.title = _.get(enumValues, [d.key, "data", "name"], ""));
-
-    return summaryData;
-}
 
 function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
@@ -153,21 +127,6 @@ function controller($q, serviceBroker) {
                 CORE_API.PhysicalFlowStore.findByEntityReference,
                 [vm.parentEntityRef])
             .then(r => r.data);
-
-        const enumValuePromise = serviceBroker
-            .loadAppData(CORE_API.EnumValueStore.findAll)
-            .then(r => vm.summaryConfig =
-                indexByKeyForType(r.data, "FreshnessIndicator"));
-
-        $q.all([logicalFlowPromise, physicalFlowPromise, enumValuePromise])
-            .then(([logicalFlows, physicalFlows]) => {
-                vm.freshnessSummaryData = getFreshnessSummaryData(
-                    logicalFlows,
-                    physicalFlows,
-                    vm.summaryConfig);
-
-                vm.freshnessSummaryConfig = getFreshnessSummaryConfig();
-            });
     };
 
     const loadUnknownDataType = () => {

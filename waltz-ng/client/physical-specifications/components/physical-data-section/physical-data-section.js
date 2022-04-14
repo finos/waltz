@@ -126,7 +126,6 @@ function controller() {
         withWidth(columnDef.extId, "5%"),
         columnDef.source,
         columnDef.target,
-        columnDef.observation,
         columnDef.criticality,
         columnDef.description
     ];
