@@ -45,7 +45,6 @@ function determineColumnDefs(entityKind) {
                 columnDef.source,
                 columnDef.target,
                 columnDef.extId,
-                columnDef.observation,
                 columnDef.frequency,
                 columnDef.description];
         default:

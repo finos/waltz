@@ -235,7 +235,6 @@ public class PhysicalFlowExtractor extends CustomDataExtractor {
                         PHYSICAL_FLOW.TRANSPORT.as("Transport"),
                         PHYSICAL_FLOW.FREQUENCY.as("Frequency"),
                         PHYSICAL_FLOW.CRITICALITY.as("Criticality"),
-                        PHYSICAL_FLOW.FRESHNESS_INDICATOR.as("Freshness Indicator"),
                         PHYSICAL_SPECIFICATION.DESCRIPTION.as("Description")
                 ).from(PHYSICAL_SPECIFICATION)
                 .join(PHYSICAL_FLOW)

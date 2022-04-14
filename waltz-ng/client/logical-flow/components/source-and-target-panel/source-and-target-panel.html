@@ -193,7 +193,6 @@
                 <thead>
                 <tr>
                     <th>Name</th>
-                    <th>Observation</th>
                     <th>Format</th>
                     <th>Transport</th>
                     <th>Frequency</th>
@@ -210,13 +209,6 @@
                                     ng-if="$ctrl.selected.changeUnitsByPhysicalFlowId[pf.id]"
                                     uib-tooltip="Changes planned for this physical flow">
                         </waltz-icon>
-                    </td>
-                    <td>
-                        <waltz-enum-value type="'FreshnessIndicator'"
-                                          key="pf.freshnessIndicator"
-                                          show-icon="true"
-                                          show-popover="true">
-                        </waltz-enum-value>
                     </td>
                     <td>
                         <span ng-bind="pf.specification.format"></span>

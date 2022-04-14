@@ -26,8 +26,7 @@ public enum EnumValueKind {
     PERSON_KIND("PersonKind"),
     SCENARIO_TYPE("ScenarioType"),
     CHANGE_INITIATIVE_LIFECYCLE_PHASE("changeInitiativeLifecyclePhase"),
-    PHYSICAL_FLOW_CRITICALITY("physicalFlowCriticality"),
-    FRESHNESS_INDICATOR("FreshnessIndicator");
+    PHYSICAL_FLOW_CRITICALITY("physicalFlowCriticality");
 
     private final String dbValue;
 
