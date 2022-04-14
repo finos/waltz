@@ -14,15 +14,17 @@
 </script>
 
 
-<rect stroke="white"
-      stroke-width="5"
-      width={cellWidth}
-      height={dimensions.cell.height}
-      fill={color}>
-</rect>
+<g class="outer">
+    <rect stroke="white"
+          stroke-width="5"
+          width={cellWidth}
+          height={dimensions.cell.height}
+          fill={color}>
+    </rect>
+</g>
 
-<g transform="translate(0, 10)"
-   data-cell-id={cell.id}>
+
+<g transform="translate(0, 10)">
     <foreignObject width={cellWidth}
                    height={dimensions.cell.labelHeight}>
         <div class="cell-title">

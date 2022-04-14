@@ -15,7 +15,8 @@
 
 <g>
     {#each row as cell, idx}
-        <g transform={`translate(${idx * cellWidth})`}>
+        <g transform={`translate(${idx * cellWidth})`}
+           data-cell-id={cell.id}>
             <EntityCell {cell} {cellWidth} {dimensions} {color}/>
         </g>
     {/each}

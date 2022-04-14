@@ -13,7 +13,7 @@
 
 <h1>Hello Mum</h1>
 
-<svg class="widget" viewBox="0 0 300 100">
+<svg class="content" viewBox="0 0 300 100">
     <g>
         <circle class=""
                 r={rScale(cellData?.currentStateCount) || 10}

@@ -3,7 +3,7 @@
 </script>
 
 
-<svg class="widget" viewBox="0 0 270 90">
+<svg class="content" viewBox="0 0 270 90">
     <foreignObject width="270" height="90">
         {#if cellData}
             <div style="font-size: 20px; width: 100%; text-align: center">

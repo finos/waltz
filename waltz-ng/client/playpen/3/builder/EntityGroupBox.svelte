@@ -10,12 +10,12 @@
 </script>
 
 {#if dimensions}
-<g class="entity-group-box"  data-group-id={group.id}>
+<g class="entity-group-box"
+   data-group-id={group.id}>
     <rect class="outer"
           width={dimensions.w - (dimensions.padding + dimensions.group.padding) * 2}
           {height}>
     </rect>
-
 
     <foreignObject width={dimensions.labelWidth}
                    height={height}>
