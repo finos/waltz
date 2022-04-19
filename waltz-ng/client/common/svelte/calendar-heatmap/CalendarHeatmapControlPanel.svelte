@@ -2,7 +2,9 @@
 
     import DatePicker from "../DatePicker.svelte";
     import Icon from "../Icon.svelte";
+    import {timeFormat} from "d3-time-format";
 
+    const format = timeFormat("%Y-%m-%d");
 
     export let setStartDate = (d) => console.log("setting start date", d)
     export let setEndDate = (d) => console.log("setting end date", d)
@@ -40,9 +42,11 @@
         </div>
     </div>
 {:else}
+    <b>Date Range:</b>
+    {format(startDate)} to {format(endDate)}.  
     <button class="btn btn-skinny"
             on:click={() => changeDateSelection = true}>
-        Change date selection
+        Change date range
         <Icon name="pencil"/>
     </button>
 {/if}
