@@ -2,32 +2,23 @@
     import _ from "lodash";
     import WidgetSelector from "./WidgetSelector.svelte";
     import Callout from "./Callout.svelte";
+    import {selectedDiagram, selectedInstance, callouts, hoveredCallout} from "../../aggregate-overlay-diagram-store";
 
     export let svg = "";
     export let primaryEntityRef;
     export let widgetComponent;
     export let dataProvider;
+    // export let callouts = [];
 
     let svgHolderElem;
     let renderedWidgetRefs = {}; // this gets populated by the calls to `bind:this`
     let renderedCalloutRefs = {}; // this gets populated by the calls to `bind:this`
-    let documentationIconElem;
 
     $: console.log({primaryEntityRef});
 
     $: cellDataByCellExtId = _.keyBy($dataProvider?.data, d => d.cellExternalId);
 
-    const callouts = [
-        {cellId: "SURV", text: "Surveillance is up"},
-        {cellId: "TRADE_MGMT", text: "Trade Management will change"},
-        {cellId: "TREASURE", text: "Nothing happens"},
-        {cellId: "AFC", text: "2025 is far away, maybe things will be different"},
-    ]
-
-
     function renderOverlays(refs = [], targetSelector, setContentSize) {
-
-        console.log({refs});
 
         _.each(refs, (v, k) => {
             if (!v) return;
@@ -58,9 +49,9 @@
 
             const existingContent = targetBox.querySelector(".content");
             if (existingContent) {
-                targetBox.replaceChild(contentRef.cloneNode(true), existingContent);
+                targetBox.replaceChild(contentRef, existingContent);
             } else {
-                targetBox.append(contentRef.cloneNode(true));
+                targetBox.append(contentRef);
             }
         });
     }
@@ -74,17 +65,37 @@
                     contentRef.setAttribute("width", bBox.width);
                     contentRef.setAttribute("height", bBox.height);
                 });
+        }
+    }
+
+
+    $: {
+        if (svgHolderElem && renderedCalloutRefs) {
+            console.log("rendering callouts")
             renderOverlays(
                 renderedCalloutRefs,
                 ".outer",
                 (bBox, contentRef) => {
-
                     const size = bBox.height * 0.25;
-
                     contentRef.setAttribute("width", size);
                     contentRef.setAttribute("height", size);
                 });
         }
+    }
+
+    $: instance = $selectedInstance;
+    $: diagram = $selectedDiagram;
+
+    $: console.log({instance, diagram});
+
+    function hoverCallout(evt) {
+        $hoveredCallout = evt.detail;
+        console.log({c: evt.detail})
+    }
+
+    function leaveCallout(evt) {
+        $hoveredCallout = null;
+        console.log({c: evt.detail})
     }
 
 </script>
@@ -106,15 +117,19 @@
     </div>
 {/key}
 
-<div class="rendered-callouts">
-    {#each callouts as callout, idx}
-        <div bind:this={renderedCalloutRefs[callout.cellId]}>
-            <h4>Callout for cell: {callout.cellId}</h4>
-            <Callout {callout} label={idx}/>
-        </div>
-    {/each}
-</div>
-
+{#key instance}
+    <div class="rendered-callouts">
+        {#each $callouts as callout, idx}
+            <div bind:this={renderedCalloutRefs[callout.cellExternalId]}>
+                <h4>Callout for cell: {callout.cellExternalId}</h4>
+                <Callout {callout}
+                         label={idx + 1}
+                         on:hover={hoverCallout}
+                         on:leave={leaveCallout}/>
+            </div>
+        {/each}
+    </div>
+{/key}
 
 <style>
     .rendered-widgets {
@@ -122,6 +137,6 @@
     }
 
     .rendered-callouts {
-        display: none;
+        xxdisplay: none;
     }
 </style>

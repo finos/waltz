@@ -530,4 +530,54 @@
                           remarks="origination of this aggregate overlay diagram instance"/>
     </changeSet>
 
+
+    <changeSet id="20220419-6001-10"
+               author="woodjes">
+        <comment>6001: create aggregate_diagram_instance table</comment>
+        <createTable tableName="aggregate_overlay_diagram_callout">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="aggregate_overlay_diagram_callout_pkey"/>
+            </column>
+            <column name="diagram_instance_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="start_color"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_color"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cell_external_id"
+                    type="${external-id.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20220419-6001-11"
+               author="woodjes">
+        <comment>6001: create aggregate_overlay_diagram tables</comment>
+        <addForeignKeyConstraint constraintName="agg_overlay_diag_callout_fk"
+                                 baseTableName="aggregate_overlay_diagram_callout"
+                                 baseColumnNames="diagram_instance_id"
+                                 referencedTableName="aggregate_overlay_diagram_instance"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
 </databaseChangeLog>

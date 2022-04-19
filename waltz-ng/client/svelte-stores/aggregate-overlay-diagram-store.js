@@ -13,6 +13,16 @@ export function mkOverlayDiagramStore() {
     };
 
 
+    const findAll = (force = false) => {
+        return remote
+            .fetchViewList(
+                "GET",
+                "api/aggregate-overlay-diagram/all",
+                [],
+                {force});
+    };
+
+
     const findAppCountsForDiagram = (diagramId, vantagePointRef, force = false) => {
         return remote
             .fetchViewList(
@@ -33,6 +43,7 @@ export function mkOverlayDiagramStore() {
 
     return {
         getById,
+        findAll,
         findAppCountsForDiagram,
         findAppCostForDiagram
     };

@@ -34,7 +34,7 @@
 
 </script>
 
-<svg width="1000px"
+<svg width="100%"
      height={`${dimensions.height}px`}
      viewBox={`0 0 1000 ${dimensions.height}`}
      style="border: 1px solid #dcefeb">
