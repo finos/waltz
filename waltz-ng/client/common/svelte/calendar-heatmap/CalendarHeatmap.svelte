@@ -5,13 +5,16 @@
     import {scaleSqrt} from "d3-scale";
     import _ from "lodash";
     import CalendarHeatmapControlPanel from "./CalendarHeatmapControlPanel.svelte";
+    import {timeFormat} from "d3-time-format";
 
-    export let data = [];
+    const format = timeFormat("%Y-%m");    export let data = [];
+
     export let onSelectDate = (x) => console.log("selecting date", x);
     export let onSelectWeek = (x) => console.log("selecting week", x);
     export let onSelectMonth = (x) => console.log("selecting month", x);
 
-    $: colorScale = scaleSqrt().domain([0, maxValue?.count]).range(["#e7fae2", "#07ed4a"]);
+    $: dayFillColorScale = scaleSqrt().domain([0, maxValue?.count]).range(["#e7fae2", "#07ed4a"]);
+    $: monthLabelColorScale = scaleSqrt().domain([0, months.length]).range(["#b7b7b7", "#666"]);
 
     const today = new Date();
 
@@ -48,7 +51,10 @@
     <g>
         {#each months as monthData, idx}
             <g transform={`translate(${determineColumn(idx) * dimensions.month.width}, ${determineRow(idx) * dimensions.month.height})`}>
+
                 <g>
+                    <title>{format(monthData?.startDate)}</title>
+
                     <rect width={dimensions.month.width}
                           height={30}
                           class="clickable"
@@ -62,15 +68,24 @@
                       text-anchor="middle"
                       dx={dimensions.day.width /4}
                       dy="20"
-                      fill="#aaa"
+                      fill={monthLabelColorScale(idx)}
                       pointer-events="none">
                     {monthNames[monthData?.startDate.getMonth()]}
                 </text>
                 <Month monthData={monthData}
-                       {colorScale}
+                       {dayFillColorScale}
                        {onSelectDate}
                        {onSelectWeek}>
                 </Month>
+                <rect stroke={hoveredMonth === idx ? "#ddd" : "none"}
+                      fill="none"
+                      x="1"
+                      y="1"
+                      rx="2"
+                      ry="2"
+                      width={dimensions.month.width - 2}
+                      height={dimensions.month.height - 2}>
+                </rect>
             </g>
         {/each}
     </g>

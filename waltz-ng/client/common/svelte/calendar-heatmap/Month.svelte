@@ -5,7 +5,7 @@
     import Weeks from "./Weeks.svelte";
 
     export let monthData = null;
-    export let colorScale;
+    export let dayFillColorScale;
     export let onSelectDate = (x) => console.log("selecting date", x);
     export let onSelectWeek = (x) => console.log("selecting week", x);
 
@@ -36,7 +36,7 @@
            on:mouseleave={() => hoveredDay = null}
            transform={mkTranslate(i)}>
             <Day data={day}
-                 color={colorScale(day.value)}
+                 color={dayFillColorScale(day.value)}
                  stroke={hoveredDay === i ? "black" : "#bbb"}
                  onSelect={onSelectDate}/>
         </g>
