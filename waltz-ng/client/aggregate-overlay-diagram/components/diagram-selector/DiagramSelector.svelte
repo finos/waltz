@@ -14,8 +14,6 @@
         dispatch("select", diagram)
     }
 
-    $: console.log({diagrams});
-
 </script>
 
 <h4>Select a diagram</h4>
@@ -33,8 +31,10 @@
                 <button class="btn btn-skinny"
                         on:click={() => selectDiagram(diagram)}>
                     {diagram.name}
-                    <LastEdited entity={diagram}/>
                 </button>
+                <span class="text-muted">
+                    <LastEdited entity={diagram}/>
+                </span>
             </li>
         {/each}
     </ul>

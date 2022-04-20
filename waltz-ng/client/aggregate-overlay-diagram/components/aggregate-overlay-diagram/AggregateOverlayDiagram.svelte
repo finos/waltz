@@ -1,78 +1,40 @@
 <script>
     import _ from "lodash";
-    import WidgetSelector from "./WidgetSelector.svelte";
     import Callout from "./Callout.svelte";
-    import {selectedDiagram, selectedInstance, callouts, hoveredCallout} from "../../aggregate-overlay-diagram-store";
+    import {renderOverlays} from "./aggregate-overlay-diagram-utils";
+    import {entity} from "../../../common/services/enums/entity";
+    import {getContext} from "svelte";
 
     export let svg = "";
     export let primaryEntityRef;
     export let widgetComponent;
     export let dataProvider;
-    // export let callouts = [];
 
     let svgHolderElem;
     let renderedWidgetRefs = {}; // this gets populated by the calls to `bind:this`
     let renderedCalloutRefs = {}; // this gets populated by the calls to `bind:this`
 
-    $: console.log({primaryEntityRef});
-
     $: cellDataByCellExtId = _.keyBy($dataProvider?.data, d => d.cellExternalId);
-
-    function renderOverlays(refs = [], targetSelector, setContentSize) {
-
-        _.each(refs, (v, k) => {
-            if (!v) return;
-            const cell = svgHolderElem.querySelector(`[data-cell-id=${k}]`);
-
-            if (cell == null) {
-                console.log("Cannot find cell for key:" + k);
-                return;
-            }
-
-            const targetBox = cell.querySelector(targetSelector);
-
-            if (!targetBox) {
-                console.log("Cannot find target box for cell-id", k);
-                return;
-            }
-
-            const contentRef = v.querySelector(".content");
-
-            if (!contentRef) {
-                console.log("Cannot find content section for copying into the target box for cell-id", k);
-                return;
-            }
-
-            const boundingBox = targetBox.getBBox();
-
-            setContentSize(boundingBox, contentRef);
-
-            const existingContent = targetBox.querySelector(".content");
-            if (existingContent) {
-                targetBox.replaceChild(contentRef, existingContent);
-            } else {
-                targetBox.append(contentRef);
-            }
-        });
-    }
 
     $: {
         if (svgHolderElem && renderedWidgetRefs) {
             renderOverlays(
+                svgHolderElem,
                 renderedWidgetRefs,
                 ".statistics-box",
                 (bBox, contentRef) => {
                     contentRef.setAttribute("width", bBox.width);
                     contentRef.setAttribute("height", bBox.height);
-                });
+                },
+                primaryEntityRef.kind === entity.AGGREGATE_OVERLAY_DIAGRAM_INSTANCE.key);
         }
     }
 
 
     $: {
-        if (svgHolderElem && renderedCalloutRefs) {
-            console.log("rendering callouts")
+        if (svgHolderElem && renderedCalloutRefs && $callouts) {
             renderOverlays(
+                svgHolderElem,
                 renderedCalloutRefs,
                 ".outer",
                 (bBox, contentRef) => {
@@ -83,20 +45,20 @@
         }
     }
 
-    $: instance = $selectedInstance;
-    $: diagram = $selectedDiagram;
-
-    $: console.log({instance, diagram});
+    let callouts = getContext("callouts");
+    let selectedInstance = getContext("selectedInstance");
+    let selectedDiagram = getContext("selectedDiagram");
+    let hoveredCallout = getContext("hoveredCallout");
 
     function hoverCallout(evt) {
         $hoveredCallout = evt.detail;
-        console.log({c: evt.detail})
     }
 
     function leaveCallout(evt) {
         $hoveredCallout = null;
-        console.log({c: evt.detail})
     }
+
+    $: console.log({callouts: $callouts, svg});
 
 </script>
 
@@ -117,18 +79,20 @@
     </div>
 {/key}
 
-{#key instance}
-    <div class="rendered-callouts">
-        {#each $callouts as callout, idx}
-            <div bind:this={renderedCalloutRefs[callout.cellExternalId]}>
-                <h4>Callout for cell: {callout.cellExternalId}</h4>
-                <Callout {callout}
-                         label={idx + 1}
-                         on:hover={hoverCallout}
-                         on:leave={leaveCallout}/>
-            </div>
-        {/each}
-    </div>
+{#key $selectedInstance}
+    {#if !_.isEmpty($callouts)}
+        <div class="rendered-callouts">
+            {#each $callouts as callout, idx}
+                <div bind:this={renderedCalloutRefs[callout.cellExternalId]}>
+                    <h4>Callout for cell: {callout.cellExternalId}</h4>
+                    <Callout {callout}
+                             label={idx + 1}
+                             on:hover={hoverCallout}
+                             on:leave={leaveCallout}/>
+                </div>
+            {/each}
+        </div>
+    {/if}
 {/key}
 
 <style>
@@ -137,6 +101,6 @@
     }
 
     .rendered-callouts {
-        xxdisplay: none;
+        display: none;
     }
 </style>

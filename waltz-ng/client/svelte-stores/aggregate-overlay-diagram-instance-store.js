@@ -12,8 +12,18 @@ export function mkOverlayDiagramInstanceStore() {
                 {force});
     };
 
+
+    const getById = (id, force = false) => {
+        return remote
+            .fetchViewDatum(
+                "GET",
+                `api/aggregate-overlay-diagram-instance/id/${id}`,
+                {force});
+    };
+
     return {
         findByDiagramId,
+        getById
     };
 }
 

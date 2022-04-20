@@ -14,4 +14,10 @@ public abstract class AggregateOverlayDiagramInstance implements IdProvider, Nam
 
     public abstract EntityReference parentEntityReference();
 
+    public abstract String svg();
+
+    @Value.Default
+    public EntityKind kind() {
+        return EntityKind.AGGREGATE_OVERLAY_DIAGRAM_INSTANCE;
+    }
 }

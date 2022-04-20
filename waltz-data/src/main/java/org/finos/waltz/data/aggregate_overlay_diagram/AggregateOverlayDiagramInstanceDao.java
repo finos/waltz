@@ -37,6 +37,7 @@ public class AggregateOverlayDiagramInstanceDao {
                 .id(record.getId())
                 .diagramId(record.getDiagramId())
                 .parentEntityReference(mkRef(EntityKind.valueOf(record.getParentEntityKind()), record.getParentEntityId()))
+                .svg(record.getSvg())
                 .name(record.getName())
                 .description(record.getDescription())
                 .lastUpdatedAt(toLocalDateTime(record.getLastUpdatedAt()))

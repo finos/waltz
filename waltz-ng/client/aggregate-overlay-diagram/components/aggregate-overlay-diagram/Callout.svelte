@@ -1,9 +1,11 @@
 <script>
-    import {createEventDispatcher} from "svelte";
-    import {hoveredCallout} from "../../aggregate-overlay-diagram-store";
+    import {createEventDispatcher, getContext} from "svelte";
 
     export let callout;
     export let label;
+
+    let hoveredCallout = getContext("hoveredCallout");
+
 
     const dispatch = createEventDispatcher();
 

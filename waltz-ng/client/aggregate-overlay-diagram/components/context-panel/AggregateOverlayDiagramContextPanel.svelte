@@ -8,11 +8,6 @@
 
 </script>
 
-
-<div>
-    <WidgetSelector on:change={handleWidgetChange}
-                    {primaryEntityRef}/>
-</div>
 <div>
     <CalloutList/>
 </div>

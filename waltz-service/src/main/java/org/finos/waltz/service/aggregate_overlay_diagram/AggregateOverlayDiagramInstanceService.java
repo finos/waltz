@@ -25,5 +25,9 @@ public class AggregateOverlayDiagramInstanceService {
         return aggregateOverlayDiagramInstanceDao.findByDiagramId(diagramId);
     }
 
+    public AggregateOverlayDiagramInstance getById(Long instanceId) {
+        return aggregateOverlayDiagramInstanceDao.getById(instanceId);
+    }
+
 
 }

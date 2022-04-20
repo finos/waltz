@@ -8,11 +8,10 @@
     import {aggregateOverlayDiagramInstanceStore} from "../../../svelte-stores/aggregate-overlay-diagram-instance-store";
     import {aggregateOverlayDiagramCalloutStore} from "../../../svelte-stores/aggregate-overlay-diagram-callout-store";
     import DiagramSelector from "../diagram-selector/DiagramSelector.svelte";
-    import {selectedDiagram, selectedInstance, callouts} from "../../aggregate-overlay-diagram-store";
     import NoData from "../../../common/svelte/NoData.svelte";
     import DiagramInstanceSelector from "../instance-selector/DiagramInstanceSelector.svelte";
-    import CalloutList from "../aggregate-overlay-diagram/CalloutList.svelte";
     import AggregateOverlayDiagramContextPanel from "../context-panel/AggregateOverlayDiagramContextPanel.svelte";
+    import {setupContextStores} from "../aggregate-overlay-diagram/aggregate-overlay-diagram-utils";
 
     export let svg = '<svg><circle r="100" fill="red"/></svg>';
     export let primaryEntityRef;
@@ -51,24 +50,24 @@
     }
 
     $: diagram = $svgCall?.data;
-    $: instances = $instancesCall?.data;
-    $: $callouts = $calloutCall?.data;
-    $: diagrams = $diagramsCall?.data;
-
-    $: console.log({svg, primaryEntityRef, instances, callouts});
+    $: instances = $instancesCall?.data || [];
+    $: $callouts = $calloutCall?.data || [];
+    $: diagrams = $diagramsCall?.data || [];
 
 
     function selectDiagram(evt) {
-        console.log({diagram: evt.detail});
         $selectedInstance = null;
         $callouts = [];
         $selectedDiagram = evt.detail;
     }
 
     function selectInstance(evt) {
-        console.log({instance: evt.detail});
+        $callouts = [];
         $selectedInstance = evt.detail;
     }
+
+    const {selectedDiagram, selectedInstance, callouts, hoveredCallout} = setupContextStores();
+
 
 </script>
 
@@ -94,6 +93,10 @@
                                          {dataProvider}/>
             </div>
             <div class="col-sm-3">
+                <div>
+                    <WidgetSelector on:change={handleWidgetChange}
+                                    {primaryEntityRef}/>
+                </div>
                 <AggregateOverlayDiagramContextPanel {handleWidgetChange}
                                                      {primaryEntityRef}/>
             </div>

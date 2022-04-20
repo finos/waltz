@@ -1,7 +1,9 @@
 <script>
 
-    import {callouts, hoveredCallout} from "../../aggregate-overlay-diagram-store";
+    import {callouts} from "../../aggregate-overlay-diagram-store";
+    import {getContext} from "svelte";
 
+    let hoveredCallout = getContext("hoveredCallout");
 
     function hover(callout) {
         $hoveredCallout = callout;

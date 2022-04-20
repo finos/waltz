@@ -17,14 +17,25 @@
  */
 
 
+import InstanceView from "../aggregate-overlay-diagram/pages/instance-view/overlay-diagram-instance-view";
+
 const baseState = {
     url: "aggregate-overlay-diagram",
 };
 
 
+const viewState = {
+    url: "/instance/{id:int}",
+    views: {
+        "content@": InstanceView.id
+    }
+};
+
 function setup($stateProvider) {
+    console.log($stateProvider);
     $stateProvider
         .state("main.aggregate-overlay-diagram", baseState)
+        .state("main.aggregate-overlay-diagram.instance-view", viewState)
 }
 
 setup.$inject = [

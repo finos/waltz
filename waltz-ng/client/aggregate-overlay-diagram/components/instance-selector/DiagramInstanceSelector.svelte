@@ -1,12 +1,14 @@
 <script>
 
-    import {createEventDispatcher} from "svelte";
+    import {createEventDispatcher, getContext} from "svelte";
     import LastEdited from "../../../common/svelte/LastEdited.svelte";
     import _ from "lodash";
-    import {selectedDiagram} from "../../aggregate-overlay-diagram-store";
+    import EntityLink from "../../../common/svelte/EntityLink.svelte";
 
 
     export let instances = [];
+
+    let selectedDiagram = getContext("selectedDiagram");
 
     const dispatch = createEventDispatcher();
 
@@ -15,7 +17,6 @@
         dispatch("select", instance)
     }
 
-    $: console.log({instances})
 
 </script>
 
@@ -25,11 +26,13 @@
     <ul>
         {#each instances as instance}
             <li>
+                <EntityLink ref={instance}/>
                 <button class="btn btn-skinny"
                         on:click={() => selectInstance(instance)}>
-                    {instance.name}
+                    {instance.name}</button>
+                <span class="text-muted">
                     <LastEdited entity={instance}/>
-                </button>
+                </span>
             </li>
         {/each}
     </ul>

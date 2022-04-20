@@ -21,6 +21,7 @@ package org.finos.waltz.web.endpoints.api;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramCallout;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramInstance;
 import org.finos.waltz.service.aggregate_overlay_diagram.AggregateOverlayDiagramInstanceService;
+import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.WebUtilities;
 import org.finos.waltz.web.endpoints.Endpoint;
@@ -32,8 +33,7 @@ import org.springframework.stereotype.Service;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.web.WebUtilities.getId;
 import static org.finos.waltz.web.WebUtilities.mkPath;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.getForList;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.postForList;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 
 @Service
 public class AggregateOverlayDiagramInstanceEndpoint implements Endpoint {
@@ -56,12 +56,18 @@ public class AggregateOverlayDiagramInstanceEndpoint implements Endpoint {
     public void register() {
 
         String findByDiagramIdPath = mkPath(BASE_URL, "diagram-id", ":id");
+        String getByIdPath = mkPath(BASE_URL, "id", ":id");
 
         ListRoute<AggregateOverlayDiagramInstance> findByDiagramIdRoute = (request, response) -> {
             return aggregateOverlayDiagramInstanceService.findByDiagramId(getId(request));
         };
 
+        DatumRoute<AggregateOverlayDiagramInstance> getByIdRoute = (request, response) -> {
+            return aggregateOverlayDiagramInstanceService.getById(getId(request));
+        };
+
         getForList(findByDiagramIdPath, findByDiagramIdRoute);
+        getForDatum(getByIdPath, getByIdRoute);
     }
 
 }
