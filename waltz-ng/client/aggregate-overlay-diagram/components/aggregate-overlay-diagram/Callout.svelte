@@ -44,3 +44,11 @@
         </text>
     </g>
 </svg>
+
+
+<style>
+
+    .content circle {
+        transition: fill 2s;
+    }
+</style>

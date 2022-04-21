@@ -10,10 +10,10 @@
     import DiagramSelector from "../diagram-selector/DiagramSelector.svelte";
     import NoData from "../../../common/svelte/NoData.svelte";
     import DiagramInstanceSelector from "../instance-selector/DiagramInstanceSelector.svelte";
-    import AggregateOverlayDiagramContextPanel from "../context-panel/AggregateOverlayDiagramContextPanel.svelte";
+    import AggregateOverlayDiagramContextPanel
+        from "../context-panel/AggregateOverlayDiagramInstanceContextPanel.svelte";
     import {setupContextStores} from "../aggregate-overlay-diagram/aggregate-overlay-diagram-utils";
 
-    export let svg = '<svg><circle r="100" fill="red"/></svg>';
     export let primaryEntityRef;
 
     let widgetComponent;
@@ -51,22 +51,19 @@
 
     $: diagram = $svgCall?.data;
     $: instances = $instancesCall?.data || [];
-    $: $callouts = $calloutCall?.data || [];
     $: diagrams = $diagramsCall?.data || [];
 
 
     function selectDiagram(evt) {
         $selectedInstance = null;
-        $callouts = [];
         $selectedDiagram = evt.detail;
     }
 
     function selectInstance(evt) {
-        $callouts = [];
         $selectedInstance = evt.detail;
     }
 
-    const {selectedDiagram, selectedInstance, callouts, hoveredCallout} = setupContextStores();
+    const {selectedDiagram, selectedInstance, hoveredCallout} = setupContextStores();
 
 
 </script>
@@ -86,7 +83,7 @@
     </div>
     <div class="row">
         {#if $selectedDiagram}
-            <div class="col-sm-9">
+            <div class="col-sm-9" style="padding-top: 1em">
                 <AggregateOverlayDiagram svg={$selectedDiagram?.svg}
                                          {primaryEntityRef}
                                          {widgetComponent}

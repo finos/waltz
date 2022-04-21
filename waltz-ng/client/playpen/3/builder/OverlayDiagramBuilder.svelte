@@ -3,7 +3,7 @@
     import EntityGroupBox from "./EntityGroupBox.svelte";
     import {scaleLinear} from "d3-scale";
     import {layout} from "./overlay-diagram-builder-utils";
-    import diagramGroups from "./front-to-back-trade-data";
+    import diagramGroups from "./front-to-back-operations-data";
 
 
 

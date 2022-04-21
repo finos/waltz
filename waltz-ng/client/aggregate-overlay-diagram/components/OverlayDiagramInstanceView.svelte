@@ -4,7 +4,8 @@
     import EntityLink from "../../common/svelte/EntityLink.svelte";
     import {aggregateOverlayDiagramInstanceStore} from "../../svelte-stores/aggregate-overlay-diagram-instance-store";
     import AggregateOverlayDiagram from "./aggregate-overlay-diagram/AggregateOverlayDiagram.svelte";
-    import AggregateOverlayDiagramContextPanel from "./context-panel/AggregateOverlayDiagramContextPanel.svelte";
+    import AggregateOverlayDiagramContextPanel
+        from "./context-panel/AggregateOverlayDiagramInstanceContextPanel.svelte";
     import NoData from "../../common/svelte/NoData.svelte";
     import {aggregateOverlayDiagramStore} from "../../svelte-stores/aggregate-overlay-diagram-store";
     import {setupContextStores} from "./aggregate-overlay-diagram/aggregate-overlay-diagram-utils";

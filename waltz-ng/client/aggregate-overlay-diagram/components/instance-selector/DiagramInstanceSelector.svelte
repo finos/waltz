@@ -10,13 +10,6 @@
 
     let selectedDiagram = getContext("selectedDiagram");
 
-    const dispatch = createEventDispatcher();
-
-
-    function selectInstance(instance) {
-        dispatch("select", instance)
-    }
-
 
 </script>
 
@@ -27,9 +20,6 @@
         {#each instances as instance}
             <li>
                 <EntityLink ref={instance}/>
-                <button class="btn btn-skinny"
-                        on:click={() => selectInstance(instance)}>
-                    {instance.name}</button>
                 <span class="text-muted">
                     <LastEdited entity={instance}/>
                 </span>
