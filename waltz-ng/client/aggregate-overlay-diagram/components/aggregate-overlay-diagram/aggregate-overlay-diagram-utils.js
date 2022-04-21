@@ -50,11 +50,19 @@ export function setupContextStores() {
     const selectedInstance = writable(null);
     const callouts = writable([]);
     const hoveredCallout = writable(null);
+    const selectedCallout = writable(null);
 
     setContext("hoveredCallout", hoveredCallout);
     setContext("selectedDiagram", selectedDiagram);
     setContext("selectedInstance", selectedInstance);
     setContext("callouts", callouts);
+    setContext("selectedCallout", selectedCallout);
 
-    return {selectedDiagram, selectedInstance, callouts, hoveredCallout}
+    return {
+        selectedDiagram,
+        selectedInstance,
+        callouts,
+        hoveredCallout,
+        selectedCallout
+    }
 }

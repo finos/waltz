@@ -58,8 +58,6 @@
         $hoveredCallout = null;
     }
 
-    $: console.log({callouts: $callouts, svg});
-
 </script>
 
 <div bind:this={svgHolderElem}>

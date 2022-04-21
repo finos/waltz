@@ -65,11 +65,11 @@
 
         <div class="row">
             {#if $selectedInstance}
-                <div class="col-sm-9">
+                <div class="col-sm-8">
                     <AggregateOverlayDiagram svg={$selectedInstance?.svg}
                                              {primaryEntityRef}/>
                 </div>
-                <div class="col-sm-3">
+                <div class="col-sm-4">
                     <AggregateOverlayDiagramContextPanel {primaryEntityRef}/>
                 </div>
             {:else}

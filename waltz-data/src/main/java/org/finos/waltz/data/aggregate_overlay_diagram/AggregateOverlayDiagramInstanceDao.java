@@ -1,6 +1,7 @@
 
 package org.finos.waltz.data.aggregate_overlay_diagram;
 
+import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.data.JooqUtilities;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;
@@ -22,6 +23,7 @@ import java.util.Set;
 import static java.util.stream.Collectors.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
+import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.data.JooqUtilities.readRef;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
@@ -31,12 +33,30 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 @Repository
 public class AggregateOverlayDiagramInstanceDao {
 
+
+    private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
+                    AGGREGATE_OVERLAY_DIAGRAM_INSTANCE.PARENT_ENTITY_ID,
+                    AGGREGATE_OVERLAY_DIAGRAM_INSTANCE.PARENT_ENTITY_KIND,
+                    newArrayList(
+                            EntityKind.ORG_UNIT,
+                            EntityKind.APP_GROUP,
+                            EntityKind.MEASURABLE,
+                            EntityKind.PERSON
+                    ))
+            .as("entity_name");
+
     private static final RecordMapper<? super Record, ? extends AggregateOverlayDiagramInstance> TO_DOMAIN_MAPPER = r -> {
         AggregateOverlayDiagramInstanceRecord record = r.into(AGGREGATE_OVERLAY_DIAGRAM_INSTANCE);
+
+        EntityReference parentEntityReference = mkRef(
+                EntityKind.valueOf(record.getParentEntityKind()),
+                record.getParentEntityId(),
+                r.get(ENTITY_NAME_FIELD));
+
         return ImmutableAggregateOverlayDiagramInstance.builder()
                 .id(record.getId())
                 .diagramId(record.getDiagramId())
-                .parentEntityReference(mkRef(EntityKind.valueOf(record.getParentEntityKind()), record.getParentEntityId()))
+                .parentEntityReference(parentEntityReference)
                 .svg(record.getSvg())
                 .name(record.getName())
                 .description(record.getDescription())
@@ -59,6 +79,7 @@ public class AggregateOverlayDiagramInstanceDao {
     public AggregateOverlayDiagramInstance getById(Long instanceId) {
         return dsl
                 .select(AGGREGATE_OVERLAY_DIAGRAM_INSTANCE.fields())
+                .select(ENTITY_NAME_FIELD)
                 .from(AGGREGATE_OVERLAY_DIAGRAM_INSTANCE)
                 .where(AGGREGATE_OVERLAY_DIAGRAM_INSTANCE.ID.eq(instanceId))
                 .fetchOne(TO_DOMAIN_MAPPER);
@@ -68,6 +89,7 @@ public class AggregateOverlayDiagramInstanceDao {
     public Set<AggregateOverlayDiagramInstance> findByDiagramId(Long diagramId) {
         return dsl
                 .select(AGGREGATE_OVERLAY_DIAGRAM_INSTANCE.fields())
+                .select(ENTITY_NAME_FIELD)
                 .from(AGGREGATE_OVERLAY_DIAGRAM_INSTANCE)
                 .where(AGGREGATE_OVERLAY_DIAGRAM_INSTANCE.DIAGRAM_ID.eq(diagramId))
                 .fetchSet(TO_DOMAIN_MAPPER::map);

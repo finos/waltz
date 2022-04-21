@@ -6,7 +6,6 @@
 
     let hoveredCallout = getContext("hoveredCallout");
 
-
     const dispatch = createEventDispatcher();
 
     function hover() {
@@ -21,25 +20,47 @@
         if (hc?.id === callout.id) {
             return "#fffbdc"
         } else {
-            return callout.startColor;
+            return `url(#content-gradient-${callout.id})`;
         }
     }
+
+    function determineRadius(hc, callout) {
+        if (hc?.id === callout.id) {
+            return 12
+        } else {
+            return 10;
+        }
+    }
+
+    $: radius = determineRadius($hoveredCallout, callout)
 
 </script>
 
 
 <svg class="content"
-     viewBox="0 0 20 20">
+     viewBox={`0 0 24 24`}>
+    <defs>
+        <linearGradient id={`content-gradient-${callout.id}`}
+                        x1="0"
+                        x2="0"
+                        y1="0"
+                        y2="1">
+            <stop stop-color={callout.startColor} offset="0%"/>
+            <stop stop-color={callout.startColor} offset="50%"/>
+            <stop stop-color={callout.endColor} offset="50%"/>
+            <stop stop-color={callout.endColor} offset="100%"/>
+        </linearGradient>
+    </defs>
     <g on:mouseenter={() => hover()}
        on:mouseleave={() => leave()}>
-        <circle r="10"
-                cx="10"
-                cy="10"
+        <circle r={radius}
+                cx="12"
+                cy="12"
                 fill={determineFill($hoveredCallout, callout)}/>
         <text pointer-events="none"
               text-anchor="middle"
-              dx="10"
-              dy="15">
+              dx="12"
+              dy="17">
             {label}
         </text>
     </g>
@@ -49,6 +70,7 @@
 <style>
 
     .content circle {
-        transition: fill 2s;
+        transition: fill 0.5s;
+        transition: r 1s;
     }
 </style>
