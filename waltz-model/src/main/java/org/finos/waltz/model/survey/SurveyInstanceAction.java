@@ -10,9 +10,9 @@ import static org.finos.waltz.model.survey.SurveyInstanceActionConfirmationRequi
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum SurveyInstanceAction {
 
-    SUBMITTING("Submit", "submitted", "cloud-upload", "success", "Submit this survey for an owner to review", CONFIRM_REQUIRED, EDIT_AND_VIEW, REQUIRE_FULL_COMPLETION),
+    SUBMITTING("Submit", "submitted", "cloud-upload", "success", "Submit this survey for an owner to review", CONFIRM_AND_COMMENT_REQUIRED, EDIT_AND_VIEW, REQUIRE_FULL_COMPLETION),
     REJECTING("Reject", "rejected", "ban", "danger", "Reject this survey, rejected surveys must then be reopened for rework", CONFIRM_AND_COMMENT_REQUIRED, VIEW_ONLY, ALLOW_PARTIAL_COMPLETION),
-    WITHDRAWING("Withdraw", "withdrawn", "trash-o", "danger", "Withdraw this survey, this will remove it from the recipients' survey list", CONFIRM_REQUIRED, VIEW_ONLY, ALLOW_PARTIAL_COMPLETION),
+    WITHDRAWING("Withdraw", "withdrawn", "trash-o", "danger", "Withdraw this survey, this will remove it from the recipients' survey list", CONFIRM_AND_COMMENT_REQUIRED, VIEW_ONLY, ALLOW_PARTIAL_COMPLETION),
     REOPENING("Reopen", "reopened", "undo", "warning", "Reopen this survey, this will allow recipients to update question responses and submit a new version of the survey", NOT_REQUIRED, VIEW_ONLY, ALLOW_PARTIAL_COMPLETION),
     SAVING("Save", "saved", "floppy-o", "info", "Save this survey, this will not submit the survey", NOT_REQUIRED, EDIT_ONLY, ALLOW_PARTIAL_COMPLETION),
     APPROVING("Approve", "approved", "check-square-o", "success", "Approve this survey", CONFIRM_AND_COMMENT_REQUIRED, VIEW_ONLY, REQUIRE_FULL_COMPLETION);
