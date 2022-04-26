@@ -35,17 +35,12 @@ const initialState = {
         name: "A Group"
     },
     FlowVenn,
-    OverlayDiagramBuilder,
+    OverlayDiagramBuilder
 };
 
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    serviceBroker
-        .loadViewData(CORE_API.SvgDiagramStore.findByGroup, ["STATIC_OVERLAY_1"])
-        .then(x => {
-            vm.svg = x.data[0].svg;
-        });
 
 }
 

@@ -23,20 +23,29 @@ export function mkOverlayDiagramStore() {
     };
 
 
-    const findAppCountsForDiagram = (diagramId, vantagePointRef, force = false) => {
+    const findAppCountsForDiagram = (diagramId, vantagePointRef, futureDate, force = false) => {
         return remote
             .fetchViewList(
                 "POST",
-                `api/aggregate-overlay-diagram/diagram-id/${diagramId}/app-count-widget`,
+                `api/aggregate-overlay-diagram/diagram-id/${diagramId}/app-count-widget/${futureDate}`,
                 vantagePointRef,
                 {force});
     };
 
-    const findAppCostForDiagram = (diagramId, vantagePointRef, force = false) => {
+    const findAppCostForDiagram = (diagramId, vantagePointRef, futureDate, force = false) => {
         return remote
             .fetchViewList(
                 "POST",
-                `api/aggregate-overlay-diagram/diagram-id/${diagramId}/app-cost-widget`,
+                `api/aggregate-overlay-diagram/diagram-id/${diagramId}/app-cost-widget/${futureDate}`,
+                vantagePointRef,
+                {force});
+    };
+
+    const findAppAssessmentsForDiagram = (diagramId, assessmentId, vantagePointRef, force = false) => {
+        return remote
+            .fetchViewList(
+                "POST",
+                `api/aggregate-overlay-diagram/diagram-id/${diagramId}/app-assessment-widget/${assessmentId}`,
                 vantagePointRef,
                 {force});
     };
@@ -45,7 +54,8 @@ export function mkOverlayDiagramStore() {
         getById,
         findAll,
         findAppCountsForDiagram,
-        findAppCostForDiagram
+        findAppCostForDiagram,
+        findAppAssessmentsForDiagram
     };
 }
 

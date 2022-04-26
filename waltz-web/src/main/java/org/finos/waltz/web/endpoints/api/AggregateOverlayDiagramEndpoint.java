@@ -19,8 +19,9 @@
 package org.finos.waltz.web.endpoints.api;
 
 import org.finos.waltz.common.DateTimeUtilities;
-import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
+import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
+import org.finos.waltz.model.overlay_diagram.AssessmentRatingsWidgetDatum;
 import org.finos.waltz.model.overlay_diagram.CostWidgetDatum;
 import org.finos.waltz.model.overlay_diagram.CountWidgetDatum;
 import org.finos.waltz.service.aggregate_overlay_diagram.AggregateOverlayDiagramService;
@@ -28,12 +29,13 @@ import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.WebUtilities;
 import org.finos.waltz.web.endpoints.Endpoint;
-import org.jooq.Record1;
-import org.jooq.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Request;
+
+import java.time.LocalDate;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.web.WebUtilities.*;
@@ -61,8 +63,9 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
 
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
         String findAllPath = mkPath(BASE_URL, "all");
-        String findAppCountWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "app-count-widget");
-        String findAppCostWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "app-cost-widget");
+        String findAppCountWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "app-count-widget", ":target-date");
+        String findAppCostWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "app-cost-widget", ":target-date");
+        String findAppAssessmentWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "app-assessment-widget", ":assessment-id");
 
         DatumRoute<AggregateOverlayDiagram> getByIdRoute = (request, response) -> {
             return aggregateOverlayDiagramService.getById(getId(request));
@@ -79,7 +82,7 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
                     .findAppCountWidgetData(
                             getId(request),
                             readIdSelectionOptionsFromBody(request),
-                            DateTimeUtilities.nowUtc().toLocalDate().plusYears(2));
+                            getTargetDate(request));
         };
 
 
@@ -88,7 +91,20 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
                     .findAppCostWidgetData(
                             getId(request),
                             readIdSelectionOptionsFromBody(request),
-                            DateTimeUtilities.nowUtc().toLocalDate().plusYears(2));
+                            getTargetDate(request));
+        };
+
+
+        ListRoute<AssessmentRatingsWidgetDatum> findAppAssessmentWidgetDataRoute = (request, response) -> {
+            long diagramId = getId(request);
+            long assessmentId = getLong(request, "assessment-id");
+            IdSelectionOptions options = readIdSelectionOptionsFromBody(request);
+
+            return aggregateOverlayDiagramService
+                    .findAppAssessmentWidgetData(
+                            diagramId,
+                            assessmentId,
+                            options);
         };
 
 
@@ -96,6 +112,12 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
         getForList(findAllPath, findAllRoute);
         postForList(findAppCountWidgetDataPath, findAppCountWidgetDataRoute);
         postForList(findAppCostWidgetDataPath, findAppCostWidgetDataRoute);
+        postForList(findAppAssessmentWidgetDataPath, findAppAssessmentWidgetDataRoute);
+    }
+
+    private LocalDate getTargetDate(Request request) {
+        return getLocalDateParam(request, "target-date")
+                .orElse(DateTimeUtilities.nowUtc().toLocalDate().plusYears(2));
     }
 
 }

@@ -17,11 +17,9 @@
     export let primaryEntityRef;
 
     let widgetComponent;
-    let dataProvider;
 
     function handleWidgetChange(e) {
         widgetComponent = e.detail.widget;
-        dataProvider = e.detail.dataProvider;
     }
 
     let svgCall;
@@ -70,11 +68,11 @@
 
 {#if primaryEntityRef}
     <div class="row">
-        <div class="col-sm-4">
+        <div class="col-sm-3">
             <DiagramSelector {diagrams}
                              on:select={selectDiagram}/>
         </div>
-        <div class="col-sm-4">
+        <div class="col-sm-3">
             {#if $selectedDiagram}
                 <DiagramInstanceSelector {instances}
                                          on:select={selectInstance}/>
@@ -86,13 +84,11 @@
             <div class="col-sm-9" style="padding-top: 1em">
                 <AggregateOverlayDiagram svg={$selectedDiagram?.svg}
                                          {primaryEntityRef}
-                                         {widgetComponent}
-                                         {dataProvider}/>
+                                         {widgetComponent}/>
             </div>
             <div class="col-sm-3">
                 <div>
-                    <WidgetSelector on:change={handleWidgetChange}
-                                    {primaryEntityRef}/>
+                    <WidgetSelector {primaryEntityRef}/>
                 </div>
                 <AggregateOverlayDiagramContextPanel {handleWidgetChange}
                                                      {primaryEntityRef}/>

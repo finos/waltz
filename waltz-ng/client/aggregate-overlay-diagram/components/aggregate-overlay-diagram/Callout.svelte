@@ -46,8 +46,8 @@
                         y1="0"
                         y2="1">
             <stop stop-color={callout.startColor} offset="0%"/>
-            <stop stop-color={callout.startColor} offset="50%"/>
-            <stop stop-color={callout.endColor} offset="50%"/>
+            <stop stop-color={callout.startColor} offset="40%"/>
+            <stop stop-color={callout.endColor} offset="60%"/>
             <stop stop-color={callout.endColor} offset="100%"/>
         </linearGradient>
     </defs>
@@ -60,6 +60,7 @@
         <text pointer-events="none"
               text-anchor="middle"
               dx="12"
+              fill="black"
               dy="17">
             {label}
         </text>

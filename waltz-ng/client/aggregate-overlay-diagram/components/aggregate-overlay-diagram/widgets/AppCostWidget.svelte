@@ -8,7 +8,7 @@
 <svg class="content" viewBox="0 0 270 90">
     <foreignObject width="270" height="90">
         {#if cellData}
-            <div style="font-size: 20px; width: 100%; text-align: center">
+            <div style="font-size: 22px; width: 100%; text-align: center">
                 App Costs: {numberFormatter(cellData?.currentStateCost, 2)}
                 &raquo; {numberFormatter(cellData?.targetStateCost, 2)}
             </div>

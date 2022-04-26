@@ -578,6 +578,7 @@ const measurableSections = [
              reportGridViewSection,
              technologySummarySection
          ]),
+    aggregateOverlayDiagramSection,
     bookmarksSection,
     changeSetSection,
     entityDiagramsSection,
@@ -672,6 +673,7 @@ const flowDiagramSections = [
              reportGridViewSection,
              technologySummarySection
          ]),
+    aggregateOverlayDiagramSection,
     bookmarksSection,
     entityNamedNotesSection,
     changeLogSection
@@ -688,6 +690,7 @@ const processDiagramSections = [
              reportGridViewSection,
              technologySummarySection
          ]),
+    aggregateOverlayDiagramSection,
     bookmarksSection,
     entityNamedNotesSection,
     changeLogSection

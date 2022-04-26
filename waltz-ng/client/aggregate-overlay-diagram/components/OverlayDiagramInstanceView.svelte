@@ -13,6 +13,8 @@
 
     export let primaryEntityRef;
 
+    const {selectedDiagram, selectedInstance, callouts, hoveredCallout} = setupContextStores();
+
     let diagramInstanceCall;
     let diagramCall;
     let calloutCall;
@@ -35,11 +37,6 @@
     $: $selectedDiagram = $diagramCall?.data;
     $: $callouts = $calloutCall?.data;
 
-
-    const {selectedDiagram, selectedInstance, callouts, hoveredCallout} = setupContextStores();
-
-    $: console.log({si: $selectedInstance, diagram: $selectedDiagram});
-
 </script>
 
 
@@ -51,7 +48,10 @@
                 <ViewLink state="main">Home</ViewLink>
             </li>
             <li>
-                <ViewLink state="main.system.list">Diagram</ViewLink>
+                <EntityLink ref={$selectedInstance?.parentEntityReference}/>
+            </li>
+            <li>
+                Diagram
             </li>
             <li>
                 <EntityLink ref={$selectedInstance}/>

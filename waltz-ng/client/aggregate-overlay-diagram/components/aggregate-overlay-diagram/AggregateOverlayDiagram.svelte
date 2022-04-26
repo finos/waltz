@@ -7,14 +7,12 @@
 
     export let svg = "";
     export let primaryEntityRef;
-    export let widgetComponent;
-    export let dataProvider;
 
     let svgHolderElem;
     let renderedWidgetRefs = {}; // this gets populated by the calls to `bind:this`
     let renderedCalloutRefs = {}; // this gets populated by the calls to `bind:this`
 
-    $: cellDataByCellExtId = _.keyBy($dataProvider?.data, d => d.cellExternalId);
+    $: cellDataByCellExtId = _.keyBy($overlayData, d => d.cellExternalId);
 
     $: {
         if (svgHolderElem && renderedWidgetRefs) {
@@ -49,6 +47,8 @@
     let selectedInstance = getContext("selectedInstance");
     let selectedDiagram = getContext("selectedDiagram");
     let hoveredCallout = getContext("hoveredCallout");
+    let overlayData = getContext("overlayData");
+    let widget = getContext("widget");
 
     function hoverCallout(evt) {
         $hoveredCallout = evt.detail;
@@ -64,12 +64,12 @@
     {@html svg}
 </div>
 
-{#key widgetComponent}  <!-- we want to destroy this section if the widget changes so the renderedWidgetRefs gets reset -->
+{#key $widget}  <!-- we want to destroy this section if the widget changes so the renderedWidgetRefs gets reset -->
     <div class="rendered-widgets">
         {#each _.keys(cellDataByCellExtId) as cellExtId, idx}
             <div bind:this={renderedWidgetRefs[cellExtId]}>
                 <h4>Widget for cell: {cellExtId}</h4>
-                <svelte:component this={widgetComponent}
+                <svelte:component this={$widget}
                                   cellExtId={cellExtId}
                                   cellData={cellDataByCellExtId[cellExtId]}/>
             </div>
