@@ -62,9 +62,6 @@
         ? `survey-instance-${survey.surveyRun.name}-${survey.surveyInstance.surveyEntity.name}`
         : "survey-instance";
 
-    function copyResponses() {
-        dispatch("showCloneWidget");
-    }
 
     let additionalViewActions = [
         {

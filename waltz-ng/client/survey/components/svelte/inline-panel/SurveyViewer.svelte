@@ -56,8 +56,6 @@
         primaryEntityRef = Object.assign({}, primaryEntityRef, {id: d.detail});
     }
 
-    $: console.log({sectionsToShow})
-
 </script>
 
 
