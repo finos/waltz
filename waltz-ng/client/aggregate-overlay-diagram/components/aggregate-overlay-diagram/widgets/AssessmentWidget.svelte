@@ -12,7 +12,7 @@
 
     $: y = scaleBand()
         .domain(counts.map(c => c.rating.id))
-        .range([0,100])
+        .range([0,90])
 
     $: xMax = _.get(
         _.maxBy(counts, c => c.count),
@@ -23,27 +23,28 @@
         .domain([0, xMax])
         .range([0, 100]);
 
-    $: rowHeight = y.bandwidth() > 40
-        ? 40
+    $: rowHeight = y.bandwidth() > 30
+        ? 30
         : y.bandwidth();
 
 </script>
 
-<h1>Hello Mum</h1>
-
 <svg class="content" viewBox="0 0 300 100">
-    {#each counts as r, idx}
-        <rect x="0"
-              y={y(r.rating.id)}
-              width={x(r.count)}
-              height={rowHeight}
-              fill={r.rating.color}>
-        </rect>
-        <text dx="110"
-              dy={y(r.rating.id) + rowHeight - 4}
-              font-size={rowHeight - 1}
-              fill="#666">
-            {r.rating.name || "?"}
-        </text>
-    {/each}
+    <g transform="translate(10, 5)">
+        {#each counts as r, idx}
+            <rect x="0"
+                  y={y(r.rating.id)}
+                  width={x(r.count)}
+                  height={rowHeight}
+                  stroke="#888"
+                  fill={r.rating.color}>
+            </rect>
+            <text dx="110"
+                  dy={y(r.rating.id) + rowHeight - 4}
+                  font-size={rowHeight - 1}
+                  fill="#666">
+                {r.rating.name || "?"}
+            </text>
+        {/each}
+    </g>
 </svg>
