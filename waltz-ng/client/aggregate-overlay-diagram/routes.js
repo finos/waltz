@@ -32,7 +32,6 @@ const viewState = {
 };
 
 function setup($stateProvider) {
-    console.log($stateProvider);
     $stateProvider
         .state("main.aggregate-overlay-diagram", baseState)
         .state("main.aggregate-overlay-diagram.instance-view", viewState)

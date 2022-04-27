@@ -1,7 +1,7 @@
 <script>
     import _ from "lodash";
     import Callout from "./Callout.svelte";
-    import {renderOverlays} from "./aggregate-overlay-diagram-utils";
+    import {renderOverlays, renderOverlaysNew} from "./aggregate-overlay-diagram-utils";
     import {entity} from "../../../common/services/enums/entity";
     import {getContext} from "svelte";
 
@@ -15,16 +15,18 @@
     $: cellDataByCellExtId = _.keyBy($overlayData, d => d.cellExternalId);
 
     $: {
-        if (svgHolderElem && renderedWidgetRefs) {
-            renderOverlays(
-                svgHolderElem,
-                renderedWidgetRefs,
-                ".statistics-box",
-                (bBox, contentRef) => {
-                    contentRef.setAttribute("width", bBox.width);
-                    contentRef.setAttribute("height", bBox.height);
-                },
-                primaryEntityRef.kind === entity.AGGREGATE_OVERLAY_DIAGRAM_INSTANCE.key);
+        if (svgHolderElem && $overlayData) {
+            setTimeout(
+                () => renderOverlaysNew(
+                    svgHolderElem,
+                    overlayCellsHolder,
+                    ".statistics-box",
+                    (bBox, contentRef) => {
+                        contentRef.setAttribute("width", bBox.width);
+                        contentRef.setAttribute("height", bBox.height);
+                    },
+                    primaryEntityRef.kind === entity.AGGREGATE_OVERLAY_DIAGRAM_INSTANCE.key),
+                100);
         }
     }
 
@@ -50,6 +52,8 @@
     let overlayData = getContext("overlayData");
     let widget = getContext("widget");
 
+    let overlayCellsHolder;
+
     function hoverCallout(evt) {
         $hoveredCallout = evt.detail;
     }
@@ -64,18 +68,6 @@
     {@html svg}
 </div>
 
-{#key $widget}  <!-- we want to destroy this section if the widget changes so the renderedWidgetRefs gets reset -->
-    <div class="rendered-widgets">
-        {#each _.keys(cellDataByCellExtId) as cellExtId, idx}
-            <div bind:this={renderedWidgetRefs[cellExtId]}>
-                <h4>Widget for cell: {cellExtId}</h4>
-                <svelte:component this={$widget}
-                                  cellExtId={cellExtId}
-                                  cellData={cellDataByCellExtId[cellExtId]}/>
-            </div>
-        {/each}
-    </div>
-{/key}
 
 {#key $selectedInstance}
     {#if !_.isEmpty($callouts)}
@@ -92,6 +84,14 @@
         </div>
     {/if}
 {/key}
+
+{#key $widget}
+    <div class="rendered-widgets"
+         bind:this={overlayCellsHolder}>
+        <svelte:component this={$widget}/>
+    </div>
+{/key}
+
 
 <style>
     .rendered-widgets {

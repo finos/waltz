@@ -2,6 +2,46 @@ import _ from "lodash";
 import {writable} from "svelte/store";
 import {setContext} from "svelte";
 
+export function renderOverlaysNew(svgHolderElem,
+                                  overlayCellsHolder = [],
+                                  targetSelector,
+                                  setContentSize,
+                                  isInstance) {
+
+    if (!isInstance) {
+        const existingContent = svgHolderElem.querySelectorAll(`${targetSelector} .content`);
+        _.each(existingContent, elem => elem.parentNode.removeChild(elem));
+    }
+
+    const cells = Array.from(overlayCellsHolder.querySelectorAll(".overlay-cell"));
+    cells.forEach(c => {
+        const targetCellId = c.getAttribute("data-cell-id");
+
+        const targetCell = svgHolderElem.querySelector(`[data-cell-id='${targetCellId}'] ${targetSelector}`);
+        if (!targetCell) {
+            console.log("Cannot find target cell for cell-id", targetCellId);
+            return;
+        }
+
+        const contentRef = c.querySelector(".content");
+        if (!contentRef) {
+            console.log("Cannot find content section for copying into the target box for cell-id",targetCellId);
+            return;
+        }
+
+        setContentSize(
+            targetCell.getBBox(),
+            contentRef);
+
+        const existingContent = targetCell.querySelector(".content");
+        if (existingContent) {
+            targetCell.replaceChild(contentRef, existingContent);
+        } else {
+            targetCell.append(contentRef);
+        }
+    });
+}
+
 export function renderOverlays(svgHolderElem, refs = [], targetSelector, setContentSize, isInstance) {
 
     if (!isInstance) {

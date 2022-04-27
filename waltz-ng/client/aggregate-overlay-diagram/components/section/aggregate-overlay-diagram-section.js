@@ -15,7 +15,6 @@ const initialState = {
 function controller() {
 
     const vm = initialiseData(this, initialState);
-    console.log({ref: vm.parentEntityRef});
 
 }
 

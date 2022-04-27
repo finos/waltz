@@ -18,8 +18,21 @@
 
 <div>
 
-    <waltz-section name="builder">
-        <waltz-svelte-component component="$ctrl.OverlayDiagramBuilder">
+    <waltz-section name="F2B Trade">
+        <waltz-svelte-component component="$ctrl.OverlayDiagramBuilder"
+                                config="$ctrl.configA">
+        </waltz-svelte-component>
+    </waltz-section>
+
+    <waltz-section name="F2B Ops">
+        <waltz-svelte-component component="$ctrl.OverlayDiagramBuilder"
+                                config="$ctrl.configB">
+        </waltz-svelte-component>
+    </waltz-section>
+
+    <waltz-section name="Northstar">
+        <waltz-svelte-component component="$ctrl.OverlayDiagramBuilder"
+                                config="$ctrl.configC">
         </waltz-svelte-component>
     </waltz-section>
 

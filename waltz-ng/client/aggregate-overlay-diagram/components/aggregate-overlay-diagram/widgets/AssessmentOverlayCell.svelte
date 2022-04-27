@@ -1,11 +1,11 @@
 <script>
     import _ from "lodash";
-    import {scaleLinear, scaleBand} from "d3-scale";
+    import {scaleBand, scaleLinear} from "d3-scale";
 
-    export let cellData;
+    export let cellData = [];
+    export let maxCount = 0;
 
     let counts = [];
-    let xMax = 0;
     let y;
 
     $: counts = _.orderBy(cellData?.counts, c => c.rating.name);
@@ -14,14 +14,10 @@
         .domain(counts.map(c => c.rating.id))
         .range([0,90])
 
-    $: xMax = _.get(
-        _.maxBy(counts, c => c.count),
-        ["count"],
-        0);
 
     $:x = scaleLinear()
-        .domain([0, xMax])
-        .range([0, 100]);
+        .domain([0, maxCount])
+        .range([0, 90]);
 
     $: rowHeight = y.bandwidth() > 30
         ? 30
@@ -29,9 +25,11 @@
 
 </script>
 
+
+
 <svg class="content" viewBox="0 0 300 100">
     <g transform="translate(10, 5)">
-        {#each counts as r, idx}
+        {#each counts as r}
             <rect x="0"
                   y={y(r.rating.id)}
                   width={x(r.count)}
@@ -39,7 +37,7 @@
                   stroke="#888"
                   fill={r.rating.color}>
             </rect>
-            <text dx="110"
+            <text dx="100"
                   dy={y(r.rating.id) + rowHeight - 4}
                   font-size={rowHeight - 1}
                   fill="#666">
