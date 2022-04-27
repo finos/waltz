@@ -2,11 +2,25 @@ import _ from "lodash";
 import {writable} from "svelte/store";
 import {setContext} from "svelte";
 
-export function renderOverlaysNew(svgHolderElem,
-                                  overlayCellsHolder = [],
-                                  targetSelector,
-                                  setContentSize,
-                                  isInstance) {
+/**
+ * Takes elements in the `overlayCellsHolder` marked with a class of `overlay-cell` and
+ * links them to matching target cells in the `svgHolderElem`.  The matching is done via
+ * an attribute, `data-cell-id`.
+ *
+ * For each overlay cell we search for a sub element classed as `content` and insert it
+ * into the target cell using the given selector.
+ *
+ * @param svgHolderElem
+ * @param overlayCellsHolder
+ * @param targetSelector
+ * @param setContentSize
+ * @param isInstance
+ */
+export function renderBulkOverlays(svgHolderElem,
+                                   overlayCellsHolder = [],
+                                   targetSelector,
+                                   setContentSize,
+                                   isInstance) {
 
     if (!isInstance) {
         const existingContent = svgHolderElem.querySelectorAll(`${targetSelector} .content`);
@@ -41,6 +55,7 @@ export function renderOverlaysNew(svgHolderElem,
         }
     });
 }
+
 
 export function renderOverlays(svgHolderElem, refs = [], targetSelector, setContentSize, isInstance) {
 

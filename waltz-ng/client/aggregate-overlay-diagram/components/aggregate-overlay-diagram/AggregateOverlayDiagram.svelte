@@ -1,7 +1,7 @@
 <script>
     import _ from "lodash";
     import Callout from "./Callout.svelte";
-    import {renderOverlays, renderOverlaysNew} from "./aggregate-overlay-diagram-utils";
+    import {renderOverlays, renderBulkOverlays} from "./aggregate-overlay-diagram-utils";
     import {entity} from "../../../common/services/enums/entity";
     import {getContext} from "svelte";
 
@@ -17,7 +17,7 @@
     $: {
         if (svgHolderElem && $overlayData) {
             setTimeout(
-                () => renderOverlaysNew(
+                () => renderBulkOverlays(
                     svgHolderElem,
                     overlayCellsHolder,
                     ".statistics-box",

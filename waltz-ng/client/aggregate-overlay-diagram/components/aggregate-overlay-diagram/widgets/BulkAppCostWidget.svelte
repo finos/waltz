@@ -12,7 +12,9 @@
         .max()
         .value();
 
-    $: cellDataByCellExtId = _.keyBy($overlayData, d => d.cellExternalId);
+    $: cellDataByCellExtId = _.keyBy(
+        $overlayData,
+        d => d.cellExternalId);
 </script>
 
 {#each Object.entries(cellDataByCellExtId) as [key, cellData]}
