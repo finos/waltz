@@ -4,7 +4,7 @@
     import EntityLink from "../../common/svelte/EntityLink.svelte";
     import {aggregateOverlayDiagramInstanceStore} from "../../svelte-stores/aggregate-overlay-diagram-instance-store";
     import AggregateOverlayDiagram from "./aggregate-overlay-diagram/AggregateOverlayDiagram.svelte";
-    import AggregateOverlayDiagramContextPanel
+    import AggregateOverlayDiagramInstanceContextPanel
         from "./context-panel/AggregateOverlayDiagramInstanceContextPanel.svelte";
     import NoData from "../../common/svelte/NoData.svelte";
     import {aggregateOverlayDiagramStore} from "../../svelte-stores/aggregate-overlay-diagram-store";
@@ -69,7 +69,7 @@
                                              {primaryEntityRef}/>
                 </div>
                 <div class="col-sm-4">
-                    <AggregateOverlayDiagramContextPanel {primaryEntityRef}/>
+                    <AggregateOverlayDiagramInstanceContextPanel {primaryEntityRef}/>
                 </div>
             {:else}
                 <div class="col-sm-12" style="padding-top: 1em">

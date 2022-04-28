@@ -67,6 +67,7 @@ export function setupContextStores() {
     const widget = writable(null);
     const svgDetail = writable(null);
     const instances = writable([]);
+    const diagramProportion = writable(9);
 
     setContext("hoveredCallout", hoveredCallout);
     setContext("selectedDiagram", selectedDiagram);
@@ -77,6 +78,7 @@ export function setupContextStores() {
     setContext("widget", widget);
     setContext("svgDetail", svgDetail);
     setContext("instances", instances);
+    setContext("diagramProportion", diagramProportion);
 
     return {
         selectedDiagram,
@@ -87,6 +89,7 @@ export function setupContextStores() {
         overlayData,
         widget,
         svgDetail,
-        instances
+        instances,
+        diagramProportion
     };
 }

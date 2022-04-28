@@ -37,12 +37,14 @@
         Promise.resolve(createPromise)
             .then(() => {
                 toasts.success("Diagram saved!");
-                aggregateOverlayDiagramInstanceStore.findByDiagramId($selectedDiagram.id, true);
+                return instanceCall = aggregateOverlayDiagramInstanceStore.findByDiagramId($selectedDiagram.id, true);
             })
             .catch(e => displayError("Could not save diagram", e))
             .finally(() => cancel());
 
     }
+
+    $: $instances = instanceCall?.data;
 
     function cancel() {
         dispatch("cancel");

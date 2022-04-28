@@ -9,6 +9,7 @@ export function mkOverlayDiagramInstanceStore() {
             .fetchViewList(
                 "GET",
                 `api/aggregate-overlay-diagram-instance/diagram-id/${diagramId}`,
+                null,
                 {force});
     };
 
@@ -18,6 +19,7 @@ export function mkOverlayDiagramInstanceStore() {
             .fetchViewDatum(
                 "GET",
                 `api/aggregate-overlay-diagram-instance/id/${id}`,
+                null,
                 {force});
     };
 

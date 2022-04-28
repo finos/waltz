@@ -3,31 +3,32 @@
 
     import AggregateOverlayDiagram from "../aggregate-overlay-diagram/AggregateOverlayDiagram.svelte";
     import {aggregateOverlayDiagramStore} from "../../../svelte-stores/aggregate-overlay-diagram-store";
-    import {onMount} from "svelte";
+    import {getContext, onMount} from "svelte";
     import WidgetSelector from "../aggregate-overlay-diagram/WidgetSelector.svelte";
-    import {aggregateOverlayDiagramInstanceStore} from "../../../svelte-stores/aggregate-overlay-diagram-instance-store";
     import {aggregateOverlayDiagramCalloutStore} from "../../../svelte-stores/aggregate-overlay-diagram-callout-store";
     import DiagramSelector from "../diagram-selector/DiagramSelector.svelte";
     import NoData from "../../../common/svelte/NoData.svelte";
-    import DiagramInstanceSelector from "../instance-selector/DiagramInstanceSelector.svelte";
-    import AggregateOverlayDiagramContextPanel
-        from "../context-panel/AggregateOverlayDiagramInstanceContextPanel.svelte";
     import {setupContextStores} from "../aggregate-overlay-diagram/aggregate-overlay-diagram-utils";
     import _ from "lodash";
+    import AggregateOverlayDiagramContextPanel from "../context-panel/AggregateOverlayDiagramContextPanel.svelte";
+    import Icon from "../../../common/svelte/Icon.svelte";
 
     export let primaryEntityRef;
 
-    let widgetComponent;
-
-    function handleWidgetChange(e) {
-        widgetComponent = e.detail.widget;
-    }
 
     let svgCall;
-    // let instancesCall;
     let calloutCall;
     let diagramsCall;
 
+
+    const Modes = {
+        SELECT: "SELECT",
+        VIEW: "VIEW"
+    }
+
+    let activeMode = $selectedDiagram == null
+        ? Modes.SELECT
+        : Modes.VIEW
 
     onMount(() => {
         diagramsCall = aggregateOverlayDiagramStore.findAll();
@@ -54,13 +55,15 @@
     function selectDiagram(evt) {
         $selectedInstance = null;
         $selectedDiagram = evt.detail;
+        activeMode = Modes.VIEW;
     }
 
-    function selectInstance(evt) {
-        $selectedInstance = evt.detail;
-    }
 
-    const {selectedDiagram, selectedInstance, hoveredCallout} = setupContextStores();
+    setupContextStores();
+
+    let selectedInstance = getContext("selectedInstance");
+    let selectedDiagram = getContext("selectedDiagram");
+    let diagramProportion = getContext("diagramProportion");
 
 
 </script>
@@ -69,34 +72,51 @@
     {#if _.isEmpty(diagrams)}
         <NoData>There are no diagrams</NoData>
     {:else}
-        <div class="row">
-            <div class="col-sm-3">
-                <DiagramSelector {diagrams}
-                                 on:select={selectDiagram}/>
-            </div>
-            <div class="col-sm-3">
-                {#if $selectedDiagram}
-                    <DiagramInstanceSelector {primaryEntityRef}
-                                             on:select={selectInstance}/>
-                {/if}
-            </div>
-        </div>
-        <div class="row">
-            {#if $selectedDiagram}
-                <div class="col-sm-9" style="padding-top: 1em">
-                    <AggregateOverlayDiagram svg={$selectedDiagram?.svg}
-                                             {primaryEntityRef}
-                                             {widgetComponent}/>
-                </div>
-                <div class="col-sm-3">
-                    <div>
-                        <WidgetSelector {primaryEntityRef}/>
+        <div class="row row-no-gutters">
+            {#if activeMode === Modes.VIEW}
+                <div class={`col-sm-${$diagramProportion}`}
+                     style="padding-top: 1em">
+                    <div class="col-sm-6">
+                        <h4>{$selectedDiagram?.name}</h4>
+                        <button class="small btn btn-skinny"
+                                on:click={() => activeMode = Modes.SELECT}>
+                            Change diagram
+                        </button>
                     </div>
-                    <AggregateOverlayDiagramContextPanel {handleWidgetChange}
-                                                         {primaryEntityRef}/>
+                    <div class="col-sm-6">
+                        <div class="pull-right btn-group">
+                            <button class="btn btn-default btn-xs"
+                                    title="Expand Diagram"
+                                    on:click={() => $diagramProportion = 12}>
+                                <Icon name="arrows-alt"/>
+                            </button>
+                            <button class="btn btn-default btn-xs"
+                                    title="Original Size"
+                                    on:click={() => $diagramProportion = 9}>
+                                <Icon name="chevron-left"/>
+                            </button>
+                            <button class="btn btn-default btn-xs"
+                                    title="Expand Context Panel"
+                                    on:click={() => $diagramProportion = 6}>
+                                <Icon name="arrow-left"/>
+                            </button>
+                        </div>
+                    </div>
+                    <br>
+                    <AggregateOverlayDiagram svg={$selectedDiagram?.svg}
+                                             {primaryEntityRef}/>
                 </div>
-            {:else}
-                <div class="col-sm-12" style="padding-top: 1em">
+                <div class={`col-sm-${12 - $diagramProportion}`}
+                     style="padding-left: 1em">
+                    <AggregateOverlayDiagramContextPanel {primaryEntityRef}/>
+                </div>
+            {:else if activeMode === Modes.SELECT}
+                <div class="col-sm-12">
+                    <DiagramSelector {diagrams}
+                                     on:select={selectDiagram}/>
+                </div>
+                <div class="col-sm-12"
+                     style="padding-top: 1em">
                     <NoData>No diagram selected, choose one from the list above</NoData>
                 </div>
             {/if}

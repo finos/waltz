@@ -54,7 +54,8 @@
         </ul>
     {:else}
         <p>There are no instances of this diagram at this vantage point, would you like to
-            <button class="btn btn-skinny" on:click={() => activeMode = Modes.CREATE}>
+            <button class="btn btn-skinny"
+                    on:click={() => activeMode = Modes.CREATE}>
                 create one
             </button>
             ?
