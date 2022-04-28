@@ -1,7 +1,6 @@
 
 package org.finos.waltz.data.aggregate_overlay_diagram;
 
-import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
 import org.finos.waltz.model.aggregate_overlay_diagram.ImmutableAggregateOverlayDiagram;
@@ -11,7 +10,7 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -133,15 +132,26 @@ public class AggregateOverlayDiagramDao {
 
 
     /**
-     * Combines the cell and app id selector with the inScope (for this vantage point) app id selector.
-     * Return only appIds which should appear on the diagram  (basically the intersection between the two selectors).
+     * Takes the maximal set of app ids that may appear on the diagram (derived by unioning the values of
+     * the cellExtIdsToAppIdsMap) and filters then by the apps associated to the vantage point (given via
+     * the inScopeApplicationSelector).
+     * <p>
+     * Returns only appIds which should appear on the diagram  (basically the intersection between the
+     * maximal set given diagram cell mappings and the vantage point selector).
      */
-    protected Select<Record1<Long>> mkAppIdSelectorForDiagram(Select<Record2<String, Long>> cellAndAppSelector,
-                                                              Select<Record1<Long>> inScopeApplicationSelector) {
-        return DSL
-                .select(cellAndAppSelector.field(1, Long.class))
-                .from(cellAndAppSelector)
-                .where(dsl.renderInlined(cellAndAppSelector.field(1, Long.class).in(inScopeApplicationSelector)));
+    protected Set<Long> calcExactAppIdsDiagram(Map<String, Set<Long>> cellExtIdsToAppIdsMap,
+                                               Select<Record1<Long>> inScopeApplicationSelector) {
+        Set<Long> maximalAppIdsForCells = cellExtIdsToAppIdsMap
+                .values()
+                .stream()
+                .flatMap(Collection::stream)
+                .collect(toSet());
+
+        return dsl
+                .select(inScopeApplicationSelector.field(0, Long.class))
+                .from(inScopeApplicationSelector)
+                .where(inScopeApplicationSelector.field(0).in(maximalAppIdsForCells))
+                .fetchSet(0, Long.class);
     }
 
 

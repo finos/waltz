@@ -43,13 +43,13 @@ public class AppCountWidgetDao extends AggregateOverlayDiagramDao {
 
         Map<String, Set<Long>> cellExtIdsToAppIdsMap = fetchAndGroupAppIdsByCellId(cellExtIdWithAppIdSelector);
 
-        Select<Record1<Long>> diagramApplicationIdSelector = mkAppIdSelectorForDiagram(
-                cellExtIdWithAppIdSelector,
+        Set<Long> diagramApplicationIds = calcExactAppIdsDiagram(
+                cellExtIdsToAppIdsMap,
                 inScopeApplicationSelector);
 
         Map<Long, Tuple2<Integer, Integer>> appToTargetStateCounts = fetchAppIdToTargetStatePresenceIndicator(
                 targetStateDate,
-                diagramApplicationIdSelector);
+                diagramApplicationIds);
 
         return cellExtIdsToAppIdsMap
                 .entrySet()
@@ -78,9 +78,8 @@ public class AppCountWidgetDao extends AggregateOverlayDiagramDao {
     }
 
 
-
     private Map<Long, Tuple2<Integer, Integer>> fetchAppIdToTargetStatePresenceIndicator(LocalDate targetStateDate,
-                                                                                         Select<Record1<Long>> diagramApplicationIdSelector) {
+                                                                                         Set<Long> diagramApplicationIdSelector) {
         Timestamp targetStateTimestamp = Timestamp.valueOf(targetStateDate.atStartOfDay());
 
         // actual: 2022, target: 2025  -> 0   (it has retired)

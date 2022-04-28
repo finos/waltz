@@ -1,6 +1,6 @@
 <script>
 
-    import CalloutList from "../aggregate-overlay-diagram/CalloutList.svelte";
+    import CalloutList from "../aggregate-overlay-diagram/callout/CalloutList.svelte";
     import EntityLink from "../../../common/svelte/EntityLink.svelte";
     import {getContext} from "svelte";
     import LastEdited from "../../../common/svelte/LastEdited.svelte";

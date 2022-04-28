@@ -1,9 +1,9 @@
 <script>
     import {aggregateOverlayDiagramStore} from "../../../../svelte-stores/aggregate-overlay-diagram-store";
     import {getContext} from "svelte";
-    import AppCostWidget from "./AppCostWidget.svelte";
     import DatePicker from "../../../../common/svelte/DatePicker.svelte";
     import {timeFormat} from "d3-time-format";
+    import BulkAppCostWidget from "./BulkAppCostWidget.svelte";
 
     export let opts;
 
@@ -19,7 +19,7 @@
     function onSelect() {
         const dateStr = fmt(futureDate);
         overlayDataCall = aggregateOverlayDiagramStore.findAppCostForDiagram($selectedDiagram.id, opts, dateStr);
-        $widget = AppCostWidget;
+        $widget = BulkAppCostWidget;
     }
 
     $: {
@@ -30,11 +30,6 @@
         futureDate = evt.detail;
         onSelect();
     }
-
-    $: console.log({futureDate})
-
-
-
 </script>
 
 <DatePicker on:change={onDateChange}

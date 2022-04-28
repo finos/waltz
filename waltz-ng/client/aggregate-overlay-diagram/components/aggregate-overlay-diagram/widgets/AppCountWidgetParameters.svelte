@@ -3,7 +3,7 @@
     import {getContext} from "svelte";
     import DatePicker from "../../../../common/svelte/DatePicker.svelte";
     import {timeFormat} from "d3-time-format";
-    import AppCountWidget from "./AppCountWidget.svelte";
+    import BulkAppCountWidget from "./BulkAppCountWidget.svelte";
 
     export let opts;
 
@@ -19,7 +19,7 @@
     function onSelect() {
         const dateStr = fmt(futureDate);
         overlayDataCall = aggregateOverlayDiagramStore.findAppCountsForDiagram($selectedDiagram.id, opts, dateStr);
-        $widget = AppCountWidget;
+        $widget = BulkAppCountWidget;
     }
 
     $: {

@@ -3,7 +3,7 @@
     import Markdown from "../../../../common/svelte/Markdown.svelte";
     import {aggregateOverlayDiagramStore} from "../../../../svelte-stores/aggregate-overlay-diagram-store";
     import {getContext} from "svelte";
-    import AssessmentWidget from "./AssessmentWidget.svelte";
+    import BulkAssessmentWidget from "./BulkAssessmentWidget.svelte";
 
     export let opts;
 
@@ -21,7 +21,7 @@
             ad.id,
             opts,
             true);
-        $widget = AssessmentWidget;
+        $widget = BulkAssessmentWidget;
     }
 
     $: {

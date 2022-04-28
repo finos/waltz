@@ -16,10 +16,6 @@ function controller() {
 
     const vm = initialiseData(this, initialState);
 
-    vm.$onInit = () => {
-        console.log({ref: vm.parentEntityRef});
-    }
-
 }
 
 controller.$inject = [];

@@ -21,6 +21,9 @@ import template from "./playpen3.html";
 import {CORE_API} from "../../common/services/core-api-utils";
 import FlowVenn from "../../logical-flow/svelte/flow-venn/FlowVenn.svelte";
 import OverlayDiagramBuilder from "./builder/OverlayDiagramBuilder.svelte";
+import configA from "./builder/front-to-back-trade-data";
+import configB from "./builder/front-to-back-operations-data";
+import configC from "./builder/north-star";
 
 
 const initialState = {
@@ -35,7 +38,10 @@ const initialState = {
         name: "A Group"
     },
     FlowVenn,
-    OverlayDiagramBuilder
+    OverlayDiagramBuilder,
+    configA,
+    configB,
+    configC
 };
 
 function controller(serviceBroker) {
