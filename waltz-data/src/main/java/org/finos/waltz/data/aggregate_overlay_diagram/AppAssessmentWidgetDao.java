@@ -10,7 +10,6 @@ import org.finos.waltz.model.overlay_diagram.ImmutableAssessmentRatingCount;
 import org.finos.waltz.model.overlay_diagram.ImmutableAssessmentRatingsWidgetDatum;
 import org.finos.waltz.model.utils.IdUtilities;
 import org.finos.waltz.schema.tables.AssessmentRating;
-import org.finos.waltz.schema.tables.RatingSchemeItem;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Record2;
@@ -28,7 +27,6 @@ import static java.util.stream.Collectors.toSet;
 @Repository
 public class AppAssessmentWidgetDao extends AggregateOverlayDiagramDao{
 
-    private static final RatingSchemeItem rsi = RatingSchemeItem.RATING_SCHEME_ITEM;
     private static final AssessmentRating ar = AssessmentRating.ASSESSMENT_RATING;
     private final RatingSchemeDAO ratingSchemeDAO;
 
@@ -54,8 +52,8 @@ public class AppAssessmentWidgetDao extends AggregateOverlayDiagramDao{
 
         Map<String, Set<Long>> cellExtIdsToAppIdsMap = fetchAndGroupAppIdsByCellId(cellExtIdWithAppIdSelector);
 
-        Select<Record1<Long>> diagramApplicationIdSelector = mkAppIdSelectorForDiagram(
-                cellExtIdWithAppIdSelector,
+        Set<Long> diagramApplicationIds = calcExactAppIdsDiagram(
+                cellExtIdsToAppIdsMap,
                 inScopeApplicationSelector);
 
         Map<Long, org.finos.waltz.model.rating.RatingSchemeItem> itemsById = IdUtilities.indexById(ratingSchemeDAO.findRatingSchemeItemsForAssessmentDefinition(assessmentId));
@@ -68,7 +66,7 @@ public class AppAssessmentWidgetDao extends AggregateOverlayDiagramDao{
                 .select(ar.RATING_ID, ar.ENTITY_ID)
                 .from(ar)
                 .where(ar.ASSESSMENT_DEFINITION_ID.eq(assessmentId))
-                .and(ar.ENTITY_ID.in(diagramApplicationIdSelector))
+                .and(ar.ENTITY_ID.in(diagramApplicationIds))
                 .and(ar.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                 .fetchMap(ar.ENTITY_ID, ar.RATING_ID);
 

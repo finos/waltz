@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
+import static org.finos.waltz.common.FunctionUtilities.time;
 import static org.finos.waltz.schema.Tables.*;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
@@ -43,15 +44,15 @@ public class AppCostWidgetDao extends AggregateOverlayDiagramDao {
             return Collections.emptySet();
         }
 
-        Map<String, Set<Long>> cellExtIdsToAppIdsMap = fetchAndGroupAppIdsByCellId(cellExtIdWithAppIdSelector);
+        Map<String, Set<Long>> cellExtIdsToAppIdsMap = time("fetchAndGroupAppIdsByCellId", () -> fetchAndGroupAppIdsByCellId(cellExtIdWithAppIdSelector));
 
-        Select<Record1<Long>> diagramApplicationIdSelector = mkAppIdSelectorForDiagram(
-                cellExtIdWithAppIdSelector,
+        Set<Long> diagramApplicationIds = calcExactAppIdsDiagram(
+                cellExtIdsToAppIdsMap,
                 inScopeApplicationSelector);
 
-        Map<Long, Tuple2<BigDecimal, BigDecimal>> appToTargetStateCosts = fetchAppIdToTargetStateCostIndicator(
+        Map<Long, Tuple2<BigDecimal, BigDecimal>> appToTargetStateCosts = time("fetchAppIdToTargetStateCostIndicator", () -> fetchAppIdToTargetStateCostIndicator(
                 targetStateDate,
-                diagramApplicationIdSelector);
+                diagramApplicationIds));
 
         return cellExtIdsToAppIdsMap
                 .entrySet()
@@ -82,7 +83,7 @@ public class AppCostWidgetDao extends AggregateOverlayDiagramDao {
 
 
     private Map<Long, Tuple2<BigDecimal, BigDecimal>> fetchAppIdToTargetStateCostIndicator(LocalDate targetStateDate,
-                                                                                           Select<Record1<Long>> diagramApplicationIdSelector) {
+                                                                                           Set<Long> diagramApplicationIds) {
 
         Timestamp targetStateTimestamp = Timestamp.valueOf(targetStateDate.atStartOfDay());
 
@@ -95,7 +96,7 @@ public class AppCostWidgetDao extends AggregateOverlayDiagramDao {
                 .otherwise(COST.AMOUNT)
                 .as("target_cost");
 
-        Condition costCondition = APPLICATION.ID.in(diagramApplicationIdSelector)
+        Condition costCondition = APPLICATION.ID.in(diagramApplicationIds)
                 .and(COST.YEAR.eq(2021));
 
         Condition costJoinCondition = COST.ENTITY_ID.eq(APPLICATION.ID)

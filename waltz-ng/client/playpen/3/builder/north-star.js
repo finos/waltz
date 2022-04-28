@@ -69,7 +69,7 @@ const cells = {
     },
     "CLIENT_REFERENCE_DATA_MANAGEMENT": {
         "name": "Client Reference Data Management",
-        "id": "CLIENT_REFERENCE_DATA_MANAGEMENT"
+        "id": "CLIENT_MANAGEMENT"
     },
     "REFERENCE_DATA_MANAGEMENT": {
         "name": "Reference Data Management",
@@ -151,7 +151,11 @@ const referenceData = {
     id: "REF_DATA",
     name: "Reference Data",
     rows: [
-        [cells.REFERENCE_DATA_MANAGEMENT, cells.CLIENT_REFERENCE_DATA_MANAGEMENT, cells.MARKET_REFERENCE_DATA_MANAGEMENT]
+        [
+            ns1("REFERENCE_DATA_MANAGEMENT", cells.REFERENCE_DATA_MANAGEMENT),
+            ns1("CLIENT_REFERENCE_DATA_MANAGEMENT", cells.CLIENT_REFERENCE_DATA_MANAGEMENT),
+            ns1("MARKET_REFERENCE_DATA_MANAGEMENT", cells.MARKET_REFERENCE_DATA_MANAGEMENT)
+        ]
     ]
 };
 
@@ -159,8 +163,8 @@ const transactionInitiation = {
     id: "TRANSACTION_INITIATION",
     name: "Transaction Initiation",
     rows: [
-        [cells.TRADING, cells.LENDING, cells.BANKING_MANAGEMENT, cells.TRADE_BANKING],
-        [cells.SALES_AND_ADVISORY, cells.CLIENT_MANAGEMENT, cells.CLIENT_SERVICING, cells.PAYMENTS]
+        ns("TRANSACTION_INITIATION", [cells.TRADING, cells.LENDING, cells.BANKING_MANAGEMENT, cells.TRADE_BANKING]),
+        ns("TRANSACTION_INITIATION", [cells.SALES_AND_ADVISORY, cells.CLIENT_MANAGEMENT, cells.CLIENT_SERVICING, cells.PAYMENTS])
     ]
 };
 
@@ -168,10 +172,10 @@ const coreProcessing = {
     id: "CORE_PROCESSING",
     name: "Core Processing",
     rows: [
-        [cells.CLIENT_SERVICING, cells.CLIENT_MANAGEMENT, cells.CLIENT_AND_FUNDS_PORTFOLIO_MANAGEMENT, cells.SALES_AND_ADVISORY],
-        [cells.TRADING, cells.RISK_AND_VALUATION],
-        [cells.HUMAN_RESOURCES, cells.LEGAL],
-        [cells.ANTI_FINANCIAL_CRIME, cells.COMPLIANCE]
+        ns("CORE_PROCESSING", [cells.CLIENT_SERVICING, cells.CLIENT_MANAGEMENT, cells.CLIENT_AND_FUNDS_PORTFOLIO_MANAGEMENT, cells.SALES_AND_ADVISORY]),
+        ns("CORE_PROCESSING", [cells.TRADING, cells.RISK_AND_VALUATION]),
+        ns("CORE_PROCESSING", [cells.HUMAN_RESOURCES, cells.LEGAL]),
+        ns("CORE_PROCESSING", [cells.ANTI_FINANCIAL_CRIME, cells.COMPLIANCE])
     ]
 };
 
@@ -179,9 +183,9 @@ const coreProcessingOperations = {
     id: "CORE_PROCESSING_OPERATIONS",
     name: "Core Processing (Operations)",
     rows: [
-        [cells.MARKET_OPERATIONS, cells.CLEARING_AND_SETTLEMENT, cells.PAYMENTS],
-        [cells.COLLATERAL_AND_MARGIN, cells.POSITION_MANAGEMENT, cells.LENDING],
-        [cells.BANKING_MANAGEMENT]
+        ns("CORE_PROCESSING", [cells.MARKET_OPERATIONS, cells.CLEARING_AND_SETTLEMENT, cells.PAYMENTS]),
+        ns("CORE_PROCESSING", [cells.COLLATERAL_AND_MARGIN, cells.POSITION_MANAGEMENT, cells.LENDING]),
+        ns("CORE_PROCESSING", [cells.BANKING_MANAGEMENT])
     ]
 };
 
@@ -189,22 +193,27 @@ const coreProcessingFinance = {
     id: "CORE_PROCESSING_FINANCE",
     name: "Core Processing (Finance)",
     rows: [
-        [cells.FINANCE_CONTROL, cells.FINANCIAL_RISK_CONTROL, cells.FINANCIAL_MANAGEMENT, cells.TRANSACTION_ACCOUNTING],
-        [cells.FINANCE_PERFORMANCE, cells.NON_FINANCIAL_RISK_CONTROL, cells.TREASURY, cells.TAX_MANAGEMENT]
+        ns("CORE_PROCESSING", [cells.FINANCE_CONTROL, cells.FINANCIAL_RISK_CONTROL, cells.FINANCIAL_MANAGEMENT, cells.TRANSACTION_ACCOUNTING]),
+        ns("CORE_PROCESSING", [cells.FINANCE_PERFORMANCE, cells.NON_FINANCIAL_RISK_CONTROL, cells.TREASURY, cells.TAX_MANAGEMENT])
     ]
 };
 
 function ns(namespace, cells) {
-    return _.map(cells, c => Object.assign({}, c, {id: namespace + "_" + c.id}))
+    return _.map(cells, c => ns1(namespace, c));
+}
+
+
+function ns1(namespace, cell) {
+    return Object.assign({}, cell, {id: namespace + "_" + cell.id});
 }
 
 const analyticsAndReporting = {
     id: "ANALYTICS_REPORTING",
     name: "Analytics and Reporting",
     rows: [
-        ns("ANALYTICS", [cells.RESEARCH, cells.COMPLIANCE, cells.FINANCE_CONTROL]),
-        ns("ANALYTICS", [cells.TREASURY, cells.TAX_MANAGEMENT]),
-        ns("ANALYTICS", [cells.BUSINESS_INTELLIGENCE_AND_ANALYTICS, cells.BUSINESS_PERFORMANCE_AND_MANAGEMENT, cells.CLIENT_SERVICING, cells.CLIENT_MANAGEMENT])
+        ns("ANALYTICS_AND_REPORTING", [cells.RESEARCH, cells.COMPLIANCE, cells.FINANCE_CONTROL]),
+        ns("ANALYTICS_AND_REPORTING", [cells.TREASURY, cells.TAX_MANAGEMENT]),
+        ns("ANALYTICS_AND_REPORTING", [cells.BUSINESS_INTELLIGENCE_AND_ANALYTICS, cells.BUSINESS_PERFORMANCE_AND_MANAGEMENT, cells.CLIENT_SERVICING, cells.CLIENT_MANAGEMENT])
     ]
 };
 
