@@ -1,9 +1,8 @@
 <script>
-
     import {getContext} from "svelte";
     import _ from "lodash";
-    import Icon from "../../../common/svelte/Icon.svelte";
-    import Markdown from "../../../common/svelte/Markdown.svelte";
+    import Icon from "../../../../common/svelte/Icon.svelte";
+    import Markdown from "../../../../common/svelte/Markdown.svelte";
 
     let hoveredCallout = getContext("hoveredCallout");
     let callouts = getContext("callouts");
@@ -16,8 +15,6 @@
     function leave(callout) {
         $hoveredCallout = null;
     }
-
-    $: console.log({sc: $selectedCallout});
 
     function selectCallout(callout) {
         console.log({callout});

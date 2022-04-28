@@ -2,6 +2,12 @@ import _ from "lodash";
 import {writable} from "svelte/store";
 import {setContext} from "svelte";
 
+export function clearOverlayContent(svgHolderElem, targetSelector) {
+    const existingContent = svgHolderElem.querySelectorAll(`${targetSelector} .content`);
+    _.each(existingContent, elem => elem.parentNode.removeChild(elem));
+}
+
+
 /**
  * Takes elements in the `overlayCellsHolder` marked with a class of `overlay-cell` and
  * links them to matching target cells in the `svgHolderElem`.  The matching is done via
@@ -14,18 +20,12 @@ import {setContext} from "svelte";
  * @param overlayCellsHolder
  * @param targetSelector
  * @param setContentSize
- * @param isInstance
  */
 export function renderBulkOverlays(svgHolderElem,
                                    overlayCellsHolder = [],
                                    targetSelector,
-                                   setContentSize,
-                                   isInstance) {
+                                   setContentSize) {
 
-    if (!isInstance) {
-        const existingContent = svgHolderElem.querySelectorAll(`${targetSelector} .content`);
-        _.each(existingContent, elem => elem.parentNode.removeChild(elem));
-    }
 
     const cells = Array.from(overlayCellsHolder.querySelectorAll(".overlay-cell"));
     cells.forEach(c => {
@@ -52,50 +52,6 @@ export function renderBulkOverlays(svgHolderElem,
             targetCell.replaceChild(contentRef, existingContent);
         } else {
             targetCell.append(contentRef);
-        }
-    });
-}
-
-
-export function renderOverlays(svgHolderElem, refs = [], targetSelector, setContentSize, isInstance) {
-
-    if (!isInstance) {
-        const existingContent = svgHolderElem.querySelectorAll(`${targetSelector} .content`);
-        _.each(existingContent, elem => elem.parentNode.removeChild(elem));
-    }
-
-    _.each(refs, (v, k) => {
-        if (!v) return;
-        const cell = svgHolderElem.querySelector(`[data-cell-id='${k}']`);
-
-        if (cell == null) {
-            console.log("Cannot find cell for key:" + k);
-            return;
-        }
-
-        const targetBox = cell.querySelector(targetSelector);
-
-        if (!targetBox) {
-            console.log("Cannot find target box for cell-id", k);
-            return;
-        }
-
-        const contentRef = v.querySelector(".content");
-
-        if (!contentRef) {
-            console.log("Cannot find content section for copying into the target box for cell-id", k);
-            return;
-        }
-
-        const boundingBox = targetBox.getBBox();
-
-        setContentSize(boundingBox, contentRef);
-
-        const existingContent = targetBox.querySelector(".content");
-        if (existingContent) {
-            targetBox.replaceChild(contentRef, existingContent);
-        } else {
-            targetBox.append(contentRef);
         }
     });
 }
