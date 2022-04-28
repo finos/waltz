@@ -15,7 +15,10 @@ const initialState = {
 function controller() {
 
     const vm = initialiseData(this, initialState);
-    console.log({ref: vm.parentEntityRef});
+
+    vm.$onInit = () => {
+        console.log({ref: vm.parentEntityRef});
+    }
 
 }
 

@@ -1,15 +1,13 @@
 
 package org.finos.waltz.data.aggregate_overlay_diagram;
 
+import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.data.JooqUtilities;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
-import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramInstance;
-import org.finos.waltz.model.aggregate_overlay_diagram.ImmutableAggregateOverlayDiagram;
-import org.finos.waltz.model.aggregate_overlay_diagram.ImmutableAggregateOverlayDiagramInstance;
+import org.finos.waltz.model.aggregate_overlay_diagram.*;
 import org.finos.waltz.schema.tables.records.AggregateOverlayDiagramInstanceRecord;
 import org.finos.waltz.schema.tables.records.AggregateOverlayDiagramRecord;
 import org.jooq.*;
@@ -93,6 +91,29 @@ public class AggregateOverlayDiagramInstanceDao {
                 .from(AGGREGATE_OVERLAY_DIAGRAM_INSTANCE)
                 .where(AGGREGATE_OVERLAY_DIAGRAM_INSTANCE.DIAGRAM_ID.eq(diagramId))
                 .fetchSet(TO_DOMAIN_MAPPER::map);
+    }
+
+
+    public int createInstance(OverlayDiagramInstanceCreateCommand createCommand,
+                              String username) {
+
+        AggregateOverlayDiagramInstanceRecord record = dsl.newRecord(AGGREGATE_OVERLAY_DIAGRAM_INSTANCE);
+
+        record.setDiagramId(createCommand.diagramId());
+        record.setName(createCommand.name());
+        record.setDescription(createCommand.description());
+        record.setParentEntityKind(createCommand.parentEntityReference().kind().name());
+        record.setParentEntityId(createCommand.parentEntityReference().id());
+        record.setSvg(createCommand.svg());
+        record.setLastUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
+        record.setLastUpdatedBy(username);
+        record.setProvenance("waltz");
+
+        return dsl
+                .insertInto(AGGREGATE_OVERLAY_DIAGRAM_INSTANCE)
+                .set(record)
+                .execute();
+
     }
 
 }

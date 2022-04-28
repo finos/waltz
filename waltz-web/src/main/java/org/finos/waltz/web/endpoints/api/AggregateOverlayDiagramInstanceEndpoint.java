@@ -20,6 +20,7 @@ package org.finos.waltz.web.endpoints.api;
 
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramCallout;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramInstance;
+import org.finos.waltz.model.aggregate_overlay_diagram.OverlayDiagramInstanceCreateCommand;
 import org.finos.waltz.service.aggregate_overlay_diagram.AggregateOverlayDiagramInstanceService;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
@@ -31,8 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.web.WebUtilities.getId;
-import static org.finos.waltz.web.WebUtilities.mkPath;
+import static org.finos.waltz.web.WebUtilities.*;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 
 @Service
@@ -57,6 +57,7 @@ public class AggregateOverlayDiagramInstanceEndpoint implements Endpoint {
 
         String findByDiagramIdPath = mkPath(BASE_URL, "diagram-id", ":id");
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
+        String createInstancePath = mkPath(BASE_URL, "create");
 
         ListRoute<AggregateOverlayDiagramInstance> findByDiagramIdRoute = (request, response) -> {
             return aggregateOverlayDiagramInstanceService.findByDiagramId(getId(request));
@@ -66,8 +67,14 @@ public class AggregateOverlayDiagramInstanceEndpoint implements Endpoint {
             return aggregateOverlayDiagramInstanceService.getById(getId(request));
         };
 
+        DatumRoute<Integer> createInstanceRoute = (request, response) -> {
+            OverlayDiagramInstanceCreateCommand createCmd = readBody(request, OverlayDiagramInstanceCreateCommand.class);
+            return aggregateOverlayDiagramInstanceService.createInstance(createCmd, getUsername(request));
+        };
+
         getForList(findByDiagramIdPath, findByDiagramIdRoute);
         getForDatum(getByIdPath, getByIdRoute);
+        postForDatum(createInstancePath, createInstanceRoute);
     }
 
 }

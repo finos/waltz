@@ -58,6 +58,18 @@
         $hoveredCallout = null;
     }
 
+    let svgDetail = getContext("svgDetail");
+
+    $: {
+        if (svgHolderElem) {
+            console.log({svgHolderElem});
+            const svgElem = svgHolderElem.querySelector("svg");
+            $svgDetail = svgElem;
+        }
+    }
+
+    $: console.log({sd: $svgDetail});
+
 </script>
 
 <div bind:this={svgHolderElem}>

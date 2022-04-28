@@ -4,6 +4,7 @@ import org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramCal
 import org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramInstanceDao;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramCallout;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramInstance;
+import org.finos.waltz.model.aggregate_overlay_diagram.OverlayDiagramInstanceCreateCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,5 +30,9 @@ public class AggregateOverlayDiagramInstanceService {
         return aggregateOverlayDiagramInstanceDao.getById(instanceId);
     }
 
+    public int createInstance(OverlayDiagramInstanceCreateCommand createCommand,
+                              String username) {
+        return aggregateOverlayDiagramInstanceDao.createInstance(createCommand, username);
+    }
 
 }

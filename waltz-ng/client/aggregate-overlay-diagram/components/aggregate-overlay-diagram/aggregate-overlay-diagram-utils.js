@@ -54,6 +54,8 @@ export function setupContextStores() {
     const selectedCallout = writable(null);
     const overlayData = writable([]);
     const widget = writable(null);
+    const svgDetail = writable(null);
+    const instances = writable([]);
 
     setContext("hoveredCallout", hoveredCallout);
     setContext("selectedDiagram", selectedDiagram);
@@ -62,6 +64,8 @@ export function setupContextStores() {
     setContext("selectedCallout", selectedCallout);
     setContext("overlayData", overlayData);
     setContext("widget", widget);
+    setContext("svgDetail", svgDetail);
+    setContext("instances", instances);
 
     return {
         selectedDiagram,
@@ -70,6 +74,8 @@ export function setupContextStores() {
         hoveredCallout,
         selectedCallout,
         overlayData,
-        widget
+        widget,
+        svgDetail,
+        instances
     };
 }

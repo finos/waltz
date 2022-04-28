@@ -21,9 +21,20 @@ export function mkOverlayDiagramInstanceStore() {
                 {force});
     };
 
+
+    const create = (createCmd, force = false) => {
+        return remote
+            .fetchViewDatum(
+                "POST",
+                "api/aggregate-overlay-diagram-instance/create",
+                createCmd,
+                {force});
+    };
+
     return {
         findByDiagramId,
-        getById
+        getById,
+        create
     };
 }
 

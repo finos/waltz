@@ -16,9 +16,8 @@
 
 </script>
 
-<h4>Select a diagram</h4>
 {#if !_.isEmpty(diagrams)}
-
+    <h4>Select a diagram</h4>
     <p>
         <Icon name="info-circle"/>
         Select a diagram from the list below to see a dynamic overlay of waltz data and any instances of this diagram
