@@ -153,17 +153,17 @@ public class MeasurableRatingPlannedDecommissionDao {
                                            String userName) {
         checkIfReadOnly(entityReference, measurableId);
 
-        MeasurableRatingPlannedDecommissionRecord existingRecord = dsl
+        Record existingRecord = dsl
                 .select(MEASURABLE_RATING_PLANNED_DECOMMISSION.fields())
                 .from(MEASURABLE_RATING_PLANNED_DECOMMISSION)
                 .where(mkRefCondition(entityReference)
                         .and(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_ID.eq(measurableId)))
-                .fetchOne()
-                .into(MEASURABLE_RATING_PLANNED_DECOMMISSION);
+                .fetchOne();
 
         if (existingRecord != null) {
-            updateDecommDateOnRecord(existingRecord, dateChange, userName);
-            boolean updatedRecord = existingRecord.update() == 1;
+            MeasurableRatingPlannedDecommissionRecord existingDecommRecord = existingRecord.into(MEASURABLE_RATING_PLANNED_DECOMMISSION);
+            updateDecommDateOnRecord(existingDecommRecord, dateChange, userName);
+            boolean updatedRecord = existingDecommRecord.update() == 1;
             return Tuple.tuple(Operation.UPDATE, updatedRecord);
         } else {
             MeasurableRatingPlannedDecommissionRecord record = dsl.newRecord(MEASURABLE_RATING_PLANNED_DECOMMISSION);
@@ -174,7 +174,6 @@ public class MeasurableRatingPlannedDecommissionDao {
             record.setEntityKind(entityReference.kind().name());
             record.setMeasurableId(measurableId);
             boolean recordsInserted = record.insert() == 1;
-
             return Tuple.tuple(Operation.ADD, recordsInserted);
         }
     }
