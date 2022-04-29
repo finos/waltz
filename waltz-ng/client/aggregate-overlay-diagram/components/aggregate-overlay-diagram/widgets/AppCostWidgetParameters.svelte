@@ -4,6 +4,7 @@
     import DatePicker from "../../../../common/svelte/DatePicker.svelte";
     import {timeFormat} from "d3-time-format";
     import BulkAppCostWidget from "./BulkAppCostWidget.svelte";
+    import moment from "moment";
 
     export let opts;
 
@@ -14,11 +15,14 @@
     const widget = getContext("widget");
     let selectedDefinition;
     let overlayDataCall;
-    let futureDate = null;
 
-    function onSelect() {
+    function onSelect(futureDate) {
         const dateStr = fmt(futureDate);
-        overlayDataCall = aggregateOverlayDiagramStore.findAppCostForDiagram($selectedDiagram.id, opts, dateStr);
+        overlayDataCall = aggregateOverlayDiagramStore.findAppCostForDiagram(
+            $selectedDiagram.id,
+            opts,
+            dateStr,
+            true);
         $widget = BulkAppCostWidget;
     }
 
@@ -26,12 +30,27 @@
         $overlayData = $overlayDataCall?.data;
     }
 
-    function onDateChange(evt) {
-        futureDate = evt.detail;
-        onSelect();
-    }
+    let slideVal = 0;
+
+    const debouncedOnSelect = _.debounce(onSelect, 500);
+
+    $: futureDate = moment().set("date", 1).add(slideVal * 2, "months");
+    $: debouncedOnSelect(futureDate);
+
 </script>
 
-<DatePicker on:change={onDateChange}
-            canEdit={true}/>
-<button on:click={onSelect}>Get Data</button>
+
+<label for="future-date">Projected costs for:</label>
+<span>{fmt(futureDate)}</span>
+
+<input id="future-date"
+       type="range"
+       min="0"
+       max="60"
+       bind:value={slideVal}>
+
+<div class="help-block">
+    Use the slider to adjust how far in the future to project costs.
+    This is calculated by incorporating app retirement dates and subtracting their associated
+    costs from the current total.
+</div>

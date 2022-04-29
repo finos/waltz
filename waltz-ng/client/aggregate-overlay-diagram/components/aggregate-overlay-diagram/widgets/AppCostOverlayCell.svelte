@@ -11,7 +11,6 @@
 
     $: cr = r(cellData?.currentStateCost) || 0;
     $: tr = r(cellData?.targetStateCost) || 0;
-
 </script>
 
 
@@ -22,12 +21,15 @@
             stroke-width="2"
             cx={150 - (cr / 1.4)}
             cy="50"/>
-    <circle r={tr}
-            fill="#c6eeff"
-            stroke="#25b0ff"
-            stroke-width="2"
-            cx={150 + (cr / 1.4)}
-            cy="50"/>
+
+    {#if (tr !== cr)}
+        <circle r={tr}
+                fill="#c6eeff"
+                stroke="#25b0ff"
+                stroke-width="2"
+                cx={150 + (cr / 1.4)}
+                cy="50"/>
+    {/if}
     <foreignObject transform="translate(15, 5)"
                    width="270"
                    height="90">
@@ -39,7 +41,6 @@
             <div style="font-size: 16px; width: 100%; text-align: center">
                 Change: {numberFormatter(cellData?.targetStateCost - cellData?.currentStateCost, 2)}
             </div>
-
         {:else}
             -
         {/if}
