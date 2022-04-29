@@ -5,6 +5,7 @@ import org.finos.waltz.data.aggregate_overlay_diagram.AppCostWidgetDao;
 import org.finos.waltz.data.aggregate_overlay_diagram.AppCountWidgetDao;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramCallout;
+import org.finos.waltz.model.aggregate_overlay_diagram.DiagramCalloutCreateCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,4 +28,11 @@ public class AggregateOverlayDiagramCalloutService {
     }
 
 
+    public Integer create(DiagramCalloutCreateCommand createCommand) {
+        return aggregateOverlayDiagramCalloutDao.create(createCommand);
+    }
+
+    public Integer update(AggregateOverlayDiagramCallout callout) {
+        return aggregateOverlayDiagramCalloutDao.update(callout);
+    }
 }

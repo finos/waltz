@@ -18,13 +18,9 @@
 
 package org.finos.waltz.web.endpoints.api;
 
-import org.finos.waltz.common.DateTimeUtilities;
-import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramCallout;
-import org.finos.waltz.model.overlay_diagram.CostWidgetDatum;
-import org.finos.waltz.model.overlay_diagram.CountWidgetDatum;
+import org.finos.waltz.model.aggregate_overlay_diagram.DiagramCalloutCreateCommand;
 import org.finos.waltz.service.aggregate_overlay_diagram.AggregateOverlayDiagramCalloutService;
-import org.finos.waltz.service.aggregate_overlay_diagram.AggregateOverlayDiagramService;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.WebUtilities;
@@ -36,7 +32,8 @@ import org.springframework.stereotype.Service;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.web.WebUtilities.*;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.getForList;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.postForDatum;
 
 @Service
 public class AggregateOverlayDiagramCalloutEndpoint implements Endpoint {
@@ -59,12 +56,25 @@ public class AggregateOverlayDiagramCalloutEndpoint implements Endpoint {
     public void register() {
 
         String findByDiagramInstanceIdPath = mkPath(BASE_URL, "diagram-instance-id", ":id");
+        String createPath = mkPath(BASE_URL, "create");
+        String updatePath = mkPath(BASE_URL, "update");
 
         ListRoute<AggregateOverlayDiagramCallout> findByDiagramInstanceIdRoute = (request, response) -> {
             return aggregateOverlayDiagramCalloutService.findByDiagramInstanceId(getId(request));
         };
 
+        DatumRoute<Integer> createRoute = (request, response) -> {
+            return aggregateOverlayDiagramCalloutService.create(readBody(request, DiagramCalloutCreateCommand.class));
+        };
+
+
+        DatumRoute<Integer> updateRoute = (request, response) -> {
+            return aggregateOverlayDiagramCalloutService.update(readBody(request, AggregateOverlayDiagramCallout.class));
+        };
+
         getForList(findByDiagramInstanceIdPath, findByDiagramInstanceIdRoute);
+        postForDatum(createPath, createRoute);
+        postForDatum(updatePath, updateRoute);
     }
 
 }
