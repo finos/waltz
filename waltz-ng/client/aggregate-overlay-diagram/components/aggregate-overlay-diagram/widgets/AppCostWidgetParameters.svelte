@@ -1,10 +1,10 @@
 <script>
     import {aggregateOverlayDiagramStore} from "../../../../svelte-stores/aggregate-overlay-diagram-store";
     import {getContext} from "svelte";
-    import DatePicker from "../../../../common/svelte/DatePicker.svelte";
     import {timeFormat} from "d3-time-format";
     import BulkAppCostWidget from "./BulkAppCostWidget.svelte";
     import moment from "moment";
+    import Icon from "../../../../common/svelte/Icon.svelte";
 
     export let opts;
 
@@ -54,3 +54,11 @@
     This is calculated by incorporating app retirement dates and subtracting their associated
     costs from the current total.
 </div>
+
+
+{#if $overlayDataCall?.status === 'loading'}
+    <h4>
+        Loading
+        <Icon name="refresh" spin="true"/>
+    </h4>
+{/if}

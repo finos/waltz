@@ -176,7 +176,7 @@ export function numberFormatter(num, digits = 0, simplify = true) {
                 return 0;
             }
             if (Math.abs(num) >= si[i].value) {
-                return (num / si[i].value)
+                return (Number(num) / si[i].value)
                     .toFixed(digits)
                     .replace(/\.?0+$/, "") + si[i].symbol;
             }
