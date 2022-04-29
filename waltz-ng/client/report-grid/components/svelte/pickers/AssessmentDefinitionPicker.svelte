@@ -1,4 +1,4 @@
-<script>
+    <script>
 
     import Grid from "../../../../common/svelte/Grid.svelte";
     import Icon from "../../../../common/svelte/Icon.svelte";

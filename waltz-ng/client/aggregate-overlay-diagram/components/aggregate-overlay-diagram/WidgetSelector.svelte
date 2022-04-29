@@ -3,6 +3,8 @@
     import AssessmentWidgetParameters from "./widgets/AssessmentWidgetParameters.svelte";
     import AppCostWidgetParameters from "./widgets/AppCostWidgetParameters.svelte";
     import AppCountWidgetParameters from "./widgets/AppCountWidgetParameters.svelte";
+    import Icon from "../../../common/svelte/Icon.svelte";
+
 
     export let primaryEntityRef;
 
@@ -45,7 +47,8 @@
     {#each widgets as widget}
         <div>
             <button class="btn btn-skinny" on:click={() => focusWidget = widget}>
-                Configure {widget.label}
+                <Icon name="plus"/>
+                {widget.label}
             </button>
         </div>
     {/each}

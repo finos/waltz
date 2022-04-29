@@ -20,7 +20,7 @@
     }
 </script>
 
-<div class="waltz-tabs"
+<div class="row waltz-tabs"
      style="padding-top: 1em">
     <!-- TAB HEADERS -->
     <input type="radio"

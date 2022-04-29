@@ -72,7 +72,7 @@
     {#if _.isEmpty(diagrams)}
         <NoData>There are no diagrams</NoData>
     {:else}
-        <div class="row row-no-gutters">
+        <div class="row">
             {#if activeMode === Modes.VIEW}
                 <div class={`col-sm-${$diagramProportion}`}
                      style="padding-top: 1em">

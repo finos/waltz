@@ -4,6 +4,7 @@
     import {aggregateOverlayDiagramStore} from "../../../../svelte-stores/aggregate-overlay-diagram-store";
     import {getContext} from "svelte";
     import BulkAssessmentWidget from "./BulkAssessmentWidget.svelte";
+    import Icon from "../../../../common/svelte/Icon.svelte";
 
     export let opts;
 
@@ -36,9 +37,14 @@
     <div class="help-block">
         <Markdown text={selectedDefinition.description}/>
     </div>
-
-    <h3>{$overlayData?.length || '??'}</h3>
 {:else}
     <AssessmentDefinitionPicker {onSelect}
                                 selectionFilter={ad => ad.entityKind === 'APPLICATION'}/>
+{/if}
+
+{#if $overlayDataCall?.status === 'loading'}
+    <h4>
+        Loading
+        <Icon name="refresh" spin="true"/>
+    </h4>
 {/if}
