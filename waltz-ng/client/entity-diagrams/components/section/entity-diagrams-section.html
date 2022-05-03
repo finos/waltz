@@ -1,8 +1,8 @@
 <div class="waltz-tabs">
     <!-- TAB HEADERS -->
     <input type="radio"
-           xxng-disabled="! tab.measurables"
-           value="linked"
+           ng-disabled="$ctrl.isDisabled($ctrl.TABS.linked)"
+           ng-value="$ctrl.TABS.linked.id"
            ng-model="$ctrl.tab"
            name="tab"
            id="linked">
@@ -11,7 +11,8 @@
         Linked Diagrams
     </label>
     <input type="radio"
-           value="overlay"
+           ng-disabled="$ctrl.isDisabled($ctrl.TABS.overlay)"
+           ng-value="$ctrl.TABS.overlay.id"
            ng-model="$ctrl.tab"
            name="tab"
            id="overlay">
@@ -22,14 +23,13 @@
 
 
     <div class="wt-tab wt-active">
-        <div ng-if="$ctrl.tab === 'linked'">
+        <div ng-if="$ctrl.tab === $ctrl.TABS.linked.id">
             <waltz-linked-diagrams-panel parent-entity-ref="$ctrl.parentEntityRef"></waltz-linked-diagrams-panel>
         </div>
-        <div ng-if="$ctrl.tab === 'overlay'">
+        <div ng-if="$ctrl.tab === $ctrl.TABS.overlay.id">
             <waltz-svelte-component component="$ctrl.AggregateOverlayDiagramPanel"
                                     primary-entity-ref="$ctrl.parentEntityRef">
             </waltz-svelte-component>
         </div>
     </div>
-
 </div>
