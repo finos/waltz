@@ -190,18 +190,23 @@
             {/each}
             </tbody>
         </table>
-        <button class="btn btn-skinny"
-                on:click={() => addCallout()}>
-            <Icon name="plus"/>
-            Add a callout
-        </button>
-    {:else}
-        <NoData type="info">
-            There are no callouts for this instance, would you like
+        {#if hasEditPermissions}
             <button class="btn btn-skinny"
                     on:click={() => addCallout()}>
-                to add one?
+                <Icon name="plus"/>
+                Add a callout
             </button>
+        {/if}
+    {:else}
+        <NoData type="info">
+            There are no callouts for this instance
+            {#if hasEditPermissions}
+                , would you like
+                <button class="btn btn-skinny"
+                        on:click={() => addCallout()}>
+                    to add one?
+                </button>
+            {/if}
         </NoData>
     {/if}
 {:else if activeMode === Modes.ADD}
