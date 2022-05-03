@@ -24,8 +24,7 @@
 </g>
 
 
-<g transform="translate(0, 10)"
-   pointer-events="none">
+<g transform="translate(0, 10)">
     <foreignObject width={cellWidth}
                    height={dimensions.cell.labelHeight}>
         <div class="cell-title">
