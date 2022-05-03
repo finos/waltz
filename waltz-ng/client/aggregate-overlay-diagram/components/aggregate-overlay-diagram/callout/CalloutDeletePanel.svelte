@@ -23,7 +23,7 @@
     function deleteCallout() {
         let deletePromise = aggregateOverlayDiagramCalloutStore.remove($selectedCellCallout.id);
         Promise.resolve(deletePromise)
-            .then(e => {
+            .then(() => {
                 toasts.success("Successfully removed callout");
                 calloutsCall = aggregateOverlayDiagramCalloutStore.findCalloutsByDiagramInstanceId($selectedInstance.id, true);
                 $callouts = $calloutsCall?.data;

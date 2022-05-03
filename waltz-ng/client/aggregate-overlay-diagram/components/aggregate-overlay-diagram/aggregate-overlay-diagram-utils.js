@@ -59,7 +59,6 @@ export function renderBulkOverlays(svgHolderElem,
 
         const existingContent = targetCell.querySelector(".content");
         if (existingContent) {
-            console.log("replaying content")
             targetCell.replaceChild(contentRef, existingContent);
         } else {
             targetCell.append(contentRef);
