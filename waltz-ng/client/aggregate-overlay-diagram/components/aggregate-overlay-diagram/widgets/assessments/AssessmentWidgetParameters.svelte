@@ -1,10 +1,10 @@
 <script>
-    import AssessmentDefinitionPicker from "../../../../report-grid/components/svelte/pickers/AssessmentDefinitionPicker.svelte";
-    import Markdown from "../../../../common/svelte/Markdown.svelte";
-    import {aggregateOverlayDiagramStore} from "../../../../svelte-stores/aggregate-overlay-diagram-store";
+    import AssessmentDefinitionPicker from "../../../../../report-grid/components/svelte/pickers/AssessmentDefinitionPicker.svelte";
+    import Markdown from "../../../../../common/svelte/Markdown.svelte";
+    import {aggregateOverlayDiagramStore} from "../../../../../svelte-stores/aggregate-overlay-diagram-store";
     import {getContext} from "svelte";
     import BulkAssessmentWidget from "./BulkAssessmentWidget.svelte";
-    import Icon from "../../../../common/svelte/Icon.svelte";
+    import Icon from "../../../../../common/svelte/Icon.svelte";
 
     export let opts;
 

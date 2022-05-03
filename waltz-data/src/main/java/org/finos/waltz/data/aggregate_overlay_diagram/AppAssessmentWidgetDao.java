@@ -23,18 +23,21 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.stream.Collectors.toSet;
+import static org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramUtilities.*;
 
 @Repository
-public class AppAssessmentWidgetDao extends AggregateOverlayDiagramDao{
+public class AppAssessmentWidgetDao {
 
     private static final AssessmentRating ar = AssessmentRating.ASSESSMENT_RATING;
+
     private final RatingSchemeDAO ratingSchemeDAO;
+    private final DSLContext dsl;
 
 
     @Autowired
     public AppAssessmentWidgetDao(DSLContext dsl,
                                   RatingSchemeDAO ratingSchemeDAO) {
-        super(dsl);
+        this.dsl = dsl;
         this.ratingSchemeDAO = ratingSchemeDAO;
     }
 
@@ -43,16 +46,17 @@ public class AppAssessmentWidgetDao extends AggregateOverlayDiagramDao{
                                                             Long assessmentId,
                                                             Select<Record1<Long>> inScopeApplicationSelector) {
 
-        Select<Record2<String, Long>> cellExtIdWithAppIdSelector = mkOverlayEntityCellApplicationSelector(diagramId);
+        Select<Record2<String, Long>> cellExtIdWithAppIdSelector = mkOverlayEntityCellApplicationSelector(dsl, diagramId);
 
         if (cellExtIdWithAppIdSelector == null) {
             // no cell mapping data so short circuit and give no results
             return Collections.emptySet();
         }
 
-        Map<String, Set<Long>> cellExtIdsToAppIdsMap = fetchAndGroupAppIdsByCellId(cellExtIdWithAppIdSelector);
+        Map<String, Set<Long>> cellExtIdsToAppIdsMap = fetchAndGroupAppIdsByCellId(dsl, cellExtIdWithAppIdSelector);
 
         Set<Long> diagramApplicationIds = calcExactAppIdsDiagram(
+                dsl,
                 cellExtIdsToAppIdsMap,
                 inScopeApplicationSelector);
 

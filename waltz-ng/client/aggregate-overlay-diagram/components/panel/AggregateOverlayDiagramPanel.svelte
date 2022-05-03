@@ -79,7 +79,7 @@
                     <div class="col-sm-6">
                         <h4>
                             {$selectedDiagram?.name}
-                            <button class="small btn btn-skinny pull-right"
+                            <button class="small btn btn-link pull-right"
                                     on:click={() => activeMode = Modes.SELECT}>
                                 <Icon name="list-ul"/> Change diagram
                             </button>

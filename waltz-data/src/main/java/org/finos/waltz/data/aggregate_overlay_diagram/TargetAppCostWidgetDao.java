@@ -18,18 +18,20 @@ import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.FunctionUtilities.time;
+import static org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramUtilities.*;
 import static org.finos.waltz.schema.Tables.*;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository
-public class AppCostWidgetDao extends AggregateOverlayDiagramDao {
+public class TargetAppCostWidgetDao {
 
     private static final Tuple2<BigDecimal, BigDecimal> ZERO_COST = tuple(BigDecimal.ZERO, BigDecimal.ZERO);
+    private final DSLContext dsl;
 
 
     @Autowired
-    public AppCostWidgetDao(DSLContext dsl) {
-        super(dsl);
+    public TargetAppCostWidgetDao(DSLContext dsl) {
+        this.dsl = dsl;
     }
 
 
@@ -37,16 +39,21 @@ public class AppCostWidgetDao extends AggregateOverlayDiagramDao {
                                                Select<Record1<Long>> inScopeApplicationSelector,
                                                LocalDate targetStateDate) {
 
-        Select<Record2<String, Long>> cellExtIdWithAppIdSelector = mkOverlayEntityCellApplicationSelector(diagramId);
+        Select<Record2<String, Long>> cellExtIdWithAppIdSelector = mkOverlayEntityCellApplicationSelector(
+                dsl,
+                diagramId);
 
         if (cellExtIdWithAppIdSelector == null) {
             // no cell mapping data so short circuit and give no results
             return Collections.emptySet();
         }
 
-        Map<String, Set<Long>> cellExtIdsToAppIdsMap = time("fetchAndGroupAppIdsByCellId", () -> fetchAndGroupAppIdsByCellId(cellExtIdWithAppIdSelector));
+        Map<String, Set<Long>> cellExtIdsToAppIdsMap = time("fetchAndGroupAppIdsByCellId", () -> fetchAndGroupAppIdsByCellId(
+                dsl,
+                cellExtIdWithAppIdSelector));
 
         Set<Long> diagramApplicationIds = calcExactAppIdsDiagram(
+                dsl,
                 cellExtIdsToAppIdsMap,
                 inScopeApplicationSelector);
 

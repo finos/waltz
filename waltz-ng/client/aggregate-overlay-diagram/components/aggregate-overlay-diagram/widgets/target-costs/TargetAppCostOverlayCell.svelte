@@ -1,5 +1,5 @@
 <script>
-    import {numberFormatter} from "../../../../common/string-utils";
+    import {numberFormatter} from "../../../../../common/string-utils";
     import {scaleLinear} from "d3-scale";
 
     export let cellData = {};

@@ -1,10 +1,10 @@
 <script>
-    import {aggregateOverlayDiagramStore} from "../../../../svelte-stores/aggregate-overlay-diagram-store";
+    import {aggregateOverlayDiagramStore} from "../../../../../svelte-stores/aggregate-overlay-diagram-store";
     import {getContext} from "svelte";
     import {timeFormat} from "d3-time-format";
+    import BulkTargetAppCostWidget from "./BulkTargetAppCostWidget.svelte";
     import moment from "moment";
-    import BulkAppCountWidget from "./BulkAppCountWidget.svelte";
-    import Icon from "../../../../common/svelte/Icon.svelte";
+    import Icon from "../../../../../common/svelte/Icon.svelte";
 
     export let opts;
 
@@ -15,29 +15,29 @@
     const widget = getContext("widget");
     let selectedDefinition;
     let overlayDataCall;
-    let futureDate = null;
-    let slideVal = 0;
 
     function onSelect(futureDate) {
         const dateStr = fmt(futureDate);
-        overlayDataCall = aggregateOverlayDiagramStore.findAppCountsForDiagram(
+        overlayDataCall = aggregateOverlayDiagramStore.findTargetAppCostForDiagram(
             $selectedDiagram.id,
             opts,
             dateStr,
             true);
-        $widget = BulkAppCountWidget;
+        $widget = BulkTargetAppCostWidget;
     }
-
-    const debouncedOnSelect = _.debounce(onSelect, 500);
 
     $: {
         $overlayData = $overlayDataCall?.data;
     }
 
+    let slideVal = 0;
+
+    const debouncedOnSelect = _.debounce(onSelect, 500);
+
     $: futureDate = moment().set("date", 1).add(slideVal * 2, "months");
     $: debouncedOnSelect(futureDate);
-</script>
 
+</script>
 
 
 <label for="future-date">Projected costs for:</label>
@@ -50,9 +50,9 @@
        bind:value={slideVal}>
 
 <div class="help-block">
-    Use the slider to adjust how far in the future to application counts.
+    Use the slider to adjust how far in the future to project costs.
     This is calculated by incorporating app retirement dates and subtracting their associated
-    apps from the current total.
+    costs from the current total.
 </div>
 
 

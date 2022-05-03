@@ -1,8 +1,8 @@
 <script>
     import {mkSelectionOptions} from "../../../common/selector-utils";
-    import AssessmentWidgetParameters from "./widgets/AssessmentWidgetParameters.svelte";
-    import AppCostWidgetParameters from "./widgets/AppCostWidgetParameters.svelte";
-    import AppCountWidgetParameters from "./widgets/AppCountWidgetParameters.svelte";
+    import AssessmentWidgetParameters from "./widgets/assessments/AssessmentWidgetParameters.svelte";
+    import TargetAppCostWidgetParameters from "./widgets/target-costs/TargetAppCostWidgetParameters.svelte";
+    import AppCountWidgetParameters from "./widgets/app-counts/AppCountWidgetParameters.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
 
 
@@ -10,9 +10,9 @@
 
     const widgets = [
       {
-            parameterWidget: AppCostWidgetParameters,
+            parameterWidget: TargetAppCostWidgetParameters,
             description: "Shows current cost and future cost info",
-            label: "App Costs"
+            label: "Target App Costs"
         }, {
             parameterWidget: AppCountWidgetParameters,
             description: "Shows current app count and future app count info",

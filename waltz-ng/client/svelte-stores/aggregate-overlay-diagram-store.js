@@ -32,11 +32,11 @@ export function mkOverlayDiagramStore() {
                 {force});
     };
 
-    const findAppCostForDiagram = (diagramId, vantagePointRef, futureDate, force = false) => {
+    const findTargetAppCostForDiagram = (diagramId, vantagePointRef, futureDate, force = false) => {
         return remote
             .fetchViewList(
                 "POST",
-                `api/aggregate-overlay-diagram/diagram-id/${diagramId}/app-cost-widget/${futureDate}`,
+                `api/aggregate-overlay-diagram/diagram-id/${diagramId}/target-app-cost-widget/${futureDate}`,
                 vantagePointRef,
                 {force});
     };
@@ -54,7 +54,7 @@ export function mkOverlayDiagramStore() {
         getById,
         findAll,
         findAppCountsForDiagram,
-        findAppCostForDiagram,
+        findTargetAppCostForDiagram,
         findAppAssessmentsForDiagram
     };
 }

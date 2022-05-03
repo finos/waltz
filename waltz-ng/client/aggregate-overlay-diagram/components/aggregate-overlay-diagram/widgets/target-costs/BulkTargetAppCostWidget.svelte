@@ -1,7 +1,7 @@
 <script>
     import _ from "lodash";
     import {getContext} from "svelte";
-    import AppCostOverlayCell from "./AppCostOverlayCell.svelte";
+    import TargetAppCostOverlayCell from "./TargetAppCostOverlayCell.svelte";
 
     const overlayData = getContext("overlayData");
 
@@ -21,7 +21,7 @@
     <h4>{key}</h4>
     <div class="overlay-cell {key}"
          data-cell-id={key}>
-        <AppCostOverlayCell {cellData}
-                            {maxCost}/>
+        <TargetAppCostOverlayCell {cellData}
+                                  {maxCost}/>
     </div>
 {/each}

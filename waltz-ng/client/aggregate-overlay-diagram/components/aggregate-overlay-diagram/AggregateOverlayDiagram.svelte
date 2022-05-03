@@ -3,32 +3,11 @@
     import {entity} from "../../../common/services/enums/entity";
     import {getContext} from "svelte";
     import BulkCallouts from "./callout/BulkCallouts.svelte";
-    import {event, select} from "d3-selection";
-    import {zoom} from "d3-zoom";
 
     export let svg = "";
     export let primaryEntityRef;
 
-
-    function zoomed() {
-        if (! event.sourceEvent?.altKey) {
-            event.sourceEvent.preventDefault();
-            return;
-        }
-        const t = event.transform;
-
-        $svgDetail
-            .querySelector("g")
-            .setAttribute("transform", t);
-    }
-
-    const myZoom = zoom()
-        .on("zoom", zoomed);
-
-
     let svgHolderElem;
-    let svgElem;
-
 
     $: {
         if (svgHolderElem && $overlayData) {
@@ -79,13 +58,10 @@
 
     $: {
         if (svgHolderElem) {
-            const svgElem = svgHolderElem.querySelector("svg");
-            $svgDetail = svgElem;
-            select(svgElem)
-                .call(myZoom)
-                .on("dblclick.zoom", null);
+            $svgDetail = svgHolderElem.querySelector("svg");
         }
     }
+
 
 </script>
 
