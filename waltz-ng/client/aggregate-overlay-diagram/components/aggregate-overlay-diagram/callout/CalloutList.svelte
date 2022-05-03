@@ -6,6 +6,8 @@
     import NoData from "../../../../common/svelte/NoData.svelte";
     import CalloutCreatePanel from "./CalloutCreatePanel.svelte";
     import CalloutDeletePanel from "./CalloutDeletePanel.svelte";
+    import {userStore} from "../../../../svelte-stores/user-store";
+    import systemRoles from "../../../../user/system-roles";
 
 
     const Modes = {
@@ -24,6 +26,10 @@
     let selectedCellId = getContext("selectedCellId");
     let selectedCellCallout = getContext("selectedCellCallout");
 
+    let permissionsCall = userStore.load();
+    $: permissions = $permissionsCall?.data;
+
+    $: hasEditPermissions = _.includes(permissions?.roles, systemRoles.AGGREGATE_OVERLAY_DIAGRAM_EDITOR.key) || false;
 
     function hover(callout) {
         $hoveredCallout = callout;
@@ -143,9 +149,13 @@
             Click to view callout detail
         </div>
         <table class="table table-condensed">
+            <colgroup>
+                <col width="10%">
+                <col width="90%">
+            </colgroup>
             <tbody>
             {#each $callouts as callout, idx}
-                <tr class:hovered={$hoveredCallout?.id === callout?.id}
+                <tr class:hovered={$hoveredCallout?.id === callout?.id || $selectedCallout?.id === callout?.id}
                     class="clickable"
                     on:click={() => selectCallout(callout)}
                     on:mouseenter={() => hover(callout)}
@@ -158,21 +168,22 @@
                         <td></td>
                         <td>
                             <Markdown text={callout.content}/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td>
-                            <button class="btn btn-skinny"
-                                    on:click={() => editCallout(callout.cellExternalId)}>
-                                <Icon name="pencil"/>
-                                Edit
-                            </button>
-                            <button class="btn btn-skinny"
-                                    on:click={() => deleteCallout(callout)}>
-                                <Icon name="trash"/>
-                                Delete
-                            </button>
+                            {#if hasEditPermissions}
+                                <br>
+                                <div style="border-top: 1px solid #eee;padding-top: 0.5em">
+                                    <button class="btn btn-skinny"
+                                            on:click={() => editCallout(callout.cellExternalId)}>
+                                        <Icon name="pencil"/>
+                                        Edit
+                                    </button>
+                                    |
+                                    <button class="btn btn-skinny"
+                                            on:click={() => deleteCallout(callout)}>
+                                        <Icon name="trash"/>
+                                        Delete
+                                    </button>
+                                </div>
+                            {/if}
                         </td>
                     </tr>
                 {/if}

@@ -21,8 +21,6 @@ function controller($stateParams) {
         name: "?"
     };
 
-    console.log("Hello world!!!")
-    console.log({per: vm.parentEntityRef});
 }
 
 

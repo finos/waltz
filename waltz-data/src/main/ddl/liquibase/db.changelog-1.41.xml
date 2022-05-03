@@ -584,4 +584,16 @@
                                  onDelete="CASCADE"/>
     </changeSet>
 
+    <changeSet id="20220503-6001-12"
+               author="woodjes">
+        <comment>6001: create aggregate_overlay_diagram tables</comment>
+        <insert tableName="role">
+            <column name="name" value="Aggregate Overlay Diagram Editor"/>
+            <column name="key" value="AGGREGATE_OVERLAY_DIAGRAM_EDITOR"/>
+            <column name="description" value="Can create overlay diagram instances and edit callout annotations"/>
+            <column name="is_custom" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+
+
 </databaseChangeLog>

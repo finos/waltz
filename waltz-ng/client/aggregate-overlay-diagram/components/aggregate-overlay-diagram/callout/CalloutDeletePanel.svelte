@@ -34,7 +34,7 @@
     }
 
     function cancel() {
-        dispatch("cancel")
+        dispatch("cancel");
     }
 
 
