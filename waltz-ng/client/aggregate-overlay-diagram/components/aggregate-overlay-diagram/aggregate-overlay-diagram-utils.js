@@ -37,7 +37,6 @@ export function renderBulkOverlays(svgHolderElem,
                                    targetSelector,
                                    setContentSize) {
 
-
     const cells = Array.from(overlayCellsHolder.querySelectorAll(".overlay-cell"));
     cells.forEach(c => {
         const targetCellId = c.getAttribute("data-cell-id");
@@ -60,6 +59,7 @@ export function renderBulkOverlays(svgHolderElem,
 
         const existingContent = targetCell.querySelector(".content");
         if (existingContent) {
+            console.log("replaying content")
             targetCell.replaceChild(contentRef, existingContent);
         } else {
             targetCell.append(contentRef);

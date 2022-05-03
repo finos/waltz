@@ -29,6 +29,8 @@
 
     $: {
         if (svgHolderElem && $callouts) {
+            clearOverlayContent(svgHolderElem, ".outer");
+
             setTimeout(
                 () => renderBulkOverlays(
                     svgHolderElem,
@@ -56,13 +58,10 @@
 
     $: {
         if (svgHolderElem) {
-            console.log({svgHolderElem});
             const svgElem = svgHolderElem.querySelector("svg");
             $svgDetail = svgElem;
         }
     }
-
-    $: console.log({sd: $svgDetail, svgHolderElem});
 
 </script>
 
@@ -71,7 +70,7 @@
 </div>
 
 
-{#key $selectedInstance}
+{#key $callouts}
     <div class="rendered-callouts"
          bind:this={calloutsHolder}>
         <BulkCallouts/>
@@ -92,6 +91,6 @@
     }
 
     .rendered-callouts {
-        display: none;
+        xxdisplay: none;
     }
 </style>

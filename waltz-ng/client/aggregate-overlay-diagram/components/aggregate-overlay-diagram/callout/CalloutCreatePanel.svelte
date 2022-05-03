@@ -19,7 +19,7 @@
 
     const dispatch = createEventDispatcher();
 
-    $: workingCallout = Object.assign({}, $selectedCellCallout);
+    let workingCallout = Object.assign({}, $selectedCellCallout);
 
     function cancel() {
         dispatch("cancel");
@@ -34,18 +34,15 @@
         workingCallout.endColor = evt.detail;
     }
 
-
     function save() {
         if (workingCallout.id) {
-            updateCallout()
+            updateCallout();
         } else {
-            createCallout()
+            createCallout();
         }
     }
 
-
     function createCallout() {
-
         const createCommand = Object.assign(
             {},
             workingCallout,
@@ -60,6 +57,20 @@
         reloadCallouts(savePromise)
     }
 
+    function updateCallout() {
+        const updateCommand = Object.assign(
+            {},
+            workingCallout,
+            {
+                endColor: requireSecondColor ? workingCallout.endColor : workingCallout.startColor,
+                cellExternalId: $selectedCellId,
+                diagramInstanceId: $selectedInstance.id
+            });
+
+        let savePromise = aggregateOverlayDiagramCalloutStore.update(updateCommand);
+
+        reloadCallouts(savePromise);
+    }
 
     function reloadCallouts(savePromise) {
         Promise.resolve(savePromise)
@@ -69,23 +80,6 @@
                 resetCallout();
             })
             .finally(cancel)
-    }
-
-
-    function updateCallout() {
-
-        const updateCommand = Object.assign(
-            {},
-            workingCallout,
-            {
-                endColor: requireSecondColor ? workingCallout.endColor : workingCallout.startColor,
-                cellExternalId: $selectedCellId,
-                instanceId: $selectedInstance.id
-            });
-
-        let savePromise = aggregateOverlayDiagramCalloutStore.update(updateCommand);
-
-        reloadCallouts(savePromise);
     }
 
     function resetCallout() {
@@ -160,7 +154,7 @@
         </button>
 
         <button class="btn"
-                on:click={cancel}>
+                on:click|preventDefault={cancel}>
             Cancel
         </button>
     </form>

@@ -32,8 +32,7 @@ import org.springframework.stereotype.Service;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.web.WebUtilities.*;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.getForList;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.postForDatum;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 
 @Service
 public class AggregateOverlayDiagramCalloutEndpoint implements Endpoint {
@@ -58,6 +57,7 @@ public class AggregateOverlayDiagramCalloutEndpoint implements Endpoint {
         String findByDiagramInstanceIdPath = mkPath(BASE_URL, "diagram-instance-id", ":id");
         String createPath = mkPath(BASE_URL, "create");
         String updatePath = mkPath(BASE_URL, "update");
+        String deletePath = mkPath(BASE_URL, "remove", "id", ":id");
 
         ListRoute<AggregateOverlayDiagramCallout> findByDiagramInstanceIdRoute = (request, response) -> {
             return aggregateOverlayDiagramCalloutService.findByDiagramInstanceId(getId(request));
@@ -72,9 +72,15 @@ public class AggregateOverlayDiagramCalloutEndpoint implements Endpoint {
             return aggregateOverlayDiagramCalloutService.update(readBody(request, AggregateOverlayDiagramCallout.class));
         };
 
+
+        DatumRoute<Integer> deleteRoute = (request, response) -> {
+            return aggregateOverlayDiagramCalloutService.delete(getId(request));
+        };
+
         getForList(findByDiagramInstanceIdPath, findByDiagramInstanceIdRoute);
         postForDatum(createPath, createRoute);
         postForDatum(updatePath, updateRoute);
+        deleteForDatum(deletePath, deleteRoute);
     }
 
 }

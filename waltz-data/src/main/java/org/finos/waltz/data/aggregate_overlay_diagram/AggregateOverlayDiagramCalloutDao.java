@@ -79,4 +79,12 @@ public class AggregateOverlayDiagramCalloutDao {
                 .where(AGGREGATE_OVERLAY_DIAGRAM_CALLOUT.ID.eq(callout.id().get()))
                 .execute();
     }
+
+
+    public Integer delete(long calloutId) {
+        return dsl
+                .deleteFrom(AGGREGATE_OVERLAY_DIAGRAM_CALLOUT)
+                .where(AGGREGATE_OVERLAY_DIAGRAM_CALLOUT.ID.eq(calloutId))
+                .execute();
+    }
 }

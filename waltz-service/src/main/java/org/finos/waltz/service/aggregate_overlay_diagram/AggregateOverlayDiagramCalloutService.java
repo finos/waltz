@@ -35,4 +35,8 @@ public class AggregateOverlayDiagramCalloutService {
     public Integer update(AggregateOverlayDiagramCallout callout) {
         return aggregateOverlayDiagramCalloutDao.update(callout);
     }
+
+    public Integer delete(long calloutId) {
+        return aggregateOverlayDiagramCalloutDao.delete(calloutId);
+    }
 }

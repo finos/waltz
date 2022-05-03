@@ -5,11 +5,13 @@
     import Markdown from "../../../../common/svelte/Markdown.svelte";
     import NoData from "../../../../common/svelte/NoData.svelte";
     import CalloutCreatePanel from "./CalloutCreatePanel.svelte";
+    import CalloutDeletePanel from "./CalloutDeletePanel.svelte";
 
 
     const Modes = {
         VIEW: "VIEW",
-        ADD: "ADD"
+        ADD: "ADD",
+        DELETE: "DELETE"
     }
 
     let activeMode = Modes.VIEW;
@@ -32,7 +34,6 @@
     }
 
     function selectCallout(callout) {
-        console.log({callout});
         if ($selectedCallout?.id === callout.id) {
             $selectedCallout = null;
         } else {
@@ -55,20 +56,36 @@
     }
 
 
+    function setSelectedCell() {
+        return (e) => {
+            if (activeMode === Modes.ADD) {
+
+                const clickedElem = e.target;
+                const dataCell = determineCell(clickedElem);
+
+                $selectedCellId = dataCell === null
+                    ? null
+                    : dataCell.getAttribute("data-cell-id");
+
+                if ($selectedCellId == null) {
+                    return;
+                }
+
+                const existingCallout = _.find($callouts, c => c.cellExternalId === $selectedCellId);
+
+                if (!_.isNil(existingCallout)) {
+                    editCallout(existingCallout?.cellExternalId);
+                } else {
+                    addCallout();
+                }
+            }
+        };
+    }
+
+
     $: {
-        if ($svgDetail && activeMode === Modes.ADD) {
-
-            $svgDetail.addEventListener(
-                "click",
-                (e) => {
-                    const clickedElem = e.target;
-                    const dataCell = determineCell(clickedElem);
-                    $selectedCellId = dataCell == null
-                        ? null
-                        : dataCell.getAttribute("data-cell-id");
-
-                    console.log({cs: $callouts});
-                })
+        if ($svgDetail) {
+            $svgDetail.addEventListener("click", setSelectedCell())
         }
     }
 
@@ -91,6 +108,22 @@
         activeMode = Modes.VIEW
     }
 
+    function addCallout() {
+        $selectedCellCallout = emptyCallout;
+        activeMode = Modes.ADD;
+    }
+
+    function editCallout(cellExtId) {
+        $selectedCellId = cellExtId;
+        $selectedCellCallout = _.find($callouts, c => c.cellExternalId === cellExtId);
+        activeMode = Modes.ADD;
+    }
+
+    function deleteCallout(callout) {
+        $selectedCellId = callout.cellExternalId;
+        $selectedCellCallout = _.find($callouts, c => c.cellExternalId === callout.cellExternalId);
+        activeMode = Modes.DELETE;
+    }
 
     const emptyCallout = {
         title: null,
@@ -99,11 +132,6 @@
         endColor: null,
     }
 
-    $: {
-        if (selectedCellId) {
-            $selectedCellCallout = _.find($callouts, c => c.cellExternalId === $selectedCellId) || emptyCallout;
-        }
-    }
 
 </script>
 
@@ -132,12 +160,27 @@
                             <Markdown text={callout.content}/>
                         </td>
                     </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <button class="btn btn-skinny"
+                                    on:click={() => editCallout(callout.cellExternalId)}>
+                                <Icon name="pencil"/>
+                                Edit
+                            </button>
+                            <button class="btn btn-skinny"
+                                    on:click={() => deleteCallout(callout)}>
+                                <Icon name="trash"/>
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
                 {/if}
             {/each}
             </tbody>
         </table>
         <button class="btn btn-skinny"
-                on:click={() => activeMode = Modes.ADD}>
+                on:click={() => addCallout()}>
             <Icon name="plus"/>
             Add a callout
         </button>
@@ -145,15 +188,17 @@
         <NoData type="info">
             There are no callouts for this instance, would you like
             <button class="btn btn-skinny"
-                    on:click={() => activeMode = Modes.ADD}>
+                    on:click={() => addCallout()}>
                 to add one?
             </button>
         </NoData>
     {/if}
 {:else if activeMode === Modes.ADD}
-    {#if $selectedCellCallout}
+    {#key $selectedCellCallout}
         <CalloutCreatePanel on:cancel={cancel}/>
-    {/if}
+    {/key}
+{:else if activeMode === Modes.DELETE}
+    <CalloutDeletePanel on:cancel={cancel}/>
 {/if}
 
 <style>
