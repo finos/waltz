@@ -1,9 +1,6 @@
 package org.finos.waltz.data.aggregate_overlay_diagram;
 
-import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
-import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramCallout;
-import org.finos.waltz.model.aggregate_overlay_diagram.ImmutableAggregateOverlayDiagram;
-import org.finos.waltz.model.aggregate_overlay_diagram.ImmutableAggregateOverlayDiagramCallout;
+import org.finos.waltz.model.aggregate_overlay_diagram.*;
 import org.finos.waltz.schema.tables.records.AggregateOverlayDiagramCalloutRecord;
 import org.finos.waltz.schema.tables.records.AggregateOverlayDiagramRecord;
 import org.jooq.DSLContext;
@@ -54,4 +51,32 @@ public class AggregateOverlayDiagramCalloutDao {
                 .fetchSet(TO_DOMAIN_MAPPER::map);
     }
 
+
+    public int create(DiagramCalloutCreateCommand createCommand) {
+
+        AggregateOverlayDiagramCalloutRecord record = dsl.newRecord(AGGREGATE_OVERLAY_DIAGRAM_CALLOUT);
+        record.setDiagramInstanceId(createCommand.instanceId());
+        record.setCellExternalId(createCommand.cellExternalId());
+        record.setTitle(createCommand.title());
+        record.setContent(createCommand.content());
+        record.setStartColor(createCommand.startColor());
+        record.setEndColor(createCommand.endColor());
+
+        return dsl
+                .insertInto(AGGREGATE_OVERLAY_DIAGRAM_CALLOUT)
+                .set(record)
+                .execute();
+    }
+
+
+    public Integer update(AggregateOverlayDiagramCallout callout) {
+        return dsl
+                .update(AGGREGATE_OVERLAY_DIAGRAM_CALLOUT)
+                .set(AGGREGATE_OVERLAY_DIAGRAM_CALLOUT.TITLE, callout.title())
+                .set(AGGREGATE_OVERLAY_DIAGRAM_CALLOUT.CONTENT, callout.content())
+                .set(AGGREGATE_OVERLAY_DIAGRAM_CALLOUT.START_COLOR, callout.startColor())
+                .set(AGGREGATE_OVERLAY_DIAGRAM_CALLOUT.END_COLOR, callout.endColor())
+                .where(AGGREGATE_OVERLAY_DIAGRAM_CALLOUT.ID.eq(callout.id().get()))
+                .execute();
+    }
 }

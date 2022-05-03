@@ -62,7 +62,7 @@
         }
     }
 
-    $: console.log({sd: $svgDetail});
+    $: console.log({sd: $svgDetail, svgHolderElem});
 
 </script>
 

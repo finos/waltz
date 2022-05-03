@@ -1,6 +1,17 @@
 import _ from "lodash";
 import {writable} from "svelte/store";
 import {setContext} from "svelte";
+import {
+    amberHex,
+    blueHex,
+    goldHex,
+    greenHex,
+    greyHex,
+    lightGreyHex,
+    pinkHex,
+    purpleHex,
+    redHex, yellowHex
+} from "../../../common/colors";
 
 export function clearOverlayContent(svgHolderElem, targetSelector) {
     const existingContent = svgHolderElem.querySelectorAll(`${targetSelector} .content`);
@@ -68,6 +79,8 @@ export function setupContextStores() {
     const svgDetail = writable(null);
     const instances = writable([]);
     const diagramProportion = writable(9);
+    const selectedCellId = writable(null);
+    const selectedCellCallout = writable(null);
 
     setContext("hoveredCallout", hoveredCallout);
     setContext("selectedDiagram", selectedDiagram);
@@ -79,6 +92,8 @@ export function setupContextStores() {
     setContext("svgDetail", svgDetail);
     setContext("instances", instances);
     setContext("diagramProportion", diagramProportion);
+    setContext("selectedCellId", selectedCellId)
+    setContext("selectedCellCallout", selectedCellCallout)
 
     return {
         selectedDiagram,
@@ -90,6 +105,22 @@ export function setupContextStores() {
         widget,
         svgDetail,
         instances,
-        diagramProportion
+        diagramProportion,
+        selectedCellId,
+        selectedCellCallout
     };
 }
+
+
+export const calloutColors = [
+    greyHex,
+    lightGreyHex,
+    greenHex,
+    blueHex,
+    purpleHex,
+    redHex,
+    pinkHex,
+    goldHex,
+    amberHex,
+    yellowHex
+];
