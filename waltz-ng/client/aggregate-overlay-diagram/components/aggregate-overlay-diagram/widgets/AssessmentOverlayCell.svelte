@@ -35,12 +35,14 @@
                   height={rowHeight}
                   stroke="#888"
                   fill={r.rating.color}>
+                <title>{r.rating.name}</title>
             </rect>
             <text dx="100"
                   dy={y(r.rating.id) + rowHeight - 4}
                   font-size={rowHeight - 1}
                   fill="#666">
                 {r.rating.name || "?"}
+                <title>{r.rating.name}</title>
             </text>
         {/each}
     </g>
