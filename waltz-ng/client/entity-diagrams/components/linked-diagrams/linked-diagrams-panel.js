@@ -18,7 +18,7 @@
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
 import _ from "lodash";
-import template from "./entity-diagrams-section.html";
+import template from "./linked-diagrams-panel.html";
 import {refToString, toEntityRef} from "../../../common/entity-utils";
 import {determineIfCreateAllowed} from "../../../flow-diagram/flow-diagram-utils";
 import {displayError} from "../../../common/error-utils";
@@ -27,27 +27,18 @@ import toasts from "../../../svelte-stores/toast-store";
 import {processDiagramStore} from "../../../svelte-stores/process-diagram-store";
 import {mkSelectionOptions} from "../../../common/selector-utils";
 import {svelteCallToPromise} from "../../../common/promise-utils";
-import AggregateOverlayDiagramPanel from "../../../aggregate-overlay-diagram/components/panel/AggregateOverlayDiagramPanel.svelte"
 
 const bindings = {
     parentEntityRef: "<"
 };
 
 
-const TABS = {
-    linked: "linked",
-    overlay: "overlay"
-};
-
-
 const initialState = {
-    AggregateOverlayDiagramPanel,
     selectedDiagram: null,
     visibility: {
         flowDiagramMode: null, // null | VIEW | EDIT
         makeNew: true
     },
-    tab: TABS.linked
 };
 
 
@@ -265,5 +256,5 @@ const component = {
 
 export default {
     component,
-    id: "waltzEntityDiagramsSection"
+    id: "waltzLinkedDiagramsPanel"
 };
