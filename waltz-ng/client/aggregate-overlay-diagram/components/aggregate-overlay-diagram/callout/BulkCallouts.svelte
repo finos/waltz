@@ -10,6 +10,6 @@
     <div class="overlay-cell {c.cellExternalId}"
          data-cell-id={c.cellExternalId}>
         <Callout callout={c}
-                 label={idx}/>
+                 label={idx + 1}/>
     </div>
 {/each}

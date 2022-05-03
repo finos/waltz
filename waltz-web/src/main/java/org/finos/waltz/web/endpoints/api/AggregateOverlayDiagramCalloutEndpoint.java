@@ -20,7 +20,9 @@ package org.finos.waltz.web.endpoints.api;
 
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramCallout;
 import org.finos.waltz.model.aggregate_overlay_diagram.DiagramCalloutCreateCommand;
+import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.aggregate_overlay_diagram.AggregateOverlayDiagramCalloutService;
+import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.WebUtilities;
@@ -29,11 +31,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Request;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.web.WebUtilities.*;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.getForList;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.postForDatum;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 
 @Service
 public class AggregateOverlayDiagramCalloutEndpoint implements Endpoint {
@@ -42,13 +44,17 @@ public class AggregateOverlayDiagramCalloutEndpoint implements Endpoint {
     private static final String BASE_URL = WebUtilities.mkPath("api", "aggregate-overlay-diagram-callout");
 
     private final AggregateOverlayDiagramCalloutService aggregateOverlayDiagramCalloutService;
+    private final UserRoleService userRoleService;
 
 
     @Autowired
-    public AggregateOverlayDiagramCalloutEndpoint(AggregateOverlayDiagramCalloutService aggregateOverlayDiagramCalloutService) {
+    public AggregateOverlayDiagramCalloutEndpoint(AggregateOverlayDiagramCalloutService aggregateOverlayDiagramCalloutService,
+                                                  UserRoleService userRoleService) {
         checkNotNull(aggregateOverlayDiagramCalloutService, "aggregateOverlayDiagramCalloutService must not be null");
+        checkNotNull(userRoleService, "userRoleService must not be null");
 
         this.aggregateOverlayDiagramCalloutService = aggregateOverlayDiagramCalloutService;
+        this.userRoleService = userRoleService;
     }
 
 
@@ -58,23 +64,37 @@ public class AggregateOverlayDiagramCalloutEndpoint implements Endpoint {
         String findByDiagramInstanceIdPath = mkPath(BASE_URL, "diagram-instance-id", ":id");
         String createPath = mkPath(BASE_URL, "create");
         String updatePath = mkPath(BASE_URL, "update");
+        String deletePath = mkPath(BASE_URL, "remove", "id", ":id");
 
         ListRoute<AggregateOverlayDiagramCallout> findByDiagramInstanceIdRoute = (request, response) -> {
             return aggregateOverlayDiagramCalloutService.findByDiagramInstanceId(getId(request));
         };
 
         DatumRoute<Integer> createRoute = (request, response) -> {
+            ensureUserHasEditRights(request);
             return aggregateOverlayDiagramCalloutService.create(readBody(request, DiagramCalloutCreateCommand.class));
         };
 
 
         DatumRoute<Integer> updateRoute = (request, response) -> {
+            ensureUserHasEditRights(request);
             return aggregateOverlayDiagramCalloutService.update(readBody(request, AggregateOverlayDiagramCallout.class));
+        };
+
+
+        DatumRoute<Integer> deleteRoute = (request, response) -> {
+            ensureUserHasEditRights(request);
+            return aggregateOverlayDiagramCalloutService.delete(getId(request));
         };
 
         getForList(findByDiagramInstanceIdPath, findByDiagramInstanceIdRoute);
         postForDatum(createPath, createRoute);
         postForDatum(updatePath, updateRoute);
+        deleteForDatum(deletePath, deleteRoute);
+    }
+
+    private void ensureUserHasEditRights(Request request) {
+        requireRole(userRoleService, request, SystemRole.AGGREGATE_OVERLAY_DIAGRAM_EDITOR);
     }
 
 }

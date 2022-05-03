@@ -37,7 +37,6 @@ export function renderBulkOverlays(svgHolderElem,
                                    targetSelector,
                                    setContentSize) {
 
-
     const cells = Array.from(overlayCellsHolder.querySelectorAll(".overlay-cell"));
     cells.forEach(c => {
         const targetCellId = c.getAttribute("data-cell-id");

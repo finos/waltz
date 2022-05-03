@@ -7,6 +7,7 @@
     import ColorPicker from "../../../../system/svelte/ratings-schemes/ColorPicker.svelte";
     import {createEventDispatcher, getContext} from "svelte";
     import {calloutColors} from "../aggregate-overlay-diagram-utils";
+    import {displayError} from "../../../../common/error-utils";
 
     let selectedInstance = getContext("selectedInstance");
     let svgDetail = getContext("svgDetail");
@@ -19,11 +20,10 @@
 
     const dispatch = createEventDispatcher();
 
-    $: workingCallout = Object.assign({}, $selectedCellCallout);
+    let workingCallout = Object.assign({}, $selectedCellCallout);
 
     function cancel() {
         dispatch("cancel");
-        resetCallout();
     }
 
     function onSelectStartColor(evt) {
@@ -34,23 +34,36 @@
         workingCallout.endColor = evt.detail;
     }
 
-
     function save() {
         if (workingCallout.id) {
-            updateCallout()
+            updateCallout();
         } else {
-            createCallout()
+            createCallout();
         }
     }
 
+    function determineEndColor(startColor, endColor, requireSecondColor, defaultColor) {
+        if (requireSecondColor && endColor) {
+            return endColor;
+        } else if (requireSecondColor) {
+            return defaultColor;
+        } else if (startColor) {
+            return startColor;
+        } else {
+            return defaultColor;
+        }
+    }
 
     function createCallout() {
+        let startColor = workingCallout.startColor ? workingCallout.startColor : defaultColor;
+        let endColor = determineEndColor(workingCallout.startColor, workingCallout.endColor, requireSecondColor, defaultColor);
 
         const createCommand = Object.assign(
             {},
             workingCallout,
             {
-                endColor: requireSecondColor ? workingCallout.endColor : workingCallout.startColor,
+                startColor,
+                endColor,
                 cellExternalId: $selectedCellId,
                 instanceId: $selectedInstance.id
             });
@@ -60,27 +73,14 @@
         reloadCallouts(savePromise)
     }
 
-
-    function reloadCallouts(savePromise) {
-        Promise.resolve(savePromise)
-            .then(() => {
-                calloutsCall = aggregateOverlayDiagramCalloutStore.findCalloutsByDiagramInstanceId($selectedInstance.id, true);
-                $callouts = $calloutsCall?.data;
-                resetCallout();
-            })
-            .finally(cancel)
-    }
-
-
     function updateCallout() {
-
         const updateCommand = Object.assign(
             {},
             workingCallout,
             {
                 endColor: requireSecondColor ? workingCallout.endColor : workingCallout.startColor,
                 cellExternalId: $selectedCellId,
-                instanceId: $selectedInstance.id
+                diagramInstanceId: $selectedInstance.id
             });
 
         let savePromise = aggregateOverlayDiagramCalloutStore.update(updateCommand);
@@ -88,10 +88,17 @@
         reloadCallouts(savePromise);
     }
 
-    function resetCallout() {
-        workingCallout.title = null;
-        workingCallout.content = null;
+    function reloadCallouts(savePromise) {
+        Promise.resolve(savePromise)
+            .then(() => {
+                calloutsCall = aggregateOverlayDiagramCalloutStore.findCalloutsByDiagramInstanceId($selectedInstance.id, true);
+                $callouts = $calloutsCall?.data;
+            })
+            .catch(e => displayError("Could not save callout", e))
+            .finally(cancel)
     }
+
+    $: defaultColor = _.first(calloutColors);
 
     $: invalid = _.isNil(workingCallout.title) || _.isNil(workingCallout.content)
 
@@ -112,16 +119,16 @@
             The title of this callout
         </div>
 
-        <input class="form-control"
-               id="content"
-               placeholder="Content"
-               bind:value={workingCallout.content}/>
+        <textarea class="form-control"
+                  id="content"
+                  placeholder="Content"
+                  bind:value={workingCallout.content}/>
         <div class="help-block">
             The main content of this callout, markdown is supported
         </div>
 
         <div id="start-color">
-            <ColorPicker startColor={workingCallout.startColor}
+            <ColorPicker startColor={workingCallout.startColor || defaultColor}
                          on:select={onSelectStartColor}
                          predefinedColors={calloutColors}/>
         </div>
@@ -160,7 +167,7 @@
         </button>
 
         <button class="btn"
-                on:click={cancel}>
+                on:click|preventDefault={cancel}>
             Cancel
         </button>
     </form>

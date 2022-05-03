@@ -23,20 +23,28 @@ export function mkOverlayDiagramCalloutStore() {
     };
 
 
-    const update = (updateCommand, force = false) => {
+    const update = (updateCommand) => {
         return remote
             .execute(
                 "POST",
                 "api/aggregate-overlay-diagram-callout/update",
-                updateCommand,
-                {force});
+                updateCommand);
+    };
+
+
+    const remove = (id) => {
+        return remote
+            .execute(
+                "DELETE",
+                `api/aggregate-overlay-diagram-callout/remove/id/${id}`);
     };
 
 
     return {
         findCalloutsByDiagramInstanceId,
         create,
-        update
+        update,
+        remove
     };
 }
 
