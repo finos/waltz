@@ -1,6 +1,4 @@
 <script>
-
-
     import AggregateOverlayDiagram from "../aggregate-overlay-diagram/AggregateOverlayDiagram.svelte";
     import {aggregateOverlayDiagramStore} from "../../../svelte-stores/aggregate-overlay-diagram-store";
     import {getContext, onMount} from "svelte";

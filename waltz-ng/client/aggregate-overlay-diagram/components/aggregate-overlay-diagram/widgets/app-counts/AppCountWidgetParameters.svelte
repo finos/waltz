@@ -40,7 +40,7 @@
 
 
 
-<label for="future-date">Projected costs for:</label>
+<label for="future-date">Projected app counts for:</label>
 <span>{fmt(futureDate)}</span>
 
 <input id="future-date"
