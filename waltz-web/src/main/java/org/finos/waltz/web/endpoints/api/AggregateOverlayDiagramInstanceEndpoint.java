@@ -56,11 +56,16 @@ public class AggregateOverlayDiagramInstanceEndpoint implements Endpoint {
     public void register() {
 
         String findByDiagramIdPath = mkPath(BASE_URL, "diagram-id", ":id");
+        String findAllPath = mkPath(BASE_URL, "all");
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
         String createInstancePath = mkPath(BASE_URL, "create");
 
         ListRoute<AggregateOverlayDiagramInstance> findByDiagramIdRoute = (request, response) -> {
             return aggregateOverlayDiagramInstanceService.findByDiagramId(getId(request));
+        };
+
+        ListRoute<AggregateOverlayDiagramInstance> findAllRoute = (request, response) -> {
+            return aggregateOverlayDiagramInstanceService.findAll();
         };
 
         DatumRoute<AggregateOverlayDiagramInstance> getByIdRoute = (request, response) -> {
@@ -73,6 +78,7 @@ public class AggregateOverlayDiagramInstanceEndpoint implements Endpoint {
         };
 
         getForList(findByDiagramIdPath, findByDiagramIdRoute);
+        getForList(findAllPath, findAllRoute);
         getForDatum(getByIdPath, getByIdRoute);
         postForDatum(createInstancePath, createInstanceRoute);
     }

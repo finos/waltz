@@ -74,6 +74,15 @@ public class AggregateOverlayDiagramInstanceDao {
     }
 
 
+    public Set<AggregateOverlayDiagramInstance> findAll() {
+        return dsl
+                .select(AGGREGATE_OVERLAY_DIAGRAM_INSTANCE.fields())
+                .select(ENTITY_NAME_FIELD)
+                .from(AGGREGATE_OVERLAY_DIAGRAM_INSTANCE)
+                .fetchSet(TO_DOMAIN_MAPPER::map);
+    }
+
+
     public AggregateOverlayDiagramInstance getById(Long instanceId) {
         return dsl
                 .select(AGGREGATE_OVERLAY_DIAGRAM_INSTANCE.fields())

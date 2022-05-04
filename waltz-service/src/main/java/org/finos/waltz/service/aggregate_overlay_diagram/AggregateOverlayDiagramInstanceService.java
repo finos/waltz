@@ -22,6 +22,10 @@ public class AggregateOverlayDiagramInstanceService {
     }
 
 
+    public Set<AggregateOverlayDiagramInstance> findAll() {
+        return aggregateOverlayDiagramInstanceDao.findAll();
+    }
+
     public Set<AggregateOverlayDiagramInstance> findByDiagramId(Long diagramId) {
         return aggregateOverlayDiagramInstanceDao.findByDiagramId(diagramId);
     }

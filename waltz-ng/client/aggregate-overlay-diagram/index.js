@@ -19,6 +19,7 @@
 import angular from "angular";
 import AggregateOverlayDiagramSection from "./components/section/aggregate-overlay-diagram-section.js"
 import InstanceView from "./pages/instance-view/overlay-diagram-instance-view.js"
+import DiagramList from "./pages/list/overlay-diagram-list.js"
 import {registerComponents} from "../common/module-utils";
 import routes from "./routes";
 
@@ -33,7 +34,8 @@ export default () => {
         module,
         [
             AggregateOverlayDiagramSection,
-            InstanceView
+            InstanceView,
+            DiagramList
         ]);
 
     return module.name;

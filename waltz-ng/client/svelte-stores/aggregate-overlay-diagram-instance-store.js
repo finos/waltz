@@ -1,8 +1,17 @@
 import {remote} from "./remote";
-import {checkIsEntityRef} from "../common/checks";
 
 
 export function mkOverlayDiagramInstanceStore() {
+
+    const findAll = (diagramId, force = false) => {
+        return remote
+            .fetchViewList(
+                "GET",
+                "api/aggregate-overlay-diagram-instance/all",
+                null,
+                {force});
+    };
+
 
     const findByDiagramId = (diagramId, force = false) => {
         return remote
@@ -34,6 +43,7 @@ export function mkOverlayDiagramInstanceStore() {
     };
 
     return {
+        findAll,
         findByDiagramId,
         getById,
         create

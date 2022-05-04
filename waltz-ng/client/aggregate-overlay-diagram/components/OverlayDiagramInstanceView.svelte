@@ -47,10 +47,10 @@
                 <ViewLink state="main">Home</ViewLink>
             </li>
             <li>
-                <EntityLink ref={$selectedInstance?.parentEntityReference}/>
+                <ViewLink state="main.aggregate-overlay-diagram.list">Diagrams</ViewLink>
             </li>
             <li>
-                Diagram
+                <EntityLink ref={$selectedInstance?.parentEntityReference}/>
             </li>
             <li>
                 <EntityLink ref={$selectedInstance}/>
