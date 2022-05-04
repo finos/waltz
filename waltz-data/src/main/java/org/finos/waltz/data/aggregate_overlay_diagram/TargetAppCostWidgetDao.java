@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
-import static org.finos.waltz.common.FunctionUtilities.time;
 import static org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramUtilities.*;
 import static org.finos.waltz.schema.Tables.*;
 import static org.jooq.lambda.tuple.Tuple.tuple;
@@ -48,18 +47,18 @@ public class TargetAppCostWidgetDao {
             return Collections.emptySet();
         }
 
-        Map<String, Set<Long>> cellExtIdsToAppIdsMap = time("fetchAndGroupAppIdsByCellId", () -> fetchAndGroupAppIdsByCellId(
+        Map<String, Set<Long>> cellExtIdsToAppIdsMap = fetchAndGroupAppIdsByCellId(
                 dsl,
-                cellExtIdWithAppIdSelector));
+                cellExtIdWithAppIdSelector);
 
         Set<Long> diagramApplicationIds = calcExactAppIdsDiagram(
                 dsl,
                 cellExtIdsToAppIdsMap,
                 inScopeApplicationSelector);
 
-        Map<Long, Tuple2<BigDecimal, BigDecimal>> appToTargetStateCosts = time("fetchAppIdToTargetStateCostIndicator", () -> fetchAppIdToTargetStateCostIndicator(
+        Map<Long, Tuple2<BigDecimal, BigDecimal>> appToTargetStateCosts = fetchAppIdToTargetStateCostIndicator(
                 targetStateDate,
-                diagramApplicationIds));
+                diagramApplicationIds);
 
         return cellExtIdsToAppIdsMap
                 .entrySet()
