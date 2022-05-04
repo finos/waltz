@@ -35,11 +35,10 @@ export function mkOverlayDiagramInstanceStore() {
 
     const create = (createCmd, force = false) => {
         return remote
-            .fetchViewDatum(
+            .execute(
                 "POST",
                 "api/aggregate-overlay-diagram-instance/create",
-                createCmd,
-                {force});
+                createCmd);
     };
 
     return {

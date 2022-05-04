@@ -18,11 +18,7 @@
     const dispatch = createEventDispatcher();
 
     function createInstance() {
-        console.log({sd: $selectedDiagram, svg: $svgDetail});
-
         const svgString = $svgDetail.outerHTML;
-
-        console.log({svgDe: $svgDetail, svgString});
 
         const createCmd = {
             name,
@@ -34,17 +30,19 @@
 
         let createPromise = aggregateOverlayDiagramInstanceStore.create(createCmd);
 
-        Promise.resolve(createPromise)
-            .then(() => {
-                toasts.success("Diagram saved!");
-                return instanceCall = aggregateOverlayDiagramInstanceStore.findByDiagramId($selectedDiagram.id, true);
-            })
-            .catch(e => displayError("Could not save diagram", e))
-            .finally(() => cancel());
+        reloadInstances(createPromise);
 
     }
 
-    $: $instances = instanceCall?.data;
+    function reloadInstances(createPromise) {
+        createPromise
+            .then(() => {
+                instanceCall = aggregateOverlayDiagramInstanceStore.findByDiagramId($selectedDiagram.id, true)
+                $instances = instanceCall?.data;
+            })
+            .catch(e => displayError("Could not save diagram", e))
+            .finally(cancel)
+    }
 
     function cancel() {
         dispatch("cancel");

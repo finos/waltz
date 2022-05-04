@@ -18,10 +18,11 @@
 
 package org.finos.waltz.web.endpoints.api;
 
-import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramCallout;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramInstance;
 import org.finos.waltz.model.aggregate_overlay_diagram.OverlayDiagramInstanceCreateCommand;
+import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.aggregate_overlay_diagram.AggregateOverlayDiagramInstanceService;
+import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.WebUtilities;
@@ -30,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Request;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.web.WebUtilities.*;
@@ -42,13 +44,17 @@ public class AggregateOverlayDiagramInstanceEndpoint implements Endpoint {
     private static final String BASE_URL = WebUtilities.mkPath("api", "aggregate-overlay-diagram-instance");
 
     private final AggregateOverlayDiagramInstanceService aggregateOverlayDiagramInstanceService;
+    private final UserRoleService userRoleService;
 
 
     @Autowired
-    public AggregateOverlayDiagramInstanceEndpoint(AggregateOverlayDiagramInstanceService aggregateOverlayDiagramInstanceService) {
+    public AggregateOverlayDiagramInstanceEndpoint(AggregateOverlayDiagramInstanceService aggregateOverlayDiagramInstanceService,
+                                                   UserRoleService userRoleService) {
         checkNotNull(aggregateOverlayDiagramInstanceService, "aggregateOverlayDiagramInstanceService must not be null");
+        checkNotNull(userRoleService, "userRoleService must not be null");
 
         this.aggregateOverlayDiagramInstanceService = aggregateOverlayDiagramInstanceService;
+        this.userRoleService = userRoleService;
     }
 
 
@@ -73,6 +79,7 @@ public class AggregateOverlayDiagramInstanceEndpoint implements Endpoint {
         };
 
         DatumRoute<Integer> createInstanceRoute = (request, response) -> {
+            ensureUserHasEditRights(request);
             OverlayDiagramInstanceCreateCommand createCmd = readBody(request, OverlayDiagramInstanceCreateCommand.class);
             return aggregateOverlayDiagramInstanceService.createInstance(createCmd, getUsername(request));
         };
@@ -83,4 +90,7 @@ public class AggregateOverlayDiagramInstanceEndpoint implements Endpoint {
         postForDatum(createInstancePath, createInstanceRoute);
     }
 
+    private void ensureUserHasEditRights(Request request) {
+        requireRole(userRoleService, request, SystemRole.AGGREGATE_OVERLAY_DIAGRAM_EDITOR);
+    }
 }

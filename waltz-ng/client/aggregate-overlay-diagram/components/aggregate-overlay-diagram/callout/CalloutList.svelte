@@ -31,6 +31,8 @@
 
     $: hasEditPermissions = _.includes(permissions?.roles, systemRoles.AGGREGATE_OVERLAY_DIAGRAM_EDITOR.key) || false;
 
+    $: console.log({hasEdit: hasEditPermissions});
+
     function hover(callout) {
         $hoveredCallout = callout;
     }
