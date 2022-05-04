@@ -20,7 +20,7 @@ package org.finos.waltz.jobs.harness;
 
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
-import org.finos.waltz.data.aggregate_overlay_diagram.AppCostWidgetDao;
+import org.finos.waltz.data.aggregate_overlay_diagram.TargetAppCostWidgetDao;
 import org.finos.waltz.data.aggregate_overlay_diagram.AppCountWidgetDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.IdSelectionOptions;
@@ -50,7 +50,7 @@ public class OverlayDiagramHarness {
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
         AppCountWidgetDao countWidgetDao = ctx.getBean(AppCountWidgetDao.class);
-        AppCostWidgetDao costWidgetDao = ctx.getBean(AppCostWidgetDao.class);
+        TargetAppCostWidgetDao costWidgetDao = ctx.getBean(TargetAppCostWidgetDao.class);
 
         IdSelectionOptions appGroup = mkOpts(mkRef(EntityKind.APP_GROUP, 11785L));
         IdSelectionOptions ou = mkOpts(mkRef(EntityKind.ORG_UNIT, 95L));

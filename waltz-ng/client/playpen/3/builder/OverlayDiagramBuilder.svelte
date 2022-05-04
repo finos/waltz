@@ -37,12 +37,15 @@
      viewBox={`0 0 1000 ${dimensions.height}`}
      style="border: 1px solid #dcefeb">
 
-    {#each data as block, idx}
-        <g transform={`translate(10, ${block.layoutData.dy})`}>
-            <EntityGroupBox height={ block.layoutData.height }
-                            {dimensions}
-                            color={groupColorScale(idx)}
-                            group={block}/>
-        </g>
-    {/each}
+    <g>
+        {#each data as block, idx}
+            <g transform={`translate(10, ${block.layoutData.dy})`}>
+                <EntityGroupBox height={ block.layoutData.height }
+                                {dimensions}
+                                color={groupColorScale(idx)}
+                                group={block}/>
+            </g>
+        {/each}
+    </g>
+
 </svg>

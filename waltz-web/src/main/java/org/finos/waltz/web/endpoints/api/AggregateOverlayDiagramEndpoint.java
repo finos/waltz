@@ -64,7 +64,7 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
         String findAllPath = mkPath(BASE_URL, "all");
         String findAppCountWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "app-count-widget", ":target-date");
-        String findAppCostWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "app-cost-widget", ":target-date");
+        String findTargetAppCostWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "target-app-cost-widget", ":target-date");
         String findAppAssessmentWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "app-assessment-widget", ":assessment-id");
 
         DatumRoute<AggregateOverlayDiagram> getByIdRoute = (request, response) -> {
@@ -86,9 +86,9 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
         };
 
 
-        ListRoute<CostWidgetDatum> findAppCostWidgetDataRoute = (request, response) -> {
+        ListRoute<CostWidgetDatum> findTargetAppCostWidgetDataRoute = (request, response) -> {
             return aggregateOverlayDiagramService
-                    .findAppCostWidgetData(
+                    .findTargetAppCostWidgetData(
                             getId(request),
                             readIdSelectionOptionsFromBody(request),
                             getTargetDate(request));
@@ -111,7 +111,7 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
         getForDatum(getByIdPath, getByIdRoute);
         getForList(findAllPath, findAllRoute);
         postForList(findAppCountWidgetDataPath, findAppCountWidgetDataRoute);
-        postForList(findAppCostWidgetDataPath, findAppCostWidgetDataRoute);
+        postForList(findTargetAppCostWidgetDataPath, findTargetAppCostWidgetDataRoute);
         postForList(findAppAssessmentWidgetDataPath, findAppAssessmentWidgetDataRoute);
     }
 

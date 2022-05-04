@@ -77,11 +77,14 @@
                 <div class={`col-sm-${$diagramProportion}`}
                      style="padding-top: 1em">
                     <div class="col-sm-6">
-                        <h4>{$selectedDiagram?.name}</h4>
-                        <button class="small btn btn-skinny"
-                                on:click={() => activeMode = Modes.SELECT}>
-                            Change diagram
-                        </button>
+                        <h4>
+                            {$selectedDiagram?.name}
+                            <button class="small btn btn-link pull-right"
+                                    on:click={() => activeMode = Modes.SELECT}>
+                                <Icon name="list-ul"/> Change diagram
+                            </button>
+                        </h4>
+
                     </div>
                     <div class="col-sm-6">
                         <div class="pull-right btn-group">

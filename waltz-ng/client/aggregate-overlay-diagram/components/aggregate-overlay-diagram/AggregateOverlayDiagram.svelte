@@ -58,10 +58,10 @@
 
     $: {
         if (svgHolderElem) {
-            const svgElem = svgHolderElem.querySelector("svg");
-            $svgDetail = svgElem;
+            $svgDetail = svgHolderElem.querySelector("svg");
         }
     }
+
 
 </script>
 

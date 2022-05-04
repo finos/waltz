@@ -1,10 +1,10 @@
 <script>
-    import {aggregateOverlayDiagramStore} from "../../../../svelte-stores/aggregate-overlay-diagram-store";
+    import {aggregateOverlayDiagramStore} from "../../../../../svelte-stores/aggregate-overlay-diagram-store";
     import {getContext} from "svelte";
     import {timeFormat} from "d3-time-format";
-    import BulkAppCostWidget from "./BulkAppCostWidget.svelte";
     import moment from "moment";
-    import Icon from "../../../../common/svelte/Icon.svelte";
+    import BulkAppCountWidget from "./BulkAppCountWidget.svelte";
+    import Icon from "../../../../../common/svelte/Icon.svelte";
 
     export let opts;
 
@@ -15,29 +15,29 @@
     const widget = getContext("widget");
     let selectedDefinition;
     let overlayDataCall;
+    let futureDate = null;
+    let slideVal = 0;
 
     function onSelect(futureDate) {
         const dateStr = fmt(futureDate);
-        overlayDataCall = aggregateOverlayDiagramStore.findAppCostForDiagram(
+        overlayDataCall = aggregateOverlayDiagramStore.findAppCountsForDiagram(
             $selectedDiagram.id,
             opts,
             dateStr,
             true);
-        $widget = BulkAppCostWidget;
+        $widget = BulkAppCountWidget;
     }
+
+    const debouncedOnSelect = _.debounce(onSelect, 500);
 
     $: {
         $overlayData = $overlayDataCall?.data;
     }
 
-    let slideVal = 0;
-
-    const debouncedOnSelect = _.debounce(onSelect, 500);
-
     $: futureDate = moment().set("date", 1).add(slideVal * 2, "months");
     $: debouncedOnSelect(futureDate);
-
 </script>
+
 
 
 <label for="future-date">Projected costs for:</label>
@@ -50,9 +50,9 @@
        bind:value={slideVal}>
 
 <div class="help-block">
-    Use the slider to adjust how far in the future to project costs.
+    Use the slider to adjust how far in the future to application counts.
     This is calculated by incorporating app retirement dates and subtracting their associated
-    costs from the current total.
+    apps from the current total.
 </div>
 
 
