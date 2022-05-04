@@ -50,12 +50,22 @@ export function mkOverlayDiagramStore() {
                 {force});
     };
 
+    const findBackingEntitiesForDiagram = (diagramId, force = false) => {
+        return remote
+            .fetchViewList(
+                "GET",
+                `api/aggregate-overlay-diagram/diagram-id/${diagramId}/backing-entity-widget`,
+                null,
+                {force});
+    };
+
     return {
         getById,
         findAll,
         findAppCountsForDiagram,
         findTargetAppCostForDiagram,
-        findAppAssessmentsForDiagram
+        findAppAssessmentsForDiagram,
+        findBackingEntitiesForDiagram
     };
 }
 

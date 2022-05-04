@@ -5,6 +5,7 @@ import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
 import org.finos.waltz.model.overlay_diagram.AssessmentRatingsWidgetDatum;
+import org.finos.waltz.model.overlay_diagram.BackingEntityWidgetDatum;
 import org.finos.waltz.model.overlay_diagram.CostWidgetDatum;
 import org.finos.waltz.model.overlay_diagram.CountWidgetDatum;
 import org.jooq.Record1;
@@ -24,16 +25,19 @@ public class AggregateOverlayDiagramService {
     private final AppCountWidgetDao appCountWidgetDao;
     private final TargetAppCostWidgetDao targetAppCostWidgetDao;
     private final AppAssessmentWidgetDao appAssessmentWidgetDao;
+    private final BackingEntityWidgetDao backingEntityWidgetDao;
 
     @Autowired
     public AggregateOverlayDiagramService(AggregateOverlayDiagramDao aggregateOverlayDiagramDao,
                                           AppCountWidgetDao appCountWidgetDao,
                                           TargetAppCostWidgetDao targetAppCostWidgetDao,
-                                          AppAssessmentWidgetDao appAssessmentWidgetDao) {
+                                          AppAssessmentWidgetDao appAssessmentWidgetDao,
+                                          BackingEntityWidgetDao backingEntityWidgetDao) {
         this.aggregateOverlayDiagramDao = aggregateOverlayDiagramDao;
         this.appCountWidgetDao = appCountWidgetDao;
         this.targetAppCostWidgetDao = targetAppCostWidgetDao;
         this.appAssessmentWidgetDao = appAssessmentWidgetDao;
+        this.backingEntityWidgetDao = backingEntityWidgetDao;
     }
 
 
@@ -75,5 +79,11 @@ public class AggregateOverlayDiagramService {
                 assessmentId,
                 applicationIdSelector);
     }
+
+
+    public Set<BackingEntityWidgetDatum> findBackingEntityWidgetData(Long diagramId) {
+        return backingEntityWidgetDao.findWidgetData(diagramId);
+    }
+
 
 }

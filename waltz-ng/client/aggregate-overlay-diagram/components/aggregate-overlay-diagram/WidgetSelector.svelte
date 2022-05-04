@@ -3,6 +3,7 @@
     import AssessmentWidgetParameters from "./widgets/assessments/AssessmentWidgetParameters.svelte";
     import TargetAppCostWidgetParameters from "./widgets/target-costs/TargetAppCostWidgetParameters.svelte";
     import AppCountWidgetParameters from "./widgets/app-counts/AppCountWidgetParameters.svelte";
+    import BackingEntitiesWidgetParameters from "./widgets/backing-entities/BackingEntitiesWidgetParameters.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
 
 
@@ -11,9 +12,9 @@
     const widgets = [
       {
             parameterWidget: TargetAppCostWidgetParameters,
-            description: "Shows current cost and future cost info",
-            label: "Target App Costs"
-        }, {
+          description: "Shows current cost and future cost info",
+          label: "Target App Costs"
+      }, {
             parameterWidget: AppCountWidgetParameters,
             description: "Shows current app count and future app count info",
             label: "App Counts"
@@ -21,6 +22,10 @@
             label: "Assessments",
             description: "Allows user to select an assessment to overlay on the diagram",
             parameterWidget: AssessmentWidgetParameters
+        }, {
+            label: "Backing Entities",
+            description: "Displays the underlying entities which drive the overlays on the diagram",
+            parameterWidget: BackingEntitiesWidgetParameters
         }
     ];
 
