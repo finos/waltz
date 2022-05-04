@@ -36,7 +36,6 @@
 
     $: $instances = $instancesCall?.data || [];
 
-    $: console.log({hep: hasEditPermissions});
 
 </script>
 

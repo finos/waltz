@@ -19,13 +19,19 @@
 
     let instancesCall = aggregateOverlayDiagramInstanceStore.findAll();
 
-    $: instances = _.map(
-        $instancesCall?.data,
-        d => Object.assign({}, d, {diagram: diagramsById[d.diagramId]}));
+    $: instances = _.map($instancesCall?.data, d => Object.assign({}, d, {diagram: _.get(diagramsById, d.diagramId)}));
 
     $: instanceList = _.isEmpty(qry)
         ? instances
-        : termSearch(instances, qry, ['diagram.name', 'name', 'description']);
+        : termSearch(instances, qry, ["diagram.name", "name", "description"]);
+
+    $: instancesByDiagramId = _
+        .chain(instanceList)
+        .orderBy(d => _.toLower(d.name))
+        .groupBy(d => d.diagramId)
+        .value();
+
+    $: diagramsWithInstances = _.map(diagrams, d => Object.assign({}, d, {instances: _.get(instancesByDiagramId, d.id, [])}))
 
 </script>
 
@@ -72,23 +78,43 @@
                             <th>Last Updated</th>
                         </tr>
                         </thead>
-                        <tbody>
-                        {#each _.orderBy(instanceList, d => [d.diagram?.name, d.name]) as instance}
-                            <tr>
-                                <td title={instance.diagram?.description}>
-                                    {instance.diagram?.name}
-                                </td>
-                                <td>
-                                    <EntityLink ref={instance}/>
-                                </td>
-                                <td>{instance.description}</td>
-                                <td>
-                                    <LastEdited entity={instance}/>
-                                </td>
-                            </tr>
+                        {#each _.orderBy(diagramsWithInstances, d => d.name) as diagram}
+                            <tbody>
+                            {#each diagram.instances as instance}
+                                <tr class="waltz-visibility-parent">
+                                    {#if _.indexOf(diagram.instances, instance) === 0}
+                                        <td title={diagram.description}>
+                                            <strong>{diagram.name}</strong>
+                                        </td>
+                                    {:else}
+                                        <td title={diagram.description}
+                                            class="waltz-visibility-child-30">
+                                            {diagram.name}
+                                        </td>
+                                    {/if}
+                                    <td>
+                                        <EntityLink ref={instance}/>
+                                    </td>
+                                    <td>{instance.description}</td>
+                                    <td>
+                                        <LastEdited entity={instance}/>
+                                    </td>
+                                </tr>
+                            {:else}
+                                <tr>
+                                <tr>
+                                    <td title={diagram.description}>
+                                        <span class="text-muted">{diagram.name}</span>
+                                    </td>
+                                    <td colspan="3">
+                                        <span class="text-muted">There are no instances for this diagram</span>
+                                    </td>
+                                </tr>
+                            {/each}
+                            </tbody>
                         {/each}
-                        </tbody>
                     </table>
+
                 {/if}
             </div>
 
