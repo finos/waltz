@@ -23,11 +23,14 @@ import org.finos.waltz.data.aggregate_overlay_diagram.AppCostWidgetDao;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.overlay_diagram.CostWidgetDatum;
 import org.finos.waltz.service.DIBaseConfiguration;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import java.util.Set;
 
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
@@ -48,7 +51,8 @@ public class AggregateWidgetCostHarness {
 
         ApplicationIdSelectorFactory selectorFactory  = new ApplicationIdSelectorFactory();
         Select<Record1<Long>> appIds = selectorFactory.apply(selectionOptions);
-        dao.foo(diagramId, SetUtilities.asSet(schemeId), allocationSchemeId, appIds);
+        Set<CostWidgetDatum> widgetData = dao.findWidgetData(diagramId, SetUtilities.asSet(schemeId), allocationSchemeId, appIds);
+        System.out.println(widgetData);
 
     }
 

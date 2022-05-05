@@ -1,8 +1,8 @@
 package org.finos.waltz.data.aggregate_overlay_diagram;
 
 import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.overlay_diagram.CostWidgetDatum;
-import org.finos.waltz.model.overlay_diagram.ImmutableCostWidgetDatum;
+import org.finos.waltz.model.overlay_diagram.ImmutableTargetCostWidgetDatum;
+import org.finos.waltz.model.overlay_diagram.TargetCostWidgetDatum;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
@@ -34,9 +34,9 @@ public class TargetAppCostWidgetDao {
     }
 
 
-    public Set<CostWidgetDatum> findWidgetData(long diagramId,
-                                               Select<Record1<Long>> inScopeApplicationSelector,
-                                               LocalDate targetStateDate) {
+    public Set<TargetCostWidgetDatum> findWidgetData(long diagramId,
+                                                     Select<Record1<Long>> inScopeApplicationSelector,
+                                                     LocalDate targetStateDate) {
 
         Select<Record2<String, Long>> cellExtIdWithAppIdSelector = mkOverlayEntityCellApplicationSelector(
                 dsl,
@@ -77,7 +77,7 @@ public class TargetAppCostWidgetDao {
                             .map(v -> appToTargetStateCosts.getOrDefault(v, ZERO_COST).v2)
                             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-                    return ImmutableCostWidgetDatum.builder()
+                    return ImmutableTargetCostWidgetDatum.builder()
                             .cellExternalId(cellExtId)
                             .currentStateCost(currentCost)
                             .targetStateCost(targetCost)

@@ -3,16 +3,21 @@
     import AssessmentWidgetParameters from "./widgets/assessments/AssessmentWidgetParameters.svelte";
     import TargetAppCostWidgetParameters from "./widgets/target-costs/TargetAppCostWidgetParameters.svelte";
     import AppCountWidgetParameters from "./widgets/app-counts/AppCountWidgetParameters.svelte";
+    import AppCostWidgetParameters from "./widgets/app-costs/AppCostWidgetParameters.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
 
 
     export let primaryEntityRef;
 
     const widgets = [
-      {
+        {
             parameterWidget: TargetAppCostWidgetParameters,
             description: "Shows current cost and future cost info",
             label: "Target App Costs"
+        }, {
+            parameterWidget: AppCostWidgetParameters,
+            description: "Shows current app costs accounting for allocation percentages",
+            label: "App Costs"
         }, {
             parameterWidget: AppCountWidgetParameters,
             description: "Shows current app count and future app count info",

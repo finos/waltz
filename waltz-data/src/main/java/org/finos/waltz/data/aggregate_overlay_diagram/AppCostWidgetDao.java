@@ -4,6 +4,8 @@ import org.finos.waltz.common.StreamUtilities.Siphon;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.Nullable;
+import org.finos.waltz.model.overlay_diagram.CostWidgetDatum;
+import org.finos.waltz.model.overlay_diagram.ImmutableCostWidgetDatum;
 import org.finos.waltz.schema.tables.*;
 import org.immutables.value.Value;
 import org.jooq.*;
@@ -19,6 +21,7 @@ import java.util.Set;
 
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.*;
+import static org.finos.waltz.common.CollectionUtilities.*;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.StreamUtilities.mkSiphon;
 import static org.finos.waltz.data.JooqUtilities.readRef;
@@ -26,6 +29,8 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository
 public class AppCostWidgetDao {
+
+    private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf(100);
 
     @Value.Immutable
     interface MeasurableCostEntry {
@@ -53,10 +58,10 @@ public class AppCostWidgetDao {
         this.dsl = dsl;
     }
 
-    public Set<?> foo(long diagramId,
-                      Set<Long> costKindIds,
-                      long allocationSchemeId,
-                      Select<Record1<Long>> inScopeApplicationSelector) {
+    public Set<CostWidgetDatum> findWidgetData(long diagramId,
+                                               Set<Long> costKindIds,
+                                               long allocationSchemeId,
+                                               Select<Record1<Long>> inScopeApplicationSelector) {
 
         Map<String, Set<EntityReference>> expandedBackingForCells = findExpandedBackingForCells(
                 dsl,
@@ -77,69 +82,91 @@ public class AppCostWidgetDao {
                 costData,
                 MeasurableCostEntry::measurableId);
 
-        expandedBackingForCells.entrySet()
+        return expandedBackingForCells
+                .entrySet()
                 .stream()
-                .map(kv -> {
-                    processCell(kv.getKey(), kv.getValue(), costDataByMeasurableId, costDataByAppId);
-                    return null;
-                })
+                .map(kv -> processCell(
+                        kv.getKey(),
+                        kv.getValue(),
+                        costDataByMeasurableId,
+                        costDataByAppId))
                 .collect(toSet());
-
-        System.out.println("Done");
-        // load cell mappings  (cell -> [entity])
-           // expand cell mappings if hierarchical
-
-        // find all allocations for any mentioned measurable for apps on diagram
-        // find all costs for apps on diagram
-
-        // a -> 10%
-        // a.b -> 30%
-        // a.c -> 20%
-
-        // [a] -> [a, a.b, a.c, a.d]
-        // [a] -> ((0.1 * c1) + (0.3 * c1) + (0.2 * c1)) + ((..) + (..) ...)
-
-
-        return null;
     }
 
-    private void processCell(String cellRef,
-                             Set<EntityReference> backingRefs,
-                             Map<Long, Collection<MeasurableCostEntry>> costDataByMeasurableId,
-                             Map<Long, Collection<MeasurableCostEntry>> costDataByAppId) {
+
+    private CostWidgetDatum processCell(String cellRef,
+                                        Set<EntityReference> backingRefs,
+                                        Map<Long, Collection<MeasurableCostEntry>> costDataByMeasurableId,
+                                        Map<Long, Collection<MeasurableCostEntry>> costDataByAppId) {
 
         // backing refs may not be measurables (i.e. app groups, org units, people)
 
-        backingRefs
+        BigDecimal totalCostForCell = backingRefs
                 .stream()
                 .filter(r -> r.kind() == EntityKind.MEASURABLE)
                 .map(r -> processCostsForMeasurable(
-                        r.id(),
                         costDataByMeasurableId.getOrDefault(r.id(), emptySet()),
                         costDataByAppId))
-                .collect(toSet());
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-
+        return ImmutableCostWidgetDatum.builder()
+                .cellExternalId(cellRef)
+                .totalCost(totalCostForCell)
+                .build();
     }
 
-    private Object processCostsForMeasurable(long measurableId,
-                                             Collection<MeasurableCostEntry> costsForMeasurable,
-                                             Map<Long, Collection<MeasurableCostEntry>> costDataByAppId) {
 
-        System.out.printf(">M:%s  #:%d\n", measurableId, costsForMeasurable.size());
+    private BigDecimal processCostsForMeasurable(Collection<MeasurableCostEntry> costsForMeasurable,
+                                                 Map<Long, Collection<MeasurableCostEntry>> costDataByAppId) {
+
         Siphon<MeasurableCostEntry> noCostsSiphon = mkSiphon(mce -> mce.overallCost() == null);
         Siphon<MeasurableCostEntry> noAllocationSiphon = mkSiphon(mce -> mce.allocationPercentage() == null);
-        BigDecimal total = costsForMeasurable
+
+        BigDecimal explicitShareOfCost = costsForMeasurable
                 .stream()
                 .filter(noCostsSiphon)
                 .filter(noAllocationSiphon)
                 .map(d -> {
-                    BigDecimal alloc = BigDecimal.valueOf(d.allocationPercentage()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-                    return d.overallCost().multiply(alloc);
+                    BigDecimal allocPercentage = BigDecimal.valueOf(d.allocationPercentage());
+
+                    return allocPercentage
+                            .divide(ONE_HUNDRED, 2, RoundingMode.HALF_UP)
+                            .multiply(d.overallCost());
                 })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        System.out.printf("<M:%s, T: %s\n", measurableId, total);
-        return null;
+
+        BigDecimal implicitShareOfCost = noAllocationSiphon
+                .stream()
+                .map(d -> {
+                    long appId = d.appId();
+                    Collection<MeasurableCostEntry> otherRatings = costDataByAppId.getOrDefault(appId, emptySet());
+                    if (otherRatings.size() == 1) {
+                        // only one rating, therefore entire cost is on this measurable
+                        return d.overallCost();
+                    } else {
+                        Collection<MeasurableCostEntry> othersWithAllocations = filter(otherRatings, r -> r.allocationPercentage() != null);
+                        if (othersWithAllocations.isEmpty()) {
+                            // no other allocations (but more than 1 rating)
+                            BigDecimal otherRatingsCount = BigDecimal.valueOf(otherRatings.size());
+
+                            return d.overallCost()
+                                    .divide(otherRatingsCount, 2, RoundingMode.HALF_UP);
+                        } else {
+                            Long overallAllocatedPercentage = sumInts(map(othersWithAllocations, MeasurableCostEntry::allocationPercentage));
+                            BigDecimal unallocatedPercentage = BigDecimal.valueOf(100 - overallAllocatedPercentage);
+                            BigDecimal numUnallocatedRatings = BigDecimal.valueOf(otherRatings.size() - othersWithAllocations.size());
+
+                            return unallocatedPercentage
+                                    .divide(numUnallocatedRatings, 2, RoundingMode.HALF_UP)
+                                    .divide(ONE_HUNDRED, 2, RoundingMode.HALF_UP)
+                                    .multiply(d.overallCost());
+                        }
+                    }
+                })
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return explicitShareOfCost
+                .add(implicitShareOfCost);
     }
 
     private Set<MeasurableCostEntry> fetchCostData(DSLContext dsl,

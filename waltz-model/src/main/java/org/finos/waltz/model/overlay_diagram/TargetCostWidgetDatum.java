@@ -6,10 +6,11 @@ import org.immutables.value.Value;
 import java.math.BigDecimal;
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableCostWidgetDatum.class)
-public abstract class CostWidgetDatum {
+@JsonSerialize(as = ImmutableTargetCostWidgetDatum.class)
+public abstract class TargetCostWidgetDatum {
 
     public abstract String cellExternalId();
-    public abstract BigDecimal totalCost();
+    public abstract BigDecimal currentStateCost();
+    public abstract BigDecimal targetStateCost();
 
 }

@@ -91,6 +91,10 @@ public class StreamUtilities {
         public List<T> getResults() {
             return results;
         }
+
+        public Stream<T> stream() {
+            return results.stream();
+        }
     }
 
 

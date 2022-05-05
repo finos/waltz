@@ -19,11 +19,13 @@
 package org.finos.waltz.web.endpoints.api;
 
 import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
 import org.finos.waltz.model.overlay_diagram.AssessmentRatingsWidgetDatum;
 import org.finos.waltz.model.overlay_diagram.CostWidgetDatum;
 import org.finos.waltz.model.overlay_diagram.CountWidgetDatum;
+import org.finos.waltz.model.overlay_diagram.TargetCostWidgetDatum;
 import org.finos.waltz.service.aggregate_overlay_diagram.AggregateOverlayDiagramService;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
@@ -65,6 +67,7 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
         String findAllPath = mkPath(BASE_URL, "all");
         String findAppCountWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "app-count-widget", ":target-date");
         String findTargetAppCostWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "target-app-cost-widget", ":target-date");
+        String findAppCostWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "app-cost-widget");
         String findAppAssessmentWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "app-assessment-widget", ":assessment-id");
 
         DatumRoute<AggregateOverlayDiagram> getByIdRoute = (request, response) -> {
@@ -86,12 +89,22 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
         };
 
 
-        ListRoute<CostWidgetDatum> findTargetAppCostWidgetDataRoute = (request, response) -> {
+        ListRoute<TargetCostWidgetDatum> findTargetAppCostWidgetDataRoute = (request, response) -> {
             return aggregateOverlayDiagramService
                     .findTargetAppCostWidgetData(
                             getId(request),
                             readIdSelectionOptionsFromBody(request),
                             getTargetDate(request));
+        };
+
+
+        ListRoute<CostWidgetDatum> findAppCostWidgetDataRoute = (request, response) -> {
+            return aggregateOverlayDiagramService
+                    .findAppCostWidgetData(
+                            getId(request),
+                            readIdSelectionOptionsFromBody(request),
+                            SetUtilities.asSet(1L),
+                            1L);
         };
 
 
@@ -112,6 +125,7 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
         getForList(findAllPath, findAllRoute);
         postForList(findAppCountWidgetDataPath, findAppCountWidgetDataRoute);
         postForList(findTargetAppCostWidgetDataPath, findTargetAppCostWidgetDataRoute);
+        postForList(findAppCostWidgetDataPath, findAppCostWidgetDataRoute);
         postForList(findAppAssessmentWidgetDataPath, findAppAssessmentWidgetDataRoute);
     }
 

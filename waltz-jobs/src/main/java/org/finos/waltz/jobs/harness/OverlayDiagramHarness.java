@@ -19,13 +19,13 @@
 package org.finos.waltz.jobs.harness;
 
 import org.finos.waltz.common.DateTimeUtilities;
-import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
-import org.finos.waltz.data.aggregate_overlay_diagram.TargetAppCostWidgetDao;
 import org.finos.waltz.data.aggregate_overlay_diagram.AppCountWidgetDao;
+import org.finos.waltz.data.aggregate_overlay_diagram.TargetAppCostWidgetDao;
+import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.IdSelectionOptions;
-import org.finos.waltz.model.overlay_diagram.CostWidgetDatum;
 import org.finos.waltz.model.overlay_diagram.CountWidgetDatum;
+import org.finos.waltz.model.overlay_diagram.TargetCostWidgetDatum;
 import org.finos.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
@@ -66,7 +66,7 @@ public class OverlayDiagramHarness {
                 appIds,
                 targetStateDate));
 
-        Set<CostWidgetDatum> appCostWidgetData = time("costWidgetData", () -> costWidgetDao.findWidgetData(
+        Set<TargetCostWidgetDatum> appCostWidgetData = time("costWidgetData", () -> costWidgetDao.findWidgetData(
                 1,
                 appIds,
                 targetStateDate));
