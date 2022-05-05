@@ -115,4 +115,19 @@ public class QuestionEntityPredicateNamespace extends QuestionBasePredicateNames
                 .fetchExists(qry);
     }
 
+
+    protected boolean hasLifecyclePhase(String name,
+                                        Table<?> subjectTable,
+                                        Field<Long> subjectId,
+                                        Field<String> subjectLifecyclePhase) {
+
+
+        return dsl
+                .fetchExists(DSL
+                        .select()
+                        .from(subjectTable)
+                        .where(subjectLifecyclePhase.eq(name)
+                                .and(subjectId.eq(subjectRef.id()))));
+    }
+
 }

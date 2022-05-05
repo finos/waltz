@@ -75,12 +75,26 @@ public class QuestionAppPredicateNamespace extends QuestionEntityPredicateNamesp
     }
 
 
-    public boolean hasDataType(String name){
-        return ! dataTypeUsages(name).isEmpty();
+    public boolean isKind(String name) {
+        return dsl.fetchExists(DSL
+                .select()
+                .from(APPLICATION)
+                .where(APPLICATION.ID.eq(subjectRef.id()))
+                .and(APPLICATION.KIND.eq(name)));
     }
 
 
-    public Set<String> dataTypeUsages(String name){
+    public boolean hasLifecyclePhase(String name) {
+        return hasLifecyclePhase(name, APPLICATION, APPLICATION.ID, APPLICATION.LIFECYCLE_PHASE);
+    }
+
+
+    public boolean hasDataType(String name) {
+        return !dataTypeUsages(name).isEmpty();
+    }
+
+
+    public Set<String> dataTypeUsages(String name) {
 
         DataTypeUsage dtu = DATA_TYPE_USAGE.as("dtu");
         DataType dt = DATA_TYPE.as("dt");
