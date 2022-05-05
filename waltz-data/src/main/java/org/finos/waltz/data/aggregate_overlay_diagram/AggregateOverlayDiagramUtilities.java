@@ -70,12 +70,7 @@ public class AggregateOverlayDiagramUtilities {
 
         ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
 
-        Set<Select<Record2<String, Long>>> stuffToUnion = dsl
-                .select(AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.CELL_EXTERNAL_ID,
-                        AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.RELATED_ENTITY_KIND,
-                        AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.RELATED_ENTITY_ID)
-                .from(AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA)
-                .where(AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.DIAGRAM_ID.eq(diagramId))
+        Set<Select<Record2<String, Long>>> stuffToUnion = selectCellMappingsForDiagram(dsl, diagramId)
                 .fetchSet(r -> {
                     r.get(AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.RELATED_ENTITY_KIND);
 
@@ -103,6 +98,17 @@ public class AggregateOverlayDiagramUtilities {
     }
 
 
+    protected static SelectConditionStep<Record3<String, String, Long>> selectCellMappingsForDiagram(DSLContext dsl,
+                                                                                                     long diagramId) {
+        return dsl
+                .select(AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.CELL_EXTERNAL_ID,
+                        AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.RELATED_ENTITY_KIND,
+                        AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.RELATED_ENTITY_ID)
+                .from(AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA)
+                .where(AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.DIAGRAM_ID.eq(diagramId));
+    }
+
+
     /**
      * Takes the maximal set of app ids that may appear on the diagram (derived by unioning the values of
      * the cellExtIdsToAppIdsMap) and filters then by the apps associated to the vantage point (given via
@@ -111,9 +117,9 @@ public class AggregateOverlayDiagramUtilities {
      * Returns only appIds which should appear on the diagram  (basically the intersection between the
      * maximal set given diagram cell mappings and the vantage point selector).
      */
-    protected static Set<Long> calcExactAppIdsDiagram(DSLContext dsl,
-                                                      Map<String, Set<Long>> cellExtIdsToAppIdsMap,
-                                                      Select<Record1<Long>> inScopeApplicationSelector) {
+    protected static Set<Long> calcExactAppIdsOnDiagram(DSLContext dsl,
+                                                        Map<String, Set<Long>> cellExtIdsToAppIdsMap,
+                                                        Select<Record1<Long>> inScopeApplicationSelector) {
         Set<Long> maximalAppIdsForCells = cellExtIdsToAppIdsMap
                 .values()
                 .stream()

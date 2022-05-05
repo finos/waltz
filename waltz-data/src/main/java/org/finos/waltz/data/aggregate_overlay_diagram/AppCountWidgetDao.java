@@ -49,7 +49,7 @@ public class AppCountWidgetDao {
                 dsl,
                 cellExtIdWithAppIdSelector);
 
-        Set<Long> diagramApplicationIds = calcExactAppIdsDiagram(
+        Set<Long> diagramApplicationIds = calcExactAppIdsOnDiagram(
                 dsl,
                 cellExtIdsToAppIdsMap,
                 inScopeApplicationSelector);

@@ -55,7 +55,7 @@ public class AppAssessmentWidgetDao {
 
         Map<String, Set<Long>> cellExtIdsToAppIdsMap = fetchAndGroupAppIdsByCellId(dsl, cellExtIdWithAppIdSelector);
 
-        Set<Long> diagramApplicationIds = calcExactAppIdsDiagram(
+        Set<Long> diagramApplicationIds = calcExactAppIdsOnDiagram(
                 dsl,
                 cellExtIdsToAppIdsMap,
                 inScopeApplicationSelector);

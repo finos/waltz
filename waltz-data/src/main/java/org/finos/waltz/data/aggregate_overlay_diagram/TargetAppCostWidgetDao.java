@@ -51,7 +51,7 @@ public class TargetAppCostWidgetDao {
                 dsl,
                 cellExtIdWithAppIdSelector);
 
-        Set<Long> diagramApplicationIds = calcExactAppIdsDiagram(
+        Set<Long> diagramApplicationIds = calcExactAppIdsOnDiagram(
                 dsl,
                 cellExtIdsToAppIdsMap,
                 inScopeApplicationSelector);

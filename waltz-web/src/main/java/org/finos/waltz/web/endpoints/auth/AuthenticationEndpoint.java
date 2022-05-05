@@ -22,16 +22,16 @@ package org.finos.waltz.web.endpoints.auth;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.finos.waltz.service.settings.SettingsService;
-import org.finos.waltz.service.user.UserRoleService;
-import org.finos.waltz.service.user.UserService;
-import org.finos.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.common.IOUtilities;
 import org.finos.waltz.model.settings.NamedSettings;
 import org.finos.waltz.model.user.AuthenticationResponse;
 import org.finos.waltz.model.user.ImmutableAuthenticationResponse;
 import org.finos.waltz.model.user.LoginRequest;
+import org.finos.waltz.service.settings.SettingsService;
+import org.finos.waltz.service.user.UserRoleService;
+import org.finos.waltz.service.user.UserService;
 import org.finos.waltz.web.WebUtilities;
+import org.finos.waltz.web.endpoints.Endpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,8 +45,6 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import static org.finos.waltz.common.MapUtilities.newHashMap;
-import static spark.Spark.before;
-import static spark.Spark.post;
 
 
 @Service
