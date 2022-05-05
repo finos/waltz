@@ -100,7 +100,6 @@ public class AppCostWidgetDao {
                                         Map<Long, Collection<MeasurableCostEntry>> costDataByAppId) {
 
         // backing refs may not be measurables (i.e. app groups, org units, people)
-
         BigDecimal totalCostForCell = backingRefs
                 .stream()
                 .filter(r -> r.kind() == EntityKind.MEASURABLE)
@@ -109,9 +108,17 @@ public class AppCostWidgetDao {
                         costDataByAppId))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+        Set<Long> distinctAppsForCell = backingRefs
+                .stream()
+                .filter(r -> r.kind() == EntityKind.MEASURABLE)
+                .flatMap(r -> costDataByMeasurableId.getOrDefault(r.id(), emptySet()).stream())
+                .map(MeasurableCostEntry::appId)
+                .collect(toSet());
+
         return ImmutableCostWidgetDatum.builder()
                 .cellExternalId(cellRef)
                 .totalCost(totalCostForCell)
+                .appCount(distinctAppsForCell.size())
                 .build();
     }
 

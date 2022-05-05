@@ -14,6 +14,7 @@
     $: cellDataByCellExtId = _.keyBy(
         $overlayData,
         d => d.cellExternalId);
+
 </script>
 
 {#each Object.entries(cellDataByCellExtId) as [key, cellData]}

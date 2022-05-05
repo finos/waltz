@@ -22,11 +22,7 @@ import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
-import org.finos.waltz.model.overlay_diagram.AssessmentRatingsWidgetDatum;
-import org.finos.waltz.model.overlay_diagram.BackingEntityWidgetDatum;
-import org.finos.waltz.model.overlay_diagram.CostWidgetDatum;
-import org.finos.waltz.model.overlay_diagram.CountWidgetDatum;
-import org.finos.waltz.model.overlay_diagram.TargetCostWidgetDatum;
+import org.finos.waltz.model.overlay_diagram.*;
 import org.finos.waltz.service.aggregate_overlay_diagram.AggregateOverlayDiagramService;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
@@ -101,12 +97,13 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
 
 
         ListRoute<CostWidgetDatum> findAppCostWidgetDataRoute = (request, response) -> {
+            AppCostWidgetParameters appCostWidgetParameters = readBody(request, AppCostWidgetParameters.class);
             return aggregateOverlayDiagramService
                     .findAppCostWidgetData(
                             getId(request),
-                            readIdSelectionOptionsFromBody(request),
-                            SetUtilities.asSet(1L),
-                            1L);
+                            appCostWidgetParameters.selectionOptions(),
+                            appCostWidgetParameters.costKindIds(),
+                            appCostWidgetParameters.allocationSchemeId());
         };
 
 

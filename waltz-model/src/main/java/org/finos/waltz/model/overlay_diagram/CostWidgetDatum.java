@@ -12,4 +12,6 @@ public abstract class CostWidgetDatum {
     public abstract String cellExternalId();
     public abstract BigDecimal totalCost();
 
+    public abstract int appCount();
+
 }
