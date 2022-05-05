@@ -10,6 +10,8 @@
     import _ from "lodash";
     import AggregateOverlayDiagramContextPanel from "../context-panel/AggregateOverlayDiagramContextPanel.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
+    import {userStore} from "../../../svelte-stores/user-store";
+    import systemRoles from "../../../user/system-roles";
 
     export let primaryEntityRef;
 
@@ -49,20 +51,17 @@
     $: diagram = $svgCall?.data;
     $: diagrams = $diagramsCall?.data || [];
 
-
     function selectDiagram(evt) {
         $selectedInstance = null;
         $selectedDiagram = evt.detail;
         activeMode = Modes.VIEW;
     }
 
-
     setupContextStores();
 
     let selectedInstance = getContext("selectedInstance");
     let selectedDiagram = getContext("selectedDiagram");
     let diagramProportion = getContext("diagramProportion");
-
 
 </script>
 

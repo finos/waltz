@@ -89,7 +89,8 @@
     }
 
     function reloadCallouts(savePromise) {
-        Promise.resolve(savePromise)
+
+        savePromise
             .then(() => {
                 calloutsCall = aggregateOverlayDiagramCalloutStore.findCalloutsByDiagramInstanceId($selectedInstance.id, true);
                 $callouts = $calloutsCall?.data;

@@ -4,6 +4,7 @@
     import TargetAppCostWidgetParameters from "./widgets/target-costs/TargetAppCostWidgetParameters.svelte";
     import AppCountWidgetParameters from "./widgets/app-counts/AppCountWidgetParameters.svelte";
     import AppCostWidgetParameters from "./widgets/app-costs/AppCostWidgetParameters.svelte";
+    import BackingEntitiesWidgetParameters from "./widgets/backing-entities/BackingEntitiesWidgetParameters.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
 
 
@@ -26,6 +27,10 @@
             label: "Assessments",
             description: "Allows user to select an assessment to overlay on the diagram",
             parameterWidget: AssessmentWidgetParameters
+        }, {
+            label: "Backing Entities",
+            description: "Displays the underlying entities which drive the overlays on the diagram",
+            parameterWidget: BackingEntitiesWidgetParameters
         }
     ];
 

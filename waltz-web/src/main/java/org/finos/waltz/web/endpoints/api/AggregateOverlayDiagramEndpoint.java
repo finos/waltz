@@ -23,6 +23,7 @@ import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
 import org.finos.waltz.model.overlay_diagram.AssessmentRatingsWidgetDatum;
+import org.finos.waltz.model.overlay_diagram.BackingEntityWidgetDatum;
 import org.finos.waltz.model.overlay_diagram.CostWidgetDatum;
 import org.finos.waltz.model.overlay_diagram.CountWidgetDatum;
 import org.finos.waltz.model.overlay_diagram.TargetCostWidgetDatum;
@@ -69,6 +70,7 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
         String findTargetAppCostWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "target-app-cost-widget", ":target-date");
         String findAppCostWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "app-cost-widget");
         String findAppAssessmentWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "app-assessment-widget", ":assessment-id");
+        String findBackingEntityWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "backing-entity-widget");
 
         DatumRoute<AggregateOverlayDiagram> getByIdRoute = (request, response) -> {
             return aggregateOverlayDiagramService.getById(getId(request));
@@ -121,8 +123,15 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
         };
 
 
+        ListRoute<BackingEntityWidgetDatum> findBackingEntityWidgetDataRoute = (request, response) -> {
+            long diagramId = getId(request);
+            return aggregateOverlayDiagramService.findBackingEntityWidgetData(diagramId);
+        };
+
+
         getForDatum(getByIdPath, getByIdRoute);
         getForList(findAllPath, findAllRoute);
+        getForList(findBackingEntityWidgetDataPath, findBackingEntityWidgetDataRoute);
         postForList(findAppCountWidgetDataPath, findAppCountWidgetDataRoute);
         postForList(findTargetAppCostWidgetDataPath, findTargetAppCostWidgetDataRoute);
         postForList(findAppCostWidgetDataPath, findAppCostWidgetDataRoute);

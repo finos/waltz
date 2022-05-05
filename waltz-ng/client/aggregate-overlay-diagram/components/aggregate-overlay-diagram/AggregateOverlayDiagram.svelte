@@ -91,6 +91,6 @@
     }
 
     .rendered-callouts {
-        xxdisplay: none;
+        display: none;
     }
 </style>

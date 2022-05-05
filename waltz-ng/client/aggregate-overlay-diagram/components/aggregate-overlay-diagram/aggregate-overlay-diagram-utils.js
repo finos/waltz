@@ -80,6 +80,7 @@ export function setupContextStores() {
     const diagramProportion = writable(9);
     const selectedCellId = writable(null);
     const selectedCellCallout = writable(null);
+    const hasEditPermissions = writable(false);
 
     setContext("hoveredCallout", hoveredCallout);
     setContext("selectedDiagram", selectedDiagram);
@@ -93,6 +94,7 @@ export function setupContextStores() {
     setContext("diagramProportion", diagramProportion);
     setContext("selectedCellId", selectedCellId)
     setContext("selectedCellCallout", selectedCellCallout)
+    setContext("hasEditPermissions", hasEditPermissions)
 
     return {
         selectedDiagram,
@@ -106,7 +108,8 @@ export function setupContextStores() {
         instances,
         diagramProportion,
         selectedCellId,
-        selectedCellCallout
+        selectedCellCallout,
+        hasEditPermissions
     };
 }
 
