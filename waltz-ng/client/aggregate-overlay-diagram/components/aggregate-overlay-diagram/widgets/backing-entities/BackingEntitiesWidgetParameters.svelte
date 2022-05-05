@@ -24,14 +24,6 @@
 
 </script>
 
-
-<div class="help-block">
-    Use the slider to adjust how far in the future to application counts.
-    This is calculated by incorporating app retirement dates and subtracting their associated
-    apps from the current total.
-</div>
-
-
 {#if $overlayDataCall?.status === 'loading'}
     <h4>
         Loading
