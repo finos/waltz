@@ -35,6 +35,7 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
+import static org.finos.waltz.common.StringUtilities.isEmpty;
 import static org.finos.waltz.schema.tables.AssessmentDefinition.ASSESSMENT_DEFINITION;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
@@ -108,6 +109,10 @@ public class AssessmentDefinitionDao {
     public Long save(AssessmentDefinition def) {
         AssessmentDefinitionRecord r = dsl.newRecord(ASSESSMENT_DEFINITION);
 
+        String permittedRole = def.permittedRole()
+                .map(role -> !isEmpty(role) ? role : null)
+                .orElse(null);
+
         r.setName(def.name());
         r.setEntityKind(def.entityKind().name());
         r.setRatingSchemeId(def.ratingSchemeId());
@@ -117,7 +122,7 @@ public class AssessmentDefinitionDao {
         r.setVisibility(def.visibility().name());
 
         r.setIsReadonly(def.isReadOnly());
-        r.setPermittedRole(def.permittedRole().orElse(null));
+        r.setPermittedRole(permittedRole);
 
         r.setLastUpdatedAt(Timestamp.valueOf(def.lastUpdatedAt()));
         r.setLastUpdatedBy(def.lastUpdatedBy());
