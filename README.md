@@ -57,9 +57,20 @@ See [pom.xml](https://github.com/finos/waltz/blob/master/pom.xml) for a full lis
 
 See [package.json](https://github.com/finos/waltz/blob/master/waltz-ng/package.json) for full list of javascript dependencies.
 
-## Roadmap
+## Roadmap / Releases
 
 Checkout [the project milestones](https://github.com/finos/waltz/milestones) and browse through the Todo, work in progress and done issues.
+
+Provisional dates for upcoming releases:
+
+Release | Date 
+--- | --- 
+1.41 | 17th May 
+1.42 | 14th June 
+1.43 | 26th July 
+1.44 | 6th September
+1.45 | 18th October 
+1.46 | 22nd November 
 
 ## Contributing
 
