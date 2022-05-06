@@ -13,7 +13,7 @@
     export let requestBody = null;
     export let extractUrl;
 
-    const base = "data-extract/";
+    const base = "data-extract";
 
     function getFileNameFromHttpResponse(httpResponse) {
         const contentDispositionHeader = httpResponse.headers["Content-Disposition"];

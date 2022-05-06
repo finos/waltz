@@ -15,37 +15,33 @@
  * See the License for the specific
  *
  */
+import template from "./actor-list-view.html";
+import {initialiseData} from "../../../common";
+import ActorListView from "../../components/svelte/ActorListView.svelte"
 
-import actorView from "./pages/actor-view/actor-view";
-import listView from "./pages/list-view/actor-list-view";
+const bindings = {}
 
-
-const baseState = {
-    url: "actor"
+const initialState = {
+    ActorListView
 };
 
 
-const viewState = {
-    url: "/{id:int}",
-    views: {"content@": actorView}
-};
+function controller() {
 
-
-const listViewState = {
-    url: "/list",
-    views: {"content@": listView.id}
-};
-
-
-function setup($stateProvider) {
-    $stateProvider
-        .state("main.actor", baseState)
-        .state("main.actor.view", viewState)
-        .state("main.actor.list", listViewState);
+    const vm = initialiseData(this, initialState);
 }
 
 
-setup.$inject = ["$stateProvider"];
+controller.$inject = [];
 
 
-export default setup;
+const component = {
+    template,
+    controller,
+    bindings
+}
+
+export default {
+    component,
+    id: "waltzActorListView",
+};
