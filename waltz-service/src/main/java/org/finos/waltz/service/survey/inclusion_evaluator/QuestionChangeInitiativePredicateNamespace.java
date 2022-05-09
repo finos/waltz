@@ -27,6 +27,9 @@ import org.jooq.DSLContext;
 import java.util.List;
 import java.util.Map;
 
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
+
 /**
  *
  * NOTE: methods in this class may show as unused.  This is to be expected as they are referred to via
@@ -35,7 +38,7 @@ import java.util.Map;
 public class QuestionChangeInitiativePredicateNamespace extends QuestionEntityPredicateNamespace {
 
     public QuestionChangeInitiativePredicateNamespace(DSLContext dsl,
-                                                       EntityReference subjectRef,
+                                                      EntityReference subjectRef,
                                                       List<SurveyQuestion> questions,
                                                       Map<Long, SurveyQuestionResponse> responsesByQuestionId) {
         super(dsl, subjectRef, questions, responsesByQuestionId);
@@ -43,8 +46,13 @@ public class QuestionChangeInitiativePredicateNamespace extends QuestionEntityPr
 
 
     public boolean belongsToOrgUnit(String name) {
-        ChangeInitiative ci = ChangeInitiative.CHANGE_INITIATIVE.as("ci");
+        ChangeInitiative ci = CHANGE_INITIATIVE.as("ci");
         return belongsToOrgUnit(name, ci, ci.ID, ci.ORGANISATIONAL_UNIT_ID);
+    }
+
+
+    public boolean hasLifecyclePhase(String name) {
+        return hasLifecyclePhase(name, CHANGE_INITIATIVE, CHANGE_INITIATIVE.ID, CHANGE_INITIATIVE.LIFECYCLE_PHASE);
     }
 
 }
