@@ -109,6 +109,7 @@ public class AppGroupService {
                 .applications(appGroupEntryDao.findEntriesForGroup(groupId))
                 .members(appGroupMemberDao.getMembers(groupId))
                 .organisationalUnits(appGroupOrganisationalUnitDao.getEntriesForGroup(groupId))
+                .changeInitiatives(changeInitiativeService.findEntriesForAppGroup(groupId))
                 .build();
     }
 
