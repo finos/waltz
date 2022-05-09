@@ -24,8 +24,8 @@
         </span>
     </div>
     <div ng-if="$ctrl.startDate">
-        <h5>
-            Changes
+        <span>
+            <b>Changes:</b>
             <span ng-if="$ctrl.startDate !== $ctrl.endDate">
                 between
                 <span ng-bind="$ctrl.startDate |  date:'yyyy-MM-dd'"></span>

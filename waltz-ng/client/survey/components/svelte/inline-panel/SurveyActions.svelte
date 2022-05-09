@@ -54,7 +54,7 @@
 
         // SHOW MESSAGE
 
-        const updateCmd = {action: name, reason: reason};
+        const updateCmd = {action: name, reason};
 
         return Promise
             .resolve(surveyInstanceStore.updateStatus(surveyInstanceId, updateCmd))
@@ -169,7 +169,7 @@
     </div>
 
     <form autocomplete="off"
-          on:submit|preventDefault={() => invokeAction(activeAction, instanceId)}>
+          on:submit|preventDefault={() => invokeAction(activeAction, instanceId, reason)}>
 
         <!-- CONFIRMATION REASON ? -->
         {#if activeAction.confirmationRequirement === "CONFIRM_AND_COMMENT_REQUIRED"}

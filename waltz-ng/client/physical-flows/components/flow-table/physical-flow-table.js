@@ -41,7 +41,6 @@ function controller($q, serviceBroker) {
     const defaultColumnDefs = [
         withWidth(columnDef.name, "20%"),
         columnDef.extId,
-        columnDef.observation,
         columnDef.format,
         columnDef.transport,
         columnDef.frequency,

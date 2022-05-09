@@ -27,7 +27,7 @@
         <label class="wt-label"
                ng-model="$ctrl.activeTab"
                for="table">
-            <span>Table</span>
+            <span>Log</span>
         </label>
 
         <input type="radio"
@@ -42,8 +42,12 @@
         <div class="wt-tab wt-active">
             <div ng-if="$ctrl.activeTab === 'calendar'"
                  style="padding-top: 1em; padding-bottom: 0.7em; padding-left:1em">
-                <waltz-change-summaries-panel parent-entity-ref="$ctrl.parentEntityRef">
-                </waltz-change-summaries-panel>
+                 <div class="help-block">
+                     The <i>Application Change Calendar</i> shows when changes happen to information stored in Waltz
+                     for the applications related to this page.
+                 </div>
+                 <waltz-change-summaries-panel parent-entity-ref="$ctrl.parentEntityRef">
+                 </waltz-change-summaries-panel>
             </div>
             <div ng-if="$ctrl.activeTab === 'table'"
                  style="padding-top: 1em; padding-bottom: 0.7em; padding-left:1em">
