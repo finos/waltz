@@ -4,6 +4,7 @@
     import EntityLink from "../../../common/svelte/EntityLink.svelte";
     import {getContext} from "svelte";
     import LastEdited from "../../../common/svelte/LastEdited.svelte";
+    import DescriptionFade from "../../../common/svelte/DescriptionFade.svelte";
 
     let selectedInstance = getContext("selectedInstance");
     let selectedDiagram = getContext("selectedDiagram");
@@ -15,21 +16,31 @@
         {$selectedInstance?.name}
     </h4>
     <table class="table table-condensed small">
+        <colgroup>
+            <col width="50%">
+            <col width="50%">
+        </colgroup>
         <tbody>
         <tr>
-            <td width="50%">Diagram</td>
-            <td width="50%">{$selectedDiagram?.name}</td>
+            <td>Diagram</td>
+            <td>{$selectedDiagram?.name}</td>
         </tr>
         <tr>
-            <td width="50%">Vantage Point</td>
-            <td width="50%">
+            <td>Vantage Point</td>
+            <td>
                 <EntityLink ref={$selectedInstance?.parentEntityReference}/>
             </td>
         </tr>
         <tr>
-            <td width="50%">Last Updated</td>
-            <td width="50%">
+            <td>Last Updated</td>
+            <td>
                 <LastEdited entity={$selectedInstance}/>
+            </td>
+        </tr>
+        <tr>
+            <td>Description</td>
+            <td>
+                <DescriptionFade text={$selectedInstance?.description}/>
             </td>
         </tr>
         </tbody>

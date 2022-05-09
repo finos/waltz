@@ -71,11 +71,10 @@
         Name of the Diagram Instance
     </div>
 
-    <input class="form-control"
-           id="description"
-           maxlength="255"
-           placeholder="Description"
-           bind:value={description}/>
+    <textarea class="form-control"
+              id="description"
+              placeholder="Description"
+              bind:value={description}/>
     <div class="help-block">
         Description
     </div>

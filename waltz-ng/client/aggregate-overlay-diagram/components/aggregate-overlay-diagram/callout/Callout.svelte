@@ -1,5 +1,6 @@
 <script>
     import {createEventDispatcher, getContext} from "svelte";
+    import {determineForegroundColor} from "../../../../common/colors";
 
     export let callout;
     export let label;
@@ -18,7 +19,7 @@
 
     function determineFill(hc, callout) {
         if (hc?.id === callout.id) {
-            return "#fffbdc"
+            return "#ecd243"
         } else {
             return `url(#content-gradient-${callout.id})`;
         }
@@ -56,11 +57,12 @@
         <circle r={radius}
                 cx="12"
                 cy="12"
-                fill={determineFill($hoveredCallout, callout)}/>
-        <text pointer-events="none"
-              text-anchor="middle"
+                fill={determineFill($hoveredCallout, callout)}>
+            <title>{callout.title}</title>
+        </circle>
+        <text text-anchor="middle"
               dx="12"
-              fill="black"
+              fill={determineForegroundColor(callout.startColor)}
               dy="17">
             {label}
         </text>
@@ -71,7 +73,10 @@
 <style>
 
     .content circle {
-        transition: fill 0.5s;
-        transition: r 1s;
+        transition: fill 1s, r 1s;
+    }
+
+    .content text {
+        pointer-events: none;
     }
 </style>
