@@ -304,4 +304,303 @@
     </changeSet>
 
 
+    <changeSet id="20220413-6001-1"
+               author="woodjes">
+        <comment>6001: create aggregate_overlay_diagram table</comment>
+        <createTable tableName="aggregate_overlay_diagram">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="aggregate_overlay_diagram_pkey"/>
+            </column>
+            <column name="name"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="svg"
+                    type="${clob.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated_by"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="provenance"
+                    type="${provenance.type}"
+                    defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20220413-6001-2"
+               author="woodjes">
+        <comment>6001: create aggregate_overlay_diagram_cell_data table</comment>
+        <createTable tableName="aggregate_overlay_diagram_cell_data">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="aggregate_overlay_diagram_cell_data_pkey"/>
+            </column>
+            <column name="diagram_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cell_external_id"
+                    type="${external-id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="related_entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="related_entity_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20220413-6001-3"
+               author="woodjes">
+        <comment>6001: create aggregate_diagram_instance table</comment>
+        <createTable tableName="aggregate_overlay_diagram_instance">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="aggregate_overlay_diagram_instance_pkey"/>
+            </column>
+            <column name="diagram_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="parent_entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_entity_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="svg"
+                    type="${clob.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated_by"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="provenance"
+                    type="${provenance.type}"
+                    defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20220413-6001-4"
+               author="woodjes">
+        <comment>6001: create aggregate_overlay_diagram tables</comment>
+        <addForeignKeyConstraint constraintName="agg_overlay_diag_cell_data_fk"
+                                 baseTableName="aggregate_overlay_diagram_cell_data"
+                                 baseColumnNames="diagram_id"
+                                 referencedTableName="aggregate_overlay_diagram"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="20220413-6001-5"
+               author="woodjes">
+        <comment>6001: create aggregate_overlay_diagram tables</comment>
+        <addForeignKeyConstraint constraintName="agg_overlay_diag_instance_fk"
+                                 baseTableName="aggregate_overlay_diagram_instance"
+                                 baseColumnNames="diagram_id"
+                                 referencedTableName="aggregate_overlay_diagram"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="20220413-6001-6"
+               author="woodjes">
+        <createIndex indexName="idx_agg_overlay_diagram_cell_data"
+                     tableName="aggregate_overlay_diagram_cell_data"
+                     unique="true">
+            <column name="diagram_id" type="${id.type}"/>
+            <column name="cell_external_id" type="${external-id.type}"/>
+            <column name="related_entity_kind" type="${enum.type}"/>
+            <column name="related_entity_id" type="${id.type}"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20220413-6001-7"
+               author="woodjes">
+        <setTableRemarks tableName="aggregate_overlay_diagram"
+                         remarks="svg diagram used to overlay waltz information, uses a data-cell-id attribute on the svg element to link to the cell_ext_id on aggregate_overlay_diagram_cell_data"/>
+        <setColumnRemarks tableName="aggregate_overlay_diagram"
+                          columnName="id"
+                          remarks="unique identifier for this aggregate overlay diagram record within waltz"/>
+        <setColumnRemarks tableName="aggregate_overlay_diagram"
+                          columnName="name"
+                          remarks="the name of this aggregate overlay diagram"/>
+        <setColumnRemarks tableName="aggregate_overlay_diagram"
+                          columnName="description"
+                          remarks="longer description to provide more information about this aggregate overlay diagram"/>
+        <setColumnRemarks tableName="aggregate_overlay_diagram"
+                          columnName="svg"
+                          remarks="the svg diagram used to overlay waltz data onto, uses a data-cell-id attribute to lookup data"/>
+        <setColumnRemarks tableName="aggregate_overlay_diagram"
+                          columnName="last_updated_at"
+                          remarks="the datetime this aggregate overlay diagram record was last updated"/>
+        <setColumnRemarks tableName="aggregate_overlay_diagram"
+                          columnName="last_updated_by"
+                          remarks="the last user to update this aggregate overlay diagram record"/>
+        <setColumnRemarks tableName="aggregate_overlay_diagram"
+                          columnName="provenance"
+                          remarks="origination of this aggregate overlay diagram"/>
+    </changeSet>
+
+    <changeSet id="20220413-6001-8"
+               author="woodjes">
+        <setTableRemarks tableName="aggregate_overlay_diagram_cell_data"
+                         remarks="links entities in waltz to an svg diagram listed in the aggregate_overlay_diagram table"/>
+        <setColumnRemarks tableName="aggregate_overlay_diagram_cell_data"
+                          columnName="id"
+                          remarks="unique identifier for this aggregate overlay diagram cell data record within waltz"/>
+        <setColumnRemarks tableName="aggregate_overlay_diagram_cell_data"
+                          columnName="diagram_id"
+                          remarks="the reference to the aggregate overlay diagram that these entities relate to"/>
+        <setColumnRemarks tableName="aggregate_overlay_diagram_cell_data"
+                          columnName="cell_external_id"
+                          remarks="used to assign the entity in waltz to an evg element on the related diagram, via the data-cell-id attribute "/>
+        <setColumnRemarks tableName="aggregate_overlay_diagram_cell_data"
+                          columnName="related_entity_kind"
+                          remarks="the kind of entity being linked to the aggregate overlay diagram"/>
+        <setColumnRemarks tableName="aggregate_overlay_diagram_cell_data"
+                          columnName="related_entity_id"
+                          remarks="the identifier for the entity being linked to the aggregate overlay diagram"/>
+    </changeSet>
+
+    <changeSet id="20220413-6001-9"
+               author="woodjes">
+        <setTableRemarks tableName="aggregate_overlay_diagram_instance"
+                         remarks="an instance of an aggregate overlay diagram, specific to a particular vantage point in waltz e.g. an particular ORG_UNIT"/>
+        <setColumnRemarks tableName="aggregate_overlay_diagram_instance"
+                          columnName="id"
+                          remarks="unique identifier for this aggregate overlay diagram instance record within waltz"/>
+        <setColumnRemarks tableName="aggregate_overlay_diagram_instance"
+                          columnName="diagram_id"
+                          remarks="the reference to the aggregate overlay diagram that this instance references"/>
+        <setColumnRemarks tableName="aggregate_overlay_diagram_instance"
+                          columnName="name"
+                          remarks="the name of this aggregate overlay diagram instance"/>
+        <setColumnRemarks tableName="aggregate_overlay_diagram_instance"
+                          columnName="description"
+                          remarks="longer description to provide more information about this aggregate overlay diagram instance"/>
+        <setColumnRemarks tableName="aggregate_overlay_diagram_instance"
+                          columnName="parent_entity_kind"
+                          remarks="the kind of entity which describes the in scope applications for this diagram"/>
+        <setColumnRemarks tableName="aggregate_overlay_diagram_instance"
+                          columnName="parent_entity_id"
+                          remarks="the identifier for the entity which describes the in scope applications for this diagram"/>
+        <setColumnRemarks tableName="aggregate_overlay_diagram_instance"
+                          columnName="last_updated_at"
+                          remarks="the datetime this aggregate overlay diagram record was last updated"/>
+        <setColumnRemarks tableName="aggregate_overlay_diagram_instance"
+                          columnName="last_updated_by"
+                          remarks="the last user to update this aggregate overlay diagram instance record"/>
+        <setColumnRemarks tableName="aggregate_overlay_diagram_instance"
+                          columnName="provenance"
+                          remarks="origination of this aggregate overlay diagram instance"/>
+    </changeSet>
+
+
+    <changeSet id="20220419-6001-10"
+               author="woodjes">
+        <comment>6001: create aggregate_diagram_instance table</comment>
+        <createTable tableName="aggregate_overlay_diagram_callout">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="aggregate_overlay_diagram_callout_pkey"/>
+            </column>
+            <column name="diagram_instance_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="start_color"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_color"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cell_external_id"
+                    type="${external-id.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20220419-6001-11"
+               author="woodjes">
+        <comment>6001: create aggregate_overlay_diagram tables</comment>
+        <addForeignKeyConstraint constraintName="agg_overlay_diag_callout_fk"
+                                 baseTableName="aggregate_overlay_diagram_callout"
+                                 baseColumnNames="diagram_instance_id"
+                                 referencedTableName="aggregate_overlay_diagram_instance"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="20220503-6001-12"
+               author="woodjes">
+        <comment>6001: create aggregate_overlay_diagram tables</comment>
+        <insert tableName="role">
+            <column name="name" value="Aggregate Overlay Diagram Editor"/>
+            <column name="key" value="AGGREGATE_OVERLAY_DIAGRAM_EDITOR"/>
+            <column name="description" value="Can create overlay diagram instances and edit callout annotations"/>
+            <column name="is_custom" valueBoolean="false"/>
+        </insert>
+    </changeSet>
+
+
 </databaseChangeLog>

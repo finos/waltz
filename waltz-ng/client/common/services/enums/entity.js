@@ -24,6 +24,20 @@ export const entity = {
         description: null,
         position: 10
     },
+    AGGREGATE_OVERLAY_DIAGRAM: {
+        key: "AGGREGATE_OVERLAY_DIAGRAM",
+        name: "Aggregate Overlay Diagram",
+        icon: "object-group",
+        description: null,
+        position: 15
+    },
+    AGGREGATE_OVERLAY_DIAGRAM_INSTANCE: {
+        key: "AGGREGATE_OVERLAY_DIAGRAM_INSTANCE",
+        name: "Aggregate Overlay Diagram Instance",
+        icon: "object-group",
+        description: null,
+        position: 16
+    },
     ALLOCATION_SCHEME: {
         key: "ALLOCATION_SCHEME",
         name: "Allocation Scheme",

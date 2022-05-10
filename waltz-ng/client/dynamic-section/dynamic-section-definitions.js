@@ -548,8 +548,9 @@ const orgUnitSections = [
              entityStatisticSummarySection,
              measurableRatingsBrowserSection,
              reportGridViewSection,
-             technologySummarySection,
+             technologySummarySection
          ]),
+    entityDiagramsSection,
     bookmarksSection,
     changeInitiativeSection,
     changeSetSection,
@@ -593,6 +594,7 @@ const personSections = [
              reportGridViewSection,
              technologySummarySection
          ]),
+    entityDiagramsSection,
     personChangeSetSection,
     personHierarchySection,
     surveySection,
@@ -624,6 +626,7 @@ const appGroupSections = [
              technologySummarySection
          ]),
     bookmarksSection,
+    entityDiagramsSection,
     changeInitiativeSection,
     changeSetSection,
     entityNamedNotesSection,
@@ -660,6 +663,7 @@ const flowDiagramSections = [
              reportGridViewSection,
              technologySummarySection
          ]),
+    entityDiagramsSection,
     bookmarksSection,
     entityNamedNotesSection,
     changeLogSection
@@ -676,6 +680,7 @@ const processDiagramSections = [
              reportGridViewSection,
              technologySummarySection
          ]),
+    entityDiagramsSection,
     bookmarksSection,
     entityNamedNotesSection,
     changeLogSection

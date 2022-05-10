@@ -25,6 +25,7 @@ import java.util.Set;
 
 public enum SystemRole {
     ADMIN,
+    AGGREGATE_OVERLAY_DIAGRAM_EDITOR,
     APP_EDITOR,
     ANONYMOUS,
     ASSESSMENT_DEFINITION_ADMIN,

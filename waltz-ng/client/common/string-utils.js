@@ -172,8 +172,11 @@ export function numberFormatter(num, digits = 0, simplify = true) {
 
     if (simplify) {
         for (let i = 0; i < si.length; i++) {
-            if (num >= si[i].value) {
-                return (num / si[i].value)
+            if (Math.abs(num) < 0.5) {
+                return 0;
+            }
+            if (Math.abs(num) >= si[i].value) {
+                return (Number(num) / si[i].value)
                     .toFixed(digits)
                     .replace(/\.?0+$/, "") + si[i].symbol;
             }

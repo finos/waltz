@@ -35,6 +35,7 @@ import AngularFormlyTemplates from "angular-formly-templates-bootstrap";
 
 import AccessLog from "./access-log";
 import Actor from "./actor";
+import AggregateOverlayDiagram from "./aggregate-overlay-diagram";
 import Alias from "./alias";
 import Allocation from "./allocation";
 import AllocationScheme from "./allocation-scheme";
@@ -144,6 +145,7 @@ const dependencies = [
     // -- waltz-modules ---
     AccessLog(),
     Actor(),
+    AggregateOverlayDiagram(),
     Alias(),
     Allocation(),
     AllocationScheme(),

@@ -19,13 +19,21 @@
 
 import {registerComponents} from "../common/module-utils";
 import EntityDiagramsSection from "./components/section/entity-diagrams-section";
+import LinkedDiagramsPanel from "./components/linked-diagrams/linked-diagrams-panel";
 
 
 export default () => {
 
-    const module = angular.module('waltz.entity-diagrams', []);
+    const module = angular.module("waltz.entity-diagrams", []);
 
-    registerComponents(module, [EntityDiagramsSection]);
+    const components = [
+        EntityDiagramsSection,
+        LinkedDiagramsPanel
+    ];
+
+    registerComponents(
+        module,
+        components);
 
     return module.name;
 };
