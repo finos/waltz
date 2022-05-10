@@ -21,6 +21,14 @@
             path: ctx => `actor/${ctx.id}`,
             title: "Actor View"
         },
+        "main.aggregate-overlay-diagram.instance-view": {
+            path: ctx => `aggregate-overlay-diagram/instance/${ctx.id}`,
+            title: "Aggregate Overlay Diagram Instance View"
+        },
+        "main.aggregate-overlay-diagram.list": {
+            path: () => `aggregate-overlay-diagram/list`,
+            title: "Aggregate Overlay Diagram List View"
+        },
         "main.app.view": {
             path: ctx => `application/${ctx.id}`,
             title: "Application View"

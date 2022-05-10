@@ -17,17 +17,22 @@
  */
 
 export default {
-    "ADMIN" : {
+    "ADMIN": {
         key: "ADMIN",
         name: "Admin",
         description: "Administrative capabilities"
     },
-    "APP_EDITOR" : {
+    "AGGREGATE_OVERLAY_DIAGRAM_EDITOR": {
+        key: "AGGREGATE_OVERLAY_DIAGRAM_EDITOR",
+        name: "Aggregate Overlay Diagram Editor",
+        description: "Can create overlay diagram instances and edit callout annotations"
+    },
+    "APP_EDITOR": {
         key: "APP_EDITOR",
         name: "App editor",
         description: "Can modify application information"
     },
-    "ATTESTATION_ADMIN" : {
+    "ATTESTATION_ADMIN": {
         key: "ATTESTATION_ADMIN",
         name: "Attestation Admin",
         description: "Can manage attestation runs"

@@ -22,14 +22,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
-import org.finos.waltz.service.user.UserRoleService;
-import org.finos.waltz.web.endpoints.auth.AuthenticationUtilities;
 import org.eclipse.jetty.http.MimeTypes;
 import org.finos.waltz.common.EnumUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.model.*;
 import org.finos.waltz.model.user.SystemRole;
+import org.finos.waltz.service.user.UserRoleService;
+import org.finos.waltz.web.endpoints.auth.AuthenticationUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;
@@ -37,19 +37,21 @@ import spark.Response;
 import spark.ResponseTransformer;
 
 import java.io.IOException;
-import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.finos.waltz.service.user.RoleUtilities.getRequiredRoleForEntityKind;
 import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ObjectUtilities.firstNotNull;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.service.user.RoleUtilities.getRequiredRoleForEntityKind;
 
 public class WebUtilities {
 
@@ -364,6 +366,22 @@ public class WebUtilities {
                     try {
                         return new SimpleDateFormat("yyyy-MM-dd").parse(s);
                     } catch (ParseException pe) {
+                        LOG.warn("Could not parse date: " + s);
+                        return null;
+                    }
+                });
+
+    }
+
+    public static Optional<LocalDate> getLocalDateParam(Request request, String paramName) {
+        String dateVal = request.params(paramName);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        return Optional
+                .ofNullable(dateVal)
+                .map(s -> {
+                    try {
+                        return LocalDate.parse(s, formatter);
+                    } catch (DateTimeParseException pe) {
                         LOG.warn("Could not parse date: " + s);
                         return null;
                     }

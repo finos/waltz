@@ -1,0 +1,137 @@
+<script>
+    import {aggregateOverlayDiagramStore} from "../../../../../svelte-stores/aggregate-overlay-diagram-store";
+    import {getContext} from "svelte";
+    import Icon from "../../../../../common/svelte/Icon.svelte";
+    import BulkAppCostWidget from "./BulkAppCostWidget.svelte";
+    import AllocationSchemePicker
+        from "../../../../../report-grid/components/svelte/pickers/AllocationSchemePicker.svelte";
+    import CostKindPicker from "../../../../../report-grid/components/svelte/pickers/CostKindPicker.svelte";
+    import _ from "lodash";
+
+    export let opts;
+
+    const overlayData = getContext("overlayData");
+    const selectedDiagram = getContext("selectedDiagram");
+    const widget = getContext("widget");
+
+    let selectedAllocationScheme;
+    let selectedCostKinds = [];
+    let selectedCostKindIds = [];
+    let selectedDefinition;
+
+    let overlayDataCall;
+
+    const Modes = {
+        ALLOCATION_SCHEME_PICKER: "ALLOCATION_SCHEME_PICKER",
+        COST_KIND_PICKER: "COST_KIND_PICKER",
+        SUMMARY: "SUMMARY"
+    }
+
+    let activeMode = Modes.ALLOCATION_SCHEME_PICKER;
+
+    function onSelect() {
+
+        const appCostParameters = {
+            allocationSchemeId: selectedAllocationScheme.id,
+            costKindIds: selectedCostKindIds,
+            selectionOptions: opts
+        }
+
+        overlayDataCall = aggregateOverlayDiagramStore.findAppCostForDiagram(
+            $selectedDiagram.id,
+            appCostParameters,
+            true);
+
+        $widget = BulkAppCostWidget;
+        activeMode = Modes.SUMMARY;
+    }
+
+    $: {
+        $overlayData = $overlayDataCall?.data;
+    }
+
+    function onSelectAllocationScheme(scheme) {
+        activeMode = Modes.COST_KIND_PICKER
+        selectedAllocationScheme = scheme;
+    }
+
+    function onSelectCostKind(costKind) {
+        selectedCostKinds = _.concat(selectedCostKinds, costKind)
+    }
+
+    function changeAllocationScheme() {
+        activeMode = Modes.ALLOCATION_SCHEME_PICKER
+        selectedAllocationScheme = null;
+        selectedCostKinds = [];
+    }
+
+    $: selectedCostKindIds = _.map(selectedCostKinds, d => d.id);
+
+    $: incompleteSelection = _.isEmpty(selectedCostKinds) || _.isNil(selectedAllocationScheme);
+
+</script>
+
+
+{#if activeMode === Modes.ALLOCATION_SCHEME_PICKER}
+    <div class="help-block">
+        Select an allocation scheme from the list below,
+        then select one or more cost kinds to apply the allocations to.
+    </div>
+    <AllocationSchemePicker onSelect={onSelectAllocationScheme}/>
+{:else if activeMode === Modes.COST_KIND_PICKER}
+    <div class="help-block">
+        Select an allocation scheme from the list below,
+        then select one or more the cost kinds to apply the allocations to.
+    </div>
+    <div>Allocation Scheme: {selectedAllocationScheme.name}</div>
+    <CostKindPicker onSelect={onSelectCostKind}
+                    selectionFilter={ck => !_.includes(selectedCostKindIds, ck.id)}/>
+    {#if !_.isEmpty(selectedCostKindIds)}
+        <div>
+            Selected Cost Kinds:
+            <ul>
+                {#each selectedCostKinds as kind}
+                    <li>
+                        {kind.name}
+                    </li>
+                {/each}
+            </ul>
+        </div>
+    {/if}
+    <span>
+         <button class="btn btn-success"
+                 on:click={onSelect}
+                 disabled={incompleteSelection}>
+            Load data
+        </button>
+        <button class="btn btn-skinny"
+                on:click={changeAllocationScheme}>
+            Change allocation scheme
+        </button>
+    </span>
+{:else if activeMode === Modes.SUMMARY}
+    <div>Allocation Scheme: {selectedAllocationScheme.name}</div>
+    <br>
+    <div>
+        Selected Cost Kinds:
+        <ul>
+            {#each selectedCostKinds as kind}
+                <li>
+                    {kind.name}
+                </li>
+            {/each}
+        </ul>
+    </div>
+    <button class="btn btn-skinny"
+            on:click={changeAllocationScheme}>
+        Change allocation scheme
+    </button>
+{/if}
+
+
+{#if $overlayDataCall?.status === 'loading'}
+    <h4>
+        Loading
+        <Icon name="refresh" spin="true"/>
+    </h4>
+{/if}
