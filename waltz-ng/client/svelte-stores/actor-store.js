@@ -24,7 +24,17 @@ export function mkActorStore() {
         return remote.fetchViewData("GET", `api/actor/id/${id}`);
     };
 
+    const findAll = (force) => {
+        return remote
+            .fetchViewList(
+                "GET",
+                "api/actor",
+                [],
+                {force});
+    };
+
     return {
+        findAll,
         getById
     };
 }
