@@ -50,7 +50,7 @@
             </label>
 
             <div class="wt-tab wt-active">
-                <!-- SERVERS -->
+                <!-- FLOWS -->
                 <div ng-if="$ctrl.activeTab === 'flows'"
                      class="row"
                      style="padding-top: 1em; padding-bottom: 0.7em; padding-left:1em">
@@ -71,6 +71,18 @@
                     </div>
                 </div>
 
+                <!-- MEASURABLES -->
+                <div ng-if="$ctrl.activeTab === 'viewpoints'">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <waltz-svelte-component component="$ctrl.MeasurableAttestationPanel"
+                                                    primary-entity-ref="$ctrl.parentEntityRef">
+                            </waltz-svelte-component>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HISTORY -->
                 <div ng-if="$ctrl.activeTab === 'history'">
                     <div class="row">
                         <div class="col-sm-12" ng-if="$ctrl.attestations.length > 0">
@@ -150,15 +162,6 @@
                             <strong>No attestations</strong>
                         </message>
                     </waltz-no-data>
-                </div>
-                <div ng-if="$ctrl.activeTab === 'viewpoints'">
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <waltz-svelte-component component="$ctrl.MeasurableAttestationPanel"
-                                                    primary-entity-ref="$ctrl.parentEntityRef">
-                            </waltz-svelte-component>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

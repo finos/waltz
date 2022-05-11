@@ -3,12 +3,14 @@ package org.finos.waltz.service.permission;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.involvement.Involvement;
+import org.finos.waltz.model.measurable_category.MeasurableCategory;
 import org.finos.waltz.model.permission_group.CheckPermissionCommand;
 import org.finos.waltz.model.permission_group.Permission;
 import org.finos.waltz.model.permission_group.RequiredInvolvementsResult;
 import org.finos.waltz.model.person.Person;
 import org.finos.waltz.service.involvement.InvolvementService;
 import org.finos.waltz.service.person.PersonService;
+import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,4 +112,8 @@ public class PermissionGroupService {
         return required.isAllowed(existingInvolvements);
     }
 
+
+    public Set<Tuple2<MeasurableCategory, Boolean>> findSupportedMeasurableCategoryAttestations(EntityReference ref, String userId) {
+        return permissionGroupDao.findSupportedMeasurableCategoryAttestations(ref, userId);
+    }
 }
