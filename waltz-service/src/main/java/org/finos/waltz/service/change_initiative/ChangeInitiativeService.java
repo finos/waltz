@@ -18,6 +18,9 @@
 
 package org.finos.waltz.service.change_initiative;
 
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.app_group.AppGroupEntry;
+import org.finos.waltz.model.app_group.ImmutableAppGroupEntry;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.entity_relationship.EntityRelationshipUtilities;
 import org.finos.waltz.common.DateTimeUtilities;
@@ -26,10 +29,6 @@ import org.finos.waltz.data.change_initiative.ChangeInitiativeDao;
 import org.finos.waltz.data.change_initiative.ChangeInitiativeIdSelectorFactory;
 import org.finos.waltz.data.change_initiative.search.ChangeInitiativeSearchDao;
 import org.finos.waltz.data.entity_relationship.EntityRelationshipDao;
-import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.IdSelectionOptions;
-import org.finos.waltz.model.Operation;
-import org.finos.waltz.model.Severity;
 import org.finos.waltz.model.change_initiative.ChangeInitiative;
 import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
@@ -40,6 +39,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.model.EntityKind.CHANGE_INITIATIVE;
@@ -187,5 +188,33 @@ public class ChangeInitiativeService {
 
     public Collection<ChangeInitiative> findAll() {
         return changeInitiativeDao.findAll();
+    }
+
+
+    public List<AppGroupEntry> findEntriesForAppGroup(long groupId) {
+        return relationshipDao.findRelationshipsInvolving(mkRef(EntityKind.APP_GROUP, groupId))
+                .stream()
+                .filter(r -> r.a().kind().equals(CHANGE_INITIATIVE) || r.b().kind().equals(CHANGE_INITIATIVE))
+                .map(r -> {
+                    if (r.a().kind() == CHANGE_INITIATIVE) {
+                        return mkAppGroupEntryRecord(r.a(), r.provenance());
+                    } else {
+                        return mkAppGroupEntryRecord(r.b(), r.provenance());
+                    }
+                })
+                .collect(Collectors.toList());
+    }
+
+
+    private AppGroupEntry mkAppGroupEntryRecord(EntityReference ref, String provenance) {
+        return ImmutableAppGroupEntry.builder()
+                .id(ref.id())
+                .name(ref.name())
+                .kind(ref.kind())
+                .provenance(provenance)
+                .description(ref.description())
+                .entityLifecycleStatus(ref.entityLifecycleStatus())
+                .isReadOnly(false)
+                .build();
     }
 }

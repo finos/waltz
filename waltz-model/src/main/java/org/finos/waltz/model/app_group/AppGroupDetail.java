@@ -33,4 +33,6 @@ public abstract class AppGroupDetail {
     public abstract List<AppGroupMember> members();
     public abstract List<AppGroupEntry> applications();
     public abstract List<AppGroupEntry> organisationalUnits();
+
+    public abstract List<AppGroupEntry> changeInitiatives();
 }

@@ -20,20 +20,51 @@ package org.finos.waltz.data.orgunit;
 
 
 import org.finos.waltz.data.entity_hierarchy.AbstractIdSelectorFactory;
-import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.HierarchyQueryScope;
 import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.schema.Tables;
 import org.jooq.Record1;
 import org.jooq.Select;
+import org.jooq.impl.DSL;
+
+import static org.finos.waltz.model.EntityKind.*;
+import static org.finos.waltz.schema.Tables.APPLICATION_GROUP_OU_ENTRY;
 
 public class OrganisationalUnitIdSelectorFactory extends AbstractIdSelectorFactory {
 
 
     public OrganisationalUnitIdSelectorFactory() {
-        super(EntityKind.ORG_UNIT);
+        super(ORG_UNIT);
     }
 
     @Override
     protected Select<Record1<Long>> mkForOptions(IdSelectionOptions options) {
-        throw new UnsupportedOperationException("Cannot create orgUnit selector from kind: "+options.entityReference().kind());
+        switch (options.entityReference().kind()) {
+            case APP_GROUP:
+                return mkForAppGroup(options);
+            default:
+                throw new UnsupportedOperationException("Cannot create orgUnit selector from kind: " + options.entityReference().kind());
+        }
+    }
+
+    private Select<Record1<Long>> mkForAppGroup(IdSelectionOptions options) {
+        if (options.scope().equals(HierarchyQueryScope.EXACT)) {
+            return DSL
+                    .select(APPLICATION_GROUP_OU_ENTRY.ORG_UNIT_ID)
+                    .from(APPLICATION_GROUP_OU_ENTRY)
+                    .where(APPLICATION_GROUP_OU_ENTRY.GROUP_ID.eq(options.entityReference().id()));
+        } else if (options.scope().equals(HierarchyQueryScope.CHILDREN)) {
+            return DSL
+                    .select(Tables.ENTITY_HIERARCHY.ID)
+                    .from(APPLICATION_GROUP_OU_ENTRY)
+                    .innerJoin(Tables.ENTITY_HIERARCHY).on(APPLICATION_GROUP_OU_ENTRY.ORG_UNIT_ID.eq(Tables.ENTITY_HIERARCHY.ANCESTOR_ID))
+                    .where(APPLICATION_GROUP_OU_ENTRY.GROUP_ID.eq(options.entityReference().id()));
+        } else {
+            return DSL
+                    .select(Tables.ENTITY_HIERARCHY.ANCESTOR_ID)
+                    .from(APPLICATION_GROUP_OU_ENTRY)
+                    .innerJoin(Tables.ENTITY_HIERARCHY).on(APPLICATION_GROUP_OU_ENTRY.ORG_UNIT_ID.eq(Tables.ENTITY_HIERARCHY.ID))
+                    .where(APPLICATION_GROUP_OU_ENTRY.GROUP_ID.eq(options.entityReference().id()));
+        }
     }
 }
