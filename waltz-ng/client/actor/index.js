@@ -17,32 +17,36 @@
  */
 import {registerComponents, registerStores} from "../common/module-utils";
 import ActorOverview from "./components/actor-overview";
-import ActorStore from './services/actor-store';
+import ActorStore from "./services/actor-store";
 
-import Routes from './routes';
-import ActorService from './services/actor-service';
-import ActorSelector from './components/actor-selector';
-import BasicActorSelector from './components/basic-actor-selector';
+import Routes from "./routes";
+import ActorService from "./services/actor-service";
+import ActorSelector from "./components/actor-selector";
+import BasicActorSelector from "./components/basic-actor-selector";
+import ActorListView from "./pages/list-view/actor-list-view";
 
 export default () => {
 
-    const module = angular.module('waltz.actor', []);
+    const module = angular.module("waltz.actor", []);
 
     module
         .config(Routes)
-        .service('ActorService', ActorService);
+        .service("ActorService", ActorService);
 
     registerComponents(
         module,
-        [ ActorOverview ]);
+        [
+            ActorOverview,
+            ActorListView
+        ]);
 
     registerStores(
         module,
         [ ActorStore ]);
 
     module
-        .component('waltzActorSelector', ActorSelector)
-        .component('waltzBasicActorSelector', BasicActorSelector);
+        .component("waltzActorSelector", ActorSelector)
+        .component("waltzBasicActorSelector", BasicActorSelector);
 
     return module.name;
 };
