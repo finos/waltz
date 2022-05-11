@@ -73,7 +73,7 @@ public class ReportGridExtractor implements DataExtractor {
     private final ReportGridService reportGridService;
     private final SurveyQuestionService surveyQuestionService;
     private final SettingsService settingsService;
-    private final String CELL_LIMIT_MESSAGE = "...Data truncated, call limit reached. Export using CSV for complete data.";
+    private final String CELL_LIMIT_MESSAGE = "...Data truncated, excel cell limit reached. Export using CSV for complete data.";
 
     @Autowired
     public ReportGridExtractor(ReportGridService reportGridService,
