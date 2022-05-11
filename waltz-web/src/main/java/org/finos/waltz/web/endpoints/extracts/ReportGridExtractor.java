@@ -58,6 +58,8 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.ListUtilities.*;
 import static org.finos.waltz.common.MapUtilities.*;
+import static org.finos.waltz.common.StringUtilities.length;
+import static org.finos.waltz.common.StringUtilities.limit;
 import static org.finos.waltz.model.utils.IdUtilities.getIdOrDefault;
 import static org.finos.waltz.model.utils.IdUtilities.indexById;
 import static org.jooq.lambda.fi.util.function.CheckedConsumer.unchecked;
@@ -71,6 +73,7 @@ public class ReportGridExtractor implements DataExtractor {
     private final ReportGridService reportGridService;
     private final SurveyQuestionService surveyQuestionService;
     private final SettingsService settingsService;
+    private final String CELL_LIMIT_MESSAGE = "...Data truncated, call limit reached. Export using CSV for complete data.";
 
     @Autowired
     public ReportGridExtractor(ReportGridService reportGridService,
@@ -376,6 +379,7 @@ public class ReportGridExtractor implements DataExtractor {
 
     private int writeExcelBody(List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows, SXSSFSheet sheet) {
         AtomicInteger rowNum = new AtomicInteger(1);
+        int maxCellLength = 32767 - length(CELL_LIMIT_MESSAGE);
         reportRows.forEach(r -> {
 
             long subjectId = r.v1.entityReference().id();
@@ -406,7 +410,11 @@ public class ReportGridExtractor implements DataExtractor {
                     cell.setCellValue(((ExternalIdValue) v).value());
                 } else {
                     Cell cell = row.createCell(nextColNum);
-                    cell.setCellValue(Objects.toString(v));
+                    String cellValue = Objects.toString(v);
+                    String cellValueToWrite = (length(cellValue) >= maxCellLength)
+                            ? format("%s%s", limit(cellValue, maxCellLength), CELL_LIMIT_MESSAGE)
+                            : cellValue;
+                    cell.setCellValue(cellValueToWrite);
                 }
 
             }

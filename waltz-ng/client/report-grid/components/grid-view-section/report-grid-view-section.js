@@ -82,8 +82,7 @@ function controller($scope, serviceBroker, localStorageService) {
         const value = localStorage.getItem(key);
 
         try {
-            const summaries = JSON.parse(value)
-            return summaries
+            return JSON.parse(value)
         } catch (e) {
             console.log("Cannot parse local storage value", { e, key, value });
             return [];
@@ -102,23 +101,25 @@ function controller($scope, serviceBroker, localStorageService) {
         serviceBroker
             .loadViewData(
                 CORE_API.ReportGridStore.getViewById,
-                [vm.gridId, mkSelectionOptions(vm.parentEntityRef)], { force: true })
+                [vm.gridId, vm.selectionOptions], {force: true})
             .then(r => {
 
                 const gridData = r.data;
                 vm.loading = false;
 
-                vm.rawGridData = gridData;
+                if (gridData) {
+                    vm.rawGridData = gridData;
 
-                const summaries = getSummaryColumns(gridData);
-                activeSummaries.set(summaries);
+                    const summaries = getSummaryColumns(gridData);
+                    activeSummaries.set(summaries);
 
-                selectedGrid.set(gridData);
-                columnDefs.set(gridData.definition.columnDefinitions);
+                    selectedGrid.set(gridData);
+                    columnDefs.set(gridData?.definition.columnDefinitions);
 
-                vm.allTableData = prepareTableData(vm.rawGridData);
-                vm.allColumnDefs = prepareColumnDefs(vm.rawGridData);
-                refresh();
+                    vm.allTableData = prepareTableData(vm.rawGridData);
+                    vm.allColumnDefs = prepareColumnDefs(vm.rawGridData);
+                    refresh();
+                }
             })
             .catch(e => {
                 displayError("Could not load grid data for id: " + vm.gridId, e)
