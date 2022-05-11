@@ -39,7 +39,7 @@ import static org.finos.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGO
 @Repository
 public class MeasurableCategoryDao {
 
-    private static final RecordMapper<Record, MeasurableCategory> TO_DOMAIN_MAPPER = record -> {
+    public static final RecordMapper<Record, MeasurableCategory> TO_DOMAIN_MAPPER = record -> {
         MeasurableCategoryRecord r = record.into(MEASURABLE_CATEGORY);
         return ImmutableMeasurableCategory.builder()
                 .ratingSchemeId(r.getRatingSchemeId())

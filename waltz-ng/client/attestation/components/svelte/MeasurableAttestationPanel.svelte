@@ -6,11 +6,16 @@
     import NoData from "../../../common/svelte/NoData.svelte";
     import {entity} from "../../../common/services/enums/entity";
     import _ from "lodash";
+    import {permissionGroupStore} from "../../../svelte-stores/permission-group-store";
 
     export let primaryEntityRef;
 
     $: latestattestationsCall = attestationInstanceStore.findLatestMeasurableAttestations(primaryEntityRef);
+    $: supportedCategoriesCall = permissionGroupStore.findSupportedMeasurableCategoryAttestations(primaryEntityRef);
     $: measurableAttestationInstances = $latestattestationsCall.data;
+    $: supportedCategories = $supportedCategoriesCall.data;
+
+    $:console.log ({sc: supportedCategories})
 
 </script>
 
@@ -19,7 +24,7 @@
     <Icon name="info-circle">
     </Icon>
     The below table shows the latest attestation completed for each viewpoint taxonomy.
-    If a run has been assigned but never completed, the 'attested at' and 'attested by' appear blank.
+    If a run has been assigned but never completed, the '<i>attested at</i>' and '<i>attested by</i>' columns will appear blank.
     Some viewpoint categories may not appear as no run has ever been issued.
 </div>
 
