@@ -37,7 +37,7 @@ const initialState = {
 
 
 function setup(groupDetail) {
-    const {organisationalUnits, applications, members, appGroup} = groupDetail;
+    const {organisationalUnits, applications, members, appGroup, changeInitiatives} = groupDetail;
 
     const owners = _.filter(members, m => m.role === "OWNER");
     const viewers = _.filter(members, m => m.role === "VIEWER");
@@ -47,7 +47,8 @@ function setup(groupDetail) {
         viewers,
         organisationalUnits,
         applications,
-        appGroup
+        appGroup,
+        changeInitiatives
     };
 }
 
@@ -430,12 +431,6 @@ function controller($q,
             toasts.info("There are no change initiatives to be added or removed");
         }
     };
-
-    serviceBroker
-        .loadViewData(
-            CORE_API.ChangeInitiativeStore.findBySelector,
-            [mkSelectionOptions({kind: "APP_GROUP", id}, "EXACT")])
-        .then(result => vm.changeInitiatives = result.data);
 
 }
 
