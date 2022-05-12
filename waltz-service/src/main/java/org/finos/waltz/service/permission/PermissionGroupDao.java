@@ -248,8 +248,8 @@ public class PermissionGroupDao {
                     // then, for each category, we group by `is_default` and take only the involvement kind ids
                     Map<Boolean, Collection<Long>> invKindsByDefault = groupBy(
                             xs,
-                            t -> t.v2,
-                            t -> t.v3);
+                            t -> t.v2,   // is_default
+                            t -> t.v3);  // involvement_kind
                     // check to see if there are any specific involvement kinds for this entity...
                     Collection<Long> specificInvKindsNeeded = invKindsByDefault.getOrDefault(
                             Boolean.FALSE,
