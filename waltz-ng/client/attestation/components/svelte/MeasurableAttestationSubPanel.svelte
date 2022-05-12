@@ -18,17 +18,10 @@
         handleAction: ctx => dispatcher("attestationInitiated", ctx)
     };
 
-    const downloadChangesMiniAction = {
-        name: "Download changes",
-        icon: "cloud-download",
-        handleAction: (ctx) => console.log("Download ?", ctx)
-    };
-
     let hasChanges = true;
 
     $: actions = _.compact([
-        isAttestable ? attestMiniAction : null,
-        hasChanges ?  downloadChangesMiniAction: null
+        isAttestable ? attestMiniAction : null
     ]);
 
 

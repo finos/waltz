@@ -228,7 +228,9 @@ public class PermissionGroupDao {
                 .innerJoin(MEASURABLE_CATEGORY).on(MEASURABLE_CATEGORY.ID.eq(PERMISSION_GROUP_INVOLVEMENT.QUALIFIER_ID))
                 .leftJoin(PERMISSION_GROUP_ENTRY).on(specificApplicationPermissionGroupEntryJoinCondition)
                 .where(PERMISSION_GROUP_INVOLVEMENT.SUBJECT_KIND.eq(EntityKind.ATTESTATION.name()))
-                .and(PERMISSION_GROUP_INVOLVEMENT.QUALIFIER_KIND.eq(EntityKind.MEASURABLE_CATEGORY.name()));
+                .and(PERMISSION_GROUP_INVOLVEMENT.QUALIFIER_KIND.eq(EntityKind.MEASURABLE_CATEGORY.name()))
+                .and(PERMISSION_GROUP.IS_DEFAULT.isTrue()
+                        .or(PERMISSION_GROUP_ENTRY.PERMISSION_GROUP_ID.isNotNull()));
 
         Set<Tuple3<MeasurableCategory, Boolean, Long>> data = qry
                 .fetchSet(r -> tuple(
@@ -250,10 +252,12 @@ public class PermissionGroupDao {
                             xs,
                             t -> t.v2,   // is_default
                             t -> t.v3);  // involvement_kind
+
                     // check to see if there are any specific involvement kinds for this entity...
                     Collection<Long> specificInvKindsNeeded = invKindsByDefault.getOrDefault(
                             Boolean.FALSE,
                             emptySet());
+
                     return specificInvKindsNeeded.isEmpty()
                             ? invKindsByDefault.getOrDefault(   // ... if not, return the default involvements
                                     Boolean.TRUE,
