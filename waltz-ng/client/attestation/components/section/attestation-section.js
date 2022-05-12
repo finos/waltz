@@ -86,6 +86,7 @@ function mkAttestationSections(baseSections = [], attestations = [], unattestedC
 
 
 function controller($q,
+                    $scope,
                     serviceBroker) {
 
     const vm = initialiseData(this, initialState);
@@ -203,11 +204,26 @@ function controller($q,
         }
     };
 
+    vm.onMeasurableAttestationInitiated = (category) => {
+        $scope.$applyAsync(() => {
+            vm.mode = modes.EDIT;
+            vm.activeAttestationSection = {
+                type: "MEASURABLE_CATEGORY",
+                name: category.name,
+                actionLabel:  `Attest '${category.name}' ratings`,
+                typeName: category.name,
+                unattestedChanges: [],
+                attestedEntityRef: category
+            };
+        });
+    };
+
 }
 
 
 controller.$inject = [
     "$q",
+    "$scope",
     "ServiceBroker"
 ];
 

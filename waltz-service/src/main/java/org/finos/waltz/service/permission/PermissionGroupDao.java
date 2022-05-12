@@ -3,11 +3,12 @@ package org.finos.waltz.service.permission;
 import org.finos.waltz.data.measurable_category.MeasurableCategoryDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.attestation.ImmutableUserAttestationPermission;
+import org.finos.waltz.model.attestation.UserAttestationPermission;
 import org.finos.waltz.model.measurable_category.MeasurableCategory;
 import org.finos.waltz.model.permission_group.*;
 import org.jooq.*;
 import org.jooq.impl.DSL;
-import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
 import org.springframework.stereotype.Repository;
 
@@ -200,10 +201,20 @@ public class PermissionGroupDao {
     }
 
 
-    public Set<Tuple2<MeasurableCategory, Boolean>> findSupportedMeasurableCategoryAttestations(EntityReference ref, String userId) {
+    /**
+     * Given an entity ref (typically an app) and a userId, this will return a list of
+     * measurable categories that are attestable along with a flag to indicate if _this_
+     * user can attest the category for the entity.
+     * @param ref  the entity being attested
+     * @param userId  the user who _may_ be doing the attestation
+     * @return  a set of tuples: [{category, userCanAttestForThisEntityFlag}, ...]
+     */
+    public Set<UserAttestationPermission> findSupportedMeasurableCategoryAttestations(EntityReference ref, String userId) {
+        // specific involvements only exist for apps,
+        // ... therefore if the given ref is not an app we want to 'force-fail' the (upcoming) left join
         Condition specificApplicationPermissionGroupEntryJoinCondition = ref.kind() == EntityKind.APPLICATION
                 ? PERMISSION_GROUP_ENTRY.PERMISSION_GROUP_ID.eq(PERMISSION_GROUP.ID)
-                        .and(PERMISSION_GROUP_ENTRY.APPLICATION_ID.eq(20506L))
+                        .and(PERMISSION_GROUP_ENTRY.APPLICATION_ID.eq(ref.id()))
                 : DSL.falseCondition();
 
         SelectConditionStep<Record> qry = dsl
@@ -232,32 +243,39 @@ public class PermissionGroupDao {
 
         Map<MeasurableCategory, Collection<Long>> categoryByInvKindsNeeded = groupAndThen(
                 data,
-                d -> d.v1,  // grouping by category
+                d -> d.v1,  // grouping by measurable category
                 xs -> {
                     // then, for each category, we group by `is_default` and take only the involvement kind ids
                     Map<Boolean, Collection<Long>> invKindsByDefault = groupBy(
                             xs,
                             t -> t.v2,
                             t -> t.v3);
+                    // check to see if there are any specific involvement kinds for this entity...
                     Collection<Long> specificInvKindsNeeded = invKindsByDefault.getOrDefault(
                             Boolean.FALSE,
                             emptySet());
                     return specificInvKindsNeeded.isEmpty()
-                            ? invKindsByDefault.getOrDefault(
+                            ? invKindsByDefault.getOrDefault(   // ... if not, return the default involvements
                                     Boolean.TRUE,
                                     emptySet())
-                            : specificInvKindsNeeded;
+                            : specificInvKindsNeeded;  // ... if so return them
                 });
 
+        // We now want to see if _this_ user has those involvements
+        // ...so first we get all the users involvement kinds for this entity
         Set<Long> existingInvolvementKinds = findExistingInvolvementKindIdsForUser(ref, userId);
 
+        // ...now we map over the categories and required involvements,
+        // ...checking to see if the user's involvement satisfies each one
         return map(
                 categoryByInvKindsNeeded.entrySet(),
-                kv -> tuple(
-                    kv.getKey(),
-                    hasIntersection(
-                            fromCollection(kv.getValue()),
-                            existingInvolvementKinds)));
-
+                kv -> ImmutableUserAttestationPermission
+                        .builder()
+                        .subjectKind(EntityKind.ATTESTATION)
+                        .qualifierReference(kv.getKey().entityReference())
+                        .hasPermission(hasIntersection(
+                                fromCollection(kv.getValue()),
+                                existingInvolvementKinds))
+                        .build());
     }
 }

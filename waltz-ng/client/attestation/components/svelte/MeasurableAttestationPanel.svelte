@@ -1,22 +1,29 @@
 <script>
     import {attestationInstanceStore} from "../../../svelte-stores/attestation-instance-store";
-    import EntityLink from "../../../common/svelte/EntityLink.svelte";
-    import DateTime from "../../../common/svelte/DateTime.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
     import NoData from "../../../common/svelte/NoData.svelte";
-    import {entity} from "../../../common/services/enums/entity";
-    import _ from "lodash";
     import {permissionGroupStore} from "../../../svelte-stores/permission-group-store";
+    import {mkChunks} from "../../../common/list-utils";
+    import MeasurableAttestationSubPanel from "./MeasurableAttestationSubPanel.svelte";
+    import LoadingPlaceholder from "../../../common/svelte/LoadingPlaceholder.svelte";
+    import {mergeCategoriesWithLatestAttestations} from "./measurable-attestation-utils";
 
     export let primaryEntityRef;
+    export let onAttestationInitiated = (category) => console.log("Default Handler: onAttestationInitiated", {category});
 
-    $: latestattestationsCall = attestationInstanceStore.findLatestMeasurableAttestations(primaryEntityRef);
+    function attestationInitiated(evt) {
+        onAttestationInitiated(evt.detail);
+    }
+
+    let chunkedCategories = [];
+
+    $: latestAttestationsCall = attestationInstanceStore.findLatestMeasurableAttestations(primaryEntityRef);
     $: supportedCategoriesCall = permissionGroupStore.findSupportedMeasurableCategoryAttestations(primaryEntityRef);
-    $: measurableAttestationInstances = $latestattestationsCall.data;
-    $: supportedCategories = $supportedCategoriesCall.data;
-
-    $:console.log ({sc: supportedCategories})
-
+    $: chunkedCategories = mkChunks(
+        mergeCategoriesWithLatestAttestations(
+            $supportedCategoriesCall.data,
+            $latestAttestationsCall.data),
+        2);
 </script>
 
 
@@ -28,42 +35,24 @@
     Some viewpoint categories may not appear as no run has ever been issued.
 </div>
 
-{#if _.isEmpty(measurableAttestationInstances)}
-    <NoData>
-        No viewpoint category attestation runs have been issued for this {_.get(entity, [primaryEntityRef.kind, 'name'], 'entity')}
-    </NoData>
-{:else}
-<table class="table table-condensed">
-    <thead>
-        <tr>
-            <th>Category</th>
-            <th>Last Attested At</th>
-            <th>Last Attested By</th>
-            <th>Run Name</th>
-            <th>Run Issued On</th>
-            <th>Run Due Date</th>
-        </tr>
-    </thead>
 
-    <tbody>
-        {#each measurableAttestationInstances as attestation}
-            <tr>
-                <td><EntityLink showIcon={false} ref={attestation.categoryRef}/></td>
-                <td>
-                    {#if attestation.attestedAt}
-                        <DateTime relative={true}
-                                  formatStr="yyyy-MM-DD"
-                                  dateTime={attestation.attestedAt}/>
-                    {:else}
-                        -
-                    {/if}
-                </td>
-                <td>{attestation.attestedBy || '-'}</td>
-                <td><EntityLink showIcon={false} ref={attestation.attestationRunRef}/></td>
-                <td>{attestation.issuedOn}</td>
-                <td>{attestation.dueDate}</td>
-            </tr>
-        {/each}
-    </tbody>
-</table>
+{#if $supportedCategoriesCall?.status === 'loading' || $latestAttestationsCall?.status === 'loading'}
+    <LoadingPlaceholder/>
+{:else}
+    {#each chunkedCategories as chunks}
+        <div class="row">
+            {#each chunks as chunk}
+                <div class="col-sm-6">
+                    <MeasurableAttestationSubPanel on:attestationInitiated={attestationInitiated}
+                                                   measurableCategory={chunk.qualifierReference}
+                                                   latestAttestation={chunk.latestAttestation}
+                                                   isAttestable={chunk.hasPermission}/>
+                </div>
+            {/each}
+        </div>
+    {:else}
+        <NoData>
+            There are no attestable viewpoints
+        </NoData>
+    {/each}
 {/if}

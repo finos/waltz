@@ -19,12 +19,11 @@
 package org.finos.waltz.web.endpoints.api;
 
 
-import org.finos.waltz.model.measurable_category.MeasurableCategory;
+import org.finos.waltz.model.attestation.UserAttestationPermission;
 import org.finos.waltz.model.permission_group.Permission;
 import org.finos.waltz.service.permission.PermissionGroupService;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.endpoints.Endpoint;
-import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -74,7 +73,7 @@ public class PermissionGroupEndpoint implements Endpoint {
                 getEntityReference(request), getUsername(request));
 
 
-        ListRoute<Tuple2<MeasurableCategory, Boolean>> findSupportedMeasurableCategoryAttestationsRoute = ((request, response)
+        ListRoute<UserAttestationPermission> findSupportedMeasurableCategoryAttestationsRoute = ((request, response)
                 -> permissionGroupService.findSupportedMeasurableCategoryAttestations(
                         getEntityReference(request),
                         getUsername(request)));

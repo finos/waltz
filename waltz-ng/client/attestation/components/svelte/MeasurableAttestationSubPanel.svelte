@@ -1,0 +1,70 @@
+<script>
+    import SubSection from "../../../common/svelte/SubSection.svelte";
+    import NoData from "../../../common/svelte/NoData.svelte";
+    import {createEventDispatcher} from "svelte";
+    import MiniActions from "../../../common/svelte/MiniActions.svelte";
+    import DateTime from "../../../common/svelte/DateTime.svelte";
+
+    export let measurableCategory;
+    export let isAttestable = false;
+    export let latestAttestation = null;
+
+    const dispatcher = createEventDispatcher();
+
+    const attestMiniAction = {
+        name: "Attest Now",
+        icon: "check",
+        description: "Initiate Attestation",
+        handleAction: ctx => dispatcher("attestationInitiated", ctx)
+    };
+
+    const downloadChangesMiniAction = {
+        name: "Download changes",
+        icon: "cloud-download",
+        handleAction: (ctx) => console.log("Download ?", ctx)
+    };
+
+    let hasChanges = true;
+
+    $: actions = _.compact([
+        isAttestable ? attestMiniAction : null,
+        hasChanges ?  downloadChangesMiniAction: null
+    ]);
+
+
+</script>
+
+{#if measurableCategory}
+    <SubSection>
+        <div slot="header">
+            {measurableCategory.name}
+        </div>
+        <div slot="content">
+            {#if latestAttestation}
+                <table class="table waltz-field-table waltz-field-table-border">
+                    <tr>
+                        <td class="wft-label">Attested By:</td>
+                        <td>{latestAttestation.attestedBy}</td>
+                    </tr>
+                    <tr>
+                        <td class="wft-label">Attested At:</td>
+                        <td>
+                            <DateTime dateTime={latestAttestation.attestedAt}/>
+                        </td>
+                    </tr>
+                </table>
+            {:else}
+                <NoData type="warning">
+                    Never attested
+                </NoData>
+            {/if}
+        </div>
+        <div slot="controls">
+            <div style="float:right" class="small">
+                {#if isAttestable}
+                    <MiniActions actions={actions} ctx={measurableCategory}/>
+                {/if}
+            </div>
+        </div>
+    </SubSection>
+{/if}
