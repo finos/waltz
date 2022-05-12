@@ -75,9 +75,9 @@
                                     <Icon name={determineSubjectIcon(grid?.subjectKind)}/> {grid?.name}
                                 </button>
                             </td>
-                            <td>
+                            <td title={grid?.description}>
                                 <span class:text-muted={!grid?.description}>
-                                    {truncateMiddle(grid?.description, 300) || "No description"}
+                                    {truncateMiddle(grid?.description, 100) || "No description"}
                                 </span>
                             </td>
                         </tr>

@@ -17,13 +17,15 @@
 </style>
 <div>
 
-    <waltz-loading-notification show="$ctrl.loading" name="Loading grid data">
+    <waltz-loading-notification show="$ctrl.loading"
+                                name="Loading grid data">
     </waltz-loading-notification>
 
     <div ng-if="!$ctrl.loading">
         <!-- SUMMARIES -->
-        <waltz-svelte-component component="$ctrl.ReportGridControlPanel" on-grid-select="$ctrl.onGridSelect"
-            on-save="$ctrl.onUpdateColumns">
+        <waltz-svelte-component component="$ctrl.ReportGridControlPanel"
+                                on-grid-select="$ctrl.onGridSelect"
+                                on-save="$ctrl.onUpdateColumns">
         </waltz-svelte-component>
 
         <br>
