@@ -24,6 +24,7 @@
             <input type="radio"
                    value="flows"
                    ng-model="$ctrl.activeTab"
+                   ng-change="$ctrl.mode = 'VIEW'"
                    id="flows">
             <label class="wt-label"
                    ng-model="$ctrl.activeTab"
@@ -34,6 +35,7 @@
             <input type="radio"
                    value="viewpoints"
                    ng-model="$ctrl.activeTab"
+                   ng-change="$ctrl.mode = 'VIEW'"
                    id="viewpoints">
             <label class="wt-label"
                    for="viewpoints">
@@ -42,6 +44,7 @@
 
             <input type="radio"
                    ng-model="$ctrl.activeTab"
+                   ng-change="$ctrl.mode = 'VIEW'"
                    value="history"
                    id="history">
             <label class="wt-label"
