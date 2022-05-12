@@ -158,7 +158,14 @@ function controller($q,
     vm.attestEntity = () => {
         const msg = "By clicking 'OK', you are attesting that all mappings are present, correct and accurately reflected for this entity, and thereby accountable for this validation.";
         if (confirm(msg)){
-            return attest(serviceBroker, vm.parentEntityRef, vm.activeAttestationSection.type)
+            // an attested entity id will not be present in all cases.
+            // It's main use is for thing like measurable categories
+            const maybeAttestedEntityId = _.get(vm, ["activeAttestationSection", "attestedEntityRef", "id"]);
+            return attest(
+                    serviceBroker,
+                    vm.parentEntityRef,
+                    vm.activeAttestationSection.type,
+                    maybeAttestedEntityId)
                 .then(() => {
                     toasts.success("Attested successfully");
                     loadAttestationData(vm.parentEntityRef);

@@ -28,7 +28,6 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.service.attestation.AttestationPreCheckService;
-import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -44,9 +43,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AttestationPreCheckServiceTest extends BaseInMemoryIntegrationTest {
-
-    @Autowired
-    private LogicalFlowService lfSvc;
 
     @Autowired
     private LogicalFlowHelper lfHelper;

@@ -31,9 +31,9 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutableAttestEntityCommand.class)
 public abstract class AttestEntityCommand implements Command {
 
-    public abstract EntityKind attestedEntityKind(); // LOGICAL or PHYSICAL flows
     public abstract EntityReference entityReference(); // The entity for which the above kind is being attested
 
+    public abstract EntityKind attestedEntityKind(); // e.g. LOGICAL or PHYSICAL flows
     @Nullable
     public abstract Long attestedEntityId(); // optional qualifier (e.g. for MEASURABLE_CATEGORY)
 
