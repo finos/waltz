@@ -4,6 +4,7 @@
     import {createEventDispatcher} from "svelte";
     import MiniActions from "../../../common/svelte/MiniActions.svelte";
     import DateTime from "../../../common/svelte/DateTime.svelte";
+    import _ from "lodash";
 
     export let measurableCategory;
     export let isAttestable = false;
@@ -18,13 +19,11 @@
         handleAction: ctx => dispatcher("attestationInitiated", ctx)
     };
 
-    let hasChanges = true;
-
     $: actions = _.compact([
         isAttestable ? attestMiniAction : null
     ]);
 
-
+    $: hasEverBeenAttested = ! _.isNil(_.get(latestAttestation, "attestedBy"))
 </script>
 
 {#if measurableCategory}
@@ -33,7 +32,8 @@
             {measurableCategory.name}
         </div>
         <div slot="content">
-            {#if latestAttestation}
+            {#if hasEverBeenAttested}
+
                 <table class="table waltz-field-table waltz-field-table-border">
                     <tr>
                         <td class="wft-label">Attested By:</td>
@@ -46,12 +46,19 @@
                         </td>
                     </tr>
                 </table>
+
             {:else}
+
                 <NoData type="warning">
-                    Never attested
+                    Never attested.
+                    {#if isAttestable}
+                        <button class="btn-link" on:click={attestMiniAction.handleAction}>Attest now</button>
+                    {/if}
                 </NoData>
+
             {/if}
         </div>
+
         <div slot="controls">
             <div style="float:right" class="small">
                 {#if isAttestable}
@@ -59,5 +66,6 @@
                 {/if}
             </div>
         </div>
+
     </SubSection>
 {/if}

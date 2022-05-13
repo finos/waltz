@@ -27,15 +27,6 @@
 </script>
 
 
-<div class="help-block">
-    <Icon name="info-circle">
-    </Icon>
-    The below table shows the latest attestation completed for each viewpoint taxonomy.
-    If a run has been assigned but never completed, the '<i>attested at</i>' and '<i>attested by</i>' columns will appear blank.
-    Some viewpoint categories may not appear as no run has ever been issued.
-</div>
-
-
 {#if $supportedCategoriesCall?.status === 'loading' || $latestAttestationsCall?.status === 'loading'}
     <LoadingPlaceholder/>
 {:else}
