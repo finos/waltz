@@ -24,7 +24,8 @@ import OverlayDiagramBuilder from "./builder/OverlayDiagramBuilder.svelte";
 import configA from "./builder/front-to-back-trade-data";
 import configB from "./builder/front-to-back-operations-data";
 import configC from "./builder/north-star";
-
+import configD from "./builder/process-diag";
+import epm from "./builder/epm-taxonomy";
 
 const initialState = {
     b: {
@@ -41,12 +42,15 @@ const initialState = {
     OverlayDiagramBuilder,
     configA,
     configB,
-    configC
+    configC,
+    configD
 };
 
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
+    global.epm = epm;
+    global.groups = configD;
 
 }
 

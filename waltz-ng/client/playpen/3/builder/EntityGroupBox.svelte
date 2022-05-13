@@ -19,7 +19,8 @@
 
     <foreignObject width={dimensions.labelWidth}
                    height={height}>
-        <div class="group-title">
+        <div class="group-title"
+             style={`background-color: ${group.headerColor || '#0e2541'}`}>
             {group.name}
         </div>
     </foreignObject>
@@ -27,7 +28,9 @@
     <g transform={`translate(${dimensions.labelWidth})`}>
         {#each group.rows as row, idx}
             <g transform={`translate(0, ${calcHeight(idx, dimensions)})`}>
-                <GroupRow {row} {dimensions} {color}/>
+                <GroupRow {row}
+                          {dimensions}
+                          color={group.cellColor || color}/>
             </g>
         {/each}
     </g>
@@ -43,7 +46,7 @@
 
     .group-title {
         font-weight: bolder;
-        background-color: #0e2541;
+
         height: 100%;
         padding: 1em;
         color: #f2f6f2;
