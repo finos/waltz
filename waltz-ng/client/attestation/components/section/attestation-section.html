@@ -24,6 +24,7 @@
             <input type="radio"
                    value="flows"
                    ng-model="$ctrl.activeTab"
+                   ng-change="$ctrl.mode = 'VIEW'"
                    id="flows">
             <label class="wt-label"
                    ng-model="$ctrl.activeTab"
@@ -34,6 +35,7 @@
             <input type="radio"
                    value="viewpoints"
                    ng-model="$ctrl.activeTab"
+                   ng-change="$ctrl.mode = 'VIEW'"
                    id="viewpoints">
             <label class="wt-label"
                    for="viewpoints">
@@ -42,6 +44,7 @@
 
             <input type="radio"
                    ng-model="$ctrl.activeTab"
+                   ng-change="$ctrl.mode = 'VIEW'"
                    value="history"
                    id="history">
             <label class="wt-label"
@@ -50,27 +53,40 @@
             </label>
 
             <div class="wt-tab wt-active">
-                <!-- SERVERS -->
-                <div ng-if="$ctrl.activeTab === 'flows'"
-                     class="row"
-                     style="padding-top: 1em; padding-bottom: 0.7em; padding-left:1em">
-                    <div ng-if="$ctrl.mode === 'EDIT'"
-                         class="col-sm-12">
+                <div ng-if="$ctrl.mode === 'EDIT'"
+                     class="row">
+                    <div class="col-sm-12">
                         <waltz-attestation-confirmation parent-entity-ref="$ctrl.parentEntityRef"
                                                         attestation-kind="$ctrl.activeAttestationSection.type"
+                                                        attested-entity-ref="$ctrl.activeAttestationSection.attestedEntityRef"
                                                         on-confirm="$ctrl.attestEntity"
                                                         on-cancel="$ctrl.onCancelAttestation">
                         </waltz-attestation-confirmation>
                     </div>
+                </div>
 
-                    <!-- ATTESTATION SUMMARY SUB_SECTIONS -->
-                    <div ng-if="$ctrl.mode === 'VIEW'"
+                <div class="row"
+                     style="padding-top: 1em; padding-bottom: 0.7em; padding-left:1em"
+                     ng-if="$ctrl.mode === 'VIEW'">
+
+                    <div ng-if="$ctrl.activeTab === 'flows'"
                          ng-repeat="attestationSection in $ctrl.attestationSections | orderBy: 'section.name'"
                          class="col-sm-6">
-                        <div ng-include="'was-latest-attestation-subsection'"></div>
+                        <!-- ATTESTATION SUMMARY SUB_SECTIONS -->
+                        <div ng-include="'was-latest-attestation-subsection'">
+                        </div>
+                    </div>
+                    <div class="col-sm-12"
+                         ng-if="$ctrl.activeTab === 'viewpoints'">
+                        <waltz-svelte-component component="$ctrl.MeasurableAttestationPanel"
+                                                on-attestation-initiated="$ctrl.onMeasurableAttestationInitiated"
+                                                primary-entity-ref="$ctrl.parentEntityRef">
+                        </waltz-svelte-component>
                     </div>
                 </div>
 
+
+                <!-- HISTORY -->
                 <div ng-if="$ctrl.activeTab === 'history'">
                     <div class="row">
                         <div class="col-sm-12" ng-if="$ctrl.attestations.length > 0">
@@ -150,15 +166,6 @@
                             <strong>No attestations</strong>
                         </message>
                     </waltz-no-data>
-                </div>
-                <div ng-if="$ctrl.activeTab === 'viewpoints'">
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <waltz-svelte-component component="$ctrl.MeasurableAttestationPanel"
-                                                    primary-entity-ref="$ctrl.parentEntityRef">
-                            </waltz-svelte-component>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

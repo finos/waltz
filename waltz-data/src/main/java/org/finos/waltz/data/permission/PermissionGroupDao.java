@@ -1,19 +1,23 @@
-package org.finos.waltz.service.permission;
+package org.finos.waltz.data.permission;
 
+import org.finos.waltz.data.measurable_category.MeasurableCategoryDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.attestation.ImmutableUserAttestationPermission;
+import org.finos.waltz.model.attestation.UserAttestationPermission;
+import org.finos.waltz.model.measurable_category.MeasurableCategory;
 import org.finos.waltz.model.permission_group.*;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple3;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
+import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.toSet;
+import static org.finos.waltz.common.MapUtilities.groupAndThen;
+import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.SetUtilities.*;
 import static org.finos.waltz.schema.Tables.*;
 import static org.finos.waltz.schema.tables.PermissionGroup.PERMISSION_GROUP;
@@ -24,18 +28,13 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 @Repository
 public class PermissionGroupDao {
 
-    private final DSLContext dsl;
-
-
     private static final Set<Long> ALL_USERS_ALLOWED = asSet((Long) null);
+
+    private final DSLContext dsl;
 
 
     public PermissionGroupDao(DSLContext dsl) {
         this.dsl = dsl;
-    }
-
-    public Set<Permission> getPermissionsForEntityRef(EntityReference parentEntityRef) {
-        return getPermissionsForEntityRef(parentEntityRef, DSL.trueCondition());
     }
 
 
@@ -89,7 +88,7 @@ public class PermissionGroupDao {
                             .requiredInvolvementsResult(requiredInvolvementsResult)
                             .build();
                 })
-                .collect(Collectors.toSet());
+                .collect(toSet());
     }
 
 
@@ -132,7 +131,7 @@ public class PermissionGroupDao {
                             .requiredInvolvementsResult(requiredInvolvementsResult)
                             .build();
                 })
-                .collect(Collectors.toSet());
+                .collect(toSet());
     }
 
 
@@ -194,5 +193,88 @@ public class PermissionGroupDao {
                         .and(INVOLVEMENT.ENTITY_KIND.eq(parentEntityRef.kind().name()))
                         .and(INVOLVEMENT.ENTITY_ID.eq(parentEntityRef.id())))
                 .fetchSet(INVOLVEMENT.KIND_ID);
+    }
+
+
+    /**
+     * Given an entity ref (typically an app) and a userId, this will return a list of
+     * measurable categories that are attestable along with a flag to indicate if _this_
+     * user can attest the category for the entity.
+     * @param ref  the entity being attested
+     * @param userId  the user who _may_ be doing the attestation
+     * @return  a set of tuples: [{category, userCanAttestForThisEntityFlag}, ...]
+     */
+    public Set<UserAttestationPermission> findSupportedMeasurableCategoryAttestations(EntityReference ref, String userId) {
+        // specific involvements only exist for apps,
+        // ... therefore if the given ref is not an app we want to 'force-fail' the (upcoming) left join
+        Condition specificApplicationPermissionGroupEntryJoinCondition = ref.kind() == EntityKind.APPLICATION
+                ? PERMISSION_GROUP_ENTRY.PERMISSION_GROUP_ID.eq(PERMISSION_GROUP.ID)
+                        .and(PERMISSION_GROUP_ENTRY.APPLICATION_ID.eq(ref.id()))
+                : DSL.falseCondition();
+
+        SelectConditionStep<Record> qry = dsl
+                .select(MEASURABLE_CATEGORY.fields())
+                .select(PERMISSION_GROUP.IS_DEFAULT)
+                .select(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_KIND_ID)
+                .from(PERMISSION_GROUP_INVOLVEMENT)
+                .innerJoin(PERMISSION_GROUP).on(PERMISSION_GROUP_INVOLVEMENT.PERMISSION_GROUP_ID.eq(PERMISSION_GROUP.ID))
+                .innerJoin(INVOLVEMENT_GROUP).on(INVOLVEMENT_GROUP.ID.eq(PERMISSION_GROUP_INVOLVEMENT.INVOLVEMENT_GROUP_ID))
+                .innerJoin(INVOLVEMENT_GROUP_ENTRY).on(INVOLVEMENT_GROUP.ID.eq(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_GROUP_ID))
+                .innerJoin(MEASURABLE_CATEGORY).on(MEASURABLE_CATEGORY.ID.eq(PERMISSION_GROUP_INVOLVEMENT.QUALIFIER_ID))
+                .leftJoin(PERMISSION_GROUP_ENTRY).on(specificApplicationPermissionGroupEntryJoinCondition)
+                .where(PERMISSION_GROUP_INVOLVEMENT.SUBJECT_KIND.eq(EntityKind.ATTESTATION.name()))
+                .and(PERMISSION_GROUP_INVOLVEMENT.QUALIFIER_KIND.eq(EntityKind.MEASURABLE_CATEGORY.name()))
+                .and(PERMISSION_GROUP.IS_DEFAULT.isTrue()
+                        .or(PERMISSION_GROUP_ENTRY.PERMISSION_GROUP_ID.isNotNull()));
+
+        Set<Tuple3<MeasurableCategory, Boolean, Long>> data = qry
+                .fetchSet(r -> tuple(
+                    MeasurableCategoryDao.TO_DOMAIN_MAPPER.map(r),
+                    r.get(PERMISSION_GROUP.IS_DEFAULT),
+                    r.get(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_KIND_ID)));
+
+        if (data.isEmpty()) {
+            // no point continuing as no measurable categories are available for attestation, regardless of involvement
+            return emptySet();
+        }
+
+        Map<MeasurableCategory, Collection<Long>> categoryByInvKindsNeeded = groupAndThen(
+                data,
+                d -> d.v1,  // grouping by measurable category
+                xs -> {
+                    // then, for each category, we group by `is_default` and take only the involvement kind ids
+                    Map<Boolean, Collection<Long>> invKindsByDefault = groupBy(
+                            xs,
+                            t -> t.v2,   // is_default
+                            t -> t.v3);  // involvement_kind
+
+                    // check to see if there are any specific involvement kinds for this entity...
+                    Collection<Long> specificInvKindsNeeded = invKindsByDefault.getOrDefault(
+                            Boolean.FALSE,
+                            emptySet());
+
+                    return specificInvKindsNeeded.isEmpty()
+                            ? invKindsByDefault.getOrDefault(   // ... if not, return the default involvements
+                                    Boolean.TRUE,
+                                    emptySet())
+                            : specificInvKindsNeeded;  // ... if so return them
+                });
+
+        // We now want to see if _this_ user has those involvements
+        // ...so first we get all the users involvement kinds for this entity
+        Set<Long> existingInvolvementKinds = findExistingInvolvementKindIdsForUser(ref, userId);
+
+        // ...now we map over the categories and required involvements,
+        // ...checking to see if the user's involvement satisfies each one
+        return map(
+                categoryByInvKindsNeeded.entrySet(),
+                kv -> ImmutableUserAttestationPermission
+                        .builder()
+                        .subjectKind(EntityKind.ATTESTATION)
+                        .qualifierReference(kv.getKey().entityReference())
+                        .hasPermission(hasIntersection(
+                                fromCollection(kv.getValue()),
+                                existingInvolvementKinds))
+                        .build());
     }
 }

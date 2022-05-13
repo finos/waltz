@@ -38,14 +38,15 @@ function mkAttestationCommand(parentRef, attestedEntityKind, attestedEntityId){
  * @param serviceBroker
  * @param parentEntityRef
  * @param attestedEntityKind
+ * @paran attestedEntityId (optional)
  * @return Promise
  */
-export function attest(serviceBroker, parentEntityRef, attestedEntityKind, attestedEntityRef) {
+export function attest(serviceBroker, parentEntityRef, attestedEntityKind, attestedEntityId) {
 
     const attestationCommand = mkAttestationCommand(
         parentEntityRef,
         attestedEntityKind,
-        attestedEntityRef);
+        attestedEntityId);
 
     return serviceBroker
         .execute(

@@ -224,21 +224,31 @@ public class MapUtilities {
                 : Optional.ofNullable(map.get(key));
     }
 
+
+    /** Use the version with the collection as the first arg instead **/
+    @Deprecated
+    public static <K, V, V2> Map<K, V2> groupAndThen(Function<V, K> keyFn,
+                                                     Function<Collection<V>, V2> valueFn,
+                                                     Collection<V> xs) {
+        return groupAndThen(xs, keyFn, valueFn);
+    }
+
+
     /**
      * Similar to groupBy, however the valueFn runs over the entire group after the initial grouping
      * has been performed
+     * @param xs - initial values
      * @param keyFn  - extracts/derives the grouping key
      * @param valueFn - function which transforms each group
-     * @param xs - initial values
      * @param <K> - key type
      * @param <V> - (initial value type)
      * @param <V2> - resultant value type
      * @return a new map where elements of xs have been grouped by the key fn,
      *      the resultant group is then transformed using the valueFn.
      */
-    public static <K, V, V2> Map<K, V2> groupAndThen(Function<V, K> keyFn,
-                                                     Function<Collection<V>, V2> valueFn,
-                                                     Collection<V> xs) {
+    public static <K, V, V2> Map<K, V2> groupAndThen(Collection<V> xs,
+                                                     Function<V, K> keyFn,
+                                                     Function<Collection<V>, V2> valueFn) {
         checkNotNull(xs, "xs cannot be null");
         checkNotNull(keyFn, "keyFn cannot be null");
         checkNotNull(valueFn, "valueFn cannot be null");

@@ -20,7 +20,11 @@
     <div class="wac-header">
         <div style="padding-bottom: 0.5em">
             You are attesting that the
-            <span ng-bind="$ctrl.attestationKind | toDisplayName:'entity'">
+            <span ng-if="!$ctrl.attestedEntityRef"
+                  ng-bind="$ctrl.attestationKind | toDisplayName:'entity'">
+            </span>
+            <span ng-if="$ctrl.attestedEntityRef"
+                  ng-bind="$ctrl.attestedEntityRef.name">
             </span>
             entries are correct.
         </div>

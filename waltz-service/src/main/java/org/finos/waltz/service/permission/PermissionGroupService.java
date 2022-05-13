@@ -1,7 +1,9 @@
 package org.finos.waltz.service.permission;
 
+import org.finos.waltz.data.permission.PermissionGroupDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.attestation.UserAttestationPermission;
 import org.finos.waltz.model.involvement.Involvement;
 import org.finos.waltz.model.permission_group.CheckPermissionCommand;
 import org.finos.waltz.model.permission_group.Permission;
@@ -110,4 +112,8 @@ public class PermissionGroupService {
         return required.isAllowed(existingInvolvements);
     }
 
+
+    public Set<UserAttestationPermission> findSupportedMeasurableCategoryAttestations(EntityReference ref, String userId) {
+        return permissionGroupDao.findSupportedMeasurableCategoryAttestations(ref, userId);
+    }
 }

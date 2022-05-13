@@ -43,18 +43,22 @@ function controller($q, serviceBroker) {
 
     const loadData = () => {
         const measurablesPromise = serviceBroker
-            .loadViewData(CORE_API.MeasurableStore.findMeasurablesBySelector,
+            .loadViewData(
+                CORE_API.MeasurableStore.findMeasurablesBySelector,
                 [mkSelectionOptions(vm.parentEntityRef)])
             .then(r => r.data);
 
         const measurableRatingsPromise = serviceBroker
-            .loadViewData(CORE_API.MeasurableRatingStore.findForEntityReference,
+            .loadViewData(
+                CORE_API.MeasurableRatingStore.findForEntityReference,
                 [vm.parentEntityRef],
                 {force: true})
             .then(r => r.data);
 
-        const ratingsPromise = serviceBroker.loadViewData(CORE_API.RatingSchemeStore.findRatingsForEntityAndMeasurableCategory,
-            [vm.parentEntityRef, vm.measurableCategoryRef.id])
+        const ratingsPromise = serviceBroker
+            .loadViewData(
+                CORE_API.RatingSchemeStore.findRatingsForEntityAndMeasurableCategory,
+                [vm.parentEntityRef, vm.measurableCategoryRef.id])
             .then(r => r.data);
 
         $q.all([measurablesPromise, measurableRatingsPromise, ratingsPromise])
@@ -62,9 +66,8 @@ function controller($q, serviceBroker) {
                 vm.measurables = _.filter(measurables, d => d.categoryId === vm.measurableCategoryRef.id);
                 vm.ratings = measurableRatings;
                 vm.ratingSchemeItems = ratingSchemeItems;
-            })
+            });
     };
-
 
     vm.$onChanges = (changes) => {
         if(vm.parentEntityRef && vm.measurableCategoryRef){

@@ -18,6 +18,7 @@
 
 
 import {remote} from "./remote";
+import {checkIsEntityRef} from "../common/checks";
 
 export function mkPermissionGroupStore() {
 
@@ -30,8 +31,20 @@ export function mkPermissionGroupStore() {
                 force);
     };
 
+
+    const findSupportedMeasurableCategoryAttestations = (ref, force = false) => {
+        return remote
+            .fetchViewList(
+                "GET",
+                `api/permission-group/entity-ref/${ref.kind}/${ref.id}/supported-attestations/measurable-category`,
+                null,
+                {force});
+    };
+
+
     return {
-        findByEntity
+        findByEntity,
+        findSupportedMeasurableCategoryAttestations
     };
 }
 
