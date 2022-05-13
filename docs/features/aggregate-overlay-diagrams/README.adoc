@@ -7,6 +7,7 @@ Aggregate overlay diagrams can be used to overlay dynamic data on top of static 
 Each underlying diagram defines a set of regions where data can be overlaid.
 There regions, known as _cells_, can have different information overlaid in them by cell renderers.
 
+<<<
 
 === Dynamic usage
 
@@ -35,8 +36,7 @@ Waltz 1.41 supports several overlays, including:
 .Overlay Types
 image::images/aggregate-overlay-diagram-overlay-types.png[Callout example]
 
-
-
+<<<
 === Instance Snapshots
 
 Aggregate Overlay Diagrams also support _instance snapshots_.
@@ -52,6 +52,7 @@ The example above shows an instance with the costs overlay and 3 callouts.
 Note that each callout can
 have a upper and lower color.
 
+<<<
 == Setup
 
 To create new diagrams you must provide a base image with placeholders to identify where the overlays and callouts will be placed.
@@ -66,7 +67,7 @@ In the above example we can see that a custom property is defined to identify:
 - (3) A region marked with the class `outer`:  _this defines the bounds of the cell, callouts are placed in the top left_
 - (4) A region marked with class `statistics-box`: _this should be a box with the ratio 3:1.  Overlays are placed here_
 
-
+<<<
 == Mapping Cells
 
 .Cell Mapping
@@ -77,6 +78,7 @@ Mapping cells to backing entities is not currently supported via the gui.
 Cells must be mapped directly in the database using the `aggregate_overlay_diagram_cell_data` table.
 However, mappings are visible using the _Backing Entities_ overlay.
 
+<<<
 == Technical
 
 === Table Structure

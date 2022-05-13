@@ -1,5 +1,5 @@
 <script>
-    export let type = "dflt";
+    export let type = "dflt"; // dflt | info | warning
 </script>
 
 <div class={type}>
