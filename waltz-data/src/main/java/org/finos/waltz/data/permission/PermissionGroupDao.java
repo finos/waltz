@@ -1,4 +1,4 @@
-package org.finos.waltz.service.permission;
+package org.finos.waltz.data.permission;
 
 import org.finos.waltz.data.measurable_category.MeasurableCategoryDao;
 import org.finos.waltz.model.EntityKind;
@@ -28,15 +28,15 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 @Repository
 public class PermissionGroupDao {
 
-    private final DSLContext dsl;
-
-
     private static final Set<Long> ALL_USERS_ALLOWED = asSet((Long) null);
+
+    private final DSLContext dsl;
 
 
     public PermissionGroupDao(DSLContext dsl) {
         this.dsl = dsl;
     }
+
 
     public Set<Permission> getPermissionsForEntityRef(EntityReference parentEntityRef) {
         return getPermissionsForEntityRef(parentEntityRef, DSL.trueCondition());

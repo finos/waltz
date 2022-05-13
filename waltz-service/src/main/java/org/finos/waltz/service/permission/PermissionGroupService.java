@@ -1,5 +1,6 @@
 package org.finos.waltz.service.permission;
 
+import org.finos.waltz.data.permission.PermissionGroupDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.attestation.UserAttestationPermission;
