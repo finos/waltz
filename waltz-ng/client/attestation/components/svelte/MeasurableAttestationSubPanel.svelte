@@ -19,8 +19,6 @@
         handleAction: ctx => dispatcher("attestationInitiated", ctx)
     };
 
-    let hasChanges = true;
-
     $: actions = _.compact([
         isAttestable ? attestMiniAction : null
     ]);
