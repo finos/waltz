@@ -18,6 +18,7 @@
 
 package org.finos.waltz.data.entity_relationship;
 
+import org.finos.waltz.model.ImmutableEntityReference;
 import org.finos.waltz.schema.tables.records.EntityRelationshipRecord;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.GenericSelector;
@@ -34,6 +35,7 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -68,18 +70,34 @@ public class EntityRelationshipDao {
             POSSIBLE_ENTITIES);
 
 
+    private static final Field<String> EXT_ID_A = InlineSelectFieldFactory.mkExternalIdField(
+            ENTITY_RELATIONSHIP.ID_A,
+            ENTITY_RELATIONSHIP.KIND_A,
+            POSSIBLE_ENTITIES);
+
+
+    private static final Field<String> EXT_ID_B = InlineSelectFieldFactory.mkExternalIdField(
+            ENTITY_RELATIONSHIP.ID_B,
+            ENTITY_RELATIONSHIP.KIND_B,
+            POSSIBLE_ENTITIES);
+
+
     private static final RecordMapper<Record, EntityRelationship> TO_DOMAIN_MAPPER = r -> {
         EntityRelationshipRecord record = r.into(ENTITY_RELATIONSHIP);
         return ImmutableEntityRelationship.builder()
                 .id(record.getId())
-                .a(mkRef(
-                        EntityKind.valueOf(record.getKindA()),
-                        record.getIdA(),
-                        r.get(NAME_A)))
-                .b(mkRef(
-                        EntityKind.valueOf(record.getKindB()),
-                        record.getIdB(),
-                        r.get(NAME_B)))
+                .a(ImmutableEntityReference.builder()
+                        .kind(EntityKind.valueOf(record.getKindA()))
+                        .id(record.getIdA())
+                        .name(r.get(NAME_A))
+                        .externalId(Optional.ofNullable(r.get(EXT_ID_A)))
+                        .build())
+                .b(ImmutableEntityReference.builder()
+                        .kind(EntityKind.valueOf(record.getKindB()))
+                        .id(record.getIdB())
+                        .name(r.get(NAME_B))
+                        .externalId(Optional.ofNullable(r.get(EXT_ID_B)))
+                        .build())
                 .provenance(record.getProvenance())
                 .relationship(record.getRelationship())
                 .description(record.getDescription())
@@ -153,6 +171,7 @@ public class EntityRelationshipDao {
         return dsl
                 .select(ENTITY_RELATIONSHIP.fields())
                 .select(NAME_A, NAME_B)
+                .select(EXT_ID_A, EXT_ID_B)
                 .from(ENTITY_RELATIONSHIP)
                 .where(ENTITY_RELATIONSHIP.ID.eq(id))
                 .fetchOne(TO_DOMAIN_MAPPER);
@@ -232,6 +251,7 @@ public class EntityRelationshipDao {
         return dsl
                 .select(ENTITY_RELATIONSHIP.fields())
                 .select(NAME_A, NAME_B)
+                .select(EXT_ID_A, EXT_ID_B)
                 .from(ENTITY_RELATIONSHIP)
                 .where(condition)
                 .fetch(TO_DOMAIN_MAPPER);

@@ -210,6 +210,7 @@ public class ChangeInitiativeService {
         return ImmutableAppGroupEntry.builder()
                 .id(ref.id())
                 .name(ref.name())
+                .externalId(ref.externalId())
                 .kind(ref.kind())
                 .provenance(provenance)
                 .description(ref.description())
