@@ -38,11 +38,6 @@ public class PermissionGroupDao {
     }
 
 
-    public Set<Permission> getPermissionsForEntityRef(EntityReference parentEntityRef) {
-        return getPermissionsForEntityRef(parentEntityRef, DSL.trueCondition());
-    }
-
-
     public Set<Permission> findPermissionsForEntityRefAndSubjectKind(EntityReference parentEntityRef, EntityKind subjectKind) {
         return getPermissionsForEntityRef(parentEntityRef, PERMISSION_GROUP_INVOLVEMENT.SUBJECT_KIND.eq(subjectKind.name()));
     }
