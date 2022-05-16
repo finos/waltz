@@ -13,7 +13,11 @@
 
     let qry;
 
-    $: actors = _.map($actorsCall?.data, d => Object.assign({}, d, {externalString: d.isExternal ? "External" : "Internal"}));
+    $: actors = _
+        .chain($actorsCall?.data)
+        .map(d => Object.assign({}, d, {externalString: d.isExternal ? "External" : "Internal"}))
+        .orderBy(d => _.toLower(d.name))
+        .value();
 
     $: actorList = _.isEmpty(qry)
         ? actors
@@ -36,7 +40,8 @@
     </div>
 </PageHeader>
 
-<div class="waltz-page-summary waltz-page-summary-attach">
+<div class="waltz-page-summary waltz-page-summary-attach"
+     style="margin-bottom: 5em;">
     <div class="waltz-display-section">
 
         <div class="row">
