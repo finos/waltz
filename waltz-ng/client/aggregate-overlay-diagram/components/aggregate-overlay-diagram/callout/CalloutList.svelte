@@ -57,20 +57,6 @@
             } else {
                 return determineCell(elem.parentElement)
             }
-
-        }
-    }
-
-    function determineGroup(elem) {
-        if (elem == null) {
-            return null;
-        } else {
-            const cellId = elem.getAttribute("data-group-id");
-            if (!_.isNil(cellId)) {
-                return elem;
-            } else {
-                return determineGroup(elem.parentElement)
-            }
         }
     }
 
@@ -81,13 +67,10 @@
 
                 const clickedElem = e.target;
                 const dataCell = determineCell(clickedElem);
-                const dataGroup = determineGroup(clickedElem);
 
                 $selectedCellId = dataCell !== null
                     ? dataCell.getAttribute("data-cell-id")
-                    : dataGroup !== null
-                        ? dataGroup.getAttribute("data-group-id")
-                        : null;
+                    : null;
 
                 if ($selectedCellId == null) {
                     return;
@@ -119,11 +102,9 @@
                 outers,
                 cell => {
                     const parent = cell.parentElement;
-                    const cellId = parent.getAttribute("data-cell-id");
-                    const groupId = parent.getAttribute("data-group-id");
-                    const targetId = cellId || groupId;
+                    const targetId = parent.getAttribute("data-cell-id");
 
-                    cell.setAttribute("style", `opacity: ${$selectedCellId === targetId
+                    cell.setAttribute("style", `opacity: ${!_.isNull($selectedCellId) && $selectedCellId === targetId
                         ? "0.7"
                         : "1"}`)
                 });

@@ -2,6 +2,7 @@
 
     import GroupRow from "./GroupRow.svelte";
     import {calcHeight} from "./overlay-diagram-builder-utils";
+    import CalloutBox from "./CalloutBox.svelte";
 
     export let dimensions;
     export let group;
@@ -10,20 +11,22 @@
 </script>
 
 {#if dimensions}
-<g class="entity-group-box"
-   data-group-id={group.id}>
+    <g class="entity-group-box"
+       data-cell-id={group.id}>
 
-    <g class="outer">
-        <rect width={dimensions.w}
-              {height}>
-        </rect>
-        <foreignObject width={dimensions.labelWidth}
-                       height={height}>
-            <div class="group-title">
-                {group.name}
-            </div>
-        </foreignObject>
-    </g>
+        <g class="outer">
+            <rect width={dimensions.w}
+                  {height}>
+            </rect>
+            <foreignObject width={dimensions.labelWidth}
+                           height={height}>
+                <div class="group-title">
+                    {group.name}
+                </div>
+            </foreignObject>
+            <CalloutBox width={dimensions.callout.width}
+                        height={dimensions.callout.height}/>
+        </g>
 
     <g transform={`translate(${dimensions.labelWidth})`}>
         {#each group.rows as row, idx}

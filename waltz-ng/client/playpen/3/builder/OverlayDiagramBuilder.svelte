@@ -18,6 +18,10 @@
             height: 120,
             labelHeight: 40,
             statsHeight: 50
+        },
+        callout: {
+            width: 30,
+            height: 30
         }
     };
 

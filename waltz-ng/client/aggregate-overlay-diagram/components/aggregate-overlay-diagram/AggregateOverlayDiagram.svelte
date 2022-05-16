@@ -31,19 +31,14 @@
         if (svgHolderElem && $callouts) {
             clearOverlayContent(svgHolderElem, ".outer");
 
-            const dataCell = svgHolderElem.querySelector(`.data-cell .outer`);
-            const dataCellBox = dataCell?.getBBox();
-
             setTimeout(
                 () => renderBulkOverlays(
                     svgHolderElem,
                     calloutsHolder,
-                    ".outer",
+                    ".callout-box",
                     (bBox, contentRef) => {
-                        const height = dataCellBox?.height || bBox.height
-                        const size = height * 0.25;
-                        contentRef.setAttribute("width", size);
-                        contentRef.setAttribute("height", size);
+                        contentRef.setAttribute("width", bBox.width);
+                        contentRef.setAttribute("height", bBox.height);
                     }),
                 100);
         }

@@ -43,12 +43,10 @@ export function renderBulkOverlays(svgHolderElem,
         .forEach(c => {
 
             const targetCellId = c.getAttribute("data-cell-id");
-            const targetGroupId = c.getAttribute("data-group-id");
 
             const targetCell = svgHolderElem.querySelector(`[data-cell-id='${targetCellId}'] ${targetSelector}`);
-            const targetGroup = svgHolderElem.querySelector(`[data-group-id='${targetGroupId}'] ${targetSelector}`);
 
-            if (!targetCell && !targetGroup) {
+            if (!targetCell) {
                 console.log("Cannot find target cell for cell-id", targetCellId);
                 return;
             }
@@ -60,18 +58,17 @@ export function renderBulkOverlays(svgHolderElem,
                 return;
             }
 
-            const target = targetCell ? targetCell : targetGroup;
 
             setContentSize(
-                target.getBBox(),
+                targetCell.getBBox(),
                 contentRef);
 
-            const existingContent = target.querySelector(".content");
+            const existingContent = targetCell.querySelector(".content");
 
             if (existingContent) {
-                target.replaceChild(contentRef, existingContent);
+                targetCell.replaceChild(contentRef, existingContent);
             } else {
-                target.append(contentRef);
+                targetCell.append(contentRef);
             }
         });
 }
