@@ -21,7 +21,7 @@
 
     $: actorList = _.isEmpty(qry)
         ? actors
-        : termSearch(actors, qry, ["name", "description", "externalString"])
+        : termSearch(actors, qry, ["name", "description", "externalString"]);
 
 </script>
 
