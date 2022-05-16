@@ -1,6 +1,5 @@
 <script>
     import {attestationInstanceStore} from "../../../svelte-stores/attestation-instance-store";
-    import Icon from "../../../common/svelte/Icon.svelte";
     import NoData from "../../../common/svelte/NoData.svelte";
     import {permissionGroupStore} from "../../../svelte-stores/permission-group-store";
     import {mkChunks} from "../../../common/list-utils";
@@ -17,7 +16,7 @@
 
     let chunkedCategories = [];
 
-    $: latestAttestationsCall = attestationInstanceStore.findLatestMeasurableAttestations(primaryEntityRef);
+    $: latestAttestationsCall = attestationInstanceStore.findLatestMeasurableAttestations(primaryEntityRef, true);
     $: supportedCategoriesCall = permissionGroupStore.findSupportedMeasurableCategoryAttestations(primaryEntityRef);
     $: chunkedCategories = mkChunks(
         mergeCategoriesWithLatestAttestations(
