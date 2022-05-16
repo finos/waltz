@@ -8,7 +8,8 @@
 
 {#each $callouts as c, idx}
     <div class="overlay-cell {c.cellExternalId}"
-         data-cell-id={c.cellExternalId}>
+         data-cell-id={c.cellExternalId}
+         data-group-id={c.cellExternalId}>
         <Callout callout={c}
                  label={idx + 1}/>
     </div>

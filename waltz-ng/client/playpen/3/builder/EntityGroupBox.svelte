@@ -12,17 +12,18 @@
 {#if dimensions}
 <g class="entity-group-box"
    data-group-id={group.id}>
-    <rect class="outer"
-          width={dimensions.w - (dimensions.padding + dimensions.group.padding) * 2}
-          {height}>
-    </rect>
 
-    <foreignObject width={dimensions.labelWidth}
-                   height={height}>
-        <div class="group-title">
-            {group.name}
-        </div>
-    </foreignObject>
+    <g class="outer">
+        <rect width={dimensions.w}
+              {height}>
+        </rect>
+        <foreignObject width={dimensions.labelWidth}
+                       height={height}>
+            <div class="group-title">
+                {group.name}
+            </div>
+        </foreignObject>
+    </g>
 
     <g transform={`translate(${dimensions.labelWidth})`}>
         {#each group.rows as row, idx}
@@ -36,16 +37,21 @@
 
 
 <style>
-    rect.outer {
+    .outer rect {
         stroke: #fff;
         stroke-width: 2;
+        background-color: white;
     }
 
     .group-title {
         font-weight: bolder;
         background-color: #0e2541;
         height: 100%;
-        padding: 1em;
+        padding: 0.5em;
         color: #f2f6f2;
+        border: solid 2px white;
+        display: -webkit-flex;
+        display: flex;
+        align-items: center;
     }
 </style>

@@ -25,7 +25,8 @@
 
 
 <g transform="translate(0, 10)">
-    <foreignObject width={cellWidth}
+    <foreignObject transform={`translate(${dimensions.cell.height * 0.25} 0)`}
+                   width={cellWidth - dimensions.cell.height * 0.5}
                    height={dimensions.cell.labelHeight}>
         <div class="cell-title">
             {cell.name}

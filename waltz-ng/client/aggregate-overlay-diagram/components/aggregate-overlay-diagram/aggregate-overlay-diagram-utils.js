@@ -38,32 +38,42 @@ export function renderBulkOverlays(svgHolderElem,
                                    setContentSize) {
 
     const cells = Array.from(overlayCellsHolder.querySelectorAll(".overlay-cell"));
-    cells.forEach(c => {
-        const targetCellId = c.getAttribute("data-cell-id");
 
-        const targetCell = svgHolderElem.querySelector(`[data-cell-id='${targetCellId}'] ${targetSelector}`);
-        if (!targetCell) {
-            console.log("Cannot find target cell for cell-id", targetCellId);
-            return;
-        }
+    cells
+        .forEach(c => {
 
-        const contentRef = c.querySelector(".content");
-        if (!contentRef) {
-            console.log("Cannot find content section for copying into the target box for cell-id", targetCellId);
-            return;
-        }
+            const targetCellId = c.getAttribute("data-cell-id");
+            const targetGroupId = c.getAttribute("data-group-id");
 
-        setContentSize(
-            targetCell.getBBox(),
-            contentRef);
+            const targetCell = svgHolderElem.querySelector(`[data-cell-id='${targetCellId}'] ${targetSelector}`);
+            const targetGroup = svgHolderElem.querySelector(`[data-group-id='${targetGroupId}'] ${targetSelector}`);
 
-        const existingContent = targetCell.querySelector(".content");
-        if (existingContent) {
-            targetCell.replaceChild(contentRef, existingContent);
-        } else {
-            targetCell.append(contentRef);
-        }
-    });
+            if (!targetCell && !targetGroup) {
+                console.log("Cannot find target cell for cell-id", targetCellId);
+                return;
+            }
+
+            const contentRef = c.querySelector(".content");
+
+            if (!contentRef) {
+                console.log("Cannot find content section for copying into the target box for cell-id", targetCellId);
+                return;
+            }
+
+            const target = targetCell ? targetCell : targetGroup;
+
+            setContentSize(
+                target.getBBox(),
+                contentRef);
+
+            const existingContent = target.querySelector(".content");
+
+            if (existingContent) {
+                target.replaceChild(contentRef, existingContent);
+            } else {
+                target.append(contentRef);
+            }
+        });
 }
 
 
