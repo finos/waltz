@@ -18,6 +18,7 @@
 
 import {AccessLogStore_API as AccessLogStore} from "../../access-log/service/access-log-store";
 import {ActorStore_API as ActorStore} from "../../actor/services/actor-store";
+import {AggregateOverlayDiagramInstanceStore_API as AggregateOverlayDiagramInstanceStore} from "../../aggregate-overlay-diagram/services/aggregate-overlay-diagram-instance-store";
 import {AliasStore_API as AliasStore} from "../../alias/services/alias-store";
 import {AllocationStore_API as AllocationStore} from "../../allocation/services/allocation-store";
 import {AllocationSchemeStore_API as AllocationSchemeStore} from "../../allocation-scheme/services/allocation-scheme-store";
@@ -119,6 +120,7 @@ import {VulnerabilityStore_API as VulnerabilityStore} from "../../software-catal
 export const CORE_API = {
     AccessLogStore,
     ActorStore,
+    AggregateOverlayDiagramInstanceStore,
     AliasStore,
     AllocationStore,
     AllocationSchemeStore,

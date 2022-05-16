@@ -20,8 +20,9 @@ import angular from "angular";
 import AggregateOverlayDiagramSection from "./components/section/aggregate-overlay-diagram-section.js"
 import InstanceView from "./pages/instance-view/overlay-diagram-instance-view.js"
 import DiagramList from "./pages/list/overlay-diagram-list.js"
-import {registerComponents} from "../common/module-utils";
+import {registerComponents, registerStores} from "../common/module-utils";
 import routes from "./routes";
+import AggregateOverlayDiagramInstanceStore from "./services/aggregate-overlay-diagram-instance-store";
 
 
 export default () => {
@@ -37,6 +38,11 @@ export default () => {
             InstanceView,
             DiagramList
         ]);
+
+    registerStores(
+        module,
+        [AggregateOverlayDiagramInstanceStore]
+    )
 
     return module.name;
 };
