@@ -1,5 +1,4 @@
 <script>
-
     import {selectedGrid} from "../report-grid-store";
     import {reportGridMemberStore} from "../../../../svelte-stores/report-grid-member-store";
     import {reportGridMember} from "../report-grid-utils";
@@ -14,7 +13,7 @@
     const Modes = {
         VIEW: "VIEW",
         CREATE: "CREATE"
-    }
+    };
 
     let activeMode = Modes.VIEW;
     let selectedMember = null;
@@ -31,7 +30,7 @@
         ? members
         : termSearch(members, qry, ["userId", "role"]);
 
-    $: encrichedMembersList = _.map(
+    $: enrichedMembersList = _.map(
         membersList,
         d => Object.assign({}, d, {person: _.find(people, p => p.email === d.userId)}));
 
@@ -48,7 +47,7 @@
         let updatePromise = reportGridMemberStore.updateRole($selectedGrid?.definition?.id, updateCmd);
 
         Promise.resolve(updatePromise)
-            .then(r => {
+            .then(() => {
                 toasts.success("Updated user role to:" + role)
                 reloadMembers();
                 activeMode = Modes.VIEW;
@@ -71,11 +70,12 @@
         }
 
         let deletePromise = reportGridMemberStore.deleteRole(reportGridMember);
-        Promise.resolve(deletePromise)
-            .then(r => {
+        return Promise
+            .resolve(deletePromise)
+            .then(() => {
                 reloadMembers();
                 selectedMember = null;
-            })
+            });
     }
 
     function cancel(){
@@ -95,13 +95,14 @@
 
         let createPromise = reportGridMemberStore.create(cmd);
 
-        Promise.resolve(createPromise)
-            .then(r => {
+        return Promise
+            .resolve(createPromise)
+            .then(() => {
                 toasts.success(`Successfully added ${p.name} as a subscriber to ${$selectedGrid?.definition.name} grid`);
                 reloadMembers();
                 activeMode = Modes.VIEW;
             })
-            .catch(e => toasts.error(`Could not add ${p.name} as a subscriber to this grid.` + e.error))
+            .catch(e => toasts.error(`Could not add ${p.name} as a subscriber to this grid.` + e.error));
     }
 
 </script>
@@ -128,12 +129,16 @@
                 </tr>
             </thead>
             <tbody>
-            {#each encrichedMembersList as member}
+            {#each enrichedMembersList as member}
                 <tr class="clickable"
                     class:selected={selectedMember?.userId === member?.userId}
                     on:click={() => selectMember(member)}>
-                    <td>{member?.person?.displayName}</td>
-                    <td>{reportGridMember[member.role].name}</td>
+                    <td class:memberInactive={member.person?.isRemoved}>
+                        {member.person?.displayName}
+                    </td>
+                    <td>
+                        {reportGridMember[member.role].name}
+                    </td>
                 </tr>
             {/each}
             <tr class="clickable"
@@ -165,5 +170,9 @@
 <style>
     .selected{
         background: #f3f9ff;
+    }
+
+    .memberInactive {
+        text-decoration: line-through;
     }
 </style>

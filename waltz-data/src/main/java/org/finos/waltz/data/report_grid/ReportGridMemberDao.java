@@ -116,8 +116,7 @@ public class ReportGridMemberDao {
         return dsl
                 .select(PERSON.fields())
                 .from(REPORT_GRID_MEMBER)
-                .innerJoin(PERSON).on(PERSON.EMAIL.eq(REPORT_GRID_MEMBER.USER_ID)
-                        .and(PERSON.IS_REMOVED.isFalse()))
+                .innerJoin(PERSON).on(PERSON.EMAIL.eq(REPORT_GRID_MEMBER.USER_ID))
                 .where(REPORT_GRID_MEMBER.GRID_ID.eq(gridId))
                 .fetchSet(PersonDao.personMapper);
     }
