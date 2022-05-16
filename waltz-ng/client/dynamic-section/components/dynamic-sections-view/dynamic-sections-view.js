@@ -15,10 +15,12 @@
  * See the License for the specific
  *
  */
-import { initialiseData } from "../../../common/index";
+import {initialiseData} from "../../../common/index";
 import {activeSections} from "../../section-store";
+import _ from "lodash";
 
 import template from "./dynamic-sections-view.html";
+import {dynamicSectionsByKind} from "../../dynamic-section-definitions";
 
 
 const bindings = {
@@ -36,6 +38,7 @@ function controller($scope) {
     const vm = initialiseData(this, initialState);
 
     const unsub = activeSections.subscribe(d => $scope.$applyAsync(() => {
+        vm.availableSections = _.get(dynamicSectionsByKind, d.pageKind, []);
         vm.sections = d.sections;
     }));
 
