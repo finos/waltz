@@ -53,9 +53,10 @@ export function renderBulkOverlays(svgHolderElem,
             return;
         }
 
-        setContentSize(
-            targetCell.getBBox(),
-            contentRef);
+        // console.log({targetCell})
+        // setContentSize(
+        //     targetCell.getBBox(),
+        //     contentRef);
 
         const existingContent = targetCell.querySelector(".content");
         if (existingContent) {

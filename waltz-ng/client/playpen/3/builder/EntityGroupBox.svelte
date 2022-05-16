@@ -13,6 +13,8 @@
 <g class="entity-group-box"
    data-group-id={group.id}>
     <rect class="outer"
+          stroke="#fff"
+          stroke-width="2"
           width={dimensions.w - (dimensions.padding + dimensions.group.padding) * 2}
           {height}>
     </rect>
@@ -20,7 +22,12 @@
     <foreignObject width={dimensions.labelWidth}
                    height={height}>
         <div class="group-title"
-             style={`background-color: ${group.headerColor || '#0e2541'}`}>
+             style={`
+                background-color: ${group.headerColor || '#0e2541'};
+                font-weight: bolder;
+                height: 100%;
+                padding: 1em;
+                color: #f2f6f2;`}>
             {group.name}
         </div>
     </foreignObject>
@@ -36,19 +43,3 @@
     </g>
 </g>
 {/if}
-
-
-<style>
-    rect.outer {
-        stroke: #fff;
-        stroke-width: 2;
-    }
-
-    .group-title {
-        font-weight: bolder;
-
-        height: 100%;
-        padding: 1em;
-        color: #f2f6f2;
-    }
-</style>
