@@ -218,25 +218,25 @@ public class AppGroupEndpoint implements Endpoint {
             return appGroupService.createNewGroup(userId);
         };
 
-        ListRoute<ChangeInitiative> addChangeInitiativeRoute = (request, response) -> {
+        ListRoute<AppGroupEntry> addChangeInitiativeRoute = (request, response) -> {
             long groupId = WebUtilities.getId(request);
             long changeInitiativeId = WebUtilities.readBody(request, Long.class);
-            LOG.info("Adding Change Initiative: {}, to group: {} ", changeInitiativeId,  groupId);
+            LOG.info("Adding Change Initiative: {}, to group: {} ", changeInitiativeId, groupId);
             return appGroupService.addChangeInitiative(WebUtilities.getUsername(request), groupId, changeInitiativeId);
         };
 
-        ListRoute<ChangeInitiative> removeChangeInitiativeRoute = (request, response) -> {
+        ListRoute<AppGroupEntry> removeChangeInitiativeRoute = (request, response) -> {
             long groupId = WebUtilities.getId(request);
             long changeInitiativeId = WebUtilities.getLong(request, "changeInitiativeId");
-            LOG.info("Removing Change Initiative: {}, from group: {} ", changeInitiativeId,  groupId);
+            LOG.info("Removing Change Initiative: {}, from group: {} ", changeInitiativeId, groupId);
             return appGroupService.removeChangeInitiative(WebUtilities.getUsername(request), groupId, changeInitiativeId);
         };
 
 
-        ListRoute<ChangeInitiative> addChangeInitiativeListRoute = (request, response) -> {
+        ListRoute<AppGroupEntry> addChangeInitiativeListRoute = (request, response) -> {
             long groupId = WebUtilities.getId(request);
             AppGroupBulkAddRequest appGroupBulkAddRequest = WebUtilities.readBody(request, AppGroupBulkAddRequest.class);
-            LOG.info("Adding change initiatives: {}, to group: {} ", appGroupBulkAddRequest.changeInitiativeIds(),  groupId);
+            LOG.info("Adding change initiatives: {}, to group: {} ", appGroupBulkAddRequest.changeInitiativeIds(), groupId);
             String userId = WebUtilities.getUsername(request);
             return appGroupService.addChangeInitiatives(
                     userId,
@@ -244,10 +244,10 @@ public class AppGroupEndpoint implements Endpoint {
                     appGroupBulkAddRequest.changeInitiativeIds());
         };
 
-        ListRoute<ChangeInitiative> removeChangeInitiativeListRoute = (request, response) -> {
+        ListRoute<AppGroupEntry> removeChangeInitiativeListRoute = (request, response) -> {
             long groupId = WebUtilities.getId(request);
             List<Long> changeInitiativeIds = WebUtilities.readIdsFromBody(request);
-            LOG.info("Removing change initiatives: {}, from group: {} ", changeInitiativeIds,  groupId);
+            LOG.info("Removing change initiatives: {}, from group: {} ", changeInitiativeIds, groupId);
             String userId = WebUtilities.getUsername(request);
             return appGroupService.removeChangeInitiatives(userId, groupId, changeInitiativeIds);
         };

@@ -32,7 +32,6 @@ import org.finos.waltz.data.orgunit.OrganisationalUnitDao;
 import org.finos.waltz.model.*;
 import org.finos.waltz.model.app_group.*;
 import org.finos.waltz.model.application.Application;
-import org.finos.waltz.model.change_initiative.ChangeInitiative;
 import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.entity_relationship.EntityRelationship;
@@ -352,7 +351,7 @@ public class AppGroupService {
     }
 
 
-    public Collection<ChangeInitiative> addChangeInitiative(
+    public List<AppGroupEntry> addChangeInitiative(
             String username,
             long groupId,
             long changeInitiativeId) throws InsufficientPrivelegeException {
@@ -367,13 +366,11 @@ public class AppGroupService {
                 EntityKind.CHANGE_INITIATIVE,
                 Operation.ADD);
 
-        return changeInitiativeService.findForSelector(mkOpts(
-                mkRef(EntityKind.APP_GROUP, groupId),
-                HierarchyQueryScope.EXACT));
+        return changeInitiativeService.findEntriesForAppGroup(groupId);
     }
 
 
-    public Collection<ChangeInitiative> removeChangeInitiative(
+    public List<AppGroupEntry> removeChangeInitiative(
             String username,
             long groupId,
             long changeInitiativeId) throws InsufficientPrivelegeException {
@@ -388,35 +385,31 @@ public class AppGroupService {
                 EntityKind.CHANGE_INITIATIVE,
                 Operation.REMOVE);
 
-        return changeInitiativeService.findForSelector(mkOpts(
-                mkRef(EntityKind.APP_GROUP, groupId),
-                HierarchyQueryScope.EXACT));
+        return changeInitiativeService.findEntriesForAppGroup(groupId);
     }
 
-    public Collection<ChangeInitiative> addChangeInitiatives(String userId, long groupId,
-                                                             List<Long> changeInitiativeIds) throws InsufficientPrivelegeException {
+    public List<AppGroupEntry> addChangeInitiatives(String userId, long groupId,
+                                                    List<Long> changeInitiativeIds) throws InsufficientPrivelegeException {
         verifyUserCanUpdateGroup(userId, groupId);
 
         entityRelationshipDao.saveAll(userId, groupId, changeInitiativeIds);
 
         List<ChangeLog> changeInitiativeChangeLogs = changeInitiativeIds
-        .stream()
-        .map(ci -> ImmutableChangeLog.builder()
-                .message(format("Associated change initiative: %d", ci))
-                .userId(userId)
-                .parentReference(ImmutableEntityReference.builder().id(groupId).kind(EntityKind.APP_GROUP).build())
+                .stream()
+                .map(ci -> ImmutableChangeLog.builder()
+                        .message(format("Associated change initiative: %d", ci))
+                        .userId(userId)
+                        .parentReference(ImmutableEntityReference.builder().id(groupId).kind(EntityKind.APP_GROUP).build())
                 .childKind(Optional.of(EntityKind.CHANGE_INITIATIVE))
                 .operation(Operation.ADD)
                 .build())
         .collect(Collectors.toList());
         changeLogService.write(changeInitiativeChangeLogs);
 
-        return changeInitiativeService.findForSelector(mkOpts(
-                mkRef(EntityKind.APP_GROUP, groupId),
-                HierarchyQueryScope.EXACT));
+        return changeInitiativeService.findEntriesForAppGroup(groupId);
     }
 
-    public Collection<ChangeInitiative> removeChangeInitiatives(String userId,
+    public List<AppGroupEntry> removeChangeInitiatives(String userId,
                                                        long groupId,
                                                        List<Long> changeInitiativeIds) throws InsufficientPrivelegeException {
         verifyUserCanUpdateGroup(userId, groupId);
@@ -436,9 +429,7 @@ public class AppGroupService {
 
         changeLogService.write(changeInitiativeChangeLogs);
 
-        return changeInitiativeService.findForSelector(mkOpts(
-                mkRef(EntityKind.APP_GROUP, groupId),
-                HierarchyQueryScope.EXACT));
+        return changeInitiativeService.findEntriesForAppGroup(groupId);
     }
 
 
