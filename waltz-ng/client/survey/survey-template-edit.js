@@ -44,7 +44,7 @@ See the documentation for a complete list of functions and their arguments.  Bel
 * \`hasDataType(name|extId)\`: returns whether the specified datatype (or a descendent) is in use by the app
 * \`hasInvolvement(roleName)\`: returns whether the subject entity has any involvement record with the given role name
 * \`hasLifecyclePhase(lifecyclePhase)\`: returns true of the given lifecycle phase matches the entities lifecycles phase. (PRODUCTION, DEVELOPMENT, CONCEPTUAL, RETIRED)
-* \`isAppKind(applicationKind)\`: returns true of the given app kind phase matches the application kind. ( IN&#95;HOUSE, INTERNALLY&#95;HOSTED, EXTERNALLY&#95;HOSTED, EUC, THIRD_PARTY, CUSTOMISED, EXTERNAL)
+* \`isAppKind(applicationKind)\`: returns true of the given app kind phase matches the application kind. ( IN&#95;HOUSE, INTERNALLY&#95;HOSTED, EXTERNALLY&#95;HOSTED, EUC, THIRD&#95;PARTY, CUSTOMISED, EXTERNAL)
 `;
 
 
