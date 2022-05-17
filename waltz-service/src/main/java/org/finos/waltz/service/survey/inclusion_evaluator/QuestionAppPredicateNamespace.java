@@ -75,7 +75,7 @@ public class QuestionAppPredicateNamespace extends QuestionEntityPredicateNamesp
     }
 
 
-    public boolean isKind(String name) {
+    public boolean isAppKind(String name) {
         return dsl.fetchExists(DSL
                 .select()
                 .from(APPLICATION)

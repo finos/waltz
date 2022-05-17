@@ -63,33 +63,41 @@
                 <div class="help-block">
                     Select the survey template to issue
                 </div>
-                <table class="table table-condensed small">
-                    <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th>Owner</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr ng-repeat="template in $ctrl.templates">
-                        <td>
-                            <a ng-click="$ctrl.onSelectTemplate(template)"
-                               class="clickable">
-                                <span ng-bind="template.name"></span>
-                            </a>
-                        </td>
-                        <td>
-                            <span ng-bind="template.description"></span>
-                        </td>
-                        <td>
-                            <waltz-entity-link tooltip-placement="left"
-                                               entity-ref="{ kind: 'PERSON', id: template.ownerId}">
-                            </waltz-entity-link>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+                <input type="search"
+                       class="form-control"
+                       ng-if="$ctrl.templates.length > 7"
+                       placeholder="Filter..."
+                       ng-model="$ctrl.templateQuery">
+                <div class="waltz-scroll-region-300">
+                    <table class="table table-condensed small">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Owner</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="template in $ctrl.templates | filter:$ctrl.templateQuery">
+                            <td>
+                                <a ng-click="$ctrl.onSelectTemplate(template)"
+                                   class="clickable">
+                                    <span ng-bind="template.name"></span>
+                                </a>
+                            </td>
+                            <td>
+                                <span ng-bind="template.description | truncateMiddle:100"></span>
+                            </td>
+                            <td>
+                                <waltz-entity-link tooltip-placement="left"
+                                                   entity-ref="{ kind: 'PERSON', id: template.ownerId}">
+                                </waltz-entity-link>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                </div>
 
                 <a ng-click="$ctrl.onDismissCreateForm()"
                    class="clickable">

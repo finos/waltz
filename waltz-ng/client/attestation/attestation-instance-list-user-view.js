@@ -106,7 +106,7 @@ function controller($q,
         const index = _.findIndex(instances, i => i.id === instance.id)
         const nextInstanceId =  _.get(instances, [index + 1, "id"]);
 
-        attest(serviceBroker, instance.parentEntity, instance.attestedEntityKind, instance.attestedEntityId)
+        return attest(serviceBroker, instance.parentEntity, instance.attestedEntityKind, instance.attestedEntityId)
             .then(() => loadData())
             .then(() => {
                 const remainingInstances = getInstancesForRun(vm.runsWithInstances, instance.attestationRunId);

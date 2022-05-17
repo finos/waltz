@@ -76,6 +76,7 @@ public enum EntityKind {
     RELATIONSHIP_KIND("Relationship Kind"),
     REPORT_GRID("Report Grid"),
     ROADMAP("Roadmap"),
+    ROLE("Role"),
     SCENARIO("Scenario"),
     SERVER("Server"),
     SERVER_USAGE("Server usage"),
