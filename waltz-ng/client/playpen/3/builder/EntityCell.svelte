@@ -1,6 +1,7 @@
 <script>
 
     import StatisticsBox from "./StatisticsBox.svelte";
+    import CalloutBox from "./CalloutBox.svelte";
 
     export let cell;
     export let cellWidth;
@@ -21,11 +22,14 @@
           height={dimensions.cell.height}
           fill={color}>
     </rect>
+    <CalloutBox width={dimensions.callout.width}
+                height={dimensions.callout.height}/>
 </g>
 
 
 <g transform="translate(0, 10)">
-    <foreignObject width={cellWidth}
+    <foreignObject transform={`translate(${dimensions.cell.height * 0.25} 0)`}
+                   width={cellWidth - dimensions.cell.height * 0.5}
                    height={dimensions.cell.labelHeight}>
         <div class="cell-title">
             {cell.name}

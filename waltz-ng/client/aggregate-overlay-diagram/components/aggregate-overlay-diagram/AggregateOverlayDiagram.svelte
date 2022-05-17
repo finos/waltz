@@ -35,11 +35,10 @@
                 () => renderBulkOverlays(
                     svgHolderElem,
                     calloutsHolder,
-                    ".outer",
+                    ".callout-box",
                     (bBox, contentRef) => {
-                        const size = bBox.height * 0.25;
-                        contentRef.setAttribute("width", size);
-                        contentRef.setAttribute("height", size);
+                        contentRef.setAttribute("width", bBox.width);
+                        contentRef.setAttribute("height", bBox.height);
                     }),
                 100);
         }
