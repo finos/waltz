@@ -57,7 +57,6 @@
             } else {
                 return determineCell(elem.parentElement)
             }
-
         }
     }
 
@@ -69,9 +68,9 @@
                 const clickedElem = e.target;
                 const dataCell = determineCell(clickedElem);
 
-                $selectedCellId = dataCell === null
-                    ? null
-                    : dataCell.getAttribute("data-cell-id");
+                $selectedCellId = dataCell !== null
+                    ? dataCell.getAttribute("data-cell-id")
+                    : null;
 
                 if ($selectedCellId == null) {
                     return;
@@ -103,8 +102,11 @@
                 outers,
                 cell => {
                     const parent = cell.parentElement;
-                    const cellId = parent.getAttribute("data-cell-id");
-                    cell.setAttribute("style", `opacity: ${$selectedCellId === cellId ? "0.7" : "1"}`)
+                    const targetId = parent.getAttribute("data-cell-id");
+
+                    cell.setAttribute("style", `opacity: ${!_.isNull($selectedCellId) && $selectedCellId === targetId
+                        ? "0.7"
+                        : "1"}`)
                 });
         }
     }

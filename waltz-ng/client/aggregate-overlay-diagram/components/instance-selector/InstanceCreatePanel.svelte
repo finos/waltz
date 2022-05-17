@@ -76,7 +76,7 @@
               placeholder="Description"
               bind:value={description}/>
     <div class="help-block">
-        Description
+        Description of this diagram instance
     </div>
 
 
