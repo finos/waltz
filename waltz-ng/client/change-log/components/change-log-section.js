@@ -18,7 +18,8 @@
 
 import {initialiseData} from "../../common";
 import {CORE_API} from "../../common/services/core-api-utils";
-import template from './change-log-section.html';
+import template from "./change-log-section.html";
+import {entity} from "../../common/services/enums/entity";
 
 
 const bindings = {
@@ -29,10 +30,24 @@ const bindings = {
 
 const initialState = {
     entries: [],
-    activeTab: "table"
+    activeTab: "table",
+    allowApplicationChangeCalendar: false
 };
 
 
+const allowedAppCalendarKinds = [
+    entity.APP_GROUP.key,
+    entity.ORG_UNIT.key,
+    entity.PROCESS_DIAGRAM.key,
+    entity.CHANGE_INITIATIVE.key,
+    entity.APPLICATION.key,
+    entity.MEASURABLE.key,
+    entity.FLOW_DIAGRAM.key,
+    entity.LOGICAL_DATA_FLOW.key,
+    entity.PHYSICAL_FLOW.key,
+    entity.PHYSICAL_SPECIFICATION.key,
+    entity.PERSON.key
+];
 
 
 function controller(serviceBroker) {
@@ -63,6 +78,7 @@ function controller(serviceBroker) {
     vm.$onChanges = (changes) => {
         if (vm.parentEntityRef || vm.userName) {
             loadEntries();
+            vm.allowApplicationChangeCalendar = _.includes(allowedAppCalendarKinds, vm.parentEntityRef.kind);
         }
     };
 

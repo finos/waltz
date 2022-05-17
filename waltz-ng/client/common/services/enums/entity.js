@@ -311,6 +311,13 @@ export const entity = {
         description: null,
         position: 235
     },
+    ROLE: {
+        key: "ROLE",
+        name: "Role",
+        icon: "key",
+        description: null,
+        position: 236
+    },
     SCENARIO: {
         key: "SCENARIO",
         name: "Scenario",

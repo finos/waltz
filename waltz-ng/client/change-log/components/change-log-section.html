@@ -30,14 +30,16 @@
             <span>Log</span>
         </label>
 
-        <input type="radio"
-               value="calendar"
-               ng-model="$ctrl.activeTab"
-               id="calendar">
-        <label class="wt-label"
-               for="calendar">
-            <span>Application Change Calendar</span>
-        </label>
+        <span ng-if="$ctrl.allowApplicationChangeCalendar">
+            <input type="radio"
+                   value="calendar"
+                   ng-model="$ctrl.activeTab"
+                   id="calendar">
+            <label class="wt-label"
+                   for="calendar">
+                <span>Application Change Calendar</span>
+            </label>
+        </span>
 
         <div class="wt-tab wt-active">
             <div ng-if="$ctrl.activeTab === 'calendar'"

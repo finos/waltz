@@ -37,7 +37,8 @@ const initialState = {
         issuanceKind: "GROUP",
         recipients: [],
         owningRole: null
-    }
+    },
+    templateQuery: null
 };
 
 
