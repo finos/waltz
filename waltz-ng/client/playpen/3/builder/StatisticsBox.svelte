@@ -3,9 +3,14 @@
     export let height;
 </script>
 
-<g class="statistics-box">
-    <rect {width}
-          {height}
-          fill="#eee">
-    </rect>
-</g>
+
+
+<foreignObject {width}
+               {height}
+               style="overflow-y: auto;
+                      overflow-x: clip;">
+    <div class="statistics-box"
+         style="background-color: #f2f6f2;">
+
+    </div>
+</foreignObject>

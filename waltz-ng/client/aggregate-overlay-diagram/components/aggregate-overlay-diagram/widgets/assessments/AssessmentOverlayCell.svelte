@@ -5,29 +5,33 @@
     export let cellData = [];
     export let maxCount = 0;
 
+    const rowHeight = 14;
+
     let counts = [];
     let y;
 
+
     $: counts = _.orderBy(cellData?.counts, c => c.rating.name);
+
+    $: height = Math.max(counts.length * rowHeight, 3 * rowHeight);
 
     $: y = scaleBand()
         .domain(counts.map(c => c.rating.id))
-        .range([0, 90])
-
+        .range([0, height])
 
     $:x = scaleLinear()
         .domain([0, maxCount])
-        .range([0, 90]);
+        .range([0, 30]);
 
-    $: rowHeight = y.bandwidth() > 30
-        ? 30
-        : y.bandwidth();
+
 
 </script>
 
 
-<svg class="content" viewBox="0 0 300 100">
-    <g transform="translate(10, 5)">
+<svg class="content"
+     width="300"
+     height={height + 10}>
+    <g transform="translate(0, 5)">
         {#each counts as r}
             <rect x="0"
                   y={y(r.rating.id)}
@@ -37,7 +41,7 @@
                   fill={r.rating.color}>
                 <title>{r.rating.name}</title>
             </rect>
-            <text dx="100"
+            <text dx="32"
                   dy={y(r.rating.id) + rowHeight - 4}
                   font-size={rowHeight - 1}
                   fill="#666">

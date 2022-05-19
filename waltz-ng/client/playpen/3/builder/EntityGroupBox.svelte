@@ -31,7 +31,9 @@
     <g transform={`translate(${dimensions.labelWidth})`}>
         {#each group.rows as row, idx}
             <g transform={`translate(0, ${calcHeight(idx, dimensions)})`}>
-                <GroupRow {row} {dimensions} {color}/>
+                <GroupRow {row}
+                          {dimensions}
+                          color={group.cellColor || color}/>
             </g>
         {/each}
     </g>
