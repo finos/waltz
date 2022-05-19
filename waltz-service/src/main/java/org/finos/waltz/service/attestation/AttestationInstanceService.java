@@ -241,7 +241,7 @@ public class AttestationInstanceService {
         CheckPermissionCommand checkPermissionCommand = ImmutableCheckPermissionCommand
                 .builder()
                 .parentEntityRef(createCommand.entityReference())
-                .subjectKind(EntityKind.ATTESTATION)
+                .operation(Operation.ATTEST)
                 .qualifierKind(createCommand.attestedEntityKind())
                 .qualifierId(createCommand.attestedEntityId())
                 .user(username)

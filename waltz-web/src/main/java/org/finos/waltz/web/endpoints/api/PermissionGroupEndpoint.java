@@ -19,6 +19,8 @@
 package org.finos.waltz.web.endpoints.api;
 
 
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.attestation.UserAttestationPermission;
 import org.finos.waltz.model.permission_group.Permission;
 import org.finos.waltz.service.permission.PermissionGroupService;
@@ -75,14 +77,16 @@ public class PermissionGroupEndpoint implements Endpoint {
 
         ListRoute<UserAttestationPermission> findSupportedMeasurableCategoryAttestationsRoute = ((request, response)
                 -> permissionGroupService.findSupportedMeasurableCategoryAttestations(
-                        getEntityReference(request),
-                        getUsername(request)));
+                getEntityReference(request),
+                getUsername(request)));
 
-        ListRoute<Permission> findPermissionsForSubjectKindRoute = (request, response)
-                -> permissionGroupService.findPermissionsForSubjectKind(
-                        getEntityReference(request),
-                        getKind(request, "subjectKind"),
-                        getUsername(request));
+        ListRoute<Permission> findPermissionsForSubjectKindRoute = (request, response) -> {
+            Operation operation = Operation.valueOf(request.params("operation"));
+            return permissionGroupService.findPermissionsForOperationOnEntityRef(
+                    getEntityReference(request),
+                    operation,
+                    getUsername(request));
+        };
 
         getForList(findByParentEntityRefPath, findByParentEntityRef);
         getForList(findPermissionsForSubjectKindPath, findPermissionsForSubjectKindRoute);

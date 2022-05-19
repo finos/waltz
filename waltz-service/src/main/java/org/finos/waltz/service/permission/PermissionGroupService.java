@@ -3,6 +3,7 @@ package org.finos.waltz.service.permission;
 import org.finos.waltz.data.permission.PermissionGroupDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.attestation.UserAttestationPermission;
 import org.finos.waltz.model.involvement.Involvement;
 import org.finos.waltz.model.permission_group.CheckPermissionCommand;
@@ -64,9 +65,9 @@ public class PermissionGroupService {
     }
 
 
-    public Set<Permission> findPermissionsForSubjectKind(EntityReference parentEntityRef,
-                                                         EntityKind subjectKind,
-                                                         String username) {
+    public Set<Permission> findPermissionsForOperationOnEntityRef(EntityReference parentEntityRef,
+                                                                  Operation operation,
+                                                                  String username) {
 
         Person person = personService.getPersonByUserId(username);
 
@@ -74,7 +75,7 @@ public class PermissionGroupService {
             return Collections.emptySet();
         }
 
-        Set<Permission> permissions = permissionGroupDao.findPermissionsForEntityRefAndSubjectKind(parentEntityRef, subjectKind);
+        Set<Permission> permissions = permissionGroupDao.findPermissionsForOperationOnEntityRef(parentEntityRef, operation);
 
         Set<Long> involvements = permissionGroupDao.findExistingInvolvementKindIdsForUser(parentEntityRef, username);
 

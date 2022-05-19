@@ -3,6 +3,7 @@ package org.finos.waltz.data.permission;
 import org.finos.waltz.data.measurable_category.MeasurableCategoryDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.attestation.ImmutableUserAttestationPermission;
 import org.finos.waltz.model.attestation.UserAttestationPermission;
 import org.finos.waltz.model.measurable_category.MeasurableCategory;
@@ -38,8 +39,8 @@ public class PermissionGroupDao {
     }
 
 
-    public Set<Permission> findPermissionsForEntityRefAndSubjectKind(EntityReference parentEntityRef, EntityKind subjectKind) {
-        return getPermissionsForEntityRef(parentEntityRef, PERMISSION_GROUP_INVOLVEMENT.SUBJECT_KIND.eq(subjectKind.name()));
+    public Set<Permission> findPermissionsForOperationOnEntityRef(EntityReference parentEntityRef, Operation operation) {
+        return getPermissionsForEntityRef(parentEntityRef, PERMISSION_GROUP_INVOLVEMENT.OPERATION.eq(operation.name()));
     }
 
 
@@ -49,7 +50,7 @@ public class PermissionGroupDao {
                 .or(PERMISSION_GROUP.IS_DEFAULT.isTrue());
 
         Map<Tuple3<String, String, Long>, List<Long>> permissionsForSubjectQualifier = dsl
-                .select(PERMISSION_GROUP_INVOLVEMENT.SUBJECT_KIND,
+                .select(PERMISSION_GROUP_INVOLVEMENT.OPERATION,
                         PERMISSION_GROUP_INVOLVEMENT.QUALIFIER_KIND,
                         PERMISSION_GROUP_INVOLVEMENT.QUALIFIER_ID,
                         INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_KIND_ID)
@@ -61,7 +62,7 @@ public class PermissionGroupDao {
                 .and(condition)
                 .fetchGroups(
                         r -> tuple(
-                                r.get(PERMISSION_GROUP_INVOLVEMENT.SUBJECT_KIND),
+                                r.get(PERMISSION_GROUP_INVOLVEMENT.OPERATION),
                                 r.get(PERMISSION_GROUP_INVOLVEMENT.QUALIFIER_KIND),
                                 r.get(PERMISSION_GROUP_INVOLVEMENT.QUALIFIER_ID)),
                         r -> r.get(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_KIND_ID));
@@ -82,7 +83,7 @@ public class PermissionGroupDao {
                     String qualifierKind = groupInfo.v2;
 
                     return ImmutablePermission.builder()
-                            .subjectKind(EntityKind.valueOf(groupInfo.v1))
+                            .operation(Operation.valueOf(groupInfo.v1))
                             .qualifierKind(qualifierKind == null ? null : EntityKind.valueOf(qualifierKind))
                             .qualifierId(Optional.ofNullable(groupInfo.v3))
                             .requiredInvolvementsResult(requiredInvolvementsResult)
@@ -95,7 +96,7 @@ public class PermissionGroupDao {
     public Set<Permission> getDefaultPermissions() {
 
         Map<Tuple3<String, String, Long>, List<Long>> permissionsForSubjectQualifier = dsl
-                .select(PERMISSION_GROUP_INVOLVEMENT.SUBJECT_KIND,
+                .select(PERMISSION_GROUP_INVOLVEMENT.OPERATION,
                         PERMISSION_GROUP_INVOLVEMENT.QUALIFIER_KIND,
                         PERMISSION_GROUP_INVOLVEMENT.QUALIFIER_ID,
                         INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_KIND_ID)
@@ -106,7 +107,7 @@ public class PermissionGroupDao {
                 .where(PERMISSION_GROUP.IS_DEFAULT.isTrue())
                 .fetchGroups(
                         r -> tuple(
-                                r.get(PERMISSION_GROUP_INVOLVEMENT.SUBJECT_KIND),
+                                r.get(PERMISSION_GROUP_INVOLVEMENT.OPERATION),
                                 r.get(PERMISSION_GROUP_INVOLVEMENT.QUALIFIER_KIND),
                                 r.get(PERMISSION_GROUP_INVOLVEMENT.QUALIFIER_ID)),
                         r -> r.get(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_KIND_ID));
@@ -125,7 +126,7 @@ public class PermissionGroupDao {
                             .build();
 
                     return ImmutablePermission.builder()
-                            .subjectKind(EntityKind.valueOf(groupInfo.v1))
+                            .operation(Operation.valueOf(groupInfo.v1))
                             .qualifierKind(EntityKind.valueOf(groupInfo.v2))
                             .qualifierId(Optional.ofNullable(groupInfo.v3))
                             .requiredInvolvementsResult(requiredInvolvementsResult)
@@ -169,7 +170,7 @@ public class PermissionGroupDao {
                 .leftJoin(INVOLVEMENT_GROUP).on(PERMISSION_GROUP_INVOLVEMENT.INVOLVEMENT_GROUP_ID.eq(INVOLVEMENT_GROUP.ID))
                 .leftJoin(INVOLVEMENT_GROUP_ENTRY).on(INVOLVEMENT_GROUP.ID.eq(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_GROUP_ID))
                 .where(groupCondition)
-                .and(PERMISSION_GROUP_INVOLVEMENT.SUBJECT_KIND.eq(permissionCommand.subjectKind().name()))
+                .and(PERMISSION_GROUP_INVOLVEMENT.OPERATION.eq(permissionCommand.operation().name()))
                 .and(qualifierKindCondition)
                 .and(qualifierIdCondition);
 
@@ -222,7 +223,7 @@ public class PermissionGroupDao {
                 .innerJoin(INVOLVEMENT_GROUP_ENTRY).on(INVOLVEMENT_GROUP.ID.eq(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_GROUP_ID))
                 .innerJoin(MEASURABLE_CATEGORY).on(MEASURABLE_CATEGORY.ID.eq(PERMISSION_GROUP_INVOLVEMENT.QUALIFIER_ID))
                 .leftJoin(PERMISSION_GROUP_ENTRY).on(specificApplicationPermissionGroupEntryJoinCondition)
-                .where(PERMISSION_GROUP_INVOLVEMENT.SUBJECT_KIND.eq(EntityKind.ATTESTATION.name()))
+                .where(PERMISSION_GROUP_INVOLVEMENT.OPERATION.eq(Operation.ATTEST.name()))
                 .and(PERMISSION_GROUP_INVOLVEMENT.QUALIFIER_KIND.eq(EntityKind.MEASURABLE_CATEGORY.name()))
                 .and(PERMISSION_GROUP.IS_DEFAULT.isTrue()
                         .or(PERMISSION_GROUP_ENTRY.PERMISSION_GROUP_ID.isNotNull()));
@@ -270,7 +271,6 @@ public class PermissionGroupDao {
                 categoryByInvKindsNeeded.entrySet(),
                 kv -> ImmutableUserAttestationPermission
                         .builder()
-                        .subjectKind(EntityKind.ATTESTATION)
                         .qualifierReference(kv.getKey().entityReference())
                         .hasPermission(hasIntersection(
                                 fromCollection(kv.getValue()),

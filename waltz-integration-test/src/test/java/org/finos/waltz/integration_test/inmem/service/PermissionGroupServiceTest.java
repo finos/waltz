@@ -6,12 +6,12 @@ import org.finos.waltz.integration_test.inmem.helpers.InvolvementHelper;
 import org.finos.waltz.integration_test.inmem.helpers.PersonHelper;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.permission_group.CheckPermissionCommand;
 import org.finos.waltz.model.permission_group.ImmutableCheckPermissionCommand;
 import org.finos.waltz.model.permission_group.Permission;
 import org.finos.waltz.schema.tables.records.*;
 import org.finos.waltz.service.permission.PermissionGroupService;
-import org.finos.waltz.service.person.PersonService;
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,14 +88,14 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
         String u1 = mkName(stem, "user1");
 
         assertEquals(emptySet(),
-                permissionGroupService.findPermissionsForSubjectKind(appA, EntityKind.ATTESTATION, u1),
+                permissionGroupService.findPermissionsForOperationOnEntityRef(appA, Operation.ATTEST, u1),
                 "if person does not exists, should return no permissions");
 
         Long u1Id = personHelper.createPerson(u1);
 
         long privKind = involvementHelper.mkInvolvementKind(mkName(stem, "privileged"));
 
-        Set<Permission> permissionsForSubjectKind = permissionGroupService.findPermissionsForSubjectKind(appA, EntityKind.ATTESTATION, u1);
+        Set<Permission> permissionsForSubjectKind = permissionGroupService.findPermissionsForOperationOnEntityRef(appA, Operation.ATTEST, u1);
 
         assertEquals(
                 asSet(EntityKind.LOGICAL_DATA_FLOW, EntityKind.PHYSICAL_FLOW, EntityKind.MEASURABLE_CATEGORY),
@@ -104,7 +104,7 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
 
         setupSpecificPermissionGroupForApp(appA, privKind);
 
-        Set<Permission> userHasNoExtraPermissions = permissionGroupService.findPermissionsForSubjectKind(appA, EntityKind.ATTESTATION, u1);
+        Set<Permission> userHasNoExtraPermissions = permissionGroupService.findPermissionsForOperationOnEntityRef(appA, Operation.ATTEST, u1);
 
         Map<EntityKind, Permission> permissionsByKind = indexBy(userHasNoExtraPermissions, Permission::qualifierKind);
 
@@ -113,7 +113,7 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
 
         involvementHelper.createInvolvement(u1Id, privKind, appA);
 
-        Set<Permission> withExtraPermissions = permissionGroupService.findPermissionsForSubjectKind(appA, EntityKind.ATTESTATION, u1);
+        Set<Permission> withExtraPermissions = permissionGroupService.findPermissionsForOperationOnEntityRef(appA, Operation.ATTEST, u1);
 
         assertEquals(
                 asSet(EntityKind.LOGICAL_DATA_FLOW, EntityKind.PHYSICAL_FLOW, EntityKind.MEASURABLE_CATEGORY),
@@ -126,7 +126,7 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
         return ImmutableCheckPermissionCommand
                 .builder()
                 .parentEntityRef(appA)
-                .subjectKind(EntityKind.ATTESTATION)
+                .operation(Operation.ATTEST)
                 .qualifierKind(EntityKind.LOGICAL_DATA_FLOW)
                 .user(u1)
                 .build();
@@ -157,7 +157,7 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
 
         PermissionGroupInvolvementRecord pgi = dsl.newRecord(PERMISSION_GROUP_INVOLVEMENT);
         pgi.setPermissionGroupId(pg.getId());
-        pgi.setSubjectKind(EntityKind.ATTESTATION.name());
+        pgi.setOperation(Operation.ATTEST.name());
         pgi.setQualifierKind(EntityKind.LOGICAL_DATA_FLOW.name());
         pgi.setInvolvementGroupId(ig.getId());
         pgi.insert();

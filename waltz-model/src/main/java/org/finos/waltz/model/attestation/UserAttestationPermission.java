@@ -9,7 +9,6 @@ import org.immutables.value.Value;
 @JsonSerialize(as=ImmutableUserAttestationPermission.class)
 public abstract class UserAttestationPermission {
 
-    public abstract EntityKind subjectKind();
     public abstract EntityReference qualifierReference();
 
     @Value.Default
