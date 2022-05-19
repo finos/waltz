@@ -85,11 +85,11 @@ public class PermissionGroupService {
 
     @Deprecated
     public boolean hasPermission(EntityReference entityReference,
-                                 EntityKind qualifierKind,
+                                 EntityKind subjectKind,
                                  String username) {
         return findPermissions(entityReference, username)
                 .stream()
-                .anyMatch(permission -> permission.qualifierKind().equals(qualifierKind));
+                .anyMatch(permission -> permission.subjectKind().equals(subjectKind));
     }
 
 

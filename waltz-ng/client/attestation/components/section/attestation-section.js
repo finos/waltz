@@ -185,7 +185,7 @@ function controller($q,
     vm.hasPermissionToAttest = (entityKind) => {
         return _.isEmpty(vm.permissions)
             ? false
-            : _.some(vm.permissions, p => p.qualifierKind === entityKind);
+            : _.some(vm.permissions, p => p.subjectKind === entityKind);
     };
 
     vm.onCancelAttestation = () => {

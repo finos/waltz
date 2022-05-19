@@ -55,6 +55,111 @@
 
     <changeSet id="20220518-6061-4"
                author="woodjes">
+        <addColumn tableName="permission_group_involvement">
+            <column name="parent_kind"
+                    type="${enum.type}"
+                    defaultValue="APPLICATION">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20220518-6061-5"
+               author="woodjes">
+        <dropDefaultValue tableName="permission_group_involvement"
+                          columnName="parent_kind"/>
+    </changeSet>
+
+    <changeSet id="20220518-6061-6"
+               author="woodjes">
+        <addColumn tableName="permission_group_involvement">
+            <column name="subject_kind"
+                    type="${enum.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20220518-6061-7"
+               author="woodjes">
+        <sql>
+            UPDATE permission_group_involvement
+            SET subject_kind = qualifier_kind
+            WHERE qualifier_kind != 'MEASURABLE_CATEGORY'
+        </sql>
+    </changeSet>
+
+    <changeSet id="20220518-6061-8"
+               author="woodjes">
+        <update tableName="permission_group_involvement">
+            <column name="subject_kind"
+                    value="MEASURABLE_RATING"/>
+            <where>qualifier_kind='MEASURABLE_CATEGORY'</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="20220518-6061-9"
+               author="woodjes">
+        <dropColumn tableName="permission_group_involvement"
+                    columnName="qualifier_kind">
+        </dropColumn>
+    </changeSet>
+
+    <changeSet id="20220518-6061-10"
+               author="woodjes">
+        <addColumn tableName="permission_group_involvement">
+            <column name="qualifier_kind"
+                    type="${enum.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20220518-6061-11"
+               author="woodjes">
+        <update tableName="permission_group_involvement">
+            <column name="qualifier_kind"
+                    value="MEASURABLE_CATEGORY"/>
+            <where>subject_kind='MEASURABLE_RATING'</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="20220518-6061-12"
+               author="woodjes">
+        <addColumn tableName="permission_group_involvement">
+            <column name="qualifier_id_2"
+                    type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20220518-6061-13"
+               author="woodjes">
+        <sql>
+            UPDATE permission_group_involvement
+            SET qualifier_id_2 = qualifier_id
+            WHERE qualifier_id IS NOT NULL
+        </sql>
+    </changeSet>
+
+    <changeSet id="20220518-6061-14"
+               author="woodjes">
+        <dropColumn tableName="permission_group_involvement"
+                    columnName="qualifier_id">
+        </dropColumn>
+    </changeSet>
+
+    <changeSet id="20220518-6061-15"
+               author="woodjes">
+        <renameColumn tableName="permission_group_involvement"
+                      oldColumnName="qualifier_id_2"
+                      columnDataType="${id.type}"
+                      newColumnName="qualifier_id"/>
+    </changeSet>
+
+    <changeSet id="20220518-6061-16"
+               author="woodjes">
         <setTableRemarks tableName="permission_group"
                          remarks="group describing the permissions different involvement kinds have against waltz entities"/>
         <setColumnRemarks tableName="permission_group"
@@ -91,17 +196,23 @@
                           columnName="permission_group_id"
                           remarks="identifier of the permission group this association is tied to"/>
         <setColumnRemarks tableName="permission_group_involvement"
-                          columnName="qualifier_id"
-                          remarks="identifier of the entity this involvement group is acting upon"/>
-        <setColumnRemarks tableName="permission_group_involvement"
-                          columnName="qualifier_kind"
-                          remarks="kind of entity this involvement group is acting upon"/>
-        <setColumnRemarks tableName="permission_group_involvement"
                           columnName="involvement_group_id"
                           remarks="identifier of the involvement group"/>
         <setColumnRemarks tableName="permission_group_involvement"
                           columnName="operation"
                           remarks="type of operation this involvement group is allowed to perform (one of: ADD, ATTEST, REMOVE, UPDATE, UNKNOWN)"/>
+        <setColumnRemarks tableName="permission_group_involvement"
+                          columnName="parent_kind"
+                          remarks="kind of the parent entity the change is related to e.g. APPLICATION"/>
+        <setColumnRemarks tableName="permission_group_involvement"
+                          columnName="subject_kind"
+                          remarks="kind of the entity the change acting upon e.g. MEASURABLE_RATING"/>
+        <setColumnRemarks tableName="permission_group_involvement"
+                          columnName="qualifier_id"
+                          remarks="identifier of the qualifier entity needed to specify a more specific permission"/>
+        <setColumnRemarks tableName="permission_group_involvement"
+                          columnName="qualifier_kind"
+                          remarks="kind of qualifier entity needed to specify a more specific permission e.g. MEASURABLE_CATEGORY"/>
 
         <setTableRemarks tableName="involvement_group"
                          remarks="collection of involvement kinds"/>

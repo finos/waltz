@@ -95,18 +95,18 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
 
         long privKind = involvementHelper.mkInvolvementKind(mkName(stem, "privileged"));
 
-        Set<Permission> permissionsForSubjectKind = permissionGroupService.findPermissionsForOperationOnEntityRef(appA, Operation.ATTEST, u1);
+        Set<Permission> permissionsForOperationOnEntityKind = permissionGroupService.findPermissionsForOperationOnEntityRef(appA, Operation.ATTEST, u1);
 
         assertEquals(
-                asSet(EntityKind.LOGICAL_DATA_FLOW, EntityKind.PHYSICAL_FLOW, EntityKind.MEASURABLE_CATEGORY),
-                map(permissionsForSubjectKind, Permission::qualifierKind),
+                asSet(EntityKind.LOGICAL_DATA_FLOW, EntityKind.PHYSICAL_FLOW, EntityKind.MEASURABLE_RATING),
+                map(permissionsForOperationOnEntityKind, Permission::subjectKind),
                 "u1 should have default permissions for all attestation qualifiers");
 
         setupSpecificPermissionGroupForApp(appA, privKind);
 
         Set<Permission> userHasNoExtraPermissions = permissionGroupService.findPermissionsForOperationOnEntityRef(appA, Operation.ATTEST, u1);
 
-        Map<EntityKind, Permission> permissionsByKind = indexBy(userHasNoExtraPermissions, Permission::qualifierKind);
+        Map<EntityKind, Permission> permissionsByKind = indexBy(userHasNoExtraPermissions, Permission::subjectKind);
 
         Permission logicalFlowPermission = permissionsByKind.get(EntityKind.LOGICAL_DATA_FLOW);
         assertNull(logicalFlowPermission, "u1 should have no permissions for data flows as doesn't have the all involvements required");
@@ -116,8 +116,8 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
         Set<Permission> withExtraPermissions = permissionGroupService.findPermissionsForOperationOnEntityRef(appA, Operation.ATTEST, u1);
 
         assertEquals(
-                asSet(EntityKind.LOGICAL_DATA_FLOW, EntityKind.PHYSICAL_FLOW, EntityKind.MEASURABLE_CATEGORY),
-                map(withExtraPermissions, Permission::qualifierKind),
+                asSet(EntityKind.LOGICAL_DATA_FLOW, EntityKind.PHYSICAL_FLOW, EntityKind.MEASURABLE_RATING),
+                map(withExtraPermissions, Permission::subjectKind),
                 "u1 should all permissions as they have the extra involvement required for logical flows");
     }
 
@@ -127,7 +127,9 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
                 .builder()
                 .parentEntityRef(appA)
                 .operation(Operation.ATTEST)
-                .qualifierKind(EntityKind.LOGICAL_DATA_FLOW)
+                .subjectKind(EntityKind.LOGICAL_DATA_FLOW)
+                .qualifierKind(null)
+                .qualifierId(null)
                 .user(u1)
                 .build();
     }
@@ -158,7 +160,8 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
         PermissionGroupInvolvementRecord pgi = dsl.newRecord(PERMISSION_GROUP_INVOLVEMENT);
         pgi.setPermissionGroupId(pg.getId());
         pgi.setOperation(Operation.ATTEST.name());
-        pgi.setQualifierKind(EntityKind.LOGICAL_DATA_FLOW.name());
+        pgi.setSubjectKind(EntityKind.LOGICAL_DATA_FLOW.name());
+        pgi.setParentKind(EntityKind.APPLICATION.name());
         pgi.setInvolvementGroupId(ig.getId());
         pgi.insert();
         return pg;

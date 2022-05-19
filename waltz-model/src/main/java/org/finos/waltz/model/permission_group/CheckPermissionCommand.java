@@ -16,6 +16,8 @@ public abstract class CheckPermissionCommand implements Command {
 
     public abstract Operation operation();
 
+    public abstract EntityKind subjectKind();
+
     @Nullable
     public abstract EntityKind qualifierKind();
 

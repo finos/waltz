@@ -54,13 +54,13 @@ public class PermissionGroupEndpoint implements Endpoint {
                 ":kind",
                 ":id");
 
-        String findPermissionsForSubjectKindPath = mkPath(
+        String findPermissionsForOperationOnEntityRefPath = mkPath(
                 BASE_URL,
                 "entity-ref",
                 ":kind",
                 ":id",
-                "subject-kind",
-                ":subjectKind");
+                "operation",
+                ":operation");
 
         String findSupportedMeasurableCategoryAttestationsPath = mkPath(
                 BASE_URL,
@@ -80,7 +80,7 @@ public class PermissionGroupEndpoint implements Endpoint {
                 getEntityReference(request),
                 getUsername(request)));
 
-        ListRoute<Permission> findPermissionsForSubjectKindRoute = (request, response) -> {
+        ListRoute<Permission> findPermissionsForOperationOnEntityRefRoute = (request, response) -> {
             Operation operation = Operation.valueOf(request.params("operation"));
             return permissionGroupService.findPermissionsForOperationOnEntityRef(
                     getEntityReference(request),
@@ -89,7 +89,7 @@ public class PermissionGroupEndpoint implements Endpoint {
         };
 
         getForList(findByParentEntityRefPath, findByParentEntityRef);
-        getForList(findPermissionsForSubjectKindPath, findPermissionsForSubjectKindRoute);
+        getForList(findPermissionsForOperationOnEntityRefPath, findPermissionsForOperationOnEntityRefRoute);
         getForList(findSupportedMeasurableCategoryAttestationsPath, findSupportedMeasurableCategoryAttestationsRoute);
     }
 
