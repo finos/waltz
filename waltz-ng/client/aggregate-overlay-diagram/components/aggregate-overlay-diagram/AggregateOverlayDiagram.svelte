@@ -1,9 +1,9 @@
 <script>
     import {
         renderBulkOverlays,
-        clearOverlayContent,
         addScrollers,
-        addCellClickHandlers
+        addCellClickHandlers,
+        clearContent
     } from "./aggregate-overlay-diagram-utils";
     import {entity} from "../../../common/services/enums/entity";
     import {getContext} from "svelte";
@@ -17,18 +17,14 @@
     $: {
         if (svgHolderElem && $overlayData) {
             if (primaryEntityRef.kind !== entity.AGGREGATE_OVERLAY_DIAGRAM_INSTANCE.key) {
-                clearOverlayContent(svgHolderElem, ".statistics-box");
+                clearContent(svgHolderElem, ".statistics-box");
             }
             setTimeout(
                 () => {
                     renderBulkOverlays(
                         svgHolderElem,
                         overlayCellsHolder,
-                        ".statistics-box",
-                        (bBox, contentRef) => {
-                            contentRef.setAttribute("width", bBox.width);
-                            contentRef.setAttribute("height", bBox.height);
-                        });
+                        ".statistics-box");
                     addScrollers(svgHolderElem);
                     addCellClickHandlers(svgHolderElem, selectedOverlay);
                 },
@@ -38,7 +34,7 @@
 
     $: {
         if (svgHolderElem && $callouts) {
-            clearOverlayContent(svgHolderElem, ".outer");
+            // clearContent(svgHolderElem, ".callout-box");
 
             setTimeout(
                 () => renderBulkOverlays(

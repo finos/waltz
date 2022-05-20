@@ -1,6 +1,6 @@
 import _ from "lodash";
 import {writable} from "svelte/store";
-import {getContext, setContext} from "svelte";
+import {setContext} from "svelte";
 import {
     amberHex,
     blueHex,
@@ -13,7 +13,7 @@ import {
     redHex, yellowHex
 } from "../../../common/colors";
 
-export function clearOverlayContent(svgHolderElem, targetSelector) {
+export function clearContent(svgHolderElem, targetSelector) {
     console.log("clearing")
     const existingContent = svgHolderElem.querySelectorAll(`${targetSelector} .content`);
     _.each(existingContent, elem => elem.parentNode.removeChild(elem));
@@ -83,21 +83,24 @@ export function renderBulkOverlays(svgHolderElem,
 
     cells
         .forEach(c => {
-
             const targetCellId = c.getAttribute("data-cell-id");
-
             const targetCell = svgHolderElem.querySelector(`[data-cell-id='${targetCellId}'] ${targetSelector}`);
+            const contentRef = c.querySelector(".content");
 
             if (!targetCell) {
                 console.log("Cannot find target cell for cell-id", targetCellId);
                 return;
             }
 
-            const contentRef = c.querySelector(".content");
-
             if (!contentRef) {
                 console.log("Cannot find content section for copying into the target box for cell-id", targetCellId);
                 return;
+            }
+
+            if (setContentSize) {
+                setContentSize(
+                    targetCell.getBBox(),
+                    contentRef);
             }
 
             const existingContent = targetCell.querySelector(".content");
