@@ -13,7 +13,7 @@
 
     $: counts = _.orderBy(cellData?.counts, c => c.rating.name);
 
-    $: height = Math.max(counts.length * rowHeight, 3 * rowHeight);
+    $: height = Math.max(counts.length * rowHeight, rowHeight);
 
     $: y = scaleBand()
         .domain(counts.map(c => c.rating.id))
@@ -22,8 +22,6 @@
     $:x = scaleLinear()
         .domain([0, maxCount])
         .range([0, 30]);
-
-
 
 </script>
 
