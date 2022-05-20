@@ -6,11 +6,8 @@
 
 
 <foreignObject {width}
-               {height}
-               style="overflow-y: auto;
-                      overflow-x: clip;">
+               {height}>
     <div class="statistics-box"
-         style="background-color: #f2f6f2;">
-
+         style="background-color: #f2f6f2; height: 100%">
     </div>
 </foreignObject>

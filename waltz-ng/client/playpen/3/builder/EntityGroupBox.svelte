@@ -1,42 +1,43 @@
 <script>
-
     import GroupRow from "./GroupRow.svelte";
     import {calcHeight} from "./overlay-diagram-builder-utils";
     import CalloutBox from "./CalloutBox.svelte";
 
     export let dimensions;
     export let group;
-    export let height = 200;
+    export let layoutData  = { height: 200 };
     export let color;
 </script>
 
 {#if dimensions}
-    <g class="entity-group-box"
-       data-cell-id={group.id}>
+<g class="entity-group-box outer"
+   transform={`translate(0 ${layoutData.dy})`}
+   data-cell-id={group.id}
+   data-cell-name={group.name}>
 
-        <g class="outer">
-            <rect width={dimensions.w}
-                  {height}>
-            </rect>
-            <foreignObject width={dimensions.labelWidth}
-                           height={height}>
-                <div class="group-title">
-                    {group.name}
-                </div>
-            </foreignObject>
-            <CalloutBox width={dimensions.callout.width}
-                        height={dimensions.callout.height}/>
+    <!-- GROUP HEADER -->
+    <rect width={dimensions.w}
+          height={layoutData.height}>
+    </rect>
+    <foreignObject width={dimensions.labelWidth}
+                   height={layoutData.height}>
+        <div class="group-title">
+            {group.name}
+        </div>
+    </foreignObject>
+
+    <!-- GROUP CALLOUT -->
+    <CalloutBox width={dimensions.callout.width}
+                height={dimensions.callout.height}/>
+
+    {#each group.rows as row, idx}
+        <!-- ROW -->
+        <g transform={`translate(${dimensions.labelWidth}, ${calcHeight(idx, dimensions)})`}>
+            <GroupRow {row}
+                      {dimensions}
+                      color={group.cellColor || color}/>
         </g>
-
-    <g transform={`translate(${dimensions.labelWidth})`}>
-        {#each group.rows as row, idx}
-            <g transform={`translate(0, ${calcHeight(idx, dimensions)})`}>
-                <GroupRow {row}
-                          {dimensions}
-                          color={group.cellColor || color}/>
-            </g>
-        {/each}
-    </g>
+    {/each}
 </g>
 {/if}
 

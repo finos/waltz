@@ -43,12 +43,10 @@
 
     <g>
         {#each data as block, idx}
-            <g transform={`translate(10, ${block.layoutData.dy})`}>
-                <EntityGroupBox height={ block.layoutData.height }
-                                {dimensions}
-                                color={groupColorScale(idx)}
-                                group={block}/>
-            </g>
+            <EntityGroupBox layoutData={ block.layoutData }
+                            {dimensions}
+                            color={groupColorScale(idx)}
+                            group={block}/>
         {/each}
     </g>
 

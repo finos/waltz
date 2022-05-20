@@ -15,19 +15,19 @@
 </script>
 
 
-<g class="outer">
-    <rect stroke="white"
-          stroke-width="5"
-          width={cellWidth}
-          height={dimensions.cell.height}
-          fill={color}>
-    </rect>
-    <CalloutBox width={dimensions.callout.width}
-                height={dimensions.callout.height}/>
-</g>
+<!-- CELL BACKGROUND -->
+<rect stroke="white"
+      stroke-width="5"
+      width={cellWidth}
+      height={dimensions.cell.height}
+      fill={color}>
+</rect>
 
+<CalloutBox width={dimensions.callout.width}
+            height={dimensions.callout.height}/>
 
 <g transform="translate(0, 10)">
+    <!-- CELL TITLE -->
     <foreignObject transform={`translate(${dimensions.cell.height * 0.25} 0)`}
                    width={cellWidth - dimensions.cell.height * 0.5}
                    height={dimensions.cell.labelHeight}>
@@ -35,12 +35,17 @@
             {cell.name}
         </div>
     </foreignObject>
+
+    <!-- STATS BOX -->
     <g transform={`translate(${cellWidth / 2 - (statBoxWidth / 2)}, ${dimensions.cell.labelHeight})`}>
         <StatisticsBox width={statBoxWidth}
                        height={dimensions.cell.statsHeight}>
         </StatisticsBox>
     </g>
 </g>
+
+
+
 
 
 <style>

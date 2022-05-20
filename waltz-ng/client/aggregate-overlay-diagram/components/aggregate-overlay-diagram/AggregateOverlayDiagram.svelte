@@ -1,5 +1,10 @@
 <script>
-    import {renderBulkOverlays, clearOverlayContent} from "./aggregate-overlay-diagram-utils";
+    import {
+        renderBulkOverlays,
+        clearOverlayContent,
+        addScrollers,
+        addCellClickHandlers
+    } from "./aggregate-overlay-diagram-utils";
     import {entity} from "../../../common/services/enums/entity";
     import {getContext} from "svelte";
     import BulkCallouts from "./callout/BulkCallouts.svelte";
@@ -15,14 +20,18 @@
                 clearOverlayContent(svgHolderElem, ".statistics-box");
             }
             setTimeout(
-                () => renderBulkOverlays(
-                    svgHolderElem,
-                    overlayCellsHolder,
-                    ".statistics-box",
-                    (bBox, contentRef) => {
-                        contentRef.setAttribute("width", bBox.width);
-                        contentRef.setAttribute("height", bBox.height);
-                    }),
+                () => {
+                    renderBulkOverlays(
+                        svgHolderElem,
+                        overlayCellsHolder,
+                        ".statistics-box",
+                        (bBox, contentRef) => {
+                            contentRef.setAttribute("width", bBox.width);
+                            contentRef.setAttribute("height", bBox.height);
+                        });
+                    addScrollers(svgHolderElem);
+                    addCellClickHandlers(svgHolderElem, selectedOverlay);
+                },
                 100);
         }
     }
@@ -49,11 +58,12 @@
     let overlayData = getContext("overlayData");
     let widget = getContext("widget");
     let callouts = getContext("callouts");
+    let selectedOverlay = getContext("selectedOverlay");
+    let svgDetail = getContext("svgDetail");
 
     let overlayCellsHolder;
     let calloutsHolder;
 
-    let svgDetail = getContext("svgDetail");
 
     $: {
         if (svgHolderElem) {

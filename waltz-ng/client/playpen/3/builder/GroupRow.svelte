@@ -8,17 +8,18 @@
 
     const rowWidth = dimensions.w - dimensions.labelWidth;
 
-
     const cellWidth = rowWidth / row.length;
 </script>
 
 
-<g>
-    {#each row as cell, idx}
-        <g transform={`translate(${idx * cellWidth})`}
-           class="data-cell"
-           data-cell-id={cell.id}>
-            <EntityCell {cell} {cellWidth} {dimensions} {color}/>
-        </g>
-    {/each}
-</g>
+{#each row as cell, idx}
+    <g transform={`translate(${idx * cellWidth})`}
+       class="data-cell"
+       data-cell-id={cell.id}
+       data-cell-name={cell.name}>
+        <EntityCell {cell}
+                    {cellWidth}
+                    {dimensions}
+                    {color}/>
+    </g>
+{/each}

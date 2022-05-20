@@ -30,6 +30,7 @@
 
 <svg class="content"
      width="300"
+     style="background: white"
      height={height + 10}>
     <g transform="translate(0, 5)">
         {#each counts as r}

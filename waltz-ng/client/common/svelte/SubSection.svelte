@@ -51,7 +51,7 @@
             transition: font-weight ease-in 0.3s;
         }
 
-        &:hover .wss-name {
+        &:hover .name {
             font-weight: bolder;
         }
     }
