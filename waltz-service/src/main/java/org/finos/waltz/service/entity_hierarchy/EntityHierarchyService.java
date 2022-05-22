@@ -221,7 +221,7 @@ public class EntityHierarchyService {
                 .id(nodeId)
                 .parentId(nodeId)
                 .ancestorLevel(level == null ? -1 : level)
-                .descendantLevel(idToLevel.get(node.getId()))
+                .descendantLevel(idToLevel.getOrDefault(node.getId(), -1))
                 .kind(kind)
                 .build();
         return Stream.of(selfAsEntityHierarchyItem);

@@ -380,17 +380,19 @@ public class FlowClassificationRuleDao {
         Field<Long> applicationIdField = APPLICATION.ID.as("application_id");
         Field<String> applicationNameField = APPLICATION.NAME.as("application_name");
 
-        Result<Record3<Long, Long, String>> records = dsl
+        SelectSeekStep2<Record3<Long, Long, String>, Long, String> qry = dsl
                 .select(classificationRuleIdField,
                         applicationIdField,
                         applicationNameField)
                 .from(LOGICAL_FLOW)
                 .innerJoin(LOGICAL_FLOW_DECORATOR).on(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID))
-                .innerJoin(FLOW_CLASSIFICATION).on(flowClassificationRuleJoin)
+                .innerJoin(FLOW_CLASSIFICATION_RULE).on(flowClassificationRuleJoin)
                 .innerJoin(ENTITY_HIERARCHY).on(hierarchyJoin)
                 .innerJoin(APPLICATION).on(appJoin)
                 .where(condition)
-                .orderBy(FLOW_CLASSIFICATION_RULE.ID, APPLICATION.NAME)
+                .orderBy(FLOW_CLASSIFICATION_RULE.ID, APPLICATION.NAME);
+
+        Result<Record3<Long, Long, String>> records = qry
                 .fetch();
 
         return groupBy(
