@@ -18,14 +18,12 @@
 
 import {initialiseData} from "../../common/index";
 import template from "./playpen3.html";
-import {CORE_API} from "../../common/services/core-api-utils";
 import FlowVenn from "../../logical-flow/svelte/flow-venn/FlowVenn.svelte";
 import OverlayDiagramBuilder from "./builder/OverlayDiagramBuilder.svelte";
 import configA from "./builder/front-to-back-trade-data";
 import configB from "./builder/front-to-back-operations-data";
 import configC from "./builder/north-star";
 import configD from "./builder/process-diag";
-import epm from "./builder/epm-taxonomy";
 
 const initialState = {
     b: {
@@ -48,10 +46,6 @@ const initialState = {
 
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
-
-    global.epm = epm;
-    global.groups = configD;
-
 }
 
 controller.$inject = [
