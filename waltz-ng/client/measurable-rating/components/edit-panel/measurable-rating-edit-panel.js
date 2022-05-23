@@ -96,10 +96,11 @@ function controller($q,
         const hasNoRatings = vm.ratings.length === 0;
         const showAllCategories = hasNoRatings || vm.visibility.showAllCategories;
         const allTabs = mkTabs(vm, showAllCategories);
-        vm.tabs = _.filter(allTabs, t => _.includes(vm.userRoles, t.category.ratingEditorRole) || _.includes(vm.editableCategoriesForUser, t.category.id));
+        vm.tabs = _.filter(allTabs, t => t.category.editable
+            && (_.includes(vm.userRoles, t.category.ratingEditorRole) || _.includes(vm.editableCategoriesForUser, t.category.id)));
         vm.hasHiddenTabs = vm.categories.length !== allTabs.length;
         if (vm.activeTab) {
-            const ratingSchemeItems =  vm.activeTab.ratingSchemeItems;
+            const ratingSchemeItems = vm.activeTab.ratingSchemeItems;
             vm.activeTab = _.find(vm.tabs, t => t.category.id === vm.activeTab.category.id);
             vm.activeTab.ratingSchemeItems = ratingSchemeItems;
         }
@@ -316,6 +317,7 @@ function controller($q,
             : doRatingSave(r, getDescription())
                 .then(() => toasts.success(`Saved: ${vm.selected.measurable.name}`))
                 .catch(e => {
+                    deselectMeasurable()
                     displayError("Could not save rating", e);
                     throw e;
                 })
@@ -356,21 +358,23 @@ function controller($q,
     vm.onTabChange = () => {
         deselectMeasurable();
 
-        if(_.isUndefined(vm.activeTab)){
+        if (_.isUndefined(vm.activeTab)) {
             vm.activeTab = _.first(vm.tabs);
         }
 
-        serviceBroker
-            .loadViewData(
-                CORE_API.RatingSchemeStore.findRatingsForEntityAndMeasurableCategory,
-                [vm.parentEntityRef, vm.activeTab.category.id])
-            .then(r => {
-                vm.activeTab.ratingSchemeItems = r.data;
-                vm.onKeypress = mkRatingsKeyHandler(
-                    vm.activeTab.ratingSchemeItems,
-                    vm.onRatingSelect,
-                    vm.doCancel);
-            });
+        if (vm.activeTab) {
+            serviceBroker
+                .loadViewData(
+                    CORE_API.RatingSchemeStore.findRatingsForEntityAndMeasurableCategory,
+                    [vm.parentEntityRef, vm.activeTab.category.id])
+                .then(r => {
+                    vm.activeTab.ratingSchemeItems = r.data;
+                    vm.onKeypress = mkRatingsKeyHandler(
+                        vm.activeTab.ratingSchemeItems,
+                        vm.onRatingSelect,
+                        vm.doCancel);
+                });
+        }
     };
 
     vm.onShowAllTabs = () => {
