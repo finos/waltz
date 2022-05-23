@@ -169,77 +169,72 @@ const cells = {
     }
 };
 
-const IB = "IB";
-const PB = "PB";
-const CB = "CB";
-const TSY_MKT = "TSY_MKT";
-
 
 const deliverCells = {
     "PROVIDE_RESEARCH_SERVICES": {
         "id": "PROVIDE_RESEARCH_SERVICES",
-        relevance: [IB],
-        "name": "Provide Research Services [IB]"
+        relevance: [],
+        "name": "Provide Research Services "
     },
     "PROVIDE_OPERATIONS_SERVICES": {
         "id": "PROVIDE_OPERATIONS_SERVICES",
-        relevance: [IB, CB, TSY_MKT],
-        "name": "Provide Operations Services [IB, CB, Tsy Mkt]"
+        relevance: [],
+        "name": "Provide Operations Services "
     },
     "PROVIDE_FINANCING": {
         "id": "PROVIDE_FINANCING",
-        relevance: [IB],
-        "name": "Provide Financing [IB]"
+        relevance: [],
+        "name": "Provide Financing "
     },
     "PERFORM_STRUCTURING": {
         "id": "PERFORM_STRUCTURING",
-        relevance: [IB],
-        "name": "Perform Structuring [IB]"
+        relevance: [],
+        "name": "Perform Structuring "
     },
     "PERFORM_MANDA": {
         "id": "PERFORM_MANDA",
-        relevance: [IB],
-        "name": "Perform M&A [IB]"
+        relevance: [],
+        "name": "Perform M&A "
     },
     "PERFORM_SALES": {
         "id": "PERFORM_SALES",
-        relevance: [IB, CB],
-        "name": "Perform Sales [IB, CB]"
+        relevance: [],
+        "name": "Perform Sales "
     },
     "PROVIDE_RETAIL_BANKING_SERVICES": {
         "id": "PROVIDE_RETAIL_BANKING_SERVICES",
-        relevance: [PB],
-        "name": "Provide Retail Banking Services [PB]"
+        relevance: [],
+        "name": "Provide Retail Banking Services "
     },
     "PROVIDE_FUNDS_SERVICES": {
         "id": "PROVIDE_FUNDS_SERVICES",
-        relevance: [CB],
-        "name": "Provide Funds Services [CB]"
+        relevance: [],
+        "name": "Provide Funds Services "
     },
     "CLIENT_ADVISORY": {
         "id": "CLIENT_ADVISORY",
-        relevance: [PB],
-        "name": "Client Advisory [PB]"
+        relevance: [],
+        "name": "Client Advisory "
     },
     "PERFORM_CUSTODY_SERVICES": {
         "id": "PERFORM_CUSTODY_SERVICES",
-        relevance: [CB, PB],
-        "name": "Perform Custody Services [CB, PB]"
+        relevance: [],
+        "name": "Perform Custody Services "
     },
     "PORTFOLIO_MANAGEMENT": {
-        "id": "PORTFOLIO_MANAGEMENT_[PB]",
-        relevance: [PB],
-        "name": "Portfolio Management [PB]"
+        "id": "PORTFOLIO_MANAGEMENT_",
+        relevance: [],
+        "name": "Portfolio Management "
     },
     "PROVIDE_TRADE_SOLUTION_SERVICES": {
-        "id": "PROVIDE_TRADE_SOLUTION_SERVICES_[CB]",
-        relevance: [CB],
-        "name": "Provide Trade Solution Services [CB]"
+        "id": "PROVIDE_TRADE_SOLUTION_SERVICES_",
+        relevance: [],
+        "name": "Provide Trade Solution Services "
     },
     "POSTAL_SERVICES": {
         "id": "POSTAL_SERVICES",
-        relevance: [PB],
-        "name": "Postal Services [PB]"
+        relevance: [],
+        "name": "Postal Services "
     }
 }
 
