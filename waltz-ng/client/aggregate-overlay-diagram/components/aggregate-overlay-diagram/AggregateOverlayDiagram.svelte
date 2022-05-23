@@ -1,34 +1,54 @@
 <script>
     import {
         renderBulkOverlays,
-        addScrollers,
         addCellClickHandlers,
         clearContent
     } from "./aggregate-overlay-diagram-utils";
-    import {entity} from "../../../common/services/enums/entity";
     import {getContext} from "svelte";
     import BulkCallouts from "./callout/BulkCallouts.svelte";
+    import _ from "lodash";
 
     export let svg = "";
-    export let primaryEntityRef;
 
     let svgHolderElem;
 
     $: {
-        if (svgHolderElem && $overlayData) {
-            if (primaryEntityRef.kind !== entity.AGGREGATE_OVERLAY_DIAGRAM_INSTANCE.key) {
-                clearContent(svgHolderElem, ".statistics-box");
-            }
-            setTimeout(
-                () => {
-                    renderBulkOverlays(
-                        svgHolderElem,
-                        overlayCellsHolder,
-                        ".statistics-box");
-                    addScrollers(svgHolderElem);
-                    addCellClickHandlers(svgHolderElem, selectedOverlay);
-                },
-                100);
+        if (svgHolderElem && $overlayData && $widget?.overlay) {
+            const cellDataByCellExtId = _.keyBy(
+                $overlayData,
+                d => d.cellExternalId);
+
+            clearContent(svgHolderElem, ".statistics-box");
+
+            const globalProps = $widget.mkGlobalProps($overlayData);
+
+            const propsByCellId = Array
+                .from(svgHolderElem.querySelectorAll(".data-cell"))
+                .map(cell => {
+                    const sb = cell.querySelector(".statistics-box");
+                    const cellId = cell.getAttribute("data-cell-id");
+                    const cellProps = Object.assign(
+                        {},
+                        globalProps,
+                        { cellData: cellDataByCellExtId[cellId]} );
+
+                    const component = $widget.overlay;
+
+                    new component({
+                        target: sb,
+                        props: cellProps
+                    });
+
+                    return {cellId, cellProps}
+                })
+                .reduce(
+                    (acc, d) => {
+                        acc[d.cellId] = d.cellProps;
+                        return acc;
+                    },
+                    {});
+
+            addCellClickHandlers(svgHolderElem, selectedOverlay, propsByCellId);
         }
     }
 
@@ -57,7 +77,6 @@
     let selectedOverlay = getContext("selectedOverlay");
     let svgDetail = getContext("svgDetail");
 
-    let overlayCellsHolder;
     let calloutsHolder;
 
 
@@ -82,19 +101,8 @@
     </div>
 {/key}
 
-{#key $widget}
-    <div class="rendered-widgets"
-         bind:this={overlayCellsHolder}>
-        <svelte:component this={$widget}/>
-    </div>
-{/key}
-
 
 <style>
-    .rendered-widgets {
-        display: none;
-    }
-
     .rendered-callouts {
         display: none;
     }

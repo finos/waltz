@@ -16,7 +16,7 @@
     $: {
         if ($selectedDiagram) {
             overlayDataCall = aggregateOverlayDiagramStore.findBackingEntitiesForDiagram($selectedDiagram.id);
-            $widget = BackingEntitiesWidget;
+            $widget = BackingEntitiesOverlayCell;
         }
     }
 

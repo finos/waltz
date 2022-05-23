@@ -1,21 +1,29 @@
 <script>
     import {getContext} from "svelte";
 
-    const selectedOverlay = getContext("selectedOverlay");
+    const selectedOverlayCell = getContext("selectedOverlay");
+    const widget = getContext("widget");
 
     let overlayHolder;
 
     $: {
-        if (overlayHolder) {
+        if (overlayHolder && $widget) {
             overlayHolder.innerHTML = "";
-            if ($selectedOverlay?.svg) {
-                overlayHolder.appendChild($selectedOverlay.svg.cloneNode(true));
+            if ($selectedOverlayCell?.props) {
+
+                const component = $widget.overlay;
+
+                new component({
+                    target: overlayHolder,
+                    props: Object.assign({}, $selectedOverlayCell.props, {isContext: true})
+                });
+
             }
         }
     }
 </script>
 
-{#if $selectedOverlay}
-    <h3>{$selectedOverlay?.cellName}</h3>
+{#if $selectedOverlayCell}
+    <h4>{$selectedOverlayCell?.cellName}</h4>
 {/if}
 <div bind:this={overlayHolder}></div>

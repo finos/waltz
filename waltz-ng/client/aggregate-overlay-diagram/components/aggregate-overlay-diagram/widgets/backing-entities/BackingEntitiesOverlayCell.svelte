@@ -7,7 +7,7 @@
 
     let references = [];
 
-    $: references = cellData?.backingEntityReferences;
+    $: references = cellData?.backingEntityReferences || [];
 
     $: height = references.length * 20;
 

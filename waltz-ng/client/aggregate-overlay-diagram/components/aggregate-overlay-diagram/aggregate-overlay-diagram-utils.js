@@ -14,7 +14,6 @@ import {
 } from "../../../common/colors";
 
 export function clearContent(svgHolderElem, targetSelector) {
-    console.log("clearing")
     const existingContent = svgHolderElem.querySelectorAll(`${targetSelector} .content`);
     _.each(existingContent, elem => elem.parentNode.removeChild(elem));
 }
@@ -23,12 +22,13 @@ export function clearContent(svgHolderElem, targetSelector) {
 /**
  * Adds click handlers to all `.data-cell` elements.  The
  * click handler simply puts the cell id, name and any .stats svg
- * into the selectedOverlayStore.
+ * into the selectedOverlayCellStore.
  *
  * @param svgHolderElem
- * @param selectedOverlayStore
+ * @param selectedOverlayCellStore
+ * @param propsByCellId
  */
-export function addCellClickHandlers(svgHolderElem, selectedOverlayStore) {
+export function addCellClickHandlers(svgHolderElem, selectedOverlayCellStore, propsByCellId) {
     Array
         .from(svgHolderElem.querySelectorAll(".data-cell"))
         .forEach(sb => {
@@ -36,7 +36,7 @@ export function addCellClickHandlers(svgHolderElem, selectedOverlayStore) {
                 const cellId = sb.getAttribute("data-cell-id");
                 const cellName = sb.getAttribute("data-cell-name");
                 const svg = sb.querySelector(".statistics-box svg");
-                selectedOverlayStore.set({cellId, cellName, svg});
+                selectedOverlayCellStore.set({cellId, cellName, svg, props: propsByCellId[cellId]});
             };
         });
 }
@@ -78,7 +78,6 @@ export function renderBulkOverlays(svgHolderElem,
                                    targetSelector,
                                    setContentSize) {
 
-    console.log("rendering", targetSelector)
     const cells = Array.from(overlayCellsHolder.querySelectorAll(".overlay-cell"));
 
     cells

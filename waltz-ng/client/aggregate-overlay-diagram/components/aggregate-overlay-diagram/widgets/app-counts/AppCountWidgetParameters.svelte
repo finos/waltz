@@ -3,8 +3,9 @@
     import {getContext} from "svelte";
     import {timeFormat} from "d3-time-format";
     import moment from "moment";
-    import BulkAppCountWidget from "./BulkAppCountWidget.svelte";
     import Icon from "../../../../../common/svelte/Icon.svelte";
+    import AppCountOverlayCell from "./AppCountOverlayCell.svelte";
+    import _ from "lodash";
 
     export let opts;
 
@@ -18,6 +19,16 @@
     let futureDate = null;
     let slideVal = 0;
 
+    function mkGlobalProps(data) {
+        const maxCount = _
+            .chain(data)
+            .map(d => [d.currentStateCount, d.targetStateCount])
+            .flatten()
+            .max()
+            .value();
+        return { maxCount };
+    }
+
     function onSelect(futureDate) {
         const dateStr = fmt(futureDate);
         overlayDataCall = aggregateOverlayDiagramStore.findAppCountsForDiagram(
@@ -25,7 +36,10 @@
             opts,
             dateStr,
             true);
-        $widget = BulkAppCountWidget;
+        $widget = {
+            overlay: AppCountOverlayCell,
+            mkGlobalProps
+        };
     }
 
     const debouncedOnSelect = _.debounce(onSelect, 500);
