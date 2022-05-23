@@ -254,6 +254,7 @@ public class MeasurableRatingService {
                 .deleteByMeasurableIdSelector(selector);
     }
 
+
     public String getRequiredRatingEditRole(EntityReference ref) {
         return measurableDao.getRequiredRatingEditRole(ref);
     }
@@ -281,5 +282,10 @@ public class MeasurableRatingService {
                 .orElse(false);
 
         checkFalse(isRestricted, "New rating is restricted, rating not saved");
+    }
+
+
+    public boolean checkRatingExists(SaveMeasurableRatingCommand command) {
+        return measurableRatingDao.checkRatingExists(command);
     }
 }

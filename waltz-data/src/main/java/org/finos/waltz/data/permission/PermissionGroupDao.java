@@ -46,6 +46,11 @@ public class PermissionGroupDao {
     }
 
 
+    public Set<Permission> findPermissionsForParentEntityReference(EntityReference parentEntityRef) {
+        return getPermissionsForEntityRef(parentEntityRef, DSL.trueCondition());
+    }
+
+
     public Set<Permission> getPermissionsForEntityRef(EntityReference parentEntityRef, Condition condition) {
 
         Condition groupCondition = PERMISSION_GROUP_INVOLVEMENT.PERMISSION_GROUP_ID.in(permissionGroupSelector(parentEntityRef))

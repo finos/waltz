@@ -83,6 +83,23 @@ public class PermissionGroupService {
     }
 
 
+    public Set<Permission> findPermissionsForParentReference(EntityReference parentEntityRef,
+                                                             String username) {
+
+        Person person = personService.getPersonByUserId(username);
+
+        if (isNull(person)) {
+            return Collections.emptySet();
+        }
+
+        Set<Permission> permissions = permissionGroupDao.findPermissionsForParentEntityReference(parentEntityRef);
+
+        Set<Long> involvements = permissionGroupDao.findExistingInvolvementKindIdsForUser(parentEntityRef, username);
+
+        return filter(permissions, p -> p.requiredInvolvementsResult().isAllowed(involvements));
+    }
+
+
     @Deprecated
     public boolean hasPermission(EntityReference entityReference,
                                  EntityKind subjectKind,

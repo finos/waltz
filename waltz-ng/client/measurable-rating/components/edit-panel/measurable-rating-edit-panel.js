@@ -27,6 +27,7 @@ import template from "./measurable-rating-edit-panel.html";
 import {displayError} from "../../../common/error-utils";
 import {alignDateToUTC} from "../../../common/date-utils";
 import toasts from "../../../svelte-stores/toast-store";
+import {entity} from "../../../common/services/enums/entity";
 
 const bindings = {
     allocations: "<",
@@ -95,7 +96,7 @@ function controller($q,
         const hasNoRatings = vm.ratings.length === 0;
         const showAllCategories = hasNoRatings || vm.visibility.showAllCategories;
         const allTabs = mkTabs(vm, showAllCategories);
-        vm.tabs = _.filter(allTabs, t => _.includes(vm.userRoles, t.category.ratingEditorRole));
+        vm.tabs = _.filter(allTabs, t => _.includes(vm.userRoles, t.category.ratingEditorRole) || _.includes(vm.editableCategoriesForUser, t.category.id));
         vm.hasHiddenTabs = vm.categories.length !== allTabs.length;
         if (vm.activeTab) {
             const ratingSchemeItems =  vm.activeTab.ratingSchemeItems;
@@ -121,10 +122,6 @@ function controller($q,
                 const newRating = { rating, description };
                 vm.selected = Object.assign({}, vm.selected, { rating: newRating });
             })
-            .catch(e => {
-                displayError("Could not save rating", e);
-                throw e;
-            })
     };
 
     const doRemove = () => {
@@ -141,7 +138,7 @@ function controller($q,
                 vm.ratings = r.data;
                 vm.selected.rating = null;
                 recalcTabs();
-            });
+            })
     };
 
     const deselectMeasurable = () => {
@@ -191,6 +188,20 @@ function controller($q,
 
     vm.$onInit = () => {
 
+        const editOperations = ["ADD", "UPDATE", "REMOVE"];
+
+        serviceBroker
+            .loadViewData(CORE_API.PermissionGroupStore.findForParentEntityRef, [vm.parentEntityRef])
+            .then(r => {
+                const permissions = r.data;
+                vm.editableCategoriesForUser = _
+                    .chain(permissions)
+                    .filter(d => d.subjectKind === entity.MEASURABLE_RATING.key && _.includes(editOperations, d.operation) && d.qualifierReference.kind === entity.MEASURABLE_CATEGORY.key)
+                    .map(d => d.qualifierReference.id)
+                    .uniq()
+                    .value()
+            })
+
         userService
             .whoami()
             .then(user => vm.userRoles = user.roles)
@@ -199,7 +210,7 @@ function controller($q,
         vm.backUrl = $state
             .href(
                 kindToViewState(vm.parentEntityRef.kind),
-                { id: vm.parentEntityRef.id });
+                {id: vm.parentEntityRef.id});
         vm.allocationsByMeasurableId = _.groupBy(vm.allocations, a => a.measurableId);
         vm.allocationSchemesById = _.keyBy(vm.allocationSchemes, s => s.id);
     };
@@ -294,14 +305,29 @@ function controller($q,
 
         return r === "X"
             ? doRemove()
-                .then(() => toasts.success(`Removed: ${vm.selected.measurable.name}`))
+                .then(() => {
+                    toasts.success(`Removed: ${vm.selected.measurable.name}`);
+                })
+                .catch(e => {
+                    deselectMeasurable();
+                    vm.saveInProgress = false;
+                    displayError("Could not remove measurable rating.", e)
+                })
             : doRatingSave(r, getDescription())
                 .then(() => toasts.success(`Saved: ${vm.selected.measurable.name}`))
+                .catch(e => {
+                    displayError("Could not save rating", e);
+                    throw e;
+                })
     };
 
     vm.onSaveComment = (comment) => {
         return doRatingSave(getRating(), comment)
             .then(() => toasts.success(`Saved Comment for: ${vm.selected.measurable.name}`))
+            .catch(e => {
+                displayError("Could not save comment for rating", e);
+                throw e;
+            })
     };
 
     vm.doCancel = () => {
