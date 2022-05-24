@@ -386,7 +386,7 @@ public class FlowClassificationRuleDao {
                         applicationNameField)
                 .from(LOGICAL_FLOW)
                 .innerJoin(LOGICAL_FLOW_DECORATOR).on(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID))
-                .innerJoin(FLOW_CLASSIFICATION).on(flowClassificationRuleJoin)
+                .innerJoin(FLOW_CLASSIFICATION_RULE).on(flowClassificationRuleJoin)
                 .innerJoin(ENTITY_HIERARCHY).on(hierarchyJoin)
                 .innerJoin(APPLICATION).on(appJoin)
                 .where(condition)
