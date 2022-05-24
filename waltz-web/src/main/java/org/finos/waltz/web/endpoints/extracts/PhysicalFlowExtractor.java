@@ -53,25 +53,14 @@ import static spark.Spark.post;
 @Service
 public class PhysicalFlowExtractor extends CustomDataExtractor {
 
-    private DSLContext dsl;
-    private final PhysicalFlowIdSelectorFactory physicalFlowIdSelectorFactory = new PhysicalFlowIdSelectorFactory();
+    private static final List<Field<String>> RECEIVER_NAME_AND_ASSET_CODE_FIELDS;
+    private static final List<Field<String>> SOURCE_NAME_AND_ASSET_CODE_FIELDS;
+    private static final List<Field<String>> SOURCE_AND_TARGET_NAME_AND_ASSET_CODE;
+    private static final PhysicalFlowIdSelectorFactory physicalFlowIdSelectorFactory = new PhysicalFlowIdSelectorFactory();
 
-    private static List<Field> RECEIVER_NAME_AND_ASSET_CODE_FIELDS;
-    private static List<Field> SOURCE_NAME_AND_ASSET_CODE_FIELDS;
-    private static List<Field> SOURCE_AND_TARGET_NAME_AND_ASSET_CODE;
-    private static List<String> staticHeaders = newArrayList(
-            "Name",
-            "External Id",
-            "Source",
-            "Source Asset Code",
-            "Receiver",
-            "Receiver Asset Code",
-            "Format",
-            "Transport",
-            "Frequency",
-            "Criticality",
-            "Freshness Indicator",
-            "Description");
+
+    private final DSLContext dsl;
+
 
     static {
         Field<String> SOURCE_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
@@ -251,11 +240,15 @@ public class PhysicalFlowExtractor extends CustomDataExtractor {
 
         List<List<Object>> reportRows = prepareReportRows(query, tags);
 
+        List<String> headers = ListUtilities.map(
+                query.getSelect(),
+                Field::getName);
+
         return formatReport(
                 format,
                 reportName,
                 reportRows,
-                ListUtilities.append(staticHeaders, "Tags")
+                ListUtilities.append(headers, "Tags")
         );
     }
 
@@ -266,8 +259,9 @@ public class PhysicalFlowExtractor extends CustomDataExtractor {
         return results
                 .stream()
                 .map(row -> {
-                    ArrayList<Object> reportRow = new ArrayList<>();
-                    staticHeaders.forEach(h -> reportRow.add(row.get(h)));
+                    List<Object> reportRow = ListUtilities.map(
+                            qry.getSelect(),
+                            row::get);
                     Long physicalFlowId = row.get(PHYSICAL_FLOW.ID);
                     List<String> physicalFlowTags = tags.get(physicalFlowId);
                     reportRow.add(isEmpty(physicalFlowTags)
