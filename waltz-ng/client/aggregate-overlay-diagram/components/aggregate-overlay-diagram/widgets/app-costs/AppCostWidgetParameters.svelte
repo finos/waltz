@@ -13,6 +13,7 @@
     const overlayData = getContext("overlayData");
     const selectedDiagram = getContext("selectedDiagram");
     const widget = getContext("widget");
+    const selectedOverlay = getContext("selectedOverlay");
 
     let selectedAllocationScheme;
     let selectedCostKinds = [];
@@ -40,6 +41,8 @@
     }
 
     function onSelect() {
+
+        $selectedOverlay = null;
 
         const appCostParameters = {
             allocationSchemeId: selectedAllocationScheme.id,

@@ -44,8 +44,10 @@
     function selectCallout(callout) {
         if ($selectedCallout?.id === callout.id) {
             $selectedCallout = null;
+            $selectedOverlay = null;
         } else {
             $selectedCallout = callout;
+            $selectedOverlay = Object.assign({}, {cellId: callout.cellExternalId});
         }
     }
 

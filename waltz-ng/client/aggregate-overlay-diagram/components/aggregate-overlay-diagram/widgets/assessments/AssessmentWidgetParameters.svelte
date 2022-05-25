@@ -12,6 +12,7 @@
     const overlayData = getContext("overlayData");
     const widget = getContext("widget");
     const selectedDiagram = getContext("selectedDiagram");
+    const selectedOverlay = getContext("selectedOverlay");
 
     let selectedDefinition;
     let overlayDataCall;
@@ -31,6 +32,7 @@
 
 
     function onSelect(ad) {
+        $selectedOverlay = null;
         selectedDefinition = ad;
         overlayDataCall = aggregateOverlayDiagramStore.findAppAssessmentsForDiagram(
             $selectedDiagram.id,

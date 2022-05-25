@@ -12,6 +12,7 @@
     const fmt = timeFormat("%Y-%m-%d");
     const overlayData = getContext("overlayData");
     const selectedDiagram = getContext("selectedDiagram");
+    const selectedOverlay = getContext("selectedOverlay");
 
     const widget = getContext("widget");
     let selectedDefinition;
@@ -30,6 +31,7 @@
     }
 
     function onSelect(futureDate) {
+        $selectedOverlay = null;
         const dateStr = fmt(futureDate);
         overlayDataCall = aggregateOverlayDiagramStore.findAppCountsForDiagram(
             $selectedDiagram.id,
