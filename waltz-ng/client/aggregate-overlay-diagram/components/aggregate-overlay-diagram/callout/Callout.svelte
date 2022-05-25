@@ -4,8 +4,7 @@
 
     export let callout;
     export let label;
-
-    let hoveredCallout = getContext("hoveredCallout");
+    export let hoveredCallout;
 
     const dispatch = createEventDispatcher();
 
@@ -26,48 +25,50 @@
     }
 
     function determineRadius(hc, callout) {
-        if (hc?.id === callout.id) {
+        if (hc?.id === callout?.id) {
             return 12
         } else {
             return 10;
         }
     }
 
-    $: radius = determineRadius($hoveredCallout, callout)
+    $: radius = determineRadius(hoveredCallout, callout)
 
 </script>
 
 
-<svg class="content"
-     viewBox={`0 0 24 24`}>
-    <defs>
-        <linearGradient id={`content-gradient-${callout.id}`}
-                        x1="0"
-                        x2="0"
-                        y1="0"
-                        y2="1">
-            <stop stop-color={callout.startColor} offset="0%"/>
-            <stop stop-color={callout.startColor} offset="40%"/>
-            <stop stop-color={callout.endColor} offset="60%"/>
-            <stop stop-color={callout.endColor} offset="100%"/>
-        </linearGradient>
-    </defs>
-    <g on:mouseenter={() => hover()}
-       on:mouseleave={() => leave()}>
-        <circle r={radius}
-                cx="12"
-                cy="12"
-                fill={determineFill($hoveredCallout, callout)}>
-            <title>{callout.title}</title>
-        </circle>
-        <text text-anchor="middle"
-              dx="12"
-              fill={determineForegroundColor(callout.startColor)}
-              dy="17">
-            {label}
-        </text>
-    </g>
-</svg>
+{#if callout}
+    <svg class="content"
+         viewBox={`0 0 24 24`}>
+        <defs>
+            <linearGradient id={`content-gradient-${callout.id}`}
+                            x1="0"
+                            x2="0"
+                            y1="0"
+                            y2="1">
+                <stop stop-color={callout.startColor} offset="0%"/>
+                <stop stop-color={callout.startColor} offset="40%"/>
+                <stop stop-color={callout.endColor} offset="60%"/>
+                <stop stop-color={callout.endColor} offset="100%"/>
+            </linearGradient>
+        </defs>
+        <g on:mouseenter={() => hover()}
+           on:mouseleave={() => leave()}>
+            <circle r={radius}
+                    cx="12"
+                    cy="12"
+                    fill={determineFill($hoveredCallout, callout)}>
+                <title>{callout.title}</title>
+            </circle>
+            <text text-anchor="middle"
+                  dx="12"
+                  fill={determineForegroundColor(callout.startColor)}
+                  dy="17">
+                {label}
+            </text>
+        </g>
+    </svg>
+{/if}
 
 
 <style>

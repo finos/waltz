@@ -5,9 +5,10 @@
         clearContent
     } from "./aggregate-overlay-diagram-utils";
     import {getContext} from "svelte";
-    import BulkCallouts from "./callout/BulkCallouts.svelte";
     import _ from "lodash";
     import {select, selectAll} from "d3-selection";
+    import Callout from "./callout/Callout.svelte";
+    import {hoveredCallout} from "../../aggregate-overlay-diagram-store";
 
     export let svg = "";
 
@@ -66,20 +67,41 @@
         }
     }
 
+
     $: {
         if (svgHolderElem && $callouts) {
-            // clearContent(svgHolderElem, ".callout-box");
+            clearContent(svgHolderElem, ".callout-box");
 
-            setTimeout(
-                () => renderBulkOverlays(
-                    svgHolderElem,
-                    calloutsHolder,
-                    ".callout-box",
-                    (bBox, contentRef) => {
-                        contentRef.setAttribute("width", bBox.width);
-                        contentRef.setAttribute("height", bBox.height);
-                    }),
-                100);
+            const calloutsByCellId = _.keyBy($callouts, c => c.cellExternalId)
+
+            Array
+                .from(svgHolderElem.querySelectorAll(".data-cell"))
+                .map(cell => {
+                    const sb = cell.querySelector(".callout-box");
+                    const cellId = cell.getAttribute("data-cell-id");
+
+                    const component = Callout
+
+                    let callout = calloutsByCellId[cellId];
+
+                    let cellProps = {
+                        callout: callout,
+                        hoveredCallout: $hoveredCallout,
+                        label: _.indexOf($callouts, callout) + 1
+                    };
+                    new component({
+                        target: sb,
+                        props: cellProps
+                    })
+
+                    return {cellId, cellProps}
+                })
+                .reduce((acc, d) => {
+                        acc[d.cellId] = d.cellProps;
+                        return acc;
+                    },
+                    {}
+                );
         }
     }
 
@@ -112,18 +134,3 @@
 <div bind:this={svgHolderElem}>
     {@html svg}
 </div>
-
-
-{#key $callouts}
-    <div class="rendered-callouts"
-         bind:this={calloutsHolder}>
-        <BulkCallouts/>
-    </div>
-{/key}
-
-
-<style>
-    .rendered-callouts {
-        display: none;
-    }
-</style>
