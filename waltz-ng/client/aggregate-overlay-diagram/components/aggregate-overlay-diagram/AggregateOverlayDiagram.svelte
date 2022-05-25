@@ -1,9 +1,5 @@
 <script>
-    import {
-        renderBulkOverlays,
-        addCellClickHandlers,
-        clearContent
-    } from "./aggregate-overlay-diagram-utils";
+    import {addCellClickHandlers, clearContent} from "./aggregate-overlay-diagram-utils";
     import {getContext} from "svelte";
     import _ from "lodash";
     import {select, selectAll} from "d3-selection";
@@ -74,7 +70,7 @@
 
             const calloutsByCellId = _.keyBy($callouts, c => c.cellExternalId)
 
-            Array
+            const propsByCellId = Array
                 .from(svgHolderElem.querySelectorAll(".data-cell"))
                 .map(cell => {
                     const sb = cell.querySelector(".callout-box");
@@ -102,6 +98,9 @@
                     },
                     {}
                 );
+
+            addCellClickHandlers(svgHolderElem, selectedOverlay, propsByCellId);
+
         }
     }
 
@@ -123,8 +122,9 @@
 
     // toggle inset indication
     $: {
+        selectAll('.data-cell').classed("inset", false);
+
         if ($selectedOverlay) {
-            selectAll('.data-cell').classed("inset", false);
             select(`[data-cell-id=${$selectedOverlay.cellId}]`).classed("inset", true);
         }
     }
