@@ -1,11 +1,12 @@
 <script>
     import {numberFormatter} from "../../../../../common/string-utils";
     import {scaleLinear} from "d3-scale";
+    import _ from "lodash";
 
-    export let cellData = {};
+    export let cellData = null;
     export let maxCost;
 
-    $:r = scaleLinear()
+    $: r = scaleLinear()
         .domain([0, maxCost])
         .range([0, 45]);
 
@@ -34,7 +35,9 @@
     <foreignObject transform="translate(15, 5)"
                    width="270"
                    height="90">
-        {#if cellData}
+        {#if _.isNil(cellData)}
+            -
+        {:else}
             <div style="font-size: 22px; width: 100%; text-align: center">
                 App Costs:
                 <br>
@@ -43,8 +46,6 @@
             <div style="font-size: 16px; width: 100%; text-align: center">
                 Change: {numberFormatter(delta, 2)}
             </div>
-        {:else}
-            -
         {/if}
     </foreignObject>
 </svg>

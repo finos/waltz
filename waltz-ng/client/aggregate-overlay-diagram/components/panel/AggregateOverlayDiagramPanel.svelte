@@ -2,28 +2,38 @@
     import AggregateOverlayDiagram from "../aggregate-overlay-diagram/AggregateOverlayDiagram.svelte";
     import {aggregateOverlayDiagramStore} from "../../../svelte-stores/aggregate-overlay-diagram-store";
     import {getContext, onMount} from "svelte";
-    import WidgetSelector from "../aggregate-overlay-diagram/WidgetSelector.svelte";
     import {aggregateOverlayDiagramCalloutStore} from "../../../svelte-stores/aggregate-overlay-diagram-callout-store";
     import DiagramSelector from "../diagram-selector/DiagramSelector.svelte";
     import NoData from "../../../common/svelte/NoData.svelte";
-    import {setupContextStores} from "../aggregate-overlay-diagram/aggregate-overlay-diagram-utils";
+    import {setupContextStores, determineWhichCellsAreLinkedByParent} from "../aggregate-overlay-diagram/aggregate-overlay-diagram-utils";
     import _ from "lodash";
     import AggregateOverlayDiagramContextPanel from "../context-panel/AggregateOverlayDiagramContextPanel.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
-    import {userStore} from "../../../svelte-stores/user-store";
-    import systemRoles from "../../../user/system-roles";
+    import {measurableRelationshipStore} from "../../../svelte-stores/measurable-relationship-store";
 
     export let primaryEntityRef;
-
-
-    let svgCall;
-    let calloutCall;
-    let diagramsCall;
-
 
     const Modes = {
         SELECT: "SELECT",
         VIEW: "VIEW"
+    }
+
+    setupContextStores();
+
+    let selectedInstance = getContext("selectedInstance");
+    let selectedDiagram = getContext("selectedDiagram");
+    let diagramProportion = getContext("diagramProportion");
+    let cellIdsExplicitlyRelatedToParent = getContext("cellIdsExplicitlyRelatedToParent");
+
+    let svgCall;
+    let calloutCall;
+    let diagramsCall;
+    let relatedEntitiesCall;
+
+    function selectDiagram(evt) {
+        $selectedInstance = null;
+        $selectedDiagram = evt.detail;
+        activeMode = Modes.VIEW;
     }
 
     let activeMode = $selectedDiagram == null
@@ -32,13 +42,12 @@
 
     onMount(() => {
         diagramsCall = aggregateOverlayDiagramStore.findAll();
-
     });
-
 
     $: {
         if ($selectedDiagram) {
             svgCall = aggregateOverlayDiagramStore.getById($selectedDiagram.id);
+            relatedEntitiesCall = measurableRelationshipStore.findByEntityReference(primaryEntityRef);
         }
     }
 
@@ -48,21 +57,11 @@
         }
     }
 
-    $: diagram = $svgCall?.data;
+    $: diagram = $svgCall?.data?.diagram;
+    $: backingEntities = $svgCall?.data?.backingEntities;
     $: diagrams = $diagramsCall?.data || [];
-
-    function selectDiagram(evt) {
-        $selectedInstance = null;
-        $selectedDiagram = evt.detail;
-        activeMode = Modes.VIEW;
-    }
-
-    setupContextStores();
-
-    let selectedInstance = getContext("selectedInstance");
-    let selectedDiagram = getContext("selectedDiagram");
-    let diagramProportion = getContext("diagramProportion");
-
+    $: relatedEntities = $relatedEntitiesCall?.data;
+    $: $cellIdsExplicitlyRelatedToParent = determineWhichCellsAreLinkedByParent(backingEntities, relatedEntities);
 </script>
 
 {#if primaryEntityRef}
@@ -76,9 +75,10 @@
                     <div class="col-sm-6">
                         <h4>
                             {$selectedDiagram?.name}
-                            <button class="small btn btn-link pull-right"
+                            <button class="small btn btn-link"
                                     on:click={() => activeMode = Modes.SELECT}>
-                                <Icon name="list-ul"/> Change diagram
+                                <Icon name="list-ul"/>
+                                Change diagram
                             </button>
                         </h4>
 

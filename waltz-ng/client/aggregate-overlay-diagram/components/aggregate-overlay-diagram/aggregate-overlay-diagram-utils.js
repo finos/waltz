@@ -12,6 +12,8 @@ import {
     purpleHex,
     redHex, yellowHex
 } from "../../../common/colors";
+import {refToString} from "../../../common/entity-utils";
+
 
 export function clearContent(svgHolderElem, targetSelector) {
     const existingContent = svgHolderElem.querySelectorAll(`${targetSelector} .content`);
@@ -113,6 +115,44 @@ export function renderBulkOverlays(svgHolderElem,
 }
 
 
+/**
+ * Given a list of backing entities and entity references this function
+ * will return a list of cellId's which are mentioned by any of the
+ * linked entityReferences.
+ *
+ * @param backingEntities  [ { cellId, entityReference }, ... ]
+ * @param relatedEntities [ { a, b, ... }, .... ]
+ * @returns list of cell ids
+ */
+export function determineWhichCellsAreLinkedByParent(backingEntities = [],
+                                                     relatedEntities = []) {
+    if (backingEntities && relatedEntities) {
+        const relatedRefs = _
+            .chain(relatedEntities)
+            .map(d => [d.a, d.b])
+            .flatten()
+            .map(refToString)
+            .value();
+
+        return _
+            .chain(backingEntities)
+            .groupBy(d => d.cellId)
+            .map((xs, k) => {
+                const backingRefs = _.map(xs, x => refToString(x.entityReference));
+                return _.some(backingRefs, br => _.includes(relatedRefs, br))
+                    ? k
+                    : null;
+            })
+            .compact()
+            .value();
+    } else {
+        return [];
+    }
+
+}
+
+
+
 export function setupContextStores() {
     const selectedDiagram = writable(null);
     const selectedInstance = writable(null);
@@ -128,6 +168,8 @@ export function setupContextStores() {
     const selectedCellCallout = writable(null);
     const hasEditPermissions = writable(false);
     const selectedOverlay = writable(null);
+    const relatedBackingEntities = writable([]);
+    const cellIdsExplicitlyRelatedToParent = writable([]);
 
     setContext("hoveredCallout", hoveredCallout);
     setContext("selectedDiagram", selectedDiagram);
@@ -143,6 +185,8 @@ export function setupContextStores() {
     setContext("selectedCellCallout", selectedCellCallout);
     setContext("hasEditPermissions", hasEditPermissions);
     setContext("selectedOverlay", selectedOverlay);
+    setContext("relatedBackingEntities", relatedBackingEntities);
+    setContext("cellIdsExplicitlyRelatedToParent", cellIdsExplicitlyRelatedToParent);
 
     return {
         selectedDiagram,
@@ -158,7 +202,8 @@ export function setupContextStores() {
         selectedCellId,
         selectedCellCallout,
         hasEditPermissions,
-        selectedOverlay
+        selectedOverlay,
+        relatedBackingEntities
     };
 }
 

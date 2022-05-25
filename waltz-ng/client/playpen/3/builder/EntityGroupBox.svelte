@@ -17,7 +17,8 @@
 
     <!-- GROUP HEADER -->
     <rect width={dimensions.w}
-          height={layoutData.height}>
+          height={layoutData.height}
+          fill="none">
     </rect>
     <foreignObject width={dimensions.labelWidth}
                    height={layoutData.height}>

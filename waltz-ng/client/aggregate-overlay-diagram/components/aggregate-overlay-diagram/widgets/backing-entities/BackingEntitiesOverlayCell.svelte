@@ -15,6 +15,7 @@
 
 
 <svg class="content"
+     width="100%"
      {height}
      style="background: white">
     {#if cellData}

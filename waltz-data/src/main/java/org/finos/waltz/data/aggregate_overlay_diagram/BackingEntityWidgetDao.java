@@ -1,37 +1,22 @@
 package org.finos.waltz.data.aggregate_overlay_diagram;
 
-import org.finos.waltz.common.MapUtilities;
-import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.InlineSelectFieldFactory;
-import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
-import org.finos.waltz.data.rating_scheme.RatingSchemeDAO;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.overlay_diagram.*;
-import org.finos.waltz.model.utils.IdUtilities;
-import org.finos.waltz.schema.tables.AssessmentRating;
-import org.finos.waltz.schema.tables.MeasurableRating;
-import org.jooq.*;
-import org.jooq.impl.DSL;
-import org.jooq.lambda.tuple.Tuple2;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.BackingEntityWidgetDatum;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.ImmutableBackingEntityWidgetDatum;
+import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.*;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
-import static org.finos.waltz.common.SetUtilities.map;
-import static org.finos.waltz.data.JooqUtilities.readRef;
-import static org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramUtilities.*;
 import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 import static org.finos.waltz.schema.Tables.AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA;
-import static org.finos.waltz.schema.Tables.AGGREGATE_OVERLAY_DIAGRAM_INSTANCE;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository

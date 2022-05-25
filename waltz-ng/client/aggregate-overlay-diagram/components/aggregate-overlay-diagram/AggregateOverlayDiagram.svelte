@@ -7,10 +7,22 @@
     import {getContext} from "svelte";
     import BulkCallouts from "./callout/BulkCallouts.svelte";
     import _ from "lodash";
+    import {select, selectAll} from "d3-selection";
 
     export let svg = "";
 
+    let selectedInstance = getContext("selectedInstance");
+    let selectedDiagram = getContext("selectedDiagram");
+    let overlayData = getContext("overlayData");
+    let widget = getContext("widget");
+    let callouts = getContext("callouts");
+    let selectedOverlay = getContext("selectedOverlay");
+    let svgDetail = getContext("svgDetail");
+    let relatedBackingEntities = getContext("relatedBackingEntities");
+    let cellIdsExplicitlyRelatedToParent = getContext("cellIdsExplicitlyRelatedToParent");
+
     let svgHolderElem;
+    let calloutsHolder;
 
     $: {
         if (svgHolderElem && $overlayData && $widget?.overlay) {
@@ -20,7 +32,9 @@
 
             clearContent(svgHolderElem, ".statistics-box");
 
-            const globalProps = $widget.mkGlobalProps($overlayData);
+            const globalProps = $widget.mkGlobalProps
+                ? $widget.mkGlobalProps($overlayData)
+                : {};
 
             const propsByCellId = Array
                 .from(svgHolderElem.querySelectorAll(".data-cell"))
@@ -69,16 +83,6 @@
         }
     }
 
-    let selectedInstance = getContext("selectedInstance");
-    let selectedDiagram = getContext("selectedDiagram");
-    let overlayData = getContext("overlayData");
-    let widget = getContext("widget");
-    let callouts = getContext("callouts");
-    let selectedOverlay = getContext("selectedOverlay");
-    let svgDetail = getContext("svgDetail");
-
-    let calloutsHolder;
-
 
     $: {
         if (svgHolderElem) {
@@ -86,6 +90,22 @@
         }
     }
 
+    // highlight explicitly related cells
+    $: {
+        if (svgHolderElem && $cellIdsExplicitlyRelatedToParent) {
+            $cellIdsExplicitlyRelatedToParent
+                .forEach(cellId => select(`[data-cell-id=${cellId}]`)
+                    .classed("show-related-entity-indicator", true));
+        }
+    }
+
+    // toggle inset indication
+    $: {
+        if ($selectedOverlay) {
+            selectAll('.data-cell').classed("inset", false);
+            select(`[data-cell-id=${$selectedOverlay.cellId}]`).classed("inset", true);
+        }
+    }
 
 </script>
 

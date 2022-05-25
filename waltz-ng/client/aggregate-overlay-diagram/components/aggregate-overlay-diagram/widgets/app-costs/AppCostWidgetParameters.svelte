@@ -2,11 +2,11 @@
     import {aggregateOverlayDiagramStore} from "../../../../../svelte-stores/aggregate-overlay-diagram-store";
     import {getContext} from "svelte";
     import Icon from "../../../../../common/svelte/Icon.svelte";
-    import BulkAppCostWidget from "./BulkAppCostWidget.svelte";
     import AllocationSchemePicker
         from "../../../../../report-grid/components/svelte/pickers/AllocationSchemePicker.svelte";
     import CostKindPicker from "../../../../../report-grid/components/svelte/pickers/CostKindPicker.svelte";
     import _ from "lodash";
+    import AppCostOverlayCell from "./AppCostOverlayCell.svelte";
 
     export let opts;
 
@@ -29,6 +29,16 @@
 
     let activeMode = Modes.ALLOCATION_SCHEME_PICKER;
 
+
+    function mkGlobalProps(data) {
+        const maxCost = _
+            .chain(data)
+            .map(d => d.totalCost)
+            .max()
+            .value();
+        return { maxCost };
+    }
+
     function onSelect() {
 
         const appCostParameters = {
@@ -42,7 +52,10 @@
             appCostParameters,
             true);
 
-        $widget = BulkAppCostWidget;
+        $widget = {
+            overlay: AppCostOverlayCell,
+            mkGlobalProps
+        };
         activeMode = Modes.SUMMARY;
     }
 

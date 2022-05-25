@@ -27,9 +27,9 @@
 
 
 <svg class="content"
-     width="300"
-     style="background: white"
-     height={height + 10}>
+     width="100%"
+     height={height + 10}
+     style="background: white">
     <g transform="translate(0, 5)">
         {#each counts as r}
             <rect x="0"

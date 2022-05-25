@@ -37,9 +37,64 @@
 </script>
 
 <svg width="100%"
+     preserveAspectRatio="xMidYMin meet"
      height={`${dimensions.height}px`}
      viewBox={`0 0 1000 ${dimensions.height}`}
      style="border: 1px solid #dcefeb">
+
+    <style>
+        .data-cell.inset .cell-background {
+            filter: url(#inset);
+        }
+
+        .data-cell .cell-related-entity-indicator {
+            visibility: hidden;
+        }
+
+        .data-cell.show-related-entity-indicator .cell-related-entity-indicator {
+            visibility: visible;
+        }
+    </style>
+
+    <defs>
+        <filter id='inset'>
+            <!-- Shadow offset -->
+            <feOffset
+                dx='0'
+                dy='0'
+            />
+            <!-- Shadow blur -->
+            <feGaussianBlur
+                stdDeviation='10'
+                result='offset-blur'
+            />
+            <!-- Invert drop shadow to make an inset shadow-->
+            <feComposite
+                operator='out'
+                in='SourceGraphic'
+                in2='offset-blur'
+                result='inverse'
+            />
+            <!-- Cut colour inside shadow -->
+            <feFlood
+                flood-color='#21077F'
+                flood-opacity='.95'
+                result='color'
+            />
+            <feComposite
+                operator='in'
+                in='color'
+                in2='inverse'
+                result='shadow'
+            />
+            <!-- Placing shadow over element -->
+            <feComposite
+                operator='over'
+                in='shadow'
+                in2='SourceGraphic'
+            />
+        </filter>
+    </defs>
 
     <g>
         {#each data as block, idx}

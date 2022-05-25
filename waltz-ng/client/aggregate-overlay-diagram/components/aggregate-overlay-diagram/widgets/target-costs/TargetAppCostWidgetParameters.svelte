@@ -2,9 +2,10 @@
     import {aggregateOverlayDiagramStore} from "../../../../../svelte-stores/aggregate-overlay-diagram-store";
     import {getContext} from "svelte";
     import {timeFormat} from "d3-time-format";
-    import BulkTargetAppCostWidget from "./BulkTargetAppCostWidget.svelte";
     import moment from "moment";
     import Icon from "../../../../../common/svelte/Icon.svelte";
+    import TargetAppCostOverlayCell from "./TargetAppCostOverlayCell.svelte";
+    import _ from "lodash";
 
     export let opts;
 
@@ -16,6 +17,17 @@
     let selectedDefinition;
     let overlayDataCall;
 
+
+    function mkGlobalProps(data) {
+        const maxCost = _
+            .chain(data)
+            .map(d => [d.currentStateCost, d.targetStateCost])
+            .flatten()
+            .max()
+            .value();
+        return { maxCost };
+    }
+
     function onSelect(futureDate) {
         const dateStr = fmt(futureDate);
         overlayDataCall = aggregateOverlayDiagramStore.findTargetAppCostForDiagram(
@@ -23,7 +35,10 @@
             opts,
             dateStr,
             true);
-        $widget = BulkTargetAppCostWidget;
+        $widget = {
+            overlay: TargetAppCostOverlayCell,
+            mkGlobalProps
+        };
     }
 
     $: {

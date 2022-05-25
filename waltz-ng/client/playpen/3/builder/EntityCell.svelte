@@ -16,12 +16,18 @@
 
 
 <!-- CELL BACKGROUND -->
-<rect stroke="white"
-      stroke-width="5"
-      width={cellWidth}
-      height={dimensions.cell.height}
+<rect transform="translate(4 4)"
+      width={cellWidth-8}
+      height={dimensions.cell.height-8}
+      class="cell-background"
       fill={color}>
 </rect>
+
+<path d={`M ${cellWidth-34} 4 l30 0 l0 30 Z`}
+      class="cell-related-entity-indicator"
+      fill="#1B96FF">
+    <title>This cell is directly related to the parent entity</title>
+</path>
 
 <CalloutBox width={dimensions.callout.width}
             height={dimensions.callout.height}/>

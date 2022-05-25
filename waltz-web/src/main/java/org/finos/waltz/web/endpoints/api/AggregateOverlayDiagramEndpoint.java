@@ -19,10 +19,10 @@
 package org.finos.waltz.web.endpoints.api;
 
 import org.finos.waltz.common.DateTimeUtilities;
-import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
-import org.finos.waltz.model.overlay_diagram.*;
+import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramInfo;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.*;
 import org.finos.waltz.service.aggregate_overlay_diagram.AggregateOverlayDiagramService;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
@@ -68,7 +68,7 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
         String findAppAssessmentWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "app-assessment-widget", ":assessment-id");
         String findBackingEntityWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "backing-entity-widget");
 
-        DatumRoute<AggregateOverlayDiagram> getByIdRoute = (request, response) -> {
+        DatumRoute<AggregateOverlayDiagramInfo> getByIdRoute = (request, response) -> {
             return aggregateOverlayDiagramService.getById(getId(request));
         };
 
