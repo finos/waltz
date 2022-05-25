@@ -31,6 +31,7 @@
                 <waltz-editable-enum initial-val="$ctrl.physicalFlow.criticality"
                                      enum-kind="physicalFlowCriticality"
                                      on-save="$ctrl.onSaveCriticality"
+                                     read-only="$ctrl.physicalFlow.isReadOnly"
                                      edit-role="LOGICAL_DATA_FLOW_EDITOR">
                 </waltz-editable-enum>
             </td>
@@ -43,6 +44,7 @@
                 <waltz-editable-enum initial-val="$ctrl.physicalFlow.transport"
                                      enum-kind="TransportKind"
                                      on-save="$ctrl.onSaveTransport"
+                                     read-only="$ctrl.physicalFlow.isReadOnly"
                                      edit-role="LOGICAL_DATA_FLOW_EDITOR">
                 </waltz-editable-enum>
             </td>
@@ -55,6 +57,7 @@
                 <waltz-editable-enum initial-val="$ctrl.physicalFlow.frequency"
                                      enum-kind="frequencyKind"
                                      on-save="$ctrl.onSaveFrequency"
+                                     read-only="$ctrl.physicalFlow.isReadOnly"
                                      edit-role="LOGICAL_DATA_FLOW_EDITOR">
                 </waltz-editable-enum>
             </td>
@@ -66,6 +69,7 @@
             <td>
                 <waltz-editable-field on-save="$ctrl.onSaveBasisOffset"
                                       field-type="text"
+                                      read-only="$ctrl.physicalFlow.isReadOnly"
                                       initial-val="$ctrl.physicalFlow.basisOffset">
                 </waltz-editable-field>
             </td>
@@ -112,6 +116,7 @@
                 <waltz-editable-field on-save="$ctrl.onSaveDescription"
                                       field-type="textarea"
                                       empty-label="Not provided"
+                                      read-only="$ctrl.physicalFlow.isReadOnly"
                                       initial-val="$ctrl.physicalFlow.description">
                 </waltz-editable-field>
             </td>
