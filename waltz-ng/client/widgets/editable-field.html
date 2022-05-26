@@ -48,23 +48,31 @@
               ng-if="$ctrl.newVal == null">
         </span>
 
-        <a ng-click="$ctrl.edit()"
-           ng-if="$ctrl.editRole"
-           waltz-has-role="{{ $ctrl.editRole }}"
-           style="position: relative; top: -1px"
-           class="btn btn-xs waltz-visibility-child-30">
-            <waltz-icon name="pencil">
-            </waltz-icon>
-            <span ng-bind="$ctrl.buttonLabel"></span>
-        </a>
-        <a ng-click="$ctrl.edit()"
-           ng-if="! $ctrl.editRole"
-           style="position: relative; top: -1px"
-           class="btn btn-xs waltz-visibility-child-30">
-            <waltz-icon name="pencil">
-            </waltz-icon>
-            <span ng-bind="$ctrl.buttonLabel"></span>
-        </a>
+        <span class="btn btn-xs waltz-visibility-child-30">
+            <span ng-if="$ctrl.readOnly"
+                  title="Cannot edit as marked as read-only">
+                <waltz-icon name="lock"></waltz-icon>
+                Edit
+            </span>
+            <span ng-if="!$ctrl.readOnly">
+                <a ng-click="$ctrl.edit()"
+                   ng-if="$ctrl.editRole"
+                   waltz-has-role="{{ $ctrl.editRole }}"
+                   style="position: relative; top: -1px">
+                    <waltz-icon name="pencil">
+                    </waltz-icon>
+                    <span ng-bind="$ctrl.buttonLabel"></span>
+                </a>
+                <a ng-click="$ctrl.edit()"
+                   ng-if="! $ctrl.editRole"
+                   style="position: relative; top: -1px">
+                    <waltz-icon name="pencil">
+                    </waltz-icon>
+                    <span ng-bind="$ctrl.buttonLabel"></span>
+                </a>
+            </span>
+        </span>
+
     </div>
 
     <div ng-if="$ctrl.editing" style="border-radius: 3px; border: 1px solid #eee; background-color: #fafafa; padding: 10px">

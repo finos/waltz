@@ -18,6 +18,8 @@
 
 package org.finos.waltz.service.physical_flow;
 
+import org.finos.waltz.common.exception.ModifyingReadOnlyRecordException;
+import org.finos.waltz.common.exception.NotFoundException;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.external_identifier.ExternalIdentifierService;
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
@@ -300,6 +302,7 @@ public class PhysicalFlowService {
 
     public int updateAttribute(String username, SetAttributeCommand command) {
 
+
         int rc = doUpdateAttribute(command);
 
         if (rc != 0) {
@@ -319,6 +322,7 @@ public class PhysicalFlowService {
 
     private int doUpdateAttribute(SetAttributeCommand command) {
         long flowId = command.entityReference().id();
+        ensureFlowExistsAndIsNotReadOnly(flowId);
         switch(command.name()) {
             case "criticality":
                 return physicalFlowDao.updateCriticality(flowId, Criticality.valueOf(command.value()));
@@ -337,6 +341,27 @@ public class PhysicalFlowService {
                         "Cannot update attribute %s on flow as unknown attribute name",
                         command.name());
                 throw new UnsupportedOperationException(errMsg);
+        }
+    }
+
+    /**
+     * Verifies that a flow exists and is not read only.
+     * If it is then the corresponding exception is thrown, namely one of:
+     *
+     * <ul>
+     *   <li>NotFoundException</li>
+     *   <li>ModifyingReadOnlyRecordException</li>
+     * </ul>
+     *
+     * @param flowId  identifier of the flow being checked
+     */
+    private void ensureFlowExistsAndIsNotReadOnly(long flowId) {
+        PhysicalFlow flow = getById(flowId);
+        if (flow == null) {
+            throw new NotFoundException("PF_NOTFOUND", "Physical Flow: %d not found", flowId);
+        }
+        if (flow.isReadOnly()) {
+            throw new ModifyingReadOnlyRecordException("PF_READONLY", "Physical Flow: %d is read only", flowId);
         }
     }
 

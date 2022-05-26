@@ -237,6 +237,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
     private int updateAttribute(Request request, Response response) throws IOException {
         WebUtilities.requireRole(userRoleService, request, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
+
         String username = WebUtilities.getUsername(request);
         SetAttributeCommand command
                 = WebUtilities.readBody(request, SetAttributeCommand.class);
