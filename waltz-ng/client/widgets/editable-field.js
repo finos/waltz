@@ -35,7 +35,8 @@ const bindings = {
     onCancel: "<?",
     maxDate: "<?",  // only for date fields
     minDate: "<?",  // only for date fields
-    inlineHelp: "@?"
+    inlineHelp: "@?",
+    readOnly: "<?"
 };
 
 
@@ -52,7 +53,8 @@ const initialState = {
     saveLabel:  "Save",
     startInEditMode: false,
     onCancel: null,
-    onSave: () => console.log("WEF: No on-save method provided")
+    onSave: () => console.log("WEF: No on-save method provided"),
+    readOnly: false
 };
 
 

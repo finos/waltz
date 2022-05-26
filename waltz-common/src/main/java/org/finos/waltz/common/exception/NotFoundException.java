@@ -1,5 +1,7 @@
 package org.finos.waltz.common.exception;
 
+import static java.lang.String.format;
+
 public class NotFoundException extends RuntimeException {
 
     private final String code;
@@ -11,8 +13,8 @@ public class NotFoundException extends RuntimeException {
     }
 
 
-    public NotFoundException(String code, String message, Throwable cause) {
-        super(message, cause);
+    public NotFoundException(String code, String messageFormat, Object... args) {
+        super(format(messageFormat, args));
         this.code = code;
     }
 

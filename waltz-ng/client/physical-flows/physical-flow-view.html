@@ -46,7 +46,7 @@
             <waltz-section-actions ng-if="ctrl.physicalFlow.entityLifecycleStatus !== 'REMOVED'">
                 <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
                     <button class="btn btn-xs btn-danger"
-                            ng-disabled="! (ctrl.mentions | isEmpty)"
+                            ng-disabled="! (ctrl.mentions | isEmpty) || ctrl.physicalFlow.isReadOnly"
                             ng-click="(ctrl.mentions | isEmpty) && ctrl.deleteFlow()">
                         Delete
                     </button>
@@ -297,6 +297,10 @@
                     <a ng-click="ctrl.visibility.overviewEditor = true"
                        ng-if="! ctrl.visibility.overviewEditor"
                        class="clickable">
+                        <span ng-if="ctrl.physicalFlow.isReadOnly"
+                              title="The flow is locked, only limited fields will be editable">
+                            <waltz-icon name="unlock-alt"></waltz-icon>
+                        </span>
                         Edit
                     </a>
 

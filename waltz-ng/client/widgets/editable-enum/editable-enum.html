@@ -23,19 +23,30 @@
 
         <span ng-bind="$ctrl.currentVal | toDisplayName:$ctrl.enumKind"></span>
 
-        <a ng-click="$ctrl.onEdit()"
-           ng-if="$ctrl.editRole"
-           waltz-has-role="{{ $ctrl.editRole }}"
-           class="btn btn-xs waltz-visibility-child-30">
-            <waltz-icon name="pencil"></waltz-icon>
-            Edit
-        </a>
-        <a ng-click="$ctrl.onEdit()"
-           ng-if="! $ctrl.editRole"
-           class="btn btn-xs waltz-visibility-child-30">
-            <waltz-icon name="pencil"></waltz-icon>
-            Edit
-        </a>
+        <span class="btn btn-xs waltz-visibility-child-30">
+            <span ng-if="$ctrl.readOnly"
+                  title="Cannot edit as marked as read-only">
+                <waltz-icon name="lock"></waltz-icon>
+                Edit
+            </span>
+
+            <span ng-if="!$ctrl.readOnly">
+                <a ng-if="$ctrl.editRole"
+                   ng-click="$ctrl.onEdit()"
+                   waltz-has-role="{{ $ctrl.editRole }}"
+                   class="btn btn-xs waltz-visibility-child-30">
+                    <waltz-icon name="pencil"></waltz-icon>
+                    Edit
+                </a>
+                <a ng-if="! $ctrl.editRole"
+                   ng-click="$ctrl.onEdit()"
+                   class="btn btn-xs waltz-visibility-child-30">
+                    <waltz-icon name="pencil"></waltz-icon>
+                    Edit
+                </a>
+            </span>
+        </span>
+
     </span>
 
     <!-- EDIT -->

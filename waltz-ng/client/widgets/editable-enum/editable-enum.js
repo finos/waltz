@@ -27,12 +27,14 @@ const bindings = {
     enumKind: "@",
     onSave: "<",
     editRole: "@",
-    ctx: "<?"
+    ctx: "<?",
+    readOnly: "<?"
 };
 
 
 const initialState = {
     currentVal: null,
+    readOnly: false,
     visibility: {
         editor: false
     }
