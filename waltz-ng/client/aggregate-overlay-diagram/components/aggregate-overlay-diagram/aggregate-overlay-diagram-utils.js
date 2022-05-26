@@ -31,8 +31,10 @@ export function clearContent(svgHolderElem, targetSelector) {
  * @param propsByCellId
  */
 export function addCellClickHandlers(svgHolderElem, selectedOverlayCellStore, propsByCellId) {
+    let dataCells = svgHolderElem.querySelectorAll(".data-cell");
+    let headerCells = svgHolderElem.querySelectorAll(".entity-group-box");
     Array
-        .from(svgHolderElem.querySelectorAll(".data-cell"))
+        .from(_.union(dataCells, headerCells))
         .forEach(sb => {
             sb.onclick = () => {
                 const cellId = sb.getAttribute("data-cell-id");

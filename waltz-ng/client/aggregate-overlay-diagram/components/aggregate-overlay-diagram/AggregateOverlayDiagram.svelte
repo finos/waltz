@@ -70,8 +70,11 @@
 
             const calloutsByCellId = _.keyBy($callouts, c => c.cellExternalId)
 
+            let dataCells = svgHolderElem.querySelectorAll(".data-cell");
+            let headerCells = svgHolderElem.querySelectorAll(".entity-group-box");
+
             const propsByCellId = Array
-                .from(svgHolderElem.querySelectorAll(".data-cell"))
+                .from(_.union(headerCells, dataCells))
                 .map(cell => {
                     const sb = cell.querySelector(".callout-box");
                     const cellId = cell.getAttribute("data-cell-id");
