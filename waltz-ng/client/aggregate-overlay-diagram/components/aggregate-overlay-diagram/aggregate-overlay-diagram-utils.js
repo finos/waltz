@@ -161,6 +161,7 @@ export function setupContextStores() {
     const selectedCallout = writable(null);
     const overlayData = writable([]);
     const widget = writable(null);
+    const focusWidget = writable(null);
     const svgDetail = writable(null);
     const instances = writable([]);
     const diagramProportion = writable(9);
@@ -171,6 +172,13 @@ export function setupContextStores() {
     const relatedBackingEntities = writable([]);
     const cellIdsExplicitlyRelatedToParent = writable([]);
 
+    //widget parameters
+    const appCountSliderValue = writable(0);
+    const costSliderValue = writable(0);
+    const selectedAssessmentDefinition = writable(null);
+    const selectedAllocationScheme = writable(null);
+    const selectedCostKinds = writable([]);
+
     setContext("hoveredCallout", hoveredCallout);
     setContext("selectedDiagram", selectedDiagram);
     setContext("selectedInstance", selectedInstance);
@@ -178,6 +186,7 @@ export function setupContextStores() {
     setContext("selectedCallout", selectedCallout);
     setContext("overlayData", overlayData);
     setContext("widget", widget);
+    setContext("focusWidget", focusWidget);
     setContext("svgDetail", svgDetail);
     setContext("instances", instances);
     setContext("diagramProportion", diagramProportion);
@@ -187,6 +196,11 @@ export function setupContextStores() {
     setContext("selectedOverlay", selectedOverlay);
     setContext("relatedBackingEntities", relatedBackingEntities);
     setContext("cellIdsExplicitlyRelatedToParent", cellIdsExplicitlyRelatedToParent);
+    setContext("appCountSliderValue", appCountSliderValue);
+    setContext("costSliderValue", costSliderValue);
+    setContext("selectedAssessmentDefinition", selectedAssessmentDefinition);
+    setContext("selectedAllocationScheme", selectedAllocationScheme);
+    setContext("selectedCostKinds", selectedCostKinds);
 
     return {
         selectedDiagram,
@@ -196,6 +210,7 @@ export function setupContextStores() {
         selectedCallout,
         overlayData,
         widget,
+        focusWidget,
         svgDetail,
         instances,
         diagramProportion,
@@ -203,7 +218,12 @@ export function setupContextStores() {
         selectedCellCallout,
         hasEditPermissions,
         selectedOverlay,
-        relatedBackingEntities
+        relatedBackingEntities,
+        appCountSliderValue,
+        costSliderValue,
+        selectedAssessmentDefinition,
+        selectedAllocationScheme,
+        selectedCostKinds
     };
 }
 

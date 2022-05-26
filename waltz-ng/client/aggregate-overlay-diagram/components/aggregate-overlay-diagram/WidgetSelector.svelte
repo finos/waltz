@@ -12,6 +12,7 @@
     export let primaryEntityRef;
 
     const selectedOverlay = getContext("selectedOverlay");
+    const focusWidget = getContext("focusWidget");
 
     const widgets = [
         {
@@ -38,11 +39,10 @@
     ];
 
     function onCancel() {
-        focusWidget = null;
+        $focusWidget = null;
         $selectedOverlay = null;
     }
 
-    let focusWidget = null;
     let opts = null;
 
     $: opts = mkSelectionOptions(primaryEntityRef);
@@ -50,10 +50,10 @@
 </script>
 
 
-{#if focusWidget}
-    <div class="help-block">{focusWidget.description}</div>
+{#if $focusWidget}
+    <div class="help-block">{$focusWidget.description}</div>
 
-    <svelte:component this={focusWidget.parameterWidget}
+    <svelte:component this={$focusWidget.parameterWidget}
                       {opts}/>
     <hr>
     <button class="btn btn-skinny"
@@ -65,7 +65,7 @@
     {#each widgets as widget}
         <div>
             <button class="btn btn-skinny"
-                    on:click={() => focusWidget = widget}>
+                    on:click={() => $focusWidget = widget}>
                 <Icon name="plus"/>
                 {widget.label}
             </button>

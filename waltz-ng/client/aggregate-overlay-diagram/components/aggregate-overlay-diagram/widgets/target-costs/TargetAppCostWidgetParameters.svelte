@@ -13,6 +13,7 @@
     const overlayData = getContext("overlayData");
     const selectedDiagram = getContext("selectedDiagram");
     const selectedOverlay = getContext("selectedOverlay");
+    const costSliderValue = getContext("costSliderValue");
 
     const widget = getContext("widget");
     let selectedDefinition;
@@ -47,11 +48,9 @@
         $overlayData = $overlayDataCall?.data;
     }
 
-    let slideVal = 0;
-
     const debouncedOnSelect = _.debounce(onSelect, 500);
 
-    $: futureDate = moment().set("date", 1).add(slideVal * 2, "months");
+    $: futureDate = moment().set("date", 1).add($costSliderValue * 2, "months");
     $: debouncedOnSelect(futureDate);
 
 </script>
@@ -64,7 +63,7 @@
        type="range"
        min="0"
        max="60"
-       bind:value={slideVal}>
+       bind:value={$costSliderValue}>
 
 <div class="help-block">
     Use the slider to adjust how far in the future to project costs.

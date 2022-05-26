@@ -13,8 +13,8 @@
     const widget = getContext("widget");
     const selectedDiagram = getContext("selectedDiagram");
     const selectedOverlay = getContext("selectedOverlay");
+    const selectedAssessmentDefinition = getContext("selectedAssessmentDefinition");
 
-    let selectedDefinition;
     let overlayDataCall;
 
 
@@ -27,13 +27,18 @@
             .max()
             .value();
 
-        return { maxCount };
+        return {maxCount};
+    }
+
+
+    function changeDefinition() {
+        $selectedAssessmentDefinition = null;
     }
 
 
     function onSelect(ad) {
         $selectedOverlay = null;
-        selectedDefinition = ad;
+        $selectedAssessmentDefinition = ad;
         overlayDataCall = aggregateOverlayDiagramStore.findAppAssessmentsForDiagram(
             $selectedDiagram.id,
             ad.id,
@@ -51,12 +56,15 @@
 
 </script>
 
-{#if selectedDefinition}
-    <h4>Showing: {selectedDefinition.name}</h4>
+{#if $selectedAssessmentDefinition}
+    <h4>Showing: {$selectedAssessmentDefinition.name}</h4>
 
     <div class="help-block">
-        <Markdown text={selectedDefinition.description}/>
+        <Markdown text={$selectedAssessmentDefinition.description}/>
     </div>
+    <button class="btn btn-skinny" on:click={changeDefinition}>
+        Change assessment
+    </button>
 {:else}
     <AssessmentDefinitionPicker {onSelect}
                                 selectionFilter={ad => ad.entityKind === 'APPLICATION'}/>

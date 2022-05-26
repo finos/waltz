@@ -13,12 +13,12 @@
     const overlayData = getContext("overlayData");
     const selectedDiagram = getContext("selectedDiagram");
     const selectedOverlay = getContext("selectedOverlay");
-
     const widget = getContext("widget");
+    const appCountSliderValue = getContext("appCountSliderValue");
+
     let selectedDefinition;
     let overlayDataCall;
     let futureDate = null;
-    let slideVal = 0;
 
     function mkGlobalProps(data) {
         const maxCount = _
@@ -50,7 +50,7 @@
         $overlayData = $overlayDataCall?.data;
     }
 
-    $: futureDate = moment().set("date", 1).add(slideVal * 2, "months");
+    $: futureDate = moment().set("date", 1).add($appCountSliderValue * 2, "months");
     $: debouncedOnSelect(futureDate);
 </script>
 
@@ -63,7 +63,7 @@
        type="range"
        min="0"
        max="60"
-       bind:value={slideVal}>
+       bind:value={$appCountSliderValue}>
 
 <div class="help-block">
     Use the slider to adjust how far in the future to application counts.

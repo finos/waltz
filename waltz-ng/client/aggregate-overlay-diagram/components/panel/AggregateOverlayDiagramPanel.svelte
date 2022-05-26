@@ -24,13 +24,30 @@
     let selectedDiagram = getContext("selectedDiagram");
     let diagramProportion = getContext("diagramProportion");
     let cellIdsExplicitlyRelatedToParent = getContext("cellIdsExplicitlyRelatedToParent");
+    let focusWidget = getContext("focusWidget");
+    let costSliderValue = getContext("costSliderValue");
+    let appCountSliderValue = getContext("appCountSliderValue");
+    let selectedCostKinds = getContext("selectedCostKinds");
+    let selectedAllocationScheme = getContext("selectedAllocationScheme");
+    let selectedAssessmentDefinition = getContext("selectedAssessmentDefinition");
 
     let svgCall;
     let calloutCall;
     let diagramsCall;
     let relatedEntitiesCall;
 
+    function clearWidgetParameters() {
+        $focusWidget = null;
+        $costSliderValue = 0;
+        $appCountSliderValue = 0;
+        $selectedCostKinds = [];
+        $selectedAllocationScheme = null;
+        $selectedAssessmentDefinition = null;
+    }
+
+
     function selectDiagram(evt) {
+        clearWidgetParameters();
         $selectedInstance = null;
         $selectedDiagram = evt.detail;
         activeMode = Modes.VIEW;
