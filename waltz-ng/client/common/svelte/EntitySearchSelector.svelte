@@ -2,6 +2,7 @@
     import {entitySearchStore} from "../../svelte-stores/entity-search-store";
     import AutoComplete from "simple-svelte-autocomplete";
     import {createEventDispatcher} from "svelte";
+    import _ from "lodash";
 
     export let entityKinds;
     export let placeholder = "Search...";
@@ -23,8 +24,11 @@
 
 
 <AutoComplete searchFunction={search}
+              delay="300"
               labelFieldName="name"
               valueFieldName="id"
+              cleanUserText={false}
+              localFiltering={false}
               {placeholder}
               {showClear}
               bind:selectedItem={selectedItem} />
