@@ -32,15 +32,29 @@ export function clearContent(svgHolderElem, targetSelector) {
  */
 export function addCellClickHandlers(svgHolderElem, selectedOverlayCellStore, propsByCellId) {
     let dataCells = svgHolderElem.querySelectorAll(".data-cell");
-    let headerCells = svgHolderElem.querySelectorAll(".entity-group-box");
     Array
-        .from(_.union(dataCells, headerCells))
+        .from(dataCells)
         .forEach(sb => {
             sb.onclick = () => {
                 const cellId = sb.getAttribute("data-cell-id");
                 const cellName = sb.getAttribute("data-cell-name");
                 const svg = sb.querySelector(".statistics-box svg");
                 selectedOverlayCellStore.set({cellId, cellName, svg, props: propsByCellId[cellId]});
+            };
+        });
+}
+
+
+export function addSectionHeaderClickHandlers(svgHolderElem, selectedOverlayCellStore, propsByCellId) {
+    let headerCells = svgHolderElem.querySelectorAll(".group-title");
+    Array
+        .from(headerCells)
+        .forEach(sb => {
+            sb.onclick = () => {
+                const dataCell = determineCell(sb);
+                const cellId = dataCell.getAttribute("data-cell-id");
+                const cellName = dataCell.getAttribute("data-cell-name");
+                selectedOverlayCellStore.set({cellId, cellName, props: propsByCellId[cellId]});
             };
         });
 }
@@ -242,3 +256,17 @@ export const calloutColors = [
     amberHex,
     yellowHex
 ];
+
+
+export function determineCell(elem) {
+    if (elem == null) {
+        return null;
+    } else {
+        const cellId = elem.getAttribute("data-cell-id");
+        if (!_.isNil(cellId)) {
+            return elem;
+        } else {
+            return determineCell(elem.parentElement)
+        }
+    }
+}

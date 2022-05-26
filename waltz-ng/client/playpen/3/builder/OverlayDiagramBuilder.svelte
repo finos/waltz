@@ -47,6 +47,10 @@
             filter: url(#inset);
         }
 
+        .entity-group-box.inset .section-header.cell-background {
+            filter: url(#header-inset);
+        }
+
         .data-cell .cell-related-entity-indicator {
             visibility: hidden;
         }
@@ -78,6 +82,43 @@
             <!-- Cut colour inside shadow -->
             <feFlood
                 flood-color='#21077F'
+                flood-opacity='.95'
+                result='color'
+            />
+            <feComposite
+                operator='in'
+                in='color'
+                in2='inverse'
+                result='shadow'
+            />
+            <!-- Placing shadow over element -->
+            <feComposite
+                operator='over'
+                in='shadow'
+                in2='SourceGraphic'
+            />
+        </filter>
+        <filter id='header-inset'>
+            <!-- Shadow offset -->
+            <feOffset
+                dx='0'
+                dy='0'
+            />
+            <!-- Shadow blur -->
+            <feGaussianBlur
+                stdDeviation='10'
+                result='offset-blur'
+            />
+            <!-- Invert drop shadow to make an inset shadow-->
+            <feComposite
+                operator='out'
+                in='SourceGraphic'
+                in2='offset-blur'
+                result='inverse'
+            />
+            <!-- Cut colour inside shadow -->
+            <feFlood
+                flood-color='#BFADFF'
                 flood-opacity='.95'
                 result='color'
             />

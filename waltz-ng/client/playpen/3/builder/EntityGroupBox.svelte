@@ -20,6 +20,11 @@
           height={layoutData.height}
           fill="none">
     </rect>
+    <rect width={dimensions.labelWidth}
+          height={layoutData.height}
+          class="section-header cell-background"
+          fill="#0e2541">
+    </rect>
     <foreignObject width={dimensions.labelWidth}
                    height={layoutData.height}>
         <div class="group-title">
@@ -52,7 +57,6 @@
 
     .group-title {
         font-weight: bolder;
-        background-color: #0e2541;
         height: 100%;
         padding: 0.5em;
         color: #f2f6f2;

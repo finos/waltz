@@ -1,5 +1,5 @@
 <script>
-    import {addCellClickHandlers, clearContent} from "./aggregate-overlay-diagram-utils";
+    import {addCellClickHandlers, addSectionHeaderClickHandlers, clearContent} from "./aggregate-overlay-diagram-utils";
     import {getContext} from "svelte";
     import _ from "lodash";
     import {select, selectAll} from "d3-selection";
@@ -103,7 +103,7 @@
                 );
 
             addCellClickHandlers(svgHolderElem, selectedOverlay, propsByCellId);
-
+            addSectionHeaderClickHandlers(svgHolderElem, selectedOverlay, propsByCellId);
         }
     }
 
@@ -125,8 +125,9 @@
 
     // toggle inset indication
     $: {
-        selectAll('.data-cell').classed("inset", false);
 
+        selectAll('.data-cell').classed("inset", false);
+        selectAll('.entity-group-box').classed("inset", false);
         if ($selectedOverlay) {
             select(`[data-cell-id=${$selectedOverlay.cellId}]`).classed("inset", true);
         }

@@ -8,6 +8,7 @@
     import CalloutDeletePanel from "./CalloutDeletePanel.svelte";
     import {userStore} from "../../../../svelte-stores/user-store";
     import systemRoles from "../../../../user/system-roles";
+    import {determineCell} from "../aggregate-overlay-diagram-utils";
 
 
     const Modes = {
@@ -51,18 +52,6 @@
         }
     }
 
-    function determineCell(elem) {
-        if (elem == null) {
-            return null;
-        } else {
-            const cellId = elem.getAttribute("data-cell-id");
-            if (!_.isNil(cellId)) {
-                return elem;
-            } else {
-                return determineCell(elem.parentElement)
-            }
-        }
-    }
 
     function setSelectedCell() {
         return (e) => {
