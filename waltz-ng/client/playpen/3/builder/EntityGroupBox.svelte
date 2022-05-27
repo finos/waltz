@@ -5,8 +5,13 @@
 
     export let dimensions;
     export let group;
-    export let layoutData  = { height: 200 };
+    export let layoutData = {height: 200};
     export let color;
+
+    $: cellHeight = group.cellHeight || dimensions?.cell?.height;
+    $: statsHeight = group.statsBoxHeight || cellHeight / 3;
+    $: statsWidth = group.statsBoxWidth || dimensions?.cell?.statsBoxWidth || statsHeight * 3;
+
 </script>
 
 {#if dimensions}
@@ -38,10 +43,13 @@
 
     {#each group.rows as row, idx}
         <!-- ROW -->
-        <g transform={`translate(${dimensions.labelWidth}, ${calcHeight(idx, dimensions)})`}>
+        <g transform={`translate(${dimensions.labelWidth}, ${idx * (group.cellHeight || dimensions.cell.height)})`}>
             <GroupRow {row}
                       {dimensions}
-                      color={group.cellColor || color}/>
+                      color={group.cellColor || color}
+                      {cellHeight}
+                      statsBoxHeight={statsHeight}
+                      statsBoxWidth={statsWidth}/>
         </g>
     {/each}
 </g>

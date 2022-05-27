@@ -24,6 +24,7 @@ import configA from "./builder/front-to-back-trade-data";
 import configB from "./builder/front-to-back-operations-data";
 import configC from "./builder/north-star";
 import configD from "./builder/process-diag";
+import DiagramBuilderControls from "./builder/DiagramBuilderControls.svelte"
 
 const initialState = {
     b: {
@@ -41,7 +42,8 @@ const initialState = {
     configA,
     configB,
     configC,
-    configD
+    configD,
+    DiagramBuilderControls
 };
 
 function controller(serviceBroker) {

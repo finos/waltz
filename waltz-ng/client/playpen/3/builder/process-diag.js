@@ -287,13 +287,14 @@ const sections = {
     "CUSTOMER_JOURNEY": {
         "id": "CUSTOMER_JOURNEY",
         "name": "Customer Journey",
-
+        "cellHeight": 150,
+        "statsBoxWidth": 70,
         rows: [
             [
                 cells.BILL_THE_CLIENT,
                 cells.OFF_BOARD_THE_CLIENT,
                 cells.OFFER_PRODUCTS_AND_SERVICES
-            ],[
+            ], [
                 cells.ONBOARD_THE_CLIENT,
                 cells.SUPPORT_THE_DELIVERY_OF_PRODUCTS_AND_SERVICES,
                 cells.SUSTAIN_THE_CLIENT_RELATIONSHIP
@@ -329,6 +330,9 @@ const sections = {
     "MANAGE_RISK": {
         "id": "MANAGE_RISK",
         "name": "Manage Risk",
+        "headerColor": "#ff0000",
+        "cellColor": "#dbfffe",
+        "cellHeight": 200,
         rows: [
             [
                 cells.MANAGE_RISK_FRAMEWORKS,

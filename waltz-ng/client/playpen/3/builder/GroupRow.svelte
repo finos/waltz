@@ -5,6 +5,9 @@
     export let row;
     export let dimensions;
     export let color;
+    export let cellHeight;
+    export let statsBoxHeight;
+    export let statsBoxWidth;
 
     const rowWidth = dimensions.w - dimensions.labelWidth;
 
@@ -18,6 +21,9 @@
        data-cell-id={cell.id}
        data-cell-name={cell.name}>
         <EntityCell {cell}
+                    {cellHeight}
+                    {statsBoxHeight}
+                    {statsBoxWidth}
                     {cellWidth}
                     {dimensions}
                     {color}/>

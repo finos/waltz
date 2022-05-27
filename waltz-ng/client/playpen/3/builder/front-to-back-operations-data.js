@@ -37,6 +37,7 @@ const businessManagement = {
 const controlFunctions = {
     id: "CONTROL_FNS",
     name: "Control Functions / Service Integration",
+    cellHeight: 200,
     rows: [
         [afc, compliance, finance, risk/*, treasury*/]
     ]
