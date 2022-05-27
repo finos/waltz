@@ -1,4 +1,4 @@
-package org.finos.waltz.model.overlay_diagram;
+package org.finos.waltz.model.aggregate_overlay_diagram.overlay;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;

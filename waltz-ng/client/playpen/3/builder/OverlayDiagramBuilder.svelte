@@ -3,6 +3,7 @@
     import EntityGroupBox from "./EntityGroupBox.svelte";
     import {scaleLinear} from "d3-scale";
     import {layout} from "./overlay-diagram-builder-utils";
+    import {cellHeight, statsBoxWidth} from "./overlay-diagram-builder-store";
 
     export let config;
 
@@ -17,7 +18,6 @@
             padding: 10,
             height: 120,
             labelHeight: 40,
-            statsHeight: 50
         },
         callout: {
             width: 30,
@@ -25,31 +25,134 @@
         }
     };
 
-    const data = layout(
-        config,
-        dimensions);
+    $: dimensions.cell.height = $cellHeight;
+    $: dimensions.cell.statsBoxWidth = $statsBoxWidth;
 
-    const groupColorScale = scaleLinear()
-        .domain([0, data.length - 1])
-        .range(["#DCEFEB", "#67B9A9"]);
+    let data = [];
+    let groupColorScale;
+
+    $: {
+        data = layout(
+            config,
+            dimensions);
+
+        groupColorScale = scaleLinear()
+            .domain([0, data.length - 1])
+            .range(["#DCEFEB", "#67B9A9"]);
+    }
 
 
 </script>
 
-<svg width="100%"
-     height={`${dimensions.height}px`}
-     viewBox={`0 0 1000 ${dimensions.height}`}
-     style="border: 1px solid #dcefeb">
+{#key config}
+    <svg width="100%"
+         preserveAspectRatio="xMidYMin meet"
+         height={`${dimensions.height}px`}
+         viewBox={`0 0 1000 ${dimensions.height}`}
+         style="border: 1px solid #dcefeb">
 
-    <g>
-        {#each data as block, idx}
-            <g transform={`translate(10, ${block.layoutData.dy})`}>
-                <EntityGroupBox height={ block.layoutData.height }
+        <style>
+            .data-cell.inset .cell-background {
+                filter: url(#inset);
+            }
+
+            .entity-group-box.inset .section-header.cell-background {
+                filter: url(#header-inset);
+            }
+
+            .data-cell .cell-related-entity-indicator {
+                visibility: hidden;
+            }
+
+            .data-cell.show-related-entity-indicator .cell-related-entity-indicator {
+                visibility: visible;
+            }
+        </style>
+
+        <defs>
+            <filter id='inset'>
+                <!-- Shadow offset -->
+                <feOffset
+                    dx='0'
+                    dy='0'
+                />
+                <!-- Shadow blur -->
+                <feGaussianBlur
+                    stdDeviation='10'
+                    result='offset-blur'
+                />
+                <!-- Invert drop shadow to make an inset shadow-->
+                <feComposite
+                    operator='out'
+                    in='SourceGraphic'
+                    in2='offset-blur'
+                    result='inverse'
+                />
+                <!-- Cut colour inside shadow -->
+                <feFlood
+                    flood-color='#21077F'
+                    flood-opacity='.95'
+                    result='color'
+                />
+                <feComposite
+                    operator='in'
+                    in='color'
+                    in2='inverse'
+                    result='shadow'
+                />
+                <!-- Placing shadow over element -->
+                <feComposite
+                    operator='over'
+                    in='shadow'
+                    in2='SourceGraphic'
+                />
+            </filter>
+            <filter id='header-inset'>
+                <!-- Shadow offset -->
+                <feOffset
+                    dx='0'
+                    dy='0'
+                />
+                <!-- Shadow blur -->
+                <feGaussianBlur
+                    stdDeviation='10'
+                    result='offset-blur'
+                />
+                <!-- Invert drop shadow to make an inset shadow-->
+                <feComposite
+                    operator='out'
+                    in='SourceGraphic'
+                    in2='offset-blur'
+                    result='inverse'
+                />
+                <!-- Cut colour inside shadow -->
+                <feFlood
+                    flood-color='#BFADFF'
+                    flood-opacity='.95'
+                    result='color'
+                />
+                <feComposite
+                    operator='in'
+                    in='color'
+                    in2='inverse'
+                    result='shadow'
+                />
+                <!-- Placing shadow over element -->
+                <feComposite
+                    operator='over'
+                    in='shadow'
+                    in2='SourceGraphic'
+                />
+            </filter>
+        </defs>
+
+        <g>
+            {#each data as block, idx}
+                <EntityGroupBox layoutData={ block.layoutData }
                                 {dimensions}
                                 color={groupColorScale(idx)}
                                 group={block}/>
-            </g>
-        {/each}
-    </g>
-
-</svg>
+            {/each}
+        </g>
+    </svg>
+{/key}

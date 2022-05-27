@@ -34,7 +34,7 @@
     }
 
     $: $selectedInstance = $diagramInstanceCall?.data;
-    $: $selectedDiagram = $diagramCall?.data;
+    $: $selectedDiagram = $diagramCall?.data?.diagram;
     $: $callouts = $calloutCall?.data;
 </script>
 

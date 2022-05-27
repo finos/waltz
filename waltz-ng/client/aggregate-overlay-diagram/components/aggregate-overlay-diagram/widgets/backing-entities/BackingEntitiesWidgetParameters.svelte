@@ -3,8 +3,6 @@
     import {getContext} from "svelte";
     import BackingEntitiesOverlayCell from "./BackingEntitiesOverlayCell.svelte";
     import {aggregateOverlayDiagramStore} from "../../../../../svelte-stores/aggregate-overlay-diagram-store";
-    import _ from "lodash";
-    import BackingEntitiesWidget from "./BackingEntitiesWidget.svelte";
     import Icon from "../../../../../common/svelte/Icon.svelte";
 
     const overlayData = getContext("overlayData");
@@ -16,7 +14,9 @@
     $: {
         if ($selectedDiagram) {
             overlayDataCall = aggregateOverlayDiagramStore.findBackingEntitiesForDiagram($selectedDiagram.id);
-            $widget = BackingEntitiesWidget;
+            $widget = {
+                overlay: BackingEntitiesOverlayCell
+            };
         }
     }
 

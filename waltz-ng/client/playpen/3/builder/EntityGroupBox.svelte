@@ -1,40 +1,57 @@
 <script>
-
     import GroupRow from "./GroupRow.svelte";
     import {calcHeight} from "./overlay-diagram-builder-utils";
     import CalloutBox from "./CalloutBox.svelte";
 
     export let dimensions;
     export let group;
-    export let height = 200;
+    export let layoutData = {height: 200};
     export let color;
+
+    $: cellHeight = group.cellHeight || dimensions?.cell?.height;
+    $: statsHeight = group.statsBoxHeight || cellHeight / 3;
+    $: statsWidth = group.statsBoxWidth || dimensions?.cell?.statsBoxWidth || statsHeight * 3;
+
 </script>
 
 {#if dimensions}
-    <g class="entity-group-box"
-       data-cell-id={group.id}>
+<g class="entity-group-box outer"
+   transform={`translate(0 ${layoutData.dy})`}
+   data-cell-id={group.id}
+   data-cell-name={group.name}>
 
-        <g class="outer">
-            <rect width={dimensions.w}
-                  {height}>
-            </rect>
-            <foreignObject width={dimensions.labelWidth}
-                           height={height}>
-                <div class="group-title">
-                    {group.name}
-                </div>
-            </foreignObject>
-            <CalloutBox width={dimensions.callout.width}
-                        height={dimensions.callout.height}/>
+    <!-- GROUP HEADER -->
+    <rect width={dimensions.w}
+          height={layoutData.height}
+          fill="none">
+    </rect>
+    <rect width={dimensions.labelWidth}
+          height={layoutData.height}
+          class="section-header cell-background"
+          fill="#0e2541">
+    </rect>
+    <foreignObject width={dimensions.labelWidth}
+                   height={layoutData.height}>
+        <div class="group-title">
+            {group.name}
+        </div>
+    </foreignObject>
+
+    <!-- GROUP CALLOUT -->
+    <CalloutBox width={dimensions.callout.width}
+                height={dimensions.callout.height}/>
+
+    {#each group.rows as row, idx}
+        <!-- ROW -->
+        <g transform={`translate(${dimensions.labelWidth}, ${idx * (group.cellHeight || dimensions.cell.height)})`}>
+            <GroupRow {row}
+                      {dimensions}
+                      color={group.cellColor || color}
+                      {cellHeight}
+                      statsBoxHeight={statsHeight}
+                      statsBoxWidth={statsWidth}/>
         </g>
-
-    <g transform={`translate(${dimensions.labelWidth})`}>
-        {#each group.rows as row, idx}
-            <g transform={`translate(0, ${calcHeight(idx, dimensions)})`}>
-                <GroupRow {row} {dimensions} {color}/>
-            </g>
-        {/each}
-    </g>
+    {/each}
 </g>
 {/if}
 
@@ -48,7 +65,6 @@
 
     .group-title {
         font-weight: bolder;
-        background-color: #0e2541;
         height: 100%;
         padding: 0.5em;
         color: #f2f6f2;

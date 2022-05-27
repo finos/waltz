@@ -6,9 +6,13 @@
     import AppCostWidgetParameters from "./widgets/app-costs/AppCostWidgetParameters.svelte";
     import BackingEntitiesWidgetParameters from "./widgets/backing-entities/BackingEntitiesWidgetParameters.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
+    import {getContext} from "svelte";
 
 
     export let primaryEntityRef;
+
+    const selectedOverlay = getContext("selectedOverlay");
+    const focusWidget = getContext("focusWidget");
 
     const widgets = [
         {
@@ -34,32 +38,39 @@
         }
     ];
 
-    let focusWidget = null;
+    function onCancel() {
+        $focusWidget = null;
+        $selectedOverlay = null;
+    }
+
     let opts = null;
 
     $: opts = mkSelectionOptions(primaryEntityRef);
 
-
 </script>
 
-{#if focusWidget}
-    <div class="help-block">{focusWidget.description}</div>
 
-    <svelte:component this={focusWidget.parameterWidget}
+{#if $focusWidget}
+    <div class="help-block">{$focusWidget.description}</div>
+
+    <svelte:component this={$focusWidget.parameterWidget}
                       {opts}/>
     <hr>
     <button class="btn btn-skinny"
-            on:click={() => focusWidget = null}>
+            on:click={onCancel}>
         Cancel
     </button>
 
 {:else}
     {#each widgets as widget}
         <div>
-            <button class="btn btn-skinny" on:click={() => focusWidget = widget}>
+            <button class="btn btn-skinny"
+                    on:click={() => $focusWidget = widget}>
                 <Icon name="plus"/>
                 {widget.label}
             </button>
         </div>
     {/each}
 {/if}
+
+

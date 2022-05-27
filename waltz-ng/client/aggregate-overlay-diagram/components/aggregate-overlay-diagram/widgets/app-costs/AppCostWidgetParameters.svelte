@@ -2,20 +2,21 @@
     import {aggregateOverlayDiagramStore} from "../../../../../svelte-stores/aggregate-overlay-diagram-store";
     import {getContext} from "svelte";
     import Icon from "../../../../../common/svelte/Icon.svelte";
-    import BulkAppCostWidget from "./BulkAppCostWidget.svelte";
     import AllocationSchemePicker
         from "../../../../../report-grid/components/svelte/pickers/AllocationSchemePicker.svelte";
     import CostKindPicker from "../../../../../report-grid/components/svelte/pickers/CostKindPicker.svelte";
     import _ from "lodash";
+    import AppCostOverlayCell from "./AppCostOverlayCell.svelte";
 
     export let opts;
 
     const overlayData = getContext("overlayData");
     const selectedDiagram = getContext("selectedDiagram");
     const widget = getContext("widget");
+    const selectedOverlay = getContext("selectedOverlay");
+    const selectedCostKinds = getContext("selectedCostKinds");
+    const selectedAllocationScheme = getContext("selectedAllocationScheme");
 
-    let selectedAllocationScheme;
-    let selectedCostKinds = [];
     let selectedCostKindIds = [];
     let selectedDefinition;
 
@@ -27,12 +28,26 @@
         SUMMARY: "SUMMARY"
     }
 
-    let activeMode = Modes.ALLOCATION_SCHEME_PICKER;
+    let activeMode = $selectedAllocationScheme
+        ? Modes.SUMMARY
+        : Modes.ALLOCATION_SCHEME_PICKER;
+
+
+    function mkGlobalProps(data) {
+        const maxCost = _
+            .chain(data)
+            .map(d => d.totalCost)
+            .max()
+            .value();
+        return {maxCost};
+    }
 
     function onSelect() {
 
+        $selectedOverlay = null;
+
         const appCostParameters = {
-            allocationSchemeId: selectedAllocationScheme.id,
+            allocationSchemeId: $selectedAllocationScheme.id,
             costKindIds: selectedCostKindIds,
             selectionOptions: opts
         }
@@ -42,7 +57,10 @@
             appCostParameters,
             true);
 
-        $widget = BulkAppCostWidget;
+        $widget = {
+            overlay: AppCostOverlayCell,
+            mkGlobalProps
+        };
         activeMode = Modes.SUMMARY;
     }
 
@@ -52,22 +70,22 @@
 
     function onSelectAllocationScheme(scheme) {
         activeMode = Modes.COST_KIND_PICKER
-        selectedAllocationScheme = scheme;
+        $selectedAllocationScheme = scheme;
     }
 
     function onSelectCostKind(costKind) {
-        selectedCostKinds = _.concat(selectedCostKinds, costKind)
+        $selectedCostKinds = _.concat($selectedCostKinds, costKind)
     }
 
     function changeAllocationScheme() {
         activeMode = Modes.ALLOCATION_SCHEME_PICKER
-        selectedAllocationScheme = null;
-        selectedCostKinds = [];
+        $selectedAllocationScheme = null;
+        $selectedCostKinds = [];
     }
 
-    $: selectedCostKindIds = _.map(selectedCostKinds, d => d.id);
+    $: selectedCostKindIds = _.map($selectedCostKinds, d => d.id);
 
-    $: incompleteSelection = _.isEmpty(selectedCostKinds) || _.isNil(selectedAllocationScheme);
+    $: incompleteSelection = _.isEmpty($selectedCostKinds) || _.isNil($selectedAllocationScheme);
 
 </script>
 
@@ -83,14 +101,14 @@
         Select an allocation scheme from the list below,
         then select one or more the cost kinds to apply the allocations to.
     </div>
-    <div>Allocation Scheme: {selectedAllocationScheme.name}</div>
+    <div>Allocation Scheme: {$selectedAllocationScheme.name}</div>
     <CostKindPicker onSelect={onSelectCostKind}
                     selectionFilter={ck => !_.includes(selectedCostKindIds, ck.id)}/>
     {#if !_.isEmpty(selectedCostKindIds)}
         <div>
             Selected Cost Kinds:
             <ul>
-                {#each selectedCostKinds as kind}
+                {#each $selectedCostKinds as kind}
                     <li>
                         {kind.name}
                     </li>
@@ -110,12 +128,12 @@
         </button>
     </span>
 {:else if activeMode === Modes.SUMMARY}
-    <div>Allocation Scheme: {selectedAllocationScheme.name}</div>
+    <div>Allocation Scheme: {$selectedAllocationScheme.name}</div>
     <br>
     <div>
         Selected Cost Kinds:
         <ul>
-            {#each selectedCostKinds as kind}
+            {#each $selectedCostKinds as kind}
                 <li>
                     {kind.name}
                 </li>
