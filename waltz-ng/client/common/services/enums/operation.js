@@ -16,24 +16,38 @@
  *
  */
 
-export const orgUnitKind = {
-    IT: {
-        key: "IT",
-        name: "Information Technology",
+export const operation = {
+    ADD: {
+        key: "ADD",
+        name: "Add",
         icon: null,
         description: null,
         position: 10
     },
-    BUSINESS: {
-        key: "BUSINESS",
-        name: "Business",
+    ATTEST: {
+        key: "ATTEST",
+        name: "Attest",
         icon: null,
         description: null,
         position: 20
     },
-    CONTROL: {
-        key: "CONTROL",
-        name: "Control",
+    REMOVE: {
+        key: "REMOVE",
+        name: "Remove",
+        icon: null,
+        description: null,
+        position: 30
+    },
+    UPDATE: {
+        key: "UPDATE",
+        name: "Update",
+        icon: null,
+        description: null,
+        position: 30
+    },
+    UNKNOWN: {
+        key: "UNKNOWN",
+        name: "Unknown",
         icon: null,
         description: null,
         position: 30

@@ -24,7 +24,7 @@ import {attest} from "../../attestation-utils";
 import {displayError} from "../../../common/error-utils";
 import toasts from "../../../svelte-stores/toast-store";
 import MeasurableAttestationPanel from "../../components/svelte/MeasurableAttestationPanel.svelte"
-import {entity} from "../../../common/services/enums/entity";
+import {operation} from "../../../common/services/enums/operation";
 
 const bindings = {
     parentEntityRef: "<"
@@ -133,8 +133,8 @@ function controller($q,
 
         const permissionGroupPromise = serviceBroker
             .loadViewData(
-                CORE_API.PermissionGroupStore.findForEntityRefAndSubjectKind,
-                [entityReference, entity.ATTESTATION.key])
+                CORE_API.PermissionGroupStore.findForOperationOnEntityRef,
+                [entityReference, operation.ATTEST.key])
             .then(r => r.data);
 
         return $q
@@ -185,7 +185,7 @@ function controller($q,
     vm.hasPermissionToAttest = (entityKind) => {
         return _.isEmpty(vm.permissions)
             ? false
-            : _.some(vm.permissions, p => p.qualifierKind === entityKind);
+            : _.some(vm.permissions, p => p.subjectKind === entityKind);
     };
 
     vm.onCancelAttestation = () => {

@@ -24,13 +24,18 @@ function store($http, baseApiUrl) {
         .get(`${baseUrl}/entity-ref/${ref.kind}/${ref.id}`)
         .then(d => d.data);
 
-    const findForEntityRefAndSubjectKind = (ref, subjectKind) => $http
-        .get(`${baseUrl}/entity-ref/${ref.kind}/${ref.id}/subject-kind/${subjectKind}`)
+    const findForOperationOnEntityRef = (ref, operation) => $http
+        .get(`${baseUrl}/entity-ref/${ref.kind}/${ref.id}/operation/${operation}`)
+        .then(d => d.data);
+
+    const findForParentEntityRef = (ref, operation) => $http
+        .get(`${baseUrl}/entity-ref/${ref.kind}/${ref.id}`)
         .then(d => d.data);
 
     return {
         findByEntity,
-        findForEntityRefAndSubjectKind
+        findForOperationOnEntityRef,
+        findForParentEntityRef
     };
 }
 
@@ -54,9 +59,14 @@ export const PermissionGroupStore_API = {
         serviceFnName: "findByEntity",
         description: "findByEntity [ref]"
     },
-    findForEntityRefAndSubjectKind: {
+    findForOperationOnEntityRef: {
         serviceName,
-        serviceFnName: "findForEntityRefAndSubjectKind",
-        description: "findForEntityRefAndSubjectKind [ref, subjectKind]"
+        serviceFnName: "findForOperationOnEntityRef",
+        description: "findForOperationOnEntityRef [ref, operation]"
+    },
+    findForParentEntityRef: {
+        serviceName,
+        serviceFnName: "findForParentEntityRef",
+        description: "findForParentEntityRef [ref]"
     }
 };

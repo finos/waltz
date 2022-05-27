@@ -238,16 +238,27 @@ public class AttestationInstanceService {
 
     private void checkAttestationPermission(String username, AttestEntityCommand createCommand) {
 
-        CheckPermissionCommand checkPermissionCommand = ImmutableCheckPermissionCommand
+        CheckPermissionCommand checkPermissionCommand = createCommand.attestedEntityKind() == EntityKind.MEASURABLE_CATEGORY
+                ? ImmutableCheckPermissionCommand
                 .builder()
                 .parentEntityRef(createCommand.entityReference())
-                .subjectKind(EntityKind.ATTESTATION)
+                .subjectKind(EntityKind.MEASURABLE_RATING)
+                .operation(Operation.ATTEST)
                 .qualifierKind(createCommand.attestedEntityKind())
                 .qualifierId(createCommand.attestedEntityId())
                 .user(username)
+                .build()
+                : ImmutableCheckPermissionCommand
+                .builder()
+                .parentEntityRef(createCommand.entityReference())
+                .subjectKind(createCommand.attestedEntityKind())
+                .operation(Operation.ATTEST)
+                .qualifierKind(null)
+                .qualifierId(null)
+                .user(username)
                 .build();
 
-        if (! permissionGroupService.hasPermission(checkPermissionCommand)) {
+        if (!permissionGroupService.hasPermission(checkPermissionCommand)) {
             throw new UpdateFailedException("ATTESTATION_FAILED",
                     "user does not have permission to attest " + createCommand.attestedEntityKind().prettyName());
         }
