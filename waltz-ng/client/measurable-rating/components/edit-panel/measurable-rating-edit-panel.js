@@ -96,8 +96,14 @@ function controller($q,
         const hasNoRatings = vm.ratings.length === 0;
         const showAllCategories = hasNoRatings || vm.visibility.showAllCategories;
         const allTabs = mkTabs(vm, showAllCategories);
-        vm.tabs = _.filter(allTabs, t => t.category.editable
-            && (_.includes(vm.userRoles, t.category.ratingEditorRole) || _.includes(vm.editableCategoriesForUser, t.category.id)));
+        vm.tabs = _.filter(
+            allTabs,
+            t => {
+                const hasRole = _.includes(vm.userRoles, t.category.ratingEditorRole);
+                const editableCategoryForUser = _.includes(vm.editableCategoriesForUser, t.category.id);
+                const isEditableCategory = t.category.editable;
+                return isEditableCategory && (hasRole || editableCategoryForUser);
+            });
         vm.hasHiddenTabs = vm.categories.length !== allTabs.length;
         if (vm.activeTab) {
             const ratingSchemeItems = vm.activeTab.ratingSchemeItems;
@@ -306,13 +312,11 @@ function controller($q,
 
         return r === "X"
             ? doRemove()
-                .then(() => {
-                    toasts.success(`Removed: ${vm.selected.measurable.name}`);
-                })
+                .then(() => toasts.success(`Removed: ${vm.selected.measurable.name}`))
                 .catch(e => {
                     deselectMeasurable();
                     vm.saveInProgress = false;
-                    displayError("Could not remove measurable rating.", e)
+                    displayError("Could not remove measurable rating.", e);
                 })
             : doRatingSave(r, getDescription())
                 .then(() => toasts.success(`Saved: ${vm.selected.measurable.name}`))
@@ -320,7 +324,7 @@ function controller($q,
                     deselectMeasurable()
                     displayError("Could not save rating", e);
                     throw e;
-                })
+                });
     };
 
     vm.onSaveComment = (comment) => {
