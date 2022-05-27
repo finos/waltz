@@ -18,7 +18,13 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.common.StringUtilities;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.measurable.Measurable;
+import org.finos.waltz.model.permission_group.ImmutableCheckPermissionCommand;
+import org.finos.waltz.service.measurable.MeasurableService;
 import org.finos.waltz.service.measurable_rating.MeasurableRatingService;
+import org.finos.waltz.service.permission.PermissionGroupService;
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.endpoints.Endpoint;
@@ -39,6 +45,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
+import static java.lang.String.format;
+import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.web.WebUtilities.*;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -52,16 +60,25 @@ public class MeasurableRatingEndpoint implements Endpoint {
 
 
     private final MeasurableRatingService measurableRatingService;
+    private final MeasurableService measurableService;
     private final UserRoleService userRoleService;
+    private final PermissionGroupService permissionGroupService;
 
 
     @Autowired
     public MeasurableRatingEndpoint(MeasurableRatingService measurableRatingService,
-                                    UserRoleService userRoleService) {
+                                    MeasurableService measurableService,
+                                    UserRoleService userRoleService,
+                                    PermissionGroupService permissionGroupService) {
+
         checkNotNull(measurableRatingService, "measurableRatingService cannot be null");
+        checkNotNull(measurableRatingService, "measurableService cannot be null");
         checkNotNull(userRoleService, "userRoleService cannot be null");
+        checkNotNull(permissionGroupService, "permissionGroupService cannot be null");
 
         this.measurableRatingService = measurableRatingService;
+        this.measurableService = measurableService;
+        this.permissionGroupService = permissionGroupService;
         this.userRoleService = userRoleService;
     }
 
@@ -124,6 +141,12 @@ public class MeasurableRatingEndpoint implements Endpoint {
 
     private Collection<MeasurableRating> saveRoute(Request request, Response z) throws IOException {
         SaveMeasurableRatingCommand command = mkCommand(request);
+
+        Operation operation = measurableRatingService.checkRatingExists(command)
+                ? Operation.UPDATE
+                : Operation.ADD;
+
+        checkHasPermissionForThisOperation(command.measurableId(), command.entityReference(), operation, getUsername(request));
         requireRole(userRoleService, request, measurableRatingService.getRequiredRatingEditRole(mkRef(EntityKind.MEASURABLE, command.measurableId())));
         return measurableRatingService.save(command, false);
     }
@@ -132,15 +155,42 @@ public class MeasurableRatingEndpoint implements Endpoint {
     private Collection<MeasurableRating> removeRoute(Request request, Response z) throws IOException {
         long measurableId = getLong(request, "measurableId");
         String username = getUsername(request);
+        EntityReference parentReference = getEntityReference(request);
 
-        requireRole(userRoleService, request, measurableRatingService.getRequiredRatingEditRole(mkRef(EntityKind.MEASURABLE, measurableId)));
+        checkHasPermissionForThisOperation(measurableId, parentReference, Operation.REMOVE, username);
 
         RemoveMeasurableRatingCommand command = ImmutableRemoveMeasurableRatingCommand.builder()
-                .entityReference(getEntityReference(request))
+                .entityReference(parentReference)
                 .measurableId(measurableId)
                 .lastUpdate(UserTimestamp.mkForUser(username))
                 .build();
+
         return measurableRatingService.remove(command);
+    }
+
+
+    private void checkHasPermissionForThisOperation(Long measurableId,
+                                                    EntityReference parentReference,
+                                                    Operation operation,
+                                                    String username) {
+
+        boolean roleBasedPermissions = userRoleService.hasRole(username, measurableRatingService.getRequiredRatingEditRole(mkRef(EntityKind.MEASURABLE, measurableId)));
+
+        Measurable measurable = measurableService.getById(measurableId);
+
+        ImmutableCheckPermissionCommand checkPermissionCommand = ImmutableCheckPermissionCommand
+                .builder()
+                .parentEntityRef(parentReference)
+                .subjectKind(EntityKind.MEASURABLE_RATING)
+                .operation(operation)
+                .qualifierKind(EntityKind.MEASURABLE_CATEGORY)
+                .qualifierId(measurable.categoryId())
+                .user(username)
+                .build();
+
+        checkTrue(
+                roleBasedPermissions || permissionGroupService.hasPermission(checkPermissionCommand),
+                format("User does not have permission to %s measurable ratings for this %s", operation.name().toLowerCase(), parentReference.kind().prettyName()));
     }
 
 
@@ -148,10 +198,6 @@ public class MeasurableRatingEndpoint implements Endpoint {
         String username = getUsername(request);
 
         Map<String, String> body = readBody(request, Map.class);
-        String plannedDateString = body.get("plannedDate");
-        Optional<LocalDate> plannedDate = plannedDateString != null
-                ? Optional.of(LocalDate.parse(plannedDateString))
-                : Optional.empty();
 
         return ImmutableSaveMeasurableRatingCommand.builder()
                 .entityReference(getEntityReference(request))

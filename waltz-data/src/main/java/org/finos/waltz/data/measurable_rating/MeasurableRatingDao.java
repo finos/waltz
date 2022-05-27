@@ -133,14 +133,7 @@ public class MeasurableRatingDao {
     public Operation save(SaveMeasurableRatingCommand command, boolean ignoreReadOnly) {
         MeasurableRatingRecord record = TO_RECORD_MAPPER.apply(command);
 
-        boolean exists = dsl
-                .fetchExists(DSL
-                        .select(MEASURABLE_RATING.fields())
-                        .from(MEASURABLE_RATING)
-                        .where(MEASURABLE_RATING.MEASURABLE_ID.eq(command.measurableId()))
-                        .and(MEASURABLE_RATING.ENTITY_ID.eq(command.entityReference().id()))
-                        .and(MEASURABLE_RATING.ENTITY_KIND.eq(command.entityReference().kind().name())));
-
+        boolean exists = checkRatingExists(command);
 
         if (exists) {
             int updateCount = dsl
@@ -169,15 +162,28 @@ public class MeasurableRatingDao {
                 throw new NotFoundException(
                         "MR_SAVE_INSERT_FAILED",
                         format("Creation of record failed: %s", command));
-            };
+            }
+            ;
             return Operation.ADD;
         }
     }
 
 
+    public boolean checkRatingExists(SaveMeasurableRatingCommand command) {
+        return dsl
+                .fetchExists(DSL
+                        .select(MEASURABLE_RATING.fields())
+                        .from(MEASURABLE_RATING)
+                        .where(MEASURABLE_RATING.MEASURABLE_ID.eq(command.measurableId()))
+                        .and(MEASURABLE_RATING.ENTITY_ID.eq(command.entityReference().id()))
+                        .and(MEASURABLE_RATING.ENTITY_KIND.eq(command.entityReference().kind().name())));
+    }
+
+
     public boolean remove(RemoveMeasurableRatingCommand command) {
         EntityReference ref = command.entityReference();
-        return dsl.deleteFrom(MEASURABLE_RATING)
+        return dsl
+                .deleteFrom(MEASURABLE_RATING)
                 .where(MEASURABLE_RATING.ENTITY_KIND.eq(ref.kind().name()))
                 .and(MEASURABLE_RATING.ENTITY_ID.eq(ref.id()))
                 .and(MEASURABLE_RATING.MEASURABLE_ID.eq(command.measurableId()))

@@ -1,0 +1,243 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="db.changelog-1.42.xml">
+
+    <changeSet id="v1-41-tag"
+               author="woodjes">
+        <tagDatabase tag="v1.41"/> <!-- tag the current db version, i.e. the last  -->
+    </changeSet>
+
+    <changeSet id="20220518-6061-1"
+               author="woodjes">
+        <addColumn tableName="permission_group_involvement">
+            <column name="operation"
+                    type="${enum.type}"
+                    defaultValue="UNKNOWN">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20220518-6061-2"
+               author="woodjes">
+        <update tableName="permission_group_involvement">
+            <column name="operation"
+                    value="ATTEST"/>
+            <where>subject_kind='ATTESTATION'</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="20220518-6061-3"
+               author="woodjes">
+        <dropColumn tableName="permission_group_involvement"
+                    columnName="subject_kind">
+        </dropColumn>
+    </changeSet>
+
+    <changeSet id="20220518-6061-4"
+               author="woodjes">
+        <addColumn tableName="permission_group_involvement">
+            <column name="parent_kind"
+                    type="${enum.type}"
+                    defaultValue="APPLICATION">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20220518-6061-5"
+               author="woodjes">
+        <dropDefaultValue tableName="permission_group_involvement"
+                          columnName="parent_kind"/>
+    </changeSet>
+
+    <changeSet id="20220518-6061-6"
+               author="woodjes">
+        <addColumn tableName="permission_group_involvement">
+            <column name="subject_kind"
+                    type="${enum.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20220518-6061-7"
+               author="woodjes">
+        <sql>
+            UPDATE permission_group_involvement
+            SET subject_kind = qualifier_kind
+            WHERE qualifier_kind != 'MEASURABLE_CATEGORY'
+        </sql>
+    </changeSet>
+
+    <changeSet id="20220518-6061-8"
+               author="woodjes">
+        <update tableName="permission_group_involvement">
+            <column name="subject_kind"
+                    value="MEASURABLE_RATING"/>
+            <where>qualifier_kind='MEASURABLE_CATEGORY'</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="20220518-6061-9"
+               author="woodjes">
+        <dropColumn tableName="permission_group_involvement"
+                    columnName="qualifier_kind">
+        </dropColumn>
+    </changeSet>
+
+    <changeSet id="20220518-6061-10"
+               author="woodjes">
+        <addColumn tableName="permission_group_involvement">
+            <column name="qualifier_kind"
+                    type="${enum.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20220518-6061-11"
+               author="woodjes">
+        <update tableName="permission_group_involvement">
+            <column name="qualifier_kind"
+                    value="MEASURABLE_CATEGORY"/>
+            <where>subject_kind='MEASURABLE_RATING'</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="20220518-6061-12"
+               author="woodjes">
+        <addColumn tableName="permission_group_involvement">
+            <column name="qualifier_id_2"
+                    type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20220518-6061-13"
+               author="woodjes">
+        <sql>
+            UPDATE permission_group_involvement
+            SET qualifier_id_2 = qualifier_id
+            WHERE qualifier_id IS NOT NULL
+        </sql>
+    </changeSet>
+
+    <changeSet id="20220518-6061-14"
+               author="woodjes">
+        <dropColumn tableName="permission_group_involvement"
+                    columnName="qualifier_id">
+        </dropColumn>
+    </changeSet>
+
+    <changeSet id="20220518-6061-15"
+               author="woodjes">
+        <renameColumn tableName="permission_group_involvement"
+                      oldColumnName="qualifier_id_2"
+                      columnDataType="${id.type}"
+                      newColumnName="qualifier_id"/>
+    </changeSet>
+
+    <changeSet id="20220518-6061-16"
+               author="woodjes">
+        <setTableRemarks tableName="permission_group"
+                         remarks="group describing the permissions different involvement kinds have against waltz entities"/>
+        <setColumnRemarks tableName="permission_group"
+                          columnName="is_default"
+                          remarks="flag to identify the default permission group"/>
+        <setColumnRemarks tableName="permission_group"
+                          columnName="name"
+                          remarks="name of the permission group"/>
+        <setColumnRemarks tableName="permission_group"
+                          columnName="external_id"
+                          remarks="external identifier for this permission group"/>
+        <setColumnRemarks tableName="permission_group"
+                          columnName="description"
+                          remarks="longer description to provide more information about this permission group"/>
+        <setColumnRemarks tableName="permission_group"
+                          columnName="provenance"
+                          remarks="origination of this permission group"/>
+        <setColumnRemarks tableName="permission_group"
+                          columnName="id"
+                          remarks="unique identifier for this cost record within waltz"/>
+
+        <setTableRemarks tableName="permission_group_entry"
+                         remarks="indicates which permission group belongs to if not the default"/>
+        <setColumnRemarks tableName="permission_group_entry"
+                          columnName="application_id"
+                          remarks="identifier of the application that is being linked to a non-default permission group"/>
+        <setColumnRemarks tableName="permission_group_entry"
+                          columnName="permission_group_id"
+                          remarks="identifier of the permission group being linked to"/>
+
+        <setTableRemarks tableName="permission_group_involvement"
+                         remarks="links a group of involvements to a given operation on an entity kind"/>
+        <setColumnRemarks tableName="permission_group_involvement"
+                          columnName="permission_group_id"
+                          remarks="identifier of the permission group this association is tied to"/>
+        <setColumnRemarks tableName="permission_group_involvement"
+                          columnName="involvement_group_id"
+                          remarks="identifier of the involvement group"/>
+        <setColumnRemarks tableName="permission_group_involvement"
+                          columnName="operation"
+                          remarks="type of operation this involvement group is allowed to perform (one of: ADD, ATTEST, REMOVE, UPDATE, UNKNOWN)"/>
+        <setColumnRemarks tableName="permission_group_involvement"
+                          columnName="parent_kind"
+                          remarks="kind of the parent entity the change is related to e.g. APPLICATION"/>
+        <setColumnRemarks tableName="permission_group_involvement"
+                          columnName="subject_kind"
+                          remarks="kind of the entity the change acting upon e.g. MEASURABLE_RATING"/>
+        <setColumnRemarks tableName="permission_group_involvement"
+                          columnName="qualifier_id"
+                          remarks="identifier of the qualifier entity needed to specify a more specific permission"/>
+        <setColumnRemarks tableName="permission_group_involvement"
+                          columnName="qualifier_kind"
+                          remarks="kind of qualifier entity needed to specify a more specific permission e.g. MEASURABLE_CATEGORY"/>
+
+        <setTableRemarks tableName="involvement_group"
+                         remarks="collection of involvement kinds"/>
+        <setColumnRemarks tableName="involvement_group"
+                          columnName="name"
+                          remarks="name of this involvement group"/>
+        <setColumnRemarks tableName="involvement_group"
+                          columnName="id"
+                          remarks="unique identifier for this involvement group within waltz"/>
+        <setColumnRemarks tableName="involvement_group"
+                          columnName="provenance"
+                          remarks="origination of this involvement group"/>
+        <setColumnRemarks tableName="involvement_group"
+                          columnName="external_id"
+                          remarks="external identifier for this involvement group"/>
+
+        <setTableRemarks tableName="involvement_group_entry"
+                         remarks="describes the association of an involvement kind to an involvement group"/>
+        <setColumnRemarks tableName="involvement_group_entry"
+                          columnName="involvement_kind_id"
+                          remarks="identifier of the involvement kind this entry refers to"/>
+        <setColumnRemarks tableName="involvement_group_entry"
+                          columnName="involvement_group_id"
+                          remarks="identifier of the group this involvement kind is included in"/>
+    </changeSet>
+
+
+</databaseChangeLog>
