@@ -321,7 +321,7 @@ function controller($q,
             : doRatingSave(r, getDescription())
                 .then(() => toasts.success(`Saved: ${vm.selected.measurable.name}`))
                 .catch(e => {
-                    deselectMeasurable()
+                    deselectMeasurable();
                     displayError("Could not save rating", e);
                     throw e;
                 });
