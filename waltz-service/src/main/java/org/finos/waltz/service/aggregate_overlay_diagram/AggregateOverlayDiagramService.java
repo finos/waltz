@@ -4,11 +4,10 @@ import org.finos.waltz.data.aggregate_overlay_diagram.*;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
-import org.finos.waltz.model.overlay_diagram.AssessmentRatingsWidgetDatum;
-import org.finos.waltz.model.overlay_diagram.BackingEntityWidgetDatum;
-import org.finos.waltz.model.overlay_diagram.CostWidgetDatum;
-import org.finos.waltz.model.overlay_diagram.CountWidgetDatum;
-import org.finos.waltz.model.overlay_diagram.TargetCostWidgetDatum;
+import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramInfo;
+import org.finos.waltz.model.aggregate_overlay_diagram.BackingEntity;
+import org.finos.waltz.model.aggregate_overlay_diagram.ImmutableAggregateOverlayDiagramInfo;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.*;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,8 +44,14 @@ public class AggregateOverlayDiagramService {
     }
 
 
-    public AggregateOverlayDiagram getById(Long diagramId) {
-        return aggregateOverlayDiagramDao.getById(diagramId);
+    public AggregateOverlayDiagramInfo getById(Long diagramId) {
+        AggregateOverlayDiagram diagram = aggregateOverlayDiagramDao.getById(diagramId);
+        Set<BackingEntity> backingEntities = aggregateOverlayDiagramDao.findBackingEntities(diagramId);
+
+        return ImmutableAggregateOverlayDiagramInfo.builder()
+                .diagram(diagram)
+                .backingEntities(backingEntities)
+                .build();
     }
 
 

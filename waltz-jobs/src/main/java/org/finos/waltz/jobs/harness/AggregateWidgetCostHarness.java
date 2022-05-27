@@ -23,7 +23,7 @@ import org.finos.waltz.data.aggregate_overlay_diagram.AppCostWidgetDao;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.IdSelectionOptions;
-import org.finos.waltz.model.overlay_diagram.CostWidgetDatum;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.CostWidgetDatum;
 import org.finos.waltz.service.DIBaseConfiguration;
 import org.jooq.Record1;
 import org.jooq.Select;

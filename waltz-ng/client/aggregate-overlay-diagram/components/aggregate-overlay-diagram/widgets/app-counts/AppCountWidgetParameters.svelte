@@ -3,29 +3,45 @@
     import {getContext} from "svelte";
     import {timeFormat} from "d3-time-format";
     import moment from "moment";
-    import BulkAppCountWidget from "./BulkAppCountWidget.svelte";
     import Icon from "../../../../../common/svelte/Icon.svelte";
+    import AppCountOverlayCell from "./AppCountOverlayCell.svelte";
+    import _ from "lodash";
 
     export let opts;
 
     const fmt = timeFormat("%Y-%m-%d");
     const overlayData = getContext("overlayData");
     const selectedDiagram = getContext("selectedDiagram");
-
+    const selectedOverlay = getContext("selectedOverlay");
     const widget = getContext("widget");
+    const appCountSliderValue = getContext("appCountSliderValue");
+
     let selectedDefinition;
     let overlayDataCall;
     let futureDate = null;
-    let slideVal = 0;
+
+    function mkGlobalProps(data) {
+        const maxCount = _
+            .chain(data)
+            .map(d => [d.currentStateCount, d.targetStateCount])
+            .flatten()
+            .max()
+            .value();
+        return { maxCount };
+    }
 
     function onSelect(futureDate) {
+        $selectedOverlay = null;
         const dateStr = fmt(futureDate);
         overlayDataCall = aggregateOverlayDiagramStore.findAppCountsForDiagram(
             $selectedDiagram.id,
             opts,
             dateStr,
             true);
-        $widget = BulkAppCountWidget;
+        $widget = {
+            overlay: AppCountOverlayCell,
+            mkGlobalProps
+        };
     }
 
     const debouncedOnSelect = _.debounce(onSelect, 500);
@@ -34,7 +50,7 @@
         $overlayData = $overlayDataCall?.data;
     }
 
-    $: futureDate = moment().set("date", 1).add(slideVal * 2, "months");
+    $: futureDate = moment().set("date", 1).add($appCountSliderValue * 2, "months");
     $: debouncedOnSelect(futureDate);
 </script>
 
@@ -47,7 +63,7 @@
        type="range"
        min="0"
        max="60"
-       bind:value={slideVal}>
+       bind:value={$appCountSliderValue}>
 
 <div class="help-block">
     Use the slider to adjust how far in the future to application counts.

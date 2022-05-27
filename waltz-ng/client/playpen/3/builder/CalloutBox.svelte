@@ -3,9 +3,8 @@
     export let height;
 </script>
 
-<g class="callout-box">
-    <rect {width}
-          {height}
-          fill="none">
-    </rect>
-</g>
+<foreignObject {width}
+               {height}>
+    <div class="callout-box">
+    </div>
+</foreignObject>

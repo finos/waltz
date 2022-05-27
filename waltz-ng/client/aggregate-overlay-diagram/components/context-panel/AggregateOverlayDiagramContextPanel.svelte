@@ -4,6 +4,7 @@
     import WidgetSelector from "../aggregate-overlay-diagram/WidgetSelector.svelte";
     import DescriptionFade from "../../../common/svelte/DescriptionFade.svelte";
     import DiagramInstanceSelector from "../instance-selector/DiagramInstanceSelector.svelte";
+    import SelectedOverlayPanel from "./SelectedOverlayPanel.svelte";
 
     export let primaryEntityRef;
 
@@ -52,6 +53,10 @@
         {#if selectedTab === 'widgets'}
 
             <WidgetSelector {primaryEntityRef}/>
+
+            <hr>
+
+            <SelectedOverlayPanel/>
 
         {:else if selectedTab === 'info'}
 

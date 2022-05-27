@@ -1,15 +1,17 @@
 <script>
     import {scaleLinear} from "d3-scale";
+    import _ from "lodash";
 
-    export let cellData = {};
-    export let maxCount;
+    export let cellData = null;
+    export let maxCount = 0;
 
-    $:r = scaleLinear()
+    $: r = scaleLinear()
         .domain([0, maxCount])
         .range([0, 45]);
 
     $: cr = r(cellData?.currentStateCount) || 0;
     $: tr = r(cellData?.targetStateCount) || 0;
+
 </script>
 
 
@@ -31,15 +33,15 @@
     <foreignObject transform="translate(15, 5)"
                    width="270"
                    height="90">
-        {#if cellData}
+        {#if _.isNil(cellData)}
+            -
+        {:else}
             <div style="font-size: 22px; width: 100%; text-align: center">
                 App Count: #{cellData?.currentStateCount} &raquo; #{cellData?.targetStateCount}
             </div>
             <div style="font-size: 16px; width: 100%; text-align: center">
                 Change: {cellData?.targetStateCount - cellData?.currentStateCount}
             </div>
-        {:else}
-            -
         {/if}
     </foreignObject>
 </svg>

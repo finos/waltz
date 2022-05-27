@@ -1,7 +1,7 @@
 package org.finos.waltz.data.aggregate_overlay_diagram;
 
-import org.finos.waltz.model.overlay_diagram.CountWidgetDatum;
-import org.finos.waltz.model.overlay_diagram.ImmutableCountWidgetDatum;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.CountWidgetDatum;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.ImmutableCountWidgetDatum;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;

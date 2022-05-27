@@ -1,59 +1,112 @@
 <script>
-    import {renderBulkOverlays, clearOverlayContent} from "./aggregate-overlay-diagram-utils";
-    import {entity} from "../../../common/services/enums/entity";
+    import {addCellClickHandlers, addSectionHeaderClickHandlers, clearContent} from "./aggregate-overlay-diagram-utils";
     import {getContext} from "svelte";
-    import BulkCallouts from "./callout/BulkCallouts.svelte";
+    import _ from "lodash";
+    import {select, selectAll} from "d3-selection";
+    import Callout from "./callout/Callout.svelte";
+    import {hoveredCallout} from "../../aggregate-overlay-diagram-store";
 
     export let svg = "";
-    export let primaryEntityRef;
-
-    let svgHolderElem;
-
-    $: {
-        if (svgHolderElem && $overlayData) {
-            if (primaryEntityRef.kind !== entity.AGGREGATE_OVERLAY_DIAGRAM_INSTANCE.key) {
-                clearOverlayContent(svgHolderElem, ".statistics-box");
-            }
-            setTimeout(
-                () => renderBulkOverlays(
-                    svgHolderElem,
-                    overlayCellsHolder,
-                    ".statistics-box",
-                    (bBox, contentRef) => {
-                        contentRef.setAttribute("width", bBox.width);
-                        contentRef.setAttribute("height", bBox.height);
-                    }),
-                100);
-        }
-    }
-
-    $: {
-        if (svgHolderElem && $callouts) {
-            clearOverlayContent(svgHolderElem, ".outer");
-
-            setTimeout(
-                () => renderBulkOverlays(
-                    svgHolderElem,
-                    calloutsHolder,
-                    ".callout-box",
-                    (bBox, contentRef) => {
-                        contentRef.setAttribute("width", bBox.width);
-                        contentRef.setAttribute("height", bBox.height);
-                    }),
-                100);
-        }
-    }
 
     let selectedInstance = getContext("selectedInstance");
     let selectedDiagram = getContext("selectedDiagram");
     let overlayData = getContext("overlayData");
     let widget = getContext("widget");
     let callouts = getContext("callouts");
+    let selectedOverlay = getContext("selectedOverlay");
+    let svgDetail = getContext("svgDetail");
+    let relatedBackingEntities = getContext("relatedBackingEntities");
+    let cellIdsExplicitlyRelatedToParent = getContext("cellIdsExplicitlyRelatedToParent");
 
-    let overlayCellsHolder;
+    let svgHolderElem;
     let calloutsHolder;
 
-    let svgDetail = getContext("svgDetail");
+    $: {
+        if (svgHolderElem && $overlayData && $widget?.overlay) {
+            const cellDataByCellExtId = _.keyBy(
+                $overlayData,
+                d => d.cellExternalId);
+
+            clearContent(svgHolderElem, ".statistics-box");
+
+            const globalProps = $widget.mkGlobalProps
+                ? $widget.mkGlobalProps($overlayData)
+                : {};
+
+            const propsByCellId = Array
+                .from(svgHolderElem.querySelectorAll(".data-cell"))
+                .map(cell => {
+                    const sb = cell.querySelector(".statistics-box");
+                    const cellId = cell.getAttribute("data-cell-id");
+                    const cellProps = Object.assign(
+                        {},
+                        globalProps,
+                        { cellData: cellDataByCellExtId[cellId]} );
+
+                    const component = $widget.overlay;
+
+                    new component({
+                        target: sb,
+                        props: cellProps
+                    });
+
+                    return {cellId, cellProps}
+                })
+                .reduce(
+                    (acc, d) => {
+                        acc[d.cellId] = d.cellProps;
+                        return acc;
+                    },
+                    {});
+
+            addCellClickHandlers(svgHolderElem, selectedOverlay, propsByCellId);
+        }
+    }
+
+
+    $: {
+        if (svgHolderElem && $callouts) {
+            clearContent(svgHolderElem, ".callout-box");
+
+            const calloutsByCellId = _.keyBy($callouts, c => c.cellExternalId)
+
+            let dataCells = svgHolderElem.querySelectorAll(".data-cell");
+            let headerCells = svgHolderElem.querySelectorAll(".entity-group-box");
+
+            const propsByCellId = Array
+                .from(_.union(headerCells, dataCells))
+                .map(cell => {
+                    const sb = cell.querySelector(".callout-box");
+                    const cellId = cell.getAttribute("data-cell-id");
+
+                    const component = Callout
+
+                    let callout = calloutsByCellId[cellId];
+
+                    let cellProps = {
+                        callout: callout,
+                        hoveredCallout: $hoveredCallout,
+                        label: _.indexOf($callouts, callout) + 1
+                    };
+                    new component({
+                        target: sb,
+                        props: cellProps
+                    })
+
+                    return {cellId, cellProps}
+                })
+                .reduce((acc, d) => {
+                        acc[d.cellId] = d.cellProps;
+                        return acc;
+                    },
+                    {}
+                );
+
+            addCellClickHandlers(svgHolderElem, selectedOverlay, propsByCellId);
+            addSectionHeaderClickHandlers(svgHolderElem, selectedOverlay, propsByCellId);
+        }
+    }
+
 
     $: {
         if (svgHolderElem) {
@@ -61,35 +114,27 @@
         }
     }
 
+    // highlight explicitly related cells
+    $: {
+        if (svgHolderElem && $cellIdsExplicitlyRelatedToParent) {
+            $cellIdsExplicitlyRelatedToParent
+                .forEach(cellId => select(`[data-cell-id=${cellId}]`)
+                    .classed("show-related-entity-indicator", true));
+        }
+    }
+
+    // toggle inset indication
+    $: {
+
+        selectAll('.data-cell').classed("inset", false);
+        selectAll('.entity-group-box').classed("inset", false);
+        if ($selectedOverlay) {
+            select(`[data-cell-id=${$selectedOverlay.cellId}]`).classed("inset", true);
+        }
+    }
 
 </script>
 
 <div bind:this={svgHolderElem}>
     {@html svg}
 </div>
-
-
-{#key $callouts}
-    <div class="rendered-callouts"
-         bind:this={calloutsHolder}>
-        <BulkCallouts/>
-    </div>
-{/key}
-
-{#key $widget}
-    <div class="rendered-widgets"
-         bind:this={overlayCellsHolder}>
-        <svelte:component this={$widget}/>
-    </div>
-{/key}
-
-
-<style>
-    .rendered-widgets {
-        display: none;
-    }
-
-    .rendered-callouts {
-        display: none;
-    }
-</style>

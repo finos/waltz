@@ -18,6 +18,12 @@
 
 <div>
 
+    <waltz-section name="Process">
+        <waltz-svelte-component component="$ctrl.OverlayDiagramBuilder"
+                                config="$ctrl.configD">
+        </waltz-svelte-component>
+    </waltz-section>
+
     <waltz-section name="F2B Trade">
         <waltz-svelte-component component="$ctrl.OverlayDiagramBuilder"
                                 config="$ctrl.configA">
@@ -33,6 +39,11 @@
     <waltz-section name="Northstar">
         <waltz-svelte-component component="$ctrl.OverlayDiagramBuilder"
                                 config="$ctrl.configC">
+        </waltz-svelte-component>
+    </waltz-section>
+
+    <waltz-section name="Controls">
+        <waltz-svelte-component component="$ctrl.DiagramBuilderControls">
         </waltz-svelte-component>
     </waltz-section>
 

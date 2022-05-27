@@ -3,26 +3,51 @@
     import Markdown from "../../../../../common/svelte/Markdown.svelte";
     import {aggregateOverlayDiagramStore} from "../../../../../svelte-stores/aggregate-overlay-diagram-store";
     import {getContext} from "svelte";
-    import BulkAssessmentWidget from "./BulkAssessmentWidget.svelte";
+    import AssessmentOverlayCell from "./AssessmentOverlayCell.svelte";
     import Icon from "../../../../../common/svelte/Icon.svelte";
+    import _ from "lodash";
 
     export let opts;
 
     const overlayData = getContext("overlayData");
     const widget = getContext("widget");
     const selectedDiagram = getContext("selectedDiagram");
+    const selectedOverlay = getContext("selectedOverlay");
+    const selectedAssessmentDefinition = getContext("selectedAssessmentDefinition");
 
-    let selectedDefinition;
     let overlayDataCall;
 
+
+    function mkGlobalProps(data) {
+        const maxCount = _
+            .chain(data)
+            .map(d => d.counts)
+            .flatten()
+            .map(d => d.count)
+            .max()
+            .value();
+
+        return {maxCount};
+    }
+
+
+    function changeDefinition() {
+        $selectedAssessmentDefinition = null;
+    }
+
+
     function onSelect(ad) {
-        selectedDefinition = ad;
+        $selectedOverlay = null;
+        $selectedAssessmentDefinition = ad;
         overlayDataCall = aggregateOverlayDiagramStore.findAppAssessmentsForDiagram(
             $selectedDiagram.id,
             ad.id,
             opts,
             true);
-        $widget = BulkAssessmentWidget;
+        $widget = {
+            mkGlobalProps,
+            overlay: AssessmentOverlayCell
+        };
     }
 
     $: {
@@ -31,12 +56,15 @@
 
 </script>
 
-{#if selectedDefinition}
-    <h4>Showing: {selectedDefinition.name}</h4>
+{#if $selectedAssessmentDefinition}
+    <h4>Showing: {$selectedAssessmentDefinition.name}</h4>
 
     <div class="help-block">
-        <Markdown text={selectedDefinition.description}/>
+        <Markdown text={$selectedAssessmentDefinition.description}/>
     </div>
+    <button class="btn btn-skinny" on:click={changeDefinition}>
+        Change assessment
+    </button>
 {:else}
     <AssessmentDefinitionPicker {onSelect}
                                 selectionFilter={ad => ad.entityKind === 'APPLICATION'}/>

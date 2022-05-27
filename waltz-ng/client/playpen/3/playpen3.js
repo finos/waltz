@@ -18,13 +18,13 @@
 
 import {initialiseData} from "../../common/index";
 import template from "./playpen3.html";
-import {CORE_API} from "../../common/services/core-api-utils";
 import FlowVenn from "../../logical-flow/svelte/flow-venn/FlowVenn.svelte";
 import OverlayDiagramBuilder from "./builder/OverlayDiagramBuilder.svelte";
 import configA from "./builder/front-to-back-trade-data";
 import configB from "./builder/front-to-back-operations-data";
 import configC from "./builder/north-star";
-
+import configD from "./builder/process-diag";
+import DiagramBuilderControls from "./builder/DiagramBuilderControls.svelte"
 
 const initialState = {
     b: {
@@ -41,13 +41,13 @@ const initialState = {
     OverlayDiagramBuilder,
     configA,
     configB,
-    configC
+    configC,
+    configD,
+    DiagramBuilderControls
 };
 
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
-
-
 }
 
 controller.$inject = [

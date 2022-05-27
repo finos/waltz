@@ -8,6 +8,7 @@
     import CalloutDeletePanel from "./CalloutDeletePanel.svelte";
     import {userStore} from "../../../../svelte-stores/user-store";
     import systemRoles from "../../../../user/system-roles";
+    import {determineCell} from "../aggregate-overlay-diagram-utils";
 
 
     const Modes = {
@@ -25,6 +26,8 @@
     let svgDetail = getContext("svgDetail");
     let selectedCellId = getContext("selectedCellId");
     let selectedCellCallout = getContext("selectedCellCallout");
+    let selectedOverlay = getContext("selectedOverlay");
+
 
     let permissionsCall = userStore.load();
     $: permissions = $permissionsCall?.data;
@@ -42,46 +45,41 @@
     function selectCallout(callout) {
         if ($selectedCallout?.id === callout.id) {
             $selectedCallout = null;
+            $selectedOverlay = null;
         } else {
             $selectedCallout = callout;
-        }
-    }
-
-    function determineCell(elem) {
-        if (elem == null) {
-            return null;
-        } else {
-            const cellId = elem.getAttribute("data-cell-id");
-            if (!_.isNil(cellId)) {
-                return elem;
-            } else {
-                return determineCell(elem.parentElement)
-            }
+            $selectedOverlay = Object.assign({}, {cellId: callout.cellExternalId});
         }
     }
 
 
     function setSelectedCell() {
         return (e) => {
+
+            const clickedElem = e.target;
+            const dataCell = determineCell(clickedElem);
+
+            $selectedCellId = dataCell !== null
+                ? dataCell.getAttribute("data-cell-id")
+                : null;
+
+            if ($selectedCellId == null) {
+                return;
+            }
+
+            const existingCallout = _.find($callouts, c => c.cellExternalId === $selectedCellId);
+
             if (activeMode === Modes.ADD) {
-
-                const clickedElem = e.target;
-                const dataCell = determineCell(clickedElem);
-
-                $selectedCellId = dataCell !== null
-                    ? dataCell.getAttribute("data-cell-id")
-                    : null;
-
-                if ($selectedCellId == null) {
-                    return;
-                }
-
-                const existingCallout = _.find($callouts, c => c.cellExternalId === $selectedCellId);
-
                 if (!_.isNil(existingCallout)) {
                     editCallout(existingCallout?.cellExternalId);
                 } else {
                     addCallout();
+                }
+            } else {
+                if (!_.isNil(existingCallout)) {
+                    selectCallout(existingCallout);
+                } else {
+                    $selectedCallout = null;
                 }
             }
         };
@@ -95,22 +93,6 @@
     }
 
 
-    $: {
-        if ($svgDetail) {
-            const outers = $svgDetail.querySelectorAll(".outer");
-            _.forEach(
-                outers,
-                cell => {
-                    const parent = cell.parentElement;
-                    const targetId = parent.getAttribute("data-cell-id");
-
-                    cell.setAttribute("style", `opacity: ${!_.isNull($selectedCellId) && $selectedCellId === targetId
-                        ? "0.7"
-                        : "1"}`)
-                });
-        }
-    }
-
     function cancel() {
         $selectedCellId = null;
         activeMode = Modes.VIEW
@@ -119,6 +101,12 @@
     function addCallout() {
         $selectedCellCallout = emptyCallout;
         activeMode = Modes.ADD;
+    }
+
+
+    function editMode() {
+        $selectedOverlay = null;
+        addCallout();
     }
 
     function editCallout(cellExtId) {
@@ -194,7 +182,7 @@
         </table>
         {#if hasEditPermissions}
             <button class="btn btn-skinny"
-                    on:click={() => addCallout()}>
+                    on:click={() => editMode()}>
                 <Icon name="plus"/>
                 Add a callout
             </button>
@@ -205,7 +193,7 @@
             {#if hasEditPermissions}
                 , would you like
                 <button class="btn btn-skinny"
-                        on:click={() => addCallout()}>
+                        on:click={() => editMode()}>
                     to add one?
                 </button>
             {/if}

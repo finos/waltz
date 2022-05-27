@@ -1,8 +1,8 @@
 package org.finos.waltz.data.aggregate_overlay_diagram;
 
 import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.overlay_diagram.ImmutableTargetCostWidgetDatum;
-import org.finos.waltz.model.overlay_diagram.TargetCostWidgetDatum;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.ImmutableTargetCostWidgetDatum;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.TargetCostWidgetDatum;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;

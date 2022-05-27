@@ -2,39 +2,55 @@
     import {aggregateOverlayDiagramStore} from "../../../../../svelte-stores/aggregate-overlay-diagram-store";
     import {getContext} from "svelte";
     import {timeFormat} from "d3-time-format";
-    import BulkTargetAppCostWidget from "./BulkTargetAppCostWidget.svelte";
     import moment from "moment";
     import Icon from "../../../../../common/svelte/Icon.svelte";
+    import TargetAppCostOverlayCell from "./TargetAppCostOverlayCell.svelte";
+    import _ from "lodash";
 
     export let opts;
 
     const fmt = timeFormat("%Y-%m-%d");
     const overlayData = getContext("overlayData");
     const selectedDiagram = getContext("selectedDiagram");
+    const selectedOverlay = getContext("selectedOverlay");
+    const costSliderValue = getContext("costSliderValue");
 
     const widget = getContext("widget");
     let selectedDefinition;
     let overlayDataCall;
 
+
+    function mkGlobalProps(data) {
+        const maxCost = _
+            .chain(data)
+            .map(d => [d.currentStateCost, d.targetStateCost])
+            .flatten()
+            .max()
+            .value();
+        return { maxCost };
+    }
+
     function onSelect(futureDate) {
+        $selectedOverlay = null;
         const dateStr = fmt(futureDate);
         overlayDataCall = aggregateOverlayDiagramStore.findTargetAppCostForDiagram(
             $selectedDiagram.id,
             opts,
             dateStr,
             true);
-        $widget = BulkTargetAppCostWidget;
+        $widget = {
+            overlay: TargetAppCostOverlayCell,
+            mkGlobalProps
+        };
     }
 
     $: {
         $overlayData = $overlayDataCall?.data;
     }
 
-    let slideVal = 0;
-
     const debouncedOnSelect = _.debounce(onSelect, 500);
 
-    $: futureDate = moment().set("date", 1).add(slideVal * 2, "months");
+    $: futureDate = moment().set("date", 1).add($costSliderValue * 2, "months");
     $: debouncedOnSelect(futureDate);
 
 </script>
@@ -47,7 +63,7 @@
        type="range"
        min="0"
        max="60"
-       bind:value={slideVal}>
+       bind:value={$costSliderValue}>
 
 <div class="help-block">
     Use the slider to adjust how far in the future to project costs.

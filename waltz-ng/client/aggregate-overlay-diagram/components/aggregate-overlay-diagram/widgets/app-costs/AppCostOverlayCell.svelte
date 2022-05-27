@@ -13,7 +13,8 @@
 </script>
 
 
-<svg class="content" viewBox="0 0 300 100">
+<svg class="content"
+     viewBox="0 0 300 100">
     <circle r={tr}
             fill="#c6eeff"
             stroke="#25b0ff"
@@ -23,7 +24,7 @@
     <foreignObject transform="translate(15, 5)"
                    width="270"
                    height="90">
-        {#if cellData}
+        {#if cellData?.appCount}
             <div style="font-size: 26px; width: 100%;">
                 App Costs: <strong>{numberFormatter(cellData?.totalCost, 2)}</strong>
                 <br>
