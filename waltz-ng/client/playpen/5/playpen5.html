@@ -29,6 +29,8 @@
     </waltz-page-header>
 
     <waltz-section>
-        <waltz-dynamic-nav-aid></waltz-dynamic-nav-aid>
+        <waltz-svelte-component component="$ctrl.AssessmentRatingPicker"
+                                definition-filter="$ctrl.definitionFilter">
+        </waltz-svelte-component>
     </waltz-section>
 </div>
