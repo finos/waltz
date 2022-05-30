@@ -92,6 +92,7 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
                     .findTargetAppCostWidgetData(
                             getId(request),
                             readIdSelectionOptionsFromBody(request),
+                            null,
                             getTargetDate(request));
         };
 

@@ -2,6 +2,7 @@ package org.finos.waltz.service.aggregate_overlay_diagram;
 
 import org.finos.waltz.data.aggregate_overlay_diagram.*;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
+import org.finos.waltz.model.AssessmentBasedSelectionFilter;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramInfo;
@@ -71,7 +72,9 @@ public class AggregateOverlayDiagramService {
 
     public Set<TargetCostWidgetDatum> findTargetAppCostWidgetData(Long diagramId,
                                                                   IdSelectionOptions appSelectionOptions,
+                                                                  AssessmentBasedSelectionFilter filterParams,
                                                                   LocalDate targetStateDate) {
+
 
         Select<Record1<Long>> applicationIdSelector = APPLICATION_ID_SELECTOR_FACTORY.apply(appSelectionOptions);
         return targetAppCostWidgetDao.findWidgetData(diagramId, applicationIdSelector, targetStateDate);
