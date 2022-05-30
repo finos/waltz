@@ -33,9 +33,14 @@
     function onSelect(futureDate) {
         $selectedOverlay = null;
         const dateStr = fmt(futureDate);
+
+        let widgetParameters = {
+            idSelectionOptions: opts
+        }
+
         overlayDataCall = aggregateOverlayDiagramStore.findTargetAppCostForDiagram(
             $selectedDiagram.id,
-            opts,
+            widgetParameters,
             dateStr,
             true);
         $widget = {

@@ -1,4 +1,5 @@
-package org.finos.waltz.model.aggregate_overlay_diagram.overlay;
+package org.finos.waltz.web.json;
+
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -7,19 +8,16 @@ import org.finos.waltz.model.IdSelectionOptions;
 import org.immutables.value.Value;
 
 import java.util.Optional;
-import java.util.Set;
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableAppCostWidgetParameters.class)
-@JsonDeserialize(as = ImmutableAppCostWidgetParameters.class)
-public abstract class AppCostWidgetParameters {
+@JsonSerialize(as = ImmutableOverlayDiagramWidgetInfo.class)
+@JsonDeserialize(as = ImmutableOverlayDiagramWidgetInfo.class)
+public abstract class OverlayDiagramWidgetInfo {
 
-    public abstract Long allocationSchemeId();
-
-    public abstract Set<Long> costKindIds();
-
-    public abstract IdSelectionOptions selectionOptions();
+    public abstract IdSelectionOptions idSelectionOptions();
 
     public abstract Optional<AssessmentBasedSelectionFilter> assessmentBasedSelectionFilter();
 
 }
+
+

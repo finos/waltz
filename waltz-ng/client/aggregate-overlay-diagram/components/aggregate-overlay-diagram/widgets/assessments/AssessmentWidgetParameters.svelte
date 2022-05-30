@@ -39,10 +39,15 @@
     function onSelect(ad) {
         $selectedOverlay = null;
         $selectedAssessmentDefinition = ad;
+
+        const widgetParameters = {
+            idSelectionOptions: opts
+        }
+
         overlayDataCall = aggregateOverlayDiagramStore.findAppAssessmentsForDiagram(
             $selectedDiagram.id,
             ad.id,
-            opts,
+            widgetParameters,
             true);
         $widget = {
             mkGlobalProps,

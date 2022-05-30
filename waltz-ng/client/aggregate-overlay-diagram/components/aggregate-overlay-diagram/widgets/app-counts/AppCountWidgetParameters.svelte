@@ -31,13 +31,20 @@
     }
 
     function onSelect(futureDate) {
+
+        const widgetParameters = {
+            idSelectionOptions: opts
+        }
+
         $selectedOverlay = null;
         const dateStr = fmt(futureDate);
+
         overlayDataCall = aggregateOverlayDiagramStore.findAppCountsForDiagram(
             $selectedDiagram.id,
-            opts,
+            widgetParameters,
             dateStr,
             true);
+
         $widget = {
             overlay: AppCountOverlayCell,
             mkGlobalProps

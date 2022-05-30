@@ -1,5 +1,4 @@
 import {remote} from "./remote";
-import {checkIsEntityRef} from "../common/checks";
 
 
 export function mkOverlayDiagramStore() {
@@ -23,21 +22,21 @@ export function mkOverlayDiagramStore() {
     };
 
 
-    const findAppCountsForDiagram = (diagramId, vantagePointRef, futureDate, force = false) => {
+    const findAppCountsForDiagram = (diagramId, widgetParameters, futureDate, force = false) => {
         return remote
             .fetchViewList(
                 "POST",
                 `api/aggregate-overlay-diagram/diagram-id/${diagramId}/app-count-widget/${futureDate}`,
-                vantagePointRef,
+                widgetParameters,
                 {force});
     };
 
-    const findTargetAppCostForDiagram = (diagramId, vantagePointRef, futureDate, force = false) => {
+    const findTargetAppCostForDiagram = (diagramId, widgetParameters, futureDate, force = false) => {
         return remote
             .fetchViewList(
                 "POST",
                 `api/aggregate-overlay-diagram/diagram-id/${diagramId}/target-app-cost-widget/${futureDate}`,
-                vantagePointRef,
+                widgetParameters,
                 {force});
     };
 
@@ -50,12 +49,12 @@ export function mkOverlayDiagramStore() {
                 {force});
     };
 
-    const findAppAssessmentsForDiagram = (diagramId, assessmentId, vantagePointRef, force = false) => {
+    const findAppAssessmentsForDiagram = (diagramId, assessmentId, widgetParameters, force = false) => {
         return remote
             .fetchViewList(
                 "POST",
                 `api/aggregate-overlay-diagram/diagram-id/${diagramId}/app-assessment-widget/${assessmentId}`,
-                vantagePointRef,
+                widgetParameters,
                 {force});
     };
 

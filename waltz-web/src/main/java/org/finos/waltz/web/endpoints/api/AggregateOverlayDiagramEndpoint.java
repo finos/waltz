@@ -19,6 +19,7 @@
 package org.finos.waltz.web.endpoints.api;
 
 import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.model.AssessmentBasedSelectionFilter;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramInfo;
@@ -28,6 +29,7 @@ import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.WebUtilities;
 import org.finos.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.web.json.OverlayDiagramWidgetInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +37,7 @@ import org.springframework.stereotype.Service;
 import spark.Request;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.web.WebUtilities.*;
@@ -79,29 +82,38 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
 
 
         ListRoute<CountWidgetDatum> findAppCountWidgetDataRoute = (request, response) -> {
+
+            OverlayDiagramWidgetInfo widgetParameters = readBody(request, OverlayDiagramWidgetInfo.class, null);
+
             return aggregateOverlayDiagramService
                     .findAppCountWidgetData(
                             getId(request),
-                            readIdSelectionOptionsFromBody(request),
+                            widgetParameters.idSelectionOptions(),
+                            widgetParameters.assessmentBasedSelectionFilter(),
                             getTargetDate(request));
         };
 
 
         ListRoute<TargetCostWidgetDatum> findTargetAppCostWidgetDataRoute = (request, response) -> {
+
+            OverlayDiagramWidgetInfo widgetParameters = readBody(request, OverlayDiagramWidgetInfo.class, null);
+
             return aggregateOverlayDiagramService
                     .findTargetAppCostWidgetData(
                             getId(request),
-                            readIdSelectionOptionsFromBody(request),
-                            null,
+                            widgetParameters.idSelectionOptions(),
+                            widgetParameters.assessmentBasedSelectionFilter(),
                             getTargetDate(request));
         };
 
 
         ListRoute<CostWidgetDatum> findAppCostWidgetDataRoute = (request, response) -> {
             AppCostWidgetParameters appCostWidgetParameters = readBody(request, AppCostWidgetParameters.class);
+
             return aggregateOverlayDiagramService
                     .findAppCostWidgetData(
                             getId(request),
+                            appCostWidgetParameters.assessmentBasedSelectionFilter(),
                             appCostWidgetParameters.selectionOptions(),
                             appCostWidgetParameters.costKindIds(),
                             appCostWidgetParameters.allocationSchemeId());
@@ -111,13 +123,14 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
         ListRoute<AssessmentRatingsWidgetDatum> findAppAssessmentWidgetDataRoute = (request, response) -> {
             long diagramId = getId(request);
             long assessmentId = getLong(request, "assessment-id");
-            IdSelectionOptions options = readIdSelectionOptionsFromBody(request);
+            OverlayDiagramWidgetInfo widgetParameters = readBody(request, OverlayDiagramWidgetInfo.class, null);
 
             return aggregateOverlayDiagramService
                     .findAppAssessmentWidgetData(
                             diagramId,
+                            widgetParameters.assessmentBasedSelectionFilter(),
                             assessmentId,
-                            options);
+                            widgetParameters.idSelectionOptions());
         };
 
 
