@@ -24,8 +24,8 @@
                 displayName: null
             }))
         .filter(selectionFilter)
-        .orderBy(d => d.name)
-        .value()
+        .orderBy( d => d.name)
+        .value();
 
     const columnDefs = [
         {field: "name", name: "Assessment Definition", width: "30%"},

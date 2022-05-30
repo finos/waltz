@@ -19,28 +19,28 @@
 import angular from "angular";
 
 import playpenView5 from "./playpen5";
-import { registerComponents } from '../../common/module-utils';
-import DynamicNavAid from "./dynamic-nav-aid";
+import { registerComponents } from "../../common/module-utils";
+
+
 
 
 export default () => {
 
-    const module = angular.module('waltz.playpen5', []);
+    const module = angular.module("waltz.playpen5", []);
 
     module.config([
-        '$stateProvider',
+        "$stateProvider",
         ($stateProvider) => {
             $stateProvider
-                .state('main.playpen.5', {
-                    url: '/5',
-                    views: { 'content@': playpenView5 }
+                .state("main.playpen.5", {
+                    url: "/5",
+                    views: { "content@": playpenView5 }
                 })
         }
     ]);
 
 
     registerComponents(module, [
-        DynamicNavAid
     ]);
 
     return module.name;

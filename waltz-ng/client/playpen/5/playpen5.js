@@ -15,10 +15,12 @@
  * See the License for the specific
  *
  */
-import template from './playpen5.html';
+import template from "./playpen5.html";
+import AssessmentRatingPicker from "../../common/svelte/AssessmentRatingPicker.svelte";
 
 
 const initialState = {
+    AssessmentRatingPicker
 };
 
 
@@ -26,8 +28,7 @@ function controller() {
 
     const vm = Object.assign(this, initialState);
 
-
-
+    vm.definitionFilter = d => d.entityKind === "CHANGE_INITIATIVE";
 
 }
 
@@ -40,7 +41,7 @@ controller.$inject = [
 const view = {
     template,
     controller,
-    controllerAs: 'ctrl',
+    controllerAs: "$ctrl",
     bindToController: true,
     scope: {}
 };
