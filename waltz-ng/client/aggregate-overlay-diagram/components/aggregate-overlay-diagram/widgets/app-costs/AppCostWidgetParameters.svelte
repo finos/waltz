@@ -8,19 +8,17 @@
     import _ from "lodash";
     import AppCostOverlayCell from "./AppCostOverlayCell.svelte";
 
-    export let opts;
-
-    const overlayData = getContext("overlayData");
     const selectedDiagram = getContext("selectedDiagram");
     const widget = getContext("widget");
     const selectedOverlay = getContext("selectedOverlay");
     const selectedCostKinds = getContext("selectedCostKinds");
     const selectedAllocationScheme = getContext("selectedAllocationScheme");
+    const widgetParameters = getContext("widgetParameters");
+    const remoteMethod = getContext("remoteMethod");
+    const overlayDataCall = getContext("overlayDataCall");
 
     let selectedCostKindIds = [];
     let selectedDefinition;
-
-    let overlayDataCall;
 
     const Modes = {
         ALLOCATION_SCHEME_PICKER: "ALLOCATION_SCHEME_PICKER",
@@ -44,29 +42,23 @@
 
     function onSelect() {
 
-        $selectedOverlay = null;
+        $remoteMethod = aggregateOverlayDiagramStore.findAppCostForDiagram;
 
-        const appCostParameters = {
+        $widgetParameters = {
             allocationSchemeId: $selectedAllocationScheme.id,
             costKindIds: selectedCostKindIds,
-            selectionOptions: opts
         }
 
-        overlayDataCall = aggregateOverlayDiagramStore.findAppCostForDiagram(
-            $selectedDiagram.id,
-            appCostParameters,
-            true);
+        $selectedOverlay = null;
 
         $widget = {
             overlay: AppCostOverlayCell,
             mkGlobalProps
         };
+
         activeMode = Modes.SUMMARY;
     }
 
-    $: {
-        $overlayData = $overlayDataCall?.data;
-    }
 
     function onSelectAllocationScheme(scheme) {
         activeMode = Modes.COST_KIND_PICKER

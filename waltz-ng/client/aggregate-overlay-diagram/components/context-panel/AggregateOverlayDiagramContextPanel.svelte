@@ -5,6 +5,7 @@
     import DescriptionFade from "../../../common/svelte/DescriptionFade.svelte";
     import DiagramInstanceSelector from "../instance-selector/DiagramInstanceSelector.svelte";
     import SelectedOverlayPanel from "./SelectedOverlayPanel.svelte";
+    import FilterSelectorPanel from "../filter-selector/FilterSelectorPanel.svelte";
 
     export let primaryEntityRef;
 
@@ -48,6 +49,15 @@
         <span>Instances</span>
     </label>
 
+    <input type="radio"
+           bind:group={selectedTab}
+           value="filters"
+           id="filters">
+    <label class="wt-label"
+           for="filters">
+        <span>Filters</span>
+    </label>
+
     <div class="wt-tab wt-active">
         <!-- SERVERS -->
         {#if selectedTab === 'widgets'}
@@ -66,6 +76,9 @@
         {:else if selectedTab === 'instances'}
             <DiagramInstanceSelector {primaryEntityRef}
                                      on:select={selectInstance}/>
+
+        {:else if selectedTab === 'filters'}
+            <FilterSelectorPanel/>
         {/if}
     </div>
 </div>

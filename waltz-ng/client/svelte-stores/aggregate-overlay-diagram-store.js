@@ -22,11 +22,11 @@ export function mkOverlayDiagramStore() {
     };
 
 
-    const findAppCountsForDiagram = (diagramId, widgetParameters, futureDate, force = false) => {
+    const findAppCountsForDiagram = (diagramId, widgetParameters, force = false) => {
         return remote
             .fetchViewList(
                 "POST",
-                `api/aggregate-overlay-diagram/diagram-id/${diagramId}/app-count-widget/${futureDate}`,
+                `api/aggregate-overlay-diagram/diagram-id/${diagramId}/app-count-widget`,
                 widgetParameters,
                 {force});
     };
@@ -35,25 +35,25 @@ export function mkOverlayDiagramStore() {
         return remote
             .fetchViewList(
                 "POST",
-                `api/aggregate-overlay-diagram/diagram-id/${diagramId}/target-app-cost-widget/${futureDate}`,
+                `api/aggregate-overlay-diagram/diagram-id/${diagramId}/target-app-cost-widget`,
                 widgetParameters,
                 {force});
     };
 
-    const findAppCostForDiagram = (diagramId, appCostParameters, force = false) => {
+    const findAppCostForDiagram = (diagramId, widgetParameters, force = false) => {
         return remote
             .fetchViewList(
                 "POST",
                 `api/aggregate-overlay-diagram/diagram-id/${diagramId}/app-cost-widget`,
-                appCostParameters,
+                widgetParameters,
                 {force});
     };
 
-    const findAppAssessmentsForDiagram = (diagramId, assessmentId, widgetParameters, force = false) => {
+    const findAppAssessmentsForDiagram = (diagramId, widgetParameters, force = false) => {
         return remote
             .fetchViewList(
                 "POST",
-                `api/aggregate-overlay-diagram/diagram-id/${diagramId}/app-assessment-widget/${assessmentId}`,
+                `api/aggregate-overlay-diagram/diagram-id/${diagramId}/app-assessment-widget`,
                 widgetParameters,
                 {force});
     };

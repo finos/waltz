@@ -1,5 +1,6 @@
 <script>
-    import AssessmentDefinitionPicker from "../../../../../report-grid/components/svelte/pickers/AssessmentDefinitionPicker.svelte";
+    import AssessmentDefinitionPicker
+        from "../../../../../report-grid/components/svelte/pickers/AssessmentDefinitionPicker.svelte";
     import Markdown from "../../../../../common/svelte/Markdown.svelte";
     import {aggregateOverlayDiagramStore} from "../../../../../svelte-stores/aggregate-overlay-diagram-store";
     import {getContext} from "svelte";
@@ -7,16 +8,12 @@
     import Icon from "../../../../../common/svelte/Icon.svelte";
     import _ from "lodash";
 
-    export let opts;
-
-    const overlayData = getContext("overlayData");
     const widget = getContext("widget");
-    const selectedDiagram = getContext("selectedDiagram");
     const selectedOverlay = getContext("selectedOverlay");
     const selectedAssessmentDefinition = getContext("selectedAssessmentDefinition");
-
-    let overlayDataCall;
-
+    const remoteMethod = getContext("remoteMethod");
+    const overlayDataCall = getContext("overlayDataCall");
+    const widgetParameters = getContext("widgetParameters");
 
     function mkGlobalProps(data) {
         const maxCount = _
@@ -37,26 +34,19 @@
 
 
     function onSelect(ad) {
-        $selectedOverlay = null;
-        $selectedAssessmentDefinition = ad;
 
-        const widgetParameters = {
-            idSelectionOptions: opts
+        $remoteMethod = aggregateOverlayDiagramStore.findAppAssessmentsForDiagram;
+
+        $widgetParameters = {
+            assessmentDefinitionId: ad.id
         }
 
-        overlayDataCall = aggregateOverlayDiagramStore.findAppAssessmentsForDiagram(
-            $selectedDiagram.id,
-            ad.id,
-            widgetParameters,
-            true);
+        $selectedOverlay = null;
+
         $widget = {
             mkGlobalProps,
             overlay: AssessmentOverlayCell
         };
-    }
-
-    $: {
-        $overlayData = $overlayDataCall?.data;
     }
 
 </script>

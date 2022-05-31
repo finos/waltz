@@ -1,10 +1,8 @@
 package org.finos.waltz.data.assessment_rating;
 
 import org.finos.waltz.data.GenericSelector;
-import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.model.AssessmentBasedSelectionFilter;
 import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.IdSelectionOptions;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
@@ -12,21 +10,28 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.schema.Tables.ASSESSMENT_RATING;
 
 @Service
 public class AssessmentRatingBasedGenericSelectorFactory {
 
 
-    public static Select<Record1<Long>> prepareFilteredSelection(EntityKind targetKind,
-                                                                 IdSelectionOptions options,
-                                                                 Optional<AssessmentBasedSelectionFilter> params) {
-
-        GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
-        GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, options);
+    /**
+     * Creates a selector for entity ids of the given kind. If there are filters these are applied, if the filters are provided
+     * but there are no specified ratings, this uses the default generic selector.
+     *
+     * @param genericSelector the selector for the target entity
+     * @param params          optional assessment based filter parameters to limit the selector by ratings for the entity
+     * @return id selector
+     */
+    public static Select<Record1<Long>> applyFilterToSelector(GenericSelector genericSelector,
+                                                              Optional<AssessmentBasedSelectionFilter> params) {
 
         return params
-                .map(p -> genericSelector.selector().intersect(mkAssessmentRatingSelector(p, genericSelector.kind())))
+                .map(p -> isEmpty(p.ratingIds())
+                        ? genericSelector.selector()
+                        : genericSelector.selector().intersect(mkAssessmentRatingSelector(p, genericSelector.kind())))
                 .orElse(genericSelector.selector());
     }
 
