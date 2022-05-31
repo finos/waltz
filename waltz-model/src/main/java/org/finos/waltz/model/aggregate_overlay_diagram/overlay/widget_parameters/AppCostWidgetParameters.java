@@ -1,8 +1,7 @@
-package org.finos.waltz.model.aggregate_overlay_diagram.overlay;
+package org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.finos.waltz.model.IdSelectionOptions;
 import org.immutables.value.Value;
 
 import java.util.Set;
@@ -13,9 +12,6 @@ import java.util.Set;
 public abstract class AppCostWidgetParameters {
 
     public abstract Long allocationSchemeId();
-
     public abstract Set<Long> costKindIds();
-
-    public abstract IdSelectionOptions selectionOptions();
 
 }

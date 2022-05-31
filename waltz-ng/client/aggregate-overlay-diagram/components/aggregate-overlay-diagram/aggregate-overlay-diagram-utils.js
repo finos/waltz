@@ -1,5 +1,5 @@
 import _ from "lodash";
-import {writable} from "svelte/store";
+import {derived, writable} from "svelte/store";
 import {setContext} from "svelte";
 import {
     amberHex,
@@ -10,7 +10,8 @@ import {
     lightGreyHex,
     pinkHex,
     purpleHex,
-    redHex, yellowHex
+    redHex,
+    yellowHex
 } from "../../../common/colors";
 import {refToString} from "../../../common/entity-utils";
 
@@ -187,6 +188,10 @@ export function setupContextStores() {
     const selectedOverlay = writable(null);
     const relatedBackingEntities = writable([]);
     const cellIdsExplicitlyRelatedToParent = writable([]);
+    const filterParameters = writable(null);
+    const widgetParameters = writable(null);
+    const selectionOptions = writable(null);
+    const remoteMethod = writable(null);
 
     //widget parameters
     const appCountSliderValue = writable(0);
@@ -194,6 +199,33 @@ export function setupContextStores() {
     const selectedAssessmentDefinition = writable(null);
     const selectedAllocationScheme = writable(null);
     const selectedCostKinds = writable([]);
+
+
+    //anything passed up to endpoint
+    const overlayDataCall = derived(
+        [remoteMethod, selectedDiagram, selectionOptions, filterParameters, widgetParameters],
+        ([$remoteMethod, $selectedDiagram, $selectionOptions, $filterParameters, $widgetParameters]) => {
+
+            if ($remoteMethod && $selectedDiagram && $widgetParameters) {
+
+                const assessmentBasedSelectionFilter = {
+                    definitionId: $filterParameters?.assessmentDefinition.id,
+                    ratingIds: _.map($filterParameters?.ratingSchemeItems, p => p?.id)
+                }
+
+                const body = Object.assign(
+                    {},
+                    {
+                        idSelectionOptions: $selectionOptions,
+                        overlayParameters: $widgetParameters
+                    },
+                    $filterParameters ? {assessmentBasedSelectionFilter} : null);
+
+                return $remoteMethod($selectedDiagram.id, body);
+            }
+        });
+
+    overlayDataCall.subscribe(callStore => callStore?.subscribe(d => overlayData.set(d?.data)));
 
     setContext("hoveredCallout", hoveredCallout);
     setContext("selectedDiagram", selectedDiagram);
@@ -217,6 +249,11 @@ export function setupContextStores() {
     setContext("selectedAssessmentDefinition", selectedAssessmentDefinition);
     setContext("selectedAllocationScheme", selectedAllocationScheme);
     setContext("selectedCostKinds", selectedCostKinds);
+    setContext("filterParameters", filterParameters);
+    setContext("widgetParameters", widgetParameters);
+    setContext("selectionOptions", selectionOptions);
+    setContext("remoteMethod", remoteMethod);
+    setContext("overlayDataCall", overlayDataCall);
 
     return {
         selectedDiagram,
@@ -239,7 +276,9 @@ export function setupContextStores() {
         costSliderValue,
         selectedAssessmentDefinition,
         selectedAllocationScheme,
-        selectedCostKinds
+        selectedCostKinds,
+        filterParameters,
+        widgetParameters
     };
 }
 

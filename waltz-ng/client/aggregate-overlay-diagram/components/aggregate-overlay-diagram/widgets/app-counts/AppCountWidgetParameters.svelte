@@ -2,22 +2,20 @@
     import {aggregateOverlayDiagramStore} from "../../../../../svelte-stores/aggregate-overlay-diagram-store";
     import {getContext} from "svelte";
     import {timeFormat} from "d3-time-format";
-    import moment from "moment";
     import Icon from "../../../../../common/svelte/Icon.svelte";
     import AppCountOverlayCell from "./AppCountOverlayCell.svelte";
     import _ from "lodash";
 
-    export let opts;
-
     const fmt = timeFormat("%Y-%m-%d");
-    const overlayData = getContext("overlayData");
     const selectedDiagram = getContext("selectedDiagram");
     const selectedOverlay = getContext("selectedOverlay");
     const widget = getContext("widget");
     const appCountSliderValue = getContext("appCountSliderValue");
+    const filterParameters = getContext("appCountSliderValue");
+    const widgetParameters = getContext("widgetParameters");
+    const remoteMethod = getContext("remoteMethod");
+    const overlayDataCall = getContext("overlayDataCall");
 
-    let selectedDefinition;
-    let overlayDataCall;
     let futureDate = null;
 
     function mkGlobalProps(data) {
@@ -31,13 +29,15 @@
     }
 
     function onSelect(futureDate) {
+
+        $remoteMethod = aggregateOverlayDiagramStore.findAppCountsForDiagram;
+
+        $widgetParameters = {
+            targetDate: fmt(futureDate)
+        }
+
         $selectedOverlay = null;
-        const dateStr = fmt(futureDate);
-        overlayDataCall = aggregateOverlayDiagramStore.findAppCountsForDiagram(
-            $selectedDiagram.id,
-            opts,
-            dateStr,
-            true);
+
         $widget = {
             overlay: AppCountOverlayCell,
             mkGlobalProps
@@ -46,12 +46,9 @@
 
     const debouncedOnSelect = _.debounce(onSelect, 500);
 
-    $: {
-        $overlayData = $overlayDataCall?.data;
-    }
 
-    $: futureDate = moment().set("date", 1).add($appCountSliderValue * 2, "months");
     $: debouncedOnSelect(futureDate);
+
 </script>
 
 
