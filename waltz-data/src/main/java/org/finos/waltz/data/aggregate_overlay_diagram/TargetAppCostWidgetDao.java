@@ -38,9 +38,10 @@ public class TargetAppCostWidgetDao {
                                                      Select<Record1<Long>> inScopeApplicationSelector,
                                                      LocalDate targetStateDate) {
 
-        Select<Record2<String, Long>> cellExtIdWithAppIdSelector = mkOverlayEntityCellApplicationSelector(
+        Select<Record2<String, Long>> cellExtIdWithAppIdSelector = mkOverlayEntityCellAggregateEntitySelector(
                 dsl,
-                diagramId);
+                diagramId,
+                EntityKind.APPLICATION);
 
         if (cellExtIdWithAppIdSelector == null) {
             // no cell mapping data so short circuit and give no results
@@ -51,7 +52,7 @@ public class TargetAppCostWidgetDao {
                 dsl,
                 cellExtIdWithAppIdSelector);
 
-        Set<Long> diagramApplicationIds = calcExactAppIdsOnDiagram(
+        Set<Long> diagramApplicationIds = calcExactEntityIdsOnDiagram(
                 dsl,
                 cellExtIdsToAppIdsMap,
                 inScopeApplicationSelector);

@@ -18,30 +18,28 @@
 
 package org.finos.waltz.jobs.harness;
 
-import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.aggregate_overlay_diagram.AppCountWidgetDao;
-import org.finos.waltz.data.aggregate_overlay_diagram.TargetAppCostWidgetDao;
-import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
+import org.finos.waltz.data.aggregate_overlay_diagram.AssessmentRatingWidgetDao;
 import org.finos.waltz.model.AssessmentBasedSelectionFilter;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.IdSelectionOptions;
-import org.finos.waltz.model.ImmutableAssessmentBasedSelectionFilter;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.AssessmentRatingsWidgetDatum;
 import org.finos.waltz.service.DIConfiguration;
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.jooq.impl.DSL;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.Optional;
+import java.util.Set;
 
-import static java.lang.String.format;
-import static org.finos.waltz.common.FunctionUtilities.time;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 import static org.finos.waltz.schema.Tables.ASSESSMENT_RATING;
-import static org.finos.waltz.schema.Tables.CHANGE_INITIATIVE;
 
 
 public class OverlayDiagramHarness {
@@ -53,44 +51,21 @@ public class OverlayDiagramHarness {
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
         AppCountWidgetDao countWidgetDao = ctx.getBean(AppCountWidgetDao.class);
-        TargetAppCostWidgetDao costWidgetDao = ctx.getBean(TargetAppCostWidgetDao.class);
+        AssessmentRatingWidgetDao assessmentWidgetDao = ctx.getBean(AssessmentRatingWidgetDao.class);
 
         IdSelectionOptions appGroup = mkOpts(mkRef(EntityKind.APP_GROUP, 11785L));
         IdSelectionOptions ou = mkOpts(mkRef(EntityKind.ORG_UNIT, 95L));
 
-        ApplicationIdSelectorFactory appSelector = new ApplicationIdSelectorFactory();
+        GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(EntityKind.CHANGE_INITIATIVE, ou);
 
+        Set<AssessmentRatingsWidgetDatum> widgetData = assessmentWidgetDao.findWidgetData(8L, EntityKind.CHANGE_INITIATIVE, 7L, genericSelector.selector());
 
-        AssessmentBasedSelectionFilter assessmentFilter = ImmutableAssessmentBasedSelectionFilter.builder()
-                .definitionId(93L)
-                .ratingIds(SetUtilities.asSet(381L))
-                .build();
+        System.out.println(widgetData.size());
 
-        Select<Record1<Long>> selector = prepareFilteredSelection(EntityKind.CHANGE_INITIATIVE, ou, Optional.of(assessmentFilter));
-        Select<Record1<Long>> selector2 = prepareFilteredSelection(EntityKind.CHANGE_INITIATIVE, ou, Optional.empty());
-
-
-        int changeInitiativeCount = dsl.fetchCount(DSL
-                .select()
-                .from(CHANGE_INITIATIVE)
-                .where(CHANGE_INITIATIVE.ID.in(selector)));
-
-
-        SelectConditionStep<Record> qry = dsl
-                .select()
-                .from(CHANGE_INITIATIVE)
-                .where(CHANGE_INITIATIVE.ID.in(selector));
-
-        SelectConditionStep<Record> qry2 = dsl
-                .select()
-                .from(CHANGE_INITIATIVE)
-                .where(CHANGE_INITIATIVE.ID.in(selector2));
-
-        int changeInitiativeCount2 = dsl.fetchCount(qry2);
-
-        System.out.println(format("with filter: %d", changeInitiativeCount));
-        System.out.println(qry);
-        System.out.println(changeInitiativeCount2);
+//        System.out.println(format("with filter: %d", changeInitiativeCount));
+//        System.out.println(qry);
+//        System.out.println(changeInitiativeCount2);
     }
 
 

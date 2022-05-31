@@ -10,6 +10,7 @@
 
     const widget = getContext("widget");
     const selectedOverlay = getContext("selectedOverlay");
+    const selectedDiagram = getContext("selectedDiagram");
     const selectedAssessmentDefinition = getContext("selectedAssessmentDefinition");
     const remoteMethod = getContext("remoteMethod");
     const overlayDataCall = getContext("overlayDataCall");
@@ -62,7 +63,7 @@
     </button>
 {:else}
     <AssessmentDefinitionPicker {onSelect}
-                                selectionFilter={ad => ad.entityKind === 'APPLICATION'}/>
+                                selectionFilter={ad => ad.entityKind === $selectedDiagram.aggregatedEntityKind}/>
 {/if}
 
 {#if $overlayDataCall?.status === 'loading'}

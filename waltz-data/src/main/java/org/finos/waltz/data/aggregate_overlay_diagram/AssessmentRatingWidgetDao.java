@@ -1,7 +1,6 @@
 package org.finos.waltz.data.aggregate_overlay_diagram;
 
 import org.finos.waltz.common.MapUtilities;
-import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.rating_scheme.RatingSchemeDAO;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.AssessmentRatingCount;
@@ -10,10 +9,7 @@ import org.finos.waltz.model.aggregate_overlay_diagram.overlay.ImmutableAssessme
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.ImmutableAssessmentRatingsWidgetDatum;
 import org.finos.waltz.model.utils.IdUtilities;
 import org.finos.waltz.schema.tables.AssessmentRating;
-import org.jooq.DSLContext;
-import org.jooq.Record1;
-import org.jooq.Record2;
-import org.jooq.Select;
+import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -23,10 +19,11 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.stream.Collectors.toSet;
+import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramUtilities.*;
 
 @Repository
-public class AppAssessmentWidgetDao {
+public class AssessmentRatingWidgetDao {
 
     private static final AssessmentRating ar = AssessmentRating.ASSESSMENT_RATING;
 
@@ -35,30 +32,31 @@ public class AppAssessmentWidgetDao {
 
 
     @Autowired
-    public AppAssessmentWidgetDao(DSLContext dsl,
-                                  RatingSchemeDAO ratingSchemeDAO) {
+    public AssessmentRatingWidgetDao(DSLContext dsl,
+                                     RatingSchemeDAO ratingSchemeDAO) {
         this.dsl = dsl;
         this.ratingSchemeDAO = ratingSchemeDAO;
     }
 
 
     public Set<AssessmentRatingsWidgetDatum> findWidgetData(long diagramId,
+                                                            EntityKind aggregatedEntityKind,
                                                             Long assessmentId,
-                                                            Select<Record1<Long>> inScopeApplicationSelector) {
+                                                            Select<Record1<Long>> inScopeEntityIdSelector) {
 
-        Select<Record2<String, Long>> cellExtIdWithAppIdSelector = mkOverlayEntityCellApplicationSelector(dsl, diagramId);
+        Select<Record2<String, Long>> cellExtIdWithEntityIdSelector = mkOverlayEntityCellAggregateEntitySelector(dsl, diagramId, aggregatedEntityKind);
 
-        if (cellExtIdWithAppIdSelector == null) {
+        if (cellExtIdWithEntityIdSelector == null) {
             // no cell mapping data so short circuit and give no results
             return Collections.emptySet();
         }
 
-        Map<String, Set<Long>> cellExtIdsToAppIdsMap = fetchAndGroupAppIdsByCellId(dsl, cellExtIdWithAppIdSelector);
+        Map<String, Set<Long>> cellExtIdsToEntityIdsMap = fetchAndGroupAppIdsByCellId(dsl, cellExtIdWithEntityIdSelector);
 
-        Set<Long> diagramApplicationIds = calcExactAppIdsOnDiagram(
+        Set<Long> diagramEntityIds = calcExactEntityIdsOnDiagram(
                 dsl,
-                cellExtIdsToAppIdsMap,
-                inScopeApplicationSelector);
+                cellExtIdsToEntityIdsMap,
+                inScopeEntityIdSelector);
 
         Map<Long, org.finos.waltz.model.rating.RatingSchemeItem> itemsById = IdUtilities.indexById(ratingSchemeDAO.findRatingSchemeItemsForAssessmentDefinition(assessmentId));
 
@@ -66,33 +64,33 @@ public class AppAssessmentWidgetDao {
             return Collections.emptySet();
         }
 
-        Map<Long, Long> appToRatingMap = dsl
+        Map<Long, Long> entityToRatingMap = dsl
                 .select(ar.RATING_ID, ar.ENTITY_ID)
                 .from(ar)
                 .where(ar.ASSESSMENT_DEFINITION_ID.eq(assessmentId))
-                .and(ar.ENTITY_ID.in(diagramApplicationIds))
-                .and(ar.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .and(ar.ENTITY_ID.in(diagramEntityIds))
+                .and(ar.ENTITY_KIND.eq(aggregatedEntityKind.name()))
                 .fetchMap(ar.ENTITY_ID, ar.RATING_ID);
 
-        return cellExtIdsToAppIdsMap
+        return cellExtIdsToEntityIdsMap
                 .entrySet()
                 .stream()
                 .map(e -> {
                     String cellExtId = e.getKey();
-                    Set<Long> appIds = e.getValue();
+                    Set<Long> entityIds = e.getValue();
 
                     Map<Long, AtomicInteger> counts = MapUtilities.newHashMap();
-                    appIds.forEach(id -> {
-                            Long rating = appToRatingMap.get(id);
-                            if (rating == null) {
-                                return;
-                            }
-                            AtomicInteger count = counts.getOrDefault(rating, new AtomicInteger());
-                            count.incrementAndGet();
-                            counts.put(rating, count);
-                        });
+                    entityIds.forEach(id -> {
+                        Long rating = entityToRatingMap.get(id);
+                        if (rating == null) {
+                            return;
+                        }
+                        AtomicInteger count = counts.getOrDefault(rating, new AtomicInteger());
+                        count.incrementAndGet();
+                        counts.put(rating, count);
+                    });
 
-                    Set<AssessmentRatingCount> countsWithRating = SetUtilities.map(
+                    Set<AssessmentRatingCount> countsWithRating = map(
                             counts.entrySet(),
                             kv -> ImmutableAssessmentRatingCount.builder()
                                     .rating(itemsById.get(kv.getKey()))
