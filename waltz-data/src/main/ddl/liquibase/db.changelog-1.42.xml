@@ -240,4 +240,33 @@
     </changeSet>
 
 
+    <changeSet id="20220531-6085-1"
+               author="woodjes">
+        <comment>6085: support change initiatives in overlay diagrams</comment>
+        <addColumn tableName="aggregate_overlay_diagram">
+            <column name="aggregated_entity_kind"
+                    type="${enum.type}"
+                    defaultValue="APPLICATION">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+    <changeSet id="20220531-6085-2"
+               author="woodjes">
+        <comment>6085: support change initiatives in overlay diagrams</comment>
+        <dropDefaultValue tableName="aggregate_overlay_diagram"
+                          columnName="aggregated_entity_kind"/>
+    </changeSet>
+
+
+    <changeSet id="20220531-6085-3"
+               author="woodjes">
+        <comment>6085: support change initiatives in overlay diagrams</comment>
+        <setColumnRemarks tableName="aggregate_overlay_diagram"
+                          columnName="aggregated_entity_kind"
+                          remarks="the kind of entity this diagram is aggregating"/>
+    </changeSet>
+
 </databaseChangeLog>

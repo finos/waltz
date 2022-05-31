@@ -12,6 +12,8 @@ public abstract class AggregateOverlayDiagram implements IdProvider, NameProvide
 
     public abstract String svg();
 
+    public abstract EntityKind aggregatedEntityKind();
+
     @Value.Default
     public EntityKind kind() {
         return EntityKind.AGGREGATE_OVERLAY_DIAGRAM;

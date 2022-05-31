@@ -1,7 +1,10 @@
 
 package org.finos.waltz.data.aggregate_overlay_diagram;
 
-import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
+import org.finos.waltz.data.GenericSelector;
+import org.finos.waltz.data.GenericSelectorFactory;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
 import org.finos.waltz.model.aggregate_overlay_diagram.ImmutableAggregateOverlayDiagram;
 import org.finos.waltz.schema.tables.records.AggregateOverlayDiagramRecord;
@@ -32,14 +35,16 @@ public class AggregateOverlayDiagramUtilities {
                 .lastUpdatedAt(toLocalDateTime(record.getLastUpdatedAt()))
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .provenance(record.getProvenance())
+                .aggregatedEntityKind(EntityKind.valueOf(record.getAggregateEntityKind()))
                 .build();
     };
 
 
     protected static Map<String, Set<Long>> fetchAndGroupAppIdsByCellId(DSLContext dsl,
-                                                                 Select<Record2<String, Long>> cellExtIdWithAppIdSelector) {
+                                                                        Select<Record2<String, Long>> cellExtIdWithEntityIdSelector) {
+
         return dsl
-                .selectQuery(cellExtIdWithAppIdSelector)
+                .selectQuery(cellExtIdWithEntityIdSelector)
                 .fetchSet(r -> tuple(r.get(0, String.class), r.get(1, Long.class)))
                 .stream()
                 .collect(groupingBy(
@@ -63,26 +68,30 @@ public class AggregateOverlayDiagramUtilities {
      * Note, all app relevant app ids are returned, this does not take into account the vantage point
      *
      * @param diagramId  diagram identifier
+     * @param aggregatedEntityKind
      * @return a select statement returning a list of `{cellExtId, appId}` entries
      */
-    protected static Select<Record2<String, Long>> mkOverlayEntityCellApplicationSelector(DSLContext dsl,
-                                                                                          long diagramId) {
+    protected static Select<Record2<String, Long>> mkOverlayEntityCellAggregateEntitySelector(DSLContext dsl,
+                                                                                              long diagramId,
+                                                                                              EntityKind aggregatedEntityKind) {
 
-        ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
+        GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
 
         Set<Select<Record2<String, Long>>> stuffToUnion = selectCellMappingsForDiagram(dsl, diagramId)
                 .fetchSet(r -> {
                     r.get(AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.RELATED_ENTITY_KIND);
 
-                    Select<Record1<Long>> appSelectorForRelatedEntity = applicationIdSelectorFactory.apply(mkOpts(readRef(
+                    IdSelectionOptions idSelectionOptions = mkOpts(readRef(
                             r,
                             AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.RELATED_ENTITY_KIND,
-                            AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.RELATED_ENTITY_ID)));
+                            AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.RELATED_ENTITY_ID));
+
+                    GenericSelector entityIdSelector = genericSelectorFactory.applyForKind(aggregatedEntityKind, idSelectionOptions);
 
                     return DSL
                             .select(DSL.val(r.get(AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.CELL_EXTERNAL_ID)).as("cell_ext_id"),
-                                    appSelectorForRelatedEntity.field(0, Long.class))
-                            .from(appSelectorForRelatedEntity);
+                                    entityIdSelector.selector().field(0, Long.class))
+                            .from(entityIdSelector.selector());
                 });
 
         return stuffToUnion
@@ -111,25 +120,25 @@ public class AggregateOverlayDiagramUtilities {
 
     /**
      * Takes the maximal set of app ids that may appear on the diagram (derived by unioning the values of
-     * the cellExtIdsToAppIdsMap) and filters then by the apps associated to the vantage point (given via
-     * the inScopeApplicationSelector).
+     * the cellExtIdsToEntityIdsMap) and filters then by the apps associated to the vantage point (given via
+     * the inScopeAggregatedEntitySelector).
      * <p>
      * Returns only appIds which should appear on the diagram  (basically the intersection between the
      * maximal set given diagram cell mappings and the vantage point selector).
      */
-    protected static Set<Long> calcExactAppIdsOnDiagram(DSLContext dsl,
-                                                        Map<String, Set<Long>> cellExtIdsToAppIdsMap,
-                                                        Select<Record1<Long>> inScopeApplicationSelector) {
-        Set<Long> maximalAppIdsForCells = cellExtIdsToAppIdsMap
+    protected static Set<Long> calcExactEntityIdsOnDiagram(DSLContext dsl,
+                                                           Map<String, Set<Long>> cellExtIdsToEntityIdsMap,
+                                                           Select<Record1<Long>> inScopeAggregatedEntitySelector) {
+        Set<Long> maximalEntityIdsForCells = cellExtIdsToEntityIdsMap
                 .values()
                 .stream()
                 .flatMap(Collection::stream)
                 .collect(toSet());
 
         return dsl
-                .select(inScopeApplicationSelector.field(0, Long.class))
-                .from(inScopeApplicationSelector)
-                .where(inScopeApplicationSelector.field(0).in(maximalAppIdsForCells))
+                .select(inScopeAggregatedEntitySelector.field(0, Long.class))
+                .from(inScopeAggregatedEntitySelector)
+                .where(inScopeAggregatedEntitySelector.field(0).in(maximalEntityIdsForCells))
                 .fetchSet(0, Long.class);
     }
 

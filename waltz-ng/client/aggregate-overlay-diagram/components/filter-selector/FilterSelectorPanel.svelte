@@ -12,6 +12,7 @@
     let activeMode = Modes.VIEW
 
     const filterParameters = getContext("filterParameters");
+    const selectedDiagram = getContext("selectedDiagram");
 
     function selectRatings(evt) {
         $filterParameters = evt.detail;
@@ -24,7 +25,7 @@
         .value();
 
     function definitionFilter(d) {
-        return d.entityKind === "APPLICATION";
+        return d.entityKind === $selectedDiagram.aggregatedEntityKind;
     }
 
 </script>
