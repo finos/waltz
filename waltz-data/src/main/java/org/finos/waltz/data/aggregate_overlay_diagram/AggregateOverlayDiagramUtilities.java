@@ -19,8 +19,7 @@ import static java.util.stream.Collectors.*;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.data.JooqUtilities.readRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
-import static org.finos.waltz.schema.Tables.AGGREGATE_OVERLAY_DIAGRAM;
-import static org.finos.waltz.schema.Tables.AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA;
+import static org.finos.waltz.schema.Tables.*;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 public class AggregateOverlayDiagramUtilities {
@@ -84,7 +83,7 @@ public class AggregateOverlayDiagramUtilities {
                     IdSelectionOptions idSelectionOptions = mkOpts(readRef(
                             r,
                             AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.RELATED_ENTITY_KIND,
-                            AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.RELATED_ENTITY_ID));
+                            r.field3()));
 
                     GenericSelector entityIdSelector = genericSelectorFactory.applyForKind(aggregatedEntityKind, idSelectionOptions);
 
@@ -109,11 +108,18 @@ public class AggregateOverlayDiagramUtilities {
 
     protected static SelectConditionStep<Record3<String, String, Long>> selectCellMappingsForDiagram(DSLContext dsl,
                                                                                                      long diagramId) {
+
+        Field<Long> related_entity_id = DSL.coalesce(ENTITY_HIERARCHY.ID, AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.RELATED_ENTITY_ID).as("related_entity_id");
+
         return dsl
-                .select(AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.CELL_EXTERNAL_ID,
+                .selectDistinct(
+                        AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.CELL_EXTERNAL_ID,
                         AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.RELATED_ENTITY_KIND,
-                        AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.RELATED_ENTITY_ID)
+                        related_entity_id)
                 .from(AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA)
+                .leftJoin(ENTITY_HIERARCHY)
+                .on(AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.RELATED_ENTITY_ID.eq(ENTITY_HIERARCHY.ANCESTOR_ID))
+                .and(ENTITY_HIERARCHY.KIND.eq(AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.RELATED_ENTITY_KIND))
                 .where(AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.DIAGRAM_ID.eq(diagramId));
     }
 
