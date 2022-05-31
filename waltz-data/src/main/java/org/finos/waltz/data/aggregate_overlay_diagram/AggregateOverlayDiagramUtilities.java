@@ -39,8 +39,8 @@ public class AggregateOverlayDiagramUtilities {
     };
 
 
-    protected static Map<String, Set<Long>> fetchAndGroupAppIdsByCellId(DSLContext dsl,
-                                                                        Select<Record2<String, Long>> cellExtIdWithEntityIdSelector) {
+    protected static Map<String, Set<Long>> fetchAndGroupEntityIdsByCellId(DSLContext dsl,
+                                                                           Select<Record2<String, Long>> cellExtIdWithEntityIdSelector) {
 
         return dsl
                 .selectQuery(cellExtIdWithEntityIdSelector)

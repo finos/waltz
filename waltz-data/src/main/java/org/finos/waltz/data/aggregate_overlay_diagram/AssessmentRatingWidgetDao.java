@@ -51,7 +51,7 @@ public class AssessmentRatingWidgetDao {
             return Collections.emptySet();
         }
 
-        Map<String, Set<Long>> cellExtIdsToEntityIdsMap = fetchAndGroupAppIdsByCellId(dsl, cellExtIdWithEntityIdSelector);
+        Map<String, Set<Long>> cellExtIdsToEntityIdsMap = fetchAndGroupEntityIdsByCellId(dsl, cellExtIdWithEntityIdSelector);
 
         Set<Long> diagramEntityIds = calcExactEntityIdsOnDiagram(
                 dsl,

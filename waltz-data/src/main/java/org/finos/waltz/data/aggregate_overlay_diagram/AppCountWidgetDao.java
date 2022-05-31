@@ -47,7 +47,7 @@ public class AppCountWidgetDao {
             return Collections.emptySet();
         }
 
-        Map<String, Set<Long>> cellExtIdsToAppIdsMap = fetchAndGroupAppIdsByCellId(
+        Map<String, Set<Long>> cellExtIdsToAppIdsMap = fetchAndGroupEntityIdsByCellId(
                 dsl,
                 cellExtIdWithAppIdSelector);
 
