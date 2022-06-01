@@ -7,10 +7,12 @@
 
     export let cellData = {};
     export let maxCount;
+    export let height;
+    export let width;
 
     $: r = scaleLinear()
         .domain([0, maxCount])
-        .range([0, 18]);
+        .range([0, height / 2 - 2]);
 
 
     $: cr = r(references.length)
@@ -19,9 +21,9 @@
 
     $: references = cellData?.aggregatedEntityReferences || [];
 
-    $: height = references.length === 0
-        ? 28
-        : (references.length + additionalLines) * 20 + 40;
+    $: svgHeight = references.length === 0
+        ? height
+        : (references.length + additionalLines) * 20 + height;
 
     $: additionalLines = _
         .chain(references)
@@ -35,7 +37,7 @@
 
 <svg class="content"
      width="100%"
-     {height}
+     height={svgHeight}
      style="background: white">
     {#if _.size(references) == 0}
         <text font-size="16"
@@ -48,21 +50,21 @@
                 fill="#a9e4ff"
                 stroke="#25b0ff"
                 stroke-width="2"
-                cx="30"
-                cy="20"/>
+                cx={height * 0.75}
+                cy={height / 2}/>
 
         <!--        Count label-->
 
         <text font-size="16"
-              dy="26"
-              dx="60">
+              dy={height / 2 + 6}
+              dx={height * 1.5}>
             {_.size(references)}
         </text>
 
         <!--        List of entities-->
-        <foreignObject transform="translate(0, 40)"
+        <foreignObject transform={`translate(0, ${height})`}
                        width="300"
-                       height="100%">
+                       height={svgHeight - height}>
             <ul>
                 {#each references as ref}
                     <li>

@@ -38,10 +38,20 @@
                 .map(cell => {
                     const sb = cell.querySelector(".statistics-box");
                     const cellId = cell.getAttribute("data-cell-id");
+
+                    let bBox = sb.getBoundingClientRect();
+
+                    const height = bBox.height;
+                    const width = bBox.width;
+
                     const cellProps = Object.assign(
                         {},
                         globalProps,
-                        { cellData: cellDataByCellExtId[cellId]} );
+                        {
+                            cellData: cellDataByCellExtId[cellId],
+                            height,
+                            width
+                        });
 
                     const component = $widget.overlay;
 
