@@ -84,6 +84,7 @@ public class TargetAppCostWidgetDao {
                             .targetStateCost(targetCost)
                             .build();
                 })
+                .filter(d -> !(d.currentStateCost().equals(BigDecimal.ZERO) && d.targetStateCost().equals(BigDecimal.ZERO)))
                 .collect(toSet());
     }
 

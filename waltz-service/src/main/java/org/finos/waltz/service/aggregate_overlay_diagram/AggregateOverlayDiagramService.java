@@ -34,6 +34,7 @@ public class AggregateOverlayDiagramService {
     private final AppCostWidgetDao appCostWidgetDao;
     private final AssessmentRatingWidgetDao appAssessmentWidgetDao;
     private final BackingEntityWidgetDao backingEntityWidgetDao;
+    private final AggregatedEntitiesWidgetDao aggregatedEntitiesWidgetDao;
 
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
 
@@ -43,13 +44,15 @@ public class AggregateOverlayDiagramService {
                                           TargetAppCostWidgetDao targetAppCostWidgetDao,
                                           AssessmentRatingWidgetDao appAssessmentWidgetDao,
                                           BackingEntityWidgetDao backingEntityWidgetDao,
-                                          AppCostWidgetDao appCostWidgetDao) {
+                                          AppCostWidgetDao appCostWidgetDao,
+                                          AggregatedEntitiesWidgetDao aggregatedEntitiesWidgetDao) {
         this.aggregateOverlayDiagramDao = aggregateOverlayDiagramDao;
         this.appCountWidgetDao = appCountWidgetDao;
         this.targetAppCostWidgetDao = targetAppCostWidgetDao;
         this.appCostWidgetDao = appCostWidgetDao;
         this.appAssessmentWidgetDao = appAssessmentWidgetDao;
         this.backingEntityWidgetDao = backingEntityWidgetDao;
+        this.aggregatedEntitiesWidgetDao = aggregatedEntitiesWidgetDao;
     }
 
 
@@ -129,6 +132,22 @@ public class AggregateOverlayDiagramService {
                 diagramId,
                 diagram.aggregatedEntityKind(),
                 assessmentWidgetParameters.assessmentDefinitionId(),
+                entityIdSelector);
+    }
+
+
+    public Set<AggregatedEntitiesWidgetDatum> findAggregatedEntitiesWidgetData(Long diagramId,
+                                                                               Optional<AssessmentBasedSelectionFilter> filterParams,
+                                                                               IdSelectionOptions idSelectionOptions) {
+
+        AggregateOverlayDiagram diagram = aggregateOverlayDiagramDao.getById(diagramId);
+        ;
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(diagram.aggregatedEntityKind(), idSelectionOptions);
+        Select<Record1<Long>> entityIdSelector = applyFilterToSelector(genericSelector, filterParams);
+
+        return aggregatedEntitiesWidgetDao.findWidgetData(
+                diagramId,
+                diagram.aggregatedEntityKind(),
                 entityIdSelector);
     }
 

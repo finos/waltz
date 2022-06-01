@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -90,6 +91,10 @@ public class AssessmentRatingWidgetDao {
                         counts.put(rating, count);
                     });
 
+                    if (counts.isEmpty()) {
+                        return null;
+                    }
+
                     Set<AssessmentRatingCount> countsWithRating = map(
                             counts.entrySet(),
                             kv -> ImmutableAssessmentRatingCount.builder()
@@ -102,6 +107,7 @@ public class AssessmentRatingWidgetDao {
                             .counts(countsWithRating)
                             .build();
                 })
+                .filter(Objects::nonNull)
                 .collect(toSet());
     }
 }

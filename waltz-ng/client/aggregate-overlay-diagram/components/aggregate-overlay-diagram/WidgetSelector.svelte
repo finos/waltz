@@ -9,6 +9,8 @@
     import {getContext} from "svelte";
     import {entity} from "../../../common/services/enums/entity";
     import _ from "lodash";
+    import AggregatedEntitiesWidgetParameters
+        from "./widgets/aggregated-entities/AggregatedEntitiesWidgetParameters.svelte";
 
     export let primaryEntityRef;
 
@@ -46,6 +48,11 @@
             label: "Backing Entities",
             description: "Displays the underlying entities which drive the overlays on the diagram",
             parameterWidget: BackingEntitiesWidgetParameters,
+            aggregatedEntityKinds: [entity.APPLICATION.key, entity.CHANGE_INITIATIVE.key]
+        }, {
+            label: "Aggregated Entities",
+            description: "Displays entities which are aggregated to populate the other overlay data",
+            parameterWidget: AggregatedEntitiesWidgetParameters,
             aggregatedEntityKinds: [entity.APPLICATION.key, entity.CHANGE_INITIATIVE.key]
         }
     ];

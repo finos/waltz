@@ -67,6 +67,15 @@
             .data-cell.show-related-entity-indicator .cell-related-entity-indicator {
                 visibility: visible;
             }
+
+            .data-cell {
+                transition: opacity 300ms;
+            }
+
+            .data-cell.no-data {
+                opacity: 0.5;
+            }
+
         </style>
 
         <defs>

@@ -20,12 +20,13 @@ package org.finos.waltz.jobs.harness;
 
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
+import org.finos.waltz.data.aggregate_overlay_diagram.AggregatedEntitiesWidgetDao;
 import org.finos.waltz.data.aggregate_overlay_diagram.AppCountWidgetDao;
 import org.finos.waltz.data.aggregate_overlay_diagram.AssessmentRatingWidgetDao;
 import org.finos.waltz.model.AssessmentBasedSelectionFilter;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.IdSelectionOptions;
-import org.finos.waltz.model.aggregate_overlay_diagram.overlay.AssessmentRatingsWidgetDatum;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.AggregatedEntitiesWidgetDatum;
 import org.finos.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
@@ -52,6 +53,7 @@ public class OverlayDiagramHarness {
 
         AppCountWidgetDao countWidgetDao = ctx.getBean(AppCountWidgetDao.class);
         AssessmentRatingWidgetDao assessmentWidgetDao = ctx.getBean(AssessmentRatingWidgetDao.class);
+        AggregatedEntitiesWidgetDao aggregatedEntitiesWidgetDao = ctx.getBean(AggregatedEntitiesWidgetDao.class);
 
         IdSelectionOptions appGroup = mkOpts(mkRef(EntityKind.APP_GROUP, 11785L));
         IdSelectionOptions ou = mkOpts(mkRef(EntityKind.ORG_UNIT, 95L));
@@ -59,7 +61,7 @@ public class OverlayDiagramHarness {
         GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
         GenericSelector genericSelector = genericSelectorFactory.applyForKind(EntityKind.CHANGE_INITIATIVE, ou);
 
-        Set<AssessmentRatingsWidgetDatum> widgetData = assessmentWidgetDao.findWidgetData(8L, EntityKind.CHANGE_INITIATIVE, 7L, genericSelector.selector());
+        Set<AggregatedEntitiesWidgetDatum> widgetData = aggregatedEntitiesWidgetDao.findWidgetData(3L, EntityKind.CHANGE_INITIATIVE, genericSelector.selector());
 
         System.out.println(widgetData.size());
 

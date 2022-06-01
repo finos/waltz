@@ -34,7 +34,7 @@ public class AggregateOverlayDiagramUtilities {
                 .lastUpdatedAt(toLocalDateTime(record.getLastUpdatedAt()))
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .provenance(record.getProvenance())
-                .aggregatedEntityKind(EntityKind.valueOf(record.getAggregateEntityKind()))
+                .aggregatedEntityKind(EntityKind.valueOf(record.getAggregatedEntityKind()))
                 .build();
     };
 

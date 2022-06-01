@@ -83,6 +83,7 @@ public class AppCountWidgetDao {
                             .targetStateCount(targetCount)
                             .build();
                 })
+                .filter(d -> d.currentStateCount() != 0 && d.targetStateCount() != 0)
                 .collect(toSet());
     }
 

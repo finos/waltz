@@ -79,6 +79,7 @@
     $: diagrams = $diagramsCall?.data || [];
     $: relatedEntities = $relatedEntitiesCall?.data;
     $: $cellIdsExplicitlyRelatedToParent = determineWhichCellsAreLinkedByParent(backingEntities, relatedEntities);
+
 </script>
 
 {#if primaryEntityRef}

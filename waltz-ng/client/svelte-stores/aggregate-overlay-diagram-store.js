@@ -58,6 +58,15 @@ export function mkOverlayDiagramStore() {
                 {force});
     };
 
+    const findAggregatedEntitiesForDiagram = (diagramId, widgetParameters, force = false) => {
+        return remote
+            .fetchViewList(
+                "POST",
+                `api/aggregate-overlay-diagram/diagram-id/${diagramId}/aggregated-entities-widget`,
+                widgetParameters,
+                {force});
+    };
+
     const findBackingEntitiesForDiagram = (diagramId, force = false) => {
         return remote
             .fetchViewList(
@@ -74,7 +83,8 @@ export function mkOverlayDiagramStore() {
         findTargetAppCostForDiagram,
         findAppCostForDiagram,
         findAppAssessmentsForDiagram,
-        findBackingEntitiesForDiagram
+        findBackingEntitiesForDiagram,
+        findAggregatedEntitiesForDiagram
     };
 }
 

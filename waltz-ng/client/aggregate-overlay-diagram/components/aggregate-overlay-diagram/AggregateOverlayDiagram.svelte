@@ -133,6 +133,23 @@
         }
     }
 
+    // toggle no data indication
+    $: {
+        if (svgHolderElem && $overlayData && $selectedInstance == null) {
+
+            const cellsWithData = _
+                .chain($overlayData)
+                .map(d => d.cellExternalId)
+                .value();
+
+            selectAll(".data-cell")
+                .classed("no-data", function () {
+                    const dataCellId = select(this).attr("data-cell-id");
+                    return !_.includes(cellsWithData, dataCellId);
+                });
+        }
+    }
+
 </script>
 
 <div bind:this={svgHolderElem}>
