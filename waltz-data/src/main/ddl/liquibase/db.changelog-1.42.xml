@@ -334,4 +334,24 @@
     </changeSet>
 
 
+    <changeSet id="20220606-6074-1"
+               author="davidwatkins73">
+        <comment>6074: read only assessment ratings</comment>
+        <addColumn tableName="assessment_rating">
+            <column name="is_readonly"
+                    type="boolean"
+                    defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+    <changeSet id="20220606-6074-2"
+               author="davidwatkins73">
+        <setColumnRemarks tableName="assessment_rating"
+                          columnName="is_readonly"
+                          remarks="Specifically lock this rating, note the readonly value with the associated definition takes precedence"/>
+    </changeSet>
+
 </databaseChangeLog>

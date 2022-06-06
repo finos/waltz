@@ -23,6 +23,7 @@ public enum Operation {
 
     ADD,
     ATTEST,
+    LOCK,
     REMOVE,
     UPDATE,
     UNKNOWN
