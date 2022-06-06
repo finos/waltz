@@ -1,5 +1,4 @@
 import {remote} from "./remote";
-import {checkIsEntityRef} from "../common/checks";
 
 
 export function mkOverlayDiagramCalloutStore() {

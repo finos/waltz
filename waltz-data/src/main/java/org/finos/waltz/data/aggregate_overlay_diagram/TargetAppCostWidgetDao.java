@@ -38,20 +38,21 @@ public class TargetAppCostWidgetDao {
                                                      Select<Record1<Long>> inScopeApplicationSelector,
                                                      LocalDate targetStateDate) {
 
-        Select<Record2<String, Long>> cellExtIdWithAppIdSelector = mkOverlayEntityCellApplicationSelector(
+        Select<Record2<String, Long>> cellExtIdWithAppIdSelector = mkOverlayEntityCellAggregateEntitySelector(
                 dsl,
-                diagramId);
+                diagramId,
+                EntityKind.APPLICATION);
 
         if (cellExtIdWithAppIdSelector == null) {
             // no cell mapping data so short circuit and give no results
             return Collections.emptySet();
         }
 
-        Map<String, Set<Long>> cellExtIdsToAppIdsMap = fetchAndGroupAppIdsByCellId(
+        Map<String, Set<Long>> cellExtIdsToAppIdsMap = fetchAndGroupEntityIdsByCellId(
                 dsl,
                 cellExtIdWithAppIdSelector);
 
-        Set<Long> diagramApplicationIds = calcExactAppIdsOnDiagram(
+        Set<Long> diagramApplicationIds = calcExactEntityIdsOnDiagram(
                 dsl,
                 cellExtIdsToAppIdsMap,
                 inScopeApplicationSelector);
@@ -83,6 +84,7 @@ public class TargetAppCostWidgetDao {
                             .targetStateCost(targetCost)
                             .build();
                 })
+                .filter(d -> !(d.currentStateCost().equals(BigDecimal.ZERO) && d.targetStateCost().equals(BigDecimal.ZERO)))
                 .collect(toSet());
     }
 

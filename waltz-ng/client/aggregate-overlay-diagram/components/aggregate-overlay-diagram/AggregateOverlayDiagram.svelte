@@ -38,10 +38,20 @@
                 .map(cell => {
                     const sb = cell.querySelector(".statistics-box");
                     const cellId = cell.getAttribute("data-cell-id");
+
+                    let bBox = sb.getBoundingClientRect();
+
+                    const height = bBox.height;
+                    const width = bBox.width;
+
                     const cellProps = Object.assign(
                         {},
                         globalProps,
-                        { cellData: cellDataByCellExtId[cellId]} );
+                        {
+                            cellData: cellDataByCellExtId[cellId],
+                            height,
+                            width
+                        });
 
                     const component = $widget.overlay;
 
@@ -130,6 +140,23 @@
         selectAll('.entity-group-box').classed("inset", false);
         if ($selectedOverlay) {
             select(`[data-cell-id=${$selectedOverlay.cellId}]`).classed("inset", true);
+        }
+    }
+
+    // toggle no data indication
+    $: {
+        if (svgHolderElem && $overlayData && $selectedInstance == null) {
+
+            const cellsWithData = _
+                .chain($overlayData)
+                .map(d => d.cellExternalId)
+                .value();
+
+            selectAll(".data-cell")
+                .classed("no-data", function () {
+                    const dataCellId = select(this).attr("data-cell-id");
+                    return !_.includes(cellsWithData, dataCellId);
+                });
         }
     }
 

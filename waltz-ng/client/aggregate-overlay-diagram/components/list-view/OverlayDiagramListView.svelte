@@ -9,6 +9,8 @@
     import NoData from "../../../common/svelte/NoData.svelte";
     import {termSearch} from "../../../common";
     import SearchInput from "../../../common/svelte/SearchInput.svelte";
+    import Icon from "../../../common/svelte/Icon.svelte";
+    import {entity} from "../../../common/services/enums/entity";
 
 
     let diagramsCall = aggregateOverlayDiagramStore.findAll();
@@ -60,8 +62,8 @@
                                  placeholder="Search diagram instances"/>
                     <br>
                 {/if}
-                {#if _.isEmpty(instances)}
-                    <NoData>There are no diagram instances</NoData>
+                {#if _.isEmpty(diagrams)}
+                    <NoData>There are no diagrams</NoData>
                 {:else}
                     <table class="table table-condensed">
                         <colgroup>
@@ -84,7 +86,10 @@
                                 <tr class="waltz-visibility-parent">
                                     {#if _.indexOf(diagram.instances, instance) === 0}
                                         <td title={diagram.description}>
-                                            <strong>{diagram.name}</strong>
+                                            <strong>
+                                                <Icon name={entity[diagram.aggregatedEntityKind].icon}/>
+                                                {diagram.name}
+                                            </strong>
                                         </td>
                                     {:else}
                                         <td title={diagram.description}
@@ -103,9 +108,12 @@
                             {:else}
                                 <tr>
                                 <tr>
-                                    <td title={diagram.description}>
-                                        <span class="text-muted">{diagram.name}</span>
-                                    </td>
+                                <td title={diagram.description}>
+                                        <span class="text-muted">
+                                            <Icon name={entity[diagram.aggregatedEntityKind].icon}/>
+                                            {diagram.name}
+                                        </span>
+                                </td>
                                     <td colspan="3">
                                         <span class="text-muted">There are no instances for this diagram</span>
                                     </td>

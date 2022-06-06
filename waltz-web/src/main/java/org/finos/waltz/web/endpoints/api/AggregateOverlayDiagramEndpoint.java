@@ -21,10 +21,7 @@ package org.finos.waltz.web.endpoints.api;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramInfo;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.*;
-import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AppCostWidgetParameters;
-import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AppCountWidgetParameters;
-import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AssessmentWidgetParameters;
-import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.TargetAppCostWidgetParameters;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.*;
 import org.finos.waltz.service.aggregate_overlay_diagram.AggregateOverlayDiagramService;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
@@ -66,6 +63,7 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
         String findTargetAppCostWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "target-app-cost-widget");
         String findAppCostWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "app-cost-widget");
         String findAppAssessmentWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "app-assessment-widget");
+        String findAggregatedEntitiesWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "aggregated-entities-widget");
         String findBackingEntityWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "backing-entity-widget");
 
         DatumRoute<AggregateOverlayDiagramInfo> getByIdRoute = (request, response) -> {
@@ -130,6 +128,17 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
         };
 
 
+        ListRoute<AggregatedEntitiesWidgetDatum> findAggregatedEntitiesWidgetDataRoute = (request, response) -> {
+            OverlayDiagramWidgetInfo<AggregatedEntitiesWidgetParameters> widgetParameters = readBody(request, OverlayDiagramAggregatedEntitiesWidgetInfo.class, null);
+
+            return aggregateOverlayDiagramService
+                    .findAggregatedEntitiesWidgetData(
+                            getId(request),
+                            widgetParameters.assessmentBasedSelectionFilter(),
+                            widgetParameters.idSelectionOptions());
+        };
+
+
         ListRoute<BackingEntityWidgetDatum> findBackingEntityWidgetDataRoute = (request, response) -> {
             long diagramId = getId(request);
             return aggregateOverlayDiagramService.findBackingEntityWidgetData(diagramId);
@@ -143,6 +152,7 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
         postForList(findTargetAppCostWidgetDataPath, findTargetAppCostWidgetDataRoute);
         postForList(findAppCostWidgetDataPath, findAppCostWidgetDataRoute);
         postForList(findAppAssessmentWidgetDataPath, findAppAssessmentWidgetDataRoute);
+        postForList(findAggregatedEntitiesWidgetDataPath, findAggregatedEntitiesWidgetDataRoute);
     }
 
 }
