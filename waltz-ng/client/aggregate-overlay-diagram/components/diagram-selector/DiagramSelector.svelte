@@ -4,6 +4,7 @@
     import LastEdited from "../../../common/svelte/LastEdited.svelte";
     import _ from "lodash";
     import Icon from "../../../common/svelte/Icon.svelte";
+    import {entity} from "../../../common/services/enums/entity";
 
     export let diagrams = [];
 
@@ -24,33 +25,38 @@
         which have been created.
     </p>
 
-    <ul>
+    <table class="table table-condensed table-hover">
+        <colgroup>
+            <col width="30%"/>
+            <col width="30%"/>
+            <col width="40%"/>
+        </colgroup>
+        <thead>
+        <tr>
+            <th>Diagram</th>
+            <th>Aggregated Kind</th>
+            <th>Last Updated</th>
+        </tr>
+        </thead>
+        <tbody>
         {#each diagrams as diagram}
-            <li>
-                <button class="btn btn-skinny"
-                        on:click={() => selectDiagram(diagram)}>
+            <tr class="clickable"
+                on:click={() => selectDiagram(diagram)}>
+                <td>
                     {diagram.name}
-                </button>
-                <span class="text-muted">
+                </td>
+                <td>
+                    <Icon name={entity[diagram.aggregatedEntityKind].icon}/>
+                    {entity[diagram.aggregatedEntityKind].name}
+                </td>
+                <td>
+                    <span class="text-muted">
                     <LastEdited entity={diagram}/>
                 </span>
-            </li>
+                </td>
+            </tr>
         {/each}
-    </ul>
-
+        </tbody>
+    </table>
 {/if}
-
-
-<style>
-    ul {
-        padding: 0.2em 0 0 0;
-        margin: 0 0 0 0;
-        list-style: none;
-    }
-
-    li {
-        padding-top: 0.2em;
-    }
-
-</style>
 

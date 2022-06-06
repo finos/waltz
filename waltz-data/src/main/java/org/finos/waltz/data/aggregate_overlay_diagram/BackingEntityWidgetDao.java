@@ -68,6 +68,7 @@ public class BackingEntityWidgetDao {
                             .backingEntityReferences(backingEntities)
                             .build();
                 })
+                .filter(d -> !d.backingEntityReferences().isEmpty())
                 .collect(toSet());
     }
 

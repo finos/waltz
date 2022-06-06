@@ -90,6 +90,7 @@ public class AppCostWidgetDao {
                         kv.getValue(),
                         costDataByMeasurableId,
                         costDataByAppId))
+                .filter(d -> !d.totalCost().equals(BigDecimal.ZERO))
                 .collect(toSet());
     }
 

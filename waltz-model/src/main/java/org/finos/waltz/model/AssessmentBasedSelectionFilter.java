@@ -15,36 +15,23 @@
  * See the License for the specific
  *
  */
-import template from "./playpen5.html";
-import AssessmentRatingPicker from "../../common/svelte/AssessmentRatingPicker.svelte";
 
+package org.finos.waltz.model;
 
-const initialState = {
-    AssessmentRatingPicker
-};
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.finos.waltz.model.application.ApplicationKind;
+import org.immutables.value.Value;
 
+import java.util.Set;
 
-function controller() {
+@Value.Immutable
+@JsonSerialize(as = ImmutableAssessmentBasedSelectionFilter.class)
+@JsonDeserialize(as = ImmutableAssessmentBasedSelectionFilter.class)
+public abstract class AssessmentBasedSelectionFilter {
 
-    const vm = Object.assign(this, initialState);
+    public abstract Long definitionId();
 
-    vm.definitionFilter = d => d.entityKind === "CHANGE_INITIATIVE";
+    public abstract Set<Long> ratingIds();
 
 }
-
-
-controller.$inject = [
-];
-
-
-
-const view = {
-    template,
-    controller,
-    controllerAs: "$ctrl",
-    bindToController: true,
-    scope: {}
-};
-
-
-export default view;

@@ -7,17 +7,13 @@
     import TargetAppCostOverlayCell from "./TargetAppCostOverlayCell.svelte";
     import _ from "lodash";
 
-    export let opts;
-
     const fmt = timeFormat("%Y-%m-%d");
-    const overlayData = getContext("overlayData");
-    const selectedDiagram = getContext("selectedDiagram");
     const selectedOverlay = getContext("selectedOverlay");
     const costSliderValue = getContext("costSliderValue");
-
+    const remoteMethod = getContext("remoteMethod");
+    const widgetParameters = getContext("widgetParameters");
+    const overlayDataCall = getContext("overlayDataCall");
     const widget = getContext("widget");
-    let selectedDefinition;
-    let overlayDataCall;
 
 
     function mkGlobalProps(data) {
@@ -31,21 +27,19 @@
     }
 
     function onSelect(futureDate) {
+
+        $remoteMethod = aggregateOverlayDiagramStore.findTargetAppCostForDiagram;
+
+        $widgetParameters = {
+            targetDate: fmt(futureDate)
+        }
+
         $selectedOverlay = null;
-        const dateStr = fmt(futureDate);
-        overlayDataCall = aggregateOverlayDiagramStore.findTargetAppCostForDiagram(
-            $selectedDiagram.id,
-            opts,
-            dateStr,
-            true);
+
         $widget = {
             overlay: TargetAppCostOverlayCell,
             mkGlobalProps
         };
-    }
-
-    $: {
-        $overlayData = $overlayDataCall?.data;
     }
 
     const debouncedOnSelect = _.debounce(onSelect, 500);

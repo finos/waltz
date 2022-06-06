@@ -1,5 +1,6 @@
 package org.finos.waltz.data.aggregate_overlay_diagram;
 
+import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.CountWidgetDatum;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.ImmutableCountWidgetDatum;
 import org.jooq.*;
@@ -36,20 +37,21 @@ public class AppCountWidgetDao {
                                                 Select<Record1<Long>> inScopeApplicationSelector,
                                                 LocalDate targetStateDate) {
 
-        Select<Record2<String, Long>> cellExtIdWithAppIdSelector = mkOverlayEntityCellApplicationSelector(
+        Select<Record2<String, Long>> cellExtIdWithAppIdSelector = mkOverlayEntityCellAggregateEntitySelector(
                 dsl,
-                diagramId);
+                diagramId,
+                EntityKind.APPLICATION);
 
         if (cellExtIdWithAppIdSelector == null) {
             // no cell mapping data so short circuit and give no results
             return Collections.emptySet();
         }
 
-        Map<String, Set<Long>> cellExtIdsToAppIdsMap = fetchAndGroupAppIdsByCellId(
+        Map<String, Set<Long>> cellExtIdsToAppIdsMap = fetchAndGroupEntityIdsByCellId(
                 dsl,
                 cellExtIdWithAppIdSelector);
 
-        Set<Long> diagramApplicationIds = calcExactAppIdsOnDiagram(
+        Set<Long> diagramApplicationIds = calcExactEntityIdsOnDiagram(
                 dsl,
                 cellExtIdsToAppIdsMap,
                 inScopeApplicationSelector);
@@ -81,6 +83,7 @@ public class AppCountWidgetDao {
                             .targetStateCount(targetCount)
                             .build();
                 })
+                .filter(d -> d.currentStateCount() != 0 && d.targetStateCount() != 0)
                 .collect(toSet());
     }
 

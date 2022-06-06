@@ -36,7 +36,6 @@ const tradeManagement = {
 const controlFunctions = {
     id: "CONTROL_FNS",
     name: "Control Functions / Service Integration",
-    statsBoxHeight: 60,
     rows: [
         [afc, compliance, finance, risk],
         [treasury, compliance, finance, risk, cashManagement]

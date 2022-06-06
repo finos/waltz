@@ -287,8 +287,6 @@ const sections = {
     "CUSTOMER_JOURNEY": {
         "id": "CUSTOMER_JOURNEY",
         "name": "Customer Journey",
-        "cellHeight": 150,
-        "statsBoxWidth": 70,
         rows: [
             [
                 cells.BILL_THE_CLIENT,
@@ -332,7 +330,6 @@ const sections = {
         "name": "Manage Risk",
         "headerColor": "#ff0000",
         "cellColor": "#dbfffe",
-        "cellHeight": 200,
         rows: [
             [
                 cells.MANAGE_RISK_FRAMEWORKS,

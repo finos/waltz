@@ -1,46 +1,58 @@
 package org.finos.waltz.service.aggregate_overlay_diagram;
 
+import org.finos.waltz.data.GenericSelector;
+import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.aggregate_overlay_diagram.*;
-import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
+import org.finos.waltz.model.AssessmentBasedSelectionFilter;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramInfo;
 import org.finos.waltz.model.aggregate_overlay_diagram.BackingEntity;
 import org.finos.waltz.model.aggregate_overlay_diagram.ImmutableAggregateOverlayDiagramInfo;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.*;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AppCostWidgetParameters;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AppCountWidgetParameters;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AssessmentWidgetParameters;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.TargetAppCostWidgetParameters;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.util.Optional;
 import java.util.Set;
+
+import static org.finos.waltz.data.assessment_rating.AssessmentRatingBasedGenericSelectorFactory.applyFilterToSelector;
 
 @Service
 public class AggregateOverlayDiagramService {
 
-    public static final ApplicationIdSelectorFactory APPLICATION_ID_SELECTOR_FACTORY = new ApplicationIdSelectorFactory();
 
     private final AggregateOverlayDiagramDao aggregateOverlayDiagramDao;
     private final AppCountWidgetDao appCountWidgetDao;
     private final TargetAppCostWidgetDao targetAppCostWidgetDao;
     private final AppCostWidgetDao appCostWidgetDao;
-    private final AppAssessmentWidgetDao appAssessmentWidgetDao;
+    private final AssessmentRatingWidgetDao appAssessmentWidgetDao;
     private final BackingEntityWidgetDao backingEntityWidgetDao;
+    private final AggregatedEntitiesWidgetDao aggregatedEntitiesWidgetDao;
+
+    private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
 
     @Autowired
     public AggregateOverlayDiagramService(AggregateOverlayDiagramDao aggregateOverlayDiagramDao,
                                           AppCountWidgetDao appCountWidgetDao,
                                           TargetAppCostWidgetDao targetAppCostWidgetDao,
-                                          AppAssessmentWidgetDao appAssessmentWidgetDao,
+                                          AssessmentRatingWidgetDao appAssessmentWidgetDao,
                                           BackingEntityWidgetDao backingEntityWidgetDao,
-                                          AppCostWidgetDao appCostWidgetDao) {
+                                          AppCostWidgetDao appCostWidgetDao,
+                                          AggregatedEntitiesWidgetDao aggregatedEntitiesWidgetDao) {
         this.aggregateOverlayDiagramDao = aggregateOverlayDiagramDao;
         this.appCountWidgetDao = appCountWidgetDao;
         this.targetAppCostWidgetDao = targetAppCostWidgetDao;
         this.appCostWidgetDao = appCostWidgetDao;
         this.appAssessmentWidgetDao = appAssessmentWidgetDao;
         this.backingEntityWidgetDao = backingEntityWidgetDao;
+        this.aggregatedEntitiesWidgetDao = aggregatedEntitiesWidgetDao;
     }
 
 
@@ -62,45 +74,81 @@ public class AggregateOverlayDiagramService {
 
     public Set<CountWidgetDatum> findAppCountWidgetData(Long diagramId,
                                                         IdSelectionOptions appSelectionOptions,
-                                                        LocalDate targetStateDate) {
+                                                        Optional<AssessmentBasedSelectionFilter> filterParams,
+                                                        AppCountWidgetParameters appCountWidgetParameters) {
 
-        Select<Record1<Long>> applicationIdSelector = APPLICATION_ID_SELECTOR_FACTORY.apply(appSelectionOptions);
-        return appCountWidgetDao.findWidgetData(diagramId, applicationIdSelector, targetStateDate);
+        AggregateOverlayDiagram diagram = aggregateOverlayDiagramDao.getById(diagramId);
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(diagram.aggregatedEntityKind(), appSelectionOptions);
+        Select<Record1<Long>> entityIdSelector = applyFilterToSelector(genericSelector, filterParams);
+
+        return appCountWidgetDao.findWidgetData(diagramId, entityIdSelector, appCountWidgetParameters.targetDate());
     }
 
 
     public Set<TargetCostWidgetDatum> findTargetAppCostWidgetData(Long diagramId,
                                                                   IdSelectionOptions appSelectionOptions,
-                                                                  LocalDate targetStateDate) {
+                                                                  Optional<AssessmentBasedSelectionFilter> filterParams,
+                                                                  TargetAppCostWidgetParameters targetAppCostWidgetParameters) {
 
-        Select<Record1<Long>> applicationIdSelector = APPLICATION_ID_SELECTOR_FACTORY.apply(appSelectionOptions);
-        return targetAppCostWidgetDao.findWidgetData(diagramId, applicationIdSelector, targetStateDate);
+        AggregateOverlayDiagram diagram = aggregateOverlayDiagramDao.getById(diagramId);
+        ;
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(diagram.aggregatedEntityKind(), appSelectionOptions);
+
+        Select<Record1<Long>> entityIdSelector = applyFilterToSelector(genericSelector, filterParams);
+        return targetAppCostWidgetDao.findWidgetData(diagramId, entityIdSelector, targetAppCostWidgetParameters.targetDate());
     }
 
 
     public Set<CostWidgetDatum> findAppCostWidgetData(Long diagramId,
+                                                      Optional<AssessmentBasedSelectionFilter> filterParams,
                                                       IdSelectionOptions appSelectionOptions,
-                                                      Set<Long> costKinds,
-                                                      long allocationSchemeId) {
+                                                      AppCostWidgetParameters appCostWidgetParameters) {
 
-        Select<Record1<Long>> applicationIdSelector = APPLICATION_ID_SELECTOR_FACTORY.apply(appSelectionOptions);
+        AggregateOverlayDiagram diagram = aggregateOverlayDiagramDao.getById(diagramId);
+        ;
+
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(diagram.aggregatedEntityKind(), appSelectionOptions);
+        Select<Record1<Long>> entityIdSelector = applyFilterToSelector(genericSelector, filterParams);
+
         return appCostWidgetDao.findWidgetData(
                 diagramId,
-                costKinds,
-                allocationSchemeId,
-                applicationIdSelector);
+                appCostWidgetParameters.costKindIds(),
+                appCostWidgetParameters.allocationSchemeId(),
+                entityIdSelector);
     }
 
 
     public Set<AssessmentRatingsWidgetDatum> findAppAssessmentWidgetData(Long diagramId,
-                                                                         long assessmentId,
-                                                                         IdSelectionOptions appSelectionOptions) {
+                                                                         Optional<AssessmentBasedSelectionFilter> filterParams,
+                                                                         IdSelectionOptions appSelectionOptions,
+                                                                         AssessmentWidgetParameters assessmentWidgetParameters) {
 
-        Select<Record1<Long>> applicationIdSelector = APPLICATION_ID_SELECTOR_FACTORY.apply(appSelectionOptions);
+        AggregateOverlayDiagram diagram = aggregateOverlayDiagramDao.getById(diagramId);
+        ;
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(diagram.aggregatedEntityKind(), appSelectionOptions);
+        Select<Record1<Long>> entityIdSelector = applyFilterToSelector(genericSelector, filterParams);
+
         return appAssessmentWidgetDao.findWidgetData(
                 diagramId,
-                assessmentId,
-                applicationIdSelector);
+                diagram.aggregatedEntityKind(),
+                assessmentWidgetParameters.assessmentDefinitionId(),
+                entityIdSelector);
+    }
+
+
+    public Set<AggregatedEntitiesWidgetDatum> findAggregatedEntitiesWidgetData(Long diagramId,
+                                                                               Optional<AssessmentBasedSelectionFilter> filterParams,
+                                                                               IdSelectionOptions idSelectionOptions) {
+
+        AggregateOverlayDiagram diagram = aggregateOverlayDiagramDao.getById(diagramId);
+        ;
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(diagram.aggregatedEntityKind(), idSelectionOptions);
+        Select<Record1<Long>> entityIdSelector = applyFilterToSelector(genericSelector, filterParams);
+
+        return aggregatedEntitiesWidgetDao.findWidgetData(
+                diagramId,
+                diagram.aggregatedEntityKind(),
+                entityIdSelector);
     }
 
 
