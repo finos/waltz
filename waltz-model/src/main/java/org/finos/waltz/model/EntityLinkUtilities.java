@@ -29,7 +29,7 @@ public class EntityLinkUtilities {
         checkNotNull(kind, "kind cannot be null");
         checkNotNull(id, "id cannot be null");
 
-        return mkPath(baseUrl, "entity", kind.name(), "id", id);
+        return mkPath(baseUrl, "entity", kind.name(), "id", Long.toString(id));
     }
 
 
@@ -40,6 +40,5 @@ public class EntityLinkUtilities {
 
         return mkPath(baseUrl, "entity", kind.name(), "external-id", externalId);
     }
-
 
 }

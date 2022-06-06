@@ -18,14 +18,14 @@
 
 package org.finos.waltz.data.entity_relationship;
 
-import org.finos.waltz.model.ImmutableEntityReference;
-import org.finos.waltz.schema.tables.records.EntityRelationshipRecord;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.ImmutableEntityReference;
 import org.finos.waltz.model.entity_relationship.*;
+import org.finos.waltz.schema.tables.records.EntityRelationshipRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,11 +39,10 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.finos.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
-import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 
 
 @Repository
@@ -215,7 +214,8 @@ public class EntityRelationshipDao {
     public boolean update(EntityRelationshipKey key,
                           UpdateEntityRelationshipParams params,
                           String username) {
-        return dsl.update(ENTITY_RELATIONSHIP)
+        return dsl
+                .update(ENTITY_RELATIONSHIP)
                 .set(ENTITY_RELATIONSHIP.RELATIONSHIP, params.relationshipKind())
                 .set(ENTITY_RELATIONSHIP.DESCRIPTION, params.description())
                 .set(ENTITY_RELATIONSHIP.LAST_UPDATED_BY, username)
@@ -260,13 +260,12 @@ public class EntityRelationshipDao {
 
     private boolean exists(EntityRelationshipKey key) {
 
-        int count = dsl.fetchCount(
-                DSL.select()
-                        .from(ENTITY_RELATIONSHIP)
-                        .where(mkExactKeyMatchCondition(key)));
-
-        return count > 0;
-    }
+        return dsl
+                .fetchExists(
+                    DSL.select()
+                       .from(ENTITY_RELATIONSHIP)
+                       .where(mkExactKeyMatchCondition(key)));
+        }
 
 
     private Condition mkExactRefMatchCondition(EntityReference ref) {
@@ -302,7 +301,8 @@ public class EntityRelationshipDao {
         
         Query[] queries  = changeInitiativeIds
                 .stream()
-                .map(ci -> DSL.insertInto(ENTITY_RELATIONSHIP)
+                .map(ci -> DSL
+                        .insertInto(ENTITY_RELATIONSHIP)
                         .set(ENTITY_RELATIONSHIP.KIND_A, EntityKind.APP_GROUP.name())
                         .set(ENTITY_RELATIONSHIP.ID_A, groupId)
                         .set(ENTITY_RELATIONSHIP.KIND_B, EntityKind.CHANGE_INITIATIVE.name())
@@ -322,7 +322,8 @@ public class EntityRelationshipDao {
         checkNotNull(groupId, "groupId cannot be null");
         checkNotNull(changeInitiativeIds, "changeInitiativeIds cannot be null");
 
-        return dsl.delete(ENTITY_RELATIONSHIP)
+        return dsl
+                .delete(ENTITY_RELATIONSHIP)
                 .where(ENTITY_RELATIONSHIP.ID_A.eq(groupId))
                 .and(ENTITY_RELATIONSHIP.ID_B.in(changeInitiativeIds))
                 .execute();

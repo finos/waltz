@@ -189,11 +189,11 @@ public class StringUtilities {
      * @return String representing the path produced by joining the segments
      * @throws IllegalArgumentException If any of the segments are null
      */
-    public static String mkPath(Object... segs) {
+    public static String mkPath(String... segs) {
         checkAll(
                 segs,
-                d -> d != null && notEmpty(d.toString()),
-                "Cannot convert empty segments to path");
+                StringUtilities::notEmpty,
+                "Cannot convert empty or null segments to path");
 
         return Stream
                 .of(segs)
