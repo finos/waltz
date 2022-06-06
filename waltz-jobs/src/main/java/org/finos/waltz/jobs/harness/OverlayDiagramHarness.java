@@ -59,11 +59,16 @@ public class OverlayDiagramHarness {
         IdSelectionOptions ou = mkOpts(mkRef(EntityKind.ORG_UNIT, 95L));
 
         GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
-        GenericSelector genericSelector = genericSelectorFactory.applyForKind(EntityKind.CHANGE_INITIATIVE, ou);
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(EntityKind.APPLICATION, ou);
+        GenericSelector genericSelector2 = genericSelectorFactory.applyForKind(EntityKind.CHANGE_INITIATIVE, ou);
 
-        Set<AggregatedEntitiesWidgetDatum> widgetData = aggregatedEntitiesWidgetDao.findWidgetData(3L, EntityKind.CHANGE_INITIATIVE, genericSelector.selector());
+        Set<AggregatedEntitiesWidgetDatum> widgetData2 = aggregatedEntitiesWidgetDao.findWidgetData(2L, EntityKind.CHANGE_INITIATIVE, genericSelector2.selector());
+        Set<AggregatedEntitiesWidgetDatum> widgetData = aggregatedEntitiesWidgetDao.findWidgetData(1L, EntityKind.APPLICATION, genericSelector.selector());
 
+        System.out.println(widgetData2.size());
         System.out.println(widgetData.size());
+
+        System.out.println("Done");
 
 //        System.out.println(format("with filter: %d", changeInitiativeCount));
 //        System.out.println(qry);

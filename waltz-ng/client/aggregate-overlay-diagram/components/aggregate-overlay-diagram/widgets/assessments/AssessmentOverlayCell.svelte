@@ -4,6 +4,8 @@
 
     export let cellData = [];
     export let maxCount = 0;
+    export let height;
+    export let width;
 
     const rowHeight = 14;
 
