@@ -45,15 +45,15 @@ public class FlowClassificationRuleResolver {
 
         byOuThenDataTypeThenApp =
                 groupAndThen(
+                        flowClassificationVantagePoints,
                         FlowClassificationRuleVantagePoint::vantagePoint,
                         byOus -> groupAndThen(
+                                byOus,
                                 byOu -> byOu.dataType().id(),
                                 byDts -> groupAndThen(
+                                        byDts,
                                         FlowClassificationRuleVantagePoint::applicationId,
-                                        a -> getMostSpecificRanked(a),
-                                        byDts),
-                                byOus),
-                        flowClassificationVantagePoints);
+                                        FlowClassificationRuleResolver::getMostSpecificRanked)));
     }
 
 

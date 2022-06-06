@@ -47,13 +47,14 @@ public class OptionalUtilities {
      * @param <T>
      * @return
      */
+    @SafeVarargs
     public static <T> List<T> toList(Optional<T>... optionals) {
         if (optionals == null) { return Collections.emptyList(); }
 
         return Stream
                 .of(optionals)
-                .filter(opt -> opt.isPresent())
-                .map(opt -> opt.get())
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .collect(Collectors.toList());
 
     }

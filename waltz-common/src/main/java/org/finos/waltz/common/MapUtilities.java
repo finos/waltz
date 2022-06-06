@@ -225,15 +225,6 @@ public class MapUtilities {
     }
 
 
-    /** Use the version with the collection as the first arg instead **/
-    @Deprecated
-    public static <K, V, V2> Map<K, V2> groupAndThen(Function<V, K> keyFn,
-                                                     Function<Collection<V>, V2> valueFn,
-                                                     Collection<V> xs) {
-        return groupAndThen(xs, keyFn, valueFn);
-    }
-
-
     /**
      * Similar to groupBy, however the valueFn runs over the entire group after the initial grouping
      * has been performed

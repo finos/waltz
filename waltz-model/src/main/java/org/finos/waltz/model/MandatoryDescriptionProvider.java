@@ -23,7 +23,6 @@ import org.immutables.value.Value;
 
 public interface MandatoryDescriptionProvider {
 
-    @Value
     @Value.Auxiliary
     String description();
 }

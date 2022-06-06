@@ -18,10 +18,8 @@
 
 package org.finos.waltz.common;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static org.finos.waltz.common.StringUtilities.firstChar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -35,12 +33,6 @@ public class StringUtilities_mkPathTest {
     @Test
     public void mkPathWithSegmentsReturnsSlashDelimitedConcatenation() {
         assertEquals("hello/world", StringUtilities.mkPath("hello", "world"));
-    }
-
-
-    @Test
-    public void mkPathWithNonStringSegmentsReturnsToStringEquivalent() {
-        assertEquals("hello/23/world", StringUtilities.mkPath("hello", 23, "world"));
     }
 
 

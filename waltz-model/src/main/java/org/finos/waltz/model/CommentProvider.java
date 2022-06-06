@@ -22,7 +22,6 @@ import org.immutables.value.Value;
 
 public interface CommentProvider {
 
-    @Value
     @Value.Auxiliary
     @Nullable
     String comment();

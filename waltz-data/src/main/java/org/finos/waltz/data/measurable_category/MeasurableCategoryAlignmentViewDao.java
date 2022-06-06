@@ -104,6 +104,7 @@ public class MeasurableCategoryAlignmentViewDao {
                     EntityReference categoryRef = e.getKey();
 
                     Map<Measurable, Set<Long>> measurableAlignments = groupAndThen(
+                            values,
                             k -> ImmutableMeasurable.builder()
                                     .categoryId(k.get(mc.ID))
                                     .id(k.get(m.ID))
@@ -113,8 +114,7 @@ public class MeasurableCategoryAlignmentViewDao {
                                     .organisationalUnitId(k.get(m.ORGANISATIONAL_UNIT_ID))
                                     .lastUpdatedBy(k.get(m.LAST_UPDATED_BY))
                                     .build(),
-                            v -> map(v, r -> r.get(parents_with_ratings.field(mr.ENTITY_ID))),
-                            values);
+                            v -> map(v, r -> r.get(parents_with_ratings.field(mr.ENTITY_ID))));
 
                     Set<MeasurableAlignment> alignments = map(measurableAlignments.entrySet(), es ->
                             ImmutableMeasurableAlignment.builder()
