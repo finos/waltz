@@ -150,18 +150,22 @@ public class AggregatedEntitiesWidgetDao {
                                                                   Select<Record1<Long>> inScopeEntityIdSelector) {
 
         SelectConditionStep<Record2<Long, Long>> aToB = dsl
-                .selectDistinct(ENTITY_RELATIONSHIP.ID_B.as("measurable_id"), ENTITY_RELATIONSHIP.ID_A.as("ci_id"))
+                .selectDistinct(ENTITY_RELATIONSHIP.ID_B.as("measurable_id"), ENTITY_HIERARCHY.ID.as("ci_id"))
                 .from(ENTITY_RELATIONSHIP)
+                .innerJoin(ENTITY_HIERARCHY).on(ENTITY_RELATIONSHIP.ID_A.eq(ENTITY_HIERARCHY.ANCESTOR_ID)
+                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.CHANGE_INITIATIVE.name())))
                 .where(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.CHANGE_INITIATIVE.name()))
                 .and(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.MEASURABLE.name())
-                        .and(ENTITY_RELATIONSHIP.ID_A.in(inScopeEntityIdSelector)));
+                        .and(ENTITY_HIERARCHY.ID.in(inScopeEntityIdSelector)));
 
         SelectConditionStep<Record2<Long, Long>> bToA = dsl
                 .selectDistinct(ENTITY_RELATIONSHIP.ID_A.as("measurable_id"), ENTITY_RELATIONSHIP.ID_B.as("ci_id"))
                 .from(ENTITY_RELATIONSHIP)
+                .innerJoin(ENTITY_HIERARCHY).on(ENTITY_RELATIONSHIP.ID_A.eq(ENTITY_HIERARCHY.ANCESTOR_ID)
+                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.CHANGE_INITIATIVE.name())))
                 .where(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.CHANGE_INITIATIVE.name()))
                 .and(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.MEASURABLE.name()))
-                .and(ENTITY_RELATIONSHIP.ID_B.in(inScopeEntityIdSelector));
+                .and(ENTITY_HIERARCHY.ID.in(inScopeEntityIdSelector));
 
         return aToB.union(bToA)
                 .fetchGroups(r -> r.get("measurable_id", Long.class), r -> r.get("ci_id", Long.class));

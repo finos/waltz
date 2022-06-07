@@ -3,13 +3,16 @@ package org.finos.waltz.data.aggregate_overlay_diagram;
 
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
+import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
 import org.finos.waltz.model.aggregate_overlay_diagram.ImmutableAggregateOverlayDiagram;
 import org.finos.waltz.schema.tables.records.AggregateOverlayDiagramRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.jooq.lambda.tuple.Tuple3;
 
 import java.util.Collection;
 import java.util.Map;
@@ -41,6 +44,8 @@ public class AggregateOverlayDiagramUtilities {
 
     protected static Map<String, Set<Long>> fetchAndGroupEntityIdsByCellId(DSLContext dsl,
                                                                            Select<Record2<String, Long>> cellExtIdWithEntityIdSelector) {
+
+        Result<Record2<String, Long>> fetch = dsl.selectQuery(cellExtIdWithEntityIdSelector).fetch();
 
         return dsl
                 .selectQuery(cellExtIdWithEntityIdSelector)
@@ -76,14 +81,21 @@ public class AggregateOverlayDiagramUtilities {
 
         GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
 
-        Set<Select<Record2<String, Long>>> stuffToUnion = selectCellMappingsForDiagram(dsl, diagramId)
-                .fetchSet(r -> {
-                    r.get(AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.RELATED_ENTITY_KIND);
+        SelectConditionStep<Record3<String, String, Long>> record3s = selectCellMappingsForDiagram(dsl, diagramId);
 
-                    IdSelectionOptions idSelectionOptions = mkOpts(readRef(
-                            r,
-                            AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.RELATED_ENTITY_KIND,
-                            r.field3()));
+        Set<Tuple3<String, String, Long>> fetch = dsl
+                .selectQuery(record3s)
+                .fetchSet(r -> tuple(r.get(0, String.class), r.get(1, String.class), r.get(2, Long.class)))
+                .stream()
+                .filter(t -> t.v1 == null || t.v2 == null || t.v3 == null)
+                .collect(toSet());
+
+        Set<Select<Record2<String, Long>>> stuffToUnion = record3s
+                .fetchSet(r -> {
+                    String relatedKind = r.get(AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.RELATED_ENTITY_KIND);
+                    Long relatedId = r.get("related_entity_id", Long.class);
+
+                    IdSelectionOptions idSelectionOptions = mkOpts(EntityReference.mkRef(EntityKind.valueOf(relatedKind), relatedId));
 
                     GenericSelector entityIdSelector = genericSelectorFactory.applyForKind(aggregatedEntityKind, idSelectionOptions);
 
@@ -109,7 +121,9 @@ public class AggregateOverlayDiagramUtilities {
     protected static SelectConditionStep<Record3<String, String, Long>> selectCellMappingsForDiagram(DSLContext dsl,
                                                                                                      long diagramId) {
 
-        Field<Long> related_entity_id = DSL.coalesce(ENTITY_HIERARCHY.ID, AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.RELATED_ENTITY_ID).as("related_entity_id");
+        Field<Long> related_entity_id = DSL
+                .coalesce(ENTITY_HIERARCHY.ID, AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.RELATED_ENTITY_ID)
+                .as("related_entity_id");
 
         return dsl
                 .selectDistinct(

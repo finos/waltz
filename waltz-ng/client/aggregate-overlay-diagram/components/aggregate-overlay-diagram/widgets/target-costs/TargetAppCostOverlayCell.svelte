@@ -5,6 +5,7 @@
 
     export let cellData = null;
     export let maxCost;
+    export let height;
 
     $: r = scaleLinear()
         .domain([0, maxCost])
@@ -13,10 +14,12 @@
     $: cr = r(cellData?.currentStateCost) || 0;
     $: tr = r(cellData?.targetStateCost) || 0;
     $: delta = cellData?.currentStateCost - cellData?.targetStateCost;
+
 </script>
 
 
-<svg class="content" viewBox="0 0 300 100">
+<svg class="content"
+     viewBox="0 0 300 100">
     <circle r={cr}
             fill="#a9e4ff"
             stroke="#25b0ff"

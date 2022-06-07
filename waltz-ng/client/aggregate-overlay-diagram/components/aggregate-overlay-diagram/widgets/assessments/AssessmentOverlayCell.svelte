@@ -7,30 +7,37 @@
     export let height;
     export let width;
 
-    const rowHeight = 14;
+    const rowHeight = height / 3 < defaultHeight
+        ? defaultHeight
+        : height / 3;
 
     let counts = [];
     let y;
+    let defaultHeight = 14
 
 
     $: counts = _.orderBy(cellData?.counts, c => c.rating.name);
 
-    $: height = Math.max(counts.length * rowHeight, rowHeight);
+    $: svgHeight = Math.max(counts.length * rowHeight, height);
 
     $: y = scaleBand()
         .domain(counts.map(c => c.rating.id))
-        .range([0, height])
+        .range([0, svgHeight])
 
     $:x = scaleLinear()
         .domain([0, maxCount])
-        .range([0, 30]);
+        .range([0, width / 3]);
+
+
+    $: textSize = rowHeight - 1
+
 
 </script>
 
 
 <svg class="content"
      width="100%"
-     height={height + 10}
+     height={svgHeight + 10}
      style="background: white">
     <g transform="translate(0, 5)">
         {#each counts as r}
@@ -42,9 +49,9 @@
                   fill={r.rating.color}>
                 <title>{r.rating.name}</title>
             </rect>
-            <text dx="32"
-                  dy={y(r.rating.id) + rowHeight - 4}
-                  font-size={rowHeight - 1}
+            <text dx={width / 3 + 2}
+                  dy={y(r.rating.id) + rowHeight / 2 + textSize / 2}
+                  font-size={textSize}
                   fill="#666">
                 {r.rating.name || "?"}
                 <title>{r.rating.name}</title>

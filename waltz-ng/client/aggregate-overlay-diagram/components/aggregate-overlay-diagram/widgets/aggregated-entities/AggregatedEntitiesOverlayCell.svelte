@@ -18,12 +18,12 @@
     $: cr = r(references.length)
 
     let references = [];
+    let textHeight = 20;
 
     $: references = cellData?.aggregatedEntityReferences || [];
 
-    $: svgHeight = references.length === 0
-        ? height
-        : (references.length + additionalLines) * 20 + height;
+
+    $: svgHeight = Math.max((references.length + additionalLines) * textHeight + height, height);
 
     $: additionalLines = _
         .chain(references)
