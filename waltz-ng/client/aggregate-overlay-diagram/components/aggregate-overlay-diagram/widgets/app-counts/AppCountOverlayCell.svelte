@@ -15,7 +15,6 @@
     $: cr = r(cellData?.currentStateCount) || 0;
     $: tr = r(cellData?.targetStateCount) || 0;
 
-    $: console.log({height, width, maxCount, current: cellData?.currentStateCount, target: cellData?.targetStateCount});
 </script>
 
 

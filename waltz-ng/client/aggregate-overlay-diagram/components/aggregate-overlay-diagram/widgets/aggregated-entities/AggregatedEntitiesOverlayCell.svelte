@@ -8,7 +8,6 @@
     export let cellData = {};
     export let maxCount;
     export let height;
-    export let width;
 
     $: r = scaleLinear()
         .domain([0, maxCount])
