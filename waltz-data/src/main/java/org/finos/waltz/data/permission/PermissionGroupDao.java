@@ -31,18 +31,13 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 @Repository
 public class PermissionGroupDao {
 
-    private static final Set<Long> ALL_USERS_ALLOWED = asSet((Long) null);
+    private static final Set<Long> ALL_USERS_ALLOWED = asSet((Long) null); // the set containing the value <null>
 
     private final DSLContext dsl;
 
 
     public PermissionGroupDao(DSLContext dsl) {
         this.dsl = dsl;
-    }
-
-
-    public Set<Permission> findPermissionsForOperationOnEntityRef(EntityReference parentEntityRef, Operation operation) {
-        return getPermissionsForEntityRef(parentEntityRef, PERMISSION_GROUP_INVOLVEMENT.OPERATION.eq(operation.name()));
     }
 
 

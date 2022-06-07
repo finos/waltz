@@ -52,7 +52,10 @@
                 <NoData type="warning">
                     Never attested.
                     {#if isAttestable}
-                        <button class="btn-link" on:click={attestMiniAction.handleAction}>Attest now</button>
+                        <button class="btn-link"
+                                on:click={() => attestMiniAction.handleAction(measurableCategory)}>
+                            Attest now
+                        </button>
                     {/if}
                 </NoData>
 

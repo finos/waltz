@@ -24,17 +24,12 @@ function store($http, baseApiUrl) {
         .get(`${baseUrl}/entity-ref/${ref.kind}/${ref.id}`)
         .then(d => d.data);
 
-    const findForOperationOnEntityRef = (ref, operation) => $http
-        .get(`${baseUrl}/entity-ref/${ref.kind}/${ref.id}/operation/${operation}`)
-        .then(d => d.data);
-
     const findForParentEntityRef = (ref, operation) => $http
         .get(`${baseUrl}/entity-ref/${ref.kind}/${ref.id}`)
         .then(d => d.data);
 
     return {
         findByEntity,
-        findForOperationOnEntityRef,
         findForParentEntityRef
     };
 }
@@ -58,11 +53,6 @@ export const PermissionGroupStore_API = {
         serviceName,
         serviceFnName: "findByEntity",
         description: "findByEntity [ref]"
-    },
-    findForOperationOnEntityRef: {
-        serviceName,
-        serviceFnName: "findForOperationOnEntityRef",
-        description: "findForOperationOnEntityRef [ref, operation]"
     },
     findForParentEntityRef: {
         serviceName,

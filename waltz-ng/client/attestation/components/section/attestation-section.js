@@ -133,9 +133,9 @@ function controller($q,
 
         const permissionGroupPromise = serviceBroker
             .loadViewData(
-                CORE_API.PermissionGroupStore.findForOperationOnEntityRef,
-                [entityReference, operation.ATTEST.key])
-            .then(r => r.data);
+                CORE_API.PermissionGroupStore.findForParentEntityRef,
+                [entityReference])
+            .then(r => _.filter(r.data, d => d.operation === operation.ATTEST.key));
 
         return $q
             .all([runsPromise, instancesPromise, unattestedChangesPromise, permissionGroupPromise])
