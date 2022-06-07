@@ -9,7 +9,7 @@
 
     $: r = scaleLinear()
         .domain([0, maxCount])
-        .range([0, height - 8])
+        .range([0, height / 2 - 2])
         .clamp(true);
 
     $: cr = r(cellData?.currentStateCount) || 0;
@@ -25,7 +25,7 @@
     <circle r={cr}
             fill="#b2ffca"
             stroke="#31ff89"
-            stroke-width="2"
+            stroke-width="1"
             cx={width / 2 - (cr / 1.6)}
             cy={height / 2}/>
     <circle r={tr}

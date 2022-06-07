@@ -8,6 +8,6 @@
 <foreignObject {width}
                {height}>
     <div class="statistics-box"
-         style="background-color: #f2f6f2; height: 100%; overflow-y: auto">
+         style="background-color: #f2f6f2; height: 100%; overflow-y: auto; box-sizing: content-box">
     </div>
 </foreignObject>
