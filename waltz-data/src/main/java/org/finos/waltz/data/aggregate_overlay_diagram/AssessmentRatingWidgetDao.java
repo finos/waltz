@@ -13,15 +13,13 @@ import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramUtilities.*;
+import static org.finos.waltz.model.utils.IdUtilities.indexById;
 
 @Repository
 public class AssessmentRatingWidgetDao {
@@ -45,21 +43,18 @@ public class AssessmentRatingWidgetDao {
                                                             Long assessmentId,
                                                             Select<Record1<Long>> inScopeEntityIdSelector) {
 
-        Select<Record2<String, Long>> cellExtIdWithEntityIdSelector = mkOverlayEntityCellAggregateEntitySelector(dsl, diagramId, aggregatedEntityKind);
-
-        if (cellExtIdWithEntityIdSelector == null) {
-            // no cell mapping data so short circuit and give no results
-            return Collections.emptySet();
-        }
-
-        Map<String, Set<Long>> cellExtIdsToEntityIdsMap = fetchAndGroupEntityIdsByCellId(dsl, cellExtIdWithEntityIdSelector);
-
-        Set<Long> diagramEntityIds = calcExactEntityIdsOnDiagram(
+        Map<String, Set<Long>> cellExtIdsToAggregatedEntities = loadCellExtIdToAggregatedEntities(
                 dsl,
-                cellExtIdsToEntityIdsMap,
+                diagramId,
+                aggregatedEntityKind,
                 inScopeEntityIdSelector);
 
-        Map<Long, org.finos.waltz.model.rating.RatingSchemeItem> itemsById = IdUtilities.indexById(ratingSchemeDAO.findRatingSchemeItemsForAssessmentDefinition(assessmentId));
+        Set<Long> diagramEntityIds = cellExtIdsToAggregatedEntities.values()
+                .stream()
+                .flatMap(Collection::stream)
+                .collect(toSet());
+
+        Map<Long, org.finos.waltz.model.rating.RatingSchemeItem> itemsById = indexById(ratingSchemeDAO.findRatingSchemeItemsForAssessmentDefinition(assessmentId));
 
         if (itemsById.isEmpty()) {
             return Collections.emptySet();
@@ -73,7 +68,7 @@ public class AssessmentRatingWidgetDao {
                 .and(ar.ENTITY_KIND.eq(aggregatedEntityKind.name()))
                 .fetchMap(ar.ENTITY_ID, ar.RATING_ID);
 
-        return cellExtIdsToEntityIdsMap
+        return cellExtIdsToAggregatedEntities
                 .entrySet()
                 .stream()
                 .map(e -> {

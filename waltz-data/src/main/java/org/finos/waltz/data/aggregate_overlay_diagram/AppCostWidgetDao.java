@@ -25,6 +25,7 @@ import static org.finos.waltz.common.CollectionUtilities.*;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.StreamUtilities.mkSiphon;
 import static org.finos.waltz.data.JooqUtilities.readRef;
+import static org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramUtilities.loadCellExtIdToAggregatedEntities;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository
@@ -63,16 +64,18 @@ public class AppCostWidgetDao {
                                                long allocationSchemeId,
                                                Select<Record1<Long>> inScopeApplicationSelector) {
 
-        Map<String, Set<EntityReference>> expandedBackingForCells = findExpandedBackingForCells(
+        Map<String, Set<Long>> cellExtIdsToBackingEntities = loadCellExtIdToAggregatedEntities(
                 dsl,
-                diagramId);
+                diagramId,
+                EntityKind.APPLICATION,
+                inScopeApplicationSelector);
 
         Set<MeasurableCostEntry> costData = fetchCostData(
                 dsl,
                 costKindIds,
                 allocationSchemeId,
                 inScopeApplicationSelector,
-                expandedBackingForCells);
+                cellExtIdsToBackingEntities);
 
         Map<Long, Collection<MeasurableCostEntry>> costDataByAppId = groupBy(
                 costData,
@@ -82,10 +85,10 @@ public class AppCostWidgetDao {
                 costData,
                 MeasurableCostEntry::measurableId);
 
-        return expandedBackingForCells
+        return cellExtIdsToBackingEntities
                 .entrySet()
                 .stream()
-                .map(kv -> processCell(
+                .map(kv -> processMeasurableBackingsForCell(
                         kv.getKey(),
                         kv.getValue(),
                         costDataByMeasurableId,
@@ -95,24 +98,22 @@ public class AppCostWidgetDao {
     }
 
 
-    private CostWidgetDatum processCell(String cellRef,
-                                        Set<EntityReference> backingRefs,
-                                        Map<Long, Collection<MeasurableCostEntry>> costDataByMeasurableId,
-                                        Map<Long, Collection<MeasurableCostEntry>> costDataByAppId) {
+    private CostWidgetDatum processMeasurableBackingsForCell(String cellRef,
+                                                             Set<Long> backingMeasurableIds,
+                                                             Map<Long, Collection<MeasurableCostEntry>> costDataByMeasurableId,
+                                                             Map<Long, Collection<MeasurableCostEntry>> costDataByAppId) {
 
         // backing refs may not be measurables (i.e. app groups, org units, people)
-        BigDecimal totalCostForCell = backingRefs
+        BigDecimal totalCostForCell = backingMeasurableIds
                 .stream()
-                .filter(r -> r.kind() == EntityKind.MEASURABLE)
                 .map(r -> processCostsForMeasurable(
-                        costDataByMeasurableId.getOrDefault(r.id(), emptySet()),
+                        costDataByMeasurableId.getOrDefault(r, emptySet()),
                         costDataByAppId))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        Set<Long> distinctAppsForCell = backingRefs
+        Set<Long> distinctAppsForCell = backingMeasurableIds
                 .stream()
-                .filter(r -> r.kind() == EntityKind.MEASURABLE)
-                .flatMap(r -> costDataByMeasurableId.getOrDefault(r.id(), emptySet()).stream())
+                .flatMap(r -> costDataByMeasurableId.getOrDefault(r, emptySet()).stream())
                 .map(MeasurableCostEntry::appId)
                 .collect(toSet());
 
@@ -181,7 +182,8 @@ public class AppCostWidgetDao {
                                                    Set<Long> costKindIds,
                                                    long allocationSchemeId,
                                                    Select<Record1<Long>> inScopeApplicationSelector,
-                                                   Map<String, Set<EntityReference>> expandedBackingForCells) {
+                                                   Map<String, Set<Long>> expandedBackingForCells) {
+
         Set<Long> measurableIds = flattenToMeasurableIds(expandedBackingForCells);
 
         SelectConditionStep<Record5<Long, Long, Integer, Long, BigDecimal>> qry = dsl
@@ -214,14 +216,11 @@ public class AppCostWidgetDao {
     }
 
 
-    private Set<Long> flattenToMeasurableIds(Map<String, Set<EntityReference>> expandedBackingForCells) {
+    private Set<Long> flattenToMeasurableIds(Map<String, Set<Long>> expandedBackingForCells) {
         return expandedBackingForCells
                 .values()
                 .stream()
-                .flatMap(xs -> xs
-                        .stream()
-                        .filter(x -> x.kind() == EntityKind.MEASURABLE)
-                        .map(EntityReference::id))
+                .flatMap(Collection::stream)
                 .collect(toSet());
     }
 

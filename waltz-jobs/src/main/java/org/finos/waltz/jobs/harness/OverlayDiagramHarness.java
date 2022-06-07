@@ -18,6 +18,7 @@
 
 package org.finos.waltz.jobs.harness;
 
+import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.aggregate_overlay_diagram.AggregatedEntitiesWidgetDao;
@@ -27,6 +28,7 @@ import org.finos.waltz.model.AssessmentBasedSelectionFilter;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.AggregatedEntitiesWidgetDatum;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.CountWidgetDatum;
 import org.finos.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
@@ -59,11 +61,16 @@ public class OverlayDiagramHarness {
         IdSelectionOptions ou = mkOpts(mkRef(EntityKind.ORG_UNIT, 95L));
 
         GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
-        GenericSelector genericSelector = genericSelectorFactory.applyForKind(EntityKind.CHANGE_INITIATIVE, ou);
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(EntityKind.APPLICATION, ou);
+        GenericSelector genericSelector2 = genericSelectorFactory.applyForKind(EntityKind.CHANGE_INITIATIVE, ou);
 
-        Set<AggregatedEntitiesWidgetDatum> widgetData = aggregatedEntitiesWidgetDao.findWidgetData(3L, EntityKind.CHANGE_INITIATIVE, genericSelector.selector());
+//        Set<AggregatedEntitiesWidgetDatum> widgetData2 = countWidgetDao.findWidgetData(2L, EntityKind.CHANGE_INITIATIVE, genericSelector2.selector());
+        Set<CountWidgetDatum> widgetData = countWidgetDao.findWidgetData(3L, genericSelector.selector(), DateTimeUtilities.today());
 
+//        System.out.println(widgetData2.size());
         System.out.println(widgetData.size());
+
+        System.out.println("Done");
 
 //        System.out.println(format("with filter: %d", changeInitiativeCount));
 //        System.out.println(qry);

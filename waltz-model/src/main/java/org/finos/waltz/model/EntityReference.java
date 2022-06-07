@@ -21,6 +21,7 @@ package org.finos.waltz.model;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.immutables.value.Value;
+import org.jooq.lambda.tuple.Tuple2;
 
 import java.util.Map;
 import java.util.Optional;

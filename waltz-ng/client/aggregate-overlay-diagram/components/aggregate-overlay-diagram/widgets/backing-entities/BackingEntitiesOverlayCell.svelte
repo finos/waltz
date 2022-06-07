@@ -4,19 +4,21 @@
     import Icon from "../../../../../common/svelte/Icon.svelte";
 
     export let cellData = {};
+    export let height;
 
     let references = [];
+    let textHeight = 20
 
     $: references = cellData?.backingEntityReferences || [];
 
-    $: height = references.length * 20;
+    $: svgHeight = Math.max(references.length * textHeight, height);
 
 </script>
 
 
 <svg class="content"
      width="100%"
-     {height}
+     height={svgHeight}
      style="background: white">
     {#if cellData}
         <foreignObject width="300"
