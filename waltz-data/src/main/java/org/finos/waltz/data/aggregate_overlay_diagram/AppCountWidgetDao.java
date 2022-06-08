@@ -11,12 +11,12 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
-import static org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramUtilities.*;
+import static org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramUtilities.loadCellExtIdToAggregatedEntities;
 import static org.finos.waltz.schema.Tables.APPLICATION;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
@@ -37,42 +37,34 @@ public class AppCountWidgetDao {
                                                 Select<Record1<Long>> inScopeApplicationSelector,
                                                 LocalDate targetStateDate) {
 
-        Select<Record2<String, Long>> cellExtIdWithAppIdSelector = mkOverlayEntityCellAggregateEntitySelector(
+        Map<String, Set<Long>> cellExtIdsToAggregatedEntities = loadCellExtIdToAggregatedEntities(
                 dsl,
                 diagramId,
-                EntityKind.APPLICATION);
-
-        if (cellExtIdWithAppIdSelector == null) {
-            // no cell mapping data so short circuit and give no results
-            return Collections.emptySet();
-        }
-
-        Map<String, Set<Long>> cellExtIdsToAppIdsMap = fetchAndGroupEntityIdsByCellId(
-                dsl,
-                cellExtIdWithAppIdSelector);
-
-        Set<Long> diagramApplicationIds = calcExactEntityIdsOnDiagram(
-                dsl,
-                cellExtIdsToAppIdsMap,
+                EntityKind.APPLICATION,
                 inScopeApplicationSelector);
+
+        Set<Long> appIds = cellExtIdsToAggregatedEntities.values()
+                .stream()
+                .flatMap(Collection::stream)
+                .collect(toSet());
 
         Map<Long, Tuple2<Integer, Integer>> appToTargetStateCounts = fetchAppIdToTargetStatePresenceIndicator(
                 targetStateDate,
-                diagramApplicationIds);
+                appIds);
 
-        return cellExtIdsToAppIdsMap
+        return cellExtIdsToAggregatedEntities
                 .entrySet()
                 .stream()
                 .map(e -> {
                     String cellExtId = e.getKey();
-                    Set<Long> appIds = e.getValue();
+                    Set<Long> appIdsForCell = e.getValue();
 
-                    int currentCount = appIds
+                    int currentCount = appIdsForCell
                             .stream()
                             .mapToInt(v -> appToTargetStateCounts.getOrDefault(v, ZERO_COUNT).v1)
                             .sum();
 
-                    int targetCount = appIds
+                    int targetCount = appIdsForCell
                             .stream()
                             .mapToInt(v -> appToTargetStateCounts.getOrDefault(v, ZERO_COUNT).v2)
                             .sum();

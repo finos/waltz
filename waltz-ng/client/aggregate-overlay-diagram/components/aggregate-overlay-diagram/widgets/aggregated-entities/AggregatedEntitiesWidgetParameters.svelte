@@ -24,8 +24,6 @@
 
     $: {
 
-        console.log({od: $overlayData})
-
         $remoteMethod = aggregateOverlayDiagramStore.findAggregatedEntitiesForDiagram;
 
         $widgetParameters = {};

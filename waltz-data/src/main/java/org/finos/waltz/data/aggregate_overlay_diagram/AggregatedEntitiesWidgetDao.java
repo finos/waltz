@@ -9,13 +9,12 @@ import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toSet;
-import static org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramUtilities.*;
+import static org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramUtilities.loadCellExtIdToAggregatedEntities;
 import static org.finos.waltz.model.EntityReference.mkRef;
 
 @Repository
@@ -34,23 +33,15 @@ public class AggregatedEntitiesWidgetDao {
                                                              EntityKind aggregatedEntityKind,
                                                              Select<Record1<Long>> inScopeEntityIdSelector) {
 
-        Select<Record2<String, Long>> cellExtIdWithEntityIdSelector = mkOverlayEntityCellAggregateEntitySelector(dsl, diagramId, aggregatedEntityKind);
-
-        if (cellExtIdWithEntityIdSelector == null) {
-            // no cell mapping data so short circuit and give no results
-            return Collections.emptySet();
-        }
-
-        Map<String, Set<Long>> cellExtIdsToEntityIdsMap = fetchAndGroupEntityIdsByCellId(dsl, cellExtIdWithEntityIdSelector);
-
-        Set<Long> diagramEntityIds = calcExactEntityIdsOnDiagram(
+        Map<String, Set<Long>> cellExtIdsToAggregatedEntities = loadCellExtIdToAggregatedEntities(
                 dsl,
-                cellExtIdsToEntityIdsMap,
+                diagramId,
+                aggregatedEntityKind,
                 inScopeEntityIdSelector);
 
         Map<Long, String> entityIdToNameMap = loadEntityIdToNameMap(aggregatedEntityKind, inScopeEntityIdSelector);
 
-        return cellExtIdsToEntityIdsMap
+        return cellExtIdsToAggregatedEntities
                 .entrySet()
                 .stream()
                 .map(e -> {
@@ -60,7 +51,6 @@ public class AggregatedEntitiesWidgetDao {
 
                     Set<EntityReference> entityRefs = entityIds
                             .stream()
-                            .filter(diagramEntityIds::contains)
                             .map(id -> mkRef(aggregatedEntityKind, id, entityIdToNameMap.get(id)))
                             .filter(ref -> ref.name().isPresent())
                             .collect(toSet());
@@ -97,4 +87,7 @@ public class AggregatedEntitiesWidgetDao {
                 .where(idField.in(inScopeEntityIdSelector))
                 .fetchMap(idField, nameField);
     }
+
+
+
 }
