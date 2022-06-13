@@ -5,7 +5,11 @@
     import {aggregateOverlayDiagramCalloutStore} from "../../../svelte-stores/aggregate-overlay-diagram-callout-store";
     import DiagramSelector from "../diagram-selector/DiagramSelector.svelte";
     import NoData from "../../../common/svelte/NoData.svelte";
-    import {setupContextStores, determineWhichCellsAreLinkedByParent} from "../aggregate-overlay-diagram/aggregate-overlay-diagram-utils";
+    import {
+        setupContextStores,
+        determineWhichCellsAreLinkedByParent,
+        widgets
+    } from "../aggregate-overlay-diagram/aggregate-overlay-diagram-utils";
     import _ from "lodash";
     import AggregateOverlayDiagramContextPanel from "../context-panel/AggregateOverlayDiagramContextPanel.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
@@ -25,26 +29,20 @@
     let diagramProportion = getContext("diagramProportion");
     let cellIdsExplicitlyRelatedToParent = getContext("cellIdsExplicitlyRelatedToParent");
     let focusWidget = getContext("focusWidget");
-    let costSliderValue = getContext("costSliderValue");
-    let appCountSliderValue = getContext("appCountSliderValue");
-    let selectedCostKinds = getContext("selectedCostKinds");
-    let selectedAllocationScheme = getContext("selectedAllocationScheme");
-    let selectedAssessmentDefinition = getContext("selectedAssessmentDefinition");
+    let diagramPresets = getContext("diagramPresets");
+    let overlayDataCall = getContext("overlayDataCall");
+    let loading = getContext("loading");
 
     let svgCall;
     let calloutCall;
     let diagramsCall;
     let relatedEntitiesCall;
+    let presetsCall;
 
     function clearWidgetParameters() {
         $focusWidget = null;
-        $costSliderValue = 0;
-        $appCountSliderValue = 0;
-        $selectedCostKinds = [];
-        $selectedAllocationScheme = null;
-        $selectedAssessmentDefinition = null;
+        _.each(widgets, d => d.resetParameters ? d.resetParameters() : null);
     }
-
 
     function selectDiagram(evt) {
         clearWidgetParameters();
@@ -65,6 +63,7 @@
         if ($selectedDiagram) {
             svgCall = aggregateOverlayDiagramStore.getById($selectedDiagram.id);
             relatedEntitiesCall = measurableRelationshipStore.findByEntityReference(primaryEntityRef);
+            presetsCall = aggregateOverlayDiagramStore.findPresetsForDiagram($selectedDiagram.id);
         }
     }
 
@@ -79,6 +78,7 @@
     $: diagrams = $diagramsCall?.data || [];
     $: relatedEntities = $relatedEntitiesCall?.data;
     $: $cellIdsExplicitlyRelatedToParent = determineWhichCellsAreLinkedByParent(backingEntities, relatedEntities);
+    $: $diagramPresets = $presetsCall?.data;
 
 </script>
 
@@ -101,7 +101,15 @@
                         </h4>
 
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
+                        {#if $loading}
+                            <h4>
+                                Loading
+                                <Icon name="refresh" spin="true"/>
+                            </h4>
+                        {/if}
+                    </div>
+                    <div class="col-sm-2">
                         <div class="pull-right btn-group">
                             <button class="btn btn-default btn-xs"
                                     title="Expand Diagram"

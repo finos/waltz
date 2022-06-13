@@ -28,7 +28,7 @@
     <rect width={dimensions.labelWidth}
           height={layoutData.height}
           class="section-header cell-background"
-          fill="#0e2541">
+          fill={group.headerColor || '#0e2541'}>
     </rect>
     <foreignObject width={dimensions.labelWidth}
                    height={layoutData.height}>

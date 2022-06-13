@@ -9,7 +9,9 @@ import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static java.lang.String.format;
@@ -31,13 +33,15 @@ public class AggregatedEntitiesWidgetDao {
 
     public Set<AggregatedEntitiesWidgetDatum> findWidgetData(long diagramId,
                                                              EntityKind aggregatedEntityKind,
-                                                             Select<Record1<Long>> inScopeEntityIdSelector) {
+                                                             Select<Record1<Long>> inScopeEntityIdSelector,
+                                                             Optional<LocalDate> targetStateDate) {
 
         Map<String, Set<Long>> cellExtIdsToAggregatedEntities = loadCellExtIdToAggregatedEntities(
                 dsl,
                 diagramId,
                 aggregatedEntityKind,
-                inScopeEntityIdSelector);
+                inScopeEntityIdSelector,
+                targetStateDate);
 
         Map<Long, String> entityIdToNameMap = loadEntityIdToNameMap(aggregatedEntityKind, inScopeEntityIdSelector);
 

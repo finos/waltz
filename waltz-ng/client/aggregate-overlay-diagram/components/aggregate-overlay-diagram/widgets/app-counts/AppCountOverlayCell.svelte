@@ -40,10 +40,10 @@
         {#if _.isNil(cellData)}
             -
         {:else}
-            <div style={`font-size: ${height/5}px; width: 100%; text-align: center`}>
+            <div style={`font-size: ${height/4}px; width: 100%; text-align: center`}>
                 App Count: #{cellData?.currentStateCount} &raquo; #{cellData?.targetStateCount}
             </div>
-            <div style={`font-size: ${height / 6}px; width: 100%; text-align: center`}>
+            <div style={`font-size: ${height / 5}px; width: 100%; text-align: center`}>
                 Change: {cellData?.targetStateCount - cellData?.currentStateCount}
             </div>
         {/if}

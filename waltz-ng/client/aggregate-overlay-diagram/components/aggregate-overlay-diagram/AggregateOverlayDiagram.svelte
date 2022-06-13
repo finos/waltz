@@ -11,7 +11,7 @@
     let selectedInstance = getContext("selectedInstance");
     let selectedDiagram = getContext("selectedDiagram");
     let overlayData = getContext("overlayData");
-    let widget = getContext("widget");
+    let widget = getContext("focusWidget");
     let callouts = getContext("callouts");
     let selectedOverlay = getContext("selectedOverlay");
     let svgDetail = getContext("svgDetail");

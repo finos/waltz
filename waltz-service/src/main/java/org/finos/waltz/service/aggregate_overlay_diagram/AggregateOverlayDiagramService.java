@@ -5,10 +5,7 @@ import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.aggregate_overlay_diagram.*;
 import org.finos.waltz.model.AssessmentBasedSelectionFilter;
 import org.finos.waltz.model.IdSelectionOptions;
-import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
-import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramInfo;
-import org.finos.waltz.model.aggregate_overlay_diagram.BackingEntity;
-import org.finos.waltz.model.aggregate_overlay_diagram.ImmutableAggregateOverlayDiagramInfo;
+import org.finos.waltz.model.aggregate_overlay_diagram.*;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.*;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AppCostWidgetParameters;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AppCountWidgetParameters;
@@ -35,6 +32,7 @@ public class AggregateOverlayDiagramService {
     private final AssessmentRatingWidgetDao appAssessmentWidgetDao;
     private final BackingEntityWidgetDao backingEntityWidgetDao;
     private final AggregatedEntitiesWidgetDao aggregatedEntitiesWidgetDao;
+    private final AggregateOverlayDiagramPresetDao aggregateOverlayDiagramPresetDao;
 
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
 
@@ -45,7 +43,8 @@ public class AggregateOverlayDiagramService {
                                           AssessmentRatingWidgetDao appAssessmentWidgetDao,
                                           BackingEntityWidgetDao backingEntityWidgetDao,
                                           AppCostWidgetDao appCostWidgetDao,
-                                          AggregatedEntitiesWidgetDao aggregatedEntitiesWidgetDao) {
+                                          AggregatedEntitiesWidgetDao aggregatedEntitiesWidgetDao,
+                                          AggregateOverlayDiagramPresetDao aggregateOverlayDiagramPresetDao) {
         this.aggregateOverlayDiagramDao = aggregateOverlayDiagramDao;
         this.appCountWidgetDao = appCountWidgetDao;
         this.targetAppCostWidgetDao = targetAppCostWidgetDao;
@@ -53,6 +52,7 @@ public class AggregateOverlayDiagramService {
         this.appAssessmentWidgetDao = appAssessmentWidgetDao;
         this.backingEntityWidgetDao = backingEntityWidgetDao;
         this.aggregatedEntitiesWidgetDao = aggregatedEntitiesWidgetDao;
+        this.aggregateOverlayDiagramPresetDao = aggregateOverlayDiagramPresetDao;
     }
 
 
@@ -114,7 +114,8 @@ public class AggregateOverlayDiagramService {
                 diagramId,
                 appCostWidgetParameters.costKindIds(),
                 appCostWidgetParameters.allocationSchemeId(),
-                entityIdSelector);
+                entityIdSelector,
+                Optional.empty());
     }
 
 
@@ -124,7 +125,7 @@ public class AggregateOverlayDiagramService {
                                                                          AssessmentWidgetParameters assessmentWidgetParameters) {
 
         AggregateOverlayDiagram diagram = aggregateOverlayDiagramDao.getById(diagramId);
-        ;
+
         GenericSelector genericSelector = genericSelectorFactory.applyForKind(diagram.aggregatedEntityKind(), appSelectionOptions);
         Select<Record1<Long>> entityIdSelector = applyFilterToSelector(genericSelector, filterParams);
 
@@ -132,7 +133,8 @@ public class AggregateOverlayDiagramService {
                 diagramId,
                 diagram.aggregatedEntityKind(),
                 assessmentWidgetParameters.assessmentDefinitionId(),
-                entityIdSelector);
+                entityIdSelector,
+                assessmentWidgetParameters.targetDate());
     }
 
 
@@ -148,12 +150,22 @@ public class AggregateOverlayDiagramService {
         return aggregatedEntitiesWidgetDao.findWidgetData(
                 diagramId,
                 diagram.aggregatedEntityKind(),
-                entityIdSelector);
+                entityIdSelector,
+                Optional.empty());
     }
 
 
     public Set<BackingEntityWidgetDatum> findBackingEntityWidgetData(Long diagramId) {
         return backingEntityWidgetDao.findWidgetData(diagramId);
+    }
+
+
+    public Set<AggregateOverlayDiagramPreset> findPresetsForDiagram(Long diagramId) {
+        return aggregateOverlayDiagramPresetDao.findPresetsForDiagram(diagramId);
+    }
+
+    public int createPreset(OverlayDiagramPresetCreateCommand createCommand, String username) {
+        return aggregateOverlayDiagramPresetDao.create(createCommand, username);
     }
 
 

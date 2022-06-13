@@ -49,9 +49,10 @@ public class AggregateWidgetCostHarness {
         long schemeId = 1L;
         long allocationSchemeId = 1L;
 
-        ApplicationIdSelectorFactory selectorFactory  = new ApplicationIdSelectorFactory();
+        ApplicationIdSelectorFactory selectorFactory = new ApplicationIdSelectorFactory();
         Select<Record1<Long>> appIds = selectorFactory.apply(selectionOptions);
-        Set<CostWidgetDatum> widgetData = dao.findWidgetData(diagramId, SetUtilities.asSet(schemeId), allocationSchemeId, appIds);
+        Set<CostWidgetDatum> widgetData = dao.findWidgetData(diagramId, SetUtilities.asSet(schemeId), allocationSchemeId, appIds,
+                targetStateDate);
         System.out.println(widgetData);
 
     }

@@ -1,17 +1,17 @@
 <script>
-    import AssessmentDefinitionPicker from "../../report-grid/components/svelte/pickers/AssessmentDefinitionPicker.svelte";
+    import AssessmentDefinitionPicker
+        from "../../report-grid/components/svelte/pickers/AssessmentDefinitionPicker.svelte";
     import {ratingSchemeStore} from "../../svelte-stores/rating-schemes";
     import RatingPicker from "./RatingPicker.svelte";
     import {createEventDispatcher} from "svelte";
     import Markdown from "./Markdown.svelte";
 
     export let definitionFilter = () => true;
-
+    export let selectedDefinition = null;
+    export let selectedRatings = [];
     const dispatch = createEventDispatcher();
     const loadSchemesCall = ratingSchemeStore.loadAll(true);
 
-    let selectedDefinition = null;
-    let selectedRatings = null;
     let schemesById = {};
 
     function onDefinitionSelect(def) {
@@ -32,16 +32,17 @@
     <AssessmentDefinitionPicker selectionFilter={definitionFilter}
                                 onSelect={onDefinitionSelect} />
 {:else}
-    <h4>{selectedDefinition.name}</h4>
-    <div class="help-text">
+    <h5>{selectedDefinition.name}
+        <button class="btn btn-skinny"
+                on:click={() => selectedDefinition = null}>
+            (Change assessment)
+        </button>
+    </h5>
+    <div class="help-block">
         <Markdown text={selectedDefinition.description}/>
     </div>
 
     <RatingPicker on:select={onRatingsSelect}
-                  scheme={schemesById[selectedDefinition.ratingSchemeId]}/>
-
-    <button class="btn btn-link"
-            on:click={() => selectedDefinition = null}>
-        Cancel
-    </button>
+                  scheme={schemesById[selectedDefinition.ratingSchemeId]}
+                  selectedRatings={selectedRatings}/>
 {/if}
