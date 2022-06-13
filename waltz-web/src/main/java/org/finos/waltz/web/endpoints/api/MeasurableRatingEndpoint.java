@@ -147,7 +147,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
                 : Operation.ADD;
 
         checkHasPermissionForThisOperation(command.measurableId(), command.entityReference(), operation, getUsername(request));
-        requireRole(userRoleService, request, measurableRatingService.getRequiredRatingEditRole(mkRef(EntityKind.MEASURABLE, command.measurableId())));
+
         return measurableRatingService.save(command, false);
     }
 
@@ -188,8 +188,10 @@ public class MeasurableRatingEndpoint implements Endpoint {
                 .user(username)
                 .build();
 
+        boolean involvementBasedPermissions = permissionGroupService.hasPermission(checkPermissionCommand);
+
         checkTrue(
-                roleBasedPermissions || permissionGroupService.hasPermission(checkPermissionCommand),
+                roleBasedPermissions || involvementBasedPermissions,
                 format("User does not have permission to %s measurable ratings for this %s", operation.name().toLowerCase(), parentReference.kind().prettyName()));
     }
 
