@@ -6,8 +6,8 @@
     import DiagramSelector from "../diagram-selector/DiagramSelector.svelte";
     import NoData from "../../../common/svelte/NoData.svelte";
     import {
-        setupContextStores,
         determineWhichCellsAreLinkedByParent,
+        setupContextStores,
         widgets
     } from "../aggregate-overlay-diagram/aggregate-overlay-diagram-utils";
     import _ from "lodash";

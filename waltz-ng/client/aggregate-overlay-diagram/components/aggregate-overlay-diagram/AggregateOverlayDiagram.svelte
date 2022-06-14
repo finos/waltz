@@ -162,6 +162,7 @@
 
 </script>
 
-<div bind:this={svgHolderElem}>
+<div id="diagram-capture"
+     bind:this={svgHolderElem}>
     {@html svg}
 </div>

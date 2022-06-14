@@ -3,19 +3,51 @@
     import DescriptionFade from "../../../common/svelte/DescriptionFade.svelte";
     import DiagramInstanceSelector from "../instance-selector/DiagramInstanceSelector.svelte";
     import SelectedOverlayPanel from "./SelectedOverlayPanel.svelte";
-    import FilterSelectorPanel from "../filter-selector/FilterSelectorPanel.svelte";
     import CustomiseOverlayPanel from "./CustomiseOverlayPanel.svelte";
+    import html2canvas from "html2canvas";
+    import Icon from "../../../common/svelte/Icon.svelte";
 
     export let primaryEntityRef;
 
     let selectedInstance = getContext("selectedInstance");
     let selectedDiagram = getContext("selectedDiagram");
 
-    let selectedTab = 'widgets'
+    let selectedTab = 'widgets';
+    let generatingDiagram = false;
 
     function selectInstance(evt) {
         $selectedInstance = evt.detail;
     }
+
+    function exportDiagram() {
+
+        const element = document.querySelector("#diagram-capture");
+
+        if (element) {
+
+            generatingDiagram = true;
+            //Using a timeout so browser has chance to display the progress icon
+            setTimeout(() => {
+                    return html2canvas(element)
+                        .then(canvas => {
+                            document.body.appendChild(canvas);
+                            return canvas;
+                        })
+                        .then(canvas => {
+                            const image = canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
+                            const a = document.createElement('a');
+                            a.setAttribute('download', `${$selectedDiagram.name}-image.png`);
+                            a.setAttribute('href', image);
+                            a.click();
+                            canvas.remove();
+                        })
+                        .then(() => generatingDiagram = false);
+                },
+                0);
+
+        }
+    }
+
 </script>
 
 <div class="row waltz-tabs"
@@ -61,6 +93,23 @@
             <hr>
 
             <SelectedOverlayPanel/>
+
+            <hr>
+
+            <button class="btn btn-link"
+                    on:click={() => exportDiagram()}
+                    disabled={generatingDiagram}>
+                {#if generatingDiagram}
+                    <Icon fixedWidth="true"
+                          name="refresh"
+                          spin="true"/>
+                {:else}
+                    <Icon fixedWidth="true"
+                          name="cloud-download"/>
+                {/if}
+                Export diagram
+            </button>
+
 
         {:else if selectedTab === 'instances'}
             <DiagramInstanceSelector {primaryEntityRef}

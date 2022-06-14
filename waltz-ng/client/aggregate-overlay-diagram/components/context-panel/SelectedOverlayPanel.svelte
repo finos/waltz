@@ -6,6 +6,7 @@
     const widget = getContext("focusWidget");
 
     let overlayHolder;
+    let selectedCellHeight = 0;
 
     $: {
         if (overlayHolder && $widget) {
@@ -31,4 +32,9 @@
         Select a cell on the diagram to view the overlay in more detail
     </div>
 {/if}
-<div bind:this={overlayHolder}></div>
+<div class:waltz-scroll-region-400={selectedCellHeight > 400}>
+    <div bind:clientHeight={selectedCellHeight}>
+        <div bind:this={overlayHolder}>
+        </div>
+    </div>
+</div>
