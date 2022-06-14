@@ -5,29 +5,58 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
 import org.finos.waltz.model.aggregate_overlay_diagram.ImmutableAggregateOverlayDiagram;
+import org.finos.waltz.schema.tables.Application;
+import org.finos.waltz.schema.tables.MeasurableRating;
+import org.finos.waltz.schema.tables.MeasurableRatingPlannedDecommission;
+import org.finos.waltz.schema.tables.MeasurableRatingReplacement;
 import org.finos.waltz.schema.tables.records.AggregateOverlayDiagramRecord;
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.Record2;
+import org.jooq.Record3;
+import org.jooq.RecordMapper;
+import org.jooq.Select;
+import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.mapping;
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.SetUtilities.fromCollection;
 import static org.finos.waltz.data.JooqUtilities.readRef;
-import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.Tables.AGGREGATE_OVERLAY_DIAGRAM;
+import static org.finos.waltz.schema.Tables.AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA;
+import static org.finos.waltz.schema.Tables.APPLICATION;
+import static org.finos.waltz.schema.Tables.ENTITY_HIERARCHY;
+import static org.finos.waltz.schema.Tables.MEASURABLE_RATING;
+import static org.finos.waltz.schema.Tables.MEASURABLE_RATING_PLANNED_DECOMMISSION;
+import static org.finos.waltz.schema.Tables.MEASURABLE_RATING_REPLACEMENT;
 import static org.finos.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 public class AggregateOverlayDiagramUtilities {
+
+    private static final MeasurableRating mr = MEASURABLE_RATING;
+    private static final Application app = APPLICATION;
+    private static final MeasurableRatingPlannedDecommission mrpd = MEASURABLE_RATING_PLANNED_DECOMMISSION;
+    private static final MeasurableRatingReplacement mrp = MEASURABLE_RATING_REPLACEMENT;
 
     protected static final RecordMapper<? super Record, ? extends AggregateOverlayDiagram> TO_DOMAIN_MAPPER = r -> {
         AggregateOverlayDiagramRecord record = r.into(AGGREGATE_OVERLAY_DIAGRAM);
@@ -83,7 +112,8 @@ public class AggregateOverlayDiagramUtilities {
     protected static Map<String, Set<Long>> loadCellExtIdToAggregatedEntities(DSLContext dsl,
                                                                               long diagramId,
                                                                               EntityKind aggregatedEntityKind,
-                                                                              Select<Record1<Long>> inScopeEntityIdSelector) {
+                                                                              Select<Record1<Long>> inScopeEntityIdSelector,
+                                                                              Optional<LocalDate> targetStateDate) {
 
         Set<Tuple2<String, EntityReference>> cellMappings = loadExpandedCellMappingsForDiagram(dsl, diagramId);
 
@@ -103,7 +133,8 @@ public class AggregateOverlayDiagramUtilities {
                 dsl,
                 aggregatedEntityKind,
                 inScopeEntityIdSelector,
-                backingMeasurableEntityIds);
+                backingMeasurableEntityIds,
+                targetStateDate);
 
         return cellBackingEntitiesByCellExtId
                 .entrySet()
@@ -135,11 +166,12 @@ public class AggregateOverlayDiagramUtilities {
     private static Map<Long, List<Long>> findMeasurableIdToAggregatedEntityIdMap(DSLContext dsl,
                                                                                  EntityKind aggregatedEntityKind,
                                                                                  Select<Record1<Long>> inScopeEntityIdSelector,
-                                                                                 Set<Long> backingEntityIds) {
+                                                                                 Set<Long> backingEntityIds,
+                                                                                 Optional<LocalDate> targetStateDate) {
 
         switch (aggregatedEntityKind) {
             case APPLICATION:
-                return loadMeasurableToAppIdsMap(dsl, inScopeEntityIdSelector, backingEntityIds);
+                return loadMeasurableToAppIdsMap(dsl, inScopeEntityIdSelector, backingEntityIds, targetStateDate);
             case CHANGE_INITIATIVE:
                 return loadMeasurableToCIIdsMap(dsl, inScopeEntityIdSelector, backingEntityIds);
             default:
@@ -181,7 +213,71 @@ public class AggregateOverlayDiagramUtilities {
 
     private static Map<Long, List<Long>> loadMeasurableToAppIdsMap(DSLContext dsl,
                                                                    Select<Record1<Long>> inScopeEntityIdSelector,
-                                                                   Set<Long> backingEntityReferences) {
+                                                                   Set<Long> backingEntityReferences,
+                                                                   Optional<LocalDate> targetStateDate) {
+        return targetStateDate
+                .map(targetDate -> loadMeasurableToAppIdsMapUsingTargetState(
+                        dsl,
+                        inScopeEntityIdSelector,
+                        backingEntityReferences,
+                        targetDate))
+                .orElse(loadMeasurableToAppIdsMapIgnoringTargetDate(
+                        dsl,
+                        inScopeEntityIdSelector,
+                        backingEntityReferences));
+    }
+
+
+    private static Map<Long, List<Long>> loadMeasurableToAppIdsMapUsingTargetState(DSLContext dsl,
+                                                                                   Select<Record1<Long>> inScopeEntityIdSelector,
+                                                                                   Set<Long> backingEntityReferences,
+                                                                                   LocalDate targetStateDate) {
+        Date targetDate = targetStateDate == null
+                ? null
+                : Date.valueOf(targetStateDate);
+
+
+        Field<Date> decommDate = DSL.coalesce(
+                mrpd.PLANNED_DECOMMISSION_DATE,
+                app.PLANNED_RETIREMENT_DATE);
+
+
+        Field<Long> appIdCol = DSL
+                .when(decommDate.isNull().or(decommDate.gt(targetDate)),
+                        mr.ENTITY_ID)
+                .when(mrp.PLANNED_COMMISSION_DATE.lt(targetDate),
+                        mrp.ENTITY_ID)
+                .otherwise((Long) null);
+
+        SelectConditionStep<Record2<Long, Long>> qry = dsl
+                .select(mr.MEASURABLE_ID,
+                        appIdCol)
+                .from(mr)
+                .innerJoin(app)
+                .on(mr.ENTITY_ID
+                        .eq(app.ID)
+                        .and(mr.ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
+                .leftJoin(mrpd)
+                .on(mr.ENTITY_ID
+                        .eq(mrpd.ENTITY_ID)
+                        .and(mr.ENTITY_KIND
+                                .eq(mrpd.ENTITY_KIND)
+                                .and(mr.MEASURABLE_ID.eq(mrpd.MEASURABLE_ID))))
+                .leftJoin(mrp)
+                .on(mrp.DECOMMISSION_ID.eq(mrpd.ID))
+                .where(mr.ENTITY_ID.in(inScopeEntityIdSelector))
+                .and(mr.MEASURABLE_ID.in(backingEntityReferences));
+
+        return qry
+                .fetchGroups(
+                        mr.MEASURABLE_ID,
+                        appIdCol);
+    }
+
+
+    private static Map<Long, List<Long>> loadMeasurableToAppIdsMapIgnoringTargetDate(DSLContext dsl,
+                                                                                     Select<Record1<Long>> inScopeEntityIdSelector,
+                                                                                     Set<Long> backingEntityReferences) {
         return dsl
                 .selectDistinct(MEASURABLE_RATING.MEASURABLE_ID, MEASURABLE_RATING.ENTITY_ID)
                 .from(MEASURABLE_RATING)

@@ -20,15 +20,15 @@
 
 <style>
     .cell {
+        top: 4px;
         display: inline-block;
-        width: 1.3em;
-        height: 1.3em;
+        width: 1em;
+        height: 1em;
         border: 1px solid;
-        border-radius: 6px;
+        border-radius: 2px;
     }
 
     .name {
         position: relative;
-        top: -4px;
     }
 </style>

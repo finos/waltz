@@ -20,22 +20,44 @@ package org.finos.waltz.web.endpoints.api;
 
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramInfo;
-import org.finos.waltz.model.aggregate_overlay_diagram.overlay.*;
-import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.*;
+import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramPreset;
+import org.finos.waltz.model.aggregate_overlay_diagram.OverlayDiagramPresetCreateCommand;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.AggregatedEntitiesWidgetDatum;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.AssessmentRatingsWidgetDatum;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.BackingEntityWidgetDatum;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.CostWidgetDatum;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.CountWidgetDatum;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.TargetCostWidgetDatum;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AggregatedEntitiesWidgetParameters;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AppCostWidgetParameters;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AppCountWidgetParameters;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AssessmentWidgetParameters;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.TargetAppCostWidgetParameters;
 import org.finos.waltz.service.aggregate_overlay_diagram.AggregateOverlayDiagramService;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.WebUtilities;
 import org.finos.waltz.web.endpoints.Endpoint;
-import org.finos.waltz.web.json.*;
+import org.finos.waltz.web.json.OverlayDiagramAggregatedEntitiesWidgetInfo;
+import org.finos.waltz.web.json.OverlayDiagramAppCostWidgetInfo;
+import org.finos.waltz.web.json.OverlayDiagramAppCountWidgetInfo;
+import org.finos.waltz.web.json.OverlayDiagramAssessmentWidgetInfo;
+import org.finos.waltz.web.json.OverlayDiagramTargetAppCostWidgetInfo;
+import org.finos.waltz.web.json.OverlayDiagramWidgetInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.web.WebUtilities.*;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
+import static org.finos.waltz.web.WebUtilities.getId;
+import static org.finos.waltz.web.WebUtilities.getUsername;
+import static org.finos.waltz.web.WebUtilities.mkPath;
+import static org.finos.waltz.web.WebUtilities.readBody;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.getForDatum;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.getForList;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.postForDatum;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.postForList;
 
 @Service
 public class AggregateOverlayDiagramEndpoint implements Endpoint {
@@ -65,6 +87,8 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
         String findAppAssessmentWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "app-assessment-widget");
         String findAggregatedEntitiesWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "aggregated-entities-widget");
         String findBackingEntityWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "backing-entity-widget");
+        String findPresetsForDiagramPath = mkPath(BASE_URL, "diagram-id", ":id", "presets");
+        String createPresetPath = mkPath(BASE_URL, "create-preset");
 
         DatumRoute<AggregateOverlayDiagramInfo> getByIdRoute = (request, response) -> {
             return aggregateOverlayDiagramService.getById(getId(request));
@@ -145,14 +169,27 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
         };
 
 
+        ListRoute<AggregateOverlayDiagramPreset> findPresetsForDiagramRoute = (request, response) -> {
+            long diagramId = getId(request);
+            return aggregateOverlayDiagramService.findPresetsForDiagram(diagramId);
+        };
+
+
+        DatumRoute<Integer> createPresetRoute = (request, response) -> {
+            return aggregateOverlayDiagramService.createPreset(readBody(request, OverlayDiagramPresetCreateCommand.class), getUsername(request));
+        };
+
+
         getForDatum(getByIdPath, getByIdRoute);
         getForList(findAllPath, findAllRoute);
         getForList(findBackingEntityWidgetDataPath, findBackingEntityWidgetDataRoute);
+        getForList(findPresetsForDiagramPath, findPresetsForDiagramRoute);
         postForList(findAppCountWidgetDataPath, findAppCountWidgetDataRoute);
         postForList(findTargetAppCostWidgetDataPath, findTargetAppCostWidgetDataRoute);
         postForList(findAppCostWidgetDataPath, findAppCostWidgetDataRoute);
         postForList(findAppAssessmentWidgetDataPath, findAppAssessmentWidgetDataRoute);
         postForList(findAggregatedEntitiesWidgetDataPath, findAggregatedEntitiesWidgetDataRoute);
+        postForDatum(createPresetPath, createPresetRoute);
     }
 
 }
