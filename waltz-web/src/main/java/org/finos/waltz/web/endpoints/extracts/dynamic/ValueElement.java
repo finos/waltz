@@ -5,17 +5,16 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.immutables.value.Value;
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableChangeInitiativeSchema.class)
-@JsonDeserialize(as = ImmutableChangeInitiativeSchema.class)
-public interface ChangeInitiativeSchema extends Schema{
+@JsonSerialize(as = ImmutableValueElement.class)
+@JsonDeserialize(as = ImmutableValueElement.class)
+public interface ValueElement extends Element{
 
-    String TYPE ="http://waltz.intranet.db.com/types/1/schema#id=change-initiative";
+    String TYPE ="http://waltz.intranet.db.com/types/1/schema#id=ValueElement";
 
     @Value.Default
     default String type() {
         return TYPE;
     }
-    String id();
     String name();
-    String phase();
+    String value();
 }

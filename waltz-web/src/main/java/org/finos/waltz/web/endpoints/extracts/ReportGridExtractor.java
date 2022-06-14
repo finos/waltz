@@ -130,6 +130,7 @@ public class ReportGridExtractor implements DataExtractor {
 
         return formatReport(
                 format,
+                reportGrid,
                 mkReportName(reportGrid.definition(), selectionOptions),
                 colsWithCommentRequirement,
                 reportRows);
@@ -272,19 +273,20 @@ public class ReportGridExtractor implements DataExtractor {
 
 
     private Tuple3<ExtractFormat, String, byte[]> formatReport(ExtractFormat format,
+                                                               ReportGrid reportGrid,
                                                                String reportName,
                                                                List<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions,
                                                                List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows) throws IOException {
         switch (format) {
             case XLSX:
                 return tuple(format, reportName, dynamicExcelFormatter
-                        .format(reportName, columnDefinitions, reportRows));
+                        .format(reportName, reportGrid,columnDefinitions, reportRows));
             case CSV:
                 return tuple(format, reportName, dynamicCommaSeperatedValueFormatter
-                        .format(reportName,columnDefinitions, reportRows));
+                        .format(reportName,reportGrid,columnDefinitions, reportRows));
             case JSON:
                 return tuple(format, reportName, dynamicJSONFormatter
-                        .format(reportName,columnDefinitions, reportRows));
+                        .format(reportName,reportGrid,columnDefinitions, reportRows));
             default:
                 throw new UnsupportedOperationException("This report does not support export format: " + format);
         }

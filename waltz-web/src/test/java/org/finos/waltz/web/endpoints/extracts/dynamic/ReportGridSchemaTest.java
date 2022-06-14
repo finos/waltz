@@ -4,22 +4,25 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ChangeInitiativeSchemaTest {
+class ReportGridSchemaTest {
 
-    private ImmutableChangeInitiativeSchema changeInitiativeSchema =
-            ImmutableChangeInitiativeSchema.builder().id("id")
+    private ImmutableReportGridSchema reportGridSchema =
+            ImmutableReportGridSchema.builder().id("id")
                     .name("dummy")
-                    .phase("dummy-phase")
+                    .grid(ImmutableGrid.builder().build())
                     .build();
+
+
     @Test
     public void canCreateChangeInitiativeWithCorrectURItype(){
-        assertEquals(ChangeInitiativeSchema.TYPE,changeInitiativeSchema.type());
+        assertEquals(ReportGridSchema.TYPE, reportGridSchema.type());
     }
+
 
     @Test
     public void warnIfURItypeIsChanged(){
-        String expectedType ="http://waltz.intranet.db.com/types/1/schema#id=change-initiative";
-        assertEquals(expectedType,changeInitiativeSchema.type(),
+        String expectedType ="http://waltz.intranet.db.com/types/1/schema#id=report-grid";
+        assertEquals(expectedType, reportGridSchema.type(),
                 "Consumers using Jackson serialisation may be broken if you change type as it forms part of public API");
     }
 }

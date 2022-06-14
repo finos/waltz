@@ -2,9 +2,10 @@ package org.finos.waltz.web.endpoints.extracts.dynamic;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.finos.waltz.model.Nullable;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.immutables.value.Value;
 
-import java.util.Optional;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
@@ -12,11 +13,9 @@ import java.util.Optional;
         property = "type",
         visible = true)
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = ReportGridSchema.class, name = ReportGridSchema.TYPE)
+        @JsonSubTypes.Type(value = ValueElement.class, name = ValueElement.TYPE)
 })
-public interface Schema {
+public interface Element {
 
     String type();
-
-
 }

@@ -8,6 +8,7 @@ import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.finos.waltz.model.application.LifecyclePhase;
 import org.finos.waltz.model.external_identifier.ExternalIdValue;
+import org.finos.waltz.model.report_grid.ReportGrid;
 import org.finos.waltz.model.report_grid.ReportGridColumnDefinition;
 import org.finos.waltz.model.report_grid.ReportSubject;
 import org.finos.waltz.web.endpoints.extracts.ExtractorUtilities;
@@ -49,6 +50,7 @@ public class DynamicExcelFormatter implements DynamicFormatter {
 
     @Override
     public byte[] format(String id,
+                         ReportGrid reportGrid,
                          List<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions,
                          List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows)  throws IOException{
         try {
