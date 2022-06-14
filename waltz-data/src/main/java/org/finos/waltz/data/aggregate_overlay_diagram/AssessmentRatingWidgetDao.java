@@ -7,12 +7,12 @@ import org.finos.waltz.model.aggregate_overlay_diagram.overlay.AssessmentRatingC
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.AssessmentRatingsWidgetDatum;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.ImmutableAssessmentRatingCount;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.ImmutableAssessmentRatingsWidgetDatum;
-import org.finos.waltz.model.utils.IdUtilities;
 import org.finos.waltz.schema.tables.AssessmentRating;
 import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -41,13 +41,15 @@ public class AssessmentRatingWidgetDao {
     public Set<AssessmentRatingsWidgetDatum> findWidgetData(long diagramId,
                                                             EntityKind aggregatedEntityKind,
                                                             Long assessmentId,
-                                                            Select<Record1<Long>> inScopeEntityIdSelector) {
+                                                            Select<Record1<Long>> inScopeEntityIdSelector,
+                                                            Optional<LocalDate> targetStateDate) {
 
         Map<String, Set<Long>> cellExtIdsToAggregatedEntities = loadCellExtIdToAggregatedEntities(
                 dsl,
                 diagramId,
                 aggregatedEntityKind,
-                inScopeEntityIdSelector);
+                inScopeEntityIdSelector,
+                targetStateDate);
 
         Set<Long> diagramEntityIds = cellExtIdsToAggregatedEntities.values()
                 .stream()

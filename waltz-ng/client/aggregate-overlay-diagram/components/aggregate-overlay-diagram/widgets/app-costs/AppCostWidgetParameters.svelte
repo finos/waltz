@@ -1,23 +1,26 @@
+<script context="module">
+    import {writable} from "svelte/store";
+
+    const selectedCostKinds = writable([]);
+    const selectedAllocationScheme = writable(null);
+
+    export function resetParameters() {
+        selectedCostKinds.set([]);
+        selectedAllocationScheme.set(null);
+    }
+
+</script>
+
 <script>
-    import {aggregateOverlayDiagramStore} from "../../../../../svelte-stores/aggregate-overlay-diagram-store";
     import {getContext} from "svelte";
-    import Icon from "../../../../../common/svelte/Icon.svelte";
     import AllocationSchemePicker
         from "../../../../../report-grid/components/svelte/pickers/AllocationSchemePicker.svelte";
     import CostKindPicker from "../../../../../report-grid/components/svelte/pickers/CostKindPicker.svelte";
     import _ from "lodash";
-    import AppCostOverlayCell from "./AppCostOverlayCell.svelte";
 
-    const selectedDiagram = getContext("selectedDiagram");
-    const widget = getContext("widget");
     const selectedOverlay = getContext("selectedOverlay");
-    const selectedCostKinds = getContext("selectedCostKinds");
-    const selectedAllocationScheme = getContext("selectedAllocationScheme");
     const widgetParameters = getContext("widgetParameters");
-    const remoteMethod = getContext("remoteMethod");
-    const overlayDataCall = getContext("overlayDataCall");
 
-    let selectedCostKindIds = [];
     let selectedDefinition;
 
     const Modes = {
@@ -30,31 +33,13 @@
         ? Modes.SUMMARY
         : Modes.ALLOCATION_SCHEME_PICKER;
 
-
-    function mkGlobalProps(data) {
-        const maxCost = _
-            .chain(data)
-            .map(d => d.totalCost)
-            .max()
-            .value();
-        return {maxCost};
-    }
-
     function onSelect() {
-
-        $remoteMethod = aggregateOverlayDiagramStore.findAppCostForDiagram;
-
         $widgetParameters = {
             allocationSchemeId: $selectedAllocationScheme.id,
             costKindIds: selectedCostKindIds,
-        }
+        };
 
         $selectedOverlay = null;
-
-        $widget = {
-            overlay: AppCostOverlayCell,
-            mkGlobalProps
-        };
 
         activeMode = Modes.SUMMARY;
     }
@@ -136,12 +121,4 @@
             on:click={changeAllocationScheme}>
         Change allocation scheme
     </button>
-{/if}
-
-
-{#if $overlayDataCall?.status === 'loading'}
-    <h4>
-        Loading
-        <Icon name="refresh" spin="true"/>
-    </h4>
 {/if}

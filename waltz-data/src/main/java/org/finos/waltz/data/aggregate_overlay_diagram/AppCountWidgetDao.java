@@ -13,6 +13,7 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
@@ -41,7 +42,8 @@ public class AppCountWidgetDao {
                 dsl,
                 diagramId,
                 EntityKind.APPLICATION,
-                inScopeApplicationSelector);
+                inScopeApplicationSelector,
+                Optional.empty());
 
         Set<Long> appIds = cellExtIdsToAggregatedEntities.values()
                 .stream()

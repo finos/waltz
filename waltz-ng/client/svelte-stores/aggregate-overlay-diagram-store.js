@@ -76,6 +76,24 @@ export function mkOverlayDiagramStore() {
                 {force});
     };
 
+    const findPresetsForDiagram = (diagramId, force = false) => {
+        return remote
+            .fetchViewList(
+                "GET",
+                `api/aggregate-overlay-diagram/diagram-id/${diagramId}/presets`,
+                null,
+                {force});
+    };
+
+    const createPreset = (createCommand, force = false) => {
+        return remote
+            .execute(
+                "POST",
+                "api/aggregate-overlay-diagram/create-preset",
+                createCommand,
+                {force});
+    };
+
     return {
         getById,
         findAll,
@@ -84,7 +102,9 @@ export function mkOverlayDiagramStore() {
         findAppCostForDiagram,
         findAppAssessmentsForDiagram,
         findBackingEntitiesForDiagram,
-        findAggregatedEntitiesForDiagram
+        findAggregatedEntitiesForDiagram,
+        findPresetsForDiagram,
+        createPreset
     };
 }
 
