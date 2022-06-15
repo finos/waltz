@@ -69,7 +69,7 @@ public abstract class PhysicalFlowParsed {
     public abstract String externalId();
 
     @Nullable
-    public abstract FrequencyKind frequency();
+    public abstract FrequencyKindValue frequency();
 
     @Nullable
     public abstract TransportKindValue transport();

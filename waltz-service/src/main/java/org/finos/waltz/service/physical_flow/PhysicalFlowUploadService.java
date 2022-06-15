@@ -125,6 +125,7 @@ public class PhysicalFlowUploadService {
         Map<String, DataType> dataTypesByNameOrCodeMap = loadDataTypesByNameOrCode();
         Aliases<TransportKindValue> transportAliases = loadTransportAliases();
         Aliases<CriticalityValue> criticalityAliases = loadCriticalityAliases();
+        Aliases<FrequencyKindValue> frequencyAliases = loadFrequencyAliases();
 
         // parse flows and resolve strings into entities or enums
         List<PhysicalFlowUploadCommandResponse> parsedFlows = cmds.stream()
@@ -133,6 +134,7 @@ public class PhysicalFlowUploadService {
                         dataTypesByNameOrCodeMap,
                         transportAliases,
                         criticalityAliases,
+                        frequencyAliases,
                         cmd))
                 .collect(toList());
 
@@ -212,6 +214,7 @@ public class PhysicalFlowUploadService {
                                                               Map<String, DataType> dataTypeMap,
                                                               Aliases<TransportKindValue> transportAliases,
                                                               Aliases<CriticalityValue> criticalityAliases,
+                                                              Aliases<FrequencyKindValue> frequencyAliases,
                                                               PhysicalFlowUploadCommand cmd) {
         checkNotNull(cmd, "cmd cannot be null");
 
@@ -246,10 +249,6 @@ public class PhysicalFlowUploadService {
             errors.put("format", String.format("%s is not a recognised value", cmd.format()));
         }
 
-        FrequencyKind frequency = FrequencyKind.parse(cmd.frequency(), (s) -> null);
-        if (frequency == null) {
-            errors.put("frequency", String.format("%s is not a recognised value", cmd.frequency()));
-        }
 
         TransportKindValue transport = transportAliases
                 .lookup(cmd.transport())
@@ -258,6 +257,12 @@ public class PhysicalFlowUploadService {
                     return null;
                 });
 
+        FrequencyKindValue frequency = frequencyAliases
+                .lookup(cmd.frequency())
+                .orElseGet(() -> {
+                    errors.put("frequency", String.format("%s is not a recognised value", cmd.frequency()));
+                    return null;
+                });
 
         CriticalityValue criticality = criticalityAliases
                 .lookup(cmd.criticality())
@@ -469,6 +474,10 @@ public class PhysicalFlowUploadService {
 
     private Aliases<CriticalityValue> loadCriticalityAliases() {
         return enumValueAliasService.mkAliases(EnumValueKind.PHYSICAL_FLOW_CRITICALITY, CriticalityValue::of);
+    }
+
+    private Aliases<FrequencyKindValue> loadFrequencyAliases() {
+        return enumValueAliasService.mkAliases(EnumValueKind.PHYSICAL_FLOW_CRITICALITY, FrequencyKindValue::of);
     }
 
 }

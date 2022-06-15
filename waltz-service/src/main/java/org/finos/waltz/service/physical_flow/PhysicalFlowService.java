@@ -327,7 +327,7 @@ public class PhysicalFlowService {
             case "criticality":
                 return physicalFlowDao.updateCriticality(flowId, CriticalityValue.of(command.value()));
             case "frequency":
-                return physicalFlowDao.updateFrequency(flowId, FrequencyKind.valueOf(command.value()));
+                return physicalFlowDao.updateFrequency(flowId, FrequencyKindValue.of(command.value()));
             case "transport":
                 return physicalFlowDao.updateTransport(flowId, command.value());
             case "basisOffset":

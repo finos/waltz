@@ -64,7 +64,7 @@ public class PhysicalFlowDao {
                 .provenance(record.getProvenance())
                 .specificationId(record.getSpecificationId())
                 .basisOffset(record.getBasisOffset())
-                .frequency(FrequencyKind.valueOf(record.getFrequency()))
+                .frequency(FrequencyKindValue.of(record.getFrequency()))
                 .criticality(CriticalityValue.of(record.getCriticality()))
                 .description(record.getDescription())
                 .logicalFlowId(record.getLogicalFlowId())
@@ -179,7 +179,7 @@ public class PhysicalFlowDao {
 
         Condition sameFlow = PHYSICAL_FLOW.SPECIFICATION_ID.eq(flow.specificationId())
                 .and(PHYSICAL_FLOW.BASIS_OFFSET.eq(flow.basisOffset()))
-                .and(PHYSICAL_FLOW.FREQUENCY.eq(flow.frequency().name()))
+                .and(PHYSICAL_FLOW.FREQUENCY.eq(flow.frequency().value()))
                 .and(PHYSICAL_FLOW.TRANSPORT.eq(flow.transport().value()))
                 .and(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(flow.logicalFlowId()))
                 .and(PHYSICAL_FLOW.IS_REMOVED.isFalse());
@@ -190,7 +190,7 @@ public class PhysicalFlowDao {
 
     public PhysicalFlow getByParsedFlow(PhysicalFlowParsed flow) {
         Condition attributesMatch = PHYSICAL_FLOW.BASIS_OFFSET.eq(flow.basisOffset())
-                .and(PHYSICAL_FLOW.FREQUENCY.eq(flow.frequency().name()))
+                .and(PHYSICAL_FLOW.FREQUENCY.eq(flow.frequency().value()))
                 .and(PHYSICAL_FLOW.TRANSPORT.eq(flow.transport().value()))
                 .and(PHYSICAL_FLOW.CRITICALITY.eq(flow.criticality().value()))
                 .and(PHYSICAL_FLOW_NOT_REMOVED);
@@ -242,7 +242,7 @@ public class PhysicalFlowDao {
                 .where(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(flow.logicalFlowId()))
                 .and(PHYSICAL_FLOW.SPECIFICATION_ID.eq(flow.specificationId()))
                 .and(PHYSICAL_FLOW.BASIS_OFFSET.eq(flow.basisOffset()))
-                .and(PHYSICAL_FLOW.FREQUENCY.eq(flow.frequency().name()))
+                .and(PHYSICAL_FLOW.FREQUENCY.eq(flow.frequency().value()))
                 .and(PHYSICAL_FLOW.TRANSPORT.eq(flow.transport().value()))
                 .and(PHYSICAL_FLOW.CRITICALITY.eq(flow.criticality().value()))
                 .and(idCondition)
@@ -281,7 +281,7 @@ public class PhysicalFlowDao {
         PhysicalFlowRecord record = dsl.newRecord(PHYSICAL_FLOW);
         record.setLogicalFlowId(flow.logicalFlowId());
 
-        record.setFrequency(flow.frequency().name());
+        record.setFrequency(flow.frequency().value());
         record.setTransport(flow.transport().value());
         record.setBasisOffset(flow.basisOffset());
         record.setCriticality(flow.criticality().value());
@@ -403,8 +403,8 @@ public class PhysicalFlowDao {
     }
 
 
-    public int updateFrequency(long flowId, FrequencyKind frequencyKind) {
-        return updateEnum(flowId, PHYSICAL_FLOW.FREQUENCY, frequencyKind.name());
+    public int updateFrequency(long flowId, FrequencyKindValue frequencyKind) {
+        return updateEnum(flowId, PHYSICAL_FLOW.FREQUENCY, frequencyKind.value());
     }
 
 
