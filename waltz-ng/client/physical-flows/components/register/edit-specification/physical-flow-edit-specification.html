@@ -54,7 +54,7 @@
              ng-click="$ctrl.select(candidate)">
             <div class="col-md-3"><span ng-bind="candidate.name"></span></div>
             <div class="col-md-2"><span ng-bind="candidate.externalId"></span></div>
-            <div class="col-md-2"><span ng-bind="candidate.format"></span></div>
+            <div class="col-md-2"><span ng-bind="candidate.format | toDisplayName:'DataFormatKind'"></span></div>
             <div class="col-md-5"><span ng-bind="candidate.description"></span></div>
         </div>
 

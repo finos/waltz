@@ -97,6 +97,7 @@ function controller(serviceBroker) {
                 const enumsByType = _.groupBy(r.data, "type");
 
                 transportField.templateOptions.options = toOptions(enumsByType["TransportKind"]);
+                frequencyField.templateOptions.options = toOptions(enumsByType["Frequency"]);
 
                 criticalityField.templateOptions.options = _.map(
                     enumsByType["physicalFlowCriticality"],

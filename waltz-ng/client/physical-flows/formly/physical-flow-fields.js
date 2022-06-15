@@ -40,7 +40,7 @@ export const frequencyField = {
     templateOptions: {
         valueProp: "code",
         labelProp: "name",
-        options: toOptions(frequencyKind, true),
+        options: [],
         label: "Frequency",
         placeholder: "",
         required: true

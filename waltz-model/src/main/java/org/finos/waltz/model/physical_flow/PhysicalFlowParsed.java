@@ -20,10 +20,9 @@ package org.finos.waltz.model.physical_flow;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.finos.waltz.model.Criticality;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.Nullable;
-import org.finos.waltz.model.physical_specification.DataFormatKind;
+import org.finos.waltz.model.physical_specification.DataFormatKindValue;
 import org.immutables.value.Value;
 
 
@@ -45,7 +44,7 @@ public abstract class PhysicalFlowParsed {
     public abstract EntityReference owner();
 
     @Nullable
-    public abstract DataFormatKind format();
+    public abstract DataFormatKindValue format();
 
     public abstract String name();
 

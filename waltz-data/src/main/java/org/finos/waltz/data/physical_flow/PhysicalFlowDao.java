@@ -203,7 +203,7 @@ public class PhysicalFlowDao {
 
         Condition specMatch = PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID.eq(flow.owner().id())
                 .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_KIND.eq(flow.owner().kind().name()))
-                .and(PHYSICAL_SPECIFICATION.FORMAT.eq(flow.format().name()))
+                .and(PHYSICAL_SPECIFICATION.FORMAT.eq(flow.format().value()))
                 .and(PHYSICAL_SPECIFICATION.NAME.eq(flow.name()))
                 .and(PHYSICAL_SPECIFICATION.IS_REMOVED.isFalse());
 

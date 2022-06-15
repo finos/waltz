@@ -18,6 +18,7 @@
 
 package org.finos.waltz.service.physical_flow;
 
+import org.finos.waltz.model.physical_specification.DataFormatKindValue;
 import org.finos.waltz.service.data_type.DataTypeDecoratorService;
 import org.finos.waltz.service.enum_value.EnumValueAliasService;
 import org.finos.waltz.common.Aliases;
@@ -126,6 +127,7 @@ public class PhysicalFlowUploadService {
         Aliases<TransportKindValue> transportAliases = loadTransportAliases();
         Aliases<CriticalityValue> criticalityAliases = loadCriticalityAliases();
         Aliases<FrequencyKindValue> frequencyAliases = loadFrequencyAliases();
+        Aliases<DataFormatKindValue> dataFormatKindAliases = loadDataFormatKindAliases();
 
         // parse flows and resolve strings into entities or enums
         List<PhysicalFlowUploadCommandResponse> parsedFlows = cmds.stream()
@@ -135,6 +137,7 @@ public class PhysicalFlowUploadService {
                         transportAliases,
                         criticalityAliases,
                         frequencyAliases,
+                        dataFormatKindAliases,
                         cmd))
                 .collect(toList());
 
@@ -215,6 +218,7 @@ public class PhysicalFlowUploadService {
                                                               Aliases<TransportKindValue> transportAliases,
                                                               Aliases<CriticalityValue> criticalityAliases,
                                                               Aliases<FrequencyKindValue> frequencyAliases,
+                                                              Aliases<DataFormatKindValue> dataFormatKindValueAliases,
                                                               PhysicalFlowUploadCommand cmd) {
         checkNotNull(cmd, "cmd cannot be null");
 
@@ -244,11 +248,12 @@ public class PhysicalFlowUploadService {
 
 
         // resolve enums - format, frequency, transport, criticality
-        DataFormatKind format = DataFormatKind.parse(cmd.format(), (s) -> null);
-        if (format == null) {
-            errors.put("format", String.format("%s is not a recognised value", cmd.format()));
-        }
-
+        DataFormatKindValue format = dataFormatKindValueAliases
+                .lookup(cmd.format())
+                .orElseGet(() -> {
+                    errors.put("format", String.format("%s is not a recognised value", cmd.format()));
+                    return null;
+                });
 
         TransportKindValue transport = transportAliases
                 .lookup(cmd.transport())
@@ -419,7 +424,7 @@ public class PhysicalFlowUploadService {
     private PhysicalSpecification getOrCreatePhysicalSpec(PhysicalFlowParsed flow,
                                                           String username) {
         EntityReference owner = flow.owner();
-        DataFormatKind format = flow.format();
+        DataFormatKindValue format = flow.format();
         String name = flow.name();
 
 
@@ -478,6 +483,10 @@ public class PhysicalFlowUploadService {
 
     private Aliases<FrequencyKindValue> loadFrequencyAliases() {
         return enumValueAliasService.mkAliases(EnumValueKind.PHYSICAL_FLOW_CRITICALITY, FrequencyKindValue::of);
+    }
+
+    private Aliases<DataFormatKindValue> loadDataFormatKindAliases() {
+        return enumValueAliasService.mkAliases(EnumValueKind.DATA_FORMAT_KIND, DataFormatKindValue::of);
     }
 
 }
