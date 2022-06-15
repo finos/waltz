@@ -31,7 +31,6 @@ import org.finos.waltz.model.change_unit.ChangeAction;
 import org.finos.waltz.model.change_unit.ChangeUnit;
 import org.finos.waltz.model.change_unit.ExecutionStatus;
 import org.finos.waltz.model.datatype.DataType;
-import org.finos.waltz.model.physical_flow.FrequencyKind;
 import org.finos.waltz.model.physical_flow.PhysicalFlow;
 import org.finos.waltz.schema.tables.records.AttributeChangeRecord;
 import org.finos.waltz.schema.tables.records.ChangeUnitRecord;
@@ -173,8 +172,8 @@ public class ChangeUnitGenerator implements SampleDataGenerator {
         AttributeChangeRecord record = dsl.newRecord(ATTRIBUTE_CHANGE);
         record.setChangeUnitId(cu.id().get());
         record.setType("string");
-        record.setOldValue(flow.frequency().name());
-        record.setNewValue(randomPick(FrequencyKind.values()).name());
+        record.setOldValue(flow.frequency().value());
+        record.setNewValue(randomPick("DAILY", "MONTHLY", "WEEKLY", "ON_DEMAND"));
         record.setName(name);
         record.setLastUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
         record.setLastUpdatedBy("admin");

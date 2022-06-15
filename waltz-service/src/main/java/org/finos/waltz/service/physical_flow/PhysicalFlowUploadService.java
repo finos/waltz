@@ -18,9 +18,6 @@
 
 package org.finos.waltz.service.physical_flow;
 
-import org.finos.waltz.model.physical_specification.DataFormatKindValue;
-import org.finos.waltz.service.data_type.DataTypeDecoratorService;
-import org.finos.waltz.service.enum_value.EnumValueAliasService;
 import org.finos.waltz.common.Aliases;
 import org.finos.waltz.common.MapUtilities;
 import org.finos.waltz.common.StringUtilities;
@@ -30,7 +27,6 @@ import org.finos.waltz.data.data_type.DataTypeDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowDao;
 import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
 import org.finos.waltz.data.physical_specification.PhysicalSpecificationDao;
-import org.finos.waltz.model.Criticality;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.UserTimestamp;
@@ -44,9 +40,11 @@ import org.finos.waltz.model.external_identifier.ExternalIdValue;
 import org.finos.waltz.model.logical_flow.ImmutableLogicalFlow;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.model.physical_flow.*;
-import org.finos.waltz.model.physical_specification.DataFormatKind;
+import org.finos.waltz.model.physical_specification.DataFormatKindValue;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
+import org.finos.waltz.service.data_type.DataTypeDecoratorService;
+import org.finos.waltz.service.enum_value.EnumValueAliasService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

@@ -509,9 +509,9 @@ public class PhysicalFlowDao {
                         .specification(mkRef(EntityKind.PHYSICAL_SPECIFICATION, r.get(PHYSICAL_SPECIFICATION.ID), r.get(PHYSICAL_SPECIFICATION.NAME)))
                         .physicalFlowDescription(r.get(PHYSICAL_FLOW.DESCRIPTION))
                         .physicalFlowExternalId(r.get(PHYSICAL_FLOW.EXTERNAL_ID))
-                        .frequencyKind(FrequencyKind.valueOf(r.get(PHYSICAL_FLOW.FREQUENCY)))
+                        .frequencyKind(FrequencyKindValue.of(r.get(PHYSICAL_FLOW.FREQUENCY)))
                         .transportKindValue(TransportKindValue.of(r.get(PHYSICAL_FLOW.TRANSPORT)))
-                        .criticality(Criticality.valueOf(r.get(PHYSICAL_FLOW.CRITICALITY)))
+                        .criticality(CriticalityValue.of(r.get(PHYSICAL_FLOW.CRITICALITY)))
                         .dataTypes(specIdToDataTypeList.getOrDefault(r.get(PHYSICAL_SPECIFICATION.ID), emptyList()))
                         .build());
 
