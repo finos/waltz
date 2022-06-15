@@ -325,7 +325,7 @@ public class PhysicalFlowService {
         ensureFlowExistsAndIsNotReadOnly(flowId);
         switch(command.name()) {
             case "criticality":
-                return physicalFlowDao.updateCriticality(flowId, Criticality.valueOf(command.value()));
+                return physicalFlowDao.updateCriticality(flowId, CriticalityValue.of(command.value()));
             case "frequency":
                 return physicalFlowDao.updateFrequency(flowId, FrequencyKind.valueOf(command.value()));
             case "transport":

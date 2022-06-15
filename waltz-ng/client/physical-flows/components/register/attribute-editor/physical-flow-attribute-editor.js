@@ -26,14 +26,14 @@ import {
     criticalityField
 } from "../../../formly/physical-flow-fields";
 import {CORE_API} from "../../../../common/services/core-api-utils";
-import template from './physical-flow-attribute-editor.html';
+import template from "./physical-flow-attribute-editor.html";
 import {toOptions} from "../../../../common/services/enums";
 
 
 const bindings = {
-    current: '<',
-    onDismiss: '<',
-    onChange: '<'
+    current: "<",
+    onDismiss: "<",
+    onChange: "<"
 };
 
 
@@ -46,12 +46,12 @@ const initialState = {
 
 
 function getBasisOffset(basisOffsetSelect, basisOffsetInput) {
-    if(basisOffsetSelect && basisOffsetSelect !== 'OTHER') {
+    if (basisOffsetSelect && basisOffsetSelect !== "OTHER") {
         return Number(basisOffsetSelect);
-    } else if(basisOffsetInput) {
+    } else if (basisOffsetInput) {
         const basisOffsetRegex = /^(?:T|t)?((?:\+?|-)\d+)$/g;
         const match = basisOffsetRegex.exec(basisOffsetInput);
-        if(match !== null && match[1]) {
+        if (match !== null && match[1]) {
             return Number(match[1]);
         } else {
             throw "Could not parse basis offset: " + basisOffsetInput;
@@ -67,28 +67,28 @@ function controller(serviceBroker) {
 
     const fields = [
         {
-            className: 'row',
+            className: "row",
             fieldGroup: [
-                { className: 'col-sm-6', fieldGroup: [transportField] },
-                { className: 'col-sm-6', fieldGroup: [frequencyField] }
+                {className: "col-sm-6", fieldGroup: [transportField]},
+                {className: "col-sm-6", fieldGroup: [frequencyField]}
             ]
         }, {
-            className: 'row',
+            className: "row",
             fieldGroup: [
-                { className: 'col-sm-6', fieldGroup: [basisOffsetSelectField] },
-                { className: 'col-sm-6', fieldGroup: [basisOffsetInputField] }
+                {className: "col-sm-6", fieldGroup: [basisOffsetSelectField]},
+                {className: "col-sm-6", fieldGroup: [basisOffsetInputField]}
             ]
         }, {
-            className: 'row',
+            className: "row",
             fieldGroup: [
-                { className: 'col-sm-6', fieldGroup: [criticalityField] }
+                {className: "col-sm-6", fieldGroup: [criticalityField]}
             ]
         }
     ];
 
     vm.fields = fields;
 
-    const basisOffsetOptions = _.map(basisOffsetSelectField.templateOptions.options, 'code');
+    const basisOffsetOptions = _.map(basisOffsetSelectField.templateOptions.options, "code");
 
     vm.$onInit = () => {
         serviceBroker
@@ -98,17 +98,9 @@ function controller(serviceBroker) {
 
                 transportField.templateOptions.options = toOptions(enumsByType["TransportKind"]);
 
-                const criticalityValuesByCode = _
-                    .chain(enumsByType["physicalFlowCriticality"])
-                    .map(c => ({ code: c.key, name: c.name }))
-                    .keyBy("code")
-                    .value();
-                criticalityField.templateOptions.options = [
-                    criticalityValuesByCode['VERY_HIGH'],
-                    criticalityValuesByCode['HIGH'],
-                    criticalityValuesByCode['MEDIUM'],
-                    criticalityValuesByCode['LOW']
-                ];
+                criticalityField.templateOptions.options = _.map(
+                    enumsByType["physicalFlowCriticality"],
+                    c => ({code: c.key, name: c.name}));
             });
     };
 
@@ -122,7 +114,7 @@ function controller(serviceBroker) {
                 transport: vm.current.transport,
                 frequency: vm.current.frequency,
                 criticality: vm.current.criticality,
-                basisOffsetSelect: isOtherBasisOffset ? 'OTHER' : vm.current.basisOffset,
+                basisOffsetSelect: isOtherBasisOffset ? "OTHER" : vm.current.basisOffset,
                 basisOffsetInput: isOtherBasisOffset ? vm.current.basisOffset : undefined
             };
 
@@ -145,7 +137,7 @@ function controller(serviceBroker) {
 
 
 controller.$inject = [
-    'ServiceBroker'
+    "ServiceBroker"
 ];
 
 
@@ -158,5 +150,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzPhysicalFlowAttributeEditor'
+    id: "waltzPhysicalFlowAttributeEditor"
 };

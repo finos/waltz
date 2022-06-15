@@ -61,7 +61,7 @@ public abstract class PhysicalFlowParsed {
     public abstract Integer basisOffset();
 
     @Nullable
-    public abstract Criticality criticality();
+    public abstract CriticalityValue criticality();
 
     public abstract String description();
 

@@ -124,10 +124,16 @@ public class PhysicalFlowUploadService {
         Map<String, Actor> actorsByNameMap = loadActorsByName();
         Map<String, DataType> dataTypesByNameOrCodeMap = loadDataTypesByNameOrCode();
         Aliases<TransportKindValue> transportAliases = loadTransportAliases();
+        Aliases<CriticalityValue> criticalityAliases = loadCriticalityAliases();
 
         // parse flows and resolve strings into entities or enums
         List<PhysicalFlowUploadCommandResponse> parsedFlows = cmds.stream()
-                .map(cmd -> validateCommand(actorsByNameMap, applicationsByAssetCode, dataTypesByNameOrCodeMap, transportAliases, cmd))
+                .map(cmd -> validateCommand(actorsByNameMap,
+                        applicationsByAssetCode,
+                        dataTypesByNameOrCodeMap,
+                        transportAliases,
+                        criticalityAliases,
+                        cmd))
                 .collect(toList());
 
         // enumerate and locate an existing physical flows that exist - iff no parse errors
@@ -205,6 +211,7 @@ public class PhysicalFlowUploadService {
                                                               Map<String, Application> applicationsByAssetCode,
                                                               Map<String, DataType> dataTypeMap,
                                                               Aliases<TransportKindValue> transportAliases,
+                                                              Aliases<CriticalityValue> criticalityAliases,
                                                               PhysicalFlowUploadCommand cmd) {
         checkNotNull(cmd, "cmd cannot be null");
 
@@ -251,13 +258,17 @@ public class PhysicalFlowUploadService {
                     return null;
                 });
 
-        Criticality criticality = Criticality.parse(cmd.criticality(), (s) -> null);
-        if (criticality == null) {
-            errors.put("criticality", String.format("%s is not a recognised value", cmd.criticality()));
-        }
+
+        CriticalityValue criticality = criticalityAliases
+                .lookup(cmd.criticality())
+                .orElseGet(() -> {
+                    errors.put("criticality", String.format("%s is not a recognised value", cmd.criticality()));
+                    return null;
+                });
+
 
         // check for nulls or duplicates in other fields
-        if(isEmpty(cmd.name())) {
+        if (isEmpty(cmd.name())) {
             errors.put("name", "name not provided");
         }
 
@@ -454,6 +465,10 @@ public class PhysicalFlowUploadService {
 
     private Aliases<TransportKindValue> loadTransportAliases() {
         return enumValueAliasService.mkAliases(EnumValueKind.TRANSPORT_KIND, TransportKindValue::of);
+    }
+
+    private Aliases<CriticalityValue> loadCriticalityAliases() {
+        return enumValueAliasService.mkAliases(EnumValueKind.PHYSICAL_FLOW_CRITICALITY, CriticalityValue::of);
     }
 
 }

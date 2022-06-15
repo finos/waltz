@@ -31,7 +31,9 @@ public abstract class FlowAttributes implements DescriptionProvider {
 
     public abstract TransportKindValue transport();
     public abstract FrequencyKind frequency();
-    public abstract Criticality criticality();
+
+    public abstract CriticalityValue criticality();
+
     public abstract int basisOffset();
 
 }

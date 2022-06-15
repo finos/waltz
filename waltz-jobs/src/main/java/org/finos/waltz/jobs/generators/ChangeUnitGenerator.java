@@ -25,7 +25,6 @@ import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.data.change_unit.ChangeUnitDao;
 import org.finos.waltz.data.data_type.DataTypeDao;
 import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
-import org.finos.waltz.model.Criticality;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.change_unit.ChangeAction;
@@ -188,8 +187,8 @@ public class ChangeUnitGenerator implements SampleDataGenerator {
         AttributeChangeRecord record = dsl.newRecord(ATTRIBUTE_CHANGE);
         record.setChangeUnitId(cu.id().get());
         record.setType("string");
-        record.setOldValue(flow.criticality().name());
-        record.setNewValue(randomPick(Criticality.values()).name());
+        record.setOldValue(flow.criticality().value());
+        record.setNewValue(randomPick("LOW", "MEDIUM", "HIGH"));
         record.setName(name);
         record.setLastUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
         record.setLastUpdatedBy("admin");

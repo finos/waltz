@@ -70,7 +70,7 @@ public abstract class PhysicalFlow implements
 
     public abstract Optional<Long> specificationDefinitionId();
 
-    public abstract Criticality criticality();
+    public abstract CriticalityValue criticality();
 
     @Value.Default
     public EntityKind kind() {
