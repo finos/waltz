@@ -5,16 +5,18 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.immutables.value.Value;
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableValueElement.class)
-@JsonDeserialize(as = ImmutableValueElement.class)
-public interface ValueElement extends Element{
+@JsonSerialize(as = ImmutableCellValue.class)
+@JsonDeserialize(as = ImmutableCellValue.class)
+public interface CellValue extends Cell {
 
-    String TYPE ="http://waltz.intranet.db.com/types/1/schema#id=ValueElement";
+    String TYPE = ApiTypes.VALCELL;
+
 
     @Value.Default
     default String type() {
         return TYPE;
     }
+
     String name();
     String value();
 }

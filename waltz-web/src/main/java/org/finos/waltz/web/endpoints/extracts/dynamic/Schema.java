@@ -1,10 +1,9 @@
 package org.finos.waltz.web.endpoints.extracts.dynamic;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.finos.waltz.model.Nullable;
 
-import java.util.Optional;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
@@ -14,7 +13,10 @@ import java.util.Optional;
 @JsonSubTypes({
         @JsonSubTypes.Type(value = ReportGridSchema.class, name = ReportGridSchema.TYPE)
 })
+@JsonPropertyOrder({"apiTypes","type"})
 public interface Schema {
+
+    ApiTypes apiTypes();
 
     String type();
 

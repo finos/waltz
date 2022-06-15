@@ -12,10 +12,10 @@ import java.util.List;
 @JsonDeserialize(as = ImmutableRow.class)
 public abstract class Row {
 
-    public abstract KeyElement idElement();
+    public abstract KeyCell id();
 
     @Value.Default
-    public List<Element> elements() {
+    public List<Cell> cells() {
         return new ArrayList<>();
     }
 }

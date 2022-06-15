@@ -55,14 +55,16 @@ public class DynamicJSONFormatter implements DynamicFormatter {
                               List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows) throws IOException {
 
         ReportGridDefinition reportGridDefinition = reportGrid.definition();
-        ImmutableReportGridSchema changeInitiativeSchema =
-                ImmutableReportGridSchema.builder().id(reportGridDefinition.externalId().orElseGet(()->""+reportGridDefinition.id()))
+        ImmutableReportGridSchema reportGridSchema =
+                ImmutableReportGridSchema.builder()
+                        .id(reportGridDefinition.externalId().orElseGet(()->""+reportGridDefinition.id()))
+                        .apiTypes(new ApiTypes())
                         .name(reportGridDefinition.name())
                         .grid(transform(columnDefinitions,reportRows))
                         .build();
 
         return createMapper()
-                .writeValueAsBytes(changeInitiativeSchema);
+                .writeValueAsBytes(reportGridSchema);
     }
 
 
@@ -74,21 +76,21 @@ public class DynamicJSONFormatter implements DynamicFormatter {
         for (Tuple2<ReportSubject, ArrayList<Object>> currentRow : reportRows) {
             ImmutableRow.Builder transformedRow = ImmutableRow.builder();
 
-            List<Element> transformedRowValues = new ArrayList<>();
+            List<Cell> transformedRowValues = new ArrayList<>();
 
-            transformedRow.idElement(createKeyElement(currentRow.v1.entityReference()));
+            transformedRow.id(createKeyElement(currentRow.v1.entityReference()));
 
             for (int idx = 0; idx < columnDefinitions.size(); idx++) {
                 Tuple2<ReportGridColumnDefinition, Boolean> columnDef = columnDefinitions.get(idx);
                 if (currentRow.v2.get(idx) != null) {
-                    Element element = ImmutableValueElement.builder()
+                    Cell cell = ImmutableCellValue.builder()
                             .name(coalesceColumnName(columnDef.v1.columnName(), columnDef.v1.displayName()))
                             .value(currentRow.v2.get(idx).toString())
                             .build();
-                    transformedRowValues.add(element);
+                    transformedRowValues.add(cell);
                 }
             }
-            transformedRow.addAllElements(transformedRowValues);
+            transformedRow.addAllCells(transformedRowValues);
             data.add(transformedRow.build());
         }
 
@@ -98,8 +100,8 @@ public class DynamicJSONFormatter implements DynamicFormatter {
     }
 
 
-    private KeyElement createKeyElement(EntityReference keyAttrib ){
-        return ImmutableKeyElement.builder()
+    private KeyCell createKeyElement(EntityReference keyAttrib ){
+        return ImmutableKeyCell.builder()
                 .key(keyAttrib)
                 .build();
     }

@@ -13,9 +13,10 @@ import org.immutables.value.Value;
         property = "type",
         visible = true)
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = ValueElement.class, name = ValueElement.TYPE)
+        @JsonSubTypes.Type(value = CellValue.class, name = CellValue.TYPE),
+        @JsonSubTypes.Type(value = KeyCell.class, name = KeyCell.TYPE),
 })
-public interface Element {
+public interface Cell {
 
     String type();
 }

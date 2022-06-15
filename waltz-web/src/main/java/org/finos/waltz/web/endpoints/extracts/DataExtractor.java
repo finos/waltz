@@ -62,7 +62,6 @@ public interface DataExtractor {
         httpResponse.getOutputStream().write(bytes);
         httpResponse.getOutputStream().flush();
         httpResponse.getOutputStream().close();
-
         return httpResponse;
     }
 

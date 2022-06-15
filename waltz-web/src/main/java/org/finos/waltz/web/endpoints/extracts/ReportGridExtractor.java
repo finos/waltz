@@ -17,20 +17,11 @@
  */
 package org.finos.waltz.web.endpoints.extracts;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.xssf.streaming.SXSSFSheet;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.StringUtilities;
+import org.finos.waltz.common.exception.NotFoundException;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.NameProvider;
-import org.finos.waltz.model.application.LifecyclePhase;
-import org.finos.waltz.model.entity_field_reference.EntityFieldReference;
-import org.finos.waltz.model.external_identifier.ExternalIdValue;
 import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.model.report_grid.*;
 import org.finos.waltz.model.survey.SurveyQuestion;
@@ -45,24 +36,15 @@ import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.supercsv.io.CsvListWriter;
-import org.supercsv.prefs.CsvPreference;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.function.LongFunction;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static org.finos.waltz.common.ListUtilities.*;
 import static org.finos.waltz.common.MapUtilities.*;
-import static org.finos.waltz.common.StringUtilities.length;
-import static org.finos.waltz.common.StringUtilities.limit;
 import static org.finos.waltz.model.utils.IdUtilities.getIdOrDefault;
 import static org.finos.waltz.model.utils.IdUtilities.indexById;
 import static org.jooq.lambda.fi.util.function.CheckedConsumer.unchecked;
@@ -101,28 +83,31 @@ public class ReportGridExtractor implements DataExtractor {
     @Override
     public void register() {
         registerGridViewExtract();
+        //registerGeyById();
     }
 
 
     private void registerGridViewExtract() {
         post(WebUtilities.mkPath(BASE_URL, "id", ":id"),
-            (request, response) ->
-                writeReportResults(
+            (request, response) -> {
+                long gridId = WebUtilities.getId(request);
+                IdSelectionOptions selectionOptions =  WebUtilities.readIdSelectionOptionsFromBody(request);
+                ReportGrid reportGrid = getById(gridId,selectionOptions)
+                        .orElseThrow(() -> notFoundException.apply(gridId));
+                return writeReportResults(
                     response,
-                    prepareReport(
+                    prepareReport(reportGrid,
                         parseExtractFormat(request),
-                        WebUtilities.getId(request),
-                        WebUtilities.readIdSelectionOptionsFromBody(request))));
+                        selectionOptions));
+            });
     }
 
 
-    private Tuple3<ExtractFormat, String, byte[]> prepareReport(ExtractFormat format,
-                                                                long gridId,
-                                                                IdSelectionOptions selectionOptions) throws IOException {
 
-        ReportGrid reportGrid = reportGridService.getByIdAndSelectionOptions(
-                gridId,
-                selectionOptions);
+
+    private Tuple3<ExtractFormat, String, byte[]> prepareReport(ReportGrid reportGrid,
+                                                                ExtractFormat format,
+                                                                IdSelectionOptions selectionOptions) throws IOException {
 
         List<Tuple2<ReportGridColumnDefinition, Boolean>> colsWithCommentRequirement = enrichColsWithCommentRequirement(reportGrid);
 
@@ -136,6 +121,13 @@ public class ReportGridExtractor implements DataExtractor {
                 reportRows);
     }
 
+    private Optional<ReportGrid> getById(long gridId,
+                                         IdSelectionOptions selectionOptions){
+        ReportGrid reportGrid = reportGridService.getByIdAndSelectionOptions(
+                gridId,
+                selectionOptions);
+        return Optional.ofNullable(reportGrid);
+    }
 
     private List<Tuple2<ReportGridColumnDefinition, Boolean>> enrichColsWithCommentRequirement(ReportGrid reportGrid) {
         Set<Long> surveyQuestionsIds = reportGrid
@@ -292,4 +284,8 @@ public class ReportGridExtractor implements DataExtractor {
         }
     }
 
+
+    private static LongFunction<NotFoundException> notFoundException = (gridId) -> new NotFoundException(
+            "REPORT_GRID_NOT_FOUND",
+            format(" Grid def: %d not found", gridId));
 }

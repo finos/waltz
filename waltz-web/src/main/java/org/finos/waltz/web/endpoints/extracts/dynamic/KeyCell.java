@@ -6,11 +6,11 @@ import org.finos.waltz.model.EntityReference;
 import org.immutables.value.Value;
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableKeyElement.class)
-@JsonDeserialize(as = ImmutableKeyElement.class)
-public interface KeyElement extends Element{
+@JsonSerialize(as = ImmutableKeyCell.class)
+@JsonDeserialize(as = ImmutableKeyCell.class)
+public interface KeyCell extends Cell {
 
-    String TYPE ="http://waltz.intranet.db.com/types/1/schema#id=KeyElement";
+    String TYPE =ApiTypes.KEYCELL;
 
     @Value.Default
     default String type() {
