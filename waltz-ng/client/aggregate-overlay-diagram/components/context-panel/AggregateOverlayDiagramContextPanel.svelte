@@ -93,9 +93,9 @@
             <h4>{$selectedDiagram.name}</h4>
             <DescriptionFade text={$selectedDiagram.description}/>
 
-            <hr>
 
             {#if $focusWidget?.legend}
+                <hr>
                 <svelte:component this={$focusWidget.legend}/>
             {/if}
 

@@ -274,7 +274,7 @@ export function mkAssessmentOverlayGlobalProps(data) {
         .chain(data)
         .map(d => d.counts)
         .flatten()
-        .map(d => d.count)
+        .map(d => _.get(d, ["count"], 0))
         .max()
         .value();
 
@@ -285,7 +285,7 @@ export function mkAssessmentOverlayGlobalProps(data) {
 export function mkTargetAppCountGlobalProps(data) {
     const maxCount = _
         .chain(data)
-        .map(d => [d.currentStateCount, d.targetStateCount])
+        .map(d => [_.get(d, ["currentStateCount"], 0), _.get(d, ["targetStateCount"], 0)])
         .flatten()
         .max()
         .value();
@@ -296,7 +296,7 @@ export function mkTargetAppCountGlobalProps(data) {
 export function mkAppCostGlobalProps(data) {
     const maxCost = _
         .chain(data)
-        .map(d => d.totalCost)
+        .map(d => _.get(d, ["totalCost"], 0))
         .max()
         .value();
     return {maxCost};
@@ -306,7 +306,7 @@ export function mkAppCostGlobalProps(data) {
 export function mkTargetAppCostGlobalProps(data) {
     const maxCost = _
         .chain(data)
-        .map(d => [d.currentStateCost, d.targetStateCost])
+        .map(d => [_.get(d, ["currentStateCost"], 0), _.get(d, ["targetStateCost"], 0)])
         .flatten()
         .max()
         .value();
