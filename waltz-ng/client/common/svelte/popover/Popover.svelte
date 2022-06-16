@@ -24,7 +24,7 @@
 </script>
 
 {#if $Popover}
-    <section class="svelte-popover">
+    <section class="waltz-svelte-popover">
         <PopoverContent on:dismiss={() => Popover.dismiss()}>
             <div slot="content">
                 <div style="width: 100%; height: 100%">
@@ -48,7 +48,7 @@
 {/if}
 
 <style>
-    .svelte-popover {
+    .waltz-svelte-popover {
         position: fixed;
         top: 20%;
         right: 20%;
