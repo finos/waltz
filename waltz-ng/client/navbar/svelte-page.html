@@ -9,11 +9,15 @@
         'sidebar-hidden': !$ctrl.isVisible}">
     <!-- Content -->
     <aside class="sidebar">
-       <waltz-svelte-component component="$ctrl.Sidebar"></waltz-svelte-component>
+        <waltz-svelte-component component="$ctrl.Sidebar"></waltz-svelte-component>
     </aside>
 
     <aside class="notifications">
-       <waltz-svelte-component component="$ctrl.Toasts"></waltz-svelte-component>
+        <waltz-svelte-component component="$ctrl.Toasts"></waltz-svelte-component>
+    </aside>
+
+    <aside class="waltz-svelte-popover">
+        <waltz-svelte-component component="$ctrl.Popover"></waltz-svelte-component>
     </aside>
 
     <main ui-view="content"

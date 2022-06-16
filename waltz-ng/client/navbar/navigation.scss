@@ -55,6 +55,10 @@ $hiddenWidth: 8px;
     .sidebar {
         width: $expandedWidth;
     }
+
+    .waltz-svelte-popover {
+        margin-left: $expandedWidth
+    }
 }
 
 .sidebar-collapsed {
@@ -65,6 +69,10 @@ $hiddenWidth: 8px;
     .sidebar {
         width: $collapsedWidth;
     }
+
+    .waltz-svelte-popover {
+        margin-left: $collapsedWidth
+    }
 }
 
 .sidebar-hidden {
@@ -74,6 +82,10 @@ $hiddenWidth: 8px;
 
     .sidebar {
         width: $hiddenWidth;
+    }
+
+    .waltz-svelte-popover {
+        margin-left: $hiddenWidth;
     }
 }
 

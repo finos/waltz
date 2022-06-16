@@ -24,6 +24,7 @@ import AppCountWidgetParameters from "./widgets/app-counts/AppCountWidgetParamet
 import AppCountOverlayCell from "./widgets/app-counts/AppCountOverlayCell.svelte";
 import AssessmentWidgetParameters from "./widgets/assessments/AssessmentWidgetParameters.svelte";
 import AssessmentOverlayCell from "./widgets/assessments/AssessmentOverlayCell.svelte";
+import AssessmentOverlayLegend from "./widgets/assessments/AssessmentOverlayLegend.svelte";
 import BackingEntitiesWidgetParameters from "./widgets/backing-entities/BackingEntitiesWidgetParameters.svelte";
 import BackingEntitiesOverlayCell from "./widgets/backing-entities/BackingEntitiesOverlayCell.svelte";
 import AggregatedEntitiesWidgetParameters
@@ -273,7 +274,7 @@ export function mkAssessmentOverlayGlobalProps(data) {
         .chain(data)
         .map(d => d.counts)
         .flatten()
-        .map(d => d.count)
+        .map(d => _.get(d, ["count"], 0))
         .max()
         .value();
 
@@ -284,7 +285,7 @@ export function mkAssessmentOverlayGlobalProps(data) {
 export function mkTargetAppCountGlobalProps(data) {
     const maxCount = _
         .chain(data)
-        .map(d => [d.currentStateCount, d.targetStateCount])
+        .map(d => [_.get(d, ["currentStateCount"], 0), _.get(d, ["targetStateCount"], 0)])
         .flatten()
         .max()
         .value();
@@ -295,7 +296,7 @@ export function mkTargetAppCountGlobalProps(data) {
 export function mkAppCostGlobalProps(data) {
     const maxCost = _
         .chain(data)
-        .map(d => d.totalCost)
+        .map(d => _.get(d, ["totalCost"], 0))
         .max()
         .value();
     return {maxCost};
@@ -305,7 +306,7 @@ export function mkAppCostGlobalProps(data) {
 export function mkTargetAppCostGlobalProps(data) {
     const maxCost = _
         .chain(data)
-        .map(d => [d.currentStateCost, d.targetStateCost])
+        .map(d => [_.get(d, ["currentStateCost"], 0), _.get(d, ["targetStateCost"], 0)])
         .flatten()
         .max()
         .value();
@@ -354,6 +355,7 @@ export const widgets = [
         description: "Allows user to select an assessment to overlay on the diagram",
         parameterWidget: AssessmentWidgetParameters,
         overlay: AssessmentOverlayCell,
+        legend: AssessmentOverlayLegend,
         remoteMethod: aggregateOverlayDiagramStore.findAppAssessmentsForDiagram,
         mkGlobalProps: mkAssessmentOverlayGlobalProps,
         resetParameters: resetAssessmentParameters,
