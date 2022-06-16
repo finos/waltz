@@ -6,6 +6,8 @@
     import CustomiseOverlayPanel from "./CustomiseOverlayPanel.svelte";
     import html2canvas from "html2canvas";
     import Icon from "../../../common/svelte/Icon.svelte";
+    import Popover from "../../../svelte-stores/popover-store";
+
 
     export let primaryEntityRef;
 
@@ -93,6 +95,11 @@
             <hr>
 
             <SelectedOverlayPanel/>
+
+            <button class="btn btn-default"
+                    on:click={() => Popover.add("Some text here!")}>
+                Add popover text
+            </button>
 
             <hr>
 

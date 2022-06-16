@@ -5,11 +5,11 @@
 </script>
 
 {#if $Toasts}
-    <section>
+    <section class="toasts">
         {#each $Toasts as toast (toast.id)}
             <Toast type={toast.type}
-                    dismissible={toast.dismissible}
-                    on:dismiss={() => Toasts.dismiss(toast.id)}>
+                   dismissible={toast.dismissible}
+                   on:dismiss={() => Toasts.dismiss(toast.id)}>
                 <Markdown text={toast.message}/>
             </Toast>
         {/each}
@@ -17,7 +17,7 @@
 {/if}
 
 <style>
-    section {
+    .toasts {
         position: fixed;
         bottom: 0;
         right: 1%;
