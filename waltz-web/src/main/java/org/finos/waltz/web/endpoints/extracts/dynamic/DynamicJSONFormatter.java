@@ -10,6 +10,7 @@ import org.finos.waltz.model.report_grid.ReportGrid;
 import org.finos.waltz.model.report_grid.ReportGridColumnDefinition;
 import org.finos.waltz.model.report_grid.ReportGridDefinition;
 import org.finos.waltz.model.report_grid.ReportSubject;
+import org.finos.waltz.web.endpoints.extracts.ColumnCommentary;
 import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,7 @@ public class DynamicJSONFormatter implements DynamicFormatter {
     @Override
     public byte[] format(String id,
                          ReportGrid reportGrid,
-                         List<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions,
+                         List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> columnDefinitions,
                          List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows)  throws IOException {
         try {
             LOG.info("Generating JSON data {}",id);
@@ -51,7 +52,7 @@ public class DynamicJSONFormatter implements DynamicFormatter {
     }
 
     private byte[] mkResponse(ReportGrid reportGrid,
-                              List<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions,
+                              List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> columnDefinitions,
                               List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows) throws IOException {
 
         ReportGridDefinition reportGridDefinition = reportGrid.definition();
@@ -68,7 +69,7 @@ public class DynamicJSONFormatter implements DynamicFormatter {
     }
 
 
-    private Grid transform(List<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions,
+    private Grid transform(List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> columnDefinitions,
                            List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows) {
 
         ArrayList<Row> data = new ArrayList<>();
@@ -81,25 +82,27 @@ public class DynamicJSONFormatter implements DynamicFormatter {
             transformedRow.id(createKeyElement(currentRow.v1.entityReference()));
             List<String> columnHeadings = formatterUtils.mkColumnHeaders(columnDefinitions);
             int maxColumns = columnHeadings.size();
+
             for (int idx = 0; idx < maxColumns; idx++) {
-                Tuple2<ReportGridColumnDefinition, Boolean> columnDef = columnDefinitions.get(idx);
                 String formattedColumnName = formatterUtils.getShortColumnName(columnHeadings.get(idx));
-                if(formattedColumnName.contains("comment")){
-                    LOG.info("Found a comment");
-                }
-                if (currentRow.v2.get(idx) != null) {
+                int prevCellAddedIdx= transformedRowValues.size() - 1;
+                boolean isComment = (formattedColumnName.contains("comment"));
+                Object currentCell = currentRow.v2.get(idx);
+                if (currentCell != null) {
                     ImmutableCellValue cell = ImmutableCellValue.builder()
                             .name(formattedColumnName)
-                            .value(currentRow.v2.get(idx).toString())
+                            .value(currentCell.toString())
                             .build();
-                    // TODO:  extract comment from row
-                    if (idx%3==0) {
-                        ImmutableCellValue withComment = ImmutableCellValue.copyOf(cell)
-                                .withComment("a comment");
-                        transformedRowValues.add(withComment);
+
+                    if (isComment && prevCellAddedIdx>-1 && transformedRowValues.get(prevCellAddedIdx) instanceof ImmutableCellValue) {
+                        ImmutableCellValue previousColumnCell = (ImmutableCellValue)transformedRowValues.get(prevCellAddedIdx);
+                        ImmutableCellValue withComment = ImmutableCellValue.copyOf(previousColumnCell)
+                                .withComment(currentCell.toString());
+                        transformedRowValues.set(prevCellAddedIdx,withComment);
                     }else{
                         transformedRowValues.add(cell);
                     }
+
                 }
             }
             transformedRow.addAllCells(transformedRowValues);

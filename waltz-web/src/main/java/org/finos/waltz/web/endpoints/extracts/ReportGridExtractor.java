@@ -109,7 +109,7 @@ public class ReportGridExtractor implements DataExtractor {
                                                                 ExtractFormat format,
                                                                 IdSelectionOptions selectionOptions) throws IOException {
 
-        List<Tuple2<ReportGridColumnDefinition, Boolean>> colsWithCommentRequirement = enrichColsWithCommentRequirement(reportGrid);
+        List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> colsWithCommentRequirement = enrichColsWithCommentRequirement(reportGrid);
 
         List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows = prepareReportRows(colsWithCommentRequirement, reportGrid.instance());
 
@@ -129,7 +129,7 @@ public class ReportGridExtractor implements DataExtractor {
         return Optional.ofNullable(reportGrid);
     }
 
-    private List<Tuple2<ReportGridColumnDefinition, Boolean>> enrichColsWithCommentRequirement(ReportGrid reportGrid) {
+    private List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> enrichColsWithCommentRequirement(ReportGrid reportGrid) {
         Set<Long> surveyQuestionsIds = reportGrid
                 .definition()
                 .columnDefinitions()
@@ -154,9 +154,13 @@ public class ReportGridExtractor implements DataExtractor {
                 .collect(toList());
     }
 
-    private static boolean columnHasComment(ReportGridColumnDefinition cd, Set<Long> colsNeedingComments ){
-       return cd.columnEntityKind().equals(EntityKind.SURVEY_QUESTION) &&
-               colsNeedingComments.contains(cd.columnEntityId());
+    private static ColumnCommentary columnHasComment(ReportGridColumnDefinition cd, Set<Long> colsNeedingComments ){
+       if (cd.columnEntityKind().equals(EntityKind.SURVEY_QUESTION) &&
+               colsNeedingComments.contains(cd.columnEntityId())){
+           return ColumnCommentary.HAS_COMMENTARY;
+       }else{
+           return ColumnCommentary.NO_COMMENTARY;
+       }
     }
 
     private String mkReportName(ReportGridDefinition gridDefinition, IdSelectionOptions selectionOptions) {
@@ -168,7 +172,7 @@ public class ReportGridExtractor implements DataExtractor {
 
 
 
-    private List<Tuple2<ReportSubject, ArrayList<Object>>> prepareReportRows(List<Tuple2<ReportGridColumnDefinition, Boolean>> colsWithCommentRequirement,
+    private List<Tuple2<ReportSubject, ArrayList<Object>>> prepareReportRows(List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> colsWithCommentRequirement,
                                                                              ReportGridInstance reportGridInstance) {
 
         Set<ReportGridCell> tableData = reportGridInstance.cellData();
@@ -205,8 +209,6 @@ public class ReportGridExtractor implements DataExtractor {
                     colsWithCommentRequirement
                             .forEach(t -> {
                                 ReportGridColumnDefinition colDef = t.v1;
-                                Boolean needsComment = t.v2;
-
                                 boolean isCostColumn = colDef.columnEntityKind().equals(EntityKind.COST_KIND);
 
                                 if (!allowCostsExport && isCostColumn) {
@@ -220,9 +222,8 @@ public class ReportGridExtractor implements DataExtractor {
                                             null);
 
                                     reportRow.add(getValueFromReportCell(ratingsById, cell));
-                                    if (needsComment) {
-                                        // TODO: reinstante this line reportRow.add(getCommentFromCell(cell));
-                                        reportRow.add("I am a comment");
+                                    if (ColumnCommentary.HAS_COMMENTARY.equals(t.v2)) {
+                                        reportRow.add(getCommentFromCell(cell));
                                     }
                                 }
                             });
@@ -272,7 +273,7 @@ public class ReportGridExtractor implements DataExtractor {
     private Tuple3<ExtractFormat, String, byte[]> formatReport(ExtractFormat format,
                                                                ReportGrid reportGrid,
                                                                String reportName,
-                                                               List<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions,
+                                                               List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> columnDefinitions,
                                                                List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows) throws IOException {
         switch (format) {
             case XLSX:

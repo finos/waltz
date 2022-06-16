@@ -19,6 +19,4 @@ public interface Schema {
     ApiTypes apiTypes();
 
     String type();
-
-
 }

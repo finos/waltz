@@ -4,8 +4,7 @@ import org.finos.waltz.model.application.LifecyclePhase;
 import org.finos.waltz.model.report_grid.ReportGrid;
 import org.finos.waltz.model.report_grid.ReportGridColumnDefinition;
 import org.finos.waltz.model.report_grid.ReportSubject;
-import org.finos.waltz.web.endpoints.api.BookmarksEndpoint;
-import org.finos.waltz.web.endpoints.extracts.ExtractFormat;
+import org.finos.waltz.web.endpoints.extracts.ColumnCommentary;
 import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +21,6 @@ import java.util.Optional;
 import static org.finos.waltz.common.ListUtilities.*;
 import static org.jooq.lambda.fi.util.function.CheckedConsumer.unchecked;
 
-import org.jooq.lambda.tuple.Tuple2;
-import org.jooq.lambda.tuple.Tuple3;
-
 @Component
 public class DynamicCommaSeperatedValueFormatter implements DynamicFormatter {
 
@@ -39,7 +35,7 @@ public class DynamicCommaSeperatedValueFormatter implements DynamicFormatter {
     @Override
     public byte[] format(String id,
                          ReportGrid reportGrid,
-                         List<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions,
+                         List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> columnDefinitions,
                          List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows) throws IOException{
         try {
             LOG.info("Generating CSV report {}",id);
@@ -50,7 +46,7 @@ public class DynamicCommaSeperatedValueFormatter implements DynamicFormatter {
         }
     }
 
-    private byte[] mkCSVReport(List<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions,
+    private byte[] mkCSVReport(List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> columnDefinitions,
                                List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows) throws IOException {
         List<String> headers = formatterUtils.mkHeaderStrings(columnDefinitions);
 

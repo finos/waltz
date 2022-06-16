@@ -11,6 +11,7 @@ import org.finos.waltz.model.external_identifier.ExternalIdValue;
 import org.finos.waltz.model.report_grid.ReportGrid;
 import org.finos.waltz.model.report_grid.ReportGridColumnDefinition;
 import org.finos.waltz.model.report_grid.ReportSubject;
+import org.finos.waltz.web.endpoints.extracts.ColumnCommentary;
 import org.finos.waltz.web.endpoints.extracts.ExtractorUtilities;
 import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
@@ -50,10 +51,10 @@ public class DynamicExcelFormatter implements DynamicFormatter {
     @Override
     public byte[] format(String id,
                          ReportGrid reportGrid,
-                         List<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions,
+                         List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> columnDefinitions,
                          List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows)  throws IOException{
         try {
-            LOG.info("Generating CSV report {}",id);
+            LOG.info("Generating Excel report {}",id);
             return mkExcelReport(id,columnDefinitions,reportRows);
         } catch (IOException e) {
            LOG.warn("Encounter error when trying to generate CSV report.  Details:{}", e.getMessage());
@@ -63,7 +64,7 @@ public class DynamicExcelFormatter implements DynamicFormatter {
 
 
     private byte[] mkExcelReport(String reportName,
-                                 List<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions,
+                                 List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> columnDefinitions,
                                  List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows) throws IOException {
         SXSSFWorkbook workbook = new SXSSFWorkbook(2000);
         SXSSFSheet sheet = workbook.createSheet(ExtractorUtilities.sanitizeSheetName(reportName));
@@ -132,7 +133,7 @@ public class DynamicExcelFormatter implements DynamicFormatter {
     }
 
 
-    private int writeExcelHeader(List<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions, SXSSFSheet sheet) {
+    private int writeExcelHeader(List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> columnDefinitions, SXSSFSheet sheet) {
         Row headerRow = sheet.createRow(0);
         AtomicInteger colNum = new AtomicInteger();
         formatterUtils.mkHeaderStrings(columnDefinitions).forEach(hdr -> writeExcelHeaderCell(headerRow, colNum, hdr));
