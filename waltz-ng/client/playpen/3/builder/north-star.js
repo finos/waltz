@@ -59,6 +59,10 @@ const cells = {
         "name": "Lending",
         "id": "LENDING"
     },
+    "LENDING_H": {
+        "name": "Lending",
+        "id": "LENDING-H"
+    },
     "TRADE_BANKING": {
         "name": "Trade Banking",
         "id": "TRADE_BANKING"
@@ -192,7 +196,7 @@ const coreProcessingOperations = {
     headerColor: "#9d9179",
     rows: [
         ns("CORE_PROCESSING", [cells.MARKET_OPERATIONS, cells.CLEARING_AND_SETTLEMENT, cells.PAYMENTS]),
-        ns("CORE_PROCESSING", [cells.COLLATERAL_AND_MARGIN, cells.POSITION_MANAGEMENT, cells.LENDING]),
+        ns("CORE_PROCESSING", [cells.COLLATERAL_AND_MARGIN, cells.POSITION_MANAGEMENT, cells.LENDING_H]),
         ns("CORE_PROCESSING", [cells.BANKING_MANAGEMENT])
     ]
 };
@@ -230,4 +234,7 @@ const analyticsAndReporting = {
 };
 
 
-export default [referenceData, transactionInitiation, coreProcessing, coreProcessingOperations, coreProcessingFinance, analyticsAndReporting];
+export default [referenceData,
+    transactionInitiation,
+    coreProcessing,
+    coreProcessingOperations, coreProcessingFinance, analyticsAndReporting];
