@@ -13,6 +13,7 @@
 
     let selectedInstance = getContext("selectedInstance");
     let selectedDiagram = getContext("selectedDiagram");
+    let focusWidget = getContext("focusWidget");
 
     let selectedTab = 'widgets';
     let generatingDiagram = false;
@@ -94,12 +95,9 @@
 
             <hr>
 
-            <SelectedOverlayPanel/>
-
-            <button class="btn btn-default"
-                    on:click={() => Popover.add("Some text here!")}>
-                Add popover text
-            </button>
+            {#if $focusWidget?.legend}
+                <svelte:component this={$focusWidget.legend}/>
+            {/if}
 
             <hr>
 

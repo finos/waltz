@@ -24,6 +24,7 @@ import AppCountWidgetParameters from "./widgets/app-counts/AppCountWidgetParamet
 import AppCountOverlayCell from "./widgets/app-counts/AppCountOverlayCell.svelte";
 import AssessmentWidgetParameters from "./widgets/assessments/AssessmentWidgetParameters.svelte";
 import AssessmentOverlayCell from "./widgets/assessments/AssessmentOverlayCell.svelte";
+import AssessmentOverlayLegend from "./widgets/assessments/AssessmentOverlayLegend.svelte";
 import BackingEntitiesWidgetParameters from "./widgets/backing-entities/BackingEntitiesWidgetParameters.svelte";
 import BackingEntitiesOverlayCell from "./widgets/backing-entities/BackingEntitiesOverlayCell.svelte";
 import AggregatedEntitiesWidgetParameters
@@ -354,6 +355,7 @@ export const widgets = [
         description: "Allows user to select an assessment to overlay on the diagram",
         parameterWidget: AssessmentWidgetParameters,
         overlay: AssessmentOverlayCell,
+        legend: AssessmentOverlayLegend,
         remoteMethod: aggregateOverlayDiagramStore.findAppAssessmentsForDiagram,
         mkGlobalProps: mkAssessmentOverlayGlobalProps,
         resetParameters: resetAssessmentParameters,
