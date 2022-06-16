@@ -28,10 +28,7 @@ import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.command.CommandResponse;
 import org.finos.waltz.model.command.ImmutableCommandResponse;
 import org.finos.waltz.model.entity_search.EntitySearchOptions;
-import org.finos.waltz.model.physical_specification.DataFormatKind;
-import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
-import org.finos.waltz.model.physical_specification.PhysicalSpecification;
-import org.finos.waltz.model.physical_specification.PhysicalSpecificationDeleteCommand;
+import org.finos.waltz.model.physical_specification.*;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -223,7 +220,7 @@ public class PhysicalSpecificationService {
            case "description":
                 return specificationDao.updateDescription(flowId, command.value());
             case "format":
-                return specificationDao.updateFormat(flowId, DataFormatKind.valueOf(command.value()));
+                return specificationDao.updateFormat(flowId, DataFormatKindValue.of(command.value()));
             default:
                 String errMsg = format(
                         "Cannot update attribute %s on flow as unknown attribute name",

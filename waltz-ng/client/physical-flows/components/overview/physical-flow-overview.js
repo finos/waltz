@@ -17,8 +17,6 @@
  */
 import template from "./physical-flow-overview.html";
 import {initialiseData} from "../../../common/index";
-import {resolveSourceAndTarget} from "../../../logical-flow/logical-flow-utils";
-import {compareCriticalities} from "../../../common/criticality-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {toEntityRef} from "../../../common/entity-utils";
 import {truncate} from "../../../common/string-utils";
@@ -30,7 +28,6 @@ const bindings = {
 
 
 const initialState = {
-    hasCriticalityMismatch: false
 };
 
 
@@ -79,24 +76,6 @@ function controller(serviceBroker) {
                     }))
                     .value();
             });
-
-        logicalFlowPromise.then(() => {
-            if (vm.logicalFlow.source.kind === "APPLICATION") {
-                resolveSourceAndTarget(serviceBroker, vm.logicalFlow)
-                    .then(sourceAndTarget => {
-                        const criticalityComparison = compareCriticalities(
-                            sourceAndTarget.source.businessCriticality,
-                            vm.physicalFlow.criticality);
-
-                        if (criticalityComparison === -1) {
-                            vm.hasCriticalityMismatch = true;
-                        } else {
-                            vm.hasCriticalityMismatch = false;
-                        }
-                    });
-            }
-        })
-
     };
 
 

@@ -18,15 +18,15 @@
 
 package org.finos.waltz.data.physical_specification;
 
-import org.finos.waltz.schema.tables.DataType;
-import org.finos.waltz.schema.tables.*;
-import org.finos.waltz.schema.tables.records.PhysicalSpecificationRecord;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.*;
 import org.finos.waltz.model.physical_flow.PhysicalFlowParsed;
-import org.finos.waltz.model.physical_specification.DataFormatKind;
+import org.finos.waltz.model.physical_specification.DataFormatKindValue;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
+import org.finos.waltz.schema.tables.DataType;
+import org.finos.waltz.schema.tables.*;
+import org.finos.waltz.schema.tables.records.PhysicalSpecificationRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +37,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import static org.finos.waltz.common.Checks.checkFalse;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
+import static org.finos.waltz.data.physical_flow.PhysicalFlowDao.PHYSICAL_FLOW_NOT_REMOVED;
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.schema.tables.ChangeLog.CHANGE_LOG;
 import static org.finos.waltz.schema.tables.DataType.DATA_TYPE;
 import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
@@ -44,12 +50,6 @@ import static org.finos.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DE
 import static org.finos.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static org.finos.waltz.schema.tables.PhysicalSpecDataType.PHYSICAL_SPEC_DATA_TYPE;
 import static org.finos.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
-import static org.finos.waltz.common.Checks.checkFalse;
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.ListUtilities.newArrayList;
-import static org.finos.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
-import static org.finos.waltz.data.physical_flow.PhysicalFlowDao.PHYSICAL_FLOW_NOT_REMOVED;
-import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.jooq.impl.DSL.*;
 
 @Repository
@@ -79,7 +79,7 @@ public class PhysicalSpecificationDao {
                         r.getValue(owningEntityNameField)))
                 .name(record.getName())
                 .description(record.getDescription())
-                .format(DataFormatKind.valueOf(record.getFormat()))
+                .format(DataFormatKindValue.of(record.getFormat()))
                 .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .provenance(record.getProvenance())
@@ -149,7 +149,7 @@ public class PhysicalSpecificationDao {
     public PhysicalSpecification getByParsedFlow(PhysicalFlowParsed flow) {
 
         Condition condition = PHYSICAL_SPECIFICATION.NAME.eq(flow.name())
-                        .and(PHYSICAL_SPECIFICATION.FORMAT.eq(flow.format().name()))
+                .and(PHYSICAL_SPECIFICATION.FORMAT.eq(flow.format().value()))
                         .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_KIND.eq(flow.owner().kind().name()))
                         .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID.eq(flow.owner().id()))
                         .and(PHYSICAL_SPEC_NOT_REMOVED);
@@ -186,7 +186,7 @@ public class PhysicalSpecificationDao {
         record.setName(specification.name());
         record.setExternalId(specification.externalId().orElse(""));
         record.setDescription(specification.description());
-        record.setFormat(specification.format().name());
+        record.setFormat(specification.format().value());
         record.setLastUpdatedAt(Timestamp.valueOf(specification.lastUpdatedAt()));
         record.setLastUpdatedBy(specification.lastUpdatedBy());
         record.setIsRemoved(specification.isRemoved());
@@ -320,10 +320,10 @@ public class PhysicalSpecificationDao {
     }
 
 
-    public int updateFormat(long specId, DataFormatKind format) {
+    public int updateFormat(long specId, DataFormatKindValue format) {
         return dsl
                 .update(PHYSICAL_SPECIFICATION)
-                .set(PHYSICAL_SPECIFICATION.FORMAT, format.name())
+                .set(PHYSICAL_SPECIFICATION.FORMAT, format.value())
                 .where(PHYSICAL_SPECIFICATION.ID.eq(specId))
                 .execute();
     }

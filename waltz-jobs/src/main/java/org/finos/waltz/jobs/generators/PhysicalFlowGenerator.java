@@ -23,7 +23,6 @@ import org.finos.waltz.data.physical_specification.PhysicalSpecificationDao;
 import org.finos.waltz.model.Criticality;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.enum_value.EnumValueKind;
-import org.finos.waltz.model.physical_flow.FrequencyKind;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
 import org.finos.waltz.schema.tables.records.PhysicalFlowRecord;
 import org.jooq.DSLContext;
@@ -88,7 +87,7 @@ public class PhysicalFlowGenerator implements SampleDataGenerator {
                     record.setProvenance(SAMPLE_DATA_PROVENANCE);
                     record.setBasisOffset(randomPick(newArrayList(0, 0, 0, 0, 1, 1, 2, -1)));
                     record.setTransport(randomPick(transportKinds));
-                    record.setFrequency(randomPick(FrequencyKind.values()).name());
+                    record.setFrequency(randomPick("DAILY", "MONTHLY", "WEEKLY", "ON_DEMAND"));
                     record.setCriticality(randomPick(criticalityDistribution).name());
                     record.setEntityLifecycleStatus(randomPick(lifecycleStatusDistribution).name());
                     record.setLastUpdatedBy("admin");

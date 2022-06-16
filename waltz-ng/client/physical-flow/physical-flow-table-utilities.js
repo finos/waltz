@@ -22,16 +22,24 @@ import {CORE_API} from "../common/services/core-api-utils";
 
 
 export const columnDef = {
-    name : mkLinkGridCell("Name", "specification.name", "physicalFlow.id", "main.physical-flow.view"),
-    extId : { field: "physicalFlow.externalId", displayName: "Ext. Id"},
-    format: { field: "specification.format", displayName: "Format", cellFilter: "toDisplayName:\"dataFormatKind\"" },
-    transport: { field: "physicalFlow.transport", displayName: "Transport", cellFilter: "toDisplayName:\"TransportKind\"" },
-    frequency: { field: "physicalFlow.frequency", displayName: "Frequency", cellFilter: "toDisplayName:\"frequencyKind\"" },
-    criticality: { field: "physicalFlow.criticality", displayName: "Criticality", cellFilter: "toDisplayName:\"physicalFlowCriticality\"" },
-    description: { field: "specification.description", displayName: "Description"},
+    name: mkLinkGridCell("Name", "specification.name", "physicalFlow.id", "main.physical-flow.view"),
+    extId: {field: "physicalFlow.externalId", displayName: "Ext. Id"},
+    format: {field: "specification.format", displayName: "Format", cellFilter: "toDisplayName:\"DataFormatKind\""},
+    transport: {
+        field: "physicalFlow.transport",
+        displayName: "Transport",
+        cellFilter: "toDisplayName:\"TransportKind\""
+    },
+    frequency: {field: "physicalFlow.frequency", displayName: "Frequency", cellFilter: "toDisplayName:\"Frequency\""},
+    criticality: {
+        field: "physicalFlow.criticality",
+        displayName: "Criticality",
+        cellFilter: "toDisplayName:\"physicalFlowCriticality\""
+    },
+    description: {field: "specification.description", displayName: "Description"},
     source: mkEntityLinkGridCell("Source", "logicalFlow.source"),
     target: mkEntityLinkGridCell("Target", "logicalFlow.target"),
-    basisOffset: { field: "physicalFlow.basisOffset", displayName: "Basis", cellFilter: "toBasisOffset" }
+    basisOffset: {field: "physicalFlow.basisOffset", displayName: "Basis", cellFilter: "toBasisOffset"}
 };
 
 
