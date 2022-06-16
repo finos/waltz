@@ -39,8 +39,6 @@
 
 
 <style>
-
-
     ul {
         padding: 0.1em 0 0 0;
         margin: 0 0 0 0;

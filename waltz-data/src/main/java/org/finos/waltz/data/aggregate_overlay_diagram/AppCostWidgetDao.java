@@ -15,8 +15,10 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static java.util.Collections.emptySet;
@@ -62,13 +64,15 @@ public class AppCostWidgetDao {
     public Set<CostWidgetDatum> findWidgetData(long diagramId,
                                                Set<Long> costKindIds,
                                                long allocationSchemeId,
-                                               Select<Record1<Long>> inScopeApplicationSelector) {
+                                               Select<Record1<Long>> inScopeApplicationSelector,
+                                               Optional<LocalDate> targetStateDate) {
 
         Map<String, Set<Long>> cellExtIdsToBackingEntities = loadCellExtIdToAggregatedEntities(
                 dsl,
                 diagramId,
                 EntityKind.APPLICATION,
-                inScopeApplicationSelector);
+                inScopeApplicationSelector,
+                targetStateDate);
 
         Set<MeasurableCostEntry> costData = fetchCostData(
                 dsl,

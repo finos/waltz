@@ -65,8 +65,8 @@ Provisional dates for upcoming releases:
 
 Release | Date 
 --- | --- 
-1.41 | 17th May 
 1.42 | 14th June 
+1.42.1 | 28th June
 1.43 | 26th July 
 1.44 | 6th September
 1.45 | 18th October 

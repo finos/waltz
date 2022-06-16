@@ -7,30 +7,31 @@
 
     export let scheme;
     export let isMultiSelect = true;
+    export let selectedRatings = [];
 
     const dispatch = createEventDispatcher();
 
-    let selectedItems = [];
 
     function onSelect(item) {
         if (isMultiSelect) {
-            const existing = selectedItems.indexOf(item) > -1;
+            const existing = _.find(selectedRatings, d => d.id === item.id);
 
             if (existing) {
-                selectedItems = _.without(selectedItems, item);
+                selectedRatings = _.reject(selectedRatings, d => d.id === item.id);
             } else {
-                selectedItems = _.concat(selectedItems, [item])
+                selectedRatings = _.concat(selectedRatings, [item]);
             }
         } else {
-            selectedItems = [item];
+            selectedRatings = [item];
         }
-        dispatch("select", selectedItems);
+        dispatch("select", selectedRatings);
     }
 
     $: items = _
         .chain(scheme?.ratings)
         .orderBy([d => d.position, d => d.name])
         .value();
+
 </script>
 
 
@@ -48,12 +49,12 @@
     <tbody>
     {#each items as item}
         <tr class="clickable"
-            class:selected={selectedItems.indexOf(item) > -1}
+            class:selected={_.find(selectedRatings, d => d.id === item.id)}
             on:click={() => onSelect(item)}>
             <td>
                 {#if isMultiSelect}
                     <Icon size="2x"
-                          name={selectedItems.indexOf(item) > -1
+                          name={_.find(selectedRatings, d => d.id === item.id)
                             ? 'check-square-o'
                             : 'square-o'}/>
                 {/if}

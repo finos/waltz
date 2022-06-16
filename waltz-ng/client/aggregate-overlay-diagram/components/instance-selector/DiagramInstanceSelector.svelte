@@ -51,16 +51,27 @@
                 </button>
             {/if}
         </p>
-        <ul>
+
+        <table class="table table-condensed table-hover">
+            <colgroup>
+                <col width="40%"/>
+                <col width="60%"/>
+            </colgroup>
+            <tbody>
             {#each $instances as instance}
-                <li>
-                    <EntityLink ref={instance}/>
-                    <span class="text-muted">
+                <tr>
+                    <td>
+                        <EntityLink ref={instance}/>
+                    </td>
+                    <td>
+                        <span class="text-muted">
                         <LastEdited entity={instance}/>
                     </span>
-                </li>
+                    </td>
+                </tr>
             {/each}
-        </ul>
+            </tbody>
+        </table>
     {:else}
         <p>There are no instances of this diagram at this vantage point
             {#if hasEditPermissions}
@@ -77,16 +88,3 @@
     <InstanceCreatePanel {primaryEntityRef}
                          on:cancel={() => activeMode = Modes.VIEW}/>
 {/if}
-
-<style>
-    ul {
-        padding: 0.2em 0 0 0;
-        margin: 0 0 0 0;
-        list-style: none;
-    }
-
-    li {
-        padding-top: 0.2em;
-    }
-
-</style>
