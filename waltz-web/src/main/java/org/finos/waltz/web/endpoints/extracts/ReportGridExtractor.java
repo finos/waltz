@@ -149,11 +149,15 @@ public class ReportGridExtractor implements DataExtractor {
                 .definition()
                 .columnDefinitions()
                 .stream()
-                .map(cd -> tuple(cd, cd.columnEntityKind().equals(EntityKind.SURVEY_QUESTION) && colsNeedingComments.contains(cd.columnEntityId())))
+                .map(cd -> tuple(cd, columnHasComment(cd,colsNeedingComments)))
                 .sorted(Comparator.comparingLong(r -> r.v1.position()))
                 .collect(toList());
     }
 
+    private static boolean columnHasComment(ReportGridColumnDefinition cd, Set<Long> colsNeedingComments ){
+       return cd.columnEntityKind().equals(EntityKind.SURVEY_QUESTION) &&
+               colsNeedingComments.contains(cd.columnEntityId());
+    }
 
     private String mkReportName(ReportGridDefinition gridDefinition, IdSelectionOptions selectionOptions) {
         return format("%s_%s_%s",
@@ -217,7 +221,8 @@ public class ReportGridExtractor implements DataExtractor {
 
                                     reportRow.add(getValueFromReportCell(ratingsById, cell));
                                     if (needsComment) {
-                                        reportRow.add(getCommentFromCell(cell));
+                                        // TODO: reinstante this line reportRow.add(getCommentFromCell(cell));
+                                        reportRow.add("I am a comment");
                                     }
                                 }
                             });

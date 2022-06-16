@@ -79,15 +79,27 @@ public class DynamicJSONFormatter implements DynamicFormatter {
             List<Cell> transformedRowValues = new ArrayList<>();
 
             transformedRow.id(createKeyElement(currentRow.v1.entityReference()));
-
-            for (int idx = 0; idx < columnDefinitions.size(); idx++) {
+            List<String> columnHeadings = formatterUtils.mkColumnHeaders(columnDefinitions);
+            int maxColumns = columnHeadings.size();
+            for (int idx = 0; idx < maxColumns; idx++) {
                 Tuple2<ReportGridColumnDefinition, Boolean> columnDef = columnDefinitions.get(idx);
+                String formattedColumnName = formatterUtils.getShortColumnName(columnHeadings.get(idx));
+                if(formattedColumnName.contains("comment")){
+                    LOG.info("Found a comment");
+                }
                 if (currentRow.v2.get(idx) != null) {
-                    Cell cell = ImmutableCellValue.builder()
-                            .name(coalesceColumnName(columnDef.v1.columnName(), columnDef.v1.displayName()))
+                    ImmutableCellValue cell = ImmutableCellValue.builder()
+                            .name(formattedColumnName)
                             .value(currentRow.v2.get(idx).toString())
                             .build();
-                    transformedRowValues.add(cell);
+                    // TODO:  extract comment from row
+                    if (idx%3==0) {
+                        ImmutableCellValue withComment = ImmutableCellValue.copyOf(cell)
+                                .withComment("a comment");
+                        transformedRowValues.add(withComment);
+                    }else{
+                        transformedRowValues.add(cell);
+                    }
                 }
             }
             transformedRow.addAllCells(transformedRowValues);
@@ -99,6 +111,10 @@ public class DynamicJSONFormatter implements DynamicFormatter {
                 .build();
     }
 
+
+    private String format(Object o){
+        return "";
+    }
 
     private KeyCell createKeyElement(EntityReference keyAttrib ){
         return ImmutableKeyCell.builder()

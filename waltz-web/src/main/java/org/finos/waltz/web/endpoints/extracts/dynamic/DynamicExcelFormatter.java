@@ -21,18 +21,17 @@ import org.supercsv.prefs.CsvPreference;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static java.lang.String.format;
+
 import static org.finos.waltz.common.ListUtilities.*;
 import static org.finos.waltz.common.StringUtilities.length;
 import static org.finos.waltz.common.StringUtilities.limit;
-import static org.jooq.lambda.fi.util.function.CheckedConsumer.unchecked;
+
 
 @Component
 public class DynamicExcelFormatter implements DynamicFormatter {

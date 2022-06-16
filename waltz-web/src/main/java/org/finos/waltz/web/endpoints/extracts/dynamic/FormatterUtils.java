@@ -6,10 +6,7 @@ import org.finos.waltz.model.report_grid.ReportGridColumnDefinition;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.stereotype.Component;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -27,8 +24,18 @@ public class FormatterUtils {
                 "Subject Name",
                 "Subject External Id",
                 "Subject Lifecycle Phase");
+        List<String> columnHeaders = mkColumnHeaders(columnDefinitions);
+        return concat(
+                staticHeaders,
+                columnHeaders);
+    }
 
-        List<String> columnHeaders = columnDefinitions
+
+    public List<String> mkColumnHeaders(List<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions){
+        if(columnDefinitions==null){
+            return new ArrayList<>();
+        }
+        return columnDefinitions
                 .stream()
                 .sorted(Comparator.comparingLong(r -> r.v1.position()))
                 .flatMap(r -> {
@@ -43,14 +50,9 @@ public class FormatterUtils {
                 })
                 .filter(Objects::nonNull)
                 .collect(toList());
-
-        return concat(
-                staticHeaders,
-                columnHeaders);
     }
 
-
-    private String getColumnName(ReportGridColumnDefinition column) {
+    public String getColumnName(ReportGridColumnDefinition column) {
         if (column.displayName() != null) {
             return column.displayName();
         } else {
@@ -64,5 +66,17 @@ public class FormatterUtils {
                     .filter(Objects::nonNull)
                     .collect(Collectors.joining(" / "));
         }
+    }
+
+    /**
+     * Column names are composed of A / B     Eg King / Change Initiative.  For the JSON
+     * representation we only part 'A'
+     */
+    public String getShortColumnName(String composedColumnName) {
+        if(composedColumnName!=null){
+            String[] components = composedColumnName.split("/");
+            return components[0].trim();
+        }
+        return "";
     }
 }
