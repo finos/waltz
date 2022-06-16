@@ -3,6 +3,7 @@ import Sidebar from "./Sidebar.svelte";
 import {sidebarExpanded, sidebarVisible} from "./sidebar-store";
 import Toasts from "../notification/components/toaster/Toasts.svelte";
 import ToastStore from "../svelte-stores/toast-store"
+import Popover from "../common/svelte/popover/Popover.svelte";
 import {isIE} from "../common/browser-utils";
 
 function controller($scope, $timeout, settingsService, $rootScope) {
@@ -10,6 +11,7 @@ function controller($scope, $timeout, settingsService, $rootScope) {
 
     vm.Sidebar = Sidebar;
     vm.Toasts = Toasts;
+    vm.Popover = Popover;
 
     const unsubExpand = sidebarExpanded.subscribe((d) => {
         $scope.$applyAsync(() => vm.isExpanded = d);

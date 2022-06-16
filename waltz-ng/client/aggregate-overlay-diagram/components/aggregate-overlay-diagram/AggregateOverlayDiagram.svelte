@@ -5,6 +5,10 @@
     import {select, selectAll} from "d3-selection";
     import Callout from "./callout/Callout.svelte";
     import {hoveredCallout} from "../../aggregate-overlay-diagram-store";
+    import Popover from "../../../svelte-stores/popover-store";
+
+    const selectedOverlayCell = getContext("selectedOverlay");
+
 
     export let svg = "";
 
@@ -138,8 +142,27 @@
 
         selectAll('.data-cell').classed("inset", false);
         selectAll('.entity-group-box').classed("inset", false);
+
         if ($selectedOverlay) {
+
             select(`[data-cell-id=${$selectedOverlay.cellId}]`).classed("inset", true);
+
+            const component = $widget.overlay;
+
+            const cell = svgHolderElem.querySelector(`[data-cell-id=${$selectedOverlay.cellId}]`);
+            const cellName = cell.getAttribute("data-cell-name");
+            const elem = cell.querySelector(".content");
+
+            if (elem) {
+
+                const popover = {
+                    title: cellName,
+                    props: $selectedOverlayCell?.props,
+                    component
+                }
+
+                Popover.add(popover);
+            }
         }
     }
 

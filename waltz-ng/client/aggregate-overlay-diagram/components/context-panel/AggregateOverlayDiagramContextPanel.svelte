@@ -2,15 +2,16 @@
     import {getContext} from "svelte";
     import DescriptionFade from "../../../common/svelte/DescriptionFade.svelte";
     import DiagramInstanceSelector from "../instance-selector/DiagramInstanceSelector.svelte";
-    import SelectedOverlayPanel from "./SelectedOverlayPanel.svelte";
     import CustomiseOverlayPanel from "./CustomiseOverlayPanel.svelte";
     import html2canvas from "html2canvas";
     import Icon from "../../../common/svelte/Icon.svelte";
+
 
     export let primaryEntityRef;
 
     let selectedInstance = getContext("selectedInstance");
     let selectedDiagram = getContext("selectedDiagram");
+    let focusWidget = getContext("focusWidget");
 
     let selectedTab = 'widgets';
     let generatingDiagram = false;
@@ -90,9 +91,11 @@
             <h4>{$selectedDiagram.name}</h4>
             <DescriptionFade text={$selectedDiagram.description}/>
 
-            <hr>
 
-            <SelectedOverlayPanel/>
+            {#if $focusWidget?.legend}
+                <hr>
+                <svelte:component this={$focusWidget.legend}/>
+            {/if}
 
             <hr>
 
