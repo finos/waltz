@@ -2,11 +2,9 @@
     import {getContext} from "svelte";
     import DescriptionFade from "../../../common/svelte/DescriptionFade.svelte";
     import DiagramInstanceSelector from "../instance-selector/DiagramInstanceSelector.svelte";
-    import SelectedOverlayPanel from "./SelectedOverlayPanel.svelte";
     import CustomiseOverlayPanel from "./CustomiseOverlayPanel.svelte";
     import html2canvas from "html2canvas";
     import Icon from "../../../common/svelte/Icon.svelte";
-    import Popover from "../../../svelte-stores/popover-store";
 
 
     export let primaryEntityRef;

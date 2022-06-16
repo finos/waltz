@@ -142,6 +142,7 @@
 
         selectAll('.data-cell').classed("inset", false);
         selectAll('.entity-group-box').classed("inset", false);
+
         if ($selectedOverlay) {
 
             select(`[data-cell-id=${$selectedOverlay.cellId}]`).classed("inset", true);
