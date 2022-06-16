@@ -5,9 +5,11 @@
     import {getContext} from "svelte";
     import LastEdited from "../../../common/svelte/LastEdited.svelte";
     import DescriptionFade from "../../../common/svelte/DescriptionFade.svelte";
+    import ImageDownloadLink from "../../../common/svelte/ImageDownloadLink.svelte";
 
     let selectedInstance = getContext("selectedInstance");
     let selectedDiagram = getContext("selectedDiagram");
+    let svgDetail = getContext("svgDetail");
 
 </script>
 
@@ -48,4 +50,10 @@
 </div>
 <div>
     <CalloutList/>
+</div>
+<div>
+    <hr>
+    <ImageDownloadLink styling="link"
+                       element={$svgDetail}
+                       filename={`${$selectedInstance?.name}-image.png`}/>
 </div>

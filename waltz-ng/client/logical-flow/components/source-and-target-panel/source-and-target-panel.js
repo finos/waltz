@@ -32,7 +32,7 @@ import template from "./source-and-target-panel.html";
 import {sameRef} from "../../../common/entity-utils";
 import {appLogicalFlowFilterExcludedTagIdsKey} from "../../../user";
 import {loadFlowClassificationRatings} from "../../../flow-classification-rule/flow-classification-utils";
-
+import ImageDownloadLink from "../../../common/svelte/ImageDownloadLink.svelte";
 
 const bindings = {
     entityRef: "<",
@@ -64,7 +64,9 @@ const initialState = {
         tagFilterApplied: false
     },
     tags: [],
-    flowClassificationsByCode: []
+    flowClassificationsByCode: [],
+    ImageDownloadLink,
+    diagramElem: null
 };
 
 
@@ -225,6 +227,8 @@ function controller($element,
         serviceBroker
             .loadViewData(CORE_API.DataTypeStore.findAll)
             .then(r => vm.dataTypes = _.keyBy(r.data, dt => dt.id));
+
+        vm.diagramElem = _.head($element.find("waltz-source-and-target-graph"));
     };
 
     vm.$onChanges = (changes) => {

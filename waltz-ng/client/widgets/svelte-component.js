@@ -25,8 +25,8 @@ const directive = function() {
             const props = _
                 .chain(attrs)
                 .map((p, k) => ({p, k}))
-                .reject(d => d.k.indexOf("$") === 0)
-                .map(d => Object.assign(d, {v: _.get(scope, d.p)}))
+                .reject(d => d.k.startsWith("$"))
+                .map(d => Object.assign(d, {v: _.get(scope, d.p, d.p)})) // fall back to d.p, as may be a literal value
                 .reduce(
                     (acc, d) => {
                         acc[d.k] = d.v;

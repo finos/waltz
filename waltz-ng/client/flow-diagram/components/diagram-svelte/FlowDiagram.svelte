@@ -11,9 +11,9 @@
     import {diagramTransform, positions} from "./store/layout";
     import overlay from "./store/overlay";
     import {diagram} from "./store/diagram";
-    import dirty from "./store/dirty";
     import NoData from "../../../common/svelte/NoData.svelte";
     import _ from "lodash";
+    import ImageDownloadLink from "../../../common/svelte/ImageDownloadLink.svelte";
 
 
     let elem;
@@ -124,6 +124,9 @@
                        groups={$overlay.groupOverlays[$overlay.selectedGroup?.id] || []}/>
         </g>
     </svg>
+    <ImageDownloadLink styling="link"
+                       element={elem?.parentElement}
+                       filename={`${$diagram.name}-diagram.png`}/>
 </div>
 <div class="col-md-4 context-menu">
     <ContextPanel diagramId={$diagram.id}/>

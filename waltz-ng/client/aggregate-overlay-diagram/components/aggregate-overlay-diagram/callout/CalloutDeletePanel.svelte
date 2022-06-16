@@ -15,11 +15,6 @@
     let calloutsCall;
 
 
-    function clearCallout(svgHolderElem) {
-        const targetCell = svgHolderElem.querySelector(`[data-cell-id='${$selectedCellCallout.cellExternalId}'] .outer .content`);
-        targetCell.parentNode.removeChild(targetCell);
-    }
-
     function deleteCallout() {
         let deletePromise = aggregateOverlayDiagramCalloutStore.remove($selectedCellCallout.id);
         Promise.resolve(deletePromise)
@@ -27,7 +22,6 @@
                 toasts.success("Successfully removed callout");
                 calloutsCall = aggregateOverlayDiagramCalloutStore.findCalloutsByDiagramInstanceId($selectedInstance.id, true);
                 $callouts = $calloutsCall?.data;
-                clearCallout($svgDetail);
                 cancel();
             })
             .catch(e => displayError("Failed to remove callout", e))
