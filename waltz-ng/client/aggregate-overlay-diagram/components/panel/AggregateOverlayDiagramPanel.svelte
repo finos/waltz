@@ -15,6 +15,8 @@
     import Icon from "../../../common/svelte/Icon.svelte";
     import {measurableRelationshipStore} from "../../../svelte-stores/measurable-relationship-store";
     import {settingsStore} from "../../../svelte-stores/settings-store";
+    import namedSettings from "../../../system/named-settings";
+
 
     export let primaryEntityRef;
 
@@ -95,7 +97,7 @@
 
     $: disabledWidgetsSetting = _.find(
         $settingsCall?.data,
-        d => d.name === "feature.overlay-diagrams.disabled-widget-keys");
+        d => d.name === namedSettings.overlayDiagramWidgetsDisabled);
 
     $: $disabledWidgetKeys = _.isNull(disabledWidgetsSetting)
         ? []

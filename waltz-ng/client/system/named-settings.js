@@ -27,5 +27,6 @@ export default {
     currentYearText: "settings.asset-cost.current-year-text",
     avatarTemplateUrl: "ui.avatar.template.url",
     costExportEnabled: "feature.data-extractor.entity-cost.enabled",
-    measurableRatingRoadmapsEnabled: "feature.measurable-rating-roadmaps.enabled"
+    measurableRatingRoadmapsEnabled: "feature.measurable-rating-roadmaps.enabled",
+    overlayDiagramWidgetsDisabled: "feature.overlay-diagrams.disabled-widget-keys"
 };
