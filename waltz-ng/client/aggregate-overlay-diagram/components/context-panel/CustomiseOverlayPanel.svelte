@@ -14,7 +14,7 @@
 
     const diagramPresets = getContext("diagramPresets");
     const filterParameters = getContext("filterParameters");
-
+    const focusWidget = getContext("focusWidget");
     const selectionOptions = getContext("selectionOptions");
 
     const Modes = {
@@ -60,6 +60,8 @@
     <div>
         <br>
         <button class="btn btn-skinny"
+                title={_.isNull($focusWidget) ? "You must select an overlay to save a preset" : ""}
+                disabled={_.isNull($focusWidget)}
                 on:click={() => activeMode = Modes.CREATE_PRESET}>
             <Icon name="save"/>
             Save as preset
