@@ -4,15 +4,16 @@
     import CreatePresetPanel from "../aggregate-overlay-diagram/presets/CreatePresetPanel.svelte";
     import PresetSelector from "../aggregate-overlay-diagram/presets/PresetSelector.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
-    import FilterSelectorPanel from "../filter-selector/FilterSelectorPanel.svelte";
     import {mkSelectionOptions} from "../../../common/selector-utils";
     import {getContext} from "svelte";
     import _ from "lodash";
     import NoData from "../../../common/svelte/NoData.svelte";
+    import FilterPanel from "../filter-selector/FilterPanel.svelte";
 
     export let primaryEntityRef;
 
     const diagramPresets = getContext("diagramPresets");
+    const filterParameters = getContext("filterParameters");
 
     const selectionOptions = getContext("selectionOptions");
 
@@ -55,7 +56,7 @@
     {/if}
     <WidgetSelector {primaryEntityRef}/>
     <hr>
-    <FilterSelectorPanel/>
+    <FilterPanel existingFilters={!_.isEmpty($filterParameters)}/>
     <div>
         <br>
         <button class="btn btn-skinny"

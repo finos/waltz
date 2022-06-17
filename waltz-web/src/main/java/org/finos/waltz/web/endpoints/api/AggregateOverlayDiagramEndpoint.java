@@ -50,6 +50,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.web.WebUtilities.getId;
 import static org.finos.waltz.web.WebUtilities.getUsername;
 import static org.finos.waltz.web.WebUtilities.mkPath;
@@ -108,7 +109,7 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
                     .findAppCountWidgetData(
                             getId(request),
                             widgetInfo.idSelectionOptions(),
-                            widgetInfo.assessmentBasedSelectionFilter(),
+                            widgetInfo.assessmentBasedSelectionFilters(),
                             widgetInfo.overlayParameters());
         };
 
@@ -121,7 +122,7 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
                     .findTargetAppCostWidgetData(
                             getId(request),
                             widgetParameters.idSelectionOptions(),
-                            widgetParameters.assessmentBasedSelectionFilter(),
+                            widgetParameters.assessmentBasedSelectionFilters(),
                             widgetParameters.overlayParameters())
                     ;
         };
@@ -133,7 +134,7 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
             return aggregateOverlayDiagramService
                     .findAppCostWidgetData(
                             getId(request),
-                            appCostWidgetParameters.assessmentBasedSelectionFilter(),
+                            appCostWidgetParameters.assessmentBasedSelectionFilters(),
                             appCostWidgetParameters.idSelectionOptions(),
                             appCostWidgetParameters.overlayParameters());
         };
@@ -146,7 +147,7 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
             return aggregateOverlayDiagramService
                     .findAppAssessmentWidgetData(
                             diagramId,
-                            widgetParameters.assessmentBasedSelectionFilter(),
+                            widgetParameters.assessmentBasedSelectionFilters(),
                             widgetParameters.idSelectionOptions(),
                             widgetParameters.overlayParameters());
         };
@@ -158,7 +159,7 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
             return aggregateOverlayDiagramService
                     .findAggregatedEntitiesWidgetData(
                             getId(request),
-                            widgetParameters.assessmentBasedSelectionFilter(),
+                            widgetParameters.assessmentBasedSelectionFilters(),
                             widgetParameters.idSelectionOptions());
         };
 

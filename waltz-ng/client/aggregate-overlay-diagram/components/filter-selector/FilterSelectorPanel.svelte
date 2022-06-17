@@ -1,15 +1,27 @@
 <script>
 
     import AssessmentRatingPicker from "../../../common/svelte/AssessmentRatingPicker.svelte";
-    import {getContext} from "svelte";
+    import {createEventDispatcher, getContext} from "svelte";
     import _ from "lodash";
     import Icon from "../../../common/svelte/Icon.svelte";
 
     const filterParameters = getContext("filterParameters");
+    const selectedFilter = getContext("selectedFilter");
     const selectedDiagram = getContext("selectedDiagram");
 
+    const dispatch = createEventDispatcher();
+
     function selectRatings(evt) {
-        $filterParameters = evt.detail;
+
+        const filter = evt.detail;
+
+        const existingFilterForDefn = _.find(
+            $filterParameters,
+            d => d.assessmentDefinition.id === filter.assessmentDefinition.id)
+
+        const withoutExisting = _.without($filterParameters, existingFilterForDefn);
+
+        $filterParameters = _.concat(withoutExisting, [filter]);
     }
 
     $: ratings = _
@@ -22,20 +34,27 @@
         return d.entityKind === $selectedDiagram.aggregatedEntityKind;
     }
 
+    function cancel() {
+        dispatch("cancel");
+    }
+
 </script>
 
-<h4>
-    <Icon name="filter"/>
-    Filters
-</h4>
+
 <AssessmentRatingPicker on:select={selectRatings}
                         definitionFilter={definitionFilter}
-                        selectedDefinition={$filterParameters?.assessmentDefinition}
-                        selectedRatings={$filterParameters?.ratingSchemeItems}/>
-{#if $filterParameters}
+                        selectedDefinition={$selectedFilter?.assessmentDefinition}
+                        selectedRatings={$selectedFilter?.ratingSchemeItems}/>
+{#if !_.isEmpty($selectedFilter)}
     <button class="btn btn-skinny"
-            on:click={() => $filterParameters = null}>
+            on:click={() => $filterParameters = _.without($filterParameters, $selectedFilter)}>
         <Icon name="ban"/>
-        Clear filters
+        Clear filter
+    </button>
+{/if}
+{#if !_.isEmpty($filterParameters)}
+    <button class="btn btn-skinny"
+            on:click={() => cancel()}>
+        Close
     </button>
 {/if}
