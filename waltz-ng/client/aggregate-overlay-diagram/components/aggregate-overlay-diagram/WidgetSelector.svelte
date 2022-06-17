@@ -3,6 +3,7 @@
     import {getContext} from "svelte";
     import _ from "lodash";
     import {widgets} from "./aggregate-overlay-diagram-utils";
+    import {settingsStore} from "../../../svelte-stores/settings-store";
 
     let displayedWidgets;
 
@@ -12,10 +13,18 @@
     const filterParameters = getContext("filterParameters");
     const widgetParameters = getContext("widgetParameters");
     const diagramPresets = getContext("diagramPresets");
+    const disabledWidgetKeys = getContext("disabledWidgetKeys");
+
+    let settingsCall = settingsStore.loadAll();
+    let disabledWidgetsSetting;
 
     $: displayedWidgets = _.filter(
         widgets,
-        d => _.includes(d.aggregatedEntityKinds, $selectedDiagram.aggregatedEntityKind));
+        d => {
+            const allowedKindForParentEntity = _.includes(d.aggregatedEntityKinds, $selectedDiagram.aggregatedEntityKind);
+            const notDisabled = !_.some($disabledWidgetKeys, k => k === d.key);
+            return allowedKindForParentEntity && notDisabled;
+        });
 
     function onCancel() {
         $focusWidget = null;

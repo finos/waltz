@@ -142,6 +142,7 @@ export function setupContextStores() {
     const diagramPresets = writable([]);
     const selectedPreset = writable(null);
     const loading = writable(false);
+    const disabledWidgetKeys = writable([]);
 
 
     //anything passed up to endpoint
@@ -208,6 +209,7 @@ export function setupContextStores() {
     setContext("diagramPresets", diagramPresets);
     setContext("selectedPreset", selectedPreset);
     setContext("loading", loading);
+    setContext("disabledWidgetKeys", disabledWidgetKeys);
 
     return {
         selectedDiagram,
