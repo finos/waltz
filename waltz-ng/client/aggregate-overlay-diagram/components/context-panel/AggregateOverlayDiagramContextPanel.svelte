@@ -3,11 +3,12 @@
     import DescriptionFade from "../../../common/svelte/DescriptionFade.svelte";
     import DiagramInstanceSelector from "../instance-selector/DiagramInstanceSelector.svelte";
     import CustomiseOverlayPanel from "./CustomiseOverlayPanel.svelte";
-    import html2canvas from "html2canvas";
-    import Icon from "../../../common/svelte/Icon.svelte";
+    import ImageDownloadLink from "../../../common/svelte/ImageDownloadLink.svelte";
 
 
     export let primaryEntityRef;
+
+    const svgDetail = getContext("svgDetail");
 
     let selectedInstance = getContext("selectedInstance");
     let selectedDiagram = getContext("selectedDiagram");
@@ -16,37 +17,9 @@
     let selectedTab = 'widgets';
     let generatingDiagram = false;
 
+
     function selectInstance(evt) {
         $selectedInstance = evt.detail;
-    }
-
-    function exportDiagram() {
-
-        const element = document.querySelector("#diagram-capture");
-
-        if (element) {
-
-            generatingDiagram = true;
-            //Using a timeout so browser has chance to display the progress icon
-            setTimeout(() => {
-                    return html2canvas(element)
-                        .then(canvas => {
-                            document.body.appendChild(canvas);
-                            return canvas;
-                        })
-                        .then(canvas => {
-                            const image = canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
-                            const a = document.createElement('a');
-                            a.setAttribute('download', `${$selectedDiagram.name}-image.png`);
-                            a.setAttribute('href', image);
-                            a.click();
-                            canvas.remove();
-                        })
-                        .then(() => generatingDiagram = false);
-                },
-                0);
-
-        }
     }
 
 </script>
@@ -99,19 +72,9 @@
 
             <hr>
 
-            <button class="btn btn-link"
-                    on:click={() => exportDiagram()}
-                    disabled={generatingDiagram}>
-                {#if generatingDiagram}
-                    <Icon fixedWidth="true"
-                          name="refresh"
-                          spin="true"/>
-                {:else}
-                    <Icon fixedWidth="true"
-                          name="cloud-download"/>
-                {/if}
-                Export diagram
-            </button>
+            <ImageDownloadLink styling="link"
+                               element={$svgDetail}
+                               filename={`${$selectedDiagram.name}-image.png`}/>
 
 
         {:else if selectedTab === 'instances'}
