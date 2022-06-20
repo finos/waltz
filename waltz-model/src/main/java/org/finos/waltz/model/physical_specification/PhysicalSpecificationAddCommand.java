@@ -37,5 +37,6 @@ public abstract class PhysicalSpecificationAddCommand implements
         DescriptionProvider {
 
     public abstract EntityReference owningEntity();
-    public abstract DataFormatKind format();
+
+    public abstract DataFormatKindValue format();
 }

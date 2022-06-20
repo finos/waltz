@@ -18,6 +18,8 @@
 
 package org.finos.waltz.web.endpoints.extracts;
 
+import org.finos.waltz.model.enum_value.EnumValueKind;
+import org.finos.waltz.schema.tables.EnumValue;
 import org.finos.waltz.schema.tables.PhysicalFlow;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.data.InlineSelectFieldFactory;
@@ -213,6 +215,11 @@ public class PhysicalFlowExtractor extends CustomDataExtractor {
 
 
     private SelectConditionStep<Record> getQuery(Condition condition) {
+        EnumValue criticalityValue = ENUM_VALUE.as("criticality_value");
+        EnumValue transportValue = ENUM_VALUE.as("transport_value");
+        EnumValue frequencyValue = ENUM_VALUE.as("frequency_value");
+        EnumValue dataFormatKindValue = ENUM_VALUE.as("data_format_kind_value");
+
         return dsl
                 .select(
                         PHYSICAL_FLOW.ID,
@@ -220,16 +227,24 @@ public class PhysicalFlowExtractor extends CustomDataExtractor {
                         PHYSICAL_FLOW.EXTERNAL_ID.as("External Id"))
                 .select(SOURCE_AND_TARGET_NAME_AND_ASSET_CODE)
                 .select(
-                        PHYSICAL_SPECIFICATION.FORMAT.as("Format"),
-                        PHYSICAL_FLOW.TRANSPORT.as("Transport"),
-                        PHYSICAL_FLOW.FREQUENCY.as("Frequency"),
-                        PHYSICAL_FLOW.CRITICALITY.as("Criticality"),
-                        PHYSICAL_SPECIFICATION.DESCRIPTION.as("Description")
-                ).from(PHYSICAL_SPECIFICATION)
-                .join(PHYSICAL_FLOW)
+                        dataFormatKindValue.DISPLAY_NAME.as("Format"),
+                        transportValue.DISPLAY_NAME.as("Transport"),
+                        frequencyValue.DISPLAY_NAME.as("Frequency"),
+                        criticalityValue.DISPLAY_NAME.as("Criticality"),
+                        PHYSICAL_SPECIFICATION.DESCRIPTION.as("Description"))
+                .from(PHYSICAL_SPECIFICATION)
+                .innerJoin(PHYSICAL_FLOW)
                 .on(PHYSICAL_FLOW.SPECIFICATION_ID.eq(PHYSICAL_SPECIFICATION.ID))
-                .join(LOGICAL_FLOW)
+                .innerJoin(LOGICAL_FLOW)
                 .on(LOGICAL_FLOW.ID.eq(PHYSICAL_FLOW.LOGICAL_FLOW_ID))
+                .leftJoin(criticalityValue).on(PHYSICAL_FLOW.CRITICALITY.eq(criticalityValue.KEY)
+                        .and(criticalityValue.TYPE.eq(EnumValueKind.PHYSICAL_FLOW_CRITICALITY.dbValue())))
+                .leftJoin(transportValue).on(PHYSICAL_FLOW.TRANSPORT.eq(transportValue.KEY)
+                        .and(transportValue.TYPE.eq(EnumValueKind.TRANSPORT_KIND.dbValue())))
+                .leftJoin(frequencyValue).on(PHYSICAL_FLOW.FREQUENCY.eq(frequencyValue.KEY)
+                        .and(frequencyValue.TYPE.eq(EnumValueKind.FREQUENCY.dbValue())))
+                .leftJoin(dataFormatKindValue).on(PHYSICAL_SPECIFICATION.FORMAT.eq(dataFormatKindValue.KEY)
+                        .and(dataFormatKindValue.TYPE.eq(EnumValueKind.DATA_FORMAT_KIND.dbValue())))
                 .where(condition);
     }
 

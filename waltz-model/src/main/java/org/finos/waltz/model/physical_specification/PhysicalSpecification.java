@@ -45,7 +45,8 @@ public abstract class PhysicalSpecification implements
         WaltzEntity {
 
     public abstract EntityReference owningEntity();
-    public abstract DataFormatKind format();
+
+    public abstract DataFormatKindValue format();
 
     public EntityReference entityReference() {
         return ImmutableEntityReference.builder()

@@ -23,6 +23,11 @@ import org.finos.waltz.common.EnumUtilities;
 
 import java.util.function.Function;
 
+
+/**
+ * Should use CriticalityValue instead
+ */
+@Deprecated
 public enum Criticality {
     LOW,
     MEDIUM,

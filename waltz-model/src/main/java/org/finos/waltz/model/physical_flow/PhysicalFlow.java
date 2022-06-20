@@ -53,7 +53,7 @@ public abstract class PhysicalFlow implements
 
     public abstract long specificationId();
 
-    public abstract FrequencyKind frequency();
+    public abstract FrequencyKindValue frequency();
 
     // e.g. for representing T+0, T+1, T+7, T-1
     public abstract int basisOffset();
@@ -70,7 +70,7 @@ public abstract class PhysicalFlow implements
 
     public abstract Optional<Long> specificationDefinitionId();
 
-    public abstract Criticality criticality();
+    public abstract CriticalityValue criticality();
 
     @Value.Default
     public EntityKind kind() {

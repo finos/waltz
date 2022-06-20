@@ -42,7 +42,8 @@ public class EnumValueService {
 
 
     public List<EnumValue> findAll() {
-        return enumValueDao.findAll();
+        List<EnumValue> all = enumValueDao.findAll();
+        return all;
     }
 
 }

@@ -25,10 +25,7 @@ import org.finos.waltz.model.*;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.model.physical_flow.*;
-import org.finos.waltz.model.physical_specification.DataFormatKind;
-import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
-import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecificationDeleteCommand;
-import org.finos.waltz.model.physical_specification.PhysicalSpecification;
+import org.finos.waltz.model.physical_specification.*;
 import org.finos.waltz.model.physical_specification_definition.ImmutablePhysicalSpecDefinitionChangeCommand;
 import org.finos.waltz.model.physical_specification_definition.PhysicalSpecDefinitionType;
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
@@ -479,8 +476,8 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
 
 
         ImmutableFlowAttributes flowAttrs = ImmutableFlowAttributes.builder()
-                .frequency(FrequencyKind.DAILY)
-                .criticality(Criticality.MEDIUM)
+                .frequency(FrequencyKindValue.of("DAILY"))
+                .criticality(CriticalityValue.of("MEDIUM"))
                 .transport(TransportKindValue.UNKNOWN)
                 .basisOffset(0)
                 .build();
@@ -523,8 +520,8 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
 
 
         ImmutableFlowAttributes flowAttrs = ImmutableFlowAttributes.builder()
-                .frequency(FrequencyKind.DAILY)
-                .criticality(Criticality.MEDIUM)
+                .frequency(FrequencyKindValue.of("DAILY"))
+                .criticality(CriticalityValue.of("MEDIUM"))
                 .transport(TransportKindValue.UNKNOWN)
                 .basisOffset(0)
                 .build();
@@ -561,8 +558,8 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
 
 
         ImmutableFlowAttributes flowAttrs = ImmutableFlowAttributes.builder()
-                .frequency(FrequencyKind.DAILY)
-                .criticality(Criticality.MEDIUM)
+                .frequency(FrequencyKindValue.of("DAILY"))
+                .criticality(CriticalityValue.of("MEDIUM"))
                 .transport(TransportKindValue.UNKNOWN)
                 .basisOffset(0)
                 .build();
@@ -606,15 +603,15 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 .owningEntity(a)
                 .name(specExtId)
                 .description(specExtId)
-                .format(DataFormatKind.UNKNOWN)
+                .format(DataFormatKindValue.UNKNOWN)
                 .lastUpdatedBy(username)
                 .isRemoved(false)
                 .created(UserTimestamp.mkForUser(username, DateTimeUtilities.nowUtcTimestamp()))
                 .build();
 
         ImmutableFlowAttributes flowAttrs = ImmutableFlowAttributes.builder()
-                .frequency(FrequencyKind.DAILY)
-                .criticality(Criticality.MEDIUM)
+                .frequency(FrequencyKindValue.of("DAILY"))
+                .criticality(CriticalityValue.of("MEDIUM"))
                 .transport(TransportKindValue.UNKNOWN)
                 .basisOffset(0)
                 .build();
@@ -658,8 +655,8 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
         assertTrue(specOnceRemoved.isRemoved(), "Specification is only soft deleted prior to reactivation");
 
         ImmutableFlowAttributes flowAttrs = ImmutableFlowAttributes.builder()
-                .frequency(FrequencyKind.DAILY)
-                .criticality(Criticality.MEDIUM)
+                .frequency(FrequencyKindValue.of("DAILY"))
+                .criticality(CriticalityValue.of("MEDIUM"))
                 .transport(TransportKindValue.UNKNOWN)
                 .basisOffset(0)
                 .build();
@@ -695,8 +692,8 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
         PhysicalSpecification spec = psSvc.getById(specId);
 
         ImmutableFlowAttributes flowAttrs = ImmutableFlowAttributes.builder()
-                .frequency(FrequencyKind.DAILY)
-                .criticality(Criticality.MEDIUM)
+                .frequency(FrequencyKindValue.of("DAILY"))
+                .criticality(CriticalityValue.of("MEDIUM"))
                 .transport(TransportKindValue.UNKNOWN)
                 .basisOffset(0)
                 .build();
@@ -863,8 +860,8 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 .transport(TransportKindValue.UNKNOWN)
                 .description("before")
                 .basisOffset(1)
-                .criticality(Criticality.MEDIUM)
-                .frequency(FrequencyKind.DAILY)
+                .frequency(FrequencyKindValue.of("DAILY"))
+                .criticality(CriticalityValue.of("MEDIUM"))
                 .build();
 
         ImmutablePhysicalFlowCreateCommand createCmd = ImmutablePhysicalFlowCreateCommand.builder()
@@ -936,11 +933,11 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
         PhysicalFlow physFlowAfterUpdates = pfSvc.getById(flowResp.entityReference().id());
 
         assertEquals("after", physFlowAfterUpdates.description(), "Description should be updated after updateAttribute");
-        assertEquals(FrequencyKind.MONTHLY, physFlowAfterUpdates.frequency(), "Frequency should be updated after updateAttribute");
+        assertEquals(FrequencyKindValue.of("MONTHLY"), physFlowAfterUpdates.frequency(), "Frequency should be updated after updateAttribute");
         assertEquals(TransportKindValue.of("OTHER"), physFlowAfterUpdates.transport(), "Transport should be updated after updateAttribute");
         assertEquals(0, physFlowAfterUpdates.basisOffset(), "Basis offset should be updated after updateAttribute");
         assertEquals(EntityLifecycleStatus.REMOVED, physFlowAfterUpdates.entityLifecycleStatus(), "EntityLifecycleStatus should be updated after updateAttribute");
-        assertEquals(Criticality.LOW, physFlowAfterUpdates.criticality(), "Criticality should be updated after updateAttribute");
+        assertEquals(CriticalityValue.of("LOW"), physFlowAfterUpdates.criticality(), "Criticality should be updated after updateAttribute");
     }
 
 

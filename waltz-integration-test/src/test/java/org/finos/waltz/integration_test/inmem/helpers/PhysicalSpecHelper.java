@@ -3,7 +3,7 @@ package org.finos.waltz.integration_test.inmem.helpers;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.UserTimestamp;
-import org.finos.waltz.model.physical_specification.DataFormatKind;
+import org.finos.waltz.model.physical_specification.DataFormatKindValue;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecificationDeleteCommand;
 import org.finos.waltz.service.physical_specification.PhysicalSpecificationService;
@@ -30,7 +30,7 @@ public class PhysicalSpecHelper {
                 .owningEntity(owningEntity)
                 .name(specName)
                 .description(name)
-                .format(DataFormatKind.UNKNOWN)
+                .format(DataFormatKindValue.UNKNOWN)
                 .lastUpdatedBy(user)
                 .isRemoved(false)
                 .created(UserTimestamp.mkForUser(user, DateTimeUtilities.nowUtcTimestamp()))

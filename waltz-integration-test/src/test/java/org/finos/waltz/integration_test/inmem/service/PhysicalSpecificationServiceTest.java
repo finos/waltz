@@ -296,7 +296,7 @@ public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTes
                 .owningEntity(a)
                 .name(name)
                 .description("desc")
-                .format(DataFormatKind.UNKNOWN)
+                .format(DataFormatKindValue.UNKNOWN)
                 .lastUpdatedBy(username)
                 .isRemoved(false)
                 .created(UserTimestamp.mkForUser(username, DateTimeUtilities.nowUtcTimestamp()))

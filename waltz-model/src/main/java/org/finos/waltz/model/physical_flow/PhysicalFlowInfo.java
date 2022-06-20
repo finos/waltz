@@ -18,6 +18,7 @@ public abstract class PhysicalFlowInfo {
     public abstract EntityReference target();
 
     public abstract EntityReference specification();
+
     public abstract EntityReference logicalFlow();
 
     @Nullable
@@ -27,8 +28,10 @@ public abstract class PhysicalFlowInfo {
     public abstract String physicalFlowDescription();
 
     public abstract TransportKindValue transportKindValue();
-    public abstract FrequencyKind frequencyKind();
-    public abstract Criticality criticality();
+
+    public abstract FrequencyKindValue frequencyKind();
+
+    public abstract CriticalityValue criticality();
 
     public abstract List<EntityReference> dataTypes();
 

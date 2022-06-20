@@ -119,15 +119,3 @@ export function toOptions(items = {}, excludeUnknown = false) {
         .reject(o => o.code === "UNKNOWN" && excludeUnknown)
         .value();
 }
-
-
-/**
- * Used to convert a map of { code->displayName } into
- * a format suitable for use by ui-grid.
- * @param lookups
- */
-export function toGridOptions(lookups = {}) {
-    return _.map(
-        lookups,
-        (v, k) => ({label: v.name, value: k}));
-}

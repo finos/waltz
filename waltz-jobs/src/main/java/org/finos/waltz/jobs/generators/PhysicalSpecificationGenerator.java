@@ -20,7 +20,6 @@ package org.finos.waltz.jobs.generators;
 
 import org.finos.waltz.common.RandomUtilities;
 import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.physical_specification.DataFormatKind;
 import org.finos.waltz.schema.tables.records.PhysicalSpecificationRecord;
 import org.jooq.DSLContext;
 import org.springframework.context.ApplicationContext;
@@ -118,7 +117,7 @@ public class PhysicalSpecificationGenerator implements SampleDataGenerator {
                     PhysicalSpecificationRecord record = dsl.newRecord(PHYSICAL_SPECIFICATION);
                     record.setOwningEntityId(t.v1);
                     record.setOwningEntityKind(EntityKind.APPLICATION.name());
-                    record.setFormat(randomPick(DataFormatKind.values()).name());
+                    record.setFormat(randomPick("XML", "DATABASE", "JSON", "OTHER"));
                     record.setProvenance(SAMPLE_DATA_PROVENANCE);
                     record.setDescription("Desc "+ name + " " + t.v2);
                     record.setName(name);

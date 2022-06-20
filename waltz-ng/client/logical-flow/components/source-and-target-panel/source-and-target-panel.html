@@ -211,13 +211,25 @@
                         </waltz-icon>
                     </td>
                     <td>
-                        <span ng-bind="pf.specification.format"></span>
+                        <waltz-enum-value type="'DataFormatKind'"
+                                          key="pf.specification.format"
+                                          show-icon="false"
+                                          show-popover="false">
+                        </waltz-enum-value>
                     </td>
                     <td>
-                        <span ng-bind="pf.transport"></span>
+                        <waltz-enum-value type="'TransportKind'"
+                                          key="pf.transport"
+                                          show-icon="false"
+                                          show-popover="false">
+                        </waltz-enum-value>
                     </td>
                     <td>
-                        <span ng-bind="pf.frequency"></span>
+                        <waltz-enum-value type="'Frequency'"
+                                          key="pf.frequency"
+                                          show-icon="false"
+                                          show-popover="false">
+                        </waltz-enum-value>
                     </td>
                 </tr>
                 </tbody>
