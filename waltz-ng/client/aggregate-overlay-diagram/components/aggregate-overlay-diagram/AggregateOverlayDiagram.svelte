@@ -124,7 +124,8 @@
 
     $: {
         if (svgHolderElem) {
-            $svgDetail = svgHolderElem.querySelector("svg");
+            // $svgDetail = svgHolderElem.querySelector("svg");
+            $svgDetail = svgHolderElem;
         }
     }
 

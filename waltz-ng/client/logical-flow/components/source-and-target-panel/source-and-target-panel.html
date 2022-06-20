@@ -85,13 +85,20 @@
                 </div>
             </div>
         </div>
-        <div class="pull-right" style="margin-right: 30px; margin-bottom: 4px">
-            <a class="clickable waltz-visibility-child-30"
+        <div class="pull-right waltz-visibility-child-30"
+             style="margin-right: 30px; margin-bottom: 4px">
+            <a class="clickable"
                ng-click="$ctrl.exportLogicalFlowData()">
                 <waltz-icon name="download"></waltz-icon>
                 Export logical flows
             </a>
+            <waltz-svelte-component styling="link"
+                                    filename="flows.png"
+                                    element="$ctrl.diagramElem"
+                                    component="$ctrl.ImageDownloadLink">
+            </waltz-svelte-component>
         </div>
+
     </div>
 
     <!-- POPUP -->

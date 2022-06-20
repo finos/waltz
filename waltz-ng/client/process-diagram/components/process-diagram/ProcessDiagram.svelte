@@ -5,8 +5,9 @@
     import Connections from "./svg-elems/Connections.svelte";
     import {zoom} from "d3-zoom";
     import {event, select} from "d3-selection";
-    import {positions} from "./diagram-store";
+    import {diagramInfo, positions} from "./diagram-store";
     import ProcessDiagramContextPanel from "./context-panels/ProcessDiagramContextPanel.svelte";
+    import ImageDownloadLink from "../../../common/svelte/ImageDownloadLink.svelte";
 
     // pan + zoom
     function zoomed() {
@@ -42,7 +43,9 @@
                 <Objects/>
             </g>
         </svg>
-
+        <ImageDownloadLink styling="link"
+                           element={elem?.parentElement}
+                           filename={`${$diagramInfo?.name}-process-diagram.png`}/>
     </div>
     <div class="col-md-3"
          style="padding-left: 1em">

@@ -59,6 +59,10 @@ const cells = {
         "name": "Lending",
         "id": "LENDING"
     },
+    "LENDING_H": {
+        "name": "Lending",
+        "id": "LENDING-H"
+    },
     "TRADE_BANKING": {
         "name": "Trade Banking",
         "id": "TRADE_BANKING"
@@ -164,8 +168,8 @@ const referenceData = {
 const transactionInitiation = {
     id: "TRANSACTION_INITIATION",
     name: "Transaction Initiation",
-    cellColor: "#abd5d5",
-    headerColor: "#6e8d8d",
+    cellColor: "#BDD7EE",
+    headerColor: "#5B9BD5",
     rows: [
         ns("TRANSACTION_INITIATION", [cells.TRADING, cells.LENDING, cells.BANKING_MANAGEMENT, cells.TRADE_BANKING]),
         ns("TRANSACTION_INITIATION", [cells.SALES_AND_ADVISORY, cells.CLIENT_MANAGEMENT, cells.CLIENT_SERVICING, cells.PAYMENTS])
@@ -175,8 +179,8 @@ const transactionInitiation = {
 const coreProcessing = {
     id: "CORE_PROCESSING",
     name: "Core Processing",
-    cellColor: "#efdfc4",
-    headerColor: "#9d9179",
+    cellColor: "#C5E0B4",
+    headerColor: "#9db791",
     rows: [
         ns("CORE_PROCESSING", [cells.CLIENT_SERVICING, cells.CLIENT_MANAGEMENT, cells.CLIENT_AND_FUNDS_PORTFOLIO_MANAGEMENT, cells.SALES_AND_ADVISORY]),
         ns("CORE_PROCESSING", [cells.TRADING, cells.RISK_AND_VALUATION]),
@@ -188,11 +192,11 @@ const coreProcessing = {
 const coreProcessingOperations = {
     id: "CORE_PROCESSING_OPERATIONS",
     name: "Core Processing (Operations)",
-    cellColor: "#efdfc4",
-    headerColor: "#9d9179",
+    cellColor: "#C5E0B4",
+    headerColor: "#9db791",
     rows: [
         ns("CORE_PROCESSING", [cells.MARKET_OPERATIONS, cells.CLEARING_AND_SETTLEMENT, cells.PAYMENTS]),
-        ns("CORE_PROCESSING", [cells.COLLATERAL_AND_MARGIN, cells.POSITION_MANAGEMENT, cells.LENDING]),
+        ns("CORE_PROCESSING", [cells.COLLATERAL_AND_MARGIN, cells.POSITION_MANAGEMENT, cells.LENDING_H]),
         ns("CORE_PROCESSING", [cells.BANKING_MANAGEMENT])
     ]
 };
@@ -200,8 +204,8 @@ const coreProcessingOperations = {
 const coreProcessingFinance = {
     id: "CORE_PROCESSING_FINANCE",
     name: "Core Processing (Finance)",
-    cellColor: "#efdfc4",
-    headerColor: "#9d9179",
+    cellColor: "#C5E0B4",
+    headerColor: "#9db791",
     rows: [
         ns("CORE_PROCESSING", [cells.FINANCE_CONTROL, cells.FINANCIAL_RISK_CONTROL, cells.FINANCIAL_MANAGEMENT, cells.TRANSACTION_ACCOUNTING]),
         ns("CORE_PROCESSING", [cells.FINANCE_PERFORMANCE, cells.NON_FINANCIAL_RISK_CONTROL, cells.TREASURY, cells.TAX_MANAGEMENT])
@@ -220,8 +224,8 @@ function ns1(namespace, cell) {
 const analyticsAndReporting = {
     id: "ANALYTICS_REPORTING",
     name: "Analytics and Reporting",
-    cellColor: "#FECBC6",
-    headerColor: "#a87d7a",
+    cellColor: "#f8e4b8",
+    headerColor: "#d2c599",
     rows: [
         ns("ANALYTICS_AND_REPORTING", [cells.RESEARCH, cells.COMPLIANCE, cells.FINANCE_CONTROL]),
         ns("ANALYTICS_AND_REPORTING", [cells.TREASURY, cells.TAX_MANAGEMENT]),
@@ -230,4 +234,7 @@ const analyticsAndReporting = {
 };
 
 
-export default [referenceData, transactionInitiation, coreProcessing, coreProcessingOperations, coreProcessingFinance, analyticsAndReporting];
+export default [referenceData,
+    transactionInitiation,
+    coreProcessing,
+    coreProcessingOperations, coreProcessingFinance, analyticsAndReporting];
