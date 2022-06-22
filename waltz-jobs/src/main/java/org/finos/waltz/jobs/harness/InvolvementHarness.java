@@ -20,7 +20,6 @@ package org.finos.waltz.jobs.harness;
 
 import org.finos.waltz.data.involvement.InvolvementDao;
 import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.application.Application;
 import org.finos.waltz.service.DIConfiguration;
 import org.finos.waltz.service.involvement.InvolvementService;
 import org.jooq.*;
@@ -31,7 +30,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 
 import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
@@ -82,18 +80,6 @@ public class InvolvementHarness {
 
     }
 
-    private static void viaDao(InvolvementDao dao) {
-        System.out.println("-- dao start");
-        long start = System.currentTimeMillis();
-
-
-        List<Application> apps = dao.findAllApplicationsByEmployeeId("Ms6tJhlJn");
-        System.out.println(apps.size());
-
-        long duration = System.currentTimeMillis() - start;
-        System.out.println("-- dao end "+ duration);
-
-    }
 
     private static void viaJdbc(DataSource dataSource) {
 

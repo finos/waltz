@@ -19,15 +19,17 @@
 package org.finos.waltz.web.endpoints.api;
 
 
+import org.finos.waltz.common.StringUtilities;
+import org.finos.waltz.common.exception.InsufficientPrivelegeException;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.UserTimestamp;
+import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
+import org.finos.waltz.model.assessment_rating.*;
 import org.finos.waltz.service.assessment_definition.AssessmentDefinitionService;
 import org.finos.waltz.service.assessment_rating.AssessmentRatingService;
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.NotAuthorizedException;
 import org.finos.waltz.web.endpoints.Endpoint;
-import org.finos.waltz.common.StringUtilities;
-import org.finos.waltz.model.UserTimestamp;
-import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
-import org.finos.waltz.model.assessment_rating.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
@@ -36,10 +38,11 @@ import spark.Response;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.web.WebUtilities.*;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
-import static org.finos.waltz.common.Checks.checkNotNull;
 
 
 @Service
@@ -74,18 +77,33 @@ public class AssessmentRatingEndpoint implements Endpoint {
         String findByDefinitionPath = mkPath(BASE_URL, "definition-id", ":assessmentDefinitionId");
         String findByTargetKindForRelatedSelectorPath = mkPath(BASE_URL, "target-kind", ":targetKind", "selector");
         String modifyPath = mkPath(BASE_URL, "entity", ":kind", ":id", ":assessmentDefinitionId");
+        String lockPath = mkPath(BASE_URL, "entity", ":kind", ":id", ":assessmentDefinitionId", "lock");
+        String unlockPath = mkPath(BASE_URL, "entity", ":kind", ":id", ":assessmentDefinitionId", "unlock");
+        String findRatingPermissionsPath = mkPath(BASE_URL, "entity", ":kind", ":id", ":assessmentDefinitionId", "permissions");
         String bulkUpdatePath = mkPath(BASE_URL, "bulk-update", ":assessmentDefinitionId");
         String bulkRemovePath = mkPath(BASE_URL, "bulk-remove", ":assessmentDefinitionId");
 
         getForList(findForEntityPath, this::findForEntityRoute);
         getForList(findByEntityKindPath, this::findByEntityKindRoute);
         getForList(findByDefinitionPath, this::findByDefinitionIdRoute);
+        getForList(findRatingPermissionsPath, this::findRatingPermissionsRoute);
         postForList(findByTargetKindForRelatedSelectorPath, this::findByTargetKindForRelatedSelectorRoute);
         postForDatum(bulkUpdatePath, this::bulkStoreRoute);
         postForDatum(bulkRemovePath, this::bulkRemoveRoute);
         postForDatum(modifyPath, this::storeRoute);
+        putForDatum(lockPath, this::lockRoute);
+        putForDatum(unlockPath, this::unlockRoute);
         deleteForDatum(modifyPath, this::removeRoute);
     }
+
+
+    private Set<Operation> findRatingPermissionsRoute(Request request, Response response) {
+        return assessmentRatingService.findRatingPermissions(
+                getEntityReference(request),
+                getLong(request, "assessmentDefinitionId"),
+                getUsername(request));
+    }
+
 
     private List<AssessmentRating> findByTargetKindForRelatedSelectorRoute(Request request, Response response) throws IOException {
         return assessmentRatingService.findByTargetKindForRelatedSelector(
@@ -104,16 +122,34 @@ public class AssessmentRatingEndpoint implements Endpoint {
         return assessmentRatingService.findByEntityKind(getKind(request, "kind"));
     }
 
+
     private List<AssessmentRating> findByDefinitionIdRoute(Request request, Response response) {
         long assessmentDefinitionId = getLong(request, "assessmentDefinitionId");
         return assessmentRatingService.findByDefinitionId(assessmentDefinitionId);
     }
 
-    private boolean storeRoute(Request request, Response z) throws IOException {
+
+    private boolean lockRoute(Request request, Response z) throws InsufficientPrivelegeException {
+        return assessmentRatingService.lock(
+                getEntityReference(request),
+                getLong(request, "assessmentDefinitionId"),
+                getUsername(request));
+    }
+
+
+    private boolean unlockRoute(Request request, Response z) throws InsufficientPrivelegeException {
+        return assessmentRatingService.unlock(
+                getEntityReference(request),
+                getLong(request, "assessmentDefinitionId"),
+                getUsername(request));
+    }
+
+
+    private boolean storeRoute(Request request, Response z) throws IOException, InsufficientPrivelegeException {
         SaveAssessmentRatingCommand command = mkCommand(request);
-        verifyCanWrite(request, command.assessmentDefinitionId());
         return assessmentRatingService.store(command, getUsername(request));
     }
+
 
     private boolean bulkStoreRoute(Request request, Response z) throws IOException {
         long assessmentDefinitionId = getLong(request, "assessmentDefinitionId");
@@ -122,6 +158,7 @@ public class AssessmentRatingEndpoint implements Endpoint {
         return assessmentRatingService.bulkStore(commands, assessmentDefinitionId, getUsername(request));
     }
 
+
     private boolean bulkRemoveRoute(Request request, Response z) throws IOException {
         long assessmentDefinitionId = getLong(request, "assessmentDefinitionId");
         verifyCanWrite(request, assessmentDefinitionId);
@@ -129,7 +166,8 @@ public class AssessmentRatingEndpoint implements Endpoint {
         return assessmentRatingService.bulkDelete(commands, assessmentDefinitionId, getUsername(request));
     }
 
-    private boolean removeRoute(Request request, Response z) throws IOException {
+
+    private boolean removeRoute(Request request, Response z) throws InsufficientPrivelegeException {
         String username = getUsername(request);
         UserTimestamp lastUpdate = UserTimestamp.mkForUser(username);
         RemoveAssessmentRatingCommand command = ImmutableRemoveAssessmentRatingCommand.builder()
@@ -139,7 +177,6 @@ public class AssessmentRatingEndpoint implements Endpoint {
                 .lastUpdatedBy(lastUpdate.by())
                 .build();
 
-        verifyCanWrite(request, command.assessmentDefinitionId());
         return assessmentRatingService.remove(command, getUsername(request));
     }
 
@@ -153,7 +190,7 @@ public class AssessmentRatingEndpoint implements Endpoint {
         return ImmutableSaveAssessmentRatingCommand.builder()
                 .entityReference(getEntityReference(request))
                 .assessmentDefinitionId(getLong(request, "assessmentDefinitionId"))
-                .ratingId(Long.valueOf(body.getOrDefault("ratingId", "").toString()))
+                .ratingId(Long.parseLong(body.getOrDefault("ratingId", "").toString()))
                 .comment(StringUtilities.mkSafe((String) body.get("comment")))
                 .lastUpdatedAt(lastUpdate.at())
                 .lastUpdatedBy(lastUpdate.by())

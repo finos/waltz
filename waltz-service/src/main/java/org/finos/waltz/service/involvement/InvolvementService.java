@@ -19,21 +19,20 @@
 package org.finos.waltz.service.involvement;
 
 import org.finos.waltz.common.Checks;
-import org.finos.waltz.model.*;
-import org.finos.waltz.model.involvement_kind.InvolvementKind;
-import org.finos.waltz.model.user.SystemRole;
-import org.finos.waltz.service.changelog.ChangeLogService;
-import org.finos.waltz.service.involvement_kind.InvolvementKindService;
 import org.finos.waltz.data.EntityReferenceNameResolver;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.involvement.InvolvementDao;
 import org.finos.waltz.data.person.PersonDao;
-import org.finos.waltz.model.application.Application;
+import org.finos.waltz.model.*;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.involvement.EntityInvolvementChangeCommand;
 import org.finos.waltz.model.involvement.Involvement;
+import org.finos.waltz.model.involvement_kind.InvolvementKind;
 import org.finos.waltz.model.person.Person;
+import org.finos.waltz.model.user.SystemRole;
+import org.finos.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.service.involvement_kind.InvolvementKindService;
 import org.finos.waltz.service.user.UserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -90,18 +89,6 @@ public class InvolvementService {
     public List<Involvement> findByEntityReference(EntityReference ref) {
         checkNotNull(ref, "ref cannot be null");
         return time("IS.findByEntityReference", () -> involvementDao.findByEntityReference(ref));
-    }
-
-
-    public List<Application> findDirectApplicationsByEmployeeId(String employeeId) {
-        checkNotEmpty(employeeId, "employeeId cannot be empty");
-        return time("IS.findDirectApplicationsByEmployeeId", () -> involvementDao.findDirectApplicationsByEmployeeId(employeeId));
-    }
-
-
-    public List<Application> findAllApplicationsByEmployeeId(String employeeId) {
-        checkNotEmpty(employeeId, "employeeId cannot be empty");
-        return time("IS.findAllApplicationsByEmployeeId", () -> involvementDao.findAllApplicationsByEmployeeId(employeeId));
     }
 
 

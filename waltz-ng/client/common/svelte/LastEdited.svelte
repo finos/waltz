@@ -7,7 +7,7 @@
 <span>
     {entity.lastUpdatedBy},
     <DateTime relative={true}
-              formatStr="yyyy-MM-DD"
+              formatStr="yyyy-MM-DD HH:mm:ss"
               dateTime={entity.lastUpdatedAt}/>
 </span>
 {/if}

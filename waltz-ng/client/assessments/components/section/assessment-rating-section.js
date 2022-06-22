@@ -25,6 +25,7 @@ import {displayError} from "../../../common/error-utils";
 import {resolveResponses} from "../../../common/promise-utils";
 import _ from "lodash";
 import toasts from "../../../svelte-stores/toast-store";
+import AssessmentEditor from "../editor/AssessmentEditor.svelte";
 
 const bindings = {
     parentEntityRef: "<",
@@ -32,13 +33,15 @@ const bindings = {
 
 
 const initialState = {
+    AssessmentEditor,
+    permissions: []
 };
 
 
 function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    const loadAll = () => {
+    const loadAssessments = () => {
         const definitionsPromise = serviceBroker
             .loadViewData(
                 CORE_API.AssessmentDefinitionStore.findByKind,
@@ -73,31 +76,39 @@ function controller($q, serviceBroker) {
             });
     };
 
+    function loadPermissions(definitionId) {
+        if (definitionId) {
+            serviceBroker
+                .loadViewData(
+                    CORE_API.AssessmentRatingStore.findRatingPermissions,
+                    [vm.parentEntityRef, definitionId],
+                    {force: true})
+                .then(d => vm.permissions = d.data);
+        }
+    }
 
     vm.$onInit = () => {
-        loadAll();
+        loadAssessments();
     };
 
 
     // INTERACT
 
-    vm.onSelect = (def) => {
-        vm.selectedAssessment = def;
+    vm.onSelect = (selectedAssessment) => {
+        vm.selectedAssessment = selectedAssessment;
+        loadPermissions(selectedAssessment.definition.id);
     };
 
 
     vm.onClose = () => {
         vm.selectedAssessment = null;
-        loadAll();
+        loadAssessments();
     };
 
 
-    vm.onRemove = (ctx) => {
-        if (! confirm("Are you sure you want to remove this assessment ?")) {
-            return;
-        }
+    vm.onRemove = (definitionId) => {
         return serviceBroker
-            .execute(CORE_API.AssessmentRatingStore.remove, [ vm.parentEntityRef, ctx.definition.id ])
+            .execute(CORE_API.AssessmentRatingStore.remove, [ vm.parentEntityRef, definitionId ])
             .then(() => {
                 vm.onClose();
                 toasts.warning("Assessment removed");
@@ -114,10 +125,36 @@ function controller($q, serviceBroker) {
                 CORE_API.AssessmentRatingStore.store,
                 [vm.parentEntityRef, definitionId, ratingId, comments])
             .then(d => {
-                loadAll();
+                loadAssessments();
                 toasts.success("Assessment saved");
             })
             .catch(e => displayError("Failed to save", e));
+    };
+
+    vm.onLock = (definitionId) => {
+        return serviceBroker
+            .execute(
+                CORE_API.AssessmentRatingStore.lock,
+                [vm.parentEntityRef, definitionId])
+            .then(d => {
+                loadAssessments();
+                loadPermissions(definitionId);
+                toasts.success("Assessment Locked");
+            })
+            .catch(e => displayError("Failed to lock", e));
+    };
+
+    vm.onUnlock = (definitionId) => {
+        return serviceBroker
+            .execute(
+                CORE_API.AssessmentRatingStore.unlock,
+                [vm.parentEntityRef, definitionId])
+            .then(d => {
+                loadAssessments();
+                loadPermissions(definitionId);
+                toasts.success("Assessment Unlocked");
+            })
+            .catch(e => displayError("Failed to unlock", e));
     };
 
 }

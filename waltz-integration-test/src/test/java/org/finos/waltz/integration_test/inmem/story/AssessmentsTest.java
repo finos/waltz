@@ -1,5 +1,6 @@
 package org.finos.waltz.integration_test.inmem.story;
 
+import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import org.finos.waltz.integration_test.inmem.helpers.AppHelper;
 import org.finos.waltz.integration_test.inmem.helpers.ChangeLogHelper;
@@ -50,7 +51,7 @@ public class AssessmentsTest extends BaseInMemoryIntegrationTest {
     private ChangeLogHelper changeLogHelper;
 
     @Test
-    public void createUpdateAndRemoveSingleRating() {
+    public void createUpdateAndRemoveSingleRating() throws InsufficientPrivelegeException {
         String user = NameHelper.mkUserId("user");
         String name = NameHelper.mkName("testAssessment");
         String role = NameHelper.mkName("testRole");

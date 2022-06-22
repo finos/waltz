@@ -22,13 +22,11 @@
     }
 
     $: html = mkHtml(text, context);
-
 </script>
 
 <span class:inline-markdown={inline}>
     {@html html}
 </span>
-
 
 <style>
 

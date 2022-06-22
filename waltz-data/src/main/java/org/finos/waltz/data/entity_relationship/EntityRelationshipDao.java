@@ -187,15 +187,6 @@ public class EntityRelationshipDao {
     }
 
 
-    @Deprecated
-    public boolean remove(EntityRelationship entityRelationship) {
-        checkNotNull(entityRelationship, "entityRelationship cannot be null");
-        EntityRelationshipKey key = entityRelationship.toKey();
-        return remove(key);
-    }
-
-
-
     public boolean create(EntityRelationship relationship) {
         return dsl.executeInsert(TO_RECORD_MAPPER.apply(relationship)) == 1;
     }

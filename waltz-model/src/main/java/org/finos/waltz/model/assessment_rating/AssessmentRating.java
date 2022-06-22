@@ -20,10 +20,7 @@ package org.finos.waltz.model.assessment_rating;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.finos.waltz.model.CommentProvider;
-import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.LastUpdatedProvider;
-import org.finos.waltz.model.ProvenanceProvider;
+import org.finos.waltz.model.*;
 import org.immutables.value.Value;
 
 
@@ -33,7 +30,8 @@ import org.immutables.value.Value;
 public abstract class AssessmentRating implements
         CommentProvider,
         LastUpdatedProvider,
-        ProvenanceProvider {
+        ProvenanceProvider,
+        IsReadOnlyProvider {
 
     public abstract EntityReference entityReference();
     public abstract long assessmentDefinitionId();
