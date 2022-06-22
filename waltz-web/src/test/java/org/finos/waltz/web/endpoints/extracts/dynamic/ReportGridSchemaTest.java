@@ -8,6 +8,7 @@ class ReportGridSchemaTest {
 
     private ImmutableReportGridSchema reportGridSchema =
             ImmutableReportGridSchema.builder().id("id")
+                    .apiTypes(ImmutableApiTypes.builder().build())
                     .name("dummy")
                     .grid(ImmutableGrid.builder().build())
                     .build();

@@ -83,7 +83,6 @@ public class ReportGridExtractor implements DataExtractor {
     @Override
     public void register() {
         registerGridViewExtract();
-        //registerGeyById();
     }
 
 
@@ -101,8 +100,6 @@ public class ReportGridExtractor implements DataExtractor {
                         selectionOptions));
             });
     }
-
-
 
 
     private Tuple3<ExtractFormat, String, byte[]> prepareReport(ReportGrid reportGrid,
@@ -123,10 +120,9 @@ public class ReportGridExtractor implements DataExtractor {
 
     private Optional<ReportGrid> getById(long gridId,
                                          IdSelectionOptions selectionOptions){
-        ReportGrid reportGrid = reportGridService.getByIdAndSelectionOptions(
+        return reportGridService.getByIdAndSelectionOptions(
                 gridId,
                 selectionOptions);
-        return Optional.ofNullable(reportGrid);
     }
 
     private List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> enrichColsWithCommentRequirement(ReportGrid reportGrid) {
@@ -291,7 +287,7 @@ public class ReportGridExtractor implements DataExtractor {
     }
 
 
-    private static LongFunction<NotFoundException> notFoundException = (gridId) -> new NotFoundException(
+    private static final LongFunction<NotFoundException> notFoundException = (gridId) -> new NotFoundException(
             "REPORT_GRID_NOT_FOUND",
             format(" Grid def: %d not found", gridId));
 }

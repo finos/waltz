@@ -37,15 +37,12 @@ import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.rating_scheme.RatingSchemeService;
 import org.finos.waltz.service.user.UserRoleService;
-import org.jooq.Record1;
-import org.jooq.Select;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -55,6 +52,8 @@ import static org.finos.waltz.model.EntityReference.mkRef;
 
 @Service
 public class ReportGridService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ReportGridService.class);
 
     private final RatingSchemeService ratingSchemeService;
     private final ApplicationDao applicationDao;
@@ -101,7 +100,7 @@ public class ReportGridService {
     }
 
 
-    public ReportGrid getByIdAndSelectionOptions(
+    public Optional<ReportGrid> getByIdAndSelectionOptions(
             long id,
             IdSelectionOptions idSelectionOptions) {
 
@@ -114,21 +113,22 @@ public class ReportGridService {
                 .copyOf(idSelectionOptions)
                 .withScope(HierarchyQueryScope.EXACT)
                 : idSelectionOptions;
-
+        LOG.info("ReportGrid - getting by ID={} SelectionOptions={}",id,idSelectionOptions);
         ReportGridDefinition definition = reportGridDao.getGridDefinitionById(id);
 
         if (definition == null) {
-            return null;
+            LOG.warn("No Report Grid Definition found for ID={}", id);
+            return Optional.empty();
         }
 
         EntityKind targetKind = definition.subjectKind();
         ReportGridInstance instance = mkInstance(id, opts, targetKind);
 
-        return ImmutableReportGrid
+        return Optional.of(ImmutableReportGrid
                 .builder()
                 .definition(definition)
                 .instance(instance)
-                .build();
+                .build());
     }
 
 
@@ -142,14 +142,12 @@ public class ReportGridService {
                 cellData,
                 ReportGridCell::ratingId));
 
-        ReportGridInstance instance = ImmutableReportGridInstance
+        return ImmutableReportGridInstance
                 .builder()
                 .subjects(subjects)
                 .cellData(cellData)
                 .ratingSchemeItems(ratingSchemeItems)
                 .build();
-
-        return instance;
     }
 
 
@@ -192,7 +190,7 @@ public class ReportGridService {
                                                         ReportGridColumnDefinitionsUpdateCommand updateCommand,
                                                         String username) throws InsufficientPrivelegeException {
         checkIsOwner(reportGridId, username);
-        int newColumnCount = reportGridDao.updateColumnDefinitions(reportGridId, updateCommand.columnDefinitions());
+        reportGridDao.updateColumnDefinitions(reportGridId, updateCommand.columnDefinitions());
         return reportGridDao.getGridDefinitionById(reportGridId);
     }
 
@@ -216,7 +214,7 @@ public class ReportGridService {
                     "You do not have permission to change the kind of a report grid");
         }
 
-        long gridId = reportGridDao.update(id, updateCommand, username);
+        reportGridDao.update(id, updateCommand, username);
         return reportGridDao.getGridDefinitionById(id);
     }
 

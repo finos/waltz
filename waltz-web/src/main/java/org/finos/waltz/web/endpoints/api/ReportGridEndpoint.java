@@ -19,6 +19,7 @@
 package org.finos.waltz.web.endpoints.api;
 
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
+import org.finos.waltz.common.exception.NotFoundException;
 import org.finos.waltz.model.report_grid.*;
 import org.finos.waltz.service.report_grid.ReportGridService;
 import org.finos.waltz.web.endpoints.Endpoint;
@@ -78,10 +79,11 @@ public class ReportGridEndpoint implements Endpoint {
 
 
     public ReportGrid getViewByIdRoute(Request req,
-                                       Response resp) throws IOException {
+                                                 Response resp) throws IOException {
         return reportGridService.getByIdAndSelectionOptions(
                 getId(req),
-                readIdSelectionOptionsFromBody(req));
+                readIdSelectionOptionsFromBody(req))
+                .orElseThrow(() -> new NotFoundException("404","ID not found"));
     }
 
 
