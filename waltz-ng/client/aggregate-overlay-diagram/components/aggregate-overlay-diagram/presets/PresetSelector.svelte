@@ -3,6 +3,7 @@
     import {getContext} from "svelte";
     import {widgets} from "../aggregate-overlay-diagram-utils";
     import NoData from "../../../../common/svelte/NoData.svelte";
+    import Markdown from "../../../../common/svelte/Markdown.svelte";
 
     const focusWidget = getContext("focusWidget");
     const filterParameters = getContext("filterParameters");
@@ -14,16 +15,16 @@
 
         //must set to null until the parameters are prepared to make the new data call
         $focusWidget = null;
+        $filterParameters = [];
         $selectedPreset = preset;
 
         const overlayConfig = JSON.parse(preset.overlayConfig);
         const filterConfig = JSON.parse(preset.filterConfig);
 
         const selectedWidget = _.find(widgets, d => d.key === overlayConfig.widgetKey);
-        const selectedFilter = _.first(filterConfig);
 
         $widgetParameters = overlayConfig.widgetParameters;
-        $filterParameters = selectedFilter.filterParameters;
+        $filterParameters = _.map(filterConfig, d => d.filterParameters);
 
         $focusWidget = selectedWidget;
     }
@@ -54,7 +55,7 @@
                     <button class="btn btn-skinny">{preset.name}</button>
                 </td>
                 <td>
-                    {preset.description || "-"}
+                    <Markdown text={preset.description}/>
                 </td>
             </tr>
         {/each}

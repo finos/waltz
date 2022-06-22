@@ -14,6 +14,9 @@
     import AggregateOverlayDiagramContextPanel from "../context-panel/AggregateOverlayDiagramContextPanel.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
     import {measurableRelationshipStore} from "../../../svelte-stores/measurable-relationship-store";
+    import {settingsStore} from "../../../svelte-stores/settings-store";
+    import namedSettings from "../../../system/named-settings";
+
 
     export let primaryEntityRef;
 
@@ -32,12 +35,16 @@
     let diagramPresets = getContext("diagramPresets");
     let overlayDataCall = getContext("overlayDataCall");
     let loading = getContext("loading");
+    let disabledWidgetKeys = getContext("disabledWidgetKeys");
 
     let svgCall;
     let calloutCall;
     let diagramsCall;
     let relatedEntitiesCall;
     let presetsCall;
+    let settingsCall;
+
+    let disabledWidgetsSetting;
 
     function clearWidgetParameters() {
         $focusWidget = null;
@@ -57,6 +64,7 @@
 
     onMount(() => {
         diagramsCall = aggregateOverlayDiagramStore.findAll();
+        settingsCall = settingsStore.loadAll();
     });
 
     $: {
@@ -73,12 +81,28 @@
         }
     }
 
+
     $: diagram = $svgCall?.data?.diagram;
     $: backingEntities = $svgCall?.data?.backingEntities;
     $: diagrams = $diagramsCall?.data || [];
     $: relatedEntities = $relatedEntitiesCall?.data;
     $: $cellIdsExplicitlyRelatedToParent = determineWhichCellsAreLinkedByParent(backingEntities, relatedEntities);
-    $: $diagramPresets = $presetsCall?.data;
+
+    $: $diagramPresets = _.filter(
+        $presetsCall?.data,
+        p => {
+            const overlayConfig = JSON.parse(p.overlayConfig);
+            return !_.some($disabledWidgetKeys, k => k === overlayConfig?.widgetKey)
+        });
+
+    $: disabledWidgetsSetting = _.find(
+        $settingsCall?.data,
+        d => d.name === namedSettings.overlayDiagramWidgetsDisabled);
+
+    $: $disabledWidgetKeys = _.isNull(disabledWidgetsSetting)
+        ? []
+        : _.map(_.split(disabledWidgetsSetting?.value, ","), s => _.trim(s));
+
 
 </script>
 

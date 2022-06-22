@@ -136,12 +136,14 @@ export function setupContextStores() {
     const selectedOverlay = writable(null);
     const relatedBackingEntities = writable([]);
     const cellIdsExplicitlyRelatedToParent = writable([]);
-    const filterParameters = writable(null);
+    const filterParameters = writable([]);
     const widgetParameters = writable(null);
     const selectionOptions = writable(null);
     const diagramPresets = writable([]);
     const selectedPreset = writable(null);
     const loading = writable(false);
+    const disabledWidgetKeys = writable([]);
+    const selectedFilter = writable(null);
 
 
     //anything passed up to endpoint
@@ -151,12 +153,20 @@ export function setupContextStores() {
 
             if ($focusWidget && $selectedDiagram && $widgetParameters) {
 
-                const assessmentBasedSelectionFilter = {
-                    definitionId: _.get($filterParameters, ["assessmentDefinition", "id"]),
-                    ratingIds: _.map(
-                        _.get($filterParameters, ["ratingSchemeItems"], []),
-                        p => _.get(p, "id"))
-                };
+                const assessmentBasedSelectionFilters = _.isEmpty($filterParameters)
+                    ? []
+                    : _.map(
+                        $filterParameters,
+                        filter => {
+                            const definitionId = _.get(filter, ["assessmentDefinition", "id"]);
+                            const ratings = _.get(filter, ["ratingSchemeItems"], []);
+                            const ratingIds = _.map(ratings, p => _.get(p, "id"));
+
+                            return {
+                                definitionId,
+                                ratingIds
+                            }
+                        });
 
                 const body = Object.assign(
                     {},
@@ -164,7 +174,7 @@ export function setupContextStores() {
                         idSelectionOptions: $selectionOptions,
                         overlayParameters: $widgetParameters
                     },
-                    $filterParameters ? {assessmentBasedSelectionFilter} : null);
+                    {assessmentBasedSelectionFilters});
 
                 return $focusWidget.remoteMethod($selectedDiagram.id, body);
             }
@@ -208,6 +218,8 @@ export function setupContextStores() {
     setContext("diagramPresets", diagramPresets);
     setContext("selectedPreset", selectedPreset);
     setContext("loading", loading);
+    setContext("disabledWidgetKeys", disabledWidgetKeys);
+    setContext("selectedFilter", selectedFilter);
 
 
     return {
