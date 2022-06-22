@@ -21,6 +21,7 @@ package org.finos.waltz.model.assessment_rating;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.CommentProvider;
+import org.finos.waltz.model.IsReadOnlyProvider;
 import org.finos.waltz.model.ProvenanceProvider;
 import org.immutables.value.Value;
 
@@ -29,7 +30,8 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutableSaveAssessmentRatingCommand.class)
 public abstract class SaveAssessmentRatingCommand extends AssessmentRatingCommand implements
         CommentProvider,
-        ProvenanceProvider {
+        ProvenanceProvider,
+        IsReadOnlyProvider {
 
     public abstract long ratingId();
 }

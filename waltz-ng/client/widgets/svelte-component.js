@@ -19,13 +19,19 @@
 import _ from "lodash";
 
 const directive = function() {
+    let comp = null;
     return {
         restrict: "E",
         link: (scope, elem, attrs) => {
-            const props = _
+            const propKeys = _
                 .chain(attrs)
                 .map((p, k) => ({p, k}))
                 .reject(d => d.k.startsWith("$"))
+                .value();
+
+            const component = _.get(scope, attrs.component);
+
+            const initialProps = _.chain(propKeys)
                 .map(d => Object.assign(d, {v: _.get(scope, d.p, d.p)})) // fall back to d.p, as may be a literal value
                 .reduce(
                     (acc, d) => {
@@ -35,10 +41,17 @@ const directive = function() {
                     {})
                 .value();
 
-            new props.component({
+            comp = new component({
                 target: elem[0],
-                props
+                props: initialProps
             });
+
+            propKeys.forEach(({p, k}) => {
+                scope.$watch(p, (oldVal, newVal, s) => {
+                    comp.$set({[k]: _.get(s, p, p)});
+                });
+            });
+
         }
     };
 };

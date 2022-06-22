@@ -244,6 +244,9 @@
               ng-if="item.rating.comment.length > 0">
             <waltz-icon name="sticky-note-o">
             </waltz-icon>
+            <span ng-if="item.rating.isReadOnly">
+                <waltz-icon name="lock"></waltz-icon>
+            </span>
         </span>
     </span>
 </script>
@@ -287,6 +290,11 @@
         <br>
 
         <div class="small">
+            <div ng-if="item.rating.isReadOnly">
+                <waltz-icon name="lock"></waltz-icon>
+                Locked by
+                <span ng-bind="item.rating.lastUpdatedBy"></span>
+            </div>
             <waltz-last-updated entity="item.rating">
             </waltz-last-updated>
         </div>

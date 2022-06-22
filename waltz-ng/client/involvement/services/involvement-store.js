@@ -25,11 +25,6 @@ function store($http, BaseApiUrl) {
     const BASE = `${BaseApiUrl}/involvement`;
 
 
-    const findAppsForEmployeeId = (employeeId) =>
-        $http.get(`${BASE}/employee/${employeeId}/applications`)
-            .then(result => result.data);
-
-
     const findByEmployeeId = (employeeId) =>
         $http.get(`${BASE}/employee/${employeeId}`)
             .then(result => result.data);
@@ -87,7 +82,6 @@ function store($http, BaseApiUrl) {
 
 
     return {
-        findAppsForEmployeeId,
         findByEmployeeId,
         findByEntityReference,
         findBySelector,
@@ -107,11 +101,6 @@ const serviceName = "InvolvementStore";
 
 
 export const InvolvementStore_API = {
-    findAppsForEmployeeId: {
-        serviceName,
-        serviceFnName: "findAppsForEmployeeId",
-        description: "finds apps by employee id"
-    },
     findByEmployeeId: {
         serviceName,
         serviceFnName: "findByEmployeeId",

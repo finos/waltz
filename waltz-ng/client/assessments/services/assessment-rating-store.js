@@ -30,6 +30,13 @@ export function store($http, BaseApiUrl) {
             .then(d => d.data);
     };
 
+    const findRatingPermissions = (ref, definitionId) => {
+        checkIsEntityRef(ref);
+        return $http
+            .get(`${BASE}/entity/${ref.kind}/${ref.id}/${definitionId}/permissions`)
+            .then(d => d.data);
+    };
+
     const findByEntityKind = (kind) => {
         return $http
             .get(`${BASE}/entity-kind/${kind}`)
@@ -55,6 +62,20 @@ export function store($http, BaseApiUrl) {
             .then(d => d.data);
     };
 
+    const lock = (ref, assessmentDefinitionId) => {
+        checkIsEntityRef(ref);
+        return $http
+            .put(`${BASE}/entity/${ref.kind}/${ref.id}/${assessmentDefinitionId}/lock`)
+            .then(d => d.data);
+    };
+
+    const unlock = (ref, assessmentDefinitionId) => {
+        checkIsEntityRef(ref);
+        return $http
+            .put(`${BASE}/entity/${ref.kind}/${ref.id}/${assessmentDefinitionId}/unlock`)
+            .then(d => d.data);
+    };
+
     const bulkStore = (assessmentDefinitionId, commands = []) => {
         return $http
             .post(`${BASE}/bulk-update/${assessmentDefinitionId}`, commands)
@@ -75,11 +96,14 @@ export function store($http, BaseApiUrl) {
     };
 
     return {
+        findRatingPermissions,
         findForEntityReference,
         findByEntityKind,
         findByAssessmentDefinitionId,
         findByTargetKindForRelatedSelector,
         store,
+        lock,
+        unlock,
         bulkStore,
         bulkRemove,
         remove
@@ -97,6 +121,11 @@ export const serviceName = "AssessmentRatingStore";
 
 
 export const AssessmentRatingStore_API = {
+    findRatingPermissions: {
+        serviceName,
+        serviceFnName: "findRatingPermissions",
+        description: "find permissions for a single rating [ref, assessmentDefId]"
+    },
     findForEntityReference: {
         serviceName,
         serviceFnName: "findForEntityReference",
@@ -121,6 +150,16 @@ export const AssessmentRatingStore_API = {
         serviceName,
         serviceFnName: "store",
         description: "update or create a rating"
+    },
+    lock: {
+        serviceName,
+        serviceFnName: "lock",
+        description: "Locks a rating [ref, defId]"
+    },
+    unlock: {
+        serviceName,
+        serviceFnName: "unlock",
+        description: "Unlocks a locked rating [ref, defId]"
     },
     bulkStore: {
         serviceName,

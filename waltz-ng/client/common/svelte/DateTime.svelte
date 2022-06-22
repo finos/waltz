@@ -6,7 +6,7 @@
     export let formatStr = "yyyy-MM-DD hh:mm:ss";
 
     const timeAgo = t => moment.utc(t).fromNow();
-    const format = t => moment.utc(t).format(formatStr)
+    const format = t => moment.utc(t).local().format(formatStr)
 </script>
 
 {#if relative}
