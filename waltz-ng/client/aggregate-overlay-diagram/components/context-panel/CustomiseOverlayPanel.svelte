@@ -56,7 +56,7 @@
     {/if}
     <WidgetSelector {primaryEntityRef}/>
     <hr>
-    <FilterPanel existingFilters={!_.isEmpty($filterParameters)}/>
+    <FilterPanel/>
     <div>
         <br>
         <button class="btn btn-skinny"

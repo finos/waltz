@@ -3,11 +3,17 @@
     import {createEventDispatcher, getContext} from "svelte";
     import RatingIndicatorCell from "../../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
+    import toasts from "../../../svelte-stores/toast-store";
 
     const filterParameters = getContext("filterParameters");
     const selectedFilter = getContext("selectedFilter");
 
     const dispatch = createEventDispatcher();
+
+    function addFilter() {
+        $selectedFilter = null;
+        editFilter();
+    }
 
     function editFilter() {
         dispatch("edit");
@@ -16,6 +22,11 @@
     function selectFilter(filter) {
         $selectedFilter = filter;
         editFilter();
+    }
+
+    function deleteFilter(filter) {
+        $filterParameters = _.without($filterParameters, filter);
+        toasts.info(`Removed ${filter.assessmentDefinition.name} filter`);
     }
 
 </script>
@@ -47,14 +58,26 @@
                         on:click={() => selectFilter(filter)}>
                     <Icon name="pencil"/>
                 </button>
+                <button class="btn btn-skinny"
+                        on:click={() => deleteFilter(filter)}>
+                    <Icon name="trash"/>
+                </button>
+            </td>
+        </tr>
+    {:else}
+        <tr>
+            <td colspan="3">
+                <i>No filters applied</i>
             </td>
         </tr>
     {/each}
-    <tr on:click={() => editFilter()}>
+    </tbody>
+    <tbody>
+    <tr on:click={() => addFilter()}>
         <td colspan="3">
             <button class="btn btn-skinny">
+                Add filter
                 <Icon name="plus"/>
-                Add another filter
             </button>
         </td>
     </tr>

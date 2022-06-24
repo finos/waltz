@@ -6,7 +6,6 @@
     let height = 100;
     let elem;
 
-
     $: {
         if ($Popover) {
 
@@ -24,22 +23,25 @@
 </script>
 
 {#if $Popover}
+
+    <div class="waltz-backing-screen"
+         on:click={() => $Popover ? Popover.dismiss() : null}>
+    </div>
+
     <section class="waltz-svelte-popover">
         <PopoverContent on:dismiss={() => Popover.dismiss()}>
             <div slot="content">
-                <div style="width: 100%; height: 100%">
-                    {#if $Popover.title}
-                        <h4>{$Popover.title}</h4>
-                    {/if}
-                    <div class:waltz-scroll-region-400={height > 400}>
-                        <div bind:clientHeight={height}>
-                            <div bind:this={elem}></div>
-                            {#if $Popover.content}
-                                <div>
-                                    {@html $Popover.content}
-                                </div>
-                            {/if}
-                        </div>
+                {#if $Popover.title}
+                    <h4>{$Popover.title}</h4>
+                {/if}
+                <div class:waltz-scroll-region-400={height > 400}>
+                    <div bind:clientHeight={height}>
+                        <div bind:this={elem}></div>
+                        {#if $Popover.content}
+                            <div>
+                                {@html $Popover.content}
+                            </div>
+                        {/if}
                     </div>
                 </div>
             </div>
@@ -48,6 +50,16 @@
 {/if}
 
 <style>
+    .waltz-backing-screen {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background-color: #aaa;
+        opacity: 0.3;
+        z-index: 899;
+        transition: opacity ease 0.3s;
+    }
+
     .waltz-svelte-popover {
         position: fixed;
         top: 20%;

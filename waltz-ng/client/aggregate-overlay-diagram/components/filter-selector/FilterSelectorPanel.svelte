@@ -4,6 +4,7 @@
     import {createEventDispatcher, getContext} from "svelte";
     import _ from "lodash";
     import Icon from "../../../common/svelte/Icon.svelte";
+    import toasts from "../../../svelte-stores/toast-store";
 
     const filterParameters = getContext("filterParameters");
     const selectedFilter = getContext("selectedFilter");
@@ -24,19 +25,23 @@
         $filterParameters = _.concat(withoutExisting, [filter]);
     }
 
+    function definitionFilter(d) {
+        return d.entityKind === $selectedDiagram.aggregatedEntityKind;
+    }
+
+    function close() {
+        dispatch("close");
+        // remove any 'empty' filters
+        $filterParameters = _.reject(
+            $filterParameters,
+            d => _.isEmpty(d.ratingSchemeItems));
+    }
+
     $: ratings = _
         .chain($filterParameters?.ratingSchemeItems)
         .map(d => d.name)
         .join(', ')
         .value();
-
-    function definitionFilter(d) {
-        return d.entityKind === $selectedDiagram.aggregatedEntityKind;
-    }
-
-    function cancel() {
-        dispatch("cancel");
-    }
 
 </script>
 
@@ -45,16 +50,8 @@
                         definitionFilter={definitionFilter}
                         selectedDefinition={$selectedFilter?.assessmentDefinition}
                         selectedRatings={$selectedFilter?.ratingSchemeItems}/>
-{#if !_.isEmpty($selectedFilter)}
-    <button class="btn btn-skinny"
-            on:click={() => $filterParameters = _.without($filterParameters, $selectedFilter)}>
-        <Icon name="ban"/>
-        Clear filter
-    </button>
-{/if}
-{#if !_.isEmpty($filterParameters)}
-    <button class="btn btn-skinny"
-            on:click={() => cancel()}>
-        Close
-    </button>
-{/if}
+<button class="btn btn-skinny"
+        on:click={() => close()}>
+    <Icon name="close"/>
+    Close
+</button>
