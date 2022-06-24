@@ -15,22 +15,24 @@
  * See the License for the specific
  *
  */
-package org.finos.waltz.web.endpoints.extracts.dynamic;
+package org.finos.waltz.web.json;
 
-import org.finos.waltz.model.report_grid.ReportGrid;
-import org.finos.waltz.model.report_grid.ReportGridColumnDefinition;
-import org.finos.waltz.model.report_grid.ReportSubject;
-import org.finos.waltz.web.endpoints.extracts.ColumnCommentary;
-import org.jooq.lambda.tuple.Tuple2;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.immutables.value.Value;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public interface DynamicFormatter {
+@Value.Immutable
+@JsonSerialize(as = ImmutableRow.class)
+@JsonDeserialize(as = ImmutableRow.class)
+public abstract class Row {
 
-    byte[] format(String id,
-                  ReportGrid reportGrid,
-            List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> columnDefinitions,
-                  List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows)  throws IOException;
+    public abstract KeyCell id();
+
+    @Value.Default
+    public List<Cell> cells() {
+        return new ArrayList<>();
+    }
 }

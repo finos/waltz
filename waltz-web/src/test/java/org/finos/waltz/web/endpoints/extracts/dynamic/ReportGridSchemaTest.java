@@ -1,5 +1,9 @@
 package org.finos.waltz.web.endpoints.extracts.dynamic;
 
+import org.finos.waltz.web.json.ImmutableApiTypes;
+import org.finos.waltz.web.json.ImmutableGrid;
+import org.finos.waltz.web.json.ImmutableReportGridSchema;
+import org.finos.waltz.web.json.ReportGridSchema;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
