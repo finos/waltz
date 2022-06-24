@@ -394,3 +394,9 @@ export const widgets = [
         aggregatedEntityKinds: [entity.APPLICATION.key, entity.CHANGE_INITIATIVE.key]
     }
 ];
+
+
+export const RenderModes = {
+    OVERLAY: Symbol("OVERLAY"),
+    FOCUSED: Symbol("FOCUSED")
+};

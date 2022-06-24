@@ -1,5 +1,10 @@
 <script>
-    import {addCellClickHandlers, addSectionHeaderClickHandlers, clearContent} from "./aggregate-overlay-diagram-utils";
+    import {
+        addCellClickHandlers,
+        addSectionHeaderClickHandlers,
+        clearContent,
+        RenderModes
+    } from "./aggregate-overlay-diagram-utils";
     import {getContext} from "svelte";
     import _ from "lodash";
     import {select, selectAll} from "d3-selection";
@@ -45,17 +50,19 @@
 
                     let bBox = sb.getBoundingClientRect();
 
-                    const height = bBox.height;
-                    const width = bBox.width;
+                    const {width, height} = bBox;
+
+                    const customProps = {
+                        cellData: cellDataByCellExtId[cellId],
+                        renderMode: RenderModes.OVERLAY,
+                        height,
+                        width
+                    };
 
                     const cellProps = Object.assign(
                         {},
                         globalProps,
-                        {
-                            cellData: cellDataByCellExtId[cellId],
-                            height,
-                            width
-                        });
+                        customProps);
 
                     const component = $widget.overlay;
 
@@ -64,7 +71,10 @@
                         props: cellProps
                     });
 
-                    return {cellId, cellProps}
+                    return {
+                        cellId,
+                        cellProps
+                    };
                 })
                 .reduce(
                     (acc, d) => {
@@ -73,7 +83,10 @@
                     },
                     {});
 
-            addCellClickHandlers(svgHolderElem, selectedOverlay, propsByCellId);
+            addCellClickHandlers(
+                svgHolderElem,
+                selectedOverlay,
+                propsByCellId);
         }
     }
 
@@ -155,12 +168,16 @@
             const elem = cell.querySelector(".content");
 
             if (elem) {
+                const props = Object.assign(
+                    {},
+                    $selectedOverlayCell?.props,
+                    { renderMode: RenderModes.FOCUSED });
 
                 const popover = {
                     title: cellName,
-                    props: $selectedOverlayCell?.props,
+                    props,
                     component
-                }
+                };
 
                 Popover.add(popover);
             }
