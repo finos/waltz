@@ -15,7 +15,7 @@
  * See the License for the specific
  *
  */
-package org.finos.waltz.web.endpoints.extracts.dynamic;
+package org.finos.waltz.web.endpoints.extracts.reportgrid;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -34,8 +34,6 @@ import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.supercsv.io.CsvListWriter;
-import org.supercsv.prefs.CsvPreference;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

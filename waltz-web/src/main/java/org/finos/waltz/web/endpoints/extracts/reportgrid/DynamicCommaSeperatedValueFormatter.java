@@ -15,7 +15,7 @@
  * See the License for the specific
  *
  */
-package org.finos.waltz.web.endpoints.extracts.dynamic;
+package org.finos.waltz.web.endpoints.extracts.reportgrid;
 
 import org.finos.waltz.model.application.LifecyclePhase;
 import org.finos.waltz.model.report_grid.ReportGrid;

@@ -15,7 +15,7 @@
  * See the License for the specific
  *
  */
-package org.finos.waltz.web.endpoints.extracts.dynamic;
+package org.finos.waltz.web.endpoints.extracts.reportgrid;
 
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.model.entity_field_reference.EntityFieldReference;

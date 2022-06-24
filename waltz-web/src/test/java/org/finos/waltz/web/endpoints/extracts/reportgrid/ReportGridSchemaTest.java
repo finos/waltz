@@ -1,4 +1,4 @@
-package org.finos.waltz.web.endpoints.extracts.dynamic;
+package org.finos.waltz.web.endpoints.extracts.reportgrid;
 
 import org.finos.waltz.web.json.ImmutableApiTypes;
 import org.finos.waltz.web.json.ImmutableGrid;

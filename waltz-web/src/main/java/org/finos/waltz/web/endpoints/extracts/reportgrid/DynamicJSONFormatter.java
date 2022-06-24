@@ -15,7 +15,7 @@
  * See the License for the specific
  *
  */
-package org.finos.waltz.web.endpoints.extracts.dynamic;
+package org.finos.waltz.web.endpoints.extracts.reportgrid;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
