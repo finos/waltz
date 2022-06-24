@@ -31,8 +31,6 @@
             .join("\n")
             .value();
 
-    $: console.log({categories, measurables, groups})
-
 </script>
 
 <label>
