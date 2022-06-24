@@ -328,8 +328,6 @@ const sections = {
     "MANAGE_RISK": {
         "id": "MANAGE_RISK",
         "name": "Manage Risk",
-        "headerColor": "#ff0000",
-        "cellColor": "#dbfffe",
         rows: [
             [
                 cells.MANAGE_RISK_FRAMEWORKS,

@@ -18,18 +18,17 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.involvement.EntityInvolvementChangeCommand;
+import org.finos.waltz.model.involvement.Involvement;
+import org.finos.waltz.model.person.Person;
 import org.finos.waltz.service.involvement.InvolvementService;
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.endpoints.Endpoint;
-import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.IdSelectionOptions;
-import org.finos.waltz.model.application.Application;
-import org.finos.waltz.model.involvement.EntityInvolvementChangeCommand;
-import org.finos.waltz.model.involvement.Involvement;
-import org.finos.waltz.model.person.Person;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
@@ -58,8 +57,6 @@ public class InvolvementEndpoint implements Endpoint {
     public void register() {
 
         String findByEmployeePath = mkPath(BASE_URL, "employee", ":employeeId");
-        String findDirectAppsByEmployeePath = mkPath(findByEmployeePath, "applications", "direct");
-        String findAllAppsByEmployeePath = mkPath(findByEmployeePath, "applications");
         String findByEntityRefPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findPeopleByEntityRefPath = mkPath(findByEntityRefPath, "people");
 
@@ -73,16 +70,6 @@ public class InvolvementEndpoint implements Endpoint {
         ListRoute<Involvement> findByEmployeeRoute = (request, response) -> {
             String employeeId = request.params("employeeId");
             return service.findByEmployeeId(employeeId);
-        };
-
-        ListRoute<Application> findDirectAppsByEmployeeRoute = (request, response) -> {
-            String employeeId = request.params("employeeId");
-            return service.findDirectApplicationsByEmployeeId(employeeId);
-        };
-
-        ListRoute<Application>  findAllAppsByEmployeeRoute = (request, response) -> {
-            String employeeId = request.params("employeeId");
-            return service.findAllApplicationsByEmployeeId(employeeId);
         };
 
         ListRoute<Involvement> findByEntityRefRoute = (request, response) -> {
@@ -118,8 +105,6 @@ public class InvolvementEndpoint implements Endpoint {
         DatumRoute<Boolean> updateForEntityRefRoute = (request, response) -> updateEntityInvolvement(request);
 
         getForList(findByEmployeePath, findByEmployeeRoute);
-        getForList(findDirectAppsByEmployeePath, findDirectAppsByEmployeeRoute);
-        getForList(findAllAppsByEmployeePath, findAllAppsByEmployeeRoute);
         getForList(findByEntityRefPath, findByEntityRefRoute);
         getForDatum(countOrphanInvolvementsForKindPath, countOrphanInvolvementsForKindRoute);
         postForList(findBySelectorPath, findBySelectorRoute);

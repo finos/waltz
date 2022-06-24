@@ -41,11 +41,15 @@
                 Select a rating for more information or to edit
             </div>
             <div ng-if="$ctrl.selectedAssessment">
-                <waltz-assessment-editor assessment="$ctrl.selectedAssessment"
-                                         on-save="$ctrl.onSave"
-                                         on-close="$ctrl.onClose"
-                                         on-remove="$ctrl.onRemove">
-                </waltz-assessment-editor>
+                <waltz-svelte-component component="$ctrl.AssessmentEditor"
+                                        assessment="$ctrl.selectedAssessment"
+                                        on-close="$ctrl.onClose"
+                                        do-remove="$ctrl.onRemove"
+                                        do-save="$ctrl.onSave"
+                                        do-lock="$ctrl.onLock"
+                                        do-unlock="$ctrl.onUnlock"
+                                        permissions="$ctrl.permissions">
+                </waltz-svelte-component>
             </div>
         </div>
     </div>

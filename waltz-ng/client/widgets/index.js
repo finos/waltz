@@ -71,6 +71,7 @@ export default () => {
     module.directive("waltzStepCount", StepCount);
     module.directive("waltzSvelteComponent", SvelteComponent);
 
+
     module
         .component("waltzBasicInfoTile", BasicInfoTile)
         .component("waltzDataExtractLink", DataExtractLink)

@@ -63,14 +63,13 @@ Checkout [the project milestones](https://github.com/finos/waltz/milestones) and
 
 Provisional dates for upcoming releases:
 
-Release | Date 
---- | --- 
-1.42 | 14th June 
-1.42.1 | 28th June
-1.43 | 26th July 
-1.44 | 6th September
-1.45 | 18th October 
-1.46 | 22nd November 
+Release | Date | Summary
+--- | --- | --- 
+1.42.1 | 30th June | Enhanced permissions on assessments, more overlay diagram improvements
+1.43 | 26th July | Enhanced permissions on flows, tbd..
+1.44 | 6th September | tbd 
+1.45 | 18th October | tbd
+1.46 | 22nd November | tbd
 
 ## Contributing
 

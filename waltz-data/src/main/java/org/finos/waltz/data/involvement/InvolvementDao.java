@@ -20,12 +20,10 @@ package org.finos.waltz.data.involvement;
 
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.InlineSelectFieldFactory;
-import org.finos.waltz.data.application.ApplicationDao;
 import org.finos.waltz.data.person.PersonDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.ImmutableEntityReference;
-import org.finos.waltz.model.application.Application;
 import org.finos.waltz.model.involvement.ImmutableInvolvement;
 import org.finos.waltz.model.involvement.Involvement;
 import org.finos.waltz.model.person.Person;
@@ -44,10 +42,8 @@ import java.util.function.Function;
 import static java.util.stream.Collectors.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
-import static org.finos.waltz.data.application.ApplicationDao.IS_ACTIVE;
 import static org.finos.waltz.schema.Tables.CHANGE_INITIATIVE;
 import static org.finos.waltz.schema.Tables.END_USER_APPLICATION;
-import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static org.finos.waltz.schema.tables.Person.PERSON;
 import static org.finos.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
@@ -134,47 +130,6 @@ public class InvolvementDao {
                 .where(PERSON_HIERARCHY.MANAGER_ID.eq(employeeId)
                         .or(INVOLVEMENT.EMPLOYEE_ID.eq(employeeId)))
                 .fetch(TO_MODEL_MAPPER);
-    }
-
-
-    @Deprecated
-    public List<Application> findDirectApplicationsByEmployeeId(String employeeId) {
-        return dsl.select()
-                .from(APPLICATION)
-                .innerJoin(INVOLVEMENT)
-                .on(INVOLVEMENT.EMPLOYEE_ID.eq(employeeId))
-                .and(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                .where(APPLICATION.ID.eq(INVOLVEMENT.ENTITY_ID))
-                .and(IS_ACTIVE)
-                .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
-    }
-
-
-    @Deprecated
-    public List<Application> findAllApplicationsByEmployeeId(String employeeId) {
-        SelectOrderByStep<Record1<String>> employeeIds = DSL
-                    .selectDistinct(PERSON_HIERARCHY.EMPLOYEE_ID)
-                    .from(PERSON_HIERARCHY)
-                    .where(PERSON_HIERARCHY.MANAGER_ID.eq(employeeId))
-                    .union(DSL
-                            .select(DSL.value(employeeId))
-                            .from(PERSON_HIERARCHY));
-
-        SelectConditionStep<Record1<Long>> applicationIds = DSL
-                .selectDistinct(INVOLVEMENT.ENTITY_ID)
-                .from(INVOLVEMENT)
-                .where(INVOLVEMENT.ENTITY_KIND
-                        .eq(EntityKind.APPLICATION.name())
-                        .and(INVOLVEMENT.EMPLOYEE_ID.in(employeeIds)));
-
-        SelectConditionStep<Record> query = dsl
-                .select(APPLICATION.fields())
-                .from(APPLICATION)
-                .where(APPLICATION.ID.in(applicationIds))
-                .and(IS_ACTIVE);
-
-        return query
-                .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
     }
 
 

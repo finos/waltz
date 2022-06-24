@@ -27,6 +27,7 @@ import {entity} from "../../../common/services/enums/entity";
 import {filterUtils, maybeAddUntaggedFlowsTag} from "../../logical-flow-utils";
 import {loadFlowClassificationColorScale} from "../../../flow-classification-rule/flow-classification-utils";
 import FlowClassificationLegend from "../../../flow-classification-rule/components/svelte/FlowClassificationLegend.svelte";
+import ImageDownloadLink from "../../../common/svelte/ImageDownloadLink.svelte";
 
 const bindings = {
     filters: "<",
@@ -55,6 +56,8 @@ const defaultOptions = {
 
 const initialState = {
     FlowClassificationLegend,
+    ImageDownloadLink,
+    diagramElem: null,
     applications: [],
     flows: [],
     decorators: [],
@@ -150,7 +153,8 @@ function prepareGraphTweakers(logicalFlowUtilityService,
 }
 
 
-function controller($scope,
+function controller($element,
+                    $scope,
                     $q,
                     serviceBroker,
                     logicalFlowUtilityService) {
@@ -240,12 +244,14 @@ function controller($scope,
             .then(r => vm.allDataTypes = r.data);
 
         loadFlowClassificationColorScale(serviceBroker).then(r => vm.flowClassificationColors = r);
+        vm.diagramElem = document.querySelector(".viz");
     };
 
 }
 
 
 controller.$inject = [
+    "$element",
     "$scope",
     "$q",
     "ServiceBroker",

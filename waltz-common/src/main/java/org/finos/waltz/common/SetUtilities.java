@@ -144,8 +144,8 @@ public class SetUtilities {
     }
 
 
-    public static <T> boolean hasIntersection(Set<Long> xs,
-                                              Set<Long> ys) {
+    public static <T> boolean hasIntersection(Set<T> xs,
+                                              Set<T> ys) {
         return ! intersection(xs, ys).isEmpty();
     }
 }

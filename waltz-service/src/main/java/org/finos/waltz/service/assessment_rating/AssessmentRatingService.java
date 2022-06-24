@@ -18,9 +18,10 @@
 
 package org.finos.waltz.service.assessment_rating;
 
-import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.common.MapUtilities;
+import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.common.StringUtilities;
+import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.assessment_definition.AssessmentDefinitionDao;
@@ -32,6 +33,7 @@ import org.finos.waltz.model.assessment_rating.*;
 import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.rating.RatingSchemeItem;
+import org.finos.waltz.service.changelog.ChangeLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +42,8 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.SetUtilities.hasIntersection;
 import static org.finos.waltz.model.EntityReference.mkRef;
 
 @Service
@@ -94,15 +98,47 @@ public class AssessmentRatingService {
     }
 
 
-    public boolean store(SaveAssessmentRatingCommand command, String username) {
+    public boolean store(SaveAssessmentRatingCommand command, String username) throws InsufficientPrivelegeException {
+        verifyAnyPermission(SetUtilities.asSet(Operation.UPDATE, Operation.ADD), command.entityReference(), command.assessmentDefinitionId(), username);
         AssessmentDefinition assessmentDefinition = assessmentDefinitionDao.getById(command.assessmentDefinitionId());
-        createChangeLogEntry(command, username, assessmentDefinition);
+        createChangeLogEntryForSave(command, username, assessmentDefinition);
 
         return assessmentRatingDao.store(command);
     }
 
 
-    public boolean remove(RemoveAssessmentRatingCommand command, String username) {
+    public boolean lock(EntityReference entityReference,
+                        long assessmentDefinitionId,
+                        String username) throws InsufficientPrivelegeException {
+
+        verifyPermission(Operation.LOCK, entityReference, assessmentDefinitionId, username);
+        return assessmentRatingDao.lock(entityReference, assessmentDefinitionId, username);
+    }
+
+
+    public boolean unlock(EntityReference entityReference,
+                          long assessmentDefinitionId,
+                          String username) throws InsufficientPrivelegeException {
+        verifyPermission(
+                Operation.LOCK,
+                entityReference,
+                assessmentDefinitionId,
+                username);
+        return assessmentRatingDao.unlock(
+                entityReference,
+                assessmentDefinitionId,
+                username);
+    }
+
+
+    public boolean remove(RemoveAssessmentRatingCommand command, String username) throws InsufficientPrivelegeException {
+
+        verifyPermission(
+                Operation.REMOVE,
+                command.entityReference(),
+                command.assessmentDefinitionId(),
+                username);
+
         ChangeLog logEntry = ImmutableChangeLog.builder()
                 .message(format(
                         "Removed %s",
@@ -145,66 +181,6 @@ public class AssessmentRatingService {
         return result  > 1;
     }
 
-    private void createChangeLogEntry(SaveAssessmentRatingCommand command,
-                                      String username,
-                                      AssessmentDefinition assessmentDefinition) {
-        Optional<AssessmentRating>  previousRating = assessmentRatingDao.findForEntity(command.entityReference())
-                .stream()
-                .filter(r -> r.assessmentDefinitionId() == command.assessmentDefinitionId())
-                .findAny();
-        Optional<RatingSchemeItem> previousRatingSchemeItem = previousRating.map(assessmentRating -> ratingSchemeDAO.getRatingSchemeItemById(assessmentRating.ratingId()));
-        Optional<String> messagePostfix = previousRatingSchemeItem
-                .map(rn -> format(" from assessment %s as [%s - %s]",
-                        assessmentDefinition.name(),
-                        rn.name(),
-                        previousRating.get().comment()));
-
-        ChangeLog logEntry = ImmutableChangeLog.builder()
-                .message(format(
-                        "Storing assessment %s as [%s - %s]%s",
-                        assessmentDefinition.name(),
-                        ratingSchemeDAO.getRatingSchemeItemById(command.ratingId()).name(),
-                        command.comment(),
-                        messagePostfix.orElse("")))
-                .parentReference(mkRef(command.entityReference().kind(), command.entityReference().id()))
-                .userId(username)
-                .severity(Severity.INFORMATION)
-                .operation(Operation.UPDATE)
-                .build();
-
-        changeLogService.write(logEntry);
-    }
-
-    private void createChangeLogs(long assessmentDefinitionId,
-                                  String username,
-                                  Set<AssessmentRating> ratingsToAdd,
-                                  Operation operation) {
-
-        String messagePrefix = operation.equals(Operation.REMOVE) ? "Removed" : "Added";
-
-        AssessmentDefinition assessmentDefinition = assessmentDefinitionDao.getById(assessmentDefinitionId);
-        Map<Long, RatingSchemeItem> ratingItems = MapUtilities.indexBy(
-                ratingSchemeDAO.findRatingSchemeItemsForAssessmentDefinition(assessmentDefinitionId),
-                r -> r.id().orElse(0L));
-
-        Set<ChangeLog> logs = ratingsToAdd.stream()
-                .map(r ->
-                        ImmutableChangeLog.builder()
-                                .message(messagePrefix + format(
-                                        " assessment %s as [%s - %s] for %s",
-                                        assessmentDefinition.name(),
-                                        ratingItems.get(r.ratingId()).name(),
-                                        StringUtilities.ifEmpty(r.comment(),""),
-                                        r.entityReference().name().orElse("")))
-                                .parentReference(r.entityReference())
-                                .userId(username)
-                                .severity(Severity.INFORMATION)
-                                .operation(operation)
-                                .build())
-                .collect(Collectors.toSet());
-
-        changeLogService.write(logs);
-    }
 
     private Set<AssessmentRating> getRatingsFilterByOperation(BulkAssessmentRatingCommand[] commands,
                                                               long assessmentDefinitionId,
@@ -229,4 +205,110 @@ public class AssessmentRatingService {
                 .provenance("waltz")
                 .build();
     }
+
+
+    public Set<Operation> findRatingPermissions(EntityReference entityReference,
+                                                long assessmentDefinitionId,
+                                                String username) {
+
+        return assessmentRatingDao.findRatingPermissions(entityReference, assessmentDefinitionId, username);
+
+    }
+
+
+    // region HELPERS
+
+    private void verifyPermission(Operation requiredPerm,
+                                  EntityReference ref,
+                                  long defId,
+                                  String username) throws InsufficientPrivelegeException {
+        verifyAnyPermission(
+                asSet(requiredPerm),
+                ref,
+                defId,
+                username);
+    }
+
+
+    private void verifyAnyPermission(Set<Operation> possiblePerms,
+                                     EntityReference ref,
+                                     long defId,
+                                     String username) throws InsufficientPrivelegeException {
+
+        Set<Operation> perms = findRatingPermissions(ref, defId, username);
+        if (! hasIntersection(perms, possiblePerms)) {
+            throw new InsufficientPrivelegeException(format(
+                    "%s does not have any of the permissions: %s, for assessment def: %d: ",
+                    username,
+                    possiblePerms,
+                    defId));
+        }
+    }
+
+
+    private void createChangeLogEntryForSave(SaveAssessmentRatingCommand command,
+                                             String username,
+                                             AssessmentDefinition assessmentDefinition) {
+        Optional<AssessmentRating>  previousRating = assessmentRatingDao.findForEntity(command.entityReference())
+                                                                        .stream()
+                                                                        .filter(r -> r.assessmentDefinitionId() == command.assessmentDefinitionId())
+                                                                        .findAny();
+        Optional<RatingSchemeItem> previousRatingSchemeItem = previousRating.map(assessmentRating -> ratingSchemeDAO.getRatingSchemeItemById(assessmentRating.ratingId()));
+        Optional<String> messagePostfix = previousRatingSchemeItem
+                .map(rn -> format(" from assessment %s as [%s - %s]",
+                                  assessmentDefinition.name(),
+                                  rn.name(),
+                                  previousRating.get().comment()));
+
+        ChangeLog logEntry = ImmutableChangeLog.builder()
+                                               .message(format(
+                                                       "Storing assessment %s as [%s - %s]%s",
+                                                       assessmentDefinition.name(),
+                                                       ratingSchemeDAO.getRatingSchemeItemById(command.ratingId()).name(),
+                                                       command.comment(),
+                                                       messagePostfix.orElse("")))
+                                               .parentReference(mkRef(command.entityReference().kind(), command.entityReference().id()))
+                                               .userId(username)
+                                               .severity(Severity.INFORMATION)
+                                               .operation(Operation.UPDATE)
+                                               .build();
+
+        changeLogService.write(logEntry);
+    }
+
+
+    private void createChangeLogs(long assessmentDefinitionId,
+                                  String username,
+                                  Set<AssessmentRating> ratingsToAdd,
+                                  Operation operation) {
+
+        String messagePrefix = operation.equals(Operation.REMOVE) ? "Removed" : "Added";
+
+        AssessmentDefinition assessmentDefinition = assessmentDefinitionDao.getById(assessmentDefinitionId);
+        Map<Long, RatingSchemeItem> ratingItems = MapUtilities.indexBy(
+                ratingSchemeDAO.findRatingSchemeItemsForAssessmentDefinition(assessmentDefinitionId),
+                r -> r.id().orElse(0L));
+
+        Set<ChangeLog> logs = ratingsToAdd.stream()
+                                          .map(r ->
+                                                       ImmutableChangeLog.builder()
+                                                                         .message(messagePrefix + format(
+                                                                                 " assessment %s as [%s - %s] for %s",
+                                                                                 assessmentDefinition.name(),
+                                                                                 ratingItems.get(r.ratingId()).name(),
+                                                                                 StringUtilities.ifEmpty(r.comment(),""),
+                                                                                 r.entityReference().name().orElse("")))
+                                                                         .parentReference(r.entityReference())
+                                                                         .userId(username)
+                                                                         .severity(Severity.INFORMATION)
+                                                                         .operation(operation)
+                                                                         .build())
+                                          .collect(Collectors.toSet());
+
+        changeLogService.write(logs);
+    }
+
+    // endregion
+
+
 }

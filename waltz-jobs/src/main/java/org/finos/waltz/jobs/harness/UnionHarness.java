@@ -25,7 +25,6 @@ import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.data.complexity.ConnectionComplexityDao;
 import org.finos.waltz.data.data_type_usage.DataTypeUsageDao;
 import org.finos.waltz.data.entity_relationship.EntityRelationshipDao;
-import org.finos.waltz.data.involvement.InvolvementDao;
 import org.finos.waltz.data.licence.LicenceDao;
 import org.finos.waltz.data.logical_data_element.search.LogicalDataElementSearchDao;
 import org.finos.waltz.data.measurable.MeasurableDao;
@@ -72,7 +71,6 @@ public class UnionHarness {
         dataTypeUsageDao_recalculateForAllApplications(ctx);
         entityNameResolver_resolve(ctx);
         entityRelationshipDao_tallyRelationshipsInvolving(ctx);
-        involvementDao_findAllApplicationsByEmployeeId(ctx);
         licenceDao_countApplications(ctx);
         logicalDataElementSearch_search(ctx);
         measurableIdSelectorFactory_mkForFlowDiagram(ctx);
@@ -98,11 +96,6 @@ public class UnionHarness {
         System.out.println(counts);
     }
 
-
-    private static void involvementDao_findAllApplicationsByEmployeeId(ApplicationContext ctx) {
-        List<Application> apps = ctx.getBean(InvolvementDao.class).findAllApplicationsByEmployeeId("1234");
-        System.out.println(apps.size());
-    }
 
 
     private static void entityRelationshipDao_tallyRelationshipsInvolving(ApplicationContext ctx) {
