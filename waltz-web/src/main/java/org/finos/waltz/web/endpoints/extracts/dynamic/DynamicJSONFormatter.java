@@ -71,7 +71,7 @@ public class DynamicJSONFormatter implements DynamicFormatter {
                               List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows) throws IOException {
 
         ReportGridDefinition reportGridDefinition = reportGrid.definition();
-        ImmutableReportGridSchema reportGridSchema =
+        ReportGridSchema reportGridSchema =
                 ImmutableReportGridSchema.builder()
                         .id(reportGridDefinition.externalId().orElseGet(()->""+reportGridDefinition.id()))
                         .apiTypes(new ApiTypes())
@@ -87,12 +87,12 @@ public class DynamicJSONFormatter implements DynamicFormatter {
     private Grid transform(List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> columnDefinitions,
                            List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows) {
 
-        ArrayList<Row> data = new ArrayList<>();
-        data.ensureCapacity(reportRows.size());
+        List<Row> data = new ArrayList<>(reportRows.size());
+
         for (Tuple2<ReportSubject, ArrayList<Object>> currentRow : reportRows) {
             ImmutableRow.Builder transformedRow = ImmutableRow.builder();
 
-            List<Cell> transformedRowValues = new ArrayList<>();
+            List<CellValue> transformedRowValues = new ArrayList<>();
 
             transformedRow.id(createKeyElement(currentRow.v1.entityReference()));
             List<String> columnHeadings = formatterUtils.mkColumnHeaders(columnDefinitions);
@@ -158,7 +158,9 @@ public class DynamicJSONFormatter implements DynamicFormatter {
         List<Object> appInfo = asList(appId, appName, assetCode, lifecyclePhase.name());
 
         return map(concat(appInfo, row.v2), value -> {
-            if (value == null) return null;
+            if (value == null) {
+                return null;
+            }
             if (value instanceof Optional) {
                 return ((Optional<?>) value).orElse(null);
             } else {

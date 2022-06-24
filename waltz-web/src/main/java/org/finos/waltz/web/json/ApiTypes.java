@@ -40,8 +40,8 @@ public class ApiTypes {
 
     public ApiTypes() {
         Map<String, String> types = new HashMap<>();
-        types.put(KEYCELL, "http://waltz.intranet.db.com/types/1/schema#id=KeyCell");
-        types.put(VALCELL, "http://waltz.intranet.db.com/types/1/schema#id=CellValue");
+        types.put(KEYCELL, "/types/1/schema#id=KeyCell");
+        types.put(VALCELL, "/types/1/schema#id=CellValue");
         this.apiTypes = types;
     }
 

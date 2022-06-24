@@ -31,6 +31,6 @@ public interface DynamicFormatter {
 
     byte[] format(String id,
                   ReportGrid reportGrid,
-            List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> columnDefinitions,
+                  List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> columnDefinitions,
                   List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows)  throws IOException;
 }

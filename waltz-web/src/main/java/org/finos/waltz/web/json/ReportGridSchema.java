@@ -28,7 +28,7 @@ import org.immutables.value.Value;
 @JsonPropertyOrder({"type","id","name"})
 public interface ReportGridSchema extends Schema{
 
-    String TYPE ="http://waltz.intranet.db.com/types/1/schema#id=report-grid";
+    String TYPE ="/types/1/schema#id=report-grid";
 
     @Value.Default
     default String type() {

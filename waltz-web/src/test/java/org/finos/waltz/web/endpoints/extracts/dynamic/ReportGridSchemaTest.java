@@ -26,7 +26,7 @@ class ReportGridSchemaTest {
 
     @Test
     public void warnIfURItypeIsChanged(){
-        String expectedType ="http://waltz.intranet.db.com/types/1/schema#id=report-grid";
+        String expectedType ="/types/1/schema#id=report-grid";
         assertEquals(expectedType, reportGridSchema.type(),
                 "Consumers using Jackson serialisation may be broken if you change type as it forms part of public API");
     }

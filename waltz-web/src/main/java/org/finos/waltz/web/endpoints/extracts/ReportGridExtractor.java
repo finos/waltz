@@ -151,12 +151,8 @@ public class ReportGridExtractor implements DataExtractor {
     }
 
     private static ColumnCommentary columnHasComment(ReportGridColumnDefinition cd, Set<Long> colsNeedingComments ){
-       if (cd.columnEntityKind().equals(EntityKind.SURVEY_QUESTION) &&
-               colsNeedingComments.contains(cd.columnEntityId())){
-           return ColumnCommentary.HAS_COMMENTARY;
-       }else{
-           return ColumnCommentary.NO_COMMENTARY;
-       }
+       return (colsNeedingComments.contains(cd.columnEntityId())) ?
+               ColumnCommentary.HAS_COMMENTARY:ColumnCommentary.NO_COMMENTARY;
     }
 
     private String mkReportName(ReportGridDefinition gridDefinition, IdSelectionOptions selectionOptions) {

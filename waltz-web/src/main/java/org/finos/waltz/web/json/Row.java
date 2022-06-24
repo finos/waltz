@@ -32,7 +32,7 @@ public abstract class Row {
     public abstract KeyCell id();
 
     @Value.Default
-    public List<Cell> cells() {
+    public List<CellValue> cells() {
         return new ArrayList<>();
     }
 }
