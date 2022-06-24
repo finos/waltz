@@ -2,6 +2,7 @@
     import {buildHierarchies} from "../../../common/hierarchy-utils";
     import OverlayDiagramBuilder from "./OverlayDiagramBuilder.svelte";
     import {mkChunks} from "../../../common/list-utils";
+    import _ from "lodash";
 
     export let categories;
     export let measurables;
