@@ -129,15 +129,17 @@ function controller($scope, serviceBroker, localStorageService) {
 
     vm.$onChanges = () => {
 
-        const lastUsedGridId = localStorageService.get(localStorageKey);
+        if (vm.parentEntityRef) {
 
-        if (!vm.parentEntityRef) return;
-
-        if (lastUsedGridId) {
-            vm.gridId = lastUsedGridId;
             vm.selectionOptions = mkSelectionOptions(vm.parentEntityRef);
-            vm.loading = true;
-            loadGridData();
+            const lastUsedGridId = localStorageService.get(localStorageKey);
+
+            if (lastUsedGridId) {
+                vm.gridId = lastUsedGridId;
+                vm.loading = true;
+                loadGridData();
+            }
+
         }
     };
 
