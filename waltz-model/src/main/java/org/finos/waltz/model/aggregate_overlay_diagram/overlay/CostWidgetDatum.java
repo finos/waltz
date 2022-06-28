@@ -4,14 +4,22 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.immutables.value.Value;
 
 import java.math.BigDecimal;
+import java.util.Set;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableCostWidgetDatum.class)
 public abstract class CostWidgetDatum {
 
     public abstract String cellExternalId();
-    public abstract BigDecimal totalCost();
 
-    public abstract int appCount();
+    @Value.Derived
+    public BigDecimal totalCost() {
+        return measurableCosts()
+                .stream()
+                .map(MeasurableCostEntry::allocatedCost)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public abstract Set<MeasurableCostEntry> measurableCosts();
 
 }
