@@ -52,7 +52,7 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 import static spark.Spark.post;
 
 @Service
-public class ReportGridExtractor implements DataExtractor {
+public class ReportGridExtractor implements PublicDataExtractor {
 
     public static final String BASE_URL = WebUtilities.mkPath("data-extract", "report-grid");
     private final DynamicCommaSeperatedValueFormatter dynamicCommaSeperatedValueFormatter;
@@ -286,4 +286,6 @@ public class ReportGridExtractor implements DataExtractor {
     private static final LongFunction<NotFoundException> notFoundException = (gridId) -> new NotFoundException(
             "REPORT_GRID_NOT_FOUND",
             format(" Grid def: %d not found", gridId));
+
+
 }

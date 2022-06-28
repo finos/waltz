@@ -135,9 +135,8 @@ public class DynamicJSONFormatter implements DynamicFormatter {
     }
 
     private KeyCell createKeyElement(EntityReference keyAttrib ){
-        return ImmutableKeyCell.builder()
-                .key(keyAttrib)
-                .build();
+        return KeyCell
+                .fromRef(keyAttrib);
     }
 
 

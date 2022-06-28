@@ -15,21 +15,15 @@
  * See the License for the specific
  *
  */
-package org.finos.waltz.web.json;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.immutables.value.Value;
+package org.finos.waltz.web.endpoints.extracts;
 
-import java.util.ArrayList;
-import java.util.List;
+/**
+ * Marker interface applied to extractors whose output can be formatted as JSON and form
+ * part of a Waltz public API.
+ * This means care must be taken when changing the data returned to ensure that the
+ * JSON can still be consumed by pre-existing clients.
+ */
+public interface PublicDataExtractor extends DataExtractor {
 
-@Value.Immutable
-@JsonSerialize(as = ImmutableRow.class)
-@JsonDeserialize(as = ImmutableRow.class)
-public abstract class Row {
-
-    public abstract KeyCell id();
-
-    public abstract List<CellValue> cells();
 }

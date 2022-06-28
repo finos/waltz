@@ -17,10 +17,15 @@
  */
 package org.finos.waltz.web.json;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.EntityReference;
 import org.immutables.value.Value;
+
+import java.util.Optional;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableKeyCell.class)
@@ -34,7 +39,26 @@ public interface KeyCell extends Cell {
         return TYPE;
     }
 
+    Optional<String> name();
 
-    EntityReference key();
+    EntityKind kind();
+
+    Optional<Long> waltzId();
+
+    Optional<String> externalId();
+
+    EntityLifecycleStatus lifecycleStatus();
+
+
+    static KeyCell fromRef(EntityReference ref) {
+        return ImmutableKeyCell
+                .builder()
+                .name(ref.name())
+                .kind(ref.kind())
+                .waltzId(ref.id())
+                .externalId(ref.externalId())
+                .lifecycleStatus(ref.entityLifecycleStatus())
+                .build();
+    }
 
 }
