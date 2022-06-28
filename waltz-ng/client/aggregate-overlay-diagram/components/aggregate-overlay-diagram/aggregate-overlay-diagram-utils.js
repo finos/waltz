@@ -165,7 +165,7 @@ export function setupContextStores() {
                             return {
                                 definitionId,
                                 ratingIds
-                            }
+                            };
                         });
 
                 const body = Object.assign(

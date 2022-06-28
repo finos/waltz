@@ -1,13 +1,29 @@
 package org.finos.waltz.service.aggregate_overlay_diagram;
 
-import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
-import org.finos.waltz.data.aggregate_overlay_diagram.*;
+import org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramDao;
+import org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramPresetDao;
+import org.finos.waltz.data.aggregate_overlay_diagram.AggregatedEntitiesWidgetDao;
+import org.finos.waltz.data.aggregate_overlay_diagram.AppCostWidgetDao;
+import org.finos.waltz.data.aggregate_overlay_diagram.AppCountWidgetDao;
+import org.finos.waltz.data.aggregate_overlay_diagram.AssessmentRatingWidgetDao;
+import org.finos.waltz.data.aggregate_overlay_diagram.BackingEntityWidgetDao;
+import org.finos.waltz.data.aggregate_overlay_diagram.TargetAppCostWidgetDao;
 import org.finos.waltz.model.AssessmentBasedSelectionFilter;
 import org.finos.waltz.model.IdSelectionOptions;
-import org.finos.waltz.model.aggregate_overlay_diagram.*;
-import org.finos.waltz.model.aggregate_overlay_diagram.overlay.*;
+import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
+import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramInfo;
+import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramPreset;
+import org.finos.waltz.model.aggregate_overlay_diagram.BackingEntity;
+import org.finos.waltz.model.aggregate_overlay_diagram.ImmutableAggregateOverlayDiagramInfo;
+import org.finos.waltz.model.aggregate_overlay_diagram.OverlayDiagramPresetCreateCommand;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.AggregatedEntitiesWidgetDatum;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.AssessmentRatingsWidgetDatum;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.BackingEntityWidgetDatum;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.CostWidgetDatum;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.CountWidgetDatum;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.TargetCostWidgetDatum;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AppCostWidgetParameters;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AppCountWidgetParameters;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AssessmentWidgetParameters;
@@ -144,7 +160,7 @@ public class AggregateOverlayDiagramService {
                                                                                IdSelectionOptions idSelectionOptions) {
 
         AggregateOverlayDiagram diagram = aggregateOverlayDiagramDao.getById(diagramId);
-        ;
+
         GenericSelector genericSelector = genericSelectorFactory.applyForKind(diagram.aggregatedEntityKind(), idSelectionOptions);
         Select<Record1<Long>> entityIdSelector = applyFiltersToSelector(genericSelector, filterParams);
 

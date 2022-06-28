@@ -14,7 +14,7 @@
         .map(d => d.rating)
         .uniqBy(d => d.id)
         .orderBy(["position", "name"])
-        .value()
+        .value();
 
 </script>
 

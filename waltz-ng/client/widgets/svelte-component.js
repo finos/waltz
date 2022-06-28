@@ -18,21 +18,6 @@
 
 import _ from "lodash";
 
-/**
- * Attempts to get the value referenced by propVal out of the scope
- * However it may not be a scope variable, it may be a literal
- * so we fall back to the propVal itself.
- *
- * @param propVal
- * @param scope
- * @returns {*}
- */
-function getVal(propVal, scope) {
-    return propVal.startsWith(".")
-        ? propVal
-        : _.get(scope, propVal, propVal);
-}
-
 
 const directive = function() {
     let comp = null;
@@ -69,7 +54,7 @@ const directive = function() {
                 } else {
                     scope.$watch(
                         p,
-                        (oldVal, newVal, s) => {
+                        (newVal, oldVal, s) => {
                             const upd = {[k]: newVal};
                             comp.$set(upd);
                         });

@@ -14,6 +14,7 @@
     const widgetParameters = getContext("widgetParameters");
     const diagramPresets = getContext("diagramPresets");
     const disabledWidgetKeys = getContext("disabledWidgetKeys");
+    const overlayData = getContext("overlayData");
 
     let settingsCall = settingsStore.loadAll();
     let disabledWidgetsSetting;
@@ -28,11 +29,13 @@
 
     function onCancel() {
         $focusWidget = null;
+        $overlayData = [];
         $selectedOverlay = null;
     }
 
     function selectWidget(widget) {
         $widgetParameters = null;
+        $overlayData = [];
         $focusWidget = widget;
     }
 
@@ -43,7 +46,7 @@
     <h4>
         <Icon name={$focusWidget.icon}/>
         {$focusWidget.label}
-        <button class="small btn btn-skinny"
+        <button class="btn btn-skinny"
                 on:click={onCancel}>
             (Change overlay)
         </button>

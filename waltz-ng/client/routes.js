@@ -20,6 +20,8 @@ import {CORE_API} from "./common/services/core-api-utils";
 import WelcomeJs from "./welcome/welcome.js";
 import {activeSections} from "./dynamic-section/section-store";
 import toasts from "./svelte-stores/toast-store";
+import popover from "./svelte-stores/popover-store";
+
 
 function warmUpCache($q, serviceBroker) {
     return $q
@@ -78,6 +80,8 @@ function configureScrollToTopOnChange($doc, $transitions) {
     $transitions.onSuccess({}, () => {
         $doc[0].body.scrollTop = 0;
         $doc[0].documentElement.scrollTop = 0;
+        // remove any popovers, as unlikely they would still be wanted after a page transition
+        popover.dismiss();
     });
 }
 

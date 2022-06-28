@@ -4,8 +4,8 @@
     import {mkChunks} from "../../../common/list-utils";
     import _ from "lodash";
 
-    export let categories;
-    export let measurables;
+    export let categories = [];
+    export let measurables = [];
 
     let selectedCategory = null;
     let groups = [];
@@ -24,7 +24,7 @@
         : [];
 
 
-    $: cellMappings = _
+    $: sqlStatements = _
             .chain(groups)
             .flatMap(g => g.rows)
             .flatMap()
@@ -47,5 +47,6 @@
 {#if groups.length > 0}
     <OverlayDiagramBuilder config={groups}/>
 
-    <pre>{cellMappings}</pre>
+    <h4>SQL</h4>
+    <pre>{sqlStatements}</pre>
 {/if}
