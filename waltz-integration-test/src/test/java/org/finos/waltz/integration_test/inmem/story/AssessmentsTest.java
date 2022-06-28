@@ -2,10 +2,7 @@ package org.finos.waltz.integration_test.inmem.story;
 
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
-import org.finos.waltz.integration_test.inmem.helpers.AppHelper;
-import org.finos.waltz.integration_test.inmem.helpers.ChangeLogHelper;
-import org.finos.waltz.integration_test.inmem.helpers.NameHelper;
-import org.finos.waltz.integration_test.inmem.helpers.RatingSchemeHelper;
+import org.finos.waltz.integration_test.inmem.helpers.*;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.Operation;
@@ -36,6 +33,12 @@ public class AssessmentsTest extends BaseInMemoryIntegrationTest {
     private AppHelper appHelper;
 
     @Autowired
+    private UserHelper userHelper;
+
+    @Autowired
+    private PersonHelper personHelper;
+
+    @Autowired
     private AssessmentDefinitionService definitionService;
 
     @Autowired
@@ -52,9 +55,15 @@ public class AssessmentsTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void createUpdateAndRemoveSingleRating() throws InsufficientPrivelegeException {
-        String user = NameHelper.mkUserId("user");
+        String adminUser = NameHelper.mkUserId("adminUser");
+        String userWithPerms = NameHelper.mkUserId("userWithPerms");
+        String userWithoutPerms = NameHelper.mkUserId("userWithoutPerms");
         String name = NameHelper.mkName("testAssessment");
         String role = NameHelper.mkName("testRole");
+
+        personHelper.createPerson(userWithPerms);
+        personHelper.createPerson(userWithoutPerms);
+
         SchemeDetail schemeDetail = createScheme();
 
         AssessmentDefinition def = ImmutableAssessmentDefinition.builder()
@@ -63,7 +72,7 @@ public class AssessmentsTest extends BaseInMemoryIntegrationTest {
                 .isReadOnly(false)
                 .permittedRole(role)
                 .entityKind(EntityKind.APPLICATION)
-                .lastUpdatedBy(user)
+                .lastUpdatedBy(adminUser)
                 .visibility(AssessmentVisibility.SECONDARY)
                 .ratingSchemeId(schemeDetail.id)
                 .build();
@@ -93,14 +102,23 @@ public class AssessmentsTest extends BaseInMemoryIntegrationTest {
         EntityReference app1 = appHelper.createNewApp(NameHelper.mkName("app1"), ouIds.a);
         EntityReference app2 = appHelper.createNewApp(NameHelper.mkName("app2"), ouIds.b);
 
-        SaveAssessmentRatingCommand cmd = ImmutableSaveAssessmentRatingCommand.builder()
+        SaveAssessmentRatingCommand cmd = ImmutableSaveAssessmentRatingCommand
+                .builder()
                 .assessmentDefinitionId(defId)
                 .entityReference(app1)
                 .ratingId(schemeDetail.y)
-                .lastUpdatedBy(user)
+                .lastUpdatedBy(userWithPerms)
                 .build();
 
-        ratingService.store(cmd, user);
+        try {
+            ratingService.store(cmd, userWithoutPerms);
+            fail("should have thrown an exception as user cannot update assessment");
+        } catch (InsufficientPrivelegeException ipe) {
+            // pass
+        }
+
+        userHelper.createUserWithRoles(userWithPerms, role);
+        ratingService.store(cmd, userWithPerms);
 
         changeLogHelper.assertChangeLogContainsAtLeastOneMatchingOperation(
                 app1,
@@ -115,7 +133,7 @@ public class AssessmentsTest extends BaseInMemoryIntegrationTest {
                 ImmutableSaveAssessmentRatingCommand
                     .copyOf(cmd)
                     .withRatingId(schemeDetail.n),
-                user);
+                userWithPerms);
 
         changeLogHelper.assertChangeLogContainsAtLeastOneMatchingOperation(
                 app1,
@@ -137,9 +155,9 @@ public class AssessmentsTest extends BaseInMemoryIntegrationTest {
                 ImmutableRemoveAssessmentRatingCommand.builder()
                         .assessmentDefinitionId(defId)
                         .entityReference(app1)
-                        .lastUpdatedBy(user)
+                        .lastUpdatedBy(userWithPerms)
                     .build(),
-                user);
+                userWithPerms);
 
         changeLogHelper.assertChangeLogContainsAtLeastOneMatchingOperation(
                 app1,
