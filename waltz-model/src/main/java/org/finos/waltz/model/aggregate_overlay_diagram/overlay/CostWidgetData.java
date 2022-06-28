@@ -6,14 +6,12 @@ import org.finos.waltz.model.cost.EntityCostKind;
 import org.finos.waltz.model.measurable.Measurable;
 import org.immutables.value.Value;
 
-import java.math.BigDecimal;
 import java.util.Set;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableCostWidgetData.class)
-public abstract class CostWidgetData {
+public abstract class CostWidgetData implements CellDataProvider<CostWidgetDatum> {
 
-    public abstract Set<CostWidgetDatum> costs();
 
     public abstract Set<Application> applications();
 

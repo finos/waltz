@@ -307,11 +307,13 @@ export function mkTargetAppCountGlobalProps(data) {
 
 
 export function mkAppCostGlobalProps(data) {
+
     const maxCost = _
-        .chain(data)
+        .chain(data.cellData)
         .map(d => _.get(d, ["totalCost"], 0))
         .max()
         .value();
+    console.log("mkAppCostGlobalProps", {data, maxCost})
     return {maxCost};
 }
 

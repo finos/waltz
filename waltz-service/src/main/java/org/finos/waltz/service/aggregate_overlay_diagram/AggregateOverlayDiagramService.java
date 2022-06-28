@@ -26,6 +26,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.finos.waltz.data.assessment_rating.AssessmentRatingBasedGenericSelectorFactory.applyFiltersToSelector;
+
 @Service
 public class AggregateOverlayDiagramService {
 
@@ -106,7 +108,7 @@ public class AggregateOverlayDiagramService {
                                                                   TargetAppCostWidgetParameters targetAppCostWidgetParameters) {
 
         AggregateOverlayDiagram diagram = aggregateOverlayDiagramDao.getById(diagramId);
-        ;
+
         GenericSelector genericSelector = genericSelectorFactory.applyForKind(diagram.aggregatedEntityKind(), appSelectionOptions);
 
         Select<Record1<Long>> entityIdSelector = applyFiltersToSelector(genericSelector, filterParams);
@@ -115,7 +117,7 @@ public class AggregateOverlayDiagramService {
 
 
     public CostWidgetData getAppCostWidgetData(Long diagramId,
-                                               Optional<AssessmentBasedSelectionFilter> filterParams,
+                                               Set<AssessmentBasedSelectionFilter> filterParams,
                                                IdSelectionOptions appSelectionOptions,
                                                AppCostWidgetParameters appCostWidgetParameters) {
 
@@ -131,17 +133,16 @@ public class AggregateOverlayDiagramService {
                 entityIdSelector,
                 Optional.empty());
 
-        Set<Row1<Long>> measurableIds = widgetData
+        Set<Long> measurableIds = widgetData
                 .stream()
                 .flatMap(d -> d.measurableCosts().stream())
                 .map(MeasurableCostEntry::measurableId)
-                .map(DSL::row)
                 .collect(Collectors.toSet());
 
         Table<?> measurableIdTable = DSL.table(measurableIds);
 
         SelectJoinStep<Record1<Long>> measurableSelector = DSL
-                .select(measurableIdTable.field(0, Long.class))
+                .select(measurableIdTable.field(1, Long.class))
                 .from(measurableIdTable);
 
         List<Measurable> measurables = measurableDao.findByMeasurableIdSelector(measurableSelector);
@@ -149,7 +150,7 @@ public class AggregateOverlayDiagramService {
         Set<EntityCostKind> costKinds = costKindDao.findAll();
 
         return ImmutableCostWidgetData.builder()
-                .costs(widgetData)
+                .cellData(widgetData)
                 .measurables(measurables)
                 .applications(applications)
                 .costKinds(costKinds)

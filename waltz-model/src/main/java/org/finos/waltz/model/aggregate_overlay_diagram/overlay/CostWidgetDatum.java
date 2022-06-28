@@ -8,9 +8,7 @@ import java.util.Set;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableCostWidgetDatum.class)
-public abstract class CostWidgetDatum {
-
-    public abstract String cellExternalId();
+public abstract class CostWidgetDatum implements CellExternalIdProvider {
 
     @Value.Derived
     public BigDecimal totalCost() {
@@ -18,6 +16,15 @@ public abstract class CostWidgetDatum {
                 .stream()
                 .map(MeasurableCostEntry::allocatedCost)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    @Value.Derived
+    public long appCount() {
+        return measurableCosts()
+                .stream()
+                .map(MeasurableCostEntry::appId)
+                .distinct()
+                .count();
     }
 
     public abstract Set<MeasurableCostEntry> measurableCosts();

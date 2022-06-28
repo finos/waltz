@@ -10,6 +10,8 @@
         .range([0, 45]);
 
     $: tr = r(cellData?.totalCost) || 0;
+
+    $: console.log("overlay cell", {maxCost});
 </script>
 
 

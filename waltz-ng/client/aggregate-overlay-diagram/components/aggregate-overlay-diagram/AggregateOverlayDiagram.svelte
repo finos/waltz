@@ -33,7 +33,7 @@
     $: {
         if (svgHolderElem && $overlayData && $widget?.overlay) {
             const cellDataByCellExtId = _.keyBy(
-                $overlayData,
+                $overlayData.cellData,
                 d => d.cellExternalId);
 
             clearContent(svgHolderElem, ".statistics-box");
@@ -189,7 +189,7 @@
         if (svgHolderElem && $overlayData && $selectedInstance == null) {
 
             const cellsWithData = _
-                .chain($overlayData)
+                .chain($overlayData.cellData)
                 .map(d => d.cellExternalId)
                 .value();
 
