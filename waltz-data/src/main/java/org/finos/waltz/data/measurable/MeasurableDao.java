@@ -112,7 +112,6 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .from(MEASURABLE)
                 .where(dsl.renderInlined(MEASURABLE.ID.in(selector)));
 
-        System.out.println(qry);
         return qry.fetch(TO_DOMAIN_MAPPER);
     }
 

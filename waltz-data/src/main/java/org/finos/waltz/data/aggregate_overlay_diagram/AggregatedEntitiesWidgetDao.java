@@ -6,6 +6,7 @@ import org.finos.waltz.model.aggregate_overlay_diagram.overlay.AggregatedEntitie
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.ImmutableAggregatedEntitiesWidgetDatum;
 import org.finos.waltz.schema.Tables;
 import org.jooq.*;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -18,6 +19,7 @@ import java.util.Set;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramUtilities.loadCellExtIdToAggregatedEntities;
+import static org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramUtilities.loadExpandedCellMappingsForDiagram;
 import static org.finos.waltz.model.EntityReference.mkRef;
 
 @Repository
@@ -37,9 +39,12 @@ public class AggregatedEntitiesWidgetDao {
                                                              Select<Record1<Long>> inScopeEntityIdSelector,
                                                              Optional<LocalDate> targetStateDate) {
 
+        Set<Tuple2<String, EntityReference>> cellWithBackingEntities = loadExpandedCellMappingsForDiagram(dsl, diagramId);
+
         Map<String, Set<Long>> cellExtIdsToAggregatedEntities = loadCellExtIdToAggregatedEntities(
                 dsl,
                 diagramId,
+                cellWithBackingEntities,
                 aggregatedEntityKind,
                 inScopeEntityIdSelector,
                 targetStateDate);

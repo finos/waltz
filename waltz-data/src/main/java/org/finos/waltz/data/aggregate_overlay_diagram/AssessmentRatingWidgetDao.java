@@ -3,12 +3,14 @@ package org.finos.waltz.data.aggregate_overlay_diagram;
 import org.finos.waltz.common.MapUtilities;
 import org.finos.waltz.data.rating_scheme.RatingSchemeDAO;
 import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.AssessmentRatingCount;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.AssessmentRatingsWidgetDatum;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.ImmutableAssessmentRatingCount;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.ImmutableAssessmentRatingsWidgetDatum;
 import org.finos.waltz.schema.tables.AssessmentRating;
 import org.jooq.*;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -44,9 +46,12 @@ public class AssessmentRatingWidgetDao {
                                                             Select<Record1<Long>> inScopeEntityIdSelector,
                                                             Optional<LocalDate> targetStateDate) {
 
+        Set<Tuple2<String, EntityReference>> cellWithBackingEntities = loadExpandedCellMappingsForDiagram(dsl, diagramId);
+
         Map<String, Set<Long>> cellExtIdsToAggregatedEntities = loadCellExtIdToAggregatedEntities(
                 dsl,
                 diagramId,
+                cellWithBackingEntities,
                 aggregatedEntityKind,
                 inScopeEntityIdSelector,
                 targetStateDate);

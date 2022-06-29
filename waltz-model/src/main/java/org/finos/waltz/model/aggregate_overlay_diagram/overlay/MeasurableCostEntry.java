@@ -26,10 +26,5 @@ public abstract class MeasurableCostEntry {
     @Nullable
     public abstract BigDecimal allocatedCost();
 
-    @Value.Derived
-    public AllocationDerivation derivationKind() {
-        return allocationPercentage() == null
-                ? AllocationDerivation.IMPLICIT
-                : AllocationDerivation.EXPLICIT;
-    }
+    public abstract AllocationDerivation allocationDerivation();
 }

@@ -313,8 +313,13 @@ export function mkAppCostGlobalProps(data) {
         .map(d => _.get(d, ["totalCost"], 0))
         .max()
         .value();
-    console.log("mkAppCostGlobalProps", {data, maxCost})
-    return {maxCost};
+
+    return {
+        maxCost,
+        applicationsById: _.keyBy(data.applications, d => d.id),
+        measurablesById: _.keyBy(data.measurables, d => d.id),
+        costKindsById: _.keyBy(data.costKinds, d => d.id)
+    };
 }
 
 
@@ -325,7 +330,10 @@ export function mkTargetAppCostGlobalProps(data) {
         .flatten()
         .max()
         .value();
-    return {maxCost};
+
+    return {
+        maxCost,
+    };
 }
 
 
