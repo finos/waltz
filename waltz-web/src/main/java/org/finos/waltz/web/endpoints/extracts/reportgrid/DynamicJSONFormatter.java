@@ -102,7 +102,7 @@ public class DynamicJSONFormatter implements DynamicFormatter {
             int maxColumns = columnHeadings.size();
 
             for (int idx = 0; idx < maxColumns; idx++) {
-                String formattedColumnName = formatterUtils.getShortColumnName(columnHeadings.get(idx));
+                String formattedColumnName = columnHeadings.get(idx)!=null?columnHeadings.get(idx):"";
                 int prevCellAddedIdx= transformedRowValues.size() - 1;
                 boolean isComment = (formattedColumnName.contains("comment"));
                 Object currentCell = currentRow.v2.get(idx);

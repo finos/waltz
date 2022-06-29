@@ -85,15 +85,4 @@ public class FormatterUtils {
         }
     }
 
-    /**
-     * Column names are composed of A / B     Eg King / Change Initiative.  For the JSON
-     * representation we only part 'A'
-     */
-    public String getShortColumnName(String composedColumnName) {
-        if(composedColumnName!=null){
-            String[] components = composedColumnName.split("/");
-            return components[0].trim();
-        }
-        return "";
-    }
 }
