@@ -17,7 +17,7 @@
  */
 package org.finos.waltz.web.json;
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.EntityKind;
@@ -30,13 +30,11 @@ import java.util.Optional;
 @Value.Immutable
 @JsonSerialize(as = ImmutableKeyCell.class)
 @JsonDeserialize(as = ImmutableKeyCell.class)
-public interface KeyCell extends Cell {
-
-    String TYPE =ApiTypes.KEYCELL;
+public interface KeyCell{
 
     @Value.Default
     default String type() {
-        return TYPE;
+        return ApiTypes.KEYCELL;
     }
 
     Optional<String> name();

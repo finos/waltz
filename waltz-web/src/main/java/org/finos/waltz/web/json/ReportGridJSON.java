@@ -18,22 +18,24 @@
 package org.finos.waltz.web.json;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.immutables.value.Value;
 
+@Value.Immutable
+@JsonSerialize(as = ImmutableReportGridJSON.class)
+@JsonDeserialize(as = ImmutableReportGridJSON.class)
+@JsonPropertyOrder({"type","id","name"})
+public interface ReportGridJSON extends JsonAPI {
 
-@JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.EXISTING_PROPERTY,
-        property = "type",
-        visible = true)
-@JsonSubTypes({
-        @JsonSubTypes.Type(value = ReportGridSchema.class, name = ReportGridSchema.TYPE)
-})
-@JsonPropertyOrder({"apiTypes","type"})
-public interface Schema {
+    String REPORT_GRID_TYPE ="/types/1/schema#id=report-grid";
 
-    ApiTypes apiTypes();
+    @Value.Default
+    default String type() {
+        return REPORT_GRID_TYPE;
+    }
+    String id();
+    String name();
 
-    String type();
+    Grid grid();
 }

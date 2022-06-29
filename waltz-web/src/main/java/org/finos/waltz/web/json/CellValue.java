@@ -27,14 +27,11 @@ import java.util.Optional;
 @Value.Immutable
 @JsonSerialize(as = ImmutableCellValue.class)
 @JsonDeserialize(as = ImmutableCellValue.class)
-public interface CellValue extends Cell {
-
-    String TYPE = ApiTypes.VALCELL;
-
+public interface CellValue{
 
     @Value.Default
     default String type() {
-        return TYPE;
+        return ApiTypes.VALCELL;
     }
 
     String name();

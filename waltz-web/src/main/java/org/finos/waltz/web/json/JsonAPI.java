@@ -17,6 +17,7 @@
  */
 package org.finos.waltz.web.json;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -27,10 +28,12 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         property = "type",
         visible = true)
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = CellValue.class, name = CellValue.TYPE),
-        @JsonSubTypes.Type(value = KeyCell.class, name = KeyCell.TYPE),
+        @JsonSubTypes.Type(value = ReportGridJSON.class, name = ReportGridJSON.REPORT_GRID_TYPE)
 })
-public interface Cell {
+@JsonPropertyOrder({"apiTypes","type"})
+public interface JsonAPI {
+
+    ApiTypes apiTypes();
 
     String type();
 }

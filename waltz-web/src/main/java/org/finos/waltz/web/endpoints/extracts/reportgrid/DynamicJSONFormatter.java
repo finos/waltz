@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.application.LifecyclePhase;
 import org.finos.waltz.model.report_grid.ReportGrid;
 import org.finos.waltz.model.report_grid.ReportGridColumnDefinition;
 import org.finos.waltz.model.report_grid.ReportGridDefinition;
@@ -37,9 +36,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-import static org.finos.waltz.common.ListUtilities.*;
 
 @Component
 public class DynamicJSONFormatter implements DynamicFormatter {
@@ -58,11 +55,17 @@ public class DynamicJSONFormatter implements DynamicFormatter {
                          List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> columnDefinitions,
                          List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows)  throws IOException {
         try {
-            LOG.info("Generating JSON data {}",id);
-            return mkResponse(reportGrid,columnDefinitions,reportRows);
+            LOG.debug("Generating JSON data {}",id);
+            long start = System.currentTimeMillis();
+            byte[] response = mkResponse(reportGrid,columnDefinitions,reportRows);
+            long finish = System.currentTimeMillis();
+            LOG.info("Generated JSON data {} in {}ms response. response payload sz={}bytes",id,
+                    finish-start, response.length);
+            return response;
         } catch (IOException e) {
-           LOG.warn("Encountered error when trying to generate JSON response.  Details:{}", e.getMessage());
-           throw e;
+           String err = String
+                   .format("Encountered error generating JSON response.Details:%s", e.getMessage());
+           throw new IOException(err,e);
         }
     }
 
@@ -71,8 +74,8 @@ public class DynamicJSONFormatter implements DynamicFormatter {
                               List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows) throws IOException {
 
         ReportGridDefinition reportGridDefinition = reportGrid.definition();
-        ReportGridSchema reportGridSchema =
-                ImmutableReportGridSchema.builder()
+        ReportGridJSON reportGridJSON =
+                ImmutableReportGridJSON.builder()
                         .id(reportGridDefinition.externalId().orElseGet(()->""+reportGridDefinition.id()))
                         .apiTypes(new ApiTypes())
                         .name(reportGridDefinition.name())
@@ -80,7 +83,7 @@ public class DynamicJSONFormatter implements DynamicFormatter {
                         .build();
 
         return createMapper()
-                .writeValueAsBytes(reportGridSchema);
+                .writeValueAsBytes(reportGridJSON);
     }
 
 
@@ -104,14 +107,14 @@ public class DynamicJSONFormatter implements DynamicFormatter {
                 boolean isComment = (formattedColumnName.contains("comment"));
                 Object currentCell = currentRow.v2.get(idx);
                 if (currentCell != null) {
-                    ImmutableCellValue cell = ImmutableCellValue.builder()
+                    CellValue cell = ImmutableCellValue.builder()
                             .name(formattedColumnName)
                             .value(currentCell.toString())
                             .build();
 
                     if (isComment && prevCellAddedIdx>-1 && transformedRowValues.get(prevCellAddedIdx) instanceof ImmutableCellValue) {
-                        ImmutableCellValue previousColumnCell = (ImmutableCellValue)transformedRowValues.get(prevCellAddedIdx);
-                        ImmutableCellValue withComment = ImmutableCellValue.copyOf(previousColumnCell)
+                        CellValue previousColumnCell = transformedRowValues.get(prevCellAddedIdx);
+                        CellValue withComment = ImmutableCellValue.copyOf(previousColumnCell)
                                 .withComment(currentCell.toString());
                         transformedRowValues.set(prevCellAddedIdx,withComment);
                     }else{
@@ -130,43 +133,11 @@ public class DynamicJSONFormatter implements DynamicFormatter {
     }
 
 
-    private String format(Object o){
-        return "";
-    }
-
     private KeyCell createKeyElement(EntityReference keyAttrib ){
         return KeyCell
                 .fromRef(keyAttrib);
     }
 
-
-    private String coalesceColumnName(String columnName, String displayName) {
-        return displayName!=null&&displayName.trim().length()>0 ?
-                displayName : columnName;
-    }
-
-
-
-    private List<Object> simplify(Tuple2<ReportSubject, ArrayList<Object>> row) {
-
-        long appId = row.v1.entityReference().id();
-        String appName = row.v1.entityReference().name().orElse("");
-        Optional<String> assetCode = row.v1.entityReference().externalId();
-        LifecyclePhase lifecyclePhase = row.v1.lifecyclePhase();
-
-        List<Object> appInfo = asList(appId, appName, assetCode, lifecyclePhase.name());
-
-        return map(concat(appInfo, row.v2), value -> {
-            if (value == null) {
-                return null;
-            }
-            if (value instanceof Optional) {
-                return ((Optional<?>) value).orElse(null);
-            } else {
-                return value;
-            }
-        });
-    }
 
     private ObjectMapper createMapper() {
         ObjectMapper mapper = new ObjectMapper();
