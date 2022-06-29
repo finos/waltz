@@ -83,6 +83,7 @@
                     },
                     {});
 
+            console.log("click handler via data cell");
             addCellClickHandlers(
                 svgHolderElem,
                 selectedOverlay,
@@ -129,6 +130,7 @@
                     {}
                 );
 
+            console.log("click handler via callouts");
             addCellClickHandlers(svgHolderElem, selectedOverlay, propsByCellId);
             addSectionHeaderClickHandlers(svgHolderElem, selectedOverlay, propsByCellId);
         }
@@ -153,13 +155,17 @@
 
     // toggle inset indication
     $: {
-
         selectAll('.data-cell').classed("inset", false);
         selectAll('.entity-group-box').classed("inset", false);
 
-        if ($selectedOverlay && $widget) {
-
+        if ($selectedOverlay) {
             select(`[data-cell-id=${$selectedOverlay.cellId}]`).classed("inset", true);
+        }
+    }
+
+    // toggle popover
+    $: {
+        if ($selectedOverlay && $widget) {
 
             const component = $widget.overlay;
 
@@ -184,7 +190,7 @@
         }
     }
 
-    // toggle no data indication
+    // no data indication
     $: {
         if (svgHolderElem && $overlayData && $selectedInstance == null) {
 

@@ -12,7 +12,6 @@
     $: references = cellData?.backingEntityReferences || [];
 
     $: svgHeight = Math.max(references.length * textHeight, height);
-
 </script>
 
 

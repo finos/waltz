@@ -53,6 +53,7 @@ export function clearContent(svgHolderElem, targetSelector) {
  */
 export function addCellClickHandlers(svgHolderElem, selectedOverlayCellStore, propsByCellId) {
     let dataCells = svgHolderElem.querySelectorAll(".data-cell");
+    console.log("click handler");
     Array
         .from(dataCells)
         .forEach(sb => {
@@ -274,7 +275,7 @@ export function determineCell(elem) {
 
 export function mkAggregatedEntitiesGlobalProps(data) {
     const maxCount = _
-        .chain(data)
+        .chain(data.cellData)
         .map(d => _.size(d.aggregatedEntityReferences))
         .max()
         .value();
@@ -284,7 +285,7 @@ export function mkAggregatedEntitiesGlobalProps(data) {
 
 export function mkAssessmentOverlayGlobalProps(data) {
     const maxCount = _
-        .chain(data)
+        .chain(data.cellData)
         .map(d => d.counts)
         .flatten()
         .map(d => _.get(d, ["count"], 0))
@@ -297,7 +298,7 @@ export function mkAssessmentOverlayGlobalProps(data) {
 
 export function mkTargetAppCountGlobalProps(data) {
     const maxCount = _
-        .chain(data)
+        .chain(data.cellData)
         .map(d => [_.get(d, ["currentStateCount"], 0), _.get(d, ["targetStateCount"], 0)])
         .flatten()
         .max()

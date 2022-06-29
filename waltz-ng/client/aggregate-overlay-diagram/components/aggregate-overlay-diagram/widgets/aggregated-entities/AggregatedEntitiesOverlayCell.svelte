@@ -1,15 +1,16 @@
 <script>
     import EntityLink from "../../../../../common/svelte/EntityLink.svelte";
-    import {scaleLinear} from "d3-scale";
+    import {scaleSqrt} from "d3-scale";
     import _ from "lodash";
     import {RenderModes} from "../../aggregate-overlay-diagram-utils";
 
     export let cellData = {};
     export let maxCount;
     export let height;
+    export let width;
     export let renderMode;
 
-    $: r = scaleLinear()
+    $: r = scaleSqrt()
         .domain([0, maxCount])
         .range([0, height / 2 - 2]);
 
@@ -20,41 +21,28 @@
 
     $: references = cellData?.aggregatedEntityReferences || [];
 
-    $: additionalLines = _
-        .chain(references)
-        .map(r => r.name)
-        .map(name => _.floor(_.size(name) / 47))
-        .sum()
-        .value();
-
 </script>
 
 <div>
     <svg class="content"
-         width="100%"
-         {height}
+         viewBox="0 0 {width} {height}"
          style="background: none">
-        {#if _.isEmpty(references)}
-            <text font-size="16"
-                  dy="26"
-                  dx="60">
-                -
-            </text>
-        {:else}
+        {#if !_.isEmpty(references)}
             <circle r={cr}
                     fill="#a9e4ff"
                     stroke="#25b0ff"
-                    stroke-width="2"
-                    cx={height * 0.75}
+                    stroke-width="0.5"
+                    cx={width * 0.2}
                     cy={height / 2}/>
-
-            <!-- Count label-->
-            <text font-size="16"
-                  dy={height / 2 + 6}
-                  dx={height * 1.5}>
-                {_.size(references)}
-            </text>
         {/if}
+        <text font-size={height/2}
+              dy={height * 0.67}
+              dx={width / 2}
+              text-anchor="middle">
+            {_.isEmpty(references)
+                ? "-"
+                : _.size(references)}
+        </text>
     </svg>
 
 

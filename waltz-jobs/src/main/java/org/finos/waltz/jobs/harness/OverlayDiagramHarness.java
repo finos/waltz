@@ -28,7 +28,7 @@ import org.finos.waltz.model.AssessmentBasedSelectionFilter;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.ImmutableAssessmentBasedSelectionFilter;
-import org.finos.waltz.model.aggregate_overlay_diagram.overlay.CountWidgetDatum;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.CountWidgetData;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.ImmutableAppCountWidgetParameters;
 import org.finos.waltz.service.DIConfiguration;
 import org.finos.waltz.service.aggregate_overlay_diagram.AggregateOverlayDiagramService;
@@ -40,7 +40,6 @@ import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.Optional;
-import java.util.Set;
 
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.model.EntityReference.mkRef;
@@ -83,7 +82,7 @@ public class OverlayDiagramHarness {
                 .targetDate(DateTimeUtilities.today())
                 .build();
 
-        Set<CountWidgetDatum> datums = diagramSvc.findAppCountWidgetData(1L, ou, asSet(sdlcPassFilter, criticalityFilter), countParams);
+        CountWidgetData datums = diagramSvc.getAppCountWidgetData(1L, ou, asSet(sdlcPassFilter, criticalityFilter), countParams);
 
         System.out.println(datums);
 

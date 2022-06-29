@@ -8,9 +8,7 @@ import java.util.Set;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableAggregatedEntitiesWidgetDatum.class)
-public abstract class AggregatedEntitiesWidgetDatum {
-
-    public abstract String cellExternalId();
+public abstract class AggregatedEntitiesWidgetDatum implements CellExternalIdProvider {
 
     public abstract Set<EntityReference> aggregatedEntityReferences();
 
