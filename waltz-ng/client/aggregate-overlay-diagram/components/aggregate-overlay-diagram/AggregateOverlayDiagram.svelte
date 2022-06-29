@@ -83,7 +83,6 @@
                     },
                     {});
 
-            console.log("click handler via data cell");
             addCellClickHandlers(
                 svgHolderElem,
                 selectedOverlay,
@@ -130,7 +129,6 @@
                     {}
                 );
 
-            console.log("click handler via callouts");
             addCellClickHandlers(svgHolderElem, selectedOverlay, propsByCellId);
             addSectionHeaderClickHandlers(svgHolderElem, selectedOverlay, propsByCellId);
         }

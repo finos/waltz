@@ -53,7 +53,6 @@ export function clearContent(svgHolderElem, targetSelector) {
  */
 export function addCellClickHandlers(svgHolderElem, selectedOverlayCellStore, propsByCellId) {
     let dataCells = svgHolderElem.querySelectorAll(".data-cell");
-    console.log("click handler");
     Array
         .from(dataCells)
         .forEach(sb => {
