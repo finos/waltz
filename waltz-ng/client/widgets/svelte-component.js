@@ -18,6 +18,7 @@
 
 import _ from "lodash";
 
+
 const directive = function() {
     let comp = null;
     return {
@@ -31,8 +32,9 @@ const directive = function() {
 
             const component = _.get(scope, attrs.component);
 
-            const initialProps = _.chain(propKeys)
-                .map(d => Object.assign(d, {v: _.get(scope, d.p, d.p)})) // fall back to d.p, as may be a literal value
+            const initialProps = _
+                .chain(propKeys)
+                .map(d => Object.assign(d, {v: scope.$eval(d.p)}))
                 .reduce(
                     (acc, d) => {
                         acc[d.k] = d.v;
@@ -47,11 +49,17 @@ const directive = function() {
             });
 
             propKeys.forEach(({p, k}) => {
-                scope.$watch(p, (oldVal, newVal, s) => {
-                    comp.$set({[k]: _.get(s, p, p)});
-                });
+                if (p.startsWith(".")) {
+                    return; // skip
+                } else {
+                    scope.$watch(
+                        p,
+                        (newVal, oldVal, s) => {
+                            const upd = {[k]: newVal};
+                            comp.$set(upd);
+                        });
+                }
             });
-
         }
     };
 };

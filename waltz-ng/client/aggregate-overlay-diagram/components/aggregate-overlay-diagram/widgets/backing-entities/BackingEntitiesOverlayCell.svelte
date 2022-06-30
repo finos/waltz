@@ -12,7 +12,6 @@
     $: references = cellData?.backingEntityReferences || [];
 
     $: svgHeight = Math.max(references.length * textHeight, height);
-
 </script>
 
 
@@ -48,6 +47,10 @@
 
     li {
         padding-top: 0.1em;
+    }
+
+    svg {
+        display: block;
     }
 
 </style>

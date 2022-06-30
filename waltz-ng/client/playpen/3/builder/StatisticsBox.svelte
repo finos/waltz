@@ -4,10 +4,18 @@
 </script>
 
 
-
 <foreignObject {width}
                {height}>
-    <div class="statistics-box"
-         style="background-color: #f2f6f2; height: 100%; overflow-y: auto; box-sizing: content-box">
-    </div>
+    <div class="statistics-box"></div>
 </foreignObject>
+
+
+<style>
+    .statistics-box {
+        background-color: #f2f6f2;
+        overflow-y: auto;
+        overflow-x: hidden;
+        box-sizing: border-box;
+        height: 100%
+    }
+</style>

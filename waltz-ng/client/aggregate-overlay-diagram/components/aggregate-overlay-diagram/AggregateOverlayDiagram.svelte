@@ -1,5 +1,10 @@
 <script>
-    import {addCellClickHandlers, addSectionHeaderClickHandlers, clearContent} from "./aggregate-overlay-diagram-utils";
+    import {
+        addCellClickHandlers,
+        addSectionHeaderClickHandlers,
+        clearContent,
+        RenderModes
+    } from "./aggregate-overlay-diagram-utils";
     import {getContext} from "svelte";
     import _ from "lodash";
     import {select, selectAll} from "d3-selection";
@@ -28,7 +33,7 @@
     $: {
         if (svgHolderElem && $overlayData && $widget?.overlay) {
             const cellDataByCellExtId = _.keyBy(
-                $overlayData,
+                $overlayData.cellData,
                 d => d.cellExternalId);
 
             clearContent(svgHolderElem, ".statistics-box");
@@ -45,17 +50,19 @@
 
                     let bBox = sb.getBoundingClientRect();
 
-                    const height = bBox.height;
-                    const width = bBox.width;
+                    const {width, height} = bBox;
+
+                    const customProps = {
+                        cellData: cellDataByCellExtId[cellId],
+                        renderMode: RenderModes.OVERLAY,
+                        height,
+                        width
+                    };
 
                     const cellProps = Object.assign(
                         {},
                         globalProps,
-                        {
-                            cellData: cellDataByCellExtId[cellId],
-                            height,
-                            width
-                        });
+                        customProps);
 
                     const component = $widget.overlay;
 
@@ -64,7 +71,10 @@
                         props: cellProps
                     });
 
-                    return {cellId, cellProps}
+                    return {
+                        cellId,
+                        cellProps
+                    };
                 })
                 .reduce(
                     (acc, d) => {
@@ -73,7 +83,10 @@
                     },
                     {});
 
-            addCellClickHandlers(svgHolderElem, selectedOverlay, propsByCellId);
+            addCellClickHandlers(
+                svgHolderElem,
+                selectedOverlay,
+                propsByCellId);
         }
     }
 
@@ -140,13 +153,17 @@
 
     // toggle inset indication
     $: {
-
         selectAll('.data-cell').classed("inset", false);
         selectAll('.entity-group-box').classed("inset", false);
 
         if ($selectedOverlay) {
-
             select(`[data-cell-id=${$selectedOverlay.cellId}]`).classed("inset", true);
+        }
+    }
+
+    // toggle popover
+    $: {
+        if ($selectedOverlay && $widget) {
 
             const component = $widget.overlay;
 
@@ -155,24 +172,28 @@
             const elem = cell.querySelector(".content");
 
             if (elem) {
+                const props = Object.assign(
+                    {},
+                    $selectedOverlayCell?.props,
+                    { renderMode: RenderModes.FOCUSED });
 
                 const popover = {
                     title: cellName,
-                    props: $selectedOverlayCell?.props,
+                    props,
                     component
-                }
+                };
 
                 Popover.add(popover);
             }
         }
     }
 
-    // toggle no data indication
+    // no data indication
     $: {
         if (svgHolderElem && $overlayData && $selectedInstance == null) {
 
             const cellsWithData = _
-                .chain($overlayData)
+                .chain($overlayData.cellData)
                 .map(d => d.cellExternalId)
                 .value();
 

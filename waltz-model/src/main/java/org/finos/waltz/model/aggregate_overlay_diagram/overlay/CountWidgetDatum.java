@@ -5,9 +5,8 @@ import org.immutables.value.Value;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableCountWidgetDatum.class)
-public abstract class CountWidgetDatum {
+public abstract class CountWidgetDatum implements CellExternalIdProvider {
 
-    public abstract String cellExternalId();
     public abstract int currentStateCount();
     public abstract int targetStateCount();
 

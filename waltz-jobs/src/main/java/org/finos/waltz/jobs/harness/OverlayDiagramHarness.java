@@ -27,9 +27,11 @@ import org.finos.waltz.data.aggregate_overlay_diagram.AssessmentRatingWidgetDao;
 import org.finos.waltz.model.AssessmentBasedSelectionFilter;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.IdSelectionOptions;
-import org.finos.waltz.model.aggregate_overlay_diagram.overlay.AggregatedEntitiesWidgetDatum;
-import org.finos.waltz.model.aggregate_overlay_diagram.overlay.CountWidgetDatum;
+import org.finos.waltz.model.ImmutableAssessmentBasedSelectionFilter;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.CountWidgetData;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.ImmutableAppCountWidgetParameters;
 import org.finos.waltz.service.DIConfiguration;
+import org.finos.waltz.service.aggregate_overlay_diagram.AggregateOverlayDiagramService;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -38,8 +40,8 @@ import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.Optional;
-import java.util.Set;
 
+import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 import static org.finos.waltz.schema.Tables.ASSESSMENT_RATING;
@@ -56,6 +58,7 @@ public class OverlayDiagramHarness {
         AppCountWidgetDao countWidgetDao = ctx.getBean(AppCountWidgetDao.class);
         AssessmentRatingWidgetDao assessmentWidgetDao = ctx.getBean(AssessmentRatingWidgetDao.class);
         AggregatedEntitiesWidgetDao aggregatedEntitiesWidgetDao = ctx.getBean(AggregatedEntitiesWidgetDao.class);
+        AggregateOverlayDiagramService diagramSvc = ctx.getBean(AggregateOverlayDiagramService.class);
 
         IdSelectionOptions appGroup = mkOpts(mkRef(EntityKind.APP_GROUP, 11785L));
         IdSelectionOptions ou = mkOpts(mkRef(EntityKind.ORG_UNIT, 95L));
@@ -64,17 +67,26 @@ public class OverlayDiagramHarness {
         GenericSelector genericSelector = genericSelectorFactory.applyForKind(EntityKind.APPLICATION, ou);
         GenericSelector genericSelector2 = genericSelectorFactory.applyForKind(EntityKind.CHANGE_INITIATIVE, ou);
 
-//        Set<AggregatedEntitiesWidgetDatum> widgetData2 = countWidgetDao.findWidgetData(2L, EntityKind.CHANGE_INITIATIVE, genericSelector2.selector());
-        Set<CountWidgetDatum> widgetData = countWidgetDao.findWidgetData(3L, genericSelector.selector(), DateTimeUtilities.today());
+        ImmutableAssessmentBasedSelectionFilter sdlcPassFilter = ImmutableAssessmentBasedSelectionFilter.builder()
+                .definitionId(30L)
+                .ratingIds(asSet(240L))
+                .build();
 
-//        System.out.println(widgetData2.size());
-        System.out.println(widgetData.size());
+        ImmutableAssessmentBasedSelectionFilter criticalityFilter = ImmutableAssessmentBasedSelectionFilter.builder()
+                .definitionId(73L)
+                .ratingIds(asSet(327L))
+                .build();
+
+
+        ImmutableAppCountWidgetParameters countParams = ImmutableAppCountWidgetParameters.builder()
+                .targetDate(DateTimeUtilities.today())
+                .build();
+
+        CountWidgetData datums = diagramSvc.getAppCountWidgetData(1L, ou, asSet(sdlcPassFilter, criticalityFilter), countParams);
+
+        System.out.println(datums);
 
         System.out.println("Done");
-
-//        System.out.println(format("with filter: %d", changeInitiativeCount));
-//        System.out.println(qry);
-//        System.out.println(changeInitiativeCount2);
     }
 
 

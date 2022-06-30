@@ -11,7 +11,6 @@
 
     const dispatch = createEventDispatcher();
 
-
     function onSelect(item) {
         if (isMultiSelect) {
             const existing = _.find(selectedRatings, d => d.id === item.id);
@@ -24,6 +23,16 @@
         } else {
             selectedRatings = [item];
         }
+        dispatch("select", selectedRatings);
+    }
+
+    function selectAll() {
+        selectedRatings = [...items];
+        dispatch("select", selectedRatings);
+    }
+
+    function deselectAll() {
+        selectedRatings = [];
         dispatch("select", selectedRatings);
     }
 
@@ -66,6 +75,25 @@
         </tr>
     {/each}
     </tbody>
+    {#if isMultiSelect}
+        <tbody>
+            <tr>
+                <td colspan="2">
+                    <button class="btn-skinny"
+                    on:click={selectAll}>
+                        <Icon name="check-square-o"/>
+                        Select All
+                    </button>
+                    |
+                    <button class="btn-skinny"
+                            on:click={deselectAll}>
+                        <Icon name="square-o"/>
+                        Deselect All
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    {/if}
 </table>
 
 <style>

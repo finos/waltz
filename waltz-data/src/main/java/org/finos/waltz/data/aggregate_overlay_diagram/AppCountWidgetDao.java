@@ -1,6 +1,7 @@
 package org.finos.waltz.data.aggregate_overlay_diagram;
 
 import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.CountWidgetDatum;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.ImmutableCountWidgetDatum;
 import org.jooq.*;
@@ -18,6 +19,7 @@ import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramUtilities.loadCellExtIdToAggregatedEntities;
+import static org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramUtilities.loadExpandedCellMappingsForDiagram;
 import static org.finos.waltz.schema.Tables.APPLICATION;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
@@ -38,9 +40,12 @@ public class AppCountWidgetDao {
                                                 Select<Record1<Long>> inScopeApplicationSelector,
                                                 LocalDate targetStateDate) {
 
+        Set<Tuple2<String, EntityReference>> cellWithBackingEntities = loadExpandedCellMappingsForDiagram(dsl, diagramId);
+
         Map<String, Set<Long>> cellExtIdsToAggregatedEntities = loadCellExtIdToAggregatedEntities(
                 dsl,
                 diagramId,
+                cellWithBackingEntities,
                 EntityKind.APPLICATION,
                 inScopeApplicationSelector,
                 Optional.empty());

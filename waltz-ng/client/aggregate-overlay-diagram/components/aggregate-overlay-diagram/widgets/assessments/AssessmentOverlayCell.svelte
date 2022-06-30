@@ -1,12 +1,13 @@
 <script>
-    import {renderMode, Modes} from "./store";
+    import {assessmentRenderMode, Modes} from "./store";
     import BarGraphCell from "./BarGraphCell.svelte";
     import BoxGraphCell from "./BoxGraphCell.svelte";
 
     export let cellData = [];
     export let maxCount = 0;
+    export let renderMode;
 
-    $: comp = $renderMode === Modes.BAR
+    $: comp = $assessmentRenderMode === Modes.BAR
         ? BarGraphCell
         : BoxGraphCell;
 
@@ -15,5 +16,6 @@
 <div class="content">
     <svelte:component this={comp}
                       {cellData}
-                      {maxCount}/>
+                      {maxCount}
+                      {renderMode}/>
 </div>

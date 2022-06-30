@@ -107,11 +107,12 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
 
     public List<Measurable> findByMeasurableIdSelector(Select<Record1<Long>> selector) {
         checkNotNull(selector, "selector cannot be null");
-        return dsl
+        SelectConditionStep<Record> qry = dsl
                 .select(MEASURABLE.fields())
                 .from(MEASURABLE)
-                .where(dsl.renderInlined(MEASURABLE.ID.in(selector)))
-                .fetch(TO_DOMAIN_MAPPER);
+                .where(dsl.renderInlined(MEASURABLE.ID.in(selector)));
+
+        return qry.fetch(TO_DOMAIN_MAPPER);
     }
 
 

@@ -15,7 +15,6 @@ import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.Record1;
 import org.jooq.Record2;
-import org.jooq.Record3;
 import org.jooq.RecordMapper;
 import org.jooq.Select;
 import org.jooq.SelectConditionStep;
@@ -96,38 +95,15 @@ public class AggregateOverlayDiagramUtilities {
     }
 
 
-    protected static SelectConditionStep<Record3<String, String, Long>> selectCellMappingsForDiagram2(DSLContext dsl,
-                                                                                                      long diagramId) {
-
-        return dsl
-                .selectDistinct(
-                        AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.CELL_EXTERNAL_ID,
-                        AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.RELATED_ENTITY_KIND,
-                        AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.RELATED_ENTITY_ID)
-                .from(AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA)
-                .where(AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA.DIAGRAM_ID.eq(diagramId));
-    }
-
-
     protected static Map<String, Set<Long>> loadCellExtIdToAggregatedEntities(DSLContext dsl,
                                                                               long diagramId,
+                                                                              Set<Tuple2<String, EntityReference>> cellMappings,
                                                                               EntityKind aggregatedEntityKind,
                                                                               Select<Record1<Long>> inScopeEntityIdSelector,
                                                                               Optional<LocalDate> targetStateDate) {
 
-        Set<Tuple2<String, EntityReference>> cellMappings = loadExpandedCellMappingsForDiagram(dsl, diagramId);
 
-        Map<String, Collection<EntityReference>> cellBackingEntitiesByCellExtId = groupBy(
-                cellMappings,
-                t -> t.v1,
-                t -> t.v2);
-
-        Set<Long> backingMeasurableEntityIds = cellMappings
-                .stream()
-                .map(Tuple2::v2)
-                .filter(d -> d.kind() == EntityKind.MEASURABLE)
-                .map(EntityReference::id)
-                .collect(toSet());
+        Set<Long> backingMeasurableEntityIds = toMeasurableIds(cellMappings);
 
         Map<Long, List<Long>> measurableIdToEntityIds = findMeasurableIdToAggregatedEntityIdMap(
                 dsl,
@@ -135,6 +111,11 @@ public class AggregateOverlayDiagramUtilities {
                 inScopeEntityIdSelector,
                 backingMeasurableEntityIds,
                 targetStateDate);
+
+        Map<String, Collection<EntityReference>> cellBackingEntitiesByCellExtId = groupBy(
+                cellMappings,
+                t -> t.v1,
+                t -> t.v2);
 
         return cellBackingEntitiesByCellExtId
                 .entrySet()
@@ -160,6 +141,16 @@ public class AggregateOverlayDiagramUtilities {
                     return tuple(cellExtId, entityIds);
                 })
                 .collect(toMap(k -> k.v1, k -> k.v2));
+    }
+
+
+    public static Set<Long> toMeasurableIds(Set<Tuple2<String, EntityReference>> cellMappings) {
+        return cellMappings
+                .stream()
+                .map(Tuple2::v2)
+                .filter(d -> d.kind() == EntityKind.MEASURABLE)
+                .map(EntityReference::id)
+                .collect(toSet());
     }
 
 
