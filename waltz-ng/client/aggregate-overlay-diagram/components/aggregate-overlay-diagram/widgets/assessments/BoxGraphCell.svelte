@@ -1,11 +1,10 @@
 <script>
     import _ from "lodash";
-    import {scaleBand, scaleLinear} from "d3-scale";
     import {mkChunks} from "../../../../../common/list-utils";
     import {determineForegroundColor} from "../../../../../common/colors";
+    import {RenderModes} from "../../aggregate-overlay-diagram-utils";
     import RatingIndicatorCell
         from "../../../../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
-    import {RenderModes} from "../../aggregate-overlay-diagram-utils";
 
     export let cellData = [];
     export let renderMode;
@@ -18,6 +17,7 @@
     $: counts = _.orderBy(cellData?.counts, c => c.rating.name);
     $: rows = mkChunks(counts, 6);
     $: height = Math.max(rows.length * (rowHeight + cellPadding), rowHeight) + cellPadding * 2;
+
 </script>
 
 <div>

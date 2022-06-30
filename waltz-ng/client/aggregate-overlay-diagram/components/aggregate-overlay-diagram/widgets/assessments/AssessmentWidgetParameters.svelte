@@ -19,7 +19,7 @@
     import AssessmentDefinitionPicker
         from "../../../../../report-grid/components/svelte/pickers/AssessmentDefinitionPicker.svelte";
     import {getContext} from "svelte";
-    import {renderMode, Modes} from "./store";
+    import {assessmentRenderMode, Modes} from "./store";
     import moment from "moment";
     import {timeFormat} from "d3-time-format";
     import DescriptionFade from "../../../../../common/svelte/DescriptionFade.svelte";
@@ -46,7 +46,7 @@
         ? moment().set("date", 1).add($sliderVal, "months")
         : null;
 
-    $: $renderMode = Modes[$mode];
+    $: $assessmentRenderMode = Modes[$mode];
 
     $: {
         load($selectedDefinition, targetDate);
@@ -83,7 +83,7 @@
         <input style="display: inline-block;"
                type="radio"
                bind:group={$mode}
-               name="renderMode"
+               name="assessmentRenderMode"
                value={"BAR"}>
         Bar Chart
     </label>
@@ -92,7 +92,7 @@
         <input style="display: inline-block;"
                type="radio"
                bind:group={$mode}
-               name="renderMode"
+               name="assessmentRenderMode"
                value={"BOX"}>
         Box Chart
     </label>

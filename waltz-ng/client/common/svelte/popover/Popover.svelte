@@ -1,24 +1,8 @@
 <script>
     import Popover from "../../../svelte-stores/popover-store";
     import PopoverContent from "./PopoverContent.svelte";
-    import _ from "lodash";
 
     let height = 100;
-    let elem;
-
-    $: {
-        if ($Popover) {
-
-            _.each(elem?.children, elem => elem.parentNode.removeChild(elem));
-
-            if ($Popover.component) {
-                new $Popover.component({
-                    target: elem,
-                    props: $Popover.props
-                });
-            }
-        }
-    }
 
 </script>
 
@@ -36,7 +20,7 @@
                 {/if}
                 <div class:waltz-scroll-region-400={height > 400}>
                     <div bind:clientHeight={height}>
-                        <div bind:this={elem}></div>
+                        <svelte:component this={$Popover.component} {...$Popover.props}/>
                         {#if $Popover.content}
                             <div>
                                 {@html $Popover.content}
