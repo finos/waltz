@@ -19,17 +19,12 @@
 package org.finos.waltz.web.endpoints.extracts;
 
 
-import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.finos.waltz.web.WebUtilities;
 import org.jooq.DSLContext;
 import org.jooq.Record6;
 import org.jooq.SelectJoinStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 import static org.finos.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static spark.Spark.get;
@@ -39,13 +34,9 @@ import static spark.Spark.get;
 public class OrgUnitExtractor extends DirectQueryBasedDataExtractor {
 
 
-    private EntityHierarchyService entityHierarchyService;
-
-
-    public OrgUnitExtractor(DSLContext dsl,
-                            EntityHierarchyService entityHierarchyService) {
+    @Autowired
+    public OrgUnitExtractor(DSLContext dsl) {
         super(dsl);
-        this.entityHierarchyService = entityHierarchyService;
     }
 
 
@@ -63,12 +54,12 @@ public class OrgUnitExtractor extends DirectQueryBasedDataExtractor {
     private SelectJoinStep<Record6<Long, Long, String, String, String, String>> prepareExtract() {
         return dsl
                 .select(
-                    ORGANISATIONAL_UNIT.ID.as("id"),
-                    ORGANISATIONAL_UNIT.PARENT_ID.as("parentId"),
-                    ORGANISATIONAL_UNIT.NAME.as("name"),
-                    ORGANISATIONAL_UNIT.DESCRIPTION.as("description"),
-                    ORGANISATIONAL_UNIT.EXTERNAL_ID.as("externalId"),
-                    ORGANISATIONAL_UNIT.PROVENANCE.as("provenance"))
+                        ORGANISATIONAL_UNIT.ID.as("id"),
+                        ORGANISATIONAL_UNIT.PARENT_ID.as("parentId"),
+                        ORGANISATIONAL_UNIT.NAME.as("name"),
+                        ORGANISATIONAL_UNIT.DESCRIPTION.as("description"),
+                        ORGANISATIONAL_UNIT.EXTERNAL_ID.as("externalId"),
+                        ORGANISATIONAL_UNIT.PROVENANCE.as("provenance"))
                 .from(ORGANISATIONAL_UNIT);
     }
 
