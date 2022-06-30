@@ -39,7 +39,6 @@
     }
 
     function onSave() {
-        console.log("onSave", {f: $form, a: assessment})
         doSave(assessment.definition.id, $form.ratingId, $form.comment)
             .catch(e => toasts.error("Could not update assessment: " + e.error))
             .finally(onCancel);

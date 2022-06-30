@@ -35,7 +35,8 @@
 </script>
 
 <div class="help-block small">
-    <Icon name="info-circle"/>Select an assessment definition from the list below, you can filter the list using the search bar.
+    <Icon name="info-circle"/>
+    Select an assessment definition from the list below, you can filter the list using the search bar.
 </div>
 <br>
 <Grid {columnDefs}

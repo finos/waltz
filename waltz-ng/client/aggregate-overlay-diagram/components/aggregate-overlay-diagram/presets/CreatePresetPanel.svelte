@@ -1,11 +1,11 @@
 <script>
     import {createEventDispatcher, getContext} from "svelte";
     import {displayError} from "../../../../common/error-utils";
-    import {primaryEntityRef} from "../../instance-selector/InstanceCreatePanel.svelte";
     import {aggregateOverlayDiagramStore} from "../../../../svelte-stores/aggregate-overlay-diagram-store";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import {entity} from "../../../../common/services/enums/entity";
     import {toUpperSnakeCase} from "../../../../common/string-utils";
+    import _ from "lodash";
 
     const focusWidget = getContext("focusWidget");
     const filterParameters = getContext("filterParameters");
@@ -21,10 +21,12 @@
 
     function createPreset() {
 
-        const filterConfig = [{
-            filterKind: entity.ASSESSMENT_RATING.key,
-            filterParameters: $filterParameters
-        }];
+        const filterConfig = _.map(
+            $filterParameters,
+            filter => ({
+                filterKind: entity.ASSESSMENT_RATING.key,
+                filterParameters: filter
+            }));
 
         const overlayConfig = {
             widgetKey: $focusWidget.key,
@@ -91,7 +93,7 @@
 
     <button type="submit"
             class="btn btn-success"
-            disabled={name === null}>
+            disabled={name === null || _.isNull($focusWidget)}>
         Save
     </button>
 

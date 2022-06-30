@@ -8,13 +8,13 @@
     const overlayData = getContext("overlayData");
 
     $: ratings = _
-        .chain($overlayData)
+        .chain($overlayData.cellData)
         .map(d => d.counts)
         .flatMap()
         .map(d => d.rating)
         .uniqBy(d => d.id)
         .orderBy(["position", "name"])
-        .value()
+        .value();
 
 </script>
 

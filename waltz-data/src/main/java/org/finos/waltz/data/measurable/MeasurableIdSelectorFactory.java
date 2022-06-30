@@ -57,6 +57,8 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
             case APP_GROUP:
             case PROCESS_DIAGRAM:
                 return mkViaAppSelector(options);
+            case AGGREGATE_OVERLAY_DIAGRAM:
+                return mkForAggregatedEntityDiagram(options);
             case FLOW_DIAGRAM:
                 return mkForFlowDiagram(options);
             case SCENARIO:
@@ -71,6 +73,11 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
                         "Cannot create measurable selector from kind: %s",
                         options.entityReference().kind()));
         }
+    }
+
+
+    private Select<Record1<Long>> mkForAggregatedEntityDiagram(IdSelectionOptions options) {
+        return null;
     }
 
 

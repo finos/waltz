@@ -5,4 +5,4 @@ export const Modes = {
     BOX: Symbol("BOX")
 };
 
-export const renderMode = writable(Modes.BOX);
+export const assessmentRenderMode = writable(Modes.BOX);

@@ -8,9 +8,10 @@ import org.jooq.Select;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.Set;
 
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
+import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.schema.Tables.ASSESSMENT_RATING;
 
 @Service
@@ -25,19 +26,24 @@ public class AssessmentRatingBasedGenericSelectorFactory {
      * @param params          optional assessment based filter parameters to limit the selector by ratings for the entity
      * @return id selector
      */
-    public static Select<Record1<Long>> applyFilterToSelector(GenericSelector genericSelector,
-                                                              Optional<AssessmentBasedSelectionFilter> params) {
+    public static Select<Record1<Long>> applyFiltersToSelector(GenericSelector genericSelector,
+                                                               Set<AssessmentBasedSelectionFilter> params) {
+        if (isEmpty(params)) {
+            return genericSelector.selector();
+        } else {
+            Set<Select<Record1<Long>>> assessmentRatingSelectors = map(
+                    params,
+                    d -> mkAssessmentRatingSelector(d, genericSelector.kind()));
 
-        return params
-                .map(p -> isEmpty(p.ratingIds())
-                        ? genericSelector.selector()
-                        : genericSelector.selector().intersect(mkAssessmentRatingSelector(p, genericSelector.kind())))
-                .orElse(genericSelector.selector());
+            return assessmentRatingSelectors
+                    .stream()
+                    .reduce(genericSelector.selector(), Select::intersect);
+        }
     }
 
 
-    private static Select<? extends Record1<Long>> mkAssessmentRatingSelector(AssessmentBasedSelectionFilter params,
-                                                                              EntityKind targetKind) {
+    private static Select<Record1<Long>> mkAssessmentRatingSelector(AssessmentBasedSelectionFilter params,
+                                                                    EntityKind targetKind) {
         return DSL
                 .select(ASSESSMENT_RATING.ENTITY_ID)
                 .from(ASSESSMENT_RATING)

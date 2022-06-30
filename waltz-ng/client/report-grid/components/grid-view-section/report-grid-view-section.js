@@ -98,6 +98,7 @@ function controller($scope, serviceBroker, localStorageService) {
 
 
     function loadGridData() {
+        console.log("loadGridData", {g: vm.gridId, so: vm.selectionOptions})
         serviceBroker
             .loadViewData(
                 CORE_API.ReportGridStore.getViewById,
