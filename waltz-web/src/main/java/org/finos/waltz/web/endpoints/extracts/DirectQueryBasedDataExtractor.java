@@ -24,6 +24,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.MimeTypes;
 import org.jooq.DSLContext;
 import org.jooq.Result;
@@ -63,11 +64,18 @@ public abstract class DirectQueryBasedDataExtractor implements DataExtractor {
                 return writeAsExcel(suggestedFilenameStem, qry, response);
             case CSV:
                 return writeAsCSV(suggestedFilenameStem, qry, response);
+            case JSON:
+                return writeAsJson(qry, response);
             default:
                 throw new IllegalArgumentException("Cannot write extract using unknown format: " + format);
         }
     }
 
+    private Object writeAsJson(Select<?> qry,
+                              Response response) {
+        response.type(MimeTypes.Type.APPLICATION_JSON_UTF_8.name());
+        return qry.fetch().formatJSON();
+    }
 
     @SafeVarargs
     public static Object writeAsMultiSheetExcel(DSLContext dsl,

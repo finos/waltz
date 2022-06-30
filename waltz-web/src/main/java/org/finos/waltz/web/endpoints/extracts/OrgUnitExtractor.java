@@ -19,12 +19,17 @@
 package org.finos.waltz.web.endpoints.extracts;
 
 
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.finos.waltz.web.WebUtilities;
 import org.jooq.DSLContext;
 import org.jooq.Record6;
 import org.jooq.SelectJoinStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 import static org.finos.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static spark.Spark.get;
@@ -34,9 +39,13 @@ import static spark.Spark.get;
 public class OrgUnitExtractor extends DirectQueryBasedDataExtractor {
 
 
-    @Autowired
-    public OrgUnitExtractor(DSLContext dsl) {
+    private EntityHierarchyService entityHierarchyService;
+
+
+    public OrgUnitExtractor(DSLContext dsl,
+                            EntityHierarchyService entityHierarchyService) {
         super(dsl);
+        this.entityHierarchyService = entityHierarchyService;
     }
 
 
