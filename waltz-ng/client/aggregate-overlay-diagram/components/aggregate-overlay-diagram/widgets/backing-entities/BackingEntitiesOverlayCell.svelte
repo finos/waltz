@@ -49,4 +49,8 @@
         padding-top: 0.1em;
     }
 
+    svg {
+        display: block;
+    }
+
 </style>

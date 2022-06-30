@@ -28,7 +28,7 @@
 
 </script>
 
-<div>
+<div style="height: 100%">
     <svg width="100%"
          height={height + 10}
          style="background: white">
@@ -67,3 +67,10 @@
     {/if}
 </div>
 
+<style>
+
+    svg {
+        display: block;
+    }
+
+</style>

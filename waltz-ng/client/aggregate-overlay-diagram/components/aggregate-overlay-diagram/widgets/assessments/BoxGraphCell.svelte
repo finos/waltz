@@ -65,3 +65,11 @@
         </table>
     {/if}
 </div>
+
+<style>
+
+    svg {
+        display: block;
+    }
+
+</style>

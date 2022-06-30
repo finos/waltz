@@ -17,9 +17,9 @@
 
 </script>
 
-
 <svg class="content"
      viewBox={`0 0 ${width} ${height}`}>
+
 
     <circle r={cr}
             fill="#b2ffca"
@@ -36,7 +36,7 @@
 
     <text x={width * 0.5}
           text-anchor="middle"
-          font-size={height * 0.4}
+          font-size={height * 0.3}
           y={height * 0.45}>
         {#if !_.isNil(cellData)}
             App Count: #{cellData?.currentStateCount} &raquo; #{cellData?.targetStateCount}
@@ -54,18 +54,13 @@
         {/if}
     </text>
 
-<!--    <foreignObject transform={`translate(${width / 8}, ${height / 4})`}-->
-<!--                   width={width * 0.75}-->
-<!--                   height={height / 2}>-->
-<!--        {#if _.isNil(cellData)}-->
-<!--            - -->
-<!--        {:else}-->
-<!--            <div style={`font-size: ${height/4}px; width: 100%; text-align: center`}>-->
-<!--                App Count: #{cellData?.currentStateCount} &raquo; #{cellData?.targetStateCount}-->
-<!--            </div>-->
-<!--            <div style={`font-size: ${height / 5}px; width: 100%; text-align: center`}>-->
-<!--                Change: {cellData?.targetStateCount - cellData?.currentStateCount}-->
-<!--            </div>-->
-<!--        {/if}-->
-<!--    </foreignObject>-->
 </svg>
+
+
+<style>
+
+    svg {
+        display: block;
+    }
+
+</style>
