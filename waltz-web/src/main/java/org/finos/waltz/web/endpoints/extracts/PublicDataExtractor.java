@@ -18,9 +18,12 @@
 
 package org.finos.waltz.web.endpoints.extracts;
 
-public enum ExtractFormat {
-    XLSX,
-    CSV,
-    JSON,
-    SVG
+/**
+ * Marker interface applied to extractors whose output can be formatted as JSON and form
+ * part of a Waltz public API.
+ * This means care must be taken when changing the data returned to ensure that the
+ * JSON can still be consumed by pre-existing clients.
+ */
+public interface PublicDataExtractor extends DataExtractor {
+
 }

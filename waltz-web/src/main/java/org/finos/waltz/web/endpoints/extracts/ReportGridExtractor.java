@@ -17,20 +17,11 @@
  */
 package org.finos.waltz.web.endpoints.extracts;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.xssf.streaming.SXSSFSheet;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.StringUtilities;
+import org.finos.waltz.common.exception.NotFoundException;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.NameProvider;
-import org.finos.waltz.model.application.LifecyclePhase;
-import org.finos.waltz.model.entity_field_reference.EntityFieldReference;
-import org.finos.waltz.model.external_identifier.ExternalIdValue;
 import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.model.report_grid.*;
 import org.finos.waltz.model.survey.SurveyQuestion;
@@ -38,28 +29,22 @@ import org.finos.waltz.service.report_grid.ReportGridService;
 import org.finos.waltz.service.settings.SettingsService;
 import org.finos.waltz.service.survey.SurveyQuestionService;
 import org.finos.waltz.web.WebUtilities;
+import org.finos.waltz.web.endpoints.extracts.reportgrid.DynamicCommaSeperatedValueFormatter;
+import org.finos.waltz.web.endpoints.extracts.reportgrid.DynamicExcelFormatter;
+import org.finos.waltz.web.endpoints.extracts.reportgrid.DynamicJSONFormatter;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.supercsv.io.CsvListWriter;
-import org.supercsv.prefs.CsvPreference;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.function.LongFunction;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static org.finos.waltz.common.ListUtilities.*;
 import static org.finos.waltz.common.MapUtilities.*;
-import static org.finos.waltz.common.StringUtilities.length;
-import static org.finos.waltz.common.StringUtilities.limit;
 import static org.finos.waltz.model.utils.IdUtilities.getIdOrDefault;
 import static org.finos.waltz.model.utils.IdUtilities.indexById;
 import static org.jooq.lambda.fi.util.function.CheckedConsumer.unchecked;
@@ -67,19 +52,28 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 import static spark.Spark.post;
 
 @Service
-public class ReportGridExtractor implements DataExtractor {
+public class ReportGridExtractor implements PublicDataExtractor {
 
     public static final String BASE_URL = WebUtilities.mkPath("data-extract", "report-grid");
+    private final DynamicCommaSeperatedValueFormatter dynamicCommaSeperatedValueFormatter;
+    private final DynamicExcelFormatter dynamicExcelFormatter;
+    private final DynamicJSONFormatter dynamicJSONFormatter;
     private final ReportGridService reportGridService;
     private final SurveyQuestionService surveyQuestionService;
     private final SettingsService settingsService;
-    private final String CELL_LIMIT_MESSAGE = "...Data truncated, excel cell limit reached. Export using CSV for complete data.";
+
 
     @Autowired
-    public ReportGridExtractor(ReportGridService reportGridService,
+    public ReportGridExtractor(DynamicCommaSeperatedValueFormatter dynamicCommaSeperatedValueFormatter,
+                               DynamicExcelFormatter dynamicExcelFormatter,
+                               DynamicJSONFormatter dynamicJSONFormatter,
+                               ReportGridService reportGridService,
                                SurveyQuestionService surveyQuestionService,
                                SettingsService settingsService) {
 
+        this.dynamicCommaSeperatedValueFormatter = dynamicCommaSeperatedValueFormatter;
+        this.dynamicExcelFormatter = dynamicExcelFormatter;
+        this.dynamicJSONFormatter = dynamicJSONFormatter;
         this.reportGridService = reportGridService;
         this.surveyQuestionService = surveyQuestionService;
         this.settingsService = settingsService;
@@ -94,37 +88,44 @@ public class ReportGridExtractor implements DataExtractor {
 
     private void registerGridViewExtract() {
         post(WebUtilities.mkPath(BASE_URL, "id", ":id"),
-            (request, response) ->
-                writeReportResults(
+            (request, response) -> {
+                long gridId = WebUtilities.getId(request);
+                IdSelectionOptions selectionOptions =  WebUtilities.readIdSelectionOptionsFromBody(request);
+                ReportGrid reportGrid = getById(gridId,selectionOptions)
+                        .orElseThrow(() -> notFoundException.apply(gridId));
+                return writeReportResults(
                     response,
-                    prepareReport(
+                    prepareReport(reportGrid,
                         parseExtractFormat(request),
-                        WebUtilities.getId(request),
-                        WebUtilities.readIdSelectionOptionsFromBody(request))));
+                        selectionOptions));
+            });
     }
 
 
-    private Tuple3<ExtractFormat, String, byte[]> prepareReport(ExtractFormat format,
-                                                                long gridId,
+    private Tuple3<ExtractFormat, String, byte[]> prepareReport(ReportGrid reportGrid,
+                                                                ExtractFormat format,
                                                                 IdSelectionOptions selectionOptions) throws IOException {
 
-        ReportGrid reportGrid = reportGridService.getByIdAndSelectionOptions(
-                gridId,
-                selectionOptions);
-
-        List<Tuple2<ReportGridColumnDefinition, Boolean>> colsWithCommentRequirement = enrichColsWithCommentRequirement(reportGrid);
+        List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> colsWithCommentRequirement = enrichColsWithCommentRequirement(reportGrid);
 
         List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows = prepareReportRows(colsWithCommentRequirement, reportGrid.instance());
 
         return formatReport(
                 format,
+                reportGrid,
                 mkReportName(reportGrid.definition(), selectionOptions),
                 colsWithCommentRequirement,
                 reportRows);
     }
 
+    private Optional<ReportGrid> getById(long gridId,
+                                         IdSelectionOptions selectionOptions){
+        return reportGridService.getByIdAndSelectionOptions(
+                gridId,
+                selectionOptions);
+    }
 
-    private List<Tuple2<ReportGridColumnDefinition, Boolean>> enrichColsWithCommentRequirement(ReportGrid reportGrid) {
+    private List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> enrichColsWithCommentRequirement(ReportGrid reportGrid) {
         Set<Long> surveyQuestionsIds = reportGrid
                 .definition()
                 .columnDefinitions()
@@ -144,11 +145,15 @@ public class ReportGridExtractor implements DataExtractor {
                 .definition()
                 .columnDefinitions()
                 .stream()
-                .map(cd -> tuple(cd, cd.columnEntityKind().equals(EntityKind.SURVEY_QUESTION) && colsNeedingComments.contains(cd.columnEntityId())))
+                .map(cd -> tuple(cd, columnHasComment(cd,colsNeedingComments)))
                 .sorted(Comparator.comparingLong(r -> r.v1.position()))
                 .collect(toList());
     }
 
+    private static ColumnCommentary columnHasComment(ReportGridColumnDefinition cd, Set<Long> colsNeedingComments ){
+       return (colsNeedingComments.contains(cd.columnEntityId())) ?
+               ColumnCommentary.HAS_COMMENTARY:ColumnCommentary.NO_COMMENTARY;
+    }
 
     private String mkReportName(ReportGridDefinition gridDefinition, IdSelectionOptions selectionOptions) {
         return format("%s_%s_%s",
@@ -158,52 +163,8 @@ public class ReportGridExtractor implements DataExtractor {
     }
 
 
-    private List<String> mkHeaderStrings(List<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions) {
-        List<String> staticHeaders = newArrayList(
-                "Subject Id",
-                "Subject Name",
-                "Subject External Id",
-                "Subject Lifecycle Phase");
 
-        List<String> columnHeaders = columnDefinitions
-                .stream()
-                .sorted(Comparator.comparingLong(r -> r.v1.position()))
-                .flatMap(r -> {
-                    String name = getColumnName(r.v1);
-                    Boolean needsComment = r.v2;
-                    return Stream.of(
-                            name,
-                            needsComment
-                                ? String.format("%s: comment", name)
-                                    : null);
-
-                })
-                .filter(Objects::nonNull)
-                .collect(toList());
-
-        return concat(
-                staticHeaders,
-                columnHeaders);
-    }
-
-    private String getColumnName(ReportGridColumnDefinition column) {
-        if (column.displayName() != null) {
-            return column.displayName();
-        } else {
-            String fieldName = Optional
-                    .ofNullable(column.entityFieldReference())
-                    .map(EntityFieldReference::displayName)
-                    .orElse(null);
-
-            return ListUtilities.asList(fieldName, column.columnName())
-                    .stream()
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.joining(" / "));
-        }
-    }
-
-
-    private List<Tuple2<ReportSubject, ArrayList<Object>>> prepareReportRows(List<Tuple2<ReportGridColumnDefinition, Boolean>> colsWithCommentRequirement,
+    private List<Tuple2<ReportSubject, ArrayList<Object>>> prepareReportRows(List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> colsWithCommentRequirement,
                                                                              ReportGridInstance reportGridInstance) {
 
         Set<ReportGridCell> tableData = reportGridInstance.cellData();
@@ -240,8 +201,6 @@ public class ReportGridExtractor implements DataExtractor {
                     colsWithCommentRequirement
                             .forEach(t -> {
                                 ReportGridColumnDefinition colDef = t.v1;
-                                Boolean needsComment = t.v2;
-
                                 boolean isCostColumn = colDef.columnEntityKind().equals(EntityKind.COST_KIND);
 
                                 if (!allowCostsExport && isCostColumn) {
@@ -255,7 +214,7 @@ public class ReportGridExtractor implements DataExtractor {
                                             null);
 
                                     reportRow.add(getValueFromReportCell(ratingsById, cell));
-                                    if (needsComment) {
+                                    if (ColumnCommentary.HAS_COMMENTARY.equals(t.v2)) {
                                         reportRow.add(getCommentFromCell(cell));
                                     }
                                 }
@@ -304,138 +263,29 @@ public class ReportGridExtractor implements DataExtractor {
 
 
     private Tuple3<ExtractFormat, String, byte[]> formatReport(ExtractFormat format,
+                                                               ReportGrid reportGrid,
                                                                String reportName,
-                                                               List<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions,
+                                                               List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> columnDefinitions,
                                                                List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows) throws IOException {
         switch (format) {
             case XLSX:
-                return tuple(format, reportName, mkExcelReport(reportName, columnDefinitions, reportRows));
+                return tuple(format, reportName, dynamicExcelFormatter
+                        .format(reportName, reportGrid,columnDefinitions, reportRows));
             case CSV:
-                return tuple(format, reportName, mkCSVReport(columnDefinitions, reportRows));
+                return tuple(format, reportName, dynamicCommaSeperatedValueFormatter
+                        .format(reportName,reportGrid,columnDefinitions, reportRows));
+            case JSON:
+                return tuple(format, reportName, dynamicJSONFormatter
+                        .format(reportName,reportGrid,columnDefinitions, reportRows));
             default:
                 throw new UnsupportedOperationException("This report does not support export format: " + format);
         }
     }
 
 
-    private byte[] mkCSVReport(List<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions,
-                               List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows) throws IOException {
-        List<String> headers = mkHeaderStrings(columnDefinitions);
+    private static final LongFunction<NotFoundException> notFoundException = (gridId) -> new NotFoundException(
+            "REPORT_GRID_NOT_FOUND",
+            format(" Grid def: %d not found", gridId));
 
-        StringWriter writer = new StringWriter();
-        CsvListWriter csvWriter = new CsvListWriter(writer, CsvPreference.EXCEL_PREFERENCE);
-
-        csvWriter.write(headers);
-        reportRows.forEach(unchecked(row -> csvWriter.write(simplify(row))));
-        csvWriter.flush();
-
-        return writer.toString().getBytes();
-    }
-
-
-    private List<Object> simplify(Tuple2<ReportSubject, ArrayList<Object>> row) {
-
-        long appId = row.v1.entityReference().id();
-        String appName = row.v1.entityReference().name().get();
-        Optional<String> assetCode = row.v1.entityReference().externalId();
-        LifecyclePhase lifecyclePhase = row.v1.lifecyclePhase();
-
-        List<Object> appInfo = asList(appId, appName, assetCode, lifecyclePhase.name());
-
-        return map(concat(appInfo, row.v2), value -> {
-            if (value == null) return null;
-            if (value instanceof Optional) {
-                return ((Optional<?>) value).orElse(null);
-            } else {
-                return value;
-            }
-        });
-    }
-
-
-    private byte[] mkExcelReport(String reportName,
-                                 List<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions,
-                                 List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows) throws IOException {
-        SXSSFWorkbook workbook = new SXSSFWorkbook(2000);
-        SXSSFSheet sheet = workbook.createSheet(ExtractorUtilities.sanitizeSheetName(reportName));
-
-        int colCount = writeExcelHeader(columnDefinitions, sheet);
-        writeExcelBody(reportRows, sheet);
-
-        sheet.setAutoFilter(new CellRangeAddress(0, 0, 0, colCount - 1));
-        sheet.createFreezePane(0, 1);
-
-        return convertExcelToByteArray(workbook);
-    }
-
-
-    private byte[] convertExcelToByteArray(SXSSFWorkbook workbook) throws IOException {
-        ByteArrayOutputStream outByteStream = new ByteArrayOutputStream();
-        workbook.write(outByteStream);
-        workbook.close();
-        return outByteStream.toByteArray();
-    }
-
-
-    private int writeExcelBody(List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows, SXSSFSheet sheet) {
-        AtomicInteger rowNum = new AtomicInteger(1);
-        int maxCellLength = 32767 - length(CELL_LIMIT_MESSAGE);
-        reportRows.forEach(r -> {
-
-            long subjectId = r.v1.entityReference().id();
-            String subjectName = r.v1.entityReference().name().get();
-            Optional<String> externalId = r.v1.entityReference().externalId();
-            LifecyclePhase lifecyclePhase = r.v1.lifecyclePhase();
-
-            List<Object> subjectInfo = asList(subjectId, subjectName, externalId, lifecyclePhase.name());
-
-            List<Object> values = concat(subjectInfo, r.v2);
-
-            Row row = sheet.createRow(rowNum.getAndIncrement());
-            AtomicInteger colNum = new AtomicInteger(0);
-            for (Object value : values) {
-                Object v = value instanceof Optional
-                        ? ((Optional<?>) value).orElse(null)
-                        : value;
-
-                int nextColNum = colNum.getAndIncrement();
-
-                if (v == null) {
-                    row.createCell(nextColNum);
-                } else if (v instanceof Number) {
-                    Cell cell = row.createCell(nextColNum, CellType.NUMERIC);
-                    cell.setCellValue(((Number) v).doubleValue());
-                } else if (v instanceof ExternalIdValue) {
-                    Cell cell = row.createCell(nextColNum, CellType.STRING);
-                    cell.setCellValue(((ExternalIdValue) v).value());
-                } else {
-                    Cell cell = row.createCell(nextColNum);
-                    String cellValue = Objects.toString(v);
-                    String cellValueToWrite = (length(cellValue) >= maxCellLength)
-                            ? format("%s%s", limit(cellValue, maxCellLength), CELL_LIMIT_MESSAGE)
-                            : cellValue;
-                    cell.setCellValue(cellValueToWrite);
-                }
-
-            }
-        });
-        return rowNum.get();
-    }
-
-
-    private int writeExcelHeader(List<Tuple2<ReportGridColumnDefinition, Boolean>> columnDefinitions, SXSSFSheet sheet) {
-        Row headerRow = sheet.createRow(0);
-        AtomicInteger colNum = new AtomicInteger();
-
-        mkHeaderStrings(columnDefinitions).forEach(hdr -> writeExcelHeaderCell(headerRow, colNum, hdr));
-
-        return colNum.get();
-    }
-
-
-    private void writeExcelHeaderCell(Row headerRow, AtomicInteger colNum, String text) {
-        Cell cell = headerRow.createCell(colNum.getAndIncrement());
-        cell.setCellValue(text);
-    }
 
 }

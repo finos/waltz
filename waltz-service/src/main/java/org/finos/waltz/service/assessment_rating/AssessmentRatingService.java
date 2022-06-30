@@ -235,13 +235,14 @@ public class AssessmentRatingService {
                                      long defId,
                                      String username) throws InsufficientPrivelegeException {
 
-        Set<Operation> perms = findRatingPermissions(ref, defId, username);
-        if (! hasIntersection(perms, possiblePerms)) {
+        Set<Operation> permsUserHas = findRatingPermissions(ref, defId, username);
+        if (! hasIntersection(permsUserHas, possiblePerms)) {
             throw new InsufficientPrivelegeException(format(
-                    "%s does not have any of the permissions: %s, for assessment def: %d: ",
+                    "%s does not have any of the permissions: %s, for assessment def: %d.  They have: %s",
                     username,
                     possiblePerms,
-                    defId));
+                    defId,
+                    permsUserHas));
         }
     }
 

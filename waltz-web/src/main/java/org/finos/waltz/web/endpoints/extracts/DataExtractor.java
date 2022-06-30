@@ -41,14 +41,17 @@ public interface DataExtractor {
         HttpServletResponse httpResponse = response.raw();
 
         switch (reportResult.v1) {
+            case CSV:
+                response.type(MimeTypes.Type.TEXT_PLAIN.name());
+                response.header("Content-disposition", "attachment; filename=" + templateName + ".csv");
+                break;
+            case JSON:
+                httpResponse.setHeader("Content-Type", MimeTypes.Type.APPLICATION_JSON_UTF_8.name());
+                break;
             case XLSX:
                 httpResponse.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
                 httpResponse.setHeader("Content-Disposition", "attachment; filename=" + templateName + ".xlsx");
                 httpResponse.setHeader("Content-Transfer-Encoding", "7bit");
-                break;
-            case CSV:
-                response.type(MimeTypes.Type.TEXT_PLAIN.name());
-                response.header("Content-disposition", "attachment; filename=" + templateName + ".csv");
                 break;
             default:
                 break;
@@ -59,7 +62,6 @@ public interface DataExtractor {
         httpResponse.getOutputStream().write(bytes);
         httpResponse.getOutputStream().flush();
         httpResponse.getOutputStream().close();
-
         return httpResponse;
     }
 

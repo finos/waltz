@@ -15,12 +15,25 @@
  * See the License for the specific
  *
  */
+package org.finos.waltz.web.json;
 
-package org.finos.waltz.web.endpoints.extracts;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-public enum ExtractFormat {
-    XLSX,
-    CSV,
-    JSON,
-    SVG
+
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
+        property = "type",
+        visible = true)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = ReportGridJSON.class, name = ReportGridJSON.REPORT_GRID_TYPE)
+})
+@JsonPropertyOrder({"apiTypes","type"})
+public interface JsonAPI {
+
+    ApiTypes apiTypes();
+
+    String type();
 }

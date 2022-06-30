@@ -15,12 +15,19 @@
  * See the License for the specific
  *
  */
+package org.finos.waltz.web.json;
 
-package org.finos.waltz.web.endpoints.extracts;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.immutables.value.Value;
 
-public enum ExtractFormat {
-    XLSX,
-    CSV,
-    JSON,
-    SVG
+import java.util.List;
+
+@Value.Immutable
+@JsonSerialize(as = ImmutableGrid.class)
+@JsonDeserialize(as = ImmutableGrid.class)
+public abstract class Grid {
+
+    public abstract List<Row> rows();
+
 }

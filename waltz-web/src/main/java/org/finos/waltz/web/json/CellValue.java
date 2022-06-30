@@ -15,12 +15,28 @@
  * See the License for the specific
  *
  */
+package org.finos.waltz.web.json;
 
-package org.finos.waltz.web.endpoints.extracts;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.immutables.value.Value;
 
-public enum ExtractFormat {
-    XLSX,
-    CSV,
-    JSON,
-    SVG
+import java.util.Optional;
+
+@Value.Immutable
+@JsonSerialize(as = ImmutableCellValue.class)
+@JsonDeserialize(as = ImmutableCellValue.class)
+public interface CellValue{
+
+    @Value.Default
+    default String type() {
+        return ApiTypes.VALCELL;
+    }
+
+    String name();
+    String value();
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    Optional<String> comment();
 }
