@@ -20,7 +20,6 @@
 <svg class="content"
      viewBox={`0 0 ${width} ${height}`}>
 
-
     <circle r={cr}
             fill="#b2ffca"
             stroke="#31ff89"

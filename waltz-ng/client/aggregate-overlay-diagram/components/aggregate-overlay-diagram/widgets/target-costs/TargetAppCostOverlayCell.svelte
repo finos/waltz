@@ -8,6 +8,8 @@
     export let height;
     export let width;
 
+    $: console.log({maxCost});
+
     $: r = scaleLinear()
         .domain([0, maxCost])
         .range([0, height / 2 - 2]);
@@ -24,7 +26,7 @@
     <circle r={cr}
             fill="#a9e4ff"
             stroke="#25b0ff"
-            stroke-width="2"
+            stroke-width="1"
             cx={width / 2 - (cr / 1.4)}
             cy={height / 2}/>
 
@@ -32,7 +34,7 @@
         <circle r={tr}
                 fill="#c6eeff"
                 stroke="#25b0ff"
-                stroke-width="2"
+                stroke-width="1"
                 cx={width / 2 + (cr / 1.4)}
                 cy={height / 2}/>
     {/if}
@@ -53,3 +55,12 @@
         {/if}
     </foreignObject>
 </svg>
+
+
+<style>
+
+    svg {
+        display: block;
+    }
+
+</style>
