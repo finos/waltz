@@ -8,8 +8,6 @@
     export let height;
     export let width;
 
-    $: console.log({maxCost});
-
     $: r = scaleLinear()
         .domain([0, maxCost])
         .range([0, height / 2 - 2]);

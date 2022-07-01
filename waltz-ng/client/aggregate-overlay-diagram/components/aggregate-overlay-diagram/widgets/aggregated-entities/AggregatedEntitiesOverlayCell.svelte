@@ -26,8 +26,6 @@
 <div>
     <svg class="content"
          viewBox="0 0 {width} {height}"
-         width="100%"
-         height="100%"
          style="background: none">
         {#if !_.isEmpty(references)}
             <circle r={cr}
