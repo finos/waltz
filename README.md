@@ -65,7 +65,7 @@ Provisional dates for upcoming releases:
 
 Release | Date | Summary
 --- | --- | --- 
-1.42.1 | 30th June | Enhanced permissions on assessments, more overlay diagram improvements
+1.42.1 | 4th July | Enhanced permissions on assessments, more overlay diagram improvements
 1.43 | 26th July | Enhanced permissions on flows, tbd..
 1.44 | 6th September | tbd 
 1.45 | 18th October | tbd
