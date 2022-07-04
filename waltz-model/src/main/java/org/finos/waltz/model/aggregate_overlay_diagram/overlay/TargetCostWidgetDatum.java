@@ -7,10 +7,10 @@ import java.math.BigDecimal;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableTargetCostWidgetDatum.class)
-public abstract class TargetCostWidgetDatum {
+public abstract class TargetCostWidgetDatum implements CellExternalIdProvider {
 
-    public abstract String cellExternalId();
     public abstract BigDecimal currentStateCost();
+
     public abstract BigDecimal targetStateCost();
 
 }

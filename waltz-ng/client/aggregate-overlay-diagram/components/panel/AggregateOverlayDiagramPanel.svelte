@@ -147,6 +147,13 @@
                                             <h1>{$selectedDiagram.name}</h1>
                                         </div>
                                     </div>
+                                    <div slot="footer">
+                                        {#if $focusWidget?.legend}
+                                            <div class="image-download-footer">
+                                                <svelte:component this={$focusWidget.legend}/>
+                                            </div>
+                                        {/if}
+                                    </div>
                                 </ImageDownloadLink>
                             </div>
 
