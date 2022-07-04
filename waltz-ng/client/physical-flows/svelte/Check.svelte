@@ -6,7 +6,8 @@
 
 
 <span class:selected>
-    <Icon name={selected ? "check-square-o" : "square-o"}/>
+    <Icon name={selected ? "check-square-o" : "square-o"}
+          fixedWidth="true"/>
 </span>
 
 <style type="text/scss">
