@@ -82,6 +82,7 @@
         <jooq.version>3.13.2</jooq.version> <!--If this changes see issue #4553 -->
         <junit.version>5.7.2</junit.version>
         <jwt.version>3.14.0</jwt.version>
+        <mockito.version>4.1.0</mockito.version>
         <liquibase.maven.version>3.10.3</liquibase.maven.version>
         <logback.version>1.2.11</logback.version>
         <pcollections.version>3.1.4</pcollections.version>
@@ -283,6 +284,13 @@
                 <groupId>org.junit.platform</groupId>
                 <artifactId>junit-platform-launcher</artifactId>
                 <version>1.7.2</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${mockito.version}</version>
                 <scope>test</scope>
             </dependency>
 

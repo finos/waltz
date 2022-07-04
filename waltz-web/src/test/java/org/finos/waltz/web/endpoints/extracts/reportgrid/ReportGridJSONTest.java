@@ -12,7 +12,7 @@ class ReportGridJSONTest {
 
     private final String TEST_NAME = "er-name";
     private final EntityReference TEST_REF = ImmutableEntityReference.mkRef(EntityKind.COMPLEXITY,1L,TEST_NAME);
-    private final KeyCell KEY_CELL = KeyCell.fromRef(TEST_REF);
+    private final KeyCell KEY_CELL = EntityReferenceKeyCell.fromRef(TEST_REF);
 
     private final ReportGridJSON reportGridJSON =
             ImmutableReportGridJSON.builder().id("id")
@@ -33,11 +33,10 @@ class ReportGridJSONTest {
     @Test
     void keyCellCopiesValuesFromEntityRef(){
         Row row = ImmutableRow.builder()
-                .id(KeyCell.fromRef(TEST_REF))
+                .id(EntityReferenceKeyCell.fromRef(TEST_REF))
                 .build();
         assertEquals( 0, row.cells().size());
-        assertTrue(row.id().name().isPresent() && row.id().name().get().equals(TEST_NAME));
-        assertEquals(EntityKind.COMPLEXITY,row.id().kind());
+        assertEquals(ApiTypes.ENTITY_REFERENCE_KEYCELL, row.id().type());
     }
 
 

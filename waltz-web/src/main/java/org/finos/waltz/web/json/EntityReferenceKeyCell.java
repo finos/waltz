@@ -18,8 +18,6 @@
 package org.finos.waltz.web.json;
 
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.EntityKind;
@@ -29,17 +27,36 @@ import org.immutables.value.Value;
 
 import java.util.Optional;
 
+@Value.Immutable
+@JsonSerialize(as = ImmutableEntityReferenceKeyCell.class)
+@JsonDeserialize(as = ImmutableEntityReferenceKeyCell.class)
+public interface EntityReferenceKeyCell extends KeyCell {
 
-@JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.EXISTING_PROPERTY,
-        property = "type",
-        visible = true)
-@JsonSubTypes({
-        @JsonSubTypes.Type(value = SimpleKeyCell.class, name = ApiTypes.SIMPLE_KEYCELL),
-        @JsonSubTypes.Type(value = EntityReferenceKeyCell.class, name = ApiTypes.ENTITY_REFERENCE_KEYCELL)
-})
-public interface KeyCell{
+    Optional<String> name();
 
-    String type();
+    @Value.Default
+    default String type() {
+        return ApiTypes.ENTITY_REFERENCE_KEYCELL;
+    }
+
+    Optional<EntityKind> kind();
+
+    Optional<Long> waltzId();
+
+    Optional<String> externalId();
+
+    Optional<EntityLifecycleStatus> lifecycleStatus();
+
+
+    static EntityReferenceKeyCell fromRef(EntityReference ref) {
+        return ImmutableEntityReferenceKeyCell
+                .builder()
+                .name(ref.name())
+                .kind(ref.kind())
+                .waltzId(ref.id())
+                .externalId(ref.externalId())
+                .lifecycleStatus(ref.entityLifecycleStatus())
+                .build();
+    }
+
 }

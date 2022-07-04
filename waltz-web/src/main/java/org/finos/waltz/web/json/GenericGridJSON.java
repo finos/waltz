@@ -17,29 +17,25 @@
  */
 package org.finos.waltz.web.json;
 
-
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.EntityLifecycleStatus;
-import org.finos.waltz.model.EntityReference;
 import org.immutables.value.Value;
 
-import java.util.Optional;
+@Value.Immutable
+@JsonSerialize(as = ImmutableGenericGridJSON.class)
+@JsonDeserialize(as = ImmutableGenericGridJSON.class)
+@JsonPropertyOrder({"type","id","name"})
+public interface GenericGridJSON extends JsonAPI {
 
+    String GENERIC_GRID_TYPE ="/types/1/schema#id=generic-grid";
 
-@JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.EXISTING_PROPERTY,
-        property = "type",
-        visible = true)
-@JsonSubTypes({
-        @JsonSubTypes.Type(value = SimpleKeyCell.class, name = ApiTypes.SIMPLE_KEYCELL),
-        @JsonSubTypes.Type(value = EntityReferenceKeyCell.class, name = ApiTypes.ENTITY_REFERENCE_KEYCELL)
-})
-public interface KeyCell{
+    @Value.Default
+    default String type() {
+        return GENERIC_GRID_TYPE;
+    }
 
-    String type();
+    String id();
+    String name();
+    Grid grid();
 }

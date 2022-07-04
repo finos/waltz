@@ -19,6 +19,11 @@
 package org.finos.waltz.web.endpoints.extracts;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -26,6 +31,9 @@ import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.MimeTypes;
+import org.finos.waltz.web.json.GenericGridJSON;
+import org.finos.waltz.web.json.ImmutableCellValue;
+import org.finos.waltz.web.json.ImmutableRow;
 import org.jooq.DSLContext;
 import org.jooq.Result;
 import org.jooq.Select;
@@ -36,8 +44,13 @@ import spark.Response;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.FunctionUtilities.time;
@@ -45,8 +58,8 @@ import static org.finos.waltz.common.FunctionUtilities.time;
 
 public abstract class DirectQueryBasedDataExtractor implements DataExtractor {
 
-    protected DSLContext dsl;
 
+    protected DSLContext dsl;
 
     public DirectQueryBasedDataExtractor(DSLContext dsl) {
         checkNotNull(dsl, "dsl cannot be null");
@@ -65,17 +78,37 @@ public abstract class DirectQueryBasedDataExtractor implements DataExtractor {
             case CSV:
                 return writeAsCSV(suggestedFilenameStem, qry, response);
             case JSON:
-                return writeAsJson(qry, response);
+                return writeAsJson(suggestedFilenameStem,suggestedFilenameStem,qry, response);
             default:
                 throw new IllegalArgumentException("Cannot write extract using unknown format: " + format);
         }
     }
 
-    private Object writeAsJson(Select<?> qry,
-                              Response response) {
+    private String writeAsJson(String name,
+                                        String id,
+                                        Select<?> qry,
+                                        Response response) {
         response.type(MimeTypes.Type.APPLICATION_JSON_UTF_8.name());
-        return qry.fetch().formatJSON();
+        JooqQueryTransformer jooqQueryTransformer = new JooqQueryTransformer();
+
+        try {
+            return createMapper().writeValueAsString(
+                    jooqQueryTransformer.transformFromQuery(dsl, qry,id,name));
+        } catch (JsonProcessingException e){
+            throw new RuntimeException(String.format("Failed to transform query to json (%s)",e.getMessage()),e);
+        }
     }
+
+    private ObjectMapper createMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper
+                .registerModule(new JavaTimeModule())
+                .registerModule(new Jdk8Module())
+                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+    }
+
+
 
     @SafeVarargs
     public static Object writeAsMultiSheetExcel(DSLContext dsl,

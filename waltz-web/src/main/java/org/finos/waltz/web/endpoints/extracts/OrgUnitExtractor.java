@@ -31,7 +31,8 @@ import static spark.Spark.get;
 
 
 @Service
-public class OrgUnitExtractor extends DirectQueryBasedDataExtractor {
+public class OrgUnitExtractor extends DirectQueryBasedDataExtractor
+        implements PublicDataExtractor {
 
 
     @Autowired

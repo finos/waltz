@@ -18,8 +18,6 @@
 package org.finos.waltz.web.json;
 
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.EntityKind;
@@ -29,17 +27,16 @@ import org.immutables.value.Value;
 
 import java.util.Optional;
 
+@Value.Immutable
+@JsonSerialize(as = ImmutableEntityReferenceKeyCell.class)
+@JsonDeserialize(as = ImmutableEntityReferenceKeyCell.class)
+public interface SimpleKeyCell extends KeyCell {
 
-@JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.EXISTING_PROPERTY,
-        property = "type",
-        visible = true)
-@JsonSubTypes({
-        @JsonSubTypes.Type(value = SimpleKeyCell.class, name = ApiTypes.SIMPLE_KEYCELL),
-        @JsonSubTypes.Type(value = EntityReferenceKeyCell.class, name = ApiTypes.ENTITY_REFERENCE_KEYCELL)
-})
-public interface KeyCell{
+    @Value.Default
+    default String type() {
+        return ApiTypes.SIMPLE_KEYCELL;
+    }
 
-    String type();
+    String name();
+
 }
