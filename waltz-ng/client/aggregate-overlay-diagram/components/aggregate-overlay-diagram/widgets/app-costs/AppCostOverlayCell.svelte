@@ -115,4 +115,8 @@
     .summary-table .derived {
         font-style: italic;
     }
+
+    svg {
+        display: block;
+    }
 </style>

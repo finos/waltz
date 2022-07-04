@@ -22,12 +22,7 @@ import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramInfo;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramPreset;
 import org.finos.waltz.model.aggregate_overlay_diagram.OverlayDiagramPresetCreateCommand;
-import org.finos.waltz.model.aggregate_overlay_diagram.overlay.AggregatedEntitiesWidgetData;
-import org.finos.waltz.model.aggregate_overlay_diagram.overlay.AssessmentRatingsWidgetData;
-import org.finos.waltz.model.aggregate_overlay_diagram.overlay.BackingEntityWidgetData;
-import org.finos.waltz.model.aggregate_overlay_diagram.overlay.CostWidgetData;
-import org.finos.waltz.model.aggregate_overlay_diagram.overlay.CountWidgetData;
-import org.finos.waltz.model.aggregate_overlay_diagram.overlay.TargetCostWidgetDatum;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.*;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AggregatedEntitiesWidgetParameters;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AppCostWidgetParameters;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AppCountWidgetParameters;
@@ -113,7 +108,7 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
         };
 
 
-        ListRoute<TargetCostWidgetDatum> findTargetAppCostWidgetDataRoute = (request, response) -> {
+        DatumRoute<TargetCostWidgetData> findTargetAppCostWidgetDataRoute = (request, response) -> {
 
             OverlayDiagramWidgetInfo<TargetAppCostWidgetParameters> widgetParameters = readBody(request, OverlayDiagramTargetAppCostWidgetInfo.class, null);
 
@@ -185,7 +180,7 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
         getForDatum(getBackingEntityWidgetDataPath, getBackingEntityWidgetDataRoute);
         getForList(findPresetsForDiagramPath, findPresetsForDiagramRoute);
         postForDatum(getAppCountWidgetDataPath, getAppCountWidgetDataRoute);
-        postForList(findTargetAppCostWidgetDataPath, findTargetAppCostWidgetDataRoute);
+        postForDatum(findTargetAppCostWidgetDataPath, findTargetAppCostWidgetDataRoute);
         postForDatum(getAppCostWidgetDataPath, getAppCostWidgetDataRoute);
         postForDatum(getAppAssessmentWidgetDataPath, getAppAssessmentWidgetDataRoute);
         postForDatum(getAggregatedEntitiesWidgetDataPath, getAggregatedEntitiesWidgetDataRoute);

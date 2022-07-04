@@ -325,7 +325,7 @@ export function mkAppCostGlobalProps(data) {
 
 export function mkTargetAppCostGlobalProps(data) {
     const maxCost = _
-        .chain(data)
+        .chain(data.cellData)
         .map(d => [_.get(d, ["currentStateCost"], 0), _.get(d, ["targetStateCost"], 0)])
         .flatten()
         .max()
