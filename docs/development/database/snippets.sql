@@ -25,9 +25,11 @@ WHERE
 -- update parent id's based on external parent ids (mssql)
 UPDATE child
 SET child.parent_id = parent.id
-FROM measurable AS child
-  INNER JOIN measurable AS parent ON parent.external_id = child.external_parent_id
-WHERE child.measurable_category_id = 18;
+    FROM measurable AS child
+         INNER JOIN measurable AS parent ON parent.external_id = child.external_parent_id
+WHERE child.measurable_category_id = (select id from measurable_category where external_id = :categoryExtId)
+  and parent.measurable_category_id =  (select id from measurable_category where external_id = :categoryExtId);
+
 
 
 -- update parent id's based on external parent ids (postgres)

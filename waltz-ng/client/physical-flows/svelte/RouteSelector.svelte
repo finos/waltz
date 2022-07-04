@@ -17,7 +17,7 @@
 
     $: filteredFlows = _.isEmpty(qry)
             ? flows
-            : termSearch(flows, qry, ["source.name", "target.name"]);
+            : termSearch(flows, qry, ["source.name", "source.externalId", "target.name", "target.externalId"]);
 
 </script>
 
@@ -26,38 +26,41 @@
 
     <SearchInput bind:value={qry}/>
 
-    <table class="table table-condensed table-hover">
-        <colgroup>
-            <col width="48%">
-            <col width="4%">
-            <col width="48%">
-        </colgroup>
-        <thead>
-        <tr>
-            <th>Source</th>
-            <th/>
-            <th>Target</th>
-        </tr>
-        </thead>
-        <tbody>
-        {#each filteredFlows as flow}
-            <tr class="clickable"
-                on:click={() => $logicalFlow = flow}>
-                <td class:counterpart={node && !sameRef(node, flow.source)}
-                    class:mainNode={node && sameRef(node, flow.source)}>
-                    <EntityLabel ref={flow.source}/>
-                </td>
-                <td class="counterpart">
-                    <Icon name="arrow-right"/>
-                </td>
-                <td class:counterpart={node && !sameRef(node, flow.target)}
-                    class:mainNode={node && sameRef(node, flow.target)}>
-                    <EntityLabel ref={flow.target}/>
-                </td>
+    <div class:waltz-scroll-region-300={filteredFlows.length > 10}>
+        <table class="table table-condensed table-hover small">
+            <colgroup>
+                <col width="48%">
+                <col width="4%">
+                <col width="48%">
+            </colgroup>
+            <thead>
+            <tr>
+                <th>Source</th>
+                <th/>
+                <th>Target</th>
             </tr>
-        {/each}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            {#each filteredFlows as flow}
+                <tr class="clickable"
+                    on:click={() => $logicalFlow = flow}>
+                    <td class:counterpart={node && !sameRef(node, flow.source)}
+                        class:mainNode={node && sameRef(node, flow.source)}>
+                        <EntityLabel ref={flow.source}/>
+                    </td>
+                    <td class="counterpart">
+                        <Icon name="arrow-right"/>
+                    </td>
+                    <td class:counterpart={node && !sameRef(node, flow.target)}
+                        class:mainNode={node && sameRef(node, flow.target)}>
+                        <EntityLabel ref={flow.target}/>
+                    </td>
+                </tr>
+            {/each}
+            </tbody>
+        </table>
+    </div>
+
 </div>
 
 

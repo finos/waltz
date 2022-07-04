@@ -7,124 +7,47 @@
     import Icon from "../../common/svelte/Icon.svelte";
     import Check from "./Check.svelte";
 
-    import {CORE_API} from "../../common/services/core-api-utils";
-
     import {logicalFlow, physicalSpecification, physicalFlow, reset} from "./physical-flow-editor-store";
 
     import _ from "lodash";
     import PhysicalSpecificationSelector from "./PhysicalSpecificationSelector.svelte";
+    import {applicationStore} from "../../svelte-stores/application-store";
+    import {logicalFlowStore} from "../../svelte-stores/logical-flow-store";
+    import {physicalSpecStore} from "../../svelte-stores/physical-spec-store";
     import {onMount} from "svelte";
+    import LogicalFlowLabel from "./LogicalFlowLabel.svelte";
+    import LogicalFlowSelectionStep from "./LogicalFlowSelectionStep.svelte";
+    import PhysicalFlowCharacteristicsStep from "./PhysicalFlowCharacteristicsStep.svelte";
 
     export let primaryEntityRef = {};
-    export let serviceBroker;
 
-    function parseLogicalFlowId() {
-        const idAsStr = new URLSearchParams(window.location.search).get("LOGICAL_DATA_FLOW");
-        return idAsStr
-            ? Number(idAsStr)
-            : null;
-    }
-
-    const givenLogicalFlowId = parseLogicalFlowId();
-
+    $: application = primaryEntityRef;
     let logicalFlows = [];
     let specifications = [];
-    let application;
 
-    onMount(() => {
-        reset();
-    });
 
-    $: {
-        primaryEntityRef && serviceBroker
-            .loadViewData(
-                CORE_API.ApplicationStore.getById,
-                [primaryEntityRef.id])
-            .then(r => application = r.data);
-        primaryEntityRef && serviceBroker
-            .loadViewData(
-                CORE_API.LogicalFlowStore.findByEntityReference,
-                [primaryEntityRef])
-            .then(r => logicalFlows = r.data);
-    }
+    $: console.log({application, logicalFlows, specifications})
 
-    $: $logicalFlow = givenLogicalFlowId
-        ? _.find(logicalFlows, d => d.id === givenLogicalFlowId)
-        : null;
-
-    $: $logicalFlow && serviceBroker
-        .loadViewData(
-            CORE_API.PhysicalSpecificationStore.findByEntityReference,
-            [$logicalFlow.source])
-        .then(r => specifications = r.data);
 
 </script>
 
 
-{#if application}
+{#if primaryEntityRef}
 <PageHeader name="Register new Physical Flow"
             icon="dot-circle-o"
-            small={_.get(application, ["name"], "-")}>
+            small={_.get(primaryEntityRef, ["name"], "-")}>
     <div slot="breadcrumbs">
         <ol class="waltz-breadcrumbs">
             <li><ViewLink state="main">Home</ViewLink></li>
-            <li><EntityLink ref={application}/></li>
+            <li><EntityLink ref={primaryEntityRef}/></li>
             <li>Register Physical Flow</li>
         </ol>
     </div>
 
     <div slot="summary">
-        <!-- ROUTE -->
-        <h3>
-            <Check selected={$logicalFlow !== null}/>
-            Route
-        </h3>
-        <div class="step-body">
-            {#if !$logicalFlow}
-                <div class="help-block">
-                    Select which nodes this physical flow is between.
-                    <br>
-                    If the route is not listed add a new logical flow using the <em>Add new route</em> option.
-                </div>
-                <RouteSelector node={application}
-                               flows={logicalFlows}/>
-            {:else}
-                <EntityLabel ref={$logicalFlow.source}/>
-                <span class="flow-arrow">
-                <Icon name="arrow-right"/>
-            </span>
-                <EntityLabel ref={$logicalFlow.target}/>
+        <LogicalFlowSelectionStep {primaryEntityRef}/>
 
-                <button class="btn btn-link"
-                        on:click={() => $logicalFlow = null}>
-                    <Icon name="times"/>
-                    Select different route
-                </button>
-            {/if}
-        </div>
-
-        <!-- PHYS FLOW -->
-        <h3>
-            <Check selected={$physicalFlow}/>
-            Delivery Characteristics
-        </h3>
-
-        <div class="step-body">
-            {#if $physicalFlow}
-                <pre>{JSON.stringify($physicalFlow, "", 2)}</pre>
-
-                <button class="btn btn-link"
-                        on:click={() => $physicalSpecification = null}>
-                    <Icon name="times"/>
-                    Select different specification
-                </button>
-            {:else}
-                <div class="help-block">
-                    Either reuse an existing specification or create a new one using the <em>Add new specification</em> option.
-                </div>
-                <PhysicalSpecificationSelector {specifications}/>
-            {/if}
-        </div>
+        <PhysicalFlowCharacteristicsStep {primaryEntityRef}/>
 
         <!-- SPEC -->
         <h3>
@@ -167,6 +90,7 @@
         padding-left: 1em;
         padding-right: 1em;
     }
+
     .step-body {
         margin-left: 1em;
     }
