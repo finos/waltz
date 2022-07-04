@@ -89,6 +89,6 @@ public class DataTypeService {
 
 
     public Collection<DataType> findSuggestedBySourceEntityRef(EntityReference source){
-        return dataTypeDao.findSuggestedBySourceEntityRef(source);
+        return dataTypeDao.findSuggestedByEntityRef(source);
     }
 }

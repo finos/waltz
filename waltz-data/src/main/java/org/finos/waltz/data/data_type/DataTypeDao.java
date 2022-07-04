@@ -117,13 +117,12 @@ public class DataTypeDao implements FindEntityReferencesByIdSelector {
                 .fetch(TO_DOMAIN);
     }
 
-
-    public List<DataType> findSuggestedBySourceEntityRef(EntityReference source) {
+    public List<DataType> findSuggestedByEntityRef(EntityReference source) {
 
         Condition isSourceOrTarget = LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(source.id())
-                .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(source.kind().name()))
-                .or(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(source.id())
-                        .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(source.kind().name())));
+              .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(source.kind().name()))
+              .or(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(source.id())
+                   .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(source.kind().name())));
 
         SelectConditionStep<Record1<Long>> logicalFlowsForSource = DSL
                 .select(LOGICAL_FLOW.ID)
@@ -134,8 +133,9 @@ public class DataTypeDao implements FindEntityReferencesByIdSelector {
                 .selectDistinct(DATA_TYPE.asterisk())
                 .from(DATA_TYPE)
                 .innerJoin(LOGICAL_FLOW_DECORATOR).on(DATA_TYPE.ID.eq(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID)
-                        .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())))
+                      .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())))
                 .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.in(logicalFlowsForSource))
                 .fetch(TO_DOMAIN);
     }
+
 }
