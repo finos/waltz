@@ -52,7 +52,6 @@ import static org.finos.waltz.web.WebUtilities.readBody;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.getForDatum;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.getForList;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.postForDatum;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.postForList;
 
 @Service
 public class AggregateOverlayDiagramEndpoint implements Endpoint {
@@ -113,7 +112,7 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
             OverlayDiagramWidgetInfo<TargetAppCostWidgetParameters> widgetParameters = readBody(request, OverlayDiagramTargetAppCostWidgetInfo.class, null);
 
             return aggregateOverlayDiagramService
-                    .findTargetAppCostWidgetData(
+                    .getTargetAppCostWidgetData(
                             getId(request),
                             widgetParameters.idSelectionOptions(),
                             widgetParameters.assessmentBasedSelectionFilters(),
