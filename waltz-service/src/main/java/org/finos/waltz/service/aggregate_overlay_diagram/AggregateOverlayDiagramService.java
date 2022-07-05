@@ -126,10 +126,10 @@ public class AggregateOverlayDiagramService {
     }
 
 
-    public TargetCostWidgetData findTargetAppCostWidgetData(Long diagramId,
-                                                            IdSelectionOptions appSelectionOptions,
-                                                            Set<AssessmentBasedSelectionFilter> filterParams,
-                                                            TargetAppCostWidgetParameters targetAppCostWidgetParameters) {
+    public TargetCostWidgetData getTargetAppCostWidgetData(Long diagramId,
+                                                           IdSelectionOptions appSelectionOptions,
+                                                           Set<AssessmentBasedSelectionFilter> filterParams,
+                                                           TargetAppCostWidgetParameters targetAppCostWidgetParameters) {
 
         AggregateOverlayDiagram diagram = aggregateOverlayDiagramDao.getById(diagramId);
 
