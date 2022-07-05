@@ -5,7 +5,7 @@
 </script>
 
 
-<span class:selected>
+<span class={selected ? "selected" : "unselected"}>
     <Icon name={selected ? "check-square-o" : "square-o"}
           fixedWidth="true"/>
 </span>
@@ -15,5 +15,9 @@
 
     .selected {
         color: $waltz-green;
+    }
+
+    .unselected {
+        color: $waltz-amber;
     }
 </style>

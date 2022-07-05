@@ -2,32 +2,59 @@
     import PageHeader from "../../common/svelte/PageHeader.svelte";
     import ViewLink from "../../common/svelte/ViewLink.svelte";
     import EntityLink from "../../common/svelte/EntityLink.svelte";
-    import RouteSelector from "./RouteSelector.svelte";
-    import EntityLabel from "../../common/svelte/EntityLabel.svelte";
-    import Icon from "../../common/svelte/Icon.svelte";
-    import Check from "./Check.svelte";
+    import toasts from "../../svelte-stores/toast-store";
 
-    import {logicalFlow, physicalSpecification, physicalFlow, reset} from "./physical-flow-editor-store";
+    import {expandedSections, logicalFlow, physicalFlow, physicalSpecification} from "./physical-flow-editor-store";
 
     import _ from "lodash";
-    import PhysicalSpecificationSelector from "./PhysicalSpecificationSelector.svelte";
-    import {applicationStore} from "../../svelte-stores/application-store";
-    import {logicalFlowStore} from "../../svelte-stores/logical-flow-store";
-    import {physicalSpecStore} from "../../svelte-stores/physical-spec-store";
     import {onMount} from "svelte";
-    import LogicalFlowLabel from "./LogicalFlowLabel.svelte";
     import LogicalFlowSelectionStep from "./LogicalFlowSelectionStep.svelte";
     import PhysicalFlowCharacteristicsStep from "./PhysicalFlowCharacteristicsStep.svelte";
+    import PhysicalSpecificationStep from "./PhysicalSpecificationStep.svelte";
+    import {sections} from "./physical-flow-registration-utils";
+    import {physicalFlowStore} from "../../svelte-stores/physical-flow-store";
+    import {toEntityRef} from "../../common/entity-utils";
+    import {displayError} from "../../common/error-utils";
+    import Icon from "../../common/svelte/Icon.svelte";
 
     export let primaryEntityRef = {};
 
-    $: application = primaryEntityRef;
-    let logicalFlows = [];
-    let specifications = [];
+    onMount(() => {
+        $expandedSections = [sections.ROUTE];
+    })
 
+    function createFlow() {
 
-    $: console.log({application, logicalFlows, specifications})
+        const specification = {
+            owningEntity: toEntityRef(primaryEntityRef),
+            name: $physicalSpecification.name,
+            description: $physicalSpecification.description,
+            format: $physicalSpecification.format,
+            lastUpdatedBy: "waltz"
+        }
 
+        const flowAttributes = {
+            transport: $physicalFlow.transport,
+            frequency: $physicalFlow.frequency,
+            basisOffset: $physicalFlow.basisOffset,
+            criticality: $physicalFlow.criticality
+        }
+
+        const command = {
+            specification,
+            flowAttributes,
+            logicalFlowId: $logicalFlow.id
+        }
+
+        physicalFlowStore.create(command)
+            .then(() => {
+                toasts.success("Successfully added physical flow");
+                history.back();
+            })
+            .catch(e => displayError("Could not create physical flow", e));
+    }
+
+    $: incompleteRecord = !($logicalFlow && $physicalFlow && $physicalSpecification);
 
 </script>
 
@@ -45,53 +72,38 @@
     </div>
 
     <div slot="summary">
+
         <LogicalFlowSelectionStep {primaryEntityRef}/>
+
+        <PhysicalSpecificationStep {primaryEntityRef}/>
 
         <PhysicalFlowCharacteristicsStep {primaryEntityRef}/>
 
-        <!-- SPEC -->
-        <h3>
-            <Check selected={$physicalSpecification}/>
-            Specification (Payload)
-        </h3>
+        <br>
 
-        <div class="step-body">
-            {#if $physicalSpecification}
-                {$physicalSpecification.name}
+        <span>
+            <button class="btn btn-success"
+                    disabled={incompleteRecord}
+                    on:click={() => createFlow()}>
+                Create
+            </button>
 
-                <button class="btn btn-link"
-                        on:click={() => $physicalSpecification = null}>
-                    <Icon name="times"/>
-                    Select different specification
-                </button>
-            {:else if !$logicalFlow}
-                Select a route first
-            {:else}
-                <div class="help-block">
-                    Either reuse an existing specification or create a new one using the <em>Add new specification</em> option.
-                </div>
-                <PhysicalSpecificationSelector {specifications}/>
+            {#if incompleteRecord}
+                <span class="incomplete-warning">
+                    <Icon name="exclamation-triangle"/>You must complete all sections
+                </span>
             {/if}
-        </div>
-
-        <hr>
-
-        <EntityLink ref={application}>
-            Cancel
-        </EntityLink>
+        </span>
     </div>
 </PageHeader>
 
 {/if}
 
 
-<style>
-    .flow-arrow {
-        padding-left: 1em;
-        padding-right: 1em;
-    }
+<style type="text/scss">
+    @import "../../../style/_variables.scss";
 
-    .step-body {
-        margin-left: 1em;
+    .incomplete-warning {
+        color: $waltz-amber;
     }
 </style>

@@ -6,8 +6,10 @@
     import {sameRef} from "../../common/entity-utils";
     import SearchInput from "../../common/svelte/SearchInput.svelte";
     import {termSearch} from "../../common";
+    import _ from "lodash";
 
-    import {logicalFlow} from "./physical-flow-editor-store";
+    import {expandedSections, logicalFlow} from "./physical-flow-editor-store";
+    import {sections} from "./physical-flow-registration-utils";
 
     export let flows = [];
     export let node = null;
@@ -16,8 +18,16 @@
     let qry = "";
 
     $: filteredFlows = _.isEmpty(qry)
-            ? flows
-            : termSearch(flows, qry, ["source.name", "source.externalId", "target.name", "target.externalId"]);
+        ? flows
+        : termSearch(flows, qry, ["source.name", "source.externalId", "target.name", "target.externalId"]);
+
+    function selectFlow(flow) {
+        $logicalFlow = flow;
+        const specSectionOpen = _.includes($expandedSections, sections.SPECIFICATION);
+        if (!specSectionOpen) {
+            $expandedSections = _.concat($expandedSections, sections.SPECIFICATION)
+        }
+    }
 
 </script>
 
@@ -43,7 +53,7 @@
             <tbody>
             {#each filteredFlows as flow}
                 <tr class="clickable"
-                    on:click={() => $logicalFlow = flow}>
+                    on:click={() => selectFlow(flow)}>
                     <td class:counterpart={node && !sameRef(node, flow.source)}
                         class:mainNode={node && sameRef(node, flow.source)}>
                         <EntityLabel ref={flow.source}/>

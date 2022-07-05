@@ -21,6 +21,7 @@ import {writable} from "svelte/store";
 export const logicalFlow = writable(null);
 export const physicalFlow = writable(null);
 export const physicalSpecification = writable(null);
+export const expandedSections = writable([]);
 
 
 export function reset() {
@@ -28,5 +29,3 @@ export function reset() {
     physicalSpecification.set(null);
     physicalFlow.set(null);
 }
-
-
