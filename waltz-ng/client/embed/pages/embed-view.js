@@ -21,8 +21,10 @@ import {initialiseData} from "../../common";
 import {dynamicSections} from "../../dynamic-section/dynamic-section-definitions";
 import template from "./embed-view.html";
 import Toasts from "../../notification/components/toaster/Toasts.svelte";
+import Popover from "../../common/svelte/popover/Popover.svelte";
 
 const initialState = {
+    Popover,
     Toasts
 };
 

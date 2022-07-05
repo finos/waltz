@@ -9,6 +9,8 @@
     export let selector = null; // optional css selector
 
     let busy = false;
+    let headerElem = null;
+    let footerElem = null;
 
     function calcClasses(styling = "button") {
         switch (styling) {
@@ -21,10 +23,18 @@
 
     function downloadImage() {
         const elem = element || document.querySelector(selector);
+
         if (elem) {
             busy = true;
             //Using a timeout so browser has chance to display the progress icon
             setTimeout(() => {
+                    if ($$slots.header) {
+                        elem.prepend(headerElem);
+                    }
+                    if ($$slots.footer) {
+                        elem.append(footerElem);
+                    }
+
                     return html2canvas(elem, {allowTaint: true})
                         .then(canvas => {
                             document.body.appendChild(canvas);
@@ -40,13 +50,23 @@
                             a.click();
                             canvas.remove();
                         })
-                        .finally(() => busy = false);
+                        .finally(() => {
+                            if (elem.contains(headerElem)) {
+                                elem.removeChild(headerElem);
+                            }
+                            if (elem.contains(footerElem)) {
+                                elem.removeChild(footerElem);
+                            }
+                            busy = false;
+                        });
+
                 },
                 0);
         }
     }
 
     $: classes = calcClasses(styling);
+
 </script>
 
 
@@ -62,6 +82,18 @@
           spin={busy}/>
     {name}
 </button>
+
+<div style="display: none">
+    <div bind:this={headerElem}>
+        <slot name="header"/>
+    </div>
+
+    <div bind:this={footerElem}>
+        <slot name="footer"/>
+    </div>
+</div>
+
+
 
 <style>
 

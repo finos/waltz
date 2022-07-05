@@ -7,9 +7,8 @@ import java.util.Set;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableAssessmentRatingsWidgetDatum.class)
-public abstract class AssessmentRatingsWidgetDatum {
+public abstract class AssessmentRatingsWidgetDatum implements CellExternalIdProvider {
 
-    public abstract String cellExternalId();
     public abstract Set<AssessmentRatingCount> counts();
 
 }

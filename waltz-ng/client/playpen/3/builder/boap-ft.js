@@ -195,9 +195,8 @@ const coreProcessingOperations = {
     cellColor: "#C5E0B4",
     headerColor: "#9db791",
     rows: [
-        ns("CORE_PROCESSING", [cells.MARKET_OPERATIONS, cells.CLEARING_AND_SETTLEMENT, cells.PAYMENTS]),
+        ns("CORE_PROCESSING", [cells.MARKET_OPERATIONS, cells.CLEARING_AND_SETTLEMENT, cells.PAYMENTS, cells.BANKING_MANAGEMENT]),
         ns("CORE_PROCESSING", [cells.COLLATERAL_AND_MARGIN, cells.POSITION_MANAGEMENT, cells.LENDING_H]),
-        ns("CORE_PROCESSING", [cells.BANKING_MANAGEMENT])
     ]
 };
 

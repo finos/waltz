@@ -17,22 +17,17 @@
   -->
 
 <div>
+    <waltz-section name="Taxonomy">
+        <waltz-svelte-component ng-if="$ctrl.categories && $ctrl.measurables"
+                                component="$ctrl.TaxonomyDiagramBuilder"
+                                measurables="$ctrl.measurables"
+                                categories="$ctrl.categories">
+        </waltz-svelte-component>
+    </waltz-section>
 
     <waltz-section name="Process">
         <waltz-svelte-component component="$ctrl.OverlayDiagramBuilder"
                                 config="$ctrl.configD">
-        </waltz-svelte-component>
-    </waltz-section>
-
-    <waltz-section name="F2B Trade">
-        <waltz-svelte-component component="$ctrl.OverlayDiagramBuilder"
-                                config="$ctrl.configA">
-        </waltz-svelte-component>
-    </waltz-section>
-
-    <waltz-section name="F2B Ops">
-        <waltz-svelte-component component="$ctrl.OverlayDiagramBuilder"
-                                config="$ctrl.configB">
         </waltz-svelte-component>
     </waltz-section>
 

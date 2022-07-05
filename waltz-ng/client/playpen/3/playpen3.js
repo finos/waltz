@@ -20,11 +20,11 @@ import {initialiseData} from "../../common/index";
 import template from "./playpen3.html";
 import FlowVenn from "../../logical-flow/svelte/flow-venn/FlowVenn.svelte";
 import OverlayDiagramBuilder from "./builder/OverlayDiagramBuilder.svelte";
-import configA from "./builder/front-to-back-trade-data";
-import configB from "./builder/front-to-back-operations-data";
+import TaxonomyDiagramBuilder from "./builder/TaxonomyDiagramBuilder.svelte";
 import configC from "./builder/boap-ft";
 import configD from "./builder/process-diag";
 import DiagramBuilderControls from "./builder/DiagramBuilderControls.svelte"
+import {CORE_API} from "../../common/services/core-api-utils";
 
 const initialState = {
     b: {
@@ -39,15 +39,22 @@ const initialState = {
     },
     FlowVenn,
     OverlayDiagramBuilder,
-    configA,
-    configB,
     configC,
     configD,
-    DiagramBuilderControls
+    DiagramBuilderControls,
+    TaxonomyDiagramBuilder
 };
 
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
+
+    serviceBroker
+        .loadAppData(CORE_API.MeasurableStore.findAll)
+        .then(r => vm.measurables = r.data);
+
+    serviceBroker
+        .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
+        .then(r => vm.categories = r.data);
 }
 
 controller.$inject = [
