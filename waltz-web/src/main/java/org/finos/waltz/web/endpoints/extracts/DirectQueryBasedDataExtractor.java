@@ -19,21 +19,12 @@
 package org.finos.waltz.web.endpoints.extracts;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.MimeTypes;
-import org.finos.waltz.web.json.GenericGridJSON;
-import org.finos.waltz.web.json.ImmutableCellValue;
-import org.finos.waltz.web.json.ImmutableRow;
 import org.jooq.DSLContext;
 import org.jooq.JSONFormat;
 import org.jooq.Result;
@@ -45,13 +36,8 @@ import spark.Response;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.FunctionUtilities.time;
@@ -93,25 +79,18 @@ public abstract class DirectQueryBasedDataExtractor implements DataExtractor {
     private String writeAsJson(ExtractSpecification extractSpecification,
                                Response response) {
         response.type(MimeTypes.Type.APPLICATION_JSON_UTF_8.name());
-        JooqQueryTransformer jooqQueryTransformer = new JooqQueryTransformer();
-
-        try {
-            return createMapper().writeValueAsString(
-                    jooqQueryTransformer.transformFromQuery(extractSpecification,dsl));
-        } catch (JsonProcessingException e){
-            throw new RuntimeException(String.format("Failed to transform query to json (%s)",e.getMessage()),e);
-        }
+        return query(dsl, extractSpecification.qry())
+                .formatJSON(new JSONFormat()
+                        .header(false)
+                        .recordFormat(JSONFormat.RecordFormat.OBJECT));
     }
 
-    private ObjectMapper createMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper
-                .registerModule(new JavaTimeModule())
-                .registerModule(new Jdk8Module())
-                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
+    private Result<?> query(DSLContext dslContext, Select<?> qry){
+        return dslContext == null
+                ? qry.fetch()
+                : time("fetch", () -> dslContext.fetch(dslContext.renderInlined(qry)));
     }
-
 
 
     @SafeVarargs

@@ -133,8 +133,8 @@ public class DynamicJSONFormatter implements DynamicFormatter {
     }
 
 
-    private EntityReferenceKeyCell createKeyElement(EntityReference keyAttrib ){
-        return EntityReferenceKeyCell
+    private KeyCell createKeyElement(EntityReference keyAttrib ){
+        return KeyCell
                 .fromRef(keyAttrib);
     }
 

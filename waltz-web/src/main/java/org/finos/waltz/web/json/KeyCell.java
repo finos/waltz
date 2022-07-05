@@ -18,8 +18,6 @@
 package org.finos.waltz.web.json;
 
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.EntityKind;
@@ -29,17 +27,36 @@ import org.immutables.value.Value;
 
 import java.util.Optional;
 
-
-@JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.EXISTING_PROPERTY,
-        property = "type",
-        visible = true)
-@JsonSubTypes({
-        @JsonSubTypes.Type(value = SimpleKeyCell.class, name = ApiTypes.SIMPLE_KEYCELL),
-        @JsonSubTypes.Type(value = EntityReferenceKeyCell.class, name = ApiTypes.ENTITY_REFERENCE_KEYCELL)
-})
+@Value.Immutable
+@JsonSerialize(as = ImmutableKeyCell.class)
+@JsonDeserialize(as = ImmutableKeyCell.class)
 public interface KeyCell{
 
-    String type();
+    @Value.Default
+    default String type() {
+        return ApiTypes.KEYCELL;
+    }
+
+    Optional<String> name();
+
+    EntityKind kind();
+
+    Optional<Long> waltzId();
+
+    Optional<String> externalId();
+
+    EntityLifecycleStatus lifecycleStatus();
+
+
+    static KeyCell fromRef(EntityReference ref) {
+        return ImmutableKeyCell
+                .builder()
+                .name(ref.name())
+                .kind(ref.kind())
+                .waltzId(ref.id())
+                .externalId(ref.externalId())
+                .lifecycleStatus(ref.entityLifecycleStatus())
+                .build();
+    }
+
 }

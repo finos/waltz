@@ -28,8 +28,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         property = "type",
         visible = true)
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = ReportGridJSON.class, name = ReportGridJSON.REPORT_GRID_TYPE),
-        @JsonSubTypes.Type(value = GenericGridJSON.class, name = GenericGridJSON.GENERIC_GRID_TYPE)
+        @JsonSubTypes.Type(value = ReportGridJSON.class, name = ReportGridJSON.REPORT_GRID_TYPE)
 })
 @JsonPropertyOrder({"apiTypes","type"})
 public interface JsonAPI {
