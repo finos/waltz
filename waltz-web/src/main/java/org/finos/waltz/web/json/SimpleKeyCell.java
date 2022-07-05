@@ -28,8 +28,8 @@ import org.immutables.value.Value;
 import java.util.Optional;
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableEntityReferenceKeyCell.class)
-@JsonDeserialize(as = ImmutableEntityReferenceKeyCell.class)
+@JsonSerialize(as = ImmutableSimpleKeyCell.class)
+@JsonDeserialize(as = ImmutableSimpleKeyCell.class)
 public interface SimpleKeyCell extends KeyCell {
 
     @Value.Default

@@ -32,7 +32,7 @@ import static spark.Spark.get;
 
 @Service
 public class OrgUnitExtractor extends DirectQueryBasedDataExtractor
-        implements PublicDataExtractor {
+        implements SupportsJsonExtraction {
 
 
     @Autowired

@@ -32,21 +32,22 @@ class JooqQueryTransformerTest {
     private JooqQueryTransformer jooqQueryTransformer = new JooqQueryTransformer();
     private DSLContext testDslContext;
     private ObjectMapper objectMapper;
+    private ExtractSpecification extractSpecification;
+
+
 
     @BeforeEach
     public void setUp(){
         testDslContext = createTestDslContext();
         objectMapper = createMapper();
+        extractSpecification = createJsonSpecification();
     }
 
 
     @Test
     void recordsFoundAreTransformRecordsToJsonModel() {
-
-        SelectJoinStep<Record6<Long, Long, String, String, String, String>>
-                query = createDummyQuery();
         GenericGridJSON genericGridJSON =
-                jooqQueryTransformer.transformFromQuery(testDslContext,query,"id","name");
+                jooqQueryTransformer.transformFromQuery(extractSpecification,testDslContext);
         assertEquals("name", genericGridJSON.name());
         assertEquals("id", genericGridJSON.id());
         List<Row> rows  = genericGridJSON.grid().rows();
@@ -62,8 +63,9 @@ class JooqQueryTransformerTest {
         SelectJoinStep<Record6<Long, Long, String, String, String, String>>
                 query = createDummyQuery();
         GenericGridJSON genericGridJSON =
-                jooqQueryTransformer.transformFromQuery(testDslContext, query, "id", "name");
-        objectMapper.writeValueAsString(genericGridJSON);
+                jooqQueryTransformer.transformFromQuery(extractSpecification,testDslContext);
+        String json = objectMapper.writeValueAsString(genericGridJSON);
+        assertNotNull(json);
 
     }
 
@@ -102,6 +104,18 @@ class JooqQueryTransformerTest {
                 .registerModule(new JavaTimeModule())
                 .registerModule(new Jdk8Module())
                 .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+    }
+
+    private ExtractSpecification createJsonSpecification(){
+        SelectJoinStep<Record6<Long, Long, String, String, String, String>>
+                query = createDummyQuery();
+        return ImmutableExtractSpecification.builder()
+                .qry(query)
+                .id("id")
+                .outputName("name")
+                .extractFormat(ExtractFormat.JSON)
+                .build();
 
     }
 }

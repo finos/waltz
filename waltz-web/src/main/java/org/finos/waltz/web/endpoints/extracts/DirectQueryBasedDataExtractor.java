@@ -35,6 +35,7 @@ import org.finos.waltz.web.json.GenericGridJSON;
 import org.finos.waltz.web.json.ImmutableCellValue;
 import org.finos.waltz.web.json.ImmutableRow;
 import org.jooq.DSLContext;
+import org.jooq.JSONFormat;
 import org.jooq.Result;
 import org.jooq.Select;
 import org.jooq.lambda.Unchecked;
@@ -72,28 +73,31 @@ public abstract class DirectQueryBasedDataExtractor implements DataExtractor {
                                   Request request,
                                   Response response) throws IOException {
         ExtractFormat format = parseExtractFormat(request);
+        ExtractSpecification extractSpecification = ImmutableExtractSpecification.builder()
+                .qry(qry)
+                .outputName(suggestedFilenameStem)
+                .extractFormat(format)
+                .build();
         switch (format) {
             case XLSX:
                 return writeAsExcel(suggestedFilenameStem, qry, response);
             case CSV:
                 return writeAsCSV(suggestedFilenameStem, qry, response);
             case JSON:
-                return writeAsJson(suggestedFilenameStem,suggestedFilenameStem,qry, response);
+                    return writeAsJson(extractSpecification,response);
             default:
                 throw new IllegalArgumentException("Cannot write extract using unknown format: " + format);
         }
     }
 
-    private String writeAsJson(String name,
-                                        String id,
-                                        Select<?> qry,
-                                        Response response) {
+    private String writeAsJson(ExtractSpecification extractSpecification,
+                               Response response) {
         response.type(MimeTypes.Type.APPLICATION_JSON_UTF_8.name());
         JooqQueryTransformer jooqQueryTransformer = new JooqQueryTransformer();
 
         try {
             return createMapper().writeValueAsString(
-                    jooqQueryTransformer.transformFromQuery(dsl, qry,id,name));
+                    jooqQueryTransformer.transformFromQuery(extractSpecification,dsl));
         } catch (JsonProcessingException e){
             throw new RuntimeException(String.format("Failed to transform query to json (%s)",e.getMessage()),e);
         }
@@ -182,7 +186,7 @@ public abstract class DirectQueryBasedDataExtractor implements DataExtractor {
     private Object writeAsCSV(String suggestedFilenameStem,
                               Select<?> qry,
                               Response response) {
-        String csv = qry.fetch().formatCSV();
+        String csv = qry.fetch().formatJSON(JSONFormat.DEFAULT_FOR_RECORDS);
         response.type(MimeTypes.Type.TEXT_PLAIN.name());
         response.header("Content-disposition", "attachment; filename=" + suggestedFilenameStem + ".csv");
         return csv;

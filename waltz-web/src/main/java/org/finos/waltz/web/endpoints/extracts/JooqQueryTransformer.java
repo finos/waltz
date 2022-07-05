@@ -20,25 +20,26 @@ import static org.finos.waltz.common.FunctionUtilities.time;
 public class JooqQueryTransformer {
 
 
-    public GenericGridJSON transformFromQuery(DSLContext dslContext,Select<?> qry, String id, String name) {
+    public GenericGridJSON transformFromQuery(ExtractSpecification extractSpecification,
+                                              DSLContext dslContext) {
         return
                 ImmutableGenericGridJSON.builder()
-                        .id(id)
+                        .id(extractSpecification.id())
                         .apiTypes(new ApiTypes())
-                        .name(name)
-                        .grid(gridFor(dslContext,qry))
+                        .name(extractSpecification.outputName())
+                        .grid(gridFor(dslContext, extractSpecification))
                         .build();
     }
 
 
-    private Grid gridFor(DSLContext dslContext, Select<?> qry) {
-        return Optional.ofNullable(qry)
+    private Grid gridFor(DSLContext dslContext, ExtractSpecification extractSpecification) {
+        return Optional.ofNullable(extractSpecification.qry())
                 .map(q -> {
                     ImmutableGrid.Builder gridBuilder = ImmutableGrid.builder();
                     List<String> columns = columnNames(dslContext, q);
                     gridBuilder.columnDescriptors(createColumnDescriptors(columns));
                     return gridBuilder
-                            .addAllRows(transformRecordsToJSON(columns, query(dslContext, q)))
+                            .addAllRows(transformRecordsToJSON(extractSpecification, columns, query(dslContext, q)))
                             .build();
                 })
                 .orElseThrow(() -> new IllegalArgumentException("Query not supplied"));
@@ -56,7 +57,7 @@ public class JooqQueryTransformer {
 
     }
 
-    private List<ImmutableRow> transformRecordsToJSON(List<String> colNames, Result<?> records){
+    private List<ImmutableRow> transformRecordsToJSON(ExtractSpecification extractSpecification,List<String> colNames, Result<?> records){
         List<ImmutableRow> jsonRows = new ArrayList<>(records.size());
 
         int colCount = colNames.size();
@@ -69,7 +70,7 @@ public class JooqQueryTransformer {
                 Object val = r.get(col);
                 if(val!=null) {
                     ImmutableCellValue.Builder cellBuilder = ImmutableCellValue.builder();
-                    cellBuilder.name(colNames.get(col));
+                    cellBuilder.name(ExtractFormat.JSON.equals(extractSpecification.extractFormat()) ? colNames.get(col) : ""+col);
                     cellBuilder.value(val.toString());
                     cellValues.add(cellBuilder.build());
                 }
