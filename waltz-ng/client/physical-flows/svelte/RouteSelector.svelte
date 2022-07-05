@@ -10,6 +10,7 @@
 
     import {expandedSections, logicalFlow} from "./physical-flow-editor-store";
     import {sections} from "./physical-flow-registration-utils";
+    import {createEventDispatcher} from "svelte";
 
     export let flows = [];
     export let node = null;
@@ -17,16 +18,14 @@
     let filteredFlows = [];
     let qry = "";
 
+    let dispatch = createEventDispatcher();
+
     $: filteredFlows = _.isEmpty(qry)
         ? flows
         : termSearch(flows, qry, ["source.name", "source.externalId", "target.name", "target.externalId"]);
 
     function selectFlow(flow) {
-        $logicalFlow = flow;
-        const specSectionOpen = _.includes($expandedSections, sections.SPECIFICATION);
-        if (!specSectionOpen) {
-            $expandedSections = _.concat($expandedSections, sections.SPECIFICATION)
-        }
+        dispatch("select", flow)
     }
 
 </script>

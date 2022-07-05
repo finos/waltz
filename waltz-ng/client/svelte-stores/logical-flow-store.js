@@ -32,7 +32,7 @@ export function mkLogicalFlowStore() {
 
     const findBySelector = (selector, force = false) => {
         return remote.fetchViewList(
-            "POST", 
+            "POST",
             "api/logical-flow/selector",
             selector,
             {force});
@@ -51,11 +51,21 @@ export function mkLogicalFlowStore() {
     }
 
 
+    const addFlow = (command) => {
+        return remote
+            .execute(
+                "POST",
+                "api/logical-flow",
+                command);
+    }
+
+
     return {
         findByEntityReference,
         findBySelector,
         getFlowGraphSummary,
-        getById
+        getById,
+        addFlow
     };
 }
 

@@ -109,7 +109,6 @@
                     </div>
                 </EnumSelect>
 
-
                 <EnumSelect options={frequencyKinds}
                             bind:value={workingCopy.frequencyKind}
                             mandatory="true"
