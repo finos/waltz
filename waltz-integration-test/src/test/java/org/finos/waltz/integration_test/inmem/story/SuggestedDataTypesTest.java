@@ -1,32 +1,26 @@
 package org.finos.waltz.integration_test.inmem.story;
 
-import org.finos.waltz.data.data_type.DataTypeDao;
 import org.finos.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import org.finos.waltz.integration_test.inmem.helpers.AppHelper;
 import org.finos.waltz.integration_test.inmem.helpers.DataTypeHelper;
 import org.finos.waltz.integration_test.inmem.helpers.LogicalFlowHelper;
-import org.finos.waltz.integration_test.inmem.helpers.UserHelper;
 import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.datatype.DataType;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
+import org.finos.waltz.service.data_type.DataTypeService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
 
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static org.finos.waltz.model.utils.IdUtilities.toIds;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SuggestedDataTypesTest extends BaseInMemoryIntegrationTest {
 
     @Autowired
     private AppHelper appHelper;
-
-    @Autowired
-    private UserHelper userHelper;
 
     @Autowired
     private LogicalFlowHelper logicalFlowHelper;
@@ -38,51 +32,59 @@ public class SuggestedDataTypesTest extends BaseInMemoryIntegrationTest {
     private LogicalFlowDecoratorDao decoratorDao;
 
     @Autowired
-    private DataTypeDao dataTypeDao;
+    private DataTypeService dataTypeService;
 
     @Test
     public void dataTypeSuggestionsShowAllActiveDataTypesAssociatedToTheGivenEntity() {
         Long dt1 = dataTypeHelper.createDataType(mkName("dt1"));
         Long dt2 = dataTypeHelper.createDataType(mkName("dt2"));
         Long dt3 = dataTypeHelper.createDataType(mkName("dt3"));
+        Long dt4 = dataTypeHelper.createDataType(mkName("dt3"));
 
         EntityReference a = appHelper.createNewApp(mkName("a"), ouIds.a);
         EntityReference b = appHelper.createNewApp(mkName("b"), ouIds.b);
         EntityReference c = appHelper.createNewApp(mkName("c"), ouIds.a);
         EntityReference d = appHelper.createNewApp(mkName("d"), ouIds.a);
+        EntityReference e = appHelper.createNewApp(mkName("e"), ouIds.a);  // not part of any flow
+        EntityReference f = appHelper.createNewApp(mkName("f"), ouIds.a);
 
-        LogicalFlow ab = logicalFlowHelper.createLogicalFlow(a, b);
-        LogicalFlow bc = logicalFlowHelper.createLogicalFlow(b, c);
-        LogicalFlow bd = logicalFlowHelper.createLogicalFlow(b, d);
+        LogicalFlow aToB = logicalFlowHelper.createLogicalFlow(a, b);
+        LogicalFlow bToC = logicalFlowHelper.createLogicalFlow(b, c);
+        LogicalFlow bToD = logicalFlowHelper.createLogicalFlow(b, d);
+        LogicalFlow cToF = logicalFlowHelper.createLogicalFlow(c, f);
 
-        logicalFlowHelper.createLogicalFlowDecorators(ab.entityReference(), asSet(dt1, dt2));
-        logicalFlowHelper.createLogicalFlowDecorators(bc.entityReference(), asSet(dt2));
-        logicalFlowHelper.createLogicalFlowDecorators(bd.entityReference(), asSet(dt3));
+        logicalFlowHelper.createLogicalFlowDecorators(aToB.entityReference(), asSet(dt1, dt2));
+        logicalFlowHelper.createLogicalFlowDecorators(bToC.entityReference(), asSet(dt2));
+        logicalFlowHelper.createLogicalFlowDecorators(bToD.entityReference(), asSet(dt3));
+        logicalFlowHelper.createLogicalFlowDecorators(cToF.entityReference(), asSet(dt4));
 
         // This sets up a flow structure which can be visually depicted like:
-        //
+        //             *
         // a --[1,2]-> b
         //             b --[2]-> c
+        //                       c --[4]-> d
         //             b --[3]-> d
-
-        List<DataType> suggestedDataTypes = dataTypeDao.findSuggestedByEntityRef(b);
 
         assertEquals(
                 asSet(dt1, dt2, dt3),
-                toIds(suggestedDataTypes),
+                toIds(dataTypeService.findSuggestedByEntityRef(b)),
                 "App B should have dt1, dt2 and dt3");
 
-        // drop bd, leading to a diagram like:
-        //
+        assertTrue(
+                dataTypeService.findSuggestedByEntityRef(e).isEmpty(),
+                "App E should have no data type suggestions as it has no flows");
+
+        // drop bToD, leading to a diagram like:
+        //             *
         // a --[1,2]-> b
         //             b --[2]-> c
-
-        logicalFlowHelper.removeFlow(bd.id().get());
+        //                       c --[4]-> d
+        int rmRc = logicalFlowHelper.removeFlow(bToD.id().get());
+        assertEquals(1, rmRc, "flow bToD should have been removed");
 
         assertEquals(
                 asSet(dt1, dt2),
-                toIds(suggestedDataTypes),
-                "App B should now have dt1, dt2. The type: dt3 should no longer be present as it was associated to a removed flow");
-
+                toIds(dataTypeService.findSuggestedByEntityRef(b)),
+                "App B should now have dt1, dt2. The type: dt3 should no longer be present as it was associated to a removed flow (bToD)");
     }
 }
