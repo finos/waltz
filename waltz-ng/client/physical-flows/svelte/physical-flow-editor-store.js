@@ -22,6 +22,7 @@ export const logicalFlow = writable(null);
 export const physicalFlow = writable(null);
 export const physicalSpecification = writable(null);
 export const expandedSections = writable([]);
+export const nestedEnums = writable({});
 
 
 export function reset() {

@@ -89,7 +89,8 @@ public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
         return DSL
                 .select(PHYSICAL_FLOW.ID)
                 .from(PHYSICAL_FLOW)
-                .where(PHYSICAL_FLOW.LOGICAL_FLOW_ID.in(logicalFlowSelector));
+                .where(PHYSICAL_FLOW.LOGICAL_FLOW_ID.in(logicalFlowSelector)
+                        .and(getLifecycleCondition(options)));
 
     }
 

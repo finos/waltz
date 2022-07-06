@@ -3,11 +3,15 @@
     import StepHeader from "./StepHeader.svelte";
     import {enumValueStore} from "../../svelte-stores/enum-value-store";
     import EnumSelect from "./EnumSelect.svelte";
-    import {basisOffsetDefaultOptions, determineExpandedSections, sections} from "./physical-flow-registration-utils";
+    import {
+        basisOffsetDefaultOptions,
+        determineExpandedSections,
+        sections, toCriticalityName, toFrequencyKindName,
+        toOptions, toTransportKindName
+    } from "./physical-flow-registration-utils";
     import BasisOffsetSelect from "./BasisOffsetSelect.svelte";
-    import {expandedSections, physicalFlow} from "./physical-flow-editor-store";
+    import {expandedSections, nestedEnums, physicalFlow} from "./physical-flow-editor-store";
     import Icon from "../../common/svelte/Icon.svelte";
-    import {nestEnums} from "../../common/svelte/enum-utils";
 
     export let primaryEntityRef;
 
@@ -15,17 +19,12 @@
         basisOffset: "0",
         description: ""
     };
+
     let transportKinds = [];
+    let frequencyKinds = [];
+    let physicalFlowCriticalityKinds = [];
 
     let enumsCall = enumValueStore.load();
-
-    function toOptions(enumsByType, kind) {
-        return _
-            .chain(enumsByType)
-            .get([kind], [])
-            .orderBy([d => d.position, d => d.name])
-            .value();
-    }
 
     $: basisOffsetByCode = _.keyBy(basisOffsetDefaultOptions, k => k.code)
     $: enumsByType = _.groupBy($enumsCall.data, d => d.type);
@@ -34,7 +33,6 @@
     $: frequencyKinds = toOptions(enumsByType, "Frequency");
     $: physicalFlowCriticalityKinds = toOptions(enumsByType, "physicalFlowCriticality");
 
-    $: nestedEnums = nestEnums($enumsCall.data);
 
     $: done = workingCopy.transport
         && workingCopy.physicalFlowCriticality
@@ -79,11 +77,11 @@
                 <div>Selected Characteristics:</div>
                 <ul>
                     <li>
-                        Transport: {_.get(nestedEnums, ["TransportKind", `${$physicalFlow.transport}`, "name"], $physicalFlow.transport)}</li>
+                        Transport: {toTransportKindName($nestedEnums, $physicalFlow.transport)}</li>
                     <li>
-                        Frequency: {_.get(nestedEnums, ["Frequency", `${$physicalFlow.frequency}`, "name"], $physicalFlow.frequency)}</li>
+                        Frequency: {toFrequencyKindName($nestedEnums, $physicalFlow.frequency)}</li>
                     <li>
-                        Criticality: {_.get(nestedEnums, ["physicalFlowCriticality", `${$physicalFlow.criticality}`, "name"], $physicalFlow.criticality)}</li>
+                        Criticality: {toCriticalityName($nestedEnums, $physicalFlow.criticality)}</li>
                     <li>Basis
                         Offset: {_.get(basisOffsetByCode, [$physicalFlow.basisOffset, "name"], $physicalFlow.basisOffset)}</li>
                 </ul>

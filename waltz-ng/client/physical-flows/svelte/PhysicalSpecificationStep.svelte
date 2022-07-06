@@ -9,6 +9,7 @@
     import {expandedSections, physicalSpecification} from "./physical-flow-editor-store";
     import {determineExpandedSections, sections} from "./physical-flow-registration-utils";
     import Icon from "../../common/svelte/Icon.svelte";
+    import {toOptions} from "../../common/services/enums";
 
     export let primaryEntityRef;
 
@@ -35,17 +36,7 @@
 
     let activeMode = Modes.CREATE;
 
-    let transportKinds = [];
-
     let enumsCall = enumValueStore.load();
-
-    function toOptions(enumsByType, kind) {
-        return _
-            .chain(enumsByType)
-            .get([kind], [])
-            .orderBy([d => d.position, d => d.name])
-            .value();
-    }
 
     $: enumsByType = _.groupBy($enumsCall.data, d => d.type);
     $: dataFormatKinds = toOptions(enumsByType, "DataFormatKind");
@@ -56,14 +47,6 @@
     function save() {
         $physicalSpecification = workingCopy;
         openNextSection();
-    }
-
-    function chooseExistingSpec() {
-        activeMode = Modes.EXISTING;
-    }
-
-    function createNewSpec() {
-        activeMode = Modes.CREATE;
     }
 
     function selectSpecification(evt) {
@@ -115,7 +98,7 @@
                 <PhysicalSpecificationSelector {specifications}
                                                on:select={selectSpecification}/>
                 <button class="btn btn-skinny"
-                        on:click={() => createNewSpec()}>
+                        on:click={() => activeMode = Modes.CREATE}>
                     Create new specification
                 </button>
 
@@ -127,7 +110,7 @@
                     {#if !_.isEmpty(specifications)}
                         <span> or select from
                             <button class="btn btn-skinny"
-                                    on:click={() => chooseExistingSpec()}>
+                                    on:click={() => activeMode = Modes.EXISTING}>
                                 existing specifications
                             </button>
                         </span>

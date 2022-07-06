@@ -4,6 +4,8 @@
     import {termSearch} from "../../common";
     import _ from "lodash";
     import {createEventDispatcher} from "svelte";
+    import {nestedEnums} from "./physical-flow-editor-store";
+    import {toDataFormatKindName} from "./physical-flow-registration-utils";
 
     export let specifications = [];
 
@@ -24,11 +26,15 @@
 
 
 <div class="small">
-
     <SearchInput bind:value={qry}/>
     <br>
     <div class:waltz-scroll-region-350={_.size(filteredSpecs) > 10}>
         <table class="table table-condensed table-hover">
+            <colgroup>
+                <col width="40%"/>
+                <col width="40%"/>
+                <col width="20%"/>
+            </colgroup>
             <thead>
             <tr>
                 <th>Name</th>
@@ -40,9 +46,9 @@
             {#each filteredSpecs as spec}
                 <tr class="clickable"
                     on:click={() => selectSpec(spec)}>
-                    <td>{spec.name}</td>
-                    <td>{spec.externalId}</td>
-                    <td>{spec.format}</td>
+                    <td class="force-wrap">{spec.name}</td>
+                    <td class="force-wrap">{spec.externalId}</td>
+                    <td>{toDataFormatKindName($nestedEnums, spec.format)}</td>
                 </tr>
             {/each}
             </tbody>

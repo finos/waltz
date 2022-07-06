@@ -74,6 +74,12 @@ public class PhysicalSpecificationIdSelectorFactory implements IdSelectorFactory
     private Select<Record1<Long>> mkForApplication(IdSelectionOptions options) {
         SelectorUtilities.ensureScopeIsExact(options);
 
+        Condition lifecycleCondition = options.entityLifecycleStatuses().contains(EntityLifecycleStatus.REMOVED)
+                ? DSL.trueCondition()
+                : PHYSICAL_FLOW.IS_REMOVED.isFalse()
+                .and(LOGICAL_FLOW.IS_REMOVED.isFalse()
+                        .and(PHYSICAL_SPECIFICATION.IS_REMOVED.isFalse()));
+
         Condition isSourceOrTarget = (LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(options.entityReference().id())
                 .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(options.entityReference().kind().name())))
                 .or((LOGICAL_FLOW.TARGET_ENTITY_ID.eq(options.entityReference().id())
@@ -82,9 +88,11 @@ public class PhysicalSpecificationIdSelectorFactory implements IdSelectorFactory
         SelectConditionStep<Record1<Long>> specsUsedByApp = DSL
                 .select(PHYSICAL_SPECIFICATION.ID)
                 .from(PHYSICAL_SPECIFICATION)
-                .innerJoin(PHYSICAL_FLOW).on(PHYSICAL_SPECIFICATION.ID.eq(PHYSICAL_FLOW.ID))
+                .innerJoin(PHYSICAL_FLOW).on(PHYSICAL_SPECIFICATION.ID.eq(PHYSICAL_FLOW.SPECIFICATION_ID))
                 .innerJoin(LOGICAL_FLOW).on(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID))
-                .where(isSourceOrTarget);
+                .where(isSourceOrTarget)
+                .and(lifecycleCondition);
+        ;
 
         SelectConditionStep<Record1<Long>> specsOwnedByApp = DSL
                 .select(PHYSICAL_SPECIFICATION.ID)

@@ -4,7 +4,13 @@
     import EntityLink from "../../common/svelte/EntityLink.svelte";
     import toasts from "../../svelte-stores/toast-store";
 
-    import {expandedSections, logicalFlow, physicalFlow, physicalSpecification} from "./physical-flow-editor-store";
+    import {
+        expandedSections,
+        logicalFlow,
+        physicalFlow,
+        physicalSpecification,
+        nestedEnums
+    } from "./physical-flow-editor-store";
 
     import _ from "lodash";
     import {onMount} from "svelte";
@@ -16,8 +22,21 @@
     import {toEntityRef} from "../../common/entity-utils";
     import {displayError} from "../../common/error-utils";
     import Icon from "../../common/svelte/Icon.svelte";
+    import ClonePhysicalFlowPanel from "./ClonePhysicalFlowPanel.svelte";
+    import {enumValueStore} from "../../svelte-stores/enum-value-store";
+    import {nestEnums} from "../../common/svelte/enum-utils";
 
     export let primaryEntityRef = {};
+
+    const Modes = {
+        CREATE: "CREATE",
+        CLONE: "CLONE"
+    }
+
+    let activeMode = Modes.CREATE;
+    let enumsCall = enumValueStore.load();
+
+    $: $nestedEnums = nestEnums($enumsCall.data);
 
     onMount(() => {
         $expandedSections = [sections.ROUTE];
@@ -54,6 +73,14 @@
             .catch(e => displayError("Could not create physical flow", e));
     }
 
+    function selectFlowToClone(flow) {
+        $logicalFlow = flow.logicalFlow;
+        $physicalSpecification = flow.specification
+        $physicalFlow = flow;
+        activeMode = Modes.CREATE;
+        $expandedSections = [sections.ROUTE, sections.SPECIFICATION, sections.FLOW];
+    }
+
     $: incompleteRecord = !($logicalFlow && $physicalFlow && $physicalSpecification);
 
 </script>
@@ -73,27 +100,50 @@
 
     <div slot="summary">
 
-        <LogicalFlowSelectionStep {primaryEntityRef}/>
+        {#if activeMode === Modes.CLONE}
 
-        <PhysicalSpecificationStep {primaryEntityRef}/>
-
-        <PhysicalFlowCharacteristicsStep {primaryEntityRef}/>
-
-        <br>
-
-        <span>
-            <button class="btn btn-success"
-                    disabled={incompleteRecord}
-                    on:click={() => createFlow()}>
-                Create
+            <ClonePhysicalFlowPanel {primaryEntityRef}
+                                    on:select={(evt) => selectFlowToClone(evt.detail)}/>
+            <br>
+            <button class="btn btn-skinny"
+                    on:click={() => activeMode = Modes.CREATE}>
+                Cancel
             </button>
 
-            {#if incompleteRecord}
-                <span class="incomplete-warning">
-                    <Icon name="exclamation-triangle"/>You must complete all sections
-                </span>
-            {/if}
-        </span>
+        {:else if activeMode = Modes.CREATE}
+
+            <div class="help-block">
+                <Icon name="info-circle"/>
+                Complete the form below to register a new physical flow, or
+                <button class="btn btn-skinny"
+                        on:click={() => activeMode = Modes.CLONE}>
+                    clone an existing flow
+                </button>
+                and modify it's details.
+            </div>
+
+            <LogicalFlowSelectionStep {primaryEntityRef}/>
+
+            <PhysicalSpecificationStep {primaryEntityRef}/>
+
+            <PhysicalFlowCharacteristicsStep {primaryEntityRef}/>
+
+            <br>
+
+            <span>
+                <button class="btn btn-success"
+                        disabled={incompleteRecord}
+                        on:click={() => createFlow()}>
+                    Create
+                </button>
+
+                {#if incompleteRecord}
+                    <span class="incomplete-warning">
+                        <Icon name="exclamation-triangle"/>You must complete all sections
+                    </span>
+                {/if}
+            </span>
+        {/if}
     </div>
 </PageHeader>
 

@@ -6,10 +6,9 @@
     import LogicalFlowLabel from "./LogicalFlowLabel.svelte";
     import Icon from "../../common/svelte/Icon.svelte";
     import StepHeader from "./StepHeader.svelte";
-    import {determineExpandedSections, sections} from "./physical-flow-registration-utils";
-    import EntitySearchSelector from "../../common/svelte/EntitySearchSelector.svelte";
+    import {determineExpandedSections, Direction, sections} from "./physical-flow-registration-utils";
     import {toEntityRef} from "../../common/entity-utils";
-    import toasts from "../../svelte-stores/toast-store";
+    import FlowCreator from "./FlowCreator.svelte";
 
 
     export let primaryEntityRef;
@@ -24,6 +23,7 @@
 
     let source;
     let target;
+    let direction;
 
     let activeMode = Modes.LIST;
 
@@ -45,24 +45,16 @@
         $expandedSections = determineExpandedSections($expandedSections, sections.ROUTE);
     }
 
-    function createNewLogical() {
-        const command = {
-            source,
-            target
-        }
-        logicalFlowStore.addFlow(command)
-            .then(r => {
-                toasts.success(`Successfully created new logical flow from ${source.name} to ${target.name}`);
-                selectFlow(r.data);
-            });
+    function createDownstream() {
+        source = toEntityRef(primaryEntityRef);
+        direction = Direction.DOWNSTREAM;
+        activeMode = Modes.CREATE;
     }
 
-    function onSelectSource(sourceEntity) {
-        source = sourceEntity;
-    }
-
-    function onSelectTarget(targetEntity) {
-        target = targetEntity;
+    function createUpstream() {
+        target = toEntityRef(primaryEntityRef);
+        direction = Direction.UPSTREAM;
+        activeMode = Modes.CREATE;
     }
 
     function cancel() {
@@ -99,9 +91,15 @@
                     <br>
                     If the route is not listed you can
                     <button class="btn btn-skinny"
-                            on:click={() => activeMode = Modes.CREATE}>
-                        create a new logical flow
+                            on:click={() => createUpstream()}>
+                        create a new upstream
                     </button>
+                    flow or
+                    <button class="btn btn-skinny"
+                            on:click={() => createDownstream()}>
+                        create a new downstream
+                    </button>
+                    flow
                 </div>
 
                 <RouteSelector node={primaryEntityRef}
@@ -110,83 +108,12 @@
 
             {:else if activeMode === Modes.CREATE}
 
-                <div class="help-block">
-                    <Icon name="info-circle"/>
-                    Pick a source and target for the new flow
-                </div>
-
-                <form on:submit|preventDefault={createNewLogical}>
-                    <div class="form-group">
-                        <label for="source">
-                            Source
-                        </label>
-                        <div id="source">
-                            {#if source}
-                                <div>
-                                    {source.name}
-                                    <button class="btn btn-skinny"
-                                            on:click={() => source = null}>
-                                        <Icon name="times"/>
-                                        select a different source
-                                    </button>
-                                </div>
-                            {:else}
-                                <button class="btn btn-info btn-sm"
-                                        on:click={() => onSelectSource(toEntityRef(primaryEntityRef))}>
-                                    {primaryEntityRef.name}
-                                </button>
-                                <EntitySearchSelector on:select={(evt) => onSelectSource(evt.detail)}
-                                                      placeholder="... or search for source"
-                                                      entityKinds={['APPLICATION', 'ACTOR']}>
-                                </EntitySearchSelector>
-                            {/if}
-                        </div>
-                    </div>
-                    <div class="help-block">
-                        Source of this data flow
-                    </div>
-
-                    <div class="form-group">
-                        <label for="target">
-                            Target
-                        </label>
-                        <div id="target">
-                            {#if target}
-                                <div>
-                                    {target.name}
-                                    <button class="btn btn-skinny"
-                                            on:click={() => target = null}>
-                                        <Icon name="times"/>
-                                        select a different target
-                                    </button>
-                                </div>
-                            {:else}
-                                <button class="btn btn-info btn-sm"
-                                        on:click={() => onSelectTarget(toEntityRef(primaryEntityRef))}>
-                                    {primaryEntityRef.name}
-                                </button>
-                                <EntitySearchSelector on:select={(evt) => onSelectTarget(evt.detail)}
-                                                      placeholder="... or search for target"
-                                                      entityKinds={['APPLICATION', 'ACTOR']}>
-                                </EntitySearchSelector>
-                            {/if}
-                        </div>
-                    </div>
-                    <div class="help-block">
-                        Target of this data flow
-                    </div>
-
-
-                    <button class="btn btn-success"
-                            disabled={!(source && target)}
-                            on:click={() => createNewLogical()}>
-                        Save
-                    </button>
-                    <button class="btn btn-skinny"
-                            on:click={() => cancel()}>
-                        Cancel
-                    </button>
-                </form>
+                <FlowCreator {primaryEntityRef}
+                             bind:source
+                             bind:target
+                             {direction}
+                             on:cancel={cancel}
+                             on:select={(evt) => selectFlow(evt.detail)}/>
             {/if}
 
         {:else}
