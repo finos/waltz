@@ -49,7 +49,8 @@
             name: $physicalSpecification.name,
             description: $physicalSpecification.description,
             format: $physicalSpecification.format,
-            lastUpdatedBy: "waltz"
+            lastUpdatedBy: "waltz",
+            id: $physicalSpecification.id ? $physicalSpecification.id : null
         }
 
         const flowAttributes = {
@@ -122,11 +123,17 @@
                 and modify it's details.
             </div>
 
-            <LogicalFlowSelectionStep {primaryEntityRef}/>
+            <div class="selection-step">
+                <LogicalFlowSelectionStep {primaryEntityRef}/>
+            </div>
 
-            <PhysicalSpecificationStep {primaryEntityRef}/>
+            <div class="selection-step">
+                <PhysicalSpecificationStep {primaryEntityRef}/>
+            </div>
 
-            <PhysicalFlowCharacteristicsStep {primaryEntityRef}/>
+            <div class="selection-step">
+                <PhysicalFlowCharacteristicsStep {primaryEntityRef}/>
+            </div>
 
             <br>
 
@@ -155,5 +162,12 @@
 
     .incomplete-warning {
         color: $waltz-amber;
+    }
+
+    .selection-step {
+        border: #EEEEEE 1px solid;
+        padding-bottom: 1em;
+        padding-left: 1em;
+        padding-right: 1em;
     }
 </style>

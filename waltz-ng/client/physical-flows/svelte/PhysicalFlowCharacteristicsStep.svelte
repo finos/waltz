@@ -12,8 +12,7 @@
     import BasisOffsetSelect from "./BasisOffsetSelect.svelte";
     import {expandedSections, nestedEnums, physicalFlow} from "./physical-flow-editor-store";
     import Icon from "../../common/svelte/Icon.svelte";
-
-    export let primaryEntityRef;
+    import {onMount} from "svelte";
 
     let workingCopy = {
         basisOffset: "0",
@@ -34,9 +33,22 @@
     $: physicalFlowCriticalityKinds = toOptions(enumsByType, "physicalFlowCriticality");
 
 
+    onMount(() => {
+        if ($physicalFlow) {
+            const offsetString = $physicalFlow.basisOffset.toString();
+            const offset = _.find(basisOffsetDefaultOptions, d => d.code === offsetString);
+
+            const offsetInfo = offset
+                ? {basisOffset: offset.code}
+                : {basisOffset: "OTHER", customBasisOffset: offsetString}
+
+            workingCopy = Object.assign({}, $physicalFlow, offsetInfo)
+        }
+    })
+
     $: done = workingCopy.transport
-        && workingCopy.physicalFlowCriticality
-        && workingCopy.frequencyKind
+        && workingCopy.criticality
+        && workingCopy.frequency
 
     function save() {
 
@@ -48,9 +60,9 @@
             {},
             {
                 transport: workingCopy.transport,
-                frequency: workingCopy.frequencyKind,
+                frequency: workingCopy.frequency,
                 basisOffset,
-                criticality: workingCopy.physicalFlowCriticality
+                criticality: workingCopy.criticality
             });
     }
 
@@ -108,7 +120,7 @@
                 </EnumSelect>
 
                 <EnumSelect options={frequencyKinds}
-                            bind:value={workingCopy.frequencyKind}
+                            bind:value={workingCopy.frequency}
                             mandatory="true"
                             name="Frequency">
                     <div slot="help">
@@ -117,7 +129,7 @@
                 </EnumSelect>
 
                 <EnumSelect options={physicalFlowCriticalityKinds}
-                            bind:value={workingCopy.physicalFlowCriticality}
+                            bind:value={workingCopy.criticality}
                             mandatory="true"
                             name="Criticality">
                     <div slot="help">
@@ -170,6 +182,6 @@
 
 <style>
     .step-body {
-        padding-left: 1em;
+        padding-left: 2em;
     }
 </style>

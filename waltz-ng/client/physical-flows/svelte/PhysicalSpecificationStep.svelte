@@ -7,9 +7,9 @@
     import {physicalSpecStore} from "../../svelte-stores/physical-spec-store";
     import {mkSelectionOptions} from "../../common/selector-utils";
     import {expandedSections, physicalSpecification} from "./physical-flow-editor-store";
-    import {determineExpandedSections, sections} from "./physical-flow-registration-utils";
+    import {determineExpandedSections, sections, toOptions} from "./physical-flow-registration-utils";
     import Icon from "../../common/svelte/Icon.svelte";
-    import {toOptions} from "../../common/services/enums";
+    import {onMount} from "svelte";
 
     export let primaryEntityRef;
 
@@ -33,6 +33,12 @@
         EXISTING: "EXISTING",
         CREATE: "CREATE"
     }
+
+    onMount(() => {
+        if ($physicalSpecification) {
+            workingCopy = Object.assign({}, $physicalSpecification);
+        }
+    })
 
     let activeMode = Modes.CREATE;
 
@@ -67,6 +73,11 @@
 
     $: expanded = _.includes($expandedSections, sections.SPECIFICATION);
 
+    function editSpec() {
+        $physicalSpecification = null;
+        workingCopy.id = null;
+    }
+
 </script>
 
 <StepHeader label="Specification"
@@ -86,7 +97,7 @@
 
             <button class="btn btn-skinny"
                     style="padding-top: 1em"
-                    on:click={() => $physicalSpecification = null}>
+                    on:click={() => editSpec()}>
                 <Icon name="times"/>
                 Pick a different specification
             </button>

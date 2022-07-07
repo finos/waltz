@@ -8,7 +8,6 @@
     import {Direction} from "./physical-flow-registration-utils";
     import EntityLabel from "../../common/svelte/EntityLabel.svelte";
 
-    export let primaryEntityRef;
     export let direction;
     export let source;
     export let target;

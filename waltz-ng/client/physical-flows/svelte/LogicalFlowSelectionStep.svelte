@@ -9,6 +9,7 @@
     import {determineExpandedSections, Direction, sections} from "./physical-flow-registration-utils";
     import {toEntityRef} from "../../common/entity-utils";
     import FlowCreator from "./FlowCreator.svelte";
+    import {onMount} from "svelte";
 
 
     export let primaryEntityRef;
@@ -40,6 +41,10 @@
             d => d.target.name.toLowerCase()
         ])
         .value();
+
+    onMount(() => {
+
+    })
 
     function toggleSection() {
         $expandedSections = determineExpandedSections($expandedSections, sections.ROUTE);
@@ -139,6 +144,6 @@
 
 <style>
     .step-body {
-        padding-left: 1em;
+        padding-left: 2em;
     }
 </style>

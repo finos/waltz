@@ -19,6 +19,7 @@
 import _ from "lodash";
 import {initialiseData} from "../common";
 import {kindToViewState} from "../common/link-utils";
+import {logicalFlow} from "./svelte/physical-flow-editor-store";
 
 
 import template from "./physical-flow-registration.html";
@@ -106,8 +107,11 @@ function controller(
 
     if (targetFlowId) {
         serviceBroker
-            .loadViewData(CORE_API.LogicalFlowStore.getById, [ targetFlowId ])
-            .then(r => vm.targetChanged(r.data));
+            .loadViewData(CORE_API.LogicalFlowStore.getById, [targetFlowId])
+            .then(r => {
+                logicalFlow.set(r.data);
+                vm.targetChanged(r.data);
+            });
     }
 
     const viewState = kindToViewState(sourceEntityRef.kind);
