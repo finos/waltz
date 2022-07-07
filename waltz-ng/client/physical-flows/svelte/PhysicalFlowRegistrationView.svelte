@@ -7,9 +7,9 @@
     import {
         expandedSections,
         logicalFlow,
+        nestedEnums,
         physicalFlow,
-        physicalSpecification,
-        nestedEnums
+        physicalSpecification
     } from "./physical-flow-editor-store";
 
     import _ from "lodash";
@@ -41,6 +41,9 @@
     onMount(() => {
         $expandedSections = [sections.ROUTE];
     })
+
+    $:         console.log({log: $logicalFlow, phys: $physicalFlow, sepc: $physicalSpecification});
+
 
     function createFlow() {
 

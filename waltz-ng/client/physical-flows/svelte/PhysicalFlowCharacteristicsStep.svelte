@@ -169,10 +169,10 @@
                     External identifier for this flow
                 </div>
 
-                <button class="btn btn-success"
+                <button class="btn btn-skinny"
                         disabled={!done}
                         on:click={() => save()}>
-                    Save
+                    Done
                 </button>
             </form>
         {/if}
@@ -182,6 +182,6 @@
 
 <style>
     .step-body {
-        padding-left: 2em;
+        padding-left: 1em;
     }
 </style>

@@ -108,6 +108,7 @@
 
                 <PhysicalSpecificationSelector {specifications}
                                                on:select={selectSpecification}/>
+                <br>
                 <button class="btn btn-skinny"
                         on:click={() => activeMode = Modes.CREATE}>
                     Create new specification
@@ -183,10 +184,10 @@
                         External identifier for this specification
                     </div>
 
-                    <button class="btn btn-success"
+                    <button class="btn btn-skinny"
                             disabled={!done}
                             on:click={() => save()}>
-                        Save
+                        Done
                     </button>
                 </form>
             {/if}

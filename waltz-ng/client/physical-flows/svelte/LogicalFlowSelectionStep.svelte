@@ -144,6 +144,6 @@
 
 <style>
     .step-body {
-        padding-left: 2em;
+        padding-left: 1em;
     }
 </style>
