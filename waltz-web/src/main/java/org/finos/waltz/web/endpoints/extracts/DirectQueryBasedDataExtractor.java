@@ -173,7 +173,7 @@ public abstract class DirectQueryBasedDataExtractor implements DataExtractor {
     private Object writeAsCSV(String suggestedFilenameStem,
                               Select<?> qry,
                               Response response) {
-        String csv = qry.fetch().formatJSON(JSONFormat.DEFAULT_FOR_RECORDS);
+        String csv = qry.fetch().formatCSV();
         response.type(MimeTypes.Type.TEXT_PLAIN.name());
         response.header("Content-disposition", "attachment; filename=" + suggestedFilenameStem + ".csv");
         return csv;
