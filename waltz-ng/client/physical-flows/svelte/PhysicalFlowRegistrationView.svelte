@@ -9,7 +9,8 @@
         logicalFlow,
         nestedEnums,
         physicalFlow,
-        physicalSpecification
+        physicalSpecification, ViewMode,
+        viewMode
     } from "./physical-flow-editor-store";
 
     import _ from "lodash";
@@ -25,6 +26,7 @@
     import ClonePhysicalFlowPanel from "./ClonePhysicalFlowPanel.svelte";
     import {enumValueStore} from "../../svelte-stores/enum-value-store";
     import {nestEnums} from "../../common/svelte/enum-utils";
+    import Toggle from "../../common/svelte/Toggle.svelte";
 
     export let primaryEntityRef = {};
 
@@ -87,6 +89,12 @@
         $expandedSections = [sections.ROUTE, sections.SPECIFICATION, sections.FLOW];
     }
 
+    function toggleViewMode() {
+        $viewMode = $viewMode === ViewMode.SECTION
+            ? ViewMode.FLOW
+            : ViewMode.SECTION;
+    }
+
     $: incompleteRecord = !($logicalFlow && $physicalFlow && $physicalSpecification);
 
 </script>
@@ -105,6 +113,12 @@
     </div>
 
     <div slot="summary">
+        <div class="pull-right">
+            <Toggle labelOn="Show flow view"
+                    labelOff="Show section flows"
+                    state={$viewMode === ViewMode.SECTION}
+                    onToggle={() => toggleViewMode()}/>
+        </div>
 
         {#if activeMode === Modes.CLONE}
 

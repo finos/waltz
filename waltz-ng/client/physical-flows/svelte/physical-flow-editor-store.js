@@ -18,15 +18,15 @@
 
 import {writable} from "svelte/store";
 
+export const ViewMode = {
+    SECTION: "SECTION",
+    FLOW: "FLOW"
+}
+
 export const logicalFlow = writable(null);
 export const physicalFlow = writable(null);
 export const physicalSpecification = writable(null);
 export const expandedSections = writable([]);
 export const nestedEnums = writable({});
+export const viewMode = writable(ViewMode.SECTION)
 
-
-export function reset() {
-    logicalFlow.set(null);
-    physicalSpecification.set(null);
-    physicalFlow.set(null);
-}
