@@ -174,5 +174,6 @@
         padding-bottom: 1em;
         padding-left: 1em;
         padding-right: 1em;
+        margin-bottom: 0.25em;
     }
 </style>
