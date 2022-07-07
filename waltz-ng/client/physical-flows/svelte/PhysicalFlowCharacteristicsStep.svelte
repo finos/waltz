@@ -133,7 +133,7 @@
                             mandatory="true"
                             name="Criticality">
                     <div slot="help">
-                        How important ?!
+                        An indicator of the importance of this flow
                     </div>
                 </EnumSelect>
 
