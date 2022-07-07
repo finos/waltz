@@ -112,6 +112,8 @@ function controller(
                 logicalFlow.set(r.data);
                 vm.targetChanged(r.data);
             });
+    } else {
+        logicalFlow.set(null);
     }
 
     const viewState = kindToViewState(sourceEntityRef.kind);

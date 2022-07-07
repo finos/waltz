@@ -40,9 +40,11 @@
 
     onMount(() => {
         $expandedSections = [sections.ROUTE];
-    })
 
-    $:         console.log({log: $logicalFlow, phys: $physicalFlow, sepc: $physicalSpecification});
+        // clear off any previous store values, logicals are handled when a target is read from the state params
+        $physicalSpecification = null;
+        $physicalFlow = null;
+    })
 
 
     function createFlow() {
