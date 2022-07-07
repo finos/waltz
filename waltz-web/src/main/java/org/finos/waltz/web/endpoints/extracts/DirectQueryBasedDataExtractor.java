@@ -58,28 +58,36 @@ public abstract class DirectQueryBasedDataExtractor implements DataExtractor {
                                   Select<?> qry,
                                   Request request,
                                   Response response) throws IOException {
-        ExtractFormat format = parseExtractFormat(request);
-        ExtractSpecification extractSpecification = ImmutableExtractSpecification.builder()
-                .qry(qry)
-                .outputName(suggestedFilenameStem)
-                .extractFormat(format)
-                .build();
-        switch (format) {
+        ExtractFormat extractFormat = parseExtractFormat(request);
+        if(ExtractFormat.JSON.equals(extractFormat) &&
+                !(this instanceof SupportsJsonExtraction)) {
+            throw new IllegalArgumentException(String.format("Client specified format=%s. This endpoint does not support JSON."+
+                    "This is to prevent unintentional usage as a public API",extractFormat));
+        }
+        return writeSupportedExtract(extractFormat, suggestedFilenameStem, qry, response);
+
+    }
+
+    private Object writeSupportedExtract(ExtractFormat extractFormat,
+                                         String suggestedFilenameStem,
+                                         Select<?> qry,
+                                         Response response) throws IOException{
+        switch (extractFormat) {
             case XLSX:
                 return writeAsExcel(suggestedFilenameStem, qry, response);
             case CSV:
                 return writeAsCSV(suggestedFilenameStem, qry, response);
             case JSON:
-                    return writeAsJson(extractSpecification,response);
+                return writeAsJson(qry, response);
             default:
-                throw new IllegalArgumentException("Cannot write extract using unknown format: " + format);
+                throw new IllegalArgumentException("Cannot write extract using unknown format: " + extractFormat);
         }
     }
 
-    private String writeAsJson(ExtractSpecification extractSpecification,
+    private String writeAsJson(Select<?> qry,
                                Response response) {
         response.type(MimeTypes.Type.APPLICATION_JSON_UTF_8.name());
-        return query(dsl, extractSpecification.qry())
+        return query(dsl, qry)
                 .formatJSON(new JSONFormat()
                         .header(false)
                         .recordFormat(JSONFormat.RecordFormat.OBJECT));
