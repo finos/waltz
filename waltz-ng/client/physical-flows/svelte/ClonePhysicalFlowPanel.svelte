@@ -15,6 +15,7 @@
         toFrequencyKindName,
         toTransportKindName
     } from "./physical-flow-registration-utils";
+    import toasts from "../../svelte-stores/toast-store";
 
     export let primaryEntityRef;
 
@@ -28,6 +29,7 @@
 
     function selectFlow(flow) {
         dispatch("select", flow);
+        toasts.info("You have selected a flow to clone, please modify attributes as needed")
     }
 
     $: {

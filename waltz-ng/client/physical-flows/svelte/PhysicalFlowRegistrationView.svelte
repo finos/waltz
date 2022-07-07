@@ -114,8 +114,8 @@
 
     <div slot="summary">
         <div class="pull-right">
-            <Toggle labelOn="Show flow view"
-                    labelOff="Show section flows"
+            <Toggle labelOn="Show old view"
+                    labelOff="Show new flows"
                     state={$viewMode === ViewMode.SECTION}
                     onToggle={() => toggleViewMode()}/>
         </div>

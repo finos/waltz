@@ -6,10 +6,16 @@
     import PhysicalSpecificationSelector from "./PhysicalSpecificationSelector.svelte";
     import {physicalSpecStore} from "../../svelte-stores/physical-spec-store";
     import {mkSelectionOptions} from "../../common/selector-utils";
-    import {expandedSections, physicalSpecification} from "./physical-flow-editor-store";
-    import {determineExpandedSections, sections, toOptions} from "./physical-flow-registration-utils";
+    import {expandedSections, physicalSpecification, nestedEnums} from "./physical-flow-editor-store";
+    import {
+        determineExpandedSections,
+        sections,
+        toDataFormatKindName,
+        toOptions
+    } from "./physical-flow-registration-utils";
     import Icon from "../../common/svelte/Icon.svelte";
     import {onMount} from "svelte";
+    import toasts from "../../svelte-stores/toast-store";
 
     export let primaryEntityRef;
 
@@ -37,6 +43,13 @@
     onMount(() => {
         if ($physicalSpecification) {
             workingCopy = Object.assign({}, $physicalSpecification);
+        } else {
+            workingCopy = {
+                externalId: "",
+                description: "",
+                format: null,
+                name: ""
+            }
         }
     })
 
@@ -57,6 +70,7 @@
 
     function selectSpecification(evt) {
         $physicalSpecification = evt.detail;
+        workingCopy = evt.detail;
         openNextSection();
     }
 
@@ -74,8 +88,12 @@
     $: expanded = _.includes($expandedSections, sections.SPECIFICATION);
 
     function editSpec() {
+        if ($physicalSpecification.id) {
+            workingCopy.id = null;
+            toasts.info("Instead of altering the original specification, a new one will be created for this flow")
+        }
         $physicalSpecification = null;
-        workingCopy.id = null;
+        activeMode = Modes.CREATE;
     }
 
 </script>
@@ -92,7 +110,12 @@
         {#if $physicalSpecification}
 
             <div>
-                <span style="font-weight: lighter">Selected Specification: {$physicalSpecification.name}</span>
+                <div style="font-weight: lighter">Selected Specification: {$physicalSpecification.name}</div>
+                <ul>
+                    <li>
+                        Format: {toDataFormatKindName($nestedEnums, $physicalSpecification.format)}
+                    </li>
+                </ul>
             </div>
 
             <button class="btn btn-skinny"
@@ -136,6 +159,7 @@
                     <div class="form-group">
                         <label for="name">
                             Name
+                            <small class="text-muted">(required)</small>
                         </label>
 
                         <input class="form-control"
@@ -160,11 +184,9 @@
                     <div class="form-group">
                         <label for="description">
                             Description
-                            <small class="text-muted">(required)</small>
                         </label>
                         <textarea class="form-control"
                                   id="description"
-                                  required={true}
                                   rows="2"
                                   bind:value={workingCopy.description}/>
                     </div>
@@ -173,11 +195,9 @@
                     <div class="form-group">
                         <label for="external-id">
                             External Id
-                            <small class="text-muted">(required)</small>
                         </label>
                         <input class="form-control"
                                id="external-id"
-                               required={true}
                                bind:value={workingCopy.externalId}/>
                     </div>
                     <div class="help-block">

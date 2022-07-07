@@ -44,67 +44,67 @@
 
 <div class="help-block">
     <Icon name="info-circle"/>
-    Pick a <span>{direction === Direction.UPSTREAM ? "source" : "target"}</span> for the new flow
+    Pick a
+    <span>{direction === Direction.UPSTREAM ? "source" : "target"}</span>
+    for the new flow
+    <span>{direction === Direction.UPSTREAM ? "to" : "from"}</span>
+    <span class="text-muted"><EntityLabel ref={direction === Direction.UPSTREAM ? target : source}/></span>
 </div>
 
 <form on:submit|preventDefault={createNewLogical}>
 
-    <div class="form-group">
-        <label for="source">
-            Source
-        </label>
-        <div id="source">
-            {#if source}
-                <div>
-                    <EntityLabel ref={source}/>
-                    {#if direction === Direction.UPSTREAM}
+    {#if direction === Direction.UPSTREAM}
+        <div class="form-group">
+            <label for="source">
+                Source
+            </label>
+            <div id="source">
+                {#if source}
+                    <div>
+                        <EntityLabel ref={source}/>
                         <button class="btn btn-skinny"
                                 on:click={() => source = null}>
                             <Icon name="times"/>
                             select a different source
                         </button>
-                    {/if}
-                </div>
-            {:else}
-                {#if direction === Direction.UPSTREAM}
+                    </div>
+                {:else}
                     <EntitySearchSelector on:select={(evt) => onSelectSource(evt.detail)}
                                           placeholder="Search for source"
                                           entityKinds={['APPLICATION', 'ACTOR']}>
                     </EntitySearchSelector>
                 {/if}
-            {/if}
+            </div>
         </div>
-    </div>
-
-    <div class="form-group">
-        <label for="target">
-            Target
-        </label>
-        <div id="target">
-            {#if target}
-                <div>
-                    <EntityLabel ref={target}/>
-                    {#if direction === Direction.DOWNSTREAM}
+    {:else}
+        <div class="form-group">
+            <label for="target">
+                Target
+            </label>
+            <div id="target">
+                {#if target}
+                    <div>
+                        <EntityLabel ref={target}/>
                         <button class="btn btn-skinny"
                                 on:click={() => target = null}>
                             <Icon name="times"/>
                             select a different target
                         </button>
-                    {/if}
-                </div>
-            {:else}
-                <EntitySearchSelector on:select={(evt) => onSelectTarget(evt.detail)}
-                                      placeholder="Search for target"
-                                      entityKinds={['APPLICATION', 'ACTOR']}>
-                </EntitySearchSelector>
-            {/if}
+                    </div>
+                {:else}
+                    <EntitySearchSelector on:select={(evt) => onSelectTarget(evt.detail)}
+                                          placeholder="Search for target"
+                                          entityKinds={['APPLICATION', 'ACTOR']}>
+                    </EntitySearchSelector>
+                {/if}
+            </div>
         </div>
-    </div>
+    {/if}
 
     <button class="btn btn-success"
             disabled={!(source && target)}
-            on:click={() => createNewLogical()}>
-        Save
+            on:click|preventDefault={() => createNewLogical()}>
+        Create new flow
     </button>
     <button class="btn btn-skinny"
             on:click={() => cancel()}>

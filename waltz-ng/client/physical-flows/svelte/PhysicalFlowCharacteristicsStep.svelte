@@ -43,6 +43,14 @@
                 : {basisOffset: "OTHER", customBasisOffset: offsetString}
 
             workingCopy = Object.assign({}, $physicalFlow, offsetInfo)
+        } else {
+            workingCopy = {
+                transport: null,
+                frequency: null,
+                criticality: null,
+                basisOffset: "0",
+                description: ""
+            };
         }
     })
 
