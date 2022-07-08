@@ -26,6 +26,7 @@ import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.eclipse.jetty.http.MimeTypes;
 import org.jooq.DSLContext;
+import org.jooq.JSONFormat;
 import org.jooq.Result;
 import org.jooq.Select;
 import org.jooq.lambda.Unchecked;
@@ -44,8 +45,8 @@ import static org.finos.waltz.common.FunctionUtilities.time;
 
 public abstract class DirectQueryBasedDataExtractor implements DataExtractor {
 
-    protected DSLContext dsl;
 
+    protected DSLContext dsl;
 
     public DirectQueryBasedDataExtractor(DSLContext dsl) {
         checkNotNull(dsl, "dsl cannot be null");
@@ -57,15 +58,46 @@ public abstract class DirectQueryBasedDataExtractor implements DataExtractor {
                                   Select<?> qry,
                                   Request request,
                                   Response response) throws IOException {
-        ExtractFormat format = parseExtractFormat(request);
-        switch (format) {
+        ExtractFormat extractFormat = parseExtractFormat(request);
+        if(ExtractFormat.JSON.equals(extractFormat) &&
+                !(this instanceof SupportsJsonExtraction)) {
+            throw new IllegalArgumentException(String.format("Client specified format=%s. This endpoint does not support JSON."+
+                    "This is to prevent unintentional usage as a public API",extractFormat));
+        }
+        return writeSupportedExtract(extractFormat, suggestedFilenameStem, qry, response);
+
+    }
+
+    private Object writeSupportedExtract(ExtractFormat extractFormat,
+                                         String suggestedFilenameStem,
+                                         Select<?> qry,
+                                         Response response) throws IOException{
+        switch (extractFormat) {
             case XLSX:
                 return writeAsExcel(suggestedFilenameStem, qry, response);
             case CSV:
                 return writeAsCSV(suggestedFilenameStem, qry, response);
+            case JSON:
+                return writeAsJson(qry, response);
             default:
-                throw new IllegalArgumentException("Cannot write extract using unknown format: " + format);
+                throw new IllegalArgumentException("Cannot write extract using unknown format: " + extractFormat);
         }
+    }
+
+    private String writeAsJson(Select<?> qry,
+                               Response response) {
+        response.type(MimeTypes.Type.APPLICATION_JSON_UTF_8.name());
+        return query(dsl, qry)
+                .formatJSON(new JSONFormat()
+                        .header(false)
+                        .recordFormat(JSONFormat.RecordFormat.OBJECT));
+    }
+
+
+    private Result<?> query(DSLContext dslContext, Select<?> qry){
+        return dslContext == null
+                ? qry.fetch()
+                : time("fetch", () -> dslContext.fetch(dslContext.renderInlined(qry)));
     }
 
 

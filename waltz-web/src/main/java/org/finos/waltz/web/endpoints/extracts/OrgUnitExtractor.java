@@ -31,7 +31,8 @@ import static spark.Spark.get;
 
 
 @Service
-public class OrgUnitExtractor extends DirectQueryBasedDataExtractor {
+public class OrgUnitExtractor extends DirectQueryBasedDataExtractor
+        implements SupportsJsonExtraction {
 
 
     @Autowired
@@ -54,12 +55,12 @@ public class OrgUnitExtractor extends DirectQueryBasedDataExtractor {
     private SelectJoinStep<Record6<Long, Long, String, String, String, String>> prepareExtract() {
         return dsl
                 .select(
-                    ORGANISATIONAL_UNIT.ID.as("id"),
-                    ORGANISATIONAL_UNIT.PARENT_ID.as("parentId"),
-                    ORGANISATIONAL_UNIT.NAME.as("name"),
-                    ORGANISATIONAL_UNIT.DESCRIPTION.as("description"),
-                    ORGANISATIONAL_UNIT.EXTERNAL_ID.as("externalId"),
-                    ORGANISATIONAL_UNIT.PROVENANCE.as("provenance"))
+                        ORGANISATIONAL_UNIT.ID.as("id"),
+                        ORGANISATIONAL_UNIT.PARENT_ID.as("parentId"),
+                        ORGANISATIONAL_UNIT.NAME.as("name"),
+                        ORGANISATIONAL_UNIT.DESCRIPTION.as("description"),
+                        ORGANISATIONAL_UNIT.EXTERNAL_ID.as("externalId"),
+                        ORGANISATIONAL_UNIT.PROVENANCE.as("provenance"))
                 .from(ORGANISATIONAL_UNIT);
     }
 

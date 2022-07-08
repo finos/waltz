@@ -21,6 +21,6 @@ package org.finos.waltz.web.endpoints.extracts;
 public enum ExtractFormat {
     XLSX,
     CSV,
-    JSON,
-    SVG
+    SVG,
+    JSON
 }

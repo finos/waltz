@@ -36,8 +36,7 @@ class ReportGridJSONTest {
                 .id(KeyCell.fromRef(TEST_REF))
                 .build();
         assertEquals( 0, row.cells().size());
-        assertTrue(row.id().name().isPresent() && row.id().name().get().equals(TEST_NAME));
-        assertEquals(EntityKind.COMPLEXITY,row.id().kind());
+        assertEquals(ApiTypes.KEYCELL, row.id().type());
     }
 
 
