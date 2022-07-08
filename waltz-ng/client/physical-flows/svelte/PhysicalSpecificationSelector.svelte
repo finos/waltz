@@ -14,13 +14,13 @@
 
     const dispatch = createEventDispatcher();
 
-    $: filteredSpecs = _.isEmpty(qry)
-        ? specifications
-        : termSearch(specifications, qry, ["name", "externalId", "format"]);
-
     function selectSpec(spec) {
         dispatch("select", spec);
     }
+
+    $: filteredSpecs = _.isEmpty(qry)
+        ? specifications
+        : termSearch(specifications, qry, ["name", "externalId", "format"]);
 
 </script>
 

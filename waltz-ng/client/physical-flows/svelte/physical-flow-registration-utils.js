@@ -20,7 +20,8 @@ export let basisOffsetDefaultOptions = [
 export const sections = {
     ROUTE: "ROUTE",
     SPECIFICATION: "SPECIFICATION",
-    FLOW: "FLOW"
+    FLOW: "FLOW",
+    DATA_TYPE: "DATA_TYPE"
 }
 
 export function determineExpandedSections(expandedSections, section) {

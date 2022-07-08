@@ -14,23 +14,11 @@
     import Icon from "../../common/svelte/Icon.svelte";
     import {onMount} from "svelte";
 
-    let workingCopy = {
-        basisOffset: "0",
-        description: ""
-    };
-
+    let workingCopy = {};
     let transportKinds = [];
     let frequencyKinds = [];
     let physicalFlowCriticalityKinds = [];
-
     let enumsCall = enumValueStore.load();
-
-    $: basisOffsetByCode = _.keyBy(basisOffsetDefaultOptions, k => k.code)
-    $: enumsByType = _.groupBy($enumsCall.data, d => d.type);
-
-    $: transportKinds = toOptions(enumsByType, "TransportKind");
-    $: frequencyKinds = toOptions(enumsByType, "Frequency");
-    $: physicalFlowCriticalityKinds = toOptions(enumsByType, "physicalFlowCriticality");
 
 
     onMount(() => {
@@ -54,10 +42,6 @@
         }
     })
 
-    $: done = workingCopy.transport
-        && workingCopy.criticality
-        && workingCopy.frequency
-
     function save() {
 
         const basisOffset = workingCopy.basisOffset === "OTHER"
@@ -77,6 +61,17 @@
     function toggleSection() {
         $expandedSections = determineExpandedSections($expandedSections, sections.FLOW);
     }
+
+    $: basisOffsetByCode = _.keyBy(basisOffsetDefaultOptions, k => k.code);
+    $: enumsByType = _.groupBy($enumsCall.data, d => d.type);
+
+    $: transportKinds = toOptions(enumsByType, "TransportKind");
+    $: frequencyKinds = toOptions(enumsByType, "Frequency");
+    $: physicalFlowCriticalityKinds = toOptions(enumsByType, "physicalFlowCriticality");
+
+    $: done = workingCopy.transport
+        && workingCopy.criticality
+        && workingCopy.frequency;
 
     $: expanded = _.includes($expandedSections, sections.FLOW);
 

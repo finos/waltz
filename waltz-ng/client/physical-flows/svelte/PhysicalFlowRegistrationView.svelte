@@ -5,11 +5,13 @@
     import toasts from "../../svelte-stores/toast-store";
 
     import {
+        dataTypes,
         expandedSections,
         logicalFlow,
         nestedEnums,
         physicalFlow,
-        physicalSpecification, ViewMode,
+        physicalSpecification,
+        ViewMode,
         viewMode
     } from "./physical-flow-editor-store";
 
@@ -27,6 +29,7 @@
     import {enumValueStore} from "../../svelte-stores/enum-value-store";
     import {nestEnums} from "../../common/svelte/enum-utils";
     import Toggle from "../../common/svelte/Toggle.svelte";
+    import DataTypeSelectionStep from "./DataTypeSelectionStep.svelte";
 
     export let primaryEntityRef = {};
 
@@ -70,14 +73,13 @@
         const command = {
             specification,
             flowAttributes,
-            logicalFlowId: $logicalFlow.id
+            logicalFlowId: $logicalFlow.id,
+            dataTypeIds: $dataTypes
         }
 
         physicalFlowStore.create(command)
-            .then(() => {
-                toasts.success("Successfully added physical flow");
-                history.back();
-            })
+            .then(() => toasts.success("Successfully added physical flow"))
+            .then(() => history.back())
             .catch(e => displayError("Could not create physical flow", e));
     }
 
@@ -152,6 +154,10 @@
 
             <div class="selection-step">
                 <PhysicalFlowCharacteristicsStep {primaryEntityRef}/>
+            </div>
+
+            <div class="selection-step">
+                <DataTypeSelectionStep {primaryEntityRef}/>
             </div>
 
             <br>

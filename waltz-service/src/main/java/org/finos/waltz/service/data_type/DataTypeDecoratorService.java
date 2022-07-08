@@ -63,7 +63,6 @@ import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 public class DataTypeDecoratorService {
 
     private final ChangeLogService changeLogService;
-    private final PhysicalFlowService physicalFlowService;
     private final DataTypeDecoratorDaoSelectorFactory dataTypeDecoratorDaoSelectorFactory;
     private final LogicalFlowDao logicalFlowDao;
     private final LogicalFlowService logicalFlowService;
@@ -78,7 +77,6 @@ public class DataTypeDecoratorService {
     @Autowired
     public DataTypeDecoratorService(ChangeLogService changeLogService,
                                     LogicalFlowDecoratorService logicalFlowDecoratorService,
-                                    PhysicalFlowService physicalFlowService,
                                     DataTypeDecoratorDaoSelectorFactory dataTypeDecoratorDaoSelectorFactory,
                                     LogicalFlowDao logicalFlowDao,
                                     LogicalFlowService logicalFlowService,
@@ -89,11 +87,9 @@ public class DataTypeDecoratorService {
                                     PhysicalSpecificationService physicalSpecificationService) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(logicalFlowDecoratorService, "logicalFlowDecoratorService cannot be null");
-        checkNotNull(physicalFlowService, "physicalFlowService cannot be null");
         checkNotNull(physicalSpecificationService, "physicalSpecificationService cannot be null");
 
         this.changeLogService = changeLogService;
-        this.physicalFlowService = physicalFlowService;
         this.logicalFlowDao = logicalFlowDao;
         this.logicalFlowService = logicalFlowService;
         this.ratingsCalculator = ratingsCalculator;

@@ -20,13 +20,13 @@
 
     let dispatch = createEventDispatcher();
 
-    $: filteredFlows = _.isEmpty(qry)
-        ? flows
-        : termSearch(flows, qry, ["source.name", "source.externalId", "target.name", "target.externalId"]);
-
     function selectFlow(flow) {
         dispatch("select", flow)
     }
+
+    $: filteredFlows = _.isEmpty(qry)
+        ? flows
+        : termSearch(flows, qry, ["source.name", "source.externalId", "target.name", "target.externalId"]);
 
 </script>
 

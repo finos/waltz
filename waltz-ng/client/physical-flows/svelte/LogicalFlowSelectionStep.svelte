@@ -11,40 +11,18 @@
     import FlowCreator from "./FlowCreator.svelte";
     import {onMount} from "svelte";
 
-
-    export let primaryEntityRef;
-
-    let logicalFlowsCall = null;
-
-
     const Modes = {
         CREATE: "CREATE",
         LIST: "LIST"
     }
 
+    export let primaryEntityRef;
+
+    let logicalFlowsCall = null;
     let source;
     let target;
     let direction;
-
     let activeMode = Modes.LIST;
-
-    $: {
-        if (primaryEntityRef) {
-            logicalFlowsCall = logicalFlowStore.findByEntityReference(primaryEntityRef);
-        }
-    }
-
-    $: logicalFlows = _
-        .chain($logicalFlowsCall?.data)
-        .orderBy([
-            d => d.source.name.toLowerCase(),
-            d => d.target.name.toLowerCase()
-        ])
-        .value();
-
-    onMount(() => {
-
-    })
 
     function toggleSection() {
         $expandedSections = determineExpandedSections($expandedSections, sections.ROUTE);
@@ -75,6 +53,20 @@
             $expandedSections = _.concat($expandedSections, sections.SPECIFICATION)
         }
     }
+
+    $: {
+        if (primaryEntityRef) {
+            logicalFlowsCall = logicalFlowStore.findByEntityReference(primaryEntityRef);
+        }
+    }
+
+    $: logicalFlows = _
+        .chain($logicalFlowsCall?.data)
+        .orderBy([
+            d => d.source.name.toLowerCase(),
+            d => d.target.name.toLowerCase()
+        ])
+        .value();
 
     $: expanded = _.includes($expandedSections, sections.ROUTE);
 

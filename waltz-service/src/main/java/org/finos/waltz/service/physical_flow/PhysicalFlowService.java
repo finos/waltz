@@ -21,6 +21,7 @@ package org.finos.waltz.service.physical_flow;
 import org.finos.waltz.common.exception.ModifyingReadOnlyRecordException;
 import org.finos.waltz.common.exception.NotFoundException;
 import org.finos.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.service.data_type.DataTypeDecoratorService;
 import org.finos.waltz.service.external_identifier.ExternalIdentifierService;
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.finos.waltz.service.physical_specification.PhysicalSpecificationService;
@@ -46,6 +47,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptySet;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.common.StringUtilities.isEmpty;
@@ -59,6 +61,7 @@ public class PhysicalFlowService {
 
     private final PhysicalFlowDao physicalFlowDao;
     private final PhysicalSpecificationService physicalSpecificationService;
+    private final DataTypeDecoratorService dataTypeDecoratorService;
     private final ChangeLogService changeLogService;
     private final LogicalFlowService logicalFlowService;
     private final ExternalIdentifierService externalIdentifierService;
@@ -70,17 +73,20 @@ public class PhysicalFlowService {
                                LogicalFlowService logicalFlowService,
                                PhysicalFlowDao physicalDataFlowDao,
                                PhysicalSpecificationService physicalSpecificationService,
-                               ExternalIdentifierService externalIdentifierService) {
+                               ExternalIdentifierService externalIdentifierService,
+                               DataTypeDecoratorService dataTypeDecoratorService) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(logicalFlowService, "logicalFlowService cannot be null");
         checkNotNull(physicalDataFlowDao, "physicalFlowDao cannot be null");
         checkNotNull(physicalSpecificationService, "physicalSpecificationService cannot be null");
+        checkNotNull(dataTypeDecoratorService, "dataTypeDecoratorService cannot be null");
 
         this.changeLogService = changeLogService;
         this.logicalFlowService = logicalFlowService;
         this.physicalFlowDao = physicalDataFlowDao;
         this.physicalSpecificationService = physicalSpecificationService;
         this.externalIdentifierService = externalIdentifierService;
+        this.dataTypeDecoratorService = dataTypeDecoratorService;
     }
 
 
@@ -243,8 +249,17 @@ public class PhysicalFlowService {
 
         long physicalFlowId = physicalFlowDao.create(flow);
 
-        if(command.specification().isRemoved()) {
+        if (command.specification().isRemoved()) {
             physicalSpecificationService.makeActive(specId, username);
+        }
+
+        if (!command.dataTypeIds().isEmpty()) {
+            //create dts on spec, these are cascaded onto logical
+            dataTypeDecoratorService.updateDecorators(
+                    username,
+                    mkRef(EntityKind.PHYSICAL_SPECIFICATION, specId),
+                    command.dataTypeIds(),
+                    emptySet());
         }
 
         changeLogService.writeChangeLogEntries(

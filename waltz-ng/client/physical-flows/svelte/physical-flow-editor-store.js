@@ -26,6 +26,7 @@ export const ViewMode = {
 export const logicalFlow = writable(null);
 export const physicalFlow = writable(null);
 export const physicalSpecification = writable(null);
+export const dataTypes = writable([]);
 export const expandedSections = writable([]);
 export const nestedEnums = writable({});
 export const viewMode = writable(ViewMode.SECTION)

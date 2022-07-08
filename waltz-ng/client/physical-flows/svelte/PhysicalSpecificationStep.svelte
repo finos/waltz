@@ -17,28 +17,17 @@
     import {onMount} from "svelte";
     import toasts from "../../svelte-stores/toast-store";
 
-    export let primaryEntityRef;
-
-    let specificationCall;
-
-    $: {
-        if (primaryEntityRef) {
-            const selector = mkSelectionOptions(primaryEntityRef);
-            specificationCall = physicalSpecStore.findBySelector(selector)
-        }
-    }
-
-    $: specifications = $specificationCall?.data;
-
-    let workingCopy = {
-        externalId: "",
-        description: ""
-    };
-
     const Modes = {
         EXISTING: "EXISTING",
         CREATE: "CREATE"
     }
+
+    export let primaryEntityRef;
+
+    let workingCopy = {};
+    let specificationCall;
+    let activeMode = Modes.CREATE;
+    let enumsCall = enumValueStore.load();
 
     onMount(() => {
         if ($physicalSpecification) {
@@ -52,16 +41,6 @@
             }
         }
     })
-
-    let activeMode = Modes.CREATE;
-
-    let enumsCall = enumValueStore.load();
-
-    $: enumsByType = _.groupBy($enumsCall.data, d => d.type);
-    $: dataFormatKinds = toOptions(enumsByType, "DataFormatKind");
-
-    $: done = workingCopy.name
-        && workingCopy.format
 
     function save() {
         $physicalSpecification = workingCopy;
@@ -85,8 +64,6 @@
         $expandedSections = determineExpandedSections($expandedSections, sections.SPECIFICATION);
     }
 
-    $: expanded = _.includes($expandedSections, sections.SPECIFICATION);
-
     function editSpec() {
         if ($physicalSpecification.id) {
             workingCopy.id = null;
@@ -95,6 +72,22 @@
         $physicalSpecification = null;
         activeMode = Modes.CREATE;
     }
+
+    $: {
+        if (primaryEntityRef) {
+            const selector = mkSelectionOptions(primaryEntityRef);
+            specificationCall = physicalSpecStore.findBySelector(selector)
+        }
+    }
+
+    $: specifications = $specificationCall?.data;
+    $: enumsByType = _.groupBy($enumsCall.data, d => d.type);
+    $: dataFormatKinds = toOptions(enumsByType, "DataFormatKind");
+
+    $: done = workingCopy.name
+        && workingCopy.format
+
+    $: expanded = _.includes($expandedSections, sections.SPECIFICATION);
 
 </script>
 
