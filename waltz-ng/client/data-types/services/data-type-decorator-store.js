@@ -31,14 +31,8 @@ function store($http, BaseApiUrl) {
 
 
     const findBySelector = (options, targetKind) => {
-        return $http.post(`${BASE}/selector/targetKind/${targetKind}`, options)
-            .then(result => result.data);
-    };
-
-
-    const findSuggestedByEntityRef = (ref) => {
         return $http
-            .get(`${BASE}/suggested/entity/${ref.kind}/${ref.id}`)
+            .post(`${BASE}/selector/targetKind/${targetKind}`, options)
             .then(result => result.data);
     };
 
@@ -68,7 +62,6 @@ function store($http, BaseApiUrl) {
     return {
         findBySelector,
         findByEntityReference,
-        findSuggestedByEntityRef,
         findByFlowIds,
         save,
         findDatatypeUsageCharacteristics,
@@ -77,44 +70,39 @@ function store($http, BaseApiUrl) {
 
 
 store.$inject = [
-    '$http',
-    'BaseApiUrl'
+    "$http",
+    "BaseApiUrl"
 ];
 
 
-const serviceName = 'DataTypeDecoratorStore';
+const serviceName = "DataTypeDecoratorStore";
 
 
 export const DataTypeDecoratorStore_API = {
     findBySelector: {
         serviceName,
-        serviceFnName: 'findBySelector',
-        description: 'finds data types for a given selector'
+        serviceFnName: "findBySelector",
+        description: "finds data types for a given selector"
     },
     findByEntityReference: {
         serviceName,
-        serviceFnName: 'findByEntityReference',
-        description: 'finds by entity reference for data types'
+        serviceFnName: "findByEntityReference",
+        description: "finds by entity reference for data types"
     },
     findByFlowIds: {
         serviceName,
-        serviceFnName: 'findByFlowIds',
-        description: 'finds data types for flow ids'
-    },
-    findSuggestedByEntityRef: {
-        serviceName,
-        serviceFnName: 'findSuggestedByEntityRef',
-        description: 'finds suggested datatypes by entity reference'
+        serviceFnName: "findByFlowIds",
+        description: "finds data types for flow ids"
     },
     save: {
         serviceName,
-        serviceFnName: 'save',
-        description: 'saves (inserts/deletes) data types for a given entity ref'
+        serviceFnName: "save",
+        description: "saves (inserts/deletes) data types for a given entity ref"
     },
     findDatatypeUsageCharacteristics: {
         serviceName,
-        serviceFnName: 'findDatatypeUsageCharacteristics',
-        description: 'finds datatype usage characteristics for this entity'
+        serviceFnName: "findDatatypeUsageCharacteristics",
+        description: "finds datatype usage characteristics for this entity"
     }
 };
 

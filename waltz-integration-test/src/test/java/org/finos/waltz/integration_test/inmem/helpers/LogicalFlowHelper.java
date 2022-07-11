@@ -68,4 +68,7 @@ public class LogicalFlowHelper {
     }
 
 
+    public int removeFlow(Long flowId) {
+        return logicalFlowDao.removeFlow(flowId, "admin");
+    }
 }

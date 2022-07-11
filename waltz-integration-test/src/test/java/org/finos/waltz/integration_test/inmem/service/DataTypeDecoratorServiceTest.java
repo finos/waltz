@@ -19,7 +19,11 @@
 package org.finos.waltz.integration_test.inmem.service;
 
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
-import org.finos.waltz.integration_test.inmem.helpers.*;
+import org.finos.waltz.integration_test.inmem.helpers.AppHelper;
+import org.finos.waltz.integration_test.inmem.helpers.DataTypeHelper;
+import org.finos.waltz.integration_test.inmem.helpers.LogicalFlowHelper;
+import org.finos.waltz.integration_test.inmem.helpers.PhysicalFlowHelper;
+import org.finos.waltz.integration_test.inmem.helpers.PhysicalSpecHelper;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
@@ -28,11 +32,13 @@ import org.finos.waltz.model.datatype.DataTypeDecorator;
 import org.finos.waltz.model.datatype.DataTypeUsageCharacteristics;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.service.data_type.DataTypeDecoratorService;
+import org.finos.waltz.service.data_type.DataTypeService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
@@ -43,12 +49,19 @@ import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DataTypeDecoratorServiceTest extends BaseInMemoryIntegrationTest {
 
     @Autowired
     private DataTypeDecoratorService dtdSvc;
+
+    @Autowired
+    private DataTypeService dtSvc;
 
     @Autowired
     private LogicalFlowHelper lfHelper;
@@ -272,16 +285,11 @@ public class DataTypeDecoratorServiceTest extends BaseInMemoryIntegrationTest {
         String username = mkName("updateDecorators");
         EntityReference a = appHelper.createNewApp("a", ouIds.a);
 
-        assertThrows(
-                UnsupportedOperationException.class,
-                () -> dtdSvc.findSuggestedByEntityRef(a),
-                "Throw exception if not a logical data flow or physical spec");
-
         EntityReference b = appHelper.createNewApp("b", ouIds.a1);
         LogicalFlow flow = lfHelper.createLogicalFlow(a, b);
 
-        Collection<DataType> suggestedWhenNoFlows = dtdSvc.findSuggestedByEntityRef(flow.entityReference());
-        assertEquals(emptyList(), suggestedWhenNoFlows, "If no flows associated to entity should return empty list");
+        Set<DataType> suggestedWhenNoFlows = dtSvc.findSuggestedByEntityRef(flow.entityReference());
+        assertTrue(suggestedWhenNoFlows.isEmpty(), "If no flows associated to entity should return empty list");
 
         EntityReference c = appHelper.createNewApp("b", ouIds.a1);
         LogicalFlow flow2 = lfHelper.createLogicalFlow(b, c);
@@ -291,10 +299,10 @@ public class DataTypeDecoratorServiceTest extends BaseInMemoryIntegrationTest {
         dtdSvc.updateDecorators(username, flow.entityReference(), asSet(dtId), emptySet());
         dtdSvc.updateDecorators(username, flow2.entityReference(), asSet(dtId, dtId2), emptySet());
 
-        Collection<DataType> suggestedWhenUpstream = dtdSvc.findSuggestedByEntityRef(flow.entityReference());
+        Collection<DataType> suggestedWhenUpstream = dtSvc.findSuggestedByEntityRef(flow.entityReference());
         assertEquals(asSet(dtId), map(suggestedWhenUpstream, d -> d.id().get()), "Should return suggested data types based on the upstream app");
 
-        Collection<DataType> suggestedWhenSrcHasUpstreamAndDownStream = dtdSvc.findSuggestedByEntityRef(flow2.entityReference());
+        Collection<DataType> suggestedWhenSrcHasUpstreamAndDownStream = dtSvc.findSuggestedByEntityRef(flow2.entityReference());
         assertEquals(asSet(dtId, dtId2),
                 map(suggestedWhenSrcHasUpstreamAndDownStream, d -> d.id().get()),
                 "Should return suggested data types based on up and down stream flows on the upstream app");
@@ -302,13 +310,13 @@ public class DataTypeDecoratorServiceTest extends BaseInMemoryIntegrationTest {
         Long specId = psHelper.createPhysicalSpec(a, "updateDecorators");
         pfHelper.createPhysicalFlow(flow.entityReference().id(), specId, "updateDecorators");
 
-        Collection<DataType> suggestedForPsWhenUpstream = dtdSvc.findSuggestedByEntityRef(mkRef(EntityKind.PHYSICAL_SPECIFICATION, specId));
+        Collection<DataType> suggestedForPsWhenUpstream = dtSvc.findSuggestedByEntityRef(mkRef(EntityKind.PHYSICAL_SPECIFICATION, specId));
         assertEquals(asSet(dtId), map(suggestedForPsWhenUpstream, d -> d.id().get()), "Should return suggested data types based on the upstream app");
 
         Long specId2 = psHelper.createPhysicalSpec(a, "updateDecorators");
-        Collection<DataType> specNotInvolvedInFlows = dtdSvc.findSuggestedByEntityRef(mkRef(EntityKind.PHYSICAL_SPECIFICATION, specId2));
+        Collection<DataType> specNotInvolvedInFlows = dtSvc.findSuggestedByEntityRef(mkRef(EntityKind.PHYSICAL_SPECIFICATION, specId2));
 
-        assertEquals(emptyList(), specNotInvolvedInFlows, "Spec not involved in flows should return empty list");
+        assertTrue(specNotInvolvedInFlows.isEmpty(), "Spec not involved in flows should return empty list");
     }
 
 

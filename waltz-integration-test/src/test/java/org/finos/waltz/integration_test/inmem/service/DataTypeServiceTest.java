@@ -32,14 +32,16 @@ import org.finos.waltz.service.data_type.DataTypeService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
 import static java.util.Collections.emptyList;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.common.SetUtilities.map;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DataTypeServiceTest extends BaseInMemoryIntegrationTest {
 
@@ -116,30 +118,30 @@ public class DataTypeServiceTest extends BaseInMemoryIntegrationTest {
         EntityReference b = appHelper.createNewApp("b", ouIds.a1);
         EntityReference c = appHelper.createNewApp("b", ouIds.b);
 
-        Collection<DataType> noDecoratorsOnFlow = dtSvc.findSuggestedBySourceEntityRef(a);
-        assertEquals(emptyList(), noDecoratorsOnFlow, "if source app has no logical flows returns empty list");
+        Set<DataType> noDecoratorsOnFlow = dtSvc.findSuggestedByEntityRef(a);
+        assertTrue(noDecoratorsOnFlow.isEmpty(), "if source app has no logical flows returns empty list");
 
         LogicalFlow ab = lfHelper.createLogicalFlow(a, b);
-        assertEquals(emptyList(), noDecoratorsOnFlow, "if source app has no flow decorators returns empty list");
+        assertTrue(noDecoratorsOnFlow.isEmpty(), "if source app has no flow decorators returns empty list");
 
         dataTypeHelper.createDataType(1L, "dt1", "DT1");
         lfHelper.createLogicalFlowDecorators(ab.entityReference(), asSet(1L));
-        Set<Long> suggestedDtIds = map(dtSvc.findSuggestedBySourceEntityRef(a), dtd -> dtd.entityReference().id());
+        Set<Long> suggestedDtIds = map(dtSvc.findSuggestedByEntityRef(a), dtd -> dtd.entityReference().id());
         assertEquals(asSet(1L), suggestedDtIds, "returns data type associated to the source application");
 
         LogicalFlow bc = lfHelper.createLogicalFlow(b, c);
         dataTypeHelper.createDataType(2L, "dt2", "DT2");
         lfHelper.createLogicalFlowDecorators(bc.entityReference(), asSet(2L));
-        Set<Long> onlySourceDts = map(dtSvc.findSuggestedBySourceEntityRef(a), dtd -> dtd.entityReference().id());
+        Set<Long> onlySourceDts = map(dtSvc.findSuggestedByEntityRef(a), dtd -> dtd.entityReference().id());
         assertEquals(asSet(1L), onlySourceDts, "does not return dts associated to only the target app");
 
         lfHelper.createLogicalFlowDecorators(ab.entityReference(), asSet(2L));
-        Set<Long> allSourceDts = map(dtSvc.findSuggestedBySourceEntityRef(a), dtd -> dtd.entityReference().id());
+        Set<Long> allSourceDts = map(dtSvc.findSuggestedByEntityRef(a), dtd -> dtd.entityReference().id());
         assertEquals(asSet(1L, 2L), allSourceDts, "returns all dts associated to source app");
 
         LogicalFlow ac = lfHelper.createLogicalFlow(a, c);
         lfHelper.createLogicalFlowDecorators(ac.entityReference(), asSet(2L));
-        Set<Long> setOfDts = map(dtSvc.findSuggestedBySourceEntityRef(a), dtd -> dtd.entityReference().id());
+        Set<Long> setOfDts = map(dtSvc.findSuggestedByEntityRef(a), dtd -> dtd.entityReference().id());
         assertEquals(asSet(1L, 2L), setOfDts, "returns all dts associated to source app");
     }
 

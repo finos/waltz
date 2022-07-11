@@ -350,6 +350,14 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
                 });
     }
 
+    public int updateRatingsByCondition(AuthoritativenessRatingValue rating, Condition condition) {
+        return dsl
+                .update(LOGICAL_FLOW_DECORATOR)
+                .set(LOGICAL_FLOW_DECORATOR.RATING, rating.value())
+                .where(condition)
+                .execute();
+    }
+
 
     // --- HELPERS ---
 
@@ -360,15 +368,6 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
                 .from(LOGICAL_FLOW_DECORATOR)
                 .where(dsl.renderInlined(condition))
                 .fetch(TO_DECORATOR_MAPPER);
-    }
-
-
-    public int updateRatingsByCondition(AuthoritativenessRatingValue rating, Condition condition) {
-        return dsl
-                .update(LOGICAL_FLOW_DECORATOR)
-                .set(LOGICAL_FLOW_DECORATOR.RATING, rating.value())
-                .where(condition)
-                .execute();
     }
 
 }
