@@ -24,6 +24,6 @@ package org.finos.waltz.web.endpoints.extracts;
  * This means care must be taken when changing the data returned to ensure that the
  * JSON can still be consumed by pre-existing clients.
  */
-public interface PublicDataExtractor extends DataExtractor {
+public interface SupportsJsonExtraction extends DataExtractor {
 
 }

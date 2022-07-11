@@ -52,7 +52,7 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 import static spark.Spark.post;
 
 @Service
-public class ReportGridExtractor implements PublicDataExtractor {
+public class ReportGridExtractor implements SupportsJsonExtraction {
 
     public static final String BASE_URL = WebUtilities.mkPath("data-extract", "report-grid");
     private final DynamicCommaSeperatedValueFormatter dynamicCommaSeperatedValueFormatter;
