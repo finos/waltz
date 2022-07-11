@@ -1,7 +1,7 @@
 <script>
     import _ from "lodash";
     import StepHeader from "./StepHeader.svelte";
-    import {dataTypes, expandedSections, physicalSpecification} from "./physical-flow-editor-store";
+    import {dataTypes, expandedSections, physicalSpecification, skipDataTypes} from "./physical-flow-editor-store";
     import {determineExpandedSections, sections} from "./physical-flow-registration-utils";
     import Icon from "../../common/svelte/Icon.svelte";
     import DataTypeTreeSelector from "../../common/svelte/DataTypeTreeSelector.svelte";
@@ -30,6 +30,7 @@
     }
 
     function editDataTypes() {
+        $skipDataTypes = false;
         $dataTypes = [];
     }
 
@@ -45,6 +46,10 @@
     }
 
     $: expanded = _.includes($expandedSections, sections.DATA_TYPE);
+
+    function skip() {
+        $skipDataTypes = true;
+    }
 
 </script>
 
@@ -65,16 +70,20 @@
 {#if expanded}
     <div class="step-body">
 
-        {#if !_.isEmpty($dataTypes)}
+        {#if !_.isEmpty($dataTypes) || $skipDataTypes}
             <div>
-                <div style="font-weight: lighter">Selected Data Types:</div>
-                <ul>
-                    {#each $dataTypes as dataTypeId}
-                        <li>
-                            {_.get(dataTypesById, [dataTypeId, "name"], "?")}
-                        </li>
-                    {/each}
-                </ul>
+                <span style="font-weight: lighter">Selected Data Types:</span>
+                {#if _.isEmpty($dataTypes)}
+                    <span style="font-style: italic">No data types selected</span>
+                {:else}
+                    <ul>
+                        {#each $dataTypes as dataTypeId}
+                            <li>
+                                {_.get(dataTypesById, [dataTypeId, "name"], "?")}
+                            </li>
+                        {/each}
+                    </ul>
+                {/if}
             </div>
 
             <button class="btn btn-skinny"
@@ -100,6 +109,10 @@
             <button class="btn btn-skinny"
                     on:click={() => updateDataTypes()}>
                 Done
+            </button>
+            <button class="btn btn-skinny"
+                    on:click={() => skip()}>
+                Skip
             </button>
 
         {/if}

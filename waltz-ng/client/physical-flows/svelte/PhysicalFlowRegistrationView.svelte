@@ -12,7 +12,8 @@
         physicalFlow,
         physicalSpecification,
         ViewMode,
-        viewMode
+        viewMode,
+        skipDataTypes
     } from "./physical-flow-editor-store";
 
     import _ from "lodash";
@@ -97,7 +98,7 @@
             : ViewMode.SECTION;
     }
 
-    $: incompleteRecord = !($logicalFlow && $physicalFlow && $physicalSpecification);
+    $: incompleteRecord = !($logicalFlow && $physicalFlow && $physicalSpecification && (!_.isEmpty($dataTypes) || $skipDataTypes));
 
 </script>
 

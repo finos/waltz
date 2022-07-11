@@ -56,6 +56,15 @@
                 basisOffset,
                 criticality: workingCopy.criticality
             });
+
+        openNextSection()
+    }
+
+    function openNextSection() {
+        const flowSectionOpen = _.includes($expandedSections, sections.DATA_TYPE);
+        if (!flowSectionOpen) {
+            $expandedSections = _.concat($expandedSections, sections.DATA_TYPE)
+        }
     }
 
     function toggleSection() {

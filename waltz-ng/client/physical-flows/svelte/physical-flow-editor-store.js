@@ -29,5 +29,6 @@ export const physicalSpecification = writable(null);
 export const dataTypes = writable([]);
 export const expandedSections = writable([]);
 export const nestedEnums = writable({});
+export const skipDataTypes = writable(false);
 export const viewMode = writable(ViewMode.SECTION)
 
