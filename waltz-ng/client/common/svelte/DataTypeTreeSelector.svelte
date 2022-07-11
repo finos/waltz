@@ -9,7 +9,7 @@
     export let selectionFilter = () => true;
 
     const root = {name: "Root"};
-    
+
 
     function calcDisplayHierarchy(nodes, query) {
         const searchResult = _.map(

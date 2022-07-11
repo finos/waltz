@@ -17,6 +17,7 @@
  */
 
 import {remote} from "./remote";
+import {checkIsCreatePhysicalFlowCommand} from "../common/checks";
 
 export function mkPhysicalFlowStore() {
 
@@ -36,9 +37,19 @@ export function mkPhysicalFlowStore() {
     };
 
 
+    const create = (cmd) => {
+        checkIsCreatePhysicalFlowCommand(cmd);
+        return remote
+            .execute(
+                "POST",
+                "api/physical-flow",
+                cmd);
+    };
+
     return {
         findBySelector,
-        findUnderlyingPhysicalFlows
+        findUnderlyingPhysicalFlows,
+        create
     };
 }
 

@@ -2,172 +2,199 @@
     import PageHeader from "../../common/svelte/PageHeader.svelte";
     import ViewLink from "../../common/svelte/ViewLink.svelte";
     import EntityLink from "../../common/svelte/EntityLink.svelte";
-    import RouteSelector from "./RouteSelector.svelte";
-    import EntityLabel from "../../common/svelte/EntityLabel.svelte";
-    import Icon from "../../common/svelte/Icon.svelte";
-    import Check from "./Check.svelte";
+    import toasts from "../../svelte-stores/toast-store";
 
-    import {CORE_API} from "../../common/services/core-api-utils";
-
-    import {logicalFlow, physicalSpecification, physicalFlow, reset} from "./physical-flow-editor-store";
+    import {
+        dataTypes,
+        expandedSections,
+        logicalFlow,
+        nestedEnums,
+        physicalFlow,
+        physicalSpecification,
+        ViewMode,
+        viewMode,
+        skipDataTypes
+    } from "./physical-flow-editor-store";
 
     import _ from "lodash";
-    import PhysicalSpecificationSelector from "./PhysicalSpecificationSelector.svelte";
     import {onMount} from "svelte";
+    import LogicalFlowSelectionStep from "./LogicalFlowSelectionStep.svelte";
+    import PhysicalFlowCharacteristicsStep from "./PhysicalFlowCharacteristicsStep.svelte";
+    import PhysicalSpecificationStep from "./PhysicalSpecificationStep.svelte";
+    import {sections} from "./physical-flow-registration-utils";
+    import {physicalFlowStore} from "../../svelte-stores/physical-flow-store";
+    import {toEntityRef} from "../../common/entity-utils";
+    import {displayError} from "../../common/error-utils";
+    import Icon from "../../common/svelte/Icon.svelte";
+    import ClonePhysicalFlowPanel from "./ClonePhysicalFlowPanel.svelte";
+    import {enumValueStore} from "../../svelte-stores/enum-value-store";
+    import {nestEnums} from "../../common/svelte/enum-utils";
+    import Toggle from "../../common/svelte/Toggle.svelte";
+    import DataTypeSelectionStep from "./DataTypeSelectionStep.svelte";
 
     export let primaryEntityRef = {};
-    export let serviceBroker;
 
-    function parseLogicalFlowId() {
-        const idAsStr = new URLSearchParams(window.location.search).get("LOGICAL_DATA_FLOW");
-        return idAsStr
-            ? Number(idAsStr)
-            : null;
+    const Modes = {
+        CREATE: "CREATE",
+        CLONE: "CLONE"
     }
 
-    const givenLogicalFlowId = parseLogicalFlowId();
+    let activeMode = Modes.CREATE;
+    let enumsCall = enumValueStore.load();
 
-    let logicalFlows = [];
-    let specifications = [];
-    let application;
+    $: $nestedEnums = nestEnums($enumsCall.data);
 
     onMount(() => {
-        reset();
-    });
+        $expandedSections = [sections.ROUTE];
 
-    $: {
-        primaryEntityRef && serviceBroker
-            .loadViewData(
-                CORE_API.ApplicationStore.getById,
-                [primaryEntityRef.id])
-            .then(r => application = r.data);
-        primaryEntityRef && serviceBroker
-            .loadViewData(
-                CORE_API.LogicalFlowStore.findByEntityReference,
-                [primaryEntityRef])
-            .then(r => logicalFlows = r.data);
+        // clear off any previous store values, logicals are handled when a target is read from the state params
+        $physicalSpecification = null;
+        $physicalFlow = null;
+    })
+
+
+    function createFlow() {
+
+        const specification = {
+            owningEntity: toEntityRef(primaryEntityRef),
+            name: $physicalSpecification.name,
+            description: $physicalSpecification.description,
+            format: $physicalSpecification.format,
+            lastUpdatedBy: "waltz",
+            id: $physicalSpecification.id ? $physicalSpecification.id : null
+        }
+
+        const flowAttributes = {
+            transport: $physicalFlow.transport,
+            frequency: $physicalFlow.frequency,
+            basisOffset: $physicalFlow.basisOffset,
+            criticality: $physicalFlow.criticality
+        }
+
+        const command = {
+            specification,
+            flowAttributes,
+            logicalFlowId: $logicalFlow.id,
+            dataTypeIds: $dataTypes
+        }
+
+        physicalFlowStore.create(command)
+            .then(() => toasts.success("Successfully added physical flow"))
+            .then(() => history.back())
+            .catch(e => displayError("Could not create physical flow", e));
     }
 
-    $: $logicalFlow = givenLogicalFlowId
-        ? _.find(logicalFlows, d => d.id === givenLogicalFlowId)
-        : null;
+    function selectFlowToClone(flow) {
+        $logicalFlow = flow.logicalFlow;
+        $physicalSpecification = flow.specification
+        $physicalFlow = flow;
+        activeMode = Modes.CREATE;
+        $expandedSections = [sections.ROUTE, sections.SPECIFICATION, sections.FLOW];
+    }
 
-    $: $logicalFlow && serviceBroker
-        .loadViewData(
-            CORE_API.PhysicalSpecificationStore.findByEntityReference,
-            [$logicalFlow.source])
-        .then(r => specifications = r.data);
+    function toggleViewMode() {
+        $viewMode = $viewMode === ViewMode.SECTION
+            ? ViewMode.FLOW
+            : ViewMode.SECTION;
+    }
+
+    $: incompleteRecord = !($logicalFlow && $physicalFlow && $physicalSpecification && (!_.isEmpty($dataTypes) || $skipDataTypes));
 
 </script>
 
 
-{#if application}
+{#if primaryEntityRef}
 <PageHeader name="Register new Physical Flow"
             icon="dot-circle-o"
-            small={_.get(application, ["name"], "-")}>
+            small={_.get(primaryEntityRef, ["name"], "-")}>
     <div slot="breadcrumbs">
         <ol class="waltz-breadcrumbs">
             <li><ViewLink state="main">Home</ViewLink></li>
-            <li><EntityLink ref={application}/></li>
+            <li><EntityLink ref={primaryEntityRef}/></li>
             <li>Register Physical Flow</li>
         </ol>
     </div>
 
     <div slot="summary">
-        <!-- ROUTE -->
-        <h3>
-            <Check selected={$logicalFlow !== null}/>
-            Route
-        </h3>
-        <div class="step-body">
-            {#if !$logicalFlow}
-                <div class="help-block">
-                    Select which nodes this physical flow is between.
-                    <br>
-                    If the route is not listed add a new logical flow using the <em>Add new route</em> option.
-                </div>
-                <RouteSelector node={application}
-                               flows={logicalFlows}/>
-            {:else}
-                <EntityLabel ref={$logicalFlow.source}/>
-                <span class="flow-arrow">
-                <Icon name="arrow-right"/>
+        <div class="pull-right">
+            <Toggle labelOn="Show old view"
+                    labelOff="Show new flows"
+                    state={$viewMode === ViewMode.SECTION}
+                    onToggle={() => toggleViewMode()}/>
+        </div>
+
+        {#if activeMode === Modes.CLONE}
+
+            <ClonePhysicalFlowPanel {primaryEntityRef}
+                                    on:select={(evt) => selectFlowToClone(evt.detail)}/>
+            <br>
+            <button class="btn btn-skinny"
+                    on:click={() => activeMode = Modes.CREATE}>
+                Cancel
+            </button>
+
+        {:else if activeMode = Modes.CREATE}
+
+            <div class="help-block">
+                <Icon name="info-circle"/>
+                Complete the form below to register a new physical flow, or
+                <button class="btn btn-skinny"
+                        on:click={() => activeMode = Modes.CLONE}>
+                    clone an existing flow
+                </button>
+                and modify it's details.
+            </div>
+
+            <div class="selection-step">
+                <LogicalFlowSelectionStep {primaryEntityRef}/>
+            </div>
+
+            <div class="selection-step">
+                <PhysicalSpecificationStep {primaryEntityRef}/>
+            </div>
+
+            <div class="selection-step">
+                <PhysicalFlowCharacteristicsStep {primaryEntityRef}/>
+            </div>
+
+            <div class="selection-step">
+                <DataTypeSelectionStep {primaryEntityRef}/>
+            </div>
+
+            <br>
+
+            <span>
+                <button class="btn btn-success"
+                        disabled={incompleteRecord}
+                        on:click={() => createFlow()}>
+                    Create
+                </button>
+
+                {#if incompleteRecord}
+                    <span class="incomplete-warning">
+                        <Icon name="exclamation-triangle"/>You must complete all sections
+                    </span>
+                {/if}
             </span>
-                <EntityLabel ref={$logicalFlow.target}/>
-
-                <button class="btn btn-link"
-                        on:click={() => $logicalFlow = null}>
-                    <Icon name="times"/>
-                    Select different route
-                </button>
-            {/if}
-        </div>
-
-        <!-- PHYS FLOW -->
-        <h3>
-            <Check selected={$physicalFlow}/>
-            Delivery Characteristics
-        </h3>
-
-        <div class="step-body">
-            {#if $physicalFlow}
-                <pre>{JSON.stringify($physicalFlow, "", 2)}</pre>
-
-                <button class="btn btn-link"
-                        on:click={() => $physicalSpecification = null}>
-                    <Icon name="times"/>
-                    Select different specification
-                </button>
-            {:else}
-                <div class="help-block">
-                    Either reuse an existing specification or create a new one using the <em>Add new specification</em> option.
-                </div>
-                <PhysicalSpecificationSelector {specifications}/>
-            {/if}
-        </div>
-
-        <!-- SPEC -->
-        <h3>
-            <Check selected={$physicalSpecification}/>
-            Specification (Payload)
-        </h3>
-
-        <div class="step-body">
-            {#if $physicalSpecification}
-                {$physicalSpecification.name}
-
-                <button class="btn btn-link"
-                        on:click={() => $physicalSpecification = null}>
-                    <Icon name="times"/>
-                    Select different specification
-                </button>
-            {:else if !$logicalFlow}
-                Select a route first
-            {:else}
-                <div class="help-block">
-                    Either reuse an existing specification or create a new one using the <em>Add new specification</em> option.
-                </div>
-                <PhysicalSpecificationSelector {specifications}/>
-            {/if}
-        </div>
-
-        <hr>
-
-        <EntityLink ref={application}>
-            Cancel
-        </EntityLink>
+        {/if}
     </div>
 </PageHeader>
 
 {/if}
 
 
-<style>
-    .flow-arrow {
+<style type="text/scss">
+    @import "../../../style/_variables.scss";
+
+    .incomplete-warning {
+        color: $waltz-amber;
+    }
+
+    .selection-step {
+        border: #EEEEEE 1px solid;
+        padding-bottom: 1em;
         padding-left: 1em;
         padding-right: 1em;
-    }
-    .step-body {
-        margin-left: 1em;
+        margin-bottom: 0.25em;
     }
 </style>

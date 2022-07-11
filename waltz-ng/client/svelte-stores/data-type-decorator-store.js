@@ -18,6 +18,7 @@
 
 import {remote} from "./remote";
 import {entity} from "../common/services/enums/entity";
+import {checkIsEntityRef} from "../common/checks";
 
 export function mkDataTypeDecoratorStore() {
 
@@ -48,10 +49,17 @@ export function mkDataTypeDecoratorStore() {
             null,
             {force});
 
+
+    const save = (ref, command) => remote
+        .execute("POST",
+            `api/data-type-decorator/save/entity/${ref.kind}/${ref.id}`,
+            command);
+
     return {
         findByFlowIds,
         findDatatypeUsageCharacteristics,
-        findBySelector
+        findBySelector,
+        save
     };
 }
 

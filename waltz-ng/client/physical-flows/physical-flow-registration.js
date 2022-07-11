@@ -19,6 +19,7 @@
 import _ from "lodash";
 import {initialiseData} from "../common";
 import {kindToViewState} from "../common/link-utils";
+import {logicalFlow, ViewMode, viewMode} from "./svelte/physical-flow-editor-store";
 
 
 import template from "./physical-flow-registration.html";
@@ -49,7 +50,8 @@ const initialState = {
         loading: false,
         similarFlows: false
     },
-    PhysicalFlowRegistrationView
+    PhysicalFlowRegistrationView,
+    viewMode: ViewMode.SECTION
 };
 
 
@@ -87,6 +89,21 @@ function controller(
     const vm = initialiseData(this, initialState);
     preventNavigationService.setupWarningDialog($scope, () => isDirty());
 
+
+    viewMode.subscribe((mode) => {
+        $scope.$applyAsync(() => {
+            vm.viewMode = mode;
+        });
+    })
+
+    vm.onToggleMode = () => {
+        if (vm.viewMode === ViewMode.SECTION) {
+            viewMode.set(ViewMode.FLOW)
+        } else {
+            viewMode.set(ViewMode.SECTION)
+        }
+    }
+
     vm.similarFlowDefs = [
         withWidth(columnDef.name, "10%"),
         withWidth(columnDef.format, "10%"),
@@ -106,8 +123,13 @@ function controller(
 
     if (targetFlowId) {
         serviceBroker
-            .loadViewData(CORE_API.LogicalFlowStore.getById, [ targetFlowId ])
-            .then(r => vm.targetChanged(r.data));
+            .loadViewData(CORE_API.LogicalFlowStore.getById, [targetFlowId])
+            .then(r => {
+                logicalFlow.set(r.data);
+                vm.targetChanged(r.data);
+            });
+    } else {
+        logicalFlow.set(null);
     }
 
     const viewState = kindToViewState(sourceEntityRef.kind);
