@@ -24,13 +24,24 @@ import org.finos.waltz.model.command.Command;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
 import org.immutables.value.Value;
 
+import java.util.Set;
+
+import static java.util.Collections.emptySet;
+
 @Value.Immutable
 @JsonSerialize(as = ImmutablePhysicalFlowCreateCommand.class)
 @JsonDeserialize(as = ImmutablePhysicalFlowCreateCommand.class)
 public abstract class PhysicalFlowCreateCommand implements Command {
 
     public abstract PhysicalSpecification specification();
+
     public abstract long logicalFlowId();
+
     public abstract FlowAttributes flowAttributes();
+
+    @Value.Default
+    public Set<Long> dataTypeIds() {
+        return emptySet();
+    }
 
 }

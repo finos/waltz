@@ -9,14 +9,14 @@
 
     function handleSelection(evt) {
         const d = evt.detail;
-        
+
         const payload = {
                 columnEntityId: d.id,
                 columnEntityKind: "DATA_TYPE",
                 entityFieldReference: null,
                 columnName: d.name,
-                displayName: null
-            };
+            displayName: null
+        };
 
         if (selectionFilter(payload)) {
             onSelect(payload);
@@ -25,10 +25,24 @@
         }
     }
 
+    function dataTypeSelectionFilter(selectionFilter, datatype) {
+
+        const payload = {
+            columnEntityId: datatype.id,
+            columnEntityKind: "DATA_TYPE",
+            entityFieldReference: null,
+            columnName: datatype.name,
+            displayName: null
+        };
+
+        return selectionFilter(payload);
+    }
+
+
     $: console.log("DTP", {selectionFilter})
 </script>
 
 
 <DataTypeTreeSelector multiSelect={true}
-                      {selectionFilter}
+                      selectionFilter={(d) => dataTypeSelectionFilter(selectionFilter, d)}
                       on:select={handleSelection}/>

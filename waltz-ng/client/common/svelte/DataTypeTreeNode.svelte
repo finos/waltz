@@ -23,10 +23,10 @@
     }
 
     function calcCheckIcon(filterFn, n) {
-        const isUnchecked = filterFn({columnEntityKind: 'DATA_TYPE', columnEntityId: n.id}) 
-        
+        const isUnchecked = filterFn(n);
+
         return isUnchecked
-            ? 'square-o' 
+            ? 'square-o'
             : 'check-square-o';
     }
 
@@ -37,8 +37,8 @@
     <button class="btn btn-plain"
             on:click={toggleExpanded}>
         <Icon size="lg"
-              name={expanded 
-                        ? "caret-down fw" 
+              name={expanded
+                        ? "caret-down fw"
                         : "caret-right fw"}/>
     </button>
     <button class="btn btn-plain"
@@ -84,7 +84,7 @@
                                 </span>
                             {/if}
                         </span>
-                      
+
                     </button>
                 {/if}
             </li>
