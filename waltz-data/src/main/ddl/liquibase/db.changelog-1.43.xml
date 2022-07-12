@@ -115,5 +115,37 @@
                           remarks="An optional reference a qualifier id, to further identify this item of grid data"/>
     </changeSet>
 
+    <!-- TODO: uncomment when the new permission code is ready
 
+    <changeSet id="20220711-6133-6"
+               author="davidwatkins73">
+        <addColumn tableName="permission_group_entry">
+            <column name="entity_kind"
+                    type="${enum.type}"
+                    defaultValue="APPLICATION">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <renameColumn tableName="permission_group_entry"
+                      oldColumnName="application_id"
+                      newColumnName="entity_id"
+                      columnDataType="${id.type}"/>
+        <dropDefaultValue tableName="permission_group_entry"
+                          columnName="entity_kind"/>
+    </changeSet>
+
+
+    <changeSet id="20220711-6133-7"
+               author="davidwatkins73">
+        <setTableRemarks tableName="permission_group_entry"
+                         remarks="entities which have specific permissions which replace the default permission group"/>
+        <setColumnRemarks tableName="permission_group_entry"
+                          columnName="entity_kind"
+                          remarks="the type of the entity being given specific permissions"/>
+        <setColumnRemarks tableName="permission_group_entry"
+                          columnName="entity_id"
+                          remarks="the id of the entity being given specific permissions"/>
+    </changeSet>
+
+    -->
 </databaseChangeLog>
