@@ -97,7 +97,7 @@
                           remarks="optional name, if provided this effectively overrides the associated specification name"/>
         <setColumnRemarks tableName="aggregate_overlay_diagram_instance"
                           columnName="snapshot_data"
-                          remarks="json copy of the data backing this diagram instance.  We each row should be very flat and contain (at a minimum) a column ref so the client can present the appropriate tranche of data in the UI"/>
+                          remarks="json copy of the data backing this diagram instance.  Each row should be very flat and contain (at a minimum) a column ref so the client can present the appropriate tranche of data in the UI"/>
         <setColumnRemarks tableName="assessment_definition"
                           columnName="definition_group"
                           remarks="Used to categorized assessments into a basic 2 level tree, useful when the number of assessments gets large"/>
