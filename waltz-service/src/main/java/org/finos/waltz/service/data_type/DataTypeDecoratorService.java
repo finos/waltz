@@ -18,6 +18,24 @@
 
 package org.finos.waltz.service.data_type;
 
+import org.finos.waltz.data.GenericSelectorFactory;
+import org.finos.waltz.data.datatype_decorator.DataTypeDecoratorDao;
+import org.finos.waltz.data.datatype_decorator.DataTypeDecoratorDaoSelectorFactory;
+import org.finos.waltz.data.logical_flow.LogicalFlowDao;
+import org.finos.waltz.data.physical_specification.PhysicalSpecificationDao;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.HierarchyQueryScope;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.Severity;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.datatype.DataTypeDecorator;
+import org.finos.waltz.model.datatype.DataTypeUsageCharacteristics;
+import org.finos.waltz.model.datatype.ImmutableDataTypeDecorator;
+import org.finos.waltz.model.logical_flow.LogicalFlow;
+import org.finos.waltz.model.physical_specification.PhysicalSpecification;
+import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.data_flow_decorator.LogicalFlowDecoratorRatingsCalculator;
 import org.finos.waltz.service.data_flow_decorator.LogicalFlowDecoratorService;
@@ -25,37 +43,31 @@ import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.finos.waltz.service.physical_flow.PhysicalFlowService;
 import org.finos.waltz.service.physical_specification.PhysicalSpecificationService;
 import org.finos.waltz.service.usage_info.DataTypeUsageService;
-import org.finos.waltz.data.GenericSelectorFactory;
-import org.finos.waltz.data.datatype_decorator.DataTypeDecoratorDao;
-import org.finos.waltz.data.datatype_decorator.DataTypeDecoratorDaoSelectorFactory;
-import org.finos.waltz.data.logical_flow.LogicalFlowDao;
-import org.finos.waltz.data.physical_specification.PhysicalSpecificationDao;
-import org.finos.waltz.model.*;
-import org.finos.waltz.model.changelog.ImmutableChangeLog;
-import org.finos.waltz.model.datatype.DataType;
-import org.finos.waltz.model.datatype.DataTypeDecorator;
-import org.finos.waltz.model.datatype.DataTypeUsageCharacteristics;
-import org.finos.waltz.model.datatype.ImmutableDataTypeDecorator;
-import org.finos.waltz.model.logical_flow.LogicalFlow;
-import org.finos.waltz.model.physical_specification.PhysicalSpecification;
-import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
-import static java.util.Collections.emptyList;
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.CollectionUtilities.*;
+import static org.finos.waltz.common.CollectionUtilities.isEmpty;
+import static org.finos.waltz.common.CollectionUtilities.map;
+import static org.finos.waltz.common.CollectionUtilities.notEmpty;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
-import static org.finos.waltz.common.SetUtilities.asSet;
-import static org.finos.waltz.model.EntityKind.*;
+import static org.finos.waltz.model.EntityKind.ACTOR;
+import static org.finos.waltz.model.EntityKind.APPLICATION;
+import static org.finos.waltz.model.EntityKind.DATA_TYPE;
+import static org.finos.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
+import static org.finos.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 
@@ -336,25 +348,6 @@ public class DataTypeDecoratorService {
                 .map(EntityReference::name)
                 .map(Optional::get)
                 .collect(Collectors.joining(", "));
-    }
-
-
-    public Collection<DataType> findSuggestedByEntityRef(EntityReference entityReference) {
-
-        if (!asSet(LOGICAL_DATA_FLOW, PHYSICAL_SPECIFICATION).contains(entityReference.kind())){
-            throw new UnsupportedOperationException(format("Cannot find suggested data types for entity kind: %s", entityReference.kind()));
-        }
-
-        // finds all flows for this entity
-        List<LogicalFlow> logicalFlows = logicalFlowService.findBySelector(mkOpts(entityReference));
-
-        if(isEmpty(logicalFlows)){
-            return emptyList();
-        } else {
-            //finds the first flow -- used by logical flows and specs only!
-            LogicalFlow flow = first(logicalFlows);
-            return dataTypeService.findSuggestedBySourceEntityRef(flow.source());
-        }
     }
 
 

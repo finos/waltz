@@ -1,4 +1,3 @@
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
@@ -38,44 +37,54 @@ function store($http, BaseApiUrl) {
         .get(`${BASE}/code/${code}`)
         .then(r => r.data);
 
+    const findSuggestedByEntityRef = (ref) => $http
+        .get(`${BASE}/suggested/entity/${ref.kind}/${ref.id}`)
+        .then(r => r.data);
+
     return {
         findAll,
         search,
         getDataTypeById,
-        getDataTypeByCode
+        getDataTypeByCode,
+        findSuggestedByEntityRef
     };
 }
 
 
 store.$inject = [
-    '$http',
-    'BaseApiUrl'
+    "$http",
+    "BaseApiUrl"
 ];
 
 
-const serviceName = 'DataTypeStore';
+const serviceName = "DataTypeStore";
 
 
 export const DataTypeStore_API = {
     findAll: {
         serviceName,
-        serviceFnName: 'findAll',
-        description: 'finds all data types'
+        serviceFnName: "findAll",
+        description: "finds all data types"
     },
     search: {
         serviceName,
-        serviceFnName: 'search',
-        description: 'search data types'
+        serviceFnName: "search",
+        description: "search data types"
     },
     getDataTypeById: {
         serviceName,
-        serviceFnName: 'getDataTypeById',
-        description: 'get datatype by id'
+        serviceFnName: "getDataTypeById",
+        description: "get datatype by id"
     },
     getDataTypeByCode: {
         serviceName,
-        serviceFnName: 'getDataTypeByCode',
-        description: 'get datatype by code'
+        serviceFnName: "getDataTypeByCode",
+        description: "get datatype by code"
+    },
+    findSuggestedByEntityRef: {
+        serviceName,
+        serviceFnName: "findSuggestedByEntityRef",
+        description: "find suggested types based on the given [ref]"
     }
 };
 
