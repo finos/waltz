@@ -95,4 +95,12 @@ class OrgUnitExtractorTest {
                 .from(ORGANISATIONAL_UNIT);
     }
 
+    private ObjectMapper createMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper
+                .registerModule(new JavaTimeModule())
+                .registerModule(new Jdk8Module())
+                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+    }
 }
