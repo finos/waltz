@@ -1,0 +1,151 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="db.changelog-1.43.xml">
+
+    <changeSet id="v1-42-tag"
+               author="davidwatkins73">
+        <tagDatabase tag="v1.42"/> <!-- tag the current db version, i.e. the last  -->
+    </changeSet>
+
+
+    <changeSet id="20220711-6133-1"
+               author="davidwatkins73">
+        <addColumn tableName="assessment_definition">
+            <column name="definition_group"
+                    type="${name.type}"
+                    defaultValue="Uncategorized">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="assessment_definition">
+            <column name="qualifier_kind"
+                    type="${enum.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="assessment_definition">
+            <column name="qualifier_id"
+                    type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+    <changeSet id="20220711-6133-2"
+               author="davidwatkins73">
+        <addColumn tableName="report_grid_column_definition">
+            <column name="column_qualifier_kind"
+                    type="${enum.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="report_grid_column_definition">
+            <column name="column_qualifier_id"
+                    type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+    <changeSet id="20220711-6133-3"
+               author="davidwatkins73">
+        <addColumn tableName="aggregate_overlay_diagram_instance">
+            <column name="snapshot_data"
+                    type="${clob.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+    <changeSet id="20220711-6133-4"
+               author="davidwatkins73">
+        <addColumn tableName="physical_flow">
+            <column name="name"
+                    type="${name.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+    <changeSet id="20220711-6133-5"
+               author="davidwatkins73">
+        <setColumnRemarks tableName="physical_flow"
+                          columnName="name"
+                          remarks="optional name, if provided this effectively overrides the associated specification name"/>
+        <setColumnRemarks tableName="aggregate_overlay_diagram_instance"
+                          columnName="snapshot_data"
+                          remarks="json copy of the data backing this diagram instance.  Each row should be very flat and contain (at a minimum) a column ref so the client can present the appropriate tranche of data in the UI"/>
+        <setColumnRemarks tableName="assessment_definition"
+                          columnName="definition_group"
+                          remarks="Used to categorized assessments into a basic 2 level tree, useful when the number of assessments gets large"/>
+        <setColumnRemarks tableName="assessment_definition"
+                          columnName="qualifier_kind"
+                          remarks="An optional reference a qualifier kind, to further identify where this assessment is applicable"/>
+        <setColumnRemarks tableName="assessment_definition"
+                          columnName="qualifier_id"
+                          remarks="An optional reference a qualifier id, to further identify where this assessment is applicable"/>
+        <setColumnRemarks tableName="report_grid_column_definition"
+                          columnName="column_qualifier_kind"
+                          remarks="An optional reference a qualifier kind, to further identify this item of grid data"/>
+        <setColumnRemarks tableName="report_grid_column_definition"
+                          columnName="column_qualifier_id"
+                          remarks="An optional reference a qualifier id, to further identify this item of grid data"/>
+    </changeSet>
+
+    <!-- TODO: uncomment when the new permission code is ready
+
+    <changeSet id="20220711-6133-6"
+               author="davidwatkins73">
+        <addColumn tableName="permission_group_entry">
+            <column name="entity_kind"
+                    type="${enum.type}"
+                    defaultValue="APPLICATION">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <renameColumn tableName="permission_group_entry"
+                      oldColumnName="application_id"
+                      newColumnName="entity_id"
+                      columnDataType="${id.type}"/>
+        <dropDefaultValue tableName="permission_group_entry"
+                          columnName="entity_kind"/>
+    </changeSet>
+
+
+    <changeSet id="20220711-6133-7"
+               author="davidwatkins73">
+        <setTableRemarks tableName="permission_group_entry"
+                         remarks="entities which have specific permissions which replace the default permission group"/>
+        <setColumnRemarks tableName="permission_group_entry"
+                          columnName="entity_kind"
+                          remarks="the type of the entity being given specific permissions"/>
+        <setColumnRemarks tableName="permission_group_entry"
+                          columnName="entity_id"
+                          remarks="the id of the entity being given specific permissions"/>
+    </changeSet>
+
+    -->
+</databaseChangeLog>
