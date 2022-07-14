@@ -40,6 +40,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.finos.waltz.common.Checks.*;
@@ -96,6 +97,13 @@ public class InvolvementService {
         checkNotEmpty(employeeId, "employeeId cannot be empty");
         return involvementDao.findByEmployeeId(employeeId);
     }
+
+
+    public Set<Long> findExistingInvolvementKindIdsForUser(EntityReference entityReference, String username) {
+        checkNotEmpty(username, "username cannot be empty");
+        return involvementDao.findExistingInvolvementKindIdsForUser(entityReference, username);
+    }
+
 
     public List<Involvement> findAllByEmployeeId(String employeeId) {
         return involvementDao.findAllByEmployeeId(employeeId);

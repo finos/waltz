@@ -18,6 +18,7 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.model.Operation;
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.DatumRoute;
@@ -43,6 +44,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.finos.waltz.web.WebUtilities.*;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
@@ -79,6 +81,7 @@ public class LogicalFlowEndpoint implements Endpoint {
         String findByIdsPath = mkPath(BASE_URL, "ids");
         String findBySourceAndTargetsPath = mkPath(BASE_URL, "source-targets");
         String findStatsPath = mkPath(BASE_URL, "stats");
+        String findFlowPermissionsPath = mkPath(BASE_URL, "entity", ":kind", ":id", "permissions");
         String findUpstreamFlowsForEntityReferencesPath = mkPath(BASE_URL, "find-upstream-flows");
         String getByIdPath = mkPath(BASE_URL, ":id");
         String removeFlowPath = mkPath(BASE_URL, ":id");
@@ -102,6 +105,10 @@ public class LogicalFlowEndpoint implements Endpoint {
             return logicalFlowService.findUpstreamFlowsForEntityReferences(newArrayList(refs));
         };
 
+        ListRoute<Operation> findFlowPermissionsRoute = (request, response) -> logicalFlowService.findFlowPermissionsForParentEntity(
+                getEntityReference(request),
+                getUsername(request));
+
         DatumRoute<LogicalFlowStatistics> findStatsRoute = (request, response)
                 -> logicalFlowService.calculateStats(readIdSelectionOptionsFromBody(request));
 
@@ -117,6 +124,7 @@ public class LogicalFlowEndpoint implements Endpoint {
         getForDatum(cleanupOrphansPath, this::cleanupOrphansRoute);
         getForDatum(cleanupSelfReferencesPath, this::cleanupSelfReferencingFlowsRoute);
         getForList(findByEntityPath, getByEntityRef);
+        getForList(findFlowPermissionsPath, findFlowPermissionsRoute);
         getForDatum(getByIdPath, getByIdRoute);
         getForDatum(getFlowGraphSummaryPath, getGraphSummaryRoute);
         postForList(findByIdsPath, findByIdsRoute);
@@ -214,5 +222,4 @@ public class LogicalFlowEndpoint implements Endpoint {
     private void ensureUserHasAdminRights(Request request) {
         requireRole(userRoleService, request, SystemRole.ADMIN);
     }
-
 }

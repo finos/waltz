@@ -33,10 +33,13 @@ import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.datatype.DataType;
 import org.finos.waltz.model.datatype.ImmutableDataTypeDecorator;
 import org.finos.waltz.model.logical_flow.*;
+import org.finos.waltz.model.permission_group.Permission;
 import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
 import org.finos.waltz.model.tally.TallyPack;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.data_type.DataTypeService;
+import org.finos.waltz.service.involvement.InvolvementService;
+import org.finos.waltz.service.permission.PermissionGroupService;
 import org.finos.waltz.service.usage_info.DataTypeUsageService;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -80,6 +83,8 @@ public class LogicalFlowService {
     private final LogicalFlowDao logicalFlowDao;
     private final LogicalFlowStatsDao logicalFlowStatsDao;
     private final LogicalFlowDecoratorDao logicalFlowDecoratorDao;
+    private final InvolvementService involvementService;
+    private final PermissionGroupService permissionGroupService;
 
     private final ApplicationIdSelectorFactory appIdSelectorFactory = new ApplicationIdSelectorFactory();
     private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory = new LogicalFlowIdSelectorFactory();
@@ -93,7 +98,10 @@ public class LogicalFlowService {
                               DBExecutorPoolInterface dbExecutorPool,
                               LogicalFlowDao logicalFlowDao,
                               LogicalFlowStatsDao logicalFlowStatsDao,
-                              LogicalFlowDecoratorDao logicalFlowDecoratorDao) {
+                              LogicalFlowDecoratorDao logicalFlowDecoratorDao,
+                              InvolvementService involvementService,
+                              PermissionGroupService permissionGroupService) {
+
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(dbExecutorPool, "dbExecutorPool cannot be null");
         checkNotNull(dataTypeService, "dataTypeService cannot be null");
@@ -101,6 +109,8 @@ public class LogicalFlowService {
         checkNotNull(logicalFlowDao, "logicalFlowDao must not be null");
         checkNotNull(logicalFlowDecoratorDao, "logicalFlowDataTypeDecoratorDao cannot be null");
         checkNotNull(logicalFlowStatsDao, "logicalFlowStatsDao cannot be null");
+        checkNotNull(involvementService, "involvementService cannot be null");
+        checkNotNull(permissionGroupService, "permissionGroupService cannot be null");
 
         this.changeLogService = changeLogService;
         this.dataTypeService = dataTypeService;
@@ -109,6 +119,8 @@ public class LogicalFlowService {
         this.logicalFlowDao = logicalFlowDao;
         this.logicalFlowStatsDao = logicalFlowStatsDao;
         this.logicalFlowDecoratorDao = logicalFlowDecoratorDao;
+        this.involvementService = involvementService;
+        this.permissionGroupService = permissionGroupService;
     }
 
 
@@ -374,8 +386,28 @@ public class LogicalFlowService {
     }
 
 
+    public Set<Operation> findFlowPermissionsForParentEntity(EntityReference entityReference,
+                                                             String username) {
 
-        private void attemptToAddUnknownDecoration(LogicalFlow logicalFlow, String username) {
+        Set<Long> invsForUser = involvementService.findExistingInvolvementKindIdsForUser(entityReference, username);
+
+        Set<Operation> operationsForEntityAssessment = permissionGroupService
+                .findPermissionsForParentReference(entityReference, username)
+                .stream()
+                .filter(p -> p.subjectKind().equals(LOGICAL_DATA_FLOW)
+                        && p.parentKind().equals(entityReference.kind()))
+                .filter(p -> p.requiredInvolvementsResult().isAllowed(invsForUser))
+                .map(Permission::operation)
+                .collect(Collectors.toSet());
+
+        return logicalFlowDao.calculateAmendedFlowOperations(
+                operationsForEntityAssessment,
+                entityReference,
+                username);
+    }
+
+
+    private void attemptToAddUnknownDecoration(LogicalFlow logicalFlow, String username) {
         dataTypeService
                 .getUnknownDataType()
                 .flatMap(IdProvider::id)
