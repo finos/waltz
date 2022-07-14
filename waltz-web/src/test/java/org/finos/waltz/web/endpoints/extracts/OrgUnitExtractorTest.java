@@ -2,13 +2,12 @@ package org.finos.waltz.web.endpoints.extracts;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.finos.waltz.schema.tables.records.OrganisationalUnitRecord;
-import org.finos.waltz.web.json.CellValue;
-import org.finos.waltz.web.json.Row;
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Record6;
+import org.jooq.Result;
+import org.jooq.SQLDialect;
+import org.jooq.SelectJoinStep;
 import org.jooq.impl.DSL;
 import org.jooq.tools.jdbc.MockConnection;
 import org.jooq.tools.jdbc.MockDataProvider;
@@ -21,14 +20,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import spark.Request;
 import spark.Response;
 
-import javax.persistence.MapKeyColumn;
-import javax.persistence.MapKeyJoinColumn;
 import java.io.IOException;
 import java.sql.Connection;
-import java.util.List;
 
 import static org.finos.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -84,6 +82,7 @@ class OrgUnitExtractorTest {
         return DSL.using(connection, SQLDialect.SQLSERVER2017);
     }
 
+
     private SelectJoinStep<Record6<Long, Long, String, String, String, String>> createDummyQuery(){
         return testDslContext
                 .select(
@@ -96,12 +95,4 @@ class OrgUnitExtractorTest {
                 .from(ORGANISATIONAL_UNIT);
     }
 
-    private ObjectMapper createMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper
-                .registerModule(new JavaTimeModule())
-                .registerModule(new Jdk8Module())
-                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-
-    }
 }
