@@ -59,12 +59,14 @@ import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.SetUtilities.fromCollection;
+import static org.finos.waltz.common.SetUtilities.union;
 import static org.finos.waltz.model.EntityKind.DATA_TYPE;
 import static org.finos.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
 import static org.finos.waltz.model.EntityReference.mkRef;
@@ -394,7 +396,7 @@ public class LogicalFlowService {
         Set<Operation> operationsForEntityAssessment = permissionGroupService
                 .findPermissionsForParentReference(entityReference, username)
                 .stream()
-                .filter(p -> p.subjectKind().equals(LOGICAL_DATA_FLOW)
+                .filter(p -> p.subjectKind().equals(EntityKind.LOGICAL_DATA_FLOW)
                         && p.parentKind().equals(entityReference.kind()))
                 .filter(p -> p.requiredInvolvementsResult().isAllowed(invsForUser))
                 .map(Permission::operation)
@@ -404,6 +406,21 @@ public class LogicalFlowService {
                 operationsForEntityAssessment,
                 entityReference,
                 username);
+    }
+
+
+    public Set<Operation> findPermissionsForFlow(Long flowId,
+                                                 String username) {
+
+        LogicalFlow flow = logicalFlowDao.getByFlowId(flowId);
+
+        if (flow.isReadOnly()) {
+            return emptySet();
+        } else {
+            Set<Operation> sourcePermissions = findFlowPermissionsForParentEntity(flow.source(), username);
+            Set<Operation> targetPermissions = findFlowPermissionsForParentEntity(flow.target(), username);
+            return union(sourcePermissions, targetPermissions);
+        }
     }
 
 

@@ -21,8 +21,7 @@
     <!-- ACTIONS -->
     <waltz-section-actions>
         <!-- Edit Logical Split button -->
-        <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR"
-             ng-if="$ctrl.activeTab.id === 'SUMMARY' && !$ctrl.isAnyEditorVisible()">
+        <div ng-if="$ctrl.canEdit && $ctrl.activeTab.id === 'SUMMARY' && !$ctrl.isAnyEditorVisible()">
             <div class="btn-group"
                  uib-dropdown>
 
@@ -101,7 +100,6 @@
                                entities="['LOGICAL_DATA_FLOW', 'PHYSICAL_SPECIFICATION', 'PHYSICAL_FLOW']">
     </waltz-source-data-overlay>
 
-    <h4>Hi there!!!</h4>
     <div class="waltz-tabs">
         <input ng-repeat-start="tab in $ctrl.tabs"
                type="radio"

@@ -150,6 +150,14 @@ function controller(serviceBroker) {
                 CORE_API.TagStore.findTagsByEntityKindAndTargetSelector,
                 [entity.LOGICAL_DATA_FLOW.key, mkSelectionOptions(vm.parentEntityRef)])
             .then(r => vm.tags = r.data);
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.LogicalFlowStore.findPermissionsForParentRef,
+                [vm.parentEntityRef])
+            .then(r => {
+                vm.canEdit = _.some(r.data, d => _.includes(["ADD", "UPDATE", "REMOVE"], d));
+            });
     }
 
     vm.$onInit = () => {

@@ -199,6 +199,7 @@ public class AssessmentRatingEndpoint implements Endpoint {
     }
 
 
+    // maybe need to update this
     private void verifyCanWrite(Request request, long defId) {
         AssessmentDefinition def = assessmentDefinitionService.getById(defId);
         def.permittedRole().ifPresent(r -> requireRole(userRoleService, request, r));

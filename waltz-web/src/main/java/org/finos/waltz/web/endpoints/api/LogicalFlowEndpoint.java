@@ -81,7 +81,8 @@ public class LogicalFlowEndpoint implements Endpoint {
         String findByIdsPath = mkPath(BASE_URL, "ids");
         String findBySourceAndTargetsPath = mkPath(BASE_URL, "source-targets");
         String findStatsPath = mkPath(BASE_URL, "stats");
-        String findFlowPermissionsPath = mkPath(BASE_URL, "entity", ":kind", ":id", "permissions");
+        String findFlowPermissionsForParentEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id", "permissions");
+        String findPermissionsForFlowPath = mkPath(BASE_URL, "id", ":id", "permissions");
         String findUpstreamFlowsForEntityReferencesPath = mkPath(BASE_URL, "find-upstream-flows");
         String getByIdPath = mkPath(BASE_URL, ":id");
         String removeFlowPath = mkPath(BASE_URL, ":id");
@@ -105,8 +106,15 @@ public class LogicalFlowEndpoint implements Endpoint {
             return logicalFlowService.findUpstreamFlowsForEntityReferences(newArrayList(refs));
         };
 
-        ListRoute<Operation> findFlowPermissionsRoute = (request, response) -> logicalFlowService.findFlowPermissionsForParentEntity(
-                getEntityReference(request),
+        ListRoute<Operation> findFlowPermissionsForParentEntityRoute = (request, response) -> {
+            EntityReference entityReference = getEntityReference(request);
+            return logicalFlowService.findFlowPermissionsForParentEntity(
+                    entityReference,
+                    getUsername(request));
+        };
+
+        ListRoute<Operation> findPermissionsForFlowRoute = (request, response) -> logicalFlowService.findPermissionsForFlow(
+                getId(request),
                 getUsername(request));
 
         DatumRoute<LogicalFlowStatistics> findStatsRoute = (request, response)
@@ -124,7 +132,8 @@ public class LogicalFlowEndpoint implements Endpoint {
         getForDatum(cleanupOrphansPath, this::cleanupOrphansRoute);
         getForDatum(cleanupSelfReferencesPath, this::cleanupSelfReferencingFlowsRoute);
         getForList(findByEntityPath, getByEntityRef);
-        getForList(findFlowPermissionsPath, findFlowPermissionsRoute);
+        getForList(findFlowPermissionsForParentEntityPath, findFlowPermissionsForParentEntityRoute);
+        getForList(findPermissionsForFlowPath, findPermissionsForFlowRoute);
         getForDatum(getByIdPath, getByIdRoute);
         getForDatum(getFlowGraphSummaryPath, getGraphSummaryRoute);
         postForList(findByIdsPath, findByIdsRoute);
