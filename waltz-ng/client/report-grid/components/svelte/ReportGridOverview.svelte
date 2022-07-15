@@ -139,11 +139,10 @@
                         <td>Kind</td>
                         <td>{_.get(reportGridKinds[$selectedGrid?.definition?.kind], 'name', 'Unknown Kind')}</td>
                     </tr>
-                    <tr style="display:none;">
-                        <td>id</td>
-                        <td>{_.get(reportGridKinds[$selectedGrid?.definition?.externalId], 'id', 'Unknown id')}</td>
+                    <tr id="report-grid-identifier-externalId" style="display:none;">
+                        <td>externalId</td>
+                        <td>{$selectedGrid?.definition?.externalId}</td>
                     </tr>
-
                     <tr>
                         <td>Owners</td>
                         <td>
