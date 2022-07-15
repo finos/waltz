@@ -31,6 +31,8 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class OrgUnitExtractorTest {
+
+    private final ObjectMapper objectMapper = createMapper();
     private DSLContext testDslContext;
     private OrgUnitExtractor orgUnitExtractor;
 
@@ -55,8 +57,7 @@ class OrgUnitExtractorTest {
         assertTrue(obj instanceof String);
         String responseJSON = (String)obj;
         assertTrue(responseJSON.length()>0);
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode node = mapper.readTree(responseJSON);
+        JsonNode node = objectMapper.readTree(responseJSON);
         JsonNode arrElement = node.get(0);
         assertNotNull(arrElement);
         assertEquals("1", arrElement.get("id").asText());
