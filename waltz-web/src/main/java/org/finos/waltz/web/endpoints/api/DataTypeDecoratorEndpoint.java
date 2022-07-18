@@ -19,6 +19,7 @@
 package org.finos.waltz.web.endpoints.api;
 
 
+import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.datatype.DataType;
@@ -26,8 +27,8 @@ import org.finos.waltz.model.datatype.DataTypeDecorator;
 import org.finos.waltz.model.datatype.DataTypeUsageCharacteristics;
 import org.finos.waltz.service.data_type.DataTypeDecoratorService;
 import org.finos.waltz.service.data_type.DataTypeService;
+import org.finos.waltz.service.permission.permission_checker.FlowPermissionChecker;
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
-import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.WebUtilities;
 import org.finos.waltz.web.action.UpdateDataTypeDecoratorAction;
@@ -55,25 +56,21 @@ public class DataTypeDecoratorEndpoint implements Endpoint {
     private static final String BASE_URL = mkPath("api", "data-type-decorator");
 
     private final DataTypeDecoratorService dataTypeDecoratorService;
-    private final UserRoleService userRoleService;
+    private final FlowPermissionChecker flowPermissionChecker;
     private final DataTypeService dataTypeService;
-    private final LogicalFlowService logicalFlowService;
 
 
     @Autowired
     public DataTypeDecoratorEndpoint(DataTypeDecoratorService dataTypeDecoratorService,
                                      DataTypeService dataTypeService,
-                                     UserRoleService userRoleService,
-                                     LogicalFlowService logicalFlowService) {
+                                     FlowPermissionChecker flowPermissionChecker) {
         checkNotNull(dataTypeDecoratorService, "DataTypeDecoratorService cannot be null");
-        checkNotNull(userRoleService, "userRoleService cannot be null");
+        checkNotNull(flowPermissionChecker, "userRoleService cannot be null");
         checkNotNull(dataTypeService, "dataTypeService cannot be null");
-        checkNotNull(logicalFlowService, "logicalFlowService cannot be null");
 
         this.dataTypeDecoratorService = dataTypeDecoratorService;
-        this.userRoleService = userRoleService;
+        this.flowPermissionChecker = flowPermissionChecker;
         this.dataTypeService = dataTypeService;
-        this.logicalFlowService = logicalFlowService;
     }
 
 
@@ -110,8 +107,7 @@ public class DataTypeDecoratorEndpoint implements Endpoint {
                         .findDatatypeUsageCharacteristics(getEntityReference(req));
 
         ListRoute<Operation> findPermissionsRoute = (req, res) ->
-                dataTypeDecoratorService
-                        .findPermissions(getEntityReference(req), getUsername(req));
+                flowPermissionChecker.findPermissionsForDecorator(getEntityReference(req), getUsername(req));
 
         getForList(findByEntityReference, findByEntityReferenceRoute);
         getForList(findSuggestedByEntityRefPath, findSuggestedByEntityRefRoute);
@@ -123,7 +119,7 @@ public class DataTypeDecoratorEndpoint implements Endpoint {
     }
 
 
-    private boolean updateDataTypesRoute(Request request, Response response) throws IOException {
+    private boolean updateDataTypesRoute(Request request, Response response) throws IOException, InsufficientPrivelegeException {
 
         String userName = WebUtilities.getUsername(request);
         UpdateDataTypeDecoratorAction action = readBody(request, UpdateDataTypeDecoratorAction.class);
@@ -138,14 +134,9 @@ public class DataTypeDecoratorEndpoint implements Endpoint {
 
 
     private void checkHasPermissionToUpdateDataTypes(EntityReference ref,
-                                                     String username) {
-
-        Set<Operation> permissions = dataTypeDecoratorService.findPermissions(ref, username);
-        Set<Operation> editPermissions = intersection(permissions, asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE));
-
-        checkTrue(
-                notEmpty(editPermissions),
-                format("User does not have permission to edit data types for this %s", ref.kind().prettyName()));
+                                                     String username) throws InsufficientPrivelegeException {
+        Set<Operation> permissions = flowPermissionChecker.findPermissionsForDecorator(ref, username);
+        flowPermissionChecker.verifyEditPerms(permissions, ref.kind(), username);
     }
 
 }

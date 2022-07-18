@@ -18,7 +18,10 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.common.exception.InsufficientPrivelegeException;
+import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.Operation;
+import org.finos.waltz.service.permission.permission_checker.FlowPermissionChecker;
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.DatumRoute;
@@ -65,16 +68,20 @@ public class LogicalFlowEndpoint implements Endpoint {
 
     private final LogicalFlowService logicalFlowService;
     private final UserRoleService userRoleService;
+    private final FlowPermissionChecker flowPermissionChecker;
 
 
     @Autowired
     public LogicalFlowEndpoint(LogicalFlowService logicalFlowService,
-                               UserRoleService userRoleService) {
+                               UserRoleService userRoleService,
+                               FlowPermissionChecker flowPermissionChecker) {
         checkNotNull(logicalFlowService, "logicalFlowService must not be null");
         checkNotNull(userRoleService, "userRoleService must not be null");
+        checkNotNull(flowPermissionChecker, "flowPermissionService must not be null");
 
         this.logicalFlowService = logicalFlowService;
         this.userRoleService = userRoleService;
+        this.flowPermissionChecker = flowPermissionChecker;
     }
 
 
@@ -112,12 +119,12 @@ public class LogicalFlowEndpoint implements Endpoint {
 
         ListRoute<Operation> findFlowPermissionsForParentEntityRoute = (request, response) -> {
             EntityReference entityReference = getEntityReference(request);
-            return logicalFlowService.findFlowPermissionsForParentEntity(
+            return flowPermissionChecker.findFlowPermissionsForParentEntity(
                     entityReference,
                     getUsername(request));
         };
 
-        ListRoute<Operation> findPermissionsForFlowRoute = (request, response) -> logicalFlowService.findPermissionsForFlow(
+        ListRoute<Operation> findPermissionsForFlowRoute = (request, response) -> flowPermissionChecker.findPermissionsForFlow(
                 getId(request),
                 getUsername(request));
 
@@ -191,7 +198,7 @@ public class LogicalFlowEndpoint implements Endpoint {
     }
 
 
-    private LogicalFlow addFlowRoute(Request request, Response response) throws IOException {
+    private LogicalFlow addFlowRoute(Request request, Response response) throws IOException, InsufficientPrivelegeException {
 
         String username = getUsername(request);
         AddLogicalFlowCommand addCmd = readBody(request, AddLogicalFlowCommand.class);
@@ -227,7 +234,7 @@ public class LogicalFlowEndpoint implements Endpoint {
 
 
     private void ensureUserHasEditRights(Long id, String username) {
-        Set<Operation> permissionsForFlow = logicalFlowService.findPermissionsForFlow(id, username);
+        Set<Operation> permissionsForFlow = flowPermissionChecker.findPermissionsForFlow(id, username);
         Set<Operation> editPermissions = intersection(permissionsForFlow, asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE));
 
         checkTrue(
@@ -236,13 +243,9 @@ public class LogicalFlowEndpoint implements Endpoint {
     }
 
 
-    private void ensureUserHasEditRights(EntityReference source, EntityReference target, String username) {
-        Set<Operation> permissionsForFlow = logicalFlowService.findPermissionsForSourceAndTarget(source, target, username);
-        Set<Operation> editPermissions = intersection(permissionsForFlow, asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE));
-
-        checkTrue(
-                notEmpty(editPermissions),
-                "User does not have permission to edit this flow");
+    private void ensureUserHasEditRights(EntityReference source, EntityReference target, String username) throws InsufficientPrivelegeException {
+        Set<Operation> permissionsForFlow = flowPermissionChecker.findPermissionsForSourceAndTarget(source, target, username);
+        flowPermissionChecker.verifyEditPerms(permissionsForFlow, EntityKind.LOGICAL_DATA_FLOW, username);
     }
 
 

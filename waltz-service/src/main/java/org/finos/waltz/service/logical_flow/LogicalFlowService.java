@@ -51,7 +51,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -388,49 +391,6 @@ public class LogicalFlowService {
     }
 
 
-    public Set<Operation> findFlowPermissionsForParentEntity(EntityReference entityReference,
-                                                             String username) {
-
-        Set<Long> invsForUser = involvementService.findExistingInvolvementKindIdsForUser(entityReference, username);
-
-        Set<Operation> operationsForEntityAssessment = permissionGroupService
-                .findPermissionsForParentReference(entityReference, username)
-                .stream()
-                .filter(p -> p.subjectKind().equals(EntityKind.LOGICAL_DATA_FLOW)
-                        && p.parentKind().equals(entityReference.kind()))
-                .filter(p -> p.requiredInvolvementsResult().isAllowed(invsForUser))
-                .map(Permission::operation)
-                .collect(Collectors.toSet());
-
-        return logicalFlowDao.calculateAmendedFlowOperations(
-                operationsForEntityAssessment,
-                entityReference,
-                username);
-    }
-
-
-    public Set<Operation> findPermissionsForFlow(Long flowId,
-                                                 String username) {
-
-        LogicalFlow flow = logicalFlowDao.getByFlowId(flowId);
-
-        if (flow.isReadOnly()) {
-            return emptySet();
-        } else {
-            return findPermissionsForSourceAndTarget(flow.source(), flow.target(), username);
-        }
-    }
-
-
-    public Set<Operation> findPermissionsForSourceAndTarget(EntityReference source,
-                                                            EntityReference target,
-                                                            String username) {
-        Set<Operation> sourcePermissions = findFlowPermissionsForParentEntity(source, username);
-        Set<Operation> targetPermissions = findFlowPermissionsForParentEntity(target, username);
-        return union(sourcePermissions, targetPermissions);
-    }
-
-
     private void attemptToAddUnknownDecoration(LogicalFlow logicalFlow, String username) {
         dataTypeService
                 .getUnknownDataType()
@@ -448,6 +408,7 @@ public class LogicalFlowService {
                         .build())
                 .map(decoration -> logicalFlowDecoratorDao.addDecorators(newArrayList(decoration)));
     }
+
 
     private String getAssociatedDatatypeNamesAsCsv(Long flowId) {
         IdSelectionOptions idSelectionOptions = IdSelectionOptions.mkOpts(

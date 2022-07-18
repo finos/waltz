@@ -32,11 +32,9 @@ import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.assessment_rating.*;
 import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
-import org.finos.waltz.model.permission_group.Permission;
 import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.service.changelog.ChangeLogService;
-import org.finos.waltz.service.involvement.InvolvementService;
-import org.finos.waltz.service.permission.PermissionGroupService;
+import org.finos.waltz.service.permission.permission_checker.RatingPermissionChecker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +44,6 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.SetUtilities.asSet;
-import static org.finos.waltz.common.SetUtilities.hasIntersection;
 import static org.finos.waltz.model.EntityReference.mkRef;
 
 @Service
@@ -56,8 +53,7 @@ public class AssessmentRatingService {
     private final AssessmentDefinitionDao assessmentDefinitionDao;
     private final RatingSchemeDAO ratingSchemeDAO;
     private final ChangeLogService changeLogService;
-    private final PermissionGroupService permissionGroupService;
-    private final InvolvementService involvementService;
+    private final RatingPermissionChecker ratingPermissionChecker;
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
 
 
@@ -67,20 +63,18 @@ public class AssessmentRatingService {
             AssessmentDefinitionDao assessmentDefinitionDao,
             RatingSchemeDAO ratingSchemeDAO,
             ChangeLogService changeLogService,
-            PermissionGroupService permissionGroupService,
-            InvolvementService involvementService) {
+            RatingPermissionChecker ratingPermissionChecker) {
+
         checkNotNull(assessmentRatingDao, "assessmentRatingDao cannot be null");
         checkNotNull(assessmentDefinitionDao, "assessmentDefinitionDao cannot be null");
         checkNotNull(ratingSchemeDAO, "ratingSchemeDao cannot be null");
+        checkNotNull(ratingPermissionChecker, "ratingPermissionChecker cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
-        checkNotNull(involvementService, "involvementService cannot be null");
-        checkNotNull(permissionGroupService, "permissionGroupService cannot be null");
 
-        this.permissionGroupService = permissionGroupService;
+        this.ratingPermissionChecker = ratingPermissionChecker;
         this.assessmentRatingDao = assessmentRatingDao;
         this.ratingSchemeDAO = ratingSchemeDAO;
         this.assessmentDefinitionDao = assessmentDefinitionDao;
-        this.involvementService = involvementService;
         this.changeLogService = changeLogService;
 
     }
@@ -168,6 +162,7 @@ public class AssessmentRatingService {
         return assessmentRatingDao.remove(command);
     }
 
+
     public boolean bulkStore(BulkAssessmentRatingCommand[] commands,
                              long assessmentDefinitionId,
                              String username) {
@@ -182,6 +177,7 @@ public class AssessmentRatingService {
         return addedResult + updateResult > 1;
     }
 
+
     public boolean bulkDelete(BulkAssessmentRatingCommand[] commands,
                               long assessmentDefinitionId,
                               String username) {
@@ -195,52 +191,17 @@ public class AssessmentRatingService {
 
     private Set<AssessmentRating> getRatingsFilterByOperation(BulkAssessmentRatingCommand[] commands,
                                                               long assessmentDefinitionId,
-                                                              String username, Operation operation) {
+                                                              String username,
+                                                              Operation operation) {
         return Arrays.stream(commands)
                 .filter(c -> c.operation().equals(operation))
                 .map(command -> getAssessmentRating(command, assessmentDefinitionId, username))
                 .collect(Collectors.toSet());
     }
 
-    private AssessmentRating getAssessmentRating(BulkAssessmentRatingCommand command,
-                                                 Long assessmentDefinitionId,
-                                                 String username) {
-        UserTimestamp lastUpdate = UserTimestamp.mkForUser(username);
-        return ImmutableAssessmentRating.builder()
-                .assessmentDefinitionId(assessmentDefinitionId)
-                .entityReference(command.entityRef())
-                .ratingId(command.ratingId())
-                .comment(command.comment())
-                .lastUpdatedAt(lastUpdate.at())
-                .lastUpdatedBy(lastUpdate.by())
-                .provenance("waltz")
-                .build();
-    }
 
-
-    public Set<Operation> findRatingPermissions(EntityReference entityReference,
-                                                long assessmentDefinitionId,
-                                                String username) {
-
-        Set<Long> invsForUser = involvementService.findExistingInvolvementKindIdsForUser(entityReference, username);
-
-        Set<Operation> operationsForEntityAssessment = permissionGroupService
-                .findPermissionsForParentReference(entityReference, username)
-                .stream()
-                .filter(p -> p.subjectKind().equals(EntityKind.ASSESSMENT_RATING)
-                        && p.parentKind().equals(entityReference.kind())
-                        && p.qualifierReference()
-                        .map(ref -> mkRef(EntityKind.ASSESSMENT_DEFINITION, assessmentDefinitionId).equals(ref))
-                        .orElse(false))
-                .filter(p -> p.requiredInvolvementsResult().isAllowed(invsForUser))
-                .map(Permission::operation)
-                .collect(Collectors.toSet());
-
-        return assessmentRatingDao.calculateAmendedRatingOperations(
-                operationsForEntityAssessment,
-                entityReference,
-                assessmentDefinitionId,
-                username);
+    public Set<Operation> findRatingPermissions(EntityReference entityReference, long assessmentDefinitionId, String username) {
+        return ratingPermissionChecker.findRatingPermissions(entityReference, assessmentDefinitionId, username);
     }
 
 
@@ -258,20 +219,30 @@ public class AssessmentRatingService {
     }
 
 
+    private AssessmentRating getAssessmentRating(BulkAssessmentRatingCommand command,
+                                                 Long assessmentDefinitionId,
+                                                 String username) {
+        UserTimestamp lastUpdate = UserTimestamp.mkForUser(username);
+        return ImmutableAssessmentRating.builder()
+                .assessmentDefinitionId(assessmentDefinitionId)
+                .entityReference(command.entityRef())
+                .ratingId(command.ratingId())
+                .comment(command.comment())
+                .lastUpdatedAt(lastUpdate.at())
+                .lastUpdatedBy(lastUpdate.by())
+                .provenance("waltz")
+                .build();
+    }
+
+
     private void verifyAnyPermission(Set<Operation> possiblePerms,
                                      EntityReference ref,
                                      long defId,
                                      String username) throws InsufficientPrivelegeException {
 
-        Set<Operation> permsUserHas = findRatingPermissions(ref, defId, username);
-        if (! hasIntersection(permsUserHas, possiblePerms)) {
-            throw new InsufficientPrivelegeException(format(
-                    "%s does not have any of the permissions: %s, for assessment def: %d.  They have: %s",
-                    username,
-                    possiblePerms,
-                    defId,
-                    permsUserHas));
-        }
+        Set<Operation> permsUserHas = ratingPermissionChecker.findRatingPermissions(ref, defId, username);
+
+        ratingPermissionChecker.verifyAnyPerms(possiblePerms, permsUserHas, EntityKind.ASSESSMENT_DEFINITION, username);
     }
 
 
@@ -336,8 +307,5 @@ public class AssessmentRatingService {
 
         changeLogService.write(logs);
     }
-
-    // endregion
-
 
 }

@@ -18,16 +18,17 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.common.exception.InsufficientPrivelegeException;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.external_identifier.ExternalIdentifier;
 import org.finos.waltz.service.external_identifier.ExternalIdentifierService;
-import org.finos.waltz.service.logical_flow.LogicalFlowService;
-import org.finos.waltz.service.user.UserRoleService;
+import org.finos.waltz.service.permission.permission_checker.FlowPermissionChecker;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
-import org.finos.waltz.web.endpoints.Endpoint;
-import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.external_identifier.ExternalIdentifier;
 import org.finos.waltz.web.WebUtilities;
+import org.finos.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.web.endpoints.EndpointUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,10 +36,6 @@ import org.springframework.stereotype.Service;
 import java.util.Set;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.Checks.checkTrue;
-import static org.finos.waltz.common.CollectionUtilities.notEmpty;
-import static org.finos.waltz.common.SetUtilities.asSet;
-import static org.finos.waltz.common.SetUtilities.intersection;
 import static org.finos.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
 import static org.finos.waltz.web.WebUtilities.getUsername;
 
@@ -48,21 +45,17 @@ public class ExternalIdentifierEndpoint implements Endpoint {
 
     private static final String BASE_URL = WebUtilities.mkPath("api", "external-identifier");
     private final ExternalIdentifierService externalIdentifierService;
-    private final UserRoleService userRoleService;
-    private final LogicalFlowService logicalFlowService;
+    private final FlowPermissionChecker flowPermissionChecker;
 
 
     @Autowired
     public ExternalIdentifierEndpoint(ExternalIdentifierService externalIdentifierService,
-                                      UserRoleService userRoleService,
-                                      LogicalFlowService logicalFlowService) {
+                                      FlowPermissionChecker flowPermissionChecker) {
         checkNotNull(externalIdentifierService, "externalIdentifierService cannot be null");
-        checkNotNull(userRoleService, "userRoleService cannot be null");
-        checkNotNull(logicalFlowService, "logicalFlowService cannot be null");
+        checkNotNull(flowPermissionChecker, "flowPermissionChecker cannot be null");
 
         this.externalIdentifierService = externalIdentifierService;
-        this.logicalFlowService = logicalFlowService;
-        this.userRoleService = userRoleService;
+        this.flowPermissionChecker = flowPermissionChecker;
     }
 
     @Override
@@ -101,16 +94,10 @@ public class ExternalIdentifierEndpoint implements Endpoint {
     }
 
 
-    private void checkHasPermission(EntityReference ref, String username) {
-
+    private void checkHasPermission(EntityReference ref, String username) throws InsufficientPrivelegeException {
         if (ref.kind().equals(LOGICAL_DATA_FLOW)) {
-
-            Set<Operation> permissions = logicalFlowService.findPermissionsForFlow(ref.id(), username);
-            Set<Operation> editPermissions = intersection(permissions, asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE));
-
-            checkTrue(
-                    notEmpty(editPermissions),
-                    "User does not have permission to edit the external identifier for this flow");
+            Set<Operation> permissions = flowPermissionChecker.findPermissionsForFlow(ref.id(), username);
+            flowPermissionChecker.verifyEditPerms(permissions, EntityKind.EXTERNAL_IDENTIFIER, username);
         }
     }
 }

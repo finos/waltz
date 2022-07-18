@@ -237,15 +237,4 @@ public class PhysicalSpecificationService {
         }
     }
 
-    public Set<Operation> findPermissions(long id, String username) {
-        boolean hasOverride = userRoleService.hasRole(username, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
-
-        //Do we need to check logicals?
-
-        if (hasOverride) {
-            return asSet(Operation.REMOVE, Operation.UPDATE, Operation.ADD);
-        } else {
-            return emptySet();
-        }
-    }
 }
