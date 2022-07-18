@@ -2,6 +2,9 @@ package org.finos.waltz.web.endpoints.extracts;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.finos.waltz.schema.tables.records.OrganisationalUnitRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record6;
