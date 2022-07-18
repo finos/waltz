@@ -18,3 +18,4 @@ npm-debug.log
 /docs/design/draft/taxonomy_mapping/merged.svg
 /docs/design/draft/taxonomy_mapping/.asciidoctor/diagram/merged.svg.cache
 /.run/
+/waltz-ng/.vscode/
