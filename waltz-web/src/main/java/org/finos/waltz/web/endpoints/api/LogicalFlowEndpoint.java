@@ -46,6 +46,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.finos.waltz.common.Checks.checkTrue;
+import static org.finos.waltz.common.CollectionUtilities.notEmpty;
+import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.SetUtilities.intersection;
 import static org.finos.waltz.web.WebUtilities.*;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -188,12 +192,11 @@ public class LogicalFlowEndpoint implements Endpoint {
 
 
     private LogicalFlow addFlowRoute(Request request, Response response) throws IOException {
-        ensureUserHasEditRights(request);
 
         String username = getUsername(request);
-
         AddLogicalFlowCommand addCmd = readBody(request, AddLogicalFlowCommand.class);
 
+        ensureUserHasEditRights(addCmd.source(), addCmd.target(), username);
 
         LOG.info("User: {}, adding new logical flow: {}", username, addCmd);
         return logicalFlowService.addFlow(addCmd, username);
@@ -201,7 +204,7 @@ public class LogicalFlowEndpoint implements Endpoint {
 
 
     private List<LogicalFlow> addFlowsRoute(Request request, Response response) throws IOException {
-        ensureUserHasEditRights(request);
+        requireRole(userRoleService, request, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
 
         String username = getUsername(request);
 
@@ -212,10 +215,10 @@ public class LogicalFlowEndpoint implements Endpoint {
 
 
     private int removeFlowRoute(Request request, Response response) {
-        ensureUserHasEditRights(request);
 
         long flowId = getId(request);
         String username = getUsername(request);
+        ensureUserHasEditRights(flowId, username);
 
         LOG.info("User: {} removing logical flow: {}", username, flowId);
 
@@ -223,8 +226,23 @@ public class LogicalFlowEndpoint implements Endpoint {
     }
 
 
-    private void ensureUserHasEditRights(Request request) {
-        requireRole(userRoleService, request, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
+    private void ensureUserHasEditRights(Long id, String username) {
+        Set<Operation> permissionsForFlow = logicalFlowService.findPermissionsForFlow(id, username);
+        Set<Operation> editPermissions = intersection(permissionsForFlow, asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE));
+
+        checkTrue(
+                notEmpty(editPermissions),
+                "User does not have permission to edit this flow");
+    }
+
+
+    private void ensureUserHasEditRights(EntityReference source, EntityReference target, String username) {
+        Set<Operation> permissionsForFlow = logicalFlowService.findPermissionsForSourceAndTarget(source, target, username);
+        Set<Operation> editPermissions = intersection(permissionsForFlow, asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE));
+
+        checkTrue(
+                notEmpty(editPermissions),
+                "User does not have permission to edit this flow");
     }
 
 

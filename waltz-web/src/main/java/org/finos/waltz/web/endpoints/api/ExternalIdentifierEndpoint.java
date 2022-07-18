@@ -18,20 +18,29 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.model.Operation;
 import org.finos.waltz.service.external_identifier.ExternalIdentifierService;
+import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.external_identifier.ExternalIdentifier;
-import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.web.WebUtilities;
 import org.finos.waltz.web.endpoints.EndpointUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkTrue;
+import static org.finos.waltz.common.CollectionUtilities.notEmpty;
+import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.SetUtilities.intersection;
+import static org.finos.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
+import static org.finos.waltz.web.WebUtilities.getUsername;
 
 
 @Service
@@ -40,15 +49,19 @@ public class ExternalIdentifierEndpoint implements Endpoint {
     private static final String BASE_URL = WebUtilities.mkPath("api", "external-identifier");
     private final ExternalIdentifierService externalIdentifierService;
     private final UserRoleService userRoleService;
+    private final LogicalFlowService logicalFlowService;
 
 
     @Autowired
     public ExternalIdentifierEndpoint(ExternalIdentifierService externalIdentifierService,
-                                      UserRoleService userRoleService) {
+                                      UserRoleService userRoleService,
+                                      LogicalFlowService logicalFlowService) {
         checkNotNull(externalIdentifierService, "externalIdentifierService cannot be null");
         checkNotNull(userRoleService, "userRoleService cannot be null");
+        checkNotNull(logicalFlowService, "logicalFlowService cannot be null");
 
         this.externalIdentifierService = externalIdentifierService;
+        this.logicalFlowService = logicalFlowService;
         this.userRoleService = userRoleService;
     }
 
@@ -62,22 +75,20 @@ public class ExternalIdentifierEndpoint implements Endpoint {
 
 
         DatumRoute<Integer> deleteRoute = (req, resp) -> {
-            WebUtilities.requireRole(userRoleService, req, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
-
             EntityReference ref = WebUtilities.getEntityReference(req);
             String system = req.params("system");
             String externalId = req.splat()[0];
 
-            return externalIdentifierService.delete(ref, externalId, system, WebUtilities.getUsername(req));
+            checkHasPermission(ref, getUsername(req));
+
+            return externalIdentifierService.delete(ref, externalId, system, getUsername(req));
         };
 
         DatumRoute<Integer> createRoute = (req, resp) -> {
-            WebUtilities.requireRole(userRoleService, req, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
-
             EntityReference ref = WebUtilities.getEntityReference(req);
             String externalId = req.splat()[0];
-
-            return externalIdentifierService.create(ref, externalId, WebUtilities.getUsername(req));
+            checkHasPermission(ref, getUsername(req));
+            return externalIdentifierService.create(ref, externalId, getUsername(req));
         };
 
 
@@ -89,4 +100,17 @@ public class ExternalIdentifierEndpoint implements Endpoint {
         EndpointUtilities.getForList(WebUtilities.mkPath(BASE_URL, "entity", ":kind", ":id"), findForEntityReference);
     }
 
+
+    private void checkHasPermission(EntityReference ref, String username) {
+
+        if (ref.kind().equals(LOGICAL_DATA_FLOW)) {
+
+            Set<Operation> permissions = logicalFlowService.findPermissionsForFlow(ref.id(), username);
+            Set<Operation> editPermissions = intersection(permissions, asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE));
+
+            checkTrue(
+                    notEmpty(editPermissions),
+                    "User does not have permission to edit the external identifier for this flow");
+        }
+    }
 }

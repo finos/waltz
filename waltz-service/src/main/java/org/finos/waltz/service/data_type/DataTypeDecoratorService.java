@@ -353,7 +353,19 @@ public class DataTypeDecoratorService {
 
     public Collection<DataTypeUsageCharacteristics> findDatatypeUsageCharacteristics(EntityReference ref) {
         return dataTypeDecoratorDaoSelectorFactory
-            .getDao(ref.kind())
-            .findDatatypeUsageCharacteristics(ref);
+                .getDao(ref.kind())
+                .findDatatypeUsageCharacteristics(ref);
+    }
+
+
+    public Set<Operation> findPermissions(EntityReference entityReference, String username) {
+        switch (entityReference.kind()) {
+            case LOGICAL_DATA_FLOW:
+                return logicalFlowService.findPermissionsForFlow(entityReference.id(), username);
+            case PHYSICAL_SPECIFICATION:
+                return physicalSpecificationService.findPermissions(entityReference.id(), username);
+            default:
+                throw new UnsupportedOperationException(format("Cannot find decorator permissions for kind: %s", entityReference.kind()));
+        }
     }
 }

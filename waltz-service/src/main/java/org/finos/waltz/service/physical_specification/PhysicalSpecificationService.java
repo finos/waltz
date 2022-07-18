@@ -29,7 +29,9 @@ import org.finos.waltz.model.command.CommandResponse;
 import org.finos.waltz.model.command.ImmutableCommandResponse;
 import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.finos.waltz.model.physical_specification.*;
+import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.service.user.UserRoleService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,8 +44,10 @@ import java.util.Set;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
+import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
 import static org.finos.waltz.model.EntityReference.mkRef;
 
@@ -54,21 +58,25 @@ public class PhysicalSpecificationService {
     private final ChangeLogService changeLogService;
     private final PhysicalSpecificationDao specificationDao;
     private final PhysicalSpecificationSearchDao specificationSearchDao;
+    private final UserRoleService userRoleService;
     private final PhysicalSpecificationIdSelectorFactory idSelectorFactory = new PhysicalSpecificationIdSelectorFactory();
 
 
     @Autowired
     public PhysicalSpecificationService(ChangeLogService changeLogService,
                                         PhysicalSpecificationDao specificationDao,
-                                        PhysicalSpecificationSearchDao specificationSearchDao)
+                                        PhysicalSpecificationSearchDao specificationSearchDao,
+                                        UserRoleService userRoleService)
     {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(specificationDao, "specificationDao cannot be null");
         checkNotNull(specificationSearchDao, "specificationSearchDao cannot be null");
+        checkNotNull(userRoleService, "userRoleService cannot be null");
 
         this.changeLogService = changeLogService;
         this.specificationDao = specificationDao;
         this.specificationSearchDao = specificationSearchDao;
+        this.userRoleService = userRoleService;
     }
 
 
@@ -229,4 +237,13 @@ public class PhysicalSpecificationService {
         }
     }
 
+    public Set<Operation> findPermissions(long id, String username) {
+        boolean hasOverride = userRoleService.hasRole(username, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
+
+        if (hasOverride) {
+            return asSet(Operation.REMOVE, Operation.UPDATE, Operation.ADD);
+        } else {
+            return emptySet();
+        }
+    }
 }

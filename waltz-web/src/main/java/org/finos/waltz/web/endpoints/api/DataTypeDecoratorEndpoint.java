@@ -19,17 +19,14 @@
 package org.finos.waltz.web.endpoints.api;
 
 
-import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.datatype.DataType;
 import org.finos.waltz.model.datatype.DataTypeDecorator;
 import org.finos.waltz.model.datatype.DataTypeUsageCharacteristics;
-import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.data_type.DataTypeDecoratorService;
 import org.finos.waltz.service.data_type.DataTypeService;
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
-import org.finos.waltz.service.permission.PermissionGroupService;
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.WebUtilities;
@@ -89,6 +86,7 @@ public class DataTypeDecoratorEndpoint implements Endpoint {
         String findByFlowIdsAndKindPath = mkPath(BASE_URL, "flow-ids", "kind", ":kind");
         String updateDataTypesPath = mkPath(BASE_URL, "save", "entity", ":kind", ":id");
         String findDatatypeUsageCharacteristicsPath = mkPath(BASE_URL, "entity", ":kind", ":id", "usage-characteristics");
+        String findPermissionsPath = mkPath(BASE_URL, "entity", ":kind", ":id", "permissions");
 
         ListRoute<DataTypeDecorator> findByEntityReferenceRoute = (req, res) ->
                 dataTypeDecoratorService.findByEntityId(getEntityReference(req));
@@ -101,19 +99,24 @@ public class DataTypeDecoratorEndpoint implements Endpoint {
         ListRoute<DataTypeDecorator> findByFlowIdsAndKindRoute = (request, response) ->
                 dataTypeDecoratorService
                     .findByFlowIds(
-                        readIdsFromBody(request),
-                        getKind(request));
+                            readIdsFromBody(request),
+                            getKind(request));
 
         ListRoute<DataType> findSuggestedByEntityRefRoute = (req, res) ->
                 dataTypeService.findSuggestedByEntityRef(getEntityReference(req));
 
         ListRoute<DataTypeUsageCharacteristics> findDatatypeUsageCharacteristicsRoute = (req, res) ->
                 dataTypeDecoratorService
-                    .findDatatypeUsageCharacteristics(getEntityReference(req));
+                        .findDatatypeUsageCharacteristics(getEntityReference(req));
+
+        ListRoute<Operation> findPermissionsRoute = (req, res) ->
+                dataTypeDecoratorService
+                        .findPermissions(getEntityReference(req), getUsername(req));
 
         getForList(findByEntityReference, findByEntityReferenceRoute);
         getForList(findSuggestedByEntityRefPath, findSuggestedByEntityRefRoute);
         getForList(findDatatypeUsageCharacteristicsPath, findDatatypeUsageCharacteristicsRoute);
+        getForList(findPermissionsPath, findPermissionsRoute);
         postForList(findBySelectorPath, findBySelectorRoute);
         postForList(findByFlowIdsAndKindPath, findByFlowIdsAndKindRoute);
         postForDatum(updateDataTypesPath, this::updateDataTypesRoute);
@@ -137,19 +140,12 @@ public class DataTypeDecoratorEndpoint implements Endpoint {
     private void checkHasPermissionToUpdateDataTypes(EntityReference ref,
                                                      String username) {
 
-        boolean roleBasedPermissions = userRoleService.hasRole(username, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
+        Set<Operation> permissions = dataTypeDecoratorService.findPermissions(ref, username);
+        Set<Operation> editPermissions = intersection(permissions, asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE));
 
-        if (ref.kind().equals(EntityKind.LOGICAL_DATA_FLOW)) {
-            Set<Operation> operations = logicalFlowService.findPermissionsForFlow(ref.id(), username);
-            Set<Operation> editOps = intersection(operations, asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE));
-            checkTrue(
-                    roleBasedPermissions || notEmpty(editOps),
-                    format("User does not have permission to edit data types for this %s", ref.kind().prettyName()));
-        } else {
-            checkTrue(
-                    roleBasedPermissions,
-                    format("User does not have permission to edit data types for this %s", ref.kind().prettyName()));
-        }
+        checkTrue(
+                notEmpty(editPermissions),
+                format("User does not have permission to edit data types for this %s", ref.kind().prettyName()));
     }
 
 }

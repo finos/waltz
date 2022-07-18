@@ -59,12 +59,20 @@ function store($http, BaseApiUrl) {
             .then(result => result.data);
     };
 
+    const findPermissions = (ref) => {
+        checkIsEntityRef(ref);
+        return $http
+            .get(`${BASE}/entity/${ref.kind}/${ref.id}/permissions`)
+            .then(result => result.data);
+    };
+
     return {
         findBySelector,
         findByEntityReference,
         findByFlowIds,
         save,
         findDatatypeUsageCharacteristics,
+        findPermissions
     };
 }
 
@@ -103,6 +111,11 @@ export const DataTypeDecoratorStore_API = {
         serviceName,
         serviceFnName: "findDatatypeUsageCharacteristics",
         description: "finds datatype usage characteristics for this entity"
+    },
+    findPermissions: {
+        serviceName,
+        serviceFnName: "findPermissions",
+        description: "finds allowed operations for this entity"
     }
 };
 

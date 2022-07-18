@@ -417,10 +417,17 @@ public class LogicalFlowService {
         if (flow.isReadOnly()) {
             return emptySet();
         } else {
-            Set<Operation> sourcePermissions = findFlowPermissionsForParentEntity(flow.source(), username);
-            Set<Operation> targetPermissions = findFlowPermissionsForParentEntity(flow.target(), username);
-            return union(sourcePermissions, targetPermissions);
+            return findPermissionsForSourceAndTarget(flow.source(), flow.target(), username);
         }
+    }
+
+
+    public Set<Operation> findPermissionsForSourceAndTarget(EntityReference source,
+                                                            EntityReference target,
+                                                            String username) {
+        Set<Operation> sourcePermissions = findFlowPermissionsForParentEntity(source, username);
+        Set<Operation> targetPermissions = findFlowPermissionsForParentEntity(target, username);
+        return union(sourcePermissions, targetPermissions);
     }
 
 

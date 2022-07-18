@@ -19,6 +19,10 @@
 package org.finos.waltz.web.endpoints.api;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.finos.waltz.service.physical_flow.PhysicalFlowService;
 import org.finos.waltz.service.physical_flow.PhysicalFlowUploadService;
 import org.finos.waltz.service.user.UserRoleService;
@@ -40,10 +44,16 @@ import spark.Response;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkTrue;
+import static org.finos.waltz.common.CollectionUtilities.notEmpty;
+import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.SetUtilities.intersection;
 
 @Service
 public class PhysicalFlowEndpoint implements Endpoint {
@@ -54,20 +64,24 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
     private final PhysicalFlowService physicalFlowService;
     private final UserRoleService userRoleService;
+    private final LogicalFlowService logicalFlowService;
     private final PhysicalFlowUploadService physicalFlowUploadService;
 
 
     @Autowired
     public PhysicalFlowEndpoint(PhysicalFlowService physicalFlowService,
                                 PhysicalFlowUploadService physicalFlowUploadService,
+                                LogicalFlowService logicalFlowService,
                                 UserRoleService userRoleService) {
         checkNotNull(physicalFlowService, "physicalFlowService cannot be null");
         checkNotNull(physicalFlowUploadService, "physicalFlowUploadService cannot be null");
         checkNotNull(userRoleService, "userRoleService cannot be null");
+        checkNotNull(logicalFlowService, "logicalFlowService cannot be null");
 
         this.physicalFlowService = physicalFlowService;
         this.physicalFlowUploadService = physicalFlowUploadService;
         this.userRoleService = userRoleService;
+        this.logicalFlowService = logicalFlowService;
     }
 
 
@@ -215,10 +229,11 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
 
     private PhysicalFlowCreateCommandResponse createFlow(Request request, Response response) throws IOException {
-        WebUtilities.requireRole(userRoleService, request, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
         String username = WebUtilities.getUsername(request);
-
         PhysicalFlowCreateCommand command = WebUtilities.readBody(request, PhysicalFlowCreateCommand.class);
+
+        checkHasPermission(EntityReference.mkRef(EntityKind.LOGICAL_DATA_FLOW, command.logicalFlowId()), username);
+
         return physicalFlowService.create(command, username);
     }
 
@@ -236,21 +251,21 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
 
     private int updateAttribute(Request request, Response response) throws IOException {
-        WebUtilities.requireRole(userRoleService, request, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
-
         String username = WebUtilities.getUsername(request);
         SetAttributeCommand command
                 = WebUtilities.readBody(request, SetAttributeCommand.class);
+
+        checkHasPermission(command.entityReference(), username);
 
         return physicalFlowService.updateAttribute(username, command);
     }
 
 
     private PhysicalFlowDeleteCommandResponse deleteFlow(Request request, Response response) {
-        WebUtilities.requireRole(userRoleService, request, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
-
         long flowId = WebUtilities.getId(request);
         String username = WebUtilities.getUsername(request);
+
+        checkHasPermission(EntityReference.mkRef(EntityKind.PHYSICAL_FLOW, flowId), username);
 
         ImmutablePhysicalFlowDeleteCommand deleteCommand = ImmutablePhysicalFlowDeleteCommand.builder()
                 .flowId(flowId)
@@ -305,6 +320,19 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
         LOG.info("User: {}, requested physical flow cleanup", username);
         return physicalFlowService.cleanupOrphans();
+    }
+
+
+    private void checkHasPermission(EntityReference ref, String username) {
+
+        PhysicalFlow physFlow = physicalFlowService.getById(ref.id());
+
+        Set<Operation> permissions = logicalFlowService.findPermissionsForFlow(physFlow.logicalFlowId(), username);
+        Set<Operation> editPermissions = intersection(permissions, asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE));
+
+        checkTrue(
+                notEmpty(editPermissions),
+                "User does not have permission to edit this physical flow");
     }
 
 }

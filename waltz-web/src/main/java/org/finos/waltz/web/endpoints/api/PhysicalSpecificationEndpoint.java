@@ -18,13 +18,15 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.SetAttributeCommand;
 import org.finos.waltz.model.command.CommandResponse;
 import org.finos.waltz.model.entity_search.ImmutableEntitySearchOptions;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecificationDeleteCommand;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
 import org.finos.waltz.model.physical_specification.PhysicalSpecificationDeleteCommand;
-import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.physical_specification.PhysicalSpecificationService;
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.DatumRoute;
@@ -37,8 +39,13 @@ import spark.Request;
 import spark.Response;
 
 import java.io.IOException;
+import java.util.Set;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkTrue;
+import static org.finos.waltz.common.CollectionUtilities.notEmpty;
+import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.SetUtilities.intersection;
 import static org.finos.waltz.web.WebUtilities.*;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 
@@ -129,10 +136,11 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
 
 
     private CommandResponse<PhysicalSpecificationDeleteCommand> deleteSpecification(Request request, Response response) {
-        requireRole(userRoleService, request, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
 
         long specId = getId(request);
         String username = getUsername(request);
+
+        checkHasPermission(EntityReference.mkRef(EntityKind.PHYSICAL_SPECIFICATION, specId), username);
 
         ImmutablePhysicalSpecificationDeleteCommand deleteCommand = ImmutablePhysicalSpecificationDeleteCommand.builder()
                 .specificationId(specId)
@@ -143,12 +151,22 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
 
 
     private int updateAttribute(Request request, Response response) throws IOException {
-        WebUtilities.requireRole(userRoleService, request, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
         String username = WebUtilities.getUsername(request);
-        SetAttributeCommand command
-                = WebUtilities.readBody(request, SetAttributeCommand.class);
+        SetAttributeCommand command = WebUtilities.readBody(request, SetAttributeCommand.class);
 
+        checkHasPermission(command.entityReference(), username);
         return specificationService.updateAttribute(username, command);
+    }
+
+
+    private void checkHasPermission(EntityReference ref, String username) {
+
+        Set<Operation> permissions = specificationService.findPermissions(ref.id(), username);
+        Set<Operation> editPermissions = intersection(permissions, asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE));
+
+        checkTrue(
+                notEmpty(editPermissions),
+                "User does not have permission to edit this specification");
     }
 
 }

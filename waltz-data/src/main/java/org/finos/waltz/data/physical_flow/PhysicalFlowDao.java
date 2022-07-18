@@ -259,6 +259,7 @@ public class PhysicalFlowDao {
     public int delete(long flowId) {
         return dsl.update(PHYSICAL_FLOW)
                 .set(PHYSICAL_FLOW.IS_REMOVED, true)
+                .set(PHYSICAL_FLOW.ENTITY_LIFECYCLE_STATUS, EntityLifecycleStatus.ACTIVE.name())
                 .where(PHYSICAL_FLOW.ID.eq(flowId))
                 .and(PHYSICAL_FLOW.IS_READONLY.isFalse())
                 .execute();
