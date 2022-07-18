@@ -28,6 +28,7 @@ import org.finos.waltz.model.survey.SurveyQuestion;
 import org.finos.waltz.service.report_grid.ReportGridService;
 import org.finos.waltz.service.settings.SettingsService;
 import org.finos.waltz.service.survey.SurveyQuestionService;
+import org.finos.waltz.web.WebException;
 import org.finos.waltz.web.WebUtilities;
 import org.finos.waltz.web.endpoints.extracts.reportgrid.DynamicCommaSeperatedValueFormatter;
 import org.finos.waltz.web.endpoints.extracts.reportgrid.DynamicExcelFormatter;
@@ -82,23 +83,37 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
 
     @Override
     public void register() {
-        registerGridViewExtract();
+        registerGridViewExtractByGUID();
     }
 
 
-    private void registerGridViewExtract() {
-        post(WebUtilities.mkPath(BASE_URL, "id", ":id"),
-            (request, response) -> {
-                long gridId = WebUtilities.getId(request);
-                IdSelectionOptions selectionOptions =  WebUtilities.readIdSelectionOptionsFromBody(request);
-                ReportGrid reportGrid = getById(gridId,selectionOptions)
-                        .orElseThrow(() -> notFoundException.apply(gridId));
-                return writeReportResults(
-                    response,
-                    prepareReport(reportGrid,
-                        parseExtractFormat(request),
-                        selectionOptions));
-            });
+    private void registerGridViewExtractByGUID() {
+        post(WebUtilities.mkPath(BASE_URL, "external-id", ":externalId"),
+                (request, response) -> {
+                    String clientProvidedExternalId = request.params("externalId");
+                    Set<ReportGridDefinition> grids = reportGridService.findAll();
+                    Optional<ReportGridDefinition> definition =
+                             grids.stream()
+                                     .filter(g -> g.externalId().isPresent() && clientProvidedExternalId.equals(g.externalId().get()))
+                                     .findAny();
+                    return definition.map(def-> {
+                        try {
+                            IdSelectionOptions selectionOptions = WebUtilities.readIdSelectionOptionsFromBody(request);
+                            long reportGridIdentifier = def.id()
+                                    .orElseThrow(() -> new IllegalArgumentException("Report Grid Definition found but it has no internal identifier"));
+                            ReportGrid reportGrid = getById(reportGridIdentifier, selectionOptions)
+                                    .orElseThrow(() -> notFoundException.apply(reportGridIdentifier));
+                            return writeReportResults(
+                                    response,
+                                    prepareReport(reportGrid,
+                                            parseExtractFormat(request),
+                                            selectionOptions));
+                        }catch(IOException e){
+                            throw new WebException("500",""+e.getMessage(),e);
+                        }
+                    }).orElseThrow(()->new NotFoundException("404",
+                            String.format(" Report Grid GUID (%s) not found",clientProvidedExternalId)));
+                });
     }
 
 
