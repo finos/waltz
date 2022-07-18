@@ -453,6 +453,7 @@ public class LogicalFlowDao {
                                                          EntityReference entityReference,
                                                          String username) {
 
+        //TODO: Need to add 'FLOW_ADMIN' permissions for bulk loaders
         boolean hasOverride = dsl
                 .fetchExists(DSL
                         .select(USER_ROLE.ROLE)
