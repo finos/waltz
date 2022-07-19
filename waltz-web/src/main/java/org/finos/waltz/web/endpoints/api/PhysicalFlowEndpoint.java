@@ -26,8 +26,8 @@ import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.SetAttributeCommand;
 import org.finos.waltz.model.physical_flow.*;
 import org.finos.waltz.model.user.SystemRole;
-import org.finos.waltz.service.permission.permission_checker.FlowPermissionChecker;
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
+import org.finos.waltz.service.permission.permission_checker.FlowPermissionChecker;
 import org.finos.waltz.service.physical_flow.PhysicalFlowService;
 import org.finos.waltz.service.physical_flow.PhysicalFlowUploadService;
 import org.finos.waltz.service.user.UserRoleService;
@@ -265,7 +265,6 @@ public class PhysicalFlowEndpoint implements Endpoint {
     private PhysicalFlowDeleteCommandResponse deleteFlow(Request request, Response response) throws InsufficientPrivelegeException {
         long flowId = WebUtilities.getId(request);
         String username = WebUtilities.getUsername(request);
-
 
         checkHasPermission(flowId, username);
 

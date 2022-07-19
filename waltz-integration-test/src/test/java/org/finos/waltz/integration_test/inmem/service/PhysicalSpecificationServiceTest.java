@@ -363,10 +363,10 @@ public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTes
         PhysicalFlowCreateCommandResponse physFlow2 = pfHelper
                 .createPhysicalFlow(flow.entityReference().id(), specId2, mkName("findBySelector"));
 
-        IdSelectionOptions appOpts = mkOpts(mkRef(EntityKind.APPLICATION, b.id()));
+        IdSelectionOptions appOpts = mkOpts(mkRef(EntityKind.MEASURABLE_RATING, 1L));
         assertThrows(UnsupportedOperationException.class,
                 () -> psSvc.findBySelector(appOpts),
-                "Throws exception  for unsupported entity kinds");
+                "Throws exception for unsupported entity kinds");
 
         IdSelectionOptions flowOpts = mkOpts(mkRef(EntityKind.LOGICAL_DATA_FLOW, flow.entityReference().id()));
         Collection<PhysicalSpecification> specsForFlow = psSvc.findBySelector(flowOpts);
