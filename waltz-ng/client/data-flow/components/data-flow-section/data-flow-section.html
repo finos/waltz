@@ -21,8 +21,8 @@
     <!-- ACTIONS -->
     <waltz-section-actions>
         <!-- Edit Logical Split button -->
-        <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR"
-             ng-if="$ctrl.activeTab.id === 'SUMMARY' && !$ctrl.isAnyEditorVisible()">
+        <div style="display: inline-block"
+             ng-if="$ctrl.canEdit && $ctrl.activeTab.id === 'SUMMARY' && !$ctrl.isAnyEditorVisible()">
             <div class="btn-group"
                  uib-dropdown>
 
@@ -34,12 +34,14 @@
                 </button>
                 <button type="button"
                         class="btn btn-xs btn-primary"
+                        waltz-has-role="LOGICAL_DATA_FLOW_EDITOR"
                         uib-dropdown-toggle>
                     <span class="caret"></span>
                 </button>
                 <ul uib-dropdown-menu
                     class="dropdown-menu"
-                    role="menu">
+                    role="menu"
+                    waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
                     <li role="menuitem">
                         <a href=""
                            ng-click="$ctrl.bulkLoad()"
@@ -62,8 +64,8 @@
 
 
         <!-- Edit Physical Split button -->
-        <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR"
-             ng-if="$ctrl.activeTab.id === 'PHYSICAL' && !$ctrl.isAnyEditorVisible()">
+        <div style="display: inline-block"
+             ng-if="$ctrl.canEdit && $ctrl.activeTab.id === 'PHYSICAL' && !$ctrl.isAnyEditorVisible()">
             <div class="btn-group"
                  uib-dropdown>
 
@@ -72,13 +74,15 @@
                     Edit
                 </a>
                 <button type="button"
+                        waltz-has-role="LOGICAL_DATA_FLOW_EDITOR"
                         class="btn btn-xs btn-primary"
                         uib-dropdown-toggle>
                     <span class="caret"></span>
                 </button>
                 <ul uib-dropdown-menu
                     class="dropdown-menu"
-                    role="menu">
+                    role="menu"
+                    waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
                     <li role="menuitem">
                         <a href=""
                            ng-click="$ctrl.bulkLoad()"
@@ -91,10 +95,13 @@
             </div>
         </div>
 
-        <button class="btn btn-xs waltz-btn-transparent"
-                ng-click="$ctrl.visibility.sourceDataRatings = ! $ctrl.visibility.sourceDataRatings">
-            <waltz-icon name="map-signs"></waltz-icon>
-        </button>
+        <span>
+            <button style="display: inline-block"
+                    class="btn btn-xs waltz-btn-transparent"
+                    ng-click="$ctrl.visibility.sourceDataRatings = ! $ctrl.visibility.sourceDataRatings">
+                <waltz-icon name="map-signs"></waltz-icon>
+            </button>
+        </span>
     </waltz-section-actions>
 
     <waltz-source-data-overlay visible="$ctrl.visibility.sourceDataRatings"

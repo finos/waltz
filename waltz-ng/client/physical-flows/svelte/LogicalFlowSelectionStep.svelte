@@ -19,6 +19,7 @@
     export let primaryEntityRef;
 
     let logicalFlowsCall = null;
+    let editableFlowsCall = null;
     let source;
     let target;
     let direction;
@@ -57,16 +58,20 @@
     $: {
         if (primaryEntityRef) {
             logicalFlowsCall = logicalFlowStore.findByEntityReference(primaryEntityRef);
+            editableFlowsCall = logicalFlowStore.findEditableFlowIdsForParentReference(primaryEntityRef);
         }
     }
 
     $: logicalFlows = _
         .chain($logicalFlowsCall?.data)
+        .filter(f => _.includes(editableFlows, f.id))
         .orderBy([
             d => d.source.name.toLowerCase(),
             d => d.target.name.toLowerCase()
         ])
         .value();
+
+    $: editableFlows = $editableFlowsCall?.data;
 
     $: expanded = _.includes($expandedSections, sections.ROUTE);
 

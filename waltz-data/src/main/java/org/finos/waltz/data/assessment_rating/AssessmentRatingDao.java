@@ -20,6 +20,8 @@ package org.finos.waltz.data.assessment_rating;
 
 
 import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.SetUtilities;
+import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.*;
@@ -52,6 +54,7 @@ import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.SetUtilities.*;
 import static org.finos.waltz.common.StringUtilities.mkSafe;
+import static org.finos.waltz.common.StringUtilities.notEmpty;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.schema.Tables.*;
 import static org.finos.waltz.schema.tables.AssessmentDefinition.ASSESSMENT_DEFINITION;
@@ -297,100 +300,6 @@ public class AssessmentRatingDao {
     }
 
 
-    public Set<Operation> findRatingPermissions(EntityReference entityReference,
-                                                long assessmentDefinitionId,
-                                                String username) {
-
-        Field<Boolean> userHasDefRoleField = DSL
-                .field(ad.PERMITTED_ROLE.isNull()
-                    .or(ur.ROLE.isNotNull()))
-                .as("user_has_def_role");
-
-        Field<Boolean> userHasOperationField = DSL
-                .field(inv.EMPLOYEE_ID.isNotNull())
-                .as("user_has_operation");
-
-        Field<Boolean> ratingIsReadOnly = DSL
-                .coalesce(ar.IS_READONLY, false)
-                .as("rating_is_readonly");
-
-        Condition ratingViaDef = ar.ASSESSMENT_DEFINITION_ID.eq(ad.ID)
-                .and(ar.ENTITY_ID.eq(entityReference.id()))
-                .and(ar.ENTITY_KIND.eq(ad.ENTITY_KIND));
-
-        Condition permissionViaDef = pgi.QUALIFIER_KIND.eq(EntityKind.ASSESSMENT_DEFINITION.name())
-                .and(pgi.QUALIFIER_ID.eq(ad.ID))
-                .and(pgi.PARENT_KIND.eq(ad.ENTITY_KIND))
-                .and(pgi.SUBJECT_KIND.eq(EntityKind.ASSESSMENT_RATING.name()));
-
-        Condition involvementGroupViaPermission = ige.INVOLVEMENT_GROUP_ID.eq(pgi.INVOLVEMENT_GROUP_ID);
-
-        Condition involvementViaInvGroupAndPerson = inv.KIND_ID.eq(ige.INVOLVEMENT_KIND_ID)
-                .and(inv.EMPLOYEE_ID.eq(p.EMPLOYEE_ID))
-                .and(inv.ENTITY_ID.eq(entityReference.id()))
-                .and(inv.ENTITY_KIND.eq(entityReference.kind().name()));
-
-        Condition userRoleViaPersonAndDef = ur.USER_NAME.eq(p.EMAIL)
-                .and(ur.ROLE.eq(ad.PERMITTED_ROLE));
-
-        SelectConditionStep<Record5<Boolean, Boolean, Boolean, String, Boolean>> qry = dsl
-                .select(ad.IS_READONLY,
-                        ratingIsReadOnly,
-                        userHasDefRoleField,
-                        pgi.OPERATION,
-                        userHasOperationField)
-                .from(ad)
-                .innerJoin(p).on(p.EMAIL.eq(username))
-                .leftJoin(ur).on(userRoleViaPersonAndDef)
-                .leftJoin(ar).on(ratingViaDef)
-                .leftJoin(pgi).on(permissionViaDef)
-                .leftJoin(ige).on(involvementGroupViaPermission)
-                .leftJoin(inv).on(involvementViaInvGroupAndPerson)
-                .where(ad.ID.eq(assessmentDefinitionId));
-
-        Set<Tuple5<Boolean, Boolean, Boolean, String, Boolean>> result = qry
-                .fetchSet(r -> tuple(
-                    r.get(ad.IS_READONLY),
-                    r.get(ratingIsReadOnly),
-                    r.get(userHasDefRoleField),
-                    r.get(pgi.OPERATION),
-                    r.get(userHasOperationField)));
-
-        // { ad.isReadonly, ar.isReadonly, userHasDefRole }
-        Tuple3<Boolean, Boolean, Boolean> basicPerms = maybeFirst(result)
-                .map(Tuple5::limit3)
-                .orElse(null);
-
-        Set<Operation> explicitOperations = result
-                .stream()
-                .filter(Tuple5::v5)
-                .map(t -> Operation.valueOf(t.v4()))
-                .collect(toSet());
-
-
-        if (basicPerms == null || basicPerms.v1) {
-            // no perms found or def is marked as readonly
-            return emptySet();
-        }
-
-        if (basicPerms.v2) {
-            // rating is currently locked
-            return explicitOperations.contains(Operation.LOCK)
-                    ? asSet(Operation.LOCK)
-                    : emptySet();
-        }
-
-        if (basicPerms.v3) {
-            // user has permissions, therefore ensure they have add/remove/update and perhaps lock (from explicit ops)
-            return union(
-                    explicitOperations,
-                    asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE));
-        }
-
-        return explicitOperations;
-    }
-
-
     public boolean lock(EntityReference entityReference,
                         long defId,
                         String username) {
@@ -418,5 +327,42 @@ public class AssessmentRatingDao {
                 .and(ar.ENTITY_ID.eq(entityReference.id()))
                 .and(ar.ASSESSMENT_DEFINITION_ID.eq(defId))
                 .execute() == 1;
+    }
+
+    public Set<Operation> calculateAmendedRatingOperations(Set<Operation> operationsForEntityAssessment,
+                                                           EntityReference entityReference,
+                                                           long assessmentDefinitionId,
+                                                           String username) {
+
+        Field<Boolean> readOnlyRatingField = DSL.coalesce(ASSESSMENT_RATING.IS_READONLY, DSL.val(false)).as("rating_read_only");
+
+        Tuple3<Boolean, Boolean, Boolean> hasRoleAndDefinitionROAndIsReadOnly = dsl
+                .select(USER_ROLE.ROLE,
+                        ASSESSMENT_DEFINITION.IS_READONLY,
+                        readOnlyRatingField)
+                .from(ASSESSMENT_DEFINITION)
+                .leftJoin(ASSESSMENT_RATING)
+                .on(ASSESSMENT_DEFINITION.ID.eq(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID))
+                .and(ASSESSMENT_RATING.ENTITY_ID.eq(entityReference.id())
+                        .and(ASSESSMENT_RATING.ENTITY_KIND.eq(entityReference.kind().name())))
+                .leftJoin(USER_ROLE)
+                .on(USER_ROLE.ROLE.eq(ASSESSMENT_DEFINITION.PERMITTED_ROLE)
+                        .and(USER_ROLE.USER_NAME.eq(username)))
+                .where(ASSESSMENT_DEFINITION.ID.eq(assessmentDefinitionId))
+                .fetchOne(r -> tuple(
+                        notEmpty(r.get(USER_ROLE.ROLE)),
+                        r.get(ASSESSMENT_DEFINITION.IS_READONLY),
+                        r.get(readOnlyRatingField)));
+
+
+        if (hasRoleAndDefinitionROAndIsReadOnly.v2) {
+            return emptySet();
+        } else if (hasRoleAndDefinitionROAndIsReadOnly.v3) {
+            return intersection(operationsForEntityAssessment, asSet(Operation.LOCK));
+        } else if (hasRoleAndDefinitionROAndIsReadOnly.v1) {
+            return union(operationsForEntityAssessment, asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE));
+        } else {
+            return operationsForEntityAssessment;
+        }
     }
 }

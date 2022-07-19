@@ -18,9 +18,12 @@
 import {initialiseData} from "../../../common/index";
 
 import template from "./data-type-usage-panel.html";
-import roles from "../../../user/system-roles";
 import {loadUsageData} from "../../data-type-utils";
 import toasts from "../../../svelte-stores/toast-store";
+import _ from "lodash";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {mkRef} from "../../../common/entity-utils";
+import {entity} from "../../../common/services/enums/entity";
 
 
 const bindings = {
@@ -50,9 +53,18 @@ function controller(serviceBroker, userService, $q) {
     };
 
     vm.$onInit = () => {
-        userService
-            .whoami()
-            .then(u => vm.visibility.controls = userService.hasRole(u, roles.LOGICAL_DATA_FLOW_EDITOR));
+
+        const decoratedRef = vm.parentEntityRef
+            ? vm.parentEntityRef
+            : mkRef(entity.PHYSICAL_SPECIFICATION.key, vm.parentFlow.specificationId);
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.DataTypeDecoratorStore.findPermissions,
+                [decoratedRef])
+            .then(r => {
+                vm.visibility.controls = _.some(r.data, d => _.includes(["ADD", "UPDATE", "REMOVE"], d));
+            });
     };
 
     vm.$onChanges = () => {

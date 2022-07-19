@@ -18,22 +18,22 @@
 
 package org.finos.waltz.web.endpoints.api;
 
-import org.finos.waltz.service.tag.TagService;
-import org.finos.waltz.web.DatumRoute;
-import org.finos.waltz.web.ListRoute;
-import org.finos.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.tag.Tag;
+import org.finos.waltz.service.tag.TagService;
+import org.finos.waltz.web.DatumRoute;
+import org.finos.waltz.web.ListRoute;
+import org.finos.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.web.WebUtilities.*;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
-import static org.finos.waltz.common.Checks.checkNotNull;
 
 
 @Service

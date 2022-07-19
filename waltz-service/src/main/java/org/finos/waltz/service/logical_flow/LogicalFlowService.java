@@ -37,6 +37,9 @@ import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
 import org.finos.waltz.model.tally.TallyPack;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.data_type.DataTypeService;
+import org.finos.waltz.service.involvement.InvolvementService;
+import org.finos.waltz.service.permission.PermissionGroupService;
+import org.finos.waltz.service.permission.permission_checker.FlowPermissionChecker;
 import org.finos.waltz.service.usage_info.DataTypeUsageService;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -48,7 +51,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -61,7 +67,7 @@ import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
-import static org.finos.waltz.common.SetUtilities.fromCollection;
+import static org.finos.waltz.common.SetUtilities.*;
 import static org.finos.waltz.model.EntityKind.DATA_TYPE;
 import static org.finos.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
 import static org.finos.waltz.model.EntityReference.mkRef;
@@ -80,6 +86,9 @@ public class LogicalFlowService {
     private final LogicalFlowDao logicalFlowDao;
     private final LogicalFlowStatsDao logicalFlowStatsDao;
     private final LogicalFlowDecoratorDao logicalFlowDecoratorDao;
+    private final InvolvementService involvementService;
+    private final PermissionGroupService permissionGroupService;
+    private final FlowPermissionChecker flowPermissionChecker;
 
     private final ApplicationIdSelectorFactory appIdSelectorFactory = new ApplicationIdSelectorFactory();
     private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory = new LogicalFlowIdSelectorFactory();
@@ -93,7 +102,11 @@ public class LogicalFlowService {
                               DBExecutorPoolInterface dbExecutorPool,
                               LogicalFlowDao logicalFlowDao,
                               LogicalFlowStatsDao logicalFlowStatsDao,
-                              LogicalFlowDecoratorDao logicalFlowDecoratorDao) {
+                              LogicalFlowDecoratorDao logicalFlowDecoratorDao,
+                              InvolvementService involvementService,
+                              PermissionGroupService permissionGroupService,
+                              FlowPermissionChecker flowPermissionChecker) {
+
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(dbExecutorPool, "dbExecutorPool cannot be null");
         checkNotNull(dataTypeService, "dataTypeService cannot be null");
@@ -101,14 +114,20 @@ public class LogicalFlowService {
         checkNotNull(logicalFlowDao, "logicalFlowDao must not be null");
         checkNotNull(logicalFlowDecoratorDao, "logicalFlowDataTypeDecoratorDao cannot be null");
         checkNotNull(logicalFlowStatsDao, "logicalFlowStatsDao cannot be null");
+        checkNotNull(involvementService, "involvementService cannot be null");
+        checkNotNull(permissionGroupService, "permissionGroupService cannot be null");
+        checkNotNull(flowPermissionChecker, "flowPermissionChecker cannot be null");
 
         this.changeLogService = changeLogService;
         this.dataTypeService = dataTypeService;
+        this.flowPermissionChecker = flowPermissionChecker;
         this.dataTypeUsageService = dataTypeUsageService;
         this.dbExecutorPool = dbExecutorPool;
         this.logicalFlowDao = logicalFlowDao;
         this.logicalFlowStatsDao = logicalFlowStatsDao;
         this.logicalFlowDecoratorDao = logicalFlowDecoratorDao;
+        this.involvementService = involvementService;
+        this.permissionGroupService = permissionGroupService;
     }
 
 
@@ -350,10 +369,30 @@ public class LogicalFlowService {
     }
 
 
+    public Set<Long> findEditableFlowIdsForParentReference(EntityReference parentRef, String username) {
+        List<LogicalFlow> logicalFlows = findByEntityReference(parentRef);
+
+        Set<Operation> flowPermissionsForParentEntity = flowPermissionChecker.findFlowPermissionsForParentEntity(parentRef, username);
+
+        if (hasIntersection(flowPermissionsForParentEntity, asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE))) {
+            return map(logicalFlows, f -> f.id().get());
+        } else {
+
+            return logicalFlows.stream()
+                    .flatMap(f -> asSet(tuple(f.id().get(), f.source()), tuple(f.id().get(), f.target())).stream())
+                    .filter(t -> {
+                        Set<Operation> entity = flowPermissionChecker.findFlowPermissionsForParentEntity(t.v2, username);
+                        return hasIntersection(entity, asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE));
+                    })
+                    .map(t -> t.v1)
+                    .collect(Collectors.toSet());
+        }
+    }
+
+
     /**
-     *
-     * @param ref  app or actor ref
-     * @param startingDataTypeId  optional id of the data type to use (i.e. restrict to flows below that data type)
+     * @param ref                app or actor ref
+     * @param startingDataTypeId optional id of the data type to use (i.e. restrict to flows below that data type)
      * @return
      */
     public LogicalFlowGraphSummary getFlowInfoByDirection(EntityReference ref, Long startingDataTypeId) {
@@ -374,8 +413,7 @@ public class LogicalFlowService {
     }
 
 
-
-        private void attemptToAddUnknownDecoration(LogicalFlow logicalFlow, String username) {
+    private void attemptToAddUnknownDecoration(LogicalFlow logicalFlow, String username) {
         dataTypeService
                 .getUnknownDataType()
                 .flatMap(IdProvider::id)
@@ -392,6 +430,7 @@ public class LogicalFlowService {
                         .build())
                 .map(decoration -> logicalFlowDecoratorDao.addDecorators(newArrayList(decoration)));
     }
+
 
     private String getAssociatedDatatypeNamesAsCsv(Long flowId) {
         IdSelectionOptions idSelectionOptions = IdSelectionOptions.mkOpts(

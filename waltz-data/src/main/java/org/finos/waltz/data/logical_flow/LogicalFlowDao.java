@@ -18,6 +18,7 @@
 
 package org.finos.waltz.data.logical_flow;
 
+import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.schema.tables.records.LogicalFlowRecord;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.*;
@@ -25,6 +26,7 @@ import org.finos.waltz.model.logical_flow.ImmutableLogicalFlow;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.jooq.lambda.tuple.Tuple0;
 import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,8 +38,12 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
-import static org.finos.waltz.schema.Tables.PHYSICAL_SPECIFICATION;
+import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.SetUtilities.union;
+import static org.finos.waltz.schema.Tables.*;
 import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.AssessmentDefinition.ASSESSMENT_DEFINITION;
+import static org.finos.waltz.schema.tables.AssessmentRating.ASSESSMENT_RATING;
 import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -443,4 +449,22 @@ public class LogicalFlowDao {
     }
 
 
+    public Set<Operation> calculateAmendedFlowOperations(Set<Operation> operationsForFlow,
+                                                         EntityReference entityReference,
+                                                         String username) {
+
+        //TODO: Need to add 'FLOW_ADMIN' permissions for bulk loaders
+        boolean hasOverride = dsl
+                .fetchExists(DSL
+                        .select(USER_ROLE.ROLE)
+                        .from(USER_ROLE)
+                        .where(USER_ROLE.ROLE.eq(SystemRole.LOGICAL_DATA_FLOW_EDITOR.name())
+                                .and(USER_ROLE.USER_NAME.eq(username))));
+
+        if (hasOverride) {
+            return union(operationsForFlow, asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE));
+        } else {
+            return operationsForFlow;
+        }
+    }
 }

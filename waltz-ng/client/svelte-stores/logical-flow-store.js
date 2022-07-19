@@ -39,6 +39,15 @@ export function mkLogicalFlowStore() {
     }
 
 
+    const findEditableFlowIdsForParentReference = (ref, force = false) => {
+        return remote.fetchViewList(
+            "GET",
+            `api/logical-flow/entity/${ref.kind}/${ref.id}/editable-flows`,
+            null,
+            {force});
+    }
+
+
     const getFlowGraphSummary = (ref, dtId, force = false) => {
         checkIsEntityRef(ref);
         return remote
@@ -65,7 +74,8 @@ export function mkLogicalFlowStore() {
         findBySelector,
         getFlowGraphSummary,
         getById,
-        addFlow
+        addFlow,
+        findEditableFlowIdsForParentReference
     };
 }
 

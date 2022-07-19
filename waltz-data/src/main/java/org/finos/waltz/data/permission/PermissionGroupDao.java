@@ -8,6 +8,7 @@ import org.finos.waltz.model.attestation.ImmutableUserAttestationPermission;
 import org.finos.waltz.model.attestation.UserAttestationPermission;
 import org.finos.waltz.model.measurable_category.MeasurableCategory;
 import org.finos.waltz.model.permission_group.*;
+import org.finos.waltz.schema.Tables;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple3;
@@ -42,14 +43,10 @@ public class PermissionGroupDao {
 
 
     public Set<Permission> findPermissionsForParentEntityReference(EntityReference parentEntityRef) {
-        return getPermissionsForEntityRef(parentEntityRef, DSL.trueCondition());
-    }
-
-
-    public Set<Permission> getPermissionsForEntityRef(EntityReference parentEntityRef, Condition condition) {
 
         Condition groupCondition = PERMISSION_GROUP_INVOLVEMENT.PERMISSION_GROUP_ID.in(permissionGroupSelector(parentEntityRef))
-                .or(PERMISSION_GROUP.IS_DEFAULT.isTrue());
+                .or(PERMISSION_GROUP.IS_DEFAULT.isTrue()
+                        .and(PERMISSION_GROUP.ID.notIn(permissionGroupSelector(parentEntityRef))));
 
         Map<Tuple5<String, String, Long, String, String>, List<Long>> permissionsForSubjectQualifier = dsl
                 .select(PERMISSION_GROUP_INVOLVEMENT.OPERATION,
@@ -63,7 +60,6 @@ public class PermissionGroupDao {
                 .leftJoin(INVOLVEMENT_GROUP).on(PERMISSION_GROUP_INVOLVEMENT.INVOLVEMENT_GROUP_ID.eq(INVOLVEMENT_GROUP.ID))
                 .leftJoin(INVOLVEMENT_GROUP_ENTRY).on(INVOLVEMENT_GROUP.ID.eq(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_GROUP_ID))
                 .where(groupCondition)
-                .and(condition)
                 .fetchGroups(
                         r -> tuple(
                                 r.get(PERMISSION_GROUP_INVOLVEMENT.OPERATION),
@@ -106,66 +102,16 @@ public class PermissionGroupDao {
     }
 
 
-    public Set<Permission> getDefaultPermissions() {
-
-        Map<Tuple5<String, String, Long, String, String>, List<Long>> permissionsForSubjectQualifier = dsl
-                .select(PERMISSION_GROUP_INVOLVEMENT.OPERATION,
-                        PERMISSION_GROUP_INVOLVEMENT.PARENT_KIND,
-                        PERMISSION_GROUP_INVOLVEMENT.SUBJECT_KIND,
-                        PERMISSION_GROUP_INVOLVEMENT.QUALIFIER_KIND,
-                        PERMISSION_GROUP_INVOLVEMENT.QUALIFIER_ID,
-                        INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_KIND_ID)
-                .from(PERMISSION_GROUP_INVOLVEMENT)
-                .innerJoin(PERMISSION_GROUP).on(PERMISSION_GROUP.ID.eq(PERMISSION_GROUP_INVOLVEMENT.PERMISSION_GROUP_ID))
-                .leftJoin(INVOLVEMENT_GROUP).on(PERMISSION_GROUP_INVOLVEMENT.INVOLVEMENT_GROUP_ID.eq(INVOLVEMENT_GROUP.ID))
-                .leftJoin(INVOLVEMENT_GROUP_ENTRY).on(INVOLVEMENT_GROUP.ID.eq(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_GROUP_ID))
-                .where(PERMISSION_GROUP.IS_DEFAULT.isTrue())
-                .fetchGroups(
-                        r -> tuple(
-                                r.get(PERMISSION_GROUP_INVOLVEMENT.OPERATION),
-                                r.get(PERMISSION_GROUP_INVOLVEMENT.QUALIFIER_KIND),
-                                r.get(PERMISSION_GROUP_INVOLVEMENT.QUALIFIER_ID),
-                                r.get(PERMISSION_GROUP_INVOLVEMENT.PARENT_KIND),
-                                r.get(PERMISSION_GROUP_INVOLVEMENT.SUBJECT_KIND)),
-                        r -> r.get(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_KIND_ID));
-
-        return permissionsForSubjectQualifier
-                .entrySet()
-                .stream()
-                .map(e -> {
-                    Tuple5<String, String, Long, String, String> groupInfo = e.getKey();
-                    Set<Long> requiredInvolvementIds = fromCollection(e.getValue());
-
-                    ImmutableRequiredInvolvementsResult requiredInvolvementsResult = ImmutableRequiredInvolvementsResult
-                            .builder()
-                            .areAllUsersAllowed(requiredInvolvementIds.equals(ALL_USERS_ALLOWED))
-                            .requiredInvolvementKindIds(minus(requiredInvolvementIds, ALL_USERS_ALLOWED))
-                            .build();
-
-
-                    ImmutablePermission.Builder permission = ImmutablePermission.builder()
-                            .operation(Operation.valueOf(groupInfo.v1))
-                            .parentKind(EntityKind.valueOf(groupInfo.v4))
-                            .subjectKind(EntityKind.valueOf(groupInfo.v5))
-                            .requiredInvolvementsResult(requiredInvolvementsResult);
-
-                    if (groupInfo.v3 != null && groupInfo.v2 != null) {
-                        permission.qualifierReference(mkRef(EntityKind.valueOf(groupInfo.v2), groupInfo.v3));
-                    }
-
-                    return permission.build();
-                })
-                .collect(toSet());
-    }
-
-
     private SelectConditionStep<Record1<Long>> permissionGroupSelector(EntityReference parentEntityRef) {
         switch (parentEntityRef.kind()) {
             case APPLICATION:
+            case ACTOR:
+            case CHANGE_INITIATIVE:
                 return DSL
                         .select(PERMISSION_GROUP_ENTRY.PERMISSION_GROUP_ID)
                         .from(PERMISSION_GROUP_ENTRY)
-                        .where(PERMISSION_GROUP_ENTRY.APPLICATION_ID.eq(parentEntityRef.id()));
+                        .where(PERMISSION_GROUP_ENTRY.ENTITY_ID.eq(parentEntityRef.id())
+                                .and(PERMISSION_GROUP_ENTRY.ENTITY_KIND.eq(parentEntityRef.kind().name())));
             default:
                 throw new UnsupportedOperationException("Cannot find permission group for kind: " + parentEntityRef.kind());
 
@@ -176,7 +122,8 @@ public class PermissionGroupDao {
     public RequiredInvolvementsResult getRequiredInvolvements(CheckPermissionCommand permissionCommand) {
 
         Condition groupCondition = PERMISSION_GROUP.ID.in(permissionGroupSelector(permissionCommand.parentEntityRef()))
-                .or(PERMISSION_GROUP.IS_DEFAULT.isTrue());
+                .or(PERMISSION_GROUP.IS_DEFAULT.isTrue()
+                        .and(PERMISSION_GROUP.ID.notIn(permissionGroupSelector(permissionCommand.parentEntityRef()))));
 
         Condition qualifierKindCondition = permissionCommand.qualifierKind() == null
                 ? PERMISSION_GROUP_INVOLVEMENT.QUALIFIER_KIND.isNull()
@@ -210,18 +157,6 @@ public class PermissionGroupDao {
     }
 
 
-    public Set<Long> findExistingInvolvementKindIdsForUser(EntityReference parentEntityRef, String username) {
-        return dsl
-                .select(INVOLVEMENT.KIND_ID)
-                .from(INVOLVEMENT)
-                .innerJoin(PERSON).on(PERSON.EMPLOYEE_ID.eq(INVOLVEMENT.EMPLOYEE_ID))
-                .where(PERSON.EMAIL.eq(username)
-                        .and(INVOLVEMENT.ENTITY_KIND.eq(parentEntityRef.kind().name()))
-                        .and(INVOLVEMENT.ENTITY_ID.eq(parentEntityRef.id())))
-                .fetchSet(INVOLVEMENT.KIND_ID);
-    }
-
-
     /**
      * Given an entity ref (typically an app) and a userId, this will return a list of
      * measurable categories that are attestable along with a flag to indicate if _this_
@@ -235,7 +170,7 @@ public class PermissionGroupDao {
         // ... therefore if the given ref is not an app we want to 'force-fail' the (upcoming) left join
         Condition specificApplicationPermissionGroupEntryJoinCondition = ref.kind() == EntityKind.APPLICATION
                 ? PERMISSION_GROUP_ENTRY.PERMISSION_GROUP_ID.eq(PERMISSION_GROUP.ID)
-                        .and(PERMISSION_GROUP_ENTRY.APPLICATION_ID.eq(ref.id()))
+                .and(PERMISSION_GROUP_ENTRY.ENTITY_ID.eq(ref.id()))
                 : DSL.falseCondition();
 
         SelectConditionStep<Record> qry = dsl
@@ -289,7 +224,7 @@ public class PermissionGroupDao {
 
         // We now want to see if _this_ user has those involvements
         // ...so first we get all the users involvement kinds for this entity
-        Set<Long> existingInvolvementKinds = findExistingInvolvementKindIdsForUser(ref, userId);
+        Set<Long> existingInvolvementKinds = findExistingInvolvementKinds(ref, userId);
 
         // ...now we map over the categories and required involvements,
         // ...checking to see if the user's involvement satisfies each one
@@ -304,5 +239,17 @@ public class PermissionGroupDao {
                                 fromCollection(kv.getValue()),
                                 existingInvolvementKinds))
                         .build());
+    }
+
+
+    private Set<Long> findExistingInvolvementKinds(EntityReference ref, String userId) {
+        return dsl
+                .select(Tables.INVOLVEMENT.KIND_ID)
+                .from(Tables.INVOLVEMENT)
+                .innerJoin(Tables.PERSON).on(Tables.PERSON.EMPLOYEE_ID.eq(Tables.INVOLVEMENT.EMPLOYEE_ID))
+                .where(Tables.PERSON.EMAIL.eq(userId)
+                        .and(Tables.INVOLVEMENT.ENTITY_KIND.eq(ref.kind().name()))
+                        .and(Tables.INVOLVEMENT.ENTITY_ID.eq(ref.id())))
+                .fetchSet(Tables.INVOLVEMENT.KIND_ID);
     }
 }

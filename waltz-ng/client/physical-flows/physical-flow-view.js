@@ -23,6 +23,7 @@ import template from "./physical-flow-view.html";
 import {CORE_API} from "../common/services/core-api-utils";
 import {toEntityRef} from "../common/entity-utils";
 import toasts from "../svelte-stores/toast-store";
+import {displayError} from "../common/error-utils";
 
 
 const modes = {
@@ -117,10 +118,11 @@ function controller($q,
     vm.$onInit = () => {
         vm.parentEntityRef = entityReference;
 
+
         const physicalFlowPromise = serviceBroker
             .loadViewData(
                 CORE_API.PhysicalFlowStore.getById,
-                [ vm.parentEntityRef.id ])
+                [vm.parentEntityRef.id])
             .then(r => vm.physicalFlow = r.data);
 
         physicalFlowPromise
@@ -130,6 +132,14 @@ function controller($q,
                     [vm.physicalFlow.logicalFlowId]))
             .then(r => vm.logicalFlow = r.data);
 
+        physicalFlowPromise
+            .then(() => serviceBroker
+                .loadViewData(
+                    CORE_API.LogicalFlowStore.findPermissionsForFlow,
+                    [vm.physicalFlow.logicalFlowId]))
+            .then(r => vm.canEdit = _.some(
+                r.data,
+                d => _.includes(["ADD", "UPDATE", "REMOVE"], d)));
 
         physicalFlowPromise
             .then(physicalFlow => serviceBroker
@@ -148,28 +158,19 @@ function controller($q,
 
     // -- INTERACT: delete
     const deleteSpecification = () => {
-        physicalSpecificationStore.deleteById(vm.specification.id)
-            .then(r => {
-                if (r.outcome === "SUCCESS") {
-                    toasts.success(`Specification ${vm.specification.name} deleted`);
-                } else {
-                    toasts.error(r.message);
-                }
-                navigateToLastView($state, historyStore);
-            })
+        serviceBroker
+            .execute(CORE_API.PhysicalSpecificationStore.deleteById, [vm.specification.id])
+            .then(r => toasts.success(`Specification ${vm.specification.name} deleted`))
+            .catch(e => displayError("Could not delete specification", e))
+            .finally(() => navigateToLastView($state, historyStore));
     };
 
     const deleteLogicalFlow = () => {
         serviceBroker
             .execute(CORE_API.LogicalFlowStore.removeFlow, [vm.physicalFlow.logicalFlowId])
-            .then(r => {
-                if (r.outcome === "SUCCESS") {
-                    toasts.success(`Logical Flow between ${vm.logicalFlow.source.name} and ${vm.logicalFlow.target.name} deleted`);
-                } else {
-                    toasts.error(r.message);
-                }
-                navigateToLastView($state, historyStore);
-            });
+            .then(r => toasts.success(`Logical Flow between ${vm.logicalFlow.source.name} and ${vm.logicalFlow.target.name} deleted`))
+            .catch(e => displayError("Could not delete logical flow", e))
+            .finally(() => navigateToLastView($state, historyStore));
     };
 
     const handleDeleteFlowResponse = (response) => {

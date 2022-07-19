@@ -94,6 +94,14 @@ export function store($http, BaseApiUrl) {
         .post(`${BASE}/list`, addFlowCmds)
         .then(r => r.data);
 
+    const findPermissionsForParentRef = (ref) => $http
+        .get(`${BASE}/entity/${ref.kind}/${ref.id}/permissions`)
+        .then(r => r.data);
+
+    const findPermissionsForFlow = (id) => $http
+        .get(`${BASE}/id/${id}/permissions`)
+        .then(r => r.data);
+
     const cleanupOrphans = () => $http
         .get(`${BASE}/cleanup-orphans`)
         .then(r => r.data);
@@ -114,6 +122,8 @@ export function store($http, BaseApiUrl) {
         getById,
         addFlow,
         addFlows,
+        findPermissionsForParentRef,
+        findPermissionsForFlow,
         cleanupOrphans,
         cleanupSelfReferences
     };
@@ -187,6 +197,16 @@ export const LogicalFlowStore_API = {
         serviceName,
         serviceFnName: "addFlows",
         description: "adds a list of logical flows"
+    },
+    findPermissionsForParentRef: {
+        serviceName,
+        serviceFnName: "findPermissionsForParentRef",
+        description: "returns the operations that a user can perform on flows linked to the parent entity"
+    },
+    findPermissionsForFlow: {
+        serviceName,
+        serviceFnName: "findPermissionsForFlow",
+        description: "returns the operations that a user can perform on a flow"
     },
     cleanupOrphans: {
         serviceName,
