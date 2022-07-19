@@ -5,38 +5,41 @@
 
     import {ratingSchemeStore} from "../../../svelte-stores/rating-schemes";
     import {assessmentRatingStore} from "../../../svelte-stores/assessment-rating";
-    import {getRequiredFields, possibleVisibility, possibleEntityKinds} from "./assessment-definition-utils";
-
+    import {getRequiredFields, possibleVisibility, possibleEntityKinds, selectedDefinition} from "./assessment-definition-utils";
+    import MeasurableCategoryPicker from "./MeasurableCategoryPicker.svelte";
 
     export let doCancel;
     export let doSave;
-    export let definition;
 
     const ratingSchemesCall = ratingSchemeStore.loadAll();
 
     let hasRatings = false;
-    let workingCopy = _.cloneDeep(definition);
     let savePromise = null;
 
     let ratingCall;
 
+    function save() {
+        savePromise = doSave($selectedDefinition);
+    }
+
     $: {
-        if (definition.id) {
-            ratingCall = assessmentRatingStore.findByDefinitionId(definition.id);
+        if ($selectedDefinition.id) {
+            ratingCall = assessmentRatingStore.findByDefinitionId($selectedDefinition.id);
+        }
+    }
+
+    $: {
+        if ($selectedDefinition.entityKind === 'MEASURABLE') {
+            $selectedDefinition.qualifierReference.kind = 'MEASURABLE_CATEGORY';
+        } else {
+            $selectedDefinition.qualifierReference.kind = null;
         }
     }
 
     $: ratings = $ratingCall?.data || [];
     $: hasRatings = ratings.length > 0;
-
     $: possibleRatingSchemes = _.sortBy($ratingSchemesCall.data, d => d.name);
-
-    $: invalid = _.some(getRequiredFields(workingCopy), v => _.isEmpty(v));
-
-    function save() {
-        savePromise = doSave(workingCopy);
-    }
-
+    $: invalid = _.some(getRequiredFields($selectedDefinition), v => _.isNil(v));
 </script>
 
 
@@ -45,7 +48,7 @@
 
     <div class="row">
         <div class="col-md-12">
-            <h3>{definition.name || "Creating New Assessment Definition"}</h3>
+            <h3>{$selectedDefinition.name || "Creating New Assessment Definition"}</h3>
         </div>
     </div>
 
@@ -61,7 +64,7 @@
                        id="name"
                        required="required"
                        placeholder="Name of assessment"
-                       bind:value={workingCopy.name}>
+                       bind:value={$selectedDefinition.name}>
                 <div class="help-block">
                     Short name which describes this assessment
                 </div>
@@ -73,7 +76,7 @@
                 </label>
                 <select id="ratingScheme"
                         disabled={hasRatings}
-                        bind:value={workingCopy.ratingSchemeId}>
+                        bind:value={$selectedDefinition.ratingSchemeId}>
                     {#each possibleRatingSchemes as r}
                         <option value={r.id}>
                             {r.name}
@@ -96,7 +99,7 @@
                 </label>
                 <select id="entityKind"
                         disabled={hasRatings}
-                        bind:value={workingCopy.entityKind}>
+                        bind:value={$selectedDefinition.entityKind}>
 
                         {#each possibleEntityKinds as k}
                         <option value={k.value}>
@@ -114,6 +117,27 @@
 
                 </div>
 
+                <!-- CATEGORY ? -->
+                {#if $selectedDefinition.entityKind === 'MEASURABLE'}
+                    <MeasurableCategoryPicker initialId="2"
+                                              disabled={hasRatings}
+                                              bind:value={$selectedDefinition.qualifierReference.id}>
+                        <svelte:fragment slot="label">
+                            Measurable Category
+                            <small class="text-muted">(required)</small>
+                        </svelte:fragment>
+                        <svelte:fragment slot="help">
+                            When the entity kind is 'Measurable' you must further qualify which category of measurables
+                            this assessment applies to.
+                            {#if hasRatings}
+                                <br>
+                                <Icon name="warning"/>
+                                The associated category qualifier for this definition cannot be changed as ratings already exist.
+                            {/if}
+                        </svelte:fragment>
+                    </MeasurableCategoryPicker>
+                {/if}
+
 
                 <!-- DESCRIPTION -->
                 <label for="description">
@@ -125,7 +149,7 @@
                           rows="12"
                           style="width: 100%"
                           required="required"
-                          bind:value={workingCopy.description}/>
+                          bind:value={$selectedDefinition.description}/>
                 <div class="help-block">
                     HTML or markdown code, any paths should be absolute
                 </div>
@@ -141,7 +165,7 @@
                 <input class="form-control"
                        id="externalId"
                        placeholder="External identifier"
-                       bind:value={workingCopy.externalId}>
+                       bind:value={$selectedDefinition.externalId}>
                 <div class="help-block">
                     External identifiers help with data import/export as they <i>should not</i> change if the display name is updated
                 </div>
@@ -152,7 +176,7 @@
                     <small class="text-muted">(required)</small>
                 </label>
                 <select id="visibility"
-                        bind:value={workingCopy.visibility}>
+                        bind:value={$selectedDefinition.visibility}>
                     {#each possibleVisibility as r}
                         <option value={r.value}>
                             {r.name}
@@ -170,9 +194,9 @@
                 </label>
                 <input type=checkbox
                        id="isReadOnly"
-                       bind:checked={workingCopy.isReadOnly}>
+                       bind:checked={$selectedDefinition.isReadOnly}>
                 <span class="text-muted">
-                    {#if workingCopy.isReadOnly}
+                    {#if $selectedDefinition.isReadOnly}
                         Yes, assessments are locked
                         <Icon name="lock"/>
                     {:else}
@@ -190,7 +214,7 @@
                 </label>
                 <input type=text
                        id="permittedRole"
-                       bind:value={workingCopy.permittedRole}>
+                       bind:value={$selectedDefinition.permittedRole}>
                 <div class="help-block">
                     If provided, restricts editing to users which have been assigned the role
                 </div>

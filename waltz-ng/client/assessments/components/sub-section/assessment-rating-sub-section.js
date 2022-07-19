@@ -39,8 +39,8 @@ function controller($q, serviceBroker) {
     const loadAll = () => {
         const definitionsPromise = serviceBroker
             .loadViewData(
-                CORE_API.AssessmentDefinitionStore.findByKind,
-                [vm.parentEntityRef.kind]);
+                CORE_API.AssessmentDefinitionStore.findByEntityReference,
+                [vm.parentEntityRef]);
 
         const ratingsPromise = serviceBroker
             .loadViewData(

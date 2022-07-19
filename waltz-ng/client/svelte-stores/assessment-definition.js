@@ -16,11 +16,17 @@ export function mkAssessmentDefinitionStore() {
             null,
             {force});
 
-    const save = (def) => remote
-        .execute(
-            "PUT",
-            `api/assessment-definition`,
-            def);
+    const save = (def) => {
+        const defToSave = def.entityKind === 'MEASURABLE'
+            ? def
+            : _.omit(def, ["qualifierReference"]);
+
+        return remote
+            .execute(
+                "PUT",
+                `api/assessment-definition`,
+                defToSave);
+    }
 
     const remove = (id) => remote
         .execute(
