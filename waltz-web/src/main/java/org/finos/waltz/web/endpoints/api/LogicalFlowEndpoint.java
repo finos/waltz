@@ -93,6 +93,7 @@ public class LogicalFlowEndpoint implements Endpoint {
         String findBySourceAndTargetsPath = mkPath(BASE_URL, "source-targets");
         String findStatsPath = mkPath(BASE_URL, "stats");
         String findFlowPermissionsForParentEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id", "permissions");
+        String findEditableFlowIdsForParentReferencePath = mkPath(BASE_URL, "entity", ":kind", ":id", "editable-flows");
         String findPermissionsForFlowPath = mkPath(BASE_URL, "id", ":id", "permissions");
         String findUpstreamFlowsForEntityReferencesPath = mkPath(BASE_URL, "find-upstream-flows");
         String getByIdPath = mkPath(BASE_URL, ":id");
@@ -115,6 +116,10 @@ public class LogicalFlowEndpoint implements Endpoint {
         ListRoute<LogicalFlow> findUpstreamFlowsForEntityReferencesRoute = (request, response) -> {
             EntityReference[] refs = readBody(request, EntityReference[].class);
             return logicalFlowService.findUpstreamFlowsForEntityReferences(newArrayList(refs));
+        };
+
+        ListRoute<Long> findEditableFlowIdsForParentReferenceRoute = (request, response) -> {
+            return logicalFlowService.findEditableFlowIdsForParentReference(getEntityReference(request), getUsername(request));
         };
 
         ListRoute<Operation> findFlowPermissionsForParentEntityRoute = (request, response) -> {
@@ -145,6 +150,7 @@ public class LogicalFlowEndpoint implements Endpoint {
         getForList(findByEntityPath, getByEntityRef);
         getForList(findFlowPermissionsForParentEntityPath, findFlowPermissionsForParentEntityRoute);
         getForList(findPermissionsForFlowPath, findPermissionsForFlowRoute);
+        getForList(findEditableFlowIdsForParentReferencePath, findEditableFlowIdsForParentReferenceRoute);
         getForDatum(getByIdPath, getByIdRoute);
         getForDatum(getFlowGraphSummaryPath, getGraphSummaryRoute);
         postForList(findByIdsPath, findByIdsRoute);

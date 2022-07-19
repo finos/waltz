@@ -105,6 +105,7 @@ public class PermissionGroupDao {
     private SelectConditionStep<Record1<Long>> permissionGroupSelector(EntityReference parentEntityRef) {
         switch (parentEntityRef.kind()) {
             case APPLICATION:
+            case ACTOR:
             case CHANGE_INITIATIVE:
                 return DSL
                         .select(PERMISSION_GROUP_ENTRY.PERMISSION_GROUP_ID)

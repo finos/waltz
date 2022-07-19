@@ -259,7 +259,7 @@ function controller($element,
 
         const logicalFlowsById = _.keyBy(vm.logicalFlows, "id");
 
-        function select(entity, type, logicalFlowId, evt) {
+        function select(serviceBroker, entity, type, logicalFlowId, evt) {
             const typeInfoByFlowId = mkTypeInfo(vm.decorators, vm.dataTypes);
             const types = typeInfoByFlowId[logicalFlowId] || [];
             const logicalFlow = logicalFlowsById[logicalFlowId];
@@ -271,6 +271,10 @@ function controller($element,
                 .value();
             const tagInfoByFlowId = mkTagInfo(vm.tags);
             const tags = tagInfoByFlowId[logicalFlowId] || [];
+
+            serviceBroker
+                .loadViewData(CORE_API.LogicalFlowStore.findPermissionsForFlow, [logicalFlowId])
+                .then(r => vm.canEditPhysical = _.some(r.data, d => _.includes(["ADD", "UPDATE", "REMOVE"], d)))
 
             return {
                 type,
@@ -289,13 +293,13 @@ function controller($element,
             source: {
                 onSelect: (entity, evt) => $scope.$applyAsync(() => {
                     const flowId = keyedLogicalFlows.sourceFlowsByEntityId[entity.id];
-                    vm.selected = select(entity, "source", flowId, evt);
+                    vm.selected = select(serviceBroker, entity, "source", flowId, evt);
                 })
             },
             target: {
                 onSelect: (entity, evt) => $scope.$applyAsync(() => {
                     const flowId = keyedLogicalFlows.targetFlowsByEntityId[entity.id];
-                    vm.selected = select(entity, "target", flowId, evt);
+                    vm.selected = select(serviceBroker, entity, "target", flowId, evt);
                 })
             },
             type: {

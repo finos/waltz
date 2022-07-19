@@ -51,10 +51,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.Checks.checkTrue;
-import static org.finos.waltz.common.CollectionUtilities.notEmpty;
-import static org.finos.waltz.common.SetUtilities.asSet;
-import static org.finos.waltz.common.SetUtilities.intersection;
 
 @Service
 public class PhysicalFlowEndpoint implements Endpoint {
@@ -237,7 +233,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
         String username = WebUtilities.getUsername(request);
         PhysicalFlowCreateCommand command = WebUtilities.readBody(request, PhysicalFlowCreateCommand.class);
 
-        checkHasPermission(EntityReference.mkRef(EntityKind.LOGICAL_DATA_FLOW, command.logicalFlowId()), username);
+        checkLogicalFlowPermission(EntityReference.mkRef(EntityKind.LOGICAL_DATA_FLOW, command.logicalFlowId()), username);
 
         return physicalFlowService.create(command, username);
     }
@@ -260,7 +256,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
         SetAttributeCommand command
                 = WebUtilities.readBody(request, SetAttributeCommand.class);
 
-        checkHasPermission(command.entityReference(), username);
+        checkHasPermission(command.entityReference().id(), username);
 
         return physicalFlowService.updateAttribute(username, command);
     }
@@ -270,7 +266,8 @@ public class PhysicalFlowEndpoint implements Endpoint {
         long flowId = WebUtilities.getId(request);
         String username = WebUtilities.getUsername(request);
 
-        checkHasPermission(EntityReference.mkRef(EntityKind.PHYSICAL_FLOW, flowId), username);
+
+        checkHasPermission(flowId, username);
 
         ImmutablePhysicalFlowDeleteCommand deleteCommand = ImmutablePhysicalFlowDeleteCommand.builder()
                 .flowId(flowId)
@@ -328,10 +325,16 @@ public class PhysicalFlowEndpoint implements Endpoint {
     }
 
 
-    private void checkHasPermission(EntityReference ref, String username) throws InsufficientPrivelegeException {
-        PhysicalFlow physFlow = physicalFlowService.getById(ref.id());
-        Set<Operation> permissions = flowPermissionChecker.findPermissionsForFlow(physFlow.logicalFlowId(), username);
+    private void checkLogicalFlowPermission(EntityReference ref, String username) throws InsufficientPrivelegeException {
+        Set<Operation> permissions = flowPermissionChecker.findPermissionsForFlow(ref.id(), username);
         flowPermissionChecker.verifyEditPerms(permissions, EntityKind.PHYSICAL_FLOW, username);
     }
+
+
+    private void checkHasPermission(long flowId, String username) throws InsufficientPrivelegeException {
+        PhysicalFlow physFlow = physicalFlowService.getById(flowId);
+        checkLogicalFlowPermission(EntityReference.mkRef(EntityKind.LOGICAL_DATA_FLOW, physFlow.logicalFlowId()), username);
+    }
+
 
 }

@@ -33,13 +33,13 @@ import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.datatype.DataType;
 import org.finos.waltz.model.datatype.ImmutableDataTypeDecorator;
 import org.finos.waltz.model.logical_flow.*;
-import org.finos.waltz.model.permission_group.Permission;
 import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
 import org.finos.waltz.model.tally.TallyPack;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.data_type.DataTypeService;
 import org.finos.waltz.service.involvement.InvolvementService;
 import org.finos.waltz.service.permission.PermissionGroupService;
+import org.finos.waltz.service.permission.permission_checker.FlowPermissionChecker;
 import org.finos.waltz.service.usage_info.DataTypeUsageService;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -62,14 +62,12 @@ import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
-import static org.finos.waltz.common.SetUtilities.fromCollection;
-import static org.finos.waltz.common.SetUtilities.union;
+import static org.finos.waltz.common.SetUtilities.*;
 import static org.finos.waltz.model.EntityKind.DATA_TYPE;
 import static org.finos.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
 import static org.finos.waltz.model.EntityReference.mkRef;
@@ -90,6 +88,7 @@ public class LogicalFlowService {
     private final LogicalFlowDecoratorDao logicalFlowDecoratorDao;
     private final InvolvementService involvementService;
     private final PermissionGroupService permissionGroupService;
+    private final FlowPermissionChecker flowPermissionChecker;
 
     private final ApplicationIdSelectorFactory appIdSelectorFactory = new ApplicationIdSelectorFactory();
     private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory = new LogicalFlowIdSelectorFactory();
@@ -105,7 +104,8 @@ public class LogicalFlowService {
                               LogicalFlowStatsDao logicalFlowStatsDao,
                               LogicalFlowDecoratorDao logicalFlowDecoratorDao,
                               InvolvementService involvementService,
-                              PermissionGroupService permissionGroupService) {
+                              PermissionGroupService permissionGroupService,
+                              FlowPermissionChecker flowPermissionChecker) {
 
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(dbExecutorPool, "dbExecutorPool cannot be null");
@@ -116,9 +116,11 @@ public class LogicalFlowService {
         checkNotNull(logicalFlowStatsDao, "logicalFlowStatsDao cannot be null");
         checkNotNull(involvementService, "involvementService cannot be null");
         checkNotNull(permissionGroupService, "permissionGroupService cannot be null");
+        checkNotNull(flowPermissionChecker, "flowPermissionChecker cannot be null");
 
         this.changeLogService = changeLogService;
         this.dataTypeService = dataTypeService;
+        this.flowPermissionChecker = flowPermissionChecker;
         this.dataTypeUsageService = dataTypeUsageService;
         this.dbExecutorPool = dbExecutorPool;
         this.logicalFlowDao = logicalFlowDao;
@@ -367,10 +369,30 @@ public class LogicalFlowService {
     }
 
 
+    public Set<Long> findEditableFlowIdsForParentReference(EntityReference parentRef, String username) {
+        List<LogicalFlow> logicalFlows = findByEntityReference(parentRef);
+
+        Set<Operation> flowPermissionsForParentEntity = flowPermissionChecker.findFlowPermissionsForParentEntity(parentRef, username);
+
+        if (hasIntersection(flowPermissionsForParentEntity, asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE))) {
+            return map(logicalFlows, f -> f.id().get());
+        } else {
+
+            return logicalFlows.stream()
+                    .flatMap(f -> asSet(tuple(f.id().get(), f.source()), tuple(f.id().get(), f.target())).stream())
+                    .filter(t -> {
+                        Set<Operation> entity = flowPermissionChecker.findFlowPermissionsForParentEntity(t.v2, username);
+                        return hasIntersection(entity, asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE));
+                    })
+                    .map(t -> t.v1)
+                    .collect(Collectors.toSet());
+        }
+    }
+
+
     /**
-     *
-     * @param ref  app or actor ref
-     * @param startingDataTypeId  optional id of the data type to use (i.e. restrict to flows below that data type)
+     * @param ref                app or actor ref
+     * @param startingDataTypeId optional id of the data type to use (i.e. restrict to flows below that data type)
      * @return
      */
     public LogicalFlowGraphSummary getFlowInfoByDirection(EntityReference ref, Long startingDataTypeId) {
