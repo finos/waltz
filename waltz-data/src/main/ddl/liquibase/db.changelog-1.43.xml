@@ -115,7 +115,6 @@
                           remarks="An optional reference a qualifier id, to further identify this item of grid data"/>
     </changeSet>
 
-    <!-- TODO: uncomment when the new permission code is ready
 
     <changeSet id="20220711-6133-6"
                author="davidwatkins73">
@@ -147,5 +146,4 @@
                           remarks="the id of the entity being given specific permissions"/>
     </changeSet>
 
-    -->
 </databaseChangeLog>

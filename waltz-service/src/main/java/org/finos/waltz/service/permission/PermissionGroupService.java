@@ -7,6 +7,7 @@ import org.finos.waltz.model.permission_group.CheckPermissionCommand;
 import org.finos.waltz.model.permission_group.Permission;
 import org.finos.waltz.model.permission_group.RequiredInvolvementsResult;
 import org.finos.waltz.model.person.Person;
+import org.finos.waltz.service.involvement.InvolvementService;
 import org.finos.waltz.service.person.PersonService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,13 +26,16 @@ public class PermissionGroupService {
 
     private final PersonService personService;
     private final PermissionGroupDao permissionGroupDao;
+    private final InvolvementService involvementService;
 
 
     @Autowired
     public PermissionGroupService(PersonService personService,
-                                  PermissionGroupDao permissionGroupDao) {
+                                  PermissionGroupDao permissionGroupDao,
+                                  InvolvementService involvementService) {
         this.personService = personService;
         this.permissionGroupDao = permissionGroupDao;
+        this.involvementService = involvementService;
     }
 
 
@@ -45,7 +49,7 @@ public class PermissionGroupService {
         }
 
         Set<Permission> permissions = permissionGroupDao.findPermissionsForParentEntityReference(parentEntityRef);
-        Set<Long> involvements = permissionGroupDao.findExistingInvolvementKindIdsForUser(parentEntityRef, username);
+        Set<Long> involvements = involvementService.findExistingInvolvementKindIdsForUser(parentEntityRef, username);
 
         return filter(
                 permissions,
@@ -66,7 +70,7 @@ public class PermissionGroupService {
             return false;
         }
 
-        Set<Long> existingInvolvements = permissionGroupDao.findExistingInvolvementKindIdsForUser(
+        Set<Long> existingInvolvements = involvementService.findExistingInvolvementKindIdsForUser(
                 permissionCommand.parentEntityRef(),
                 permissionCommand.user());
 

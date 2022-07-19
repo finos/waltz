@@ -20,10 +20,9 @@ package org.finos.waltz.jobs.harness;
 
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.Operation;
-import org.finos.waltz.model.assessment_rating.AssessmentRatingDetail;
 import org.finos.waltz.service.DIConfiguration;
-import org.finos.waltz.service.assessment_rating.AssessmentRatingService;
 import org.finos.waltz.service.assessment_rating.AssessmentRatingViewService;
+import org.finos.waltz.service.permission.permission_checker.AssessmentRatingPermissionChecker;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -39,13 +38,10 @@ public class AssessmentHarness {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
         AssessmentRatingViewService viewSvc = ctx.getBean(AssessmentRatingViewService.class);
-        AssessmentRatingService ratingSvc = ctx.getBean(AssessmentRatingService.class);
+        AssessmentRatingPermissionChecker permChecker = ctx.getBean(AssessmentRatingPermissionChecker.class);
 
-        Set<AssessmentRatingDetail> assessments = viewSvc.findFavouriteAssessmentsForEntityAndUser(
-                mkRef(EntityKind.APPLICATION, 20506L),
-                "jessica.woodland-scott@db.com");
 
-        Set<Operation> perms = ratingSvc.findRatingPermissions(mkRef(EntityKind.APPLICATION, 90L), 14, "admin");
+        Set<Operation> perms = permChecker.findRatingPermissions(mkRef(EntityKind.APPLICATION, 90L), 14, "admin");
         System.out.println(perms);
 
 

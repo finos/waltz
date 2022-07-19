@@ -18,15 +18,18 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.common.exception.InsufficientPrivelegeException;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.SetAttributeCommand;
 import org.finos.waltz.model.command.CommandResponse;
 import org.finos.waltz.model.entity_search.ImmutableEntitySearchOptions;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecificationDeleteCommand;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
 import org.finos.waltz.model.physical_specification.PhysicalSpecificationDeleteCommand;
-import org.finos.waltz.model.user.SystemRole;
+import org.finos.waltz.service.permission.permission_checker.FlowPermissionChecker;
 import org.finos.waltz.service.physical_specification.PhysicalSpecificationService;
-import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.WebUtilities;
@@ -37,6 +40,7 @@ import spark.Request;
 import spark.Response;
 
 import java.io.IOException;
+import java.util.Set;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.web.WebUtilities.*;
@@ -48,16 +52,16 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
     private static final String BASE_URL = mkPath("api", "physical-specification");
 
     private final PhysicalSpecificationService specificationService;
-    private final UserRoleService userRoleService;
+    private final FlowPermissionChecker flowPermissionChecker;
 
 
     @Autowired
-    public PhysicalSpecificationEndpoint(PhysicalSpecificationService specificationService, UserRoleService userRoleService) {
+    public PhysicalSpecificationEndpoint(PhysicalSpecificationService specificationService, FlowPermissionChecker flowPermissionChecker) {
         checkNotNull(specificationService, "specificationService cannot be null");
-        checkNotNull(userRoleService, "userRoleService cannot be null");
+        checkNotNull(flowPermissionChecker, "flowPermissionChecker cannot be null");
 
         this.specificationService = specificationService;
-        this.userRoleService = userRoleService;
+        this.flowPermissionChecker = flowPermissionChecker;
     }
 
 
@@ -128,11 +132,12 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
     }
 
 
-    private CommandResponse<PhysicalSpecificationDeleteCommand> deleteSpecification(Request request, Response response) {
-        requireRole(userRoleService, request, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
+    private CommandResponse<PhysicalSpecificationDeleteCommand> deleteSpecification(Request request, Response response) throws InsufficientPrivelegeException {
 
         long specId = getId(request);
         String username = getUsername(request);
+
+        checkHasPermission(EntityReference.mkRef(EntityKind.PHYSICAL_SPECIFICATION, specId), username);
 
         ImmutablePhysicalSpecificationDeleteCommand deleteCommand = ImmutablePhysicalSpecificationDeleteCommand.builder()
                 .specificationId(specId)
@@ -142,13 +147,19 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
     }
 
 
-    private int updateAttribute(Request request, Response response) throws IOException {
-        WebUtilities.requireRole(userRoleService, request, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
+    private int updateAttribute(Request request, Response response) throws IOException, InsufficientPrivelegeException {
         String username = WebUtilities.getUsername(request);
-        SetAttributeCommand command
-                = WebUtilities.readBody(request, SetAttributeCommand.class);
+        SetAttributeCommand command = WebUtilities.readBody(request, SetAttributeCommand.class);
 
+        checkHasPermission(command.entityReference(), username);
         return specificationService.updateAttribute(username, command);
+    }
+
+
+    private void checkHasPermission(EntityReference ref, String username) throws InsufficientPrivelegeException {
+
+        Set<Operation> permissions = flowPermissionChecker.findPermissionsForSpec(ref.id(), username);
+        flowPermissionChecker.verifyEditPerms(permissions, EntityKind.PHYSICAL_SPECIFICATION, username);
     }
 
 }

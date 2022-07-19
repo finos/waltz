@@ -18,6 +18,8 @@
 
 package org.finos.waltz.model;
 
+import java.util.Optional;
+
 /**
  * Created by dwatkins on 06/06/2017.
  */
@@ -38,6 +40,13 @@ public class EntityReferenceUtilities {
                 .name()
                 .map(n -> n + " " + idStr)
                 .orElse(idStr);
+    }
+
+
+    public static boolean sameRef(Optional<EntityReference> refA, EntityReference refB) {
+        return refA
+                .map(refB::equals)
+                .orElse(false);
     }
 
 }

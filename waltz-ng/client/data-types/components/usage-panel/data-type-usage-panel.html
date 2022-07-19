@@ -17,8 +17,7 @@
   -->
 
 <div class="waltz-data-type-usage-panel">
-    <waltz-sub-section name="Data Types"
-                       hide-controls="! $ctrl.visibility.controls">
+    <waltz-sub-section name="Data Types">
         <content>
 
             <div style="padding-top: 0.5em">
@@ -50,9 +49,8 @@
             </div>
 
             <!-- ACTIONS -->
-            <div class="waltz-sub-section-controls"
-                 waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
-                <span ng-if="!$ctrl.visibility.editor">
+            <div class="waltz-sub-section-controls">
+                <span ng-if="!$ctrl.visibility.editor && $ctrl.visibility.controls">
                     <!-- WHILST VIEWING -->
                     <a ng-click="$ctrl.onShowEdit()"
                        class="clickable">
@@ -60,7 +58,7 @@
                     </a>
                 </span>
 
-                <span ng-if="$ctrl.visibility.editor">
+                <span ng-if="$ctrl.visibility.editor && $ctrl.visibility.controls">
                     <!-- WHILST EDITING -->
                     <a ng-click="$ctrl.onSave()"
                        class="clickable"

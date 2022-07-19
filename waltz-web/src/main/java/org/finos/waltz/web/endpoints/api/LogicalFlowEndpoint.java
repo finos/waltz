@@ -18,6 +18,10 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.common.exception.InsufficientPrivelegeException;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.service.permission.permission_checker.FlowPermissionChecker;
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.DatumRoute;
@@ -43,7 +47,12 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import static org.finos.waltz.common.Checks.checkTrue;
+import static org.finos.waltz.common.CollectionUtilities.notEmpty;
+import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.SetUtilities.intersection;
 import static org.finos.waltz.web.WebUtilities.*;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -59,16 +68,20 @@ public class LogicalFlowEndpoint implements Endpoint {
 
     private final LogicalFlowService logicalFlowService;
     private final UserRoleService userRoleService;
+    private final FlowPermissionChecker flowPermissionChecker;
 
 
     @Autowired
     public LogicalFlowEndpoint(LogicalFlowService logicalFlowService,
-                               UserRoleService userRoleService) {
+                               UserRoleService userRoleService,
+                               FlowPermissionChecker flowPermissionChecker) {
         checkNotNull(logicalFlowService, "logicalFlowService must not be null");
         checkNotNull(userRoleService, "userRoleService must not be null");
+        checkNotNull(flowPermissionChecker, "flowPermissionService must not be null");
 
         this.logicalFlowService = logicalFlowService;
         this.userRoleService = userRoleService;
+        this.flowPermissionChecker = flowPermissionChecker;
     }
 
 
@@ -79,6 +92,9 @@ public class LogicalFlowEndpoint implements Endpoint {
         String findByIdsPath = mkPath(BASE_URL, "ids");
         String findBySourceAndTargetsPath = mkPath(BASE_URL, "source-targets");
         String findStatsPath = mkPath(BASE_URL, "stats");
+        String findFlowPermissionsForParentEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id", "permissions");
+        String findEditableFlowIdsForParentReferencePath = mkPath(BASE_URL, "entity", ":kind", ":id", "editable-flows");
+        String findPermissionsForFlowPath = mkPath(BASE_URL, "id", ":id", "permissions");
         String findUpstreamFlowsForEntityReferencesPath = mkPath(BASE_URL, "find-upstream-flows");
         String getByIdPath = mkPath(BASE_URL, ":id");
         String removeFlowPath = mkPath(BASE_URL, ":id");
@@ -102,6 +118,21 @@ public class LogicalFlowEndpoint implements Endpoint {
             return logicalFlowService.findUpstreamFlowsForEntityReferences(newArrayList(refs));
         };
 
+        ListRoute<Long> findEditableFlowIdsForParentReferenceRoute = (request, response) -> {
+            return logicalFlowService.findEditableFlowIdsForParentReference(getEntityReference(request), getUsername(request));
+        };
+
+        ListRoute<Operation> findFlowPermissionsForParentEntityRoute = (request, response) -> {
+            EntityReference entityReference = getEntityReference(request);
+            return flowPermissionChecker.findFlowPermissionsForParentEntity(
+                    entityReference,
+                    getUsername(request));
+        };
+
+        ListRoute<Operation> findPermissionsForFlowRoute = (request, response) -> flowPermissionChecker.findPermissionsForFlow(
+                getId(request),
+                getUsername(request));
+
         DatumRoute<LogicalFlowStatistics> findStatsRoute = (request, response)
                 -> logicalFlowService.calculateStats(readIdSelectionOptionsFromBody(request));
 
@@ -117,6 +148,9 @@ public class LogicalFlowEndpoint implements Endpoint {
         getForDatum(cleanupOrphansPath, this::cleanupOrphansRoute);
         getForDatum(cleanupSelfReferencesPath, this::cleanupSelfReferencingFlowsRoute);
         getForList(findByEntityPath, getByEntityRef);
+        getForList(findFlowPermissionsForParentEntityPath, findFlowPermissionsForParentEntityRoute);
+        getForList(findPermissionsForFlowPath, findPermissionsForFlowRoute);
+        getForList(findEditableFlowIdsForParentReferencePath, findEditableFlowIdsForParentReferenceRoute);
         getForDatum(getByIdPath, getByIdRoute);
         getForDatum(getFlowGraphSummaryPath, getGraphSummaryRoute);
         postForList(findByIdsPath, findByIdsRoute);
@@ -170,13 +204,12 @@ public class LogicalFlowEndpoint implements Endpoint {
     }
 
 
-    private LogicalFlow addFlowRoute(Request request, Response response) throws IOException {
-        ensureUserHasEditRights(request);
+    private LogicalFlow addFlowRoute(Request request, Response response) throws IOException, InsufficientPrivelegeException {
 
         String username = getUsername(request);
-
         AddLogicalFlowCommand addCmd = readBody(request, AddLogicalFlowCommand.class);
 
+        ensureUserHasEditRights(addCmd.source(), addCmd.target(), username);
 
         LOG.info("User: {}, adding new logical flow: {}", username, addCmd);
         return logicalFlowService.addFlow(addCmd, username);
@@ -184,7 +217,7 @@ public class LogicalFlowEndpoint implements Endpoint {
 
 
     private List<LogicalFlow> addFlowsRoute(Request request, Response response) throws IOException {
-        ensureUserHasEditRights(request);
+        requireRole(userRoleService, request, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
 
         String username = getUsername(request);
 
@@ -195,10 +228,10 @@ public class LogicalFlowEndpoint implements Endpoint {
 
 
     private int removeFlowRoute(Request request, Response response) {
-        ensureUserHasEditRights(request);
 
         long flowId = getId(request);
         String username = getUsername(request);
+        ensureUserHasEditRights(flowId, username);
 
         LOG.info("User: {} removing logical flow: {}", username, flowId);
 
@@ -206,13 +239,23 @@ public class LogicalFlowEndpoint implements Endpoint {
     }
 
 
-    private void ensureUserHasEditRights(Request request) {
-        requireRole(userRoleService, request, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
+    private void ensureUserHasEditRights(Long id, String username) {
+        Set<Operation> permissionsForFlow = flowPermissionChecker.findPermissionsForFlow(id, username);
+        Set<Operation> editPermissions = intersection(permissionsForFlow, asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE));
+
+        checkTrue(
+                notEmpty(editPermissions),
+                "User does not have permission to edit this flow");
+    }
+
+
+    private void ensureUserHasEditRights(EntityReference source, EntityReference target, String username) throws InsufficientPrivelegeException {
+        Set<Operation> permissionsForFlow = flowPermissionChecker.findPermissionsForSourceAndTarget(source, target, username);
+        flowPermissionChecker.verifyEditPerms(permissionsForFlow, EntityKind.LOGICAL_DATA_FLOW, username);
     }
 
 
     private void ensureUserHasAdminRights(Request request) {
         requireRole(userRoleService, request, SystemRole.ADMIN);
     }
-
 }

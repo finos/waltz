@@ -51,6 +51,7 @@ public enum EntityKind {
     ENTITY_NAMED_NOTE_TYPE("Entity named note type"),
     ENTITY_RELATIONSHIP("Entity relationship"),
     ENTITY_STATISTIC("Entity statistic"),
+    EXTERNAL_IDENTIFIER("External Identifier"),
     FLOW_ANNOTATION("Flow annotation"),
     FLOW_CLASSIFICATION_RULE("Flow classification rule"),
     FLOW_CLASSIFICATION("Flow classification"),

@@ -480,7 +480,7 @@ public class PhysicalFlowUploadService {
     }
 
     private Aliases<FrequencyKindValue> loadFrequencyAliases() {
-        return enumValueAliasService.mkAliases(EnumValueKind.PHYSICAL_FLOW_CRITICALITY, FrequencyKindValue::of);
+        return enumValueAliasService.mkAliases(EnumValueKind.FREQUENCY, FrequencyKindValue::of);
     }
 
     private Aliases<DataFormatKindValue> loadDataFormatKindAliases() {
