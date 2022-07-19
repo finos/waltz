@@ -178,6 +178,13 @@ export const entity = {
         description: null,
         position: 130
     },
+    EXTERNAL_IDENTIFIER: {
+        key: "EXTERNAL_IDENTIFIER",
+        name: "External Identifier",
+        icon: "comments-o",
+        description: null,
+        position: 135
+    },
     FLOW_DIAGRAM: {
         key: "FLOW_DIAGRAM",
         name: "Flow Diagram",

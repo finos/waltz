@@ -333,7 +333,7 @@ public class AssessmentRatingDao {
                                                            EntityReference entityReference,
                                                            long assessmentDefinitionId,
                                                            String username) {
-        Tuple3<Boolean, Boolean, Boolean> hasRoleAndDefinitionROAndIsLocked = dsl
+        Tuple3<Boolean, Boolean, Boolean> hasRoleAndDefinitionROAndIsReadOnly = dsl
                 .select(USER_ROLE.ROLE, ASSESSMENT_DEFINITION.IS_READONLY, ASSESSMENT_RATING.IS_READONLY)
                 .from(ASSESSMENT_DEFINITION)
                 .leftJoin(ASSESSMENT_RATING)
@@ -345,15 +345,16 @@ public class AssessmentRatingDao {
                         .and(USER_ROLE.USER_NAME.eq(username)))
                 .where(ASSESSMENT_DEFINITION.ID.eq(assessmentDefinitionId))
                 .fetchOne(r -> tuple(
+                        notEmpty(r.get(USER_ROLE.ROLE)),
                         r.get(ASSESSMENT_DEFINITION.IS_READONLY),
-                        r.get(ASSESSMENT_RATING.IS_READONLY),
-                        notEmpty(r.get(USER_ROLE.ROLE))));
+                        r.get(ASSESSMENT_RATING.IS_READONLY)));
 
-        if (hasRoleAndDefinitionROAndIsLocked.v1) {
+
+        if (hasRoleAndDefinitionROAndIsReadOnly.v2) {
             return emptySet();
-        } else if (hasRoleAndDefinitionROAndIsLocked.v2) {
+        } else if (hasRoleAndDefinitionROAndIsReadOnly.v3) {
             return intersection(operationsForEntityAssessment, asSet(Operation.LOCK));
-        } else if (hasRoleAndDefinitionROAndIsLocked.v3) {
+        } else if (hasRoleAndDefinitionROAndIsReadOnly.v1) {
             return union(operationsForEntityAssessment, asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE));
         } else {
             return operationsForEntityAssessment;

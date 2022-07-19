@@ -27,7 +27,7 @@ import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.assessment_rating.*;
 import org.finos.waltz.service.assessment_definition.AssessmentDefinitionService;
 import org.finos.waltz.service.assessment_rating.AssessmentRatingService;
-import org.finos.waltz.service.permission.permission_checker.RatingPermissionChecker;
+import org.finos.waltz.service.permission.permission_checker.AssessmentRatingPermissionChecker;
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.NotAuthorizedException;
 import org.finos.waltz.web.endpoints.Endpoint;
@@ -53,24 +53,24 @@ public class AssessmentRatingEndpoint implements Endpoint {
 
     private final AssessmentRatingService assessmentRatingService;
     private final AssessmentDefinitionService assessmentDefinitionService;
-    private final RatingPermissionChecker ratingPermissionChecker;
+    private final AssessmentRatingPermissionChecker assessmentRatingPermissionChecker;
     private final UserRoleService userRoleService;
 
 
     @Autowired
     public AssessmentRatingEndpoint(AssessmentRatingService assessmentRatingService,
                                     AssessmentDefinitionService assessmentDefinitionService,
-                                    RatingPermissionChecker ratingPermissionChecker,
+                                    AssessmentRatingPermissionChecker assessmentRatingPermissionChecker,
                                     UserRoleService userRoleService) {
 
         checkNotNull(assessmentRatingService, "assessmentRatingService cannot be null");
         checkNotNull(assessmentDefinitionService, "assessmentDefinitionService cannot be null");
         checkNotNull(userRoleService, "userRoleService cannot be null");
-        checkNotNull(ratingPermissionChecker, "ratingPermissionChecker cannot be null");
+        checkNotNull(assessmentRatingPermissionChecker, "ratingPermissionChecker cannot be null");
 
         this.assessmentRatingService = assessmentRatingService;
         this.assessmentDefinitionService = assessmentDefinitionService;
-        this.ratingPermissionChecker = ratingPermissionChecker;
+        this.assessmentRatingPermissionChecker = assessmentRatingPermissionChecker;
         this.userRoleService = userRoleService;
     }
 

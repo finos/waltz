@@ -34,7 +34,7 @@ import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.service.changelog.ChangeLogService;
-import org.finos.waltz.service.permission.permission_checker.RatingPermissionChecker;
+import org.finos.waltz.service.permission.permission_checker.AssessmentRatingPermissionChecker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,7 +53,7 @@ public class AssessmentRatingService {
     private final AssessmentDefinitionDao assessmentDefinitionDao;
     private final RatingSchemeDAO ratingSchemeDAO;
     private final ChangeLogService changeLogService;
-    private final RatingPermissionChecker ratingPermissionChecker;
+    private final AssessmentRatingPermissionChecker assessmentRatingPermissionChecker;
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
 
 
@@ -63,15 +63,15 @@ public class AssessmentRatingService {
             AssessmentDefinitionDao assessmentDefinitionDao,
             RatingSchemeDAO ratingSchemeDAO,
             ChangeLogService changeLogService,
-            RatingPermissionChecker ratingPermissionChecker) {
+            AssessmentRatingPermissionChecker assessmentRatingPermissionChecker) {
 
         checkNotNull(assessmentRatingDao, "assessmentRatingDao cannot be null");
         checkNotNull(assessmentDefinitionDao, "assessmentDefinitionDao cannot be null");
         checkNotNull(ratingSchemeDAO, "ratingSchemeDao cannot be null");
-        checkNotNull(ratingPermissionChecker, "ratingPermissionChecker cannot be null");
+        checkNotNull(assessmentRatingPermissionChecker, "ratingPermissionChecker cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
 
-        this.ratingPermissionChecker = ratingPermissionChecker;
+        this.assessmentRatingPermissionChecker = assessmentRatingPermissionChecker;
         this.assessmentRatingDao = assessmentRatingDao;
         this.ratingSchemeDAO = ratingSchemeDAO;
         this.assessmentDefinitionDao = assessmentDefinitionDao;
@@ -201,7 +201,7 @@ public class AssessmentRatingService {
 
 
     public Set<Operation> findRatingPermissions(EntityReference entityReference, long assessmentDefinitionId, String username) {
-        return ratingPermissionChecker.findRatingPermissions(entityReference, assessmentDefinitionId, username);
+        return assessmentRatingPermissionChecker.findRatingPermissions(entityReference, assessmentDefinitionId, username);
     }
 
 
@@ -240,9 +240,9 @@ public class AssessmentRatingService {
                                      long defId,
                                      String username) throws InsufficientPrivelegeException {
 
-        Set<Operation> permsUserHas = ratingPermissionChecker.findRatingPermissions(ref, defId, username);
+        Set<Operation> permsUserHas = assessmentRatingPermissionChecker.findRatingPermissions(ref, defId, username);
 
-        ratingPermissionChecker.verifyAnyPerms(possiblePerms, permsUserHas, EntityKind.ASSESSMENT_DEFINITION, username);
+        assessmentRatingPermissionChecker.verifyAnyPerms(possiblePerms, permsUserHas, EntityKind.ASSESSMENT_DEFINITION, username);
     }
 
 

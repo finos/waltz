@@ -36,12 +36,13 @@ import java.util.stream.Collectors;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.EntityReferenceUtilities.sameRef;
 
 
 @Service
-public class RatingPermissionChecker implements PermissionChecker {
+public class AssessmentRatingPermissionChecker implements PermissionChecker {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RatingPermissionChecker.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AssessmentRatingPermissionChecker.class);
 
     private final AssessmentRatingDao assessmentRatingDao;
     private final InvolvementService involvementService;
@@ -49,10 +50,10 @@ public class RatingPermissionChecker implements PermissionChecker {
     private final UserRoleService userRoleService;
 
     @Autowired
-    public RatingPermissionChecker(AssessmentRatingDao assessmentRatingDao,
-                                   InvolvementService involvementService,
-                                   PermissionGroupService permissionGroupService,
-                                   UserRoleService userRoleService) {
+    public AssessmentRatingPermissionChecker(AssessmentRatingDao assessmentRatingDao,
+                                             InvolvementService involvementService,
+                                             PermissionGroupService permissionGroupService,
+                                             UserRoleService userRoleService) {
 
         checkNotNull(assessmentRatingDao, "assessmentRatingDao must not be null");
         checkNotNull(involvementService, "involvementService cannot be null");
@@ -77,9 +78,7 @@ public class RatingPermissionChecker implements PermissionChecker {
                 .stream()
                 .filter(p -> p.subjectKind().equals(EntityKind.ASSESSMENT_RATING)
                         && p.parentKind().equals(entityReference.kind())
-                        && p.qualifierReference()
-                        .map(ref -> mkRef(EntityKind.ASSESSMENT_DEFINITION, assessmentDefinitionId).equals(ref))
-                        .orElse(false))
+                        && sameRef(p.qualifierReference(), mkRef(EntityKind.ASSESSMENT_DEFINITION, assessmentDefinitionId)))
                 .filter(p -> p.requiredInvolvementsResult().isAllowed(invsForUser))
                 .map(Permission::operation)
                 .collect(Collectors.toSet());
