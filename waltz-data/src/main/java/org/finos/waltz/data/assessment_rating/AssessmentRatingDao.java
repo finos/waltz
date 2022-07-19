@@ -333,8 +333,13 @@ public class AssessmentRatingDao {
                                                            EntityReference entityReference,
                                                            long assessmentDefinitionId,
                                                            String username) {
+
+        Field<Boolean> readOnlyRatingField = DSL.coalesce(ASSESSMENT_RATING.IS_READONLY, DSL.val(false)).as("rating_read_only");
+
         Tuple3<Boolean, Boolean, Boolean> hasRoleAndDefinitionROAndIsReadOnly = dsl
-                .select(USER_ROLE.ROLE, ASSESSMENT_DEFINITION.IS_READONLY, ASSESSMENT_RATING.IS_READONLY)
+                .select(USER_ROLE.ROLE,
+                        ASSESSMENT_DEFINITION.IS_READONLY,
+                        readOnlyRatingField)
                 .from(ASSESSMENT_DEFINITION)
                 .leftJoin(ASSESSMENT_RATING)
                 .on(ASSESSMENT_DEFINITION.ID.eq(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID))
@@ -347,7 +352,7 @@ public class AssessmentRatingDao {
                 .fetchOne(r -> tuple(
                         notEmpty(r.get(USER_ROLE.ROLE)),
                         r.get(ASSESSMENT_DEFINITION.IS_READONLY),
-                        r.get(ASSESSMENT_RATING.IS_READONLY)));
+                        r.get(readOnlyRatingField)));
 
 
         if (hasRoleAndDefinitionROAndIsReadOnly.v2) {
