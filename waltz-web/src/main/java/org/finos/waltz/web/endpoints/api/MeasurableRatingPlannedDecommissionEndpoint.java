@@ -18,6 +18,10 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.permission_group.ImmutableCheckPermissionCommand;
+import org.finos.waltz.service.measurable_rating.MeasurableRatingPermissionChecker;
 import org.finos.waltz.service.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommissionService;
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.DatumRoute;
@@ -29,6 +33,8 @@ import org.finos.waltz.model.measurable_rating_planned_decommission.MeasurableRa
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static java.lang.String.format;
+import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.web.WebUtilities.*;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -43,17 +49,21 @@ public class MeasurableRatingPlannedDecommissionEndpoint implements Endpoint {
 
 
     private final MeasurableRatingPlannedDecommissionService measurableRatingPlannedDecommissionService;
+    private final MeasurableRatingPermissionChecker measurableRatingPermissionChecker;
     private final UserRoleService userRoleService;
 
 
     @Autowired
     public MeasurableRatingPlannedDecommissionEndpoint(MeasurableRatingPlannedDecommissionService measurableRatingPlannedDecommissionService,
+                                                       MeasurableRatingPermissionChecker measurableRatingPermissionChecker,
                                                        UserRoleService userRoleService) {
         checkNotNull(measurableRatingPlannedDecommissionService, "measurableRatingPlannedDecommissionService cannot be null");
         checkNotNull(userRoleService, "userRoleService cannot be null");
+        checkNotNull(measurableRatingPermissionChecker, "measurableRatingPermissionChecker cannot be null");
 
-        this.measurableRatingPlannedDecommissionService = measurableRatingPlannedDecommissionService;
         this.userRoleService = userRoleService;
+        this.measurableRatingPlannedDecommissionService = measurableRatingPlannedDecommissionService;
+        this.measurableRatingPermissionChecker = measurableRatingPermissionChecker;
     }
 
 
@@ -88,7 +98,9 @@ public class MeasurableRatingPlannedDecommissionEndpoint implements Endpoint {
             long decommissionId = getId(request);
             EntityReference entityRef = mkRef(MEASURABLE_RATING_PLANNED_DECOMMISSION, decommissionId);
 
-            requireRole(userRoleService, request,  measurableRatingPlannedDecommissionService.getRequiredRatingEditRole(entityRef));
+            checkHasPermissionForThisOperation(decommissionId, parentReference, Operation.REMOVE, getUsername());
+
+            requireRole(userRoleService, request, measurableRatingPlannedDecommissionService.getRequiredRatingEditRole(entityRef));
 
             return measurableRatingPlannedDecommissionService.remove(decommissionId, getUsername(request));
         };
@@ -98,5 +110,35 @@ public class MeasurableRatingPlannedDecommissionEndpoint implements Endpoint {
         postForDatum(savePath, saveRoute);
         deleteForDatum(removePath, removeRoute);
 
+    }
+
+    private void checkHasPermissionForThisOperation(Long decommId,
+                                                    EntityReference parentReference,
+                                                    Operation operation,
+                                                    String username) {
+
+        MeasurableRatingPlannedDecommission decomm = measurableRatingPlannedDecommissionService.getById(decommId);
+
+        measurableRatingPermissionChecker.findMeasurableRatingDecommPermissions(parentReference, decomm.measurableId(), username);
+
+        boolean roleBasedPermissions = userRoleService.hasRole(username, measurableRatingPlannedDecommissionService.getRequiredRatingEditRole(mkRef(EntityKind.MEASURABLE, measurableId)));
+
+        MeasurableRatingPlannedDecommission decomm = measurableRatingPlannedDecommissionService.findOperationsForDecomm(decommId);
+
+        ImmutableCheckPermissionCommand checkPermissionCommand = ImmutableCheckPermissionCommand
+                .builder()
+                .parentEntityRef(decomm.entityReference())
+                .subjectKind(MEASURABLE_RATING_PLANNED_DECOMMISSION)
+                .operation(operation)
+                .qualifierKind(EntityKind.MEASURABLE_CATEGORY)
+                .qualifierId(measurable.categoryId())
+                .user(username)
+                .build();
+
+        boolean involvementBasedPermissions = permissionGroupService.hasPermission(checkPermissionCommand);
+
+        checkTrue(
+                roleBasedPermissions || involvementBasedPermissions,
+                format("User does not have permission to %s measurable ratings for this %s", operation.name().toLowerCase(), parentReference.kind().prettyName()));
     }
 }
