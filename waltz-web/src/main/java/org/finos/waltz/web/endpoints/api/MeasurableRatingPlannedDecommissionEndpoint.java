@@ -18,50 +18,42 @@
 
 package org.finos.waltz.web.endpoints.api;
 
-import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.common.exception.InsufficientPrivelegeException;
+import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.Operation;
-import org.finos.waltz.model.permission_group.ImmutableCheckPermissionCommand;
-import org.finos.waltz.service.measurable_rating.MeasurableRatingPermissionChecker;
+import org.finos.waltz.model.command.DateFieldChange;
+import org.finos.waltz.model.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommission;
 import org.finos.waltz.service.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommissionService;
+import org.finos.waltz.service.permission.permission_checker.MeasurableRatingPermissionChecker;
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.endpoints.Endpoint;
-import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.command.DateFieldChange;
-import org.finos.waltz.model.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommission;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static java.lang.String.format;
-import static org.finos.waltz.common.Checks.checkTrue;
+import java.util.Set;
+
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.model.EntityKind.MEASURABLE_RATING_PLANNED_DECOMMISSION;
 import static org.finos.waltz.web.WebUtilities.*;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.model.EntityKind.MEASURABLE;
-import static org.finos.waltz.model.EntityKind.MEASURABLE_RATING_PLANNED_DECOMMISSION;
-import static org.finos.waltz.model.EntityReference.mkRef;
 
 @Service
 public class MeasurableRatingPlannedDecommissionEndpoint implements Endpoint {
 
     private static final String BASE_URL = mkPath("api", "measurable-rating-planned-decommission");
 
-
     private final MeasurableRatingPlannedDecommissionService measurableRatingPlannedDecommissionService;
     private final MeasurableRatingPermissionChecker measurableRatingPermissionChecker;
-    private final UserRoleService userRoleService;
-
 
     @Autowired
     public MeasurableRatingPlannedDecommissionEndpoint(MeasurableRatingPlannedDecommissionService measurableRatingPlannedDecommissionService,
-                                                       MeasurableRatingPermissionChecker measurableRatingPermissionChecker,
-                                                       UserRoleService userRoleService) {
+                                                       MeasurableRatingPermissionChecker measurableRatingPermissionChecker) {
         checkNotNull(measurableRatingPlannedDecommissionService, "measurableRatingPlannedDecommissionService cannot be null");
-        checkNotNull(userRoleService, "userRoleService cannot be null");
         checkNotNull(measurableRatingPermissionChecker, "measurableRatingPermissionChecker cannot be null");
 
-        this.userRoleService = userRoleService;
         this.measurableRatingPlannedDecommissionService = measurableRatingPlannedDecommissionService;
         this.measurableRatingPermissionChecker = measurableRatingPermissionChecker;
     }
@@ -85,7 +77,7 @@ public class MeasurableRatingPlannedDecommissionEndpoint implements Endpoint {
             EntityReference entityRef = getEntityReference(request);
             long measurableId = getLong(request, "measurableId");
 
-            requireRole(userRoleService, request, measurableRatingPlannedDecommissionService.getRequiredRatingEditRole(mkRef(MEASURABLE, measurableId)));
+            checkHasPermissionForThisOperation(entityRef, measurableId, asSet(Operation.ADD, Operation.UPDATE), getUsername(request));
 
             return measurableRatingPlannedDecommissionService.save(
                     entityRef,
@@ -96,11 +88,8 @@ public class MeasurableRatingPlannedDecommissionEndpoint implements Endpoint {
 
         DatumRoute<Boolean> removeRoute = (request, response) -> {
             long decommissionId = getId(request);
-            EntityReference entityRef = mkRef(MEASURABLE_RATING_PLANNED_DECOMMISSION, decommissionId);
 
-            checkHasPermissionForThisOperation(decommissionId, parentReference, Operation.REMOVE, getUsername());
-
-            requireRole(userRoleService, request, measurableRatingPlannedDecommissionService.getRequiredRatingEditRole(entityRef));
+            checkHasPermissionForThisOperation(decommissionId, asSet(Operation.REMOVE), getUsername(request));
 
             return measurableRatingPlannedDecommissionService.remove(decommissionId, getUsername(request));
         };
@@ -113,32 +102,19 @@ public class MeasurableRatingPlannedDecommissionEndpoint implements Endpoint {
     }
 
     private void checkHasPermissionForThisOperation(Long decommId,
-                                                    EntityReference parentReference,
-                                                    Operation operation,
-                                                    String username) {
+                                                    Set<Operation> operations,
+                                                    String username) throws InsufficientPrivelegeException {
 
         MeasurableRatingPlannedDecommission decomm = measurableRatingPlannedDecommissionService.getById(decommId);
+        checkHasPermissionForThisOperation(decomm.entityReference(), decomm.measurableId(), operations, username);
+    }
 
-        measurableRatingPermissionChecker.findMeasurableRatingDecommPermissions(parentReference, decomm.measurableId(), username);
+    private void checkHasPermissionForThisOperation(EntityReference parentRef,
+                                                    Long measurableId,
+                                                    Set<Operation> operations,
+                                                    String username) throws InsufficientPrivelegeException {
 
-        boolean roleBasedPermissions = userRoleService.hasRole(username, measurableRatingPlannedDecommissionService.getRequiredRatingEditRole(mkRef(EntityKind.MEASURABLE, measurableId)));
-
-        MeasurableRatingPlannedDecommission decomm = measurableRatingPlannedDecommissionService.findOperationsForDecomm(decommId);
-
-        ImmutableCheckPermissionCommand checkPermissionCommand = ImmutableCheckPermissionCommand
-                .builder()
-                .parentEntityRef(decomm.entityReference())
-                .subjectKind(MEASURABLE_RATING_PLANNED_DECOMMISSION)
-                .operation(operation)
-                .qualifierKind(EntityKind.MEASURABLE_CATEGORY)
-                .qualifierId(measurable.categoryId())
-                .user(username)
-                .build();
-
-        boolean involvementBasedPermissions = permissionGroupService.hasPermission(checkPermissionCommand);
-
-        checkTrue(
-                roleBasedPermissions || involvementBasedPermissions,
-                format("User does not have permission to %s measurable ratings for this %s", operation.name().toLowerCase(), parentReference.kind().prettyName()));
+        Set<Operation> perms = measurableRatingPermissionChecker.findMeasurableRatingDecommPermissions(parentRef, measurableId, username);
+        measurableRatingPermissionChecker.verifyAnyPerms(operations, perms, MEASURABLE_RATING_PLANNED_DECOMMISSION, username);
     }
 }

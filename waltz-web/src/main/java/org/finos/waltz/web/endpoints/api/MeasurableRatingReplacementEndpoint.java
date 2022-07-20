@@ -18,22 +18,26 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.common.exception.InsufficientPrivelegeException;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.measurable_rating_replacement.MeasurableRatingReplacement;
 import org.finos.waltz.service.measurable_rating_replacement.MeasurableRatingReplacementService;
+import org.finos.waltz.service.permission.permission_checker.MeasurableRatingPermissionChecker;
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.endpoints.Endpoint;
-import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.measurable_rating_replacement.MeasurableRatingReplacement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Set;
 
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.web.WebUtilities.*;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.model.EntityReference.mkRef;
 
 @Service
 public class MeasurableRatingReplacementEndpoint implements Endpoint {
@@ -42,17 +46,17 @@ public class MeasurableRatingReplacementEndpoint implements Endpoint {
 
 
     private final MeasurableRatingReplacementService measurableRatingReplacementService;
-    private final UserRoleService userRoleService;
+    private final MeasurableRatingPermissionChecker measurableRatingPermissionChecker;
 
 
     @Autowired
     public MeasurableRatingReplacementEndpoint(MeasurableRatingReplacementService measurableRatingReplacementService,
-                                               UserRoleService userRoleService) {
+                                               MeasurableRatingPermissionChecker measurableRatingPermissionChecker) {
         checkNotNull(measurableRatingReplacementService, "measurableRatingReplacementService cannot be null");
-        checkNotNull(userRoleService, "userRoleService cannot be null");
+        checkNotNull(measurableRatingPermissionChecker, "measurableRatingPermissionChecker cannot be null");
 
         this.measurableRatingReplacementService = measurableRatingReplacementService;
-        this.userRoleService = userRoleService;
+        this.measurableRatingPermissionChecker = measurableRatingPermissionChecker;
     }
 
 
@@ -72,8 +76,7 @@ public class MeasurableRatingReplacementEndpoint implements Endpoint {
             Date commissionDate = readBody(request, Date.class);
             String username = getUsername(request);
 
-            requireRole(userRoleService, request, measurableRatingReplacementService.getRequiredRatingEditRole(
-                    mkRef(EntityKind.MEASURABLE_RATING_PLANNED_DECOMMISSION, decommId)));
+            checkHasPermissionForThisOperation(decommId, asSet(Operation.ADD, Operation.UPDATE), username);
 
             return measurableRatingReplacementService.save(decommId, entityReference, commissionDate, username);
         };
@@ -84,8 +87,7 @@ public class MeasurableRatingReplacementEndpoint implements Endpoint {
             long decommId = getLong(request, "decommId");
             long replacementId = getLong(request, "replacementId");
 
-            requireRole(userRoleService, request, measurableRatingReplacementService.getRequiredRatingEditRole(
-                    mkRef(EntityKind.MEASURABLE_RATING_PLANNED_DECOMMISSION, decommId)));
+            checkHasPermissionForThisOperation(decommId, asSet(Operation.REMOVE), username);
 
             return measurableRatingReplacementService.remove(decommId, replacementId, username);
         };
@@ -95,5 +97,14 @@ public class MeasurableRatingReplacementEndpoint implements Endpoint {
         deleteForList(removePath, removeRoute);
         postForList(savePath, saveRoute);
 
+    }
+
+
+    private void checkHasPermissionForThisOperation(Long decommId,
+                                                    Set<Operation> operations,
+                                                    String username) throws InsufficientPrivelegeException {
+
+        Set<Operation> perms = measurableRatingPermissionChecker.findMeasurableRatingReplacementPermissions(decommId, username);
+        measurableRatingPermissionChecker.verifyAnyPerms(operations, perms, EntityKind.MEASURABLE_RATING_REPLACEMENT, username);
     }
 }

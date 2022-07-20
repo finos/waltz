@@ -231,7 +231,7 @@ public class MeasurableRatingPlannedDecommissionDao {
                                                            long measurableCategoryId,
                                                            String username) {
 
-        Tuple2<Boolean, Boolean> hasRoleAndDefinitionROAndIsReadOnly = dsl
+        Tuple2<Boolean, Boolean> hasRoleAndCategoryEditable = dsl
                 .select(USER_ROLE.ROLE,
                         MEASURABLE_CATEGORY.EDITABLE)
                 .from(MEASURABLE_CATEGORY)
@@ -243,9 +243,9 @@ public class MeasurableRatingPlannedDecommissionDao {
                         notEmpty(r.get(USER_ROLE.ROLE)),
                         r.get(MEASURABLE_CATEGORY.EDITABLE)));
 
-        if (hasRoleAndDefinitionROAndIsReadOnly.v2) {
+        if (!hasRoleAndCategoryEditable.v2) {
             return emptySet();
-        } else if (hasRoleAndDefinitionROAndIsReadOnly.v1) {
+        } else if (hasRoleAndCategoryEditable.v1) {
             return union(operationsForEntityAssessment, asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE));
         } else {
             return operationsForEntityAssessment;
