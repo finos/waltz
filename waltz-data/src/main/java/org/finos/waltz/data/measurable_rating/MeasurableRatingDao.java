@@ -350,12 +350,11 @@ public class MeasurableRatingDao {
                         .and(USER_ROLE.USER_NAME.eq(username)))
                 .where(MEASURABLE.ID.eq(measurableId));
 
-        System.out.println(qry);
-
-        Tuple3<Boolean, Boolean, Boolean> hasRoleAndDefinitionEditableAndIsReadOnly = qry.fetchOne(r -> tuple(
-                notEmpty(r.get(USER_ROLE.ROLE)),
-                r.get(MEASURABLE_CATEGORY.EDITABLE),
-                r.get(readOnlyRatingField)));
+        Tuple3<Boolean, Boolean, Boolean> hasRoleAndDefinitionEditableAndIsReadOnly = qry
+                .fetchOne(r -> tuple(
+                        notEmpty(r.get(USER_ROLE.ROLE)),
+                        r.get(MEASURABLE_CATEGORY.EDITABLE),
+                        r.get(readOnlyRatingField)));
 
         if (!hasRoleAndDefinitionEditableAndIsReadOnly.v2) {
             return emptySet();
