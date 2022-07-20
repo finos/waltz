@@ -44,7 +44,7 @@
     <div class="waltz-page-summary waltz-page-summary-attach">
         <div ng-if="ctrl.logicalFlow">
             <waltz-section-actions ng-if="ctrl.physicalFlow.entityLifecycleStatus !== 'REMOVED'">
-                <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
+                <div ng-if="ctrl.canEdit">
                     <button class="btn btn-xs btn-danger"
                             ng-disabled="! (ctrl.mentions | isEmpty) || ctrl.physicalFlow.isReadOnly"
                             ng-click="(ctrl.mentions | isEmpty) && ctrl.deleteFlow()">
@@ -293,7 +293,9 @@
 
             </div>
             <div class="waltz-sub-section-controls">
-                <span waltz-has-role="LOGICAL_DATA_FLOW_EDITOR" >
+                <span ng-if="ctrl.canEdit">
+                    <span>|</span>
+
                     <a ng-click="ctrl.visibility.overviewEditor = true"
                        ng-if="! ctrl.visibility.overviewEditor"
                        class="clickable">
@@ -310,7 +312,6 @@
                         Done
                     </a>
                 </span>
-                <span>|</span>
                 <span>
                     <waltz-entity-link entity-ref="{
                         kind: 'LOGICAL_DATA_FLOW',

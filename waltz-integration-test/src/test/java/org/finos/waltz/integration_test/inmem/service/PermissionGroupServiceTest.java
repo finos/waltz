@@ -230,7 +230,8 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
     private void setupPermissionGroupEntry(EntityReference appRef, Long pgId) {
         PermissionGroupEntryRecord pge = dsl.newRecord(PERMISSION_GROUP_ENTRY);
         pge.setPermissionGroupId(pgId);
-        pge.setApplicationId(appRef.id());
+        pge.setEntityKind(EntityKind.APPLICATION.name());
+        pge.setEntityId(appRef.id());
         pge.insert();
     }
 

@@ -27,6 +27,7 @@ import org.finos.waltz.model.ImmutableEntityReference;
 import org.finos.waltz.model.involvement.ImmutableInvolvement;
 import org.finos.waltz.model.involvement.Involvement;
 import org.finos.waltz.model.person.Person;
+import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.records.InvolvementRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -120,6 +121,17 @@ public class InvolvementDao {
                 .from(INVOLVEMENT)
                 .where(INVOLVEMENT.EMPLOYEE_ID.eq(employeeId))
                 .fetch(TO_MODEL_MAPPER);
+    }
+
+    public Set<Long> findExistingInvolvementKindIdsForUser(EntityReference parentEntityRef, String username) {
+        return dsl
+                .select(Tables.INVOLVEMENT.KIND_ID)
+                .from(Tables.INVOLVEMENT)
+                .innerJoin(Tables.PERSON).on(Tables.PERSON.EMPLOYEE_ID.eq(Tables.INVOLVEMENT.EMPLOYEE_ID))
+                .where(Tables.PERSON.EMAIL.eq(username)
+                        .and(Tables.INVOLVEMENT.ENTITY_KIND.eq(parentEntityRef.kind().name()))
+                        .and(Tables.INVOLVEMENT.ENTITY_ID.eq(parentEntityRef.id())))
+                .fetchSet(Tables.INVOLVEMENT.KIND_ID);
     }
 
 

@@ -19,13 +19,16 @@
 package org.finos.waltz.web.endpoints.api;
 
 
+import org.finos.waltz.common.exception.InsufficientPrivelegeException;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.datatype.DataType;
 import org.finos.waltz.model.datatype.DataTypeDecorator;
 import org.finos.waltz.model.datatype.DataTypeUsageCharacteristics;
-import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.data_type.DataTypeDecoratorService;
 import org.finos.waltz.service.data_type.DataTypeService;
-import org.finos.waltz.service.user.UserRoleService;
+import org.finos.waltz.service.permission.permission_checker.FlowPermissionChecker;
+import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.WebUtilities;
 import org.finos.waltz.web.action.UpdateDataTypeDecoratorAction;
@@ -36,18 +39,16 @@ import spark.Request;
 import spark.Response;
 
 import java.io.IOException;
+import java.util.Set;
 
+import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.web.WebUtilities.getEntityReference;
-import static org.finos.waltz.web.WebUtilities.getKind;
-import static org.finos.waltz.web.WebUtilities.mkPath;
-import static org.finos.waltz.web.WebUtilities.readBody;
-import static org.finos.waltz.web.WebUtilities.readIdSelectionOptionsFromBody;
-import static org.finos.waltz.web.WebUtilities.readIdsFromBody;
-import static org.finos.waltz.web.WebUtilities.requireRole;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.getForList;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.postForDatum;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.postForList;
+import static org.finos.waltz.common.Checks.checkTrue;
+import static org.finos.waltz.common.CollectionUtilities.notEmpty;
+import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.SetUtilities.intersection;
+import static org.finos.waltz.web.WebUtilities.*;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 
 @Service
 public class DataTypeDecoratorEndpoint implements Endpoint {
@@ -55,20 +56,20 @@ public class DataTypeDecoratorEndpoint implements Endpoint {
     private static final String BASE_URL = mkPath("api", "data-type-decorator");
 
     private final DataTypeDecoratorService dataTypeDecoratorService;
-    private final UserRoleService userRoleService;
+    private final FlowPermissionChecker flowPermissionChecker;
     private final DataTypeService dataTypeService;
 
 
     @Autowired
     public DataTypeDecoratorEndpoint(DataTypeDecoratorService dataTypeDecoratorService,
                                      DataTypeService dataTypeService,
-                                     UserRoleService userRoleService) {
+                                     FlowPermissionChecker flowPermissionChecker) {
         checkNotNull(dataTypeDecoratorService, "DataTypeDecoratorService cannot be null");
-        checkNotNull(userRoleService, "userRoleService cannot be null");
+        checkNotNull(flowPermissionChecker, "userRoleService cannot be null");
         checkNotNull(dataTypeService, "dataTypeService cannot be null");
 
         this.dataTypeDecoratorService = dataTypeDecoratorService;
-        this.userRoleService = userRoleService;
+        this.flowPermissionChecker = flowPermissionChecker;
         this.dataTypeService = dataTypeService;
     }
 
@@ -82,6 +83,7 @@ public class DataTypeDecoratorEndpoint implements Endpoint {
         String findByFlowIdsAndKindPath = mkPath(BASE_URL, "flow-ids", "kind", ":kind");
         String updateDataTypesPath = mkPath(BASE_URL, "save", "entity", ":kind", ":id");
         String findDatatypeUsageCharacteristicsPath = mkPath(BASE_URL, "entity", ":kind", ":id", "usage-characteristics");
+        String findPermissionsPath = mkPath(BASE_URL, "entity", ":kind", ":id", "permissions");
 
         ListRoute<DataTypeDecorator> findByEntityReferenceRoute = (req, res) ->
                 dataTypeDecoratorService.findByEntityId(getEntityReference(req));
@@ -93,35 +95,48 @@ public class DataTypeDecoratorEndpoint implements Endpoint {
 
         ListRoute<DataTypeDecorator> findByFlowIdsAndKindRoute = (request, response) ->
                 dataTypeDecoratorService
-                    .findByFlowIds(
-                        readIdsFromBody(request),
-                        getKind(request));
+                        .findByFlowIds(
+                                readIdsFromBody(request),
+                                getKind(request));
 
         ListRoute<DataType> findSuggestedByEntityRefRoute = (req, res) ->
                 dataTypeService.findSuggestedByEntityRef(getEntityReference(req));
 
         ListRoute<DataTypeUsageCharacteristics> findDatatypeUsageCharacteristicsRoute = (req, res) ->
                 dataTypeDecoratorService
-                    .findDatatypeUsageCharacteristics(getEntityReference(req));
+                        .findDatatypeUsageCharacteristics(getEntityReference(req));
+
+        ListRoute<Operation> findPermissionsRoute = (req, res) ->
+                flowPermissionChecker.findPermissionsForDecorator(getEntityReference(req), getUsername(req));
 
         getForList(findByEntityReference, findByEntityReferenceRoute);
         getForList(findSuggestedByEntityRefPath, findSuggestedByEntityRefRoute);
         getForList(findDatatypeUsageCharacteristicsPath, findDatatypeUsageCharacteristicsRoute);
+        getForList(findPermissionsPath, findPermissionsRoute);
         postForList(findBySelectorPath, findBySelectorRoute);
         postForList(findByFlowIdsAndKindPath, findByFlowIdsAndKindRoute);
         postForDatum(updateDataTypesPath, this::updateDataTypesRoute);
     }
 
 
-    private boolean updateDataTypesRoute(Request request, Response response) throws IOException {
-        requireRole(userRoleService, request, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
+    private boolean updateDataTypesRoute(Request request, Response response) throws IOException, InsufficientPrivelegeException {
 
         String userName = WebUtilities.getUsername(request);
         UpdateDataTypeDecoratorAction action = readBody(request, UpdateDataTypeDecoratorAction.class);
+
+        checkHasPermissionToUpdateDataTypes(action.entityReference(), userName);
 
         return dataTypeDecoratorService.updateDecorators(userName,
                 action.entityReference(),
                 action.addedDataTypeIds(),
                 action.removedDataTypeIds());
     }
+
+
+    private void checkHasPermissionToUpdateDataTypes(EntityReference ref,
+                                                     String username) throws InsufficientPrivelegeException {
+        Set<Operation> permissions = flowPermissionChecker.findPermissionsForDecorator(ref, username);
+        flowPermissionChecker.verifyEditPerms(permissions, ref.kind(), username);
+    }
+
 }

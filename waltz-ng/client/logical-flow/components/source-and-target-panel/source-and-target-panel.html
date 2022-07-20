@@ -184,7 +184,8 @@
         <hr>
 
         <strong>Physical Data</strong>
-        <span class="small pull-right">
+        <span class="small pull-right"
+              ng-if="$ctrl.canEditPhysical">
             <a class="clickable"
                ui-sref='main.physical-flow.registration({
                             kind: $ctrl.selected.type === "source" ? $ctrl.selected.entity.kind : $ctrl.entityRef.kind,
