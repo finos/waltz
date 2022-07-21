@@ -67,7 +67,7 @@ class OrgUnitExtractorTest {
 
     private DSLContext createTestDslContext(){
         MockDataProvider provider = context -> {
-            DSLContext create = DSL.using(SQLDialect.SQLSERVER2017);
+            DSLContext create = DSL.using(SQLDialect.POSTGRES);
             Result<OrganisationalUnitRecord> result = create.newResult(ORGANISATIONAL_UNIT);
             result.add(create.newRecord(ORGANISATIONAL_UNIT)
                     .with(ORGANISATIONAL_UNIT.ID,1L)
@@ -79,7 +79,7 @@ class OrgUnitExtractorTest {
             };
         };
         Connection connection = new MockConnection(provider);
-        return DSL.using(connection, SQLDialect.SQLSERVER2017);
+        return DSL.using(connection, SQLDialect.POSTGRES);
     }
 
 
