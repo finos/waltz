@@ -12,6 +12,9 @@
     import {ratingSchemeStore} from "../../../svelte-stores/rating-schemes";
     import AssessmentDefinitionRemovalConfirmation from "./AssessmentDefinitionRemovalConfirmation.svelte";
     import RatingSchemePreviewBar from "../ratings-schemes/ItemPreviewBar.svelte";
+    import {selectedDefinition} from "./assessment-definition-utils";
+    import {onMount} from "svelte";
+
 
     const definitionsCall = assessmentDefinitionStore.loadAll();
     const ratingSchemesCall = ratingSchemeStore.loadAll();
@@ -23,28 +26,21 @@
     };
 
     let qry = "";
-    let selectedDefinition = null;
     let activeMode = "list"; // edit | delete
-
-    $: definitionList = _
-        .chain(termSearch($definitionsCall.data, qry, ["name", "entityKind"]))
-        .orderBy("name")
-        .value();
-
-    $: ratingSchemesById = _.keyBy($ratingSchemesCall.data, "id");
 
 
     function onEdit(def) {
-        selectedDefinition = def;
+        $selectedDefinition = def;
         activeMode = Modes.EDIT;
     }
 
 
     function onDelete(def) {
-        selectedDefinition = def;
+        $selectedDefinition = def;
         activeMode = Modes.DELETE;
     }
 
+    onMount(() => $selectedDefinition = null);
 
     function doSave(d) {
         const savePromise = assessmentDefinitionStore
@@ -53,7 +49,7 @@
         return Promise
             .resolve(savePromise)
             .then(() => {
-                selectedDefinition = null;
+                $selectedDefinition = null;
                 activeMode = Modes.LIST;
                 assessmentDefinitionStore.loadAll(true);
                 toasts.success("Successfully saved assessment definition");
@@ -68,7 +64,7 @@
         return Promise
             .resolve(removePromise)
             .then(() => {
-                selectedDefinition = null;
+                $selectedDefinition = null;
                 activeMode = Modes.LIST;
                 assessmentDefinitionStore.loadAll(true);
                 toasts.success("Successfully removed assessment definition")
@@ -79,18 +75,28 @@
 
     function doCancel() {
         activeMode = Modes.LIST;
-        selectedDefinition = null;
+        $selectedDefinition = null;
     }
 
 
     function mkNew() {
-        selectedDefinition = {
+        $selectedDefinition = {
             isReadOnly: false,
             lastUpdatedBy: "temp-will-be-overwritten-by-server",
-            visibility: "SECONDARY"
+            visibility: "SECONDARY",
+            qualifierReference: {}
         };
         activeMode = Modes.EDIT;
     }
+
+    $: definitionList = _
+        .chain(termSearch($definitionsCall.data, qry, ["name", "entityKind"]))
+        .orderBy("name")
+        .value();
+
+    $: ratingSchemesById = _.keyBy($ratingSchemesCall.data, "id");
+
+
 
 </script>
 
@@ -127,22 +133,20 @@
     </div>
 
     <div class="row">
-        {#if selectedDefinition}
+        {#if $selectedDefinition}
         <div class="col-md-12">
             {#if activeMode === Modes.EDIT}
-                <AssessmentDefinitionEditor definition={selectedDefinition}
-                                            {doCancel}
+                <AssessmentDefinitionEditor {doCancel}
                                             {doSave}/>
             {:else if activeMode === Modes.DELETE}
-                <AssessmentDefinitionRemovalConfirmation definition={selectedDefinition}
-                                                         {doCancel}
+                <AssessmentDefinitionRemovalConfirmation {doCancel}
                                                          {doRemove}/>
             {/if}
         </div>
         {:else }
         <div class="col-md-12">
             <SearchInput bind:value={qry}/>
-            <table class="table table-condensed table-striped"
+            <table class="table table-condensed table-striped table-hover"
                    style="table-layout: fixed">
                 <thead>
                     <tr>

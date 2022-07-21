@@ -570,6 +570,7 @@ const measurableSections = [
              technologySummarySection
          ]),
     bookmarksSection,
+    assessmentRatingSection,
     changeSetSection,
     entityDiagramsSection,
     entityNamedNotesSection,
