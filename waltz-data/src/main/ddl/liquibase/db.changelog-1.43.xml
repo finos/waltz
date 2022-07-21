@@ -154,7 +154,7 @@
             <column name="is_custom" valueBoolean="false"/>
             <column name="name" value="Bulk Flow Editor"/>
             <column name="description" value="Can upload logical and physical flows in bulk"/>
-            <column name="user_selectable" value="true"/>
+            <column name="user_selectable" valueBoolean="true"/>
         </insert>
     </changeSet>
 
