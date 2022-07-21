@@ -146,4 +146,15 @@
                           remarks="the id of the entity being given specific permissions"/>
     </changeSet>
 
+    <changeSet id="20220719-6139-1"
+               author="woodjes">
+        <insert tableName="role">
+            <column name="key" value="BULK_FLOW_EDITOR"/>
+            <column name="is_custom" valueBoolean="false"/>
+            <column name="name" value="Bulk Flow Editor"/>
+            <column name="description" value="Can upload logical and physical flows in bulk"/>
+            <column name="user_selectable" valueBoolean="true"/>
+        </insert>
+  </changeSet>
+  
 </databaseChangeLog>
