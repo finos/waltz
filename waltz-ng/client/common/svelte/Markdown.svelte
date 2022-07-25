@@ -1,7 +1,7 @@
 <script context="module">
     import showdown from "showdown";
 
-    showdown.extension("bs-tables", () => {
+    showdown.extension("bootstrap-tables", () => {
         return [{
             type: "output",
             regex: /<table>/g,
@@ -9,7 +9,7 @@
         }]
     });
 
-    const converter = new showdown.Converter({extensions: ["bs-tables"]});
+    const converter = new showdown.Converter({extensions: ["bootstrap-tables"]});
     converter.setFlavor("github");
 </script>
 
@@ -36,15 +36,14 @@
     $: html = mkHtml(text, context);
 </script>
 
+
 <span class:inline-markdown={inline}>
     {@html html}
 </span>
 
-<style type="text/scss">
 
+<style>
     :global(.inline-markdown > p) {
         display: inline;
     }
-
-
 </style>
