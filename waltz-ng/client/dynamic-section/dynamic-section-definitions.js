@@ -562,14 +562,15 @@ const orgUnitSections = [
 
 const measurableSections = [
     pack(appsSection,
-         [
-             appCostsSummarySection,
-             appComplexitySummarySection,
-             entityStatisticSummarySection,
-             reportGridViewSection,
-             technologySummarySection
-         ]),
+        [
+            appCostsSummarySection,
+            appComplexitySummarySection,
+            entityStatisticSummarySection,
+            reportGridViewSection,
+            technologySummarySection
+        ]),
     bookmarksSection,
+    assessmentRatingSection,
     changeSetSection,
     entityDiagramsSection,
     entityNamedNotesSection,

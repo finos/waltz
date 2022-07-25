@@ -56,4 +56,6 @@ public abstract class AssessmentDefinition implements
     public EntityKind kind() {
         return EntityKind.ASSESSMENT_DEFINITION;
     }
+
+    public abstract Optional<EntityReference> qualifierReference();
 }

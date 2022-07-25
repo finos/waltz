@@ -61,17 +61,20 @@ public class AssessmentDefinitionEndpoint implements Endpoint {
         String getByIdPath = WebUtilities.mkPath(BASE_URL, "id", ":id");
         String findAllPath = WebUtilities.mkPath(BASE_URL);
         String savePath = WebUtilities.mkPath(BASE_URL);
-        String findByKind = WebUtilities.mkPath(BASE_URL, "kind", ":kind");
+        String findByKindPath = WebUtilities.mkPath(BASE_URL, "kind", ":kind");
+        String findByRefPath = WebUtilities.mkPath(BASE_URL, "kind", ":kind", "id", ":id");
         String removeByIdPath = WebUtilities.mkPath(BASE_URL, "id", ":id");
 
 
         DatumRoute<AssessmentDefinition> getByIdRoute = (request, response) -> assessmentDefinitionService.getById(WebUtilities.getId(request));
         ListRoute<AssessmentDefinition> findAllRoute = (request, response) -> assessmentDefinitionService.findAll();
         ListRoute<AssessmentDefinition> findByKindRoute = (request, response) -> assessmentDefinitionService.findByEntityKind(WebUtilities.getKind(request));
+        ListRoute<AssessmentDefinition> findByRefRoute = (request, response) -> assessmentDefinitionService.findByEntityReference(WebUtilities.getEntityReference(request));
 
         EndpointUtilities.getForDatum(getByIdPath, getByIdRoute);
         EndpointUtilities.getForList(findAllPath, findAllRoute);
-        EndpointUtilities.getForList(findByKind, findByKindRoute);
+        EndpointUtilities.getForList(findByKindPath, findByKindRoute);
+        EndpointUtilities.getForList(findByRefPath, findByRefRoute);
         EndpointUtilities.putForDatum(savePath, this::saveRoute);
         EndpointUtilities.deleteForDatum(removeByIdPath, this::removeByIdRoute);
     }

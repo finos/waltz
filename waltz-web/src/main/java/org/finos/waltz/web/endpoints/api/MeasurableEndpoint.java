@@ -52,7 +52,6 @@ public class MeasurableEndpoint implements Endpoint {
         String findByMeasurableIdSelectorPath = mkPath(BASE_URL, "measurable-selector");
         String findByExternalIdPath = mkPath(BASE_URL, "external-id", ":extId");
         String findByOrgUnitIdPath = mkPath(BASE_URL, "org-unit", "id", ":id");
-        String findMeasurablesAndCountsBySelectorPath = mkPath(BASE_URL, "counts", "selector");
         String searchPath = mkPath(BASE_URL, "search", ":query");
 
         ListRoute<Measurable> findAllRoute = (request, response)

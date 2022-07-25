@@ -19,27 +19,32 @@
 package org.finos.waltz.data.assessment_definition;
 
 
-import org.finos.waltz.schema.tables.records.AssessmentDefinitionRecord;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.assessment_definition.AssessmentVisibility;
 import org.finos.waltz.model.assessment_definition.ImmutableAssessmentDefinition;
+import org.finos.waltz.schema.tables.records.AssessmentDefinitionRecord;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import static org.finos.waltz.common.StringUtilities.isEmpty;
-import static org.finos.waltz.schema.tables.AssessmentDefinition.ASSESSMENT_DEFINITION;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
+import static org.finos.waltz.common.StringUtilities.isEmpty;
 import static org.finos.waltz.common.StringUtilities.mkSafe;
+import static org.finos.waltz.data.JooqUtilities.maybeReadRef;
+import static org.finos.waltz.schema.tables.AssessmentDefinition.ASSESSMENT_DEFINITION;
 
 
 @Repository
@@ -61,6 +66,10 @@ public class AssessmentDefinitionDao {
                 .provenance(record.getProvenance())
                 .visibility(AssessmentVisibility.valueOf(record.getVisibility()))
                 .definitionGroup(record.getDefinitionGroup())
+                .qualifierReference(maybeReadRef(
+                        record,
+                        ASSESSMENT_DEFINITION.QUALIFIER_KIND,
+                        ASSESSMENT_DEFINITION.QUALIFIER_ID))
                 .build();
     };
 
@@ -85,25 +94,28 @@ public class AssessmentDefinitionDao {
 
 
     public List<AssessmentDefinition> findAll() {
-        return dsl
-                .select(ASSESSMENT_DEFINITION.fields())
-                .from(ASSESSMENT_DEFINITION)
-                .fetch(TO_DOMAIN);
+        return findByCondition(DSL.trueCondition());
     }
 
 
     public List<AssessmentDefinition> findByEntityKind(EntityKind kind) {
-        return dsl
-                .select(ASSESSMENT_DEFINITION.fields())
-                .from(ASSESSMENT_DEFINITION)
-                .where(ASSESSMENT_DEFINITION.ENTITY_KIND.eq(kind.name()))
-                .fetch(TO_DOMAIN);
+        Condition condition = ASSESSMENT_DEFINITION.ENTITY_KIND.eq(kind.name());
+        return findByCondition(condition);
+    }
+
+
+    public Collection<AssessmentDefinition> findByEntityKindAndQualifier(EntityKind kind, EntityReference qualifier) {
+        Condition condition = ASSESSMENT_DEFINITION.ENTITY_KIND.eq(kind.name())
+                .and(ASSESSMENT_DEFINITION.QUALIFIER_KIND.eq(qualifier.kind().name()))
+                .and(ASSESSMENT_DEFINITION.QUALIFIER_ID.eq(qualifier.id()));
+        return findByCondition(condition);
     }
 
 
     /**
      * Saves the given assessment definition.  Either updating or inserting.
      * Returns the identifier for the record.
+     *
      * @param def the definition to save
      * @return the identifier for the record
      */
@@ -130,7 +142,14 @@ public class AssessmentDefinitionDao {
         r.setProvenance(StringUtilities.ifEmpty(def.provenance(), "waltz"));
         r.setDefinitionGroup(r.getDefinitionGroup());
 
-        def.id().ifPresent(r::setId);
+        def.qualifierReference()
+                .ifPresent(qualifier -> {
+                    r.setQualifierId(qualifier.id());
+                    r.setQualifierKind(qualifier.kind().name());
+                });
+
+        def.id()
+                .ifPresent(r::setId);
 
         if (r.getId() == null) {
             r.insert();
@@ -143,10 +162,21 @@ public class AssessmentDefinitionDao {
 
     }
 
+
     public int remove(long definitionId) {
         return dsl
                 .deleteFrom(ASSESSMENT_DEFINITION)
                 .where(ASSESSMENT_DEFINITION.ID.eq(definitionId))
                 .execute();
     }
+
+
+    private List<AssessmentDefinition> findByCondition(Condition condition) {
+        return dsl
+                .select(ASSESSMENT_DEFINITION.fields())
+                .from(ASSESSMENT_DEFINITION)
+                .where(condition)
+                .fetch(TO_DOMAIN);
+    }
+
 }

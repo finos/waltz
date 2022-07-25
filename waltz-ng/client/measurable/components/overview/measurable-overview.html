@@ -25,7 +25,7 @@
 
     <div ng-if="$ctrl.measurable">
         <div class="row">
-            <div class="col-sm-12">
+            <div class="col-sm-7">
                 <waltz-sub-section name="Overview">
                     <content>
                         <div style="padding:8px">
@@ -35,6 +35,11 @@
                         </div>
                     </content>
                 </waltz-sub-section>
+            </div>
+            <div class="col-sm-5">
+                <!-- Assessment Ratings -->
+                <waltz-assessment-rating-sub-section parent-entity-ref="$ctrl.measurable">
+                </waltz-assessment-rating-sub-section>
             </div>
         </div>
         <br>
