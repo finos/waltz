@@ -60,6 +60,7 @@ public class AssessmentDefinitionDao {
                 .isReadOnly(record.getIsReadonly())
                 .provenance(record.getProvenance())
                 .visibility(AssessmentVisibility.valueOf(record.getVisibility()))
+                .definitionGroup(record.getDefinitionGroup())
                 .build();
     };
 
@@ -127,6 +128,7 @@ public class AssessmentDefinitionDao {
         r.setLastUpdatedAt(Timestamp.valueOf(def.lastUpdatedAt()));
         r.setLastUpdatedBy(def.lastUpdatedBy());
         r.setProvenance(StringUtilities.ifEmpty(def.provenance(), "waltz"));
+        r.setDefinitionGroup(r.getDefinitionGroup());
 
         def.id().ifPresent(r::setId);
 

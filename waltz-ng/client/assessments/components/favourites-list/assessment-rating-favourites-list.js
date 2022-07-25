@@ -19,7 +19,7 @@
 import {initialiseData} from "../../../common";
 import _ from "lodash";
 import template from "./assessment-rating-favourites-list.html";
-import {mkAssessmentDefinitionsIdsKey} from "../../../user";
+import {mkAssessmentDefinitionsIdsBaseKey} from "../../../user";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
 
@@ -82,7 +82,7 @@ function controller(serviceBroker) {
         serviceBroker
             .loadAppData(CORE_API.UserPreferenceStore.findAllForUser, [], {force: true})
             .then(r => vm.favouriteAssessmentDefnIds = getFavouriteAssessmentDefnIds(
-                mkAssessmentDefinitionsIdsKey(vm.parentEntityRef),
+                mkAssessmentDefinitionsIdsBaseKey(vm.parentEntityRef),
                 r.data,
                 vm.defaultPrimaryList))
             .then(() => filterAssessments());
