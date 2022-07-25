@@ -2,7 +2,7 @@
 
     import {fade} from "svelte/transition";
     import Icon from "../../../common/svelte/Icon.svelte";
-    import Tooltip from "./Tooltip.svelte";
+    import Tooltip from "./../../../common/svelte/Tooltip.svelte";
     import {createEventDispatcher} from "svelte";
     import _ from "lodash";
     import RatingIndicatorCell from "../../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
