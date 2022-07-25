@@ -238,7 +238,7 @@ public class AggregateOverlayDiagramUtilities {
                         mr.ENTITY_ID)
                 .when(mrp.PLANNED_COMMISSION_DATE.lt(targetDate),
                         mrp.ENTITY_ID)
-                .otherwise((Long) null);
+                .otherwise(DSL.castNull(Long.class));
 
         SelectConditionStep<Record2<Long, Long>> qry = dsl
                 .select(mr.MEASURABLE_ID,
