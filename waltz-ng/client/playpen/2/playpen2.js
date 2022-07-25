@@ -20,24 +20,34 @@ import template from "./playpen2.html";
 import {mkSelectionOptions} from "../../common/selector-utils";
 import {CORE_API} from "../../common/services/core-api-utils";
 import {mkRef} from "../../common/entity-utils";
+import Markdown from "../../common/svelte/Markdown.svelte"
 
 
 const initialState = {
     checkedItemIds: [],
-    parentEntityRef: {id: 20506, kind: "APPLICATION"}
+    parentEntityRef: {id: 20506, kind: "APPLICATION"},
+    Markdown
 }
 
 function controller(serviceBroker) {
 
     const vm = Object.assign(this, initialState);
 
+    vm.text = `
+# Hello
+
+hello | world
+--- | ---
+a | b
+    `
+
     serviceBroker
-        .loadViewData(CORE_API.MeasurableStore.findMeasurablesBySelector, 
+        .loadViewData(CORE_API.MeasurableStore.findMeasurablesBySelector,
                       [mkSelectionOptions(
                           mkRef("MEASURABLE_CATEGORY", 16),
                           "EXACT")])
         .then(r => vm.recordsManagementItems = console.log(r.data) || r.data);
-    
+
     vm.isDisabled = (d) => !d.concrete;
 
     vm.onItemCheck = (d) => {
