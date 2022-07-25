@@ -90,6 +90,9 @@ public class ReportGridService {
         return reportGridDao.findAll();
     }
 
+    public Optional<ReportGridDefinition> findByExternalId(String externalId){
+        return Optional.ofNullable(reportGridDao.getGridDefinitionByExternalId(externalId));
+    }
 
     public Set<ReportGridDefinition> findForUser(String username){
         return reportGridDao.findForUser(username);

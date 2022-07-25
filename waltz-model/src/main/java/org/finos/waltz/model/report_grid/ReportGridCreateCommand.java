@@ -27,7 +27,7 @@ public abstract class ReportGridCreateCommand implements Command {
     }
 
     public String toExtId() {
-        UUID uuid  =  UUID.randomUUID();
+        UUID uuid = UUID.randomUUID();
         return uuid.toString();
     }
 }

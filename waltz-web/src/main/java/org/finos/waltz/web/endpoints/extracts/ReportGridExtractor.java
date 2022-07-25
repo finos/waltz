@@ -83,19 +83,17 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
 
     @Override
     public void register() {
-        registerGridViewExtractByGUID();
+        registerGridViewExtractByExternalId();
     }
 
 
-    private void registerGridViewExtractByGUID() {
+    private void registerGridViewExtractByExternalId() {
         post(WebUtilities.mkPath(BASE_URL, "external-id", ":externalId"),
                 (request, response) -> {
-                    String clientProvidedExternalId = request.params("externalId");
-                    Set<ReportGridDefinition> grids = reportGridService.findAll();
+                    String externalId = request.params("externalId");
                     Optional<ReportGridDefinition> definition =
-                             grids.stream()
-                                     .filter(g -> g.externalId().isPresent() && clientProvidedExternalId.equals(g.externalId().get()))
-                                     .findAny();
+                            reportGridService.findByExternalId(externalId);
+
                     return definition.map(def-> {
                         try {
                             IdSelectionOptions selectionOptions = WebUtilities.readIdSelectionOptionsFromBody(request);
@@ -109,10 +107,10 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
                                             parseExtractFormat(request),
                                             selectionOptions));
                         }catch(IOException e){
-                            throw new WebException("500",""+e.getMessage(),e);
+                            throw new WebException("REPORT_GRID_RENDER_ERROR",""+e.getMessage(),e);
                         }
-                    }).orElseThrow(()->new NotFoundException("404",
-                            String.format(" Report Grid GUID (%s) not found",clientProvidedExternalId)));
+                    }).orElseThrow(()->new NotFoundException("MISSING_GRID",
+                            String.format(" Report Grid GUID (%s) not found",externalId)));
                 });
     }
 
