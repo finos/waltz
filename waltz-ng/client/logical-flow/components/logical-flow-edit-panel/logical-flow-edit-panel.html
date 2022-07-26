@@ -39,8 +39,9 @@
           ng-submit="$ctrl.submit()">
 
         <!-- ACTIONS -->
-        <div class="row">
-            <div class="col-sm-5">
+        <div class="row"
+             ng-if="$ctrl.mode === 'addSource' || $ctrl.mode === 'addTarget' || $ctrl.mode === ''">
+            <div class="col-sm-6">
                 <div class="alert"
                      style="background-color: #f5f5f5; border-radius: 10px;">
                     <ul class="small">
@@ -80,7 +81,8 @@
                     </ul>
                 </div>
             </div>
-            <div class="col-sm-7">
+            <div class="col-sm-6">
+
                 <div ng-if="$ctrl.mode === 'addSource'"
                      class="waltz-fade-if">
                     <waltz-logical-flow-counterpart-selector all-actors="$ctrl.allActors"
@@ -118,13 +120,20 @@
                     </waltz-logical-flow-counterpart-selector>
                 </div>
 
+            </div>
+        </div>
+
+        <div class="row"
+             ng-if="$ctrl.mode === 'editDataTypeUsage' || $ctrl.mode === 'editCounterpart'">
+            <div class="col-sm-6">
 
                 <div ng-if="$ctrl.mode === 'editCounterpart'"
                      class="waltz-fade-if">
                     <waltz-logical-flow-type-editor flow="$ctrl.selectedFlow"
                                                     on-delete="$ctrl.deleteFlow"
                                                     on-reload="$ctrl.onReload"
-                                                    on-cancel="$ctrl.cancel">
+                                                    on-cancel="$ctrl.cancel"
+                                                    on-select="$ctrl.onSelectDataType">
                     </waltz-logical-flow-type-editor>
                 </div>
 
@@ -136,6 +145,24 @@
                                                       on-cancel="$ctrl.cancel"
                                                       usages="$ctrl.selectedUsages">
                     </waltz-app-data-type-usage-editor>
+                </div>
+            </div>
+
+            <div class="col-sm-6">
+                <div ng-if="$ctrl.mode === 'editCounterpart'">
+                    <waltz-svelte-component ng-if="$ctrl.dataTypeInfo"
+                                            component="$ctrl.DataTypeInfoPanel"
+                                            datatype="$ctrl.dataTypeInfo"
+                                            primary-entity-ref="$ctrl.parentEntityRef"
+                                            logical-flow="$ctrl.selectedFlow">
+                    </waltz-svelte-component>
+                    <div class="help-block small"
+                         style="padding-top: 1em"
+                         ng-if="!$ctrl.dataTypeInfo">
+                        <waltz-icon name="info-circle"></waltz-icon>
+                        Select a datatype on the tree to see more information and the underlying physical flows which
+                        share it (if any)
+                    </div>
                 </div>
             </div>
         </div>
