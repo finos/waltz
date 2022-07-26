@@ -33,13 +33,13 @@
         <dependency>
             <groupId>org.finos</groupId>
             <artifactId>waltz-model</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.finos</groupId>
             <artifactId>waltz-schema</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- Database -->
