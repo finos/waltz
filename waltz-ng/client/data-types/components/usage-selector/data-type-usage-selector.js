@@ -238,7 +238,7 @@ function controller($q, serviceBroker) {
 
     vm.click = (key, item) => {
         vm.onSelect(item);
-    }
+    };
 }
 
 
