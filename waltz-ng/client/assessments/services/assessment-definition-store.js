@@ -33,11 +33,16 @@ export function store($http, BaseApiUrl) {
         .get(`${BASE}/kind/${kind}`)
         .then(x => x.data);
 
+    const findByEntityReference = (ref) => $http
+        .get(`${BASE}/kind/${ref.kind}/id/${ref.id}`)
+        .then(x => x.data);
+
 
     return {
         getById,
         findAll,
-        findByKind
+        findByKind,
+        findByEntityReference
     };
 }
 
@@ -67,5 +72,10 @@ export const AssessmentDefinitionStore_API = {
         serviceFnName: 'findByKind',
         description: 'find all assessment definitions for an entity kind '
     },
+    findByEntityReference: {
+        serviceName,
+        serviceFnName: 'findByEntityReference',
+        description: 'find all assessment definitions for a parent entity ref'
+    }
 };
 

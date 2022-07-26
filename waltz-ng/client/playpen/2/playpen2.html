@@ -42,6 +42,8 @@
     <!--    expanded-item-ids="$ctrl.expandedItemIds"-->
     <!--    disable-predicate="$ctrl.disableNode">-->
 
+    <waltz-svelte-component component="$ctrl.Markdown" text="$ctrl.text"></waltz-svelte-component>
+
 
     <pre ng-bind="$ctrl.checkedItemIds | json"></pre>
 

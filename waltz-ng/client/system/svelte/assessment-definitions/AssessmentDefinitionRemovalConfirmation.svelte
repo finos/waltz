@@ -2,8 +2,8 @@
     import Icon from "../../../common/svelte/Icon.svelte";
 
     import {assessmentRatingStore} from "../../../svelte-stores/assessment-rating";
+    import {selectedDefinition} from "./assessment-definition-utils";
 
-    export let definition;
     export let doCancel;
     export let doRemove;
 
@@ -11,18 +11,19 @@
     let canRemove = false;
     let removePromise = null;
 
-    $: ratingCall = assessmentRatingStore.findByDefinitionId(definition.id);
+    function onRemove() {
+        removePromise = doRemove($selectedDefinition.id);
+    }
+
+    $: ratingCall = assessmentRatingStore.findByDefinitionId($selectedDefinition.id);
     $: ratings = $ratingCall.data;
     $: canRemove = ratings.length === 0;
 
-    function onRemove() {
-        removePromise = doRemove(definition.id);
-    }
 </script>
 
 {#if $ratingCall.status === 'loading'}
     <h4 class="text-muted">
-        Analyzing impact of removing {definition.name}...
+        Analyzing impact of removing {$selectedDefinition.name}...
     </h4>
 {:else}
     <div class="removal-box"
@@ -32,8 +33,8 @@
         Are you sure you want to remove this assessment definition ?
 
         <div>
-            <h4>{definition.name}</h4>
-            <p>{definition.description}</p>
+            <h4>{$selectedDefinition.name}</h4>
+            <p>{$selectedDefinition.description}</p>
         </div>
 
         {#if ratings.length > 0}
@@ -45,7 +46,7 @@
                 Please ensure you have a backup of the data before proceeding.
                 <br>
                 You can obtain a backup from the export on the
-                <a href="../../assessment-definition/{definition.id}">overview page</a>.
+                <a href="../../assessment-definition/{$selectedDefinition.id}">overview page</a>.
                 <br>
                 <br>
                 <button class="btn btn-danger"
