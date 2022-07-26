@@ -33,19 +33,19 @@ import java.util.Map;
 @JsonDeserialize(as = ImmutableApiTypes.class)
 public class ApiTypes {
 
-    public final static String KEYCELL = "5";
-    public final static String VALCELL = "10";
-    private final Map<String, String> apiTypes;
+    public static final String KEYCELL = "5";
+    public static final String VALCELL = "10";
+    private final Map<String, String> cellTypes;
 
 
     public ApiTypes() {
         Map<String, String> types = new HashMap<>();
         types.put(KEYCELL, "/types/1/schema#id=KeyCell");
         types.put(VALCELL, "/types/1/schema#id=CellValue");
-        this.apiTypes = types;
+        this.cellTypes = types;
     }
 
-    public Map<String, String> getApiTypes() {
-        return apiTypes;
+    public Map<String, String> getCellTypes() {
+        return cellTypes;
     }
 }

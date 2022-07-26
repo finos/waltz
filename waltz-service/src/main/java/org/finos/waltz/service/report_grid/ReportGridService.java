@@ -60,7 +60,6 @@ public class ReportGridService {
     private final ChangeInitiativeDao changeInititativeDao;
     private final ReportGridDao reportGridDao;
     private final ReportGridMemberService reportGridMemberService;
-    private final ChangeLogService changeLogService;
     private final UserRoleService userRoleService;
 
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
@@ -70,21 +69,18 @@ public class ReportGridService {
                              ApplicationDao applicationDao,
                              RatingSchemeService ratingSchemeService,
                              ReportGridMemberService reportGridMemberService,
-                             ChangeLogService changeLogService,
                              UserRoleService userRoleService,
                              ChangeInitiativeDao changeInitiativeDao) {
         checkNotNull(reportGridDao, "reportGridDao cannot be null");
         checkNotNull(reportGridMemberService, "reportGridMemberService cannot be null");
         checkNotNull(applicationDao, "applicationDao cannot be null");
         checkNotNull(ratingSchemeService, "ratingSchemeService cannot be null");
-        checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(userRoleService, "userRoleService cannot be null");
 
         this.reportGridDao = reportGridDao;
         this.reportGridMemberService = reportGridMemberService;
         this.applicationDao = applicationDao;
         this.ratingSchemeService = ratingSchemeService;
-        this.changeLogService = changeLogService;
         this.changeInititativeDao = changeInitiativeDao;
         this.userRoleService = userRoleService;
     }
@@ -94,6 +90,9 @@ public class ReportGridService {
         return reportGridDao.findAll();
     }
 
+    public Optional<ReportGridDefinition> findByExternalId(String externalId){
+        return Optional.ofNullable(reportGridDao.getGridDefinitionByExternalId(externalId));
+    }
 
     public Set<ReportGridDefinition> findForUser(String username){
         return reportGridDao.findForUser(username);
