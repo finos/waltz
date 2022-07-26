@@ -4,7 +4,10 @@
     import Markdown from "../../../common/svelte/Markdown.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
     import {fade} from 'svelte/transition';
+
     export let assessment;
+
+    $: console.log({assessment});
 </script>
 
 

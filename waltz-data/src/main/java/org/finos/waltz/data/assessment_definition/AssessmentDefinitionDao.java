@@ -65,6 +65,7 @@ public class AssessmentDefinitionDao {
                 .isReadOnly(record.getIsReadonly())
                 .provenance(record.getProvenance())
                 .visibility(AssessmentVisibility.valueOf(record.getVisibility()))
+                .definitionGroup(record.getDefinitionGroup())
                 .qualifierReference(maybeReadRef(
                         record,
                         ASSESSMENT_DEFINITION.QUALIFIER_KIND,
@@ -114,6 +115,7 @@ public class AssessmentDefinitionDao {
     /**
      * Saves the given assessment definition.  Either updating or inserting.
      * Returns the identifier for the record.
+     *
      * @param def the definition to save
      * @return the identifier for the record
      */
@@ -138,15 +140,16 @@ public class AssessmentDefinitionDao {
         r.setLastUpdatedAt(Timestamp.valueOf(def.lastUpdatedAt()));
         r.setLastUpdatedBy(def.lastUpdatedBy());
         r.setProvenance(StringUtilities.ifEmpty(def.provenance(), "waltz"));
+        r.setDefinitionGroup(r.getDefinitionGroup());
 
         def.qualifierReference()
-           .ifPresent(qualifier -> {
-               r.setQualifierId(qualifier.id());
-               r.setQualifierKind(qualifier.kind().name());
-            });
+                .ifPresent(qualifier -> {
+                    r.setQualifierId(qualifier.id());
+                    r.setQualifierKind(qualifier.kind().name());
+                });
 
         def.id()
-           .ifPresent(r::setId);
+                .ifPresent(r::setId);
 
         if (r.getId() == null) {
             r.insert();

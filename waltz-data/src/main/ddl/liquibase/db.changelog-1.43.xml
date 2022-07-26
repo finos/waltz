@@ -155,6 +155,6 @@
             <column name="description" value="Can upload logical and physical flows in bulk"/>
             <column name="user_selectable" valueBoolean="true"/>
         </insert>
-  </changeSet>
-  
+    </changeSet>
+
 </databaseChangeLog>

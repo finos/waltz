@@ -26,6 +26,7 @@ import {resolveResponses} from "../../../common/promise-utils";
 import _ from "lodash";
 import toasts from "../../../svelte-stores/toast-store";
 import AssessmentEditor from "../editor/AssessmentEditor.svelte";
+import AssessmentList from "../list/AssessmentRatingList.svelte";
 
 const bindings = {
     parentEntityRef: "<",
@@ -34,6 +35,7 @@ const bindings = {
 
 const initialState = {
     AssessmentEditor,
+    AssessmentList,
     permissions: []
 };
 

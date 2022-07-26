@@ -48,6 +48,11 @@ public abstract class AssessmentDefinition implements
     public abstract AssessmentVisibility visibility();
 
     @Value.Default
+    public String definitionGroup() {
+        return "Uncategorized";
+    }
+
+    @Value.Default
     public EntityKind kind() {
         return EntityKind.ASSESSMENT_DEFINITION;
     }

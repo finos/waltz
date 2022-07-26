@@ -1,0 +1,44 @@
+<script>
+
+    import tippy from "tippy.js";
+    import 'tippy.js/dist/tippy.css';
+    import 'tippy.js/themes/light-border.css';
+
+    let elem;
+    let contentElem;
+    let open = false;
+
+    export let content;
+    export let props
+
+    $: {
+
+        if (elem && content) {
+            tippy(elem, {
+                content: "loading",
+                arrow: true,
+                interactive: true,
+                trigger: 'mouseenter click',
+                theme: "light-border",
+                onShow(instance) {
+                    open = true;
+                    setTimeout(() => instance.setContent(contentElem), 100);
+                }
+            });
+        }
+    }
+
+
+</script>
+
+<span bind:this={elem}>
+    <slot name="target"></slot>
+</span>
+
+<div style="display: none">
+    <div bind:this={contentElem}>
+        {#if open}
+            <svelte:component this={content} {...props}/>
+        {/if}
+    </div>
+</div>

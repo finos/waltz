@@ -19,10 +19,11 @@
 import {initialiseData} from "../../../common";
 import _ from "lodash";
 import template from "./assessment-rating-list.html";
-import {mkAssessmentDefinitionsIdsKey} from "../../../user";
+import {mkAssessmentDefinitionsIdsBaseKey} from "../../../user";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {displayError} from "../../../common/error-utils";
 import toasts from "../../../svelte-stores/toast-store";
+import {isFavourite} from "../../assessment-utils";
 
 const bindings = {
     assessments: "<",
@@ -53,16 +54,13 @@ function getFavouriteAssessmentDefnIds(key, preferences, defaultList = []) {
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    function isFavourite(id) {
-        return _.includes(vm.favouriteAssessmentDefnIds, id);
-    }
 
     const partitionAssessments = () => {
         if (vm.assessments) {
             const [notProvided, provided] = _
                 .chain(vm.assessments)
                 .sortBy(d => d.definition.name)
-                .map(a => Object.assign({}, a, { isFavourite: isFavourite(a.definition.id)}))
+                .map(a => Object.assign({}, a, {isFavourite: isFavourite(vm.favouriteAssessmentDefnIds, a.definition.id)}))
                 .partition(assessment => _.isNil(assessment.rating))
                 .value();
 
@@ -72,7 +70,7 @@ function controller(serviceBroker) {
     };
 
     vm.$onInit = () => {
-        vm.favouritesKey = mkAssessmentDefinitionsIdsKey(vm.parentEntityRef);
+        vm.favouritesKey = mkAssessmentDefinitionsIdsBaseKey(vm.parentEntityRef);
     };
 
     vm.$onChanges = () => {
@@ -90,7 +88,7 @@ function controller(serviceBroker) {
 
     vm.toggleFavourite = (assessmentRatingId) => {
 
-        const alreadyFavourite = isFavourite(assessmentRatingId);
+        const alreadyFavourite = isFavourite(vm.favouriteAssessmentDefnIds, assessmentRatingId);
 
         const newFavouritesList = (alreadyFavourite)
             ? _.without(vm.favouriteAssessmentDefnIds, assessmentRatingId)
