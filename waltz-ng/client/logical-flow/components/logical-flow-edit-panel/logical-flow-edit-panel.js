@@ -46,7 +46,8 @@ const initialState = {
     selectedCounterpart: null,
     selectedDecorators: null,
     selectedFlow: null,
-    selectedUsages: []
+    selectedUsages: [],
+    dataTypeInfo: null
 };
 
 
@@ -321,6 +322,7 @@ function controller($element,
         vm.selectedCounterpart = null;
         vm.selectedDecorators = null;
         vm.selectedFlow = null;
+        vm.dataTypeInfo = null;
         vm.isDirty = false;
         vm.setMode("");
     };
@@ -404,6 +406,10 @@ function controller($element,
         }
         vm.mode = mode;
     };
+
+    vm.onSelectDataType = (dt) => {
+        vm.dataTypeInfo = dt;
+    }
 }
 
 

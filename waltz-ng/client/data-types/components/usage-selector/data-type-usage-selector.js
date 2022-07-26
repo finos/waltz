@@ -28,7 +28,8 @@ import {reduceToSelectedNodesOnly} from "../../../common/hierarchy-utils";
 const bindings = {
     parentEntityRef: "<",
     onDirty: "<?",
-    onRegisterSave: "<?"
+    onRegisterSave: "<?",
+    onSelect: "<?"
 };
 
 
@@ -42,6 +43,7 @@ const initialState = {
     suggestedDataTypes: [],
     showAllDataTypes: false,
     onDirty: (d) => console.log("dtus:onDirty - default impl", d),
+    onSelect: (d) => console.log("dtus:onSelect - default impl", d),
     onRegisterSave: (f) => console.log("dtus:onRegisterSave - default impl", f)
 };
 
@@ -233,6 +235,10 @@ function controller($q, serviceBroker) {
     };
 
     vm.nameProviderFn = d => d.dataType.name;
+
+    vm.click = (key, item) => {
+        vm.onSelect(item);
+    }
 }
 
 

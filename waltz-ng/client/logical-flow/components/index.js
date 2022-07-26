@@ -24,6 +24,7 @@ import LogicalFlowTypeEditor from "./edit/logical-flow-type-editor";
 import LogicalFlowEditPanel from "./logical-flow-edit-panel/logical-flow-edit-panel";
 import SourceAndTargetGraph from "./source-and-target-graph/source-and-target-graph";
 import SourceAndTargetPanel from "./source-and-target-panel/source-and-target-panel";
+import DataTypeInfoPanel from "./data-type-info-panel/data-type-info-panel";
 import RatedFlowSummaryPanel from "./rated-flow-summary/rated-flow-summary-panel";
 import LogicalFlowsDataTypeSummaryPane from "./logical-flows-data-type-summary-pane/logical-flows-data-type-summary-pane";
 import LogicalFlowsBoingyGraph from "./logical-flows-boingy-graph/logical-flows-boingy-graph";
@@ -50,7 +51,8 @@ function setup(module) {
         LogicalFlowsBoingyGraph,
         RatedFlowSummaryPanel,
         SourceAndTargetGraph,
-        SourceAndTargetPanel
+        SourceAndTargetPanel,
+        DataTypeInfoPanel
     ]);
 
     module
