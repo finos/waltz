@@ -95,9 +95,9 @@ public class DataTypeDecoratorEndpoint implements Endpoint {
 
         ListRoute<DataTypeDecorator> findByFlowIdsAndKindRoute = (request, response) ->
                 dataTypeDecoratorService
-                    .findByFlowIds(
-                            readIdsFromBody(request),
-                            getKind(request));
+                        .findByFlowIds(
+                                readIdsFromBody(request),
+                                getKind(request));
 
         ListRoute<DataType> findSuggestedByEntityRefRoute = (req, res) ->
                 dataTypeService.findSuggestedByEntityRef(getEntityReference(req));

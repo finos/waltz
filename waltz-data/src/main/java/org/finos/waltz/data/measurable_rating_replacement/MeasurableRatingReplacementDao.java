@@ -35,6 +35,11 @@ import org.springframework.stereotype.Repository;
 import java.util.Date;
 import java.util.Set;
 
+import static java.util.Collections.emptySet;
+import static org.finos.waltz.common.SetUtilities.union;
+import static org.finos.waltz.common.StringUtilities.notEmpty;
+import static org.finos.waltz.schema.Tables.MEASURABLE_CATEGORY;
+import static org.finos.waltz.schema.Tables.USER_ROLE;
 import static org.finos.waltz.schema.tables.MeasurableRatingPlannedDecommission.MEASURABLE_RATING_PLANNED_DECOMMISSION;
 import static org.finos.waltz.schema.tables.MeasurableRatingReplacement.MEASURABLE_RATING_REPLACEMENT;
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -178,5 +183,30 @@ public class MeasurableRatingReplacementDao {
                 .and(MEASURABLE_RATING_REPLACEMENT.ID.eq(replacementId))
                 .execute() == 1;
 
+    }
+
+    public Set<Operation> calculateAmendedReplacementOperations(Set<Operation> operationsForEntityAssessment,
+                                                                long categoryId,
+                                                                String username) {
+
+        Tuple2<Boolean, Boolean> hasRoleAndCategoryEditable = dsl
+                .select(USER_ROLE.ROLE,
+                        MEASURABLE_CATEGORY.EDITABLE)
+                .from(MEASURABLE_CATEGORY)
+                .leftJoin(USER_ROLE)
+                .on(USER_ROLE.ROLE.eq(MEASURABLE_CATEGORY.RATING_EDITOR_ROLE)
+                        .and(USER_ROLE.USER_NAME.eq(username)))
+                .where(MEASURABLE_CATEGORY.ID.eq(categoryId))
+                .fetchOne(r -> tuple(
+                        notEmpty(r.get(USER_ROLE.ROLE)),
+                        r.get(MEASURABLE_CATEGORY.EDITABLE)));
+
+        if (!hasRoleAndCategoryEditable.v2) {
+            return emptySet();
+        } else if (hasRoleAndCategoryEditable.v1) {
+            return union(operationsForEntityAssessment, asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE));
+        } else {
+            return operationsForEntityAssessment;
+        }
     }
 }

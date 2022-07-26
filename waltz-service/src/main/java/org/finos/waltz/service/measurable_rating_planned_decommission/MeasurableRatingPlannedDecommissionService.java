@@ -52,7 +52,7 @@ public class MeasurableRatingPlannedDecommissionService {
     public MeasurableRatingPlannedDecommissionService(MeasurableRatingPlannedDecommissionDao measurableRatingPlannedDecommissionDao,
                                                       MeasurableRatingReplacementDao measurableRatingReplacementDao,
                                                       MeasurableRatingService measurableRatingService,
-                                                      ChangeLogService changeLogService){
+                                                      ChangeLogService changeLogService) {
         checkNotNull(measurableRatingPlannedDecommissionDao, "MeasurableRatingPlannedDecommissionDao cannot be null");
         checkNotNull(measurableRatingReplacementDao, "MeasurableRatingReplacementDao cannot be null");
         checkNotNull(measurableRatingService, "MeasurableRatingService cannot be null");
@@ -64,7 +64,7 @@ public class MeasurableRatingPlannedDecommissionService {
     }
 
 
-    public Collection<MeasurableRatingPlannedDecommission> findForEntityRef(EntityReference ref){
+    public Collection<MeasurableRatingPlannedDecommission> findForEntityRef(EntityReference ref) {
         return measurableRatingPlannedDecommissionDao.findByEntityRef(ref);
     }
 
@@ -111,7 +111,7 @@ public class MeasurableRatingPlannedDecommissionService {
     }
 
 
-    public Boolean remove(Long id, String username){
+    public Boolean remove(Long id, String username) {
         Set<String> replacementApps = map(measurableRatingReplacementDao.fetchByDecommissionId(id), r -> r.entityReference().name().get());
 
         String msg = (replacementApps.size() > 0) ?
@@ -131,4 +131,10 @@ public class MeasurableRatingPlannedDecommissionService {
     public String getRequiredRatingEditRole(EntityReference entityRef) {
         return measurableRatingService.getRequiredRatingEditRole(entityRef);
     }
+
+
+    public MeasurableRatingPlannedDecommission getById(Long decommId) {
+        return measurableRatingPlannedDecommissionDao.getById(decommId);
+    }
+
 }
