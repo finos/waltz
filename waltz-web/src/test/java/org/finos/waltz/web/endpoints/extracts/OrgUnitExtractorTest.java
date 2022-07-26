@@ -2,6 +2,9 @@ package org.finos.waltz.web.endpoints.extracts;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.finos.waltz.schema.tables.records.OrganisationalUnitRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record6;
@@ -31,6 +34,8 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class OrgUnitExtractorTest {
+
+    private final ObjectMapper objectMapper = createMapper();
     private DSLContext testDslContext;
     private OrgUnitExtractor orgUnitExtractor;
 
@@ -55,8 +60,7 @@ class OrgUnitExtractorTest {
         assertTrue(obj instanceof String);
         String responseJSON = (String)obj;
         assertTrue(responseJSON.length()>0);
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode node = mapper.readTree(responseJSON);
+        JsonNode node = objectMapper.readTree(responseJSON);
         JsonNode arrElement = node.get(0);
         assertNotNull(arrElement);
         assertEquals("1", arrElement.get("id").asText());
@@ -95,4 +99,12 @@ class OrgUnitExtractorTest {
                 .from(ORGANISATIONAL_UNIT);
     }
 
+    private ObjectMapper createMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper
+                .registerModule(new JavaTimeModule())
+                .registerModule(new Jdk8Module())
+                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+    }
 }
