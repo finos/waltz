@@ -5,7 +5,12 @@
 
     import {ratingSchemeStore} from "../../../svelte-stores/rating-schemes";
     import {assessmentRatingStore} from "../../../svelte-stores/assessment-rating";
-    import {getRequiredFields, possibleVisibility, possibleEntityKinds, selectedDefinition} from "./assessment-definition-utils";
+    import {
+        getRequiredFields,
+        possibleVisibility,
+        possibleEntityKinds,
+        selectedDefinition
+    } from "./assessment-definition-utils";
     import MeasurableCategoryPicker from "./MeasurableCategoryPicker.svelte";
 
     export let doCancel;
@@ -101,7 +106,7 @@
                         disabled={hasRatings}
                         bind:value={$selectedDefinition.entityKind}>
 
-                        {#each possibleEntityKinds as k}
+                    {#each possibleEntityKinds as k}
                         <option value={k.value}>
                             {k.name}
                         </option>
@@ -132,7 +137,8 @@
                             {#if hasRatings}
                                 <br>
                                 <Icon name="warning"/>
-                                The associated category qualifier for this definition cannot be changed as ratings already exist.
+                                The associated category qualifier for this definition cannot be changed as ratings
+                                already exist.
                             {/if}
                         </svelte:fragment>
                     </MeasurableCategoryPicker>

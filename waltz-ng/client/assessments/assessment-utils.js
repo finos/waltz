@@ -231,3 +231,18 @@ function loadAssessments($q, serviceBroker, kind, ratingsPromise, primaryOnly = 
             };
         });
 }
+
+
+export function isFavourite(favouriteDefinitionIds, id) {
+    return _.includes(favouriteDefinitionIds, id);
+}
+
+
+export function getIdsFromString(includedFavouritesString) {
+    return _.isNil(includedFavouritesString)
+        ? []
+        : _.chain(includedFavouritesString.value)
+            .split(",")
+            .map(idString => _.toNumber(idString))
+            .value();
+}

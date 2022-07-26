@@ -149,12 +149,12 @@
             <table class="table table-condensed table-striped table-hover"
                    style="table-layout: fixed">
                 <thead>
-                    <tr>
-                        <th style="width:25%">Name</th>
-                        <th style="width:25%">Rating Scheme</th>
-                        <th style="width:20%">Applicable Kind</th>
-                        <th style="width:30%">Operations</th>
-                    </tr>
+                <tr>
+                    <th style="width:25%">Name</th>
+                    <th style="width:25%">Rating Scheme</th>
+                    <th style="width:20%">Applicable Kind</th>
+                    <th style="width:30%">Operations</th>
+                </tr>
                 </thead>
                 <tbody>
                 {#each definitionList as def}

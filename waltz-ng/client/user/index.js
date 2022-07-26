@@ -39,9 +39,9 @@ export const groupLogicalFlowFilterExcludedTagIdsKey = "main.group-views.logical
 export const favouriteAssessmentDefinitionIdsKey = "main.app-view.assessment-rating.favouriteAssessmentDefnIds";
 export const lastViewedFlowTabKey = "main.app-view.data-flows.lastTab";
 
-export function mkAssessmentDefinitionsIdsKey(entityReference) {
+export function mkAssessmentDefinitionsIdsBaseKey(entityReference) {
     checkIsEntityRef(entityReference);
-    return favouriteAssessmentDefinitionIdsKey + _.camelCase(entityReference.kind);
+    return `${favouriteAssessmentDefinitionIdsKey}.${_.camelCase(entityReference.kind)}`;
 }
 
 export default () => {

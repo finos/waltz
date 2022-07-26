@@ -18,39 +18,40 @@
 
 
 <div class="row">
-    <div class="col-sm-12" style="padding: 5px 0">
-        <div class="col-sm-6">
-            <waltz-assessment-rating-list assessments="$ctrl.assessments"
-                                          parent-entity-ref="$ctrl.parentEntityRef"
-                                          on-select="$ctrl.onSelect">
-            </waltz-assessment-rating-list>
-            <p class="help-block"
-               style="padding-top: 1em">
-                Assessments associated to this:
-                <span ng-bind="$ctrl.parentEntityRef.kind | toDisplayName:'entity'"></span>.
-                Click the stars in the first column to configure which assessments appear at the top of the screen for all
-                <span ng-bind="$ctrl.parentEntityRef.kind | toDisplayName:'entity'"></span>
-                pages.
 
-            </p>
+    <div class="col-sm-6">
+        <waltz-svelte-component ng-if="$ctrl.assessments"
+                                component="$ctrl.AssessmentList"
+                                primary-entity-ref="$ctrl.parentEntityRef"
+                                assessments="$ctrl.assessments"
+                                on-select="$ctrl.onSelect">
+        </waltz-svelte-component>
+        <p class="help-block"
+           style="padding-top: 1em">
+            Assessments associated to this:
+            <span ng-bind="$ctrl.parentEntityRef.kind | toDisplayName:'entity'"></span>.
+            Click the stars in the first column to configure which assessments appear at the top of the screen for all
+            <span ng-bind="$ctrl.parentEntityRef.kind | toDisplayName:'entity'"></span>
+            pages.
+
+        </p>
+    </div>
+    <div class="col-sm-6">
+        <div class="text-muted"
+             ng-if="$ctrl.assessments.length > 0 && !$ctrl.selectedAssessment">
+            <waltz-icon name="info-circle"></waltz-icon>
+            Select a rating for more information or to edit
         </div>
-        <div class="col-sm-6">
-            <div class="text-muted"
-                 ng-if="$ctrl.assessments.length > 0 && !$ctrl.selectedAssessment">
-                <waltz-icon name="info-circle"></waltz-icon>
-                Select a rating for more information or to edit
-            </div>
-            <div ng-if="$ctrl.selectedAssessment">
-                <waltz-svelte-component component="$ctrl.AssessmentEditor"
-                                        assessment="$ctrl.selectedAssessment"
-                                        on-close="$ctrl.onClose"
-                                        do-remove="$ctrl.onRemove"
-                                        do-save="$ctrl.onSave"
-                                        do-lock="$ctrl.onLock"
-                                        do-unlock="$ctrl.onUnlock"
-                                        permissions="$ctrl.permissions">
-                </waltz-svelte-component>
-            </div>
+        <div ng-if="$ctrl.selectedAssessment">
+            <waltz-svelte-component component="$ctrl.AssessmentEditor"
+                                    assessment="$ctrl.selectedAssessment"
+                                    on-close="$ctrl.onClose"
+                                    do-remove="$ctrl.onRemove"
+                                    do-save="$ctrl.onSave"
+                                    do-lock="$ctrl.onLock"
+                                    do-unlock="$ctrl.onUnlock"
+                                    permissions="$ctrl.permissions">
+            </waltz-svelte-component>
         </div>
     </div>
 </div>
