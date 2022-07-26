@@ -150,11 +150,12 @@
 
             <div class="col-sm-6">
                 <div ng-if="$ctrl.mode === 'editCounterpart'">
-                    <waltz-data-type-info-panel ng-if="$ctrl.dataTypeInfo"
-                                                datatype="$ctrl.dataTypeInfo"
-                                                parent-entity-ref="$ctrl.parentEntityRef"
-                                                logical-flow="$ctrl.selectedFlow">
-                    </waltz-data-type-info-panel>
+                    <waltz-svelte-component ng-if="$ctrl.dataTypeInfo"
+                                            component="$ctrl.DataTypeInfoPanel"
+                                            datatype="$ctrl.dataTypeInfo"
+                                            primary-entity-ref="$ctrl.parentEntityRef"
+                                            logical-flow="$ctrl.selectedFlow">
+                    </waltz-svelte-component>
                     <div class="help-block small"
                          style="padding-top: 1em"
                          ng-if="!$ctrl.dataTypeInfo">

@@ -36,6 +36,7 @@
         .chain($physFlowCall.data)
         .map(d => Object.assign({}, d, {specification: specsById[d.specificationId]}))
         .filter(d => !_.isNil(d.specification))
+        .orderBy(d => d.externalId)
         .value();
 
     $: filteredPhysicalFlows = _.isEmpty(qry)

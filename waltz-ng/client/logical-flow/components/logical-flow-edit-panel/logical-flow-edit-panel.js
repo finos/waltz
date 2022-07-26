@@ -28,6 +28,7 @@ import {event} from "d3-selection";
 import {entity} from "../../../common/services/enums/entity";
 import {loadFlowClassificationRatings} from "../../../flow-classification-rule/flow-classification-utils";
 import toasts from "../../../svelte-stores/toast-store";
+import DataTypeInfoPanel from "../data-type-info-panel/DataTypeInfoPanel.svelte";
 
 const bindings = {
     parentEntityRef: "<",
@@ -47,7 +48,8 @@ const initialState = {
     selectedDecorators: null,
     selectedFlow: null,
     selectedUsages: [],
-    dataTypeInfo: null
+    dataTypeInfo: null,
+    DataTypeInfoPanel
 };
 
 
