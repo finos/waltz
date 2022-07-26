@@ -126,7 +126,4 @@
         padding-left: 1em;
     }
 
-    .warning {
-        color: $waltz-amber;
-    }
 </style>

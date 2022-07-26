@@ -19,6 +19,7 @@
 package org.finos.waltz.data.measurable;
 
 
+import org.finos.waltz.data.change_initiative.ChangeInitiativeIdSelectorFactory;
 import org.finos.waltz.schema.tables.MeasurableRating;
 import org.finos.waltz.data.IdSelectorFactory;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
@@ -33,6 +34,7 @@ import org.jooq.impl.DSL;
 import static org.finos.waltz.schema.Tables.*;
 import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static org.finos.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
+import static org.finos.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
 import static org.finos.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
 import static java.lang.String.format;
@@ -68,11 +70,40 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
             case ACTOR:
             case APPLICATION:
                 return mkForDirectEntityKind(options);
+            case CHANGE_INITIATIVE:
+                return mkForChangeInitiative(options);
             default:
                 throw new UnsupportedOperationException(format(
                         "Cannot create measurable selector from kind: %s",
                         options.entityReference().kind()));
         }
+    }
+
+    private Select<Record1<Long>> mkForChangeInitiative(IdSelectionOptions options) {
+
+        Select<Record1<Long>> changeInitiativeSelector = new ChangeInitiativeIdSelectorFactory().apply(options);
+
+        Select<Record1<Long>> ciToMeasurable = DSL
+                .select(ENTITY_RELATIONSHIP.ID_B)
+                .from(ENTITY_RELATIONSHIP)
+                .innerJoin(CHANGE_INITIATIVE)
+                .on(CHANGE_INITIATIVE.ID.eq(ENTITY_RELATIONSHIP.ID_A)
+                        .and(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.CHANGE_INITIATIVE.name())))
+                .where(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.MEASURABLE.name()))
+                .and(CHANGE_INITIATIVE.ID.in(changeInitiativeSelector));
+
+        Select<Record1<Long>> measurableToCI = DSL
+                .select(ENTITY_RELATIONSHIP.ID_A)
+                .from(ENTITY_RELATIONSHIP)
+                .innerJoin(CHANGE_INITIATIVE)
+                .on(CHANGE_INITIATIVE.ID.eq(ENTITY_RELATIONSHIP.ID_B)
+                        .and(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.CHANGE_INITIATIVE.name())))
+                .where(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.MEASURABLE.name()))
+                .and(CHANGE_INITIATIVE.ID.in(changeInitiativeSelector));
+
+        return measurableToCI
+                .union(ciToMeasurable);
+
     }
 
 
