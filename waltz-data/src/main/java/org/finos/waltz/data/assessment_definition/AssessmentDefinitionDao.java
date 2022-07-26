@@ -140,7 +140,7 @@ public class AssessmentDefinitionDao {
         r.setLastUpdatedAt(Timestamp.valueOf(def.lastUpdatedAt()));
         r.setLastUpdatedBy(def.lastUpdatedBy());
         r.setProvenance(StringUtilities.ifEmpty(def.provenance(), "waltz"));
-        r.setDefinitionGroup(r.getDefinitionGroup());
+        r.setDefinitionGroup(def.definitionGroup());
 
         def.qualifierReference()
                 .ifPresent(qualifier -> {
