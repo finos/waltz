@@ -18,7 +18,6 @@
 
 package org.finos.waltz.data.measurable_rating;
 
-import org.finos.waltz.schema.tables.records.MeasurableRatingRecord;
 import org.finos.waltz.common.exception.NotFoundException;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.data.JooqUtilities;
@@ -31,8 +30,11 @@ import org.finos.waltz.model.measurable_rating.SaveMeasurableRatingCommand;
 import org.finos.waltz.model.tally.ImmutableMeasurableRatingTally;
 import org.finos.waltz.model.tally.MeasurableRatingTally;
 import org.finos.waltz.model.tally.Tally;
+import org.finos.waltz.schema.Tables;
+import org.finos.waltz.schema.tables.records.MeasurableRatingRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.jooq.lambda.tuple.Tuple3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -40,17 +42,25 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
-import static org.finos.waltz.schema.tables.Application.APPLICATION;
-import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
-import static org.finos.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
 import static java.lang.String.format;
+import static java.util.Collections.emptySet;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.common.EnumUtilities.readEnum;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.SetUtilities.union;
 import static org.finos.waltz.common.StringUtilities.firstChar;
+import static org.finos.waltz.common.StringUtilities.notEmpty;
+import static org.finos.waltz.schema.Tables.MEASURABLE_CATEGORY;
+import static org.finos.waltz.schema.Tables.USER_ROLE;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
+import static org.finos.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository
 public class MeasurableRatingDao {
@@ -318,6 +328,43 @@ public class MeasurableRatingDao {
                 .select(ENTITY_NAME_FIELD)
                 .select(ENTITY_LIFECYCLE_FIELD)
                 .from(MEASURABLE_RATING);
+    }
+
+    public Set<Operation> calculateAmendedRatingOperations(Set<Operation> operationsForEntityAssessment,
+                                                           EntityReference entityReference,
+                                                           long measurableId,
+                                                           String username) {
+
+        Field<Boolean> readOnlyRatingField = DSL.coalesce(MEASURABLE_RATING.IS_READONLY, DSL.val(false)).as("rating_read_only");
+
+        SelectConditionStep<Record3<String, Boolean, Boolean>> qry = dsl
+                .select(USER_ROLE.ROLE,
+                        MEASURABLE_CATEGORY.EDITABLE,
+                        readOnlyRatingField)
+                .from(MEASURABLE)
+                .leftJoin(MEASURABLE_CATEGORY).on(MEASURABLE_CATEGORY.ID.eq(Tables.MEASURABLE.MEASURABLE_CATEGORY_ID))
+                .leftJoin(MEASURABLE_RATING).on(Tables.MEASURABLE.ID.eq(MEASURABLE_RATING.MEASURABLE_ID)
+                        .and(MEASURABLE_RATING.ENTITY_KIND.eq(entityReference.kind().name())
+                                .and(MEASURABLE_RATING.ENTITY_ID.eq(entityReference.id()))))
+                .leftJoin(USER_ROLE).on(USER_ROLE.ROLE.eq(MEASURABLE_CATEGORY.RATING_EDITOR_ROLE)
+                        .and(USER_ROLE.USER_NAME.eq(username)))
+                .where(MEASURABLE.ID.eq(measurableId));
+
+        Tuple3<Boolean, Boolean, Boolean> hasRoleAndDefinitionEditableAndIsReadOnly = qry
+                .fetchOne(r -> tuple(
+                        notEmpty(r.get(USER_ROLE.ROLE)),
+                        r.get(MEASURABLE_CATEGORY.EDITABLE),
+                        r.get(readOnlyRatingField)));
+
+        if (!hasRoleAndDefinitionEditableAndIsReadOnly.v2) {
+            return emptySet();
+        } else if (hasRoleAndDefinitionEditableAndIsReadOnly.v3) {
+            return emptySet();
+        } else if (hasRoleAndDefinitionEditableAndIsReadOnly.v1) {
+            return union(operationsForEntityAssessment, asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE));
+        } else {
+            return operationsForEntityAssessment;
+        }
     }
 
 }

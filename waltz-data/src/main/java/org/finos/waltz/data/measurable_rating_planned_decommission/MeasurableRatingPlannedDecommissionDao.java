@@ -30,14 +30,20 @@ import org.finos.waltz.model.command.DateFieldChange;
 import org.finos.waltz.model.measurable_rating_planned_decommission.ImmutableMeasurableRatingPlannedDecommission;
 import org.finos.waltz.model.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommission;
 import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple2;
+import org.jooq.lambda.tuple.Tuple3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.Set;
 
+import static java.util.Collections.emptySet;
+import static org.finos.waltz.common.SetUtilities.union;
+import static org.finos.waltz.common.StringUtilities.notEmpty;
+import static org.finos.waltz.schema.Tables.*;
 import static org.finos.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
 import static org.finos.waltz.schema.tables.MeasurableRatingPlannedDecommission.MEASURABLE_RATING_PLANNED_DECOMMISSION;
 import static org.finos.waltz.schema.tables.MeasurableRatingReplacement.MEASURABLE_RATING_REPLACEMENT;
@@ -46,6 +52,8 @@ import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.immutables.value.internal.$guava$.collect.$Sets.intersection;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository
 public class MeasurableRatingPlannedDecommissionDao {
@@ -164,7 +172,7 @@ public class MeasurableRatingPlannedDecommissionDao {
             MeasurableRatingPlannedDecommissionRecord existingDecommRecord = existingRecord.into(MEASURABLE_RATING_PLANNED_DECOMMISSION);
             updateDecommDateOnRecord(existingDecommRecord, dateChange, userName);
             boolean updatedRecord = existingDecommRecord.update() == 1;
-            return Tuple.tuple(Operation.UPDATE, updatedRecord);
+            return tuple(Operation.UPDATE, updatedRecord);
         } else {
             MeasurableRatingPlannedDecommissionRecord record = dsl.newRecord(MEASURABLE_RATING_PLANNED_DECOMMISSION);
             updateDecommDateOnRecord(record, dateChange, userName);
@@ -174,7 +182,7 @@ public class MeasurableRatingPlannedDecommissionDao {
             record.setEntityKind(entityReference.kind().name());
             record.setMeasurableId(measurableId);
             boolean recordsInserted = record.insert() == 1;
-            return Tuple.tuple(Operation.ADD, recordsInserted);
+            return tuple(Operation.ADD, recordsInserted);
         }
     }
 
@@ -211,7 +219,6 @@ public class MeasurableRatingPlannedDecommissionDao {
     }
 
 
-
     private void updateDecommDateOnRecord(MeasurableRatingPlannedDecommissionRecord record,
                                           DateFieldChange dateChange,
                                           String userName) {
@@ -220,4 +227,28 @@ public class MeasurableRatingPlannedDecommissionDao {
         record.setPlannedDecommissionDate(toSqlDate(dateChange.newVal()));
     }
 
+    public Set<Operation> calculateAmendedDecommOperations(Set<Operation> operationsForEntityAssessment,
+                                                           long measurableCategoryId,
+                                                           String username) {
+
+        Tuple2<Boolean, Boolean> hasRoleAndCategoryEditable = dsl
+                .select(USER_ROLE.ROLE,
+                        MEASURABLE_CATEGORY.EDITABLE)
+                .from(MEASURABLE_CATEGORY)
+                .leftJoin(USER_ROLE)
+                .on(USER_ROLE.ROLE.eq(MEASURABLE_CATEGORY.RATING_EDITOR_ROLE)
+                        .and(USER_ROLE.USER_NAME.eq(username)))
+                .where(MEASURABLE_CATEGORY.ID.eq(measurableCategoryId))
+                .fetchOne(r -> tuple(
+                        notEmpty(r.get(USER_ROLE.ROLE)),
+                        r.get(MEASURABLE_CATEGORY.EDITABLE)));
+
+        if (!hasRoleAndCategoryEditable.v2) {
+            return emptySet();
+        } else if (hasRoleAndCategoryEditable.v1) {
+            return union(operationsForEntityAssessment, asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE));
+        } else {
+            return operationsForEntityAssessment;
+        }
+    }
 }

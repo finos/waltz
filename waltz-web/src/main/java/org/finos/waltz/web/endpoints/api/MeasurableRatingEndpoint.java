@@ -18,40 +18,38 @@
 
 package org.finos.waltz.web.endpoints.api;
 
-import org.finos.waltz.common.StringUtilities;
-import org.finos.waltz.model.Operation;
-import org.finos.waltz.model.measurable.Measurable;
-import org.finos.waltz.model.permission_group.ImmutableCheckPermissionCommand;
-import org.finos.waltz.service.measurable.MeasurableService;
-import org.finos.waltz.service.measurable_rating.MeasurableRatingService;
-import org.finos.waltz.service.permission.PermissionGroupService;
-import org.finos.waltz.service.user.UserRoleService;
-import org.finos.waltz.web.ListRoute;
-import org.finos.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.UserTimestamp;
 import org.finos.waltz.model.measurable_rating.*;
 import org.finos.waltz.model.tally.MeasurableRatingTally;
 import org.finos.waltz.model.tally.Tally;
+import org.finos.waltz.service.measurable.MeasurableService;
+import org.finos.waltz.service.measurable_rating.MeasurableRatingService;
+import org.finos.waltz.service.permission.PermissionGroupService;
+import org.finos.waltz.service.permission.permission_checker.MeasurableRatingPermissionChecker;
+import org.finos.waltz.service.user.UserRoleService;
+import org.finos.waltz.web.ListRoute;
+import org.finos.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
 import spark.Response;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Set;
 
-import static java.lang.String.format;
-import static org.finos.waltz.common.Checks.checkTrue;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.StringUtilities.firstChar;
+import static org.finos.waltz.model.EntityKind.MEASURABLE_RATING;
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.web.WebUtilities.*;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.StringUtilities.firstChar;
-import static org.finos.waltz.model.EntityReference.mkRef;
 
 @Service
 public class MeasurableRatingEndpoint implements Endpoint {
@@ -60,6 +58,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
 
 
     private final MeasurableRatingService measurableRatingService;
+    private final MeasurableRatingPermissionChecker measurableRatingPermissionChecker;
     private final MeasurableService measurableService;
     private final UserRoleService userRoleService;
     private final PermissionGroupService permissionGroupService;
@@ -67,6 +66,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
 
     @Autowired
     public MeasurableRatingEndpoint(MeasurableRatingService measurableRatingService,
+                                    MeasurableRatingPermissionChecker measurableRatingPermissionChecker,
                                     MeasurableService measurableService,
                                     UserRoleService userRoleService,
                                     PermissionGroupService permissionGroupService) {
@@ -75,10 +75,12 @@ public class MeasurableRatingEndpoint implements Endpoint {
         checkNotNull(measurableRatingService, "measurableService cannot be null");
         checkNotNull(userRoleService, "userRoleService cannot be null");
         checkNotNull(permissionGroupService, "permissionGroupService cannot be null");
+        checkNotNull(measurableRatingPermissionChecker, "measurableRatingPermissionChecker cannot be null");
 
         this.measurableRatingService = measurableRatingService;
         this.measurableService = measurableService;
         this.permissionGroupService = permissionGroupService;
+        this.measurableRatingPermissionChecker = measurableRatingPermissionChecker;
         this.userRoleService = userRoleService;
     }
 
@@ -139,25 +141,25 @@ public class MeasurableRatingEndpoint implements Endpoint {
     }
 
 
-    private Collection<MeasurableRating> saveRoute(Request request, Response z) throws IOException {
+    private Collection<MeasurableRating> saveRoute(Request request, Response z) throws IOException, InsufficientPrivelegeException {
         SaveMeasurableRatingCommand command = mkCommand(request);
 
         Operation operation = measurableRatingService.checkRatingExists(command)
                 ? Operation.UPDATE
                 : Operation.ADD;
 
-        checkHasPermissionForThisOperation(command.measurableId(), command.entityReference(), operation, getUsername(request));
+        checkHasPermissionForThisOperation(command.entityReference(), command.measurableId(), asSet(operation), getUsername(request));
 
         return measurableRatingService.save(command, false);
     }
 
 
-    private Collection<MeasurableRating> removeRoute(Request request, Response z) throws IOException {
+    private Collection<MeasurableRating> removeRoute(Request request, Response z) throws IOException, InsufficientPrivelegeException {
         long measurableId = getLong(request, "measurableId");
         String username = getUsername(request);
         EntityReference parentReference = getEntityReference(request);
 
-        checkHasPermissionForThisOperation(measurableId, parentReference, Operation.REMOVE, username);
+        checkHasPermissionForThisOperation(parentReference, measurableId, asSet(Operation.REMOVE), username);
 
         RemoveMeasurableRatingCommand command = ImmutableRemoveMeasurableRatingCommand.builder()
                 .entityReference(parentReference)
@@ -166,33 +168,6 @@ public class MeasurableRatingEndpoint implements Endpoint {
                 .build();
 
         return measurableRatingService.remove(command);
-    }
-
-
-    private void checkHasPermissionForThisOperation(Long measurableId,
-                                                    EntityReference parentReference,
-                                                    Operation operation,
-                                                    String username) {
-
-        boolean roleBasedPermissions = userRoleService.hasRole(username, measurableRatingService.getRequiredRatingEditRole(mkRef(EntityKind.MEASURABLE, measurableId)));
-
-        Measurable measurable = measurableService.getById(measurableId);
-
-        ImmutableCheckPermissionCommand checkPermissionCommand = ImmutableCheckPermissionCommand
-                .builder()
-                .parentEntityRef(parentReference)
-                .subjectKind(EntityKind.MEASURABLE_RATING)
-                .operation(operation)
-                .qualifierKind(EntityKind.MEASURABLE_CATEGORY)
-                .qualifierId(measurable.categoryId())
-                .user(username)
-                .build();
-
-        boolean involvementBasedPermissions = permissionGroupService.hasPermission(checkPermissionCommand);
-
-        checkTrue(
-                roleBasedPermissions || involvementBasedPermissions,
-                format("User does not have permission to %s measurable ratings for this %s", operation.name().toLowerCase(), parentReference.kind().prettyName()));
     }
 
 
@@ -210,6 +185,16 @@ public class MeasurableRatingEndpoint implements Endpoint {
                 .lastUpdate(UserTimestamp.mkForUser(username))
                 .provenance("waltz")
                 .build();
+    }
+
+
+    private void checkHasPermissionForThisOperation(EntityReference parentRef,
+                                                    Long measurableId,
+                                                    Set<Operation> operations,
+                                                    String username) throws InsufficientPrivelegeException {
+
+        Set<Operation> perms = measurableRatingPermissionChecker.findMeasurableRatingPermissions(parentRef, measurableId, username);
+        measurableRatingPermissionChecker.verifyAnyPerms(operations, perms, MEASURABLE_RATING, username);
     }
 
 }

@@ -277,7 +277,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
 
     private List<PhysicalFlowUploadCommandResponse> validateUpload(Request request, Response response) throws IOException {
-        WebUtilities.requireRole(userRoleService, request, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
+        WebUtilities.requireRole(userRoleService, request, SystemRole.BULK_FLOW_EDITOR);
         try {
             List<PhysicalFlowUploadCommand> commands = Arrays.asList(WebUtilities.readBody(request, PhysicalFlowUploadCommand[].class));
             return physicalFlowUploadService.validate(commands);
@@ -306,7 +306,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
 
     private List<PhysicalFlowUploadCommandResponse> upload(Request request, Response response) throws IOException, Exception {
-        WebUtilities.requireRole(userRoleService, request, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
+        WebUtilities.requireRole(userRoleService, request, SystemRole.BULK_FLOW_EDITOR);
         List<PhysicalFlowUploadCommand> commands = Arrays.asList(WebUtilities.readBody(request, PhysicalFlowUploadCommand[].class));
         String username = WebUtilities.getUsername(request);
 

@@ -66,6 +66,7 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
     private static final LogicalFlow logicalFlow = LOGICAL_FLOW.as("lf");
     private static final MeasurableRating measurableRating = MEASURABLE_RATING.as("mr");
     private static final Person person = PERSON.as("p");
+    private static final Person reportee = PERSON.as("pr");
     private static final PersonHierarchy personHierarchy = PERSON_HIERARCHY.as("ph");
 
 
@@ -506,7 +507,9 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
         SelectConditionStep<Record1<String>> reporteeIds = DSL
                 .selectDistinct(personHierarchy.EMPLOYEE_ID)
                 .from(personHierarchy)
-                .where(personHierarchy.MANAGER_ID.eq(emp));
+                .innerJoin(reportee).on(personHierarchy.EMPLOYEE_ID.eq(reportee.EMPLOYEE_ID))
+                .where(personHierarchy.MANAGER_ID.eq(emp)
+                        .and(reportee.IS_REMOVED.isFalse()));
 
         Condition applicationConditions = SelectorUtilities.mkApplicationConditions(options);
         Condition condition = involvement.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
