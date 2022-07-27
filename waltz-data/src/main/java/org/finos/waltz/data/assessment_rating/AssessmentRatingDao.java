@@ -20,8 +20,6 @@ package org.finos.waltz.data.assessment_rating;
 
 
 import org.finos.waltz.common.DateTimeUtilities;
-import org.finos.waltz.common.SetUtilities;
-import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.*;
@@ -32,8 +30,7 @@ import org.finos.waltz.schema.tables.records.AssessmentRatingRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
-import org.jooq.lambda.tuple.Tuple3;
-import org.jooq.lambda.tuple.Tuple5;
+import org.jooq.lambda.tuple.Tuple4;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -48,7 +45,6 @@ import static java.util.Collections.emptySet;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.CollectionUtilities.maybeFirst;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.MapUtilities.groupBy;
@@ -336,8 +332,9 @@ public class AssessmentRatingDao {
 
         Field<Boolean> readOnlyRatingField = DSL.coalesce(ASSESSMENT_RATING.IS_READONLY, DSL.val(false)).as("rating_read_only");
 
-        Tuple3<Boolean, Boolean, Boolean> hasRoleAndDefinitionROAndIsReadOnly = dsl
+        Tuple4<Boolean, Boolean, Boolean, Boolean> hasRoleAndUserHasRoleAndDefinitionROAndIsReadOnly = dsl
                 .select(USER_ROLE.ROLE,
+                        ASSESSMENT_DEFINITION.PERMITTED_ROLE,
                         ASSESSMENT_DEFINITION.IS_READONLY,
                         readOnlyRatingField)
                 .from(ASSESSMENT_DEFINITION)
@@ -350,16 +347,21 @@ public class AssessmentRatingDao {
                         .and(USER_ROLE.USER_NAME.eq(username)))
                 .where(ASSESSMENT_DEFINITION.ID.eq(assessmentDefinitionId))
                 .fetchOne(r -> tuple(
+                        notEmpty(r.get(ASSESSMENT_DEFINITION.PERMITTED_ROLE)),
                         notEmpty(r.get(USER_ROLE.ROLE)),
                         r.get(ASSESSMENT_DEFINITION.IS_READONLY),
                         r.get(readOnlyRatingField)));
 
+        Boolean defHasPermittedRole = hasRoleAndUserHasRoleAndDefinitionROAndIsReadOnly.v1;
+        Boolean userHasPermittedRole = hasRoleAndUserHasRoleAndDefinitionROAndIsReadOnly.v2;
+        Boolean defIsReadOnly = hasRoleAndUserHasRoleAndDefinitionROAndIsReadOnly.v3;
+        Boolean ratingIsReadOnly = hasRoleAndUserHasRoleAndDefinitionROAndIsReadOnly.v4;
 
-        if (hasRoleAndDefinitionROAndIsReadOnly.v2) {
+        if (defIsReadOnly) {
             return emptySet();
-        } else if (hasRoleAndDefinitionROAndIsReadOnly.v3) {
+        } else if (ratingIsReadOnly) {
             return intersection(operationsForEntityAssessment, asSet(Operation.LOCK));
-        } else if (hasRoleAndDefinitionROAndIsReadOnly.v1) {
+        } else if (userHasPermittedRole || !defHasPermittedRole) {
             return union(operationsForEntityAssessment, asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE));
         } else {
             return operationsForEntityAssessment;
