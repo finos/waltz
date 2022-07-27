@@ -28,6 +28,7 @@ import {event} from "d3-selection";
 import {entity} from "../../../common/services/enums/entity";
 import {loadFlowClassificationRatings} from "../../../flow-classification-rule/flow-classification-utils";
 import toasts from "../../../svelte-stores/toast-store";
+import DataTypeInfoPanel from "../data-type-info-panel/DataTypeInfoPanel.svelte";
 
 const bindings = {
     parentEntityRef: "<",
@@ -46,7 +47,9 @@ const initialState = {
     selectedCounterpart: null,
     selectedDecorators: null,
     selectedFlow: null,
-    selectedUsages: []
+    selectedUsages: [],
+    dataTypeInfo: null,
+    DataTypeInfoPanel
 };
 
 
@@ -321,6 +324,7 @@ function controller($element,
         vm.selectedCounterpart = null;
         vm.selectedDecorators = null;
         vm.selectedFlow = null;
+        vm.dataTypeInfo = null;
         vm.isDirty = false;
         vm.setMode("");
     };
@@ -404,6 +408,10 @@ function controller($element,
         }
         vm.mode = mode;
     };
+
+    vm.onSelectDataType = (dt) => {
+        vm.dataTypeInfo = dt;
+    }
 }
 
 

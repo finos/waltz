@@ -26,16 +26,18 @@ const bindings = {
     flow: "<",
     onDelete: "<",
     onReload: "<",
-    onCancel: "<"
+    onCancel: "<",
+    onSelect: "<?"
 };
 
 
 const initialState = {
     flow: null,
-    isDirty:false,
+    isDirty: false,
     onDelete: (x) => console.log("lfte: default onDelete()", x),
     onReload: (x) => console.log("lfte: default onReload()", x),
-    onCancel: (x) => console.log("lfte: default onCancel()", x)
+    onCancel: (x) => console.log("lfte: default onCancel()", x),
+    onSelect: (x) => console.log("lfte: default onSelect()", x)
 };
 
 
