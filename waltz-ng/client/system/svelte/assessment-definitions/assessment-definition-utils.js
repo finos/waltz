@@ -20,13 +20,7 @@
 import {writable} from "svelte/store";
 
 export function getRequiredFields(d) {
-    const basics = [d.name, d.entityKind, d.description];
-
-    if (d.entityKind === 'MEASURABLE') {
-        return _.concat(basics, [d.qualifierReference.id]);
-    } else {
-        return basics;
-    }
+    return [d.name, d.entityKind, d.description];
 }
 
 export const possibleEntityKinds = [

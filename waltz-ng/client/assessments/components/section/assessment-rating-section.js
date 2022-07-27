@@ -27,6 +27,9 @@ import _ from "lodash";
 import toasts from "../../../svelte-stores/toast-store";
 import AssessmentEditor from "../editor/AssessmentEditor.svelte";
 import AssessmentList from "../list/AssessmentRatingList.svelte";
+import {writable} from "svelte/store";
+
+export const assessments = writable([]);
 
 const bindings = {
     parentEntityRef: "<",
@@ -64,10 +67,10 @@ function controller($q, serviceBroker) {
             .then(responses => {
                 [vm.assessmentDefinitions, vm.assessmentRatings, vm.ratingSchemes] = resolveResponses(responses);
 
-                vm.assessments = mkEnrichedAssessmentDefinitions(
+                assessments.set(mkEnrichedAssessmentDefinitions(
                     vm.assessmentDefinitions,
                     vm.ratingSchemes,
-                    vm.assessmentRatings);
+                    vm.assessmentRatings));
 
                 if (vm.selectedAssessment) {
                     // re-find the selected assessment
