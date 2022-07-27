@@ -11,6 +11,8 @@ import org.finos.waltz.schema.tables.records.OrganisationalUnitRecord;
 import org.finos.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.h2.tools.Server;
 import org.jooq.DSLContext;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -114,19 +116,19 @@ public abstract class BaseInMemoryIntegrationTest {
 
     /**
      * DEBUG ONLY
-     *
-     * Uncomment the @After annotation to get the test executor
+     * <p>
+     * Uncomment the @AfterAll annotation to get the test executor
      * to pause for 2 hours.  During this time you can
      * attach an external database client to the in memory H2
      * instance to see the current state of the database.
-     *
+     * <p>
      * The url to connect to is:
-     *    jdbc:h2:tcp://localhost/mem:waltz
-     *    username: sa
-     *    password: sa
+     * jdbc:h2:tcp://localhost/mem:waltz
+     * username: sa
+     * password: sa
      */
-//    @After
-    public void stickAround() {
+//    @AfterAll
+    public static void stickAround() {
         try {
             System.err.println("Starting tcp server, connect with: jdbc:h2:tcp://localhost/mem:waltz, username: sa, password: sa");
             Server.createTcpServer().start();

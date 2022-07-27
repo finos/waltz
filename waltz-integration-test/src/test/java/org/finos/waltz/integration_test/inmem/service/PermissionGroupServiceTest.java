@@ -1,17 +1,16 @@
 package org.finos.waltz.integration_test.inmem.service;
 
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
-import org.finos.waltz.integration_test.inmem.helpers.AppHelper;
-import org.finos.waltz.integration_test.inmem.helpers.InvolvementHelper;
-import org.finos.waltz.integration_test.inmem.helpers.MeasurableHelper;
-import org.finos.waltz.integration_test.inmem.helpers.PersonHelper;
+import org.finos.waltz.integration_test.inmem.helpers.*;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.attestation.UserAttestationPermission;
 import org.finos.waltz.model.permission_group.CheckPermissionCommand;
 import org.finos.waltz.model.permission_group.ImmutableCheckPermissionCommand;
 import org.finos.waltz.model.permission_group.Permission;
-import org.finos.waltz.schema.tables.records.*;
+import org.finos.waltz.schema.tables.records.InvolvementGroupRecord;
+import org.finos.waltz.schema.tables.records.PermissionGroupRecord;
 import org.finos.waltz.service.permission.PermissionGroupService;
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.Test;
@@ -20,17 +19,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.emptySet;
 import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.SetUtilities.*;
 import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.finos.waltz.schema.tables.InvolvementGroup.INVOLVEMENT_GROUP;
-import static org.finos.waltz.schema.tables.InvolvementGroupEntry.INVOLVEMENT_GROUP_ENTRY;
-import static org.finos.waltz.schema.tables.PermissionGroup.PERMISSION_GROUP;
-import static org.finos.waltz.schema.tables.PermissionGroupEntry.PERMISSION_GROUP_ENTRY;
-import static org.finos.waltz.schema.tables.PermissionGroupInvolvement.PERMISSION_GROUP_INVOLVEMENT;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Service
@@ -55,6 +50,10 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
     @Autowired
     private InvolvementHelper involvementHelper;
 
+
+    @Autowired
+    private PermissionGroupHelper permissionHelper;
+
     private final String stem = "pgst";
 
 
@@ -75,7 +74,7 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
 
         assertTrue(permissionGroupService.hasPermission(mkLogicalFlowAttestCommand(u1, appA)), "u1 should have access as is open by default");
 
-        setupSpecificPermissionGroupForApp(appB, privKind);
+        permissionHelper.setupSpecificPermissionGroupForApp(appB, privKind, stem);
 
         involvementHelper.createInvolvement(u1Id, privKind, appB);
         involvementHelper.createInvolvement(u1Id, nonPrivKind, appB);
@@ -98,13 +97,15 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
 
         long privKind = involvementHelper.mkInvolvementKind(mkName(stem, "privileged"));
 
-        InvolvementGroupRecord ig = setupInvolvementGroup(privKind);
-        PermissionGroupRecord pg = setupPermissionGroup(appA, ig);
-        setupAttestationPermissionGroupInvolvement(ig.getId(),
-                                                   pg.getId(),
-                                                   EntityKind.MEASURABLE_RATING,
-                                                   EntityKind.APPLICATION,
-                                                   mkRef(EntityKind.MEASURABLE_CATEGORY, categoryId));
+        InvolvementGroupRecord ig = permissionHelper.setupInvolvementGroup(privKind, stem);
+        PermissionGroupRecord pg = permissionHelper.setupPermissionGroup(appA, ig, stem);
+        permissionHelper.setupPermissionGroupInvolvement(
+                ig.getId(),
+                pg.getId(),
+                EntityKind.MEASURABLE_RATING,
+                EntityKind.APPLICATION,
+                Operation.ATTEST,
+                mkRef(EntityKind.MEASURABLE_CATEGORY, categoryId));
 
         assertFalse(permissionGroupService.hasPermission(mkMeasurableCategoryAttestCommand(u1, categoryId, appA)), "u1 should not have access as category 1 is locked down");
         involvementHelper.createInvolvement(u1Id, privKind, appA);
@@ -115,8 +116,9 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
     @Test
     public void findPermissionsForSubjectKind() {
 
-        EntityReference appA = appHelper.createNewApp(mkName(stem, "appA"), ouIds.a);
         String u1 = mkName(stem, "user1");
+
+        EntityReference appA = appHelper.createNewApp(mkName(stem, "appA"), ouIds.a);
 
         assertEquals(emptySet(),
                 permissionGroupService.findPermissionsForParentReference(appA, u1),
@@ -124,32 +126,113 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
 
         Long u1Id = personHelper.createPerson(u1);
 
+        assertThrows(UnsupportedOperationException.class,
+                () -> permissionGroupService.findPermissionsForParentReference(mkRef(EntityKind.DATA_TYPE, 1L), u1),
+                "should throw an exception for invalid permission group parent kinds");
+
         long privKind = involvementHelper.mkInvolvementKind(mkName(stem, "privileged"));
 
-        Set<Permission> permissionsForOperationOnEntityKind = filter(permissionGroupService.findPermissionsForParentReference(appA, u1), p -> p.operation() == Operation.ATTEST);
+        Set<Permission> permissionsForOperationOnEntityKind = filter(
+                permissionGroupService.findPermissionsForParentReference(appA, u1),
+                p -> p.operation() == Operation.ATTEST);
 
         assertEquals(
                 asSet(EntityKind.LOGICAL_DATA_FLOW, EntityKind.PHYSICAL_FLOW, EntityKind.MEASURABLE_RATING),
                 map(permissionsForOperationOnEntityKind, Permission::subjectKind),
                 "u1 should have default permissions for all attestation qualifiers");
 
-        setupSpecificPermissionGroupForApp(appA, privKind);
+        // this creates the attestation involvement
+        permissionHelper.setupSpecificPermissionGroupForApp(appA, privKind, stem);
 
         Set<Permission> userHasNoExtraPermissions = permissionGroupService.findPermissionsForParentReference(appA, u1);
-
         Map<EntityKind, Permission> permissionsByKind = indexBy(userHasNoExtraPermissions, Permission::subjectKind);
+
+        assertEquals(emptySet(), userHasNoExtraPermissions, "user has override group so should have no default permissions");
 
         Permission logicalFlowPermission = permissionsByKind.get(EntityKind.LOGICAL_DATA_FLOW);
         assertNull(logicalFlowPermission, "u1 should have no permissions for data flows as doesn't have the all involvements required");
 
         involvementHelper.createInvolvement(u1Id, privKind, appA);
 
-        Set<Permission> withExtraPermissions = filter(permissionGroupService.findPermissionsForParentReference(appA, u1), p -> p.operation() == Operation.ATTEST);
+        Set<Permission> withExtraPermissions = filter(
+                permissionGroupService.findPermissionsForParentReference(appA, u1),
+                p -> p.operation() == Operation.ATTEST);
 
         assertEquals(
-                asSet(EntityKind.LOGICAL_DATA_FLOW, EntityKind.PHYSICAL_FLOW, EntityKind.MEASURABLE_RATING),
+                asSet(EntityKind.LOGICAL_DATA_FLOW),
                 map(withExtraPermissions, Permission::subjectKind),
-                "u1 should all permissions as they have the extra involvement required for logical flows");
+                "u1 should flow permissions only as they have the extra involvement required for logical flows but inherit none of the defaults");
+    }
+
+
+    @Test
+    public void findSupportedMeasurableCategoryAttestations() {
+
+        String u1 = mkName(stem, "user1");
+
+        EntityReference appA = appHelper.createNewApp(mkName(stem, "appA"), ouIds.a);
+
+        assertThrows(IllegalArgumentException.class, () -> permissionGroupService.findSupportedMeasurableCategoryAttestations(appA, null), "should throw exception if user id is null");
+        assertThrows(IllegalArgumentException.class, () -> permissionGroupService.findSupportedMeasurableCategoryAttestations(null, u1), "should throw exception if parent ref is null");
+
+        Set<UserAttestationPermission> noPermGroup = permissionGroupService
+                .findSupportedMeasurableCategoryAttestations(appA, u1);
+        assertEquals(emptySet(), noPermGroup, "if no permission group should return no permitted categories to attest");
+
+        long privKind = involvementHelper.mkInvolvementKind(mkName(stem, "privileged"));
+        InvolvementGroupRecord ig = permissionHelper.setupInvolvementGroup(privKind, stem);
+        PermissionGroupRecord pg = permissionHelper.setupPermissionGroup(appA, ig, stem);
+        Long u1Id = personHelper.createPerson(u1);
+
+        Set<UserAttestationPermission> userHasNoInvolvement = permissionGroupService
+                .findSupportedMeasurableCategoryAttestations(appA, u1);
+        assertEquals(emptySet(), userHasNoInvolvement, "if no involvement with app should return no permitted categories to attest");
+
+        involvementHelper.createInvolvement(u1Id, privKind, appA);
+
+        Set<UserAttestationPermission> userHasNoPermissionForMeasurableCategory = permissionGroupService
+                .findSupportedMeasurableCategoryAttestations(appA, u1);
+        assertEquals(emptySet(), userHasNoPermissionForMeasurableCategory, "if no permissions to attest measurables should return no permitted categories to attest");
+
+        long categoryId = measurableHelper.createMeasurableCategory(mkName(stem, "category1"));
+        long categoryId2 = measurableHelper.createMeasurableCategory(mkName(stem, "category2"));
+
+        permissionHelper.setupPermissionGroupInvolvement(
+                ig.getId(),
+                pg.getId(),
+                EntityKind.MEASURABLE_RATING,
+                EntityKind.APPLICATION,
+                Operation.ATTEST,
+                mkRef(EntityKind.MEASURABLE_CATEGORY, categoryId));
+
+        long notPermed = involvementHelper.mkInvolvementKind(mkName(stem, "notPrivileged"));
+        InvolvementGroupRecord ig2 = permissionHelper.setupInvolvementGroup(notPermed, stem);
+
+        permissionHelper.setupPermissionGroupInvolvement(
+                ig2.getId(),
+                pg.getId(),
+                EntityKind.MEASURABLE_RATING,
+                EntityKind.APPLICATION,
+                Operation.ATTEST,
+                mkRef(EntityKind.MEASURABLE_CATEGORY, categoryId2));
+
+        Set<UserAttestationPermission> userHasPermToAttestCategory = permissionGroupService
+                .findSupportedMeasurableCategoryAttestations(appA, u1);
+
+        boolean onlyMeasurablePermsReturned = userHasPermToAttestCategory
+                .stream()
+                .allMatch(d -> d.subjectKind() == EntityKind.MEASURABLE_RATING);
+
+        Set<Long> categoryIds = userHasPermToAttestCategory
+                .stream()
+                .filter(UserAttestationPermission::hasPermission)
+                .map(d -> d.qualifierReference()
+                        .map(EntityReference::id)
+                        .orElse(null))
+                .collect(Collectors.toSet());
+
+        assertTrue(onlyMeasurablePermsReturned, "only permissions to attest measurables should be returned");
+        assertEquals(asSet(categoryId), categoryIds, "has permission flag reflects which categories can be attested");
     }
 
 
@@ -178,76 +261,4 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
                 .build();
     }
 
-
-    private Long setupSpecificPermissionGroupForApp(EntityReference appRef, Long involvementKindId) {
-        InvolvementGroupRecord ig = setupInvolvementGroup(involvementKindId);
-        PermissionGroupRecord pg = setupPermissionGroup(appRef, ig);
-        return pg.getId();
-    }
-
-
-    private PermissionGroupRecord setupPermissionGroup(EntityReference appRef, InvolvementGroupRecord ig) {
-        String pgName = mkName(stem, "_pg");
-        PermissionGroupRecord pg = dsl.newRecord(PERMISSION_GROUP);
-        pg.setDescription("test group: " + pgName);
-        pg.setIsDefault(false);
-        pg.setExternalId(pgName);
-        pg.setName(pgName);
-        pg.setProvenance(mkName(stem, "prov"));
-        pg.insert();
-
-        setupPermissionGroupEntry(appRef, pg.getId());
-        setupAttestationPermissionGroupInvolvement(
-                ig.getId(),
-                pg.getId(),
-                EntityKind.LOGICAL_DATA_FLOW,
-                EntityKind.APPLICATION,
-                null);
-
-        return pg;
-    }
-
-
-    private void setupAttestationPermissionGroupInvolvement(Long igId,
-                                                            Long pgId,
-                                                            EntityKind subjectKind,
-                                                            EntityKind parentKind,
-                                                            EntityReference qualifierRef) {
-        PermissionGroupInvolvementRecord pgi = dsl.newRecord(PERMISSION_GROUP_INVOLVEMENT);
-        pgi.setPermissionGroupId(pgId);
-        pgi.setInvolvementGroupId(igId);
-        pgi.setOperation(Operation.ATTEST.name());
-        pgi.setSubjectKind(subjectKind.name());
-        pgi.setParentKind(parentKind.name());
-        if (qualifierRef != null) {
-            pgi.setQualifierId(qualifierRef.id());
-            pgi.setQualifierKind(qualifierRef.kind().name());
-        }
-        pgi.insert();
-    }
-
-
-    private void setupPermissionGroupEntry(EntityReference appRef, Long pgId) {
-        PermissionGroupEntryRecord pge = dsl.newRecord(PERMISSION_GROUP_ENTRY);
-        pge.setPermissionGroupId(pgId);
-        pge.setEntityKind(EntityKind.APPLICATION.name());
-        pge.setEntityId(appRef.id());
-        pge.insert();
-    }
-
-
-    private InvolvementGroupRecord setupInvolvementGroup(Long involvementKindId) {
-        String igName = mkName(stem, "_ig");
-        InvolvementGroupRecord ig = dsl.newRecord(INVOLVEMENT_GROUP);
-        ig.setName(igName);
-        ig.setExternalId(igName);
-        ig.setProvenance(mkName(stem, "prov"));
-        ig.insert();
-
-        InvolvementGroupEntryRecord ige = dsl.newRecord(INVOLVEMENT_GROUP_ENTRY);
-        ige.setInvolvementGroupId(ig.getId());
-        ige.setInvolvementKindId(involvementKindId);
-        ige.insert();
-        return ig;
-    }
 }

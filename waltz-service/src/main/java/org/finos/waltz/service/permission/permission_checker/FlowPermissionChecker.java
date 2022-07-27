@@ -72,11 +72,6 @@ public class FlowPermissionChecker implements PermissionChecker {
     }
 
 
-    public List<LogicalFlow> findByEntityReference(EntityReference ref) {
-        return logicalFlowDao.findByEntityReference(ref);
-    }
-
-
     public Set<Operation> findPermissionsForDecorator(EntityReference entityReference, String username) {
         switch (entityReference.kind()) {
             case LOGICAL_DATA_FLOW:
@@ -91,8 +86,6 @@ public class FlowPermissionChecker implements PermissionChecker {
 
     public Set<Operation> findPermissionsForSpec(long id, String username) {
         boolean hasOverride = userRoleService.hasRole(username, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
-
-        //Do we need to check logicals?
 
         if (hasOverride) {
             return asSet(Operation.REMOVE, Operation.UPDATE, Operation.ADD);
@@ -125,6 +118,8 @@ public class FlowPermissionChecker implements PermissionChecker {
 
     public Set<Operation> findPermissionsForFlow(Long flowId,
                                                  String username) {
+        checkNotNull(flowId, "flow id cannot be null");
+        checkNotNull(username, "username cannot be null");
 
         LogicalFlow flow = logicalFlowDao.getByFlowId(flowId);
 
