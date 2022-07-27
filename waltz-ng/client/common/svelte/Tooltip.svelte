@@ -9,7 +9,10 @@
     let open = false;
 
     export let content;
-    export let props
+    export let props;
+    export let placement = "top";
+    export let delay = [300, 100];
+
 
     $: {
 
@@ -20,6 +23,8 @@
                 interactive: true,
                 trigger: 'mouseenter click',
                 theme: "light-border",
+                placement,
+                delay,
                 onShow(instance) {
                     open = true;
                     setTimeout(() => instance.setContent(contentElem), 100);

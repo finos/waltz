@@ -11,7 +11,6 @@
         possibleEntityKinds,
         selectedDefinition
     } from "./assessment-definition-utils";
-    import MeasurableCategoryPicker from "./MeasurableCategoryPicker.svelte";
 
     export let doCancel;
     export let doSave;
@@ -33,13 +32,6 @@
         }
     }
 
-    $: {
-        if ($selectedDefinition.entityKind === 'MEASURABLE') {
-            $selectedDefinition.qualifierReference.kind = 'MEASURABLE_CATEGORY';
-        } else {
-            $selectedDefinition.qualifierReference.kind = null;
-        }
-    }
 
     $: ratings = $ratingCall?.data || [];
     $: hasRatings = ratings.length > 0;
@@ -122,28 +114,6 @@
 
                 </div>
 
-                <!-- CATEGORY ? -->
-                {#if $selectedDefinition.entityKind === 'MEASURABLE'}
-                    <MeasurableCategoryPicker initialId="2"
-                                              disabled={hasRatings}
-                                              bind:value={$selectedDefinition.qualifierReference.id}>
-                        <svelte:fragment slot="label">
-                            Measurable Category
-                            <small class="text-muted">(required)</small>
-                        </svelte:fragment>
-                        <svelte:fragment slot="help">
-                            When the entity kind is 'Measurable' you must further qualify which category of measurables
-                            this assessment applies to.
-                            {#if hasRatings}
-                                <br>
-                                <Icon name="warning"/>
-                                The associated category qualifier for this definition cannot be changed as ratings
-                                already exist.
-                            {/if}
-                        </svelte:fragment>
-                    </MeasurableCategoryPicker>
-                {/if}
-
 
                 <!-- DESCRIPTION -->
                 <label for="description">
@@ -223,6 +193,17 @@
                        bind:value={$selectedDefinition.permittedRole}>
                 <div class="help-block">
                     If provided, restricts editing to users which have been assigned the role
+                </div>
+
+                <!-- GROUP -->
+                <label for="definitionGroup">
+                    Definition Group
+                </label>
+                <input type=text
+                       id="definitionGroup"
+                       bind:value={$selectedDefinition.definitionGroup}>
+                <div class="help-block">
+                    Used to group multiple definitions together, defaults to 'Uncategorized'
                 </div>
             </div>
         </div>

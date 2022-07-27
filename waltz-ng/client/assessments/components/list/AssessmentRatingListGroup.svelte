@@ -50,6 +50,7 @@
         </td>
         <td>
             <Tooltip content={AssessmentDefinitionTooltipContent}
+                     placement="left-start"
                      props={mkDefinitionTooltipProps(row)}>
                 <svelte:fragment slot="target">
                                     <span>
@@ -61,6 +62,7 @@
         </td>
         <td>
             <Tooltip content={AssessmentRatingTooltipContent}
+                     placement="left-start"
                      props={mkRatingTooltipProps(row)}>
                 <svelte:fragment slot="target">
                     <RatingIndicatorCell {...row.ratingItem}
@@ -75,7 +77,7 @@
 {/each}
 {#if !_.isEmpty(group.notProvided)}
     {#if notProvidedCollapsed}
-        <tr transition:fade>
+        <tr>
             <td>
                 <button class="btn btn-skinny"
                         on:click={() => notProvidedCollapsed = false}>
@@ -83,7 +85,8 @@
                           name="caret-right"/>
                 </button>
             </td>
-            <td>
+            <td class="clickable"
+                on:click={() => notProvidedCollapsed = false}>
                 <strong>Not Rated</strong>
             </td>
             <td class="force-wrap">
@@ -108,7 +111,7 @@
             </td>
         </tr>
     {:else}
-        <tr transition:fade>
+        <tr>
             <td>
                 <button class="btn btn-skinny"
                         on:click={() => notProvidedCollapsed = true}>
@@ -116,12 +119,14 @@
                           name="caret-down"/>
                 </button>
             </td>
-            <td colspan="2">
+            <td colspan="2"
+                class="clickable"
+                on:click={() => notProvidedCollapsed = true}>
                 <strong>Not Rated</strong>
             </td>
         </tr>
         {#each group.notProvided as row}
-            <tr transition:fade>
+            <tr>
                 <td>
                     <button class="btn btn-skinny"
                             on:click={() => toggleFavourite(row)}>
