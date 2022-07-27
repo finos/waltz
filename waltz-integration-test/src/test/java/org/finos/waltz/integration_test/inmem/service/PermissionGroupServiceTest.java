@@ -132,30 +132,36 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
 
         long privKind = involvementHelper.mkInvolvementKind(mkName(stem, "privileged"));
 
-        Set<Permission> permissionsForOperationOnEntityKind = filter(permissionGroupService.findPermissionsForParentReference(appA, u1), p -> p.operation() == Operation.ATTEST);
+        Set<Permission> permissionsForOperationOnEntityKind = filter(
+                permissionGroupService.findPermissionsForParentReference(appA, u1),
+                p -> p.operation() == Operation.ATTEST);
 
         assertEquals(
                 asSet(EntityKind.LOGICAL_DATA_FLOW, EntityKind.PHYSICAL_FLOW, EntityKind.MEASURABLE_RATING),
                 map(permissionsForOperationOnEntityKind, Permission::subjectKind),
                 "u1 should have default permissions for all attestation qualifiers");
 
+        // this creates the attestation involvement
         permissionHelper.setupSpecificPermissionGroupForApp(appA, privKind, stem);
 
         Set<Permission> userHasNoExtraPermissions = permissionGroupService.findPermissionsForParentReference(appA, u1);
-
         Map<EntityKind, Permission> permissionsByKind = indexBy(userHasNoExtraPermissions, Permission::subjectKind);
+
+        assertEquals(emptySet(), userHasNoExtraPermissions, "user has override group so should have no default permissions");
 
         Permission logicalFlowPermission = permissionsByKind.get(EntityKind.LOGICAL_DATA_FLOW);
         assertNull(logicalFlowPermission, "u1 should have no permissions for data flows as doesn't have the all involvements required");
 
         involvementHelper.createInvolvement(u1Id, privKind, appA);
 
-        Set<Permission> withExtraPermissions = filter(permissionGroupService.findPermissionsForParentReference(appA, u1), p -> p.operation() == Operation.ATTEST);
+        Set<Permission> withExtraPermissions = filter(
+                permissionGroupService.findPermissionsForParentReference(appA, u1),
+                p -> p.operation() == Operation.ATTEST);
 
         assertEquals(
-                asSet(EntityKind.LOGICAL_DATA_FLOW, EntityKind.PHYSICAL_FLOW, EntityKind.MEASURABLE_RATING),
+                asSet(EntityKind.LOGICAL_DATA_FLOW),
                 map(withExtraPermissions, Permission::subjectKind),
-                "u1 should all permissions as they have the extra involvement required for logical flows");
+                "u1 should flow permissions only as they have the extra involvement required for logical flows but inherit none of the defaults");
     }
 
 
