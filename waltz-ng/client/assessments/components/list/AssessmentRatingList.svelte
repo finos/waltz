@@ -6,6 +6,7 @@
     import {createStores} from "./assessment-rating-store";
     import AssessmentRatingListGroup from "./AssessmentRatingListGroup.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
+    import {assessments} from "../section/assessment-rating-section";
 
 
     let elem;
@@ -18,13 +19,12 @@
 
     let userPreferenceCall = userPreferenceStore.findAllForUser();
 
-    export let assessments = [];
     export let primaryEntityRef = [];
     export let onSelect = (d) => console.log("selected", d);
 
     onMount(() => {
         userPreferenceCall = userPreferenceStore.findAllForUser();
-    })
+    });
 
 
     function toggleGroup(group) {
@@ -86,14 +86,14 @@
 
 
     $: expansions = _
-        .chain(assessments)
+        .chain($assessments)
         .filter(d => _.includes($favouriteIds, d.definition.id))
         .map(d => d.definition.definitionGroup)
         .uniq()
         .value();
 
 
-    $: groupedAssessments = _.chain(assessments)
+    $: groupedAssessments = _.chain($assessments)
         .groupBy(d => d.definition?.definitionGroup)
         .map((v, k) => {
 
@@ -116,7 +116,7 @@
     $: {
         if (stores) {
             $defaultPrimaryList = _
-                .chain(assessments)
+                .chain($assessments)
                 .filter(a => a.definition.visibility === "PRIMARY")
                 .map(r => r.definition.id)
                 .value();
@@ -146,7 +146,9 @@
                                   name={_.includes(expansions, group.groupName) ? "caret-down" : "caret-right"}/>
                         </button>
                     </td>
-                    <td colspan="2">
+                    <td colspan="2"
+                        class="clickable"
+                        on:click={() => toggleGroup(group)}>
                         <strong>
                             <span>{group.groupName}</span>
                         </strong>

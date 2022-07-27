@@ -20,10 +20,8 @@
 <div class="row">
 
     <div class="col-sm-6">
-        <waltz-svelte-component ng-if="$ctrl.assessments"
-                                component="$ctrl.AssessmentList"
+        <waltz-svelte-component component="$ctrl.AssessmentList"
                                 primary-entity-ref="$ctrl.parentEntityRef"
-                                assessments="$ctrl.assessments"
                                 on-select="$ctrl.onSelect">
         </waltz-svelte-component>
         <p class="help-block"

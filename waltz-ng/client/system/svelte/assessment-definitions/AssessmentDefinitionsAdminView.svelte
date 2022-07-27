@@ -83,8 +83,7 @@
         $selectedDefinition = {
             isReadOnly: false,
             lastUpdatedBy: "temp-will-be-overwritten-by-server",
-            visibility: "SECONDARY",
-            qualifierReference: {}
+            visibility: "SECONDARY"
         };
         activeMode = Modes.EDIT;
     }
