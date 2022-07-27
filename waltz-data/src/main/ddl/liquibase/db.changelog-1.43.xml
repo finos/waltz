@@ -158,4 +158,179 @@
         </insert>
     </changeSet>
 
+    <changeSet id="20220727-6167-1"
+               author="davidwatkins73">
+        <delete tableName="enum_value">
+            <where>type in ('Frequency', 'DataFormatKind')</where>
+        </delete>
+    </changeSet>
+
+
+
+    <changeSet id="20220727-6167-2"
+               author="davidwatkins73">
+        <insert tableName="enum_value">
+            <column name="type" value="DataFormatKind"/>
+            <column name="key" value="BINARY"/>
+            <column name="display_name" value="Binary"/>
+            <column name="description" value="Binary"/>
+            <column name="icon_name" value="fw"/>
+            <column name="position" value="0"/>
+            <column name="icon_color" value="none"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type" value="DataFormatKind"/>
+            <column name="key" value="DATABASE"/>
+            <column name="display_name" value="Database"/>
+            <column name="description" value="Database"/>
+            <column name="icon_name" value="fw"/>
+            <column name="position" value="0"/>
+            <column name="icon_color" value="none"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type" value="DataFormatKind"/>
+            <column name="key" value="FLAT_FILE"/>
+            <column name="display_name" value="Flat File"/>
+            <column name="description" value="Flat File"/>
+            <column name="icon_name" value="fw"/>
+            <column name="position" value="0"/>
+            <column name="icon_color" value="none"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type" value="DataFormatKind"/>
+            <column name="key" value="JSON"/>
+            <column name="display_name" value="JSON"/>
+            <column name="description" value="JSON"/>
+            <column name="icon_name" value="fw"/>
+            <column name="position" value="0"/>
+            <column name="icon_color" value="none"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type" value="DataFormatKind"/>
+            <column name="key" value="OTHER"/>
+            <column name="display_name" value="Other"/>
+            <column name="description" value="Other"/>
+            <column name="icon_name" value="fw"/>
+            <column name="position" value="0"/>
+            <column name="icon_color" value="none"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type" value="DataFormatKind"/>
+            <column name="key" value="UNKNOWN"/>
+            <column name="display_name" value="Unknown"/>
+            <column name="description" value="Unknown"/>
+            <column name="icon_name" value="fw"/>
+            <column name="position" value="0"/>
+            <column name="icon_color" value="none"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type" value="DataFormatKind"/>
+            <column name="key" value="UNSTRUCTURED"/>
+            <column name="display_name" value="Unstructured"/>
+            <column name="description" value="Unstructured"/>
+            <column name="icon_name" value="fw"/>
+            <column name="position" value="0"/>
+            <column name="icon_color" value="none"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type" value="DataFormatKind"/>
+            <column name="key" value="XML"/>
+            <column name="display_name" value="XML"/>
+            <column name="description" value="XML"/>
+            <column name="icon_name" value="fw"/>
+            <column name="position" value="0"/>
+            <column name="icon_color" value="none"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type" value="Frequency"/>
+            <column name="key" value="BIANNUALLY"/>
+            <column name="display_name" value="Biannually"/>
+            <column name="description" value="Biannually"/>
+            <column name="icon_name" value="fw"/>
+            <column name="position" value="0"/>
+            <column name="icon_color" value="none"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type" value="Frequency"/>
+            <column name="key" value="DAILY"/>
+            <column name="display_name" value="Daily"/>
+            <column name="description" value="Daily"/>
+            <column name="icon_name" value="fw"/>
+            <column name="position" value="0"/>
+            <column name="icon_color" value="none"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type" value="Frequency"/>
+            <column name="key" value="INTRA_DAY"/>
+            <column name="display_name" value="Intra Day"/>
+            <column name="description" value="Intra Day"/>
+            <column name="icon_name" value="fw"/>
+            <column name="position" value="0"/>
+            <column name="icon_color" value="none"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type" value="Frequency"/>
+            <column name="key" value="MONTHLY"/>
+            <column name="display_name" value="Monthly"/>
+            <column name="description" value="Monthly"/>
+            <column name="icon_name" value="fw"/>
+            <column name="position" value="0"/>
+            <column name="icon_color" value="none"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type" value="Frequency"/>
+            <column name="key" value="ON_DEMAND"/>
+            <column name="display_name" value="On Demand"/>
+            <column name="description" value="On Demand"/>
+            <column name="icon_name" value="fw"/>
+            <column name="position" value="0"/>
+            <column name="icon_color" value="none"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type" value="Frequency"/>
+            <column name="key" value="QUARTERLY"/>
+            <column name="display_name" value="Quarterly"/>
+            <column name="description" value="Quarterly"/>
+            <column name="icon_name" value="fw"/>
+            <column name="position" value="0"/>
+            <column name="icon_color" value="none"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type" value="Frequency"/>
+            <column name="key" value="REAL_TIME"/>
+            <column name="display_name" value="Real Time"/>
+            <column name="description" value="Real Time"/>
+            <column name="icon_name" value="fw"/>
+            <column name="position" value="0"/>
+            <column name="icon_color" value="none"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type" value="Frequency"/>
+            <column name="key" value="UNKNOWN"/>
+            <column name="display_name" value="Unknown"/>
+            <column name="description" value="Unknown"/>
+            <column name="icon_name" value="fw"/>
+            <column name="position" value="0"/>
+            <column name="icon_color" value="none"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type" value="Frequency"/>
+            <column name="key" value="WEEKLY"/>
+            <column name="display_name" value="Weekly"/>
+            <column name="description" value="Weekly"/>
+            <column name="icon_name" value="fw"/>
+            <column name="position" value="0"/>
+            <column name="icon_color" value="none"/>
+        </insert>
+        <insert tableName="enum_value">
+            <column name="type" value="Frequency"/>
+            <column name="key" value="YEARLY"/>
+            <column name="display_name" value="Yearly"/>
+            <column name="description" value="Yearly"/>
+            <column name="icon_name" value="fw"/>
+            <column name="position" value="0"/>
+            <column name="icon_color" value="none"/>
+        </insert>
+    </changeSet>
+
 </databaseChangeLog>
