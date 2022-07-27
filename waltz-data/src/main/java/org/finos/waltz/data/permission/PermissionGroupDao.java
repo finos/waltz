@@ -44,11 +44,13 @@ public class PermissionGroupDao {
 
     public Set<Permission> findPermissionsForParentEntityReference(EntityReference parentEntityRef) {
 
-        Condition groupCondition = PERMISSION_GROUP_INVOLVEMENT.PERMISSION_GROUP_ID.in(permissionGroupSelector(parentEntityRef))
-                .or(PERMISSION_GROUP.IS_DEFAULT.isTrue()
-                        .and(PERMISSION_GROUP.ID.notIn(permissionGroupSelector(parentEntityRef))));
+        boolean isInOverrideGroup = dsl.fetchExists(permissionGroupSelector(parentEntityRef));
 
-        Map<Tuple5<String, String, Long, String, String>, List<Long>> permissionsForSubjectQualifier = dsl
+        Condition groupCondition = isInOverrideGroup
+                ? PERMISSION_GROUP_INVOLVEMENT.PERMISSION_GROUP_ID.in(permissionGroupSelector(parentEntityRef))
+                : PERMISSION_GROUP.IS_DEFAULT.isTrue();
+
+        SelectConditionStep<Record6<String, String, Long, String, String, Long>> qry = dsl
                 .select(PERMISSION_GROUP_INVOLVEMENT.OPERATION,
                         PERMISSION_GROUP_INVOLVEMENT.QUALIFIER_KIND,
                         PERMISSION_GROUP_INVOLVEMENT.QUALIFIER_ID,
@@ -59,7 +61,9 @@ public class PermissionGroupDao {
                 .innerJoin(PERMISSION_GROUP).on(PERMISSION_GROUP.ID.eq(PERMISSION_GROUP_INVOLVEMENT.PERMISSION_GROUP_ID))
                 .leftJoin(INVOLVEMENT_GROUP).on(PERMISSION_GROUP_INVOLVEMENT.INVOLVEMENT_GROUP_ID.eq(INVOLVEMENT_GROUP.ID))
                 .leftJoin(INVOLVEMENT_GROUP_ENTRY).on(INVOLVEMENT_GROUP.ID.eq(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_GROUP_ID))
-                .where(groupCondition)
+                .where(groupCondition);
+
+        Map<Tuple5<String, String, Long, String, String>, List<Long>> permissionsForSubjectQualifier = qry
                 .fetchGroups(
                         r -> tuple(
                                 r.get(PERMISSION_GROUP_INVOLVEMENT.OPERATION),
