@@ -119,7 +119,7 @@ public class LogicalFlowDecoratorStatsEndpoint implements Endpoint {
 
 
     private Collection<DataTypeDecorator> updateDecoratorsBatchRoute(Request request, Response response) throws IOException {
-        requireRole(userRoleService, request, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
+        requireRole(userRoleService, request, SystemRole.BULK_FLOW_EDITOR);
 
         String user = getUsername(request);
         List<UpdateDataFlowDecoratorsAction> actions = Arrays.asList(readBody(request, UpdateDataFlowDecoratorsAction[].class));
