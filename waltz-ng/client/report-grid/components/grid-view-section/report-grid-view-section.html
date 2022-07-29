@@ -37,8 +37,11 @@
                                     class="small">
             </waltz-grid-with-search>
 
-            <waltz-data-extract-link name="Export grid" styling="link" filename="report.csv"
-                                     extract="report-grid/id/{{$ctrl.gridId}}" method="POST"
+            <waltz-data-extract-link name="Export grid"
+                                     styling="link"
+                                     filename="report.csv"
+                                     extract="report-grid/external-id/{{$ctrl.rawGridData.definition.externalId}}"
+                                     method="POST"
                                      request-body="$ctrl.selectionOptions">
             </waltz-data-extract-link>
 
