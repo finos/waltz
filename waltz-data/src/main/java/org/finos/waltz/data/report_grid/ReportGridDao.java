@@ -45,13 +45,14 @@ import java.util.Comparator;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.ToIntFunction;
-import java.util.stream.IntStream;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
+import static java.util.Optional.ofNullable;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.*;
+import static org.finos.waltz.common.ArrayUtilities.sum;
 import static org.finos.waltz.common.CollectionUtilities.first;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDate;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
@@ -59,6 +60,7 @@ import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.SetUtilities.*;
 import static org.finos.waltz.common.StringUtilities.join;
+import static org.finos.waltz.data.JooqUtilities.fieldsWithout;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.survey.SurveyInstanceStatus.APPROVED;
 import static org.finos.waltz.model.survey.SurveyInstanceStatus.COMPLETED;
@@ -98,6 +100,9 @@ public class ReportGridDao {
     private final org.finos.waltz.schema.tables.EntityRelationship er = ENTITY_RELATIONSHIP.as("er");
     private final org.finos.waltz.schema.tables.DataTypeUsage dtu = DATA_TYPE_USAGE.as("dtu");
     private final org.finos.waltz.schema.tables.DataType dt = DATA_TYPE.as("dt");
+    private final org.finos.waltz.schema.tables.AttestationInstance atti = ATTESTATION_INSTANCE.as("atti");
+    private final org.finos.waltz.schema.tables.AttestationRun attr = ATTESTATION_RUN.as("attr");
+
 
     private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
                     SURVEY_QUESTION_RESPONSE.ENTITY_RESPONSE_ID,
@@ -105,10 +110,12 @@ public class ReportGridDao {
                     newArrayList(EntityKind.PERSON, EntityKind.APPLICATION))
             .as("entity_name");
 
+
     @Autowired
     public ReportGridDao(DSLContext dsl) {
         this.dsl = dsl;
     }
+
 
 
     public Set<ReportGridDefinition> findAll(){
@@ -179,7 +186,7 @@ public class ReportGridDao {
                 })
                 .collect(collectingAndThen(toSet(), d -> dsl.batchInsert(d).execute()));
 
-        return IntStream.of(columnsUpdated).sum();
+        return sum(columnsUpdated);
     }
 
 
@@ -252,7 +259,7 @@ public class ReportGridDao {
 
     private List<ReportGridColumnDefinition> getColumnDefinitions(Condition condition) {
 
-        SelectConditionStep<Record13<String, String, Long, String, String, Integer, String, String, Long, String, String, String, String>> measurableColumns = mkColumnDefinitionQuery(
+        SelectConditionStep<Record7<Long, String, String, String, String, String, String>> measurableColumns = mkSupplementalColumnDefinitionQuery(
                 EntityKind.MEASURABLE,
                 m,
                 m.ID,
@@ -260,7 +267,7 @@ public class ReportGridDao {
                 m.DESCRIPTION,
                 condition);
 
-        SelectConditionStep<Record13<String, String, Long, String, String, Integer, String, String, Long, String, String, String, String>> assessmentDefinitionColumns = mkColumnDefinitionQuery(
+        SelectConditionStep<Record7<Long, String, String, String, String, String, String>> assessmentDefinitionColumns = mkSupplementalColumnDefinitionQuery(
                 EntityKind.ASSESSMENT_DEFINITION,
                 ad,
                 ad.ID,
@@ -268,7 +275,7 @@ public class ReportGridDao {
                 ad.DESCRIPTION,
                 condition);
 
-        SelectConditionStep<Record13<String, String, Long, String, String, Integer, String, String, Long, String, String, String, String>> costKindColumns = mkColumnDefinitionQuery(
+        SelectConditionStep<Record7<Long, String, String, String, String, String, String>> costKindColumns = mkSupplementalColumnDefinitionQuery(
                 EntityKind.COST_KIND,
                 ck,
                 ck.ID,
@@ -276,7 +283,7 @@ public class ReportGridDao {
                 ck.DESCRIPTION,
                 condition);
 
-        SelectConditionStep<Record13<String, String, Long, String, String, Integer, String, String, Long, String, String, String, String>> involvementKindColumns = mkColumnDefinitionQuery(
+        SelectConditionStep<Record7<Long, String, String, String, String, String, String>> involvementKindColumns = mkSupplementalColumnDefinitionQuery(
                 EntityKind.INVOLVEMENT_KIND,
                 ik,
                 ik.ID,
@@ -284,7 +291,7 @@ public class ReportGridDao {
                 ik.DESCRIPTION,
                 condition);
 
-        SelectConditionStep<Record13<String, String, Long, String, String, Integer, String, String, Long, String, String, String, String>> surveyQuestionColumns = mkColumnDefinitionQuery(
+        SelectConditionStep<Record7<Long, String, String, String, String, String, String>> surveyQuestionColumns = mkSupplementalColumnDefinitionQuery(
                 EntityKind.SURVEY_QUESTION,
                 sq,
                 sq.ID,
@@ -292,7 +299,7 @@ public class ReportGridDao {
                 sq.HELP_TEXT,
                 condition);
 
-        SelectConditionStep<Record13<String, String, Long, String, String, Integer, String, String, Long, String, String, String, String>> appGroupColumns = mkColumnDefinitionQuery(
+        SelectConditionStep<Record7<Long, String, String, String, String, String, String>> appGroupColumns = mkSupplementalColumnDefinitionQuery(
                 EntityKind.APP_GROUP,
                 ag,
                 ag.ID,
@@ -300,7 +307,7 @@ public class ReportGridDao {
                 ag.DESCRIPTION,
                 condition);
 
-        SelectConditionStep<Record13<String, String, Long, String, String, Integer, String, String, Long, String, String, String, String>> surveyMetaColumns = mkColumnDefinitionQuery(
+        SelectConditionStep<Record7<Long, String, String, String, String, String, String>> surveyMetaColumns = mkSupplementalColumnDefinitionQuery(
                 EntityKind.SURVEY_TEMPLATE,
                 st,
                 st.ID,
@@ -308,7 +315,7 @@ public class ReportGridDao {
                 st.DESCRIPTION,
                 condition);
 
-        SelectConditionStep<Record13<String, String, Long, String, String, Integer, String, String, Long, String, String, String, String>> applicationMetaColumns = mkColumnDefinitionQuery(
+        SelectConditionStep<Record7<Long, String, String, String, String, String, String>> applicationMetaColumns = mkSupplementalColumnDefinitionQuery(
                 EntityKind.APPLICATION,
                 a,
                 a.ID,
@@ -316,7 +323,7 @@ public class ReportGridDao {
                 a.DESCRIPTION,
                 condition);
 
-        SelectConditionStep<Record13<String, String, Long, String, String, Integer, String, String, Long, String, String, String, String>> changeInitiativeMetaColumns = mkColumnDefinitionQuery(
+        SelectConditionStep<Record7<Long, String, String, String, String, String, String>> changeInitiativeMetaColumns = mkSupplementalColumnDefinitionQuery(
                 EntityKind.CHANGE_INITIATIVE,
                 ci,
                 ci.ID,
@@ -324,7 +331,7 @@ public class ReportGridDao {
                 ci.DESCRIPTION,
                 condition);
 
-        SelectConditionStep<Record13<String, String, Long, String, String, Integer, String, String, Long, String, String, String, String>> dataTypeColumns = mkColumnDefinitionQuery(
+        SelectConditionStep<Record7<Long, String, String, String, String, String, String>> dataTypeColumns = mkSupplementalColumnDefinitionQuery(
                 EntityKind.DATA_TYPE,
                 dt,
                 dt.ID,
@@ -332,7 +339,10 @@ public class ReportGridDao {
                 dt.DESCRIPTION,
                 condition);
 
-        return assessmentDefinitionColumns
+
+        SelectConditionStep<Record7<Long, String, String, String, String, String, String>> attestationColumns = mkAttestationColumnDefinitionQuery(condition);
+
+        Table<Record7<Long, String, String, String, String, String, String>> extras = assessmentDefinitionColumns
                 .unionAll(measurableColumns)
                 .unionAll(costKindColumns)
                 .unionAll(involvementKindColumns)
@@ -342,20 +352,30 @@ public class ReportGridDao {
                 .unionAll(applicationMetaColumns)
                 .unionAll(changeInitiativeMetaColumns)
                 .unionAll(dataTypeColumns)
+                .asTable("extras");
+
+        return dsl
+                .select(extras.fields())
+                .select(fieldsWithout(rgcd, rgcd.ID))
+                .from(rg)
+                .innerJoin(rgcd).on(rg.ID.eq(rgcd.REPORT_GRID_ID))
+                .innerJoin(extras).on(extras.field(rgcd.ID).eq(rgcd.ID))
+                .where(condition)
                 .orderBy(rgcd.POSITION, DSL.field("name", String.class))
                 .fetch(r -> {
+                    EntityFieldReference entityFieldReference = ofNullable(r.get(rgcd.ENTITY_FIELD_REFERENCE_ID))
+                            .map(fieldReferenceId -> ImmutableEntityFieldReference.builder()
+                                  .id(fieldReferenceId)
+                                  .fieldName(r.get(efr.FIELD_NAME))
+                                  .entityKind(EntityKind.valueOf(r.get(efr.ENTITY_KIND)))
+                                  .displayName(r.get(efr.DISPLAY_NAME))
+                                  .description(r.get(efr.DESCRIPTION))
+                                  .build())
+                            .orElse(null);
 
-                    Long fieldReferenceId = r.get(rgcd.ENTITY_FIELD_REFERENCE_ID);
-
-                    ImmutableEntityFieldReference entityFieldReference = fieldReferenceId == null
-                            ? null
-                            : ImmutableEntityFieldReference.builder()
-                            .id(fieldReferenceId)
-                            .fieldName(r.get(efr.FIELD_NAME))
-                            .entityKind(EntityKind.valueOf(r.get(efr.ENTITY_KIND)))
-                            .displayName(r.get(efr.DISPLAY_NAME))
-                            .description(r.get(efr.DESCRIPTION))
-                            .build();
+                    EntityKind columnQualifierKind = ofNullable(r.get(rgcd.COLUMN_QUALIFIER_KIND))
+                            .map(EntityKind::valueOf)
+                            .orElse(null);
 
                     return ImmutableReportGridColumnDefinition.builder()
                             .columnEntityId(r.get(rgcd.COLUMN_ENTITY_ID))
@@ -367,27 +387,88 @@ public class ReportGridDao {
                             .usageKind(ColumnUsageKind.valueOf(r.get(rgcd.COLUMN_USAGE_KIND)))
                             .ratingRollupRule(RatingRollupRule.valueOf(r.get(rgcd.RATING_ROLLUP_RULE)))
                             .entityFieldReference(entityFieldReference)
+                            .columnQualifierKind(columnQualifierKind)
+                            .columnQualifierId(r.get(rgcd.COLUMN_QUALIFIER_ID))
                             .build();
                 });
     }
 
 
-    private SelectConditionStep<Record13<String, String, Long, String, String, Integer, String, String, Long, String, String, String, String>> mkColumnDefinitionQuery(EntityKind entityKind,
-                                                                                                                                                                       Table<?> t,
-                                                                                                                                                                       TableField<? extends Record, Long> idField,
-                                                                                                                                                                       TableField<? extends Record, String> nameField,
-                                                                                                                                                                       TableField<? extends Record, String> descriptionField,
-                                                                                                                                                                       Condition reportCondition) {
+    private SelectConditionStep<Record7<Long, String, String, String, String, String, String>> mkAttestationColumnDefinitionQuery(Condition condition) {
+
+        SelectJoinStep<Record4<Long, String, String, String>> dynamic = dsl
+                .select(mc.ID,
+                        DSL.inline(EntityKind.MEASURABLE_CATEGORY.name()).as("kind"),
+                        mc.NAME,
+                        mc.DESCRIPTION)
+                .from(mc);
+
+        Row4<Long, String, String, String> lfRow = DSL.row(
+                DSL.castNull(DSL.field("id", Long.class)),
+                DSL.inline(EntityKind.LOGICAL_DATA_FLOW.name()).as("kind"),
+                DSL.inline("Logical Flow Attestation").as("name"),
+                DSL.inline("Logical Flow Attestation").as("description"));
+
+        Row4<Long, String, String, String> pfRow = DSL.row(
+                DSL.castNull(DSL.field("id", Long.class)),
+                DSL.inline(EntityKind.PHYSICAL_FLOW.name()).as("kind"),
+                DSL.inline("Physical Flow Attestation").as("name"),
+                DSL.inline("Physical Flow Attestation").as("description"));
+
+        Table<Record4<Long, String, String, String>> fixed = DSL
+                .values(lfRow, pfRow)
+                .asTable();
+
+        Table<Record4<Long, String, String, String>> possible = dsl
+                .selectFrom(fixed)
+                .unionAll(dynamic)
+                .asTable("possible", "id", "kind", "name", "description");
+
+        Condition colDefToPossibleJoinCond = rgcd.COLUMN_QUALIFIER_KIND.eq(possible.field("kind", String.class))
+                .and(rgcd.COLUMN_QUALIFIER_ID.isNull()
+                     .or(rgcd.COLUMN_QUALIFIER_ID.eq(possible.field("id", Long.class))));
+
         return dsl
-                .select(DSL.coalesce(nameField, DSL.val(entityKind.prettyName())).as("name"),
-                        rgcd.DISPLAY_NAME,
-                        rgcd.COLUMN_ENTITY_ID,
-                        rgcd.COLUMN_ENTITY_KIND,
-                        descriptionField.as("desc"),
-                        rgcd.POSITION,
-                        rgcd.COLUMN_USAGE_KIND,
-                        rgcd.RATING_ROLLUP_RULE,
-                        rgcd.ENTITY_FIELD_REFERENCE_ID,
+                .select(rgcd.ID,
+                        possible.field("name", String.class),
+                        possible.field("description", String.class),
+                        efr.ENTITY_KIND,
+                        efr.DISPLAY_NAME,
+                        efr.DESCRIPTION,
+                        efr.FIELD_NAME)
+                .from(rgcd)
+                .innerJoin(rg).on(rg.ID.eq(rgcd.REPORT_GRID_ID))
+                .innerJoin(possible).on(colDefToPossibleJoinCond)
+                .leftJoin(efr).on(rgcd.ENTITY_FIELD_REFERENCE_ID.eq(efr.ID))
+                .where(condition)
+                .and(rgcd.COLUMN_ENTITY_KIND.eq(EntityKind.ATTESTATION.name()));
+
+
+    }
+
+
+    /**
+     * 1) col def id,
+     * 2) derived name,
+     * 3) derived desc,
+     * 4) entity field kind,
+     * 5) entity field id,
+     * 6) entity field desc,
+     * 7) entity field name,
+     */
+    private SelectConditionStep<Record7<Long, String, String, String, String, String, String>> mkSupplementalColumnDefinitionQuery(EntityKind entityKind,
+                                                                                                                                   Table<?> t,
+                                                                                                                                   TableField<? extends Record, Long> idField,
+                                                                                                                                   TableField<? extends Record, String> nameField,
+                                                                                                                                   TableField<? extends Record, String> descriptionField,
+                                                                                                                                   Condition reportCondition) {
+        Field<String> name = DSL.coalesce(nameField, DSL.val(entityKind.prettyName())).as("name");
+        Field<String> desc = descriptionField.as("desc");
+
+        return dsl
+                .select(rgcd.ID,
+                        name,
+                        desc,
                         efr.ENTITY_KIND,
                         efr.DISPLAY_NAME,
                         efr.DESCRIPTION,
@@ -1217,7 +1298,7 @@ public class ReportGridDao {
                 .id(r.get(rg.ID))
                 .name(r.get(rg.NAME))
                 .description(r.get(rg.DESCRIPTION))
-                .externalId(Optional.ofNullable(r.get(rg.EXTERNAL_ID)))
+                .externalId(ofNullable(r.get(rg.EXTERNAL_ID)))
                 .provenance(r.get(rg.PROVENANCE))
                 .lastUpdatedAt(toLocalDateTime(r.get(rg.LAST_UPDATED_AT)))
                 .lastUpdatedBy(r.get(rg.LAST_UPDATED_BY))

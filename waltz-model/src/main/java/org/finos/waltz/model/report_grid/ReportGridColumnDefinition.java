@@ -41,4 +41,11 @@ public abstract class ReportGridColumnDefinition {
     @Nullable
     public abstract EntityFieldReference entityFieldReference();
 
+
+    @Nullable
+    public abstract EntityKind columnQualifierKind();
+
+    @Nullable
+    public abstract Long columnQualifierId();
+
 }

@@ -44,6 +44,8 @@ import static java.util.stream.Collectors.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDate;
 import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
+import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.SetUtilities.minus;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.jooq.impl.DSL.currentDate;
 import static org.jooq.impl.DSL.inline;
@@ -362,6 +364,13 @@ public class JooqUtilities {
                 .name(name)
                 .fields("id")
                 .as(genericSelector.selector());
+    }
+
+
+    public static Collection<? extends Field<?>> fieldsWithout(Table<?> t, Field<?> ...excludes) {
+        return minus(
+                asSet(t.fields()),
+                asSet(excludes));
     }
 
 }
