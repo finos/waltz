@@ -32,6 +32,8 @@ import java.math.BigDecimal;
 @JsonDeserialize(as = ImmutableReportGridCell.class)
 public abstract class ReportGridCell implements CommentProvider {
 
+    public abstract Long columnDefinitionId();
+
     public abstract EntityKind columnEntityKind();  // x
 
     @Nullable

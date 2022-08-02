@@ -12,6 +12,8 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutableReportGridColumnDefinition.class)
 public abstract class ReportGridColumnDefinition {
 
+    public abstract Long columnDefinitionId();
+
     public abstract EntityKind columnEntityKind();
 
     @Nullable
