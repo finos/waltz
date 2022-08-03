@@ -538,26 +538,22 @@ public class ReportGridDao {
                     .collect(groupingBy(t -> t.v2.entityKind(), toSet()));
 
 
-            Set<Tuple2<ReportGridColumnDefinition, EntityFieldReference>> requiredChangeInitiativeColumns = complexColsByKind
-                    .getOrDefault(EntityKind.CHANGE_INITIATIVE, emptySet());
-
             return union(
                     fetchAssessmentData(genericSelector, colsByKind.getOrDefault(EntityKind.ASSESSMENT_DEFINITION, emptySet())),
                     fetchInvolvementData(genericSelector, colsByKind.getOrDefault(EntityKind.INVOLVEMENT_KIND, emptySet())),
                     fetchCostData(genericSelector, colsByKind.getOrDefault(EntityKind.COST_KIND, emptySet())),
                     fetchSummaryMeasurableData(
                             genericSelector,
-                            measurableColumnsByRollupKind.get(RatingRollupRule.PICK_HIGHEST),
-                            measurableColumnsByRollupKind.get(RatingRollupRule.PICK_LOWEST)),
+                            measurableColumnsByRollupKind.getOrDefault(RatingRollupRule.PICK_HIGHEST, emptySet()),
+                            measurableColumnsByRollupKind.getOrDefault(RatingRollupRule.PICK_LOWEST, emptySet())),
                     fetchExactMeasurableData(genericSelector, measurableColumnsByRollupKind.getOrDefault(RatingRollupRule.NONE, emptySet())),
                     fetchSurveyQuestionResponseData(genericSelector, colsByKind.getOrDefault(EntityKind.SURVEY_QUESTION, emptySet())),
                     fetchAppGroupData(genericSelector, colsByKind.getOrDefault(EntityKind.APP_GROUP, emptySet())),
                     fetchApplicationFieldReferenceData(genericSelector, complexColsByKind.getOrDefault(EntityKind.APPLICATION, emptySet())),
-                    fetchExactDataTypeData(genericSelector, dataTypeColumnsByIsExact.get(Boolean.TRUE)),
-                    fetchSummaryDataTypeData(genericSelector, dataTypeColumnsByIsExact.get(Boolean.FALSE)),
-                    fetchSurveyFieldReferenceData(genericSelector, complexColsByKind.getOrDefault(EntityKind.SURVEY_INSTANCE, emptySet()))
-//                    fetchChangeInitiativeFieldReferenceData(genericSelector, requiredChangeInitiativeColumns),
-                    );
+                    fetchExactDataTypeData(genericSelector, dataTypeColumnsByIsExact.getOrDefault(Boolean.TRUE, emptySet())),
+                    fetchSummaryDataTypeData(genericSelector, dataTypeColumnsByIsExact.getOrDefault(Boolean.FALSE, emptySet())),
+                    fetchSurveyFieldReferenceData(genericSelector, complexColsByKind.getOrDefault(EntityKind.SURVEY_INSTANCE, emptySet())),
+                    fetchChangeInitiativeFieldReferenceData(genericSelector, complexColsByKind.getOrDefault(EntityKind.CHANGE_INITIATIVE, emptySet())));
         }
     }
 
@@ -862,6 +858,7 @@ public class ReportGridDao {
                                 return ImmutableReportGridCell
                                         .builder()
                                         .subjectId(ciRecord.get(CHANGE_INITIATIVE.ID))
+                                        .columnDefinitionId(colDefn.columnDefinitionId())
                                         .columnEntityId(colDefn.columnEntityId())
                                         .columnEntityKind(EntityKind.CHANGE_INITIATIVE)
                                         .text(String.valueOf(value))
