@@ -10,9 +10,10 @@ import org.immutables.value.Value;
 @Value.Immutable
 @JsonSerialize(as = ImmutableReportGridColumnDefinition.class)
 @JsonDeserialize(as = ImmutableReportGridColumnDefinition.class)
-public abstract class ReportGridColumnDefinition {
+public abstract class ReportGridColumnDefinition  {
 
-    public abstract Long columnDefinitionId();
+    @Nullable
+    public abstract Long id();
 
     public abstract EntityKind columnEntityKind();
 

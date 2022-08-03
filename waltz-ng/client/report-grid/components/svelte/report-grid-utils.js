@@ -112,6 +112,7 @@ const unknownRating = {
 
 
 export function mkPropNameForColumnDefinition(columnDefn) {
+    console.log(columnDefn.id, {columnDefn});
     return `${columnDefn.columnEntityKind}/${columnDefn.columnEntityId}/${_.get(columnDefn.entityFieldReference, ["id"], null)}`;
 }
 

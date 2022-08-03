@@ -379,7 +379,7 @@ public class ReportGridDao {
                             .orElse(null);
 
                     return ImmutableReportGridColumnDefinition.builder()
-                            .columnDefinitionId(r.get(extras.field(rgcd.ID)))
+                            .id(r.get(extras.field(rgcd.ID)))
                             .columnEntityId(r.get(rgcd.COLUMN_ENTITY_ID))
                             .columnEntityKind(EntityKind.valueOf(r.get(rgcd.COLUMN_ENTITY_KIND)))
                             .columnName(r.get("name", String.class))
@@ -568,7 +568,7 @@ public class ReportGridDao {
             Map<Long, Long> dataTypeIdToDefIdMap = indexBy(
                     cols,
                     ReportGridColumnDefinition::columnEntityId,
-                    ReportGridColumnDefinition::columnDefinitionId);
+                    ReportGridColumnDefinition::id);
              return dsl
                     .select(dtu.ENTITY_ID,
                             dtu.DATA_TYPE_ID,
@@ -607,7 +607,7 @@ public class ReportGridDao {
             Map<Long, Long> dataTypeIdToDefIdMap = indexBy(
                     cols,
                     ReportGridColumnDefinition::columnEntityId,
-                    ReportGridColumnDefinition::columnDefinitionId);
+                    ReportGridColumnDefinition::id);
 
             return dsl
                     .select(dtu.ENTITY_ID,
@@ -667,7 +667,7 @@ public class ReportGridDao {
             Map<Long, Long> groupIdToDefIdMap = indexBy(
                     cols,
                     ReportGridColumnDefinition::columnEntityId,
-                    ReportGridColumnDefinition::columnDefinitionId);
+                    ReportGridColumnDefinition::id);
 
             SelectOrderByStep<Record3<Long, Long, Timestamp>> appGroupInfoSelect = determineAppGroupQuery(
                     genericSelector,
@@ -808,7 +808,7 @@ public class ReportGridDao {
                                 return ImmutableReportGridCell
                                         .builder()
                                         .subjectId(appRecord.get(APPLICATION.ID))
-                                        .columnDefinitionId(colDefn.columnDefinitionId())
+                                        .columnDefinitionId(colDefn.id())
                                         .columnEntityId(colDefn.columnEntityId())
                                         .columnEntityKind(EntityKind.APPLICATION)
                                         .text(textValue)
@@ -860,7 +860,7 @@ public class ReportGridDao {
                                 return ImmutableReportGridCell
                                         .builder()
                                         .subjectId(ciRecord.get(CHANGE_INITIATIVE.ID))
-                                        .columnDefinitionId(colDefn.columnDefinitionId())
+                                        .columnDefinitionId(colDefn.id())
                                         .columnEntityId(colDefn.columnEntityId())
                                         .columnEntityKind(EntityKind.CHANGE_INITIATIVE)
                                         .text(String.valueOf(value))
@@ -882,7 +882,7 @@ public class ReportGridDao {
             Map<Tuple2<Long, Long>, Long> templateAndFieldRefToDefIdMap = indexBy(
                     surveyInstanceInfo,
                     t -> tuple(t.v1.columnEntityId(), t.v2.id().get()),
-                    t -> t.v1.columnDefinitionId());
+                    t -> t.v1.id());
 
             Map<Long, Collection<EntityFieldReference>> fieldReferencesByTemplateId = groupBy(
                     surveyInstanceInfo,
@@ -974,7 +974,7 @@ public class ReportGridDao {
             Map<Long, Long> involvementIdToDefIdMap = indexBy(
                     cols,
                     ReportGridColumnDefinition::columnEntityId,
-                    ReportGridColumnDefinition::columnDefinitionId);
+                    ReportGridColumnDefinition::id);
 
             return fromCollection(dsl
                     .select(
@@ -1030,7 +1030,7 @@ public class ReportGridDao {
             Map<Long, Long> costKindIdToDefIdMap = indexBy(
                     cols,
                     ReportGridColumnDefinition::columnEntityId,
-                    ReportGridColumnDefinition::columnDefinitionId);
+                    ReportGridColumnDefinition::id);
 
             return dsl
                     .select(c.ENTITY_ID,
@@ -1064,12 +1064,12 @@ public class ReportGridDao {
         Map<Long, Long> highIdToDefIdMap = indexBy(
                 highCols,
                 ReportGridColumnDefinition::columnEntityId,
-                ReportGridColumnDefinition::columnDefinitionId);
+                ReportGridColumnDefinition::id);
 
         Map<Long, Long> lowIdToDefIdMap = indexBy(
                 lowCols,
                 ReportGridColumnDefinition::columnEntityId,
-                ReportGridColumnDefinition::columnDefinitionId);
+                ReportGridColumnDefinition::id);
 
         Table<Record5<Long, String, Long, Integer, String>> ratingSchemeItems = DSL
                 .select(mc.ID.as("mcId"),
@@ -1161,7 +1161,7 @@ public class ReportGridDao {
             Map<Long, Long> measurableIdToDefIdMap = indexBy(
                     cols,
                     ReportGridColumnDefinition::columnEntityId,
-                    ReportGridColumnDefinition::columnDefinitionId);
+                    ReportGridColumnDefinition::id);
 
             SelectConditionStep<Record4<Long, Long, Long, String>> qry = dsl
                     .select(mr.ENTITY_ID,
@@ -1199,7 +1199,7 @@ public class ReportGridDao {
             Map<Long, Long> assessmentIdToDefIdMap = indexBy(
                     cols,
                     ReportGridColumnDefinition::columnEntityId,
-                    ReportGridColumnDefinition::columnDefinitionId);
+                    ReportGridColumnDefinition::id);
 
             return dsl
                     .select(ar.ENTITY_ID,
@@ -1232,7 +1232,7 @@ public class ReportGridDao {
             Map<Long, Long> questionIdToDefIdMap = indexBy(
                     cols,
                     ReportGridColumnDefinition::columnEntityId,
-                    ReportGridColumnDefinition::columnDefinitionId);
+                    ReportGridColumnDefinition::id);
 
             Field<Long> latestInstance = DSL
                     .firstValue(SURVEY_INSTANCE.ID)
