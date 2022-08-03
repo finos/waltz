@@ -422,7 +422,11 @@ public class ReportGridDao {
                 .asTable();
 
         Table<Record4<Long, String, String, String>> possible = dsl
-                .selectFrom(fixed)
+                .select(fixed.field("id", Long.class),
+                        fixed.field("kind", String.class),
+                        fixed.field("name", String.class),
+                        fixed.field("description", String.class))
+                .from(fixed)
                 .unionAll(dynamic)
                 .asTable("possible", "id", "kind", "name", "description");
 
@@ -444,8 +448,6 @@ public class ReportGridDao {
                 .leftJoin(efr).on(rgcd.ENTITY_FIELD_REFERENCE_ID.eq(efr.ID))
                 .where(condition)
                 .and(rgcd.COLUMN_ENTITY_KIND.eq(EntityKind.ATTESTATION.name()));
-
-
     }
 
 
