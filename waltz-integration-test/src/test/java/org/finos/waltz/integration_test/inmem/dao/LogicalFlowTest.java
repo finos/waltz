@@ -20,13 +20,12 @@ package org.finos.waltz.integration_test.inmem.dao;
 
 import org.finos.waltz.data.logical_flow.LogicalFlowDao;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
-import org.finos.waltz.integration_test.inmem.helpers.AppHelper;
-import org.finos.waltz.integration_test.inmem.helpers.LogicalFlowHelper;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdProvider;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
-
+import org.finos.waltz.test_common_again.helpers.AppHelper;
+import org.finos.waltz.test_common_again.helpers.LogicalFlowHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

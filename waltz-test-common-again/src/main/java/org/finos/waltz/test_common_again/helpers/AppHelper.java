@@ -1,4 +1,4 @@
-package org.finos.waltz.integration_test.inmem.helpers;
+package org.finos.waltz.test_common_again.helpers;
 
 import org.finos.waltz.model.Criticality;
 import org.finos.waltz.model.EntityKind;
@@ -23,21 +23,21 @@ public class AppHelper {
         AppRegistrationResponse resp = applicationSvc
                 .registerApp(
                         ImmutableAppRegistrationRequest.builder()
-                            .name(name)
-                            .organisationalUnitId(ouId != null ? ouId : 1L)
-                            .applicationKind(ApplicationKind.IN_HOUSE)
-                            .businessCriticality(Criticality.MEDIUM)
-                            .lifecyclePhase(LifecyclePhase.PRODUCTION)
-                            .overallRating(RagRating.G)
-                            .businessCriticality(Criticality.MEDIUM)
-                            .build(),
+                                .name(name)
+                                .organisationalUnitId(ouId != null ? ouId : 1L)
+                                .applicationKind(ApplicationKind.IN_HOUSE)
+                                .businessCriticality(Criticality.MEDIUM)
+                                .lifecyclePhase(LifecyclePhase.PRODUCTION)
+                                .overallRating(RagRating.G)
+                                .businessCriticality(Criticality.MEDIUM)
+                                .build(),
                         "appHelper");
 
         return resp.id().map(id -> mkRef(EntityKind.APPLICATION, id)).get();
     }
 
 
-    public void removeApp(Long appId){
+    public void removeApp(Long appId) {
         Application app = applicationSvc.getById(appId);
         applicationSvc
                 .update(ImmutableApplication

@@ -1,4 +1,4 @@
-package org.finos.waltz.integration_test.inmem.helpers;
+package org.finos.waltz.test_common_again.helpers;
 
 import org.finos.waltz.model.role.Role;
 import org.finos.waltz.model.user.ImmutableUpdateRolesCommand;
@@ -31,7 +31,7 @@ public class UserHelper {
         Set<String> roles = map(
                 roleService.findAllRoles(),
                 Role::name);
-        if (! roles.contains(role)) {
+        if (!roles.contains(role)) {
             roleService.create(role, role + " name", role + " desc");
         }
     }

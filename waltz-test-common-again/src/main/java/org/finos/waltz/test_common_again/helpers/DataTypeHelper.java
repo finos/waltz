@@ -1,4 +1,4 @@
-package org.finos.waltz.integration_test.inmem.helpers;
+package org.finos.waltz.test_common_again.helpers;
 
 import org.finos.waltz.schema.tables.records.DataTypeRecord;
 import org.finos.waltz.service.data_type.DataTypeService;
@@ -59,7 +59,6 @@ public class DataTypeHelper {
     }
 
 
-
     public void createDataType(Long id, String name, String code) {
 
         dsl.insertInto(DATA_TYPE)
@@ -73,7 +72,7 @@ public class DataTypeHelper {
     }
 
 
-    public void clearAllDataTypes(){
+    public void clearAllDataTypes() {
         dsl.deleteFrom(DATA_TYPE).execute();
     }
 

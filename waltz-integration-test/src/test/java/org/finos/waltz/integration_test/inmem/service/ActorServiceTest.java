@@ -19,24 +19,21 @@
 package org.finos.waltz.integration_test.inmem.service;
 
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
-import org.finos.waltz.integration_test.inmem.helpers.ActorHelper;
-import org.finos.waltz.integration_test.inmem.helpers.LogicalFlowHelper;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.actor.Actor;
 import org.finos.waltz.service.actor.ActorService;
+import org.finos.waltz.test_common_again.helpers.ActorHelper;
+import org.finos.waltz.test_common_again.helpers.LogicalFlowHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-
 import static org.finos.waltz.common.CollectionUtilities.first;
-import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.finos.waltz.test_common_again.helpers.NameHelper.mkName;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class ActorServiceTest extends BaseInMemoryIntegrationTest {

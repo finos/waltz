@@ -4,8 +4,9 @@ import {mkAssessmentDefinitionsIdsBaseKey} from "../../../user";
 import {userPreferenceStore} from "../../../svelte-stores/user-preference-store";
 import {getIdsFromString} from "../../assessment-utils";
 
-function writePreference(favouriteIncludedKey, $favouriteIncludedIds) {
-    const userPreference = {key: favouriteIncludedKey, value: $favouriteIncludedIds.toString()};
+function writePreference(key, definitionIds) {
+    console.log({key, definitionIds})
+    const userPreference = {key, value: definitionIds.toString()};
     userPreferenceStore.saveForUser(userPreference);
 }
 

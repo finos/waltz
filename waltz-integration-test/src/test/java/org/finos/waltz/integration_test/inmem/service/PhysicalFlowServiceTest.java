@@ -20,18 +20,21 @@ package org.finos.waltz.integration_test.inmem.service;
 
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
-import org.finos.waltz.integration_test.inmem.helpers.*;
 import org.finos.waltz.model.*;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.model.physical_flow.*;
-import org.finos.waltz.model.physical_specification.*;
+import org.finos.waltz.model.physical_specification.DataFormatKindValue;
+import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
+import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecificationDeleteCommand;
+import org.finos.waltz.model.physical_specification.PhysicalSpecification;
 import org.finos.waltz.model.physical_specification_definition.ImmutablePhysicalSpecDefinitionChangeCommand;
 import org.finos.waltz.model.physical_specification_definition.PhysicalSpecDefinitionType;
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.finos.waltz.service.physical_flow.PhysicalFlowService;
 import org.finos.waltz.service.physical_specification.PhysicalSpecificationService;
 import org.finos.waltz.service.physical_specification_definition.PhysicalSpecDefinitionService;
+import org.finos.waltz.test_common_again.helpers.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -44,9 +47,9 @@ import static java.util.Collections.emptySet;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.common.SetUtilities.map;
-import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
+import static org.finos.waltz.test_common_again.helpers.NameHelper.mkName;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {

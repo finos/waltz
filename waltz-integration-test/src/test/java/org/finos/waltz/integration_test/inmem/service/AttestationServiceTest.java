@@ -20,17 +20,16 @@ package org.finos.waltz.integration_test.inmem.service;
 
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.OptionalUtilities;
-import org.finos.waltz.common.exception.UpdateFailedException;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
-import org.finos.waltz.integration_test.inmem.helpers.AppHelper;
-import org.finos.waltz.integration_test.inmem.helpers.InvolvementHelper;
-import org.finos.waltz.integration_test.inmem.helpers.PersonHelper;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdCommandResponse;
 import org.finos.waltz.model.attestation.*;
 import org.finos.waltz.service.attestation.AttestationInstanceService;
 import org.finos.waltz.service.attestation.AttestationRunService;
+import org.finos.waltz.test_common_again.helpers.AppHelper;
+import org.finos.waltz.test_common_again.helpers.InvolvementHelper;
+import org.finos.waltz.test_common_again.helpers.PersonHelper;
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -42,11 +41,11 @@ import java.util.Optional;
 import static org.finos.waltz.common.CollectionUtilities.first;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.SetUtilities.asSet;
-import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
-import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkUserId;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 import static org.finos.waltz.schema.tables.AttestationInstance.ATTESTATION_INSTANCE;
+import static org.finos.waltz.test_common_again.helpers.NameHelper.mkName;
+import static org.finos.waltz.test_common_again.helpers.NameHelper.mkUserId;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class AttestationServiceTest extends BaseInMemoryIntegrationTest {

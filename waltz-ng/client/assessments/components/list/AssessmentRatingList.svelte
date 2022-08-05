@@ -137,8 +137,8 @@
                 <col width="40%"/>
             </colgroup>
             {#each groupedAssessments as group}
-                <tbody>
-                <tr style="background-color: #eee">
+                <tbody class="assessment-group">
+                <tr class="assessment-group-header">
                     <td>
                         <button class="btn btn-skinny"
                                 on:click={() => toggleGroup(group)}>
@@ -166,4 +166,13 @@
     </div>
 
 </div>
+
+
+<style>
+
+    .assessment-group-header {
+        background-color: #eee;
+    }
+
+</style>
 

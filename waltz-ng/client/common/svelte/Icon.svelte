@@ -34,6 +34,7 @@
     }
 </style>
 
-<span class="icon">
+<span class="icon"
+      data-ux={name}>
     <i class={classNames}/>
 </span>

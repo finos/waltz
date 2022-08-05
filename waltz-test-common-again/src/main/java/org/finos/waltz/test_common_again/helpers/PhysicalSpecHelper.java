@@ -1,4 +1,4 @@
-package org.finos.waltz.integration_test.inmem.helpers;
+package org.finos.waltz.test_common_again.helpers;
 
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.model.EntityReference;
@@ -10,7 +10,7 @@ import org.finos.waltz.service.physical_specification.PhysicalSpecificationServi
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
+import static org.finos.waltz.test_common_again.helpers.NameHelper.mkName;
 
 @Service
 public class PhysicalSpecHelper {

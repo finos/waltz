@@ -19,11 +19,6 @@
 package org.finos.waltz.integration_test.inmem.service;
 
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
-import org.finos.waltz.integration_test.inmem.helpers.AppHelper;
-import org.finos.waltz.integration_test.inmem.helpers.DataTypeHelper;
-import org.finos.waltz.integration_test.inmem.helpers.LogicalFlowHelper;
-import org.finos.waltz.integration_test.inmem.helpers.PhysicalFlowHelper;
-import org.finos.waltz.integration_test.inmem.helpers.PhysicalSpecHelper;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
@@ -33,6 +28,7 @@ import org.finos.waltz.model.datatype.DataTypeUsageCharacteristics;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.service.data_type.DataTypeDecoratorService;
 import org.finos.waltz.service.data_type.DataTypeService;
+import org.finos.waltz.test_common_again.helpers.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -46,14 +42,10 @@ import static org.finos.waltz.common.CollectionUtilities.first;
 import static org.finos.waltz.common.ListUtilities.asList;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.common.SetUtilities.map;
-import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.finos.waltz.test_common_again.helpers.NameHelper.mkName;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DataTypeDecoratorServiceTest extends BaseInMemoryIntegrationTest {
 

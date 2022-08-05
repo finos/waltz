@@ -33,6 +33,12 @@
     <dependencies>
 
         <dependency>
+            <groupId>org.finos</groupId>
+            <artifactId>waltz-test-common-again</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>net.sf.supercsv</groupId>
             <artifactId>super-csv</artifactId>
         </dependency>

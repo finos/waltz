@@ -1,4 +1,4 @@
-package org.finos.waltz.integration_test.inmem.helpers;
+package org.finos.waltz.test_common_again.helpers;
 
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.Operation;

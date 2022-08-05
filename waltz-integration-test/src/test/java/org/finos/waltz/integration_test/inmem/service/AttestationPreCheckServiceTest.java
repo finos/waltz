@@ -21,13 +21,13 @@ package org.finos.waltz.integration_test.inmem.service;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.data.attestation.AttestationPreCheckDao;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
-import org.finos.waltz.integration_test.inmem.helpers.AppGroupHelper;
-import org.finos.waltz.integration_test.inmem.helpers.DataTypeHelper;
-import org.finos.waltz.integration_test.inmem.helpers.LogicalFlowHelper;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.service.attestation.AttestationPreCheckService;
+import org.finos.waltz.test_common_again.helpers.AppGroupHelper;
+import org.finos.waltz.test_common_again.helpers.DataTypeHelper;
+import org.finos.waltz.test_common_again.helpers.LogicalFlowHelper;
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -36,9 +36,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 import static org.finos.waltz.common.SetUtilities.asSet;
-import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static org.finos.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
 import static org.finos.waltz.schema.tables.DataType.DATA_TYPE;
+import static org.finos.waltz.test_common_again.helpers.NameHelper.mkName;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

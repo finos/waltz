@@ -2,18 +2,18 @@ package org.finos.waltz.integration_test.inmem.story;
 
 import org.finos.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
-import org.finos.waltz.integration_test.inmem.helpers.AppHelper;
-import org.finos.waltz.integration_test.inmem.helpers.DataTypeHelper;
-import org.finos.waltz.integration_test.inmem.helpers.LogicalFlowHelper;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.service.data_type.DataTypeService;
+import org.finos.waltz.test_common_again.helpers.AppHelper;
+import org.finos.waltz.test_common_again.helpers.DataTypeHelper;
+import org.finos.waltz.test_common_again.helpers.LogicalFlowHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.finos.waltz.common.SetUtilities.asSet;
-import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static org.finos.waltz.model.utils.IdUtilities.toIds;
+import static org.finos.waltz.test_common_again.helpers.NameHelper.mkName;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

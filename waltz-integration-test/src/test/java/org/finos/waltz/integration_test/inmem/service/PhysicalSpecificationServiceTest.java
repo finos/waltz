@@ -20,7 +20,6 @@ package org.finos.waltz.integration_test.inmem.service;
 
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
-import org.finos.waltz.integration_test.inmem.helpers.*;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
@@ -32,10 +31,8 @@ import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.model.physical_flow.PhysicalFlowCreateCommandResponse;
 import org.finos.waltz.model.physical_specification.*;
 import org.finos.waltz.service.data_type.DataTypeDecoratorService;
-import org.finos.waltz.service.logical_flow.LogicalFlowService;
-import org.finos.waltz.service.physical_flow.PhysicalFlowService;
 import org.finos.waltz.service.physical_specification.PhysicalSpecificationService;
-import org.finos.waltz.service.physical_specification_definition.PhysicalSpecDefinitionService;
+import org.finos.waltz.test_common_again.helpers.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -49,10 +46,10 @@ import static org.finos.waltz.common.CollectionUtilities.first;
 import static org.finos.waltz.common.ListUtilities.asList;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.common.SetUtilities.map;
-import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 import static org.finos.waltz.model.entity_search.EntitySearchOptions.mkForEntity;
+import static org.finos.waltz.test_common_again.helpers.NameHelper.mkName;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTest {
