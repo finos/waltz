@@ -25,7 +25,6 @@ import ReportGridControlPanel from "../svelte/ReportGridControlPanel.svelte";
 import {activeSummaries, columnDefs, filters, selectedGrid} from "../svelte/report-grid-store";
 import {
     mkLocalStorageFilterKey,
-    mkPropNameForColumnDefinition,
     mkRowFilter,
     prepareColumnDefs,
     prepareTableData
@@ -65,7 +64,7 @@ function controller($scope, serviceBroker, localStorageService) {
         const dfltFilters = _
             .chain(columnDefs)
             .filter(d => d.usageKind === "SUMMARY")
-            .map(d => mkPropNameForColumnDefinition(d))
+            .map(d => d.id)
             .value();
 
         if (!_.isEmpty(dfltFilters)) {
@@ -98,7 +97,6 @@ function controller($scope, serviceBroker, localStorageService) {
 
 
     function loadGridData() {
-        console.log("loadGridData", {g: vm.gridId, so: vm.selectionOptions})
         serviceBroker
             .loadViewData(
                 CORE_API.ReportGridStore.getViewById,

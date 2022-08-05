@@ -46,9 +46,7 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.MapUtilities.*;
-import static org.finos.waltz.model.utils.IdUtilities.getIdOrDefault;
 import static org.finos.waltz.model.utils.IdUtilities.indexById;
-import static org.jooq.lambda.fi.util.function.CheckedConsumer.unchecked;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 import static spark.Spark.post;
 
@@ -206,9 +204,9 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
 
                     Collection<ReportGridCell> cells = r.getValue();
 
-                    Map<Tuple3<Long, EntityKind, Long>, ReportGridCell> cellValuesByColumnRefForSubject = indexBy(
+                    Map<Long, ReportGridCell> cellValuesByColumnRefForSubject = indexBy(
                             cells,
-                            k -> tuple(k.columnEntityId(), k.columnEntityKind(), k.entityFieldReferenceId()));
+                            ReportGridCell::columnDefinitionId);
 
                     //find data for columns
                     colsWithCommentRequirement
@@ -220,13 +218,10 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
                                     reportRow.add("REDACTED");
                                 } else {
                                     ReportGridCell cell = cellValuesByColumnRefForSubject.getOrDefault(
-                                            tuple(
-                                                    colDef.columnEntityId(),
-                                                    colDef.columnEntityKind(),
-                                                    getIdOrDefault(colDef.entityFieldReference(), null)),
+                                            colDef.id(),
                                             null);
 
-                                    reportRow.add(getValueFromReportCell(ratingsById, cell));
+                                    reportRow.add(getValueFromReportCell(colDef, ratingsById, cell));
                                     if (ColumnCommentary.HAS_COMMENTARY.equals(t.v2)) {
                                         reportRow.add(getCommentFromCell(cell));
                                     }
@@ -248,12 +243,13 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
     }
 
 
-    private Object getValueFromReportCell(Map<Long, RatingSchemeItem> ratingsById,
+    private Object getValueFromReportCell(ReportGridColumnDefinition colDef,
+                                          Map<Long, RatingSchemeItem> ratingsById,
                                           ReportGridCell reportGridCell) {
         if (reportGridCell == null) {
             return null;
         }
-        switch (reportGridCell.columnEntityKind()) {
+        switch (colDef.columnEntityKind()) {
             case COST_KIND:
                 return reportGridCell.value();
             case INVOLVEMENT_KIND:
@@ -270,7 +266,7 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
                         .map(NameProvider::name)
                         .orElse(null);
             default:
-                throw new IllegalArgumentException("This report does not support export with column of type: " + reportGridCell.columnEntityKind().name());
+                throw new IllegalArgumentException("This report does not support export with column of type: " + colDef.columnEntityKind().name());
         }
     }
 

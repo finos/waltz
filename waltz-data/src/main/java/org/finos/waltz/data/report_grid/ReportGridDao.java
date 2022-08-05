@@ -651,10 +651,7 @@ public class ReportGridDao {
                 .builder()
                 .subjectId(subjectId)
                 .columnDefinitionId(colDefId)
-                .columnEntityId(dataTypeId)
-                .columnEntityKind(EntityKind.DATA_TYPE)
                 .text(derivedUsage.name())
-                .entityFieldReferenceId(null)
                 .build();
     }
 
@@ -684,11 +681,8 @@ public class ReportGridDao {
                                 .builder()
                                 .subjectId(subjectId)
                                 .columnDefinitionId(groupIdToDefIdMap.get(r.get(ag.ID)))
-                                .columnEntityId(r.get(ag.ID))
-                                .columnEntityKind(EntityKind.APP_GROUP)
                                 .text("Y")
                                 .comment(format("Created at: %s", toLocalDate(created_at).toString()))
-                                .entityFieldReferenceId(null)
                                 .build();
                     })
                     .collect(toSet());
@@ -809,10 +803,7 @@ public class ReportGridDao {
                                         .builder()
                                         .subjectId(appRecord.get(APPLICATION.ID))
                                         .columnDefinitionId(colDefn.id())
-                                        .columnEntityId(colDefn.columnEntityId())
-                                        .columnEntityKind(EntityKind.APPLICATION)
                                         .text(textValue)
-                                        .entityFieldReferenceId(colDefn.entityFieldReference().id().get())
                                         .build();
                             }))
                     .filter(Objects::nonNull)
@@ -861,10 +852,7 @@ public class ReportGridDao {
                                         .builder()
                                         .subjectId(ciRecord.get(CHANGE_INITIATIVE.ID))
                                         .columnDefinitionId(colDefn.id())
-                                        .columnEntityId(colDefn.columnEntityId())
-                                        .columnEntityKind(EntityKind.CHANGE_INITIATIVE)
                                         .text(String.valueOf(value))
-                                        .entityFieldReferenceId(colDefn.entityFieldReference().id().get())
                                         .build();
                             }))
                     .filter(Objects::nonNull)
@@ -953,10 +941,7 @@ public class ReportGridDao {
                                             .builder()
                                             .subjectId(surveyRecord.get(SURVEY_INSTANCE.ENTITY_ID))
                                             .columnDefinitionId(templateAndFieldRefToDefIdMap.get(tuple(templateId, fieldRef.id().get()))) // FIX
-                                            .columnEntityId(templateId)
-                                            .columnEntityKind(EntityKind.SURVEY_TEMPLATE)
                                             .text(textValue)
-                                            .entityFieldReferenceId(fieldRef.id().get())
                                             .build();
                                 });
                     })
@@ -991,15 +976,12 @@ public class ReportGridDao {
                             .builder()
                             .subjectId(r.get(inv.ENTITY_ID))
                             .columnDefinitionId(involvementIdToDefIdMap.get(r.get(inv.KIND_ID)))
-                            .columnEntityId(r.get(inv.KIND_ID))
-                            .columnEntityKind(EntityKind.INVOLVEMENT_KIND)
                             .text(r.get(p.EMAIL))
-                            .entityFieldReferenceId(null)
                             .build())
                     // we now convert to a map so we can merge text values of cells with the same coordinates (appId, entId)
                     .stream()
                     .collect(toMap(
-                            c -> tuple(c.subjectId(), c.columnEntityId()),
+                            c -> tuple(c.subjectId(), c.columnDefinitionId()),
                             identity(),
                             (a, b) -> ImmutableReportGridCell
                                     .copyOf(a)
@@ -1044,10 +1026,7 @@ public class ReportGridDao {
                     .fetchSet(r -> ImmutableReportGridCell.builder()
                             .subjectId(r.get(c.ENTITY_ID))
                             .columnDefinitionId(costKindIdToDefIdMap.get(r.get(c.COST_KIND_ID)))
-                            .columnEntityId(r.get(c.COST_KIND_ID))
-                            .columnEntityKind(EntityKind.COST_KIND)
                             .value(r.get(c.AMOUNT))
-                            .entityFieldReferenceId(null)
                             .build());
         }
     }
@@ -1140,10 +1119,7 @@ public class ReportGridDao {
                                     .builder()
                                     .subjectId(entityId)
                                     .columnDefinitionId(highIdToDefIdMap.getOrDefault(measurableId, lowIdToDefIdMap.get(measurableId)))
-                                    .columnEntityId(measurableId)
-                                    .columnEntityKind(EntityKind.MEASURABLE)
                                     .ratingId(t.v1)
-                                    .entityFieldReferenceId(null)
                                     .build())
                             .orElse(null);
                 })
@@ -1181,11 +1157,8 @@ public class ReportGridDao {
                     .fetchSet(r -> ImmutableReportGridCell.builder()
                         .subjectId(r.get(mr.ENTITY_ID))
                         .columnDefinitionId(measurableIdToDefIdMap.get(r.get(mr.MEASURABLE_ID)))
-                        .columnEntityId(r.get(mr.MEASURABLE_ID))
-                        .columnEntityKind(EntityKind.MEASURABLE)
                         .ratingId(r.get(rsi.ID))
                         .comment(r.get(mr.DESCRIPTION))
-                        .entityFieldReferenceId(null)
                         .build());
         }
     }
@@ -1213,11 +1186,8 @@ public class ReportGridDao {
                     .fetchSet(r -> ImmutableReportGridCell.builder()
                             .subjectId(r.get(ar.ENTITY_ID))
                             .columnDefinitionId(assessmentIdToDefIdMap.get(r.get(ar.ASSESSMENT_DEFINITION_ID)))
-                            .columnEntityId(r.get(ar.ASSESSMENT_DEFINITION_ID))
-                            .columnEntityKind(EntityKind.ASSESSMENT_DEFINITION)
                             .ratingId(r.get(ar.RATING_ID))
                             .comment(r.get(ar.DESCRIPTION))
-                            .entityFieldReferenceId(null)
                             .build());
         }
     }
@@ -1303,11 +1273,8 @@ public class ReportGridDao {
                         return ImmutableReportGridCell.builder()
                                 .subjectId(r.get(SURVEY_INSTANCE.ENTITY_ID))
                                 .columnDefinitionId(questionIdToDefIdMap.get(questionId))
-                                .columnEntityId(questionId)
-                                .columnEntityKind(EntityKind.SURVEY_QUESTION)
                                 .text(determineDisplayText(fieldType, entityName, response, listResponses))
                                 .comment(r.get(SURVEY_QUESTION_RESPONSE.COMMENT))
-                                .entityFieldReferenceId(null)
                                 .build();
                     });
         }

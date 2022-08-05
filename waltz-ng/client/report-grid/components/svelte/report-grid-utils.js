@@ -111,34 +111,24 @@ const unknownRating = {
 };
 
 
-export function mkPropNameForColumnDefinition(columnDefn) {
-    console.log(columnDefn.id, {columnDefn});
-    return `${columnDefn.columnEntityKind}/${columnDefn.columnEntityId}/${_.get(columnDefn.entityFieldReference, ["id"], null)}`;
-}
 
-
-export function mkPropNameForCellRef(x) {
-    return `${x.columnEntityKind}/${x.columnEntityId}/${x.entityFieldReferenceId}`;
-}
-
-
-function initialiseDataForRow(subject, columnRefs) {
+function initialiseDataForRow(subject, columnDefs) {
     return _.reduce(
-        columnRefs,
+        columnDefs,
         (acc, c) => {
-            acc[c] = unknownRating;
+            acc[c.id] = unknownRating;
             return acc;
         },
         {subject});
 }
 
 
-export function getColumnName(c) {
-    let entityFieldName = _.get(c, ["entityFieldReference", "displayName"], null);
+export function getColumnName(column) {
+    let entityFieldName = _.get(column, ["entityFieldReference", "displayName"], null);
 
     return _.chain([])
         .concat(entityFieldName)
-        .concat(c.columnName)
+        .concat(column.columnName)
         .compact()
         .join(" / ")
         .value();
@@ -174,7 +164,7 @@ export function prepareColumnDefs(gridData) {
             default:
                 return {
                     allowSummary: true,
-                    toSearchTerm: d => _.get(d, [mkPropNameForColumnDefinition(c), "text"], ""),
+                    toSearchTerm: d => _.get(d, [c.id, "text"], ""),
                     cellTemplate:
                         `<div class="waltz-grid-report-cell"
                               ng-bind="COL_FIELD.text"
@@ -198,7 +188,7 @@ export function prepareColumnDefs(gridData) {
         .map(c => {
             return Object.assign(
                 {
-                    field: mkPropNameForColumnDefinition(c),
+                    field: c.id.toString(), // ui-grid doesn't like numeric field references
                     displayName: getDisplayNameForColumn(c),
                     columnDef: c,
                     width: 100,
@@ -250,11 +240,23 @@ function determineDataTypeUsageColor(usageKind) {
 }
 
 
+/**
+ * Returns a map of color scales keyed by their column id's
+ * @param gridData
+ * @returns {*}
+ */
 function calculateCostScales(gridData) {
+    const costCols = _
+        .chain(gridData)
+        .get(["definition", "columnDefinitions"], [])
+        .filter(cd => cd.columnEntityKind === 'COST_KIND')
+        .map(cd => cd.id)
+        .value();
+
     return _
         .chain(gridData.instance.cellData)
-        .filter(d => d.columnEntityKind === "COST_KIND")
-        .groupBy(d => d.columnEntityId)
+        .filter(d =>  _.includes(costCols, d.columnDefinitionId))
+        .groupBy(d => d.columnDefinitionId)
         .mapValues(v => scaleLinear()
             .domain(extent(v, d => d.value))
             .range(["#e2f5ff", "#86e4ff"]))
@@ -287,52 +289,54 @@ export function prepareTableData(gridData) {
         .value();
 
     const colDefs = _.get(gridData, ["definition", "columnDefinitions"], []);
-    const columnRefs = _.map(colDefs, c => mkPropNameForColumnDefinition(c));
+    const colsById = _.keyBy(colDefs, cd => cd.id);
 
-    const costColorScalesByColumnEntityId = calculateCostScales(gridData);
+    const costColorScalesByColumnDefinitionId = calculateCostScales(gridData);
 
     const baseCell = {
         fontColor: "#3b3b3b",
         optionCode: "PROVIDED",
         optionText: "Provided"
-    }
+    };
 
-    function mkTableCell(x) {
-        switch (x.columnEntityKind) {
+    function mkTableCell(dataCell) {
+        const colDef = colsById[dataCell.columnDefinitionId];
+        switch (colDef.columnEntityKind) {
             case "COST_KIND":
-                const color = costColorScalesByColumnEntityId[x.columnEntityId](x.value);
+                const colorScale = costColorScalesByColumnDefinitionId[dataCell.columnDefinitionId];
+                const color = colorScale(dataCell.value);
                 return Object.assign({}, baseCell, {
                     color: color,
-                    value: x.value,
+                    value: dataCell.value,
                 });
             case "DATA_TYPE":
                 return Object.assign({}, baseCell, {
-                    optionCode: x.text,
-                    optionText: _.capitalize(x.text),
-                    color: determineDataTypeUsageColor(x.text),
-                    text: x.text,
-                    comment: x.comment
+                    optionCode: dataCell.text,
+                    optionText: _.capitalize(dataCell.text),
+                    color: determineDataTypeUsageColor(dataCell.text),
+                    text: dataCell.text,
+                    comment: dataCell.comment
                 });
             case "INVOLVEMENT_KIND":
             case "APP_GROUP":
                 return Object.assign({}, baseCell, {
-                    color: determineColorForKind(x.columnEntityKind),
-                    text: x.text,
-                    comment: x.comment
+                    color: determineColorForKind(dataCell.columnEntityKind),
+                    text: dataCell.text,
+                    comment: dataCell.comment
                 });
             case "SURVEY_TEMPLATE":
             case "APPLICATION":
             case "CHANGE_INITIATIVE":
             case "SURVEY_QUESTION":
                 return Object.assign({}, baseCell, {
-                    color: determineColorForKind(x.columnEntityKind),
-                    text: x.text,
-                    comment: x.comment
+                    color: determineColorForKind(dataCell.columnEntityKind),
+                    text: dataCell.text,
+                    comment: dataCell.comment
                 });
             case "ASSESSMENT_DEFINITION":
             case "MEASURABLE":
-                const ratingSchemeItem = ratingSchemeItemsById[x.ratingId];
-                const popoverHtml = mkPopoverHtml(x, ratingSchemeItem);
+                const ratingSchemeItem = ratingSchemeItemsById[dataCell.ratingId];
+                const popoverHtml = mkPopoverHtml(dataCell, ratingSchemeItem);
                 return Object.assign({}, baseCell, {
                     comment: popoverHtml,
                     color: ratingSchemeItem.color,
@@ -342,10 +346,10 @@ export function prepareTableData(gridData) {
                     optionText: ratingSchemeItem.name
                 });
             default:
-                console.error("Cannot prepare table data for column kind: " + x.columnEntityKind);
+                console.error(`Cannot prepare table data for column kind:  ${colDef.columnEntityKind}, colId: ${colDef.id}`);
                 return {
-                    text: x.text,
-                    comment: x.comment
+                    text: dataCell.text,
+                    comment: dataCell.comment
                 };
         }
     }
@@ -355,12 +359,12 @@ export function prepareTableData(gridData) {
         .groupBy(d => d.subjectId)
         .map((xs, k) => _.reduce(
             xs,
-            (acc, x) => {
-                acc[mkPropNameForCellRef(x)] = mkTableCell(x);
+            (acc, cell) => {
+                acc[cell.columnDefinitionId] = mkTableCell(cell);
                 return acc;
             },
-            initialiseDataForRow(subjectsById[k], columnRefs)))
-        .orderBy(d => d.subject.name)
+            initialiseDataForRow(subjectsById[k], colDefs)))
+        .orderBy(row => row.subject.name)
         .value();
 }
 
@@ -407,18 +411,24 @@ export function refreshSummaries(tableData,
         return acc;
     };
 
-    const columnsByRef = _.keyBy(columnDefinitions, d => mkPropNameForColumnDefinition(d));
+    const columnsById = _.keyBy(columnDefinitions, cd => cd.id);
 
-    const result = _
+    return _
         .chain(tableData)
         .reduce(reducer, {})  // transform into a raw summary object for all rows
         .map((optionSummary, k) => { // convert basic prop-val/count pairs in the summary object into a list of enriched objects
-            const [colRef, ratingId] = _.split(k, "#");
-            return Object.assign({}, optionSummary, {summaryId: k, colRef});
+            const [columnDefinitionId, ratingId] = _.split(k, "#");
+            return Object.assign(
+                {},
+                optionSummary,
+                {
+                    summaryId: k,
+                    columnDefinitionId: Number(columnDefinitionId)
+                });
         })
-        .groupBy(d => d.colRef)  // group by the prop (colRef)
-        .map((optionSummaries, colRef) => ({ // convert each prop group into a summary object with the actual column and a sorted set of counters
-            column: columnsByRef[colRef],
+        .groupBy(d => d.columnDefinitionId)  // group by the prop (colRef)
+        .map((optionSummaries, columnDefinitionId) => ({ // convert each prop group into a summary object with the actual column and a sorted set of counters
+            column: columnsById[columnDefinitionId],
             optionSummaries: _.orderBy(  // sort counters according to the rating ordering
                 optionSummaries,
                 [
@@ -432,8 +442,6 @@ export function refreshSummaries(tableData,
             d => d.column.columnName
         ])
         .value();
-
-    return result;
 }
 
 
@@ -448,12 +456,17 @@ export function refreshSummaries(tableData,
  * @returns {function(*=): boolean}
  */
 export function mkRowFilter(filters = []) {
-    const filtersByPropName = _.groupBy(filters, f => f.propName);
+    const filtersByColumnDefinitionId = _.groupBy(
+        filters,
+        f => f.columnDefinitionId);
+
     return row => _.every(
-        filtersByPropName,
-        (filtersForProp, prop) => {
-            const propOptionCode = _.get(row, [prop, "optionCode"], undefined);
-            return _.some(filtersForProp, f => propOptionCode === f.optionCode);
+        filtersByColumnDefinitionId,
+        (filtersForCol, colId) => {
+            const colOptionCode = _.get(row, [colId, "optionCode"], undefined);
+            return _.some(
+                filtersForCol,
+                f => colOptionCode === f.optionCode);
         });
 }
 
