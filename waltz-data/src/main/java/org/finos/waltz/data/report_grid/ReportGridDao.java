@@ -353,6 +353,7 @@ public class ReportGridDao {
                 .unionAll(applicationMetaColumns)
                 .unionAll(changeInitiativeMetaColumns)
                 .unionAll(dataTypeColumns)
+                .unionAll(attestationColumns)
                 .asTable("extras");
 
         return dsl
@@ -401,21 +402,21 @@ public class ReportGridDao {
         SelectJoinStep<Record4<Long, String, String, String>> dynamic = dsl
                 .select(mc.ID,
                         DSL.inline(EntityKind.MEASURABLE_CATEGORY.name()).as("kind"),
-                        mc.NAME,
-                        mc.DESCRIPTION)
+                        DSL.concat(mc.NAME, " Attestation"),
+                        DSL.concat(mc.NAME, ": Last attestation"))
                 .from(mc);
 
         Row4<Long, String, String, String> lfRow = DSL.row(
                 DSL.castNull(DSL.field("id", Long.class)),
-                DSL.inline(EntityKind.LOGICAL_DATA_FLOW.name()).as("kind"),
-                DSL.inline("Logical Flow Attestation").as("name"),
-                DSL.inline("Logical Flow Attestation").as("description"));
+                DSL.inline(EntityKind.LOGICAL_DATA_FLOW.name()),
+                DSL.inline("Logical Flow Attestation"),
+                DSL.inline("Logical Flow Attestation"));
 
         Row4<Long, String, String, String> pfRow = DSL.row(
                 DSL.castNull(DSL.field("id", Long.class)),
-                DSL.inline(EntityKind.PHYSICAL_FLOW.name()).as("kind"),
-                DSL.inline("Physical Flow Attestation").as("name"),
-                DSL.inline("Physical Flow Attestation").as("description"));
+                DSL.inline(EntityKind.PHYSICAL_FLOW.name()),
+                DSL.inline("Physical Flow Attestation"),
+                DSL.inline("Physical Flow Attestation"));
 
         Table<Record4<Long, String, String, String>> fixed = DSL
                 .values(lfRow, pfRow)
@@ -500,8 +501,8 @@ public class ReportGridDao {
                     gridDefn.columnDefinitions(),
                     d -> d.entityFieldReference() == null);
 
-            Collection<ReportGridColumnDefinition> simpleGridDefs = gridDefinitionsByContainingFieldRef.getOrDefault(true, Collections.emptyList());
-            Collection<ReportGridColumnDefinition> complexGridDefs = gridDefinitionsByContainingFieldRef.getOrDefault(false, Collections.emptyList());
+            Collection<ReportGridColumnDefinition> simpleGridDefs = gridDefinitionsByContainingFieldRef.getOrDefault(true, emptySet());
+            Collection<ReportGridColumnDefinition> complexGridDefs = gridDefinitionsByContainingFieldRef.getOrDefault(false, emptySet());
 
             // SIMPLE GRID DEFS
 
