@@ -16,6 +16,7 @@
     let favouriteExcludedIds;
     let favouriteIds;
     let setFromPreferences;
+    let expansions;
 
     let userPreferenceCall = userPreferenceStore.findAllForUser();
 
@@ -66,11 +67,11 @@
     $: {
         if (primaryEntityRef) {
             stores = createStores(primaryEntityRef);
-            defaultPrimaryList = stores.defaultPrimaryList
-            favouriteIncludedIds = stores.favouriteIncludedIds,
-                favouriteExcludedIds = stores.favouriteExcludedIds,
-                favouriteIds = stores.favouriteIds,
-                setFromPreferences = stores.setFromPreferences
+            defaultPrimaryList = stores.defaultPrimaryList;
+            favouriteIncludedIds = stores.favouriteIncludedIds;
+            favouriteExcludedIds = stores.favouriteExcludedIds;
+            favouriteIds = stores.favouriteIds;
+            setFromPreferences = stores.setFromPreferences;
         }
     }
 
@@ -85,13 +86,21 @@
     }
 
 
-    $: expansions = _
-        .chain($assessments)
-        .filter(d => _.includes($favouriteIds, d.definition.id))
-        .map(d => d.definition.definitionGroup)
-        .uniq()
-        .value();
+    $: {
+        if(stores) {
+            expansions = _
+                .chain($assessments)
+                .filter(d => _.includes($favouriteIncludedIds, d.definition.id)
+                    || _.includes($defaultPrimaryList, d.definition.id))
+                .reject(d => _.includes($favouriteExcludedIds, d.definition.id))
+                .map(d => d.definition.definitionGroup)
+                .uniq()
+                .value();
+        }
+    }
 
+
+    $: console.log({expansions, ass: $assessments, faves: $favouriteIds, inc: $favouriteIncludedIds, def: $defaultPrimaryList});
 
     $: groupedAssessments = _.chain($assessments)
         .groupBy(d => d.definition?.definitionGroup)

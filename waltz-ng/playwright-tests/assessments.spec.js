@@ -21,6 +21,8 @@ test.describe("assessments section", () => {
         await expect(icon).toHaveAttribute("data-ux", "caret-down");
         await toggle.click();
         await expect(icon).toHaveAttribute("data-ux", "caret-right");
+        await toggle.click();
+        await expect(icon).toHaveAttribute("data-ux", "caret-down");
     });
 
     test('Can favourite assessment and shows in overview', async ({context, page}) => {
@@ -42,8 +44,8 @@ test.describe("assessments section", () => {
         expect(parentUrl).toMatch(/application/i);
 
         const assessmentsSection = await newPage.locator("waltz-assessment-rating-sub-section");
-        const assessmentInOverview = assessmentsSection.locator("table tr span:has-text('Test Definition B')");
-        await expect(assessmentInOverview).toBeDefined();
+        const assessmentInOverview = assessmentsSection.locator("table tr td:has-text('Test Definition B')");
+        await expect(assessmentInOverview).toHaveCount(1);
     });
 
     test('Can un-favourite assessment and removed from overview', async ({context, page}) => {
@@ -65,8 +67,9 @@ test.describe("assessments section", () => {
         expect(parentUrl).toMatch(/application/i);
 
         const assessmentsSection = await newPage.locator("waltz-assessment-rating-sub-section");
-        const assessmentInOverview = assessmentsSection.locator("table tr span:has-text('Test Definition A')");
-        await expect(assessmentInOverview).not.toBeDefined();
+        const assessmentInOverview = assessmentsSection.locator("table tr td:has-text('Test Definition A')");
+        await newPage.pause();
+        await expect(assessmentInOverview).toHaveCount(0);
     });
 
 });

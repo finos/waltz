@@ -44,6 +44,8 @@ public class TestDataGenerator {
         RatingSchemeHelper ratingSchemeHelper = ctx.getBean(RatingSchemeHelper.class);
         AssessmentHelper assessmentHelper = ctx.getBean(AssessmentHelper.class);
 
+        LOG.error("Creating data for ui testing");
+
         Long rootOU = orgHelper.createOrgUnit("Root", null);
         Long orgA = orgHelper.createOrgUnit("Org Unit A", rootOU);
         Long orgB = orgHelper.createOrgUnit("Org Unit B", rootOU);
@@ -66,6 +68,9 @@ public class TestDataGenerator {
         } catch (InsufficientPrivelegeException e) {
             LOG.error("Could not create assessments for playwright tests", e);
         }
+
+        LOG.error("Test data creation completed");
+
     }
 
 }
