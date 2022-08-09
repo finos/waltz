@@ -317,6 +317,7 @@ export function prepareTableData(gridData) {
                     text: dataCell.text,
                     comment: dataCell.comment
                 });
+            case "ATTESTATION":
             case "INVOLVEMENT_KIND":
             case "APP_GROUP":
                 return Object.assign({}, baseCell, {

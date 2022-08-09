@@ -54,6 +54,7 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.*;
 import static org.finos.waltz.common.ArrayUtilities.sum;
 import static org.finos.waltz.common.CollectionUtilities.first;
+import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDate;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
@@ -340,8 +341,8 @@ public class ReportGridDao {
                 dt.DESCRIPTION,
                 condition);
 
-
-        SelectConditionStep<Record7<Long, String, String, String, String, String, String>> attestationColumns = mkAttestationColumnDefinitionQuery(condition);
+        SelectConditionStep<Record7<Long, String, String, String, String, String, String>> attestationColumns = mkAttestationColumnDefinitionQuery(
+                condition);
 
         Table<Record7<Long, String, String, String, String, String, String>> extras = assessmentDefinitionColumns
                 .unionAll(measurableColumns)
@@ -542,28 +543,101 @@ public class ReportGridDao {
 
 
             return union(
-                    fetchAssessmentData(genericSelector, colsByKind.getOrDefault(EntityKind.ASSESSMENT_DEFINITION, emptySet())),
-                    fetchInvolvementData(genericSelector, colsByKind.getOrDefault(EntityKind.INVOLVEMENT_KIND, emptySet())),
-                    fetchCostData(genericSelector, colsByKind.getOrDefault(EntityKind.COST_KIND, emptySet())),
+                    fetchAssessmentData(genericSelector, colsByKind.get(EntityKind.ASSESSMENT_DEFINITION)),
+                    fetchInvolvementData(genericSelector, colsByKind.get(EntityKind.INVOLVEMENT_KIND)),
+                    fetchCostData(genericSelector, colsByKind.get(EntityKind.COST_KIND)),
                     fetchSummaryMeasurableData(
                             genericSelector,
-                            measurableColumnsByRollupKind.getOrDefault(RatingRollupRule.PICK_HIGHEST, emptySet()),
-                            measurableColumnsByRollupKind.getOrDefault(RatingRollupRule.PICK_LOWEST, emptySet())),
-                    fetchExactMeasurableData(genericSelector, measurableColumnsByRollupKind.getOrDefault(RatingRollupRule.NONE, emptySet())),
-                    fetchSurveyQuestionResponseData(genericSelector, colsByKind.getOrDefault(EntityKind.SURVEY_QUESTION, emptySet())),
-                    fetchAppGroupData(genericSelector, colsByKind.getOrDefault(EntityKind.APP_GROUP, emptySet())),
-                    fetchApplicationFieldReferenceData(genericSelector, complexColsByKind.getOrDefault(EntityKind.APPLICATION, emptySet())),
-                    fetchExactDataTypeData(genericSelector, dataTypeColumnsByIsExact.getOrDefault(Boolean.TRUE, emptySet())),
-                    fetchSummaryDataTypeData(genericSelector, dataTypeColumnsByIsExact.getOrDefault(Boolean.FALSE, emptySet())),
-                    fetchSurveyFieldReferenceData(genericSelector, complexColsByKind.getOrDefault(EntityKind.SURVEY_INSTANCE, emptySet())),
-                    fetchChangeInitiativeFieldReferenceData(genericSelector, complexColsByKind.getOrDefault(EntityKind.CHANGE_INITIATIVE, emptySet())));
+                            measurableColumnsByRollupKind.get(RatingRollupRule.PICK_HIGHEST),
+                            measurableColumnsByRollupKind.get(RatingRollupRule.PICK_LOWEST)),
+                    fetchExactMeasurableData(genericSelector, measurableColumnsByRollupKind.get(RatingRollupRule.NONE)),
+                    fetchSurveyQuestionResponseData(genericSelector, colsByKind.get(EntityKind.SURVEY_QUESTION)),
+                    fetchAppGroupData(genericSelector, colsByKind.get(EntityKind.APP_GROUP)),
+                    fetchApplicationFieldReferenceData(genericSelector, complexColsByKind.get(EntityKind.APPLICATION)),
+                    fetchExactDataTypeData(genericSelector, dataTypeColumnsByIsExact.get(Boolean.TRUE)),
+                    fetchSummaryDataTypeData(genericSelector, dataTypeColumnsByIsExact.get(Boolean.FALSE)),
+                    fetchSurveyFieldReferenceData(genericSelector, complexColsByKind.get(EntityKind.SURVEY_INSTANCE)),
+                    fetchChangeInitiativeFieldReferenceData(genericSelector, complexColsByKind.get(EntityKind.CHANGE_INITIATIVE)),
+                    fetchAttestationData(genericSelector, colsByKind.get(EntityKind.ATTESTATION), gridCondition));
+        }
+    }
+
+    private Set<ReportGridCell> fetchAttestationData(GenericSelector genericSelector,
+                                                     Collection<ReportGridColumnDefinition> cols,
+                                                     Condition gridCond) {
+        if (isEmpty(cols)) {
+            return emptySet();
+        } else {
+
+            CommonTableExpression<Record5<Long, String, Long, String, Long>> required = DSL
+                    .name("required")
+                    .fields("col_id", "ref_k", "ref_i", "att_k", "att_i")
+                    .as(DSL
+                        .select(
+                            rgcd.ID,
+                            DSL.inline(genericSelector.kind().name()),
+                            genericSelector.selector().field(0, Long.class),
+                            rgcd.COLUMN_QUALIFIER_KIND,
+                            rgcd.COLUMN_QUALIFIER_ID)
+                        .from(rgcd)
+                        .innerJoin(rg).on(rg.ID.eq(rgcd.REPORT_GRID_ID))
+                        .crossJoin(genericSelector.selector().asTable())
+                        .where(gridCond)
+                        .and(rgcd.COLUMN_QUALIFIER_KIND.isNotNull()));
+
+            CommonTableExpression<Record6<Long, String, Long, Timestamp, String, Timestamp>> attestations = DSL
+                    .name("attestations")
+                    .fields("col_id", "ref_k", "ref_i", "att_at", "att_by", "latest")
+                    .as(DSL
+                        .select(
+                            required.field("col_id", Long.class),
+                            atti.PARENT_ENTITY_KIND,
+                            atti.PARENT_ENTITY_ID,
+                            atti.ATTESTED_AT,
+                            atti.ATTESTED_BY,
+                            DSL.max(atti.ATTESTED_AT)
+                                .over(DSL
+                                    .partitionBy(
+                                        atti.PARENT_ENTITY_KIND,
+                                        atti.PARENT_ENTITY_ID,
+                                        atti.ATTESTED_ENTITY_KIND,
+                                        attr.ATTESTED_ENTITY_ID)
+                                    .orderBy(atti.ATTESTED_AT.desc()))
+                                .as("latest"))
+                        .from(atti)
+                        .innerJoin(attr).on(atti.ATTESTATION_RUN_ID.eq(attr.ID))
+                        .innerJoin(required).on(
+                            required.field("ref_i", Long.class).eq(atti.PARENT_ENTITY_ID)
+                                .and(required.field("ref_k", String.class).eq(atti.PARENT_ENTITY_KIND))
+                                .and(required.field("att_k", String.class).eq(atti.ATTESTED_ENTITY_KIND))
+                                .and(required.field("att_i", Long.class).eq(attr.ATTESTED_ENTITY_ID)
+                                    .or(required.field("att_i").isNull()))));
+
+            return dsl
+                    .with(required)
+                    .with(attestations)
+                    .select(
+                            attestations.field("col_id", Long.class),
+                            attestations.field("ref_k", String.class),
+                            attestations.field("ref_i", Long.class),
+                            attestations.field("att_by", String.class),
+                            attestations.field("att_at", Timestamp.class))
+                    .from(attestations)
+                    .where(attestations.field("latest", Timestamp.class).eq(attestations.field("att_at", Timestamp.class)))
+                    .fetchSet(r -> ImmutableReportGridCell
+                            .builder()
+                            .subjectId(r.get("ref_i", Long.class))
+                            .columnDefinitionId(r.get("col_id", Long.class))
+                            .text(r.get("att_at", Timestamp.class).toString())
+                            .comment(format("Attested by: %s", r.get("att_by", String.class)))
+                            .build());
         }
     }
 
 
     private Set<ReportGridCell> fetchExactDataTypeData(GenericSelector genericSelector,
                                                        Collection<ReportGridColumnDefinition> cols) {
-        if (cols.isEmpty()) {
+        if (isEmpty(cols)) {
             return Collections.emptySet();
         } else {
             Map<Long, Long> dataTypeIdToDefIdMap = indexBy(
@@ -601,7 +675,7 @@ public class ReportGridDao {
 
     private Set<ReportGridCell> fetchSummaryDataTypeData(GenericSelector genericSelector,
                                                          Collection<ReportGridColumnDefinition> cols) {
-        if (cols.isEmpty()) {
+        if (isEmpty(cols)) {
             return Collections.emptySet();
         } else {
 
@@ -659,7 +733,7 @@ public class ReportGridDao {
 
     private Set<ReportGridCell> fetchAppGroupData(GenericSelector genericSelector,
                                                   Collection<ReportGridColumnDefinition> cols) {
-        if (cols.isEmpty()) {
+        if (isEmpty(cols)) {
             return emptySet();
         } else {
             Map<Long, Long> groupIdToDefIdMap = indexBy(
@@ -768,7 +842,7 @@ public class ReportGridDao {
     private Set<ReportGridCell> fetchApplicationFieldReferenceData(GenericSelector selector,
                                                                   Set<Tuple2<ReportGridColumnDefinition, EntityFieldReference>> requiredApplicationColumns) {
 
-        if (requiredApplicationColumns.isEmpty()) {
+        if (isEmpty(requiredApplicationColumns)) {
             return emptySet();
         } else {
 
@@ -812,6 +886,7 @@ public class ReportGridDao {
         }
     }
 
+
     private boolean isTimestampField(Field<?> field) {
         DataType<?> dataType = field.getDataType();
         int sqlType = dataType.getSQLType();
@@ -822,7 +897,7 @@ public class ReportGridDao {
     private Set<ReportGridCell> fetchChangeInitiativeFieldReferenceData(GenericSelector selector,
                                                                         Set<Tuple2<ReportGridColumnDefinition, EntityFieldReference>> requiredChangeInitiativeColumns) {
 
-        if (requiredChangeInitiativeColumns.isEmpty()) {
+        if (isEmpty(requiredChangeInitiativeColumns)) {
             return emptySet();
         } else {
 
@@ -864,7 +939,7 @@ public class ReportGridDao {
 
     private Set<ReportGridCell> fetchSurveyFieldReferenceData(GenericSelector selector,
                                                              Set<Tuple2<ReportGridColumnDefinition, EntityFieldReference>> surveyInstanceInfo) {
-        if (surveyInstanceInfo.isEmpty()) {
+        if (isEmpty(surveyInstanceInfo)) {
             return emptySet();
         } else {
 
@@ -954,7 +1029,7 @@ public class ReportGridDao {
 
     private Set<ReportGridCell> fetchInvolvementData(GenericSelector selector,
                                                      Collection<ReportGridColumnDefinition> cols) {
-        if (cols.isEmpty()) {
+        if (isEmpty(cols)) {
             return emptySet();
         } else {
             Map<Long, Long> involvementIdToDefIdMap = indexBy(
@@ -996,7 +1071,7 @@ public class ReportGridDao {
     private Set<ReportGridCell> fetchCostData(GenericSelector selector,
                                               Collection<ReportGridColumnDefinition> cols) {
 
-        if (cols.isEmpty()) {
+        if (isEmpty(cols)) {
             return emptySet();
         } else {
 
@@ -1037,7 +1112,7 @@ public class ReportGridDao {
                                                            Collection<ReportGridColumnDefinition> highCols,
                                                            Collection<ReportGridColumnDefinition> lowCols) {
 
-        if (highCols.isEmpty() && lowCols.isEmpty()) {
+        if (isEmpty(highCols) && isEmpty(lowCols)) {
             return emptySet();
         }
 
@@ -1132,7 +1207,7 @@ public class ReportGridDao {
     private Set<ReportGridCell> fetchExactMeasurableData(GenericSelector selector,
                                                          Collection<ReportGridColumnDefinition> cols) {
 
-        if (cols.isEmpty()) {
+        if (isEmpty(cols)) {
             return emptySet();
         } else {
             Map<Long, Long> measurableIdToDefIdMap = indexBy(
@@ -1167,7 +1242,7 @@ public class ReportGridDao {
 
     private Set<ReportGridCell> fetchAssessmentData(GenericSelector selector,
                                                     Collection<ReportGridColumnDefinition> cols) {
-        if (cols.isEmpty()) {
+        if (isEmpty(cols)) {
             return emptySet();
         } else {
             Map<Long, Long> assessmentIdToDefIdMap = indexBy(
@@ -1196,7 +1271,7 @@ public class ReportGridDao {
 
     private Set<ReportGridCell> fetchSurveyQuestionResponseData(GenericSelector selector,
                                                                 Collection<ReportGridColumnDefinition> cols) {
-        if (cols.isEmpty()) {
+        if (isEmpty(cols)) {
             return emptySet();
         } else {
 
