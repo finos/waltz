@@ -1,4 +1,4 @@
-package org.finos.waltz.test_common_again.helpers;
+package org.finos.waltz.test_common.helpers;
 
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.service.external_identifier.ExternalIdentifierService;

@@ -11,6 +11,7 @@ import org.finos.waltz.model.permission_group.Permission;
 import org.finos.waltz.schema.tables.records.InvolvementGroupRecord;
 import org.finos.waltz.schema.tables.records.PermissionGroupRecord;
 import org.finos.waltz.service.permission.PermissionGroupService;
+import org.finos.waltz.test_common.helpers.*;
 import org.finos.waltz.test_common_again.helpers.*;
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.Test;
@@ -25,7 +26,7 @@ import static java.util.Collections.emptySet;
 import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.SetUtilities.*;
 import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.finos.waltz.test_common_again.helpers.NameHelper.mkName;
+import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Service

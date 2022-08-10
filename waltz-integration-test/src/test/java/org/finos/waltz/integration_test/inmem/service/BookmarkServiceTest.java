@@ -41,7 +41,7 @@ import static org.finos.waltz.common.CollectionUtilities.first;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
-import static org.finos.waltz.test_common_again.helpers.NameHelper.mkUserId;
+import static org.finos.waltz.test_common.helpers.NameHelper.mkUserId;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 

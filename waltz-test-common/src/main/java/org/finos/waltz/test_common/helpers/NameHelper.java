@@ -1,4 +1,4 @@
-package org.finos.waltz.test_common_again.helpers;
+package org.finos.waltz.test_common.helpers;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

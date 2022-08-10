@@ -1,4 +1,4 @@
-package org.finos.waltz.test_common_again.helpers;
+package org.finos.waltz.test_common.helpers;
 
 import org.finos.waltz.model.physical_flow.*;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static org.finos.waltz.schema.Tables.PHYSICAL_FLOW;
-import static org.finos.waltz.test_common_again.helpers.NameHelper.mkName;
+import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
 
 @Service
 public class PhysicalFlowHelper {
@@ -45,7 +45,7 @@ public class PhysicalFlowHelper {
                 .flowAttributes(flowAttributes)
                 .build();
 
-        return physicalFlowService.create(createCmd, mkName(name));
+        return physicalFlowService.create(createCmd, NameHelper.mkName(name));
     }
 
 
@@ -54,7 +54,7 @@ public class PhysicalFlowHelper {
                 ImmutablePhysicalFlowDeleteCommand.builder()
                         .flowId(flowId)
                         .build(),
-                mkName("deletingFlow"));
+                NameHelper.mkName("deletingFlow"));
     }
 
     public void markFlowAsReadOnly(long id) {

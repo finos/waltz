@@ -16,6 +16,7 @@ import org.finos.waltz.model.rating.ImmutableRatingSchemeItem;
 import org.finos.waltz.service.assessment_definition.AssessmentDefinitionService;
 import org.finos.waltz.service.assessment_rating.AssessmentRatingService;
 import org.finos.waltz.service.rating_scheme.RatingSchemeService;
+import org.finos.waltz.test_common.helpers.*;
 import org.finos.waltz.test_common_again.helpers.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

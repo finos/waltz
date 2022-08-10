@@ -12,6 +12,7 @@ export async function hoistSection(page, sectionId) {
     const hoistButton = await section.locator("a", {has: page.locator("waltz-icon[title='Embed section']")})
     await hoistButton.click();
     const parentUrl = await page.url();
+    await page.waitForLoadState();
     expect(parentUrl).toContain('embed');
 }
 

@@ -1,4 +1,4 @@
-package org.finos.waltz.test_common_again.helpers;
+package org.finos.waltz.test_common.helpers;
 
 import org.finos.waltz.schema.tables.records.DataTypeRecord;
 import org.finos.waltz.service.data_type.DataTypeService;

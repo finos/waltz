@@ -7,7 +7,7 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.report_grid.*;
 import org.finos.waltz.service.report_grid.ReportGridMemberService;
 import org.finos.waltz.service.report_grid.ReportGridService;
-import org.finos.waltz.test_common_again.helpers.InvolvementHelper;
+import org.finos.waltz.test_common.helpers.InvolvementHelper;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ import static org.finos.waltz.common.CollectionUtilities.find;
 import static org.finos.waltz.common.CollectionUtilities.maybeFirst;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.schema.Tables.REPORT_GRID_COLUMN_DEFINITION;
-import static org.finos.waltz.test_common_again.helpers.NameHelper.mkName;
+import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
 import static org.junit.jupiter.api.Assertions.*;
 
 

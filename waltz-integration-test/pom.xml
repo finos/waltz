@@ -33,7 +33,7 @@
 
         <dependency>
             <groupId>org.finos</groupId>
-            <artifactId>waltz-test-common-again</artifactId>
+            <artifactId>waltz-test-common</artifactId>
             <version>${project.version}</version>
         </dependency>
 

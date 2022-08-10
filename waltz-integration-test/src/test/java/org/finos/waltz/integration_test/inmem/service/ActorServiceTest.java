@@ -23,8 +23,8 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.actor.Actor;
 import org.finos.waltz.service.actor.ActorService;
-import org.finos.waltz.test_common_again.helpers.ActorHelper;
-import org.finos.waltz.test_common_again.helpers.LogicalFlowHelper;
+import org.finos.waltz.test_common.helpers.ActorHelper;
+import org.finos.waltz.test_common.helpers.LogicalFlowHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -32,7 +32,7 @@ import java.util.List;
 
 import static org.finos.waltz.common.CollectionUtilities.first;
 import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.finos.waltz.test_common_again.helpers.NameHelper.mkName;
+import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
 import static org.junit.jupiter.api.Assertions.*;
 
 

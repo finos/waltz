@@ -14,7 +14,7 @@ import org.finos.waltz.schema.tables.records.AssessmentRatingRecord;
 import org.finos.waltz.schema.tables.records.RatingSchemeItemRecord;
 import org.finos.waltz.schema.tables.records.RatingSchemeRecord;
 import org.finos.waltz.service.workflow.*;
-import org.finos.waltz.test_common_again.helpers.AppHelper;
+import org.finos.waltz.test_common.helpers.AppHelper;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ import static java.lang.String.format;
 import static org.finos.waltz.common.CollectionUtilities.find;
 import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static org.finos.waltz.service.workflow.ContextVariableDeclaration.mkDecl;
-import static org.finos.waltz.test_common_again.helpers.NameHelper.mkName;
+import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 

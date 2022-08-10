@@ -9,10 +9,10 @@ import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.survey.*;
 import org.finos.waltz.service.survey.SurveyInstanceService;
 import org.finos.waltz.service.survey.SurveyRunService;
-import org.finos.waltz.test_common_again.helpers.AppHelper;
-import org.finos.waltz.test_common_again.helpers.InvolvementHelper;
-import org.finos.waltz.test_common_again.helpers.PersonHelper;
-import org.finos.waltz.test_common_again.helpers.SurveyTemplateHelper;
+import org.finos.waltz.test_common.helpers.AppHelper;
+import org.finos.waltz.test_common.helpers.InvolvementHelper;
+import org.finos.waltz.test_common.helpers.PersonHelper;
+import org.finos.waltz.test_common.helpers.SurveyTemplateHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -25,7 +25,7 @@ import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDate;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.common.SetUtilities.fromCollection;
-import static org.finos.waltz.test_common_again.helpers.NameHelper.mkName;
+import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
 import static org.junit.Assert.assertEquals;
 
 public class SurveyInstanceResponseCopyTest extends BaseInMemoryIntegrationTest {

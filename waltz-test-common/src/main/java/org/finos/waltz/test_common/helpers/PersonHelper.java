@@ -1,4 +1,4 @@
-package org.finos.waltz.test_common_again.helpers;
+package org.finos.waltz.test_common.helpers;
 
 import org.finos.waltz.model.person.PersonKind;
 import org.finos.waltz.schema.tables.records.PersonRecord;

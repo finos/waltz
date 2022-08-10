@@ -17,6 +17,7 @@ const config = {
                 viewport: {width: 1280, height: 720},
                 // ignoreHTTPSErrors: true,
                 baseURL: "http://localhost:8000/",
+                trace: 'retain-on-failure'
                 // storageState: "state.json",
             },
         },

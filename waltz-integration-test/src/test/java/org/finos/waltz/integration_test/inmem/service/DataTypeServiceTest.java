@@ -26,9 +26,9 @@ import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.finos.waltz.model.entity_search.ImmutableEntitySearchOptions;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.service.data_type.DataTypeService;
-import org.finos.waltz.test_common_again.helpers.AppHelper;
-import org.finos.waltz.test_common_again.helpers.DataTypeHelper;
-import org.finos.waltz.test_common_again.helpers.LogicalFlowHelper;
+import org.finos.waltz.test_common.helpers.AppHelper;
+import org.finos.waltz.test_common.helpers.DataTypeHelper;
+import org.finos.waltz.test_common.helpers.LogicalFlowHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
