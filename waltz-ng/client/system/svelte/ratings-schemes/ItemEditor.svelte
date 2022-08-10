@@ -159,6 +159,19 @@
             HTML or markdown code, any paths should be absolute
         </div>
 
+        <!-- EXTERNAL ID -->
+        <label for="external-id">
+            External Identifier
+        </label>
+        <input class="form-control"
+               id="external-id"
+               placeholder="External identifier of rating item"
+               bind:value={workingCopy.externalId}>
+        <div class="help-block">
+            Short name used to identify this rating in an external system
+        </div>
+
+
     </div>
 
 
