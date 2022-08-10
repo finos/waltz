@@ -19,26 +19,29 @@
 package org.finos.waltz.service.scheduled_job;
 
 
+import org.finos.waltz.common.ExcludeFromIntegrationTesting;
+import org.finos.waltz.data.scheduled_job.ScheduledJobDao;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.scheduled_job.JobKey;
+import org.finos.waltz.model.scheduled_job.JobLifecycleStatus;
 import org.finos.waltz.service.attestation.AttestationRunService;
 import org.finos.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.finos.waltz.service.flow_classification_rule.FlowClassificationRuleService;
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.finos.waltz.service.physical_specification_data_type.PhysicalSpecDataTypeService;
 import org.finos.waltz.service.usage_info.DataTypeUsageService;
-import org.finos.waltz.common.ExcludeFromIntegrationTesting;
-import org.finos.waltz.data.scheduled_job.ScheduledJobDao;
-import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.scheduled_job.JobKey;
-import org.finos.waltz.model.scheduled_job.JobLifecycleStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.SetUtilities.asSet;
 
 @ExcludeFromIntegrationTesting
 @Service
@@ -102,10 +105,12 @@ public class ScheduledJobService {
                 (jk) -> entityHierarchyService.buildFor(EntityKind.PERSON));
 
         runIfNeeded(JobKey.DATA_TYPE_RIPPLE_PHYSICAL_TO_LOGICAL,
-                (jk) -> physicalSpecDataTypeService.rippleDataTypesToLogicalFlows());
+                (jk) -> physicalSpecDataTypeService.rippleDataTypesToLogicalFlows(),
+                asSet(JobKey.DATA_TYPE_USAGE_RECALC_APPLICATION));
 
         runIfNeeded(JobKey.DATA_TYPE_USAGE_RECALC_APPLICATION,
-                (jk) -> dataTypeUsageService.recalculateForAllApplications());
+                (jk) -> dataTypeUsageService.recalculateForAllApplications(),
+                asSet(JobKey.DATA_TYPE_RIPPLE_PHYSICAL_TO_LOGICAL));
 
         runIfNeeded(JobKey.AUTH_SOURCE_RECALC_FLOW_RATINGS,
                 (jk) -> flowClassificationRuleService.fastRecalculateAllFlowRatings());
@@ -119,8 +124,13 @@ public class ScheduledJobService {
 
 
     private void runIfNeeded(JobKey jobKey, Consumer<JobKey> jobExecutor) {
+        runIfNeeded(jobKey, jobExecutor, Collections.emptySet());
+    }
+
+    private void runIfNeeded(JobKey jobKey, Consumer<JobKey> jobExecutor, Set<JobKey> deadlockJobKeys) {
         try {
             if (scheduledJobDao.isJobRunnable(jobKey)
+                    && !scheduledJobDao.anyJobsRunning(deadlockJobKeys)
                     && scheduledJobDao.markJobAsRunning(jobKey)) {
                 jobExecutor
                         .andThen((jk) -> scheduledJobDao.updateJobStatus(jk, JobLifecycleStatus.COMPLETED))
@@ -131,5 +141,6 @@ public class ScheduledJobService {
             scheduledJobDao.updateJobStatus(jobKey, JobLifecycleStatus.ERRORED);
         }
     }
+
 
 }
