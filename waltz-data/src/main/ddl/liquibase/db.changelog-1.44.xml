@@ -26,4 +26,27 @@
         <tagDatabase tag="v1.43"/> <!-- tag the current db version, i.e. the last  -->
     </changeSet>
 
+    <changeSet id="20220801-6103-1"
+               author="davidwatkins73">
+        <dropIndex tableName="report_grid_column_definition"
+                   indexName="idx_rgcd_entity_ref_report_grid_id"/>
+
+        <createIndex tableName="report_grid_column_definition"
+                     indexName="idx_rgcd_entity_ref_report_grid_id"
+                     unique="true">
+            <column name="report_grid_id"
+                    type="${id.type}"/>
+            <column name="column_entity_kind"
+                    type="${enum.type}"/>
+            <column name="column_entity_id"
+                    type="${id.type}"/>
+            <column name="entity_field_reference_id"
+                    type="${id.type}"/>
+            <column name="column_qualifier_kind"
+                    type="${enum.type}"/>
+            <column name="column_qualifier_id"
+                    type="${id.type}"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>
