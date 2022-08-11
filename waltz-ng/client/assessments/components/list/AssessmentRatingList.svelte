@@ -17,14 +17,15 @@
     let favouriteIds;
     let setFromPreferences;
     let expansions;
-
-    let userPreferenceCall = userPreferenceStore.findAllForUser();
+    let userPreferences = null;
+    let userPreferenceCall;
 
     export let primaryEntityRef = [];
     export let onSelect = (d) => console.log("selected", d);
 
     onMount(() => {
         userPreferenceCall = userPreferenceStore.findAllForUser();
+        console.log({primaryEntityRef});
     });
 
 
@@ -76,11 +77,18 @@
     }
 
 
-    $: userPreferences = $userPreferenceCall.data;
+    $: {
+        // before loaded defaults to initial state [], the derived stores pick this up and reset the favourites
+        if ($userPreferenceCall?.status === "loaded") {
+            console.log({ups: $userPreferenceCall})
+            userPreferences = $userPreferenceCall?.data;
+        }
+    }
 
 
     $: {
         if (userPreferences && stores) {
+            console.log({userPreferences});
             setFromPreferences(userPreferences)
         }
     }
@@ -100,9 +108,16 @@
     }
 
 
-    $: console.log({expansions, ass: $assessments, faves: $favouriteIds, inc: $favouriteIncludedIds, def: $defaultPrimaryList});
+    $: console.log({
+        expansions,
+        ass: $assessments,
+        faves: $favouriteIds,
+        inc: $favouriteIncludedIds,
+        def: $defaultPrimaryList
+    });
 
-    $: groupedAssessments = _.chain($assessments)
+    $: groupedAssessments = _
+        .chain($assessments)
         .groupBy(d => d.definition?.definitionGroup)
         .map((v, k) => {
 

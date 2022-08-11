@@ -25,7 +25,7 @@ public class AssessmentHelper {
     private AssessmentRatingService ratingService;
 
 
-    public long createDefinition(long schemeId, String name, String permittedRole, AssessmentVisibility visibility) {
+    public long createDefinition(long schemeId, String name, String permittedRole, AssessmentVisibility visibility, String definitionGroup) {
 
         ImmutableAssessmentDefinition.Builder def = ImmutableAssessmentDefinition.builder()
                 .name(name)
@@ -35,7 +35,8 @@ public class AssessmentHelper {
                 .entityKind(EntityKind.APPLICATION)
                 .lastUpdatedBy("test")
                 .visibility(visibility)
-                .ratingSchemeId(schemeId);
+                .ratingSchemeId(schemeId)
+                .definitionGroup(definitionGroup);
 
         if (!isEmpty(permittedRole)) {
             def.permittedRole(permittedRole);

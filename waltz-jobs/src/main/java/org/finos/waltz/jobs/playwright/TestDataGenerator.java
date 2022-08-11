@@ -22,10 +22,10 @@ import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.assessment_definition.AssessmentVisibility;
 import org.finos.waltz.service.DIConfiguration;
-import org.finos.waltz.test_common_again.helpers.AppHelper;
-import org.finos.waltz.test_common_again.helpers.AssessmentHelper;
-import org.finos.waltz.test_common_again.helpers.OrgUnitHelper;
-import org.finos.waltz.test_common_again.helpers.RatingSchemeHelper;
+import org.finos.waltz.test_common.helpers.AppHelper;
+import org.finos.waltz.test_common.helpers.AssessmentHelper;
+import org.finos.waltz.test_common.helpers.OrgUnitHelper;
+import org.finos.waltz.test_common.helpers.RatingSchemeHelper;
 import org.jooq.tools.json.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,12 +59,16 @@ public class TestDataGenerator {
         Long n = ratingSchemeHelper.saveRatingItem(schemeId, "No", 20, "red", 'N');
         Long m = ratingSchemeHelper.saveRatingItem(schemeId, "Maybe", 30, "yellow", 'M');
 
-        long defA = assessmentHelper.createDefinition(schemeId, "Test Definition A", null, AssessmentVisibility.PRIMARY);
-        long defB = assessmentHelper.createDefinition(schemeId, "Test Definition B", null, AssessmentVisibility.SECONDARY);
+        long defA = assessmentHelper.createDefinition(schemeId, "Test Definition A", null, AssessmentVisibility.PRIMARY, null);
+        long defB = assessmentHelper.createDefinition(schemeId, "Test Definition B", null, AssessmentVisibility.SECONDARY, null);
+        long defC = assessmentHelper.createDefinition(schemeId, "Test Definition C", null, AssessmentVisibility.PRIMARY, null);
+        long defD = assessmentHelper.createDefinition(schemeId, "Test Definition D", null, AssessmentVisibility.PRIMARY, "Toggle Group");
 
         try {
             assessmentHelper.createAssessment(defA, testApp, y, "test");
             assessmentHelper.createAssessment(defB, testApp, n, "test");
+            assessmentHelper.createAssessment(defC, testApp, y, "test");
+            assessmentHelper.createAssessment(defD, testApp, y, "test");
         } catch (InsufficientPrivelegeException e) {
             LOG.error("Could not create assessments for playwright tests", e);
         }

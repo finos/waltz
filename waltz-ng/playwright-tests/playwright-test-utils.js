@@ -7,8 +7,7 @@ export async function openSection(page, sectionName) {
 }
 
 
-export async function hoistSection(page, sectionId) {
-    const section = await page.locator(`.waltz-${sectionId}`);
+export async function hoistSection(page, section) {
     const hoistButton = await section.locator("a", {has: page.locator("waltz-icon[title='Embed section']")})
     await hoistButton.click();
     const parentUrl = await page.url();
@@ -17,7 +16,7 @@ export async function hoistSection(page, sectionId) {
 }
 
 
-export async function unHoistSection(context, page) {
+export async function unHoistSection(page) {
     const navigateBackButton = await page.locator("a", {has: page.locator("waltz-icon[name='share-square-o']")});
     navigateBackButton.click() // Opens a new tab
 }
@@ -37,7 +36,9 @@ export async function search(page, searchText) {
 export async function clickAndWait(page, locator, expectResponseURL) {
     const [response] = await Promise.all([
         page.waitForResponse(resp => resp.url().includes(expectResponseURL) && resp.status() === 200),
-        page.click(locator)
-    ])
-    return response
+        locator.click()
+    ]);
+
+    await response.finished();
+    return response;
 }
