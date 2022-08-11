@@ -1,6 +1,6 @@
 import {test, expect} from '@playwright/test';
 import _ from "lodash";
-import {hoistSection, openSection, search, unHoistSection} from "./playwright-test-utils";
+import {clickAndWait, hoistSection, openSection, search, unHoistSection} from "./playwright-test-utils";
 
 test.describe("assessments section", () => {
 
@@ -31,14 +31,18 @@ test.describe("assessments section", () => {
         const assessment = await assessmentGroup.locator("tr:has-text('Test Definition B')");
         const favouriteButton = await assessment.locator("button:has([data-ux='star-o']) >> visible=true");
 
-        await page.pause(); // pausing here allows it to run as expected
+        // await page.pause(); // pausing here allows it to run as expected
         // await page.waitForLoadState(); // this sometimes works?
+        const selectorString = ".assessment-group:has-text('Uncategorized') >> tr:has-text('Test Definition B') >> button:has([data-ux='star-o']) >> visible=true"
+
+        const canClick = await page.click(selectorString, {trial: true});
+
+        console.log({canClick});
+
+        await clickAndWait(page, selectorString, '/api/user-preference/save');
 
 
-        await Promise.all([
-            page.waitForResponse(resp => resp.url().includes('/api/user-preference/save') && resp.status() === 200),
-            favouriteButton.click()
-        ]);
+        // console.log(await response);
 
         // await page.pause(); pausing here the click has already happened/failed
         //trace shows everything as having been clicked but hte database doesn't reflect the update
@@ -89,3 +93,4 @@ test.describe("assessments section", () => {
     // });
 
 });
+

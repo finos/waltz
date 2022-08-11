@@ -32,3 +32,12 @@ export async function search(page, searchText) {
     const searchResult = await page.locator(`.wnso-search-results a:has-text("${searchText}")`);
     await searchResult.click();
 }
+
+
+export async function clickAndWait(page, locator, expectResponseURL) {
+    const [response] = await Promise.all([
+        page.waitForResponse(resp => resp.url().includes(expectResponseURL) && resp.status() === 200),
+        page.click(locator)
+    ])
+    return response
+}
