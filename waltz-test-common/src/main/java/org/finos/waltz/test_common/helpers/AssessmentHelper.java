@@ -35,11 +35,14 @@ public class AssessmentHelper {
                 .entityKind(EntityKind.APPLICATION)
                 .lastUpdatedBy("test")
                 .visibility(visibility)
-                .ratingSchemeId(schemeId)
-                .definitionGroup(definitionGroup);
+                .ratingSchemeId(schemeId);
 
         if (!isEmpty(permittedRole)) {
             def.permittedRole(permittedRole);
+        }
+
+        if (!isEmpty(definitionGroup)) {
+            def.definitionGroup(definitionGroup);
         }
 
         long defId = definitionService.save(def.build());

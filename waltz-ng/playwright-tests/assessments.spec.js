@@ -57,7 +57,7 @@ test.describe("assessments section", () => {
         await expect(assessmentInOverview).toHaveCount(1);
     });
 
-    test('Can favourite assessment and shows in overview', async ({context, page}) => {
+    test('Can unfavourite assessment and removed from overview', async ({context, page}) => {
 
         const assessmentGroup = await page.locator(".assessment-group:has-text('Uncategorized')");
         const assessment = await assessmentGroup.locator("tr:has-text('Test Definition C')");
@@ -67,7 +67,7 @@ test.describe("assessments section", () => {
         await favouriteResponse.finished();
 
         const icon = await assessment.locator("button:visible .icon");
-        await expect(icon).toHaveAttribute("data-ux", "star-0");
+        await expect(icon).toHaveAttribute("data-ux", "star-o");
 
         const [newPage] = await Promise.all([
             context.waitForEvent('page'),

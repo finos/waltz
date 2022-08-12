@@ -12,7 +12,6 @@ import org.finos.waltz.schema.tables.records.InvolvementGroupRecord;
 import org.finos.waltz.schema.tables.records.PermissionGroupRecord;
 import org.finos.waltz.service.permission.PermissionGroupService;
 import org.finos.waltz.test_common.helpers.*;
-import org.finos.waltz.test_common_again.helpers.*;
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

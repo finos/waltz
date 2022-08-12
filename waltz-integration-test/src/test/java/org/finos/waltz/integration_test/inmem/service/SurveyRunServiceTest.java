@@ -13,7 +13,6 @@ import org.finos.waltz.model.survey.*;
 import org.finos.waltz.service.survey.SurveyInstanceService;
 import org.finos.waltz.service.survey.SurveyRunService;
 import org.finos.waltz.test_common.helpers.*;
-import org.finos.waltz.test_common_again.helpers.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
