@@ -4,6 +4,7 @@ import {rgb} from "d3-color";
 import {determineForegroundColor, amberBg, blueBg, pinkBg, greenBg, greyBg} from "../../../common/colors";
 import {scaleLinear} from "d3-scale";
 import {extent} from "d3-array";
+import {subtractYears, withinMonths} from "../../../common/date-utils";
 
 
 export const reportGridMember = {
@@ -73,6 +74,12 @@ export const columnUsageKind = {
         name: "Summary",
 
     }
+};
+
+const baseCell = {
+    fontColor: "#3b3b3b",
+    optionCode: "PROVIDED",
+    optionText: "Provided"
 };
 
 const nameCol = mkEntityLinkGridCell(
@@ -263,28 +270,11 @@ function calculateCostColorScales(gridData) {
         .value();
 }
 
-/**
- * Returns a map of color scales keyed by their column id's
- * @param gridData
- * @returns {*}
- */
-function calculateAttestationColorScales(gridData) {
-    const attestationCols = _
-        .chain(gridData)
-        .get(["definition", "columnDefinitions"], [])
-        .filter(cd => cd.columnEntityKind === 'ATTESTATION')
-        .map(cd => cd.id)
-        .value();
+const attestationColorScale = scaleLinear()
+    .domain([subtractYears(1), new Date()])
+    .range(["#ebfdf0", "#96ff86"])
+    .clamp(true);
 
-    return _
-        .chain(gridData.instance.cellData)
-        .filter(d =>  _.includes(attestationCols, d.columnDefinitionId))
-        .groupBy(d => d.columnDefinitionId)
-        .mapValues(xs => scaleLinear()
-            .domain(extent(xs, d => new Date(d.text)))
-            .range(["#ebfdf0", "#96ff86"]))
-        .value();
-}
 
 function determineColorForKind(columnEntityKind) {
     switch (columnEntityKind) {
@@ -298,6 +288,51 @@ function determineColorForKind(columnEntityKind) {
             return "#dbfffe"
     }
 }
+
+
+
+function mkAttestationCell(dataCell) {
+    const attDate = new Date(dataCell.text);
+    const attColor = attestationColorScale(attDate);
+
+    let attOptions = {};
+
+    if (withinMonths(new Date(), attDate, 1)) {
+        attOptions = {
+            optionCode: "<1M",
+            optionText: "< 1 Months"
+        };
+    } else if (withinMonths(new Date(), attDate, 3)) {
+        attOptions = {
+            optionCode: "<3M",
+            optionText: "< 3 Months"
+        };
+    } else if (withinMonths(new Date(), attDate, 6)) {
+        attOptions = {
+            optionCode: "<6M",
+            optionText: "< 6 Months"
+        };
+    } else if (withinMonths(new Date(), attDate, 12)) {
+        attOptions = {
+            optionCode: "<1Y",
+            optionText: "< 1 Year"
+        };
+    } else {
+        attOptions = {
+            optionCode: ">1Y",
+            optionText: "> 1 Year"
+        };
+    }
+
+    const cellValues = {
+        color: attColor,
+        text: dataCell.text,
+        comment: dataCell.comment
+    };
+
+    return Object.assign({}, baseCell, attOptions, cellValues);
+}
+
 
 export function prepareTableData(gridData) {
     const subjectsById = _.keyBy(gridData.instance.subjects, d => d.entityReference.id);
@@ -315,16 +350,11 @@ export function prepareTableData(gridData) {
     const colsById = _.keyBy(colDefs, cd => cd.id);
 
     const costColorScalesByColumnDefinitionId = calculateCostColorScales(gridData);
-    const attestationColorScalesByColumnDefinitionId = calculateAttestationColorScales(gridData);
 
-    const baseCell = {
-        fontColor: "#3b3b3b",
-        optionCode: "PROVIDED",
-        optionText: "Provided"
-    };
 
     function mkTableCell(dataCell) {
         const colDef = colsById[dataCell.columnDefinitionId];
+
         switch (colDef.columnEntityKind) {
             case "COST_KIND":
                 const costColorScale = costColorScalesByColumnDefinitionId[dataCell.columnDefinitionId];
@@ -342,13 +372,7 @@ export function prepareTableData(gridData) {
                     comment: dataCell.comment
                 });
             case "ATTESTATION":
-                const attesttionColorScale = attestationColorScalesByColumnDefinitionId[dataCell.columnDefinitionId];
-                const attColor = attesttionColorScale(new Date(dataCell.text));
-                return Object.assign({}, baseCell, {
-                    color: attColor,
-                    text: dataCell.text,
-                    comment: dataCell.comment
-                });
+                return mkAttestationCell(dataCell);
             case "INVOLVEMENT_KIND":
             case "APP_GROUP":
                 return Object.assign({}, baseCell, {
@@ -418,7 +442,6 @@ function isSummarisableProperty(k) {
 export function refreshSummaries(tableData,
                                  columnDefinitions) {
 
-
     // increments a pair of counters referenced by `prop` in the object `acc`
     const accInc = (acc, prop, visible, optionInfo) => {
         const info = _.get(acc, prop, {counts: {visible: 0, total: 0}, optionInfo});
@@ -464,7 +487,7 @@ export function refreshSummaries(tableData,
             optionSummaries: _.orderBy(  // sort counters according to the rating ordering
                 optionSummaries,
                 [
-                    c => c.name
+                    c => c.optionInfo.name
                 ]),
             total: _.sumBy(optionSummaries, c => c.counts.total),
             totalVisible: _.sumBy(optionSummaries, c => c.counts.visible)

@@ -7,7 +7,15 @@
     import {mkChunks} from "../../../common/list-utils";
     import EntityIcon from "../../../common/svelte/EntityIcon.svelte";
 
-    const supportedColumnKinds = ["ASSESSMENT_DEFINITION", "MEASURABLE", "DATA_TYPE", "APP_GROUP", "INVOLVEMENT_KIND", "COST_KIND"];
+    const supportedColumnKinds = [
+        "ATTESTATION",
+        "ASSESSMENT_DEFINITION",
+        "MEASURABLE",
+        "DATA_TYPE",
+        "APP_GROUP",
+        "INVOLVEMENT_KIND",
+        "COST_KIND"
+    ];
 
     let chunkedSummaryData = [];
 
