@@ -280,11 +280,9 @@ function calculateAttestationColorScales(gridData) {
         .chain(gridData.instance.cellData)
         .filter(d =>  _.includes(attestationCols, d.columnDefinitionId))
         .groupBy(d => d.columnDefinitionId)
-        .mapValues(xs => {
-            return scaleLinear()
-                .domain(extent(xs, d => new Date(d.text)))
-                .range(["#ebfdf0", "#96ff86"])
-        })
+        .mapValues(xs => scaleLinear()
+            .domain(extent(xs, d => new Date(d.text)))
+            .range(["#ebfdf0", "#96ff86"]))
         .value();
 }
 

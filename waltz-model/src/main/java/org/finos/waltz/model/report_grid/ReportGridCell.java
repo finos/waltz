@@ -33,13 +33,17 @@ public abstract class ReportGridCell implements CommentProvider {
 
     public abstract Long columnDefinitionId();
 
+
     public abstract long subjectId(); // y
+
 
     @Nullable
     public abstract Long ratingId();
 
+
     @Nullable
     public abstract BigDecimal value();
+
 
     @Nullable
     public abstract String text();
