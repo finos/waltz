@@ -245,7 +245,7 @@ function determineDataTypeUsageColor(usageKind) {
  * @param gridData
  * @returns {*}
  */
-function calculateCostScales(gridData) {
+function calculateCostColorScales(gridData) {
     const costCols = _
         .chain(gridData)
         .get(["definition", "columnDefinitions"], [])
@@ -260,6 +260,31 @@ function calculateCostScales(gridData) {
         .mapValues(v => scaleLinear()
             .domain(extent(v, d => d.value))
             .range(["#e2f5ff", "#86e4ff"]))
+        .value();
+}
+
+/**
+ * Returns a map of color scales keyed by their column id's
+ * @param gridData
+ * @returns {*}
+ */
+function calculateAttestationColorScales(gridData) {
+    const attestationCols = _
+        .chain(gridData)
+        .get(["definition", "columnDefinitions"], [])
+        .filter(cd => cd.columnEntityKind === 'ATTESTATION')
+        .map(cd => cd.id)
+        .value();
+
+    return _
+        .chain(gridData.instance.cellData)
+        .filter(d =>  _.includes(attestationCols, d.columnDefinitionId))
+        .groupBy(d => d.columnDefinitionId)
+        .mapValues(xs => {
+            return scaleLinear()
+                .domain(extent(xs, d => new Date(d.text)))
+                .range(["#ebfdf0", "#96ff86"])
+        })
         .value();
 }
 
@@ -291,7 +316,8 @@ export function prepareTableData(gridData) {
     const colDefs = _.get(gridData, ["definition", "columnDefinitions"], []);
     const colsById = _.keyBy(colDefs, cd => cd.id);
 
-    const costColorScalesByColumnDefinitionId = calculateCostScales(gridData);
+    const costColorScalesByColumnDefinitionId = calculateCostColorScales(gridData);
+    const attestationColorScalesByColumnDefinitionId = calculateAttestationColorScales(gridData);
 
     const baseCell = {
         fontColor: "#3b3b3b",
@@ -303,10 +329,10 @@ export function prepareTableData(gridData) {
         const colDef = colsById[dataCell.columnDefinitionId];
         switch (colDef.columnEntityKind) {
             case "COST_KIND":
-                const colorScale = costColorScalesByColumnDefinitionId[dataCell.columnDefinitionId];
-                const color = colorScale(dataCell.value);
+                const costColorScale = costColorScalesByColumnDefinitionId[dataCell.columnDefinitionId];
+                const costColor = costColorScale(dataCell.value);
                 return Object.assign({}, baseCell, {
-                    color: color,
+                    color: costColor,
                     value: dataCell.value,
                 });
             case "DATA_TYPE":
@@ -318,6 +344,13 @@ export function prepareTableData(gridData) {
                     comment: dataCell.comment
                 });
             case "ATTESTATION":
+                const attesttionColorScale = attestationColorScalesByColumnDefinitionId[dataCell.columnDefinitionId];
+                const attColor = attesttionColorScale(new Date(dataCell.text));
+                return Object.assign({}, baseCell, {
+                    color: attColor,
+                    text: dataCell.text,
+                    comment: dataCell.comment
+                });
             case "INVOLVEMENT_KIND":
             case "APP_GROUP":
                 return Object.assign({}, baseCell, {
