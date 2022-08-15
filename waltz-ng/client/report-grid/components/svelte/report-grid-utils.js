@@ -527,9 +527,12 @@ export function mkRowFilter(filters = []) {
 
 
 export function sameColumnRef(v1, v2) {
-    return v1?.columnEntityKind === v2?.columnEntityKind
-        && v1?.columnEntityId === v2?.columnEntityId
-        && v1?.entityFieldReference?.id === v2?.entityFieldReference?.id;
+    if (!v1 || !v2) return false;
+    return v1.columnEntityKind === v2.columnEntityKind
+        && v1.columnEntityId === v2.columnEntityId
+        && v1.entityFieldReference?.id === v2.entityFieldReference?.id
+        && v1.columnQualifierKind === v2.columnQualifierKind
+        && v1.columnQualifierId === v2.columnQualifierId;
 }
 
 

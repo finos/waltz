@@ -183,6 +183,11 @@ public class ReportGridDao {
                     record.setRatingRollupRule(d.ratingRollupRule().name());
                     record.setPosition(Long.valueOf(d.position()).intValue());
                     record.setDisplayName(d.displayName());
+                    record.setColumnQualifierKind(Optional
+                            .ofNullable(d.columnQualifierKind())
+                            .map(Enum::name)
+                            .orElse(null));
+                    record.setColumnQualifierId(d.columnQualifierId());
                     record.setEntityFieldReferenceId(fieldReferenceId);
                     return record;
                 })

@@ -32,6 +32,8 @@
             columnEntityId: d.columnEntityId,
             columnEntityKind: d.columnEntityKind,
             entityFieldReference: d.entityFieldReference,
+            columnQualifierKind: d.columnQualifierKind,
+            columnQualifierId: d.columnQualifierId,
             columnName: d.columnName,
             columnDescription: d.columnDescription,
             usageKind: columnUsageKind.NONE.key,
@@ -83,7 +85,9 @@
                 usageKind: d.usageKind,
                 ratingRollupRule: d.ratingRollupRule,
                 entityFieldReference: d.entityFieldReference,
-                displayName: d.displayName
+                displayName: d.displayName,
+                columnQualifierKind: d.columnQualifierKind,
+                columnQualifierId: d.columnQualifierId
             }));
 
         return reportGridStore
