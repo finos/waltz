@@ -94,26 +94,54 @@
                         </p>
 
                         <table class="table table-condensed">
+                            <colgroup>
+                                <col width="70%">
+                                <col width="30%">
+                            </colgroup>
                             <tbody>
                             <tr>
-                                <td>Total</td>
-                                <td><span ng-bind="$ctrl.complexitySummary.total"></span></td>
+                                <td title="A sum of the complexities">Total</td>
+                                <td>
+                                    <span class="pull-right"
+                                          ng-bind="$ctrl.complexitySummary.total">
+
+                                    </span>
+                                </td>
                             </tr>
                             <tr>
-                                <td>Mean</td>
-                                <td><span ng-bind="$ctrl.complexitySummary.average"></span></td>
+                                <td title="The mean value of the complexities">Average</td>
+                                <td>
+                                    <span class="pull-right"
+                                          ng-bind="$ctrl.complexitySummary.average">
+                                    </span>
+                                </td>
                             </tr>
                             <tr>
-                                <td>Median</td>
-                                <td><span ng-bind="$ctrl.complexitySummary.median"></span></td>
+                                <td title="The median value of the complexities">Median</td>
+                                <td>
+                                    <span class="pull-right"
+                                          ng-bind="$ctrl.complexitySummary.median">
+                                    </span>
+                                </td>
                             </tr>
                             <tr>
-                                <td>Variance</td>
-                                <td><span ng-bind="$ctrl.complexitySummary.variance"></span></td>
+                                <td title="The variance of the complexities, a measure of the dispersion of values">
+                                    Variance
+                                </td>
+                                <td>
+                                    <span class="pull-right"
+                                          ng-bind="$ctrl.complexitySummary.variance">
+                                    </span>
+                                </td>
                             </tr>
                             <tr>
-                                <td>Standard Deviation</td>
-                                <td><span ng-bind="$ctrl.complexitySummary.standardDeviation"></span></td>
+                                <td title="The population standard deviation of the complexities">Standard Deviation
+                                </td>
+                                <td>
+                                    <span class="pull-right"
+                                          ng-bind="$ctrl.complexitySummary.standardDeviation">
+                                    </span>
+                                </td>
                             </tr>
                             </tbody>
 
@@ -181,3 +209,4 @@
             </div>
         </div>
     </div>
+</div>
