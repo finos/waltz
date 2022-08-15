@@ -59,12 +59,16 @@ public class DynamicJSONFormatter implements DynamicFormatter {
             long start = System.currentTimeMillis();
             byte[] response = mkResponse(reportGrid,columnDefinitions,reportRows);
             long finish = System.currentTimeMillis();
-            LOG.info("Generated JSON data {} in {}ms response. response payload sz={}bytes",id,
-                    finish-start, response.length);
+            LOG.info(
+                    "Generated JSON data {} in {}ms response. response payload sz={}bytes",
+                    id,
+                    finish-start,
+                    response.length);
             return response;
         } catch (IOException e) {
-           String err = String
-                   .format("Encountered error generating JSON response.Details:%s", e.getMessage());
+           String err = String.format(
+                   "Encountered error generating JSON response.Details:%s",
+                   e.getMessage());
            throw new IOException(err,e);
         }
     }

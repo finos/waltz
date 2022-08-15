@@ -101,7 +101,8 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
                                     .orElseThrow(() -> notFoundException.apply(reportGridIdentifier));
                             return writeReportResults(
                                     response,
-                                    prepareReport(reportGrid,
+                                    prepareReport(
+                                            reportGrid,
                                             parseExtractFormat(request),
                                             selectionOptions));
                         }catch(IOException e){
@@ -119,7 +120,9 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
 
         List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> colsWithCommentRequirement = enrichColsWithCommentRequirement(reportGrid);
 
-        List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows = prepareReportRows(colsWithCommentRequirement, reportGrid.instance());
+        List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows = prepareReportRows(
+                colsWithCommentRequirement,
+                reportGrid.instance());
 
         return formatReport(
                 format,
@@ -258,6 +261,7 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
             case CHANGE_INITIATIVE:
             case SURVEY_QUESTION:
             case DATA_TYPE:
+            case ATTESTATION:
             case APP_GROUP:
                 return Optional.ofNullable(reportGridCell.text()).orElse("-");
             case MEASURABLE:
