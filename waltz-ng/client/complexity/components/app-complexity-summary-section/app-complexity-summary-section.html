@@ -87,17 +87,37 @@
                              ng-bind="$ctrl.complexitySummary.complexityKind.description">
                         </div>
 
-                        <h4>&Sigma;<span ng-bind="$ctrl.complexitySummary.total"></span></h4>
-
                         <p>
-                            Total complexity over
+                            Complexity statistics calculated over
                             <span ng-bind="$ctrl.complexitySummary.mappedCount"></span>
                             <span ng-bind="$ctrl.targetEntityKind | toDisplayName:'entity'"></span>s.
                         </p>
-                        <p>
-                            The average complexity is
-                            <span ng-bind="$ctrl.complexitySummary.average"></span>
-                        </p>
+
+                        <table class="table table-condensed">
+                            <tbody>
+                            <tr>
+                                <td>Total</td>
+                                <td><span ng-bind="$ctrl.complexitySummary.total"></span></td>
+                            </tr>
+                            <tr>
+                                <td>Mean</td>
+                                <td><span ng-bind="$ctrl.complexitySummary.average"></span></td>
+                            </tr>
+                            <tr>
+                                <td>Median</td>
+                                <td><span ng-bind="$ctrl.complexitySummary.median"></span></td>
+                            </tr>
+                            <tr>
+                                <td>Variance</td>
+                                <td><span ng-bind="$ctrl.complexitySummary.variance"></span></td>
+                            </tr>
+                            <tr>
+                                <td>Standard Deviation</td>
+                                <td><span ng-bind="$ctrl.complexitySummary.standardDeviation"></span></td>
+                            </tr>
+                            </tbody>
+
+                        </table>
 
                         <p class="help-block"
                            ng-if="$ctrl.complexitySummary.missingCount > 0">
@@ -107,7 +127,6 @@
                             apps with no associated
                             <span ng-bind="$ctrl.complexitySummary.complexityKind.name"></span> complexity scores.
                         </p>
-
 
                         <div ng-if="$ctrl.selectedEntity"
                              style="padding-bottom: 1em;">
