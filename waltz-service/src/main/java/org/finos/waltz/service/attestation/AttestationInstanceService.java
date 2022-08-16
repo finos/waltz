@@ -240,23 +240,23 @@ public class AttestationInstanceService {
 
         CheckPermissionCommand checkPermissionCommand = createCommand.attestedEntityKind() == EntityKind.MEASURABLE_CATEGORY
                 ? ImmutableCheckPermissionCommand
-                .builder()
-                .parentEntityRef(createCommand.entityReference())
-                .subjectKind(EntityKind.MEASURABLE_RATING)
-                .operation(Operation.ATTEST)
-                .qualifierKind(createCommand.attestedEntityKind())
-                .qualifierId(createCommand.attestedEntityId())
-                .user(username)
-                .build()
+                    .builder()
+                    .parentEntityRef(createCommand.entityReference())
+                    .subjectKind(EntityKind.MEASURABLE_RATING)
+                    .operation(Operation.ATTEST)
+                    .qualifierKind(createCommand.attestedEntityKind())
+                    .qualifierId(createCommand.attestedEntityId())
+                    .user(username)
+                    .build()
                 : ImmutableCheckPermissionCommand
-                .builder()
-                .parentEntityRef(createCommand.entityReference())
-                .subjectKind(createCommand.attestedEntityKind())
-                .operation(Operation.ATTEST)
-                .qualifierKind(null)
-                .qualifierId(null)
-                .user(username)
-                .build();
+                    .builder()
+                    .parentEntityRef(createCommand.entityReference())
+                    .subjectKind(createCommand.attestedEntityKind())
+                    .operation(Operation.ATTEST)
+                    .qualifierKind(null)
+                    .qualifierId(null)
+                    .user(username)
+                    .build();
 
         if (!permissionGroupService.hasPermission(checkPermissionCommand)) {
             throw new UpdateFailedException("ATTESTATION_FAILED",

@@ -79,7 +79,7 @@ public class ReportGridEndpoint implements Endpoint {
 
 
     public ReportGrid getViewByIdRoute(Request req,
-                                                 Response resp) throws IOException {
+                                       Response resp) throws IOException {
         return reportGridService.getByIdAndSelectionOptions(
                 getId(req),
                 readIdSelectionOptionsFromBody(req))

@@ -2,42 +2,55 @@
     import _ from "lodash";
     import NoData from "../../../common/svelte/NoData.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
-    import {getDisplayNameForColumn, mkPropNameForColumnDefinition} from "./report-grid-utils";
-    import {activeSummaries, filters, selectedGrid, summaries} from "./report-grid-store";
+    import {getDisplayNameForColumn} from "./report-grid-utils";
+    import {activeSummaries, filters, summaries} from "./report-grid-store";
     import {mkChunks} from "../../../common/list-utils";
     import EntityIcon from "../../../common/svelte/EntityIcon.svelte";
 
+    const supportedColumnKinds = [
+        "ATTESTATION",
+        "ASSESSMENT_DEFINITION",
+        "MEASURABLE",
+        "DATA_TYPE",
+        "APP_GROUP",
+        "INVOLVEMENT_KIND",
+        "COST_KIND"
+    ];
+
     let chunkedSummaryData = [];
 
-    const supportedColumnKinds = ["ASSESSMENT_DEFINITION", "MEASURABLE", "DATA_TYPE", "APP_GROUP", "INVOLVEMENT_KIND", "COST_KIND"];
-
     function isSelectedSummary(cId) {
-        return _.some($filters, f => f.summaryId === cId);
+        return _.some(
+            $filters,
+            f => f.summaryId === cId);
     }
 
+
     function onToggleFilter(optionSummary) {
-        if (_.some($filters, f => f.summaryId === optionSummary.summaryId)) {
-            $filters = _.reject($filters, f => f.summaryId === optionSummary.summaryId);
+        if (isSelectedSummary(optionSummary.summaryId)) {
+            $filters = _.reject(
+                $filters,
+                f => f.summaryId === optionSummary.summaryId);
         } else {
             const newFilter = {
                 summaryId: optionSummary.summaryId,
-                propName: optionSummary.colRef,
+                columnDefinitionId: optionSummary.columnDefinitionId,
                 optionCode: optionSummary.optionInfo.code
             };
             $filters = _.concat($filters, [newFilter]);
         }
     }
 
+
     function removeSummary(summary) {
-        const refToRemove = mkPropNameForColumnDefinition(summary.column);
-        activeSummaries.remove(refToRemove);
+        activeSummaries.remove(summary.column.id);
         // remove any filters which refer to the property used by this summary
-        $filters = _.reject($filters, f => f.propName === refToRemove);
+        $filters = _.reject($filters, f => f.columnDefinitionId === summary.column.id);
     }
 
+
     function addToActiveSummaries(column) {
-        const colRef = mkPropNameForColumnDefinition(column);
-        activeSummaries.add(colRef);
+        activeSummaries.add(column.id);
     }
 
 
@@ -51,7 +64,7 @@
 
 
     function isActive(activeSummaries, summary) {
-        return _.includes(activeSummaries, mkPropNameForColumnDefinition(summary.column))
+        return _.includes(activeSummaries, summary.column.id)
     }
 
 
@@ -67,19 +80,22 @@
 
 
     $: {
-        const byPropName = _.keyBy($summaries, d => mkPropNameForColumnDefinition(d.column));
+        const byColDefId = _.keyBy(
+            $summaries,
+            d => d.column.id);
 
         const activeSummaryDefs = _
             .chain($activeSummaries)
-            .map(d => byPropName[d])
+            .map(d => byColDefId[d])
             .compact()
             .value();
 
         chunkedSummaryData = mkChunks(activeSummaryDefs, 3);
     }
 
-    $: availableSummaries = _.filter($summaries, s => _.includes(supportedColumnKinds, s.column.columnEntityKind));
-
+    $: availableSummaries = _.filter(
+        $summaries,
+        s => _.includes(supportedColumnKinds, s.column.columnEntityKind));
 </script>
 
 <div>
@@ -140,10 +156,8 @@
                                         <td class="text-right">
                                             <!-- TOTAL COUNTER -->
                                             {#if optionSummary.counts.total !== optionSummary.counts.visible}
-                                            <span class="text-muted small">
-                                                    (
-                                                    <span>{optionSummary.counts.total}</span>
-                                                    )
+                                                <span class="text-muted small">
+                                                    ({optionSummary.counts.total})
                                                 </span>
                                             {/if}
                                             <!-- VISIBLE COUNTER -->
@@ -161,9 +175,7 @@
                                     <td class="text-right">
                                         {#if summary.total !== summary.totalVisible}
                                             <span class="text-muted small">
-                                                (
-                                                <span>{summary.total}</span>
-                                                )
+                                                ({summary.total})
                                             </span>
                                         {/if}
                                         <span>{summary.totalVisible}</span>
@@ -218,7 +230,6 @@
                         </tr>
                     {/each}
                     </tbody>
-
                 </table>
             </div>
 

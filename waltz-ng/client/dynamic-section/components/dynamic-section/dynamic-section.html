@@ -31,16 +31,14 @@
                 <waltz-icon fixed-width="true"></waltz-icon>
             </span>
 
-            <span class="waltz-visibility-child-30">
-                <a class="no-text-select"
-                   ng-if="!$ctrl.embedded"
+            <span class="no-text-select waltz-visibility-child-30">
+                <a ng-if="!$ctrl.embedded"
                    ui-sref="embed.internal ({kind: $ctrl.parentEntityRef.kind, id: $ctrl.parentEntityRef.id, sectionId: $ctrl.section.id })">
                     <waltz-icon name="share-square-o"
                                 title="Embed section">
                     </waltz-icon>
                 </a>
-                <a class="no-text-select"
-                   ng-if="$ctrl.embedded"
+                <a ng-if="$ctrl.embedded"
                    target="_blank"
                    ui-sref="main.entity.ref ({kind: $ctrl.parentEntityRef.kind, id: $ctrl.parentEntityRef.id})">
                     <waltz-icon name="share-square-o"
