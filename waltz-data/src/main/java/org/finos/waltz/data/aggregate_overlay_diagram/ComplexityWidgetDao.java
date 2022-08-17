@@ -15,23 +15,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramUtilities.loadCellExtIdToAggregatedEntities;
 import static org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramUtilities.loadExpandedCellMappingsForDiagram;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository
 public class ComplexityWidgetDao {
 
-    private static final AggregateOverlayDiagramCellData cd = AggregateOverlayDiagramCellData.AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA;
-    private static final EntityHierarchy eh = EntityHierarchy.ENTITY_HIERARCHY;
-    private static final MeasurableRating mr = MeasurableRating.MEASURABLE_RATING;
-    private static final Measurable m = Measurable.MEASURABLE;
-    private static final Allocation a = Allocation.ALLOCATION;
     private static final Complexity c = Complexity.COMPLEXITY;
     private static final ComplexityKind ck = ComplexityKind.COMPLEXITY_KIND;
 
@@ -45,7 +39,7 @@ public class ComplexityWidgetDao {
     // cellExtId,
     public Set<ComplexityWidgetDatum> findWidgetData(long diagramId,
                                                      EntityKind aggregatedEntityKind,
-                                                     Long costKindId,
+                                                     Set<Long> costKindIds,
                                                      Select<Record1<Long>> inScopeEntityIdSelector) {
 
         Set<Tuple2<String, EntityReference>> cellWithBackingEntities = loadExpandedCellMappingsForDiagram(dsl, diagramId);
@@ -59,14 +53,14 @@ public class ComplexityWidgetDao {
 
         return fetchComplexityData(
                 dsl,
-                costKindId,
+                costKindIds,
                 aggregatedEntityKind,
                 cellExtIdsToAggregatedEntities);
     }
 
 
     private Set<ComplexityWidgetDatum> fetchComplexityData(DSLContext dsl,
-                                                           Long costKindId,
+                                                           Set<Long> costKindIds,
                                                            EntityKind aggregatedEntityKind,
                                                            Map<String, Set<Long>> cellExtIdToAggEntities) {
 
@@ -76,13 +70,13 @@ public class ComplexityWidgetDao {
                 .flatMap(Collection::stream)
                 .collect(toSet());
 
-        Map<Long, BigDecimal> entityIdToScoreMap = dsl
-                .select(c.ENTITY_ID, c.SCORE)
+        Map<Long, List<Tuple2<Long, BigDecimal>>> entityIdToScoreMap = dsl
+                .select(c.ENTITY_ID, c.COMPLEXITY_KIND_ID, c.SCORE)
                 .from(c)
-                .where(c.COMPLEXITY_KIND_ID.eq(costKindId))
+                .where(c.COMPLEXITY_KIND_ID.in(costKindIds))
                 .and(c.ENTITY_ID.in(diagramEntityIds)
                         .and(c.ENTITY_KIND.eq(aggregatedEntityKind.name())))
-                .fetchMap(r -> r.get(c.ENTITY_ID), r -> r.get(c.SCORE));
+                .fetchGroups(r -> r.get(c.ENTITY_ID), r -> tuple(r.get(c.COMPLEXITY_KIND_ID), r.get(c.SCORE)));
 
         return cellExtIdToAggEntities
                 .entrySet()
@@ -94,19 +88,18 @@ public class ComplexityWidgetDao {
 
                     Set<ComplexityEntry> complexities = entityIds
                             .stream()
-                            .map(id -> {
+                            .flatMap(id -> {
 
-                                BigDecimal complexity = entityIdToScoreMap.get(id);
+                                List<Tuple2<Long, BigDecimal>> complexityScores = entityIdToScoreMap.getOrDefault(id, emptyList());
 
-                                if (complexity == null) {
-                                    return null;
-                                } else {
-                                    return ImmutableComplexityEntry
-                                            .builder()
-                                            .appId(id)
-                                            .complexityScore(complexity)
-                                            .build();
-                                }
+                                return complexityScores
+                                        .stream()
+                                        .map(t -> ImmutableComplexityEntry
+                                                .builder()
+                                                .appId(id)
+                                                .complexityKindId(t.v1)
+                                                .complexityScore(t.v2)
+                                                .build());
                             })
                             .collect(toSet());
 

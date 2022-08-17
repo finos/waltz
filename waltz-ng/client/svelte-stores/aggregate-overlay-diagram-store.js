@@ -59,7 +59,6 @@ export function mkOverlayDiagramStore() {
     };
 
     const findComplexitiesForDiagram = (diagramId, widgetParameters, force = false) => {
-        console.log("loading")
         return remote
             .fetchViewList(
                 "POST",

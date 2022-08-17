@@ -309,14 +309,21 @@ export function mkAssessmentOverlayGlobalProps(data) {
 
 
 export function mkComplexityOverlayGlobalProps(data) {
-    const maxComplexity = _
+    const maxTotalComplexity = _
         .chain(data.cellData)
         .map(d => _.get(d, ["totalComplexity"], 0))
         .max()
         .value();
 
+    const maxAverageComplexity = _
+        .chain(data.cellData)
+        .map(d => _.get(d, ["averageComplexity"], 0))
+        .max()
+        .value();
+
     return {
-        maxComplexity,
+        maxTotalComplexity,
+        maxAverageComplexity,
         applicationsById: _.keyBy(data.applications, d => d.id),
         complexityKindsById: _.keyBy(data.complexityKinds, d => d.id)
     };

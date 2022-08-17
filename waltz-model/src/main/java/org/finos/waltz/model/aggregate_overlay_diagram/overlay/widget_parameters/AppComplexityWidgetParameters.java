@@ -4,11 +4,13 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.immutables.value.Value;
 
+import java.util.Set;
+
 @Value.Immutable
 @JsonSerialize(as = ImmutableAppComplexityWidgetParameters.class)
 @JsonDeserialize(as = ImmutableAppComplexityWidgetParameters.class)
 public abstract class AppComplexityWidgetParameters {
 
-    public abstract Long complexityKindId();
+    public abstract Set<Long> complexityKindIds();
 
 }

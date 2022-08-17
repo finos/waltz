@@ -12,6 +12,8 @@ public abstract class ComplexityEntry {
 
     public abstract long appId();
 
+    public abstract long complexityKindId();
+
     @Nullable
     public abstract BigDecimal complexityScore();
 

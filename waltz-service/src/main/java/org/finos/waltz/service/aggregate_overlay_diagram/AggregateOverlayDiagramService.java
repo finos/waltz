@@ -259,7 +259,7 @@ public class AggregateOverlayDiagramService {
                 .findWidgetData(
                         diagramId,
                         diagram.aggregatedEntityKind(),
-                        complexityWidgetParameters.complexityKindId(),
+                        complexityWidgetParameters.complexityKindIds(),
                         entityIdSelector);
 
         List<Application> applications = applicationDao.findByAppIdSelector(entityIdSelector);
