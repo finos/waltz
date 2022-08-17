@@ -30,10 +30,23 @@ import BackingEntitiesOverlayCell from "./widgets/backing-entities/BackingEntiti
 import AggregatedEntitiesWidgetParameters
     from "./widgets/aggregated-entities/AggregatedEntitiesWidgetParameters.svelte";
 import AggregatedEntitiesOverlayCell from "./widgets/aggregated-entities/AggregatedEntitiesOverlayCell.svelte";
-import {resetParameters as resetAssessmentParameters} from "../aggregate-overlay-diagram/widgets/assessments/AssessmentWidgetParameters.svelte";
-import {resetParameters as resetTargetAppCostParameters} from "../aggregate-overlay-diagram/widgets/target-costs/TargetAppCostWidgetParameters.svelte";
-import {resetParameters as resetAppCostParameters} from "../aggregate-overlay-diagram/widgets/app-costs/AppCostWidgetParameters.svelte";
-import {resetParameters as resetTargetAppCountParameters} from "../aggregate-overlay-diagram/widgets/app-counts/AppCountWidgetParameters.svelte";
+import {
+    resetParameters as resetComplexityParameters
+} from "../aggregate-overlay-diagram/widgets/complexities/ComplexityWidgetParameters.svelte";
+import {
+    resetParameters as resetAssessmentParameters
+} from "../aggregate-overlay-diagram/widgets/assessments/AssessmentWidgetParameters.svelte";
+import {
+    resetParameters as resetTargetAppCostParameters
+} from "../aggregate-overlay-diagram/widgets/target-costs/TargetAppCostWidgetParameters.svelte";
+import {
+    resetParameters as resetAppCostParameters
+} from "../aggregate-overlay-diagram/widgets/app-costs/AppCostWidgetParameters.svelte";
+import {
+    resetParameters as resetTargetAppCountParameters
+} from "../aggregate-overlay-diagram/widgets/app-counts/AppCountWidgetParameters.svelte";
+import ComplexityOverlayCell from "./widgets/complexities/ComplexityOverlayCell.svelte";
+import ComplexityWidgetParameters from "./widgets/complexities/ComplexityWidgetParameters.svelte";
 
 
 export function clearContent(svgHolderElem, targetSelector) {
@@ -295,6 +308,21 @@ export function mkAssessmentOverlayGlobalProps(data) {
 }
 
 
+export function mkComplexityOverlayGlobalProps(data) {
+    const maxComplexity = _
+        .chain(data.cellData)
+        .map(d => _.get(d, ["totalComplexity"], 0))
+        .max()
+        .value();
+
+    return {
+        maxComplexity,
+        applicationsById: _.keyBy(data.applications, d => d.id),
+        complexityKindsById: _.keyBy(data.complexityKinds, d => d.id)
+    };
+}
+
+
 export function mkTargetAppCountGlobalProps(data) {
     const maxCount = _
         .chain(data.cellData)
@@ -382,6 +410,17 @@ export const widgets = [
         remoteMethod: aggregateOverlayDiagramStore.findAppAssessmentsForDiagram,
         mkGlobalProps: mkAssessmentOverlayGlobalProps,
         resetParameters: resetAssessmentParameters,
+        aggregatedEntityKinds: [entity.APPLICATION.key, entity.CHANGE_INITIATIVE.key]
+    }, {
+        key: "COMPLEXITIES",
+        label: "Complexity Scores",
+        icon: "puzzle-piece",
+        description: "Allows user to select an complexity statistic to overlay on the diagram",
+        parameterWidget: ComplexityWidgetParameters,
+        overlay: ComplexityOverlayCell,
+        remoteMethod: aggregateOverlayDiagramStore.findComplexitiesForDiagram,
+        mkGlobalProps: mkComplexityOverlayGlobalProps,
+        resetParameters: resetComplexityParameters,
         aggregatedEntityKinds: [entity.APPLICATION.key, entity.CHANGE_INITIATIVE.key]
     }, {
         key: "BACKING_ENTITIES",

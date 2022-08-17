@@ -2,7 +2,7 @@ import template from "./complexity-basic-info-tile.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {determineDownwardsScopeForKind, mkSelectionOptions} from "../../../common/selector-utils";
-
+import _ from "lodash";
 
 const bindings = {
     parentEntityRef: "<",
@@ -33,7 +33,7 @@ function controller(serviceBroker) {
             .loadViewData(
                 CORE_API.ComplexityStore.findTotalsByTargetKindAndSelector,
                 ["APPLICATION", selector])
-            .then(r => vm.stats = console.log(r.data) || _.orderBy(
+            .then(r => vm.stats = _.orderBy(
                 r.data,
                 [
                     d => d.complexityKind.isDefault,

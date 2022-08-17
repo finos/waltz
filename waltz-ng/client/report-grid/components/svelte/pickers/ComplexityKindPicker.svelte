@@ -3,16 +3,16 @@
     import Grid from "../../../../common/svelte/Grid.svelte";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import _ from "lodash";
-    import {allocationSchemeStore} from "../../../../svelte-stores/allocation-scheme-store";
+    import {complexityKindStore} from "../../../../svelte-stores/complexity-kind-store";
 
     export let onSelect = () => console.log("Selecting complexity kind");
     export let selectionFilter = () => true;
 
-    $: allocationSchemesCall = allocationSchemeStore.findAll();
-    $: allocationSchemes = $allocationSchemesCall?.data;
+    $: complexityKindsCall = complexityKindStore.findAll();
+    $: complexityKinds = $complexityKindsCall?.data;
 
     $: rowData = _
-        .chain(allocationSchemes)
+        .chain(complexityKinds)
         .map(d => Object.assign(
             {},
             d,
@@ -28,7 +28,7 @@
         .value()
 
     const columnDefs = [
-        {field: "name", name: "Allocation Scheme", width: "30%"},
+        {field: "name", name: "Complexity Kind", width: "30%"},
         {field: "description", name: "Description", width: "70%", maxLength: 300}
     ];
 
@@ -36,7 +36,7 @@
 
 <div class="help-block small">
     <Icon name="info-circle"/>
-    Select an allocation scheme from the list below, you can filter the list using the search bar.
+    Select an complexity kind from the list below, you can filter the list using the search bar.
 </div>
 <br>
 <Grid {columnDefs}
