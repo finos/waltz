@@ -16,8 +16,9 @@
     let favouriteExcludedIds;
     let favouriteIds;
     let setFromPreferences;
-
-    let userPreferenceCall = userPreferenceStore.findAllForUser();
+    let expansions;
+    let userPreferences = null;
+    let userPreferenceCall;
 
     export let primaryEntityRef = [];
     export let onSelect = (d) => console.log("selected", d);
@@ -66,16 +67,21 @@
     $: {
         if (primaryEntityRef) {
             stores = createStores(primaryEntityRef);
-            defaultPrimaryList = stores.defaultPrimaryList
-            favouriteIncludedIds = stores.favouriteIncludedIds,
-                favouriteExcludedIds = stores.favouriteExcludedIds,
-                favouriteIds = stores.favouriteIds,
-                setFromPreferences = stores.setFromPreferences
+            defaultPrimaryList = stores.defaultPrimaryList;
+            favouriteIncludedIds = stores.favouriteIncludedIds;
+            favouriteExcludedIds = stores.favouriteExcludedIds;
+            favouriteIds = stores.favouriteIds;
+            setFromPreferences = stores.setFromPreferences;
         }
     }
 
 
-    $: userPreferences = $userPreferenceCall.data;
+    $: {
+        // before loaded defaults to initial state [], the derived stores pick this up and reset the favourites
+        if ($userPreferenceCall?.status === "loaded") {
+            userPreferences = $userPreferenceCall?.data;
+        }
+    }
 
 
     $: {
@@ -85,15 +91,21 @@
     }
 
 
-    $: expansions = _
+    $: {
+        if(stores) {
+            expansions = _
+                .chain($assessments)
+                .filter(d => _.includes($favouriteIncludedIds, d.definition.id)
+                    || _.includes($defaultPrimaryList, d.definition.id))
+                .reject(d => _.includes($favouriteExcludedIds, d.definition.id))
+                .map(d => d.definition.definitionGroup)
+                .uniq()
+                .value();
+        }
+    }
+
+    $: groupedAssessments = _
         .chain($assessments)
-        .filter(d => _.includes($favouriteIds, d.definition.id))
-        .map(d => d.definition.definitionGroup)
-        .uniq()
-        .value();
-
-
-    $: groupedAssessments = _.chain($assessments)
         .groupBy(d => d.definition?.definitionGroup)
         .map((v, k) => {
 
@@ -137,14 +149,24 @@
                 <col width="40%"/>
             </colgroup>
             {#each groupedAssessments as group}
-                <tbody>
-                <tr style="background-color: #eee">
+                <tbody class="assessment-group">
+                <tr class="assessment-group-header clickable">
                     <td>
-                        <button class="btn btn-skinny"
-                                on:click={() => toggleGroup(group)}>
-                            <Icon size="lg"
-                                  name={_.includes(expansions, group.groupName) ? "caret-down" : "caret-right"}/>
-                        </button>
+                        {#if _.includes(expansions, group.groupName)}
+                            <button class="btn btn-skinny"
+                                    data-ux={`${group.groupName}-caret-down-button`}
+                                    on:click={() => toggleGroup(group)}>
+                                <Icon size="lg"
+                                      name={"caret-down"}/>
+                            </button>
+                        {:else}
+                            <button class="btn btn-skinny"
+                                    data-ux={`${group.groupName}-caret-right-button`}
+                                    on:click={() => toggleGroup(group)}>
+                                <Icon size="lg"
+                                      name={"caret-right"}/>
+                            </button>
+                        {/if}
                     </td>
                     <td colspan="2"
                         class="clickable"
@@ -166,4 +188,13 @@
     </div>
 
 </div>
+
+
+<style>
+
+    .assessment-group-header {
+        background-color: #eee;
+    }
+
+</style>
 
