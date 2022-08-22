@@ -1,5 +1,6 @@
 package org.finos.waltz.test_common.helpers;
 
+import org.finos.waltz.data.user.UserDao;
 import org.finos.waltz.model.person.PersonKind;
 import org.finos.waltz.schema.tables.records.PersonRecord;
 import org.jooq.DSLContext;
@@ -17,6 +18,9 @@ public class PersonHelper {
 
     @Autowired
     private DSLContext dsl;
+
+    @Autowired
+    private UserDao userDao;
 
 
     public Long createPerson(String name) {
@@ -40,4 +44,20 @@ public class PersonHelper {
 
         return execute == 1;
     }
+
+
+    public Long createAdmin() {
+        PersonRecord p = dsl.newRecord(PERSON);
+        p.setDepartmentName("dept");
+        p.setEmail("admin@email.com");
+        p.setKind(PersonKind.EMPLOYEE.name());
+        p.setDisplayName("Admin");
+        p.setEmployeeId(Long.toString(1));
+        p.insert();
+
+        userDao.create("admin@email.com", "testUserPassword");
+
+        return p.getId();
+    }
+
 }

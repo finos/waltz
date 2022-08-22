@@ -37,7 +37,6 @@ export function createStores(primaryEntityRef) {
     // check stores initialised
     derived([favouriteIncludedIds, storesInitialised], ([$favouriteIncludedIds, $storesInitialised]) => {
         if ($storesInitialised) {
-            console.log("saving included")
             writePreference(favouriteIncludedKey, $favouriteIncludedIds);
         }
     }).subscribe(() => {
@@ -45,7 +44,6 @@ export function createStores(primaryEntityRef) {
 
     derived([favouriteExcludedIds, storesInitialised], ([$favouriteExcludedIds, $storesInitialised]) => {
         if ($storesInitialised) {
-            console.log("saving excluded")
             writePreference(favouriteExcludedKey, $favouriteExcludedIds);
         }
     }).subscribe(() => {
@@ -59,7 +57,6 @@ export function createStores(primaryEntityRef) {
         favouriteIncludedIds.set(getIdsFromString(includedFavouritesString));
         favouriteExcludedIds.set(getIdsFromString(excludedFavouritesString));
 
-        console.log("favourites set")
         storesInitialised.set(true);
     }
 

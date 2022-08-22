@@ -21,7 +21,7 @@ test.describe("home page", () => {
 
     test('User visible in the user menu', async ({page}) => {
         const user = await page.locator('[data-test-id=user-id]');
-        await expect(user).toHaveText('anonymous');
+        await expect(user).toHaveText('admin@email.com');
     });
 
     test('User menu should display all dropdown menu (excluding admin)', async ({page}) => {

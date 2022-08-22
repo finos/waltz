@@ -25,7 +25,6 @@
 
     onMount(() => {
         userPreferenceCall = userPreferenceStore.findAllForUser();
-        console.log({primaryEntityRef});
     });
 
 
@@ -80,7 +79,6 @@
     $: {
         // before loaded defaults to initial state [], the derived stores pick this up and reset the favourites
         if ($userPreferenceCall?.status === "loaded") {
-            console.log({ups: $userPreferenceCall})
             userPreferences = $userPreferenceCall?.data;
         }
     }
@@ -88,7 +86,6 @@
 
     $: {
         if (userPreferences && stores) {
-            console.log({userPreferences});
             setFromPreferences(userPreferences)
         }
     }
@@ -106,15 +103,6 @@
                 .value();
         }
     }
-
-
-    $: console.log({
-        expansions,
-        ass: $assessments,
-        faves: $favouriteIds,
-        inc: $favouriteIncludedIds,
-        def: $defaultPrimaryList
-    });
 
     $: groupedAssessments = _
         .chain($assessments)
@@ -162,13 +150,23 @@
             </colgroup>
             {#each groupedAssessments as group}
                 <tbody class="assessment-group">
-                <tr class="assessment-group-header">
+                <tr class="assessment-group-header clickable">
                     <td>
-                        <button class="btn btn-skinny"
-                                on:click={() => toggleGroup(group)}>
-                            <Icon size="lg"
-                                  name={_.includes(expansions, group.groupName) ? "caret-down" : "caret-right"}/>
-                        </button>
+                        {#if _.includes(expansions, group.groupName)}
+                            <button class="btn btn-skinny"
+                                    data-ux={`${group.groupName}-caret-down-button`}
+                                    on:click={() => toggleGroup(group)}>
+                                <Icon size="lg"
+                                      name={"caret-down"}/>
+                            </button>
+                        {:else}
+                            <button class="btn btn-skinny"
+                                    data-ux={`${group.groupName}-caret-right-button`}
+                                    on:click={() => toggleGroup(group)}>
+                                <Icon size="lg"
+                                      name={"caret-right"}/>
+                            </button>
+                        {/if}
                     </td>
                     <td colspan="2"
                         class="clickable"

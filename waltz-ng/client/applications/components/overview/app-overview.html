@@ -87,7 +87,7 @@
                     <div class="col-sm-2 waltz-display-field-label">
                         Aliases
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 waltz-alias-list">
                         <waltz-keyword-list ng-if="!$ctrl.visibility.aliasEditor"
                                             keywords="$ctrl.aliases">
                             <last>
@@ -118,9 +118,9 @@
                     <div class="col-sm-2 waltz-display-field-label">
                         Tags
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 waltz-tags-list">
                         <waltz-tag-list ng-if="!$ctrl.visibility.tagEditor"
-                                            keywords="$ctrl.tags">
+                                        keywords="$ctrl.tags">
                             <last>
                                 <span class="small">
                                     <a ng-click="$ctrl.showTagEditor()"

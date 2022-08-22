@@ -1,4 +1,5 @@
 const config = {
+    globalSetup: require.resolve("./playwright-login"),
     projects: [
         {
             name: "chromium",
@@ -8,17 +9,14 @@ const config = {
                 timeout: 120 * 1000,
                 reuseExistingServer: !process.env.CI,
             },
-            reporter: [["html", {open: "always"}]],
-            // globalSetup: require.resolve("./playwright-login"),
             use: {
-                // trace: "retain-on-failure",
                 headless: false,
                 browserName: "chromium",
                 viewport: {width: 1280, height: 720},
                 // ignoreHTTPSErrors: true,
                 baseURL: "http://localhost:8000/",
-                trace: 'retain-on-failure'
-                // storageState: "state.json",
+                retries: 3,
+                storageState: "state.json",
             },
         },
         // {
