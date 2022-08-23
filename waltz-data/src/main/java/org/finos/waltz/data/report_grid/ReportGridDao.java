@@ -75,6 +75,8 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 @Repository
 public class ReportGridDao {
 
+
+
     private final DSLContext dsl;
 
     private final org.finos.waltz.schema.tables.Measurable m = MEASURABLE.as("m");
@@ -385,10 +387,12 @@ public class ReportGridDao {
                             .map(EntityKind::valueOf)
                             .orElse(null);
 
+                    EntityKind columnEntityKind = EntityKind.valueOf(r.get(rgcd.COLUMN_ENTITY_KIND));
+
                     return ImmutableReportGridColumnDefinition.builder()
                             .id(r.get(extras.field(rgcd.ID)))
                             .columnEntityId(r.get(rgcd.COLUMN_ENTITY_ID))
-                            .columnEntityKind(EntityKind.valueOf(r.get(rgcd.COLUMN_ENTITY_KIND)))
+                            .columnEntityKind(columnEntityKind)
                             .columnName(r.get("name", String.class))
                             .columnDescription(r.get("desc", String.class))
                             .displayName(r.get(rgcd.DISPLAY_NAME))
@@ -401,6 +405,7 @@ public class ReportGridDao {
                             .build();
                 });
     }
+
 
 
     private SelectConditionStep<Record7<Long, String, String, String, String, String, String>> mkAttestationColumnDefinitionQuery(Condition condition) {
@@ -627,7 +632,7 @@ public class ReportGridDao {
                                 .builder()
                                 .columnDefinitionId(colId)
                                 .subjectId(r.get("ref_i", Long.class))
-                                .text(attAt.toString())
+                                .dateTimeValue(toLocalDateTime(attAt))
                                 .comment(format("Attested by: %s", r.get("att_by", String.class)))
                                 .build();
                     });
@@ -726,7 +731,7 @@ public class ReportGridDao {
                 .builder()
                 .subjectId(subjectId)
                 .columnDefinitionId(colDefId)
-                .text(derivedUsage.name())
+                .textValue(derivedUsage.name())
                 .build();
     }
 
@@ -756,7 +761,7 @@ public class ReportGridDao {
                                 .builder()
                                 .subjectId(subjectId)
                                 .columnDefinitionId(groupIdToDefIdMap.get(r.get(ag.ID)))
-                                .text("Y")
+                                .textValue("Y")
                                 .comment(format("Created at: %s", toLocalDate(created_at).toString()))
                                 .build();
                     })
@@ -878,7 +883,7 @@ public class ReportGridDao {
                                         .builder()
                                         .subjectId(appRecord.get(APPLICATION.ID))
                                         .columnDefinitionId(colDefn.id())
-                                        .text(textValue)
+                                        .textValue(textValue)
                                         .build();
                             }))
                     .filter(Objects::nonNull)
@@ -928,7 +933,7 @@ public class ReportGridDao {
                                         .builder()
                                         .subjectId(ciRecord.get(CHANGE_INITIATIVE.ID))
                                         .columnDefinitionId(colDefn.id())
-                                        .text(String.valueOf(value))
+                                        .textValue(String.valueOf(value))
                                         .build();
                             }))
                     .filter(Objects::nonNull)
@@ -1017,7 +1022,7 @@ public class ReportGridDao {
                                             .builder()
                                             .subjectId(surveyRecord.get(SURVEY_INSTANCE.ENTITY_ID))
                                             .columnDefinitionId(templateAndFieldRefToDefIdMap.get(tuple(templateId, fieldRef.id().get()))) // FIX
-                                            .text(textValue)
+                                            .textValue(textValue)
                                             .build();
                                 });
                     })
@@ -1052,7 +1057,7 @@ public class ReportGridDao {
                             .builder()
                             .subjectId(r.get(inv.ENTITY_ID))
                             .columnDefinitionId(involvementIdToDefIdMap.get(r.get(inv.KIND_ID)))
-                            .text(r.get(p.EMAIL))
+                            .textValue(r.get(p.EMAIL))
                             .build())
                     // we now convert to a map so we can merge text values of cells with the same coordinates (appId, entId)
                     .stream()
@@ -1061,7 +1066,7 @@ public class ReportGridDao {
                             identity(),
                             (a, b) -> ImmutableReportGridCell
                                     .copyOf(a)
-                                    .withText(a.text() + "; " + b.text())))
+                                    .withTextValue(a.textValue() + "; " + b.textValue())))
                     // and then we simply return the values of that temporary map.
                     .values());
         }
@@ -1102,7 +1107,7 @@ public class ReportGridDao {
                     .fetchSet(r -> ImmutableReportGridCell.builder()
                             .subjectId(r.get(c.ENTITY_ID))
                             .columnDefinitionId(costKindIdToDefIdMap.get(r.get(c.COST_KIND_ID)))
-                            .value(r.get(c.AMOUNT))
+                            .numberValue(r.get(c.AMOUNT))
                             .build());
         }
     }
@@ -1195,7 +1200,7 @@ public class ReportGridDao {
                                     .builder()
                                     .subjectId(entityId)
                                     .columnDefinitionId(highIdToDefIdMap.getOrDefault(measurableId, lowIdToDefIdMap.get(measurableId)))
-                                    .ratingId(t.v1)
+                                    .ratingIdValue(t.v1)
                                     .build())
                             .orElse(null);
                 })
@@ -1233,7 +1238,7 @@ public class ReportGridDao {
                     .fetchSet(r -> ImmutableReportGridCell.builder()
                         .subjectId(r.get(mr.ENTITY_ID))
                         .columnDefinitionId(measurableIdToDefIdMap.get(r.get(mr.MEASURABLE_ID)))
-                        .ratingId(r.get(rsi.ID))
+                        .ratingIdValue(r.get(rsi.ID))
                         .comment(r.get(mr.DESCRIPTION))
                         .build());
         }
@@ -1262,7 +1267,7 @@ public class ReportGridDao {
                     .fetchSet(r -> ImmutableReportGridCell.builder()
                             .subjectId(r.get(ar.ENTITY_ID))
                             .columnDefinitionId(assessmentIdToDefIdMap.get(r.get(ar.ASSESSMENT_DEFINITION_ID)))
-                            .ratingId(r.get(ar.RATING_ID))
+                            .ratingIdValue(r.get(ar.RATING_ID))
                             .comment(r.get(ar.DESCRIPTION))
                             .build());
         }
@@ -1349,7 +1354,7 @@ public class ReportGridDao {
                         return ImmutableReportGridCell.builder()
                                 .subjectId(r.get(SURVEY_INSTANCE.ENTITY_ID))
                                 .columnDefinitionId(questionIdToDefIdMap.get(questionId))
-                                .text(determineDisplayText(fieldType, entityName, response, listResponses))
+                                .textValue(determineDisplayText(fieldType, entityName, response, listResponses))
                                 .comment(r.get(SURVEY_QUESTION_RESPONSE.COMMENT))
                                 .build();
                     });

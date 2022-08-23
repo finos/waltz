@@ -41,6 +41,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.LongFunction;
 
@@ -270,19 +271,25 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
         }
         switch (colDef.columnEntityKind()) {
             case COST_KIND:
-                return reportGridCell.value();
+                return reportGridCell.numberValue();
             case INVOLVEMENT_KIND:
             case SURVEY_TEMPLATE:
             case APPLICATION:
             case CHANGE_INITIATIVE:
             case SURVEY_QUESTION:
             case DATA_TYPE:
-            case ATTESTATION:
             case APP_GROUP:
-                return Optional.ofNullable(reportGridCell.text()).orElse("-");
+                return Optional
+                        .ofNullable(reportGridCell.textValue())
+                        .orElse("-");
+            case ATTESTATION:
+                return Optional
+                        .ofNullable(reportGridCell.dateTimeValue())
+                        .map(LocalDateTime::toString)
+                        .orElse("-");
             case MEASURABLE:
             case ASSESSMENT_DEFINITION:
-                return maybeGet(ratingsById, reportGridCell.ratingId())
+                return maybeGet(ratingsById, reportGridCell.ratingIdValue())
                         .map(NameProvider::name)
                         .orElse(null);
             default:

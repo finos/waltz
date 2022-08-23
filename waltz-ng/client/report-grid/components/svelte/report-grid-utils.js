@@ -265,7 +265,7 @@ function calculateCostColorScales(gridData) {
         .filter(d =>  _.includes(costCols, d.columnDefinitionId))
         .groupBy(d => d.columnDefinitionId)
         .mapValues(v => scaleLinear()
-            .domain(extent(v, d => d.value))
+            .domain(extent(v, d => d.numberValue))
             .range(["#e2f5ff", "#86e4ff"]))
         .value();
 }
@@ -358,17 +358,17 @@ export function prepareTableData(gridData) {
         switch (colDef.columnEntityKind) {
             case "COST_KIND":
                 const costColorScale = costColorScalesByColumnDefinitionId[dataCell.columnDefinitionId];
-                const costColor = costColorScale(dataCell.value);
+                const costColor = costColorScale(dataCell.numberValue);
                 return Object.assign({}, baseCell, {
                     color: costColor,
-                    value: dataCell.value,
+                    value: dataCell.numberValue,
                 });
             case "DATA_TYPE":
                 return Object.assign({}, baseCell, {
-                    optionCode: dataCell.text,
-                    optionText: _.capitalize(dataCell.text),
-                    color: determineDataTypeUsageColor(dataCell.text),
-                    text: dataCell.text,
+                    optionCode: dataCell.textValue,
+                    optionText: _.capitalize(dataCell.textValue),
+                    color: determineDataTypeUsageColor(dataCell.textValue),
+                    text: dataCell.textValue,
                     comment: dataCell.comment
                 });
             case "ATTESTATION":
@@ -377,7 +377,7 @@ export function prepareTableData(gridData) {
             case "APP_GROUP":
                 return Object.assign({}, baseCell, {
                     color: determineColorForKind(dataCell.columnEntityKind),
-                    text: dataCell.text,
+                    text: dataCell.textValue,
                     comment: dataCell.comment
                 });
             case "SURVEY_TEMPLATE":
@@ -386,12 +386,12 @@ export function prepareTableData(gridData) {
             case "SURVEY_QUESTION":
                 return Object.assign({}, baseCell, {
                     color: determineColorForKind(dataCell.columnEntityKind),
-                    text: dataCell.text,
+                    text: dataCell.textValue,
                     comment: dataCell.comment
                 });
             case "ASSESSMENT_DEFINITION":
             case "MEASURABLE":
-                const ratingSchemeItem = ratingSchemeItemsById[dataCell.ratingId];
+                const ratingSchemeItem = ratingSchemeItemsById[dataCell.ratingIdValue];
                 const popoverHtml = mkPopoverHtml(dataCell, ratingSchemeItem);
                 return Object.assign({}, baseCell, {
                     comment: popoverHtml,
@@ -404,7 +404,7 @@ export function prepareTableData(gridData) {
             default:
                 console.error(`Cannot prepare table data for column kind:  ${colDef.columnEntityKind}, colId: ${colDef.id}`);
                 return {
-                    text: dataCell.text,
+                    text: dataCell.textValue,
                     comment: dataCell.comment
                 };
         }
