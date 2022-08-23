@@ -54,7 +54,7 @@ function controller(personStore, surveyTemplateStore) {
     const vm = this;
 
     surveyTemplateStore
-        .findAll()
+        .findByOwner()
         .then(ts => {
             vm.groupedTemplates = processTemplates(ts);
             loadOwners(vm, personStore, ts)

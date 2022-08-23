@@ -7,16 +7,19 @@
     import {entityFieldReferenceStore} from "../../../../svelte-stores/entity-field-reference-store";
     import {entity} from "../../../../common/services/enums/entity";
     import NoData from "../../../../common/svelte/NoData.svelte";
+    import Toggle from "../../../../common/svelte/Toggle.svelte";
 
     export let onSelect = () => console.log("Selecting survey field kind");
     export let selectionFilter = () => true;
 
     let selectedTemplate = null;
+    let showActiveOnly = true;
 
     $: templatesCall = surveyTemplateStore.findAll();
     $: templates = _
         .chain($templatesCall.data)
         .filter(selectionFilter)
+        .filter(r => !showActiveOnly || r.status === 'ACTIVE')
         .orderBy(d => d.name)
         .value();
 
@@ -86,6 +89,10 @@
         Select a template from the list below, you can filter the list using the search bar.
     </div>
     <br>
+    <Toggle labelOn="Active Templates Only"
+            labelOff="Active Templates Only"
+            state={showActiveOnly}
+            onToggle={() => showActiveOnly = !showActiveOnly}/>
     <Grid columnDefs={templateColumnDefs}
           rowData={templates}
           onSelectRow={selectTemplate}/>
