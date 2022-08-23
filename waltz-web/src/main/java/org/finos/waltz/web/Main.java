@@ -134,11 +134,16 @@ public class Main {
     private void registerExceptionHandlers() {
 
         EndpointUtilities.addExceptionHandler(InsufficientPrivelegeException.class, (e, req, resp) ->
-                reportException(HttpStatus.UNAUTHORIZED_401, "NOT_AUTHORIZED", e.getMessage(), resp, LOG));
+                reportException(
+                    HttpStatus.UNAUTHORIZED_401,
+                    "NOT_AUTHORIZED",
+                    e.getMessage(),
+                    resp,
+                    LOG));
 
         EndpointUtilities.addExceptionHandler(NotFoundException.class, (e, req, res) -> {
             String message = "Not found exception" + e.getMessage();
-            LOG.error(message);
+            LOG.error(message, e);
             reportException(
                     HttpStatus.NOT_FOUND_404,
                     e.getCode(),
@@ -149,7 +154,7 @@ public class Main {
 
         EndpointUtilities.addExceptionHandler(UpdateFailedException.class, (e, req, res) -> {
             String message = "Update failed exception:" + e.getMessage();
-            LOG.error(message);
+            LOG.error(message, e);
             reportException(
                     HttpStatus.BAD_REQUEST_400,
                     e.getCode(),
@@ -160,7 +165,7 @@ public class Main {
 
         EndpointUtilities.addExceptionHandler(DuplicateKeyException.class, (e, req, res) -> {
             String message = "Duplicate detected: " + e.getMessage();
-            LOG.error(message);
+            LOG.error(message, e);
             reportException(
                     HttpStatus.CONFLICT_409,
                     "DUPLICATE",
@@ -171,7 +176,7 @@ public class Main {
 
         EndpointUtilities.addExceptionHandler(DataIntegrityViolationException.class, (e, req, res) -> {
             String message = "Data integrity violation detected: " + e.getMessage();
-            LOG.error(message);
+            LOG.error(message, e);
             reportException(
                     HttpStatus.CONFLICT_409,
                     "DATA_INTEGRITY",
@@ -182,7 +187,7 @@ public class Main {
 
         EndpointUtilities.addExceptionHandler(DataAccessException.class, (e, req, resp) -> {
             String message = "Exception: " + e.getCause().getMessage();
-            LOG.error(message);
+            LOG.error(message, e);
             reportException(
                     HttpStatus.BAD_REQUEST_400,
                     e.sqlState(),
@@ -193,7 +198,7 @@ public class Main {
 
         EndpointUtilities.addExceptionHandler(IllegalArgumentException.class, (e, req, resp) -> {
             String message = "Illegal Argument Exception: " + e.getMessage();
-            LOG.error(message);
+            LOG.error(message, e);
             reportException(
                     HttpStatus.BAD_REQUEST_400,
                     "ILLEGAL ARGUMENT",
@@ -204,7 +209,7 @@ public class Main {
 
         EndpointUtilities.addExceptionHandler(WebException.class, (e, req, res) -> {
             String message = "Web exception: " + e.getMessage();
-            LOG.error(message);
+            LOG.error(message, e);
             reportException(
                     HttpStatus.INTERNAL_SERVER_ERROR_500,
                     e.getCode(),

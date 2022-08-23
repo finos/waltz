@@ -42,7 +42,7 @@ const initialState = {
     searchControlMinRows: 5,
     searchPlaceholderText: "Search...",
     searchQuery: null,
-    onInitialise: (gridApi) => console.log("Default onInitialise handler for grid-search: ", gridApi),
+    onInitialise: (gridApi) => {},
     onChange: (gridApi) => {}
 };
 

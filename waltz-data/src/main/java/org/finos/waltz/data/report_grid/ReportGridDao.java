@@ -102,8 +102,8 @@ public class ReportGridDao {
     private final org.finos.waltz.schema.tables.EntityRelationship er = ENTITY_RELATIONSHIP.as("er");
     private final org.finos.waltz.schema.tables.DataTypeUsage dtu = DATA_TYPE_USAGE.as("dtu");
     private final org.finos.waltz.schema.tables.DataType dt = DATA_TYPE.as("dt");
-    private final org.finos.waltz.schema.tables.AttestationInstance atti = ATTESTATION_INSTANCE.as("atti");
-    private final org.finos.waltz.schema.tables.AttestationRun attr = ATTESTATION_RUN.as("attr");
+    private final org.finos.waltz.schema.tables.AttestationInstance att_i = ATTESTATION_INSTANCE.as("atti");
+    private final org.finos.waltz.schema.tables.AttestationRun att_r = ATTESTATION_RUN.as("attr");
 
 
     private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
@@ -553,8 +553,8 @@ public class ReportGridDao {
                     fetchCostData(genericSelector, colsByKind.get(EntityKind.COST_KIND)),
                     fetchSummaryMeasurableData(
                             genericSelector,
-                            measurableColumnsByRollupKind.get(RatingRollupRule.PICK_HIGHEST),
-                            measurableColumnsByRollupKind.get(RatingRollupRule.PICK_LOWEST)),
+                            measurableColumnsByRollupKind.getOrDefault(RatingRollupRule.PICK_HIGHEST, emptySet()),
+                            measurableColumnsByRollupKind.getOrDefault(RatingRollupRule.PICK_LOWEST, emptySet())),
                     fetchExactMeasurableData(genericSelector, measurableColumnsByRollupKind.get(RatingRollupRule.NONE)),
                     fetchSurveyQuestionResponseData(genericSelector, colsByKind.get(EntityKind.SURVEY_QUESTION)),
                     fetchAppGroupData(genericSelector, colsByKind.get(EntityKind.APP_GROUP)),
@@ -563,79 +563,74 @@ public class ReportGridDao {
                     fetchSummaryDataTypeData(genericSelector, dataTypeColumnsByIsExact.get(Boolean.FALSE)),
                     fetchSurveyFieldReferenceData(genericSelector, complexColsByKind.get(EntityKind.SURVEY_INSTANCE)),
                     fetchChangeInitiativeFieldReferenceData(genericSelector, complexColsByKind.get(EntityKind.CHANGE_INITIATIVE)),
-                    fetchAttestationData(genericSelector, colsByKind.get(EntityKind.ATTESTATION), gridCondition));
+                    fetchAttestationData(genericSelector, colsByKind.get(EntityKind.ATTESTATION)));
         }
     }
 
+
     private Set<ReportGridCell> fetchAttestationData(GenericSelector genericSelector,
-                                                     Collection<ReportGridColumnDefinition> cols,
-                                                     Condition gridCond) {
+                                                     Collection<ReportGridColumnDefinition> cols) {
         if (isEmpty(cols)) {
             return emptySet();
         } else {
+            Map<Tuple2<EntityKind, Long>, Long> colIdsByQualifierKindAnId = indexBy(
+                    cols,
+                    c -> tuple(
+                            c.columnQualifierKind(),
+                            c.columnQualifierId()),
+                    ReportGridColumnDefinition::id);
 
-            CommonTableExpression<Record5<Long, String, Long, String, Long>> required = DSL
-                    .name("required")
-                    .fields("col_id", "ref_k", "ref_i", "att_k", "att_i")
-                    .as(DSL
-                        .select(
-                            rgcd.ID,
-                            DSL.inline(genericSelector.kind().name()),
-                            genericSelector.selector().field(0, Long.class),
-                            rgcd.COLUMN_QUALIFIER_KIND,
-                            rgcd.COLUMN_QUALIFIER_ID)
-                        .from(rgcd)
-                        .innerJoin(rg).on(rg.ID.eq(rgcd.REPORT_GRID_ID))
-                        .crossJoin(genericSelector.selector().asTable())
-                        .where(gridCond)
-                        .and(rgcd.COLUMN_QUALIFIER_KIND.isNotNull()));
+            Condition colConds = DSL.or(map(
+                    cols,
+                    c -> att_r.ATTESTED_ENTITY_KIND.eq(c.columnQualifierKind().name())
+                            .and(c.columnQualifierId() == null
+                                    ? DSL.trueCondition()
+                                    : att_r.ATTESTED_ENTITY_ID.eq(c.columnQualifierId()))));
 
-            CommonTableExpression<Record6<Long, String, Long, Timestamp, String, Timestamp>> attestations = DSL
-                    .name("attestations")
-                    .fields("col_id", "ref_k", "ref_i", "att_at", "att_by", "latest")
-                    .as(DSL
-                        .select(
-                            required.field("col_id", Long.class),
-                            atti.PARENT_ENTITY_KIND,
-                            atti.PARENT_ENTITY_ID,
-                            atti.ATTESTED_AT,
-                            atti.ATTESTED_BY,
-                            DSL.max(atti.ATTESTED_AT)
-                                .over(DSL
-                                    .partitionBy(
-                                        atti.PARENT_ENTITY_KIND,
-                                        atti.PARENT_ENTITY_ID,
-                                        atti.ATTESTED_ENTITY_KIND,
-                                        attr.ATTESTED_ENTITY_ID)
-                                    .orderBy(atti.ATTESTED_AT.desc()))
-                                .as("latest"))
-                        .from(atti)
-                        .innerJoin(attr).on(atti.ATTESTATION_RUN_ID.eq(attr.ID))
-                        .innerJoin(required).on(
-                            required.field("ref_i", Long.class).eq(atti.PARENT_ENTITY_ID)
-                                .and(required.field("ref_k", String.class).eq(atti.PARENT_ENTITY_KIND))
-                                .and(required.field("att_k", String.class).eq(atti.ATTESTED_ENTITY_KIND))
-                                .and(required.field("att_i", Long.class).eq(attr.ATTESTED_ENTITY_ID)
-                                    .or(required.field("att_i").isNull()))));
-
-            return dsl
-                    .with(required)
-                    .with(attestations)
+            SelectConditionStep<Record7<String, Long, String, Long, Timestamp, String, Integer>> rawAttestationData = dsl
                     .select(
-                            attestations.field("col_id", Long.class),
-                            attestations.field("ref_k", String.class),
-                            attestations.field("ref_i", Long.class),
-                            attestations.field("att_by", String.class),
-                            attestations.field("att_at", Timestamp.class))
-                    .from(attestations)
-                    .where(attestations.field("latest", Timestamp.class).eq(attestations.field("att_at", Timestamp.class)))
-                    .fetchSet(r -> ImmutableReportGridCell
-                            .builder()
-                            .subjectId(r.get("ref_i", Long.class))
-                            .columnDefinitionId(r.get("col_id", Long.class))
-                            .text(r.get("att_at", Timestamp.class).toString())
-                            .comment(format("Attested by: %s", r.get("att_by", String.class)))
-                            .build());
+                        att_i.PARENT_ENTITY_KIND.as("ref_k"),
+                        att_i.PARENT_ENTITY_ID.as("ref_i"),
+                        att_r.ATTESTED_ENTITY_KIND.as("att_k"),
+                        att_r.ATTESTED_ENTITY_ID.as("att_i"),
+                        att_i.ATTESTED_AT.as("att_at"),
+                        att_i.ATTESTED_BY.as("att_by"),
+                        DSL.rowNumber().over(DSL
+                                .partitionBy(
+                                        att_i.PARENT_ENTITY_KIND,
+                                        att_i.PARENT_ENTITY_ID,
+                                        att_r.ATTESTED_ENTITY_KIND,
+                                        att_r.ATTESTED_ENTITY_ID)
+                                .orderBy(att_i.ATTESTED_AT.desc())).as("latest"))
+                        .from(att_i)
+                        .innerJoin(att_r).on(att_i.ATTESTATION_RUN_ID.eq(att_r.ID))
+                        .where(att_i.PARENT_ENTITY_KIND.eq(DSL.inline(genericSelector.kind().name())))
+                        .and(att_i.PARENT_ENTITY_ID.in(genericSelector.selector()))
+                        .and(att_i.ATTESTED_AT.isNotNull())
+                        .and(colConds);
+
+            SelectConditionStep<Record> latestAttestationData = dsl
+                    .select(rawAttestationData.fields())
+                    .from(rawAttestationData.asTable())
+                    .where(rawAttestationData.field("latest", Integer.class).eq(1));
+
+            return latestAttestationData
+                    .fetchSet(r -> {
+                        Long colId = colIdsByQualifierKindAnId.get(
+                                tuple(
+                                    EntityKind.valueOf(r.get("att_k", String.class)),
+                                    r.get("att_i", Long.class)));
+
+                        Timestamp attAt = r.get("att_at", Timestamp.class);
+
+                        return ImmutableReportGridCell
+                                .builder()
+                                .columnDefinitionId(colId)
+                                .subjectId(r.get("ref_i", Long.class))
+                                .text(attAt.toString())
+                                .comment(format("Attested by: %s", r.get("att_by", String.class)))
+                                .build();
+                    });
         }
     }
 

@@ -410,18 +410,38 @@ export function prepareTableData(gridData) {
         }
     }
 
+    const cellsBySubjectId = _.groupBy(
+        gridData.instance.cellData,
+        d => d.subjectId);
+
+    const emptyRow = _.reduce(
+        colDefs,
+        (acc, c) => {
+            acc[c.id] = unknownRating;
+            return acc;
+        },
+        {});
+
     return _
-        .chain(gridData.instance.cellData)
-        .groupBy(d => d.subjectId)
-        .map((xs, k) => _.reduce(
-            xs,
-            (acc, cell) => {
-                acc[cell.columnDefinitionId] = mkTableCell(cell);
-                return acc;
-            },
-            initialiseDataForRow(subjectsById[k], colDefs)))
+        .chain(gridData.instance.subjects)
+        .map(s => {
+            const rowCells = _.reduce(
+                _.get(cellsBySubjectId, [s.entityReference.id], []),
+                (acc, cell) => {
+                    acc[cell.columnDefinitionId] = mkTableCell(cell);
+                    return acc;
+                },
+                {});
+
+            return Object.assign(
+                {},
+                emptyRow,
+                {subject: s},
+                rowCells);
+        })
         .orderBy(row => row.subject.name)
         .value();
+
 }
 
 
