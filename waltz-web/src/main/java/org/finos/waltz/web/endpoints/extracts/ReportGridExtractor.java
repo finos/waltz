@@ -45,6 +45,7 @@ import java.util.*;
 import java.util.function.LongFunction;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.MapUtilities.*;
@@ -211,20 +212,18 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
                 .map(r -> StringUtilities.isEmpty(r) || Boolean.parseBoolean(r))
                 .orElse(true);
 
-        return tableDataBySubjectId
-                .entrySet()
+        return reportGridInstance
+                .subjects()
                 .stream()
-                .map(r -> {
-                    Long subjectId = r.getKey();
-
-                    ReportSubject subject = subjectsById.getOrDefault(subjectId, null);
+                .map(subject -> {
+                    Collection<ReportGridCell> cellsForSubject = tableDataBySubjectId.getOrDefault(
+                            subject.entityReference().id(),
+                            emptySet());
 
                     ArrayList<Object> reportRow = new ArrayList<>();
 
-                    Collection<ReportGridCell> cells = r.getValue();
-
                     Map<Long, ReportGridCell> cellValuesByColumnRefForSubject = indexBy(
-                            cells,
+                            cellsForSubject,
                             ReportGridCell::columnDefinitionId);
 
                     //find data for columns
@@ -251,6 +250,7 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
                 })
                 .sorted(Comparator.comparing(t -> t.v1.entityReference().name().get()))
                 .collect(toList());
+
     }
 
 
