@@ -43,7 +43,6 @@ public class AggregatedEntitiesWidgetDao {
 
         Map<String, Set<Long>> cellExtIdsToAggregatedEntities = loadCellExtIdToAggregatedEntities(
                 dsl,
-                diagramId,
                 cellWithBackingEntities,
                 aggregatedEntityKind,
                 inScopeEntityIdSelector,

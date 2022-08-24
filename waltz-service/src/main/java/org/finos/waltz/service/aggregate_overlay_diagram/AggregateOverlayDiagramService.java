@@ -2,15 +2,9 @@ package org.finos.waltz.service.aggregate_overlay_diagram;
 
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
-import org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramDao;
-import org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramPresetDao;
-import org.finos.waltz.data.aggregate_overlay_diagram.AggregatedEntitiesWidgetDao;
-import org.finos.waltz.data.aggregate_overlay_diagram.AppCostWidgetDao;
-import org.finos.waltz.data.aggregate_overlay_diagram.AppCountWidgetDao;
-import org.finos.waltz.data.aggregate_overlay_diagram.AssessmentRatingWidgetDao;
-import org.finos.waltz.data.aggregate_overlay_diagram.BackingEntityWidgetDao;
-import org.finos.waltz.data.aggregate_overlay_diagram.TargetAppCostWidgetDao;
+import org.finos.waltz.data.aggregate_overlay_diagram.*;
 import org.finos.waltz.data.application.ApplicationDao;
+import org.finos.waltz.data.complexity.ComplexityKindDao;
 import org.finos.waltz.data.cost.CostKindDao;
 import org.finos.waltz.data.measurable.MeasurableDao;
 import org.finos.waltz.model.AssessmentBasedSelectionFilter;
@@ -22,11 +16,9 @@ import org.finos.waltz.model.aggregate_overlay_diagram.BackingEntity;
 import org.finos.waltz.model.aggregate_overlay_diagram.ImmutableAggregateOverlayDiagramInfo;
 import org.finos.waltz.model.aggregate_overlay_diagram.OverlayDiagramPresetCreateCommand;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.*;
-import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AppCostWidgetParameters;
-import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AppCountWidgetParameters;
-import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AssessmentWidgetParameters;
-import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.TargetAppCostWidgetParameters;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.*;
 import org.finos.waltz.model.application.Application;
+import org.finos.waltz.model.complexity.ComplexityKind;
 import org.finos.waltz.model.cost.EntityCostKind;
 import org.finos.waltz.model.measurable.Measurable;
 import org.jooq.Record1;
@@ -58,6 +50,8 @@ public class AggregateOverlayDiagramService {
     private final MeasurableDao measurableDao;
     private final ApplicationDao applicationDao;
     private final CostKindDao costKindDao;
+    private final ComplexityKindDao complexityKindDao;
+    private final ComplexityWidgetDao complexityWidgetDao;
 
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
 
@@ -72,7 +66,9 @@ public class AggregateOverlayDiagramService {
                                           AggregateOverlayDiagramPresetDao aggregateOverlayDiagramPresetDao,
                                           MeasurableDao measurableDao,
                                           ApplicationDao applicationDao,
-                                          CostKindDao costKindDao) {
+                                          CostKindDao costKindDao,
+                                          ComplexityKindDao complexityKindDao,
+                                          ComplexityWidgetDao complexityWidgetDao) {
 
         this.aggregateOverlayDiagramDao = aggregateOverlayDiagramDao;
         this.appCountWidgetDao = appCountWidgetDao;
@@ -85,6 +81,8 @@ public class AggregateOverlayDiagramService {
         this.measurableDao = measurableDao;
         this.applicationDao = applicationDao;
         this.costKindDao = costKindDao;
+        this.complexityKindDao = complexityKindDao;
+        this.complexityWidgetDao = complexityWidgetDao;
     }
 
 
@@ -159,8 +157,7 @@ public class AggregateOverlayDiagramService {
                 diagramId,
                 appCostWidgetParameters.costKindIds(),
                 appCostWidgetParameters.allocationSchemeId(),
-                entityIdSelector,
-                Optional.empty());
+                entityIdSelector);
 
         Set<Long> measurableIds = costData
                 .stream()
@@ -247,4 +244,32 @@ public class AggregateOverlayDiagramService {
     }
 
 
+    public ComplexityWidgetData getAppComplexityWidgetData(long diagramId,
+                                                           Set<AssessmentBasedSelectionFilter> assessmentBasedSelectionFilters,
+                                                           IdSelectionOptions idSelectionOptions,
+                                                           AppComplexityWidgetParameters complexityWidgetParameters) {
+
+
+        AggregateOverlayDiagram diagram = aggregateOverlayDiagramDao.getById(diagramId);
+
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(diagram.aggregatedEntityKind(), idSelectionOptions);
+        Select<Record1<Long>> entityIdSelector = applyFiltersToSelector(genericSelector, assessmentBasedSelectionFilters);
+
+        Set<ComplexityWidgetDatum> complexityData = complexityWidgetDao
+                .findWidgetData(
+                        diagramId,
+                        diagram.aggregatedEntityKind(),
+                        complexityWidgetParameters.complexityKindIds(),
+                        entityIdSelector);
+
+        List<Application> applications = applicationDao.findByAppIdSelector(entityIdSelector);
+        Set<ComplexityKind> complexityKinds = complexityKindDao.findAll();
+
+        return ImmutableComplexityWidgetData
+                .builder()
+                .cellData(complexityData)
+                .applications(applications)
+                .complexityKinds(complexityKinds)
+                .build();
+    }
 }
