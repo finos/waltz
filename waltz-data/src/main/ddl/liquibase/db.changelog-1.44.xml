@@ -54,20 +54,36 @@
         <insert tableName="entity_field_reference">
             <column name="entity_kind" value="ORG_UNIT"/>
             <column name="field_name" value="name"/>
-            <column name="display_name" value="Org Unit Name"/>
+            <column name="display_name" value="Name"/>
             <column name="description" value="The name of the owning organisational unit"/>
         </insert>
         <insert tableName="entity_field_reference">
             <column name="entity_kind" value="ORG_UNIT"/>
             <column name="field_name" value="description"/>
-            <column name="display_name" value="Org Unit Description"/>
+            <column name="display_name" value="Description"/>
             <column name="description" value="The description of the owning organisational unit"/>
         </insert>
         <insert tableName="entity_field_reference">
             <column name="entity_kind" value="ORG_UNIT"/>
             <column name="field_name" value="external_id"/>
-            <column name="display_name" value="Org Unit External Id"/>
+            <column name="display_name" value="External Id"/>
             <column name="description" value="The external identifier of the owning organisational unit"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="20220824-6192-2"
+               author="woodjes">
+        <insert tableName="entity_field_reference">
+            <column name="entity_kind" value="CHANGE_INITIATIVE"/>
+            <column name="field_name" value="description"/>
+            <column name="display_name" value="Description"/>
+            <column name="description" value="The description of the change initiative"/>
+        </insert>
+        <insert tableName="entity_field_reference">
+            <column name="entity_kind" value="CHANGE_INITIATIVE"/>
+            <column name="field_name" value="parent_external_id"/>
+            <column name="display_name" value="Parent External Id"/>
+            <column name="description" value="The external identifier of the parent change initiative"/>
         </insert>
     </changeSet>
 

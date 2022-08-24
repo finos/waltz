@@ -29,6 +29,7 @@ import org.finos.waltz.model.entity_field_reference.ImmutableEntityFieldReferenc
 import org.finos.waltz.model.report_grid.*;
 import org.finos.waltz.model.usage_info.UsageKind;
 import org.finos.waltz.schema.Tables;
+import org.finos.waltz.schema.tables.ChangeInitiative;
 import org.finos.waltz.schema.tables.records.ReportGridColumnDefinitionRecord;
 import org.finos.waltz.schema.tables.records.ReportGridRecord;
 import org.jooq.*;
@@ -923,10 +924,15 @@ public class ReportGridDao {
                     .stream()
                     .collect(toMap(k -> k.v2.fieldName(), v -> v.v1));
 
+            ChangeInitiative ci = CHANGE_INITIATIVE.as("ci");
+            ChangeInitiative ci_parent = CHANGE_INITIATIVE.as("ci_parent");
+
             return dsl
-                    .select(CHANGE_INITIATIVE.fields())
-                    .from(CHANGE_INITIATIVE)
-                    .where(CHANGE_INITIATIVE.ID.in(selector.selector()))
+                    .select(ci.fields())
+                    .select(ci_parent.EXTERNAL_ID.as("parent_external_id"))
+                    .from(ci)
+                    .leftJoin(ci_parent).on(ci.PARENT_ID.eq(ci_parent.ID))
+                    .where(ci.ID.in(selector.selector()))
                     .fetch()
                     .stream()
                     .flatMap(ciRecord -> fields
@@ -934,7 +940,7 @@ public class ReportGridDao {
                             .map(fieldName -> {
                                 ReportGridColumnDefinition colDefn = columnDefinitionsByFieldReference.get(fieldName);
 
-                                Object value = ciRecord.get(CHANGE_INITIATIVE.field(fieldName));
+                                Object value = ciRecord.get(fieldName);
 
                                 if (value == null) {
                                     return null;
