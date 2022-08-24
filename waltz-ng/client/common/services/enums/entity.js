@@ -164,6 +164,13 @@ export const entity = {
         description: null,
         position: 120
     },
+    ENTITY_ALIAS: {
+        key: "ENTITY_ALIAS",
+        name: "Entity Alias",
+        icon: "id-badge",
+        description: null,
+        position: 125
+    },
     ENTITY_RELATIONSHIP: {
         key: "ENTITY_RELATIONSHIP",
         name: "Entity Relationship",
@@ -380,5 +387,12 @@ export const entity = {
         icon: "gears",
         description: null,
         position: 260
+    },
+    TAG: {
+        key: "TAG",
+        name: "Tag",
+        icon: "tags",
+        description: null,
+        position: 270
     }
 };

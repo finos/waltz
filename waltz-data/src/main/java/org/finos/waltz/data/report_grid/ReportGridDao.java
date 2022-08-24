@@ -20,6 +20,7 @@ package org.finos.waltz.data.report_grid;
 
 
 import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
@@ -108,7 +109,10 @@ public class ReportGridDao {
     private final org.finos.waltz.schema.tables.AttestationInstance att_i = ATTESTATION_INSTANCE.as("atti");
     private final org.finos.waltz.schema.tables.AttestationRun att_r = ATTESTATION_RUN.as("attr");
     private final org.finos.waltz.schema.tables.OrganisationalUnit ou = ORGANISATIONAL_UNIT.as("ou");
+    private final org.finos.waltz.schema.tables.TagUsage tu = TAG_USAGE.as("tu");
+    private final org.finos.waltz.schema.tables.Tag t = TAG.as("t");
 
+    private final org.finos.waltz.schema.tables.EntityAlias ea = ENTITY_ALIAS.as("ea");
 
     private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
                     SURVEY_QUESTION_RESPONSE.ENTITY_RESPONSE_ID,
@@ -358,6 +362,18 @@ public class ReportGridDao {
                 dt.DESCRIPTION,
                 condition);
 
+        SelectConditionStep<Record7<Long, String, String, String, String, String, String>> tagColumns = mkEntityDescriptorColumnDefinitionQry(
+                EntityKind.TAG,
+                "Tags",
+                "Tags associated to this entity",
+                condition);
+
+        SelectConditionStep<Record7<Long, String, String, String, String, String, String>> aliasColumns = mkEntityDescriptorColumnDefinitionQry(
+                EntityKind.ENTITY_ALIAS,
+                "Aliases",
+                "Aliases associated to this entity",
+                condition);
+
         SelectConditionStep<Record7<Long, String, String, String, String, String, String>> attestationColumns = mkAttestationColumnDefinitionQuery(
                 condition);
 
@@ -373,6 +389,8 @@ public class ReportGridDao {
                 .unionAll(orgUnitMetaColumns)
                 .unionAll(dataTypeColumns)
                 .unionAll(attestationColumns)
+                .unionAll(tagColumns)
+                .unionAll(aliasColumns)
                 .asTable("extras");
 
         return dsl
@@ -508,6 +526,25 @@ public class ReportGridDao {
                 .and(rgcd.COLUMN_ENTITY_KIND.eq(entityKind.name()));
     }
 
+    private SelectConditionStep<Record7<Long, String, String, String, String, String, String>> mkEntityDescriptorColumnDefinitionQry(EntityKind entityKind,
+                                                                                                                                     String columnName,
+                                                                                                                                     String columnDescription,
+                                                                                                                                     Condition reportCondition) {
+        return dsl
+                .select(rgcd.ID,
+                        DSL.val(columnName),
+                        DSL.val(columnDescription),
+                        efr.ENTITY_KIND,
+                        efr.DISPLAY_NAME,
+                        efr.DESCRIPTION,
+                        efr.FIELD_NAME)
+                .from(rgcd)
+                .innerJoin(rg).on(rg.ID.eq(rgcd.REPORT_GRID_ID))
+                .leftJoin(efr).on(rgcd.ENTITY_FIELD_REFERENCE_ID.eq(efr.ID))
+                .where(reportCondition)
+                .and(rgcd.COLUMN_ENTITY_KIND.eq(entityKind.name()));
+    }
+
 
     private Set<ReportGridCell> findCellDataByGridCondition(Condition gridCondition,
                                                             GenericSelector genericSelector) {
@@ -580,7 +617,9 @@ public class ReportGridDao {
                     fetchSurveyFieldReferenceData(genericSelector, complexColsByKind.get(EntityKind.SURVEY_INSTANCE)),
                     fetchChangeInitiativeFieldReferenceData(genericSelector, complexColsByKind.get(EntityKind.CHANGE_INITIATIVE)),
                     fetchAttestationData(genericSelector, colsByKind.get(EntityKind.ATTESTATION)),
-                    fetchOrgUnitFieldReferenceData(genericSelector, complexColsByKind.get(EntityKind.ORG_UNIT)));
+                    fetchOrgUnitFieldReferenceData(genericSelector, complexColsByKind.get(EntityKind.ORG_UNIT)),
+                    fetchTagData(genericSelector, colsByKind.get(EntityKind.TAG)),
+                    fetchAliasData(genericSelector, colsByKind.get(EntityKind.ENTITY_ALIAS)));
         }
     }
 
@@ -661,7 +700,7 @@ public class ReportGridDao {
                     cols,
                     ReportGridColumnDefinition::columnEntityId,
                     ReportGridColumnDefinition::id);
-             return dsl
+            return dsl
                     .select(dtu.ENTITY_ID,
                             dtu.DATA_TYPE_ID,
                             dtu.USAGE_KIND)
@@ -672,19 +711,19 @@ public class ReportGridDao {
                     .fetchGroups(r -> tuple(
                             r.get(dtu.ENTITY_ID),
                             r.get(dtu.DATA_TYPE_ID)))
-                     .entrySet()
-                     .stream()
-                     .map(entry -> {
-                         Set<UsageKind> usageKinds = map(
-                             entry.getValue(),
-                             d -> UsageKind.valueOf(d.get(dtu.USAGE_KIND)));
+                    .entrySet()
+                    .stream()
+                    .map(entry -> {
+                        Set<UsageKind> usageKinds = map(
+                                entry.getValue(),
+                                d -> UsageKind.valueOf(d.get(dtu.USAGE_KIND)));
 
-                         return mkDataTypeUsageCell(
-                                 dataTypeIdToDefIdMap.get(entry.getKey().v2),
-                                 entry.getKey().v1,
-                                 entry.getKey().v2,
-                                 usageKinds);
-                     })
+                        return mkDataTypeUsageCell(
+                                dataTypeIdToDefIdMap.get(entry.getKey().v2),
+                                entry.getKey().v1,
+                                entry.getKey().v2,
+                                usageKinds);
+                    })
                     .collect(toSet());
         }
     }
@@ -1156,6 +1195,86 @@ public class ReportGridDao {
         }
     }
 
+
+    private Set<ReportGridCell> fetchTagData(GenericSelector selector,
+                                             Collection<ReportGridColumnDefinition> cols) {
+        if (isEmpty(cols)) {
+            return emptySet();
+        } else {
+
+            //Should only be one tags column max
+            Optional<Long> tagsColumn = cols
+                    .stream()
+                    .map(ReportGridColumnDefinition::id)
+                    .findFirst();
+
+            return tagsColumn
+                    .map(columnId -> SetUtilities.<ReportGridCell>fromCollection(dsl
+                            .select(tu.ENTITY_ID,
+                                    t.NAME)
+                            .from(tu)
+                            .innerJoin(t).on(t.ID.eq(tu.TAG_ID).and(t.TARGET_KIND.eq(tu.ENTITY_KIND)))
+                            .where(tu.ENTITY_KIND.eq(selector.kind().name()))
+                            .and(tu.ENTITY_ID.in(selector.selector()))
+                            .fetchSet(r -> ImmutableReportGridCell
+                                    .builder()
+                                    .subjectId(r.get(tu.ENTITY_ID))
+                                    .columnDefinitionId(columnId)
+                                    .textValue(r.get(t.NAME))
+                                    .build())
+                            // we now convert to a map so we can merge text values of cells with the same coordinates (appId, entId)
+                            .stream()
+                            .collect(toMap(
+                                    c1 -> tuple(c1.subjectId(), c1.columnDefinitionId()),
+                                    identity(),
+                                    (a1, b) -> ImmutableReportGridCell
+                                            .copyOf(a1)
+                                            .withTextValue(a1.textValue() + "; " + b.textValue())))
+                            // and then we simply return the values of that temporary map.
+                            .values()))
+                    .orElse(emptySet());
+        }
+    }
+
+
+    private Set<ReportGridCell> fetchAliasData(GenericSelector selector,
+                                               Collection<ReportGridColumnDefinition> cols) {
+        if (isEmpty(cols)) {
+            return emptySet();
+        } else {
+
+            //Should only be one alias column max
+            Optional<Long> aliasColumn = cols
+                    .stream()
+                    .map(ReportGridColumnDefinition::id)
+                    .findFirst();
+
+            return aliasColumn
+                    .map(columnId -> SetUtilities.<ReportGridCell>fromCollection(dsl
+                            .select(ea.ID,
+                                    ea.ALIAS)
+                            .from(ea)
+                            .where(ea.KIND.eq(selector.kind().name()))
+                            .and(ea.ID.in(selector.selector()))
+                            .fetchSet(r -> ImmutableReportGridCell
+                                    .builder()
+                                    .subjectId(r.get(ea.ID))
+                                    .columnDefinitionId(columnId)
+                                    .textValue(r.get(ea.ALIAS))
+                                    .build())
+                            // we now convert to a map so we can merge text values of cells with the same coordinates (appId, entId)
+                            .stream()
+                            .collect(toMap(
+                                    c1 -> tuple(c1.subjectId(), c1.columnDefinitionId()),
+                                    identity(),
+                                    (a1, b) -> ImmutableReportGridCell
+                                            .copyOf(a1)
+                                            .withTextValue(a1.textValue() + "; " + b.textValue())))
+                            // and then we simply return the values of that temporary map.
+                            .values()))
+                    .orElse(emptySet());
+        }
+    }
 
     private Set<ReportGridCell> fetchCostData(GenericSelector selector,
                                               Collection<ReportGridColumnDefinition> cols) {

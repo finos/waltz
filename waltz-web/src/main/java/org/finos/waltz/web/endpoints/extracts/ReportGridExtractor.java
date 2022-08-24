@@ -201,7 +201,6 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
 
         Set<ReportGridCell> tableData = reportGridInstance.cellData();
 
-        Map<Long, ReportSubject> subjectsById = indexBy(reportGridInstance.subjects(), d -> d.entityReference().id());
         Map<Long, RatingSchemeItem> ratingsById = indexById(reportGridInstance.ratingSchemeItems());
 
         Map<Long, Collection<ReportGridCell>> tableDataBySubjectId = groupBy(
@@ -279,6 +278,9 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
             case SURVEY_QUESTION:
             case DATA_TYPE:
             case APP_GROUP:
+            case ORG_UNIT:
+            case TAG:
+            case ENTITY_ALIAS:
                 return Optional
                         .ofNullable(reportGridCell.textValue())
                         .orElse("-");

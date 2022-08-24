@@ -87,4 +87,14 @@
         </insert>
     </changeSet>
 
+    <changeSet id="20220824-6192-3"
+               author="woodjes">
+        <insert tableName="entity_field_reference">
+            <column name="entity_kind" value="APPLICATION"/>
+            <column name="field_name" value="description"/>
+            <column name="display_name" value="Description"/>
+            <column name="description" value="The description of the application"/>
+        </insert>
+    </changeSet>
+
 </databaseChangeLog>
