@@ -285,7 +285,7 @@ function determineColorForKind(columnEntityKind) {
         case "SURVEY_QUESTION":
             return "#fff59d";
         case "ORG_UNIT":
-            return "#eecfff";
+            return "#f3e4ff";
         default:
             return "#dbfffe"
     }
@@ -383,7 +383,7 @@ export function prepareTableData(gridData) {
             case "ORG_UNIT":
             case "SURVEY_QUESTION":
                 return Object.assign({}, baseCell, {
-                    color: determineColorForKind(dataCell.columnEntityKind),
+                    color: determineColorForKind(colDef.columnEntityKind),
                     text: dataCell.textValue,
                     comment: dataCell.comment
                 });
