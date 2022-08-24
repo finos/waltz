@@ -284,6 +284,8 @@ function determineColorForKind(columnEntityKind) {
             return "#e0ffe1";
         case "SURVEY_QUESTION":
             return "#fff59d";
+        case "ORG_UNIT":
+            return "#eecfff";
         default:
             return "#dbfffe"
     }
@@ -292,7 +294,7 @@ function determineColorForKind(columnEntityKind) {
 
 
 function mkAttestationCell(dataCell) {
-    const attDate = new Date(dataCell.text);
+    const attDate = new Date(dataCell.dateTimeValue);
     const attColor = attestationColorScale(attDate);
 
     let attOptions = {};
@@ -326,7 +328,7 @@ function mkAttestationCell(dataCell) {
 
     const cellValues = {
         color: attColor,
-        text: dataCell.text,
+        text: dataCell.dateTimeValue,
         comment: dataCell.comment
     };
 
@@ -375,14 +377,10 @@ export function prepareTableData(gridData) {
                 return mkAttestationCell(dataCell);
             case "INVOLVEMENT_KIND":
             case "APP_GROUP":
-                return Object.assign({}, baseCell, {
-                    color: determineColorForKind(dataCell.columnEntityKind),
-                    text: dataCell.textValue,
-                    comment: dataCell.comment
-                });
             case "SURVEY_TEMPLATE":
             case "APPLICATION":
             case "CHANGE_INITIATIVE":
+            case "ORG_UNIT":
             case "SURVEY_QUESTION":
                 return Object.assign({}, baseCell, {
                     color: determineColorForKind(dataCell.columnEntityKind),
@@ -548,11 +546,21 @@ export function mkRowFilter(filters = []) {
 
 export function sameColumnRef(v1, v2) {
     if (!v1 || !v2) return false;
+
+    const fieldRef1 = _.get(v1, ["entityFieldReference", "id"], null);
+    const fieldRef2 = _.get(v2, ["entityFieldReference", "id"], null);
+
+    const qualiKind1 = _.get(v1, ["columnQualifierKind"], null);
+    const qualiKind2 = _.get(v2, ["columnQualifierKind"], null);
+
+    const qualiId1 = _.get(v1, ["columnQualifierId"], null);
+    const qualiId2 = _.get(v2, ["columnQualifierId"], null);
+
     return v1.columnEntityKind === v2.columnEntityKind
         && v1.columnEntityId === v2.columnEntityId
-        && v1.entityFieldReference?.id === v2.entityFieldReference?.id
-        && v1.columnQualifierKind === v2.columnQualifierKind
-        && v1.columnQualifierId === v2.columnQualifierId;
+        && fieldRef1 === fieldRef2
+        && qualiKind1 === qualiKind2
+        && qualiId1 === qualiId2;
 }
 
 

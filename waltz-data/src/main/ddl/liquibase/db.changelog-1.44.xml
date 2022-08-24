@@ -49,4 +49,26 @@
         </createIndex>
     </changeSet>
 
+    <changeSet id="20220823-6192-1"
+               author="woodjes">
+        <insert tableName="entity_field_reference">
+            <column name="entity_kind" value="ORG_UNIT"/>
+            <column name="field_name" value="name"/>
+            <column name="display_name" value="Org Unit Name"/>
+            <column name="description" value="The name of the owning organisational unit"/>
+        </insert>
+        <insert tableName="entity_field_reference">
+            <column name="entity_kind" value="ORG_UNIT"/>
+            <column name="field_name" value="description"/>
+            <column name="display_name" value="Org Unit Description"/>
+            <column name="description" value="The description of the owning organisational unit"/>
+        </insert>
+        <insert tableName="entity_field_reference">
+            <column name="entity_kind" value="ORG_UNIT"/>
+            <column name="field_name" value="external_id"/>
+            <column name="display_name" value="Org Unit External Id"/>
+            <column name="description" value="The external identifier of the owning organisational unit"/>
+        </insert>
+    </changeSet>
+
 </databaseChangeLog>

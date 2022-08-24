@@ -106,6 +106,7 @@ public class ReportGridDao {
     private final org.finos.waltz.schema.tables.DataType dt = DATA_TYPE.as("dt");
     private final org.finos.waltz.schema.tables.AttestationInstance att_i = ATTESTATION_INSTANCE.as("atti");
     private final org.finos.waltz.schema.tables.AttestationRun att_r = ATTESTATION_RUN.as("attr");
+    private final org.finos.waltz.schema.tables.OrganisationalUnit ou = ORGANISATIONAL_UNIT.as("ou");
 
 
     private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
@@ -340,6 +341,14 @@ public class ReportGridDao {
                 ci.DESCRIPTION,
                 condition);
 
+        SelectConditionStep<Record7<Long, String, String, String, String, String, String>> orgUnitMetaColumns = mkSupplementalColumnDefinitionQuery(
+                EntityKind.ORG_UNIT,
+                ou,
+                ou.ID,
+                ou.NAME,
+                ou.DESCRIPTION,
+                condition);
+
         SelectConditionStep<Record7<Long, String, String, String, String, String, String>> dataTypeColumns = mkSupplementalColumnDefinitionQuery(
                 EntityKind.DATA_TYPE,
                 dt,
@@ -360,6 +369,7 @@ public class ReportGridDao {
                 .unionAll(surveyMetaColumns)
                 .unionAll(applicationMetaColumns)
                 .unionAll(changeInitiativeMetaColumns)
+                .unionAll(orgUnitMetaColumns)
                 .unionAll(dataTypeColumns)
                 .unionAll(attestationColumns)
                 .asTable("extras");
@@ -568,7 +578,8 @@ public class ReportGridDao {
                     fetchSummaryDataTypeData(genericSelector, dataTypeColumnsByIsExact.get(Boolean.FALSE)),
                     fetchSurveyFieldReferenceData(genericSelector, complexColsByKind.get(EntityKind.SURVEY_INSTANCE)),
                     fetchChangeInitiativeFieldReferenceData(genericSelector, complexColsByKind.get(EntityKind.CHANGE_INITIATIVE)),
-                    fetchAttestationData(genericSelector, colsByKind.get(EntityKind.ATTESTATION)));
+                    fetchAttestationData(genericSelector, colsByKind.get(EntityKind.ATTESTATION)),
+                    fetchOrgUnitFieldReferenceData(genericSelector, complexColsByKind.get(EntityKind.ORG_UNIT)));
         }
     }
 
@@ -943,7 +954,7 @@ public class ReportGridDao {
 
 
     private Set<ReportGridCell> fetchSurveyFieldReferenceData(GenericSelector selector,
-                                                             Set<Tuple2<ReportGridColumnDefinition, EntityFieldReference>> surveyInstanceInfo) {
+                                                              Set<Tuple2<ReportGridColumnDefinition, EntityFieldReference>> surveyInstanceInfo) {
         if (isEmpty(surveyInstanceInfo)) {
             return emptySet();
         } else {
@@ -1029,6 +1040,73 @@ public class ReportGridDao {
                     .filter(Objects::nonNull)
                     .collect(toSet());
         }
+    }
+
+
+    private Set<ReportGridCell> fetchOrgUnitFieldReferenceData(GenericSelector selector,
+                                                               Set<Tuple2<ReportGridColumnDefinition, EntityFieldReference>> requiredOrgUnitColumns) {
+
+        if (isEmpty(requiredOrgUnitColumns)) {
+            return emptySet();
+        } else {
+
+            Set<String> fields = map(requiredOrgUnitColumns, d -> d.v2.fieldName());
+
+            Map<String, ReportGridColumnDefinition> columnDefinitionsByFieldReference = requiredOrgUnitColumns
+                    .stream()
+                    .collect(toMap(k -> k.v2.fieldName(), v -> v.v1));
+
+            SelectConditionStep<Record> qry = getOrgUnitSelectQuery(selector);
+
+            return qry
+                    .fetch()
+                    .stream()
+                    .flatMap(orgUnitRecord -> fields
+                            .stream()
+                            .map(fieldName -> {
+                                ReportGridColumnDefinition colDefn = columnDefinitionsByFieldReference.get(fieldName);
+
+                                Field<?> field = ORGANISATIONAL_UNIT.field(fieldName);
+                                Object rawValue = orgUnitRecord.get(field);
+
+                                if (rawValue == null) {
+                                    return null;
+                                }
+
+                                return ImmutableReportGridCell
+                                        .builder()
+                                        .subjectId(orgUnitRecord.get("entityId", Long.class))
+                                        .columnDefinitionId(colDefn.id())
+                                        .textValue(String.valueOf(rawValue))
+                                        .build();
+                            }))
+                    .filter(Objects::nonNull)
+                    .collect(toSet());
+        }
+    }
+
+
+    private SelectConditionStep<Record> getOrgUnitSelectQuery(GenericSelector selector) {
+
+        SelectConditionStep<Record> appOrgUnitQuery = dsl
+                .select(ORGANISATIONAL_UNIT.fields())
+                .select(APPLICATION.ID.as("entityId"))
+                .from(ORGANISATIONAL_UNIT)
+                .innerJoin(APPLICATION)
+                .on(ORGANISATIONAL_UNIT.ID.eq(APPLICATION.ORGANISATIONAL_UNIT_ID))
+                .where(APPLICATION.ID.in(selector.selector()));
+
+        SelectConditionStep<Record> changeInitiativeOrgUnitQuery = dsl
+                .select(ORGANISATIONAL_UNIT.fields())
+                .select(CHANGE_INITIATIVE.ID.as("entityId"))
+                .from(ORGANISATIONAL_UNIT)
+                .innerJoin(CHANGE_INITIATIVE)
+                .on(ORGANISATIONAL_UNIT.ID.eq(CHANGE_INITIATIVE.ORGANISATIONAL_UNIT_ID))
+                .where(CHANGE_INITIATIVE.ID.in(selector.selector()));
+
+        return selector.kind() == EntityKind.APPLICATION
+                ? appOrgUnitQuery
+                : changeInitiativeOrgUnitQuery;
     }
 
 
