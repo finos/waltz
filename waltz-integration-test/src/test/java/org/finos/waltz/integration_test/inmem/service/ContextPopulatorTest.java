@@ -3,7 +3,6 @@ package org.finos.waltz.integration_test.inmem.service;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.ImmutableGenericSelector;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
-import org.finos.waltz.integration_test.inmem.helpers.AppHelper;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.schema.tables.AssessmentDefinition;
@@ -14,11 +13,8 @@ import org.finos.waltz.schema.tables.records.AssessmentDefinitionRecord;
 import org.finos.waltz.schema.tables.records.AssessmentRatingRecord;
 import org.finos.waltz.schema.tables.records.RatingSchemeItemRecord;
 import org.finos.waltz.schema.tables.records.RatingSchemeRecord;
-import org.finos.waltz.service.workflow.AssessmentContextValue;
-import org.finos.waltz.service.workflow.ContextPopulator;
-import org.finos.waltz.service.workflow.ContextValue;
-import org.finos.waltz.service.workflow.ContextVariable;
-import org.finos.waltz.service.workflow.ContextVariableDeclaration;
+import org.finos.waltz.service.workflow.*;
+import org.finos.waltz.test_common.helpers.AppHelper;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.junit.jupiter.api.Test;
@@ -30,9 +26,9 @@ import java.util.function.Predicate;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.CollectionUtilities.find;
-import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static org.finos.waltz.service.workflow.ContextVariableDeclaration.mkDecl;
+import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 

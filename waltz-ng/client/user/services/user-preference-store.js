@@ -51,7 +51,7 @@ function store($http, BaseApiUrl) {
     };
 }
 
-store.$inject = ['$http', 'BaseApiUrl'];
+store.$inject = ["$http", "BaseApiUrl"];
 
 const serviceName = "UserPreferenceStore";
 

@@ -40,7 +40,8 @@
 
 {#each group.provided as row}
     <tr transition:fade
-        on:click={() => selectAssessment(row)}>
+        on:click={() => selectAssessment(row)}
+        class="clickable">
         <td>
             <button class="btn btn-skinny"
                     on:click={() => toggleFavourite(row)}>

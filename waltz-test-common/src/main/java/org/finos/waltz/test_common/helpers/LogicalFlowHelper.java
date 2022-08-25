@@ -1,4 +1,4 @@
-package org.finos.waltz.integration_test.inmem.helpers;
+package org.finos.waltz.test_common.helpers;
 
 import org.finos.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowDao;
@@ -26,7 +26,7 @@ public class LogicalFlowHelper {
 
     @Autowired
     private DSLContext dsl;
-    
+
     @Autowired
     private LogicalFlowDao logicalFlowDao;
 
@@ -63,7 +63,7 @@ public class LogicalFlowHelper {
     }
 
 
-    public void clearAllFlows(){
+    public void clearAllFlows() {
         dsl.deleteFrom(LOGICAL_FLOW).execute();
     }
 

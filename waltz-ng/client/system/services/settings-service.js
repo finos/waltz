@@ -42,10 +42,8 @@ function service(serviceBroker) {
     };
 
     const findOrDie = (name, msg) => {
-        const defaultMsg = `
-Cannot find setting: [${name}] in settings table.
-Please see docs/features/configuration/settings.md for more details about this table.
-`;
+        const defaultMsg = `Cannot find setting: [${name}] in settings table. Please see docs/features/configuration/settings.md for more details about this table.`;
+
         return findOrDefault(name, null)
             .then(r => {
                 if (_.isNull(r)) {

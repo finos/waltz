@@ -1,4 +1,4 @@
-package org.finos.waltz.integration_test.inmem.helpers;
+package org.finos.waltz.test_common.helpers;
 
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.service.external_identifier.ExternalIdentifierService;
@@ -16,7 +16,7 @@ public class ExternalIdHelper {
     }
 
     public int createExtId(EntityReference ref, String extId, String name) {
-       return externalIdentifierService.create(ref, extId, name);
+        return externalIdentifierService.create(ref, extId, name);
     }
 
 }

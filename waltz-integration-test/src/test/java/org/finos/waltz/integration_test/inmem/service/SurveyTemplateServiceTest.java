@@ -1,9 +1,6 @@
 package org.finos.waltz.integration_test.inmem.service;
 
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
-import org.finos.waltz.integration_test.inmem.helpers.ChangeLogHelper;
-import org.finos.waltz.integration_test.inmem.helpers.PersonHelper;
-import org.finos.waltz.integration_test.inmem.helpers.SurveyTemplateHelper;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.ReleaseLifecycleStatus;
@@ -12,6 +9,9 @@ import org.finos.waltz.model.survey.SurveyTemplate;
 import org.finos.waltz.model.survey.SurveyTemplateChangeCommand;
 import org.finos.waltz.service.survey.SurveyQuestionService;
 import org.finos.waltz.service.survey.SurveyTemplateService;
+import org.finos.waltz.test_common.helpers.ChangeLogHelper;
+import org.finos.waltz.test_common.helpers.PersonHelper;
+import org.finos.waltz.test_common.helpers.SurveyTemplateHelper;
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +25,9 @@ import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.CollectionUtilities.find;
 import static org.finos.waltz.common.StringUtilities.lower;
-import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
-import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkUserId;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
+import static org.finos.waltz.test_common.helpers.NameHelper.mkUserId;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Service
