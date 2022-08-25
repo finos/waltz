@@ -7,14 +7,8 @@
     import {mkChunks} from "../../../common/list-utils";
     import EntityIcon from "../../../common/svelte/EntityIcon.svelte";
 
-    const supportedColumnKinds = [
-        "ATTESTATION",
-        "ASSESSMENT_DEFINITION",
-        "MEASURABLE",
-        "DATA_TYPE",
-        "APP_GROUP",
-        "INVOLVEMENT_KIND",
-        "COST_KIND"
+    const rejectedColumnKinds = [
+        "ORG_UNIT",
     ];
 
     let chunkedSummaryData = [];
@@ -93,9 +87,9 @@
         chunkedSummaryData = mkChunks(activeSummaryDefs, 3);
     }
 
-    $: availableSummaries = _.filter(
+    $: availableSummaries = _.reject(
         $summaries,
-        s => _.includes(supportedColumnKinds, s.column.columnEntityKind));
+        s => _.includes(rejectedColumnKinds, s.column.columnEntityKind));
 </script>
 
 <div>

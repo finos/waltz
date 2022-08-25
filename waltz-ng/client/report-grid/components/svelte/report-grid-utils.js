@@ -76,11 +76,6 @@ export const columnUsageKind = {
     }
 };
 
-const baseCell = {
-    fontColor: "#3b3b3b",
-    optionCode: "PROVIDED",
-    optionText: "Provided"
-};
 
 const nameCol = mkEntityLinkGridCell(
     "Name",
@@ -296,38 +291,9 @@ function determineColorForKind(columnEntityKind) {
 
 
 
-function mkAttestationCell(dataCell) {
+function mkAttestationCell(dataCell, baseCell) {
     const attDate = new Date(dataCell.dateTimeValue);
     const attColor = attestationColorScale(attDate);
-
-    let attOptions = {};
-
-    if (withinMonths(new Date(), attDate, 1)) {
-        attOptions = {
-            optionCode: "<1M",
-            optionText: "< 1 Months"
-        };
-    } else if (withinMonths(new Date(), attDate, 3)) {
-        attOptions = {
-            optionCode: "<3M",
-            optionText: "< 3 Months"
-        };
-    } else if (withinMonths(new Date(), attDate, 6)) {
-        attOptions = {
-            optionCode: "<6M",
-            optionText: "< 6 Months"
-        };
-    } else if (withinMonths(new Date(), attDate, 12)) {
-        attOptions = {
-            optionCode: "<1Y",
-            optionText: "< 1 Year"
-        };
-    } else {
-        attOptions = {
-            optionCode: ">1Y",
-            optionText: "> 1 Year"
-        };
-    }
 
     const cellValues = {
         color: attColor,
@@ -335,7 +301,7 @@ function mkAttestationCell(dataCell) {
         comment: dataCell.comment
     };
 
-    return Object.assign({}, baseCell, attOptions, cellValues);
+    return Object.assign({}, baseCell, cellValues);
 }
 
 
@@ -360,6 +326,12 @@ export function prepareTableData(gridData) {
     function mkTableCell(dataCell) {
         const colDef = colsById[dataCell.columnDefinitionId];
 
+        const baseCell = {
+            fontColor: "#3b3b3b",
+            optionCode: dataCell.optionCode,
+            optionText: dataCell.optionText
+        };
+
         switch (colDef.columnEntityKind) {
             case "COST_KIND":
                 const costColorScale = costColorScalesByColumnDefinitionId[dataCell.columnDefinitionId];
@@ -370,14 +342,12 @@ export function prepareTableData(gridData) {
                 });
             case "DATA_TYPE":
                 return Object.assign({}, baseCell, {
-                    optionCode: dataCell.textValue,
-                    optionText: _.capitalize(dataCell.textValue),
-                    color: determineDataTypeUsageColor(dataCell.textValue),
+                    color: determineDataTypeUsageColor(dataCell.optionCode),
                     text: dataCell.textValue,
                     comment: dataCell.comment
                 });
             case "ATTESTATION":
-                return mkAttestationCell(dataCell);
+                return mkAttestationCell(dataCell, baseCell);
             case "INVOLVEMENT_KIND":
             case "APP_GROUP":
             case "SURVEY_TEMPLATE":
@@ -390,7 +360,7 @@ export function prepareTableData(gridData) {
                 return Object.assign({}, baseCell, {
                     color: determineColorForKind(colDef.columnEntityKind),
                     text: dataCell.textValue,
-                    comment: dataCell.comment
+                    comment: dataCell.comment,
                 });
             case "ASSESSMENT_DEFINITION":
             case "MEASURABLE":
@@ -401,8 +371,6 @@ export function prepareTableData(gridData) {
                     color: ratingSchemeItem.color,
                     fontColor: ratingSchemeItem.fontColor,
                     text: ratingSchemeItem.name,
-                    optionCode: ratingSchemeItem.id,
-                    optionText: ratingSchemeItem.name
                 });
             default:
                 console.error(`Cannot prepare table data for column kind:  ${colDef.columnEntityKind}, colId: ${colDef.id}`);
@@ -456,9 +424,7 @@ export function prepareTableData(gridData) {
 function isSummarisableProperty(k) {
     return !(k === "subject"
         || k === "$$hashKey"
-        || k === "visible"
-        || k === _.startsWith("COST_KIND")
-        || k === _.startsWith("SURVEY_QUESTION"));
+        || k === "visible");
 }
 
 

@@ -43,6 +43,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.*;
 import java.util.function.Function;
@@ -674,10 +675,12 @@ public class ReportGridDao {
                     .fetchSet(r -> {
                         Long colId = colIdsByQualifierKindAnId.get(
                                 tuple(
-                                    EntityKind.valueOf(r.get("att_k", String.class)),
-                                    r.get("att_i", Long.class)));
+                                        EntityKind.valueOf(r.get("att_k", String.class)),
+                                        r.get("att_i", Long.class)));
 
                         Timestamp attAt = r.get("att_at", Timestamp.class);
+
+                        Tuple2<String, String> optionCodeAndText = determineOptionForAttestation(attAt);
 
                         return ImmutableReportGridCell
                                 .builder()
@@ -685,8 +688,32 @@ public class ReportGridDao {
                                 .subjectId(r.get("ref_i", Long.class))
                                 .dateTimeValue(toLocalDateTime(attAt))
                                 .comment(format("Attested by: %s", r.get("att_by", String.class)))
+                                .optionCode(optionCodeAndText.v1)
+                                .optionText(optionCodeAndText.v2)
                                 .build();
                     });
+        }
+    }
+
+    private Tuple2<String, String> determineOptionForAttestation(Timestamp attAt) {
+
+        LocalDateTime attestationDate = toLocalDateTime(attAt);
+
+        LocalDateTime oneMonthAgo = DateTimeUtilities.nowUtc().minusMonths(1);
+        LocalDateTime threeMonthsAgo = DateTimeUtilities.nowUtc().minusMonths(3);
+        LocalDateTime sixMonthsAgo = DateTimeUtilities.nowUtc().minusMonths(6);
+        LocalDateTime yearAgo = DateTimeUtilities.nowUtc().minusMonths(12);
+
+        if (attestationDate.isAfter(oneMonthAgo)) {
+            return tuple("<1M", "<1 Month");
+        } else if (attestationDate.isAfter(threeMonthsAgo)) {
+            return tuple("<3M", "1-3 Months");
+        } else if (attestationDate.isAfter(sixMonthsAgo)) {
+            return tuple("<6M", "3-6 Months");
+        } else if (attestationDate.isAfter(yearAgo)) {
+            return tuple("<1Y", "6-12 Months");
+        } else {
+            return tuple(">1Y", ">1 Year");
         }
     }
 
@@ -721,7 +748,6 @@ public class ReportGridDao {
                         return mkDataTypeUsageCell(
                                 dataTypeIdToDefIdMap.get(entry.getKey().v2),
                                 entry.getKey().v1,
-                                entry.getKey().v2,
                                 usageKinds);
                     })
                     .collect(toSet());
@@ -764,7 +790,6 @@ public class ReportGridDao {
                         return mkDataTypeUsageCell(
                                 dataTypeIdToDefIdMap.get(entry.getKey().v2),
                                 entry.getKey().v1,
-                                entry.getKey().v2,
                                 usageKinds);
                     })
                     .collect(toSet());
@@ -774,7 +799,6 @@ public class ReportGridDao {
 
     private ImmutableReportGridCell mkDataTypeUsageCell(Long colDefId,
                                                         Long subjectId,
-                                                        Long dataTypeId,
                                                         Set<UsageKind> usageKinds) {
         UsageKind derivedUsage = deriveUsage(usageKinds);
 
@@ -782,7 +806,9 @@ public class ReportGridDao {
                 .builder()
                 .subjectId(subjectId)
                 .columnDefinitionId(colDefId)
-                .textValue(derivedUsage.name())
+                .textValue(derivedUsage.displayName())
+                .optionCode(derivedUsage.name())
+                .optionText(derivedUsage.displayName())
                 .build();
     }
 
@@ -1404,6 +1430,8 @@ public class ReportGridDao {
                                     .subjectId(entityId)
                                     .columnDefinitionId(highIdToDefIdMap.getOrDefault(measurableId, lowIdToDefIdMap.get(measurableId)))
                                     .ratingIdValue(t.v1)
+                                    .optionCode(Long.toString(t.v1))
+                                    .optionText(t.v3)
                                     .build())
                             .orElse(null);
                 })
@@ -1423,10 +1451,11 @@ public class ReportGridDao {
                     ReportGridColumnDefinition::columnEntityId,
                     ReportGridColumnDefinition::id);
 
-            SelectConditionStep<Record4<Long, Long, Long, String>> qry = dsl
+            SelectConditionStep<Record5<Long, Long, Long, String, String>> qry = dsl
                     .select(mr.ENTITY_ID,
                             mr.MEASURABLE_ID,
                             rsi.ID,
+                            rsi.NAME,
                             mr.DESCRIPTION)
                     .from(mr)
                     .innerJoin(m).on(m.ID.eq(mr.MEASURABLE_ID))
@@ -1439,10 +1468,12 @@ public class ReportGridDao {
             return dsl
                     .resultQuery(dsl.renderInlined(qry))
                     .fetchSet(r -> ImmutableReportGridCell.builder()
-                        .subjectId(r.get(mr.ENTITY_ID))
-                        .columnDefinitionId(measurableIdToDefIdMap.get(r.get(mr.MEASURABLE_ID)))
-                        .ratingIdValue(r.get(rsi.ID))
-                        .comment(r.get(mr.DESCRIPTION))
+                            .subjectId(r.get(mr.ENTITY_ID))
+                            .columnDefinitionId(measurableIdToDefIdMap.get(r.get(mr.MEASURABLE_ID)))
+                            .ratingIdValue(r.get(rsi.ID))
+                            .comment(r.get(mr.DESCRIPTION))
+                            .optionText(r.get(rsi.NAME))
+                            .optionCode(Long.toString(r.get(rsi.ID)))
                         .build());
         }
     }
@@ -1462,8 +1493,10 @@ public class ReportGridDao {
                     .select(ar.ENTITY_ID,
                             ar.ASSESSMENT_DEFINITION_ID,
                             ar.RATING_ID,
+                            rsi.NAME,
                             ar.DESCRIPTION)
                     .from(ar)
+                    .innerJoin(rsi).on(ar.RATING_ID.eq(rsi.ID))
                     .where(ar.ASSESSMENT_DEFINITION_ID.in(assessmentIdToDefIdMap.keySet())
                             .and(ar.ENTITY_KIND.eq(selector.kind().name()))
                             .and(ar.ENTITY_ID.in(selector.selector())))
@@ -1472,6 +1505,8 @@ public class ReportGridDao {
                             .columnDefinitionId(assessmentIdToDefIdMap.get(r.get(ar.ASSESSMENT_DEFINITION_ID)))
                             .ratingIdValue(r.get(ar.RATING_ID))
                             .comment(r.get(ar.DESCRIPTION))
+                            .optionCode(Long.toString(r.get(ar.RATING_ID)))
+                            .optionText(r.get(rsi.NAME))
                             .build());
         }
     }

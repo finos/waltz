@@ -52,15 +52,14 @@ public abstract class ReportGridCell implements CommentProvider {
     @Nullable
     public abstract LocalDateTime dateTimeValue();
 
+    @Value.Default
+    public String optionCode() {
+        return "PROVIDED";
+    }
 
-//
-//
-//    // TODO: remove nullable
-//    @Nullable
-//    public abstract String filterOptionCode();
-
-
-    // numberValue(), textValue(), ratingValue(), dateTimeValue(),
-    // filterOptionCode(),
+    @Value.Default
+    public String optionText() {
+        return "Provided";
+    }
 
 }
