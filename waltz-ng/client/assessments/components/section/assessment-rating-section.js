@@ -26,7 +26,7 @@ import {resolveResponses} from "../../../common/promise-utils";
 import _ from "lodash";
 import toasts from "../../../svelte-stores/toast-store";
 import AssessmentEditor from "../editor/AssessmentEditor.svelte";
-import AssessmentList from "../list/AssessmentRatingList.svelte";
+import AssessmentRatingList from "../list/AssessmentRatingList.svelte";
 import {writable} from "svelte/store";
 
 export const assessments = writable([]);
@@ -38,7 +38,7 @@ const bindings = {
 
 const initialState = {
     AssessmentEditor,
-    AssessmentList,
+    AssessmentRatingList,
     permissions: []
 };
 

@@ -1,4 +1,4 @@
-package org.finos.waltz.integration_test.inmem.helpers;
+package org.finos.waltz.test_common.helpers;
 
 import org.finos.waltz.model.actor.ImmutableActorCreateCommand;
 import org.finos.waltz.service.actor.ActorService;

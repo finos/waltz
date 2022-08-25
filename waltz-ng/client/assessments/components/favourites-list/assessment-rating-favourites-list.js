@@ -21,6 +21,7 @@ import _ from "lodash";
 import template from "./assessment-rating-favourites-list.html";
 import {mkAssessmentDefinitionsIdsBaseKey} from "../../../user";
 import {CORE_API} from "../../../common/services/core-api-utils";
+import {getIdsFromString} from "../../assessment-utils";
 
 
 const bindings = {
@@ -35,15 +36,28 @@ const initialState = {
 };
 
 
-function getFavouriteAssessmentDefnIds(key, preferences, defaultList = []) {
-    const favouritesString = _.find(preferences, d => d.key === key, null);
-    return _.isNull(favouritesString) || _.isEmpty(favouritesString)
-        ? defaultList
-        : _
-            .chain(favouritesString.value)
-            .split(',')
-            .map(idString => _.toNumber(idString))
-            .value();
+function isEmpty(favouritesString) {
+    return _.isNull(favouritesString) || _.isEmpty(favouritesString);
+}
+
+function getFavouriteAssessmentDefnIds(baseKey, preferences, defaultList = []) {
+
+    const favouriteIncludedKey = `${baseKey}.included`;
+    const favouriteExcludedKey = `${baseKey}.excluded`;
+
+    const includedFavouritesString = _.find(preferences, d => d.key === favouriteIncludedKey, null);
+    const excludedFavouritesString = _.find(preferences, d => d.key === favouriteExcludedKey, null);
+
+    if (isEmpty(includedFavouritesString) && isEmpty(excludedFavouritesString)) {
+        return defaultList;
+    } else {
+        const incIds = getIdsFromString(includedFavouritesString);
+        const excIds = getIdsFromString(excludedFavouritesString);
+
+        return _.reject(
+            _.concat(defaultList, incIds),
+            d => _.includes(excIds, d));
+    }
 }
 
 
@@ -80,7 +94,7 @@ function controller(serviceBroker) {
             .value();
 
         serviceBroker
-            .loadAppData(CORE_API.UserPreferenceStore.findAllForUser, [], {force: true})
+            .loadAppData(CORE_API.UserPreferenceStore.findAllForUser, [])
             .then(r => vm.favouriteAssessmentDefnIds = getFavouriteAssessmentDefnIds(
                 mkAssessmentDefinitionsIdsBaseKey(vm.parentEntityRef),
                 r.data,

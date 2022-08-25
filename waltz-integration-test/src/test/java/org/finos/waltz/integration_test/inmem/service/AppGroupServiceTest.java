@@ -32,7 +32,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.finos.waltz.common.SetUtilities.asSet;
-import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkUserId;
+import static org.finos.waltz.test_common.helpers.NameHelper.mkUserId;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class AppGroupServiceTest extends BaseInMemoryIntegrationTest {
