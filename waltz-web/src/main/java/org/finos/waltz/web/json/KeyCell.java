@@ -21,8 +21,8 @@ package org.finos.waltz.web.json;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.EntityLifecycleStatus;
-import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.application.LifecyclePhase;
+import org.finos.waltz.model.report_grid.ReportSubject;
 import org.immutables.value.Value;
 
 import java.util.Optional;
@@ -31,6 +31,7 @@ import java.util.Optional;
 @JsonSerialize(as = ImmutableKeyCell.class)
 @JsonDeserialize(as = ImmutableKeyCell.class)
 public interface KeyCell{
+
 
     @Value.Default
     default String type() {
@@ -45,18 +46,18 @@ public interface KeyCell{
 
     Optional<String> externalId();
 
-    EntityLifecycleStatus lifecycleStatus();
+    LifecyclePhase lifecyclePhase();
 
-
-    static KeyCell fromRef(EntityReference ref) {
+    static KeyCell fromSubject(ReportSubject subject) {
         return ImmutableKeyCell
                 .builder()
-                .name(ref.name())
-                .kind(ref.kind())
-                .waltzId(ref.id())
-                .externalId(ref.externalId())
-                .lifecycleStatus(ref.entityLifecycleStatus())
+                .name(subject.entityReference().name())
+                .kind(subject.entityReference().kind())
+                .waltzId(subject.entityReference().id())
+                .externalId(subject.entityReference().externalId())
+                .lifecyclePhase(subject.lifecyclePhase())
                 .build();
     }
+
 
 }

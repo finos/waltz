@@ -27,6 +27,12 @@ export function mkSurveyTemplateStore() {
         [],
         {force});
 
+    const findByOwner = (force = false) => remote.fetchViewList(
+        "GET",
+        "api/survey-template/owner",
+        [],
+        {force});
+
     const getByQuestionId = (id, force = false) => remote.fetchViewDatum(
         "GET",
         `api/survey-template/question-id/${id}`,
@@ -35,6 +41,7 @@ export function mkSurveyTemplateStore() {
 
     return {
         findAll,
+        findByOwner,
         getByQuestionId
     };
 }

@@ -40,6 +40,11 @@ function store($http, baseUrl) {
             .then(result => result.data);
     };
 
+    const findByOwner = () => {
+        return $http.get(`${BASE}/owner`)
+            .then(result => result.data);
+    };
+
     const update = (cmd) => {
         return $http.put(`${BASE}`, cmd)
             .then(result => result.data);
@@ -62,6 +67,7 @@ function store($http, baseUrl) {
         clone,
         getById,
         findAll,
+        findByOwner,
         update,
         updateStatus,
         remove

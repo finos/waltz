@@ -96,7 +96,6 @@ public class AggregateOverlayDiagramUtilities {
 
 
     protected static Map<String, Set<Long>> loadCellExtIdToAggregatedEntities(DSLContext dsl,
-                                                                              long diagramId,
                                                                               Set<Tuple2<String, EntityReference>> cellMappings,
                                                                               EntityKind aggregatedEntityKind,
                                                                               Select<Record1<Long>> inScopeEntityIdSelector,

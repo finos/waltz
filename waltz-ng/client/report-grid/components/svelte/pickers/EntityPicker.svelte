@@ -11,6 +11,9 @@
     import AppGroupPicker from "./AppGroupPicker.svelte";
     import DataTypePicker from "./DataTypePicker.svelte";
     import AttestationPicker from "./AttestationPicker.svelte";
+    import OrgUnitFieldPicker from "./OrgUnitFieldPicker.svelte";
+    import TagPicker from "./TagPicker.svelte";
+    import AliasPicker from "./AliasPicker.svelte";
 
     export let onSelect = (d) => console.log("Selecting an entity", d);
     export let onDeselect = (d) => console.log("Deselecting an entity", d);
@@ -41,6 +44,12 @@
                 return DataTypePicker;
             case "ATTESTATION":
                 return AttestationPicker;
+            case "ORG_UNIT":
+                return OrgUnitFieldPicker;
+            case "TAG":
+                return TagPicker;
+            case "ENTITY_ALIAS":
+                return AliasPicker;
             default:
                 throw "Cannot find picker for kind: " + entityKind;
         }

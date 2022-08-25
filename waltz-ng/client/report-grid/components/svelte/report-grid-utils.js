@@ -76,11 +76,6 @@ export const columnUsageKind = {
     }
 };
 
-const baseCell = {
-    fontColor: "#3b3b3b",
-    optionCode: "PROVIDED",
-    optionText: "Provided"
-};
 
 const nameCol = mkEntityLinkGridCell(
     "Name",
@@ -265,7 +260,7 @@ function calculateCostColorScales(gridData) {
         .filter(d =>  _.includes(costCols, d.columnDefinitionId))
         .groupBy(d => d.columnDefinitionId)
         .mapValues(v => scaleLinear()
-            .domain(extent(v, d => d.value))
+            .domain(extent(v, d => d.numberValue))
             .range(["#e2f5ff", "#86e4ff"]))
         .value();
 }
@@ -284,6 +279,11 @@ function determineColorForKind(columnEntityKind) {
             return "#e0ffe1";
         case "SURVEY_QUESTION":
             return "#fff59d";
+        case "ORG_UNIT":
+            return "#f3e4ff";
+        case "TAG":
+        case "ENTITY_ALIAS":
+            return "#fff9e4";
         default:
             return "#dbfffe"
     }
@@ -291,46 +291,17 @@ function determineColorForKind(columnEntityKind) {
 
 
 
-function mkAttestationCell(dataCell) {
-    const attDate = new Date(dataCell.text);
+function mkAttestationCell(dataCell, baseCell) {
+    const attDate = new Date(dataCell.dateTimeValue);
     const attColor = attestationColorScale(attDate);
-
-    let attOptions = {};
-
-    if (withinMonths(new Date(), attDate, 1)) {
-        attOptions = {
-            optionCode: "<1M",
-            optionText: "< 1 Months"
-        };
-    } else if (withinMonths(new Date(), attDate, 3)) {
-        attOptions = {
-            optionCode: "<3M",
-            optionText: "< 3 Months"
-        };
-    } else if (withinMonths(new Date(), attDate, 6)) {
-        attOptions = {
-            optionCode: "<6M",
-            optionText: "< 6 Months"
-        };
-    } else if (withinMonths(new Date(), attDate, 12)) {
-        attOptions = {
-            optionCode: "<1Y",
-            optionText: "< 1 Year"
-        };
-    } else {
-        attOptions = {
-            optionCode: ">1Y",
-            optionText: "> 1 Year"
-        };
-    }
 
     const cellValues = {
         color: attColor,
-        text: dataCell.text,
+        text: dataCell.dateTimeValue,
         comment: dataCell.comment
     };
 
-    return Object.assign({}, baseCell, attOptions, cellValues);
+    return Object.assign({}, baseCell, cellValues);
 }
 
 
@@ -355,73 +326,93 @@ export function prepareTableData(gridData) {
     function mkTableCell(dataCell) {
         const colDef = colsById[dataCell.columnDefinitionId];
 
+        const baseCell = {
+            fontColor: "#3b3b3b",
+            optionCode: dataCell.optionCode,
+            optionText: dataCell.optionText
+        };
+
         switch (colDef.columnEntityKind) {
             case "COST_KIND":
                 const costColorScale = costColorScalesByColumnDefinitionId[dataCell.columnDefinitionId];
-                const costColor = costColorScale(dataCell.value);
+                const costColor = costColorScale(dataCell.numberValue);
                 return Object.assign({}, baseCell, {
                     color: costColor,
-                    value: dataCell.value,
+                    value: dataCell.numberValue,
                 });
             case "DATA_TYPE":
                 return Object.assign({}, baseCell, {
-                    optionCode: dataCell.text,
-                    optionText: _.capitalize(dataCell.text),
-                    color: determineDataTypeUsageColor(dataCell.text),
-                    text: dataCell.text,
+                    color: determineDataTypeUsageColor(dataCell.optionCode),
+                    text: dataCell.textValue,
                     comment: dataCell.comment
                 });
             case "ATTESTATION":
-                return mkAttestationCell(dataCell);
+                return mkAttestationCell(dataCell, baseCell);
             case "INVOLVEMENT_KIND":
             case "APP_GROUP":
-                return Object.assign({}, baseCell, {
-                    color: determineColorForKind(dataCell.columnEntityKind),
-                    text: dataCell.text,
-                    comment: dataCell.comment
-                });
             case "SURVEY_TEMPLATE":
             case "APPLICATION":
             case "CHANGE_INITIATIVE":
+            case "ORG_UNIT":
             case "SURVEY_QUESTION":
+            case "TAG":
+            case "ENTITY_ALIAS":
                 return Object.assign({}, baseCell, {
-                    color: determineColorForKind(dataCell.columnEntityKind),
-                    text: dataCell.text,
-                    comment: dataCell.comment
+                    color: determineColorForKind(colDef.columnEntityKind),
+                    text: dataCell.textValue,
+                    comment: dataCell.comment,
                 });
             case "ASSESSMENT_DEFINITION":
             case "MEASURABLE":
-                const ratingSchemeItem = ratingSchemeItemsById[dataCell.ratingId];
+                const ratingSchemeItem = ratingSchemeItemsById[dataCell.ratingIdValue];
                 const popoverHtml = mkPopoverHtml(dataCell, ratingSchemeItem);
                 return Object.assign({}, baseCell, {
                     comment: popoverHtml,
                     color: ratingSchemeItem.color,
                     fontColor: ratingSchemeItem.fontColor,
                     text: ratingSchemeItem.name,
-                    optionCode: ratingSchemeItem.id,
-                    optionText: ratingSchemeItem.name
                 });
             default:
                 console.error(`Cannot prepare table data for column kind:  ${colDef.columnEntityKind}, colId: ${colDef.id}`);
                 return {
-                    text: dataCell.text,
+                    text: dataCell.textValue,
                     comment: dataCell.comment
                 };
         }
     }
 
+    const cellsBySubjectId = _.groupBy(
+        gridData.instance.cellData,
+        d => d.subjectId);
+
+    const emptyRow = _.reduce(
+        colDefs,
+        (acc, c) => {
+            acc[c.id] = unknownRating;
+            return acc;
+        },
+        {});
+
     return _
-        .chain(gridData.instance.cellData)
-        .groupBy(d => d.subjectId)
-        .map((xs, k) => _.reduce(
-            xs,
-            (acc, cell) => {
-                acc[cell.columnDefinitionId] = mkTableCell(cell);
-                return acc;
-            },
-            initialiseDataForRow(subjectsById[k], colDefs)))
+        .chain(gridData.instance.subjects)
+        .map(s => {
+            const rowCells = _.reduce(
+                _.get(cellsBySubjectId, [s.entityReference.id], []),
+                (acc, cell) => {
+                    acc[cell.columnDefinitionId] = mkTableCell(cell);
+                    return acc;
+                },
+                {});
+
+            return Object.assign(
+                {},
+                emptyRow,
+                {subject: s},
+                rowCells);
+        })
         .orderBy(row => row.subject.name)
         .value();
+
 }
 
 
@@ -433,9 +424,7 @@ export function prepareTableData(gridData) {
 function isSummarisableProperty(k) {
     return !(k === "subject"
         || k === "$$hashKey"
-        || k === "visible"
-        || k === _.startsWith("COST_KIND")
-        || k === _.startsWith("SURVEY_QUESTION"));
+        || k === "visible");
 }
 
 
@@ -528,11 +517,21 @@ export function mkRowFilter(filters = []) {
 
 export function sameColumnRef(v1, v2) {
     if (!v1 || !v2) return false;
+
+    const fieldRef1 = _.get(v1, ["entityFieldReference", "id"], null);
+    const fieldRef2 = _.get(v2, ["entityFieldReference", "id"], null);
+
+    const qualiKind1 = _.get(v1, ["columnQualifierKind"], null);
+    const qualiKind2 = _.get(v2, ["columnQualifierKind"], null);
+
+    const qualiId1 = _.get(v1, ["columnQualifierId"], null);
+    const qualiId2 = _.get(v2, ["columnQualifierId"], null);
+
     return v1.columnEntityKind === v2.columnEntityKind
         && v1.columnEntityId === v2.columnEntityId
-        && v1.entityFieldReference?.id === v2.entityFieldReference?.id
-        && v1.columnQualifierKind === v2.columnQualifierKind
-        && v1.columnQualifierId === v2.columnQualifierId;
+        && fieldRef1 === fieldRef2
+        && qualiKind1 === qualiKind2
+        && qualiId1 === qualiId2;
 }
 
 

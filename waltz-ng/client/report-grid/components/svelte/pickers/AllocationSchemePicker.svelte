@@ -3,10 +3,9 @@
     import Grid from "../../../../common/svelte/Grid.svelte";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import _ from "lodash";
-    import {assessmentDefinitionStore} from "../../../../svelte-stores/assessment-definition";
     import {allocationSchemeStore} from "../../../../svelte-stores/allocation-scheme-store";
 
-    export let onSelect = () => console.log("Selecting allocation scheme");
+    export let onSelect = () => console.log("Selecting complexity kind");
     export let selectionFilter = () => true;
 
     $: allocationSchemesCall = allocationSchemeStore.findAll();

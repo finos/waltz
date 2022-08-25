@@ -26,6 +26,8 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Set;
+
 import static org.finos.waltz.schema.tables.Settings.SETTINGS;
 import static org.finos.waltz.common.Checks.checkNotNull;
 
@@ -44,10 +46,12 @@ public class ScheduledJobDao {
 
 
     public boolean isJobRunnable(JobKey jobKey) {
-        return dsl.fetchExists(DSL.select(SETTINGS.NAME)
-                .from(SETTINGS)
-                .where(SETTINGS.NAME.eq(jobKey.name()))
-                .and(SETTINGS.VALUE.eq(JobLifecycleStatus.RUNNABLE.name())));
+        return dsl
+                .fetchExists(DSL
+                        .select(SETTINGS.NAME)
+                        .from(SETTINGS)
+                        .where(SETTINGS.NAME.eq(jobKey.name()))
+                        .and(SETTINGS.VALUE.eq(JobLifecycleStatus.RUNNABLE.name())));
     }
 
 
@@ -68,4 +72,15 @@ public class ScheduledJobDao {
                 .where(SETTINGS.NAME.eq(jobKey.name()))
                 .execute();
     }
+
+
+    public boolean anyJobsRunning(Set<JobKey> jobKeys) {
+        return dsl
+                .fetchExists(DSL
+                        .select(SETTINGS.NAME)
+                        .from(SETTINGS)
+                        .where(SETTINGS.NAME.in(jobKeys)
+                                .and(SETTINGS.VALUE.eq(JobLifecycleStatus.RUNNING.name()))));
+    }
+
 }

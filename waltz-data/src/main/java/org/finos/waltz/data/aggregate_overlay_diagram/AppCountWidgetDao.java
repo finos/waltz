@@ -44,7 +44,6 @@ public class AppCountWidgetDao {
 
         Map<String, Set<Long>> cellExtIdsToAggregatedEntities = loadCellExtIdToAggregatedEntities(
                 dsl,
-                diagramId,
                 cellWithBackingEntities,
                 EntityKind.APPLICATION,
                 inScopeApplicationSelector,

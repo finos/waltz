@@ -209,6 +209,8 @@ public class RatingSchemeDAO {
         r.setPosition(item.position());
         r.setUserSelectable(item.userSelectable());
 
+        item.externalId().ifPresent(r::setExternalId);
+
         return item.id()
                 .map(id -> {
                     r.setId(id);

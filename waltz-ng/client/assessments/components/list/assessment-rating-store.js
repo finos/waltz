@@ -4,8 +4,8 @@ import {mkAssessmentDefinitionsIdsBaseKey} from "../../../user";
 import {userPreferenceStore} from "../../../svelte-stores/user-preference-store";
 import {getIdsFromString} from "../../assessment-utils";
 
-function writePreference(favouriteIncludedKey, $favouriteIncludedIds) {
-    const userPreference = {key: favouriteIncludedKey, value: $favouriteIncludedIds.toString()};
+function writePreference(key, definitionIds) {
+    const userPreference = {key, value: definitionIds.toString()};
     userPreferenceStore.saveForUser(userPreference);
 }
 
@@ -19,6 +19,8 @@ export function createStores(primaryEntityRef) {
     const favouriteExcludedIds = writable([]);
     const favouriteIncludedIds = writable([]);
 
+    const storesInitialised = writable(false);
+
     const favouriteIds = derived(
         [defaultPrimaryList, favouriteExcludedIds, favouriteIncludedIds],
 
@@ -31,13 +33,19 @@ export function createStores(primaryEntityRef) {
     favouriteIds.subscribe(() => {
     })
 
-    derived([favouriteIncludedIds], ($favouriteIncludedIds) => {
-        writePreference(favouriteIncludedKey, $favouriteIncludedIds);
+
+    // check stores initialised
+    derived([favouriteIncludedIds, storesInitialised], ([$favouriteIncludedIds, $storesInitialised]) => {
+        if ($storesInitialised) {
+            writePreference(favouriteIncludedKey, $favouriteIncludedIds);
+        }
     }).subscribe(() => {
     });
 
-    derived([favouriteExcludedIds], ($favouriteExcludedIds) => {
-        writePreference(favouriteExcludedKey, $favouriteExcludedIds);
+    derived([favouriteExcludedIds, storesInitialised], ([$favouriteExcludedIds, $storesInitialised]) => {
+        if ($storesInitialised) {
+            writePreference(favouriteExcludedKey, $favouriteExcludedIds);
+        }
     }).subscribe(() => {
     });
 
@@ -48,6 +56,8 @@ export function createStores(primaryEntityRef) {
 
         favouriteIncludedIds.set(getIdsFromString(includedFavouritesString));
         favouriteExcludedIds.set(getIdsFromString(excludedFavouritesString));
+
+        storesInitialised.set(true);
     }
 
     return {

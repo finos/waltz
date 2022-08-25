@@ -32,9 +32,20 @@ import java.util.List;
 public abstract class ComplexitySummary {
 
     public abstract int mappedCount();
+
     public abstract int missingCount();
+
     public abstract BigDecimal average();
+
+    public abstract BigDecimal median();
+
+    public abstract BigDecimal variance();
+
+    public abstract BigDecimal standardDeviation();
+
     public abstract BigDecimal total();
+
     public abstract List<Complexity> topComplexityScores();
+
     public abstract ComplexityKind complexityKind();
 }

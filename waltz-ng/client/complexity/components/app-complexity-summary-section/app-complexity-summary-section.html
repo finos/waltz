@@ -87,17 +87,65 @@
                              ng-bind="$ctrl.complexitySummary.complexityKind.description">
                         </div>
 
-                        <h4>&Sigma;<span ng-bind="$ctrl.complexitySummary.total"></span></h4>
-
                         <p>
-                            Total complexity over
+                            Complexity statistics calculated over
                             <span ng-bind="$ctrl.complexitySummary.mappedCount"></span>
                             <span ng-bind="$ctrl.targetEntityKind | toDisplayName:'entity'"></span>s.
                         </p>
-                        <p>
-                            The average complexity is
-                            <span ng-bind="$ctrl.complexitySummary.average"></span>
-                        </p>
+
+                        <table class="table table-condensed">
+                            <colgroup>
+                                <col width="70%">
+                                <col width="30%">
+                            </colgroup>
+                            <tbody>
+                            <tr>
+                                <td title="A sum of the complexities">Total</td>
+                                <td>
+                                    <span class="pull-right"
+                                          ng-bind="$ctrl.complexitySummary.total">
+
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td title="The mean value of the complexities">Average</td>
+                                <td>
+                                    <span class="pull-right"
+                                          ng-bind="$ctrl.complexitySummary.average">
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td title="The median value of the complexities">Median</td>
+                                <td>
+                                    <span class="pull-right"
+                                          ng-bind="$ctrl.complexitySummary.median">
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td title="The variance of the complexities, a measure of the dispersion of values">
+                                    Variance
+                                </td>
+                                <td>
+                                    <span class="pull-right"
+                                          ng-bind="$ctrl.complexitySummary.variance">
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td title="The population standard deviation of the complexities">Standard Deviation
+                                </td>
+                                <td>
+                                    <span class="pull-right"
+                                          ng-bind="$ctrl.complexitySummary.standardDeviation">
+                                    </span>
+                                </td>
+                            </tr>
+                            </tbody>
+
+                        </table>
 
                         <p class="help-block"
                            ng-if="$ctrl.complexitySummary.missingCount > 0">
@@ -107,7 +155,6 @@
                             apps with no associated
                             <span ng-bind="$ctrl.complexitySummary.complexityKind.name"></span> complexity scores.
                         </p>
-
 
                         <div ng-if="$ctrl.selectedEntity"
                              style="padding-bottom: 1em;">
@@ -162,3 +209,4 @@
             </div>
         </div>
     </div>
+</div>

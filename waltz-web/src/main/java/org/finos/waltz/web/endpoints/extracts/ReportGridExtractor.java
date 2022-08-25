@@ -33,19 +33,24 @@ import org.finos.waltz.web.WebUtilities;
 import org.finos.waltz.web.endpoints.extracts.reportgrid.DynamicCommaSeperatedValueFormatter;
 import org.finos.waltz.web.endpoints.extracts.reportgrid.DynamicExcelFormatter;
 import org.finos.waltz.web.endpoints.extracts.reportgrid.DynamicJSONFormatter;
+import org.jooq.lambda.Unchecked;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.LongFunction;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.MapUtilities.*;
+import static org.finos.waltz.common.StringUtilities.mkSafe;
 import static org.finos.waltz.model.utils.IdUtilities.indexById;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 import static spark.Spark.post;
@@ -53,7 +58,8 @@ import static spark.Spark.post;
 @Service
 public class ReportGridExtractor implements SupportsJsonExtraction {
 
-    public static final String BASE_URL = WebUtilities.mkPath("data-extract", "report-grid");
+    private static final String BASE_URL = WebUtilities.mkPath("data-extract", "report-grid");
+
     private final DynamicCommaSeperatedValueFormatter dynamicCommaSeperatedValueFormatter;
     private final DynamicExcelFormatter dynamicExcelFormatter;
     private final DynamicJSONFormatter dynamicJSONFormatter;
@@ -89,27 +95,37 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
         post(WebUtilities.mkPath(BASE_URL, "external-id", ":externalId"),
                 (request, response) -> {
                     String externalId = request.params("externalId");
+                    IdSelectionOptions selectionOptions = WebUtilities.readIdSelectionOptionsFromBody(request);
+
                     Optional<ReportGridDefinition> definition =
                             reportGridService.findByExternalId(externalId);
 
-                    return definition.map(def-> {
-                        try {
-                            IdSelectionOptions selectionOptions = WebUtilities.readIdSelectionOptionsFromBody(request);
-                            long reportGridIdentifier = def.id()
-                                    .orElseThrow(() -> new IllegalArgumentException("Report Grid Definition found but it has no internal identifier"));
-                            ReportGrid reportGrid = getById(reportGridIdentifier, selectionOptions)
-                                    .orElseThrow(() -> notFoundException.apply(reportGridIdentifier));
-                            return writeReportResults(
-                                    response,
-                                    prepareReport(
-                                            reportGrid,
-                                            parseExtractFormat(request),
-                                            selectionOptions));
-                        }catch(IOException e){
-                            throw new WebException("REPORT_GRID_RENDER_ERROR",""+e.getMessage(),e);
-                        }
-                    }).orElseThrow(()->new NotFoundException("MISSING_GRID",
-                            String.format(" Report Grid GUID (%s) not found",externalId)));
+                    return definition
+                            .map(def-> {
+                                try {
+                                    long reportGridIdentifier = def
+                                            .id()
+                                            .orElseThrow(() -> new IllegalArgumentException("Report Grid Definition found but it has no internal identifier"));
+
+                                    return findReportGridById(reportGridIdentifier, selectionOptions)
+                                            .map(Unchecked.function(reportGrid -> prepareReport(
+                                                    reportGrid,
+                                                    parseExtractFormat(request),
+                                                    selectionOptions)))
+                                            .map(Unchecked.function(report -> writeReportResults(
+                                                    response,
+                                                    report)))
+                                            .orElseThrow(() -> notFoundException.apply(reportGridIdentifier));
+
+                                } catch(UncheckedIOException e) {
+                                    throw new WebException("REPORT_GRID_RENDER_ERROR", mkSafe(e.getMessage()), e);
+                                }
+                            })
+                            .orElseThrow(() -> new NotFoundException(
+                                "MISSING_GRID",
+                                String.format(
+                                        "Report Grid GUID (%s) not found",
+                                        externalId)));
                 });
     }
 
@@ -132,12 +148,14 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
                 reportRows);
     }
 
-    private Optional<ReportGrid> getById(long gridId,
-                                         IdSelectionOptions selectionOptions){
+
+    private Optional<ReportGrid> findReportGridById(long gridId,
+                                                    IdSelectionOptions selectionOptions){
         return reportGridService.getByIdAndSelectionOptions(
                 gridId,
                 selectionOptions);
     }
+
 
     private List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> enrichColsWithCommentRequirement(ReportGrid reportGrid) {
         Set<Long> surveyQuestionsIds = reportGrid
@@ -183,7 +201,6 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
 
         Set<ReportGridCell> tableData = reportGridInstance.cellData();
 
-        Map<Long, ReportSubject> subjectsById = indexBy(reportGridInstance.subjects(), d -> d.entityReference().id());
         Map<Long, RatingSchemeItem> ratingsById = indexById(reportGridInstance.ratingSchemeItems());
 
         Map<Long, Collection<ReportGridCell>> tableDataBySubjectId = groupBy(
@@ -195,20 +212,18 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
                 .map(r -> StringUtilities.isEmpty(r) || Boolean.parseBoolean(r))
                 .orElse(true);
 
-        return tableDataBySubjectId
-                .entrySet()
+        return reportGridInstance
+                .subjects()
                 .stream()
-                .map(r -> {
-                    Long subjectId = r.getKey();
-
-                    ReportSubject subject = subjectsById.getOrDefault(subjectId, null);
+                .map(subject -> {
+                    Collection<ReportGridCell> cellsForSubject = tableDataBySubjectId.getOrDefault(
+                            subject.entityReference().id(),
+                            emptySet());
 
                     ArrayList<Object> reportRow = new ArrayList<>();
 
-                    Collection<ReportGridCell> cells = r.getValue();
-
                     Map<Long, ReportGridCell> cellValuesByColumnRefForSubject = indexBy(
-                            cells,
+                            cellsForSubject,
                             ReportGridCell::columnDefinitionId);
 
                     //find data for columns
@@ -235,6 +250,7 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
                 })
                 .sorted(Comparator.comparing(t -> t.v1.entityReference().name().get()))
                 .collect(toList());
+
     }
 
 
@@ -254,19 +270,28 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
         }
         switch (colDef.columnEntityKind()) {
             case COST_KIND:
-                return reportGridCell.value();
+                return reportGridCell.numberValue();
             case INVOLVEMENT_KIND:
             case SURVEY_TEMPLATE:
             case APPLICATION:
             case CHANGE_INITIATIVE:
             case SURVEY_QUESTION:
             case DATA_TYPE:
-            case ATTESTATION:
             case APP_GROUP:
-                return Optional.ofNullable(reportGridCell.text()).orElse("-");
+            case ORG_UNIT:
+            case TAG:
+            case ENTITY_ALIAS:
+                return Optional
+                        .ofNullable(reportGridCell.textValue())
+                        .orElse("-");
+            case ATTESTATION:
+                return Optional
+                        .ofNullable(reportGridCell.dateTimeValue())
+                        .map(LocalDateTime::toString)
+                        .orElse("-");
             case MEASURABLE:
             case ASSESSMENT_DEFINITION:
-                return maybeGet(ratingsById, reportGridCell.ratingId())
+                return maybeGet(ratingsById, reportGridCell.ratingIdValue())
                         .map(NameProvider::name)
                         .orElse(null);
             default:

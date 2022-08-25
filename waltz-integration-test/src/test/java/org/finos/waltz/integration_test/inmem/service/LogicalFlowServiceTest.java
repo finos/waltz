@@ -19,9 +19,6 @@
 package org.finos.waltz.integration_test.inmem.service;
 
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
-import org.finos.waltz.integration_test.inmem.helpers.AppHelper;
-import org.finos.waltz.integration_test.inmem.helpers.DataTypeHelper;
-import org.finos.waltz.integration_test.inmem.helpers.LogicalFlowHelper;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.EntityReference;
@@ -29,6 +26,9 @@ import org.finos.waltz.model.IdProvider;
 import org.finos.waltz.model.logical_flow.ImmutableAddLogicalFlowCommand;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
+import org.finos.waltz.test_common.helpers.AppHelper;
+import org.finos.waltz.test_common.helpers.DataTypeHelper;
+import org.finos.waltz.test_common.helpers.LogicalFlowHelper;
 import org.jooq.lambda.tuple.Tuple2;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

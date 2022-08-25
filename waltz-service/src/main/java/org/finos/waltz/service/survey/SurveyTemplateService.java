@@ -31,6 +31,7 @@ import org.finos.waltz.model.survey.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -78,15 +79,15 @@ public class SurveyTemplateService {
     }
 
 
-    public List<SurveyTemplate> findAll(String userName) {
+    public List<SurveyTemplate> findForOwner(String userName) {
         checkNotNull(userName, "userName cannot be null");
 
         Person owner = personDao.getActiveByUserEmail(userName);
 
         if (owner == null) {
-            return surveyTemplateDao.findAll(null);
+            return surveyTemplateDao.findForOwner(null);
         } else {
-            return surveyTemplateDao.findAll(owner.id().orElse(null));
+            return surveyTemplateDao.findForOwner(owner.id().orElse(null));
         }
     }
 
@@ -217,5 +218,9 @@ public class SurveyTemplateService {
 
     public SurveyTemplate getByQuestionId(long questionId) {
         return surveyTemplateDao.getByQuestionId(questionId);
+    }
+
+    public Collection<SurveyTemplate> findAll() {
+        return surveyTemplateDao.findAll();
     }
 }

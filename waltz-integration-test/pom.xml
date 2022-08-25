@@ -30,6 +30,13 @@
     <artifactId>waltz-integration-test</artifactId>
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.finos</groupId>
+            <artifactId>waltz-test-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.finos</groupId>
             <artifactId>waltz-service</artifactId>

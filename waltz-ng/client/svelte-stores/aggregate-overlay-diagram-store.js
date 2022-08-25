@@ -58,6 +58,15 @@ export function mkOverlayDiagramStore() {
                 {force});
     };
 
+    const findComplexitiesForDiagram = (diagramId, widgetParameters, force = false) => {
+        return remote
+            .fetchViewList(
+                "POST",
+                `api/aggregate-overlay-diagram/diagram-id/${diagramId}/complexity-widget`,
+                widgetParameters,
+                {force});
+    };
+
     const findAggregatedEntitiesForDiagram = (diagramId, widgetParameters, force = false) => {
         return remote
             .fetchViewList(
@@ -103,6 +112,7 @@ export function mkOverlayDiagramStore() {
         findAppAssessmentsForDiagram,
         findBackingEntitiesForDiagram,
         findAggregatedEntitiesForDiagram,
+        findComplexitiesForDiagram,
         findPresetsForDiagram,
         createPreset
     };

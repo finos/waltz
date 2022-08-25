@@ -41,6 +41,7 @@
         <module>waltz-jobs</module>
         <module>waltz-data</module>
         <module>waltz-schema</module>
+        <module>waltz-test-common</module>
         <!--TODO: find a better way of passing a logback configuration file-->
         <!--<module>waltz-local-config</module>-->
     </modules>
