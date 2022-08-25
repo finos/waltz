@@ -1262,7 +1262,6 @@ public class ReportGridDao {
         }
     }
 
-
     private Set<ReportGridCell> fetchAliasData(GenericSelector selector,
                                                Collection<ReportGridColumnDefinition> cols) {
         if (isEmpty(cols)) {
