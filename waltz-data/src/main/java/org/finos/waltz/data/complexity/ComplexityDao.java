@@ -18,7 +18,6 @@
 
 package org.finos.waltz.data.complexity;
 
-import org.finos.waltz.schema.tables.records.ComplexityRecord;
 import org.finos.waltz.common.Checks;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.InlineSelectFieldFactory;
@@ -28,21 +27,23 @@ import org.finos.waltz.model.complexity.Complexity;
 import org.finos.waltz.model.complexity.ComplexityTotal;
 import org.finos.waltz.model.complexity.ImmutableComplexity;
 import org.finos.waltz.model.complexity.ImmutableComplexityTotal;
+import org.finos.waltz.schema.tables.records.ComplexityRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
+import org.jooq.lambda.tuple.Tuple3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.Set;
 
-import static org.finos.waltz.schema.Tables.COMPLEXITY;
-import static org.finos.waltz.schema.Tables.COMPLEXITY_KIND;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.data.JooqUtilities.selectorToCTE;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.schema.Tables.COMPLEXITY;
+import static org.finos.waltz.schema.Tables.COMPLEXITY_KIND;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository
@@ -116,45 +117,88 @@ public class ComplexityDao {
     }
 
 
-    public Tuple2<BigDecimal, BigDecimal> getAverageAndTotalScoreByKindAndSelector(Long complexityKindId, GenericSelector genericSelector) {
+    public Tuple3<BigDecimal, BigDecimal, BigDecimal> getAverageAndTotalAndMedianScoreByKindAndSelector(Long complexityKindId, GenericSelector genericSelector) {
+
         Field<BigDecimal> total_complexity = DSL.sum(COMPLEXITY.SCORE).as("total_complexity");
         Field<BigDecimal> average_complexity = DSL.sum(COMPLEXITY.SCORE).divide(DSL.countDistinct(COMPLEXITY.ENTITY_ID)).as("average_complexity");
-        return dsl
-                .select(total_complexity)
-                .select(average_complexity)
+        Field<BigDecimal> median_complexity = DSL.percentileCont(0.5).withinGroupOrderBy(COMPLEXITY.SCORE).over().as("median_complexity");
+
+        SelectHavingStep<Record> median_complexities = dsl
+                .select(COMPLEXITY.ID)
+                .select(median_complexity)
                 .from(COMPLEXITY)
                 .where(COMPLEXITY.COMPLEXITY_KIND_ID.eq(complexityKindId)
                         .and(COMPLEXITY.ENTITY_ID.in(genericSelector.selector())
+                                .and(COMPLEXITY.ENTITY_KIND.eq(genericSelector.kind().name()))));
+
+        AggregateFunction<BigDecimal> grouped_median_complexity = DSL.max(median_complexities.field("median_complexity", BigDecimal.class).as("median_complexity"));
+
+        SelectHavingStep<Record> qry = dsl
+                .select(total_complexity)
+                .select(average_complexity)
+                .select(grouped_median_complexity)
+                .from(COMPLEXITY)
+                .leftJoin(median_complexities).on(COMPLEXITY.ID.eq(median_complexities.field(COMPLEXITY.ID)))
+                .where(COMPLEXITY.COMPLEXITY_KIND_ID.eq(complexityKindId)
+                        .and(COMPLEXITY.ENTITY_ID.in(genericSelector.selector())
                                 .and(COMPLEXITY.ENTITY_KIND.eq(genericSelector.kind().name()))))
-                .groupBy(COMPLEXITY.COMPLEXITY_KIND_ID)
-                .fetchOne(r -> tuple(r.get(average_complexity), r.get(total_complexity)));
+                .groupBy(COMPLEXITY.COMPLEXITY_KIND_ID);
+
+        return qry
+                .fetchOne(r -> tuple(r.get(average_complexity), r.get(total_complexity), r.get(grouped_median_complexity)));
     }
 
 
     public Set<ComplexityTotal> findTotalsByGenericSelector(GenericSelector genericSelector) {
 
         Field<BigDecimal> total_complexity = DSL.sum(COMPLEXITY.SCORE).as("total_complexity");
+        Field<Integer> complexity_count = DSL.count(COMPLEXITY.ID).as("complexity_count");
         Field<BigDecimal> average_complexity = DSL.sum(COMPLEXITY.SCORE).divide(DSL.countDistinct(COMPLEXITY.ENTITY_ID)).as("average_complexity");
-        SelectHavingStep<Record3<Long, BigDecimal, BigDecimal>> totalsAndAverages = DSL
-                .select( COMPLEXITY.COMPLEXITY_KIND_ID, total_complexity, average_complexity)
+
+        SelectHavingStep<Record4<Long, BigDecimal, BigDecimal, Integer>> totalsAndAveragesQry = DSL
+                .select(COMPLEXITY.COMPLEXITY_KIND_ID,
+                        total_complexity,
+                        average_complexity,
+                        complexity_count)
                 .from(COMPLEXITY)
                 .where(COMPLEXITY.ENTITY_ID.in(genericSelector.selector())
                         .and(COMPLEXITY.ENTITY_KIND.eq(genericSelector.kind().name())))
                 .groupBy(COMPLEXITY.COMPLEXITY_KIND_ID);
 
-        SelectOnConditionStep<Record> qry = dsl
-                .select(totalsAndAverages.fields())
-                .select(COMPLEXITY_KIND.fields())
-                .from(totalsAndAverages)
-                .innerJoin(COMPLEXITY_KIND).on(COMPLEXITY_KIND.ID.eq(totalsAndAverages.field(COMPLEXITY.COMPLEXITY_KIND_ID)));
+        SelectConditionStep<Record3<Long, Long, BigDecimal>> squaredValuesMinusMean = DSL
+                .select(COMPLEXITY.COMPLEXITY_KIND_ID,
+                        COMPLEXITY.ID,
+                        DSL.power(COMPLEXITY.SCORE.minus(totalsAndAveragesQry.field(average_complexity)), 2).as("value"))
+                .from(COMPLEXITY)
+                .innerJoin(totalsAndAveragesQry).on(COMPLEXITY.COMPLEXITY_KIND_ID.eq(totalsAndAveragesQry.field(COMPLEXITY.COMPLEXITY_KIND_ID)))
+                .where(COMPLEXITY.ENTITY_ID.in(genericSelector.selector())
+                        .and(COMPLEXITY.ENTITY_KIND.eq(genericSelector.kind().name())));
 
-        return qry
-            .fetchSet(r -> ImmutableComplexityTotal
-                    .builder()
-                    .average(r.get(totalsAndAverages.field(average_complexity)))
-                    .total(r.get(totalsAndAverages.field(total_complexity)))
-                    .complexityKind(ComplexityKindDao.TO_COMPLEXITY_KIND_MAPPER.map(r))
-                    .build());
+        Field<BigDecimal> standardDeviation = DSL.sqrt(
+                DSL.sum(squaredValuesMinusMean.field("value", BigDecimal.class))
+                        .divide(DSL.count(squaredValuesMinusMean.field(COMPLEXITY.ID)))).as("standard_deviation");
+
+        SelectHavingStep<Record> standardDeviationByKind = DSL
+                .select(squaredValuesMinusMean.field(COMPLEXITY.COMPLEXITY_KIND_ID).as("kind_id"))
+                .select(standardDeviation)
+                .from(squaredValuesMinusMean)
+                .groupBy(squaredValuesMinusMean.field(COMPLEXITY.COMPLEXITY_KIND_ID));
+
+        return dsl
+                .select(totalsAndAveragesQry.field(total_complexity),
+                        totalsAndAveragesQry.field(average_complexity))
+                .select(standardDeviationByKind.field(standardDeviation))
+                .select(COMPLEXITY_KIND.fields())
+                .from(totalsAndAveragesQry)
+                .innerJoin(COMPLEXITY_KIND).on(COMPLEXITY_KIND.ID.eq(totalsAndAveragesQry.field(COMPLEXITY.COMPLEXITY_KIND_ID)))
+                .innerJoin(standardDeviationByKind).on(standardDeviationByKind.field("kind_id", Long.class).eq(totalsAndAveragesQry.field(COMPLEXITY.COMPLEXITY_KIND_ID)))
+                .fetchSet(r -> ImmutableComplexityTotal
+                        .builder()
+                        .complexityKind(ComplexityKindDao.TO_COMPLEXITY_KIND_MAPPER.map(r))
+                        .total(r.get(total_complexity))
+                        .average(r.get(average_complexity))
+                        .standardDeviation(r.get(standardDeviationByKind.field(standardDeviation)))
+                        .build());
     }
 
 
@@ -187,5 +231,27 @@ public class ComplexityDao {
                 .fetchOne(r -> tuple(
                         r.get(entityWithComplexityCount),
                         r.get(entityCount) - r.get(entityWithComplexityCount)));
+    }
+
+    public Tuple2<BigDecimal, BigDecimal> getStandardDeviationAndVariance(Long kindId, GenericSelector genericSelector, BigDecimal mean, Integer numberOfItems) {
+
+        SelectConditionStep<Record2<Long, BigDecimal>> squaredValuesMinusMean = dsl
+                .select(COMPLEXITY.COMPLEXITY_KIND_ID, DSL.power(COMPLEXITY.SCORE.minus(DSL.val(mean)), 2).as("value"))
+                .from(COMPLEXITY)
+                .where(COMPLEXITY.COMPLEXITY_KIND_ID.eq(kindId)
+                        .and(COMPLEXITY.ENTITY_ID.in(genericSelector.selector())
+                                .and(COMPLEXITY.ENTITY_KIND.eq(genericSelector.kind().name()))));
+
+
+        Field<BigDecimal> variance = DSL.sum(squaredValuesMinusMean.field("value", BigDecimal.class)).divide(DSL.val(numberOfItems)).as("variance");
+        Field<BigDecimal> standardDeviation = DSL.sqrt(DSL.sum(squaredValuesMinusMean.field("value", BigDecimal.class)).divide(DSL.val(numberOfItems))).as("standard_deviation");
+
+        SelectHavingStep<Record> qry = dsl
+                .select(standardDeviation)
+                .select(variance)
+                .from(squaredValuesMinusMean)
+                .groupBy(squaredValuesMinusMean.field(COMPLEXITY.COMPLEXITY_KIND_ID));
+
+        return qry.fetchOne(r -> tuple(r.get("standard_deviation", BigDecimal.class), r.get("variance", BigDecimal.class)));
     }
 }

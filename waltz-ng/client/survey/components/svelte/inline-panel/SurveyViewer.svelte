@@ -15,6 +15,7 @@
     import {surveyInstanceStore} from "../../../../svelte-stores/survey-instance-store";
     import CopySurveyResponsesPanel from "./CopySurveyResponsesPanel.svelte";
     import Icon from "../../../../widgets/icon";
+    import Markdown from "../../../../common/svelte/Markdown.svelte";
 
     export let primaryEntityRef;
 
@@ -79,6 +80,12 @@
                             </div>
                             {#if question?.externalId}
                                 <div class="text-muted small">({question?.externalId})</div>
+                            {/if}
+                            {#if question?.helpText}
+                                <div class="text-muted small"
+                                     style="padding-top: 1em">
+                                    <Markdown text={question?.helpText}/>
+                                </div>
                             {/if}
                         </div>
                         <div class:col-md-6={_.isEmpty(question?.subQuestions)}

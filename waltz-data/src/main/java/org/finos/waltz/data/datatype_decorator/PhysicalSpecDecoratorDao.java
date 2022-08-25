@@ -212,22 +212,33 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
 
 
     public int rippleDataTypesToLogicalFlows() {
-        return dsl.insertInto(LOGICAL_FLOW_DECORATOR)
-                .select(DSL
-                        .selectDistinct(
-                                PHYSICAL_FLOW.LOGICAL_FLOW_ID,
-                                DSL.val(DATA_TYPE.name()),
-                                PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID,
-                                DSL.val(AuthoritativenessRatingValue.NO_OPINION.value()),
-                                DSL.val("waltz"),
-                                DSL.val(Timestamp.valueOf(nowUtc())),
-                                DSL.val("admin"))
-                        .from(PHYSICAL_SPEC_DATA_TYPE)
-                        .join(PHYSICAL_FLOW).on(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID.eq(PHYSICAL_FLOW.SPECIFICATION_ID))
-                        .leftJoin(LOGICAL_FLOW_DECORATOR)
-                            .on(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(PHYSICAL_FLOW.LOGICAL_FLOW_ID)
-                                .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.eq(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID)))
-                        .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.isNull()))
+        SelectConditionStep<Record7<Long, String, Long, String, String, Timestamp, String>> qry = DSL
+                .selectDistinct(
+                        PHYSICAL_FLOW.LOGICAL_FLOW_ID,
+                        DSL.val(DATA_TYPE.name()),
+                        PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID,
+                        DSL.val(AuthoritativenessRatingValue.NO_OPINION.value()),
+                        DSL.val("waltz"),
+                        DSL.val(Timestamp.valueOf(nowUtc())),
+                        DSL.val("admin"))
+                .from(PHYSICAL_SPEC_DATA_TYPE)
+                .innerJoin(PHYSICAL_FLOW)
+                .on(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID.eq(PHYSICAL_FLOW.SPECIFICATION_ID))
+                .leftJoin(LOGICAL_FLOW_DECORATOR)
+                .on(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(PHYSICAL_FLOW.LOGICAL_FLOW_ID)
+                        .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.eq(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID)))
+                .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.isNull());
+
+        return dsl
+                .insertInto(LOGICAL_FLOW_DECORATOR)
+                .columns(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID,
+                        LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND,
+                        LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID,
+                        LOGICAL_FLOW_DECORATOR.RATING,
+                        LOGICAL_FLOW_DECORATOR.PROVENANCE,
+                        LOGICAL_FLOW_DECORATOR.LAST_UPDATED_AT,
+                        LOGICAL_FLOW_DECORATOR.LAST_UPDATED_BY)
+                .select(qry)
                 .execute();
     }
 }

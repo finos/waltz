@@ -13,4 +13,6 @@ public abstract class ComplexityTotal {
     public abstract BigDecimal total();
     public abstract BigDecimal average();
 
+    public abstract BigDecimal standardDeviation();
+
 }
