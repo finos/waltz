@@ -49,6 +49,7 @@ import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.service.report_grid.ReportGridUtilities.modifySelectionOptionsForGrid;
 
 @Service
 public class ReportGridService {
@@ -106,13 +107,10 @@ public class ReportGridService {
         // WARNING:  The grid computation is very slow if given a large person tree.
         //    Therefore we restrict it to EXACT only behaviour.
         //    If you are changing this please ensure you have tested with realistic test data.
+        IdSelectionOptions opts = modifySelectionOptionsForGrid(idSelectionOptions);
 
-        IdSelectionOptions opts = idSelectionOptions.entityReference().kind() == EntityKind.PERSON
-                ? ImmutableIdSelectionOptions
-                .copyOf(idSelectionOptions)
-                .withScope(HierarchyQueryScope.EXACT)
-                : idSelectionOptions;
         LOG.info("ReportGrid - getting by ID={} SelectionOptions={}",id,idSelectionOptions);
+
         ReportGridDefinition definition = reportGridDao.getGridDefinitionById(id);
 
         if (definition == null) {
@@ -121,6 +119,7 @@ public class ReportGridService {
         }
 
         EntityKind targetKind = definition.subjectKind();
+
         ReportGridInstance instance = mkInstance(id, opts, targetKind);
 
         return Optional.of(ImmutableReportGrid
@@ -131,7 +130,7 @@ public class ReportGridService {
     }
 
 
-    private ReportGridInstance mkInstance(long id, IdSelectionOptions idSelectionOptions, EntityKind targetKind) {
+    public ReportGridInstance mkInstance(long id, IdSelectionOptions idSelectionOptions, EntityKind targetKind) {
 
         GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, idSelectionOptions);
         Set<ReportGridCell> cellData = reportGridDao.findCellDataByGridId(id, genericSelector);

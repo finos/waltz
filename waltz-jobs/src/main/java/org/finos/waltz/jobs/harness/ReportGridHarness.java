@@ -27,6 +27,8 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.report_grid.ReportGridCell;
 import org.finos.waltz.service.DIBaseConfiguration;
+import org.finos.waltz.service.DIConfiguration;
+import org.finos.waltz.service.report_grid.ReportGridFilterViewService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -43,31 +45,33 @@ public class ReportGridHarness {
 
     public static void main(String[] args) {
 
-        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIBaseConfiguration.class);
-        ReportGridDao dao = ctx.getBean(ReportGridDao.class);
+        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
+        ReportGridFilterViewService svc = ctx.getBean(ReportGridFilterViewService.class);
 
-        System.out.println("Starting....");
+        svc.generateAppGroupsFromFilter();
 
-        EntityReference cib = mkRef(EntityKind.APP_GROUP, 11261);
-        EntityReference infra = mkRef(EntityKind.ORG_UNIT, 6811);
-        EntityReference justWaltz = mkRef(EntityKind.APPLICATION, 20506);
-        EntityReference justWaltzGroup = mkRef(EntityKind.APP_GROUP, 433);
-        EntityReference orgUnit = mkRef(EntityKind.ORG_UNIT, 95);
-        EntityReference everythingGroup = mkRef(EntityKind.APP_GROUP, 20827);
-        EntityReference flowDiagram = mkRef(EntityKind.FLOW_DIAGRAM, 1);
-        EntityReference mgr = mkRef(EntityKind.PERSON, 1);
-
-        GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
-        GenericSelector selector = genericSelectorFactory.applyForKind(EntityKind.APPLICATION, mkOpts(orgUnit));
-
-        System.out.println("Made selector");
-
-        Set<ReportGridCell> a = FunctionUtilities.time("getCellData", () -> dao.findCellDataByGridId(3, selector));
-        Set<ReportGridCell> b = FunctionUtilities.time("getCellData", () -> dao.findCellDataByGridId(3, selector));
-        Set<ReportGridCell> c = FunctionUtilities.time("getCellData", () -> dao.findCellDataByGridId(3, selector));
-        Set<ReportGridCell> data = FunctionUtilities.time("getCellData", () -> dao.findCellDataByGridId(3, selector));
-        System.out.println(data.size());
-        System.out.println(first(data));
+//        System.out.println("Starting....");
+//
+//        EntityReference cib = mkRef(EntityKind.APP_GROUP, 11261);
+//        EntityReference infra = mkRef(EntityKind.ORG_UNIT, 6811);
+//        EntityReference justWaltz = mkRef(EntityKind.APPLICATION, 20506);
+//        EntityReference justWaltzGroup = mkRef(EntityKind.APP_GROUP, 433);
+//        EntityReference orgUnit = mkRef(EntityKind.ORG_UNIT, 95);
+//        EntityReference everythingGroup = mkRef(EntityKind.APP_GROUP, 20827);
+//        EntityReference flowDiagram = mkRef(EntityKind.FLOW_DIAGRAM, 1);
+//        EntityReference mgr = mkRef(EntityKind.PERSON, 1);
+//
+//        GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
+//        GenericSelector selector = genericSelectorFactory.applyForKind(EntityKind.APPLICATION, mkOpts(orgUnit));
+//
+//        System.out.println("Made selector");
+//
+//        Set<ReportGridCell> a = FunctionUtilities.time("getCellData", () -> dao.findCellDataByGridId(3, selector));
+//        Set<ReportGridCell> b = FunctionUtilities.time("getCellData", () -> dao.findCellDataByGridId(3, selector));
+//        Set<ReportGridCell> c = FunctionUtilities.time("getCellData", () -> dao.findCellDataByGridId(3, selector));
+//        Set<ReportGridCell> data = FunctionUtilities.time("getCellData", () -> dao.findCellDataByGridId(3, selector));
+//        System.out.println(data.size());
+//        System.out.println(first(data));
     }
 
 

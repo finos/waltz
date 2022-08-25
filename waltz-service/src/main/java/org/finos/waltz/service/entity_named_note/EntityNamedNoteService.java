@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.finos.waltz.common.Checks.checkFalse;
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -60,6 +61,12 @@ public class EntityNamedNoteService {
 
     public List<EntityNamedNote> findByEntityReference(EntityReference ref) {
         return entityNamedNoteDao.findByEntityReference(ref);
+    }
+
+
+    public Set<EntityNamedNote> findByNoteTypeExtId(String noteTypeExtId) {
+        checkNotNull(noteTypeExtId, "noteTypeExtId cannot be null");
+        return entityNamedNoteDao.findByNoteTypeExtId(noteTypeExtId);
     }
 
 
