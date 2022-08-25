@@ -66,6 +66,7 @@ public class SurveyTemplateEndpoint implements Endpoint {
     @Override
     public void register() {
         String getByIdPath = mkPath(BASE_URL, ":id");
+        String findForOwnerPath = mkPath(BASE_URL, "owner");
         String getByQuestionIdPath = mkPath(BASE_URL, "question-id", ":id");
         String updateStatusPath = mkPath(BASE_URL, ":id", "status");
         String clonePath = mkPath(BASE_URL, ":id", "clone");
@@ -76,8 +77,11 @@ public class SurveyTemplateEndpoint implements Endpoint {
         DatumRoute<SurveyTemplate> getByQuestionIdRoute = (request, response) ->
                 surveyTemplateService.getByQuestionId(getId(request));
 
+        ListRoute<SurveyTemplate> findForOwnerRoute = (request, response) ->
+                surveyTemplateService.findForOwner(getUsername(request));
+
         ListRoute<SurveyTemplate> findAllRoute = (request, response) ->
-                surveyTemplateService.findAll(getUsername(request));
+                surveyTemplateService.findAll();
 
         DatumRoute<Long> createRoute =
                 (req, res) -> {
@@ -122,6 +126,7 @@ public class SurveyTemplateEndpoint implements Endpoint {
 
 
         getForList(BASE_URL, findAllRoute);
+        getForList(findForOwnerPath, findForOwnerRoute);
         getForDatum(getByIdPath, getByIdRoute);
         getForDatum(getByQuestionIdPath, getByQuestionIdRoute);
         postForDatum(BASE_URL, createRoute);

@@ -54,7 +54,7 @@ public class SurveyTemplateServiceTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void ifCannotFindPersonMustOnlyReturnActiveTemplates() {
-        List<SurveyTemplate> surveys = surveyTemplateService.findAll("foo");
+        List<SurveyTemplate> surveys = surveyTemplateService.findForOwner("foo");
         Set<SurveyTemplate> nonActiveTemplates = surveys
                 .stream()
                 .filter(r -> r.status().equals(ReleaseLifecycleStatus.ACTIVE))
@@ -68,7 +68,7 @@ public class SurveyTemplateServiceTest extends BaseInMemoryIntegrationTest {
         templateHelper.deleteAllSurveyTemplate();
         String userId = mkUserId("findAllReturnsEmptyListIfNoTemplates");
         personHelper.createPerson(userId);
-        List<SurveyTemplate> templates = surveyTemplateService.findAll(userId);
+        List<SurveyTemplate> templates = surveyTemplateService.findForOwner(userId);
         assertNotNull(templates);
         assertTrue(templates.isEmpty());
     }
@@ -82,7 +82,7 @@ public class SurveyTemplateServiceTest extends BaseInMemoryIntegrationTest {
         personHelper.createPerson(userId);
 
         long id = templateHelper.createTemplate(userId, templateName);
-        List<SurveyTemplate> all = surveyTemplateService.findAll(userId);
+        List<SurveyTemplate> all = surveyTemplateService.findForOwner(userId);
 
         assertNotNull(all);
         assertNotNull(find(
