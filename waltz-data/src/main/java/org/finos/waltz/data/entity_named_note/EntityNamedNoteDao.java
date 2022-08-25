@@ -32,7 +32,9 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Set;
 
+import static org.finos.waltz.schema.Tables.ENTITY_NAMED_NOTE_TYPE;
 import static org.finos.waltz.schema.tables.EntityNamedNote.ENTITY_NAMED_NOTE;
 import static org.finos.waltz.common.Checks.checkNotNull;
 
@@ -108,12 +110,21 @@ public class EntityNamedNoteDao {
                 .execute() == 1;
     }
 
-    
+
     public boolean remove(EntityReference ref) {
         checkNotNull(ref, "ref cannot be null");
         return dsl.deleteFrom(ENTITY_NAMED_NOTE)
                 .where(ENTITY_NAMED_NOTE.ENTITY_KIND.eq(ref.kind().name()))
                 .and(ENTITY_NAMED_NOTE.ENTITY_ID.eq(ref.id()))
                 .execute() > 0;
+    }
+
+    public Set<EntityNamedNote> findByNoteTypeExtId(String noteTypeExtId) {
+        return dsl
+                .select(ENTITY_NAMED_NOTE.fields())
+                .from(ENTITY_NAMED_NOTE)
+                .innerJoin(ENTITY_NAMED_NOTE_TYPE).on(ENTITY_NAMED_NOTE.NAMED_NOTE_TYPE_ID.eq(ENTITY_NAMED_NOTE_TYPE.ID))
+                .where(ENTITY_NAMED_NOTE_TYPE.EXTERNAL_ID.eq(noteTypeExtId))
+                .fetchSet(TO_DOMAIN_MAPPER);
     }
 }
