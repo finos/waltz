@@ -19,12 +19,12 @@
 package org.finos.waltz.data.survey;
 
 
-import org.finos.waltz.schema.tables.records.SurveyTemplateRecord;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.ReleaseLifecycleStatus;
 import org.finos.waltz.model.survey.ImmutableSurveyTemplate;
 import org.finos.waltz.model.survey.SurveyTemplate;
 import org.finos.waltz.model.survey.SurveyTemplateChangeCommand;
+import org.finos.waltz.schema.tables.records.SurveyTemplateRecord;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -33,13 +33,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.schema.Tables.SURVEY_QUESTION;
 import static org.finos.waltz.schema.tables.SurveyTemplate.SURVEY_TEMPLATE;
-import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Repository
 public class SurveyTemplateDao {
@@ -98,32 +99,37 @@ public class SurveyTemplateDao {
      * @return Returns all 'ACTIVE' templates (owned by any user)
      * and all 'DRAFT' templates owned by the specified user
      */
-    public List<SurveyTemplate> findAll(Long ownerId) {
+    public List<SurveyTemplate> findForOwner(Long ownerId) {
 
         Condition canViewSurveyCondition = ownerId != null
                 ? SURVEY_TEMPLATE.STATUS.eq(ReleaseLifecycleStatus.ACTIVE.name())
                 .or(SURVEY_TEMPLATE.STATUS.eq(ReleaseLifecycleStatus.DRAFT.name()).and(SURVEY_TEMPLATE.OWNER_ID.eq(ownerId)))
                 : SURVEY_TEMPLATE.STATUS.eq(ReleaseLifecycleStatus.ACTIVE.name());
 
+        return findByCondition(canViewSurveyCondition);
+    }
+
+    public List<SurveyTemplate> findAllActive() {
+        Condition activeCondition = SURVEY_TEMPLATE.STATUS.eq(ReleaseLifecycleStatus.ACTIVE.name());
+        return findByCondition(activeCondition);
+    }
+
+    public Collection<SurveyTemplate> findAll() {
+        Condition notDraftCondition = SURVEY_TEMPLATE.STATUS.ne(ReleaseLifecycleStatus.DRAFT.name());
+        return findByCondition(notDraftCondition);
+    }
+
+    public List<SurveyTemplate> findByCondition(Condition condition) {
         return dsl
                 .select()
                 .from(SURVEY_TEMPLATE)
-                .where(canViewSurveyCondition)
+                .where(condition)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
-
-    public List<SurveyTemplate> findAllActive() {
-        return dsl.select()
-                .from(SURVEY_TEMPLATE)
-                .where(SURVEY_TEMPLATE.STATUS.eq(ReleaseLifecycleStatus.ACTIVE.name()))
-                .fetch(TO_DOMAIN_MAPPER);
-    }
-
-    
     public long create(SurveyTemplate surveyTemplate) {
         checkNotNull(surveyTemplate, "surveyTemplate cannot be null");
-        
+
         SurveyTemplateRecord record = TO_RECORD_MAPPER.apply(surveyTemplate);
         return dsl.insertInto(SURVEY_TEMPLATE)
                 .set(record)

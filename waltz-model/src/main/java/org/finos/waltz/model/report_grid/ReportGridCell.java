@@ -25,6 +25,7 @@ import org.finos.waltz.model.Nullable;
 import org.immutables.value.Value;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableReportGridCell.class)
@@ -38,14 +39,27 @@ public abstract class ReportGridCell implements CommentProvider {
 
 
     @Nullable
-    public abstract Long ratingId();
+    public abstract Long ratingIdValue();
 
 
     @Nullable
-    public abstract BigDecimal value();
+    public abstract BigDecimal numberValue();
 
 
     @Nullable
-    public abstract String text();
+    public abstract String textValue();
+
+    @Nullable
+    public abstract LocalDateTime dateTimeValue();
+
+    @Value.Default
+    public String optionCode() {
+        return "PROVIDED";
+    }
+
+    @Value.Default
+    public String optionText() {
+        return "Provided";
+    }
 
 }

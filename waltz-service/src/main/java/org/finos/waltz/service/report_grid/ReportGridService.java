@@ -34,7 +34,6 @@ import org.finos.waltz.model.change_initiative.ChangeInitiative;
 import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.model.report_grid.*;
 import org.finos.waltz.model.user.SystemRole;
-import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.rating_scheme.RatingSchemeService;
 import org.finos.waltz.service.user.UserRoleService;
 import org.slf4j.Logger;
@@ -139,7 +138,7 @@ public class ReportGridService {
 
         Set<RatingSchemeItem> ratingSchemeItems = ratingSchemeService.findRatingSchemeItemsByIds(map(
                 cellData,
-                ReportGridCell::ratingId));
+                ReportGridCell::ratingIdValue));
 
         return ImmutableReportGridInstance
                 .builder()

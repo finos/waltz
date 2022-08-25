@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.report_grid.ReportGrid;
 import org.finos.waltz.model.report_grid.ReportGridColumnDefinition;
 import org.finos.waltz.model.report_grid.ReportGridDefinition;
@@ -43,6 +42,7 @@ public class DynamicJSONFormatter implements DynamicFormatter {
 
     private static final Logger LOG = LoggerFactory.getLogger(DynamicJSONFormatter.class);
     private final FormatterUtils formatterUtils;
+
 
     public DynamicJSONFormatter(FormatterUtils formatterUtils){
         this.formatterUtils = formatterUtils;
@@ -73,6 +73,7 @@ public class DynamicJSONFormatter implements DynamicFormatter {
         }
     }
 
+
     private byte[] mkResponse(ReportGrid reportGrid,
                               List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> columnDefinitions,
                               List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows) throws IOException {
@@ -101,27 +102,31 @@ public class DynamicJSONFormatter implements DynamicFormatter {
 
             List<CellValue> transformedRowValues = new ArrayList<>();
 
-            transformedRow.id(createKeyElement(currentRow.v1.entityReference()));
+            transformedRow.id(createKeyElement(currentRow.v1));
             List<String> columnHeadings = formatterUtils.mkColumnHeaders(columnDefinitions);
             int maxColumns = columnHeadings.size();
 
             for (int idx = 0; idx < maxColumns; idx++) {
-                String formattedColumnName = columnHeadings.get(idx)!=null?columnHeadings.get(idx):"";
+                String formattedColumnName = columnHeadings.get(idx) != null
+                        ? columnHeadings.get(idx)
+                        : "";
                 int prevCellAddedIdx= transformedRowValues.size() - 1;
-                boolean isComment = (formattedColumnName.contains("comment"));
+                boolean isComment = formattedColumnName.contains("comment");
                 Object currentCell = currentRow.v2.get(idx);
                 if (currentCell != null) {
-                    CellValue cell = ImmutableCellValue.builder()
+                    CellValue cell = ImmutableCellValue
+                            .builder()
                             .name(formattedColumnName)
                             .value(currentCell.toString())
                             .build();
 
-                    if (isComment && prevCellAddedIdx>-1 && transformedRowValues.get(prevCellAddedIdx) instanceof ImmutableCellValue) {
+                    if (isComment && prevCellAddedIdx > -1 && transformedRowValues.get(prevCellAddedIdx) instanceof ImmutableCellValue) {
                         CellValue previousColumnCell = transformedRowValues.get(prevCellAddedIdx);
-                        CellValue withComment = ImmutableCellValue.copyOf(previousColumnCell)
+                        CellValue withComment = ImmutableCellValue
+                                .copyOf(previousColumnCell)
                                 .withComment(currentCell.toString());
                         transformedRowValues.set(prevCellAddedIdx,withComment);
-                    }else{
+                    } else {
                         transformedRowValues.add(cell);
                     }
 
@@ -137,9 +142,8 @@ public class DynamicJSONFormatter implements DynamicFormatter {
     }
 
 
-    private KeyCell createKeyElement(EntityReference keyAttrib ){
-        return KeyCell
-                .fromRef(keyAttrib);
+    private KeyCell createKeyElement(ReportSubject reportSubject){
+        return KeyCell.fromSubject(reportSubject);
     }
 
 

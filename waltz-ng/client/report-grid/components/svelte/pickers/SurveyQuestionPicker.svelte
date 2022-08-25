@@ -5,17 +5,20 @@
     import {surveyTemplateStore} from "../../../../svelte-stores/survey-template-store";
     import {surveyQuestionStore} from "../../../../svelte-stores/survey-question-store";
     import _ from "lodash";
+    import Toggle from "../../../../common/svelte/Toggle.svelte";
 
     export let onSelect = () => console.log("Selecting involvement kind");
     export let selectionFilter = () => true;
 
     let selectedTemplate = null;
+    let showActiveOnly = true;
 
     $: templatesCall = surveyTemplateStore.findAll();
 
     $: templates = _
         .chain($templatesCall?.data)
         .filter(selectionFilter)
+        .filter(r => !showActiveOnly || r.status === 'ACTIVE')
         .orderBy(d => d.name)
         .value();
 
@@ -72,9 +75,14 @@
           onSelectRow={onSelect}/>
 {:else}
     <div class="help-block small">
-        <Icon name="info-circle"/>Select a template from the list below, you can filter the list using the search bar.
+        <Icon name="info-circle"/>
+        Select a template from the list below, you can filter the list using the search bar.
     </div>
     <br>
+    <Toggle labelOn="Active Templates Only"
+            labelOff="Active Templates Only"
+            state={showActiveOnly}
+            onToggle={() => showActiveOnly = !showActiveOnly}/>
     <Grid columnDefs={templateColumnDefs}
           rowData={templates}
           onSelectRow={selectTemplate}/>

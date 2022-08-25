@@ -19,20 +19,26 @@
 package org.finos.waltz.model.usage_info;
 
 public enum UsageKind {
-    CONSUMER(true),
-    DISTRIBUTOR(true),
-    MODIFIER(false),
-    ORIGINATOR(true);
+    CONSUMER(true, "Consumer"),
+    DISTRIBUTOR(true, "Distributor"),
+    MODIFIER(false, "Modifier"),
+    ORIGINATOR(true, "Originator");
 
 
     private final boolean readOnly;
+    private final String displayName;
 
-    UsageKind(boolean readOnly) {
+    UsageKind(boolean readOnly, String displayName) {
         this.readOnly = readOnly;
+        this.displayName = displayName;
     }
 
     public boolean isReadOnly() {
         return readOnly;
+    }
+
+    public String displayName() {
+        return displayName;
     }
 
 }

@@ -38,8 +38,6 @@
         return selectionFilter(payload);
     }
 
-
-    $: console.log("DTP", {selectionFilter})
 </script>
 
 
