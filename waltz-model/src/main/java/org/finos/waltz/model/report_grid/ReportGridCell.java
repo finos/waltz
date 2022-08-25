@@ -21,7 +21,6 @@ package org.finos.waltz.model.report_grid;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.CommentProvider;
-import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.Nullable;
 import org.immutables.value.Value;
 
@@ -32,21 +31,19 @@ import java.math.BigDecimal;
 @JsonDeserialize(as = ImmutableReportGridCell.class)
 public abstract class ReportGridCell implements CommentProvider {
 
-    public abstract EntityKind columnEntityKind();  // x
+    public abstract Long columnDefinitionId();
 
-    @Nullable
-    public abstract Long columnEntityId();  // x
-
-    @Nullable
-    public abstract Long entityFieldReferenceId();  // x
 
     public abstract long subjectId(); // y
+
 
     @Nullable
     public abstract Long ratingId();
 
+
     @Nullable
     public abstract BigDecimal value();
+
 
     @Nullable
     public abstract String text();
