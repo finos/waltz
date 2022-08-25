@@ -12,13 +12,21 @@
 
     <div ng-if="$ctrl.stats.length > 0">
         <table class="table-condensed table small">
+            <colgroup>
+                <col width="40%"/>
+                <col width="20%"/>
+                <col width="20%"/>
+                <col width="20%"/>
+            </colgroup>
             <thead>
             <tr>
-                <th>Kind</th>
-                <th>Sum</th>
-                <th>Avg</th>
+                <th><span class="pull-left">Kind</span></th>
+                <th title="A sum of the complexities">Total</th>
+                <th title="The mean value of the complexities">Avg</th>
+                <th title="The population standard deviation of the complexities">SD</th>
             </tr>
             </thead>
+            <tbody>
             <tr ng-repeat="stat in $ctrl.stats"
                 ng-style="{ 'font-weight': stat.complexityKind.isDefault ? 'bold': 'none'}"
                 uib-popover="{{stat.complexityKind.description}}"
@@ -26,10 +34,16 @@
                 popover-append-to-body="true"
                 popover-placement="right"
                 popover-trigger="mouseenter">
-                <td ng-bind="stat.complexityKind.name"></td>
+                <td>
+                        <span class="pull-left"
+                              ng-bind="stat.complexityKind.name">
+                        </span>
+                </td>
                 <td><span ng-bind="stat.total | toFixed:2"></span></td>
                 <td><span ng-bind="stat.average | toFixed:2"></span></td>
+                <td><span ng-bind="stat.standardDeviation | toFixed:2"></span></td>
             </tr>
+            </tbody>
         </table>
     </div>
 

@@ -10,6 +10,7 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.complexity.*;
 import org.jooq.lambda.tuple.Tuple2;
+import org.jooq.lambda.tuple.Tuple3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,23 +52,28 @@ public class ComplexityService {
     public ComplexitySummary getComplexitySummaryForSelector(Long complexityKindId,
                                                              EntityKind targetKind,
                                                              IdSelectionOptions options,
-                                                             int limit){
+                                                             int limit) {
 
         GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, options);
 
         Set<Complexity> topComplexities = complexityDao.findTopComplexityScoresForKindAndSelector(complexityKindId, genericSelector, limit);
 
-        Tuple2<BigDecimal, BigDecimal> averageAndTotalScore = complexityDao.getAverageAndTotalScoreByKindAndSelector(complexityKindId, genericSelector);
+        Tuple3<BigDecimal, BigDecimal, BigDecimal> averageAndTotalAndMedianScore = complexityDao.getAverageAndTotalAndMedianScoreByKindAndSelector(complexityKindId, genericSelector);
 
         Tuple2<Integer, Integer> mappedAndMissingCountsForKindBySelector = complexityDao.getMappedAndMissingCountsForKindBySelector(complexityKindId, genericSelector);
+
+        Tuple2<BigDecimal, BigDecimal> standardDeviationAndVariance = complexityDao.getStandardDeviationAndVariance(complexityKindId, genericSelector, averageAndTotalAndMedianScore.v1, mappedAndMissingCountsForKindBySelector.v1);
 
         ComplexityKind complexityKind = complexityKindService.getById(complexityKindId);
 
         return ImmutableComplexitySummary.builder()
                 .complexityKind(complexityKind)
                 .topComplexityScores(topComplexities)
-                .average(averageAndTotalScore.v1.setScale(2, ROUND_HALF_UP))
-                .total(averageAndTotalScore.v2)
+                .average(averageAndTotalAndMedianScore.v1.setScale(2, ROUND_HALF_UP))
+                .median(averageAndTotalAndMedianScore.v3.setScale(2, ROUND_HALF_UP))
+                .variance(standardDeviationAndVariance.v2.setScale(2, ROUND_HALF_UP))
+                .standardDeviation(standardDeviationAndVariance.v1.setScale(2, ROUND_HALF_UP))
+                .total(averageAndTotalAndMedianScore.v2)
                 .mappedCount(mappedAndMissingCountsForKindBySelector.v1)
                 .missingCount(mappedAndMissingCountsForKindBySelector.v2)
                 .build();

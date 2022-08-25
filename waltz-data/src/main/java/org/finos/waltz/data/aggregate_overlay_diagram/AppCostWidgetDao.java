@@ -66,8 +66,7 @@ public class AppCostWidgetDao {
     public Set<CostWidgetDatum> findWidgetData(long diagramId,
                                                Set<Long> costKindIds,
                                                long allocationSchemeId,
-                                               Select<Record1<Long>> inScopeApplicationSelector,
-                                               Optional<LocalDate> targetStateDate) {
+                                               Select<Record1<Long>> inScopeApplicationSelector) {
 
         Set<Tuple2<String, EntityReference>> cellWithBackingEntities = loadExpandedCellMappingsForDiagram(dsl, diagramId);
 
@@ -220,8 +219,6 @@ public class AppCostWidgetDao {
                         .and(c.YEAR.eq(2021))) //TODO: this should be soft coded (or come in via a param)
                 .where(mr.MEASURABLE_ID.in(backingMeasurableIds))
                 .and(mr.ENTITY_ID.in(inScopeApplicationSelector));
-
-        System.out.println(qry);
 
         return qry
                 .fetchSet(r -> ImmutableMeasurableCostEntry

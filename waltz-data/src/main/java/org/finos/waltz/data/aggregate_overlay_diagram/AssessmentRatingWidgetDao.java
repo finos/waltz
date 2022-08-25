@@ -50,7 +50,6 @@ public class AssessmentRatingWidgetDao {
 
         Map<String, Set<Long>> cellExtIdsToAggregatedEntities = loadCellExtIdToAggregatedEntities(
                 dsl,
-                diagramId,
                 cellWithBackingEntities,
                 aggregatedEntityKind,
                 inScopeEntityIdSelector,

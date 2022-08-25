@@ -23,35 +23,21 @@ import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramIn
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramPreset;
 import org.finos.waltz.model.aggregate_overlay_diagram.OverlayDiagramPresetCreateCommand;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.*;
-import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AggregatedEntitiesWidgetParameters;
-import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AppCostWidgetParameters;
-import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AppCountWidgetParameters;
-import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AssessmentWidgetParameters;
-import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.TargetAppCostWidgetParameters;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.*;
 import org.finos.waltz.service.aggregate_overlay_diagram.AggregateOverlayDiagramService;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.WebUtilities;
 import org.finos.waltz.web.endpoints.Endpoint;
-import org.finos.waltz.web.json.OverlayDiagramAggregatedEntitiesWidgetInfo;
-import org.finos.waltz.web.json.OverlayDiagramAppCostWidgetInfo;
-import org.finos.waltz.web.json.OverlayDiagramAppCountWidgetInfo;
-import org.finos.waltz.web.json.OverlayDiagramAssessmentWidgetInfo;
-import org.finos.waltz.web.json.OverlayDiagramTargetAppCostWidgetInfo;
-import org.finos.waltz.web.json.OverlayDiagramWidgetInfo;
+import org.finos.waltz.web.json.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.web.WebUtilities.getId;
-import static org.finos.waltz.web.WebUtilities.getUsername;
-import static org.finos.waltz.web.WebUtilities.mkPath;
-import static org.finos.waltz.web.WebUtilities.readBody;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.getForDatum;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.getForList;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.postForDatum;
+import static org.finos.waltz.web.WebUtilities.*;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 
 @Service
 public class AggregateOverlayDiagramEndpoint implements Endpoint {
@@ -81,6 +67,7 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
         String getAppAssessmentWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "app-assessment-widget");
         String getAggregatedEntitiesWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "aggregated-entities-widget");
         String getBackingEntityWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "backing-entity-widget");
+        String getComplexityWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "complexity-widget");
         String findPresetsForDiagramPath = mkPath(BASE_URL, "diagram-id", ":id", "presets");
         String createPresetPath = mkPath(BASE_URL, "create-preset");
 
@@ -130,6 +117,18 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
                             appCostWidgetParameters.assessmentBasedSelectionFilters(),
                             appCostWidgetParameters.idSelectionOptions(),
                             appCostWidgetParameters.overlayParameters());
+        };
+
+
+        DatumRoute<ComplexityWidgetData> getComplexityWidgetDataRoute = (request, response) -> {
+            OverlayDiagramWidgetInfo<AppComplexityWidgetParameters> appComplexityWidgetParameters = readBody(request, OverlayDiagramAppComplexityWidgetInfo.class);
+
+            return aggregateOverlayDiagramService
+                    .getAppComplexityWidgetData(
+                            getId(request),
+                            appComplexityWidgetParameters.assessmentBasedSelectionFilters(),
+                            appComplexityWidgetParameters.idSelectionOptions(),
+                            appComplexityWidgetParameters.overlayParameters());
         };
 
 
@@ -183,6 +182,7 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
         postForDatum(getAppCostWidgetDataPath, getAppCostWidgetDataRoute);
         postForDatum(getAppAssessmentWidgetDataPath, getAppAssessmentWidgetDataRoute);
         postForDatum(getAggregatedEntitiesWidgetDataPath, getAggregatedEntitiesWidgetDataRoute);
+        postForDatum(getComplexityWidgetDataPath, getComplexityWidgetDataRoute);
         postForDatum(createPresetPath, createPresetRoute);
     }
 
