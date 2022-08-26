@@ -29,6 +29,7 @@ import org.finos.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.finos.waltz.service.flow_classification_rule.FlowClassificationRuleService;
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.finos.waltz.service.physical_specification_data_type.PhysicalSpecDataTypeService;
+import org.finos.waltz.service.report_grid.ReportGridFilterViewService;
 import org.finos.waltz.service.usage_info.DataTypeUsageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +58,8 @@ public class ScheduledJobService {
     private final ScheduledJobDao scheduledJobDao;
     private final AttestationRunService attestationRunService;
 
+    private final ReportGridFilterViewService reportGridFilterViewService;
+
 
     @Autowired
     public ScheduledJobService(DataTypeUsageService dataTypeUsageService,
@@ -65,13 +68,16 @@ public class ScheduledJobService {
                                LogicalFlowService logicalFlowService,
                                PhysicalSpecDataTypeService physicalSpecDataTypeService,
                                ScheduledJobDao scheduledJobDao,
-                               AttestationRunService attestationRunService) {
+                               AttestationRunService attestationRunService,
+                               ReportGridFilterViewService reportGridFilterViewService) {
+
         checkNotNull(dataTypeUsageService, "dataTypeUsageService cannot be null");
         checkNotNull(flowClassificationRuleService, "flowClassificationRuleService cannot be null");
         checkNotNull(logicalFlowService, "logicalFlowService cannot be null");
         checkNotNull(physicalSpecDataTypeService, "physicalSpecDataTypeService cannot be null");
         checkNotNull(scheduledJobDao, "scheduledJobDao cannot be null");
         checkNotNull(attestationRunService, "attestationRunService cannot be null");
+        checkNotNull(reportGridFilterViewService, "reportGridFilterViewService cannot be null");
 
         this.dataTypeUsageService = dataTypeUsageService;
         this.entityHierarchyService = entityHierarchyService;
@@ -80,6 +86,7 @@ public class ScheduledJobService {
         this.physicalSpecDataTypeService = physicalSpecDataTypeService;
         this.scheduledJobDao = scheduledJobDao;
         this.attestationRunService = attestationRunService;
+        this.reportGridFilterViewService = reportGridFilterViewService;
     }
 
 
@@ -120,6 +127,9 @@ public class ScheduledJobService {
 
         runIfNeeded(JobKey.ATTESTATION_ISSUE_INSTANCES,
                 (jk) -> attestationRunService.issueInstancesForPendingRuns());
+
+        runIfNeeded(JobKey.REPORT_GRID_FILTER_PRESET,
+                (jk) -> reportGridFilterViewService.generateAppGroupsFromFilter());
     }
 
 
