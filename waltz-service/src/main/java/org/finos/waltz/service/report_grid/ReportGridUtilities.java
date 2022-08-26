@@ -30,7 +30,7 @@ public class ReportGridUtilities {
         String[] lines = noteText.split("\\r?\\n");
 
         String tableHeader = "| Grid Name | Grid Identifier | Vantage Point Kind | Vantage Point Id |";
-        String filterHeader = "| Filter Column | Values |";
+        String filterHeader = "| Filter Column | Column Option Codes |";
 
         ArrayList<List<String>> headerRows = parseTableData(lines, tableHeader);
         ArrayList<List<String>> filterRows = parseTableData(lines, filterHeader);
@@ -91,19 +91,6 @@ public class ReportGridUtilities {
                 });
 
         return cells;
-    }
-
-    public static Integer findIndexContaining(List<String> lines, String searchString) {
-        Checks.checkNotEmpty(searchString, "Cannot search for an empty or null search string");
-
-        Optional<String> lineWithContent = lines
-                .stream()
-                .filter(line -> line.contains(searchString))
-                .findFirst();
-
-        return lineWithContent
-                .map(lines::indexOf)
-                .orElseThrow(() -> new IllegalArgumentException(format("Could not find line with content '%s'", searchString)));
     }
 
 

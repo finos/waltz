@@ -39,6 +39,7 @@ import org.finos.waltz.model.entity_relationship.ImmutableEntityRelationship;
 import org.finos.waltz.model.entity_relationship.RelationshipKind;
 import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.finos.waltz.model.orgunit.OrganisationalUnit;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -430,6 +431,13 @@ public class AppGroupService {
         changeLogService.write(changeInitiativeChangeLogs);
 
         return changeInitiativeService.findEntriesForAppGroup(groupId);
+    }
+
+    /*
+    Removes all entries from groups and repopulates with the list of appGroupEntries
+     */
+    public void updateGroups(Set<Tuple2<Long, Set<AppGroupEntry>>> entriesForGroups) {
+        appGroupEntryDao.updateGroups(entriesForGroups);
     }
 
 

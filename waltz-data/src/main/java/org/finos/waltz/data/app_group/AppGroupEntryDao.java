@@ -18,23 +18,31 @@
 
 package org.finos.waltz.data.app_group;
 
+import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.app_group.AppGroupEntry;
 import org.finos.waltz.model.app_group.ImmutableAppGroupEntry;
+import org.finos.waltz.schema.tables.records.ApplicationGroupEntryRecord;
 import org.jooq.DSLContext;
 import org.jooq.Query;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
 import org.jooq.impl.DSL;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toSet;
+import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static org.finos.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_GROUP_ENTRY;
 import static org.finos.waltz.data.application.ApplicationDao.IS_ACTIVE;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 
 
 @Repository
@@ -105,5 +113,36 @@ public class AppGroupEntryDao {
                 .and(APPLICATION_GROUP_ENTRY.APPLICATION_ID.in(applicationIds)
                         .and(APPLICATION_GROUP_ENTRY.IS_READONLY.isFalse()))
                 .execute();
+    }
+
+    public void updateGroups(Set<Tuple2<Long, Set<AppGroupEntry>>> entriesForGroups) {
+        Set<Long> groupIds = map(entriesForGroups, d -> d.v1);
+
+        dsl.transaction(ctx -> {
+            DSLContext tx = ctx.dsl();
+
+            int removedEntries = tx
+                    .deleteFrom(APPLICATION_GROUP_ENTRY)
+                    .where(APPLICATION_GROUP_ENTRY.GROUP_ID.in(groupIds))
+                    .execute();
+
+            int[] createdEntries = entriesForGroups
+                    .stream()
+                    .flatMap(t -> t.v2
+                            .stream()
+                            .map(r -> {
+                                ApplicationGroupEntryRecord record = dsl.newRecord(APPLICATION_GROUP_ENTRY);
+                                record.setGroupId(t.v1);
+                                record.setApplicationId(r.id());
+                                record.setIsReadonly(r.isReadOnly());
+                                record.setProvenance(r.provenance());
+                                record.setCreatedAt(DateTimeUtilities.nowUtcTimestamp());
+                                return record;
+                            }))
+                    .collect(Collectors.collectingAndThen(toSet(), tx::batchInsert))
+                    .execute();
+
+            System.out.println("Hi");
+        });
     }
 }
