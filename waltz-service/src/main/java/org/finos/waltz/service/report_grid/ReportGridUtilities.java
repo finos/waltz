@@ -65,6 +65,7 @@ public class ReportGridUtilities {
                     //Stop parsing when hit empty line
                     if (StringUtilities.isEmpty(line)) {
                         savingRows.set(false);
+                        return;
                     }
 
                     //Ignore lines which don't look part of a table or are just describing table structure

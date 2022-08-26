@@ -90,6 +90,8 @@ public class ReportGridFilterViewService {
 
     public void generateAppGroupsFromFilter() {
 
+        LOG.info("Populating application groups from filters");
+
         Set<EntityNamedNote> filterPresetNotes = entityNamedNoteService.findByNoteTypeExtId(REPORT_GRID_APP_GROUP_CREATION_NOTE_TYPE_EXT_ID);
 
         Set<ReportGridDefinition> grids = reportGridDao.findAll();
@@ -110,14 +112,15 @@ public class ReportGridFilterViewService {
 
                     Set<Long> subjectsPassingFilters = applyFilters(cellData, t.v4);
 
-                    Set<AppGroupEntry> appGroupEntries = SetUtilities.map(subjectsPassingFilters, id -> ImmutableAppGroupEntry
-                            .builder()
-                            .id(id)
-                            .kind(gridDefinition.subjectKind())
-                            .isReadOnly(true)
-                            .build());
+                    Set<AppGroupEntry> appGroupEntries = SetUtilities.map(
+                            subjectsPassingFilters,
+                            id -> ImmutableAppGroupEntry
+                                    .builder()
+                                    .id(id)
+                                    .kind(gridDefinition.subjectKind())
+                                    .isReadOnly(true)
+                                    .build());
 
-                    System.out.println(subjectsPassingFilters.size());
                     return tuple(appGroup, appGroupEntries);
                 })
                 .collect(Collectors.toSet());
@@ -145,6 +148,7 @@ public class ReportGridFilterViewService {
                 .collect(Collectors.toSet());
 
         if (isEmpty(appIdsPassingFilters)) {
+            //If there are no filters all the apps should populate the group
             return SetUtilities.map(cellData, ReportGridCell::subjectId);
         } else {
             return appIdsPassingFilters
@@ -168,9 +172,11 @@ public class ReportGridFilterViewService {
                         return null;
                     }
 
+                    //Should only be one row for grid information
                     List<String> gridInfo = headersAndFilters.v1.get(0);
                     ArrayList<List<String>> filterRows = headersAndFilters.v2;
                     String gridExtId = gridInfo.get(1);
+
                     ReportGridDefinition grid = gridsByExternalId.get(gridExtId);
 
                     if (grid == null) {
