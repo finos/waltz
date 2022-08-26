@@ -35,14 +35,13 @@ import org.springframework.stereotype.Repository;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.SetUtilities.map;
+import static org.finos.waltz.data.application.ApplicationDao.IS_ACTIVE;
 import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static org.finos.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_GROUP_ENTRY;
-import static org.finos.waltz.data.application.ApplicationDao.IS_ACTIVE;
-import static org.jooq.lambda.tuple.Tuple.tuple;
 
 
 @Repository
@@ -139,10 +138,8 @@ public class AppGroupEntryDao {
                                 record.setCreatedAt(DateTimeUtilities.nowUtcTimestamp());
                                 return record;
                             }))
-                    .collect(Collectors.collectingAndThen(toSet(), tx::batchInsert))
+                    .collect(collectingAndThen(toSet(), tx::batchInsert))
                     .execute();
-
-            System.out.println("Hi");
         });
     }
 }

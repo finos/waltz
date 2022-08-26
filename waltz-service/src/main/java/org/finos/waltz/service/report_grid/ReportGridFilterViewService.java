@@ -27,14 +27,10 @@ import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.app_group.AppGroupEntry;
 import org.finos.waltz.model.app_group.ImmutableAppGroupEntry;
 import org.finos.waltz.model.entity_named_note.EntityNamedNote;
-import org.finos.waltz.model.report_grid.ReportGridCell;
-import org.finos.waltz.model.report_grid.ReportGridColumnDefinition;
-import org.finos.waltz.model.report_grid.ReportGridDefinition;
-import org.finos.waltz.model.report_grid.ReportGridInstance;
+import org.finos.waltz.model.report_grid.*;
 import org.finos.waltz.service.app_group.AppGroupService;
 import org.finos.waltz.service.entity_named_note.EntityNamedNoteService;
 import org.jooq.lambda.tuple.Tuple2;
-import org.jooq.lambda.tuple.Tuple4;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,50 +94,57 @@ public class ReportGridFilterViewService {
 
         Map<String, ReportGridDefinition> gridsByExternalId = indexBy(grids, d -> d.externalId().get());
 
-        Set<Tuple4<Long, ReportGridDefinition, IdSelectionOptions, Set<Tuple2<Long, Set<String>>>>> gridInfoWithFilters = findGridInfoWithFilters(filterPresetNotes, gridsByExternalId);
+        Set<ReportGridFilterInfo> gridInfoWithFilters = findGridInfoWithFilters(filterPresetNotes, gridsByExternalId);
 
-        Set<Tuple2<Long, Set<AppGroupEntry>>> appGroupToEntries = gridInfoWithFilters
-                .stream()
-                .map(t -> {
-                    Long appGroup = t.v1;
-                    ReportGridDefinition gridDefinition = t.v2;
-                    IdSelectionOptions opts = t.v3;
-
-                    ReportGridInstance instance = reportGridService.mkInstance(gridDefinition.id().get(), opts, gridDefinition.subjectKind());
-                    Set<ReportGridCell> cellData = instance.cellData();
-
-                    Set<Long> subjectsPassingFilters = applyFilters(cellData, t.v4);
-
-                    Set<AppGroupEntry> appGroupEntries = SetUtilities.map(
-                            subjectsPassingFilters,
-                            id -> ImmutableAppGroupEntry
-                                    .builder()
-                                    .id(id)
-                                    .kind(gridDefinition.subjectKind())
-                                    .isReadOnly(true)
-                                    .build());
-
-                    return tuple(appGroup, appGroupEntries);
-                })
-                .collect(Collectors.toSet());
+        Set<Tuple2<Long, Set<AppGroupEntry>>> appGroupToEntries = determineAppGroupEntries(gridInfoWithFilters);
 
         appGroupService.updateGroups(appGroupToEntries);
 
         LOG.info("Finished updating filter groups");
     }
 
-    private Set<Long> applyFilters(Set<ReportGridCell> cellData, Set<Tuple2<Long, Set<String>>> colDefIdToFilterValues) {
+    private Set<Tuple2<Long, Set<AppGroupEntry>>> determineAppGroupEntries(Set<ReportGridFilterInfo> gridInfoWithFilters) {
+        return gridInfoWithFilters
+                .stream()
+                .map(d -> {
+
+                    EntityKind subjectKind = d.gridDefinition().subjectKind();
+
+                    ReportGridInstance instance = reportGridService.mkInstance(
+                            d.gridDefinition().id().get(),
+                            d.idSelectionOptions(),
+                            subjectKind);
+
+                    Set<ReportGridCell> cellData = instance.cellData();
+
+                    Set<Long> subjectsPassingFilters = applyFilters(cellData, d.gridFilters());
+
+                    Set<AppGroupEntry> appGroupEntries = SetUtilities.map(
+                            subjectsPassingFilters,
+                            id -> ImmutableAppGroupEntry
+                                    .builder()
+                                    .id(id)
+                                    .kind(subjectKind)
+                                    .isReadOnly(true)
+                                    .build());
+
+                    return tuple(d.appGroupId(), appGroupEntries);
+                })
+                .collect(Collectors.toSet());
+    }
+
+    private Set<Long> applyFilters(Set<ReportGridCell> cellData, Set<GridFilter> colDefIdToFilterValues) {
 
         Map<Long, Collection<ReportGridCell>> dataByCol = groupBy(cellData, ReportGridCell::columnDefinitionId);
 
         Set<Set<Long>> appIdsPassingFilters = colDefIdToFilterValues
                 .stream()
                 .map(d -> {
-                    Collection<ReportGridCell> cellDataForColumn = dataByCol.getOrDefault(d.v1, emptySet());
+                    Collection<ReportGridCell> cellDataForColumn = dataByCol.getOrDefault(d.columnDefinitionId(), emptySet());
 
                     return cellDataForColumn
                             .stream()
-                            .filter(c -> d.v2.contains(c.optionCode()))
+                            .filter(c -> d.optionCodes().contains(c.optionCode()))
                             .map(ReportGridCell::subjectId)
                             .collect(Collectors.toSet());
                 })
@@ -158,7 +161,7 @@ public class ReportGridFilterViewService {
 
     }
 
-    private Set<Tuple4<Long, ReportGridDefinition, IdSelectionOptions, Set<Tuple2<Long, Set<String>>>>> findGridInfoWithFilters(Set<EntityNamedNote> filterPresetNotes, Map<String, ReportGridDefinition> gridsByExternalId) {
+    private Set<ReportGridFilterInfo> findGridInfoWithFilters(Set<EntityNamedNote> filterPresetNotes, Map<String, ReportGridDefinition> gridsByExternalId) {
 
         List<Tuple2<Long, String>> appGroupIdToNoteText = map(filterPresetNotes, d -> tuple(d.entityReference().id(), d.noteText()));
 
@@ -166,15 +169,15 @@ public class ReportGridFilterViewService {
                 .stream()
                 .map(t -> {
                     String noteText = t.v2;
-                    Tuple2<ArrayList<List<String>>, ArrayList<List<String>>> headersAndFilters = parseNoteText(noteText);
+                    Tuple2<ArrayList<List<String>>, ArrayList<List<String>>> gridInfoAndFilters = parseNoteText(noteText);
 
-                    if (headersAndFilters == null) {
+                    if (gridInfoAndFilters == null) {
                         return null;
                     }
 
                     //Should only be one row for grid information
-                    List<String> gridInfo = headersAndFilters.v1.get(0);
-                    ArrayList<List<String>> filterRows = headersAndFilters.v2;
+                    List<String> gridInfo = gridInfoAndFilters.v1.get(0);
+                    ArrayList<List<String>> filterRows = gridInfoAndFilters.v2;
                     String gridExtId = gridInfo.get(1);
 
                     ReportGridDefinition grid = gridsByExternalId.get(gridExtId);
@@ -192,7 +195,7 @@ public class ReportGridFilterViewService {
                             r -> r.entityFieldReference() == null ? sanitizeString(r.columnName()) : sanitizeString(format("%s/%s", r.entityFieldReference().displayName(), r.columnName())),
                             ReportGridColumnDefinition::id);
 
-                    Set<Tuple2<Long, Set<String>>> filterValues = filterRows
+                    Set<GridFilter> filterValues = filterRows
                             .stream()
                             .map(r -> {
                                 String columnName = sanitizeString(r.get(0));
@@ -202,7 +205,10 @@ public class ReportGridFilterViewService {
                                     LOG.info(format("Cannot find column '%s' on grid. Skipping this filter", columnName));
                                     return null;
                                 } else {
-                                    return tuple(columnDefnId, getFilterValues(r.get(1)));
+                                    return ImmutableGridFilter.builder()
+                                            .columnDefinitionId(columnDefnId)
+                                            .optionCodes(getFilterValues(r.get(1)))
+                                            .build();
                                 }
                             })
                             .filter(Objects::nonNull)
@@ -210,7 +216,12 @@ public class ReportGridFilterViewService {
 
                     IdSelectionOptions idSelectionOptions = modifySelectionOptionsForGrid(mkOpts(vantagePoint));
 
-                    return tuple(t.v1, grid, idSelectionOptions, filterValues);
+                    return ImmutableReportGridFilterInfo.builder()
+                            .appGroupId(t.v1)
+                            .idSelectionOptions(idSelectionOptions)
+                            .gridDefinition(grid)
+                            .gridFilters(filterValues)
+                            .build();
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
