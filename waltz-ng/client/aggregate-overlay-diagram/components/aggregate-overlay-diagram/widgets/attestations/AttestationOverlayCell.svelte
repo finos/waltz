@@ -4,6 +4,7 @@
     import EntityLink from "../../../../../common/svelte/EntityLink.svelte";
     import _ from "lodash";
     import {threshold, cutoff} from "./store"
+    import Toggle from "../../../../../common/svelte/Toggle.svelte";
 
     export let cellData = {}; // {attestations: [{ appId: 123, attestedBy: "bob", attestedAt: "2022-12-12" }, ...], cellExternalId: "ABC"}
     export let width;
@@ -68,6 +69,8 @@
                     : "FAILED"
         });
 
+    let hidePassed = false;
+
 </script>
 
 
@@ -103,6 +106,10 @@
     </svg>
 
     {#if renderMode === RenderModes.FOCUSED}
+        Filter: <Toggle state={hidePassed}
+                        labelOn="Showing only entries which fail the attestation criteria"
+                        labelOff="Showing all"
+                        onToggle={() => hidePassed = !hidePassed}/>
         <table class="summary-table table table-condensed table-hover small">
             <thead>
             <tr>
@@ -113,7 +120,7 @@
             </tr>
             </thead>
             <tbody>
-                {#each rows as row}
+                {#each _.reject(rows, r => hidePassed && r.state === 'PASSED') as row}
                 <tr class:danger={row.state === "FAILED" || row.state === "NEVER"}
                     class:success={row.state === "PASSED"}>
                     <td>
