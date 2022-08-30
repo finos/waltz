@@ -1,25 +1,32 @@
 package org.finos.waltz.service.report_grid;
 
 import org.finos.waltz.common.ArrayUtilities;
-import org.finos.waltz.common.Checks;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.HierarchyQueryScope;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.ImmutableIdSelectionOptions;
+import org.finos.waltz.model.report_grid.GridFilter;
+import org.finos.waltz.model.report_grid.ImmutableGridFilter;
+import org.finos.waltz.model.report_grid.ReportGridColumnDefinition;
+import org.finos.waltz.model.report_grid.ReportGridDefinition;
 import org.jooq.lambda.tuple.Tuple2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
-import static java.util.Collections.emptyList;
+import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.StringUtilities.isEmpty;
 import static org.finos.waltz.common.StringUtilities.mkSafe;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 public class ReportGridUtilities {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ReportGridUtilities.class);
 
     public static Tuple2<ArrayList<List<String>>, ArrayList<List<String>>> parseNoteText(String noteText) {
 
@@ -94,8 +101,33 @@ public class ReportGridUtilities {
         return cells;
     }
 
+    public static Set<GridFilter> getGridFilters(ArrayList<List<String>> filterRows, ReportGridDefinition grid) {
 
-    public static String sanitizeString(String name) {
+        Map<String, Long> columnsDefinitionIdByName = indexBy(grid.columnDefinitions(),
+                r -> r.entityFieldReference() == null ? sanitizeString(r.columnName()) : sanitizeString(format("%s/%s", r.entityFieldReference().displayName(), r.columnName())),
+                ReportGridColumnDefinition::id);
+
+        return filterRows
+                .stream()
+                .map(r -> {
+                    String columnName = sanitizeString(r.get(0));
+                    Long columnDefnId = columnsDefinitionIdByName.get(columnName);
+
+                    if (columnDefnId == null) {
+                        LOG.info(format("Cannot find column '%s' on grid. Skipping this filter", columnName));
+                        return null;
+                    } else {
+                        return ImmutableGridFilter.builder()
+                                .columnDefinitionId(columnDefnId)
+                                .optionCodes(getFilterValues(r.get(1)))
+                                .build();
+                    }
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+    }
+
+    private static String sanitizeString(String name) {
         return mkSafe(name)
                 .replaceAll("[:;*?/\\\\]", "")
                 .replaceAll("\\s+", "")

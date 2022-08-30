@@ -191,28 +191,7 @@ public class ReportGridFilterViewService {
                     String vantagePointId = gridInfo.get(3);
                     EntityReference vantagePoint = mkRef(EntityKind.valueOf(vantagePointKind), Long.parseLong(vantagePointId));
 
-                    Map<String, Long> columnsDefinitionIdByName = indexBy(grid.columnDefinitions(),
-                            r -> r.entityFieldReference() == null ? sanitizeString(r.columnName()) : sanitizeString(format("%s/%s", r.entityFieldReference().displayName(), r.columnName())),
-                            ReportGridColumnDefinition::id);
-
-                    Set<GridFilter> filterValues = filterRows
-                            .stream()
-                            .map(r -> {
-                                String columnName = sanitizeString(r.get(0));
-                                Long columnDefnId = columnsDefinitionIdByName.get(columnName);
-
-                                if (columnDefnId == null) {
-                                    LOG.info(format("Cannot find column '%s' on grid. Skipping this filter", columnName));
-                                    return null;
-                                } else {
-                                    return ImmutableGridFilter.builder()
-                                            .columnDefinitionId(columnDefnId)
-                                            .optionCodes(getFilterValues(r.get(1)))
-                                            .build();
-                                }
-                            })
-                            .filter(Objects::nonNull)
-                            .collect(Collectors.toSet());
+                    Set<GridFilter> filterValues = getGridFilters(filterRows, grid);
 
                     IdSelectionOptions idSelectionOptions = modifySelectionOptionsForGrid(mkOpts(vantagePoint));
 

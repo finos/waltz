@@ -114,7 +114,7 @@ public class AppGroupEntryDao {
                 .execute();
     }
 
-    public void updateGroups(Set<Tuple2<Long, Set<AppGroupEntry>>> entriesForGroups) {
+    public void replaceGroupEntries(Set<Tuple2<Long, Set<AppGroupEntry>>> entriesForGroups) {
         Set<Long> groupIds = map(entriesForGroups, d -> d.v1);
 
         dsl.transaction(ctx -> {
