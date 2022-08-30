@@ -86,19 +86,15 @@ public class ReportGridFilterViewService {
 
     public void generateAppGroupsFromFilter() {
 
-        LOG.info("Populating application groups from filters");
+        LOG.info("Starting filter group population");
 
-        Set<EntityNamedNote> filterPresetNotes = entityNamedNoteService.findByNoteTypeExtId(REPORT_GRID_APP_GROUP_CREATION_NOTE_TYPE_EXT_ID);
-
-        Set<ReportGridDefinition> grids = reportGridDao.findAll();
-
-        Map<String, ReportGridDefinition> gridsByExternalId = indexBy(grids, d -> d.externalId().get());
-
-        Set<ReportGridFilterInfo> gridInfoWithFilters = findGridInfoWithFilters(filterPresetNotes, gridsByExternalId);
+        LOG.info("Loading filter info from notes");
+        Set<ReportGridFilterInfo> gridInfoWithFilters = findGridInfoWithFilters();
 
         Set<Tuple2<Long, Set<AppGroupEntry>>> appGroupToEntries = determineAppGroupEntries(gridInfoWithFilters);
 
-        appGroupService.updateGroups(appGroupToEntries);
+        LOG.info("Populating application groups from filters");
+        appGroupService.replaceGroupEntries(appGroupToEntries);
 
         LOG.info("Finished updating filter groups");
     }
@@ -133,35 +129,40 @@ public class ReportGridFilterViewService {
                 .collect(Collectors.toSet());
     }
 
-    private Set<Long> applyFilters(Set<ReportGridCell> cellData, Set<GridFilter> colDefIdToFilterValues) {
+    private Set<Long> applyFilters(Set<ReportGridCell> cellData, Set<GridFilter> gridFilters) {
 
-        Map<Long, Collection<ReportGridCell>> dataByCol = groupBy(cellData, ReportGridCell::columnDefinitionId);
-
-        Set<Set<Long>> appIdsPassingFilters = colDefIdToFilterValues
-                .stream()
-                .map(d -> {
-                    Collection<ReportGridCell> cellDataForColumn = dataByCol.getOrDefault(d.columnDefinitionId(), emptySet());
-
-                    return cellDataForColumn
-                            .stream()
-                            .filter(c -> d.optionCodes().contains(c.optionCode()))
-                            .map(ReportGridCell::subjectId)
-                            .collect(Collectors.toSet());
-                })
-                .collect(Collectors.toSet());
-
-        if (isEmpty(appIdsPassingFilters)) {
+        if (isEmpty(gridFilters)) {
             //If there are no filters all the apps should populate the group
             return SetUtilities.map(cellData, ReportGridCell::subjectId);
         } else {
+
+            Map<Long, Collection<ReportGridCell>> dataByCol = groupBy(cellData, ReportGridCell::columnDefinitionId);
+
+            Set<Set<Long>> appIdsPassingFilters = gridFilters
+                    .stream()
+                    .map(d -> {
+                        Collection<ReportGridCell> cellDataForColumn = dataByCol.getOrDefault(d.columnDefinitionId(), emptySet());
+
+                        return cellDataForColumn
+                                .stream()
+                                .filter(c -> d.optionCodes().contains(c.optionCode()))
+                                .map(ReportGridCell::subjectId)
+                                .collect(Collectors.toSet());
+                    })
+                    .collect(Collectors.toSet());
+
             return appIdsPassingFilters
                     .stream()
                     .reduce(first(appIdsPassingFilters), SetUtilities::intersection);
         }
-
     }
 
-    private Set<ReportGridFilterInfo> findGridInfoWithFilters(Set<EntityNamedNote> filterPresetNotes, Map<String, ReportGridDefinition> gridsByExternalId) {
+    private Set<ReportGridFilterInfo> findGridInfoWithFilters() {
+
+        Set<EntityNamedNote> filterPresetNotes = entityNamedNoteService.findByNoteTypeExtId(REPORT_GRID_APP_GROUP_CREATION_NOTE_TYPE_EXT_ID);
+        Set<ReportGridDefinition> grids = reportGridDao.findAll();
+
+        Map<String, ReportGridDefinition> gridsByExternalId = indexBy(grids, d -> d.externalId().get());
 
         List<Tuple2<Long, String>> appGroupIdToNoteText = map(filterPresetNotes, d -> tuple(d.entityReference().id(), d.noteText()));
 
