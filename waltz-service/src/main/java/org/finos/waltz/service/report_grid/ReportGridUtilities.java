@@ -27,8 +27,10 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 public class ReportGridUtilities {
 
     private static final Logger LOG = LoggerFactory.getLogger(ReportGridUtilities.class);
+    private static final int HEADER_COLUMN_COUNT = 4;
+    private static final int FILTER_OPTIONS_COLUMN_COUNT = 2;
 
-    public static Tuple2<ArrayList<List<String>>, ArrayList<List<String>>> parseNoteText(String noteText) {
+    public static Tuple2<List<String>, ArrayList<List<String>>> parseGridFilterNoteText(String noteText) {
 
         if (isEmpty(noteText)) {
             return null;
@@ -42,7 +44,35 @@ public class ReportGridUtilities {
         ArrayList<List<String>> headerRows = parseTableData(lines, tableHeader);
         ArrayList<List<String>> filterRows = parseTableData(lines, filterHeader);
 
-        return tuple(headerRows, filterRows);
+        if (headerRows.size() != 1) {
+            throw new IllegalArgumentException(format(
+                    "Incorrect number of header rows found [%d], ensure there are blank rows between tables",
+                    headerRows.size()));
+        }
+
+        List<String> headerRow = headerRows
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Cannot identify header row"));
+
+        if (headerRow.size() != HEADER_COLUMN_COUNT) {
+            throw new IllegalArgumentException(format(
+                    "Incorrect number of header columns found [%d], should follow : [Grid Name, Grid Identifier, Vantage Point Kind, Vantage Point Id]",
+                    headerRow.size()));
+        }
+
+        List<String> filterRow = filterRows
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No Filter rows identified"));
+
+        if (filterRow.size() != FILTER_OPTIONS_COLUMN_COUNT) {
+            throw new IllegalArgumentException(format(
+                    "Incorrect number of filter columns found [%d], should follow : [Filter Column, Column Option Codes]",
+                    filterRow.size()));
+        }
+
+        return tuple(headerRow, filterRows);
     }
 
 

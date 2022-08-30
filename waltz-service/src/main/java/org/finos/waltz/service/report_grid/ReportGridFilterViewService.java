@@ -170,14 +170,22 @@ public class ReportGridFilterViewService {
                 .stream()
                 .map(t -> {
                     String noteText = t.v2;
-                    Tuple2<ArrayList<List<String>>, ArrayList<List<String>>> gridInfoAndFilters = parseNoteText(noteText);
+
+                    Tuple2<List<String>, ArrayList<List<String>>> gridInfoAndFilters;
+
+                    try {
+                        gridInfoAndFilters = parseGridFilterNoteText(noteText);
+                    } catch (IllegalArgumentException e) {
+                        LOG.debug("Could not parse note text. " + e.getMessage());
+                        return null;
+                    }
 
                     if (gridInfoAndFilters == null) {
                         return null;
                     }
 
                     //Should only be one row for grid information
-                    List<String> gridInfo = gridInfoAndFilters.v1.get(0);
+                    List<String> gridInfo = gridInfoAndFilters.v1;
                     ArrayList<List<String>> filterRows = gridInfoAndFilters.v2;
                     String gridExtId = gridInfo.get(1);
 
