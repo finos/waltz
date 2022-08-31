@@ -14,7 +14,6 @@
 
     const selectedOverlayCell = getContext("selectedOverlay");
 
-
     export let svg = "";
 
     let selectedInstance = getContext("selectedInstance");

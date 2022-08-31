@@ -9,12 +9,7 @@ import org.finos.waltz.data.cost.CostKindDao;
 import org.finos.waltz.data.measurable.MeasurableDao;
 import org.finos.waltz.model.AssessmentBasedSelectionFilter;
 import org.finos.waltz.model.IdSelectionOptions;
-import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
-import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramInfo;
-import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramPreset;
-import org.finos.waltz.model.aggregate_overlay_diagram.BackingEntity;
-import org.finos.waltz.model.aggregate_overlay_diagram.ImmutableAggregateOverlayDiagramInfo;
-import org.finos.waltz.model.aggregate_overlay_diagram.OverlayDiagramPresetCreateCommand;
+import org.finos.waltz.model.aggregate_overlay_diagram.*;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.*;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.*;
 import org.finos.waltz.model.application.Application;
@@ -52,6 +47,7 @@ public class AggregateOverlayDiagramService {
     private final CostKindDao costKindDao;
     private final ComplexityKindDao complexityKindDao;
     private final ComplexityWidgetDao complexityWidgetDao;
+    private final AttestationWidgetDao attestationWidgetDao;
 
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
 
@@ -68,7 +64,8 @@ public class AggregateOverlayDiagramService {
                                           ApplicationDao applicationDao,
                                           CostKindDao costKindDao,
                                           ComplexityKindDao complexityKindDao,
-                                          ComplexityWidgetDao complexityWidgetDao) {
+                                          ComplexityWidgetDao complexityWidgetDao,
+                                          AttestationWidgetDao attestationWidgetDao) {
 
         this.aggregateOverlayDiagramDao = aggregateOverlayDiagramDao;
         this.appCountWidgetDao = appCountWidgetDao;
@@ -83,6 +80,7 @@ public class AggregateOverlayDiagramService {
         this.costKindDao = costKindDao;
         this.complexityKindDao = complexityKindDao;
         this.complexityWidgetDao = complexityWidgetDao;
+        this.attestationWidgetDao = attestationWidgetDao;
     }
 
 
@@ -142,6 +140,31 @@ public class AggregateOverlayDiagramService {
                 .build();
     }
 
+    public AttestationWidgetData getAttestationWidgetData(long diagramId,
+                                                          Set<AssessmentBasedSelectionFilter> filterParams,
+                                                          IdSelectionOptions appSelectionOptions,
+                                                          AttestationWidgetParameters widgetParams) {
+
+
+        AggregateOverlayDiagram diagram = aggregateOverlayDiagramDao.getById(diagramId);
+
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(diagram.aggregatedEntityKind(), appSelectionOptions);
+        Select<Record1<Long>> entityIdSelector = applyFiltersToSelector(genericSelector, filterParams);
+
+        Set<AttestationWidgetDatum> attestations = attestationWidgetDao.findWidgetData(
+                diagramId,
+                widgetParams.attestedEntityKind(),
+                Optional.ofNullable(widgetParams.attestedEntityId()),
+                entityIdSelector);
+
+        List<Application> applications = applicationDao.findByAppIdSelector(entityIdSelector);
+
+        return ImmutableAttestationWidgetData
+                .builder()
+                .cellData(attestations)
+                .applications(applications)
+                .build();
+    }
 
     public CostWidgetData getAppCostWidgetData(Long diagramId,
                                                Set<AssessmentBasedSelectionFilter> filterParams,
