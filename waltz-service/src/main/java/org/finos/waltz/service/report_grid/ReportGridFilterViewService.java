@@ -171,7 +171,7 @@ public class ReportGridFilterViewService {
                 .map(t -> {
                     String noteText = t.v2;
 
-                    Tuple2<List<String>, ArrayList<List<String>>> gridInfoAndFilters;
+                    Tuple2<List<String>, List<List<String>>> gridInfoAndFilters;
 
                     try {
                         gridInfoAndFilters = parseGridFilterNoteText(noteText);
@@ -186,7 +186,7 @@ public class ReportGridFilterViewService {
 
                     //Should only be one row for grid information
                     List<String> gridInfo = gridInfoAndFilters.v1;
-                    ArrayList<List<String>> filterRows = gridInfoAndFilters.v2;
+                    List<List<String>> filterRows = gridInfoAndFilters.v2;
                     String gridExtId = gridInfo.get(1);
 
                     ReportGridDefinition grid = gridsByExternalId.get(gridExtId);

@@ -120,17 +120,16 @@ public class AppGroupEntryDao {
         dsl.transaction(ctx -> {
             DSLContext tx = ctx.dsl();
 
-            int removedEntries = tx
-                    .deleteFrom(APPLICATION_GROUP_ENTRY)
+            tx.deleteFrom(APPLICATION_GROUP_ENTRY)
                     .where(APPLICATION_GROUP_ENTRY.GROUP_ID.in(groupIds))
                     .execute();
 
-            int[] createdEntries = entriesForGroups
+            entriesForGroups
                     .stream()
                     .flatMap(t -> t.v2
                             .stream()
                             .map(r -> {
-                                ApplicationGroupEntryRecord record = dsl.newRecord(APPLICATION_GROUP_ENTRY);
+                                ApplicationGroupEntryRecord record = tx.newRecord(APPLICATION_GROUP_ENTRY);
                                 record.setGroupId(t.v1);
                                 record.setApplicationId(r.id());
                                 record.setIsReadonly(r.isReadOnly());

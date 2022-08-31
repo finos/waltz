@@ -30,7 +30,7 @@ public class ReportGridUtilities {
     private static final int HEADER_COLUMN_COUNT = 4;
     private static final int FILTER_OPTIONS_COLUMN_COUNT = 2;
 
-    public static Tuple2<List<String>, ArrayList<List<String>>> parseGridFilterNoteText(String noteText) {
+    public static Tuple2<List<String>, List<List<String>>> parseGridFilterNoteText(String noteText) {
 
         if (isEmpty(noteText)) {
             return null;
@@ -41,8 +41,8 @@ public class ReportGridUtilities {
         String tableHeader = "| Grid Name | Grid Identifier | Vantage Point Kind | Vantage Point Id |";
         String filterHeader = "| Filter Column | Column Option Codes |";
 
-        ArrayList<List<String>> headerRows = parseTableData(lines, tableHeader);
-        ArrayList<List<String>> filterRows = parseTableData(lines, filterHeader);
+        List<List<String>> headerRows = parseTableData(lines, tableHeader);
+        List<List<String>> filterRows = parseTableData(lines, filterHeader);
 
         if (headerRows.size() != 1) {
             throw new IllegalArgumentException(format(
@@ -83,7 +83,7 @@ public class ReportGridUtilities {
                 .collect(Collectors.toSet());
     }
 
-    public static ArrayList<List<String>> parseTableData(String[] lines, String tableHeader) {
+    public static List<List<String>> parseTableData(String[] lines, String tableHeader) {
 
         if (ArrayUtilities.isEmpty(lines)) {
             return new ArrayList<>();
@@ -91,7 +91,7 @@ public class ReportGridUtilities {
 
         String sanitizedHeader = sanitizeString(tableHeader);
 
-        ArrayList<List<String>> cells = new ArrayList<>();
+        List<List<String>> cells = new ArrayList<>();
 
         AtomicBoolean savingRows = new AtomicBoolean(false);
 
@@ -131,7 +131,7 @@ public class ReportGridUtilities {
         return cells;
     }
 
-    public static Set<GridFilter> getGridFilters(ArrayList<List<String>> filterRows, ReportGridDefinition grid) {
+    public static Set<GridFilter> getGridFilters(List<List<String>> filterRows, ReportGridDefinition grid) {
 
         Map<String, Long> columnsDefinitionIdByName = indexBy(grid.columnDefinitions(),
                 r -> r.entityFieldReference() == null ? sanitizeString(r.columnName()) : sanitizeString(format("%s/%s", r.entityFieldReference().displayName(), r.columnName())),
