@@ -79,7 +79,10 @@
                                 {/if}
                             </div>
                             {#if question?.externalId}
-                                <div class="text-muted small">({question?.externalId})</div>
+                                <div class="text-muted small"
+                                     style="word-break: break-all">
+                                    ({question?.externalId})
+                                </div>
                             {/if}
                             {#if question?.helpText}
                                 <div class="text-muted small"
