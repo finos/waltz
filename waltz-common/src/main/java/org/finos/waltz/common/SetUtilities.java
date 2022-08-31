@@ -21,6 +21,7 @@ package org.finos.waltz.common;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static java.util.stream.Collectors.toSet;
@@ -148,4 +149,15 @@ public class SetUtilities {
                                               Set<T> ys) {
         return ! intersection(xs, ys).isEmpty();
     }
+
+
+    public static <T> Set<T> fromOptionals(Collection<Optional<T>> ts) {
+        return ts
+                .stream()
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toSet());
+    }
+
+
 }

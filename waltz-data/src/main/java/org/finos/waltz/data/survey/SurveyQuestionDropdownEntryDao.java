@@ -18,21 +18,22 @@
 
 package org.finos.waltz.data.survey;
 
-import org.finos.waltz.schema.tables.records.SurveyQuestionDropdownEntryRecord;
 import org.finos.waltz.model.survey.ImmutableSurveyQuestionDropdownEntry;
 import org.finos.waltz.model.survey.SurveyQuestionDropdownEntry;
+import org.finos.waltz.schema.tables.records.SurveyQuestionDropdownEntryRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
-import static org.finos.waltz.schema.Tables.*;
-import static org.finos.waltz.schema.tables.SurveyQuestionDropdownEntry.SURVEY_QUESTION_DROPDOWN_ENTRY;
 import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.SurveyQuestionDropdownEntry.SURVEY_QUESTION_DROPDOWN_ENTRY;
 
 @Repository
 public class SurveyQuestionDropdownEntryDao {
@@ -80,7 +81,7 @@ public class SurveyQuestionDropdownEntryDao {
     }
 
 
-    public void saveEntries(long questionId, List<SurveyQuestionDropdownEntry> entries) {
+    public void saveEntries(long questionId, Collection<SurveyQuestionDropdownEntry> entries) {
         checkNotNull(entries, "entries cannot be null");
 
         dsl.transaction(config -> {
@@ -90,7 +91,9 @@ public class SurveyQuestionDropdownEntryDao {
                     .where(SURVEY_QUESTION_DROPDOWN_ENTRY.QUESTION_ID.eq(questionId))
                     .execute();
 
-            List<SurveyQuestionDropdownEntryRecord> records = entries.stream()
+            List<SurveyQuestionDropdownEntryRecord> records = entries
+                    .stream()
+                    .map(r -> ImmutableSurveyQuestionDropdownEntry.copyOf(r).withQuestionId(questionId))
                     .map(TO_RECORD_MAPPER)
                     .collect(toList());
 
