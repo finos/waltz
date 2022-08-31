@@ -30,7 +30,7 @@
            autocomplete="off"
            ng-model="$ctrl.searchTerms"
            ng-change="$ctrl.searchTermsChanged($ctrl.searchTerms)"
-           ng-model-options="{ debounce: 300 }"
+           ng-model-options="{ debounce: 1000 }"
            placeholder="Search">
     &nbsp;
     <waltz-icon name="close"

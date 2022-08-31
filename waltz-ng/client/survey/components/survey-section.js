@@ -16,7 +16,7 @@
  *
  */
 import _ from "lodash";
-import {initialiseData} from "../../common/index";
+import {initialiseData, termSearch} from "../../common/index";
 import {CORE_API} from "../../common/services/core-api-utils";
 import template from "./survey-section.html";
 import {timeFormat} from "d3-time-format";
@@ -31,6 +31,7 @@ const initialState = {
         showIssueSurveyBtn: false
     },
     selectedTemplate: null,
+    filteredTemplates: [],
     surveyRunForm: {
         dueDate: null,
         contactEmail: null,
@@ -38,7 +39,7 @@ const initialState = {
         recipients: [],
         owningRole: null
     },
-    templateQuery: null
+    templateQuery: ""
 };
 
 
@@ -71,7 +72,8 @@ function controller(serviceBroker, userService) {
                 .filter(t => t.targetEntityKind === vm.parentEntityRef.kind)
                 .filter(t => t.status === "ACTIVE")
                 .sortBy("name")
-                .value());
+                .value())
+            .then(vm.onQueryChange);
     };
 
     vm.onDismissCreateForm = () => {
@@ -86,6 +88,10 @@ function controller(serviceBroker, userService) {
         if (! p) return;
         const recipients = vm.surveyRunForm.recipients;
         vm.surveyRunForm.recipients = _.concat(recipients ? recipients : [], [ p ])
+    };
+
+    vm.onQueryChange = () => {
+        vm.filteredTemplates = termSearch(vm.templates, vm.templateQuery, ["name", "description", "externalId"]);
     };
 
     vm.onRemoveRecipient = (p) => {

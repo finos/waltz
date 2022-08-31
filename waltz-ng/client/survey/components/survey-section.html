@@ -67,9 +67,15 @@
                        class="form-control"
                        ng-if="$ctrl.templates.length > 7"
                        placeholder="Filter..."
-                       ng-model="$ctrl.templateQuery">
+                       ng-model="$ctrl.templateQuery"
+                       ng-change="$ctrl.onQueryChange()" >
                 <div class="waltz-scroll-region-300">
                     <table class="table table-condensed small">
+                        <colgroup>
+                            <col width="30%">
+                            <col width="60%">
+                            <col width="10%">
+                        </colgroup>
                         <thead>
                         <tr>
                             <th>Name</th>
@@ -78,7 +84,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr ng-repeat="template in $ctrl.templates | filter:$ctrl.templateQuery">
+                        <tr ng-repeat="template in $ctrl.filteredTemplates">
                             <td>
                                 <a ng-click="$ctrl.onSelectTemplate(template)"
                                    class="clickable">
