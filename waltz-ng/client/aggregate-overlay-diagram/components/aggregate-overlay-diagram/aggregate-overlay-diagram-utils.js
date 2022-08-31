@@ -34,6 +34,9 @@ import {
     resetParameters as resetComplexityParameters
 } from "../aggregate-overlay-diagram/widgets/complexities/ComplexityWidgetParameters.svelte";
 import {
+    resetParameters as resetAttestationParameters
+} from "../aggregate-overlay-diagram/widgets/attestations/store";
+import {
     resetParameters as resetAssessmentParameters
 } from "../aggregate-overlay-diagram/widgets/assessments/AssessmentWidgetParameters.svelte";
 import {
@@ -47,6 +50,8 @@ import {
 } from "../aggregate-overlay-diagram/widgets/app-counts/AppCountWidgetParameters.svelte";
 import ComplexityOverlayCell from "./widgets/complexities/ComplexityOverlayCell.svelte";
 import ComplexityWidgetParameters from "./widgets/complexities/ComplexityWidgetParameters.svelte";
+import AttestationWidgetParameters from "./widgets/attestations/AttestationWidgetParameters.svelte";
+import AttestationOverlayCell from "./widgets/attestations/AttestationOverlayCell.svelte";
 
 
 export function clearContent(svgHolderElem, targetSelector) {
@@ -357,6 +362,19 @@ export function mkAppCostGlobalProps(data) {
     };
 }
 
+export function mkAttestationGlobalProps(data) {
+    const maxApps = _
+        .chain(data.cellData)
+        .map(d => _.get(d, ["attestations", "length"], 0))
+        .max()
+        .value();
+
+    return {
+        maxApps,
+        applicationsById: _.keyBy(data.applications, d => d.id)
+    };
+}
+
 
 export function mkTargetAppCostGlobalProps(data) {
     const maxCost = _
@@ -372,84 +390,97 @@ export function mkTargetAppCostGlobalProps(data) {
 }
 
 
-export const widgets = [
-    {
-        key: "TARGET_APP_COSTS",
-        parameterWidget: TargetAppCostWidgetParameters,
-        description: "Shows current cost and future cost info",
-        label: "Target App Costs",
-        icon: "money",
-        overlay: TargetAppCostOverlayCell,
-        remoteMethod: aggregateOverlayDiagramStore.findTargetAppCostForDiagram,
-        mkGlobalProps: mkTargetAppCostGlobalProps,
-        resetParameters: resetTargetAppCostParameters,
-        aggregatedEntityKinds: [entity.APPLICATION.key],
-    }, {
-        key: "APP_COSTS",
-        parameterWidget: AppCostWidgetParameters,
-        description: "Shows current app costs accounting for allocation percentages",
-        label: "App Costs",
-        icon: "money",
-        overlay: AppCostOverlayCell,
-        remoteMethod: aggregateOverlayDiagramStore.findAppCostForDiagram,
-        mkGlobalProps: mkAppCostGlobalProps,
-        resetParameters: resetAppCostParameters,
-        aggregatedEntityKinds: [entity.APPLICATION.key]
-    }, {
-        key: "TARGET_APP_COUNTS",
-        parameterWidget: AppCountWidgetParameters,
-        description: "Shows current app count and future app count info",
-        label: "App Counts",
-        icon: "desktop",
-        overlay: AppCountOverlayCell,
-        remoteMethod: aggregateOverlayDiagramStore.findAppCountsForDiagram,
-        mkGlobalProps: mkTargetAppCountGlobalProps,
-        resetParameters: resetTargetAppCountParameters,
-        aggregatedEntityKinds: [entity.APPLICATION.key]
-    }, {
-        key: "ASSESSMENTS",
-        label: "Assessments",
-        icon: "puzzle-piece",
-        description: "Allows user to select an assessment to overlay on the diagram",
-        parameterWidget: AssessmentWidgetParameters,
-        overlay: AssessmentOverlayCell,
-        legend: AssessmentOverlayLegend,
-        remoteMethod: aggregateOverlayDiagramStore.findAppAssessmentsForDiagram,
-        mkGlobalProps: mkAssessmentOverlayGlobalProps,
-        resetParameters: resetAssessmentParameters,
-        aggregatedEntityKinds: [entity.APPLICATION.key, entity.CHANGE_INITIATIVE.key]
-    }, {
-        key: "COMPLEXITIES",
-        label: "Complexity Scores",
-        icon: "puzzle-piece",
-        description: "Allows user to select an complexity statistic to overlay on the diagram",
-        parameterWidget: ComplexityWidgetParameters,
-        overlay: ComplexityOverlayCell,
-        remoteMethod: aggregateOverlayDiagramStore.findComplexitiesForDiagram,
-        mkGlobalProps: mkComplexityOverlayGlobalProps,
-        resetParameters: resetComplexityParameters,
-        aggregatedEntityKinds: [entity.APPLICATION.key, entity.CHANGE_INITIATIVE.key]
-    }, {
-        key: "BACKING_ENTITIES",
-        label: "Backing Entities",
-        icon: "cubes",
-        description: "Displays the underlying entities which drive the overlays on the diagram",
-        parameterWidget: BackingEntitiesWidgetParameters,
-        overlay: BackingEntitiesOverlayCell,
-        remoteMethod: aggregateOverlayDiagramStore.findBackingEntitiesForDiagram,
-        aggregatedEntityKinds: [entity.APPLICATION.key, entity.CHANGE_INITIATIVE.key]
-    }, {
-        key: "AGGREGATED_ENTITIES",
-        label: "Aggregated Entities",
-        icon: "pie-chart",
-        description: "Displays entities which are aggregated to populate the overlay data",
-        parameterWidget: AggregatedEntitiesWidgetParameters,
-        overlay: AggregatedEntitiesOverlayCell,
-        remoteMethod: aggregateOverlayDiagramStore.findAggregatedEntitiesForDiagram,
-        mkGlobalProps: mkAggregatedEntitiesGlobalProps,
-        aggregatedEntityKinds: [entity.APPLICATION.key, entity.CHANGE_INITIATIVE.key]
-    }
-];
+export const widgets = _.orderBy(
+    [
+        {
+            key: "ATTESTATION",
+            parameterWidget: AttestationWidgetParameters,
+            description: "Shows attestation status",
+            label: "Attestation Status",
+            icon: "tick",
+            overlay: AttestationOverlayCell,
+            remoteMethod: aggregateOverlayDiagramStore.findAttestationsForDiagram,
+            mkGlobalProps: mkAttestationGlobalProps,
+            resetParameters: resetAttestationParameters,
+            aggregatedEntityKinds: [entity.APPLICATION.key],
+        }, {
+            key: "TARGET_APP_COSTS",
+            parameterWidget: TargetAppCostWidgetParameters,
+            description: "Shows current cost and future cost info",
+            label: "Target App Costs",
+            icon: "money",
+            overlay: TargetAppCostOverlayCell,
+            remoteMethod: aggregateOverlayDiagramStore.findTargetAppCostForDiagram,
+            mkGlobalProps: mkTargetAppCostGlobalProps,
+            resetParameters: resetTargetAppCostParameters,
+            aggregatedEntityKinds: [entity.APPLICATION.key],
+        }, {
+            key: "APP_COSTS",
+            parameterWidget: AppCostWidgetParameters,
+            description: "Shows current app costs accounting for allocation percentages",
+            label: "App Costs",
+            icon: "money",
+            overlay: AppCostOverlayCell,
+            remoteMethod: aggregateOverlayDiagramStore.findAppCostForDiagram,
+            mkGlobalProps: mkAppCostGlobalProps,
+            resetParameters: resetAppCostParameters,
+            aggregatedEntityKinds: [entity.APPLICATION.key]
+        }, {
+            key: "TARGET_APP_COUNTS",
+            parameterWidget: AppCountWidgetParameters,
+            description: "Shows current app count and future app count info",
+            label: "App Counts",
+            icon: "desktop",
+            overlay: AppCountOverlayCell,
+            remoteMethod: aggregateOverlayDiagramStore.findAppCountsForDiagram,
+            mkGlobalProps: mkTargetAppCountGlobalProps,
+            resetParameters: resetTargetAppCountParameters,
+            aggregatedEntityKinds: [entity.APPLICATION.key]
+        }, {
+            key: "ASSESSMENTS",
+            label: "Assessments",
+            icon: "puzzle-piece",
+            description: "Allows user to select an assessment to overlay on the diagram",
+            parameterWidget: AssessmentWidgetParameters,
+            overlay: AssessmentOverlayCell,
+            legend: AssessmentOverlayLegend,
+            remoteMethod: aggregateOverlayDiagramStore.findAppAssessmentsForDiagram,
+            mkGlobalProps: mkAssessmentOverlayGlobalProps,
+            resetParameters: resetAssessmentParameters,
+            aggregatedEntityKinds: [entity.APPLICATION.key, entity.CHANGE_INITIATIVE.key]
+        }, {
+            key: "COMPLEXITIES",
+            label: "Complexity Scores",
+            icon: "puzzle-piece",
+            description: "Allows user to select an complexity statistic to overlay on the diagram",
+            parameterWidget: ComplexityWidgetParameters,
+            overlay: ComplexityOverlayCell,
+            remoteMethod: aggregateOverlayDiagramStore.findComplexitiesForDiagram,
+            mkGlobalProps: mkComplexityOverlayGlobalProps,
+            resetParameters: resetComplexityParameters,
+            aggregatedEntityKinds: [entity.APPLICATION.key, entity.CHANGE_INITIATIVE.key]
+        }, {
+            key: "BACKING_ENTITIES",
+            label: "Backing Entities",
+            icon: "cubes",
+            description: "Displays the underlying entities which drive the overlays on the diagram",
+            parameterWidget: BackingEntitiesWidgetParameters,
+            overlay: BackingEntitiesOverlayCell,
+            remoteMethod: aggregateOverlayDiagramStore.findBackingEntitiesForDiagram,
+            aggregatedEntityKinds: [entity.APPLICATION.key, entity.CHANGE_INITIATIVE.key]
+        }, {
+            key: "AGGREGATED_ENTITIES",
+            label: "Aggregated Entities",
+            icon: "pie-chart",
+            description: "Displays entities which are aggregated to populate the overlay data",
+            parameterWidget: AggregatedEntitiesWidgetParameters,
+            overlay: AggregatedEntitiesOverlayCell,
+            remoteMethod: aggregateOverlayDiagramStore.findAggregatedEntitiesForDiagram,
+            mkGlobalProps: mkAggregatedEntitiesGlobalProps,
+            aggregatedEntityKinds: [entity.APPLICATION.key, entity.CHANGE_INITIATIVE.key]
+        }
+    ],
+    d => d.label);
 
 
 export const RenderModes = {

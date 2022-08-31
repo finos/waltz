@@ -76,6 +76,15 @@ export function mkOverlayDiagramStore() {
                 {force});
     };
 
+    const findAttestationsForDiagram = (diagramId, widgetParameters, force = false) => {
+        return remote
+            .fetchViewList(
+                "POST",
+                `api/aggregate-overlay-diagram/diagram-id/${diagramId}/attestation`,
+                widgetParameters,
+                {force});
+    };
+
     const findBackingEntitiesForDiagram = (diagramId, force = false) => {
         return remote
             .fetchViewList(
@@ -108,6 +117,7 @@ export function mkOverlayDiagramStore() {
         findAll,
         findAppCountsForDiagram,
         findTargetAppCostForDiagram,
+        findAttestationsForDiagram,
         findAppCostForDiagram,
         findAppAssessmentsForDiagram,
         findBackingEntitiesForDiagram,
