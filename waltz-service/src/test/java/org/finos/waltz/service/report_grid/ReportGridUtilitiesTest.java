@@ -77,37 +77,37 @@ public class ReportGridUtilitiesTest {
 
     @Test
     public void parseEmptyTextShouldReturnEmptyList() {
-        ArrayList<List<String>> cellList = parseTableData(null, "| Grid Name | Grid Identifier | Vantage Point Kind | Vantage Point Id |");
+        List<List<String>> cellList = parseTableData(null, "| Grid Name | Grid Identifier | Vantage Point Kind | Vantage Point Id |");
         assertEquals(0, cellList.size());
     }
 
     @Test
     public void parseNullTextShouldReturnEmptyList() {
-        ArrayList<List<String>> cellList = parseTableData(null, "| Grid Name | Grid Identifier | Vantage Point Kind | Vantage Point Id |");
+        List<List<String>> cellList = parseTableData(null, "| Grid Name | Grid Identifier | Vantage Point Kind | Vantage Point Id |");
         assertEquals(0, cellList.size());
     }
 
     @Test
     public void parseNoteTextForHeaderShouldReturnOnlyOneRow() {
-        ArrayList<List<String>> cellList = parseTableData(TEST_STRING_ARRAY, "| Grid Name | Grid Identifier | Vantage Point Kind | Vantage Point Id |");
+        List<List<String>> cellList = parseTableData(TEST_STRING_ARRAY, "| Grid Name | Grid Identifier | Vantage Point Kind | Vantage Point Id |");
         assertEquals(1, cellList.size());
     }
 
     @Test
     public void parseNoteTextForFiltersShouldReturnTwoRows() {
-        ArrayList<List<String>> cellList = parseTableData(TEST_STRING_ARRAY, "| Filter Column | Column Option Codes |");
+        List<List<String>> cellList = parseTableData(TEST_STRING_ARRAY, "| Filter Column | Column Option Codes |");
         assertEquals(2, cellList.size());
     }
 
     @Test
     public void parseNoteTextShouldHaveFourFieldsInGridInfoRow() {
-        Tuple2<List<String>, ArrayList<List<String>>> noteText = ReportGridUtilities.parseGridFilterNoteText(TEST_STRING);
+        Tuple2<List<String>, List<List<String>>> noteText = ReportGridUtilities.parseGridFilterNoteText(TEST_STRING);
         assertEquals(4, noteText.v1.size(), "Should have four fields of grid info in header row");
     }
 
     @Test
     public void parseNoteTextShouldHaveTwoFieldsInGridInfoRow() {
-        Tuple2<List<String>, ArrayList<List<String>>> noteText = ReportGridUtilities.parseGridFilterNoteText(TEST_STRING);
+        Tuple2<List<String>, List<List<String>>> noteText = ReportGridUtilities.parseGridFilterNoteText(TEST_STRING);
         assertEquals(2, noteText.v2.get(0).size(), "Should have two fields in each filter info row");
     }
 
