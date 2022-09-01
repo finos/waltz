@@ -1,10 +1,10 @@
 import {mkEntityLinkGridCell} from "../../../common/grid-utils";
 import _ from "lodash";
 import {rgb} from "d3-color";
-import {determineForegroundColor, amberBg, blueBg, pinkBg, greenBg, greyBg} from "../../../common/colors";
+import {amberBg, blueBg, determineForegroundColor, greenBg, greyBg, pinkBg} from "../../../common/colors";
 import {scaleLinear} from "d3-scale";
 import {extent} from "d3-array";
-import {subtractYears, withinMonths} from "../../../common/date-utils";
+import {subtractYears} from "../../../common/date-utils";
 
 
 export const reportGridMember = {
@@ -163,6 +163,18 @@ export function prepareColumnDefs(gridData) {
                                 <waltz-currency-amount amount="COL_FIELD.value"></waltz-currency-amount>
                         </div>`
                 };
+            case "COMPLEXITY_KIND":
+                return {
+                    allowSummary: false,
+                    cellTemplate: `
+                        <div class="waltz-grid-report-cell"
+                             style="text-align: right"
+                             ng-bind="COL_FIELD.value"
+                             ng-style="{
+                                'background-color': COL_FIELD.color,
+                                'color': COL_FIELD.fontColor}">
+                        </div>`
+                };
             default:
                 return {
                     allowSummary: true,
@@ -248,20 +260,42 @@ function determineDataTypeUsageColor(usageKind) {
  * @returns {*}
  */
 function calculateCostColorScales(gridData) {
-    const costCols = _
+    return calculateColorScales(gridData, "COST_KIND", "#e2f5ff", "#86e4ff");
+}
+
+/**
+ * Returns a map of color scales keyed by their column id's
+ * @param gridData
+ * @returns {*}
+ */
+function calculateComplexityColorScales(gridData) {
+    return calculateColorScales(gridData, "COMPLEXITY_KIND", "#e2efff", "#77baff");
+}
+
+
+/**
+ * Returns a map of color scales keyed by their column id's
+ * @param gridData
+ * @param entityKind
+ * @param startColor
+ * @param endColor
+ * @returns {*}
+ */
+function calculateColorScales(gridData, entityKind, startColor, endColor) {
+    const cols = _
         .chain(gridData)
         .get(["definition", "columnDefinitions"], [])
-        .filter(cd => cd.columnEntityKind === 'COST_KIND')
+        .filter(cd => cd.columnEntityKind === entityKind)
         .map(cd => cd.id)
         .value();
 
     return _
         .chain(gridData.instance.cellData)
-        .filter(d =>  _.includes(costCols, d.columnDefinitionId))
+        .filter(d => _.includes(cols, d.columnDefinitionId))
         .groupBy(d => d.columnDefinitionId)
         .mapValues(v => scaleLinear()
             .domain(extent(v, d => d.numberValue))
-            .range(["#e2f5ff", "#86e4ff"]))
+            .range([startColor, endColor]))
         .value();
 }
 
@@ -306,7 +340,6 @@ function mkAttestationCell(dataCell, baseCell) {
 
 
 export function prepareTableData(gridData) {
-    const subjectsById = _.keyBy(gridData.instance.subjects, d => d.entityReference.id);
 
     const ratingSchemeItemsById = _
         .chain(gridData.instance.ratingSchemeItems)
@@ -321,7 +354,7 @@ export function prepareTableData(gridData) {
     const colsById = _.keyBy(colDefs, cd => cd.id);
 
     const costColorScalesByColumnDefinitionId = calculateCostColorScales(gridData);
-
+    const complexityColorScalesByColumnDefinitionId = calculateComplexityColorScales(gridData);
 
     function mkTableCell(dataCell) {
         const colDef = colsById[dataCell.columnDefinitionId];
@@ -338,6 +371,13 @@ export function prepareTableData(gridData) {
                 const costColor = costColorScale(dataCell.numberValue);
                 return Object.assign({}, baseCell, {
                     color: costColor,
+                    value: dataCell.numberValue,
+                });
+            case "COMPLEXITY_KIND":
+                const complexityColorScale = complexityColorScalesByColumnDefinitionId[dataCell.columnDefinitionId];
+                const complexityColor = complexityColorScale(dataCell.numberValue);
+                return Object.assign({}, baseCell, {
+                    color: complexityColor,
                     value: dataCell.numberValue,
                 });
             case "DATA_TYPE":
