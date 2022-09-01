@@ -270,6 +270,7 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
         }
         switch (colDef.columnEntityKind()) {
             case COST_KIND:
+            case COMPLEXITY_KIND:
                 return reportGridCell.numberValue();
             case INVOLVEMENT_KIND:
             case SURVEY_TEMPLATE:
