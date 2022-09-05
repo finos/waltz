@@ -171,7 +171,10 @@
     <table class="table table-condensed">
         <thead>
         <tr>
-            <th width="30%">Survey Name</th>
+            <th width="30%"
+                style="text-align: left">
+                Survey Name
+            </th>
             {#each tableHeaders as header}
                 <th width={`${70 / tableHeaders.length}%`}
                     class={header.headerClass}
