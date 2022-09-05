@@ -36,7 +36,7 @@ function store($http, baseUrl) {
     };
 
     const findAll = () => {
-        return $http.get(`${BASE}`)
+        return $http.get(BASE)
             .then(result => result.data);
     };
 

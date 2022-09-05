@@ -74,6 +74,10 @@
     <table class="table table-condensed small">
         <tbody>
             <tr>
+                <td width="50%">Template Name</td>
+                <td width="50%">{survey.surveyTemplateRef?.name}</td>
+            </tr>
+            <tr>
                 <td width="50%">Run Name</td>
                 <td width="50%">{survey.surveyRun?.name}</td>
             </tr>

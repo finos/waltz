@@ -73,8 +73,9 @@
            ng-if="surveys.length > 0">
         <thead>
         <tr>
-            <th>Title</th>
-            <th>Name</th>
+            <th>Template Name</th>
+            <th>Run Name</th>
+            <th>Instance Name</th>
             <th ng-if="$ctrl.visibility.showSurveySubject">Subject</th>
             <th>Status</th>
             <th>Issued On</th>
@@ -86,6 +87,9 @@
         </thead>
         <tbody>
         <tr ng-repeat="row in surveys | orderBy:'surveyRun.name'">
+            <td>
+                <span ng-bind="row.surveyTemplate.name"></span>
+            </td>
             <td>
                 <a ng-bind="row.surveyRun.name"
                    class="clickable"

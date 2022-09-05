@@ -39,23 +39,34 @@ const initialState = {
 };
 
 
-function mkTableData(surveyRuns = [], surveyInstances = []) {
+function mkTableData(surveyRuns = [], surveyInstances = [], templates = []) {
     const runsById = _.keyBy(surveyRuns, "id");
+    const templatesById = _.keyBy(templates, "id");
 
-    const surveys = _.map(surveyInstances, instance => {
-        return {
-            "surveyInstance": instance,
-            "surveyRun": runsById[instance.surveyRunId],
-            "surveyEntity": instance.surveyEntity
-        }
-    });
+    const surveys = _.map(
+        surveyInstances,
+        instance => {
+            const run = runsById[instance.surveyRunId];
+            const template = run
+                ? templatesById[run.surveyTemplateId]
+                : null;
+
+            return {
+                "surveyInstance": instance,
+                "surveyRun": run,
+                "surveyEntity": instance.surveyEntity,
+                "surveyTemplate": template
+            };
+        });
 
     const now = moment();
-    const grouped = _.groupBy(surveys, s => {
-        const subMoment = moment(s.surveyInstance.submittedAt);
-        return s.surveyInstance.status == "WITHDRAWN" || now.diff(subMoment, "months") >= 12 ? "ARCHIVE" : "CURRENT"
-    });
-    return grouped;
+
+    return _.groupBy(
+        surveys,
+        s => {
+            const subMoment = moment(s.surveyInstance.submittedAt);
+            return s.surveyInstance.status === "WITHDRAWN" || now.diff(subMoment, "months") >= 12 ? "ARCHIVE" : "CURRENT"
+        });
 }
 
 
@@ -77,6 +88,10 @@ function controller($q, serviceBroker) {
         if (vm.parentEntityRef) {
             let runsPromise;
             let instancesPromise;
+
+            const templatePromise = serviceBroker.loadAppData(
+                CORE_API.SurveyTemplateStore.findAll,
+                []);
 
             if (vm.parentEntityRef.kind === 'PERSON') {
                 runsPromise = serviceBroker.loadViewData(
@@ -102,9 +117,9 @@ function controller($q, serviceBroker) {
 
             vm.visibility.showSurveySubject = ! isSurveyTargetKind(vm.parentEntityRef.kind);
 
-            $q.all([runsPromise, instancesPromise])
-                .then(([runsResult, instancesResult]) =>
-                    vm.surveys = mkTableData(runsResult.data, instancesResult.data));
+            $q.all([runsPromise, instancesPromise, templatePromise])
+                .then(([runsResult, instancesResult, templateResult]) =>
+                    vm.surveys = mkTableData(runsResult.data, instancesResult.data, templateResult.data));
         }
     };
 
