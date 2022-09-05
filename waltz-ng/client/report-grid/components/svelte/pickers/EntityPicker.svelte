@@ -14,6 +14,7 @@
     import OrgUnitFieldPicker from "./OrgUnitFieldPicker.svelte";
     import TagPicker from "./TagPicker.svelte";
     import AliasPicker from "./AliasPicker.svelte";
+    import ComplexityKindPicker from "./ComplexityKindPicker.svelte";
 
     export let onSelect = (d) => console.log("Selecting an entity", d);
     export let onDeselect = (d) => console.log("Deselecting an entity", d);
@@ -26,6 +27,8 @@
                 return InvolvementPicker;
             case "COST_KIND":
                 return CostKindPicker;
+            case "COMPLEXITY_KIND":
+                return ComplexityKindPicker;
             case "SURVEY_QUESTION":
                 return SurveyQuestionPicker;
             case "ASSESSMENT_DEFINITION":

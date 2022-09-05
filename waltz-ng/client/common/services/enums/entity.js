@@ -143,6 +143,13 @@ export const entity = {
         description: null,
         position: 97
     },
+    COMPLEXITY_KIND: {
+        key: "COMPLEXITY_KIND",
+        name: "Complexity Kind",
+        icon: "sort-numeric-asc",
+        description: null,
+        position: 98
+    },
     DATABASE: {
         key: "DATABASE",
         name: "Database",

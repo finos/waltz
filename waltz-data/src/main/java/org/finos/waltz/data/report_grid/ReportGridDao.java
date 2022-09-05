@@ -93,6 +93,8 @@ public class ReportGridDao {
     private final org.finos.waltz.schema.tables.AssessmentRating ar = ASSESSMENT_RATING.as("ar");
     private final org.finos.waltz.schema.tables.CostKind ck = COST_KIND.as("ck");
     private final org.finos.waltz.schema.tables.Cost c = COST.as("c");
+    private final org.finos.waltz.schema.tables.Complexity cx = COMPLEXITY.as("cx");
+    private final org.finos.waltz.schema.tables.ComplexityKind cxk = COMPLEXITY_KIND.as("cxk");
     private final org.finos.waltz.schema.tables.Involvement inv = INVOLVEMENT.as("inv");
     private final org.finos.waltz.schema.tables.InvolvementKind ik = INVOLVEMENT_KIND.as("ik");
     private final org.finos.waltz.schema.tables.Person p = Tables.PERSON.as("p");
@@ -299,6 +301,14 @@ public class ReportGridDao {
                 ck.DESCRIPTION,
                 condition);
 
+        SelectConditionStep<Record7<Long, String, String, String, String, String, String>> complexityKindColumns = mkSupplementalColumnDefinitionQuery(
+                EntityKind.COMPLEXITY_KIND,
+                cxk,
+                cxk.ID,
+                cxk.NAME,
+                cxk.DESCRIPTION,
+                condition);
+
         SelectConditionStep<Record7<Long, String, String, String, String, String, String>> involvementKindColumns = mkSupplementalColumnDefinitionQuery(
                 EntityKind.INVOLVEMENT_KIND,
                 ik,
@@ -381,6 +391,7 @@ public class ReportGridDao {
         Table<Record7<Long, String, String, String, String, String, String>> extras = assessmentDefinitionColumns
                 .unionAll(measurableColumns)
                 .unionAll(costKindColumns)
+                .unionAll(complexityKindColumns)
                 .unionAll(involvementKindColumns)
                 .unionAll(surveyQuestionColumns)
                 .unionAll(appGroupColumns)
@@ -605,6 +616,7 @@ public class ReportGridDao {
                     fetchAssessmentData(genericSelector, colsByKind.get(EntityKind.ASSESSMENT_DEFINITION)),
                     fetchInvolvementData(genericSelector, colsByKind.get(EntityKind.INVOLVEMENT_KIND)),
                     fetchCostData(genericSelector, colsByKind.get(EntityKind.COST_KIND)),
+                    fetchComplexityData(genericSelector, colsByKind.get(EntityKind.COMPLEXITY_KIND)),
                     fetchSummaryMeasurableData(
                             genericSelector,
                             measurableColumnsByRollupKind.getOrDefault(RatingRollupRule.PICK_HIGHEST, emptySet()),
@@ -1336,6 +1348,35 @@ public class ReportGridDao {
                             .subjectId(r.get(c.ENTITY_ID))
                             .columnDefinitionId(costKindIdToDefIdMap.get(r.get(c.COST_KIND_ID)))
                             .numberValue(r.get(c.AMOUNT))
+                            .build());
+        }
+    }
+
+
+    private Set<ReportGridCell> fetchComplexityData(GenericSelector selector,
+                                                    Collection<ReportGridColumnDefinition> cols) {
+
+        if (isEmpty(cols)) {
+            return emptySet();
+        } else {
+
+            Map<Long, Long> complexityKindIdToDefIdMap = indexBy(
+                    cols,
+                    ReportGridColumnDefinition::columnEntityId,
+                    ReportGridColumnDefinition::id);
+
+            return dsl
+                    .select(cx.ENTITY_ID,
+                            cx.COMPLEXITY_KIND_ID,
+                            cx.SCORE)
+                    .from(cx)
+                    .where(dsl.renderInlined(cx.COMPLEXITY_KIND_ID.in(complexityKindIdToDefIdMap.keySet())
+                            .and(cx.ENTITY_KIND.eq(selector.kind().name()))
+                            .and(cx.ENTITY_ID.in(selector.selector()))))
+                    .fetchSet(r -> ImmutableReportGridCell.builder()
+                            .subjectId(r.get(cx.ENTITY_ID))
+                            .columnDefinitionId(complexityKindIdToDefIdMap.get(r.get(cx.COMPLEXITY_KIND_ID)))
+                            .numberValue(r.get(cx.SCORE))
                             .build());
         }
     }
