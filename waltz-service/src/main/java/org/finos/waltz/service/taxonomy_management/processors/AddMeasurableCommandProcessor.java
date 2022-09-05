@@ -18,6 +18,7 @@
 
 package org.finos.waltz.service.taxonomy_management.processors;
 
+import org.finos.waltz.model.ExternalIdProvider;
 import org.finos.waltz.service.measurable.MeasurableService;
 import org.finos.waltz.service.taxonomy_management.TaxonomyCommandProcessor;
 import org.finos.waltz.common.DateTimeUtilities;
@@ -84,15 +85,20 @@ public class AddMeasurableCommandProcessor implements TaxonomyCommandProcessor {
 
         Optional<Long> parentId = cmd.changeType() == TaxonomyChangeType.ADD_CHILD
                 ? primaryReference.id()
-                : primaryReference.parentId();
+                : primaryReference.parentId(); // peer
+
+        Optional<String> externalParentId = parentId
+                .map(measurableService::getById)
+                .flatMap(ExternalIdProvider::externalId);
 
         Measurable newMeasurable = ImmutableMeasurable
                 .builder()
                 .categoryId(cmd.changeDomain().id())
+                .externalId(Optional.ofNullable(getExternalIdParam(cmd)))
+                .externalParentId(externalParentId)
                 .parentId(parentId)
                 .name(getNameParam(cmd))
                 .description(mkSafe(getDescriptionParam(cmd)))
-                .externalId(Optional.ofNullable(getExternalIdParam(cmd)))
                 .concrete(getConcreteParam(cmd, true))
                 .lastUpdatedBy(userId)
                 .lastUpdatedAt(DateTimeUtilities.nowUtc())

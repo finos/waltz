@@ -294,4 +294,5 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .where(MEASURABLE.ORGANISATIONAL_UNIT_ID.in(orgUnitOrChildIds))
                 .fetch(TO_DOMAIN_MAPPER);
     }
+
 }
