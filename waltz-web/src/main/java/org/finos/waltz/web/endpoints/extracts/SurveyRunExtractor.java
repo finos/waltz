@@ -48,8 +48,8 @@ import static spark.Spark.get;
 public class SurveyRunExtractor extends DirectQueryBasedDataExtractor {
 
     private static final Logger LOG = LoggerFactory.getLogger(SurveyRunExtractor.class);
-    private static List<Field> SURVEY_RESPONSE_FIELDS;
-    private static List<Field> SURVEY_INSTANCE_FIELDS;
+    private static final List<Field<?>> SURVEY_RESPONSE_FIELDS;
+    private static final List<Field<?>> SURVEY_INSTANCE_FIELDS;
 
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
 
@@ -59,12 +59,13 @@ public class SurveyRunExtractor extends DirectQueryBasedDataExtractor {
                 SURVEY_QUESTION_RESPONSE.ENTITY_RESPONSE_ID,
                 SURVEY_QUESTION_RESPONSE.ENTITY_RESPONSE_KIND);
 
-        Field<String> answer = DSL.concat(SURVEY_QUESTION_RESPONSE.STRING_RESPONSE.coalesce(""),
-                SURVEY_QUESTION_RESPONSE.NUMBER_RESPONSE.cast(String.class).coalesce(""),
-                SURVEY_QUESTION_RESPONSE.BOOLEAN_RESPONSE.cast(String.class).coalesce(""),
-                SURVEY_QUESTION_RESPONSE.DATE_RESPONSE.cast(String.class).coalesce(""),
-                ENTITY_RESPONSE_NAME_FIELD.coalesce(""),
-                SURVEY_QUESTION_RESPONSE.LIST_RESPONSE_CONCAT.coalesce("")).as("Answer");
+        Field<String> answer = DSL.concat(
+                DSL.coalesce(SURVEY_QUESTION_RESPONSE.STRING_RESPONSE,""),
+                DSL.coalesce(SURVEY_QUESTION_RESPONSE.NUMBER_RESPONSE.cast(String.class), ""),
+                DSL.coalesce(SURVEY_QUESTION_RESPONSE.BOOLEAN_RESPONSE.cast(String.class), ""),
+                DSL.coalesce(SURVEY_QUESTION_RESPONSE.DATE_RESPONSE.cast(String.class), ""),
+                DSL.coalesce(ENTITY_RESPONSE_NAME_FIELD, ""),
+                DSL.coalesce(SURVEY_QUESTION_RESPONSE.LIST_RESPONSE_CONCAT, "")).as("Answer");
 
         SURVEY_RESPONSE_FIELDS = ListUtilities.asList(
                 SURVEY_QUESTION.SECTION_NAME.as("Section"),
@@ -208,8 +209,8 @@ public class SurveyRunExtractor extends DirectQueryBasedDataExtractor {
 
     private SelectConditionStep<?> getSurveyRunInstances(long surveyRunId) {
         return dsl
-                .select(APPLICATION.NAME.coalesce(CHANGE_INITIATIVE.NAME).as("Entity Name"),
-                        APPLICATION.ASSET_CODE.coalesce(CHANGE_INITIATIVE.EXTERNAL_ID).as("Entity Id"),
+                .select(DSL.coalesce(APPLICATION.NAME, CHANGE_INITIATIVE.NAME).as("Entity Name"),
+                        DSL.coalesce(APPLICATION.ASSET_CODE, CHANGE_INITIATIVE.EXTERNAL_ID).as("Entity Id"),
                         SURVEY_INSTANCE.ENTITY_KIND.as("Entity Kind"),
                         SURVEY_INSTANCE.STATUS.as("Status"))
                 .select(SURVEY_INSTANCE_FIELDS)
@@ -235,8 +236,8 @@ public class SurveyRunExtractor extends DirectQueryBasedDataExtractor {
 
     private SelectConditionStep<?> getSurveyRunWithResponses(long surveyRunId) {
         return dsl.select(
-                APPLICATION.NAME.coalesce(CHANGE_INITIATIVE.NAME).as("Entity Name"),
-                APPLICATION.ASSET_CODE.coalesce(CHANGE_INITIATIVE.EXTERNAL_ID).as("Entity Id"),
+                DSL.coalesce(APPLICATION.NAME, CHANGE_INITIATIVE.NAME).as("Entity Name"),
+                DSL.coalesce(APPLICATION.ASSET_CODE, CHANGE_INITIATIVE.EXTERNAL_ID).as("Entity Id"),
                 SURVEY_INSTANCE.ENTITY_KIND.as("Entity Kind"),
                 SURVEY_INSTANCE.STATUS.as("Status"))
                 .select(SURVEY_RESPONSE_FIELDS)
