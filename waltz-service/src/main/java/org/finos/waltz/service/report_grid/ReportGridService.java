@@ -109,13 +109,6 @@ public class ReportGridService {
 
         LOG.info("ReportGrid - getting by ID={} SelectionOptions={}",id,idSelectionOptions);
 
-        // col | match | text | optionText | optionCode
-        // EXPRESSION | null | "Not Provided" |  "Not Provided" | "NOT PROVIDED"
-        // EXPRESSION | =="Yes" | "Yay" |  "Yup" | "Y"
-        // EXPRESSION | =="No" | "Nope" |  "No" | "N"
-
-
-
 
         ReportGridDefinition definition = ImmutableReportGridDefinition
                 .copyOf(reportGridDao.getGridDefinitionById(id))
