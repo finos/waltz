@@ -21,10 +21,7 @@ public abstract class ReportGridCalculatedColumnDefinition {
     public abstract long position();
 
 
-    public abstract String valueExpression();
-
-    @Nullable
-    public abstract String outcomeExpression();
+    public abstract String expression();
 
     //  (r) => r.colA && r.colB ? r.colA + r.colB : null;
     //  (r, v) => v > 10 ? (v > 100 ? "Loads": "Lots") : "Few"

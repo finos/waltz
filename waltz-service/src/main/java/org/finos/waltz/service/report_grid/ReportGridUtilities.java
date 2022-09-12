@@ -157,7 +157,7 @@ public class ReportGridUtilities {
                 .collect(Collectors.toSet());
     }
 
-    private static String sanitizeString(String name) {
+    public static String sanitizeString(String name) {
         return mkSafe(name)
                 .replaceAll("[:;*?/\\\\]", "")
                 .replaceAll("\\s+", "")

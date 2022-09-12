@@ -115,19 +115,26 @@ public class ReportGridService {
                 .withCalculatedColumnDefinitions(
                         ImmutableReportGridCalculatedColumnDefinition
                                 .builder()
-                                .id(40000L)
-                                .displayName("Expression")
+                                .id(50000L)
+                                .displayName("Payments DT")
                                 .position(1)
-                                .valueExpression("cell('DPO_ASSIGNED_CHECK').rating().name() == 'Yes' ? 'Yay' : 'Boo'") // Not working!!!
-                                .outcomeExpression("'Hello Jess`s Mum Again!'")
+                                .expression("anyCellsProvided(['PAYMENT', 'PAYMENT_INSTRUCTION', 'PAYMENT_MANDATE']) ? 'Payments DT' : null") // Not working!!!
                                 .build()
                         ,
                         ImmutableReportGridCalculatedColumnDefinition
                                 .builder()
-                                .id(50000L)
-                                .displayName("Payments DT")
+                                .id(60000L)
+                                .displayName("Payments DT2")
                                 .position(1)
-                                .valueExpression("anyCellProvided(['PAYMENT', 'PAYMENT_INSTRUCTION', 'PAYMENT_MANDATE'])") // Not working!!!
+                                .expression("anyCellsProvided(['PAYMENTS_DT']) ? mkResult('Yes Derived', 'Payment', 'PAYMENT') : null") // Not working!!!
+                                .build()
+                        ,
+                        ImmutableReportGridCalculatedColumnDefinition
+                                .builder()
+                                .id(80000L)
+                                .displayName("Defo Payments")
+                                .position(1)
+                                .expression("var r = ratioProvided(['PAYMENTS_DT', 'PAYMENTS', 'PAYMENTS_RECORDS']); return mkResult('Ratio: ' + r)") // Not working!!!
                                 .build()
 
 
@@ -160,9 +167,6 @@ public class ReportGridService {
                 .instance(instance)
                 .build());
     }
-
-
-
 
 
     public ReportGridInstance mkInstance(long id, IdSelectionOptions idSelectionOptions, EntityKind targetKind) {

@@ -3,24 +3,22 @@ package org.finos.waltz.service.report_grid;
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
-import org.apache.commons.jexl3.JexlExpression;
+import org.apache.commons.jexl3.JexlScript;
 import org.finos.waltz.common.MapUtilities;
 import org.finos.waltz.common.SetUtilities;
-import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.model.either.Either;
 import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.model.report_grid.*;
-import org.jooq.lambda.tuple.Tuple2;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.util.Optional.ofNullable;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.MapUtilities.newHashMap;
 import static org.finos.waltz.common.SetUtilities.map;
+import static org.finos.waltz.common.SetUtilities.union;
 import static org.finos.waltz.common.StringUtilities.notEmpty;
 import static org.finos.waltz.model.utils.IdUtilities.indexById;
 import static org.jooq.lambda.tuple.Tuple.tuple;
@@ -28,8 +26,9 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 public class ReportGridColumnCalculator {
 
 
-    public static Set<ReportGridCell> calculate(ReportGridInstance instance, ReportGridDefinition definition) {
-        ReportGridEvaluatorNamespace ns = new ReportGridEvaluatorNamespace();
+    public static Set<ReportGridCell> calculate(ReportGridInstance instance,
+                                                ReportGridDefinition definition) {
+        ReportGridEvaluatorNamespace ns = new ReportGridEvaluatorNamespace(definition);
         JexlBuilder builder = new JexlBuilder();
         JexlEngine jexl = builder.namespaces(newHashMap(null, ns)).create();
 
@@ -42,21 +41,14 @@ public class ReportGridColumnCalculator {
         Set<CompiledCalculatedColumn> derivedColumns = map(
                 definition.calculatedColumnDefinitions(),
                 d -> {
-                    Either<String, JexlExpression> valueExpr = compile(
+                    Either<String, JexlScript> expr = compile(
                             jexl,
-                            d.valueExpression());
-
-                    Either<String, JexlExpression> perhapsOutcomeExpression = notEmpty(d.outcomeExpression())
-                            ? compile(
-                                jexl,
-                                d.outcomeExpression())
-                            : null;
+                            d.expression());
 
                     return ImmutableCompiledCalculatedColumn
                             .builder()
                             .column(d)
-                            .valueExpression(valueExpr)
-                            .outcomeExpression(perhapsOutcomeExpression)
+                            .expression(expr)
                             .build();
                 });
 
@@ -91,9 +83,9 @@ public class ReportGridColumnCalculator {
                                                        Set<CompiledCalculatedColumn> colsToCalc) {
 
         // we need to evaluate derived cols at least once
-        AtomicBoolean runAgain = new AtomicBoolean(true);
+        AtomicBoolean evaluateRowAgain = new AtomicBoolean(true);
         // collecting the results as we go
-        Set<ReportGridCell> results = new HashSet<>();
+        Map<Long, ReportGridCell> results = new HashMap<>();
         // this collection tracks successfully calculated columns, so we don't keep re-evaluating
         Set<CompiledCalculatedColumn> colsToRemove = new HashSet<>();
 
@@ -101,29 +93,36 @@ public class ReportGridColumnCalculator {
 
         Map<ReportGridCalculatedColumnDefinition, String> lastErrors = new HashMap<>();
 
-        while (runAgain.get()) {
+        while (evaluateRowAgain.get()) {
             // assume this time will be the last
-            runAgain.set(false);
+            evaluateRowAgain.set(false);
 
             // iterate over remaining columns attempting execution
             remaining.forEach(ccc -> {
                 try {
                     // attempt to evaluate the cell
                     ofNullable(evaluateCalcCol(ccc, subjectId))
-                        .ifPresent(result -> {
-                            // If successful record the result
-                            results.add(result);
+                            .ifPresent(result -> {
 
-                            // ...add the column to the list of cols to remove after this iteration
-                            //   (we remove late to prevent a concurrent modification exception)
-                            colsToRemove.add(ccc);
 
-                            // ...and update the context so dependent expressions can be calculated
-                            ns.addContext(colToExtId(ccc.column()), result);
+                                ReportGridCell existingResult = results.get(ccc.column().id());
+                                boolean isDifferent = existingResult == null || !existingResult.equals(result);
 
-                            // Since something has changed we want to run the loop again in case
-                            // ...a dependant expression can now be evaluated.
-                            runAgain.set(true);
+                                if (isDifferent) {
+                                    // If successful record the result
+                                    results.put(ccc.column().id(), result);
+
+                                    // ...add the column to the list of cols to remove after this iteration
+                                    //   (we remove late to prevent a concurrent modification exception)
+//                            colsToRemove.add(ccc);
+
+                                    // ...and update the context so dependent expressions can be calculated
+                                    ns.addContext(colToExtId(ccc.column()), result);
+
+                                    // Since something has changed we want to run the loop again in case
+                                    // ...a dependant expression can now be evaluated.
+                                    evaluateRowAgain.set(true);
+                                }
                         });
 
                     // clear out the error map for this column as the last evaluation succeeded (but may have been null)
@@ -141,36 +140,27 @@ public class ReportGridColumnCalculator {
 
             if (remaining.isEmpty()) {
                 // nothing left to do, therefore we can finish on this iteration
-                runAgain.set(false);
+                evaluateRowAgain.set(false);
             }
         }
 
-        Stream<Tuple2<ReportGridCalculatedColumnDefinition, String>> remainingStream = remaining
+        Set<ReportGridCell> errorResults = remaining
                 .stream()
                 .map(ccc -> tuple(
                         ccc.column(),
-                        lastErrors.get(ccc.column())));
+                        lastErrors.get(ccc.column())))
+                .filter(d -> notEmpty(d.v2))
+                .map(t -> ImmutableReportGridCell
+                        .builder()
+                        .subjectId(subjectId)
+                        .errorValue(t.v2)
+                        .optionCode("EXECUTION_ERROR")
+                        .optionText("Execution Error")
+                        .columnDefinitionId(t.v1.id())
+                        .build())
+                .collect(Collectors.toSet());
 
-        // handle remaining values (errors and blanks)
-        remainingStream
-                .map(t -> {
-                    boolean isError = StringUtilities.notEmpty(t.v2);
-                    String optionCode = isError ? "EXECUTION_ERROR" : "NO_VALUE";
-                    String optionText = isError ? "Execution Error" : "No Value";
-                    String errorValue = isError ? t.v2 : null;
-
-                    return ImmutableReportGridCell
-                            .builder()
-                            .subjectId(subjectId)
-                            .errorValue(errorValue)
-                            .optionCode(optionCode)
-                            .optionText(optionText)
-                            .columnDefinitionId(t.v1.id())
-                            .build();
-                })
-                .forEach(results::add);
-
-        return results;
+        return union(results.values(), errorResults);
     }
 
     private static String toMessage(Exception e) {
@@ -178,9 +168,9 @@ public class ReportGridColumnCalculator {
     }
 
 
-    private static Either<String, JexlExpression> compile(JexlEngine jexl, String expression) {
+    private static Either<String, JexlScript> compile(JexlEngine jexl, String expression) {
         try {
-            JexlExpression expr = jexl.createExpression(expression);
+            JexlScript expr = jexl.createScript(expression);
             return Either.right(expr);
         } catch (JexlException e) {
             return Either.left(e.getMessage());
@@ -214,43 +204,42 @@ public class ReportGridColumnCalculator {
 
         ReportGridCalculatedColumnDefinition cd = compiledCalculatedColumn.column();
 
-        Optional<Object> outcome = ofNullable(compiledCalculatedColumn.outcomeExpression())
-                .map(outcomeExpr ->
-                        outcomeExpr.map(
-                            err -> err,
-                            expr -> expr.evaluate(null)));
-
-
         return compiledCalculatedColumn
-                .valueExpression()
+                .expression()
                 .map(
-                    compilationError -> ImmutableReportGridCell
-                            .builder()
-                            .subjectId(subjectId)
-                            .errorValue(compilationError)
-                            .optionCode("COMPILE_ERROR")
-                            .optionText("Compile Error")
-                            .columnDefinitionId(cd.id())
-                            .build(),
-                    expr -> {
-                        Object result = expr.evaluate(null);
-                        return result == null
-                                ? null
-                                : ImmutableReportGridCell
-                                    .builder()
-                                    .textValue(result.toString())
-                                    .subjectId(subjectId)
-                                    .columnDefinitionId(cd.id())
-                                    .optionCode(outcome.map(Object::toString).orElse(""))
-                                    .optionText(outcome.map(Object::toString).orElse(""))
-                                    .build();
-                    });
+                        compilationError -> ImmutableReportGridCell
+                                .builder()
+                                .subjectId(subjectId)
+                                .errorValue(compilationError)
+                                .optionCode("COMPILE_ERROR")
+                                .optionText("Compile Error")
+                                .columnDefinitionId(cd.id())
+                                .build(),
+                        expr -> {
+                            Object result = expr.execute(null);
 
+                            if (result == null) {
+                                return null;
+                            } else {
 
+                                CellResult cr = (result instanceof CellResult)
+                                        ? (CellResult) result
+                                        : CellResult.mkResult(result.toString(), "Provided", "PROVIDED");
+
+                                return ImmutableReportGridCell
+                                        .builder()
+                                        .textValue(cr.value())
+                                        .subjectId(subjectId)
+                                        .columnDefinitionId(cd.id())
+                                        .optionCode(cr.optionCode())
+                                        .optionText(cr.optionText())
+                                        .build();
+                            }
+                        });
     }
 
 
-    private static String colToExtId(ReportGridColumnDefinition col) {
+    public static String colToExtId(ReportGridColumnDefinition col) {
         String base = col.displayName() == null
                 ? col.columnName()
                 : col.displayName();
@@ -260,7 +249,7 @@ public class ReportGridColumnCalculator {
     }
 
 
-    private static String colToExtId(ReportGridCalculatedColumnDefinition col) {
+    public static String colToExtId(ReportGridCalculatedColumnDefinition col) {
         return col.displayName()
                 .toUpperCase()
                 .replaceAll(" ", "_");
