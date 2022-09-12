@@ -3,7 +3,6 @@ package org.finos.waltz.service.report_grid;
 import org.jooq.lambda.tuple.Tuple2;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.finos.waltz.service.report_grid.ReportGridUtilities.parseTableData;

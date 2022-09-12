@@ -72,9 +72,13 @@ export const summaries = derived([selectedGrid, filters, tableData], ([$selected
             $tableData,
             d => Object.assign({}, d, {visible: rowFilter(d)}));
 
+        const columnDefinitions = _.concat(
+            $selectedGrid?.definition.columnDefinitions,
+            $selectedGrid?.definition.calculatedColumnDefinitions);
+
         return refreshSummaries(
             workingTableData,
-            $selectedGrid?.definition.columnDefinitions,
+            columnDefinitions,
             $selectedGrid?.instance.ratingSchemeItems);
     }
 });

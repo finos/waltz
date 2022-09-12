@@ -81,7 +81,7 @@
         <archunit.version>0.23.1</archunit.version>
         <freemarker.version>2.3.31</freemarker.version>
         <hikari.version>3.4.5</hikari.version>
-        <immutables.version>2.9.0</immutables.version>
+        <immutables.version>2.9.2</immutables.version>
         <jackson.version>2.13.3</jackson.version>
         <jackson-jsr310.version>2.13.3</jackson-jsr310.version>
         <java.version>1.8</java.version>

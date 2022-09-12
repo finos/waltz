@@ -19,6 +19,7 @@ public abstract class ReportGridDefinition implements
         ExternalIdProvider {
 
     public abstract List<ReportGridColumnDefinition> columnDefinitions();  // columns
+    public abstract List<ReportGridCalculatedColumnDefinition> calculatedColumnDefinitions();  // columns
 
     public abstract EntityKind subjectKind();
 

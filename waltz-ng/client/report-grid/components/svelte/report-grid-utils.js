@@ -147,7 +147,11 @@ export function getDisplayNameForColumn(c) {
 
 
 export function prepareColumnDefs(gridData) {
-    const colDefs = _.get(gridData, ["definition", "columnDefinitions"], []);
+    console.log("pcd", {gridData})
+    const fixedColDefs = _.get(gridData, ["definition", "columnDefinitions"], []);
+    const calculatedColDefs = _.get(gridData, ["definition", "calculatedColumnDefinitions"], []);
+
+    const colDefs = _.concat(fixedColDefs, calculatedColDefs);
 
     const mkColumnCustomProps = (c) => {
         switch (c.columnEntityKind) {
@@ -197,6 +201,7 @@ export function prepareColumnDefs(gridData) {
         }
     };
 
+    console.log("Making cols out of: ", {fixedColDefs, calculatedColDefs, colDefs});
     const additionalColumns = _
         .chain(colDefs)
         .map(c => {
@@ -357,7 +362,7 @@ export function prepareTableData(gridData) {
     const complexityColorScalesByColumnDefinitionId = calculateComplexityColorScales(gridData);
 
     function mkTableCell(dataCell) {
-        const colDef = colsById[dataCell.columnDefinitionId];
+        const colDef = _.get(colsById, [dataCell.columnDefinitionId], {columnEntityKind: "REPORT_GRID_CALCULATED_COLUMN_DEFINITION" });
 
         const baseCell = {
             fontColor: "#3b3b3b",
@@ -405,12 +410,22 @@ export function prepareTableData(gridData) {
             case "ASSESSMENT_DEFINITION":
             case "MEASURABLE":
                 const ratingSchemeItem = ratingSchemeItemsById[dataCell.ratingIdValue];
-                const popoverHtml = mkPopoverHtml(dataCell, ratingSchemeItem);
                 return Object.assign({}, baseCell, {
-                    comment: popoverHtml,
+                    comment: mkPopoverHtml(dataCell, ratingSchemeItem),
                     color: ratingSchemeItem.color,
                     fontColor: ratingSchemeItem.fontColor,
                     text: ratingSchemeItem.name,
+                });
+            case "REPORT_GRID_CALCULATED_COLUMN_DEFINITION":
+                return Object.assign({}, baseCell, {
+                    comment: dataCell.errorValue
+                        ? `<span class="force-wrap" style="word-break: break-all">${dataCell.errorValue}</span>`
+                        : null,
+                    color: dataCell.errorValue
+                        ? "#F6AAB7"
+                        : "#86C9F6",
+                    fontColor: "black",
+                    text: dataCell.errorValue || dataCell.textValue
                 });
             default:
                 console.error(`Cannot prepare table data for column kind:  ${colDef.columnEntityKind}, colId: ${colDef.id}`);

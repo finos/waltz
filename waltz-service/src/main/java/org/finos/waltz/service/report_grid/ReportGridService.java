@@ -18,6 +18,7 @@
 
 package org.finos.waltz.service.report_grid;
 
+import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.common.exception.NotFoundException;
 import org.finos.waltz.data.GenericSelector;
@@ -26,9 +27,7 @@ import org.finos.waltz.data.application.ApplicationDao;
 import org.finos.waltz.data.change_initiative.ChangeInitiativeDao;
 import org.finos.waltz.data.report_grid.ReportGridDao;
 import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.HierarchyQueryScope;
 import org.finos.waltz.model.IdSelectionOptions;
-import org.finos.waltz.model.ImmutableIdSelectionOptions;
 import org.finos.waltz.model.application.Application;
 import org.finos.waltz.model.change_initiative.ChangeInitiative;
 import org.finos.waltz.model.rating.RatingSchemeItem;
@@ -110,7 +109,36 @@ public class ReportGridService {
 
         LOG.info("ReportGrid - getting by ID={} SelectionOptions={}",id,idSelectionOptions);
 
-        ReportGridDefinition definition = reportGridDao.getGridDefinitionById(id);
+        // col | match | text | optionText | optionCode
+        // EXPRESSION | null | "Not Provided" |  "Not Provided" | "NOT PROVIDED"
+        // EXPRESSION | =="Yes" | "Yay" |  "Yup" | "Y"
+        // EXPRESSION | =="No" | "Nope" |  "No" | "N"
+
+
+
+
+        ReportGridDefinition definition = ImmutableReportGridDefinition
+                .copyOf(reportGridDao.getGridDefinitionById(id))
+                .withCalculatedColumnDefinitions(
+                        ImmutableReportGridCalculatedColumnDefinition
+                                .builder()
+                                .id(40000L)
+                                .displayName("Expression")
+                                .position(1)
+                                .valueExpression("cell('DPO_ASSIGNED_CHECK').rating().name() == 'Yes' ? 'Yay' : 'Boo'") // Not working!!!
+                                .outcomeExpression("'Hello Jess`s Mum Again!'")
+                                .build()
+                        ,
+                        ImmutableReportGridCalculatedColumnDefinition
+                                .builder()
+                                .id(50000L)
+                                .displayName("Payments DT")
+                                .position(1)
+                                .valueExpression("anyCellProvided(['PAYMENT', 'PAYMENT_INSTRUCTION', 'PAYMENT_MANDATE'])") // Not working!!!
+                                .build()
+
+
+                );
 
         if (definition == null) {
             LOG.warn("No Report Grid Definition found for ID={}", id);
@@ -121,12 +149,27 @@ public class ReportGridService {
 
         ReportGridInstance instance = mkInstance(id, opts, targetKind);
 
+        if (!definition.calculatedColumnDefinitions().isEmpty()) {
+            Set<ReportGridCell> calculatedCells = ReportGridColumnCalculator.calculate(instance, definition);
+
+            return Optional.of(ImmutableReportGrid
+                    .builder()
+                    .definition(definition)
+                    .instance(ImmutableReportGridInstance
+                            .copyOf(instance)
+                            .withCellData(SetUtilities.union(instance.cellData(), calculatedCells)))
+                    .build());
+        }
+
         return Optional.of(ImmutableReportGrid
                 .builder()
                 .definition(definition)
                 .instance(instance)
                 .build());
     }
+
+
+
 
 
     public ReportGridInstance mkInstance(long id, IdSelectionOptions idSelectionOptions, EntityKind targetKind) {
@@ -244,4 +287,5 @@ public class ReportGridService {
     public ReportGridDefinition getGridDefinitionById(long gridId) {
         return reportGridDao.getGridDefinitionById(gridId);
     }
+
 }

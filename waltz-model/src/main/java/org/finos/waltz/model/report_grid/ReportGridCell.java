@@ -50,6 +50,9 @@ public abstract class ReportGridCell implements CommentProvider {
     public abstract String textValue();
 
     @Nullable
+    public abstract String errorValue();
+
+    @Nullable
     public abstract LocalDateTime dateTimeValue();
 
     @Value.Default
