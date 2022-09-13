@@ -136,6 +136,14 @@ public class ReportGridService {
                                 .position(1)
                                 .expression("var r = ratioProvided(['PAYMENTS_DT', 'PAYMENTS', 'PAYMENTS_RECORDS']); return mkResult('Ratio: ' + r)") // Not working!!!
                                 .build()
+                        ,
+                        ImmutableReportGridDerivedColumnDefinition
+                                .builder()
+                                .id(90000L)
+                                .displayName("Defo Payments")
+                                .position(1)
+                                .expression("var r = percentageProvided(['PAYMENTS_DT', 'PAYMENTS', 'PAYMENTS_RECORDS']); return mkResult(r + '%')") // Not working!!!
+                                .build()
 
 
                 );
@@ -227,7 +235,7 @@ public class ReportGridService {
                                                         ReportGridColumnDefinitionsUpdateCommand updateCommand,
                                                         String username) throws InsufficientPrivelegeException {
         checkIsOwner(reportGridId, username);
-        reportGridDao.updateColumnDefinitions(reportGridId, updateCommand.columnDefinitions());
+        reportGridDao.updateColumnDefinitions(reportGridId, updateCommand.fixedColumnDefinitions());
         return reportGridDao.getGridDefinitionById(reportGridId);
     }
 

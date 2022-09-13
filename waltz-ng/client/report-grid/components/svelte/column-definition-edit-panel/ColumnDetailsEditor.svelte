@@ -18,7 +18,7 @@
     }
 
     function selectSummary(usageKind, column) {
-        const originalColumn = _.find($selectedGrid.definition.columnDefinitions, d => sameColumnRef(d, column));
+        const originalColumn = _.find($selectedGrid.definition.fixedColumnDefinitions, d => sameColumnRef(d, column));
         const newColumn = Object.assign({},
             column,
             {usageKind: usageKind?.key, usageKindChanged: usageKind?.key !== originalColumn?.usageKind})
@@ -27,7 +27,7 @@
     }
 
     function selectRollupKind(rollupKind, column) {
-        const originalColumn = _.find($selectedGrid.definition.columnDefinitions, d => sameColumnRef(d, column));
+        const originalColumn = _.find($selectedGrid.definition.fixedColumnDefinitions, d => sameColumnRef(d, column));
         const newColumn = Object.assign(
             {},
             column,
@@ -40,7 +40,7 @@
     }
 
     function updateDisplayName(workingDisplayName, column) {
-        const originalColumn = _.find($selectedGrid.definition.columnDefinitions, d => sameColumnRef(d, column));
+        const originalColumn = _.find($selectedGrid.definition.fixedColumnDefinitions, d => sameColumnRef(d, column));
         const newColumn = Object.assign(
             {},
             column,
@@ -66,20 +66,6 @@
         <col width="50%">
     </colgroup>
     <tbody>
-    <tr>
-        <td>
-            <div>Usage Kind</div>
-            <div class="small help-text">
-                    Select summary for columns to appear in the filter list.
-                </div>
-            </td>
-            <td>
-                <DropdownPicker items={summaryItems}
-                                onSelect={(d) => selectSummary(d, column)}
-                                defaultMessage="Select a summary kind"
-                                selectedItem={columnUsageKind[column.usageKind]}/>
-            </td>
-        </tr>
         <tr>
             <td>
                 <div>Rating rollup rule</div>

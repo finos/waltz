@@ -36,7 +36,6 @@
             columnQualifierId: d.columnQualifierId,
             columnName: d.columnName,
             columnDescription: d.columnDescription,
-            usageKind: columnUsageKind.NONE.key,
             ratingRollupRule: determineDefaultRollupRule(d).key,
             displayName: d.displayName,
             position: 0
@@ -82,7 +81,6 @@
                 columnEntityKind: d.columnEntityKind,
                 columnEntityId: d.columnEntityId,
                 position: d.position,
-                usageKind: d.usageKind,
                 ratingRollupRule: d.ratingRollupRule,
                 entityFieldReference: d.entityFieldReference,
                 displayName: d.displayName,
@@ -91,7 +89,7 @@
             }));
 
         return reportGridStore
-            .updateColumnDefinitions(gridId, {columnDefinitions: columnDefs})
+            .updateColumnDefinitions(gridId, {fixedColumnDefinitions: columnDefs})
             .then(() => {
                 onSave();
                 toasts.success("Report grid columns updated successfully");

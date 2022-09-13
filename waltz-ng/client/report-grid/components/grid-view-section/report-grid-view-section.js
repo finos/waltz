@@ -92,7 +92,7 @@ function controller($scope, serviceBroker, localStorageService) {
     function getSummaryColumns(gridData) {
         return coalesceFns(
             () => getSummaryColumnsFromLocalStorage(gridData),
-            () => getDefaultSummaryColumns(gridData?.definition.columnDefinitions));
+            () => getDefaultSummaryColumns(gridData?.definition.fixedColumnDefinitions));
     }
 
 
@@ -113,7 +113,7 @@ function controller($scope, serviceBroker, localStorageService) {
                     activeSummaries.set(summaries);
 
                     selectedGrid.set(gridData);
-                    columnDefs.set(gridData?.definition.columnDefinitions);
+                    columnDefs.set(gridData?.definition.fixedColumnDefinitions);
 
                     vm.allTableData = prepareTableData(vm.rawGridData);
                     vm.allColumnDefs = prepareColumnDefs(vm.rawGridData);

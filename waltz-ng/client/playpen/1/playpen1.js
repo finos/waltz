@@ -54,7 +54,7 @@ function controller($q,
             [2, mkSelectionOptions(vm.orgEntityRef)])
             .then(d => {
                 const report = d.data;
-                vm.columnDefs = _.orderBy(report.definition.columnDefinitions, d => d.position) || []
+                vm.columnDefs = _.orderBy(report.definition.fixedColumnDefinitions, d => d.position) || []
                 vm.gridId = report.definition.id;
             });
 

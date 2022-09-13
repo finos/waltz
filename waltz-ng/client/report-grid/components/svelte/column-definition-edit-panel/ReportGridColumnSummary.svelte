@@ -21,7 +21,7 @@
         const reorderedList = move($columnDefs, _.indexOf($columnDefs, column), positionCount);
         $lastMovedColumn = column;
 
-        $columnDefs = recalcPositions(reorderedList, $selectedGrid.definition.columnDefinitions);
+        $columnDefs = recalcPositions(reorderedList, $selectedGrid.definition.fixedColumnDefinitions);
 
     }
 
@@ -41,13 +41,13 @@
     function moveToTop(column) {
         const columnTail = _.reject($columnDefs, column);
         const reorderedColumns = _.concat([column], columnTail);
-        $columnDefs = recalcPositions(reorderedColumns, $selectedGrid.definition.columnDefinitions)
+        $columnDefs = recalcPositions(reorderedColumns, $selectedGrid.definition.fixedColumnDefinitions)
     }
 
     function moveToBottom(column) {
         const columnHead = _.reject($columnDefs, column);
         const reorderedColumns = _.concat(columnHead, [column]);
-        $columnDefs = recalcPositions(reorderedColumns, $selectedGrid.definition.columnDefinitions)
+        $columnDefs = recalcPositions(reorderedColumns, $selectedGrid.definition.fixedColumnDefinitions)
     }
 
     function moveUp(column) {

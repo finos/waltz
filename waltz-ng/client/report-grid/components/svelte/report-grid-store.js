@@ -18,7 +18,7 @@ export const ownedReportIds = writable([]);
 
 export let columnsChanged = derived([columnDefs, selectedGrid], ([$columnDefs, $selectedGrid]) => {
 
-    const originalColumnDefs = $selectedGrid?.definition.columnDefinitions || [];
+    const originalColumnDefs = $selectedGrid?.definition.fixedColumnDefinitions || [];
 
     if (!$selectedGrid) {
         return false
@@ -73,8 +73,8 @@ export const summaries = derived([selectedGrid, filters, tableData], ([$selected
             d => Object.assign({}, d, {visible: rowFilter(d)}));
 
         const columnDefinitions = _.concat(
-            $selectedGrid?.definition.columnDefinitions,
-            $selectedGrid?.definition.calculatedColumnDefinitions);
+            $selectedGrid?.definition.fixedColumnDefinitions,
+            $selectedGrid?.definition.derivedColumnDefinitions);
 
         return refreshSummaries(
             workingTableData,

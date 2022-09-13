@@ -5,6 +5,8 @@ import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.model.report_grid.ReportGridCell;
 import org.finos.waltz.model.report_grid.ReportGridDefinition;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -12,6 +14,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
+import static org.finos.waltz.common.ArrayUtilities.isEmpty;
 import static org.finos.waltz.common.SetUtilities.*;
 import static org.finos.waltz.service.report_grid.ReportGridUtilities.sanitizeString;
 
@@ -69,6 +72,11 @@ public class ReportGridEvaluatorNamespace {
 
     public double ratioProvided(String... cellExtIds) {
 
+
+        if (isEmpty(cellExtIds)) {
+            return (double) 0;
+        }
+
         checkAllCellsExist(cellExtIds);
 
         long foundColumns = Stream.of(cellExtIds)
@@ -76,9 +84,17 @@ public class ReportGridEvaluatorNamespace {
                 .filter(c -> Objects.nonNull(c) && !hasErrors(c))
                 .count();
 
-        int totalColumns = cellExtIds.length;
+        BigDecimal totalColumns = BigDecimal.valueOf(cellExtIds.length);
 
-        return ((double) foundColumns) / totalColumns;
+        BigDecimal ratioProvided = BigDecimal.valueOf(foundColumns)
+                .divide(totalColumns, 2, RoundingMode.HALF_UP);
+
+        return ratioProvided.doubleValue();
+    }
+
+    public double percentageProvided(String... cellExtIds) {
+        double ratio = ratioProvided(cellExtIds);
+        return ratio * 100;
     }
 
     private boolean hasErrors(Object c) {
