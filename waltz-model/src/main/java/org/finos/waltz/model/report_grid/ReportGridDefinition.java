@@ -18,8 +18,9 @@ public abstract class ReportGridDefinition implements
         ProvenanceProvider,
         ExternalIdProvider {
 
-    public abstract List<ReportGridColumnDefinition> columnDefinitions();  // columns
-    public abstract List<ReportGridCalculatedColumnDefinition> calculatedColumnDefinitions();  // columns
+    public abstract List<ReportGridFixedColumnDefinition> fixedColumnDefinitions();  // columns
+
+    public abstract List<ReportGridDerivedColumnDefinition> derivedColumnDefinitions();  // columns
 
     public abstract EntityKind subjectKind();
 

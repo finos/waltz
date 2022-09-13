@@ -39,7 +39,7 @@ public class ReportGridColumnCalculator {
         Map<Long, RatingSchemeItem> ratingSchemeItemsById = indexById(instance.ratingSchemeItems());
 
         Set<CompiledCalculatedColumn> derivedColumns = map(
-                definition.calculatedColumnDefinitions(),
+                definition.derivedColumnDefinitions(),
                 d -> {
                     Either<String, JexlScript> expr = compile(
                             jexl,
@@ -60,7 +60,7 @@ public class ReportGridColumnCalculator {
                     long subjectId = s.entityReference().id();
                     Collection<ReportGridCell> row = rowBySubject.getOrDefault(subjectId, Collections.emptySet());
                     Map<String, Object> ctx = initialiseContext(
-                            definition.columnDefinitions(),
+                            definition.fixedColumnDefinitions(),
                             ratingSchemeItemsById,
                             subjectId,
                             row);
@@ -91,7 +91,7 @@ public class ReportGridColumnCalculator {
 
         Set<CompiledCalculatedColumn> remaining = SetUtilities.fromCollection(colsToCalc);
 
-        Map<ReportGridCalculatedColumnDefinition, String> lastErrors = new HashMap<>();
+        Map<ReportGridDerivedColumnDefinition, String> lastErrors = new HashMap<>();
 
         while (evaluateRowAgain.get()) {
             // assume this time will be the last
@@ -178,7 +178,7 @@ public class ReportGridColumnCalculator {
     }
 
 
-    private static Map<String, Object> initialiseContext(List<ReportGridColumnDefinition> columnDefinitions,
+    private static Map<String, Object> initialiseContext(List<ReportGridFixedColumnDefinition> columnDefinitions,
                                                          Map<Long, RatingSchemeItem> ratingSchemeItemsById,
                                                          Long subjectId,
                                                          Collection<ReportGridCell> row) {
@@ -202,7 +202,7 @@ public class ReportGridColumnCalculator {
     private static ReportGridCell evaluateCalcCol(CompiledCalculatedColumn compiledCalculatedColumn,
                                                   Long subjectId) {
 
-        ReportGridCalculatedColumnDefinition cd = compiledCalculatedColumn.column();
+        ReportGridDerivedColumnDefinition cd = compiledCalculatedColumn.column();
 
         return compiledCalculatedColumn
                 .expression()
@@ -239,7 +239,7 @@ public class ReportGridColumnCalculator {
     }
 
 
-    public static String colToExtId(ReportGridColumnDefinition col) {
+    public static String colToExtId(ReportGridFixedColumnDefinition col) {
         String base = col.displayName() == null
                 ? col.columnName()
                 : col.displayName();
@@ -249,7 +249,7 @@ public class ReportGridColumnCalculator {
     }
 
 
-    public static String colToExtId(ReportGridCalculatedColumnDefinition col) {
+    public static String colToExtId(ReportGridDerivedColumnDefinition col) {
         return col.displayName()
                 .toUpperCase()
                 .replaceAll(" ", "_");

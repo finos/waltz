@@ -148,10 +148,10 @@ export function getDisplayNameForColumn(c) {
 
 export function prepareColumnDefs(gridData) {
     console.log("pcd", {gridData})
-    const fixedColDefs = _.get(gridData, ["definition", "columnDefinitions"], []);
-    const calculatedColDefs = _.get(gridData, ["definition", "calculatedColumnDefinitions"], []);
+    const fixedColDefs = _.get(gridData, ["definition", "fixedColumnDefinitions"], []);
+    const derivedColDefs = _.get(gridData, ["definition", "derivedColumnDefinitions"], []);
 
-    const colDefs = _.concat(fixedColDefs, calculatedColDefs);
+    const colDefs = _.concat(fixedColDefs, derivedColDefs);
 
     const mkColumnCustomProps = (c) => {
         switch (c.columnEntityKind) {
@@ -201,7 +201,7 @@ export function prepareColumnDefs(gridData) {
         }
     };
 
-    console.log("Making cols out of: ", {fixedColDefs, calculatedColDefs, colDefs});
+    console.log("Making cols out of: ", {fixedColDefs, calculatedColDefs: derivedColDefs, colDefs});
     const additionalColumns = _
         .chain(colDefs)
         .map(c => {
@@ -289,7 +289,7 @@ function calculateComplexityColorScales(gridData) {
 function calculateColorScales(gridData, entityKind, startColor, endColor) {
     const cols = _
         .chain(gridData)
-        .get(["definition", "columnDefinitions"], [])
+        .get(["definition", "fixedColumnDefinitions"], [])
         .filter(cd => cd.columnEntityKind === entityKind)
         .map(cd => cd.id)
         .value();
@@ -355,14 +355,14 @@ export function prepareTableData(gridData) {
         .keyBy(d => d.id)
         .value();
 
-    const colDefs = _.get(gridData, ["definition", "columnDefinitions"], []);
+    const colDefs = _.get(gridData, ["definition", "fixedColumnDefinitions"], []);
     const colsById = _.keyBy(colDefs, cd => cd.id);
 
     const costColorScalesByColumnDefinitionId = calculateCostColorScales(gridData);
     const complexityColorScalesByColumnDefinitionId = calculateComplexityColorScales(gridData);
 
     function mkTableCell(dataCell) {
-        const colDef = _.get(colsById, [dataCell.columnDefinitionId], {columnEntityKind: "REPORT_GRID_CALCULATED_COLUMN_DEFINITION" });
+        const colDef = _.get(colsById, [dataCell.columnDefinitionId], {columnEntityKind: "REPORT_GRID_DERIVED_COLUMN_DEFINITION"});
 
         const baseCell = {
             fontColor: "#3b3b3b",
@@ -416,7 +416,7 @@ export function prepareTableData(gridData) {
                     fontColor: ratingSchemeItem.fontColor,
                     text: ratingSchemeItem.name,
                 });
-            case "REPORT_GRID_CALCULATED_COLUMN_DEFINITION":
+            case "REPORT_GRID_DERIVED_COLUMN_DEFINITION":
                 return Object.assign({}, baseCell, {
                     comment: dataCell.errorValue
                         ? `<span class="force-wrap" style="word-break: break-all">${dataCell.errorValue}</span>`

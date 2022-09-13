@@ -6,9 +6,9 @@ import org.finos.waltz.model.Nullable;
 import org.immutables.value.Value;
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableReportGridCalculatedColumnDefinition.class)
-@JsonDeserialize(as = ImmutableReportGridCalculatedColumnDefinition.class)
-public abstract class ReportGridCalculatedColumnDefinition {
+@JsonSerialize(as = ImmutableReportGridDerivedColumnDefinition.class)
+@JsonDeserialize(as = ImmutableReportGridDerivedColumnDefinition.class)
+public abstract class ReportGridDerivedColumnDefinition {
 
     @Nullable
     public abstract Long id();

@@ -19,7 +19,7 @@ package org.finos.waltz.web.endpoints.extracts.reportgrid;
 
 import org.finos.waltz.model.application.LifecyclePhase;
 import org.finos.waltz.model.report_grid.ReportGrid;
-import org.finos.waltz.model.report_grid.ReportGridColumnDefinition;
+import org.finos.waltz.model.report_grid.ReportGridFixedColumnDefinition;
 import org.finos.waltz.model.report_grid.ReportSubject;
 import org.finos.waltz.web.endpoints.extracts.ColumnCommentary;
 import org.jooq.lambda.tuple.Tuple2;
@@ -52,18 +52,18 @@ public class DynamicCommaSeperatedValueFormatter implements DynamicFormatter {
     @Override
     public byte[] format(String id,
                          ReportGrid reportGrid,
-                         List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> columnDefinitions,
+                         List<Tuple2<ReportGridFixedColumnDefinition, ColumnCommentary>> columnDefinitions,
                          List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows) throws IOException{
         try {
             LOG.info("Generating CSV report {}",id);
-            return mkCSVReport(columnDefinitions,reportRows);
+            return mkCSVReport(columnDefinitions, reportRows);
         } catch (IOException e) {
            LOG.warn("Encounter error when trying to generate CSV report.  Details:{}", e.getMessage());
            throw e;
         }
     }
 
-    private byte[] mkCSVReport(List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> columnDefinitions,
+    private byte[] mkCSVReport(List<Tuple2<ReportGridFixedColumnDefinition, ColumnCommentary>> columnDefinitions,
                                List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows) throws IOException {
         List<String> headers = formatterUtils.mkHeaderStrings(columnDefinitions);
 

@@ -105,8 +105,8 @@ public class ReportGridEvaluatorNamespace {
 
     private void checkAllCellsExist(Set<String> requiredCellExtIds) {
         Set<String> availableCellExtIds = union(
-                map(definition.columnDefinitions(), ReportGridColumnCalculator::colToExtId),
-                map(definition.calculatedColumnDefinitions(), ReportGridColumnCalculator::colToExtId));
+                map(definition.fixedColumnDefinitions(), ReportGridColumnCalculator::colToExtId),
+                map(definition.derivedColumnDefinitions(), ReportGridColumnCalculator::colToExtId));
 
         Checks.checkTrue(availableCellExtIds.containsAll(
                         requiredCellExtIds),

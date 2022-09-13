@@ -112,8 +112,8 @@ public class ReportGridService {
 
         ReportGridDefinition definition = ImmutableReportGridDefinition
                 .copyOf(reportGridDao.getGridDefinitionById(id))
-                .withCalculatedColumnDefinitions(
-                        ImmutableReportGridCalculatedColumnDefinition
+                .withDerivedColumnDefinitions(
+                        ImmutableReportGridDerivedColumnDefinition
                                 .builder()
                                 .id(50000L)
                                 .displayName("Payments DT")
@@ -121,7 +121,7 @@ public class ReportGridService {
                                 .expression("anyCellsProvided(['PAYMENT', 'PAYMENT_INSTRUCTION', 'PAYMENT_MANDATE']) ? 'Payments DT' : null") // Not working!!!
                                 .build()
                         ,
-                        ImmutableReportGridCalculatedColumnDefinition
+                        ImmutableReportGridDerivedColumnDefinition
                                 .builder()
                                 .id(60000L)
                                 .displayName("Payments DT2")
@@ -129,7 +129,7 @@ public class ReportGridService {
                                 .expression("anyCellsProvided(['PAYMENTS_DT']) ? mkResult('Yes Derived', 'Payment', 'PAYMENT') : null") // Not working!!!
                                 .build()
                         ,
-                        ImmutableReportGridCalculatedColumnDefinition
+                        ImmutableReportGridDerivedColumnDefinition
                                 .builder()
                                 .id(80000L)
                                 .displayName("Defo Payments")
@@ -149,7 +149,7 @@ public class ReportGridService {
 
         ReportGridInstance instance = mkInstance(id, opts, targetKind);
 
-        if (!definition.calculatedColumnDefinitions().isEmpty()) {
+        if (!definition.derivedColumnDefinitions().isEmpty()) {
             Set<ReportGridCell> calculatedCells = ReportGridColumnCalculator.calculate(instance, definition);
 
             return Optional.of(ImmutableReportGrid

@@ -134,7 +134,7 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
                                                                 ExtractFormat format,
                                                                 IdSelectionOptions selectionOptions) throws IOException {
 
-        List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> colsWithCommentRequirement = enrichColsWithCommentRequirement(reportGrid);
+        List<Tuple2<ReportGridFixedColumnDefinition, ColumnCommentary>> colsWithCommentRequirement = enrichColsWithCommentRequirement(reportGrid);
 
         List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows = prepareReportRows(
                 colsWithCommentRequirement,
@@ -157,13 +157,13 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
     }
 
 
-    private List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> enrichColsWithCommentRequirement(ReportGrid reportGrid) {
+    private List<Tuple2<ReportGridFixedColumnDefinition, ColumnCommentary>> enrichColsWithCommentRequirement(ReportGrid reportGrid) {
         Set<Long> surveyQuestionsIds = reportGrid
                 .definition()
-                .columnDefinitions()
+                .fixedColumnDefinitions()
                 .stream()
                 .filter(r -> r.columnEntityKind() == EntityKind.SURVEY_QUESTION)
-                .map(ReportGridColumnDefinition::columnEntityId)
+                .map(ReportGridFixedColumnDefinition::columnEntityId)
                 .collect(toSet());
 
         Set<Long> colsNeedingComments = surveyQuestionService
@@ -175,16 +175,16 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
 
         return reportGrid
                 .definition()
-                .columnDefinitions()
+                .fixedColumnDefinitions()
                 .stream()
                 .map(cd -> tuple(cd, columnHasComment(cd,colsNeedingComments)))
                 .sorted(Comparator.comparingLong(r -> r.v1.position()))
                 .collect(toList());
     }
 
-    private static ColumnCommentary columnHasComment(ReportGridColumnDefinition cd, Set<Long> colsNeedingComments ){
-       return (colsNeedingComments.contains(cd.columnEntityId())) ?
-               ColumnCommentary.HAS_COMMENTARY:ColumnCommentary.NO_COMMENTARY;
+    private static ColumnCommentary columnHasComment(ReportGridFixedColumnDefinition cd, Set<Long> colsNeedingComments) {
+        return (colsNeedingComments.contains(cd.columnEntityId())) ?
+                ColumnCommentary.HAS_COMMENTARY : ColumnCommentary.NO_COMMENTARY;
     }
 
     private String mkReportName(ReportGridDefinition gridDefinition, IdSelectionOptions selectionOptions) {
@@ -195,8 +195,7 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
     }
 
 
-
-    private List<Tuple2<ReportSubject, ArrayList<Object>>> prepareReportRows(List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> colsWithCommentRequirement,
+    private List<Tuple2<ReportSubject, ArrayList<Object>>> prepareReportRows(List<Tuple2<ReportGridFixedColumnDefinition, ColumnCommentary>> colsWithCommentRequirement,
                                                                              ReportGridInstance reportGridInstance) {
 
         Set<ReportGridCell> tableData = reportGridInstance.cellData();
@@ -229,7 +228,7 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
                     //find data for columns
                     colsWithCommentRequirement
                             .forEach(t -> {
-                                ReportGridColumnDefinition colDef = t.v1;
+                                ReportGridFixedColumnDefinition colDef = t.v1;
                                 boolean isCostColumn = colDef.columnEntityKind().equals(EntityKind.COST_KIND);
 
                                 if (!allowCostsExport && isCostColumn) {
@@ -262,7 +261,7 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
     }
 
 
-    private Object getValueFromReportCell(ReportGridColumnDefinition colDef,
+    private Object getValueFromReportCell(ReportGridFixedColumnDefinition colDef,
                                           Map<Long, RatingSchemeItem> ratingsById,
                                           ReportGridCell reportGridCell) {
         if (reportGridCell == null) {
@@ -304,7 +303,7 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
     private Tuple3<ExtractFormat, String, byte[]> formatReport(ExtractFormat format,
                                                                ReportGrid reportGrid,
                                                                String reportName,
-                                                               List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> columnDefinitions,
+                                                               List<Tuple2<ReportGridFixedColumnDefinition, ColumnCommentary>> columnDefinitions,
                                                                List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows) throws IOException {
         switch (format) {
             case XLSX:
