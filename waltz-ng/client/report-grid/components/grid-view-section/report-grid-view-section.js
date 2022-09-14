@@ -61,6 +61,8 @@ function controller($scope, serviceBroker, localStorageService) {
 
 
     function getDefaultSummaryColumns(columnDefs) {
+
+        // These needs to go so no default summaries!!!
         const dfltFilters = _
             .chain(columnDefs)
             .filter(d => d.usageKind === "SUMMARY")

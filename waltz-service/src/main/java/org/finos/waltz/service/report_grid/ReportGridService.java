@@ -18,6 +18,8 @@
 
 package org.finos.waltz.service.report_grid;
 
+import org.finos.waltz.common.CollectionUtilities;
+import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.common.exception.NotFoundException;
@@ -107,9 +109,21 @@ public class ReportGridService {
         //    If you are changing this please ensure you have tested with realistic test data.
         IdSelectionOptions opts = modifySelectionOptionsForGrid(idSelectionOptions);
 
-        LOG.info("ReportGrid - getting by ID={} SelectionOptions={}",id,idSelectionOptions);
+        LOG.info("ReportGrid - getting by ID={} SelectionOptions={}", id, idSelectionOptions);
 
-        ReportGridDefinition definition = reportGridDao.getGridDefinitionById(id);
+        ReportGridDefinition gridDef = reportGridDao.getGridDefinitionById(id);
+
+        ReportGridDefinition definition = ImmutableReportGridDefinition
+                .copyOf(gridDef)
+                .withDerivedColumnDefinitions(ListUtilities.append(gridDef.derivedColumnDefinitions(),
+                        ImmutableReportGridDerivedColumnDefinition
+                                .builder()
+                                .id(CollectionUtilities.first(gridDef.fixedColumnDefinitions()).id())
+                                .displayName("Same ID")
+                                .position(1)
+                                .derivationScript("anyCellsProvided(['PAYMENT', 'PAYMENT_INSTRUCTION', 'PAYMENT_MANDATE']) ? 'Payments DT' : null") // Not working!!!
+                                .build())
+                );
 
         if (definition == null) {
             LOG.warn("No Report Grid Definition found for ID={}", id);

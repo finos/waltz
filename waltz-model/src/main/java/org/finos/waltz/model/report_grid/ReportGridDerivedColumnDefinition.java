@@ -1,16 +1,15 @@
 package org.finos.waltz.model.report_grid;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.ExternalIdProvider;
-import org.finos.waltz.model.Nullable;
+import org.finos.waltz.model.*;
 import org.immutables.value.Value;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableReportGridDerivedColumnDefinition.class)
 @JsonDeserialize(as = ImmutableReportGridDerivedColumnDefinition.class)
-public abstract class ReportGridDerivedColumnDefinition implements ExternalIdProvider {
+public abstract class ReportGridDerivedColumnDefinition implements ExternalIdProvider, EntityKindProvider {
 
     @Nullable
     public abstract Long id();
@@ -20,7 +19,7 @@ public abstract class ReportGridDerivedColumnDefinition implements ExternalIdPro
     @Nullable
     public abstract String columnDescription();
 
-    @Value.Default
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public EntityKind columnEntityKind() {
         return EntityKind.REPORT_GRID_DERIVED_COLUMN_DEFINITION;
     }
@@ -30,4 +29,9 @@ public abstract class ReportGridDerivedColumnDefinition implements ExternalIdPro
 
     public abstract String derivationScript();
 
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    public EntityKind kind() {
+        return EntityKind.REPORT_GRID_DERIVED_COLUMN_DEFINITION;
+    }
 }

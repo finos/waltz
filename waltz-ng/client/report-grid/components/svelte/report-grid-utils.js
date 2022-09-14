@@ -5,6 +5,7 @@ import {amberBg, blueBg, determineForegroundColor, greenBg, greyBg, pinkBg} from
 import {scaleLinear} from "d3-scale";
 import {extent} from "d3-array";
 import {subtractYears} from "../../../common/date-utils";
+import {mkRef, refToString} from "../../../common/entity-utils";
 
 
 export const reportGridMember = {
@@ -355,14 +356,22 @@ export function prepareTableData(gridData) {
         .keyBy(d => d.id)
         .value();
 
-    const colDefs = _.get(gridData, ["definition", "fixedColumnDefinitions"], []);
+    const fixedColDefs = _.get(gridData, ["definition", "fixedColumnDefinitions"], []);
+    const derivedColDefs = _.get(gridData, ["definition", "derivedColumnDefinitions"], []);
+
+    const colDefs = _.concat(fixedColDefs, derivedColDefs);
+
     const colsById = _.keyBy(colDefs, cd => cd.id);
+
+    // const colsById = _.keyBy(colDefs, cd => refToString(mkRef(cd.kind, cd.id)));
+
+    console.log({gridData, colsById});
 
     const costColorScalesByColumnDefinitionId = calculateCostColorScales(gridData);
     const complexityColorScalesByColumnDefinitionId = calculateComplexityColorScales(gridData);
 
     function mkTableCell(dataCell) {
-        const colDef = _.get(colsById, [dataCell.columnDefinitionId], {columnEntityKind: "REPORT_GRID_DERIVED_COLUMN_DEFINITION"});
+        const colDef = _.get(colsById, [dataCell.columnDefinitionId]);
 
         const baseCell = {
             fontColor: "#3b3b3b",
