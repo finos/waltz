@@ -43,7 +43,7 @@ public class ReportGridColumnCalculator {
                 d -> {
                     Either<String, JexlScript> expr = compile(
                             jexl,
-                            d.expression());
+                            d.derivationScript());
 
                     return ImmutableCompiledCalculatedColumn
                             .builder()
@@ -240,19 +240,28 @@ public class ReportGridColumnCalculator {
 
 
     public static String colToExtId(ReportGridFixedColumnDefinition col) {
-        String base = col.displayName() == null
-                ? col.columnName()
-                : col.displayName();
-        return base
-                .toUpperCase()
-                .replaceAll(" ", "_");
+        return col
+                .externalId()
+                .orElseGet(() -> {
+
+                    String base = col.displayName() == null
+                            ? col.columnName()
+                            : col.displayName();
+
+                    return base
+                            .toUpperCase()
+                            .replaceAll(" ", "_");
+                });
     }
 
 
     public static String colToExtId(ReportGridDerivedColumnDefinition col) {
-        return col.displayName()
-                .toUpperCase()
-                .replaceAll(" ", "_");
+        return col
+                .externalId()
+                .orElseGet(() -> col
+                        .displayName()
+                        .toUpperCase()
+                        .replaceAll(" ", "_"));
     }
 
 

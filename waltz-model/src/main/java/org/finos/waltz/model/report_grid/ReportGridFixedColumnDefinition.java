@@ -3,6 +3,7 @@ package org.finos.waltz.model.report_grid;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.ExternalIdProvider;
 import org.finos.waltz.model.Nullable;
 import org.finos.waltz.model.entity_field_reference.EntityFieldReference;
 import org.immutables.value.Value;
@@ -10,7 +11,7 @@ import org.immutables.value.Value;
 @Value.Immutable
 @JsonSerialize(as = ImmutableReportGridFixedColumnDefinition.class)
 @JsonDeserialize(as = ImmutableReportGridFixedColumnDefinition.class)
-public abstract class ReportGridFixedColumnDefinition {
+public abstract class ReportGridFixedColumnDefinition implements ExternalIdProvider {
 
     @Nullable
     public abstract Long id();

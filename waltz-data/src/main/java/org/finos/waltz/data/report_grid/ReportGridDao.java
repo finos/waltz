@@ -31,7 +31,7 @@ import org.finos.waltz.model.report_grid.*;
 import org.finos.waltz.model.usage_info.UsageKind;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.ChangeInitiative;
-import org.finos.waltz.schema.tables.records.ReportGridColumnDefinitionRecord;
+import org.finos.waltz.schema.tables.records.ReportGridFixedColumnDefinitionRecord;
 import org.finos.waltz.schema.tables.records.ReportGridRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -79,13 +79,13 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 public class ReportGridDao {
 
 
-
     private final DSLContext dsl;
 
     private final org.finos.waltz.schema.tables.Measurable m = MEASURABLE.as("m");
     private final org.finos.waltz.schema.tables.MeasurableRating mr = MEASURABLE_RATING.as("mr");
     private final org.finos.waltz.schema.tables.MeasurableCategory mc = MEASURABLE_CATEGORY.as("mc");
-    private final org.finos.waltz.schema.tables.ReportGridColumnDefinition rgcd = REPORT_GRID_COLUMN_DEFINITION.as("rgcd");
+    private final org.finos.waltz.schema.tables.ReportGridFixedColumnDefinition rgfcd = REPORT_GRID_FIXED_COLUMN_DEFINITION.as("rgfcd");
+    private final org.finos.waltz.schema.tables.ReportGridDerivedColumnDefinition rgdcd = REPORT_GRID_DERIVED_COLUMN_DEFINITION.as("rgdcd");
     private final org.finos.waltz.schema.tables.ReportGrid rg = Tables.REPORT_GRID.as("rg");
     private final org.finos.waltz.schema.tables.RatingSchemeItem rsi = RATING_SCHEME_ITEM.as("rsi");
     private final org.finos.waltz.schema.tables.EntityHierarchy eh = ENTITY_HIERARCHY.as("eh");
@@ -135,7 +135,7 @@ public class ReportGridDao {
         return dsl
                 .select(rg.fields())
                 .from(rg)
-                .fetchSet(r -> mkReportGridDefinition(rgcd.REPORT_GRID_ID.eq(r.get(rg.ID)), r.into(REPORT_GRID)));
+                .fetchSet(r -> mkReportGridDefinition(DSL.trueCondition(), r.into(REPORT_GRID)));
     }
 
 
@@ -146,7 +146,7 @@ public class ReportGridDao {
                 .leftJoin(REPORT_GRID_MEMBER)
                 .on(rg.ID.eq(REPORT_GRID_MEMBER.GRID_ID))
                 .where(rg.KIND.eq(ReportGridKind.PUBLIC.name()).or(REPORT_GRID_MEMBER.USER_ID.eq(username)))
-                .fetchSet(r -> mkReportGridDefinition(rgcd.REPORT_GRID_ID.eq(r.get(rg.ID)), r.into(REPORT_GRID)));
+                .fetchSet(r -> mkReportGridDefinition(DSL.trueCondition(), r.into(REPORT_GRID)));
     }
 
 
@@ -175,8 +175,8 @@ public class ReportGridDao {
     public int updateColumnDefinitions(long gridId, List<ReportGridFixedColumnDefinition> columnDefinitions) {
 
         int clearedColumns = dsl
-                .deleteFrom(rgcd)
-                .where(rgcd.REPORT_GRID_ID.eq(gridId))
+                .deleteFrom(rgfcd)
+                .where(rgfcd.REPORT_GRID_ID.eq(gridId))
                 .execute();
 
         int[] columnsUpdated = columnDefinitions
@@ -186,7 +186,7 @@ public class ReportGridDao {
                             ? null
                             : d.entityFieldReference().id().orElse(null);
 
-                    ReportGridColumnDefinitionRecord record = dsl.newRecord(rgcd);
+                    ReportGridFixedColumnDefinitionRecord record = dsl.newRecord(rgfcd);
                     record.setReportGridId(gridId);
                     record.setColumnEntityId(d.columnEntityId());
                     record.setColumnEntityKind(d.columnEntityKind().name());
@@ -199,6 +199,7 @@ public class ReportGridDao {
                             .orElse(null));
                     record.setColumnQualifierId(d.columnQualifierId());
                     record.setEntityFieldReferenceId(fieldReferenceId);
+                    record.setExternalId(d.externalId().orElse(null));
                     return record;
                 })
                 .collect(collectingAndThen(toSet(), d -> dsl.batchInsert(d).execute()));
@@ -251,7 +252,7 @@ public class ReportGridDao {
                 .innerJoin(REPORT_GRID_MEMBER)
                 .on(rg.ID.eq(REPORT_GRID_MEMBER.GRID_ID))
                 .where(isOwner)
-                .fetchSet(r -> mkReportGridDefinition(rgcd.REPORT_GRID_ID.eq(r.get(rg.ID)), r.into(REPORT_GRID)));
+                .fetchSet(r -> mkReportGridDefinition(DSL.trueCondition(), r.into(REPORT_GRID)));
     }
 
 
@@ -274,7 +275,7 @@ public class ReportGridDao {
     }
 
 
-    private List<ReportGridFixedColumnDefinition> getColumnDefinitions(Condition condition) {
+    private List<ReportGridFixedColumnDefinition> getFixedColumnDefinitions(Condition condition) {
 
         SelectConditionStep<Record7<Long, String, String, String, String, String, String>> measurableColumns = mkSupplementalColumnDefinitionQuery(
                 EntityKind.MEASURABLE,
@@ -406,45 +407,63 @@ public class ReportGridDao {
 
         return dsl
                 .select(extras.fields())
-                .select(fieldsWithout(rgcd, rgcd.ID))
+                .select(fieldsWithout(rgfcd, rgfcd.ID))
                 .from(rg)
-                .innerJoin(rgcd).on(rg.ID.eq(rgcd.REPORT_GRID_ID))
-                .innerJoin(extras).on(extras.field(rgcd.ID).eq(rgcd.ID))
+                .innerJoin(rgfcd).on(rg.ID.eq(rgfcd.REPORT_GRID_ID))
+                .innerJoin(extras).on(extras.field(rgfcd.ID).eq(rgfcd.ID))
                 .where(condition)
-                .orderBy(rgcd.POSITION, DSL.field("name", String.class))
+                .orderBy(rgfcd.POSITION, DSL.field("name", String.class))
                 .fetch(r -> {
-                    EntityFieldReference entityFieldReference = ofNullable(r.get(rgcd.ENTITY_FIELD_REFERENCE_ID))
+                    EntityFieldReference entityFieldReference = ofNullable(r.get(rgfcd.ENTITY_FIELD_REFERENCE_ID))
                             .map(fieldReferenceId -> ImmutableEntityFieldReference.builder()
-                                  .id(fieldReferenceId)
-                                  .fieldName(r.get(efr.FIELD_NAME))
-                                  .entityKind(EntityKind.valueOf(r.get(efr.ENTITY_KIND)))
-                                  .displayName(r.get(efr.DISPLAY_NAME))
-                                  .description(r.get(efr.DESCRIPTION))
-                                  .build())
+                                    .id(fieldReferenceId)
+                                    .fieldName(r.get(efr.FIELD_NAME))
+                                    .entityKind(EntityKind.valueOf(r.get(efr.ENTITY_KIND)))
+                                    .displayName(r.get(efr.DISPLAY_NAME))
+                                    .description(r.get(efr.DESCRIPTION))
+                                    .build())
                             .orElse(null);
 
-                    EntityKind columnQualifierKind = ofNullable(r.get(rgcd.COLUMN_QUALIFIER_KIND))
+                    EntityKind columnQualifierKind = ofNullable(r.get(rgfcd.COLUMN_QUALIFIER_KIND))
                             .map(EntityKind::valueOf)
                             .orElse(null);
 
-                    EntityKind columnEntityKind = EntityKind.valueOf(r.get(rgcd.COLUMN_ENTITY_KIND));
+                    EntityKind columnEntityKind = EntityKind.valueOf(r.get(rgfcd.COLUMN_ENTITY_KIND));
 
                     return ImmutableReportGridFixedColumnDefinition.builder()
-                            .id(r.get(extras.field(rgcd.ID)))
-                            .columnEntityId(r.get(rgcd.COLUMN_ENTITY_ID))
+                            .id(r.get(extras.field(rgfcd.ID)))
+                            .columnEntityId(r.get(rgfcd.COLUMN_ENTITY_ID))
                             .columnEntityKind(columnEntityKind)
                             .columnName(r.get("name", String.class))
                             .columnDescription(r.get("desc", String.class))
-                            .displayName(r.get(rgcd.DISPLAY_NAME))
-                            .position(r.get(rgcd.POSITION))
-                            .ratingRollupRule(RatingRollupRule.valueOf(r.get(rgcd.RATING_ROLLUP_RULE)))
+                            .displayName(r.get(rgfcd.DISPLAY_NAME))
+                            .position(r.get(rgfcd.POSITION))
+                            .ratingRollupRule(RatingRollupRule.valueOf(r.get(rgfcd.RATING_ROLLUP_RULE)))
                             .entityFieldReference(entityFieldReference)
                             .columnQualifierKind(columnQualifierKind)
-                            .columnQualifierId(r.get(rgcd.COLUMN_QUALIFIER_ID))
+                            .columnQualifierId(r.get(rgfcd.COLUMN_QUALIFIER_ID))
+                            .externalId(Optional.ofNullable(r.get(rgfcd.EXTERNAL_ID)))
                             .build();
                 });
     }
 
+
+    private List<ReportGridDerivedColumnDefinition> getDerivedColumnDefinitions(Condition condition) {
+        return dsl
+                .select(rgdcd.fields())
+                .from(rg)
+                .innerJoin(rgdcd).on(rg.ID.eq(rgdcd.REPORT_GRID_ID))
+                .where(condition)
+                .orderBy(rgdcd.POSITION, rgdcd.DISPLAY_NAME)
+                .fetch(r -> ImmutableReportGridDerivedColumnDefinition.builder()
+                        .id(r.get(rgdcd.ID))
+                        .displayName(r.get(rgdcd.DISPLAY_NAME))
+                        .position(r.get(rgdcd.POSITION))
+                        .externalId(Optional.ofNullable(r.get(rgdcd.EXTERNAL_ID)))
+                        .columnDescription(r.get(rgdcd.COLUMN_DESCRIPTION))
+                        .derivationScript(r.get(rgdcd.DERIVATION_SCRIPT))
+                        .build());
+    }
 
 
     private SelectConditionStep<Record7<Long, String, String, String, String, String, String>> mkAttestationColumnDefinitionQuery(Condition condition) {
@@ -481,24 +500,24 @@ public class ReportGridDao {
                 .unionAll(dynamic)
                 .asTable("possible", "id", "kind", "name", "description");
 
-        Condition colDefToPossibleJoinCond = rgcd.COLUMN_QUALIFIER_KIND.eq(possible.field("kind", String.class))
-                .and(rgcd.COLUMN_QUALIFIER_ID.isNull()
-                     .or(rgcd.COLUMN_QUALIFIER_ID.eq(possible.field("id", Long.class))));
+        Condition colDefToPossibleJoinCond = rgfcd.COLUMN_QUALIFIER_KIND.eq(possible.field("kind", String.class))
+                .and(rgfcd.COLUMN_QUALIFIER_ID.isNull()
+                        .or(rgfcd.COLUMN_QUALIFIER_ID.eq(possible.field("id", Long.class))));
 
         return dsl
-                .select(rgcd.ID,
+                .select(rgfcd.ID,
                         possible.field("name", String.class),
                         possible.field("description", String.class),
                         efr.ENTITY_KIND,
                         efr.DISPLAY_NAME,
                         efr.DESCRIPTION,
                         efr.FIELD_NAME)
-                .from(rgcd)
-                .innerJoin(rg).on(rg.ID.eq(rgcd.REPORT_GRID_ID))
+                .from(rgfcd)
+                .innerJoin(rg).on(rg.ID.eq(rgfcd.REPORT_GRID_ID))
                 .innerJoin(possible).on(colDefToPossibleJoinCond)
-                .leftJoin(efr).on(rgcd.ENTITY_FIELD_REFERENCE_ID.eq(efr.ID))
+                .leftJoin(efr).on(rgfcd.ENTITY_FIELD_REFERENCE_ID.eq(efr.ID))
                 .where(condition)
-                .and(rgcd.COLUMN_ENTITY_KIND.eq(EntityKind.ATTESTATION.name()));
+                .and(rgfcd.COLUMN_ENTITY_KIND.eq(EntityKind.ATTESTATION.name()));
     }
 
 
@@ -521,19 +540,19 @@ public class ReportGridDao {
         Field<String> desc = descriptionField.as("desc");
 
         return dsl
-                .select(rgcd.ID,
+                .select(rgfcd.ID,
                         name,
                         desc,
                         efr.ENTITY_KIND,
                         efr.DISPLAY_NAME,
                         efr.DESCRIPTION,
                         efr.FIELD_NAME)
-                .from(rgcd)
-                .innerJoin(rg).on(rg.ID.eq(rgcd.REPORT_GRID_ID))
-                .leftJoin(t).on(idField.eq(rgcd.COLUMN_ENTITY_ID).and(rgcd.COLUMN_ENTITY_KIND.eq(entityKind.name())))
-                .leftJoin(efr).on(rgcd.ENTITY_FIELD_REFERENCE_ID.eq(efr.ID))
+                .from(rgfcd)
+                .innerJoin(rg).on(rg.ID.eq(rgfcd.REPORT_GRID_ID))
+                .leftJoin(t).on(idField.eq(rgfcd.COLUMN_ENTITY_ID).and(rgfcd.COLUMN_ENTITY_KIND.eq(entityKind.name())))
+                .leftJoin(efr).on(rgfcd.ENTITY_FIELD_REFERENCE_ID.eq(efr.ID))
                 .where(reportCondition)
-                .and(rgcd.COLUMN_ENTITY_KIND.eq(entityKind.name()));
+                .and(rgfcd.COLUMN_ENTITY_KIND.eq(entityKind.name()));
     }
 
     private SelectConditionStep<Record7<Long, String, String, String, String, String, String>> mkEntityDescriptorColumnDefinitionQry(EntityKind entityKind,
@@ -541,18 +560,18 @@ public class ReportGridDao {
                                                                                                                                      String columnDescription,
                                                                                                                                      Condition reportCondition) {
         return dsl
-                .select(rgcd.ID,
+                .select(rgfcd.ID,
                         DSL.val(columnName),
                         DSL.val(columnDescription),
                         efr.ENTITY_KIND,
                         efr.DISPLAY_NAME,
                         efr.DESCRIPTION,
                         efr.FIELD_NAME)
-                .from(rgcd)
-                .innerJoin(rg).on(rg.ID.eq(rgcd.REPORT_GRID_ID))
-                .leftJoin(efr).on(rgcd.ENTITY_FIELD_REFERENCE_ID.eq(efr.ID))
+                .from(rgfcd)
+                .innerJoin(rg).on(rg.ID.eq(rgfcd.REPORT_GRID_ID))
+                .leftJoin(efr).on(rgfcd.ENTITY_FIELD_REFERENCE_ID.eq(efr.ID))
                 .where(reportCondition)
-                .and(rgcd.COLUMN_ENTITY_KIND.eq(entityKind.name()));
+                .and(rgfcd.COLUMN_ENTITY_KIND.eq(entityKind.name()));
     }
 
 
@@ -1665,7 +1684,8 @@ public class ReportGridDao {
                 .provenance(r.get(rg.PROVENANCE))
                 .lastUpdatedAt(toLocalDateTime(r.get(rg.LAST_UPDATED_AT)))
                 .lastUpdatedBy(r.get(rg.LAST_UPDATED_BY))
-                .fixedColumnDefinitions(getColumnDefinitions(condition))
+                .fixedColumnDefinitions(getFixedColumnDefinitions(condition))
+                .derivedColumnDefinitions(getDerivedColumnDefinitions(condition))
                 .subjectKind(EntityKind.valueOf(r.get(rg.SUBJECT_KIND)))
                 .kind(ReportGridKind.valueOf(r.get(rg.KIND)))
                 .build();

@@ -109,44 +109,7 @@ public class ReportGridService {
 
         LOG.info("ReportGrid - getting by ID={} SelectionOptions={}",id,idSelectionOptions);
 
-
-        ReportGridDefinition definition = ImmutableReportGridDefinition
-                .copyOf(reportGridDao.getGridDefinitionById(id))
-                .withDerivedColumnDefinitions(
-                        ImmutableReportGridDerivedColumnDefinition
-                                .builder()
-                                .id(50000L)
-                                .displayName("Payments DT")
-                                .position(1)
-                                .expression("anyCellsProvided(['PAYMENT', 'PAYMENT_INSTRUCTION', 'PAYMENT_MANDATE']) ? 'Payments DT' : null") // Not working!!!
-                                .build()
-                        ,
-                        ImmutableReportGridDerivedColumnDefinition
-                                .builder()
-                                .id(60000L)
-                                .displayName("Payments DT2")
-                                .position(1)
-                                .expression("anyCellsProvided(['PAYMENTS_DT']) ? mkResult('Yes Derived', 'Payment', 'PAYMENT') : null") // Not working!!!
-                                .build()
-                        ,
-                        ImmutableReportGridDerivedColumnDefinition
-                                .builder()
-                                .id(80000L)
-                                .displayName("Defo Payments")
-                                .position(1)
-                                .expression("var r = ratioProvided(['PAYMENTS_DT', 'PAYMENTS', 'PAYMENTS_RECORDS']); return mkResult('Ratio: ' + r)") // Not working!!!
-                                .build()
-                        ,
-                        ImmutableReportGridDerivedColumnDefinition
-                                .builder()
-                                .id(90000L)
-                                .displayName("Defo Payments")
-                                .position(1)
-                                .expression("var r = percentageProvided(['PAYMENTS_DT', 'PAYMENTS', 'PAYMENTS_RECORDS']); return mkResult(r + '%')") // Not working!!!
-                                .build()
-
-
-                );
+        ReportGridDefinition definition = reportGridDao.getGridDefinitionById(id);
 
         if (definition == null) {
             LOG.warn("No Report Grid Definition found for ID={}", id);
