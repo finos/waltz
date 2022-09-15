@@ -14,4 +14,6 @@ public abstract class ReportGridColumnDefinitionsUpdateCommand implements Comman
 
     public abstract List<ReportGridFixedColumnDefinition> fixedColumnDefinitions();
 
+    public abstract List<ReportGridDerivedColumnDefinition> derivedColumnDefinitions();
+
 }

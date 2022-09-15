@@ -70,11 +70,18 @@ public class ReportGridEvaluatorNamespace {
                 .allMatch(c -> Objects.nonNull(c) && !hasErrors(c));
     }
 
-    public double ratioProvided(String... cellExtIds) {
+    public BigDecimal ratioProvided(String... cellExtIds) {
 
+        BigDecimal ratio = calcRatio(cellExtIds);
+        return ratio.equals(BigDecimal.ZERO)
+                ? null
+                : ratio.setScale(2, RoundingMode.HALF_UP);
+    }
+
+    private BigDecimal calcRatio(String[] cellExtIds) {
 
         if (isEmpty(cellExtIds)) {
-            return (double) 0;
+            return BigDecimal.ZERO;
         }
 
         checkAllCellsExist(cellExtIds);
@@ -84,17 +91,21 @@ public class ReportGridEvaluatorNamespace {
                 .filter(c -> Objects.nonNull(c) && !hasErrors(c))
                 .count();
 
+        if (foundColumns == 0) {
+            return BigDecimal.ZERO;
+        }
+
         BigDecimal totalColumns = BigDecimal.valueOf(cellExtIds.length);
 
-        BigDecimal ratioProvided = BigDecimal.valueOf(foundColumns)
-                .divide(totalColumns, 2, RoundingMode.HALF_UP);
-
-        return ratioProvided.doubleValue();
+        return BigDecimal.valueOf(foundColumns)
+                .divide(totalColumns, 4, RoundingMode.HALF_UP);
     }
 
-    public double percentageProvided(String... cellExtIds) {
-        double ratio = ratioProvided(cellExtIds);
-        return ratio * 100;
+    public BigDecimal percentageProvided(String... cellExtIds) {
+        BigDecimal ratio = calcRatio(cellExtIds);
+        return ratio.equals(BigDecimal.ZERO)
+                ? null
+                : ratio.multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP);
     }
 
     private boolean hasErrors(Object c) {

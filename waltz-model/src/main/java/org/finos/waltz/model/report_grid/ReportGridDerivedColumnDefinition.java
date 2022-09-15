@@ -14,6 +14,9 @@ public abstract class ReportGridDerivedColumnDefinition implements ExternalIdPro
     @Nullable
     public abstract Long id();
 
+    @Nullable
+    public abstract Long gridColumnId();
+
     public abstract String displayName();
 
     @Nullable
@@ -24,7 +27,7 @@ public abstract class ReportGridDerivedColumnDefinition implements ExternalIdPro
         return EntityKind.REPORT_GRID_DERIVED_COLUMN_DEFINITION;
     }
 
-    public abstract long position();
+    public abstract int position();
 
 
     public abstract String derivationScript();

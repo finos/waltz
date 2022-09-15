@@ -12,9 +12,23 @@ import {
 export const selectedGrid = writable(null);
 export const filters = writable([]);
 export const columnDefs = writable([]);
+export const derivedColumnDefs = writable([]);
 export const selectedColumn = writable(null);
 export const lastMovedColumn = writable(null);
 export const ownedReportIds = writable([]);
+
+
+export let allColumnDefs = derived([columnDefs, derivedColumnDefs], ([$columnDefs, $derivedColumnDefs]) => {
+    let fixed = _.map(
+        $columnDefs,
+        d => ({gridColId: d.gridColumnId, position: d.position, column: d}));
+
+    let derived = _.map(
+        $derivedColumnDefs,
+        d => ({gridColId: d.gridColumnId, position: d.position, column: d}));
+
+    return _.concat(fixed, derived);
+})
 
 export let columnsChanged = derived([columnDefs, selectedGrid], ([$columnDefs, $selectedGrid]) => {
 

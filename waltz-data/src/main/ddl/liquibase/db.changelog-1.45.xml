@@ -28,7 +28,7 @@
 
     <changeSet id="20220914-6221-1"
                author="woodjes">
-        <comment>6221: Report Grid: Add dervied column table</comment>
+        <comment>6221: Report Grid: Add derived column table</comment>
         <createTable tableName="report_grid_derived_column_definition">
             <column name="id"
                     type="${id.type}"
@@ -63,7 +63,7 @@
 
     <changeSet id="20220914-6221-2"
                author="woodjes">
-        <comment>6221: Report Grid: Add dervied column table</comment>
+        <comment>6221: Report Grid: Add derived column table</comment>
         <addForeignKeyConstraint baseTableName="report_grid_derived_column_definition"
                                  baseColumnNames="report_grid_id"
                                  constraintName="report_derived_column_report_grid_fk"
@@ -79,7 +79,7 @@
                      newTableName="report_grid_fixed_column_definition"/>
     </changeSet>
 
-    <changeSet id="20220518-6061-4"
+    <changeSet id="20220518-6221-4"
                author="woodjes">
         <dropDefaultValue tableName="report_grid_fixed_column_definition"
                           columnName="column_usage_kind"/>
@@ -189,6 +189,220 @@
                       oldColumnName="script"
                       columnDataType="${maxvarchar.type}"
                       newColumnName="derivation_script"/>
+    </changeSet>
+
+    <changeSet id="20220518-6221-14"
+               author="woodjes">
+        <dropDefaultValue tableName="report_grid_fixed_column_definition"
+                          columnName="position"/>
+    </changeSet>
+
+    <changeSet id="20220914-6221-15"
+               author="woodjes"
+               dbms="mssql">
+        <comment>6221: Report Grid: Add column defn table</comment>
+        <createTable tableName="report_grid_column_definition">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="report_grid_column_defn_pkey"/>
+            </column>
+            <column name="report_grid_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="position"
+                    type="${int.type}"
+                    defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20220914-6221-15a"
+               author="woodjes"
+               dbms="postgresql">
+        <comment>6221: Report Grid: Add column defn table</comment>
+        <createTable tableName="report_grid_column_definition">
+            <column name="id"
+                    type="${id.type}">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="report_grid_column_defn_pkey"/>
+            </column>
+            <column name="report_grid_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="position"
+                    type="${int.type}"
+                    defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20220914-6221-16"
+               author="woodjes"
+               dbms="mssql">
+        <comment>6221: Report Grid: Migrate column ids and position from fixed column to col defn table</comment>
+        <sql>
+            SET IDENTITY_INSERT report_grid_column_definition ON
+
+            INSERT INTO report_grid_column_definition (id, report_grid_id, position)
+            SELECT id, report_grid_id, position
+            FROM report_grid_fixed_column_definition;
+
+            SET IDENTITY_INSERT report_grid_column_definition OFF;
+        </sql>
+    </changeSet>
+
+    <changeSet id="20220914-6221-17"
+               author="woodjes"
+               dbms="postgres">
+        <comment>6221: Report Grid: Migrate column ids and position from fixed column to col defn table</comment>
+        <sql>
+            INSERT INTO report_grid_column_definitionxx (id, report_grid_id, position)
+            SELECT id, report_grid_id, position
+            -- TODO: check on postgres
+        </sql>
+
+        <addAutoIncrement tableName="report_grid_column_definition"
+                          columnName="id"
+                          columnDataType="${id.type}"
+                          incrementBy="1"/>
+    </changeSet>
+
+    <!--    <changeSet id="20220914-6221-18"-->
+    <!--               author="woodjes">-->
+    <!--        <comment>6221: Report Grid: Migrate column ids and position from fixed column to col defn table</comment>-->
+    <!--        <dropIndex tableName="report_grid_fixed_column_definition"-->
+    <!--                   indexName="idx_rgfcd_entity_ref_report_grid_id"/>-->
+    <!--    </changeSet>-->
+
+    <!--    <changeSet id="20220914-6221-19"-->
+    <!--               author="woodjes">-->
+    <!--        <comment>6221: Report Grid: Drop FK on fixed column defn</comment>-->
+    <!--        <dropForeignKeyConstraint baseTableName="report_grid_fixed_column_definition"-->
+    <!--                                  constraintName="report_fixed_column_report_grid_fk"/>-->
+    <!--    </changeSet>-->
+
+    <!--    <changeSet id="20220914-6221-20"-->
+    <!--               author="woodjes">-->
+    <!--        <comment>6221: Report Grid: Migrate column ids and position from fixed column to col defn table</comment>-->
+    <!--        <dropColumn tableName="report_grid_fixed_column_definition"-->
+    <!--                    columnName="report_grid_id"/>-->
+    <!--        <dropColumn tableName="report_grid_fixed_column_definition"-->
+    <!--                    columnName="position"/>-->
+    <!--    </changeSet>-->
+
+    <changeSet id="20220914-6221-21"
+               author="woodjes">
+        <comment>6221: Report Grid: Migrate column ids and position from fixed column to col defn table</comment>
+        <addColumn tableName="report_grid_fixed_column_definition">
+            <column name="grid_column_id"
+                    type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20220914-6221-22"
+               author="woodjes">
+        <comment>6221: Report Grid: Migrate column ids and position from fixed column to col defn table</comment>
+        <sql>
+            UPDATE report_grid_fixed_column_definition
+            SET grid_column_id = id
+        </sql>
+    </changeSet>
+
+    <changeSet id="20220914-6221-23"
+               author="woodjes">
+        <comment>6221: Report Grid: Migrate column ids and position from fixed column to col defn table</comment>
+        <addNotNullConstraint tableName="report_grid_fixed_column_definition"
+                              columnName="grid_column_id"
+                              columnDataType="${id.type}"/>
+    </changeSet>
+
+    <changeSet id="20220914-6221-24"
+               author="woodjes">
+        <comment>5107: Report Grid - add foreign key from report column back to report</comment>
+        <addForeignKeyConstraint baseTableName="report_grid_fixed_column_definition"
+                                 baseColumnNames="grid_column_id"
+                                 constraintName="fixed_column_grid_column_id_fk"
+                                 referencedTableName="report_grid_column_definition"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <!--    <changeSet id="20220914-6221-25"-->
+    <!--               author="woodjes">-->
+    <!--        <comment>6221: Report Grid: Drop FK on derived column defn</comment>-->
+    <!--        <dropForeignKeyConstraint baseTableName="report_grid_derived_column_definition"-->
+    <!--                                  constraintName="report_derived_column_report_grid_fk"/>-->
+    <!--    </changeSet>-->
+
+    <!--    <changeSet id="20220518-6221-26"-->
+    <!--               author="woodjes">-->
+    <!--        <dropDefaultValue tableName="report_grid_derived_column_definition"-->
+    <!--                          columnName="position"/>-->
+    <!--    </changeSet>-->
+
+    <!--    <changeSet id="20220914-6221-27"-->
+    <!--               author="woodjes">-->
+    <!--        <comment>6221: Report Grid: Migrate column ids and position from fixed column to col defn table</comment>-->
+    <!--        <dropIndex tableName="report_grid_derived_column_definition"-->
+    <!--                   indexName="idx_rgdcd_entity_ref_report_grid_id"/>-->
+    <!--    </changeSet>-->
+
+    <!--    <changeSet id="20220914-6221-28"-->
+    <!--               author="woodjes">-->
+    <!--        <comment>6221: Report Grid: Migrate column ids and position from derived column to col defn table</comment>-->
+    <!--        <dropColumn tableName="report_grid_derived_column_definition"-->
+    <!--                    columnName="report_grid_id"/>-->
+    <!--        <dropColumn tableName="report_grid_derived_column_definition"-->
+    <!--                    columnName="position"/>-->
+    <!--    </changeSet>-->
+
+    <changeSet id="20220914-6221-29"
+               author="woodjes">
+        <comment>6221: Report Grid: Migrate column ids and position from derived column to col defn table</comment>
+        <addColumn tableName="report_grid_derived_column_definition">
+            <column name="grid_column_id"
+                    type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20220914-6221-30"
+               author="woodjes">
+        <comment>6221: Report Grid: Migrate column ids and position from derived column to col defn table</comment>
+        <sql>
+            UPDATE report_grid_derived_column_definition
+            SET grid_column_id = id
+        </sql>
+    </changeSet>
+
+    <changeSet id="20220914-6221-31"
+               author="woodjes">
+        <comment>6221: Report Grid: Migrate column ids and position from derived column to col defn table</comment>
+        <addNotNullConstraint tableName="report_grid_derived_column_definition"
+                              columnName="grid_column_id"
+                              columnDataType="${id.type}"/>
+    </changeSet>
+
+    <changeSet id="20220914-6221-32"
+               author="woodjes">
+        <comment>5107: Report Grid - add foreign key from report column back to report</comment>
+        <addForeignKeyConstraint baseTableName="report_grid_derived_column_definition"
+                                 baseColumnNames="grid_column_id"
+                                 constraintName="derived_column_grid_column_id_fk"
+                                 referencedTableName="report_grid_column_definition"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
     </changeSet>
 
 

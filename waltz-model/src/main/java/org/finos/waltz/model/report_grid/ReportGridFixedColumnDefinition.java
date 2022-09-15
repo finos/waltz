@@ -18,7 +18,11 @@ public abstract class ReportGridFixedColumnDefinition implements ExternalIdProvi
     @Nullable
     public abstract Long id();
 
+    @Nullable
+    public abstract Long gridColumnId();
+
     public abstract EntityKind columnEntityKind();
+
 
     @Nullable
     public abstract Long columnEntityId();
@@ -29,7 +33,7 @@ public abstract class ReportGridFixedColumnDefinition implements ExternalIdProvi
     @Nullable
     public abstract String columnDescription();
 
-    public abstract long position();
+    public abstract int position();
 
     @Value.Default
     public RatingRollupRule ratingRollupRule() {

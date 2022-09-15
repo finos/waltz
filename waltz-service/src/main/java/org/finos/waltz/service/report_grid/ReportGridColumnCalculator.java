@@ -164,7 +164,11 @@ public class ReportGridColumnCalculator {
     }
 
     private static String toMessage(Exception e) {
-        return e.getCause().getMessage();
+        if (e.getCause() != null) {
+            return e.getCause().getMessage();
+        } else {
+            return e.getMessage();
+        }
     }
 
 

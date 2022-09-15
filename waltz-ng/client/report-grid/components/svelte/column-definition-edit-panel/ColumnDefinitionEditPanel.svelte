@@ -8,7 +8,14 @@
     import toasts from "../../../../svelte-stores/toast-store";
     import ColumnDetailsEditor from "./ColumnDetailsEditor.svelte";
     import NoData from "../../../../common/svelte/NoData.svelte";
-    import {columnDefs, hasChanged, selectedColumn, lastMovedColumn, selectedGrid} from "../report-grid-store";
+    import {
+        columnDefs,
+        hasChanged,
+        selectedColumn,
+        lastMovedColumn,
+        selectedGrid,
+        allColumnDefs
+    } from "../report-grid-store";
     import ColumnRemovalConfirmation from "./ColumnRemovalConfirmation.svelte";
     import {entity} from "../../../../common/services/enums/entity";
 
@@ -121,7 +128,7 @@
         activeMode = Modes.EDIT;
     }
 
-    function removeColumn(column){
+    function removeColumn(column) {
         $selectedColumn = column;
         activeMode = Modes.DELETE;
     }
@@ -130,6 +137,8 @@
         $selectedColumn = null;
         activeMode = Modes.VIEW
     }
+
+    $: console.log({allColDefs: $allColumnDefs})
 
 </script>
 
@@ -168,8 +177,7 @@
 
     <div class="col-sm-4"
          style="padding-left: 0; padding-right: 0">
-        <ReportGridColumnSummary {columnDefs}
-                                 {gridId}
+        <ReportGridColumnSummary {gridId}
                                  onRemove={removeColumn}
                                  onEdit={editColumn}/>
     </div>

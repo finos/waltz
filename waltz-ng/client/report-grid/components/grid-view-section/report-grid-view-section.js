@@ -22,7 +22,7 @@ import {mkSelectionOptions} from "../../../common/selector-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
 import ReportGridControlPanel from "../svelte/ReportGridControlPanel.svelte";
-import {activeSummaries, columnDefs, filters, selectedGrid} from "../svelte/report-grid-store";
+import {activeSummaries, columnDefs, derivedColumnDefs, filters, selectedGrid} from "../svelte/report-grid-store";
 import {
     mkLocalStorageFilterKey,
     mkRowFilter,
@@ -116,6 +116,7 @@ function controller($scope, serviceBroker, localStorageService) {
 
                     selectedGrid.set(gridData);
                     columnDefs.set(gridData?.definition.fixedColumnDefinitions);
+                    derivedColumnDefs.set(gridData?.definition.derivedColumnDefinitions);
 
                     vm.allTableData = prepareTableData(vm.rawGridData);
                     vm.allColumnDefs = prepareColumnDefs(vm.rawGridData);

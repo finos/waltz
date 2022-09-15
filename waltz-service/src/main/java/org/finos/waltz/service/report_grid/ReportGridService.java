@@ -110,20 +110,7 @@ public class ReportGridService {
         IdSelectionOptions opts = modifySelectionOptionsForGrid(idSelectionOptions);
 
         LOG.info("ReportGrid - getting by ID={} SelectionOptions={}", id, idSelectionOptions);
-
-        ReportGridDefinition gridDef = reportGridDao.getGridDefinitionById(id);
-
-        ReportGridDefinition definition = ImmutableReportGridDefinition
-                .copyOf(gridDef)
-                .withDerivedColumnDefinitions(ListUtilities.append(gridDef.derivedColumnDefinitions(),
-                        ImmutableReportGridDerivedColumnDefinition
-                                .builder()
-                                .id(CollectionUtilities.first(gridDef.fixedColumnDefinitions()).id())
-                                .displayName("Same ID")
-                                .position(1)
-                                .derivationScript("anyCellsProvided(['PAYMENT', 'PAYMENT_INSTRUCTION', 'PAYMENT_MANDATE']) ? 'Payments DT' : null") // Not working!!!
-                                .build())
-                );
+        ReportGridDefinition definition = reportGridDao.getGridDefinitionById(id);
 
         if (definition == null) {
             LOG.warn("No Report Grid Definition found for ID={}", id);
@@ -212,7 +199,7 @@ public class ReportGridService {
                                                         ReportGridColumnDefinitionsUpdateCommand updateCommand,
                                                         String username) throws InsufficientPrivelegeException {
         checkIsOwner(reportGridId, username);
-        reportGridDao.updateColumnDefinitions(reportGridId, updateCommand.fixedColumnDefinitions());
+        reportGridDao.updateColumnDefinitions(reportGridId, updateCommand);
         return reportGridDao.getGridDefinitionById(reportGridId);
     }
 

@@ -113,19 +113,6 @@ const unknownRating = {
     position: 0
 };
 
-
-
-function initialiseDataForRow(subject, columnDefs) {
-    return _.reduce(
-        columnDefs,
-        (acc, c) => {
-            acc[c.id] = unknownRating;
-            return acc;
-        },
-        {subject});
-}
-
-
 export function getColumnName(column) {
     let entityFieldName = _.get(column, ["entityFieldReference", "displayName"], null);
 
@@ -183,7 +170,7 @@ export function prepareColumnDefs(gridData) {
             default:
                 return {
                     allowSummary: true,
-                    toSearchTerm: d => _.get(d, [c.id, "text"], ""),
+                    toSearchTerm: d => _.get(d, [c.gridColumnId, "text"], ""),
                     cellTemplate:
                         `<div class="waltz-grid-report-cell"
                               ng-bind="COL_FIELD.text"
@@ -202,13 +189,14 @@ export function prepareColumnDefs(gridData) {
         }
     };
 
-    console.log("Making cols out of: ", {fixedColDefs, calculatedColDefs: derivedColDefs, colDefs});
+    console.log("Making cols out of: ", {fixedColDefs, derivedColDefs, colDefs});
+
     const additionalColumns = _
         .chain(colDefs)
         .map(c => {
             return Object.assign(
                 {
-                    field: c.id.toString(), // ui-grid doesn't like numeric field references
+                    field: c.gridColumnId.toString(), // ui-grid doesn't like numeric field references
                     displayName: getDisplayNameForColumn(c),
                     columnDef: c,
                     width: 100,
@@ -292,7 +280,7 @@ function calculateColorScales(gridData, entityKind, startColor, endColor) {
         .chain(gridData)
         .get(["definition", "fixedColumnDefinitions"], [])
         .filter(cd => cd.columnEntityKind === entityKind)
-        .map(cd => cd.id)
+        .map(cd => cd.gridColumnId)
         .value();
 
     return _
@@ -361,11 +349,7 @@ export function prepareTableData(gridData) {
 
     const colDefs = _.concat(fixedColDefs, derivedColDefs);
 
-    const colsById = _.keyBy(colDefs, cd => cd.id);
-
-    // const colsById = _.keyBy(colDefs, cd => refToString(mkRef(cd.kind, cd.id)));
-
-    console.log({gridData, colsById});
+    const colsById = _.keyBy(colDefs, cd => cd.gridColumnId);
 
     const costColorScalesByColumnDefinitionId = calculateCostColorScales(gridData);
     const complexityColorScalesByColumnDefinitionId = calculateComplexityColorScales(gridData);
@@ -452,7 +436,7 @@ export function prepareTableData(gridData) {
     const emptyRow = _.reduce(
         colDefs,
         (acc, c) => {
-            acc[c.id] = unknownRating;
+            acc[c.gridColumnId] = unknownRating;
             return acc;
         },
         {});
@@ -519,7 +503,7 @@ export function refreshSummaries(tableData,
         return acc;
     };
 
-    const columnsById = _.keyBy(columnDefinitions, cd => cd.id);
+    const columnsById = _.keyBy(columnDefinitions, cd => cd.gridColumnId);
 
     return _
         .chain(tableData)
