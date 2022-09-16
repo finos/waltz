@@ -36,22 +36,26 @@ export let columnsChanged = derived([columnDefs, selectedGrid], ([$columnDefs, $
     }
 })
 
-export let ratingRollupRuleChanged = derived(columnDefs,
-    ($columnDefs) => _.some(
-        $columnDefs,
-        d => d.ratingRollupRuleChanged));
+export let ratingRollupRuleChanged = derived(
+    columnDefs,
+    ($columnDefs) => _.some($columnDefs, d => d.ratingRollupRuleChanged));
 
-export let displayNameChanged = derived(columnDefs,
+export let displayNameChanged = derived(
+    columnDefs,
     ($columnDefs) => _.some($columnDefs, d => d.displayNameChanged));
 
-export let positionChanged = derived(columnDefs, ($columnDefs) => {
-    return _.some($columnDefs, d => d.originalPosition && d.originalPosition !== d.position);
-});
+export let positionChanged = derived(
+    columnDefs,
+    ($columnDefs) => _.some($columnDefs, d => d.originalPosition && d.originalPosition !== d.position));
+
+export let derivationScriptChanged = derived(
+    columnDefs,
+    ($columnDefs) => _.some($columnDefs, d => d.derivationScriptChanged));
 
 export let hasChanged = derived(
-    [columnsChanged, ratingRollupRuleChanged, displayNameChanged, positionChanged],
-    ([$columnsChanged, $ratingRollupRuleChanged, $displayNameChanged, $positionChanged]) => {
-        return $columnsChanged || $ratingRollupRuleChanged || $displayNameChanged || $positionChanged;
+    [columnsChanged, ratingRollupRuleChanged, displayNameChanged, positionChanged, derivationScriptChanged],
+    ([$columnsChanged, $ratingRollupRuleChanged, $displayNameChanged, $positionChanged, $derivationScriptChanged]) => {
+        return $columnsChanged || $ratingRollupRuleChanged || $displayNameChanged || $positionChanged || $derivationScriptChanged;
     });
 
 export const tableData = derived(

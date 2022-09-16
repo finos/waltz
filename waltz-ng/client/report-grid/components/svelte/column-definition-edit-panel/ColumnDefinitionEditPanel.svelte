@@ -20,12 +20,29 @@
     const Modes = {
         VIEW: "VIEW",
         EDIT: "EDIT",
-        DELETE: "DELETE"
+        DELETE: "DELETE",
+        DERIVED: "DERIVED"
     }
 
     let activeMode = Modes.VIEW;
 
     let canBeAdded;
+
+    let workingDerivedCol = {
+        displayName: null,
+        derivationScript: null,
+        externalId: null,
+        columnDescription: null
+    }
+
+    function clearWorking() {
+        workingDerivedCol = {
+            displayName: null,
+            derivationScript: null,
+            externalId: null,
+            columnDescription: null
+        }
+    }
 
     function onSelect(d) {
 
@@ -57,7 +74,38 @@
             d => Object.assign(
                 {},
                 d,
-                { position: _.indexOf(newList, d) }));
+                {position: _.indexOf(newList, d)}));
+    }
+
+
+    function addDerivedColumn() {
+
+        const column = {
+            kind: "REPORT_GRID_DERIVED_COLUMN_DEFINITION",
+            columnEntityKind: "REPORT_GRID_DERIVED_COLUMN_DEFINITION",
+            displayName: workingDerivedCol.displayName,
+            columnDescription: workingDerivedCol.columnDescription,
+            externalId: workingDerivedCol.externalId,
+            derivationScript: workingDerivedCol.derivationScript,
+            position: 0
+        };
+
+        if (_.some($columnDefs, c => sameColumnRef(column, c))) {
+            return;
+        }
+
+        const newList = _.concat(
+            $columnDefs,
+            column);
+
+        $columnDefs = _.map(
+            newList,
+            d => Object.assign(
+                {},
+                d,
+                {position: _.indexOf(newList, d)}));
+
+        cancel();
     }
 
     function deleteColumn(d) {
@@ -104,8 +152,6 @@
                 externalId: d.externalId
             }));
 
-        console.log({fixedColumnDefinitions, derivedColumnDefinitions, colDefs: $columnDefs});
-
         return reportGridStore
             .updateColumnDefinitions(gridId, {fixedColumnDefinitions, derivedColumnDefinitions})
             .then(() => {
@@ -145,8 +191,9 @@
     }
 
     function cancel() {
+        clearWorking();
         $selectedColumn = null;
-        activeMode = Modes.VIEW
+        activeMode = Modes.VIEW;
     }
 
     function determineEditComponent(kind) {
@@ -185,26 +232,15 @@
 {/if}
 
 <div class="row">
-    <div class="col-sm-4">
-        <div style="padding-bottom: 1em">
-            <strong>Add a column</strong> to the report grid, you can construct a grid from a combination of entities:
-            e.g. viewpoints, assessments, survey question responses, or fields:
-            e.g. application kind, survey due date etc.
-        </div>
-        <EntitySelector onSelect={onSelect}
-                        onDeselect={deleteEntity}
-                        selectionFilter={canBeAdded}
-                        subjectKind={$selectedGrid?.definition.subjectKind}/>
-    </div>
 
-    <div class="col-sm-4"
+    <div class="col-sm-6"
          style="padding-left: 0; padding-right: 0">
         <ReportGridColumnSummary {gridId}
                                  onRemove={removeColumn}
                                  onEdit={editColumn}/>
     </div>
 
-    <div class="col-sm-4">
+    <div class="col-sm-6">
         {#if activeMode === Modes.EDIT}
             <svelte:component this={comp}
                               column={$selectedColumn}
@@ -215,10 +251,75 @@
                                        onCancel={cancel}
                                        onRemove={deleteColumn}/>
         {:else if activeMode === Modes.VIEW}
-            <div class="help-block small">
-                <Icon name="info-circle"/>
-                Select a column to edit from the list to the left
+            <div style="padding-bottom: 1em">
+                <strong>Add a column</strong> to the report grid, you can construct a grid from a combination of
+                entities:
+                e.g. viewpoints, assessments, survey question responses, or fields:
+                e.g. application kind, survey due date etc.
             </div>
+            <EntitySelector onSelect={onSelect}
+                            onDeselect={deleteEntity}
+                            selectionFilter={canBeAdded}
+                            subjectKind={$selectedGrid?.definition.subjectKind}/>
+            <div>
+                You can also
+                <button class="btn btn-skinny"
+                        on:click={() => activeMode = Modes.DERIVED}>
+                    <strong>add a derived column</strong>
+                </button>
+                which can be based on fixed columns or other derived columns.
+            </div>
+        {:else if activeMode === Modes.DERIVED}
+            <h4>Add a derived column:</h4>
+            <div style="padding-bottom: 1em">
+                <strong>Display name</strong>
+                <div class="small help-text">The name displayed on the grid.
+                </div>
+                <input class="form-control"
+                       required
+                       id="title"
+                       placeholder="Display name"
+                       bind:value={workingDerivedCol.displayName}>
+            </div>
+            <div style="padding-bottom: 1em">
+                <strong>External Id</strong>
+                <div class="small help-text">A Fixed name used to reference this column in other derivation scripts.
+                </div>
+                <input class="form-control"
+                       required
+                       id="externalId"
+                       placeholder="External Id"
+                       bind:value={workingDerivedCol.externalId}>
+            </div>
+            <div style="padding-bottom: 1em">
+                <strong>Description</strong>
+                <div class="small help-text">A description of this column.
+                </div>
+                <input class="form-control"
+                       required
+                       id="description"
+                       placeholder="Description"
+                       bind:value={workingDerivedCol.columnDescription}>
+            </div>
+            <div style="padding-bottom: 1em">
+                <strong>Derivation Script</strong>
+                <div class="small help-text">Calculates the value to be displayed in this column.
+                </div>
+                <textarea class="form-control"
+                          required
+                          id="derivationScript"
+                          rows="6"
+                          placeholder="Enter script here"
+                          bind:value={workingDerivedCol.derivationScript}/>
+            </div>
+            <button class="btn btn-skinny"
+                    on:click={() => addDerivedColumn()}>
+                <strong>Done</strong>
+            </button>
+            <button class="btn btn-skinny"
+                    on:click={() => cancel()}>
+                <strong>Cancel</strong>
+            </button>
         {/if}
     </div>
 </div>

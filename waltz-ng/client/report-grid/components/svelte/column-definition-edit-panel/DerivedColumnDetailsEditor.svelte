@@ -12,6 +12,7 @@
     export let onRemove = () => console.log("Remove");
 
     let workingDisplayName = column.displayName;
+    let workingScript = column.derivationScript;
 
     function cancelEdit(){
         onCancel();
@@ -25,6 +26,19 @@
             {
                 displayName: workingDisplayName,
                 displayNameChanged: workingDisplayName !== originalColumn?.displayName
+            })
+        const columnsWithoutCol = _.reject($columnDefs, d => sameColumnRef(d, column));
+        $columnDefs = _.concat(columnsWithoutCol, newColumn);
+    }
+
+    function updateDerivationScript(workingScript, column) {
+        const originalColumn = _.find($selectedGrid.definition.derivedColumnDefinitions, d => sameColumnRef(d, column));
+        const newColumn = Object.assign(
+            {},
+            column,
+            {
+                derivationScript: workingScript,
+                derivationScriptChanged: workingScript !== originalColumn?.derivationScript
             })
         const columnsWithoutCol = _.reject($columnDefs, d => sameColumnRef(d, column));
         $columnDefs = _.concat(columnsWithoutCol, newColumn);
@@ -55,6 +69,22 @@
                    on:change={() => updateDisplayName(workingDisplayName, column)}
                    placeholder="Display name"
                    bind:value={workingDisplayName}>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <div>Derivation Script</div>
+            <div class="small help-text">Calculates the value to be displayed in this column.
+            </div>
+        </td>
+        <td>
+            <textarea class="form-control"
+                      required
+                      id="derivationScript"
+                      rows="6"
+                      on:change={() => updateDerivationScript(workingScript, column)}
+                      placeholder="Enter script here"
+                      bind:value={workingScript}/>
         </td>
     </tr>
     </tbody>
