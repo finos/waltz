@@ -105,12 +105,12 @@ public class ReportGridColumnCalculator {
                             .ifPresent(result -> {
 
 
-                                ReportGridCell existingResult = results.get(ccc.column().id());
+                                ReportGridCell existingResult = results.get(ccc.column().gridColumnId());
                                 boolean isDifferent = existingResult == null || !existingResult.equals(result);
 
                                 if (isDifferent) {
                                     // If successful record the result
-                                    results.put(ccc.column().id(), result);
+                                    results.put(ccc.column().gridColumnId(), result);
 
                                     // ...add the column to the list of cols to remove after this iteration
                                     //   (we remove late to prevent a concurrent modification exception)
@@ -156,7 +156,7 @@ public class ReportGridColumnCalculator {
                         .errorValue(t.v2)
                         .optionCode("EXECUTION_ERROR")
                         .optionText("Execution Error")
-                        .columnDefinitionId(t.v1.id())
+                        .columnDefinitionId(t.v1.gridColumnId())
                         .build())
                 .collect(Collectors.toSet());
 
@@ -194,7 +194,7 @@ public class ReportGridColumnCalculator {
         columnDefinitions
                 .forEach(col -> {
                     ctx.put(colToExtId(col),
-                            mkVal(ratingSchemeItemsById, cellsInRowbyColId.get(col.id())));
+                            mkVal(ratingSchemeItemsById, cellsInRowbyColId.get(col.gridColumnId())));
                 });
 
         ctx.put("subjectId", subjectId);
@@ -217,7 +217,7 @@ public class ReportGridColumnCalculator {
                                 .errorValue(compilationError)
                                 .optionCode("COMPILE_ERROR")
                                 .optionText("Compile Error")
-                                .columnDefinitionId(cd.id())
+                                .columnDefinitionId(cd.gridColumnId())
                                 .build(),
                         expr -> {
                             Object result = expr.execute(null);
@@ -234,7 +234,7 @@ public class ReportGridColumnCalculator {
                                         .builder()
                                         .textValue(cr.value())
                                         .subjectId(subjectId)
-                                        .columnDefinitionId(cd.id())
+                                        .columnDefinitionId(cd.gridColumnId())
                                         .optionCode(cr.optionCode())
                                         .optionText(cr.optionText())
                                         .build();
