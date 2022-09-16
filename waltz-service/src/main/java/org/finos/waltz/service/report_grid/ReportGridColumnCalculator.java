@@ -30,7 +30,7 @@ public class ReportGridColumnCalculator {
                                                 ReportGridDefinition definition) {
         ReportGridEvaluatorNamespace ns = new ReportGridEvaluatorNamespace(definition);
         JexlBuilder builder = new JexlBuilder();
-        JexlEngine jexl = builder.namespaces(newHashMap(null, ns)).create();
+        JexlEngine jexl = builder.namespaces(newHashMap(null, ns)).cache(512).create();
 
         Map<Long, Collection<ReportGridCell>> rowBySubject = groupBy(
                 instance.cellData(),

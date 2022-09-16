@@ -113,7 +113,7 @@ const unknownRating = {
     position: 0
 };
 
-export function getColumnName(column) {
+function getFixedColumnName(column) {
     let entityFieldName = _.get(column, ["entityFieldReference", "displayName"], null);
 
     return _.chain([])
@@ -124,22 +124,26 @@ export function getColumnName(column) {
         .value();
 }
 
+export function getColumnName(column) {
+    switch (column.kind) {
+        case "REPORT_GRID_FIXED_COLUMN_DEFINITION":
+            return getFixedColumnName(column)
+        case "REPORT_GRID_DERIVED_COLUMN_DEFINITION":
+            return column.displayName;
+            throw `Cannot determine name for unknown column kind: ${column.kind}`;
+    }
+}
+
 export function getDisplayNameForColumn(c) {
     if (c.displayName != null) {
         return c.displayName;
     } else {
         return getColumnName(c);
     }
-
 }
 
 
-export function prepareColumnDefs(gridData) {
-    console.log("pcd", {gridData})
-    const fixedColDefs = _.get(gridData, ["definition", "fixedColumnDefinitions"], []);
-    const derivedColDefs = _.get(gridData, ["definition", "derivedColumnDefinitions"], []);
-
-    const colDefs = _.concat(fixedColDefs, derivedColDefs);
+export function prepareColumnDefs(colDefs) {
 
     const mkColumnCustomProps = (c) => {
         switch (c.columnEntityKind) {
@@ -189,7 +193,7 @@ export function prepareColumnDefs(gridData) {
         }
     };
 
-    console.log("Making cols out of: ", {fixedColDefs, derivedColDefs, colDefs});
+    console.log("Making cols out of: ", {colDefs});
 
     const additionalColumns = _
         .chain(colDefs)
@@ -333,6 +337,16 @@ function mkAttestationCell(dataCell, baseCell) {
 }
 
 
+export function combineColDefs(gridData) {
+    const fixedColDefs = _.get(gridData, ["definition", "fixedColumnDefinitions"], []);
+    const derivedColDefs = _.get(gridData, ["definition", "derivedColumnDefinitions"], []);
+
+    return _.orderBy(
+        _.concat(fixedColDefs, derivedColDefs),
+        d => d.position);
+}
+
+
 export function prepareTableData(gridData) {
 
     const ratingSchemeItemsById = _
@@ -344,11 +358,7 @@ export function prepareTableData(gridData) {
         .keyBy(d => d.id)
         .value();
 
-    const fixedColDefs = _.get(gridData, ["definition", "fixedColumnDefinitions"], []);
-    const derivedColDefs = _.get(gridData, ["definition", "derivedColumnDefinitions"], []);
-
-    const colDefs = _.concat(fixedColDefs, derivedColDefs);
-
+    const colDefs = combineColDefs(gridData);
     const colsById = _.keyBy(colDefs, cd => cd.gridColumnId);
 
     const costColorScalesByColumnDefinitionId = calculateCostColorScales(gridData);
@@ -421,7 +431,7 @@ export function prepareTableData(gridData) {
                     text: dataCell.errorValue || dataCell.textValue
                 });
             default:
-                console.error(`Cannot prepare table data for column kind:  ${colDef.columnEntityKind}, colId: ${colDef.id}`);
+                console.error(`Cannot prepare table data for column kind:  ${colDef.columnEntityKind}, colId: ${colDef.gridColumnId}`);
                 return {
                     text: dataCell.textValue,
                     comment: dataCell.comment
@@ -563,8 +573,7 @@ export function mkRowFilter(filters = []) {
 }
 
 
-export function sameColumnRef(v1, v2) {
-    if (!v1 || !v2) return false;
+function sameFixedColumnRefs(v1, v2) {
 
     const fieldRef1 = _.get(v1, ["entityFieldReference", "id"], null);
     const fieldRef2 = _.get(v2, ["entityFieldReference", "id"], null);
@@ -580,6 +589,30 @@ export function sameColumnRef(v1, v2) {
         && fieldRef1 === fieldRef2
         && qualiKind1 === qualiKind2
         && qualiId1 === qualiId2;
+}
+
+function sameDerivedColumnRefs(v1, v2) {
+
+    const name1 = _.get(v1, ["displayName"], null);
+    const name2 = _.get(v2, ["displayName"], null);
+
+    return name1 === name2;
+}
+
+export function sameColumnRef(v1, v2) {
+    if (!v1 || !v2) return false;
+
+    let sameColumnKind = v1.kind === v2.kind;
+
+    if (!sameColumnKind) {
+        return false;
+    } else if (v1.kind === "REPORT_GRID_FIXED_COLUMN_DEFINITION") {
+        return sameFixedColumnRefs(v1, v2);
+    } else if (v1.kind === "REPORT_GRID_DERIVED_COLUMN_DEFINITION") {
+        return sameDerivedColumnRefs(v1, v2);
+    } else {
+        throw `Cannot identify column kind to compare: ${v1.kind}}`
+    }
 }
 
 

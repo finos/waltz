@@ -1509,7 +1509,7 @@ public class ReportGridDao {
         Map<Long, Long> lowIdToDefIdMap = indexBy(
                 lowCols,
                 ReportGridFixedColumnDefinition::columnEntityId,
-                ReportGridFixedColumnDefinition::id);
+                ReportGridFixedColumnDefinition::gridColumnId);
 
         Table<Record5<Long, String, Long, Integer, String>> ratingSchemeItems = DSL
                 .select(mc.ID.as("mcId"),

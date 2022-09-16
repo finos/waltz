@@ -2,20 +2,14 @@
     import EntitySelector from "./EntitySelector.svelte";
     import _ from "lodash";
     import ReportGridColumnSummary from "./ReportGridColumnSummary.svelte";
-    import {columnUsageKind, determineDefaultRollupRule, sameColumnRef} from "../report-grid-utils";
+    import {determineDefaultRollupRule, sameColumnRef} from "../report-grid-utils";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import {reportGridStore} from "../../../../svelte-stores/report-grid-store";
     import toasts from "../../../../svelte-stores/toast-store";
-    import ColumnDetailsEditor from "./ColumnDetailsEditor.svelte";
+    import FixedColumnDetailsEditor from "./FixedColumnDetailsEditor.svelte";
+    import DerivedColumnDetailsEditor from "./DerivedColumnDetailsEditor.svelte";
     import NoData from "../../../../common/svelte/NoData.svelte";
-    import {
-        columnDefs,
-        hasChanged,
-        selectedColumn,
-        lastMovedColumn,
-        selectedGrid,
-        allColumnDefs
-    } from "../report-grid-store";
+    import {columnDefs, hasChanged, lastMovedColumn, selectedColumn, selectedGrid,} from "../report-grid-store";
     import ColumnRemovalConfirmation from "./ColumnRemovalConfirmation.svelte";
     import {entity} from "../../../../common/services/enums/entity";
 
@@ -35,7 +29,9 @@
 
     function onSelect(d) {
 
+        //Only fixed columns are chosen through picker
         const column = {
+            kind: "REPORT_GRID_FIXED_COLUMN_DEFINITION",
             columnEntityId: d.columnEntityId,
             columnEntityKind: d.columnEntityKind,
             entityFieldReference: d.entityFieldReference,
@@ -82,8 +78,11 @@
 
     function saveColumnDefs(columns) {
 
-        const columnDefs = _.map(
-            columns,
+        let fixedColDefs = _.filter(columns, d => d.kind === "REPORT_GRID_FIXED_COLUMN_DEFINITION");
+        let derivedColDefs = _.filter(columns, d => d.kind === "REPORT_GRID_DERIVED_COLUMN_DEFINITION");
+
+        const fixedColumnDefinitions = _.map(
+            fixedColDefs,
             d => ({
                 columnEntityKind: d.columnEntityKind,
                 columnEntityId: d.columnEntityId,
@@ -92,11 +91,23 @@
                 entityFieldReference: d.entityFieldReference,
                 displayName: d.displayName,
                 columnQualifierKind: d.columnQualifierKind,
-                columnQualifierId: d.columnQualifierId
+                columnQualifierId: d.columnQualifierId,
+                externalId: d.externalId
             }));
 
+        const derivedColumnDefinitions = _.map(
+            derivedColDefs,
+            d => ({
+                position: d.position,
+                displayName: d.displayName,
+                derivationScript: d.derivationScript,
+                externalId: d.externalId
+            }));
+
+        console.log({fixedColumnDefinitions, derivedColumnDefinitions, colDefs: $columnDefs});
+
         return reportGridStore
-            .updateColumnDefinitions(gridId, {fixedColumnDefinitions: columnDefs})
+            .updateColumnDefinitions(gridId, {fixedColumnDefinitions, derivedColumnDefinitions})
             .then(() => {
                 onSave();
                 toasts.success("Report grid columns updated successfully");
@@ -110,7 +121,7 @@
     $: canBeAdded = (d) => {
         const notAlreadyAdded = !_.some(
             $columnDefs,
-            r => sameColumnRef(r, d));
+            r => sameColumnRef(r, Object.assign(d, {kind: "REPORT_GRID_FIXED_COLUMN_DEFINITION"})));
 
         switch (d.kind) {
             case entity.ASSESSMENT_DEFINITION.key:
@@ -138,7 +149,18 @@
         activeMode = Modes.VIEW
     }
 
-    $: console.log({allColDefs: $allColumnDefs})
+    function determineEditComponent(kind) {
+        switch (kind) {
+            case "REPORT_GRID_FIXED_COLUMN_DEFINITION":
+                return FixedColumnDetailsEditor;
+            case "REPORT_GRID_DERIVED_COLUMN_DEFINITION":
+                return DerivedColumnDetailsEditor
+            default:
+                throw `Cannot determine edit component for column kind: ${kind}`;
+        }
+    }
+
+    $: comp = $selectedColumn && determineEditComponent($selectedColumn?.kind);
 
 </script>
 
@@ -184,9 +206,10 @@
 
     <div class="col-sm-4">
         {#if activeMode === Modes.EDIT}
-            <ColumnDetailsEditor column={$selectedColumn}
-                                 onCancel={cancel}
-                                 onRemove={removeColumn}/>
+            <svelte:component this={comp}
+                              column={$selectedColumn}
+                              onCancel={cancel}
+                              onRemove={removeColumn}/>
         {:else if activeMode === Modes.DELETE}
             <ColumnRemovalConfirmation column={$selectedColumn}
                                        onCancel={cancel}

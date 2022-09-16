@@ -24,6 +24,7 @@ import _ from "lodash";
 import ReportGridControlPanel from "../svelte/ReportGridControlPanel.svelte";
 import {activeSummaries, columnDefs, derivedColumnDefs, filters, selectedGrid} from "../svelte/report-grid-store";
 import {
+    combineColDefs,
     mkLocalStorageFilterKey,
     mkRowFilter,
     prepareColumnDefs,
@@ -115,11 +116,12 @@ function controller($scope, serviceBroker, localStorageService) {
                     activeSummaries.set(summaries);
 
                     selectedGrid.set(gridData);
-                    columnDefs.set(gridData?.definition.fixedColumnDefinitions);
-                    derivedColumnDefs.set(gridData?.definition.derivedColumnDefinitions);
+
+                    const colDefs = combineColDefs(gridData);
+                    columnDefs.set(colDefs);
 
                     vm.allTableData = prepareTableData(vm.rawGridData);
-                    vm.allColumnDefs = prepareColumnDefs(vm.rawGridData);
+                    vm.allColumnDefs = prepareColumnDefs(colDefs);
                     refresh();
                 }
             })

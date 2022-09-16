@@ -134,8 +134,10 @@ public class ReportGridUtilities {
     public static Set<GridFilter> getGridFilters(List<List<String>> filterRows, ReportGridDefinition grid) {
 
         Map<String, Long> columnsDefinitionIdByName = indexBy(grid.fixedColumnDefinitions(),
-                r -> r.entityFieldReference() == null ? sanitizeString(r.columnName()) : sanitizeString(format("%s/%s", r.entityFieldReference().displayName(), r.columnName())),
-                ReportGridFixedColumnDefinition::id);
+                r -> r.entityFieldReference() == null
+                        ? sanitizeString(r.columnName())
+                        : sanitizeString(format("%s/%s", r.entityFieldReference().displayName(), r.columnName())),
+                ReportGridFixedColumnDefinition::gridColumnId);
 
         return filterRows
                 .stream()

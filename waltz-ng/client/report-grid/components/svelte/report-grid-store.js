@@ -17,22 +17,11 @@ export const selectedColumn = writable(null);
 export const lastMovedColumn = writable(null);
 export const ownedReportIds = writable([]);
 
-
-export let allColumnDefs = derived([columnDefs, derivedColumnDefs], ([$columnDefs, $derivedColumnDefs]) => {
-    let fixed = _.map(
-        $columnDefs,
-        d => ({gridColId: d.gridColumnId, position: d.position, column: d}));
-
-    let derived = _.map(
-        $derivedColumnDefs,
-        d => ({gridColId: d.gridColumnId, position: d.position, column: d}));
-
-    return _.concat(fixed, derived);
-})
-
 export let columnsChanged = derived([columnDefs, selectedGrid], ([$columnDefs, $selectedGrid]) => {
 
-    const originalColumnDefs = $selectedGrid?.definition.fixedColumnDefinitions || [];
+    const originalColumnDefs = _.concat(
+        $selectedGrid?.definition.fixedColumnDefinitions,
+        $selectedGrid?.definition.derivedColumnDefinitions) || [];
 
     if (!$selectedGrid) {
         return false
@@ -47,12 +36,10 @@ export let columnsChanged = derived([columnDefs, selectedGrid], ([$columnDefs, $
     }
 })
 
-export let usageKindChanged = derived(columnDefs, ($columnDefs) => {
-    return _.some($columnDefs, d => d.usageKindChanged)
-});
-
 export let ratingRollupRuleChanged = derived(columnDefs,
-    ($columnDefs) => _.some($columnDefs, d => d.ratingRollupRuleChanged));
+    ($columnDefs) => _.some(
+        $columnDefs,
+        d => d.ratingRollupRuleChanged));
 
 export let displayNameChanged = derived(columnDefs,
     ($columnDefs) => _.some($columnDefs, d => d.displayNameChanged));
@@ -62,9 +49,9 @@ export let positionChanged = derived(columnDefs, ($columnDefs) => {
 });
 
 export let hasChanged = derived(
-    [columnsChanged, usageKindChanged, ratingRollupRuleChanged, displayNameChanged, positionChanged],
-    ([$columnsChanged, $usageKindChanged, $ratingRollupRuleChanged, $displayNameChanged, $positionChanged]) => {
-        return $columnsChanged || $usageKindChanged || $ratingRollupRuleChanged || $displayNameChanged || $positionChanged;
+    [columnsChanged, ratingRollupRuleChanged, displayNameChanged, positionChanged],
+    ([$columnsChanged, $ratingRollupRuleChanged, $displayNameChanged, $positionChanged]) => {
+        return $columnsChanged || $ratingRollupRuleChanged || $displayNameChanged || $positionChanged;
     });
 
 export const tableData = derived(

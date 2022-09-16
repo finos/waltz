@@ -33,6 +33,19 @@
     $: category = $categoryCall?.data;
     $: surveyTemplate = $surveyTemplateCall?.data;
 
+    function determineColumnType(kind) {
+        switch (kind) {
+            case "REPORT_GRID_FIXED_COLUMN_DEFINITION":
+                return "Fixed";
+            case "REPORT_GRID_DERIVED_COLUMN_DEFINITION":
+                return "Derived";
+            default:
+                return "Unknown"
+        }
+    }
+
+    $: columnType = determineColumnType(column.kind);
+
 </script>
 
 
@@ -41,26 +54,26 @@
     <DescriptionFade text={column?.columnDescription || ''}/>
 </div>
 
-{#if column?.columnEntityKind === entity.MEASURABLE.key}
-    <div>
-        <table class="table table-condensed small">
-            <tbody>
+<div>
+    <table class="table table-condensed small">
+        <tbody>
+        <tr>
+            <td width="50%">
+                Column Type
+            </td>
+            <td width="50%">{columnType}</td>
+        </tr>
+        {#if column?.columnEntityKind === entity.MEASURABLE.key}
             <tr>
                 <td width="50%">Category</td>
                 <td width="50%">{category?.name}</td>
             </tr>
-            </tbody>
-        </table>
-    </div>
-{:else if column?.columnEntityKind === entity.SURVEY_QUESTION.key}
-    <div>
-        <table class="table table-condensed small">
-            <tbody>
+        {:else if column?.columnEntityKind === entity.SURVEY_QUESTION.key}
             <tr>
                 <td width="50%">Template</td>
                 <td width="50%">{surveyTemplate?.name}</td>
             </tr>
-            </tbody>
-        </table>
-    </div>
-{/if}
+        {/if}
+        </tbody>
+    </table>
+</div>

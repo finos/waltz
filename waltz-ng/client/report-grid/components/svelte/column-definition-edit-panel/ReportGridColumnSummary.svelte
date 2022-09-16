@@ -20,9 +20,8 @@
     function moveColumn(positionCount, column) {
         const reorderedList = move($columnDefs, _.indexOf($columnDefs, column), positionCount);
         $lastMovedColumn = column;
-
-        $columnDefs = recalcPositions(reorderedList, $selectedGrid.definition.fixedColumnDefinitions);
-
+        const originalColumnDefs = _.concat($selectedGrid.definition.fixedColumnDefinitions, $selectedGrid.definition.derivedColumnDefinitions);
+        $columnDefs = recalcPositions(reorderedList, originalColumnDefs);
     }
 
     function recalcPositions(reorderedList, originalList) {
