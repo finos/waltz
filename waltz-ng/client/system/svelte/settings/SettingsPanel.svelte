@@ -75,7 +75,7 @@
     <br>
 {/if}
 
-<table class="table table-condensed small">
+<table class="table force-wrap table-condensed small">
     <colgroup>
         <col width="35%">
         <col width="30%">
