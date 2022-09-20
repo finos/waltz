@@ -4,7 +4,6 @@
     import {columnUsageKind, ratingRollupRule, sameColumnRef} from "../report-grid-utils";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import {columnDefs, selectedGrid} from "../report-grid-store";
-    import {sameRef} from "../../../../common/entity-utils";
     import ColumnDefinitionHeader from "./ColumnDefinitionHeader.svelte";
 
     export let column;
@@ -13,21 +12,13 @@
 
     let workingDisplayName = column.displayName;
 
-    function cancelEdit(){
+    function cancelEdit() {
         onCancel();
     }
 
-    function selectSummary(usageKind, column) {
-        const originalColumn = _.find($selectedGrid.definition.columnDefinitions, d => sameColumnRef(d, column));
-        const newColumn = Object.assign({},
-            column,
-            {usageKind: usageKind?.key, usageKindChanged: usageKind?.key !== originalColumn?.usageKind})
-        const columnsWithoutCol = _.reject($columnDefs, d => sameColumnRef(d, column));
-        $columnDefs = _.concat(columnsWithoutCol, newColumn);
-    }
-
     function selectRollupKind(rollupKind, column) {
-        const originalColumn = _.find($selectedGrid.definition.columnDefinitions, d => sameColumnRef(d, column));
+        const originalColumn = _.find($selectedGrid.definition.fixedColumnDefinitions, d => sameColumnRef(d, column));
+        console.log({rollupKind, column, originalColumn})
         const newColumn = Object.assign(
             {},
             column,
@@ -40,7 +31,7 @@
     }
 
     function updateDisplayName(workingDisplayName, column) {
-        const originalColumn = _.find($selectedGrid.definition.columnDefinitions, d => sameColumnRef(d, column));
+        const originalColumn = _.find($selectedGrid.definition.fixedColumnDefinitions, d => sameColumnRef(d, column));
         const newColumn = Object.assign(
             {},
             column,
@@ -68,36 +59,22 @@
     <tbody>
     <tr>
         <td>
-            <div>Usage Kind</div>
+            <div>Rating rollup rule</div>
             <div class="small help-text">
-                    Select summary for columns to appear in the filter list.
-                </div>
-            </td>
-            <td>
-                <DropdownPicker items={summaryItems}
-                                onSelect={(d) => selectSummary(d, column)}
-                                defaultMessage="Select a summary kind"
-                                selectedItem={columnUsageKind[column.usageKind]}/>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <div>Rating rollup rule</div>
-                <div class="small help-text">
-                    Describes the rating value to be displayed when aggregating for a hierarchy.
-                </div>
-            </td>
-            <td>
-                {#if column?.columnEntityKind === 'MEASURABLE'}
-                    <DropdownPicker items={rollupKinds}
-                                    onSelect={(d) => selectRollupKind(d, column)}
-                                    defaultMessage="Select rollup kind"
-                                    selectedItem={ratingRollupRule[column.ratingRollupRule]}/>
-                {:else}
-                    <span>{ratingRollupRule[column.ratingRollupRule].name}</span>
-                {/if}
-            </td>
-        </tr>
+                Describes the rating value to be displayed when aggregating for a hierarchy.
+            </div>
+        </td>
+        <td>
+            {#if column?.columnEntityKind === 'MEASURABLE'}
+                <DropdownPicker items={rollupKinds}
+                                onSelect={(d) => selectRollupKind(d, column)}
+                                defaultMessage="Select rollup kind"
+                                selectedItem={ratingRollupRule[column.ratingRollupRule]}/>
+            {:else}
+                <span>{ratingRollupRule[column.ratingRollupRule].name}</span>
+            {/if}
+        </td>
+    </tr>
     <tr>
         <td>
             <div>Display name</div>
@@ -117,10 +94,12 @@
 
 <button class="btn btn-skinny"
         on:click={cancelEdit}>
-    <Icon name="times"/>Close
+    <Icon name="times"/>
+    Close
 </button>
 |
 <button class="btn btn-skinny"
         on:click={() => onRemove(column)}>
-    <Icon name="trash"/>Delete
+    <Icon name="trash"/>
+    Delete
 </button>

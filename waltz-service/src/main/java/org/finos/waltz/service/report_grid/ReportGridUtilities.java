@@ -8,8 +8,8 @@ import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.ImmutableIdSelectionOptions;
 import org.finos.waltz.model.report_grid.GridFilter;
 import org.finos.waltz.model.report_grid.ImmutableGridFilter;
-import org.finos.waltz.model.report_grid.ReportGridColumnDefinition;
 import org.finos.waltz.model.report_grid.ReportGridDefinition;
+import org.finos.waltz.model.report_grid.ReportGridFixedColumnDefinition;
 import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -133,9 +133,11 @@ public class ReportGridUtilities {
 
     public static Set<GridFilter> getGridFilters(List<List<String>> filterRows, ReportGridDefinition grid) {
 
-        Map<String, Long> columnsDefinitionIdByName = indexBy(grid.columnDefinitions(),
-                r -> r.entityFieldReference() == null ? sanitizeString(r.columnName()) : sanitizeString(format("%s/%s", r.entityFieldReference().displayName(), r.columnName())),
-                ReportGridColumnDefinition::id);
+        Map<String, Long> columnsDefinitionIdByName = indexBy(grid.fixedColumnDefinitions(),
+                r -> r.entityFieldReference() == null
+                        ? sanitizeString(r.columnName())
+                        : sanitizeString(format("%s/%s", r.entityFieldReference().displayName(), r.columnName())),
+                ReportGridFixedColumnDefinition::gridColumnId);
 
         return filterRows
                 .stream()
@@ -157,7 +159,7 @@ public class ReportGridUtilities {
                 .collect(Collectors.toSet());
     }
 
-    private static String sanitizeString(String name) {
+    public static String sanitizeString(String name) {
         return mkSafe(name)
                 .replaceAll("[:;*?/\\\\]", "")
                 .replaceAll("\\s+", "")

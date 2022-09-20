@@ -18,12 +18,15 @@
 
 package org.finos.waltz.common;
 
+import org.jooq.lambda.Seq;
+import org.jooq.lambda.tuple.Tuple2;
+
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static java.util.stream.Collectors.toList;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 
 public class ListUtilities {
@@ -149,12 +152,16 @@ public class ListUtilities {
      * @param mapFn  function to transform an input element to desired output element
      * @param <X> type of input list
      * @param <Y> type of result
-     * @return  an optional result of applying the `mapFn` to the first element of `xs`
+     * @return an optional result of applying the `mapFn` to the first element of `xs`
      */
     public static <X, Y> Optional<Y> applyToFirst(List<X> xs, Function<X, Y> mapFn) {
         if (isEmpty(xs)) return Optional.empty();
 
         return Optional.ofNullable(xs.get(0))
                 .map(mapFn);
+    }
+
+    public static <X, Y> List<Tuple2<X, Y>> zip(List<X> xs, List<Y> ys) {
+        return Seq.zip(xs, ys).collect(toList());
     }
 }

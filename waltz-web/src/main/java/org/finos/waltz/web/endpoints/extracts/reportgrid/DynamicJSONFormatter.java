@@ -22,8 +22,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.finos.waltz.model.report_grid.ReportGrid;
-import org.finos.waltz.model.report_grid.ReportGridColumnDefinition;
 import org.finos.waltz.model.report_grid.ReportGridDefinition;
+import org.finos.waltz.model.report_grid.ReportGridFixedColumnDefinition;
 import org.finos.waltz.model.report_grid.ReportSubject;
 import org.finos.waltz.web.endpoints.extracts.ColumnCommentary;
 import org.finos.waltz.web.json.*;
@@ -52,7 +52,7 @@ public class DynamicJSONFormatter implements DynamicFormatter {
     @Override
     public byte[] format(String id,
                          ReportGrid reportGrid,
-                         List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> columnDefinitions,
+                         List<Tuple2<ReportGridFixedColumnDefinition, ColumnCommentary>> columnDefinitions,
                          List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows)  throws IOException {
         try {
             LOG.debug("Generating JSON data {}",id);
@@ -75,7 +75,7 @@ public class DynamicJSONFormatter implements DynamicFormatter {
 
 
     private byte[] mkResponse(ReportGrid reportGrid,
-                              List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> columnDefinitions,
+                              List<Tuple2<ReportGridFixedColumnDefinition, ColumnCommentary>> columnDefinitions,
                               List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows) throws IOException {
 
         ReportGridDefinition reportGridDefinition = reportGrid.definition();
@@ -92,7 +92,7 @@ public class DynamicJSONFormatter implements DynamicFormatter {
     }
 
 
-    private Grid transform(List<Tuple2<ReportGridColumnDefinition, ColumnCommentary>> columnDefinitions,
+    private Grid transform(List<Tuple2<ReportGridFixedColumnDefinition, ColumnCommentary>> columnDefinitions,
                            List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows) {
 
         List<Row> data = new ArrayList<>(reportRows.size());

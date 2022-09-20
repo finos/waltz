@@ -32,11 +32,15 @@ import org.finos.waltz.model.usage_info.UsageKind;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.ChangeInitiative;
 import org.finos.waltz.schema.tables.records.ReportGridColumnDefinitionRecord;
+import org.finos.waltz.schema.tables.records.ReportGridDerivedColumnDefinitionRecord;
+import org.finos.waltz.schema.tables.records.ReportGridFixedColumnDefinitionRecord;
 import org.finos.waltz.schema.tables.records.ReportGridRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
@@ -48,6 +52,7 @@ import java.util.Comparator;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.ToIntFunction;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
@@ -55,7 +60,6 @@ import static java.util.Collections.emptySet;
 import static java.util.Optional.ofNullable;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.*;
-import static org.finos.waltz.common.ArrayUtilities.sum;
 import static org.finos.waltz.common.CollectionUtilities.first;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDate;
@@ -78,14 +82,16 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 @Repository
 public class ReportGridDao {
 
-
+    private static final Logger LOG = LoggerFactory.getLogger(ReportGridDao.class);
 
     private final DSLContext dsl;
 
     private final org.finos.waltz.schema.tables.Measurable m = MEASURABLE.as("m");
     private final org.finos.waltz.schema.tables.MeasurableRating mr = MEASURABLE_RATING.as("mr");
     private final org.finos.waltz.schema.tables.MeasurableCategory mc = MEASURABLE_CATEGORY.as("mc");
+    private final org.finos.waltz.schema.tables.ReportGridFixedColumnDefinition rgfcd = REPORT_GRID_FIXED_COLUMN_DEFINITION.as("rgfcd");
     private final org.finos.waltz.schema.tables.ReportGridColumnDefinition rgcd = REPORT_GRID_COLUMN_DEFINITION.as("rgcd");
+    private final org.finos.waltz.schema.tables.ReportGridDerivedColumnDefinition rgdcd = REPORT_GRID_DERIVED_COLUMN_DEFINITION.as("rgdcd");
     private final org.finos.waltz.schema.tables.ReportGrid rg = Tables.REPORT_GRID.as("rg");
     private final org.finos.waltz.schema.tables.RatingSchemeItem rsi = RATING_SCHEME_ITEM.as("rsi");
     private final org.finos.waltz.schema.tables.EntityHierarchy eh = ENTITY_HIERARCHY.as("eh");
@@ -135,7 +141,7 @@ public class ReportGridDao {
         return dsl
                 .select(rg.fields())
                 .from(rg)
-                .fetchSet(r -> mkReportGridDefinition(rgcd.REPORT_GRID_ID.eq(r.get(rg.ID)), r.into(REPORT_GRID)));
+                .fetchSet(r -> mkReportGridDefinition(DSL.trueCondition(), r.into(REPORT_GRID)));
     }
 
 
@@ -146,7 +152,7 @@ public class ReportGridDao {
                 .leftJoin(REPORT_GRID_MEMBER)
                 .on(rg.ID.eq(REPORT_GRID_MEMBER.GRID_ID))
                 .where(rg.KIND.eq(ReportGridKind.PUBLIC.name()).or(REPORT_GRID_MEMBER.USER_ID.eq(username)))
-                .fetchSet(r -> mkReportGridDefinition(rgcd.REPORT_GRID_ID.eq(r.get(rg.ID)), r.into(REPORT_GRID)));
+                .fetchSet(r -> mkReportGridDefinition(DSL.trueCondition(), r.into(REPORT_GRID)));
     }
 
 
@@ -171,40 +177,122 @@ public class ReportGridDao {
         return getGridDefinitionByCondition(rg.EXTERNAL_ID.eq(externalId));
     }
 
+    public void updateColumnDefinitions(long gridId, ReportGridColumnDefinitionsUpdateCommand updatedCmd) {
 
-    public int updateColumnDefinitions(long gridId, List<ReportGridColumnDefinition> columnDefinitions) {
+        dsl.transaction(ctx -> {
+            DSLContext tx = ctx.dsl();
 
-        int clearedColumns = dsl
+            //cascade delete should clear out the fixed and derived column entries
+            int clearedColumns = deleteExistingColumns(tx, gridId);
+
+            int[] fixedColumnsUpdated = insertFixedColumnDefinitions(tx, gridId, updatedCmd.fixedColumnDefinitions());
+            int[] derivedColumnsUpdated = insertDerivedColumnDefinitions(tx, gridId, updatedCmd.derivedColumnDefinitions());
+
+            LOG.debug(format("Successfully updated columns for grid: %d", gridId));
+        });
+    }
+
+    private int deleteExistingColumns(DSLContext tx, long gridId) {
+        return tx
                 .deleteFrom(rgcd)
                 .where(rgcd.REPORT_GRID_ID.eq(gridId))
                 .execute();
+    }
 
-        int[] columnsUpdated = columnDefinitions
+    private int[] insertFixedColumnDefinitions(DSLContext tx,
+                                               long gridId,
+                                               List<ReportGridFixedColumnDefinition> fixedColumnDefinitions) {
+
+        fixedColumnDefinitions
                 .stream()
-                .map(d -> {
-                    Long fieldReferenceId = d.entityFieldReference() == null
-                            ? null
-                            : d.entityFieldReference().id().orElse(null);
+                .map(c -> {
+                    ReportGridColumnDefinitionRecord columnRecord = dsl.newRecord(rgcd);
+                    columnRecord.setReportGridId(gridId);
+                    columnRecord.setPosition(c.position());
+                    return columnRecord;
+                })
+                .collect(Collectors.collectingAndThen(
+                        toSet(),
+                        d -> tx.batchInsert(d).execute()));
 
-                    ReportGridColumnDefinitionRecord record = dsl.newRecord(rgcd);
+        Map<Integer, Long> positionToColumnMap = tx
+                .select(rgcd.POSITION, rgcd.ID)
+                .from(rgcd)
+                .where(rgcd.REPORT_GRID_ID.eq(gridId)
+                        .and(rgcd.POSITION.in(map(fixedColumnDefinitions, ReportGridFixedColumnDefinition::position))))
+                .fetchMap(rgcd.POSITION, rgcd.ID);
+
+        return fixedColumnDefinitions
+                .stream()
+                .map(fixedCol -> {
+                    Long gridColId = positionToColumnMap.get(fixedCol.position()); // This may be ok so long as we fix into db rule for unique grid position index
+
+                    Long fieldReferenceId = fixedCol.entityFieldReference() == null
+                            ? null
+                            : fixedCol.entityFieldReference().id().orElse(null);
+
+                    ReportGridFixedColumnDefinitionRecord record = tx.newRecord(rgfcd);
                     record.setReportGridId(gridId);
-                    record.setColumnEntityId(d.columnEntityId());
-                    record.setColumnEntityKind(d.columnEntityKind().name());
-                    record.setColumnUsageKind(d.usageKind().name());
-                    record.setRatingRollupRule(d.ratingRollupRule().name());
-                    record.setPosition(Long.valueOf(d.position()).intValue());
-                    record.setDisplayName(d.displayName());
+                    record.setGridColumnId(gridColId);
+                    record.setColumnEntityId(fixedCol.columnEntityId());
+                    record.setColumnEntityKind(fixedCol.columnEntityKind().name());
+                    record.setRatingRollupRule(fixedCol.ratingRollupRule().name());
+                    record.setPosition(Long.valueOf(fixedCol.position()).intValue());
+                    record.setDisplayName(fixedCol.displayName());
                     record.setColumnQualifierKind(Optional
-                            .ofNullable(d.columnQualifierKind())
+                            .ofNullable(fixedCol.columnQualifierKind())
                             .map(Enum::name)
                             .orElse(null));
-                    record.setColumnQualifierId(d.columnQualifierId());
+                    record.setColumnQualifierId(fixedCol.columnQualifierId());
                     record.setEntityFieldReferenceId(fieldReferenceId);
+                    record.setExternalId(fixedCol.externalId().orElse(null));
                     return record;
                 })
-                .collect(collectingAndThen(toSet(), d -> dsl.batchInsert(d).execute()));
+                .collect(collectingAndThen(toSet(), d -> tx.batchInsert(d).execute()));
+    }
 
-        return sum(columnsUpdated);
+
+    private int[] insertDerivedColumnDefinitions(DSLContext tx,
+                                                 long gridId,
+                                                 List<ReportGridDerivedColumnDefinition> derivedColumnDefinitions) {
+
+        derivedColumnDefinitions
+                .stream()
+                .map(c -> {
+                    ReportGridColumnDefinitionRecord columnRecord = dsl.newRecord(rgcd);
+                    columnRecord.setReportGridId(gridId);
+                    columnRecord.setPosition(c.position());
+                    return columnRecord;
+                })
+                .collect(Collectors.collectingAndThen(
+                        toSet(),
+                        d -> tx.batchInsert(d).execute()));
+
+        Map<Integer, Long> positionToColumnMap = tx
+                .select(rgcd.POSITION, rgcd.ID)
+                .from(rgcd)
+                .where(rgcd.REPORT_GRID_ID.eq(gridId)
+                        .and(rgcd.POSITION.in(map(derivedColumnDefinitions, ReportGridDerivedColumnDefinition::position))))
+                .fetchMap(rgcd.POSITION, rgcd.ID);
+
+
+        return derivedColumnDefinitions
+                .stream()
+                .map(derivedCol -> {
+
+                    Long colId = positionToColumnMap.get(derivedCol.position());
+
+                    ReportGridDerivedColumnDefinitionRecord record = tx.newRecord(rgdcd);
+                    record.setGridColumnId(colId);
+                    record.setPosition(Long.valueOf(derivedCol.position()).intValue());
+                    record.setDisplayName(derivedCol.displayName());
+                    record.setExternalId(derivedCol.externalId().orElse(null));
+                    record.setDerivationScript(derivedCol.derivationScript());
+                    record.setColumnDescription(derivedCol.columnDescription());
+                    record.setReportGridId(gridId);
+                    return record;
+                })
+                .collect(collectingAndThen(toSet(), d -> tx.batchInsert(d).execute()));
     }
 
 
@@ -252,7 +340,7 @@ public class ReportGridDao {
                 .innerJoin(REPORT_GRID_MEMBER)
                 .on(rg.ID.eq(REPORT_GRID_MEMBER.GRID_ID))
                 .where(isOwner)
-                .fetchSet(r -> mkReportGridDefinition(rgcd.REPORT_GRID_ID.eq(r.get(rg.ID)), r.into(REPORT_GRID)));
+                .fetchSet(r -> mkReportGridDefinition(DSL.trueCondition(), r.into(REPORT_GRID)));
     }
 
 
@@ -275,7 +363,7 @@ public class ReportGridDao {
     }
 
 
-    private List<ReportGridColumnDefinition> getColumnDefinitions(Condition condition) {
+    private List<ReportGridFixedColumnDefinition> getFixedColumnDefinitions(Condition condition) {
 
         SelectConditionStep<Record7<Long, String, String, String, String, String, String>> measurableColumns = mkSupplementalColumnDefinitionQuery(
                 EntityKind.MEASURABLE,
@@ -407,46 +495,69 @@ public class ReportGridDao {
 
         return dsl
                 .select(extras.fields())
-                .select(fieldsWithout(rgcd, rgcd.ID))
+                .select(fieldsWithout(rgfcd, rgfcd.ID))
+                .select(rgcd.fields())
                 .from(rg)
                 .innerJoin(rgcd).on(rg.ID.eq(rgcd.REPORT_GRID_ID))
-                .innerJoin(extras).on(extras.field(rgcd.ID).eq(rgcd.ID))
+                .innerJoin(rgfcd).on(rgfcd.GRID_COLUMN_ID.eq(rgcd.ID))
+                .innerJoin(extras).on(extras.field(rgfcd.ID).eq(rgfcd.ID))
                 .where(condition)
                 .orderBy(rgcd.POSITION, DSL.field("name", String.class))
                 .fetch(r -> {
-                    EntityFieldReference entityFieldReference = ofNullable(r.get(rgcd.ENTITY_FIELD_REFERENCE_ID))
+                    EntityFieldReference entityFieldReference = ofNullable(r.get(rgfcd.ENTITY_FIELD_REFERENCE_ID))
                             .map(fieldReferenceId -> ImmutableEntityFieldReference.builder()
-                                  .id(fieldReferenceId)
-                                  .fieldName(r.get(efr.FIELD_NAME))
-                                  .entityKind(EntityKind.valueOf(r.get(efr.ENTITY_KIND)))
-                                  .displayName(r.get(efr.DISPLAY_NAME))
-                                  .description(r.get(efr.DESCRIPTION))
-                                  .build())
+                                    .id(fieldReferenceId)
+                                    .fieldName(r.get(efr.FIELD_NAME))
+                                    .entityKind(EntityKind.valueOf(r.get(efr.ENTITY_KIND)))
+                                    .displayName(r.get(efr.DISPLAY_NAME))
+                                    .description(r.get(efr.DESCRIPTION))
+                                    .build())
                             .orElse(null);
 
-                    EntityKind columnQualifierKind = ofNullable(r.get(rgcd.COLUMN_QUALIFIER_KIND))
+                    EntityKind columnQualifierKind = ofNullable(r.get(rgfcd.COLUMN_QUALIFIER_KIND))
                             .map(EntityKind::valueOf)
                             .orElse(null);
 
-                    EntityKind columnEntityKind = EntityKind.valueOf(r.get(rgcd.COLUMN_ENTITY_KIND));
+                    EntityKind columnEntityKind = EntityKind.valueOf(r.get(rgfcd.COLUMN_ENTITY_KIND));
 
-                    return ImmutableReportGridColumnDefinition.builder()
-                            .id(r.get(extras.field(rgcd.ID)))
-                            .columnEntityId(r.get(rgcd.COLUMN_ENTITY_ID))
+                    return ImmutableReportGridFixedColumnDefinition.builder()
+                            .id(r.get(extras.field(rgfcd.ID)))
+                            .columnEntityId(r.get(rgfcd.COLUMN_ENTITY_ID))
                             .columnEntityKind(columnEntityKind)
                             .columnName(r.get("name", String.class))
                             .columnDescription(r.get("desc", String.class))
-                            .displayName(r.get(rgcd.DISPLAY_NAME))
+                            .displayName(r.get(rgfcd.DISPLAY_NAME))
                             .position(r.get(rgcd.POSITION))
-                            .usageKind(ColumnUsageKind.valueOf(r.get(rgcd.COLUMN_USAGE_KIND)))
-                            .ratingRollupRule(RatingRollupRule.valueOf(r.get(rgcd.RATING_ROLLUP_RULE)))
+                            .ratingRollupRule(RatingRollupRule.valueOf(r.get(rgfcd.RATING_ROLLUP_RULE)))
                             .entityFieldReference(entityFieldReference)
                             .columnQualifierKind(columnQualifierKind)
-                            .columnQualifierId(r.get(rgcd.COLUMN_QUALIFIER_ID))
+                            .columnQualifierId(r.get(rgfcd.COLUMN_QUALIFIER_ID))
+                            .externalId(Optional.ofNullable(r.get(rgfcd.EXTERNAL_ID)))
+                            .gridColumnId(r.get(rgfcd.GRID_COLUMN_ID))
                             .build();
                 });
     }
 
+
+    private List<ReportGridDerivedColumnDefinition> getDerivedColumnDefinitions(Condition condition) {
+        return dsl
+                .select(rgdcd.fields())
+                .select(rgcd.fields())
+                .from(rg)
+                .innerJoin(rgcd).on(rg.ID.eq(rgcd.REPORT_GRID_ID))
+                .innerJoin(rgdcd).on(rgdcd.GRID_COLUMN_ID.eq(rgcd.ID))
+                .where(condition)
+                .orderBy(rgcd.POSITION, rgdcd.DISPLAY_NAME)
+                .fetch(r -> ImmutableReportGridDerivedColumnDefinition.builder()
+                        .id(r.get(rgdcd.ID))
+                        .displayName(r.get(rgdcd.DISPLAY_NAME))
+                        .position(r.get(rgcd.POSITION))
+                        .externalId(Optional.ofNullable(r.get(rgdcd.EXTERNAL_ID)))
+                        .columnDescription(r.get(rgdcd.COLUMN_DESCRIPTION))
+                        .derivationScript(r.get(rgdcd.DERIVATION_SCRIPT))
+                        .gridColumnId(r.get(rgdcd.GRID_COLUMN_ID))
+                        .build());
+    }
 
 
     private SelectConditionStep<Record7<Long, String, String, String, String, String, String>> mkAttestationColumnDefinitionQuery(Condition condition) {
@@ -483,24 +594,24 @@ public class ReportGridDao {
                 .unionAll(dynamic)
                 .asTable("possible", "id", "kind", "name", "description");
 
-        Condition colDefToPossibleJoinCond = rgcd.COLUMN_QUALIFIER_KIND.eq(possible.field("kind", String.class))
-                .and(rgcd.COLUMN_QUALIFIER_ID.isNull()
-                     .or(rgcd.COLUMN_QUALIFIER_ID.eq(possible.field("id", Long.class))));
+        Condition colDefToPossibleJoinCond = rgfcd.COLUMN_QUALIFIER_KIND.eq(possible.field("kind", String.class))
+                .and(rgfcd.COLUMN_QUALIFIER_ID.isNull()
+                        .or(rgfcd.COLUMN_QUALIFIER_ID.eq(possible.field("id", Long.class))));
 
         return dsl
-                .select(rgcd.ID,
+                .select(rgfcd.ID,
                         possible.field("name", String.class),
                         possible.field("description", String.class),
                         efr.ENTITY_KIND,
                         efr.DISPLAY_NAME,
                         efr.DESCRIPTION,
                         efr.FIELD_NAME)
-                .from(rgcd)
-                .innerJoin(rg).on(rg.ID.eq(rgcd.REPORT_GRID_ID))
+                .from(rgfcd)
+                .innerJoin(rg).on(rg.ID.eq(rgfcd.REPORT_GRID_ID))
                 .innerJoin(possible).on(colDefToPossibleJoinCond)
-                .leftJoin(efr).on(rgcd.ENTITY_FIELD_REFERENCE_ID.eq(efr.ID))
+                .leftJoin(efr).on(rgfcd.ENTITY_FIELD_REFERENCE_ID.eq(efr.ID))
                 .where(condition)
-                .and(rgcd.COLUMN_ENTITY_KIND.eq(EntityKind.ATTESTATION.name()));
+                .and(rgfcd.COLUMN_ENTITY_KIND.eq(EntityKind.ATTESTATION.name()));
     }
 
 
@@ -523,19 +634,19 @@ public class ReportGridDao {
         Field<String> desc = descriptionField.as("desc");
 
         return dsl
-                .select(rgcd.ID,
+                .select(rgfcd.ID,
                         name,
                         desc,
                         efr.ENTITY_KIND,
                         efr.DISPLAY_NAME,
                         efr.DESCRIPTION,
                         efr.FIELD_NAME)
-                .from(rgcd)
-                .innerJoin(rg).on(rg.ID.eq(rgcd.REPORT_GRID_ID))
-                .leftJoin(t).on(idField.eq(rgcd.COLUMN_ENTITY_ID).and(rgcd.COLUMN_ENTITY_KIND.eq(entityKind.name())))
-                .leftJoin(efr).on(rgcd.ENTITY_FIELD_REFERENCE_ID.eq(efr.ID))
+                .from(rgfcd)
+                .innerJoin(rg).on(rg.ID.eq(rgfcd.REPORT_GRID_ID))
+                .leftJoin(t).on(idField.eq(rgfcd.COLUMN_ENTITY_ID).and(rgfcd.COLUMN_ENTITY_KIND.eq(entityKind.name())))
+                .leftJoin(efr).on(rgfcd.ENTITY_FIELD_REFERENCE_ID.eq(efr.ID))
                 .where(reportCondition)
-                .and(rgcd.COLUMN_ENTITY_KIND.eq(entityKind.name()));
+                .and(rgfcd.COLUMN_ENTITY_KIND.eq(entityKind.name()));
     }
 
     private SelectConditionStep<Record7<Long, String, String, String, String, String, String>> mkEntityDescriptorColumnDefinitionQry(EntityKind entityKind,
@@ -543,18 +654,18 @@ public class ReportGridDao {
                                                                                                                                      String columnDescription,
                                                                                                                                      Condition reportCondition) {
         return dsl
-                .select(rgcd.ID,
+                .select(rgfcd.ID,
                         DSL.val(columnName),
                         DSL.val(columnDescription),
                         efr.ENTITY_KIND,
                         efr.DISPLAY_NAME,
                         efr.DESCRIPTION,
                         efr.FIELD_NAME)
-                .from(rgcd)
-                .innerJoin(rg).on(rg.ID.eq(rgcd.REPORT_GRID_ID))
-                .leftJoin(efr).on(rgcd.ENTITY_FIELD_REFERENCE_ID.eq(efr.ID))
+                .from(rgfcd)
+                .innerJoin(rg).on(rg.ID.eq(rgfcd.REPORT_GRID_ID))
+                .leftJoin(efr).on(rgfcd.ENTITY_FIELD_REFERENCE_ID.eq(efr.ID))
                 .where(reportCondition)
-                .and(rgcd.COLUMN_ENTITY_KIND.eq(entityKind.name()));
+                .and(rgfcd.COLUMN_ENTITY_KIND.eq(entityKind.name()));
     }
 
 
@@ -568,24 +679,24 @@ public class ReportGridDao {
 
         } else {
 
-            Map<Boolean, Collection<ReportGridColumnDefinition>> gridDefinitionsByContainingFieldRef = groupBy(
-                    gridDefn.columnDefinitions(),
+            Map<Boolean, Collection<ReportGridFixedColumnDefinition>> gridDefinitionsByContainingFieldRef = groupBy(
+                    gridDefn.fixedColumnDefinitions(),
                     d -> d.entityFieldReference() == null);
 
-            Collection<ReportGridColumnDefinition> simpleGridDefs = gridDefinitionsByContainingFieldRef.getOrDefault(true, emptySet());
-            Collection<ReportGridColumnDefinition> complexGridDefs = gridDefinitionsByContainingFieldRef.getOrDefault(false, emptySet());
+            Collection<ReportGridFixedColumnDefinition> simpleGridDefs = gridDefinitionsByContainingFieldRef.getOrDefault(true, emptySet());
+            Collection<ReportGridFixedColumnDefinition> complexGridDefs = gridDefinitionsByContainingFieldRef.getOrDefault(false, emptySet());
 
             // SIMPLE GRID DEFS
 
-            Map<EntityKind, Collection<ReportGridColumnDefinition>> colsByKind = groupBy(
+            Map<EntityKind, Collection<ReportGridFixedColumnDefinition>> colsByKind = groupBy(
                     simpleGridDefs,
-                    ReportGridColumnDefinition::columnEntityKind);
+                    ReportGridFixedColumnDefinition::columnEntityKind);
 
-            Map<RatingRollupRule, Collection<ReportGridColumnDefinition>> measurableColumnsByRollupKind = groupBy(
+            Map<RatingRollupRule, Collection<ReportGridFixedColumnDefinition>> measurableColumnsByRollupKind = groupBy(
                     colsByKind.getOrDefault(EntityKind.MEASURABLE, emptySet()),
-                    ReportGridColumnDefinition::ratingRollupRule);
+                    ReportGridFixedColumnDefinition::ratingRollupRule);
 
-            Map<Boolean, Collection<ReportGridColumnDefinition>> dataTypeColumnsByIsExact = groupBy(
+            Map<Boolean, Collection<ReportGridFixedColumnDefinition>> dataTypeColumnsByIsExact = groupBy(
                     colsByKind.getOrDefault(EntityKind.DATA_TYPE, emptySet()),
                     d -> d.ratingRollupRule() == RatingRollupRule.NONE);
 
@@ -606,7 +717,7 @@ public class ReportGridDao {
                                     .description(r.get(efr.DESCRIPTION))
                                     .build());
 
-            Map<EntityKind, Set<Tuple2<ReportGridColumnDefinition, EntityFieldReference>>> complexColsByKind = complexGridDefs
+            Map<EntityKind, Set<Tuple2<ReportGridFixedColumnDefinition, EntityFieldReference>>> complexColsByKind = complexGridDefs
                     .stream()
                     .map(d -> tuple(d, fieldReferencesById.get(d.entityFieldReference().id().get())))
                     .collect(groupingBy(t -> t.v2.entityKind(), toSet()));
@@ -638,7 +749,7 @@ public class ReportGridDao {
 
 
     private Set<ReportGridCell> fetchAttestationData(GenericSelector genericSelector,
-                                                     Collection<ReportGridColumnDefinition> cols) {
+                                                     Collection<ReportGridFixedColumnDefinition> cols) {
         if (isEmpty(cols)) {
             return emptySet();
         } else {
@@ -647,7 +758,7 @@ public class ReportGridDao {
                     c -> tuple(
                             c.columnQualifierKind(),
                             c.columnQualifierId()),
-                    ReportGridColumnDefinition::id);
+                    ReportGridFixedColumnDefinition::gridColumnId);
 
             Condition colConds = DSL.or(map(
                     cols,
@@ -731,14 +842,14 @@ public class ReportGridDao {
 
 
     private Set<ReportGridCell> fetchExactDataTypeData(GenericSelector genericSelector,
-                                                       Collection<ReportGridColumnDefinition> cols) {
+                                                       Collection<ReportGridFixedColumnDefinition> cols) {
         if (isEmpty(cols)) {
             return Collections.emptySet();
         } else {
             Map<Long, Long> dataTypeIdToDefIdMap = indexBy(
                     cols,
-                    ReportGridColumnDefinition::columnEntityId,
-                    ReportGridColumnDefinition::id);
+                    ReportGridFixedColumnDefinition::columnEntityId,
+                    ReportGridFixedColumnDefinition::gridColumnId);
             return dsl
                     .select(dtu.ENTITY_ID,
                             dtu.DATA_TYPE_ID,
@@ -768,15 +879,15 @@ public class ReportGridDao {
 
 
     private Set<ReportGridCell> fetchSummaryDataTypeData(GenericSelector genericSelector,
-                                                         Collection<ReportGridColumnDefinition> cols) {
+                                                         Collection<ReportGridFixedColumnDefinition> cols) {
         if (isEmpty(cols)) {
             return Collections.emptySet();
         } else {
 
             Map<Long, Long> dataTypeIdToDefIdMap = indexBy(
                     cols,
-                    ReportGridColumnDefinition::columnEntityId,
-                    ReportGridColumnDefinition::id);
+                    ReportGridFixedColumnDefinition::columnEntityId,
+                    ReportGridFixedColumnDefinition::gridColumnId);
 
             return dsl
                     .select(dtu.ENTITY_ID,
@@ -826,14 +937,14 @@ public class ReportGridDao {
 
 
     private Set<ReportGridCell> fetchAppGroupData(GenericSelector genericSelector,
-                                                  Collection<ReportGridColumnDefinition> cols) {
+                                                  Collection<ReportGridFixedColumnDefinition> cols) {
         if (isEmpty(cols)) {
             return emptySet();
         } else {
             Map<Long, Long> groupIdToDefIdMap = indexBy(
                     cols,
-                    ReportGridColumnDefinition::columnEntityId,
-                    ReportGridColumnDefinition::id);
+                    ReportGridFixedColumnDefinition::columnEntityId,
+                    ReportGridFixedColumnDefinition::gridColumnId);
 
             SelectOrderByStep<Record3<Long, Long, Timestamp>> appGroupInfoSelect = determineAppGroupQuery(
                     genericSelector,
@@ -934,7 +1045,7 @@ public class ReportGridDao {
 
 
     private Set<ReportGridCell> fetchApplicationFieldReferenceData(GenericSelector selector,
-                                                                  Set<Tuple2<ReportGridColumnDefinition, EntityFieldReference>> requiredApplicationColumns) {
+                                                                   Set<Tuple2<ReportGridFixedColumnDefinition, EntityFieldReference>> requiredApplicationColumns) {
 
         if (isEmpty(requiredApplicationColumns)) {
             return emptySet();
@@ -942,7 +1053,7 @@ public class ReportGridDao {
 
             Set<String> fields = map(requiredApplicationColumns, d -> d.v2.fieldName());
 
-            Map<String, ReportGridColumnDefinition> columnDefinitionsByFieldReference = requiredApplicationColumns
+            Map<String, ReportGridFixedColumnDefinition> columnDefinitionsByFieldReference = requiredApplicationColumns
                     .stream()
                     .collect(toMap(k -> k.v2.fieldName(), v -> v.v1));
 
@@ -955,7 +1066,7 @@ public class ReportGridDao {
                     .flatMap(appRecord -> fields
                             .stream()
                             .map(fieldName -> {
-                                ReportGridColumnDefinition colDefn = columnDefinitionsByFieldReference.get(fieldName);
+                                ReportGridFixedColumnDefinition colDefn = columnDefinitionsByFieldReference.get(fieldName);
 
                                 Field<?> field = APPLICATION.field(fieldName);
                                 Object rawValue = appRecord.get(field);
@@ -971,7 +1082,7 @@ public class ReportGridDao {
                                 return ImmutableReportGridCell
                                         .builder()
                                         .subjectId(appRecord.get(APPLICATION.ID))
-                                        .columnDefinitionId(colDefn.id())
+                                        .columnDefinitionId(colDefn.gridColumnId())
                                         .textValue(textValue)
                                         .build();
                             }))
@@ -989,7 +1100,7 @@ public class ReportGridDao {
 
 
     private Set<ReportGridCell> fetchChangeInitiativeFieldReferenceData(GenericSelector selector,
-                                                                        Set<Tuple2<ReportGridColumnDefinition, EntityFieldReference>> requiredChangeInitiativeColumns) {
+                                                                        Set<Tuple2<ReportGridFixedColumnDefinition, EntityFieldReference>> requiredChangeInitiativeColumns) {
 
         if (isEmpty(requiredChangeInitiativeColumns)) {
             return emptySet();
@@ -997,7 +1108,7 @@ public class ReportGridDao {
 
             Set<String> fields = map(requiredChangeInitiativeColumns, d -> d.v2.fieldName());
 
-            Map<String, ReportGridColumnDefinition> columnDefinitionsByFieldReference = requiredChangeInitiativeColumns
+            Map<String, ReportGridFixedColumnDefinition> columnDefinitionsByFieldReference = requiredChangeInitiativeColumns
                     .stream()
                     .collect(toMap(k -> k.v2.fieldName(), v -> v.v1));
 
@@ -1015,7 +1126,7 @@ public class ReportGridDao {
                     .flatMap(ciRecord -> fields
                             .stream()
                             .map(fieldName -> {
-                                ReportGridColumnDefinition colDefn = columnDefinitionsByFieldReference.get(fieldName);
+                                ReportGridFixedColumnDefinition colDefn = columnDefinitionsByFieldReference.get(fieldName);
 
                                 Object value = ciRecord.get(fieldName);
 
@@ -1026,7 +1137,7 @@ public class ReportGridDao {
                                 return ImmutableReportGridCell
                                         .builder()
                                         .subjectId(ciRecord.get(CHANGE_INITIATIVE.ID))
-                                        .columnDefinitionId(colDefn.id())
+                                        .columnDefinitionId(colDefn.gridColumnId())
                                         .textValue(String.valueOf(value))
                                         .build();
                             }))
@@ -1037,7 +1148,7 @@ public class ReportGridDao {
 
 
     private Set<ReportGridCell> fetchSurveyFieldReferenceData(GenericSelector selector,
-                                                              Set<Tuple2<ReportGridColumnDefinition, EntityFieldReference>> surveyInstanceInfo) {
+                                                              Set<Tuple2<ReportGridFixedColumnDefinition, EntityFieldReference>> surveyInstanceInfo) {
         if (isEmpty(surveyInstanceInfo)) {
             return emptySet();
         } else {
@@ -1045,7 +1156,7 @@ public class ReportGridDao {
             Map<Tuple2<Long, Long>, Long> templateAndFieldRefToDefIdMap = indexBy(
                     surveyInstanceInfo,
                     t -> tuple(t.v1.columnEntityId(), t.v2.id().get()),
-                    t -> t.v1.id());
+                    t -> t.v1.gridColumnId());
 
             Map<Long, Collection<EntityFieldReference>> fieldReferencesByTemplateId = groupBy(
                     surveyInstanceInfo,
@@ -1127,7 +1238,7 @@ public class ReportGridDao {
 
 
     private Set<ReportGridCell> fetchOrgUnitFieldReferenceData(GenericSelector selector,
-                                                               Set<Tuple2<ReportGridColumnDefinition, EntityFieldReference>> requiredOrgUnitColumns) {
+                                                               Set<Tuple2<ReportGridFixedColumnDefinition, EntityFieldReference>> requiredOrgUnitColumns) {
 
         if (isEmpty(requiredOrgUnitColumns)) {
             return emptySet();
@@ -1135,7 +1246,7 @@ public class ReportGridDao {
 
             Set<String> fields = map(requiredOrgUnitColumns, d -> d.v2.fieldName());
 
-            Map<String, ReportGridColumnDefinition> columnDefinitionsByFieldReference = requiredOrgUnitColumns
+            Map<String, ReportGridFixedColumnDefinition> columnDefinitionsByFieldReference = requiredOrgUnitColumns
                     .stream()
                     .collect(toMap(k -> k.v2.fieldName(), v -> v.v1));
 
@@ -1147,7 +1258,7 @@ public class ReportGridDao {
                     .flatMap(orgUnitRecord -> fields
                             .stream()
                             .map(fieldName -> {
-                                ReportGridColumnDefinition colDefn = columnDefinitionsByFieldReference.get(fieldName);
+                                ReportGridFixedColumnDefinition colDefn = columnDefinitionsByFieldReference.get(fieldName);
 
                                 Field<?> field = ORGANISATIONAL_UNIT.field(fieldName);
                                 Object rawValue = orgUnitRecord.get(field);
@@ -1159,7 +1270,7 @@ public class ReportGridDao {
                                 return ImmutableReportGridCell
                                         .builder()
                                         .subjectId(orgUnitRecord.get("entityId", Long.class))
-                                        .columnDefinitionId(colDefn.id())
+                                        .columnDefinitionId(colDefn.gridColumnId())
                                         .textValue(String.valueOf(rawValue))
                                         .build();
                             }))
@@ -1194,14 +1305,14 @@ public class ReportGridDao {
 
 
     private Set<ReportGridCell> fetchInvolvementData(GenericSelector selector,
-                                                     Collection<ReportGridColumnDefinition> cols) {
+                                                     Collection<ReportGridFixedColumnDefinition> cols) {
         if (isEmpty(cols)) {
             return emptySet();
         } else {
             Map<Long, Long> involvementIdToDefIdMap = indexBy(
                     cols,
-                    ReportGridColumnDefinition::columnEntityId,
-                    ReportGridColumnDefinition::id);
+                    ReportGridFixedColumnDefinition::columnEntityId,
+                    ReportGridFixedColumnDefinition::gridColumnId);
 
             return fromCollection(dsl
                     .select(
@@ -1235,7 +1346,7 @@ public class ReportGridDao {
 
 
     private Set<ReportGridCell> fetchTagData(GenericSelector selector,
-                                             Collection<ReportGridColumnDefinition> cols) {
+                                             Collection<ReportGridFixedColumnDefinition> cols) {
         if (isEmpty(cols)) {
             return emptySet();
         } else {
@@ -1243,7 +1354,7 @@ public class ReportGridDao {
             //Should only be one tags column max
             Optional<Long> tagsColumn = cols
                     .stream()
-                    .map(ReportGridColumnDefinition::id)
+                    .map(ReportGridFixedColumnDefinition::gridColumnId)
                     .findFirst();
 
             return tagsColumn
@@ -1275,7 +1386,7 @@ public class ReportGridDao {
     }
 
     private Set<ReportGridCell> fetchAliasData(GenericSelector selector,
-                                               Collection<ReportGridColumnDefinition> cols) {
+                                               Collection<ReportGridFixedColumnDefinition> cols) {
         if (isEmpty(cols)) {
             return emptySet();
         } else {
@@ -1283,7 +1394,7 @@ public class ReportGridDao {
             //Should only be one alias column max
             Optional<Long> aliasColumn = cols
                     .stream()
-                    .map(ReportGridColumnDefinition::id)
+                    .map(ReportGridFixedColumnDefinition::gridColumnId)
                     .findFirst();
 
             return aliasColumn
@@ -1314,7 +1425,7 @@ public class ReportGridDao {
     }
 
     private Set<ReportGridCell> fetchCostData(GenericSelector selector,
-                                              Collection<ReportGridColumnDefinition> cols) {
+                                              Collection<ReportGridFixedColumnDefinition> cols) {
 
         if (isEmpty(cols)) {
             return emptySet();
@@ -1332,8 +1443,8 @@ public class ReportGridDao {
 
             Map<Long, Long> costKindIdToDefIdMap = indexBy(
                     cols,
-                    ReportGridColumnDefinition::columnEntityId,
-                    ReportGridColumnDefinition::id);
+                    ReportGridFixedColumnDefinition::columnEntityId,
+                    ReportGridFixedColumnDefinition::gridColumnId);
 
             return dsl
                     .select(c.ENTITY_ID,
@@ -1354,7 +1465,7 @@ public class ReportGridDao {
 
 
     private Set<ReportGridCell> fetchComplexityData(GenericSelector selector,
-                                                    Collection<ReportGridColumnDefinition> cols) {
+                                                    Collection<ReportGridFixedColumnDefinition> cols) {
 
         if (isEmpty(cols)) {
             return emptySet();
@@ -1362,8 +1473,8 @@ public class ReportGridDao {
 
             Map<Long, Long> complexityKindIdToDefIdMap = indexBy(
                     cols,
-                    ReportGridColumnDefinition::columnEntityId,
-                    ReportGridColumnDefinition::id);
+                    ReportGridFixedColumnDefinition::columnEntityId,
+                    ReportGridFixedColumnDefinition::gridColumnId);
 
             return dsl
                     .select(cx.ENTITY_ID,
@@ -1383,8 +1494,8 @@ public class ReportGridDao {
 
 
     private Set<ReportGridCell> fetchSummaryMeasurableData(GenericSelector selector,
-                                                           Collection<ReportGridColumnDefinition> highCols,
-                                                           Collection<ReportGridColumnDefinition> lowCols) {
+                                                           Collection<ReportGridFixedColumnDefinition> highCols,
+                                                           Collection<ReportGridFixedColumnDefinition> lowCols) {
 
         if (isEmpty(highCols) && isEmpty(lowCols)) {
             return emptySet();
@@ -1392,13 +1503,13 @@ public class ReportGridDao {
 
         Map<Long, Long> highIdToDefIdMap = indexBy(
                 highCols,
-                ReportGridColumnDefinition::columnEntityId,
-                ReportGridColumnDefinition::id);
+                ReportGridFixedColumnDefinition::columnEntityId,
+                ReportGridFixedColumnDefinition::gridColumnId);
 
         Map<Long, Long> lowIdToDefIdMap = indexBy(
                 lowCols,
-                ReportGridColumnDefinition::columnEntityId,
-                ReportGridColumnDefinition::id);
+                ReportGridFixedColumnDefinition::columnEntityId,
+                ReportGridFixedColumnDefinition::gridColumnId);
 
         Table<Record5<Long, String, Long, Integer, String>> ratingSchemeItems = DSL
                 .select(mc.ID.as("mcId"),
@@ -1481,15 +1592,15 @@ public class ReportGridDao {
 
 
     private Set<ReportGridCell> fetchExactMeasurableData(GenericSelector selector,
-                                                         Collection<ReportGridColumnDefinition> cols) {
+                                                         Collection<ReportGridFixedColumnDefinition> cols) {
 
         if (isEmpty(cols)) {
             return emptySet();
         } else {
             Map<Long, Long> measurableIdToDefIdMap = indexBy(
                     cols,
-                    ReportGridColumnDefinition::columnEntityId,
-                    ReportGridColumnDefinition::id);
+                    ReportGridFixedColumnDefinition::columnEntityId,
+                    ReportGridFixedColumnDefinition::gridColumnId);
 
             SelectConditionStep<Record5<Long, Long, Long, String, String>> qry = dsl
                     .select(mr.ENTITY_ID,
@@ -1520,14 +1631,14 @@ public class ReportGridDao {
 
 
     private Set<ReportGridCell> fetchAssessmentData(GenericSelector selector,
-                                                    Collection<ReportGridColumnDefinition> cols) {
+                                                    Collection<ReportGridFixedColumnDefinition> cols) {
         if (isEmpty(cols)) {
             return emptySet();
         } else {
             Map<Long, Long> assessmentIdToDefIdMap = indexBy(
                     cols,
-                    ReportGridColumnDefinition::columnEntityId,
-                    ReportGridColumnDefinition::id);
+                    ReportGridFixedColumnDefinition::columnEntityId,
+                    ReportGridFixedColumnDefinition::gridColumnId);
 
             return dsl
                     .select(ar.ENTITY_ID,
@@ -1553,15 +1664,15 @@ public class ReportGridDao {
 
 
     private Set<ReportGridCell> fetchSurveyQuestionResponseData(GenericSelector selector,
-                                                                Collection<ReportGridColumnDefinition> cols) {
+                                                                Collection<ReportGridFixedColumnDefinition> cols) {
         if (isEmpty(cols)) {
             return emptySet();
         } else {
 
             Map<Long, Long> questionIdToDefIdMap = indexBy(
                     cols,
-                    ReportGridColumnDefinition::columnEntityId,
-                    ReportGridColumnDefinition::id);
+                    ReportGridFixedColumnDefinition::columnEntityId,
+                    ReportGridFixedColumnDefinition::gridColumnId);
 
             Field<Long> latestInstance = DSL
                     .firstValue(SURVEY_INSTANCE.ID)
@@ -1667,7 +1778,8 @@ public class ReportGridDao {
                 .provenance(r.get(rg.PROVENANCE))
                 .lastUpdatedAt(toLocalDateTime(r.get(rg.LAST_UPDATED_AT)))
                 .lastUpdatedBy(r.get(rg.LAST_UPDATED_BY))
-                .columnDefinitions(getColumnDefinitions(condition))
+                .fixedColumnDefinitions(getFixedColumnDefinitions(condition))
+                .derivedColumnDefinitions(getDerivedColumnDefinitions(condition))
                 .subjectKind(EntityKind.valueOf(r.get(rg.SUBJECT_KIND)))
                 .kind(ReportGridKind.valueOf(r.get(rg.KIND)))
                 .build();

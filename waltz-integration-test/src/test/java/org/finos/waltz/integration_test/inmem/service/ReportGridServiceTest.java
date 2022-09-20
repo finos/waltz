@@ -52,7 +52,7 @@ public class ReportGridServiceTest extends BaseInMemoryIntegrationTest {
     @Test
     public void canGetColumnDefinitionsForGrid() throws InsufficientPrivelegeException {
         ReportGridDefinition def = mkGrid();
-        assertEquals(1, def.columnDefinitions().size());
+        assertEquals(1, def.fixedColumnDefinitions().size());
     }
 
 
@@ -120,7 +120,7 @@ public class ReportGridServiceTest extends BaseInMemoryIntegrationTest {
 
         long invKind = involvementHelper.mkInvolvementKind(mkName("dummyInv"));
 
-        ReportGridColumnDefinition colDef = ImmutableReportGridColumnDefinition
+        ReportGridFixedColumnDefinition colDef = ImmutableReportGridFixedColumnDefinition
                 .builder()
                 .columnEntityKind(EntityKind.INVOLVEMENT_KIND)
                 .columnEntityId(invKind)
@@ -129,7 +129,7 @@ public class ReportGridServiceTest extends BaseInMemoryIntegrationTest {
 
         ReportGridColumnDefinitionsUpdateCommand colCmd = ImmutableReportGridColumnDefinitionsUpdateCommand
                 .builder()
-                .columnDefinitions(asSet(colDef))
+                .fixedColumnDefinitions(asSet(colDef))
                 .build();
 
 

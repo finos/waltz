@@ -12,13 +12,16 @@ import {
 export const selectedGrid = writable(null);
 export const filters = writable([]);
 export const columnDefs = writable([]);
+export const derivedColumnDefs = writable([]);
 export const selectedColumn = writable(null);
 export const lastMovedColumn = writable(null);
 export const ownedReportIds = writable([]);
 
 export let columnsChanged = derived([columnDefs, selectedGrid], ([$columnDefs, $selectedGrid]) => {
 
-    const originalColumnDefs = $selectedGrid?.definition.columnDefinitions || [];
+    const originalColumnDefs = _.concat(
+        $selectedGrid?.definition.fixedColumnDefinitions,
+        $selectedGrid?.definition.derivedColumnDefinitions) || [];
 
     if (!$selectedGrid) {
         return false
@@ -33,24 +36,30 @@ export let columnsChanged = derived([columnDefs, selectedGrid], ([$columnDefs, $
     }
 })
 
-export let usageKindChanged = derived(columnDefs, ($columnDefs) => {
-    return _.some($columnDefs, d => d.usageKindChanged)
-});
-
-export let ratingRollupRuleChanged = derived(columnDefs,
+export let ratingRollupRuleChanged = derived(
+    columnDefs,
     ($columnDefs) => _.some($columnDefs, d => d.ratingRollupRuleChanged));
 
-export let displayNameChanged = derived(columnDefs,
+export let displayNameChanged = derived(
+    columnDefs,
     ($columnDefs) => _.some($columnDefs, d => d.displayNameChanged));
 
-export let positionChanged = derived(columnDefs, ($columnDefs) => {
-    return _.some($columnDefs, d => d.originalPosition && d.originalPosition !== d.position);
-});
+export let positionChanged = derived(
+    columnDefs,
+    ($columnDefs) => _.some($columnDefs, d => d.originalPosition && d.originalPosition !== d.position));
+
+export let derivationScriptChanged = derived(
+    columnDefs,
+    ($columnDefs) => _.some($columnDefs, d => d.derivationScriptChanged));
+
+export let externalIdChanged = derived(
+    columnDefs,
+    ($columnDefs) => _.some($columnDefs, d => d.externalIdChanged));
 
 export let hasChanged = derived(
-    [columnsChanged, usageKindChanged, ratingRollupRuleChanged, displayNameChanged, positionChanged],
-    ([$columnsChanged, $usageKindChanged, $ratingRollupRuleChanged, $displayNameChanged, $positionChanged]) => {
-        return $columnsChanged || $usageKindChanged || $ratingRollupRuleChanged || $displayNameChanged || $positionChanged;
+    [columnsChanged, ratingRollupRuleChanged, displayNameChanged, positionChanged, derivationScriptChanged, externalIdChanged],
+    ([$columnsChanged, $ratingRollupRuleChanged, $displayNameChanged, $positionChanged, $derivationScriptChanged, $externalIdChanged]) => {
+        return $columnsChanged || $ratingRollupRuleChanged || $displayNameChanged || $positionChanged || $derivationScriptChanged || $externalIdChanged;
     });
 
 export const tableData = derived(
@@ -72,9 +81,13 @@ export const summaries = derived([selectedGrid, filters, tableData], ([$selected
             $tableData,
             d => Object.assign({}, d, {visible: rowFilter(d)}));
 
+        const columnDefinitions = _.concat(
+            $selectedGrid?.definition.fixedColumnDefinitions,
+            $selectedGrid?.definition.derivedColumnDefinitions);
+
         return refreshSummaries(
             workingTableData,
-            $selectedGrid?.definition.columnDefinitions,
+            columnDefinitions,
             $selectedGrid?.instance.ratingSchemeItems);
     }
 });
