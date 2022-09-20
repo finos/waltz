@@ -52,10 +52,14 @@ export let derivationScriptChanged = derived(
     columnDefs,
     ($columnDefs) => _.some($columnDefs, d => d.derivationScriptChanged));
 
+export let externalIdChanged = derived(
+    columnDefs,
+    ($columnDefs) => _.some($columnDefs, d => d.externalIdChanged));
+
 export let hasChanged = derived(
-    [columnsChanged, ratingRollupRuleChanged, displayNameChanged, positionChanged, derivationScriptChanged],
-    ([$columnsChanged, $ratingRollupRuleChanged, $displayNameChanged, $positionChanged, $derivationScriptChanged]) => {
-        return $columnsChanged || $ratingRollupRuleChanged || $displayNameChanged || $positionChanged || $derivationScriptChanged;
+    [columnsChanged, ratingRollupRuleChanged, displayNameChanged, positionChanged, derivationScriptChanged, externalIdChanged],
+    ([$columnsChanged, $ratingRollupRuleChanged, $displayNameChanged, $positionChanged, $derivationScriptChanged, $externalIdChanged]) => {
+        return $columnsChanged || $ratingRollupRuleChanged || $displayNameChanged || $positionChanged || $derivationScriptChanged || $externalIdChanged;
     });
 
 export const tableData = derived(

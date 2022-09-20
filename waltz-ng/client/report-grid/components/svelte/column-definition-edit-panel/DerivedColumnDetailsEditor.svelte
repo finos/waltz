@@ -12,6 +12,7 @@
     export let onRemove = () => console.log("Remove");
 
     let workingDisplayName = column.displayName;
+    let workingExternalId = column.externalId;
     let workingScript = column.derivationScript;
 
     function cancelEdit(){
@@ -26,6 +27,19 @@
             {
                 displayName: workingDisplayName,
                 displayNameChanged: workingDisplayName !== originalColumn?.displayName
+            })
+        const columnsWithoutCol = _.reject($columnDefs, d => sameColumnRef(d, column));
+        $columnDefs = _.concat(columnsWithoutCol, newColumn);
+    }
+
+    function updateExternalId(workingExternalId, column) {
+        const originalColumn = _.find($selectedGrid.definition.derivedColumnDefinitions, d => sameColumnRef(d, column));
+        const newColumn = Object.assign(
+            {},
+            column,
+            {
+                workingExternalId: workingExternalId,
+                externalIdChanged: workingExternalId !== originalColumn?.externalId
             })
         const columnsWithoutCol = _.reject($columnDefs, d => sameColumnRef(d, column));
         $columnDefs = _.concat(columnsWithoutCol, newColumn);
@@ -59,13 +73,12 @@
     <tr>
         <td>
             <div>Display name</div>
-            <div class="small help-text">The name displayed on the grid.
-            </div>
+            <div class="small help-text">The name displayed on the grid</div>
         </td>
         <td>
             <input class="form-control"
                    required
-                   id="title"
+                   id="displayName"
                    on:change={() => updateDisplayName(workingDisplayName, column)}
                    placeholder="Display name"
                    bind:value={workingDisplayName}>
@@ -73,9 +86,23 @@
     </tr>
     <tr>
         <td>
+            <div>External ID</div>
+            <div class="small help-text">A Fixed name used to reference this column in other derivation scripts</div>
+        </td>
+        <td>
+            <input class="form-control"
+                   required
+                   id="externalId"
+                   placeholder="External Id"
+                   on:change={() => updateExternalId(workingExternalId, column)}
+                   bind:value={workingExternalId}>
+        </td>
+    </tr>
+
+    <tr>
+        <td>
             <div>Derivation Script</div>
-            <div class="small help-text">Calculates the value to be displayed in this column.
-            </div>
+            <div class="small help-text">Calculates the value to be displayed in this column</div>
         </td>
         <td>
             <textarea class="form-control"

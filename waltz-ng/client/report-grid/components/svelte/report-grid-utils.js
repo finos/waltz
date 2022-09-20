@@ -193,8 +193,6 @@ export function prepareColumnDefs(colDefs) {
         }
     };
 
-    console.log("Making cols out of: ", {colDefs});
-
     const additionalColumns = _
         .chain(colDefs)
         .map(c => {

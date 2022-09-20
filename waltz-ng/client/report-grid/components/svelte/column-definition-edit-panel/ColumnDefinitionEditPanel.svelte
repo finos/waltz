@@ -273,8 +273,7 @@
             <h4>Add a derived column:</h4>
             <div style="padding-bottom: 1em">
                 <strong>Display name</strong>
-                <div class="small help-text">The name displayed on the grid.
-                </div>
+                <div class="small help-text">The name displayed on the grid.</div>
                 <input class="form-control"
                        required
                        id="title"
@@ -283,8 +282,7 @@
             </div>
             <div style="padding-bottom: 1em">
                 <strong>External Id</strong>
-                <div class="small help-text">A Fixed name used to reference this column in other derivation scripts.
-                </div>
+                <div class="small help-text">A name used to reference this column in other derivation scripts.</div>
                 <input class="form-control"
                        required
                        id="externalId"
@@ -293,8 +291,7 @@
             </div>
             <div style="padding-bottom: 1em">
                 <strong>Description</strong>
-                <div class="small help-text">A description of this column.
-                </div>
+                <div class="small help-text">A description of this column.</div>
                 <input class="form-control"
                        required
                        id="description"
@@ -312,14 +309,18 @@
                           placeholder="Enter script here"
                           bind:value={workingDerivedCol.derivationScript}/>
             </div>
-            <button class="btn btn-skinny"
-                    on:click={() => addDerivedColumn()}>
-                <strong>Done</strong>
-            </button>
-            <button class="btn btn-skinny"
-                    on:click={() => cancel()}>
-                <strong>Cancel</strong>
-            </button>
+            <span>
+                <button class="btn btn-skinny"
+                        disabled={workingDerivedCol.displayName == null || workingDerivedCol.derivationScript == null}
+                        on:click={() => addDerivedColumn()}>
+                    Done
+                </button>
+                |
+                <button class="btn btn-skinny"
+                        on:click={() => cancel()}>
+                    Cancel
+                </button>
+            </span>
         {/if}
     </div>
 </div>
