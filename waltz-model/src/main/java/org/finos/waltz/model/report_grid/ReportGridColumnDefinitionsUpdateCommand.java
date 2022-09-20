@@ -12,6 +12,8 @@ import java.util.List;
 @JsonDeserialize(as = ImmutableReportGridColumnDefinitionsUpdateCommand.class)
 public abstract class ReportGridColumnDefinitionsUpdateCommand implements Command {
 
-    public abstract List<ReportGridColumnDefinition> columnDefinitions();
+    public abstract List<ReportGridFixedColumnDefinition> fixedColumnDefinitions();
+
+    public abstract List<ReportGridDerivedColumnDefinition> derivedColumnDefinitions();
 
 }

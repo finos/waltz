@@ -18,6 +18,9 @@
 
 package org.finos.waltz.service.report_grid;
 
+import org.finos.waltz.common.CollectionUtilities;
+import org.finos.waltz.common.ListUtilities;
+import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.common.exception.NotFoundException;
 import org.finos.waltz.data.GenericSelector;
@@ -26,9 +29,7 @@ import org.finos.waltz.data.application.ApplicationDao;
 import org.finos.waltz.data.change_initiative.ChangeInitiativeDao;
 import org.finos.waltz.data.report_grid.ReportGridDao;
 import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.HierarchyQueryScope;
 import org.finos.waltz.model.IdSelectionOptions;
-import org.finos.waltz.model.ImmutableIdSelectionOptions;
 import org.finos.waltz.model.application.Application;
 import org.finos.waltz.model.change_initiative.ChangeInitiative;
 import org.finos.waltz.model.rating.RatingSchemeItem;
@@ -108,8 +109,7 @@ public class ReportGridService {
         //    If you are changing this please ensure you have tested with realistic test data.
         IdSelectionOptions opts = modifySelectionOptionsForGrid(idSelectionOptions);
 
-        LOG.info("ReportGrid - getting by ID={} SelectionOptions={}",id,idSelectionOptions);
-
+        LOG.info("ReportGrid - getting by ID={} SelectionOptions={}", id, idSelectionOptions);
         ReportGridDefinition definition = reportGridDao.getGridDefinitionById(id);
 
         if (definition == null) {
@@ -120,6 +120,18 @@ public class ReportGridService {
         EntityKind targetKind = definition.subjectKind();
 
         ReportGridInstance instance = mkInstance(id, opts, targetKind);
+
+        if (!definition.derivedColumnDefinitions().isEmpty()) {
+            Set<ReportGridCell> calculatedCells = ReportGridColumnCalculator.calculate(instance, definition);
+
+            return Optional.of(ImmutableReportGrid
+                    .builder()
+                    .definition(definition)
+                    .instance(ImmutableReportGridInstance
+                            .copyOf(instance)
+                            .withCellData(SetUtilities.union(instance.cellData(), calculatedCells)))
+                    .build());
+        }
 
         return Optional.of(ImmutableReportGrid
                 .builder()
@@ -187,7 +199,7 @@ public class ReportGridService {
                                                         ReportGridColumnDefinitionsUpdateCommand updateCommand,
                                                         String username) throws InsufficientPrivelegeException {
         checkIsOwner(reportGridId, username);
-        reportGridDao.updateColumnDefinitions(reportGridId, updateCommand.columnDefinitions());
+        reportGridDao.updateColumnDefinitions(reportGridId, updateCommand);
         return reportGridDao.getGridDefinitionById(reportGridId);
     }
 
@@ -244,4 +256,5 @@ public class ReportGridService {
     public ReportGridDefinition getGridDefinitionById(long gridId) {
         return reportGridDao.getGridDefinitionById(gridId);
     }
+
 }

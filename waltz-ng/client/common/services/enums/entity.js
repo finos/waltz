@@ -323,6 +323,27 @@ export const entity = {
         name: "Process Diagram",
         icon: "cogs",
         description: null,
+        position: 231
+    },
+    REPORT_GRID: {
+        key: "REPORT_GRID",
+        name: "Report Grid",
+        icon: "table",
+        description: null,
+        position: 231
+    },
+    REPORT_GRID_DERIVED_COLUMN_DEFINITION: {
+        key: "REPORT_GRID_DERIVED_COLUMN_DEFINITION",
+        name: "Report Grid Derived Column Definition",
+        icon: "cubes",
+        description: null,
+        position: 232
+    },
+    REPORT_GRID_FIXED_COLUMN_DEFINITION: {
+        key: "REPORT_GRID_FIXED_COLUMN_DEFINITION",
+        name: "Report Grid Fixed Column Definition",
+        icon: "cube",
+        description: null,
         position: 233
     },
     ROADMAP: {

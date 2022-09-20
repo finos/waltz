@@ -77,6 +77,8 @@ public enum EntityKind {
     PROCESS_DIAGRAM("Process Diagram"),
     RELATIONSHIP_KIND("Relationship Kind"),
     REPORT_GRID("Report Grid"),
+    REPORT_GRID_DERIVED_COLUMN_DEFINITION("Report Grid Derived Column Definition"),
+    REPORT_GRID_FIXED_COLUMN_DEFINITION("Report Grid Fixed Column Definition"),
     ROADMAP("Roadmap"),
     ROLE("Role"),
     SCENARIO("Scenario"),

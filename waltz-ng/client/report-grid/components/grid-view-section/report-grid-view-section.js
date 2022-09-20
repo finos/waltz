@@ -22,8 +22,9 @@ import {mkSelectionOptions} from "../../../common/selector-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
 import ReportGridControlPanel from "../svelte/ReportGridControlPanel.svelte";
-import {activeSummaries, columnDefs, filters, selectedGrid} from "../svelte/report-grid-store";
+import {activeSummaries, columnDefs, derivedColumnDefs, filters, selectedGrid} from "../svelte/report-grid-store";
 import {
+    combineColDefs,
     mkLocalStorageFilterKey,
     mkRowFilter,
     prepareColumnDefs,
@@ -61,6 +62,8 @@ function controller($scope, serviceBroker, localStorageService) {
 
 
     function getDefaultSummaryColumns(columnDefs) {
+
+        // These needs to go so no default summaries!!!
         const dfltFilters = _
             .chain(columnDefs)
             .filter(d => d.usageKind === "SUMMARY")
@@ -92,7 +95,7 @@ function controller($scope, serviceBroker, localStorageService) {
     function getSummaryColumns(gridData) {
         return coalesceFns(
             () => getSummaryColumnsFromLocalStorage(gridData),
-            () => getDefaultSummaryColumns(gridData?.definition.columnDefinitions));
+            () => getDefaultSummaryColumns(gridData?.definition.fixedColumnDefinitions));
     }
 
 
@@ -113,10 +116,12 @@ function controller($scope, serviceBroker, localStorageService) {
                     activeSummaries.set(summaries);
 
                     selectedGrid.set(gridData);
-                    columnDefs.set(gridData?.definition.columnDefinitions);
+
+                    const colDefs = combineColDefs(gridData);
+                    columnDefs.set(colDefs);
 
                     vm.allTableData = prepareTableData(vm.rawGridData);
-                    vm.allColumnDefs = prepareColumnDefs(vm.rawGridData);
+                    vm.allColumnDefs = prepareColumnDefs(colDefs);
                     refresh();
                 }
             })

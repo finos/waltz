@@ -5,6 +5,7 @@ import {amberBg, blueBg, determineForegroundColor, greenBg, greyBg, pinkBg} from
 import {scaleLinear} from "d3-scale";
 import {extent} from "d3-array";
 import {subtractYears} from "../../../common/date-utils";
+import {mkRef, refToString} from "../../../common/entity-utils";
 
 
 export const reportGridMember = {
@@ -112,20 +113,7 @@ const unknownRating = {
     position: 0
 };
 
-
-
-function initialiseDataForRow(subject, columnDefs) {
-    return _.reduce(
-        columnDefs,
-        (acc, c) => {
-            acc[c.id] = unknownRating;
-            return acc;
-        },
-        {subject});
-}
-
-
-export function getColumnName(column) {
+function getFixedColumnName(column) {
     let entityFieldName = _.get(column, ["entityFieldReference", "displayName"], null);
 
     return _.chain([])
@@ -136,18 +124,26 @@ export function getColumnName(column) {
         .value();
 }
 
+export function getColumnName(column) {
+    switch (column.kind) {
+        case "REPORT_GRID_FIXED_COLUMN_DEFINITION":
+            return getFixedColumnName(column)
+        case "REPORT_GRID_DERIVED_COLUMN_DEFINITION":
+            return column.displayName;
+            throw `Cannot determine name for unknown column kind: ${column.kind}`;
+    }
+}
+
 export function getDisplayNameForColumn(c) {
     if (c.displayName != null) {
         return c.displayName;
     } else {
         return getColumnName(c);
     }
-
 }
 
 
-export function prepareColumnDefs(gridData) {
-    const colDefs = _.get(gridData, ["definition", "columnDefinitions"], []);
+export function prepareColumnDefs(colDefs) {
 
     const mkColumnCustomProps = (c) => {
         switch (c.columnEntityKind) {
@@ -178,7 +174,7 @@ export function prepareColumnDefs(gridData) {
             default:
                 return {
                     allowSummary: true,
-                    toSearchTerm: d => _.get(d, [c.id, "text"], ""),
+                    toSearchTerm: d => _.get(d, [c.gridColumnId, "text"], ""),
                     cellTemplate:
                         `<div class="waltz-grid-report-cell"
                               ng-bind="COL_FIELD.text"
@@ -202,7 +198,7 @@ export function prepareColumnDefs(gridData) {
         .map(c => {
             return Object.assign(
                 {
-                    field: c.id.toString(), // ui-grid doesn't like numeric field references
+                    field: c.gridColumnId.toString(), // ui-grid doesn't like numeric field references
                     displayName: getDisplayNameForColumn(c),
                     columnDef: c,
                     width: 100,
@@ -284,9 +280,9 @@ function calculateComplexityColorScales(gridData) {
 function calculateColorScales(gridData, entityKind, startColor, endColor) {
     const cols = _
         .chain(gridData)
-        .get(["definition", "columnDefinitions"], [])
+        .get(["definition", "fixedColumnDefinitions"], [])
         .filter(cd => cd.columnEntityKind === entityKind)
-        .map(cd => cd.id)
+        .map(cd => cd.gridColumnId)
         .value();
 
     return _
@@ -339,6 +335,16 @@ function mkAttestationCell(dataCell, baseCell) {
 }
 
 
+export function combineColDefs(gridData) {
+    const fixedColDefs = _.get(gridData, ["definition", "fixedColumnDefinitions"], []);
+    const derivedColDefs = _.get(gridData, ["definition", "derivedColumnDefinitions"], []);
+
+    return _.orderBy(
+        _.concat(fixedColDefs, derivedColDefs),
+        d => d.position);
+}
+
+
 export function prepareTableData(gridData) {
 
     const ratingSchemeItemsById = _
@@ -350,14 +356,14 @@ export function prepareTableData(gridData) {
         .keyBy(d => d.id)
         .value();
 
-    const colDefs = _.get(gridData, ["definition", "columnDefinitions"], []);
-    const colsById = _.keyBy(colDefs, cd => cd.id);
+    const colDefs = combineColDefs(gridData);
+    const colsById = _.keyBy(colDefs, cd => cd.gridColumnId);
 
     const costColorScalesByColumnDefinitionId = calculateCostColorScales(gridData);
     const complexityColorScalesByColumnDefinitionId = calculateComplexityColorScales(gridData);
 
     function mkTableCell(dataCell) {
-        const colDef = colsById[dataCell.columnDefinitionId];
+        const colDef = _.get(colsById, [dataCell.columnDefinitionId]);
 
         const baseCell = {
             fontColor: "#3b3b3b",
@@ -405,15 +411,25 @@ export function prepareTableData(gridData) {
             case "ASSESSMENT_DEFINITION":
             case "MEASURABLE":
                 const ratingSchemeItem = ratingSchemeItemsById[dataCell.ratingIdValue];
-                const popoverHtml = mkPopoverHtml(dataCell, ratingSchemeItem);
                 return Object.assign({}, baseCell, {
-                    comment: popoverHtml,
+                    comment: mkPopoverHtml(dataCell, ratingSchemeItem),
                     color: ratingSchemeItem.color,
                     fontColor: ratingSchemeItem.fontColor,
                     text: ratingSchemeItem.name,
                 });
+            case "REPORT_GRID_DERIVED_COLUMN_DEFINITION":
+                return Object.assign({}, baseCell, {
+                    comment: dataCell.errorValue
+                        ? `<span class="force-wrap" style="word-break: break-all">${dataCell.errorValue}</span>`
+                        : null,
+                    color: dataCell.errorValue
+                        ? "#F6AAB7"
+                        : "#86C9F6",
+                    fontColor: "black",
+                    text: dataCell.errorValue || dataCell.textValue
+                });
             default:
-                console.error(`Cannot prepare table data for column kind:  ${colDef.columnEntityKind}, colId: ${colDef.id}`);
+                console.error(`Cannot prepare table data for column kind:  ${colDef.columnEntityKind}, colId: ${colDef.gridColumnId}`);
                 return {
                     text: dataCell.textValue,
                     comment: dataCell.comment
@@ -428,7 +444,7 @@ export function prepareTableData(gridData) {
     const emptyRow = _.reduce(
         colDefs,
         (acc, c) => {
-            acc[c.id] = unknownRating;
+            acc[c.gridColumnId] = unknownRating;
             return acc;
         },
         {});
@@ -495,7 +511,7 @@ export function refreshSummaries(tableData,
         return acc;
     };
 
-    const columnsById = _.keyBy(columnDefinitions, cd => cd.id);
+    const columnsById = _.keyBy(columnDefinitions, cd => cd.gridColumnId);
 
     return _
         .chain(tableData)
@@ -555,8 +571,7 @@ export function mkRowFilter(filters = []) {
 }
 
 
-export function sameColumnRef(v1, v2) {
-    if (!v1 || !v2) return false;
+function sameFixedColumnRefs(v1, v2) {
 
     const fieldRef1 = _.get(v1, ["entityFieldReference", "id"], null);
     const fieldRef2 = _.get(v2, ["entityFieldReference", "id"], null);
@@ -572,6 +587,30 @@ export function sameColumnRef(v1, v2) {
         && fieldRef1 === fieldRef2
         && qualiKind1 === qualiKind2
         && qualiId1 === qualiId2;
+}
+
+function sameDerivedColumnRefs(v1, v2) {
+
+    const name1 = _.get(v1, ["displayName"], null);
+    const name2 = _.get(v2, ["displayName"], null);
+
+    return name1 === name2;
+}
+
+export function sameColumnRef(v1, v2) {
+    if (!v1 || !v2) return false;
+
+    let sameColumnKind = v1.kind === v2.kind;
+
+    if (!sameColumnKind) {
+        return false;
+    } else if (v1.kind === "REPORT_GRID_FIXED_COLUMN_DEFINITION") {
+        return sameFixedColumnRefs(v1, v2);
+    } else if (v1.kind === "REPORT_GRID_DERIVED_COLUMN_DEFINITION") {
+        return sameDerivedColumnRefs(v1, v2);
+    } else {
+        throw `Cannot identify column kind to compare: ${v1.kind}}`
+    }
 }
 
 

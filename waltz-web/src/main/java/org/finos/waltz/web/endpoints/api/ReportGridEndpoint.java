@@ -18,6 +18,7 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.common.FunctionUtilities;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.common.exception.NotFoundException;
 import org.finos.waltz.model.report_grid.*;
@@ -80,10 +81,16 @@ public class ReportGridEndpoint implements Endpoint {
 
     public ReportGrid getViewByIdRoute(Request req,
                                        Response resp) throws IOException {
-        return reportGridService.getByIdAndSelectionOptions(
-                getId(req),
-                readIdSelectionOptionsFromBody(req))
-                .orElseThrow(() -> new NotFoundException("404","ID not found"));
+        return FunctionUtilities.time("load grid", () -> {
+            try {
+                return reportGridService.getByIdAndSelectionOptions(
+                                getId(req),
+                                readIdSelectionOptionsFromBody(req))
+                        .orElseThrow(() -> new NotFoundException("404", "ID not found"));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
 
