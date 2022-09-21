@@ -128,7 +128,7 @@ public class ScheduledJobService {
         runIfNeeded(JobKey.ATTESTATION_ISSUE_INSTANCES,
                 (jk) -> attestationRunService.issueInstancesForPendingRuns());
 
-        runIfNeeded(JobKey.REPORT_GRID_FILTER_PRESET,
+        runIfNeeded(JobKey.REPORT_GRID_RECALCULATE_APP_GROUPS_FROM_FILTERS,
                 (jk) -> reportGridFilterViewService.generateAppGroupsFromFilter());
     }
 

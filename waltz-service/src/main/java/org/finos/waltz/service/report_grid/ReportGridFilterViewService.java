@@ -27,6 +27,7 @@ import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.app_group.AppGroupEntry;
 import org.finos.waltz.model.app_group.ImmutableAppGroupEntry;
 import org.finos.waltz.model.entity_named_note.EntityNamedNote;
+import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.model.report_grid.*;
 import org.finos.waltz.service.app_group.AppGroupService;
 import org.finos.waltz.service.entity_named_note.EntityNamedNoteService;
@@ -42,11 +43,12 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.CollectionUtilities.first;
-import static org.finos.waltz.common.CollectionUtilities.isEmpty;
+import static org.finos.waltz.common.CollectionUtilities.*;
 import static org.finos.waltz.common.ListUtilities.map;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.MapUtilities.indexBy;
+import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.SetUtilities.intersection;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 import static org.finos.waltz.service.report_grid.ReportGridUtilities.*;
@@ -113,7 +115,7 @@ public class ReportGridFilterViewService {
 
                     Set<ReportGridCell> cellData = instance.cellData();
 
-                    Set<Long> subjectsPassingFilters = applyFilters(cellData, d.gridFilters());
+                    Set<Long> subjectsPassingFilters = applyFilters(cellData, d.gridFilters(), instance.ratingSchemeItems());
 
                     Set<AppGroupEntry> appGroupEntries = SetUtilities.map(
                             subjectsPassingFilters,
@@ -129,12 +131,16 @@ public class ReportGridFilterViewService {
                 .collect(Collectors.toSet());
     }
 
-    private Set<Long> applyFilters(Set<ReportGridCell> cellData, Set<GridFilter> gridFilters) {
+    private Set<Long> applyFilters(Set<ReportGridCell> cellData,
+                                   Set<GridFilter> gridFilters,
+                                   Set<RatingSchemeItem> ratingSchemeItems) {
 
         if (isEmpty(gridFilters)) {
             //If there are no filters all the apps should populate the group
             return SetUtilities.map(cellData, ReportGridCell::subjectId);
         } else {
+
+            Map<Long, RatingSchemeItem> ratingSchemeItemByIdMap = indexBy(ratingSchemeItems, d -> d.id().get());
 
             Map<Long, Collection<ReportGridCell>> dataByCol = groupBy(cellData, ReportGridCell::columnDefinitionId);
 
@@ -145,7 +151,16 @@ public class ReportGridFilterViewService {
 
                         return cellDataForColumn
                                 .stream()
-                                .filter(c -> d.optionCodes().contains(c.optionCode()))
+                                .filter(c -> {
+                                    // rating cells may want to look up on rating id / code / external id
+                                    if (c.ratingIdValue() != null) {
+                                        RatingSchemeItem rating = ratingSchemeItemByIdMap.get(c.ratingIdValue());
+                                        Set<String> ratingIdentifiers = asSet(c.optionCode(), String.valueOf(rating.rating()), rating.name(), rating.externalId().orElse(null));
+                                        return notEmpty(intersection(d.optionCodes(), ratingIdentifiers));
+                                    } else {
+                                        return d.optionCodes().contains(c.optionCode());
+                                    }
+                                })
                                 .map(ReportGridCell::subjectId)
                                 .collect(Collectors.toSet());
                     })
