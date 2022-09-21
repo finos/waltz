@@ -19,6 +19,7 @@ package org.finos.waltz.web.endpoints.extracts.reportgrid;
 
 import org.finos.waltz.model.application.LifecyclePhase;
 import org.finos.waltz.model.report_grid.ReportGrid;
+import org.finos.waltz.model.report_grid.ReportGridDerivedColumnDefinition;
 import org.finos.waltz.model.report_grid.ReportGridFixedColumnDefinition;
 import org.finos.waltz.model.report_grid.ReportSubject;
 import org.finos.waltz.web.endpoints.extracts.ColumnCommentary;
@@ -53,19 +54,21 @@ public class DynamicCommaSeperatedValueFormatter implements DynamicFormatter {
     public byte[] format(String id,
                          ReportGrid reportGrid,
                          List<Tuple2<ReportGridFixedColumnDefinition, ColumnCommentary>> columnDefinitions,
-                         List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows) throws IOException{
+                         List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows) throws IOException {
         try {
-            LOG.info("Generating CSV report {}",id);
-            return mkCSVReport(columnDefinitions, reportRows);
+            LOG.info("Generating CSV report {}", id);
+            return mkCSVReport(columnDefinitions, reportGrid.definition().derivedColumnDefinitions(), reportRows);
         } catch (IOException e) {
-           LOG.warn("Encounter error when trying to generate CSV report.  Details:{}", e.getMessage());
-           throw e;
+            LOG.warn("Encounter error when trying to generate CSV report.  Details:{}", e.getMessage());
+            throw e;
         }
     }
 
-    private byte[] mkCSVReport(List<Tuple2<ReportGridFixedColumnDefinition, ColumnCommentary>> columnDefinitions,
+    private byte[] mkCSVReport(List<Tuple2<ReportGridFixedColumnDefinition, ColumnCommentary>> fixedColumnDefinitions,
+                               List<ReportGridDerivedColumnDefinition> derivedColumnDefinitions,
                                List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows) throws IOException {
-        List<String> headers = formatterUtils.mkHeaderStrings(columnDefinitions);
+
+        List<String> headers = formatterUtils.mkHeaderStrings(fixedColumnDefinitions, derivedColumnDefinitions);
 
         StringWriter writer = new StringWriter();
         CsvListWriter csvWriter = new CsvListWriter(writer, CsvPreference.EXCEL_PREFERENCE);

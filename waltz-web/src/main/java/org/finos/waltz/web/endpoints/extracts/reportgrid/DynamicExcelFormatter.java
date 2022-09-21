@@ -26,6 +26,7 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.finos.waltz.model.application.LifecyclePhase;
 import org.finos.waltz.model.external_identifier.ExternalIdValue;
 import org.finos.waltz.model.report_grid.ReportGrid;
+import org.finos.waltz.model.report_grid.ReportGridDerivedColumnDefinition;
 import org.finos.waltz.model.report_grid.ReportGridFixedColumnDefinition;
 import org.finos.waltz.model.report_grid.ReportSubject;
 import org.finos.waltz.web.endpoints.extracts.ColumnCommentary;
@@ -70,7 +71,7 @@ public class DynamicExcelFormatter implements DynamicFormatter {
                          List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows)  throws IOException{
         try {
             LOG.info("Generating Excel report {}",id);
-            return mkExcelReport(id,columnDefinitions,reportRows);
+            return mkExcelReport(id, columnDefinitions, reportGrid.definition().derivedColumnDefinitions(), reportRows);
         } catch (IOException e) {
            LOG.warn("Encounter error when trying to generate CSV report.  Details:{}", e.getMessage());
            throw e;
@@ -79,12 +80,14 @@ public class DynamicExcelFormatter implements DynamicFormatter {
 
 
     private byte[] mkExcelReport(String reportName,
-                                 List<Tuple2<ReportGridFixedColumnDefinition, ColumnCommentary>> columnDefinitions,
+                                 List<Tuple2<ReportGridFixedColumnDefinition, ColumnCommentary>> fixedColumnDefinitions,
+                                 List<ReportGridDerivedColumnDefinition> derivedColumnDefinitions,
                                  List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows) throws IOException {
+
         SXSSFWorkbook workbook = new SXSSFWorkbook(2000);
         SXSSFSheet sheet = workbook.createSheet(ExtractorUtilities.sanitizeSheetName(reportName));
 
-        int colCount = writeExcelHeader(columnDefinitions, sheet);
+        int colCount = writeExcelHeader(fixedColumnDefinitions, derivedColumnDefinitions, sheet);
         writeExcelBody(reportRows, sheet);
 
         sheet.setAutoFilter(new CellRangeAddress(0, 0, 0, colCount - 1));
@@ -148,10 +151,13 @@ public class DynamicExcelFormatter implements DynamicFormatter {
     }
 
 
-    private int writeExcelHeader(List<Tuple2<ReportGridFixedColumnDefinition, ColumnCommentary>> columnDefinitions, SXSSFSheet sheet) {
+    private int writeExcelHeader(List<Tuple2<ReportGridFixedColumnDefinition, ColumnCommentary>> fixedColumnDefinitions,
+                                 List<ReportGridDerivedColumnDefinition> derivedColumnDefinitions,
+                                 SXSSFSheet sheet) {
+
         Row headerRow = sheet.createRow(0);
         AtomicInteger colNum = new AtomicInteger();
-        formatterUtils.mkHeaderStrings(columnDefinitions).forEach(hdr -> writeExcelHeaderCell(headerRow, colNum, hdr));
+        formatterUtils.mkHeaderStrings(fixedColumnDefinitions, derivedColumnDefinitions).forEach(hdr -> writeExcelHeaderCell(headerRow, colNum, hdr));
         return colNum.get();
     }
 

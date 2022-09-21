@@ -21,10 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.finos.waltz.model.report_grid.ReportGrid;
-import org.finos.waltz.model.report_grid.ReportGridDefinition;
-import org.finos.waltz.model.report_grid.ReportGridFixedColumnDefinition;
-import org.finos.waltz.model.report_grid.ReportSubject;
+import org.finos.waltz.model.report_grid.*;
 import org.finos.waltz.web.endpoints.extracts.ColumnCommentary;
 import org.finos.waltz.web.json.*;
 import org.jooq.lambda.tuple.Tuple2;
@@ -81,10 +78,10 @@ public class DynamicJSONFormatter implements DynamicFormatter {
         ReportGridDefinition reportGridDefinition = reportGrid.definition();
         ReportGridJSON reportGridJSON =
                 ImmutableReportGridJSON.builder()
-                        .id(reportGridDefinition.externalId().orElseGet(()->""+reportGridDefinition.id()))
+                        .id(reportGridDefinition.externalId().orElseGet(() -> "" + reportGridDefinition.id()))
                         .apiTypes(new ApiTypes())
                         .name(reportGridDefinition.name())
-                        .grid(transform(columnDefinitions,reportRows))
+                        .grid(transform(columnDefinitions, reportGrid.definition().derivedColumnDefinitions(), reportRows))
                         .build();
 
         return createMapper()
@@ -92,7 +89,8 @@ public class DynamicJSONFormatter implements DynamicFormatter {
     }
 
 
-    private Grid transform(List<Tuple2<ReportGridFixedColumnDefinition, ColumnCommentary>> columnDefinitions,
+    private Grid transform(List<Tuple2<ReportGridFixedColumnDefinition, ColumnCommentary>> fixedColumnDefinitions,
+                           List<ReportGridDerivedColumnDefinition> derivedColumnDefinitions,
                            List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows) {
 
         List<Row> data = new ArrayList<>(reportRows.size());
@@ -103,14 +101,16 @@ public class DynamicJSONFormatter implements DynamicFormatter {
             List<CellValue> transformedRowValues = new ArrayList<>();
 
             transformedRow.id(createKeyElement(currentRow.v1));
-            List<String> columnHeadings = formatterUtils.mkColumnHeaders(columnDefinitions);
+
+            List<String> columnHeadings = formatterUtils.mkColumnHeaders(fixedColumnDefinitions, derivedColumnDefinitions);
+
             int maxColumns = columnHeadings.size();
 
             for (int idx = 0; idx < maxColumns; idx++) {
                 String formattedColumnName = columnHeadings.get(idx) != null
                         ? columnHeadings.get(idx)
                         : "";
-                int prevCellAddedIdx= transformedRowValues.size() - 1;
+                int prevCellAddedIdx = transformedRowValues.size() - 1;
                 boolean isComment = formattedColumnName.contains("comment");
                 Object currentCell = currentRow.v2.get(idx);
                 if (currentCell != null) {
