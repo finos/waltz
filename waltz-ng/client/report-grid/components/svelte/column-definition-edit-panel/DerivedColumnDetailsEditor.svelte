@@ -100,7 +100,7 @@
     <tr>
         <td>
             <div>External ID</div>
-            <div class="small help-text">A Fixed name used to reference this column in other derivation scripts</div>
+            <div class="small help-text">An identifier used to reference this column in other derivation scripts</div>
         </td>
         <td>
             <input class="form-control"

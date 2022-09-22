@@ -10,7 +10,21 @@
     export let onCancel = () => console.log("Close");
     export let onRemove = () => console.log("Remove");
 
-    let workingDisplayName = column.displayName;
+    let working = {
+        id: column.id,
+        displayName: column.displayName,
+        externalId: column.externalId,
+    }
+
+    $: {
+        if (column && column.id !== working.id) {
+            working = {
+                id: column.id,
+                displayName: column.displayName,
+                externalId: column.externalId,
+            }
+        }
+    }
 
     function cancelEdit() {
         onCancel();
@@ -18,7 +32,6 @@
 
     function selectRollupKind(rollupKind, column) {
         const originalColumn = _.find($selectedGrid.definition.fixedColumnDefinitions, d => sameColumnRef(d, column));
-        console.log({rollupKind, column, originalColumn})
         const newColumn = Object.assign(
             {},
             column,
@@ -43,8 +56,21 @@
         $columnDefs = _.concat(columnsWithoutCol, newColumn);
     }
 
-    $: summaryItems = _.values(columnUsageKind);
+    function updateExternalId(workingExternalId, column) {
+        const originalColumn = _.find($selectedGrid.definition.fixedColumnDefinitions, d => sameColumnRef(d, column));
+        const newColumn = Object.assign(
+            {},
+            column,
+            {
+                externalId: workingExternalId,
+                externalIdChanged: workingExternalId !== originalColumn?.externalId
+            })
+        const columnsWithoutCol = _.reject($columnDefs, d => sameColumnRef(d, column));
+        $columnDefs = _.concat(columnsWithoutCol, newColumn);
+    }
+
     $: rollupKinds = _.values(ratingRollupRule);
+
 </script>
 
 <h4>
@@ -83,10 +109,23 @@
         </td>
         <td>
             <input class="form-control"
-                   id="title"
-                   on:change={() => updateDisplayName(workingDisplayName, column)}
+                   id="displayName"
+                   on:change={() => updateDisplayName(working.displayName, column)}
                    placeholder="Display name"
-                   bind:value={workingDisplayName}>
+                   bind:value={working.displayName}>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <div>External ID</div>
+            <div class="small help-text">An identifier used to reference this column in derivation scripts</div>
+        </td>
+        <td>
+            <input class="form-control"
+                   id="externalId"
+                   on:change={() => updateExternalId(working.externalId, column)}
+                   placeholder="External Id"
+                   bind:value={working.externalId}>
         </td>
     </tr>
     </tbody>
