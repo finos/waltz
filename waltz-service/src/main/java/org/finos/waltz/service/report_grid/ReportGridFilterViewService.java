@@ -59,6 +59,7 @@ public class ReportGridFilterViewService {
     private static final Logger LOG = LoggerFactory.getLogger(ReportGridFilterViewService.class);
 
     private final String REPORT_GRID_APP_GROUP_CREATION_NOTE_TYPE_EXT_ID = "WALTZ_REPORT_GRID_FILTER_PRESET";
+    private final String NOT_PROVIDED_OPTION_CODE = "NOT_PROVIDED";
 
     private final ReportGridDao reportGridDao;
     private final ReportGridService reportGridService;
@@ -171,7 +172,7 @@ public class ReportGridFilterViewService {
                                 .collect(Collectors.toSet());
 
 
-                        if (d.optionCodes().contains("NOT_PROVIDED")) {
+                        if (d.optionCodes().contains(NOT_PROVIDED_OPTION_CODE)) {
                             Set<Long> subjectIdsWithValues = SetUtilities.map(cellDataForColumn, ReportGridCell::subjectId);
                             Set<Long> subjectIdsWithoutValue = minus(subjectIds, subjectIdsWithValues);
 
