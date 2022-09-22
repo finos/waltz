@@ -54,7 +54,7 @@ public class DynamicJSONFormatter implements DynamicFormatter {
         try {
             LOG.debug("Generating JSON data {}",id);
             long start = System.currentTimeMillis();
-            byte[] response = mkResponse(reportGrid,columnDefinitions,reportRows);
+            byte[] response = mkResponse(reportGrid, columnDefinitions, reportRows);
             long finish = System.currentTimeMillis();
             LOG.info(
                     "Generated JSON data {} in {}ms response. response payload sz={}bytes",
@@ -93,6 +93,8 @@ public class DynamicJSONFormatter implements DynamicFormatter {
                            List<ReportGridDerivedColumnDefinition> derivedColumnDefinitions,
                            List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows) {
 
+        List<String> columnHeadings = formatterUtils.mkColumnHeaders(fixedColumnDefinitions, derivedColumnDefinitions);
+
         List<Row> data = new ArrayList<>(reportRows.size());
 
         for (Tuple2<ReportSubject, ArrayList<Object>> currentRow : reportRows) {
@@ -101,8 +103,6 @@ public class DynamicJSONFormatter implements DynamicFormatter {
             List<CellValue> transformedRowValues = new ArrayList<>();
 
             transformedRow.id(createKeyElement(currentRow.v1));
-
-            List<String> columnHeadings = formatterUtils.mkColumnHeaders(fixedColumnDefinitions, derivedColumnDefinitions);
 
             int maxColumns = columnHeadings.size();
 
