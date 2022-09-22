@@ -1,22 +1,35 @@
 <script>
-    import DropdownPicker from "./DropdownPicker.svelte";
     import _ from "lodash";
-    import {columnUsageKind, ratingRollupRule, sameColumnRef} from "../report-grid-utils";
+    import {sameColumnRef} from "../report-grid-utils";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import {columnDefs, selectedGrid} from "../report-grid-store";
-    import {sameRef} from "../../../../common/entity-utils";
     import ColumnDefinitionHeader from "./ColumnDefinitionHeader.svelte";
 
     export let column;
     export let onCancel = () => console.log("Close");
     export let onRemove = () => console.log("Remove");
 
-    let workingDisplayName = column.displayName;
-    let workingExternalId = column.externalId;
-    let workingScript = column.derivationScript;
+    let working = {
+        id: column.id,
+        displayName: column.displayName,
+        externalId: column.externalId,
+        derivationScript: column.derivationScript
+    }
 
-    function cancelEdit(){
+    function cancelEdit() {
         onCancel();
+    }
+
+
+    $: {
+        if (column && column.id !== working.id) {
+            working = {
+                id: column.id,
+                displayName: column.displayName,
+                externalId: column.externalId,
+                derivationScript: column.derivationScript
+            }
+        }
     }
 
     function updateDisplayName(workingDisplayName, column) {
@@ -38,7 +51,7 @@
             {},
             column,
             {
-                workingExternalId: workingExternalId,
+                externalId: workingExternalId,
                 externalIdChanged: workingExternalId !== originalColumn?.externalId
             })
         const columnsWithoutCol = _.reject($columnDefs, d => sameColumnRef(d, column));
@@ -79,9 +92,9 @@
             <input class="form-control"
                    required
                    id="displayName"
-                   on:change={() => updateDisplayName(workingDisplayName, column)}
+                   on:change={() => updateDisplayName(working.displayName, column)}
                    placeholder="Display name"
-                   bind:value={workingDisplayName}>
+                   bind:value={working.displayName}>
         </td>
     </tr>
     <tr>
@@ -94,8 +107,8 @@
                    required
                    id="externalId"
                    placeholder="External Id"
-                   on:change={() => updateExternalId(workingExternalId, column)}
-                   bind:value={workingExternalId}>
+                   on:change={() => updateExternalId(working.externalId, column)}
+                   bind:value={working.externalId}>
         </td>
     </tr>
 
@@ -109,9 +122,9 @@
                       required
                       id="derivationScript"
                       rows="6"
-                      on:change={() => updateDerivationScript(workingScript, column)}
+                      on:change={() => updateDerivationScript(working.derivationScript, column)}
                       placeholder="Enter script here"
-                      bind:value={workingScript}/>
+                      bind:value={working.derivationScript}/>
         </td>
     </tr>
     </tbody>
