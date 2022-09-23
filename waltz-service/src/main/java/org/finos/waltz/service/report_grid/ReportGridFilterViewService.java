@@ -27,6 +27,7 @@ import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.app_group.AppGroupEntry;
 import org.finos.waltz.model.app_group.ImmutableAppGroupEntry;
 import org.finos.waltz.model.entity_named_note.EntityNamedNote;
+import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.model.report_grid.*;
 import org.finos.waltz.service.app_group.AppGroupService;
 import org.finos.waltz.service.entity_named_note.EntityNamedNoteService;
@@ -42,11 +43,11 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.CollectionUtilities.first;
-import static org.finos.waltz.common.CollectionUtilities.isEmpty;
+import static org.finos.waltz.common.CollectionUtilities.*;
 import static org.finos.waltz.common.ListUtilities.map;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.MapUtilities.indexBy;
+import static org.finos.waltz.common.SetUtilities.*;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 import static org.finos.waltz.service.report_grid.ReportGridUtilities.*;
@@ -58,6 +59,7 @@ public class ReportGridFilterViewService {
     private static final Logger LOG = LoggerFactory.getLogger(ReportGridFilterViewService.class);
 
     private final String REPORT_GRID_APP_GROUP_CREATION_NOTE_TYPE_EXT_ID = "WALTZ_REPORT_GRID_FILTER_PRESET";
+    private final String NOT_PROVIDED_OPTION_CODE = "NOT_PROVIDED";
 
     private final ReportGridDao reportGridDao;
     private final ReportGridService reportGridService;
@@ -84,6 +86,33 @@ public class ReportGridFilterViewService {
     }
 
 
+    public boolean recalculateAppGroupFromNoteText(Long appGroupId) {
+
+        Set<ReportGridDefinition> grids = reportGridDao.findAll();
+        Map<String, ReportGridDefinition> gridsByExternalId = indexBy(grids, d -> d.externalId().get());
+
+        Set<EntityNamedNote> filterNotesForGroup = entityNamedNoteService.findByNoteTypeExtIdAndEntityReference(
+                REPORT_GRID_APP_GROUP_CREATION_NOTE_TYPE_EXT_ID,
+                mkRef(EntityKind.APP_GROUP, appGroupId));
+
+        if (isEmpty(filterNotesForGroup)) {
+            throw new IllegalArgumentException(format(
+                    "Cannot find Report Grid Filter Preset note for application group: %d",
+                    appGroupId));
+        }
+
+        if (filterNotesForGroup.size() == 1) {
+            //should only be one note per group.
+            EntityNamedNote note = first(filterNotesForGroup);
+            ReportGridFilterInfo gridFilterInfo = getGridFilterInfo(gridsByExternalId, appGroupId, note.noteText());
+            updateApplicationGroupsFromFilterInfo(asSet(gridFilterInfo));
+            return filterNotesForGroup.size() == 1;
+        } else {
+            throw new IllegalArgumentException("Cannot have more than one Report Grid Filter note per application group");
+        }
+    }
+
+
     public void generateAppGroupsFromFilter() {
 
         LOG.info("Starting filter group population");
@@ -91,6 +120,11 @@ public class ReportGridFilterViewService {
         LOG.info("Loading filter info from notes");
         Set<ReportGridFilterInfo> gridInfoWithFilters = findGridInfoWithFilters();
 
+        updateApplicationGroupsFromFilterInfo(gridInfoWithFilters);
+    }
+
+
+    private void updateApplicationGroupsFromFilterInfo(Set<ReportGridFilterInfo> gridInfoWithFilters) {
         Set<Tuple2<Long, Set<AppGroupEntry>>> appGroupToEntries = determineAppGroupEntries(gridInfoWithFilters);
 
         LOG.info("Populating application groups from filters");
@@ -98,6 +132,7 @@ public class ReportGridFilterViewService {
 
         LOG.info("Finished updating filter groups");
     }
+
 
     private Set<Tuple2<Long, Set<AppGroupEntry>>> determineAppGroupEntries(Set<ReportGridFilterInfo> gridInfoWithFilters) {
         return gridInfoWithFilters
@@ -113,7 +148,13 @@ public class ReportGridFilterViewService {
 
                     Set<ReportGridCell> cellData = instance.cellData();
 
-                    Set<Long> subjectsPassingFilters = applyFilters(cellData, d.gridFilters());
+                    Set<Long> subjectIds = SetUtilities.map(instance.subjects(), s -> s.entityReference().id());
+
+                    Set<Long> subjectsPassingFilters = applyFilters(
+                            cellData,
+                            d.gridFilters(),
+                            subjectIds,
+                            instance.ratingSchemeItems());
 
                     Set<AppGroupEntry> appGroupEntries = SetUtilities.map(
                             subjectsPassingFilters,
@@ -129,12 +170,18 @@ public class ReportGridFilterViewService {
                 .collect(Collectors.toSet());
     }
 
-    private Set<Long> applyFilters(Set<ReportGridCell> cellData, Set<GridFilter> gridFilters) {
+
+    private Set<Long> applyFilters(Set<ReportGridCell> cellData,
+                                   Set<GridFilter> gridFilters,
+                                   Set<Long> subjectIds,
+                                   Set<RatingSchemeItem> ratingSchemeItems) {
 
         if (isEmpty(gridFilters)) {
             //If there are no filters all the apps should populate the group
             return SetUtilities.map(cellData, ReportGridCell::subjectId);
         } else {
+
+            Map<Long, RatingSchemeItem> ratingSchemeItemByIdMap = indexBy(ratingSchemeItems, d -> d.id().get());
 
             Map<Long, Collection<ReportGridCell>> dataByCol = groupBy(cellData, ReportGridCell::columnDefinitionId);
 
@@ -143,11 +190,30 @@ public class ReportGridFilterViewService {
                     .map(d -> {
                         Collection<ReportGridCell> cellDataForColumn = dataByCol.getOrDefault(d.columnDefinitionId(), emptySet());
 
-                        return cellDataForColumn
+                        Set<Long> appsPassingFilter = cellDataForColumn
                                 .stream()
-                                .filter(c -> d.optionCodes().contains(c.optionCode()))
+                                .filter(c -> {
+                                    // rating cells may want to look up on rating id / code / external id
+                                    if (c.ratingIdValue() != null) {
+                                        RatingSchemeItem rating = ratingSchemeItemByIdMap.get(c.ratingIdValue());
+                                        Set<String> ratingIdentifiers = asSet(c.optionCode(), String.valueOf(rating.rating()), rating.name(), rating.externalId().orElse(null));
+                                        return notEmpty(intersection(d.optionCodes(), ratingIdentifiers));
+                                    } else {
+                                        return d.optionCodes().contains(c.optionCode());
+                                    }
+                                })
                                 .map(ReportGridCell::subjectId)
                                 .collect(Collectors.toSet());
+
+
+                        if (d.optionCodes().contains(NOT_PROVIDED_OPTION_CODE)) {
+                            Set<Long> subjectIdsWithValues = SetUtilities.map(cellDataForColumn, ReportGridCell::subjectId);
+                            Set<Long> subjectIdsWithoutValue = minus(subjectIds, subjectIdsWithValues);
+
+                            return union(appsPassingFilter, subjectIdsWithoutValue);
+                        } else {
+                            return appsPassingFilter;
+                        }
                     })
                     .collect(Collectors.toSet());
 
@@ -157,62 +223,67 @@ public class ReportGridFilterViewService {
         }
     }
 
+
     private Set<ReportGridFilterInfo> findGridInfoWithFilters() {
 
         Set<EntityNamedNote> filterPresetNotes = entityNamedNoteService.findByNoteTypeExtId(REPORT_GRID_APP_GROUP_CREATION_NOTE_TYPE_EXT_ID);
-        Set<ReportGridDefinition> grids = reportGridDao.findAll();
 
+        Set<ReportGridDefinition> grids = reportGridDao.findAll();
         Map<String, ReportGridDefinition> gridsByExternalId = indexBy(grids, d -> d.externalId().get());
 
         List<Tuple2<Long, String>> appGroupIdToNoteText = map(filterPresetNotes, d -> tuple(d.entityReference().id(), d.noteText()));
 
         return appGroupIdToNoteText
                 .stream()
-                .map(t -> {
-                    String noteText = t.v2;
-
-                    Tuple2<List<String>, List<List<String>>> gridInfoAndFilters;
-
-                    try {
-                        gridInfoAndFilters = parseGridFilterNoteText(noteText);
-                    } catch (IllegalArgumentException e) {
-                        LOG.debug("Could not parse note text. " + e.getMessage());
-                        return null;
-                    }
-
-                    if (gridInfoAndFilters == null) {
-                        return null;
-                    }
-
-                    //Should only be one row for grid information
-                    List<String> gridInfo = gridInfoAndFilters.v1;
-                    List<List<String>> filterRows = gridInfoAndFilters.v2;
-                    String gridExtId = gridInfo.get(1);
-
-                    ReportGridDefinition grid = gridsByExternalId.get(gridExtId);
-
-                    if (grid == null) {
-                        LOG.debug(format("Cannot identify grid '%s' from note", gridExtId));
-                        return null;
-                    }
-
-                    String vantagePointKind = gridInfo.get(2);
-                    String vantagePointId = gridInfo.get(3);
-                    EntityReference vantagePoint = mkRef(EntityKind.valueOf(vantagePointKind), Long.parseLong(vantagePointId));
-
-                    Set<GridFilter> filterValues = getGridFilters(filterRows, grid);
-
-                    IdSelectionOptions idSelectionOptions = modifySelectionOptionsForGrid(mkOpts(vantagePoint));
-
-                    return ImmutableReportGridFilterInfo.builder()
-                            .appGroupId(t.v1)
-                            .idSelectionOptions(idSelectionOptions)
-                            .gridDefinition(grid)
-                            .gridFilters(filterValues)
-                            .build();
-                })
+                .map(t -> getGridFilterInfo(gridsByExternalId, t.v1, t.v2))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
+    }
+
+
+    private ImmutableReportGridFilterInfo getGridFilterInfo(Map<String, ReportGridDefinition> gridsByExternalId,
+                                                            Long appGroupId,
+                                                            String noteText) {
+
+        Tuple2<List<String>, List<List<String>>> gridInfoAndFilters;
+
+        try {
+            gridInfoAndFilters = parseGridFilterNoteText(noteText);
+        } catch (IllegalArgumentException e) {
+            LOG.debug("Could not parse note text. " + e.getMessage());
+            return null;
+        }
+
+        if (gridInfoAndFilters == null) {
+            return null;
+        }
+
+        //Should only be one row for grid information
+        List<String> gridInfo = gridInfoAndFilters.v1;
+        List<List<String>> filterRows = gridInfoAndFilters.v2;
+        String gridExtId = gridInfo.get(1);
+
+        ReportGridDefinition grid = gridsByExternalId.get(gridExtId);
+
+        if (grid == null) {
+            LOG.debug(format("Cannot identify grid '%s' from note", gridExtId));
+            return null;
+        }
+
+        String vantagePointKind = gridInfo.get(2);
+        String vantagePointId = gridInfo.get(3);
+        EntityReference vantagePoint = mkRef(EntityKind.valueOf(vantagePointKind), Long.parseLong(vantagePointId));
+
+        Set<GridFilter> filterValues = getGridFilters(filterRows, grid);
+
+        IdSelectionOptions idSelectionOptions = modifySelectionOptionsForGrid(mkOpts(vantagePoint));
+
+        return ImmutableReportGridFilterInfo.builder()
+                .appGroupId(appGroupId)
+                .idSelectionOptions(idSelectionOptions)
+                .gridDefinition(grid)
+                .gridFilters(filterValues)
+                .build();
     }
 }

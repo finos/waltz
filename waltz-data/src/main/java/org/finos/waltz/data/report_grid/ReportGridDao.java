@@ -141,7 +141,7 @@ public class ReportGridDao {
         return dsl
                 .select(rg.fields())
                 .from(rg)
-                .fetchSet(r -> mkReportGridDefinition(DSL.trueCondition(), r.into(REPORT_GRID)));
+                .fetchSet(r -> mkReportGridDefinition(rgcd.REPORT_GRID_ID.eq(r.get(rg.ID)), r.into(REPORT_GRID)));
     }
 
 
@@ -152,7 +152,7 @@ public class ReportGridDao {
                 .leftJoin(REPORT_GRID_MEMBER)
                 .on(rg.ID.eq(REPORT_GRID_MEMBER.GRID_ID))
                 .where(rg.KIND.eq(ReportGridKind.PUBLIC.name()).or(REPORT_GRID_MEMBER.USER_ID.eq(username)))
-                .fetchSet(r -> mkReportGridDefinition(DSL.trueCondition(), r.into(REPORT_GRID)));
+                .fetchSet(r -> mkReportGridDefinition(rgcd.REPORT_GRID_ID.eq(r.get(rg.ID)), r.into(REPORT_GRID)));
     }
 
 
@@ -340,7 +340,7 @@ public class ReportGridDao {
                 .innerJoin(REPORT_GRID_MEMBER)
                 .on(rg.ID.eq(REPORT_GRID_MEMBER.GRID_ID))
                 .where(isOwner)
-                .fetchSet(r -> mkReportGridDefinition(DSL.trueCondition(), r.into(REPORT_GRID)));
+                .fetchSet(r -> mkReportGridDefinition(rgcd.REPORT_GRID_ID.eq(r.get(rg.ID)), r.into(REPORT_GRID)));
     }
 
 
@@ -500,7 +500,7 @@ public class ReportGridDao {
                 .from(rg)
                 .innerJoin(rgcd).on(rg.ID.eq(rgcd.REPORT_GRID_ID))
                 .innerJoin(rgfcd).on(rgfcd.GRID_COLUMN_ID.eq(rgcd.ID))
-                .innerJoin(extras).on(extras.field(rgfcd.ID).eq(rgfcd.ID))
+                .innerJoin(extras).on(extras.field(rgfcd.GRID_COLUMN_ID).eq(rgfcd.GRID_COLUMN_ID))
                 .where(condition)
                 .orderBy(rgcd.POSITION, DSL.field("name", String.class))
                 .fetch(r -> {
@@ -521,7 +521,7 @@ public class ReportGridDao {
                     EntityKind columnEntityKind = EntityKind.valueOf(r.get(rgfcd.COLUMN_ENTITY_KIND));
 
                     return ImmutableReportGridFixedColumnDefinition.builder()
-                            .id(r.get(extras.field(rgfcd.ID)))
+                            .id(r.get(rgfcd.ID))
                             .columnEntityId(r.get(rgfcd.COLUMN_ENTITY_ID))
                             .columnEntityKind(columnEntityKind)
                             .columnName(r.get("name", String.class))
@@ -533,7 +533,7 @@ public class ReportGridDao {
                             .columnQualifierKind(columnQualifierKind)
                             .columnQualifierId(r.get(rgfcd.COLUMN_QUALIFIER_ID))
                             .externalId(Optional.ofNullable(r.get(rgfcd.EXTERNAL_ID)))
-                            .gridColumnId(r.get(rgfcd.GRID_COLUMN_ID))
+                            .gridColumnId(r.get(extras.field(rgfcd.GRID_COLUMN_ID)))
                             .build();
                 });
     }
@@ -599,7 +599,7 @@ public class ReportGridDao {
                         .or(rgfcd.COLUMN_QUALIFIER_ID.eq(possible.field("id", Long.class))));
 
         return dsl
-                .select(rgfcd.ID,
+                .select(rgfcd.GRID_COLUMN_ID,
                         possible.field("name", String.class),
                         possible.field("description", String.class),
                         efr.ENTITY_KIND,
@@ -607,7 +607,8 @@ public class ReportGridDao {
                         efr.DESCRIPTION,
                         efr.FIELD_NAME)
                 .from(rgfcd)
-                .innerJoin(rg).on(rg.ID.eq(rgfcd.REPORT_GRID_ID))
+                .innerJoin(rgcd).on(rgfcd.GRID_COLUMN_ID.eq(rgcd.ID))
+                .innerJoin(rg).on(rg.ID.eq(rgcd.REPORT_GRID_ID))
                 .innerJoin(possible).on(colDefToPossibleJoinCond)
                 .leftJoin(efr).on(rgfcd.ENTITY_FIELD_REFERENCE_ID.eq(efr.ID))
                 .where(condition)
@@ -634,7 +635,7 @@ public class ReportGridDao {
         Field<String> desc = descriptionField.as("desc");
 
         return dsl
-                .select(rgfcd.ID,
+                .select(rgfcd.GRID_COLUMN_ID,
                         name,
                         desc,
                         efr.ENTITY_KIND,
@@ -642,7 +643,8 @@ public class ReportGridDao {
                         efr.DESCRIPTION,
                         efr.FIELD_NAME)
                 .from(rgfcd)
-                .innerJoin(rg).on(rg.ID.eq(rgfcd.REPORT_GRID_ID))
+                .innerJoin(rgcd).on(rgfcd.GRID_COLUMN_ID.eq(rgcd.ID))
+                .innerJoin(rg).on(rg.ID.eq(rgcd.REPORT_GRID_ID))
                 .leftJoin(t).on(idField.eq(rgfcd.COLUMN_ENTITY_ID).and(rgfcd.COLUMN_ENTITY_KIND.eq(entityKind.name())))
                 .leftJoin(efr).on(rgfcd.ENTITY_FIELD_REFERENCE_ID.eq(efr.ID))
                 .where(reportCondition)
@@ -654,7 +656,7 @@ public class ReportGridDao {
                                                                                                                                      String columnDescription,
                                                                                                                                      Condition reportCondition) {
         return dsl
-                .select(rgfcd.ID,
+                .select(rgfcd.GRID_COLUMN_ID,
                         DSL.val(columnName),
                         DSL.val(columnDescription),
                         efr.ENTITY_KIND,
@@ -662,7 +664,8 @@ public class ReportGridDao {
                         efr.DESCRIPTION,
                         efr.FIELD_NAME)
                 .from(rgfcd)
-                .innerJoin(rg).on(rg.ID.eq(rgfcd.REPORT_GRID_ID))
+                .innerJoin(rgcd).on(rgfcd.GRID_COLUMN_ID.eq(rgcd.ID))
+                .innerJoin(rg).on(rg.ID.eq(rgcd.REPORT_GRID_ID))
                 .leftJoin(efr).on(rgfcd.ENTITY_FIELD_REFERENCE_ID.eq(efr.ID))
                 .where(reportCondition)
                 .and(rgfcd.COLUMN_ENTITY_KIND.eq(entityKind.name()));

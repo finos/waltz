@@ -70,6 +70,13 @@ public class EntityNamedNoteService {
     }
 
 
+    public Set<EntityNamedNote> findByNoteTypeExtIdAndEntityReference(String noteTypeExtId, EntityReference entityReference) {
+        checkNotNull(noteTypeExtId, "noteTypeExtId cannot be null");
+        checkNotNull(entityReference, "entityReference cannot be null");
+        return entityNamedNoteDao.findByNoteTypeExtIdAndEntityReference(noteTypeExtId, entityReference);
+    }
+
+
     public boolean save(EntityReference ref, long namedNoteTypeId, String noteText, String username) {
         checkNotNull(ref, "ref cannot be null");
 

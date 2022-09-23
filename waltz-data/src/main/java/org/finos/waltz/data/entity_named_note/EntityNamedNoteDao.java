@@ -127,4 +127,15 @@ public class EntityNamedNoteDao {
                 .where(ENTITY_NAMED_NOTE_TYPE.EXTERNAL_ID.eq(noteTypeExtId))
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
+
+    public Set<EntityNamedNote> findByNoteTypeExtIdAndEntityReference(String noteTypeExtId, EntityReference entityReference) {
+        return dsl
+                .select(ENTITY_NAMED_NOTE.fields())
+                .from(ENTITY_NAMED_NOTE)
+                .innerJoin(ENTITY_NAMED_NOTE_TYPE).on(ENTITY_NAMED_NOTE.NAMED_NOTE_TYPE_ID.eq(ENTITY_NAMED_NOTE_TYPE.ID))
+                .where(ENTITY_NAMED_NOTE_TYPE.EXTERNAL_ID.eq(noteTypeExtId))
+                .and(ENTITY_NAMED_NOTE.ENTITY_KIND.eq(entityReference.kind().name()))
+                .and(ENTITY_NAMED_NOTE.ENTITY_ID.eq(entityReference.id()))
+                .fetchSet(TO_DOMAIN_MAPPER);
+    }
 }
