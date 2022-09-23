@@ -19,9 +19,11 @@ package org.finos.waltz.web.endpoints.extracts.reportgrid;
 
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.model.entity_field_reference.EntityFieldReference;
+import org.finos.waltz.model.report_grid.ReportGridDerivedColumnDefinition;
 import org.finos.waltz.model.report_grid.ReportGridFixedColumnDefinition;
 import org.finos.waltz.web.endpoints.extracts.ColumnCommentary;
 import org.jooq.lambda.tuple.Tuple2;
+import org.jooq.lambda.tuple.Tuple3;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -29,43 +31,70 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.collections4.CollectionUtils.union;
 import static org.finos.waltz.common.ListUtilities.concat;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Component
 public class FormatterUtils {
 
 
-    public List<String> mkHeaderStrings(List<Tuple2<ReportGridFixedColumnDefinition, ColumnCommentary>> columnDefinitions) {
+    public List<String> mkHeaderStrings(List<Tuple2<ReportGridFixedColumnDefinition, ColumnCommentary>> fixedColumnDefinitions,
+                                        List<ReportGridDerivedColumnDefinition> derivedColumnDefinitions) {
         List<String> staticHeaders = newArrayList(
                 "Subject Id",
                 "Subject Name",
                 "Subject External Id",
                 "Subject Lifecycle Phase");
-        List<String> columnHeaders = mkColumnHeaders(columnDefinitions);
+
+        List<String> columnHeaders = mkColumnHeaders(fixedColumnDefinitions, derivedColumnDefinitions);
+
         return concat(
                 staticHeaders,
                 columnHeaders);
     }
 
+    public List<String> mkColumnHeaders(List<Tuple2<ReportGridFixedColumnDefinition, ColumnCommentary>> fixedColumnDefinitions,
+                                        List<ReportGridDerivedColumnDefinition> derivedColumnDefinitions) {
 
-    public List<String> mkColumnHeaders(List<Tuple2<ReportGridFixedColumnDefinition, ColumnCommentary>> columnDefinitions) {
+        List<Tuple3<String, String, Integer>> fixedColumnHeaders = mkFixedColumnHeaders(fixedColumnDefinitions);
+        List<Tuple3<String, String, Integer>> derivedColumnHeaders = mkDerivedColumnHeaders(derivedColumnDefinitions);
+
+        return union(fixedColumnHeaders, derivedColumnHeaders)
+                .stream()
+                .sorted(Comparator.comparing(Tuple3::v3))
+                .flatMap(t -> Stream.of(t.v1, t.v2))
+                .filter(Objects::nonNull)
+                .collect(toList());
+    }
+
+
+    public List<Tuple3<String, String, Integer>> mkFixedColumnHeaders(List<Tuple2<ReportGridFixedColumnDefinition, ColumnCommentary>> columnDefinitions) {
         if (columnDefinitions == null) {
             return new ArrayList<>();
         }
         return columnDefinitions
                 .stream()
-                .sorted(Comparator.comparingLong(r -> r.v1.position()))
-                .flatMap(r -> {
+                .map(r -> {
                     String name = getColumnName(r.v1);
-                    return Stream.of(
-                            name,
-                            ColumnCommentary.HAS_COMMENTARY.equals(r.v2)
-                                    ? String.format("%s: comment", name)
-                                    : null);
+                    String commentName = ColumnCommentary.HAS_COMMENTARY.equals(r.v2)
+                            ? String.format("%s: comment", name)
+                            : null;
 
+                    return tuple(name, commentName, r.v1.position());
                 })
-                .filter(Objects::nonNull)
+                .collect(toList());
+    }
+
+
+    public List<Tuple3<String, String, Integer>> mkDerivedColumnHeaders(List<ReportGridDerivedColumnDefinition> columnDefinitions) {
+        if (columnDefinitions == null) {
+            return new ArrayList<>();
+        }
+        return columnDefinitions
+                .stream()
+                .map(t -> tuple(t.displayName(), (String) null, t.position()))
                 .collect(toList());
     }
 

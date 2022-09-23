@@ -167,7 +167,11 @@
     $: canBeAdded = (d) => {
         const notAlreadyAdded = !_.some(
             $columnDefs,
-            r => sameColumnRef(r, Object.assign(d, {kind: "REPORT_GRID_FIXED_COLUMN_DEFINITION"})));
+            r => sameColumnRef(r, Object.assign({}, {
+                kind: "REPORT_GRID_FIXED_COLUMN_DEFINITION",
+                columnEntityId: d.id,
+                columnEntityKind: d.kind
+            })));
 
         switch (d.kind) {
             case entity.ASSESSMENT_DEFINITION.key:

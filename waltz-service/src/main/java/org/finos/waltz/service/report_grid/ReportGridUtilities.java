@@ -133,11 +133,19 @@ public class ReportGridUtilities {
 
     public static Set<GridFilter> getGridFilters(List<List<String>> filterRows, ReportGridDefinition grid) {
 
-        Map<String, Long> columnsDefinitionIdByName = indexBy(grid.fixedColumnDefinitions(),
-                r -> r.entityFieldReference() == null
-                        ? sanitizeString(r.columnName())
-                        : sanitizeString(format("%s/%s", r.entityFieldReference().displayName(), r.columnName())),
-                ReportGridFixedColumnDefinition::gridColumnId);
+        Map<String, Long> columnsDefinitionIdByName;
+
+        try {
+            columnsDefinitionIdByName = indexBy(grid.fixedColumnDefinitions(),
+                    r -> r.entityFieldReference() == null
+                            ? sanitizeString(r.columnName())
+                            : sanitizeString(format("%s/%s", r.entityFieldReference().displayName(), r.columnName())),
+                    ReportGridFixedColumnDefinition::gridColumnId);
+
+        } catch (Exception e) {
+            LOG.error("Could not fetch grid filters, grid cannot have multiple columns with the same name");
+            return Collections.emptySet();
+        }
 
         return filterRows
                 .stream()

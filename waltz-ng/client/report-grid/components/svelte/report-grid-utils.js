@@ -5,7 +5,6 @@ import {amberBg, blueBg, determineForegroundColor, greenBg, greyBg, pinkBg} from
 import {scaleLinear} from "d3-scale";
 import {extent} from "d3-array";
 import {subtractYears} from "../../../common/date-utils";
-import {mkRef, refToString} from "../../../common/entity-utils";
 
 
 export const reportGridMember = {

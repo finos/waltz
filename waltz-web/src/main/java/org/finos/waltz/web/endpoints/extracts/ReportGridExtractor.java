@@ -49,9 +49,12 @@ import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static org.finos.waltz.common.ListUtilities.map;
 import static org.finos.waltz.common.MapUtilities.*;
+import static org.finos.waltz.common.SetUtilities.union;
 import static org.finos.waltz.common.StringUtilities.mkSafe;
 import static org.finos.waltz.model.utils.IdUtilities.indexById;
+import static org.finos.waltz.service.report_grid.ReportGridColumnCalculator.calculate;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 import static spark.Spark.post;
 
@@ -137,6 +140,7 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
         List<Tuple2<ReportGridFixedColumnDefinition, ColumnCommentary>> colsWithCommentRequirement = enrichColsWithCommentRequirement(reportGrid);
 
         List<Tuple2<ReportSubject, ArrayList<Object>>> reportRows = prepareReportRows(
+                reportGrid.definition(),
                 colsWithCommentRequirement,
                 reportGrid.instance());
 
@@ -195,10 +199,22 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
     }
 
 
-    private List<Tuple2<ReportSubject, ArrayList<Object>>> prepareReportRows(List<Tuple2<ReportGridFixedColumnDefinition, ColumnCommentary>> colsWithCommentRequirement,
+    private List<Tuple2<ReportSubject, ArrayList<Object>>> prepareReportRows(ReportGridDefinition definition,
+                                                                             List<Tuple2<ReportGridFixedColumnDefinition, ColumnCommentary>> colsWithCommentRequirement,
                                                                              ReportGridInstance reportGridInstance) {
 
-        Set<ReportGridCell> tableData = reportGridInstance.cellData();
+        List<Tuple3<Long, Integer, EntityKind>> derivedCols = map(definition.derivedColumnDefinitions(), d -> tuple(d.gridColumnId(), d.position(), d.kind()));
+        List<Tuple3<Long, Integer, EntityKind>> fixedCols = map(definition.fixedColumnDefinitions(), d -> tuple(d.gridColumnId(), d.position(), d.kind()));
+
+        Map<Long, Tuple2<ReportGridFixedColumnDefinition, ColumnCommentary>> colsWithCommentReqById = indexBy(
+                colsWithCommentRequirement,
+                k -> k.v1.id());
+
+        Set<Tuple3<Long, Integer, EntityKind>> allColumnDefinitions = union(derivedCols, fixedCols);
+
+        Set<ReportGridCell> tableData = (definition.derivedColumnDefinitions().isEmpty())
+                ? reportGridInstance.cellData()
+                : union(reportGridInstance.cellData(), calculate(reportGridInstance, definition));
 
         Map<Long, RatingSchemeItem> ratingsById = indexById(reportGridInstance.ratingSchemeItems());
 
@@ -225,22 +241,41 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
                             cellsForSubject,
                             ReportGridCell::columnDefinitionId);
 
-                    //find data for columns
-                    colsWithCommentRequirement
-                            .forEach(t -> {
-                                ReportGridFixedColumnDefinition colDef = t.v1;
-                                boolean isCostColumn = colDef.columnEntityKind().equals(EntityKind.COST_KIND);
+                    allColumnDefinitions
+                            .stream()
+                            .sorted(Comparator.comparingInt(Tuple3::v2))
+                            .forEachOrdered(t -> {
 
-                                if (!allowCostsExport && isCostColumn) {
-                                    reportRow.add("REDACTED");
-                                } else {
+                                Long columnId = t.v1;
+
+                                if (t.v3.equals(EntityKind.REPORT_GRID_DERIVED_COLUMN_DEFINITION)) {
+
                                     ReportGridCell cell = cellValuesByColumnRefForSubject.getOrDefault(
-                                            colDef.id(),
+                                            columnId,
                                             null);
 
-                                    reportRow.add(getValueFromReportCell(colDef, ratingsById, cell));
-                                    if (ColumnCommentary.HAS_COMMENTARY.equals(t.v2)) {
-                                        reportRow.add(getCommentFromCell(cell));
+                                    reportRow.add(getDerivedCellValue(cell));
+
+                                } else {
+
+                                    Tuple2<ReportGridFixedColumnDefinition, ColumnCommentary> fixedCol = colsWithCommentReqById.get(columnId);
+                                    ReportGridFixedColumnDefinition colDef = fixedCol.v1;
+
+                                    boolean isCostColumn = colDef.columnEntityKind().equals(EntityKind.COST_KIND);
+
+                                    if (!allowCostsExport && isCostColumn) {
+                                        reportRow.add("REDACTED");
+                                    } else {
+
+                                        ReportGridCell cell = cellValuesByColumnRefForSubject.getOrDefault(
+                                                colDef.gridColumnId(),
+                                                null);
+
+                                        reportRow.add(getValueFromFixedReportCell(colDef, ratingsById, cell));
+
+                                        if (ColumnCommentary.HAS_COMMENTARY.equals(fixedCol.v2)) {
+                                            reportRow.add(getCommentFromCell(cell));
+                                        }
                                     }
                                 }
                             });
@@ -249,9 +284,17 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
                 })
                 .sorted(Comparator.comparing(t -> t.v1.entityReference().name().get()))
                 .collect(toList());
-
     }
 
+    private Object getDerivedCellValue(ReportGridCell cell) {
+        if (cell == null) {
+            return null;
+        } else {
+            return Optional
+                    .ofNullable(cell.textValue())
+                    .orElse(cell.errorValue());
+        }
+    }
 
     private Object getCommentFromCell(ReportGridCell reportGridCell) {
         if (reportGridCell == null) {
@@ -261,9 +304,9 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
     }
 
 
-    private Object getValueFromReportCell(ReportGridFixedColumnDefinition colDef,
-                                          Map<Long, RatingSchemeItem> ratingsById,
-                                          ReportGridCell reportGridCell) {
+    private Object getValueFromFixedReportCell(ReportGridFixedColumnDefinition colDef,
+                                               Map<Long, RatingSchemeItem> ratingsById,
+                                               ReportGridCell reportGridCell) {
         if (reportGridCell == null) {
             return null;
         }
@@ -308,13 +351,13 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
         switch (format) {
             case XLSX:
                 return tuple(format, reportName, dynamicExcelFormatter
-                        .format(reportName, reportGrid,columnDefinitions, reportRows));
+                        .format(reportName, reportGrid, columnDefinitions, reportRows));
             case CSV:
                 return tuple(format, reportName, dynamicCommaSeperatedValueFormatter
-                        .format(reportName,reportGrid,columnDefinitions, reportRows));
+                        .format(reportName, reportGrid, columnDefinitions, reportRows));
             case JSON:
                 return tuple(format, reportName, dynamicJSONFormatter
-                        .format(reportName,reportGrid,columnDefinitions, reportRows));
+                        .format(reportName, reportGrid, columnDefinitions, reportRows));
             default:
                 throw new UnsupportedOperationException("This report does not support export format: " + format);
         }
