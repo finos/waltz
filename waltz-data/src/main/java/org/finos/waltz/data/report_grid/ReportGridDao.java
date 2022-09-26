@@ -1187,7 +1187,10 @@ public class ReportGridDao {
                             SURVEY_INSTANCE.DUE_DATE,
                             SURVEY_INSTANCE.APPROVAL_DUE_DATE,
                             SURVEY_INSTANCE.ENTITY_ID,
-                            SURVEY_INSTANCE.ENTITY_KIND)
+                            SURVEY_INSTANCE.ENTITY_KIND,
+                            SURVEY_RUN.ISSUED_ON,
+                            SURVEY_INSTANCE.NAME.as("instance_name"),
+                            SURVEY_RUN.NAME.as("run_name"))
                     .select(SURVEY_RUN.SURVEY_TEMPLATE_ID)
                     .from(SURVEY_INSTANCE)
                     .innerJoin(SURVEY_RUN).on(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(SURVEY_RUN.ID))
@@ -1208,6 +1211,7 @@ public class ReportGridDao {
                     .fetch()
                     .stream()
                     .flatMap(surveyRecord -> {
+
                         Long templateId = surveyRecord.get(SURVEY_RUN.SURVEY_TEMPLATE_ID);
 
                         return fieldReferencesByTemplateId
@@ -1215,8 +1219,8 @@ public class ReportGridDao {
                                 .stream()
                                 .map(fieldRef -> {
 
-                                    Field<?> field = SURVEY_INSTANCE.field(fieldRef.fieldName());
-                                    Object rawValue = surveyRecord.get(field);
+                                    Field<?> field = surveyRecord.field(fieldRef.fieldName());
+                                    Object rawValue = surveyRecord.get(fieldRef.fieldName());
 
                                     String textValue = isTimestampField(field)
                                             ? String.valueOf(DateTimeUtilities.toLocalDate((Timestamp) rawValue))
