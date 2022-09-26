@@ -243,8 +243,6 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
                         .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(DATA_TYPE.name())))
                 .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.isNull());
 
-        System.out.println(qry);
-
         return dsl
                 .insertInto(LOGICAL_FLOW_DECORATOR)
                 .columns(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID,
