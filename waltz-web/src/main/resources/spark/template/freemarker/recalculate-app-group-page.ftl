@@ -3,13 +3,13 @@
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=10,9">
     <meta charset="utf-8">
-    <title>SDLC Health Information</title>
+    <title>Application Group Recalculation</title>
     <link href='https://fonts.googleapis.com/css?family=Oxygen|Hind|Maven+Pro' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
           integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet"
           type="text/css">
-    <link href="../../../../../../../waltz-ng/style/style.scss" rel="stylesheet" type="text/css">
+    <link href="/style/style.scss" rel="stylesheet" type="text/css">
 </head>
 
 <body>
