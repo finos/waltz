@@ -19,25 +19,30 @@
 package org.finos.waltz.web.endpoints.api;
 
 import org.finos.waltz.service.report_grid.ReportGridFilterViewService;
-import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.ModelAndView;
+import spark.TemplateViewRoute;
+import spark.template.freemarker.FreeMarkerEngine;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.finos.waltz.web.WebUtilities.getId;
 import static org.finos.waltz.web.WebUtilities.mkPath;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.getForDatum;
+import static spark.Spark.get;
 
 @Service
-public class ReportGridViewEndpoint implements Endpoint {
+public class ReportGridPageEndpoint implements Endpoint {
 
-    private static final String BASE_URL = mkPath("api", "report-grid-view");
+    private static final String BASE_URL = mkPath("page", "report-grid-view");
 
     private final ReportGridFilterViewService reportGridFilterViewService;
 
 
     @Autowired
-    public ReportGridViewEndpoint(ReportGridFilterViewService reportGridFilterViewService) {
+    public ReportGridPageEndpoint(ReportGridFilterViewService reportGridFilterViewService) {
         this.reportGridFilterViewService = reportGridFilterViewService;
     }
 
@@ -46,11 +51,25 @@ public class ReportGridViewEndpoint implements Endpoint {
     public void register() {
         String recalculateAppGroupPath = mkPath(BASE_URL, "recalculate", "app-group-id", ":id");
 
-        DatumRoute<Boolean> recalculateAppGroupRoute = (req, resp) -> {
+        TemplateViewRoute templateViewRoute = (req, resp) -> {
             long appGroupId = getId(req);
-            return reportGridFilterViewService.recalculateAppGroupFromNoteText(appGroupId);
+
+            Map<String, Object> model = new HashMap<>();
+            model.put("appGroupId", String.valueOf(appGroupId));
+
+            try {
+                int appCount = reportGridFilterViewService.recalculateAppGroupFromNoteText(appGroupId);
+                model.put("success", true);
+                model.put("appCount", appCount);
+            } catch (IllegalArgumentException e) {
+                model.put("success", false);
+                model.put("errorMessage", e.getMessage());
+            }
+
+            return new ModelAndView(model, "recalculate-app-group-page.ftl"); // located in src/main/resources/spark/template/freemarker
         };
-        getForDatum(recalculateAppGroupPath, recalculateAppGroupRoute);
+
+        get(recalculateAppGroupPath, templateViewRoute, new FreeMarkerEngine());
     }
 
 }

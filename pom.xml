@@ -99,6 +99,7 @@
         <poi.version>5.2.2</poi.version>
         <slf4j.version>1.7.36</slf4j.version>
         <spark.version>2.9.1</spark.version> <!-- 2.9.3 causes issues with tomcat -->
+        <spark-freemarker.version>2.7.1</spark-freemarker.version>
         <spring.version>5.3.20</spring.version>
         <super-csv.version>2.4.0</super-csv.version>
         <surefire.version>2.22.2</surefire.version>
@@ -127,7 +128,11 @@
                 <artifactId>jBCrypt</artifactId>
                 <version>${jbcrypt.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>com.sparkjava</groupId>
+                <artifactId>spark-template-freemarker</artifactId>
+                <version>${spark-freemarker.version}</version>
+            </dependency>
 
             <!-- json -->
             <dependency>
