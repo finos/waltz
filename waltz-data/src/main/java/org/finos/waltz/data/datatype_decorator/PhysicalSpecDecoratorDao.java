@@ -222,12 +222,28 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
                         DSL.val(Timestamp.valueOf(nowUtc())),
                         DSL.val("admin"))
                 .from(PHYSICAL_SPEC_DATA_TYPE)
+                .innerJoin(Tables.DATA_TYPE)
+                .on(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID.eq(Tables.DATA_TYPE.ID)
+                        .and(Tables.DATA_TYPE.UNKNOWN.isFalse()
+                                .and(Tables.DATA_TYPE.DEPRECATED.isFalse())))
+                .innerJoin(Tables.PHYSICAL_SPECIFICATION)
+                .on(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID.eq(Tables.PHYSICAL_SPECIFICATION.ID)
+                        .and(Tables.PHYSICAL_SPECIFICATION.IS_REMOVED.isFalse()))
                 .innerJoin(PHYSICAL_FLOW)
-                .on(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID.eq(PHYSICAL_FLOW.SPECIFICATION_ID))
+                .on(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID.eq(PHYSICAL_FLOW.SPECIFICATION_ID)
+                        .and(PHYSICAL_FLOW.IS_REMOVED.isFalse()
+                                .and(PHYSICAL_FLOW.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name()))))
+                .innerJoin(Tables.LOGICAL_FLOW)
+                .on(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(Tables.LOGICAL_FLOW.ID)
+                        .and(Tables.LOGICAL_FLOW.IS_REMOVED.isFalse()
+                                .and(Tables.LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name()))))
                 .leftJoin(LOGICAL_FLOW_DECORATOR)
-                .on(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(PHYSICAL_FLOW.LOGICAL_FLOW_ID)
-                        .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.eq(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID)))
+                .on(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(Tables.LOGICAL_FLOW.ID)
+                        .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.eq(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID))
+                        .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(DATA_TYPE.name())))
                 .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.isNull());
+
+        System.out.println(qry);
 
         return dsl
                 .insertInto(LOGICAL_FLOW_DECORATOR)
