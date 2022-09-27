@@ -19,6 +19,7 @@
     export let onSelect = (d) => console.log("Selecting an entity", d);
     export let onDeselect = (d) => console.log("Deselecting an entity", d);
     export let entityKind;
+    export let subjectKindFilter = () => true;
     export let selectionFilter = () => true
 
     function determineEntityPicker(entityKind) {
@@ -65,4 +66,6 @@
 <svelte:component {onSelect}
                   {onDeselect}
                   {selectionFilter}
+                  {subjectKindFilter}
+                  {entityKind}
                   this={comp}/>

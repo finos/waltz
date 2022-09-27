@@ -7,9 +7,10 @@
 
     export let onSelect = () => console.log("Selecting involvement kind");
     export let selectionFilter = () => true;
+    export let subjectKindFilter = () => true;
 
     $: assessmentDefinitionsCall = assessmentDefinitionStore.loadAll();
-    $: assessmentDefintions = $assessmentDefinitionsCall.data;
+    $: assessmentDefintions = _.filter($assessmentDefinitionsCall.data, d => subjectKindFilter(d.entityKind));
 
     $: rowData = _
         .chain(assessmentDefintions)

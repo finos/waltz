@@ -43,6 +43,10 @@
         showDropdown = false
     }
 
+    $: subjectKindFilter = (kind) => {
+        return subjectKind === kind;
+    }
+
 </script>
 
 
@@ -103,6 +107,7 @@
             <EntityPicker {onSelect}
                           {onDeselect}
                           {selectionFilter}
+                          {subjectKindFilter}
                           entityKind={selectedEntityKind?.key}/>
         {:else}
             <div class="help-block small">

@@ -9,6 +9,7 @@
 
     export let onSelect = () => console.log("Selecting involvement kind");
     export let selectionFilter = () => true;
+    export let subjectKindFilter = () => true;
 
     let selectedTemplate = null;
     let showActiveOnly = true;
@@ -17,7 +18,7 @@
 
     $: templates = _
         .chain($templatesCall?.data)
-        .filter(selectionFilter)
+        .filter(d => subjectKindFilter(d.targetEntityKind))
         .filter(r => !showActiveOnly || r.status === 'ACTIVE')
         .orderBy(d => d.name)
         .value();
