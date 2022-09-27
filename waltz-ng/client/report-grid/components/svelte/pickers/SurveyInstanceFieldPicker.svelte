@@ -40,7 +40,7 @@
                 columnName: selectedTemplate?.name,
                 displayName: null
             }))
-        .orderBy(d => d.displayName)
+        .orderBy(d => d.entityFieldReference.displayName)
         .value();
 
     $: rowData = _.filter(fieldReferences, selectionFilter)

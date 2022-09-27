@@ -31,7 +31,7 @@
     $: rowData = _
         .chain(fieldReferences)
         .filter(selectionFilter)
-        .orderBy(d => d.displayName)
+        .orderBy(d => d.entityFieldReference.displayName)
         .value();
 
     const columnDefs = [
