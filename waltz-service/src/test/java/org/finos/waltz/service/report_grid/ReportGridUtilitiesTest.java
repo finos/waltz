@@ -10,55 +10,58 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ReportGridUtilitiesTest {
 
+    private static final String HEADER_TEXT = "| Grid Name | Grid Identifier | Vantage Point Kind | Vantage Point Id |";
+    private static final String FILTER_INFO_TEXT = "| Filter Column | Filter Operator | Value/s |";
+
     private final String TEST_STRING = "| Grid Name | Grid Identifier | Vantage Point Kind | Vantage Point Id |\n" +
             "| --- | --- | --- | --- |\n" +
-            "| Grid Name | {GRIDEXTID} | ORG_UNIT | 1 |\n" +
+            "| `Grid Name` | `{GRIDEXTID}` | `ORG_UNIT` | `1` |\n" +
             "\n" +
             "\n" +
-            "| Filter Column | Column Option Codes |\n" +
+            "| Filter Column | Filter Operator | Value/s |\n" +
             "| --- | --- |\n" +
-            "| Asset Kind/Application | PROVIDED |\n" +
-            "| Developer | PROVIDED |";
+            "| `Asset Kind/Application` | `CONTAINS_OPERATION` | `PROVIDED` |\n" +
+            "| `Developer` | `CONTAINS_OPERATION` | `PROVIDED` |";
 
     private final String NO_SPACED_TABLES = "| Grid Name | Grid Identifier | Vantage Point Kind | Vantage Point Id |\n" +
             "| --- | --- | --- | --- |\n" +
-            "| Grid Name | {GRIDEXTID} | ORG_UNIT | 1 |\n" +
-            "| Filter Column | Column Option Codes |\n" +
+            "| `Grid Name` | `{GRIDEXTID}` | `ORG_UNIT` | `1` |\n" +
+            "| Filter Column | Filter Operator | Value/s |\n" +
             "| --- | --- |\n" +
-            "| Asset Kind/Application | PROVIDED |\n" +
-            "| Developer | PROVIDED |";
+            "| `Asset Kind/Application` | `CONTAINS_OPERATION` | `PROVIDED` |\n" +
+            "| `Developer` | `CONTAINS_OPERATION` | `PROVIDED` |";
 
     private final String TOO_MANY_HEADERS = "| Grid Name | Grid Identifier | Vantage Point Kind | Vantage Point Id |\n" +
             "| --- | --- | --- | --- |\n" +
-            "| Grid Name | {GRIDEXTID} | ORG_UNIT | 1 | 12 |\n" +
-            "| Filter Column | Column Option Codes |\n" +
+            "| `Grid Name` | `{GRIDEXTID}` | `ORG_UNIT` | `1` | `12` |\n" +
+            "| Filter Column | Filter Operator | Value/s |\n" +
             "| --- | --- |\n" +
-            "| Asset Kind/Application | PROVIDED |\n" +
-            "| Developer | PROVIDED |";
+            "| `Asset Kind/Application` | `CONTAINS_OPERATION` | `PROVIDED` |\n" +
+            "| `Developer` | `CONTAINS_OPERATION` | `PROVIDED` |";
 
     private final String NOT_ENOUGH_HEADERS = "| Grid Name | Grid Identifier | Vantage Point Kind | Vantage Point Id |\n" +
             "| --- | --- | --- | --- |\n" +
-            "| Grid Name | {GRIDEXTID} |\n" +
-            "| Filter Column | Column Option Codes |\n" +
+            "| `Grid Name` | `{GRIDEXTID}` |\n" +
+            "| Filter Column | Filter Operator | Value/s |\n" +
             "| --- | --- |\n" +
-            "| Asset Kind/Application | PROVIDED |\n" +
-            "| Developer | PROVIDED |";
+            "| `Asset Kind/Application` | `CONTAINS_OPERATION` | `PROVIDED` |\n" +
+            "| `Developer` | `CONTAINS_OPERATION` | `PROVIDED` |";
 
     private final String TOO_MANY_FILTER_COLS = "| Grid Name | Grid Identifier | Vantage Point Kind | Vantage Point Id |\n" +
             "| --- | --- | --- | --- |\n" +
-            "| Grid Name | {GRIDEXTID} | ORG_UNIT | 1 |\n" +
-            "| Filter Column | Column Option Codes |\n" +
+            "| `Grid Name` | `{GRIDEXTID}` | `ORG_UNIT` | `1` |\n" +
+            "| Filter Column | Filter Operator | Value/s |\n" +
             "| --- | --- |\n" +
-            "| Asset Kind/Application | PROVIDED |\n" +
-            "| Developer | PROVIDED | TESTING | TESTING |";
+            "| `Asset Kind/Application` | `CONTAINS_OPERATION` | `PROVIDED` |\n" +
+            "| `Developer` | `CONTAINS_OPERATION` | `PROVIDED` | `PROVIDED`";
 
     private final String NOT_ENOUGH_FILTER_COLS = "| Grid Name | Grid Identifier | Vantage Point Kind | Vantage Point Id |\n" +
             "| --- | --- | --- | --- |\n" +
-            "| Grid Name | {GRIDEXTID} | ORG_UNIT | 1 |\n" +
-            "| Filter Column | Column Option Codes |\n" +
+            "| `Grid Name` | `{GRIDEXTID}` | `ORG_UNIT` | `1` |\n" +
+            "| Filter Column | Filter Operator | Value/s |\n" +
             "| --- | --- |\n" +
-            "| Asset Kind/Application | PROVIDED |\n" +
-            "| Developer |";
+            "|` Asset Kind/Application` | `PROVIDED` |\n" +
+            "| `Developer` |";
 
     private final String[] TEST_STRING_ARRAY = TEST_STRING.split("\\r?\\n");
 
@@ -76,25 +79,25 @@ public class ReportGridUtilitiesTest {
 
     @Test
     public void parseEmptyTextShouldReturnEmptyList() {
-        List<List<String>> cellList = parseTableData(null, "| Grid Name | Grid Identifier | Vantage Point Kind | Vantage Point Id |");
+        List<List<String>> cellList = parseTableData(null, HEADER_TEXT);
         assertEquals(0, cellList.size());
     }
 
     @Test
     public void parseNullTextShouldReturnEmptyList() {
-        List<List<String>> cellList = parseTableData(null, "| Grid Name | Grid Identifier | Vantage Point Kind | Vantage Point Id |");
+        List<List<String>> cellList = parseTableData(null, HEADER_TEXT);
         assertEquals(0, cellList.size());
     }
 
     @Test
     public void parseNoteTextForHeaderShouldReturnOnlyOneRow() {
-        List<List<String>> cellList = parseTableData(TEST_STRING_ARRAY, "| Grid Name | Grid Identifier | Vantage Point Kind | Vantage Point Id |");
+        List<List<String>> cellList = parseTableData(TEST_STRING_ARRAY, HEADER_TEXT);
         assertEquals(1, cellList.size());
     }
 
     @Test
     public void parseNoteTextForFiltersShouldReturnTwoRows() {
-        List<List<String>> cellList = parseTableData(TEST_STRING_ARRAY, "| Filter Column | Column Option Codes |");
+        List<List<String>> cellList = parseTableData(TEST_STRING_ARRAY, FILTER_INFO_TEXT);
         assertEquals(2, cellList.size());
     }
 
@@ -107,7 +110,7 @@ public class ReportGridUtilitiesTest {
     @Test
     public void parseNoteTextShouldHaveTwoFieldsInGridInfoRow() {
         Tuple2<List<String>, List<List<String>>> noteText = ReportGridUtilities.parseGridFilterNoteText(TEST_STRING);
-        assertEquals(2, noteText.v2.get(0).size(), "Should have two fields in each filter info row");
+        assertEquals(3, noteText.v2.get(0).size(), "Should have two fields in each filter info row");
     }
 
     @Test

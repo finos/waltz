@@ -187,32 +187,15 @@ public class ReportGridFilterViewService {
 
             Set<Set<Long>> appIdsPassingFilters = gridFilters
                     .stream()
-                    .map(d -> {
-                        Collection<ReportGridCell> cellDataForColumn = dataByCol.getOrDefault(d.columnDefinitionId(), emptySet());
+                    .map(filter -> {
+                        Collection<ReportGridCell> cellDataForColumn = dataByCol.getOrDefault(filter.columnDefinitionId(), emptySet());
 
-                        Set<Long> appsPassingFilter = cellDataForColumn
-                                .stream()
-                                .filter(c -> {
-                                    // rating cells may want to look up on rating id / code / external id
-                                    if (c.ratingIdValue() != null) {
-                                        RatingSchemeItem rating = ratingSchemeItemByIdMap.get(c.ratingIdValue());
-                                        Set<String> ratingIdentifiers = asSet(c.optionCode(), String.valueOf(rating.rating()), rating.name(), rating.externalId().orElse(null));
-                                        return notEmpty(intersection(d.optionCodes(), ratingIdentifiers));
-                                    } else {
-                                        return d.optionCodes().contains(c.optionCode());
-                                    }
-                                })
-                                .map(ReportGridCell::subjectId)
-                                .collect(Collectors.toSet());
-
-
-                        if (d.optionCodes().contains(NOT_PROVIDED_OPTION_CODE)) {
-                            Set<Long> subjectIdsWithValues = SetUtilities.map(cellDataForColumn, ReportGridCell::subjectId);
-                            Set<Long> subjectIdsWithoutValue = minus(subjectIds, subjectIdsWithValues);
-
-                            return union(appsPassingFilter, subjectIdsWithoutValue);
+                        if (filter.filterOperator().equals(FilterOperator.CONTAINS_OPTION)) {
+                            return determineAppsPassingContainsOperatorFilter(subjectIds, ratingSchemeItemByIdMap, filter, cellDataForColumn);
+                        } else if (filter.filterOperator().equals(FilterOperator.CONTAINS_STRING)) {
+                            return determineAppsPassingContainsStringFilter(filter, cellDataForColumn);
                         } else {
-                            return appsPassingFilter;
+                            return subjectIds; // return all apps if filter operator not supported to support intersection
                         }
                     })
                     .collect(Collectors.toSet());
@@ -220,6 +203,59 @@ public class ReportGridFilterViewService {
             return appIdsPassingFilters
                     .stream()
                     .reduce(first(appIdsPassingFilters), SetUtilities::intersection);
+        }
+    }
+
+
+    private Set<Long> determineAppsPassingContainsStringFilter(GridFilter filter,
+                                                               Collection<ReportGridCell> cellDataForColumn) {
+        Set<Long> cellsPassingFilters = cellDataForColumn
+                .stream()
+                .filter(c -> containsAny(filter.filterValues(), c.textValue()))
+                .map(ReportGridCell::subjectId)
+                .collect(Collectors.toSet());
+
+        return cellsPassingFilters;
+    }
+
+
+    private boolean containsAny(Set<String> searchStrings, String lookupString) {
+        for (String text : searchStrings) {
+            if (lookupString.contains(text)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    private Set<Long> determineAppsPassingContainsOperatorFilter(Set<Long> subjectIds,
+                                                                 Map<Long, RatingSchemeItem> ratingSchemeItemByIdMap,
+                                                                 GridFilter filter,
+                                                                 Collection<ReportGridCell> cellDataForColumn) {
+        Set<Long> appsPassingFilter = cellDataForColumn
+                .stream()
+                .filter(c -> {
+                    // rating cells may want to look up on rating id / code / external id
+                    if (c.ratingIdValue() != null) {
+                        RatingSchemeItem rating = ratingSchemeItemByIdMap.get(c.ratingIdValue());
+                        Set<String> ratingIdentifiers = asSet(c.optionCode(), String.valueOf(rating.rating()), rating.name(), rating.externalId().orElse(null));
+                        return notEmpty(intersection(filter.filterValues(), ratingIdentifiers));
+                    } else {
+                        return filter.filterValues().contains(c.optionCode());
+                    }
+                })
+                .map(ReportGridCell::subjectId)
+                .collect(Collectors.toSet());
+
+
+        if (filter.filterValues().contains(NOT_PROVIDED_OPTION_CODE)) {
+            Set<Long> subjectIdsWithValues = SetUtilities.map(cellDataForColumn, ReportGridCell::subjectId);
+            Set<Long> subjectIdsWithoutValue = minus(subjectIds, subjectIdsWithValues);
+
+            return union(appsPassingFilter, subjectIdsWithoutValue);
+        } else {
+            return appsPassingFilter;
         }
     }
 
@@ -242,9 +278,9 @@ public class ReportGridFilterViewService {
     }
 
 
-    private ImmutableReportGridFilterInfo getGridFilterInfo(Map<String, ReportGridDefinition> gridsByExternalId,
-                                                            Long appGroupId,
-                                                            String noteText) {
+    private ReportGridFilterInfo getGridFilterInfo(Map<String, ReportGridDefinition> gridsByExternalId,
+                                                   Long appGroupId,
+                                                   String noteText) {
 
         Tuple2<List<String>, List<List<String>>> gridInfoAndFilters;
 

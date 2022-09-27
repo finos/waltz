@@ -6,10 +6,7 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.HierarchyQueryScope;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.ImmutableIdSelectionOptions;
-import org.finos.waltz.model.report_grid.GridFilter;
-import org.finos.waltz.model.report_grid.ImmutableGridFilter;
-import org.finos.waltz.model.report_grid.ReportGridDefinition;
-import org.finos.waltz.model.report_grid.ReportGridFixedColumnDefinition;
+import org.finos.waltz.model.report_grid.*;
 import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +25,11 @@ public class ReportGridUtilities {
 
     private static final Logger LOG = LoggerFactory.getLogger(ReportGridUtilities.class);
     private static final int HEADER_COLUMN_COUNT = 4;
-    private static final int FILTER_OPTIONS_COLUMN_COUNT = 2;
+    private static final int FILTER_OPTIONS_COLUMN_COUNT = 3;
+    private static final String TABLE_HEADER = "| Grid Name | Grid Identifier | Vantage Point Kind | Vantage Point Id |";
+    private static final String FILTER_HEADER = "| Filter Column | Filter Operator | Value/s |";
+    private static final String FILTER_DELIMETER = ";";
+
 
     public static Tuple2<List<String>, List<List<String>>> parseGridFilterNoteText(String noteText) {
 
@@ -38,11 +39,9 @@ public class ReportGridUtilities {
 
         String[] lines = noteText.split("\\r?\\n");
 
-        String tableHeader = "| Grid Name | Grid Identifier | Vantage Point Kind | Vantage Point Id |";
-        String filterHeader = "| Filter Column | Column Option Codes |";
 
-        List<List<String>> headerRows = parseTableData(lines, tableHeader);
-        List<List<String>> filterRows = parseTableData(lines, filterHeader);
+        List<List<String>> headerRows = parseTableData(lines, TABLE_HEADER);
+        List<List<String>> filterRows = parseTableData(lines, FILTER_HEADER);
 
         if (headerRows.size() != 1) {
             throw new IllegalArgumentException(format(
@@ -68,7 +67,7 @@ public class ReportGridUtilities {
 
         if (filterRow.size() != FILTER_OPTIONS_COLUMN_COUNT) {
             throw new IllegalArgumentException(format(
-                    "Incorrect number of filter columns found [%d], should follow : [Filter Column, Column Option Codes]",
+                    "Incorrect number of filter columns found [%d], should follow : [Filter Column, Filter Operator, Value/s]",
                     filterRow.size()));
         }
 
@@ -78,7 +77,7 @@ public class ReportGridUtilities {
 
     public static Set<String> getFilterValues(String string) {
         return Arrays
-                .stream(string.split(";"))
+                .stream(string.split(FILTER_DELIMETER))
                 .map(String::trim)
                 .collect(Collectors.toSet());
     }
@@ -115,7 +114,7 @@ public class ReportGridUtilities {
 
                         List<String> cellData = Arrays
                                 .stream(line.split("\\|"))
-                                .map(String::trim)
+                                .map(s -> s.replaceAll("`", "").trim())
                                 .filter(s -> !StringUtilities.isEmpty(s))
                                 .collect(Collectors.toList());
 
@@ -150,17 +149,29 @@ public class ReportGridUtilities {
         return filterRows
                 .stream()
                 .map(r -> {
-                    String columnName = sanitizeString(r.get(0));
+
+                    String columnString = r.get(0);
+                    String filterOperator = r.get(1);
+                    String values = r.get(2);
+
+                    String columnName = sanitizeString(columnString);
                     Long columnDefnId = columnsDefinitionIdByName.get(columnName);
 
                     if (columnDefnId == null) {
                         LOG.info(format("Cannot find column '%s' on grid. Skipping this filter", columnName));
                         return null;
                     } else {
-                        return ImmutableGridFilter.builder()
-                                .columnDefinitionId(columnDefnId)
-                                .optionCodes(getFilterValues(r.get(1)))
-                                .build();
+
+                        Optional<FilterOperator> operator = FilterOperator.parseString(filterOperator);
+
+                        return operator
+                                .map(op -> ImmutableGridFilter.builder()
+                                        .columnDefinitionId(columnDefnId)
+                                        .filterOperator(op)
+                                        .filterValues(getFilterValues(values))
+                                        .build())
+                                .orElse(null);
+
                     }
                 })
                 .filter(Objects::nonNull)
