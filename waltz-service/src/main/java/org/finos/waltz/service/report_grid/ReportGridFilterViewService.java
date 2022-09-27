@@ -18,6 +18,7 @@
 
 package org.finos.waltz.service.report_grid;
 
+import org.finos.waltz.common.CollectionUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.report_grid.ReportGridDao;
@@ -43,11 +44,13 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.CollectionUtilities.*;
+import static org.finos.waltz.common.CollectionUtilities.first;
+import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.ListUtilities.map;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.SetUtilities.*;
+import static org.finos.waltz.common.StringUtilities.notEmpty;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 import static org.finos.waltz.service.report_grid.ReportGridUtilities.*;
@@ -211,7 +214,7 @@ public class ReportGridFilterViewService {
                                                                Collection<ReportGridCell> cellDataForColumn) {
         Set<Long> cellsPassingFilters = cellDataForColumn
                 .stream()
-                .filter(c -> containsAny(filter.filterValues(), c.textValue()))
+                .filter(c -> notEmpty(c.textValue()) && containsAny(filter.filterValues(), c.textValue()))
                 .map(ReportGridCell::subjectId)
                 .collect(Collectors.toSet());
 
@@ -240,7 +243,7 @@ public class ReportGridFilterViewService {
                     if (c.ratingIdValue() != null) {
                         RatingSchemeItem rating = ratingSchemeItemByIdMap.get(c.ratingIdValue());
                         Set<String> ratingIdentifiers = asSet(c.optionCode(), String.valueOf(rating.rating()), rating.name(), rating.externalId().orElse(null));
-                        return notEmpty(intersection(filter.filterValues(), ratingIdentifiers));
+                        return CollectionUtilities.notEmpty(intersection(filter.filterValues(), ratingIdentifiers));
                     } else {
                         return filter.filterValues().contains(c.optionCode());
                     }
