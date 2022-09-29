@@ -303,6 +303,7 @@ const attestationColorScale = scaleLinear()
 function determineColorForKind(columnEntityKind) {
     switch (columnEntityKind) {
         case "APP_GROUP":
+        case "MEASURABLE_CATEGORY":
             return "#d1dbff";
         case "INVOLVEMENT_KIND":
             return "#e0ffe1";
@@ -402,6 +403,7 @@ export function prepareTableData(gridData) {
             case "SURVEY_QUESTION":
             case "TAG":
             case "ENTITY_ALIAS":
+            case "MEASURABLE_CATEGORY":
                 return Object.assign({}, baseCell, {
                     color: determineColorForKind(colDef.columnEntityKind),
                     text: dataCell.textValue,

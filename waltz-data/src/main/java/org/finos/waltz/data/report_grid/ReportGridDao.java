@@ -21,9 +21,11 @@ package org.finos.waltz.data.report_grid;
 
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.SetUtilities;
+import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.entity_field_reference.EntityFieldReference;
 import org.finos.waltz.model.entity_field_reference.ImmutableEntityFieldReference;
@@ -476,6 +478,9 @@ public class ReportGridDao {
         SelectConditionStep<Record7<Long, String, String, String, String, String, String>> attestationColumns = mkAttestationColumnDefinitionQuery(
                 condition);
 
+        SelectConditionStep<Record7<Long, String, String, String, String, String, String>> measurableHierarchyColumns = mkMeasurableHierarchyColumnDefinitionQuery(
+                condition);
+
         Table<Record7<Long, String, String, String, String, String, String>> extras = assessmentDefinitionColumns
                 .unionAll(measurableColumns)
                 .unionAll(costKindColumns)
@@ -491,6 +496,7 @@ public class ReportGridDao {
                 .unionAll(attestationColumns)
                 .unionAll(tagColumns)
                 .unionAll(aliasColumns)
+                .unionAll(measurableHierarchyColumns)
                 .asTable("extras");
 
         return dsl
@@ -651,6 +657,29 @@ public class ReportGridDao {
                 .and(rgfcd.COLUMN_ENTITY_KIND.eq(entityKind.name()));
     }
 
+
+    private SelectConditionStep<Record7<Long, String, String, String, String, String, String>> mkMeasurableHierarchyColumnDefinitionQuery(Condition reportCondition) {
+        Condition hasQualifier = rgfcd.COLUMN_QUALIFIER_ID.isNotNull();
+        Field<String> nameField = DSL.when(hasQualifier, DSL.concat(mc.NAME, DSL.val("/"), m.NAME)).otherwise(mc.NAME).as("name");
+
+        return dsl
+                .select(rgfcd.GRID_COLUMN_ID,
+                        nameField,
+                        mc.DESCRIPTION,
+                        efr.ENTITY_KIND,
+                        efr.DISPLAY_NAME,
+                        efr.DESCRIPTION,
+                        efr.FIELD_NAME)
+                .from(rgfcd)
+                .innerJoin(rgcd).on(rgfcd.GRID_COLUMN_ID.eq(rgcd.ID))
+                .innerJoin(rg).on(rg.ID.eq(rgcd.REPORT_GRID_ID))
+                .innerJoin(mc).on(rgfcd.COLUMN_ENTITY_ID.eq(mc.ID)
+                        .and(rgfcd.COLUMN_ENTITY_KIND.eq(EntityKind.MEASURABLE_CATEGORY.name())))
+                .leftJoin(m).on(rgfcd.COLUMN_QUALIFIER_ID.eq(m.ID).and(rgfcd.COLUMN_QUALIFIER_KIND.eq(EntityKind.MEASURABLE.name())))
+                .leftJoin(efr).on(rgfcd.ENTITY_FIELD_REFERENCE_ID.eq(efr.ID))
+                .where(reportCondition);
+    }
+
     private SelectConditionStep<Record7<Long, String, String, String, String, String, String>> mkEntityDescriptorColumnDefinitionQry(EntityKind entityKind,
                                                                                                                                      String columnName,
                                                                                                                                      String columnDescription,
@@ -746,8 +775,110 @@ public class ReportGridDao {
                     fetchAttestationData(genericSelector, colsByKind.get(EntityKind.ATTESTATION)),
                     fetchOrgUnitFieldReferenceData(genericSelector, complexColsByKind.get(EntityKind.ORG_UNIT)),
                     fetchTagData(genericSelector, colsByKind.get(EntityKind.TAG)),
-                    fetchAliasData(genericSelector, colsByKind.get(EntityKind.ENTITY_ALIAS)));
+                    fetchAliasData(genericSelector, colsByKind.get(EntityKind.ENTITY_ALIAS)),
+                    fetchMeasurableHierarchyData(genericSelector, colsByKind.get(EntityKind.MEASURABLE_CATEGORY)));
         }
+    }
+
+    public Set<ReportGridCell> fetchMeasurableHierarchyData(GenericSelector genericSelector,
+                                                            Collection<ReportGridFixedColumnDefinition> cols) {
+        if (isEmpty(cols)) {
+            return emptySet();
+        } else {
+
+            Map<Tuple2<Long, Long>, Long> colIdsByCategoryIdAndQualifierId = indexBy(
+                    cols,
+                    c -> tuple(c.columnEntityId(), c.columnQualifierId()),
+                    ReportGridFixedColumnDefinition::gridColumnId);
+
+            SelectConditionStep<Record2<Long, Long>> allRootMeasurableToEntityMapping = mkAllRootMeasurablesToEntityQry(genericSelector);
+
+            return colIdsByCategoryIdAndQualifierId
+                    .entrySet()
+                    .stream()
+                    .flatMap(e -> {
+
+                        Tuple2<Long, Long> categoryAndQualifier = e.getKey();
+                        Long colId = e.getValue();
+
+                        Condition qualifierCondition = categoryAndQualifier.v2 == null
+                                ? DSL.trueCondition()
+                                : eh.ANCESTOR_ID.eq(categoryAndQualifier.v2);
+
+                        Map<Tuple3<Long, Object, Long>, List<Tuple2<String, Long>>> measurablesForEachApp = dsl
+                                .selectDistinct(
+                                        m.MEASURABLE_CATEGORY_ID,
+                                        DSL.val(categoryAndQualifier.v2),
+                                        m.ID,
+                                        m.NAME,
+                                        allRootMeasurableToEntityMapping.field(mr.ENTITY_ID))
+                                .from(m)
+                                .innerJoin(allRootMeasurableToEntityMapping).on(m.ID.eq(allRootMeasurableToEntityMapping.field(eh.ID)))
+                                .innerJoin(eh).on(m.ID.eq(eh.ID).and(eh.KIND.eq(EntityKind.MEASURABLE.name())))
+                                .where(m.MEASURABLE_CATEGORY_ID.eq(categoryAndQualifier.v1))
+                                .and(qualifierCondition)
+                                .fetchGroups(
+                                        r -> tuple(
+                                                r.get(m.MEASURABLE_CATEGORY_ID),
+                                                null,
+                                                r.get(allRootMeasurableToEntityMapping.field(mr.ENTITY_ID))),
+                                        r -> tuple(r.get(m.NAME), r.get(m.ID)));
+
+
+                        return measurablesForEachApp
+                                .entrySet()
+                                .stream()
+                                .map(entries -> {
+
+                                    String measurableList = join(map(entries.getValue(), t -> t.v1), "; ");
+
+                                    return ImmutableReportGridCell
+                                            .builder()
+                                            .columnDefinitionId(colId)
+                                            .subjectId(entries.getKey().v3)
+                                            .textValue(measurableList)
+                                            .comment(measurableList)
+                                            .build();
+                                });
+                    })
+                    .collect(toSet());
+        }
+    }
+
+
+    private SelectConditionStep<Record2<Long, Long>> mkAllRootMeasurablesToEntityQry(GenericSelector genericSelector) {
+
+        SelectHavingConditionStep<Record2<Long, Integer>> measurablesAtRootLevel = mkRootMeasurableQry();
+        SelectConditionStep<Record2<Long, Long>> ratingsInScope = mkMeasurableRatingsQry(genericSelector);
+
+        // This could maybe be simplified if we assume all measurable ratings are the root nodes? but not the case for many taxonomies
+
+        return dsl
+                .select(ratingsInScope.field(mr.ENTITY_ID), eh.ID)
+                .from(eh)
+                .innerJoin(ratingsInScope).on(eh.ANCESTOR_ID.eq(ratingsInScope.field(mr.MEASURABLE_ID)))
+                .innerJoin(m).on(eh.ID.eq(m.ID).and(m.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name())))
+                .innerJoin(measurablesAtRootLevel).on(eh.ID.eq(measurablesAtRootLevel.field(eh.ANCESTOR_ID)))
+                .where(eh.KIND.eq(EntityKind.MEASURABLE.name()));
+    }
+
+
+    private SelectConditionStep<Record2<Long, Long>> mkMeasurableRatingsQry(GenericSelector genericSelector) {
+        return DSL
+                .select(mr.ENTITY_ID, mr.MEASURABLE_ID)
+                .from(mr)
+                .where(mr.ENTITY_ID.in(genericSelector.selector()))
+                .and(mr.ENTITY_KIND.eq(genericSelector.kind().name()));
+    }
+
+
+    private SelectHavingConditionStep<Record2<Long, Integer>> mkRootMeasurableQry() {
+        return DSL
+                .select(eh.ANCESTOR_ID, DSL.count(eh.ID).as("count"))
+                .from(eh)
+                .where(eh.KIND.eq(EntityKind.MEASURABLE.name()))
+                .groupBy(eh.ANCESTOR_ID)
+                .having(DSL.count(eh.ID).eq(1));
     }
 
 

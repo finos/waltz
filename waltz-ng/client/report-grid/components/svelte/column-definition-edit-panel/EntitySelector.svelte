@@ -25,8 +25,26 @@
     $: entityKinds = entityKindsBySubjectKind[subjectKind] || baseKinds;
 
     const entityKindsBySubjectKind = {
-        "APPLICATION": _.orderBy(_.concat(baseKinds, [entity.ATTESTATION, entity.APPLICATION, entity.DATA_TYPE, entity.MEASURABLE, entity.COST_KIND, entity.ENTITY_ALIAS, entity.TAG, entity.COMPLEXITY_KIND]), d => d.name),
-        "CHANGE_INITIATIVE": _.orderBy(_.concat(baseKinds, [entity.CHANGE_INITIATIVE]), d => d.name)
+        "APPLICATION": _.orderBy(
+            _.concat(
+                baseKinds,
+                [
+                    entity.ATTESTATION,
+                    entity.APPLICATION,
+                    entity.DATA_TYPE,
+                    entity.MEASURABLE,
+                    entity.COST_KIND,
+                    entity.ENTITY_ALIAS,
+                    entity.TAG,
+                    entity.COMPLEXITY_KIND,
+                    entity.MEASURABLE_CATEGORY,
+                ]),
+            d => d.name),
+        "CHANGE_INITIATIVE": _.orderBy(
+            _.concat(
+                baseKinds,
+                [entity.CHANGE_INITIATIVE]),
+            d => d.name)
     };
 
     function toggleDropdown() {
