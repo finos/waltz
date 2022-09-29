@@ -19,7 +19,8 @@
         entity.ASSESSMENT_DEFINITION,
         entity.APP_GROUP,
         entity.SURVEY_INSTANCE,
-        entity.ORG_UNIT
+        entity.ORG_UNIT,
+        entity.ENTITY_STATISTIC
     ];
 
     $: entityKinds = entityKindsBySubjectKind[subjectKind] || baseKinds;

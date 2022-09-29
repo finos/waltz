@@ -16,6 +16,7 @@
     import AliasPicker from "./AliasPicker.svelte";
     import ComplexityKindPicker from "./ComplexityKindPicker.svelte";
     import MeasurableCategoryPicker from "./MeasurableCategoryPicker.svelte";
+    import EntityStatisticPicker from "./EntityStatisticPicker.svelte";
 
     export let onSelect = (d) => console.log("Selecting an entity", d);
     export let onDeselect = (d) => console.log("Deselecting an entity", d);
@@ -57,6 +58,8 @@
                 return AliasPicker;
             case "MEASURABLE_CATEGORY":
                 return MeasurableCategoryPicker;
+            case "ENTITY_STATISTIC":
+                return EntityStatisticPicker;
             default:
                 throw "Cannot find picker for kind: " + entityKind;
         }

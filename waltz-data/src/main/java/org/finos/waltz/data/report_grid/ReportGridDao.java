@@ -124,6 +124,8 @@ public class ReportGridDao {
     private final org.finos.waltz.schema.tables.Tag t = TAG.as("t");
 
     private final org.finos.waltz.schema.tables.EntityAlias ea = ENTITY_ALIAS.as("ea");
+    private final org.finos.waltz.schema.tables.EntityStatisticValue esv = ENTITY_STATISTIC_VALUE.as("esv");
+    private final org.finos.waltz.schema.tables.EntityStatisticDefinition esd = ENTITY_STATISTIC_DEFINITION.as("esd");
 
     private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
                     SURVEY_QUESTION_RESPONSE.ENTITY_RESPONSE_ID,
@@ -463,6 +465,14 @@ public class ReportGridDao {
                 dt.DESCRIPTION,
                 condition);
 
+        SelectConditionStep<Record7<Long, String, String, String, String, String, String>> entityStatisticColumns = mkSupplementalColumnDefinitionQuery(
+                EntityKind.ENTITY_STATISTIC,
+                esd,
+                esd.ID,
+                esd.NAME,
+                esd.DESCRIPTION,
+                condition);
+
         SelectConditionStep<Record7<Long, String, String, String, String, String, String>> tagColumns = mkEntityDescriptorColumnDefinitionQry(
                 EntityKind.TAG,
                 "Tags",
@@ -497,6 +507,7 @@ public class ReportGridDao {
                 .unionAll(tagColumns)
                 .unionAll(aliasColumns)
                 .unionAll(measurableHierarchyColumns)
+                .unionAll(entityStatisticColumns)
                 .asTable("extras");
 
         return dsl
@@ -776,7 +787,8 @@ public class ReportGridDao {
                     fetchOrgUnitFieldReferenceData(genericSelector, complexColsByKind.get(EntityKind.ORG_UNIT)),
                     fetchTagData(genericSelector, colsByKind.get(EntityKind.TAG)),
                     fetchAliasData(genericSelector, colsByKind.get(EntityKind.ENTITY_ALIAS)),
-                    fetchMeasurableHierarchyData(genericSelector, colsByKind.get(EntityKind.MEASURABLE_CATEGORY)));
+                    fetchMeasurableHierarchyData(genericSelector, colsByKind.get(EntityKind.MEASURABLE_CATEGORY)),
+                    fetchEntityStatisticData(genericSelector, colsByKind.get(EntityKind.ENTITY_STATISTIC)));
         }
     }
 
@@ -1796,6 +1808,38 @@ public class ReportGridDao {
                             .comment(r.get(ar.DESCRIPTION))
                             .optionCode(Long.toString(r.get(ar.RATING_ID)))
                             .optionText(r.get(rsi.NAME))
+                            .build());
+        }
+    }
+
+
+    private Set<ReportGridCell> fetchEntityStatisticData(GenericSelector selector,
+                                                         Collection<ReportGridFixedColumnDefinition> cols) {
+        if (isEmpty(cols)) {
+            return emptySet();
+        } else {
+            Map<Long, Long> statisticDefinitionIdToColIdMap = indexBy(
+                    cols,
+                    ReportGridFixedColumnDefinition::columnEntityId,
+                    ReportGridFixedColumnDefinition::gridColumnId);
+
+            return dsl
+                    .select(esv.ENTITY_ID,
+                            esv.STATISTIC_ID,
+                            esv.OUTCOME,
+                            esv.REASON)
+                    .from(esv)
+                    .where(esv.STATISTIC_ID.in(statisticDefinitionIdToColIdMap.keySet())
+                            .and(esv.CURRENT.eq(true))
+                            .and(esv.ENTITY_KIND.eq(selector.kind().name()))
+                            .and(esv.ENTITY_ID.in(selector.selector())))
+                    .fetchSet(r -> ImmutableReportGridCell.builder()
+                            .subjectId(r.get(esv.ENTITY_ID))
+                            .columnDefinitionId(statisticDefinitionIdToColIdMap.get(r.get(esv.STATISTIC_ID)))
+                            .textValue(r.get(esv.OUTCOME))
+                            .comment(r.get(esv.REASON))
+                            .optionCode(r.get(esv.OUTCOME))
+                            .optionText(r.get(esv.OUTCOME))
                             .build());
         }
     }

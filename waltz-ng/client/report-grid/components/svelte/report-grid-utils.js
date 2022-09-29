@@ -310,6 +310,7 @@ function determineColorForKind(columnEntityKind) {
         case "SURVEY_QUESTION":
             return "#fff59d";
         case "ORG_UNIT":
+        case "ENTITY_STATISTIC":
             return "#f3e4ff";
         case "TAG":
         case "ENTITY_ALIAS":
@@ -404,6 +405,7 @@ export function prepareTableData(gridData) {
             case "TAG":
             case "ENTITY_ALIAS":
             case "MEASURABLE_CATEGORY":
+            case "ENTITY_STATISTIC":
                 return Object.assign({}, baseCell, {
                     color: determineColorForKind(colDef.columnEntityKind),
                     text: dataCell.textValue,
