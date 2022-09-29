@@ -170,7 +170,10 @@ public class ReportGridUtilities {
                                         .filterOperator(op)
                                         .filterValues(getFilterValues(values))
                                         .build())
-                                .orElse(null);
+                                .orElseGet(() -> {
+                                    LOG.info(format("Cannot parse filter operator: '%s'. Skipping this filter", filterOperator));
+                                    return null;
+                                });
 
                     }
                 })

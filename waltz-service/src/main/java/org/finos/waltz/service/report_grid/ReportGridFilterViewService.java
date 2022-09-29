@@ -193,9 +193,9 @@ public class ReportGridFilterViewService {
                     .map(filter -> {
                         Collection<ReportGridCell> cellDataForColumn = dataByCol.getOrDefault(filter.columnDefinitionId(), emptySet());
 
-                        if (filter.filterOperator().equals(FilterOperator.CONTAINS_OPTION)) {
+                        if (filter.filterOperator().equals(FilterOperator.CONTAINS_ANY_OPTION)) {
                             return determineAppsPassingContainsOperatorFilter(subjectIds, ratingSchemeItemByIdMap, filter, cellDataForColumn);
-                        } else if (filter.filterOperator().equals(FilterOperator.CONTAINS_STRING)) {
+                        } else if (filter.filterOperator().equals(FilterOperator.CONTAINS_ANY_STRING)) {
                             return determineAppsPassingContainsStringFilter(filter, cellDataForColumn);
                         } else {
                             return subjectIds; // return all apps if filter operator not supported to support intersection

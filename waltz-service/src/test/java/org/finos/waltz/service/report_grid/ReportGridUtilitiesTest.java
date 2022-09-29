@@ -20,40 +20,40 @@ public class ReportGridUtilitiesTest {
             "\n" +
             "| Filter Column | Filter Operator | Value/s |\n" +
             "| --- | --- |\n" +
-            "| `Asset Kind/Application` | `CONTAINS_OPERATION` | `PROVIDED` |\n" +
-            "| `Developer` | `CONTAINS_OPERATION` | `PROVIDED` |";
+            "| `Asset Kind/Application` | `CONTAINS_ANY_OPTION` | `PROVIDED` |\n" +
+            "| `Developer` | `CONTAINS_ANY_OPTION` | `PROVIDED` |";
 
     private final String NO_SPACED_TABLES = "| Grid Name | Grid Identifier | Vantage Point Kind | Vantage Point Id |\n" +
             "| --- | --- | --- | --- |\n" +
             "| `Grid Name` | `{GRIDEXTID}` | `ORG_UNIT` | `1` |\n" +
             "| Filter Column | Filter Operator | Value/s |\n" +
             "| --- | --- |\n" +
-            "| `Asset Kind/Application` | `CONTAINS_OPERATION` | `PROVIDED` |\n" +
-            "| `Developer` | `CONTAINS_OPERATION` | `PROVIDED` |";
+            "| `Asset Kind/Application` | `CONTAINS_ANY_OPTION` | `PROVIDED` |\n" +
+            "| `Developer` | `CONTAINS_ANY_OPTION` | `PROVIDED` |";
 
     private final String TOO_MANY_HEADERS = "| Grid Name | Grid Identifier | Vantage Point Kind | Vantage Point Id |\n" +
             "| --- | --- | --- | --- |\n" +
             "| `Grid Name` | `{GRIDEXTID}` | `ORG_UNIT` | `1` | `12` |\n" +
             "| Filter Column | Filter Operator | Value/s |\n" +
             "| --- | --- |\n" +
-            "| `Asset Kind/Application` | `CONTAINS_OPERATION` | `PROVIDED` |\n" +
-            "| `Developer` | `CONTAINS_OPERATION` | `PROVIDED` |";
+            "| `Asset Kind/Application` | `CONTAINS_ANY_OPTION` | `PROVIDED` |\n" +
+            "| `Developer` | `CONTAINS_ANY_OPTION` | `PROVIDED` |";
 
     private final String NOT_ENOUGH_HEADERS = "| Grid Name | Grid Identifier | Vantage Point Kind | Vantage Point Id |\n" +
             "| --- | --- | --- | --- |\n" +
             "| `Grid Name` | `{GRIDEXTID}` |\n" +
             "| Filter Column | Filter Operator | Value/s |\n" +
             "| --- | --- |\n" +
-            "| `Asset Kind/Application` | `CONTAINS_OPERATION` | `PROVIDED` |\n" +
-            "| `Developer` | `CONTAINS_OPERATION` | `PROVIDED` |";
+            "| `Asset Kind/Application` | `CONTAINS_ANY_OPTION` | `PROVIDED` |\n" +
+            "| `Developer` | `CONTAINS_ANY_OPTION` | `PROVIDED` |";
 
     private final String TOO_MANY_FILTER_COLS = "| Grid Name | Grid Identifier | Vantage Point Kind | Vantage Point Id |\n" +
             "| --- | --- | --- | --- |\n" +
             "| `Grid Name` | `{GRIDEXTID}` | `ORG_UNIT` | `1` |\n" +
             "| Filter Column | Filter Operator | Value/s |\n" +
             "| --- | --- |\n" +
-            "| `Asset Kind/Application` | `CONTAINS_OPERATION` | `PROVIDED` |\n" +
-            "| `Developer` | `CONTAINS_OPERATION` | `PROVIDED` | `PROVIDED`";
+            "| `Asset Kind/Application` | `CONTAINS_ANY_OPTION` | `PROVIDED` |\n" +
+            "| `Developer` | `CONTAINS_ANY_OPTION` | `PROVIDED` | `PROVIDED`";
 
     private final String NOT_ENOUGH_FILTER_COLS = "| Grid Name | Grid Identifier | Vantage Point Kind | Vantage Point Id |\n" +
             "| --- | --- | --- | --- |\n" +
