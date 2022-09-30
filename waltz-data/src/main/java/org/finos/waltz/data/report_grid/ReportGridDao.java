@@ -803,7 +803,12 @@ public class ReportGridDao {
                     c -> tuple(c.columnEntityId(), c.columnQualifierId()),
                     ReportGridFixedColumnDefinition::gridColumnId);
 
-            SelectConditionStep<Record2<Long, Long>> allRootMeasurableToEntityMapping = mkAllRootMeasurablesToEntityQry(genericSelector);
+            SelectConditionStep<Record2<Long, Long>> ratingsInScope = DSL
+                    .select(mr.ENTITY_ID, mr.MEASURABLE_ID)
+                    .from(mr)
+                    .where(mr.ENTITY_ID.in(genericSelector.selector()))
+                    .and(mr.ENTITY_KIND.eq(genericSelector.kind().name()));
+
 
             return colIdsByCategoryIdAndQualifierId
                     .entrySet()
@@ -823,9 +828,9 @@ public class ReportGridDao {
                                         DSL.val(categoryAndQualifier.v2),
                                         m.ID,
                                         m.NAME,
-                                        allRootMeasurableToEntityMapping.field(mr.ENTITY_ID))
+                                        ratingsInScope.field(mr.ENTITY_ID))
                                 .from(m)
-                                .innerJoin(allRootMeasurableToEntityMapping).on(m.ID.eq(allRootMeasurableToEntityMapping.field(eh.ID)))
+                                .innerJoin(ratingsInScope).on(m.ID.eq(ratingsInScope.field(mr.MEASURABLE_ID)))
                                 .innerJoin(eh).on(m.ID.eq(eh.ID).and(eh.KIND.eq(EntityKind.MEASURABLE.name())))
                                 .where(m.MEASURABLE_CATEGORY_ID.eq(categoryAndQualifier.v1))
                                 .and(qualifierCondition)
@@ -833,7 +838,7 @@ public class ReportGridDao {
                                         r -> tuple(
                                                 r.get(m.MEASURABLE_CATEGORY_ID),
                                                 null,
-                                                r.get(allRootMeasurableToEntityMapping.field(mr.ENTITY_ID))),
+                                                r.get(ratingsInScope.field(mr.ENTITY_ID))),
                                         r -> tuple(r.get(m.NAME), r.get(m.ID)));
 
 
@@ -855,42 +860,6 @@ public class ReportGridDao {
                     })
                     .collect(toSet());
         }
-    }
-
-
-    private SelectConditionStep<Record2<Long, Long>> mkAllRootMeasurablesToEntityQry(GenericSelector genericSelector) {
-
-        SelectHavingConditionStep<Record2<Long, Integer>> measurablesAtRootLevel = mkRootMeasurableQry();
-        SelectConditionStep<Record2<Long, Long>> ratingsInScope = mkMeasurableRatingsQry(genericSelector);
-
-        // This could maybe be simplified if we assume all measurable ratings are the root nodes? but not the case for many taxonomies
-
-        return dsl
-                .select(ratingsInScope.field(mr.ENTITY_ID), eh.ID)
-                .from(eh)
-                .innerJoin(ratingsInScope).on(eh.ANCESTOR_ID.eq(ratingsInScope.field(mr.MEASURABLE_ID)))
-                .innerJoin(m).on(eh.ID.eq(m.ID).and(m.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name())))
-                .innerJoin(measurablesAtRootLevel).on(eh.ID.eq(measurablesAtRootLevel.field(eh.ANCESTOR_ID)))
-                .where(eh.KIND.eq(EntityKind.MEASURABLE.name()));
-    }
-
-
-    private SelectConditionStep<Record2<Long, Long>> mkMeasurableRatingsQry(GenericSelector genericSelector) {
-        return DSL
-                .select(mr.ENTITY_ID, mr.MEASURABLE_ID)
-                .from(mr)
-                .where(mr.ENTITY_ID.in(genericSelector.selector()))
-                .and(mr.ENTITY_KIND.eq(genericSelector.kind().name()));
-    }
-
-
-    private SelectHavingConditionStep<Record2<Long, Integer>> mkRootMeasurableQry() {
-        return DSL
-                .select(eh.ANCESTOR_ID, DSL.count(eh.ID).as("count"))
-                .from(eh)
-                .where(eh.KIND.eq(EntityKind.MEASURABLE.name()))
-                .groupBy(eh.ANCESTOR_ID)
-                .having(DSL.count(eh.ID).eq(1));
     }
 
 
