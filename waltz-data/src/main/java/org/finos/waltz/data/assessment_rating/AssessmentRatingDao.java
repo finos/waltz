@@ -49,8 +49,7 @@ import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.SetUtilities.*;
-import static org.finos.waltz.common.StringUtilities.mkSafe;
-import static org.finos.waltz.common.StringUtilities.notEmpty;
+import static org.finos.waltz.common.StringUtilities.*;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.schema.Tables.*;
 import static org.finos.waltz.schema.tables.AssessmentDefinition.ASSESSMENT_DEFINITION;
@@ -104,7 +103,7 @@ public class AssessmentRatingDao {
         record.setEntityKind(r.entityReference().kind().name());
         record.setEntityId(r.entityReference().id());
         record.setRatingId(r.ratingId());
-        record.setDescription(r.comment());
+        record.setDescription(sanitizeCharacters(r.comment()));
         record.setLastUpdatedAt(Timestamp.valueOf(r.lastUpdatedAt()));
         record.setLastUpdatedBy(r.lastUpdatedBy());
         record.setProvenance(r.provenance());
@@ -141,14 +140,13 @@ public class AssessmentRatingDao {
         record.setEntityKind(command.entityReference().kind().name());
         record.setAssessmentDefinitionId(command.assessmentDefinitionId());
         record.setRatingId(command.ratingId());
-        record.setDescription(command.comment());
+        record.setDescription(sanitizeCharacters(command.comment()));
         record.setLastUpdatedAt(Timestamp.valueOf(command.lastUpdatedAt()));
         record.setLastUpdatedBy(command.lastUpdatedBy());
         record.setProvenance(command.provenance());
         record.setIsReadonly(command.isReadOnly()); 
         return record;
     };
-
 
     private final DSLContext dsl;
 
