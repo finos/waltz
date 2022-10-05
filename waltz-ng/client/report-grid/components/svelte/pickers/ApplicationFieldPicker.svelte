@@ -6,6 +6,7 @@
     import {entityFieldReferenceStore} from "../../../../svelte-stores/entity-field-reference-store";
     import {entity} from "../../../../common/services/enums/entity";
     import NoData from "../../../../common/svelte/NoData.svelte";
+    import {mkReportGridEntityFieldReferenceColumnRef} from "../report-grid-utils";
 
     export let onSelect = () => console.log("Selecting application field");
     export let selectionFilter = () => true;
@@ -13,25 +14,12 @@
     $: entityFieldReferenceCall = entityFieldReferenceStore.findAll();
     $: entityFieldReferences = $entityFieldReferenceCall.data;
 
-    $: fieldReferences = _
+    $: rowData = _
         .chain(entityFieldReferences)
         .filter(d => d.entityKind === "APPLICATION")
-        .map(d => Object.assign(
-            {},
-            d,
-            {
-                columnEntityId: null,
-                columnEntityKind: entity.APPLICATION.key,
-                entityFieldReference: d,
-                columnName: entity.APPLICATION.name,
-                displayName: null
-            }))
-        .value();
-
-    $: rowData = _
-        .chain(fieldReferences)
+        .map(d => mkReportGridEntityFieldReferenceColumnRef(d, entity.APPLICATION))
         .filter(selectionFilter)
-        .orderBy(d => d.displayName)
+        .orderBy(d => d.entityFieldReference.displayName)
         .value();
 
     const columnDefs = [

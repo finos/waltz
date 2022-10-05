@@ -21,9 +21,11 @@ package org.finos.waltz.data.report_grid;
 
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.SetUtilities;
+import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.entity_field_reference.EntityFieldReference;
 import org.finos.waltz.model.entity_field_reference.ImmutableEntityFieldReference;
@@ -122,6 +124,8 @@ public class ReportGridDao {
     private final org.finos.waltz.schema.tables.Tag t = TAG.as("t");
 
     private final org.finos.waltz.schema.tables.EntityAlias ea = ENTITY_ALIAS.as("ea");
+    private final org.finos.waltz.schema.tables.EntityStatisticValue esv = ENTITY_STATISTIC_VALUE.as("esv");
+    private final org.finos.waltz.schema.tables.EntityStatisticDefinition esd = ENTITY_STATISTIC_DEFINITION.as("esd");
 
     private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
                     SURVEY_QUESTION_RESPONSE.ENTITY_RESPONSE_ID,
@@ -461,6 +465,14 @@ public class ReportGridDao {
                 dt.DESCRIPTION,
                 condition);
 
+        SelectConditionStep<Record7<Long, String, String, String, String, String, String>> entityStatisticColumns = mkSupplementalColumnDefinitionQuery(
+                EntityKind.ENTITY_STATISTIC,
+                esd,
+                esd.ID,
+                esd.NAME,
+                esd.DESCRIPTION,
+                condition);
+
         SelectConditionStep<Record7<Long, String, String, String, String, String, String>> tagColumns = mkEntityDescriptorColumnDefinitionQry(
                 EntityKind.TAG,
                 "Tags",
@@ -474,6 +486,9 @@ public class ReportGridDao {
                 condition);
 
         SelectConditionStep<Record7<Long, String, String, String, String, String, String>> attestationColumns = mkAttestationColumnDefinitionQuery(
+                condition);
+
+        SelectConditionStep<Record7<Long, String, String, String, String, String, String>> measurableHierarchyColumns = mkMeasurableHierarchyColumnDefinitionQuery(
                 condition);
 
         Table<Record7<Long, String, String, String, String, String, String>> extras = assessmentDefinitionColumns
@@ -491,6 +506,8 @@ public class ReportGridDao {
                 .unionAll(attestationColumns)
                 .unionAll(tagColumns)
                 .unionAll(aliasColumns)
+                .unionAll(measurableHierarchyColumns)
+                .unionAll(entityStatisticColumns)
                 .asTable("extras");
 
         return dsl
@@ -651,6 +668,29 @@ public class ReportGridDao {
                 .and(rgfcd.COLUMN_ENTITY_KIND.eq(entityKind.name()));
     }
 
+
+    private SelectConditionStep<Record7<Long, String, String, String, String, String, String>> mkMeasurableHierarchyColumnDefinitionQuery(Condition reportCondition) {
+        Condition hasQualifier = rgfcd.COLUMN_QUALIFIER_ID.isNotNull();
+        Field<String> nameField = DSL.when(hasQualifier, DSL.concat(mc.NAME, DSL.val("/"), m.NAME)).otherwise(mc.NAME).as("name");
+
+        return dsl
+                .select(rgfcd.GRID_COLUMN_ID,
+                        nameField,
+                        mc.DESCRIPTION,
+                        efr.ENTITY_KIND,
+                        efr.DISPLAY_NAME,
+                        efr.DESCRIPTION,
+                        efr.FIELD_NAME)
+                .from(rgfcd)
+                .innerJoin(rgcd).on(rgfcd.GRID_COLUMN_ID.eq(rgcd.ID))
+                .innerJoin(rg).on(rg.ID.eq(rgcd.REPORT_GRID_ID))
+                .innerJoin(mc).on(rgfcd.COLUMN_ENTITY_ID.eq(mc.ID)
+                        .and(rgfcd.COLUMN_ENTITY_KIND.eq(EntityKind.MEASURABLE_CATEGORY.name())))
+                .leftJoin(m).on(rgfcd.COLUMN_QUALIFIER_ID.eq(m.ID).and(rgfcd.COLUMN_QUALIFIER_KIND.eq(EntityKind.MEASURABLE.name())))
+                .leftJoin(efr).on(rgfcd.ENTITY_FIELD_REFERENCE_ID.eq(efr.ID))
+                .where(reportCondition);
+    }
+
     private SelectConditionStep<Record7<Long, String, String, String, String, String, String>> mkEntityDescriptorColumnDefinitionQry(EntityKind entityKind,
                                                                                                                                      String columnName,
                                                                                                                                      String columnDescription,
@@ -746,7 +786,79 @@ public class ReportGridDao {
                     fetchAttestationData(genericSelector, colsByKind.get(EntityKind.ATTESTATION)),
                     fetchOrgUnitFieldReferenceData(genericSelector, complexColsByKind.get(EntityKind.ORG_UNIT)),
                     fetchTagData(genericSelector, colsByKind.get(EntityKind.TAG)),
-                    fetchAliasData(genericSelector, colsByKind.get(EntityKind.ENTITY_ALIAS)));
+                    fetchAliasData(genericSelector, colsByKind.get(EntityKind.ENTITY_ALIAS)),
+                    fetchMeasurableHierarchyData(genericSelector, colsByKind.get(EntityKind.MEASURABLE_CATEGORY)),
+                    fetchEntityStatisticData(genericSelector, colsByKind.get(EntityKind.ENTITY_STATISTIC)));
+        }
+    }
+
+    public Set<ReportGridCell> fetchMeasurableHierarchyData(GenericSelector genericSelector,
+                                                            Collection<ReportGridFixedColumnDefinition> cols) {
+        if (isEmpty(cols)) {
+            return emptySet();
+        } else {
+
+            Map<Tuple2<Long, Long>, Long> colIdsByCategoryIdAndQualifierId = indexBy(
+                    cols,
+                    c -> tuple(c.columnEntityId(), c.columnQualifierId()),
+                    ReportGridFixedColumnDefinition::gridColumnId);
+
+            SelectConditionStep<Record2<Long, Long>> ratingsInScope = DSL
+                    .select(mr.ENTITY_ID, mr.MEASURABLE_ID)
+                    .from(mr)
+                    .where(mr.ENTITY_ID.in(genericSelector.selector()))
+                    .and(mr.ENTITY_KIND.eq(genericSelector.kind().name()));
+
+
+            return colIdsByCategoryIdAndQualifierId
+                    .entrySet()
+                    .stream()
+                    .flatMap(e -> {
+
+                        Tuple2<Long, Long> categoryAndQualifier = e.getKey();
+                        Long colId = e.getValue();
+
+                        Condition qualifierCondition = categoryAndQualifier.v2 == null
+                                ? DSL.trueCondition()
+                                : eh.ANCESTOR_ID.eq(categoryAndQualifier.v2);
+
+                        Map<Tuple3<Long, Object, Long>, List<Tuple2<String, Long>>> measurablesForEachApp = dsl
+                                .selectDistinct(
+                                        m.MEASURABLE_CATEGORY_ID,
+                                        DSL.val(categoryAndQualifier.v2),
+                                        m.ID,
+                                        m.NAME,
+                                        ratingsInScope.field(mr.ENTITY_ID))
+                                .from(m)
+                                .innerJoin(ratingsInScope).on(m.ID.eq(ratingsInScope.field(mr.MEASURABLE_ID)))
+                                .innerJoin(eh).on(m.ID.eq(eh.ID).and(eh.KIND.eq(EntityKind.MEASURABLE.name())))
+                                .where(m.MEASURABLE_CATEGORY_ID.eq(categoryAndQualifier.v1))
+                                .and(qualifierCondition)
+                                .fetchGroups(
+                                        r -> tuple(
+                                                r.get(m.MEASURABLE_CATEGORY_ID),
+                                                null,
+                                                r.get(ratingsInScope.field(mr.ENTITY_ID))),
+                                        r -> tuple(r.get(m.NAME), r.get(m.ID)));
+
+
+                        return measurablesForEachApp
+                                .entrySet()
+                                .stream()
+                                .map(entries -> {
+
+                                    String measurableList = join(map(entries.getValue(), t -> t.v1), "; ");
+
+                                    return ImmutableReportGridCell
+                                            .builder()
+                                            .columnDefinitionId(colId)
+                                            .subjectId(entries.getKey().v3)
+                                            .textValue(measurableList)
+                                            .comment(measurableList)
+                                            .build();
+                                });
+                    })
+                    .collect(toSet());
         }
     }
 
@@ -1187,7 +1299,10 @@ public class ReportGridDao {
                             SURVEY_INSTANCE.DUE_DATE,
                             SURVEY_INSTANCE.APPROVAL_DUE_DATE,
                             SURVEY_INSTANCE.ENTITY_ID,
-                            SURVEY_INSTANCE.ENTITY_KIND)
+                            SURVEY_INSTANCE.ENTITY_KIND,
+                            SURVEY_RUN.ISSUED_ON,
+                            SURVEY_INSTANCE.NAME.as("instance_name"),
+                            SURVEY_RUN.NAME.as("run_name"))
                     .select(SURVEY_RUN.SURVEY_TEMPLATE_ID)
                     .from(SURVEY_INSTANCE)
                     .innerJoin(SURVEY_RUN).on(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(SURVEY_RUN.ID))
@@ -1208,6 +1323,7 @@ public class ReportGridDao {
                     .fetch()
                     .stream()
                     .flatMap(surveyRecord -> {
+
                         Long templateId = surveyRecord.get(SURVEY_RUN.SURVEY_TEMPLATE_ID);
 
                         return fieldReferencesByTemplateId
@@ -1215,8 +1331,8 @@ public class ReportGridDao {
                                 .stream()
                                 .map(fieldRef -> {
 
-                                    Field<?> field = SURVEY_INSTANCE.field(fieldRef.fieldName());
-                                    Object rawValue = surveyRecord.get(field);
+                                    Field<?> field = surveyRecord.field(fieldRef.fieldName());
+                                    Object rawValue = surveyRecord.get(fieldRef.fieldName());
 
                                     String textValue = isTimestampField(field)
                                             ? String.valueOf(DateTimeUtilities.toLocalDate((Timestamp) rawValue))
@@ -1661,6 +1777,38 @@ public class ReportGridDao {
                             .comment(r.get(ar.DESCRIPTION))
                             .optionCode(Long.toString(r.get(ar.RATING_ID)))
                             .optionText(r.get(rsi.NAME))
+                            .build());
+        }
+    }
+
+
+    private Set<ReportGridCell> fetchEntityStatisticData(GenericSelector selector,
+                                                         Collection<ReportGridFixedColumnDefinition> cols) {
+        if (isEmpty(cols)) {
+            return emptySet();
+        } else {
+            Map<Long, Long> statisticDefinitionIdToColIdMap = indexBy(
+                    cols,
+                    ReportGridFixedColumnDefinition::columnEntityId,
+                    ReportGridFixedColumnDefinition::gridColumnId);
+
+            return dsl
+                    .select(esv.ENTITY_ID,
+                            esv.STATISTIC_ID,
+                            esv.OUTCOME,
+                            esv.REASON)
+                    .from(esv)
+                    .where(esv.STATISTIC_ID.in(statisticDefinitionIdToColIdMap.keySet())
+                            .and(esv.CURRENT.eq(true))
+                            .and(esv.ENTITY_KIND.eq(selector.kind().name()))
+                            .and(esv.ENTITY_ID.in(selector.selector())))
+                    .fetchSet(r -> ImmutableReportGridCell.builder()
+                            .subjectId(r.get(esv.ENTITY_ID))
+                            .columnDefinitionId(statisticDefinitionIdToColIdMap.get(r.get(esv.STATISTIC_ID)))
+                            .textValue(r.get(esv.OUTCOME))
+                            .comment(r.get(esv.REASON))
+                            .optionCode(r.get(esv.OUTCOME))
+                            .optionText(r.get(esv.OUTCOME))
                             .build());
         }
     }

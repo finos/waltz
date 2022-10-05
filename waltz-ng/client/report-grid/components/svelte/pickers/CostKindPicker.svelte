@@ -4,8 +4,9 @@
     import Icon from "../../../../common/svelte/Icon.svelte";
     import {costKindStore} from "../../../../svelte-stores/cost-kind-store";
     import _ from "lodash";
+    import {mkReportGridFixedColumnRef} from "../report-grid-utils";
 
-    export let onSelect = () => console.log("Selecting involvement kind");
+    export let onSelect = () => console.log("Selecting cost kind");
     export let selectionFilter = () => true;
 
     $: costKindCall = costKindStore.findAll();
@@ -13,17 +14,7 @@
 
     $: rowData = _
         .chain(costKinds)
-        .map(d => Object.assign(
-            {},
-            d,
-            {
-                columnEntityId: d.id,
-                columnEntityKind: d.kind,
-                entityFieldReference: null,
-                columnName: d.name,
-                displayName: null
-            }))
-        .filter(selectionFilter)
+        .filter(d => selectionFilter(mkReportGridFixedColumnRef(d)))
         .orderBy(d => d.name)
         .value();
 
@@ -40,4 +31,4 @@
 <br>
 <Grid {columnDefs}
       {rowData}
-      onSelectRow={onSelect}/>
+      onSelectRow={d => onSelect(mkReportGridFixedColumnRef(d))}/>

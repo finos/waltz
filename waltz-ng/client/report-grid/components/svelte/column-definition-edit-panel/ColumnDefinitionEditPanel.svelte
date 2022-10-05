@@ -126,8 +126,8 @@
 
     function saveColumnDefs(columns) {
 
-        let fixedColDefs = _.filter(columns, d => d.kind === "REPORT_GRID_FIXED_COLUMN_DEFINITION");
-        let derivedColDefs = _.filter(columns, d => d.kind === "REPORT_GRID_DERIVED_COLUMN_DEFINITION");
+        const fixedColDefs = _.filter(columns, d => d.kind === "REPORT_GRID_FIXED_COLUMN_DEFINITION");
+        const derivedColDefs = _.filter(columns, d => d.kind === "REPORT_GRID_DERIVED_COLUMN_DEFINITION");
 
         const fixedColumnDefinitions = _.map(
             fixedColDefs,
@@ -165,23 +165,9 @@
     }
 
     $: canBeAdded = (d) => {
-        const notAlreadyAdded = !_.some(
+        return !_.some(
             $columnDefs,
-            r => sameColumnRef(r, Object.assign({}, {
-                kind: "REPORT_GRID_FIXED_COLUMN_DEFINITION",
-                columnEntityId: d.id,
-                columnEntityKind: d.kind
-            })));
-
-        switch (d.kind) {
-            case entity.ASSESSMENT_DEFINITION.key:
-                const assessmentAllowableForThisGrid = _.get(d, ["entityKind"]) === $selectedGrid?.definition?.subjectKind;
-                return notAlreadyAdded && assessmentAllowableForThisGrid;
-            case entity.SURVEY_TEMPLATE.key:
-                return _.get(d, ["targetEntityKind"]) === $selectedGrid?.definition?.subjectKind;
-            default:
-                return notAlreadyAdded;
-        }
+            r => sameColumnRef(r, d));
     }
 
     function editColumn(column){
