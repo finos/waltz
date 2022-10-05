@@ -6,6 +6,7 @@
     import {entityFieldReferenceStore} from "../../../../svelte-stores/entity-field-reference-store";
     import {entity} from "../../../../common/services/enums/entity";
     import NoData from "../../../../common/svelte/NoData.svelte";
+    import {mkReportGridEntityFieldReferenceColumnRef} from "../report-grid-utils";
 
     export let onSelect = () => console.log("Selecting change initiative field");
     export let selectionFilter = () => true;
@@ -13,23 +14,10 @@
     $: entityFieldReferenceCall = entityFieldReferenceStore.findAll();
     $: entityFieldReferences = $entityFieldReferenceCall.data;
 
-    $: fieldReferences = _
+    $: rowData = _
         .chain(entityFieldReferences)
         .filter(d => d.entityKind === "CHANGE_INITIATIVE")
-        .map(d => Object.assign(
-            {},
-            d,
-            {
-                columnEntityId: null,
-                columnEntityKind: entity.CHANGE_INITIATIVE.key,
-                entityFieldReference: d,
-                columnName: entity.CHANGE_INITIATIVE.name,
-                displayName: null
-            }))
-        .value();
-
-    $: rowData = _
-        .chain(fieldReferences)
+        .map(d => mkReportGridEntityFieldReferenceColumnRef(d, entity.CHANGE_INITIATIVE))
         .filter(selectionFilter)
         .orderBy(d => d.entityFieldReference.displayName)
         .value();

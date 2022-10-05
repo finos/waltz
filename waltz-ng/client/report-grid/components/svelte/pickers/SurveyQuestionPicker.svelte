@@ -6,6 +6,7 @@
     import {surveyQuestionStore} from "../../../../svelte-stores/survey-question-store";
     import _ from "lodash";
     import Toggle from "../../../../common/svelte/Toggle.svelte";
+    import {mkReportGridFixedColumnRef} from "../report-grid-utils";
 
     export let onSelect = () => console.log("Selecting involvement kind");
     export let selectionFilter = () => true;
@@ -28,18 +29,8 @@
 
     $: rowData = _
         .chain(questions)
-        .map(d => Object.assign(
-            {},
-            d,
-            {
-                columnEntityId: d.id,
-                columnEntityKind: d.kind,
-                entityFieldReference: null,
-                columnName: d.questionText,
-                displayName: null
-            }))
-        .filter(selectionFilter)
-        .value()
+        .filter(d => selectionFilter(mkReportGridFixedColumnRef(d, "questionText")))
+        .value();
 
     const columnDefs = [
         {field: "questionText", name: "Question", width: "40%"},
@@ -73,7 +64,7 @@
     <p>Questions for template: <strong>{selectedTemplate.name}</strong></p>
     <Grid {columnDefs}
           {rowData}
-          onSelectRow={onSelect}/>
+          onSelectRow={d => onSelect(mkReportGridFixedColumnRef(d, "questionText"))}/>
 {:else}
     <div class="help-block small">
         <Icon name="info-circle"/>

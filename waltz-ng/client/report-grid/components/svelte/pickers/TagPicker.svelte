@@ -7,6 +7,7 @@
     export let selectionFilter = () => true;
 
     const tagColumn = {
+        kind: "REPORT_GRID_FIXED_COLUMN_DEFINITION",
         columnEntityId: null,
         columnEntityKind: "TAG",
         entityFieldReference: null,

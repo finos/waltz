@@ -5,6 +5,7 @@ import {amberBg, blueBg, determineForegroundColor, greenBg, greyBg, pinkBg} from
 import {scaleLinear} from "d3-scale";
 import {extent} from "d3-array";
 import {subtractYears} from "../../../common/date-utils";
+import {entity} from "../../../common/services/enums/entity";
 
 
 export const reportGridMember = {
@@ -620,3 +621,52 @@ export function sameColumnRef(v1, v2) {
 export function mkLocalStorageFilterKey(gridId) {
     return `waltz-report-grid-${gridId}-active-summaries`
 }
+
+export function mkReportGridFixedColumnRef(d, nameProvider = "name") {
+    return Object.assign(
+        {},
+        {
+            kind: "REPORT_GRID_FIXED_COLUMN_DEFINITION",
+            columnEntityId: d.id,
+            columnEntityKind: d.kind,
+            entityFieldReference: null,
+            columnName: d[nameProvider],
+            displayName: null
+        });
+}
+
+/**
+ *
+ * @param fieldRef
+ * @param entity - taken from entity.js
+ * @returns {{entityFieldReference, columnEntityKind, kind: string, displayName: null, columnEntityId: null, columnName}}
+ */
+export function mkReportGridEntityFieldReferenceColumnRef(fieldRef, entity) {
+    return Object.assign(
+        {},
+        {
+            kind: "REPORT_GRID_FIXED_COLUMN_DEFINITION",
+            columnEntityId: null,
+            columnEntityKind: entity.key,
+            entityFieldReference: fieldRef,
+            columnName: entity.name,
+            displayName: null
+        });
+}
+
+
+export function mkMeasurableColumn(selectedCategory, measurable) {
+    return Object.assign(
+        {},
+        {
+            kind: "REPORT_GRID_FIXED_COLUMN_DEFINITION",
+            columnEntityId: selectedCategory.id,
+            columnEntityKind: "MEASURABLE_CATEGORY",
+            entityFieldReference: null,
+            columnQualifierKind: "MEASURABLE",
+            columnQualifierId: measurable.id,
+            columnName: `${selectedCategory.name}/${measurable.name}`,
+            displayName: null
+        });
+}
+

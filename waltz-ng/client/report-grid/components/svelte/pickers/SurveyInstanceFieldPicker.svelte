@@ -27,23 +27,22 @@
     $: entityFieldReferenceCall = entityFieldReferenceStore.findAll();
     $: entityFieldReferences = $entityFieldReferenceCall.data;
 
-    $: fieldReferences = _
+    $: rowData = _
         .chain(entityFieldReferences)
         .filter(d => d.entityKind === "SURVEY_INSTANCE")
         .map(d => Object.assign(
             {},
-            d,
             {
+                kind: "REPORT_GRID_FIXED_COLUMN_DEFINITION",
                 columnEntityId: selectedTemplate?.id,
                 columnEntityKind: entity.SURVEY_TEMPLATE.key,
                 entityFieldReference: d,
                 columnName: selectedTemplate?.name,
                 displayName: null
             }))
+        .filter(selectionFilter)
         .orderBy(d => d.entityFieldReference.displayName)
         .value();
-
-    $: rowData = _.filter(fieldReferences, selectionFilter)
 
     const columnDefs = [
         {field: "entityFieldReference.displayName", name: "Field", width: "30%"},

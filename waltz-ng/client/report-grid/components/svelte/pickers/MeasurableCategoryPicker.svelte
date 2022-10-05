@@ -8,6 +8,7 @@
     import {mkSelectionOptions} from "../../../../common/selector-utils";
     import {buildHierarchies} from "../../../../common/hierarchy-utils";
     import MeasurableTreeSelector from "../../../../common/svelte/MeasurableTreeSelector.svelte";
+    import {mkMeasurableColumn, mkReportGridFixedColumnRef} from "../report-grid-utils";
 
     export let onSelect = () => console.log("Selecting measurable");
     export let onDeselect = () => console.log("Deselecting measurable");
@@ -19,35 +20,11 @@
     $: measurablesCall = selectedCategory && measurableStore.findMeasurablesBySelector(mkSelectionOptions(selectedCategory, "EXACT"));
     $: measurables = $measurablesCall?.data || [];
 
-    $: measurableColumns = _.map(measurables, d => Object.assign(
-        {},
-        d,
-        {
-            columnEntityId: selectedCategory.id,
-            columnEntityKind: "MEASURABLE_CATEGORY",
-            entityFieldReference: null,
-            columnQualifierKind: "MEASURABLE",
-            columnQualifierId: d.id,
-            columnName: `${selectedCategory.name}/${d.name}`,
-            displayName: null
-        }));
-
-
-    $: wholeCategory = {
-        columnEntityId: selectedCategory?.id,
-        columnEntityKind: "MEASURABLE_CATEGORY",
-        entityFieldReference: null,
-        columnQualifierKind: null,
-        columnQualifierId: null,
-        columnName: `${selectedCategory?.name}`,
-        displayName: null
-    }
-
     let selectedCategory = null;
     let rowData;
     let selected = [];
 
-    $: [rowData, selected] = _.partition(measurableColumns, selectionFilter);
+    $: [rowData, selected] = _.partition(measurables, d => selectionFilter(mkMeasurableColumn(selectedCategory, d)));
 
     const categoryColumnDefs = [
         {field: "name", name: "Measurable Category", width: "30%"},
@@ -68,14 +45,13 @@
     }
 
     function selectAllForCategory() {
-        let notSelected = selectionFilter(wholeCategory);
-
+        const catCol = mkReportGridFixedColumnRef(selectedCategory);
+        const notSelected = selectionFilter(catCol);
         if (notSelected) {
-            onSelect(wholeCategory);
+            onSelect(catCol);
         } else {
-            onDeselect(wholeCategory);
+            onDeselect(catCol);
         }
-
     }
 
     $: hierarchy = {name: "root", hideNode: true, children: buildHierarchies(measurables, false)};
@@ -93,13 +69,13 @@
         </span>
     </div>
     <p>Measurables for category: <strong>{selectedCategory.name}</strong></p>
-    <MeasurableTreeSelector measurables={measurableColumns}
-                            selected={selected}
-                            {onSelect}
-                            {onDeselect}/>
+    <MeasurableTreeSelector {measurables}
+                            {selected}
+                            onSelect={m => onSelect(mkMeasurableColumn(selectedCategory, m))}
+                            onDeselect={m => onDeselect(mkMeasurableColumn(selectedCategory, m))}/>
     <button class="btn btn-skinny"
             on:click={selectAllForCategory}>
-        <Icon name={selectionFilter(wholeCategory) ? "square-o": "check-square-o"}/>
+        <Icon name={selectionFilter(mkReportGridFixedColumnRef(selectedCategory)) ? "square-o": "check-square-o"}/>
         Show all mappings to this category
     </button>
 

@@ -31,7 +31,8 @@ public abstract class EntityStatisticDefinition implements
         NameProvider,
         DescriptionProvider,
         ProvenanceProvider,
-        ParentIdProvider
+        ParentIdProvider,
+        EntityKindProvider
 {
 
     public abstract StatisticType type();
@@ -44,7 +45,15 @@ public abstract class EntityStatisticDefinition implements
     }
 
     public abstract String renderer();
+
     public abstract String historicRenderer();
+
     public abstract Boolean entityVisibility();
+
     public abstract Boolean rollupVisibility();
+
+    @Value.Default
+    public EntityKind kind() {
+        return EntityKind.ENTITY_STATISTIC;
+    }
 }

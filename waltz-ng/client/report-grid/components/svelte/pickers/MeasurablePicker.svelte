@@ -8,6 +8,7 @@
     import {mkSelectionOptions} from "../../../../common/selector-utils";
     import {buildHierarchies} from "../../../../common/hierarchy-utils";
     import MeasurableTreeSelector from "../../../../common/svelte/MeasurableTreeSelector.svelte";
+    import {mkMeasurableColumn, mkReportGridFixedColumnRef} from "../report-grid-utils";
 
     export let onSelect = () => console.log("Selecting measurable");
     export let onDeselect = () => console.log("Deselecting measurable");
@@ -16,25 +17,14 @@
     $: measurableCategoriesCall = measurableCategoryStore.findAll();
     $: categories = $measurableCategoriesCall.data;
 
-    $: measurablesCall = selectedCategory && measurableStore.findMeasurablesBySelector(mkSelectionOptions(selectedCategory));
+    $: measurablesCall = selectedCategory && measurableStore.findMeasurablesBySelector(mkSelectionOptions(selectedCategory, "EXACT"));
     $: measurables = $measurablesCall?.data || [];
-
-    $: measurableColumns = _.map(measurables, d => Object.assign(
-        {},
-        d,
-        {
-            columnEntityId: d.id,
-            columnEntityKind: d.kind,
-            entityFieldReference: null,
-            columnName: d.name,
-            displayName: null
-        }));
 
     let selectedCategory = null;
     let rowData;
     let selected = [];
 
-    $: [rowData, selected] = _.partition(measurableColumns, selectionFilter);
+    $: [rowData, selected] = _.partition(measurables, d => selectionFilter(mkReportGridFixedColumnRef(d)));
 
     $: selectedIds = _.map(selected, d => d.id);
 
@@ -72,10 +62,10 @@
         </span>
     </div>
     <p>Measurables for category: <strong>{selectedCategory.name}</strong></p>
-    <MeasurableTreeSelector measurables={measurableColumns}
-                            selected={selected}
-                            {onSelect}
-                            {onDeselect}/>
+    <MeasurableTreeSelector {measurables}
+                            {selected}
+                            onSelect={m => onSelect(mkReportGridFixedColumnRef(m))}
+                            onDeselect={m => onDeselect(mkReportGridFixedColumnRef(m))}/>
 {:else}
     <div class="help-block small">
         <Icon name="info-circle"/>Select a category from the list below, you can filter the list using the search bar.

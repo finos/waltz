@@ -11,6 +11,7 @@
 
     const baseAttestationKinds = [
         {
+            kind: "REPORT_GRID_FIXED_COLUMN_DEFINITION",
             name: "Logical Flow",
             description: "Latest logical flow attestation",
             columnEntityId: null,
@@ -21,6 +22,7 @@
             columnQualifierId: null,
             displayName: null
         }, {
+            kind: "REPORT_GRID_FIXED_COLUMN_DEFINITION",
             name: "Physical Flow",
             description: "Latest physical flow attestation",
             columnEntityId: null,
@@ -28,7 +30,8 @@
             entityFieldReference: null,
             columnName: "Physical Flow Attestation",
             columnQualifierKind: entity.PHYSICAL_FLOW.key,
-            columnQualifierId: null
+            columnQualifierId: null,
+            displayName: null
         }
     ];
 
@@ -44,6 +47,7 @@
     $: rowData = _
         .chain($measurableCategoriesCall.data)
         .map(d => ({
+            kind: "REPORT_GRID_FIXED_COLUMN_DEFINITION",
             columnEntityKind: "ATTESTATION",
             columnEntityId: null,
             columnQualifierKind: "MEASURABLE_CATEGORY",

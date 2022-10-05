@@ -4,6 +4,7 @@
     import Icon from "../../../../common/svelte/Icon.svelte";
     import _ from "lodash";
     import {complexityKindStore} from "../../../../svelte-stores/complexity-kind-store";
+    import {mkReportGridFixedColumnRef} from "../report-grid-utils";
 
     export let onSelect = () => console.log("Selecting complexity kind");
     export let selectionFilter = () => true;
@@ -13,17 +14,7 @@
 
     $: rowData = _
         .chain(complexityKinds)
-        .map(d => Object.assign(
-            {},
-            d,
-            {
-                columnEntityId: d.id,
-                columnEntityKind: d.kind,
-                entityFieldReference: null,
-                columnName: d.name,
-                displayName: null
-            }))
-        .filter(selectionFilter)
+        .filter(d => selectionFilter(mkReportGridFixedColumnRef(d)))
         .orderBy(d => d.name)
         .value()
 
@@ -41,4 +32,4 @@
 <br>
 <Grid {columnDefs}
       {rowData}
-      onSelectRow={onSelect}/>
+      onSelectRow={d => onSelect(mkReportGridFixedColumnRef(d))}/>

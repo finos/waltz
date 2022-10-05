@@ -126,8 +126,8 @@
 
     function saveColumnDefs(columns) {
 
-        let fixedColDefs = _.filter(columns, d => d.kind === "REPORT_GRID_FIXED_COLUMN_DEFINITION");
-        let derivedColDefs = _.filter(columns, d => d.kind === "REPORT_GRID_DERIVED_COLUMN_DEFINITION");
+        const fixedColDefs = _.filter(columns, d => d.kind === "REPORT_GRID_FIXED_COLUMN_DEFINITION");
+        const derivedColDefs = _.filter(columns, d => d.kind === "REPORT_GRID_DERIVED_COLUMN_DEFINITION");
 
         const fixedColumnDefinitions = _.map(
             fixedColDefs,
@@ -167,7 +167,7 @@
     $: canBeAdded = (d) => {
         return !_.some(
             $columnDefs,
-            r => sameColumnRef(r, Object.assign({}, d, {kind: "REPORT_GRID_FIXED_COLUMN_DEFINITION"})));
+            r => sameColumnRef(r, d));
     }
 
     function editColumn(column){

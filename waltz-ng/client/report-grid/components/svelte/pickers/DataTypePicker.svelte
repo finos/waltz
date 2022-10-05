@@ -1,6 +1,5 @@
 <script>
 
-    import _ from "lodash";
     import DataTypeTreeSelector from "../../../../common/svelte/DataTypeTreeSelector.svelte";
 
     export let onSelect = (dt) => console.log("Selecting dataType", {dt});
@@ -8,16 +7,7 @@
     export let selectionFilter = () => true;
 
     function handleSelection(evt) {
-        const d = evt.detail;
-
-        const payload = {
-                columnEntityId: d.id,
-                columnEntityKind: "DATA_TYPE",
-                entityFieldReference: null,
-                columnName: d.name,
-            displayName: null
-        };
-
+        const payload = mkDataTypeColumn(evt.detail);
         if (selectionFilter(payload)) {
             onSelect(payload);
         } else {
@@ -25,16 +15,19 @@
         }
     }
 
-    function dataTypeSelectionFilter(selectionFilter, datatype) {
-
-        const payload = {
+    function mkDataTypeColumn(datatype) {
+        return {
+            kind: "REPORT_GRID_FIXED_COLUMN_DEFINITION",
             columnEntityId: datatype.id,
             columnEntityKind: "DATA_TYPE",
             entityFieldReference: null,
             columnName: datatype.name,
             displayName: null
         };
+    }
 
+    function dataTypeSelectionFilter(selectionFilter, datatype) {
+        const payload = mkDataTypeColumn(datatype);
         return selectionFilter(payload);
     }
 
