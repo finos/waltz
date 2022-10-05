@@ -16,8 +16,8 @@
         $: rowData = _
             .chain(assessmentDefintions)
             .filter(d => selectionFilter(mkReportGridFixedColumnRef(d)))
-        .orderBy( d => d.name)
-        .value();
+            .orderBy(d => d.name)
+            .value();
 
     const columnDefs = [
         {field: "name", name: "Assessment Definition", width: "30%"},

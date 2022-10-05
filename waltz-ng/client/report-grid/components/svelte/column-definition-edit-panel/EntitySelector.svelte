@@ -4,7 +4,6 @@
     import _ from "lodash";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import EntityPicker from "../pickers/EntityPicker.svelte";
-    import {mkReportGridFixedColumnRef} from "../report-grid-utils";
 
     export let onSelect = (d) => console.log("Selecting entity", d);
     export let onDeselect = (d) => console.log("Deselecting entity", d);
