@@ -167,7 +167,7 @@
     $: canBeAdded = (d) => {
         return !_.some(
             $columnDefs,
-            r => sameColumnRef(r, Object.assign(d, {kind: "REPORT_GRID_FIXED_COLUMN_DEFINITION",})));
+            r => sameColumnRef(r, Object.assign({}, d, {kind: "REPORT_GRID_FIXED_COLUMN_DEFINITION"})));
     }
 
     function editColumn(column){
