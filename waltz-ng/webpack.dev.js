@@ -32,7 +32,7 @@ module.exports = smp.wrap(merge(common, {
             disableDotRule: true
         },
         proxy: [{
-            context: ["/data-extract", "/api", "/authentication"],
+            context: ["/data-extract", "/api", "/page", "/authentication"],
             target: "http://[::1]:8443", // see note [1]
         }]
     }
