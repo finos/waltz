@@ -1,23 +1,23 @@
-    <script>
+<script>
 
-        import Grid from "../../../../common/svelte/Grid.svelte";
-        import Icon from "../../../../common/svelte/Icon.svelte";
-        import _ from "lodash";
-        import {assessmentDefinitionStore} from "../../../../svelte-stores/assessment-definition";
-        import {mkReportGridFixedColumnRef} from "../report-grid-utils";
+    import Grid from "../../../../common/svelte/Grid.svelte";
+    import Icon from "../../../../common/svelte/Icon.svelte";
+    import _ from "lodash";
+    import {assessmentDefinitionStore} from "../../../../svelte-stores/assessment-definition";
+    import {mkReportGridFixedColumnRef} from "../report-grid-utils";
 
-        export let onSelect = () => console.log("Selecting assessment definition");
-        export let selectionFilter = () => true;
-        export let subjectKindFilter = () => true;
+    export let onSelect = () => console.log("Selecting assessment definition");
+    export let selectionFilter = () => true;
+    export let subjectKindFilter = () => true;
 
-        $: assessmentDefinitionsCall = assessmentDefinitionStore.loadAll();
-        $: assessmentDefintions = _.filter($assessmentDefinitionsCall.data, d => subjectKindFilter(d.entityKind));
+    $: assessmentDefinitionsCall = assessmentDefinitionStore.loadAll();
+    $: assessmentDefintions = _.filter($assessmentDefinitionsCall.data, d => subjectKindFilter(d.entityKind));
 
-        $: rowData = _
-            .chain(assessmentDefintions)
-            .filter(d => selectionFilter(mkReportGridFixedColumnRef(d)))
-            .orderBy(d => d.name)
-            .value();
+    $: rowData = _
+        .chain(assessmentDefintions)
+        .filter(d => selectionFilter(mkReportGridFixedColumnRef(d)))
+        .orderBy(d => d.name)
+        .value();
 
     const columnDefs = [
         {field: "name", name: "Assessment Definition", width: "30%"},
