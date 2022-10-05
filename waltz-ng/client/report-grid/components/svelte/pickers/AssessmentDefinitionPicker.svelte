@@ -1,30 +1,22 @@
-    <script>
+<script>
 
     import Grid from "../../../../common/svelte/Grid.svelte";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import _ from "lodash";
     import {assessmentDefinitionStore} from "../../../../svelte-stores/assessment-definition";
+    import {mkReportGridFixedColumnRef} from "../report-grid-utils";
 
-    export let onSelect = () => console.log("Selecting involvement kind");
+    export let onSelect = () => console.log("Selecting assessment definition");
     export let selectionFilter = () => true;
+    export let subjectKindFilter = () => true;
 
     $: assessmentDefinitionsCall = assessmentDefinitionStore.loadAll();
-    $: assessmentDefintions = $assessmentDefinitionsCall.data;
+    $: assessmentDefintions = _.filter($assessmentDefinitionsCall.data, d => subjectKindFilter(d.entityKind));
 
     $: rowData = _
         .chain(assessmentDefintions)
-        .map(d => Object.assign(
-            {},
-            d,
-            {
-                columnEntityId: d.id,
-                columnEntityKind: d.kind,
-                entityFieldReference: null,
-                columnName: d.name,
-                displayName: null
-            }))
-        .filter(selectionFilter)
-        .orderBy( d => d.name)
+        .filter(d => selectionFilter(mkReportGridFixedColumnRef(d)))
+        .orderBy(d => d.name)
         .value();
 
     const columnDefs = [
@@ -38,7 +30,7 @@
     <Icon name="info-circle"/>
     Select an assessment definition from the list below, you can filter the list using the search bar.
 </div>
-<br>
-<Grid {columnDefs}
-      {rowData}
-      onSelectRow={onSelect}/>
+    <br>
+    <Grid {columnDefs}
+          {rowData}
+          onSelectRow={d => onSelect(mkReportGridFixedColumnRef(d))}/>

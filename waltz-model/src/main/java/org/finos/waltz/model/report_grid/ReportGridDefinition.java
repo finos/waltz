@@ -26,6 +26,6 @@ public abstract class ReportGridDefinition implements
 
     @Value.Default
     public ReportGridKind kind() {
-        return ReportGridKind.PUBLIC;
+        return ReportGridKind.PRIVATE;
     }
 }

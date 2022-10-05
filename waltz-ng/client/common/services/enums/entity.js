@@ -264,7 +264,7 @@ export const entity = {
     },
     MEASURABLE_CATEGORY: {
         key: "MEASURABLE_CATEGORY",
-        name: "Viewpoint Rating",
+        name: "Viewpoint Category",
         icon: "puzzle-piece",
         description: null,
         position: 185

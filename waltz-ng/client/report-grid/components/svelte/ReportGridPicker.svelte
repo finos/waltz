@@ -26,9 +26,11 @@
         onGridSelect(grid);
     }
 
+    $: orderedGrids = _.sortBy(grids, 'name');
+
     $: gridList = _.isEmpty(qry)
-        ? grids
-        : termSearch(grids, qry, ['name', 'description']);
+        ? orderedGrids
+        : termSearch(orderedGrids, qry, ['name', 'description']);
 
     function determineSubjectIcon(gridSubjectKind) {
         return _.get(entity[gridSubjectKind], "icon", "fw");
@@ -70,30 +72,28 @@
                             class="clickable"
                             on:click={() => onSelect(grid)}>
                             <td>
-                                <button on:click={() => onSelect(grid)}
-                                        class="btn btn-skinny">
+                                <a class="force-wrap">
                                     <Icon name={determineSubjectIcon(grid?.subjectKind)}/> {grid?.name}
-                                </button>
+                                </a>
                             </td>
-                            <td title={grid?.description}>
+                            <td class="force-wrap"
+                                title={grid?.description}>
                                 <span class:text-muted={!grid?.description}>
                                     {truncateMiddle(grid?.description, 100) || "No description"}
                                 </span>
                             </td>
                         </tr>
                     {/each}
-                    <tr class="clickable"
-                        on:click={onCreate}>
-                        <td colspan="2">
-                            <button class="btn btn-skinny"
-                                    on:click={onCreate}>
-                                <Icon name="plus"/>Create a new report grid
-                            </button>
-                        </td>
-                    </tr>
                     </tbody>
                 </table>
             {/if}
+        </div>
+        <div style="padding-top: 1em">
+            <button class="btn btn-skinny"
+                    on:click={onCreate}>
+                <Icon name="plus"/>
+                Create a new report grid
+            </button>
         </div>
     </div>
 </div>

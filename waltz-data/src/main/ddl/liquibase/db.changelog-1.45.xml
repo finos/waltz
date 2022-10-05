@@ -405,5 +405,27 @@
                                  onDelete="CASCADE"/>
     </changeSet>
 
+    <changeSet id="20220926-6217-1"
+               author="woodjes">
+        <insert tableName="entity_field_reference">
+            <column name="entity_kind" value="SURVEY_INSTANCE"/>
+            <column name="field_name" value="issued_on"/>
+            <column name="display_name" value="Issued On"/>
+            <column name="description" value="The date the survey run was issued"/>
+        </insert>
+        <insert tableName="entity_field_reference">
+            <column name="entity_kind" value="SURVEY_INSTANCE"/>
+            <column name="field_name" value="instance_name"/>
+            <column name="display_name" value="Instance Name"/>
+            <column name="description" value="The name of the survey instance"/>
+        </insert>
+        <insert tableName="entity_field_reference">
+            <column name="entity_kind" value="SURVEY_INSTANCE"/>
+            <column name="field_name" value="run_name"/>
+            <column name="display_name" value="Run Name"/>
+            <column name="description" value="The name of the survey run"/>
+        </insert>
+    </changeSet>
+
 
 </databaseChangeLog>

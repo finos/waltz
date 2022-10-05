@@ -324,6 +324,8 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
             case ORG_UNIT:
             case TAG:
             case ENTITY_ALIAS:
+            case MEASURABLE_CATEGORY:
+            case ENTITY_STATISTIC:
                 return Optional
                         .ofNullable(reportGridCell.textValue())
                         .orElse("-");

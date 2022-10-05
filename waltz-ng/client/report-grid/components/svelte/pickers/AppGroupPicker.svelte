@@ -2,8 +2,9 @@
 
     import Icon from "../../../../common/svelte/Icon.svelte";
     import EntitySearchSelector from "../../../../common/svelte/EntitySearchSelector.svelte";
+    import {mkReportGridFixedColumnRef} from "../report-grid-utils";
 
-    export let onSelect = () => console.log("Selecting involvement kind");
+    export let onSelect = () => console.log("Selecting app group");
     export let selectionFilter = () => true;
 
     function onSelectGroup(e) {
@@ -11,34 +12,15 @@
         if (e.detail == null) {
             return;
         }
-
-        const column = {
-            columnEntityId: e.detail.id,
-            columnEntityKind: e.detail.kind,
-            entityFieldReference: null,
-            columnName: e.detail.name,
-            displayName: null
-        }
-
-        onSelect(column);
+        onSelect(mkReportGridFixedColumnRef(e.detail));
     }
 
 
-    $: canBeAdded = (d) => {
-
+    $: appGroupSelectionFilter = (d) => {
         if (d === null) {
             return true;
         } else {
-
-            const column = {
-                columnEntityId: d.id,
-                columnEntityKind: d.kind,
-                entityFieldReference: null,
-                columnName: d.name,
-                displayName: null
-            }
-
-            return selectionFilter(column);
+            return selectionFilter(mkReportGridFixedColumnRef(d));
         }
     }
 
@@ -52,5 +34,5 @@
 <EntitySearchSelector on:select={onSelectGroup}
                       placeholder="Search for app group"
                       entityKinds={['APP_GROUP']}
-                      selectionFilter={canBeAdded}>
+                      selectionFilter={appGroupSelectionFilter}>
 </EntitySearchSelector>

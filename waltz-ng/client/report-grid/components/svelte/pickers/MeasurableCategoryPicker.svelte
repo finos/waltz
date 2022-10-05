@@ -24,9 +24,7 @@
     let rowData;
     let selected = [];
 
-    $: [rowData, selected] = _.partition(measurables, d => selectionFilter(mkReportGridFixedColumnRef(d)));
-
-    $: selectedIds = _.map(selected, d => d.id);
+    $: [rowData, selected] = _.partition(measurables, d => selectionFilter(mkMeasurableColumn(selectedCategory, d)));
 
     const categoryColumnDefs = [
         {field: "name", name: "Measurable Category", width: "30%"},
@@ -35,21 +33,30 @@
 
     const columnDefs = [
         {field: "name", name: "Name", width: "30%"},
-        { field: "description", name: "Description", width: "70%"},
+        {field: "description", name: "Description", width: "70%"},
     ];
 
-    function selectCategory(d){
+    function selectCategory(d) {
         selectedCategory = d;
     }
 
-    function clearSelectedCategory(){
+    function clearSelectedCategory() {
         selectedCategory = null;
     }
 
-    $: hierarchy = { name:"root", hideNode: true, children: buildHierarchies(measurables, false)};
+    function selectAllForCategory() {
+        const catCol = mkReportGridFixedColumnRef(selectedCategory);
+        const notSelected = selectionFilter(catCol);
+        if (notSelected) {
+            onSelect(catCol);
+        } else {
+            onDeselect(catCol);
+        }
+    }
+
+    $: hierarchy = {name: "root", hideNode: true, children: buildHierarchies(measurables, false)};
 
 </script>
-
 
 {#if selectedCategory}
     <div class="help-block small">
@@ -64,11 +71,18 @@
     <p>Measurables for category: <strong>{selectedCategory.name}</strong></p>
     <MeasurableTreeSelector {measurables}
                             {selected}
-                            onSelect={m => onSelect(mkReportGridFixedColumnRef(m))}
-                            onDeselect={m => onDeselect(mkReportGridFixedColumnRef(m))}/>
+                            onSelect={m => onSelect(mkMeasurableColumn(selectedCategory, m))}
+                            onDeselect={m => onDeselect(mkMeasurableColumn(selectedCategory, m))}/>
+    <button class="btn btn-skinny"
+            on:click={selectAllForCategory}>
+        <Icon name={selectionFilter(mkReportGridFixedColumnRef(selectedCategory)) ? "square-o": "check-square-o"}/>
+        Show all mappings to this category
+    </button>
+
 {:else}
     <div class="help-block small">
-        <Icon name="info-circle"/>Select a category from the list below, you can filter the list using the search bar.
+        <Icon name="info-circle"/>
+        Select a category from the list below, you can filter the list using the search bar.
     </div>
     <br>
     <Grid columnDefs={categoryColumnDefs}

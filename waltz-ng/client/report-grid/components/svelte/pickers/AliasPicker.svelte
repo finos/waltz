@@ -7,6 +7,7 @@
     export let selectionFilter = () => true;
 
     const aliasesColumn = {
+        kind: "REPORT_GRID_FIXED_COLUMN_DEFINITION",
         columnEntityId: null,
         columnEntityKind: "ENTITY_ALIAS",
         entityFieldReference: null,
