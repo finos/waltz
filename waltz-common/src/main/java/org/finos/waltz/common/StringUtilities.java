@@ -220,8 +220,24 @@ public class StringUtilities {
                 .collect(Collectors.toList());
 
 
-
         return String.join(" ", collect);
     }
+
+    /**
+     * Removes dodgy characters and replaces with similar that can render correctly in Waltz
+     *
+     * @param str raw string
+     * @return sanitized string
+     */
+    public static String sanitizeCharacters(String str) {
+        if (str == null) {
+            return null;
+        } else {
+            return str
+                    .replaceAll("", "-")
+                    .replaceAll("‐", "-");
+        }
+    }
+
 }
 
