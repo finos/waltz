@@ -14,6 +14,8 @@ public abstract class GridFilter {
 
     public abstract Long columnDefinitionId();
 
-    public abstract Set<String> optionCodes();
+    public abstract FilterOperator filterOperator();
+
+    public abstract Set<String> filterValues();
 
 }
