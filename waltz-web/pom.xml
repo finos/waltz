@@ -75,6 +75,11 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.sparkjava</groupId>
+            <artifactId>spark-template-freemarker</artifactId>
+        </dependency>
+
         <!-- TEST -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

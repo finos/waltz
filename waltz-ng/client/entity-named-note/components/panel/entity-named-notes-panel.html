@@ -127,7 +127,8 @@
                                   ng-model="$ctrl.editingNotes[note.namedNoteTypeId].noteTextVal">
                         </textarea>
                         <waltz-markdown ng-if="! $ctrl.editingNotes[note.namedNoteTypeId]"
-                                        text="note.noteText">
+                                        text="note.noteText"
+                                        context="{ref: $ctrl.parentEntityRef}">
                         </waltz-markdown>
                     </div>
                 </td>

@@ -80,6 +80,7 @@ function setupNetworking(module) {
 
     module
         .constant('BaseApiUrl', baseUrl + 'api')
+        .constant('BasePageUrl', baseUrl + 'page')
         .constant('BaseUrl', baseUrl)
         .constant('BaseExtractUrl', baseUrl + 'data-extract')
         .config(configure)

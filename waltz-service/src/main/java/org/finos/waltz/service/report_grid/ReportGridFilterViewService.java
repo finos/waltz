@@ -86,7 +86,7 @@ public class ReportGridFilterViewService {
     }
 
 
-    public boolean recalculateAppGroupFromNoteText(Long appGroupId) {
+    public int recalculateAppGroupFromNoteText(Long appGroupId) {
 
         Set<ReportGridDefinition> grids = reportGridDao.findAll();
         Map<String, ReportGridDefinition> gridsByExternalId = indexBy(grids, d -> d.externalId().get());
@@ -101,30 +101,33 @@ public class ReportGridFilterViewService {
                     appGroupId));
         }
 
-        if (filterNotesForGroup.size() == 1) {
-            //should only be one note per group.
-            EntityNamedNote note = first(filterNotesForGroup);
-            ReportGridFilterInfo gridFilterInfo = getGridFilterInfo(gridsByExternalId, appGroupId, note.noteText());
-            updateApplicationGroupsFromFilterInfo(asSet(gridFilterInfo));
-            return filterNotesForGroup.size() == 1;
-        } else {
+        if (filterNotesForGroup.size() > 1) {
             throw new IllegalArgumentException("Cannot have more than one Report Grid Filter note per application group");
+        }
+
+        //should only be one note per group.
+        EntityNamedNote note = first(filterNotesForGroup);
+        ReportGridFilterInfo gridFilterInfo = getGridFilterInfo(gridsByExternalId, appGroupId, note.noteText());
+
+
+        if (gridFilterInfo == null) {
+            throw new IllegalArgumentException("Cannot get filter grid info from note text");
+        } else {
+            Tuple2<Long, Set<AppGroupEntry>> appGroupIdToEntries = determineApplicationsInGroup(gridFilterInfo);
+            appGroupService.replaceGroupEntries(asSet(appGroupIdToEntries));
+            return appGroupIdToEntries.v2.size();
         }
     }
 
+    ;
+
 
     public void generateAppGroupsFromFilter() {
-
         LOG.info("Starting filter group population");
 
         LOG.info("Loading filter info from notes");
         Set<ReportGridFilterInfo> gridInfoWithFilters = findGridInfoWithFilters();
 
-        updateApplicationGroupsFromFilterInfo(gridInfoWithFilters);
-    }
-
-
-    private void updateApplicationGroupsFromFilterInfo(Set<ReportGridFilterInfo> gridInfoWithFilters) {
         Set<Tuple2<Long, Set<AppGroupEntry>>> appGroupToEntries = determineAppGroupEntries(gridInfoWithFilters);
 
         LOG.info("Populating application groups from filters");
@@ -137,37 +140,38 @@ public class ReportGridFilterViewService {
     private Set<Tuple2<Long, Set<AppGroupEntry>>> determineAppGroupEntries(Set<ReportGridFilterInfo> gridInfoWithFilters) {
         return gridInfoWithFilters
                 .stream()
-                .map(d -> {
-
-                    EntityKind subjectKind = d.gridDefinition().subjectKind();
-
-                    ReportGridInstance instance = reportGridService.mkInstance(
-                            d.gridDefinition().id().get(),
-                            d.idSelectionOptions(),
-                            subjectKind);
-
-                    Set<ReportGridCell> cellData = instance.cellData();
-
-                    Set<Long> subjectIds = SetUtilities.map(instance.subjects(), s -> s.entityReference().id());
-
-                    Set<Long> subjectsPassingFilters = applyFilters(
-                            cellData,
-                            d.gridFilters(),
-                            subjectIds,
-                            instance.ratingSchemeItems());
-
-                    Set<AppGroupEntry> appGroupEntries = SetUtilities.map(
-                            subjectsPassingFilters,
-                            id -> ImmutableAppGroupEntry
-                                    .builder()
-                                    .id(id)
-                                    .kind(subjectKind)
-                                    .isReadOnly(true)
-                                    .build());
-
-                    return tuple(d.appGroupId(), appGroupEntries);
-                })
+                .map(this::determineApplicationsInGroup)
                 .collect(Collectors.toSet());
+    }
+
+    private Tuple2<Long, Set<AppGroupEntry>> determineApplicationsInGroup(ReportGridFilterInfo d) {
+        EntityKind subjectKind = d.gridDefinition().subjectKind();
+
+        ReportGridInstance instance = reportGridService.mkInstance(
+                d.gridDefinition().id().get(),
+                d.idSelectionOptions(),
+                subjectKind);
+
+        Set<ReportGridCell> cellData = instance.cellData();
+
+        Set<Long> subjectIds = SetUtilities.map(instance.subjects(), s -> s.entityReference().id());
+
+        Set<Long> subjectsPassingFilters = applyFilters(
+                cellData,
+                d.gridFilters(),
+                subjectIds,
+                instance.ratingSchemeItems());
+
+        Set<AppGroupEntry> appGroupEntries = SetUtilities.map(
+                subjectsPassingFilters,
+                id -> ImmutableAppGroupEntry
+                        .builder()
+                        .id(id)
+                        .kind(subjectKind)
+                        .isReadOnly(true)
+                        .build());
+
+        return tuple(d.appGroupId(), appGroupEntries);
     }
 
 
