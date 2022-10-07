@@ -20,11 +20,12 @@ import _ from "lodash";
 import {initialiseData} from "../common";
 import template from "./involvement-kinds-view.html";
 import toasts from "../svelte-stores/toast-store";
+import {displayError} from "../common/error-utils";
 
 const initialState = {
     involvementKinds: [],
-    creatinginvolvementKind: false,
-    newinvolvementKind: {}
+    creatingInvolvementKind: false,
+    newInvolvementKind: {}
 };
 
 
@@ -36,39 +37,51 @@ function controller($q,
     function update(id, change) {
         const updateCmd = Object.assign(change, { id });
         return involvementKindService.update(updateCmd)
-            .then(() => toasts.success("Updated"));
+            .then(() => toasts.success("Updated"))
+            .catch(e => displayError(
+                `Failed to apply change: ${JSON.stringify(change)}`,
+                e));
     }
 
     vm.updateName = (change, kind) => {
         if(change.newVal === "") return $q.reject("Too short");
-        return update(kind.id, { name: change })
+        return update(kind.id, {name: change})
             .then(() => _.find(vm.involvementKinds, {"id": kind.id}).name = change.newVal);
     };
 
     vm.updateDescription = (change, kind) => {
-        if(change.newVal === "") return $q.reject("Too short");
-        return update(kind.id, { description: change })
+        if (change.newVal === "") return $q.reject("Too short");
+        return update(kind.id, {description: change})
             .then(() => _.find(vm.involvementKinds, {"id": kind.id}).description = change.newVal);
     };
 
-
-    vm.startNewinvolvementKind = () => {
-        vm.creatinginvolvementKind = true;
+    vm.updateExternalId = (change, kind) => {
+        if (change.newVal === "") return $q.reject("Too short");
+        return update(kind.id, {externalId: change})
+            .then(() => _.find(vm.involvementKinds, {"id": kind.id}).externalId = change.newVal);
     };
 
-    vm.saveNewinvolvementKind = () => {
+
+    vm.startNewInvolvementKind = () => {
+        vm.creatingInvolvementKind = true;
+    };
+
+    vm.saveNewInvolvementKind = () => {
         involvementKindService
-            .create(vm.newinvolvementKind)
+            .create(vm.newInvolvementKind)
             .then(id => {
                 toasts.success("Created");
-                vm.creatinginvolvementKind = false;
-                vm.newinvolvementKind = {};
+                vm.creatingInvolvementKind = false;
+                vm.newInvolvementKind = {};
                 loadInvolvementKinds();
-            });
+            })
+            .catch(e => displayError(
+                "Failed to create involvement kind",
+                e));
     };
 
-    vm.cancelNewinvolvementKind = () => {
-        vm.creatinginvolvementKind = false;
+    vm.cancelNewInvolvementKind = () => {
+        vm.creatingInvolvementKind = false;
     };
 
 
