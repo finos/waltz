@@ -31,6 +31,7 @@ import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.records.InvolvementRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -48,6 +49,7 @@ import static org.finos.waltz.schema.Tables.END_USER_APPLICATION;
 import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static org.finos.waltz.schema.tables.Person.PERSON;
 import static org.finos.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 
 
 @Repository
@@ -302,4 +304,13 @@ public class InvolvementDao {
                         .and(id.isNull()));
     }
 
+    public Set<Tuple2<Long, Long>> findEntityIdToPersonIdByInvolvementKindAndEntityKind(Long invKindId, EntityKind entityKind) {
+        return dsl
+                .select(INVOLVEMENT.ENTITY_ID, PERSON.ID)
+                .from(INVOLVEMENT)
+                .innerJoin(PERSON).on(INVOLVEMENT.EMPLOYEE_ID.eq(PERSON.EMPLOYEE_ID))
+                .where(INVOLVEMENT.ENTITY_KIND.eq(entityKind.name())
+                        .and(INVOLVEMENT.KIND_ID.eq(invKindId)))
+                .fetchSet(r -> tuple(r.get(INVOLVEMENT.ENTITY_ID), r.get(PERSON.ID)));
+    }
 }

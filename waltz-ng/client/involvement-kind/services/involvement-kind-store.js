@@ -58,6 +58,12 @@ export function store($http, BaseApiUrl) {
             .then(r => r.data);
     };
 
+    const findUsageStats = () => {
+        return $http
+            .get(`${BASE}/usage-stats`)
+            .then(r => r.data);
+    };
+
 
     const deleteById = (id) => {
         return $http
@@ -72,49 +78,55 @@ export function store($http, BaseApiUrl) {
         getById,
         create,
         update,
-        deleteById
+        deleteById,
+        findUsageStats
     };
 }
 
 
 store.$inject = [
-    '$http',
-    'BaseApiUrl'
+    "$http",
+    "BaseApiUrl"
 ];
 
 
-export const serviceName = 'InvolvementKindStore';
+export const serviceName = "InvolvementKindStore";
 
 
 export const InvolvementKindStore_API = {
     findAll: {
         serviceName,
-        serviceFnName: 'findAll',
-        description: 'executes findAll'
+        serviceFnName: "findAll",
+        description: "executes findAll"
     },
     findKeyInvolvementKindsByEntityKind: {
         serviceName,
-        serviceFnName: 'findKeyInvolvementKindsByEntityKind',
-        description: 'executes findKeyInvolvementKindsByEntityKind'
+        serviceFnName: "findKeyInvolvementKindsByEntityKind",
+        description: "executes findKeyInvolvementKindsByEntityKind"
     },
     getById: {
         serviceName,
-        serviceFnName: 'getById',
-        description: 'executes getById'
+        serviceFnName: "getById",
+        description: "executes getById"
     },
     create: {
         serviceName,
-        serviceFnName: 'create',
-        description: 'executes create'
+        serviceFnName: "create",
+        description: "executes create"
     },
     update: {
         serviceName,
-        serviceFnName: 'update',
-        description: 'executes update'
+        serviceFnName: "update",
+        description: "executes update"
     },
     deleteById: {
         serviceName,
-        serviceFnName: 'deleteById',
-        description: 'executes deleteById'
+        serviceFnName: "deleteById",
+        description: "executes deleteById"
+    },
+    findUsageStats: {
+        serviceName,
+        serviceFnName: "findUsageStats",
+        description: "executes findUsageStats"
     }
 };

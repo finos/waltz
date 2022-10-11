@@ -16,33 +16,20 @@
  *
  */
 
-import _ from "lodash";
-import {initialiseData} from "../common";
-import template from "./involvement-kinds-view.html";
-import toasts from "../svelte-stores/toast-store";
-import {displayError} from "../common/error-utils";
-import InvolvementKindTable from "./svelte/involvement-kind/InvolvementKindTable.svelte";
+import {remote} from "./remote";
 
-const initialState = {
-    InvolvementKindTable
-};
+export function mkBulkUploadStore() {
 
+    const resolve = (resolveParams) => {
+        return remote.execute(
+            "POST",
+            "api/bulk-upload/resolve",
+            resolveParams);
+    };
 
-function controller() {
-
-    const vm = initialiseData(this, initialState);
-
+    return {
+        resolve,
+    };
 }
 
-
-controller.$inject = [
-];
-
-
-export default {
-    template,
-    controller,
-    controllerAs: "ctrl",
-    bindToController: true,
-    scope: {}
-};
+export const bulkUploadStore = mkBulkUploadStore();

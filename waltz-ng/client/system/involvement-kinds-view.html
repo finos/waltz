@@ -30,97 +30,16 @@
 
 
     <div class='waltz-page-summary waltz-page-summary-attach'>
-        <form class="form-inline">
-            <div class="form-group">
-                <label>Search</label>
-                <input type="search" class="form-control" placeholder="Filter..." ng-model="userQuery">
-            </div>
-        </form>
+
+        <waltz-svelte-component component="ctrl.InvolvementKindTable">
+        </waltz-svelte-component>
+
         <hr>
-        <div class="waltz-user-admin-scroll">
-            <table class="table table-condensed">
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>External Id</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr ng-repeat="involvementKind in ctrl.involvementKinds | orderBy:'name' | filter:userQuery"
-                    class="waltz-visibility-parent">
-                    <td>
-                        <waltz-editable-field on-save="ctrl.updateName"
-                                              field-type="text"
-                                              initial-val="involvementKind.name"
-                                              ctx="involvementKind">
-                        </waltz-editable-field>
-                    </td>
-                    <td align="left">
-                        <waltz-editable-field on-save="ctrl.updateDescription"
-                                              field-type="text"
-                                              initial-val="involvementKind.description"
-                                              ctx="involvementKind">
-                        </waltz-editable-field>
-                    </td>
-                    <td>
-                        <waltz-editable-field on-save="ctrl.updateExternalId"
-                                              field-type="text"
-                                              initial-val="involvementKind.externalId"
-                                              ctx="involvementKind">
-                        </waltz-editable-field>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <button class="btn btn-primary btn-sm"
-                                ng-if="ctrl.creatingInvolvementKind === false"
-                                ng-click="ctrl.startNewInvolvementKind()">
-                            Add
-                        </button>
-                        <div ng-if="ctrl.creatingInvolvementKind === true">
-                            <input type="text"
-                                   ng-model="ctrl.newInvolvementKind.name"
-                                   class="form-control input-sm">
-                        </div>
-                    </td>
-                    <td>
-                        <div ng-if="ctrl.creatingInvolvementKind === true">
-                            <input type="text"
-                                   ng-model="ctrl.newInvolvementKind.description"
-                                   class="form-control input-sm">
-                        </div>
-                    </td>
-                    <td>
-                        <div ng-if="ctrl.creatingInvolvementKind === true">
-                            <input type="text"
-                                   ng-model="ctrl.newInvolvementKind.externalId"
-                                   class="form-control input-sm">
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="3">
-                        <button class="btn btn-success btn-sm"
-                                ng-if="ctrl.creatingInvolvementKind === true"
-                                ng-click="ctrl.saveNewInvolvementKind()">
-                            Save
-                        </button>
-                        <button class="btn btn-default btn-sm"
-                                ng-if="ctrl.creatingInvolvementKind === true"
-                                ng-click="ctrl.cancelNewInvolvementKind()">
-                            Cancel
-                        </button>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-        <hr>
+
         <blockquote>
             <p>
                 Deletion of Involvement Kinds is not supported in the user interface because it can be in used in Person
-                Involvements.  Please check these before removing an involvement kind from the system.
+                Involvements. Please check these before removing an involvement kind from the system.
             </p>
         </blockquote>
     </div>

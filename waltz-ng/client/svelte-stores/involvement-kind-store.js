@@ -17,6 +17,7 @@
  */
 
 import {remote} from "./remote";
+import {checkIsCreateInvolvementKindCommand} from "../common/checks";
 
 export function mkInvolvementKindStore() {
 
@@ -49,10 +50,36 @@ export function mkInvolvementKindStore() {
                 {force: force});
     };
 
+    const update = (cmd) => {
+        return remote.execute(
+            "PUT",
+            "api/involvement-kind/update",
+            cmd);
+    };
+
+    const create = (cmd) => {
+        checkIsCreateInvolvementKindCommand(cmd);
+        return remote.execute(
+            "POST",
+            "api/involvement-kind/update",
+            cmd);
+    }
+
+    const findUsageStats = (force) => {
+        return remote.fetchViewList(
+            "GET",
+            "api/involvement-kind/usage-stats",
+            null,
+            {force});
+    };
+
     return {
         findAll,
         getById,
-        findKeyInvolvementKindsByEntityKind
+        findKeyInvolvementKindsByEntityKind,
+        update,
+        create,
+        findUsageStats
     };
 }
 

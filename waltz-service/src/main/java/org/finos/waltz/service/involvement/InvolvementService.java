@@ -34,6 +34,7 @@ import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.involvement_kind.InvolvementKindService;
 import org.finos.waltz.service.user.UserRoleService;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -107,6 +108,11 @@ public class InvolvementService {
 
     public List<Involvement> findAllByEmployeeId(String employeeId) {
         return involvementDao.findAllByEmployeeId(employeeId);
+    }
+
+
+    public Set<Tuple2<Long, Long>> findEntityIdToPersonIdByInvolvementKindAndEntityKind(Long invKindId, EntityKind entityKind) {
+        return involvementDao.findEntityIdToPersonIdByInvolvementKindAndEntityKind(invKindId, entityKind);
     }
 
 

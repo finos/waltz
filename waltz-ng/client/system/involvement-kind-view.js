@@ -15,34 +15,34 @@
  * See the License for the specific
  *
  */
-
-import _ from "lodash";
+import template from "./involvement-kind-view.html";
 import {initialiseData} from "../common";
-import template from "./involvement-kinds-view.html";
-import toasts from "../svelte-stores/toast-store";
-import {displayError} from "../common/error-utils";
-import InvolvementKindTable from "./svelte/involvement-kind/InvolvementKindTable.svelte";
+import InvolvementKindPanel from "./svelte/involvement-kind/InvolvementKindPanel.svelte";
+import {entity} from "../common/services/enums/entity";
+
 
 const initialState = {
-    InvolvementKindTable
-};
+    selectedKind: null,
+    InvolvementKindPanel
+}
 
 
-function controller() {
+function controller($stateParams) {
 
     const vm = initialiseData(this, initialState);
 
+    vm.primaryEntityRef = {id: $stateParams.id, kind: entity.INVOLVEMENT_KIND.key}
 }
 
 
 controller.$inject = [
+    "$stateParams"
 ];
 
 
 export default {
     template,
     controller,
-    controllerAs: "ctrl",
+    controllerAs: "$ctrl",
     bindToController: true,
-    scope: {}
 };

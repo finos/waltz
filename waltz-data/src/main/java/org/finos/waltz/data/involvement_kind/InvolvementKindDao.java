@@ -18,17 +18,14 @@
 
 package org.finos.waltz.data.involvement_kind;
 
-import org.finos.waltz.schema.tables.records.InvolvementKindRecord;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.UserTimestamp;
-import org.finos.waltz.model.involvement_kind.ImmutableInvolvementKind;
-import org.finos.waltz.model.involvement_kind.InvolvementKind;
-import org.finos.waltz.model.involvement_kind.InvolvementKindChangeCommand;
-import org.finos.waltz.model.involvement_kind.InvolvementKindCreateCommand;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.finos.waltz.model.involvement_kind.*;
+import org.finos.waltz.schema.tables.Involvement;
+import org.finos.waltz.schema.tables.Person;
+import org.finos.waltz.schema.tables.records.InvolvementKindRecord;
+import org.jooq.*;
 import org.jooq.exception.NoDataFoundException;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,14 +33,23 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.mapping;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkOptionalIsPresent;
+import static org.finos.waltz.common.SetUtilities.filter;
+import static org.finos.waltz.common.SetUtilities.fromCollection;
+import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.schema.Tables.PERSON;
 import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static org.finos.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
 import static org.finos.waltz.schema.tables.KeyInvolvementKind.KEY_INVOLVEMENT_KIND;
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.Checks.checkOptionalIsPresent;
 
 @Repository
 public class InvolvementKindDao {
@@ -154,6 +160,7 @@ public class InvolvementKindDao {
         command.name().ifPresent(change -> record.setName(change.newVal()));
         command.description().ifPresent(change -> record.setDescription(change.newVal()));
         command.externalId().ifPresent(change -> record.setExternalId(change.newVal()));
+        command.userSelectable().ifPresent(change -> record.setUserSelectable(change.newVal()));
 
         UserTimestamp lastUpdate = command.lastUpdate().orElseThrow(() -> new IllegalStateException("InvolvementChangeCommand must have a last update timestamp"));
         record.setLastUpdatedAt(Timestamp.valueOf(lastUpdate.at()));
@@ -172,6 +179,72 @@ public class InvolvementKindDao {
                         .from(INVOLVEMENT)
                         .where(INVOLVEMENT.KIND_ID.eq(id))))
                 .execute() > 0;
+    }
+
+
+    public Set<InvolvementKindUsageStat> loadUsageStats() {
+
+        org.finos.waltz.schema.tables.InvolvementKind ik = INVOLVEMENT_KIND;
+        Involvement inv = INVOLVEMENT;
+        Person p = PERSON;
+
+        CommonTableExpression<Record4<Long, String, Boolean, Integer>> userStatsCTE = DSL
+                .name("user_stats")
+                .as(DSL.select(ik.ID, inv.ENTITY_KIND, p.IS_REMOVED, DSL.countDistinct(inv.EMPLOYEE_ID).as("person_count"))
+                        .from(inv)
+                        .innerJoin(ik).on(ik.ID.eq(inv.KIND_ID))
+                        .innerJoin(p).on(p.EMPLOYEE_ID.eq(inv.EMPLOYEE_ID))
+                        .groupBy(ik.ID, inv.ENTITY_KIND, p.IS_REMOVED));
+
+        Field<Long> invKindIdField = userStatsCTE.field(0, Long.class);
+        Field<String> entityKindField = userStatsCTE.field(1, String.class);
+        Field<Boolean> personIsRemovedField = userStatsCTE.field(2, Boolean.class);
+        Field<Integer> personCountField = userStatsCTE.field(3, Integer.class);
+
+        return dsl
+                .with(userStatsCTE)
+                .select(ik.ID,
+                        ik.NAME,
+                        ik.EXTERNAL_ID,
+                        ik.DESCRIPTION,
+                        entityKindField,
+                        personIsRemovedField,
+                        personCountField)
+                .from(ik)
+                .leftJoin(userStatsCTE).on(invKindIdField.eq(ik.ID))
+                .fetch()
+                .stream()
+                .collect(groupingBy(
+                        r -> mkRef(
+                                EntityKind.INVOLVEMENT_KIND,
+                                r.get(ik.ID),
+                                r.get(ik.NAME),
+                                r.get(ik.DESCRIPTION),
+                                r.get(ik.EXTERNAL_ID)),
+                        mapping(
+                                r -> r.get(entityKindField) == null
+                                        ? null
+                                        : ImmutableStat
+                                        .builder()
+                                        .entityKind(EntityKind.valueOf(r.get(entityKindField)))
+                                        .isCountOfRemovedPeople(r.get(personIsRemovedField))
+                                        .personCount(r.get(personCountField))
+                                        .build(),
+                                Collectors.toSet())))
+                .entrySet()
+                .stream()
+                .map(e -> {
+                    Set<InvolvementKindUsageStat.Stat> stats = filter(
+                            fromCollection(e.getValue()),
+                            Objects::nonNull);
+
+                    return ImmutableInvolvementKindUsageStat
+                            .builder()
+                            .breakdown(stats)
+                            .involvementKind(e.getKey())
+                            .build();
+                })
+                .collect(Collectors.toSet());
     }
 
 }

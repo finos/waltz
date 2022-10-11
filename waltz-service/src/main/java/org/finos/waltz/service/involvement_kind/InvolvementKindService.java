@@ -25,14 +25,13 @@ import org.finos.waltz.model.UserTimestamp;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.command.CommandResponse;
 import org.finos.waltz.model.command.ImmutableCommandResponse;
-import org.finos.waltz.model.involvement_kind.ImmutableInvolvementKindChangeCommand;
-import org.finos.waltz.model.involvement_kind.InvolvementKind;
-import org.finos.waltz.model.involvement_kind.InvolvementKindChangeCommand;
-import org.finos.waltz.model.involvement_kind.InvolvementKindCreateCommand;
+import org.finos.waltz.model.involvement_kind.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.FunctionUtilities.time;
@@ -95,6 +94,12 @@ public class InvolvementKindService {
 
     public boolean delete(long id) {
         return involvementKindDao.deleteIfNotUsed(id);
+    }
+
+
+    public Set<InvolvementKindUsageStat> loadUsageStats() {
+        return involvementKindDao.
+                loadUsageStats();
     }
 
 }
