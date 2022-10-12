@@ -27,20 +27,13 @@
         </ol>
     </waltz-page-header>
 
-    <waltz-section>
+    <waltz-section name="NavAidBuilder">
         <div class="row">
-            <div class="col-sm-6">
-                <waltz-svelte-component ng-if="$ctrl.gridId"
-                                        component="$ctrl.TestPage"
-                                        grid-id="$ctrl.gridId"
-                                        column-defs="$ctrl.columnDefs">
+            <div class="col-sm-12">
+                <waltz-svelte-component component="$ctrl.TaxonomyNavAidBuilder"
+                                        taxonomy="$ctrl.taxonomy"
+                                        link="$ctrl.linkStem">
 
-                </waltz-svelte-component>
-            </div>
-            <div class="col-sm-6">
-                <waltz-svelte-component component="$ctrl.TestPage"
-                                        grid-id="$ctrl.gridId"
-                                        column-defs="$ctrl.columnDefs">
                 </waltz-svelte-component>
             </div>
         </div>

@@ -116,7 +116,8 @@ const unknownRating = {
 function getFixedColumnName(column) {
     let entityFieldName = _.get(column, ["entityFieldReference", "displayName"], null);
 
-    return _.chain([])
+    return _
+        .chain([])
         .concat(entityFieldName)
         .concat(column.columnName)
         .compact()
