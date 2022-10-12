@@ -15,8 +15,10 @@
     import {displayError} from "../../../common/error-utils";
     import {bulkLoadResolutionStatus} from "../../../common/services/enums/bulk-load-resolution-status";
     import Icon from "../../../common/svelte/Icon.svelte";
+    import toasts from "../../../svelte-stores/toast-store";
 
     export let involvementKind;
+    export let onSave;
 
     let Modes = {
         INPUT: "INPUT",
@@ -32,12 +34,10 @@
         entity.ORG_UNIT];
 
     function selectEntityKind(kind) {
-        console.log({kind});
         $selectedKind = kind.key;
     }
 
     function verifyEntries() {
-        console.log({re: $rawInvolvements});
 
         const resolveParams = {
             inputString: $rawInvolvements,
@@ -65,7 +65,13 @@
             rowSubjectKind: $selectedKind
         }
 
-        bulkUploadStore.upload(uploadParams);
+        bulkUploadStore.upload(uploadParams)
+            .then(r => {
+                console.log({r});
+                toasts.success(`Successfully created ${r.data} new involvements`);
+                onSave();
+            })
+            .catch(e => displayError("Could not bulk store involvements", e));
     }
 
 

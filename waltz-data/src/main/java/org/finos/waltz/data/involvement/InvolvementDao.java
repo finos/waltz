@@ -18,6 +18,7 @@
 
 package org.finos.waltz.data.involvement;
 
+import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.data.person.PersonDao;
@@ -26,6 +27,7 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.ImmutableEntityReference;
 import org.finos.waltz.model.involvement.ImmutableInvolvement;
 import org.finos.waltz.model.involvement.Involvement;
+import org.finos.waltz.model.involvement.InvolvementDetail;
 import org.finos.waltz.model.person.Person;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.records.InvolvementRecord;
@@ -40,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -57,15 +60,25 @@ public class InvolvementDao {
 
     private final DSLContext dsl;
 
+    private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory
+            .mkNameField(
+                    INVOLVEMENT.ENTITY_ID,
+                    INVOLVEMENT.ENTITY_KIND,
+                    newArrayList(EntityKind.values()))
+            .as("entity_name");
+
     private final RecordMapper<Record, Involvement> TO_MODEL_MAPPER = r -> {
         InvolvementRecord involvementRecord = r.into(InvolvementRecord.class);
+
+        ImmutableEntityReference entityRef = ImmutableEntityReference.builder()
+                .kind(EntityKind.valueOf(involvementRecord.getEntityKind()))
+                .id(involvementRecord.getEntityId())
+                .build();
+
         return ImmutableInvolvement.builder()
                 .employeeId(involvementRecord.getEmployeeId())
                 .kindId(involvementRecord.getKindId())
-                .entityReference(ImmutableEntityReference.builder()
-                        .kind(EntityKind.valueOf(involvementRecord.getEntityKind()))
-                        .id(involvementRecord.getEntityId())
-                        .build())
+                .entityReference(entityRef)
                 .isReadOnly(involvementRecord.getIsReadonly())
                 .provenance(involvementRecord.getProvenance())
                 .build();
@@ -312,5 +325,42 @@ public class InvolvementDao {
                 .where(INVOLVEMENT.ENTITY_KIND.eq(entityKind.name())
                         .and(INVOLVEMENT.KIND_ID.eq(invKindId)))
                 .fetchSet(r -> tuple(r.get(INVOLVEMENT.ENTITY_ID), r.get(PERSON.ID)));
+    }
+
+    public int bulkStoreInvolvements(Set<Involvement> involvements) {
+        Set<InvolvementRecord> involvementRecords = SetUtilities.map(involvements, TO_RECORD_MAPPER);
+        int[] inserted = dsl.batchInsert(involvementRecords).execute();
+        return IntStream.of(inserted).sum();
+    }
+
+    public Set<Involvement> findByKindIdAndEntityKind(long id, EntityKind kind) {
+        return dsl
+                .select(INVOLVEMENT.fields())
+                .select(ENTITY_NAME_FIELD)
+                .select()
+                .from(INVOLVEMENT)
+                .where(INVOLVEMENT.KIND_ID.eq(id)
+                        .and(INVOLVEMENT.ENTITY_KIND.eq(kind.name())))
+                .fetchSet(r -> {
+
+                    InvolvementRecord involvementRecord = r.into(InvolvementRecord.class);
+
+                    ImmutableEntityReference entityRef = ImmutableEntityReference.builder()
+                            .kind(EntityKind.valueOf(involvementRecord.getEntityKind()))
+                            .id(involvementRecord.getEntityId())
+                            .name(r.get(ENTITY_NAME_FIELD))
+                            .build();
+
+                    return ImmutableInvolvement.builder()
+                            .employeeId(involvementRecord.getEmployeeId())
+                            .kindId(involvementRecord.getKindId())
+                            .entityReference(entityRef)
+                            .isReadOnly(involvementRecord.getIsReadonly())
+                            .provenance(involvementRecord.getProvenance())
+                            .build();
+
+                });
+
+
     }
 }

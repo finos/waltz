@@ -7,6 +7,8 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.bulk_upload.*;
 import org.finos.waltz.model.involvement.ImmutableInvolvement;
+import org.finos.waltz.model.involvement.Involvement;
+import org.finos.waltz.model.person.Person;
 import org.finos.waltz.service.involvement.InvolvementService;
 import org.finos.waltz.service.person.PersonService;
 import org.jooq.lambda.tuple.Tuple2;
@@ -22,6 +24,7 @@ import java.util.stream.Stream;
 import static java.lang.String.format;
 import static org.finos.waltz.common.ArrayUtilities.isEmpty;
 import static org.finos.waltz.common.ListUtilities.asList;
+import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.StringUtilities.safeTrim;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
@@ -54,25 +57,31 @@ public class BulkUploadService {
     }
 
 
-    public Integer upload(BulkUploadCommand uploadCommand) {
+    public Integer upload(BulkUploadCommand uploadCommand, String username) {
 
         switch (uploadCommand.targetDomain().kind()) {
             case INVOLVEMENT_KIND:
-                return bulkUploadInvolvements(uploadCommand);
+                return bulkUploadInvolvements(uploadCommand, username);
             default:
                 throw new IllegalArgumentException(format("Cannot upload new entries domain: %s", uploadCommand.targetDomain().kind().name()));
         }
     }
 
-    private Integer bulkUploadInvolvements(BulkUploadCommand uploadCommand) {
-//
+    private Integer bulkUploadInvolvements(BulkUploadCommand uploadCommand, String username) {
+
+        Set<Tuple2<Long, Long>> existingInvolvements = involvementService
+                .findEntityIdToPersonIdByInvolvementKindAndEntityKind(uploadCommand.targetDomain().id(), uploadCommand.rowSubjectKind());
+
         Set<String> subjectIdentifiers = getColumnValuesFromInputString(uploadCommand.inputString(), 0);
         Map<String, Long> subjectIdentifierToIdMap = entityAliasPopulator.fetchEntityIdLookupMap(uploadCommand.rowSubjectKind(), subjectIdentifiers);
 
         Set<String> personIdentifiers = getColumnValuesFromInputString(uploadCommand.inputString(), 1);
         Map<String, Long> personIdentifierToIdMap = entityAliasPopulator.fetchEntityIdLookupMap(EntityKind.PERSON, personIdentifiers);
 
-        streamRowData(uploadCommand.inputString())
+        List<Person> activePeople = personService.all();
+        Map<Long, String> personIdToEmployeeIdMap = indexBy(activePeople, v -> v.id().get(), Person::employeeId, (v1, v2) -> v1);
+
+        Set<Involvement> involvementsToCreate = streamRowData(uploadCommand.inputString())
                 .map(t -> {
 
                     String[] cells = t.v2;
@@ -87,18 +96,28 @@ public class BulkUploadService {
                         return null;
                     }
 
+                    if (existingInvolvements.contains(tuple(subjectId, personId))) {
+                        return null; // no need to create records for those that already exist
+                    }
+
+                    String employeeId = personIdToEmployeeIdMap.get(personId);
+
+                    if (employeeId == null) {
+                        return null;
+                    }
+
                     return ImmutableInvolvement.builder()
-                            .entityReference(EntityReference.mkRef(uploadCommand.rowSubjectKind(), 1L))
-                            .employeeId("")
+                            .entityReference(EntityReference.mkRef(uploadCommand.rowSubjectKind(), subjectId))
+                            .employeeId(employeeId)
                             .isReadOnly(false)
-                            .kindId(1L)
-                            .provenance("")
+                            .kindId(uploadCommand.targetDomain().id())
+                            .provenance("waltz")
                             .build();
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
-        return null;
+        return involvementService.bulkStoreInvolvements(involvementsToCreate, username);
     }
 
     private List<ResolveRowResponse> resolveInvolvements(ResolveBulkUploadRequestParameters resolveParams) {

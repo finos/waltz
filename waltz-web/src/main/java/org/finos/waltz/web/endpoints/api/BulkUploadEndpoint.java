@@ -88,7 +88,7 @@ public class BulkUploadEndpoint implements Endpoint {
         String username = getUsername(request);
         LOG.info("User: {} requesting bulk upload: {}", username, uploadCommand);
 
-        return service.upload(uploadCommand);
+        return service.upload(uploadCommand, username);
     }
 
 

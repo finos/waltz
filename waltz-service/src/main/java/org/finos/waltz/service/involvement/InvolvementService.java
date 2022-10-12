@@ -25,9 +25,9 @@ import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.involvement.InvolvementDao;
 import org.finos.waltz.data.person.PersonDao;
 import org.finos.waltz.model.*;
+import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
-import org.finos.waltz.model.involvement.EntityInvolvementChangeCommand;
-import org.finos.waltz.model.involvement.Involvement;
+import org.finos.waltz.model.involvement.*;
 import org.finos.waltz.model.involvement_kind.InvolvementKind;
 import org.finos.waltz.model.person.Person;
 import org.finos.waltz.model.user.SystemRole;
@@ -44,10 +44,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.*;
 import static org.finos.waltz.common.FunctionUtilities.time;
 import static org.finos.waltz.common.ListUtilities.applyToFirst;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.common.SetUtilities.map;
 
 
 @Service
@@ -181,6 +183,25 @@ public class InvolvementService {
         return involvementDao.cleanupInvolvementsForKind(entityKind);
     }
 
+    public int bulkStoreInvolvements(Set<Involvement> involvements, String username) {
+        int insertedRecords = involvementDao.bulkStoreInvolvements(involvements);
+
+        Map<Long, String> involvementKindNameByIdMap = loadInvolvementKindIdToNameMap();
+
+
+        Set<ChangeLog> changelogs = map(involvements, i -> {
+            String message = format(
+                    "Added involvement: %s for employee: %s",
+                    involvementKindNameByIdMap.getOrDefault(i.kindId(), "Unknown"),
+                    i.employeeId());
+            return mkChangeLog(i.entityReference(), username, EntityKind.INVOLVEMENT, Operation.ADD, message);
+        });
+
+        changeLogService.write(changelogs);
+
+        return insertedRecords;
+    }
+
 
     private Involvement mkInvolvement(EntityReference entityReference,
                                       EntityInvolvementChangeCommand command) {
@@ -199,19 +220,28 @@ public class InvolvementService {
 
 
     private void logChange(EntityReference entityReference, String userId, EntityInvolvementChangeCommand command) {
-        String message = String.format("Involvement kind (%s) %s for person: %s",
+        String message = format("Involvement kind (%s) %s for person: %s",
                 resolvePrettyInvolvementKind(command.involvementKindId()),
                 command.operation().name().toLowerCase(),
                 resolveName(command.personEntityRef()));
 
-        ImmutableChangeLog changeLog = ImmutableChangeLog.builder()
+        ImmutableChangeLog changeLog = mkChangeLog(entityReference, userId, command.personEntityRef().kind(), command.operation(), message);
+        changeLogService.write(changeLog);
+    }
+
+
+    private ImmutableChangeLog mkChangeLog(EntityReference entityReference,
+                                           String userId,
+                                           EntityKind childKind,
+                                           Operation operation,
+                                           String message) {
+        return ImmutableChangeLog.builder()
                 .parentReference(entityReference)
                 .message(message)
                 .userId(userId)
-                .childKind(command.personEntityRef().kind())
-                .operation(command.operation())
+                .childKind(childKind)
+                .operation(operation)
                 .build();
-        changeLogService.write(changeLog);
     }
 
 
@@ -220,7 +250,7 @@ public class InvolvementService {
             this.involvementKindIdToNameMap = loadInvolvementKindIdToNameMap();
         }
 
-        return String.format("%s / %s", this.involvementKindIdToNameMap.get(id), id);
+        return format("%s / %s", this.involvementKindIdToNameMap.get(id), id);
     }
 
 
@@ -245,4 +275,7 @@ public class InvolvementService {
         checkTrue(involvementKind.userSelectable(), "Involvement kind '%s' is not user selectable", involvementKind.name());
     }
 
+    public Set<Involvement> findByKindIdAndEntityKind(long id, EntityKind kind) {
+        return involvementDao.findByKindIdAndEntityKind(id, kind);
+    }
 }
