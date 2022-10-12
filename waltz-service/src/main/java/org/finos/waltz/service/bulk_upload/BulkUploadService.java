@@ -4,16 +4,11 @@ import org.finos.waltz.common.*;
 import org.finos.waltz.data.EntityAliasPopulator;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.bulk_upload.ImmutableResolveRowResponse;
-import org.finos.waltz.model.bulk_upload.ResolutionStatus;
-import org.finos.waltz.model.bulk_upload.ResolveBulkUploadRequestParameters;
-import org.finos.waltz.model.bulk_upload.ResolveRowResponse;
-import org.finos.waltz.model.involvement.Involvement;
-import org.finos.waltz.schema.Tables;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.bulk_upload.*;
+import org.finos.waltz.model.involvement.ImmutableInvolvement;
 import org.finos.waltz.service.involvement.InvolvementService;
 import org.finos.waltz.service.person.PersonService;
-import org.jooq.DSLContext;
-import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,9 +22,6 @@ import java.util.stream.Stream;
 import static java.lang.String.format;
 import static org.finos.waltz.common.ArrayUtilities.isEmpty;
 import static org.finos.waltz.common.ListUtilities.asList;
-import static org.finos.waltz.common.ListUtilities.isEmpty;
-import static org.finos.waltz.common.SetUtilities.asSet;
-import static org.finos.waltz.common.StringUtilities.mkSafe;
 import static org.finos.waltz.common.StringUtilities.safeTrim;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
@@ -59,6 +51,54 @@ public class BulkUploadService {
             default:
                 throw new IllegalArgumentException(format("Cannot resolve input rows for domain: %s", resolveParams.targetDomain().kind().name()));
         }
+    }
+
+
+    public Integer upload(BulkUploadCommand uploadCommand) {
+
+        switch (uploadCommand.targetDomain().kind()) {
+            case INVOLVEMENT_KIND:
+                return bulkUploadInvolvements(uploadCommand);
+            default:
+                throw new IllegalArgumentException(format("Cannot upload new entries domain: %s", uploadCommand.targetDomain().kind().name()));
+        }
+    }
+
+    private Integer bulkUploadInvolvements(BulkUploadCommand uploadCommand) {
+//
+        Set<String> subjectIdentifiers = getColumnValuesFromInputString(uploadCommand.inputString(), 0);
+        Map<String, Long> subjectIdentifierToIdMap = entityAliasPopulator.fetchEntityIdLookupMap(uploadCommand.rowSubjectKind(), subjectIdentifiers);
+
+        Set<String> personIdentifiers = getColumnValuesFromInputString(uploadCommand.inputString(), 1);
+        Map<String, Long> personIdentifierToIdMap = entityAliasPopulator.fetchEntityIdLookupMap(EntityKind.PERSON, personIdentifiers);
+
+        streamRowData(uploadCommand.inputString())
+                .map(t -> {
+
+                    String[] cells = t.v2;
+
+                    String entityIdentifierString = safeTrim(cells[0]);
+                    String personIdentifierString = safeTrim(cells[1]);
+
+                    Long subjectId = subjectIdentifierToIdMap.get(entityIdentifierString);
+                    Long personId = personIdentifierToIdMap.get(personIdentifierString);
+
+                    if (subjectId == null || personId == null) {
+                        return null;
+                    }
+
+                    return ImmutableInvolvement.builder()
+                            .entityReference(EntityReference.mkRef(uploadCommand.rowSubjectKind(), 1L))
+                            .employeeId("")
+                            .isReadOnly(false)
+                            .kindId(1L)
+                            .provenance("")
+                            .build();
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        return null;
     }
 
     private List<ResolveRowResponse> resolveInvolvements(ResolveBulkUploadRequestParameters resolveParams) {

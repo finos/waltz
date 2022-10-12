@@ -18,6 +18,7 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.model.bulk_upload.BulkUploadCommand;
 import org.finos.waltz.model.bulk_upload.ResolveBulkUploadRequestParameters;
 import org.finos.waltz.model.bulk_upload.ResolveRowResponse;
 import org.finos.waltz.model.user.SystemRole;
@@ -65,6 +66,7 @@ public class BulkUploadEndpoint implements Endpoint {
 
         // create
         postForList(mkPath(BASE_URL, "resolve"), this::resolveRoute);
+        postForDatum(mkPath(BASE_URL), this::uploadRoute);
 
     }
 
@@ -77,6 +79,18 @@ public class BulkUploadEndpoint implements Endpoint {
 
         return service.resolve(resolveParams);
     }
+
+
+    private Integer uploadRoute(Request request, Response response) throws IOException {
+        ensureUserHasAdminRights(request);
+
+        BulkUploadCommand uploadCommand = readBody(request, BulkUploadCommand.class);
+        String username = getUsername(request);
+        LOG.info("User: {} requesting bulk upload: {}", username, uploadCommand);
+
+        return service.upload(uploadCommand);
+    }
+
 
     private void ensureUserHasAdminRights(Request request) {
         requireRole(userRoleService, request, SystemRole.ADMIN);

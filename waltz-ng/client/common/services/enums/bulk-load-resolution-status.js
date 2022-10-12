@@ -16,29 +16,26 @@
  *
  */
 
-import {remote} from "./remote";
-
-export function mkBulkUploadStore() {
-
-    const resolve = (resolveParams) => {
-        return remote.execute(
-            "POST",
-            "api/bulk-upload/resolve",
-            resolveParams);
-    };
-
-
-    const upload = (uploadParams) => {
-        return remote.execute(
-            "POST",
-            "api/bulk-upload",
-            uploadParams);
-    };
-
-    return {
-        resolve,
-        upload
-    };
-}
-
-export const bulkUploadStore = mkBulkUploadStore();
+export const bulkLoadResolutionStatus = {
+    NEW: {
+        key: "NEW",
+        name: "New",
+        icon: null,
+        description: null,
+        position: 10
+    },
+    EXISTING: {
+        key: "EXISTING",
+        name: "Existing",
+        icon: null,
+        description: null,
+        position: 20
+    },
+    ERROR: {
+        key: "ERROR",
+        name: "Error",
+        icon: null,
+        description: null,
+        position: 20
+    }
+};
