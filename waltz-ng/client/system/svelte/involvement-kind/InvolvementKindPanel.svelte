@@ -89,15 +89,7 @@
                 {#if activeMode === Modes.VIEW}
                     <InvolvementListPanel {involvementKind}/>
                 {:else if activeMode === Modes.BULK_UPLOAD}
-                    <h4>Upload involvements here!</h4>
                     <BulkInvolvementLoader {involvementKind} onSave={bulkUpdate}/>
-                    <div style="padding-top: 1em">
-                        <button class="btn btn-skinny"
-                                on:click={() => activeMode = Modes.VIEW}>
-                            <Icon name="ban"/>
-                            Cancel
-                        </button>
-                    </div>
                 {/if}
             </div>
         </div>

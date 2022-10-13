@@ -2,9 +2,12 @@
 
     import {involvementKindStore} from "../../../svelte-stores/involvement-kind-store";
     import InvolvementBreakdown from "./InvolvementBreakdown.svelte";
-    import _ from "lodash";
+    import _, {isEmpty} from "lodash";
     import {involvementViewStore} from "../../../svelte-stores/involvement-view-store";
     import EntityLink from "../../../common/svelte/EntityLink.svelte";
+    import SearchInput from "../../../common/svelte/SearchInput.svelte";
+    import {termSearch} from "../../../common";
+    import NoData from "../../../common/svelte/NoData.svelte";
 
     export let involvementKind;
 
@@ -12,10 +15,10 @@
     let involvementsCall;
 
     let selectedEntityKind;
+    let qry;
 
     function selectStat(usageStat) {
         selectedEntityKind = usageStat.entityInfo
-        console.log({usageStat})
     }
 
     $: {
@@ -36,6 +39,12 @@
     $: involvementUsageStats = $usageStatsCall?.data || [];
     $: involvements = _.orderBy($involvementsCall?.data || [], d => _.toLower(d.involvement.entityReference.name));
 
+    $: displayedInvolvements = isEmpty(qry)
+        ? involvements
+        : termSearch(involvements, qry, ["involvement.entityReference.name", "person.displayName", "person.email"])
+
+    $: filtersApplied = _.size(displayedInvolvements) !== _.size(involvements)
+
 </script>
 
 
@@ -46,7 +55,15 @@
 
     {#if selectedEntityKind}
         <hr>
-        <h4>Involvements to {selectedEntityKind.name}s <span class="text-muted">({_.size(involvements)})</span>:</h4>
+        <h4>Involvements to {selectedEntityKind.name}s
+            <span class="text-muted">
+                (
+                {#if filtersApplied}{_.size(displayedInvolvements)} / {/if}{_.size(involvements)})
+            </span>
+            :
+        </h4>
+
+        <SearchInput bind:value={qry}/>
         <div class:waltz-scroll-region-350={_.size(involvements) > 10}>
             <table class="table table-condensed">
                 <thead>
@@ -56,7 +73,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                {#each involvements as involvement}
+                {#each displayedInvolvements as involvement}
                     <tr>
                         <td>
                             <EntityLink ref={involvement.involvement.entityReference}/>
@@ -77,9 +94,12 @@
             </table>
         </div>
     {:else}
-    {/if}
-    {#if !_.isEmpty(involvements)}
+        <div class="help-block">
+            Select a row from the table to see all the involvements for that entity kind
+        </div>
     {/if}
 {:else}
-    <span>There are no usages of this involvement kind</span>
+    <div>
+        <NoData> There are no usages of this involvement kind</NoData>
+    </div>
 {/if}

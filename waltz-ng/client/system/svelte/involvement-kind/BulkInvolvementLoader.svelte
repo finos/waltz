@@ -16,6 +16,8 @@
     import {bulkLoadResolutionStatus} from "../../../common/services/enums/bulk-load-resolution-status";
     import Icon from "../../../common/svelte/Icon.svelte";
     import toasts from "../../../svelte-stores/toast-store";
+    import Tooltip from "../../../common/svelte/Tooltip.svelte";
+    import LoaderErrorTooltipContent from "./LoaderErrorTooltipContent.svelte";
 
     export let involvementKind;
     export let onSave;
@@ -49,8 +51,6 @@
             .then(d => {
                 $resolvedRows = d.data;
                 [$resolutionErrors, $involvements] = _.partition(d.data, d => d.status === bulkLoadResolutionStatus.ERROR.key);
-                console.log({d});
-                console.log("done loading");
                 activeMode = Modes.RESOLVE;
             })
             .catch(e => displayError("Could not resolve rows", e));
@@ -75,17 +75,18 @@
 
 </script>
 
-<DropdownPicker {items}
-                onSelect={selectEntityKind}
-                defaultMessage="Select an entity kind"/>
-
-
-<div style="padding-top: 1em">
-    Use the text box below to provide involvements as comma or tab separated value
-    e.g. external identifier, email.
-</div>
 
 {#if activeMode === Modes.INPUT}
+    <div style="padding: 1em 0">
+        Select the entity kind you wish to load involvements for from the dropdown picker.
+    </div>
+    <DropdownPicker {items}
+                    onSelect={selectEntityKind}
+                    defaultMessage="Select an entity kind"/>
+    <div style="padding: 3em 0 1em 0">
+        Use the text box below to provide involvements as comma or tab separated values
+        e.g. external identifier, email.
+    </div>
     <form on:submit|preventDefault={verifyEntries}>
         <div class="form-group">
             <label for="involvements">
@@ -109,14 +110,19 @@
             <span style="color: lightgreen">
                 <Icon name="check"/>
             </span>
-            All identifiers found, ready to save selection
+            All identifiers found, ready to save {_.size($involvements)} involvements
         </div>
     {:else}
         <div style="padding: 1em 0">
             <span style="color: lightcoral">
                 <Icon name="times"/>
             </span>
-            There are {_.size($resolutionErrors)} errors found, please resolve before uploading
+            There are {_.size($resolutionErrors)} errors found, please
+            <button class="btn btn-skinny"
+                    on:click={() => activeMode = Modes.INPUT}>
+                resolve
+            </button>
+            before uploading
         </div>
     {/if}
     <div class:waltz-scroll-region-350={_.size($resolvedRows) > 10}>
@@ -134,7 +140,17 @@
                     class:error={row.status === bulkLoadResolutionStatus.ERROR.key}>
                     <td>{row.inputRow[0]}</td>
                     <td>{row.inputRow[1]}</td>
-                    <td>{bulkLoadResolutionStatus[row.status].name}</td>
+                    <td>
+                        {bulkLoadResolutionStatus[row.status].name}
+                        {#if row.status === bulkLoadResolutionStatus.ERROR.key}
+                            <Tooltip content={LoaderErrorTooltipContent}
+                                     props={{resolvedRow: row}}>
+                                <svelte:fragment slot="target">
+                                    <Icon name="exclamation-triangle"/>
+                                </svelte:fragment>
+                            </Tooltip>
+                        {/if}
+                    </td>
                 </tr>
             {/each}
             </tbody>
