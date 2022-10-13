@@ -37,10 +37,7 @@ import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
@@ -334,10 +331,10 @@ public class InvolvementDao {
     }
 
     public Set<Involvement> findByKindIdAndEntityKind(long id, EntityKind kind) {
+
         return dsl
                 .select(INVOLVEMENT.fields())
                 .select(ENTITY_NAME_FIELD)
-                .select()
                 .from(INVOLVEMENT)
                 .where(INVOLVEMENT.KIND_ID.eq(id)
                         .and(INVOLVEMENT.ENTITY_KIND.eq(kind.name())))
@@ -345,10 +342,12 @@ public class InvolvementDao {
 
                     InvolvementRecord involvementRecord = r.into(InvolvementRecord.class);
 
+                    Optional<String> entityName = Optional.ofNullable(r.get(ENTITY_NAME_FIELD));
+
                     ImmutableEntityReference entityRef = ImmutableEntityReference.builder()
                             .kind(EntityKind.valueOf(involvementRecord.getEntityKind()))
                             .id(involvementRecord.getEntityId())
-                            .name(r.get(ENTITY_NAME_FIELD))
+                            .name(entityName.orElse("Unknown"))
                             .build();
 
                     return ImmutableInvolvement.builder()

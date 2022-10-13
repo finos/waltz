@@ -37,10 +37,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.mapping;
+import static java.util.stream.Collectors.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkOptionalIsPresent;
 import static org.finos.waltz.common.SetUtilities.filter;
@@ -230,7 +228,7 @@ public class InvolvementKindDao {
                                         .isCountOfRemovedPeople(r.get(personIsRemovedField))
                                         .personCount(r.get(personCountField))
                                         .build(),
-                                Collectors.toSet())))
+                                toSet())))
                 .entrySet()
                 .stream()
                 .map(e -> {
@@ -244,74 +242,46 @@ public class InvolvementKindDao {
                             .involvementKind(e.getKey())
                             .build();
                 })
-                .collect(Collectors.toSet());
+                .collect(toSet());
     }
 
 
-    public Set<InvolvementKindUsageStat> loadUsageStatsForKind(Long kindId) {
+    public InvolvementKindUsageStat loadUsageStatsForKind(Long kindId) {
 
         org.finos.waltz.schema.tables.InvolvementKind ik = INVOLVEMENT_KIND;
         Involvement inv = INVOLVEMENT;
         Person p = PERSON;
 
-        CommonTableExpression<Record4<Long, String, Boolean, Integer>> userStatsCTE = DSL
-                .name("user_stats")
-                .as(DSL.select(ik.ID, inv.ENTITY_KIND, p.IS_REMOVED, DSL.countDistinct(inv.EMPLOYEE_ID).as("person_count"))
-                        .from(inv)
-                        .innerJoin(ik).on(ik.ID.eq(inv.KIND_ID))
-                        .innerJoin(p).on(p.EMPLOYEE_ID.eq(inv.EMPLOYEE_ID))
-                        .groupBy(ik.ID, inv.ENTITY_KIND, p.IS_REMOVED));
-
-        Field<Long> invKindIdField = userStatsCTE.field(0, Long.class);
-        Field<String> entityKindField = userStatsCTE.field(1, String.class);
-        Field<Boolean> personIsRemovedField = userStatsCTE.field(2, Boolean.class);
-        Field<Integer> personCountField = userStatsCTE.field(3, Integer.class);
-
-        return dsl
-                .with(userStatsCTE)
-                .select(ik.ID,
-                        ik.NAME,
-                        ik.EXTERNAL_ID,
-                        ik.DESCRIPTION,
-                        entityKindField,
-                        personIsRemovedField,
-                        personCountField)
-                .from(ik)
-                .leftJoin(userStatsCTE).on(invKindIdField.eq(ik.ID))
+        SelectHavingStep<Record4<Long, String, Boolean, Integer>> qry = dsl
+                .select(ik.ID, inv.ENTITY_KIND, p.IS_REMOVED, DSL.countDistinct(inv.EMPLOYEE_ID).as("person_count"))
+                .from(inv)
+                .innerJoin(ik).on(ik.ID.eq(inv.KIND_ID))
+                .innerJoin(p).on(p.EMPLOYEE_ID.eq(inv.EMPLOYEE_ID))
                 .where(ik.ID.eq(kindId))
+                .groupBy(ik.ID, inv.ENTITY_KIND, p.IS_REMOVED);
+
+        Set<InvolvementKindUsageStat.Stat> statsForKind = qry
                 .fetch()
                 .stream()
-                .collect(groupingBy(
-                        r -> mkRef(
-                                EntityKind.INVOLVEMENT_KIND,
-                                r.get(ik.ID),
-                                r.get(ik.NAME),
-                                r.get(ik.DESCRIPTION),
-                                r.get(ik.EXTERNAL_ID)),
-                        mapping(
-                                r -> r.get(entityKindField) == null
-                                        ? null
-                                        : ImmutableStat
-                                        .builder()
-                                        .entityKind(EntityKind.valueOf(r.get(entityKindField)))
-                                        .isCountOfRemovedPeople(r.get(personIsRemovedField))
-                                        .personCount(r.get(personCountField))
-                                        .build(),
-                                Collectors.toSet())))
-                .entrySet()
-                .stream()
-                .map(e -> {
-                    Set<InvolvementKindUsageStat.Stat> stats = filter(
-                            fromCollection(e.getValue()),
-                            Objects::nonNull);
+                .map(r -> {
+                    String entityKind = r.get(inv.ENTITY_KIND);
 
-                    return ImmutableInvolvementKindUsageStat
+                    return entityKind == null
+                            ? null
+                            : ImmutableStat
                             .builder()
-                            .breakdown(stats)
-                            .involvementKind(e.getKey())
+                            .entityKind(EntityKind.valueOf(entityKind))
+                            .isCountOfRemovedPeople(r.get(p.IS_REMOVED))
+                            .personCount(r.get("person_count", Integer.class))
                             .build();
                 })
-                .collect(Collectors.toSet());
+                .filter(Objects::nonNull)
+                .collect(toSet());
+
+        return ImmutableInvolvementKindUsageStat.builder()
+                .involvementKind(mkRef(EntityKind.INVOLVEMENT_KIND, kindId))
+                .breakdown(statsForKind)
+                .build();
     }
 
 }

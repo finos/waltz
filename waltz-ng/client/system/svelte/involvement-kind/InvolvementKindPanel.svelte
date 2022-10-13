@@ -26,7 +26,6 @@
     }
 
     function bulkUpdate() {
-
         activeMode = Modes.VIEW;
     }
 
@@ -88,8 +87,7 @@
         <div class="row">
             <div class="col-sm-12">
                 {#if activeMode === Modes.VIEW}
-                    <h4>View table of stats</h4>
-                    <InvolvementListPanel/>
+                    <InvolvementListPanel {involvementKind}/>
                 {:else if activeMode === Modes.BULK_UPLOAD}
                     <h4>Upload involvements here!</h4>
                     <BulkInvolvementLoader {involvementKind} onSave={bulkUpdate}/>

@@ -102,4 +102,8 @@ public class InvolvementKindService {
                 loadUsageStats();
     }
 
+
+    public InvolvementKindUsageStat loadUsageStatsForKind(Long kindId) {
+        return involvementKindDao.loadUsageStatsForKind(kindId);
+    }
 }

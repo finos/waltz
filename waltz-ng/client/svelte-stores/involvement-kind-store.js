@@ -73,13 +73,23 @@ export function mkInvolvementKindStore() {
             {force});
     };
 
+    const findUsageStatsForKind = (id, force) => {
+        return remote.fetchViewData(
+            "GET",
+            `api/involvement-kind/usage-stats/kind/${id}`,
+            null,
+            [],
+            {force});
+    };
+
     return {
         findAll,
         getById,
         findKeyInvolvementKindsByEntityKind,
         update,
         create,
-        findUsageStats
+        findUsageStats,
+        findUsageStatsForKind
     };
 }
 

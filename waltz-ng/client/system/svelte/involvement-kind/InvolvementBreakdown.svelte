@@ -5,7 +5,13 @@
     import _ from "lodash";
 
     export let breakdownStats = [];
+    export let displayMode = "LIST"
+    export let onClick = (d) => console.log("Clicking on: " + JSON.stringify(d))
 
+    const DisplayModes = {
+        LIST: "LIST",
+        TABLE: "TABLE"
+    }
 
     $: displayedStats = _
         .chain(breakdownStats)
@@ -36,16 +42,38 @@
 
 </script>
 
-
-<ul>
-    {#each displayedStats as stat}
-        <li>
-            {stat.entityInfo.name || "Unknown"} -
-            <Icon name="user"/> {stat.personCounts.activePeopleCount} / <span
-            class="text-muted">{stat.personCounts.removedPeopleCount}</span>
-        </li>
-    {/each}
-</ul>
+{#if displayMode === DisplayModes.LIST}
+    <ul>
+        {#each displayedStats as stat}
+            <li on:click={() => onClick(stat)}>
+                {stat.entityInfo.name || "Unknown"} -
+                <Icon name="user"/> {stat.personCounts.activePeopleCount} /
+                <span class="text-muted">{stat.personCounts.removedPeopleCount}</span>
+            </li>
+        {/each}
+    </ul>
+{:else if displayMode === DisplayModes.TABLE}
+    <table class="table table-condensed">
+        <thead>
+        <tr>
+            <th>Entity Kind</th>
+            <th>Person Count (Active/Removed)</th>
+        </tr>
+        </thead>
+        <tbody>
+        {#each displayedStats as stat}
+            <tr class="clickable"
+                on:click={() => onClick(stat)}>
+                <td>{stat.entityInfo.name || "Unknown"}</td>
+                <td>
+                    {stat.personCounts.activePeopleCount} /
+                    <span class="text-muted">{stat.personCounts.removedPeopleCount}</span>
+                </td>
+            </tr>
+        {/each}
+        </tbody>
+    </table>
+{/if}
 
 
 <style>

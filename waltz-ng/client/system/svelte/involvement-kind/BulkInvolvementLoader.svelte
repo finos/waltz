@@ -67,16 +67,11 @@
 
         bulkUploadStore.upload(uploadParams)
             .then(r => {
-                console.log({r});
                 toasts.success(`Successfully created ${r.data} new involvements`);
                 onSave();
             })
             .catch(e => displayError("Could not bulk store involvements", e));
     }
-
-
-    $: console.log({resolvedRows: $resolvedRows});
-
 
 </script>
 
@@ -124,25 +119,27 @@
             There are {_.size($resolutionErrors)} errors found, please resolve before uploading
         </div>
     {/if}
-    <table class="table table-condensed">
-        <thead>
-        <tr>
-            <th>Entity Identifier</th>
-            <th>Person Identifier</th>
-            <th></th>
-        </tr>
-        </thead>
-        <tbody>
-        {#each $resolvedRows as row}
-            <tr class:new={row.status === bulkLoadResolutionStatus.NEW.key}
-                class:error={row.status === bulkLoadResolutionStatus.ERROR.key}>
-                <td>{row.inputRow[0]}</td>
-                <td>{row.inputRow[1]}</td>
-                <td>{bulkLoadResolutionStatus[row.status].name}</td>
+    <div class:waltz-scroll-region-350={_.size($resolvedRows) > 10}>
+        <table class="table table-condensed">
+            <thead>
+            <tr>
+                <th>Entity Identifier</th>
+                <th>Person Identifier</th>
+                <th></th>
             </tr>
-        {/each}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            {#each $resolvedRows as row}
+                <tr class:new={row.status === bulkLoadResolutionStatus.NEW.key}
+                    class:error={row.status === bulkLoadResolutionStatus.ERROR.key}>
+                    <td>{row.inputRow[0]}</td>
+                    <td>{row.inputRow[1]}</td>
+                    <td>{bulkLoadResolutionStatus[row.status].name}</td>
+                </tr>
+            {/each}
+            </tbody>
+        </table>
+    </div>
     <div>
         <button class="btn btn-success"
                 disabled={!_.isEmpty($resolutionErrors)}

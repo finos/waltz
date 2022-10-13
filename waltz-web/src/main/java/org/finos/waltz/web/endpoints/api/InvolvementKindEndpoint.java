@@ -75,6 +75,7 @@ public class InvolvementKindEndpoint implements Endpoint {
         getForList(mkPath(BASE_URL, "key-involvement-kinds", ":kind"), this::findKeyInvolvementKindByEntityKind);
 
         getForList(mkPath(BASE_URL, "usage-stats"), this::loadUsageStats);
+        getForDatum(mkPath(BASE_URL, "usage-stats", "kind", ":id"), this::loadUsageStatsForKindRoute);
 
         getForDatum(mkPath(BASE_URL, "id", ":id"), this::getByIdRoute);
 
@@ -140,6 +141,12 @@ public class InvolvementKindEndpoint implements Endpoint {
     private Set<InvolvementKindUsageStat> loadUsageStats(Request request, Response response) {
         return service.loadUsageStats();
     }
+
+
+    private InvolvementKindUsageStat loadUsageStatsForKindRoute(Request request, Response response) {
+        return service.loadUsageStatsForKind(getId(request));
+    }
+
 
     private void ensureUserHasAdminRights(Request request) {
         requireRole(userRoleService, request, SystemRole.ADMIN);

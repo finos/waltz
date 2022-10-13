@@ -20,17 +20,18 @@ package org.finos.waltz.jobs.harness;
 
 import org.finos.waltz.data.application.ApplicationDao;
 import org.finos.waltz.data.involvement.InvolvementDao;
+import org.finos.waltz.data.involvement_kind.InvolvementKindDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.application.Application;
+import org.finos.waltz.model.involvement.Involvement;
 import org.finos.waltz.service.DIConfiguration;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import javax.sql.DataSource;
 import java.util.Collection;
+import java.util.Set;
 
-import static org.finos.waltz.common.FunctionUtilities.time;
 import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static org.finos.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
@@ -61,12 +62,14 @@ public class InvolvementHarness2 {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
-        DataSource dataSource = ctx.getBean(DataSource.class);
-        InvolvementDao dao = ctx.getBean(InvolvementDao.class);
+        InvolvementKindDao dao = ctx.getBean(InvolvementKindDao.class);
+        InvolvementDao invDao = ctx.getBean(InvolvementDao.class);
 
+//        InvolvementKindUsageStat stats = dao.loadUsageStatsForKind(14L);
 
-        time("hmm", () -> foo(dsl, "NravvV2Is"));
+        Set<Involvement> invs = invDao.findByKindIdAndEntityKind(17L, EntityKind.APPLICATION);
 
+        System.out.println("done");
 //        time("findAllApps", () -> dao.findAllApplicationsByEmployeeId("NravvV2Is"));
 
 
