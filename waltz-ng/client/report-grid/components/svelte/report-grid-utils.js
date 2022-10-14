@@ -183,6 +183,7 @@ export function prepareColumnDefs(colDefs) {
                               popover-trigger="mouseenter"
                               popover-enable="COL_FIELD.comment != null"
                               popover-popup-delay="500"
+                              popover-class="waltz-popover-width-500"
                               popover-append-to-body="true"
                               popover-placement="left"
                               ng-style="{
