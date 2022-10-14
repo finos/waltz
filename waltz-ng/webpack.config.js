@@ -31,6 +31,7 @@ module.exports = {
         path: path.join(basePath, "/dist"),
         filename: "[name].[contenthash].js"
     },
+    target: ["web", "es5"],
     ignoreWarnings: [
         {
             module: /cjs\.js/
@@ -94,7 +95,7 @@ module.exports = {
                     {
                         loader: "svelte-loader",
                         options: {
-                            preprocess: require('svelte-preprocess')({
+                            preprocess: require("svelte-preprocess")({
                                 // postcss: true
                             }),
                             emitCss: true,
@@ -121,7 +122,7 @@ module.exports = {
                 ]
             }, {
                 test: /\.(jpe?g|svg|png|gif|ico|eot|ttf|woff2?)(\?v=\d+\.\d+\.\d+)?$/i,
-                type: 'asset/resource',
+                type: "asset/resource",
             }, {
                 test: /\.html?$/,
                 exclude: /node_modules/,
