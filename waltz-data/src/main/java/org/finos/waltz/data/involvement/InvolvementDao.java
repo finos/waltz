@@ -27,13 +27,11 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.ImmutableEntityReference;
 import org.finos.waltz.model.involvement.ImmutableInvolvement;
 import org.finos.waltz.model.involvement.Involvement;
-import org.finos.waltz.model.involvement.InvolvementDetail;
 import org.finos.waltz.model.person.Person;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.records.InvolvementRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
-import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -314,14 +312,13 @@ public class InvolvementDao {
                         .and(id.isNull()));
     }
 
-    public Set<Tuple2<Long, Long>> findEntityIdToPersonIdByInvolvementKindAndEntityKind(Long invKindId, EntityKind entityKind) {
+    public Set<Involvement> findInvolvementsByKindAndEntityKind(Long invKindId, EntityKind entityKind) {
         return dsl
-                .select(INVOLVEMENT.ENTITY_ID, PERSON.ID)
+                .select(INVOLVEMENT.fields())
                 .from(INVOLVEMENT)
-                .innerJoin(PERSON).on(INVOLVEMENT.EMPLOYEE_ID.eq(PERSON.EMPLOYEE_ID))
                 .where(INVOLVEMENT.ENTITY_KIND.eq(entityKind.name())
                         .and(INVOLVEMENT.KIND_ID.eq(invKindId)))
-                .fetchSet(r -> tuple(r.get(INVOLVEMENT.ENTITY_ID), r.get(PERSON.ID)));
+                .fetchSet(TO_MODEL_MAPPER);
     }
 
     public int bulkStoreInvolvements(Set<Involvement> involvements) {
@@ -361,5 +358,18 @@ public class InvolvementDao {
                 });
 
 
+    }
+
+    public int bulkDeleteInvolvements(Set<Involvement> involvements) {
+        int[] removedInvolvements = involvements
+                .stream()
+                .map(involvement -> dsl
+                        .deleteFrom(INVOLVEMENT)
+                        .where(INVOLVEMENT.ENTITY_KIND.eq(involvement.entityReference().kind().name())
+                                .and(INVOLVEMENT.ENTITY_ID.eq(involvement.entityReference().id()))
+                                .and(INVOLVEMENT.EMPLOYEE_ID.eq(involvement.employeeId()))
+                                .and(INVOLVEMENT.KIND_ID.eq(involvement.kindId()))))
+                .collect(collectingAndThen(toSet(), xs -> dsl.batch(xs).execute()));
+        return IntStream.of(removedInvolvements).sum();
     }
 }

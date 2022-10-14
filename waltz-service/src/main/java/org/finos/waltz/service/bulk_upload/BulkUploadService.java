@@ -25,7 +25,9 @@ import static java.lang.String.format;
 import static org.finos.waltz.common.ArrayUtilities.isEmpty;
 import static org.finos.waltz.common.ListUtilities.asList;
 import static org.finos.waltz.common.MapUtilities.indexBy;
+import static org.finos.waltz.common.SetUtilities.*;
 import static org.finos.waltz.common.StringUtilities.safeTrim;
+import static org.finos.waltz.model.bulk_upload.DiffResult.mkDiff;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Service
@@ -69,8 +71,8 @@ public class BulkUploadService {
 
     private Integer bulkUploadInvolvements(BulkUploadCommand uploadCommand, String username) {
 
-        Set<Tuple2<Long, Long>> existingInvolvements = involvementService
-                .findEntityIdToPersonIdByInvolvementKindAndEntityKind(uploadCommand.targetDomain().id(), uploadCommand.rowSubjectKind());
+        Set<Involvement> existingInvolvements = involvementService
+                .findInvolvementsByKindAndEntityKind(uploadCommand.targetDomain().id(), uploadCommand.rowSubjectKind());
 
         Set<String> subjectIdentifiers = getColumnValuesFromInputString(uploadCommand.inputString(), 0);
         Map<String, Long> subjectIdentifierToIdMap = entityAliasPopulator.fetchEntityIdLookupMap(uploadCommand.rowSubjectKind(), subjectIdentifiers);
@@ -81,7 +83,7 @@ public class BulkUploadService {
         List<Person> activePeople = personService.all();
         Map<Long, String> personIdToEmployeeIdMap = indexBy(activePeople, v -> v.id().get(), Person::employeeId, (v1, v2) -> v1);
 
-        Set<Involvement> involvementsToCreate = streamRowData(uploadCommand.inputString())
+        Set<Involvement> desiredInvolvements = streamRowData(uploadCommand.inputString())
                 .map(t -> {
 
                     String[] cells = t.v2;
@@ -94,10 +96,6 @@ public class BulkUploadService {
 
                     if (subjectId == null || personId == null) {
                         return null;
-                    }
-
-                    if (existingInvolvements.contains(tuple(subjectId, personId))) {
-                        return null; // no need to create records for those that already exist
                     }
 
                     String employeeId = personIdToEmployeeIdMap.get(personId);
@@ -117,19 +115,35 @@ public class BulkUploadService {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
-        return involvementService.bulkStoreInvolvements(involvementsToCreate, username);
+
+        DiffResult<Involvement> diffResult = mkDiff(
+                existingInvolvements,
+                desiredInvolvements,
+                r -> tuple(r.entityReference().id(), r.employeeId()),
+                Object::equals);
+
+        if (uploadCommand.uploadMode().equals(BulkUploadMode.REPLACE)) {
+            involvementService.bulkDeleteInvolvements(fromCollection(diffResult.waltzOnly()), username);
+        }
+
+        return involvementService.bulkStoreInvolvements(fromCollection(diffResult.otherOnly()), username);
     }
 
     private List<ResolveRowResponse> resolveInvolvements(ResolveBulkUploadRequestParameters resolveParams) {
 
-        Set<Tuple2<Long, Long>> existingInvolvements = involvementService
-                .findEntityIdToPersonIdByInvolvementKindAndEntityKind(resolveParams.targetDomain().id(), resolveParams.rowSubjectKind());
+        Set<Involvement> existingInvolvements = involvementService
+                .findInvolvementsByKindAndEntityKind(resolveParams.targetDomain().id(), resolveParams.rowSubjectKind());
+
+        Set<Tuple2<Long, String>> existingEntityIdEmpIdPairs = map(existingInvolvements, r -> tuple(r.entityReference().id(), r.employeeId()));
 
         Set<String> subjectIdentifiers = getColumnValuesFromInputString(resolveParams.inputString(), 0);
         Map<String, Long> subjectIdentifierToIdMap = entityAliasPopulator.fetchEntityIdLookupMap(resolveParams.rowSubjectKind(), subjectIdentifiers);
 
         Set<String> personIdentifiers = getColumnValuesFromInputString(resolveParams.inputString(), 1);
         Map<String, Long> personIdentifierToIdMap = entityAliasPopulator.fetchEntityIdLookupMap(EntityKind.PERSON, personIdentifiers);
+
+        List<Person> activePeople = personService.all();
+        Map<Long, String> personIdToEmployeeIdMap = indexBy(activePeople, v -> v.id().get(), Person::employeeId, (v1, v2) -> v1);
 
         return streamRowData(resolveParams.inputString())
                 .map(t -> {
@@ -154,7 +168,7 @@ public class BulkUploadService {
                         return mkErrorResponse(rowData, format("Person: '%s' cannot be resolved, ensure user is active", personIdentifierString));
                     } else {
 
-                        boolean existsAlready = existingInvolvements.contains(tuple(subjectId, personId));
+                        boolean existsAlready = existingEntityIdEmpIdPairs.contains(tuple(subjectId, personIdToEmployeeIdMap.get(personId)));
 
                         return ImmutableResolveRowResponse.builder()
                                 .inputRow(rowData)

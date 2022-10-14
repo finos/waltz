@@ -15,6 +15,8 @@ import java.util.Optional;
 @JsonDeserialize(as = ImmutableBulkUploadCommand.class)
 public abstract class BulkUploadCommand {
 
+    public abstract BulkUploadMode uploadMode();
+
     public abstract String inputString();
 
     public abstract EntityReference targetDomain();

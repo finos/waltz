@@ -63,7 +63,9 @@
             :
         </h4>
 
-        <SearchInput bind:value={qry}/>
+        {#if _.size(involvements) > 10}
+            <SearchInput bind:value={qry}/>
+        {/if}
         <div class:waltz-scroll-region-350={_.size(involvements) > 10}>
             <table class="table table-condensed">
                 <thead>

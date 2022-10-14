@@ -34,7 +34,6 @@ import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.involvement_kind.InvolvementKindService;
 import org.finos.waltz.service.user.UserRoleService;
-import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -113,8 +112,8 @@ public class InvolvementService {
     }
 
 
-    public Set<Tuple2<Long, Long>> findEntityIdToPersonIdByInvolvementKindAndEntityKind(Long invKindId, EntityKind entityKind) {
-        return involvementDao.findEntityIdToPersonIdByInvolvementKindAndEntityKind(invKindId, entityKind);
+    public Set<Involvement> findInvolvementsByKindAndEntityKind(Long invKindId, EntityKind entityKind) {
+        return involvementDao.findInvolvementsByKindAndEntityKind(invKindId, entityKind);
     }
 
 
@@ -184,10 +183,10 @@ public class InvolvementService {
     }
 
     public int bulkStoreInvolvements(Set<Involvement> involvements, String username) {
+
         int insertedRecords = involvementDao.bulkStoreInvolvements(involvements);
 
         Map<Long, String> involvementKindNameByIdMap = loadInvolvementKindIdToNameMap();
-
 
         Set<ChangeLog> changelogs = map(involvements, i -> {
             String message = format(
@@ -200,6 +199,25 @@ public class InvolvementService {
         changeLogService.write(changelogs);
 
         return insertedRecords;
+    }
+
+    public int bulkDeleteInvolvements(Set<Involvement> involvements, String username) {
+
+        int removedRecords = involvementDao.bulkDeleteInvolvements(involvements);
+
+        Map<Long, String> involvementKindNameByIdMap = loadInvolvementKindIdToNameMap();
+
+        Set<ChangeLog> changelogs = map(involvements, i -> {
+            String message = format(
+                    "Removed involvement: %s for employee: %s",
+                    involvementKindNameByIdMap.getOrDefault(i.kindId(), "Unknown"),
+                    i.employeeId());
+            return mkChangeLog(i.entityReference(), username, EntityKind.INVOLVEMENT, Operation.REMOVE, message);
+        });
+
+        changeLogService.write(changelogs);
+
+        return removedRecords;
     }
 
 

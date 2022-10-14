@@ -7,7 +7,8 @@
         selectedKind,
         resolvedRows,
         resolutionErrors,
-        involvements
+        involvements,
+        uploadMode, UploadModes
     } from "./bulk-involvement-loader-store";
     import _ from "lodash";
     import {mkRef} from "../../../common/entity-utils";
@@ -18,6 +19,7 @@
     import toasts from "../../../svelte-stores/toast-store";
     import Tooltip from "../../../common/svelte/Tooltip.svelte";
     import LoaderErrorTooltipContent from "./LoaderErrorTooltipContent.svelte";
+    import NoData from "../../../common/svelte/NoData.svelte";
 
     export let involvementKind;
     export let onSave;
@@ -62,7 +64,8 @@
         const uploadParams = {
             inputString: $rawInvolvements,
             targetDomain: mkRef(involvementKind.kind, involvementKind.id),
-            rowSubjectKind: $selectedKind
+            rowSubjectKind: $selectedKind,
+            uploadMode: $uploadMode
         }
 
         bulkUploadStore.upload(uploadParams)
@@ -77,6 +80,7 @@
 
 
 {#if activeMode === Modes.INPUT}
+    <h4>Upload Involvements:</h4>
     <div style="padding: 1em 0">
         Select the entity kind you wish to load involvements for from the dropdown picker.
     </div>
@@ -98,6 +102,27 @@
                       placeholder="Please insert involvement external identifiers and email as comma or tab separated values split by newline or pipe characters"
                       bind:value={$rawInvolvements}></textarea>
         </div>
+
+        <div class="form-group">
+            <label>
+                <input style="display: inline-block;"
+                       type="radio"
+                       bind:group={$uploadMode}
+                       name="uploadMode"
+                       value={UploadModes.ADD_ONLY}>
+                Add Only
+            </label>
+
+            <label>
+                <input style="display: inline-block;"
+                       type="radio"
+                       bind:group={$uploadMode}
+                       name="uploadMode"
+                       value={UploadModes.REPLACE}>
+                Replace
+            </label>
+        </div>
+
         <button type="submit"
                 class="btn btn-success"
                 disabled={_.isEmpty($rawInvolvements) || _.isNull($selectedKind)}>
@@ -105,6 +130,7 @@
         </button>
     </form>
 {:else if activeMode === Modes.RESOLVE}
+    <h4>Upload Summary:</h4>
     {#if _.isEmpty($resolutionErrors)}
         <div style="padding: 1em 0">
             <span style="color: lightgreen">
@@ -157,10 +183,45 @@
         </table>
     </div>
     <div>
+        <div class="form-group">
+            <label>
+                <input style="display: inline-block;"
+                       disabled={true}
+                       type="radio"
+                       bind:group={$uploadMode}
+                       name="uploadMode"
+                       value={UploadModes.ADD_ONLY}>
+                Add Only
+            </label>
+
+            <label>
+                <input style="display: inline-block;"
+                       disabled={true}
+                       type="radio"
+                       bind:group={$uploadMode}
+                       name="uploadMode"
+                       value={UploadModes.REPLACE}>
+                Replace
+            </label>
+        </div>
+        {#if $uploadMode === UploadModes.REPLACE}
+            <div>
+                <span style="color: orange">
+                    <Icon name="exclamation-triangle"/>
+                </span>
+                This will remove any involvements for this entity kind not listed above
+            </div>
+        {/if}
+    </div>
+    <div>
         <button class="btn btn-success"
                 disabled={!_.isEmpty($resolutionErrors)}
                 on:click={saveNewInvolvements}>
             Save
+        </button>
+        <button class="btn btn-default"
+                on:click={() => activeMode = Modes.INPUT}>
+            Edit
         </button>
     </div>
 {/if}
