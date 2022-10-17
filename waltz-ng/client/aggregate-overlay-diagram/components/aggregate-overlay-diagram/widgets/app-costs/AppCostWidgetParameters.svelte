@@ -14,8 +14,8 @@
 <script>
     import {getContext} from "svelte";
     import AllocationSchemePicker
-        from "../../../../../report-grid/components/svelte/pickers/AllocationSchemePicker.svelte";
-    import CostKindPicker from "../../../../../report-grid/components/svelte/pickers/CostKindPicker.svelte";
+        from "../../../../../common/svelte/entity-pickers/AllocationSchemePicker.svelte";
+    import CostKindPicker from "../../../../../common/svelte/entity-pickers/CostKindPicker.svelte";
     import _ from "lodash";
 
     const selectedOverlay = getContext("selectedOverlay");
