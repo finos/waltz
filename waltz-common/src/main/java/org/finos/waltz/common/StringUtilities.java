@@ -234,8 +234,13 @@ public class StringUtilities {
             return null;
         } else {
             return str
-                    .replaceAll("", "-")
-                    .replaceAll("‐", "-");
+                    .replaceAll("[‐–—-]", "-")
+                    .replaceAll("[”“]", "\"")
+                    .replaceAll("[’‘]", "'")
+                    .replaceAll("​", "")
+                    .replaceAll("â€œ", "\"")
+                    .replaceAll("â€", "\"")
+                    .replaceAll("â€™", "'");
         }
     }
 
