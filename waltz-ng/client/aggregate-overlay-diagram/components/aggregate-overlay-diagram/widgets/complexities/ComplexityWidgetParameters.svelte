@@ -1,7 +1,7 @@
 <script context="module">
     import {writable} from "svelte/store";
     import {getContext} from "svelte";
-    import ComplexityKindPicker from "../../../../../report-grid/components/svelte/pickers/ComplexityKindPicker.svelte";
+    import ComplexityKindPicker from "../../../../../common/svelte/entity-pickers/ComplexityKindPicker.svelte";
 
     const selectedComplexityKinds = writable([]);
     const mode = writable("TOTAL");

@@ -19,7 +19,7 @@
 
 import template from "./playpen1.html";
 import {initialiseData} from "../../common";
-import InvolvementPicker from "../../report-grid/components/svelte/pickers/InvolvementPicker.svelte";
+import InvolvementPicker from "../../common/svelte/entity-pickers/InvolvementPicker.svelte";
 import EntityPicker from "../../report-grid/components/svelte/pickers/EntityPicker.svelte";
 import EntitySelector from "../../report-grid/components/svelte/column-definition-edit-panel/EntitySelector.svelte";
 import TestPage

@@ -1,6 +1,6 @@
 <script>
     import AssessmentDefinitionPicker
-        from "../../report-grid/components/svelte/pickers/AssessmentDefinitionPicker.svelte";
+        from "./entity-pickers/AssessmentDefinitionPicker.svelte";
     import {ratingSchemeStore} from "../../svelte-stores/rating-schemes";
     import RatingPicker from "./RatingPicker.svelte";
     import {createEventDispatcher} from "svelte";
