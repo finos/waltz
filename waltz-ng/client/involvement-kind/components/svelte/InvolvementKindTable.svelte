@@ -38,7 +38,7 @@
                 toasts.success("Successfully created involvement kind");
                 involvementKindStore.findUsageStats(true);
                 $pageInfo = {
-                    state: "main.system.involvement-kind",
+                    state: "main.involvement-kind.view",
                     params: {
                         id: r.data
                     }
@@ -129,7 +129,7 @@
 
             <button type="submit"
                     class="btn btn-success"
-                    disabled={name === null}>
+                    disabled={working.name === null}>
                 Save
             </button>
 

@@ -42,7 +42,7 @@
                 <ViewLink state="main.system.list">System Admin</ViewLink>
             </li>
             <li>
-                <ViewLink state="main.system.involvement-kinds">Involvement Kinds</ViewLink>
+                <ViewLink state="main.involvement-kind.list">Involvement Kinds</ViewLink>
             </li>
             <li>
                 <span>{involvementKind?.name}</span>

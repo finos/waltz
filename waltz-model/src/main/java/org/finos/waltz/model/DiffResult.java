@@ -1,4 +1,4 @@
-package org.finos.waltz.model.bulk_upload;
+package org.finos.waltz.model;
 
 import org.finos.waltz.common.MapUtilities;
 import org.immutables.value.Value;

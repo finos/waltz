@@ -3,6 +3,7 @@ package org.finos.waltz.service.bulk_upload;
 import org.finos.waltz.common.*;
 import org.finos.waltz.data.EntityAliasPopulator;
 import org.finos.waltz.data.GenericSelectorFactory;
+import org.finos.waltz.model.DiffResult;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.bulk_upload.*;
@@ -27,7 +28,7 @@ import static org.finos.waltz.common.ListUtilities.asList;
 import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.SetUtilities.*;
 import static org.finos.waltz.common.StringUtilities.safeTrim;
-import static org.finos.waltz.model.bulk_upload.DiffResult.mkDiff;
+import static org.finos.waltz.model.DiffResult.mkDiff;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Service

@@ -93,13 +93,13 @@
             path: ctx => `survey/instance/${ctx.id}/response/edit`,
             title: "Survey Edit"
         },
-        "main.system.involvement-kinds": {
-            path: ctx => `system/involvement-kinds`,
+        "main.involvement-kind.list": {
+            path: ctx => `involvement-kind/list`,
             title: "Involvement Kind List"
         },
-        "main.system.involvement-kind": {
-            path: ctx => `system/involvement-kind/${ctx.id}`,
-            title: "Involvement Kind List"
+        "main.involvement-kind.view": {
+            path: ctx => `involvement-kind/${ctx.id}`,
+            title: "Involvement Kind View"
         }
     };
 

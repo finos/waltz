@@ -38,6 +38,11 @@ export function store($http, BaseApiUrl) {
         .then(r => r.data);
 
 
+    const getByExternalId = (externalId) => $http
+        .get(`${BASE}/external-id/${externalId}`)
+        .then(r => r.data);
+
+
     /**
      * Creates a new Involvement Kind
      *
@@ -76,6 +81,7 @@ export function store($http, BaseApiUrl) {
         findAll,
         findKeyInvolvementKindsByEntityKind,
         getById,
+        getByExternalId,
         create,
         update,
         deleteById,
@@ -108,6 +114,11 @@ export const InvolvementKindStore_API = {
         serviceName,
         serviceFnName: "getById",
         description: "executes getById"
+    },
+    getByExternalId: {
+        serviceName,
+        serviceFnName: "getByExternalId",
+        description: "executes getByExternalId"
     },
     create: {
         serviceName,

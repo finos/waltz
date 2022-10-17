@@ -284,4 +284,17 @@ public class InvolvementKindDao {
                 .build();
     }
 
+    public InvolvementKind getByExternalId(String externalId) {
+        InvolvementKindRecord record = dsl
+                .select(INVOLVEMENT_KIND.fields())
+                .from(INVOLVEMENT_KIND)
+                .where(INVOLVEMENT_KIND.EXTERNAL_ID.eq(externalId))
+                .fetchOneInto(InvolvementKindRecord.class);
+
+        if (record == null) {
+            throw new NoDataFoundException("Could not find Involvement Kind record with external id: " + externalId);
+        }
+
+        return TO_DOMAIN_MAPPER.map(record);
+    }
 }

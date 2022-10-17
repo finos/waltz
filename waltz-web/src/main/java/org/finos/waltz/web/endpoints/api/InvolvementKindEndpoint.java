@@ -78,6 +78,7 @@ public class InvolvementKindEndpoint implements Endpoint {
         getForDatum(mkPath(BASE_URL, "usage-stats", "kind", ":id"), this::loadUsageStatsForKindRoute);
 
         getForDatum(mkPath(BASE_URL, "id", ":id"), this::getByIdRoute);
+        getForDatum(mkPath(BASE_URL, "external-id", ":externalId"), this::getByExternalIdRoute);
 
         // create
         postForDatum(mkPath(BASE_URL, "update"), this::createInvolvementKindRoute);
@@ -96,8 +97,13 @@ public class InvolvementKindEndpoint implements Endpoint {
         return service.getById(id);
     }
 
+    private InvolvementKind getByExternalIdRoute(Request request, Response response) {
+        String externalId = request.params("externalId");
+        return service.getByExternalId(externalId);
+    }
 
-    private List<InvolvementKind> findKeyInvolvementKindByEntityKind (Request request, Response response) {
+
+    private List<InvolvementKind> findKeyInvolvementKindByEntityKind(Request request, Response response) {
         EntityKind entityKind = getKind(request);
         return service.findKeyInvolvementKindsByEntityKind(entityKind);
     }

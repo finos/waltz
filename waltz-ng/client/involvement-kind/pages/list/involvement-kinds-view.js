@@ -16,12 +16,11 @@
  *
  */
 
-import _ from "lodash";
-import {initialiseData} from "../common";
+import {initialiseData} from "../../../common";
 import template from "./involvement-kinds-view.html";
-import toasts from "../svelte-stores/toast-store";
-import {displayError} from "../common/error-utils";
-import InvolvementKindTable from "./svelte/involvement-kind/InvolvementKindTable.svelte";
+import InvolvementKindTable from "../../components/svelte/InvolvementKindTable.svelte";
+
+const bindings = {};
 
 const initialState = {
     InvolvementKindTable
@@ -35,14 +34,17 @@ function controller() {
 }
 
 
-controller.$inject = [
-];
+controller.$inject = [];
+
+
+const component = {
+    template,
+    bindings,
+    controller
+};
 
 
 export default {
-    template,
-    controller,
-    controllerAs: "ctrl",
-    bindToController: true,
-    scope: {}
+    id: "waltzInvolvementKindList",
+    component
 };

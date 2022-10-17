@@ -16,10 +16,11 @@
  *
  */
 import template from "./involvement-kind-view.html";
-import {initialiseData} from "../common";
-import InvolvementKindPanel from "./svelte/involvement-kind/InvolvementKindPanel.svelte";
-import {entity} from "../common/services/enums/entity";
+import {initialiseData} from "../../../common";
+import InvolvementKindPanel from "../../components/svelte/InvolvementKindPanel.svelte";
+import {entity} from "../../../common/services/enums/entity";
 
+const bindings = {};
 
 const initialState = {
     selectedKind: null,
@@ -39,10 +40,14 @@ controller.$inject = [
     "$stateParams"
 ];
 
+const component = {
+    template,
+    bindings,
+    controller
+};
+
 
 export default {
-    template,
-    controller,
-    controllerAs: "$ctrl",
-    bindToController: true,
+    id: "waltzInvolvementKindView",
+    component
 };

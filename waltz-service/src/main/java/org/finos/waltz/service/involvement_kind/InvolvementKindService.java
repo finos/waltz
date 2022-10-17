@@ -30,7 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -105,5 +104,9 @@ public class InvolvementKindService {
 
     public InvolvementKindUsageStat loadUsageStatsForKind(Long kindId) {
         return involvementKindDao.loadUsageStatsForKind(kindId);
+    }
+
+    public InvolvementKind getByExternalId(String externalId) {
+        return involvementKindDao.getByExternalId(externalId);
     }
 }

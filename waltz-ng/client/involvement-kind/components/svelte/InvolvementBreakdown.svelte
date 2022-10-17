@@ -5,13 +5,13 @@
     import _ from "lodash";
 
     export let breakdownStats = [];
-    export let displayMode = "LIST"
-    export let onClick = (d) => console.log("Clicking on: " + JSON.stringify(d))
+    export let displayMode = "LIST";
+    export let onClick = (d) => console.log("Clicking on: " + JSON.stringify(d));
 
     const DisplayModes = {
         LIST: "LIST",
         TABLE: "TABLE"
-    }
+    };
 
     $: displayedStats = _
         .chain(breakdownStats)
@@ -33,10 +33,10 @@
             return {
                 entityInfo: entity[k],
                 personCounts
-            }
+            };
         })
         .orderBy(d => d.entityInfo?.name)
-        .value()
+        .value();
 
     $: statsByKind = _.groupBy(breakdownStats, d => d.entityKind);
 

@@ -65,9 +65,12 @@ public class InvolvementDao {
     private final RecordMapper<Record, Involvement> TO_MODEL_MAPPER = r -> {
         InvolvementRecord involvementRecord = r.into(InvolvementRecord.class);
 
+        Optional<String> entityName = Optional.ofNullable(r.get(ENTITY_NAME_FIELD));
+
         ImmutableEntityReference entityRef = ImmutableEntityReference.builder()
                 .kind(EntityKind.valueOf(involvementRecord.getEntityKind()))
                 .id(involvementRecord.getEntityId())
+                .name(entityName.orElse("Unknown"))
                 .build();
 
         return ImmutableInvolvement.builder()
@@ -101,7 +104,9 @@ public class InvolvementDao {
 
 
     public List<Involvement> findByEntityReference(EntityReference ref) {
-        return dsl.select()
+        return dsl
+                .select(INVOLVEMENT.fields())
+                .select(ENTITY_NAME_FIELD)
                 .from(INVOLVEMENT)
                 .where(INVOLVEMENT.ENTITY_KIND.eq(ref.kind().name()))
                 .and(INVOLVEMENT.ENTITY_ID.eq(ref.id()))
@@ -119,6 +124,7 @@ public class InvolvementDao {
     public Collection<Involvement> findByGenericEntitySelector(GenericSelector genericSelector) {
         return dsl
                 .select(INVOLVEMENT.fields())
+                .select(ENTITY_NAME_FIELD)
                 .from(INVOLVEMENT)
                 .where(INVOLVEMENT.ENTITY_KIND.eq(genericSelector.kind().name()))
                 .and(INVOLVEMENT.ENTITY_ID.in(genericSelector.selector()))
@@ -127,7 +133,9 @@ public class InvolvementDao {
 
 
     public List<Involvement> findByEmployeeId(String employeeId) {
-        return dsl.select()
+        return dsl
+                .select(INVOLVEMENT.fields())
+                .select(ENTITY_NAME_FIELD)
                 .from(INVOLVEMENT)
                 .where(INVOLVEMENT.EMPLOYEE_ID.eq(employeeId))
                 .fetch(TO_MODEL_MAPPER);
@@ -146,7 +154,9 @@ public class InvolvementDao {
 
 
     public List<Involvement> findAllByEmployeeId(String employeeId) {
-        return dsl.select()
+        return dsl
+                .select(INVOLVEMENT.fields())
+                .select(ENTITY_NAME_FIELD)
                 .from(INVOLVEMENT)
                 .innerJoin(PERSON_HIERARCHY).on(INVOLVEMENT.EMPLOYEE_ID.eq(PERSON_HIERARCHY.EMPLOYEE_ID))
                 .where(PERSON_HIERARCHY.MANAGER_ID.eq(employeeId)
@@ -182,16 +192,10 @@ public class InvolvementDao {
             Select<Record1<Long>> entityIdSelector,
             Set<Long> involvementKindIds) {
 
-        Field<String> entityName = InlineSelectFieldFactory.mkNameField(
-                    INVOLVEMENT.ENTITY_ID,
-                    INVOLVEMENT.ENTITY_KIND,
-                    newArrayList(entityKind))
-                .as("entity_name");
-
         return dsl.selectDistinct()
                 .select(PERSON.fields())
                 .select(INVOLVEMENT.fields())
-                .select(entityName)
+                .select(ENTITY_NAME_FIELD)
                 .from(PERSON)
                 .innerJoin(INVOLVEMENT)
                 .on(INVOLVEMENT.EMPLOYEE_ID.eq(PERSON.EMPLOYEE_ID))
@@ -202,11 +206,11 @@ public class InvolvementDao {
                 .fetch()
                 .stream()
                 .collect(groupingBy(
-                            r -> EntityReference.mkRef(
-                                    entityKind,
-                                    r.getValue(INVOLVEMENT.ENTITY_ID),
-                                    r.getValue(entityName)),
-                            mapping(PersonDao.personMapper::map, toList())));
+                        r -> EntityReference.mkRef(
+                                entityKind,
+                                r.getValue(INVOLVEMENT.ENTITY_ID),
+                                r.getValue(ENTITY_NAME_FIELD)),
+                        mapping(PersonDao.personMapper::map, toList())));
     }
 
 
@@ -315,6 +319,7 @@ public class InvolvementDao {
     public Set<Involvement> findInvolvementsByKindAndEntityKind(Long invKindId, EntityKind entityKind) {
         return dsl
                 .select(INVOLVEMENT.fields())
+                .select(ENTITY_NAME_FIELD)
                 .from(INVOLVEMENT)
                 .where(INVOLVEMENT.ENTITY_KIND.eq(entityKind.name())
                         .and(INVOLVEMENT.KIND_ID.eq(invKindId)))
@@ -335,29 +340,7 @@ public class InvolvementDao {
                 .from(INVOLVEMENT)
                 .where(INVOLVEMENT.KIND_ID.eq(id)
                         .and(INVOLVEMENT.ENTITY_KIND.eq(kind.name())))
-                .fetchSet(r -> {
-
-                    InvolvementRecord involvementRecord = r.into(InvolvementRecord.class);
-
-                    Optional<String> entityName = Optional.ofNullable(r.get(ENTITY_NAME_FIELD));
-
-                    ImmutableEntityReference entityRef = ImmutableEntityReference.builder()
-                            .kind(EntityKind.valueOf(involvementRecord.getEntityKind()))
-                            .id(involvementRecord.getEntityId())
-                            .name(entityName.orElse("Unknown"))
-                            .build();
-
-                    return ImmutableInvolvement.builder()
-                            .employeeId(involvementRecord.getEmployeeId())
-                            .kindId(involvementRecord.getKindId())
-                            .entityReference(entityRef)
-                            .isReadOnly(involvementRecord.getIsReadonly())
-                            .provenance(involvementRecord.getProvenance())
-                            .build();
-
-                });
-
-
+                .fetchSet(TO_MODEL_MAPPER);
     }
 
     public int bulkDeleteInvolvements(Set<Involvement> involvements) {
