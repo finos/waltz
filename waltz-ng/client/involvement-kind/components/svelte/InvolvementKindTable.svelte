@@ -26,7 +26,7 @@
     let searchStr = "";
 
     $: involvementStatCall = involvementKindStore.findUsageStats();
-    $: usageStats = _.orderBy($involvementStatCall.data, d => _.toUpper(d.involvementKind.name));
+    $: usageStats = _.orderBy($involvementStatCall?.data, d => _.toUpper(d.involvementKind.name));
 
     $: displayedStats = _.isEmpty(searchStr)
         ? usageStats

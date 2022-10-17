@@ -5,7 +5,6 @@
     import PageHeader from "../../../common/svelte/PageHeader.svelte";
     import InvolvementListPanel from "./InvolvementListPanel.svelte";
     import InvolvementKindOverview from "./InvolvementKindOverview.svelte";
-    import Icon from "../../../common/svelte/Icon.svelte";
     import BulkInvolvementLoader from "./BulkInvolvementLoader.svelte";
 
     export let parentEntityRef;
@@ -18,7 +17,7 @@
     let activeMode = Modes.VIEW;
 
     $: involvementKindCall = involvementKindStore.getById(parentEntityRef.id);
-    $: involvementKind = $involvementKindCall.data;
+    $: involvementKind = $involvementKindCall?.data;
 
 
     function reload(id) {
