@@ -45,6 +45,7 @@
            for="overview">
         <span>
             Overview
+            {#if $selectedGrid}{` - ${$selectedGrid.definition.name}`}{/if}
         </span>
     </label>
 
