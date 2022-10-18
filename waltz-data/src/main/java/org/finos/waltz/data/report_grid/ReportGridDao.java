@@ -21,11 +21,12 @@ package org.finos.waltz.data.report_grid;
 
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.SetUtilities;
-import org.finos.waltz.common.StringUtilities;
+import org.finos.waltz.common.hierarchy.FlatNode;
+import org.finos.waltz.common.hierarchy.Forest;
+import org.finos.waltz.common.hierarchy.Node;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.entity_field_reference.EntityFieldReference;
 import org.finos.waltz.model.entity_field_reference.ImmutableEntityFieldReference;
@@ -41,6 +42,7 @@ import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
+import org.jooq.lambda.tuple.Tuple4;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,11 +68,13 @@ import static org.finos.waltz.common.CollectionUtilities.first;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDate;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
+import static org.finos.waltz.common.ListUtilities.asList;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.SetUtilities.*;
 import static org.finos.waltz.common.StringUtilities.join;
+import static org.finos.waltz.common.hierarchy.HierarchyUtilities.toForest;
 import static org.finos.waltz.data.JooqUtilities.fieldsWithout;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.survey.SurveyInstanceStatus.APPROVED;
@@ -841,6 +845,7 @@ public class ReportGridDao {
                                                 r.get(ratingsInScope.field(mr.ENTITY_ID))),
                                         r -> tuple(r.get(m.NAME), r.get(m.ID)));
 
+                        Set<Tuple4<Long, Long, Long, String>> hierarchy = fetchHierarchyforColumn(measurablesForEachApp);
 
                         return measurablesForEachApp
                                 .entrySet()
@@ -848,18 +853,79 @@ public class ReportGridDao {
                                 .map(entries -> {
 
                                     String measurableList = join(map(entries.getValue(), t -> t.v1), "; ");
+                                    Set<Long> measurableIds = map(entries.getValue(), t -> t.v2);
+
+                                    String commentString = mkCommentString(hierarchy, measurableIds);
 
                                     return ImmutableReportGridCell
                                             .builder()
                                             .columnDefinitionId(colId)
                                             .subjectId(entries.getKey().v3)
                                             .textValue(measurableList)
-                                            .comment(measurableList)
+                                            .comment(commentString)
                                             .build();
                                 });
                     })
                     .collect(toSet());
         }
+    }
+
+
+    private Set<Tuple4<Long, Long, Long, String>> fetchHierarchyforColumn(Map<Tuple3<Long, Object, Long>, List<Tuple2<String, Long>>> measurablesForEachApp) {
+
+        Set<Long> mappedMeasurablesForColumn = measurablesForEachApp.values()
+                .stream()
+                .flatMap(d -> d
+                        .stream()
+                        .map(t -> t.v2))
+                .collect(toSet());
+
+        return dsl
+                .select(ENTITY_HIERARCHY.ID, MEASURABLE.ID, MEASURABLE.PARENT_ID, MEASURABLE.NAME)
+                .from(ENTITY_HIERARCHY)
+                .innerJoin(MEASURABLE).on(ENTITY_HIERARCHY.ANCESTOR_ID.eq(MEASURABLE.ID))
+                .where(ENTITY_HIERARCHY.ID.in(mappedMeasurablesForColumn)
+                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name())))
+                .fetchSet(r -> tuple(
+                        r.get(ENTITY_HIERARCHY.ID),
+                        r.get(MEASURABLE.ID),
+                        r.get(MEASURABLE.PARENT_ID),
+                        r.get(MEASURABLE.NAME)));
+    }
+
+    private String mkCommentString(Set<Tuple4<Long, Long, Long, String>> hierarchy,
+                                   Set<Long> measurableIds) {
+
+        //filter the overall hierarchy to the segment mapped to this application
+        Set<FlatNode<String, Long>> nodes = hierarchy
+                .stream()
+                .filter(d -> measurableIds.contains(d.v1))
+                .map(t -> new FlatNode<>(t.v2, ofNullable(t.v3), t.v4))
+                .collect(toSet());
+
+        Forest<String, Long> forest = toForest(nodes);
+
+        List<String> comment = asList("<ul>\n");
+
+        forest.getRootNodes()
+                .forEach(root -> {
+                    addNodeToComment(comment, root);
+                });
+
+        comment.add("</ul>");
+
+        return join(comment, "");
+    }
+
+    private void addNodeToComment(List<String> comment, Node<String, Long> node) {
+        comment.add(format("<li>%s", node.getData()));
+        if (!node.getChildren().isEmpty()) {
+            comment.add("<ul>");
+            node.getChildren()
+                    .forEach(c -> addNodeToComment(comment, c));
+            comment.add("</ul>");
+        }
+        comment.add("</li>\n");
     }
 
 
