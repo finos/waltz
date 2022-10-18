@@ -26,8 +26,7 @@ import org.finos.waltz.model.involvement.InvolvementViewItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static org.finos.waltz.web.WebUtilities.getEntityReference;
-import static org.finos.waltz.web.WebUtilities.mkPath;
+import static org.finos.waltz.web.WebUtilities.*;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.getForList;
 
 @Service
@@ -49,6 +48,7 @@ public class InvolvementViewEndpoint implements Endpoint {
 
         String findAllByEmployeeIdPath = mkPath(BASE_URL, "employee", ":employeeId");
         String findKeyInvolvementsForEntityPath = mkPath(BASE_URL, "entity", "kind", ":kind", "id", ":id");
+        String findInvolvementsByKindAndEntityKindPath = mkPath(BASE_URL, "involvement-kind", ":id", "entity-kind", ":kind");
 
         ListRoute<InvolvementViewItem> findAllByEmployeeIdRoute = (request, response) -> {
             String employeeId = request.params("employeeId");
@@ -58,8 +58,13 @@ public class InvolvementViewEndpoint implements Endpoint {
         ListRoute<InvolvementDetail> findKeyInvolvementsForEntityRoute = (request, response) ->
                 involvementViewService.findKeyInvolvementsForEntity(getEntityReference(request));
 
+
+        ListRoute<InvolvementViewItem> findInvolvementsByKindAndEntityKindRoute = (request, response) ->
+                involvementViewService.findByKindIdAndEntityKind(getId(request), getKind(request));
+
         getForList(findAllByEmployeeIdPath, findAllByEmployeeIdRoute);
         getForList(findKeyInvolvementsForEntityPath, findKeyInvolvementsForEntityRoute);
+        getForList(findInvolvementsByKindAndEntityKindPath, findInvolvementsByKindAndEntityKindRoute);
     }
 
 }

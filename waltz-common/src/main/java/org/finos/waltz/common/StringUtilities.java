@@ -87,7 +87,7 @@ public class StringUtilities {
 
 
     public static boolean isNumericLong(String value) {
-        return ! isEmpty(value)
+        return !isEmpty(value)
                 && parseLong(value, null) != null;
     }
 
@@ -96,6 +96,10 @@ public class StringUtilities {
         return str == null
                 ? ""
                 : str;
+    }
+
+    public static String safeTrim(String str) {
+        return mkSafe(str).trim();
     }
 
 

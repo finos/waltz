@@ -82,7 +82,9 @@ public class ReportGridEndpoint implements Endpoint {
     public ReportGrid getViewByIdRoute(Request req,
                                        Response resp) throws IOException {
         return reportGridService
-                .getByIdAndSelectionOptions(getId(req), readIdSelectionOptionsFromBody(req))
+                .getByIdAndSelectionOptions(
+                        getId(req),
+                        readIdSelectionOptionsFromBody(req))
                 .orElseThrow(() -> new NotFoundException("404", "ID not found"));
     }
 

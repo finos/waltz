@@ -21,6 +21,7 @@ import WelcomeJs from "./welcome/welcome.js";
 import {activeSections} from "./dynamic-section/section-store";
 import toasts from "./svelte-stores/toast-store";
 import popover from "./svelte-stores/popover-store";
+import pageInfo from "./svelte-stores/page-navigation-store";
 
 
 function warmUpCache($q, serviceBroker) {
@@ -225,8 +226,37 @@ configureInactivityTimer.$inject = [
 ];
 
 
-
 // -- SETUP ---
+
+function configureSvelteStoreListener($transitions, $state, $scope) {
+
+    $transitions.onSuccess({}, (x, y, z) => {
+        const target = x.targetState();
+
+        pageInfo.set({
+            state: target.state().name,
+            params: target.params(),
+            options: target.options(),
+            isNotification: true
+        });
+
+    });
+
+
+    pageInfo.subscribe((nextPg) => {
+        $scope.$applyAsync(() => {
+            if (!nextPg?.isNotification) {
+                $state.go(nextPg?.state, nextPg?.params, nextPg?.options);
+            }
+        })
+    });
+}
+
+configureSvelteStoreListener.$inject = [
+    "$transitions",
+    "$state",
+    "$rootScope"
+]
 
 function setup(module) {
     module
@@ -235,7 +265,8 @@ function setup(module) {
         .run(configureBetaNagMessageNotification)
         .run(configureStateChangeListener)
         .run(configureInactivityTimer)
-        .run(configureRouteDebugging);
+        .run(configureRouteDebugging)
+        .run(configureSvelteStoreListener);
 
 }
 
