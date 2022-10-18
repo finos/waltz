@@ -19,43 +19,38 @@
 
 import template from "./playpen1.html";
 import {initialiseData} from "../../common";
-import InvolvementPicker from "../../report-grid/components/svelte/pickers/InvolvementPicker.svelte";
+import InvolvementPicker from "../../common/svelte/entity-pickers/InvolvementPicker.svelte";
 import EntityPicker from "../../report-grid/components/svelte/pickers/EntityPicker.svelte";
 import EntitySelector from "../../report-grid/components/svelte/column-definition-edit-panel/EntitySelector.svelte";
 import TestPage
     from "../../report-grid/components/svelte/column-definition-edit-panel/ColumnDefinitionEditPanel.svelte";
 import {mkSelectionOptions} from "../../common/selector-utils";
+import TaxonomyNavAidBuilder from "./TaxonomyNavAidBuilder.svelte";
 import {CORE_API} from "../../common/services/core-api-utils";
 import _ from "lodash";
 
 const initData = {
-    // parentEntityRef: {id: 20768, kind: "APPLICATION"}
-    parentEntityRef: {id: 39855, kind: "SURVEY_INSTANCE"},
-    orgEntityRef: {id: 95, kind: "ORG_UNIT"},
-    // parentEntityRef: {id: 76823, kind: "SURVEY_INSTANCE"},
-    measurableEntityRef: {id: 54566, kind: "MEASURABLE"},
-    InvolvementPicker,
-    EntityPicker,
-    EntitySelector,
-    TestPage
+    TaxonomyNavAidBuilder,
+    taxonomy: []
 };
 
 
 function controller($q,
-                    serviceBroker,
-                    userService) {
+                    serviceBroker) {
 
     const vm = initialiseData(this, initData);
 
     vm.$onInit = () => {
 
-        serviceBroker.loadViewData(
-            CORE_API.ReportGridStore.getViewById,
-            [2, mkSelectionOptions(vm.orgEntityRef)])
-            .then(d => {
-                const report = d.data;
-                vm.columnDefs = _.orderBy(report.definition.fixedColumnDefinitions, d => d.position) || []
-                vm.gridId = report.definition.id;
+        serviceBroker
+            .loadViewData(
+                // CORE_API.DataTypeStore.findAll,
+                CORE_API.MeasurableStore.findAll,
+                [])
+            .then(r => {
+                console.log(r);
+                vm.taxonomy = _.filter(r.data, m => m.categoryId === 12);
+                vm.linkStem = "measurable"; // data-types
             });
 
     }

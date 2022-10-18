@@ -4,6 +4,7 @@
     import _ from "lodash";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import EntityPicker from "../pickers/EntityPicker.svelte";
+    import {mkReportGridFixedColumnRef} from "../report-grid-utils";
 
     export let onSelect = (d) => console.log("Selecting entity", d);
     export let onDeselect = (d) => console.log("Deselecting entity", d);
@@ -64,7 +65,37 @@
 
     $: subjectKindFilter = (kind) => {
         return subjectKind === kind;
-    }
+    };
+
+
+    $: entitySelectionFilter = (d) => {
+        if (d.kind === "ENTITY_FIELD_REFERENCE" || d.kind === "REPORT_GRID_FIXED_COLUMN_DEFINITION") {
+            return selectionFilter(d);
+        } else {
+            const colRef = mkReportGridFixedColumnRef(d);
+            return selectionFilter(colRef);
+        }
+    };
+
+
+    $: selectEntity = (d) => {
+        if (d.kind === "ENTITY_FIELD_REFERENCE" || d.kind === "REPORT_GRID_FIXED_COLUMN_DEFINITION") {
+            return onSelect(d);
+        } else {
+            const colRef = mkReportGridFixedColumnRef(d);
+            return onSelect(colRef);
+        }
+    };
+
+
+    $: deselectEntity = (d) => {
+        if (d.kind === "ENTITY_FIELD_REFERENCE" || d.kind === "REPORT_GRID_FIXED_COLUMN_DEFINITION") {
+            return onDeselect(d);
+        } else {
+            const colRef = mkReportGridFixedColumnRef(d);
+            return onDeselect(colRef);
+        }
+    };
 
 </script>
 
@@ -123,9 +154,9 @@
 <div class="row">
     <div class="col-sm-12">
         {#if selectedEntityKind}
-            <EntityPicker {onSelect}
-                          {onDeselect}
-                          {selectionFilter}
+            <EntityPicker onSelect={selectEntity}
+                          onDeselect={deselectEntity}
+                          selectionFilter={entitySelectionFilter}
                           {subjectKindFilter}
                           entityKind={selectedEntityKind?.key}/>
         {:else}
