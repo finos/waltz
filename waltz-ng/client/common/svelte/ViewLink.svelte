@@ -92,6 +92,14 @@
         "main.survey.instance.edit": {
             path: ctx => `survey/instance/${ctx.id}/response/edit`,
             title: "Survey Edit"
+        },
+        "main.involvement-kind.list": {
+            path: ctx => `involvement-kind/list`,
+            title: "Involvement Kind List"
+        },
+        "main.involvement-kind.view": {
+            path: ctx => `involvement-kind/${ctx.id}`,
+            title: "Involvement Kind View"
         }
     };
 

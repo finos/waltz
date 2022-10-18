@@ -16,19 +16,27 @@
  *
  */
 
-import angular from 'angular';
-import * as InvolvementKindStore from './services/involvement-kind-store';
-import {registerStores} from "../common/module-utils";
-import InvolvementKindService from './services/involvement-kind-service';
+import angular from "angular";
+import * as InvolvementKindStore from "./services/involvement-kind-store";
+import {registerComponents, registerStores} from "../common/module-utils";
+import InvolvementKindService from "./services/involvement-kind-service";
+import InvolvementKindView from "./pages/view/involvement-kind-view"
+import InvolvementKindList from "./pages/list/involvement-kinds-view"
+import Routes from "./routes";
 
 export default () => {
 
-    const module = angular.module('waltz.involvement.kind', []);
+    const module = angular.module("waltz.involvement.kind", []);
 
     module
-        .service('InvolvementKindService', InvolvementKindService);
+        .service("InvolvementKindService", InvolvementKindService);
 
-    registerStores(module, [ InvolvementKindStore]);
+
+    module
+        .config(Routes);
+
+    registerStores(module, [InvolvementKindStore]);
+    registerComponents(module, [InvolvementKindView, InvolvementKindList])
 
     return module.name;
 };

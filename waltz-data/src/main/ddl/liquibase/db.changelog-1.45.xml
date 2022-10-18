@@ -428,4 +428,14 @@
     </changeSet>
 
 
+    <changeSet id="20221007-6249-1"
+               author="woodjes">
+        <comment>6249: Involvement Kind: add unique index</comment>
+        <sql>
+            create unique index idx_inv_kind_ext_id_uniq
+                on involvement_kind (external_id) where external_id is not null
+        </sql>
+    </changeSet>
+
+
 </databaseChangeLog>
