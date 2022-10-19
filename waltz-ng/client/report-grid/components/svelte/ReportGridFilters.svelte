@@ -3,9 +3,13 @@
     import NoData from "../../../common/svelte/NoData.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
     import {getDisplayNameForColumn} from "./report-grid-utils";
-    import {activeSummaries, filters, summaries} from "./report-grid-store";
+    import {activeSummaries, filters, selectedGrid, summaries} from "./report-grid-store";
     import {mkChunks} from "../../../common/list-utils";
     import EntityIcon from "../../../common/svelte/EntityIcon.svelte";
+    import Popover from "../../../svelte-stores/popover-store";
+    import FilterNotePopoverContent from "./FilterNotePopoverContent.svelte";
+
+    export let primaryEntityRef;
 
     const rejectedColumnKinds = [
         "ORG_UNIT",
@@ -65,11 +69,31 @@
     function mkOptionSummaryTitle(option) {
         const optionName = option.optionInfo.name || "Not Provided";
 
-        if (option.counts.total !== option.counts.visible){
+        if (option.counts.total !== option.counts.visible) {
             return `${optionName}: (${option.counts.total}) ${option.counts.visible}`
         } else {
             return `${optionName}: ${option.counts.visible}`
         }
+    }
+
+
+    function generateFilterGroupNoteTemplate() {
+
+        const props = Object.assign(
+            {},
+            {
+                primaryEntityRef,
+                grid: $selectedGrid,
+                filters: $filters
+            });
+
+        const popover = {
+            title: "Report Grid Filter Note",
+            props,
+            component: FilterNotePopoverContent
+        };
+
+        Popover.add(popover);
     }
 
 
@@ -90,6 +114,10 @@
     $: availableSummaries = _.reject(
         $summaries,
         s => _.includes(rejectedColumnKinds, s.column.columnEntityKind));
+
+
+    $: console.log({filters: $filters, sg: $selectedGrid, primaryEntityRef})
+
 </script>
 
 <div>
@@ -229,6 +257,18 @@
 
         </div>
     </div>
+
+
+    <div class="row">
+        <div class="col-sm-12">
+            <button class="btn btn-skinny"
+                    on:click={generateFilterGroupNoteTemplate}>
+                <Icon name="sticky-note-o"/>
+                Generate Filter Group Note Template
+            </button>
+        </div>
+    </div>
+
 </div>
 
 <style>

@@ -32,7 +32,7 @@ export const reportGridKinds = {
 };
 
 
-export const ratingRollupRule = {
+export const additionalColumnOptions = {
     NONE: {
         key: "NONE",
         name: "None",
@@ -47,20 +47,25 @@ export const ratingRollupRule = {
         key: "PICK_LOWEST",
         name: "Pick Lowest",
 
+    },
+    ROLLUP: {
+        key: "ROLLUP",
+        name: "Rollup",
+
     }
 };
 
 
-export function determineDefaultRollupRule(d) {
-    const typesWhichDefaultToRollingUp = ["MEASURABLE", "DATA_TYPE"];
-
-    const shouldRollup = _.includes(
-        typesWhichDefaultToRollingUp,
-        _.get(d, "columnEntityKind"));
-
-    return shouldRollup
-        ? ratingRollupRule.PICK_HIGHEST
-        : ratingRollupRule.NONE;
+export function determineDefaultColumnOptions(columnEntityKind) {
+    console.log({columnEntityKind});
+    switch (columnEntityKind) {
+        case "MEASURABLE":
+            return additionalColumnOptions.PICK_HIGHEST;
+        case "DATA_TYPE":
+            return additionalColumnOptions.ROLLUP;
+        default:
+            return additionalColumnOptions.NONE;
+    }
 }
 
 

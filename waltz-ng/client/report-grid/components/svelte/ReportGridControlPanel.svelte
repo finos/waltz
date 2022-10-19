@@ -11,6 +11,7 @@
 
     export let onGridSelect = () => console.log("selecting grid");
     export let onSave = () => console.log("Saved report grid");
+    export let primaryEntityRef;
 
     const tabs = {
         OVERVIEW: 'overview',
@@ -92,7 +93,7 @@
         {#if selectedTab === 'overview'}
             <ReportGridOverview onGridSelect={handleGridSelect}/>
         {:else if selectedTab === 'filters'}
-            <ReportGridFilters/>
+            <ReportGridFilters {primaryEntityRef}/>
         {:else if selectedTab === 'columns'}
             <ColumnDefinitionEditPanel gridId={$selectedGrid?.definition?.id}
                                        columnDefs={$selectedGrid?.definition?.columnDefinitions}

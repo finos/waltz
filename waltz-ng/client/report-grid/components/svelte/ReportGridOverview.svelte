@@ -132,6 +132,10 @@
                 <table class="table table-condensed small">
                     <tbody>
                     <tr>
+                        <td>External ID</td>
+                        <td>{$selectedGrid?.definition?.externalId || "-"}</td>
+                    </tr>
+                    <tr>
                         <td>Subject Kind</td>
                         <td>{_.get(entity[$selectedGrid?.definition?.subjectKind], 'name', 'Unknown Kind')}</td>
                     </tr>

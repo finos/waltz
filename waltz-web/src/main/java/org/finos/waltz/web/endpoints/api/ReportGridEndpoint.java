@@ -59,10 +59,12 @@ public class ReportGridEndpoint implements Endpoint {
         String findForOwnerPath = mkPath(BASE_URL, "owner");
         String getViewByIdPath = mkPath(BASE_URL, "view", "id", ":id");
         String updateColumnDefsPath = mkPath(BASE_URL, "id", ":id", "column-definitions", "update");
+        String findAdditionalColumnOptionsForKindPath = mkPath(BASE_URL, "additional-column-options", "kind", ":kind");
 
         getForDatum(findAllPath, (req, resp) -> reportGridService.findAll());
         getForList(findForUserPath, (req, resp) -> reportGridService.findForUser(getUsername(req)));
         getForList(findForOwnerPath, this::findForOwnerRoute);
+        getForList(findAdditionalColumnOptionsForKindPath, this::findAdditionalColumnOptionsForKindRoute);
         postForDatum(getViewByIdPath, this::getViewByIdRoute);
         postForDatum(updateColumnDefsPath, this::updateColumnDefsRoute);
         postForDatum(createPath, this::createRoute);
@@ -119,5 +121,10 @@ public class ReportGridEndpoint implements Endpoint {
     public Set<ReportGridDefinition> findForOwnerRoute(Request req,
                                                        Response resp) {
         return reportGridService.findForOwner(getUsername(req));
+    }
+
+    public Set<AdditionalColumnOptions> findAdditionalColumnOptionsForKindRoute(Request req,
+                                                                                Response resp) {
+        return reportGridService.findAdditionalColumnOptionsForKind(getKind(req));
     }
 }

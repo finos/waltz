@@ -243,7 +243,7 @@ public class ReportGridDao {
                     record.setGridColumnId(gridColId);
                     record.setColumnEntityId(fixedCol.columnEntityId());
                     record.setColumnEntityKind(fixedCol.columnEntityKind().name());
-                    record.setRatingRollupRule(fixedCol.ratingRollupRule().name());
+                    record.setAdditionalColumnOptions(fixedCol.additionalColumnOptions().name());
                     record.setPosition(Long.valueOf(fixedCol.position()).intValue());
                     record.setDisplayName(fixedCol.displayName());
                     record.setColumnQualifierKind(Optional
@@ -548,7 +548,7 @@ public class ReportGridDao {
                             .columnDescription(r.get("desc", String.class))
                             .displayName(r.get(rgfcd.DISPLAY_NAME))
                             .position(r.get(rgcd.POSITION))
-                            .ratingRollupRule(RatingRollupRule.valueOf(r.get(rgfcd.RATING_ROLLUP_RULE)))
+                            .additionalColumnOptions(AdditionalColumnOptions.parseColumnOptions(r.get(rgfcd.ADDITIONAL_COLUMN_OPTIONS)))
                             .entityFieldReference(entityFieldReference)
                             .columnQualifierKind(columnQualifierKind)
                             .columnQualifierId(r.get(rgfcd.COLUMN_QUALIFIER_ID))
@@ -738,13 +738,13 @@ public class ReportGridDao {
                     simpleGridDefs,
                     ReportGridFixedColumnDefinition::columnEntityKind);
 
-            Map<RatingRollupRule, Collection<ReportGridFixedColumnDefinition>> measurableColumnsByRollupKind = groupBy(
+            Map<AdditionalColumnOptions, Collection<ReportGridFixedColumnDefinition>> measurableColumnsByRollupKind = groupBy(
                     colsByKind.getOrDefault(EntityKind.MEASURABLE, emptySet()),
-                    ReportGridFixedColumnDefinition::ratingRollupRule);
+                    ReportGridFixedColumnDefinition::additionalColumnOptions);
 
             Map<Boolean, Collection<ReportGridFixedColumnDefinition>> dataTypeColumnsByIsExact = groupBy(
                     colsByKind.getOrDefault(EntityKind.DATA_TYPE, emptySet()),
-                    d -> d.ratingRollupRule() == RatingRollupRule.NONE);
+                    d -> d.additionalColumnOptions() == AdditionalColumnOptions.NONE);
 
 
             // COMPLEX GRID DEFS
@@ -776,9 +776,9 @@ public class ReportGridDao {
                     fetchComplexityData(genericSelector, colsByKind.get(EntityKind.COMPLEXITY_KIND)),
                     fetchSummaryMeasurableData(
                             genericSelector,
-                            measurableColumnsByRollupKind.getOrDefault(RatingRollupRule.PICK_HIGHEST, emptySet()),
-                            measurableColumnsByRollupKind.getOrDefault(RatingRollupRule.PICK_LOWEST, emptySet())),
-                    fetchExactMeasurableData(genericSelector, measurableColumnsByRollupKind.get(RatingRollupRule.NONE)),
+                            measurableColumnsByRollupKind.getOrDefault(AdditionalColumnOptions.PICK_HIGHEST, emptySet()),
+                            measurableColumnsByRollupKind.getOrDefault(AdditionalColumnOptions.PICK_LOWEST, emptySet())),
+                    fetchExactMeasurableData(genericSelector, measurableColumnsByRollupKind.get(AdditionalColumnOptions.NONE)),
                     fetchSurveyQuestionResponseData(genericSelector, colsByKind.get(EntityKind.SURVEY_QUESTION)),
                     fetchAppGroupData(genericSelector, colsByKind.get(EntityKind.APP_GROUP)),
                     fetchApplicationFieldReferenceData(genericSelector, complexColsByKind.get(EntityKind.APPLICATION)),

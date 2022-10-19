@@ -36,9 +36,9 @@ export let columnsChanged = derived([columnDefs, selectedGrid], ([$columnDefs, $
     }
 })
 
-export let ratingRollupRuleChanged = derived(
+export let additionalColumnOptionsChanged = derived(
     columnDefs,
-    ($columnDefs) => _.some($columnDefs, d => d.ratingRollupRuleChanged));
+    ($columnDefs) => _.some($columnDefs, d => d.additionalColumnOptionsChanged));
 
 export let displayNameChanged = derived(
     columnDefs,
@@ -57,9 +57,9 @@ export let externalIdChanged = derived(
     ($columnDefs) => _.some($columnDefs, d => d.externalIdChanged));
 
 export let hasChanged = derived(
-    [columnsChanged, ratingRollupRuleChanged, displayNameChanged, positionChanged, derivationScriptChanged, externalIdChanged],
-    ([$columnsChanged, $ratingRollupRuleChanged, $displayNameChanged, $positionChanged, $derivationScriptChanged, $externalIdChanged]) => {
-        return $columnsChanged || $ratingRollupRuleChanged || $displayNameChanged || $positionChanged || $derivationScriptChanged || $externalIdChanged;
+    [columnsChanged, additionalColumnOptionsChanged, displayNameChanged, positionChanged, derivationScriptChanged, externalIdChanged],
+    ([$columnsChanged, $additionalColumnOptionsChanged, $displayNameChanged, $positionChanged, $derivationScriptChanged, $externalIdChanged]) => {
+        return $columnsChanged || $additionalColumnOptionsChanged || $displayNameChanged || $positionChanged || $derivationScriptChanged || $externalIdChanged;
     });
 
 export const tableData = derived(
