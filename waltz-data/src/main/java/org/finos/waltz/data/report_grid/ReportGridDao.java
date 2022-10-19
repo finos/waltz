@@ -42,7 +42,6 @@ import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
-import org.jooq.lambda.tuple.Tuple4;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -845,7 +844,8 @@ public class ReportGridDao {
                                                 r.get(ratingsInScope.field(mr.ENTITY_ID))),
                                         r -> tuple(r.get(m.NAME), r.get(m.ID)));
 
-                        Set<Tuple4<Long, Long, Long, String>> hierarchy = fetchHierarchyforColumn(measurablesForEachApp);
+                        Set<FlatNode<String, Long>> relevantNodes = fetchRelevantNodes(measurablesForEachApp);
+                        Map<Long, FlatNode<String, Long>> relevantNodesById = indexBy(relevantNodes, FlatNode::getId);
 
                         return measurablesForEachApp
                                 .entrySet()
@@ -853,9 +853,9 @@ public class ReportGridDao {
                                 .map(entries -> {
 
                                     String measurableList = join(map(entries.getValue(), t -> t.v1), "; ");
-                                    Set<Long> measurableIds = map(entries.getValue(), t -> t.v2);
+                                    Set<Long> measurableIdsForCell = map(entries.getValue(), t -> t.v2);
 
-                                    String commentString = mkCommentString(hierarchy, measurableIds);
+                                    String commentString = mkCommentString(relevantNodesById, measurableIdsForCell);
 
                                     return ImmutableReportGridCell
                                             .builder()
@@ -871,7 +871,7 @@ public class ReportGridDao {
     }
 
 
-    private Set<Tuple4<Long, Long, Long, String>> fetchHierarchyforColumn(Map<Tuple3<Long, Object, Long>, List<Tuple2<String, Long>>> measurablesForEachApp) {
+    private Set<FlatNode<String, Long>> fetchRelevantNodes(Map<Tuple3<Long, Object, Long>, List<Tuple2<String, Long>>> measurablesForEachApp) {
 
         Set<Long> mappedMeasurablesForColumn = measurablesForEachApp.values()
                 .stream()
@@ -881,29 +881,36 @@ public class ReportGridDao {
                 .collect(toSet());
 
         return dsl
-                .select(ENTITY_HIERARCHY.ID, MEASURABLE.ID, MEASURABLE.PARENT_ID, MEASURABLE.NAME)
+                .select(MEASURABLE.ID, MEASURABLE.PARENT_ID, MEASURABLE.NAME)
                 .from(ENTITY_HIERARCHY)
                 .innerJoin(MEASURABLE).on(ENTITY_HIERARCHY.ANCESTOR_ID.eq(MEASURABLE.ID))
                 .where(ENTITY_HIERARCHY.ID.in(mappedMeasurablesForColumn)
                         .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name())))
-                .fetchSet(r -> tuple(
-                        r.get(ENTITY_HIERARCHY.ID),
-                        r.get(MEASURABLE.ID),
-                        r.get(MEASURABLE.PARENT_ID),
-                        r.get(MEASURABLE.NAME)));
+                .fetchSet(r -> new FlatNode<>(r.get(MEASURABLE.ID), ofNullable(r.get(MEASURABLE.PARENT_ID)), r.get(MEASURABLE.NAME)));
     }
 
-    private String mkCommentString(Set<Tuple4<Long, Long, Long, String>> hierarchy,
+    private String mkCommentString(Map<Long, FlatNode<String, Long>> relevantNodesById,
                                    Set<Long> measurableIds) {
 
-        //filter the overall hierarchy to the segment mapped to this application
-        Set<FlatNode<String, Long>> nodes = hierarchy
+        Set<FlatNode<String, Long>> allNodesForCell = measurableIds
                 .stream()
-                .filter(d -> measurableIds.contains(d.v1))
-                .map(t -> new FlatNode<>(t.v2, ofNullable(t.v3), t.v4))
+                .flatMap(mId -> {
+                    Set<FlatNode<String, Long>> nodesPerCell = asSet();
+
+                    FlatNode<String, Long> node = relevantNodesById.get(mId);
+
+                    while (node != null && nodesPerCell.add(node)) {
+                        node = node
+                                .getParentId()
+                                .map(relevantNodesById::get)
+                                .orElse(null);
+                    }
+
+                    return nodesPerCell.stream();
+                })
                 .collect(toSet());
 
-        Forest<String, Long> forest = toForest(nodes);
+        Forest<String, Long> forest = toForest(allNodesForCell);
 
         List<String> comment = asList("<ul>\n");
 
@@ -915,7 +922,9 @@ public class ReportGridDao {
         comment.add("</ul>");
 
         return join(comment, "");
+
     }
+
 
     private void addNodeToComment(List<String> comment, Node<String, Long> node) {
         comment.add(format("<li>%s", node.getData()));
