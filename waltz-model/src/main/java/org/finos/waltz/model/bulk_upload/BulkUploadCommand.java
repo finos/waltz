@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.command.Command;
+
 import org.immutables.value.Value;
 
 import java.util.List;
@@ -13,7 +15,7 @@ import java.util.Optional;
 @Value.Immutable
 @JsonSerialize(as = ImmutableBulkUploadCommand.class)
 @JsonDeserialize(as = ImmutableBulkUploadCommand.class)
-public abstract class BulkUploadCommand {
+public abstract class BulkUploadCommand implements Command {
 
     public abstract BulkUploadMode uploadMode();
 
