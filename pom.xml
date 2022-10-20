@@ -82,8 +82,8 @@
         <freemarker.version>2.3.31</freemarker.version>
         <hikari.version>3.4.5</hikari.version>
         <immutables.version>2.9.2</immutables.version>
-        <jackson.version>2.13.3</jackson.version>
-        <jackson-jsr310.version>2.13.3</jackson-jsr310.version>
+        <jackson.version>2.14.0-rc2</jackson.version>
+        <jackson-jsr310.version>2.14.0-rc2</jackson-jsr310.version>
         <java.version>1.8</java.version>
         <javax.mail.version>1.4.7</javax.mail.version>
         <jbcrypt.version>0.4.3</jbcrypt.version>
@@ -352,7 +352,7 @@
             <properties>
                 <jdbc.group>com.h2database</jdbc.group>
                 <jdbc.artifact>h2</jdbc.artifact>
-                <jdbc.version>1.4.200</jdbc.version>
+                <jdbc.version>2.1.212</jdbc.version>
                 <jdbc.driver>org.h2.Driver</jdbc.driver>
                 <jooq.dialect>H2</jooq.dialect>
                 <jooq.group>org.jooq</jooq.group>
@@ -484,9 +484,14 @@
         <profile>
             <id>dev-h2-inmem</id>
             <properties>
-                <database.url>jdbc:h2:tcp://localhost/mem:waltz;CASE_INSENSITIVE_IDENTIFIERS=TRUE</database.url>
+                <!-- <database.url>jdbc:h2:tcp://localhost/mem:waltz;CASE_INSENSITIVE_IDENTIFIERS=TRUE</database.url>
                 <database.user>sa</database.user>
-                <database.password>sa</database.password>
+                <database.password>sa</database.password> -->
+                <database.url>jdbc:h2:file:~/data/waltz/h2/waltzdb;DATABASE_TO_UPPER=false</database.url>
+                <database.user>root</database.user>
+                <database.password></database.password>
+                <database.schema>PUBLIC</database.schema>
+                <database.catalog></database.catalog>
             </properties>
         </profile>
 
