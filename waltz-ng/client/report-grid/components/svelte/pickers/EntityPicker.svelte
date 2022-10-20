@@ -1,22 +1,22 @@
 <script>
 
-    import InvolvementPicker from "./InvolvementPicker.svelte";
-    import CostKindPicker from "./CostKindPicker.svelte";
+    import InvolvementPicker from "../../../../common/svelte/entity-pickers/InvolvementPicker.svelte";
+    import CostKindPicker from "../../../../common/svelte/entity-pickers/CostKindPicker.svelte";
     import SurveyQuestionPicker from "./SurveyQuestionPicker.svelte";
-    import AssessmentDefinitionPicker from "./AssessmentDefinitionPicker.svelte";
-    import MeasurablePicker from "./MeasurablePicker.svelte";
+    import AssessmentDefinitionPicker from "../../../../common/svelte/entity-pickers/AssessmentDefinitionPicker.svelte";
+    import MeasurablePicker from "../../../../common/svelte/entity-pickers/MeasurablePicker.svelte";
     import SurveyInstanceFieldPicker from "./SurveyInstanceFieldPicker.svelte";
     import ApplicationFieldPicker from "./ApplicationFieldPicker.svelte";
     import ChangeInitiativeFieldPicker from "./ChangeInitiativeFieldPicker.svelte";
-    import AppGroupPicker from "./AppGroupPicker.svelte";
-    import DataTypePicker from "./DataTypePicker.svelte";
+    import AppGroupPicker from "../../../../common/svelte/entity-pickers/AppGroupPicker.svelte";
+    import DataTypePicker from "../../../../common/svelte/entity-pickers/DataTypePicker.svelte";
     import AttestationPicker from "./AttestationPicker.svelte";
     import OrgUnitFieldPicker from "./OrgUnitFieldPicker.svelte";
     import TagPicker from "./TagPicker.svelte";
     import AliasPicker from "./AliasPicker.svelte";
-    import ComplexityKindPicker from "./ComplexityKindPicker.svelte";
+    import ComplexityKindPicker from "../../../../common/svelte/entity-pickers/ComplexityKindPicker.svelte";
     import MeasurableCategoryPicker from "./MeasurableCategoryPicker.svelte";
-    import EntityStatisticPicker from "./EntityStatisticPicker.svelte";
+    import EntityStatisticPicker from "../../../../common/svelte/entity-pickers/EntityStatisticPicker.svelte";
 
     export let onSelect = (d) => console.log("Selecting an entity", d);
     export let onDeselect = (d) => console.log("Deselecting an entity", d);

@@ -28,8 +28,17 @@ export function mkInvolvementViewStore() {
             [],
             {force});
 
+    const findInvolvementsByKindAndEntityKind = (kindId, entityKind, force = false) => remote
+        .fetchViewData(
+            "GET",
+            `api/involvement-view/involvement-kind/${kindId}/entity-kind/${entityKind}`,
+            null,
+            [],
+            {force});
+
     return {
-        findKeyInvolvementsForEntity
+        findKeyInvolvementsForEntity,
+        findInvolvementsByKindAndEntityKind
     };
 }
 

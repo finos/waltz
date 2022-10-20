@@ -52,4 +52,36 @@ public class StringUtilities_sanitizeCharactersTest {
 
         assertEquals(expectedString, sanitizeCharacters(str));
     }
+
+    @Test
+    public void replacesZeroWidthSpace() {
+        String str = "​Test list:\n" +
+                "\n" +
+                "one​\n" +
+                "two\n";
+
+        String expectedString = "Test list:\n" +
+                "\n" +
+                "one\n" +
+                "two\n";
+
+
+        assertEquals(expectedString, sanitizeCharacters(str));
+    }
+
+    @Test
+    public void replacesMultipleDodgyCharacters() {
+        String str = "​Test list:\n" +
+                "\n" +
+                "â€one“​\n" +
+                "â€™two‘\n";
+
+        String expectedString = "Test list:\n" +
+                "\n" +
+                "\"one\"\n" +
+                "'two'\n";
+
+
+        assertEquals(expectedString, sanitizeCharacters(str));
+    }
 }
