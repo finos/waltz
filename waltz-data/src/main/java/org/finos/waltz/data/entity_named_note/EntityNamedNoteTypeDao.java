@@ -162,4 +162,11 @@ public class EntityNamedNoteTypeDao {
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
+    public EntityNamedNodeType getByExternalId(String externalId) {
+        return dsl
+                .select(ENTITY_NAMED_NOTE_TYPE.fields())
+                .from(ENTITY_NAMED_NOTE_TYPE)
+                .where(ENTITY_NAMED_NOTE_TYPE.EXTERNAL_ID.eq(externalId))
+                .fetchOne(TO_DOMAIN_MAPPER);
+    }
 }

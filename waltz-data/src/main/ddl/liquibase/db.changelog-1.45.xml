@@ -462,5 +462,27 @@
         </update>
     </changeSet>
 
+    <changeSet author="woodjes"
+               id="20221019-6261-3"
+               dbms="postgresql,h2">
+        <comment>6219: Entity Named Note - create unique index on external id</comment>
+        <createIndex indexName="idx_entity_named_note_type_ext_id"
+                     tableName="entity_named_note_type"
+                     unique="true">
+            <column name="external_id" type="${external-id.type}"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="woodjes"
+               id="20221019-6261-4"
+               dbms="mssql">
+        <comment>6219: Entity Named Note - create unique index on external id</comment>
+        <sql>
+            CREATE UNIQUE NONCLUSTERED INDEX idx_entity_named_note_type_ext_id
+                ON [entity_named_note_type] ([external_id])
+                WHERE [external_id] IS NOT NULL;
+        </sql>
+    </changeSet>
+
 
 </databaseChangeLog>

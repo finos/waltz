@@ -8,6 +8,7 @@
     import EntityIcon from "../../../common/svelte/EntityIcon.svelte";
     import Popover from "../../../svelte-stores/popover-store";
     import FilterNotePopoverContent from "./FilterNotePopoverContent.svelte";
+    import {entityNamedNoteTypeStore} from "../../../svelte-stores/entity-named-note-type-store";
 
     export let primaryEntityRef;
 
@@ -16,6 +17,7 @@
     ];
 
     let chunkedSummaryData = [];
+    let namedNoteTypeCall = entityNamedNoteTypeStore.getByExternalId("WALTZ_REPORT_GRID_FILTER_PRESET");
 
     function isSelectedSummary(cId) {
         return _.some(
@@ -97,6 +99,8 @@
     }
 
 
+    $: entityNameNoteType = $namedNoteTypeCall?.data;
+
     $: {
         const byColDefId = _.keyBy(
             $summaries,
@@ -115,8 +119,6 @@
         $summaries,
         s => _.includes(rejectedColumnKinds, s.column.columnEntityKind));
 
-
-    $: console.log({filters: $filters, sg: $selectedGrid, primaryEntityRef})
 
 </script>
 
@@ -266,6 +268,11 @@
                 <Icon name="sticky-note-o"/>
                 Generate Filter Group Note Template
             </button>
+            <div class="help-block small">
+                <Icon name="info-circle"/>
+                Click to generate note text which can be used to prepopulate application groups from filters though
+                creating a '{entityNameNoteType?.name || "?"}' named note.
+            </div>
         </div>
     </div>
 

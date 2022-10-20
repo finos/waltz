@@ -18,6 +18,7 @@
 
 package org.finos.waltz.service.entity_named_note;
 
+import org.finos.waltz.common.Checks;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.data.entity_named_note.EntityNamedNoteTypeDao;
 import org.finos.waltz.model.EntityKind;
@@ -95,5 +96,10 @@ public class EntityNamedNoteTypeService {
                 .severity(Severity.INFORMATION)
                 .build();
         changeLogService.write(logEntry);
+    }
+
+    public EntityNamedNodeType getByExternalId(String externalId) {
+        Checks.checkNotNull(externalId, "External id cannot be null");
+        return entityNamedNoteTypeDao.getByExternalId(externalId);
     }
 }
