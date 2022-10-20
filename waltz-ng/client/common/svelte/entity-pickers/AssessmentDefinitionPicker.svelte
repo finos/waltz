@@ -1,10 +1,9 @@
 <script>
 
-    import Grid from "../../../../common/svelte/Grid.svelte";
-    import Icon from "../../../../common/svelte/Icon.svelte";
+    import Grid from "../Grid.svelte";
+    import Icon from "../Icon.svelte";
     import _ from "lodash";
-    import {assessmentDefinitionStore} from "../../../../svelte-stores/assessment-definition";
-    import {mkReportGridFixedColumnRef} from "../report-grid-utils";
+    import {assessmentDefinitionStore} from "../../../svelte-stores/assessment-definition";
 
     export let onSelect = () => console.log("Selecting assessment definition");
     export let selectionFilter = () => true;
@@ -15,7 +14,7 @@
 
     $: rowData = _
         .chain(assessmentDefintions)
-        .filter(d => selectionFilter(mkReportGridFixedColumnRef(d)))
+        .filter(selectionFilter)
         .orderBy(d => d.name)
         .value();
 
@@ -30,7 +29,7 @@
     <Icon name="info-circle"/>
     Select an assessment definition from the list below, you can filter the list using the search bar.
 </div>
-    <br>
-    <Grid {columnDefs}
-          {rowData}
-          onSelectRow={d => onSelect(mkReportGridFixedColumnRef(d))}/>
+<br>
+<Grid {columnDefs}
+      {rowData}
+      onSelectRow={onSelect}/>

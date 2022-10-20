@@ -1,9 +1,8 @@
 <script>
 
     import _ from "lodash";
-    import {entityStatisticStore} from "../../../../svelte-stores/entity-statistic-store";
-    import EntityStatisticTreeSelector from "../../../../common/svelte/EntityStatisticTreeSelector.svelte";
-    import {mkReportGridFixedColumnRef} from "../report-grid-utils";
+    import {entityStatisticStore} from "../../../svelte-stores/entity-statistic-store";
+    import EntityStatisticTreeSelector from "../EntityStatisticTreeSelector.svelte";
 
     export let onSelect = () => console.log("Selecting entity statistic");
     export let onDeselect = () => console.log("Deselecting entity statistic");
@@ -14,7 +13,7 @@
 
     $: rowData = _
         .chain(statDefinitions)
-        .filter(d => selectionFilter(mkReportGridFixedColumnRef(d)))
+        .filter(selectionFilter)
         .orderBy(d => d.name)
         .value();
 
@@ -24,22 +23,17 @@
     ];
 
     function handleSelection(evt) {
-        const payload = mkReportGridFixedColumnRef(evt.detail);
+        const stat = evt.detail;
 
-        if (selectionFilter(payload)) {
-            onSelect(payload);
+        if (selectionFilter(stat)) {
+            onSelect(stat);
         } else {
-            onDeselect(payload);
+            onDeselect(stat);
         }
-    }
-
-    function statisticSelectionFilter(selectionFilter, statistic) {
-        const payload = mkReportGridFixedColumnRef(statistic)
-        return selectionFilter(payload);
     }
 
 </script>
 
 <EntityStatisticTreeSelector multiSelect={true}
-                             selectionFilter={(d) => statisticSelectionFilter(selectionFilter, d)}
+                             selectionFilter={selectionFilter}
                              on:select={handleSelection}/>

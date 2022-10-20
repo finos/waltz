@@ -26,7 +26,6 @@ import OrphansView from "./orphans-view";
 import RecalculateView from "./recalculate-view";
 import ActorsView from "./actors-view";
 import EntityNamedNoteTypesView from "./entity-named-node-types-view";
-import InvolvementKindsView from "./involvement-kinds-view";
 import StaticPanelsView from "./static-panels-view";
 import AssessmentDefinitionsView from "./assessment-defintions-view";
 import RatingSchemesView from "./rating-schemes-view";
@@ -84,24 +83,19 @@ const actorsState = {
 
 const entityNamedNodeTypesState = {
     url: "/entity-named-note-types",
-    views: { "content@": EntityNamedNoteTypesView }
-};
-
-
-const involvementKindsState = {
-    url: "/involvement-kinds",
-    views: { "content@": InvolvementKindsView }
+    views: {"content@": EntityNamedNoteTypesView}
 };
 
 
 const staticPanelsState = {
     url: "/static-panels",
-    views: { "content@": StaticPanelsView }
+    views: {"content@": StaticPanelsView}
 };
+
 
 const assessmentDefintionsState = {
     url: "/assessment-definitions",
-    views: { "content@": AssessmentDefinitionsView }
+    views: {"content@": AssessmentDefinitionsView}
 };
 
 
@@ -132,7 +126,6 @@ function setupRoutes($stateProvider) {
         .state("main.system.orphans", orphansState)
         .state("main.system.actors", actorsState)
         .state("main.system.entity-named-note-types", entityNamedNodeTypesState)
-        .state("main.system.involvement-kinds", involvementKindsState)
         .state("main.system.assessment-definitions", assessmentDefintionsState)
         .state("main.system.static-panels", staticPanelsState)
         .state("main.system.rating-schemes", ratingSchemesState)

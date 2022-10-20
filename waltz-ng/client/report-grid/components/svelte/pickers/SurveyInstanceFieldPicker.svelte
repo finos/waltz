@@ -16,6 +16,62 @@
     let selectedTemplate = null;
     let showActiveOnly = true;
 
+    const columnDefs = [
+        {field: "rowSummary.name", name: "Field", width: "30%"},
+        {field: "rowSummary.description", name: "Description", width: "70%"},
+    ];
+
+    const templateColumnDefs = [
+        {field: "name", name: "Survey Name", width: "40%"},
+        {field: "description", name: "Description", width: "60%", maxLength: 300},
+    ];
+
+    function selectTemplate(template) {
+        selectedTemplate = template;
+    }
+
+    function clearSelectedTemplate() {
+        selectedTemplate = null;
+    }
+
+    function toRowSummary(d) {
+        return {
+            name: _.get(d, ["entityFieldReference", "displayName"])
+                || _.get(d, ["columnName"], "?"),
+            description: _.get(d, ["entityFieldReference", "description"])
+                || _.get(d, ["columnDescription"], "?"),
+        };
+    }
+
+    function onColSelect(d) {
+        onSelect(d.columnDefinition);
+    }
+
+    function mkApproversColDef(surveyTemplate) {
+        return {
+            kind: "REPORT_GRID_FIXED_COLUMN_DEFINITION",
+            columnEntityId: surveyTemplate?.id,
+            columnEntityKind: entity.SURVEY_TEMPLATE.key,
+            columnQualifierKind: entity.SURVEY_INSTANCE_OWNER.key,
+            columnName: "Approver/s",
+            columnDescription: "Users who can approve the survey",
+            displayName: "Approvers / " + surveyTemplate?.name
+        };
+    }
+
+    function mkRecipientsColDef(surveyTemplate) {
+        return {
+            kind: "REPORT_GRID_FIXED_COLUMN_DEFINITION",
+            columnEntityId: surveyTemplate?.id,
+            columnEntityKind: entity.SURVEY_TEMPLATE.key,
+            columnQualifierKind: entity.SURVEY_INSTANCE_RECIPIENT.key,
+            columnName: "Recipient/s",
+            columnDescription: "Users who receive the survey to complete",
+            displayName: "Recipients / " + surveyTemplate?.name
+        };
+    }
+
+
     $: templatesCall = surveyTemplateStore.findAll();
     $: templates = _
         .chain($templatesCall.data)
@@ -40,27 +96,17 @@
                 columnName: selectedTemplate?.name,
                 displayName: null
             }))
+        .concat([
+            mkApproversColDef(selectedTemplate),
+            mkRecipientsColDef(selectedTemplate)
+        ])
         .filter(selectionFilter)
-        .orderBy(d => d.entityFieldReference.displayName)
+        .map(d => ({
+            columnDefinition: d,
+            rowSummary: toRowSummary(d)
+        }))
+        .orderBy(d => d.rowSummary.name)
         .value();
-
-    const columnDefs = [
-        {field: "entityFieldReference.displayName", name: "Field", width: "30%"},
-        {field: "entityFieldReference.description", name: "Description", width: "70%"},
-    ];
-
-    const templateColumnDefs = [
-        {field: "name", name: "Survey Name", width: "40%"},
-        {field: "description", name: "Description", width: "60%", maxLength: 300},
-    ];
-
-    function selectTemplate(template) {
-        selectedTemplate = template;
-    }
-
-    function clearSelectedTemplate() {
-        selectedTemplate = null;
-    }
 
 
 </script>
@@ -81,7 +127,7 @@
     {:else }
         <Grid {columnDefs}
               {rowData}
-              onSelectRow={onSelect}/>
+              onSelectRow={onColSelect}/>
     {/if}
 {:else}
     <div class="help-block small">

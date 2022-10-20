@@ -5,10 +5,7 @@ import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.survey.SurveyQuestionDao;
 import org.finos.waltz.data.survey.SurveyQuestionDropdownEntryDao;
 import org.finos.waltz.data.survey.SurveyTemplateDao;
-import org.finos.waltz.jobs.tools.survey.config.ImmutableSectionDupeConfig;
-import org.finos.waltz.jobs.tools.survey.config.ImmutableSurveyDupeConfig;
-import org.finos.waltz.jobs.tools.survey.config.SectionDupeConfig;
-import org.finos.waltz.jobs.tools.survey.config.SurveyDupeConfig;
+import org.finos.waltz.jobs.tools.survey.config.*;
 import org.finos.waltz.model.ReleaseLifecycleStatus;
 import org.finos.waltz.model.survey.*;
 import org.finos.waltz.schema.tables.SurveyTemplate;
@@ -18,6 +15,7 @@ import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.emptySet;
@@ -66,12 +64,9 @@ public class SurveyDupe {
                 targetTemplateId,
                 dupeConfig.sections());
 
-
-
         Map<Optional<Long>, Collection<SurveyQuestionDropdownEntry>> dropDownEntriesByQuestionId = groupBy(
                 surveyDropdownDao.findForSurveyTemplate(sourceTemplateId),
                 SurveyQuestionDropdownEntry::questionId);
-
 
         SetUtilities
                 .union(basics, repeating)
@@ -91,8 +86,6 @@ public class SurveyDupe {
                                         .copyOf(d)
                                         .withQuestionId(targetQuestionId)));
                 });
-
-
 
         System.out.println("done");
 
@@ -115,6 +108,8 @@ public class SurveyDupe {
                 questionsToDupe,
                 q -> q.sectionName().orElse(null));
 
+        AtomicInteger sectionCounter = new AtomicInteger(1);
+
         return sections
                 .stream()
                 .flatMap(section -> {
@@ -125,33 +120,41 @@ public class SurveyDupe {
                     return section
                             .targets()
                             .stream()
-                            .map(targetSection -> tuple(section, targetSection, sourceSectionQuestions));
+                            .map(targetSection -> tuple(
+                                    sectionCounter.getAndIncrement(),
+                                    targetSection,
+                                    sourceSectionQuestions));
                 })
                 .flatMap(t -> {
+                    Integer sectionNumber = t.v1;
+                    TargetSectionConfig targetSection = t.v2;
+                    Collection<SurveyQuestion> questions = t.v3;
+
                     Set<String> inScopeQuestionExtIds = fromOptionals(map(
-                            t.v3,
+                            questions,
                             SurveyQuestion::externalId));
 
-                    return t.v3
+                    return questions
                             .stream()
                             .map(q -> tuple(
                                     q.id().get(),
                                     ImmutableSurveyQuestion
-                                        .copyOf(q)
-                                        .withSurveyTemplateId(targetTemplateId)
-                                        .withId(Optional.empty())
-                                        .withSectionName(t.v2.name())
-                                        .withExternalId(q
-                                                .externalId()
-                                                .map(extId -> mkExtId(
-                                                        t.v2.extIdPrefix(),
-                                                        extId)))
-                                        .withInclusionPredicate(q
-                                                .inclusionPredicate()
-                                                .map(pred -> fixupInclusionPredicate(
-                                                        pred,
-                                                        inScopeQuestionExtIds,
-                                                        t.v2.extIdPrefix())))));
+                                            .copyOf(q)
+                                            .withSurveyTemplateId(targetTemplateId)
+                                            .withId(Optional.empty())
+                                            .withSectionName(targetSection.name())
+                                            .withPosition(q.position() + (1000 * sectionNumber))
+                                            .withExternalId(q
+                                                    .externalId()
+                                                    .map(extId -> mkExtId(
+                                                            targetSection.extIdPrefix(),
+                                                            extId)))
+                                            .withInclusionPredicate(q
+                                                    .inclusionPredicate()
+                                                    .map(pred -> fixupInclusionPredicate(
+                                                            pred,
+                                                            inScopeQuestionExtIds,
+                                                            targetSection.extIdPrefix())))));
                 })
                 .collect(Collectors.toSet());
     }

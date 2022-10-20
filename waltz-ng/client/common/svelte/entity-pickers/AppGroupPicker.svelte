@@ -1,8 +1,7 @@
 <script>
 
-    import Icon from "../../../../common/svelte/Icon.svelte";
-    import EntitySearchSelector from "../../../../common/svelte/EntitySearchSelector.svelte";
-    import {mkReportGridFixedColumnRef} from "../report-grid-utils";
+    import Icon from "../Icon.svelte";
+    import EntitySearchSelector from "../EntitySearchSelector.svelte";
 
     export let onSelect = () => console.log("Selecting app group");
     export let selectionFilter = () => true;
@@ -12,7 +11,7 @@
         if (e.detail == null) {
             return;
         }
-        onSelect(mkReportGridFixedColumnRef(e.detail));
+        return onSelect(e.detail);
     }
 
 
@@ -20,7 +19,7 @@
         if (d === null) {
             return true;
         } else {
-            return selectionFilter(mkReportGridFixedColumnRef(d));
+            return selectionFilter(d);
         }
     }
 

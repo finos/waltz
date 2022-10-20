@@ -17,7 +17,7 @@
 
 <script>
     import AssessmentDefinitionPicker
-        from "../../../../../report-grid/components/svelte/pickers/AssessmentDefinitionPicker.svelte";
+        from "../../../../../common/svelte/entity-pickers/AssessmentDefinitionPicker.svelte";
     import {getContext} from "svelte";
     import {assessmentRenderMode, Modes} from "./store";
     import moment from "moment";

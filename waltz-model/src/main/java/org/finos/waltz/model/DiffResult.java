@@ -1,4 +1,4 @@
-package org.finos.waltz.jobs.tools.importers;
+package org.finos.waltz.model;
 
 import org.finos.waltz.common.MapUtilities;
 import org.immutables.value.Value;
@@ -14,17 +14,20 @@ import java.util.stream.Collectors;
 public abstract class DiffResult<T> {
 
     public abstract Collection<T> intersection();
+
     public abstract Collection<T> otherOnly();
+
     public abstract Collection<T> waltzOnly();
+
     public abstract Collection<T> differingIntersection();
 
     public static <Z> DiffResult<Z> mkDiff(Collection<Z> waltzRecords,
                                            Collection<Z> otherRecords) {
         return mkDiff(
-            waltzRecords,
-            otherRecords,
-            Function.identity(),
-            Object::equals);
+                waltzRecords,
+                otherRecords,
+                Function.identity(),
+                Object::equals);
     }
 
 
@@ -72,11 +75,11 @@ public abstract class DiffResult<T> {
     @Override
     public String toString() {
         String s = String.format("%s - [Intersection: %s records, Other: %s records, Waltz: %s records, Differing Intersection: %s records]",
-            getClass().getName(),
-            intersection().size(),
-            otherOnly().size(),
-            waltzOnly().size(),
-            differingIntersection().size());
+                getClass().getName(),
+                intersection().size(),
+                otherOnly().size(),
+                waltzOnly().size(),
+                differingIntersection().size());
         return s;
     }
 }

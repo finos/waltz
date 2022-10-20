@@ -88,6 +88,7 @@ public class AggregateOverlayDiagramInstanceEndpoint implements Endpoint {
         getForList(findAllPath, findAllRoute);
         getForDatum(getByIdPath, getByIdRoute);
         postForDatum(createInstancePath, createInstanceRoute);
+
     }
 
     private void ensureUserHasEditRights(Request request) {

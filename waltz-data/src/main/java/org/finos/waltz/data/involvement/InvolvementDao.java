@@ -18,6 +18,7 @@
 
 package org.finos.waltz.data.involvement;
 
+import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.data.person.PersonDao;
@@ -34,11 +35,9 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -48,6 +47,7 @@ import static org.finos.waltz.schema.Tables.END_USER_APPLICATION;
 import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static org.finos.waltz.schema.tables.Person.PERSON;
 import static org.finos.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 
 
 @Repository
@@ -55,15 +55,28 @@ public class InvolvementDao {
 
     private final DSLContext dsl;
 
+    private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory
+            .mkNameField(
+                    INVOLVEMENT.ENTITY_ID,
+                    INVOLVEMENT.ENTITY_KIND,
+                    newArrayList(EntityKind.values()))
+            .as("entity_name");
+
     private final RecordMapper<Record, Involvement> TO_MODEL_MAPPER = r -> {
         InvolvementRecord involvementRecord = r.into(InvolvementRecord.class);
+
+        Optional<String> entityName = Optional.ofNullable(r.get(ENTITY_NAME_FIELD));
+
+        ImmutableEntityReference entityRef = ImmutableEntityReference.builder()
+                .kind(EntityKind.valueOf(involvementRecord.getEntityKind()))
+                .id(involvementRecord.getEntityId())
+                .name(entityName.orElse("Unknown"))
+                .build();
+
         return ImmutableInvolvement.builder()
                 .employeeId(involvementRecord.getEmployeeId())
                 .kindId(involvementRecord.getKindId())
-                .entityReference(ImmutableEntityReference.builder()
-                        .kind(EntityKind.valueOf(involvementRecord.getEntityKind()))
-                        .id(involvementRecord.getEntityId())
-                        .build())
+                .entityReference(entityRef)
                 .isReadOnly(involvementRecord.getIsReadonly())
                 .provenance(involvementRecord.getProvenance())
                 .build();
@@ -91,7 +104,9 @@ public class InvolvementDao {
 
 
     public List<Involvement> findByEntityReference(EntityReference ref) {
-        return dsl.select()
+        return dsl
+                .select(INVOLVEMENT.fields())
+                .select(ENTITY_NAME_FIELD)
                 .from(INVOLVEMENT)
                 .where(INVOLVEMENT.ENTITY_KIND.eq(ref.kind().name()))
                 .and(INVOLVEMENT.ENTITY_ID.eq(ref.id()))
@@ -109,6 +124,7 @@ public class InvolvementDao {
     public Collection<Involvement> findByGenericEntitySelector(GenericSelector genericSelector) {
         return dsl
                 .select(INVOLVEMENT.fields())
+                .select(ENTITY_NAME_FIELD)
                 .from(INVOLVEMENT)
                 .where(INVOLVEMENT.ENTITY_KIND.eq(genericSelector.kind().name()))
                 .and(INVOLVEMENT.ENTITY_ID.in(genericSelector.selector()))
@@ -117,7 +133,9 @@ public class InvolvementDao {
 
 
     public List<Involvement> findByEmployeeId(String employeeId) {
-        return dsl.select()
+        return dsl
+                .select(INVOLVEMENT.fields())
+                .select(ENTITY_NAME_FIELD)
                 .from(INVOLVEMENT)
                 .where(INVOLVEMENT.EMPLOYEE_ID.eq(employeeId))
                 .fetch(TO_MODEL_MAPPER);
@@ -136,7 +154,9 @@ public class InvolvementDao {
 
 
     public List<Involvement> findAllByEmployeeId(String employeeId) {
-        return dsl.select()
+        return dsl
+                .select(INVOLVEMENT.fields())
+                .select(ENTITY_NAME_FIELD)
                 .from(INVOLVEMENT)
                 .innerJoin(PERSON_HIERARCHY).on(INVOLVEMENT.EMPLOYEE_ID.eq(PERSON_HIERARCHY.EMPLOYEE_ID))
                 .where(PERSON_HIERARCHY.MANAGER_ID.eq(employeeId)
@@ -172,31 +192,25 @@ public class InvolvementDao {
             Select<Record1<Long>> entityIdSelector,
             Set<Long> involvementKindIds) {
 
-        Field<String> entityName = InlineSelectFieldFactory.mkNameField(
-                    INVOLVEMENT.ENTITY_ID,
-                    INVOLVEMENT.ENTITY_KIND,
-                    newArrayList(entityKind))
-                .as("entity_name");
-
         return dsl.selectDistinct()
                 .select(PERSON.fields())
                 .select(INVOLVEMENT.fields())
-                .select(entityName)
+                .select(ENTITY_NAME_FIELD)
                 .from(PERSON)
                 .innerJoin(INVOLVEMENT)
                 .on(INVOLVEMENT.EMPLOYEE_ID.eq(PERSON.EMPLOYEE_ID))
                 .where(PERSON.IS_REMOVED.isFalse()
                         .and(INVOLVEMENT.ENTITY_KIND.eq(entityKind.name())
-                            .and(INVOLVEMENT.ENTITY_ID.in(entityIdSelector)
-                                .and(INVOLVEMENT.KIND_ID.in(involvementKindIds)))))
+                                .and(INVOLVEMENT.ENTITY_ID.in(entityIdSelector)
+                                        .and(INVOLVEMENT.KIND_ID.in(involvementKindIds)))))
                 .fetch()
                 .stream()
                 .collect(groupingBy(
-                            r -> EntityReference.mkRef(
-                                    entityKind,
-                                    r.getValue(INVOLVEMENT.ENTITY_ID),
-                                    r.getValue(entityName)),
-                            mapping(PersonDao.personMapper::map, toList())));
+                        r -> EntityReference.mkRef(
+                                entityKind,
+                                r.getValue(INVOLVEMENT.ENTITY_ID),
+                                r.getValue(ENTITY_NAME_FIELD)),
+                        mapping(PersonDao.personMapper::map, toList())));
     }
 
 
@@ -302,4 +316,43 @@ public class InvolvementDao {
                         .and(id.isNull()));
     }
 
+    public Set<Involvement> findInvolvementsByKindAndEntityKind(Long invKindId, EntityKind entityKind) {
+        return dsl
+                .select(INVOLVEMENT.fields())
+                .select(ENTITY_NAME_FIELD)
+                .from(INVOLVEMENT)
+                .where(INVOLVEMENT.ENTITY_KIND.eq(entityKind.name())
+                        .and(INVOLVEMENT.KIND_ID.eq(invKindId)))
+                .fetchSet(TO_MODEL_MAPPER);
+    }
+
+    public int bulkStoreInvolvements(Set<Involvement> involvements) {
+        Set<InvolvementRecord> involvementRecords = SetUtilities.map(involvements, TO_RECORD_MAPPER);
+        int[] inserted = dsl.batchInsert(involvementRecords).execute();
+        return IntStream.of(inserted).sum();
+    }
+
+    public Set<Involvement> findByKindIdAndEntityKind(long id, EntityKind kind) {
+
+        return dsl
+                .select(INVOLVEMENT.fields())
+                .select(ENTITY_NAME_FIELD)
+                .from(INVOLVEMENT)
+                .where(INVOLVEMENT.KIND_ID.eq(id)
+                        .and(INVOLVEMENT.ENTITY_KIND.eq(kind.name())))
+                .fetchSet(TO_MODEL_MAPPER);
+    }
+
+    public int bulkDeleteInvolvements(Set<Involvement> involvements) {
+        int[] removedInvolvements = involvements
+                .stream()
+                .map(involvement -> dsl
+                        .deleteFrom(INVOLVEMENT)
+                        .where(INVOLVEMENT.ENTITY_KIND.eq(involvement.entityReference().kind().name())
+                                .and(INVOLVEMENT.ENTITY_ID.eq(involvement.entityReference().id()))
+                                .and(INVOLVEMENT.EMPLOYEE_ID.eq(involvement.employeeId()))
+                                .and(INVOLVEMENT.KIND_ID.eq(involvement.kindId()))))
+                .collect(collectingAndThen(toSet(), xs -> dsl.batch(xs).execute()));
+        return IntStream.of(removedInvolvements).sum();
+    }
 }

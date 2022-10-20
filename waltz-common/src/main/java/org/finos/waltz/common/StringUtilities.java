@@ -18,11 +18,15 @@
 
 package org.finos.waltz.common;
 
+import org.jooq.lambda.tuple.Tuple;
+
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.lang.String.format;
+import static java.util.stream.Collectors.joining;
 import static org.finos.waltz.common.Checks.checkAll;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static java.util.stream.Collectors.toList;
@@ -83,7 +87,7 @@ public class StringUtilities {
 
 
     public static boolean isNumericLong(String value) {
-        return ! isEmpty(value)
+        return !isEmpty(value)
                 && parseLong(value, null) != null;
     }
 
@@ -92,6 +96,10 @@ public class StringUtilities {
         return str == null
                 ? ""
                 : str;
+    }
+
+    public static String safeTrim(String str) {
+        return mkSafe(str).trim();
     }
 
 
@@ -234,9 +242,56 @@ public class StringUtilities {
             return null;
         } else {
             return str
-                    .replaceAll("", "-")
-                    .replaceAll("‐", "-");
+                    .replaceAll("[‐–—-]", "-")
+                    .replaceAll("[”“]", "\"")
+                    .replaceAll("[’‘]", "'")
+                    .replaceAll("​", "")
+                    .replaceAll("â€œ", "\"")
+                    .replaceAll("â€", "\"")
+                    .replaceAll("â€™", "'");
         }
+    }
+
+
+    /**
+     * Combines a display name and email address in accordance with mailbox standard defined in RFC5332.
+     * Example:
+     * <pre>
+     *     toMailbox("Fred Bloggs", "fred.blogs@mycorp.com")  //  "Fred Bloggs <fred.bloggs@mycorp.com>"
+     * </pre>
+     *
+     * @param displayName display name that indicates the name of the recipient (which can be a person or a system)
+     *                    that could be displayed to the user of a mail application,
+     * @param email       associated email address
+     * @return string formatted in accordance with mailbox spec
+     */
+    public static String toMailbox(String displayName, String email) {
+        return format("%s <%s>", displayName, email).trim();
+    }
+
+
+    public static String toHtmlTable(List<String> headers,
+                                     Collection<? extends Tuple> rows) {
+        String rowData = rows
+                .stream()
+                .map(row -> row
+                        .toList()
+                        .stream()
+                        .map(c -> c == null ? "-" : c.toString())
+                        .collect(joining("</td><td>", "<tr><td>", "</td></tr>")))
+                .sorted()
+                .collect(joining("\n"));
+
+        String header = headers
+                .stream()
+                .collect(joining("</th><th>", "<thead><tr><th>", "</th></tr></thead>"));
+
+        return "<table class='table table-condensed small'>" +
+                header +
+                "<tbody>" +
+                rowData +
+                "</tbody>" +
+                "</table>";
     }
 
 }
