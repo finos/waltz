@@ -428,14 +428,14 @@
     </changeSet>
 
 
-    <!--    <changeSet author="woodjes"-->
-    <!--               id="20221019-6219-1">-->
-    <!--        <comment>6219: Report Grid - rename rating_rollup_rule column to column_options</comment>-->
-    <!--        <renameColumn columnDataType="${enum.type}"-->
-    <!--                      newColumnName="additional_column_options"-->
-    <!--                      oldColumnName="rating_rollup_rule"-->
-    <!--                      tableName="report_grid_fixed_column_definition"/>-->
-    <!--    </changeSet>-->
+    <changeSet author="woodjes"
+               id="20221019-6219-1">
+        <comment>6219: Report Grid - rename rating_rollup_rule column to column_options</comment>
+        <renameColumn columnDataType="${enum.type}"
+                      newColumnName="additional_column_options"
+                      oldColumnName="rating_rollup_rule"
+                      tableName="report_grid_fixed_column_definition"/>
+    </changeSet>
 
 
     <changeSet author="woodjes"
@@ -453,7 +453,7 @@
 
     <changeSet author="woodjes"
                id="20221019-6261-2">
-        <comment>6219: Roles - add ACTOR_ADMIN system roles</comment>
+        <comment>6219: Report Grid - rename rating_rollup_rule column to column_options</comment>
         <update tableName="report_grid_fixed_column_definition">
             <column name="additional_column_options"
                     value="ROLLUP"/>
