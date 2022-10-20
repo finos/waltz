@@ -1,10 +1,9 @@
 <script>
 
-    import Grid from "../../../../common/svelte/Grid.svelte";
-    import Icon from "../../../../common/svelte/Icon.svelte";
-    import {costKindStore} from "../../../../svelte-stores/cost-kind-store";
+    import Grid from "../Grid.svelte";
+    import Icon from "../Icon.svelte";
+    import {costKindStore} from "../../../svelte-stores/cost-kind-store";
     import _ from "lodash";
-    import {mkReportGridFixedColumnRef} from "../report-grid-utils";
 
     export let onSelect = () => console.log("Selecting cost kind");
     export let selectionFilter = () => true;
@@ -14,7 +13,7 @@
 
     $: rowData = _
         .chain(costKinds)
-        .filter(d => selectionFilter(mkReportGridFixedColumnRef(d)))
+        .filter(selectionFilter)
         .orderBy(d => d.name)
         .value();
 
@@ -31,4 +30,4 @@
 <br>
 <Grid {columnDefs}
       {rowData}
-      onSelectRow={d => onSelect(mkReportGridFixedColumnRef(d))}/>
+      onSelectRow={onSelect}/>

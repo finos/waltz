@@ -22,405 +22,419 @@ export const entity = {
         name: "Actor",
         icon: "user-circle",
         description: null,
-        position: 10
+        position: 100
     },
     AGGREGATE_OVERLAY_DIAGRAM: {
         key: "AGGREGATE_OVERLAY_DIAGRAM",
         name: "Aggregate Overlay Diagram",
         icon: "object-group",
         description: null,
-        position: 15
+        position: 150
     },
     AGGREGATE_OVERLAY_DIAGRAM_INSTANCE: {
         key: "AGGREGATE_OVERLAY_DIAGRAM_INSTANCE",
         name: "Aggregate Overlay Diagram Instance",
         icon: "object-group",
         description: null,
-        position: 16
+        position: 160
     },
     ALLOCATION_SCHEME: {
         key: "ALLOCATION_SCHEME",
         name: "Allocation Scheme",
         icon: null,
         description: null,
-        position: 20
+        position: 200
     },
     APP_CAPABILITY: {
         key: "APP_CAPABILITY",
         name: "Application Function",
         icon: "puzzle-piece",
         description: null,
-        position: 20
+        position: 210
     },
     APP_GROUP: {
         key: "APP_GROUP",
         name: "Application Group",
         icon: "object-group",
         description: null,
-        position: 30
+        position: 300
     },
     APP_RATING: {
         key: "APP_RATING",
         name: "Application Rating",
         icon: "star-o",
         description: null,
-        position: 40
+        position: 400
     },
     APPLICATION: {
         key: "APPLICATION",
         name: "Application",
         icon: "desktop",
         description: null,
-        position: 50
+        position: 500
     },
     ASSET_COST: {
         key: "ASSET_COST",
         name: "Asset Cost",
         icon: "money",
         description: null,
-        position: 60
+        position: 600
     },
     ASSESSMENT_DEFINITION: {
         key: "ASSESSMENT_DEFINITION",
         name: "Assessment Definition",
         icon: "puzzle-piece",
         description: null,
-        position: 62
+        position: 620
     },
     ASSESSMENT_RATING: {
         key: "ASSESSMENT_RATING",
         name: "Assessment Rating",
         icon: "puzzle-piece",
         description: null,
-        position: 63
+        position: 630
     },
     ATTESTATION: {
         key: "ATTESTATION",
         name: "Attestation",
         icon: "check-square-o",
         description: null,
-        position: 65
+        position: 650
     },
     ATTESTATION_RUN: {
         key: "ATTESTATION_RUN",
         name: "Attestation Run",
         icon: "check-square-o",
         description: null,
-        position: 67
+        position: 670
     },
     BOOKMARK: {
         key: "BOOKMARK",
         name: "Bookmark",
         icon: "bookmark-o",
         description: null,
-        position: 80
+        position: 800
     },
     CHANGE_INITIATIVE: {
         key: "CHANGE_INITIATIVE",
         name: "Change Initiative",
         icon: "paper-plane-o",
         description: null,
-        position: 90
+        position: 900
     },
     CHANGE_SET: {
         key: "CHANGE_SET",
         name: "Change Set",
         icon: "hourglass-2",
         description: null,
-        position: 95
+        position: 950
     },
     CHANGE_UNIT: {
         key: "CHANGE_UNIT",
         name: "Change Unit",
         icon: "hourglass-2",
         description: null,
-        position: 96
+        position: 960
     },
     COST_KIND: {
         key: "COST_KIND",
         name: "Cost Kind",
         icon: "money",
         description: null,
-        position: 97
+        position: 970
     },
     COMPLEXITY_KIND: {
         key: "COMPLEXITY_KIND",
         name: "Complexity Kind",
         icon: "sort-numeric-asc",
         description: null,
-        position: 98
+        position: 980
     },
     DATABASE: {
         key: "DATABASE",
         name: "Database",
         icon: "database",
         description: null,
-        position: 100
+        position: 1000
     },
     DATA_TYPE: {
         key: "DATA_TYPE",
         name: "Data Type",
         icon: "qrcode",
         description: null,
-        position: 110
+        position: 1100
     },
     END_USER_APPLICATION: {
         key: "END_USER_APPLICATION",
         name: "End User App",
         icon: "table",
         description: null,
-        position: 120
+        position: 1200
     },
     ENTITY_ALIAS: {
         key: "ENTITY_ALIAS",
         name: "Entity Alias",
         icon: "id-badge",
         description: null,
-        position: 125
+        position: 1250
     },
     ENTITY_RELATIONSHIP: {
         key: "ENTITY_RELATIONSHIP",
         name: "Entity Relationship",
         icon: "link",
         description: null,
-        position: 125
+        position: 1260
     },
     ENTITY_STATISTIC: {
         key: "ENTITY_STATISTIC",
         name: "Statistic",
         icon: "pie-chart",
         description: null,
-        position: 130
+        position: 1300
     },
     EXTERNAL_IDENTIFIER: {
         key: "EXTERNAL_IDENTIFIER",
         name: "External Identifier",
         icon: "comments-o",
         description: null,
-        position: 135
+        position: 1350
     },
     FLOW_DIAGRAM: {
         key: "FLOW_DIAGRAM",
         name: "Flow Diagram",
         icon: "picture-o",
         description: null,
-        position: 140
+        position: 1400
     },
     FLOW_CLASSIFICATION_RULE: {
         key: "FLOW_CLASSIFICATION_RULE",
         name: "Flow Classification Rule",
         icon: "shield",
         description: null,
-        position: 145
+        position: 1450
     },
     INVOLVEMENT: {
         key: "INVOLVEMENT",
         name: "Involvement",
         icon: "share-alt-square",
         description: null,
-        position: 150
+        position: 1500
     },
     INVOLVEMENT_KIND: {
         key: "INVOLVEMENT_KIND",
         name: "Involvement Kind",
         icon: "share-alt-square",
         description: null,
-        position: 150
+        position: 1520
     },
     LICENCE: {
         key: "LICENCE",
         name: "Licence",
         icon: "id-card-o",
         description: null,
-        position: 153
+        position: 1530
     },
     LOGICAL_DATA_ELEMENT: {
         key: "LOGICAL_DATA_ELEMENT",
         name: "Logical Data Element",
         icon: "asterisk",
         description: null,
-        position: 155
+        position: 1550
     },
     LOGICAL_DATA_FLOW: {
         key: "LOGICAL_DATA_FLOW",
         name: "Logical Data Flow",
         icon: "random",
         description: null,
-        position: 160
+        position: 1600
     },
     ORG_UNIT: {
         key: "ORG_UNIT",
         name: "Org Unit",
         icon: "sitemap",
         description: null,
-        position: 170
+        position: 1700
     },
     MEASURABLE: {
         key: "MEASURABLE",
         name: "Viewpoint",
         icon: "puzzle-piece",
         description: null,
-        position: 180
+        position: 1800
     },
     MEASURABLE_CATEGORY: {
         key: "MEASURABLE_CATEGORY",
         name: "Viewpoint Category",
         icon: "puzzle-piece",
         description: null,
-        position: 185
+        position: 1850
     },
     MEASURABLE_RATING: {
         key: "MEASURABLE_RATING",
         name: "Viewpoint Rating",
         icon: undefined,
         description: null,
-        position: 190
+        position: 1900
     },
     MEASURABLE_RATING_PLANNED_DECOMMISSION: {
         key: "MEASURABLE_RATING_PLANNED_DECOMMISSION",
         name: "Viewpoint Rating Decommission",
         icon: undefined,
         description: null,
-        position: 195
+        position: 1950
     },
     MEASURABLE_RATING_REPLACEMENT: {
         key: "MEASURABLE_RATING_REPLACEMENT",
         name: "Viewpoint Rating Replacement Application",
         icon: undefined,
         description: null,
-        position: 196
+        position: 1960
     },
     PERSON: {
         key: "PERSON",
         name: "Person",
         icon: "user",
         description: null,
-        position: 200
+        position: 2000
     },
     PHYSICAL_SPECIFICATION: {
         key: "PHYSICAL_SPECIFICATION",
         name: "Physical Specification",
         icon: "file-text",
         description: null,
-        position: 210
+        position: 2100
     },
     PHYSICAL_FLOW: {
         key: "PHYSICAL_FLOW",
         name: "Physical Flow",
         icon: "qrcode",
         description: null,
-        position: 220
+        position: 2200
     },
     PROCESS: {
         key: "PROCESS",
         name: "Process",
         icon: "code-fork",
         description: null,
-        position: 230
+        position: 2300
     },
     PROCESS_DIAGRAM: {
         key: "PROCESS_DIAGRAM",
         name: "Process Diagram",
         icon: "cogs",
         description: null,
-        position: 231
+        position: 2310
     },
     REPORT_GRID: {
         key: "REPORT_GRID",
         name: "Report Grid",
         icon: "table",
         description: null,
-        position: 231
+        position: 2315
     },
     REPORT_GRID_DERIVED_COLUMN_DEFINITION: {
         key: "REPORT_GRID_DERIVED_COLUMN_DEFINITION",
         name: "Report Grid Derived Column Definition",
         icon: "cubes",
         description: null,
-        position: 232
+        position: 2320
     },
     REPORT_GRID_FIXED_COLUMN_DEFINITION: {
         key: "REPORT_GRID_FIXED_COLUMN_DEFINITION",
         name: "Report Grid Fixed Column Definition",
         icon: "cube",
         description: null,
-        position: 233
+        position: 2330
     },
     ROADMAP: {
         key: "ROADMAP",
         name: "Roadmap",
         icon: "road",
         description: null,
-        position: 235
+        position: 2350
     },
     ROLE: {
         key: "ROLE",
         name: "Role",
         icon: "key",
         description: null,
-        position: 236
+        position: 2360
     },
     SCENARIO: {
         key: "SCENARIO",
         name: "Scenario",
         icon: "picture-o",
         description: null,
-        position: 237
+        position: 2370
     },
     SERVER: {
         key: "SERVER",
         name: "Server",
         icon: "server",
         description: null,
-        position: 240
+        position: 2400
     },
     SOFTWARE: {
         key: "SOFTWARE",
         name: "Software",
         icon: "gift",
         description: null,
-        position: 250
+        position: 2500
     },
     SURVEY: {
         key: "SURVEY",
         name: "Survey",
         icon: "wpforms",
         description: null,
-        position: 255
+        position: 2550
     },
     SURVEY_INSTANCE: {
         key: "SURVEY_INSTANCE",
         name: "Survey Instance",
         icon: "wpforms",
         description: null,
-        position: 257
+        position: 2570
     },
     SURVEY_QUESTION: {
         key: "SURVEY_QUESTION",
         name: "Survey Question",
         icon: "question-circle-o",
         description: null,
-        position: 258
+        position: 2580
     },
     SURVEY_TEMPLATE: {
         key: "SURVEY_TEMPLATE",
         name: "Survey Template",
         icon: "wpforms",
         description: null,
-        position: 259
+        position: 2590
+    },
+    SURVEY_INSTANCE_OWNER: {
+        key: "SURVEY_INSTANCE_OWNER",
+        name: "Survey Instance Owner",
+        icon: "user",
+        description: null,
+        position: 2593
+    },
+    SURVEY_INSTANCE_RECIPIENT: {
+        key: "SURVEY_INSTANCE_RECIPIENT",
+        name: "Survey Instance Recipient",
+        icon: "users",
+        description: null,
+        position: 2596
     },
     SYSTEM: {
         key: "SYSTEM",
         name: "System",
         icon: "gears",
         description: null,
-        position: 260
+        position: 2600
     },
     TAG: {
         key: "TAG",
         name: "Tag",
         icon: "tags",
         description: null,
-        position: 270
+        position: 2700
     }
 };

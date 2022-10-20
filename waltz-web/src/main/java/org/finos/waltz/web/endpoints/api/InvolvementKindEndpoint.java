@@ -18,6 +18,8 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.involvement_kind.InvolvementKindUsageStat;
 import org.finos.waltz.service.involvement_kind.InvolvementKindService;
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.WebUtilities;
@@ -37,6 +39,8 @@ import spark.Response;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.finos.waltz.web.WebUtilities.*;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
@@ -70,13 +74,17 @@ public class InvolvementKindEndpoint implements Endpoint {
 
         getForList(mkPath(BASE_URL, "key-involvement-kinds", ":kind"), this::findKeyInvolvementKindByEntityKind);
 
-        getForDatum(mkPath(BASE_URL, "id", ":id"), this::getByIdRoute );
+        getForList(mkPath(BASE_URL, "usage-stats"), this::loadUsageStats);
+        getForDatum(mkPath(BASE_URL, "usage-stats", "kind", ":id"), this::loadUsageStatsForKindRoute);
+
+        getForDatum(mkPath(BASE_URL, "id", ":id"), this::getByIdRoute);
+        getForDatum(mkPath(BASE_URL, "external-id", ":externalId"), this::getByExternalIdRoute);
 
         // create
-        postForDatum(mkPath(BASE_URL, "update"), this::createInvolvementKindRoute );
+        postForDatum(mkPath(BASE_URL, "update"), this::createInvolvementKindRoute);
 
         // save
-        putForDatum(mkPath(BASE_URL, "update"), this::updateInvolvementKindRoute );
+        putForDatum(mkPath(BASE_URL, "update"), this::updateInvolvementKindRoute);
 
         // delete
         deleteForDatum(mkPath(BASE_URL, ":id"), this::deleteInvolvementKindRoute);
@@ -89,8 +97,13 @@ public class InvolvementKindEndpoint implements Endpoint {
         return service.getById(id);
     }
 
+    private InvolvementKind getByExternalIdRoute(Request request, Response response) {
+        String externalId = request.params("externalId");
+        return service.getByExternalId(externalId);
+    }
 
-    private List<InvolvementKind> findKeyInvolvementKindByEntityKind (Request request, Response response) {
+
+    private List<InvolvementKind> findKeyInvolvementKindByEntityKind(Request request, Response response) {
         EntityKind entityKind = getKind(request);
         return service.findKeyInvolvementKindsByEntityKind(entityKind);
     }
@@ -128,6 +141,16 @@ public class InvolvementKindEndpoint implements Endpoint {
         LOG.info("User: {} removing Involvement Kind: {}", username, id);
 
         return service.delete(id);
+    }
+
+
+    private Set<InvolvementKindUsageStat> loadUsageStats(Request request, Response response) {
+        return service.loadUsageStats();
+    }
+
+
+    private InvolvementKindUsageStat loadUsageStatsForKindRoute(Request request, Response response) {
+        return service.loadUsageStatsForKind(getId(request));
     }
 
 

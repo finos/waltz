@@ -116,7 +116,8 @@ const unknownRating = {
 function getFixedColumnName(column) {
     let entityFieldName = _.get(column, ["entityFieldReference", "displayName"], null);
 
-    return _.chain([])
+    return _
+        .chain([])
         .concat(entityFieldName)
         .concat(column.columnName)
         .compact()
@@ -182,6 +183,7 @@ export function prepareColumnDefs(colDefs) {
                               popover-trigger="mouseenter"
                               popover-enable="COL_FIELD.comment != null"
                               popover-popup-delay="500"
+                              popover-class="waltz-popover-width-500"
                               popover-append-to-body="true"
                               popover-placement="left"
                               ng-style="{

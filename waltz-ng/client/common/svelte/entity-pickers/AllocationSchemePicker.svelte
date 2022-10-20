@@ -1,12 +1,11 @@
 <script>
 
-    import Grid from "../../../../common/svelte/Grid.svelte";
-    import Icon from "../../../../common/svelte/Icon.svelte";
+    import Grid from "../Grid.svelte";
+    import Icon from "../Icon.svelte";
     import _ from "lodash";
-    import {allocationSchemeStore} from "../../../../svelte-stores/allocation-scheme-store";
-    import {mkReportGridFixedColumnRef} from "../report-grid-utils";
+    import {allocationSchemeStore} from "../../../svelte-stores/allocation-scheme-store";
 
-    export let onSelect = () => console.log("Selecting complexity kind");
+    export let onSelect = () => console.log("Selecting allocation scheme kind");
     export let selectionFilter = () => true;
 
     $: allocationSchemesCall = allocationSchemeStore.findAll();
@@ -14,7 +13,7 @@
 
     $: rowData = _
         .chain(allocationSchemes)
-        .filter(d => selectionFilter(mkReportGridFixedColumnRef(d)))
+        .filter(selectionFilter)
         .orderBy(d => d.name)
         .value()
 
@@ -32,4 +31,4 @@
 <br>
 <Grid {columnDefs}
       {rowData}
-      onSelectRow={d => onSelect(mkReportGridFixedColumnRef(d))}/>
+      onSelectRow={onSelect}/>

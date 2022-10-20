@@ -1,6 +1,7 @@
 package org.finos.waltz.service.involvement;
 
 
+import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.service.involvement_kind.InvolvementKindService;
 import org.finos.waltz.service.person.PersonService;
 import org.finos.waltz.model.EntityReference;
@@ -10,10 +11,7 @@ import org.finos.waltz.model.person.Person;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toSet;
@@ -42,13 +40,8 @@ public class InvolvementViewService {
 
         List<Involvement> involvements = involvementService.findAllByEmployeeId(employeeId);
 
-
         Set<String> employeeIds = map(involvements, Involvement::employeeId);
-
-
         Set<Person> involvedPeople = personService.findByEmployeeIds(employeeIds);
-
-
         Map<String, Person> peopleByEmployeeId = indexBy(involvedPeople, Person::employeeId);
 
         return involvements
@@ -91,5 +84,27 @@ public class InvolvementViewService {
                 .involvement(involvement)
                 .person(person)
                 .build();
+    }
+
+    public Set<InvolvementViewItem> findByKindIdAndEntityKind(long id, EntityKind kind) {
+        Set<Involvement> involvements = involvementService.findByKindIdAndEntityKind(id, kind);
+
+        Set<String> employeeIds = map(involvements, Involvement::employeeId);
+        Set<Person> involvedPeople = personService.findByEmployeeIds(employeeIds);
+        Map<String, Person> peopleByEmployeeId = indexBy(involvedPeople, Person::employeeId);
+
+        return involvements
+                .stream()
+                .map(i -> {
+                    Person person = peopleByEmployeeId.get(i.employeeId());
+
+                    if (person == null) {
+                        return null;
+                    } else {
+                        return mkInvolvementViewItem(i, person);
+                    }
+                })
+                .filter(Objects::nonNull)
+                .collect(toSet());
     }
 }

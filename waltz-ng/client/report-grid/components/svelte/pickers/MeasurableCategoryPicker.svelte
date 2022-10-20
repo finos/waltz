@@ -45,12 +45,11 @@
     }
 
     function selectAllForCategory() {
-        const catCol = mkReportGridFixedColumnRef(selectedCategory);
-        const notSelected = selectionFilter(catCol);
+        const notSelected = selectionFilter(selectedCategory);
         if (notSelected) {
-            onSelect(catCol);
+            onSelect(selectedCategory);
         } else {
-            onDeselect(catCol);
+            onDeselect(selectedCategory);
         }
     }
 
@@ -75,7 +74,7 @@
                             onDeselect={m => onDeselect(mkMeasurableColumn(selectedCategory, m))}/>
     <button class="btn btn-skinny"
             on:click={selectAllForCategory}>
-        <Icon name={selectionFilter(mkReportGridFixedColumnRef(selectedCategory)) ? "square-o": "check-square-o"}/>
+        <Icon name={selectionFilter(selectedCategory) ? "square-o": "check-square-o"}/>
         Show all mappings to this category
     </button>
 

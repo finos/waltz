@@ -4,6 +4,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.finos.waltz.common.*;
+import org.finos.waltz.model.DiffResult;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.schema.tables.records.AssessmentRatingRecord;
 import org.finos.waltz.service.DIConfiguration;
