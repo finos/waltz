@@ -57,7 +57,6 @@ export const additionalColumnOptions = {
 
 
 export function determineDefaultColumnOptions(columnEntityKind) {
-    console.log({columnEntityKind});
     switch (columnEntityKind) {
         case "MEASURABLE":
             return additionalColumnOptions.PICK_HIGHEST;
@@ -67,20 +66,6 @@ export function determineDefaultColumnOptions(columnEntityKind) {
             return additionalColumnOptions.NONE;
     }
 }
-
-
-export const columnUsageKind = {
-    NONE: {
-        key: "NONE",
-        name: "None",
-
-    },
-    SUMMARY: {
-        key: "SUMMARY",
-        name: "Summary",
-
-    }
-};
 
 
 const nameCol = mkEntityLinkGridCell(

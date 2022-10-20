@@ -290,14 +290,14 @@
                                   constraintName="report_fixed_column_report_grid_fk"/>
     </changeSet>
 
-    <!--    <changeSet id="20220914-6221-20"-->
-    <!--               author="woodjes">-->
-    <!--        <comment>6221: Report Grid: Migrate column ids and position from fixed column to col defn table</comment>-->
-    <!--        <dropColumn tableName="report_grid_fixed_column_definition"-->
-    <!--                    columnName="report_grid_id"/>-->
-    <!--        <dropColumn tableName="report_grid_fixed_column_definition"-->
-    <!--                    columnName="position"/>-->
-    <!--    </changeSet>-->
+    <changeSet id="20220914-6221-20"
+               author="woodjes">
+        <comment>6221: Report Grid: Migrate column ids and position from fixed column to col defn table</comment>
+        <dropColumn tableName="report_grid_fixed_column_definition"
+                    columnName="report_grid_id"/>
+        <dropColumn tableName="report_grid_fixed_column_definition"
+                    columnName="position"/>
+    </changeSet>
 
     <changeSet id="20220914-6221-21"
                author="woodjes">
@@ -345,27 +345,27 @@
                                   constraintName="report_derived_column_report_grid_fk"/>
     </changeSet>
 
-    <!--    <changeSet id="20220518-6221-26"-->
-    <!--               author="woodjes">-->
-    <!--        <dropDefaultValue tableName="report_grid_derived_column_definition"-->
-    <!--                          columnName="position"/>-->
-    <!--    </changeSet>-->
+    <changeSet id="20220518-6221-26"
+               author="woodjes">
+        <dropDefaultValue tableName="report_grid_derived_column_definition"
+                          columnName="position"/>
+    </changeSet>
 
-    <!--    <changeSet id="20220914-6221-27"-->
-    <!--               author="woodjes">-->
-    <!--        <comment>6221: Report Grid: Migrate column ids and position from fixed column to col defn table</comment>-->
-    <!--        <dropIndex tableName="report_grid_derived_column_definition"-->
-    <!--                   indexName="idx_rgdcd_entity_ref_report_grid_id"/>-->
-    <!--    </changeSet>-->
+    <changeSet id="20220914-6221-27"
+               author="woodjes">
+        <comment>6221: Report Grid: Migrate column ids and position from fixed column to col defn table</comment>
+        <dropIndex tableName="report_grid_derived_column_definition"
+                   indexName="idx_rgdcd_entity_ref_report_grid_id"/>
+    </changeSet>
 
-    <!--    <changeSet id="20220914-6221-28"-->
-    <!--               author="woodjes">-->
-    <!--        <comment>6221: Report Grid: Migrate column ids and position from derived column to col defn table</comment>-->
-    <!--        <dropColumn tableName="report_grid_derived_column_definition"-->
-    <!--                    columnName="report_grid_id"/>-->
-    <!--        <dropColumn tableName="report_grid_derived_column_definition"-->
-    <!--                    columnName="position"/>-->
-    <!--    </changeSet>-->
+    <changeSet id="20220914-6221-28"
+               author="woodjes">
+        <comment>6221: Report Grid: Migrate column ids and position from derived column to col defn table</comment>
+        <dropColumn tableName="report_grid_derived_column_definition"
+                    columnName="report_grid_id"/>
+        <dropColumn tableName="report_grid_derived_column_definition"
+                    columnName="position"/>
+    </changeSet>
 
     <changeSet id="20220914-6221-29"
                author="woodjes">

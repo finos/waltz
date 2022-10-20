@@ -239,12 +239,10 @@ public class ReportGridDao {
                             : fixedCol.entityFieldReference().id().orElse(null);
 
                     ReportGridFixedColumnDefinitionRecord record = tx.newRecord(rgfcd);
-                    record.setReportGridId(gridId);
                     record.setGridColumnId(gridColId);
                     record.setColumnEntityId(fixedCol.columnEntityId());
                     record.setColumnEntityKind(fixedCol.columnEntityKind().name());
                     record.setAdditionalColumnOptions(fixedCol.additionalColumnOptions().name());
-                    record.setPosition(Long.valueOf(fixedCol.position()).intValue());
                     record.setDisplayName(fixedCol.displayName());
                     record.setColumnQualifierKind(Optional
                             .ofNullable(fixedCol.columnQualifierKind())
@@ -291,12 +289,10 @@ public class ReportGridDao {
 
                     ReportGridDerivedColumnDefinitionRecord record = tx.newRecord(rgdcd);
                     record.setGridColumnId(colId);
-                    record.setPosition(Long.valueOf(derivedCol.position()).intValue());
                     record.setDisplayName(derivedCol.displayName());
                     record.setExternalId(derivedCol.externalId().orElse(null));
                     record.setDerivationScript(derivedCol.derivationScript());
                     record.setColumnDescription(derivedCol.columnDescription());
-                    record.setReportGridId(gridId);
                     return record;
                 })
                 .collect(collectingAndThen(toSet(), d -> tx.batchInsert(d).execute()));
@@ -912,7 +908,7 @@ public class ReportGridDao {
 
         Forest<String, Long> forest = toForest(allNodesForCell);
 
-        List<String> comment = asList("<ul>\n");
+        List<String> comment = asList("<ul class=\"list-unstyled\" type=\"disc\">\n");
 
         forest.getRootNodes()
                 .forEach(root -> {
@@ -929,7 +925,7 @@ public class ReportGridDao {
     private void addNodeToComment(List<String> comment, Node<String, Long> node) {
         comment.add(format("<li>%s", node.getData()));
         if (!node.getChildren().isEmpty()) {
-            comment.add("<ul>");
+            comment.add("<ul type=\"disc\">");
             node.getChildren()
                     .forEach(c -> addNodeToComment(comment, c));
             comment.add("</ul>");
