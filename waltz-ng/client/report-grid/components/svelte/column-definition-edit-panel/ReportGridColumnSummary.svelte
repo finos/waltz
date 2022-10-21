@@ -62,11 +62,13 @@
     }
 
     function determineColumnName(column) {
-        if (column.displayName) {
-            return column.displayName;
-        } else {
-            return mkColumnName(column);
-        }
+        const name = column.displayName
+            ? column.displayName
+            : mkColumnName(column);
+
+        return column.externalId
+            ? `${name} (${column.externalId})`
+            : name;
     }
 
 </script>
@@ -85,7 +87,7 @@
             </colgroup>
             <thead>
             <tr>
-                <th>Entity</th>
+                <th>Column (external id)</th>
                 <th colspan="4">Position</th>
                 <th colspan="2">Actions</th>
             </tr>
@@ -124,24 +126,24 @@
                             </span>
                     </td>
                     <td>
-                            <span style="text-align: center">
-                                <button class="btn btn-skinny waltz-visibility-child-50"
-                                        title="move down"
-                                        disabled={column.position === _.maxBy($columnDefs, d => d.position)?.position}
-                                        on:click={() => moveDown(column)}>
-                                    <Icon name="arrow-down"/>
-                                </button>
-                            </span>
+                        <span style="text-align: center">
+                            <button class="btn btn-skinny waltz-visibility-child-50"
+                                    title="move down"
+                                    disabled={column.position === _.maxBy($columnDefs, d => d.position)?.position}
+                                    on:click={() => moveDown(column)}>
+                                <Icon name="arrow-down"/>
+                            </button>
+                        </span>
                     </td>
                     <td>
-                            <span style="text-align: center">
-                                <button class="btn btn-skinny waltz-visibility-child-50"
-                                        title="move to bottom"
-                                        disabled={column.position === _.maxBy($columnDefs, d => d.position)?.position}
-                                        on:click={() => moveToBottom(column)}>
-                                    <Icon name="step-forward" rotate="90"/>
-                                </button>
-                            </span>
+                        <span style="text-align: center">
+                            <button class="btn btn-skinny waltz-visibility-child-50"
+                                    title="move to bottom"
+                                    disabled={column.position === _.maxBy($columnDefs, d => d.position)?.position}
+                                    on:click={() => moveToBottom(column)}>
+                                <Icon name="step-forward" rotate="90"/>
+                            </button>
+                        </span>
                     </td>
                     <td>
                         <button class="btn btn-skinny waltz-visibility-child-50"

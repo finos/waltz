@@ -53,7 +53,8 @@ public class ReportGridEvaluatorNamespace {
     public boolean anyCellsProvided(String... cellExtIds) {
         checkAllCellsExist(cellExtIds);
 
-        return Stream.of(cellExtIds)
+        return Stream
+                .of(cellExtIds)
                 .map(ctx::get)
                 .filter(Objects::nonNull)
                 .filter(d -> d instanceof CellVariable)
@@ -65,7 +66,8 @@ public class ReportGridEvaluatorNamespace {
     public boolean allCellsProvided(String... cellExtIds) {
         checkAllCellsExist(cellExtIds);
 
-        return Stream.of(cellExtIds)
+        return Stream
+                .of(cellExtIds)
                 .map(ctx::get)
                 .allMatch(c -> Objects.nonNull(c) && !hasErrors(c));
     }
@@ -86,7 +88,8 @@ public class ReportGridEvaluatorNamespace {
 
         checkAllCellsExist(cellExtIds);
 
-        long foundColumns = Stream.of(cellExtIds)
+        long foundColumns = Stream
+                .of(cellExtIds)
                 .map(ctx::get)
                 .filter(c -> Objects.nonNull(c) && !hasErrors(c))
                 .count();
