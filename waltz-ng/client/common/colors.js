@@ -294,3 +294,15 @@ export function determineForegroundColor(r, g, b) {
         ? "rgba(50, 50, 50, 0.9)"
         : "rgba(255, 255, 255, 0.9)";
 }
+
+
+function componentToHex(c) {
+    const hex = c.toString(16);
+    return hex.length === 1
+        ? "0"+hex
+        : hex;
+}
+
+export function rgbToHex(r,g,b) {
+    return `#${componentToHex(r)}${componentToHex(g)}${componentToHex(b)}`
+}

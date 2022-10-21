@@ -3,30 +3,19 @@
     import {scaleLinear} from "d3-scale";
     import {color} from "d3-color";
     import ColorPicker from "../../system/svelte/ratings-schemes/ColorPicker.svelte";
-
-    function componentToHex(c) {
-        const hex = c.toString(16);
-        return hex.length === 1
-            ? "0"+hex
-            : hex;
-    }
-
-    function rgbToHex(r,g,b) {
-        return `#${componentToHex(r)}${componentToHex(g)}${componentToHex(b)}`
-    }
-
-    function swap() {
-        console.log("Swap")
-        const temp = startColor;
-        startColor = endColor;
-        endColor = temp;
-    }
+    import {rgbToHex} from "../../common/colors";
 
     let rows = [];
     let howMany = 5;
     let colors = null;
     let startColor = "#5bb65d";
     let endColor = "#dae714";
+
+    function swap() {
+        const temp = startColor;
+        startColor = endColor;
+        endColor = temp;
+    }
 
     $: colors = scaleLinear()
         .domain([0, howMany])
@@ -38,8 +27,7 @@
             colorRgb,
             colorHex: rgbToHex(colorRgb.r, colorRgb.g, colorRgb.b)
         };
-    })
-
+    });
 </script>
 
 <div class="row">
