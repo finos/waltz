@@ -290,14 +290,14 @@
                                   constraintName="report_fixed_column_report_grid_fk"/>
     </changeSet>
 
-    <!--    <changeSet id="20220914-6221-20"-->
-    <!--               author="woodjes">-->
-    <!--        <comment>6221: Report Grid: Migrate column ids and position from fixed column to col defn table</comment>-->
-    <!--        <dropColumn tableName="report_grid_fixed_column_definition"-->
-    <!--                    columnName="report_grid_id"/>-->
-    <!--        <dropColumn tableName="report_grid_fixed_column_definition"-->
-    <!--                    columnName="position"/>-->
-    <!--    </changeSet>-->
+    <changeSet id="20220914-6221-20"
+               author="woodjes">
+        <comment>6221: Report Grid: Migrate column ids and position from fixed column to col defn table</comment>
+        <dropColumn tableName="report_grid_fixed_column_definition"
+                    columnName="report_grid_id"/>
+        <dropColumn tableName="report_grid_fixed_column_definition"
+                    columnName="position"/>
+    </changeSet>
 
     <changeSet id="20220914-6221-21"
                author="woodjes">
@@ -345,27 +345,27 @@
                                   constraintName="report_derived_column_report_grid_fk"/>
     </changeSet>
 
-    <!--    <changeSet id="20220518-6221-26"-->
-    <!--               author="woodjes">-->
-    <!--        <dropDefaultValue tableName="report_grid_derived_column_definition"-->
-    <!--                          columnName="position"/>-->
-    <!--    </changeSet>-->
+    <changeSet id="20220518-6221-26"
+               author="woodjes">
+        <dropDefaultValue tableName="report_grid_derived_column_definition"
+                          columnName="position"/>
+    </changeSet>
 
-    <!--    <changeSet id="20220914-6221-27"-->
-    <!--               author="woodjes">-->
-    <!--        <comment>6221: Report Grid: Migrate column ids and position from fixed column to col defn table</comment>-->
-    <!--        <dropIndex tableName="report_grid_derived_column_definition"-->
-    <!--                   indexName="idx_rgdcd_entity_ref_report_grid_id"/>-->
-    <!--    </changeSet>-->
+    <changeSet id="20220914-6221-27"
+               author="woodjes">
+        <comment>6221: Report Grid: Migrate column ids and position from fixed column to col defn table</comment>
+        <dropIndex tableName="report_grid_derived_column_definition"
+                   indexName="idx_rgdcd_entity_ref_report_grid_id"/>
+    </changeSet>
 
-    <!--    <changeSet id="20220914-6221-28"-->
-    <!--               author="woodjes">-->
-    <!--        <comment>6221: Report Grid: Migrate column ids and position from derived column to col defn table</comment>-->
-    <!--        <dropColumn tableName="report_grid_derived_column_definition"-->
-    <!--                    columnName="report_grid_id"/>-->
-    <!--        <dropColumn tableName="report_grid_derived_column_definition"-->
-    <!--                    columnName="position"/>-->
-    <!--    </changeSet>-->
+    <changeSet id="20220914-6221-28"
+               author="woodjes">
+        <comment>6221: Report Grid: Migrate column ids and position from derived column to col defn table</comment>
+        <dropColumn tableName="report_grid_derived_column_definition"
+                    columnName="report_grid_id"/>
+        <dropColumn tableName="report_grid_derived_column_definition"
+                    columnName="position"/>
+    </changeSet>
 
     <changeSet id="20220914-6221-29"
                author="woodjes">
@@ -445,6 +445,63 @@
         <sql>
             create unique index idx_inv_kind_ext_id_uniq
                 on involvement_kind (external_id) where external_id is not null
+        </sql>
+    </changeSet>
+
+
+    <changeSet author="woodjes"
+               id="20221019-6219-1">
+        <comment>6219: Report Grid - rename rating_rollup_rule column to column_options</comment>
+        <renameColumn columnDataType="${enum.type}"
+                      newColumnName="additional_column_options"
+                      oldColumnName="rating_rollup_rule"
+                      tableName="report_grid_fixed_column_definition"/>
+    </changeSet>
+
+
+    <changeSet author="woodjes"
+               id="20221019-6261-1">
+        <comment>6219: Roles - add ACTOR_ADMIN system roles</comment>
+        <insert tableName="role">
+            <column name="key" value="ACTOR_ADMIN"/>
+            <column name="name" value="Actor Admin"/>
+            <column name="description" value="Users can maintain actors through admin screens"/>
+            <column name="is_custom" valueBoolean="false"/>
+            <column name="user_selectable" valueBoolean="true"/>
+        </insert>
+    </changeSet>
+
+
+    <changeSet author="woodjes"
+               id="20221019-6261-2">
+        <comment>6219: Report Grid - rename rating_rollup_rule column to column_options</comment>
+        <update tableName="report_grid_fixed_column_definition">
+            <column name="additional_column_options"
+                    value="ROLLUP"/>
+            <where>column_entity_kind='DATA_TYPE' AND additional_column_options IN ('PICK_HIGHEST', 'PICK_LOWEST')
+            </where>
+        </update>
+    </changeSet>
+
+    <changeSet author="woodjes"
+               id="20221019-6261-3"
+               dbms="postgresql,h2">
+        <comment>6219: Entity Named Note - create unique index on external id</comment>
+        <createIndex indexName="idx_entity_named_note_type_ext_id"
+                     tableName="entity_named_note_type"
+                     unique="true">
+            <column name="external_id" type="${external-id.type}"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet author="woodjes"
+               id="20221019-6261-4"
+               dbms="mssql">
+        <comment>6219: Entity Named Note - create unique index on external id</comment>
+        <sql>
+            CREATE UNIQUE NONCLUSTERED INDEX idx_entity_named_note_type_ext_id
+                ON [entity_named_note_type] ([external_id])
+                WHERE [external_id] IS NOT NULL;
         </sql>
     </changeSet>
 

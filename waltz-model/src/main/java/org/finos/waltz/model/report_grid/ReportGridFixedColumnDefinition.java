@@ -36,8 +36,8 @@ public abstract class ReportGridFixedColumnDefinition implements ExternalIdProvi
     public abstract int position();
 
     @Value.Default
-    public RatingRollupRule ratingRollupRule() {
-        return RatingRollupRule.NONE;
+    public AdditionalColumnOptions additionalColumnOptions() {
+        return AdditionalColumnOptions.NONE;
     }
 
     @Nullable
