@@ -112,7 +112,6 @@ public class ReportGridFilterViewService {
         EntityNamedNote note = first(filterNotesForGroup);
         ReportGridFilterInfo gridFilterInfo = getGridFilterInfo(gridsByExternalId, appGroupId, note.noteText());
 
-
         if (gridFilterInfo == null) {
             throw new IllegalArgumentException("Cannot get filter grid info from note text");
         } else {
@@ -185,7 +184,6 @@ public class ReportGridFilterViewService {
             //If there are no filters all the apps should populate the group
             return SetUtilities.map(cellData, ReportGridCell::subjectId);
         } else {
-
             Map<Long, RatingSchemeItem> ratingSchemeItemByIdMap = indexBy(ratingSchemeItems, d -> d.id().get());
 
             Map<Long, Collection<ReportGridCell>> dataByCol = groupBy(cellData, ReportGridCell::columnDefinitionId);
@@ -214,13 +212,11 @@ public class ReportGridFilterViewService {
 
     private Set<Long> determineAppsPassingContainsStringFilter(GridFilter filter,
                                                                Collection<ReportGridCell> cellDataForColumn) {
-        Set<Long> cellsPassingFilters = cellDataForColumn
+        return cellDataForColumn
                 .stream()
                 .filter(c -> notEmpty(c.textValue()) && containsAny(filter.filterValues(), c.textValue()))
                 .map(ReportGridCell::subjectId)
                 .collect(Collectors.toSet());
-
-        return cellsPassingFilters;
     }
 
 
@@ -252,7 +248,6 @@ public class ReportGridFilterViewService {
                 })
                 .map(ReportGridCell::subjectId)
                 .collect(Collectors.toSet());
-
 
         if (filter.filterValues().contains(NOT_PROVIDED_OPTION_CODE)) {
             Set<Long> subjectIdsWithValues = SetUtilities.map(cellDataForColumn, ReportGridCell::subjectId);
