@@ -33,13 +33,25 @@ export function stopPropagation(e) {
  */
 export function preventDefault(e) {
     e.returnValue = false;
-    if(e.preventDefault)  e.preventDefault();
+    if (e.preventDefault) e.preventDefault();
 }
 
 
 export function isIE() {
     const match = navigator.userAgent.search(/(?:Edge|MSIE|Trident\/.*; rv:)/);
     return match !== -1;
+}
+
+
+export function copyTextToClipboard(text) {
+    if (navigator.clipboard) {
+        return navigator.clipboard.writeText(text)
+            .then(() => console.log("Copied to clipboard successfully!"))
+            .catch(() => console.error("Unable to write to clipboard. :-("));
+    } else if (window.clipboardData) { // Internet Explorer
+        window.clipboardData.setData("Text", text);
+        return Promise.resolve();
+    }
 }
 
 

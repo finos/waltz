@@ -54,9 +54,9 @@
                 acc.values.push({height: h, start: acc.start});
                 return Object.assign(
                     acc,
-                    { start: acc.start + h, end: acc.start + h} );
+                    {start: acc.start + h, end: acc.start + h});
             },
-            { values: [], start: 0, end: 0 })
+            {values: [], start: 0, end: 0})
         .thru(d => d.values)
         .value();
 
@@ -71,7 +71,7 @@
     }
 
     function calcRowOffset(rowIdx, itemHeight, headerHeight) {
-        if (rowIdx === 0){
+        if (rowIdx === 0) {
             return 0;
         } else {
             const start = rowHeights[rowIdx].start;
@@ -128,28 +128,28 @@
     </style>
 
     <g>
-    {#each chunked as nodes, i}
-        {#each nodes as node, j}
-            <g transform={`translate(${j * (nodeWidth + 10)}, ${calcRowOffset(i, itemHeight, headerHeight)})`}>
-                <rect width={nodeWidth}
-                      height={rowHeights[i].height * itemHeight + (i > 0 ? headerHeight : 0)}
-                      fill="#fafafa"/>
-                <foreignObject width={nodeWidth}
-                               height="100%">
-                    <div class="group-title">
-                        <a href="data-types/{node.id}">{simplifyName(node.name)}</a>
-                    </div>
-                    <ul class="l2-list">
-                        {#each _.orderBy(node.children, c => c.name) as child}
-                            <li>
-                                <a href="{link}/{child.id}">{simplifyName(child.name)}</a>
-                            </li>
-                        {/each}
-                    </ul>
-                </foreignObject>
+        {#each chunked as nodes, i}
+            {#each nodes as node, j}
+                <g transform={`translate(${j * (nodeWidth + 10)}, ${calcRowOffset(i, itemHeight, headerHeight)})`}>
+                    <rect width={nodeWidth}
+                          height={rowHeights[i].height * itemHeight + (i > 0 ? headerHeight : 0)}
+                          fill="#fafafa"/>
+                    <foreignObject width={nodeWidth}
+                                   height="100%">
+                        <div class="group-title">
+                            <a href="data-types/{node.id}">{simplifyName(node.name)}</a>
+                        </div>
+                        <ul class="l2-list">
+                            {#each _.orderBy(node.children, c => c.name) as child}
+                                <li>
+                                    <a href="{link}/{child.id}">{simplifyName(child.name)}</a>
+                                </li>
+                            {/each}
+                        </ul>
+                    </foreignObject>
 
-            </g>
+                </g>
+            {/each}
         {/each}
-    {/each}
     </g>
 </svg>

@@ -259,16 +259,15 @@ public class StringUtilities {
      * <pre>
      *     toMailbox("Fred Bloggs", "fred.blogs@mycorp.com")  //  "Fred Bloggs <fred.bloggs@mycorp.com>"
      * </pre>
+     *
      * @param displayName display name that indicates the name of the recipient (which can be a person or a system)
      *                    that could be displayed to the user of a mail application,
-     * @param email  associated email address
-     * @return  string formatted in accordance with mailbox spec
+     * @param email       associated email address
+     * @return string formatted in accordance with mailbox spec
      */
     public static String toMailbox(String displayName, String email) {
         return format("%s <%s>", displayName, email).trim();
     }
-
-
 
 
     public static String toHtmlTable(List<String> headers,

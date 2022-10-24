@@ -139,22 +139,22 @@ public class SurveyDupe {
                             .map(q -> tuple(
                                     q.id().get(),
                                     ImmutableSurveyQuestion
-                                        .copyOf(q)
-                                        .withSurveyTemplateId(targetTemplateId)
-                                        .withId(Optional.empty())
-                                        .withSectionName(targetSection.name())
-                                        .withPosition(q.position() + (1000 * sectionNumber))
-                                        .withExternalId(q
-                                                .externalId()
-                                                .map(extId -> mkExtId(
-                                                        targetSection.extIdPrefix(),
-                                                        extId)))
-                                        .withInclusionPredicate(q
-                                                .inclusionPredicate()
-                                                .map(pred -> fixupInclusionPredicate(
-                                                        pred,
-                                                        inScopeQuestionExtIds,
-                                                        targetSection.extIdPrefix())))));
+                                            .copyOf(q)
+                                            .withSurveyTemplateId(targetTemplateId)
+                                            .withId(Optional.empty())
+                                            .withSectionName(targetSection.name())
+                                            .withPosition(q.position() + (1000 * sectionNumber))
+                                            .withExternalId(q
+                                                    .externalId()
+                                                    .map(extId -> mkExtId(
+                                                            targetSection.extIdPrefix(),
+                                                            extId)))
+                                            .withInclusionPredicate(q
+                                                    .inclusionPredicate()
+                                                    .map(pred -> fixupInclusionPredicate(
+                                                            pred,
+                                                            inScopeQuestionExtIds,
+                                                            targetSection.extIdPrefix())))));
                 })
                 .collect(Collectors.toSet());
     }

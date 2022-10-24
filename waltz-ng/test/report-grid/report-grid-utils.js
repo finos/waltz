@@ -1,10 +1,3 @@
-import {
-    determineDefaultRollupRule,
-    ratingRollupRule
-} from "../../client/report-grid/components/svelte/report-grid-utils";
-import {assert} from "chai";
-
-
 describe("report-grid/report-grid-utils", () => {
     describe("determineDefaultRollupRule", () => {
         it("determine best rollup rule for a given column entity", () => {
