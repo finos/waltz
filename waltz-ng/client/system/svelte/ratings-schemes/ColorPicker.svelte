@@ -1,9 +1,32 @@
 <script>
     import {createEventDispatcher} from 'svelte';
+    import {
+        amberHex,
+        blueHex,
+        goldHex,
+        greenHex,
+        greyHex,
+        lightGreyHex,
+        pinkHex,
+        purpleHex,
+        redHex, yellowHex
+    } from "../../../common/colors";
 
     const dispatch = createEventDispatcher();
 
-    export let predefinedColors = [];
+    export let predefinedColors = [
+        greyHex,
+        lightGreyHex,
+        greenHex,
+        blueHex,
+        purpleHex,
+        redHex,
+        pinkHex,
+        goldHex,
+        amberHex,
+        yellowHex
+    ];
+
     export let startColor;
 
     $: selectedColor = startColor;

@@ -11,6 +11,8 @@
     import NoData from "../../../../common/svelte/NoData.svelte";
     import {columnDefs, hasChanged, lastMovedColumn, selectedColumn, selectedGrid,} from "../report-grid-store";
     import ColumnRemovalConfirmation from "./ColumnRemovalConfirmation.svelte";
+    import Markdown from "../../../../common/svelte/Markdown.svelte";
+    import {derivedColumnHelpText} from "./column-definition-utils";
 
 
     export let gridId;
@@ -299,6 +301,8 @@
                           rows="6"
                           placeholder="Enter script here"
                           bind:value={workingDerivedCol.derivationScript}/>
+                <br>
+                <Markdown text={derivedColumnHelpText}/>
             </div>
             <span>
                 <button class="btn btn-skinny"

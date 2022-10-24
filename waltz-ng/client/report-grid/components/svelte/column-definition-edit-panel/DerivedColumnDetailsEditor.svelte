@@ -3,11 +3,14 @@
     import {sameColumnRef} from "../report-grid-utils";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import {columnDefs, selectedGrid} from "../report-grid-store";
-    import ColumnDefinitionHeader from "./ColumnDefinitionHeader.svelte";
+    import ColumnDefinitionHeader from "./ColumnDefinitionHeader.svelte"
+    import Markdown from "../../../../common/svelte/Markdown.svelte";
+    import {derivedColumnHelpText} from "./column-definition-utils";
 
     export let column;
     export let onCancel = () => console.log("Close");
     export let onRemove = () => console.log("Remove");
+
 
     let working = {
         id: column.id,
@@ -18,18 +21,6 @@
 
     function cancelEdit() {
         onCancel();
-    }
-
-
-    $: {
-        if (column && column.id !== working.id) {
-            working = {
-                id: column.id,
-                displayName: column.displayName,
-                externalId: column.externalId,
-                derivationScript: column.derivationScript
-            }
-        }
     }
 
     function updateDisplayName(workingDisplayName, column) {
@@ -69,6 +60,17 @@
             })
         const columnsWithoutCol = _.reject($columnDefs, d => sameColumnRef(d, column));
         $columnDefs = _.concat(columnsWithoutCol, newColumn);
+    }
+
+    $: {
+        if (column && column.id !== working.id) {
+            working = {
+                id: column.id,
+                displayName: column.displayName,
+                externalId: column.externalId,
+                derivationScript: column.derivationScript
+            }
+        }
     }
 
 </script>
@@ -125,6 +127,8 @@
                       on:change={() => updateDerivationScript(working.derivationScript, column)}
                       placeholder="Enter script here"
                       bind:value={working.derivationScript}/>
+            <br>
+            <Markdown text={derivedColumnHelpText}/>
         </td>
     </tr>
     </tbody>
