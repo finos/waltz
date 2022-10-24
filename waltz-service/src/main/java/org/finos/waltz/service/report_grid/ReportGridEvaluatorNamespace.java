@@ -27,13 +27,16 @@ public class ReportGridEvaluatorNamespace {
         this.definition = definition;
     }
 
+
     public void setContext(Map<String, Object> ctx) {
         this.ctx = ctx;
     }
 
+
     public void addContext(String key, Object value) {
         ctx.put(key, value);
     }
+
 
     public Object cell(String cellExtId) {
         Object object = ctx.get(cellExtId);
@@ -44,6 +47,7 @@ public class ReportGridEvaluatorNamespace {
             return object;
         }
     }
+
 
     public Map<String, Object> getContext() {
         return ctx;
@@ -57,11 +61,11 @@ public class ReportGridEvaluatorNamespace {
                 .of(cellExtIds)
                 .map(ctx::get)
                 .filter(Objects::nonNull)
-                .filter(d -> d instanceof CellVariable)
-                .map(d -> (CellVariable) d)
+                .map(d -> (ReportGridCell) d)
                 .filter(d -> StringUtilities.isEmpty(d.errorValue())) // any cells remove cells with error!
                 .anyMatch(d -> true);
     }
+
 
     public boolean allCellsProvided(String... cellExtIds) {
         checkAllCellsExist(cellExtIds);
@@ -72,6 +76,7 @@ public class ReportGridEvaluatorNamespace {
                 .allMatch(c -> Objects.nonNull(c) && !hasErrors(c));
     }
 
+
     public BigDecimal ratioProvided(String... cellExtIds) {
 
         BigDecimal ratio = calcRatio(cellExtIds);
@@ -79,6 +84,7 @@ public class ReportGridEvaluatorNamespace {
                 ? null
                 : ratio.setScale(2, RoundingMode.HALF_UP);
     }
+
 
     private BigDecimal calcRatio(String[] cellExtIds) {
 
@@ -104,12 +110,14 @@ public class ReportGridEvaluatorNamespace {
                 .divide(totalColumns, 4, RoundingMode.HALF_UP);
     }
 
+
     public BigDecimal percentageProvided(String... cellExtIds) {
         BigDecimal ratio = calcRatio(cellExtIds);
         return ratio.equals(BigDecimal.ZERO)
                 ? null
                 : ratio.multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP);
     }
+
 
     private boolean hasErrors(Object c) {
         if (c instanceof ReportGridCell) {
@@ -120,9 +128,11 @@ public class ReportGridEvaluatorNamespace {
         }
     }
 
+
     public CellResult mkResult(String value, String optionText, String optionCode) {
         return CellResult.mkResult(value, optionText, optionCode);
     }
+
 
     public CellResult mkResult(String value) {
         return CellResult.mkResult(value, value, sanitizeString(value));
@@ -132,6 +142,7 @@ public class ReportGridEvaluatorNamespace {
     private void checkAllCellsExist(String... requiredCellExtIds) {
         checkAllCellsExist(asSet(requiredCellExtIds));
     }
+
 
     private void checkAllCellsExist(Set<String> requiredCellExtIds) {
         Set<String> availableCellExtIds = union(

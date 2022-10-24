@@ -122,8 +122,6 @@ public class ReportGridFilterViewService {
         }
     }
 
-    ;
-
 
     public void generateAppGroupsFromFilter() {
         LOG.info("Starting filter group population");

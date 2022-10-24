@@ -295,7 +295,7 @@
                 <strong>Derivation Script</strong>
                 <div class="small help-text">Calculates the value to be displayed in this column.
                 </div>
-                <textarea class="form-control"
+                <textarea class="form-control code"
                           required
                           id="derivationScript"
                           rows="6"
@@ -319,3 +319,9 @@
         {/if}
     </div>
 </div>
+
+<style>
+    .code {
+        font-family: monospace;
+    }
+</style>

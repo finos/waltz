@@ -135,7 +135,8 @@ public class ReportGridUtilities {
         Map<String, Long> columnsDefinitionIdByName;
 
         try {
-            columnsDefinitionIdByName = indexBy(grid.fixedColumnDefinitions(),
+            columnsDefinitionIdByName = indexBy(
+                    grid.fixedColumnDefinitions(),
                     r -> r.entityFieldReference() == null
                             ? sanitizeString(r.columnName())
                             : sanitizeString(format("%s/%s", r.entityFieldReference().displayName(), r.columnName())),

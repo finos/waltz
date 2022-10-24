@@ -120,7 +120,7 @@
             <div class="small help-text">Calculates the value to be displayed in this column</div>
         </td>
         <td>
-            <textarea class="form-control"
+            <textarea class="form-control code"
                       required
                       id="derivationScript"
                       rows="6"
@@ -143,3 +143,10 @@
         on:click={() => onRemove(column)}>
     <Icon name="trash"/>Delete
 </button>
+
+
+<style>
+    .code {
+        font-family: monospace;
+    }
+</style>
