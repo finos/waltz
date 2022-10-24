@@ -36,6 +36,10 @@ public class MeasurableHelper {
 
 
     public long createMeasurableCategory(String name) {
+        return createMeasurableCategory(name, null);
+    }
+
+    public long createMeasurableCategory(String name, String ratingEditorRole) {
         Set<MeasurableCategory> categories = categoryService.findByExternalId(name);
         return CollectionUtilities
                 .maybeFirst(categories)
@@ -49,7 +53,10 @@ public class MeasurableHelper {
                     record.setRatingSchemeId(schemeId);
                     record.setLastUpdatedBy("admin");
                     record.setLastUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
-                    record.setEditable(false);
+                    record.setEditable(true);
+                    if (ratingEditorRole != null) {
+                        record.setRatingEditorRole(ratingEditorRole);
+                    }
                     record.store();
                     return record.getId();
                 });

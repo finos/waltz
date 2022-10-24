@@ -45,9 +45,17 @@ function store($http, BaseApiUrl) {
 
 
     const findPeopleByEntityReference = (kind, id) => {
-        const ref = _.isObject(kind) ? kind : { id, kind };
+        const ref = _.isObject(kind) ? kind : {id, kind};
 
         return $http.get(`${BASE}/entity/${ref.kind}/${ref.id}/people`)
+            .then(result => result.data);
+    };
+
+
+    const findExistingInvolvementKindIdsForUser = (kind, id) => {
+        const ref = _.isObject(kind) ? kind : {id, kind};
+
+        return $http.get(`${BASE}/entity/${ref.kind}/${ref.id}/user`)
             .then(result => result.data);
     };
 
@@ -87,6 +95,7 @@ function store($http, BaseApiUrl) {
         findBySelector,
         findPeopleByEntityReference,
         findPeopleBySelector,
+        findExistingInvolvementKindIdsForUser,
         changeInvolvement,
         countOrphanInvolvementsForKind,
         cleanupOrphansForKind
@@ -110,6 +119,11 @@ export const InvolvementStore_API = {
         serviceName,
         serviceFnName: "findByEntityReference",
         description: "find involvements by entity reference"
+    },
+    findExistingInvolvementKindIdsForUser: {
+        serviceName,
+        serviceFnName: "findExistingInvolvementKindIdsForUser",
+        description: "find involvement kind ids by entity reference for user"
     },
     findBySelector: {
         serviceName,

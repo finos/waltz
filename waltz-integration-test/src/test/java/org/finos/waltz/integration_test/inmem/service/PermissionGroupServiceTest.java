@@ -10,6 +10,7 @@ import org.finos.waltz.model.permission_group.ImmutableCheckPermissionCommand;
 import org.finos.waltz.model.permission_group.Permission;
 import org.finos.waltz.schema.tables.records.InvolvementGroupRecord;
 import org.finos.waltz.schema.tables.records.PermissionGroupRecord;
+import org.finos.waltz.service.involvement.InvolvementService;
 import org.finos.waltz.service.permission.PermissionGroupService;
 import org.finos.waltz.test_common.helpers.*;
 import org.jooq.DSLContext;
@@ -50,6 +51,8 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
     @Autowired
     private InvolvementHelper involvementHelper;
 
+    @Autowired
+    private InvolvementService involvementService;
 
     @Autowired
     private PermissionGroupHelper permissionHelper;
@@ -144,18 +147,22 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
         // this creates the attestation involvement
         permissionHelper.setupSpecificPermissionGroupForApp(appA, privKind, stem);
 
-        Set<Permission> userHasNoExtraPermissions = permissionGroupService.findPermissionsForParentReference(appA, u1);
-        Map<EntityKind, Permission> permissionsByKind = indexBy(userHasNoExtraPermissions, Permission::subjectKind);
+        Set<Permission> permissions = permissionGroupService.findPermissionsForParentReference(appA, u1);
+        Set<Long> invsForUserNoPerms = involvementService.findExistingInvolvementKindIdsForUser(appA, u1);
+        Set<Permission> noAdditionalAllowedPerms = filter(permissions, p -> p.requiredInvolvementsResult().isAllowed(invsForUserNoPerms));
+        Map<EntityKind, Permission> permissionsByKind = indexBy(noAdditionalAllowedPerms, Permission::subjectKind);
 
-        assertEquals(emptySet(), userHasNoExtraPermissions, "user has override group so should have no default permissions");
+        assertEquals(emptySet(), noAdditionalAllowedPerms, "user has override group so should have no default permissions");
 
         Permission logicalFlowPermission = permissionsByKind.get(EntityKind.LOGICAL_DATA_FLOW);
         assertNull(logicalFlowPermission, "u1 should have no permissions for data flows as doesn't have the all involvements required");
 
         involvementHelper.createInvolvement(u1Id, privKind, appA);
+        Set<Long> invsForUserWithPerms = involvementService.findExistingInvolvementKindIdsForUser(appA, u1);
+        Set<Permission> additionalAllowedPerms = filter(permissions, p -> p.requiredInvolvementsResult().isAllowed(invsForUserWithPerms));
 
         Set<Permission> withExtraPermissions = filter(
-                permissionGroupService.findPermissionsForParentReference(appA, u1),
+                additionalAllowedPerms,
                 p -> p.operation() == Operation.ATTEST);
 
         assertEquals(

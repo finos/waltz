@@ -102,6 +102,7 @@ public class InvolvementService {
 
 
     public Set<Long> findExistingInvolvementKindIdsForUser(EntityReference entityReference, String username) {
+        checkNotNull(entityReference, "entityReference cannot be empty");
         checkNotEmpty(username, "username cannot be empty");
         return involvementDao.findExistingInvolvementKindIdsForUser(entityReference, username);
     }
