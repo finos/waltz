@@ -117,5 +117,12 @@ public class MeasurableRatingPermissionCheckerTest extends BaseInMemoryIntegrati
                 hasOverrideRoleForCategory,
                 "Returns all edit perms where user has the override role on the category");
 
+        EntityReference appB = appHelper.createNewApp(mkName(stem, "appB"), ouIds.b);
+        Set<Operation> overRideRoleGivesAllEditPermsOnAnyApp = measurableRatingPermissionChecker.findMeasurableRatingPermissions(appB, m2, u1);
+        assertEquals(
+                SetUtilities.asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE),
+                overRideRoleGivesAllEditPermsOnAnyApp,
+                "Override role provides edit permissions on all applications");
+
     }
 }
