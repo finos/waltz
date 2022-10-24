@@ -7,6 +7,8 @@
     import AssessmentRatingListGroup from "./AssessmentRatingListGroup.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
     import {assessments} from "../section/assessment-rating-section";
+    import SearchInput from "../../../common/svelte/SearchInput.svelte";
+    import {termSearch} from "../../../common";
 
 
     let elem;
@@ -19,6 +21,8 @@
     let expansions;
     let userPreferences = null;
     let userPreferenceCall;
+    let qry;
+    let groupedAssessments;
 
     export let primaryEntityRef = [];
     export let onSelect = (d) => console.log("selected", d);
@@ -104,8 +108,12 @@
         }
     }
 
+    $: visibleAssessments = _.isEmpty(qry)
+        ? $assessments
+        : termSearch($assessments, qry, ["definition.name", "ratingItem.name"]);
+
     $: groupedAssessments = _
-        .chain($assessments)
+        .chain(visibleAssessments)
         .groupBy(d => d.definition?.definitionGroup)
         .map((v, k) => {
 
@@ -124,7 +132,6 @@
         .orderBy([d => d.groupName === "Uncategorized", d => d.groupName])
         .value();
 
-
     $: {
         if (stores) {
             $defaultPrimaryList = _
@@ -141,7 +148,7 @@
 <div class="row">
 
     <div class="col-sm-12">
-
+        <SearchInput bind:value={qry}/>
         <table class="table table-hover table-condensed">
             <colgroup>
                 <col width="10%"/>
