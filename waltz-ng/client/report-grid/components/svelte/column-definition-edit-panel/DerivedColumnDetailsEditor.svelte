@@ -69,7 +69,7 @@
                 displayName: column.displayName,
                 externalId: column.externalId,
                 derivationScript: column.derivationScript
-            }
+            };
         }
     }
 
