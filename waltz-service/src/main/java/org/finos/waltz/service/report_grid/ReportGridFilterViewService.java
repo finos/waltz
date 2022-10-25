@@ -151,31 +151,37 @@ public class ReportGridFilterViewService {
     private Tuple2<Long, Set<AppGroupEntry>> determineApplicationsInGroup(ReportGridFilterInfo d) {
         EntityKind subjectKind = d.gridDefinition().subjectKind();
 
-        ReportGridInstance instance = reportGridService.mkInstance(
+        Optional<ReportGrid> maybeGrid = reportGridService.getByIdAndSelectionOptions(
                 d.gridDefinition().id().get(),
-                d.idSelectionOptions(),
-                subjectKind);
+                d.idSelectionOptions());
 
-        Set<ReportGridCell> cellData = instance.cellData();
+        return maybeGrid
+            .map(grid -> {
+                ReportGridInstance instance = grid.instance();
+                Set<ReportGridCell> cellData = instance.cellData();
 
-        Set<Long> subjectIds = SetUtilities.map(instance.subjects(), s -> s.entityReference().id());
+                Set<Long> subjectIds = SetUtilities.map(
+                        instance.subjects(),
+                        s -> s.entityReference().id());
 
-        Set<Long> subjectsPassingFilters = applyFilters(
-                cellData,
-                d.gridFilters(),
-                subjectIds,
-                instance.ratingSchemeItems());
+                Set<Long> subjectsPassingFilters = applyFilters(
+                        cellData,
+                        d.gridFilters(),
+                        subjectIds,
+                        instance.ratingSchemeItems());
 
-        Set<AppGroupEntry> appGroupEntries = SetUtilities.map(
-                subjectsPassingFilters,
-                id -> ImmutableAppGroupEntry
-                        .builder()
-                        .id(id)
-                        .kind(subjectKind)
-                        .isReadOnly(true)
-                        .build());
+                Set<AppGroupEntry> appGroupEntries = SetUtilities.map(
+                        subjectsPassingFilters,
+                        id -> ImmutableAppGroupEntry
+                                .builder()
+                                .id(id)
+                                .kind(subjectKind)
+                                .isReadOnly(true)
+                                .build());
 
-        return tuple(d.appGroupId(), appGroupEntries);
+                return tuple(d.appGroupId(), appGroupEntries);
+            })
+            .orElseThrow(() -> new IllegalStateException("Cannot create grid instance with params" + d));
     }
 
 
@@ -186,7 +192,7 @@ public class ReportGridFilterViewService {
 
         if (isEmpty(gridFilters)) {
             //If there are no filters all the apps should populate the group
-            return SetUtilities.map(cellData, ReportGridCell::subjectId);
+            return subjectIds;
         } else {
             Map<Long, RatingSchemeItem> ratingSchemeItemByIdMap = indexBy(ratingSchemeItems, d -> d.id().get());
 

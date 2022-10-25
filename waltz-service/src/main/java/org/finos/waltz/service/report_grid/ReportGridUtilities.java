@@ -158,10 +158,10 @@ public class ReportGridUtilities {
                     .collect(toMap(
                         t -> t.v2,
                         t -> t.v1));
-            Set<GridFilter> filters = filterRows
+
+            return filterRows
                     .stream()
                     .map(r -> {
-
                         String columnString = r.get(0);
                         String filterOperator = r.get(1);
                         String values = r.get(2);
@@ -173,11 +173,10 @@ public class ReportGridUtilities {
                             LOG.info(format("Cannot find column '%s' on grid. Skipping this filter", columnName));
                             return null;
                         } else {
-
                             Optional<FilterOperator> operator = FilterOperator.parseString(filterOperator);
-
                             return operator
-                                    .map(op -> ImmutableGridFilter.builder()
+                                    .map(op -> ImmutableGridFilter
+                                            .builder()
                                             .columnDefinitionId(columnDefnId)
                                             .filterOperator(op)
                                             .filterValues(getFilterValues(values))
@@ -192,9 +191,6 @@ public class ReportGridUtilities {
                     })
                     .filter(Objects::nonNull)
                     .collect(Collectors.toSet());
-
-            System.out.println(filters);
-            return filters;
 
         } catch (Exception e) {
             LOG.error("Could not fetch grid filters, grid cannot have multiple columns with the same name");
