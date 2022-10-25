@@ -255,7 +255,13 @@ public class ReportGridService {
         return reportGridDao.getGridDefinitionById(gridId);
     }
 
+
     public Set<AdditionalColumnOptions> findAdditionalColumnOptionsForKind(EntityKind kind) {
         return AdditionalColumnOptions.findAllowedKinds(kind);
+    }
+
+
+    public ReportGridDefinition getGridDefinitionByExtId(String gridExtId) {
+        return reportGridDao.getGridDefinitionByExternalId(gridExtId);
     }
 }
