@@ -72,9 +72,9 @@
                             class="clickable"
                             on:click={() => onSelect(grid)}>
                             <td>
-                                <a class="force-wrap">
+                                <button class="btn-skinny force-wrap">
                                     <Icon name={determineSubjectIcon(grid?.subjectKind)}/> {grid?.name}
-                                </a>
+                                </button>
                             </td>
                             <td class="force-wrap"
                                 title={grid?.description}>

@@ -18,8 +18,6 @@
 
 package org.finos.waltz.service.app_group;
 
-import org.finos.waltz.service.change_initiative.ChangeInitiativeService;
-import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.common.Checks;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.data.app_group.AppGroupDao;
@@ -29,7 +27,10 @@ import org.finos.waltz.data.app_group.AppGroupOrganisationalUnitDao;
 import org.finos.waltz.data.application.ApplicationDao;
 import org.finos.waltz.data.entity_relationship.EntityRelationshipDao;
 import org.finos.waltz.data.orgunit.OrganisationalUnitDao;
-import org.finos.waltz.model.*;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.ImmutableEntityReference;
+import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.app_group.*;
 import org.finos.waltz.model.application.Application;
 import org.finos.waltz.model.changelog.ChangeLog;
@@ -39,6 +40,8 @@ import org.finos.waltz.model.entity_relationship.ImmutableEntityRelationship;
 import org.finos.waltz.model.entity_relationship.RelationshipKind;
 import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.finos.waltz.model.orgunit.OrganisationalUnit;
+import org.finos.waltz.service.change_initiative.ChangeInitiativeService;
+import org.finos.waltz.service.changelog.ChangeLogService;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,7 +54,6 @@ import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.append;
 import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 
 @Service
 public class AppGroupService {
@@ -441,7 +443,7 @@ public class AppGroupService {
     }
 
 
-    private void verifyUserCanUpdateGroup(String userId, long groupId) throws InsufficientPrivelegeException {
+    public void verifyUserCanUpdateGroup(String userId, long groupId) throws InsufficientPrivelegeException {
         if (!appGroupMemberDao.canUpdate(groupId, userId)) {
             throw new InsufficientPrivelegeException(userId + " cannot update group: " + groupId);
         }

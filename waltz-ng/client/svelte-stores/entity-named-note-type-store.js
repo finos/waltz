@@ -27,8 +27,16 @@ export function mkEntityNamedNoteTypeStore() {
             [],
             {force});
 
+    const findForRefAndUser = (ref, force = false) => remote
+        .fetchViewList(
+            "GET",
+            `api/entity-named-note-type/by-ref/${ref.kind}/${ref.id}`,
+            [],
+            {force});
+
     return {
         getByExternalId,
+        findForRefAndUser
     };
 }
 

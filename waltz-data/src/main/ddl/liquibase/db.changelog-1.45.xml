@@ -505,5 +505,26 @@
         </sql>
     </changeSet>
 
+    <changeSet id="20221025-6228-1"
+               author="davidwatkins73">
+        <insert tableName="entity_named_note_type">
+            <column name="applicable_entity_kinds" value="APP_GROUP"/>
+            <column name="name" value="Report Grid Filter Preset"/>
+            <column name="description" value=" which drives population of an app group based on running a grid with a set of filters"/>
+            <column name="is_readonly" valueBoolean="false"/>
+            <column name="position" valueNumeric="0"/>
+            <column name="external_id" value="WALTZ_REPORT_GRID_FILTER_PRESET"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="20221025-6228-2"
+               author="davidwatkins73">
+        <insert tableName="settings">
+            <column name="name" value="REPORT_GRID_RECALCULATE_APP_GROUPS_FROM_FILTERS"/>
+            <column name="value" value="COMPLETED"/>
+            <column name="restricted" valueBoolean="false"/>
+            <column name="description" value="Repopulates app groups based on any report grid filter notes associated with them"/>
+        </insert>
+    </changeSet>
 
 </databaseChangeLog>

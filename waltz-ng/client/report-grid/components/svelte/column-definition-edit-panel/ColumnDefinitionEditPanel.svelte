@@ -32,17 +32,15 @@
     let workingDerivedCol = {
         displayName: null,
         derivationScript: null,
-        externalId: null,
-        columnDescription: null
-    }
+        externalId: null
+    };
 
     function clearWorking() {
         workingDerivedCol = {
             displayName: null,
             derivationScript: null,
-            externalId: null,
-            columnDescription: null
-        }
+            externalId: null
+        };
     }
 
     function onSelect(d) {
@@ -87,7 +85,6 @@
             kind: "REPORT_GRID_DERIVED_COLUMN_DEFINITION",
             columnEntityKind: "REPORT_GRID_DERIVED_COLUMN_DEFINITION",
             displayName: workingDerivedCol.displayName,
-            columnDescription: workingDerivedCol.columnDescription,
             externalId: workingDerivedCol.externalId,
             derivationScript: workingDerivedCol.derivationScript,
             position: 0
@@ -283,19 +280,10 @@
                        bind:value={workingDerivedCol.externalId}>
             </div>
             <div style="padding-bottom: 1em">
-                <strong>Description</strong>
-                <div class="small help-text">A description of this column.</div>
-                <input class="form-control"
-                       required
-                       id="description"
-                       placeholder="Description"
-                       bind:value={workingDerivedCol.columnDescription}>
-            </div>
-            <div style="padding-bottom: 1em">
                 <strong>Derivation Script</strong>
                 <div class="small help-text">Calculates the value to be displayed in this column.
                 </div>
-                <textarea class="form-control"
+                <textarea class="form-control code"
                           required
                           id="derivationScript"
                           rows="6"
@@ -319,3 +307,9 @@
         {/if}
     </div>
 </div>
+
+<style>
+    .code {
+        font-family: monospace;
+    }
+</style>
