@@ -13,6 +13,7 @@
     import {expandedSections, nestedEnums, physicalFlow} from "./physical-flow-editor-store";
     import Icon from "../../common/svelte/Icon.svelte";
     import {onMount} from "svelte";
+    import Markdown from "../../common/svelte/Markdown.svelte";
 
     let workingCopy = {};
     let transportKinds = [];
@@ -30,14 +31,16 @@
                 ? {basisOffset: offset.code}
                 : {basisOffset: "OTHER", customBasisOffset: offsetString}
 
-            workingCopy = Object.assign({}, $physicalFlow, offsetInfo)
+            workingCopy = Object.assign({}, $physicalFlow, offsetInfo);
+
         } else {
             workingCopy = {
                 transport: null,
                 frequency: null,
                 criticality: null,
                 basisOffset: "0",
-                description: ""
+                description: "",
+                externalId: null
             };
         }
     })
@@ -54,7 +57,9 @@
                 transport: workingCopy.transport,
                 frequency: workingCopy.frequency,
                 basisOffset,
-                criticality: workingCopy.criticality
+                criticality: workingCopy.criticality,
+                description: workingCopy.description,
+                externalId: workingCopy.externalId
             });
 
         openNextSection()
@@ -106,8 +111,18 @@
                         Frequency: {toFrequencyKindName($nestedEnums, $physicalFlow.frequency)}</li>
                     <li>
                         Criticality: {toCriticalityName($nestedEnums, $physicalFlow.criticality)}</li>
-                    <li>Basis
-                        Offset: {_.get(basisOffsetByCode, [$physicalFlow.basisOffset, "name"], $physicalFlow.basisOffset)}</li>
+                    <li>
+                        Basis
+                        Offset: {_.get(basisOffsetByCode, [$physicalFlow.basisOffset, "name"], $physicalFlow.basisOffset)}
+                    </li>
+                    <li>
+                        External ID: <span
+                        class:text-muted={!$physicalFlow.externalId}>{$physicalFlow.externalId || "Not provided"}</span>
+                    </li>
+                    <li>
+                        Description:
+                        <Markdown text={$physicalFlow.description}/>
+                    </li>
                 </ul>
             </div>
 

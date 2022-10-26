@@ -315,8 +315,59 @@ public class PhysicalSpecificationDao {
                     .select(requiredDecorators)
                     .execute();
 
+
+            removeUnknownFromLogicalFlowWherePossible(tx, specificationId, userName);
+
             return insertCount;
         });
+    }
+
+    private void removeUnknownFromLogicalFlowWherePossible(DSLContext tx, long specificationId, String userName) {
+
+        SelectHavingConditionStep<Record1<Long>> flowsWithOtherDataTypes = tx
+                .select(lfd.LOGICAL_FLOW_ID)
+                .from(lfd)
+                .innerJoin(lf).on(lf.ID.eq(lfd.LOGICAL_FLOW_ID))
+                .innerJoin(pf).on(pf.LOGICAL_FLOW_ID.eq(lf.ID))
+                .innerJoin(dt).on(dt.ID.eq(lfd.DECORATOR_ENTITY_ID))
+                .where(pf.SPECIFICATION_ID.eq(specificationId))
+                .and(dt.UNKNOWN.isFalse())
+                .and(lfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
+                .groupBy(lfd.LOGICAL_FLOW_ID)
+                .having(count(lfd.DECORATOR_ENTITY_ID).gt(0));
+
+        SelectConditionStep<Record1<Long>> unknownDecoratorsThatCanBeRemoved = tx.select(lfd.ID)
+                .from(lfd)
+                .innerJoin(dt).on(lfd.DECORATOR_ENTITY_ID.eq(dt.ID)
+                        .and(lfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())))
+                .where(lfd.LOGICAL_FLOW_ID.in(flowsWithOtherDataTypes))
+                .and(dt.UNKNOWN.isTrue());
+
+        SelectJoinStep<Record6<String, Long, String, String, String, String>> requiredChangeLogs = tx
+                .select(val(EntityKind.LOGICAL_DATA_FLOW.name()),
+                        flowsWithOtherDataTypes.field(0, Long.class), // logical flow id
+                        val("Removed 'Unknown' data type as known data types were propagated from underlying physical flow/s"),
+                        val(userName),
+                        val(Severity.INFORMATION.name()),
+                        val(Operation.REMOVE.name()))
+                .from(flowsWithOtherDataTypes);
+
+        int changelogsInserted = tx
+                .insertInto(CHANGE_LOG)
+                .columns(
+                        CHANGE_LOG.PARENT_KIND,
+                        CHANGE_LOG.PARENT_ID,
+                        CHANGE_LOG.MESSAGE,
+                        CHANGE_LOG.USER_ID,
+                        CHANGE_LOG.SEVERITY,
+                        CHANGE_LOG.OPERATION)
+                .select(requiredChangeLogs)
+                .execute();
+
+        int removedUnknowns = tx
+                .deleteFrom(lfd)
+                .where(lfd.ID.in(unknownDecoratorsThatCanBeRemoved))
+                .execute();
     }
 
 
