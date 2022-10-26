@@ -25,7 +25,8 @@
         <!-- SUMMARIES -->
         <waltz-svelte-component component="$ctrl.ReportGridControlPanel"
                                 on-grid-select="$ctrl.onGridSelect"
-                                on-save="$ctrl.onUpdateColumns">
+                                on-save="$ctrl.onUpdateColumns" ,
+                                primary-entity-ref="$ctrl.parentEntityRef">
         </waltz-svelte-component>
 
         <br>

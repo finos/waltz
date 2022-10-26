@@ -40,7 +40,7 @@
                 || _.get(d, ["columnName"], "?"),
             description: _.get(d, ["entityFieldReference", "description"])
                 || _.get(d, ["columnDescription"], "?"),
-        } ;
+        };
     }
 
     function onColSelect(d) {

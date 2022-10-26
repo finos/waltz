@@ -18,6 +18,7 @@
 
 package org.finos.waltz.common.hierarchy;
 
+import java.util.Objects;
 import java.util.Optional;
 
 
@@ -49,4 +50,16 @@ public class FlatNode<T, K> {
         return id;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FlatNode<?, ?> flatNode = (FlatNode<?, ?>) o;
+        return id.equals(flatNode.id) && data.equals(flatNode.data);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, data);
+    }
 }

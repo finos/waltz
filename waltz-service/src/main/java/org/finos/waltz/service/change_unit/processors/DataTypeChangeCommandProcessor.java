@@ -18,16 +18,16 @@
 
 package org.finos.waltz.service.change_unit.processors;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.finos.waltz.service.change_unit.AttributeChangeCommandProcessor;
-import org.finos.waltz.service.data_type.DataTypeDecoratorService;
-import org.finos.waltz.service.physical_flow.PhysicalFlowService;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.attribute_change.AttributeChange;
 import org.finos.waltz.model.change_unit.ChangeUnit;
+import org.finos.waltz.model.datatype.DataTypeDecorator;
 import org.finos.waltz.model.physical_flow.PhysicalFlow;
+import org.finos.waltz.service.change_unit.AttributeChangeCommandProcessor;
+import org.finos.waltz.service.data_type.DataTypeDecoratorService;
+import org.finos.waltz.service.physical_flow.PhysicalFlowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,13 +39,12 @@ import java.util.Set;
 import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkTrue;
+import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.finos.waltz.common.SetUtilities.minus;
 
 
 @Service
 public class DataTypeChangeCommandProcessor implements AttributeChangeCommandProcessor {
-
-    private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
 
     private final PhysicalFlowService physicalFlowService;
     private final DataTypeDecoratorService dataTypeDecoratorService;
@@ -70,8 +69,8 @@ public class DataTypeChangeCommandProcessor implements AttributeChangeCommandPro
 
     @Override
     public boolean apply(AttributeChange attributeChange,
-                                                               ChangeUnit changeUnit,
-                                                               String userName) {
+                         ChangeUnit changeUnit,
+                         String userName) {
         doBasicValidation(attributeChange, changeUnit, userName);
         checkTrue(changeUnit.subjectEntity().kind() == EntityKind.PHYSICAL_FLOW,
                 "Change Subject should be a Physical Flow");
@@ -86,7 +85,7 @@ public class DataTypeChangeCommandProcessor implements AttributeChangeCommandPro
         EntityReference specificationEntityRef = EntityReference.mkRef(EntityKind.PHYSICAL_SPECIFICATION, physicalFlow.specificationId());
         Set<Long> existing = dataTypeDecoratorService.findByEntityId(specificationEntityRef)
                 .stream()
-                .map(a -> a.dataTypeId())
+                .map(DataTypeDecorator::dataTypeId)
                 .collect(toSet());
 
         Set<Long> toAdd = minus(newValues, oldValues, existing);
@@ -102,12 +101,12 @@ public class DataTypeChangeCommandProcessor implements AttributeChangeCommandPro
 
     private Set<Long> readValue(String val) {
         try {
-            List<HashMap> list = JSON_MAPPER.readValue(val, List.class);
-            Set<Long> dataTypeId = list.stream()
+            List<HashMap> list = getJsonMapper().readValue(val, List.class);
+            return list
+                    .stream()
                     .map(hm -> hm.get("dataTypeId"))
                     .map(d -> Long.valueOf(d.toString()))
                     .collect(toSet());
-            return dataTypeId;
         } catch (IOException e) {
             return SetUtilities.asSet();
         }

@@ -15,37 +15,21 @@
  * See the License for the specific
  *
  */
-import {initialiseData} from "../../common/index";
-import template from "./playpen4.html";
-import ColorScale from "./ColorScale.svelte";
 
-const initialState = {
-    parentEntityRef: { kind: "ORG_UNIT", id: 2216 }, //10524
-    ColorScale
-};
+import {remote} from "./remote";
 
+export function mkEntityNamedNoteTypeStore() {
 
+    const getByExternalId = (externalId, force = false) => remote
+        .fetchViewDatum(
+            "GET",
+            `api/entity-named-note-type/external-id/${externalId}`,
+            [],
+            {force});
 
-function controller($q, serviceBroker) {
-
-    const vm = initialiseData(this, initialState);
-
+    return {
+        getByExternalId,
+    };
 }
 
-
-controller.$inject = [
-    "$q",
-    "ServiceBroker"
-];
-
-
-const view = {
-    template,
-    controller,
-    controllerAs: "$ctrl",
-    bindToController: true,
-    scope: {}
-};
-
-
-export default view;
+export const entityNamedNoteTypeStore = mkEntityNamedNoteTypeStore();

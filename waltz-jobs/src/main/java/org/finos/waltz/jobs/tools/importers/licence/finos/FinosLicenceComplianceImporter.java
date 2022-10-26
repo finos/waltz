@@ -18,10 +18,6 @@
 
 package org.finos.waltz.jobs.tools.importers.licence.finos;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.licence.LicenceDao;
@@ -46,6 +42,7 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.*;
 import static org.finos.waltz.common.Checks.checkNotEmpty;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.JacksonUtilities.getYamlMapper;
 import static org.finos.waltz.schema.tables.EntityNamedNote.ENTITY_NAMED_NOTE;
 import static org.finos.waltz.schema.tables.EntityNamedNoteType.ENTITY_NAMED_NOTE_TYPE;
 
@@ -64,19 +61,11 @@ public class FinosLicenceComplianceImporter {
 
     private final DSLContext dsl;
     private final LicenceDao licenceDao;
-    private final ObjectMapper mapper;
 
 
     public FinosLicenceComplianceImporter(DSLContext dsl, LicenceDao licenceDao) {
         this.dsl = dsl;
         this.licenceDao = licenceDao;
-
-        mapper = new ObjectMapper(new YAMLFactory());
-        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-        mapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
-        mapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
-        mapper.enable(DeserializationFeature.UNWRAP_SINGLE_VALUE_ARRAYS);
-        mapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
     }
 
 
@@ -151,8 +140,8 @@ public class FinosLicenceComplianceImporter {
                     );
 
                 })
-                .filter(o -> o.isPresent())
-                .map(o -> o.get())
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .collect(toList());
 
         int[] noteStoreExecute = dsl.batchStore(notes).execute();
@@ -318,8 +307,8 @@ public class FinosLicenceComplianceImporter {
             List<LicenceCompliance> compliances = paths
                     .filter(Files::isRegularFile)
                     .map(this::parseCompliance)
-                    .filter(l -> l.isPresent())
-                    .map(l -> l.get())
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
                     .collect(toList());
 
             System.out.printf("Parsed %s FINOS licence files \n", compliances.size());
@@ -330,11 +319,9 @@ public class FinosLicenceComplianceImporter {
 
     private Optional<LicenceCompliance> parseCompliance(Path path) {
         try {
-            System.out.println("Parsing: " + path);
-            LicenceCompliance compliance = mapper.readValue(path.toFile(), LicenceCompliance.class);
+            LicenceCompliance compliance = getYamlMapper().readValue(path.toFile(), LicenceCompliance.class);
             return Optional.of(compliance);
         } catch (IOException e) {
-            System.out.println(e);
             return Optional.empty();
         }
     }

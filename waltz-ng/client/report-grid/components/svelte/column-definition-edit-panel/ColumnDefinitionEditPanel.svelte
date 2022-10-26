@@ -2,7 +2,7 @@
     import EntitySelector from "./EntitySelector.svelte";
     import _ from "lodash";
     import ReportGridColumnSummary from "./ReportGridColumnSummary.svelte";
-    import {determineDefaultRollupRule, sameColumnRef} from "../report-grid-utils";
+    import {determineDefaultColumnOptions, sameColumnRef} from "../report-grid-utils";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import {reportGridStore} from "../../../../svelte-stores/report-grid-store";
     import toasts from "../../../../svelte-stores/toast-store";
@@ -11,7 +11,8 @@
     import NoData from "../../../../common/svelte/NoData.svelte";
     import {columnDefs, hasChanged, lastMovedColumn, selectedColumn, selectedGrid,} from "../report-grid-store";
     import ColumnRemovalConfirmation from "./ColumnRemovalConfirmation.svelte";
-    import {entity} from "../../../../common/services/enums/entity";
+    import Markdown from "../../../../common/svelte/Markdown.svelte";
+    import {derivedColumnHelpText} from "./column-definition-utils";
 
 
     export let gridId;
@@ -46,6 +47,8 @@
 
     function onSelect(d) {
 
+        const columnEntityKind = _.get(d, "columnEntityKind");
+
         //Only fixed columns are chosen through picker
         const column = {
             kind: "REPORT_GRID_FIXED_COLUMN_DEFINITION",
@@ -56,7 +59,7 @@
             columnQualifierId: d.columnQualifierId,
             columnName: d.columnName,
             columnDescription: d.columnDescription,
-            ratingRollupRule: determineDefaultRollupRule(d).key,
+            additionalColumnOptions: determineDefaultColumnOptions(columnEntityKind).key,
             displayName: d.displayName,
             position: 0
         };
@@ -135,7 +138,7 @@
                 columnEntityKind: d.columnEntityKind,
                 columnEntityId: d.columnEntityId,
                 position: d.position,
-                ratingRollupRule: d.ratingRollupRule,
+                additionalColumnOptions: d.additionalColumnOptions,
                 entityFieldReference: d.entityFieldReference,
                 displayName: d.displayName,
                 columnQualifierKind: d.columnQualifierKind,
@@ -298,6 +301,8 @@
                           rows="6"
                           placeholder="Enter script here"
                           bind:value={workingDerivedCol.derivationScript}/>
+                <br>
+                <Markdown text={derivedColumnHelpText}/>
             </div>
             <span>
                 <button class="btn btn-skinny"

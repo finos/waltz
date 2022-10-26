@@ -1,14 +1,18 @@
 <script>
     import DropdownPicker from "./DropdownPicker.svelte";
     import _ from "lodash";
-    import {columnUsageKind, ratingRollupRule, sameColumnRef} from "../report-grid-utils";
+    import {additionalColumnOptions, sameColumnRef} from "../report-grid-utils";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import {columnDefs, selectedGrid} from "../report-grid-store";
     import ColumnDefinitionHeader from "./ColumnDefinitionHeader.svelte";
+    import {reportGridStore} from "../../../../svelte-stores/report-grid-store";
 
     export let column;
     export let onCancel = () => console.log("Close");
     export let onRemove = () => console.log("Remove");
+
+    $: columnOptionsCall = reportGridStore.findAdditionalColumnOptionsForKind(column.columnEntityKind);
+    $: allowedColumnOptions = _.map($columnOptionsCall?.data, d => additionalColumnOptions[d]) || [additionalColumnOptions.NONE];
 
     let working = {
         id: column.id,
@@ -22,6 +26,7 @@
                 id: column.id,
                 displayName: column.displayName,
                 externalId: column.externalId,
+                additionalColumnOptions: column.additionalColumnOptions
             }
         }
     }
@@ -30,14 +35,14 @@
         onCancel();
     }
 
-    function selectRollupKind(rollupKind, column) {
+    function selectColumnOptions(columnOptions, column) {
         const originalColumn = _.find($selectedGrid.definition.fixedColumnDefinitions, d => sameColumnRef(d, column));
         const newColumn = Object.assign(
             {},
             column,
             {
-                ratingRollupRule: rollupKind?.key,
-                ratingRollupRuleChanged: rollupKind?.key !== originalColumn?.ratingRollupRule
+                additionalColumnOptions: columnOptions?.key,
+                additionalColumnOptionsChanged: columnOptions?.key !== originalColumn?.additionalColumnOptions
             })
         const columnsWithoutCol = _.reject($columnDefs, d => sameColumnRef(d, column));
         $columnDefs = _.concat(columnsWithoutCol, newColumn);
@@ -69,7 +74,6 @@
         $columnDefs = _.concat(columnsWithoutCol, newColumn);
     }
 
-    $: rollupKinds = _.values(ratingRollupRule);
 
 </script>
 
@@ -85,20 +89,16 @@
     <tbody>
     <tr>
         <td>
-            <div>Rating rollup rule</div>
+            <div>Additional Column Options</div>
             <div class="small help-text">
-                Describes the rating value to be displayed when aggregating for a hierarchy.
+                Select any additional column options used to determine the column value.
             </div>
         </td>
         <td>
-            {#if column?.columnEntityKind === 'MEASURABLE'}
-                <DropdownPicker items={rollupKinds}
-                                onSelect={(d) => selectRollupKind(d, column)}
-                                defaultMessage="Select rollup kind"
-                                selectedItem={ratingRollupRule[column.ratingRollupRule]}/>
-            {:else}
-                <span>{ratingRollupRule[column.ratingRollupRule].name}</span>
-            {/if}
+            <DropdownPicker items={allowedColumnOptions}
+                            onSelect={(d) => selectColumnOptions(d, column)}
+                            defaultMessage="Select additional column options"
+                            selectedItem={additionalColumnOptions[column.additionalColumnOptions]}/>
         </td>
     </tr>
     <tr>
