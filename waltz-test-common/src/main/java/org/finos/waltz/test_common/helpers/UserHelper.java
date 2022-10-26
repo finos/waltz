@@ -3,6 +3,7 @@ package org.finos.waltz.test_common.helpers;
 import org.finos.waltz.model.role.Role;
 import org.finos.waltz.model.user.ImmutableUpdateRolesCommand;
 import org.finos.waltz.model.user.ImmutableUserRegistrationRequest;
+import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.role.RoleService;
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.service.user.UserService;
@@ -28,8 +29,9 @@ public class UserHelper {
     private RoleService roleService;
 
     public void createRole(String role) {
+        Set<Role> allRoles = roleService.findAllRoles();
         Set<String> roles = map(
-                roleService.findAllRoles(),
+                allRoles,
                 Role::name);
         if (!roles.contains(role)) {
             roleService.create(role, role + " name", role + " desc");
@@ -55,6 +57,21 @@ public class UserHelper {
                 ImmutableUpdateRolesCommand
                         .builder()
                         .addRoles(roles)
+                        .build());
+    }
+
+
+    public void createUserWithSystemRoles(String user, Set<SystemRole> roles) {
+        createUser(user);
+
+        Set<String> roleKeys = map(roles, Enum::name);
+
+        userRoleService.updateRoles(
+                user,
+                user,
+                ImmutableUpdateRolesCommand
+                        .builder()
+                        .addAllRoles(roleKeys)
                         .build());
     }
 }
