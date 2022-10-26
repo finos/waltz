@@ -194,4 +194,73 @@ public class AssessmentRatingPermissionCheckerTest extends BaseInMemoryIntegrati
                 "Null involvement group id gives everyone permissions without needing override but only for described operations");
     }
 
+    @Test
+    public void findAssessmentRatingPermissionsNullPermittedRole() {
+
+        String u1 = mkName(stem, "user1");
+        Long u1Id = personHelper.createPerson(u1);
+        EntityReference appA = appHelper.createNewApp(mkName(stem, "appA"), ouIds.a);
+        String adminRoleName = mkName(stem, "adminRoleName");
+
+        long schemeId = ratingSchemeHelper.createEmptyRatingScheme(mkName(stem, "assessment permission checker"));
+        ratingSchemeHelper.saveRatingItem(schemeId, "Disinvest", 1, "red", 'R');
+        ratingSchemeHelper.saveRatingItem(schemeId, "Maintain", 2, "amber", 'A');
+        ratingSchemeHelper.saveRatingItem(schemeId, "Invest", 3, "green", 'G');
+        long defnId = assessmentHelper.createDefinition(schemeId, mkName(stem, "assessment permission checker"), null, AssessmentVisibility.PRIMARY, null);
+
+        Set<Operation> nullPermittedRoleGivesAllPermissions = assessmentRatingPermissionChecker.findRatingPermissions(appA, defnId, u1);
+
+        assertEquals(
+                SetUtilities.asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE),
+                nullPermittedRoleGivesAllPermissions,
+                "Null permitted role gives everyone permissions without needing override or required involvement");
+    }
+
+
+    @Test
+    public void findAssessmentRatingPermissionsReadOnlyDefinition() {
+
+        String u1 = mkName(stem, "user1");
+        Long u1Id = personHelper.createPerson(u1);
+        EntityReference appA = appHelper.createNewApp(mkName(stem, "appA"), ouIds.a);
+
+        long schemeId = ratingSchemeHelper.createEmptyRatingScheme(mkName(stem, "assessment permission checker"));
+        ratingSchemeHelper.saveRatingItem(schemeId, "Disinvest", 1, "red", 'R');
+        ratingSchemeHelper.saveRatingItem(schemeId, "Maintain", 2, "amber", 'A');
+        ratingSchemeHelper.saveRatingItem(schemeId, "Invest", 3, "green", 'G');
+        long defnId = assessmentHelper.createDefinition(schemeId, mkName(stem, "assessment permission checker"), null, AssessmentVisibility.PRIMARY, null);
+        assessmentHelper.updateDefinitionReadOnly(defnId);
+
+        Set<Operation> readOnlyDefinition = assessmentRatingPermissionChecker.findRatingPermissions(appA, defnId, u1);
+
+        assertEquals(
+                emptySet(),
+                readOnlyDefinition,
+                "Read only definition should not allow ratings to be edited");
+    }
+
+
+    @Test
+    public void findAssessmentRatingPermissionsReadOnlyRating() {
+
+        String u1 = mkName(stem, "user1");
+        Long u1Id = personHelper.createPerson(u1);
+        EntityReference appA = appHelper.createNewApp(mkName(stem, "appA"), ouIds.a);
+
+        long schemeId = ratingSchemeHelper.createEmptyRatingScheme(mkName(stem, "assessment permission checker"));
+        Long r1 = ratingSchemeHelper.saveRatingItem(schemeId, "Disinvest", 1, "red", 'R');
+        Long r2 = ratingSchemeHelper.saveRatingItem(schemeId, "Maintain", 2, "amber", 'A');
+        Long r3 = ratingSchemeHelper.saveRatingItem(schemeId, "Invest", 3, "green", 'G');
+        long defnId = assessmentHelper.createDefinition(schemeId, mkName(stem, "assessment permission checker"), null, AssessmentVisibility.PRIMARY, null);
+        assessmentHelper.createAssessment(defnId, appA, r1);
+        assessmentHelper.updateRatingReadOnly(appA, defnId);
+
+        Set<Operation> readOnlyRating = assessmentRatingPermissionChecker.findRatingPermissions(appA, defnId, u1);
+
+        assertEquals(
+                emptySet(),
+                readOnlyRating,
+                "Read only rating should not be editable");
+    }
+
 }
