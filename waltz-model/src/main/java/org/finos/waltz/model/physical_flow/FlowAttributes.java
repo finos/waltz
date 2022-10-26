@@ -22,12 +22,13 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.Criticality;
 import org.finos.waltz.model.DescriptionProvider;
+import org.finos.waltz.model.ExternalIdProvider;
 import org.immutables.value.Value;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableFlowAttributes.class)
 @JsonDeserialize(as = ImmutableFlowAttributes.class)
-public abstract class FlowAttributes implements DescriptionProvider {
+public abstract class FlowAttributes implements DescriptionProvider, ExternalIdProvider {
 
     public abstract TransportKindValue transport();
 

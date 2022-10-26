@@ -3,6 +3,7 @@
     import ViewLink from "../../common/svelte/ViewLink.svelte";
     import EntityLink from "../../common/svelte/EntityLink.svelte";
     import toasts from "../../svelte-stores/toast-store";
+    import pageInfo from "../../svelte-stores/page-navigation-store";
 
     import {
         dataTypes,
@@ -11,9 +12,9 @@
         nestedEnums,
         physicalFlow,
         physicalSpecification,
-        ViewMode,
+        skipDataTypes,
         viewMode,
-        skipDataTypes
+        ViewMode
     } from "./physical-flow-editor-store";
 
     import _ from "lodash";
@@ -61,6 +62,7 @@
             description: $physicalSpecification.description,
             format: $physicalSpecification.format,
             lastUpdatedBy: "waltz",
+            externalId: $physicalSpecification.externalId,
             id: $physicalSpecification.id ? $physicalSpecification.id : null
         }
 
@@ -68,7 +70,9 @@
             transport: $physicalFlow.transport,
             frequency: $physicalFlow.frequency,
             basisOffset: $physicalFlow.basisOffset,
-            criticality: $physicalFlow.criticality
+            criticality: $physicalFlow.criticality,
+            description: $physicalFlow.description,
+            externalId: $physicalFlow.externalId
         }
 
         const command = {
@@ -80,7 +84,14 @@
 
         physicalFlowStore.create(command)
             .then(() => toasts.success("Successfully added physical flow"))
-            .then(() => history.back())
+            .then(() => {
+                $pageInfo = {
+                    state: "main.app.view",
+                    params: {
+                        id: primaryEntityRef.id
+                    }
+                };
+            })
             .catch(e => displayError("Could not create physical flow", e));
     }
 
