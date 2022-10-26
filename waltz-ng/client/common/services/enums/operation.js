@@ -53,3 +53,6 @@ export const operation = {
         position: 30
     }
 };
+
+
+export const editOperations = [operation.ADD.key, operation.REMOVE.key, operation.UPDATE.key];

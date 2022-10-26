@@ -71,4 +71,12 @@ public class LogicalFlowHelper {
     public int removeFlow(Long flowId) {
         return logicalFlowDao.removeFlow(flowId, "admin");
     }
+
+    public void makeReadOnly(long flowId) {
+        dsl
+                .update(LOGICAL_FLOW)
+                .set(LOGICAL_FLOW.IS_READONLY, true)
+                .where(LOGICAL_FLOW.ID.eq(flowId))
+                .execute();
+    }
 }

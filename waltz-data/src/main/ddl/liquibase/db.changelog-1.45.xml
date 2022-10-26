@@ -440,12 +440,38 @@
     </changeSet>
 
     <changeSet id="20221007-6249-1"
-               author="woodjes">
+               author="woodjes"
+               dbms="mssql">
         <comment>6249: Involvement Kind: add unique index</comment>
         <sql>
             create unique index idx_inv_kind_ext_id_uniq
                 on involvement_kind (external_id) where external_id is not null
         </sql>
+    </changeSet>
+
+    <changeSet id="20221007-6249-1a"
+               author="woodjes"
+               dbms="h2,postgresql">
+        <comment>6249: Involvement Kind: add unique index</comment>
+        <createIndex indexName="idx_inv_kind_ext_id_uniq"
+                     tableName="involvement_kind"
+                     unique="true">
+            <column name="external_id"
+                    type="${external-id.type}"/>
+        </createIndex>
+    </changeSet>
+
+
+    <changeSet id="20221025-6268-1"
+               author="woodjes">
+        <comment>6268: Roles: add physical spec editor role</comment>
+        <insert tableName="role">
+            <column name="name" value="Physical Specification Editor"/>
+            <column name="key" value="PHYSICAL_SPECIFICATION_EDITOR"/>
+            <column name="description" value="Admin permissions to create, edit or remove physical specifications"/>
+            <column name="is_custom" valueBoolean="false"/>
+            <column name="user_selectable" valueBoolean="true"/>
+        </insert>
     </changeSet>
 
 

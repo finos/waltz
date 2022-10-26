@@ -11,6 +11,7 @@ import org.finos.waltz.schema.tables.records.OrganisationalUnitRecord;
 import org.finos.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.h2.tools.Server;
 import org.jooq.DSLContext;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;

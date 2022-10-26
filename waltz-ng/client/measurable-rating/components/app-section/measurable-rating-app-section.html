@@ -57,7 +57,7 @@
                         </div>
                     </div>
 
-                    <span waltz-has-role="RATING_EDITOR">
+                    <span ng-if="$ctrl.hasEditPermissions">
                         <div class="waltz-sub-section-controls">
                             <a ng-if="$ctrl.visibility.editor === false"
                                ng-click="$ctrl.onEditRatings()"
