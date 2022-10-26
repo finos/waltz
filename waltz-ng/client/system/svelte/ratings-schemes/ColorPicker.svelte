@@ -26,7 +26,7 @@
         amberHex,
         yellowHex
     ];
-
+    export let id;
     export let startColor;
 
     $: selectedColor = startColor;
@@ -36,7 +36,7 @@
 </script>
 
 
-<div>
+<div {id}>
     <label class="custom-label"
            for="custom">Custom:</label>
     <input type="color"

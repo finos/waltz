@@ -101,10 +101,10 @@
                             </li>
                         {:else}
                             <li class="force-wrap">
-                                <a class="clickable"
-                                   on:click={() => selectAssessment(row)}>
+                                <button class="btn-link"
+                                        on:click={() => selectAssessment(row)}>
                                     {row.definition.name}
-                                </a>
+                                </button>
                             </li>
                         {/if}
                     {/each}

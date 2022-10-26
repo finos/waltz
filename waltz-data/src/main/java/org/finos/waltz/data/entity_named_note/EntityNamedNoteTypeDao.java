@@ -18,26 +18,38 @@
 
 package org.finos.waltz.data.entity_named_note;
 
-import org.finos.waltz.schema.tables.records.EntityNamedNoteTypeRecord;
 import org.finos.waltz.common.Checks;
-import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.app_group.AppGroupMemberRole;
 import org.finos.waltz.model.entity_named_note.EntityNamedNodeType;
 import org.finos.waltz.model.entity_named_note.EntityNamedNoteTypeChangeCommand;
 import org.finos.waltz.model.entity_named_note.ImmutableEntityNamedNodeType;
+import org.finos.waltz.model.user.SystemRole;
+import org.finos.waltz.schema.tables.ApplicationGroupMember;
+import org.finos.waltz.schema.tables.EntityNamedNote;
+import org.finos.waltz.schema.tables.EntityNamedNoteType;
+import org.finos.waltz.schema.tables.UserRole;
+import org.finos.waltz.schema.tables.records.EntityNamedNoteTypeRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import static org.finos.waltz.schema.tables.EntityNamedNote.ENTITY_NAMED_NOTE;
-import static org.finos.waltz.schema.tables.EntityNamedNoteType.ENTITY_NAMED_NOTE_TYPE;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.SetUtilities.minus;
 import static org.finos.waltz.common.StringUtilities.join;
 import static org.finos.waltz.common.StringUtilities.splitThenMap;
+import static org.finos.waltz.schema.tables.ApplicationGroupMember.APPLICATION_GROUP_MEMBER;
+import static org.finos.waltz.schema.tables.EntityNamedNote.ENTITY_NAMED_NOTE;
+import static org.finos.waltz.schema.tables.EntityNamedNoteType.ENTITY_NAMED_NOTE_TYPE;
+import static org.finos.waltz.schema.tables.UserRole.USER_ROLE;
 
 @Repository
 public class EntityNamedNoteTypeDao {
@@ -45,9 +57,10 @@ public class EntityNamedNoteTypeDao {
     private static final String SEPARATOR = ";";
 
 
+    private static final EntityNamedNoteType ennt = ENTITY_NAMED_NOTE_TYPE;
     private static final RecordMapper<Record, EntityNamedNodeType> TO_DOMAIN_MAPPER = record -> {
 
-        EntityNamedNoteTypeRecord r = record.into(ENTITY_NAMED_NOTE_TYPE);
+        EntityNamedNoteTypeRecord r = record.into(ennt);
 
         List<EntityKind> applicableEntityKinds = splitThenMap(
                 r.getApplicableEntityKinds(),
@@ -65,6 +78,9 @@ public class EntityNamedNoteTypeDao {
                 .externalId(Optional.ofNullable(r.getExternalId()))
                 .build();
     };
+    private static final EntityNamedNote enn = ENTITY_NAMED_NOTE;
+    private static final UserRole ur = USER_ROLE;
+    private static final ApplicationGroupMember agm = APPLICATION_GROUP_MEMBER;
 
 
     private final DSLContext dsl;
@@ -79,8 +95,8 @@ public class EntityNamedNoteTypeDao {
 
     public List<EntityNamedNodeType> findAll() {
         return dsl
-                .select(ENTITY_NAMED_NOTE_TYPE.fields())
-                .from(ENTITY_NAMED_NOTE_TYPE)
+                .select(ennt.fields())
+                .from(ennt)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -96,13 +112,13 @@ public class EntityNamedNoteTypeDao {
     public boolean removeById(Long id) {
 
         SelectConditionStep<Record1<Long>> anyUsageOfType = DSL
-                .select(ENTITY_NAMED_NOTE.ENTITY_ID)
-                .from(ENTITY_NAMED_NOTE)
-                .where(ENTITY_NAMED_NOTE.NAMED_NOTE_TYPE_ID.eq(id));
+                .select(enn.ENTITY_ID)
+                .from(enn)
+                .where(enn.NAMED_NOTE_TYPE_ID.eq(id));
 
         return dsl
-                .deleteFrom(ENTITY_NAMED_NOTE_TYPE)
-                .where(ENTITY_NAMED_NOTE_TYPE.ID.eq(id))
+                .deleteFrom(ennt)
+                .where(ennt.ID.eq(id))
                 .andNotExists(anyUsageOfType)
                 .execute() == 1;
     }
@@ -119,7 +135,7 @@ public class EntityNamedNoteTypeDao {
         Set<EntityKind> applicableEntityKinds = Checks.checkOptionalIsPresent(command.applicableEntityKinds(), "Applicable Entity Kinds must be provided");
         String kinds = join(applicableEntityKinds, SEPARATOR);
 
-        EntityNamedNoteTypeRecord record = dsl.newRecord(ENTITY_NAMED_NOTE_TYPE);
+        EntityNamedNoteTypeRecord record = dsl.newRecord(ennt);
         record.setName(name);
         record.setExternalId(command.externalId().orElse(""));
         record.setDescription(command.description().orElse(""));
@@ -135,8 +151,8 @@ public class EntityNamedNoteTypeDao {
 
     public boolean update(long id, EntityNamedNoteTypeChangeCommand command) {
         EntityNamedNoteTypeRecord record = new EntityNamedNoteTypeRecord();
-        record.set(ENTITY_NAMED_NOTE_TYPE.ID, id);
-        record.changed(ENTITY_NAMED_NOTE_TYPE.ID, false);
+        record.set(ennt.ID, id);
+        record.changed(ennt.ID, false);
 
         command.name()
                 .ifPresent(record::setName);
@@ -156,17 +172,88 @@ public class EntityNamedNoteTypeDao {
 
 
     public EntityNamedNodeType getById(long namedNoteTypeId) {
-        return dsl.select(ENTITY_NAMED_NOTE_TYPE.fields())
-                .from(ENTITY_NAMED_NOTE_TYPE)
-                .where(ENTITY_NAMED_NOTE_TYPE.ID.eq(namedNoteTypeId))
+        return dsl.select(ennt.fields())
+                .from(ennt)
+                .where(ennt.ID.eq(namedNoteTypeId))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
     public EntityNamedNodeType getByExternalId(String externalId) {
         return dsl
-                .select(ENTITY_NAMED_NOTE_TYPE.fields())
-                .from(ENTITY_NAMED_NOTE_TYPE)
-                .where(ENTITY_NAMED_NOTE_TYPE.EXTERNAL_ID.eq(externalId))
+                .select(ennt.fields())
+                .from(ennt)
+                .where(ennt.EXTERNAL_ID.eq(externalId))
                 .fetchOne(TO_DOMAIN_MAPPER);
+    }
+
+
+    public Set<EntityWithOperations<EntityNamedNodeType>> findForRefAndUser(EntityReference ref,
+                                                                            String username) {
+
+        SystemRole requiredRole = SystemRole.APP_EDITOR;
+
+        SelectConditionStep<Record> qry = dsl
+                .select(ennt.fields())
+                .select(enn.LAST_UPDATED_AT) // already has a note ?
+                .select(ur.USER_NAME)  // user has role ?
+                .select(agm.USER_ID) // user is part of app group
+                .from(ennt)
+                .leftJoin(enn)
+                .on(enn.NAMED_NOTE_TYPE_ID.eq(ennt.ID)
+                        .and(enn.ENTITY_ID.eq(ref.id()))
+                        .and(enn.ENTITY_KIND.eq(ref.kind().name())))
+                .leftJoin(ur)
+                .on(ur.USER_NAME.eq(username)
+                        .and(ur.ROLE.eq(requiredRole.name())))
+                .leftJoin(agm)
+                .on(ref.kind() == EntityKind.APP_GROUP
+                            ? DSL.trueCondition()
+                            : DSL.falseCondition())
+                        .and(agm.GROUP_ID.eq(ref.id()))
+                        .and(agm.USER_ID.eq(username))
+                        .and(agm.ROLE.eq(AppGroupMemberRole.OWNER.name()))
+                .where(ennt.APPLICABLE_ENTITY_KINDS.like(String.format("%%%s%%", ref.kind())));
+
+        return qry
+                .fetch()
+                .stream()
+                .map(r -> {
+                    EntityNamedNodeType entityNamedNodeType = TO_DOMAIN_MAPPER.map(r);
+                    boolean alreadyExists = r.get(enn.LAST_UPDATED_AT) != null;
+                    boolean hasBasicRole = r.get(ur.USER_NAME) != null;
+                    boolean isAppGroup = ref.kind() == EntityKind.APP_GROUP;
+                    boolean hasAppGroupOwnership = r.get(agm.USER_ID) != null;
+
+                    Set<Operation> ops = asSet(
+                            Operation.ADD,
+                            Operation.UPDATE,
+                            Operation.REMOVE);
+
+                    if (entityNamedNodeType.isReadOnly()) {
+                        ops = new HashSet<>();
+                    }
+
+                    if (alreadyExists) {
+                        ops = minus(ops, asSet(Operation.ADD));
+                    } else {
+                        ops = minus(ops, asSet(Operation.UPDATE, Operation.REMOVE));
+                    }
+
+                    if (isAppGroup && ! hasAppGroupOwnership) {
+                        ops = new HashSet<>();
+                    }
+
+                    if (!isAppGroup && !hasBasicRole) {
+                        ops = new HashSet<>();
+                    }
+
+                    return ImmutableEntityWithOperations
+                            .<EntityNamedNodeType>builder()
+                            .entity(entityNamedNodeType)
+                            .addAllOperations(ops)
+                            .build();
+                })
+                .collect(Collectors.toSet());
+
     }
 }
