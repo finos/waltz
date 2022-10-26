@@ -39,15 +39,20 @@
                    bind:value={howMany}>
         </label>
         <br>
-        <label>Start Color
-            <ColorPicker startColor={'#5bb65d'}
-                         on:select={evt => startColor = evt.detail}/>
+        <label for="start-color">
+            Start Color
+
         </label>
+        <ColorPicker id="start-color"
+                     startColor={'#5bb65d'}
+                     on:select={evt => startColor = evt.detail}/>
         <br>
-        <label>End Color
-            <ColorPicker startColor={'#dae714'}
-                         on:select={evt => endColor = evt.detail}/>
+        <label for="end-color">
+            End Color
         </label>
+        <ColorPicker id="end-color"
+                     startColor={'#dae714'}
+                     on:select={evt => endColor = evt.detail}/>
     </div>
 
     <div class="col-sm-6">

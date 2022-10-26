@@ -18,6 +18,7 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.model.EntityWithOperations;
 import org.finos.waltz.model.entity_named_note.EntityNamedNodeType;
 import org.finos.waltz.model.entity_named_note.EntityNamedNoteTypeChangeCommand;
 import org.finos.waltz.model.user.SystemRole;
@@ -61,6 +62,7 @@ public class EntityNamedNoteTypeEndpoint implements Endpoint {
         String removePath = mkPath(BASE, ":id");
         String updatePath = mkPath(BASE, ":id");
         String createPath = mkPath(BASE);
+        String findForRefAndUserPath = mkPath(BASE, "by-ref", ":kind", ":id");
 
 
         ListRoute<EntityNamedNodeType> findAllRoute = (req, res) ->
@@ -85,12 +87,18 @@ public class EntityNamedNoteTypeEndpoint implements Endpoint {
 
         DatumRoute<EntityNamedNodeType> getByExternalIdRoute = (req, res) -> entityNamedNoteTypeService.getByExternalId(req.params("externalId"));
 
+        ListRoute<EntityWithOperations<EntityNamedNodeType>> findForRefAndUserRoute = (req, res) ->
+                entityNamedNoteTypeService.findForRefAndUser(getEntityReference(req), getUsername(req));
+
         getForList(findAllPath, findAllRoute);
         getForDatum(getByExternalIdPath, getByExternalIdRoute);
         deleteForDatum(removePath, removeRoute);
         postForDatum(createPath, createRoute);
         putForDatum(updatePath, updateRoute);
+        getForList(findForRefAndUserPath, findForRefAndUserRoute);
     }
+
+
 
 
     private void ensureUserHasAdminRights(Request request) {

@@ -17,22 +17,7 @@
   -->
 
 <div>
-    <waltz-section-actions ng-if="$ctrl.hasRole && $ctrl.availableTypes.length > 0">
-        <button type="button"
-                class="btn btn-xs btn-primary"
-                ng-if="($ctrl.hasRole && $ctrl.availableTypes.length > 0)"
-                ng-click="$ctrl.showEditor()">
-            Add Note
-        </button>
-    </waltz-section-actions>
-
-
-    <waltz-entity-named-notes-panel parent-entity-ref="$ctrl.parentEntityRef"
-                                    notes="$ctrl.notes"
-                                    all-note-types="$ctrl.allNoteTypes"
-                                    on-save="$ctrl.saveNote"
-                                    on-delete="$ctrl.deleteNote"
-                                    creating-note="$ctrl.creatingNote"
-                                    on-editor-dismiss="$ctrl.editorDismiss">
-    </waltz-entity-named-notes-panel>
+    <waltz-svelte-component component="$ctrl.EntityNamedNotesSection"
+                            parent-entity-ref="$ctrl.parentEntityRef">
+    </waltz-svelte-component>
 </div>

@@ -19,20 +19,18 @@
 package org.finos.waltz.service.entity_named_note;
 
 import org.finos.waltz.common.Checks;
-import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.data.entity_named_note.EntityNamedNoteTypeDao;
-import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.Operation;
-import org.finos.waltz.model.Severity;
+import org.finos.waltz.model.*;
 import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.entity_named_note.EntityNamedNodeType;
 import org.finos.waltz.model.entity_named_note.EntityNamedNoteTypeChangeCommand;
+import org.finos.waltz.service.changelog.ChangeLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 
@@ -101,5 +99,11 @@ public class EntityNamedNoteTypeService {
     public EntityNamedNodeType getByExternalId(String externalId) {
         Checks.checkNotNull(externalId, "External id cannot be null");
         return entityNamedNoteTypeDao.getByExternalId(externalId);
+    }
+
+
+    public Set<EntityWithOperations<EntityNamedNodeType>> findForRefAndUser(EntityReference ref,
+                                                                            String username) {
+        return entityNamedNoteTypeDao.findForRefAndUser(ref, username);
     }
 }

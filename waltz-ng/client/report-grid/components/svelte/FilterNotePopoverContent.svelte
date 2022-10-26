@@ -1,6 +1,4 @@
 <script>
-
-
     import Markdown from "../../../common/svelte/Markdown.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
     import _ from "lodash";
@@ -13,12 +11,24 @@
     export let grid;
     export let filters;
 
+    function copyText() {
+        return copyTextToClipboard(noteContent)
+            .then(() => toasts.success("Copied note to clipboard"))
+            .catch(e => displayError("Could not copy note to clipboard", e));
+    }
+
+    function toName(col) {
+        return col?.columnName || col?.displayName;
+    }
+
     let reloadLinkContent = "\n\n\nThis group will refresh overnight, <a href=\"./page/report-grid-view/recalculate/app-group-id/${ctx.ref.id}?sections=10\" target=\"_blank\">click here to refresh group now</a>"
 
     $: allColDefinitions = _.concat(grid.definition.fixedColumnDefinitions, grid.definition.derivedColumnDefinitions);
-    $: gridColumnsById = _.keyBy(allColDefinitions, d => d.id);
-
+    $: gridColumnsById = _.keyBy(allColDefinitions, d => d.gridColumnId);
     $: ratingSchemeItemsById = _.keyBy(grid.instance.ratingSchemeItems, d => d.id);
+    $: groupedFilters = _.groupBy(filters, d => d.columnDefinitionId);
+    $: ratingColumnKinds = [entity.MEASURABLE.key, entity.ASSESSMENT_DEFINITION.key];
+    $: noteContent = _.join([gridContent, filterContent, reloadLinkContent], "");
 
     $: gridContent = "| Grid Name | Grid Identifier | Vantage Point Kind | Vantage Point Id |\n" +
         "| --- | --- | --- | --- |\n" +
@@ -27,10 +37,6 @@
         "\n" +
         "| Filter Column | Filter Operator | Value/s |\n" +
         "| --- | --- | --- |\n";
-
-    $: groupedFilters = _.groupBy(filters, d => d.columnDefinitionId);
-
-    $: ratingColumnKinds = [entity.MEASURABLE.key, entity.ASSESSMENT_DEFINITION.key];
 
     $: filterContent = _
         .chain(groupedFilters)
@@ -53,23 +59,15 @@
                 .join("; ")
                 .value();
 
-            return `| \`${gridColumnDef?.columnName}\` | \`CONTAINS_ANY_OPTION\` | ${optionCodes} |`
+            return `| \`${toName(gridColumnDef)}\` | \`CONTAINS_ANY_OPTION\` | ${optionCodes} |`
         })
         .join("\n")
         .value();
 
-    function copyText() {
-        return copyTextToClipboard(noteContent)
-            .then(() => toasts.success("Copied note to clipboard"))
-            .catch(e => displayError("Could not copy note to clipboard", e));
-    }
-
-    $: noteContent = _.join([gridContent, filterContent, reloadLinkContent], "");
 
 </script>
 
-<div style="padding: 0.5em 0"
-     class="pull-right">
+<div class="intro pull-right">
     <button class="btn btn-default"
             on:click={copyText}>
         <Icon name="clone"/>
@@ -77,7 +75,7 @@
     </button>
 </div>
 
-<div style="padding: 0.5em 0">
+<div class="code">
     <textarea class="form-control"
               id="content"
               placeholder="Note content"
@@ -92,10 +90,30 @@
 
 <hr>
 
-<div style="padding: 0.5em 0">
+<div class="preview">
     <Markdown class="force-wrap" text={noteContent}/>
     <div class="help-block">
         <Icon name="info-circle"/>
         Preview of the formatted note once saved
     </div>
 </div>
+
+
+<style>
+    .intro {
+        padding: 0.5em 0;
+    }
+
+    .code {
+        padding: 0.5em 0;
+    }
+
+    .preview {
+        padding: 0.5em 0;
+    }
+
+    textarea {
+        font-family: monospace;
+        font-size: smaller;
+    }
+</style>
