@@ -117,6 +117,31 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
 
 
     @Test
+    public void checkNoPermissionsSpecified() {
+        String u1 = mkName(stem, "user1");
+        Long u1Id = personHelper.createPerson(u1);
+
+        EntityReference appA = appHelper.createNewApp(mkName(stem, "appA"), ouIds.a);
+
+        long categoryId = measurableHelper.createMeasurableCategory(mkName(stem, "category1"));
+
+        long privKind = involvementHelper.mkInvolvementKind(mkName(stem, "privileged"));
+
+        InvolvementGroupRecord ig = permissionHelper.setupInvolvementGroup(privKind, stem);
+        PermissionGroupRecord pg = permissionHelper.setupPermissionGroup(appA, ig, stem);
+//        permissionHelper.setupPermissionGroupInvolvement(
+//                ig.getId(),
+//                pg.getId(),
+//                EntityKind.MEASURABLE_RATING,
+//                EntityKind.APPLICATION,
+//                Operation.ATTEST,
+//                mkRef(EntityKind.MEASURABLE_CATEGORY, categoryId));
+
+        assertFalse(permissionGroupService.hasPermission(mkMeasurableCategoryAttestCommand(u1, categoryId, appA)), "u1 should not have permission as no perms specified for this subject");
+    }
+
+
+    @Test
     public void findPermissionsForSubjectKind() {
 
         String u1 = mkName(stem, "user1");

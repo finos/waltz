@@ -462,4 +462,20 @@
     </changeSet>
 
 
+    <changeSet id="20221025-6268-1"
+               author="woodjes">
+        <comment>6268: Roles: add physical spec editor role</comment>
+        <delete tableName="role">
+            <where>[key] = 'PHYSICAL_SPECIFICATION_EDITOR'</where>
+        </delete>
+        <insert tableName="role">
+            <column name="name" value="Physical Specification Editor"/>
+            <column name="key" value="PHYSICAL_SPECIFICATION_EDITOR"/>
+            <column name="description" value="Admin permissions to create, edit or remove physical specifications"/>
+            <column name="is_custom" valueBoolean="false"/>
+            <column name="user_selectable" valueBoolean="true"/>
+        </insert>
+    </changeSet>
+
+
 </databaseChangeLog>
