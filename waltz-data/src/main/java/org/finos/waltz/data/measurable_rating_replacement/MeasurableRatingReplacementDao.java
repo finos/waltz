@@ -189,21 +189,16 @@ public class MeasurableRatingReplacementDao {
                                                                 long categoryId,
                                                                 String username) {
 
-        Tuple2<Boolean, Boolean> hasRoleAndCategoryEditable = dsl
-                .select(USER_ROLE.ROLE,
-                        MEASURABLE_CATEGORY.EDITABLE)
+        Boolean hasOverrideRole = dsl
+                .select(USER_ROLE.ROLE)
                 .from(MEASURABLE_CATEGORY)
                 .leftJoin(USER_ROLE)
                 .on(USER_ROLE.ROLE.eq(MEASURABLE_CATEGORY.RATING_EDITOR_ROLE)
                         .and(USER_ROLE.USER_NAME.eq(username)))
                 .where(MEASURABLE_CATEGORY.ID.eq(categoryId))
-                .fetchOne(r -> tuple(
-                        notEmpty(r.get(USER_ROLE.ROLE)),
-                        r.get(MEASURABLE_CATEGORY.EDITABLE)));
+                .fetchOne(r -> notEmpty(r.get(USER_ROLE.ROLE)));
 
-        if (!hasRoleAndCategoryEditable.v2) {
-            return emptySet();
-        } else if (hasRoleAndCategoryEditable.v1) {
+        if (hasOverrideRole) {
             return union(operationsForEntityAssessment, asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE));
         } else {
             return operationsForEntityAssessment;

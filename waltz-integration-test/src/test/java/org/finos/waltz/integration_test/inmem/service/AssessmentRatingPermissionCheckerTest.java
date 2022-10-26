@@ -27,9 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class AssessmentRatingPermissionCheckerTest extends BaseInMemoryIntegrationTest {
 
     @Autowired
-    private DSLContext dsl;
-
-    @Autowired
     private AppHelper appHelper;
 
     @Autowired
@@ -37,9 +34,6 @@ public class AssessmentRatingPermissionCheckerTest extends BaseInMemoryIntegrati
 
     @Autowired
     private PersonHelper personHelper;
-
-    @Autowired
-    private MeasurableHelper measurableHelper;
 
     @Autowired
     private AssessmentHelper assessmentHelper;
@@ -164,6 +158,40 @@ public class AssessmentRatingPermissionCheckerTest extends BaseInMemoryIntegrati
                 SetUtilities.asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE),
                 overrideProvidesAccessEvenWhereNoEntryInPermissionsTable,
                 "Override should provide edit right even where no entry in permissions table");
+    }
+
+
+    @Test
+    public void findAssessmentRatingPermissionsNullGroupId() {
+
+        String u1 = mkName(stem, "user1");
+        Long u1Id = personHelper.createPerson(u1);
+        EntityReference appA = appHelper.createNewApp(mkName(stem, "appA"), ouIds.a);
+        String adminRoleName = mkName(stem, "adminRoleName");
+
+        long schemeId = ratingSchemeHelper.createEmptyRatingScheme(mkName(stem, "assessment permission checker"));
+        ratingSchemeHelper.saveRatingItem(schemeId, "Disinvest", 1, "red", 'R');
+        ratingSchemeHelper.saveRatingItem(schemeId, "Maintain", 2, "amber", 'A');
+        ratingSchemeHelper.saveRatingItem(schemeId, "Invest", 3, "green", 'G');
+        long defnId = assessmentHelper.createDefinition(schemeId, mkName(stem, "assessment permission checker"), adminRoleName, AssessmentVisibility.PRIMARY, null);
+
+        PermissionGroupRecord pg = permissionHelper.createGroup(stem);
+        permissionHelper.setupPermissionGroupEntry(appA, pg.getId());
+
+        permissionHelper.setupPermissionGroupInvolvement(
+                null,
+                pg.getId(),
+                EntityKind.ASSESSMENT_RATING,
+                EntityKind.APPLICATION,
+                Operation.ADD,
+                mkRef(EntityKind.ASSESSMENT_DEFINITION, defnId));
+
+        Set<Operation> nullInvolvementGroupGivesAllPermissionsForOperation = assessmentRatingPermissionChecker.findRatingPermissions(appA, defnId, u1);
+
+        assertEquals(
+                SetUtilities.asSet(Operation.ADD),
+                nullInvolvementGroupGivesAllPermissionsForOperation,
+                "Null involvement group id gives everyone permissions without needing override but only for described operations");
     }
 
 }

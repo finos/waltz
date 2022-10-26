@@ -126,9 +126,10 @@ public class FlowPermissionChecker implements PermissionChecker {
 
         Set<Long> invsForUser = involvementService.findExistingInvolvementKindIdsForUser(entityReference, username);
 
-        Set<Operation> operationsForEntityAssessment = permissionGroupService
-                .findPermissionsForParentReference(entityReference, username)
-                .stream()
+        Set<Permission> perms = permissionGroupService
+                .findPermissionsForParentReference(entityReference, username);
+
+        Set<Operation> operationsForEntityAssessment = perms.stream()
                 .filter(p -> p.subjectKind().equals(EntityKind.PHYSICAL_SPECIFICATION)
                         && p.parentKind().equals(entityReference.kind()))
                 .filter(p -> p.requiredInvolvementsResult().isAllowed(invsForUser))

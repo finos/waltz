@@ -66,6 +66,15 @@ public class MeasurableHelper {
     }
 
 
+    public void updateCategoryNotEditable(long categoryId) {
+        dsl
+                .update(MEASURABLE_CATEGORY)
+                .set(MEASURABLE_CATEGORY.EDITABLE, false)
+                .where(MEASURABLE_CATEGORY.ID.eq(categoryId))
+                .execute();
+    }
+
+
     public long createMeasurable(String name, long categoryId) {
         return dsl
                 .select(MEASURABLE.ID)
@@ -124,6 +133,16 @@ public class MeasurableHelper {
         int store = decommissionRecord.store();
 
         return decommissionRecord.getId();
+    }
+
+    public void updateMeasurableReadOnly(EntityReference ref, long measurableId) {
+        dsl
+                .update(MEASURABLE_RATING)
+                .set(MEASURABLE_RATING.IS_READONLY, true)
+                .where(MEASURABLE_RATING.ENTITY_KIND.eq(ref.kind().name())
+                        .and(MEASURABLE_RATING.ENTITY_ID.eq(ref.id())
+                                .and(MEASURABLE_RATING.MEASURABLE_ID.eq(measurableId))))
+                .execute();
     }
 
 }

@@ -34,7 +34,7 @@ import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.records.MeasurableRatingRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
-import org.jooq.lambda.tuple.Tuple3;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -337,9 +337,8 @@ public class MeasurableRatingDao {
 
         Field<Boolean> readOnlyRatingField = DSL.coalesce(MEASURABLE_RATING.IS_READONLY, DSL.val(false)).as("rating_read_only");
 
-        SelectConditionStep<Record3<String, Boolean, Boolean>> qry = dsl
+        SelectConditionStep<Record2<String, Boolean>> qry = dsl
                 .select(USER_ROLE.ROLE,
-                        MEASURABLE_CATEGORY.EDITABLE,
                         readOnlyRatingField)
                 .from(MEASURABLE)
                 .leftJoin(MEASURABLE_CATEGORY).on(MEASURABLE_CATEGORY.ID.eq(Tables.MEASURABLE.MEASURABLE_CATEGORY_ID))
@@ -350,15 +349,12 @@ public class MeasurableRatingDao {
                         .and(USER_ROLE.USER_NAME.eq(username)))
                 .where(MEASURABLE.ID.eq(measurableId));
 
-        Tuple3<Boolean, Boolean, Boolean> hasRoleAndDefinitionEditableAndIsReadOnly = qry
+        Tuple2<Boolean, Boolean> hasRoleAndDefinitionEditableAndIsReadOnly = qry
                 .fetchOne(r -> tuple(
                         notEmpty(r.get(USER_ROLE.ROLE)),
-                        r.get(MEASURABLE_CATEGORY.EDITABLE),
                         r.get(readOnlyRatingField)));
 
-        if (!hasRoleAndDefinitionEditableAndIsReadOnly.v2) {
-            return emptySet();
-        } else if (hasRoleAndDefinitionEditableAndIsReadOnly.v3) {
+        if (hasRoleAndDefinitionEditableAndIsReadOnly.v2) {
             return emptySet();
         } else if (hasRoleAndDefinitionEditableAndIsReadOnly.v1) {
             return union(operationsForEntityAssessment, asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE));
