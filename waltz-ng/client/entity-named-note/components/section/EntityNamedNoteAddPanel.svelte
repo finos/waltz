@@ -63,18 +63,22 @@
         The following note types are available:
         <br>
 
-        <ul>
+        <dl>
             {#each availableNoteTypes as type}
-                <li>
-                    <button class="btn-link" on:click={() => onShowEditPanel(type)}>
+                <dt>
+                    <button class="btn-skinny"
+                            on:click={() => onShowEditPanel(type)}>
+                        <Icon name="sticky-note-o"/>
                         {type.name}
                     </button>
+                </dt>
+                <dd>
                     <div class="small text-muted">
                         {type.description}
                     </div>
-                </li>
+                </dd>
             {/each}
-        </ul>
+        </dl>
 
         <button class="btn-skinny"
                 on:click={() => dispatch("cancel")}>
@@ -86,6 +90,15 @@
 
 
 <style>
+
+    dl {
+        padding-top: 0.5em;
+        padding-left: 1em;
+    }
+
+    dd {
+        padding-bottom: 0.5em;
+    }
 
     .edit-box{
         border-width: 1px;

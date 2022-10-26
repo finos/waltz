@@ -48,7 +48,7 @@ import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.finos.waltz.common.ObjectUtilities.firstNotNull;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.finos.waltz.service.user.RoleUtilities.getRequiredRoleForEntityKind;
+import static org.finos.waltz.model.RoleUtilities.getRequiredRoleForEntityKind;
 
 public class WebUtilities {
 

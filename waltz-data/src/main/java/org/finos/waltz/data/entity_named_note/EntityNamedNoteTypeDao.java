@@ -46,6 +46,7 @@ import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.common.SetUtilities.minus;
 import static org.finos.waltz.common.StringUtilities.join;
 import static org.finos.waltz.common.StringUtilities.splitThenMap;
+import static org.finos.waltz.model.RoleUtilities.getRequiredRoleForEntityKind;
 import static org.finos.waltz.schema.tables.ApplicationGroupMember.APPLICATION_GROUP_MEMBER;
 import static org.finos.waltz.schema.tables.EntityNamedNote.ENTITY_NAMED_NOTE;
 import static org.finos.waltz.schema.tables.EntityNamedNoteType.ENTITY_NAMED_NOTE_TYPE;
@@ -190,7 +191,7 @@ public class EntityNamedNoteTypeDao {
     public Set<EntityWithOperations<EntityNamedNodeType>> findForRefAndUser(EntityReference ref,
                                                                             String username) {
 
-        SystemRole requiredRole = SystemRole.APP_EDITOR;
+        SystemRole requiredRole = getRequiredRoleForEntityKind(ref.kind());
 
         SelectConditionStep<Record> qry = dsl
                 .select(ennt.fields())

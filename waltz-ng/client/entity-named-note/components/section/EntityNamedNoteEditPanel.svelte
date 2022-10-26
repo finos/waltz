@@ -31,7 +31,7 @@
             </td>
             <td style="vertical-align: top">
                 <div class="preview">
-                    <Markdown text={working}/>
+                    <Markdown text={working || "*Preview will appear here*" }/>
                 </div>
 
             </td>

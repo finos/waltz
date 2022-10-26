@@ -19,14 +19,13 @@
 package org.finos.waltz.web.endpoints.api;
 
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
-import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.EntityWithOperations;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.StringChangeCommand;
 import org.finos.waltz.model.entity_named_note.EntityNamedNote;
-import org.finos.waltz.service.app_group.AppGroupService;
 import org.finos.waltz.service.entity_named_note.EntityNamedNoteService;
-import org.finos.waltz.service.user.UserRoleService;
+import org.finos.waltz.service.entity_named_note.EntityNamedNoteTypeService;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.WebUtilities;
@@ -35,7 +34,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
 
+import java.util.Optional;
+
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.SetUtilities.intersection;
 import static org.finos.waltz.web.WebUtilities.*;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 
@@ -45,20 +48,16 @@ public class EntityNamedNoteEndpoint implements Endpoint {
     private static final String BASE = mkPath("api", "entity-named-note");
 
     private final EntityNamedNoteService entityNamedNoteService;
-    private final UserRoleService userRoleService;
-    private final AppGroupService appGroupService;
+    private final EntityNamedNoteTypeService entityNamedNoteTypeService;
 
 
     @Autowired
     public EntityNamedNoteEndpoint(EntityNamedNoteService entityNamedNoteService,
-                                   AppGroupService appGroupService,
-                                   UserRoleService userRoleService) {
+                                   EntityNamedNoteTypeService entityNamedNoteTypeService) {
         checkNotNull(entityNamedNoteService, "entityNamedNoteService cannot be null");
-        checkNotNull(appGroupService, "appGroupService cannot be null");
-        checkNotNull(userRoleService, "userRoleService cannot be null");
+        checkNotNull(entityNamedNoteTypeService, "entityNamedNoteTypeService cannot be null");
         this.entityNamedNoteService = entityNamedNoteService;
-        this.appGroupService = appGroupService;
-        this.userRoleService = userRoleService;
+        this.entityNamedNoteTypeService = entityNamedNoteTypeService;
     }
 
 
@@ -73,20 +72,22 @@ public class EntityNamedNoteEndpoint implements Endpoint {
 
         DatumRoute<Boolean> removeRoute = (req, res) -> {
             EntityReference ref = getEntityReference(req);
-            ensureHasPermission(ref, req, Operation.REMOVE);
+            long noteTypeId = getLong(req, "noteTypeId");
+            ensureHasPermission(ref, noteTypeId, req, Operation.REMOVE);
             return entityNamedNoteService.remove(
                     ref,
-                    getLong(req,"noteTypeId"),
+                    noteTypeId,
                     getUsername(req));
         };
 
         DatumRoute<Boolean> saveRoute = (req, res) -> {
             EntityReference ref = getEntityReference(req);
-            ensureHasPermission(ref, req, Operation.ADD);
+            long noteTypeId = getLong(req, "noteTypeId");
+            ensureHasPermission(ref, noteTypeId, req, Operation.ADD, Operation.UPDATE);
             StringChangeCommand command = WebUtilities.readBody(req, StringChangeCommand.class);
             return entityNamedNoteService.save(
                     ref,
-                    getLong(req,"noteTypeId"),
+                    noteTypeId,
                     command.newStringVal().orElse(null),
                     getUsername(req));
         };
@@ -96,20 +97,40 @@ public class EntityNamedNoteEndpoint implements Endpoint {
         deleteForDatum(removePath, removeRoute);
     }
 
+    private void ensureHasPermission(EntityReference ref, long noteTypeId, Request req, Operation... ops) throws InsufficientPrivelegeException {
+        Boolean hasPerm = entityNamedNoteTypeService
+                .findForRefAndUser(
+                        ref,
+                        getUsername(req))
+                .stream()
+                .filter(d -> d.entity().id().equals(Optional.of(noteTypeId)))
+                .map(EntityWithOperations::operations)
+                .map(availableOps -> intersection(availableOps, asSet(ops)))
+                .map(s -> !s.isEmpty())
+                .findFirst()
+                .orElse(false);
 
-    private void ensureHasPermission(EntityReference ref, Request req, Operation op) throws InsufficientPrivelegeException {
-        switch (ref.kind()) {
-            case APP_GROUP:
-                appGroupService.verifyUserCanUpdateGroup(getUsername(req), ref.id());
-                break;
-            default:
-                WebUtilities.requireEditRoleForEntity(
-                        userRoleService,
-                        req,
-                        ref.kind(),
-                        op,
-                        EntityKind.ENTITY_NAMED_NOTE);
+        if (! hasPerm) {
+            throw new InsufficientPrivelegeException("User cannot modify note");
         }
+
+
     }
+
+//
+//    private void ensureHasPermission(EntityReference ref, long noteTypeId, Request req, Operation... ops) throws InsufficientPrivelegeException {
+//        switch (ref.kind()) {
+//            case APP_GROUP:
+//                appGroupService.verifyUserCanUpdateGroup(getUsername(req), ref.id());
+//                break;
+//            default:
+//                WebUtilities.requireEditRoleForEntity(
+//                        userRoleService,
+//                        req,
+//                        ref.kind(),
+//                        op,
+//                        EntityKind.ENTITY_NAMED_NOTE);
+//        }
+//    }
 
 }
