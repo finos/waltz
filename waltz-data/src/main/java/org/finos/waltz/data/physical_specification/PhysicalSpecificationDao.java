@@ -336,7 +336,8 @@ public class PhysicalSpecificationDao {
                 .groupBy(lfd.LOGICAL_FLOW_ID)
                 .having(count(lfd.DECORATOR_ENTITY_ID).gt(0));
 
-        SelectConditionStep<Record1<Long>> unknownDecoratorsThatCanBeRemoved = tx.select(lfd.ID)
+        SelectConditionStep<Record1<Long>> unknownDecoratorsThatCanBeRemoved = tx
+                .select(lfd.ID)
                 .from(lfd)
                 .innerJoin(dt).on(lfd.DECORATOR_ENTITY_ID.eq(dt.ID)
                         .and(lfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())))
