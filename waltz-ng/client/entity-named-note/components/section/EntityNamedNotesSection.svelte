@@ -218,7 +218,8 @@
                     {/if}
                 </td>
                 <td>
-                    <Markdown text={nt.note.noteText}/>
+                    <Markdown context={{ref: parentEntityRef}}
+                              text={nt.note.noteText}/>
                 </td>
             </tr>
             {:else}
