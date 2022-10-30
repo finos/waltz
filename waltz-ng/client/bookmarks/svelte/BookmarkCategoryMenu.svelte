@@ -32,7 +32,7 @@
             class:selected={eq(selected, bookmarkKind)}
             class:clickable={bookmarkKind.count > 0}
             class:text-muted={bookmarkKind.count === 0}
-            on:click={() => bookmarkKind.count > 0 && bookmarkKindSelected(bookmarkKind)}>
+            on:click,keydown={() => bookmarkKind.count > 0 && bookmarkKindSelected(bookmarkKind)}>
 
             <Icon name={bookmarkKind.icon}/>
 

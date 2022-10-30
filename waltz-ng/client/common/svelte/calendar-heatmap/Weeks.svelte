@@ -55,7 +55,7 @@
               y="{(dimensions.day.width / 2 * -1)}"
               width={dimensions.day.width * 7 + dimensions.weekPadding}
               height={dimensions.day.width}
-              on:click={() => onSelectWeek(weekDayInfo[week])}>
+              on:click,keydown={() => onSelectWeek(weekDayInfo[week])}>
         </rect>
     </g>
 {/each}

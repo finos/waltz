@@ -26,13 +26,13 @@ module.exports = smp.wrap(merge(common, {
     //devtool: "inline-source-map",
     //devtool: "cheap-module-eval-source-map",
     devServer: {
-        contentBase: "./dist",
-        disableHostCheck: true,
+        static: "./dist", //contentBase: "./dist",
+        allowedHosts: "all", //disableHostCheck: true,
         historyApiFallback: {
             disableDotRule: true
         },
         proxy: [{
-            context: ["/data-extract", "/api", "/page", "/authentication"],
+            context: ["/data-extract", "/api", "/authentication"],
             target: "http://[::1]:8443", // see note [1]
         }]
     }

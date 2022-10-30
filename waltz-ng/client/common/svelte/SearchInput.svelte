@@ -13,7 +13,7 @@
            bind:value>
     <div class="input-group-addon">
         {#if value.length > 0}
-            <span on:click={() => value = ""}
+            <span on:click,keydown={() => value = ""}
                   class="clickable">
                 <Icon class="clickable"
                       name="times"/>

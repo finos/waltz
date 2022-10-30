@@ -13,7 +13,7 @@
 
 
 <h3 class="clickable"
-    on:click={onToggleExpanded}>
+    on:click,keydown={onToggleExpanded}>
     <Icon name={expanded ? "chevron-down" : "chevron-right"}
           fixedWidth="true"/>
 

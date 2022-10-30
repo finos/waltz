@@ -25,7 +25,7 @@
             <span style="padding-right: 2px" class="clickable">
                 <svg width="10"
                      height="10"
-                     on:click|preventDefault={() => selectedSymbol = symbolName}
+                     on:click,keydown|preventDefault={() => selectedSymbol = symbolName}
                      viewBox="0 0 10 10">
                     <path fill={color}
                           stroke={color}
