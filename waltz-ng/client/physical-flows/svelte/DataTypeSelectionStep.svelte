@@ -103,6 +103,7 @@
 
             <DataTypeTreeSelector multiSelect={true}
                                   on:select={onSelectDataType}
+                                  nonConcreteSelectable={false}
                                   {selectionFilter}/>
 
             <br>

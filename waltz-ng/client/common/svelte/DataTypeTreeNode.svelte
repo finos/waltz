@@ -5,6 +5,7 @@
 
     export let selectionFilter = () => true;
     export let multiSelect = false;
+    export let nonConcreteSelectable = true;
     export let childNodes = [];
     export let node;
     export let expanded = false;
@@ -46,6 +47,7 @@
             class:abstract={!node.concrete}
             class:unknown={node.unknown}
             class:deprecated={node.deprecated}
+            disabled={!nonConcreteSelectable && !node.concrete}
             on:click={() => selectNode(node)}>
             {#if multiSelect}
                 <Icon name={calcCheckIcon(selectionFilter, node)}/>
@@ -63,6 +65,7 @@
                                  {multiSelect}
                                  node={childNode}
                                  {selectionFilter}
+                                 {nonConcreteSelectable}
                                  childNodes={childNode.children}/>
                 {:else}
                     <Icon size="lg"
@@ -72,6 +75,7 @@
                             class:abstract={!childNode.concrete}
                             class:unknown={childNode.unknown}
                             class:deprecated={childNode.deprecated}
+                            disabled={!nonConcreteSelectable && !childNode.concrete}
                             on:click={() => selectNode(childNode)}>
                         <span class="no-wrap">
                             {#if multiSelect}
