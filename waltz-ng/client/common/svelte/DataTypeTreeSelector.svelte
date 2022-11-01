@@ -47,6 +47,5 @@
                       childNodes={displayedHierarchy}
                       expanded={expanded}
                       on:select/>
-
 </div>
 

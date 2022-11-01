@@ -31,6 +31,13 @@
             : 'check-square-o';
     }
 
+    function calcDisabled(filterFn, n) {
+        const isUnchecked = filterFn(n);
+
+        return isUnchecked // should be allowed to deselect non-concrete
+            && (!nonConcreteSelectable && !n.concrete)
+    }
+
 </script>
 
 
@@ -47,7 +54,7 @@
             class:abstract={!node.concrete}
             class:unknown={node.unknown}
             class:deprecated={node.deprecated}
-            disabled={!nonConcreteSelectable && !node.concrete}
+            disabled={calcDisabled(selectionFilter, node)}
             on:click={() => selectNode(node)}>
             {#if multiSelect}
                 <Icon name={calcCheckIcon(selectionFilter, node)}/>
