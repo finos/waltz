@@ -61,13 +61,26 @@ export function mkSurveyInstanceStore() {
         .execute("POST", `api/survey-instance/${surveyInstanceId}/owner`, personId);
 
     const updateSubmissionDueDate = (id, updDate) => remote
-        .execute("PUT",`api/survey-instance/${id}/submission-due-date`, toLocalDate(updDate));
+        .execute("PUT", `api/survey-instance/${id}/submission-due-date`, toLocalDate(updDate));
 
     const updateApprovalDueDate = (id, updDate) => remote
-        .execute("PUT",`api/survey-instance/${id}/approval-due-date`, toLocalDate(updDate));
+        .execute("PUT", `api/survey-instance/${id}/approval-due-date`, toLocalDate(updDate));
 
     const copyResponses = (id, copyCmd) => remote
-        .execute("POST",`api/survey-instance/${id}/copy-responses`, copyCmd);
+        .execute("POST", `api/survey-instance/${id}/copy-responses`, copyCmd);
+
+    const reassignRecipients = () => remote
+        .execute(
+            "POST",
+            "api/survey-instance/reassign-recipients",
+            null);
+
+    const getReassignRecipientsCounts = (force = false) => remote
+        .fetchViewDatum(
+            "GET",
+            "api/survey-instance/reassign-counts",
+            null,
+            {force});
 
 
     return {
@@ -85,8 +98,9 @@ export function mkSurveyInstanceStore() {
         updateStatus,
         updateSubmissionDueDate,
         updateApprovalDueDate,
-        copyResponses
-
+        copyResponses,
+        reassignRecipients,
+        getReassignRecipientsCounts
     };
 }
 
