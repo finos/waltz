@@ -49,7 +49,7 @@
                 .map(d => {
                     if (_.isUndefined(d.optionCode)) {
                         return `\`NOT_PROVIDED\``
-                    } else if (_.includes(ratingColumnKinds, gridColumnDef.columnEntityKind)) {
+                    } else if (_.includes(ratingColumnKinds, gridColumnDef?.columnEntityKind)) {
                         const ratingSchemeItem = ratingSchemeItemsById[d.optionCode];
                         return `\`${ratingSchemeItem?.rating}\``;
                     } else {
