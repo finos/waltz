@@ -83,14 +83,24 @@
         }
 
         physicalFlowStore.create(command)
-            .then(() => toasts.success("Successfully added physical flow"))
-            .then(() => {
-                $pageInfo = {
-                    state: "main.app.view",
-                    params: {
-                        id: primaryEntityRef.id
-                    }
-                };
+            .then(r => {
+                const flowResponse = r.data;
+                logicalFlow.set(null);
+
+                if (flowResponse.outcome === "SUCCESS") {
+                    toasts.success("Successfully added physical flow");
+                } else if (flowResponse.outcome === "FAILURE") {
+                    toasts.warning(flowResponse.message + ", redirected to existing.")
+                }
+
+                if (flowResponse.entityReference) {
+                    $pageInfo = {
+                        state: "main.physical-flow.view",
+                        params: {
+                            id: flowResponse.entityReference.id
+                        }
+                    };
+                }
             })
             .catch(e => displayError("Could not create physical flow", e));
     }
