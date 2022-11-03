@@ -28,8 +28,6 @@
 
     function onToggleFilter(optionSummary) {
 
-        console.log({optionSummary});
-
         if (isSelectedSummary(optionSummary.summaryId)) {
             $filters = _.reject(
                 $filters,
