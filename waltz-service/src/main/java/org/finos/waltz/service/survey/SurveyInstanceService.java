@@ -27,6 +27,7 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.attestation.SyncRecipientsResponse;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.person.Person;
 import org.finos.waltz.model.survey.*;
@@ -140,6 +141,16 @@ public class SurveyInstanceService {
 
     public List<Person> findOwners(long instanceId) {
         return surveyInstanceOwnerDao.findPeopleForSurveyInstance(instanceId);
+    }
+
+
+    public SyncRecipientsResponse reassignRecipients() {
+        return surveyInstanceDao.reassignRecipients();
+    }
+
+
+    public SyncRecipientsResponse getReassignRecipientsCounts() {
+        return surveyInstanceDao.getReassignRecipientsCounts();
     }
 
 
