@@ -21,6 +21,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm ci
-        working-directory: node
+        working-directory: waltz-ng
       - run: npx --yes auditjs ossi --whitelist allow-list.json
-        working-directory: node
+        working-directory: waltz-ng
