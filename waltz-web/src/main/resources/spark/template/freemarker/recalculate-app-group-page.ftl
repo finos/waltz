@@ -36,7 +36,7 @@
     </#if>
 
     <div style="padding-top: 2em">
-        <a style="text-decoration: none;" href="/app-group/${appGroupId}?sections=10" target="_blank">
+        <a style="text-decoration: none;" href="../../../../app-group/${appGroupId}?sections=10" target="_blank">
             &#8617; Back to Application Group
         </a>
     </div>
