@@ -94,6 +94,7 @@ public enum EntityKind {
     SURVEY_TEMPLATE("Survey template"),
     SYSTEM("System"),
     TAG("Tag"),
+    USER_ROLE("User Role"),
 
     @Deprecated
     CAPABILITY("Capability"),  // TO BE REMOVED IN 1.5
