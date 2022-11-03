@@ -31,7 +31,6 @@
 
         reassignPromise
             .then(r => {
-                console.log({r});
                 const counts = r.data;
                 toasts.success(`Successfully reassigned recipients. Recipients created: ${counts?.recipientsCreatedCount}, Recipients removed: ${counts?.recipientsRemovedCount}`);
             })
