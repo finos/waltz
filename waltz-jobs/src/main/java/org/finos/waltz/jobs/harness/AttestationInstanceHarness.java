@@ -19,7 +19,7 @@
 package org.finos.waltz.jobs.harness;
 
 import org.finos.waltz.data.attestation.AttestationInstanceDao;
-import org.finos.waltz.model.attestation.AttestationSyncRecipientsResponse;
+import org.finos.waltz.model.attestation.SyncRecipientsResponse;
 import org.finos.waltz.service.DIConfiguration;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -32,7 +32,7 @@ public class AttestationInstanceHarness {
 
         AttestationInstanceDao dao = ctx.getBean(AttestationInstanceDao.class);
 
-        AttestationSyncRecipientsResponse records = dao.getCountsOfRecipientsToReassign();
+        SyncRecipientsResponse records = dao.getCountsOfRecipientsToReassign();
 
         System.out.println(records);
 

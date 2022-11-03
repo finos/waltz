@@ -18,7 +18,6 @@
 
 package org.finos.waltz.data.survey;
 
-import org.finos.waltz.schema.tables.records.SurveyRunRecord;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.model.EntityKind;
@@ -26,6 +25,7 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.HierarchyQueryScope;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.survey.*;
+import org.finos.waltz.schema.tables.records.SurveyRunRecord;
 import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -35,12 +35,12 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static org.finos.waltz.common.DateTimeUtilities.toLocalDate;
-import static org.finos.waltz.schema.Tables.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.DateTimeUtilities.toLocalDate;
 import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
 import static org.finos.waltz.common.StringUtilities.join;
 import static org.finos.waltz.common.StringUtilities.splitThenMap;
+import static org.finos.waltz.schema.Tables.*;
 
 @Repository
 public class SurveyRunDao {

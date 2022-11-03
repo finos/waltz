@@ -154,7 +154,7 @@ public class AttestationInstanceEndpoint implements Endpoint {
     }
 
 
-    private AttestationSyncRecipientsResponse reassignRecipientsRoute(Request request, Response response) {
+    private SyncRecipientsResponse reassignRecipientsRoute(Request request, Response response) {
         requireRole(userRoleService, request, SystemRole.ADMIN);
 
         String username = getUsername(request);
@@ -164,7 +164,7 @@ public class AttestationInstanceEndpoint implements Endpoint {
     }
 
 
-    private AttestationSyncRecipientsResponse getCountsOfRecipientsToReassign(Request request, Response response) {
+    private SyncRecipientsResponse getCountsOfRecipientsToReassign(Request request, Response response) {
         return attestationInstanceService.getCountsOfRecipientsToReassign();
     }
 

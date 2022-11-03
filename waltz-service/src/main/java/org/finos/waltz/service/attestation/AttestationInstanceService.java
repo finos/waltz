@@ -148,12 +148,12 @@ public class AttestationInstanceService {
     }
 
 
-    public AttestationSyncRecipientsResponse reassignRecipients() {
+    public SyncRecipientsResponse reassignRecipients() {
         return attestationInstanceDao.reassignRecipients();
     }
 
 
-    public AttestationSyncRecipientsResponse getCountsOfRecipientsToReassign() {
+    public SyncRecipientsResponse getCountsOfRecipientsToReassign() {
         return attestationInstanceDao.getCountsOfRecipientsToReassign();
     }
 

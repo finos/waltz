@@ -19,13 +19,17 @@
 package org.finos.waltz.web.endpoints.api;
 
 
+import org.finos.waltz.model.attestation.SyncRecipientsResponse;
 import org.finos.waltz.model.person.Person;
 import org.finos.waltz.model.survey.*;
+import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.survey.SurveyInstanceService;
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.endpoints.Endpoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,7 +44,9 @@ import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 @Service
 public class SurveyInstanceEndpoint implements Endpoint {
 
+    private static final Logger LOG = LoggerFactory.getLogger(SurveyInstanceEndpoint.class);
     private static final String BASE_URL = mkPath("api", "survey-instance");
+
 
     private final SurveyInstanceService surveyInstanceService;
     private final UserRoleService userRoleService;
@@ -60,6 +66,8 @@ public class SurveyInstanceEndpoint implements Endpoint {
     public void register() {
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
         String getPermissionsPath = mkPath(BASE_URL, ":id", "permissions");
+        String reassignRecipientsPath = mkPath(BASE_URL, "reassign-recipients");
+        String reassignCountsPath = mkPath(BASE_URL, "reassign-counts");
         String findByEntityRefPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findForRecipientIdPath = mkPath(BASE_URL, "recipient", "id", ":id");
         String findForSurveyRunPath = mkPath(BASE_URL, "run", ":id");
@@ -103,6 +111,14 @@ public class SurveyInstanceEndpoint implements Endpoint {
 
         ListRoute<Person> findOwnersRoute =
                 (req, res) -> surveyInstanceService.findOwners(getId(req));
+
+        DatumRoute<SyncRecipientsResponse> reassignRecipientsRoute = (req, res) -> {
+            requireRole(userRoleService, req, SystemRole.ADMIN);
+            LOG.info("User: {}, requested reassign recipients for surveys", getUsername(req));
+            return surveyInstanceService.reassignRecipients();
+        };
+
+        DatumRoute<SyncRecipientsResponse> reassignCountsRoute = (req, res) -> surveyInstanceService.getReassignRecipientsCounts();
 
         ListRoute<SurveyInstance> findForSurveyRunRoute =
                 (req, res) -> surveyInstanceService.findForSurveyRun(getId(req));
@@ -221,6 +237,8 @@ public class SurveyInstanceEndpoint implements Endpoint {
 
         getForDatum(getByIdPath, getByIdRoute);
         getForDatum(getPermissionsPath, getPermissionsRoute);
+        postForDatum(reassignRecipientsPath, reassignRecipientsRoute);
+        getForDatum(reassignCountsPath, reassignCountsRoute);
         getForList(findByEntityRefPath, findByEntityRefRoute);
         getForList(findForRecipientIdPath, findForRecipientIdRoute);
         getForList(findForSurveyRunPath, findForSurveyRunRoute);
