@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 import static java.lang.String.format;
 import static org.finos.waltz.common.ArrayUtilities.isEmpty;
 import static org.finos.waltz.common.SetUtilities.*;
-import static org.finos.waltz.service.report_grid.ReportGridUtilities.sanitizeString;
+import static org.finos.waltz.service.report_grid.ReportGridUtilities.mkOptionCode;
 
 public class ReportGridEvaluatorNamespace {
 
@@ -135,7 +135,7 @@ public class ReportGridEvaluatorNamespace {
 
 
     public CellResult mkResult(String value) {
-        return CellResult.mkResult(value, value, sanitizeString(value));
+        return CellResult.mkResult(value, value, mkOptionCode(value));
     }
 
 

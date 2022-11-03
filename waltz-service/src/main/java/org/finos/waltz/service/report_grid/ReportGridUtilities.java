@@ -145,19 +145,36 @@ public class ReportGridUtilities {
         try {
             Map<String, Long> columnDefinitionIdByName = Stream
                     .concat(
-                        grid.fixedColumnDefinitions()
-                                .stream()
-                                .map(fcd -> tuple(
-                                        fcd.gridColumnId(),
-                                        toNiceName(fcd))),
-                        grid.derivedColumnDefinitions()
-                                .stream()
-                                .map(dcd -> tuple(
-                                        dcd.gridColumnId(),
-                                        dcd.displayName())))
+                            grid.fixedColumnDefinitions()
+                                    .stream()
+                                    .map(fcd -> tuple(
+                                            fcd.gridColumnId(),
+                                            toNiceName(fcd))),
+                            grid.derivedColumnDefinitions()
+                                    .stream()
+                                    .map(dcd -> tuple(
+                                            dcd.gridColumnId(),
+                                            sanitizeString(dcd.displayName()))))
                     .collect(toMap(
-                        t -> t.v2,
-                        t -> t.v1));
+                            t -> t.v2,
+                            t -> t.v1));
+
+            Map<String, Long> columnDefinitionIdByExtId = Stream
+                    .concat(
+                            grid.fixedColumnDefinitions()
+                                    .stream()
+                                    .map(fcd -> tuple(
+                                            fcd.gridColumnId(),
+                                            fcd.externalId())),
+                            grid.derivedColumnDefinitions()
+                                    .stream()
+                                    .map(dcd -> tuple(
+                                            dcd.gridColumnId(),
+                                            dcd.externalId())))
+                    .filter(t -> t.v2.isPresent())
+                    .collect(toMap(
+                            t -> sanitizeString(t.v2.get()),
+                            t -> t.v1));
 
             return filterRows
                     .stream()
@@ -167,7 +184,11 @@ public class ReportGridUtilities {
                         String values = r.get(2);
 
                         String columnName = sanitizeString(columnString);
-                        Long columnDefnId = columnDefinitionIdByName.get(columnName);
+                        Long columnDefnId = columnDefinitionIdByName // lookup on name followed by external id
+                                .getOrDefault(
+                                        columnName,
+                                        columnDefinitionIdByExtId
+                                                .get(columnName));
 
                         if (columnDefnId == null) {
                             LOG.info(format("Cannot find column '%s' on grid. Skipping this filter", columnName));
@@ -202,9 +223,18 @@ public class ReportGridUtilities {
 
     public static String sanitizeString(String name) {
         return mkSafe(name)
-                .replaceAll("[:;*?/\\\\]", "")
+                .replaceAll("[:;*?!/\\\\]", "")
                 .replaceAll("\\s+", "")
                 .toLowerCase()
+                .trim();
+    }
+
+
+    public static String mkOptionCode(String name) {
+        return mkSafe(name)
+                .replaceAll("[:;*?!/\\\\]", "")
+                .replaceAll("\\s+", "_")
+                .toUpperCase()
                 .trim();
     }
 
@@ -212,8 +242,8 @@ public class ReportGridUtilities {
     public static IdSelectionOptions modifySelectionOptionsForGrid(IdSelectionOptions idSelectionOptions) {
         return idSelectionOptions.entityReference().kind() == EntityKind.PERSON
                 ? ImmutableIdSelectionOptions
-                    .copyOf(idSelectionOptions)
-                    .withScope(HierarchyQueryScope.EXACT)
+                .copyOf(idSelectionOptions)
+                .withScope(HierarchyQueryScope.EXACT)
                 : idSelectionOptions;
     }
 
