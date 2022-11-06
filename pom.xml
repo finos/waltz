@@ -82,7 +82,7 @@
         <freemarker.version>2.3.31</freemarker.version>
         <hikari.version>3.4.5</hikari.version>
         <immutables.version>2.9.2</immutables.version>
-        <jackson.version>2.13.4.1</jackson.version>
+        <jackson.version>2.13.4</jackson.version>
         <jackson-jsr310.version>2.13.4</jackson-jsr310.version>
         <java.version>1.8</java.version>
         <javax.mail.version>1.4.7</javax.mail.version>
