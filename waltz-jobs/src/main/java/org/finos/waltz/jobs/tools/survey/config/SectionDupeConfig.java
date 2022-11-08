@@ -8,6 +8,7 @@ import java.util.List;
 public abstract class SectionDupeConfig {
 
     public abstract String sectionName();
+
     public abstract List<TargetSectionConfig> targets();
 
 }

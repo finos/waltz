@@ -185,6 +185,7 @@ public class DataTypeDecoratorService {
 
         audit(format("Removed data types: %s", dataTypeIds.toString()),
                 entityReference, userName);
+
         recalculateDataTypeUsageForApplications(entityReference);
 
         return result;

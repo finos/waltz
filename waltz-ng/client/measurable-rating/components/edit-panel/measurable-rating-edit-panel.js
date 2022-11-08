@@ -28,6 +28,7 @@ import {displayError} from "../../../common/error-utils";
 import {alignDateToUTC} from "../../../common/date-utils";
 import toasts from "../../../svelte-stores/toast-store";
 import {entity} from "../../../common/services/enums/entity";
+import {editOperations} from "../../../common/services/enums/operation";
 
 const bindings = {
     allocations: "<",
@@ -195,8 +196,6 @@ function controller($q,
 
     vm.$onInit = () => {
 
-        const editOperations = ["ADD", "UPDATE", "REMOVE"];
-
         serviceBroker
             .loadViewData(CORE_API.PermissionGroupStore.findForParentEntityRef, [vm.parentEntityRef])
             .then(r => {
@@ -218,6 +217,7 @@ function controller($q,
             .href(
                 kindToViewState(vm.parentEntityRef.kind),
                 {id: vm.parentEntityRef.id});
+
         vm.allocationsByMeasurableId = _.groupBy(vm.allocations, a => a.measurableId);
         vm.allocationSchemesById = _.keyBy(vm.allocationSchemes, s => s.id);
     };

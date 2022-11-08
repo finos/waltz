@@ -1,0 +1,62 @@
+/*
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
+ */
+
+package org.finos.waltz.jobs.harness;
+
+
+import org.finos.waltz.data.entity_named_note.EntityNamedNoteTypeDao;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.service.DIConfiguration;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import static org.finos.waltz.model.EntityReference.mkRef;
+
+public class EntityNamedNoteTypeHarness {
+    public static void main(String[] args) {
+        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
+        EntityNamedNoteTypeDao dao = ctx.getBean(EntityNamedNoteTypeDao.class);
+
+//
+//        System.out.println("\n\nTitch");
+//        System.out.println(dao.findForRefAndUser(
+//                mkRef(EntityKind.APP_GROUP, 27342),
+//                "david.watkins@db.com"));
+//
+//        System.out.println("\n\nTitch Derived");
+//        System.out.println(dao.findForRefAndUser(
+//                mkRef(EntityKind.APP_GROUP, 27343),
+//                "david.watkins@db.com"));
+
+        System.out.println("\n\nAuto");
+        System.out.println(dao.findForRefAndUser(
+                mkRef(EntityKind.APP_GROUP, 491),
+                "david.watkins@db.com"));
+//
+//        System.out.println("\n\nMTNA Me");
+//        System.out.println(dao.findForRefAndUser(
+//                mkRef(EntityKind.APPLICATION, 19399),
+//                "david.watkins@db.com"));
+//
+//        System.out.println("\n\nMTNA Nobody");
+//        System.out.println(dao.findForRefAndUser(
+//                mkRef(EntityKind.APPLICATION, 19399),
+//                "nobody.special@db.com"));
+
+
+    }
+}

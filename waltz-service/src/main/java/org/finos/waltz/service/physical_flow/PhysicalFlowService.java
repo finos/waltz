@@ -223,7 +223,7 @@ public class PhysicalFlowService {
                         .withLastUpdatedAt(now)
                         .withCreated(UserTimestamp.mkForUser(username, now))));
 
-        PhysicalFlow flow = ImmutablePhysicalFlow.builder()
+        ImmutablePhysicalFlow.Builder flowBuilder = ImmutablePhysicalFlow.builder()
                 .specificationId(specId)
                 .basisOffset(command.flowAttributes().basisOffset())
                 .frequency(command.flowAttributes().frequency())
@@ -233,12 +233,18 @@ public class PhysicalFlowService {
                 .logicalFlowId(command.logicalFlowId())
                 .lastUpdatedBy(username)
                 .lastUpdatedAt(now)
-                .created(UserTimestamp.mkForUser(username, now))
-                .build();
+                .created(UserTimestamp.mkForUser(username, now));
+
+        command
+                .flowAttributes()
+                .externalId()
+                .ifPresent(flowBuilder::externalId);
+
+        PhysicalFlow flow = flowBuilder.build();
 
         // ensure existing not in database
         List<PhysicalFlow> byAttributesAndSpecification = physicalFlowDao.findByAttributesAndSpecification(flow);
-        if(byAttributesAndSpecification.size() > 0) {
+        if (byAttributesAndSpecification.size() > 0) {
             return ImmutablePhysicalFlowCreateCommandResponse.builder()
                     .originalCommand(command)
                     .outcome(CommandOutcome.FAILURE)

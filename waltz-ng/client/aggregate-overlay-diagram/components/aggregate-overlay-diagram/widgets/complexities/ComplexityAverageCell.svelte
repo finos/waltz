@@ -94,10 +94,6 @@
         text-align: right
     }
 
-    .summary-table .derived {
-        font-style: italic;
-    }
-
     svg {
         display: block;
     }

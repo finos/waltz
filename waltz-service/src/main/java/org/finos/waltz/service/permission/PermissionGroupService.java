@@ -49,12 +49,7 @@ public class PermissionGroupService {
             return Collections.emptySet();
         }
 
-        Set<Permission> permissions = permissionGroupDao.findPermissionsForParentEntityReference(parentEntityRef);
-        Set<Long> involvements = involvementService.findExistingInvolvementKindIdsForUser(parentEntityRef, username);
-
-        return filter(
-                permissions,
-                p -> p.requiredInvolvementsResult().isAllowed(involvements));
+        return permissionGroupDao.findPermissionsForParentEntityReference(parentEntityRef);
     }
 
 

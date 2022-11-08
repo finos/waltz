@@ -133,14 +133,6 @@ public class Main {
 
     private void registerExceptionHandlers() {
 
-        EndpointUtilities.addExceptionHandler(InsufficientPrivelegeException.class, (e, req, resp) ->
-                reportException(
-                    HttpStatus.UNAUTHORIZED_401,
-                    "NOT_AUTHORIZED",
-                    e.getMessage(),
-                    resp,
-                    LOG));
-
         EndpointUtilities.addExceptionHandler(NotFoundException.class, (e, req, res) -> {
             String message = "Not found exception" + e.getMessage();
             LOG.error(message, e);
@@ -218,6 +210,23 @@ public class Main {
                     LOG);
         });
 
+        EndpointUtilities.addExceptionHandler(NotAuthorizedException.class, (e, req, res) -> {
+            reportException(
+                    HttpStatus.FORBIDDEN_403,
+                    "NOT_AUTHORIZED",
+                    e.getMessage(),
+                    res,
+                    LOG);
+        });
+
+        EndpointUtilities.addExceptionHandler(InsufficientPrivelegeException.class, (e, req, resp) ->
+                reportException(
+                        HttpStatus.FORBIDDEN_403,
+                        "NOT_AUTHORIZED",
+                        e.getMessage(),
+                        resp,
+                        LOG));
+
         EndpointUtilities.addExceptionHandler(Exception.class, (e, req, res) -> {
             String message = "Generic Exception: " + e.getMessage() + " / " + e.getClass().getCanonicalName();
             LOG.error(message, e);
@@ -228,6 +237,7 @@ public class Main {
                     res,
                     LOG);
         });
+
     }
 
 

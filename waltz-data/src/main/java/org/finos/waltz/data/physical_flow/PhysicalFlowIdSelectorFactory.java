@@ -61,6 +61,7 @@ public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
             case DATA_TYPE:
                 return mkForDataType(options);
             case APPLICATION:
+            case ACTOR:
             case APP_GROUP:
             case CHANGE_INITIATIVE:
             case MEASURABLE:

@@ -100,7 +100,7 @@ public class MeasurableRatingReplacementEndpoint implements Endpoint {
     }
 
 
-    private void checkHasPermissionForThisOperation(Long decommId,
+    private void checkHasPermissionForThisOperation(long decommId,
                                                     Set<Operation> operations,
                                                     String username) throws InsufficientPrivelegeException {
 

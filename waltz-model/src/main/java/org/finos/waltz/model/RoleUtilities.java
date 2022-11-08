@@ -16,10 +16,8 @@
  *
  */
 
-package org.finos.waltz.service.user;
+package org.finos.waltz.model;
 
-import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.user.SystemRole;
 
 import java.util.HashMap;

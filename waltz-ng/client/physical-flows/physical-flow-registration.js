@@ -96,6 +96,12 @@ function controller(
         });
     })
 
+    logicalFlow.subscribe((flow) => {
+        $scope.$applyAsync(() => {
+            vm.targetChanged(flow);
+        });
+    })
+
     vm.onToggleMode = () => {
         if (vm.viewMode === ViewMode.SECTION) {
             viewMode.set(ViewMode.FLOW)
@@ -126,7 +132,6 @@ function controller(
             .loadViewData(CORE_API.LogicalFlowStore.getById, [targetFlowId])
             .then(r => {
                 logicalFlow.set(r.data);
-                vm.targetChanged(r.data);
             });
     } else {
         logicalFlow.set(null);
@@ -137,7 +142,6 @@ function controller(
 
     const doValidation = () => {
         vm.visibility.similarFlows = false;
-        // vm.similarFlows = findSimilarFlows(vm.specification, vm.flowAttributes, vm.targetEntity, vm.existingFlowsByTarget);
         return validate(vm.specification, vm.flowAttributes, vm.targetLogicalFlow);
     };
 

@@ -2,7 +2,7 @@
     import EntitySelector from "./EntitySelector.svelte";
     import _ from "lodash";
     import ReportGridColumnSummary from "./ReportGridColumnSummary.svelte";
-    import {determineDefaultRollupRule, sameColumnRef} from "../report-grid-utils";
+    import {determineDefaultColumnOptions, sameColumnRef} from "../report-grid-utils";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import {reportGridStore} from "../../../../svelte-stores/report-grid-store";
     import toasts from "../../../../svelte-stores/toast-store";
@@ -11,7 +11,8 @@
     import NoData from "../../../../common/svelte/NoData.svelte";
     import {columnDefs, hasChanged, lastMovedColumn, selectedColumn, selectedGrid,} from "../report-grid-store";
     import ColumnRemovalConfirmation from "./ColumnRemovalConfirmation.svelte";
-    import {entity} from "../../../../common/services/enums/entity";
+    import Markdown from "../../../../common/svelte/Markdown.svelte";
+    import {derivedColumnHelpText} from "./column-definition-utils";
 
 
     export let gridId;
@@ -31,20 +32,20 @@
     let workingDerivedCol = {
         displayName: null,
         derivationScript: null,
-        externalId: null,
-        columnDescription: null
-    }
+        externalId: null
+    };
 
     function clearWorking() {
         workingDerivedCol = {
             displayName: null,
             derivationScript: null,
-            externalId: null,
-            columnDescription: null
-        }
+            externalId: null
+        };
     }
 
     function onSelect(d) {
+
+        const columnEntityKind = _.get(d, "columnEntityKind");
 
         //Only fixed columns are chosen through picker
         const column = {
@@ -56,7 +57,7 @@
             columnQualifierId: d.columnQualifierId,
             columnName: d.columnName,
             columnDescription: d.columnDescription,
-            ratingRollupRule: determineDefaultRollupRule(d).key,
+            additionalColumnOptions: determineDefaultColumnOptions(columnEntityKind).key,
             displayName: d.displayName,
             position: 0
         };
@@ -84,7 +85,6 @@
             kind: "REPORT_GRID_DERIVED_COLUMN_DEFINITION",
             columnEntityKind: "REPORT_GRID_DERIVED_COLUMN_DEFINITION",
             displayName: workingDerivedCol.displayName,
-            columnDescription: workingDerivedCol.columnDescription,
             externalId: workingDerivedCol.externalId,
             derivationScript: workingDerivedCol.derivationScript,
             position: 0
@@ -135,7 +135,7 @@
                 columnEntityKind: d.columnEntityKind,
                 columnEntityId: d.columnEntityId,
                 position: d.position,
-                ratingRollupRule: d.ratingRollupRule,
+                additionalColumnOptions: d.additionalColumnOptions,
                 entityFieldReference: d.entityFieldReference,
                 displayName: d.displayName,
                 columnQualifierKind: d.columnQualifierKind,
@@ -280,24 +280,17 @@
                        bind:value={workingDerivedCol.externalId}>
             </div>
             <div style="padding-bottom: 1em">
-                <strong>Description</strong>
-                <div class="small help-text">A description of this column.</div>
-                <input class="form-control"
-                       required
-                       id="description"
-                       placeholder="Description"
-                       bind:value={workingDerivedCol.columnDescription}>
-            </div>
-            <div style="padding-bottom: 1em">
                 <strong>Derivation Script</strong>
                 <div class="small help-text">Calculates the value to be displayed in this column.
                 </div>
-                <textarea class="form-control"
+                <textarea class="form-control code"
                           required
                           id="derivationScript"
                           rows="6"
                           placeholder="Enter script here"
                           bind:value={workingDerivedCol.derivationScript}/>
+                <br>
+                <Markdown text={derivedColumnHelpText}/>
             </div>
             <span>
                 <button class="btn btn-skinny"
@@ -314,3 +307,9 @@
         {/if}
     </div>
 </div>
+
+<style>
+    .code {
+        font-family: monospace;
+    }
+</style>

@@ -18,21 +18,22 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.model.EntityWithOperations;
+import org.finos.waltz.model.entity_named_note.EntityNamedNodeType;
+import org.finos.waltz.model.entity_named_note.EntityNamedNoteTypeChangeCommand;
+import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.entity_named_note.EntityNamedNoteTypeService;
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.endpoints.Endpoint;
-import org.finos.waltz.model.entity_named_note.EntityNamedNodeType;
-import org.finos.waltz.model.entity_named_note.EntityNamedNoteTypeChangeCommand;
-import org.finos.waltz.model.user.SystemRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
 
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.web.WebUtilities.*;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
-import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Service
 public class EntityNamedNoteTypeEndpoint implements Endpoint {
@@ -57,9 +58,11 @@ public class EntityNamedNoteTypeEndpoint implements Endpoint {
     @Override
     public void register() {
         String findAllPath = BASE;
+        String getByExternalIdPath = mkPath(BASE, "external-id", ":externalId");
         String removePath = mkPath(BASE, ":id");
         String updatePath = mkPath(BASE, ":id");
         String createPath = mkPath(BASE);
+        String findForRefAndUserPath = mkPath(BASE, "by-ref", ":kind", ":id");
 
 
         ListRoute<EntityNamedNodeType> findAllRoute = (req, res) ->
@@ -82,12 +85,20 @@ public class EntityNamedNoteTypeEndpoint implements Endpoint {
             return entityNamedNoteTypeService.removeById(getId(req), getUsername(req));
         };
 
+        DatumRoute<EntityNamedNodeType> getByExternalIdRoute = (req, res) -> entityNamedNoteTypeService.getByExternalId(req.params("externalId"));
+
+        ListRoute<EntityWithOperations<EntityNamedNodeType>> findForRefAndUserRoute = (req, res) ->
+                entityNamedNoteTypeService.findForRefAndUser(getEntityReference(req), getUsername(req));
 
         getForList(findAllPath, findAllRoute);
+        getForDatum(getByExternalIdPath, getByExternalIdRoute);
         deleteForDatum(removePath, removeRoute);
         postForDatum(createPath, createRoute);
         putForDatum(updatePath, updateRoute);
+        getForList(findForRefAndUserPath, findForRefAndUserRoute);
     }
+
+
 
 
     private void ensureUserHasAdminRights(Request request) {
