@@ -237,7 +237,7 @@ public class AttestationInstanceDao {
     }
 
 
-    public AttestationSyncRecipientsResponse reassignRecipients() {
+    public SyncRecipientsResponse reassignRecipients() {
 
         Set<Tuple2<Long, Long>> runIdToInvKindId = getAttestationRunIdToInvKindId();
 
@@ -275,7 +275,7 @@ public class AttestationInstanceDao {
                             addedRecipients,
                             removedRecipients));
 
-                    return ImmutableAttestationSyncRecipientsResponse.builder()
+                    return ImmutableSyncRecipientsResponse.builder()
                             .recipientsRemovedCount(Long.valueOf(removedRecipients))
                             .recipientsCreatedCount(Long.valueOf(addedRecipients))
                             .build();
@@ -303,7 +303,7 @@ public class AttestationInstanceDao {
     }
 
 
-    public AttestationSyncRecipientsResponse getCountsOfRecipientsToReassign() {
+    public SyncRecipientsResponse getCountsOfRecipientsToReassign() {
 
         Set<Tuple2<Long, Long>> runIdToInvKindId = getAttestationRunIdToInvKindId();
 
@@ -332,7 +332,7 @@ public class AttestationInstanceDao {
                             .from(attestationRecipientIds)
                             .fetch();
 
-                    return ImmutableAttestationSyncRecipientsResponse.builder()
+                    return ImmutableSyncRecipientsResponse.builder()
                             .recipientsRemovedCount(Long.valueOf(toRemove.size()))
                             .recipientsCreatedCount(Long.valueOf(toAdd.size()))
                             .build();

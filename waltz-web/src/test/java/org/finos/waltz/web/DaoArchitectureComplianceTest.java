@@ -55,17 +55,4 @@ public class DaoArchitectureComplianceTest extends BaseArchitectureComplianceTes
         rule.check(waltzAndJavaUtilClasses);
     }
 
-
-    @Test
-    public void daoMethodsShouldNotUseSelectFrom() {
-
-        ArchRule rule = classes().that()
-                .areNotInterfaces()
-                .and()
-                .haveNameMatching(".*Dao")
-                .should(notHaveDaoMethodsWhichCallSelectFrom);
-
-        rule.check(waltzOnlyClasses);
-    }
-
 }

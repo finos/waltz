@@ -23,7 +23,7 @@
     <parent>
         <artifactId>waltz</artifactId>
         <groupId>org.finos</groupId>
-        <version>1.45-SNAPSHOT</version>
+        <version>1.46-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -77,7 +77,7 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>1.4.200</version>
+            <version>2.1.212</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>

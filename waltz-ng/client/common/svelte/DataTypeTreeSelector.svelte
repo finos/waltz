@@ -6,6 +6,7 @@
     import _ from "lodash";
 
     export let multiSelect = false;
+    export let nonConcreteSelectable = true;
     export let selectionFilter = () => true;
 
     const root = {name: "Root"};
@@ -33,7 +34,6 @@
     $: searchNodes = prepareSearchNodes(dataTypes);
     $: displayedHierarchy = calcDisplayHierarchy(searchNodes, qry);
 
-    $: console.log("DTTS", {selectionFilter})
 </script>
 
 <SearchInput bind:value={qry}/>
@@ -41,11 +41,11 @@
 <div class="waltz-scroll-region-250">
     <DataTypeTreeNode {multiSelect}
                       {selectionFilter}
+                      {nonConcreteSelectable}
                       isRoot={true}
                       node={root}
                       childNodes={displayedHierarchy}
                       expanded={expanded}
                       on:select/>
-
 </div>
 

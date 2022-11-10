@@ -30,6 +30,7 @@ import org.finos.waltz.service.flow_classification_rule.FlowClassificationRuleSe
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.finos.waltz.service.physical_specification_data_type.PhysicalSpecDataTypeService;
 import org.finos.waltz.service.report_grid.ReportGridFilterViewService;
+import org.finos.waltz.service.survey.SurveyInstanceService;
 import org.finos.waltz.service.usage_info.DataTypeUsageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +58,7 @@ public class ScheduledJobService {
     private final PhysicalSpecDataTypeService physicalSpecDataTypeService;
     private final ScheduledJobDao scheduledJobDao;
     private final AttestationRunService attestationRunService;
+    private final SurveyInstanceService surveyInstanceService;
 
     private final ReportGridFilterViewService reportGridFilterViewService;
 
@@ -69,6 +71,7 @@ public class ScheduledJobService {
                                PhysicalSpecDataTypeService physicalSpecDataTypeService,
                                ScheduledJobDao scheduledJobDao,
                                AttestationRunService attestationRunService,
+                               SurveyInstanceService surveyInstanceService,
                                ReportGridFilterViewService reportGridFilterViewService) {
 
         checkNotNull(dataTypeUsageService, "dataTypeUsageService cannot be null");
@@ -78,6 +81,7 @@ public class ScheduledJobService {
         checkNotNull(scheduledJobDao, "scheduledJobDao cannot be null");
         checkNotNull(attestationRunService, "attestationRunService cannot be null");
         checkNotNull(reportGridFilterViewService, "reportGridFilterViewService cannot be null");
+        checkNotNull(surveyInstanceService, "surveyInstanceService cannot be null");
 
         this.dataTypeUsageService = dataTypeUsageService;
         this.entityHierarchyService = entityHierarchyService;
@@ -87,6 +91,7 @@ public class ScheduledJobService {
         this.scheduledJobDao = scheduledJobDao;
         this.attestationRunService = attestationRunService;
         this.reportGridFilterViewService = reportGridFilterViewService;
+        this.surveyInstanceService = surveyInstanceService;
     }
 
 
@@ -127,6 +132,9 @@ public class ScheduledJobService {
 
         runIfNeeded(JobKey.ATTESTATION_ISSUE_INSTANCES,
                 (jk) -> attestationRunService.issueInstancesForPendingRuns());
+
+        runIfNeeded(JobKey.SURVEY_INSTANCE_REASSIGN_RECIPIENTS,
+                (jk) -> surveyInstanceService.reassignRecipients());
 
         runIfNeeded(JobKey.REPORT_GRID_RECALCULATE_APP_GROUPS_FROM_FILTERS,
                 (jk) -> reportGridFilterViewService.generateAppGroupsFromFilter());

@@ -148,17 +148,17 @@ public class ReportGridFilterViewService {
                 .collect(Collectors.toSet());
     }
 
-    private Tuple2<Long, Set<AppGroupEntry>> determineApplicationsInGroup(ReportGridFilterInfo d) {
-        EntityKind subjectKind = d.gridDefinition().subjectKind();
+    private Tuple2<Long, Set<AppGroupEntry>> determineApplicationsInGroup(ReportGridFilterInfo reportGridFilterInfo) {
+        EntityKind subjectKind = reportGridFilterInfo.gridDefinition().subjectKind();
 
         Optional<ReportGrid> maybeGrid = reportGridService.getByIdAndSelectionOptions(
-                d.gridDefinition().id().get(),
-                d.idSelectionOptions());
+                reportGridFilterInfo.gridDefinition().id().get(),
+                reportGridFilterInfo.idSelectionOptions());
 
         return maybeGrid
-            .map(grid -> {
-                ReportGridInstance instance = grid.instance();
-                Set<ReportGridCell> cellData = instance.cellData();
+                .map(grid -> {
+                    ReportGridInstance instance = grid.instance();
+                    Set<ReportGridCell> cellData = instance.cellData();
 
                 Set<Long> subjectIds = SetUtilities.map(
                         instance.subjects(),
@@ -166,7 +166,7 @@ public class ReportGridFilterViewService {
 
                 Set<Long> subjectsPassingFilters = applyFilters(
                         cellData,
-                        d.gridFilters(),
+                        reportGridFilterInfo.gridFilters(),
                         subjectIds,
                         instance.ratingSchemeItems());
 
@@ -179,9 +179,9 @@ public class ReportGridFilterViewService {
                                 .isReadOnly(true)
                                 .build());
 
-                return tuple(d.appGroupId(), appGroupEntries);
-            })
-            .orElseThrow(() -> new IllegalStateException("Cannot create grid instance with params" + d));
+                    return tuple(reportGridFilterInfo.appGroupId(), appGroupEntries);
+                })
+                .orElseThrow(() -> new IllegalStateException("Cannot create grid instance with params" + reportGridFilterInfo));
     }
 
 
@@ -301,6 +301,7 @@ public class ReportGridFilterViewService {
             ReportGridDefinition grid = loadGrid(gridInfoRow.get(1));
 
             Set<GridFilter> filterValues = parseGridFilters(filterRows, grid);
+
             return ImmutableReportGridFilterInfo.builder()
                     .appGroupId(appGroupId)
                     .idSelectionOptions(mkSelectionOptionsFromGridInfoRow(gridInfoRow))
