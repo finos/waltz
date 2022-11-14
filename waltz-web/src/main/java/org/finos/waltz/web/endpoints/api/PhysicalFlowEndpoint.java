@@ -51,6 +51,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.web.WebUtilities.getLong;
 
 @Service
 public class PhysicalFlowEndpoint implements Endpoint {
@@ -204,8 +205,8 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
         DatumRoute<Boolean> mergeRoute =
                 (request, response) -> physicalFlowService
-                        .merge(WebUtilities.getLong(request, "fromId"),
-                                WebUtilities.getLong(request,"toId"),
+                        .merge(getLong(request, "fromId"),
+                                getLong(request, "toId"),
                                 WebUtilities.getUsername(request));
 
         EndpointUtilities.getForDatum(getByIdPath, getByIdRoute);

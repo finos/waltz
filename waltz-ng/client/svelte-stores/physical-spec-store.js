@@ -26,8 +26,19 @@ export function mkPhysicalSpecStore() {
     };
 
 
+    const findPermissions = (id, force = false) => {
+        return remote
+            .fetchViewList(
+                "GET",
+                `api/physical-specification/id/${id}`,
+                null,
+                {force});
+    };
+
+
     return {
-        findBySelector
+        findBySelector,
+        findPermissions
     };
 }
 

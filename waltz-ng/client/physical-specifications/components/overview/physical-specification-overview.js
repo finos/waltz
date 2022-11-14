@@ -16,6 +16,9 @@
  *
  */
 import template from './physical-specification-overview.html';
+import {CORE_API} from "../../../common/services/core-api-utils";
+import _ from "lodash";
+import {initialiseData} from "../../../common";
 
 
 const bindings = {
@@ -27,8 +30,34 @@ const bindings = {
 };
 
 
+const initialState = {
+    specification: null,
+    visibility: {
+        overviewEditor: false
+    }
+};
+
+function controller(serviceBroker) {
+
+    const vm = initialiseData(this, initialState);
+
+    vm.$onInit = () => {
+        serviceBroker.loadViewData(CORE_API.PhysicalSpecificationStore.findPermissionsForSpec, [vm.specification.id])
+            .then(r => vm.canEdit = console.log({r}) || _.some(
+                r.data,
+                d => _.includes(["ADD", "UPDATE", "REMOVE"], d)));
+    }
+}
+
+
+controller.$inject = [
+    "ServiceBroker"
+]
+
+
 const component = {
     bindings,
+    controller,
     template
 };
 

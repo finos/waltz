@@ -248,7 +248,8 @@ public class StringUtilities {
                     .replaceAll("​", "")
                     .replaceAll("â€œ", "\"")
                     .replaceAll("â€", "\"")
-                    .replaceAll("â€™", "'");
+                    .replaceAll("â€™", "'")
+                    .replaceAll(" ", " ");
         }
     }
 
