@@ -27,7 +27,7 @@
 {#each objs as d}
     <g transform={d.transform}
        class={`object ${d.obj.stereotype}`}
-       on:click|stopPropagation={() => selectDiagramObject(d.obj)}>
+       on:click,keydown|stopPropagation={() => selectDiagramObject(d.obj)}>
         <svelte:component obj={d.obj}
                           layout={d.layout}
                           this={d.comp}

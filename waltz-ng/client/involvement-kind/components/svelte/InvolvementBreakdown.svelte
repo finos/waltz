@@ -45,7 +45,7 @@
 {#if displayMode === DisplayModes.LIST}
     <ul>
         {#each displayedStats as stat}
-            <li on:click={() => onClick(stat)}>
+            <li on:click,keydown={() => onClick(stat)}>
                 {stat.entityInfo.name || "Unknown"} -
                 <Icon name="user"/> {stat.personCounts.activePeopleCount} /
                 <span class="text-muted">{stat.personCounts.removedPeopleCount}</span>
@@ -63,7 +63,7 @@
         <tbody>
         {#each displayedStats as stat}
             <tr class="clickable"
-                on:click={() => onClick(stat)}>
+                on:click,keydown={() => onClick(stat)}>
                 <td>{stat.entityInfo.name || "Unknown"}</td>
                 <td>
                     {stat.personCounts.activePeopleCount} /

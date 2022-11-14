@@ -18,7 +18,7 @@
         r={dimensions.circleRadius}
         fill={noData ? "#eee" : color}
         stroke={noData ? "#bbb" : stroke}
-        on:click={() => onSelect(data.date)}>
+        on:click,keydown={() => onSelect(data.date)}>
 </circle>
 
 

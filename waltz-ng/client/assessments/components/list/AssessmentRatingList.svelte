@@ -177,7 +177,7 @@
                     </td>
                     <td colspan="2"
                         class="clickable"
-                        on:click={() => toggleGroup(group)}>
+                        on:click,keydown={() => toggleGroup(group)}>
                         <strong>
                             <span>{group.groupName}</span>
                         </strong>

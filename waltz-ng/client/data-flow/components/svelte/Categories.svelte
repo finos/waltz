@@ -84,7 +84,7 @@
             <g transform={mkTranslateStr(downNavigationOffset)}
                class="navigation-control">
                 <path d={symbol().type(symbolCircle).size(500)()}
-                      on:click|stopPropagation={() => navigateToCategory(category)}
+                      on:click,keydown|stopPropagation={() => navigateToCategory(category)}
                       class="clickable navigation-circle">
                 </path>
                 <path d={symbol().type(symbolTriangle).size(40)()}
@@ -98,7 +98,7 @@
             <g transform={mkTranslateStr(upNavigationOffset)}
                class="navigation-control">
                 <path d={symbol().type(symbolCircle).size(500)()}
-                      on:click|stopPropagation={() => navigateToCategory($parentCategory)}
+                      on:click,keydown|stopPropagation={() => navigateToCategory($parentCategory)}
                       class="clickable navigation-circle">
                 </path>
                 <path d={symbol().type(symbolTriangle).size(40)()}

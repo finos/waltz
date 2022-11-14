@@ -52,7 +52,7 @@
                 {#if selectedItem}
                     <li>
                         <div class="text-muted clickable force-wrap"
-                             on:click={() => selectItem(null)}>
+                             on:click,keydown={() => selectItem(null)}>
                             {defaultMessage}
                         </div>
                     </li>
