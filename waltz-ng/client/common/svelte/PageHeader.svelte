@@ -42,7 +42,7 @@
 
     <div class="header-sticky"
          class:stickyVisible
-         on:click={() => pageY = 0}>
+         on:click,keydown={() => pageY = 0}>
 
         <h2 class="clickable">
             <Icon name={icon}/>

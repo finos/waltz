@@ -201,7 +201,7 @@
             <tr>
                 <td>{templateInfo.template.name}</td>
                 {#each tableHeaders as header}
-                    <td on:click|stopPropagation={() => selectSurveyFilter(header, templateInfo)}
+                    <td on:click,keydown|stopPropagation={() => selectSurveyFilter(header, templateInfo)}
                         class={determineClass($selectedSurveyStatusCell, header, templateInfo)}
                         class:selected={$selectedSurveyStatusCell?.header === header && $selectedSurveyStatusCell?.templateInfo === templateInfo}>
                         {#if _.isEmpty(header.data(templateInfo))}

@@ -17,6 +17,7 @@
  */
 
 import "@babel/polyfill";
+import "url-polyfill";
 import "whatwg-fetch";
 import angular from "angular";
 import "../style/style.scss";

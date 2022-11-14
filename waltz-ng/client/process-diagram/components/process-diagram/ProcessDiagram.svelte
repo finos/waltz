@@ -33,7 +33,7 @@
              width="100%"
              height="700"
              preserveAspectRatio="xMinYMin"
-             on:click={clearSelections}
+             on:click,keydown={clearSelections}
              {viewBox}>
 
             <Defs/>

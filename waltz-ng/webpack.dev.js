@@ -26,8 +26,8 @@ module.exports = smp.wrap(merge(common, {
     //devtool: "inline-source-map",
     //devtool: "cheap-module-eval-source-map",
     devServer: {
-        contentBase: "./dist",
-        disableHostCheck: true,
+        static: "./dist", //contentBase: "./dist",
+        allowedHosts: "all", //disableHostCheck: true,
         historyApiFallback: {
             disableDotRule: true
         },

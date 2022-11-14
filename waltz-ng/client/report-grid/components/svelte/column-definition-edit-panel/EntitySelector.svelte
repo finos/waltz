@@ -131,7 +131,7 @@
                         {#if selectedEntityKind}
                             <li>
                                 <div class="text-muted clickable"
-                                     on:click={() => selectEntityKind(null)}>
+                                     on:click,keydown={() => selectEntityKind(null)}>
                                     Select an entity kind
                                 </div>
                             </li>

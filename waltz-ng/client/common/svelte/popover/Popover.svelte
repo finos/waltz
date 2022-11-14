@@ -9,7 +9,7 @@
 {#if $Popover}
 
     <div class="waltz-backing-screen"
-         on:click={() => $Popover ? Popover.dismiss() : null}>
+         on:click,keydown={() => $Popover ? Popover.dismiss() : null}>
     </div>
 
     <section class="waltz-svelte-popover">

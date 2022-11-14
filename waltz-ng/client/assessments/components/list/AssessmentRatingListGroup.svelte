@@ -40,7 +40,7 @@
 
 {#each group.provided as row}
     <tr transition:fade
-        on:click={() => selectAssessment(row)}
+        on:click,keydown={() => selectAssessment(row)}
         class="clickable">
         <td>
             <button class="btn btn-skinny"
@@ -87,7 +87,7 @@
                 </button>
             </td>
             <td class="clickable"
-                on:click={() => notProvidedCollapsed = false}>
+                on:click,keydown={() => notProvidedCollapsed = false}>
                 <strong>Not Rated</strong>
             </td>
             <td class="force-wrap">
@@ -116,7 +116,7 @@
             </td>
             <td colspan="2"
                 class="clickable"
-                on:click={() => notProvidedCollapsed = true}>
+                on:click,keydown={() => notProvidedCollapsed = true}>
                 <strong>Not Rated</strong>
             </td>
         </tr>

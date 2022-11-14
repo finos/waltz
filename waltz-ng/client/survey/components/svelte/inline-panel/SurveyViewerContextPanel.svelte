@@ -130,7 +130,7 @@
                                 on:mouseleave={() => section.hovering = false}
                                 class:highlighted={section.hovering}
                                 class:selected={section?.sectionName === $selectedSection?.sectionName}
-                                on:click={() => selectSection(section)}>
+                                on:click,keydown={() => selectSection(section)}>
                                 {section.sectionName}
                                 <span
                                     title={`${getResponsesCount(section)} questions with a response out of a total ${_.size(section.questions)} questions`}

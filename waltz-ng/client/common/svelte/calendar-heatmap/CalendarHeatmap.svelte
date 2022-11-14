@@ -61,7 +61,7 @@
                           on:mouseenter={() => hoveredMonth = idx}
                           on:mouseleave={() => hoveredMonth = null}
                           fill={hoveredMonth === idx ? "#eee" : "#fff"}
-                          on:click={() => onSelectMonth(_.map(monthData.days, d => d.date))}>
+                          on:click,keydown={() => onSelectMonth(_.map(monthData.days, d => d.date))}>
                     </rect>
                 </g>
                 <text transform={`translate(${7 * dimensions.day.width / 2})`}
