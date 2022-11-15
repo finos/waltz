@@ -51,18 +51,22 @@ export function store($http, baseApiUrl) {
         .then(r => r.data);
 
 
+    const findPermissionsForSpec = (specificationId) => $http
+        .get(`${base}/id/${specificationId}/permissions`)
+        .then(r => r.data);
+
     const search = (terms) => $http
         .post(`${base}/search`, terms)
         .then(r => r.data);
 
 
     const deleteById = (specificationId) => $http
-            .delete(`${base}/${specificationId}`)
-            .then(r => r.data);
+        .delete(`${base}/${specificationId}`)
+        .then(r => r.data);
 
     const updateAttribute = (flowId, command) => $http
-            .post(`${base}/id/${flowId}/attribute`, command)
-            .then(r => r.data);
+        .post(`${base}/id/${flowId}/attribute`, command)
+        .then(r => r.data);
 
 
     return {
@@ -72,7 +76,8 @@ export function store($http, baseApiUrl) {
         getById,
         deleteById,
         search,
-        updateAttribute
+        updateAttribute,
+        findPermissionsForSpec
     };
 }
 
@@ -121,5 +126,10 @@ export const PhysicalSpecificationStore_API = {
         serviceName,
         serviceFnName: "updateAttribute",
         description: "executes updateAttribute"
+    },
+    findPermissionsForSpec: {
+        serviceName,
+        serviceFnName: "findPermissionsForSpec",
+        description: "returns permissions for spec"
     }
 };
