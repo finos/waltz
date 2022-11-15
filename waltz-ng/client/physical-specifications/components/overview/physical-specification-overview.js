@@ -43,16 +43,17 @@ function controller(serviceBroker) {
 
     vm.$onInit = () => {
         serviceBroker.loadViewData(CORE_API.PhysicalSpecificationStore.findPermissionsForSpec, [vm.specification.id])
-            .then(r => vm.canEdit = console.log({r}) || _.some(
+            .then(r => vm.canEdit = _.some(
                 r.data,
                 d => _.includes(["ADD", "UPDATE", "REMOVE"], d)));
-    }
+    };
+
 }
 
 
 controller.$inject = [
     "ServiceBroker"
-]
+];
 
 
 const component = {
