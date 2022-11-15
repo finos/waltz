@@ -17,6 +17,7 @@
  */
 
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const git = require("git-rev-sync");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const path = require("path");
 const webpack = require("webpack");
@@ -83,7 +84,7 @@ module.exports = {
         }),
         new webpack.DefinePlugin({
             "__ENV__": JSON.stringify(process.env.BUILD_ENV || "dev"),
-            //"__REVISION__": JSON.stringify(git.long()),
+            "__REVISION__": JSON.stringify(git.long()),
         })
     ],
     module: {

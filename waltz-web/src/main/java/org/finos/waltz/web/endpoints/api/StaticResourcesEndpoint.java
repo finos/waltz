@@ -130,7 +130,11 @@ public class StaticResourcesEndpoint implements Endpoint {
 
                 if (line.contains("<base href=")) {
                     LOG.info("Found <base> tag: " + line + ", adding context path: " + request.contextPath());
-                    line = String.format("\t<base href=\"%s/\" />", request.contextPath());
+                    line = line.replaceFirst(
+                            "<base href=(['\"])/(['\"])\\s*/>",
+                            format(
+                                "\t<base href=\"%s/\" />",
+                                request.contextPath()));
                     LOG.info("Updated <base> tag: " + line);
                     lines.set(i, line);
 
@@ -154,8 +158,7 @@ public class StaticResourcesEndpoint implements Endpoint {
                 }
 
                 writer.flush();
-                ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
-                return inputStream;
+                return new ByteArrayInputStream(outputStream.toByteArray());
             }
         }
         return resourceStream;
