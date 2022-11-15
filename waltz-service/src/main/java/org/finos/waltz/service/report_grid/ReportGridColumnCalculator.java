@@ -4,7 +4,6 @@ import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.JexlException;
 import org.apache.commons.jexl3.JexlScript;
-import org.finos.waltz.common.MapUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.model.either.Either;
 import org.finos.waltz.model.rating.RatingSchemeItem;
@@ -12,11 +11,10 @@ import org.finos.waltz.model.report_grid.*;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 import static java.util.Optional.ofNullable;
-import static org.finos.waltz.common.MapUtilities.groupBy;
-import static org.finos.waltz.common.MapUtilities.newHashMap;
+import static java.util.stream.Collectors.toSet;
+import static org.finos.waltz.common.MapUtilities.*;
 import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.common.SetUtilities.union;
 import static org.finos.waltz.common.StringUtilities.notEmpty;
@@ -52,18 +50,16 @@ public class ReportGridColumnCalculator {
                             .build();
                 });
 
-
         return instance
                 .subjects()
                 .stream()
                 .map(s -> {
                     long subjectId = s.entityReference().id();
-                    Collection<ReportGridCell> row = rowBySubject.getOrDefault(subjectId, Collections.emptySet());
                     Map<String, Object> ctx = initialiseContext(
                             definition.fixedColumnDefinitions(),
                             ratingSchemeItemsById,
                             subjectId,
-                            row);
+                            lookupRow(rowBySubject, subjectId));
                     ns.setContext(ctx);
                     return subjectId;
                 })
@@ -73,8 +69,16 @@ public class ReportGridColumnCalculator {
                                 subject,
                                 derivedColumns)
                         .stream())
-                .collect(Collectors.toSet());
+                .collect(toSet());
 
+    }
+
+
+    private static Collection<ReportGridCell> lookupRow(Map<Long, Collection<ReportGridCell>> rowBySubject,
+                                                        long subjectId) {
+        return rowBySubject.getOrDefault(
+                subjectId,
+                Collections.emptySet());
     }
 
 
@@ -86,8 +90,6 @@ public class ReportGridColumnCalculator {
         AtomicBoolean evaluateRowAgain = new AtomicBoolean(true);
         // collecting the results as we go
         Map<Long, ReportGridCell> results = new HashMap<>();
-        // this collection tracks successfully calculated columns, so we don't keep re-evaluating
-        Set<CompiledCalculatedColumn> colsToRemove = new HashSet<>();
 
         Set<CompiledCalculatedColumn> remaining = SetUtilities.fromCollection(colsToCalc);
 
@@ -103,18 +105,12 @@ public class ReportGridColumnCalculator {
                     // attempt to evaluate the cell
                     ofNullable(evaluateCalcCol(ccc, subjectId))
                             .ifPresent(result -> {
-
-
                                 ReportGridCell existingResult = results.get(ccc.column().gridColumnId());
                                 boolean isDifferent = existingResult == null || !existingResult.equals(result);
 
                                 if (isDifferent) {
                                     // If successful record the result
                                     results.put(ccc.column().gridColumnId(), result);
-
-                                    // ...add the column to the list of cols to remove after this iteration
-                                    //   (we remove late to prevent a concurrent modification exception)
-//                            colsToRemove.add(ccc);
 
                                     // ...and update the context so dependent expressions can be calculated
                                     ns.addContext(colToExtId(ccc.column()), result);
@@ -134,9 +130,6 @@ public class ReportGridColumnCalculator {
                     lastErrors.put(ccc.column(), msg);
                 }
             });
-
-            // remove all the cols with a result. We don't need to evaluate them again
-            remaining.removeAll(colsToRemove);
 
             if (remaining.isEmpty()) {
                 // nothing left to do, therefore we can finish on this iteration
@@ -158,7 +151,7 @@ public class ReportGridColumnCalculator {
                         .optionText("Execution Error")
                         .columnDefinitionId(t.v1.gridColumnId())
                         .build())
-                .collect(Collectors.toSet());
+                .collect(toSet());
 
         return union(results.values(), errorResults);
     }
@@ -187,15 +180,14 @@ public class ReportGridColumnCalculator {
                                                          Long subjectId,
                                                          Collection<ReportGridCell> row) {
 
-        Map<String, Object> ctx = new HashMap<>();
+        Map<Long, ReportGridCell> cellsInRowByColId = indexBy(row, ReportGridCell::columnDefinitionId);
 
-        Map<Long, ReportGridCell> cellsInRowbyColId = MapUtilities.indexBy(row, ReportGridCell::columnDefinitionId);
-
-        columnDefinitions
-                .forEach(col -> {
-                    ctx.put(colToExtId(col),
-                            mkVal(ratingSchemeItemsById, cellsInRowbyColId.get(col.gridColumnId())));
-                });
+        Map<String, Object> ctx = indexBy(
+                columnDefinitions,
+                ReportGridColumnCalculator::colToExtId,
+                col -> mkVal(
+                        ratingSchemeItemsById,
+                        cellsInRowByColId.get(col.gridColumnId())));
 
         ctx.put("subjectId", subjectId);
 

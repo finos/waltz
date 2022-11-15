@@ -162,8 +162,14 @@ public class MapUtilities {
         checkNotNull(keyFn, "keyFn cannot be null");
         checkNotNull(valueFn, "valueFn cannot be null");
 
-        return xs.stream()
-                .collect(toMap(keyFn, valueFn));
+        return xs
+                .stream()
+                .collect(
+                    HashMap::new,
+                    (acc, d) -> acc.put(
+                            keyFn.apply(d),
+                            valueFn.apply(d)),
+                    Map::putAll);
     }
 
 

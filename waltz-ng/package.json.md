@@ -4,7 +4,7 @@
 
 Upgrading some packages causes problems with the build.
 In particular css (fontawesome and ui-grid) gets corrupted.
-Thes problems often only exhibit themselves when a full 
+These problems often only exhibit themselves when a full 
 build is deployed, not when using `dev-server`.
 
 The following libs should be upgraded with care:

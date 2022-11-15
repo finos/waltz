@@ -7,18 +7,20 @@ import org.finos.waltz.model.report_grid.ReportGridDefinition;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static java.lang.String.format;
 import static org.finos.waltz.common.ArrayUtilities.isEmpty;
 import static org.finos.waltz.common.SetUtilities.*;
 import static org.finos.waltz.service.report_grid.ReportGridUtilities.mkOptionCode;
 
 public class ReportGridEvaluatorNamespace {
+
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     private final ReportGridDefinition definition;
     private Map<String, Object> ctx = new HashMap<>();
@@ -39,13 +41,19 @@ public class ReportGridEvaluatorNamespace {
 
 
     public Object cell(String cellExtId) {
-        Object object = ctx.get(cellExtId);
+        return ctx.get(cellExtId);
+    }
 
-        if (object == null) {
-            throw new IllegalArgumentException(format("Cannot find cell: '%s' in context", cellExtId));
-        } else {
-            return object;
-        }
+
+    public String coalesceCells(String... cellExtIds) {
+        checkAllCellsExist(cellExtIds);
+        return Stream
+                .of(cellExtIds)
+                .map(ctx::get)
+                .filter(Objects::nonNull)
+                .map(this::cellToStr) //  e.g. coalesce('ONBOARD', 'SCOPE', 'PAAS')
+                .findFirst()
+                .orElse(null);
     }
 
 
@@ -86,6 +94,66 @@ public class ReportGridEvaluatorNamespace {
     }
 
 
+    public BigDecimal percentageProvided(String... cellExtIds) {
+        BigDecimal ratio = calcRatio(cellExtIds);
+        return ratio.equals(BigDecimal.ZERO)
+                ? null
+                : ratio.multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP);
+    }
+
+
+    public CellResult mkResult(String value, String optionText, String optionCode) {
+        return CellResult.mkResult(value, optionText, optionCode);
+    }
+
+
+    public CellResult mkResult(String value) {
+        return CellResult.mkResult(value, value, mkOptionCode(value));
+    }
+
+
+    /**
+     * e.g.
+     * <pre>
+     * numToOutcome(
+     *   cell('CTB').numberValue(),
+     *   [ 0, "Zip",
+     *     100000, "smallish",
+     *     100000000, "big" ])
+     * </pre>
+     * @param num
+     * @param outcomes
+     * @return
+     */
+    public String numToOutcome(Byte num, Object[] outcomes) {
+        if (num == null) return null;
+        return numToOutcome(num.doubleValue(), outcomes);
+    }
+
+
+
+    public String numToOutcome(Number num, Object[] outcomes) {
+        if (num == null) return null;
+        if (outcomes.length % 2 != 0) {
+            throw new IllegalStateException("Outcomes should be [boundary, outcome, ....], therefore must be an even number of array entries.  The boundary values should be increasing");
+        }
+
+        double val = num.doubleValue();
+
+        for (int i = 0; i < outcomes.length; i += 2) {
+            double bound = Double.parseDouble(outcomes[i].toString());
+            String outcome = (String) outcomes[i + 1];
+
+            if (val <= bound) {
+                return outcome;
+            }
+        }
+        return null;
+    }
+
+
+    // --- HELPERS ------------------
+
     private BigDecimal calcRatio(String[] cellExtIds) {
 
         if (isEmpty(cellExtIds)) {
@@ -106,16 +174,9 @@ public class ReportGridEvaluatorNamespace {
 
         BigDecimal totalColumns = BigDecimal.valueOf(cellExtIds.length);
 
-        return BigDecimal.valueOf(foundColumns)
+        return BigDecimal
+                .valueOf(foundColumns)
                 .divide(totalColumns, 4, RoundingMode.HALF_UP);
-    }
-
-
-    public BigDecimal percentageProvided(String... cellExtIds) {
-        BigDecimal ratio = calcRatio(cellExtIds);
-        return ratio.equals(BigDecimal.ZERO)
-                ? null
-                : ratio.multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP);
     }
 
 
@@ -126,16 +187,6 @@ public class ReportGridEvaluatorNamespace {
         } else {
             return true;
         }
-    }
-
-
-    public CellResult mkResult(String value, String optionText, String optionCode) {
-        return CellResult.mkResult(value, optionText, optionCode);
-    }
-
-
-    public CellResult mkResult(String value) {
-        return CellResult.mkResult(value, value, mkOptionCode(value));
     }
 
 
@@ -152,6 +203,27 @@ public class ReportGridEvaluatorNamespace {
         Checks.checkTrue(availableCellExtIds.containsAll(
                         requiredCellExtIds),
                 "Not all cells external ids found in grid");
+    }
+
+
+    private String cellToStr(Object c) {
+        if (c instanceof CellVariable) {
+            CellVariable cell = (CellVariable) c;
+            return cell.rating().name();
+        }
+        if (c instanceof ReportGridCell) {
+            ReportGridCell cell = (ReportGridCell) c;
+            if (StringUtilities.notEmpty(cell.textValue())) {
+                return cell.textValue();
+            }
+            if (cell.numberValue() != null) {
+                return cell.numberValue().toString();
+            }
+            if (cell.dateTimeValue() != null) {
+                return DATE_FORMATTER.format(cell.dateTimeValue());
+            }
+        }
+        return "";
     }
 
 }
