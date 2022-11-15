@@ -99,6 +99,13 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
                 ":id",
                 "attribute");
 
+
+        String findPermissionsForSpecPath = WebUtilities.mkPath(
+                BASE_URL,
+                "id",
+                ":id",
+                "permissions");
+
         ListRoute<PhysicalSpecification> findBySelectorRoute =
                 (request, response) -> specificationService.findBySelector(readIdSelectionOptionsFromBody(request));
 
@@ -119,6 +126,10 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
         DatumRoute<PhysicalSpecification> getByIdRoute =
                 (request, response) -> specificationService.getById(getId(request));
 
+        ListRoute<Operation> findPermissionsForSpecRoute = (request, response) -> flowPermissionChecker.findPermissionsForSpec(
+                getId(request),
+                getUsername(request));
+
         postForList(findBySelectorPath, findBySelectorRoute);
         postForList(findByIdsPath, findByIdsRoute);
 
@@ -126,6 +137,7 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
         postForList(findByIdsPath, findByIdsRoute);
         postForList(searchPath, searchRoute);
         getForDatum(getByIdPath, getByIdRoute);
+        getForList(findPermissionsForSpecPath, findPermissionsForSpecRoute);
         postForDatum(updateAttributePath, this::updateAttribute);
 
         deleteForDatum(deletePath, this::deleteSpecification);

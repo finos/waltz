@@ -16,66 +16,141 @@
   ~
   -->
 
-<waltz-sub-section name="Detail"
-                   show-border="false">
+<waltz-sub-section name="Detail">
     <content>
-        <div class="waltz-sub-section-content">
-            <div class="row">
-                <div class="col-sm-4 waltz-display-field-label">
-                    Owner:
+
+        <div ng-if="$ctrl.visibility.overviewEditor">
+
+            <div class="waltz-sub-section-content">
+                <div class="row">
+                    <div class="col-sm-4 waltz-display-field-label">
+                        Owner:
+                    </div>
+                    <div class="col-sm-8">
+                        <waltz-entity-link entity-ref="$ctrl.specification.owningEntity">
+                        </waltz-entity-link>
+                    </div>
                 </div>
-                <div class="col-sm-8">
-                    <waltz-entity-link entity-ref="$ctrl.specification.owningEntity">
-                    </waltz-entity-link>
+
+
+                <div class="row">
+                    <div class="col-sm-4 waltz-display-field-label">
+                        Format:
+                    </div>
+                    <div class="col-sm-4">
+                        <waltz-editable-enum initial-val="$ctrl.specification.format"
+                                             enum-kind="DataFormatKind"
+                                             on-save="$ctrl.onSaveFormat">
+                        </waltz-editable-enum>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-sm-4 waltz-display-field-label">
+                        External Id:
+                    </div>
+                    <div class="col-sm-8">
+                        <span ng-bind="$ctrl.specification.externalId"></span>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-sm-4 waltz-display-field-label">
+                        Description:
+                    </div>
+                    <div class="col-sm-8">
+                        <waltz-editable-field on-save="$ctrl.onSaveDescription"
+                                              field-type="textarea"
+                                              empty-label="Not provided"
+                                              initial-val="$ctrl.specification.description">
+                        </waltz-editable-field>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-4 waltz-display-field-label">
+                        Provenance:
+                    </div>
+                    <div class="col-sm-8">
+                        <span ng-bind="$ctrl.specification.provenance"></span>
+                    </div>
                 </div>
             </div>
 
+        </div>
 
-            <div class="row">
-                <div class="col-sm-4 waltz-display-field-label">
-                    Format:
+
+        <div ng-if="!$ctrl.visibility.overviewEditor">
+
+            <div class="waltz-sub-section-content">
+                <div class="row">
+                    <div class="col-sm-4 waltz-display-field-label">
+                        Owner:
+                    </div>
+                    <div class="col-sm-8">
+                        <waltz-entity-link entity-ref="$ctrl.specification.owningEntity">
+                        </waltz-entity-link>
+                    </div>
                 </div>
-                <div class="col-sm-4">
-                    <waltz-editable-enum initial-val="$ctrl.specification.format"
-                                         enum-kind="DataFormatKind"
-                                         on-save="$ctrl.onSaveFormat"
-                                         edit-role="LOGICAL_DATA_FLOW_EDITOR">
-                    </waltz-editable-enum>
+
+
+                <div class="row">
+                    <div class="col-sm-4 waltz-display-field-label">
+                        Format:
+                    </div>
+                    <div class="col-sm-4">
+                        <span ng-bind="$ctrl.specification.format"></span>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-sm-4 waltz-display-field-label">
+                        External Id:
+                    </div>
+                    <div class="col-sm-8">
+                        <span ng-bind="$ctrl.specification.externalId"></span>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-sm-4 waltz-display-field-label">
+                        Description:
+                    </div>
+                    <div class="col-sm-8">
+                        <span ng-bind="$ctrl.specification.description"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-4 waltz-display-field-label">
+                        Provenance:
+                    </div>
+                    <div class="col-sm-8">
+                        <span ng-bind="$ctrl.specification.provenance"></span>
+                    </div>
                 </div>
             </div>
+        </div>
 
+        <div class="waltz-sub-section-controls">
+            <span ng-if="$ctrl.canEdit">
 
-            <div class="row">
-                <div class="col-sm-4 waltz-display-field-label">
-                    External Id:
-                </div>
-                <div class="col-sm-8">
-                    <span ng-bind="$ctrl.specification.externalId"></span>
-                </div>
-            </div>
+                <a ng-click="$ctrl.visibility.overviewEditor = true"
+                   ng-if="!$ctrl.visibility.overviewEditor"
+                   class="clickable">
+                    Edit
+                </a>
 
-
-            <div class="row">
-                <div class="col-sm-4 waltz-display-field-label">
-                    Description:
-                </div>
-                <div class="col-sm-8">
-                    <waltz-editable-field on-save="$ctrl.onSaveDescription"
-                                          field-type="textarea"
-                                          empty-label="Not provided"
-                                          initial-val="$ctrl.specification.description">
-                    </waltz-editable-field>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-sm-4 waltz-display-field-label">
-                    Provenance:
-                </div>
-                <div class="col-sm-8">
-                    <span ng-bind="$ctrl.specification.provenance"></span>
-                </div>
-            </div>
+                <a ng-click="$ctrl.visibility.overviewEditor = false"
+                   ng-if="$ctrl.visibility.overviewEditor"
+                   class="clickable">
+                    Done
+                </a>
+            </span>
         </div>
 
     </content>
