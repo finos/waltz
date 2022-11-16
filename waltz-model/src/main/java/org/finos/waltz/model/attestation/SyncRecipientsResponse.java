@@ -20,21 +20,15 @@ package org.finos.waltz.model.attestation;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.IdProvider;
-import org.finos.waltz.model.Nullable;
 import org.immutables.value.Value;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
-
 @Value.Immutable
-@JsonSerialize(as = ImmutableAttestationSyncRecipientsResponse.class)
-@JsonDeserialize(as = ImmutableAttestationSyncRecipientsResponse.class)
-public abstract class AttestationSyncRecipientsResponse {
+@JsonSerialize(as = ImmutableSyncRecipientsResponse.class)
+@JsonDeserialize(as = ImmutableSyncRecipientsResponse.class)
+public abstract class SyncRecipientsResponse {
 
     public abstract Long recipientsCreatedCount();
+
     public abstract Long recipientsRemovedCount();
 
 }

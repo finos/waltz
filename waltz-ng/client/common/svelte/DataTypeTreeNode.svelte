@@ -5,6 +5,7 @@
 
     export let selectionFilter = () => true;
     export let multiSelect = false;
+    export let nonConcreteSelectable = true;
     export let childNodes = [];
     export let node;
     export let expanded = false;
@@ -30,6 +31,13 @@
             : 'check-square-o';
     }
 
+    function calcDisabled(filterFn, n) {
+        const isUnchecked = filterFn(n);
+
+        return isUnchecked // should be allowed to deselect non-concrete
+            && (!nonConcreteSelectable && !n.concrete)
+    }
+
 </script>
 
 
@@ -46,6 +54,7 @@
             class:abstract={!node.concrete}
             class:unknown={node.unknown}
             class:deprecated={node.deprecated}
+            disabled={calcDisabled(selectionFilter, node)}
             on:click={() => selectNode(node)}>
             {#if multiSelect}
                 <Icon name={calcCheckIcon(selectionFilter, node)}/>
@@ -63,6 +72,7 @@
                                  {multiSelect}
                                  node={childNode}
                                  {selectionFilter}
+                                 {nonConcreteSelectable}
                                  childNodes={childNode.children}/>
                 {:else}
                     <Icon size="lg"
@@ -72,6 +82,7 @@
                             class:abstract={!childNode.concrete}
                             class:unknown={childNode.unknown}
                             class:deprecated={childNode.deprecated}
+                            disabled={!nonConcreteSelectable && !childNode.concrete}
                             on:click={() => selectNode(childNode)}>
                         <span class="no-wrap">
                             {#if multiSelect}

@@ -450,7 +450,6 @@ public class LogicalFlowDao {
 
 
     public Set<Operation> calculateAmendedFlowOperations(Set<Operation> operationsForFlow,
-                                                         EntityReference entityReference,
                                                          String username) {
 
         //TODO: Need to add 'FLOW_ADMIN' permissions for bulk loaders

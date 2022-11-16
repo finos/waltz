@@ -22,6 +22,9 @@ import {initialiseData} from "../../../common";
 import template from "./measurable-rating-app-section.html";
 import {determineStartingTab, loadAllData, mkTabs} from "../../measurable-rating-utils";
 import namedSettings from "../../../system/named-settings";
+import {entity} from "../../../common/services/enums/entity";
+import {editOperations} from "../../../common/services/enums/operation";
+import roles from "../../../user/system-roles";
 
 
 /**
@@ -54,7 +57,7 @@ const initialState = {
 };
 
 
-function controller($q, serviceBroker, settingsService) {
+function controller($q, serviceBroker, settingsService, userService) {
     const vm = initialiseData(this, initialState);
 
     function determineIfRoadmapsAreEnabled() {
@@ -83,7 +86,30 @@ function controller($q, serviceBroker, settingsService) {
         loadData()
             .then(() => serviceBroker.loadViewData(CORE_API.ApplicationStore.getById, [vm.parentEntityRef.id])
                 .then(r => vm.application = r.data));
-    };
+
+        const permissionsPromise = serviceBroker
+            .loadViewData(CORE_API.PermissionGroupStore.findForParentEntityRef, [vm.parentEntityRef])
+            .then(r => r.data);
+
+        const involvementsPromise = serviceBroker
+            .loadViewData(CORE_API.InvolvementStore.findExistingInvolvementKindIdsForUser, [vm.parentEntityRef])
+            .then(r => r.data);
+
+        const userRolePromise = userService
+            .whoami()
+            .then(user => userService.hasRole(user, roles.RATING_EDITOR));
+        $q
+            .all([permissionsPromise, involvementsPromise, userRolePromise])
+            .then(([permissions, involvements, hasEditRole]) => {
+
+                vm.hasEditPermissions = !_
+                    .chain(permissions)
+                    .filter(d => d.subjectKind === entity.MEASURABLE_RATING.key && _.includes(editOperations, d.operation) && d.qualifierReference.kind === entity.MEASURABLE_CATEGORY.key)
+                    .filter(d => d.requiredInvolvementsResult.areAllUsersAllowed || !_.isEmpty(_.intersection(d.requiredInvolvementsResult.requiredInvolvementKindIds, involvements)))
+                    .isEmpty()
+                    .value() || hasEditRole;
+            });
+    }
 
 
     // -- INTERACT ---
@@ -142,7 +168,8 @@ function controller($q, serviceBroker, settingsService) {
 controller.$inject = [
     "$q",
     "ServiceBroker",
-    "SettingsService"
+    "SettingsService",
+    "UserService"
 ];
 
 

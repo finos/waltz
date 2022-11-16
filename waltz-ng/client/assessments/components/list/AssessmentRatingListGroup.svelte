@@ -93,20 +93,14 @@
             <td class="force-wrap">
                 <ul class="list-inline">
                     {#each group.notProvided as row}
-                        {#if row.definition.isReadOnly}
-                            <li class="force-wrap">
-                                <span class="text-muted">
-                                    <Icon name="lock"/>{row.definition.name}
-                                </span>
-                            </li>
-                        {:else}
-                            <li class="force-wrap">
-                                <a class="clickable"
-                                   on:click={() => selectAssessment(row)}>
-                                    {row.definition.name}
-                                </a>
-                            </li>
-                        {/if}
+                        <li class="force-wrap">
+                            <span class="text-muted">
+                                {#if row.definition.isReadOnly}
+                                    <Icon name="lock"/>
+                                {/if}
+                                {row.definition.name}
+                            </span>
+                        </li>
                     {/each}
                 </ul>
             </td>
@@ -139,10 +133,21 @@
                     <Tooltip content={AssessmentDefinitionTooltipContent}
                              props={mkDefinitionTooltipProps(row)}>
                         <svelte:fragment slot="target">
-                                    <span>
-                                        <Icon name={row.definition.isReadOnly ? "lock" : "fw"}/>
-                                        {row.definition.name}
-                                    </span>
+                            {#if row.definition.isReadOnly}
+                                <span>
+                                <Icon name="fw"/>
+                                {row.definition.name}
+                            </span>
+                            {:else}
+                                <span>
+                                <Icon name="fw"/>
+                                <button class="btn-skinny"
+                                        on:click={() => selectAssessment(row)}>
+                                    {row.definition.name}
+                                </button>
+                            </span>
+                            {/if}
+
                         </svelte:fragment>
                     </Tooltip>
                 </td>

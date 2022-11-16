@@ -17,9 +17,11 @@
  */
 import {initialiseData} from "../../common/index";
 import template from "./playpen4.html";
+import ColorScale from "./ColorScale.svelte";
 
 const initialState = {
     parentEntityRef: { kind: "ORG_UNIT", id: 2216 }, //10524
+    ColorScale
 };
 
 

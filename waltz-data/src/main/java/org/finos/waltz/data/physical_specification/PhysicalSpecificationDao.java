@@ -24,6 +24,7 @@ import org.finos.waltz.model.physical_flow.PhysicalFlowParsed;
 import org.finos.waltz.model.physical_specification.DataFormatKindValue;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
+import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.schema.tables.DataType;
 import org.finos.waltz.schema.tables.*;
 import org.finos.waltz.schema.tables.records.PhysicalSpecificationRecord;
@@ -40,9 +41,12 @@ import java.util.Set;
 import static org.finos.waltz.common.Checks.checkFalse;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.SetUtilities.union;
 import static org.finos.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
 import static org.finos.waltz.data.physical_flow.PhysicalFlowDao.PHYSICAL_FLOW_NOT_REMOVED;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.schema.Tables.USER_ROLE;
 import static org.finos.waltz.schema.tables.ChangeLog.CHANGE_LOG;
 import static org.finos.waltz.schema.tables.DataType.DATA_TYPE;
 import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
@@ -315,8 +319,60 @@ public class PhysicalSpecificationDao {
                     .select(requiredDecorators)
                     .execute();
 
+
+            removeUnknownFromLogicalFlowWherePossible(tx, specificationId, userName);
+
             return insertCount;
         });
+    }
+
+    private void removeUnknownFromLogicalFlowWherePossible(DSLContext tx, long specificationId, String userName) {
+
+        SelectHavingConditionStep<Record1<Long>> flowsWithOtherDataTypes = tx
+                .select(lfd.LOGICAL_FLOW_ID)
+                .from(lfd)
+                .innerJoin(lf).on(lf.ID.eq(lfd.LOGICAL_FLOW_ID))
+                .innerJoin(pf).on(pf.LOGICAL_FLOW_ID.eq(lf.ID))
+                .innerJoin(dt).on(dt.ID.eq(lfd.DECORATOR_ENTITY_ID))
+                .where(pf.SPECIFICATION_ID.eq(specificationId))
+                .and(dt.UNKNOWN.isFalse())
+                .and(lfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
+                .groupBy(lfd.LOGICAL_FLOW_ID)
+                .having(count(lfd.DECORATOR_ENTITY_ID).gt(0));
+
+        SelectConditionStep<Record1<Long>> unknownDecoratorsThatCanBeRemoved = tx
+                .select(lfd.ID)
+                .from(lfd)
+                .innerJoin(dt).on(lfd.DECORATOR_ENTITY_ID.eq(dt.ID)
+                        .and(lfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())))
+                .where(lfd.LOGICAL_FLOW_ID.in(flowsWithOtherDataTypes))
+                .and(dt.UNKNOWN.isTrue());
+
+        SelectJoinStep<Record6<String, Long, String, String, String, String>> requiredChangeLogs = tx
+                .select(val(EntityKind.LOGICAL_DATA_FLOW.name()),
+                        flowsWithOtherDataTypes.field(0, Long.class), // logical flow id
+                        val("Removed 'Unknown' data type as known data types were propagated from underlying physical flow/s"),
+                        val(userName),
+                        val(Severity.INFORMATION.name()),
+                        val(Operation.REMOVE.name()))
+                .from(flowsWithOtherDataTypes);
+
+        int changelogsInserted = tx
+                .insertInto(CHANGE_LOG)
+                .columns(
+                        CHANGE_LOG.PARENT_KIND,
+                        CHANGE_LOG.PARENT_ID,
+                        CHANGE_LOG.MESSAGE,
+                        CHANGE_LOG.USER_ID,
+                        CHANGE_LOG.SEVERITY,
+                        CHANGE_LOG.OPERATION)
+                .select(requiredChangeLogs)
+                .execute();
+
+        int removedUnknowns = tx
+                .deleteFrom(lfd)
+                .where(lfd.ID.in(unknownDecoratorsThatCanBeRemoved))
+                .execute();
     }
 
 
@@ -338,4 +394,19 @@ public class PhysicalSpecificationDao {
     }
 
 
+    public Set<Operation> calculateAmendedSpecOperations(Set<Operation> operationsForEntity,
+                                                         String username) {
+        boolean hasOverride = dsl
+                .fetchExists(DSL
+                        .select(USER_ROLE.ROLE)
+                        .from(USER_ROLE)
+                        .where(USER_ROLE.ROLE.eq(SystemRole.PHYSICAL_SPECIFICATION_EDITOR.name())
+                                .and(USER_ROLE.USER_NAME.eq(username))));
+
+        if (hasOverride) {
+            return union(operationsForEntity, asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE));
+        } else {
+            return operationsForEntity;
+        }
+    }
 }

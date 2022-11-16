@@ -38,13 +38,21 @@ function controller($q,
     function update(actor, change) {
         const updateCmd = Object.assign(change, { id: actor.id });
         return actorService.update(updateCmd)
-            .then(() => toasts.success("Updated"));
+            .then(() => toasts.success("Updated"))
+            .catch(e => displayError("Could not add update actor", e));
+    }
+
+    function loadActors() {
+        actorService
+            .loadActors()
+            .then(kinds => vm.actors = kinds);
     }
 
     vm.updateName = (change, actor) => {
         if(change.newVal === "") return $q.reject("Too short");
         return update(actor, { name: change })
             .then(() => _.find(vm.actors, {"id": actor.id}).name = change.newVal);
+
     };
 
     vm.updateDescription = (change, actor) => {
@@ -62,10 +70,8 @@ function controller($q,
     vm.updateExternalId = (change, actor) => {
         if(change.newVal === null) return $q.reject("No value provided");
         return update(actor, { externalId: change })
-            .then(() => _.find(vm.actors, {"id": actor.id}).externalId = change.newVal)
-            .catch(e => displayError("Failed to save external id", e));
+            .then(() => _.find(vm.actors, {"id": actor.id}).externalId = change.newVal);
     };
-
 
     vm.startNewActor = () => {
         vm.creatingActor = true;
@@ -79,28 +85,21 @@ function controller($q,
                 vm.creatingActor = false;
                 vm.newActor = {};
                 loadActors();
-            });
+            })
+            .catch(e => displayError("Could not create actor", e));
     };
 
     vm.cancelNewActor = () => {
         vm.creatingActor = false;
-        console.log("cancelled new");
     };
-
-
-    function loadActors() {
-        actorService
-            .loadActors()
-            .then(kinds => {
-                vm.actors = kinds;
-            });
-    }
-
-    loadActors();
 
     vm.selectActor = (actor) => {
         vm.selectedActor = actor;
     };
+
+    // --- boot --
+
+    loadActors();
 }
 
 

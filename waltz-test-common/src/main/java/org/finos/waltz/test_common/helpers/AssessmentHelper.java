@@ -1,5 +1,6 @@
 package org.finos.waltz.test_common.helpers;
 
+import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -7,16 +8,23 @@ import org.finos.waltz.model.assessment_definition.AssessmentVisibility;
 import org.finos.waltz.model.assessment_definition.ImmutableAssessmentDefinition;
 import org.finos.waltz.model.assessment_rating.ImmutableSaveAssessmentRatingCommand;
 import org.finos.waltz.model.assessment_rating.SaveAssessmentRatingCommand;
+import org.finos.waltz.schema.tables.records.AssessmentRatingRecord;
 import org.finos.waltz.service.assessment_definition.AssessmentDefinitionService;
 import org.finos.waltz.service.assessment_rating.AssessmentRatingService;
+import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static org.finos.waltz.common.StringUtilities.isEmpty;
+import static org.finos.waltz.schema.Tables.ASSESSMENT_DEFINITION;
+import static org.finos.waltz.schema.Tables.ASSESSMENT_RATING;
 import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
 
 @Service
 public class AssessmentHelper {
+
+    @Autowired
+    private DSLContext dsl;
 
     @Autowired
     private AssessmentDefinitionService definitionService;
@@ -62,6 +70,45 @@ public class AssessmentHelper {
                 .build();
 
         ratingService.store(cmd, username);
+    }
+
+
+    public void createAssessment(Long defId, EntityReference ref, Long ratingId) {
+
+        AssessmentRatingRecord record = dsl.newRecord(ASSESSMENT_RATING);
+        record.setAssessmentDefinitionId(defId);
+        record.setEntityId(ref.id());
+        record.setEntityKind(ref.kind().name());
+        record.setRatingId(ratingId);
+        record.setDescription("test");
+        record.setLastUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
+        record.setLastUpdatedBy("test");
+        record.setIsReadonly(false);
+        record.setProvenance("test");
+
+        dsl
+                .insertInto(ASSESSMENT_RATING)
+                .set(record)
+                .onDuplicateKeyIgnore()
+                .execute();
+    }
+
+    public void updateDefinitionReadOnly(long defnId) {
+        dsl
+                .update(ASSESSMENT_DEFINITION)
+                .set(ASSESSMENT_DEFINITION.IS_READONLY, true)
+                .where(ASSESSMENT_DEFINITION.ID.eq(defnId))
+                .execute();
+    }
+
+    public void updateRatingReadOnly(EntityReference ref, long defnId) {
+        dsl
+                .update(ASSESSMENT_RATING)
+                .set(ASSESSMENT_RATING.IS_READONLY, true)
+                .where(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID.eq(defnId)
+                        .and(ASSESSMENT_RATING.ENTITY_KIND.eq(ref.kind().name())
+                                .and(ASSESSMENT_RATING.ENTITY_ID.eq(ref.id()))))
+                .execute();
     }
 
 }

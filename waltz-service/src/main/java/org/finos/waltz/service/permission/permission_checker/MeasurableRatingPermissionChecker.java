@@ -107,7 +107,7 @@ public class MeasurableRatingPermissionChecker implements PermissionChecker {
     }
 
 
-    public Set<Operation> findMeasurableRatingReplacementPermissions(Long decommId,
+    public Set<Operation> findMeasurableRatingReplacementPermissions(long decommId,
                                                                      String username) {
 
         MeasurableRatingPlannedDecommission decomm = measurableRatingPlannedDecommissionService.getById(decommId);

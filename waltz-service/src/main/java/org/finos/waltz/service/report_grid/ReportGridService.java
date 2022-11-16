@@ -18,8 +18,6 @@
 
 package org.finos.waltz.service.report_grid;
 
-import org.finos.waltz.common.CollectionUtilities;
-import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.common.exception.NotFoundException;
@@ -257,4 +255,13 @@ public class ReportGridService {
         return reportGridDao.getGridDefinitionById(gridId);
     }
 
+
+    public Set<AdditionalColumnOptions> findAdditionalColumnOptionsForKind(EntityKind kind) {
+        return AdditionalColumnOptions.findAllowedKinds(kind);
+    }
+
+
+    public ReportGridDefinition getGridDefinitionByExtId(String gridExtId) {
+        return reportGridDao.getGridDefinitionByExternalId(gridExtId);
+    }
 }

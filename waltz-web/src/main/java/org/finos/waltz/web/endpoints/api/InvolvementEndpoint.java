@@ -59,6 +59,7 @@ public class InvolvementEndpoint implements Endpoint {
         String findByEmployeePath = mkPath(BASE_URL, "employee", ":employeeId");
         String findByEntityRefPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findPeopleByEntityRefPath = mkPath(findByEntityRefPath, "people");
+        String findExistingInvolvementKindIdsForUserPath = mkPath(findByEntityRefPath, "user");
 
         String findBySelectorPath = mkPath(BASE_URL, "selector", "involvement");
         String findPeopleBySelectorPath = mkPath(BASE_URL, "selector", "people");
@@ -75,6 +76,11 @@ public class InvolvementEndpoint implements Endpoint {
         ListRoute<Involvement> findByEntityRefRoute = (request, response) -> {
             EntityReference entityReference = getEntityReference(request);
             return service.findByEntityReference(entityReference);
+        };
+
+        ListRoute<Long> findExistingInvolvementKindIdsForUserRoute = (request, response) -> {
+            EntityReference entityReference = getEntityReference(request);
+            return service.findExistingInvolvementKindIdsForUser(entityReference, getUsername(request));
         };
 
         ListRoute<Involvement> findBySelectorRoute = (request, response) -> {
@@ -109,6 +115,7 @@ public class InvolvementEndpoint implements Endpoint {
         getForDatum(countOrphanInvolvementsForKindPath, countOrphanInvolvementsForKindRoute);
         postForList(findBySelectorPath, findBySelectorRoute);
         getForList(findPeopleByEntityRefPath, findPeopleByEntityRefRoute);
+        getForList(findExistingInvolvementKindIdsForUserPath, findExistingInvolvementKindIdsForUserRoute);
         deleteForDatum(cleanupInvalidInvolvementsForEntityPath, cleanupInvalidInvolvementsForKindRoute);
         postForList(findPeopleBySelectorPath, findPeopleBySelectorRoute);
         postForDatum(updateForEntityRefPath, updateForEntityRefRoute);

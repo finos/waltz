@@ -67,14 +67,16 @@ public class ReportGridUtilitiesTest {
 
     @Test
     public void emptyStringReturnsNull() {
-        Object object = ReportGridUtilities.parseGridFilterNoteText("");
-        assertNull(object);
+        assertThrows(
+                IllegalStateException.class,
+                () -> ReportGridUtilities.parseGridFilterNoteText(""));
     }
 
     @Test
     public void nullStringReturnsNull() {
-        Object object = ReportGridUtilities.parseGridFilterNoteText(null);
-        assertNull(object);
+        assertThrows(
+                IllegalStateException.class,
+                () -> ReportGridUtilities.parseGridFilterNoteText(null));
     }
 
     @Test
@@ -116,7 +118,7 @@ public class ReportGridUtilitiesTest {
     @Test
     public void parseNoteTextShouldThrowErrorIfTablesNotCorrectlySpaced() {
         assertThrows(
-                IllegalArgumentException.class,
+                IllegalStateException.class,
                 () -> ReportGridUtilities.parseGridFilterNoteText(NO_SPACED_TABLES),
                 "Should ensure tables are correctly spaced");
     }
@@ -124,7 +126,7 @@ public class ReportGridUtilitiesTest {
     @Test
     public void parseNoteTextShouldThrowErrorIfTooManyHeaderColumns() {
         assertThrows(
-                IllegalArgumentException.class,
+                IllegalStateException.class,
                 () -> ReportGridUtilities.parseGridFilterNoteText(TOO_MANY_HEADERS),
                 "Should be 4 header columns");
     }
@@ -132,7 +134,7 @@ public class ReportGridUtilitiesTest {
     @Test
     public void parseNoteTextShouldThrowErrorIfNotEnoughHeaderColumns() {
         assertThrows(
-                IllegalArgumentException.class,
+                IllegalStateException.class,
                 () -> ReportGridUtilities.parseGridFilterNoteText(NOT_ENOUGH_HEADERS),
                 "Should be 4 header columns");
     }
@@ -140,7 +142,7 @@ public class ReportGridUtilitiesTest {
     @Test
     public void parseNoteTextShouldThrowErrorIfTooManyFilterOptionColumns() {
         assertThrows(
-                IllegalArgumentException.class,
+                IllegalStateException.class,
                 () -> ReportGridUtilities.parseGridFilterNoteText(TOO_MANY_FILTER_COLS),
                 "Should be 4 filter columns");
     }
@@ -148,7 +150,7 @@ public class ReportGridUtilitiesTest {
     @Test
     public void parseNoteTextShouldThrowErrorIfNotEnoughFilterOptionColumns() {
         assertThrows(
-                IllegalArgumentException.class,
+                IllegalStateException.class,
                 () -> ReportGridUtilities.parseGridFilterNoteText(NOT_ENOUGH_FILTER_COLS),
                 "Should be 4 filter columns");
     }

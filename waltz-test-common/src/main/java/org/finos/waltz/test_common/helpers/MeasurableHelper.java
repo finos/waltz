@@ -1,9 +1,11 @@
 package org.finos.waltz.test_common.helpers;
 
 import org.finos.waltz.common.CollectionUtilities;
-import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.measurable_category.MeasurableCategory;
 import org.finos.waltz.schema.tables.records.MeasurableCategoryRecord;
+import org.finos.waltz.schema.tables.records.MeasurableRatingPlannedDecommissionRecord;
+import org.finos.waltz.schema.tables.records.MeasurableRatingRecord;
 import org.finos.waltz.schema.tables.records.MeasurableRecord;
 import org.finos.waltz.service.measurable.MeasurableService;
 import org.finos.waltz.service.measurable_category.MeasurableCategoryService;
@@ -13,8 +15,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
-import static org.finos.waltz.schema.Tables.MEASURABLE;
-import static org.finos.waltz.schema.Tables.MEASURABLE_CATEGORY;
+import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
+import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
+import static org.finos.waltz.schema.Tables.*;
 
 @Service
 public class MeasurableHelper {
@@ -36,6 +39,10 @@ public class MeasurableHelper {
 
 
     public long createMeasurableCategory(String name) {
+        return createMeasurableCategory(name, null);
+    }
+
+    public long createMeasurableCategory(String name, String ratingEditorRole) {
         Set<MeasurableCategory> categories = categoryService.findByExternalId(name);
         return CollectionUtilities
                 .maybeFirst(categories)
@@ -48,11 +55,23 @@ public class MeasurableHelper {
                     record.setExternalId(name);
                     record.setRatingSchemeId(schemeId);
                     record.setLastUpdatedBy("admin");
-                    record.setLastUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
-                    record.setEditable(false);
+                    record.setLastUpdatedAt(nowUtcTimestamp());
+                    record.setEditable(true);
+                    if (ratingEditorRole != null) {
+                        record.setRatingEditorRole(ratingEditorRole);
+                    }
                     record.store();
                     return record.getId();
                 });
+    }
+
+
+    public void updateCategoryNotEditable(long categoryId) {
+        dsl
+                .update(MEASURABLE_CATEGORY)
+                .set(MEASURABLE_CATEGORY.EDITABLE, false)
+                .where(MEASURABLE_CATEGORY.ID.eq(categoryId))
+                .execute();
     }
 
 
@@ -72,10 +91,58 @@ public class MeasurableHelper {
                     record.setExternalId(name);
                     record.setProvenance(PROVENANCE);
                     record.setLastUpdatedBy(LAST_UPDATE_USER);
-                    record.setLastUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
+                    record.setLastUpdatedAt(nowUtcTimestamp());
                     record.store();
                     return record.getId();
                 });
+    }
+
+
+    public void createRating(EntityReference ref, long measurableId) {
+
+        MeasurableRatingRecord ratingRecord = dsl.newRecord(MEASURABLE_RATING);
+        ratingRecord.setEntityId(ref.id());
+        ratingRecord.setEntityKind(ref.kind().name());
+        ratingRecord.setMeasurableId(measurableId);
+        ratingRecord.setRating("G");
+        ratingRecord.setDescription("test desc");
+        ratingRecord.setLastUpdatedAt(nowUtcTimestamp());
+        ratingRecord.setLastUpdatedBy("test");
+        ratingRecord.setProvenance("test");
+
+        dsl
+                .insertInto(MEASURABLE_RATING)
+                .set(ratingRecord)
+                .onDuplicateKeyIgnore()
+                .execute();
+    }
+
+
+    public long createDecomm(EntityReference ref, long measurableId) {
+
+        MeasurableRatingPlannedDecommissionRecord decommissionRecord = dsl.newRecord(MEASURABLE_RATING_PLANNED_DECOMMISSION);
+        decommissionRecord.setEntityId(ref.id());
+        decommissionRecord.setEntityKind(ref.kind().name());
+        decommissionRecord.setMeasurableId(measurableId);
+        decommissionRecord.setPlannedDecommissionDate(toSqlDate(nowUtcTimestamp()));
+        decommissionRecord.setCreatedAt(nowUtcTimestamp());
+        decommissionRecord.setCreatedBy("test");
+        decommissionRecord.setUpdatedAt(nowUtcTimestamp());
+        decommissionRecord.setUpdatedBy("test");
+
+        int store = decommissionRecord.store();
+
+        return decommissionRecord.getId();
+    }
+
+    public void updateMeasurableReadOnly(EntityReference ref, long measurableId) {
+        dsl
+                .update(MEASURABLE_RATING)
+                .set(MEASURABLE_RATING.IS_READONLY, true)
+                .where(MEASURABLE_RATING.ENTITY_KIND.eq(ref.kind().name())
+                        .and(MEASURABLE_RATING.ENTITY_ID.eq(ref.id())
+                                .and(MEASURABLE_RATING.MEASURABLE_ID.eq(measurableId))))
+                .execute();
     }
 
 }

@@ -29,6 +29,10 @@ export function mkReportGridStore() {
     const findForOwner = (force = false) => remote
         .fetchAppList("GET", "api/report-grid/owner", [], {force});
 
+
+    const findAdditionalColumnOptionsForKind = (kind, force = false) => remote
+        .fetchAppList("GET", `api/report-grid/additional-column-options/kind/${kind}`, [], {force});
+
     const updateColumnDefinitions = (id, updatecommand) => remote
         .execute(
             "POST",
@@ -52,6 +56,7 @@ export function mkReportGridStore() {
         findAll,
         findForUser,
         findForOwner,
+        findAdditionalColumnOptionsForKind,
         updateColumnDefinitions,
         create,
         update,

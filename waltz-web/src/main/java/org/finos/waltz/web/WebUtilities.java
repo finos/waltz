@@ -18,10 +18,6 @@
 
 package org.finos.waltz.web;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import org.eclipse.jetty.http.MimeTypes;
 import org.finos.waltz.common.EnumUtilities;
 import org.finos.waltz.common.SetUtilities;
@@ -48,34 +44,26 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.finos.waltz.common.ObjectUtilities.firstNotNull;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.finos.waltz.service.user.RoleUtilities.getRequiredRoleForEntityKind;
+import static org.finos.waltz.model.RoleUtilities.getRequiredRoleForEntityKind;
 
 public class WebUtilities {
-
 
     private static final Logger LOG = LoggerFactory.getLogger(WebUtilities.class);
 
     public static final String TYPE_JSON = "application/json";
 
     private static final MimeTypes mimeTypes = new MimeTypes();
-    private static final ObjectMapper mapper;
 
     static {
-        mapper = new ObjectMapper();
-        mapper.registerModule(new JSR310Module()); // DateTime etc
-        mapper.registerModule(new Jdk8Module()); // Optional etc
-
-        // Force timestamps to be sent as ISO-8601 formatted strings
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-
         mimeTypes.addMimeMapping("ttf", "application/x-font-ttf");
     }
 
 
-    public static final ResponseTransformer transformer = mapper::writeValueAsString;
+    public static final ResponseTransformer transformer = getJsonMapper()::writeValueAsString;
 
 
     /**
@@ -242,7 +230,7 @@ public class WebUtilities {
      */
     public static <T> T readBody(Request request,
                                  Class<T> objClass) throws IOException {
-        return mapper.readValue(
+        return getJsonMapper().readValue(
                 request.bodyAsBytes(),
                 objClass);
     }
@@ -354,7 +342,7 @@ public class WebUtilities {
         String limitVal = request.queryParams("limit");
         return Optional
                 .ofNullable(limitVal)
-                .map(s -> Integer.valueOf(s));
+                .map(Integer::valueOf);
     }
 
 

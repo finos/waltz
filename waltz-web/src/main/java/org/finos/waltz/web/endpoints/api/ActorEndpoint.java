@@ -129,7 +129,7 @@ public class ActorEndpoint implements Endpoint {
 
 
     private void ensureUserHasAdminRights(Request request) {
-        requireRole(userRoleService, request, SystemRole.ADMIN);
+        requireRole(userRoleService, request, SystemRole.ACTOR_ADMIN);
     }
 
 }

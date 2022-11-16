@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 import static java.lang.String.format;
 import static org.finos.waltz.common.ArrayUtilities.isEmpty;
 import static org.finos.waltz.common.SetUtilities.*;
-import static org.finos.waltz.service.report_grid.ReportGridUtilities.sanitizeString;
+import static org.finos.waltz.service.report_grid.ReportGridUtilities.mkOptionCode;
 
 public class ReportGridEvaluatorNamespace {
 
@@ -27,13 +27,16 @@ public class ReportGridEvaluatorNamespace {
         this.definition = definition;
     }
 
+
     public void setContext(Map<String, Object> ctx) {
         this.ctx = ctx;
     }
 
+
     public void addContext(String key, Object value) {
         ctx.put(key, value);
     }
+
 
     public Object cell(String cellExtId) {
         Object object = ctx.get(cellExtId);
@@ -45,6 +48,7 @@ public class ReportGridEvaluatorNamespace {
         }
     }
 
+
     public Map<String, Object> getContext() {
         return ctx;
     }
@@ -53,22 +57,25 @@ public class ReportGridEvaluatorNamespace {
     public boolean anyCellsProvided(String... cellExtIds) {
         checkAllCellsExist(cellExtIds);
 
-        return Stream.of(cellExtIds)
+        return Stream
+                .of(cellExtIds)
                 .map(ctx::get)
                 .filter(Objects::nonNull)
-                .filter(d -> d instanceof CellVariable)
-                .map(d -> (CellVariable) d)
+                .map(d -> (ReportGridCell) d)
                 .filter(d -> StringUtilities.isEmpty(d.errorValue())) // any cells remove cells with error!
                 .anyMatch(d -> true);
     }
 
+
     public boolean allCellsProvided(String... cellExtIds) {
         checkAllCellsExist(cellExtIds);
 
-        return Stream.of(cellExtIds)
+        return Stream
+                .of(cellExtIds)
                 .map(ctx::get)
                 .allMatch(c -> Objects.nonNull(c) && !hasErrors(c));
     }
+
 
     public BigDecimal ratioProvided(String... cellExtIds) {
 
@@ -78,6 +85,7 @@ public class ReportGridEvaluatorNamespace {
                 : ratio.setScale(2, RoundingMode.HALF_UP);
     }
 
+
     private BigDecimal calcRatio(String[] cellExtIds) {
 
         if (isEmpty(cellExtIds)) {
@@ -86,7 +94,8 @@ public class ReportGridEvaluatorNamespace {
 
         checkAllCellsExist(cellExtIds);
 
-        long foundColumns = Stream.of(cellExtIds)
+        long foundColumns = Stream
+                .of(cellExtIds)
                 .map(ctx::get)
                 .filter(c -> Objects.nonNull(c) && !hasErrors(c))
                 .count();
@@ -101,12 +110,14 @@ public class ReportGridEvaluatorNamespace {
                 .divide(totalColumns, 4, RoundingMode.HALF_UP);
     }
 
+
     public BigDecimal percentageProvided(String... cellExtIds) {
         BigDecimal ratio = calcRatio(cellExtIds);
         return ratio.equals(BigDecimal.ZERO)
                 ? null
                 : ratio.multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP);
     }
+
 
     private boolean hasErrors(Object c) {
         if (c instanceof ReportGridCell) {
@@ -117,18 +128,21 @@ public class ReportGridEvaluatorNamespace {
         }
     }
 
+
     public CellResult mkResult(String value, String optionText, String optionCode) {
         return CellResult.mkResult(value, optionText, optionCode);
     }
 
+
     public CellResult mkResult(String value) {
-        return CellResult.mkResult(value, value, sanitizeString(value));
+        return CellResult.mkResult(value, value, mkOptionCode(value));
     }
 
 
     private void checkAllCellsExist(String... requiredCellExtIds) {
         checkAllCellsExist(asSet(requiredCellExtIds));
     }
+
 
     private void checkAllCellsExist(Set<String> requiredCellExtIds) {
         Set<String> availableCellExtIds = union(

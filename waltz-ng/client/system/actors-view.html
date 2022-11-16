@@ -34,7 +34,11 @@
         <form class="form-inline">
             <div class="form-group">
                 <label>Search</label>
-                <input type="search" class="form-control" placeholder="Filter..." ng-model="userQuery">
+                <input type="search"
+                       class="form-control"
+                       placeholder="Filter..."
+                       ng-model="userQuery"
+                       ng-model-options="{debounce: 300}">
             </div>
         </form>
 
@@ -84,7 +88,8 @@
                     </table>
                 </div>
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-4"
+                 waltz-has-role="ACTOR_ADMIN">
                 <waltz-sub-section name="Edit Actor">
                     <content>
                         <div class="container-fluid"
@@ -130,10 +135,7 @@
                                                       initial-val="$ctrl.selectedActor.externalId"
                                                       ctx="$ctrl.selectedActor">
                                 </waltz-editable-field>
-
-
                             </div>
-
                         </div>
                     </content>
                 </waltz-sub-section>
@@ -142,7 +144,9 @@
 
         <br>
         <hr>
-        <div class="row">
+
+        <div class="row"
+             waltz-has-role="ACTOR_ADMIN">
             <div class="col-sm-8">
                 <div>
                     <button class="btn btn-primary btn-sm"

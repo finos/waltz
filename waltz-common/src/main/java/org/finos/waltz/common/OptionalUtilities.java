@@ -21,6 +21,7 @@ package org.finos.waltz.common;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -86,5 +87,14 @@ public class OptionalUtilities {
 
     public static boolean isEmpty(Optional<?> d) {
         return ! d.isPresent();
+    }
+
+
+    public static <T> Optional<T> ofExplodable(Supplier<T> supplier) {
+        try {
+            return Optional.of(supplier.get());
+        } catch (Exception e) {
+            return Optional.empty();
+        }
     }
 }
