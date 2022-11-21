@@ -57,16 +57,16 @@ public class DynamicJSONFormatter implements DynamicFormatter {
             byte[] response = mkResponse(reportGrid, columnDefinitions, reportRows);
             long finish = System.currentTimeMillis();
             LOG.info(
-                    "Generated JSON data {} in {}ms response. response payload sz={}bytes",
+                    "Generated JSON data {} in {} ms response. Response payload sz={} bytes",
                     id,
                     finish-start,
                     response.length);
             return response;
         } catch (IOException e) {
-           String err = String.format(
-                   "Encountered error generating JSON response.Details:%s",
+           String msg = String.format(
+                   "Encountered error generating JSON response. Details:%s",
                    e.getMessage());
-           throw new IOException(err,e);
+           throw new IOException(msg, e);
         }
     }
 
@@ -85,6 +85,7 @@ public class DynamicJSONFormatter implements DynamicFormatter {
                         .build();
 
         return createMapper()
+                .writerWithDefaultPrettyPrinter()
                 .writeValueAsBytes(reportGridJSON);
     }
 

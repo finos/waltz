@@ -202,6 +202,25 @@ public class ReportGridService {
     }
 
 
+    /**
+     * Returns a set of column ids for those columns which may contain comments.
+     * This includes:
+     * <ul>
+     *     <li>Assessment columns</li>
+     *     <li>Survey question with the allow_comment field set to true</li>
+     * </ul>
+     *
+     * The primary usage for this method is to determine which grid columns need to have
+     * an additional comment column when doing a tabular export
+     *
+     * @param gridId
+     * @return Set of column ids
+     */
+    public Set<Long> findCommentSupportingColumnIdsForGrid(long gridId) {
+        return reportGridDao.findCommentSupportingColumnIdsForGrid(gridId);
+    }
+
+
     public ReportGridDefinition create(ReportGridCreateCommand createCommand,
                                        String username){
         long gridId = reportGridDao.create(createCommand, username);
