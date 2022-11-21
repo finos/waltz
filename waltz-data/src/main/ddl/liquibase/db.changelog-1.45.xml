@@ -532,6 +532,7 @@
     </changeSet>
 
     <changeSet id="20221025-6228-1"
+               failOnError="false"
                author="davidwatkins73">
         <insert tableName="entity_named_note_type">
             <column name="applicable_entity_kinds" value="APP_GROUP"/>
