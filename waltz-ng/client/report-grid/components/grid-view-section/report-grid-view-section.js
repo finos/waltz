@@ -33,6 +33,7 @@ import {
 import {displayError} from "../../../common/error-utils";
 import toasts from "../../../svelte-stores/toast-store";
 import {coalesceFns} from "../../../common/function-utils";
+import {parseParams} from "../../../common/browser-utils";
 
 
 const bindings = {
@@ -129,6 +130,12 @@ function controller($scope, serviceBroker, localStorageService) {
                 displayError("Could not load grid data for id: " + vm.gridId, e)
                 vm.loading = false;
             });
+    }
+
+
+    vm.$onInit = () => {
+        const params = parseParams(window.location.href);
+        console.log({params});
     }
 
     vm.$onChanges = () => {
