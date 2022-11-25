@@ -162,12 +162,7 @@ derived(
 
             const paramsString = new URLSearchParams(newParams).toString()
 
-            console.log({newParams, paramsString, href: window.location.href});
-
-
             const url = window.location.origin + window.location.pathname + "?" + paramsString;
-            // const url = window.location.origin + window.location.pathname + "?sections=" + paramValue;
-
 
             window.history.replaceState({path: url}, "", url);
             window.localStorage.setItem(mkLocalStorageKey(d.pageKind), JSON.stringify(top3SectionIds));
