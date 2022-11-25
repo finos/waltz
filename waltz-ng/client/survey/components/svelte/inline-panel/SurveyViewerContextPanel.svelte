@@ -125,18 +125,20 @@
                 <div class:waltz-scroll-region-250={_.size(sectionList) > 10}>
                     <ul class="section-list small">
                         {#each sectionList as section}
-                            <li class="clickable section-list-item"
+                            <li class="section-list-item"
                                 on:mouseenter={() => section.hovering = true}
                                 on:mouseleave={() => section.hovering = false}
                                 class:highlighted={section.hovering}
-                                class:selected={section?.sectionName === $selectedSection?.sectionName}
-                                on:click,keydown={() => selectSection(section)}>
-                                {section.sectionName}
-                                <span
-                                    title={`${getResponsesCount(section)} questions with a response out of a total ${_.size(section.questions)} questions`}
-                                    class="small pull-right text-muted">
-                        {`(${getResponsesCount(section)} / ${_.size(section.questions)})`}
-                    </span>
+                                class:selected={section?.sectionName === $selectedSection?.sectionName}>
+                                <button on:click={() => selectSection(section)}
+                                        style="width: 100%"
+                                        class="btn-plain text-left">
+                                    {section.sectionName}
+                                    <div title={`${getResponsesCount(section)} questions with a response out of a total ${_.size(section.questions)} questions`}
+                                          class="small pull-right text-muted">
+                                        {`(${getResponsesCount(section)} / ${_.size(section.questions)})`}
+                                    </div>
+                                </button>
                             </li>
                         {/each}
                     </ul>
