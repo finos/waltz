@@ -45,10 +45,13 @@
 {#if displayMode === DisplayModes.LIST}
     <ul>
         {#each displayedStats as stat}
-            <li on:click,keydown={() => onClick(stat)}>
-                {stat.entityInfo.name || "Unknown"} -
-                <Icon name="user"/> {stat.personCounts.activePeopleCount} /
-                <span class="text-muted">{stat.personCounts.removedPeopleCount}</span>
+            <li>
+                <button class="btn-plain"
+                        on:click={() => onClick(stat)}>
+                    {stat.entityInfo.name || "Unknown"} -
+                    <Icon name="user"/> {stat.personCounts.activePeopleCount} /
+                    <span class="text-muted">{stat.personCounts.removedPeopleCount}</span>
+                </button>
             </li>
         {/each}
     </ul>
@@ -62,9 +65,13 @@
         </thead>
         <tbody>
         {#each displayedStats as stat}
-            <tr class="clickable"
-                on:click,keydown={() => onClick(stat)}>
-                <td>{stat.entityInfo.name || "Unknown"}</td>
+            <tr>
+                <td>
+                    <button on:click,keydown={() => onClick(stat)}
+                            class="btn-plain">
+                        {stat.entityInfo.name || "Unknown"}
+                    </button>
+                </td>
                 <td>
                     {stat.personCounts.activePeopleCount} /
                     <span class="text-muted">{stat.personCounts.removedPeopleCount}</span>
