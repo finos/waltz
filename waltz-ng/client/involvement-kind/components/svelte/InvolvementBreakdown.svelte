@@ -67,14 +67,16 @@
         {#each displayedStats as stat}
             <tr>
                 <td>
-                    <button on:click,keydown={() => onClick(stat)}
-                            class="btn-plain">
+                    <button on:click={() => onClick(stat)}
+                            class="btn-skinny">
                         {stat.entityInfo.name || "Unknown"}
                     </button>
                 </td>
                 <td>
                     {stat.personCounts.activePeopleCount} /
-                    <span class="text-muted">{stat.personCounts.removedPeopleCount}</span>
+                    <span class="text-muted">
+                        {stat.personCounts.removedPeopleCount}
+                    </span>
                 </td>
             </tr>
         {/each}
