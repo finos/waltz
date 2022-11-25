@@ -11,8 +11,10 @@
     import Icon from "../../../common/svelte/Icon.svelte";
     import _ from "lodash";
     import {entity} from "../../../common/services/enums/entity";
+    import pageInfo from "../../../svelte-stores/page-navigation-store";
 
     export let onGridSelect = () => console.log("selecting grid");
+    export let primaryEntityRef;
 
     const Modes = {
         VIEW: "VIEW",
@@ -104,12 +106,23 @@
     }
 
 
-    function cancel(){
+    function cancel() {
         activeMode = Modes.VIEW;
         $selectedGrid = $selectedGrid.definition.id ? $selectedGrid : null;
     }
 
     $: gridOwnerNames = _.map(gridOwners, d => d.userId);
+
+    function visitPageView() {
+        $pageInfo = {
+            state: "main.report-grid.view",
+            params: {
+                gridId: $selectedGrid.definition.id,
+                kind: primaryEntityRef.kind,
+                id: primaryEntityRef.id
+            }
+        };
+    }
 
 </script>
 
@@ -128,7 +141,12 @@
                               doCancel={cancel}/>
         {:else if activeMode === Modes.VIEW || activeMode === Modes.REMOVE}
             {#if $selectedGrid?.definition?.id}
-                <h4>{$selectedGrid?.definition?.name}</h4>
+                <h4>
+                    <button on:click={() => visitPageView()}
+                            class="btn btn-plain">
+                        {$selectedGrid?.definition?.name}
+                    </button>
+                </h4>
                 <table class="table table-condensed small">
                     <tbody>
                     <tr>

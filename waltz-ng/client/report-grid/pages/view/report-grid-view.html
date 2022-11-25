@@ -16,9 +16,13 @@
   ~
   -->
 
-<waltz-svelte-component component="$ctrl.ReportGridPageHeader"
-                        report-grid="$ctrl.reportGrid">
-</waltz-svelte-component>
+
+<div ng-if="$ctrl.parentEntityRef">
+    <waltz-svelte-component component="$ctrl.ReportGridPageHeader"
+                            report-grid="$ctrl.reportGrid"
+                            parent-entity-ref="$ctrl.parentEntityRef">
+    </waltz-svelte-component>
+</div>
 
 
 <div class="waltz-page-summary waltz-page-summary-attach">

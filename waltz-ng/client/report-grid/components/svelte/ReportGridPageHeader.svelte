@@ -2,8 +2,10 @@
 
     import ViewLink from "../../../common/svelte/ViewLink.svelte";
     import PageHeader from "../../../common/svelte/PageHeader.svelte";
+    import EntityLink from "../../../common/svelte/EntityLink.svelte";
 
     export let reportGrid;
+    export let parentEntityRef;
 
 </script>
 
@@ -15,7 +17,9 @@
                 <ViewLink state="main">Home</ViewLink>
             </li>
             <li>
-                <span>Report Grids</span>
+                <span>
+                    <EntityLink ref={parentEntityRef} showIcon="false"/>
+                </span>
             </li>
             <li>
                 <span>{reportGrid?.name}</span>

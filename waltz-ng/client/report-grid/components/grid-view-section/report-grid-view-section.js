@@ -138,7 +138,7 @@ function controller($scope, serviceBroker, localStorageService) {
 
         if (vm.parentEntityRef) {
 
-            vm.selectionOptions = mkSelectionOptions(vm.parentEntityRef, "CHILDREN");
+            vm.selectionOptions = mkSelectionOptions(vm.parentEntityRef);
             const lastUsedGridId = localStorageService.get(localStorageKey);
 
             if (vm.selectedGrid) {

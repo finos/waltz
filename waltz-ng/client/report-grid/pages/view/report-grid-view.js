@@ -21,6 +21,7 @@ import {initialiseData} from "../../../common";
 import template from "./report-grid-view.html";
 import ReportGridPageHeader from "../../components/svelte/ReportGridPageHeader.svelte"
 import {CORE_API} from "../../../common/services/core-api-utils";
+import {loadEntity} from "../../../common/entity-utils";
 
 
 const bindings = {};
@@ -39,10 +40,13 @@ function controller($stateParams, serviceBroker) {
         const entityKind = $stateParams.kind;
         const entityId = $stateParams.id;
 
-        vm.parentEntityRef = {
+        const parentRef = {
             kind: entityKind,
             id: entityId
         };
+
+        loadEntity(serviceBroker, parentRef)
+            .then(r => vm.parentEntityRef = r);
 
         if (vm.gridId) {
             serviceBroker

@@ -101,7 +101,8 @@
     <div class="wt-tab wt-active">
         <!-- SERVERS -->
         {#if selectedTab === 'overview'}
-            <ReportGridOverview onGridSelect={handleGridSelect}/>
+            <ReportGridOverview onGridSelect={handleGridSelect}
+                                {primaryEntityRef}/>
         {:else if selectedTab === 'filters'}
             <ReportGridFilters {primaryEntityRef}/>
         {:else if selectedTab === 'columns'}
