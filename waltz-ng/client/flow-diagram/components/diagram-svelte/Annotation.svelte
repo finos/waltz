@@ -57,11 +57,11 @@
 
 </script>
 
-
 <g class="wfd-annotation"
    transform={`translate(${geom.subjectPosition.x} ${geom.subjectPosition.y})`}
    fill="#888"
-   on:click,keydown={selectAnnotation}>
+   on:click={selectAnnotation}
+   on:keydown={selectAnnotation}>
     <path d={linePath}
           in:draw="{{duration: 1500}}"
           out:draw="{{duration: 2000}}"

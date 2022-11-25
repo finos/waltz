@@ -18,14 +18,17 @@
 
 import {initialiseData} from "../../common/index";
 import template from "./actor-overview.html";
+import Markdown from "../../common/svelte/Markdown.svelte";
 
 
 const bindings = {
-    actor: '<'
+    actor: "<"
 };
 
 
-const initialState = {};
+const initialState = {
+    Markdown
+};
 
 
 function controller() {
@@ -34,9 +37,9 @@ function controller() {
     vm.$onChanges = (changes) => {
         if (vm.actor) {
             vm.entityRef = {
-                kind: 'ACTOR',
+                kind: "ACTOR",
                 id: vm.actor.id
-            }
+            };
         }
     };
 }
@@ -51,5 +54,5 @@ export default {
         bindings,
         controller
     },
-    id: 'waltzActorOverview'
+    id: "waltzActorOverview"
 };

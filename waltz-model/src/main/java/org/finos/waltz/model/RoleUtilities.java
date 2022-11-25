@@ -40,6 +40,12 @@ public class RoleUtilities {
         REQUIRED_ROLES.put(EntityKind.MEASURABLE, RoleUtilities::getRequiredRoleForMeasurable);
         REQUIRED_ROLES.put(EntityKind.ORG_UNIT, RoleUtilities::getRequiredRoleForOrgUnit);
         REQUIRED_ROLES.put(EntityKind.MEASURABLE_CATEGORY, RoleUtilities::getRequiredRoleForMeasurableCategory);
+        REQUIRED_ROLES.put(EntityKind.ACTOR, RoleUtilities::getRequiredRoleForActor);
+        REQUIRED_ROLES.put(EntityKind.INVOLVEMENT_KIND, RoleUtilities::getRequiredRoleForInvolvementKind);
+    }
+
+    private static SystemRole getRequiredRoleForInvolvementKind(Operation operation, EntityKind additionalKind) {
+        return SystemRole.INVOLVEMENT_EDITOR;
     }
 
 
@@ -72,8 +78,13 @@ public class RoleUtilities {
 
     // -- helpers
 
-    private static SystemRole getRequiredRoleForApplication(Operation op, EntityKind additionalKind) {
+    private static SystemRole  getRequiredRoleForApplication(Operation op, EntityKind additionalKind) {
         return APP_EDITOR;
+    }
+
+
+    private static SystemRole getRequiredRoleForActor(Operation op, EntityKind additionalKind) {
+        return ACTOR_ADMIN;
     }
 
 

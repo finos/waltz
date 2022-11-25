@@ -92,7 +92,8 @@
 
 <g {transform}
    bind:this={gElem}
-   on:click,keydown={selectNode}
+   on:click={selectNode}
+   on:keydown={selectNode}
    class={classes}>
     <path d={shape.path}
           fill="#fafafa"

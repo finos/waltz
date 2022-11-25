@@ -184,8 +184,35 @@ public class ReportGridDao {
         return getGridDefinitionByCondition(rg.EXTERNAL_ID.eq(externalId));
     }
 
-    public void updateColumnDefinitions(long gridId, ReportGridColumnDefinitionsUpdateCommand updatedCmd) {
 
+    /**
+     * Determines which columns on a grid may support comments.
+     * This includes:
+     * <ul>
+     *     <li>Assessment columns</li>
+     *     <li>Survey question with the allow_comment field set to true</li>
+     * </ul>
+     * @param gridId
+     * @return Set of report grid column ids
+     */
+    public Set<Long> findCommentSupportingColumnIdsForGrid(long gridId) {
+
+        // update the javadoc if you modify this condition
+        Condition mayHaveCommentsCondition = sq.ALLOW_COMMENT.isTrue()
+                .or(rgfcd.COLUMN_ENTITY_KIND.eq(EntityKind.ASSESSMENT_DEFINITION.name()));
+
+        return dsl
+                .select(rgcd.ID)
+                .from(rg)
+                .innerJoin(rgcd).on(rg.ID.eq(rgcd.REPORT_GRID_ID))
+                .innerJoin(rgfcd).on(rgcd.ID.eq(rgfcd.GRID_COLUMN_ID))
+                .leftJoin(sq).on(rgfcd.COLUMN_ENTITY_ID.eq(sq.ID).and(rgfcd.COLUMN_ENTITY_KIND.eq(EntityKind.SURVEY_QUESTION.name())))
+                .where(rg.ID.eq(gridId).and(mayHaveCommentsCondition))
+                .fetchSet(rgcd.ID);
+    }
+
+
+    public void updateColumnDefinitions(long gridId, ReportGridColumnDefinitionsUpdateCommand updatedCmd) {
         dsl.transaction(ctx -> {
             DSLContext tx = ctx.dsl();
 
@@ -199,6 +226,7 @@ public class ReportGridDao {
         });
     }
 
+
     private int deleteExistingColumns(DSLContext tx, long gridId) {
         return tx
                 .deleteFrom(rgcd)
@@ -206,10 +234,10 @@ public class ReportGridDao {
                 .execute();
     }
 
+
     private int[] insertFixedColumnDefinitions(DSLContext tx,
                                                long gridId,
                                                List<ReportGridFixedColumnDefinition> fixedColumnDefinitions) {
-
         fixedColumnDefinitions
                 .stream()
                 .map(c -> {

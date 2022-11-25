@@ -24,7 +24,6 @@ import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.NameProvider;
 import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.model.report_grid.*;
-import org.finos.waltz.model.survey.SurveyQuestion;
 import org.finos.waltz.service.report_grid.ReportGridService;
 import org.finos.waltz.service.settings.SettingsService;
 import org.finos.waltz.service.survey.SurveyQuestionService;
@@ -47,14 +46,15 @@ import java.util.function.LongFunction;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
+import static java.util.Comparator.comparingLong;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.ListUtilities.map;
 import static org.finos.waltz.common.MapUtilities.*;
 import static org.finos.waltz.common.SetUtilities.union;
 import static org.finos.waltz.common.StringUtilities.mkSafe;
 import static org.finos.waltz.model.utils.IdUtilities.indexById;
 import static org.finos.waltz.service.report_grid.ReportGridColumnCalculator.calculate;
+import static org.finos.waltz.web.WebUtilities.readIdSelectionOptionsFromBody;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 import static spark.Spark.post;
 
@@ -98,7 +98,7 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
         post(WebUtilities.mkPath(BASE_URL, "external-id", ":externalId"),
                 (request, response) -> {
                     String externalId = request.params("externalId");
-                    IdSelectionOptions selectionOptions = WebUtilities.readIdSelectionOptionsFromBody(request);
+                    IdSelectionOptions selectionOptions = readIdSelectionOptionsFromBody(request);
 
                     Optional<ReportGridDefinition> definition =
                             reportGridService.findByExternalId(externalId);
@@ -162,34 +162,24 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
 
 
     private List<Tuple2<ReportGridFixedColumnDefinition, ColumnCommentary>> enrichColsWithCommentRequirement(ReportGrid reportGrid) {
-        Set<Long> surveyQuestionsIds = reportGrid
-                .definition()
-                .fixedColumnDefinitions()
-                .stream()
-                .filter(r -> r.columnEntityKind() == EntityKind.SURVEY_QUESTION)
-                .map(ReportGridFixedColumnDefinition::columnEntityId)
-                .collect(toSet());
-
-        Set<Long> colsNeedingComments = surveyQuestionService
-                .findForIds(surveyQuestionsIds)
-                .stream()
-                .filter(SurveyQuestion::allowComment)
-                .map(q -> q.id().get())
-                .collect(toSet());
-
         return reportGrid
                 .definition()
-                .fixedColumnDefinitions()
-                .stream()
-                .map(cd -> tuple(cd, columnHasComment(cd,colsNeedingComments)))
-                .sorted(Comparator.comparingLong(r -> r.v1.position()))
-                .collect(toList());
+                .id()
+                .map(reportGridService::findCommentSupportingColumnIdsForGrid)
+                .map(commentableColIds -> reportGrid
+                        .definition()
+                        .fixedColumnDefinitions()
+                        .stream()
+                        .map(cd -> tuple(
+                                cd,
+                                commentableColIds.contains(cd.id())
+                                    ? ColumnCommentary.HAS_COMMENTARY
+                                    : ColumnCommentary.NO_COMMENTARY))
+                        .sorted(comparingLong(r -> r.v1.position()))
+                        .collect(toList()))
+                .orElseThrow(() -> new IllegalStateException("grid has no id"));
     }
 
-    private static ColumnCommentary columnHasComment(ReportGridFixedColumnDefinition cd, Set<Long> colsNeedingComments) {
-        return (colsNeedingComments.contains(cd.columnEntityId())) ?
-                ColumnCommentary.HAS_COMMENTARY : ColumnCommentary.NO_COMMENTARY;
-    }
 
     private String mkReportName(ReportGridDefinition gridDefinition, IdSelectionOptions selectionOptions) {
         return format("%s_%s_%s",

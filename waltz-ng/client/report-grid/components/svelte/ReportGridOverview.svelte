@@ -189,7 +189,7 @@
                     {#if activeMode === Modes.VIEW}
                         <button class="btn btn-sm btn-primary"
                                 on:click={() => activeMode = Modes.EDIT}>
-                            <Icon name="pencil"/>Edit Grid
+                            <Icon name="pencil"/>Edit Grid Overview
                         </button>
                         <button class="btn btn-sm btn-danger"
                                 on:click={() => activeMode = Modes.REMOVE}>

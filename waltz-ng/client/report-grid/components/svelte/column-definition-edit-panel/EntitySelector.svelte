@@ -130,10 +130,10 @@
                     <ul>
                         {#if selectedEntityKind}
                             <li>
-                                <div class="text-muted clickable"
-                                     on:click,keydown={() => selectEntityKind(null)}>
+                                <button class="btn-skinny text-muted"
+                                        on:click={() => selectEntityKind(null)}>
                                     Select an entity kind
-                                </div>
+                                </button>
                             </li>
                         {/if}
                         {#each entityKinds as entityKind}
@@ -188,12 +188,6 @@
         &:hover {
             background: #f3f9ff;
          }
-
-        div {
-            width: 100%;
-            padding: 0.5em;
-            text-align: left;
-        }
     }
 
     button {
