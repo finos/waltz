@@ -38,6 +38,7 @@ import {parseParams} from "../../../common/browser-utils";
 
 const bindings = {
     parentEntityRef: "<",
+    selectedGrid: "<?"
 };
 
 const initData = {
