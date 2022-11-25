@@ -554,4 +554,16 @@
         </insert>
     </changeSet>
 
+    <changeSet id="20221124-6312-1"
+               failOnError="false"
+               author="davidwatkins73">
+        <insert tableName="role">
+            <column name="key" value="INVOLVEMENT_EDITOR"/>
+            <column name="name" value="Involvement Editor"/>
+            <column name="description" value="Users that can bulk update involvements between people and entities"/>
+            <column name="is_custom" valueBoolean="false"/>
+            <column name="user_selectable" valueBoolean="true"/>
+        </insert>
+    </changeSet>
+
 </databaseChangeLog>

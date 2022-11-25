@@ -36,8 +36,9 @@
             </label>
         </div>
         <div class="col-sm-10">
-            <span ng-bind="$ctrl.actor.description">
-            </span>
+            <waltz-svelte-component component="$ctrl.Markdown"
+                                    text="$ctrl.actor.description">
+            </waltz-svelte-component>
         </div>
     </div>
 
