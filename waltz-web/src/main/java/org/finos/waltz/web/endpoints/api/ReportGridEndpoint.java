@@ -18,7 +18,6 @@
 
 package org.finos.waltz.web.endpoints.api;
 
-import org.finos.waltz.common.FunctionUtilities;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.common.exception.NotFoundException;
 import org.finos.waltz.model.report_grid.*;
@@ -58,6 +57,7 @@ public class ReportGridEndpoint implements Endpoint {
         String removalPath = mkPath(BASE_URL, "id", ":id");
         String findForOwnerPath = mkPath(BASE_URL, "owner");
         String getViewByIdPath = mkPath(BASE_URL, "view", "id", ":id");
+        String getDefinitionByIdPath = mkPath(BASE_URL, "definition", "id", ":id");
         String updateColumnDefsPath = mkPath(BASE_URL, "id", ":id", "column-definitions", "update");
         String findAdditionalColumnOptionsForKindPath = mkPath(BASE_URL, "additional-column-options", "kind", ":kind");
 
@@ -66,6 +66,7 @@ public class ReportGridEndpoint implements Endpoint {
         getForList(findForOwnerPath, this::findForOwnerRoute);
         getForList(findAdditionalColumnOptionsForKindPath, this::findAdditionalColumnOptionsForKindRoute);
         postForDatum(getViewByIdPath, this::getViewByIdRoute);
+        getForDatum(getDefinitionByIdPath, this::getDefinitionByIdRoute);
         postForDatum(updateColumnDefsPath, this::updateColumnDefsRoute);
         postForDatum(createPath, this::createRoute);
         postForDatum(updatePath, this::updateRoute);
@@ -88,6 +89,11 @@ public class ReportGridEndpoint implements Endpoint {
                         getId(req),
                         readIdSelectionOptionsFromBody(req))
                 .orElseThrow(() -> new NotFoundException("404", "ID not found"));
+    }
+
+    public ReportGridDefinition getDefinitionByIdRoute(Request req,
+                                                       Response resp) throws IOException {
+        return reportGridService.getGridDefinitionById(getId(req));
     }
 
 
