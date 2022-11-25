@@ -41,14 +41,15 @@
     </div>
 
     <div class="header-sticky"
-         class:stickyVisible
-         on:click,keydown={() => pageY = 0}>
-
-        <h2 class="clickable">
-            <Icon name={icon}/>
-            <span>{name}</span>
-            <small>{small}</small>
-        </h2>
+         class:stickyVisible>
+        <button class="btn-skinny"
+                on:click={() => pageY = 0}>
+            <h2 class="clickable">
+                <Icon name={icon}/>
+                <span>{name}</span>
+                <small>{small}</small>
+            </h2>
+        </button>
     </div>
 
     {#if $$slots.summary}

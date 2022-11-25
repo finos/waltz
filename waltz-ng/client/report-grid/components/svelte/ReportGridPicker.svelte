@@ -72,7 +72,7 @@
                             class="clickable"
                             on:click={() => onSelect(grid)}>
                             <td>
-                                <button class="btn-skinny force-wrap">
+                                <button class="btn-skinny force-wrap text-left">
                                     <Icon name={determineSubjectIcon(grid?.subjectKind)}/> {grid?.name}
                                 </button>
                             </td>

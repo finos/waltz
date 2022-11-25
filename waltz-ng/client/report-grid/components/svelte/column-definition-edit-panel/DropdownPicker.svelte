@@ -51,10 +51,10 @@
             <ul>
                 {#if selectedItem}
                     <li>
-                        <div class="text-muted clickable force-wrap"
-                             on:click,keydown={() => selectItem(null)}>
+                        <button class="btn-plain text-muted force-wrap text-left"
+                                on:click={() => selectItem(null)}>
                             {defaultMessage}
-                        </div>
+                        </button>
                     </li>
                 {/if}
                 {#each items as item}
@@ -85,11 +85,6 @@
              background: #f3f9ff;
          }
 
-        div {
-            width: 100%;
-            padding: 0.5em;
-            text-align: left;
-        }
     }
 
     button {

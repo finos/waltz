@@ -40,7 +40,6 @@
 
 {#each group.provided as row}
     <tr transition:fade
-        on:click,keydown={() => selectAssessment(row)}
         class="clickable">
         <td>
             <button class="btn btn-skinny"
@@ -54,10 +53,11 @@
                      placement="left-start"
                      props={mkDefinitionTooltipProps(row)}>
                 <svelte:fragment slot="target">
-                                    <span>
-                                        <Icon name={row.definition.isReadOnly ? "lock" : "fw"}/>
-                                        {row.definition.name}
-                                    </span>
+                    <button class="btn btn-skinny"
+                            on:click={() => selectAssessment(row)}>
+                        <Icon name={row.definition.isReadOnly ? "lock" : "fw"}/>
+                        {row.definition.name}
+                    </button>
                 </svelte:fragment>
             </Tooltip>
         </td>
@@ -79,45 +79,30 @@
 {#if !_.isEmpty(group.notProvided)}
     {#if notProvidedCollapsed}
         <tr>
-            <td>
+            <td/>
+            <td class="clickable">
                 <button class="btn btn-skinny"
                         on:click={() => notProvidedCollapsed = false}>
                     <Icon size="lg"
                           name="caret-right"/>
+                    <i>Not Rated</i>
                 </button>
             </td>
-            <td class="clickable"
-                on:click,keydown={() => notProvidedCollapsed = false}>
-                <strong>Not Rated</strong>
-            </td>
             <td class="force-wrap">
-                <ul class="list-inline">
-                    {#each group.notProvided as row}
-                        <li class="force-wrap">
-                            <span class="text-muted">
-                                {#if row.definition.isReadOnly}
-                                    <Icon name="lock"/>
-                                {/if}
-                                {row.definition.name}
-                            </span>
-                        </li>
-                    {/each}
-                </ul>
+                <span class="badge">{_.size(group.notProvided)}</span>
             </td>
         </tr>
     {:else}
         <tr>
-            <td>
+            <td/>
+            <td colspan="2"
+                class="clickable">
                 <button class="btn btn-skinny"
                         on:click={() => notProvidedCollapsed = true}>
                     <Icon size="lg"
                           name="caret-down"/>
+                    <i>Not Rated</i>
                 </button>
-            </td>
-            <td colspan="2"
-                class="clickable"
-                on:click,keydown={() => notProvidedCollapsed = true}>
-                <strong>Not Rated</strong>
             </td>
         </tr>
         {#each group.notProvided as row}
@@ -135,17 +120,17 @@
                         <svelte:fragment slot="target">
                             {#if row.definition.isReadOnly}
                                 <span>
-                                <Icon name="fw"/>
-                                {row.definition.name}
-                            </span>
+                                    <Icon name="fw"/>
+                                    {row.definition.name}
+                                </span>
                             {:else}
                                 <span>
-                                <Icon name="fw"/>
-                                <button class="btn-skinny"
-                                        on:click={() => selectAssessment(row)}>
-                                    {row.definition.name}
-                                </button>
-                            </span>
+                                    <Icon name="fw"/>
+                                    <button class="btn btn-skinny"
+                                            on:click={() => selectAssessment(row)}>
+                                        {row.definition.name}
+                                    </button>
+                                </span>
                             {/if}
 
                         </svelte:fragment>
@@ -158,24 +143,3 @@
         {/each}
     {/if}
 {/if}
-
-
-<style>
-    ul {
-        padding: 0.1em 0 0 0;
-        margin: 0 0 0 0;
-        list-style: none;
-    }
-
-    li::after {
-        content: ", ";
-    }
-
-    li:last-child::after {
-        content: "";
-    }
-
-    li {
-        padding-top: 0.1em;
-    }
-</style>
