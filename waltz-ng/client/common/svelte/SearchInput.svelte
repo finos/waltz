@@ -13,11 +13,11 @@
            bind:value>
     <div class="input-group-addon">
         {#if value.length > 0}
-            <span on:click,keydown={() => value = ""}
-                  class="clickable">
+            <button class="btn-skinny"
+                    on:click={() => value = ""}>
                 <Icon class="clickable"
                       name="times"/>
-            </span>
+            </button>
         {:else}
             <Icon name="search"/>
         {/if}
