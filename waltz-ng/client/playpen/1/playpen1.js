@@ -44,13 +44,13 @@ function controller($q,
 
         serviceBroker
             .loadViewData(
-                // CORE_API.DataTypeStore.findAll,
-                CORE_API.MeasurableStore.findAll,
+                CORE_API.DataTypeStore.findAll,
+                //CORE_API.MeasurableStore.findAll,
                 [])
             .then(r => {
                 console.log(r);
-                vm.taxonomy = _.filter(r.data, m => m.categoryId === 12);
-                vm.linkStem = "measurable"; // data-types
+                vm.taxonomy = r.data; // _.filter(r.data, m => m.categoryId === 12);
+                vm.linkStem = "data-types"; // data-types or measurable
             });
 
     }

@@ -18,10 +18,11 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.bulk_upload.BulkUploadCommand;
 import org.finos.waltz.model.bulk_upload.ResolveBulkUploadRequestParameters;
 import org.finos.waltz.model.bulk_upload.ResolveRowResponse;
-import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.bulk_upload.BulkUploadService;
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.WebUtilities;
@@ -38,7 +39,8 @@ import java.util.List;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.web.WebUtilities.*;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.postForDatum;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.postForList;
 
 @Service
 public class BulkUploadEndpoint implements Endpoint {
@@ -47,11 +49,12 @@ public class BulkUploadEndpoint implements Endpoint {
     private static final String BASE_URL = WebUtilities.mkPath("api", "bulk-upload");
 
     private final BulkUploadService service;
-    private UserRoleService userRoleService;
+    private final UserRoleService userRoleService;
 
 
     @Autowired
-    public BulkUploadEndpoint(BulkUploadService service, UserRoleService userRoleService) {
+    public BulkUploadEndpoint(BulkUploadService service,
+                              UserRoleService userRoleService) {
         checkNotNull(service, "service must not be null");
         checkNotNull(userRoleService, "userRoleService cannot be null");
 
@@ -63,7 +66,6 @@ public class BulkUploadEndpoint implements Endpoint {
     @Override
     public void register() {
 
-
         // create
         postForList(mkPath(BASE_URL, "resolve"), this::resolveRoute);
         postForDatum(mkPath(BASE_URL), this::uploadRoute);
@@ -71,10 +73,9 @@ public class BulkUploadEndpoint implements Endpoint {
     }
 
     private List<ResolveRowResponse> resolveRoute(Request request, Response response) throws IOException {
-        ensureUserHasAdminRights(request);
-
         ResolveBulkUploadRequestParameters resolveParams = readBody(request, ResolveBulkUploadRequestParameters.class);
         String username = getUsername(request);
+        ensureUserHasAdminRights(request, resolveParams.rowSubjectKind(), resolveParams.targetDomain().kind());
         LOG.info("User: {} resolving bulk upload: {}", username, resolveParams);
 
         return service.resolve(resolveParams);
@@ -82,18 +83,24 @@ public class BulkUploadEndpoint implements Endpoint {
 
 
     private Integer uploadRoute(Request request, Response response) throws IOException {
-        ensureUserHasAdminRights(request);
-
         BulkUploadCommand uploadCommand = readBody(request, BulkUploadCommand.class);
         String username = getUsername(request);
+        ensureUserHasAdminRights(request, uploadCommand.rowSubjectKind(), uploadCommand.targetDomain().kind());
         LOG.info("User: {} requesting bulk upload: {}", username, uploadCommand);
 
         return service.upload(uploadCommand, username);
     }
 
 
-    private void ensureUserHasAdminRights(Request request) {
-        requireRole(userRoleService, request, SystemRole.ADMIN);
+    private void ensureUserHasAdminRights(Request request,
+                                          EntityKind subjectKind,
+                                          EntityKind targetKind) {
+        requireEditRoleForEntity(
+                userRoleService,
+                request,
+                targetKind,
+                Operation.UPDATE,
+                subjectKind);
     }
 
 }
