@@ -41,7 +41,8 @@
     {#each $displayedClients as client}
         <g transform={`translate(0, ${$clientScale(client.id)})`}
            class={mkClasses(client)}
-           on:click,keydown|stopPropagation={() => selectClient(client)}>
+           on:click|stopPropagation={() => selectClient(client)}
+           on:keydown|stopPropagation={() => selectClient(client)}>
             <rect stroke={colors[client.kind].stroke}
                   fill={colors[client.kind].fill}
                   on:mouseenter={() => onMouseEnter(client)}
