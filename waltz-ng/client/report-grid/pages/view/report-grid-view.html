@@ -22,8 +22,11 @@
 
 
 <div class="waltz-page-summary waltz-page-summary-attach">
-    <waltz-report-grid-view-section parentEntityRef="$ctrl.parentEntityRef">
-    </waltz-report-grid-view-section>
+    <div ng-if="$ctrl.reportGrid">
+        <waltz-report-grid-view-section parent-entity-ref="$ctrl.parentEntityRef"
+                                        selected-grid="$ctrl.reportGrid">
+        </waltz-report-grid-view-section>
+    </div>
 </div>
 
 <br>

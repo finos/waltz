@@ -15,6 +15,9 @@
                 <ViewLink state="main">Home</ViewLink>
             </li>
             <li>
+                <span>Report Grids</span>
+            </li>
+            <li>
                 <span>{reportGrid?.name}</span>
             </li>
         </ol>

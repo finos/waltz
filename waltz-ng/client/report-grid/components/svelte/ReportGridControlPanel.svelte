@@ -12,6 +12,7 @@
     export let onGridSelect = () => console.log("selecting grid");
     export let onSave = () => console.log("Saved report grid");
     export let primaryEntityRef;
+    export let showGridSelector = true;
 
     const tabs = {
         OVERVIEW: 'overview',
@@ -20,7 +21,13 @@
         PEOPLE: 'people'
     };
 
-    let selectedTab = tabs.OVERVIEW;
+    function determineStartingTab(showGridSelector) {
+        return showGridSelector
+            ? 'overview'
+            : 'filters';
+    }
+
+    let selectedTab = determineStartingTab(showGridSelector)
 
     function handleGridSelect(selectedGrid, isNew) {
         if (isNew) {
@@ -38,17 +45,20 @@
 
 <div class="waltz-tabs" style="padding-top: 1em">
     <!-- TAB HEADERS -->
-    <input type="radio"
-           bind:group={selectedTab}
-           value={tabs.OVERVIEW}
-           id="overview">
-    <label class="wt-label"
-           for="overview">
-        <span>
-            Overview
-            {#if $selectedGrid}{` - ${$selectedGrid.definition.name}`}{/if}
-        </span>
-    </label>
+
+    {#if showGridSelector}
+        <input type="radio"
+               bind:group={selectedTab}
+               value={tabs.OVERVIEW}
+               id="overview">
+        <label class="wt-label"
+               for="overview">
+            <span>
+                Overview
+                {#if $selectedGrid}{` - ${$selectedGrid.definition.name}`}{/if}
+            </span>
+        </label>
+    {/if}
 
     <input type="radio"
            bind:group={selectedTab}
