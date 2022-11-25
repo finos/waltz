@@ -176,11 +176,13 @@
                         {/if}
                     </td>
                     <td colspan="2"
-                        class="clickable"
-                        on:click,keydown={() => toggleGroup(group)}>
-                        <strong>
-                            <span>{group.groupName}</span>
-                        </strong>
+                        class="clickable">
+                        <button class="btn btn-skinny"
+                                on:click={() => toggleGroup(group)}>
+                            <strong>
+                                <span>{group.groupName}</span>
+                            </strong>
+                        </button>
                     </td>
                 </tr>
                 {#if _.includes(expansions, group.groupName)}

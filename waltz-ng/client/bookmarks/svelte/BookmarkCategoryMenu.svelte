@@ -30,19 +30,29 @@
     {#each bookmarkKinds as bookmarkKind}
         <li class="list-group-item"
             class:selected={eq(selected, bookmarkKind)}
-            class:clickable={bookmarkKind.count > 0}
-            class:text-muted={bookmarkKind.count === 0}
-            on:click,keydown={() => bookmarkKind.count > 0 && bookmarkKindSelected(bookmarkKind)}>
+            class:text-muted={bookmarkKind.count === 0}>
 
-            <Icon name={bookmarkKind.icon}/>
+            {#if bookmarkKind.count > 0}
+                <button class="btn-skinny text-left"
+                        style="width: 100%"
+                        on:click={() => bookmarkKind.count > 0 && bookmarkKindSelected(bookmarkKind)}>
+                    <Icon name={bookmarkKind.icon}/>
 
-            {bookmarkKind.name}
+                    {bookmarkKind.name}
 
-            {#if eq(selected, bookmarkKind)}
-                <span class="pull-right">
-                    <Icon name="close"/>
+                    {#if eq(selected, bookmarkKind)}
+                        <span class="pull-right">
+                            <Icon name="close"/>
+                        </span>
+                    {/if}
+                </button>
+            {:else}
+                <span>
+                    <Icon name={bookmarkKind.icon}/>
+                    {bookmarkKind.name}
                 </span>
             {/if}
+
         </li>
     {/each}
 </ul>
@@ -51,9 +61,5 @@
 <style>
     .selected {
         background-color: #e2ffd9;
-    }
-
-    .clickable > :global(.icon) {
-        color: #5BB65D;
     }
 </style>
