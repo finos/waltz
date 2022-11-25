@@ -259,7 +259,8 @@
                  viewBox={`0 0 ${dimensions.diagram.width} ${dimensions.diagram.height}`}
                  width="100%"
                  height="550"
-                 on:click,keydown={clearSelections}>
+                 on:click={clearSelections}
+                 on:keydown={clearSelections}>
 
                 <clipPath id="row-clip">
                     <rect x="0"

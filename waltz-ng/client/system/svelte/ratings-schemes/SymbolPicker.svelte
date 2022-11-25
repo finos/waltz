@@ -22,10 +22,11 @@
         &nbsp;
         {#each _.keys(symbolsByName) as symbolName}
             {#if symbolName !== "DEFAULT"}
-            <span style="padding-right: 2px" class="clickable">
+            <button style="padding-right: 2px" class="btn-skinny"
+                    on:click|preventDefault={() => selectedSymbol = symbolName}>
                 <svg width="10"
                      height="10"
-                     on:click,keydown|preventDefault={() => selectedSymbol = symbolName}
+
                      viewBox="0 0 10 10">
                     <path fill={color}
                           stroke={color}
@@ -33,7 +34,7 @@
                           d={symbolsByName[symbolName]()}>
                     </path>
                 </svg>
-            </span>
+            </button>
             {/if}
         {/each}
     </div>

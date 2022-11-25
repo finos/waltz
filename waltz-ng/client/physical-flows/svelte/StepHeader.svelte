@@ -12,15 +12,17 @@
 </script>
 
 
-<h3 class="clickable"
-    on:click,keydown={onToggleExpanded}>
-    <Icon name={expanded ? "chevron-down" : "chevron-right"}
-          fixedWidth="true"/>
+<button class="btn-plain"
+        on:click={onToggleExpanded}>
+    <h3 class="clickable">
+        <Icon name={expanded ? "chevron-down" : "chevron-right"}
+              fixedWidth="true"/>
 
-    <Check selected={checked}/>
-    {#if icon}
-        <Icon name={icon} fixedWidth="true"/>
-    {/if}
-    {label}
-</h3>
+        <Check selected={checked}/>
+        {#if icon}
+            <Icon name={icon} fixedWidth="true"/>
+        {/if}
+        {label}
+    </h3>
+</button>
 

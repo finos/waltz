@@ -52,7 +52,8 @@
         {#each months as monthData, idx}
             <g transform={`translate(${determineColumn(idx) * dimensions.month.width}, ${determineRow(idx) * dimensions.month.height})`}>
 
-                <g>
+                <g on:click={() => onSelectMonth(_.map(monthData.days, d => d.date))}
+                   on:keydown={() => onSelectMonth(_.map(monthData.days, d => d.date))}>
                     <title>{format(monthData?.startDate)}</title>
 
                     <rect width={dimensions.month.width}
@@ -60,8 +61,7 @@
                           class="clickable"
                           on:mouseenter={() => hoveredMonth = idx}
                           on:mouseleave={() => hoveredMonth = null}
-                          fill={hoveredMonth === idx ? "#eee" : "#fff"}
-                          on:click,keydown={() => onSelectMonth(_.map(monthData.days, d => d.date))}>
+                          fill={hoveredMonth === idx ? "#eee" : "#fff"}>
                     </rect>
                 </g>
                 <text transform={`translate(${7 * dimensions.day.width / 2})`}

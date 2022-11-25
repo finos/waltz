@@ -117,7 +117,8 @@
     </path>
 
     <g class="wfd-flow-bucket"
-       on:click,keydown={selectBucket}>
+       on:click={selectBucket}
+       on:keydown={selectBucket}>
         <circle r={decorationCount > 0 ? 16 : 12}
                 stroke={flowStyling.color}
                 fill="#fff"
