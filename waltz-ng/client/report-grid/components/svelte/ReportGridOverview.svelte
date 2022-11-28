@@ -24,12 +24,16 @@
 
     let activeMode = Modes.VIEW;
     let grids = [];
+    let owners = [];
+    let viewers = [];
 
     $: reportGridCall = reportGridStore.findForUser(true);
     $: grids = $reportGridCall.data;
 
-    $: gridOwnersCall = $selectedGrid?.definition?.id && reportGridMemberStore.findByGridId($selectedGrid?.definition?.id);
-    $: gridOwners = $gridOwnersCall?.data || [];
+    $: gridMembersCall = $selectedGrid?.definition?.id && reportGridMemberStore.findByGridId($selectedGrid?.definition?.id);
+
+    $: gridMembers = $gridMembersCall?.data || [];
+    $: [owners, viewers] = _.partition(gridMembers, d => d.role === 'OWNER');
 
     function selectGrid(grid, isNew = false) {
         $selectedGrid = null;
@@ -111,8 +115,6 @@
         $selectedGrid = $selectedGrid.definition.id ? $selectedGrid : null;
     }
 
-    $: gridOwnerNames = _.map(gridOwners, d => d.userId);
-
     function visitPageView() {
         $pageInfo = {
             state: "main.report-grid.view",
@@ -155,11 +157,16 @@
                     </tr>
                     <tr>
                         <td>Subject Kind</td>
-                        <td>{_.get(entity[$selectedGrid?.definition?.subjectKind], 'name', 'Unknown Kind')}</td>
+                        <td>
+                            <Icon name={_.get(entity[$selectedGrid?.definition?.subjectKind], 'icon')}/>
+                            {_.get(entity[$selectedGrid?.definition?.subjectKind], 'name', 'Unknown Kind')}
+                        </td>
                     </tr>
                     <tr>
                         <td>Kind</td>
-                        <td>{_.get(reportGridKinds[$selectedGrid?.definition?.kind], 'name', 'Unknown Kind')}</td>
+                        <td>
+                            <Icon name={$selectedGrid?.definition?.kind === 'PUBLIC' ? "users" : "user-secret"}/>
+                            {_.get(reportGridKinds[$selectedGrid?.definition?.kind], 'name', 'Unknown Kind')}</td>
                     </tr>
                     <tr id="report-grid-identifier-externalId" style="display:none;">
                         <td>externalId</td>
@@ -168,14 +175,34 @@
                     <tr>
                         <td>Owners</td>
                         <td>
-                            {#if !_.isEmpty(gridOwners)}
-                                <ul>
-                                    {#each _.orderBy(gridOwners, d => d.userId) as owner}
-                                        <li>
-                                            {owner.userId}
-                                        </li>
-                                    {/each}
-                                </ul>
+                            {#if !_.isEmpty(owners)}
+                                <div class:waltz-scroll-region-150={_.size(owners) > 10}>
+                                    <ul>
+                                        {#each _.orderBy(owners, d => d.userId) as owner}
+                                            <li>
+                                                {owner.userId}
+                                            </li>
+                                        {/each}
+                                    </ul>
+                                </div>
+                            {:else}
+                                <span class="text-muted">None defined</span>
+                            {/if}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Viewers</td>
+                        <td>
+                            {#if !_.isEmpty(viewers)}
+                                <div class:waltz-scroll-region-150={_.size(viewers) > 10}>
+                                    <ul>
+                                        {#each _.orderBy(viewers, d => d.userId) as viewer}
+                                            <li>
+                                                {viewer.userId}
+                                            </li>
+                                        {/each}
+                                    </ul>
+                                </div>
                             {:else}
                                 <span class="text-muted">None defined</span>
                             {/if}
