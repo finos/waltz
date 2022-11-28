@@ -121,15 +121,16 @@ public class ComplexityDao {
 
         Field<BigDecimal> total_complexity = DSL.sum(COMPLEXITY.SCORE).as("total_complexity");
         Field<BigDecimal> average_complexity = DSL.sum(COMPLEXITY.SCORE).divide(DSL.countDistinct(COMPLEXITY.ENTITY_ID)).as("average_complexity");
-        Field<BigDecimal> median_complexity = DSL.percentileCont(0.5).withinGroupOrderBy(COMPLEXITY.SCORE).over().as("median_complexity");
+        Field<BigDecimal> median_complexity = DSL.percentileCont(0.5).withinGroupOrderBy(COMPLEXITY.SCORE).as("median_complexity");
 
         SelectHavingStep<Record> median_complexities = dsl
-                .select(COMPLEXITY.ID)
+                .select(COMPLEXITY.COMPLEXITY_KIND_ID)
                 .select(median_complexity)
                 .from(COMPLEXITY)
                 .where(COMPLEXITY.COMPLEXITY_KIND_ID.eq(complexityKindId)
                         .and(COMPLEXITY.ENTITY_ID.in(genericSelector.selector())
-                                .and(COMPLEXITY.ENTITY_KIND.eq(genericSelector.kind().name()))));
+                                .and(COMPLEXITY.ENTITY_KIND.eq(genericSelector.kind().name()))))
+                .groupBy(COMPLEXITY.COMPLEXITY_KIND_ID);
 
         AggregateFunction<BigDecimal> grouped_median_complexity = DSL.max(median_complexities.field("median_complexity", BigDecimal.class).as("median_complexity"));
 
@@ -138,14 +139,19 @@ public class ComplexityDao {
                 .select(average_complexity)
                 .select(grouped_median_complexity)
                 .from(COMPLEXITY)
-                .leftJoin(median_complexities).on(COMPLEXITY.ID.eq(median_complexities.field(COMPLEXITY.ID)))
+                .leftJoin(median_complexities).on(COMPLEXITY.COMPLEXITY_KIND_ID.eq(median_complexities.field(COMPLEXITY.COMPLEXITY_KIND_ID)))
                 .where(COMPLEXITY.COMPLEXITY_KIND_ID.eq(complexityKindId)
                         .and(COMPLEXITY.ENTITY_ID.in(genericSelector.selector())
                                 .and(COMPLEXITY.ENTITY_KIND.eq(genericSelector.kind().name()))))
                 .groupBy(COMPLEXITY.COMPLEXITY_KIND_ID);
 
+        System.out.println(qry);
+
         return qry
-                .fetchOne(r -> tuple(r.get(average_complexity), r.get(total_complexity), r.get(grouped_median_complexity)));
+                .fetchOne(r -> tuple(
+                        r.get(average_complexity),
+                        r.get(total_complexity),
+                        r.get(grouped_median_complexity)));
     }
 
 
