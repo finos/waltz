@@ -21,6 +21,7 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
                    logicalFilePath="db.changelog-1.45.xml">
 
+
     <changeSet id="v1-44-tag"
                author="davidwatkins73">
         <tagDatabase tag="v1.44"/> <!-- tag the current db version, i.e. the last  -->
@@ -261,7 +262,7 @@
 
     <changeSet id="20220914-6221-17"
                author="woodjes"
-               dbms="postgres,h2">
+               dbms="postgresql,h2">
         <comment>6221: Report Grid: Migrate column ids and position from fixed column to col defn table</comment>
         <sql>
             INSERT INTO report_grid_column_definition (id, report_grid_id, position)
@@ -269,6 +270,18 @@
             FROM report_grid_fixed_column_definition;
             -- TODO: check on postgres
         </sql>
+    </changeSet>
+
+    <changeSet id="20220914-6221-17a"
+               author="woodjes"
+               dbms="postgresql,h2">
+        <renameSequence oldSequenceName="report_grid_column_definition_id_seq"
+                        newSequenceName="report_grid_fixed_column_definition_id_seq"/>
+    </changeSet>
+
+    <changeSet id="20220914-6221-17b"
+               author="woodjes"
+               dbms="postgresql,h2">
 
         <addAutoIncrement tableName="report_grid_column_definition"
                           columnName="id"
