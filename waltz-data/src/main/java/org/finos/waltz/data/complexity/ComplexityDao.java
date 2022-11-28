@@ -145,13 +145,11 @@ public class ComplexityDao {
                                 .and(COMPLEXITY.ENTITY_KIND.eq(genericSelector.kind().name()))))
                 .groupBy(COMPLEXITY.COMPLEXITY_KIND_ID);
 
-        System.out.println(qry);
-
-        return qry
-                .fetchOne(r -> tuple(
-                        r.get(average_complexity),
-                        r.get(total_complexity),
-                        r.get(grouped_median_complexity)));
+        return qry.fetchOne(
+                r -> tuple(
+                    r.get(average_complexity),
+                    r.get(total_complexity),
+                    r.get(grouped_median_complexity)));
     }
 
 
