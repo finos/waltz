@@ -1,5 +1,6 @@
 <script>
     import EntityIcon from "./EntityIcon.svelte";
+    import _ from "lodash";
 
     export let ref;
     export let showIcon = true;

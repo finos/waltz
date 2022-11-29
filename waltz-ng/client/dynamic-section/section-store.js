@@ -158,8 +158,11 @@ derived(
                 .value();
 
             const paramValue = _.join(top3SectionIds, ";");
-            const url = window.location.origin + window.location.pathname + "?sections=" + paramValue;
+            const newParams = Object.assign({}, parseParams(window.location.href), {sections: paramValue});
 
+            const paramsString = new URLSearchParams(newParams).toString()
+
+            const url = window.location.origin + window.location.pathname + "?" + paramsString;
 
             window.history.replaceState({path: url}, "", url);
             window.localStorage.setItem(mkLocalStorageKey(d.pageKind), JSON.stringify(top3SectionIds));

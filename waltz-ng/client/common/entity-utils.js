@@ -91,6 +91,12 @@ function determineLoadByIdCall(kind) {
             return CORE_API.ActorStore.getById;
         case "CHANGE_INITIATIVE":
             return CORE_API.ChangeInitiativeStore.getById;
+        case "ORG_UNIT":
+            return CORE_API.OrgUnitStore.getById;
+        case "MEASURABLE":
+            return CORE_API.MeasurableStore.getById;
+        case "APP_GROUP":
+            return CORE_API.AppGroupStore.getById;
         default:
             throw "Unsupported kind for loadById: " + kind;
     }
@@ -115,13 +121,22 @@ function determineLoadByExtIdCall(kind) {
 }
 
 
+function getEntityFromData(kind, data) {
+    switch (kind) {
+        case "APP_GROUP":
+            return data.appGroup;
+        default:
+            return data;
+    }
+}
+
 export function loadEntity(serviceBroker, entityRef) {
     checkIsEntityRef(entityRef);
 
     const remoteCall = determineLoadByIdCall(entityRef.kind);
     return serviceBroker
-        .loadViewData(remoteCall, [ entityRef.id ])
-        .then(r => r.data);
+        .loadViewData(remoteCall, [entityRef.id])
+        .then(r => getEntityFromData(entityRef.kind, r.data));
 }
 
 

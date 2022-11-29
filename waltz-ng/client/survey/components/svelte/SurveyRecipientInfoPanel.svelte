@@ -26,7 +26,7 @@
         { field: "surveyInstance.surveyEntityExternalId", name: "Subject Ext Id"},
         { field: "surveyInstance.qualifierEntity.name", name: "Qualifier"},
         { field: "displayStatus", name: "Status"},
-        { field: "surveyRun.dueDate", name: "Due Date"}
+        { field: "surveyInstance.dueDate", name: "Due Date"}
     ];
 
     let currentDate = new Date();

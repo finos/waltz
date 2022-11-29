@@ -22,7 +22,7 @@ import {mkSelectionOptions} from "../../../common/selector-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
 import ReportGridControlPanel from "../svelte/ReportGridControlPanel.svelte";
-import {activeSummaries, columnDefs, derivedColumnDefs, filters, selectedGrid} from "../svelte/report-grid-store";
+import {activeSummaries, columnDefs, filters, selectedGrid} from "../svelte/report-grid-store";
 import {
     combineColDefs,
     mkLocalStorageFilterKey,
@@ -37,10 +37,12 @@ import {coalesceFns} from "../../../common/function-utils";
 
 const bindings = {
     parentEntityRef: "<",
+    selectedGrid: "<?"
 };
 
 const initData = {
-    ReportGridControlPanel
+    ReportGridControlPanel,
+    showGridSelector: true
 };
 
 const localStorageKey = "waltz-report-grid-view-section-last-id";
@@ -131,6 +133,7 @@ function controller($scope, serviceBroker, localStorageService) {
             });
     }
 
+
     vm.$onChanges = () => {
 
         if (vm.parentEntityRef) {
@@ -138,12 +141,16 @@ function controller($scope, serviceBroker, localStorageService) {
             vm.selectionOptions = mkSelectionOptions(vm.parentEntityRef);
             const lastUsedGridId = localStorageService.get(localStorageKey);
 
-            if (lastUsedGridId) {
+            if (vm.selectedGrid) {
+                vm.gridId = vm.selectedGrid.id;
+                vm.loading = true;
+                loadGridData();
+                vm.showGridSelector = false;
+            } else if (lastUsedGridId) {
                 vm.gridId = lastUsedGridId;
                 vm.loading = true;
                 loadGridData();
             }
-
         }
     };
 

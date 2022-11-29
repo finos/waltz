@@ -11,9 +11,17 @@
 
     export let onGridSelect = () => "selecting grid";
     export let onCreate = () => "creating grid";
-    export let grids =[];
+    export let grids = [];
+
+    const filters = {
+        ALL: d => d,
+        PRIVATE: d => d.kind === 'PRIVATE',
+        PUBLIC: d => d.kind === 'PUBLIC'
+    }
 
     let qry = "";
+
+    let filterCondition = filters.ALL;
 
     const Modes = {
         VIEW: "VIEW",
@@ -26,7 +34,11 @@
         onGridSelect(grid);
     }
 
-    $: orderedGrids = _.sortBy(grids, 'name');
+    $: orderedGrids = _
+        .chain(grids)
+        .filter(filterCondition)
+        .sortBy('name')
+        .value();
 
     $: gridList = _.isEmpty(qry)
         ? orderedGrids
@@ -39,12 +51,33 @@
 </script>
 
 <div class="row">
-    <div class="col-sm-12" >
+    <div class="col-sm-12">
         {#if _.size(grids) > 10}
             <SearchInput bind:value={qry}
                          placeholder="Search available grids"/>
             <br>
         {/if}
+        <div class="pull-right" style="padding-bottom: 1em">
+            <span class="small">
+                <button class="btn btn-default btn-xs"
+                        title="Filter grids that are private but visible to you"
+                        on:click={() => filterCondition = filters.PRIVATE}>
+                    <Icon name="user-secret"/>
+                </button>
+                <button class="btn btn-default btn-xs"
+                        title="Filter grids that are publicly visible"
+                        on:click={() => filterCondition = filters.PUBLIC}>
+                    <Icon name="users"/>
+                </button>
+                {#if filterCondition !== filters.ALL}
+                    <button class="btn btn-default btn-xs"
+                            title="Clear filters and show all grids"
+                            on:click={() => filterCondition = filters.ALL}>
+                        <Icon name="ban"/>
+                    </button>
+                {/if}
+            </span>
+        </div>
         <div class:waltz-scroll-region-350={_.size(grids) > 10}>
             {#if _.isEmpty(grids)}
                 <NoData>
@@ -57,11 +90,13 @@
             {:else }
                 <table class="table table-condensed table-hover small">
                     <colgroup>
-                        <col width="40%">
-                        <col width="40%">
+                        <col width="10%">
+                        <col width="45%">
+                        <col width="45%">
                     </colgroup>
                     <thead>
                     <tr>
+                        <th></th>
                         <th>Grid Name</th>
                         <th>Description</th>
                     </tr>
@@ -71,6 +106,9 @@
                         <tr class:selected={$selectedGrid?.definition.id === grid?.id}
                             class="clickable"
                             on:click={() => onSelect(grid)}>
+                            <td title={grid.kind === "PUBLIC" ? "Public" : "Private"}>
+                                <Icon name={grid.kind === "PUBLIC" ? "users" : "user-secret"}/>
+                            </td>
                             <td>
                                 <button class="btn-skinny force-wrap text-left">
                                     <Icon name={determineSubjectIcon(grid?.subjectKind)}/> {grid?.name}
