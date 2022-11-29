@@ -534,8 +534,8 @@ export function refreshSummaries(tableData,
             totalVisible: _.sumBy(optionSummaries, c => c.counts.visible)
         }))
         .orderBy([  // order the summaries so they reflect the column order
-            d => d.column.position,
-            d => d.column.columnName
+            d => d.column?.position,
+            d => d.column?.columnName
         ])
         .value();
 }
