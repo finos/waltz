@@ -32,10 +32,17 @@ function store($http, baseUrl) {
             .then(result => result.data);
     };
 
+    const getDefinitionById = (id) => {
+        return $http
+            .get(`${BASE}/definition/id/${id}`)
+            .then(result => result.data);
+    };
+
 
     return {
         findAll,
-        getViewById
+        getViewById,
+        getDefinitionById
     };
 }
 
@@ -59,6 +66,11 @@ export const ReportGridStore_API = {
         serviceName,
         serviceFnName: "getViewById",
         description: "executes getViewById [gridId, selectionOptions]"
+    },
+    getDefinitionById: {
+        serviceName,
+        serviceFnName: "getDefinitionById",
+        description: "executes getDefinitionById [gridId]"
     }
 };
 
