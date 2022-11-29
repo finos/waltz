@@ -108,8 +108,8 @@
                author="davidwatkins73">
         <addColumn tableName="survey_instance">
             <column name="issued_on"
-                    type="TIMESTAMP"
-                    defaultValueComputed="${now.value}">
+                    type="DATE"
+                    defaultValueComputed="${today.value}">
                 <constraints nullable="false"/>
             </column>
         </addColumn>
