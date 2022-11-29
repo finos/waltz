@@ -63,6 +63,7 @@ public class SurveyInstanceDao {
     private static final org.finos.waltz.schema.tables.SurveyInstance si = SURVEY_INSTANCE;
     private static final org.finos.waltz.schema.tables.SurveyRun sr = SURVEY_RUN;
     private static final org.finos.waltz.schema.tables.SurveyInstanceRecipient sir = SURVEY_INSTANCE_RECIPIENT;
+    private static final org.finos.waltz.schema.tables.SurveyInstanceOwner sio = SURVEY_INSTANCE_OWNER;
     private static final org.finos.waltz.schema.tables.SurveyTemplate st = SURVEY_TEMPLATE;
     private static final org.finos.waltz.schema.tables.InvolvementKind ik = INVOLVEMENT_KIND;
     private static final org.finos.waltz.schema.tables.Involvement i = INVOLVEMENT;
@@ -467,6 +468,38 @@ public class SurveyInstanceDao {
     }
 
 
+    public SyncRecipientsResponse getReassignOwnersCounts() {
+
+        CommonTableExpression<Record5<Long, Long, String, String, String>> inScopeSurveys = getInScopeSurveysCTE();
+        CommonTableExpression<Record6<Long, Long, String, Long, String, String>> requiredRecipients = getRequiredOwnersCTE(inScopeSurveys);
+        CommonTableExpression<Record6<Long, Long, String, Long, String, String>> existingRecipients = getExistingRecipientsCTE(inScopeSurveys);
+        CommonTableExpression<Record6<Long, Long, String, Long, String, String>> recipientsToRemove = getRecipientsToRemoveCTE(existingRecipients, requiredRecipients);
+        CommonTableExpression<Record6<Long, Long, String, Long, String, String>> recipientsToAdd = getRecipientsToAddCTE(existingRecipients, requiredRecipients);
+
+        Result<Record6<Long, Long, String, Long, String, String>> countToRemove = dsl
+                .with(inScopeSurveys)
+                .with(requiredRecipients)
+                .with(existingRecipients)
+                .with(recipientsToRemove)
+                .selectFrom(recipientsToRemove)
+                .fetch();
+
+        Result<Record6<Long, Long, String, Long, String, String>> countToAdd = dsl
+                .with(inScopeSurveys)
+                .with(requiredRecipients)
+                .with(existingRecipients)
+                .with(recipientsToAdd)
+                .selectFrom(recipientsToAdd)
+                .fetch();
+
+        return ImmutableSyncRecipientsResponse
+                .builder()
+                .recipientsCreatedCount((long) countToAdd.size())
+                .recipientsRemovedCount((long) countToRemove.size())
+                .build();
+    }
+
+
     public SyncRecipientsResponse reassignRecipients() {
 
         CommonTableExpression<Record5<Long, Long, String, String, String>> inScopeSurveys = getInScopeSurveysCTE();
@@ -698,6 +731,23 @@ public class SurveyInstanceDao {
                         .innerJoin(p).on(sir.PERSON_ID.eq(p.ID)));
     }
 
+
+    private CommonTableExpression<Record6<Long, Long, String, Long, String, String>> getExistingOwnersCTE(CommonTableExpression<Record5<Long, Long, String, String, String>> inScopeSurveys) {
+        return DSL
+                .name("existingRecipients")
+                .fields("survey_instance_id", "person_id", "entity_kind", "entity_id", "template_name", "person_email")
+                .as(DSL
+                        .select(sir.SURVEY_INSTANCE_ID,
+                                sir.PERSON_ID,
+                                inScopeSurveys.field(si.ENTITY_KIND),
+                                inScopeSurveys.field(si.ENTITY_ID),
+                                inScopeSurveys.field(st.NAME),
+                                p.EMAIL)
+                        .from(inScopeSurveys)
+                        .innerJoin(sir).on(inScopeSurveys.field(si.ID).eq(sir.SURVEY_INSTANCE_ID))
+                        .innerJoin(p).on(sir.PERSON_ID.eq(p.ID)));
+    }
+
     private CommonTableExpression<Record5<Long, Long, String, String, String>> getInScopeSurveysCTE() {
         return DSL
                 .name("inScopeSurveys")
@@ -739,5 +789,31 @@ public class SurveyInstanceDao {
                                 .and(p.IS_REMOVED.isFalse()))
                         .where(inScopeSurveys.field(sr.INVOLVEMENT_KIND_IDS).isNotNull()
                                 .and(inScopeSurveys.field(sr.INVOLVEMENT_KIND_IDS).ne(""))));
+    }
+
+    private CommonTableExpression<Record6<Long, Long, String, Long, String, String>> getRequiredOwnersCTE(CommonTableExpression<Record5<Long, Long, String, String, String>> inScopeSurveys) {
+
+        Field<String> surveyInvolvementsString = DSL.concat(DSL.val(";"), inScopeSurveys.field(sr.OWNER_INV_KIND_IDS), DSL.val(";"));
+        Field<String> involvementKindsString = DSL.concat(DSL.val("%;"), DSL.cast(ik.ID, String.class), DSL.val(";%"));
+
+        return DSL
+                .name("requiredOwners")
+                .fields("survey_instance_id", "person_id", "entity_kind", "entity_id", "template_name", "person_email")
+                .as(DSL
+                        .select(inScopeSurveys.field(si.ID),
+                                p.ID,
+                                inScopeSurveys.field(si.ENTITY_KIND),
+                                inScopeSurveys.field(si.ENTITY_ID),
+                                inScopeSurveys.field(st.NAME),
+                                p.EMAIL)
+                        .from(inScopeSurveys)
+                        .innerJoin(ik).on(surveyInvolvementsString.like(involvementKindsString))
+                        .innerJoin(i).on(ik.ID.eq(i.KIND_ID)
+                                .and(i.ENTITY_KIND.eq(inScopeSurveys.field(si.ENTITY_KIND))
+                                        .and(i.ENTITY_ID.eq(inScopeSurveys.field(si.ENTITY_ID)))))
+                        .innerJoin(p).on(i.EMPLOYEE_ID.eq(p.EMPLOYEE_ID)
+                                .and(p.IS_REMOVED.isFalse()))
+                        .where(inScopeSurveys.field(sr.OWNER_INV_KIND_IDS).isNotNull()
+                                .and(inScopeSurveys.field(sr.OWNER_INV_KIND_IDS).ne(""))));
     }
 }
