@@ -296,6 +296,7 @@ public class SurveyRunService {
                                         .dueDate(command.dueDate())
                                         .approvalDueDate(command.approvalDueDate())
                                         .owningRole(command.owningRole())
+                                        .name(surveyRun.name())
                                         .build())
                                 .person(p)
                                 .build()))
@@ -353,7 +354,8 @@ public class SurveyRunService {
 
         Map<SurveyInstance, Collection<SurveyInstanceOwner>> surveyOwnersByInstance = groupBy(surveyInstanceOwners, SurveyInstanceOwner::surveyInstance);
 
-        Map<SurveyInstance, List<SurveyInstanceRecipient>> instancesAndRecipientsToSave = surveyInstanceRecipients.stream()
+        Map<SurveyInstance, List<SurveyInstanceRecipient>> instancesAndRecipientsToSave = surveyInstanceRecipients
+                .stream()
                 .collect(groupingBy(
                         SurveyInstanceRecipient::surveyInstance,
                         toList()
@@ -396,14 +398,16 @@ public class SurveyRunService {
 
 
     private long createSurveyInstance(SurveyInstance surveyInstance) {
-        return surveyInstanceDao.create(ImmutableSurveyInstanceCreateCommand.builder()
-                .surveyRunId(surveyInstance.surveyRunId())
-                .entityReference(surveyInstance.surveyEntity())
-                .status(surveyInstance.status())
-                .dueDate(surveyInstance.dueDate())
-                .approvalDueDate(surveyInstance.approvalDueDate())
-                .owningRole(surveyInstance.owningRole())
-                .build());
+        return surveyInstanceDao
+                .create(ImmutableSurveyInstanceCreateCommand.builder()
+                        .surveyRunId(surveyInstance.surveyRunId())
+                        .entityReference(surveyInstance.surveyEntity())
+                        .status(surveyInstance.status())
+                        .dueDate(surveyInstance.dueDate())
+                        .approvalDueDate(surveyInstance.approvalDueDate())
+                        .owningRole(surveyInstance.owningRole())
+                        .name(surveyInstance.name())
+                        .build());
     }
 
 
@@ -531,6 +535,7 @@ public class SurveyRunService {
                 .surveyRunId(run.id().get())
                 .status(SurveyInstanceStatus.NOT_STARTED)
                 .owningRole(owningRole)
+                .name(run.name())
                 .build();
         long instanceId = surveyInstanceDao.create(instanceCreateCommand);
         surveyInstanceOwnerDao.create(ImmutableSurveyInstanceOwnerCreateCommand.builder()
