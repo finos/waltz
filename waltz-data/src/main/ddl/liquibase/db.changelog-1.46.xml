@@ -26,4 +26,112 @@
         <tagDatabase tag="v1.45"/> <!-- tag the current db version, i.e. the last  -->
     </changeSet>
 
+
+    <changeSet id="20221129-6329-10"
+               author="davidwatkins73">
+        <addColumn tableName="flow_classification_rule">
+            <column name="subject_entity_kind"
+                    type="${enum.type}"
+                    defaultValue="APPLICATION">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20221129-6329-11"
+               author="davidwatkins73">
+        <dropForeignKeyConstraint baseTableName="flow_classification_rule"
+                                  constraintName="flow_classification_rule_application_id_fkey"/>
+    </changeSet>
+
+    <changeSet id="20221129-6329-12"
+               author="davidwatkins73">
+        <renameColumn tableName="flow_classification_rule"
+                      oldColumnName="application_id"
+                      newColumnName="subject_entity_id"/>
+    </changeSet>
+
+    <changeSet id="20221129-6329-13"
+               author="davidwatkins73">
+        <setTableRemarks tableName="flow_classification_rule"
+                         remarks="An instance of a flow classification rule.  Used to evaluate data flows against a list of authorised sources etc"/>
+
+        <setColumnRemarks tableName="flow_classification_rule"
+                          columnName="parent_kind"
+                          remarks="the parent ref determines the scope of the rule. this is the entity kind part of the ref. Typically ORG_UNIT or APPLICATION"/>
+        <setColumnRemarks tableName="flow_classification_rule"
+                          columnName="parent_id"
+                          remarks="the parent ref determines the scope of the rule. this is the entity id part of the ref"/>
+        <setColumnRemarks tableName="flow_classification_rule"
+                          columnName="subject_entity_kind"
+                          remarks="the subject entity ref determines the kind of entity that has the rule declared against it. Typically APPLICATION or ACTOR"/>
+        <setColumnRemarks tableName="flow_classification_rule"
+                          columnName="subject_entity_id"
+                          remarks="the subject entity id determines the which instance of an ACTOR or APPLICATION has the rule declared against it"/>
+        <setColumnRemarks tableName="flow_classification_rule"
+                          columnName="data_type_id"
+                          remarks="reference to an entry in the data_type table.  The rule is hierarchy aware and will apply to child datatypes, unless overridden"/>
+        <setColumnRemarks tableName="flow_classification_rule"
+                          columnName="flow_classification_id"
+                          remarks="reference to an entry in the flow_classification table.  This determines the result of the rule evaluation.  Typically points at things like 'Authoritative Source' or 'Tactical Source'"/>
+        <setColumnRemarks tableName="flow_classification_rule"
+                          columnName="is_readonly"
+                          remarks="determines if a user can update this rule. Useful when consuming rules from external sources"/>
+    </changeSet>
+
+    <changeSet id="20221129-6329-14"
+               author="davidwatkins73">
+
+        <setColumnRemarks tableName="flow_classification"
+                          columnName="name"
+                          remarks="display name for the flow classification. Examples include: Authorised Source, Tactical Source"/>
+        <setColumnRemarks tableName="flow_classification"
+                          columnName="code"
+                          remarks="external identifier to isolate programmatic consumers from name changes"/>
+        <setColumnRemarks tableName="flow_classification"
+                          columnName="color"
+                          remarks="if a flow is deemed to match this rule, this will be the resultant color.  Shown in a legend below the flow visualizations"/>
+        <setColumnRemarks tableName="flow_classification"
+                          columnName="position"
+                          remarks="overrides the default (alphabetic) position, lower is earlier"/>
+        <setColumnRemarks tableName="flow_classification"
+                          columnName="is_custom"
+                          remarks="Waltz provides some 'out of the box' classification.  These should not be removed, but can have their names and colours updated"/>
+        <setColumnRemarks tableName="flow_classification"
+                          columnName="user_selectable"
+                          remarks="Controls whether users can create rules which reference this classification.  Typically used to partition externally source rules from Waltz declared rules"/>
+
+    </changeSet>
+
+
+    <changeSet id="20221129-6329-20"
+               author="davidwatkins73">
+        <addColumn tableName="survey_instance">
+            <column name="issued_on"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20221129-6329-21"
+               author="davidwatkins73">
+        <sql>
+            update survey_instance
+            set issued_on = (select issued_on
+                             from survey_run
+                             where id = survey_instance.survey_run_id);
+        </sql>
+    </changeSet>
+
+
+    <changeSet id="20221129-6329-30"
+               author="davidwatkins73">
+        <modifyDataType columnName="value"
+                        newDataType="${longvarchar.type}"
+                        tableName="settings" />
+    </changeSet>
+
+
 </databaseChangeLog>

@@ -124,6 +124,7 @@ public class SurveyRunGenerator implements SampleDataGenerator {
         LocalDate issuedOn = LocalDate.now().minusDays(random.nextInt(MAX_SURVEY_AGE_IN_DAYS));
         surveyRunRecord.setIssuedOn(java.sql.Date.valueOf(issuedOn));
         surveyRunRecord.setDueDate(java.sql.Date.valueOf(issuedOn.plusDays(random.nextInt(MAX_SURVEY_LIFESPAN_IN_DAYS))));
+        surveyRunRecord.setApprovalDueDate(java.sql.Date.valueOf(issuedOn.plusDays(random.nextInt(MAX_SURVEY_LIFESPAN_IN_DAYS))));
         surveyRunRecord.setStatus(randomPick(SurveyRunStatus.ISSUED.name(), SurveyRunStatus.COMPLETED.name()));
 
         return surveyRunRecord;
