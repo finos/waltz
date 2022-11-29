@@ -129,7 +129,7 @@
     <changeSet id="20221129-6329-30"
                author="davidwatkins73">
         <modifyDataType columnName="value"
-                        newDataType="${longvarchar.type}"
+                        newDataType="${config-value.type}"
                         tableName="settings" />
     </changeSet>
 

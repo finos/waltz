@@ -89,6 +89,7 @@
     <property name="assetcode.type" value="VARCHAR(255)"></property>
     <property name="code.type" value="VARCHAR(128)"></property>
     <property name="description.type" value="${longvarchar.type}"></property>
+    <property name="config-value.type" value="${longvarchar.type}"></property>
     <property name="email.type" value="VARCHAR(255)"></property>
     <property name="enum.type" value="VARCHAR(64)"></property>
     <property name="expression.type" value="VARCHAR(500)"></property>
