@@ -37,7 +37,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.*;
@@ -166,9 +165,10 @@ public class SurveyInstanceDao {
         record.setEntityKind(command.entityReference().kind().name());
         record.setEntityId(command.entityReference().id());
         record.setStatus(command.status().name());
-        record.setDueDate(command.dueDate().map(Date::valueOf).orElse(null));
+        record.setDueDate(toSqlDate(command.dueDate()));
         record.setApprovalDueDate(toSqlDate(command.approvalDueDate()));
         record.setOwningRole(command.owningRole());
+        record.setName(command.name());
 
         record.store();
         return record.getId();
