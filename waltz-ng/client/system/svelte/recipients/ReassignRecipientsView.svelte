@@ -46,7 +46,7 @@
         reassignPromise
             .then(r => {
                 const counts = r.data;
-                toasts.success(`Successfully reassigned owners. Recipients created: ${counts?.recipientsCreatedCount}, Owners removed: ${counts?.recipientsRemovedCount}`);
+                toasts.success(`Successfully reassigned owners. Owners created: ${counts?.recipientsCreatedCount}, Owners removed: ${counts?.recipientsRemovedCount}`);
             })
             .then(() => surveyOwnerReassignmentsCall = surveyInstanceStore.getReassignOwnersCounts(true))
             .catch(e => toasts.error("Could not reassign owners: " + e.error));
