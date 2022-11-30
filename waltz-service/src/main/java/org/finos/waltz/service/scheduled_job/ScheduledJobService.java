@@ -136,6 +136,9 @@ public class ScheduledJobService {
         runIfNeeded(JobKey.SURVEY_INSTANCE_REASSIGN_RECIPIENTS,
                 (jk) -> surveyInstanceService.reassignRecipients());
 
+        runIfNeeded(JobKey.SURVEY_INSTANCE_REASSIGN_OWNERS,
+                (jk) -> surveyInstanceService.reassignOwners());
+
         runIfNeeded(JobKey.REPORT_GRID_RECALCULATE_APP_GROUPS_FROM_FILTERS,
                 (jk) -> reportGridFilterViewService.generateAppGroupsFromFilter());
     }

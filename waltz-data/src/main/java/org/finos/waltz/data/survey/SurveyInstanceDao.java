@@ -51,6 +51,7 @@ import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.*;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.common.StringUtilities.lower;
 import static org.finos.waltz.data.JooqUtilities.maybeReadRef;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.schema.Tables.*;
@@ -438,11 +439,11 @@ public class SurveyInstanceDao {
 
     public SyncRecipientsResponse getReassignRecipientsCounts() {
 
-        CommonTableExpression<Record5<Long, Long, String, String, String>> inScopeSurveys = getInScopeSurveysCTE();
+        CommonTableExpression<Record6<Long, Long, String, String, String, String>> inScopeSurveys = getInScopeSurveysCTE();
         CommonTableExpression<Record6<Long, Long, String, Long, String, String>> requiredRecipients = getRequiredRecipientsCTE(inScopeSurveys);
         CommonTableExpression<Record6<Long, Long, String, Long, String, String>> existingRecipients = getExistingRecipientsCTE(inScopeSurveys);
-        CommonTableExpression<Record6<Long, Long, String, Long, String, String>> recipientsToRemove = getRecipientsToRemoveCTE(existingRecipients, requiredRecipients);
-        CommonTableExpression<Record6<Long, Long, String, Long, String, String>> recipientsToAdd = getRecipientsToAddCTE(existingRecipients, requiredRecipients);
+        CommonTableExpression<Record6<Long, Long, String, Long, String, String>> recipientsToRemove = getMembersToRemoveCTE(existingRecipients, requiredRecipients);
+        CommonTableExpression<Record6<Long, Long, String, Long, String, String>> recipientsToAdd = getMembersToAddCTE(existingRecipients, requiredRecipients);
 
         Result<Record6<Long, Long, String, Long, String, String>> countToRemove = dsl
                 .with(inScopeSurveys)
@@ -470,26 +471,26 @@ public class SurveyInstanceDao {
 
     public SyncRecipientsResponse getReassignOwnersCounts() {
 
-        CommonTableExpression<Record5<Long, Long, String, String, String>> inScopeSurveys = getInScopeSurveysCTE();
-        CommonTableExpression<Record6<Long, Long, String, Long, String, String>> requiredRecipients = getRequiredOwnersCTE(inScopeSurveys);
-        CommonTableExpression<Record6<Long, Long, String, Long, String, String>> existingRecipients = getExistingRecipientsCTE(inScopeSurveys);
-        CommonTableExpression<Record6<Long, Long, String, Long, String, String>> recipientsToRemove = getRecipientsToRemoveCTE(existingRecipients, requiredRecipients);
-        CommonTableExpression<Record6<Long, Long, String, Long, String, String>> recipientsToAdd = getRecipientsToAddCTE(existingRecipients, requiredRecipients);
+        CommonTableExpression<Record6<Long, Long, String, String, String, String>> inScopeSurveys = getInScopeSurveysCTE();
+        CommonTableExpression<Record6<Long, Long, String, Long, String, String>> requiredOwners = getRequiredOwnersCTE(inScopeSurveys);
+        CommonTableExpression<Record6<Long, Long, String, Long, String, String>> existingOwners = getExistingOwnersCTE(inScopeSurveys);
+        CommonTableExpression<Record6<Long, Long, String, Long, String, String>> ownersToRemove = getMembersToRemoveCTE(existingOwners, requiredOwners);
+        CommonTableExpression<Record6<Long, Long, String, Long, String, String>> ownersToAdd = getMembersToAddCTE(existingOwners, requiredOwners);
 
         Result<Record6<Long, Long, String, Long, String, String>> countToRemove = dsl
                 .with(inScopeSurveys)
-                .with(requiredRecipients)
-                .with(existingRecipients)
-                .with(recipientsToRemove)
-                .selectFrom(recipientsToRemove)
+                .with(requiredOwners)
+                .with(existingOwners)
+                .with(ownersToRemove)
+                .selectFrom(ownersToRemove)
                 .fetch();
 
         Result<Record6<Long, Long, String, Long, String, String>> countToAdd = dsl
                 .with(inScopeSurveys)
-                .with(requiredRecipients)
-                .with(existingRecipients)
-                .with(recipientsToAdd)
-                .selectFrom(recipientsToAdd)
+                .with(requiredOwners)
+                .with(existingOwners)
+                .with(ownersToAdd)
+                .selectFrom(ownersToAdd)
                 .fetch();
 
         return ImmutableSyncRecipientsResponse
@@ -502,25 +503,25 @@ public class SurveyInstanceDao {
 
     public SyncRecipientsResponse reassignRecipients() {
 
-        CommonTableExpression<Record5<Long, Long, String, String, String>> inScopeSurveys = getInScopeSurveysCTE();
+        CommonTableExpression<Record6<Long, Long, String, String, String, String>> inScopeSurveys = getInScopeSurveysCTE();
         CommonTableExpression<Record6<Long, Long, String, Long, String, String>> requiredRecipients = getRequiredRecipientsCTE(inScopeSurveys);
         CommonTableExpression<Record6<Long, Long, String, Long, String, String>> existingRecipients = getExistingRecipientsCTE(inScopeSurveys);
-        CommonTableExpression<Record6<Long, Long, String, Long, String, String>> recipientsToRemove = getRecipientsToRemoveCTE(existingRecipients, requiredRecipients);
-        CommonTableExpression<Record6<Long, Long, String, Long, String, String>> recipientsToAdd = getRecipientsToAddCTE(existingRecipients, requiredRecipients);
+        CommonTableExpression<Record6<Long, Long, String, Long, String, String>> recipientsToRemove = getMembersToRemoveCTE(existingRecipients, requiredRecipients);
+        CommonTableExpression<Record6<Long, Long, String, Long, String, String>> recipientsToAdd = getMembersToAddCTE(existingRecipients, requiredRecipients);
 
         return dsl
                 .transactionResult(ctx -> {
                     DSLContext tx = ctx.dsl();
 
                     LOG.debug("Creating change logs for additions and removals");
-                    int[] removalChangelogs = createRemovalChangeLogs(tx, inScopeSurveys, requiredRecipients, existingRecipients, recipientsToRemove);
-                    int[] additionChangelogs = createAdditionChangeLogs(tx, inScopeSurveys, requiredRecipients, existingRecipients, recipientsToAdd);
+                    int[] removalChangelogs = createRemovalChangeLogs(tx, inScopeSurveys, requiredRecipients, existingRecipients, recipientsToRemove, SurveyInvolvementKind.RECIPIENT);
+                    int[] additionChangelogs = createAdditionChangeLogs(tx, inScopeSurveys, requiredRecipients, existingRecipients, recipientsToAdd, SurveyInvolvementKind.RECIPIENT);
 
                     LOG.debug("Creating new recipients");
-                    int insertedRecords = insertRecipients(inScopeSurveys, requiredRecipients, existingRecipients, recipientsToRemove, recipientsToAdd, tx);
+                    int insertedRecords = insertRecipients(tx, inScopeSurveys, requiredRecipients, existingRecipients, recipientsToRemove, recipientsToAdd);
 
                     LOG.debug("Removing recipients");
-                    int removedRecords = removeRecipients(inScopeSurveys, requiredRecipients, existingRecipients, recipientsToRemove, tx);
+                    int removedRecords = removeRecipients(tx, inScopeSurveys, requiredRecipients, existingRecipients, recipientsToRemove);
 
                     LOG.debug(format("Created [%d] recipients and [%d] addition changelogs, removed [%d] recipients who are no longer active and [%d] removal changelogs",
                             insertedRecords,
@@ -536,7 +537,47 @@ public class SurveyInstanceDao {
                 });
     }
 
-    private int removeRecipients(CommonTableExpression<Record5<Long, Long, String, String, String>> inScopeSurveys, CommonTableExpression<Record6<Long, Long, String, Long, String, String>> requiredRecipients, CommonTableExpression<Record6<Long, Long, String, Long, String, String>> existingRecipients, CommonTableExpression<Record6<Long, Long, String, Long, String, String>> recipientsToRemove, DSLContext tx) {
+    public SyncRecipientsResponse reassignOwners() {
+
+        CommonTableExpression<Record6<Long, Long, String, String, String, String>> inScopeSurveys = getInScopeSurveysCTE();
+        CommonTableExpression<Record6<Long, Long, String, Long, String, String>> requiredOwners = getRequiredOwnersCTE(inScopeSurveys);
+        CommonTableExpression<Record6<Long, Long, String, Long, String, String>> existingOwners = getExistingOwnersCTE(inScopeSurveys);
+        CommonTableExpression<Record6<Long, Long, String, Long, String, String>> ownersToRemove = getMembersToRemoveCTE(existingOwners, requiredOwners);
+        CommonTableExpression<Record6<Long, Long, String, Long, String, String>> ownersToAdd = getMembersToAddCTE(existingOwners, requiredOwners);
+
+        return dsl
+                .transactionResult(ctx -> {
+                    DSLContext tx = ctx.dsl();
+
+                    LOG.debug("Creating change logs for additions and removals");
+                    int[] removalChangelogs = createRemovalChangeLogs(tx, inScopeSurveys, requiredOwners, existingOwners, ownersToRemove, SurveyInvolvementKind.OWNER);
+                    int[] additionChangelogs = createAdditionChangeLogs(tx, inScopeSurveys, requiredOwners, existingOwners, ownersToAdd, SurveyInvolvementKind.OWNER);
+
+                    LOG.debug("Creating new owners");
+                    int insertedRecords = insertOwners(tx, inScopeSurveys, requiredOwners, existingOwners, ownersToRemove, ownersToAdd);
+
+                    LOG.debug("Removing owners");
+                    int removedRecords = removeOwners(tx, inScopeSurveys, requiredOwners, existingOwners, ownersToRemove);
+
+                    LOG.debug(format("Created [%d] owners and [%d] addition changelogs, removed [%d] owners who are no longer active and [%d] removal changelogs",
+                            insertedRecords,
+                            IntStream.of(additionChangelogs).sum(),
+                            removedRecords,
+                            IntStream.of(removalChangelogs).sum()));
+
+                    return ImmutableSyncRecipientsResponse
+                            .builder()
+                            .recipientsCreatedCount((long) insertedRecords)
+                            .recipientsRemovedCount((long) removedRecords)
+                            .build();
+                });
+    }
+
+    private int removeRecipients(DSLContext tx,
+                                 CommonTableExpression<Record6<Long, Long, String, String, String, String>> inScopeSurveys,
+                                 CommonTableExpression<Record6<Long, Long, String, Long, String, String>> requiredRecipients,
+                                 CommonTableExpression<Record6<Long, Long, String, Long, String, String>> existingRecipients,
+                                 CommonTableExpression<Record6<Long, Long, String, Long, String, String>> recipientsToRemove) {
         return tx
                 .with(inScopeSurveys)
                 .with(requiredRecipients)
@@ -552,7 +593,32 @@ public class SurveyInstanceDao {
                 .execute();
     }
 
-    private int insertRecipients(CommonTableExpression<Record5<Long, Long, String, String, String>> inScopeSurveys, CommonTableExpression<Record6<Long, Long, String, Long, String, String>> requiredRecipients, CommonTableExpression<Record6<Long, Long, String, Long, String, String>> existingRecipients, CommonTableExpression<Record6<Long, Long, String, Long, String, String>> recipientsToRemove, CommonTableExpression<Record6<Long, Long, String, Long, String, String>> recipientsToAdd, DSLContext tx) {
+    private int removeOwners(DSLContext tx,
+                             CommonTableExpression<Record6<Long, Long, String, String, String, String>> inScopeSurveys,
+                             CommonTableExpression<Record6<Long, Long, String, Long, String, String>> requiredOwners,
+                             CommonTableExpression<Record6<Long, Long, String, Long, String, String>> existingOwners,
+                             CommonTableExpression<Record6<Long, Long, String, Long, String, String>> ownersToRemove) {
+        return tx
+                .with(inScopeSurveys)
+                .with(requiredOwners)
+                .with(existingOwners)
+                .with(ownersToRemove)
+                .delete(sio)
+                .where(sio.ID.in(DSL
+                        .select(sio.ID)
+                        .from(sio)
+                        .innerJoin(ownersToRemove)
+                        .on(sio.SURVEY_INSTANCE_ID.eq(ownersToRemove.field("survey_instance_id", Long.class))
+                                .and(sio.PERSON_ID.eq(ownersToRemove.field("person_id", Long.class))))))
+                .execute();
+    }
+
+    private int insertRecipients(DSLContext tx,
+                                 CommonTableExpression<Record6<Long, Long, String, String, String, String>> inScopeSurveys,
+                                 CommonTableExpression<Record6<Long, Long, String, Long, String, String>> requiredRecipients,
+                                 CommonTableExpression<Record6<Long, Long, String, Long, String, String>> existingRecipients,
+                                 CommonTableExpression<Record6<Long, Long, String, Long, String, String>> recipientsToRemove,
+                                 CommonTableExpression<Record6<Long, Long, String, Long, String, String>> recipientsToAdd) {
         return tx
                 .with(inScopeSurveys)
                 .with(requiredRecipients)
@@ -568,20 +634,42 @@ public class SurveyInstanceDao {
                 .execute();
     }
 
+    private int insertOwners(DSLContext tx,
+                             CommonTableExpression<Record6<Long, Long, String, String, String, String>> inScopeSurveys,
+                             CommonTableExpression<Record6<Long, Long, String, Long, String, String>> requiredOwners,
+                             CommonTableExpression<Record6<Long, Long, String, Long, String, String>> existingOwners,
+                             CommonTableExpression<Record6<Long, Long, String, Long, String, String>> ownersToRemove,
+                             CommonTableExpression<Record6<Long, Long, String, Long, String, String>> ownersToAdd) {
+        return tx
+                .with(inScopeSurveys)
+                .with(requiredOwners)
+                .with(existingOwners)
+                .with(ownersToRemove)
+                .with(ownersToAdd)
+                .insertInto(sio)
+                .columns(sio.SURVEY_INSTANCE_ID, sio.PERSON_ID)
+                .select(DSL
+                        .select(ownersToAdd.field("survey_instance_id", Long.class),
+                                ownersToAdd.field("person_id", Long.class))
+                        .from(ownersToAdd))
+                .execute();
+    }
+
     private int[] createAdditionChangeLogs(DSLContext tx,
-                                           CommonTableExpression<Record5<Long, Long, String, String, String>> inScopeSurveys,
-                                           CommonTableExpression<Record6<Long, Long, String, Long, String, String>> requiredRecipients,
-                                           CommonTableExpression<Record6<Long, Long, String, Long, String, String>> existingRecipients,
-                                           CommonTableExpression<Record6<Long, Long, String, Long, String, String>> recipientsToAdd) {
+                                           CommonTableExpression<Record6<Long, Long, String, String, String, String>> inScopeSurveys,
+                                           CommonTableExpression<Record6<Long, Long, String, Long, String, String>> requiredMembers,
+                                           CommonTableExpression<Record6<Long, Long, String, Long, String, String>> existingMembers,
+                                           CommonTableExpression<Record6<Long, Long, String, Long, String, String>> membersToAdd,
+                                           SurveyInvolvementKind involvementKind) {
 
         Timestamp now = nowUtcTimestamp();
 
         return tx
                 .with(inScopeSurveys)
-                .with(requiredRecipients)
-                .with(existingRecipients)
-                .with(recipientsToAdd)
-                .selectFrom(recipientsToAdd)
+                .with(requiredMembers)
+                .with(existingMembers)
+                .with(membersToAdd)
+                .selectFrom(membersToAdd)
                 .fetch()
                 .stream()
                 .map(r -> {
@@ -594,7 +682,8 @@ public class SurveyInstanceDao {
                     Long entityId = r.get("entity_id", Long.class);
 
                     String message = format(
-                            "Added recipient: %s [%d] to survey: %s [%d] as they have the specified involvement kind",
+                            "Added %s: %s [%d] to survey: %s [%d] as they have the specified involvement kind",
+                            lower(involvementKind.name()),
                             person,
                             personId,
                             templateName,
@@ -618,19 +707,20 @@ public class SurveyInstanceDao {
     }
 
     private int[] createRemovalChangeLogs(DSLContext tx,
-                                          CommonTableExpression<Record5<Long, Long, String, String, String>> inScopeSurveys,
-                                          CommonTableExpression<Record6<Long, Long, String, Long, String, String>> requiredRecipients,
-                                          CommonTableExpression<Record6<Long, Long, String, Long, String, String>> existingRecipients,
-                                          CommonTableExpression<Record6<Long, Long, String, Long, String, String>> recipientsToRemove) {
+                                          CommonTableExpression<Record6<Long, Long, String, String, String, String>> inScopeSurveys,
+                                          CommonTableExpression<Record6<Long, Long, String, Long, String, String>> requiredMembers,
+                                          CommonTableExpression<Record6<Long, Long, String, Long, String, String>> existingMembers,
+                                          CommonTableExpression<Record6<Long, Long, String, Long, String, String>> membersToRemove,
+                                          SurveyInvolvementKind involvementKind) {
 
         Timestamp now = nowUtcTimestamp();
 
         return tx
                 .with(inScopeSurveys)
-                .with(requiredRecipients)
-                .with(existingRecipients)
-                .with(recipientsToRemove)
-                .selectFrom(recipientsToRemove)
+                .with(requiredMembers)
+                .with(existingMembers)
+                .with(membersToRemove)
+                .selectFrom(membersToRemove)
                 .fetch()
                 .stream()
                 .map(r -> {
@@ -642,8 +732,10 @@ public class SurveyInstanceDao {
                     String entityKind = r.get("entity_kind", String.class);
                     Long entityId = r.get("entity_id", Long.class);
 
+                    String messageText = "Removed %s: %s [%d] from survey: %s [%d] as they are no longer active";
                     String message = format(
-                            "Removed recipient: %s [%d] from survey: %s [%d] as they are no longer active",
+                            messageText,
+                            lower(involvementKind.name()),
                             person,
                             personId,
                             templateName,
@@ -665,8 +757,8 @@ public class SurveyInstanceDao {
                 .execute();
     }
 
-    private CommonTableExpression<Record6<Long, Long, String, Long, String, String>> getRecipientsToAddCTE(CommonTableExpression<Record6<Long, Long, String, Long, String, String>> existingRecipients,
-                                                                                                           CommonTableExpression<Record6<Long, Long, String, Long, String, String>> requiredRecipients) {
+    private CommonTableExpression<Record6<Long, Long, String, Long, String, String>> getMembersToAddCTE(CommonTableExpression<Record6<Long, Long, String, Long, String, String>> existingRecipients,
+                                                                                                        CommonTableExpression<Record6<Long, Long, String, Long, String, String>> requiredRecipients) {
         return DSL
                 .name("recipientsToAdd")
                 .fields("survey_instance_id", "person_id", "entity_kind", "entity_id", "template_name", "person_email")
@@ -689,33 +781,32 @@ public class SurveyInstanceDao {
     }
 
 
-    private CommonTableExpression<Record6<Long, Long, String, Long, String, String>> getRecipientsToRemoveCTE(CommonTableExpression<Record6<Long, Long, String, Long, String, String>> existingRecipients,
-                                                                                                              CommonTableExpression<Record6<Long, Long, String, Long, String, String>> requiredRecipients) {
+    private CommonTableExpression<Record6<Long, Long, String, Long, String, String>> getMembersToRemoveCTE(CommonTableExpression<Record6<Long, Long, String, Long, String, String>> existingMembers,
+                                                                                                           CommonTableExpression<Record6<Long, Long, String, Long, String, String>> requiredMembers) {
         return DSL
-                .name("recipientsToRemove")
+                .name("membersToRemove")
                 .fields("survey_instance_id", "person_id", "entity_kind", "entity_id", "template_name", "person_email")
                 .as(DSL
-                        .select(existingRecipients.field("survey_instance_id", Long.class),
-                                existingRecipients.field("person_id", Long.class),
-                                existingRecipients.field("entity_kind", String.class),
-                                existingRecipients.field("entity_id", Long.class),
-                                existingRecipients.field("template_name", String.class),
-                                existingRecipients.field("person_email", String.class))
-                        .from(existingRecipients)
-                        .innerJoin(p).on(existingRecipients.field("person_id", Long.class).eq(p.ID)
-                                .and(p.IS_REMOVED.isTrue())) // only want to remove recipients that are no longer active
+                        .select(existingMembers.field("survey_instance_id", Long.class),
+                                existingMembers.field("person_id", Long.class),
+                                existingMembers.field("entity_kind", String.class),
+                                existingMembers.field("entity_id", Long.class),
+                                existingMembers.field("template_name", String.class),
+                                existingMembers.field("person_email", String.class))
+                        .from(existingMembers)
+                        .innerJoin(p).on(existingMembers.field("person_id", Long.class).eq(p.ID)
+                                .and(p.IS_REMOVED.isTrue())) // only want to remove members that are no longer active
                         .except(DSL
-                                .select(requiredRecipients.field("survey_instance_id", Long.class),
-                                        requiredRecipients.field("person_id", Long.class),
-                                        requiredRecipients.field("entity_kind", String.class),
-                                        requiredRecipients.field("entity_id", Long.class),
-                                        requiredRecipients.field("template_name", String.class),
-                                        requiredRecipients.field("person_email", String.class))
-                                .from(requiredRecipients)));
+                                .select(requiredMembers.field("survey_instance_id", Long.class),
+                                        requiredMembers.field("person_id", Long.class),
+                                        requiredMembers.field("entity_kind", String.class),
+                                        requiredMembers.field("entity_id", Long.class),
+                                        requiredMembers.field("template_name", String.class),
+                                        requiredMembers.field("person_email", String.class))
+                                .from(requiredMembers)));
     }
 
-
-    private CommonTableExpression<Record6<Long, Long, String, Long, String, String>> getExistingRecipientsCTE(CommonTableExpression<Record5<Long, Long, String, String, String>> inScopeSurveys) {
+    private CommonTableExpression<Record6<Long, Long, String, Long, String, String>> getExistingRecipientsCTE(CommonTableExpression<Record6<Long, Long, String, String, String, String>> inScopeSurveys) {
         return DSL
                 .name("existingRecipients")
                 .fields("survey_instance_id", "person_id", "entity_kind", "entity_id", "template_name", "person_email")
@@ -732,27 +823,27 @@ public class SurveyInstanceDao {
     }
 
 
-    private CommonTableExpression<Record6<Long, Long, String, Long, String, String>> getExistingOwnersCTE(CommonTableExpression<Record5<Long, Long, String, String, String>> inScopeSurveys) {
+    private CommonTableExpression<Record6<Long, Long, String, Long, String, String>> getExistingOwnersCTE(CommonTableExpression<Record6<Long, Long, String, String, String, String>> inScopeSurveys) {
         return DSL
-                .name("existingRecipients")
+                .name("existingOwners")
                 .fields("survey_instance_id", "person_id", "entity_kind", "entity_id", "template_name", "person_email")
                 .as(DSL
-                        .select(sir.SURVEY_INSTANCE_ID,
-                                sir.PERSON_ID,
+                        .select(sio.SURVEY_INSTANCE_ID,
+                                sio.PERSON_ID,
                                 inScopeSurveys.field(si.ENTITY_KIND),
                                 inScopeSurveys.field(si.ENTITY_ID),
                                 inScopeSurveys.field(st.NAME),
                                 p.EMAIL)
                         .from(inScopeSurveys)
-                        .innerJoin(sir).on(inScopeSurveys.field(si.ID).eq(sir.SURVEY_INSTANCE_ID))
-                        .innerJoin(p).on(sir.PERSON_ID.eq(p.ID)));
+                        .innerJoin(sio).on(inScopeSurveys.field(si.ID).eq(sio.SURVEY_INSTANCE_ID))
+                        .innerJoin(p).on(sio.PERSON_ID.eq(p.ID)));
     }
 
-    private CommonTableExpression<Record5<Long, Long, String, String, String>> getInScopeSurveysCTE() {
+    private CommonTableExpression<Record6<Long, Long, String, String, String, String>> getInScopeSurveysCTE() {
         return DSL
                 .name("inScopeSurveys")
                 .as(DSL
-                        .select(si.ID, si.ENTITY_ID, si.ENTITY_KIND, sr.INVOLVEMENT_KIND_IDS, st.NAME)
+                        .select(si.ID, si.ENTITY_ID, si.ENTITY_KIND, sr.INVOLVEMENT_KIND_IDS, sr.OWNER_INV_KIND_IDS, st.NAME)
                         .from(sr)
                         .innerJoin(st).on(sr.SURVEY_TEMPLATE_ID.eq(st.ID)
                                 .and(st.STATUS.eq(ReleaseLifecycleStatus.ACTIVE.name())))
@@ -765,7 +856,7 @@ public class SurveyInstanceDao {
     }
 
 
-    private CommonTableExpression<Record6<Long, Long, String, Long, String, String>> getRequiredRecipientsCTE(CommonTableExpression<Record5<Long, Long, String, String, String>> inScopeSurveys) {
+    public CommonTableExpression<Record6<Long, Long, String, Long, String, String>> getRequiredRecipientsCTE(CommonTableExpression<Record6<Long, Long, String, String, String, String>> inScopeSurveys) {
 
         Field<String> surveyInvolvementsString = DSL.concat(DSL.val(";"), inScopeSurveys.field(sr.INVOLVEMENT_KIND_IDS), DSL.val(";"));
         Field<String> involvementKindsString = DSL.concat(DSL.val("%;"), DSL.cast(ik.ID, String.class), DSL.val(";%"));
@@ -791,7 +882,7 @@ public class SurveyInstanceDao {
                                 .and(inScopeSurveys.field(sr.INVOLVEMENT_KIND_IDS).ne(""))));
     }
 
-    private CommonTableExpression<Record6<Long, Long, String, Long, String, String>> getRequiredOwnersCTE(CommonTableExpression<Record5<Long, Long, String, String, String>> inScopeSurveys) {
+    private CommonTableExpression<Record6<Long, Long, String, Long, String, String>> getRequiredOwnersCTE(CommonTableExpression<Record6<Long, Long, String, String, String, String>> inScopeSurveys) {
 
         Field<String> surveyInvolvementsString = DSL.concat(DSL.val(";"), inScopeSurveys.field(sr.OWNER_INV_KIND_IDS), DSL.val(";"));
         Field<String> involvementKindsString = DSL.concat(DSL.val("%;"), DSL.cast(ik.ID, String.class), DSL.val(";%"));

@@ -9,9 +9,11 @@
     let attestationReassignmentsCall = attestationInstanceStore.getCountsOfRecipientsToReassign();
     $: attestationReassignmentCounts = $attestationReassignmentsCall.data;
 
+    let surveyRecipientReassignmentsCall = surveyInstanceStore.getReassignRecipientsCounts();
+    $: surveyRecipientReassignmentCounts = $surveyRecipientReassignmentsCall.data;
 
-    let surveyReassignmentsCall = surveyInstanceStore.getReassignRecipientsCounts();
-    $: surveyReassignmentCounts = $surveyReassignmentsCall.data;
+    let surveyOwnerReassignmentsCall = surveyInstanceStore.getReassignOwnersCounts();
+    $: surveyOwnerReassignmentCounts = $surveyOwnerReassignmentsCall.data;
 
     function reassignAttestationRecipients() {
         let reassignPromise = attestationInstanceStore.reassignRecipients();
@@ -34,8 +36,20 @@
                 const counts = r.data;
                 toasts.success(`Successfully reassigned recipients. Recipients created: ${counts?.recipientsCreatedCount}, Recipients removed: ${counts?.recipientsRemovedCount}`);
             })
-            .then(() => surveyReassignmentsCall = surveyInstanceStore.getReassignRecipientsCounts(true))
+            .then(() => surveyRecipientReassignmentsCall = surveyInstanceStore.getReassignRecipientsCounts(true))
             .catch(e => toasts.error("Could not reassign recipients: " + e.error));
+    }
+
+    function reassignSurveyOwners() {
+        let reassignPromise = surveyInstanceStore.reassignOwners();
+
+        reassignPromise
+            .then(r => {
+                const counts = r.data;
+                toasts.success(`Successfully reassigned owners. Recipients created: ${counts?.recipientsCreatedCount}, Owners removed: ${counts?.recipientsRemovedCount}`);
+            })
+            .then(() => surveyOwnerReassignmentsCall = surveyInstanceStore.getReassignOwnersCounts(true))
+            .catch(e => toasts.error("Could not reassign owners: " + e.error));
     }
 
 </script>
@@ -70,14 +84,19 @@
                 </thead>
                 <tbody>
                 <tr>
-                    <td>Attestations</td>
+                    <td>Attestation Recipients</td>
                     <td>{attestationReassignmentCounts?.recipientsCreatedCount}</td>
                     <td>{attestationReassignmentCounts?.recipientsRemovedCount}</td>
                 </tr>
                 <tr>
-                    <td>Surveys</td>
-                    <td>{surveyReassignmentCounts?.recipientsCreatedCount}</td>
-                    <td>{surveyReassignmentCounts?.recipientsRemovedCount}</td>
+                    <td>Survey Recipients</td>
+                    <td>{surveyRecipientReassignmentCounts?.recipientsCreatedCount}</td>
+                    <td>{surveyRecipientReassignmentCounts?.recipientsRemovedCount}</td>
+                </tr>
+                <tr>
+                    <td>Surveys Owners</td>
+                    <td>{surveyOwnerReassignmentCounts?.recipientsCreatedCount}</td>
+                    <td>{surveyOwnerReassignmentCounts?.recipientsRemovedCount}</td>
                 </tr>
                 </tbody>
             </table>
@@ -102,15 +121,19 @@
         <div class="col-md-12">
             <h4>Surveys</h4>
             <div class="small help-block">
-                This will remove all recipients for surveys instances which are 'In Progress', 'Not Started' or
+                This will remove all recipients / owners for surveys instances which are 'In Progress', 'Not Started' or
                 'Rejected' where the person is
                 no longer active and no longer required according to involvement kind ids specified on the run.
-                New recipients will be assigned to any survey instances if they currently
+                New recipients / owners will be assigned to any survey instances if they currently
                 have the required involvement kind.
             </div>
             <button class="btn btn-info"
                     on:click={() => reassignSurveyRecipients()}>
                 Reassign recipients
+            </button>
+            <button class="btn btn-info"
+                    on:click={() => reassignSurveyOwners()}>
+                Reassign owners
             </button>
         </div>
     </div>
