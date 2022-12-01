@@ -7,8 +7,19 @@
     import EntityLink from "../../../common/svelte/EntityLink.svelte";
     import NoData from "../../../common/svelte/NoData.svelte";
     import {truncate} from "../../../common/string-utils";
+    import pageInfo from "../../../svelte-stores/page-navigation-store";
+    import EntityLabel from "../../../common/svelte/EntityLabel.svelte";
 
     export let primaryEntityRef;
+
+    function goToRule(rule) {
+        $pageInfo = {
+            state: "main.flow-classification-rule.view",
+            params: {
+                id: rule.id
+            }
+        };
+    }
 
     $: companionDataTypeRulesCall = flowClassificationRuleStore.findCompanionDataTypeRulesById(primaryEntityRef?.id);
     $: companionRules = $companionDataTypeRulesCall.data
@@ -32,7 +43,10 @@
         <table class="table table-hover">
             <thead>
                 <tr>
-                    <th width="20%"><Icon name="fw"/> Source App</th>
+                    <th width="20%">
+                        <Icon name="fw"/>
+                        Source
+                    </th>
                     <th width="20%">Data Type</th>
                     <th width="20%">Scope</th>
                     <th width="15%">Classification</th>
@@ -44,7 +58,9 @@
             {#each companionRules as rule}
                 <tr>
                     <td>
-                        <EntityLink ref={{kind: 'FLOW_CLASSIFICATION_RULE', id: rule.id, name: rule.applicationReference.name}}/>
+                        <button class="btn btn-skinny" on:click={() => goToRule(rule)}>
+                            <EntityLabel ref={rule.subjectReference}/>
+                        </button>
                     </td>
                     <td>
                         <EntityLink showIcon={false}
@@ -52,7 +68,7 @@
                     </td>
                     <td>
                         <EntityLink showIcon={false}
-                                    ref={{kind: 'FLOW_CLASSIFICATION_RULE', id: rule.id, name:rule.parentReference.name}}/>
+                                    ref={{kind: 'FLOW_CLASSIFICATION_RULE', id: rule.id, name:rule.vantagePointReference.name}}/>
                     </td>
                     <td>
                         <div class="rating-indicator-block"

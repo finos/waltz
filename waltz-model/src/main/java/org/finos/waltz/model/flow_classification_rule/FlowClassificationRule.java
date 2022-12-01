@@ -35,10 +35,15 @@ public abstract class FlowClassificationRule implements
         LastUpdatedProvider,
         EntityKindProvider {
 
-    public abstract EntityReference applicationReference();
-    public abstract EntityReference appOrgUnitReference();
-    public abstract EntityReference parentReference();
+    public abstract EntityReference subjectReference();
+
+    @Nullable
+    public abstract EntityReference subjectOrgUnitReference();
+
+    public abstract EntityReference vantagePointReference();
+
     public abstract Long dataTypeId();
+
     public abstract Long classificationId();
 
     @Value.Default

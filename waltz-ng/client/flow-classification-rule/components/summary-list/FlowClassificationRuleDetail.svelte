@@ -40,21 +40,21 @@
 
 {#if $mode === Modes.DETAIL}
     <div>
-        <strong>Application:</strong>
-        <EntityLink ref={$selectedClassificationRule.app}/>
+        <strong>Source:</strong>
+        <EntityLink ref={$selectedClassificationRule.subjectReference}/>
     </div>
-    <p class="text-muted">The source application for this rule</p>
+    <p class="text-muted">The source application or actor for this rule</p>
 
 
     <div>
         <strong>Data Type:</strong>
         <EntityLink ref={$selectedClassificationRule.dataType}/>
     </div>
-    <p class="text-muted">The data type this application will provide a flow classification for</p>
+    <p class="text-muted">The data type this application / actor will provide a flow classification for</p>
 
     <div>
         <strong>Scope:</strong>
-        <EntityLink ref={$selectedClassificationRule?.parentReference}/>
+        <EntityLink ref={$selectedClassificationRule?.vantagePointReference}/>
     </div>
     <p class="text-muted">The selector for which this classification rule will apply to</p>
 

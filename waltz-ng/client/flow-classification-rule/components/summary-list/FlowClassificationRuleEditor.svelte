@@ -26,7 +26,7 @@
     $: classificationsById = _.keyBy($classificationCall.data, d => d.id);
 
     function getRequiredFields(d) {
-        return [d.classificationId, d.app, d.orgUnit, d.dataType];
+        return [d.classificationId, d.subjectReference, d.orgUnit, d.dataType];
     }
 
     function fieldChanged(d) {
@@ -56,7 +56,7 @@
         const cmd = {
             description: workingCopy.description || "",
             classificationId: workingCopy.classificationId,
-            applicationId: workingCopy.app.id,
+            subjectReference: workingCopy.subjectReference,
             dataTypeId: workingCopy.dataType.id,
             parentReference: workingCopy.orgUnit
         };
@@ -79,7 +79,7 @@
     }
 
     function onSelectSource(evt) {
-        workingCopy.app = evt.detail;
+        workingCopy.subjectReference = evt.detail;
     }
 
     function onSelectDatatype(evt) {
@@ -120,10 +120,10 @@
             <div id="source">
                 <EntitySearchSelector on:select={onSelectSource}
                                       placeholder="Search for source"
-                                      entityKinds={['APPLICATION']}>
+                                      entityKinds={['APPLICATION', 'ACTOR']}>
                 </EntitySearchSelector>
             </div>
-            <p class="text-muted">Start typing to select the source application</p>
+            <p class="text-muted">Start typing to select the source application or actor</p>
         </div>
         <div class="form-group">
             <label for="datatype">Datatype:</label>
@@ -134,10 +134,12 @@
                             on:click={clearDataType}>
                         <Icon name="close"/>
                     </button>
-                    <p class="text-muted">Datatype for which this application determines flow classifications</p>
+                    <p class="text-muted">Datatype for which this application / actor determines flow
+                        classifications</p>
                 {:else}
                     <DataTypeTreeSelector on:select={onSelectDatatype}/>
-                    <p class="text-muted">Select the datatype for which this application will determine the flow classification for</p>
+                    <p class="text-muted">Select the datatype for which this application / actor will determine the flow
+                        classification for</p>
                 {/if}
             </div>
         </div>
@@ -154,15 +156,16 @@
     {:else }
 
         <h3>
-            <Icon name="desktop"/>
-            {workingCopy.app.name}
+            <EntityLabel ref={workingCopy.subjectReference}/>
         </h3>
 
-        <h4>{workingCopy.dataType.name}</h4>
+        <h4>
+            <EntityLabel ref={workingCopy.dataType}/>
+        </h4>
 
         <div>
             <strong>Scope:</strong>
-            <EntityLabel ref={workingCopy.parentReference}/>
+            <EntityLabel ref={workingCopy.vantagePointReference}/>
         </div>
         <p class="text-muted">The selector for applications this flow classification rule applies to</p>
     {/if}

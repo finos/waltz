@@ -22,6 +22,7 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.flow_classification_rule.FlowClassificationRuleVantagePoint;
 import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
 
+import javax.swing.text.html.parser.Entity;
 import java.util.*;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -33,7 +34,7 @@ import static org.finos.waltz.common.MapUtilities.isEmpty;
 
 public class FlowClassificationRuleResolver {
 
-    private final Map<EntityReference, Map<Long, Map<Long, Optional<FlowClassificationRuleVantagePoint>>>> byOuThenDataTypeThenApp;
+    private final Map<EntityReference, Map<Long, Map<EntityReference, Optional<FlowClassificationRuleVantagePoint>>>> byOuThenDataTypeThenSubject;
 
     /**
      * Construct the Resolver with an internal structure as follows:
@@ -43,7 +44,7 @@ public class FlowClassificationRuleResolver {
     public FlowClassificationRuleResolver(List<FlowClassificationRuleVantagePoint> flowClassificationVantagePoints) {
         checkNotNull(flowClassificationVantagePoints, "flowClassificationVantagePoints cannot be null");
 
-        byOuThenDataTypeThenApp =
+        byOuThenDataTypeThenSubject =
                 groupAndThen(
                         flowClassificationVantagePoints,
                         FlowClassificationRuleVantagePoint::vantagePoint,
@@ -52,7 +53,7 @@ public class FlowClassificationRuleResolver {
                                 byOu -> byOu.dataType().id(),
                                 byDts -> groupAndThen(
                                         byDts,
-                                        FlowClassificationRuleVantagePoint::applicationId,
+                                        FlowClassificationRuleVantagePoint::subjectReference,
                                         FlowClassificationRuleResolver::getMostSpecificRanked)));
     }
 
@@ -70,7 +71,7 @@ public class FlowClassificationRuleResolver {
                                                 EntityReference source,
                                                 Long dataTypeId) {
 
-        Map<Long, Map<Long, Optional<FlowClassificationRuleVantagePoint>>> ouGroup = byOuThenDataTypeThenApp.get(vantagePoint);
+        Map<Long, Map<EntityReference, Optional<FlowClassificationRuleVantagePoint>>> ouGroup = byOuThenDataTypeThenSubject.get(vantagePoint);
 
         // if a match cannot be found for the ou and the dt then no opinion, if a match can be found for these but the source application
         // doesn't match then the rating should be discouraged
@@ -79,14 +80,14 @@ public class FlowClassificationRuleResolver {
             return AuthoritativenessRatingValue.NO_OPINION;
         }
 
-        Map<Long, Optional<FlowClassificationRuleVantagePoint>> dataTypeGroup = ouGroup.get(dataTypeId);
+        Map<EntityReference, Optional<FlowClassificationRuleVantagePoint>> dataTypeGroup = ouGroup.get(dataTypeId);
 
         if(isEmpty(dataTypeGroup)) {
             return AuthoritativenessRatingValue.NO_OPINION;
         }
 
         Optional<FlowClassificationRuleVantagePoint> maybeRating = dataTypeGroup.getOrDefault(
-                source.id(),
+                source,
                 Optional.empty());
 
         return maybeRating
@@ -97,14 +98,14 @@ public class FlowClassificationRuleResolver {
 
     public Optional<FlowClassificationRuleVantagePoint> resolveAuthSource(EntityReference vantagePoint, EntityReference source, Long dataTypeId) {
 
-        Map<Long, Map<Long, Optional<FlowClassificationRuleVantagePoint>>> ouGroup = byOuThenDataTypeThenApp.get(vantagePoint);
+        Map<Long, Map<EntityReference, Optional<FlowClassificationRuleVantagePoint>>> ouGroup = byOuThenDataTypeThenSubject.get(vantagePoint);
         if(isEmpty(ouGroup)) return Optional.empty();
 
-        Map<Long, Optional<FlowClassificationRuleVantagePoint>> dataTypeGroup = ouGroup.get(dataTypeId);
+        Map<EntityReference, Optional<FlowClassificationRuleVantagePoint>> dataTypeGroup = ouGroup.get(dataTypeId);
         if(isEmpty(dataTypeGroup)) return Optional.empty();
 
         return  dataTypeGroup.getOrDefault(
-                source.id(),
+                source,
                 Optional.empty());
     }
 

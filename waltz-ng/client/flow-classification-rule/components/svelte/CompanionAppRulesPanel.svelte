@@ -7,8 +7,19 @@
     import EntityLink from "../../../common/svelte/EntityLink.svelte";
     import NoData from "../../../common/svelte/NoData.svelte";
     import {truncate} from "../../../common/string-utils";
+    import EntityLabel from "../../../common/svelte/EntityLabel.svelte";
+    import pageInfo from "../../../svelte-stores/page-navigation-store";
 
     export let primaryEntityRef;
+
+    function goToRule(rule) {
+        $pageInfo = {
+            state: "main.flow-classification-rule.view",
+            params: {
+                id: rule.id
+            }
+        };
+    }
 
     $: companionAppRulesCall = flowClassificationRuleStore.findCompanionAppRulesById(primaryEntityRef?.id);
     $: companionRules = $companionAppRulesCall.data
@@ -20,11 +31,13 @@
     $: classificationsById = _.keyBy($classificationsCall.data, d => d?.id);
 
 
+
+
 </script>
 
 <div class="help-block">
     <Icon name="info-circle"/>
-    The following rules share the same source application as the parent flow classification rule
+    The following rules share the same source application or actor as the parent flow classification rule
 </div>
 
 {#if !_.isEmpty(companionRules)}
@@ -32,7 +45,10 @@
         <table class="table table-hover">
             <thead>
                 <tr>
-                    <th width="20%"><Icon name="fw"/> Source App</th>
+                    <th width="20%">
+                        <Icon name="fw"/>
+                        Source
+                    </th>
                     <th width="20%">Data Type</th>
                     <th width="20%">Scope</th>
                     <th width="15%">Classification</th>
@@ -44,7 +60,9 @@
             {#each companionRules as rule}
                 <tr>
                     <td>
-                        <EntityLink ref={{kind: 'FLOW_CLASSIFICATION_RULE', id: rule.id, name: rule.applicationReference.name}}/>
+                        <button class="btn btn-skinny" on:click={() => goToRule(rule)}>
+                            <EntityLabel ref={rule.subjectReference}/>
+                        </button>
                     </td>
                     <td>
                         <EntityLink showIcon={false}
@@ -52,7 +70,7 @@
                     </td>
                     <td>
                         <EntityLink showIcon={false}
-                                    ref={{kind: 'FLOW_CLASSIFICATION_RULE', id: rule.id, name:rule.parentReference.name}}/>
+                                    ref={{kind: 'FLOW_CLASSIFICATION_RULE', id: rule.id, name:rule.vantagePointReference.name}}/>
                     </td>
                     <td>
                         <div class="rating-indicator-block"
@@ -70,7 +88,7 @@
     </div>
 {:else}
     <NoData>
-        There are no flow classification rules which share this source application
+        There are no flow classification rules which share this source entity
     </NoData>
 {/if}
 

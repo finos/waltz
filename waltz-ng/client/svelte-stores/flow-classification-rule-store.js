@@ -36,7 +36,7 @@ export function mkFlowClassificationRuleStore() {
         return remote
             .fetchViewData("GET", `api/flow-classification-rule/id/${id}`);
     }
-    
+
     const create = (cmd) => {
         checkIsFlowClassificationRuleCreateCommand(cmd);
         return remote.execute("POST", "api/flow-classification-rule", cmd)
@@ -44,7 +44,7 @@ export function mkFlowClassificationRuleStore() {
 
     const findCompanionAppRulesById = (id, force = false) => {
         return remote
-            .fetchViewList("GET", `api/flow-classification-rule/companion-rules/app/id/${id}`, null, {force})
+            .fetchViewList("GET", `api/flow-classification-rule/companion-rules/entity/id/${id}`, null, {force})
     }
 
     const findCompanionDataTypeRulesById = (id, force = false) => {

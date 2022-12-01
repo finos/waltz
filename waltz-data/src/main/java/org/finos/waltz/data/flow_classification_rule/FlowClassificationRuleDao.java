@@ -83,10 +83,15 @@ public class FlowClassificationRuleDao {
             FLOW_CLASSIFICATION_RULE.PARENT_KIND,
             newArrayList(EntityKind.ORG_UNIT, EntityKind.APPLICATION, EntityKind.ACTOR));
 
+    private static final Field<String> SUBJECT_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
+            FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID,
+            FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_KIND,
+            newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
+
     private static final Condition flowNotRemoved = LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name())
             .and(LOGICAL_FLOW.IS_REMOVED.isFalse());
-    private static final Condition supplierNotRemoved =  SUPPLIER_APP.IS_REMOVED.isFalse();
-    private static final Condition consumerNotRemoved =  CONSUMER_APP.IS_REMOVED.isFalse();
+    private static final Condition supplierNotRemoved = SUPPLIER_APP.IS_REMOVED.isFalse();
+    private static final Condition consumerNotRemoved = CONSUMER_APP.IS_REMOVED.isFalse();
 
     private final DSLContext dsl;
 
@@ -99,23 +104,26 @@ public class FlowClassificationRuleDao {
                 .name(r.get(PARENT_NAME_FIELD))
                 .build();
 
-        EntityReference orgUnitRef = ImmutableEntityReference.builder()
-                .kind(EntityKind.ORG_UNIT)
-                .id(r.getValue(ORGANISATIONAL_UNIT.ID))
-                .name(r.getValue(ORGANISATIONAL_UNIT.NAME))
-                .build();
+        //Actors now supported, these do not have owning org units
+        EntityReference orgUnitRef = Optional.ofNullable(r.getValue(ORGANISATIONAL_UNIT.ID))
+                .map(orgId -> ImmutableEntityReference.builder()
+                        .kind(EntityKind.ORG_UNIT)
+                        .id(orgId)
+                        .name(r.getValue(ORGANISATIONAL_UNIT.NAME))
+                        .build())
+                .orElse(null);
 
-        EntityReference appRef = ImmutableEntityReference.builder()
-                .kind(EntityKind.APPLICATION)
-                .id(r.getValue(SUPPLIER_APP.ID))
-                .name(r.getValue(SUPPLIER_APP.NAME))
+        EntityReference subjectRef = ImmutableEntityReference.builder()
+                .kind(EntityKind.valueOf(r.getValue(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_KIND)))
+                .id(r.getValue(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID))
+                .name(r.getValue(SUBJECT_NAME_FIELD))
                 .build();
 
         return ImmutableFlowClassificationRule.builder()
                 .id(record.getId())
-                .parentReference(parentRef)
-                .appOrgUnitReference(orgUnitRef)
-                .applicationReference(appRef)
+                .vantagePointReference(parentRef)
+                .subjectOrgUnitReference(orgUnitRef)
+                .subjectReference(subjectRef)
                 .dataTypeId(record.getDataTypeId())
                 .classificationId(record.getFlowClassificationId())
                 .description(record.getDescription())
@@ -132,7 +140,7 @@ public class FlowClassificationRuleDao {
             .builder()
             .vantagePoint(mkRef(EntityKind.ORG_UNIT, r.get(targetOrgUnitId)))
             .vantagePointRank(r.get(declaredOrgUnitLevel))
-            .applicationId(r.get(FLOW_CLASSIFICATION_RULE.APPLICATION_ID))
+            .subjectReference(mkRef(EntityKind.valueOf(r.get(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_KIND)), r.get(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID)))
             .classificationCode(r.get(FLOW_CLASSIFICATION.CODE))
             .dataType(mkRef(EntityKind.DATA_TYPE, r.get(declaredDataTypeId)))
             .dataTypeRank(r.get(declaredDataTypeLevel))
@@ -184,7 +192,8 @@ public class FlowClassificationRuleDao {
         checkTrue(applicationId > -1, "applicationId must be +ve");
         
         return baseSelect()
-                .where(FLOW_CLASSIFICATION_RULE.APPLICATION_ID.eq(applicationId))
+                .where(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID.eq(applicationId)
+                        .and(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -212,7 +221,8 @@ public class FlowClassificationRuleDao {
                 .set(FLOW_CLASSIFICATION_RULE.PARENT_KIND, command.parentReference().kind().name())
                 .set(FLOW_CLASSIFICATION_RULE.PARENT_ID, command.parentReference().id())
                 .set(FLOW_CLASSIFICATION_RULE.DATA_TYPE_ID, command.dataTypeId())
-                .set(FLOW_CLASSIFICATION_RULE.APPLICATION_ID, command.applicationId())
+                .set(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_KIND, command.subjectReference().kind().name())
+                .set(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID, command.subjectReference().id())
                 .set(FLOW_CLASSIFICATION_RULE.FLOW_CLASSIFICATION_ID, command.classificationId())
                 .set(FLOW_CLASSIFICATION_RULE.DESCRIPTION, command.description())
                 .set(FLOW_CLASSIFICATION_RULE.PROVENANCE, "waltz")
@@ -243,15 +253,17 @@ public class FlowClassificationRuleDao {
                 .where(IS_ACTIVE);
 
         Condition unknownOrgUnit = FLOW_CLASSIFICATION_RULE.PARENT_ID.notIn(orgUnitIds)
-                .and(FLOW_CLASSIFICATION_RULE.PARENT_KIND.eq(EntityKind.ORG_UNIT.name()));
+                .and(FLOW_CLASSIFICATION_RULE.PARENT_KIND.eq(EntityKind.ORG_UNIT.name())
+                        .and(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
 
-        Condition appIsInactive = FLOW_CLASSIFICATION_RULE.APPLICATION_ID.notIn(appIds);
+        Condition appIsInactive = FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID.notIn(appIds)
+                .and(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
 
         Set<EntityReference> appsInRulesWithoutOrgUnit = dsl
-                .select(FLOW_CLASSIFICATION_RULE.APPLICATION_ID)
+                .select(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID)
                 .from(FLOW_CLASSIFICATION_RULE)
                 .where(unknownOrgUnit)
-                .fetchSet(r -> mkRef(EntityKind.APPLICATION, r.get(FLOW_CLASSIFICATION_RULE.ID)));
+                .fetchSet(r -> mkRef(EntityKind.APPLICATION, r.get(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID)));
 
         Set<EntityReference> orgUnitsInRulesWithoutApp = dsl
                 .select(FLOW_CLASSIFICATION_RULE.PARENT_ID, FLOW_CLASSIFICATION_RULE.PARENT_KIND)
@@ -286,10 +298,10 @@ public class FlowClassificationRuleDao {
                 .innerJoin(org.finos.waltz.schema.tables.DataType.DATA_TYPE).on(ENTITY_HIERARCHY.ANCESTOR_ID.eq(org.finos.waltz.schema.tables.DataType.DATA_TYPE.ID))
                 .innerJoin(FLOW_CLASSIFICATION).on(LOGICAL_FLOW_DECORATOR.RATING.eq(FLOW_CLASSIFICATION.CODE))
                 .where(dsl.renderInlined(org.finos.waltz.schema.tables.DataType.DATA_TYPE.ID.eq(rule.dataTypeId())
-                        .and(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(rule.applicationReference().id())
+                        .and(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(rule.subjectReference().id())
                                 .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
-                                        .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(rule.parentReference().kind().name())
-                                                .and(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(rule.parentReference().id()))))
+                                        .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(rule.vantagePointReference().kind().name())
+                                                .and(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(rule.vantagePointReference().id()))))
                                 .and(FLOW_CLASSIFICATION.ID.eq(rule.classificationId())))));
 
         return dsl
@@ -302,12 +314,13 @@ public class FlowClassificationRuleDao {
 
 
     public List<FlowClassificationRuleVantagePoint> findExpandedFlowClassificationRuleVantagePoints(Set<Long> orgIds) {
-        SelectSeekStep3<Record7<Long, Integer, Long, Integer, Long, String, Long>, Integer, Integer, Long> select = dsl
+        SelectSeekStep3<Record8<Long, Integer, Long, Integer, Long, String, String, Long>, Integer, Integer, Long> select = dsl
                 .select(targetOrgUnitId,
                         declaredOrgUnitLevel,
                         declaredDataTypeId,
                         declaredDataTypeLevel,
-                        FLOW_CLASSIFICATION_RULE.APPLICATION_ID,
+                        FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID,
+                        FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_KIND,
                         FLOW_CLASSIFICATION.CODE,
                         FLOW_CLASSIFICATION_RULE.ID)
                 .from(ehOrgUnit)
@@ -329,12 +342,13 @@ public class FlowClassificationRuleDao {
 
 
     public List<FlowClassificationRuleVantagePoint> findFlowClassificationRuleVantagePoints() {
-        SelectSeekStep4<Record7<Long, Integer, Long, Integer, Long, String, Long>, Integer, Integer, Long, Long> select = dsl
+        SelectSeekStep4<Record8<Long, Integer, Long, Integer, Long, String, String, Long>, Integer, Integer, Long, Long> select = dsl
                 .select(targetOrgUnitId,
                         declaredOrgUnitLevel,
                         declaredDataTypeId,
                         declaredDataTypeLevel,
-                        FLOW_CLASSIFICATION_RULE.APPLICATION_ID,
+                        FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID,
+                        FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_KIND,
                         FLOW_CLASSIFICATION.CODE,
                         FLOW_CLASSIFICATION_RULE.ID)
                 .from(FLOW_CLASSIFICATION_RULE)
@@ -368,8 +382,8 @@ public class FlowClassificationRuleDao {
         Condition hierarchyJoin = ENTITY_HIERARCHY.ANCESTOR_ID.eq(FLOW_CLASSIFICATION_RULE.PARENT_ID)
                 .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.ORG_UNIT.name()));
 
-        Condition flowClassificationRuleJoin = FLOW_CLASSIFICATION_RULE.APPLICATION_ID.eq(LOGICAL_FLOW.SOURCE_ENTITY_ID)
-                .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+        Condition flowClassificationRuleJoin = FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID.eq(LOGICAL_FLOW.SOURCE_ENTITY_ID)
+                .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_KIND));
 
         Condition condition = LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(dataTypeIdSelector)
                 .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
@@ -454,8 +468,8 @@ public class FlowClassificationRuleDao {
                 .select(FLOW_CLASSIFICATION_RULE.ID)
                 .from(FLOW_CLASSIFICATION_RULE)
                 .innerJoin(LOGICAL_FLOW)
-                .on(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(FLOW_CLASSIFICATION_RULE.APPLICATION_ID)
-                        .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .on(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID)
+                        .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_KIND))
                         .and(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name())
                                 .and(LOGICAL_FLOW.IS_REMOVED.isFalse())))
                 .innerJoin(CONSUMER_APP).on(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(CONSUMER_APP.ID)
@@ -475,21 +489,23 @@ public class FlowClassificationRuleDao {
     private SelectOnConditionStep<Record> baseSelect() {
         return dsl
                 .select(PARENT_NAME_FIELD)
+                .select(SUBJECT_NAME_FIELD)
                 .select(ORGANISATIONAL_UNIT.ID, ORGANISATIONAL_UNIT.NAME)
                 .select(FLOW_CLASSIFICATION_RULE.fields())
                 .select(SUPPLIER_APP.NAME, SUPPLIER_APP.ID)
                 .from(FLOW_CLASSIFICATION_RULE)
-                .innerJoin(SUPPLIER_APP)
-                .on(SUPPLIER_APP.ID.eq(FLOW_CLASSIFICATION_RULE.APPLICATION_ID))
-                .innerJoin(ORGANISATIONAL_UNIT)
+                .leftJoin(SUPPLIER_APP)
+                .on(SUPPLIER_APP.ID.eq(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID)
+                        .and(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
+                .leftJoin(ORGANISATIONAL_UNIT)
                 .on(ORGANISATIONAL_UNIT.ID.eq(SUPPLIER_APP.ORGANISATIONAL_UNIT_ID));
     }
 
 
     public int updatePointToPointFlowClassificationRules() {
 
-        Condition logicalFlowTargetIsAuthSourceParent = FLOW_CLASSIFICATION_RULE.APPLICATION_ID.eq(LOGICAL_FLOW.SOURCE_ENTITY_ID)
-                .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+        Condition logicalFlowTargetIsAuthSourceParent = FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID.eq(LOGICAL_FLOW.SOURCE_ENTITY_ID)
+                .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_KIND)
                         .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(FLOW_CLASSIFICATION_RULE.PARENT_KIND)
                                 .and(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(FLOW_CLASSIFICATION_RULE.PARENT_ID))));
 
@@ -528,15 +544,17 @@ public class FlowClassificationRuleDao {
     }
 
 
-    public Set<FlowClassificationRule> findCompanionAppRules(long ruleId) {
-        SelectConditionStep<Record1<Long>> sourceAppId = DSL
-                .select(FLOW_CLASSIFICATION_RULE.APPLICATION_ID)
+    public Set<FlowClassificationRule> findCompanionEntityRules(long ruleId) {
+        SelectConditionStep<Record2<Long, String>> sourceEntity = DSL
+                .select(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID, FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_KIND)
                 .from(FLOW_CLASSIFICATION_RULE)
                 .where(FLOW_CLASSIFICATION_RULE.ID.eq(ruleId));
 
         return baseSelect()
-                .where(SUPPLIER_APP.ID.eq(sourceAppId)
-                        .and(FLOW_CLASSIFICATION_RULE.ID.ne(ruleId)))
+                .innerJoin(sourceEntity)
+                .on(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID.eq(sourceEntity.field(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID))
+                        .and(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_KIND.eq(sourceEntity.field(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_KIND))
+                                .and(FLOW_CLASSIFICATION_RULE.ID.ne(ruleId))))
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
 

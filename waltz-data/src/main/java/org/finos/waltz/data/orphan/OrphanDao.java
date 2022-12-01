@@ -127,15 +127,16 @@ public class OrphanDao {
 
 
     public List<OrphanRelationship> findOrphanFlowClassificationRulesByApp() {
-        Condition missingApplication = FLOW_CLASSIFICATION_RULE.APPLICATION_ID
+        Condition missingApplication = FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID
                 .notIn(select(APPLICATION.ID)
                         .from(APPLICATION)
-                        .where(IS_ACTIVE));
+                        .where(IS_ACTIVE))
+                .and(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
 
 
         return dsl
                 .select(FLOW_CLASSIFICATION_RULE.ID,
-                        FLOW_CLASSIFICATION_RULE.APPLICATION_ID)
+                        FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID)
                 .from(FLOW_CLASSIFICATION_RULE)
                 .where(missingApplication)
                 .fetch(r -> ImmutableOrphanRelationship.builder()

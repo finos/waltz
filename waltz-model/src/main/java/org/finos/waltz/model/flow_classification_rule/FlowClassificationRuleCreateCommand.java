@@ -32,6 +32,8 @@ import org.immutables.value.Value;
 public abstract class FlowClassificationRuleCreateCommand implements Command, DescriptionProvider {
     public abstract long classificationId();
     public abstract long dataTypeId();
-    public abstract long applicationId();
+
+    public abstract EntityReference subjectReference();
+
     public abstract EntityReference parentReference();
 }
