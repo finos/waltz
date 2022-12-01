@@ -46,6 +46,7 @@ public class FlowClassificationRuleExtractor extends DirectQueryBasedDataExtract
 
         return dsl
                 .select(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID.as("Subject Id"),
+                        FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_KIND.as("Subject Kind"),
                         ENTITY_EXT_ID_FIELD.as("Subject External Id"),
                         ENTITY_NAME_FIELD.as("Subject Name"))
                 .select(DATA_TYPE.NAME.as("Data Type"),
