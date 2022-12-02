@@ -72,4 +72,6 @@ public abstract class SurveyInstance implements IdProvider {
     public EntityKind kind() {
         return EntityKind.SURVEY_INSTANCE;
     }
+
+    public abstract LocalDate issuedOn();
 }

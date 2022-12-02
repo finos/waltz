@@ -36,6 +36,7 @@ import java.util.Set;
 
 import static java.util.Optional.ofNullable;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.DateTimeUtilities.toLocalDate;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.StringUtilities.splitThenMap;
 import static org.finos.waltz.data.JooqUtilities.maybeReadRef;
@@ -93,6 +94,7 @@ public class SurveyViewDao {
                         SURVEY_INSTANCE.ENTITY_QUALIFIER_ID,
                         QUALIFIER_NAME_FIELD)
                         .orElse(null))
+                .issuedOn(toLocalDate(instanceRecord.getIssuedOn()))
                 .build();
 
         SurveyRunRecord runRecord = r.into(SURVEY_RUN);

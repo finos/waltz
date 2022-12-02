@@ -18,6 +18,7 @@
 
 package org.finos.waltz.service.physical_flow_participant;
 
+import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.finos.waltz.service.physical_flow.PhysicalFlowService;
@@ -160,4 +161,7 @@ public class PhysicalFlowParticipantService {
         changeLogService.write(logEntry);
     }
 
+    public void checkHasPermission(long physicalFlowId, String username) throws InsufficientPrivelegeException {
+        physicalFlowService.checkHasPermission(physicalFlowId, username);
+    }
 }

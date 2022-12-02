@@ -234,7 +234,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
         String username = WebUtilities.getUsername(request);
         PhysicalFlowCreateCommand command = WebUtilities.readBody(request, PhysicalFlowCreateCommand.class);
 
-        checkLogicalFlowPermission(EntityReference.mkRef(EntityKind.LOGICAL_DATA_FLOW, command.logicalFlowId()), username);
+        physicalFlowService.checkLogicalFlowPermission(EntityReference.mkRef(EntityKind.LOGICAL_DATA_FLOW, command.logicalFlowId()), username);
 
         return physicalFlowService.create(command, username);
     }
@@ -257,7 +257,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
         SetAttributeCommand command
                 = WebUtilities.readBody(request, SetAttributeCommand.class);
 
-        checkHasPermission(command.entityReference().id(), username);
+        physicalFlowService.checkHasPermission(command.entityReference().id(), username);
 
         return physicalFlowService.updateAttribute(username, command);
     }
@@ -267,7 +267,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
         long flowId = WebUtilities.getId(request);
         String username = WebUtilities.getUsername(request);
 
-        checkHasPermission(flowId, username);
+        physicalFlowService.checkHasPermission(flowId, username);
 
         ImmutablePhysicalFlowDeleteCommand deleteCommand = ImmutablePhysicalFlowDeleteCommand.builder()
                 .flowId(flowId)
@@ -323,18 +323,5 @@ public class PhysicalFlowEndpoint implements Endpoint {
         LOG.info("User: {}, requested physical flow cleanup", username);
         return physicalFlowService.cleanupOrphans();
     }
-
-
-    private void checkLogicalFlowPermission(EntityReference ref, String username) throws InsufficientPrivelegeException {
-        Set<Operation> permissions = flowPermissionChecker.findPermissionsForFlow(ref.id(), username);
-        flowPermissionChecker.verifyEditPerms(permissions, EntityKind.PHYSICAL_FLOW, username);
-    }
-
-
-    private void checkHasPermission(long flowId, String username) throws InsufficientPrivelegeException {
-        PhysicalFlow physFlow = physicalFlowService.getById(flowId);
-        checkLogicalFlowPermission(EntityReference.mkRef(EntityKind.LOGICAL_DATA_FLOW, physFlow.logicalFlowId()), username);
-    }
-
 
 }

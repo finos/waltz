@@ -109,6 +109,7 @@ public class SurveyInstanceDao {
                         si.ENTITY_QUALIFIER_KIND,
                         si.ENTITY_QUALIFIER_ID)
                         .orElse(null))
+                .issuedOn(toLocalDate(record.getIssuedOn()))
                 .build();
     };
 
@@ -169,6 +170,7 @@ public class SurveyInstanceDao {
         record.setApprovalDueDate(toSqlDate(command.approvalDueDate()));
         record.setOwningRole(command.owningRole());
         record.setName(command.name());
+        record.setIssuedOn(toSqlDate(command.issuedOn()));
 
         record.store();
         return record.getId();
@@ -200,6 +202,7 @@ public class SurveyInstanceDao {
                     record.setEntityQualifierKind(ref.kind().name());
                     record.setEntityQualifierId(ref.id());
                 });
+        record.setIssuedOn(toSqlDate(today()));
 
         record.store();
         return record.getId();
