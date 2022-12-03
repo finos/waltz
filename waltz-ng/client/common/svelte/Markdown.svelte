@@ -11,6 +11,11 @@
 
     const converter = new showdown.Converter({extensions: ["bootstrap-tables"]});
     converter.setFlavor("github");
+    converter.setOption("ghCodeBlocks", true);
+    converter.setOption("simplifiedAutoLink", true);
+    converter.setOption("simpleLineBreaks", true);
+    converter.setOption("strikethrough", true);
+    converter.setOption("tasklists", true);
 </script>
 
 
