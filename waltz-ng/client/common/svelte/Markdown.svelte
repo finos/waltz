@@ -33,12 +33,12 @@
         }
     }
 
-    $: html = mkHtml(text, context);
+    $: convertedHtml = mkHtml(text, context);
 </script>
 
 
 <span class:inline-markdown={inline}>
-    {@html html}
+    {@html convertedHtml}
 </span>
 
 
