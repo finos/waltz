@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.service.flow_classification_rule.FlowClassificationRuleResolver.getMostSpecificRanked;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.junit.jupiter.api.Assertions.*;
@@ -69,9 +70,9 @@ public class FlowClassificationRuleResolverTest {
         vantagePoints.add(ImmutableFlowClassificationRuleVantagePoint.builder()
                 .vantagePoint(vantagePoint)
                 .vantagePointRank(1)
-                .dataType(EntityReference.mkRef(EntityKind.DATA_TYPE, 10))
+                .dataType(mkRef(EntityKind.DATA_TYPE, 10))
                 .dataTypeRank(1)
-                .applicationId(200L)
+                .subjectReference(mkRef(EntityKind.APPLICATION, 200L))
                 .classificationCode(AuthoritativenessRatingValue.of("SECONDARY").value())
                 .ruleId(1L)
                 .build());
@@ -92,9 +93,9 @@ public class FlowClassificationRuleResolverTest {
         vantagePoints.add(ImmutableFlowClassificationRuleVantagePoint.builder()
                 .vantagePoint(vantagePoint)
                 .vantagePointRank(1)
-                .dataType(EntityReference.mkRef(EntityKind.DATA_TYPE, 20))
+                .dataType(mkRef(EntityKind.DATA_TYPE, 20))
                 .dataTypeRank(1)
-                .applicationId(205L)
+                .subjectReference(mkRef(EntityKind.APPLICATION, 205L))
                 .classificationCode(AuthoritativenessRatingValue.of("PRIMARY").value())
                 .ruleId(1L)
                 .build());
@@ -115,9 +116,9 @@ public class FlowClassificationRuleResolverTest {
         vantagePoints.add(ImmutableFlowClassificationRuleVantagePoint.builder()
                 .vantagePoint(vantagePoint)
                 .vantagePointRank(1)
-                .dataType(EntityReference.mkRef(EntityKind.DATA_TYPE, 20))
+                .dataType(mkRef(EntityKind.DATA_TYPE, 20))
                 .dataTypeRank(2)
-                .applicationId(205L)
+                .subjectReference(mkRef(EntityKind.APPLICATION, 205L))
                 .classificationCode(AuthoritativenessRatingValue.of("PRIMARY").value())
                 .ruleId(1L)
                 .build());
@@ -126,9 +127,9 @@ public class FlowClassificationRuleResolverTest {
         vantagePoints.add(ImmutableFlowClassificationRuleVantagePoint.builder()
                 .vantagePoint(vantagePoint)
                 .vantagePointRank(2)
-                .dataType(EntityReference.mkRef(EntityKind.DATA_TYPE, 20))
+                .dataType(mkRef(EntityKind.DATA_TYPE, 20))
                 .dataTypeRank(3)
-                .applicationId(200L)
+                .subjectReference(mkRef(EntityKind.APPLICATION, 200L))
                 .classificationCode(AuthoritativenessRatingValue.of("SECONDARY").value())
                 .ruleId(1L)
                 .build());
@@ -148,9 +149,9 @@ public class FlowClassificationRuleResolverTest {
         ImmutableFlowClassificationRuleVantagePoint rank12 = ImmutableFlowClassificationRuleVantagePoint.builder()
                 .vantagePoint(vantagePoint)
                 .vantagePointRank(1)
-                .dataType(EntityReference.mkRef(EntityKind.DATA_TYPE, 20))
+                .dataType(mkRef(EntityKind.DATA_TYPE, 20))
                 .dataTypeRank(2)
-                .applicationId(205L)
+                .subjectReference(mkRef(EntityKind.APPLICATION, 205L))
                 .classificationCode(AuthoritativenessRatingValue.of("PRIMARY").value())
                 .ruleId(1L)
                 .build();

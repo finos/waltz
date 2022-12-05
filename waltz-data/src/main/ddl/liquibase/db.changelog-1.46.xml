@@ -119,7 +119,7 @@
                author="davidwatkins73">
         <sql>
             update survey_instance
-            set issued_on = (select issued_on
+            set issued_on = (select COALESCE(issued_on, due_date)
                              from survey_run
                              where id = survey_instance.survey_run_id);
         </sql>

@@ -7,6 +7,7 @@
     import EntityLink from "../../../common/svelte/EntityLink.svelte";
     import LastEdited from "../../../common/svelte/LastEdited.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
+    import _ from "lodash";
 
     export let primaryEntityRef;
 
@@ -34,13 +35,15 @@
 
 {#if classificationRule}
     <PageHeader icon="shield"
-                name={`Flow Classification Rule: ${classificationRule?.applicationReference?.name}`}
+                name={`Flow Classification Rule: ${classificationRule?.subjectReference?.name}`}
                 small={datatypeName}>
         <div slot="breadcrumbs">
             <ol class="waltz-breadcrumbs">
                 <li><ViewLink state="main">Home</ViewLink></li>
                 <li><ViewLink state="main.system.list">Flow Classification Rule</ViewLink></li>
-                <li><EntityLink ref={classificationRule?.applicationReference}/></li>
+                <li>
+                    <EntityLink ref={classificationRule?.subjectReference}/>
+                </li>
                 <li><EntityLink ref={datatype}/></li>
             </ol>
         </div>
@@ -72,10 +75,10 @@
 
             <div class="row">
                 <div class="col-sm-2 waltz-display-field-label">
-                    Source Application:
+                    Source Entity:
                 </div>
                 <div class="col-sm-4">
-                    <EntityLink ref={classificationRule?.applicationReference}/>
+                    <EntityLink ref={classificationRule?.subjectReference}/>
                 </div>
             </div>
 
@@ -100,7 +103,7 @@
                     Scope:
                 </div>
                 <div class="col-sm-4">
-                    <EntityLink ref={classificationRule?.parentReference}/>
+                    <EntityLink ref={classificationRule?.vantagePointReference}/>
                 </div>
             </div>
 

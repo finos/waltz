@@ -53,7 +53,7 @@ function controller($q, $stateParams, serviceBroker, historyStore){
 
                 const datatype = dataTypesById[rule.dataTypeId];
                 const flowClassificationRuleName =
-                    rule.applicationReference.name
+                    rule.subjectReference.name
                     + " - "
                     + _.get(datatype, "name", "unknown datatype");
 

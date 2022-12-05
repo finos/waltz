@@ -81,7 +81,7 @@ public class FlowClassificationRuleEndpoint implements Endpoint {
         String calculateConsumersForDataTypeIdSelectorPath = WebUtilities.mkPath(BASE_URL, "data-type", "consumers");
         String findByEntityReferencePath = WebUtilities.mkPath(BASE_URL, "entity-ref", ":kind", ":id");
         String findByApplicationIdPath = WebUtilities.mkPath(BASE_URL, "app", ":id");
-        String findCompanionAppRulesPath = WebUtilities.mkPath(BASE_URL, "companion-rules", "app", "id", ":id");
+        String findCompanionEntityRulesPath = WebUtilities.mkPath(BASE_URL, "companion-rules", "entity", "id", ":id");
         String findCompanionDataTypeRulesPath = WebUtilities.mkPath(BASE_URL, "companion-rules", "data-type", "id", ":id");
         String getByIdPath = WebUtilities.mkPath(BASE_URL, "id", ":id");
         String deletePath = WebUtilities.mkPath(BASE_URL, "id", ":id");
@@ -105,8 +105,8 @@ public class FlowClassificationRuleEndpoint implements Endpoint {
         ListRoute<FlowClassificationRule> findAllRoute = (request, response)
                 -> flowClassificationRuleService.findAll();
 
-        ListRoute<FlowClassificationRule> findCompanionAppRulesRoute = (request, response)
-                -> flowClassificationRuleService.findCompanionAppRules(WebUtilities.getId(request));
+        ListRoute<FlowClassificationRule> findCompanionEntityRulesRoute = (request, response)
+                -> flowClassificationRuleService.findCompanionEntityRules(WebUtilities.getId(request));
 
         ListRoute<FlowClassificationRule> findCompanionDataTypeRulesRoute = (request, response)
                 -> flowClassificationRuleService.findCompanionDataTypeRules(WebUtilities.getId(request));
@@ -123,7 +123,7 @@ public class FlowClassificationRuleEndpoint implements Endpoint {
         EndpointUtilities.getForList(findByApplicationIdPath, findByApplicationIdRoute);
         EndpointUtilities.postForList(findFlowClassificationRulesBySelectorPath, findFlowClassificationRulesBySelectorRoute);
         EndpointUtilities.getForList(BASE_URL, findAllRoute);
-        EndpointUtilities.getForList(findCompanionAppRulesPath, findCompanionAppRulesRoute);
+        EndpointUtilities.getForList(findCompanionEntityRulesPath, findCompanionEntityRulesRoute);
         EndpointUtilities.getForList(findCompanionDataTypeRulesPath, findCompanionDataTypeRulesRoute);
         EndpointUtilities.putForDatum(BASE_URL, this::updateRoute);
         EndpointUtilities.deleteForDatum(deletePath, this::deleteRoute);
