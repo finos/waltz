@@ -67,7 +67,9 @@ public class SurveyInstanceEndpoint implements Endpoint {
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
         String getPermissionsPath = mkPath(BASE_URL, ":id", "permissions");
         String reassignRecipientsPath = mkPath(BASE_URL, "reassign-recipients");
-        String reassignCountsPath = mkPath(BASE_URL, "reassign-counts");
+        String reassignRecipientsCountsPath = mkPath(BASE_URL, "reassign-recipients-counts");
+        String reassignOwnersPath = mkPath(BASE_URL, "reassign-owners");
+        String reassignOwnersCountsPath = mkPath(BASE_URL, "reassign-owners-counts");
         String findByEntityRefPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findForRecipientIdPath = mkPath(BASE_URL, "recipient", "id", ":id");
         String findForSurveyRunPath = mkPath(BASE_URL, "run", ":id");
@@ -118,7 +120,16 @@ public class SurveyInstanceEndpoint implements Endpoint {
             return surveyInstanceService.reassignRecipients();
         };
 
-        DatumRoute<SyncRecipientsResponse> reassignCountsRoute = (req, res) -> surveyInstanceService.getReassignRecipientsCounts();
+        DatumRoute<SyncRecipientsResponse> reassignRecipientsCountsRoute = (req, res) -> surveyInstanceService.getReassignRecipientsCounts();
+
+
+        DatumRoute<SyncRecipientsResponse> reassignOwnersRoute = (req, res) -> {
+            requireRole(userRoleService, req, SystemRole.ADMIN);
+            LOG.info("User: {}, requested reassign owners for surveys", getUsername(req));
+            return surveyInstanceService.reassignOwners();
+        };
+
+        DatumRoute<SyncRecipientsResponse> reassignOwnersCountsRoute = (req, res) -> surveyInstanceService.getReassignOwnersCounts();
 
         ListRoute<SurveyInstance> findForSurveyRunRoute =
                 (req, res) -> surveyInstanceService.findForSurveyRun(getId(req));
@@ -238,7 +249,9 @@ public class SurveyInstanceEndpoint implements Endpoint {
         getForDatum(getByIdPath, getByIdRoute);
         getForDatum(getPermissionsPath, getPermissionsRoute);
         postForDatum(reassignRecipientsPath, reassignRecipientsRoute);
-        getForDatum(reassignCountsPath, reassignCountsRoute);
+        getForDatum(reassignRecipientsCountsPath, reassignRecipientsCountsRoute);
+        postForDatum(reassignOwnersPath, reassignOwnersRoute);
+        getForDatum(reassignOwnersCountsPath, reassignOwnersCountsRoute);
         getForList(findByEntityRefPath, findByEntityRefRoute);
         getForList(findForRecipientIdPath, findForRecipientIdRoute);
         getForList(findForSurveyRunPath, findForSurveyRunRoute);

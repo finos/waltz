@@ -148,9 +148,17 @@ public class SurveyInstanceService {
         return surveyInstanceDao.reassignRecipients();
     }
 
+    public SyncRecipientsResponse reassignOwners() {
+        return surveyInstanceDao.reassignOwners();
+    }
+
 
     public SyncRecipientsResponse getReassignRecipientsCounts() {
         return surveyInstanceDao.getReassignRecipientsCounts();
+    }
+
+    public SyncRecipientsResponse getReassignOwnersCounts() {
+        return surveyInstanceDao.getReassignOwnersCounts();
     }
 
 

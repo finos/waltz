@@ -78,7 +78,20 @@ export function mkSurveyInstanceStore() {
     const getReassignRecipientsCounts = (force = false) => remote
         .fetchViewDatum(
             "GET",
-            "api/survey-instance/reassign-counts",
+            "api/survey-instance/reassign-recipients-counts",
+            null,
+            {force});
+
+    const reassignOwners = () => remote
+        .execute(
+            "POST",
+            "api/survey-instance/reassign-owners",
+            null);
+
+    const getReassignOwnersCounts = (force = false) => remote
+        .fetchViewDatum(
+            "GET",
+            "api/survey-instance/reassign-owners-counts",
             null,
             {force});
 
@@ -100,7 +113,9 @@ export function mkSurveyInstanceStore() {
         updateApprovalDueDate,
         copyResponses,
         reassignRecipients,
-        getReassignRecipientsCounts
+        getReassignRecipientsCounts,
+        reassignOwners,
+        getReassignOwnersCounts
     };
 }
 
