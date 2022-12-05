@@ -257,7 +257,7 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
         LogicalFlowDecorator lfd = LOGICAL_FLOW_DECORATOR.as("lfd");
 
         EntityReference vantagePoint = flowClassificationRuleVantagePoint.vantagePoint();
-        Long appId = flowClassificationRuleVantagePoint.applicationId();
+        EntityReference subjectReference = flowClassificationRuleVantagePoint.subjectReference();
         EntityReference dataType = flowClassificationRuleVantagePoint.dataType();
         String classificationCode = flowClassificationRuleVantagePoint.classificationCode();
 
@@ -273,10 +273,10 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
                 .where(ENTITY_HIERARCHY.KIND.eq(DATA_TYPE.name()))
                 .and(ENTITY_HIERARCHY.ANCESTOR_ID.eq(dataType.id()));
 
-        Condition usingFlowClassificationRule = LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(appId);
-        Condition notUsingFlowClassificationRule = LOGICAL_FLOW.SOURCE_ENTITY_ID.ne(appId);
+        Condition usingFlowClassificationRule = LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(subjectReference.id()).and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(subjectReference.kind().name()));
+        Condition notUsingFlowClassificationRule = LOGICAL_FLOW.SOURCE_ENTITY_ID.ne(subjectReference.id()).or(LOGICAL_FLOW.SOURCE_ENTITY_KIND.ne(subjectReference.kind().name()));
 
-        Function2<Condition, String, Update<LogicalFlowDecoratorRecord>> mkQuery = (appScopingCondition, ratingName) -> dsl
+        Function2<Condition, String, Update<LogicalFlowDecoratorRecord>> mkQuery = (subjectScopingCondition, ratingName) -> dsl
                 .update(LOGICAL_FLOW_DECORATOR)
                 .set(LOGICAL_FLOW_DECORATOR.RATING, ratingName)
                 .set(LOGICAL_FLOW_DECORATOR.FLOW_CLASSIFICATION_RULE_ID, flowClassificationRuleVantagePoint.ruleId())
@@ -287,16 +287,13 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
                                 .innerJoin(APPLICATION)
                                 .on(APPLICATION.ID.eq(LOGICAL_FLOW.TARGET_ENTITY_ID)
                                         .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
-                                .where(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
-                                        .and(appScopingCondition)
+                                .where(subjectScopingCondition
                                         .and(APPLICATION.ORGANISATIONAL_UNIT_ID.in(orgUnitSubselect))
                                         .and(lfd.DECORATOR_ENTITY_KIND.eq(DATA_TYPE.name()))
-                                        .and(lfd.DECORATOR_ENTITY_ID.in(dataTypeSubselect)))
-                                .and(lfd.RATING.in(
-                                        AuthoritativenessRatingValue.NO_OPINION.value(),
-                                        AuthoritativenessRatingValue.DISCOURAGED.value()))
-
-                ));
+                                        .and(lfd.DECORATOR_ENTITY_ID.in(dataTypeSubselect))
+                                        .and(lfd.RATING.in(
+                                                AuthoritativenessRatingValue.NO_OPINION.value(),
+                                                AuthoritativenessRatingValue.DISCOURAGED.value())))));
 
         Update<LogicalFlowDecoratorRecord> updateAuthSources = mkQuery.apply(
                 usingFlowClassificationRule,

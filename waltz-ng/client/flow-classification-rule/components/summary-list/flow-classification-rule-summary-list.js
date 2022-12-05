@@ -42,7 +42,7 @@ function controller(serviceBroker, userService, $scope){
     vm.create = () => {
         selectedClassificationRule.set({
             parentReference: null,
-            app: null,
+            subjectReference: null,
             description: null,
             dataType: null,
             rating: "SECONDARY"

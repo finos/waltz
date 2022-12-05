@@ -103,7 +103,8 @@ public class FlowClassificationRuleGenerator implements SampleDataGenerator {
                             FlowClassificationRuleRecord record = dsl.newRecord(FLOW_CLASSIFICATION_RULE);
                             record.setDataTypeId(t);
                             record.setFlowClassificationId(randomPick(classificationIds));
-                            record.setApplicationId(randomPick(appIds));
+                            record.setSubjectEntityId(randomPick(appIds));
+                            record.setSubjectEntityKind(EntityKind.APPLICATION.name());
                             record.setParentId(randomPick(ouIds));
                             record.setParentKind(EntityKind.ORG_UNIT.name());
                             record.setProvenance(SAMPLE_DATA_PROVENANCE);

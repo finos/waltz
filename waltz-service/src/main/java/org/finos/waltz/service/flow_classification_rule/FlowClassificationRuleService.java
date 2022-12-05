@@ -33,7 +33,6 @@ import org.finos.waltz.data.flow_classification_rule.FlowClassificationDao;
 import org.finos.waltz.data.flow_classification_rule.FlowClassificationRuleDao;
 import org.finos.waltz.data.orgunit.OrganisationalUnitDao;
 import org.finos.waltz.model.*;
-import org.finos.waltz.model.application.Application;
 import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.datatype.DataType;
@@ -139,7 +138,7 @@ public class FlowClassificationRuleService {
                 .id()
                 .orElseThrow(() -> new IllegalArgumentException("cannot update an flow classification rule without an id"));
         FlowClassificationRule updatedClassificationRule = getById(ruleId);
-        ratingCalculator.update(updatedClassificationRule.dataTypeId(), updatedClassificationRule.parentReference());
+        ratingCalculator.update(updatedClassificationRule.dataTypeId(), updatedClassificationRule.vantagePointReference());
         logUpdate(command, username);
         return updateCount;
     }
@@ -176,9 +175,9 @@ public class FlowClassificationRuleService {
         flowClassificationRuleDao.clearRatingsForPointToPointFlows(classificationRuleToDelete);
 
         LOG.debug("Updated point-point");
-        if(classificationRuleToDelete.parentReference().kind() != ACTOR){
+        if (classificationRuleToDelete.vantagePointReference().kind() != ACTOR) {
             LOG.debug("Updating org unit /app flow ratings");
-            ratingCalculator.update(classificationRuleToDelete.dataTypeId(), classificationRuleToDelete.parentReference());
+            ratingCalculator.update(classificationRuleToDelete.dataTypeId(), classificationRuleToDelete.vantagePointReference());
         }
 
         return deletedCount;
@@ -196,7 +195,7 @@ public class FlowClassificationRuleService {
         findAll().forEach(
                 classificationRule -> ratingCalculator.update(
                         classificationRule.dataTypeId(),
-                        classificationRule.parentReference()));
+                        classificationRule.vantagePointReference()));
         return true;
     }
 
@@ -223,8 +222,7 @@ public class FlowClassificationRuleService {
     }
 
 
-    public Map<EntityReference, Collection<EntityReference>> calculateConsumersForDataTypeIdSelector(
-            IdSelectionOptions options) {
+    public Map<EntityReference, Collection<EntityReference>> calculateConsumersForDataTypeIdSelector(IdSelectionOptions options) {
         Select<Record1<Long>> selector = dataTypeIdSelectorFactory.apply(options);
         return flowClassificationRuleDao.calculateConsumersForDataTypeIdSelector(selector);
     }
@@ -329,20 +327,29 @@ public class FlowClassificationRuleService {
             return;
         }
 
-        String parentName = getParentEntityName(rule.parentReference());
+        String parentName = getParentEntityName(rule.vantagePointReference());
         DataType dataType = dataTypeDao.getById(rule.dataTypeId());
-        Application app = applicationDao.getById(rule.applicationReference().id());
+        EntityReference subjectRef = enrichSubjectRef(rule.subjectReference());
 
 
-        if (app != null && dataType != null && parentName != null) {
+        if (subjectRef != null && dataType != null && parentName != null) {
             String msg = format(
-                    "Removed the flow classification rule where %s is a source app for type: %s for %s: %s",
-                    app.name(),
+                    "Removed the flow classification rule where %s [%s/%d] is a source for type: %s [%d] for %s: %s",
+                    subjectRef.name(),
+                    subjectRef.kind().name(),
+                    subjectRef.id(),
                     dataType.name(),
-                    rule.parentReference().kind().prettyName(),
+                    dataType.id().get(),
+                    rule.vantagePointReference().kind().prettyName(),
                     parentName);
 
-            multiLog(username, id, rule.parentReference(), dataType, app, msg, Operation.REMOVE);
+            multiLog(username,
+                    id,
+                    rule.vantagePointReference(),
+                    dataType,
+                    subjectRef,
+                    msg,
+                    Operation.REMOVE);
         }
     }
 
@@ -351,13 +358,16 @@ public class FlowClassificationRuleService {
 
         String parentName = getParentEntityName(command.parentReference());
         DataType dataType = dataTypeDao.getById(command.dataTypeId());
-        Application app = applicationDao.getById(command.applicationId());
+        EntityReference subjectRef = enrichSubjectRef(command.subjectReference());
 
-        if (app != null && dataType != null && parentName != null) {
+        if (subjectRef != null && dataType != null && parentName != null) {
             String msg = format(
-                    "Registered the flow classification rule with %s as the source app for type: %s for %s: %s",
-                    app.name(),
+                    "Registered the flow classification rule with %s [%s/%d] as the source for type: %s [%d] for %s: %s",
+                    subjectRef.name(),
+                    subjectRef.kind().name(),
+                    subjectRef.id(),
                     dataType.name(),
+                    dataType.id().get(),
                     command.parentReference().kind().prettyName(),
                     parentName);
 
@@ -366,7 +376,7 @@ public class FlowClassificationRuleService {
                     ruleId,
                     command.parentReference(),
                     dataType,
-                    app,
+                    subjectRef,
                     msg,
                     Operation.ADD);
         }
@@ -394,28 +404,43 @@ public class FlowClassificationRuleService {
             return;
         }
 
-        String parentName = getParentEntityName(rule.parentReference());
+        String parentName = getParentEntityName(rule.vantagePointReference());
         DataType dataType = dataTypeDao.getById(rule.dataTypeId());
-        Application app = applicationDao.getById(rule.applicationReference().id());
+        EntityReference subjectRef = enrichSubjectRef(rule.subjectReference());
+
         FlowClassification classification = flowClassificationDao.getById(command.classificationId());
 
-        if (app != null && dataType != null && parentName != null) {
+        if (subjectRef != null && dataType != null && parentName != null) {
+
             String msg = format(
-                    "Updated flow classification rule: %s as the source application with rating: %s, for type: %s, for %s: %s",
-                    app.name(),
+                    "Updated flow classification rule: %s [%s/%d] as the source, with rating: %s, for type: %s[%d], for %s: %s",
+                    subjectRef.name(),
+                    subjectRef.kind().name(),
+                    subjectRef.id(),
                     classification.name(),
                     dataType.name(),
-                    rule.parentReference().kind().prettyName(),
+                    dataType.id().get(),
+                    rule.vantagePointReference().kind().prettyName(),
                     parentName);
 
-            multiLog(
-                    username,
+            multiLog(username,
                     rule.id().get(),
-                    rule.parentReference(),
+                    rule.vantagePointReference(),
                     dataType,
-                    app,
+                    subjectRef,
                     msg,
                     Operation.UPDATE);
+        }
+    }
+
+
+    private EntityReference enrichSubjectRef(EntityReference subjectReference) {
+        if (subjectReference.kind().equals(EntityKind.APPLICATION)) {
+            return applicationDao.getById(subjectReference.id()).entityReference();
+        } else if (subjectReference.kind().equals(EntityKind.ACTOR)) {
+            return actorDao.getById(subjectReference.id()).entityReference();
+        } else {
+            return null;
         }
     }
 
@@ -424,7 +449,7 @@ public class FlowClassificationRuleService {
                           Long classificationRuleId,
                           EntityReference parentRef,
                           DataType dataType,
-                          Application app,
+                          EntityReference subjectRef,
                           String msg,
                           Operation operation) {
 
@@ -437,9 +462,9 @@ public class FlowClassificationRuleService {
                 .operation(operation)
                 .build();
 
-        ChangeLog appLog = ImmutableChangeLog
+        ChangeLog subjectLog = ImmutableChangeLog
                 .copyOf(parentLog)
-                .withParentReference(app.entityReference());
+                .withParentReference(subjectRef);
 
         ChangeLog dtLog = ImmutableChangeLog
                 .copyOf(parentLog)
@@ -450,14 +475,14 @@ public class FlowClassificationRuleService {
                 .withParentReference(mkRef(EntityKind.FLOW_CLASSIFICATION_RULE, classificationRuleId));
 
         changeLogService.write(parentLog);
-        changeLogService.write(appLog);
+        changeLogService.write(subjectLog);
         changeLogService.write(dtLog);
         changeLogService.write(authLog);
     }
 
 
-    public Set<FlowClassificationRule> findCompanionAppRules(long ruleId) {
-        return flowClassificationRuleDao.findCompanionAppRules(ruleId);
+    public Set<FlowClassificationRule> findCompanionEntityRules(long ruleId) {
+        return flowClassificationRuleDao.findCompanionEntityRules(ruleId);
     }
 
     public Collection<FlowClassificationRule> findCompanionDataTypeRules(long ruleId) {

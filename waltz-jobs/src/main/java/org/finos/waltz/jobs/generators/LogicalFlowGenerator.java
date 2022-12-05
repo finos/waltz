@@ -66,13 +66,13 @@ public class LogicalFlowGenerator implements SampleDataGenerator {
         Set<LogicalFlow> expectedFlows = flowClassificationRules
                 .stream()
                 .flatMap(a -> {
-                    long orgUnitId = a.parentReference().id();
+                    long orgUnitId = a.vantagePointReference().id();
 
                     return randomlySizedIntStream(0, 40)
                             .mapToObj(i ->
                                     randomAppPick(apps, orgUnitId)
                                         .map(target -> ImmutableLogicalFlow.builder()
-                                                .source(a.applicationReference())
+                                                .source(a.subjectReference())
                                                 .target(target)
                                                 .lastUpdatedBy("admin")
                                                 .provenance(SAMPLE_DATA_PROVENANCE)
@@ -89,7 +89,7 @@ public class LogicalFlowGenerator implements SampleDataGenerator {
                 .flatMap(a -> randomlySizedIntStream(0, 30)
                         .mapToObj(i -> randomAppPick(apps, randomPick(orgUnits).id().get())
                                 .map(target -> ImmutableLogicalFlow.builder()
-                                        .source(a.applicationReference())
+                                        .source(a.subjectReference())
                                         .target(target)
                                         .lastUpdatedBy("admin")
                                         .provenance(SAMPLE_DATA_PROVENANCE)

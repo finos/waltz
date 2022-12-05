@@ -33,7 +33,9 @@ public abstract class FlowClassificationRuleVantagePoint {
     public abstract int vantagePointRank();
     public abstract EntityReference dataType();
     public abstract int dataTypeRank();
-    public abstract Long applicationId();
+
+    public abstract EntityReference subjectReference();
+
     public abstract Long ruleId();
     public abstract String classificationCode();
 

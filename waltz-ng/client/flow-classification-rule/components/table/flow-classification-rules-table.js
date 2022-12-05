@@ -105,8 +105,8 @@ function mkColumnDefs(parentRef) {
 
     return _.compact([
         mkEntityLabelGridCell("Data Type", "dataType", "none", "right"),
-        mkEntityLabelGridCell("Scope", "parentReference", "left"),
-        mkEntityLabelGridCell("Application", "app", "none", "right"),
+        mkEntityLabelGridCell("Scope", "vantagePointReference", "left"),
+        mkEntityLabelGridCell("Subject", "subjectReference", "left", "right"),
         consumerCell,
         classificationCell,
         notesCell
@@ -146,10 +146,10 @@ function controller($q, $state, serviceBroker) {
         vm.gridData = _.map(vm.rules, d => {
             return {
                 id: d.id,
-                app: d.applicationReference,
+                subjectReference: d.subjectReference,
                 dataType: dataTypesById[d.dataTypeId],
-                appOrgUnit: d.appOrgUnitReference,
-                parentReference: d.parentReference,
+                subjectOrgUnitReference: d.subjectOrgUnitReference,
+                vantagePointReference: d.vantagePointReference,
                 description: d.description,
                 classification: vm.classificationsById[d.classificationId],
                 consumers: vm.consumersByAuthSourceId[d.id] || [],
