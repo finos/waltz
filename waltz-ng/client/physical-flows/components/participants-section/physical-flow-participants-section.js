@@ -70,8 +70,17 @@ function controller(serviceBroker) {
             .then(() => serviceBroker
                 .loadViewData(
                     CORE_API.LogicalFlowStore.getById,
-                    [ vm.physicalFlow.logicalFlowId ]))
+                    [vm.physicalFlow.logicalFlowId]))
             .then(r => vm.logicalFlow = r.data);
+
+        physicalFlowPromise
+            .then(() => serviceBroker
+                .loadViewData(
+                    CORE_API.LogicalFlowStore.findPermissionsForFlow,
+                    [vm.physicalFlow.logicalFlowId]))
+            .then(r => vm.canEdit = _.some(
+                r.data,
+                d => _.includes(["ADD", "UPDATE", "REMOVE"], d)));
 
         reloadParticipants();
     };

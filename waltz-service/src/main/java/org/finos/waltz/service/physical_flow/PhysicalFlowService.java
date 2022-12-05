@@ -18,12 +18,14 @@
 
 package org.finos.waltz.service.physical_flow;
 
+import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.common.exception.ModifyingReadOnlyRecordException;
 import org.finos.waltz.common.exception.NotFoundException;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.data_type.DataTypeDecoratorService;
 import org.finos.waltz.service.external_identifier.ExternalIdentifierService;
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
+import org.finos.waltz.service.permission.permission_checker.FlowPermissionChecker;
 import org.finos.waltz.service.physical_specification.PhysicalSpecificationService;
 import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
 import org.finos.waltz.data.physical_flow.PhysicalFlowIdSelectorFactory;
@@ -67,6 +69,8 @@ public class PhysicalFlowService {
     private final ExternalIdentifierService externalIdentifierService;
     private final PhysicalFlowIdSelectorFactory physicalFlowIdSelectorFactory = new PhysicalFlowIdSelectorFactory();
 
+    private final FlowPermissionChecker flowPermissionChecker;
+
 
     @Autowired
     public PhysicalFlowService(ChangeLogService changeLogService,
@@ -74,12 +78,15 @@ public class PhysicalFlowService {
                                PhysicalFlowDao physicalDataFlowDao,
                                PhysicalSpecificationService physicalSpecificationService,
                                ExternalIdentifierService externalIdentifierService,
-                               DataTypeDecoratorService dataTypeDecoratorService) {
+                               DataTypeDecoratorService dataTypeDecoratorService,
+                               FlowPermissionChecker flowPermissionChecker) {
+
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(logicalFlowService, "logicalFlowService cannot be null");
         checkNotNull(physicalDataFlowDao, "physicalFlowDao cannot be null");
         checkNotNull(physicalSpecificationService, "physicalSpecificationService cannot be null");
         checkNotNull(dataTypeDecoratorService, "dataTypeDecoratorService cannot be null");
+        checkNotNull(flowPermissionChecker, "flowPermissionChecker cannot be null");
 
         this.changeLogService = changeLogService;
         this.logicalFlowService = logicalFlowService;
@@ -87,6 +94,7 @@ public class PhysicalFlowService {
         this.physicalSpecificationService = physicalSpecificationService;
         this.externalIdentifierService = externalIdentifierService;
         this.dataTypeDecoratorService = dataTypeDecoratorService;
+        this.flowPermissionChecker = flowPermissionChecker;
     }
 
 
@@ -423,7 +431,7 @@ public class PhysicalFlowService {
                         targetSpec.id()
                                 .ifPresent(id ->
                                         physicalSpecificationService.updateExternalId(id, sourceExtId));
-                    } else if(!externalIdentifiers.contains(sourceExtId)) {
+                    } else if (!externalIdentifiers.contains(sourceExtId)) {
                         externalIdentifierService.create(toRef, sourceExtId, username);
                     }
                 });
@@ -433,4 +441,15 @@ public class PhysicalFlowService {
     public Collection<PhysicalFlowInfo> findUnderlyingPhysicalFlows(Long logicalFlowId) {
         return physicalFlowDao.findUnderlyingPhysicalFlows(logicalFlowId);
     }
+
+    public void checkLogicalFlowPermission(EntityReference ref, String username) throws InsufficientPrivelegeException {
+        Set<Operation> permissions = flowPermissionChecker.findPermissionsForFlow(ref.id(), username);
+        flowPermissionChecker.verifyEditPerms(permissions, EntityKind.PHYSICAL_FLOW, username);
+    }
+
+    public void checkHasPermission(long flowId, String username) throws InsufficientPrivelegeException {
+        PhysicalFlow physFlow = getById(flowId);
+        checkLogicalFlowPermission(EntityReference.mkRef(EntityKind.LOGICAL_DATA_FLOW, physFlow.logicalFlowId()), username);
+    }
+
 }

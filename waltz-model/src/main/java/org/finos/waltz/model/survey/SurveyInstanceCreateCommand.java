@@ -27,6 +27,8 @@ import org.immutables.value.Value;
 
 import java.time.LocalDate;
 
+import static org.finos.waltz.common.DateTimeUtilities.today;
+
 @Value.Immutable
 @JsonSerialize(as = ImmutableSurveyInstanceCreateCommand.class)
 @JsonDeserialize(as = ImmutableSurveyInstanceCreateCommand.class)
@@ -53,5 +55,11 @@ public abstract class SurveyInstanceCreateCommand implements Command {
 
     @Nullable
     public abstract String owningRole();
+
+    @Value.Default
+    public LocalDate issuedOn() {
+        return today();
+    }
+
 
 }

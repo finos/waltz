@@ -349,18 +349,37 @@ public class MeasurableRatingDao {
                         .and(USER_ROLE.USER_NAME.eq(username)))
                 .where(MEASURABLE.ID.eq(measurableId));
 
-        Tuple2<Boolean, Boolean> hasRoleAndDefinitionEditableAndIsReadOnly = qry
+        Tuple2<Boolean, Boolean> hasRoleAndIsReadOnly = qry
                 .fetchOne(r -> tuple(
                         notEmpty(r.get(USER_ROLE.ROLE)),
                         r.get(readOnlyRatingField)));
 
-        if (hasRoleAndDefinitionEditableAndIsReadOnly.v2) {
+        if (hasRoleAndIsReadOnly.v2) {
             return emptySet();
-        } else if (hasRoleAndDefinitionEditableAndIsReadOnly.v1) {
+        } else if (hasRoleAndIsReadOnly.v1) {
             return union(operationsForEntityAssessment, asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE));
         } else {
             return operationsForEntityAssessment;
         }
     }
 
+    public Set<Operation> calculateAmendedAllocationOperations(Set<Operation> operationsForAllocation,
+                                                               long categoryId,
+                                                               String username) {
+
+        boolean hasOverride = dsl
+                .fetchExists(DSL
+                        .select(USER_ROLE.ROLE)
+                        .from(MEASURABLE_CATEGORY)
+                        .innerJoin(USER_ROLE).on(USER_ROLE.ROLE.eq(MEASURABLE_CATEGORY.RATING_EDITOR_ROLE)
+                                .and(USER_ROLE.USER_NAME.eq(username)))
+                        .where(MEASURABLE_CATEGORY.ID.eq(categoryId)));
+
+        if (hasOverride) {
+            return union(operationsForAllocation, asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE));
+        } else {
+            return operationsForAllocation;
+        }
+
+    }
 }
