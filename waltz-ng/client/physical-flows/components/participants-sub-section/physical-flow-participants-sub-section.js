@@ -28,7 +28,8 @@ const bindings = {
     currentParticipants: "<",
     nodeRef: "<", // usually an appRef
     onRemove: "<",
-    onAdd: "<"
+    onAdd: "<",
+    canEdit: "<"
 };
 
 

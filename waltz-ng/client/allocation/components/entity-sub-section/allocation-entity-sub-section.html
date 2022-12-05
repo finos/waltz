@@ -95,30 +95,32 @@
         </div>
 
         <!-- CONTROLS -->
-        <span waltz-has-role="RATING_EDITOR">
+        <span>
             <div class="waltz-sub-section-controls">
 
                 <span ng-if="!$ctrl.editing">
                     <!-- EDIT BTN -->
                     <waltz-data-extract-link name="Download {{$ctrl.activeCategory.name}} allocations"
-                                                styling="link"
-                                                filename="Allocations.csv"
-                                                extract="allocations/allocation-scheme/{{$ctrl.scheme.id}}"
-                                                method="POST"
-                                                request-body="$ctrl.selector">
+                                             styling="link"
+                                             filename="Allocations.csv"
+                                             extract="allocations/allocation-scheme/{{$ctrl.scheme.id}}"
+                                             method="POST"
+                                             request-body="$ctrl.selector">
                     </waltz-data-extract-link>
-                    <span waltz-has-role="RATING_EDITOR">
-                        <a ng-click="$ctrl.setEditable(true)"
-                           class="clickable">
-                            | Edit percentages
-                        </a>
-                    </span>
-                    <span ng-if="$ctrl.onDismiss">
-                        |
-                        <a ng-click="$ctrl.onDismiss()"
-                           class="clickable">
-                            Dismiss
-                        </a>
+                    <span ng-if="$ctrl.canEdit">
+                        <span>
+                            <a ng-click="$ctrl.setEditable(true)"
+                               class="clickable">
+                                | Edit percentages
+                            </a>
+                        </span>
+                        <span ng-if="$ctrl.onDismiss">
+                            |
+                            <a ng-click="$ctrl.onDismiss()"
+                               class="clickable">
+                                Dismiss
+                            </a>
+                        </span>
                     </span>
                 </span>
 

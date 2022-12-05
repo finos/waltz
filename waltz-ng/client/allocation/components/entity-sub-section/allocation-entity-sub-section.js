@@ -33,7 +33,8 @@ const bindings = {
     allocations: "<",
     onSave: "<",
     onDismiss: "<",
-    filters: "<"
+    filters: "<",
+    canEdit: "<"
 };
 
 
@@ -43,7 +44,8 @@ const initialState = {
     saveEnabled: false,
     scheme: null,
     showingHelp: false,
-    unallocated: []
+    unallocated: [],
+    canEdit: false
 };
 
 

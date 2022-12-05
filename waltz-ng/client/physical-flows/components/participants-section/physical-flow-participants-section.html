@@ -22,7 +22,8 @@
                                                       on-remove="$ctrl.onRemoveParticipant"
                                                       on-add="$ctrl.onAddSourceParticipant"
                                                       node-ref="$ctrl.logicalFlow.source"
-                                                      current-participants="$ctrl.currentParticipantsByKind.SOURCE">
+                                                      current-participants="$ctrl.currentParticipantsByKind.SOURCE"
+                                                      can-edit="$ctrl.canEdit">
         </waltz-physical-flow-participants-sub-section>
     </div>
     <div class="col-sm-6">
@@ -30,7 +31,8 @@
                                                       on-remove="$ctrl.onRemoveParticipant"
                                                       on-add="$ctrl.onAddTargetParticipant"
                                                       node-ref="$ctrl.logicalFlow.target"
-                                                      current-participants="$ctrl.currentParticipantsByKind.TARGET">
+                                                      current-participants="$ctrl.currentParticipantsByKind.TARGET"
+                                                      can-edit="$ctrl.canEdit">
         </waltz-physical-flow-participants-sub-section>
     </div>
 </div>

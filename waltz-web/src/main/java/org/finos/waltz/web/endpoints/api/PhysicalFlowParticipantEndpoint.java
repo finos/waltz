@@ -19,21 +19,20 @@
 package org.finos.waltz.web.endpoints.api;
 
 
+import org.finos.waltz.model.physical_flow_participant.ParticipationKind;
+import org.finos.waltz.model.physical_flow_participant.PhysicalFlowParticipant;
 import org.finos.waltz.service.physical_flow_participant.PhysicalFlowParticipantService;
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.endpoints.Endpoint;
-import org.finos.waltz.model.physical_flow_participant.ParticipationKind;
-import org.finos.waltz.model.physical_flow_participant.PhysicalFlowParticipant;
-import org.finos.waltz.model.user.SystemRole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.web.WebUtilities.*;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
-import static org.finos.waltz.common.Checks.checkNotNull;
 
 
 @Service
@@ -68,29 +67,31 @@ public class PhysicalFlowParticipantEndpoint implements Endpoint {
                 (request, response) -> service.findByParticipant(getEntityReference(request));
 
         DatumRoute<Boolean> removeRoute = (request, response) -> {
-            requireRole(
-                    userRoleService,
-                    request,
-                    SystemRole.LOGICAL_DATA_FLOW_EDITOR);
+
+            long physicalFlowId = getLong(request, "physicalFlowId");
+            String username = getUsername(request);
+
+            service.checkHasPermission(physicalFlowId, username);
 
             return service.remove(
-                    getLong(request, "physicalFlowId"),
+                    physicalFlowId,
                     readEnum(request, "kind", ParticipationKind.class, (s) -> null),
                     getEntityReference(request, "participantKind", "participantId"),
-                    getUsername(request));
+                    username);
         };
 
         DatumRoute<Boolean> addRoute = (request, response) -> {
-            requireRole(
-                    userRoleService,
-                    request,
-                    SystemRole.LOGICAL_DATA_FLOW_EDITOR);
+
+            long physicalFlowId = getLong(request, "physicalFlowId");
+            String username = getUsername(request);
+
+            service.checkHasPermission(physicalFlowId, username);
 
             return service.add(
-                    getLong(request, "physicalFlowId"),
+                    physicalFlowId,
                     readEnum(request, "kind", ParticipationKind.class, (s) -> null),
                     getEntityReference(request, "participantKind", "participantId"),
-                    getUsername(request));
+                    username);
         };
 
         getForList(findByPhysicalFlowIdPath, findByPhysicalFlowIdRoute);

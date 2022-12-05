@@ -21,16 +21,16 @@ function store($http, baseApiUrl) {
     const baseUrl = `${baseApiUrl}/allocation`;
 
     const findByEntity = (ref) => $http
-            .get(`${baseUrl}/entity-ref/${ref.kind}/${ref.id}`)
-            .then(d => d.data);
+        .get(`${baseUrl}/entity-ref/${ref.kind}/${ref.id}`)
+        .then(d => d.data);
 
     const findByEntityAndScheme = (ref, schemeId) => $http
-            .get(`${baseUrl}/entity-ref/${ref.kind}/${ref.id}/${schemeId}`)
-            .then(d => d.data);
+        .get(`${baseUrl}/entity-ref/${ref.kind}/${ref.id}/${schemeId}`)
+        .then(d => d.data);
 
     const findByMeasurableAndScheme = (measurableId, schemeId) => $http
-            .get(`${baseUrl}/measurable/${measurableId}/${schemeId}`)
-            .then(d => d.data);
+        .get(`${baseUrl}/measurable/${measurableId}/${schemeId}`)
+        .then(d => d.data);
 
     const updateAllocations = (ref, schemeId, updatedAllocations = []) => $http
         .post(`${baseUrl}/entity-ref/${ref.kind}/${ref.id}/${schemeId}/allocations`, updatedAllocations)
