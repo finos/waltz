@@ -19,22 +19,22 @@
 package org.finos.waltz.web.endpoints.api;
 
 
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.allocation.Allocation;
+import org.finos.waltz.model.allocation.MeasurablePercentageChange;
 import org.finos.waltz.service.allocation.AllocationService;
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.endpoints.Endpoint;
-import org.finos.waltz.model.allocation.Allocation;
-import org.finos.waltz.model.allocation.MeasurablePercentageChange;
-import org.finos.waltz.model.user.SystemRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.web.WebUtilities.*;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.getForList;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.postForDatum;
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.ListUtilities.newArrayList;
 
 
 @Service
@@ -96,14 +96,21 @@ public class AllocationEndpoint implements Endpoint {
                         getLong(request,"scheme"));
 
         DatumRoute<Boolean> updateAllocationsRoute = (request, response) -> {
-            requireRole(userRoleService, request, SystemRole.RATING_EDITOR);
+
+            EntityReference parentRef = getEntityReference(request);
+            long schemeId = getLong(request, "scheme");
+            String username = getUsername(request);
+
+            allocationService.checkHasEditPermission(parentRef, schemeId, username);
+
             MeasurablePercentageChange[] percentages = readBody(request, MeasurablePercentageChange[].class);
+
             return allocationService
                     .updateAllocations(
-                        getEntityReference(request),
-                        getLong(request,"scheme"),
-                        newArrayList(percentages),
-                        getUsername(request));
+                            parentRef,
+                            schemeId,
+                            newArrayList(percentages),
+                            username);
         };
 
         getForList(findByEntityPath, findByEntityRoute);

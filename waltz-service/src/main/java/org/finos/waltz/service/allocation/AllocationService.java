@@ -18,7 +18,11 @@
 
 package org.finos.waltz.service.allocation;
 
+import org.finos.waltz.common.exception.InsufficientPrivelegeException;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.allocation_scheme.AllocationScheme;
 import org.finos.waltz.service.allocation.AllocationUtilities.ValidationResult;
+import org.finos.waltz.service.allocation_schemes.AllocationSchemeService;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.data.EntityReferenceNameResolver;
@@ -26,22 +30,19 @@ import org.finos.waltz.data.allocation.AllocationDao;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.allocation.Allocation;
 import org.finos.waltz.model.allocation.MeasurablePercentageChange;
+import org.finos.waltz.service.permission.permission_checker.AllocationPermissionChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.finos.waltz.model.EntityKind.*;
 import static org.finos.waltz.service.allocation.AllocationUtilities.mkBasicLogEntry;
 import static org.finos.waltz.service.allocation.AllocationUtilities.validateAllocationChanges;
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.model.EntityKind.ALLOCATION_SCHEME;
-import static org.finos.waltz.model.EntityKind.MEASURABLE;
 import static org.finos.waltz.model.EntityReference.mkRef;
 
 @Service
@@ -53,17 +54,28 @@ public class AllocationService {
     private final ChangeLogService changeLogService;
     private final EntityReferenceNameResolver nameResolver;
 
+    private final AllocationPermissionChecker allocationPermissionChecker;
+    private final AllocationSchemeService allocationSchemeService;
+
 
     @Autowired
     public AllocationService(AllocationDao allocationDao,
                              EntityReferenceNameResolver nameResolver,
-                             ChangeLogService changeLogService) {
-        this.nameResolver = nameResolver;
+                             ChangeLogService changeLogService,
+                             AllocationPermissionChecker allocationPermissionChecker,
+                             AllocationSchemeService allocationSchemeService) {
+
         checkNotNull(allocationDao, "allocationDao cannot be null");
+        checkNotNull(nameResolver, "nameResolver cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
+        checkNotNull(allocationPermissionChecker, "allocationPermissionChecker cannot be null");
+        checkNotNull(allocationSchemeService, "allocationSchemeService cannot be null");
 
         this.allocationDao = allocationDao;
         this.changeLogService = changeLogService;
+        this.allocationPermissionChecker = allocationPermissionChecker;
+        this.nameResolver = nameResolver;
+        this.allocationSchemeService = allocationSchemeService;
     }
 
 
@@ -173,6 +185,17 @@ public class AllocationService {
             default:
                 return "";
         }
+    }
+
+
+    public void checkHasEditPermission(EntityReference parentRef,
+                                       Long schemeId,
+                                       String username) throws InsufficientPrivelegeException {
+
+        AllocationScheme allocScheme = allocationSchemeService.getById(schemeId);
+
+        Set<Operation> perms = allocationPermissionChecker.findAllocationPermissions(parentRef, allocScheme.measurableCategoryId(), username);
+        allocationPermissionChecker.verifyEditPerms(perms, MEASURABLE_RATING, username);
     }
 
 }
