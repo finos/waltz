@@ -5,9 +5,7 @@ import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.ImmutableEntityReference;
 import org.junit.jupiter.api.Test;
 
-
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import static org.finos.waltz.model.survey.SurveyInstanceAction.*;
 import static org.finos.waltz.model.survey.SurveyInstanceStatus.*;
@@ -17,10 +15,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SurveyInstanceStateMachineTest {
     private final SurveyInstancePermissions admin = ImmutableSurveyInstancePermissions.builder()
             .isAdmin(true)
-            .build();
-
-    private final SurveyInstancePermissions owner = ImmutableSurveyInstancePermissions.builder()
-            .isOwner(true)
             .build();
 
     private final SurveyInstancePermissions participant = ImmutableSurveyInstancePermissions.builder()
@@ -39,11 +33,8 @@ public class SurveyInstanceStateMachineTest {
             .status(APPROVED)
             .dueDate(LocalDate.now())
             .approvalDueDate(LocalDate.now())
+            .issuedOn(LocalDate.now())
             .build();
-
-    private final SurveyInstance surveyWithApprovedDate = ImmutableSurveyInstance
-            .copyOf(survey)
-            .withApprovedAt(LocalDateTime.MIN);
 
     @Test
     public void nextPossibleStatus() {
