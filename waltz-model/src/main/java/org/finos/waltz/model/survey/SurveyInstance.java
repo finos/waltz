@@ -21,6 +21,7 @@ package org.finos.waltz.model.survey;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdProvider;
@@ -73,5 +74,8 @@ public abstract class SurveyInstance implements IdProvider {
         return EntityKind.SURVEY_INSTANCE;
     }
 
-    public abstract LocalDate issuedOn();
+    @Value.Default
+    public LocalDate issuedOn() {
+        return DateTimeUtilities.today();
+    }
 }
