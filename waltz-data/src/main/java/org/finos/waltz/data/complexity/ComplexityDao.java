@@ -40,6 +40,7 @@ import java.util.Set;
 
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.data.JooqUtilities.isPostgres;
 import static org.finos.waltz.data.JooqUtilities.selectorToCTE;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.schema.Tables.COMPLEXITY;
@@ -121,16 +122,16 @@ public class ComplexityDao {
 
         Field<BigDecimal> total_complexity = DSL.sum(COMPLEXITY.SCORE).as("total_complexity");
         Field<BigDecimal> average_complexity = DSL.sum(COMPLEXITY.SCORE).divide(DSL.countDistinct(COMPLEXITY.ENTITY_ID)).as("average_complexity");
-        Field<BigDecimal> median_complexity = DSL.percentileCont(0.5).withinGroupOrderBy(COMPLEXITY.SCORE).as("median_complexity");
+        Field<BigDecimal> median_complexity = isPostgres(dsl.dialect())
+                ? DSL.percentileCont(0.5).withinGroupOrderBy(COMPLEXITY.SCORE).as("median_complexity")
+                : DSL.percentileCont(0.5).withinGroupOrderBy(COMPLEXITY.SCORE).over().as("median_complexity");
 
-        SelectHavingStep<Record> median_complexities = dsl
-                .select(COMPLEXITY.COMPLEXITY_KIND_ID)
+        SelectConditionStep<Record1<BigDecimal>> median_complexities = dsl
                 .select(median_complexity)
                 .from(COMPLEXITY)
                 .where(COMPLEXITY.COMPLEXITY_KIND_ID.eq(complexityKindId)
                         .and(COMPLEXITY.ENTITY_ID.in(genericSelector.selector())
-                                .and(COMPLEXITY.ENTITY_KIND.eq(genericSelector.kind().name()))))
-                .groupBy(COMPLEXITY.COMPLEXITY_KIND_ID);
+                                .and(COMPLEXITY.ENTITY_KIND.eq(genericSelector.kind().name()))));
 
         AggregateFunction<BigDecimal> grouped_median_complexity = DSL.max(median_complexities.field("median_complexity", BigDecimal.class).as("median_complexity"));
 
@@ -139,17 +140,17 @@ public class ComplexityDao {
                 .select(average_complexity)
                 .select(grouped_median_complexity)
                 .from(COMPLEXITY)
-                .leftJoin(median_complexities).on(COMPLEXITY.COMPLEXITY_KIND_ID.eq(median_complexities.field(COMPLEXITY.COMPLEXITY_KIND_ID)))
+                .leftJoin(median_complexities).on(DSL.trueCondition())
                 .where(COMPLEXITY.COMPLEXITY_KIND_ID.eq(complexityKindId)
                         .and(COMPLEXITY.ENTITY_ID.in(genericSelector.selector())
                                 .and(COMPLEXITY.ENTITY_KIND.eq(genericSelector.kind().name()))))
                 .groupBy(COMPLEXITY.COMPLEXITY_KIND_ID);
 
-        return qry.fetchOne(
-                r -> tuple(
-                    r.get(average_complexity),
-                    r.get(total_complexity),
-                    r.get(grouped_median_complexity)));
+        return qry
+                .fetchOne(r -> tuple(
+                        r.get(average_complexity),
+                        r.get(total_complexity),
+                        r.get(grouped_median_complexity)));
     }
 
 
