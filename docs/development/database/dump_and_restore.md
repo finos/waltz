@@ -14,9 +14,9 @@ Usage:
 pg_dump -d {database} -U {user} --format=tar  > dump.sql
 ```
 
-Example:
+Example (taking a backup of waltz database, db1):
 ```
-pg_dump -U waltzdb1 --port 5632 --format=tar waltz > d:\dev\data\postgres-dump-1.46.sql
+pg_dump -U waltz --port 5632 --format=tar waltzdb1 > d:\dev\data\postgres-dump-1.46.sql
 ```
 
 
@@ -31,7 +31,7 @@ Usage:
 psql -U {user} {database} < dump.sql
 ```
 
-Example: 
+Example (restoring into a new blank database, db2): 
 ```
 pg_restore.exe -d waltzdb2 -U waltz --port 5632 <  c:\temp\postgres-dump-1.46.sql
 ```
