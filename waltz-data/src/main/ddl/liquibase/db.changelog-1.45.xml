@@ -262,6 +262,7 @@
 
     <changeSet id="20220914-6221-17"
                author="woodjes"
+               failOnError="false"
                dbms="postgresql,h2">
         <comment>6221: Report Grid: Migrate column ids and position from fixed column to col defn table</comment>
         <sql>
