@@ -26,6 +26,7 @@
 
     function bulkUpdate() {
         activeMode = Modes.VIEW;
+        return reload(parentEntityRef.id)
     }
 
 </script>
@@ -88,7 +89,8 @@
                 {#if activeMode === Modes.VIEW}
                     <InvolvementListPanel {involvementKind}/>
                 {:else if activeMode === Modes.BULK_UPLOAD}
-                    <BulkInvolvementLoader {involvementKind} onSave={bulkUpdate}/>
+                    <BulkInvolvementLoader {involvementKind}
+                                           onSave={bulkUpdate}/>
                 {/if}
             </div>
         </div>

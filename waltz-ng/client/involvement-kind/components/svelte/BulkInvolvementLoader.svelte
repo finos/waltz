@@ -3,12 +3,13 @@
     import {entity} from "../../../common/services/enums/entity";
     import DropdownPicker from "../../../common/svelte/DropdownPicker.svelte";
     import {
-        rawInvolvements,
-        selectedKind,
-        resolvedRows,
-        resolutionErrors,
         involvements,
-        uploadMode, UploadModes
+        rawInvolvements,
+        resolutionErrors,
+        resolvedRows,
+        selectedKind,
+        uploadMode,
+        UploadModes
     } from "./bulk-involvement-loader-store";
     import _ from "lodash";
     import {mkRef} from "../../../common/entity-utils";
@@ -19,15 +20,16 @@
     import toasts from "../../../svelte-stores/toast-store";
     import Tooltip from "../../../common/svelte/Tooltip.svelte";
     import LoaderErrorTooltipContent from "./LoaderErrorTooltipContent.svelte";
-    import NoData from "../../../common/svelte/NoData.svelte";
 
     export let involvementKind;
     export let onSave;
 
+    let errorsIgnored = false;
+
     let Modes = {
         INPUT: "INPUT",
         RESOLVE: "RESOLVE"
-    }
+    };
 
     let activeMode = Modes.INPUT;
     let resolveCall;
@@ -35,7 +37,8 @@
     const items = [
         entity.APPLICATION,
         entity.CHANGE_INITIATIVE,
-        entity.ORG_UNIT];
+        entity.ORG_UNIT
+    ];
 
     function selectEntityKind(kind) {
         $selectedKind = kind.key;
@@ -47,7 +50,7 @@
             inputString: $rawInvolvements,
             targetDomain: mkRef(involvementKind.kind, involvementKind.id),
             rowSubjectKind: $selectedKind
-        }
+        };
 
         return resolveCall = bulkUploadStore.resolve(resolveParams)
             .then(d => {
@@ -59,21 +62,34 @@
     }
 
 
-    function saveNewInvolvements() {
+    function saveInvolvements() {
+
+        const validInvs = _
+            .chain($involvements)
+            .filter(d => d.status === bulkLoadResolutionStatus.NEW.key)
+            .map(i => _.join(i.inputRow, ","))
+            .value();
+
+        toasts.info(`Saving ${_.size(validInvs)} involvements...`);
 
         const uploadParams = {
-            inputString: $rawInvolvements,
+            inputString: _.join(validInvs, "\n"),
             targetDomain: mkRef(involvementKind.kind, involvementKind.id),
             rowSubjectKind: $selectedKind,
             uploadMode: $uploadMode
-        }
+        };
 
         bulkUploadStore.upload(uploadParams)
             .then(r => {
                 toasts.success(`Successfully created ${r.data} new involvements`);
-                onSave();
+                return onSave();
             })
             .catch(e => displayError("Could not bulk store involvements", e));
+    }
+
+    function acceptErrors() {
+        errorsIgnored = true;
+        toasts.info("This set of involvements can now be saved. Any errors will be ignored.")
     }
 
 </script>
@@ -131,26 +147,7 @@
     </form>
 {:else if activeMode === Modes.RESOLVE}
     <h4>Upload Summary:</h4>
-    {#if _.isEmpty($resolutionErrors)}
-        <div style="padding: 1em 0">
-            <span style="color: lightgreen">
-                <Icon name="check"/>
-            </span>
-            All identifiers found, ready to save {_.size($involvements)} involvements
-        </div>
-    {:else}
-        <div style="padding: 1em 0">
-            <span style="color: lightcoral">
-                <Icon name="times"/>
-            </span>
-            There are {_.size($resolutionErrors)} errors found, please
-            <button class="btn btn-skinny"
-                    on:click={() => activeMode = Modes.INPUT}>
-                resolve
-            </button>
-            before uploading
-        </div>
-    {/if}
+
     <div class:waltz-scroll-region-350={_.size($resolvedRows) > 10}>
         <table class="table table-condensed">
             <thead>
@@ -182,6 +179,32 @@
             </tbody>
         </table>
     </div>
+
+    {#if _.isEmpty($resolutionErrors)}
+        <div style="padding: 1em 0">
+            <span style="color: lightgreen">
+                <Icon name="check"/>
+            </span>
+            All identifiers found, ready to save {_.size($involvements)} involvements
+        </div>
+    {:else}
+        <div style="padding: 1em 0">
+            <span style="color: lightcoral">
+                <Icon name="times"/>
+            </span>
+            There are {_.size($resolutionErrors)} errors found, please
+            <button class="btn btn-skinny"
+                    on:click={() => activeMode = Modes.INPUT}>
+                edit the data
+            </button>
+            or
+            <button class="btn btn-skinny"
+                    on:click={() => acceptErrors()}>
+                save ignoring errors
+            </button>
+        </div>
+    {/if}
+
     <div>
         <div class="form-group">
             <label>
@@ -215,8 +238,8 @@
     </div>
     <div>
         <button class="btn btn-success"
-                disabled={!_.isEmpty($resolutionErrors)}
-                on:click={saveNewInvolvements}>
+                disabled={!_.isEmpty($resolutionErrors) && !errorsIgnored}
+                on:click={saveInvolvements}>
             Save
         </button>
         <button class="btn btn-default"
