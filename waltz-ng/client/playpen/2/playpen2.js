@@ -17,56 +17,109 @@
  */
 
 import template from "./playpen2.html";
-import {mkSelectionOptions} from "../../common/selector-utils";
-import {CORE_API} from "../../common/services/core-api-utils";
-import {mkRef} from "../../common/entity-utils";
-import Markdown from "../../common/svelte/Markdown.svelte"
+import {select} from "d3-selection";
+import {
+    symbol,
+    symbols,
+    symbolSquare,
+    symbolWye,
+} from "d3-shape";
+import _ from "lodash";
 
 
-const initialState = {
-    checkedItemIds: [],
-    parentEntityRef: {id: 20506, kind: "APPLICATION"},
-    Markdown
-}
+const initialState = {}
 
-function controller(serviceBroker) {
+function controller(serviceBroker, $element) {
 
-    const vm = Object.assign(this, initialState);
-
-    vm.text = `
-# Hello
-
-hello | world
---- | ---
-a | b
-    `
-
-    serviceBroker
-        .loadViewData(CORE_API.MeasurableStore.findMeasurablesBySelector,
-                      [mkSelectionOptions(
-                          mkRef("MEASURABLE_CATEGORY", 16),
-                          "EXACT")])
-        .then(r => vm.recordsManagementItems = console.log(r.data) || r.data);
-
-    vm.isDisabled = (d) => !d.concrete;
-
-    vm.onItemCheck = (d) => {
-
-
-        vm.checkedItemIds = _.union(vm.checkedItemIds, [d]);
+    function xPath(size) {
+        size = Math.sqrt(size);
+        return "M" + (-size / 2) + "," + (-size / 2) +
+            "l" + size + "," + size +
+            "m0," + -(size) +
+            "l" + (-size) + "," + size;
     }
 
-    vm.onItemUncheck = (d) => {
-        vm.checkedItemIds = _.without(vm.checkedItemIds, d);
-
+    function desktop(size) {
+        size = Math.sqrt(size);
+        return `M${size * -1 / 8} ${size * 1 / 2} L${size * -3 / 8} ${size * 5 / 8} L${size * 3 / 8} ${size * 5 / 8} L${size * 1 / 8} ${size * 1 / 2} L${size * -1 / 8} ${size * 1 / 2}
+        M${size * -1 / 2} ${size * -1 / 2}
+         C ${size * -3 / 4} ${size * -1 / 2} ${size * -3 / 4} ${size * -1 / 2} ${size * -3 / 4} ${size * -1 / 4}
+         L${size * -3 / 4} ${size * 1 / 4}
+         C${size * -3 / 4} ${size * 1 / 2} ${size * -3 / 4} ${size * 1 / 2} ${size * -1 / 2} ${size * 1 / 2}
+         L${size * 3 / 4} ${size * 1 / 2}
+         L${size * 3 / 4} ${size * -1 / 2}
+         L${size * -1 / 2} ${size * -1 / 2}`
+        // return `M${size * -1/8} ${size * 1/2} L${size * -3/8} ${size * 5/8} L${size * 3/8} ${size * 5/8} L${size * 1/8} ${size * 1/2} L${size * -1/8} ${size * 1/2}
+        // M${size * -3/4} ${size * -1/2}  L${size * -3/4} ${size * 1/2} L${size * 3/4} ${size * 1/2} L${size * 3/4} ${size * -1/2} L${size * -3/4} ${size * -1/2}`
     }
+
+    const customSymbolTypes = {
+        "cross": xPath,
+        "desktop": desktop
+    };
+
+    const customSymbol = function () {
+
+        let type, size = 64;
+
+        function symbol(d, i) {
+            const customSymbol = _.get(customSymbolTypes, [type.call(this, d, i)]);
+            return customSymbol(size.call(this, d, i));
+        }
+
+        symbol.type = function (tp) {
+            if (!arguments.length) return type;
+            type = typeof tp === "function" ? tp : constant(tp);
+            return symbol;
+        };
+
+        symbol.size = function (sz) {
+            if (!arguments.length) return size;
+            size = typeof sz === "function" ? sz : constant(sz);
+            return symbol;
+        };
+
+        return symbol;
+    };
+
+    const svgElem = select($element.find("svg")[0]);
+
+
+    function constant(x) {
+        return function () {
+            return x;
+        };
+    }
+
+    function getSymbol(type, size) {
+        size = size || 64;
+        if (symbols.indexOf(type) !== -1) {
+            return symbol().type(type).size(size)();
+        } else {
+            return customSymbol().type(type).size(size)();
+        }
+    }
+
+    const xs = [66, 66]; //, 7, 32];
+
+    const selection = svgElem
+        .selectAll("path")
+        .data(xs);
+
+    selection
+        .enter()
+        .append("path")
+        .attr("d", (d, i) => i % 2 === 0 ? getSymbol("desktop", d) : symbol().type(symbolWye).size(d)())
+        .attr("transform", (d, i) => `translate(${i * 50 + 10}, 10)`)
+        .attr("stroke", "red")
+        .attr("stroke-width", 0.1)
+        .attr("fill", "yellow")
+        .attr("stroke-linecap", "round");
 
 }
 
 
-
-
-controller.$inject = ["ServiceBroker"];
+controller.$inject = ["ServiceBroker", "$element"];
 
 
 const view = {
