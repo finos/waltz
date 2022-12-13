@@ -23,7 +23,7 @@
 
     $: {
         if (involvementKind.id) {
-            usageStatsCall = involvementKindStore.findUsageStatsForKind(involvementKind.id)
+            usageStatsCall = involvementKindStore.findUsageStatsForKind(involvementKind.id, true)
         }
     }
 
@@ -31,7 +31,7 @@
     $: {
         if (involvementKind.id && selectedEntityKind) {
             involvementsCall = involvementViewStore
-                .findInvolvementsByKindAndEntityKind(involvementKind.id, selectedEntityKind.key);
+                .findInvolvementsByKindAndEntityKind(involvementKind.id, selectedEntityKind.key, true);
         }
     }
 
