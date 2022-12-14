@@ -58,7 +58,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: liquibase-changelogs
-        path: waltz-data/src/main/ddl/liquibase/
+        path: waltz-schema/src/main/ddl/liquibase/
 
     - name: Publish Test Report
       if: ${{ always() }}
@@ -96,6 +96,6 @@ jobs:
       if: ${{ github.ref_type == 'tag' }}
       with:
         files: |
-          waltz-data/target/liquibase-scripts.zip
+          waltz-schema/target/liquibase-scripts.zip
           waltz-web/target/waltz-web.war
           waltz-web/target/waltz-web-jar-with-dependencies.jar

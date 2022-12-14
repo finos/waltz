@@ -78,7 +78,7 @@
                 <version>${liquibase.maven.version}</version>
                 <configuration>
                     <changeLogFile>
-                        ${basedir}/../waltz-data/src/main/ddl/liquibase/db.changelog-master.xml
+                       src/main/ddl/liquibase/db.changelog-master.xml
                     </changeLogFile>
                     <driver>${jdbc.driver}</driver>
                     <url>${database.url}</url>
