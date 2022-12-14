@@ -78,7 +78,7 @@
                 <version>${liquibase.maven.version}</version>
                 <configuration>
                     <changeLogFile>
-                       src/main/ddl/liquibase/db.changelog-master.xml
+                       src/main/resources/liquibase/db.changelog-master.xml
                     </changeLogFile>
                     <driver>${jdbc.driver}</driver>
                     <url>${database.url}</url>

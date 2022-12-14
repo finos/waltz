@@ -37,12 +37,6 @@
             <version>${project.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.finos</groupId>
-            <artifactId>waltz-service</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
         <!-- Testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

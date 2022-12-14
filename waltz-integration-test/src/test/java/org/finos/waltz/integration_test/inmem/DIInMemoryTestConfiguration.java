@@ -41,7 +41,8 @@ public class DIInMemoryTestConfiguration {
         System.out.println("Setting up ds");
 
         HikariConfig dsConfig = new HikariConfig();
-        dsConfig.setJdbcUrl("jdbc:h2:mem:waltz;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DATABASE_TO_UPPER=FALSE");
+//        dsConfig.setJdbcUrl("jdbc:h2:mem:waltz;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DATABASE_TO_UPPER=FALSE");
+        dsConfig.setJdbcUrl("jdbc:h2:mem:waltz;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DATABASE_TO_UPPER=TRUE");
         dsConfig.setUsername("sa");
         dsConfig.setPassword("sa");
         dsConfig.setMaximumPoolSize(5);
@@ -76,7 +77,8 @@ public class DIInMemoryTestConfiguration {
         liquibase.setDropFirst(true);
 
         liquibase.setDataSource(dataSource);
-        liquibase.setChangeLog("file:../waltz-data/src/main/ddl/liquibase/db.changelog-master.xml");
+//        liquibase.setChangeLog("file:../waltz-schema/src/main/ddl/liquibase/db.changelog-master.xml");
+        liquibase.setChangeLog("/liquibase/db.changelog-master.xml");
         return liquibase;
     }
 

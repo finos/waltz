@@ -58,7 +58,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: liquibase-changelogs
-        path: waltz-schema/src/main/ddl/liquibase/
+        path: waltz-schema/src/main/resources/liquibase/
 
     - name: Publish Test Report
       if: ${{ always() }}
