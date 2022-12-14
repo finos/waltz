@@ -8,6 +8,7 @@
     import {widths} from "./store/layout";
     import {selectedNode} from "./diagram-model-store";
     import {toGraphId} from "../../flow-diagram-utils";
+    import {getSymbol} from "../../../common/svg-icon";
 
     const dispatch = createEventDispatcher();
 
@@ -21,7 +22,7 @@
             cx: widthHint / 2,
             cy: 10,
             title: {
-                dx: 8,
+                dx: 12,
                 dy: 14
             }
         };
@@ -33,17 +34,17 @@
             cx: widthHint / 2,
             cy: 10,
             title: {
-                dx: 4,
+                dx: 10,
                 dy: 14
             }
         };
     }
 
     const shapes = {
-        ACTOR: (widthHint = 100) => Object.assign({}, mkTrapezoidShape(widthHint), { icon: "\uf2be"}), // user-circle-o
-        APPLICATION: (widthHint = 100) => Object.assign({}, mkRectShape(widthHint), { icon: "\uf108" }),  // desktop
-        EUC: (widthHint = 100) => Object.assign({}, mkRectShape(widthHint), { icon: "\uf109" }), // laptop
-        DEFAULT: (widthHint = 100) => Object.assign({}, mkRectShape(widthHint), { icon: "\uf096" })
+        ACTOR: (widthHint = 100) => Object.assign({}, mkTrapezoidShape(widthHint), {icon: "\uf2be"}, {svgIcon: getSymbol("user")}), // user-circle-o
+        APPLICATION: (widthHint = 100) => Object.assign({}, mkRectShape(widthHint), {icon: "\uf108"}, {svgIcon: getSymbol("desktop")}),  // desktop
+        EUC: (widthHint = 100) => Object.assign({}, mkRectShape(widthHint), {icon: "\uf109"}), // laptop
+        DEFAULT: (widthHint = 100) => Object.assign({}, mkRectShape(widthHint), {icon: "\uf096"})
     };
 
     function selectNode() {
@@ -102,14 +103,13 @@
           stroke-dasharray={nodeStyling.dashArray}
           style="padding-top: 20px">
     </path>
-    <text style="font-size: 12px;"
+    <path d={shape.svgIcon}
+          fill="#fafafa"
           class="icon"
-          font-family="FontAwesome"
-          dx={shape.title.dx}
-          dy={shape.title.dy}>
-        {shape.icon}
-    </text>
-    <text dx={shape.title.dx + 16}
+          stroke={nodeStyling.color}
+          transform="translate({shape.title.dx} {shape.title.dy / 2 + 2})">
+    </path>
+    <text dx={shape.title.dx + 10}
           dy={shape.title.dy}
           style="font-size: 14px;"
           class="name"
