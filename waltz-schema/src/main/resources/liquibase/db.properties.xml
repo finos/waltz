@@ -44,6 +44,7 @@
     <property name="today.value" value="getutcdate()" dbms="mssql"></property>
     <property name="today.value" value="curdate()" dbms="mysql"></property>
     <property name="today.value" value="current_date" dbms="postgresql"></property>
+    <property name="today.value" value="CURRENT_DATE()" dbms="h2"></property>
 
     <property name="long.type" value="NUMBER(18)" dbms="oracle"></property>
     <property name="long.type" value="BIGINT" dbms="mssql"></property>

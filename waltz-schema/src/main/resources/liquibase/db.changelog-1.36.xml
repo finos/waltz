@@ -178,7 +178,8 @@
     </changeSet>
 
     <changeSet id="20210727-5554-7"
-               author="woodjes">
+               author="woodjes"
+               dbms="!h2">
         <comment>5554: Insert authority ratings from enum_value into flow_classification</comment>
         <sql>
             INSERT INTO flow_classification (name, description, code, color, position, is_custom)
@@ -189,7 +190,8 @@
     </changeSet>
 
     <changeSet id="20210727-5554-8"
-               author="woodjes">
+               author="woodjes"
+               dbms="!h2">
         <comment>5554: Copy authoritative_source info into flow_classification_rule</comment>
         <sql>
             INSERT INTO flow_classification_rule (  parent_kind,
