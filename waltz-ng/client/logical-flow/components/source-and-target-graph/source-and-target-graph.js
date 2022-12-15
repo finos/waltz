@@ -29,6 +29,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import template from "./source-and-target-graph.html"
 import {amberHex} from "../../../common/colors";
 import {sidebarExpanded} from "../../../navbar/sidebar-store";
+import {getSymbol} from "../../../common/svg-icon";
 
 
 const bindings = {
@@ -384,14 +385,19 @@ function drawLabels(section, items = [], scale, anchor = "start", tweakers) {
         .append("text")
         .attr("text-anchor", anchor)
         .attr("dx", textAdjustment)
-        .text(d => _.truncate(d.name, { length: 26 }))
+        .text(d => _.truncate(d.name, {length: 26}))
+        .attr("transform", `translate(0,0)`)
         .style("fill", d => d.deprecated ? amberHex : "inherit");
 
     newLabels
-        .append("text")
-        .classed("wsat-icon",true)
+        .append("path")
+        .classed("wsat-icon", true)
         .attr("dx", iconAdjustment)
-        .attr("font-family", "FontAwesome");
+        .attr("dy", iconAdjustment)
+        .attr("d", d => tweakers.pfIcon(d).svgIcon)
+        .attr("stroke", d => tweakers.pfIcon(d).color)
+        .attr("transform", `translate(0,0)`)
+        .attr("fill", "none");
 
     newLabels
         .append("text")
@@ -416,8 +422,12 @@ function drawLabels(section, items = [], scale, anchor = "start", tweakers) {
         labels
             .merge(newLabels)
             .select(".wsat-icon")
-            .attr("fill", d => tweakers.pfIcon(d).color)
-            .text((d) => tweakers.pfIcon(d).code || "");
+            .append("path")
+            .attr("d", d => tweakers.pfIcon(d).svgIcon)
+            .attr("stroke", d => tweakers.pfIcon(d).color)
+            // .attr("stroke-width", 0.1)
+            .attr("fill", "none");
+        // .text((d) => tweakers.pfIcon(d).code || "");
     }
 
     if(tweakers.cuIcon) {

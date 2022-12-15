@@ -26,13 +26,13 @@ function desktop(size) {
 
 function user(size) {
     size = Math.sqrt(size);
-    return `M0 ${size * -3 / 4}
+    return `M 0 ${size * -3 / 4}
             A ${size * 1 / 2} ${size * 1 / 2} 0 0 1 0 ${size * 1 / 4}
             A ${size * 1 / 2} ${size * 1 / 2} 0 0 1 0  ${size * -3 / 4}
             M ${size * -3 / 4} ${size * 3 / 4}
             A ${size * 3 / 4} ${size * 2 / 5} 0 0 1 ${size * 3 / 4} ${size * 3 / 4}
             M ${size * -3 / 4} ${size * 3 / 4}
-            L${size * 3 / 4} ${size * 3 / 4}`
+            L ${size * 3 / 4} ${size * 3 / 4}`
 }
 
 function folder(size) {

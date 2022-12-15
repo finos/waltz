@@ -18,6 +18,7 @@
 import _ from "lodash";
 import * as colors from "../../../common/colors";
 import {refToString} from "../../../common/entity-utils";
+import {getSymbol} from "../../../common/svg-icon";
 
 const iconCodes = {
     // codes from: http://fontawesome.io/cheatsheet/  (conversion: &#x1234; -> \u1234)
@@ -35,13 +36,15 @@ function toIcon(count = 0) {
             return {
                 code: iconCodes.questionCircle,
                 description: "No physical files specified",
-                color: colors.amber
+                color: colors.amber,
+                svgIcon: getSymbol("desktop")
             };
         case 1:
             return {
                 code: iconCodes.file,
                 description: "One linked physical files",
-                color: colors.black
+                color: colors.black,
+                svgIcon: getSymbol("page")
             };
         case 2:
             return {
@@ -53,7 +56,8 @@ function toIcon(count = 0) {
             return {
                 code: iconCodes.folder,
                 description: "Several linked physical files",
-                color: colors.black
+                color: colors.black,
+                svgIcon: getSymbol("folder")
             };
     }
 }
