@@ -389,17 +389,19 @@ function drawLabels(section, items = [], scale, anchor = "start", tweakers) {
         .attr("transform", `translate(0,0)`)
         .style("fill", d => d.deprecated ? amberHex : "inherit");
 
-    newLabels
-        .append("path")
-        .classed("wsat-icon", true)
-        .attr("d", d => tweakers.pfIcon(d).svgIcon)
-        .attr("stroke", d => tweakers.pfIcon(d).color)
-        .attr("transform", `translate(0,${iconAdjustment})`)
-        .attr("fill", "none");
+    if (tweakers.pfIcon) {
+        newLabels
+            .append("path")
+            .classed("wsat-icon", true)
+            .attr("d", d => tweakers.pfIcon(d).svgIcon)
+            .attr("stroke", d => tweakers.pfIcon(d).color)
+            .attr("transform", `translate(0, ${iconAdjustment})`)
+            .attr("fill", "none");
+    }
 
     newLabels
         .append("text")
-        .classed("wsat-cuIcon",true)
+        .classed("wsat-cuIcon", true)
         .attr("dx", cuIconAdjustment)
         .attr("font-family", "FontAwesome");
 
@@ -423,9 +425,7 @@ function drawLabels(section, items = [], scale, anchor = "start", tweakers) {
             .append("path")
             .attr("d", d => tweakers.pfIcon(d).svgIcon)
             .attr("stroke", d => tweakers.pfIcon(d).color)
-            // .attr("stroke-width", 0.1)
             .attr("fill", "none");
-        // .text((d) => tweakers.pfIcon(d).code || "");
     }
 
     if(tweakers.cuIcon) {
