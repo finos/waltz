@@ -69,12 +69,72 @@ function page(size) {
          L ${size * 1 / 5} ${size * -3 / 4}`
 }
 
+
+function circle(size) {
+    size = Math.sqrt(size);
+    return `M 0 ${size * -3 / 4}
+            A ${size * 3 / 4} ${size * 3 / 4} 0 0 1 0 ${size * 3 / 4}
+            A ${size * 3 / 4} ${size * 3 / 4} 0 0 1 0  ${size * -3 / 4}`
+}
+
+
+function questionMark(size) {
+    size = Math.sqrt(size);
+    return `
+            M ${size * -3 / 8} ${size * -3 / 8}
+            C 0 ${size * -6 / 8} ${size * 3 / 8} ${size * -1 / 2} ${size * 3 / 8} ${size * -1 / 4}
+            S 0 0 0 ${size * 1 / 4}
+            M 0 ${size * 1 / 2}
+            A ${size * 1 / 16} ${size * 1 / 16} 0 0 1 0 ${size * 5 / 8}
+            A ${size * 1 / 16} ${size * 1 / 16} 0 0 1 0 ${size * 1 / 2}
+            `
+}
+
+
+function questionCircle(size) {
+    size = Math.sqrt(size);
+    return `M 0 ${size * -7 / 8}
+            A ${size * 3 / 4} ${size * 3 / 4} 0 0 1 0 ${size * 7 / 8}
+            A ${size * 3 / 4} ${size * 3 / 4} 0 0 1 0  ${size * -7 / 8}
+            M ${size * -3 / 8} ${size * -3 / 8}
+            C 0 ${size * -6 / 8} ${size * 3 / 8} ${size * -1 / 2} ${size * 3 / 8} ${size * -1 / 4}
+            S 0 0 0 ${size * 1 / 4}
+            M 0 ${size * 1 / 2}
+            A ${size * 1 / 16} ${size * 1 / 16} 0 0 1 0 ${size * 5 / 8}
+            A ${size * 1 / 16} ${size * 1 / 16} 0 0 1 0 ${size * 1 / 2}
+            `
+}
+
+
+function pages(size) {
+    size = Math.sqrt(size);
+    return `M 0 ${size * -3 / 4}
+         L ${size * -3 / 5} ${size * -3 / 4}
+         L ${size * -3 / 5} ${size * 3 / 4}
+         L ${size * 3 / 5} ${size * 3 / 4}
+         L ${size * 3 / 5} ${size * -3 / 8}
+         L ${size * 1 / 5} ${size * -3 / 4}
+         L 0 ${size * -3 / 4}
+         M ${size * 3 / 5} ${size * -3 / 8}
+         L ${size * 1 / 5} ${size * -3 / 8}
+         L ${size * 1 / 5} ${size * -3 / 4}
+         M ${size * -3 / 5} ${size * -4 / 8}
+         L ${size * -3 / 4} ${size * -4 / 8}
+         L ${size * -3 / 4} ${size * 7 / 8}
+         L ${size * 2 / 5} ${size * 7 / 8}
+         L ${size * 2 / 5} ${size * 3 / 4}`
+}
+
 const customSymbolTypes = {
     "cross": xPath,
     "desktop": desktop,
     "user": user,
     "folder": folder,
-    "page": page
+    "page": page,
+    "pages": pages,
+    "circle": circle,
+    "questionMark": questionMark,
+    "questionCircle": questionCircle
 };
 
 

@@ -37,7 +37,7 @@ function toIcon(count = 0) {
                 code: iconCodes.questionCircle,
                 description: "No physical files specified",
                 color: colors.amber,
-                svgIcon: getSymbol("desktop")
+                svgIcon: getSymbol("questionCircle")
             };
         case 1:
             return {
@@ -50,7 +50,8 @@ function toIcon(count = 0) {
             return {
                 code: iconCodes.files,
                 description: "Two linked physical files",
-                color: colors.black
+                color: colors.black,
+                svgIcon: getSymbol("pages")
             };
         default:
             return {

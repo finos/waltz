@@ -392,11 +392,9 @@ function drawLabels(section, items = [], scale, anchor = "start", tweakers) {
     newLabels
         .append("path")
         .classed("wsat-icon", true)
-        .attr("dx", iconAdjustment)
-        .attr("dy", iconAdjustment)
         .attr("d", d => tweakers.pfIcon(d).svgIcon)
         .attr("stroke", d => tweakers.pfIcon(d).color)
-        .attr("transform", `translate(0,0)`)
+        .attr("transform", `translate(0,${iconAdjustment})`)
         .attr("fill", "none");
 
     newLabels
