@@ -843,10 +843,15 @@
     </changeSet>
 
     <changeSet author="dwatkins"
-               id="20170127-1428-3">
+               id="20170127-1428-3a">
+        <preConditions onFail="CONTINUE">
+            <not>
+                <columnExists tableName="measurable"
+                              columnName="measurable_category_id" />
+            </not>
+        </preConditions>
         <addColumn tableName="measurable">
             <column name="measurable_category_id"
-                    afterColumn="measurable_kind"
                     type="${id.type}">
                 <constraints nullable="true"></constraints>
             </column>
