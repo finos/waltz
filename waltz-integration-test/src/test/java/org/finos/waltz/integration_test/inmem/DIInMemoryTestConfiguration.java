@@ -8,6 +8,7 @@ import org.finos.waltz.data.DBExecutorPool;
 import org.finos.waltz.data.DBExecutorPoolInterface;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
+import org.jooq.conf.RenderNameCase;
 import org.jooq.conf.RenderQuotedNames;
 import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
@@ -41,7 +42,7 @@ public class DIInMemoryTestConfiguration {
         System.out.println("Setting up ds");
 
         HikariConfig dsConfig = new HikariConfig();
-        dsConfig.setJdbcUrl("jdbc:h2:mem:waltz;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DATABASE_TO_UPPER=FALSE");
+        dsConfig.setJdbcUrl("jdbc:h2:mem:waltz;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DATABASE_TO_UPPER=TRUE");
         dsConfig.setUsername("sa");
         dsConfig.setPassword("sa");
         dsConfig.setMaximumPoolSize(5);
@@ -56,7 +57,8 @@ public class DIInMemoryTestConfiguration {
         Settings dslSettings = new Settings()
                 .withRenderFormatted(true)
                 .withDebugInfoOnStackTrace(true)
-                .withRenderQuotedNames(RenderQuotedNames.ALWAYS)
+                .withRenderQuotedNames(RenderQuotedNames.EXPLICIT_DEFAULT_QUOTED)
+                .withRenderNameCase(RenderNameCase.UPPER)
                 .withExecuteLogging(true);
 
         org.jooq.Configuration configuration = new DefaultConfiguration()
@@ -76,7 +78,7 @@ public class DIInMemoryTestConfiguration {
         liquibase.setDropFirst(true);
 
         liquibase.setDataSource(dataSource);
-        liquibase.setChangeLog("file:../waltz-data/src/main/ddl/liquibase/db.changelog-master.xml");
+        liquibase.setChangeLog("/liquibase/db.changelog-master.xml");
         return liquibase;
     }
 

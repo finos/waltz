@@ -172,7 +172,8 @@
     </changeSet>
 
     <changeSet id="20210118-5241-2"
-               author="woodjes">
+               author="woodjes"
+               dbms="!h2">
         <comment>5241: Add different cost kinds</comment>
         <sql>
             INSERT INTO cost_kind (name, description, external_id)
@@ -195,7 +196,8 @@
     </changeSet>
 
     <changeSet id="20210118-5241-4"
-               author="woodjes">
+               author="woodjes"
+               dbms="!h2">
         <comment>5241: Add different cost kinds</comment>
         <sql>
             INSERT INTO cost (cost_kind_id, entity_id, entity_kind, year, amount, last_updated_by, provenance)
@@ -208,7 +210,8 @@
     </changeSet>
 
     <changeSet id="20210118-5241-5"
-               author="woodjes">
+               author="woodjes"
+               dbms="!h2">
         <comment>5241: Add different cost kinds</comment>
         <sql>
             INSERT INTO cost (cost_kind_id, entity_id, entity_kind, year, amount, last_updated_by, provenance)

@@ -275,7 +275,7 @@
 
     <changeSet id="20220914-6221-17a"
                author="woodjes"
-               dbms="postgresql,h2">
+               dbms="postgresql">
         <renameSequence oldSequenceName="report_grid_column_definition_id_seq"
                         newSequenceName="report_grid_fixed_column_definition_id_seq"/>
     </changeSet>

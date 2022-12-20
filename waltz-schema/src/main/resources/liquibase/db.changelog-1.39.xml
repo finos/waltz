@@ -29,6 +29,7 @@
 
     <!-- moving from `com.khartec` to `org.finos` -->
     <changeSet id="20211105-5755-1"
+               dbms="!h2"
                author="woodjes">
         <update tableName="settings">
             <column name="value"
@@ -38,6 +39,7 @@
     </changeSet>
 
     <changeSet id="20211108-5755-2"
+               dbms="!h2"
                author="davidwatkins73">
         <update tableName="settings">
             <column name="value"

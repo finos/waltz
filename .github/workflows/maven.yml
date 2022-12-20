@@ -43,7 +43,7 @@ jobs:
 
     - name: Update Maven Project Version
       if: ${{ github.ref_type == 'tag' }}
-      run: mvn versions:set -DnewVersion=${{ github.ref_name }} -Pbuild-postgres,waltz-postgres;
+      run: mvn versions:set -DnewVersion=${{ github.ref_name }} -Pci,build-postgres,waltz-postgres;
 
     - name: Build with Maven
       run: mvn -B -s .build.settings.xml -Pbuild-postgres,waltz-postgres clean package;
@@ -58,7 +58,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: liquibase-changelogs
-        path: waltz-data/src/main/ddl/liquibase/
+        path: waltz-schema/src/main/resources/liquibase/
 
     - name: Publish Test Report
       if: ${{ always() }}
@@ -96,6 +96,6 @@ jobs:
       if: ${{ github.ref_type == 'tag' }}
       with:
         files: |
-          waltz-data/target/liquibase-scripts.zip
+          waltz-schema/target/liquibase-scripts.zip
           waltz-web/target/waltz-web.war
           waltz-web/target/waltz-web-jar-with-dependencies.jar
