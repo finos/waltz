@@ -125,6 +125,35 @@ function pages(size) {
          L ${size * 2 / 5} ${size * 3 / 4}`
 }
 
+
+function hourglass(size) {
+    size = Math.sqrt(size);
+    return `M ${size * -3 / 4} ${size * -3 / 4}
+            L ${size * -3 / 4} ${size * -10 / 16}
+            L ${size * 3 / 4} ${size * -10 / 16}
+            L ${size * 3 / 4} ${size * -3 / 4}
+            L ${size * -3 / 4} ${size * -3 / 4}
+            M ${size * -10 / 16} ${size * -10 / 16}
+            C ${size * -10 / 16} ${size * -1 / 4} ${size * -1 / 16} ${size * -1 / 4} ${size * -1 / 16} 0
+            C ${size * -1 / 16} ${size * 1 / 4} ${size * -10 / 16} ${size * 1 / 4} ${size * -10 / 16} ${size * 10 / 16}
+            L ${size * 10 / 16} ${size * 10 / 16}
+            C ${size * 10 / 16} ${size * 1 / 4} ${size * 1 / 16} ${size * 1 / 4} ${size * 1 / 16} 0
+            C ${size * 1 / 16} ${size * -1 / 4} ${size * 10 / 16} ${size * -1 / 4} ${size * 10 / 16} ${size * -10 / 16}
+            L ${size * -10 / 16} ${size * -10 / 16}
+            M ${size * -3 / 4} ${size * 3 / 4}
+            L ${size * -3 / 4} ${size * 10 / 16}
+            L ${size * 3 / 4} ${size * 10 / 16}
+            L ${size * 3 / 4} ${size * 3 / 4}
+            L ${size * -3 / 4} ${size * 3 / 4}
+            M ${size * -10 / 16} ${size * 10 / 16}
+            C 0 ${size * 1 / 4} 0 ${size * 1 / 4} ${size * 10 / 16} ${size * 10 / 16}`
+}
+
+
+function fw(size) {
+    size = Math.sqrt(size);
+}
+
 const customSymbolTypes = {
     "cross": xPath,
     "desktop": desktop,
@@ -134,7 +163,9 @@ const customSymbolTypes = {
     "pages": pages,
     "circle": circle,
     "questionMark": questionMark,
-    "questionCircle": questionCircle
+    "questionCircle": questionCircle,
+    "hourglass": hourglass,
+    "fw": fw
 };
 
 

@@ -36,7 +36,7 @@ function toIcon(count = 0) {
             return {
                 code: iconCodes.questionCircle,
                 description: "No physical files specified",
-                color: colors.amber,
+                color: colors.darkAmber,
                 svgIcon: getSymbol("questionCircle")
             };
         case 1:
@@ -65,18 +65,21 @@ function toIcon(count = 0) {
 
 
 function toCUIcon(count = 0) {
+    console.log({count})
     switch (count) {
         case 0:
             return {
                 code: "",
                 description: "",
-                color: "#000"
+                color: "#000",
+                svgIcon: getSymbol("fw")
             };
         default:
             return {
                 code: iconCodes.hourglass,
                 description: "Changes are associated with this flow",
-                color: "#000"
+                color: "#000",
+                svgIcon: getSymbol("hourglass")
             };
     }
 }

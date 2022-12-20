@@ -43,7 +43,7 @@ function controller(serviceBroker, $element) {
     selection
         .enter()
         .append("path")
-        .attr("d", (d, i) => i % 2 === 0 ? getSymbol("questionMark", d) : symbol().type(symbolCircle).size(d)())
+        .attr("d", (d, i) => i % 2 === 0 ? getSymbol("hourglass", d) : symbol().type(symbolCircle).size(d)())
         .attr("transform", (d, i) => `translate(${i * 50 + 10}, 10)`)
         .attr("stroke", "red")
         .attr("stroke-width", 0.1)

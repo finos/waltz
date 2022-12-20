@@ -331,9 +331,9 @@ function setupScales(model, dimensions) {
 function determineLabelTextAdjustment(anchor) {
     switch (anchor) {
         case "start":
-            return 10;
+            return 20;
         case "end":
-            return -25;
+            return -20;
         default:
             return 0;
     }
@@ -343,9 +343,9 @@ function determineLabelTextAdjustment(anchor) {
 function determineLabelIconAdjustment(anchor) {
     switch (anchor) {
         case "start":
-            return -6;
+            return 6;
         case "end":
-            return -6;
+            return -8;
         default:
             return 0;
     }
@@ -355,9 +355,9 @@ function determineLabelIconAdjustment(anchor) {
 function determineLabelCUIconAdjustment(anchor) {
     switch (anchor) {
         case "start":
-            return -20;
+            return -12;
         case "end":
-            return -20;
+            return 10;
         default:
             return 0;
     }
@@ -384,9 +384,8 @@ function drawLabels(section, items = [], scale, anchor = "start", tweakers) {
     newLabels
         .append("text")
         .attr("text-anchor", anchor)
-        .attr("dx", textAdjustment)
         .text(d => _.truncate(d.name, {length: 26}))
-        .attr("transform", `translate(0,0)`)
+        .attr("transform", `translate(${textAdjustment},0)`)
         .style("fill", d => d.deprecated ? amberHex : "inherit");
 
     if (tweakers.pfIcon) {
@@ -395,21 +394,32 @@ function drawLabels(section, items = [], scale, anchor = "start", tweakers) {
             .classed("wsat-icon", true)
             .attr("d", d => tweakers.pfIcon(d).svgIcon)
             .attr("stroke", d => tweakers.pfIcon(d).color)
-            .attr("transform", `translate(0, ${iconAdjustment})`)
+            .attr("transform", `translate(${iconAdjustment}, -6)`)
             .attr("fill", "none");
     }
 
-    newLabels
-        .append("text")
-        .classed("wsat-cuIcon", true)
-        .attr("dx", cuIconAdjustment)
-        .attr("font-family", "FontAwesome");
+
+    if (tweakers.cuIcon) {
+        newLabels
+            .append("path")
+            .classed(".wsat-cuIcon", true)
+            .attr("d", d => tweakers.cuIcon(d).svgIcon)
+            .attr("stroke", d => tweakers.cuIcon(d).color)
+            .attr("transform", `translate(${cuIconAdjustment}, -6)`)
+            .attr("fill", "none");
+    }
 
     labels
         .merge(newLabels)
         .classed("wsat-hover", (d) => highlighted === d.id)
-        .on("mouseenter.highlight", d => { highlighted = d.id; redraw(); })
-        .on("mouseleave.highlight", d => { highlighted = null; redraw(); })
+        .on("mouseenter.highlight", d => {
+            highlighted = d.id;
+            redraw();
+        })
+        .on("mouseleave.highlight", d => {
+            highlighted = null;
+            redraw();
+        })
         .on("click.tweaker", (d) => tweakers.onSelect(d, event))
         .on("mouseenter.tweaker", tweakers.onEnter)
         .on("mouseleave.tweaker", tweakers.onLeave)
@@ -432,8 +442,10 @@ function drawLabels(section, items = [], scale, anchor = "start", tweakers) {
         labels
             .merge(newLabels)
             .select(".wsat-cuIcon")
-            .attr("fill", d => tweakers.cuIcon(d).color)
-            .text((d) => tweakers.cuIcon(d).code || "");
+            .append("path")
+            .attr("d", d => tweakers.cuIcon(d).svgIcon)
+            .attr("stroke", d => tweakers.cuIcon(d).color)
+            .attr("fill", "none");
     }
 
     labels
