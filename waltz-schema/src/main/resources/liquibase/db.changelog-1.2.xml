@@ -844,6 +844,21 @@
 
     <changeSet author="dwatkins"
                id="20170127-1428-3a">
+        <!--
+             Liquibase introduced a small backwards compatibility bug which
+             caused the original change to fail on postgres.
+
+             The workaround removed the original change and recreated it
+             here with a new id (postfixed with an 'a') and the offending
+             attribute removed ('afterColumn').
+
+             We then use a predicate to only run this new change if the
+             required column doesn't already exist.
+
+             There is an issue tracking this on liquibase:
+             https://github.com/liquibase/liquibase/issues/3091
+        -->
+
         <preConditions onFail="CONTINUE">
             <not>
                 <columnExists tableName="measurable"
