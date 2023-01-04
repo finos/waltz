@@ -38,7 +38,7 @@
               font-size={dimensions.label.height}
               text-anchor="end"
               fill="black">
-            {truncate(ratingCount.rating?.name, 20)}
+            {truncate(ratingCount.rating?.name, 16)}
         </text>
     </g>
 {/each}

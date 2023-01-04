@@ -23,6 +23,7 @@
     import DropdownPicker
         from "../../../report-grid/components/svelte/column-definition-edit-panel/DropdownPicker.svelte";
     import {determineIndexOfNextItemInList, determineIndexOfPreviousItemInList} from "../../../common/list-utils";
+    import {getSymbol} from "../../../common/svg-icon";
 
     export let primaryEntityRef;
     export let filters;
@@ -30,7 +31,7 @@
     let dimensions = {
         svg: {
             height: 200,
-            width: 200
+            width: 300
         },
         padding: {
             left: 40,
@@ -39,14 +40,15 @@
             header: 10
         },
         bar: {
-            height: 10,
+            height: 15,
         },
         label: {
             width: 80,
-            height: 8
+            height: 10
         },
         header: {
-            height: 12
+            height: 12,
+            button: 8
         }
     };
 
@@ -56,6 +58,7 @@
     let assessmentSummaryCall;
     let selectedDefnId;
     let showAssessmentPicker = false;
+    let initialPageLoad = true;
 
     function moveRight() {
         const currentIndex = _.findIndex(sortedDefinitions, d => d.id === selectedDefnId);
@@ -76,8 +79,10 @@
     }
 
     function saveLastViewedPreference(defnId) {
-        const userPreference = {key: lastViewedAssessmentInfoTileKey, value: _.toString(defnId)}
-        userPreferenceStore.saveForUser(userPreference)
+        initialPageLoad = false;
+        const userPreference = {key: lastViewedAssessmentInfoTileKey, value: _.toString(defnId)};
+        userPreferenceStore.saveForUser(userPreference);
+        userPreferenceCall = userPreferenceStore.findAllForUser(true);
     }
 
     function selectDefinition(defn) {
@@ -99,13 +104,17 @@
     let assessmentDefinitionCall = assessmentDefinitionStore.loadAll();
     $: assessmentDefinitions = $assessmentDefinitionCall?.data;
 
-    $: lastViewedDefinition = _.isNil(lastViewedDefinitionString)
-        ? _.first(sortedDefinitions)
-        : _.find(sortedDefinitions, d => d.id === _.toNumber(lastViewedDefinitionString.value));
+    $: lastViewedDefinition = !_.isNil(lastViewedDefinitionString)
+        ? _.find(sortedDefinitions, d => d.id === _.toNumber(lastViewedDefinitionString.value))
+        : _.first(sortedDefinitions);
+
+    $: selectedDefinition = !_.isNil(lastViewedDefinition)
+        ? lastViewedDefinition
+        : _.first(sortedDefinitions);
 
     $: {
-        if (lastViewedDefinition && userPreferences && sortedDefinitions) {
-            selectedDefnId = lastViewedDefinition.id;
+        if (initialPageLoad && selectedDefinition) {
+            selectedDefnId = selectedDefinition.id;
         }
     }
 
@@ -155,57 +164,83 @@
 
 </script>
 
+
 <div>
-    <div class="col-sm-2" style="padding: 0">
-        <p>
-            <button class="btn btn-plain"
-                    on:click={moveLeft}>
-                <Icon name="arrow-circle-left"/>
+    {#if showAssessmentPicker}
+        <DropdownPicker style="display: inline-block"
+                        items={sortedDefinitions}
+                        onSelect={selectDefinition}
+                        defaultMessage="Select assessment"/>
+        <div style="padding-top: 1em; display:block">
+            <button class="btn btn-default"
+                    style="align-items: start"
+                    on:click={() => showAssessmentPicker = false}>
+                Cancel
             </button>
-        </p>
-    </div>
-    <div class="col-sm-8" style="padding: 0">
-        <p style="text-align: center">
-            {#if !showAssessmentPicker}
-                {_.get(definitionsById, [selectedDefnId, "name"], `Unknown definition [${selectedDefnId}]`)}
-                <button class="btn btn-plain btn-xs"
-                        on:click={changeAssessment}>
-                    <Icon name="pencil"/>
-                </button>
-            {:else}
-                <DropdownPicker items={sortedDefinitions}
-                                onSelect={selectDefinition}/>
-            {/if}
-        </p>
-    </div>
-    <div class="col-sm-2 pull-right" style="padding: 0">
-        <p>
-            <button class="btn btn-plain"
-                    on:click={moveRight}>
-                <Icon name="arrow-circle-right"/>
-            </button>
-        </p>
-    </div>
-</div>
-<div>
-    <div class="col-sm-12"
-         class:waltz-scroll-region-200={_.size(graphData) > 12}>
-        <svg width="100%"
-             height={height + dimensions.header.height + dimensions.padding.header}>
-            <g class="header">
-                <text text-anchor="middle"
-                      font-size={dimensions.header.height}
-                      transform={`translate(${dimensions.svg.width - dimensions.label.width} ${(dimensions.header.height + dimensions.padding.header) / 2})`}>
-                    {_.get(definitionsById, [selectedDefnId, "name"], `Unknown definition [${selectedDefnId}]`)}
-                </text>
-            </g>
-            <g class="assessment-bars"
-               transform={`translate(0, ${dimensions.header.height + dimensions.padding.header})`}>
-                <AssessmentRatingGraph {dimensions}
-                                       {graphData}/>
-            </g>
-        </svg>
-    </div>
+        </div>
+    {:else}
+        <div class="col-sm-12"
+             class:waltz-scroll-region-200={_.size(graphData) > 10}>
+            <svg width="100%"
+                 height={height + dimensions.header.height + dimensions.padding.header}>
+                <g class="header clickable"
+                   transform={`translate(0 ${(dimensions.header.height + dimensions.padding.header) / 2})`}>
+                    <g on:click|stopPropagation={changeAssessment}
+                       on:keydown|stopPropagation={changeAssessment}>
+                        <rect fill="#fff"
+                              transform={`translate(${dimensions.header.button} ${- dimensions.header.button})`}
+                              stroke="none"
+                              width={dimensions.svg.width - dimensions.header.button * 2}
+                              height={dimensions.header.button * 2}>
+                        </rect>
+                        <text text-anchor="middle"
+                              font-size={dimensions.header.height}
+                              transform={`translate(${dimensions.svg.width / 2} 0)`}>
+                            {_.get(definitionsById, [selectedDefnId, "name"], `Unknown definition [${selectedDefnId}]`)}
+                        </text>
+                        <path d={getSymbol("pencil", dimensions.header.button)}
+                              transform={`translate(${dimensions.svg.width - dimensions.header.button * 4} ${- dimensions.header.button / 2})`}
+                              fill="none"
+                              stroke="#000"/>
+                    </g>
+                    <g on:click|stopPropagation={moveLeft}
+                       on:keydown|stopPropagation={moveLeft}
+                       transform={`translate(${dimensions.header.button} ${- dimensions.header.button / 2})`}
+                       class="left-toggle clickable">
+                        <rect fill="#fff"
+                              transform={`translate(${- dimensions.header.button} ${- dimensions.header.button})`}
+                              stroke="none"
+                              width={dimensions.header.button * 2}
+                              height={dimensions.header.button * 2}>
+                        </rect>
+                        <path d={getSymbol("leftArrow", dimensions.header.button)}
+                              fill="none"
+                              stroke="#000"/>
+                    </g>
+                    <g on:click|stopPropagation={moveRight}
+                       on:keydown|stopPropagation={moveRight}
+                       transform={`translate(${dimensions.svg.width - dimensions.header.button} ${- dimensions.header.button / 2})`}
+                       class="right-toggle clickable">
+                        <rect fill="#fff"
+                              transform={`translate(${- dimensions.header.button} ${- dimensions.header.button})`}
+                              stroke="none"
+                              width={dimensions.header.button * 2}
+                              height={dimensions.header.button * 2}>
+                        </rect>
+                        <path d={getSymbol("rightArrow", dimensions.header.button)}
+                              fill="none"
+                              stroke="#000"
+                              class="right-toggle"/>
+                    </g>
+                </g>
+                <g class="assessment-bars"
+                   transform={`translate(0, ${dimensions.header.height + dimensions.padding.header})`}>
+                    <AssessmentRatingGraph {dimensions}
+                                           {graphData}/>
+                </g>
+            </svg>
+        </div>
+    {/if}
 </div>
 
 

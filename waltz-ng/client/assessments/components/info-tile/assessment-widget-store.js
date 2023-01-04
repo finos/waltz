@@ -11,8 +11,6 @@ export let favouriteIds = derived(
 
     ([$defaultPrimaryList, $favouriteExcludedIds, $favouriteIncludedIds]) => {
 
-        console.log({$defaultPrimaryList, $favouriteIncludedIds, $favouriteExcludedIds});
-
         return _.reject(
             _.concat($defaultPrimaryList, $favouriteIncludedIds),
             d => _.includes($favouriteExcludedIds, d));

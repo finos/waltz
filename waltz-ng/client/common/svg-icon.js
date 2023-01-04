@@ -3,7 +3,6 @@ import _ from "lodash";
 
 
 function xPath(size) {
-    size = Math.sqrt(size);
     return "M" + (-size / 2) + "," + (-size / 2) +
         "l" + size + "," + size +
         "m0," + -(size) +
@@ -11,7 +10,6 @@ function xPath(size) {
 }
 
 function desktop(size) {
-    size = Math.sqrt(size);
     return `M${size * -1 / 8} ${size * 1 / 2} L${size * -3 / 8} ${size * 5 / 8} L${size * 3 / 8} ${size * 5 / 8} L${size * 1 / 8} ${size * 1 / 2} L${size * -1 / 8} ${size * 1 / 2}
         M${size * -1 / 2} ${size * -1 / 2}
          C ${size * -3 / 4} ${size * -1 / 2} ${size * -3 / 4} ${size * -1 / 2} ${size * -3 / 4} ${size * -1 / 4}
@@ -25,7 +23,6 @@ function desktop(size) {
 }
 
 function user(size) {
-    size = Math.sqrt(size);
     return `M 0 ${size * -3 / 4}
             A ${size * 1 / 2} ${size * 1 / 2} 0 0 1 0 ${size * 1 / 4}
             A ${size * 1 / 2} ${size * 1 / 2} 0 0 1 0  ${size * -3 / 4}
@@ -36,7 +33,6 @@ function user(size) {
 }
 
 function folder(size) {
-    size = Math.sqrt(size);
     return `M${size * -1 / 2} ${size * -1 / 2}
          C ${size * -3 / 4} ${size * -1 / 2} ${size * -3 / 4} ${size * -1 / 2} ${size * -3 / 4} ${size * -1 / 4}
          L ${size * -3 / 4} ${size * 1 / 4}
@@ -56,7 +52,6 @@ function folder(size) {
 
 
 function page(size) {
-    size = Math.sqrt(size);
     return `M 0 ${size * -3 / 4}
          L ${size * -3 / 5} ${size * -3 / 4}
          L ${size * -3 / 5} ${size * 3 / 4}
@@ -71,7 +66,6 @@ function page(size) {
 
 
 function circle(size) {
-    size = Math.sqrt(size);
     return `M 0 ${size * -3 / 4}
             A ${size * 3 / 4} ${size * 3 / 4} 0 0 1 0 ${size * 3 / 4}
             A ${size * 3 / 4} ${size * 3 / 4} 0 0 1 0  ${size * -3 / 4}`
@@ -79,7 +73,6 @@ function circle(size) {
 
 
 function questionMark(size) {
-    size = Math.sqrt(size);
     return `
             M ${size * -3 / 8} ${size * -3 / 8}
             C 0 ${size * -6 / 8} ${size * 3 / 8} ${size * -1 / 2} ${size * 3 / 8} ${size * -1 / 4}
@@ -92,7 +85,6 @@ function questionMark(size) {
 
 
 function questionCircle(size) {
-    size = Math.sqrt(size);
     return `M 0 ${size * -7 / 8}
             A ${size * 3 / 4} ${size * 3 / 4} 0 0 1 0 ${size * 7 / 8}
             A ${size * 3 / 4} ${size * 3 / 4} 0 0 1 0  ${size * -7 / 8}
@@ -107,7 +99,6 @@ function questionCircle(size) {
 
 
 function pages(size) {
-    size = Math.sqrt(size);
     return `M 0 ${size * -3 / 4}
          L ${size * -3 / 5} ${size * -3 / 4}
          L ${size * -3 / 5} ${size * 3 / 4}
@@ -127,7 +118,6 @@ function pages(size) {
 
 
 function hourglass(size) {
-    size = Math.sqrt(size);
     return `M ${size * -3 / 4} ${size * -3 / 4}
             L ${size * -3 / 4} ${size * -10 / 16}
             L ${size * 3 / 4} ${size * -10 / 16}
@@ -150,8 +140,51 @@ function hourglass(size) {
 }
 
 
+function leftArrow(size) {
+    return `M 0 ${size * -3 / 4}
+            A ${size * 3 / 4} ${size * 3 / 4} 0 0 1 0 ${size * 3 / 4}
+            A ${size * 3 / 4} ${size * 3 / 4} 0 0 1 0  ${size * -3 / 4}
+            M ${size * 1 / 2} 0
+            L ${size * -1 / 2} 0
+            M ${size * -1 / 4} ${size * -1 / 4}
+            L ${size * -1 / 2} 0
+            L ${size * -1 / 4} ${size * 1 / 4}`
+}
+
+
+function rightArrow(size) {
+    return `M 0 ${size * -3 / 4}
+            A ${size * 3 / 4} ${size * 3 / 4} 0 0 1 0 ${size * 3 / 4}
+            A ${size * 3 / 4} ${size * 3 / 4} 0 0 1 0  ${size * -3 / 4}
+            M ${size * 1 / 2} 0
+            L ${size * -1 / 2} 0
+            M ${size * 1 / 4} ${size * -1 / 4}
+            L ${size * 1 / 2} 0
+            L ${size * 1 / 4} ${size * 1 / 4}`
+}
+
+
+function pencil(size) {
+    return `
+            M ${size * 1 / 2} ${size * -1 / 2}
+            L ${size * -10 / 16} ${size * 10 / 16}
+            L ${size * -10 / 16} ${size * 14 / 16}
+            L ${size * -6 / 16} ${size * 14 / 16}
+            L ${size * 3 / 4} ${size * -1 / 4}
+            L ${size * 1 / 2} ${size * -1 / 2}
+            M ${size * 9 / 16} ${size * -9 / 16}
+            L ${size * 11 / 16} ${size * -11 / 16}
+            L ${size * 15 / 16} ${size * -7 / 16}
+            L ${size * 13 / 16} ${size * -5 / 16}
+            L ${size * 9 / 16} ${size * -9 / 16}
+            M ${size * -10 / 16} ${size * 12 / 16}
+            L ${size * -8 / 16} ${size * 12 / 16}
+            L ${size * -8 / 16} ${size * 14 / 16}`
+}
+
+
 function fw(size) {
-    size = Math.sqrt(size);
+    return ``;
 }
 
 const customSymbolTypes = {
@@ -165,6 +198,9 @@ const customSymbolTypes = {
     "questionMark": questionMark,
     "questionCircle": questionCircle,
     "hourglass": hourglass,
+    "leftArrow": leftArrow,
+    "rightArrow": rightArrow,
+    "pencil": pencil,
     "fw": fw
 };
 
@@ -178,7 +214,7 @@ function constant(x) {
 
 const customSymbol = function () {
 
-    let type, size = 64;
+    let type, size = 8;
 
     function symbol(d, i) {
         const customSymbol = _.get(customSymbolTypes, [type.call(this, d, i)]);
@@ -201,7 +237,7 @@ const customSymbol = function () {
 };
 
 export function getSymbol(type, size) {
-    size = size || 64;
+    size = size || 8;
     if (symbols.indexOf(type) !== -1) {
         return symbol().type(type).size(size)();
     } else {
