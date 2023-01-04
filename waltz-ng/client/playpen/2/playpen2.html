@@ -32,19 +32,11 @@
         </breadcrumbs>
     </waltz-page-header>
 
-
-    <waltz-multi-select-tree-control items="$ctrl.recordsManagementItems"
-                                     disable-predicate="$ctrl.isDisabled"
-                                     on-check="$ctrl.onItemCheck"
-                                     on-uncheck="$ctrl.onItemUncheck"
-                                     checked-item-ids="$ctrl.checkedItemIds" >
-    </waltz-multi-select-tree-control>
-    <!--    expanded-item-ids="$ctrl.expandedItemIds"-->
-    <!--    disable-predicate="$ctrl.disableNode">-->
-
-    <waltz-svelte-component component="$ctrl.Markdown" text="$ctrl.text"></waltz-svelte-component>
-
-
-    <pre ng-bind="$ctrl.checkedItemIds | json"></pre>
+    <svg width="800"
+         class="no-text-select"
+         style="border: 1px solid #eee; margin-bottom: 0"
+         height="800"
+         viewBox="0 0 100 100">
+    </svg>
 
 </div>

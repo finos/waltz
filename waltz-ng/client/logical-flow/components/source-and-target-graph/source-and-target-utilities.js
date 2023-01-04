@@ -18,6 +18,7 @@
 import _ from "lodash";
 import * as colors from "../../../common/colors";
 import {refToString} from "../../../common/entity-utils";
+import {getSymbol} from "../../../common/svg-icon";
 
 const iconCodes = {
     // codes from: http://fontawesome.io/cheatsheet/  (conversion: &#x1234; -> \u1234)
@@ -35,43 +36,50 @@ function toIcon(count = 0) {
             return {
                 code: iconCodes.questionCircle,
                 description: "No physical files specified",
-                color: colors.amber
+                color: colors.darkAmber,
+                svgIcon: getSymbol("questionCircle")
             };
         case 1:
             return {
                 code: iconCodes.file,
                 description: "One linked physical files",
-                color: colors.black
+                color: colors.black,
+                svgIcon: getSymbol("page")
             };
         case 2:
             return {
                 code: iconCodes.files,
                 description: "Two linked physical files",
-                color: colors.black
+                color: colors.black,
+                svgIcon: getSymbol("pages")
             };
         default:
             return {
                 code: iconCodes.folder,
                 description: "Several linked physical files",
-                color: colors.black
+                color: colors.black,
+                svgIcon: getSymbol("folder")
             };
     }
 }
 
 
 function toCUIcon(count = 0) {
+    console.log({count})
     switch (count) {
         case 0:
             return {
                 code: "",
                 description: "",
-                color: "#000"
+                color: "#000",
+                svgIcon: getSymbol("fw")
             };
         default:
             return {
                 code: iconCodes.hourglass,
                 description: "Changes are associated with this flow",
-                color: "#000"
+                color: "#000",
+                svgIcon: getSymbol("hourglass")
             };
     }
 }

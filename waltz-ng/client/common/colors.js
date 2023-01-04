@@ -39,6 +39,8 @@ export const amberBgHex = "#FCF2D7";
 export const greenBgHex = "#DFF1D2";
 export const redBgHex = "#F2D7D7";
 export const blueBgHex = "#E2F0FD";
+export const darkAmberHex = "#c24000";
+
 
 export const black = rgb(blackHex);
 export const grey = rgb(greyHex);
@@ -61,6 +63,7 @@ export const blueBg = rgb(blueBgHex);
 export const pinkBg = rgb(pinkBgHex);
 export const actorBg = rgb("#EDE5EE");
 
+export const darkAmber = rgb(darkAmberHex);
 
 export const ragColorScale = scaleOrdinal()
     .domain(["R", "A", "G", "Z", "X"])
