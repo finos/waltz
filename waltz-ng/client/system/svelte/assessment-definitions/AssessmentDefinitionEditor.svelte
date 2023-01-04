@@ -4,7 +4,7 @@
     import Icon from "../../../common/svelte/Icon.svelte";
 
     import {ratingSchemeStore} from "../../../svelte-stores/rating-schemes";
-    import {assessmentRatingStore} from "../../../svelte-stores/assessment-rating";
+    import {assessmentRatingStore} from "../../../svelte-stores/assessment-rating-store";
     import {
         getRequiredFields,
         possibleVisibility,

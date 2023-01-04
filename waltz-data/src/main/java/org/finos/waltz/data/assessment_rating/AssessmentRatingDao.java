@@ -19,12 +19,15 @@
 package org.finos.waltz.data.assessment_rating;
 
 
+import org.finos.waltz.common.CollectionUtilities;
 import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.*;
 import org.finos.waltz.model.assessment_rating.AssessmentRating;
 import org.finos.waltz.model.assessment_rating.*;
+import org.finos.waltz.model.tally.ImmutableTally;
 import org.finos.waltz.schema.tables.*;
 import org.finos.waltz.schema.tables.records.AssessmentRatingRecord;
 import org.jooq.*;
@@ -35,16 +38,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.emptySet;
 import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toSet;
+import static java.util.stream.Collectors.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.CollectionUtilities.*;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.MapUtilities.groupBy;
@@ -283,7 +285,7 @@ public class AssessmentRatingDao {
 
                     return tuple(
                             es.getKey(),
-                            map(entitiesByOutcome.entrySet(),
+                            SetUtilities.map(entitiesByOutcome.entrySet(),
                                     entrySet -> ImmutableRatingEntityList
                                             .builder()
                                             .rating(entrySet.getKey())
@@ -364,5 +366,41 @@ public class AssessmentRatingDao {
         } else {
             return operationsForEntityAssessment;
         }
+    }
+
+    public Set<AssessmentRatingSummaryCounts> findRatingSummaryCounts(GenericSelector genericSelector,
+                                                                      Set<Long> definitionIds) {
+
+        Condition definitionCondition = isEmpty(definitionIds)
+                ? DSL.trueCondition()
+                : ar.ASSESSMENT_DEFINITION_ID.in(definitionIds);
+
+        AggregateFunction<Integer> entityCount = DSL.count(ar.ENTITY_ID);
+        return dsl
+                .select(ar.ASSESSMENT_DEFINITION_ID, ar.RATING_ID, entityCount)
+                .from(ar)
+                .where(ar.ENTITY_ID.in(genericSelector.selector())
+                        .and(ar.ENTITY_KIND.eq(genericSelector.kind().name()))
+                        .and(definitionCondition))
+                .groupBy(ar.ASSESSMENT_DEFINITION_ID, ar.RATING_ID)
+                .fetchGroups(ar.ASSESSMENT_DEFINITION_ID)
+                .entrySet()
+                .stream()
+                .map(e -> {
+
+                    Set<ImmutableTally<Long>> ratingCounts = SetUtilities.map(e.getValue(),
+                            r -> ImmutableTally
+                                    .<Long>builder()
+                                    .id(r.get(ar.RATING_ID))
+                                    .count(r.get(entityCount))
+                                    .build());
+
+                    return ImmutableAssessmentRatingSummaryCounts
+                            .builder()
+                            .definitionId(e.getKey())
+                            .ratingCounts(ratingCounts)
+                            .build();
+                })
+                .collect(toSet());
     }
 }
