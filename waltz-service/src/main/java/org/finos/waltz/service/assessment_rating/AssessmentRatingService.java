@@ -298,14 +298,21 @@ public class AssessmentRatingService {
                                                                                  ratingItems.get(r.ratingId()).name(),
                                                                                  StringUtilities.ifEmpty(r.comment(),""),
                                                                                  r.entityReference().name().orElse("")))
-                                                                         .parentReference(r.entityReference())
-                                                                         .userId(username)
-                                                                         .severity(Severity.INFORMATION)
-                                                                         .operation(operation)
-                                                                         .build())
-                                          .collect(Collectors.toSet());
+                                                               .parentReference(r.entityReference())
+                                                               .userId(username)
+                                                               .severity(Severity.INFORMATION)
+                                                               .operation(operation)
+                                                               .build())
+                .collect(Collectors.toSet());
 
         changeLogService.write(logs);
     }
 
+    public Set<AssessmentRatingSummaryCounts> findRatingSummaryCounts(EntityKind targetKind,
+                                                                      IdSelectionOptions idSelectionOptions,
+                                                                      Set<Long> definitionIds) {
+
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, idSelectionOptions);
+        return assessmentRatingDao.findRatingSummaryCounts(genericSelector, definitionIds);
+    }
 }

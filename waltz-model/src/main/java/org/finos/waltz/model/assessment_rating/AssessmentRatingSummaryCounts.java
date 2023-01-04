@@ -16,33 +16,23 @@
  *
  */
 
-import template from "./playpen2.html";
-import AssessmentWidget from "../../assessments/components/info-tile/AssessmentWidget.svelte";
+package org.finos.waltz.model.assessment_rating;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.finos.waltz.model.tally.Tally;
+import org.immutables.value.Value;
+
+import java.util.Set;
 
 
-const initialState = {
-    parentEntityRef: {id: 95, kind: "ORG_UNIT"},
-    AssessmentWidget
+@Value.Immutable
+@JsonSerialize(as = ImmutableAssessmentRatingSummaryCounts.class)
+@JsonDeserialize(as = ImmutableAssessmentRatingSummaryCounts.class)
+public abstract class AssessmentRatingSummaryCounts {
+
+    public abstract long definitionId();
+
+    public abstract Set<Tally<Long>> ratingCounts();
+
 }
-
-function controller(serviceBroker) {
-
-    const vm = Object.assign(this, initialState);
-
-
-}
-
-
-
-
-controller.$inject = ["ServiceBroker"];
-
-
-const view = {
-    template,
-    controller,
-    controllerAs: "$ctrl",
-};
-
-
-export default view;

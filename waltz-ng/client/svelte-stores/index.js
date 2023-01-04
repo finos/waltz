@@ -1,5 +1,5 @@
 import {assessmentDefinitionStore} from "./assessment-definition";
-import {assessmentRatingStore} from "./assessment-rating";
+import {assessmentRatingStore} from "./assessment-rating-store";
 import {ratingSchemeStore} from "./rating-schemes";
 
 

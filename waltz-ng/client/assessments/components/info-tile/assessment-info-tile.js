@@ -16,33 +16,37 @@
  *
  */
 
-import template from "./playpen2.html";
-import AssessmentWidget from "../../assessments/components/info-tile/AssessmentWidget.svelte";
+import template from "./assessment-info-tile.html";
+import {initialiseData} from "../../../common/index";
+import AssessmentWidget from "./AssessmentWidget.svelte"
+
+const bindings = {
+    filters: "<",
+    parentEntityRef: "<",
+};
 
 
 const initialState = {
-    parentEntityRef: {id: 95, kind: "ORG_UNIT"},
     AssessmentWidget
-}
+};
+
 
 function controller(serviceBroker) {
-
-    const vm = Object.assign(this, initialState);
-
-
+    const vm = initialiseData(this, initialState);
 }
-
-
 
 
 controller.$inject = ["ServiceBroker"];
 
 
-const view = {
+const component = {
+    bindings,
     template,
-    controller,
-    controllerAs: "$ctrl",
+    controller
 };
 
 
-export default view;
+export default {
+    component,
+    id: "waltzAssessmentInfoTile"
+};
