@@ -7,6 +7,7 @@
     import {determineStylingBasedUponLifecycle} from "./flow-diagram-utils";
     import {selectedFlow, selectedNode} from "./diagram-model-store";
     import {toGraphId} from "../../flow-diagram-utils";
+    import {getSymbol} from "../../../common/svg-icon";
 
 
     const dispatch = createEventDispatcher();
@@ -18,11 +19,13 @@
 
     function determineIcon(count) {
         if (count === 0) {
-            return "\uf29c"; // question
+            return getSymbol("questionCircle"); // question
         } else if (count === 1) {
-            return "\uf016"; // one
+            return getSymbol("page"); // one
+        } else if (count === 2) {
+            return getSymbol("pages"); // two
         } else {
-            return "\uf0c5"; // many
+            return getSymbol("folder"); // many
         }
     }
 
@@ -124,14 +127,10 @@
                 fill="#fff"
                 stroke-dasharray={flowStyling.dashArray}>
         </circle>
-        <text style="font-size: 14px;"
-              font-family="FontAwesome"
-              text-anchor="middle"
-              dx="0"
-              dy="4.5"
-              fill={flowStyling.color}>
-            {icon}
-        </text>
+        <path d={icon}
+              fill="none"
+              stroke={flowStyling.color}>
+        </path>
     </g>
 </g>
 

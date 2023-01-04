@@ -17,56 +17,43 @@
  */
 
 import template from "./playpen2.html";
-import {mkSelectionOptions} from "../../common/selector-utils";
-import {CORE_API} from "../../common/services/core-api-utils";
-import {mkRef} from "../../common/entity-utils";
-import Markdown from "../../common/svelte/Markdown.svelte"
+import {select} from "d3-selection";
+import {
+    symbol, symbolCircle,
+    symbols,
+    symbolWye,
+} from "d3-shape";
+import _ from "lodash";
+import {getSymbol} from "../../common/svg-icon";
+
+const initialState = {}
+
+function controller(serviceBroker, $element) {
 
 
-const initialState = {
-    checkedItemIds: [],
-    parentEntityRef: {id: 20506, kind: "APPLICATION"},
-    Markdown
-}
-
-function controller(serviceBroker) {
-
-    const vm = Object.assign(this, initialState);
-
-    vm.text = `
-# Hello
-
-hello | world
---- | ---
-a | b
-    `
-
-    serviceBroker
-        .loadViewData(CORE_API.MeasurableStore.findMeasurablesBySelector,
-                      [mkSelectionOptions(
-                          mkRef("MEASURABLE_CATEGORY", 16),
-                          "EXACT")])
-        .then(r => vm.recordsManagementItems = console.log(r.data) || r.data);
-
-    vm.isDisabled = (d) => !d.concrete;
-
-    vm.onItemCheck = (d) => {
+    const svgElem = select($element.find("svg")[0]);
 
 
-        vm.checkedItemIds = _.union(vm.checkedItemIds, [d]);
-    }
+    const xs = [66, 66]; //, 7, 32];
 
-    vm.onItemUncheck = (d) => {
-        vm.checkedItemIds = _.without(vm.checkedItemIds, d);
+    const selection = svgElem
+        .selectAll("path")
+        .data(xs);
 
-    }
+    selection
+        .enter()
+        .append("path")
+        .attr("d", (d, i) => i % 2 === 0 ? getSymbol("hourglass", d) : symbol().type(symbolCircle).size(d)())
+        .attr("transform", (d, i) => `translate(${i * 50 + 10}, 10)`)
+        .attr("stroke", "red")
+        .attr("stroke-width", 0.1)
+        .attr("fill", "yellow")
+        .attr("stroke-linecap", "round");
 
 }
 
 
-
-
-controller.$inject = ["ServiceBroker"];
+controller.$inject = ["ServiceBroker", "$element"];
 
 
 const view = {
