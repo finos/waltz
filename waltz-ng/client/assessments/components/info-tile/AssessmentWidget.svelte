@@ -6,14 +6,9 @@
     import AssessmentRatingGraph from "./AssessmentRatingGraph.svelte";
     import {assessmentDefinitionStore} from "../../../svelte-stores/assessment-definition";
     import {ratingSchemeStore} from "../../../svelte-stores/rating-schemes";
-    import Icon from "../../../common/svelte/Icon.svelte";
     import {userPreferenceStore} from "../../../svelte-stores/user-preference-store";
     import {getIdsFromString} from "../../assessment-utils";
-    import {
-        favouriteAssessmentDefinitionIdsKey,
-        lastViewedAssessmentInfoTileKey,
-        mkAssessmentDefinitionsIdsBaseKey
-    } from "../../../user";
+    import {favouriteAssessmentDefinitionIdsKey, lastViewedAssessmentInfoTileKey} from "../../../user";
     import {
         defaultPrimaryList,
         favouriteExcludedIds,
@@ -24,6 +19,7 @@
         from "../../../report-grid/components/svelte/column-definition-edit-panel/DropdownPicker.svelte";
     import {determineIndexOfNextItemInList, determineIndexOfPreviousItemInList} from "../../../common/list-utils";
     import {getSymbol} from "../../../common/svg-icon";
+    import NoData from "../../../common/svelte/NoData.svelte";
 
     export let primaryEntityRef;
     export let filters;
@@ -164,84 +160,89 @@
 
 </script>
 
-
-<div>
-    {#if showAssessmentPicker}
-        <DropdownPicker style="display: inline-block"
-                        items={sortedDefinitions}
-                        onSelect={selectDefinition}
-                        defaultMessage="Select assessment"/>
-        <div style="padding-top: 1em; display:block">
-            <button class="btn btn-default"
-                    style="align-items: start"
-                    on:click={() => showAssessmentPicker = false}>
-                Cancel
-            </button>
-        </div>
-    {:else}
-        <div class="col-sm-12"
-             class:waltz-scroll-region-200={_.size(graphData) > 10}>
-            <svg width="100%"
-                 height={height + dimensions.header.height + dimensions.padding.header}>
-                <g class="header clickable"
-                   transform={`translate(0 ${(dimensions.header.height + dimensions.padding.header) / 2})`}>
-                    <g on:click|stopPropagation={changeAssessment}
-                       on:keydown|stopPropagation={changeAssessment}>
-                        <rect fill="#fff"
-                              transform={`translate(${dimensions.header.button} ${- dimensions.header.button})`}
-                              stroke="none"
-                              width={dimensions.svg.width - dimensions.header.button * 2}
-                              height={dimensions.header.button * 2}>
-                        </rect>
-                        <text text-anchor="middle"
-                              font-size={dimensions.header.height}
-                              transform={`translate(${dimensions.svg.width / 2} 0)`}>
-                            {_.get(definitionsById, [selectedDefnId, "name"], `Unknown definition [${selectedDefnId}]`)}
-                        </text>
-                        <path d={getSymbol("pencil", dimensions.header.button)}
-                              transform={`translate(${dimensions.svg.width - dimensions.header.button * 4} ${- dimensions.header.button / 2})`}
-                              fill="none"
-                              stroke="#000"/>
+{#if _.size(graphData) === 0}
+    <div>
+        <NoData>There are no assessments to display</NoData>
+    </div>
+{:else}
+    <div>
+        {#if showAssessmentPicker}
+            <DropdownPicker style="display: inline-block"
+                            items={sortedDefinitions}
+                            onSelect={selectDefinition}
+                            defaultMessage="Select assessment"/>
+            <div style="padding-top: 1em; display:block">
+                <button class="btn btn-default"
+                        style="align-items: start"
+                        on:click={() => showAssessmentPicker = false}>
+                    Cancel
+                </button>
+            </div>
+        {:else}
+            <div class="col-sm-12"
+                 class:waltz-scroll-region-200={_.size(graphData) > 10}>
+                <svg width="100%"
+                     height={height + dimensions.header.height + dimensions.padding.header}>
+                    <g class="header clickable"
+                       transform={`translate(0 ${(dimensions.header.height + dimensions.padding.header) / 2})`}>
+                        <g on:click|stopPropagation={changeAssessment}
+                           on:keydown|stopPropagation={changeAssessment}>
+                            <rect fill="#fff"
+                                  transform={`translate(${dimensions.header.button} ${- dimensions.header.button})`}
+                                  stroke="none"
+                                  width={dimensions.svg.width - dimensions.header.button * 2}
+                                  height={dimensions.header.button * 2}>
+                            </rect>
+                            <text text-anchor="middle"
+                                  font-size={dimensions.header.height}
+                                  transform={`translate(${dimensions.svg.width / 2} 0)`}>
+                                {_.get(definitionsById, [selectedDefnId, "name"], `Unknown definition [${selectedDefnId}]`)}
+                            </text>
+                            <path d={getSymbol("pencil", dimensions.header.button)}
+                                  transform={`translate(${dimensions.svg.width - dimensions.header.button * 4} ${- dimensions.header.button / 2})`}
+                                  fill="none"
+                                  stroke="#000"/>
+                        </g>
+                        <g on:click|stopPropagation={moveLeft}
+                           on:keydown|stopPropagation={moveLeft}
+                           transform={`translate(${dimensions.header.button} ${- dimensions.header.button / 2})`}
+                           class="left-toggle clickable">
+                            <rect fill="#fff"
+                                  transform={`translate(${- dimensions.header.button} ${- dimensions.header.button})`}
+                                  stroke="none"
+                                  width={dimensions.header.button * 2}
+                                  height={dimensions.header.button * 2}>
+                            </rect>
+                            <path d={getSymbol("leftArrow", dimensions.header.button)}
+                                  fill="none"
+                                  stroke="#000"/>
+                        </g>
+                        <g on:click|stopPropagation={moveRight}
+                           on:keydown|stopPropagation={moveRight}
+                           transform={`translate(${dimensions.svg.width - dimensions.header.button} ${- dimensions.header.button / 2})`}
+                           class="right-toggle clickable">
+                            <rect fill="#fff"
+                                  transform={`translate(${- dimensions.header.button} ${- dimensions.header.button})`}
+                                  stroke="none"
+                                  width={dimensions.header.button * 2}
+                                  height={dimensions.header.button * 2}>
+                            </rect>
+                            <path d={getSymbol("rightArrow", dimensions.header.button)}
+                                  fill="none"
+                                  stroke="#000"
+                                  class="right-toggle"/>
+                        </g>
                     </g>
-                    <g on:click|stopPropagation={moveLeft}
-                       on:keydown|stopPropagation={moveLeft}
-                       transform={`translate(${dimensions.header.button} ${- dimensions.header.button / 2})`}
-                       class="left-toggle clickable">
-                        <rect fill="#fff"
-                              transform={`translate(${- dimensions.header.button} ${- dimensions.header.button})`}
-                              stroke="none"
-                              width={dimensions.header.button * 2}
-                              height={dimensions.header.button * 2}>
-                        </rect>
-                        <path d={getSymbol("leftArrow", dimensions.header.button)}
-                              fill="none"
-                              stroke="#000"/>
+                    <g class="assessment-bars"
+                       transform={`translate(0, ${dimensions.header.height + dimensions.padding.header})`}>
+                        <AssessmentRatingGraph {dimensions}
+                                               {graphData}/>
                     </g>
-                    <g on:click|stopPropagation={moveRight}
-                       on:keydown|stopPropagation={moveRight}
-                       transform={`translate(${dimensions.svg.width - dimensions.header.button} ${- dimensions.header.button / 2})`}
-                       class="right-toggle clickable">
-                        <rect fill="#fff"
-                              transform={`translate(${- dimensions.header.button} ${- dimensions.header.button})`}
-                              stroke="none"
-                              width={dimensions.header.button * 2}
-                              height={dimensions.header.button * 2}>
-                        </rect>
-                        <path d={getSymbol("rightArrow", dimensions.header.button)}
-                              fill="none"
-                              stroke="#000"
-                              class="right-toggle"/>
-                    </g>
-                </g>
-                <g class="assessment-bars"
-                   transform={`translate(0, ${dimensions.header.height + dimensions.padding.header})`}>
-                    <AssessmentRatingGraph {dimensions}
-                                           {graphData}/>
-                </g>
-            </svg>
-        </div>
-    {/if}
-</div>
+                </svg>
+            </div>
+        {/if}
+    </div>
+{/if}
 
 
 <style>
