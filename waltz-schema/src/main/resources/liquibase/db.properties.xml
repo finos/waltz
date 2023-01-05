@@ -104,6 +104,7 @@
     <property name="provenance.type" value="VARCHAR(64)"></property>
     <property name="rag.type" value="CHAR(1)"></property>
     <property name="role.type" value="VARCHAR(255)"></property>
+    <property name="short-code.type" value="CHAR(3)"></property>
     <property name="tag.type" value="VARCHAR(255)"></property>
     <property name="url.type" value="VARCHAR(500)"></property>
     <property name="user-agent.type" value="VARCHAR(500)"></property>
