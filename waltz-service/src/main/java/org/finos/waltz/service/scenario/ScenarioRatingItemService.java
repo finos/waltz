@@ -135,8 +135,8 @@ public class ScenarioRatingItemService {
         changeLogService.write(mkBasicLogEntry(command.scenarioId(), message, userId));
     }
 
-    private String getRatingName(List<RatingSchemeItem> ratings, char rating) {
-        Optional<RatingSchemeItem> ratingOptional = ratings.stream().filter(r -> r.rating() == rating).findFirst();
+    private String getRatingName(List<RatingSchemeItem> ratings, String rating) {
+        Optional<RatingSchemeItem> ratingOptional = ratings.stream().filter(r -> r.rating().equals(rating)).findFirst();
         return ratingOptional.isPresent() ? ratingOptional.get().name() : "Unknown";
     }
 }

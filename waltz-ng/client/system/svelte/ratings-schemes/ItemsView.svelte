@@ -100,17 +100,18 @@
     <table class="table table-striped table-hover table-condensed">
         <thead>
         <tr>
-            <th width="20%">Rating</th>
+            <th width="20%"><i>Group</i></th>
+            <th width="25%">Rating</th>
             <th width="5%">Code</th>
-            <th width="15%">Color</th>
-            <th width="20%">Description</th>
-            <th width="20%">Usages</th>
-            <th width="20%">Operations</th>
+            <th width="10%">Color</th>
+            <th width="15%">Usages</th>
+            <th width="25%">Operations</th>
         </tr>
         </thead>
         <tbody>
         {#each ratings as rating}
             <tr>
+                <td>{rating.ratingGroup || '-'}</td>
                 <td>{rating.name}</td>
                 <td>{rating.rating}</td>
                 <td>
@@ -118,9 +119,6 @@
                          style="background-color: {rating.color}">
                     </div>
                     {rating.color}
-                </td>
-                <td>
-                    {rating.description}
                 </td>
                 <td>
                     {usageCountsByRatingId[rating.id] || "-"}
