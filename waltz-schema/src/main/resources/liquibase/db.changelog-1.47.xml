@@ -117,6 +117,14 @@
                         tableName="rating_scheme_item" />
     </changeSet>
 
+    <changeSet id="20230105-6360-55"
+               author="davidwatkins73">
+        <comment>6360: increase size of measurable_rating rating column</comment>
+        <modifyDataType columnName="rating"
+                        newDataType="${short-code.type}"
+                        tableName="measurable_rating" />
+    </changeSet>
+
     <changeSet id="20230105-6360-60"
                author="davidwatkins73">
         <comment>6360: add nullable rating group</comment>
