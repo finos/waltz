@@ -162,4 +162,60 @@
         <setColumnRemarks tableName="rating_scheme" columnName="external_id" remarks="external identifier for this rating scheme"/>
     </changeSet>
 
+
+
+
+    <!-- 6359 Multi valued assessments -->
+
+    <changeSet id="20230105-6359-10"
+               author="davidwatkins73">
+        <comment>6359: add cardinality column to assessment_definition</comment>
+        <addColumn tableName="assessment_definition">
+            <column name="cardinality"
+                    type="${enum.type}"
+                    defaultValue="ZERO_ONE">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20230105-6359-20"
+               author="davidwatkins73">
+        <comment>6359: update natural key on assessment_rating to allow for multi-valued assessments, first drop existing key</comment>
+        <dropPrimaryKey tableName="assessment_rating"
+                        constraintName="assessment_rating_pkey"/>
+    </changeSet>
+
+    <changeSet id="20230105-6359-30"
+               author="davidwatkins73">
+        <comment>6359: update natural key on assessment_rating to allow for multi-valued assessments, add new id column</comment>
+        <addColumn tableName="assessment_rating">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints primaryKey="true"
+                             primaryKeyName="assessment_rating_pkey"
+                             nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20230105-6359-40"
+               author="davidwatkins73">
+        <comment>6359: update natural key on assessment_rating to allow for multi-valued assessments, add unique index</comment>
+        <addUniqueConstraint tableName="assessment_rating"
+                             columnNames="entity_kind, entity_id, assessment_definition_id, rating_id"/>
+    </changeSet>
+
+    <changeSet id="20230105-6359-50"
+               author="davidwatkins73">
+        <comment>6359: update assessment definition comments</comment>
+        <setColumnRemarks tableName="assessment_definition" columnName="cardinality" remarks="indicates the number of permitted ratings per entity, One of: ZERO_ONE, ZERO_MANY"/>
+    </changeSet>
+
+    <changeSet id="20230105-6359-60"
+               author="davidwatkins73">
+        <comment>6359: update assessment rating comments</comment>
+        <setColumnRemarks tableName="assessment_rating" columnName="id" remarks="auto generated identifier"/>
+    </changeSet>
 </databaseChangeLog>
