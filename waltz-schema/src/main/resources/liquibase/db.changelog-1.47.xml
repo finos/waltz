@@ -26,4 +26,140 @@
         <tagDatabase tag="v1.46"/> <!-- tag the current db version, i.e. the last  -->
     </changeSet>
 
+
+    <!-- 6360 Rating Schemes -->
+
+    <changeSet id="20230105-6360-10"
+               author="davidwatkins73">
+        <comment>6360: enforce unique rating scheme names</comment>
+        <addUniqueConstraint tableName="rating_scheme"
+                             constraintName="idx_rating_scheme_name_unique"
+                             columnNames="name"/>
+    </changeSet>
+
+    <changeSet id="20230105-6360-20"
+               author="davidwatkins73">
+        <comment>6360: enforce unique rating item names</comment>
+        <addUniqueConstraint tableName="rating_scheme_item"
+                             constraintName="idx_rating_scheme_item_name_unique"
+                             columnNames="scheme_id, name"/>
+    </changeSet>
+
+    <changeSet id="20230105-6360-25"
+               author="davidwatkins73">
+        <comment>6360: enforce unique rating item external ids</comment>
+        <createIndex tableName="rating_scheme_item"
+                     unique="true"
+                     indexName="idx_rating_scheme_item_ext_id">
+            <column name="scheme_id"
+                    type="${id.type}"/>
+            <column name="external_id"
+                    type="${external-id.type}"/>
+        </createIndex>
+        <modifySql dbms="mssql">
+            <append value="WHERE external_id is not null"/>
+        </modifySql>
+    </changeSet>
+
+    <changeSet id="20230105-6360-30"
+               author="davidwatkins73">
+        <comment>6360: enforce unique assessment definition names</comment>
+        <addUniqueConstraint tableName="assessment_definition"
+                             constraintName="idx_assessment_definition_name_unique"
+                             columnNames="name"/>
+    </changeSet>
+
+    <changeSet id="20230105-6360-35"
+               author="davidwatkins73">
+        <comment>6360: enforce unique assessment definition external ids</comment>
+        <createIndex tableName="assessment_definition"
+                     unique="true"
+                     indexName="idx_assessment_definition_ext_id">
+            <column name="external_id"
+                    type="${external-id.type}"/>
+        </createIndex>
+        <modifySql dbms="mssql">
+            <append value="WHERE external_id is not null"/>
+        </modifySql>
+    </changeSet>
+
+
+    <changeSet id="20230105-6360-40"
+               author="davidwatkins73">
+        <comment>6360: add external id to rating scheme</comment>
+        <addColumn tableName="rating_scheme">
+            <column name="external_id"
+                    type="${external-id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20230105-6360-45"
+               author="davidwatkins73">
+        <comment>6360: enforce unique rating scheme external ids</comment>
+        <createIndex tableName="rating_scheme"
+                     unique="true"
+                     indexName="idx_rating_scheme_ext_id">
+            <column name="external_id"
+                    type="${external-id.type}"/>
+        </createIndex>
+        <modifySql dbms="mssql">
+            <append value="WHERE external_id is not null"/>
+        </modifySql>
+    </changeSet>
+
+    <changeSet id="20230105-6360-50"
+               author="davidwatkins73">
+        <comment>6360: increase size of code column</comment>
+        <modifyDataType columnName="code"
+                        newDataType="${short-code.type}"
+                        tableName="rating_scheme_item" />
+    </changeSet>
+
+    <changeSet id="20230105-6360-55"
+               author="davidwatkins73">
+        <comment>6360: increase size of measurable_rating rating column</comment>
+        <modifyDataType columnName="rating"
+                        newDataType="${short-code.type}"
+                        tableName="measurable_rating" />
+    </changeSet>
+
+    <changeSet id="20230105-6360-60"
+               author="davidwatkins73">
+        <comment>6360: add nullable rating group</comment>
+        <addColumn tableName="rating_scheme_item">
+            <column name="rating_group"
+                    type="${name.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20230105-6360-70"
+               author="davidwatkins73">
+        <comment>6360: document rating scheme item</comment>
+        <setTableRemarks tableName="rating_scheme_item" remarks="Used to enumerate the individual ratings which are part of a rating scheme"/>
+        <setColumnRemarks tableName="rating_scheme_item" columnName="code" remarks="short code to identify the item, long term plan is to replace by external_id in future version of waltz"/>
+        <setColumnRemarks tableName="rating_scheme_item" columnName="external_id" remarks="external identifier for this rating scheme item"/>
+        <setColumnRemarks tableName="rating_scheme_item" columnName="description" remarks="description of the item"/>
+        <setColumnRemarks tableName="rating_scheme_item" columnName="name" remarks="display name for the item"/>
+        <setColumnRemarks tableName="rating_scheme_item" columnName="id" remarks="autogenerated identifier"/>
+        <setColumnRemarks tableName="rating_scheme_item" columnName="position" remarks="overrides the natural alphabetical sorting"/>
+        <setColumnRemarks tableName="rating_scheme_item" columnName="color" remarks="color to use when rendering as a cell"/>
+        <setColumnRemarks tableName="rating_scheme_item" columnName="user_selectable" remarks="used to restrict ratings that should not be manually assigned"/>
+        <setColumnRemarks tableName="rating_scheme_item" columnName="scheme_id" remarks="the parent scheme for this item"/>
+        <setColumnRemarks tableName="rating_scheme_item" columnName="rating_group" remarks="used to visually group items in dropdowns etc."/>
+    </changeSet>
+
+    <changeSet id="20230105-6360-80"
+               author="davidwatkins73">
+        <comment>6360: document rating scheme</comment>
+        <setTableRemarks tableName="rating_scheme" remarks="Used to define a grouping of related values to be used when rating measurables and assessments"/>
+        <setColumnRemarks tableName="rating_scheme" columnName="description" remarks="description of the rating scheme"/>
+        <setColumnRemarks tableName="rating_scheme" columnName="id" remarks="auto generated identifier"/>
+        <setColumnRemarks tableName="rating_scheme" columnName="name" remarks="display name of the rating scheme"/>
+        <setColumnRemarks tableName="rating_scheme" columnName="external_id" remarks="external identifier for this rating scheme"/>
+    </changeSet>
+
 </databaseChangeLog>
