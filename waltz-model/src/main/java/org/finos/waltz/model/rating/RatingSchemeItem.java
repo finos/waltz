@@ -34,8 +34,10 @@ public abstract class RatingSchemeItem implements
         PositionProvider,
         ExternalIdProvider {
 
-    public abstract Character rating();
+    public abstract String rating();
+
     public abstract String color();
+
     public abstract long ratingSchemeId();
 
     @Value.Default
@@ -45,4 +47,8 @@ public abstract class RatingSchemeItem implements
 
     @Value.Default
     public boolean isRestricted() { return false; }
+
+    @Nullable
+    public abstract String ratingGroup();
+
 }
