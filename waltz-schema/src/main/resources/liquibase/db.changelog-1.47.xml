@@ -109,12 +109,32 @@
         </modifySql>
     </changeSet>
 
+    <changeSet id="20230105-6360-47"
+               author="woodjes">
+        <comment>6360: drop index to alter column</comment>
+        <dropIndex indexName="idx_rating_scheme_item_unique"
+                   tableName="rating_scheme_item"/>
+    </changeSet>
+
     <changeSet id="20230105-6360-50"
                author="davidwatkins73">
         <comment>6360: increase size of code column</comment>
         <modifyDataType columnName="code"
                         newDataType="${short-code.type}"
-                        tableName="rating_scheme_item" />
+                        tableName="rating_scheme_item"/>
+    </changeSet>
+
+    <changeSet id="20230105-6360-52"
+               author="woodjes">
+        <comment>6360: recreate index for unique code per scheme</comment>
+        <createIndex tableName="rating_scheme_item"
+                     unique="true"
+                     indexName="idx_rating_scheme_item_unique">
+            <column name="scheme_id"
+                    type="${id.type}"/>
+            <column name="code"
+                    type="${short-code.type}"/>
+        </createIndex>
     </changeSet>
 
     <changeSet id="20230105-6360-55"
@@ -122,7 +142,7 @@
         <comment>6360: increase size of measurable_rating rating column</comment>
         <modifyDataType columnName="rating"
                         newDataType="${short-code.type}"
-                        tableName="measurable_rating" />
+                        tableName="measurable_rating"/>
     </changeSet>
 
     <changeSet id="20230105-6360-60"
@@ -218,4 +238,6 @@
         <comment>6359: update assessment rating comments</comment>
         <setColumnRemarks tableName="assessment_rating" columnName="id" remarks="auto generated identifier"/>
     </changeSet>
+
+
 </databaseChangeLog>

@@ -6,6 +6,9 @@
     import {fade} from 'svelte/transition';
 
     export let assessment;
+
+
+    $: console.log({assessment});
 </script>
 
 

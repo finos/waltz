@@ -143,25 +143,26 @@
                        placeholder="External identifier"
                        bind:value={$selectedDefinition.externalId}>
                 <div class="help-block">
-                    External identifiers help with data import/export as they <i>should not</i> change if the display name is updated
+                    External identifiers help with data import/export as they <i>should not</i> change if the display
+                    name is updated
                 </div>
 
                 <!--VISIBILITY-->
-                <label for="visibility">
-                    Assessment Visibility
-                    <small class="text-muted">(required)</small>
+                <label for="cardinality">
+                    Cardinality
                 </label>
-                <select id="visibility"
-                        bind:value={$selectedDefinition.visibility}>
-                    {#each possibleVisibility as r}
-                        <option value={r.value}>
-                            {r.name}
-                        </option>
-                    {/each}
+                <select id="cardinality"
+                        bind:value={$selectedDefinition.cardinality}>
+                    <option value="ZERO_ONE">
+                        Zero to One
+                    </option>
+                    <option value="ZERO_MANY">
+                        Zero to Many
+                    </option>
                 </select>
                 <div class="help-block">
-                    The visibility setting determines if the assessment is shown by default to all users.
-                    Please note that users are free to override these defaults and choose their own primary and secondary assessments.
+                    The cardinality determines the number of ratings that can be assigned to an entity for this
+                    assessment. Defaults to 'Zero to One'.
                 </div>
 
                 <!-- READ ONLY -->
@@ -205,6 +206,26 @@
                 <div class="help-block">
                     Used to group multiple definitions together, defaults to 'Uncategorized'
                 </div>
+
+                <!--VISIBILITY-->
+                <label for="visibility">
+                    Assessment Visibility
+                    <small class="text-muted">(required)</small>
+                </label>
+                <select id="visibility"
+                        bind:value={$selectedDefinition.visibility}>
+                    {#each possibleVisibility as r}
+                        <option value={r.value}>
+                            {r.name}
+                        </option>
+                    {/each}
+                </select>
+                <div class="help-block">
+                    The visibility setting determines if the assessment is shown by default to all users.
+                    Please note that users are free to override these defaults and choose their own primary and
+                    secondary assessments.
+                </div>
+
             </div>
         </div>
     </div>
