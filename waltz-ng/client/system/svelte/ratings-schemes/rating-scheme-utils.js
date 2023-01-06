@@ -4,7 +4,7 @@ import _ from "lodash";
 export function sortItems(items = []) {
     return _.orderBy(
         items,
-        ["position", "name"])
+        ["ratingGroup", "position", "name"])
 }
 
 export function countUsageStatsBy(usageData, accessor) {

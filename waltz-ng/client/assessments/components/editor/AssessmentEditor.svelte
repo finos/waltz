@@ -28,6 +28,7 @@
 
     let mode = Modes.VIEW;
     let actions = [];
+    let dropdownConfig;
 
     function onEdit() {
         $form = Object.assign({}, assessment.rating);
@@ -125,6 +126,22 @@
         ]);
     }
 
+    $: {
+        const grouped = _
+            .chain(assessment.dropdownEntries)
+            .sortBy([d => d.ratingGroup, d => d.position, d => d.name])
+            .groupBy("ratingGroup")
+            .value();
+
+        if (grouped[null] && _.size(grouped) > 1) {
+            grouped["Ungrouped"] = grouped[null];
+            delete grouped[null];
+        }
+
+        dropdownConfig = grouped[null]
+            ? {style : "simple", options: grouped[null] }
+            : {style : "grouped", groups: _.map(grouped, (v, k) => ({groupName: k, options: v}))};
+    }
 </script>
 
 <SubSection>
@@ -157,11 +174,23 @@
                     <select id="rating-dropdown"
                             class="form-control"
                             bind:value={$form.ratingId}>
-                        {#each assessment.dropdownEntries as entry}
-                            <option value={entry.id}>
-                                {entry.name}
-                            </option>
-                        {/each}
+                        {#if dropdownConfig.style === 'simple'}
+                            {#each dropdownConfig.options as entry}
+                                <option value={entry.id}>
+                                    {entry.name}
+                                </option>
+                            {/each}
+                        {:else if dropdownConfig.style === 'grouped'}
+                            {#each dropdownConfig.groups as g}
+                                <optgroup label={g.groupName}>
+                                    {#each g.options as entry}
+                                        <option value={entry.id}>
+                                            {entry.name}
+                                        </option>
+                                    {/each}
+                                </optgroup>
+                            {/each}
+                        {/if}
                     </select>
                 </div>
 

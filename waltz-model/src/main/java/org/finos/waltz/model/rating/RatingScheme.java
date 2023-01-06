@@ -21,6 +21,7 @@ package org.finos.waltz.model.rating;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.DescriptionProvider;
+import org.finos.waltz.model.ExternalIdProvider;
 import org.finos.waltz.model.IdProvider;
 import org.finos.waltz.model.NameProvider;
 import org.immutables.value.Value;
@@ -35,7 +36,8 @@ import static org.finos.waltz.common.ListUtilities.newArrayList;
 public abstract class RatingScheme implements
         IdProvider,
         NameProvider,
-        DescriptionProvider {
+        DescriptionProvider,
+        ExternalIdProvider {
 
     @Value.Default
     public List<RatingSchemeItem> ratings() {
@@ -44,7 +46,7 @@ public abstract class RatingScheme implements
 
     private static final RatingSchemeItem dfltR = ImmutableRatingSchemeItem.builder()
             .ratingSchemeId(1)
-            .rating('R')
+            .rating("R")
             .name("dflt - Disinvest")
             .description("dflt - Disinvest")
             .color("#d62728")
@@ -54,7 +56,7 @@ public abstract class RatingScheme implements
 
     private static final RatingSchemeItem dfltA = ImmutableRatingSchemeItem.builder()
             .ratingSchemeId(1)
-            .rating('A')
+            .rating("A")
             .name("dflt - Maintain")
             .description("dflt - Maintain")
             .color("#ff7f0e")
@@ -64,7 +66,7 @@ public abstract class RatingScheme implements
 
     private static final RatingSchemeItem dfltG = ImmutableRatingSchemeItem.builder()
             .ratingSchemeId(1)
-            .rating('G')
+            .rating("G")
             .name("dflt - Invest")
             .description("dflt - Invest")
             .color("#2ca02c")
@@ -73,7 +75,7 @@ public abstract class RatingScheme implements
 
     private static final RatingSchemeItem dfltT = ImmutableRatingSchemeItem.builder()
             .ratingSchemeId(1)
-            .rating('F')
+            .rating("F")
             .name("dflt - Future")
             .description("dflt - Future")
             .color("#786aa5")
@@ -84,7 +86,7 @@ public abstract class RatingScheme implements
 
     private static final RatingSchemeItem dfltZ = ImmutableRatingSchemeItem.builder()
             .ratingSchemeId(1)
-            .rating('Z')
+            .rating("Z")
             .name("dflt - Unknown")
             .description("dflt - Unknown")
             .color("#28a1b6")
@@ -95,7 +97,7 @@ public abstract class RatingScheme implements
 
     private static final RatingSchemeItem dfltX = ImmutableRatingSchemeItem.builder()
             .ratingSchemeId(1)
-            .rating('X')
+            .rating("X")
             .name("dflt - Not Applicable")
             .description("dflt - Not Applicable")
             .color("#eee")
@@ -114,11 +116,4 @@ public abstract class RatingScheme implements
                 dfltZ);
     }
 
-    public static RatingScheme mkDflt() {
-        return ImmutableRatingScheme.builder()
-                .id(1)
-                .name("default")
-                .description("default rating scheme")
-                .build();
-    }
 }

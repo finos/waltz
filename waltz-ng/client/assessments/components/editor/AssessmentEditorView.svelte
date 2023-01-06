@@ -22,6 +22,11 @@
         </td>
         <td>
             {#if assessment.ratingItem}
+                {#if assessment.ratingItem.ratingGroup}
+                    <span class="text-muted">
+                        {assessment.ratingItem.ratingGroup} /
+                    </span>
+                {/if}
                 <RatingIndicatorCell {...assessment.ratingItem}
                                      show-name="true"/>
             {:else}

@@ -18,12 +18,12 @@
 
 package org.finos.waltz.data.rating_scheme;
 
-import org.finos.waltz.schema.Tables;
-import org.finos.waltz.schema.tables.records.RatingSchemeItemRecord;
-import org.finos.waltz.schema.tables.records.RatingSchemeRecord;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.rating.*;
+import org.finos.waltz.schema.Tables;
+import org.finos.waltz.schema.tables.records.RatingSchemeItemRecord;
+import org.finos.waltz.schema.tables.records.RatingSchemeRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,16 +31,15 @@ import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
-import static org.finos.waltz.schema.Tables.*;
-import static org.finos.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGORY;
-import static org.finos.waltz.schema.tables.RatingScheme.RATING_SCHEME;
-import static org.finos.waltz.schema.tables.RatingSchemeItem.RATING_SCHEME_ITEM;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.MapUtilities.groupBy;
-import static org.finos.waltz.common.StringUtilities.firstChar;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGORY;
+import static org.finos.waltz.schema.tables.RatingScheme.RATING_SCHEME;
+import static org.finos.waltz.schema.tables.RatingSchemeItem.RATING_SCHEME_ITEM;
 
 @Repository
 public class RatingSchemeDAO {
@@ -61,12 +60,13 @@ public class RatingSchemeDAO {
                 .id(r.getId())
                 .ratingSchemeId(r.getSchemeId())
                 .name(r.getName())
-                .rating(firstChar(r.getCode(), 'X'))
+                .rating(r.getCode())
                 .userSelectable(r.getUserSelectable())
                 .color(r.getColor())
                 .position(r.getPosition())
                 .description(r.getDescription())
-                .externalId(ofNullable(r.getExternalId()));
+                .externalId(ofNullable(r.getExternalId()))
+                .ratingGroup(r.getRatingGroup());
 
 
         if (record.field(IS_RESTRICTED_FIELD) != null){
@@ -82,6 +82,7 @@ public class RatingSchemeDAO {
                 .id(r.getId())
                 .name(r.getName())
                 .description(r.getDescription())
+                .externalId(ofNullable(r.getExternalId()))
                 .build();
 
 
@@ -186,8 +187,10 @@ public class RatingSchemeDAO {
         RatingSchemeRecord r = dsl.newRecord(RATING_SCHEME);
         r.setName(scheme.name());
         r.setDescription(scheme.description());
+        r.setExternalId(scheme.externalId().orElse(null));
 
-        return scheme.id()
+        return scheme
+            .id()
             .map(id -> {
                 r.setId(id);
                 r.changed(RATING_SCHEME.ID, false);
@@ -204,10 +207,11 @@ public class RatingSchemeDAO {
         r.setSchemeId(schemeId);
         r.setName(item.name());
         r.setDescription(item.description());
-        r.setCode(Character.toString(item.rating()));
+        r.setCode(item.rating());
         r.setColor(item.color());
         r.setPosition(item.position());
         r.setUserSelectable(item.userSelectable());
+        r.setRatingGroup(item.ratingGroup());
 
         item.externalId().ifPresent(r::setExternalId);
 

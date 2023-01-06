@@ -68,6 +68,19 @@
             Short name which describes this rating scheme item
         </div>
 
+        <!-- GROUP? -->
+        <label for="group">
+            Group
+            <small class="text-muted">(optional)</small>
+        </label>
+        <input class="form-control"
+               id="group"
+               placeholder="Optional grouping of rating item"
+               bind:value={workingCopy.ratingGroup}>
+        <div class="help-block">
+            Optional group name to categorize this rating scheme item
+        </div>
+
 
         <!-- CODE -->
         <label for="code">
@@ -79,11 +92,11 @@
                style="width: 3em"
                required="required"
                disabled={workingCopy.id}
-               maxlength="1"
+               maxlength="3"
                placeholder=""
                bind:value={workingCopy.rating}>
         <div class="help-block">
-            Single letter code to represent this rating scheme item
+            Short code (maximum of 3 chars) to represent this rating scheme item
             {#if workingCopy.id}
                 <br>
                 <Icon name="warning"/>
