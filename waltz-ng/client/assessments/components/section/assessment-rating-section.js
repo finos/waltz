@@ -67,6 +67,8 @@ function controller($q, serviceBroker) {
             .then(responses => {
                 [vm.assessmentDefinitions, vm.assessmentRatings, vm.ratingSchemes] = resolveResponses(responses);
 
+                console.log({ar: vm.assessmentRatings})
+
                 assessments.set(mkEnrichedAssessmentDefinitions(
                     vm.assessmentDefinitions,
                     vm.ratingSchemes,

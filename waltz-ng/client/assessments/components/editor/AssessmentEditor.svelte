@@ -145,7 +145,7 @@
             <Markdown text={assessment.definition.description}/>
         </p>
         <p class="help-block">
-            Cardinality: {assessment.description.cardinality}
+            Cardinality: {assessment.definition.cardinality}
         </p>
 
         <br>

@@ -110,7 +110,9 @@
         </td>
         <!-- rating -->
         <td>
-            <span ng-include="'warfl-rating-name'"></span>
+            <div ng-repeat="rating in item.ratings">
+                <span ng-include="'warfl-rating-name'"></span>
+            </div>
         </td>
     </tr>
 </script>
@@ -125,11 +127,11 @@
           popover-popup-delay="300"
           popover-class="waltz-popover-width-500"
           popover-append-to-body="true">
-        <waltz-rating-indicator-cell rating="item.ratingItem"
+        <waltz-rating-indicator-cell rating="rating.ratingItem"
                                      show-name="true">
         </waltz-rating-indicator-cell>
         <span style="position: relative; top: -4px;"
-              ng-if="item.rating.comment.length > 0">
+              ng-if="rating.rating.comment.length > 0">
             <waltz-icon name="sticky-note-o">
             </waltz-icon>
         </span>
@@ -158,17 +160,17 @@
     <div>
         <div>
             <div>
-                <strong ng-bind="item.ratingItem.name"></strong>
-                <div ng-if="item.ratingItem.description">
+                <strong ng-bind="rating.ratingItem.name"></strong>
+                <div ng-if="rating.ratingItem.description">
                     <waltz-markdown class="small"
-                                    text="item.ratingItem.description">
+                                    text="rating.ratingItem.description">
                     </waltz-markdown>
                 </div>
             </div>
             <hr class="waltz-no-margins"
-                ng-if="item.rating.comment">
+                ng-if="rating.rating.comment">
             <span class="text-muted">
-                <waltz-markdown text="item.rating.comment">
+                <waltz-markdown text="rating.rating.comment">
                 </waltz-markdown>
             </span>
         </div>
@@ -176,7 +178,7 @@
         <br>
 
         <div class="small">
-            <waltz-last-updated entity="item.rating">
+            <waltz-last-updated entity="rating.rating">
             </waltz-last-updated>
         </div>
     </div>

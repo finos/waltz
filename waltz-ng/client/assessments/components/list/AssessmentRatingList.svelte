@@ -110,7 +110,7 @@
 
     $: visibleAssessments = _.isEmpty(qry)
         ? $assessments
-        : termSearch($assessments, qry, ["definition.name", "ratingItem.name"]);
+        : termSearch($assessments, qry, ["definition.name"]);
 
     $: groupedAssessments = _
         .chain(visibleAssessments)
@@ -120,7 +120,7 @@
             const [notProvided, provided] = _
                 .chain(v)
                 .orderBy(d => d.definition.name)
-                .partition(d => d.rating == null)
+                .partition(d => _.isEmpty(d.ratings))
                 .value()
 
             return {
@@ -141,6 +141,8 @@
                 .value();
         }
     }
+
+    $: console.log({groupedAssessments, assessments: $assessments});
 
 </script>
 

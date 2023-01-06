@@ -78,7 +78,7 @@ function controller(serviceBroker) {
 
             const valuePartitioned = _.partition(
                 filtered,
-                assessment => _.isNil(assessment.rating));
+                assessment => _.isEmpty(assessment.ratings));
 
             vm.assessmentsWithoutRatings = _.sortBy(valuePartitioned[0], d => d.definition.name);
             vm.assessmentsWithRatings = _.sortBy(valuePartitioned[1], d => d.definition.name);

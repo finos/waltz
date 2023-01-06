@@ -36,6 +36,8 @@
     }
 
 
+    $: console.log({group});
+
 </script>
 
 {#each group.provided as row}
@@ -62,17 +64,23 @@
             </Tooltip>
         </td>
         <td>
-            <Tooltip content={AssessmentRatingTooltipContent}
-                     placement="left-start"
-                     props={mkRatingTooltipProps(row)}>
-                <svelte:fragment slot="target">
-                    <RatingIndicatorCell {...row.ratingItem}
-                                         show-name="true"/>
-                    {#if row.rating.comment}
-                        <Icon name="sticky-note-o"/>
-                    {/if}
-                </svelte:fragment>
-            </Tooltip>
+            <ul class="list-unstyled">
+                {#each row.ratings as rating}
+                    <li>
+                        <Tooltip content={AssessmentRatingTooltipContent}
+                                 placement="left-start"
+                                 props={mkRatingTooltipProps(rating)}>
+                            <svelte:fragment slot="target">
+                                <RatingIndicatorCell {...rating.ratingItem}
+                                                     show-name="true"/>
+                                {#if rating.rating.comment}
+                                    <Icon name="sticky-note-o"/>
+                                {/if}
+                            </svelte:fragment>
+                        </Tooltip>
+                    </li>
+                {/each}
+            </ul>
         </td>
     </tr>
 {/each}
