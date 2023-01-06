@@ -74,12 +74,6 @@
             help: "Removes this rating",
             handleAction: onRemove
         };
-        const closeAction = {
-            name: "Close",
-            icon: "times",
-            help: "Stop showing this rating",
-            handleAction: onClose
-        };
         const saveAction = {
             name: "Save",
             icon: "save",
@@ -100,6 +94,7 @@
         const canLock = permissions.includes("LOCK") && !locked && hasRating;
         const canUnlock = permissions.includes("LOCK") && locked && hasRating;
 
+        console.log({permissions});
 
         actions = _.compact([
             mode === Modes.VIEW && canLock
@@ -113,9 +108,6 @@
                 : null,
             mode === Modes.VIEW && canRemove
                 ? removeAction
-                : null,
-            mode === Modes.VIEW
-                ? closeAction
                 : null,
             mode === Modes.EDIT
                 ? saveAction
@@ -211,7 +203,26 @@
 
         {:else if mode === Modes.VIEW}
 
-            <AssessmentEditorView {assessment}/>
+            {#each assessment.ratings as rating}
+                <AssessmentEditorView {rating}
+                                      {actions}/>
+            {/each}
+
+            <div>
+                <button class="btn btn-plain"
+                        on:click={onClose}>
+                    <Icon name="times"/>
+                    Close
+                </button>
+                {#if assessment.definition.cardinality === "ZERO_MANY"}
+                    <button class="btn btn-plain"
+                            on:click={onClose}>
+                        <Icon name="pencil"/>
+                        Add
+                    </button>
+                {/if}
+            </div>
+
 
         {:else if mode === Modes.REMOVE }
             <AssessmentEditorRemovalConfirmation {assessment}
@@ -221,10 +232,10 @@
 
 
     </div>
-    <div slot="controls">
-        <div class="pull-right small">
-            <MiniActions actions={actions}/>
-        </div>
-    </div>
+    <!--    <div slot="controls">-->
+    <!--        <div class="pull-right small">-->
+    <!--            <MiniActions actions={actions}/>-->
+    <!--        </div>-->
+    <!--    </div>-->
 
 </SubSection>

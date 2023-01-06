@@ -330,7 +330,7 @@ public class AssessmentRatingDao {
 
         Field<Boolean> readOnlyRatingField = DSL.coalesce(ASSESSMENT_RATING.IS_READONLY, DSL.val(false)).as("rating_read_only");
 
-        Tuple4<Boolean, Boolean, Boolean, Boolean> hasRoleAndUserHasRoleAndDefinitionROAndIsReadOnly = dsl
+        SelectConditionStep<Record4<String, String, Boolean, Boolean>> qry = dsl
                 .select(USER_ROLE.ROLE,
                         ASSESSMENT_DEFINITION.PERMITTED_ROLE,
                         ASSESSMENT_DEFINITION.IS_READONLY,
@@ -343,7 +343,11 @@ public class AssessmentRatingDao {
                 .leftJoin(USER_ROLE)
                 .on(USER_ROLE.ROLE.eq(ASSESSMENT_DEFINITION.PERMITTED_ROLE)
                         .and(USER_ROLE.USER_NAME.eq(username)))
-                .where(ASSESSMENT_DEFINITION.ID.eq(assessmentDefinitionId))
+                .where(ASSESSMENT_DEFINITION.ID.eq(assessmentDefinitionId));
+
+        System.out.println(qry);
+
+        Tuple4<Boolean, Boolean, Boolean, Boolean> hasRoleAndUserHasRoleAndDefinitionROAndIsReadOnly = qry
                 .fetchOne(r -> tuple(
                         notEmpty(r.get(ASSESSMENT_DEFINITION.PERMITTED_ROLE)),
                         notEmpty(r.get(USER_ROLE.ROLE)),

@@ -4,64 +4,72 @@
     import Markdown from "../../../common/svelte/Markdown.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
     import {fade} from 'svelte/transition';
+    import MiniActions from "../../../common/svelte/MiniActions.svelte";
 
-    export let assessment;
+    export let rating;
+    export let actions;
 
-
-    $: console.log({assessment});
+    $: console.log({rating});
 </script>
 
 
 <table class="waltz-field-table waltz-field-table-border"
-       style="width: 100%">
+       style="width: 100%; margin-bottom: 2em">
     <colgroup>
         <col width="20%">
         <col width="60%">
     </colgroup>
+    <tbody>
     <tr>
-        <td class="text-muted"
+        <th class="text-muted"
             style="vertical-align: top">
             Rating
-        </td>
+        </th>
         <td>
-            {#if assessment.ratingItem}
-                {#if assessment.ratingItem.ratingGroup}
-                    <span class="text-muted">
-                        {assessment.ratingItem.ratingGroup} /
-                    </span>
+            {#if rating.ratingItem}
+                {#if rating.ratingItem.ratingGroup}
+                        <span class="text-muted">
+                            {rating.ratingItem.ratingGroup} /
+                        </span>
                 {/if}
-                <RatingIndicatorCell {...assessment.ratingItem}
+                <RatingIndicatorCell {...rating.ratingItem}
                                      show-name="true"/>
             {:else}
                 Not provided
             {/if}
-            {#if assessment.ratingItem?.description}
-                <span class="help-block">
-                    <Markdown text={assessment.ratingItem?.description}/>
-                </span>
+            {#if rating.ratingItem?.description}
+                    <span class="help-block">
+                        <Markdown text={rating.ratingItem?.description}/>
+                    </span>
             {/if}
         </td>
     </tr>
     <tr>
-        <td class="text-muted">Comment</td>
+        <th class="text-muted">Comment</th>
         <td>
             <Markdown inline={true}
-                      text={assessment.rating?.comment || ""}/>
+                      text={rating.rating?.comment || ""}/>
         </td>
     </tr>
-    {#if assessment.rating?.isReadOnly}
+    {#if rating.rating?.isReadOnly}
         <tr transition:fade={{ duration: 300 }}>
-            <td class="text-muted">Locked By</td>
+            <th class="text-muted">Locked By</th>
             <td>
                 <Icon name="lock"/>
-                {assessment.rating?.lastUpdatedBy}
+                {rating.rating?.lastUpdatedBy}
             </td>
         </tr>
     {/if}
     <tr>
-        <td class="text-muted">Last updated by</td>
+        <th class="text-muted">Last updated by</th>
         <td>
-            <LastEdited entity={assessment.rating}/>
+            <LastEdited entity={rating.rating}/>
         </td>
     </tr>
+    <tr>
+        <td colspan="2">
+            <MiniActions actions={actions}/>
+        </td>
+    </tr>
+    </tbody>
 </table>
