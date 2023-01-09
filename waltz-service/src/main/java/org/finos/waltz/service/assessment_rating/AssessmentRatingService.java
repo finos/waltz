@@ -290,22 +290,29 @@ public class AssessmentRatingService {
                 r -> r.id().orElse(0L));
 
         Set<ChangeLog> logs = ratingsToAdd.stream()
-                                          .map(r ->
-                                                       ImmutableChangeLog.builder()
-                                                                         .message(messagePrefix + format(
-                                                                                 " assessment %s as [%s - %s] for %s",
-                                                                                 assessmentDefinition.name(),
-                                                                                 ratingItems.get(r.ratingId()).name(),
-                                                                                 StringUtilities.ifEmpty(r.comment(),""),
-                                                                                 r.entityReference().name().orElse("")))
-                                                                         .parentReference(r.entityReference())
-                                                                         .userId(username)
-                                                                         .severity(Severity.INFORMATION)
-                                                                         .operation(operation)
-                                                                         .build())
-                                          .collect(Collectors.toSet());
+                .map(r ->
+                        ImmutableChangeLog.builder()
+                                .message(messagePrefix + format(
+                                        " assessment %s as [%s - %s] for %s",
+                                        assessmentDefinition.name(),
+                                        ratingItems.get(r.ratingId()).name(),
+                                        StringUtilities.ifEmpty(r.comment(), ""),
+                                        r.entityReference().name().orElse("")))
+                                .parentReference(r.entityReference())
+                                .userId(username)
+                                .severity(Severity.INFORMATION)
+                                .operation(operation)
+                                .build())
+                .collect(Collectors.toSet());
 
         changeLogService.write(logs);
     }
 
+    public Set<AssessmentRatingSummaryCounts> findRatingSummaryCounts(EntityKind targetKind,
+                                                                      IdSelectionOptions idSelectionOptions,
+                                                                      Set<Long> definitionIds) {
+
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, idSelectionOptions);
+        return assessmentRatingDao.findRatingSummaryCounts(genericSelector, definitionIds);
+    }
 }
