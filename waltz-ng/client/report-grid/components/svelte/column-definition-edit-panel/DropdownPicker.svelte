@@ -46,7 +46,7 @@
             </span>
         </button>
     </div>
-    <div>
+    <div style="position: absolute; z-index: 10; background-color: white">
         {#if showDropdown}
             <ul>
                 {#if selectedItem}

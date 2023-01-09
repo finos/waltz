@@ -14,9 +14,19 @@ export function mkAssessmentRatingStore() {
             null,
             {force});
 
+
+    const findSummaryCounts = (summaryRequest, targetKind, force = false) =>
+        remote
+            .fetchViewList(
+                "POST",
+                `api/assessment-rating/target-kind/${targetKind}/summary-counts`,
+                summaryRequest,
+                {force});
+
     return {
         findByDefinitionId,
-        findByEntityKind
+        findByEntityKind,
+        findSummaryCounts
     };
 }
 
