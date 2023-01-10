@@ -79,12 +79,13 @@ function prepareTree(measurables = []) {
 
 function prepareChartScale(hierarchy) {
     const maxCount = _.get(
-            _.maxBy(hierarchy, "totalCount"),
-            "totalCount") || 0;
+        _.maxBy(hierarchy, "totalCount"),
+        "totalCount") || 0;
     return scaleLinear()
         .range([0, 100])
         .domain([0, maxCount])
 }
+
 
 
 function controller() {
@@ -97,7 +98,10 @@ function controller() {
         } else {
             const matchedNodes = doSearch(termStr, vm.searchNodes);
             vm.hierarchy = prepareTree(matchedNodes);
-            vm.expandedNodes = matchedNodes;
+
+            vm.expandedNodes = determineExpandedNodes(
+                vm.hierarchy,
+                determineDepthLimit(matchedNodes.length));
         }
     };
 

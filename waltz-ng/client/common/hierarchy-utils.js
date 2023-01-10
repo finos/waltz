@@ -238,3 +238,34 @@ export function getParents(node, getParentFn = (n) => n.parent) {
 
     return result;
 }
+
+
+
+
+export function determineDepthLimit(numNodes) {
+    if (numNodes > 1000) return 1;
+    if (numNodes > 600) return 2;
+    if (numNodes > 200) return 3;
+    return 100;
+}
+
+
+export function determineExpandedNodes(hierarchy, maxDepth= 100) {
+    const shouldHalt = (n, currDepth) => _.isEmpty(n.children) || currDepth > (maxDepth - 1); // we knock 1 off as we are expanding this node, effectively giving us depth + 1
+
+    const walk = (n, currDepth = 0) => shouldHalt(n, currDepth)
+        ? []
+        : _
+            .chain(n.children)
+            .map(c => walk(c, currDepth + 1))
+            .flatten()
+            .concat([n])
+            .value();
+
+    return _
+        .chain(hierarchy)
+        .map(n => walk(n, 0))
+        .concat()
+        .flatten()
+        .value();
+}

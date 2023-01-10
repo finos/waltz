@@ -17,9 +17,9 @@
  */
 
 import _ from "lodash";
-import {initialiseData, invokeFunction} from "../../../common";
+import {initialiseData, invokeFunction} from "../../index";
 import {preventDefault, stopPropagation} from "../../browser-utils"
-import {buildHierarchies, doSearch, prepareSearchNodes} from "../../../common/hierarchy-utils";
+import {buildHierarchies, doSearch, prepareSearchNodes, determineExpandedNodes, determineDepthLimit} from "../../hierarchy-utils";
 import template from "./multi-select-tree-control.html";
 
 
@@ -156,7 +156,7 @@ function controller() {
 
         vm.expandedNodes = termStr.length === 0
             ? expandSelectedNodes(vm.items, vm.expandedItemIds)
-            : matchingNodes;
+            : determineExpandedNodes(vm.hierarchy, determineDepthLimit(matchingNodes.length));
     };
 
     vm.clearSearch = () => {
