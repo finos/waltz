@@ -28,7 +28,7 @@ const bindings = {
     onClick: "<?",
     onCheck: "<",
     onUncheck: "<",
-    orderByExpression: '@?',
+    orderByExpression: "@?",
     checkedItemIds: "<",
     expandedItemIds: "<",
     disablePredicate: "<?",
@@ -155,8 +155,10 @@ function controller() {
         vm.hierarchy = buildHierarchies(matchingNodes, false);
 
         vm.expandedNodes = termStr.length === 0
-            ? expandSelectedNodes(vm.items, vm.expandedItemIds)
-            : determineExpandedNodes(vm.hierarchy, determineDepthLimit(matchingNodes.length));
+            ? expandSelectedNodes(vm.items, vm.expandedItemIds) // reset tree to 'normal' state
+            : determineExpandedNodes(  // expand results, taking precautions to not expand too many nodes
+                m.hierarchy,
+                determineDepthLimit(matchingNodes.length));
     };
 
     vm.clearSearch = () => {
