@@ -17,7 +17,9 @@
         assessments,
         ratingSchemes,
         selectedAssessmentId,
-        primaryEntityReference
+        primaryEntityReference,
+        detailPanelActiveMode,
+        Modes
     } from "../rating-editor/rating-store";
 
 
@@ -62,6 +64,7 @@
 
 
     function selectAssessment(evt) {
+        $detailPanelActiveMode = Modes.LIST
         $selectedAssessmentId = evt.detail.definition.id;
     }
 

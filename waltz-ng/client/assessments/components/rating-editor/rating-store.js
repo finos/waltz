@@ -2,6 +2,13 @@ import {derived, writable} from "svelte/store";
 import {mkEnrichedAssessmentDefinitions} from "../../assessment-utils";
 import _ from "lodash";
 
+export const Modes = {
+    LIST: "LIST",
+    EDIT: "EDIT",
+    REMOVE: "REMOVE",
+    ADD: "ADD"
+}
+
 export const selectedAssessmentId = writable(null);
 export const primaryEntityReference = writable(null);
 export const selectedRatingId = writable(null);
@@ -9,6 +16,7 @@ export const assessmentRatings = writable([]);
 export const assessmentDefinitions = writable([]);
 export const ratingSchemes = writable([]);
 export const permissions = writable([]);
+export const detailPanelActiveMode = writable(Modes.LIST);
 
 export const permissionsByRatingId = derived(
     [permissions],

@@ -5,6 +5,8 @@
     import {assessmentRatings, primaryEntityReference, selectedAssessment} from "./rating-store";
     import {assessmentRatingStore} from "../../../svelte-stores/assessment-rating-store";
     import Icon from "../../../common/svelte/Icon.svelte";
+    import toasts from "../../../svelte-stores/toast-store";
+    import {displayError} from "../../../common/error-utils";
 
     let dropdownConfig;
     let assessmentRatingCall;
@@ -24,7 +26,9 @@
                 assessmentRatingCall = assessmentRatingStore.findForEntityReference($primaryEntityReference, true);
                 return $assessmentRatings = $assessmentRatingCall?.data;
             })
-            .then(onCancel);
+            .then(onCancel)
+            .then(() => toasts.success("Successfully added rating"))
+            .catch(e => displayError("Failed to add rating", e));
     }
 
     $: {

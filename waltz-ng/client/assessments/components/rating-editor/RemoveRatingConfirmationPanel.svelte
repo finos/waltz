@@ -4,6 +4,8 @@
     import {assessmentRatings, primaryEntityReference, selectedAssessment, selectedRating} from "./rating-store";
     import RatingIndicatorCell from "../../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
+    import toasts from "../../../svelte-stores/toast-store";
+    import {displayError} from "../../../common/error-utils";
 
     export let onCancel;
 
@@ -17,7 +19,9 @@
                 assessmentRatingCall = assessmentRatingStore.findForEntityReference($primaryEntityReference, true);
                 return $assessmentRatings = $assessmentRatingCall?.data;
             })
-            .then(onCancel);
+            .then(onCancel)
+            .then(() => toasts.success("Successfully removed rating"))
+            .catch(e => displayError("Failed to remove rating", e));
     }
 
 </script>

@@ -7,18 +7,18 @@
     import RatingEditView from "./RatingDetailView.svelte";
     import RemoveRatingConfirmationPanel from "./RemoveRatingConfirmationPanel.svelte";
     import RatingAddView from "./RatingAddView.svelte";
-    import {permissions, primaryEntityReference, selectedAssessment} from "./rating-store";
+    import {
+        permissions,
+        primaryEntityReference,
+        selectedAssessment,
+        detailPanelActiveMode,
+        Modes
+    } from "./rating-store";
     import {assessmentRatingStore} from "../../../svelte-stores/assessment-rating-store";
     import NoData from "../../../common/svelte/NoData.svelte";
     import {cardinality} from "../../../common/services/enums/cardinality";
     import _ from "lodash";
 
-    const Modes = {
-        LIST: "LIST",
-        EDIT: "EDIT",
-        REMOVE: "REMOVE",
-        ADD: "ADD"
-    }
 
     let permissionsCall;
 
@@ -30,7 +30,6 @@
 
     $: $permissions = $permissionsCall?.data;
 
-    let activeMode = Modes.LIST;
 
 </script>
 
@@ -62,16 +61,16 @@
 
             <hr>
 
-            {#if activeMode === Modes.LIST}
-                <RatingListView onEdit={() => activeMode = Modes.EDIT}
-                                onAdd={() => activeMode = Modes.ADD}/>
-            {:else if activeMode === Modes.EDIT}
-                <RatingEditView onCancel={() => activeMode = Modes.LIST}
-                                onRemove={() => activeMode = Modes.REMOVE}/>
-            {:else if activeMode === Modes.ADD}
-                <RatingAddView onCancel={() => activeMode = Modes.LIST}/>
-            {:else if activeMode === Modes.REMOVE}
-                <RemoveRatingConfirmationPanel onCancel={() => activeMode = Modes.LIST}/>
+            {#if $detailPanelActiveMode === Modes.LIST}
+                <RatingListView onEdit={() => $detailPanelActiveMode = Modes.EDIT}
+                                onAdd={() => $detailPanelActiveMode = Modes.ADD}/>
+            {:else if $detailPanelActiveMode === Modes.EDIT}
+                <RatingEditView onCancel={() => $detailPanelActiveMode = Modes.LIST}
+                                onRemove={() => $detailPanelActiveMode = Modes.REMOVE}/>
+            {:else if $detailPanelActiveMode === Modes.ADD}
+                <RatingAddView onCancel={() => $detailPanelActiveMode = Modes.LIST}/>
+            {:else if $detailPanelActiveMode === Modes.REMOVE}
+                <RemoveRatingConfirmationPanel onCancel={() => $detailPanelActiveMode = Modes.LIST}/>
             {/if}
         </div>
     </SubSection>

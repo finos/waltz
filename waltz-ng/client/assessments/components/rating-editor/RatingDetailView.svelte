@@ -15,6 +15,8 @@
     import LastEdited from "../../../common/svelte/LastEdited.svelte";
     import TextEditableField from "../../../common/svelte/TextEditableField.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
+    import toasts from "../../../svelte-stores/toast-store";
+    import {displayError} from "../../../common/error-utils";
 
     export let onCancel;
     export let onRemove;
@@ -62,7 +64,9 @@
             .then(() => {
                 assessmentRatingCall = assessmentRatingStore.findForEntityReference($primaryEntityReference, true);
                 $assessmentRatings = $assessmentRatingCall?.data;
-            });
+            })
+            .then(() => toasts.success("Successfully locked rating"))
+            .catch(e => displayError("Failed to lock rating", e));
     }
 
     function onUnlock() {
@@ -71,7 +75,9 @@
             .then(() => {
                 assessmentRatingCall = assessmentRatingStore.findForEntityReference($primaryEntityReference, true);
                 $assessmentRatings = $assessmentRatingCall?.data;
-            });
+            })
+            .then(() => toasts.success("Successfully unlocked rating"))
+            .catch(e => displayError("Failed to unlock rating", e));
     }
 
     function saveComment(comment) {
@@ -81,7 +87,9 @@
                 assessmentRatingCall = assessmentRatingStore.findForEntityReference($primaryEntityReference, true);
                 $assessmentRatings = $assessmentRatingCall?.data;
                 rating.comment = comment;
-            });
+            })
+            .then(() => toasts.success("Successfully updated comment"))
+            .catch(e => displayError("Failed to update comment", e));
     }
 
 </script>
