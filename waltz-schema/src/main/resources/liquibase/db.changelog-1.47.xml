@@ -137,6 +137,14 @@
         </createIndex>
     </changeSet>
 
+    <changeSet id="20230109-6360-53"
+               author="woodjes">
+        <comment>6360: drop default value of measurable rating</comment>
+        <dropDefaultValue columnDataType="${rag.type}"
+                          columnName="rating"
+                          tableName="measurable_rating"/>
+    </changeSet>
+
     <changeSet id="20230105-6360-55"
                author="davidwatkins73">
         <comment>6360: increase size of measurable_rating rating column</comment>

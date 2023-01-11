@@ -2,10 +2,10 @@
     import Icon from "./Icon.svelte";
 </script>
 
-<h3 class="text-muted">
+<h4 class="text-muted">
     <Icon name="circle-o-notch"
           spin="true"/>
     <slot>
-        Loading ...
+        Saving ...
     </slot>
-</h3>
+</h4>

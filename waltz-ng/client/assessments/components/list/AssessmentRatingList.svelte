@@ -6,9 +6,19 @@
     import {createStores} from "./assessment-rating-store";
     import AssessmentRatingListGroup from "./AssessmentRatingListGroup.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
-    import {assessments} from "../section/assessment-rating-section";
     import SearchInput from "../../../common/svelte/SearchInput.svelte";
     import {termSearch} from "../../../common";
+    import {assessmentDefinitionStore} from "../../../svelte-stores/assessment-definition";
+    import {assessmentRatingStore} from "../../../svelte-stores/assessment-rating";
+    import {ratingSchemeStore} from "../../../svelte-stores/rating-schemes";
+    import {
+        assessmentDefinitions,
+        assessmentRatings,
+        assessments,
+        ratingSchemes,
+        selectedAssessmentId,
+        primaryEntityReference
+    } from "../rating-editor/rating-store";
 
 
     let elem;
@@ -24,13 +34,25 @@
     let qry;
     let groupedAssessments;
 
-    export let primaryEntityRef = [];
-    export let onSelect = (d) => console.log("selected", d);
-
     onMount(() => {
         userPreferenceCall = userPreferenceStore.findAllForUser();
     });
 
+    let assessmentDefinitionCall;
+    let assessmentRatingCall;
+    let ratingSchemesCall;
+
+    $: {
+        if ($primaryEntityReference) {
+            assessmentDefinitionCall = assessmentDefinitionStore.findByEntityReference($primaryEntityReference);
+            assessmentRatingCall = assessmentRatingStore.findForEntityReference($primaryEntityReference, true);
+            ratingSchemesCall = ratingSchemeStore.loadAll();
+        }
+    }
+
+    $: $assessmentDefinitions = $assessmentDefinitionCall?.data;
+    $: $assessmentRatings = $assessmentRatingCall?.data;
+    $: $ratingSchemes = $ratingSchemesCall?.data;
 
     function toggleGroup(group) {
         expansions = _.includes(expansions, group.groupName)
@@ -40,7 +62,7 @@
 
 
     function selectAssessment(evt) {
-        onSelect(evt.detail);
+        $selectedAssessmentId = evt.detail.definition.id;
     }
 
 
@@ -69,8 +91,8 @@
 
 
     $: {
-        if (primaryEntityRef) {
-            stores = createStores(primaryEntityRef);
+        if ($primaryEntityReference) {
+            stores = createStores($primaryEntityReference);
             defaultPrimaryList = stores.defaultPrimaryList;
             favouriteIncludedIds = stores.favouriteIncludedIds;
             favouriteExcludedIds = stores.favouriteExcludedIds;
@@ -141,8 +163,6 @@
                 .value();
         }
     }
-
-    $: console.log({groupedAssessments, assessments: $assessments});
 
 </script>
 

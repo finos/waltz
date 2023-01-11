@@ -21,7 +21,6 @@ package org.finos.waltz.web.endpoints.api;
 
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
-import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.UserTimestamp;
 import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.assessment_rating.*;
@@ -42,6 +41,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.StringUtilities.mkSafe;
 import static org.finos.waltz.web.WebUtilities.*;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 
@@ -82,8 +82,10 @@ public class AssessmentRatingEndpoint implements Endpoint {
         String findByDefinitionPath = mkPath(BASE_URL, "definition-id", ":assessmentDefinitionId");
         String findByTargetKindForRelatedSelectorPath = mkPath(BASE_URL, "target-kind", ":targetKind", "selector");
         String modifyPath = mkPath(BASE_URL, "entity", ":kind", ":id", ":assessmentDefinitionId");
-        String lockPath = mkPath(BASE_URL, "entity", ":kind", ":id", ":assessmentDefinitionId", "lock");
-        String unlockPath = mkPath(BASE_URL, "entity", ":kind", ":id", ":assessmentDefinitionId", "unlock");
+        String updatePath = mkPath(BASE_URL, "id", ":id");
+        String removePath = mkPath(BASE_URL, "entity", ":kind", ":id", ":assessmentDefinitionId", ":ratingId");
+        String lockPath = mkPath(BASE_URL, "entity", ":kind", ":id", ":assessmentDefinitionId", ":ratingId", "lock");
+        String unlockPath = mkPath(BASE_URL, "entity", ":kind", ":id", ":assessmentDefinitionId", ":ratingId", "unlock");
         String findRatingPermissionsPath = mkPath(BASE_URL, "entity", ":kind", ":id", ":assessmentDefinitionId", "permissions");
         String bulkUpdatePath = mkPath(BASE_URL, "bulk-update", ":assessmentDefinitionId");
         String bulkRemovePath = mkPath(BASE_URL, "bulk-remove", ":assessmentDefinitionId");
@@ -96,17 +98,20 @@ public class AssessmentRatingEndpoint implements Endpoint {
         postForDatum(bulkUpdatePath, this::bulkStoreRoute);
         postForDatum(bulkRemovePath, this::bulkRemoveRoute);
         postForDatum(modifyPath, this::storeRoute);
+        postForDatum(updatePath, this::updateRoute);
         putForDatum(lockPath, this::lockRoute);
         putForDatum(unlockPath, this::unlockRoute);
-        deleteForDatum(modifyPath, this::removeRoute);
+        deleteForDatum(removePath, this::removeRoute);
     }
 
 
-    private Set<Operation> findRatingPermissionsRoute(Request request, Response response) {
-        return assessmentRatingService.findRatingPermissions(
-                getEntityReference(request),
-                getLong(request, "assessmentDefinitionId"),
-                getUsername(request));
+    private Set<AssessmentRatingOperations> findRatingPermissionsRoute(Request request, Response response) {
+        return assessmentRatingService
+                .getRatingPermissions(
+                        getEntityReference(request),
+                        getLong(request, "assessmentDefinitionId"),
+                        getUsername(request))
+                .ratingOperations();
     }
 
 
@@ -138,6 +143,7 @@ public class AssessmentRatingEndpoint implements Endpoint {
         return assessmentRatingService.lock(
                 getEntityReference(request),
                 getLong(request, "assessmentDefinitionId"),
+                getLong(request, "ratingId"),
                 getUsername(request));
     }
 
@@ -146,6 +152,7 @@ public class AssessmentRatingEndpoint implements Endpoint {
         return assessmentRatingService.unlock(
                 getEntityReference(request),
                 getLong(request, "assessmentDefinitionId"),
+                getLong(request, "ratingId"),
                 getUsername(request));
     }
 
@@ -153,6 +160,12 @@ public class AssessmentRatingEndpoint implements Endpoint {
     private boolean storeRoute(Request request, Response z) throws IOException, InsufficientPrivelegeException {
         SaveAssessmentRatingCommand command = mkCommand(request);
         return assessmentRatingService.store(command, getUsername(request));
+    }
+
+
+    private boolean updateRoute(Request request, Response z) throws IOException, InsufficientPrivelegeException {
+        String comment = readComment(request);
+        return assessmentRatingService.update(getId(request), comment, getUsername(request));
     }
 
 
@@ -178,6 +191,7 @@ public class AssessmentRatingEndpoint implements Endpoint {
         RemoveAssessmentRatingCommand command = ImmutableRemoveAssessmentRatingCommand.builder()
                 .entityReference(getEntityReference(request))
                 .assessmentDefinitionId(getLong(request, "assessmentDefinitionId"))
+                .ratingId(getLong(request, "ratingId"))
                 .lastUpdatedAt(lastUpdate.at())
                 .lastUpdatedBy(lastUpdate.by())
                 .build();
@@ -196,11 +210,16 @@ public class AssessmentRatingEndpoint implements Endpoint {
                 .entityReference(getEntityReference(request))
                 .assessmentDefinitionId(getLong(request, "assessmentDefinitionId"))
                 .ratingId(Long.parseLong(body.getOrDefault("ratingId", "").toString()))
-                .comment(StringUtilities.mkSafe((String) body.get("comment")))
+                .comment(mkSafe((String) body.get("comment")))
                 .lastUpdatedAt(lastUpdate.at())
                 .lastUpdatedBy(lastUpdate.by())
                 .provenance("waltz")
                 .build();
+    }
+
+    private String readComment(Request request) throws IOException {
+        Map<String, Object> body = readBody(request, Map.class);
+        return mkSafe((String) body.get("comment"));
     }
 
 

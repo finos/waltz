@@ -20,9 +20,7 @@
 <div class="row">
 
     <div class="col-sm-6">
-        <waltz-svelte-component component="$ctrl.AssessmentRatingList"
-                                primary-entity-ref="$ctrl.parentEntityRef"
-                                on-select="$ctrl.onSelect">
+        <waltz-svelte-component component="$ctrl.AssessmentRatingList">
         </waltz-svelte-component>
         <p class="help-block"
            style="padding-top: 1em">
@@ -35,21 +33,7 @@
         </p>
     </div>
     <div class="col-sm-6">
-        <div class="text-muted"
-             ng-if="$ctrl.assessments.length > 0 && !$ctrl.selectedAssessment">
-            <waltz-icon name="info-circle"></waltz-icon>
-            Select a rating for more information or to edit
-        </div>
-        <div ng-if="$ctrl.selectedAssessment">
-            <waltz-svelte-component component="$ctrl.AssessmentEditor"
-                                    assessment="$ctrl.selectedAssessment"
-                                    on-close="$ctrl.onClose"
-                                    do-remove="$ctrl.onRemove"
-                                    do-save="$ctrl.onSave"
-                                    do-lock="$ctrl.onLock"
-                                    do-unlock="$ctrl.onUnlock"
-                                    permissions="$ctrl.permissions">
-            </waltz-svelte-component>
-        </div>
+        <waltz-svelte-component component="$ctrl.AssessmentRatingEditor">
+        </waltz-svelte-component>
     </div>
 </div>

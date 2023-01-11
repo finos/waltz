@@ -6,16 +6,14 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.assessment_definition.AssessmentVisibility;
+import org.finos.waltz.model.assessment_rating.AssessmentDefinitionRatingOperations;
 import org.finos.waltz.schema.tables.records.InvolvementGroupRecord;
 import org.finos.waltz.schema.tables.records.PermissionGroupRecord;
 import org.finos.waltz.service.permission.permission_checker.AssessmentRatingPermissionChecker;
 import org.finos.waltz.test_common.helpers.*;
-import org.jooq.DSLContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Set;
 
 import static java.util.Collections.emptySet;
 import static org.finos.waltz.model.EntityReference.mkRef;
@@ -70,12 +68,12 @@ public class AssessmentRatingPermissionCheckerTest extends BaseInMemoryIntegrati
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> assessmentRatingPermissionChecker.findRatingPermissions(null, defnId, u1),
+                () -> assessmentRatingPermissionChecker.getRatingPermissions(null, defnId, u1),
                 "entity reference cannot be null");
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> assessmentRatingPermissionChecker.findRatingPermissions(appA, defnId, null),
+                () -> assessmentRatingPermissionChecker.getRatingPermissions(appA, defnId, null),
                 "username cannot be null");
 
 
@@ -85,7 +83,7 @@ public class AssessmentRatingPermissionCheckerTest extends BaseInMemoryIntegrati
         PermissionGroupRecord pg = permissionHelper.createGroup(stem);
         permissionHelper.setupPermissionGroupEntry(appA, pg.getId());
 
-        Set<Operation> noPermissionsConfigured = assessmentRatingPermissionChecker.findRatingPermissions(appA, defnId, u1);
+        AssessmentDefinitionRatingOperations noPermissionsConfigured = assessmentRatingPermissionChecker.getRatingPermissions(appA, defnId, u1);
         assertEquals(emptySet(), noPermissionsConfigured, "If no permission group involvement returns no permissions");
 
         involvementHelper.createInvolvement(u1Id, privKind, appA);
@@ -97,8 +95,8 @@ public class AssessmentRatingPermissionCheckerTest extends BaseInMemoryIntegrati
                 Operation.ADD,
                 mkRef(EntityKind.ASSESSMENT_DEFINITION, defnId));
 
-        Set<Operation> hasOneOfEditablePermissions = assessmentRatingPermissionChecker.findRatingPermissions(appA, defnId, u1);
-        assertEquals(SetUtilities.asSet(Operation.ADD), hasOneOfEditablePermissions, "If has given permission then returns operations for which have the required involvement");
+        AssessmentDefinitionRatingOperations hasOneOfEditablePermissions = assessmentRatingPermissionChecker.getRatingPermissions(appA, defnId, u1);
+        assertEquals(SetUtilities.asSet(Operation.ADD), hasOneOfEditablePermissions.findDefault(), "If has given permission then returns operations for which have the required involvement");
 
         long unprivKind = involvementHelper.mkInvolvementKind(mkName(stem, "unprivileged"));
         InvolvementGroupRecord ig2 = permissionHelper.setupInvolvementGroup(unprivKind, stem);
@@ -110,53 +108,53 @@ public class AssessmentRatingPermissionCheckerTest extends BaseInMemoryIntegrati
                 Operation.REMOVE,
                 mkRef(EntityKind.ASSESSMENT_DEFINITION, defnId));
 
-        Set<Operation> noPermsWhereNoInvKind = assessmentRatingPermissionChecker.findRatingPermissions(appA, defnId, u1);
-        assertEquals(SetUtilities.asSet(Operation.ADD), noPermsWhereNoInvKind, "Doesn't return perms for operations where user lacks the required inv kind");
+        AssessmentDefinitionRatingOperations noPermsWhereNoInvKind = assessmentRatingPermissionChecker.getRatingPermissions(appA, defnId, u1);
+        assertEquals(SetUtilities.asSet(Operation.ADD), noPermsWhereNoInvKind.findDefault(), "Doesn't return perms for operations where user lacks the required inv kind");
 
         EntityReference appB = appHelper.createNewApp(mkName(stem, "appB"), ouIds.b);
 
-        Set<Operation> hasNoInvolvementWithApplication = assessmentRatingPermissionChecker.findRatingPermissions(appB, defnId, u1);
+        AssessmentDefinitionRatingOperations hasNoInvolvementWithApplication = assessmentRatingPermissionChecker.getRatingPermissions(appB, defnId, u1);
         assertEquals(
                 emptySet(),
-                hasNoInvolvementWithApplication,
+                hasNoInvolvementWithApplication.findDefault(),
                 "User only has permissions on applications they have an involvement with");
 
         userHelper.createUserWithRoles(u1, adminRoleName);
 
-        Set<Operation> hasOverrideRoleForCategory = assessmentRatingPermissionChecker.findRatingPermissions(appA, defnId, u1);
+        AssessmentDefinitionRatingOperations hasOverrideRoleForCategory = assessmentRatingPermissionChecker.getRatingPermissions(appA, defnId, u1);
         assertEquals(
                 SetUtilities.asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE),
-                hasOverrideRoleForCategory,
+                hasOverrideRoleForCategory.findDefault(),
                 "Returns all edit perms where user has the override role on the category");
 
-        Set<Operation> overRideRoleGivesAllEditPermsOnAnyApp = assessmentRatingPermissionChecker.findRatingPermissions(appB, defnId, u1);
+        AssessmentDefinitionRatingOperations overRideRoleGivesAllEditPermsOnAnyApp = assessmentRatingPermissionChecker.getRatingPermissions(appB, defnId, u1);
         assertEquals(
                 SetUtilities.asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE),
-                overRideRoleGivesAllEditPermsOnAnyApp,
+                overRideRoleGivesAllEditPermsOnAnyApp.findDefault(),
                 "Override role provides edit permissions on all applications");
 
         long defnId2 = assessmentHelper.createDefinition(schemeId, mkName(stem, "assessment permission checker"), null, AssessmentVisibility.PRIMARY, null);
 
-        Set<Operation> definitionsWithNullPermittedRoleShouldBeEditableByAnyone = assessmentRatingPermissionChecker.findRatingPermissions(appB, defnId2, u1);
+        AssessmentDefinitionRatingOperations definitionsWithNullPermittedRoleShouldBeEditableByAnyone = assessmentRatingPermissionChecker.getRatingPermissions(appB, defnId2, u1);
         assertEquals(
                 SetUtilities.asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE),
-                definitionsWithNullPermittedRoleShouldBeEditableByAnyone,
+                definitionsWithNullPermittedRoleShouldBeEditableByAnyone.findDefault(),
                 "Assessments with a null permitted role should be editable by everyone");
 
         long defnId3 = assessmentHelper.createDefinition(schemeId, mkName(stem, "assessment permission checker"), differentRoleName, AssessmentVisibility.PRIMARY, null);
 
-        Set<Operation> permissionsAdhereToQualifier = assessmentRatingPermissionChecker.findRatingPermissions(appA, defnId3, u1);
+        AssessmentDefinitionRatingOperations permissionsAdhereToQualifier = assessmentRatingPermissionChecker.getRatingPermissions(appA, defnId3, u1);
         assertEquals(
                 emptySet(),
-                permissionsAdhereToQualifier,
+                permissionsAdhereToQualifier.findDefault(),
                 "Permissions should adhere to the qualifier, having permissions on one definition does not necessarily provide permission on another");
 
         long defnId4 = assessmentHelper.createDefinition(schemeId, mkName(stem, "assessment permission checker"), adminRoleName, AssessmentVisibility.PRIMARY, null);
 
-        Set<Operation> overrideProvidesAccessEvenWhereNoEntryInPermissionsTable = assessmentRatingPermissionChecker.findRatingPermissions(appB, defnId4, u1);
+        AssessmentDefinitionRatingOperations overrideProvidesAccessEvenWhereNoEntryInPermissionsTable = assessmentRatingPermissionChecker.getRatingPermissions(appB, defnId4, u1);
         assertEquals(
                 SetUtilities.asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE),
-                overrideProvidesAccessEvenWhereNoEntryInPermissionsTable,
+                overrideProvidesAccessEvenWhereNoEntryInPermissionsTable.findDefault(),
                 "Override should provide edit right even where no entry in permissions table");
     }
 
@@ -186,11 +184,11 @@ public class AssessmentRatingPermissionCheckerTest extends BaseInMemoryIntegrati
                 Operation.ADD,
                 mkRef(EntityKind.ASSESSMENT_DEFINITION, defnId));
 
-        Set<Operation> nullInvolvementGroupGivesAllPermissionsForOperation = assessmentRatingPermissionChecker.findRatingPermissions(appA, defnId, u1);
+        AssessmentDefinitionRatingOperations nullInvolvementGroupGivesAllPermissionsForOperation = assessmentRatingPermissionChecker.getRatingPermissions(appA, defnId, u1);
 
         assertEquals(
                 SetUtilities.asSet(Operation.ADD),
-                nullInvolvementGroupGivesAllPermissionsForOperation,
+                nullInvolvementGroupGivesAllPermissionsForOperation.findDefault(),
                 "Null involvement group id gives everyone permissions without needing override but only for described operations");
     }
 
@@ -208,11 +206,11 @@ public class AssessmentRatingPermissionCheckerTest extends BaseInMemoryIntegrati
         ratingSchemeHelper.saveRatingItem(schemeId, "Invest", 3, "green", 'G');
         long defnId = assessmentHelper.createDefinition(schemeId, mkName(stem, "assessment permission checker"), null, AssessmentVisibility.PRIMARY, null);
 
-        Set<Operation> nullPermittedRoleGivesAllPermissions = assessmentRatingPermissionChecker.findRatingPermissions(appA, defnId, u1);
+        AssessmentDefinitionRatingOperations nullPermittedRoleGivesAllPermissions = assessmentRatingPermissionChecker.getRatingPermissions(appA, defnId, u1);
 
         assertEquals(
                 SetUtilities.asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE),
-                nullPermittedRoleGivesAllPermissions,
+                nullPermittedRoleGivesAllPermissions.findDefault(),
                 "Null permitted role gives everyone permissions without needing override or required involvement");
     }
 
@@ -231,11 +229,11 @@ public class AssessmentRatingPermissionCheckerTest extends BaseInMemoryIntegrati
         long defnId = assessmentHelper.createDefinition(schemeId, mkName(stem, "assessment permission checker"), null, AssessmentVisibility.PRIMARY, null);
         assessmentHelper.updateDefinitionReadOnly(defnId);
 
-        Set<Operation> readOnlyDefinition = assessmentRatingPermissionChecker.findRatingPermissions(appA, defnId, u1);
+        AssessmentDefinitionRatingOperations readOnlyDefinition = assessmentRatingPermissionChecker.getRatingPermissions(appA, defnId, u1);
 
         assertEquals(
                 emptySet(),
-                readOnlyDefinition,
+                readOnlyDefinition.findDefault(),
                 "Read only definition should not allow ratings to be edited");
     }
 
@@ -255,11 +253,11 @@ public class AssessmentRatingPermissionCheckerTest extends BaseInMemoryIntegrati
         assessmentHelper.createAssessment(defnId, appA, r1);
         assessmentHelper.updateRatingReadOnly(appA, defnId);
 
-        Set<Operation> readOnlyRating = assessmentRatingPermissionChecker.findRatingPermissions(appA, defnId, u1);
+        AssessmentDefinitionRatingOperations readOnlyRating = assessmentRatingPermissionChecker.getRatingPermissions(appA, defnId, u1);
 
         assertEquals(
                 emptySet(),
-                readOnlyRating,
+                readOnlyRating.findForRatingId(r1),
                 "Read only rating should not be editable");
     }
 

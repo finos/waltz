@@ -38,8 +38,6 @@ export function mkEnrichedAssessmentDefinitions(definitions = [],
     const schemesByIdByRatingId = indexRatingSchemes(schemes);
     const assessmentsByDefinitionId = _.groupBy(assessments, "assessmentDefinitionId");
 
-    console.log({assessmentsByDefinitionId});
-
     return _
         .chain(definitions)
         .map(definition => {
@@ -52,12 +50,14 @@ export function mkEnrichedAssessmentDefinitions(definitions = [],
                 ratingItem: _.get(scheme, `ratingsById[${d.ratingId}]`)
             }));
 
-            const dropdownEntries = _.map(
-                scheme.ratings,
-                r => Object.assign(
-                    {},
-                    r,
-                    {code: r.id}));
+            const dropdownEntries = scheme
+                ? _.map(
+                    scheme.ratings,
+                    r => Object.assign(
+                        {},
+                        r,
+                        {code: r.id}))
+                : [];
 
             return {
                 definition,

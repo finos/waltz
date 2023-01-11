@@ -35,9 +35,6 @@
         }
     }
 
-
-    $: console.log({group});
-
 </script>
 
 {#each group.provided as row}
@@ -72,7 +69,7 @@
                                  props={mkRatingTooltipProps(rating)}>
                             <svelte:fragment slot="target">
                                 <RatingIndicatorCell {...rating.ratingItem}
-                                                     show-name="true"/>
+                                                     showName="true"/>
                                 {#if rating.rating.comment}
                                     <Icon name="sticky-note-o"/>
                                 {/if}
