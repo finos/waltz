@@ -238,3 +238,55 @@ export function getParents(node, getParentFn = (n) => n.parent) {
 
     return result;
 }
+
+
+/**
+ * A naive approach to limiting the depth/number of nodes to draw in a tree.
+ * If the number of nodes is too high performance suffers.  Limiting the
+ * expanded tree depth helps keep the rendered node count down.
+ *
+ * The values were determined by simple experimentation.
+ *
+ * @param numNodes
+ * @returns {number}
+ */
+export function determineDepthLimit(numNodes) {
+    if (numNodes > 1000) return 1;
+    if (numNodes > 600) return 2;
+    if (numNodes > 200) return 3;
+    return 100;
+}
+
+
+/**
+ * Takes a hierarchy and a max depth and returns the set of nodes needed
+ * to fully expand the tree.
+ *
+ * - leaf nodes are not included as they do not need to be expanded
+ * - we optionally limit the depth of the tree to (hopefully) prevent large numbers of nodes
+ *
+ * @param hierarchy
+ * @param maxDepth
+ * @returns {*}
+ */
+export function determineExpandedNodes(hierarchy, maxDepth= 100) {
+    const shouldHalt = (n, currDepth) =>
+        _.isEmpty(n.children) // we don't care about leaf nodes, they don't need expanding
+        || currDepth > (maxDepth - 1); // we knock 1 off as we are expanding this node, effectively giving us depth + 1
+
+    const walk = (n, currDepth = 0) => shouldHalt(n, currDepth)
+        ? []
+        : _
+            .chain(n.children)
+            .map(c => walk(c, currDepth + 1)) // recurse
+            .flatten()
+            .concat([n])
+            .value();
+
+    return _
+        .chain(hierarchy)   // do the walk for each tree in the forest
+        .map(n => walk(n, 0))
+        .concat()
+        .flatten()
+        .value();
+}
