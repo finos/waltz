@@ -27,4 +27,6 @@ public abstract class AssessmentRatingCommand implements Command, LastUpdatedPro
     public abstract EntityReference entityReference();
 
     public abstract long assessmentDefinitionId();
+
+    public abstract long ratingId();
 }
