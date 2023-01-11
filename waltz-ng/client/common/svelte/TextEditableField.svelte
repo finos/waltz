@@ -28,12 +28,9 @@
     }
 
     function save() {
-
         activeMode = Modes.SAVING;
 
         savePromise = onSave(workingText);
-
-        console.log({savePromise});
 
         savePromise
             .then(() => activeMode = Modes.VIEW);
