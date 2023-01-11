@@ -8,7 +8,7 @@
     import RemoveRatingConfirmationPanel from "./RemoveRatingConfirmationPanel.svelte";
     import RatingAddView from "./RatingAddView.svelte";
     import {permissions, primaryEntityReference, selectedAssessment} from "./rating-store";
-    import {assessmentRatingStore} from "../../../svelte-stores/assessment-rating";
+    import {assessmentRatingStore} from "../../../svelte-stores/assessment-rating-store";
     import NoData from "../../../common/svelte/NoData.svelte";
     import {cardinality} from "../../../common/services/enums/cardinality";
     import _ from "lodash";

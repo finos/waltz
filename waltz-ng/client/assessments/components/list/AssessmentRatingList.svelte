@@ -9,7 +9,7 @@
     import SearchInput from "../../../common/svelte/SearchInput.svelte";
     import {termSearch} from "../../../common";
     import {assessmentDefinitionStore} from "../../../svelte-stores/assessment-definition";
-    import {assessmentRatingStore} from "../../../svelte-stores/assessment-rating";
+    import {assessmentRatingStore} from "../../../svelte-stores/assessment-rating-store";
     import {ratingSchemeStore} from "../../../svelte-stores/rating-schemes";
     import {
         assessmentDefinitions,

@@ -9,7 +9,7 @@
         selectedAssessment,
         selectedRating
     } from "./rating-store";
-    import {assessmentRatingStore} from "../../../svelte-stores/assessment-rating";
+    import {assessmentRatingStore} from "../../../svelte-stores/assessment-rating-store";
     import _ from "lodash";
     import RatingIndicatorCell from "../../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
     import LastEdited from "../../../common/svelte/LastEdited.svelte";

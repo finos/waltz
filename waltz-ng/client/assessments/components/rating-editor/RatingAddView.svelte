@@ -3,7 +3,7 @@
 
     import _ from "lodash";
     import {assessmentRatings, primaryEntityReference, selectedAssessment} from "./rating-store";
-    import {assessmentRatingStore} from "../../../svelte-stores/assessment-rating";
+    import {assessmentRatingStore} from "../../../svelte-stores/assessment-rating-store";
     import Icon from "../../../common/svelte/Icon.svelte";
 
     let dropdownConfig;

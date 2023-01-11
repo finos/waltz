@@ -1,6 +1,6 @@
 <script>
 
-    import {assessmentRatingStore} from "../../../svelte-stores/assessment-rating";
+    import {assessmentRatingStore} from "../../../svelte-stores/assessment-rating-store";
     import {assessmentRatings, primaryEntityReference, selectedAssessment, selectedRating} from "./rating-store";
     import RatingIndicatorCell from "../../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
