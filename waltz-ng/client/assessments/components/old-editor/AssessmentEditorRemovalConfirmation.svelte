@@ -1,7 +1,11 @@
 <script>
     export let assessment;
+    export let selectedRating;
     export let doRemove;
     export let onCancel;
+
+    $: console.log({assessment, selectedRating});
+
 </script>
 
 <div class="removal-warning">
@@ -10,7 +14,7 @@
 
     <div>
         <b>{assessment.definition.name}</b>
-        <p>{assessment.ratingItem.name}</p>
+        <p>{selectedRating.name}</p>
     </div>
 
     <button class="btn btn-warning"

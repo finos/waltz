@@ -9,13 +9,14 @@
     export let rating;
     export let actions;
 
-    $: console.log({rating});
+    $: console.log({rating, actions});
 </script>
 
 
 <table class="waltz-field-table waltz-field-table-border"
        style="width: 100%; margin-bottom: 2em">
     <colgroup>
+        <col width="20%">
         <col width="20%">
         <col width="60%">
     </colgroup>
@@ -68,7 +69,7 @@
     </tr>
     <tr>
         <td colspan="2">
-            <MiniActions actions={actions}/>
+            <MiniActions {actions}/>
         </td>
     </tr>
     </tbody>

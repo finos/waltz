@@ -8,9 +8,11 @@
     import _ from "lodash";
     import toasts from "../../../svelte-stores/toast-store";
     import AssessmentEditorRemovalConfirmation from "./AssessmentEditorRemovalConfirmation.svelte";
+    import {PermissionActions, Modes} from "./assessment-editor-utils";
+    import NoData from "../../../common/svelte/NoData.svelte";
 
     export let assessment;
-    export let permissions = [];
+    export let permissions;
 
     export let doRemove;
     export let doSave;
@@ -18,104 +20,51 @@
     export let doUnlock;
     export let onClose;
 
-    const Modes = {
-        VIEW: Symbol("VIEW"),
-        REMOVE: Symbol("REMOVE"),
-        EDIT: Symbol("EDIT")
-    };
 
     const form = writable(Object.assign({}, assessment.rating));
 
     let mode = Modes.VIEW;
     let actions = [];
     let dropdownConfig;
+    let selectedRating
 
     function onEdit() {
         $form = Object.assign({}, assessment.rating);
         mode = Modes.EDIT;
     }
 
+
+    $: permissionsByRatingId = _.keyBy($permissions, d => d.ratingId);
+    $: defaultPermission = _.get($permissions, d => d.isDefault);
+
+    let permissionActions;
+
+    $: {
+
+        if(doLock && doUnlock && onEdit && onRemove && onSave && onCancel) {
+            console.log("create")
+            permissionActions = new PermissionActions(doLock, doUnlock, onEdit, onRemove, onSave, onCancel, $permissions, assessment);
+            console.log("done", {permissionActions});
+        }
+    }
+
+
+    $: console.log({permissionActions, permissions: $permissions, assessment});
+
     function onCancel() {
         mode = Modes.VIEW;
     }
 
     function onSave() {
-        doSave(assessment.definition.id, $form.ratingId, $form.comment)
+        console.log({form: $form});
+        doSave(assessment.definition.id, $form.rating.id, $form.comment)
             .catch(e => toasts.error("Could not update assessment: " + e.error))
             .finally(onCancel);
     }
 
-    function onRemove() {
+    function onRemove(ratingId) {
         mode = Modes.REMOVE;
-    }
-
-    $: {
-        const unlockAction = {
-            name: "Unlock",
-            icon: "unlock-alt",
-            help: "Removes the lock from this assessment, allowing users with edit permissions to update/remove",
-            handleAction: () => doUnlock(assessment.definition.id)
-        };
-        const lockAction = {
-            name: "Lock",
-            icon: "lock",
-            help: "Removes the lock from this assessment, preventing users from making updates or removing",
-            handleAction: () => doLock(assessment.definition.id)
-        };
-        const editAction = {
-            name: "Edit",
-            icon: "edit",
-            help: "Update this rating",
-            handleAction: onEdit
-        };
-        const removeAction = {
-            name: "Remove",
-            icon: "trash",
-            help: "Removes this rating",
-            handleAction: onRemove
-        };
-        const saveAction = {
-            name: "Save",
-            icon: "save",
-            help: "Persist this rating",
-            handleAction: onSave
-        };
-        const cancelAction = {
-            name: "Cancel",
-            icon: "times",
-            handleAction: onCancel
-        };
-
-        const locked = _.get(assessment, ["rating", "isReadOnly"], false);
-        const hasRating = assessment.rating !== null;
-
-        const canEdit = (permissions.includes("UPDATE") || permissions.includes("ADD")) && !locked;
-        const canRemove = permissions.includes("REMOVE") && hasRating && !locked;
-        const canLock = permissions.includes("LOCK") && !locked && hasRating;
-        const canUnlock = permissions.includes("LOCK") && locked && hasRating;
-
-        console.log({permissions});
-
-        actions = _.compact([
-            mode === Modes.VIEW && canLock
-                ? lockAction
-                : null,
-            mode === Modes.VIEW && canUnlock
-                ? unlockAction
-                : null,
-            mode === Modes.VIEW && canEdit
-                ? editAction
-                : null,
-            mode === Modes.VIEW && canRemove
-                ? removeAction
-                : null,
-            mode === Modes.EDIT
-                ? saveAction
-                : null,
-            mode === Modes.EDIT || mode === Modes.REMOVE
-                ? cancelAction
-                : null,
-        ]);
+        selectedRating = ratingId;
     }
 
     $: {
@@ -134,6 +83,7 @@
             ? {style : "simple", options: grouped[null] }
             : {style : "grouped", groups: _.map(grouped, (v, k) => ({groupName: k, options: v}))};
     }
+
 </script>
 
 <SubSection>
@@ -168,10 +118,10 @@
                     </label>
                     <select id="rating-dropdown"
                             class="form-control"
-                            bind:value={$form.ratingId}>
+                            bind:value={$form.rating}>
                         {#if dropdownConfig.style === 'simple'}
                             {#each dropdownConfig.options as entry}
-                                <option value={entry.id}>
+                                <option value={entry}>
                                     {entry.name}
                                 </option>
                             {/each}
@@ -179,7 +129,7 @@
                             {#each dropdownConfig.groups as g}
                                 <optgroup label={g.groupName}>
                                     {#each g.options as entry}
-                                        <option value={entry.id}>
+                                        <option value={entry}>
                                             {entry.name}
                                         </option>
                                     {/each}
@@ -199,13 +149,18 @@
                               placeholder="This comment supports markdown"
                               bind:value={$form.comment}></textarea>
                 </div>
+
+
+                <MiniActions actions={permissionActions.determineActions(mode, $form.rating)}/>
             </form>
 
         {:else if mode === Modes.VIEW}
 
             {#each assessment.ratings as rating}
                 <AssessmentEditorView {rating}
-                                      {actions}/>
+                                      actions={permissionActions.determineActions(mode, rating)}/>
+            {:else}
+                <NoData>There are no ratings for this assessment</NoData>
             {/each}
 
             <div>
@@ -226,16 +181,11 @@
 
         {:else if mode === Modes.REMOVE }
             <AssessmentEditorRemovalConfirmation {assessment}
+                                                 {selectedRating}
                                                  {onCancel}
-                                                 doRemove={() => doRemove(assessment.definition.id)}/>
+                                                 doRemove={() => doRemove(assessment.definition.id, selectedRating.id)}/>
         {/if}
 
-
     </div>
-    <!--    <div slot="controls">-->
-    <!--        <div class="pull-right small">-->
-    <!--            <MiniActions actions={actions}/>-->
-    <!--        </div>-->
-    <!--    </div>-->
 
 </SubSection>
