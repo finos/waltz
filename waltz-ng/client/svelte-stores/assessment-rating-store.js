@@ -1,5 +1,4 @@
 import {remote} from "./remote";
-import {checkIsEntityRef} from "../common/checks";
 
 
 export function mkAssessmentRatingStore() {
@@ -58,6 +57,14 @@ export function mkAssessmentRatingStore() {
             `api/assessment-rating/id/${id}`,
             {comment});
 
+    const findSummaryCounts = (summaryRequest, targetKind, force = false) =>
+        remote
+            .fetchViewList(
+                "POST",
+                `api/assessment-rating/target-kind/${targetKind}/summary-counts`,
+                summaryRequest,
+                {force});
+
     return {
         findByDefinitionId,
         findForEntityReference,
@@ -67,7 +74,8 @@ export function mkAssessmentRatingStore() {
         remove,
         lock,
         unlock,
-        update
+        update,
+        findSummaryCounts
     };
 }
 

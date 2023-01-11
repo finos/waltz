@@ -359,4 +359,12 @@ public class AssessmentRatingService {
 
         changeLogService.write(asSet(log));
     }
+
+    public Set<AssessmentRatingSummaryCounts> findRatingSummaryCounts(EntityKind targetKind,
+                                                                      IdSelectionOptions idSelectionOptions,
+                                                                      Set<Long> definitionIds) {
+
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, idSelectionOptions);
+        return assessmentRatingDao.findRatingSummaryCounts(genericSelector, definitionIds);
+    }
 }

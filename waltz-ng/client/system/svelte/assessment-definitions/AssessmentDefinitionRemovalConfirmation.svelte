@@ -1,7 +1,7 @@
 <script>
     import Icon from "../../../common/svelte/Icon.svelte";
 
-    import {assessmentRatingStore} from "../../../svelte-stores/assessment-rating";
+    import {assessmentRatingStore} from "../../../svelte-stores/assessment-rating-store";
     import {selectedDefinition} from "./assessment-definition-utils";
 
     export let doCancel;

@@ -109,11 +109,41 @@ export function mkChunks(entries = [], chunkSize) {
 }
 
 
-export function reverse(array = []){
+export function reverse(array = []) {
     const newArray = _.clone(array);
     return newArray.reverse();
 }
 
 export function coalesce(...xss) {
     return _.find(xss, xs => !_.isEmpty(xs));
+}
+
+/**
+ * returns the index of the previous item in the list.
+ * If the current index is the first item then will cycle back to last item in the list.
+ * @param list
+ * @param currentIndex
+ * @returns {number}
+ */
+export function determineIndexOfPreviousItemInList(list, currentIndex) {
+    if (currentIndex === 0) {
+        return _.size(list) - 1;
+    } else {
+        return currentIndex - 1;
+    }
+}
+
+/**
+ * returns the index of the next item in the list.
+ * If the current index is the final item then will cycle back to first item in the list.
+ * @param list
+ * @param currentIndex
+ * @returns {number}
+ */
+export function determineIndexOfNextItemInList(list, currentIndex) {
+    if (currentIndex === _.size(list) - 1) {
+        return 0;
+    } else {
+        return currentIndex + 1;
+    }
 }

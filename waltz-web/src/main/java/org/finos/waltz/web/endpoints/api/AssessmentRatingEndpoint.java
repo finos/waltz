@@ -19,8 +19,8 @@
 package org.finos.waltz.web.endpoints.api;
 
 
-import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
+import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.UserTimestamp;
 import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.assessment_rating.*;
@@ -81,6 +81,7 @@ public class AssessmentRatingEndpoint implements Endpoint {
         String findByEntityKindPath = mkPath(BASE_URL, "entity-kind", ":kind");
         String findByDefinitionPath = mkPath(BASE_URL, "definition-id", ":assessmentDefinitionId");
         String findByTargetKindForRelatedSelectorPath = mkPath(BASE_URL, "target-kind", ":targetKind", "selector");
+        String findSummaryCountsPath = mkPath(BASE_URL, "target-kind", ":targetKind", "summary-counts");
         String modifyPath = mkPath(BASE_URL, "entity", ":kind", ":id", ":assessmentDefinitionId");
         String updatePath = mkPath(BASE_URL, "id", ":id");
         String removePath = mkPath(BASE_URL, "entity", ":kind", ":id", ":assessmentDefinitionId", ":ratingId");
@@ -93,6 +94,7 @@ public class AssessmentRatingEndpoint implements Endpoint {
         getForList(findForEntityPath, this::findForEntityRoute);
         getForList(findByEntityKindPath, this::findByEntityKindRoute);
         getForList(findByDefinitionPath, this::findByDefinitionIdRoute);
+        postForList(findSummaryCountsPath, this::findSummaryCountsRoute);
         getForList(findRatingPermissionsPath, this::findRatingPermissionsRoute);
         postForList(findByTargetKindForRelatedSelectorPath, this::findByTargetKindForRelatedSelectorRoute);
         postForDatum(bulkUpdatePath, this::bulkStoreRoute);
@@ -136,6 +138,17 @@ public class AssessmentRatingEndpoint implements Endpoint {
     private List<AssessmentRating> findByDefinitionIdRoute(Request request, Response response) {
         long assessmentDefinitionId = getLong(request, "assessmentDefinitionId");
         return assessmentRatingService.findByDefinitionId(assessmentDefinitionId);
+    }
+
+
+    private Set<AssessmentRatingSummaryCounts> findSummaryCountsRoute(Request request, Response response) throws IOException {
+        SummaryCountRequest summaryCountRequest = readBody(request, SummaryCountRequest.class);
+        EntityKind targetKind = getKind(request, "targetKind");
+        return assessmentRatingService
+                .findRatingSummaryCounts(
+                        targetKind,
+                        summaryCountRequest.idSelectionOptions(),
+                        summaryCountRequest.definitionIds());
     }
 
 
