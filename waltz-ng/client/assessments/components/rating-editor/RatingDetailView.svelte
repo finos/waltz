@@ -88,7 +88,42 @@
 
 <h4>Rating Detail:</h4>
 
+<div style="padding: 1em 0">
+
+    {#if canLock}
+        <button class="btn btn-skinny"
+                on:click={onLock}>
+            <Icon name="lock"/>
+            Lock
+        </button>
+    {/if}
+
+    {#if canUnlock}
+        <button class="btn btn-skinny"
+                on:click={onUnlock}>
+            <Icon name="unlock"/>
+            Unlock
+        </button>
+    {/if}
+
+    {#if canRemove}
+        <button class="btn btn-skinny"
+                on:click={onRemove}>
+            <Icon name="trash"/>
+            Remove
+        </button>
+    {/if}
+
+    <button class="btn btn-skinny"
+            on:click={onCancel}>
+        <Icon name="times"/>
+        Cancel
+    </button>
+
+</div>
+
 {#if $selectedRating}
+
     <div class="form-group">
         <label for="rating">
             Rating
@@ -129,32 +164,4 @@
         </div>
     {/if}
 
-    {#if canLock}
-        <button class="btn btn-skinny"
-                on:click={onLock}>
-            <Icon name="lock"/>
-            Lock
-        </button>
-    {/if}
-
-    {#if canUnlock}
-        <button class="btn btn-skinny"
-                on:click={onUnlock}>
-            <Icon name="unlock"/>
-            Unlock
-        </button>
-    {/if}
-
-    {#if canRemove}
-        <button class="btn btn-skinny"
-                on:click={onRemove}>
-            <Icon name="trash"/>
-            Remove
-        </button>
-    {/if}
 {/if}
-<button class="btn btn-skinny"
-        on:click={onCancel}>
-    <Icon name="times"/>
-    Cancel
-</button>
