@@ -210,7 +210,8 @@
     <changeSet id="20230105-6359-50"
                author="davidwatkins73">
         <comment>6359: update assessment definition comments</comment>
-        <setColumnRemarks tableName="assessment_definition" columnName="cardinality" remarks="indicates the number of permitted ratings per entity, One of: ZERO_ONE, ZERO_MANY"/>
+        <setColumnRemarks tableName="assessment_definition" columnName="cardinality"
+                          remarks="indicates the number of permitted ratings per entity, One of: ZERO_ONE, ZERO_MANY"/>
     </changeSet>
 
     <changeSet id="20230105-6359-60"
@@ -218,4 +219,264 @@
         <comment>6359: update assessment rating comments</comment>
         <setColumnRemarks tableName="assessment_rating" columnName="id" remarks="auto generated identifier"/>
     </changeSet>
+
+
+    <!-- 6368 Legal Entities -->
+
+    <changeSet id="20230112-6368-10"
+               author="woodjes">
+        <comment>6368: create legal_entity table</comment>
+        <createTable tableName="legal_entity">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="legal_entity_pkey"/>
+            </column>
+            <column name="name"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="external_id"
+                    type="${external-id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated_by"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="entity_lifecycle_status"
+                    type="${enum.type}"
+                    defaultValue="ACTIVE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="provenance"
+                    type="${provenance.type}"
+                    defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20230112-6368-20"
+               author="woodjes">
+        <comment>6368: create legal_entity_relationship_kind table</comment>
+        <createTable tableName="legal_entity_relationship_kind">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="legal_entity_rel_kind_pkey"/>
+            </column>
+            <column name="name"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="target_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cardinality"
+                    type="${enum.type}"
+                    defaultValue="ZERO_ONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="required_role"
+                    type="${enum.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="external_id"
+                    type="${external-id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated_by"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="provenance"
+                    type="${provenance.type}"
+                    defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20230112-6368-30"
+               author="woodjes">
+        <comment>6368: create legal_entity_relationship table</comment>
+        <createTable tableName="legal_entity_relationship">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="legal_entity_relationship_pkey"/>
+            </column>
+            <column name="legal_entity_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="relationship_kind_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="target_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="target_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="external_id"
+                    type="${external-id.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="last_updated_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated_by"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="provenance"
+                    type="${provenance.type}"
+                    defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_readonly"
+                    type="boolean"
+                    defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet id="20230112-6368-40"
+               author="woodjes">
+        <comment>6368: create fk from legal_entity_relationship to legal_entity table</comment>
+        <addForeignKeyConstraint baseColumnNames="legal_entity_id"
+                                 baseTableName="legal_entity_relationship"
+                                 constraintName="legal_entity_rel_legal_entity_id_fkey"
+                                 onDelete="CASCADE"
+                                 referencedColumnNames="id"
+                                 referencedTableName="legal_entity"/>
+    </changeSet>
+
+
+    <changeSet id="20230112-6368-50"
+               author="woodjes">
+        <comment>6368: create fk from legal_entity_relationship to legal_entity_relationship_kind table</comment>
+        <addForeignKeyConstraint baseColumnNames="relationship_kind_id"
+                                 baseTableName="legal_entity_relationship"
+                                 constraintName="legal_entity_rel_rel_kind_id_fkey"
+                                 onDelete="CASCADE"
+                                 referencedColumnNames="id"
+                                 referencedTableName="legal_entity_relationship_kind"/>
+    </changeSet>
+
+
+    <changeSet id="20230112-6368-60"
+               author="woodjes">
+        <comment>6368: document legal_entity</comment>
+        <setTableRemarks tableName="legal_entity"
+                         remarks="used to represent an individual, company, or organization that has legal rights and obligations"/>
+        <setColumnRemarks tableName="legal_entity" columnName="id" remarks="autogenerated identifier"/>
+        <setColumnRemarks tableName="legal_entity" columnName="name" remarks="display name for the legal entity"/>
+        <setColumnRemarks tableName="legal_entity" columnName="description"
+                          remarks="longer description of the legal entity"/>
+        <setColumnRemarks tableName="legal_entity" columnName="external_id"
+                          remarks="external identifier for this legal entity"/>
+        <setColumnRemarks tableName="legal_entity" columnName="provenance"
+                          remarks="where did this legal entity originate, will be 'waltz' if provided via the UI"/>
+        <setColumnRemarks tableName="legal_entity" columnName="last_updated_at"
+                          remarks="when this legal entity record was last updated"/>
+        <setColumnRemarks tableName="legal_entity" columnName="last_updated_by"
+                          remarks="user responsible for the last update to this legal entity record"/>
+    </changeSet>
+
+
+    <changeSet id="20230112-6368-70"
+               author="woodjes">
+        <comment>6368: document legal_entity_relationship_kind</comment>
+        <setTableRemarks tableName="legal_entity_relationship_kind"
+                         remarks="describes the type of relationship between a legal entity and a target entity kind"/>
+        <setColumnRemarks tableName="legal_entity_relationship_kind" columnName="id"
+                          remarks="autogenerated identifier"/>
+        <setColumnRemarks tableName="legal_entity_relationship_kind" columnName="name"
+                          remarks="display name for the legal entity relationship kind"/>
+        <setColumnRemarks tableName="legal_entity_relationship_kind" columnName="description"
+                          remarks="longer description of the legal entity relationship kind"/>
+        <setColumnRemarks tableName="legal_entity_relationship_kind" columnName="external_id"
+                          remarks="external identifier for this legal entity relationship kind"/>
+        <setColumnRemarks tableName="legal_entity_relationship_kind" columnName="provenance"
+                          remarks="where did this legal entity relationship kind originate, will be 'waltz' if provided via the UI"/>
+        <setColumnRemarks tableName="legal_entity_relationship_kind" columnName="target_kind"
+                          remarks="the kind of entity that a legal entity can have this kind of relationship with"/>
+        <setColumnRemarks tableName="legal_entity_relationship_kind" columnName="cardinality"
+                          remarks="the number of relationships that can be supported between a legal entity and the target kind. Can be one of 'ZERO_ONE' (default) or 'ZERO_MANY"/>
+        <setColumnRemarks tableName="legal_entity_relationship_kind" columnName="required_role"
+                          remarks="the permitted role a user must have to make edits to relationships of this kind. If left blank no permitted role is required"/>
+        <setColumnRemarks tableName="legal_entity_relationship_kind" columnName="last_updated_at"
+                          remarks="when this legal entity relationship kind record was last updated"/>
+        <setColumnRemarks tableName="legal_entity_relationship_kind" columnName="last_updated_by"
+                          remarks="user responsible for the last update to this legal entity relationship kind record"/>
+    </changeSet>
+
+
+    <changeSet id="20230112-6368-80"
+               author="woodjes">
+        <comment>6368: document legal_entity_relationship</comment>
+        <setTableRemarks tableName="legal_entity_relationship"
+                         remarks="the relationship between a legal entity and target entity"/>
+        <setColumnRemarks tableName="legal_entity_relationship" columnName="id" remarks="autogenerated identifier"/>
+        <setColumnRemarks tableName="legal_entity_relationship" columnName="legal_entity_id"
+                          remarks="the identifier of the legal entity involved in the relationship"/>
+        <setColumnRemarks tableName="legal_entity_relationship" columnName="relationship_kind_id"
+                          remarks="the type of relationship between the legal entity and the target"/>
+        <setColumnRemarks tableName="legal_entity_relationship" columnName="target_kind"
+                          remarks="the kind of entity that a legal entity has been related to"/>
+        <setColumnRemarks tableName="legal_entity_relationship" columnName="target_id"
+                          remarks="the if of the entity that a legal entity has been related to"/>
+        <setColumnRemarks tableName="legal_entity_relationship" columnName="description"
+                          remarks="longer description of this legal entity relationship"/>
+        <setColumnRemarks tableName="legal_entity_relationship" columnName="external_id"
+                          remarks="external identifier for this legal entity relationship"/>
+        <setColumnRemarks tableName="legal_entity_relationship" columnName="provenance"
+                          remarks="where did this legal entity relationship originate, will be 'waltz' if provided via the UI"/>
+        <setColumnRemarks tableName="legal_entity_relationship" columnName="last_updated_at"
+                          remarks="when this legal entity relationship kind record was last updated"/>
+        <setColumnRemarks tableName="legal_entity_relationship" columnName="last_updated_by"
+                          remarks="user responsible for the last update to this legal entity relationship kind record"/>
+        <setColumnRemarks tableName="legal_entity_relationship" columnName="is_readonly"
+                          remarks="can this record be removed/edited by users (e.g. set to true if externally mastered)"/>
+    </changeSet>
+
 </databaseChangeLog>
