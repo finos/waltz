@@ -4,8 +4,6 @@
     export let actions = []; // { name: "", icon: "", handleAction: (ctx) => {}, description?: "" }
     export let ctx = null;
 
-    $: console.log({actions});
-
 </script>
 
 
