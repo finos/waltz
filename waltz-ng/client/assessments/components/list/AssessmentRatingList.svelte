@@ -3,7 +3,10 @@
     import _ from "lodash";
     import {userPreferenceStore} from "../../../svelte-stores/user-preference-store";
     import {onMount} from "svelte";
-    import {createStores} from "./assessment-rating-store";
+    import {
+        assessmentStores,
+        createStores,
+    } from "./assessment-rating-store";
     import AssessmentRatingListGroup from "./AssessmentRatingListGroup.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
     import SearchInput from "../../../common/svelte/SearchInput.svelte";
@@ -94,14 +97,15 @@
 
 
     $: {
-        if ($primaryEntityReference) {
-            stores = createStores($primaryEntityReference);
-            defaultPrimaryList = stores.defaultPrimaryList;
-            favouriteIncludedIds = stores.favouriteIncludedIds;
-            favouriteExcludedIds = stores.favouriteExcludedIds;
-            favouriteIds = stores.favouriteIds;
-            setFromPreferences = stores.setFromPreferences;
+        if ($primaryEntityReference && _.isNil($assessmentStores)) {
+            $assessmentStores = createStores($primaryEntityReference.kind);
         }
+
+        defaultPrimaryList = $assessmentStores?.defaultPrimaryList;
+        favouriteIncludedIds = $assessmentStores?.favouriteIncludedIds;
+        favouriteExcludedIds = $assessmentStores?.favouriteExcludedIds;
+        favouriteIds = $assessmentStores?.favouriteIds;
+        setFromPreferences = $assessmentStores?.setFromPreferences;
     }
 
 
@@ -114,14 +118,14 @@
 
 
     $: {
-        if (userPreferences && stores) {
-            setFromPreferences(userPreferences)
+        if (userPreferences && $assessmentStores) {
+            $assessmentStores.setFromPreferences(userPreferences);
         }
     }
 
 
     $: {
-        if(stores) {
+        if ($assessmentStores) {
             expansions = _
                 .chain($assessments)
                 .filter(d => _.includes($favouriteIncludedIds, d.definition.id)
@@ -156,16 +160,6 @@
         })
         .orderBy([d => d.groupName === "Uncategorized", d => d.groupName])
         .value();
-
-    $: {
-        if (stores) {
-            $defaultPrimaryList = _
-                .chain($assessments)
-                .filter(a => a.definition.visibility === "PRIMARY")
-                .map(r => r.definition.id)
-                .value();
-        }
-    }
 
 </script>
 
