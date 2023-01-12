@@ -17,9 +17,9 @@
  */
 
 import _ from "lodash";
-import {initialiseData, invokeFunction} from "../../../common";
+import {initialiseData, invokeFunction} from "../../index";
 import {preventDefault, stopPropagation} from "../../browser-utils"
-import {buildHierarchies, doSearch, prepareSearchNodes} from "../../../common/hierarchy-utils";
+import {buildHierarchies, doSearch, prepareSearchNodes, determineExpandedNodes, determineDepthLimit} from "../../hierarchy-utils";
 import template from "./multi-select-tree-control.html";
 
 
@@ -28,7 +28,7 @@ const bindings = {
     onClick: "<?",
     onCheck: "<",
     onUncheck: "<",
-    orderByExpression: '@?',
+    orderByExpression: "@?",
     checkedItemIds: "<",
     expandedItemIds: "<",
     disablePredicate: "<?",
@@ -155,8 +155,10 @@ function controller() {
         vm.hierarchy = buildHierarchies(matchingNodes, false);
 
         vm.expandedNodes = termStr.length === 0
-            ? expandSelectedNodes(vm.items, vm.expandedItemIds)
-            : matchingNodes;
+            ? expandSelectedNodes(vm.items, vm.expandedItemIds) // reset tree to 'normal' state
+            : determineExpandedNodes(  // expand results, taking precautions to not expand too many nodes
+                m.hierarchy,
+                determineDepthLimit(matchingNodes.length));
     };
 
     vm.clearSearch = () => {
