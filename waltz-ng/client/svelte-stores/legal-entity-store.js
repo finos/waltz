@@ -24,7 +24,6 @@ export function mkLegalEntityStore() {
     const base = "api/legal-entity";
 
     const getById = (id, force = false) => {
-        console.log("getById");
         return remote
             .fetchViewDatum("GET", `${base}/id/${id}`, null, {force});
     };

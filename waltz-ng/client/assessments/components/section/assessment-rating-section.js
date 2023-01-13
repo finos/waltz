@@ -19,11 +19,7 @@
 import {initialiseData} from "../../../common";
 
 import template from "./assessment-rating-section.html";
-import {CORE_API} from "../../../common/services/core-api-utils";
-import {displayError} from "../../../common/error-utils";
-import toasts from "../../../svelte-stores/toast-store";
 import AssessmentRatingList from "../list/AssessmentRatingList.svelte";
-import {writable} from "svelte/store";
 import AssessmentRatingEditor from "../rating-editor/AssessmentRatingEditor.svelte";
 import {primaryEntityReference} from "../rating-editor/rating-store";
 
@@ -42,7 +38,7 @@ function controller() {
 
     const vm = initialiseData(this, initialState);
 
-    vm.$onInit = () => {
+    vm.$onChanges = () => {
         primaryEntityReference.set(vm.parentEntityRef);
     };
 }
