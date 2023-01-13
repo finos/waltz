@@ -1,5 +1,6 @@
 package org.finos.waltz.data.legal_entity;
 
+import org.finos.waltz.model.Cardinality;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.legal_entity.ImmutableLegalEntityRelationshipKind;
 import org.finos.waltz.model.legal_entity.LegalEntityRelationshipKind;
@@ -27,7 +28,7 @@ public class LegalEntityRelationshipKindDao {
                 .name(record.getName())
                 .description(record.getDescription())
                 .targetKind(EntityKind.valueOf(record.getTargetKind()))
-                .cardinality(record.getCardinality())
+                .cardinality(Cardinality.valueOf(record.getCardinality()))
                 .requiredRole(record.getRequiredRole())
                 .externalId(record.getExternalId())
                 .lastUpdatedAt(toLocalDateTime(record.getLastUpdatedAt()))

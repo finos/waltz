@@ -46,8 +46,8 @@ public abstract class LegalEntityRelationshipKind implements
     public abstract String requiredRole();
 
     @Value.Default
-    public String cardinality() {
-        return "ZERO_ONE";
+    public Cardinality cardinality() {
+        return Cardinality.ZERO_ONE;
     }
 
     ;
