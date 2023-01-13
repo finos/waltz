@@ -36,31 +36,36 @@ export function mkEnrichedAssessmentDefinitions(definitions = [],
                                                 schemes = [],
                                                 assessments = []) {
     const schemesByIdByRatingId = indexRatingSchemes(schemes);
-    const assessmentsByDefinitionId = _.keyBy(assessments, "assessmentDefinitionId");
+    const assessmentsByDefinitionId = _.groupBy(assessments, "assessmentDefinitionId");
 
     return _
         .chain(definitions)
         .map(definition => {
             const scheme = _.get(schemesByIdByRatingId, `[${definition.ratingSchemeId}]`);
-            const assessment = _.get(assessmentsByDefinitionId, `[${definition.id}]`, null);
-            const ratingSchemeItem = assessment != null
-                ? _.get(scheme, `ratingsById[${assessment.ratingId}]`)
-                : null;
 
-            const dropdownEntries = _.map(
-                scheme.ratings,
-                r => Object.assign(
-                    {},
-                    r,
-                    { code: r.id }));
+            const assessments = _.get(assessmentsByDefinitionId, `[${definition.id}]`, []);
+
+            const ratings = _.map(assessments, d => ({
+                rating: d,
+                ratingItem: _.get(scheme, `ratingsById[${d.ratingId}]`)
+            }));
+
+            const dropdownEntries = scheme
+                ? _.map(
+                    scheme.ratings,
+                    r => Object.assign(
+                        {},
+                        r,
+                        {code: r.id}))
+                : [];
 
             return {
                 definition,
-                rating: assessment,
-                ratingItem: ratingSchemeItem,
-                dropdownEntries };
+                ratings,
+                dropdownEntries
+            };
         })
-        .orderBy("name")
+        .orderBy(d => d.definition.name)
         .value();
 }
 

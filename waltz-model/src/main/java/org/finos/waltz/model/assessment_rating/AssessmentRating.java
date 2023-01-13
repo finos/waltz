@@ -31,9 +31,12 @@ public abstract class AssessmentRating implements
         CommentProvider,
         LastUpdatedProvider,
         ProvenanceProvider,
-        IsReadOnlyProvider {
+        IsReadOnlyProvider,
+        IdProvider {
 
     public abstract EntityReference entityReference();
+
     public abstract long assessmentDefinitionId();
+
     public abstract long ratingId();
 }

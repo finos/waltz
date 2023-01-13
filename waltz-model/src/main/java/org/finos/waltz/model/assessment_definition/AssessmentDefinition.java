@@ -58,4 +58,9 @@ public abstract class AssessmentDefinition implements
     }
 
     public abstract Optional<EntityReference> qualifierReference();
+
+    @Value.Default
+    public Cardinality cardinality() {
+        return Cardinality.ZERO_ONE;
+    }
 }

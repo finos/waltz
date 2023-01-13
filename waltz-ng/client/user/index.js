@@ -40,9 +40,8 @@ export const favouriteAssessmentDefinitionIdsKey = "main.app-view.assessment-rat
 export const lastViewedAssessmentInfoTileKey = "main.group-views.assessment-info-tile.lastViewedDefinition";
 export const lastViewedFlowTabKey = "main.app-view.data-flows.lastTab";
 
-export function mkAssessmentDefinitionsIdsBaseKey(entityReference) {
-    checkIsEntityRef(entityReference);
-    return `${favouriteAssessmentDefinitionIdsKey}.${_.camelCase(entityReference.kind)}`;
+export function mkAssessmentDefinitionsIdsBaseKey(entityKind) {
+    return `${favouriteAssessmentDefinitionIdsKey}.${_.camelCase(entityKind)}`;
 }
 
 export default () => {

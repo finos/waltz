@@ -20,6 +20,7 @@ package org.finos.waltz.data.assessment_definition;
 
 
 import org.finos.waltz.common.StringUtilities;
+import org.finos.waltz.model.Cardinality;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
@@ -70,6 +71,7 @@ public class AssessmentDefinitionDao {
                         record,
                         ASSESSMENT_DEFINITION.QUALIFIER_KIND,
                         ASSESSMENT_DEFINITION.QUALIFIER_ID))
+                .cardinality(Cardinality.valueOf(record.getCardinality()))
                 .build();
     };
 
@@ -141,6 +143,8 @@ public class AssessmentDefinitionDao {
         r.setLastUpdatedBy(def.lastUpdatedBy());
         r.setProvenance(StringUtilities.ifEmpty(def.provenance(), "waltz"));
         r.setDefinitionGroup(def.definitionGroup());
+
+        r.setCardinality(def.cardinality().name());
 
         def.qualifierReference()
                 .ifPresent(qualifier -> {

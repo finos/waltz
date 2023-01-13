@@ -4,14 +4,16 @@ import {mkAssessmentDefinitionsIdsBaseKey} from "../../../user";
 import {userPreferenceStore} from "../../../svelte-stores/user-preference-store";
 import {getIdsFromString} from "../../assessment-utils";
 
+export const assessmentStores = writable(null);
+
 function writePreference(key, definitionIds) {
     const userPreference = {key, value: definitionIds.toString()};
     userPreferenceStore.saveForUser(userPreference);
 }
 
-export function createStores(primaryEntityRef) {
+export function createStores(entityKind) {
 
-    const baseKey = mkAssessmentDefinitionsIdsBaseKey(primaryEntityRef);
+    const baseKey = mkAssessmentDefinitionsIdsBaseKey(entityKind);
     const favouriteIncludedKey = `${baseKey}.included`;
     const favouriteExcludedKey = `${baseKey}.excluded`;
 
