@@ -22,7 +22,7 @@ export function store($http, BaseApiUrl) {
     const base = BaseApiUrl + '/rating-scheme';
 
 
-    function findAll(id) {
+    function findAll() {
         return $http
             .get(base)
             .then(result => result.data);

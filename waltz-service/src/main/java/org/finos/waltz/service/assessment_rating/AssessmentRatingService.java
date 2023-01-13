@@ -19,7 +19,6 @@
 package org.finos.waltz.service.assessment_rating;
 
 import org.finos.waltz.common.MapUtilities;
-import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.data.GenericSelector;
@@ -104,7 +103,7 @@ public class AssessmentRatingService {
 
 
     public boolean store(SaveAssessmentRatingCommand command, String username) throws InsufficientPrivelegeException {
-        verifyAnyPermission(SetUtilities.asSet(Operation.UPDATE, Operation.ADD), command.entityReference(), command.assessmentDefinitionId(), username);
+        verifyAnyPermission(asSet(Operation.UPDATE, Operation.ADD), command.entityReference(), command.assessmentDefinitionId(), command.ratingId(), username);
         AssessmentDefinition assessmentDefinition = assessmentDefinitionDao.getById(command.assessmentDefinitionId());
         createChangeLogEntryForSave(command, username, assessmentDefinition);
 
@@ -114,24 +113,28 @@ public class AssessmentRatingService {
 
     public boolean lock(EntityReference entityReference,
                         long assessmentDefinitionId,
+                        long ratingId,
                         String username) throws InsufficientPrivelegeException {
 
-        verifyPermission(Operation.LOCK, entityReference, assessmentDefinitionId, username);
-        return assessmentRatingDao.lock(entityReference, assessmentDefinitionId, username);
+        verifyPermission(Operation.LOCK, entityReference, assessmentDefinitionId, ratingId, username);
+        return assessmentRatingDao.lock(entityReference, assessmentDefinitionId, ratingId, username);
     }
 
 
     public boolean unlock(EntityReference entityReference,
                           long assessmentDefinitionId,
+                          long ratingId,
                           String username) throws InsufficientPrivelegeException {
         verifyPermission(
                 Operation.LOCK,
                 entityReference,
                 assessmentDefinitionId,
+                ratingId,
                 username);
         return assessmentRatingDao.unlock(
                 entityReference,
                 assessmentDefinitionId,
+                ratingId,
                 username);
     }
 
@@ -142,12 +145,19 @@ public class AssessmentRatingService {
                 Operation.REMOVE,
                 command.entityReference(),
                 command.assessmentDefinitionId(),
+                command.ratingId(),
                 username);
+
+        String ratingRemovedName = ratingSchemeDAO.findRatingSchemeItemsByIds(asSet(command.ratingId()))
+                .stream()
+                .map(d -> d.name())
+                .collect(Collectors.joining(", "));
 
         ChangeLog logEntry = ImmutableChangeLog.builder()
                 .message(format(
-                        "Removed %s",
-                        assessmentDefinitionDao.getById(command.assessmentDefinitionId()).name()))
+                        "Removed assessment: %s, rating: %s",
+                        assessmentDefinitionDao.getById(command.assessmentDefinitionId()).name(),
+                        ratingRemovedName))
                 .parentReference(mkRef(
                         command.entityReference().kind(),
                         command.entityReference().id()))
@@ -200,8 +210,21 @@ public class AssessmentRatingService {
     }
 
 
-    public Set<Operation> findRatingPermissions(EntityReference entityReference, long assessmentDefinitionId, String username) {
-        return assessmentRatingPermissionChecker.findRatingPermissions(entityReference, assessmentDefinitionId, username);
+    public AssessmentDefinitionRatingOperations getRatingPermissions(EntityReference entityReference, long assessmentDefinitionId, String username) {
+        return assessmentRatingPermissionChecker
+                .getRatingPermissions(entityReference, assessmentDefinitionId, username);
+    }
+
+
+    public boolean update(long id, String comment, String username) throws InsufficientPrivelegeException {
+        AssessmentRating existingRating = assessmentRatingDao.getById(id);
+        verifyAnyPermission(asSet(Operation.UPDATE, Operation.ADD),
+                existingRating.entityReference(),
+                existingRating.assessmentDefinitionId(),
+                existingRating.ratingId(),
+                username);
+        createUpdateCommentChangeLogs(id, comment, username); // do first so that comment from old rating retained
+        return assessmentRatingDao.updateComment(id, comment, username);
     }
 
 
@@ -210,11 +233,13 @@ public class AssessmentRatingService {
     private void verifyPermission(Operation requiredPerm,
                                   EntityReference ref,
                                   long defId,
+                                  long ratingId,
                                   String username) throws InsufficientPrivelegeException {
         verifyAnyPermission(
                 asSet(requiredPerm),
                 ref,
                 defId,
+                ratingId,
                 username);
     }
 
@@ -238,11 +263,14 @@ public class AssessmentRatingService {
     private void verifyAnyPermission(Set<Operation> possiblePerms,
                                      EntityReference ref,
                                      long defId,
+                                     long ratingId,
                                      String username) throws InsufficientPrivelegeException {
 
-        Set<Operation> permsUserHas = assessmentRatingPermissionChecker.findRatingPermissions(ref, defId, username);
+        AssessmentDefinitionRatingOperations definitionRatingPerms = assessmentRatingPermissionChecker.getRatingPermissions(ref, defId, username);
 
-        assessmentRatingPermissionChecker.verifyAnyPerms(possiblePerms, permsUserHas, EntityKind.ASSESSMENT_DEFINITION, username);
+        Set<Operation> permsForRating = definitionRatingPerms.findForRatingId(ratingId);
+
+        assessmentRatingPermissionChecker.verifyAnyPerms(possiblePerms, permsForRating, EntityKind.ASSESSMENT_DEFINITION, username);
     }
 
 
@@ -306,6 +334,30 @@ public class AssessmentRatingService {
                 .collect(Collectors.toSet());
 
         changeLogService.write(logs);
+    }
+
+    private void createUpdateCommentChangeLogs(long id,
+                                               String comment,
+                                               String username) {
+
+        AssessmentRating rating = assessmentRatingDao.getById(id);
+        AssessmentDefinition assessmentDefinition = assessmentDefinitionDao.getById(rating.assessmentDefinitionId());
+        RatingSchemeItem ratingItem = ratingSchemeDAO.getRatingSchemeItemById(rating.ratingId());
+
+        ImmutableChangeLog log = ImmutableChangeLog.builder()
+                .message(format(
+                        "Updated comment for assessment '%s', rating '%s' from: '%s' to '%s'",
+                        assessmentDefinition.name(),
+                        ratingItem.name(),
+                        rating.comment(),
+                        comment))
+                .parentReference(rating.entityReference())
+                .userId(username)
+                .severity(Severity.INFORMATION)
+                .operation(Operation.UPDATE)
+                .build();
+
+        changeLogService.write(asSet(log));
     }
 
     public Set<AssessmentRatingSummaryCounts> findRatingSummaryCounts(EntityKind targetKind,

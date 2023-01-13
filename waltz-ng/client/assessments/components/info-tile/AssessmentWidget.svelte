@@ -7,22 +7,24 @@
     import {assessmentDefinitionStore} from "../../../svelte-stores/assessment-definition";
     import {ratingSchemeStore} from "../../../svelte-stores/rating-schemes";
     import {userPreferenceStore} from "../../../svelte-stores/user-preference-store";
-    import {getIdsFromString} from "../../assessment-utils";
-    import {favouriteAssessmentDefinitionIdsKey, lastViewedAssessmentInfoTileKey} from "../../../user";
-    import {
-        defaultPrimaryList,
-        favouriteExcludedIds,
-        favouriteIds,
-        favouriteIncludedIds
-    } from "./assessment-widget-store";
+    import {lastViewedAssessmentInfoTileKey} from "../../../user";
     import DropdownPicker
         from "../../../report-grid/components/svelte/column-definition-edit-panel/DropdownPicker.svelte";
     import {determineIndexOfNextItemInList, determineIndexOfPreviousItemInList} from "../../../common/list-utils";
     import {getSymbol} from "../../../common/svg-icon";
     import NoData from "../../../common/svelte/NoData.svelte";
+    import {primaryEntityReference} from "../rating-editor/rating-store";
+    import {assessmentStores, createStores,} from "../list/assessment-rating-store";
 
     export let primaryEntityRef;
     export let filters;
+
+    let stores = null;
+    let defaultPrimaryList;
+    let favouriteIncludedIds;
+    let favouriteExcludedIds;
+    let favouriteIds;
+    let setFromPreferences;
 
     let dimensions = {
         svg: {
@@ -48,8 +50,31 @@
         }
     };
 
-    const favouriteIncludedKey = `${favouriteAssessmentDefinitionIdsKey}.application.included`;
-    const favouriteExcludedKey = `${favouriteAssessmentDefinitionIdsKey}.application.excluded`;
+    $: {
+        if ($primaryEntityReference && _.isNil($assessmentStores)) {
+            $assessmentStores = createStores($primaryEntityReference.kind);
+        }
+
+        defaultPrimaryList = $assessmentStores?.defaultPrimaryList;
+        favouriteIncludedIds = $assessmentStores?.favouriteIncludedIds;
+        favouriteExcludedIds = $assessmentStores?.favouriteExcludedIds;
+        favouriteIds = $assessmentStores?.favouriteIds;
+        setFromPreferences = $assessmentStores?.setFromPreferences;
+    }
+
+
+    $: {
+        if ($userPreferenceCall?.status === "loaded") {
+            userPreferences = $userPreferenceCall?.data;
+        }
+    }
+
+
+    $: {
+        if (userPreferences && $assessmentStores) {
+            $assessmentStores.setFromPreferences(userPreferences);
+        }
+    }
 
     let assessmentSummaryCall;
     let selectedDefnId;
@@ -89,13 +114,7 @@
 
     let userPreferenceCall = userPreferenceStore.findAllForUser();
     $: userPreferences = $userPreferenceCall?.data;
-
-    $: includedFavouritesString = _.find(userPreferences, d => d.key === favouriteIncludedKey);
-    $: excludedFavouritesString = _.find(userPreferences, d => d.key === favouriteExcludedKey);
     $: lastViewedDefinitionString = _.find(userPreferences, d => d.key === lastViewedAssessmentInfoTileKey);
-
-    $: $favouriteIncludedIds = getIdsFromString(includedFavouritesString);
-    $: $favouriteExcludedIds = getIdsFromString(excludedFavouritesString);
 
     let assessmentDefinitionCall = assessmentDefinitionStore.loadAll();
     $: assessmentDefinitions = $assessmentDefinitionCall?.data;
@@ -113,12 +132,6 @@
             selectedDefnId = selectedDefinition.id;
         }
     }
-
-    $: $defaultPrimaryList = _
-        .chain(assessmentDefinitions)
-        .filter(d => d.visibility === "PRIMARY")
-        .map(d => d.id)
-        .value();
 
     $: sortedDefinitions = _
         .chain($assessmentDefinitionCall?.data)

@@ -19,7 +19,6 @@
 package org.finos.waltz.data.assessment_rating;
 
 
-import org.finos.waltz.common.CollectionUtilities;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.GenericSelector;
@@ -33,20 +32,19 @@ import org.finos.waltz.schema.tables.records.AssessmentRatingRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
-import org.jooq.lambda.tuple.Tuple4;
+import org.jooq.lambda.tuple.Tuple5;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static java.util.Collections.emptySet;
 import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.CollectionUtilities.*;
+import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.MapUtilities.groupBy;
@@ -70,6 +68,8 @@ public class AssessmentRatingDao {
     private static final UserRole ur = USER_ROLE;
     private static final RatingSchemeItem rsi = RATING_SCHEME_ITEM;
 
+    private static boolean DEFAULT_RATING_READ_ONLY_VALUE = false;
+
     private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             ar.ENTITY_ID,
             ar.ENTITY_KIND,
@@ -88,6 +88,7 @@ public class AssessmentRatingDao {
     private static final RecordMapper<? super Record, AssessmentRating> TO_DOMAIN_MAPPER = r -> {
         AssessmentRatingRecord record = r.into(ar);
         return ImmutableAssessmentRating.builder()
+                .id(record.getId())
                 .entityReference(mkRef(EntityKind.valueOf(record.getEntityKind()), record.getEntityId()))
                 .assessmentDefinitionId(record.getAssessmentDefinitionId())
                 .ratingId(record.getRatingId())
@@ -116,6 +117,7 @@ public class AssessmentRatingDao {
     private static final RecordMapper<? super Record, AssessmentRating> TO_DOMAIN_MAPPER_WITH_ENTITY_DETAILS  = r -> {
         AssessmentRatingRecord record = r.into(ar);
         return ImmutableAssessmentRating.builder()
+                .id(record.getId())
                 .entityReference(ImmutableEntityReference.builder()
                         .kind(EntityKind.valueOf(record.getEntityKind()))
                         .id(record.getEntityId())
@@ -172,6 +174,15 @@ public class AssessmentRatingDao {
     }
 
 
+    public AssessmentRating getById(long id) {
+        return dsl
+                .select(ar.fields())
+                .from(ar)
+                .where(ar.ID.eq(id))
+                .fetchOne(TO_DOMAIN_MAPPER);
+    }
+
+
     public List<AssessmentRating> findByEntityKind(EntityKind kind) {
         return dsl
                 .select(ar.fields())
@@ -215,12 +226,14 @@ public class AssessmentRatingDao {
         checkNotNull(command, "command cannot be null");
         AssessmentRatingRecord record = COMMAND_TO_RECORD_MAPPER.apply(command);
         EntityReference ref = command.entityReference();
+
         boolean isUpdate = dsl.fetchExists(dsl
-                .select(ar.fields())
+                .select(ar.ID)
                 .from(ar)
                 .where(ar.ENTITY_KIND.eq(ref.kind().name()))
                 .and(ar.ENTITY_ID.eq(ref.id()))
-                .and(ar.ASSESSMENT_DEFINITION_ID.eq(command.assessmentDefinitionId())));
+                .and(ar.ASSESSMENT_DEFINITION_ID.eq(command.assessmentDefinitionId()))
+                .and(ar.RATING_ID.eq(command.ratingId())));
 
         return isUpdate
                 ? dsl.executeUpdate(record) == 1
@@ -229,10 +242,12 @@ public class AssessmentRatingDao {
 
 
     public boolean remove(RemoveAssessmentRatingCommand rating) {
-        return dsl.deleteFrom(ar)
+        return dsl
+                .deleteFrom(ar)
                 .where(ar.ENTITY_KIND.eq(rating.entityReference().kind().name()))
                 .and(ar.ENTITY_ID.eq(rating.entityReference().id()))
-                .and(ar.ASSESSMENT_DEFINITION_ID.eq(rating.assessmentDefinitionId()))
+                .and(ar.ASSESSMENT_DEFINITION_ID.eq(rating.assessmentDefinitionId())
+                        .and(ar.RATING_ID.eq(rating.ratingId())))
                 .execute() == 1;
     }
 
@@ -298,21 +313,24 @@ public class AssessmentRatingDao {
 
     public boolean lock(EntityReference entityReference,
                         long defId,
+                        long ratingId,
                         String username) {
-        return setLock(entityReference, defId, username, true);
+        return setLock(entityReference, defId, username, ratingId, true);
     }
 
 
     public boolean unlock(EntityReference entityReference,
-                        long defId,
-                        String username) {
-        return setLock(entityReference, defId, username, false);
+                          long defId,
+                          long ratingId,
+                          String username) {
+        return setLock(entityReference, defId, username, ratingId, false);
     }
 
 
     private boolean setLock(EntityReference entityReference,
                             long defId,
                             String username,
+                            long ratingId,
                             boolean isLocked) {
         return dsl
                 .update(ar)
@@ -322,21 +340,23 @@ public class AssessmentRatingDao {
                 .where(ar.ENTITY_KIND.eq(entityReference.kind().name()))
                 .and(ar.ENTITY_ID.eq(entityReference.id()))
                 .and(ar.ASSESSMENT_DEFINITION_ID.eq(defId))
+                .and(ar.RATING_ID.eq(ratingId))
                 .execute() == 1;
     }
 
-    public Set<Operation> calculateAmendedRatingOperations(Set<Operation> operationsForEntityAssessment,
-                                                           EntityReference entityReference,
-                                                           long assessmentDefinitionId,
-                                                           String username) {
+    public Set<AssessmentRatingOperations> calculateAmendedRatingOperations(Set<Operation> operationsForEntityAssessment,
+                                                                            EntityReference entityReference,
+                                                                            long assessmentDefinitionId,
+                                                                            String username) {
 
-        Field<Boolean> readOnlyRatingField = DSL.coalesce(ASSESSMENT_RATING.IS_READONLY, DSL.val(false)).as("rating_read_only");
+        Field<Boolean> readOnlyRatingField = DSL.coalesce(ASSESSMENT_RATING.IS_READONLY, DSL.val(DEFAULT_RATING_READ_ONLY_VALUE)).as("rating_read_only");
 
-        Tuple4<Boolean, Boolean, Boolean, Boolean> hasRoleAndUserHasRoleAndDefinitionROAndIsReadOnly = dsl
+        SelectConditionStep<Record5<String, String, Boolean, Boolean, Long>> qry = dsl
                 .select(USER_ROLE.ROLE,
                         ASSESSMENT_DEFINITION.PERMITTED_ROLE,
                         ASSESSMENT_DEFINITION.IS_READONLY,
-                        readOnlyRatingField)
+                        readOnlyRatingField,
+                        ASSESSMENT_RATING.RATING_ID)
                 .from(ASSESSMENT_DEFINITION)
                 .leftJoin(ASSESSMENT_RATING)
                 .on(ASSESSMENT_DEFINITION.ID.eq(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID))
@@ -345,17 +365,66 @@ public class AssessmentRatingDao {
                 .leftJoin(USER_ROLE)
                 .on(USER_ROLE.ROLE.eq(ASSESSMENT_DEFINITION.PERMITTED_ROLE)
                         .and(USER_ROLE.USER_NAME.eq(username)))
-                .where(ASSESSMENT_DEFINITION.ID.eq(assessmentDefinitionId))
-                .fetchOne(r -> tuple(
+                .where(ASSESSMENT_DEFINITION.ID.eq(assessmentDefinitionId));
+
+        Set<Tuple5<Boolean, Boolean, Boolean, Boolean, Long>> rawRecords = qry
+                .fetchSet(r -> tuple(
                         notEmpty(r.get(ASSESSMENT_DEFINITION.PERMITTED_ROLE)),
                         notEmpty(r.get(USER_ROLE.ROLE)),
                         r.get(ASSESSMENT_DEFINITION.IS_READONLY),
-                        r.get(readOnlyRatingField)));
+                        r.get(readOnlyRatingField),
+                        r.get(ASSESSMENT_RATING.RATING_ID)));
 
-        Boolean defHasPermittedRole = hasRoleAndUserHasRoleAndDefinitionROAndIsReadOnly.v1;
-        Boolean userHasPermittedRole = hasRoleAndUserHasRoleAndDefinitionROAndIsReadOnly.v2;
-        Boolean defIsReadOnly = hasRoleAndUserHasRoleAndDefinitionROAndIsReadOnly.v3;
-        Boolean ratingIsReadOnly = hasRoleAndUserHasRoleAndDefinitionROAndIsReadOnly.v4;
+        Optional<AssessmentRatingOperations> defaultRatingOperations = rawRecords
+                .stream()
+                .findFirst()
+                .map(t -> {
+                    Set<Operation> dlftOps = determineOperations(
+                            operationsForEntityAssessment,
+                            t.v1,
+                            t.v2,
+                            t.v3,
+                            DEFAULT_RATING_READ_ONLY_VALUE);
+
+                    return ImmutableAssessmentRatingOperations.builder()
+                            .ratingId(null)
+                            .operations(dlftOps)
+                            .build();
+                });
+
+        Set<AssessmentRatingOperations> permissionRecords = rawRecords
+                .stream()
+                .map(t -> {
+
+                    Boolean defHasPermittedRole = t.v1;
+                    Boolean userHasPermittedRole = t.v2;
+                    Boolean defIsReadOnly = t.v3;
+                    Boolean ratingIsReadOnly = t.v4;
+                    Long ratingId = t.v5;
+
+                    Set<Operation> operations = determineOperations(
+                            operationsForEntityAssessment,
+                            defHasPermittedRole,
+                            userHasPermittedRole,
+                            defIsReadOnly,
+                            ratingIsReadOnly);
+
+                    return ImmutableAssessmentRatingOperations.builder()
+                            .ratingId(ratingId)
+                            .operations(operations)
+                            .build();
+                })
+                .collect(toSet());
+
+
+        return maybeAdd(permissionRecords, defaultRatingOperations);
+    }
+
+    private Set<Operation> determineOperations(Set<Operation> operationsForEntityAssessment,
+                                               Boolean defHasPermittedRole,
+                                               Boolean userHasPermittedRole,
+                                               Boolean defIsReadOnly,
+                                               Boolean ratingIsReadOnly) {
 
         if (defIsReadOnly) {
             return emptySet();
@@ -366,6 +435,16 @@ public class AssessmentRatingDao {
         } else {
             return operationsForEntityAssessment;
         }
+    }
+
+    public boolean updateComment(long id, String comment, String username) {
+        return dsl
+                .update(ar)
+                .set(ar.DESCRIPTION, comment)
+                .set(ar.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
+                .set(ar.LAST_UPDATED_BY, username)
+                .where(ar.ID.eq(id))
+                .execute() == 1;
     }
 
     public Set<AssessmentRatingSummaryCounts> findRatingSummaryCounts(GenericSelector genericSelector,

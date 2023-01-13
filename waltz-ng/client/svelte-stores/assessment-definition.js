@@ -16,6 +16,14 @@ export function mkAssessmentDefinitionStore() {
             null,
             {force});
 
+
+    const findByEntityReference = (ref, force) => remote
+        .fetchViewList(
+            "GET",
+            `api/assessment-definition/kind/${ref.kind}/id/${ref.id}`,
+            null,
+            {force});
+
     const save = (def) => {
 
         return remote
@@ -33,6 +41,7 @@ export function mkAssessmentDefinitionStore() {
     return {
         loadAll,
         getById,
+        findByEntityReference,
         save,
         remove,
     };

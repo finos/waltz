@@ -1,8 +1,11 @@
 <script>
     export let color;
     export let name;
+    export let ratingGroup = null;
     export let description;
     export let showName = true;
+    export let showGroup = false;
+
 </script>
 
 
@@ -10,6 +13,11 @@
     <span class="cell"
           style={`background-color: ${color};`}>
     </span>
+    {#if showGroup && ratingGroup}
+        <span class="group text-muted">
+            {ratingGroup} /
+        </span>
+    {/if}
     {#if showName}
         <span class="name">
             {name}
@@ -29,6 +37,10 @@
     }
 
     .name {
+        position: relative;
+    }
+
+    .group {
         position: relative;
     }
 </style>

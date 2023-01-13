@@ -65,7 +65,6 @@ function toIcon(count = 0) {
 
 
 function toCUIcon(count = 0) {
-    console.log({count})
     switch (count) {
         case 0:
             return {
