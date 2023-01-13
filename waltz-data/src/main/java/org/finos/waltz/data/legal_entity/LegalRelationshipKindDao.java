@@ -1,25 +1,21 @@
 package org.finos.waltz.data.legal_entity;
 
-import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.model.legal_entity.ImmutableLegalEntity;
 import org.finos.waltz.model.legal_entity.LegalEntity;
-import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.schema.tables.records.LegalEntityRecord;
-import org.finos.waltz.schema.tables.records.LogicalFlowRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
 
-import java.sql.Timestamp;
 import java.util.Set;
 
 import static org.finos.waltz.schema.Tables.LEGAL_ENTITY;
 
-public class LegalEntityDao {
+public class LegalRelationshipKindDao {
 
     private final DSLContext dsl;
 
-    public LegalEntityDao(DSLContext dsl) {
+    public LegalRelationshipKindDao(DSLContext dsl) {
         this.dsl = dsl;
     }
 

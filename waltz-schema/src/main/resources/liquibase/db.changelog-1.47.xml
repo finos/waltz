@@ -420,6 +420,8 @@
                           remarks="when this legal entity record was last updated"/>
         <setColumnRemarks tableName="legal_entity" columnName="last_updated_by"
                           remarks="user responsible for the last update to this legal entity record"/>
+        <setColumnRemarks tableName="legal_entity" columnName="entity_lifecycle_status"
+                          remarks="the lifecycle state of this legal entity record (one of: ACTIVE, PENDING, REMOVED)"/>
     </changeSet>
 
 
