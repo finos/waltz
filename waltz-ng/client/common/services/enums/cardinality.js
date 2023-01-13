@@ -16,17 +16,13 @@
  *
  */
 
-package org.finos.waltz.model.assessment_rating;
-
-import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.LastUpdatedProvider;
-import org.finos.waltz.model.command.Command;
-
-public abstract class AssessmentRatingCommand implements Command, LastUpdatedProvider {
-
-    public abstract EntityReference entityReference();
-
-    public abstract long assessmentDefinitionId();
-
-    public abstract long ratingId();
-}
+export const cardinality = {
+    ZERO_ONE: {
+        key: "ZERO_ONE",
+        name: "Zero to One",
+    },
+    ZERO_MANY: {
+        key: "ZERO_MANY",
+        name: "Zero to Many",
+    },
+};

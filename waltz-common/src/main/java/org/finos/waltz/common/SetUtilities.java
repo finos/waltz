@@ -159,4 +159,18 @@ public class SetUtilities {
                 .collect(Collectors.toSet());
     }
 
+    /**
+     * Given a set and an optional entry, adds to the set if present otherwise returns the original set
+     *
+     * @param ts    the existing set to add to
+     * @param toAdd the optional entry to add to the set
+     * @param <T>
+     * @return
+     */
+    public static <T> Set<T> maybeAdd(Set<T> ts, Optional<T> toAdd) {
+        return toAdd
+                .map(t -> union(ts, asSet(t)))
+                .orElse(ts);
+    }
+
 }

@@ -22,6 +22,9 @@ import org.finos.waltz.data.assessment_rating.AssessmentRatingDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.assessment_rating.AssessmentDefinitionRatingOperations;
+import org.finos.waltz.model.assessment_rating.AssessmentRatingOperations;
+import org.finos.waltz.model.assessment_rating.ImmutableAssessmentDefinitionRatingOperations;
 import org.finos.waltz.model.permission_group.Permission;
 import org.finos.waltz.service.involvement.InvolvementService;
 import org.finos.waltz.service.permission.PermissionGroupService;
@@ -67,9 +70,9 @@ public class AssessmentRatingPermissionChecker implements PermissionChecker {
     }
 
 
-    public Set<Operation> findRatingPermissions(EntityReference entityReference,
-                                                long assessmentDefinitionId,
-                                                String username) {
+    public AssessmentDefinitionRatingOperations getRatingPermissions(EntityReference entityReference,
+                                                                     long assessmentDefinitionId,
+                                                                     String username) {
 
         Set<Long> invsForUser = involvementService.findExistingInvolvementKindIdsForUser(entityReference, username);
 
@@ -83,11 +86,15 @@ public class AssessmentRatingPermissionChecker implements PermissionChecker {
                 .map(Permission::operation)
                 .collect(Collectors.toSet());
 
-        return assessmentRatingDao.calculateAmendedRatingOperations(
+        Set<AssessmentRatingOperations> assessmentRatingOperations = assessmentRatingDao.calculateAmendedRatingOperations(
                 operationsForEntityAssessment,
                 entityReference,
                 assessmentDefinitionId,
                 username);
+
+        return ImmutableAssessmentDefinitionRatingOperations.builder()
+                .ratingOperations(assessmentRatingOperations)
+                .build();
     }
 
 }

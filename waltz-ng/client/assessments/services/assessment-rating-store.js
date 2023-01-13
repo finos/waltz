@@ -30,7 +30,7 @@ export function store($http, BaseApiUrl) {
             .then(d => d.data);
     };
 
-    const findRatingPermissions = (ref, definitionId) => {
+    const getRatingPermissions = (ref, definitionId) => {
         checkIsEntityRef(ref);
         return $http
             .get(`${BASE}/entity/${ref.kind}/${ref.id}/${definitionId}/permissions`)
@@ -62,17 +62,17 @@ export function store($http, BaseApiUrl) {
             .then(d => d.data);
     };
 
-    const lock = (ref, assessmentDefinitionId) => {
+    const lock = (ref, assessmentDefinitionId, ratingId) => {
         checkIsEntityRef(ref);
         return $http
-            .put(`${BASE}/entity/${ref.kind}/${ref.id}/${assessmentDefinitionId}/lock`)
+            .put(`${BASE}/entity/${ref.kind}/${ref.id}/${assessmentDefinitionId}/${ratingId}/lock`)
             .then(d => d.data);
     };
 
-    const unlock = (ref, assessmentDefinitionId) => {
+    const unlock = (ref, assessmentDefinitionId, ratingId) => {
         checkIsEntityRef(ref);
         return $http
-            .put(`${BASE}/entity/${ref.kind}/${ref.id}/${assessmentDefinitionId}/unlock`)
+            .put(`${BASE}/entity/${ref.kind}/${ref.id}/${assessmentDefinitionId}/${ratingId}/unlock`)
             .then(d => d.data);
     };
 
@@ -88,15 +88,15 @@ export function store($http, BaseApiUrl) {
             .then(d => d.data);
     };
 
-    const remove = (ref, assessmentDefinitionId) => {
+    const remove = (ref, assessmentDefinitionId, ratingId) => {
         checkIsEntityRef(ref);
         return $http
-            .delete(`${BASE}/entity/${ref.kind}/${ref.id}/${assessmentDefinitionId}`)
+            .delete(`${BASE}/entity/${ref.kind}/${ref.id}/${assessmentDefinitionId}/${ratingId}`)
             .then(d => d.data);
     };
 
     return {
-        findRatingPermissions,
+        getRatingPermissions,
         findForEntityReference,
         findByEntityKind,
         findByAssessmentDefinitionId,
@@ -121,9 +121,9 @@ export const serviceName = "AssessmentRatingStore";
 
 
 export const AssessmentRatingStore_API = {
-    findRatingPermissions: {
+    getRatingPermissions: {
         serviceName,
-        serviceFnName: "findRatingPermissions",
+        serviceFnName: "getRatingPermissions",
         description: "find permissions for a single rating [ref, assessmentDefId]"
     },
     findForEntityReference: {

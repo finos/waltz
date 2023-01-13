@@ -3,12 +3,27 @@
     import _ from "lodash";
     import {userPreferenceStore} from "../../../svelte-stores/user-preference-store";
     import {onMount} from "svelte";
-    import {createStores} from "./assessment-rating-store";
+    import {
+        assessmentStores,
+        createStores,
+    } from "./assessment-rating-store";
     import AssessmentRatingListGroup from "./AssessmentRatingListGroup.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
-    import {assessments} from "../section/assessment-rating-section";
     import SearchInput from "../../../common/svelte/SearchInput.svelte";
     import {termSearch} from "../../../common";
+    import {assessmentDefinitionStore} from "../../../svelte-stores/assessment-definition";
+    import {assessmentRatingStore} from "../../../svelte-stores/assessment-rating-store";
+    import {ratingSchemeStore} from "../../../svelte-stores/rating-schemes";
+    import {
+        assessmentDefinitions,
+        assessmentRatings,
+        assessments,
+        ratingSchemes,
+        selectedAssessmentId,
+        primaryEntityReference,
+        detailPanelActiveMode,
+        Modes
+    } from "../rating-editor/rating-store";
 
 
     let elem;
@@ -24,13 +39,25 @@
     let qry;
     let groupedAssessments;
 
-    export let primaryEntityRef = [];
-    export let onSelect = (d) => console.log("selected", d);
-
     onMount(() => {
         userPreferenceCall = userPreferenceStore.findAllForUser();
     });
 
+    let assessmentDefinitionCall;
+    let assessmentRatingCall;
+    let ratingSchemesCall;
+
+    $: {
+        if ($primaryEntityReference) {
+            assessmentDefinitionCall = assessmentDefinitionStore.findByEntityReference($primaryEntityReference);
+            assessmentRatingCall = assessmentRatingStore.findForEntityReference($primaryEntityReference, true);
+            ratingSchemesCall = ratingSchemeStore.loadAll();
+        }
+    }
+
+    $: $assessmentDefinitions = $assessmentDefinitionCall?.data;
+    $: $assessmentRatings = $assessmentRatingCall?.data;
+    $: $ratingSchemes = $ratingSchemesCall?.data;
 
     function toggleGroup(group) {
         expansions = _.includes(expansions, group.groupName)
@@ -40,7 +67,8 @@
 
 
     function selectAssessment(evt) {
-        onSelect(evt.detail);
+        $detailPanelActiveMode = Modes.LIST
+        $selectedAssessmentId = evt.detail.definition.id;
     }
 
 
@@ -69,14 +97,15 @@
 
 
     $: {
-        if (primaryEntityRef) {
-            stores = createStores(primaryEntityRef);
-            defaultPrimaryList = stores.defaultPrimaryList;
-            favouriteIncludedIds = stores.favouriteIncludedIds;
-            favouriteExcludedIds = stores.favouriteExcludedIds;
-            favouriteIds = stores.favouriteIds;
-            setFromPreferences = stores.setFromPreferences;
+        if ($primaryEntityReference && _.isNil($assessmentStores)) {
+            $assessmentStores = createStores($primaryEntityReference.kind);
         }
+
+        defaultPrimaryList = $assessmentStores?.defaultPrimaryList;
+        favouriteIncludedIds = $assessmentStores?.favouriteIncludedIds;
+        favouriteExcludedIds = $assessmentStores?.favouriteExcludedIds;
+        favouriteIds = $assessmentStores?.favouriteIds;
+        setFromPreferences = $assessmentStores?.setFromPreferences;
     }
 
 
@@ -89,14 +118,14 @@
 
 
     $: {
-        if (userPreferences && stores) {
-            setFromPreferences(userPreferences)
+        if (userPreferences && $assessmentStores) {
+            $assessmentStores.setFromPreferences(userPreferences);
         }
     }
 
 
     $: {
-        if(stores) {
+        if ($assessmentStores) {
             expansions = _
                 .chain($assessments)
                 .filter(d => _.includes($favouriteIncludedIds, d.definition.id)
@@ -110,7 +139,7 @@
 
     $: visibleAssessments = _.isEmpty(qry)
         ? $assessments
-        : termSearch($assessments, qry, ["definition.name", "ratingItem.name"]);
+        : termSearch($assessments, qry, ["definition.name"]);
 
     $: groupedAssessments = _
         .chain(visibleAssessments)
@@ -120,7 +149,7 @@
             const [notProvided, provided] = _
                 .chain(v)
                 .orderBy(d => d.definition.name)
-                .partition(d => d.rating == null)
+                .partition(d => _.isEmpty(d.ratings))
                 .value()
 
             return {
@@ -131,16 +160,6 @@
         })
         .orderBy([d => d.groupName === "Uncategorized", d => d.groupName])
         .value();
-
-    $: {
-        if (stores) {
-            $defaultPrimaryList = _
-                .chain($assessments)
-                .filter(a => a.definition.visibility === "PRIMARY")
-                .map(r => r.definition.id)
-                .value();
-        }
-    }
 
 </script>
 
