@@ -79,6 +79,7 @@ import Formly from "./formly";
 import History from "./history";
 import Involvement from "./involvement";
 import InvolvementKind from "./involvement-kind";
+import LegalEntity from "./legal-entity";
 import Licence from "./licence";
 import LogicalDataElement from "./logical-data-element";
 import LogicalFlow from "./logical-flow";
@@ -189,6 +190,7 @@ const dependencies = [
     History(),
     Involvement(),
     InvolvementKind(),
+    LegalEntity(),
     Licence(),
     LogicalDataElement(),
     LogicalFlow(),

@@ -61,6 +61,8 @@ public enum EntityKind {
     INVOLVEMENT_KIND("Involvement kind"),
     LICENCE("Licence"),
     LEGAL_ENTITY("Legal Entity"),
+    LEGAL_ENTITY_RELATIONSHIP("Legal Entity Relationship"),
+    LEGAL_ENTITY_RELATIONSHIP_KIND("Legal Entity Relationship Kind"),
     LOGICAL_DATA_ELEMENT("Logical data element"),
     LOGICAL_DATA_FLOW("Logical flow"),
     MEASURABLE("Measurable"),
