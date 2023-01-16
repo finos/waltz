@@ -79,9 +79,9 @@ function controller($q, serviceBroker) {
     };
 
     vm.determineViewState = (surveyInstance) => {
-        return surveyInstance.status === 'COMPLETED' || surveyInstance.status === 'APPROVED'
-            ? 'main.survey.instance.response.view'
-            : 'main.survey.instance.response.edit';
+        return surveyInstance.status === "COMPLETED" || surveyInstance.status === "APPROVED"
+            ? "main.survey.instance.response.view"
+            : "main.survey.instance.response.edit";
     };
 
     vm.$onChanges = () => {
@@ -93,26 +93,26 @@ function controller($q, serviceBroker) {
                 CORE_API.SurveyTemplateStore.findAll,
                 []);
 
-            if (vm.parentEntityRef.kind === 'PERSON') {
+            if (vm.parentEntityRef.kind === "PERSON") {
                 runsPromise = serviceBroker.loadViewData(
                     CORE_API.SurveyRunStore.findForRecipientId,
                     [vm.parentEntityRef.id],
-                    { force: true });
+                    {force: true});
 
                 instancesPromise = serviceBroker.loadViewData(
                     CORE_API.SurveyInstanceStore.findForRecipientId,
                     [vm.parentEntityRef.id],
-                    { force: true });
+                    {force: true});
             } else {
                 runsPromise = serviceBroker.loadViewData(
-                        CORE_API.SurveyRunStore.findByEntityReference,
-                        [vm.parentEntityRef],
-                        { force: true });
+                    CORE_API.SurveyRunStore.findByEntityReference,
+                    [vm.parentEntityRef],
+                    {force: true});
 
                 instancesPromise = serviceBroker.loadViewData(
-                        CORE_API.SurveyInstanceStore.findByEntityReference,
-                        [vm.parentEntityRef],
-                        { force: true });
+                    CORE_API.SurveyInstanceStore.findByEntityReference,
+                    [vm.parentEntityRef],
+                    {force: true});
             }
 
             vm.visibility.showSurveySubject = ! isSurveyTargetKind(vm.parentEntityRef.kind);
