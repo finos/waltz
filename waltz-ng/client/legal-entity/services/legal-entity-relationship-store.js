@@ -22,9 +22,9 @@ export function store($http, BaseApiUrl) {
     const BASE = `${BaseApiUrl}/legal-entity-relationship`;
 
 
-    const findAll = () =>
+    const findByLegalEntityId = (id) =>
         $http
-            .get(BASE)
+            .get(`${BASE}/legal-entity-id/${id}`)
             .then(result => result.data);
 
     const findByEntityReference = (ref) =>
@@ -33,7 +33,7 @@ export function store($http, BaseApiUrl) {
             .then(result => result.data);
 
     return {
-        findAll,
+        findByLegalEntityId,
         findByEntityReference
     };
 }
@@ -49,10 +49,10 @@ export const serviceName = "LegalEntityRelationshipStore";
 
 
 export const LegalEntityRelationshipStore_API = {
-    findAll: {
+    findByLegalEntityId: {
         serviceName,
-        serviceFnName: "findAll",
-        description: "executes findAll"
+        serviceFnName: "findByLegalEntityId",
+        description: "executes findByLegalEntityId"
     },
     findByEntityReference: {
         serviceName,

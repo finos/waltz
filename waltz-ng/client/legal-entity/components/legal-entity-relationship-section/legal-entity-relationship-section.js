@@ -15,9 +15,8 @@
  * See the License for the specific
  *
  */
-import template from "./legal-entity-section.html";
+import template from "./legal-entity-relationship-section.html";
 import {initialiseData} from "../../../common";
-import LegalEntitySection from "./LegalEntitySection.svelte";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
 
@@ -26,7 +25,6 @@ const bindings = {
 };
 
 const initialState = {
-    LegalEntitySection,
     relationshipKinds: [],
     relationships: [],
     visibility: {
@@ -34,11 +32,11 @@ const initialState = {
     },
     columnDefs: [
         {
-            field: "legalEntityReference",
-            name: "Legal Entity",
-            width: "40%",
+            field: "targetEntityReference",
+            name: "Target Entity",
+            width: "30%",
             cellTemplate: `<div style="padding-top: 0.5em">
-                                <waltz-entity-link entity-ref="row.entity.legalEntityReference"></waltz-entity-link>
+                                <waltz-entity-link entity-ref="row.entity.targetEntityReference"></waltz-entity-link>
                            </div>`
         },
         {
@@ -46,7 +44,7 @@ const initialState = {
             name: "Relationship",
             width: "15%"
         },
-        {field: "description", width: "20%"},
+        {field: "description", width: "30%"},
         {
             field: "lastUpdatedAt",
             name: "Last Updated At",
@@ -79,7 +77,7 @@ function controller($q, serviceBroker) {
             .then(r => r.data);
 
         const relationshipsPromise = serviceBroker
-            .loadViewData(CORE_API.LegalEntityRelationshipStore.findByEntityReference, [vm.parentEntityRef])
+            .loadViewData(CORE_API.LegalEntityRelationshipStore.findByLegalEntityId, [vm.parentEntityRef.id])
             .then(r => r.data);
 
         return $q
@@ -90,7 +88,7 @@ function controller($q, serviceBroker) {
                 vm.relationships = _
                     .chain(relationships)
                     .map(d => Object.assign({}, d, {relationshipKind: relKindsById[d.relationshipKindId]}))
-                    .sortBy(d => d.legalEntityReference.name, d => d.relationshipKind.name)
+                    .sortBy(d => d.targetEntityReference.name, d => d.relationshipKind.name)
                     .value();
             });
     }
@@ -101,6 +99,7 @@ controller.$inject = [
     "ServiceBroker"
 ];
 
+
 const component = {
     template,
     bindings,
@@ -109,6 +108,6 @@ const component = {
 
 
 export default {
-    id: "waltzLegalEntitySection",
+    id: "waltzLegalEntityRelationshipSection",
     component
 };

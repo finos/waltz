@@ -22,11 +22,16 @@ import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 @Repository
 public class LegalEntityRelationshipDao {
 
+    private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
+                    LEGAL_ENTITY_RELATIONSHIP.TARGET_ID,
+                    LEGAL_ENTITY_RELATIONSHIP.TARGET_KIND,
+                    newArrayList(EntityKind.APPLICATION))
+            .as("entity_name");
     private final DSLContext dsl;
     private static final RecordMapper<Record, LegalEntityRelationship> TO_DOMAIN_MAPPER = r -> {
         LegalEntityRelationshipRecord record = r.into(LEGAL_ENTITY_RELATIONSHIP);
 
-        EntityReference targetEntityReference = mkRef(EntityKind.valueOf(record.getTargetKind()), record.getTargetId());
+        EntityReference targetEntityReference = mkRef(EntityKind.valueOf(record.getTargetKind()), record.getTargetId(), r.get(ENTITY_NAME_FIELD));
         EntityReference legalEntityReference = mkRef(EntityKind.LEGAL_ENTITY, record.getLegalEntityId(), r.get(LEGAL_ENTITY.NAME));
 
         return ImmutableLegalEntityRelationship.builder()
@@ -57,6 +62,7 @@ public class LegalEntityRelationshipDao {
         return dsl
                 .select(LEGAL_ENTITY_RELATIONSHIP.fields())
                 .select(LEGAL_ENTITY.NAME)
+                .select(ENTITY_NAME_FIELD)
                 .from(LEGAL_ENTITY_RELATIONSHIP)
                 .innerJoin(LEGAL_ENTITY).on(LEGAL_ENTITY_RELATIONSHIP.LEGAL_ENTITY_ID.eq(LEGAL_ENTITY.ID))
                 .where(condition)
