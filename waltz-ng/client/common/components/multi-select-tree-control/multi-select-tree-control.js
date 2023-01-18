@@ -19,7 +19,13 @@
 import _ from "lodash";
 import {initialiseData, invokeFunction} from "../../index";
 import {preventDefault, stopPropagation} from "../../browser-utils"
-import {buildHierarchies, doSearch, prepareSearchNodes, determineExpandedNodes, determineDepthLimit} from "../../hierarchy-utils";
+import {
+    buildHierarchies,
+    doSearch,
+    prepareSearchNodes,
+    determineExpandedNodes,
+    determineDepthLimit
+} from "../../hierarchy-utils";
 import template from "./multi-select-tree-control.html";
 
 

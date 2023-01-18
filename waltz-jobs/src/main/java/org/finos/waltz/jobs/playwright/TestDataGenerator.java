@@ -55,9 +55,9 @@ public class TestDataGenerator {
 
         long schemeId = ratingSchemeHelper.createEmptyRatingScheme("Test Scheme");
 
-        Long y = ratingSchemeHelper.saveRatingItem(schemeId, "Yes", 10, "green", 'Y');
-        Long n = ratingSchemeHelper.saveRatingItem(schemeId, "No", 20, "red", 'N');
-        Long m = ratingSchemeHelper.saveRatingItem(schemeId, "Maybe", 30, "yellow", 'M');
+        Long y = ratingSchemeHelper.saveRatingItem(schemeId, "Yes", 10, "green", "Y");
+        Long n = ratingSchemeHelper.saveRatingItem(schemeId, "No", 20, "red", "N");
+        Long m = ratingSchemeHelper.saveRatingItem(schemeId, "Maybe", 30, "yellow", "M");
 
         long defA = assessmentHelper.createDefinition(schemeId, "Test Definition A", null, AssessmentVisibility.PRIMARY, "Edit Favourites");
         long defB = assessmentHelper.createDefinition(schemeId, "Test Definition B", null, AssessmentVisibility.SECONDARY, "Edit Favourites");

@@ -15,40 +15,29 @@
  * See the License for the specific
  *
  */
-
+import template from "./legal-entity-view.html";
 import {initialiseData} from "../../../common";
+import {entity} from "../../../common/services/enums/entity";
+import LegalEntityOverview from "./LegalEntityOverview.svelte";
 
-import template from "./assessment-rating-section.html";
-import AssessmentRatingList from "../list/AssessmentRatingList.svelte";
-import AssessmentRatingEditor from "../rating-editor/AssessmentRatingEditor.svelte";
-import {primaryEntityReference} from "../rating-editor/rating-store";
-
-const bindings = {
-    parentEntityRef: "<",
-};
-
+const bindings = {};
 
 const initialState = {
-    AssessmentRatingList,
-    AssessmentRatingEditor
-};
+    LegalEntityOverview
+}
 
 
-function controller() {
+function controller($stateParams) {
 
     const vm = initialiseData(this, initialState);
 
-    vm.$onChanges = () => {
-        primaryEntityReference.set(vm.parentEntityRef);
-    };
+    vm.primaryEntityRef = {id: $stateParams.id, kind: entity.LEGAL_ENTITY.key}
 }
 
 
 controller.$inject = [
-    "$q",
-    "ServiceBroker"
+    "$stateParams"
 ];
-
 
 const component = {
     template,
@@ -58,6 +47,6 @@ const component = {
 
 
 export default {
-    component,
-    id: "waltzAssessmentRatingSection"
+    id: "waltzLegalEntityView",
+    component
 };
