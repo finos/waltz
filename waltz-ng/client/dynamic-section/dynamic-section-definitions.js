@@ -768,6 +768,15 @@ const flowClassificationRuleSections = [
     changeLogSection
 ];
 
+const legalEntitySections = [
+    assessmentRatingSection,
+    bookmarksSection,
+    entityNamedNotesSection,
+    involvedPeopleSection,
+    changeLogSection
+];
+
+
 export const dynamicSectionsByKind = {
     "main.actor.view": actorSections,
     "main.app-group.view": appGroupSections,
@@ -785,6 +794,7 @@ export const dynamicSectionsByKind = {
     "main.entity-relationship.view": entityRelationshipSections,
     "main.flow-classification-rule.view": flowClassificationRuleSections,
     "main.flow-diagram.view": flowDiagramSections,
+    "main.legal-entity.view": legalEntitySections,
     "main.licence.external-id": licenceSections,
     "main.licence.view": licenceSections,
     "main.logical-flow.view": logicalDataFlowSections,

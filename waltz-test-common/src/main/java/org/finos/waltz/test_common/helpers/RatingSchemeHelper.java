@@ -36,7 +36,7 @@ public class RatingSchemeHelper {
     }
 
 
-    public Long saveRatingItem(long schemeId, String name, int position, String color, Character code) {
+    public Long saveRatingItem(long schemeId, String name, int position, String color, String code) {
         ImmutableRatingSchemeItem rating = ImmutableRatingSchemeItem.builder()
                 .name(name)
                 .description(format("%s description", name))

@@ -111,6 +111,7 @@ public class PermissionGroupDao {
             case APPLICATION:
             case ACTOR:
             case CHANGE_INITIATIVE:
+            case LEGAL_ENTITY:
                 return DSL
                         .select(PERMISSION_GROUP_ENTRY.PERMISSION_GROUP_ID)
                         .from(PERMISSION_GROUP_ENTRY)

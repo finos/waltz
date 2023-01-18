@@ -33,8 +33,10 @@
     let selectedType = null;
 
     function load() {
-        noteTypesCall = entityNamedNoteTypeStore.findForRefAndUser(parentEntityRef, true);
-        notesCall = entityNamedNoteStore.findForEntityReference(parentEntityRef, true);
+        if (parentEntityRef) {
+            noteTypesCall = entityNamedNoteTypeStore.findForRefAndUser(parentEntityRef, true);
+            notesCall = entityNamedNoteStore.findForEntityReference(parentEntityRef, true);
+        }
     }
 
     function clearSelected() {
