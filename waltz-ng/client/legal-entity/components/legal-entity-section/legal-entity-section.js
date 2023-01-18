@@ -17,7 +17,6 @@
  */
 import template from "./legal-entity-section.html";
 import {initialiseData} from "../../../common";
-import LegalEntitySection from "./LegalEntitySection.svelte";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
 
@@ -26,7 +25,6 @@ const bindings = {
 };
 
 const initialState = {
-    LegalEntitySection,
     relationshipKinds: [],
     relationships: [],
     visibility: {
