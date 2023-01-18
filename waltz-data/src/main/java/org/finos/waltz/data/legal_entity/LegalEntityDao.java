@@ -7,9 +7,7 @@ import org.finos.waltz.model.legal_entity.LegalEntity;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.schema.tables.records.LegalEntityRecord;
 import org.finos.waltz.schema.tables.records.LogicalFlowRecord;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -60,4 +58,11 @@ public class LegalEntityDao {
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
 
+    public Set<LegalEntity> findBySelector(Select<Record1<Long>> selector) {
+        return dsl
+                .select(LEGAL_ENTITY.fields())
+                .from(LEGAL_ENTITY)
+                .where(LEGAL_ENTITY.ID.in(selector))
+                .fetchSet(TO_DOMAIN_MAPPER);
+    }
 }

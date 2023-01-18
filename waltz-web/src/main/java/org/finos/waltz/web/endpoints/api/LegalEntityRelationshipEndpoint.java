@@ -12,8 +12,7 @@ import spark.Response;
 import java.util.Set;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.web.WebUtilities.getId;
-import static org.finos.waltz.web.WebUtilities.mkPath;
+import static org.finos.waltz.web.WebUtilities.*;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.getForDatum;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.getForList;
 
@@ -33,10 +32,15 @@ public class LegalEntityRelationshipEndpoint implements Endpoint {
     public void register() {
 
         getForList(mkPath(BASE_URL, "legal-entity-id", ":id"), this::findByLegalEntityIdRoute);
+        getForList(mkPath(BASE_URL, "kind", ":kind", "id", ":id"), this::findByEntityReferenceRoute);
     }
 
     private Set<LegalEntityRelationship> findByLegalEntityIdRoute(Request request, Response response) {
         return legalEntityRelationshipService.findByLegalEntityId(getId(request));
+    }
+
+    private Set<LegalEntityRelationship> findByEntityReferenceRoute(Request request, Response response) {
+        return legalEntityRelationshipService.findByEntityReference(getEntityReference(request));
     }
 
 }

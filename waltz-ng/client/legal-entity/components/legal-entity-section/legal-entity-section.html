@@ -1,0 +1,48 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+<waltz-section-actions>
+    <waltz-data-extract-link name="Export"
+                             styling="button"
+                             extract="legal-entity/target-ref/{{$ctrl.parentEntityRef.kind}}/{{$ctrl.parentEntityRef.id}}"
+                             method="GET">
+    </waltz-data-extract-link>
+    <button class="btn btn-xs waltz-btn-transparent"
+            ng-click="$ctrl.visibility.overlay = ! $ctrl.visibility.overlay">
+        <waltz-icon name="map-signs"></waltz-icon>
+    </button>
+
+</waltz-section-actions>
+
+<waltz-source-data-overlay visible="$ctrl.visibility.overlay"
+                           entities="['LEGAL_ENTITY']">
+</waltz-source-data-overlay>
+
+<div class="row">
+    <div class="col-sm-12">
+        <waltz-grid-with-search ng-if="$ctrl.relationships.length > 0"
+                                entries="$ctrl.relationships"
+                                column-defs="$ctrl.columnDefs">
+        </waltz-grid-with-search>
+        <waltz-no-data ng-if="$ctrl.relationships.length == 0">
+            <message>
+                No legal entities have been linked to this <span
+                ng-bind="$ctrl.parentEntityRef.kind | toDisplayName:'entity'"></span>
+            </message>
+        </waltz-no-data>
+    </div>
+</div>
