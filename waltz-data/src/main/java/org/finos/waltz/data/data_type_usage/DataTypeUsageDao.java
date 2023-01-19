@@ -431,7 +431,7 @@ public class DataTypeUsageDao {
                 val(true))
             .from(flowsWithTypesTable)
             .leftJoin(dtu)
-                .on(mkDataTypeUsageJoin(usageKindInner))
+                .on(mkDataTypeUsageJoin(nodeKind, usageKindInner))
             .where(dtu.ENTITY_ID.isNull());
     }
 
@@ -516,9 +516,9 @@ public class DataTypeUsageDao {
     }
 
 
-    private Condition mkDataTypeUsageJoin(Field<String> usageKindField) {
+    private Condition mkDataTypeUsageJoin(EntityKind nodeKind, Field<String> usageKindField) {
         return dtu.ENTITY_ID.eq(nodeIdInner)
-                        .and(dtu.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                        .and(dtu.ENTITY_KIND.eq(nodeKind.name()))
                         .and(dtu.DATA_TYPE_ID.eq(dataTypeIdInner))
                         .and(dtu.USAGE_KIND.eq(usageKindField))
                         .and(dtu.IS_SELECTED.eq(false));
