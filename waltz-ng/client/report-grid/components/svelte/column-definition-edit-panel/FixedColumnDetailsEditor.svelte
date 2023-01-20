@@ -22,17 +22,36 @@
 
     $: {
         if (column && column.id !== working.id) {
-            working = {
-                id: column.id,
-                displayName: column.displayName,
-                externalId: column.externalId,
-                additionalColumnOptions: column.additionalColumnOptions
-            }
+            setWorkingColumn(column);
         }
     }
 
     function cancelEdit() {
         onCancel();
+    }
+
+    function setWorkingColumn(col) {
+        working = {
+            id: col.id,
+            displayName: col.displayName,
+            externalId: col.externalId,
+            additionalColumnOptions: col.additionalColumnOptions
+        };
+    }
+
+    function clearEdit(column) {
+        const originalColumn = _.find($selectedGrid.definition.fixedColumnDefinitions, d => sameColumnRef(d, column));
+        const columnsWithoutCol = _.reject($columnDefs, d => sameColumnRef(d, column));
+        $columnDefs = _.concat(columnsWithoutCol, originalColumn);
+        setWorkingColumn(originalColumn);
+    }
+
+    function valueChanged(columnDefs, column) {
+        const updatedColumn = _.find(columnDefs, d => sameColumnRef(d, column));
+        return column.id != null //new columns cannot be reset
+            && (updatedColumn.additionalColumnOptionsChanged
+                || updatedColumn.displayNameChanged
+                || updatedColumn.externalIdChanged);
     }
 
     function selectColumnOptions(columnOptions, column) {
@@ -135,6 +154,13 @@
         on:click={cancelEdit}>
     <Icon name="times"/>
     Close
+</button>
+|
+<button class="btn btn-skinny"
+        disabled={!valueChanged($columnDefs, column)}
+        on:click={() => clearEdit(column)}>
+    <Icon name="ban"/>
+    Clear
 </button>
 |
 <button class="btn btn-skinny"

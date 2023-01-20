@@ -263,7 +263,7 @@
             <h4>Add a derived column:</h4>
             <div style="padding-bottom: 1em">
                 <strong>Display name</strong>
-                <div class="small help-text">The name displayed on the grid.</div>
+                <div class="small help-text">The name displayed on the grid. This cannot be changed once saved.</div>
                 <input class="form-control"
                        required
                        id="title"
