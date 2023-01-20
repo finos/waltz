@@ -62,24 +62,6 @@ function controller($scope, serviceBroker, localStorageService) {
         vm.tableData = _.filter(workingTableData, d => d.visible);
     }
 
-
-    function getDefaultSummaryColumns(columnDefs) {
-
-        // These needs to go so no default summaries!!!
-        const dfltFilters = _
-            .chain(columnDefs)
-            .filter(d => d.usageKind === "SUMMARY")
-            .map(d => d.id)
-            .value();
-
-        if (!_.isEmpty(dfltFilters)) {
-            toasts.info("Using default filters for grid");
-        }
-
-        return dfltFilters;
-    }
-
-
     function getSummaryColumnsFromLocalStorage(gridData) {
 
         const key = mkLocalStorageFilterKey(gridData?.definition.id);
@@ -97,7 +79,7 @@ function controller($scope, serviceBroker, localStorageService) {
     function getSummaryColumns(gridData) {
         return coalesceFns(
             () => getSummaryColumnsFromLocalStorage(gridData),
-            () => getDefaultSummaryColumns(gridData?.definition.fixedColumnDefinitions));
+            () => []);
     }
 
 
