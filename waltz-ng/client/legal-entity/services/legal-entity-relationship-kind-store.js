@@ -16,27 +16,41 @@
  *
  */
 
-import {remote} from "./remote";
-import {checkIsEntityRef} from "../common/checks";
 
-export function mkLegalEntityStore() {
+export function store($http, BaseApiUrl) {
 
-    const base = "api/legal-entity";
+    const BASE = `${BaseApiUrl}/legal-entity-relationship-kind`;
 
-    const getById = (id, force = false) => {
-        return remote
-            .fetchViewDatum("GET", `${base}/id/${id}`, null, {force});
-    };
 
-    const findBySelector = (selector, force = false) => {
-        return remote
-            .execute("POST", `${base}/selector`, selector, {force});
-    };
+    const findAll = () =>
+        $http.get(BASE)
+            .then(result => result.data);
 
     return {
-        getById,
-        findBySelector
+        findAll,
     };
 }
 
-export const legalEntityStore = mkLegalEntityStore();
+
+store.$inject = [
+    "$http",
+    "BaseApiUrl"
+];
+
+
+export const serviceName = "LegalEntityRelationshipKindStore";
+
+
+export const LegalEntityRelationshipKindStore_API = {
+    findAll: {
+        serviceName,
+        serviceFnName: "findAll",
+        description: "executes findAll"
+    },
+};
+
+
+export default {
+    serviceName,
+    store
+};

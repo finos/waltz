@@ -112,7 +112,7 @@
 </script>
 
 {#if _.isEmpty(favouriteAssessments)}
-    <NoData type="info">You have no favourite assessments, please open the assessments sectiont to add some</NoData>
+    <NoData type="info">You have no favourite assessments, please open the assessments section to add some</NoData>
 {:else}
     <table class="table table-hover table-condensed">
         <colgroup>

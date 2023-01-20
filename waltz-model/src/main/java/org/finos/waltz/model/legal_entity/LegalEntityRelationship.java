@@ -34,16 +34,14 @@ public abstract class LegalEntityRelationship implements
         WaltzEntity,
         EntityKindProvider,
         ExternalIdProvider,
-        IsReadOnlyProvider {
+        IsReadOnlyProvider,
+        DescriptionProvider {
 
-    public abstract Long legalEntityId();
+    public abstract EntityReference legalEntityReference();
 
     public abstract Long relationshipKindId();
 
     public abstract EntityReference targetEntityReference();
-
-    public abstract String description();
-
 
     @Override
     public EntityReference entityReference() {

@@ -425,6 +425,25 @@ const entityAttestationSection = {
     id: 10001
 };
 
+const legalEntitySection = {
+    // svelteComponent: LegalEntitySection,
+    componentId: "legal-entity-section",
+    name: "Legal Entities",
+    icon: "building-o",
+    description: "Legal Entities related to this entity",
+    id: 10010,
+};
+
+const legalEntityRelationshipsSection = {
+    // svelteComponent: LegalEntityRelationshipSection,
+    componentId: "legal-entity-relationship-section",
+    name: "Related Entities",
+    icon: "link",
+    description: "Relationships to other entities",
+    id: 10020,
+};
+
+
 export const dynamicSections = {
     appCostsSection,
     appCostsSummarySection,
@@ -451,6 +470,8 @@ export const dynamicSections = {
     entityStatisticSummarySection,
     flowSpecDefinitionSection,
     involvedPeopleSection,
+    legalEntitySection,
+    legalEntityRelationshipsSection,
     licenceSection,
     logicalDataElementsSection,
     logicalFlowsTabgroupSection,
@@ -499,6 +520,7 @@ const appSections = [
     entityNamedNotesSection,
     entityStatisticSection,
     involvedPeopleSection,
+    legalEntitySection,
     measurableRatingAppSection,
     surveySection,
     technologySection,
@@ -773,6 +795,7 @@ const legalEntitySections = [
     bookmarksSection,
     entityNamedNotesSection,
     involvedPeopleSection,
+    legalEntityRelationshipsSection,
     changeLogSection
 ];
 

@@ -28,8 +28,15 @@ export function mkLegalEntityRelationshipStore() {
             .fetchViewList("GET", `${base}/legal-entity-id/${id}`, null, {force});
     };
 
+
+    const findByEntityReference = (ref, force = false) => {
+        return remote
+            .fetchViewList("GET", `${base}/kind/${ref.kind}/id/${ref.id}`, null, {force});
+    };
+
     return {
-        findByLegalEntityId
+        findByLegalEntityId,
+        findByEntityReference
     };
 }
 

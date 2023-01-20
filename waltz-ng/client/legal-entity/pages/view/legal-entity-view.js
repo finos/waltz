@@ -19,6 +19,7 @@ import template from "./legal-entity-view.html";
 import {initialiseData} from "../../../common";
 import {entity} from "../../../common/services/enums/entity";
 import LegalEntityOverview from "./LegalEntityOverview.svelte";
+import {CORE_API} from "../../../common/services/core-api-utils";
 
 const bindings = {};
 
@@ -27,16 +28,33 @@ const initialState = {
 }
 
 
-function controller($stateParams) {
+function controller($stateParams, historyStore, serviceBroker) {
 
     const vm = initialiseData(this, initialState);
 
     vm.primaryEntityRef = {id: $stateParams.id, kind: entity.LEGAL_ENTITY.key}
+
+    vm.$onInit = () => {
+
+        serviceBroker
+            .loadViewData(CORE_API.LegalEntityStore.getById, [vm.primaryEntityRef.id])
+            .then(r => {
+                vm.legalEntity = r.data;
+                historyStore.put(
+                    vm.legalEntity.name,
+                    entity.LEGAL_ENTITY.key,
+                    "main.legal-entity.view",
+                    {id: vm.primaryEntityRef.id});
+            });
+
+    };
 }
 
 
 controller.$inject = [
-    "$stateParams"
+    "$stateParams",
+    "HistoryStore",
+    "ServiceBroker"
 ];
 
 const component = {
