@@ -19,18 +19,12 @@
 package org.finos.waltz.jobs.harness;
 
 import org.finos.waltz.data.data_type_usage.DataTypeUsageDao;
-import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.HierarchyQueryScope;
-import org.finos.waltz.model.data_type_usage.DataTypeUsage;
 import org.finos.waltz.service.DIConfiguration;
 import org.finos.waltz.service.usage_info.DataTypeUsageService;
 import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import java.util.List;
-
-import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
+import static org.finos.waltz.common.FunctionUtilities.time;
 
 
 public class DataTypeUsageHarness {
@@ -43,15 +37,7 @@ public class DataTypeUsageHarness {
         DataTypeUsageService svc = ctx.getBean(DataTypeUsageService.class);
 
 
-        long st = System.currentTimeMillis();
-
-        dao.recalculateForAllApplications();
-        List<DataTypeUsage> dtUsages = svc.findForDataTypeSelector(mkOpts(mkRef(EntityKind.DATA_TYPE, 3000), HierarchyQueryScope.CHILDREN));
-        System.out.println("Data Type usages: " + dtUsages.size());
-
-        List<DataTypeUsage> actorUsages = svc.findForEntity(mkRef(EntityKind.ACTOR, 16L));
-        System.out.println("Actor usages: " + actorUsages.size());
-        System.out.println("Took "+ (System.currentTimeMillis() - st));
+        time("Recalc All", dao::recalculateForAllApplications);
     }
 
 
