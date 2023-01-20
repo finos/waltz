@@ -28,6 +28,7 @@ export const possibleEntityKinds = [
     {value: "CHANGE_INITIATIVE", name: "Change Initiative"},
     {value: "CHANGE_SET", name: "Change Set"},
     {value: "ENTITY_RELATIONSHIP", name: "Entity Relationship"},
+    {value: "LEGAL_ENTITY", name: "Legal Entity"},
     {value: "LICENCE", name: "Software Licence"},
     {value: "LOGICAL_DATA_FLOW", name: "Logical Data Flow"},
     {value: "MEASURABLE", name: "Measurable"},

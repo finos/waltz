@@ -269,7 +269,7 @@ export function determineDepthLimit(numNodes) {
  * @param maxDepth
  * @returns {*}
  */
-export function determineExpandedNodes(hierarchy, maxDepth= 100) {
+export function determineExpandedNodes(hierarchy, maxDepth = 100) {
     const shouldHalt = (n, currDepth) =>
         _.isEmpty(n.children) // we don't care about leaf nodes, they don't need expanding
         || currDepth > (maxDepth - 1); // we knock 1 off as we are expanding this node, effectively giving us depth + 1

@@ -227,6 +227,13 @@ export const entity = {
         description: null,
         position: 1520
     },
+    LEGAL_ENTITY: {
+        key: "LEGAL_ENTITY",
+        name: "Legal Entity",
+        icon: "building-o",
+        description: null,
+        position: 1525
+    },
     LICENCE: {
         key: "LICENCE",
         name: "Licence",

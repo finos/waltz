@@ -56,39 +56,82 @@ import {EntityRelationshipStore_API as EntityRelationshipStore} from "../../enti
 import {EntitySearchStore_API as EntitySearchStore} from "../../entity/services/entity-search-store";
 import {EntityStatisticStore_API as EntityStatisticStore} from "../../entity-statistics/services/entity-statistic-store";
 import {FlowClassificationRuleStore_API as FlowClassificationRuleStore} from "../../flow-classification-rule/services/flow-classification-rule-store";
-import {FlowClassificationStore_API as FlowClassificationStore} from "../../flow-classification-rule/services/flow-classification-store";
+import {
+    FlowClassificationStore_API as FlowClassificationStore
+} from "../../flow-classification-rule/services/flow-classification-store";
 import {TagStore_API as TagStore} from "../../tag/services/tag-store";
 import {EnumValueStore_API as EnumValueStore} from "../../enum-value/services/enum-value-store";
-import {EntitySvgDiagramStore_API as EntitySvgDiagramStore} from "../../entity-svg-diagram/services/entity-svg-diagram-store";
-import {ExternalIdentifierStore_API as ExternalIdentifierStore} from "../../external-identifier/services/external-identifier-store"
+import {
+    EntitySvgDiagramStore_API as EntitySvgDiagramStore
+} from "../../entity-svg-diagram/services/entity-svg-diagram-store";
+import {
+    ExternalIdentifierStore_API as ExternalIdentifierStore
+} from "../../external-identifier/services/external-identifier-store"
 import {FacetStore_API as FacetStore} from "../../facet/services/facet-store";
 import {FavouritesStore_API as FavouritesStore} from "../../app-groups/services/favourites-store";
 import {FlowDiagramStore_API as FlowDiagramStore} from "../../flow-diagram/services/flow-diagram-store";
-import {FlowDiagramAnnotationStore_API as FlowDiagramAnnotationStore} from "../../flow-diagram/services/flow-diagram-annotation-store";
-import {FlowDiagramEntityStore_API as FlowDiagramEntityStore} from "../../flow-diagram/services/flow-diagram-entity-store";
-import {FlowDiagramOverlayGroupStore_API as FlowDiagramOverlayGroupStore} from "../../flow-diagram/services/flow-diagram-overlay-group-store";
+import {
+    FlowDiagramAnnotationStore_API as FlowDiagramAnnotationStore
+} from "../../flow-diagram/services/flow-diagram-annotation-store";
+import {
+    FlowDiagramEntityStore_API as FlowDiagramEntityStore
+} from "../../flow-diagram/services/flow-diagram-entity-store";
+import {
+    FlowDiagramOverlayGroupStore_API as FlowDiagramOverlayGroupStore
+} from "../../flow-diagram/services/flow-diagram-overlay-group-store";
 import {InvolvementStore_API as InvolvementStore} from "../../involvement/services/involvement-store";
 import {InvolvementKindStore_API as InvolvementKindStore} from "../../involvement-kind/services/involvement-kind-store";
-import {InvolvementViewService_API as InvolvementViewService} from "../../involvement/services/involvement-view-service";
+import {
+    InvolvementViewService_API as InvolvementViewService
+} from "../../involvement/services/involvement-view-service";
+import {LegalEntityStore_API as LegalEntityStore} from "../../legal-entity/services/legal-entity-store";
+import {
+    LegalEntityRelationshipStore_API as LegalEntityRelationshipStore
+} from "../../legal-entity/services/legal-entity-relationship-store";
+import {
+    LegalEntityRelationshipKindStore_API as LegalEntityRelationshipKindStore
+} from "../../legal-entity/services/legal-entity-relationship-kind-store";
 import {LicenceStore_API as LicenceStore} from "../../licence/services/licence-store";
-import {LogicalDataElementStore_API as LogicalDataElementStore} from "../../logical-data-element/services/logical-data-element-store";
+import {
+    LogicalDataElementStore_API as LogicalDataElementStore
+} from "../../logical-data-element/services/logical-data-element-store";
 import {LogicalFlowStore_API as LogicalFlowStore} from "../../logical-flow/services/logical-flow-store";
-import {LogicalFlowDecoratorStore_API as LogicalFlowDecoratorStore} from "../../logical-flow-decorator/services/logical-flow-decorator-store";
-import {MeasurableCategoryStore_API as MeasurableCategoryStore} from "../../measurable-category/services/measurable-category-store";
-import {MeasurableRatingStore_API as MeasurableRatingStore} from "../../measurable-rating/services/measurable-rating-store";
-import {MeasurableRatingPlannedDecommissionStore_API as MeasurableRatingPlannedDecommissionStore} from "../../measurable-rating/services/measurable-rating-planned-decommission-store";
-import {MeasurableRatingReplacementStore_API as MeasurableRatingReplacementStore} from "../../measurable-rating/services/measurable-rating-replacement-store";
-import {MeasurableRelationshipStore_API as MeasurableRelationshipStore} from "../../measurable-relationship/services/measurable-relationship-store";
+import {
+    LogicalFlowDecoratorStore_API as LogicalFlowDecoratorStore
+} from "../../logical-flow-decorator/services/logical-flow-decorator-store";
+import {
+    MeasurableCategoryStore_API as MeasurableCategoryStore
+} from "../../measurable-category/services/measurable-category-store";
+import {
+    MeasurableRatingStore_API as MeasurableRatingStore
+} from "../../measurable-rating/services/measurable-rating-store";
+import {
+    MeasurableRatingPlannedDecommissionStore_API as MeasurableRatingPlannedDecommissionStore
+} from "../../measurable-rating/services/measurable-rating-planned-decommission-store";
+import {
+    MeasurableRatingReplacementStore_API as MeasurableRatingReplacementStore
+} from "../../measurable-rating/services/measurable-rating-replacement-store";
+import {
+    MeasurableRelationshipStore_API as MeasurableRelationshipStore
+} from "../../measurable-relationship/services/measurable-relationship-store";
 import {MeasurableStore_API as MeasurableStore} from "../../measurable/services/measurable-store";
 import {NotificationStore_API as NotificationStore} from "../../notification/services/notification-store";
 import {OrgUnitStore_API as OrgUnitStore} from "../../org-units/services/org-unit-store";
 import {PersonStore_API as PersonStore} from "../../person/services/person-store";
 import {PermissionGroupStore_API as PermissionGroupStore} from "../../permission-group/services/permission-group-store";
 import {PhysicalFlowStore_API as PhysicalFlowStore} from "../../physical-flows/services/physical-flow-store";
-import {PhysicalFlowParticipantStore_API as PhysicalFlowParticipantStore} from "../../physical-flows/services/physical-flow-participant-store";
-import {PhysicalSpecDefinitionFieldStore_API as PhysicalSpecDefinitionFieldStore} from "../../physical-specifications/services/physical-spec-definition-field-store";
-import {PhysicalSpecDefinitionStore_API as PhysicalSpecDefinitionStore} from "../../physical-specifications/services/physical-spec-definition-store";
-import {PhysicalSpecDefinitionSampleFileStore_API as PhysicalSpecDefinitionSampleFileStore} from "../../physical-specifications/services/physical-spec-definition-sample-file-store";
+import {
+    PhysicalFlowParticipantStore_API as PhysicalFlowParticipantStore
+} from "../../physical-flows/services/physical-flow-participant-store";
+import {
+    PhysicalSpecDefinitionFieldStore_API as PhysicalSpecDefinitionFieldStore
+} from "../../physical-specifications/services/physical-spec-definition-field-store";
+import {
+    PhysicalSpecDefinitionStore_API as PhysicalSpecDefinitionStore
+} from "../../physical-specifications/services/physical-spec-definition-store";
+import {
+    PhysicalSpecDefinitionSampleFileStore_API as PhysicalSpecDefinitionSampleFileStore
+} from "../../physical-specifications/services/physical-spec-definition-sample-file-store";
 import {PhysicalSpecificationStore_API as PhysicalSpecificationStore} from "../../physical-specifications/services/physical-specification-store";
 import {RatingSchemeStore_API as RatingSchemeStore} from "../../ratings/services/rating-scheme-store";
 import {RelationshipKindStore_API as RelationshipKindStore} from "../../entity-relationship/services/relationship-kind-store";
@@ -172,6 +215,9 @@ export const CORE_API = {
     InvolvementStore,
     InvolvementKindStore,
     InvolvementViewService,
+    LegalEntityStore,
+    LegalEntityRelationshipStore,
+    LegalEntityRelationshipKindStore,
     LicenceStore,
     LogicalDataElementStore,
     LogicalFlowStore,
