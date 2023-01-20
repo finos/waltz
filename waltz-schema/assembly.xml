@@ -9,7 +9,7 @@
     <includeBaseDirectory>false</includeBaseDirectory>
     <fileSets>
         <fileSet>
-            <directory>./src/main/ddl/liquibase/</directory>
+            <directory>./src/main/resources/liquibase/</directory>
             <useDefaultExcludes>true</useDefaultExcludes>
             <outputDirectory>.</outputDirectory>
         </fileSet>
