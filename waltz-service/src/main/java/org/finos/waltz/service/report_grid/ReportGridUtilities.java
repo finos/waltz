@@ -138,18 +138,27 @@ public class ReportGridUtilities {
                     r.entityFieldReference().displayName(),
                     r.columnName()));
     }
-
     public static Set<GridFilter> parseGridFilters(List<List<String>> filterRows,
                                                    ReportGridDefinition grid) {
 
         try {
-            Map<String, Long> columnDefinitionIdByName = Stream
+            Map<String, Long> columnDefinitionIdByName = grid.fixedColumnDefinitions()
+                    .stream()
+                    .map(fcd -> tuple(
+                            fcd.gridColumnId(),
+                            toNiceName(fcd)))
+                    .collect(toMap(
+                            t -> t.v2,
+                            t -> t.v1));
+
+            Map<String, Long> columnDefinitionIdByDisplayName = Stream
                     .concat(
                             grid.fixedColumnDefinitions()
                                     .stream()
+                                    .filter(d -> d.displayName() != null)
                                     .map(fcd -> tuple(
                                             fcd.gridColumnId(),
-                                            toNiceName(fcd))),
+                                            sanitizeString(fcd.displayName()))),
                             grid.derivedColumnDefinitions()
                                     .stream()
                                     .map(dcd -> tuple(
@@ -184,11 +193,12 @@ public class ReportGridUtilities {
                         String values = r.get(2);
 
                         String columnName = sanitizeString(columnString);
-                        Long columnDefnId = columnDefinitionIdByName // lookup on name followed by external id
+                        Long columnDefnId = columnDefinitionIdByDisplayName
                                 .getOrDefault(
                                         columnName,
-                                        columnDefinitionIdByExtId
-                                                .get(columnName));
+                                        columnDefinitionIdByName.getOrDefault(
+                                                columnName,
+                                                columnDefinitionIdByExtId.get(columnName))); // lookup on displayName, then name followed by external id
 
                         if (columnDefnId == null) {
                             LOG.info(format("Cannot find column '%s' on grid. Skipping this filter", columnName));
