@@ -19,8 +19,7 @@
 package org.finos.waltz.data.report_grid;
 
 
-import org.finos.waltz.common.DateTimeUtilities;
-import org.finos.waltz.common.SetUtilities;
+import org.finos.waltz.common.*;
 import org.finos.waltz.common.hierarchy.FlatNode;
 import org.finos.waltz.common.hierarchy.Forest;
 import org.finos.waltz.common.hierarchy.Node;
@@ -40,6 +39,7 @@ import org.finos.waltz.schema.tables.records.ReportGridFixedColumnDefinitionReco
 import org.finos.waltz.schema.tables.records.ReportGridRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
 import org.slf4j.Logger;
@@ -60,10 +60,10 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
+import static java.util.Comparator.comparing;
 import static java.util.Optional.ofNullable;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.*;
-import static org.finos.waltz.common.CollectionUtilities.first;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDate;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
@@ -928,7 +928,7 @@ public class ReportGridDao {
                                     .collect(joining("; ")))
                             .comment(toHtmlTable(
                                     asList(htmlColumnHeading, "email", "Employee id"),
-                                    t.v3))
+                                    CollectionUtilities.sort(t.v3)))
                             .columnDefinitionId(t.v2) // colId
                             .subjectId(t.v1) // entityId
                             .build())
@@ -1681,7 +1681,7 @@ public class ReportGridDao {
                                     .collect(joining("; ")))
                             .comment(toHtmlTable(
                                     asList("Person", "email", "Employee id"),
-                                    kv.getValue()))
+                                    CollectionUtilities.sort(kv.getValue())))
                             .subjectId(kv.getKey().v1) // entityId
                             .columnDefinitionId(kv.getKey().v2) // colId
                             .build())
@@ -2028,17 +2028,41 @@ public class ReportGridDao {
                             .and(esv.CURRENT.eq(true))
                             .and(esv.ENTITY_KIND.eq(selector.kind().name()))
                             .and(esv.ENTITY_ID.in(selector.selector())))
-                    .fetchSet(r -> ImmutableReportGridCell.builder()
-                            .subjectId(r.get(esv.ENTITY_ID))
-                            .columnDefinitionId(statisticDefinitionIdToColIdMap.get(r.get(esv.STATISTIC_ID)))
-                            .textValue(r.get(esv.OUTCOME))
-                            .comment(r.get(esv.REASON))
-                            .optionCode(r.get(esv.OUTCOME))
-                            .optionText(r.get(esv.OUTCOME))
-                            .build());
+                    .orderBy(esv.OUTCOME)
+                    .fetchGroups(
+                            r -> tuple(
+                                    r.get(esv.ENTITY_ID),
+                                    statisticDefinitionIdToColIdMap.get(r.get(esv.STATISTIC_ID))),
+                            r -> tuple(
+                                    r.get(esv.OUTCOME),
+                                    r.get(esv.REASON)))
+                    .entrySet()
+                    .stream()
+                    .map(kv -> {
+
+                        String outcomeString = kv.getValue()
+                                .stream()
+                                .map(t -> t.v1)
+                                .sorted(comparing(StringUtilities::lower))
+                                .collect(joining("; "));
+
+                        List<Tuple2<String, String>> rowsInComment = CollectionUtilities.sort(
+                                kv.getValue(),
+                                comparing(t -> lower(safeTrim(t.v1))));
+
+                        return ImmutableReportGridCell
+                                .builder()
+                                .subjectId(kv.getKey().v1)
+                                .columnDefinitionId(kv.getKey().v2)
+                                .textValue(outcomeString)
+                                .comment(toHtmlTable(
+                                        asList("Outcome", "Reason"),
+                                        rowsInComment))
+                                .build();
+                    })
+                    .collect(toSet());
         }
     }
-
 
     private Set<ReportGridCell> fetchSurveyQuestionResponseData(GenericSelector selector,
                                                                 Collection<ReportGridFixedColumnDefinition> cols) {
@@ -2174,7 +2198,7 @@ public class ReportGridDao {
             return UsageKind.DISTRIBUTOR;
         } else {
             // should be only one left (either CONSUMER or ORIGINATOR)
-            return first(usageKinds);
+            return CollectionUtilities.first(usageKinds);
         }
     }
 

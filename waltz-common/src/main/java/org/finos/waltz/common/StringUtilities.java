@@ -280,7 +280,6 @@ public class StringUtilities {
                         .stream()
                         .map(c -> c == null ? "-" : c.toString())
                         .collect(joining("</td><td>", "<tr><td>", "</td></tr>")))
-                .sorted()
                 .collect(joining("\n"));
 
         String header = headers
