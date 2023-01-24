@@ -5,7 +5,7 @@
        Suppress h2 warning as no alternative version available. 
        Also, h2 only included/used in integration tests therefore could not be exploited in prod.
         ]]></notes>
-        <filePath regex="true">.*\h2-2\.1\.212\.jar</filePath>
+        <filePath regex="true">h2-2\.1\.212\.jar</filePath>
         <cve>CVE-2022-45868</cve>
     </suppress>   
 </suppressions>
