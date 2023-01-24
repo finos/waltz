@@ -112,7 +112,6 @@
 
     <dependencyManagement>
         <dependencies>
-
             <!-- web -->
             <dependency>
                 <groupId>com.sparkjava</groupId>
