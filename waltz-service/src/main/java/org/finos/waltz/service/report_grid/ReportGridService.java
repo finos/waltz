@@ -283,4 +283,26 @@ public class ReportGridService {
     public ReportGridDefinition getGridDefinitionByExtId(String gridExtId) {
         return reportGridDao.getGridDefinitionByExternalId(gridExtId);
     }
+
+    public ReportGridDefinition clone(long id, ReportGridUpdateCommand updateCommand, String username) {
+
+        ReportGridDefinition gridToClone = reportGridDao.getGridDefinitionById(id);
+
+        ImmutableReportGridCreateCommand newGridCreateCommand = ImmutableReportGridCreateCommand.builder()
+                .name(updateCommand.name())
+                .description(updateCommand.description())
+                .subjectKind(gridToClone.subjectKind())
+                .build();
+
+        ReportGridDefinition newGrid = create(newGridCreateCommand, username);
+
+        ImmutableReportGridColumnDefinitionsUpdateCommand updateColsCmd = ImmutableReportGridColumnDefinitionsUpdateCommand.builder()
+                .fixedColumnDefinitions(gridToClone.fixedColumnDefinitions())
+                .derivedColumnDefinitions(gridToClone.derivedColumnDefinitions())
+                .build();
+
+        reportGridDao.updateColumnDefinitions(newGrid.id().get(), updateColsCmd);
+
+        return newGrid;
+    }
 }
