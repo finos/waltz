@@ -1,19 +1,15 @@
 package org.finos.waltz.data.legal_entity;
 
-import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.legal_entity.ImmutableLegalEntity;
 import org.finos.waltz.model.legal_entity.LegalEntity;
-import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.schema.tables.records.LegalEntityRecord;
-import org.finos.waltz.schema.tables.records.LogicalFlowRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Timestamp;
 import java.util.Set;
 
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
@@ -24,7 +20,7 @@ public class LegalEntityDao {
 
     private final DSLContext dsl;
 
-    private static final RecordMapper<Record, LegalEntity> TO_DOMAIN_MAPPER = r -> {
+    public static final RecordMapper<Record, LegalEntity> TO_DOMAIN_MAPPER = r -> {
         LegalEntityRecord record = r.into(LEGAL_ENTITY);
 
         return ImmutableLegalEntity.builder()

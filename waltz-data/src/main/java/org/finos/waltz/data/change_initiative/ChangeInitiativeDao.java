@@ -93,7 +93,7 @@ public class ChangeInitiativeDao implements FindEntityReferencesByIdSelector {
         return dsl
                 .select(CHANGE_INITIATIVE.fields())
                 .from(CHANGE_INITIATIVE)
-                .where(CHANGE_INITIATIVE.ID.in(selector))
+                .where(dsl.renderInlined(CHANGE_INITIATIVE.ID.in(selector)))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
