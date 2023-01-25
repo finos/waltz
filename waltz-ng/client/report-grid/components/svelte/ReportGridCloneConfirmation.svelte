@@ -11,6 +11,8 @@
         description: null,
     }
 
+    $: disabled = _.isNil(workingCopy.name) || _.isEmpty(workingCopy.name)
+
 </script>
 
 
@@ -36,12 +38,13 @@
               bind:value={workingCopy.description}/>
 </div>
 
-<button class="btn-success btn-sm"
-        disabled={_.isNil(workingCopy.name)}
+<button class="btn btn-success btn-sm"
+        title={disabled ? "You must set a name for your grid before cloning" : null}
+        disabled={disabled}
         on:click={() => doClone(grid.definition.id, workingCopy)}>
     Clone
 </button>
-<button class="btn-primary btn btn-sm"
+<button class="btn btn-primary btn btn-sm"
         on:click={doCancel}>
     Cancel
 </button>

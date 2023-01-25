@@ -288,6 +288,10 @@ public class ReportGridService {
 
         ReportGridDefinition gridToClone = reportGridDao.getGridDefinitionById(id);
 
+        if (gridToClone == null) {
+            throw new NotFoundException("REPORT_GRID_NOT_FOUND", format("Cannot find grid with id: %d to clone", id));
+        }
+
         ImmutableReportGridCreateCommand newGridCreateCommand = ImmutableReportGridCreateCommand.builder()
                 .name(updateCommand.name())
                 .description(updateCommand.description())
@@ -301,7 +305,7 @@ public class ReportGridService {
                 .derivedColumnDefinitions(gridToClone.derivedColumnDefinitions())
                 .build();
 
-        reportGridDao.updateColumnDefinitions(newGrid.id().get(), updateColsCmd);
+        newGrid.id().ifPresent(newGridId -> reportGridDao.updateColumnDefinitions(newGridId, updateColsCmd));
 
         return newGrid;
     }
