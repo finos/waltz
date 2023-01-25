@@ -9,15 +9,17 @@
 
 
     export let id;
-    export let groupApprovers = null;
+    export let owningRole = null;
 
     let ownersCall = null;
     let recipientsCall = null;
-
+    let viewGroupApproversList = false;
+    let groupApproversCall = null;
 
     function reload() {
         ownersCall = surveyInstanceStore.findOwners(id, true);
         recipientsCall = surveyInstanceStore.findRecipients(id, true);
+        groupApproversCall = surveyInstanceStore.findGroupApprovers(id, true);
     }
 
 
@@ -55,8 +57,9 @@
     }
 
 
-    $: owners = _.sortBy($ownersCall?.data, d => d.name);
-    $: recipients = _.sortBy($recipientsCall?.data, d => d.name);
+    $: owners = _.sortBy($ownersCall?.data, d => _.toLower(d.name));
+    $: recipients = _.sortBy($recipientsCall?.data, d => _.toLower(d.name));
+    $: groupApprovers = _.sortBy($groupApproversCall?.data, d => _.toLower(d.name));
 
     $: permissionsCall = id && surveyInstanceStore.getPermissions(id);
     $: permissions = $permissionsCall.data;
@@ -94,12 +97,30 @@
                         canRemoveSelf={false}/>
         </td>
     </tr>
-    {#if !_.isNil(groupApprovers)}
+    {#if !_.isNil(owningRole)}
         <tr style="vertical-align: top">
             <td>Group Approvers</td>
             <td>
                 <Icon name="group"/>
-                {groupApprovers}
+                {owningRole}
+                {#if viewGroupApproversList}
+                    <div style="margin-top: 1em"
+                         class:waltz-scroll-region-250={_.size(groupApprovers) > 14}>
+                        <PersonList people={groupApprovers}
+                                    canAdd={false}
+                                    canRemove={false}
+                                    canRemoveSelf={false}/>
+                    </div>
+                    <button class="btn btn-xs btn-skinny"
+                            on:click={() => viewGroupApproversList = false}>
+                        Hide group members
+                    </button>
+                {:else}
+                    <button class="btn btn-xs btn-skinny"
+                            on:click={() => viewGroupApproversList = true}>
+                        View group members
+                    </button>
+                {/if}
             </td>
         </tr>
     {/if}

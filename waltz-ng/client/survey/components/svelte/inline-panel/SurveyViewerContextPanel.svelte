@@ -152,7 +152,7 @@
                 People
             </h5>
             <SurveyPeople id={instanceId}
-                          groupApprovers={survey.surveyInstance?.owningRole}/>
+                          owningRole={survey.surveyInstance?.owningRole}/>
         </div>
 
         <div class="mini-section">
