@@ -169,10 +169,7 @@ public class SurveyRunEndpoint implements Endpoint {
 
             SurveyInstanceRecipientsAndOwners recipientsAndOwners = readBody(request, SurveyInstanceRecipientsAndOwners.class);
 
-            return surveyRunService.createDirectSurveyInstances(
-                    runId,
-                    recipientsAndOwners.personIds(),
-                    recipientsAndOwners.owningRole());
+            return surveyRunService.createDirectSurveyInstances(runId, recipientsAndOwners);
         };
 
         DatumRoute<SurveyRunCompletionRate> getSurveyRunCompletionRateRoute = (request, response)

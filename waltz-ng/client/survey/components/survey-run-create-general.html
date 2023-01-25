@@ -196,7 +196,7 @@
             <div>
                 <label for="owningRole"
                        class="col-sm-2 control-label">
-                    Survey admin role/s
+                    Survey approver role/s
                 </label>
             </div>
             <div class="col-sm-10">
@@ -225,7 +225,7 @@
         <div class="form-group">
             <label for="ownerInvKinds"
                    class="col-sm-2 control-label">
-                Owner Involvement Kind/s
+                Approver Involvement Kind/s
             </label>
             <div class="col-sm-10">
                 <select id="ownerInvKinds"
@@ -238,7 +238,7 @@
                 </select>
                 <div ng-if="$ctrl.surveyRun.ownerInvolvementKinds">
                     <ul class="list-inline">
-                        <li>Selected Owners:</li>
+                        <li>Selected Approvers:</li>
                         <li ng-repeat="role in $ctrl.surveyRun.ownerInvolvementKinds">
                             <strong ng-bind="role.name"></strong>
                             <span ng-if="$ctrl.isLastInList(role, $ctrl.surveyRun.ownerInvolvementKinds)">; </span>
