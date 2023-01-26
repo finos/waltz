@@ -21,7 +21,6 @@ package org.finos.waltz.model.legal_entity;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.*;
-import org.finos.waltz.model.logical_flow.ImmutableLogicalFlow;
 import org.immutables.value.Value;
 
 
@@ -46,7 +45,10 @@ public abstract class LegalEntity implements
     public EntityReference entityReference() {
         return EntityReference.mkRef(
                 EntityKind.LEGAL_ENTITY,
-                id().get());
+                id().get(),
+                name(),
+                description(),
+                externalId());
     }
 
     @Value.Default
