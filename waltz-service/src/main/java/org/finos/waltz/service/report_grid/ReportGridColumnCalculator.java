@@ -58,7 +58,7 @@ public class ReportGridColumnCalculator {
                     Map<String, Object> ctx = initialiseContext(
                             definition.fixedColumnDefinitions(),
                             ratingSchemeItemsById,
-                            subjectId,
+                            s,
                             lookupRow(rowBySubject, subjectId));
                     ns.setContext(ctx);
                     return subjectId;
@@ -177,7 +177,7 @@ public class ReportGridColumnCalculator {
 
     private static Map<String, Object> initialiseContext(List<ReportGridFixedColumnDefinition> columnDefinitions,
                                                          Map<Long, RatingSchemeItem> ratingSchemeItemsById,
-                                                         Long subjectId,
+                                                         ReportSubject subject,
                                                          Collection<ReportGridCell> row) {
 
         Map<Long, ReportGridCell> cellsInRowByColId = indexBy(row, ReportGridCell::columnDefinitionId);
@@ -189,7 +189,10 @@ public class ReportGridColumnCalculator {
                         ratingSchemeItemsById,
                         cellsInRowByColId.get(col.gridColumnId())));
 
-        ctx.put("subjectId", subjectId);
+        ctx.put("subjectId", subject.entityReference().id());
+        ctx.put("subjectName", subject.entityReference().name().orElse(null));
+        ctx.put("subjectLifecyclePhase", subject.lifecyclePhase().name());
+        ctx.put("subjectExternalId", subject.entityReference().externalId().orElse(null));
 
         return ctx;
     }

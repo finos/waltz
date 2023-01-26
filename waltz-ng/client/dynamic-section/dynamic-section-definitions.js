@@ -340,7 +340,7 @@ const personMeasurableInvolvementsSection = {
 
 const reportGridViewSection = {
     componentId: "report-grid-view-section",
-    name: "Reports",
+    name: "Report Grids",
     icon: "cloud",
     description: "Reports composed of viewpoint ratings, assessment ratings and costs for applications related to this entity",
     id: 170

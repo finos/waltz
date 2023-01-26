@@ -55,6 +55,7 @@ public class ReportGridEndpoint implements Endpoint {
         String createPath = mkPath(BASE_URL, "create");
         String updatePath = mkPath(BASE_URL, "id", ":id", "update");
         String removalPath = mkPath(BASE_URL, "id", ":id");
+        String clonePath = mkPath(BASE_URL, "id", ":id", "clone");
         String findForOwnerPath = mkPath(BASE_URL, "owner");
         String getViewByIdPath = mkPath(BASE_URL, "view", "id", ":id");
         String getDefinitionByIdPath = mkPath(BASE_URL, "definition", "id", ":id");
@@ -70,6 +71,7 @@ public class ReportGridEndpoint implements Endpoint {
         postForDatum(updateColumnDefsPath, this::updateColumnDefsRoute);
         postForDatum(createPath, this::createRoute);
         postForDatum(updatePath, this::updateRoute);
+        postForDatum(clonePath, this::cloneRoute);
         deleteForDatum(removalPath, this::removalRoute);
     }
 
@@ -116,6 +118,12 @@ public class ReportGridEndpoint implements Endpoint {
                                             Response resp) throws IOException, InsufficientPrivelegeException {
         return reportGridService.
                 update(getId(req), readBody(req, ReportGridUpdateCommand.class), getUsername(req));
+    }
+
+    public ReportGridDefinition cloneRoute(Request req,
+                                           Response resp) throws IOException, InsufficientPrivelegeException {
+        return reportGridService
+                .clone(getId(req), readBody(req, ReportGridUpdateCommand.class), getUsername(req));
     }
 
 

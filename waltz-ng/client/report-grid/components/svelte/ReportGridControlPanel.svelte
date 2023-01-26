@@ -3,7 +3,7 @@
     import ReportGridOverview from "./ReportGridOverview.svelte";
     import ReportGridFilters from "./ReportGridFilters.svelte";
     import ColumnDefinitionEditPanel from "./column-definition-edit-panel/ColumnDefinitionEditPanel.svelte";
-    import {selectedGrid, ownedReportIds} from "./report-grid-store";
+    import {selectedGrid, ownedReportIds, filters} from "./report-grid-store";
     import {reportGridStore} from "../../../svelte-stores/report-grid-store";
     import _ from "lodash";
     import Icon from "../../../common/svelte/Icon.svelte";
@@ -33,6 +33,7 @@
         if (isNew) {
             selectedTab = tabs.COLUMNS;
         }
+        $filters = [];
         onGridSelect(selectedGrid);
     }
 

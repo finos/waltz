@@ -51,6 +51,10 @@ export function mkReportGridStore() {
         return remote.execute("DELETE", `api/report-grid/id/${id}`);
     };
 
+    const clone = (id, cloneCmd) => {
+        return remote.execute("POST", `api/report-grid/id/${id}/clone`, cloneCmd);
+    };
+
 
     return {
         findAll,
@@ -60,7 +64,8 @@ export function mkReportGridStore() {
         updateColumnDefinitions,
         create,
         update,
-        remove
+        remove,
+        clone
     };
 }
 
