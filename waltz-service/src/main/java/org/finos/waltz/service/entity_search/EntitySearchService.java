@@ -24,6 +24,7 @@ import org.finos.waltz.service.application.ApplicationService;
 import org.finos.waltz.service.change_initiative.ChangeInitiativeService;
 import org.finos.waltz.service.data_type.DataTypeService;
 import org.finos.waltz.service.flow_diagram.FlowDiagramService;
+import org.finos.waltz.service.legal_entity.LegalEntityService;
 import org.finos.waltz.service.logical_data_element.LogicalDataElementService;
 import org.finos.waltz.service.measurable.MeasurableService;
 import org.finos.waltz.service.orgunit.OrganisationalUnitService;
@@ -70,6 +71,7 @@ public class EntitySearchService {
     private final ServerInformationService serverInformationService;
     private final SoftwareCatalogService softwareCatalogService;
     private final FlowDiagramService flowDiagramService;
+    private final LegalEntityService legalEntityService;
 
 
     @Autowired
@@ -87,7 +89,8 @@ public class EntitySearchService {
                                RoadmapService roadmapService,
                                ServerInformationService serverInformationService,
                                SoftwareCatalogService softwareCatalogService,
-                               FlowDiagramService flowDiagramService) {
+                               FlowDiagramService flowDiagramService,
+                               LegalEntityService legalEntityService) {
 
         checkNotNull(dbExecutorPool, "dbExecutorPool cannot be null");
         checkNotNull(actorService, "actorService cannot be null");
@@ -104,6 +107,7 @@ public class EntitySearchService {
         checkNotNull(roadmapService, "roadmapService cannot be null");
         checkNotNull(serverInformationService, "serverInformationService cannot be null");
         checkNotNull(softwareCatalogService, "softwareCatalogService cannot be null");
+        checkNotNull(legalEntityService, "legalEntityService cannot be null");
 
         this.actorService = actorService;
         this.dbExecutorPool = dbExecutorPool;
@@ -120,6 +124,7 @@ public class EntitySearchService {
         this.roadmapService = roadmapService;
         this.serverInformationService = serverInformationService;
         this.softwareCatalogService = softwareCatalogService;
+        this.legalEntityService = legalEntityService;
     }
 
 
@@ -160,6 +165,8 @@ public class EntitySearchService {
                 return () -> dataTypeService.search(options);
             case FLOW_DIAGRAM:
                 return () -> flowDiagramService.search(options);
+            case LEGAL_ENTITY:
+                return () -> legalEntityService.search(options);
             case LOGICAL_DATA_ELEMENT:
                 return () -> logicalDataElementService.search(options);
             case MEASURABLE:

@@ -30,15 +30,14 @@ import org.jooq.SQLDialect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
 import static java.util.Collections.emptyList;
-import static org.finos.waltz.common.SetUtilities.orderedUnion;
+import static org.finos.waltz.common.ListUtilities.concat;
 import static org.finos.waltz.common.StringUtilities.lower;
 import static org.finos.waltz.data.JooqUtilities.*;
 import static org.finos.waltz.data.SearchUtilities.mkTerms;
+import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
 
 @Repository
 public class MeasurableSearchDao implements SearchDao<Measurable> {
@@ -88,10 +87,10 @@ public class MeasurableSearchDao implements SearchDao<Measurable> {
 
         List<Measurable> measurablesViaFullText = searcher.searchFullText(dsl, options);
 
-        return new ArrayList<>(orderedUnion(
+        return concat(
                 measurablesViaExternalId,
                 measurablesViaName,
-                measurablesViaFullText));
+                measurablesViaFullText);
     }
 
 
