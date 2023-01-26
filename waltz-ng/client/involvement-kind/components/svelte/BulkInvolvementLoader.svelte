@@ -4,6 +4,7 @@
     import DropdownPicker from "../../../common/svelte/DropdownPicker.svelte";
     import {
         involvements,
+        newInvolvements,
         rawInvolvements,
         resolutionErrors,
         resolvedRows,
@@ -55,7 +56,6 @@
         return resolveCall = bulkUploadStore.resolve(resolveParams)
             .then(d => {
                 $resolvedRows = d.data;
-                [$resolutionErrors, $involvements] = _.partition(d.data, d => d.status === bulkLoadResolutionStatus.ERROR.key);
                 activeMode = Modes.RESOLVE;
             })
             .catch(e => displayError("Could not resolve rows", e));
@@ -64,13 +64,9 @@
 
     function saveInvolvements() {
 
-        const validInvs = _
-            .chain($involvements)
-            .filter(d => d.status === bulkLoadResolutionStatus.NEW.key)
-            .map(i => _.join(i.inputRow, ","))
-            .value();
+        const validInvs = _.map($involvements, i => _.join(i.inputRow, ","));
 
-        toasts.info(`Saving ${_.size(validInvs)} involvements...`);
+        toasts.info(`Saving ${$uploadMode === UploadModes.ADD_ONLY ? _.size($newInvolvements) : _.size($involvements)} involvements...`);
 
         const uploadParams = {
             inputString: _.join(validInvs, "\n"),
@@ -81,7 +77,7 @@
 
         bulkUploadStore.upload(uploadParams)
             .then(r => {
-                toasts.success(`Successfully created ${r.data} new involvements`);
+                toasts.success(`Successfully saved ${r.data} new involvements`);
                 return onSave();
             })
             .catch(e => displayError("Could not bulk store involvements", e));
@@ -91,6 +87,10 @@
         errorsIgnored = true;
         toasts.info("This set of involvements can now be saved. Any errors will be ignored.")
     }
+
+    $: identifierMessage = $uploadMode === UploadModes.ADD_ONLY
+        ? `Identified: ${_.size($newInvolvements)} new involvement/s.`
+        : `Identified: ${_.size($involvements)} replacement involvement/s.`;
 
 </script>
 
@@ -185,23 +185,29 @@
             <span style="color: lightgreen">
                 <Icon name="check"/>
             </span>
-            All identifiers found, ready to save {_.size($involvements)} involvements
+            {identifierMessage} All identifiers found, ready to save.
         </div>
     {:else}
         <div style="padding: 1em 0">
             <span style="color: lightcoral">
                 <Icon name="times"/>
             </span>
-            There are {_.size($resolutionErrors)} errors found, please
+            {identifierMessage} There are {_.size($resolutionErrors)} error/s found, please
             <button class="btn btn-skinny"
                     on:click={() => activeMode = Modes.INPUT}>
                 edit the data
+                <Icon name="pencil"/>
             </button>
             or
-            <button class="btn btn-skinny"
-                    on:click={() => acceptErrors()}>
-                save ignoring errors
-            </button>
+            {#if errorsIgnored}
+                save the data, any unresolved rows will be ignored.
+            {:else}
+                <button class="btn btn-skinny"
+                        on:click={acceptErrors}>
+                    enable save ignoring errors
+                    <Icon name="unlock"/>
+                </button>
+            {/if}
         </div>
     {/if}
 
