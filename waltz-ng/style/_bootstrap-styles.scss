@@ -84,3 +84,20 @@
         color: #23527c;
     }
 }
+
+
+.btn-link {
+    background-color: transparent;
+    font: inherit;
+    color: #337ab7;
+    border: 0;
+    cursor: pointer;
+    outline: inherit;
+
+    &:focus {
+        outline: none !important;
+        border-color: #999;
+        box-shadow: none !important;
+        color: #23527c;
+    }
+}

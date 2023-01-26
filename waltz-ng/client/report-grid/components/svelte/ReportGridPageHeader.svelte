@@ -10,7 +10,8 @@
 </script>
 
 <PageHeader icon="cloud"
-            name={reportGrid?.name}>
+            name={reportGrid?.name}
+            small={`for ${parentEntityRef.name}`}>
     <div slot="breadcrumbs">
         <ol class="waltz-breadcrumbs">
             <li>

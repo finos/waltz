@@ -3,7 +3,7 @@
     import NoData from "../../../common/svelte/NoData.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
     import {getDisplayNameForColumn} from "./report-grid-utils";
-    import {activeSummaries, filters, selectedGrid, summaries} from "./report-grid-store";
+    import {activeSummaries, filters, selectedGrid, summaries, columnDefs} from "./report-grid-store";
     import {mkChunks} from "../../../common/list-utils";
     import EntityIcon from "../../../common/svelte/EntityIcon.svelte";
     import Popover from "../../../svelte-stores/popover-store";

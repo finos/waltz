@@ -16,6 +16,8 @@ import java.util.stream.Stream;
 
 import static org.finos.waltz.common.ArrayUtilities.isEmpty;
 import static org.finos.waltz.common.SetUtilities.*;
+import static org.finos.waltz.common.StringUtilities.lower;
+import static org.finos.waltz.common.StringUtilities.notEmpty;
 import static org.finos.waltz.service.report_grid.ReportGridUtilities.mkOptionCode;
 
 public class ReportGridEvaluatorNamespace {
@@ -74,7 +76,6 @@ public class ReportGridEvaluatorNamespace {
                 .anyMatch(d -> true);
     }
 
-
     public boolean allCellsProvided(String... cellExtIds) {
         checkAllCellsExist(cellExtIds);
 
@@ -82,6 +83,30 @@ public class ReportGridEvaluatorNamespace {
                 .of(cellExtIds)
                 .map(ctx::get)
                 .allMatch(c -> Objects.nonNull(c) && !hasErrors(c));
+    }
+
+    public boolean hasLifecyclePhase(String... lifecyclePhases) {
+        String lifecyclePhase = (String) ctx.get("subjectLifecyclePhase");
+        return Stream.of(lifecyclePhases)
+                .anyMatch(s -> Objects.nonNull(s) && s.equalsIgnoreCase(lower(lifecyclePhase)));
+    }
+
+    public boolean hasExternalId(String... externalIds) {
+        String extId = (String) ctx.get("subjectExternalId");
+        return Stream.of(externalIds)
+                .anyMatch(s -> Objects.nonNull(s) && s.equalsIgnoreCase(lower(extId)));
+    }
+
+    public boolean hasName(String... names) {
+        String name = (String) ctx.get("subjectName");
+        return Stream.of(names)
+                .anyMatch(s -> Objects.nonNull(s) && s.equalsIgnoreCase(lower(name)));
+    }
+
+    public boolean hasId(Long... ids) {
+        Long id = (Long) ctx.get("subjectId");
+        return Stream.of(ids)
+                .anyMatch(s -> Objects.nonNull(s) && s.equals(id));
     }
 
 
@@ -183,7 +208,7 @@ public class ReportGridEvaluatorNamespace {
     private boolean hasErrors(Object c) {
         if (c instanceof ReportGridCell) {
             ReportGridCell cv = (ReportGridCell) c;
-            return StringUtilities.notEmpty(cv.errorValue());
+            return notEmpty(cv.errorValue());
         } else {
             return true;
         }
@@ -213,7 +238,7 @@ public class ReportGridEvaluatorNamespace {
         }
         if (c instanceof ReportGridCell) {
             ReportGridCell cell = (ReportGridCell) c;
-            if (StringUtilities.notEmpty(cell.textValue())) {
+            if (notEmpty(cell.textValue())) {
                 return cell.textValue();
             }
             if (cell.numberValue() != null) {

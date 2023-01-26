@@ -5,6 +5,7 @@
     import {ownedReportIds, selectedGrid} from "./report-grid-store";
     import {reportGridKinds} from "./report-grid-utils";
     import ReportGridEditor from "./ReportGridEditor.svelte";
+    import ReportGridCloneConfirmation from "./ReportGridCloneConfirmation.svelte";
     import {reportGridMemberStore} from "../../../svelte-stores/report-grid-member-store";
     import {reportGridStore} from "../../../svelte-stores/report-grid-store";
     import toasts from "../../../svelte-stores/toast-store";
@@ -19,7 +20,8 @@
     const Modes = {
         VIEW: "VIEW",
         EDIT: "EDIT",
-        REMOVE: "REMOVE"
+        REMOVE: "REMOVE",
+        CLONE: "CLONE"
     };
 
     let activeMode = Modes.VIEW;
@@ -76,7 +78,19 @@
             .catch(e => toasts.error("Could not update grid. " + e.error));
     }
 
-    function remove(grid){
+    function clone(gridId, cloneCmd) {
+        let savePromise = reportGridStore.clone(gridId, cloneCmd);
+        Promise.resolve(savePromise)
+            .then(r => {
+                toasts.success("Grid cloned successfully")
+                const grid = r.data;
+                selectGrid(grid);
+                reportGridCall = reportGridStore.findForUser(true);
+            })
+            .catch(e => toasts.error("Could not clone grid. " + e.error));
+    }
+
+    function remove(grid) {
 
         let rmPromise = reportGridStore.remove(grid.id);
         Promise.resolve(rmPromise)
@@ -141,12 +155,17 @@
             <ReportGridEditor grid={$selectedGrid?.definition}
                               doSave={saveReportGrid}
                               doCancel={cancel}/>
+        {:else if activeMode === Modes.CLONE}
+            <ReportGridCloneConfirmation grid={$selectedGrid}
+                                         doClone={clone}
+                                         doCancel={cancel}/>
         {:else if activeMode === Modes.VIEW || activeMode === Modes.REMOVE}
             {#if $selectedGrid?.definition?.id}
-                <h4>
+                <h4 title="Click to open in dedicated view">
                     <button on:click={() => visitPageView()}
-                            class="btn btn-plain">
+                            class="btn btn-link">
                         {$selectedGrid?.definition?.name}
+                        <Icon name="external-link"/>
                     </button>
                 </h4>
                 <table class="table table-condensed small">
@@ -234,20 +253,34 @@
                     {#if activeMode === Modes.VIEW}
                         <button class="btn btn-sm btn-primary"
                                 on:click={() => activeMode = Modes.EDIT}>
-                            <Icon name="pencil"/>Edit Grid Overview
+                            <Icon name="pencil"/>
+                            Edit Grid Overview
+                        </button>
+                        <button class="btn btn-sm btn-primary"
+                                on:click={() => activeMode = Modes.CLONE}>
+                            <Icon name="clone"/>
+                            Clone Grid
                         </button>
                         <button class="btn btn-sm btn-danger"
                                 on:click={() => activeMode = Modes.REMOVE}>
-                            <Icon name="trash"/>Delete Grid
+                            <Icon name="trash"/>
+                            Delete Grid
                         </button>
                         <div class="help-block small">
-                            <Icon name="info-circle"/>To edit the columns for the grid use the 'Column Editor' tab above.
+                            <Icon name="info-circle"/>
+                            To edit the columns for the grid use the 'Column Editor' tab above.
                         </div>
                     {/if}
                 {:else}
                     <div class="help-block small">
-                        <Icon name="info-circle"/>You cannot edit this grid as you are not an owner.
+                        <Icon name="info-circle"/>
+                        You cannot edit this grid as you are not an owner.
                     </div>
+                    <button class="btn btn-sm btn-primary"
+                            on:click={() => activeMode = Modes.CLONE}>
+                        <Icon name="clone"/>
+                        Clone Grid
+                    </button>
                 {/if}
             {:else}
                 <NoData>Waiting for grid selection</NoData>

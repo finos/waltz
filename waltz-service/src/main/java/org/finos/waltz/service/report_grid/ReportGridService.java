@@ -283,4 +283,30 @@ public class ReportGridService {
     public ReportGridDefinition getGridDefinitionByExtId(String gridExtId) {
         return reportGridDao.getGridDefinitionByExternalId(gridExtId);
     }
+
+    public ReportGridDefinition clone(long id, ReportGridUpdateCommand updateCommand, String username) {
+
+        ReportGridDefinition gridToClone = reportGridDao.getGridDefinitionById(id);
+
+        if (gridToClone == null) {
+            throw new NotFoundException("REPORT_GRID_NOT_FOUND", format("Cannot find grid with id: %d to clone", id));
+        }
+
+        ImmutableReportGridCreateCommand newGridCreateCommand = ImmutableReportGridCreateCommand.builder()
+                .name(updateCommand.name())
+                .description(updateCommand.description())
+                .subjectKind(gridToClone.subjectKind())
+                .build();
+
+        ReportGridDefinition newGrid = create(newGridCreateCommand, username);
+
+        ImmutableReportGridColumnDefinitionsUpdateCommand updateColsCmd = ImmutableReportGridColumnDefinitionsUpdateCommand.builder()
+                .fixedColumnDefinitions(gridToClone.fixedColumnDefinitions())
+                .derivedColumnDefinitions(gridToClone.derivedColumnDefinitions())
+                .build();
+
+        newGrid.id().ifPresent(newGridId -> reportGridDao.updateColumnDefinitions(newGridId, updateColsCmd));
+
+        return newGrid;
+    }
 }

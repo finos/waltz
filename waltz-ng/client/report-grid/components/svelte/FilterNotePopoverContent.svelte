@@ -6,6 +6,7 @@
     import {copyTextToClipboard} from "../../../common/browser-utils";
     import toasts from "../../../svelte-stores/toast-store";
     import {displayError} from "../../../common/error-utils";
+    import {getDisplayNameForColumn} from "./report-grid-utils";
 
     export let primaryEntityRef;
     export let grid;
@@ -15,10 +16,6 @@
         return copyTextToClipboard(noteContent)
             .then(() => toasts.success("Copied note to clipboard"))
             .catch(e => displayError("Could not copy note to clipboard", e));
-    }
-
-    function toName(col) {
-        return col?.columnName || col?.displayName;
     }
 
     let reloadLinkContent = "\n\n\nThis group will refresh overnight, <a href=\"./page/report-grid-view/recalculate/app-group-id/${ctx.ref.id}?sections=10\" target=\"_blank\">click here to refresh group now</a>"
@@ -59,7 +56,7 @@
                 .join("; ")
                 .value();
 
-            return `| \`${toName(gridColumnDef)}\` | \`CONTAINS_ANY_OPTION\` | ${optionCodes} |`
+            return `| \`${getDisplayNameForColumn(gridColumnDef)}\` | \`CONTAINS_ANY_OPTION\` | ${optionCodes} |`
         })
         .join("\n")
         .value();
