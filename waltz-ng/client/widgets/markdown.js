@@ -16,8 +16,8 @@
  *
  */
 
-import _ from "lodash";
 import {initialiseData} from "../common";
+import Markdown from "../common/svelte/Markdown.svelte";
 
 
 const bindings = {
@@ -27,35 +27,22 @@ const bindings = {
 
 
 const initialState = {
-    variables: {}
+    Markdown,
+    context: null,
+    text: ""
 };
 
 
 const template = `
-    <span ng-if="$ctrl.text"
-          class="waltz-markdown"
-          markdown-to-html="$ctrl.markdown">
-    </span>`;
-
-
-function interpolate(templateFn, context = {}, templateStr = "") {
-    try {
-        return templateFn(context);
-    } catch (e) {
-        console.log("Failed to interpolate template with context", { context, templateStr, e })
-    }
-}
+    <waltz-svelte-component ng-if="$ctrl.text"
+                            component="$ctrl.Markdown"
+                            context="$ctrl.context"
+                            text="$ctrl.text">
+    </waltz-svelte-component>`;
 
 
 function controller() {
-    const vm = initialiseData(this, initialState);
-
-    let templateFn = () => "";
-
-    vm.$onChanges = (c) => {
-        templateFn = _.template(vm.text, { variable: "ctx"});
-        vm.markdown = _.isEmpty(vm.context) ? vm.text : interpolate(templateFn, vm.context, vm.text);
-    };
+    initialiseData(this, initialState);
 }
 
 
@@ -81,5 +68,3 @@ const component = {
 
 
 export default component;
-
-

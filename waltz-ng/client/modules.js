@@ -24,10 +24,8 @@ import "angular-tree-control";
 import "angular-ui-grid/ui-grid";
 import "angular-ui-bootstrap";
 import "ng-tags-input";
-import "ng-showdown";
 import "satellizer";
 import "ui-select";
-
 import "@uirouter/angularjs";
 
 import AngularFormly from "angular-formly";
@@ -135,7 +133,6 @@ const dependencies = [
     "ngAnimate",
     "ngSanitize",
     "ngTagsInput",
-    "ng-showdown",
     "satellizer",
     "LocalStorageModule",
     AngularFormly,
