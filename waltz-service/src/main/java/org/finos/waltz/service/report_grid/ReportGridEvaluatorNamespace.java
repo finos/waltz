@@ -234,7 +234,7 @@ public class ReportGridEvaluatorNamespace {
     private String cellToStr(Object c) {
         if (c instanceof CellVariable) {
             CellVariable cell = (CellVariable) c;
-            return cell.rating().name();
+            return cell.cellName();
         }
         if (c instanceof ReportGridCell) {
             ReportGridCell cell = (ReportGridCell) c;

@@ -43,6 +43,7 @@ import java.io.UncheckedIOException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.LongFunction;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
@@ -326,9 +327,7 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
                         .orElse("-");
             case MEASURABLE:
             case ASSESSMENT_DEFINITION:
-                return maybeGet(ratingsById, reportGridCell.ratingIdValue())
-                        .map(NameProvider::name)
-                        .orElse(null);
+                return reportGridCell.textValue();
             default:
                 throw new IllegalArgumentException("This report does not support export with column of type: " + colDef.columnEntityKind().name());
         }
