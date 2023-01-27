@@ -107,25 +107,23 @@
     <tr>
         <td>
             <div>Display name</div>
-            <div class="small help-text">The name displayed on the grid. This cannot be changed once saved.</div>
+            <div class="small help-text">The name displayed on the grid</div>
         </td>
         <td>
-            {#if column.id}
-                <span>{working.displayName}</span>
-            {:else}
-                <input class="form-control"
-                       required
-                       id="displayName"
-                       on:change={() => updateDisplayName(working.displayName, column)}
-                       placeholder="Display name"
-                       bind:value={working.displayName}>
-            {/if}
+            <input class="form-control"
+                   required
+                   id="displayName"
+                   on:change={() => updateDisplayName(working.displayName, column)}
+                   placeholder="Display name"
+                   bind:value={working.displayName}>
         </td>
     </tr>
     <tr>
         <td>
-            <div>External ID</div>
-            <div class="small help-text">An identifier used to reference this column in other derivation scripts</div>
+            <div>External ID <span class="text-danger">*</span></div>
+            <div class="small help-text">An identifier used to reference this column in other derivation scripts and
+                fitler notes. This is mandatory for derived columns.
+            </div>
         </td>
         <td>
             <input class="form-control"

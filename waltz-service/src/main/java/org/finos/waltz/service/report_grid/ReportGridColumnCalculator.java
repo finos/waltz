@@ -1,9 +1,6 @@
 package org.finos.waltz.service.report_grid;
 
-import org.apache.commons.jexl3.JexlBuilder;
-import org.apache.commons.jexl3.JexlEngine;
-import org.apache.commons.jexl3.JexlException;
-import org.apache.commons.jexl3.JexlScript;
+import org.apache.commons.jexl3.*;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.model.either.Either;
 import org.finos.waltz.model.rating.RatingSchemeItem;
@@ -61,7 +58,7 @@ public class ReportGridColumnCalculator {
                             s,
                             lookupRow(rowBySubject, subjectId));
                     ns.setContext(ctx);
-                    return subjectId;
+                    return s;
                 })
                 .flatMap(subject ->
                         calcDerivedCols(
@@ -83,7 +80,7 @@ public class ReportGridColumnCalculator {
 
 
     private static Set<ReportGridCell> calcDerivedCols(ReportGridEvaluatorNamespace ns,
-                                                       long subjectId,
+                                                       ReportSubject subject,
                                                        Set<CompiledCalculatedColumn> colsToCalc) {
 
         // we need to evaluate derived cols at least once
@@ -103,7 +100,7 @@ public class ReportGridColumnCalculator {
             remaining.forEach(ccc -> {
                 try {
                     // attempt to evaluate the cell
-                    ofNullable(evaluateCalcCol(ccc, subjectId))
+                    ofNullable(evaluateCalcCol(ccc, subject))
                             .ifPresent(result -> {
                                 ReportGridCell existingResult = results.get(ccc.column().gridColumnId());
                                 boolean isDifferent = existingResult == null || !existingResult.equals(result);
@@ -145,7 +142,7 @@ public class ReportGridColumnCalculator {
                 .filter(d -> notEmpty(d.v2))
                 .map(t -> ImmutableReportGridCell
                         .builder()
-                        .subjectId(subjectId)
+                        .subjectId(subject.entityReference().id())
                         .errorValue(t.v2)
                         .optionCode("EXECUTION_ERROR")
                         .optionText("Execution Error")
@@ -199,7 +196,7 @@ public class ReportGridColumnCalculator {
 
 
     private static ReportGridCell evaluateCalcCol(CompiledCalculatedColumn compiledCalculatedColumn,
-                                                  Long subjectId) {
+                                                  ReportSubject subject) {
 
         ReportGridDerivedColumnDefinition cd = compiledCalculatedColumn.column();
 
@@ -208,14 +205,21 @@ public class ReportGridColumnCalculator {
                 .map(
                         compilationError -> ImmutableReportGridCell
                                 .builder()
-                                .subjectId(subjectId)
+                                .subjectId(subject.entityReference().id())
                                 .errorValue(compilationError)
                                 .optionCode("COMPILE_ERROR")
                                 .optionText("Compile Error")
                                 .columnDefinitionId(cd.gridColumnId())
                                 .build(),
                         expr -> {
-                            Object result = expr.execute(null);
+
+                            MapContext mapContext = new MapContext(newHashMap(
+                                    "subjectId", subject.entityReference().id(),
+                                    "subjectExternalId", subject.entityReference().externalId().orElse(""),
+                                    "subjectName", subject.entityReference().name().orElse(""),
+                                    "subjectLifecyclePhase", subject.lifecyclePhase().name()));
+
+                            Object result = expr.execute(mapContext);
 
                             if (result == null) {
                                 return null;
@@ -228,7 +232,7 @@ public class ReportGridColumnCalculator {
                                 return ImmutableReportGridCell
                                         .builder()
                                         .textValue(cr.value())
-                                        .subjectId(subjectId)
+                                        .subjectId(subject.entityReference().id())
                                         .columnDefinitionId(cd.gridColumnId())
                                         .optionCode(cr.optionCode())
                                         .optionText(cr.optionText())
