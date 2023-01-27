@@ -28,6 +28,7 @@ import org.finos.waltz.model.attestation.ImmutableSyncRecipientsResponse;
 import org.finos.waltz.model.attestation.SyncRecipientsResponse;
 import org.finos.waltz.model.survey.*;
 import org.finos.waltz.schema.tables.records.ChangeLogRecord;
+import org.finos.waltz.schema.tables.records.SurveyInstanceOwnerRecord;
 import org.finos.waltz.schema.tables.records.SurveyInstanceRecipientRecord;
 import org.finos.waltz.schema.tables.records.SurveyInstanceRecord;
 import org.jooq.*;
@@ -48,6 +49,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.CollectionUtilities.map;
 import static org.finos.waltz.common.DateTimeUtilities.*;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.StringUtilities.lower;
@@ -415,10 +417,24 @@ public class SurveyInstanceDao {
     }
 
     public int[] createInstanceRecipients(Long instanceId, Collection<Long> personIds) {
-        Collection<SurveyInstanceRecipientRecord> records = CollectionUtilities.map(
+        Collection<SurveyInstanceRecipientRecord> records = map(
                 personIds,
                 p -> {
                     SurveyInstanceRecipientRecord record = new SurveyInstanceRecipientRecord();
+                    record.setSurveyInstanceId(instanceId);
+                    record.setPersonId(p);
+                    return record;
+                });
+
+        return dsl.batchInsert(records).execute();
+    }
+
+
+    public int[] createInstanceOwners(Long instanceId, Collection<Long> personIds) {
+        Collection<SurveyInstanceOwnerRecord> records = map(
+                personIds,
+                p -> {
+                    SurveyInstanceOwnerRecord record = new SurveyInstanceOwnerRecord();
                     record.setSurveyInstanceId(instanceId);
                     record.setPersonId(p);
                     return record;

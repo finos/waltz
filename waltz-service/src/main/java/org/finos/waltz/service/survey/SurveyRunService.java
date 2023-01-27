@@ -18,7 +18,6 @@
 
 package org.finos.waltz.service.survey;
 
-import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
@@ -37,15 +36,18 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
+import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkTrue;
+import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.ListUtilities.map;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.MapUtilities.indexBy;
-import static org.finos.waltz.common.SetUtilities.fromCollection;
+import static org.finos.waltz.common.SetUtilities.*;
 
 @Service
 public class SurveyRunService {
@@ -498,35 +500,73 @@ public class SurveyRunService {
     }
 
 
-    public boolean createDirectSurveyInstances(long runId, List<Long> personIds, String owningRole) {
+    public boolean createDirectSurveyInstances(long runId, SurveyInstanceRecipientsAndOwners recipientsAndOwners) {
         SurveyRun run = getById(runId);
         EntityReference subjectRef = run.selectionOptions().entityReference();
+        Set<Long> surveyOwnerList = asSet(run.ownerId());
+
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(subjectRef.kind(), IdSelectionOptions.mkOpts(subjectRef, HierarchyQueryScope.EXACT));
+
+        Set<Long> recipientPersonIdsFromKindIds = getPersonIdsFromInvKindIds(run.involvementKindIds(), subjectRef, genericSelector);
+        Set<Long> ownerPersonIdsFromKindIds = getPersonIdsFromInvKindIds(run.ownerInvKindIds(), subjectRef, genericSelector);
+
+        Set<Long> recipientIds = union(recipientPersonIdsFromKindIds, recipientsAndOwners.recipientPersonIds());
+        Set<Long> ownerIds = union(ownerPersonIdsFromKindIds, recipientsAndOwners.ownerPersonIds(), surveyOwnerList);
+
+        Set<Long> recipientsToBeIssuedSurveys = isEmpty(recipientIds)
+                ? surveyOwnerList
+                : recipientIds;
 
         switch (run.issuanceKind()) {
             case INDIVIDUAL:
-                map(personIds, p -> mkSurveyInstance(
-                        subjectRef,
-                        run,
-                        ListUtilities.newArrayList(p),
-                        owningRole));
+                //create one survey per recipient
+                recipientsToBeIssuedSurveys
+                        .forEach(pId -> mkSurveyInstance(
+                                subjectRef,
+                                run,
+                                asSet(pId),
+                                ownerIds,
+                                recipientsAndOwners.owningRole()));
                 return true;
             case GROUP:
                 mkSurveyInstance(
                         subjectRef,
                         run,
-                        personIds,
-                        owningRole);
+                        recipientsToBeIssuedSurveys,
+                        ownerIds,
+                        recipientsAndOwners.owningRole());
                 return true;
             default:
                 return false;
         }
     }
 
+    private Set<Long> getPersonIdsFromInvKindIds(Set<Long> involvementKindIds, EntityReference subjectRef, GenericSelector genericSelector) {
 
-    private int[] mkSurveyInstance(EntityReference entityRef,
-                                   SurveyRun run,
-                                   List<Long> personIds,
-                                   String owningRole) {
+        if (isEmpty(involvementKindIds)) {
+            return emptySet();
+        } else {
+
+            Map<EntityReference, List<Person>> refToRecipientsByKind = involvementDao
+                    .findPeopleByEntitySelectorAndInvolvement(
+                            genericSelector.kind(),
+                            genericSelector.selector(),
+                            involvementKindIds);
+
+            return refToRecipientsByKind.get(subjectRef)
+                    .stream()
+                    .map(p -> p.id().get())
+                    .collect(Collectors.toSet());
+        }
+    }
+
+
+    private void mkSurveyInstance(EntityReference entityRef,
+                                  SurveyRun run,
+                                  Set<Long> recipientIds,
+                                  Set<Long> ownersIds,
+                                  String owningRole) {
+
         SurveyInstanceCreateCommand instanceCreateCommand = ImmutableSurveyInstanceCreateCommand
                 .builder()
                 .dueDate(run.dueDate())
@@ -537,14 +577,16 @@ public class SurveyRunService {
                 .owningRole(owningRole)
                 .name(run.name())
                 .build();
+
         long instanceId = surveyInstanceDao.create(instanceCreateCommand);
-        surveyInstanceOwnerDao.create(ImmutableSurveyInstanceOwnerCreateCommand.builder()
-                .surveyInstanceId(instanceId)
-                .personId(run.ownerId())
-                .build());
-        return surveyInstanceDao.createInstanceRecipients(
+
+        int[] recipientsCreated = surveyInstanceDao.createInstanceRecipients(
                 instanceId,
-                personIds);
+                recipientIds);
+
+        int[] ownersCreated = surveyInstanceDao.createInstanceOwners(
+                instanceId,
+                ownersIds);
     }
 
 

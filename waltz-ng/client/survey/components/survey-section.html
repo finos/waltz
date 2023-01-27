@@ -210,17 +210,93 @@
                                                               model="$ctrl.surveyRunForm.approvalDueDate">
                                 </waltz-date-picker-form-input>
                                 <div class="small help-block">
-                                    When does this survey need to approved by an owner. If not specified the submission
+                                    When does this survey need to be approved by? If not specified the submission
                                     due date will be used.
                                 </div>
                             </div>
                         </div>
 
+                        <hr>
+
+                        <!-- RECIPIENT INVOLVEMENTS -->
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label for="recipientInvolvementKinds">
+                                    Recipient Involvement Kind/s
+                                </label>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <select id="recipientInvolvementKinds"
+                                            type="date"
+                                            class="form-control"
+                                            ng-options="kind as kind.name for kind in $ctrl.availibleInvolvementKinds | orderBy:'name' track by kind.id"
+                                            ng-model="$ctrl.surveyRunForm.recipientInvolvementKinds"
+                                            multiple
+                                            style="height: 250px;">
+                                    </select>
+                                    <div ng-if="$ctrl.surveyRunForm.recipientInvolvementKinds.length > 0">
+                                        <ul class="list-inline">
+                                            <li>Selected Recipients:</li>
+                                            <li ng-repeat="role in $ctrl.surveyRunForm.recipientInvolvementKinds">
+                                                <strong ng-bind="role.name"></strong>
+                                                <span
+                                                    ng-if="$ctrl.isLastInList(role, $ctrl.surveyRunForm.recipientInvolvementKinds)">; </span>
+                                            </li>
+                                            <li>
+                                                <button class="btn btn-skinny small"
+                                                        ng-click="$ctrl.surveyRunForm.recipientInvolvementKinds = null">
+                                                    <waltz-icon name="trash"></waltz-icon>
+                                                    Clear
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="small help-block">
+                                        Who should fill in this survey? Recipients can be selected by involvement kind
+                                        or individually using the picker below, a combination of both may be used.
+                                        Recipients can complete, submit and reopen surveys they have been assigned.
+                                        This is involvement-based and will give permissions specific to the person with
+                                        that involvement as listed in the 'people' section on the surveyed entity.
+                                        You can select multiple involvement kinds.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- RECIPIENTS -->
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label>
+                                    Recipient/s
+                                </label>
+                            </div>
+                            <div class="col-md-6">
+                                <div>
+                                    <div ng-if="$ctrl.surveyRunForm.recipients.length === 0">
+                                        No individual recipients defined
+                                    </div>
+                                    <waltz-user-pick-list people="$ctrl.surveyRunForm.recipients"
+                                                          can-remove-last="false"
+                                                          on-add="$ctrl.onAddRecipient"
+                                                          on-remove="$ctrl.onRemoveRecipient">
+                                    </waltz-user-pick-list>
+
+                                    <div class="small help-block">
+                                        Who should fill in this survey? Recipients can be selected by involvement kind
+                                        or individually using the picker below, a combination of both may be used.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
                         <!-- OWNERS -->
                         <div class="row">
                             <div class="col-md-3">
                                 <label>
-                                    Survey admin role/s
+                                    Approver role
                                 </label>
                             </div>
                             <div class="col-md-6">
@@ -239,36 +315,87 @@
                                     </select>
                                 </div>
                                 <div class="small help-block">
-                                    Select a custom role for adding additional survey owners
+                                    Select a custom role for adding additional approvers. Users with this role do not
+                                    need to be directly involved with this entity to be added.
+                                    The survey owner is also added as an approver.
                                 </div>
                             </div>
                         </div>
 
-                        <!-- RECIPIENTS -->
+                        <!-- OWNING_INVOLVEMENTS -->
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label for="ownerInvKinds">
+                                    Approver Involvement Kind/s
+                                </label>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <select id="ownerInvKinds"
+                                            type="date"
+                                            class="form-control"
+                                            ng-options="kind as kind.name for kind in $ctrl.availibleInvolvementKinds | orderBy:'name' track by kind.id"
+                                            ng-model="$ctrl.surveyRunForm.ownerInvolvementKinds"
+                                            multiple
+                                            style="height: 250px;">
+                                    </select>
+                                    <div ng-if="$ctrl.surveyRunForm.ownerInvolvementKinds.length > 0">
+                                        <ul class="list-inline">
+                                            <li>Selected Approvers:</li>
+                                            <li ng-repeat="role in $ctrl.surveyRunForm.ownerInvolvementKinds">
+                                                <strong ng-bind="role.name"></strong>
+                                                <span
+                                                    ng-if="$ctrl.isLastInList(role, $ctrl.surveyRunForm.ownerInvolvementKinds)">; </span>
+                                            </li>
+                                            <li>
+                                                <button class="btn btn-skinny small"
+                                                        ng-click="$ctrl.surveyRunForm.ownerInvolvementKinds = null">
+                                                    <waltz-icon name="trash"></waltz-icon>
+                                                    Clear
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="small help-block">
+                                        Who should review in this survey? Approvers can be selected by involvement kind
+                                        or individually using the picker below, a combination of both may be used.
+                                        Approvers can approve, reject, withdraw and reopen surveys they have been
+                                        assigned, as well as update the list of approvers and recipients.
+                                        This is involvement-based and will give permissions specific to the person with
+                                        that involvement as listed in the 'people' section on the surveyed entity.
+                                        You can select multiple involvement kinds.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- OWNERS -->
                         <div class="row">
                             <div class="col-md-3">
                                 <label>
-                                    Recipient/s
-                                    <span class="text-danger">*</span>
+                                    Approver/s
                                 </label>
                             </div>
                             <div class="col-md-6">
                                 <div>
                                     <div ng-if="$ctrl.surveyRunForm.recipients.length === 0">
-                                        No Recipients defined
+                                        No individual approvers defined
                                     </div>
-                                    <waltz-user-pick-list people="$ctrl.surveyRunForm.recipients"
-                                                          can-remove-last="false"
-                                                          on-add="$ctrl.onAddRecipient"
-                                                          on-remove="$ctrl.onRemoveRecipient">
+                                    <waltz-user-pick-list people="$ctrl.surveyRunForm.owners"
+                                                          can-remove-last="true"
+                                                          on-add="$ctrl.onAddOwner"
+                                                          on-remove="$ctrl.onRemoveOwner">
                                     </waltz-user-pick-list>
 
                                     <div class="small help-block">
-                                        Who should fill in this survey?
+                                        Who should review in this survey? Approvers can be selected individually or by
+                                        involvement kind using the picker above, a combination of both may be used.
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+                        <hr>
 
                         <!-- ISSUANCE -->
                         <div class="row">

@@ -44,9 +44,11 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptySet;
 import static org.finos.waltz.common.Checks.*;
 import static org.finos.waltz.common.CollectionUtilities.find;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
+import static org.finos.waltz.common.StringUtilities.isEmpty;
 import static org.finos.waltz.common.StringUtilities.joinUsing;
 import static org.finos.waltz.model.survey.SurveyInstanceStateMachineFactory.simple;
 import static org.finos.waltz.model.utils.IdUtilities.indexByOptionalId;
@@ -577,5 +579,16 @@ public class SurveyInstanceService {
                 });
 
         return updated;
+    }
+
+    public Set<Person> findGroupApprovers(long id) {
+        SurveyInstance surveyInstance = getById(id);
+
+        if (isEmpty(surveyInstance.owningRole())) {
+            return emptySet();
+        } else {
+            return personDao
+                    .findActivePeopleByUserRole(surveyInstance.owningRole());
+        }
     }
 }
