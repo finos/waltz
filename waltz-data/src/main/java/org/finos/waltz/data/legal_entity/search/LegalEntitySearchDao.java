@@ -7,7 +7,7 @@ import org.finos.waltz.model.legal_entity.LegalEntity;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -19,7 +19,7 @@ import static org.finos.waltz.data.SearchUtilities.mkTerms;
 import static org.finos.waltz.schema.Tables.LEGAL_ENTITY;
 
 
-@Service
+@Repository
 public class LegalEntitySearchDao implements SearchDao<LegalEntity> {
 
     private final DSLContext dsl;
