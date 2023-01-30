@@ -188,7 +188,7 @@ public class AssessmentsTest extends BaseInMemoryIntegrationTest {
                         .ratingSchemeId(schemeId)
                         .position(10)
                         .color("green")
-                        .rating('Y')
+                        .rating("Y")
                         .build());
 
         Long n = schemeService.saveRatingItem(
@@ -199,7 +199,7 @@ public class AssessmentsTest extends BaseInMemoryIntegrationTest {
                         .ratingSchemeId(schemeId)
                         .position(20)
                         .color("red")
-                        .rating('N')
+                        .rating("N")
                         .build());
 
         Long m = schemeService.saveRatingItem(
@@ -210,7 +210,7 @@ public class AssessmentsTest extends BaseInMemoryIntegrationTest {
                         .ratingSchemeId(schemeId)
                         .position(30)
                         .color("yellow")
-                        .rating('M')
+                        .rating("M")
                         .userSelectable(false)
                         .build());
 
