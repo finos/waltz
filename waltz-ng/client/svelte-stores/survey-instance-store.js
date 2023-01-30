@@ -28,13 +28,16 @@ export function mkSurveyInstanceStore() {
         .fetchViewList("GET", `api/survey-instance/${id}/actions`, [], {force});
 
     const findRecipients = (id, force = false) => remote
-        .fetchViewList("GET",`api/survey-instance/${id}/recipients`, null, {force});
+        .fetchViewList("GET", `api/survey-instance/${id}/recipients`, null, {force});
 
     const findOwners = (id, force = false) => remote
-        .fetchViewList("GET",`api/survey-instance/${id}/owners`, null, {force});
+        .fetchViewList("GET", `api/survey-instance/${id}/owners`, null, {force});
+
+    const findGroupApprovers = (id, force = false) => remote
+        .fetchViewList("GET", `api/survey-instance/${id}/group-approvers`, null, {force});
 
     const findResponses = (id) => remote
-        .fetchViewList("GET",`api/survey-instance/${id}/responses`);
+        .fetchViewList("GET", `api/survey-instance/${id}/responses`);
 
     const findPreviousVersions = (originalId) => remote
         .fetchViewList("GET", `api/survey-instance/id/${originalId}/previous-versions`);
@@ -104,6 +107,7 @@ export function mkSurveyInstanceStore() {
         findOwners,
         findPossibleActions,
         findRecipients,
+        findGroupApprovers,
         findResponses,
         findPreviousVersions,
         findVersions,

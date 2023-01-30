@@ -38,6 +38,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.finos.waltz.schema.Tables.USER_ROLE;
 import static org.finos.waltz.schema.tables.AttestationInstanceRecipient.ATTESTATION_INSTANCE_RECIPIENT;
 import static org.finos.waltz.schema.tables.Person.PERSON;
 import static org.finos.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
@@ -241,6 +242,16 @@ public class PersonDao {
                 .select(PERSON.fields())
                 .from(PERSON)
                 .where(PERSON.EMAIL.in(emails)
+                        .and(PERSON.IS_REMOVED.isFalse()))
+                .fetchSet(personMapper);
+    }
+
+
+    public Set<Person> findActivePeopleByUserRole(String role) {
+        return dsl
+                .select(PERSON.fields())
+                .from(USER_ROLE)
+                .innerJoin(PERSON).on(PERSON.EMAIL.eq(USER_ROLE.USER_NAME)
                         .and(PERSON.IS_REMOVED.isFalse()))
                 .fetchSet(personMapper);
     }

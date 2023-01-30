@@ -23,14 +23,16 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.Nullable;
 import org.immutables.value.Value;
 
-import java.util.List;
+import java.util.Set;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableSurveyInstanceRecipientsAndOwners.class)
 @JsonDeserialize(as = ImmutableSurveyInstanceRecipientsAndOwners.class)
 public abstract class SurveyInstanceRecipientsAndOwners {
 
-    public abstract List<Long> personIds();
+    public abstract Set<Long> recipientPersonIds();
+
+    public abstract Set<Long> ownerPersonIds();
 
     @Nullable
     public abstract String owningRole();

@@ -37,7 +37,10 @@ const initialState = {
         contactEmail: null,
         issuanceKind: "GROUP",
         recipients: [],
-        owningRole: null
+        owners: [],
+        owningRole: null,
+        recipientInvolvementKinds: [],
+        ownerInvolvementKinds: []
     },
     templateQuery: ""
 };
@@ -85,9 +88,15 @@ function controller(serviceBroker, userService) {
     };
 
     vm.onAddRecipient = (p) => {
-        if (! p) return;
+        if (!p) return;
         const recipients = vm.surveyRunForm.recipients;
-        vm.surveyRunForm.recipients = _.concat(recipients ? recipients : [], [ p ])
+        vm.surveyRunForm.recipients = _.concat(recipients ? recipients : [], [p])
+    };
+
+    vm.onAddOwner = (p) => {
+        if (!p) return;
+        const owners = vm.surveyRunForm.owners;
+        vm.surveyRunForm.owners = _.concat(owners ? owners : [], [p])
     };
 
     vm.onQueryChange = () => {
@@ -95,9 +104,15 @@ function controller(serviceBroker, userService) {
     };
 
     vm.onRemoveRecipient = (p) => {
-        if (! p) return;
+        if (!p) return;
         const recipients = vm.surveyRunForm.recipients;
         vm.surveyRunForm.recipients = _.reject(recipients, r => r.id === p.id);
+    };
+
+    vm.onRemoveOwner = (p) => {
+        if (!p) return;
+        const owners = vm.surveyRunForm.owners;
+        vm.surveyRunForm.owners = _.reject(owners, r => r.id === p.id);
     };
 
     vm.$onInit = () => {
@@ -107,6 +122,10 @@ function controller(serviceBroker, userService) {
         userService
             .whoami()
             .then(me => vm.surveyRunForm.contactEmail = me.userName);
+
+        serviceBroker
+            .loadAppData(CORE_API.InvolvementKindStore.findAll, [])
+            .then(r => vm.availibleInvolvementKinds = r.data);
 
         vm.visibility.showIssueSurveyBtn = isSurveyTargetKind(vm.parentEntityRef.kind);
     };
@@ -119,11 +138,18 @@ function controller(serviceBroker, userService) {
 
     function save() {
         const recipientIds = _.map(vm.surveyRunForm.recipients, "id");
+        const ownerIds = _.map(vm.surveyRunForm.owners, "id");
 
-        if (_.isEmpty(recipientIds)) {
-            toasts.error("Please provide at least one recipient");
+        const involvementKindIds = _.map(vm.surveyRunForm.recipientInvolvementKinds, "id");
+        const ownerInvKindIds = _.map(vm.surveyRunForm.ownerInvolvementKinds, "id");
+
+        if (_.isEmpty(recipientIds) && _.isEmpty(involvementKindIds)) {
+            toasts.error("Please provide at least one recipient or recipient involvement kind");
             return;
+        } else if (_.isEmpty(recipientIds)) {
+            toasts.warning("If there are no recipients found for the selected involvement kinds the survey owner will be added to allow manual addition of recipients");
         }
+
         const submissionDueDate = toDate(vm.surveyRunForm.dueDate);
         const approvalDueDate = toDate(vm.surveyRunForm.approvalDueDate) || submissionDueDate;
         const command = {
@@ -134,7 +160,8 @@ function controller(serviceBroker, userService) {
                 entityReference: vm.parentEntityRef,
                 scope: "EXACT",
             },
-            involvementKindIds: [],
+            involvementKindIds,
+            ownerInvKindIds,
             issuanceKind: vm.surveyRunForm.issuanceKind,
             dueDate: submissionDueDate,
             approvalDueDate: approvalDueDate,
@@ -146,7 +173,11 @@ function controller(serviceBroker, userService) {
             .execute(CORE_API.SurveyRunStore.create, [command])
             .then(r => r.data.id)
             .then(runId => serviceBroker
-                .execute(CORE_API.SurveyRunStore.createSurveyInstances, [ runId, { personIds: recipientIds, owningRole: vm.surveyRunForm.owningRole }])
+                .execute(CORE_API.SurveyRunStore.createSurveyInstances, [runId, {
+                    recipientPersonIds: recipientIds,
+                    ownerPersonIds: ownerIds,
+                    owningRole: vm.surveyRunForm.owningRole
+                }])
                 .then(() => runId))
             .then(runId => serviceBroker
                 .execute(CORE_API.SurveyRunStore.updateStatus, [runId, {newStatus: "ISSUED"}]))
