@@ -110,7 +110,7 @@
         <td>
             <div>Additional Column Options</div>
             <div class="small help-text">
-                Select any additional column options used to determine the column value.
+                Select any additional column options used to determine the column value
             </div>
         </td>
         <td>
@@ -123,7 +123,7 @@
     <tr>
         <td>
             <div>Display name</div>
-            <div class="small help-text">The name displayed on the grid. By default the entity name is displayed.
+            <div class="small help-text">The name displayed on the grid. By default the entity name is displayed
             </div>
         </td>
         <td>
@@ -137,7 +137,9 @@
     <tr>
         <td>
             <div>External ID</div>
-            <div class="small help-text">An identifier used to reference this column in derivation scripts</div>
+            <div class="small help-text">An identifier used to reference this column in derivation scripts and filter
+                notes
+            </div>
         </td>
         <td>
             <input class="form-control"

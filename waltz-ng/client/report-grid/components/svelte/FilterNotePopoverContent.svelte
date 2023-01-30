@@ -25,7 +25,11 @@
     $: ratingSchemeItemsById = _.keyBy(grid.instance.ratingSchemeItems, d => d.id);
     $: groupedFilters = _.groupBy(filters, d => d.columnDefinitionId);
     $: ratingColumnKinds = [entity.MEASURABLE.key, entity.ASSESSMENT_DEFINITION.key];
-    $: noteContent = _.join([gridContent, filterContent, reloadLinkContent], "");
+
+    $: filtersWithNoExtId = _.filter(filters, d => _.get(gridColumnsById, [d.columnDefinitionId, "externalId"]) == null);
+    $: headerWarning = _.isEmpty(filtersWithNoExtId)
+        ? ""
+        : "### **ERROR:** There are some columns in the filter list where the external id has not been set!\n<br>\n";
 
     $: gridContent = "| Grid Name | Grid Identifier | Vantage Point Kind | Vantage Point Id |\n" +
         "| --- | --- | --- | --- |\n" +
@@ -56,11 +60,16 @@
                 .join("; ")
                 .value();
 
-            return `| \`${getDisplayNameForColumn(gridColumnDef)}\` | \`CONTAINS_ANY_OPTION\` | ${optionCodes} |`
+            const columnIdentifier = gridColumnDef.externalId !== null
+                ? gridColumnDef.externalId
+                : `ERROR: No external identifier found for column: ${getDisplayNameForColumn(gridColumnDef)}`;
+
+            return `| \`${columnIdentifier}\` | \`CONTAINS_ANY_OPTION\` | ${optionCodes} |`
         })
         .join("\n")
         .value();
 
+    $: noteContent = _.join([headerWarning, gridContent, filterContent, reloadLinkContent], "");
 
 </script>
 
