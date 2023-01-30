@@ -107,11 +107,10 @@ function controller(appGroupStore, involvementKindStore, serviceBroker) {
             vm.availableAppGroups = [].concat(publicGroups, privateGroups);
         });
 
-    involvementKindStore.findAll().then(
-        involvementKinds => {
+    involvementKindStore.findAll()
+        .then(involvementKinds => {
             vm.availableInvolvementKinds = involvementKinds;
-        }
-    );
+        });
 
     vm.$onInit = () => {
         serviceBroker.loadViewData(CORE_API.RoleStore.findAllRoles)
