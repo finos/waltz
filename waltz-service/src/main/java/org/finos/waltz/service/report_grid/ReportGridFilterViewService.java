@@ -24,6 +24,7 @@ import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.report_grid.ReportGridDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.NameProvider;
 import org.finos.waltz.model.app_group.AppGroupEntry;
 import org.finos.waltz.model.app_group.ImmutableAppGroupEntry;
 import org.finos.waltz.model.entity_named_note.EntityNamedNote;
@@ -248,9 +249,13 @@ public class ReportGridFilterViewService {
                 .stream()
                 .filter(c -> {
                     // rating cells may want to look up on rating id / code / external id
-                    if (c.ratingIdValue() != null) {
-                        RatingSchemeItem rating = ratingSchemeItemByIdMap.get(c.ratingIdValue());
-                        Set<String> ratingIdentifiers = asSet(c.optionCode(), String.valueOf(rating.rating()), rating.name(), rating.externalId().orElse(null));
+                    if (!isEmpty(c.ratingIdValues())) {
+                        Set<RatingSchemeItem> ratings = SetUtilities.map(c.ratingIdValues(), d -> ratingSchemeItemByIdMap.get(d));
+                        Set<String> ratingIdentifiers = union(
+                                map(c.options(), CellOption::code),
+                                map(ratings, rating -> String.valueOf(rating.rating())),
+                                map(ratings, NameProvider::name),
+                                map(ratings, rating -> rating.externalId().orElse(null)));
                         return CollectionUtilities.notEmpty(intersection(filter.filterValues(), ratingIdentifiers));
                     } else {
                         return filter.filterValues().contains(c.optionCode());

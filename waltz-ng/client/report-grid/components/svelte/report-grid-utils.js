@@ -329,6 +329,19 @@ function mkAttestationCell(dataCell, baseCell) {
 }
 
 
+function mkRatingCell(dataCell, baseCell) {
+
+    const ratingSchemeItems = _.map(dataCell.ratingIdValues, d => ratingSchemeItemsById[d]);
+
+    return Object.assign({}, baseCell, {
+        comment: mkPopoverHtml(dataCell, ratingSchemeItems),
+        color: ratingSchemeItem.color,
+        fontColor: ratingSchemeItem.fontColor,
+        text: dataCell.textValue,
+    });
+}
+
+
 export function combineColDefs(gridData) {
     const fixedColDefs = _.get(gridData, ["definition", "fixedColumnDefinitions"], []);
     const derivedColDefs = _.get(gridData, ["definition", "derivedColumnDefinitions"], []);
@@ -404,15 +417,9 @@ export function prepareTableData(gridData) {
                     text: dataCell.textValue,
                     comment: dataCell.comment,
                 });
-            case "ASSESSMENT_DEFINITION":
+            case "ASSESSMENT_DEFINITION": // separate this to single and multi value cell? or sort out the co
             case "MEASURABLE":
-                const ratingSchemeItem = ratingSchemeItemsById[dataCell.ratingIdValue];
-                return Object.assign({}, baseCell, {
-                    comment: mkPopoverHtml(dataCell, ratingSchemeItem),
-                    color: ratingSchemeItem.color,
-                    fontColor: ratingSchemeItem.fontColor,
-                    text: ratingSchemeItem.name,
-                });
+                return mkRatingCell(dataCell, baseCell);
             case "REPORT_GRID_DERIVED_COLUMN_DEFINITION":
                 return Object.assign({}, baseCell, {
                     comment: dataCell.errorValue
@@ -563,6 +570,21 @@ export function mkRowFilter(filters = []) {
             return _.some(
                 filtersForCol,
                 f => colOptionCode === f.optionCode);
+        });
+}
+
+export function mkNewRowFilter(filters = []) {
+    const filtersByColumnDefinitionId = _.groupBy(
+        filters,
+        f => f.columnDefinitionId);
+
+    return row => _.every(
+        filtersByColumnDefinitionId,
+        (filtersForCol, colId) => {
+            const colOptionCodes = _.get(row, [colId, "optionCodes"], undefined);
+            return _.some(
+                filtersForCol,
+                f => _.includes(colOptionCodes, f.optionCode));
         });
 }
 

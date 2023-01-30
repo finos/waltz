@@ -276,9 +276,7 @@ public class ReportGridColumnCalculator {
 
         return ImmutableCellVariable.builder()
                 .from(cell)
-                .rating(cell.ratingIdValue() != null
-                        ? ratingSchemeItemsById.get(cell.ratingIdValue())
-                        : null)
+                .ratings(map(cell.ratingIdValues(), ratingSchemeItemsById::get))
                 .build();
     }
 

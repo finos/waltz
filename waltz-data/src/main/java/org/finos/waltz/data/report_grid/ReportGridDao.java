@@ -25,6 +25,7 @@ import org.finos.waltz.common.hierarchy.Forest;
 import org.finos.waltz.common.hierarchy.Node;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.InlineSelectFieldFactory;
+import org.finos.waltz.model.Cardinality;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.entity_field_reference.EntityFieldReference;
@@ -69,6 +70,7 @@ import static org.finos.waltz.common.DateTimeUtilities.toLocalDate;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.common.ListUtilities.asList;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.common.MapUtilities.*;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.SetUtilities.*;
@@ -1925,9 +1927,10 @@ public class ReportGridDao {
                                     .builder()
                                     .subjectId(entityId)
                                     .columnDefinitionId(highIdToDefIdMap.getOrDefault(measurableId, lowIdToDefIdMap.get(measurableId)))
-                                    .ratingIdValue(t.v1)
+                                    .ratingIdValues(asSet(t.v1))
                                     .optionCode(Long.toString(t.v1))
                                     .optionText(t.v3)
+                                    .textValue(t.v3)
                                     .build())
                             .orElse(null);
                 })
@@ -1966,7 +1969,8 @@ public class ReportGridDao {
                     .fetchSet(r -> ImmutableReportGridCell.builder()
                             .subjectId(r.get(mr.ENTITY_ID))
                             .columnDefinitionId(measurableIdToDefIdMap.get(r.get(mr.MEASURABLE_ID)))
-                            .ratingIdValue(r.get(rsi.ID))
+                            .ratingIdValues(asSet(r.get(rsi.ID)))
+                            .textValue(r.get(rsi.NAME))
                             .comment(r.get(mr.DESCRIPTION))
                             .optionText(r.get(rsi.NAME))
                             .optionCode(Long.toString(r.get(rsi.ID)))
@@ -1985,25 +1989,73 @@ public class ReportGridDao {
                     ReportGridFixedColumnDefinition::columnEntityId,
                     ReportGridFixedColumnDefinition::gridColumnId);
 
-            return dsl
+
+            Map<String, Result<Record6<Long, Long, Long, String, String, String>>> assessmentsByCardinality = dsl
                     .select(ar.ENTITY_ID,
                             ar.ASSESSMENT_DEFINITION_ID,
                             ar.RATING_ID,
                             rsi.NAME,
-                            ar.DESCRIPTION)
+                            ar.DESCRIPTION,
+                            ad.CARDINALITY)
                     .from(ar)
                     .innerJoin(rsi).on(ar.RATING_ID.eq(rsi.ID))
+                    .innerJoin(ad).on(ar.ASSESSMENT_DEFINITION_ID.eq(ad.ID))
                     .where(ar.ASSESSMENT_DEFINITION_ID.in(assessmentIdToDefIdMap.keySet())
                             .and(ar.ENTITY_KIND.eq(selector.kind().name()))
                             .and(ar.ENTITY_ID.in(selector.selector())))
-                    .fetchSet(r -> ImmutableReportGridCell.builder()
+                    .fetchGroups(r -> r.get(ad.CARDINALITY));
+
+            Result<Record6<Long, Long, Long, String, String, String>> assessmentRatings = assessmentsByCardinality.get(Cardinality.ZERO_ONE.name());
+            Result<Record6<Long, Long, Long, String, String, String>> multiValueAssessmentRatings = assessmentsByCardinality.get(Cardinality.ZERO_MANY.name());
+
+            Set<ReportGridCell> singleValueGridCells = map(assessmentRatings,
+                    r -> ImmutableReportGridCell.builder()
                             .subjectId(r.get(ar.ENTITY_ID))
                             .columnDefinitionId(assessmentIdToDefIdMap.get(r.get(ar.ASSESSMENT_DEFINITION_ID)))
-                            .ratingIdValue(r.get(ar.RATING_ID))
+                            .ratingIdValues(asSet(r.get(ar.RATING_ID)))
+                            .textValue(r.get(rsi.NAME))
                             .comment(r.get(ar.DESCRIPTION))
                             .optionCode(Long.toString(r.get(ar.RATING_ID)))
                             .optionText(r.get(rsi.NAME))
                             .build());
+
+            Set<ReportGridCell> multiValueGridCells = isEmpty(multiValueAssessmentRatings)
+                    ? emptySet()
+                    : groupBy(
+                    multiValueAssessmentRatings,
+                    d -> tuple(d.get(ar.ASSESSMENT_DEFINITION_ID), d.get(ar.ENTITY_ID)),
+                    d -> tuple(d.get(ar.RATING_ID), d.get(ar.DESCRIPTION), d.get(rsi.NAME)))
+                    .entrySet()
+                    .stream()
+                    .map(e -> {
+
+                        // feels like we want to have multiple outcomes
+                        Collection<Tuple3<Long, String, String>> values = e.getValue();
+
+                        Set<Long> ratingIds = map(values, v -> v.v1);
+                        String cellName = values
+                                .stream()
+                                .map(v -> v.v3)
+                                .collect(joining(", "));
+
+                        Set<CellOption> options = map(values, v -> ImmutableCellOption.builder()
+                                .text(v.v3)
+                                .code(Long.toString(v.v1))
+                                .build());
+
+                        return ImmutableReportGridCell.builder()
+                                .subjectId(e.getKey().v2)
+                                .columnDefinitionId(assessmentIdToDefIdMap.get(e.getKey().v1))
+                                .ratingIdValues(ratingIds)
+                                .comment("")
+                                .textValue(cellName)
+                                .options(options)
+                                .isSingleValueResponse(false)
+                                .build();
+                    })
+                    .collect(toSet());
+
+            return union(singleValueGridCells, multiValueGridCells);
         }
     }
 
