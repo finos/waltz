@@ -66,7 +66,7 @@ Checkout [the project milestones](https://github.com/finos/waltz/milestones) and
 | Release | Date              | Summary                    |
 |---------|-------------------|----------------------------|
 | 1.47    | 31st January 2023 | Legal Entities             |
-| 1.48    | 14th March 2023   | Legal Entities (continued) |
+| 1.48    | 28th March 2023   | Legal Entities (continued) |
 | 1.49    | 30th May 2023     | tbd                        |
 
 ## Contributing
