@@ -296,6 +296,7 @@ public class ReportGridService {
                 .name(updateCommand.name())
                 .description(updateCommand.description())
                 .subjectKind(gridToClone.subjectKind())
+                .kind(ReportGridKind.PRIVATE)
                 .build();
 
         ReportGridDefinition newGrid = create(newGridCreateCommand, username);
