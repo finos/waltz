@@ -70,10 +70,4 @@ public abstract class ReportGridCell implements CommentProvider {
     public Set<CellOption> options() {
         return asSet(CellOption.defaultCellOption());
     }
-
-    @Value.Default
-    public boolean isSingleValueResponse() {
-        return true;
-    }
-
 }

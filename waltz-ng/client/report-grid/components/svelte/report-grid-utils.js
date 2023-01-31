@@ -167,8 +167,7 @@ export function prepareColumnDefs(colDefs) {
                     allowSummary: true,
                     toSearchTerm: d => _.get(d, [c.gridColumnId, "text"], ""),
                     cellTemplate:
-                        `<div class="waltz-grid-report-cell"
-                              ng-bind="COL_FIELD.text"
+                        `<div
                               uib-popover-html="COL_FIELD.comment"
                               popover-trigger="mouseenter"
                               popover-enable="COL_FIELD.comment != null"
@@ -178,8 +177,12 @@ export function prepareColumnDefs(colDefs) {
                               popover-placement="left"
                               ng-style="{
                                 'border-bottom-right-radius': COL_FIELD.comment ? '15% 50%' : 0,
-                                'background-color': COL_FIELD.color,
+                                'background': COL_FIELD.color,
                                 'color': COL_FIELD.fontColor}">
+                                <div class="waltz-grid-report-cell"
+                                        ng-bind="COL_FIELD.text"
+                                        style="background: linear-gradient(to top, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) 50%)">
+                                </div>
                         </div>`
                 };
         }
@@ -205,23 +208,30 @@ export function prepareColumnDefs(colDefs) {
 }
 
 
-function mkPopoverHtml(cellData, ratingSchemeItem) {
-    const comment = cellData.comment;
-    if (_.isEmpty(comment)) {
-        return "";
-    } else {
-        const ratingDesc = ratingSchemeItem.description === ratingSchemeItem.name
-            ? ""
-            : `<div class='help-block'>${ratingSchemeItem.description}</div>`;
+function mkRatingPopoverHtml(cellData, ratingSchemeItems) {
 
-        return `
+    const ratingRows = _.map(
+        ratingSchemeItems,
+        d => `<tr><td>${d.name}</td><td>${d.description}</td></tr>`);
+
+    return `
             <div class='small'>
-                <label>Comment:</label> ${cellData.comment}
+                <label>Comment:</label>
+                ${cellData.comment || "-"}
                 <hr>
-                <label>Rating:</label> ${ratingSchemeItem.name}
-                ${ratingDesc}
+                <label>Rating/s:</label>
+                <table class="table table-condensed small">
+                <thead>
+                <tr>
+                <th>Name</th>
+                <th>Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                ${_.join(ratingRows, "")}
+                </tbody>
+                </table>
             </div>`;
-    }
 }
 
 
@@ -329,18 +339,40 @@ function mkAttestationCell(dataCell, baseCell) {
 }
 
 
-function mkRatingCell(dataCell, baseCell) {
+function mkRatingCell(dataCell, baseCell, ratingSchemeItemsById) {
+
+    console.log({dataCell, baseCell});
 
     const ratingSchemeItems = _.map(dataCell.ratingIdValues, d => ratingSchemeItemsById[d]);
 
+    const ratingSchemeItem = _.first(ratingSchemeItems);
+
+    const ratingCount = _.size(ratingSchemeItems);
+
+    const colorBandWidth = 100 / ratingCount;
+
+    console.log({ratingCount, colorBandWidth})
+
+    const colorBands = _.map(
+        ratingSchemeItems,
+        d => {
+            const idx = _.indexOf(ratingSchemeItems, d);
+            // return `${d.color}`;
+            return `${d.color} ${colorBandWidth * idx}% ${colorBandWidth * (idx + 1)}%`;
+            // return `${idx === 0 ? `${d.color} 0%,` : ""} ${d.color} ${idx === ratingCount -1 ? "100" : colorBandWidth * idx}%`
+        });
+
+    const background = `linear-gradient(to right,  ${_.join(colorBands, ",")})`;
+
+    console.log({background});
+
     return Object.assign({}, baseCell, {
-        comment: mkPopoverHtml(dataCell, ratingSchemeItems),
-        color: ratingSchemeItem.color,
-        fontColor: ratingSchemeItem.fontColor,
+        comment: mkRatingPopoverHtml(dataCell, ratingSchemeItems),
+        color: background,
+        fontColor: "black",
         text: dataCell.textValue,
     });
 }
-
 
 export function combineColDefs(gridData) {
     const fixedColDefs = _.get(gridData, ["definition", "fixedColumnDefinitions"], []);
@@ -419,7 +451,7 @@ export function prepareTableData(gridData) {
                 });
             case "ASSESSMENT_DEFINITION": // separate this to single and multi value cell? or sort out the co
             case "MEASURABLE":
-                return mkRatingCell(dataCell, baseCell);
+                return mkRatingCell(dataCell, baseCell, ratingSchemeItemsById);
             case "REPORT_GRID_DERIVED_COLUMN_DEFINITION":
                 return Object.assign({}, baseCell, {
                     comment: dataCell.errorValue
