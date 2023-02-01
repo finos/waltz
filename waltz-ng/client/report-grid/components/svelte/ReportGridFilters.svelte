@@ -119,8 +119,6 @@
         $summaries,
         s => _.includes(rejectedColumnKinds, s.column.columnEntityKind));
 
-    $: console.log({filters: $filters, activeSummaries: $activeSummaries});
-
 </script>
 
 <div>
