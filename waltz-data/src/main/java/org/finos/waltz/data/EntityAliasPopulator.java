@@ -18,16 +18,18 @@
 
 package org.finos.waltz.data;
 
+import org.finos.waltz.common.FunctionUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.schema.Tables;
-import org.jooq.*;
-import org.jooq.impl.DSL;
+import org.jooq.DSLContext;
+import org.jooq.Record2;
+import org.jooq.SelectConditionStep;
+import org.jooq.SelectOrderByStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toMap;
@@ -50,55 +52,53 @@ public class EntityAliasPopulator {
     public Map<String, Long> fetchEntityIdLookupMap(EntityKind entityKind, Set<String> identifiers) {
         checkNotNull(entityKind, "entityKind cannot be null");
 
-        Field<String> alias = DSL.field("alias", String.class);
-
-        SelectJoinStep<Record1<String>> aliasesTable = DSL
-                .select(alias)
-                .from(DSL.values(mkRowsFromIdentifiers(identifiers)).as("aliases", "alias"));
-
         switch (entityKind) {
             case APPLICATION:
-                return fetchApplicationAliasToIdMap(alias, aliasesTable);
+                return fetchApplicationAliasToIdMap(identifiers);
             case PERSON:
-                return fetchPersonAliasToIdMap(alias, aliasesTable);
+                return FunctionUtilities.time("fetch alias map people", () -> fetchPersonAliasToIdMap(identifiers));
             default:
                 throw new IllegalArgumentException(format("Cannot find lookup map for id for entity kind: %s", entityKind));
         }
     }
 
-    private Map<String, Long> fetchApplicationAliasToIdMap(Field<String> alias, SelectJoinStep<Record1<String>> aliasesTable) {
+    private Map<String, Long> fetchApplicationAliasToIdMap(Set<String> aliases) {
         return dsl
-                .select(aliasesTable.field(alias), Tables.APPLICATION.ID)
+                .select(Tables.APPLICATION.ASSET_CODE, Tables.APPLICATION.ID)
                 .from(Tables.APPLICATION)
-                .innerJoin(aliasesTable).on(aliasesTable.field(alias).eq(Tables.APPLICATION.ASSET_CODE))
-                .fetchSet(r -> tuple(r.get(aliasesTable.field(alias)), r.get(Tables.APPLICATION.ID)))
+                .where(Tables.APPLICATION.ASSET_CODE.in(aliases))
+                .fetchSet(r -> tuple(r.get(Tables.APPLICATION.ASSET_CODE), r.get(Tables.APPLICATION.ID)))
                 .stream()
                 .collect(toMap(t -> t.v1, t -> t.v2, (v1, v2) -> v1));
     }
 
 
-    private Map<String, Long> fetchPersonAliasToIdMap(Field<String> alias, SelectJoinStep<Record1<String>> aliasesTable) {
+    private Map<String, Long> fetchPersonAliasToIdMap(Set<String> aliases) {
 
-        Condition joinCond = aliasesTable.field(alias).equalIgnoreCase(Tables.PERSON.EMPLOYEE_ID)
-                .or(aliasesTable.field(alias).equalIgnoreCase(Tables.PERSON.EMAIL)
-                        .or(aliasesTable.field(alias).equalIgnoreCase(Tables.PERSON.DISPLAY_NAME)));
-
-        return dsl
-                .select(aliasesTable.field(alias), Tables.PERSON.ID)
+        SelectConditionStep<Record2<String, Long>> emails = dsl
+                .select(Tables.PERSON.EMAIL, Tables.PERSON.ID)
                 .from(Tables.PERSON)
-                .innerJoin(aliasesTable).on(joinCond)
-                .where(Tables.PERSON.IS_REMOVED.isFalse())
-                .fetchSet(r -> tuple(r.get(aliasesTable.field(alias)), r.get(Tables.PERSON.ID)))
+                .where(Tables.PERSON.IS_REMOVED.isFalse()
+                        .and(Tables.PERSON.EMAIL.in(aliases)));
+
+        SelectConditionStep<Record2<String, Long>> name = dsl
+                .select(Tables.PERSON.DISPLAY_NAME, Tables.PERSON.ID)
+                .from(Tables.PERSON)
+                .where(Tables.PERSON.IS_REMOVED.isFalse()
+                        .and(Tables.PERSON.DISPLAY_NAME.in(aliases)));
+
+        SelectConditionStep<Record2<String, Long>> empId = dsl
+                .select(Tables.PERSON.EMPLOYEE_ID, Tables.PERSON.ID)
+                .from(Tables.PERSON)
+                .where(Tables.PERSON.IS_REMOVED.isFalse()
+                        .and(Tables.PERSON.EMPLOYEE_ID.in(aliases)));
+
+        SelectOrderByStep<Record2<String, Long>> qry = emails.union(name.union(empId));
+
+        return qry
+                .fetchSet(r -> tuple(r.get(0, String.class), r.get(Tables.PERSON.ID)))
                 .stream()
                 .collect(toMap(t -> t.v1, t -> t.v2, (v1, v2) -> v1));
-    }
-
-    private Row1<String>[] mkRowsFromIdentifiers(Set<String> identifiers) {
-        return identifiers
-                .stream()
-                .map(d -> DSL.row(d))
-                .collect(Collectors.toSet())
-                .toArray(new Row1[0]);
     }
 
 }
