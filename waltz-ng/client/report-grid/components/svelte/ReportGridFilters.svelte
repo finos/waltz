@@ -28,6 +28,7 @@
 
     function onToggleFilter(optionSummary) {
 
+        console.log({toggleSummary: optionSummary});
         if (isSelectedSummary(optionSummary.summaryId)) {
             $filters = _.reject(
                 $filters,
@@ -44,9 +45,9 @@
 
 
     function removeSummary(summary) {
-        activeSummaries.remove(summary.column.id);
+        console.log({removeSummary: summary});
         // remove any filters which refer to the property used by this summary
-        $filters = _.reject($filters, f => f.columnDefinitionId === summary.column.id);
+        $filters = _.reject($filters, f => f.columnDefinitionId === summary.column.gridColumnId);
     }
 
 
@@ -120,6 +121,7 @@
         $summaries,
         s => _.includes(rejectedColumnKinds, s.column.columnEntityKind));
 
+    $: console.log({filters: $filters, activeSummaries: $activeSummaries});
 
 </script>
 
