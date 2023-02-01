@@ -6,10 +6,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.command.Command;
-
 import org.immutables.value.Value;
 
-import java.util.List;
 import java.util.Optional;
 
 @Value.Immutable
@@ -19,6 +17,7 @@ public abstract class BulkUploadCommand implements Command {
 
     public abstract BulkUploadMode uploadMode();
 
+    @Value.Redacted
     public abstract String inputString();
 
     public abstract EntityReference targetDomain();
