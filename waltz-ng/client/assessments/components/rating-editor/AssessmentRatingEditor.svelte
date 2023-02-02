@@ -55,9 +55,6 @@
             <p class="help-block">
                 <Markdown text={$selectedAssessment?.definition.description}/>
             </p>
-            <p class="help-block">
-                Cardinality: {_.get(cardinality, [$selectedAssessment?.definition.cardinality, "name"], "Unknown")}
-            </p>
 
             <hr>
 
