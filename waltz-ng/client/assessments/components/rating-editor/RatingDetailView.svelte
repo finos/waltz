@@ -96,6 +96,48 @@
 
 <h4>Rating Detail:</h4>
 
+{#if $selectedRating}
+
+    <div class="form-group">
+        <label for="rating">
+            Rating
+        </label>
+        <div id="rating">
+            <RatingIndicatorCell {...$selectedRating?.ratingItem}
+                                 showName="true"
+                                 showGroup="true"/>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="last-update">
+            Last Updated
+        </label>
+        <div id="last-update">
+            <LastEdited entity={$selectedRating?.rating}/>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div id="comment">
+            <TextEditableField text={rating.comment}
+                               label="Comment"
+                               editable={canEdit}
+                               onSave={saveComment}/>
+        </div>
+    </div>
+
+    {#if $selectedRating?.rating.isReadOnly}
+        <div class="help-block">
+            <span style="color: orange">
+                <Icon name="lock"/>
+            </span>
+            This rating is read only
+        </div>
+    {/if}
+
+{/if}
+
 <div style="padding: 1em 0">
 
     {#if canLock}
@@ -130,46 +172,3 @@
 
 </div>
 
-{#if $selectedRating}
-
-    <div class="form-group">
-        <label for="rating">
-            Rating
-        </label>
-        <div id="rating">
-            <RatingIndicatorCell {...$selectedRating?.ratingItem}
-                                 showName="true"
-                                 showGroup="true"/>
-        </div>
-    </div>
-
-    <div class="form-group">
-        <label for="last-update">
-            Last Updated
-        </label>
-        <div id="last-update">
-            <LastEdited entity={$selectedRating?.rating}/>
-        </div>
-    </div>
-
-    <div class="form-group">
-        <label for="comment">
-            Comment
-        </label>
-        <div id="comment">
-            <TextEditableField text={rating.comment}
-                               editable={canEdit}
-                               onSave={saveComment}/>
-        </div>
-    </div>
-
-    {#if $selectedRating?.rating.isReadOnly}
-        <div class="help-block">
-            <span style="color: orange">
-                <Icon name="lock"/>
-            </span>
-            This rating is read only
-        </div>
-    {/if}
-
-{/if}

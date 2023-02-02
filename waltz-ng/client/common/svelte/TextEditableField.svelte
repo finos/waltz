@@ -4,10 +4,12 @@
     import SavingPlaceholder from "./SavingPlaceholder.svelte";
     import Icon from "./Icon.svelte";
     import {createEventDispatcher} from "svelte";
+    import _ from "lodash";
 
     export let text;
     export let onSave = (text) => console.log("Text to save", {text});
     export let editable;
+    export let label;
 
     let workingText;
     let savePromise
@@ -40,8 +42,22 @@
 
 
 {#if activeMode === Modes.VIEW}
-    <Markdown {text}/>
-    {#if editable}
+    {#if !_.isEmpty(label)}
+        <label for="text">
+            {label}
+        </label>
+        {#if editable}
+            <button class="btn btn-skinny"
+                    on:click={editText}>
+                <Icon name="pencil"/>
+                Edit
+            </button>
+        {/if}
+    {/if}
+    <div id="text">
+        <Markdown {text}/>
+    </div>
+    {#if _.isEmpty(label) && editable}
         <button class="btn btn-skinny"
                 on:click={editText}>
             <Icon name="pencil"/>
@@ -49,6 +65,11 @@
         </button>
     {/if}
 {:else if activeMode === Modes.EDIT}
+    {#if !_.isEmpty(label)}
+        <label for="text">
+            {label}
+        </label>
+    {/if}
     <textarea class="form-control"
               rows="5"
               bind:value={workingText}/>
