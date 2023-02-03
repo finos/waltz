@@ -38,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -172,7 +173,7 @@ public class SurveyInstanceDao {
         record.setApprovalDueDate(toSqlDate(command.approvalDueDate()));
         record.setOwningRole(command.owningRole());
         record.setName(command.name());
-        record.setIssuedOn(toSqlDate(command.issuedOn()));
+        record.setIssuedOn(Timestamp.valueOf(command.issuedOn().atStartOfDay()));
 
         record.store();
         return record.getId();
@@ -204,7 +205,7 @@ public class SurveyInstanceDao {
                     record.setEntityQualifierKind(ref.kind().name());
                     record.setEntityQualifierId(ref.id());
                 });
-        record.setIssuedOn(toSqlDate(today()));
+        record.setIssuedOn(Timestamp.from(Instant.now()));
 
         record.store();
         return record.getId();

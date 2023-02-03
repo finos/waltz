@@ -89,4 +89,13 @@ public class ArrayUtilities {
                 .toArray();
     }
 
+
+    public static <T> T idx(T[] arr, int idx, T dflt) {
+        try {
+            return arr[idx];
+        } catch (ArrayIndexOutOfBoundsException aioobe) {
+            return dflt;
+        }
+    }
+
 }
