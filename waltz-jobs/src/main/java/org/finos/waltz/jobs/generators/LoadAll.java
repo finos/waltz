@@ -66,7 +66,8 @@ public class LoadAll {
             new SurveyRunGenerator(),
             new ChangeSetGenerator(),
             new LicenceGenerator(),
-            new ChangeUnitGenerator()
+            new ChangeUnitGenerator(),
+            new LegalEntityGenerator()
     };
 
 
