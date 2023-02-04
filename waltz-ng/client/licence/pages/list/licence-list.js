@@ -36,6 +36,7 @@ const nameCol = mkLinkGridCell(
     "main.licence.view",
     { width: "50%" });
 
+
 const assessmentsCol = {
     field: "assessments",
     name: "Assessments",
@@ -78,7 +79,7 @@ const initialState = {
 function mkColumnDefs(assessmentDefs) {
     const assessmentFields = _.map(assessmentDefs, d => {
         return {
-            field: `${d.externalId}.ratingItem.name`,
+            field: `${d.externalId}.ratings[0].ratingItem.name`,
             displayName: d.name
         };
     });
@@ -118,15 +119,18 @@ function controller($q, serviceBroker) {
 
                 vm.columnDefs = mkColumnDefs(assessmentDefinitions);
 
-                vm.licences = _.map(licences, l => {
-                    const usageCount = _.get(usageByLicenseId, [l.id, "count"], 0);
+                vm.licences = _.map(licences, licence => {
+                    const usageCount = _.get(usageByLicenseId, [licence.id, "count"], 0);
                     const usageInfo = usageCount > 0
                         ? `${usageCount} Applications`
                         : "-";
 
-                    const assessmentsByDefinitionExtId = _.get(assessmentsByLicenceId, l.id, []);
+                    const assessmentsByDefinitionExtId = _.get(
+                        assessmentsByLicenceId,
+                        licence.id,
+                        []);
 
-                    return Object.assign({}, l, { usageInfo }, assessmentsByDefinitionExtId)
+                    return Object.assign({}, licence, { usageInfo }, assessmentsByDefinitionExtId)
                 });
             });
 
