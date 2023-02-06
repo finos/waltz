@@ -447,6 +447,17 @@ public class AssessmentRatingDao {
                 .execute() == 1;
     }
 
+
+    public boolean updateRating(long assessmentRatingId, UpdateRatingCommand ratingCommand, String username) {
+        return dsl
+                .update(ar)
+                .set(ar.RATING_ID, ratingCommand.newRatingId())
+                .set(ar.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
+                .set(ar.LAST_UPDATED_BY, username)
+                .where(ar.ID.eq(assessmentRatingId))
+                .execute() == 1;
+    }
+
     public Set<AssessmentRatingSummaryCounts> findRatingSummaryCounts(GenericSelector genericSelector,
                                                                       Set<Long> definitionIds) {
 

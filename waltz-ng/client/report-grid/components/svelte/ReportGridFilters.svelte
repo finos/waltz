@@ -44,9 +44,8 @@
 
 
     function removeSummary(summary) {
-        activeSummaries.remove(summary.column.id);
         // remove any filters which refer to the property used by this summary
-        $filters = _.reject($filters, f => f.columnDefinitionId === summary.column.id);
+        $filters = _.reject($filters, f => f.columnDefinitionId === summary.column.gridColumnId);
     }
 
 
@@ -119,7 +118,6 @@
     $: availableSummaries = _.reject(
         $summaries,
         s => _.includes(rejectedColumnKinds, s.column.columnEntityKind));
-
 
 </script>
 

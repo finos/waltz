@@ -107,20 +107,11 @@ public class PermissionGroupDao {
 
 
     private SelectConditionStep<Record1<Long>> permissionGroupSelector(EntityReference parentEntityRef) {
-        switch (parentEntityRef.kind()) {
-            case APPLICATION:
-            case ACTOR:
-            case CHANGE_INITIATIVE:
-            case LEGAL_ENTITY:
-                return DSL
-                        .select(PERMISSION_GROUP_ENTRY.PERMISSION_GROUP_ID)
-                        .from(PERMISSION_GROUP_ENTRY)
-                        .where(PERMISSION_GROUP_ENTRY.ENTITY_ID.eq(parentEntityRef.id())
-                                .and(PERMISSION_GROUP_ENTRY.ENTITY_KIND.eq(parentEntityRef.kind().name())));
-            default:
-                throw new UnsupportedOperationException("Cannot find permission group for kind: " + parentEntityRef.kind());
-
-        }
+        return DSL
+                .select(PERMISSION_GROUP_ENTRY.PERMISSION_GROUP_ID)
+                .from(PERMISSION_GROUP_ENTRY)
+                .where(PERMISSION_GROUP_ENTRY.ENTITY_ID.eq(parentEntityRef.id())
+                        .and(PERMISSION_GROUP_ENTRY.ENTITY_KIND.eq(parentEntityRef.kind().name())));
     }
 
 

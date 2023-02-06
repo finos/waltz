@@ -42,16 +42,17 @@
     function valueChanged(columnDefs, column) {
         const updatedColumn = _.find(columnDefs, d => sameColumnRef(d, column));
         return column.id != null //new columns cannot be reset
-            && (updatedColumn.derivationScriptChanged
-                || updatedColumn.displayNameChanged
-                || updatedColumn.externalIdChanged);
+            && (updatedColumn?.derivationScriptChanged
+                || updatedColumn?.displayNameChanged
+                || updatedColumn?.externalIdChanged);
     }
 
     function updateDisplayName(workingDisplayName, column) {
+        const workingColumn = _.find($columnDefs, d => sameColumnRef(d, column));
         const originalColumn = _.find($selectedGrid.definition.derivedColumnDefinitions, d => sameColumnRef(d, column));
         const newColumn = Object.assign(
             {},
-            column,
+            workingColumn,
             {
                 displayName: workingDisplayName,
                 displayNameChanged: workingDisplayName !== originalColumn?.displayName
@@ -61,10 +62,11 @@
     }
 
     function updateExternalId(workingExternalId, column) {
+        const workingColumn = _.find($columnDefs, d => sameColumnRef(d, column));
         const originalColumn = _.find($selectedGrid.definition.derivedColumnDefinitions, d => sameColumnRef(d, column));
         const newColumn = Object.assign(
             {},
-            column,
+            workingColumn,
             {
                 externalId: workingExternalId,
                 externalIdChanged: workingExternalId !== originalColumn?.externalId
@@ -74,10 +76,11 @@
     }
 
     function updateDerivationScript(workingScript, column) {
+        const workingColumn = _.find($columnDefs, d => sameColumnRef(d, column));
         const originalColumn = _.find($selectedGrid.definition.derivedColumnDefinitions, d => sameColumnRef(d, column));
         const newColumn = Object.assign(
             {},
-            column,
+            workingColumn,
             {
                 derivationScript: workingScript,
                 derivationScriptChanged: workingScript !== originalColumn?.derivationScript
