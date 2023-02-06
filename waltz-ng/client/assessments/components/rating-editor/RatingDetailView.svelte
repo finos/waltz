@@ -26,6 +26,9 @@
     let assessmentRatingCall;
 
     let rating;
+    let canEdit = false;
+    let canRemove = false;
+    let ratingDisablementReason = null;  // if set this will disable the rating edit functionality
 
 
     $: {
@@ -107,12 +110,18 @@
     $: canUnlock = _.includes(permissionsForRating?.operations, "LOCK") && locked;
 
 
-    $: isSingleValuedAssessment = $selectedAssessment?.definition.cardinality === cardinality.ZERO_ONE.key
-    $: singleValueCanAdd = $selectedAssessment?.definition.cardinality === cardinality.ZERO_ONE.key && _.isEmpty($selectedAssessment?.ratings)
+    $: isMultiValuedAssessment = $selectedAssessment?.definition.cardinality === cardinality.ZERO_MANY.key
+    $: {
+          if (! canEdit) {
+              ratingDisablementReason = "You do not have permissions to edit this rating, though you may be able to remove it";
+          } else if (isMultiValuedAssessment) {
+              ratingDisablementReason = "Multi-valued ratings cannot be editied, please remove and then add the new rating";
+          } else {
+              ratingDisablementReason = null;
+          }
+    }
 
 </script>
-
-<h4>Rating Detail:</h4>
 
 {#if $selectedRating}
 
@@ -123,19 +132,11 @@
         <div id="rating">
             <EditableRatingValue ratingItem={$selectedRating.ratingItem}
                                  showGroup={true}
-                                 editable={isSingleValuedAssessment && canEdit}
+                                 disablementReason={ratingDisablementReason}
                                  onSave={saveRating}/>
         </div>
     </div>
 
-    <div class="form-group">
-        <label for="last-update">
-            Last Updated
-        </label>
-        <div id="last-update">
-            <LastEdited entity={$selectedRating?.rating}/>
-        </div>
-    </div>
 
     <div class="form-group">
         <div id="comment">
@@ -154,6 +155,16 @@
             This rating is read only
         </div>
     {/if}
+
+
+    <div class="form-group">
+        <label for="last-update">
+            Last Updated
+        </label>
+        <div id="last-update">
+            <LastEdited entity={$selectedRating?.rating}/>
+        </div>
+    </div>
 
 {/if}
 

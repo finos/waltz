@@ -38,11 +38,20 @@
     <SubSection>
         <div slot="header">
             {$selectedAssessment?.definition.name}
+            {#if $selectedAssessment?.definition.cardinality === 'ZERO_ONE'}
+                <span title="Single valued assessment. Can only have zero or one outcome">
+                    <Icon name='circle'/>
+                </span>
+            {:else}
+                <span title="Multi valued assessment. Can have multiple outcomes">
+                    <Icon name='circle'/>
+                    <Icon name='circle'/>
+                    <Icon name='circle'/>
+                </span>
+            {/if}
+
         </div>
         <div slot="content">
-            <h4>
-                Assessment Detail:
-            </h4>
             {#if $selectedAssessment?.definition.isReadOnly}
                 <p class="help-block">
                     <span style="color: orange">
