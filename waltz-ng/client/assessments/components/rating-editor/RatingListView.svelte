@@ -28,6 +28,8 @@
 
     $: canAdd = hasAddPermission && (singleValueCanAdd || multiValueCanAdd);
 
+    $: sortedRatingList =_.sortBy($selectedAssessment?.ratings, d => _.toLower(d.ratingItem.ratingGroup + d.ratingItem.name));
+
 </script>
 
 
@@ -38,7 +40,7 @@
     </div>
     <table class="table table-condensed table-hover">
         <tbody>
-            {#each $selectedAssessment?.ratings as rating}
+            {#each sortedRatingList as rating}
             <tr class="clickable"
                 on:click={() => edit(rating)}>
                 <td>
