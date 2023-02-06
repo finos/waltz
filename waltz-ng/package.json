@@ -60,7 +60,7 @@
         "html2canvas": "^1.4.1",
         "json-stable-stringify": "1.0.1",
         "lodash": "4.17.21",
-        "moment": "2.29.1",
+        "moment": "2.29.4",
         "ng-tags-input": "3.2.0",
         "patch-package": "6.4.7",
         "satellizer": "0.15.5",
