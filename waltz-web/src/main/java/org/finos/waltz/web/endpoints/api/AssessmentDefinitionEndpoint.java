@@ -63,7 +63,7 @@ public class AssessmentDefinitionEndpoint implements Endpoint {
     public void register() {
         String getByIdPath = WebUtilities.mkPath(BASE_URL, "id", ":id");
         String favouriteByIdPath = WebUtilities.mkPath(BASE_URL, "id", ":id", "favourite");
-        String findFavouritesForUserPath = WebUtilities.mkPath(BASE_URL, "favourite");
+        String findFavouritesForUserPath = WebUtilities.mkPath(BASE_URL, "favourites");
         String findAllPath = WebUtilities.mkPath(BASE_URL);
         String savePath = WebUtilities.mkPath(BASE_URL);
         String findByKindPath = WebUtilities.mkPath(BASE_URL, "kind", ":kind");
@@ -116,7 +116,7 @@ public class AssessmentDefinitionEndpoint implements Endpoint {
         return assessmentDefinitionService.save(def);
     }
 
-    private boolean removeByIdRoute(Request request, Response response) throws IOException {
+    private boolean removeByIdRoute(Request request, Response response) {
         ensureUserHasEditRights(request);
         long definitionId = WebUtilities.getId(request);
 

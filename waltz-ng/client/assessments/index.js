@@ -29,7 +29,47 @@ import AssessmentRatingTrafficLights from "./components/traffic-lights/assessmen
 import BulkAssessmentRatingSelector from "./components/bulk-assessment-rating-selector/bulk-assessment-rating-selector";
 import AssessmentDefinitionOverview from "./components/assessment-definition-overview/assessment-definition-overview";
 import AssessmentInfoTile from "./components/info-tile/assessment-info-tile";
+import {entity} from "../common/services/enums/entity";
+import _ from "lodash";
+import {writable} from "svelte/store";
+import {assessmentDefinitionStore} from "../svelte-stores/assessment-definition";
 
+
+
+
+function createFavouriteStore() {
+    const initialValues = _.reduce(
+        entity,
+        (acc, e) => { acc[e.key] = []; return acc;},
+        {});
+
+    function replaceData(r) {
+        return set(_.groupBy(r.data, d => d.entityKind));
+    }
+
+    const {subscribe, set, update} = writable(initialValues);
+
+    assessmentDefinitionStore
+        .findFavouritesForUser()
+        .subscribe(replaceData);
+
+    return {
+        subscribe,
+        add: function(defId) {
+            assessmentDefinitionStore
+                .addFavourite(defId)
+                .then(replaceData);
+        },
+        remove: function(defId) {
+            assessmentDefinitionStore
+                .removeFavourite(defId)
+                .then(replaceData);
+        }
+    }
+}
+
+
+export const favouriteAssessmentStore = createFavouriteStore();
 
 
 export default () => {

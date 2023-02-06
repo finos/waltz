@@ -189,12 +189,12 @@ public class AssessmentDefinitionDao {
         Condition nonExcludedPrimaries = ASSESSMENT_DEFINITION.VISIBILITY.eq(AssessmentVisibility.PRIMARY.name())
                 .and(ASSESSMENT_DEFINITION.ID.notIn(explicitlyExcluded));
 
-        Condition explicityIncluded = ASSESSMENT_DEFINITION.ID.in(included);
+        Condition explicitlyIncluded = ASSESSMENT_DEFINITION.ID.in(included);
 
         return dsl
                 .select(ASSESSMENT_DEFINITION.fields())
                 .from(ASSESSMENT_DEFINITION)
-                .where(explicityIncluded)
+                .where(explicitlyIncluded)
                 .or(nonExcludedPrimaries)
                 .fetchSet(TO_DOMAIN);
     }
