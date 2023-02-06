@@ -1,5 +1,7 @@
 # Building
 
+Note: If you would like to build and run Waltz on MacOS with PostgreSQL, use [this guide](build-and-run-on-mac.md).
+
 Waltz is built using [Maven](https://maven.apache.org/).
 
 ## Prerequisites
