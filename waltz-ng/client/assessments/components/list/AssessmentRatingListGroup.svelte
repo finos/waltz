@@ -39,10 +39,11 @@
 
 {#each group.provided as row}
     <tr transition:fade
-        class="clickable">
+        class="clickable"
+        on:click={() => selectAssessment(row)}>
         <td>
             <button class="btn btn-skinny"
-                    on:click={() => toggleFavourite(row)}>
+                    on:click|stopPropagation={() => toggleFavourite(row)}>
                 <Icon size="lg"
                       name={_.includes($favouriteIds, row.definition.id) ? "star" : "star-o"}/>
             </button>
@@ -62,7 +63,7 @@
         </td>
         <td>
             <ul class="list-unstyled">
-                {#each row.ratings as rating}
+                {#each _.sortBy(row.ratings, d => _.toLower(d.ratingItem.name)) as rating}
                     <li>
                         <Tooltip content={AssessmentRatingTooltipContent}
                                  placement="left-start"

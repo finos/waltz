@@ -9,7 +9,7 @@
 
     export let ratingItem;
     export let showGroup = false;
-    export let editable = false;
+    export let disablementReason = null;
     export let onSave = (rating) => console.log("Rating to save", {rating});
 
     const Modes = {
@@ -37,7 +37,11 @@
     $: existingRatings = _.map($selectedAssessment.ratings, d => d.rating.ratingId);
     $: availableRatings = _.filter($selectedAssessment.dropdownEntries, d => !_.includes(existingRatings, d.id));
 
-
+    $: isDisabled = disablementReason !== null || _.isEmpty(availableRatings);
+    $: disablementMessage = disablementReason
+        || (_.isEmpty(availableRatings)
+                ? "There are no other ratings to choose from"
+                : null);
 </script>
 
 
@@ -45,15 +49,13 @@
     <RatingIndicatorCell {...ratingItem}
                          showName="true"
                          showGroup={showGroup}/>
-    {#if editable}
-        <button class="btn btn-skinny"
-                title={_.isEmpty(availableRatings) ? "There are no other ratings to choose from" : null}
-                disabled={_.isEmpty(availableRatings)}
-                on:click={() => activeMode = Modes.EDIT}>
-            <Icon name="pencil"/>
-            Edit
-        </button>
-    {/if}
+    <button class="btn btn-skinny"
+            title={disablementMessage}
+            disabled={isDisabled}
+            on:click={() => activeMode = Modes.EDIT}>
+        <Icon name="pencil"/>
+        Edit
+    </button>
 {:else if activeMode === Modes.EDIT}
 
     <RatingItemDropdownPicker ratings={availableRatings}

@@ -26,26 +26,43 @@
 
 </script>
 
-<h4>Removal Confirmation:</h4>
-<p>
-    Are you sure you want to remove the rating:
-    <br>
-    <br>
-    <RatingIndicatorCell {...$selectedRating?.ratingItem}
-                         showName="true"
-                         showGroup="true"/>
-    <br>
-    <br>
-    from the assessment <strong>{$selectedAssessment.definition.name}</strong>?
-</p>
+<div class="removal-box">
+    <h4>Removal Confirmation:</h4>
+    <p>
+        Are you sure you want to remove the rating:
+        <br>
+        <br>
+        <RatingIndicatorCell {...$selectedRating?.ratingItem}
+                             showName="true"
+                             showGroup="true"/>
+        <br>
+        <br>
+        from the assessment <strong>{$selectedAssessment.definition.name}</strong>?
+    </p>
 
-<button class="btn btn-skinny"
-        on:click={remove}>
-    <Icon name="trash"/>
-    Remove
-</button>
-<button class="btn btn-skinny"
-        on:click={onCancel}>
-    <Icon name="times"/>
-    Cancel
-</button>
+    <button class="btn btn-skinny"
+            on:click={remove}>
+        <Icon name="trash"/>
+        Remove
+    </button>
+    <button class="btn btn-skinny"
+            on:click={onCancel}>
+        <Icon name="times"/>
+        Cancel
+    </button>
+
+</div>
+
+<style>
+    .removal-box{
+        border-width: 1px;
+        border-style: solid;
+        border-color: #d93f44;
+        background-color: #fae9ee;
+        padding-left: 2em;
+        padding-right: 2em;
+        padding-bottom: 1.5em;
+        padding-top: 1.5em;
+        border-radius: 2px;
+    }
+</style>
