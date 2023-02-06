@@ -19,20 +19,33 @@
 package org.finos.waltz.service.assessment_definition;
 
 
+import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.assessment_definition.AssessmentDefinitionDao;
 import org.finos.waltz.data.measurable.MeasurableDao;
+import org.finos.waltz.data.user.UserPreferenceDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.measurable.Measurable;
+import org.finos.waltz.model.user.UserPreference;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.ListUtilities.asList;
+import static org.finos.waltz.common.MapUtilities.indexBy;
+import static org.finos.waltz.common.StringUtilities.join;
+import static org.finos.waltz.common.StringUtilities.splitThenMap;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.user.UserPreference.mkPref;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 
 
 @Service
@@ -40,16 +53,20 @@ public class AssessmentDefinitionService {
 
     private final AssessmentDefinitionDao assessmentDefinitionDao;
     private final MeasurableDao measurableDao;
+    private final UserPreferenceDao userPreferenceDao;
 
 
     @Autowired
     public AssessmentDefinitionService(AssessmentDefinitionDao assessmentDefinitionDao,
-                                       MeasurableDao measurableDao) {
+                                       MeasurableDao measurableDao,
+                                       UserPreferenceDao userPreferenceDao) {
         checkNotNull(assessmentDefinitionDao, "assessmentDefinitionDao cannot be null");
         checkNotNull(measurableDao, "measurableDao cannot be null");
+        checkNotNull(userPreferenceDao, "userPreferenceDao cannot be null");
 
         this.measurableDao = measurableDao;
         this.assessmentDefinitionDao = assessmentDefinitionDao;
+        this.userPreferenceDao = userPreferenceDao;
     }
 
 
@@ -88,6 +105,75 @@ public class AssessmentDefinitionService {
 
     public boolean remove(long definitionId) {
         return assessmentDefinitionDao.remove(definitionId) == 1;
+    }
+
+
+    public Set<AssessmentDefinition> findFavouritesForUser(String username) {
+        Tuple2<Set<Long>, Set<Long>> t = loadFavouriteIncludedAndExcludedIds(username);
+        return assessmentDefinitionDao.findFavourites(t.v1, t.v2);
+    }
+
+
+    public Set<AssessmentDefinition> addFavourite(long defnId,
+                                                  String username) {
+
+        Tuple2<Set<Long>, Set<Long>> includedAndExcludedIds = loadFavouriteIncludedAndExcludedIds(username);
+
+        Set<Long> newIncluded = SetUtilities.add(includedAndExcludedIds.v1, defnId);
+        Set<Long> newExcluded = SetUtilities.remove(includedAndExcludedIds.v2, defnId);
+
+        storeFavourites(username, newIncluded, newExcluded);
+        return findFavouritesForUser(username);
+    }
+
+
+    public Set<AssessmentDefinition> removeFavourite(long defnId,
+                                                  String username) {
+
+        Tuple2<Set<Long>, Set<Long>> includedAndExcludedIds = loadFavouriteIncludedAndExcludedIds(username);
+
+        Set<Long> newIncluded = SetUtilities.remove(includedAndExcludedIds.v1, defnId);
+        Set<Long> newExcluded = SetUtilities.add(includedAndExcludedIds.v2, defnId);
+
+        storeFavourites(username, newIncluded, newExcluded);
+        return findFavouritesForUser(username);
+    }
+
+
+    private void storeFavourites(String username, Set<Long> newIncluded, Set<Long> newExcluded) {
+        userPreferenceDao.savePreferencesForUser(
+            username,
+            asList(
+                mkPref(
+                    "assessment-rating.favourites.included",
+                    join(newIncluded, ",")),
+                mkPref(
+                    "assessment-rating.favourites.excluded",
+                    join(newExcluded, ","))));
+    }
+
+
+    private Tuple2<Set<Long>, Set<Long>> loadFavouriteIncludedAndExcludedIds(String username) {
+        Map<String, UserPreference> preferencesForUser = indexBy(
+                userPreferenceDao.getPreferencesForUser(username),
+                UserPreference::key);
+
+        Set<Long> included = toFavouriteIds(preferencesForUser.get("assessment-rating.favourites.included"));
+        Set<Long> explicitlyExcluded = toFavouriteIds(preferencesForUser.get("assessment-rating.favourites.excluded"));
+
+        return tuple(included, explicitlyExcluded);
+    }
+
+
+    private Set<Long> toFavouriteIds(UserPreference pref) {
+        if (pref == null) {
+            return Collections.emptySet();
+        } else {
+            return SetUtilities.fromCollection(splitThenMap(
+                    pref.value(),
+                    ",",
+                    Long::parseLong));
+        }
     }
 
 }

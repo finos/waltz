@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -112,6 +113,5 @@ public class UserPreferenceDao {
                 .where(USER_PREFERENCE.USER_NAME.eq(userName))
                 .execute();
     }
-
 
 }

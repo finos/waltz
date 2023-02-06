@@ -18,16 +18,16 @@
 
 package org.finos.waltz.web.endpoints.api;
 
-import org.finos.waltz.service.assessment_definition.AssessmentDefinitionService;
-import org.finos.waltz.service.user.UserRoleService;
-import org.finos.waltz.web.DatumRoute;
-import org.finos.waltz.web.ListRoute;
-import org.finos.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.assessment_definition.ImmutableAssessmentDefinition;
 import org.finos.waltz.model.user.SystemRole;
+import org.finos.waltz.service.assessment_definition.AssessmentDefinitionService;
+import org.finos.waltz.service.user.UserRoleService;
+import org.finos.waltz.web.DatumRoute;
+import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.WebUtilities;
+import org.finos.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.web.endpoints.EndpointUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,8 +35,11 @@ import spark.Request;
 import spark.Response;
 
 import java.io.IOException;
+import java.util.Set;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.web.WebUtilities.getId;
+import static org.finos.waltz.web.WebUtilities.getUsername;
 
 @Service
 public class AssessmentDefinitionEndpoint implements Endpoint {
@@ -59,12 +62,13 @@ public class AssessmentDefinitionEndpoint implements Endpoint {
     @Override
     public void register() {
         String getByIdPath = WebUtilities.mkPath(BASE_URL, "id", ":id");
+        String favouriteByIdPath = WebUtilities.mkPath(BASE_URL, "id", ":id", "favourite");
+        String findFavouritesForUserPath = WebUtilities.mkPath(BASE_URL, "favourite");
         String findAllPath = WebUtilities.mkPath(BASE_URL);
         String savePath = WebUtilities.mkPath(BASE_URL);
         String findByKindPath = WebUtilities.mkPath(BASE_URL, "kind", ":kind");
         String findByRefPath = WebUtilities.mkPath(BASE_URL, "kind", ":kind", "id", ":id");
         String removeByIdPath = WebUtilities.mkPath(BASE_URL, "id", ":id");
-
 
         DatumRoute<AssessmentDefinition> getByIdRoute = (request, response) -> assessmentDefinitionService.getById(WebUtilities.getId(request));
         ListRoute<AssessmentDefinition> findAllRoute = (request, response) -> assessmentDefinitionService.findAll();
@@ -77,6 +81,28 @@ public class AssessmentDefinitionEndpoint implements Endpoint {
         EndpointUtilities.getForList(findByRefPath, findByRefRoute);
         EndpointUtilities.putForDatum(savePath, this::saveRoute);
         EndpointUtilities.deleteForDatum(removeByIdPath, this::removeByIdRoute);
+
+        EndpointUtilities.getForList(findFavouritesForUserPath, this::findFavouritesForUser);
+        EndpointUtilities.putForList(favouriteByIdPath, this::addFavourite);
+        EndpointUtilities.deleteForList(favouriteByIdPath, this::removeFavourite);
+    }
+
+    private Set<AssessmentDefinition> findFavouritesForUser(Request request, Response response) {
+        return assessmentDefinitionService.findFavouritesForUser(getUsername(request));
+    }
+
+
+    private Set<AssessmentDefinition> addFavourite(Request request, Response response) {
+        return assessmentDefinitionService.addFavourite(
+                getId(request),
+                getUsername(request));
+    }
+
+
+    private Set<AssessmentDefinition> removeFavourite(Request request, Response response) {
+        return assessmentDefinitionService.removeFavourite(
+                getId(request),
+                getUsername(request));
     }
 
 
@@ -85,7 +111,7 @@ public class AssessmentDefinitionEndpoint implements Endpoint {
         AssessmentDefinition def = ImmutableAssessmentDefinition
                 .copyOf(WebUtilities.readBody(request, AssessmentDefinition.class))
                 .withLastUpdatedAt(DateTimeUtilities.nowUtc())
-                .withLastUpdatedBy(WebUtilities.getUsername(request));
+                .withLastUpdatedBy(getUsername(request));
 
         return assessmentDefinitionService.save(def);
     }
@@ -101,6 +127,5 @@ public class AssessmentDefinitionEndpoint implements Endpoint {
     private void ensureUserHasEditRights(Request request) {
         WebUtilities.requireAnyRole(userRoleService, request, SystemRole.ASSESSMENT_DEFINITION_ADMIN, SystemRole.ADMIN);
     }
-
 
 }
