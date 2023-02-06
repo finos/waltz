@@ -16,7 +16,7 @@ This guide is made on 3rd February, 2023 with all versions of the components bei
 
 # Step 1. Install Homebrew
 To install required dependencies on MacOS, use the Homebrew package manager. To check wether Homebrew is installed on your local machine, run the `brew --version` command in your Terminal
-msagi@miklos-mbp ~ % brew --version
+user@macbook ~ % brew --version
 ```bash
 Homebrew 3.6.20
 Homebrew/homebrew-core (git revision c7c38c40e91; last commit 2023-02-02)
@@ -28,7 +28,7 @@ If you don't have Homebrew installed, then go to https://brew.sh/ and follow the
 # Step 2. Install git
 MacOS comes with git provided, which can be checked via the `git --version` command
 ```bash
-msagi@miklos-mbp ~ % git --version
+user@macbook ~ % git --version
 git version 2.24.1 (Apple Git-126)
 ```
 if you don't have git installed, then install it via homebrew, using `brew install git` command in your Terminal.
@@ -38,7 +38,7 @@ To check wether Java Developer Kit version 8 is installed on your local machine,
 
 ```bash
 It should be Oracle JDK 8, it does not work with OpenJDK@8
-msagi@miklos-mbp ~ % java -version
+user@macbook ~ % java -version
 openjdk version "1.8.0_362"
 OpenJDK Runtime Environment (build 1.8.0_362-bre_2023_01_22_03_32-b00)
 OpenJDK 64-Bit Server VM (build 25.362-b00, mixed mode)
@@ -50,7 +50,7 @@ If you don't have JDK 8 installed, then install it via homebrew, using `brew ins
 To check wether maven is installed on your local machine, run the `mvn --version` command in your Terminal. It is important that your maven points to JDK 8, otherwise your Waltz build will fail.
 
 ```bash
-msagi@miklos-mbp waltz % mvn --version
+user@macbook waltz % mvn --version
 Apache Maven 3.8.7 (b89d5959fcde851dcb1c8946a785a163f14e1e29)
 Maven home: /usr/local/Cellar/maven/3.8.7/libexec
 Java version: 1.8.0_362, vendor: Homebrew, runtime: /usr/local/Cellar/openjdk@8/1.8.0+362/libexec/openjdk.jdk/Contents/Home/jre
@@ -65,7 +65,7 @@ If you don't have maven installed, then install it via homebrew, using `brew ins
 To check wether Node.js is installed on your local machine, run the `node --version` command in your Terminal. It is important that your maven points to JDK 8, otherwise your Waltz build will fail.
 
 ```bash
-msagi@miklos-mbp waltz % node --version
+user@macbook waltz % node --version
 v19.6.0
 ```
 
@@ -76,7 +76,7 @@ If you don't have Node.js installed, then install it via homebrew, using `brew i
 To check wether PostgreSQL is installed on your local machine, run the `psql -V` command in your Terminal.
 
 ```bash
-msagi@miklos-mbp ~ % psql -V
+user@macbook ~ % psql -V
 psql (PostgreSQL) 14.6 (Homebrew)
 ```
 
@@ -87,11 +87,11 @@ If you don't have PostgreSQL installed, then install it via homebrew, using `bre
 WALTZ_DB_FOLDER=waltz-db
 
 # create the new folder
-msagi@miklos-mbp waltz-fork % mkdir $WALTZ_DB_FOLDER
+user@macbook waltz-fork % mkdir $WALTZ_DB_FOLDER
 
 # initialise the PostgreSQL database in this folder
-msagi@miklos-mbp waltz-fork % initdb -D ./$WALTZ_DB_FOLDER 
-The files belonging to this database system will be owned by user "msagi".
+user@macbook waltz-fork % initdb -D ./$WALTZ_DB_FOLDER 
+The files belonging to this database system will be owned by user "user".
 This user must also own the server process.
 
 The database cluster will be initialized with locale "en_GB.UTF-8".
@@ -119,19 +119,19 @@ Success. You can now start the database server using:
 
     pg_ctl -D ./waltz-db -l logfile start
 
-msagi@miklos-mbp waltz-fork % 
+user@macbook waltz-fork % 
 ```
 
 Once the database is created, we can start the PostgreSQL engine:
 
 ```bash
 # start the database engine
-msagi@miklos-mbp waltz-fork % pg_ctl -D ./waltz-db -l waltz-db.log start
+user@macbook waltz-fork % pg_ctl -D ./waltz-db -l waltz-db.log start
 waiting for server to start.... done
 server started
 
 # track log file output (optional)
-msagi@miklos-mbp waltz-fork % tail -f ./waltz-db.log 
+user@macbook waltz-fork % tail -f ./waltz-db.log 
 2023-02-03 11:57:16.772 GMT [2532] LOG:  starting PostgreSQL 14.6 (Homebrew) on x86_64-apple-darwin22.1.0, compiled by Apple clang version 14.0.0 (clang-1400.0.29.202), 64-bit
 2023-02-03 11:57:16.774 GMT [2532] LOG:  listening on IPv6 address "::1", port 5432
 2023-02-03 11:57:16.774 GMT [2532] LOG:  listening on IPv4 address "127.0.0.1", port 5432
@@ -161,7 +161,7 @@ This profile can be added to the maven settings located in your `~/.m2/settings.
             <id>dev-postgres</id>
             <properties>
                 <database.url>jdbc:postgresql://localhost:5432/waltz</database.url>
-                <database.user>msagi</database.user>
+                <database.user>user</database.user>
                 <database.password></database.password>
                 <database.schema>public</database.schema>
             </properties>
@@ -176,7 +176,7 @@ Now that all dependencies have been installed, the database is set up and config
 
 ```bash
 # clone Waltz source code repository
-msagi@miklos-mbp waltz-fork % git clone git@github.com:finos/waltz.git
+user@macbook waltz-fork % git clone git@github.com:finos/waltz.git
 
 Cloning into 'waltz'...
 remote: Enumerating objects: 165819, done.
@@ -187,10 +187,10 @@ Receiving objects: 100% (165819/165819), 49.41 MiB | 14.32 MiB/s, done.
 Resolving deltas: 100% (88392/88392), done.
 
 # change directory to the waltz main folder
-msagi@miklos-mbp waltz-fork % cd waltz
+user@macbook waltz-fork % cd waltz
 
 # run the build
-msagi@miklos-mbp waltz % mvn clean compile -P waltz-postgres,dev-postgres
+user@macbook waltz % mvn clean compile -P waltz-postgres,dev-postgres
 # this process can take some time and will produce lots of log messages
 # so we only show you the last few lines of the build so you can check your build
 # was successful
@@ -219,10 +219,10 @@ Now that we have built Waltz from source code, we can attempt to package and run
 
 ```bash
 # change directory to the waltz main folder
-msagi@miklos-mbp waltz-fork % cd waltz
+user@macbook waltz-fork % cd waltz
 
 # run the packaging
-msagi@miklos-mbp waltz % mvn clean package -P waltz-postgres,dev-postgres
+user@macbook waltz % mvn clean package -P waltz-postgres,dev-postgres
 # this process can take some time and will produce lots of log messages
 # so we only show you the last few lines of the package so you can check your build
 # was successful
@@ -249,7 +249,7 @@ msagi@miklos-mbp waltz % mvn clean package -P waltz-postgres,dev-postgres
 Waltz loads it's configuration from the Java classpaths and if no configuration found there then it falls back to the user's `~/.waltz/waltz.properties` file. The Waltz configuration properties file can have several parameters to set based on your custom needs. The following is an example configuration file.
 ```
 database.url=jdbc:postgresql://localhost:5432/waltz
-database.user=msagi
+database.user=user
 database.password=
 database.schema=waltz
 database.driver=org.postgresql.Driver
@@ -257,7 +257,7 @@ jooq.dialect=POSTGRES
 
 database.pool.max=16
 
-waltz.from.email=miklos.sagi@gmail.com
+waltz.from.email=user@macbook.com
 waltz.base.url=http://localhost:8000/
 ```
 
@@ -265,10 +265,10 @@ We are now ready to start Waltz from the Terminal:
 
 ```bash
 # change directory to the waltz main folder
-msagi@miklos-mbp waltz-fork % cd waltz
+user@macbook waltz-fork % cd waltz
 
 # start Waltz (with your configuration file being in ~/.waltz/waltz.properties)
-msagi@miklos-mbp waltz % $JAVA_HOME/bin/java -cp ./waltz-web/target/waltz-web-jar-with-dependencies.jar org.finos.waltz.web.Main 
+user@macbook waltz % $JAVA_HOME/bin/java -cp ./waltz-web/target/waltz-web-jar-with-dependencies.jar org.finos.waltz.web.Main 
 
 
     :::       :::     :::     :::    ::::::::::: ::::::::: 
@@ -281,7 +281,7 @@ msagi@miklos-mbp waltz % $JAVA_HOME/bin/java -cp ./waltz-web/target/waltz-web-ja
 
  
 --WALTZ---------------------------------------------
-Home is: /Users/msagi
+Home is: /Users/user
 Listening on port: 8443
 SSL Enabled: false
 ----------------------------------------------------
