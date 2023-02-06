@@ -51,11 +51,18 @@ export function mkAssessmentRatingStore() {
             "DELETE",
             `api/assessment-rating/entity/${ref.kind}/${ref.id}/${defnId}/${ratingId}`);
 
-    const update = (id, comment) => remote
+    const updateComment = (id, comment) => remote
         .execute(
             "POST",
-            `api/assessment-rating/id/${id}`,
+            `api/assessment-rating/id/${id}/update-comment`,
             {comment});
+
+
+    const updateRating = (id, updateCmd) => remote
+        .execute(
+            "POST",
+            `api/assessment-rating/id/${id}/update-rating`,
+            updateCmd);
 
     const findSummaryCounts = (summaryRequest, targetKind, force = false) =>
         remote
@@ -74,7 +81,8 @@ export function mkAssessmentRatingStore() {
         remove,
         lock,
         unlock,
-        update,
+        updateComment,
+        updateRating,
         findSummaryCounts
     };
 }
