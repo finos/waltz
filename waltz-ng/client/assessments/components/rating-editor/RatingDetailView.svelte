@@ -17,6 +17,8 @@
     import Icon from "../../../common/svelte/Icon.svelte";
     import toasts from "../../../svelte-stores/toast-store";
     import {displayError} from "../../../common/error-utils";
+    import {cardinality} from "../../../common/services/enums/cardinality";
+    import EditableRatingValue from "./EditableRatingValue.svelte";
 
     export let onCancel;
     export let onRemove;
@@ -48,16 +50,6 @@
             .then(onCancel);
     }
 
-    $: permissionsForRating = _.get($permissionsByRatingId, $selectedRating?.rating.id, $defaultPermission);
-
-    $: locked = _.get($selectedRating, ["rating", "isReadOnly"], false);
-
-    $: canEdit = _.includes(permissionsForRating?.operations, "UPDATE") && !locked;
-    $: canRemove = _.includes(permissionsForRating?.operations, "REMOVE") && !locked;
-    $: canLock = _.includes(permissionsForRating?.operations, "LOCK") && !locked;
-    $: canUnlock = _.includes(permissionsForRating?.operations, "LOCK") && locked;
-
-
     function onLock() {
         return assessmentRatingStore
             .lock($primaryEntityReference, $selectedAssessment.definition.id, $selectedRating?.rating.ratingId)
@@ -82,7 +74,7 @@
 
     function saveComment(comment) {
         return assessmentRatingStore
-            .update($selectedRating.rating.id, comment)
+            .updateComment($selectedRating.rating.id, comment)
             .then(() => {
                 assessmentRatingCall = assessmentRatingStore.findForEntityReference($primaryEntityReference, true);
                 $assessmentRatings = $assessmentRatingCall?.data;
@@ -91,6 +83,32 @@
             .then(() => toasts.success("Successfully updated comment"))
             .catch(e => displayError("Failed to update comment", e));
     }
+
+    function saveRating(newRating) {
+        return assessmentRatingStore
+            .updateRating($selectedRating.rating.id, {newRatingId: newRating.id})
+            .then(() => {
+                assessmentRatingCall = assessmentRatingStore.findForEntityReference($primaryEntityReference, true);
+                $assessmentRatings = $assessmentRatingCall?.data;
+                rating = newRating;
+            })
+            .then(() => toasts.success("Successfully updated rating"))
+            .catch(e => displayError("Failed to update rating", e));
+    }
+
+
+    $: permissionsForRating = _.get($permissionsByRatingId, $selectedRating?.rating.id, $defaultPermission);
+
+    $: locked = _.get($selectedRating, ["rating", "isReadOnly"], false);
+
+    $: canEdit = _.includes(permissionsForRating?.operations, "UPDATE") && !locked;
+    $: canRemove = _.includes(permissionsForRating?.operations, "REMOVE") && !locked;
+    $: canLock = _.includes(permissionsForRating?.operations, "LOCK") && !locked;
+    $: canUnlock = _.includes(permissionsForRating?.operations, "LOCK") && locked;
+
+
+    $: isSingleValuedAssessment = $selectedAssessment?.definition.cardinality === cardinality.ZERO_ONE.key
+    $: singleValueCanAdd = $selectedAssessment?.definition.cardinality === cardinality.ZERO_ONE.key && _.isEmpty($selectedAssessment?.ratings)
 
 </script>
 
@@ -103,9 +121,10 @@
             Rating
         </label>
         <div id="rating">
-            <RatingIndicatorCell {...$selectedRating?.ratingItem}
-                                 showName="true"
-                                 showGroup="true"/>
+            <EditableRatingValue ratingItem={$selectedRating.ratingItem}
+                                 showGroup={true}
+                                 editable={isSingleValuedAssessment && canEdit}
+                                 onSave={saveRating}/>
         </div>
     </div>
 

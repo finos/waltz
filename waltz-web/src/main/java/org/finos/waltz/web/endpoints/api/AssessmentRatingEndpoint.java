@@ -83,7 +83,8 @@ public class AssessmentRatingEndpoint implements Endpoint {
         String findByTargetKindForRelatedSelectorPath = mkPath(BASE_URL, "target-kind", ":targetKind", "selector");
         String findSummaryCountsPath = mkPath(BASE_URL, "target-kind", ":targetKind", "summary-counts");
         String modifyPath = mkPath(BASE_URL, "entity", ":kind", ":id", ":assessmentDefinitionId");
-        String updatePath = mkPath(BASE_URL, "id", ":id");
+        String updateCommentPath = mkPath(BASE_URL, "id", ":id", "update-comment");
+        String updateRatingPath = mkPath(BASE_URL, "id", ":id", "update-rating");
         String removePath = mkPath(BASE_URL, "entity", ":kind", ":id", ":assessmentDefinitionId", ":ratingId");
         String lockPath = mkPath(BASE_URL, "entity", ":kind", ":id", ":assessmentDefinitionId", ":ratingId", "lock");
         String unlockPath = mkPath(BASE_URL, "entity", ":kind", ":id", ":assessmentDefinitionId", ":ratingId", "unlock");
@@ -100,7 +101,8 @@ public class AssessmentRatingEndpoint implements Endpoint {
         postForDatum(bulkUpdatePath, this::bulkStoreRoute);
         postForDatum(bulkRemovePath, this::bulkRemoveRoute);
         postForDatum(modifyPath, this::storeRoute);
-        postForDatum(updatePath, this::updateRoute);
+        postForDatum(updateCommentPath, this::updateCommentRoute);
+        postForDatum(updateRatingPath, this::updateRatingRoute);
         putForDatum(lockPath, this::lockRoute);
         putForDatum(unlockPath, this::unlockRoute);
         deleteForDatum(removePath, this::removeRoute);
@@ -176,9 +178,16 @@ public class AssessmentRatingEndpoint implements Endpoint {
     }
 
 
-    private boolean updateRoute(Request request, Response z) throws IOException, InsufficientPrivelegeException {
+    private boolean updateCommentRoute(Request request, Response z) throws IOException, InsufficientPrivelegeException {
         String comment = readComment(request);
-        return assessmentRatingService.update(getId(request), comment, getUsername(request));
+        return assessmentRatingService.updateComment(getId(request), comment, getUsername(request));
+    }
+
+
+    private boolean updateRatingRoute(Request request, Response z) throws IOException, InsufficientPrivelegeException {
+        UpdateRatingCommand updateRatingCommand = readBody(request, UpdateRatingCommand.class);
+        long assessmentRatingId = getId(request);
+        return assessmentRatingService.updateRating(assessmentRatingId, updateRatingCommand, getUsername(request));
     }
 
 
