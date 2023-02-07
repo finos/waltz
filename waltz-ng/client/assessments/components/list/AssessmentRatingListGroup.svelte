@@ -45,7 +45,7 @@
             <button class="btn btn-skinny"
                     on:click|stopPropagation={() => toggleFavourite(row)}>
                 <Icon size="lg"
-                      name={_.includes($favouriteIds, row.definition.id) ? "star" : "star-o"}/>
+                      name={_.includes(favouriteIds, row.definition.id) ? "star" : "star-o"}/>
             </button>
         </td>
         <td>
@@ -117,7 +117,7 @@
                     <button class="btn btn-skinny"
                             on:click={() => toggleFavourite(row)}>
                         <Icon size="lg"
-                              name={_.includes($favouriteIds, row.definition.id) ? "star" : "star-o"}/>
+                              name={_.includes(favouriteIds, row.definition.id) ? "star" : "star-o"}/>
                     </button>
                 </td>
                 <td>

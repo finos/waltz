@@ -28,4 +28,12 @@ import org.immutables.value.Value;
 public abstract class UserPreference {
     public abstract String key();
     public abstract String value();
+
+    public static UserPreference mkPref(String key, String value) {
+        return ImmutableUserPreference
+                .builder()
+                .key(key)
+                .value(value)
+                .build();
+    }
 }

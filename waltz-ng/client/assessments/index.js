@@ -30,8 +30,6 @@ import BulkAssessmentRatingSelector from "./components/bulk-assessment-rating-se
 import AssessmentDefinitionOverview from "./components/assessment-definition-overview/assessment-definition-overview";
 import AssessmentInfoTile from "./components/info-tile/assessment-info-tile";
 
-
-
 export default () => {
 
     const module = angular.module("waltz.assessments", []);
