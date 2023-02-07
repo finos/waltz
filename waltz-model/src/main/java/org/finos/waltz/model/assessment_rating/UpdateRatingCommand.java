@@ -8,7 +8,7 @@ import org.finos.waltz.model.command.Command;
 @Value.Immutable
 @JsonSerialize(as = ImmutableUpdateRatingCommand.class)
 @JsonDeserialize(as = ImmutableUpdateRatingCommand.class)
-public abstract class UpdateRatingCommand implement Command {
+public abstract class UpdateRatingCommand implements Command {
     public abstract Long newRatingId();
 
 }
