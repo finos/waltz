@@ -1,12 +1,6 @@
 <script>
 
     import _ from "lodash";
-    import {userPreferenceStore} from "../../../svelte-stores/user-preference-store";
-    import {onMount} from "svelte";
-    import {
-        assessmentStores,
-        createStores,
-    } from "./assessment-rating-store";
     import AssessmentRatingListGroup from "./AssessmentRatingListGroup.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
     import SearchInput from "../../../common/svelte/SearchInput.svelte";
@@ -24,24 +18,15 @@
         detailPanelActiveMode,
         Modes
     } from "../rating-editor/rating-store";
+    import {favouriteAssessmentDefinitionStore} from "../../../svelte-stores/favourite-assessment-definition-store";
 
 
     let elem;
     let stores = null;
-    let defaultPrimaryList;
-    let favouriteIncludedIds;
-    let favouriteExcludedIds;
     let favouriteIds;
-    let setFromPreferences;
-    let expansions;
-    let userPreferences = null;
-    let userPreferenceCall;
+    let expansions = [];
     let qry;
     let groupedAssessments;
-
-    onMount(() => {
-        userPreferenceCall = userPreferenceStore.findAllForUser();
-    });
 
     let assessmentDefinitionCall;
     let assessmentRatingCall;
@@ -73,69 +58,21 @@
 
 
     function toggleFavourite(row) {
-
-        const isExplicitlyIncluded = _.includes($favouriteIncludedIds, row.definition.id);
-        const isExplicitlyExcluded = _.includes($favouriteExcludedIds, row.definition.id);
-        const isDefault = _.includes($defaultPrimaryList, row.definition.id);
-
-        let message;
-
-        if (isExplicitlyIncluded) {
-            message = "Removing from favourite assessments"
-            $favouriteIncludedIds = _.without($favouriteIncludedIds, row.definition.id);
-        } else if (isExplicitlyExcluded) {
-            message = "Adding to favourite assessments"
-            $favouriteExcludedIds = _.without($favouriteExcludedIds, row.definition.id);
-        } else if (isDefault) {
-            message = "Removing from favourite assessments"
-            $favouriteExcludedIds = _.concat($favouriteExcludedIds, row.definition.id);
+        if (_.includes(favouriteIds, row.definition.id)) {
+            favouriteAssessmentDefinitionStore.remove(row.definition.id);
         } else {
-            message = "Adding to favourite assessments"
-            $favouriteIncludedIds = _.concat($favouriteIncludedIds, row.definition.id);
+            favouriteAssessmentDefinitionStore.add(row.definition.id);
         }
     }
 
 
-    $: {
-        if ($primaryEntityReference && _.isNil($assessmentStores)) {
-            $assessmentStores = createStores($primaryEntityReference.kind);
-        }
-
-        defaultPrimaryList = $assessmentStores?.defaultPrimaryList;
-        favouriteIncludedIds = $assessmentStores?.favouriteIncludedIds;
-        favouriteExcludedIds = $assessmentStores?.favouriteExcludedIds;
-        favouriteIds = $assessmentStores?.favouriteIds;
-        setFromPreferences = $assessmentStores?.setFromPreferences;
-    }
-
-
-    $: {
-        // before loaded defaults to initial state [], the derived stores pick this up and reset the favourites
-        if ($userPreferenceCall?.status === "loaded") {
-            userPreferences = $userPreferenceCall?.data;
-        }
-    }
-
-
-    $: {
-        if (userPreferences && $assessmentStores) {
-            $assessmentStores.setFromPreferences(userPreferences);
-        }
-    }
-
-
-    $: {
-        if ($assessmentStores) {
-            expansions = _
-                .chain($assessments)
-                .filter(d => _.includes($favouriteIncludedIds, d.definition.id)
-                    || _.includes($defaultPrimaryList, d.definition.id))
-                .reject(d => _.includes($favouriteExcludedIds, d.definition.id))
-                .map(d => d.definition.definitionGroup)
+    $: expansions = _.isEmpty(expansions)
+            ?  _
+                .chain($favouriteAssessmentDefinitionStore[$primaryEntityReference.kind])
+                .map(d => d.definitionGroup)
                 .uniq()
-                .value();
-        }
-    }
+                .value()
+            : expansions;
 
     $: visibleAssessments = _.isEmpty(qry)
         ? $assessments
@@ -161,6 +98,7 @@
         .orderBy([d => d.groupName === "Uncategorized", d => d.groupName])
         .value();
 
+    $: favouriteIds = _.map($favouriteAssessmentDefinitionStore[$primaryEntityReference.kind], d => d.id);
 </script>
 
 
