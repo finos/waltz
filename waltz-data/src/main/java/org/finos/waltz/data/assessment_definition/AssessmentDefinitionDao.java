@@ -39,6 +39,7 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
@@ -183,4 +184,18 @@ public class AssessmentDefinitionDao {
                 .fetch(TO_DOMAIN);
     }
 
+
+    public Set<AssessmentDefinition> findFavourites(Set<Long> included, Set<Long> explicitlyExcluded) {
+        Condition nonExcludedPrimaries = ASSESSMENT_DEFINITION.VISIBILITY.eq(AssessmentVisibility.PRIMARY.name())
+                .and(ASSESSMENT_DEFINITION.ID.notIn(explicitlyExcluded));
+
+        Condition explicitlyIncluded = ASSESSMENT_DEFINITION.ID.in(included);
+
+        return dsl
+                .select(ASSESSMENT_DEFINITION.fields())
+                .from(ASSESSMENT_DEFINITION)
+                .where(explicitlyIncluded)
+                .or(nonExcludedPrimaries)
+                .fetchSet(TO_DOMAIN);
+    }
 }
