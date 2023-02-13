@@ -34,13 +34,17 @@ public class AssessmentHelper {
 
 
     public long createDefinition(long schemeId, String name, String permittedRole, AssessmentVisibility visibility, String definitionGroup) {
+        return createDefinition(schemeId, name, permittedRole, visibility, definitionGroup, EntityKind.APPLICATION);
+    }
+
+    public long createDefinition(long schemeId, String name, String permittedRole, AssessmentVisibility visibility, String definitionGroup, EntityKind entityKind) {
 
         ImmutableAssessmentDefinition.Builder def = ImmutableAssessmentDefinition.builder()
                 .name(name)
                 .description("desc")
                 .isReadOnly(false)
                 .externalId(mkName(name))
-                .entityKind(EntityKind.APPLICATION)
+                .entityKind(entityKind)
                 .lastUpdatedBy("test")
                 .visibility(visibility)
                 .ratingSchemeId(schemeId);
