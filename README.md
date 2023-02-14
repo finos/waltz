@@ -50,8 +50,9 @@ See [pom.xml](https://github.com/finos/waltz/blob/master/pom.xml) for a full lis
 ### Client
 
 - Browser based
-    - IE 10+, Chrome, Safari, Firefox)
+    - IE 11+, Chrome, Safari, Firefox)
 - AngularJS 1.7
+- Svelte
 - Bootstrap 3
 - D3 
 
@@ -63,11 +64,12 @@ Checkout [the project milestones](https://github.com/finos/waltz/milestones) and
 
 **Provisional** dates for upcoming releases:
 
-| Release | Date              | Summary                    |
-|---------|-------------------|----------------------------|
-| 1.47    | 31st January 2023 | Legal Entities             |
-| 1.48    | 28th March 2023   | Legal Entities (continued) |
-| 1.49    | 30th May 2023     | tbd                        |
+| Release  | Date            | Summary                    |
+|----------|-----------------|----------------------------|
+| **1.48** | 28th March 2023 | Legal Entities (continued) |
+| 1.49     | 30th May 2023   | tbd                        |
+ | 1.50     | tbd             | tbd                        |
+
 
 ## Contributing
 
