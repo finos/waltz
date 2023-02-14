@@ -23,10 +23,10 @@ Getting started
 
 ## Corporate Contributors
 
-Org | | Notes
---- | --- |---
-![DB Logo](https://avatars1.githubusercontent.com/u/34654027?s=30&v=4 "Deutsche Bank") | Deutsche Bank | [press release](https://www.db.com/newsroom_news/2018/deutsche-bank-takes-next-step-in-open-source-journey-en-11484.htm) 
-![NWM Logo](https://avatars2.githubusercontent.com/u/54027700?s=30&v=4 "Natwest Markets") | NatWest Markets | [press release](https://www.nwm.com/about-us/media/articles/natwest-markets-to-expand-open-source-coding)
+| Org                                                                                       |                 | Notes                                                                                                                    |
+|-------------------------------------------------------------------------------------------|-----------------|--------------------------------------------------------------------------------------------------------------------------|
+| ![DB Logo](https://avatars1.githubusercontent.com/u/34654027?s=30&v=4 "Deutsche Bank")    | Deutsche Bank   | [press release](https://www.db.com/newsroom_news/2018/deutsche-bank-takes-next-step-in-open-source-journey-en-11484.htm) |
+| ![NWM Logo](https://avatars2.githubusercontent.com/u/54027700?s=30&v=4 "Natwest Markets") | NatWest Markets | [press release](https://www.nwm.com/about-us/media/articles/natwest-markets-to-expand-open-source-coding)                |
 
 ## Technology Stack
 
