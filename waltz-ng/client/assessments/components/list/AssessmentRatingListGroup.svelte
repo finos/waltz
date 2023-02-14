@@ -63,7 +63,7 @@
         </td>
         <td>
             <ul class="list-unstyled">
-                {#each _.sortBy(row.ratings, d => _.toLower(d.ratingItem.name)) as rating}
+                {#each _.sortBy(row.ratings, d => _.toLower(d.ratingItem?.name)) as rating}
                     <li>
                         <Tooltip content={AssessmentRatingTooltipContent}
                                  placement="left-start"
