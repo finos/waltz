@@ -33,6 +33,7 @@ import EudaListView from "./euda-list-view";
 import RelationshipKindsView from "./relationship-kinds-view";
 import ReassignRecipientsView from "./reassign-recipients-view";
 import ColorGradientView from "./color-gradient-view";
+import NavAidBuilderView from "./nav-aid-builder-view";
 
 
 const baseState = {
@@ -124,6 +125,12 @@ const colorGradientState = {
 };
 
 
+const navAidBuilderState = {
+    url: "/nav-aid-builder",
+    views: { "content@": NavAidBuilderView }
+};
+
+
 function setupRoutes($stateProvider) {
     $stateProvider
         .state("main.system", baseState)
@@ -140,7 +147,8 @@ function setupRoutes($stateProvider) {
         .state("main.system.relationship-kinds", relationshipKindsState)
         .state("main.system.recalculate", recalculateState)
         .state("main.system.reassign-recipients", reassignRecipientsState)
-        .state("main.system.color-gradient", colorGradientState);
+        .state("main.system.color-gradient", colorGradientState)
+        .state("main.system.nav-aid-builder", navAidBuilderState);
 }
 
 
