@@ -86,7 +86,12 @@ public class AssessmentRatingService {
 
 
     public List<AssessmentRating> findByEntityKind(EntityKind targetKind) {
-        return assessmentRatingDao.findByEntityKind(targetKind);
+        return assessmentRatingDao.findByEntityKind(targetKind, Optional.empty());
+    }
+
+
+    public List<AssessmentRating> findByEntityKind(EntityKind targetKind, Optional<EntityReference> qualifierReference) {
+        return assessmentRatingDao.findByEntityKind(targetKind, qualifierReference);
     }
 
 

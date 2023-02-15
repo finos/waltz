@@ -30,4 +30,8 @@ public class LegalEntityRelationshipService {
     public Set<LegalEntityRelationship> findByEntityReference(EntityReference ref) {
         return legalEntityRelationshipDao.findByEntityReference(ref);
     }
+
+    public Set<LegalEntityRelationship> findByRelationshipKind(long relKindId) {
+        return legalEntityRelationshipDao.findByRelationshipKind(relKindId);
+    }
 }

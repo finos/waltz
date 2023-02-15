@@ -74,4 +74,9 @@ public class LegalEntityRelationshipDao {
                 .and(LEGAL_ENTITY_RELATIONSHIP.TARGET_KIND.eq(ref.kind().name()));
         return findByCondition(targetRefCondition);
     }
+
+    public Set<LegalEntityRelationship> findByRelationshipKind(long relKindId) {
+        Condition relationshipKindCondition = LEGAL_ENTITY_RELATIONSHIP.RELATIONSHIP_KIND_ID.eq(relKindId);
+        return findByCondition(relationshipKindCondition);
+    }
 }

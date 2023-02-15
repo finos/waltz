@@ -19,12 +19,6 @@ public abstract class ResolvedAssessmentRating {
 
     public abstract ResolvedAssessmentHeader assessmentHeader();
 
-    public abstract Optional<String> comment(); //can be provided if headerRatingId is present
-
-    public abstract Set<RatingSchemeItem> resolvedRatings(); //can be provided via header rating or listed in cell
-
-    public abstract Set<RatingResolutionError> errors();
-
-    public abstract ResolutionStatus status();
+    public abstract Set<ResolvedRatingValue> resolvedRatings(); //can be provided via header rating or listed in cell
 
 }

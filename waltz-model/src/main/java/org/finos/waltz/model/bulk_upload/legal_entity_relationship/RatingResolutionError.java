@@ -8,11 +8,14 @@ import org.immutables.value.Value;
 @Value.Immutable
 @JsonSerialize(as = ImmutableRatingResolutionError.class)
 @JsonDeserialize(as = ImmutableRatingResolutionError.class)
-public abstract class RatingResolutionError {
+public abstract class RatingResolutionError implements BulkUploadError {
 
+    public abstract RatingResolutionErrorCode errorCode();
 
-    public abstract AssessmentResolutionErrorCode errorCode();
-
-    public abstract String errorMessage();
-
+    public static RatingResolutionError mkError(RatingResolutionErrorCode code, String message) {
+        return ImmutableRatingResolutionError.builder()
+                .errorCode(code)
+                .errorMessage(message)
+                .build();
+    }
 }

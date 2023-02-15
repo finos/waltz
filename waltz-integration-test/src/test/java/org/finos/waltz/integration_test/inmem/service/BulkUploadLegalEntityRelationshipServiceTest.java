@@ -23,6 +23,7 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.assessment_definition.AssessmentVisibility;
+import org.finos.waltz.model.bulk_upload.ResolutionStatus;
 import org.finos.waltz.model.bulk_upload.legal_entity_relationship.AssessmentHeaderResolutionError;
 import org.finos.waltz.model.bulk_upload.legal_entity_relationship.AssessmentResolutionErrorCode;
 import org.finos.waltz.model.bulk_upload.legal_entity_relationship.ResolvedAssessmentHeader;
@@ -115,6 +116,7 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
 
         Set<AssessmentResolutionErrorCode> errors = map(maybeDefnA.get().v2.errors(), AssessmentHeaderResolutionError::errorCode);
         assertTrue(errors.contains(AssessmentResolutionErrorCode.HEADER_DEFINITION_NOT_FOUND), "Rating value should be reported as not identifiable");
+        assertEquals(ResolutionStatus.ERROR, maybeDefnA.get().v2.status(), "If errors not empty then resolution status should be 'ERROR'");
     }
 
     @Test
@@ -137,6 +139,7 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
 
         Set<AssessmentResolutionErrorCode> errors = map(maybeDefnA.get().v2.errors(), AssessmentHeaderResolutionError::errorCode);
         assertTrue(errors.contains(AssessmentResolutionErrorCode.NO_VALUE_PROVIDED), "Rating value should be reported as not identifiable");
+        assertEquals(ResolutionStatus.ERROR, maybeDefnA.get().v2.status(), "If errors not empty then resolution status should be 'ERROR'");
     }
 
     @Test
@@ -159,6 +162,7 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
 
         Set<AssessmentResolutionErrorCode> errors = map(maybeDefnA.get().v2.errors(), AssessmentHeaderResolutionError::errorCode);
         assertTrue(errors.contains(AssessmentResolutionErrorCode.NO_VALUE_PROVIDED), "Rating value should be reported as not identifiable");
+        assertEquals(ResolutionStatus.ERROR, maybeDefnA.get().v2.status(), "If errors not empty then resolution status should be 'ERROR'");
     }
 
     @Test
@@ -225,6 +229,7 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
 
         Set<AssessmentResolutionErrorCode> errors = map(maybeDefnA.get().v2.errors(), AssessmentHeaderResolutionError::errorCode);
         assertTrue(errors.contains(AssessmentResolutionErrorCode.HEADER_RATING_NOT_FOUND), "Rating value should be reported as not identifiable");
+        assertEquals(ResolutionStatus.ERROR, maybeDefnA.get().v2.status(), "If errors not empty then resolution status should be 'ERROR'");
     }
 
 
