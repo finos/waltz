@@ -2,6 +2,28 @@
 
 import PageHeader from "../../../common/svelte/PageHeader.svelte";
 import ViewLink from "../../../common/svelte/ViewLink.svelte";
+import TaxonomyNavAidBuilder from "./TaxonomyNavAidBuilder.svelte";
+import DataTypeNavAidBuilder from "./DataTypeNavAidBuilder.svelte";
+import MeasurableCategoryNavAidBuilder from "./MeasurableCategoryNavAidBuilder.svelte";
+
+const Modes = {
+    NONE: {},
+    DATA_TYPE: {
+        component: DataTypeNavAidBuilder
+    },
+    MEASURABLE_CATEGORY: {
+        component: MeasurableCategoryNavAidBuilder
+    },
+    PERSON: {component: TaxonomyNavAidBuilder},
+    ORG_UNIT: {component: TaxonomyNavAidBuilder}
+};
+
+let mode = Modes.NONE;
+
+function switchMode(newMode) {
+    mode = newMode;
+}
+
 </script>
 
 
@@ -25,19 +47,42 @@ import ViewLink from "../../../common/svelte/ViewLink.svelte";
                 Navigation aids can created for showing simplified views of:
             </p>
             <ul>
-                <li><i>Taxonomy based</i></li>
-                <ul>
-                    <li>Data Types</li>
-                    <li>Measurable Categories</li>
-                </ul>
-                <li><i>Curated from hierarchies</i></li>
-                <ul>
-                    <li>Person Hierarchies</li>
-                    <li>Organisational Units</li>
-                </ul>
+                <li>
+                    <i>
+                        Taxonomy based
+                    </i>
+                    <ul>
+                        <button class="btn btn-skinny"
+                                on:click={() => switchMode(Modes.DATA_TYPE)}>
+                            <li>Data Types</li>
+                        </button>
+                        <li>
+                            <button class="btn btn-skinny"
+                                    on:click={() => switchMode(Modes.MEASURABLE_CATEGORY)}>
+                                Measurable Categories
+                            </button>
+                        </li>
+                    </ul>
+                <li>
+                    <i>Curated from hierarchies</i>
+                    <ul>
+                        <li>Person Hierarchies</li>
+                        <li>Organisational Units</li>
+                    </ul>
+                </li>
             </ul>
         </div>
     </div>
+    <hr>
     <div class="row">
+        <div class="col-md-12">
+            {#if mode === Modes.NONE}
+                <p>Select a type of navigation aid to build from the list above</p>
+            {:else}
+                <svelte:component this={mode.component}
+                                  {...mode.props}/>
+            {/if}
+
+        </div>
     </div>
 </div>
