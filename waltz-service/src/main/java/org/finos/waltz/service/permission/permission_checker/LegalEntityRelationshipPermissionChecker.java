@@ -18,11 +18,11 @@
 
 package org.finos.waltz.service.permission.permission_checker;
 
-import org.finos.waltz.data.logical_flow.LogicalFlowDao;
-import org.finos.waltz.data.physical_specification.PhysicalSpecificationDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.legal_entity.LegalEntityRelationshipKind;
 import org.finos.waltz.service.involvement.InvolvementService;
+import org.finos.waltz.service.legal_entity.LegalEntityRelationshipKindService;
 import org.finos.waltz.service.permission.PermissionGroupService;
 import org.finos.waltz.service.user.UserRoleService;
 import org.slf4j.Logger;
@@ -41,52 +41,37 @@ public class LegalEntityRelationshipPermissionChecker implements PermissionCheck
 
     private static final Logger LOG = LoggerFactory.getLogger(LegalEntityRelationshipPermissionChecker.class);
 
-    private final LogicalFlowDao logicalFlowDao;
-    private final PhysicalSpecificationDao physicalSpecificationDao;
+    private final LegalEntityRelationshipKindService legalEntityRelationshipKindService;
     private final InvolvementService involvementService;
     private final PermissionGroupService permissionGroupService;
     private final UserRoleService userRoleService;
 
     @Autowired
-    public LegalEntityRelationshipPermissionChecker(LogicalFlowDao logicalFlowDao,
-                                                    PhysicalSpecificationDao physicalSpecificationDao,
+    public LegalEntityRelationshipPermissionChecker(LegalEntityRelationshipKindService legalEntityRelationshipKindService,
                                                     InvolvementService involvementService,
                                                     PermissionGroupService permissionGroupService,
                                                     UserRoleService userRoleService) {
 
-        checkNotNull(logicalFlowDao, "logicalFlowDao must not be null");
-        checkNotNull(physicalSpecificationDao, "physicalSpecificationDao must not be null");
+        checkNotNull(legalEntityRelationshipKindService, "legalEntityRelationshipKindService must not be null");
         checkNotNull(involvementService, "involvementService cannot be null");
         checkNotNull(permissionGroupService, "permissionGroupService cannot be null");
         checkNotNull(userRoleService, "userRoleService cannot be null");
 
         this.userRoleService = userRoleService;
-        this.logicalFlowDao = logicalFlowDao;
-        this.physicalSpecificationDao = physicalSpecificationDao;
+        this.legalEntityRelationshipKindService = legalEntityRelationshipKindService;
         this.involvementService = involvementService;
         this.permissionGroupService = permissionGroupService;
     }
 
 
-    public Set<Operation> findLegalEntityRelationshipPermissionsForParentKind(EntityKind parentKind,
+    public Set<Operation> findLegalEntityRelationshipPermissionsForRelationshipKind(long relKindId, String username) {
+        LegalEntityRelationshipKind relKind = legalEntityRelationshipKindService.getById(relKindId);
+        return findLegalEntityRelationshipPermissionsForTargetKind(relKind.targetKind(), username);
+    }
+
+    public Set<Operation> findLegalEntityRelationshipPermissionsForTargetKind(EntityKind parentKind,
                                                                               String username) {
-
         return emptySet();
-
-//        Set<Long> invsForUser = involvementService.findExistingInvolvementKindIdsForUser(entityReference, username);
-//
-//        Set<Operation> operationsForEntityAssessment = permissionGroupService
-//                .findPermissionsForParentReference(entityReference, username)
-//                .stream()
-//                .filter(p -> p.subjectKind().equals(EntityKind.LOGICAL_DATA_FLOW)
-//                        && p.parentKind().equals(entityReference.kind()))
-//                .filter(p -> p.requiredInvolvementsResult().isAllowed(invsForUser))
-//                .map(Permission::operation)
-//                .collect(Collectors.toSet());
-//
-//        return logicalFlowDao.calculateAmendedFlowOperations(
-//                operationsForEntityAssessment,
-//                username);
     }
 
 }

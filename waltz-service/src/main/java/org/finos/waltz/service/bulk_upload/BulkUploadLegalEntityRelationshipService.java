@@ -18,6 +18,7 @@ import org.finos.waltz.service.assessment_definition.AssessmentDefinitionService
 import org.finos.waltz.service.assessment_rating.AssessmentRatingService;
 import org.finos.waltz.service.legal_entity.LegalEntityRelationshipKindService;
 import org.finos.waltz.service.legal_entity.LegalEntityRelationshipService;
+import org.finos.waltz.service.permission.permission_checker.LegalEntityRelationshipPermissionChecker;
 import org.finos.waltz.service.rating_scheme.RatingSchemeService;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +61,7 @@ public class BulkUploadLegalEntityRelationshipService {
     private final LegalEntityRelationshipService legalEntityRelationshipService;
 
     private final AssessmentRatingService assessmentRatingService;
+
 
     @Autowired
     public BulkUploadLegalEntityRelationshipService(AssessmentDefinitionService assessmentDefinitionService,
@@ -488,4 +490,7 @@ public class BulkUploadLegalEntityRelationshipService {
         return tuple(first(headerRowSiphon.getResults()), dataRows);
     }
 
+    public void ensureUserHasAdminRights(long legalEntityRelationshipKindId, String username) {
+        LegalEntityRelationshipKind relKind = legalEntityRelationshipKindService.getById(legalEntityRelationshipKindId);
+    }
 }

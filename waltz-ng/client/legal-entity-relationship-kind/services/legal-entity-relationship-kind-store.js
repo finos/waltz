@@ -27,7 +27,7 @@ export function store($http, BaseApiUrl) {
             .then(result => result.data);
 
     const getById = (id) =>
-        $http.get(`${BASE}/${id}`)
+        $http.get(`${BASE}/id/${id}`)
             .then(result => result.data);
 
     return {

@@ -16,24 +16,20 @@
  *
  */
 
-import LegalEntityView from "./pages/view/legal-entity-view";
-import LegalEntityRelationshipKindView from "./pages/relationship-kind/legal-entity-relationship-kind-view";
+import {remote} from "./remote";
 
+export function mkBulkUploadLegalEntityRelationshipStore() {
 
-const baseState = {};
+    const resolve = (resolveParams) => {
+        return remote.execute(
+            "POST",
+            "api/bulk-upload-legal-entity-relationships/resolve",
+            resolveParams);
+    };
 
-const viewState = {
-    url: "legal-entity/{id:int}",
-    views: {"content@": LegalEntityView.id}
-};
-
-function setup($stateProvider) {
-    $stateProvider
-        .state("main.legal-entity", baseState)
-        .state("main.legal-entity.view", viewState)
+    return {
+        resolve
+    };
 }
 
-setup.$inject = ["$stateProvider"];
-
-
-export default setup;
+export const bulkUploadLegalEntityRelationshipStore = mkBulkUploadLegalEntityRelationshipStore();

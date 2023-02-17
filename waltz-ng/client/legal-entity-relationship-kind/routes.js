@@ -16,21 +16,21 @@
  *
  */
 
-import LegalEntityView from "./pages/view/legal-entity-view";
-import LegalEntityRelationshipKindView from "./pages/relationship-kind/legal-entity-relationship-kind-view";
+import LegalEntityRelationshipKindView from "./pages/view/legal-entity-relationship-kind-view";
 
 
 const baseState = {};
 
 const viewState = {
-    url: "legal-entity/{id:int}",
-    views: {"content@": LegalEntityView.id}
+    url: "legal-entity-relationship-kind/{id:int}",
+    views: {"content@": LegalEntityRelationshipKindView.id}
 };
+
 
 function setup($stateProvider) {
     $stateProvider
-        .state("main.legal-entity", baseState)
-        .state("main.legal-entity.view", viewState)
+        .state("main.legal-entity-relationship-kind", baseState)
+        .state("main.legal-entity-relationship-kind.view", viewState)
 }
 
 setup.$inject = ["$stateProvider"];

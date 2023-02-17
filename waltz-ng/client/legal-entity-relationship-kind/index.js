@@ -15,25 +15,27 @@
  * See the License for the specific
  *
  */
+import {registerComponents, registerStores} from "../common/module-utils";
 
-import LegalEntityView from "./pages/view/legal-entity-view";
-import LegalEntityRelationshipKindView from "./pages/relationship-kind/legal-entity-relationship-kind-view";
+import Routes from "./routes";
+import LegalEntityRelationshipKindView from "./pages/view/legal-entity-relationship-kind-view";
+import LegalEntityRelationshipKindStore from "./services/legal-entity-relationship-kind-store";
 
 
-const baseState = {};
+export default () => {
 
-const viewState = {
-    url: "legal-entity/{id:int}",
-    views: {"content@": LegalEntityView.id}
+    const module = angular.module("waltz.legal-entity", []);
+
+    module
+        .config(Routes);
+
+    registerComponents(module, [
+        LegalEntityRelationshipKindView
+    ]);
+
+    registerStores(module, [
+        LegalEntityRelationshipKindStore
+    ])
+
+    return module.name;
 };
-
-function setup($stateProvider) {
-    $stateProvider
-        .state("main.legal-entity", baseState)
-        .state("main.legal-entity.view", viewState)
-}
-
-setup.$inject = ["$stateProvider"];
-
-
-export default setup;
