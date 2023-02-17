@@ -6,9 +6,10 @@ import org.junit.jupiter.api.Test;
 import java.util.Set;
 
 import static org.finos.waltz.common.CollectionUtilities.first;
+import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.service.bulk_upload.BulkUploadLegalEntityRelationshipService.readRows;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 public class BulkUploadLegalEntityRelationshipsTest {
 
@@ -43,6 +44,21 @@ public class BulkUploadLegalEntityRelationshipsTest {
         Tuple2<Tuple2<Integer, String[]>, Set<Tuple2<Integer, String[]>>> resolvedRows = readRows(INCLUDING_EMPTY_STRING);
         Tuple2<Integer, String[]> row = first(resolvedRows.v2);
         assertEquals(3, row.v2.length, "Should break string on commas to form list of data");
+    }
+
+
+    @Test
+    public void getColumnValuesFromInputString() {
+
+        assertThrows(IndexOutOfBoundsException.class,
+                () -> BulkUploadUtilities.getColumnValuesFromInputString(SIMPLE_TEST_STRING, -1),
+                "Should throw an error if asking to return a column with a negative offset value");
+
+        Set<String> columnNotIncluded = BulkUploadUtilities.getColumnValuesFromInputString(SIMPLE_TEST_STRING, 16);
+        assertTrue(isEmpty(columnNotIncluded), "Should return empty set if column index is out of bounds");
+
+        Set<String> columns = BulkUploadUtilities.getColumnValuesFromInputString(SIMPLE_TEST_STRING, 0);
+        assertEquals(asSet("App Id", "12345"), columns, "Should return correct values for column offset");
     }
 
 }

@@ -2,6 +2,7 @@ package org.finos.waltz.test_common.helpers;
 
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
+import org.finos.waltz.model.Cardinality;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.assessment_definition.AssessmentVisibility;
@@ -34,10 +35,14 @@ public class AssessmentHelper {
 
 
     public long createDefinition(long schemeId, String name, String permittedRole, AssessmentVisibility visibility, String definitionGroup) {
-        return createDefinition(schemeId, name, permittedRole, visibility, definitionGroup, EntityKind.APPLICATION);
+        return createDefinition(schemeId, name, permittedRole, visibility, definitionGroup, EntityKind.APPLICATION, Cardinality.ZERO_ONE);
     }
 
     public long createDefinition(long schemeId, String name, String permittedRole, AssessmentVisibility visibility, String definitionGroup, EntityKind entityKind) {
+        return createDefinition(schemeId, name, permittedRole, visibility, definitionGroup, entityKind, Cardinality.ZERO_ONE);
+    }
+
+    public long createDefinition(long schemeId, String name, String permittedRole, AssessmentVisibility visibility, String definitionGroup, EntityKind entityKind, Cardinality cardinality) {
 
         ImmutableAssessmentDefinition.Builder def = ImmutableAssessmentDefinition.builder()
                 .name(name)
@@ -47,6 +52,7 @@ public class AssessmentHelper {
                 .entityKind(entityKind)
                 .lastUpdatedBy("test")
                 .visibility(visibility)
+                .cardinality(cardinality)
                 .ratingSchemeId(schemeId);
 
         if (!isEmpty(permittedRole)) {

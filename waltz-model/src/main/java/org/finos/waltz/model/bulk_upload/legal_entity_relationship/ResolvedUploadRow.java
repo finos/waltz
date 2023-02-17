@@ -12,7 +12,7 @@ import java.util.Set;
 @JsonDeserialize(as = ImmutableResolvedUploadRow.class)
 public abstract class ResolvedUploadRow {
 
-    public abstract long rowIndex();
+    public abstract long rowNumber();
 
     public abstract ResolvedLegalEntityRelationship legalEntityRelationship();
 
