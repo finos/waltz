@@ -54,6 +54,9 @@ function controller(serviceBroker) {
                 () => {
                     toasts.info("Role created successfully");
                     reload();
+                    vm.roleKey = ""
+                    vm.roleName = ""
+                    vm.roleDescription = ""
                 })
             .catch(e => displayError("Failed to create role! ", e));
     };
