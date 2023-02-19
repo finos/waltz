@@ -5,6 +5,7 @@ import ViewLink from "../../../common/svelte/ViewLink.svelte";
 import TaxonomyNavAidBuilder from "./TaxonomyNavAidBuilder.svelte";
 import DataTypeNavAidBuilder from "./DataTypeNavAidBuilder.svelte";
 import MeasurableCategoryNavAidBuilder from "./MeasurableCategoryNavAidBuilder.svelte";
+import PersonNavAidBuilder from "./PersonNavAidBuilder.svelte";
 
 const Modes = {
     NONE: {},
@@ -14,11 +15,11 @@ const Modes = {
     MEASURABLE_CATEGORY: {
         component: MeasurableCategoryNavAidBuilder
     },
-    PERSON: {component: TaxonomyNavAidBuilder},
+    PERSON: {component: PersonNavAidBuilder},
     ORG_UNIT: {component: TaxonomyNavAidBuilder}
 };
 
-let mode = Modes.NONE;
+let mode = Modes.PERSON;
 
 function switchMode(newMode) {
     mode = newMode;
