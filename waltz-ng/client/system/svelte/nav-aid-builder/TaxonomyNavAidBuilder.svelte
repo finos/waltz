@@ -1,6 +1,6 @@
 <script>
-    import {buildHierarchies} from "../../common/hierarchy-utils";
-    import {mkChunks} from "../../common/list-utils";
+    import {buildHierarchies} from "../../../common/hierarchy-utils";
+    import {mkChunks} from "../../../common/list-utils";
     import _ from "lodash";
 
     export let taxonomy = [];
@@ -35,7 +35,7 @@
         .reject(d => d.name.startsWith("_REMOVED_"))
         .reject(d => d.unknown)
         .thru(buildHierarchies)
-        .reject(d => _.isEmpty(d.children))
+        //.reject(d => _.isEmpty(d.children))
         .orderBy(orderMode.fn)
         .value();
 
@@ -59,8 +59,6 @@
             {values: [], start: 0, end: 0})
         .thru(d => d.values)
         .value();
-
-    $: console.log({chunked, rowHeights})
 
     function simplifyName(name) {
         return name

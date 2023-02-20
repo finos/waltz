@@ -16,21 +16,14 @@
   ~
   -->
 
-<div>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="db.changelog-1.48.xml">
 
-    <waltz-page-header name="Playpen 4"
-                       icon="rocket">
-        <breadcrumbs>
-            <ol class="waltz-breadcrumbs">
-                <li><a ui-sref="main">Home</a></li>
-                <li>Playpen</li>
-            </ol>
-        </breadcrumbs>
-    </waltz-page-header>
+    <changeSet id="v1-47-tag"
+               author="davidwatkins73">
+        <tagDatabase tag="v1.47"/> <!-- tag the current db version, i.e. the last  -->
+    </changeSet>
 
-    <waltz-section name="pp4">
-        <waltz-app-complexity-summary-section parent-entity-ref="$ctrl.parentEntityRef">
-        </waltz-app-complexity-summary-section>
-    </waltz-section>
-
-</div>
+</databaseChangeLog>
