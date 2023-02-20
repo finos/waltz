@@ -170,22 +170,32 @@ public class AssessmentRatingService {
 
         changeLogService.write(logEntry);
 
-        return assessmentRatingDao.remove(command);
+        return assessmentRatingDao.bulkRemove(command);
     }
 
 
     public boolean bulkStore(BulkAssessmentRatingCommand[] commands,
                              long assessmentDefinitionId,
                              String username) {
+
+        AssessmentDefinition defn = assessmentDefinitionDao.getById(assessmentDefinitionId);
+
         Set<AssessmentRating> ratingsToAdd = getRatingsFilterByOperation(commands, assessmentDefinitionId, username, Operation.ADD);
         int addedResult = assessmentRatingDao.add(ratingsToAdd);
         createChangeLogs(assessmentDefinitionId, username, ratingsToAdd, Operation.ADD);
 
         Set<AssessmentRating> ratingsToUpdate = getRatingsFilterByOperation(commands, assessmentDefinitionId, username, Operation.UPDATE);
-        int updateResult = assessmentRatingDao.update(ratingsToUpdate);
+
+        int updatedCommentsResult;
+
+        if (defn.cardinality().equals(Cardinality.ZERO_ONE)) {
+            updatedCommentsResult = assessmentRatingDao.bulkUpdateSingleValuedAssessments(ratingsToUpdate);
+        } else {
+            updatedCommentsResult = assessmentRatingDao.bulkUpdateMultiValuedAssessments(ratingsToUpdate);
+        }
         createChangeLogs(assessmentDefinitionId, username, ratingsToUpdate, Operation.ADD);
 
-        return addedResult + updateResult > 1;
+        return addedResult + updatedCommentsResult > 1;
     }
 
 
@@ -194,7 +204,7 @@ public class AssessmentRatingService {
                               String username) {
         Set<AssessmentRating> ratingsToRemove = getRatingsFilterByOperation(commands, assessmentDefinitionId, username, Operation.REMOVE);
         createChangeLogs(assessmentDefinitionId, username, ratingsToRemove, Operation.REMOVE);
-        int result = assessmentRatingDao.remove(ratingsToRemove);
+        int result = assessmentRatingDao.bulkRemove(ratingsToRemove);
 
         return result  > 1;
     }
