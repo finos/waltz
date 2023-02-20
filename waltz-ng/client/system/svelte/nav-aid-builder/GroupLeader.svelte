@@ -9,7 +9,7 @@
 
 <a href="person/id/{person.id}">
 
-<div class="person-card"
+<div class="navaid-leader"
      class:primary={scheme === 'primary'}
      class:secondary={scheme === 'secondary'}>
     <div class="banner">
@@ -25,20 +25,20 @@
 </div>
 </a>
 <style>
-    .person-card {
+    .navaid-leader {
         text-align: center;
     }
 
-    .banner {
+    .navaid-leader .banner {
         padding: 0.5em;
     }
 
-    .secondary .banner {
+    .navaid-leader.secondary .banner {
         background-color: #5178e7;
         color: #eee;
     }
 
-    .primary .banner {
+    .navaid-leader.primary .banner {
         background-color: #2956e0;
         color: #eee;
     }

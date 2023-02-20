@@ -4,7 +4,7 @@
     export let unit = null;
 </script>
 
-<div class="unit">
+<div class="navaid-unit">
     <div class="unit-name">
         {unit.name}
     </div>
@@ -19,27 +19,25 @@
 </div>
 
 <style>
-    .unit {
+    .navaid-unit {
         border: 1px solid #ccc;
         margin: 2em 2em;
     }
 
-    .unit-name {
+    .navaid-unit .unit-name {
         background-color: #0b23ea;
         color: #eee;
         text-align: center;
         padding: 0.2em;
     }
 
-    .people {
+    .navaid-unit .people {
         display: flex;
         flex-direction: row;
-        flex-grow: 1;
-        /*flex-wrap: wrap;*/
         justify-content: space-evenly;
     }
 
-    .person-wrapper {
+    .navaid-unit .person-wrapper {
         padding: 1em;
     }
 </style>

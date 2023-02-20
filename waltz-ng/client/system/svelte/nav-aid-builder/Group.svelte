@@ -4,7 +4,7 @@
 </script>
 
 
-<div class="group">
+<div class="navaid-group">
     <div class="group-name">
         {group.name}
     </div>
@@ -18,26 +18,26 @@
 </div>
 
 <style>
-    .group {
+    .navaid-group {
         border: 1px solid #ccc;
         margin: 1em 0;
 
     }
 
-    .group-name {
+    .navaid-group .group-name {
         text-align: center;
         background-color: #eee;
         padding: 0.3em;
         width: 100%;
     }
 
-    .unit-wrapper {
+    .navaid-group .unit-wrapper {
         padding: 0.2em;
         flex-basis: 33%;
         flex-grow: 1;
     }
 
-    .units {
+    .navaid-group .units {
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;

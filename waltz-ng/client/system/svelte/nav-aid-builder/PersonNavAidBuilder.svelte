@@ -79,10 +79,10 @@
 
 </script>
 
-<div class="diagram">
+<div class="navaid-diagram">
     <GroupLeader {...struct.leader}
                  scheme="primary"/>
-    <div class="groups">
+    <div class="navaid-groups">
         {#each struct.groups as group}
             <Group {group}/>
         {/each}
@@ -91,7 +91,7 @@
 </div>
 
 <style>
-    .groups {
+    .navaid-groups {
         display: flex;
         flex-direction: column;
         justify-content: space-evenly;
