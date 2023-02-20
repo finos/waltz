@@ -4,11 +4,11 @@
     import Group from "./Group.svelte";
 
     let boss = mkRef('PERSON', 23, "Big B. Boss");
-    let gil = mkRef('PERSON', 24, "Gil Perez");
-    let gordon = mkRef('PERSON', 25, "Gordon Mackechnie");
-    let stefan = mkRef('PERSON', 26, "Stefan Peschke");
-    let marcus = mkRef('PERSON', 27, "Marcus Heidmann");
-    let marie = mkRef('PERSON', 28, "Marie Lauri");
+    let gil = mkRef('PERSON', 24, "Gil P");
+    let gordon = mkRef('PERSON', 25, "Gordon M");
+    let stefan = mkRef('PERSON', 26, "Stefan P");
+    let marcus = mkRef('PERSON', 27, "Marcus H");
+    let marie = mkRef('PERSON', 28, "Marie L");
 
     const struct = {
         leader: {
