@@ -1,19 +1,19 @@
 <script>
+    import _ from "lodash";
+    import {scaleLinear} from "d3-scale";
+    import {max} from "d3-array";
 
     import {assessmentRatingStore} from "../../../svelte-stores/assessment-rating-store";
-    import {determineDownwardsScopeForKind, mkSelectionOptions} from "../../../common/selector-utils";
-    import _ from "lodash";
     import {ratingSchemeStore} from "../../../svelte-stores/rating-schemes";
     import {userPreferenceStore} from "../../../svelte-stores/user-preference-store";
+    import {assessmentStores, createStores,} from "../list/assessment-rating-store";
+    import {favouriteAssessmentDefinitionStore} from "../../../svelte-stores/favourite-assessment-definition-store";
+    import {determineDownwardsScopeForKind, mkSelectionOptions} from "../../../common/selector-utils";
     import {lastViewedAssessmentInfoTileKey} from "../../../user";
     import DropdownPicker
         from "../../../report-grid/components/svelte/column-definition-edit-panel/DropdownPicker.svelte";
     import NoData from "../../../common/svelte/NoData.svelte";
     import {primaryEntityReference} from "../rating-editor/rating-store";
-    import {assessmentStores, createStores,} from "../list/assessment-rating-store";
-    import {scaleLinear} from "d3-scale";
-    import {max} from "d3-array";
-    import {favouriteAssessmentDefinitionStore} from "../../../svelte-stores/favourite-assessment-definition-store";
 
     export let primaryEntityRef;
     export let filters;

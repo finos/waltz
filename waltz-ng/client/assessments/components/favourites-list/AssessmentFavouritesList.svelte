@@ -5,6 +5,7 @@
     import {assessmentRatingStore} from "../../../svelte-stores/assessment-rating-store";
     import {ratingSchemeStore} from "../../../svelte-stores/rating-schemes";
     import {
+        assessmentDefinitions,
         assessmentRatings,
         assessments,
         primaryEntityReference,
@@ -16,6 +17,7 @@
     import AssessmentDefinitionTooltipContent from "../list/AssessmentDefinitionTooltipContent.svelte";
     import NoData from "../../../common/svelte/NoData.svelte";
     import {favouriteAssessmentDefinitionStore} from "../../../svelte-stores/favourite-assessment-definition-store";
+    import {assessmentDefinitionStore} from "../../../svelte-stores/assessment-definition";
 
 
     let elem;
@@ -25,18 +27,28 @@
     let favouriteAssessments = [];
 
     let assessmentRatingCall;
+    let assessmentDefinitionCall;
     let ratingSchemesCall;
 
     $: {
         if ($primaryEntityReference) {
             assessmentRatingCall = assessmentRatingStore.findForEntityReference($primaryEntityReference, true);
             ratingSchemesCall = ratingSchemeStore.loadAll();
+            assessmentDefinitionCall = assessmentDefinitionStore.findByEntityReference($primaryEntityReference);
         }
     }
 
     $: $assessmentRatings = $assessmentRatingCall?.data;
     $: $ratingSchemes = $ratingSchemesCall?.data;
+    $: $assessmentDefinitions = $assessmentDefinitionCall?.data;
 
+    $: console.log({
+        a: $assessments,
+        ar: $assessmentRatings,
+        fa: $favouriteAssessmentDefinitionStore[$primaryEntityReference.kind],
+        rs: $ratingSchemes,
+        favouriteAssessments
+    });
 
     $: {
         const assessmentsByDefId = _.keyBy($assessments, d => d.definition.id);
@@ -76,7 +88,9 @@
 </script>
 
 {#if _.isEmpty(favouriteAssessments)}
-    <NoData type="info">You have no favourite assessments, please open the assessments section to add some</NoData>
+    <NoData type="info">
+        You have no favourite assessments, please open the assessments section to add some
+    </NoData>
 {:else}
     <table class="table table-hover table-condensed">
         <colgroup>
@@ -119,7 +133,9 @@
         {:else}
             <tr>
                 <td colspan="2">
-                    <NoData type="info">There are no favourite assessments with ratings</NoData>
+                    <NoData type="info">
+                        There are no favourite assessments with ratings
+                    </NoData>
                 </td>
             </tr>
         {/each}
