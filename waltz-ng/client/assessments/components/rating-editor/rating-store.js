@@ -2,6 +2,7 @@ import {derived, writable} from "svelte/store";
 import {mkEnrichedAssessmentDefinitions} from "../../assessment-utils";
 import _ from "lodash";
 
+
 export const Modes = {
     LIST: "LIST",
     EDIT: "EDIT",
@@ -18,13 +19,16 @@ export const ratingSchemes = writable([]);
 export const permissions = writable([]);
 export const detailPanelActiveMode = writable(Modes.LIST);
 
+
 export const permissionsByRatingId = derived(
     [permissions],
     ([$permissions]) => _.keyBy($permissions, d => d.ratingId));
 
+
 export const defaultPermission = derived(
     [permissions],
     ([$permissions]) => _.find($permissions, d => d.isDefault));
+
 
 export const assessments = derived(
     [assessmentRatings, assessmentDefinitions, ratingSchemes],
@@ -38,6 +42,7 @@ export const assessments = derived(
             return [];
         }
     });
+
 
 export const selectedAssessment = derived(
     [selectedAssessmentId, assessments],
