@@ -42,14 +42,6 @@
     $: $ratingSchemes = $ratingSchemesCall?.data;
     $: $assessmentDefinitions = $assessmentDefinitionCall?.data;
 
-    $: console.log({
-        a: $assessments,
-        ar: $assessmentRatings,
-        fa: $favouriteAssessmentDefinitionStore[$primaryEntityReference.kind],
-        rs: $ratingSchemes,
-        favouriteAssessments
-    });
-
     $: {
         const assessmentsByDefId = _.keyBy($assessments, d => d.definition.id);
         favouriteAssessments = _
