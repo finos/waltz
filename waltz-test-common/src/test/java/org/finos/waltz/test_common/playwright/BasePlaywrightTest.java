@@ -45,7 +45,7 @@ public abstract class BasePlaywrightTest {
     @BeforeEach
     void createContextAndPage() {
         context = browser.newContext();
-        context.setDefaultTimeout(2_000);
+        context.setDefaultTimeout(8_000);
         page = context.newPage();
     }
 

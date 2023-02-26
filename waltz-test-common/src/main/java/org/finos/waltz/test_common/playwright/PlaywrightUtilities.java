@@ -77,4 +77,11 @@ public class PlaywrightUtilities {
     public static void log(String msg, Object... params) {
         System.out.printf(msg+"\n", params);
     }
+
+
+    public static void logAppLink(EntityReference appRef) {
+        log("App link [%s](http://localhost:8000/application/%d)",
+            appRef.name().orElse("Un-named App"),
+            appRef.id());
+    }
 }
