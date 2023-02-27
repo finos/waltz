@@ -33,7 +33,7 @@ public class AppHelper {
                                 .build(),
                         "appHelper");
 
-        return resp.id().map(id -> mkRef(EntityKind.APPLICATION, id)).get();
+        return resp.id().map(id -> mkRef(EntityKind.APPLICATION, id, name)).get();
     }
 
 
