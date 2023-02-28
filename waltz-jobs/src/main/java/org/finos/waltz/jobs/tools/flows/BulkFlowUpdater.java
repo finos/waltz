@@ -39,7 +39,8 @@ public class BulkFlowUpdater {
     private final DataTypeDecoratorService dataTypeDecoratorService;
     private final PhysicalSpecDataTypeService physicalSpecDataTypeService;
 
-    private String username = "steven.jackson@db.com";
+    private static final String BASE_URL = "http://waltz.mycorp.com/waltz";
+    private static final String USERNAME = "some.body@mycorp.com";
 
     @Autowired
     public BulkFlowUpdater(LogicalFlowService logicalFlowService,
@@ -87,14 +88,15 @@ public class BulkFlowUpdater {
                     Tuple2<EntityReference, EntityReference> sourceAndTarget = flowToSourceTargetMap.get(lfId);
                     Collection<EntityReference> dts = kv.getValue();
                     LOG.debug(
-                            "Updating datatypes for logical flow: http://waltz.intranet.db.com/waltz/logical-flow/{}?sections=7, ({} -> {}) removing dataTypes: {}",
+                            "Updating datatypes for logical flow: {}/logical-flow/{}?sections=7, ({} -> {}) removing dataTypes: {}",
+                            BASE_URL,
                             lfId,
                             sourceAndTarget.v1.name().orElse("?"),
                             sourceAndTarget.v2.name().orElse("?"),
                             map(dts, dt -> dt.name().orElse("?")));
 
                     dataTypeDecoratorService.updateDecorators(
-                            username,
+                            USERNAME,
                             mkRef(EntityKind.LOGICAL_DATA_FLOW, lfId),
                             emptySet(),
                             map(dts, EntityReference::id));
@@ -126,7 +128,8 @@ public class BulkFlowUpdater {
 
         LOG.info("Adding {} flows", addCmds.size());
         addCmds.forEach(c -> LOG.debug(
-                "Adding flow between {} and {},  http://waltz.intranet.db.com/waltz/{}/{}?sections=9;7",
+                "Adding flow between {} and {},  {}/{}/{}?sections=9;7",
+                BASE_URL,
                 c.source().name().orElse("?"),
                 c.target().name().orElse("?"),
                 c.source().kind() == EntityKind.ACTOR ? "actor" : "application",
@@ -134,7 +137,7 @@ public class BulkFlowUpdater {
 
         Set<LogicalFlow> logicalFlows = logicalFlowService.addFlows(
                 addCmds,
-                username);
+                USERNAME);
 
         LOG.debug("{} Flows created, modifying the commands to update types", logicalFlows.size());
         Map<Tuple2<EntityReference, EntityReference>, Long> srcAndTargetToFlowIdMap = indexBy(
@@ -178,14 +181,15 @@ public class BulkFlowUpdater {
                     Tuple2<EntityReference, EntityReference> sourceAndTarget = flowToSourceTargetMap.get(lfId);
                     Collection<EntityReference> dts = kv.getValue();
                     LOG.debug(
-                            "Updating datatypes for logical flow: http://waltz.intranet.db.com/waltz/logical-flow/{}?sections=7, ({} -> {}) adding dataTypes: {}",
+                            "Updating datatypes for logical flow: {}/logical-flow/{}?sections=7, ({} -> {}) adding dataTypes: {}",
+                            BASE_URL,
                             lfId,
                             sourceAndTarget.v1.name().orElse("?"),
                             sourceAndTarget.v2.name().orElse("?"),
                             map(dts, dt -> dt.name().orElse("?")));
 
                     dataTypeDecoratorService.updateDecorators(
-                            username,
+                            USERNAME,
                             mkRef(EntityKind.LOGICAL_DATA_FLOW, lfId),
                             map(dts, EntityReference::id),
                             emptySet());
