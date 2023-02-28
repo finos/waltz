@@ -26,6 +26,7 @@ import template from "./bulk-assessment-rating-selector.html";
 
 
 const bindings = {
+    definition: "<",
     existingRefs: "<",
     ratingItems: "<",
     onSave: "<"
@@ -77,31 +78,37 @@ function mkSummary(searchResults = []) {
 }
 
 
-function determineAction(existingRef, searchedRef) {
+function determineAction(definition, existingRefs = [], searchedRef) {
     if (!searchedRef.entityRef || !searchedRef.rating) return;
 
+    const isSingleValued = definition.cardinality === "ZERO_ONE";
 
-    if (!existingRef) {
-        return "ADD";
-    } else if (sameRef(existingRef.entityRef, searchedRef.entityRef)
-        && (existingRef.rating.id !== searchedRef.rating.id
-            || (searchedRef.comment != null && searchedRef.comment !== existingRef.comment))) {
-        return "UPDATE";
-    } else if (sameRef(existingRef.entityRef, searchedRef.entityRef) ) {
+    const entityHasRating = _.some(existingRefs, d => sameRef(d.entityRef, searchedRef.entityRef));
+    const existingRating = _.find(existingRefs, d => sameRef(d.entityRef, searchedRef.entityRef) && d.rating.id === searchedRef.rating.id);
+
+    if (existingRating && searchedRef.comment === existingRating.comment) {
         return "NO_CHANGE";
+    } else if (existingRating) {
+        return "UPDATE";
+    } else if (entityHasRating && isSingleValued) {
+        return "UPDATE";
+    } else {
+        return "ADD"; //multi-valued assessments will by default add a new one
     }
 }
 
 
-function findMatchedApps(apps = [], identifiers = [], existingRefs = [], ratingItems = []) {
+function findMatchedApps(definition, apps = [], identifiers = [], existingRefs = [], ratingItems = []) {
+
     const appsByAssetCode = _.keyBy(apps, "assetCode");
-    const existingRefsById = _.keyBy(existingRefs, "entityRef.id");
+    const existingRefsById = _.groupBy(existingRefs, "entityRef.id");
+
     return _.chain(identifiers)
         .map(identifier => {
             const app = appsByAssetCode[identifier.appIdentifier];
             const selectedRating = _.find(ratingItems,
-                                          item => item.name === identifier.rating
-                                              || item.rating === _.toUpper(identifier.rating));
+                item => item.name === identifier.rating
+                    || item.rating === _.toUpper(identifier.rating));
             const entityRef = app ? toEntityRef(app, "APPLICATION") : null;
             const searchEntity = Object.assign({}, {
                 entityRef: entityRef,
@@ -109,7 +116,7 @@ function findMatchedApps(apps = [], identifiers = [], existingRefs = [], ratingI
                 comment: identifier.comment,
                 identifier: identifier.appIdentifier
             });
-            const action = entityRef ? determineAction(existingRefsById[entityRef.id], searchEntity) : null;
+            const action = entityRef ? determineAction(definition, existingRefsById[entityRef.id], searchEntity) : null;
             return _.assign(searchEntity , {action: action});
         })
         .value();
@@ -124,7 +131,7 @@ function controller(serviceBroker) {
             .loadViewData(CORE_API.ApplicationStore.findAll)
             .then(r => {
                 const allApps = r.data;
-                return findMatchedApps(allApps, identifiers, vm.existingRefs, vm.ratingItems);
+                return findMatchedApps(vm.definition, allApps, identifiers, vm.existingRefs, vm.ratingItems);
             });
     };
 
@@ -164,9 +171,14 @@ function controller(serviceBroker) {
                 vm.visibility.loading = false;
 
                 vm.searchSummary = mkSummary(vm.searchResults);
-                const resultsById = _.keyBy(results, "entityRef.id");
+                const isSingleValued = vm.definition.cardinality === "ZERO_ONE";
+
                 vm.removedResults = _.chain(vm.existingRefs)
-                    .filter(r => !resultsById[r.entityRef.id])
+                    .filter(r => {
+                        const toBeUpdated = isSingleValued && _.some(vm.searchResults, d => sameRef(r.entityRef, d.entityRef));
+                        const noChange = _.some(vm.searchResults, d => sameRef(r.entityRef, d.entityRef) && d.rating.id === r.rating.id);
+                        return !(toBeUpdated || noChange);
+                    })
                     .map(r => ({entityRef: r.entityRef, action: "REMOVE", rating: r.rating}))
                     .value();
             });

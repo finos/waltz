@@ -147,7 +147,7 @@ function controller($q,
             serviceBroker
                 .loadViewData(
                     CORE_API.AssessmentRatingStore.remove,
-                    [row.entityRef, definitionId])
+                    [row.entityRef, definitionId, row.ratingId])
                 .then(r => r.data)
                 .then(() => loadAll())
                 .then(() => toasts.success("Assessment Rating Removed for application " + row.entityRef.name))
