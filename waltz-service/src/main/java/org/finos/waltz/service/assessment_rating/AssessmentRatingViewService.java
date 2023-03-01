@@ -102,7 +102,7 @@ public class AssessmentRatingViewService {
 
     public Set<AssessmentRatingDetail> findFavouriteAssessmentsForEntityAndUser(EntityReference ref, String username){
 
-        List<AssessmentDefinition> allDefns = assessmentDefinitionDao.findAll();
+        Set<AssessmentDefinition> allDefns = assessmentDefinitionDao.findAll();
         Map<Long, AssessmentDefinition> definitionsById = indexBy(allDefns, d -> d.id().get());
 
         List<Long> assessmentDefinitionIds = determineFavoriteAssessments(username, allDefns, ref.kind());
@@ -127,7 +127,7 @@ public class AssessmentRatingViewService {
     }
 
 
-    private List<Long> determineFavoriteAssessments(String username, List<AssessmentDefinition> allDefns, EntityKind kind) {
+    private List<Long> determineFavoriteAssessments(String username, Set<AssessmentDefinition> allDefns, EntityKind kind) {
 
         List<Long> defaultAssessmentIds = allDefns
                 .stream()

@@ -14,10 +14,8 @@ import java.util.Set;
 public abstract class ResolveBulkUploadLegalEntityRelationshipParameters {
 
     public abstract BulkUploadMode uploadMode();
-
     @Value.Redacted
     public abstract String inputString();
-
     public abstract Set<ResolvedUploadRow> resolvedRows();
 
 }

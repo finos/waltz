@@ -19,22 +19,27 @@ import {registerComponents, registerStores} from "../common/module-utils";
 
 import Routes from "./routes";
 import LegalEntityRelationshipKindView from "./pages/view/legal-entity-relationship-kind-view";
+import LegalEntityRelationshipsSection from "./components/relationships-section/legal-entity-relationships-section";
 import LegalEntityRelationshipKindStore from "./services/legal-entity-relationship-kind-store";
-
+import BulkUploadLegalEntityRelationshipsStore from "./services/bulk-upload-legal-entity-relationships-store";
+import LegalEntityRelationshipBulkUpload from "./components/bulk-upload/legal-entity-relationship-bulk-upload";
 
 export default () => {
 
-    const module = angular.module("waltz.legal-entity", []);
+    const module = angular.module("waltz.legal-entity-relationship-kind", []);
 
     module
         .config(Routes);
 
     registerComponents(module, [
-        LegalEntityRelationshipKindView
+        LegalEntityRelationshipKindView,
+        LegalEntityRelationshipsSection,
+        LegalEntityRelationshipBulkUpload
     ]);
 
     registerStores(module, [
-        LegalEntityRelationshipKindStore
+        LegalEntityRelationshipKindStore,
+        BulkUploadLegalEntityRelationshipsStore
     ])
 
     return module.name;

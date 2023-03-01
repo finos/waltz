@@ -89,7 +89,7 @@ public class BulkUploadService {
         Set<Involvement> desiredInvolvements = streamRowData(uploadCommand.inputString())
                 .map(t -> {
 
-                    String[] cells = t.v2;
+                    String[] cells = t.values();
 
                     String entityIdentifierString = safeTrim(cells[0]);
                     String personIdentifierString = safeTrim(cells[1]);
@@ -151,8 +151,8 @@ public class BulkUploadService {
         return streamRowData(resolveParams.inputString())
                 .map(t -> {
 
-                    Integer lineNumber = t.v1;
-                    String[] cells = t.v2;
+                    Integer lineNumber = t.rowNumber();
+                    String[] cells = t.values();
                     List<String> rowData = asList(cells);
 
                     if (cells.length < REQUIRED_INVOLVEMENT_COLUMNS_SIZE) {

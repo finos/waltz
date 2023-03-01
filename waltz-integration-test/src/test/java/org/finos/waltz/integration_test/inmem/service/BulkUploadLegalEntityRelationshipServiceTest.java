@@ -97,7 +97,7 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
         EntityReference a = appHelper.createNewApp(mkName("a"), ouIds.a);
         EntityReference le = legalEntityHelper.create(mkName("le"));
 
-        String[] headerRow = {"a", "le", "comment", defn.externalId().get()};
+        Set<String> headerRow = asSet("a", "le", "comment", defn.externalId().get());
         Set<Tuple2<Integer, ResolvedAssessmentHeader>> assessmentWithColIdx = service.parseAssessmentsFromHeader(tuple(1, headerRow));
 
         assertEquals(1, assessmentWithColIdx.size(), "Should return a single assessment definition");
@@ -116,7 +116,7 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
         EntityReference a = appHelper.createNewApp(mkName("a"), ouIds.a);
         EntityReference le = legalEntityHelper.create(mkName("le"));
 
-        String[] headerRow = {"a", "le", "comment", "invalid identifier"};
+        Set<String> headerRow = asSet("a", "le", "comment", "invalid identifier");
         Set<Tuple2<Integer, ResolvedAssessmentHeader>> assessmentWithColIdx = service.parseAssessmentsFromHeader(tuple(1, headerRow));
         Optional<Tuple2<Integer, ResolvedAssessmentHeader>> maybeDefnA = find(assessmentWithColIdx, d -> d.v1 == 3);
 
@@ -139,7 +139,7 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
         EntityReference a = appHelper.createNewApp(mkName("a"), ouIds.a);
         EntityReference le = legalEntityHelper.create(mkName("le"));
 
-        String[] headerRow = {"a", "le", "comment", null, defn.externalId().get()};
+        Set<String> headerRow = asSet("a", "le", "comment", null, defn.externalId().get());
         Set<Tuple2<Integer, ResolvedAssessmentHeader>> assessmentWithColIdx = service.parseAssessmentsFromHeader(tuple(1, headerRow));
         Optional<Tuple2<Integer, ResolvedAssessmentHeader>> maybeDefnA = find(assessmentWithColIdx, d -> d.v1 == 3);
 
@@ -162,7 +162,7 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
         EntityReference a = appHelper.createNewApp(mkName("a"), ouIds.a);
         EntityReference le = legalEntityHelper.create(mkName("le"));
 
-        String[] headerRow = {"a", "le", "comment", "", defn.externalId().get()};
+        Set<String> headerRow = asSet("a", "le", "comment", "", defn.externalId().get());
         Set<Tuple2<Integer, ResolvedAssessmentHeader>> assessmentWithColIdx = service.parseAssessmentsFromHeader(tuple(1, headerRow));
         Optional<Tuple2<Integer, ResolvedAssessmentHeader>> maybeDefnA = find(assessmentWithColIdx, d -> d.v1 == 3);
 
@@ -190,7 +190,7 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
         EntityReference a = appHelper.createNewApp(mkName("a"), ouIds.a);
         EntityReference le = legalEntityHelper.create(mkName("le"));
 
-        String[] headerRow = {"a", "le", "comment", defnC.externalId().get(), defnB.externalId().get(), defnA.externalId().get()};
+        Set<String> headerRow = asSet("a", "le", "comment", defnC.externalId().get(), defnB.externalId().get(), defnA.externalId().get());
 
         Set<Tuple2<Integer, ResolvedAssessmentHeader>> assessmentWithColIdx = service.parseAssessmentsFromHeader(tuple(1, headerRow));
 
@@ -225,7 +225,7 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
 
         String assessmentHeaderString = format("%s / %s", defnA.externalId().get(), "invalid identifier");
 
-        String[] headerRow = {"a", "le", "comment", assessmentHeaderString};
+        Set<String> headerRow = asSet("a", "le", "comment", assessmentHeaderString);
 
         Set<Tuple2<Integer, ResolvedAssessmentHeader>> assessmentWithColIdx = service.parseAssessmentsFromHeader(tuple(1, headerRow));
 
@@ -257,7 +257,7 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
 
         String assessmentHeaderString = format("%s / %s", defn.externalId().get(), "TEST_RATING");
 
-        String[] headerRow = {"a", "le", "comment", assessmentHeaderString};
+        Set<String> headerRow = asSet("a", "le", "comment", assessmentHeaderString);
 
         Set<Tuple2<Integer, ResolvedAssessmentHeader>> assessmentWithColIdx = service.parseAssessmentsFromHeader(tuple(1, headerRow));
         Optional<Tuple2<Integer, ResolvedAssessmentHeader>> maybeDefnA = find(assessmentWithColIdx, d -> d.v1 == 3);
@@ -288,7 +288,7 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
 
         String assessmentHeaderString = format("%s", defnA.externalId().get());
 
-        String[] headerRow = {"a", "le", "comment", assessmentHeaderString};
+        Set<String> headerRow = asSet("a", "le", "comment", assessmentHeaderString);
 
         Set<Tuple2<Integer, ResolvedAssessmentHeader>> assessmentWithColIdx = service.parseAssessmentsFromHeader(tuple(1, headerRow));
 

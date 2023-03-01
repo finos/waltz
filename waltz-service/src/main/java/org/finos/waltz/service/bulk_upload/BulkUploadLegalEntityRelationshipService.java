@@ -1,7 +1,8 @@
 package org.finos.waltz.service.bulk_upload;
 
-import org.finos.waltz.common.*;
-import org.finos.waltz.common.StreamUtilities.Siphon;
+import org.finos.waltz.common.CollectionUtilities;
+import org.finos.waltz.common.OptionalUtilities;
+import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.data.EntityAliasPopulator;
 import org.finos.waltz.model.Cardinality;
 import org.finos.waltz.model.EntityKind;
@@ -16,16 +17,15 @@ import org.finos.waltz.model.legal_entity.LegalEntityRelationshipKind;
 import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.service.assessment_definition.AssessmentDefinitionService;
 import org.finos.waltz.service.assessment_rating.AssessmentRatingService;
+import org.finos.waltz.service.bulk_upload.TabularDataUtilities.Row;
 import org.finos.waltz.service.legal_entity.LegalEntityRelationshipKindService;
 import org.finos.waltz.service.legal_entity.LegalEntityRelationshipService;
-import org.finos.waltz.service.permission.permission_checker.LegalEntityRelationshipPermissionChecker;
 import org.finos.waltz.service.rating_scheme.RatingSchemeService;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -33,27 +33,27 @@ import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.ArrayUtilities.idx;
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.CollectionUtilities.first;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.SetUtilities.*;
-import static org.finos.waltz.common.StreamUtilities.mkSiphon;
 import static org.finos.waltz.common.StringUtilities.isEmpty;
 import static org.finos.waltz.common.StringUtilities.safeTrim;
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.bulk_upload.legal_entity_relationship.AssessmentHeaderResolutionError.mkError;
 import static org.finos.waltz.model.bulk_upload.legal_entity_relationship.AssessmentResolutionErrorCode.*;
 import static org.finos.waltz.model.bulk_upload.legal_entity_relationship.LegalEntityRelationshipResolutionError.mkError;
 import static org.finos.waltz.model.bulk_upload.legal_entity_relationship.ResolvedAssessmentHeader.mkHeader;
 import static org.finos.waltz.service.bulk_upload.BulkUploadUtilities.getColumnValuesFromRows;
-import static org.finos.waltz.service.bulk_upload.BulkUploadUtilities.streamRowData;
+import static org.finos.waltz.service.bulk_upload.TabularDataUtilities.streamData;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Service
 public class BulkUploadLegalEntityRelationshipService {
 
-    private static final int LEGAL_ENTITY_REL_COLS_COUNT = 3;
+    private static final Set<String> FIXED_COL_HEADERS = asSet(LegalEntityBulkUploadFixedColumns.ENTITY_IDENTIFIER, LegalEntityBulkUploadFixedColumns.LEGAL_ENTITY_IDENTIFIER);
     private final AssessmentDefinitionService assessmentDefinitionService;
     private final RatingSchemeService ratingSchemeService;
     private final EntityAliasPopulator entityAliasPopulator;
@@ -90,12 +90,26 @@ public class BulkUploadLegalEntityRelationshipService {
 
         LegalEntityRelationshipKind relKind = legalEntityRelationshipKindService.getById(uploadCommand.legalEntityRelationshipKindId());
 
-        // header to data rows
-        Tuple2<Tuple2<Integer, String[]>, Set<Tuple2<Integer, String[]>>> parsedRows = readRows(uploadCommand.inputString());
 
-        Set<Tuple2<Integer, ResolvedAssessmentHeader>> headersByColumnIndex = parseAssessmentsFromHeader(parsedRows.v1);
+        Stream<Row> tabularData = streamData(uploadCommand.inputString());
 
-        Set<ResolvedUploadRow> resolvedRows = parseRowData(parsedRows.v2, relKind, headersByColumnIndex);
+        Set<String> headers = tabularData
+                .findFirst()
+                .map(Row::getHeaders)
+                .orElseThrow(() -> new IllegalStateException("No data provided"));
+
+        if (!headers.containsAll(FIXED_COL_HEADERS)) {
+            throw new IllegalStateException(format("Not all mandatory columns (%s) provided", StringUtilities.join(FIXED_COL_HEADERS, ", ")));
+        }
+
+        Set<ResolvedAssessmentHeader> resolvedHeaders = parseAssessmentsFromHeader(
+                mkRef(EntityKind.LEGAL_ENTITY_RELATIONSHIP_KIND, uploadCommand.legalEntityRelationshipKindId()),
+                headers);
+
+        Set<ResolvedUploadRow> resolvedRows = parseRowData(
+                tabularData.collect(toSet()),
+                relKind,
+                resolvedHeaders);
 
         return ImmutableResolveBulkUploadLegalEntityRelationshipParameters.builder()
                 .uploadMode(uploadCommand.uploadMode())
@@ -104,44 +118,18 @@ public class BulkUploadLegalEntityRelationshipService {
                 .build();
     }
 
-    private Set<Tuple2<Integer, ResolvedAssessmentHeader>> assignDuplicateHeaderErrors(Set<Tuple2<Integer, ResolvedAssessmentHeader>> headersByColumnIndex) {
-        Map<Tuple2<AssessmentDefinition, RatingSchemeItem>, Collection<Tuple2<Integer, ResolvedAssessmentHeader>>> columnsByDefn = groupBy(
-                headersByColumnIndex,
-                d -> tuple(d.v2.headerDefinition().orElse(null), d.v2.headerRating().orElse(null)));
-
-        Set<Tuple2<Integer, ResolvedAssessmentHeader>> duplicateColumns = columnsByDefn
-                .entrySet()
-                .stream()
-                .filter(e -> e.getValue().size() > 1)
-                .flatMap(e -> e.getValue().stream())
-                .collect(Collectors.toSet());
-
-        AssessmentHeaderResolutionError duplicateColumnError = mkError(DUPLICATE_COLUMN_HEADER, "There are multiple columns sharing this definition / rating value");
-
-        return headersByColumnIndex
-                .stream()
-                .map(t -> {
-                    if (duplicateColumns.contains(t)) {
-                        return t.map2(d -> (ResolvedAssessmentHeader) ImmutableResolvedAssessmentHeader
-                                .copyOf(d)
-                                .withErrors(union(d.errors(), asSet(duplicateColumnError))));
-                    } else {
-                        return t;
-                    }
-                })
-                .collect(Collectors.toSet());
-    }
-
-    private Set<ResolvedUploadRow> parseRowData(Set<Tuple2<Integer, String[]>> rows,
+    private Set<ResolvedUploadRow> parseRowData(Set<Row> rows,
                                                 LegalEntityRelationshipKind relationshipKind,
-                                                Set<Tuple2<Integer, ResolvedAssessmentHeader>> headersByColumnIndex) {
+                                                Set<ResolvedAssessmentHeader> assessmentHeaders) {
 
         Set<LegalEntityRelationship> existingRelationships = legalEntityRelationshipService.findByRelationshipKind(relationshipKind.id().get());
+
         Map<Tuple2<EntityReference, EntityReference>, EntityReference> existingRelToIdMap = indexBy(existingRelationships,
                 r -> tuple(r.targetEntityReference(), r.legalEntityReference()),
                 LegalEntityRelationship::entityReference);
 
         List<AssessmentRating> existingAssessmentRatings = assessmentRatingService.findByEntityKind(EntityKind.LEGAL_ENTITY_RELATIONSHIP_KIND, Optional.of(relationshipKind.entityReference()));
+
         Map<Long, Collection<Tuple2<Long, Long>>> ratingsByRelationship = groupBy(existingAssessmentRatings,
                 d -> d.entityReference().id(),
                 d -> tuple(d.assessmentDefinitionId(), d.ratingId()));
@@ -155,28 +143,27 @@ public class BulkUploadLegalEntityRelationshipService {
         return rows
                 .stream()
                 .map(row -> {
-                    String[] values = row.v2;
 
                     ResolvedLegalEntityRelationship relationship = resolveLegalEntityRelationship(
                             relationshipKind.targetKind(),
                             targetIdentifierToIdMap,
                             legalEntityIdentifierToIdMap,
-                            values,
+                            row,
                             existingRelToIdMap);
 
                     Collection<Tuple2<Long, Long>> existingRatingInfo = relationship.relationshipId()
                             .map(ratingsByRelationship::get)
                             .orElse(emptySet());
 
-                    Set<ResolvedAssessmentRating> assessments = resolveAssessments(headersByColumnIndex, existingRatingInfo, values);
+                    Set<ResolvedAssessmentRating> assessments = resolveAssessments(assessmentHeaders, existingRatingInfo, row);
 
                     return ImmutableResolvedUploadRow.builder()
-                            .rowNumber(row.v1)
+                            .rowNumber(row.getRowNum())
                             .legalEntityRelationship(relationship)
                             .assessmentRatings(assessments)
                             .build();
                 })
-                .collect(Collectors.toSet());
+                .collect(toSet());
     }
 
     // For specific DEF / RATING cols, need to check over multiple cols for single value definitions
@@ -192,7 +179,7 @@ public class BulkUploadLegalEntityRelationshipService {
                 .stream()
                 .filter(e -> getDistinctRatings(e.getValue()).size() > 1)
                 .map(Map.Entry::getKey)
-                .collect(Collectors.toSet());
+                .collect(toSet());
 
         RatingResolutionError multipleRatingsDisallowedError = RatingResolutionError.mkError(RatingResolutionErrorCode.MULTIPLE_RATINGS_DISALLOWED, "There have been multiple ratings specified for a single value assessment definition");
 
@@ -227,30 +214,30 @@ public class BulkUploadLegalEntityRelationshipService {
                 .map(ResolvedRatingValue::rating)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .collect(Collectors.toSet());
+                .collect(toSet());
     }
 
-    private Set<ResolvedAssessmentRating> resolveAssessments(Set<Tuple2<Integer, ResolvedAssessmentHeader>> headersByColumnIndex,
+    private Set<ResolvedAssessmentRating> resolveAssessments(Set<ResolvedAssessmentHeader> resolvedAssessmentHeaders,
                                                              Collection<Tuple2<Long, Long>> existingRatingInfo,
-                                                             String[] values) {
+                                                             Row row) {
 
-        Set<ResolvedAssessmentRating> assessmentRatingsForRow = headersByColumnIndex
+        Set<ResolvedAssessmentRating> assessmentRatingsForRow = resolvedAssessmentHeaders
                 .stream()
                 .map(header -> {
-                    String ratingValue = safeTrim(idx(values, header.v1, null));
+                    String ratingValue = row.getValue(header.inputString());
 
-                    if (header.v2.headerRating().isPresent() && !isEmpty(ratingValue)) {
+                    if (header.headerRating().isPresent() && !isEmpty(ratingValue)) {
                         return mkResolvedRatingForRatingColumn(header, ratingValue, existingRatingInfo);
                     } else {
                         return mkResolvedRatingForAssessmentDefinitionColumn(header, ratingValue, existingRatingInfo);
                     }
                 })
-                .collect(Collectors.toSet());
+                .collect(toSet());
 
         return assignDisallowedMultipleRatingsError(assessmentRatingsForRow);
     }
 
-    private ResolvedAssessmentRating mkResolvedRatingForAssessmentDefinitionColumn(Tuple2<Integer, ResolvedAssessmentHeader> header,
+    private ResolvedAssessmentRating mkResolvedRatingForAssessmentDefinitionColumn(ResolvedAssessmentHeader header,
                                                                                    String ratingValue,
                                                                                    Collection<Tuple2<Long, Long>> existingRatingInfo) {
 
@@ -258,13 +245,13 @@ public class BulkUploadLegalEntityRelationshipService {
 
         Set<RatingResolutionError> errors = new HashSet<>();
 
-        Long defnId = header.v2.headerDefinition().flatMap(IdProvider::id).orElse(null);
+        Long defnId = header.headerDefinition().flatMap(IdProvider::id).orElse(null);
         String[] ratingValues = ratingValue.split(";");
 
         Set<ResolvedRatingValue> ratings = Stream.of(ratingValues)
                 .map(ratingString -> {
 
-                    Optional<RatingSchemeItem> ratingSchemeItem = determineRating(ratingSchemeItemsBySchemeId, safeTrim(ratingString), header.v2.headerDefinition());
+                    Optional<RatingSchemeItem> ratingSchemeItem = determineRating(ratingSchemeItemsBySchemeId, safeTrim(ratingString), header.headerDefinition());
 
                     if (OptionalUtilities.isEmpty(ratingSchemeItem)) {
                         errors.add(RatingResolutionError.mkError(RatingResolutionErrorCode.RATING_VALUE_NOT_FOUND, format("Could not identify rating value from: '%s'", ratingString)));
@@ -279,16 +266,15 @@ public class BulkUploadLegalEntityRelationshipService {
                             .status(status)
                             .build();
                 })
-                .collect(Collectors.toSet());
+                .collect(toSet());
 
         return ImmutableResolvedAssessmentRating.builder()
-                .columnIndex(header.v1)
-                .assessmentHeader(header.v2)
+                .assessmentHeader(header)
                 .resolvedRatings(ratings)
                 .build();
     }
 
-    private ResolvedAssessmentRating mkResolvedRatingForRatingColumn(Tuple2<Integer, ResolvedAssessmentHeader> header,
+    private ResolvedAssessmentRating mkResolvedRatingForRatingColumn(ResolvedAssessmentHeader header,
                                                                      String ratingValue,
                                                                      Collection<Tuple2<Long, Long>> existingRatingInfo) {
 
@@ -296,23 +282,22 @@ public class BulkUploadLegalEntityRelationshipService {
                 ? null
                 : ratingValue;
 
-        Long defnId = header.v2.headerDefinition().flatMap(IdProvider::id).orElse(null);
-        Long ratingId = header.v2.headerRating().flatMap(IdProvider::id).orElse(null);
+        Long defnId = header.headerDefinition().flatMap(IdProvider::id).orElse(null);
+        Long ratingId = header.headerRating().flatMap(IdProvider::id).orElse(null);
 
         boolean existingRating = existingRatingInfo.contains(tuple(defnId, ratingId));
 
         ResolutionStatus status = determineResolutionStatus(existingRating, emptySet());
 
         ImmutableResolvedRatingValue resolvedRatingValue = ImmutableResolvedRatingValue.builder()
-                .rating(header.v2.headerRating().get())
+                .rating(header.headerRating().get())
                 .comment(Optional.ofNullable(comment))
                 .errors(emptySet())
                 .status(status)
                 .build();
 
         return ImmutableResolvedAssessmentRating.builder()
-                .columnIndex(header.v1)
-                .assessmentHeader(header.v2)
+                .assessmentHeader(header)
                 .resolvedRatings(asSet(resolvedRatingValue))
                 .build();
     }
@@ -320,12 +305,12 @@ public class BulkUploadLegalEntityRelationshipService {
     private ResolvedLegalEntityRelationship resolveLegalEntityRelationship(EntityKind targetKind,
                                                                            Map<String, EntityReference> targetIdentifierToIdMap,
                                                                            Map<String, EntityReference> legalEntityIdentifierToIdMap,
-                                                                           String[] values,
+                                                                           Row row,
                                                                            Map<Tuple2<EntityReference, EntityReference>, EntityReference> existingRelToIdMap) {
 
-        String legalEntityIdentifier = safeTrim(idx(values, LegalEntityBulkUploadFixedColumns.LEGAL_ENTITY_IDENTIFIER, null));
-        String entityIdentifier = safeTrim(idx(values, LegalEntityBulkUploadFixedColumns.ENTITY_IDENTIFIER, null));
-        String comment = idx(values, LegalEntityBulkUploadFixedColumns.COMMENT, null);
+        String legalEntityIdentifier = row.getValue(LegalEntityBulkUploadFixedColumns.LEGAL_ENTITY_IDENTIFIER);
+        String entityIdentifier = row.getValue(LegalEntityBulkUploadFixedColumns.ENTITY_IDENTIFIER);
+        String comment = row.getValue(LegalEntityBulkUploadFixedColumns.COMMENT);
 
         EntityReference legalEntityRef = legalEntityIdentifierToIdMap.get(legalEntityIdentifier);
         EntityReference targetEntityRef = targetIdentifierToIdMap.get(entityIdentifier);
@@ -367,13 +352,15 @@ public class BulkUploadLegalEntityRelationshipService {
         }
     }
 
-    public Set<Tuple2<Integer, ResolvedAssessmentHeader>> parseAssessmentsFromHeader(Tuple2<Integer, String[]> headerRow) {
+    public Set<ResolvedAssessmentHeader> parseAssessmentsFromHeader(EntityReference relKind, Set<String> headers) {
 
-        if (headerRow.v2.length <= LEGAL_ENTITY_REL_COLS_COUNT) {
+        if (headers.size() <= FIXED_COL_HEADERS.size()) {
             return emptySet();
         }
 
-        List<AssessmentDefinition> definitions = assessmentDefinitionService.findByEntityKind(EntityKind.LEGAL_ENTITY_RELATIONSHIP);
+        Set<AssessmentDefinition> definitions = assessmentDefinitionService.findByEntityKindAndQualifier(
+                EntityKind.LEGAL_ENTITY_RELATIONSHIP,
+                relKind);
 
         Map<String, AssessmentDefinition> definitionsByExternalId = definitions
                 .stream()
@@ -382,19 +369,15 @@ public class BulkUploadLegalEntityRelationshipService {
 
         Map<String, AssessmentDefinition> definitionsByName = indexBy(definitions, d -> d.name().toLowerCase(), d -> d);
 
-        Map<Long, Collection<RatingSchemeItem>> ratingSchemeItemsBySchemeId = groupBy(ratingSchemeService.getAllRatingSchemeItems(), RatingSchemeItem::ratingSchemeId);
+        Map<Long, Collection<RatingSchemeItem>> ratingSchemeItemsBySchemeId = groupBy(
+                ratingSchemeService.getAllRatingSchemeItems(),
+                RatingSchemeItem::ratingSchemeId);
 
-        AtomicInteger columnIndex = new AtomicInteger(LEGAL_ENTITY_REL_COLS_COUNT);
-
-        Set<Tuple2<Integer, ResolvedAssessmentHeader>> headersByColumnIndex = Stream.of(headerRow.v2)
-                .skip(LEGAL_ENTITY_REL_COLS_COUNT)
-                .map(headerString -> {
-                    ResolvedAssessmentHeader header = determineAssessmentByOffset(headerString, definitionsByExternalId, definitionsByName, ratingSchemeItemsBySchemeId);
-                    return tuple(columnIndex.getAndIncrement(), header);
-                })
-                .collect(Collectors.toSet());
-
-        return assignDuplicateHeaderErrors(headersByColumnIndex);
+        return headers
+                .stream()
+                .filter(h -> !FIXED_COL_HEADERS.contains(h))
+                .map(headerString -> determineAssessmentByOffset(headerString, definitionsByExternalId, definitionsByName, ratingSchemeItemsBySchemeId))
+                .collect(toSet());
     }
 
     private ResolvedAssessmentHeader determineAssessmentByOffset(String headerString,
@@ -406,7 +389,7 @@ public class BulkUploadLegalEntityRelationshipService {
 
         if (isEmpty(headerString)) {
             errors.add(mkError(NO_VALUE_PROVIDED, "Header assessment is not provided"));
-            return mkHeader(Optional.empty(), Optional.empty(), errors, ResolutionStatus.ERROR);
+            return mkHeader(headerString, Optional.empty(), Optional.empty(), errors, ResolutionStatus.ERROR);
         }
 
         String[] assessmentHeader = headerString.split("/");
@@ -415,30 +398,30 @@ public class BulkUploadLegalEntityRelationshipService {
 
         if (isEmpty(definitionString)) {
             errors.add(mkError(HEADER_DEFINITION_NOT_FOUND, "No assessment definition header provided"));
-            return mkHeader(Optional.empty(), Optional.empty(), errors, ResolutionStatus.ERROR);
+            return mkHeader(headerString, Optional.empty(), Optional.empty(), errors, ResolutionStatus.ERROR);
         }
 
         Optional<AssessmentDefinition> definition = determineDefinition(definitionsByExternalId, definitionsByName, definitionString);
 
         if (OptionalUtilities.isEmpty(definition)) {
             errors.add(mkError(HEADER_DEFINITION_NOT_FOUND, format("Could not identify an assessment definition with external id or name '%s'", definitionString)));
-            return mkHeader(Optional.empty(), Optional.empty(), errors, ResolutionStatus.ERROR);
+            return mkHeader(headerString, Optional.empty(), Optional.empty(), errors, ResolutionStatus.ERROR);
         }
 
         String ratingString = safeTrim(idx(assessmentHeader, 1, null));
 
         if (isEmpty(ratingString)) {
-            return mkHeader(definition, Optional.empty(), errors, ResolutionStatus.NEW); //Does resolution status besides error matter for headers?
+            return mkHeader(headerString, definition, Optional.empty(), errors, ResolutionStatus.NEW); //Does resolution status besides error matter for headers?
         }
 
         Optional<RatingSchemeItem> rating = determineRating(ratingSchemeItemsBySchemeId, ratingString, definition);
 
         if (OptionalUtilities.isEmpty(rating)) {
             errors.add(mkError(HEADER_RATING_NOT_FOUND, format("Could not identify an assessment rating with external id or name '%s'", ratingString)));
-            return mkHeader(definition, Optional.empty(), errors, ResolutionStatus.ERROR);
+            return mkHeader(headerString, definition, Optional.empty(), errors, ResolutionStatus.ERROR);
         }
 
-        return mkHeader(definition, rating, errors, ResolutionStatus.NEW);
+        return mkHeader(headerString, definition, rating, errors, ResolutionStatus.NEW);
     }
 
     private Optional<RatingSchemeItem> determineRating(Map<Long, Collection<RatingSchemeItem>> ratingSchemeItemsBySchemeId,
@@ -471,24 +454,7 @@ public class BulkUploadLegalEntityRelationshipService {
     }
 
 
-    public static Tuple2<Tuple2<Integer, String[]>, Set<Tuple2<Integer, String[]>>> readRows(String inputString) {
-
-        if (isEmpty(inputString)) {
-            throw new IllegalStateException("Cannot parse empty data string");
-        }
-
-        Siphon<Tuple2<Integer, String[]>> headerRowSiphon = mkSiphon(t -> t.v1.equals(1));
-
-        Set<Tuple2<Integer, String[]>> dataRows = streamRowData(inputString)
-                .filter(headerRowSiphon)
-                .collect(Collectors.toSet());
-
-        if (headerRowSiphon.getResults().size() != 1) {
-            throw new IllegalStateException("Must have one header row");
-        }
-
-        return tuple(first(headerRowSiphon.getResults()), dataRows);
-    }
+    // Pull out to immutable
 
     public void ensureUserHasAdminRights(long legalEntityRelationshipKindId, String username) {
         LegalEntityRelationshipKind relKind = legalEntityRelationshipKindService.getById(legalEntityRelationshipKindId);

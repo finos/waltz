@@ -1,13 +1,13 @@
 package org.finos.waltz.service.bulk_upload;
 
-import org.jooq.lambda.tuple.Tuple2;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.finos.waltz.common.CollectionUtilities.first;
 import static org.finos.waltz.common.SetUtilities.asSet;
-import static org.finos.waltz.service.bulk_upload.BulkUploadLegalEntityRelationshipService.readRows;
+import static org.finos.waltz.service.bulk_upload.BulkUploadUtilities.streamRowData;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
@@ -23,29 +23,28 @@ public class BulkUploadLegalEntityRelationshipsTest {
     public void nullStringReturnsNull() {
         assertThrows(
                 IllegalStateException.class,
-                () -> readRows(null));
+                () -> streamRowData(null));
     }
 
     @Test
     public void returnsListPerNewLine() {
-        Tuple2<Tuple2<Integer, String[]>, Set<Tuple2<Integer, String[]>>> resolvedRows = readRows(SIMPLE_TEST_STRING);
-        assertEquals(1, resolvedRows.v2.size(), "Should return a list of string per new line in original input");
+        Set<TabularRow> resolvedRows = streamRowData(SIMPLE_TEST_STRING).collect(Collectors.toSet());
+        assertEquals(1, resolvedRows.size(), "Should return a list of string per new line in original input");
     }
 
     @Test
     public void returnsListStringPerLineDeterminedByCommaSeparation() {
-        Tuple2<Tuple2<Integer, String[]>, Set<Tuple2<Integer, String[]>>> resolvedRows = readRows(SIMPLE_TEST_STRING);
-        Tuple2<Integer, String[]> row = first(resolvedRows.v2);
-        assertEquals(3, row.v2.length, "Should break string on commas to form list of data");
+        Set<TabularRow> resolvedRows = streamRowData(SIMPLE_TEST_STRING).collect(Collectors.toSet());
+        TabularRow row = first(resolvedRows);
+        assertEquals(3, row.values().length, "Should break string on commas to form list of data");
     }
 
     @Test
     public void returnsArrayIncludingEmptyElementsWhereNoData() {
-        Tuple2<Tuple2<Integer, String[]>, Set<Tuple2<Integer, String[]>>> resolvedRows = readRows(INCLUDING_EMPTY_STRING);
-        Tuple2<Integer, String[]> row = first(resolvedRows.v2);
-        assertEquals(3, row.v2.length, "Should break string on commas to form list of data");
+        Set<TabularRow> resolvedRows = streamRowData(INCLUDING_EMPTY_STRING).collect(Collectors.toSet());
+        TabularRow row = first(resolvedRows);
+        assertEquals(3, row.values().length, "Should break string on commas to form list of data");
     }
-
 
     @Test
     public void getColumnValuesFromInputString() {

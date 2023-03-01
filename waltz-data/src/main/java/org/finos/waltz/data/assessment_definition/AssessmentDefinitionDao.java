@@ -96,18 +96,18 @@ public class AssessmentDefinitionDao {
     }
 
 
-    public List<AssessmentDefinition> findAll() {
+    public Set<AssessmentDefinition> findAll() {
         return findByCondition(DSL.trueCondition());
     }
 
 
-    public List<AssessmentDefinition> findByEntityKind(EntityKind kind) {
+    public Set<AssessmentDefinition> findByEntityKind(EntityKind kind) {
         Condition condition = ASSESSMENT_DEFINITION.ENTITY_KIND.eq(kind.name());
         return findByCondition(condition);
     }
 
 
-    public Collection<AssessmentDefinition> findByEntityKindAndQualifier(EntityKind kind, EntityReference qualifier) {
+    public Set<AssessmentDefinition> findByEntityKindAndQualifier(EntityKind kind, EntityReference qualifier) {
         Condition condition = ASSESSMENT_DEFINITION.ENTITY_KIND.eq(kind.name())
                 .and(ASSESSMENT_DEFINITION.QUALIFIER_KIND.eq(qualifier.kind().name()))
                 .and(ASSESSMENT_DEFINITION.QUALIFIER_ID.eq(qualifier.id()));
@@ -176,12 +176,12 @@ public class AssessmentDefinitionDao {
     }
 
 
-    private List<AssessmentDefinition> findByCondition(Condition condition) {
+    private Set<AssessmentDefinition> findByCondition(Condition condition) {
         return dsl
                 .select(ASSESSMENT_DEFINITION.fields())
                 .from(ASSESSMENT_DEFINITION)
                 .where(condition)
-                .fetch(TO_DOMAIN);
+                .fetchSet(TO_DOMAIN);
     }
 
 

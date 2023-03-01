@@ -24,8 +24,11 @@ public abstract class ResolvedAssessmentHeader {
 
     public abstract ResolutionStatus status();
 
+    public abstract String inputString();
 
-    public static ResolvedAssessmentHeader mkHeader(Optional<AssessmentDefinition> defn,
+
+    public static ResolvedAssessmentHeader mkHeader(String inputString,
+                                                    Optional<AssessmentDefinition> defn,
                                                     Optional<RatingSchemeItem> rating,
                                                     Set<AssessmentHeaderResolutionError> errors,
                                                     ResolutionStatus status) {
@@ -35,6 +38,7 @@ public abstract class ResolvedAssessmentHeader {
                 .headerRating(rating)
                 .errors(errors)
                 .status(status)
+                .inputString(inputString)
                 .build();
     }
 

@@ -15,34 +15,38 @@
  * See the License for the specific
  *
  */
-import template from "./legal-entity-relationship-section.html";
-import {initialiseData} from "../../../common";
+import template from "./legal-entity-relationships-section.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
+import {initialiseData} from "../../../common";
 
 const bindings = {
     parentEntityRef: "<"
 };
 
 const initialState = {
-    relationshipKinds: [],
+    relationshipKind: null,
     relationships: [],
     visibility: {
-        overlay: false
+        overlay: false,
+        bulkUpload: false
     },
     columnDefs: [
         {
             field: "targetEntityReference",
             name: "Target Entity",
-            width: "30%",
+            width: "25%",
             cellTemplate: `<div style="padding-top: 0.5em">
                                 <waltz-entity-link entity-ref="row.entity.targetEntityReference"></waltz-entity-link>
                            </div>`
         },
         {
-            field: "relationshipKind.name",
-            name: "Relationship",
-            width: "15%"
+            field: "legalEntityReference",
+            name: "Legal Entity",
+            width: "25%",
+            cellTemplate: `<div style="padding-top: 0.5em">
+                                <waltz-entity-link entity-ref="row.entity.legalEntityReference"></waltz-entity-link>
+                           </div>`
         },
         {field: "description", width: "30%"},
         {
@@ -60,7 +64,7 @@ const initialState = {
         {
             field: "lastUpdatedBy",
             name: "Last Updated By",
-            width: "15%"
+            width: "10%"
         }
     ]
 }
@@ -73,24 +77,30 @@ function controller($q, serviceBroker) {
     vm.$onChanges = () => {
 
         const relKindsPromise = serviceBroker
-            .loadAppData(CORE_API.LegalEntityRelationshipKindStore.findAll, [])
+            .loadViewData(CORE_API.LegalEntityRelationshipKindStore.getById, [vm.parentEntityRef.id])
             .then(r => r.data);
 
         const relationshipsPromise = serviceBroker
-            .loadViewData(CORE_API.LegalEntityRelationshipStore.findByLegalEntityId, [vm.parentEntityRef.id])
+            .loadViewData(CORE_API.LegalEntityRelationshipStore.findByRelationshipKindId, [vm.parentEntityRef.id])
             .then(r => r.data);
 
         return $q
             .all([relKindsPromise, relationshipsPromise])
-            .then(([relKinds, relationships]) => {
-                const relKindsById = _.keyBy(relKinds, d => d.id);
+            .then(([relKind, relationships]) => {
+                vm.relationshipKind = relKind;
 
-                vm.relationships = _
-                    .chain(relationships)
-                    .map(d => Object.assign({}, d, {relationshipKind: relKindsById[d.relationshipKindId]}))
-                    .sortBy(d => d.targetEntityReference.name, d => d.relationshipKind.name)
-                    .value();
+                vm.relationships = _.sortBy(
+                    relationships,
+                    d => d.targetEntityReference.name, d => d.legalEntityReference.name);
             });
+    }
+
+    vm.bulkUpload = () => {
+        vm.visibility.bulkUpload = true;
+    }
+
+    vm.cancelBulkUpload = () => {
+        vm.visibility.bulkUpload = false;
     }
 }
 
@@ -108,6 +118,6 @@ const component = {
 
 
 export default {
-    id: "waltzLegalEntityRelationshipSection",
+    id: "waltzLegalEntityRelationshipsSection",
     component
 };

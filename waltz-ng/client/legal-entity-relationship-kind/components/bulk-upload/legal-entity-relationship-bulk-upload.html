@@ -15,14 +15,16 @@
   ~ See the License for the specific
   ~
   -->
-<div>
-    <waltz-svelte-component component="$ctrl.LegalEntityOverview"
-                            primary-entity-reference="$ctrl.primaryEntityRef">
-    </waltz-svelte-component>
 
-    <br>
+<waltz-svelte-component component="$ctrl.BulkUploadLegalEntityRelationshipsPanel"
+                        relationship-kind="$ctrl.relationshipKind">
+
+</waltz-svelte-component>
 
 
-    <waltz-dynamic-sections-view parent-entity-ref="$ctrl.primaryEntityRef">
-    </waltz-dynamic-sections-view>
+<div ng-if="$ctrl.showGrid">
+    <waltz-grid-with-search column-defs="$ctrl.columnDefs"
+                            entries="$ctrl.rows"
+                            xxsearch-fields="['searchableStr']">
+    </waltz-grid-with-search>
 </div>

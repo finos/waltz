@@ -32,11 +32,16 @@ public class LegalEntityRelationshipEndpoint implements Endpoint {
     public void register() {
 
         getForList(mkPath(BASE_URL, "legal-entity-id", ":id"), this::findByLegalEntityIdRoute);
+        getForList(mkPath(BASE_URL, "relationship-kind", ":id"), this::findByRelationshipKindIdRoute);
         getForList(mkPath(BASE_URL, "kind", ":kind", "id", ":id"), this::findByEntityReferenceRoute);
     }
 
     private Set<LegalEntityRelationship> findByLegalEntityIdRoute(Request request, Response response) {
         return legalEntityRelationshipService.findByLegalEntityId(getId(request));
+    }
+
+    private Set<LegalEntityRelationship> findByRelationshipKindIdRoute(Request request, Response response) {
+        return legalEntityRelationshipService.findByRelationshipKindIdRoute(getId(request));
     }
 
     private Set<LegalEntityRelationship> findByEntityReferenceRoute(Request request, Response response) {

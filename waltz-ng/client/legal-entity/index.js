@@ -19,10 +19,9 @@ import {registerComponents, registerStores} from "../common/module-utils";
 
 import Routes from "./routes";
 import LegalEntityView from "./pages/view/legal-entity-view";
-import LegalEntityRelationshipKindView from "./pages/relationship-kind/legal-entity-relationship-kind-view";
 import LegalEntitySection from "./components/legal-entity-section/legal-entity-section";
 import LegalEntityRelationshipSection
-    from "./components/legal-entity-relationship-section/legal-entity-relationship-section";
+    from "./components/legal-entity-relationship-section/related-legal-entities-section";
 import LegalEntityStore from "./services/legal-entity-store";
 import LegalEntityRelationshipStore from "./services/legal-entity-relationship-store";
 

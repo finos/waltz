@@ -15,8 +15,6 @@ import java.util.Set;
 @JsonDeserialize(as = ImmutableResolvedAssessmentRating.class)
 public abstract class ResolvedAssessmentRating {
 
-    public abstract int columnIndex();
-
     public abstract ResolvedAssessmentHeader assessmentHeader();
 
     public abstract Set<ResolvedRatingValue> resolvedRatings(); //can be provided via header rating or listed in cell

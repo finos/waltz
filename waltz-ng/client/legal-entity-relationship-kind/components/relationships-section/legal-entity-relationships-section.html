@@ -1,0 +1,65 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+<waltz-section-actions>
+    <div ng-if="!$ctrl.visibility.bulkUpload">
+        <button class="btn btn-xs btn-default"
+                ng-click="$ctrl.bulkUpload()">
+            Bulk Upload
+        </button>
+        <waltz-data-extract-link name="Export"
+                                 styling="button"
+                                 extract="legal-entity/relationships/kind/{{$ctrl.parentEntityRef.id}}"
+                                 method="GET">
+        </waltz-data-extract-link>
+        <button class="btn btn-xs waltz-btn-transparent"
+                ng-click="$ctrl.visibility.overlay = ! $ctrl.visibility.overlay">
+            <waltz-icon name="map-signs"></waltz-icon>
+        </button>
+    </div>
+    <div ng-if="$ctrl.visibility.bulkUpload">
+        <button class="btn btn-xs btn-default"
+                ng-click="$ctrl.cancelBulkUpload()">
+            Cancel
+        </button>
+    </div>
+
+</waltz-section-actions>
+
+<waltz-source-data-overlay visible="$ctrl.visibility.overlay"
+                           entities="['LEGAL_ENTITY', 'LEGAL_ENTITY_RELATIONSHIP']">
+</waltz-source-data-overlay>
+
+<div class="row">
+    <div class="col-sm-12"
+         ng-if="!$ctrl.visibility.bulkUpload">
+        <waltz-grid-with-search ng-if="$ctrl.relationships.length > 0"
+                                entries="$ctrl.relationships"
+                                column-defs="$ctrl.columnDefs">
+        </waltz-grid-with-search>
+        <waltz-no-data ng-if="$ctrl.relationships.length == 0">
+            <message>
+                No <span ng-bind="$ctrl.relationshipKind.name || 'Unknown'"></span> relationships exist
+            </message>
+        </waltz-no-data>
+    </div>
+    <div class="col-sm-12"
+         ng-if="$ctrl.visibility.bulkUpload">
+        <waltz-legal-entity-relationship-bulk-upload relationship-kind="$ctrl.relationshipKind">
+        </waltz-legal-entity-relationship-bulk-upload>
+    </div>
+</div>

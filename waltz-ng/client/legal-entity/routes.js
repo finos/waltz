@@ -17,7 +17,6 @@
  */
 
 import LegalEntityView from "./pages/view/legal-entity-view";
-import LegalEntityRelationshipKindView from "./pages/relationship-kind/legal-entity-relationship-kind-view";
 
 
 const baseState = {};

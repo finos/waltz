@@ -33,4 +33,8 @@ public class LegalEntityRelationshipService {
     public Set<LegalEntityRelationship> findByRelationshipKind(long relKindId) {
         return legalEntityRelationshipDao.findByRelationshipKind(relKindId);
     }
+
+    public Set<LegalEntityRelationship> findByRelationshipKindIdRoute(long relationshipKindId) {
+        return legalEntityRelationshipDao.findByRelationshipKind(relationshipKindId);
+    }
 }
