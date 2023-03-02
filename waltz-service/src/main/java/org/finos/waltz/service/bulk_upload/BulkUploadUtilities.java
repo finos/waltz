@@ -6,6 +6,7 @@ import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.service.bulk_upload.TabularDataUtilities.Row;
 
 import java.io.ByteArrayInputStream;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;

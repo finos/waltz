@@ -54,6 +54,7 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 public class BulkUploadLegalEntityRelationshipService {
 
     private static final Set<String> FIXED_COL_HEADERS = asSet(LegalEntityBulkUploadFixedColumns.ENTITY_IDENTIFIER, LegalEntityBulkUploadFixedColumns.LEGAL_ENTITY_IDENTIFIER);
+    private static final Set<String> RELATIONSHIP_COL_HEADERS = asSet(LegalEntityBulkUploadFixedColumns.ENTITY_IDENTIFIER, LegalEntityBulkUploadFixedColumns.LEGAL_ENTITY_IDENTIFIER, LegalEntityBulkUploadFixedColumns.COMMENT);
     private final AssessmentDefinitionService assessmentDefinitionService;
     private final RatingSchemeService ratingSchemeService;
     private final EntityAliasPopulator entityAliasPopulator;
@@ -91,9 +92,7 @@ public class BulkUploadLegalEntityRelationshipService {
         LegalEntityRelationshipKind relKind = legalEntityRelationshipKindService.getById(uploadCommand.legalEntityRelationshipKindId());
 
 
-        Stream<Row> tabularData = streamData(uploadCommand.inputString());
-
-        Set<String> headers = tabularData
+        Set<String> headers = streamData(uploadCommand.inputString())
                 .findFirst()
                 .map(Row::getHeaders)
                 .orElseThrow(() -> new IllegalStateException("No data provided"));
@@ -107,7 +106,7 @@ public class BulkUploadLegalEntityRelationshipService {
                 headers);
 
         Set<ResolvedUploadRow> resolvedRows = parseRowData(
-                tabularData.collect(toSet()),
+                streamData(uploadCommand.inputString()).collect(toSet()),
                 relKind,
                 resolvedHeaders);
 
@@ -375,7 +374,7 @@ public class BulkUploadLegalEntityRelationshipService {
 
         return headers
                 .stream()
-                .filter(h -> !FIXED_COL_HEADERS.contains(h))
+                .filter(h -> !RELATIONSHIP_COL_HEADERS.contains(h))
                 .map(headerString -> determineAssessmentByOffset(headerString, definitionsByExternalId, definitionsByName, ratingSchemeItemsBySchemeId))
                 .collect(toSet());
     }

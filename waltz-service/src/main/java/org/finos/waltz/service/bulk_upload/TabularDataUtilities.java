@@ -1,12 +1,15 @@
 package org.finos.waltz.service.bulk_upload;
 
 import org.finos.waltz.common.ListUtilities;
+import org.finos.waltz.common.StringUtilities;
 import org.jooq.lambda.tuple.Tuple2;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.finos.waltz.common.ArrayUtilities.idx;
@@ -53,7 +56,10 @@ public class TabularDataUtilities {
 
         List<String> headers = streamRowData(inputString)
                 .findFirst()
-                .map(r -> asList(r.values()))
+                .map(r -> Arrays
+                        .stream(r.values())
+                        .map(StringUtilities::safeTrim)
+                        .collect(Collectors.toList()))
                 .orElseThrow(() -> new IllegalStateException("Has no header row"));
 
         if (containsDuplicates(headers)) {

@@ -16,6 +16,8 @@ import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 import static org.finos.waltz.common.StringUtilities.isEmpty;
 import static org.finos.waltz.schema.Tables.ASSESSMENT_DEFINITION;
 import static org.finos.waltz.schema.Tables.ASSESSMENT_RATING;
@@ -35,14 +37,14 @@ public class AssessmentHelper {
 
 
     public long createDefinition(long schemeId, String name, String permittedRole, AssessmentVisibility visibility, String definitionGroup) {
-        return createDefinition(schemeId, name, permittedRole, visibility, definitionGroup, EntityKind.APPLICATION, Cardinality.ZERO_ONE);
+        return createDefinition(schemeId, name, permittedRole, visibility, definitionGroup, EntityKind.APPLICATION, Cardinality.ZERO_ONE, Optional.empty());
     }
 
-    public long createDefinition(long schemeId, String name, String permittedRole, AssessmentVisibility visibility, String definitionGroup, EntityKind entityKind) {
-        return createDefinition(schemeId, name, permittedRole, visibility, definitionGroup, entityKind, Cardinality.ZERO_ONE);
+    public long createDefinition(long schemeId, String name, String permittedRole, AssessmentVisibility visibility, String definitionGroup, EntityKind entityKind, EntityReference qualifierRef) {
+        return createDefinition(schemeId, name, permittedRole, visibility, definitionGroup, entityKind, Cardinality.ZERO_ONE, Optional.ofNullable(qualifierRef));
     }
 
-    public long createDefinition(long schemeId, String name, String permittedRole, AssessmentVisibility visibility, String definitionGroup, EntityKind entityKind, Cardinality cardinality) {
+    public long createDefinition(long schemeId, String name, String permittedRole, AssessmentVisibility visibility, String definitionGroup, EntityKind entityKind, Cardinality cardinality, Optional<EntityReference> qualifierRef) {
 
         ImmutableAssessmentDefinition.Builder def = ImmutableAssessmentDefinition.builder()
                 .name(name)
@@ -53,7 +55,8 @@ public class AssessmentHelper {
                 .lastUpdatedBy("test")
                 .visibility(visibility)
                 .cardinality(cardinality)
-                .ratingSchemeId(schemeId);
+                .ratingSchemeId(schemeId)
+                .qualifierReference(qualifierRef);
 
         if (!isEmpty(permittedRole)) {
             def.permittedRole(permittedRole);

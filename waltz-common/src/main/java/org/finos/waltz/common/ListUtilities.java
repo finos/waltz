@@ -172,10 +172,10 @@ public class ListUtilities {
         for (T t : ts) {
             boolean added = seen.add(t);
             if (!added) {
-                return false;
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 }
