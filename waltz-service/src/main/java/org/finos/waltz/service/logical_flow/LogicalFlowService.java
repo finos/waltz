@@ -62,7 +62,7 @@ import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
@@ -205,7 +205,7 @@ public class LogicalFlowService {
 
 
 
-    public List<LogicalFlow> addFlows(List<AddLogicalFlowCommand> addCmds, String username) {
+    public Set<LogicalFlow> addFlows(Collection<AddLogicalFlowCommand> addCmds, String username) {
 
         addCmds.forEach(this::rejectIfSelfLoop);
 
@@ -234,7 +234,7 @@ public class LogicalFlowService {
         changeLogService.write(logEntries);
 
         LocalDateTime now = nowUtc();
-        List<LogicalFlow> flowsToAdd = toAdd
+        Set<LogicalFlow> flowsToAdd = toAdd
                 .stream()
                 .map(addCmd -> ImmutableLogicalFlow.builder()
                         .source(addCmd.source())
@@ -244,7 +244,7 @@ public class LogicalFlowService {
                         .created(UserTimestamp.mkForUser(username, now))
                         .provenance("waltz")
                         .build())
-                .collect(toList());
+                .collect(toSet());
 
         return logicalFlowDao.addFlows(flowsToAdd, username);
     }
@@ -385,7 +385,7 @@ public class LogicalFlowService {
                         return hasIntersection(entity, asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE));
                     })
                     .map(t -> t.v1)
-                    .collect(Collectors.toSet());
+                    .collect(toSet());
         }
     }
 

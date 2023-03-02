@@ -216,7 +216,7 @@ public class LogicalFlowEndpoint implements Endpoint {
     }
 
 
-    private List<LogicalFlow> addFlowsRoute(Request request, Response response) throws IOException {
+    private Set<LogicalFlow> addFlowsRoute(Request request, Response response) throws IOException {
         requireRole(userRoleService, request, SystemRole.BULK_FLOW_EDITOR);
 
         String username = getUsername(request);
