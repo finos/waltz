@@ -18,7 +18,7 @@
 
 <div>
     <waltz-page-header name="{{ ctrl.statistic.definition.name }}"
-                       small="Indicator"
+                       small="Statistic"
                        icon="pie-chart">
         <breadcrumbs>
             <ol class="waltz-breadcrumbs">
@@ -28,7 +28,7 @@
                        ng-bind="ctrl.person.displayName">
                     </a>
                 </li>
-                <li>Indicators</li>
+                <li>Statistics</li>
                 <li ng-bind="ctrl.statistic.definition.name"></li>
             </ol>
         </breadcrumbs>
@@ -69,7 +69,7 @@
                 <!-- RELATED -->
                 <div ng-if="ctrl.visibility.related">
                     <hr>
-                    <h3>Related Indicators</h3>
+                    <h3>Related Statistics</h3>
                     <waltz-related-entity-statistics-summaries definitions='ctrl.relatedDefinitions'
                                                                parent-ref="ctrl.parentRef"
                                                                summaries="ctrl.summaries">
@@ -158,7 +158,7 @@
                                 size="lg"
                                 name="{{ 'ENTITY_STATISTIC' | toIconName:'entity' }}">
                     </waltz-icon>
-                    <span>Indicators
+                    <span>Statistics
                         <small>Selector</small>
                     </span>
                 </h4>
@@ -169,7 +169,7 @@
 
                 <p class="waltz-paragraph small text-muted"
                    style="padding-top: 12px">
-                    Use the tree above to switch to a different indicator.
+                    Use the tree above to switch to a different statistic.
                 </p>
 
             </div>
