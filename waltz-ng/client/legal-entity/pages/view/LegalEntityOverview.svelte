@@ -15,9 +15,6 @@
 
     let legalEntityCall;
 
-
-    $: console.log({primaryEntityReference})
-
     $: {
         if (primaryEntityReference) {
             legalEntityCall = legalEntityStore.getById(primaryEntityReference.id);

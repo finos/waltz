@@ -9,6 +9,7 @@ export function mkAssessmentDefinitionStore() {
             null,
             {force});
 
+
     const getById = (id, force) => remote
         .fetchViewDatum(
             "GET",
@@ -29,7 +30,7 @@ export function mkAssessmentDefinitionStore() {
         return remote
             .execute(
                 "PUT",
-                `api/assessment-definition`,
+                "api/assessment-definition",
                 def);
     };
 
@@ -43,10 +44,10 @@ export function mkAssessmentDefinitionStore() {
     // --- FAVOURITES (note use of remoteApp)
 
     const addFavourite = (defId) => remoteApp
-            .execute(
-                "PUT",
-                `api/assessment-definition/id/${defId}/favourite`,
-                null);
+        .execute(
+            "PUT",
+            `api/assessment-definition/id/${defId}/favourite`,
+            null);
 
 
     const findFavouritesForUser = (force) => remoteApp
@@ -56,11 +57,13 @@ export function mkAssessmentDefinitionStore() {
             null,
             {force});
 
+
     const removeFavourite = (defId) => remoteApp
-            .execute(
-                "DELETE",
-                `api/assessment-definition/id/${defId}/favourite`,
-                null);
+        .execute(
+            "DELETE",
+            `api/assessment-definition/id/${defId}/favourite`,
+            null);
+
 
     return {
         loadAll,

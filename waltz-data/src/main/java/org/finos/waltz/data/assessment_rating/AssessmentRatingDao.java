@@ -258,7 +258,7 @@ public class AssessmentRatingDao {
     }
 
 
-    public boolean remove(RemoveAssessmentRatingCommand rating) {
+    public boolean bulkRemove(RemoveAssessmentRatingCommand rating) {
         return dsl
                 .deleteFrom(ar)
                 .where(ar.ENTITY_KIND.eq(rating.entityReference().kind().name()))
@@ -270,18 +270,52 @@ public class AssessmentRatingDao {
 
     public int add(Set<AssessmentRating> assessmentRatings) {
         Set<AssessmentRatingRecord> recordsToStore = mkAssessmentRatingRecords(assessmentRatings);
-         return dsl.batchInsert(recordsToStore).execute().length;
+        return dsl.batchInsert(recordsToStore).execute().length;
 
     }
 
-    public int update(Set<AssessmentRating> assessmentRatings) {
-            Set<AssessmentRatingRecord> recordsToUpdate = mkAssessmentRatingRecords(assessmentRatings);
-            return dsl.batchUpdate(recordsToUpdate).execute().length;
+    public int bulkUpdateSingleValuedAssessments(Set<AssessmentRating> assessmentRatings) {
+
+        Set<UpdateConditionStep<AssessmentRatingRecord>> updateStatements = assessmentRatings
+                .stream()
+                .map(r -> dsl
+                        .update(ar)
+                        .set(ar.RATING_ID, r.ratingId())
+                        .set(ar.DESCRIPTION, r.comment())
+                        .where(ar.ASSESSMENT_DEFINITION_ID.eq(r.assessmentDefinitionId())
+                                .and(ar.ENTITY_KIND.eq(r.entityReference().kind().name())
+                                        .and(ar.ENTITY_ID.eq(r.entityReference().id())))))
+                .collect(toSet());
+
+        return dsl.batch(updateStatements).execute().length;
     }
 
-    public int remove(Set<AssessmentRating> assessmentRatings) {
-        Set<AssessmentRatingRecord> ratingsToRemove = mkAssessmentRatingRecords(assessmentRatings);
-        return dsl.batchDelete(ratingsToRemove).execute().length;
+    public int bulkUpdateMultiValuedAssessments(Set<AssessmentRating> assessmentRatings) {
+
+        Set<UpdateConditionStep<AssessmentRatingRecord>> updateStatements = assessmentRatings
+                .stream()
+                .map(r -> dsl
+                        .update(ar)
+                        .set(ar.DESCRIPTION, r.comment())
+                        .where(ar.ASSESSMENT_DEFINITION_ID.eq(r.assessmentDefinitionId())
+                                .and(ar.ENTITY_KIND.eq(r.entityReference().kind().name())
+                                        .and(ar.ENTITY_ID.eq(r.entityReference().id())
+                                                .and(ar.RATING_ID.eq(r.ratingId()))))))
+                .collect(toSet());
+
+        return dsl.batch(updateStatements).execute().length;
+    }
+
+    public int bulkRemove(Set<AssessmentRating> assessmentRatings) {
+        Set<DeleteConditionStep<AssessmentRatingRecord>> deleteStatements = map(
+                assessmentRatings,
+                d -> dsl
+                        .deleteFrom(ar)
+                        .where(ar.ASSESSMENT_DEFINITION_ID.eq(d.assessmentDefinitionId())
+                                .and(ar.ENTITY_KIND.eq(d.entityReference().kind().name())
+                                        .and(ar.ENTITY_ID.eq(d.entityReference().id())
+                                                .and(ar.RATING_ID.eq(d.ratingId()))))));
+        return dsl.batch(deleteStatements).execute().length;
     }
 
 

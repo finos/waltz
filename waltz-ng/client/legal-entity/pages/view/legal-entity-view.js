@@ -35,8 +35,6 @@ function controller($stateParams, historyStore, serviceBroker) {
     vm.primaryEntityRef = {id: $stateParams.id, kind: entity.LEGAL_ENTITY.key}
 
     vm.$onInit = () => {
-
-        console.log({ref: vm.primaryEntityRef})
         serviceBroker
             .loadViewData(CORE_API.LegalEntityStore.getById, [vm.primaryEntityRef.id])
             .then(r => {
