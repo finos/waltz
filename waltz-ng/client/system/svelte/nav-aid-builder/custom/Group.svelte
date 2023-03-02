@@ -1,6 +1,14 @@
 <script>
     import Unit from "./Unit.svelte";
+    import {model} from "./builderStore";
     export let group = null;
+
+    let units = [];
+
+    $: units = _.filter($model.units, u => u.groupId === group.groupId);
+
+    $: console.log({group, units})
+
 </script>
 
 
@@ -9,7 +17,7 @@
         {group.name}
     </div>
     <div class="units">
-        {#each group.units as unit}
+        {#each units as unit}
             <div class="unit-wrapper">
                 <Unit {unit}/>
             </div>

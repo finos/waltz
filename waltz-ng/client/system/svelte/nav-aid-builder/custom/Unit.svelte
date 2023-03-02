@@ -1,7 +1,11 @@
 <script>
     import GroupLeader from "./GroupLeader.svelte";
+    import {model} from "./builderStore";
 
     export let unit = null;
+    let people = [];
+
+    $: people = _.filter($model.people, p => p.unitId === unit.unitId);
 </script>
 
 <div class="navaid-unit">
@@ -9,10 +13,10 @@
         {unit.name}
     </div>
     <div class="people">
-        {#each unit.people as p}
+        {#each people as p}
             <div class="person-wrapper">
-                <GroupLeader title={p.title}
-                             person={p.person}/>
+                <GroupLeader leader={p}
+                             scheme={"secondary"}/>
             </div>
         {/each}
     </div>
