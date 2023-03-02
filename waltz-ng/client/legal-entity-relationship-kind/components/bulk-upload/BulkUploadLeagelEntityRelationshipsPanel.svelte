@@ -44,7 +44,10 @@
 
 </script>
 
-<h4>svelte here</h4>
+<div class="help-block">
+    Please ensure that the minimum columns of 'Entity External Id' and 'Legal Entity External Id', if you wish to add a
+    'Comment' this will appear on the relationship
+</div>
 
 {#if $activeMode = Modes.INPUT}
     <form on:submit|preventDefault={verifyEntries}>
