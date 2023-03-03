@@ -6,9 +6,9 @@
     import EntitySearchSelector from "../../../../common/svelte/EntitySearchSelector.svelte";
     import {model} from "./builderStore";
     import BuilderControl from "./control/BuilderControl.svelte";
+    import PersonNavAid from "./PersonNavAid.svelte";
 
     let viz = null;
-
 
     function prettyHTML(html) {
         if (_.isNil(html)) return "";
@@ -36,14 +36,8 @@
 
 <div class="row">
     <div class="col-sm-8">
-        <div class="navaid-diagram" bind:this={viz}>
-            <GroupLeader leader={$model.leader}
-                         scheme="primary"/>
-            <div class="navaid-groups">
-                {#each $model.groups as group}
-                    <Group {group}/>
-                {/each}
-            </div>
+        <div bind:this={viz}>
+            <PersonNavAid/>
         </div>
     </div>
     <div class="col-sm-4">
@@ -61,12 +55,3 @@
         <pre>{JSON.stringify($model, "", 2)}</pre>
     </div>
 </div>
-
-
-<style>
-    .navaid-groups {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-evenly;
-    }
-</style>

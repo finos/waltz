@@ -29,7 +29,6 @@
     .navaid-group {
         border: 1px solid #c5c9dc;
         margin: 1em 0;
-
     }
 
     .navaid-group .group-name {

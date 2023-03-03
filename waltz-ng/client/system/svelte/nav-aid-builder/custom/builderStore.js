@@ -5,7 +5,7 @@ import {demoData} from "./demo-data";
 
 
 const initialModel = {
-        leader: null, // { person: ref, title: str }
+        leaders: [], // { person: ref, title: str }
         groups: [], // {groupId, name}
         units: [], // {unitId, name, groupId }
         people: []//  { personId, unitId, personRef }
@@ -22,7 +22,7 @@ function createModelStore() {
     console.log("created store")
     return {
         subscribe,
-        setLeader: (p) => update(m => _.set(m, "leader", p)),
+        addLeader: (p) => update(m => _.set(m, "leaders", _.concat(m.leaders, [p]))),
         removeGroup: (groupId) => update( m => _.set(m, "groups", _.reject(m.groups, g => g.groupId === groupId))),
         removeUnit: (unitId) => update( m => _.set(m, "units", _.reject(m.units, u => u.unitId === unitId))),
         removePerson: (personId) => update( m => _.set(m, "people", _.reject(m.people, p => p.personId === personId))),

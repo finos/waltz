@@ -26,6 +26,14 @@ function onAddUnit(group) {
     model.addUnit(group.groupId, "Hello Unit " + Math.random())
 }
 
+function onAddLeader() {
+    model.addLeader()
+}
+
+function onRemoveLeader(leader) {
+    model.addLeader()
+}
+
 const Direction = {
     UP: -1,
     DOWN: 1
@@ -63,6 +71,24 @@ function onAddPerson(unit) {
     </div>
 
     <ul class="group-header header-list">
+        <li>
+            <Icon name="user"/>
+            Leaders
+            <button class="btn-skinny" on:click={() => onAddLeader()}>
+                <Icon name="plus"/>
+                Add
+            </button>
+            <ul>
+                {#each $model.leaders as leader}
+                    <li>
+                        {leader.person.name}
+                        <button class="btn-skinny" on:click={() => onRemoveLeader(leader)}>
+                            <Icon name="trash"/>
+                        </button>
+                    </li>
+                {/each}
+            </ul>
+        </li>
         <li>
             <Icon name="cubes"/>
             Groups

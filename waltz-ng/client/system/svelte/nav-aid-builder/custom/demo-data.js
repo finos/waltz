@@ -8,9 +8,10 @@ let marcus = mkRef('PERSON', 27, "Marcus H");
 let marie = mkRef('PERSON', 28, "Marie L");
 
 export const demoData = {
-    leader: {
-        person: boss, title: "Chief Technology, Data & Innovation Officer"
-    },
+    leaders: [
+        {person: boss, title: "Chief Technology, Data & Innovation Officer"},
+        {person: gil, title: "Co Chief"}
+    ],
     groups: [
         {groupId: 1, name: "Functions"},
         {groupId: 2, name: "Chief Information Officers"}
