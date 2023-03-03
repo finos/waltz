@@ -18,6 +18,7 @@
 
 package org.finos.waltz.integration_test.inmem.service;
 
+import org.finos.waltz.common.MapUtilities;
 import org.finos.waltz.common.OptionalUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
@@ -29,6 +30,7 @@ import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.assessment_definition.AssessmentVisibility;
 import org.finos.waltz.model.bulk_upload.BulkUploadMode;
 import org.finos.waltz.model.bulk_upload.ResolutionStatus;
+import org.finos.waltz.model.bulk_upload.ResolvedAssessmentHeaderStatus;
 import org.finos.waltz.model.bulk_upload.legal_entity_relationship.*;
 import org.finos.waltz.model.legal_entity.LegalEntity;
 import org.finos.waltz.model.rating.RatingSchemeItem;
@@ -41,10 +43,10 @@ import org.finos.waltz.test_common.helpers.AppHelper;
 import org.finos.waltz.test_common.helpers.AssessmentHelper;
 import org.finos.waltz.test_common.helpers.LegalEntityHelper;
 import org.finos.waltz.test_common.helpers.RatingSchemeHelper;
-import org.jooq.lambda.tuple.Tuple2;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -101,11 +103,11 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
         EntityReference le = legalEntityHelper.create(mkName("le"));
 
         Set<String> headerRow = asSet(ENTITY_IDENTIFIER, LEGAL_ENTITY_IDENTIFIER, COMMENT, defn.externalId().get());
-        Set<ResolvedAssessmentHeader> assessmentHeaders = service.parseAssessmentsFromHeader(mkRef(EntityKind.LEGAL_ENTITY_RELATIONSHIP_KIND, leRelKindId), headerRow);
+        Set<AssessmentHeaderCell> assessmentHeaders = service.parseAssessmentsFromHeader(mkRef(EntityKind.LEGAL_ENTITY_RELATIONSHIP_KIND, leRelKindId), headerRow);
 
         assertEquals(1, assessmentHeaders.size(), "Should return a single assessment definition");
-        assertTrue(first(assessmentHeaders).headerDefinition().isPresent(), "Should be able to identify an assessment definition using externalIds");
-        assertEquals(defn, first(assessmentHeaders).headerDefinition().get(), "Should identify the correct assessment definition from the externalId");
+        assertTrue(first(assessmentHeaders).resolvedAssessmentDefinition().isPresent(), "Should be able to identify an assessment definition using externalIds");
+        assertEquals(defn, first(assessmentHeaders).resolvedAssessmentDefinition().get(), "Should identify the correct assessment definition from the externalId");
     }
 
     @Test
@@ -120,15 +122,13 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
         EntityReference le = legalEntityHelper.create(mkName("le"));
 
         Set<String> headerRow = asSet(ENTITY_IDENTIFIER, LEGAL_ENTITY_IDENTIFIER, COMMENT, "invalid identifier");
-        Set<ResolvedAssessmentHeader> assessmentHeaders = service.parseAssessmentsFromHeader(mkRef(EntityKind.LEGAL_ENTITY_RELATIONSHIP_KIND, leRelKindId), headerRow);
+        Set<AssessmentHeaderCell> assessmentHeaders = service.parseAssessmentsFromHeader(mkRef(EntityKind.LEGAL_ENTITY_RELATIONSHIP_KIND, leRelKindId), headerRow);
 
-        ResolvedAssessmentHeader assessmentHeader = first(assessmentHeaders);
-        Optional<AssessmentDefinition> assessmentDefinition = assessmentHeader.headerDefinition();
+        AssessmentHeaderCell assessmentHeader = first(assessmentHeaders);
+        Optional<AssessmentDefinition> assessmentDefinition = assessmentHeader.resolvedAssessmentDefinition();
         assertFalse(assessmentDefinition.isPresent(), "Assessment should not be found column idx 3");
 
-        Set<AssessmentResolutionErrorCode> errors = SetUtilities.map(assessmentHeader.errors(), AssessmentHeaderResolutionError::errorCode);
-        assertTrue(errors.contains(AssessmentResolutionErrorCode.HEADER_DEFINITION_NOT_FOUND), "Rating value should be reported as not identifiable");
-        assertEquals(ResolutionStatus.ERROR, assessmentHeader.status(), "If errors not empty then resolution status should be 'ERROR'");
+        assertEquals(ResolvedAssessmentHeaderStatus.HEADER_DEFINITION_NOT_FOUND, assessmentHeader.status(), "If errors not empty then resolution status should be 'HEADER_DEFINITION_NOT_FOUND'");
     }
 
     @Test
@@ -143,17 +143,15 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
         EntityReference le = legalEntityHelper.create(mkName("le"));
 
         Set<String> headerRow = asSet(ENTITY_IDENTIFIER, LEGAL_ENTITY_IDENTIFIER, COMMENT, "", defn.externalId().get());
-        Set<ResolvedAssessmentHeader> assessmentHeaders = service.parseAssessmentsFromHeader(mkRef(EntityKind.LEGAL_ENTITY_RELATIONSHIP_KIND, leRelKindId), headerRow);
+        Set<AssessmentHeaderCell> assessmentHeaders = service.parseAssessmentsFromHeader(mkRef(EntityKind.LEGAL_ENTITY_RELATIONSHIP_KIND, leRelKindId), headerRow);
 
-        Optional<ResolvedAssessmentHeader> headerWithEmptyStringVal = find(assessmentHeaders, d -> d.inputString().equalsIgnoreCase(""));
+        Optional<AssessmentHeaderCell> headerWithEmptyStringVal = find(assessmentHeaders, d -> d.inputString().equalsIgnoreCase(""));
         assertTrue(headerWithEmptyStringVal.isPresent(), "Header should find resolved assessment detail for column");
 
-        Optional<AssessmentDefinition> assessmentDefinition = headerWithEmptyStringVal.get().headerDefinition();
+        Optional<AssessmentDefinition> assessmentDefinition = headerWithEmptyStringVal.get().resolvedAssessmentDefinition();
         assertFalse(assessmentDefinition.isPresent(), "Assessment should not be identified");
 
-        Set<AssessmentResolutionErrorCode> errors = SetUtilities.map(headerWithEmptyStringVal.get().errors(), AssessmentHeaderResolutionError::errorCode);
-        assertTrue(errors.contains(AssessmentResolutionErrorCode.NO_VALUE_PROVIDED), "Rating value should be reported as not identifiable");
-        assertEquals(ResolutionStatus.ERROR, headerWithEmptyStringVal.get().status(), "If errors not empty then resolution status should be 'ERROR'");
+        assertEquals(ResolvedAssessmentHeaderStatus.HEADER_DEFINITION_NOT_FOUND, headerWithEmptyStringVal.get().status(), "If errors not empty then resolution status should be 'HEADER_DEFINITION_NOT_FOUND'");
     }
 
     @Test
@@ -178,23 +176,23 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
 
         Set<String> headerRow = asSet(ENTITY_IDENTIFIER, LEGAL_ENTITY_IDENTIFIER, COMMENT, defHeader1, defHeader2, defHeader3);
 
-        Set<ResolvedAssessmentHeader> assessmentHeaders = service.parseAssessmentsFromHeader(mkRef(EntityKind.LEGAL_ENTITY_RELATIONSHIP_KIND, leRelKindId), headerRow);
+        Set<AssessmentHeaderCell> assessmentHeaders = service.parseAssessmentsFromHeader(mkRef(EntityKind.LEGAL_ENTITY_RELATIONSHIP_KIND, leRelKindId), headerRow);
 
-        Optional<ResolvedAssessmentHeader> maybeDefnC = find(assessmentHeaders, d -> d.inputString().equalsIgnoreCase(defHeader1));
-        Optional<ResolvedAssessmentHeader> maybeDefnB = find(assessmentHeaders, d -> d.inputString().equalsIgnoreCase(defHeader2));
-        Optional<ResolvedAssessmentHeader> maybeDefnA = find(assessmentHeaders, d -> d.inputString().equalsIgnoreCase(defHeader3));
+        Optional<AssessmentHeaderCell> maybeDefnC = find(assessmentHeaders, d -> d.inputString().equalsIgnoreCase(defHeader1));
+        Optional<AssessmentHeaderCell> maybeDefnB = find(assessmentHeaders, d -> d.inputString().equalsIgnoreCase(defHeader2));
+        Optional<AssessmentHeaderCell> maybeDefnA = find(assessmentHeaders, d -> d.inputString().equalsIgnoreCase(defHeader3));
 
         assertTrue(maybeDefnC.isPresent(), "Header should find data for column idx 3");
         assertTrue(maybeDefnB.isPresent(), "Header should find data for column idx 4");
         assertTrue(maybeDefnA.isPresent(), "Header should find data for column idx 5");
 
-        assertTrue(maybeDefnC.get().headerDefinition().isPresent(), "Assessment should be identifiable for column idx 3");
-        assertTrue(maybeDefnB.get().headerDefinition().isPresent(), "Assessment should be identifiable for column idx 4");
-        assertTrue(maybeDefnA.get().headerDefinition().isPresent(), "Assessment should be identifiable for column idx 5");
+        assertTrue(maybeDefnC.get().resolvedAssessmentDefinition().isPresent(), "Assessment should be identifiable for column idx 3");
+        assertTrue(maybeDefnB.get().resolvedAssessmentDefinition().isPresent(), "Assessment should be identifiable for column idx 4");
+        assertTrue(maybeDefnA.get().resolvedAssessmentDefinition().isPresent(), "Assessment should be identifiable for column idx 5");
 
-        assertEquals(defnA, maybeDefnA.get().headerDefinition().get(), "Should identify the correct assessment definition from the externalId");
-        assertEquals(defnB, maybeDefnB.get().headerDefinition().get(), "Should identify the correct assessment definition from the externalId");
-        assertEquals(defnC, maybeDefnC.get().headerDefinition().get(), "Should identify the correct assessment definition from the externalId");
+        assertEquals(defnA, maybeDefnA.get().resolvedAssessmentDefinition().get(), "Should identify the correct assessment definition from the externalId");
+        assertEquals(defnB, maybeDefnB.get().resolvedAssessmentDefinition().get(), "Should identify the correct assessment definition from the externalId");
+        assertEquals(defnC, maybeDefnC.get().resolvedAssessmentDefinition().get(), "Should identify the correct assessment definition from the externalId");
     }
 
 
@@ -214,19 +212,17 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
 
         Set<String> headerRow = asSet(ENTITY_IDENTIFIER, LEGAL_ENTITY_IDENTIFIER, COMMENT, assessmentHeaderString);
 
-        Set<ResolvedAssessmentHeader> assessmentHeaders = service.parseAssessmentsFromHeader(mkRef(EntityKind.LEGAL_ENTITY_RELATIONSHIP_KIND, leRelKindId), headerRow);
+        Set<AssessmentHeaderCell> assessmentHeaders = service.parseAssessmentsFromHeader(mkRef(EntityKind.LEGAL_ENTITY_RELATIONSHIP_KIND, leRelKindId), headerRow);
 
-        Optional<ResolvedAssessmentHeader> maybeDefnA = find(assessmentHeaders, d -> d.inputString().equalsIgnoreCase(assessmentHeaderString));
+        Optional<AssessmentHeaderCell> maybeDefnA = find(assessmentHeaders, d -> d.inputString().equalsIgnoreCase(assessmentHeaderString));
 
         assertTrue(maybeDefnA.isPresent(), "Header should find data for column");
-        Optional<AssessmentDefinition> assessmentDefinition = maybeDefnA.get().headerDefinition();
+        Optional<AssessmentDefinition> assessmentDefinition = maybeDefnA.get().resolvedAssessmentDefinition();
 
         assertTrue(assessmentDefinition.isPresent(), "Assessment should be identifiable");
         assertEquals(defnA, assessmentDefinition.get(), "Should identify the correct assessment definition from the externalId");
 
-        Set<AssessmentResolutionErrorCode> errors = SetUtilities.map(maybeDefnA.get().errors(), AssessmentHeaderResolutionError::errorCode);
-        assertTrue(errors.contains(AssessmentResolutionErrorCode.HEADER_RATING_NOT_FOUND), "Rating value should be reported as not identifiable");
-        assertEquals(ResolutionStatus.ERROR, maybeDefnA.get().status(), "If errors not empty then resolution status should be 'ERROR'");
+        assertEquals(ResolvedAssessmentHeaderStatus.HEADER_RATING_NOT_FOUND, maybeDefnA.get().status(), "If errors not empty then resolution status should be 'HEADER_RATING_NOT_FOUND'");
     }
 
 
@@ -247,19 +243,17 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
 
         Set<String> headerRow = asSet(ENTITY_IDENTIFIER, LEGAL_ENTITY_IDENTIFIER, COMMENT, assessmentHeaderString);
 
-        Set<ResolvedAssessmentHeader> assessmentHeaders = service.parseAssessmentsFromHeader(mkRef(EntityKind.LEGAL_ENTITY_RELATIONSHIP_KIND, leRelKindId), headerRow);
-        Optional<ResolvedAssessmentHeader> maybeDefnA = find(assessmentHeaders, d -> d.inputString().equalsIgnoreCase(assessmentHeaderString));
+        Set<AssessmentHeaderCell> assessmentHeaders = service.parseAssessmentsFromHeader(mkRef(EntityKind.LEGAL_ENTITY_RELATIONSHIP_KIND, leRelKindId), headerRow);
+        Optional<AssessmentHeaderCell> maybeDefnA = find(assessmentHeaders, d -> d.inputString().equalsIgnoreCase(assessmentHeaderString));
 
         assertTrue(maybeDefnA.isPresent(), "Header should find data for column");
-        Optional<AssessmentDefinition> assessmentDefinition = maybeDefnA.get().headerDefinition();
-        Optional<RatingSchemeItem> rating = maybeDefnA.get().headerRating();
+        Optional<AssessmentDefinition> assessmentDefinition = maybeDefnA.get().resolvedAssessmentDefinition();
+        Optional<RatingSchemeItem> rating = maybeDefnA.get().resolvedRating();
 
         assertTrue(assessmentDefinition.isPresent(), "Assessment should be identifiable for column");
         assertEquals(defn, assessmentDefinition.get(), "Should identify the correct assessment definition from the externalId");
 
-        Set<AssessmentResolutionErrorCode> errors = SetUtilities.map(maybeDefnA.get().errors(), AssessmentHeaderResolutionError::errorCode);
         assertTrue(rating.isPresent(), "Rating value should be identified and no errors reported");
-        assertTrue(isEmpty(errors), "Rating value should be identified and no errors reported");
         assertEquals(ratingId, rating.get().id().get(), "Should identify the correct header rating value from the externalId");
     }
 
@@ -279,18 +273,17 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
 
         Set<String> headerRow = asSet(ENTITY_IDENTIFIER, LEGAL_ENTITY_IDENTIFIER, COMMENT, assessmentHeaderString);
 
-        Set<ResolvedAssessmentHeader> assessmentWithColIdx = service.parseAssessmentsFromHeader(mkRef(EntityKind.LEGAL_ENTITY_RELATIONSHIP_KIND, leRelKindId), headerRow);
+        Set<AssessmentHeaderCell> assessmentWithColIdx = service.parseAssessmentsFromHeader(mkRef(EntityKind.LEGAL_ENTITY_RELATIONSHIP_KIND, leRelKindId), headerRow);
 
-        Optional<ResolvedAssessmentHeader> maybeDefnA = find(assessmentWithColIdx, d -> d.inputString().equalsIgnoreCase(assessmentHeaderString));
+        Optional<AssessmentHeaderCell> maybeDefnA = find(assessmentWithColIdx, d -> d.inputString().equalsIgnoreCase(assessmentHeaderString));
 
         assertTrue(maybeDefnA.isPresent(), "Header should find data for column");
-        Optional<AssessmentDefinition> assessmentDefinition = maybeDefnA.get().headerDefinition();
+        Optional<AssessmentDefinition> assessmentDefinition = maybeDefnA.get().resolvedAssessmentDefinition();
 
         assertTrue(assessmentDefinition.isPresent(), "Assessment should be identifiable for column");
-        assertFalse(maybeDefnA.get().headerRating().isPresent(), "Rating should not be identifiable for column");
+        assertFalse(maybeDefnA.get().resolvedRating().isPresent(), "Rating should not be identifiable for column");
 
-        Set<AssessmentResolutionErrorCode> errors = SetUtilities.map(maybeDefnA.get().errors(), AssessmentHeaderResolutionError::errorCode);
-        assertTrue(isEmpty(errors), "Should be no errors reported for headers where no rating specified in format: 'DEFINITION_IDENTIFIER/RATING_IDENTIFIER'");
+        assertEquals(ResolvedAssessmentHeaderStatus.HEADER_FOUND, maybeDefnA.get().status(), "Should be no errors reported for headers where no rating specified in format: 'DEFINITION_IDENTIFIER/RATING_IDENTIFIER'");
     }
 
 
@@ -329,17 +322,18 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
                 .legalEntityRelationshipKindId(leRelKindId)
                 .build();
 
-        ResolveBulkUploadLegalEntityRelationshipParameters resolvedCommand = service.resolve(uploadCmd);
 
-        assertEquals(2, resolvedCommand.resolvedRows().size(), "Should identify 2 rows of data has been provided");
+        ResolveBulkUploadLegalEntityRelationshipResponse resolvedCommand = service.resolve(uploadCmd);
 
-        Set<ResolvedUploadRow> rowsWithAssessments = SetUtilities.filter(resolvedCommand.resolvedRows(), d -> notEmpty(d.assessmentRatings()));
+        assertEquals(2, resolvedCommand.rows().size(), "Should identify 2 rows of data has been provided");
+
+        Set<ResolvedUploadRow> rowsWithAssessments = SetUtilities.filter(resolvedCommand.rows(), d -> notEmpty(d.assessmentRatings()));
         assertTrue(isEmpty(rowsWithAssessments), "No rows should have assessments associated to them");
 
-        Set<ResolvedUploadRow> erroredRows = SetUtilities.filter(resolvedCommand.resolvedRows(), d -> d.legalEntityRelationship().status().equals(ResolutionStatus.ERROR));
+        Set<ResolvedUploadRow> erroredRows = SetUtilities.filter(resolvedCommand.rows(), d -> d.legalEntityRelationship().status().equals(ResolutionStatus.ERROR));
 
-        Optional<ResolvedUploadRow> firstRow = find(resolvedCommand.resolvedRows(), d -> d.rowNumber() == 2L);
-        Optional<ResolvedUploadRow> secondRow = find(resolvedCommand.resolvedRows(), d -> d.rowNumber() == 3L);
+        Optional<ResolvedUploadRow> firstRow = find(resolvedCommand.rows(), d -> d.rowNumber() == 2L);
+        Optional<ResolvedUploadRow> secondRow = find(resolvedCommand.rows(), d -> d.rowNumber() == 3L);
 
         assertTrue(firstRow.isPresent(), "Should find first row");
         assertTrue(secondRow.isPresent(), "Should find second row");
@@ -381,18 +375,19 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
                 .legalEntityRelationshipKindId(leRelKindId)
                 .build();
 
-        ResolveBulkUploadLegalEntityRelationshipParameters resolvedCommand = service.resolve(uploadCmd);
 
-        assertEquals(2, resolvedCommand.resolvedRows().size(), "Should identify 2 rows of data has been provided");
+        ResolveBulkUploadLegalEntityRelationshipResponse resolvedCommand = service.resolve(uploadCmd);
 
-        Set<ResolvedUploadRow> rowsWithAssessments = SetUtilities.filter(resolvedCommand.resolvedRows(), d -> notEmpty(d.assessmentRatings()));
+        assertEquals(2, resolvedCommand.rows().size(), "Should identify 2 rows of data has been provided");
+
+        Set<ResolvedUploadRow> rowsWithAssessments = SetUtilities.filter(resolvedCommand.rows(), d -> notEmpty(d.assessmentRatings()));
         assertTrue(isEmpty(rowsWithAssessments), "No rows should have assessments associated to them");
 
-        Set<ResolvedUploadRow> erroredRows = SetUtilities.filter(resolvedCommand.resolvedRows(), d -> d.legalEntityRelationship().status().equals(ResolutionStatus.ERROR));
+        Set<ResolvedUploadRow> erroredRows = SetUtilities.filter(resolvedCommand.rows(), d -> d.legalEntityRelationship().status().equals(ResolutionStatus.ERROR));
         assertTrue(notEmpty(erroredRows), "One of the roes should have a status of errored");
 
-        Optional<ResolvedUploadRow> firstRow = find(resolvedCommand.resolvedRows(), d -> d.rowNumber() == 2L);
-        Optional<ResolvedUploadRow> secondRow = find(resolvedCommand.resolvedRows(), d -> d.rowNumber() == 3L);
+        Optional<ResolvedUploadRow> firstRow = find(resolvedCommand.rows(), d -> d.rowNumber() == 2L);
+        Optional<ResolvedUploadRow> secondRow = find(resolvedCommand.rows(), d -> d.rowNumber() == 3L);
 
         assertTrue(firstRow.isPresent(), "Should find row at index 1");
         assertTrue(secondRow.isPresent(), "Should find row at index 2");
@@ -434,30 +429,34 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
                 .legalEntityRelationshipKindId(leRelKindId)
                 .build();
 
-        ResolveBulkUploadLegalEntityRelationshipParameters resolvedCommand = service.resolve(uploadCmd);
 
-        assertEquals(1, resolvedCommand.resolvedRows().size(), "Should identify 1 row of data has been provided");
+        ResolveBulkUploadLegalEntityRelationshipResponse resolvedCommand = service.resolve(uploadCmd);
 
-        Set<ResolvedUploadRow> rowsWithAssessments = SetUtilities.filter(resolvedCommand.resolvedRows(), d -> notEmpty(d.assessmentRatings()));
+        Map<String, Integer> colIdByInputString = MapUtilities.indexBy(resolvedCommand.assessmentHeaders(), AssessmentHeaderCell::inputString, AssessmentHeaderCell::columnId);
+        Integer colId = colIdByInputString.get(assessmentHeader);
+
+        assertEquals(1, resolvedCommand.rows().size(), "Should identify 1 row of data has been provided");
+
+        Set<ResolvedUploadRow> rowsWithAssessments = SetUtilities.filter(resolvedCommand.rows(), d -> notEmpty(d.assessmentRatings()));
         assertTrue(notEmpty(rowsWithAssessments), "Data rows should have assessment associated");
 
-        Optional<ResolvedUploadRow> dataRow = find(resolvedCommand.resolvedRows(), d -> d.rowNumber() == 2L);
+        Optional<ResolvedUploadRow> dataRow = find(resolvedCommand.rows(), d -> d.rowNumber() == 2L);
 
         assertTrue(dataRow.isPresent(), "Should find row at index 1");
 
-        Set<ResolvedAssessmentRating> resolvedAssessmentRatings = dataRow.get().assessmentRatings();
+        Set<AssessmentCell> resolvedAssessmentRatings = dataRow.get().assessmentRatings();
 
         assertEquals(1, resolvedAssessmentRatings.size(), "Should correctly resolve 1 assessment definition column");
 
-        Optional<ResolvedAssessmentRating> firstAssessment = find(resolvedAssessmentRatings, d -> d.assessmentHeader().inputString().equalsIgnoreCase(assessmentHeader));
+        Optional<AssessmentCell> firstAssessment = find(resolvedAssessmentRatings, d -> d.columnId() == colId);
         assertTrue(firstAssessment.isPresent(), "Should find assessment");
-        assertTrue(isEmpty(firstAssessment.get().assessmentHeader().errors()), "Should resolve assessment header with no errors");
+        assertFalse(firstAssessment.get().statuses().contains(ResolutionStatus.ERROR), "Should resolve assessment header with no errors");
 
-        assertEquals(1, firstAssessment.get().resolvedRatings().size(), "Should only find one assessment rating for this row and definition");
+        assertEquals(1, firstAssessment.get().ratings().size(), "Should only find one assessment rating for this row and definition");
 
-        ResolvedRatingValue resolvedRatingValue = first(firstAssessment.get().resolvedRatings());
-        assertTrue(resolvedRatingValue.rating().isPresent(), "Should be able to identify the correct rating scheme item");
-        assertEquals("TEST_GREEN", resolvedRatingValue.rating().get().externalId().get(), "Should be able to identify the correct rating scheme item");
+        AssessmentCellRating resolvedRatingValue = first(firstAssessment.get().ratings());
+        assertTrue(resolvedRatingValue.resolvedRating().isPresent(), "Should be able to identify the correct rating scheme item");
+        assertEquals("TEST_GREEN", resolvedRatingValue.resolvedRating().get().externalId().get(), "Should be able to identify the correct rating scheme item");
     }
 
     @Test
@@ -492,34 +491,38 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
                 .legalEntityRelationshipKindId(leRelKindId)
                 .build();
 
-        ResolveBulkUploadLegalEntityRelationshipParameters resolvedCommand = service.resolve(uploadCmd);
 
-        assertEquals(1, resolvedCommand.resolvedRows().size(), "Should identify 1 row of data has been provided");
+        ResolveBulkUploadLegalEntityRelationshipResponse resolvedCommand = service.resolve(uploadCmd);
 
-        Set<ResolvedUploadRow> rowsWithAssessments = SetUtilities.filter(resolvedCommand.resolvedRows(), d -> notEmpty(d.assessmentRatings()));
+        Map<String, Integer> colIdByInputString = MapUtilities.indexBy(resolvedCommand.assessmentHeaders(), AssessmentHeaderCell::inputString, AssessmentHeaderCell::columnId);
+        Integer colId = colIdByInputString.get(assessmentHeader);
+
+        assertEquals(1, resolvedCommand.rows().size(), "Should identify 1 row of data has been provided");
+
+        Set<ResolvedUploadRow> rowsWithAssessments = SetUtilities.filter(resolvedCommand.rows(), d -> notEmpty(d.assessmentRatings()));
         assertTrue(notEmpty(rowsWithAssessments), "Data rows should have assessment associated");
 
-        Optional<ResolvedUploadRow> dataRow = find(resolvedCommand.resolvedRows(), d -> d.rowNumber() == 2L);
+        Optional<ResolvedUploadRow> dataRow = find(resolvedCommand.rows(), d -> d.rowNumber() == 2L);
 
         assertTrue(dataRow.isPresent(), "Should find row at index 1");
 
-        Set<ResolvedAssessmentRating> resolvedAssessmentRatings = dataRow.get().assessmentRatings();
+        Set<AssessmentCell> resolvedAssessmentRatings = dataRow.get().assessmentRatings();
 
         assertEquals(1, resolvedAssessmentRatings.size(), "Should correctly resolve 1 assessment definition column");
 
-        Optional<ResolvedAssessmentRating> firstAssessment = find(resolvedAssessmentRatings, d -> d.assessmentHeader().inputString().equalsIgnoreCase(assessmentHeader));
+        Optional<AssessmentCell> firstAssessment = find(resolvedAssessmentRatings, d -> d.columnId() == colId);
         assertTrue(firstAssessment.isPresent(), "Should find assessment");
-        assertTrue(isEmpty(firstAssessment.get().assessmentHeader().errors()), "Should resolve assessment header with no errors");
+        assertFalse(firstAssessment.get().statuses().contains(ResolutionStatus.ERROR), "Should resolve assessment header with no errors");
 
-        assertEquals(2, firstAssessment.get().resolvedRatings().size(), "Should only find 2 assessment ratings for this row and definition");
+        assertEquals(2, firstAssessment.get().ratings().size(), "Should only find 2 assessment ratings for this row and definition");
 
-        Set<ResolvedRatingValue> erroredRatings = SetUtilities.filter(firstAssessment.get().resolvedRatings(), d -> notEmpty(d.errors()));
+        Set<AssessmentCellRating> erroredRatings = SetUtilities.filter(firstAssessment.get().ratings(), d -> notEmpty(d.errors()));
         assertTrue(isEmpty(erroredRatings), "Should resolve all rating values");
 
-        Set<RatingSchemeItem> resolvedRatingValues = firstAssessment.get().resolvedRatings()
+        Set<RatingSchemeItem> resolvedRatingValues = firstAssessment.get().ratings()
                 .stream()
-                .filter(d -> d.rating().isPresent())
-                .map(d -> d.rating().get())
+                .filter(d -> d.resolvedRating().isPresent())
+                .map(d -> d.resolvedRating().get())
                 .collect(Collectors.toSet());
 
         assertEquals(asSet("TEST_GREEN", "TEST_RED"), SetUtilities.map(resolvedRatingValues, d -> d.externalId().get()), "Should be able to identify the correct rating scheme items");
@@ -557,35 +560,39 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
                 .legalEntityRelationshipKindId(leRelKindId)
                 .build();
 
-        ResolveBulkUploadLegalEntityRelationshipParameters resolvedCommand = service.resolve(uploadCmd);
 
-        assertEquals(1, resolvedCommand.resolvedRows().size(), "Should identify 1 row of data has been provided");
+        ResolveBulkUploadLegalEntityRelationshipResponse resolvedCommand = service.resolve(uploadCmd);
 
-        Set<ResolvedUploadRow> rowsWithAssessments = SetUtilities.filter(resolvedCommand.resolvedRows(), d -> notEmpty(d.assessmentRatings()));
+        Map<String, Integer> colIdByInputString = MapUtilities.indexBy(resolvedCommand.assessmentHeaders(), AssessmentHeaderCell::inputString, AssessmentHeaderCell::columnId);
+        Integer colId = colIdByInputString.get(assessmentHeader);
+
+        assertEquals(1, resolvedCommand.rows().size(), "Should identify 1 row of data has been provided");
+
+        Set<ResolvedUploadRow> rowsWithAssessments = SetUtilities.filter(resolvedCommand.rows(), d -> notEmpty(d.assessmentRatings()));
         assertTrue(notEmpty(rowsWithAssessments), "Data rows should have assessment associated");
 
-        Optional<ResolvedUploadRow> dataRow = find(resolvedCommand.resolvedRows(), d -> d.rowNumber() == 2L);
+        Optional<ResolvedUploadRow> dataRow = find(resolvedCommand.rows(), d -> d.rowNumber() == 2L);
 
         assertTrue(dataRow.isPresent(), "Should find row at index 1");
 
-        Set<ResolvedAssessmentRating> resolvedAssessmentRatings = dataRow.get().assessmentRatings();
+        Set<AssessmentCell> resolvedAssessmentRatings = dataRow.get().assessmentRatings();
 
         assertEquals(1, resolvedAssessmentRatings.size(), "Should correctly resolve 1 assessment definition column");
 
-        Optional<ResolvedAssessmentRating> firstAssessment = find(resolvedAssessmentRatings, d -> d.assessmentHeader().inputString().equalsIgnoreCase(assessmentHeader));
+        Optional<AssessmentCell> firstAssessment = find(resolvedAssessmentRatings, d -> d.columnId() == colId);
         assertTrue(firstAssessment.isPresent(), "Should find assessment");
-        assertTrue(isEmpty(firstAssessment.get().assessmentHeader().errors()), "Should resolve assessment header with no errors");
+        assertFalse(firstAssessment.get().statuses().contains(ResolutionStatus.ERROR), "Should resolve assessment header with no errors");
 
-        Set<ResolvedRatingValue> resolvedRatings = firstAssessment.get().resolvedRatings();
+        Set<AssessmentCellRating> resolvedRatings = firstAssessment.get().ratings();
         assertEquals(1, resolvedRatings.size(), "Should only find 1 assessment ratings for this row and definition");
 
-        Set<ResolvedRatingValue> erroredRatings = SetUtilities.filter(resolvedRatings, d -> notEmpty(d.errors()));
+        Set<AssessmentCellRating> erroredRatings = SetUtilities.filter(resolvedRatings, d -> notEmpty(d.errors()));
         assertTrue(isEmpty(erroredRatings), "Should resolve all rating values");
 
         Set<RatingSchemeItem> resolvedRatingValues = resolvedRatings
                 .stream()
-                .filter(d -> d.rating().isPresent())
-                .map(d -> d.rating().get())
+                .filter(d -> d.resolvedRating().isPresent())
+                .map(d -> d.resolvedRating().get())
                 .collect(Collectors.toSet());
 
         assertTrue(OptionalUtilities.isEmpty(first(resolvedRatings).comment()), "Should not input 'y' value as comment");
@@ -627,35 +634,39 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
                 .legalEntityRelationshipKindId(leRelKindId)
                 .build();
 
-        ResolveBulkUploadLegalEntityRelationshipParameters resolvedCommand = service.resolve(uploadCmd);
 
-        assertEquals(1, resolvedCommand.resolvedRows().size(), "Should identify 1 row of data has been provided");
+        ResolveBulkUploadLegalEntityRelationshipResponse resolvedCommand = service.resolve(uploadCmd);
 
-        Set<ResolvedUploadRow> rowsWithAssessments = SetUtilities.filter(resolvedCommand.resolvedRows(), d -> notEmpty(d.assessmentRatings()));
+        Map<String, Integer> colIdByInputString = MapUtilities.indexBy(resolvedCommand.assessmentHeaders(), AssessmentHeaderCell::inputString, AssessmentHeaderCell::columnId);
+        Integer colId = colIdByInputString.get(assessmentHeader);
+
+        assertEquals(1, resolvedCommand.rows().size(), "Should identify 1 row of data has been provided");
+
+        Set<ResolvedUploadRow> rowsWithAssessments = SetUtilities.filter(resolvedCommand.rows(), d -> notEmpty(d.assessmentRatings()));
         assertTrue(notEmpty(rowsWithAssessments), "Data rows should have assessment associated");
 
-        Optional<ResolvedUploadRow> dataRow = find(resolvedCommand.resolvedRows(), d -> d.rowNumber() == 2L);
+        Optional<ResolvedUploadRow> dataRow = find(resolvedCommand.rows(), d -> d.rowNumber() == 2L);
 
         assertTrue(dataRow.isPresent(), "Should find row at index 1");
 
-        Set<ResolvedAssessmentRating> resolvedAssessmentRatings = dataRow.get().assessmentRatings();
+        Set<AssessmentCell> resolvedAssessmentRatings = dataRow.get().assessmentRatings();
 
         assertEquals(1, resolvedAssessmentRatings.size(), "Should correctly resolve 1 assessment definition column");
 
-        Optional<ResolvedAssessmentRating> firstAssessment = find(resolvedAssessmentRatings, d -> d.assessmentHeader().inputString().equalsIgnoreCase(assessmentHeader));
+        Optional<AssessmentCell> firstAssessment = find(resolvedAssessmentRatings, d -> d.columnId() == colId);
         assertTrue(firstAssessment.isPresent(), "Should find assessment");
-        assertTrue(isEmpty(firstAssessment.get().assessmentHeader().errors()), "Should resolve assessment header with no errors");
+        assertFalse((firstAssessment.get().statuses().contains(ResolutionStatus.ERROR)), "Should resolve assessment header with no errors");
 
-        Set<ResolvedRatingValue> resolvedRatings = firstAssessment.get().resolvedRatings();
+        Set<AssessmentCellRating> resolvedRatings = firstAssessment.get().ratings();
         assertEquals(1, resolvedRatings.size(), "Should only find 1 assessment ratings for this row and definition");
 
-        Set<ResolvedRatingValue> erroredRatings = SetUtilities.filter(resolvedRatings, d -> notEmpty(d.errors()));
+        Set<AssessmentCellRating> erroredRatings = SetUtilities.filter(resolvedRatings, d -> notEmpty(d.errors()));
         assertTrue(isEmpty(erroredRatings), "Should resolve all rating values");
 
         Set<RatingSchemeItem> resolvedRatingValues = resolvedRatings
                 .stream()
-                .filter(d -> d.rating().isPresent())
-                .map(d -> d.rating().get())
+                .filter(d -> d.resolvedRating().isPresent())
+                .map(d -> d.resolvedRating().get())
                 .collect(Collectors.toSet());
 
         assertEquals(assessmentComment, first(resolvedRatings).comment().orElse(""), "Should be able to parse the comment string from a specific rating column");
@@ -696,31 +707,35 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
                 .legalEntityRelationshipKindId(leRelKindId)
                 .build();
 
-        ResolveBulkUploadLegalEntityRelationshipParameters resolvedCommand = service.resolve(uploadCmd);
 
-        assertEquals(1, resolvedCommand.resolvedRows().size(), "Should identify 1 row of data has been provided");
+        ResolveBulkUploadLegalEntityRelationshipResponse resolvedCommand = service.resolve(uploadCmd);
 
-        Set<ResolvedUploadRow> rowsWithAssessments = SetUtilities.filter(resolvedCommand.resolvedRows(), d -> notEmpty(d.assessmentRatings()));
+        Map<String, Integer> colIdByInputString = MapUtilities.indexBy(resolvedCommand.assessmentHeaders(), AssessmentHeaderCell::inputString, AssessmentHeaderCell::columnId);
+        Integer colId = colIdByInputString.get(assessmentHeader);
+
+        assertEquals(1, resolvedCommand.rows().size(), "Should identify 1 row of data has been provided");
+
+        Set<ResolvedUploadRow> rowsWithAssessments = SetUtilities.filter(resolvedCommand.rows(), d -> notEmpty(d.assessmentRatings()));
         assertTrue(notEmpty(rowsWithAssessments), "Data rows should have assessment associated");
 
-        Optional<ResolvedUploadRow> dataRow = find(resolvedCommand.resolvedRows(), d -> d.rowNumber() == 2L);
+        Optional<ResolvedUploadRow> dataRow = find(resolvedCommand.rows(), d -> d.rowNumber() == 2L);
 
         assertTrue(dataRow.isPresent(), "Should find row at index 1");
 
-        Set<ResolvedAssessmentRating> resolvedAssessmentRatings = dataRow.get().assessmentRatings();
+        Set<AssessmentCell> resolvedAssessmentRatings = dataRow.get().assessmentRatings();
         assertEquals(1, resolvedAssessmentRatings.size(), "Should correctly resolve 1 assessment definition column");
 
-        Optional<ResolvedAssessmentRating> firstAssessment = find(resolvedAssessmentRatings, d -> d.assessmentHeader().inputString().equalsIgnoreCase(assessmentHeader));
+        Optional<AssessmentCell> firstAssessment = find(resolvedAssessmentRatings, d -> d.columnId() == colId);
         assertTrue(firstAssessment.isPresent(), "Should find assessment");
-        assertTrue(notEmpty(firstAssessment.get().assessmentHeader().errors()), "Should resolve assessment header with no errors");
+        assertFalse(firstAssessment.get().statuses().contains(ResolutionStatus.ERROR), "Should resolve assessment header with no errors");
 
-        Set<ResolvedRatingValue> resolvedRatings = firstAssessment.get().resolvedRatings();
+        Set<AssessmentCellRating> resolvedRatings = firstAssessment.get().ratings();
         assertEquals(1, resolvedRatings.size(), "Should only find 1 assessment ratings for this row and definition");
 
-        Set<ResolvedRatingValue> erroredRatings = SetUtilities.filter(resolvedRatings, d -> notEmpty(d.errors()));
+        Set<AssessmentCellRating> erroredRatings = SetUtilities.filter(resolvedRatings, d -> notEmpty(d.errors()));
         assertTrue(notEmpty(erroredRatings), "Should report error as definition could not be identified");
 
-        assertFalse(any(resolvedRatings, d -> d.rating().isPresent()), "Should be unable to resolve a rating where the definition is unknown");
+        assertFalse(any(resolvedRatings, d -> d.resolvedRating().isPresent()), "Should be unable to resolve a rating where the definition is unknown");
     }
 
 
@@ -758,25 +773,29 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
                 .legalEntityRelationshipKindId(leRelKindId)
                 .build();
 
-        ResolveBulkUploadLegalEntityRelationshipParameters resolvedCommand = service.resolve(uploadCmd);
 
-        assertEquals(1, resolvedCommand.resolvedRows().size(), "Should identify 1 row of data has been provided");
+        ResolveBulkUploadLegalEntityRelationshipResponse resolvedCommand = service.resolve(uploadCmd);
 
-        Set<ResolvedUploadRow> rowsWithAssessments = SetUtilities.filter(resolvedCommand.resolvedRows(), d -> notEmpty(d.assessmentRatings()));
+        Map<String, Integer> colIdByInputString = MapUtilities.indexBy(resolvedCommand.assessmentHeaders(), AssessmentHeaderCell::inputString, AssessmentHeaderCell::columnId);
+        Integer colId = colIdByInputString.get(assessmentHeader);
+
+        assertEquals(1, resolvedCommand.rows().size(), "Should identify 1 row of data has been provided");
+
+        Set<ResolvedUploadRow> rowsWithAssessments = SetUtilities.filter(resolvedCommand.rows(), d -> notEmpty(d.assessmentRatings()));
         assertTrue(notEmpty(rowsWithAssessments), "Data rows should have assessment associated");
 
-        Optional<ResolvedUploadRow> dataRow = find(resolvedCommand.resolvedRows(), d -> d.rowNumber() == 2L);
+        Optional<ResolvedUploadRow> dataRow = find(resolvedCommand.rows(), d -> d.rowNumber() == 2L);
         assertTrue(dataRow.isPresent(), "Should find row at index 1");
 
-        Set<ResolvedAssessmentRating> resolvedAssessmentRatings = dataRow.get().assessmentRatings();
+        Set<AssessmentCell> resolvedAssessmentRatings = dataRow.get().assessmentRatings();
         assertEquals(1, resolvedAssessmentRatings.size(), "Should correctly resolve 1 assessment definition columns");
 
-        Optional<ResolvedAssessmentRating> firstAssessment = find(resolvedAssessmentRatings, d -> d.assessmentHeader().inputString().equalsIgnoreCase(assessmentHeader));
+        Optional<AssessmentCell> firstAssessment = find(resolvedAssessmentRatings, d -> d.columnId() == colId);
 
         assertTrue(firstAssessment.isPresent(), "Should find assessment at index 3");
 
         assertTrue(all(
-                        firstAssessment.get().resolvedRatings(),
+                        firstAssessment.get().ratings(),
                         d -> SetUtilities.map(d.errors(), RatingResolutionError::errorCode).contains(RatingResolutionErrorCode.MULTIPLE_RATINGS_DISALLOWED)),
                 "Single valued assessments can only be provided one rating value, reports an error otherwise");
     }
@@ -817,32 +836,36 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
                 .legalEntityRelationshipKindId(leRelKindId)
                 .build();
 
-        ResolveBulkUploadLegalEntityRelationshipParameters resolvedCommand = service.resolve(uploadCmd);
 
-        assertEquals(1, resolvedCommand.resolvedRows().size(), "Should identify 1 row of data has been provided");
+        ResolveBulkUploadLegalEntityRelationshipResponse resolvedCommand = service.resolve(uploadCmd);
 
-        Set<ResolvedUploadRow> rowsWithAssessments = SetUtilities.filter(resolvedCommand.resolvedRows(), d -> notEmpty(d.assessmentRatings()));
+        Map<String, Integer> colIdByInputString = MapUtilities.indexBy(resolvedCommand.assessmentHeaders(), AssessmentHeaderCell::inputString, AssessmentHeaderCell::columnId);
+        Integer colId = colIdByInputString.get(assessmentHeader);
+
+        assertEquals(1, resolvedCommand.rows().size(), "Should identify 1 row of data has been provided");
+
+        Set<ResolvedUploadRow> rowsWithAssessments = SetUtilities.filter(resolvedCommand.rows(), d -> notEmpty(d.assessmentRatings()));
         assertTrue(notEmpty(rowsWithAssessments), "Data rows should have assessment associated");
 
-        Optional<ResolvedUploadRow> dataRow = find(resolvedCommand.resolvedRows(), d -> d.rowNumber() == 2L);
+        Optional<ResolvedUploadRow> dataRow = find(resolvedCommand.rows(), d -> d.rowNumber() == 2L);
         assertTrue(dataRow.isPresent(), "Should find row at index 1");
 
-        Set<ResolvedAssessmentRating> resolvedAssessmentRatings = dataRow.get().assessmentRatings();
+        Set<AssessmentCell> resolvedAssessmentRatings = dataRow.get().assessmentRatings();
         assertEquals(2, resolvedAssessmentRatings.size(), "Should correctly resolve 2 assessment definition columns");
 
-        Optional<ResolvedAssessmentRating> firstAssessment = find(resolvedAssessmentRatings, d -> d.assessmentHeader().inputString().equalsIgnoreCase(assessmentHeaderRating1));
-        Optional<ResolvedAssessmentRating> secondAssessment = find(resolvedAssessmentRatings, d -> d.assessmentHeader().inputString().equalsIgnoreCase(assessmentHeaderRating2));
+        Optional<AssessmentCell> firstAssessment = find(resolvedAssessmentRatings, d -> d.inputString().equalsIgnoreCase(assessmentHeaderRating1));
+        Optional<AssessmentCell> secondAssessment = find(resolvedAssessmentRatings, d -> d.inputString().equalsIgnoreCase(assessmentHeaderRating2));
 
         assertTrue(firstAssessment.isPresent(), "Should find assessment from header with rating 1");
         assertTrue(secondAssessment.isPresent(), "Should find assessment from header with rating 1");
 
         assertTrue(all(
-                        firstAssessment.get().resolvedRatings(),
+                        firstAssessment.get().ratings(),
                         d -> SetUtilities.map(d.errors(), RatingResolutionError::errorCode).contains(RatingResolutionErrorCode.MULTIPLE_RATINGS_DISALLOWED)),
                 "Single valued assessments can only be provided one rating value, reports an error otherwise");
 
         assertTrue(all(
-                        secondAssessment.get().resolvedRatings(),
+                        secondAssessment.get().ratings(),
                         d -> SetUtilities.map(d.errors(), RatingResolutionError::errorCode).contains(RatingResolutionErrorCode.MULTIPLE_RATINGS_DISALLOWED)),
                 "Single valued assessments can only be provided one rating value, reports an error otherwise");
     }

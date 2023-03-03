@@ -9,14 +9,14 @@ import org.immutables.value.Value;
 import java.util.Set;
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableResolveBulkUploadLegalEntityRelationshipParameters.class)
-@JsonDeserialize(as = ImmutableResolveBulkUploadLegalEntityRelationshipParameters.class)
+@JsonSerialize(as = ImmutableResolveBulkUploadLegalEntityRelationshipResponse.class)
+@JsonDeserialize(as = ImmutableResolveBulkUploadLegalEntityRelationshipResponse.class)
 public abstract class ResolveBulkUploadLegalEntityRelationshipResponse {
 
     public abstract BulkUploadMode uploadMode();
 
     public abstract Set<ResolvedUploadRow> rows();
 
-    public abstract Set<ResolvedAssessmentHeader> assessmentHeaders();
+    public abstract Set<AssessmentHeaderCell> assessmentHeaders();
 
 }

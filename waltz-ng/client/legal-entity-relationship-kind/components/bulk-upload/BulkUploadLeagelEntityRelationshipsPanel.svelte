@@ -12,7 +12,8 @@
         Modes,
         resolvedRows,
         UploadModes,
-        uploadMode
+        uploadMode,
+        resolveResponse
     } from "./bulk-upload-relationships-store";
     import _ from "lodash";
 
@@ -33,8 +34,9 @@
         return resolveCall = bulkUploadLegalEntityRelationshipStore.resolve(resolveParams)
             .then(d => {
                 console.log({d});
+                $resolveResponse = d.data;
                 $activeMode = Modes.RESOLVED;
-                $resolvedRows = d.data.resolvedRows;
+                $resolvedRows = d.data.rows;
             })
             .catch(e => displayError("Could not resolve rows", e));
     }

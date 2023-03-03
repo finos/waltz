@@ -16,6 +16,6 @@ public abstract class ResolvedUploadRow {
 
     public abstract ResolvedLegalEntityRelationship legalEntityRelationship();
 
-    public abstract Set<ResolvedAssessmentRating> assessmentRatings();
+    public abstract Set<AssessmentCell> assessmentRatings();
 
 }

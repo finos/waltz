@@ -25,6 +25,6 @@ public abstract class ResolvedLegalEntityRelationship {
 
     public abstract ResolutionStatus status();
 
-//    public abstract Optional<Long> relationshipId(); // ?
+    public abstract Optional<EntityReference> existingRelationshipReference();
 
 }

@@ -1,7 +1,8 @@
 import template from "./legal-entity-relationship-bulk-upload.html";
 import {initialiseData} from "../../../common";
 import BulkUploadLegalEntityRelationshipsPanel from "./BulkUploadLeagelEntityRelationshipsPanel.svelte";
-import {resolvedRows, activeMode, Modes} from "./bulk-upload-relationships-store";
+import {resolvedRows, activeMode, Modes, resolveResponse} from "./bulk-upload-relationships-store";
+import _ from "lodash";
 
 
 const bindings = {
@@ -19,7 +20,29 @@ function controller($scope, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const unsub = resolvedRows.subscribe((d) => {
-        $scope.$applyAsync(() => vm.rows = d);
+        $scope.$applyAsync(() => {
+            vm.rows = d
+        });
+    });
+
+    const unsubResp = resolveResponse.subscribe((d) => {
+        $scope.$applyAsync(() => {
+
+            vm.rows = _.map(d.rows, r => Object.assign(
+                {},
+                r,
+                {cellsByColumn: _.keyBy(r.assessmentRatings, d => `COL_${d.columnId}`)}));
+
+            console.log({rows: vm.rows});
+
+            const assessmentColDefs = _.map(d.assessmentHeaders, d => mkAssessmentColumnDef(d));
+
+            vm.columnDefs = _.concat(
+                relColumnDefs,
+                assessmentColDefs);
+
+            console.log({cols: vm.columnDefs});
+        });
     });
 
     const unsubMode = activeMode.subscribe((d) => {
@@ -27,6 +50,17 @@ function controller($scope, serviceBroker) {
     });
 
     vm.$onChanges = () => {
+    }
+
+    function mkAssessmentColumnDef(assessmentHeading) {
+        return {
+            field: "legalEntityRelationship",
+            displayName: assessmentHeading.inputString,
+            cellTemplate: `
+            <div class="ui-grid-cell-contents">
+            <pre ng-bind="COL_FIELD | json"></pre>
+</div>`
+        };
     }
 
     function mkEntityLinkColumnDef(columnHeading, entityRefField) {
@@ -42,22 +76,14 @@ function controller($scope, serviceBroker) {
         };
     }
 
-    vm.columnDefs = [
-        mkEntityLinkColumnDef("Target Entity", "legalEntityRelationship.targetEntityReference"),
-        mkEntityLinkColumnDef("Legal Entity", "legalEntityRelationship.legalEntityReference"),
+    const relColumnDefs = [
+        mkEntityLinkColumnDef("Target Entity", "legalEntityRelationship.targetEntityReference.resolvedEntityReference"),
+        mkEntityLinkColumnDef("Legal Entity", "legalEntityRelationship.legalEntityReference.resolvedEntityReference"),
         {
             field: "legalEntityRelationship.comment",
             displayName: "Comment"
-        },
-        {
-            field: "legalEntityRelationship.status",
-            displayName: "Status"
-        },
-        {
-            field: "legalEntityRelationship.errors",
-            displayName: "Errors"
-        }
-    ];
+        }];
+
 }
 
 

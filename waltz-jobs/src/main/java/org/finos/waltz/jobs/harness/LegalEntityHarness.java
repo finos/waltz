@@ -22,6 +22,7 @@ import org.finos.waltz.model.bulk_upload.BulkUploadMode;
 import org.finos.waltz.model.bulk_upload.legal_entity_relationship.BulkUploadLegalEntityRelationshipCommand;
 import org.finos.waltz.model.bulk_upload.legal_entity_relationship.ImmutableBulkUploadLegalEntityRelationshipCommand;
 import org.finos.waltz.model.bulk_upload.legal_entity_relationship.ResolveBulkUploadLegalEntityRelationshipParameters;
+import org.finos.waltz.model.bulk_upload.legal_entity_relationship.ResolveBulkUploadLegalEntityRelationshipResponse;
 import org.finos.waltz.service.DIConfiguration;
 import org.finos.waltz.service.bulk_upload.BulkUploadLegalEntityRelationshipService;
 import org.jooq.DSLContext;
@@ -45,9 +46,9 @@ public class LegalEntityHarness {
                 .legalEntityRelationshipKindId(1L)
                 .build();
 
-        ResolveBulkUploadLegalEntityRelationshipParameters resolvedCommand = service.resolve(uploadCommand);
+        ResolveBulkUploadLegalEntityRelationshipResponse resolvedCommand = service.resolve(uploadCommand);
 
-        System.out.println(resolvedCommand.resolvedRows().size());
+        System.out.println(resolvedCommand.rows().size());
 
     }
 

@@ -11,9 +11,9 @@ import java.util.Optional;
 import java.util.Set;
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableResolvedRatingValue.class)
-@JsonDeserialize(as = ImmutableResolvedRatingValue.class)
-public abstract class ResolvedRatingValue {
+@JsonSerialize(as = ImmutableAssessmentCellRating.class)
+@JsonDeserialize(as = ImmutableAssessmentCellRating.class)
+public abstract class AssessmentCellRating {
 
     public abstract Optional<RatingSchemeItem> resolvedRating(); //can be provided via header rating or listed in cell
 
