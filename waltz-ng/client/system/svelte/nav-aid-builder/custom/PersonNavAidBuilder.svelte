@@ -1,9 +1,4 @@
 <script>
-    import GroupLeader from "./GroupLeader.svelte";
-    import Group from "./Group.svelte";
-    import PersonList from "../../../../common/svelte/PersonList.svelte";
-    import {demoData} from "./demo-data";
-    import EntitySearchSelector from "../../../../common/svelte/EntitySearchSelector.svelte";
     import {model} from "./builderStore";
     import BuilderControl from "./control/BuilderControl.svelte";
     import PersonNavAid from "./PersonNavAid.svelte";
@@ -12,7 +7,7 @@
 
     function prettyHTML(html) {
         if (_.isNil(html)) return "";
-        const tab = '\t';
+        const tab = '    ';
         let result = '';
         let indent= '';
 

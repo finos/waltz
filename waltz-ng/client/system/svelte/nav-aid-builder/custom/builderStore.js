@@ -17,18 +17,22 @@ function nextId() {
 }
 
 function createModelStore() {
-    const {update, subscribe} = writable(demoData);
+    const {set, update, subscribe} = writable(demoData);
 
-    console.log("created store")
     return {
         subscribe,
+        reset: () => set(initialModel),
+
         addLeader: (p) => update(m => _.set(m, "leaders", _.concat(m.leaders, [p]))),
-        removeGroup: (groupId) => update( m => _.set(m, "groups", _.reject(m.groups, g => g.groupId === groupId))),
-        removeUnit: (unitId) => update( m => _.set(m, "units", _.reject(m.units, u => u.unitId === unitId))),
-        removePerson: (personId) => update( m => _.set(m, "people", _.reject(m.people, p => p.personId === personId))),
+        removeLeader: (personId) => update( m => _.set(m, "leaders", _.reject(m.leaders, p => p.personId === personId))),
+
         addGroup: (name) => update(m => _.set(m, "groups", _.concat(m.groups, [{groupId: nextId(), name}]))),
-        addUnit: (groupId, name) => update(m => _.set(m, "units", _.concat(m.units, [{groupId, unitId: nextId(), name}])))
-        // addUnitPerson: (name) => update(m => _.set(m, "leaderTitle", t))
+        removeGroup: (groupId) => update( m => _.set(m, "groups", _.reject(m.groups, g => g.groupId === groupId))),
+
+        addUnit: (groupId, name) => update(m => _.set(m, "units", _.concat(m.units, [{groupId, unitId: nextId(), name}]))),
+        removeUnit: (unitId) => update( m => _.set(m, "units", _.reject(m.units, u => u.unitId === unitId))),
+
+        removePerson: (personId) => update( m => _.set(m, "people", _.reject(m.people, p => p.personId === personId))),
     };
 }
 

@@ -7,8 +7,6 @@
 
     $: units = _.filter($model.units, u => u.groupId === group.groupId);
 
-    $: console.log({group, units})
-
 </script>
 
 

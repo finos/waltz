@@ -3,7 +3,7 @@
 import _ from "lodash";
 import Toggle from "../../../../../common/svelte/Toggle.svelte";
 import {model, RenderModes, renderModeStore} from "../builderStore";
-import LeaderControl from "./LeaderControl.svelte";
+import PersonControl from "./PersonControl.svelte";
 import Icon from "../../../../../common/svelte/Icon.svelte";
 
 function onRemoveGroup(group) {
@@ -19,19 +19,19 @@ function onRemovePerson(person) {
 }
 
 function onAddGroup() {
-    model.addGroup("Hello Group" + Math.random())
+    model.addGroup("Hello Group" + Math.random());
 }
 
 function onAddUnit(group) {
-    model.addUnit(group.groupId, "Hello Unit " + Math.random())
+    model.addUnit(group.groupId, "Hello Unit " + Math.random());
 }
 
 function onAddLeader() {
-    model.addLeader()
+    model.addLeader();
 }
 
-function onRemoveLeader(leader) {
-    model.addLeader()
+function onRemoveLeader(person) {
+    model.removeLeader(person.personId);
 }
 
 const Direction = {
@@ -40,7 +40,7 @@ const Direction = {
 };
 
 function onMoveGroup(group, direction) {
-    model.addUnit(group.groupId, "Hello Unit " + Math.random())
+    model.addUnit(group.groupId, "Hello Unit " + Math.random());
 }
 
 function onAddPerson(unit) {
@@ -64,8 +64,9 @@ function onAddPerson(unit) {
 </div>
 
 <div>
+
     <h4>Leader</h4>
-    <LeaderControl on:update={(evt) => model.setLeader(evt.detail)}/>
+    <PersonControl on:update={(evt) => model.setLeader(evt.detail)}/>
     <div class="help-block">
         The leader is a person and title to include at the head of the diagram
     </div>
@@ -81,7 +82,7 @@ function onAddPerson(unit) {
             <ul>
                 {#each $model.leaders as leader}
                     <li>
-                        {leader.person.name}
+                        {leader.person.name} ({leader.personId})
                         <button class="btn-skinny" on:click={() => onRemoveLeader(leader)}>
                             <Icon name="trash"/>
                         </button>

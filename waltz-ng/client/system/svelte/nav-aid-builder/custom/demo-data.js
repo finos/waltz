@@ -9,8 +9,8 @@ let marie = mkRef('PERSON', 28, "Marie L");
 
 export const demoData = {
     leaders: [
-        {person: boss, title: "Chief Technology, Data & Innovation Officer"},
-        {person: gil, title: "Co Chief"}
+        {personId: 1, person: boss, title: "Chief Technology, Data & Innovation Officer"},
+        {personId: 2, person: gil, title: "Co Chief"}
     ],
     groups: [
         {groupId: 1, name: "Functions"},
@@ -24,12 +24,12 @@ export const demoData = {
         {groupId: 2, unitId: 5, name: "Corporate Bank"}
     ],
     people: [
-        {unitId: 1, personId: 1, person: gil, title: "Chief Information Officer"},
-        {unitId: 2, personId: 2, person: gordon, title: "Chief Technology Officer"},
-        {unitId: 3, personId: 3, person: marie, title: "Chief Risk Officer"},
-        {unitId: 4, personId: 4, person: marcus, title: "Co Chief Information Officer - Private Bank"},
-        {unitId: 4, personId: 5, person: stefan, title: "Co Chief Information Officer - Private Bank"},
-        {unitId: 5, personId: 6, person: marcus, title: "Co Chief Information Officer - Corporate Bank"},
-        {unitId: 5, personId: 7, person: stefan, title: "Co Chief Information Officer - Corporate Bank"}
+        {unitId: 1, personId: 11, person: gil, title: "Chief Information Officer"},
+        {unitId: 2, personId: 12, person: gordon, title: "Chief Technology Officer"},
+        {unitId: 3, personId: 13, person: marie, title: "Chief Risk Officer"},
+        {unitId: 4, personId: 14, person: marcus, title: "Co Chief Information Officer - Private Bank"},
+        {unitId: 4, personId: 15, person: stefan, title: "Co Chief Information Officer - Private Bank"},
+        {unitId: 5, personId: 16, person: marcus, title: "Co Chief Information Officer - Corporate Bank"},
+        {unitId: 5, personId: 17, person: stefan, title: "Co Chief Information Officer - Corporate Bank"}
     ]
 };
