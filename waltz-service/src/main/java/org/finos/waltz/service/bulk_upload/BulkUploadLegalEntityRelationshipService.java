@@ -11,6 +11,7 @@ import org.finos.waltz.model.IdProvider;
 import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.assessment_rating.AssessmentRating;
 import org.finos.waltz.model.bulk_upload.ResolutionStatus;
+import org.finos.waltz.model.bulk_upload.ResolvedAssessmentHeaderStatus;
 import org.finos.waltz.model.bulk_upload.legal_entity_relationship.*;
 import org.finos.waltz.model.legal_entity.LegalEntityRelationship;
 import org.finos.waltz.model.legal_entity.LegalEntityRelationshipKind;
@@ -127,10 +128,11 @@ public class BulkUploadLegalEntityRelationshipService {
                 r -> tuple(r.targetEntityReference(), r.legalEntityReference()),
                 LegalEntityRelationship::entityReference);
 
-        List<AssessmentRating> existingAssessmentRatings = assessmentRatingService.findByEntityKind(EntityKind.LEGAL_ENTITY_RELATIONSHIP_KIND, Optional.of(relationshipKind.entityReference()));
+        List<AssessmentRating> existingAssessmentRatings = assessmentRatingService
+                .findByEntityKind(EntityKind.LEGAL_ENTITY_RELATIONSHIP_KIND, Optional.of(relationshipKind.entityReference()));
 
-        Map<Long, Collection<Tuple2<Long, Long>>> ratingsByRelationship = groupBy(existingAssessmentRatings,
-                d -> d.entityReference().id(),
+        Map<EntityReference, Collection<Tuple2<Long, Long>>> ratingsByRelationship = groupBy(existingAssessmentRatings,
+                AssessmentRating::entityReference,
                 d -> tuple(d.assessmentDefinitionId(), d.ratingId()));
 
         Set<String> targetIdentifiers = getColumnValuesFromRows(rows, LegalEntityBulkUploadFixedColumns.ENTITY_IDENTIFIER);
@@ -150,11 +152,11 @@ public class BulkUploadLegalEntityRelationshipService {
                             row,
                             existingRelToIdMap);
 
-                    Collection<Tuple2<Long, Long>> existingRatingInfo = relationship.relationshipId()
-                            .map(ratingsByRelationship::get)
-                            .orElse(emptySet());
+                    Tuple2<EntityReference, EntityReference> relKey = tuple(relationship.targetEntityReference().resolvedEntityReference().orElse(null), relationship.legalEntityReference().resolvedEntityReference().orElse(null));
+                    EntityReference existingRelReference = existingRelToIdMap.get(relKey);
+                    Collection<Tuple2<Long, Long>> existingRatingKeys = ratingsByRelationship.get(existingRelReference);
 
-                    Set<ResolvedAssessmentRating> assessments = resolveAssessments(assessmentHeaders, existingRatingInfo, row);
+                    Set<ResolvedAssessmentRating> assessments = resolveAssessments(assessmentHeaders, existingRatingKeys, row);
 
                     return ImmutableResolvedUploadRow.builder()
                             .rowNumber(row.getRowNum())
@@ -166,12 +168,22 @@ public class BulkUploadLegalEntityRelationshipService {
     }
 
     // For specific DEF / RATING cols, need to check over multiple cols for single value definitions
-    private Set<ResolvedAssessmentRating> assignDisallowedMultipleRatingsError(Set<ResolvedAssessmentRating> assessments) {
+    private Set<ResolvedAssessmentRating> assignDisallowedMultipleRatingsError(Set<ResolvedAssessmentHeader> resolvedAssessmentHeaders,
+                                                                               Set<ResolvedAssessmentRating> assessments) {
 
-        Map<AssessmentDefinition, List<ResolvedAssessmentRating>> ratingsByDefinitionForRow = assessments
+        Set<Optional<Long>> singleValuedDefIds = resolvedAssessmentHeaders.stream()
+                .filter(h -> h.resolvedAssessmentDefinition().map(d -> d.cardinality().equals(Cardinality.ZERO_ONE)).orElse(false))
+                .map(h -> h.resolvedAssessmentDefinition().get().id())
+                .collect(toSet());
+
+
+        ADD COLUMN OFFSET
+
+                assessments
                 .stream()
-                .filter(d -> d.assessmentHeader().headerDefinition().map(def -> def.cardinality().equals(Cardinality.ZERO_ONE)).orElse(false))
-                .collect(groupingBy(d -> d.assessmentHeader().headerDefinition().orElse(null)));
+                .flatMap(r -> r.resolvedRatings().stream())
+                .filter(r -> r.resolvedRating().isPresent())
+                .collect(groupingBy(d -> d.resolvedRatings()..headerDefinition().orElse(null)));
 
         Set<AssessmentDefinition> definitionsWithMultipleRatingsDisallowed = ratingsByDefinitionForRow
                 .entrySet()
@@ -225,7 +237,7 @@ public class BulkUploadLegalEntityRelationshipService {
                 .map(header -> {
                     String ratingValue = row.getValue(header.inputString());
 
-                    if (header.headerRating().isPresent() && !isEmpty(ratingValue)) {
+                    if (header.resolvedRating().isPresent() && !isEmpty(ratingValue)) {
                         return mkResolvedRatingForRatingColumn(header, ratingValue, existingRatingInfo);
                     } else {
                         return mkResolvedRatingForAssessmentDefinitionColumn(header, ratingValue, existingRatingInfo);
@@ -233,7 +245,7 @@ public class BulkUploadLegalEntityRelationshipService {
                 })
                 .collect(toSet());
 
-        return assignDisallowedMultipleRatingsError(assessmentRatingsForRow);
+        return assignDisallowedMultipleRatingsError(resolvedAssessmentHeaders, assessmentRatingsForRow);
     }
 
     private ResolvedAssessmentRating mkResolvedRatingForAssessmentDefinitionColumn(ResolvedAssessmentHeader header,
@@ -375,52 +387,41 @@ public class BulkUploadLegalEntityRelationshipService {
         return headers
                 .stream()
                 .filter(h -> !RELATIONSHIP_COL_HEADERS.contains(h))
-                .map(headerString -> determineAssessmentByOffset(headerString, definitionsByExternalId, definitionsByName, ratingSchemeItemsBySchemeId))
+                .map(headerString -> determineAssessment(headerString, definitionsByExternalId, definitionsByName, ratingSchemeItemsBySchemeId))
                 .collect(toSet());
     }
 
-    private ResolvedAssessmentHeader determineAssessmentByOffset(String headerString,
-                                                                 Map<String, AssessmentDefinition> definitionsByExternalId,
-                                                                 Map<String, AssessmentDefinition> definitionsByName,
-                                                                 Map<Long, Collection<RatingSchemeItem>> ratingSchemeItemsBySchemeId) {
-
-        Set<AssessmentHeaderResolutionError> errors = new HashSet<>();
-
-        if (isEmpty(headerString)) {
-            errors.add(mkError(NO_VALUE_PROVIDED, "Header assessment is not provided"));
-            return mkHeader(headerString, Optional.empty(), Optional.empty(), errors, ResolutionStatus.ERROR);
-        }
+    private ResolvedAssessmentHeader determineAssessment(String headerString,
+                                                         Map<String, AssessmentDefinition> definitionsByExternalId,
+                                                         Map<String, AssessmentDefinition> definitionsByName,
+                                                         Map<Long, Collection<RatingSchemeItem>> ratingSchemeItemsBySchemeId) {
 
         String[] assessmentHeader = headerString.split("/");
-
         String definitionString = safeTrim(idx(assessmentHeader, 0, null));
 
         if (isEmpty(definitionString)) {
-            errors.add(mkError(HEADER_DEFINITION_NOT_FOUND, "No assessment definition header provided"));
-            return mkHeader(headerString, Optional.empty(), Optional.empty(), errors, ResolutionStatus.ERROR);
+            return mkHeader(headerString, Optional.empty(), Optional.empty(), ResolvedAssessmentHeaderStatus.HEADER_DEFINITION_NOT_FOUND);
         }
 
         Optional<AssessmentDefinition> definition = determineDefinition(definitionsByExternalId, definitionsByName, definitionString);
 
         if (OptionalUtilities.isEmpty(definition)) {
-            errors.add(mkError(HEADER_DEFINITION_NOT_FOUND, format("Could not identify an assessment definition with external id or name '%s'", definitionString)));
-            return mkHeader(headerString, Optional.empty(), Optional.empty(), errors, ResolutionStatus.ERROR);
+            return mkHeader(headerString, Optional.empty(), Optional.empty(), ResolvedAssessmentHeaderStatus.HEADER_DEFINITION_NOT_FOUND);
         }
 
         String ratingString = safeTrim(idx(assessmentHeader, 1, null));
 
         if (isEmpty(ratingString)) {
-            return mkHeader(headerString, definition, Optional.empty(), errors, ResolutionStatus.NEW); //Does resolution status besides error matter for headers?
+            return mkHeader(headerString, definition, Optional.empty(), ResolvedAssessmentHeaderStatus.HEADER_RATING_NOT_FOUND);
         }
 
         Optional<RatingSchemeItem> rating = determineRating(ratingSchemeItemsBySchemeId, ratingString, definition);
 
         if (OptionalUtilities.isEmpty(rating)) {
-            errors.add(mkError(HEADER_RATING_NOT_FOUND, format("Could not identify an assessment rating with external id or name '%s'", ratingString)));
-            return mkHeader(headerString, definition, Optional.empty(), errors, ResolutionStatus.ERROR);
+            return mkHeader(headerString, definition, Optional.empty(), ResolvedAssessmentHeaderStatus.HEADER_RATING_NOT_FOUND);
         }
 
-        return mkHeader(headerString, definition, rating, errors, ResolutionStatus.NEW);
+        return mkHeader(headerString, definition, rating, ResolvedAssessmentHeaderStatus.HEADER_FOUND);
     }
 
     private Optional<RatingSchemeItem> determineRating(Map<Long, Collection<RatingSchemeItem>> ratingSchemeItemsBySchemeId,

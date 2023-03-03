@@ -11,9 +11,12 @@ import java.util.Set;
 @Value.Immutable
 @JsonSerialize(as = ImmutableResolveBulkUploadLegalEntityRelationshipParameters.class)
 @JsonDeserialize(as = ImmutableResolveBulkUploadLegalEntityRelationshipParameters.class)
-public abstract class ResolveBulkUploadLegalEntityRelationshipParameters {
+public abstract class ResolveBulkUploadLegalEntityRelationshipResponse {
 
     public abstract BulkUploadMode uploadMode();
-    public abstract Set<ResolvedUploadRow> resolvedRows();
+
+    public abstract Set<ResolvedUploadRow> rows();
+
+    public abstract Set<ResolvedAssessmentHeader> assessmentHeaders();
 
 }

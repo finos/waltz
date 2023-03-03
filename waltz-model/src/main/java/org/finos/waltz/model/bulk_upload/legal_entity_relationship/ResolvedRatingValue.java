@@ -15,12 +15,12 @@ import java.util.Set;
 @JsonDeserialize(as = ImmutableResolvedRatingValue.class)
 public abstract class ResolvedRatingValue {
 
-    public abstract Optional<RatingSchemeItem> rating(); //can be provided via header rating or listed in cell
+    public abstract Optional<RatingSchemeItem> resolvedRating(); //can be provided via header rating or listed in cell
 
     public abstract Optional<String> comment(); //can be provided if headerRatingId is present
 
-    public abstract Set<RatingResolutionError> errors();
-
     public abstract ResolutionStatus status();
+
+    public abstract Set<RatingResolutionError> errors();
 
 }

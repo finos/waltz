@@ -15,9 +15,9 @@ import java.util.Set;
 @JsonDeserialize(as = ImmutableResolvedLegalEntityRelationship.class)
 public abstract class ResolvedLegalEntityRelationship {
 
-    public abstract Optional<EntityReference> targetEntityReference();
+    public abstract ResolvedReference targetEntityReference();
 
-    public abstract Optional<EntityReference> legalEntityReference();
+    public abstract ResolvedReference legalEntityReference();
 
     public abstract Optional<String> comment();
 
@@ -25,6 +25,6 @@ public abstract class ResolvedLegalEntityRelationship {
 
     public abstract ResolutionStatus status();
 
-    public abstract Optional<Long> relationshipId(); // ?
+//    public abstract Optional<Long> relationshipId(); // ?
 
 }
