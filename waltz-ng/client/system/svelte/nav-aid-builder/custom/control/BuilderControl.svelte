@@ -1,7 +1,6 @@
 <script>
 
 import _ from "lodash";
-import EntitySearchSelector from "../../../../../common/svelte/EntitySearchSelector.svelte";
 import Toggle from "../../../../../common/svelte/Toggle.svelte";
 import {model, RenderModes, renderModeStore} from "../builderStore";
 import LeaderControl from "./LeaderControl.svelte";
@@ -24,6 +23,15 @@ function onAddGroup() {
 }
 
 function onAddUnit(group) {
+    model.addUnit(group.groupId, "Hello Unit " + Math.random())
+}
+
+const Direction = {
+    UP: -1,
+    DOWN: 1
+};
+
+function onMoveGroup(group, direction) {
     model.addUnit(group.groupId, "Hello Unit " + Math.random())
 }
 

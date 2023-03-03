@@ -17,7 +17,7 @@
                         href="person/id/{leader.person.id}">
             <div class="banner">
                 <div>
-                    {leader?.title}
+                    <strong>{leader?.title}</strong>
                 </div>
                 <div>
                     <EntityLabel ref={leader.person}
@@ -43,12 +43,12 @@
     }
 
     .navaid-leader.secondary .banner {
-        background-color: #5178e7;
-        color: #eee;
+        background-color: #e5e9fb;
+        color: #031452;
     }
 
     .navaid-leader.primary .banner {
-        background-color: #2956e0;
+        background-color: #1b3497;
         color: #eee;
     }
 </style>

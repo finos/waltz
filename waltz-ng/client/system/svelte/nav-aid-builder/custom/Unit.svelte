@@ -25,11 +25,12 @@
 <style>
     .navaid-unit {
         border: 1px solid #ccc;
-        margin: 2em 2em;
+        margin: 0.5em;
+        background-color: #e5e9fb;
     }
 
     .navaid-unit .unit-name {
-        background-color: #0b23ea;
+        background-color: #0293d0;
         color: #eee;
         text-align: center;
         padding: 0.2em;

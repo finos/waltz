@@ -27,14 +27,14 @@
 
 <style>
     .navaid-group {
-        border: 1px solid #ccc;
+        border: 1px solid #c5c9dc;
         margin: 1em 0;
 
     }
 
     .navaid-group .group-name {
         text-align: center;
-        background-color: #eee;
+        background-color: #e5e9fb;
         padding: 0.3em;
         width: 100%;
     }
