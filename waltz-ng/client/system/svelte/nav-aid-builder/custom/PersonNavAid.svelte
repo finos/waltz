@@ -11,7 +11,6 @@
                 <GroupLeader leader={leader}
                              scheme="primary"/>
             </div>
-
         {/each}
     </div>
     <div class="navaid-groups">

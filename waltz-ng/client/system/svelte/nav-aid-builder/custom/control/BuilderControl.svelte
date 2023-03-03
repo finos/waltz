@@ -1,51 +1,41 @@
 <script>
 
-import _ from "lodash";
-import Toggle from "../../../../../common/svelte/Toggle.svelte";
-import {model, RenderModes, renderModeStore} from "../builderStore";
-import PersonControl from "./PersonControl.svelte";
-import Icon from "../../../../../common/svelte/Icon.svelte";
+    import Toggle from "../../../../../common/svelte/Toggle.svelte";
+    import {model, RenderModes, renderModeStore} from "../builderStore";
+    import PersonControl from "./PersonControl.svelte";
+    import NavTree from "./NavTree.svelte";
 
-function onRemoveGroup(group) {
-    model.removeGroup(group.groupId);
-}
+    function onRemoveGroup(group) {
+        model.removeGroup(group.groupId);
+    }
 
-function onRemoveUnit(unit) {
-    model.removeUnit(unit.unitId);
-}
+    function onRemoveUnit(unit) {
+        model.removeUnit(unit.unitId);
+    }
 
-function onRemovePerson(person) {
-    model.removePerson(person.personId);
-}
+    function onRemovePerson(person) {
+        model.removePerson(person.personId);
+    }
 
-function onAddGroup() {
-    model.addGroup("Hello Group" + Math.random());
-}
+    function onAddGroup() {
+        model.addGroup("Hello Group" + Math.random());
+    }
 
-function onAddUnit(group) {
-    model.addUnit(group.groupId, "Hello Unit " + Math.random());
-}
+    function onAddUnit(group) {
+        model.addUnit(group.groupId, "Hello Unit " + Math.random());
+    }
 
-function onAddLeader() {
-    model.addLeader();
-}
+    function onAddLeader() {
+        model.addLeader();
+    }
 
-function onRemoveLeader(person) {
-    model.removeLeader(person.personId);
-}
+    function onRemoveLeader(person) {
+        model.removeLeader(person.personId);
+    }
 
-const Direction = {
-    UP: -1,
-    DOWN: 1
-};
+    function onAddPerson(unit) {
 
-function onMoveGroup(group, direction) {
-    model.addUnit(group.groupId, "Hello Unit " + Math.random());
-}
-
-function onAddPerson(unit) {
-
-}
+    }
 
 </script>
 
@@ -71,105 +61,19 @@ function onAddPerson(unit) {
         The leader is a person and title to include at the head of the diagram
     </div>
 
-    <ul class="group-header header-list">
-        <li>
-            <Icon name="user"/>
-            Leaders
-            <button class="btn-skinny" on:click={() => onAddLeader()}>
-                <Icon name="plus"/>
-                Add
-            </button>
-            <ul>
-                {#each $model.leaders as leader}
-                    <li>
-                        {leader.person.name} ({leader.personId})
-                        <button class="btn-skinny" on:click={() => onRemoveLeader(leader)}>
-                            <Icon name="trash"/>
-                        </button>
-                    </li>
-                {/each}
-            </ul>
-        </li>
-        <li>
-            <Icon name="cubes"/>
-            Groups
-            <button class="btn-skinny" on:click={() => onAddGroup()}>
-                <Icon name="plus"/>
-                Add
-            </button>
 
-            <ul class="group-list data-list">
-            {#each $model.groups as group}
-                <li>
-                    <button class="btn-skinny">{group.name}</button>
-                    <button class="btn-skinny" on:click={() => onRemoveGroup(group)}>
-                        <Icon name="trash"/>
-                    </button>
-                    <ul class="unit-header header-list">
-                        <li>
-                            <Icon name="cube"/>
-                            Units
-                            <button class="btn-skinny" on:click={() => onAddUnit(group)}>
-                                <Icon name="plus"/>
-                                Add
-                            </button>
-                            <ul class="unit-list data-list">
-                            {#each _.filter($model.units, u => u.groupId === group.groupId) as unit}
-                                <li>
-                                    {unit.name}
-                                    <button class="btn-skinny" on:click={() => onRemoveUnit(unit)}>
-                                        <Icon name="trash"/>
-                                    </button>
-                                </li>
-                                <ul class="people-header header-list">
-                                    <li>
-                                        <Icon name="users"/>
-                                        People
-                                        <Icon name="plus"/>
-                                        Add
-                                    </li>
-                                    <ul class="people-list data-list">
-                                    {#each _.filter($model.people, p => p.unitId === unit.unitId) as person}
-                                        <li>
-                                            {person.person.name}
-                                            <button class="btn-skinny" on:click={() => onRemovePerson(person)}>
-                                                <Icon name="trash"/>
-                                            </button>
-                                        </li>
-                                    {/each}
-                                    </ul>
-                                </ul>
-                            {/each}
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
-            {/each}
-            </ul>
-        </li>
-    </ul>
+
+    <NavTree on:addGroup={() => onAddGroup()}
+             on:removeGroup={(evt) => onRemoveGroup(evt.detail)}
+             on:addUnit={(evt) => onAddUnit(evt.detail)}
+             on:removeUnit={(evt) => onRemoveUnit(evt.detail)}
+             on:addLeader={(evt) => onAddLeader(evt.detail)}
+             on:removeLeader={(evt) => onRemoveLeader(evt.detail)}
+             on:addPerson={(evt) => onAddPerson(evt.detail)}
+             on:removePerson={(evt) => onRemovePerson(evt.detail)}/>
 </div>
 
 
 <style>
-    li {
-        list-style-type: none;
-    }
 
-    .header-list {
-        padding-left: 0.5em;
-        border-left: 1px dotted #ddd;
-    }
-
-    .data-list {
-        padding-left: 2em;
-    }
-
-    .data-list>li {
-        list-style-type: circle;
-    }
-
-    .header-list>li {
-        list-style-type: none;
-    }
 </style>

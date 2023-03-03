@@ -25,8 +25,6 @@
 
         return result.substring(1, result.length - 3);
     }
-
-    $: console.log({m: $model})
 </script>
 
 <div class="row">
