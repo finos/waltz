@@ -12,7 +12,8 @@
     <li>
         <Icon name="user"/>
         Leaders
-        <button class="btn-skinny" on:click={() => dispatch("addLeader")}>
+        <button class="btn-skinny"
+                on:click={() => dispatch("addLeader")}>
             <Icon name="plus"/>
             Add
         </button>
@@ -20,7 +21,8 @@
             {#each $model.leaders as leader}
                 <li>
                     {leader.person.name} ({leader.personId})
-                    <button class="btn-skinny" on:click={() => dispatch("removeLeader", leader)}>
+                    <button class="btn-skinny"
+                            on:click={() => dispatch("removeLeader", leader)}>
                         <Icon name="trash"/>
                     </button>
                 </li>
@@ -30,7 +32,8 @@
     <li>
         <Icon name="cubes"/>
         Groups
-        <button class="btn-skinny" on:click={() => dispatch("addGroup")}>
+        <button class="btn-skinny"
+                on:click={() => dispatch("addGroup")}>
             <Icon name="plus"/>
             Add
         </button>
@@ -39,14 +42,16 @@
             {#each $model.groups as group}
                 <li>
                     <button class="btn-skinny">{group.name}</button>
-                    <button class="btn-skinny" on:click={() => dispatch("removeGroup", group)}>
+                    <button class="btn-skinny"
+                            on:click={() => dispatch("removeGroup", group)}>
                         <Icon name="trash"/>
                     </button>
                     <ul class="header-list">
                         <li>
                             <Icon name="cube"/>
                             Units
-                            <button class="btn-skinny" on:click={() => dispatch("addUnit", group)}>
+                            <button class="btn-skinny"
+                                    on:click={() => dispatch("addUnit", group)}>
                                 <Icon name="plus"/>
                                 Add
                             </button>
@@ -54,7 +59,8 @@
                                 {#each _.filter($model.units, u => u.groupId === group.groupId) as unit}
                                     <li>
                                         {unit.name}
-                                        <button class="btn-skinny" on:click={() => dispatch("removeUnit", unit)}>
+                                        <button class="btn-skinny"
+                                                on:click={() => dispatch("removeUnit", unit)}>
                                             <Icon name="trash"/>
                                         </button>
                                     </li>
@@ -69,7 +75,8 @@
                                             {#each _.filter($model.people, p => p.unitId === unit.unitId) as person}
                                                 <li>
                                                     {person.person.name}
-                                                    <button class="btn-skinny" on:click={() => dispatch("removePerson", person)}>
+                                                    <button class="btn-skinny"
+                                                            on:click={() => dispatch("removePerson", person)}>
                                                         <Icon name="trash"/>
                                                     </button>
                                                 </li>
