@@ -8,7 +8,6 @@
     $: wrapperElem = $renderModeStore === RenderModes.DEV
         ? "span"
         : "a";
-
 </script>
 
 <div class="navaid-leader"
@@ -32,6 +31,7 @@
         </div>
     </svelte:element>
 </div>
+
 <style>
     .navaid-leader {
         text-align: center;

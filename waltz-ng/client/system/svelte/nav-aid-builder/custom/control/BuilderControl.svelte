@@ -1,7 +1,5 @@
 <script>
-
-    import Toggle from "../../../../../common/svelte/Toggle.svelte";
-    import {model, RenderModes, renderModeStore} from "../builderStore";
+    import {model} from "../builderStore";
     import NavTree from "./NavTree.svelte";
     import RemovalConfirmation from "./RemovalConfirmation.svelte";
     import BlockEditor from "./BlockEditor.svelte";
