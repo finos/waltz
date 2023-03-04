@@ -5,7 +5,9 @@
     export let leader = null;
     export let scheme = "secondary";
 
-    $: wrapperElem = $renderModeStore == RenderModes.DEV ? "span" : "a";
+    $: wrapperElem = $renderModeStore === RenderModes.DEV
+        ? "span"
+        : "a";
 
 </script>
 
