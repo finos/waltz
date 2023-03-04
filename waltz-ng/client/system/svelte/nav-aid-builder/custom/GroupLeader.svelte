@@ -14,26 +14,23 @@
 <div class="navaid-leader"
      class:primary={scheme === 'primary'}
      class:secondary={scheme === 'secondary'}>
-    {#if leader?.person}
-        <svelte:element this={wrapperElem}
-                        href="person/id/{leader.person.id}">
-            <div class="banner">
-                <div>
-                    <strong>{leader?.title}</strong>
-                </div>
-                <div>
-                    <EntityLabel ref={leader.person}
-                                 showIcon={false}/>
-                </div>
-            </div>
-        </svelte:element>
-    {:else}
+    <svelte:element this={wrapperElem}
+                    href="person/id/{leader.person?.id}">
         <div class="banner">
             <div>
-                {leader?.title || "?"}
+                <strong>{leader?.title}</strong>
+            </div>
+            <div>
+                {#if leader.person}
+                    <EntityLabel ref={leader.person}
+                                 showIcon={false}/>
+                {:else}
+                    <i>tbc</i>
+                {/if}
+
             </div>
         </div>
-    {/if}
+    </svelte:element>
 </div>
 <style>
     .navaid-leader {

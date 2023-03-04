@@ -16,7 +16,7 @@
 
 <hr>
 <div>
-    <button class="btn btn-success"
+    <button class="btn btn-primary"
             on:click={() => dispatch("confirm", params)}>
         Save
     </button>

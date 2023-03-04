@@ -135,30 +135,24 @@
     }
 
     function onAddLeader() {
-        model.addLeader({title: "hello", person: {id: 1323, name: "Bob"}});
+        showPersonEditor({
+            message: `Add Leader`,
+            data: {title: "TBC", person: null},
+            action: (d) => model.addLeader(d)
+        });
     }
 
     function onAddPerson(unit) {
-
+        showPersonEditor({
+            message: `Add person to ${unit.name}`,
+            data: {title: "TBC", person: null, unitId: unit.unitId},
+            action: (d) => model.addPerson(d)
+        });
     }
 
 </script>
 
 
-<label for="render-mode-toggle">
-    Render Mode
-</label>
-<span id="render-mode-toggle">
-    <Toggle id="foo"
-            state={$renderModeStore === RenderModes.LIVE}
-            labelOn="Live Mode"
-            labelOff="Dev Mode"
-            onToggle={() => renderModeStore.toggle()}/>
-    <div class="help-block">
-        Render mode determines whether to have clickable
-        regions being actual links, or used to focus
-    </div>
-</span>
 
 <div>
     {#if mode === Modes.VIEW}

@@ -6,9 +6,6 @@
 
     const dispatch = createEventDispatcher();
 
-    console.log("Here we are")
-
-    $: console.log({params})
 </script>
 
 
@@ -21,15 +18,24 @@
        type="text"
        bind:value={params.data.title}
        placeholder="Title"/>
+<div class="help-block small">
+    The title of the person, e.g. Chief Information Officer
+</div>
 
-<!--<label for="leaderPerson">-->
-<!--    Person-->
-<!--</label>-->
 
-<!--<span id="leaderPerson">-->
-<!--    <EntitySearchSelector entityKinds={["PERSON"]}-->
-<!--                          on:select={evt => miniModel.person = evt.detail}/>-->
-<!--</span>-->
+
+<label style="padding-top: 1.2em;"
+       for="leaderPerson">
+    Person
+</label>
+
+<div id="leaderPerson">
+    <EntitySearchSelector entityKinds={["PERSON"]}
+                          on:select={evt => params.data.person = evt.detail}/>
+</div>
+<div class="help-block small">
+    The person holding this title
+</div>
 
 <hr>
 

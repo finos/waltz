@@ -43,7 +43,11 @@
                     <Icon name="user"/>
                     <button class="btn-skinny"
                             on:click={() => dispatch("editLeader", leader)}>
-                        {leader.person.name}
+                        {#if leader.person}
+                            {leader.person.name}
+                        {:else}
+                            <i>tbc</i>
+                        {/if}
                     </button>
                     <button class="btn-skinny"
                             on:click={() => dispatch("removeLeader", leader)}>
@@ -97,8 +101,11 @@
                                     <ul class="header-list">
                                         <li>
                                             <span class="section-label">People</span>
-                                            <Icon name="plus"/>
-                                            Add
+                                            <button class="btn-skinny"
+                                                    on:click={() => dispatch("addPerson", unit)}>
+                                                <Icon name="plus"/>
+                                                Add
+                                            </button>
                                         </li>
                                         <ul class="people-list data-list">
                                             {#each _.filter($model.people, p => p.unitId === unit.unitId) as person}
@@ -106,7 +113,11 @@
                                                     <Icon name="user"/>
                                                     <button class="btn-skinny"
                                                             on:click={() => dispatch("editPerson", person)}>
-                                                        {person.person.name}
+                                                        {#if person.person}
+                                                            {person.person.name}
+                                                        {:else}
+                                                            <i>tbc</i>
+                                                        {/if}
                                                     </button>
                                                     <button class="btn-skinny"
                                                             on:click={() => dispatch("removePerson", person)}>
