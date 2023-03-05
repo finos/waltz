@@ -1,6 +1,6 @@
 <script>
     import GroupLeader from "./GroupLeader.svelte";
-    import {model} from "./builderStore";
+    import {model, renderMode, RenderModes as RenderMode} from "./builderStore";
 
     export let unit = null;
     let people = [];
@@ -15,8 +15,15 @@
     <div class="people">
         {#each people as p}
             <div class="person-wrapper">
-                <GroupLeader leader={p}
-                             scheme={"secondary"}/>
+                {#if $renderMode === RenderMode.DEV}
+                    <GroupLeader leader={p}
+                                 scheme="primary"/>
+                {:else}
+                    <a href="person/id/{p.person?.id}">
+                        <GroupLeader leader={p}
+                                     scheme="primary"/>
+                    </a>
+                {/if}
             </div>
         {/each}
     </div>

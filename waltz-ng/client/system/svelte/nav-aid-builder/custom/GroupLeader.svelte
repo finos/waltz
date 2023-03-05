@@ -1,35 +1,27 @@
 <script>
     import EntityLabel from "../../../../common/svelte/EntityLabel.svelte";
-    import {RenderModes, renderModeStore} from "./builderStore";
 
     export let leader = null;
     export let scheme = "secondary";
-
-    $: wrapperElem = $renderModeStore === RenderModes.DEV
-        ? "span"
-        : "a";
 </script>
 
 <div class="navaid-leader"
      class:primary={scheme === 'primary'}
      class:secondary={scheme === 'secondary'}>
-    <svelte:element this={wrapperElem}
-                    href="person/id/{leader.person?.id}">
-        <div class="banner">
-            <div>
-                <strong>{leader?.title}</strong>
-            </div>
-            <div>
-                {#if leader.person}
-                    <EntityLabel ref={leader.person}
-                                 showIcon={false}/>
-                {:else}
-                    <i>tbc</i>
-                {/if}
-
-            </div>
+    <div class="banner">
+        <div>
+            <strong>{leader?.title}</strong>
         </div>
-    </svelte:element>
+        <div>
+            {#if leader.person}
+                <EntityLabel ref={leader.person}
+                             showIcon={false}/>
+            {:else}
+                <i>tbc</i>
+            {/if}
+
+        </div>
+    </div>
 </div>
 
 <style>

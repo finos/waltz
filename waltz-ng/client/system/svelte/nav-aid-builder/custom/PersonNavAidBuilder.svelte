@@ -1,19 +1,21 @@
 <script>
-    import {model} from "./builderStore";
+    import {model, RenderModes, renderMode} from "./builderStore";
     import BuilderControl from "./control/BuilderControl.svelte";
     import PersonNavAid from "./PersonNavAid.svelte";
+    import Toggle from "../../../../common/svelte/Toggle.svelte";
 
-    let viz = null;
+    let vizElem = null;
+    let html = "";
 
-    function prettyHTML(html) {
-        if (_.isNil(html)) {
+    function prettyHTML(elemHtml) {
+        if (_.isNil(elemHtml)) {
             return "";
         }
         const tab = "    ";
         let result = "";
         let indent= "";
 
-        html
+        elemHtml
             .split(/>\s*</)
             .forEach(function(element) {
                 if (element.match( /^\/\w/ )) {
@@ -29,11 +31,17 @@
 
         return result.substring(1, result.length - 3);
     }
+
+    $: html = $model && vizElem && $renderMode
+        ? prettyHTML(vizElem.innerHTML)
+        : "";
+
 </script>
+
 
 <div class="row">
     <div class="col-sm-8">
-        <div bind:this={viz}>
+        <div bind:this={vizElem}>
             <PersonNavAid/>
         </div>
     </div>
@@ -47,7 +55,22 @@
 
 <div class="row">
     <div class="col-md-6">
-        <pre>{prettyHTML(viz?.innerHTML)}</pre>
+        <label for="render-mode-toggle">
+            Render Mode
+        </label>
+        <div id="render-mode-toggle">
+            <Toggle id="foo"
+                    state={$renderMode === RenderModes.LIVE}
+                    labelOn="Live Mode (with links)"
+                    labelOff="Dev Mode (without links)"
+                    onToggle={() => renderMode.toggle()}/>
+            <div class="help-block">
+                Render mode determines whether to have clickable
+                regions being actual links, or used to focus
+            </div>
+        </div>
+
+        <pre>{html}</pre>
     </div>
     <div class="col-md-6">
         <pre>{JSON.stringify($model, "", 2)}</pre>

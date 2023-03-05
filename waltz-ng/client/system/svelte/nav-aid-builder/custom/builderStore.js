@@ -93,7 +93,7 @@ function createLikelyPeopleStore() {
     };
 }
 
-export const renderModeStore = createRenderModeStore();
+export const renderMode = createRenderModeStore();
 export const model = createModelStore();
 export const likelyPeople = createLikelyPeopleStore();
 
