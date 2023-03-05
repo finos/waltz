@@ -1,7 +1,7 @@
 import {mkRef} from "../../../../common/entity-utils";
 
-let boss = mkRef('PERSON', 23, "Big B. Boss");
-let gil = mkRef('PERSON', 24, "Gil P");
+let boss = mkRef('PERSON', 3, "Big B. Boss");
+let gil = mkRef('PERSON', 4, "Gil P");
 let gordon = mkRef('PERSON', 25, "Gordon M");
 let stefan = mkRef('PERSON', 26, "Stefan P");
 let marcus = mkRef('PERSON', 27, "Marcus H");

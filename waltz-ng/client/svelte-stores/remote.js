@@ -44,7 +44,11 @@ class Cache {
     }
 
     set(key, d) {
-        return this.cacheData.get(key).set({ data: d, error: null, status: "loaded" })
+        const storeValue = { data: d, error: null, status: "loaded" };
+        const existingWritable = this.cacheData.get(key);
+        return existingWritable
+            ? existingWritable.set(storeValue)
+            : this.cacheData.set(key, writable(storeValue))
     }
 
     err(key, e, d) {

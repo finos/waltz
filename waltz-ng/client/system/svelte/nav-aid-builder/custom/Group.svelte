@@ -24,6 +24,10 @@
 </div>
 
 <style>
+
+    .group-name {
+        font-weight: bold;
+    }
     .navaid-group {
         border: 1px solid #c5c9dc;
         margin: 1em 0;

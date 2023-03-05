@@ -1,5 +1,6 @@
 import {writable} from "svelte/store";
 import {demoData} from "./demo-data";
+import {personStore} from "../../../../svelte-stores/person-store";
 
 function generateUUID() { // Public Domain/MIT
     let d = new Date().getTime();//Timestamp
@@ -78,5 +79,22 @@ function createRenderModeStore() {
 }
 
 
+function createLikelyPeopleStore() {
+    const {subscribe, set} = writable([])
+
+    model.subscribe($model => {
+        const personIds = _.map($model.leaders, d => d.person.id);
+        let call = personStore.findDirectsForPersonIds(personIds);
+        call.subscribe(d => set(d.data));
+    });
+
+    return {
+        subscribe
+    };
+}
+
 export const renderModeStore = createRenderModeStore();
 export const model = createModelStore();
+export const likelyPeople = createLikelyPeopleStore();
+
+likelyPeople.subscribe(() => {});
