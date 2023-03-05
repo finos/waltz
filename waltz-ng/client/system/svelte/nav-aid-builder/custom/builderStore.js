@@ -25,10 +25,11 @@ const initialModel = {
         people: []//  { personId, unitId, personRef }
 };
 
-function ensureId(d, prop) {
+function fixupPerson(d, prop) {
     if (!d[prop]) {
         d[prop] = generateUUID();
     }
+
     return d;
 }
 
@@ -39,7 +40,7 @@ function createModelStore() {
         subscribe,
         reset: () => set(initialModel),
 
-        addLeader: (p) => update(m => _.set(m, "leaders", _.concat(m.leaders, [ensureId(p, "personId")]))),
+        addLeader: (p) => update(m => _.set(m, "leaders", _.concat(m.leaders, [fixupPerson(p, "personId")]))),
         removeLeader: (personId) => update( m => _.set(m, "leaders", _.reject(m.leaders, p => p.personId === personId))),
         updateLeader: (newPerson) => update( m => _.set(m, "leaders", _.map(m.leaders, existing => existing.personId === newPerson.personId ? newPerson : existing))),
 
@@ -51,7 +52,7 @@ function createModelStore() {
         removeUnit: (unitId) => update( m => _.set(m, "units", _.reject(m.units, u => u.unitId === unitId))),
         updateUnit: (newUnit) => update(m => _.set(m, "units", _.map(m.units, existing => existing.unitId === newUnit.unitId ? newUnit : existing))),
 
-        addPerson: (p) => update(m => _.set(m, "people", _.concat(m.people, [ensureId(p, "personId")]))),
+        addPerson: (p) => update(m => _.set(m, "people", _.concat(m.people, [fixupPerson(p, "personId")]))),
         removePerson: (personId) => update( m => _.set(m, "people", _.reject(m.people, p => p.personId === personId))),
         updatePerson: (newPerson) => update( m => _.set(m, "people", _.map(m.people, existing => existing.personId === newPerson.personId ? newPerson : existing))),
     };

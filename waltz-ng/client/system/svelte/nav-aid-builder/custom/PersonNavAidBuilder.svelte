@@ -32,9 +32,13 @@
         return result.substring(1, result.length - 3);
     }
 
-    $: html = $model && vizElem && $renderMode
-        ? prettyHTML(vizElem.innerHTML)
-        : "";
+    $: {
+        if ($model && vizElem && $renderMode) {
+            // using a timeout to give innerHTML chance to be updated
+            // before we copy it
+            setTimeout(() => html = prettyHTML(vizElem.innerHTML));
+        }
+    }
 
 </script>
 

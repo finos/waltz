@@ -7,6 +7,16 @@
     export let params;
 
     const dispatch = createEventDispatcher();
+
+    function trimPerson(p) {
+        return {
+            name: p.name,
+            employeeId: p.employeeId,
+            id: p.id,
+            kind: p.kind
+        };
+    }
+
 </script>
 
 
@@ -42,7 +52,7 @@
         {#each $likelyPeople as person}
             <li>
                 <button class="btn-skinny"
-                        on:click={() =>  params.data.person = person}>
+                        on:click={() =>  params.data.person = trimPerson(person)}>
                     {person.name}
                 </button>
             </li>
@@ -54,7 +64,7 @@
     Or pick anyone:
     <div id="leaderPerson">
         <EntitySearchSelector entityKinds={["PERSON"]}
-                              on:select={evt => params.data.person = evt.detail}/>
+                              on:select={evt => params.data.person = trimPerson(evt.detail)}/>
     </div>
     <div class="help-block small">
         The person holding this title

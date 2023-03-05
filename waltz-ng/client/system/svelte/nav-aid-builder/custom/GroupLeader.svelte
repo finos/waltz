@@ -3,12 +3,26 @@
 
     export let leader = null;
     export let scheme = "secondary";
+
+    let color = "#eee";
+    let backgroundColor = '#1b3497';
+
+    $: color = scheme === 'primary'
+        ? "#eee"
+        : "#031452";
+
+    $: backgroundColor = scheme === 'primary'
+        ? "#1b3497"
+        : "#e5e9fb";
+
 </script>
 
-<div class="navaid-leader"
+<div style="text-align: center"
      class:primary={scheme === 'primary'}
      class:secondary={scheme === 'secondary'}>
-    <div class="banner">
+    <div style="padding:0.5em"
+         style:background-color={backgroundColor}
+         style:color>
         <div>
             <strong>{leader?.title}</strong>
         </div>
@@ -23,24 +37,4 @@
         </div>
     </div>
 </div>
-
-<style>
-    .navaid-leader {
-        text-align: center;
-    }
-
-    .navaid-leader .banner {
-        padding: 0.5em;
-    }
-
-    .navaid-leader.secondary .banner {
-        background-color: #e5e9fb;
-        color: #031452;
-    }
-
-    .navaid-leader.primary .banner {
-        background-color: #1b3497;
-        color: #eee;
-    }
-</style>
 

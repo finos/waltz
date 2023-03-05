@@ -8,13 +8,17 @@
     $: people = _.filter($model.people, p => p.unitId === unit.unitId);
 </script>
 
-<div class="navaid-unit">
-    <div class="unit-name">
+<div class="navaid-unit"
+     style="border: 1px solid #ccc; margin: 0.5em; background-color: #e5e9fb;">
+    <div class="unit-name"
+         style="background-color: #0293d0; color: #eee; text-align: center; padding: 0.2em;">
         {unit.name}
     </div>
-    <div class="people">
+    <div class="people"
+         style=" display: flex; flex-direction: row; justify-content: space-evenly;">
         {#each people as p}
-            <div class="person-wrapper">
+            <div class="person-wrapper"
+                 style="padding: 1em;">
                 {#if $renderMode === RenderMode.DEV}
                     <GroupLeader leader={p}
                                  scheme="primary"/>
@@ -28,28 +32,3 @@
         {/each}
     </div>
 </div>
-
-<style>
-    .navaid-unit {
-        border: 1px solid #ccc;
-        margin: 0.5em;
-        background-color: #e5e9fb;
-    }
-
-    .navaid-unit .unit-name {
-        background-color: #0293d0;
-        color: #eee;
-        text-align: center;
-        padding: 0.2em;
-    }
-
-    .navaid-unit .people {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-evenly;
-    }
-
-    .navaid-unit .person-wrapper {
-        padding: 1em;
-    }
-</style>
