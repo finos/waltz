@@ -101,4 +101,4 @@ SPDX-License-Identifier: [Apache-2.0](https://spdx.org/licenses/Apache-2.0)
 
 ## Security Reporting
 
-Please refere to the Waltz [Security Policy](SECURITY.md) page.
+Please refer to the Waltz [Security Policy](SECURITY.md) page.
