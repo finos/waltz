@@ -351,9 +351,6 @@
             <properties>
                 <playwright.skip>false</playwright.skip>
             </properties>
-            <modules>
-                <module>waltz-integration-test</module>
-            </modules>
         </profile>
 
         <profile>
