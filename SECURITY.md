@@ -36,3 +36,13 @@ process, involving the following steps:
   * Audit code to find any potential similar problems.
   * Prepare fixes for all releases still under maintenance. These fixes
     will be released as fast as possible.
+  
+## Current Known Vulvnerabilities
+
+Below is a list of vulnerabilites we are aware of.  
+Each vulnerability is given a Waltz rating based upon how we _know_ the code is used within the Waltz database.
+
+| Vulnerability | Java/JS | Waltz Severity | Status |
+| --- | --- | --- | --- | 
+| h2  | Java | Low | No fix currently available (2023-Q1).  Not severe as only used for in-memory integration testing |
+| sparkframework | Java | Medium | Fix available but breaks Tomcat deployment (2023-Q1) | 
