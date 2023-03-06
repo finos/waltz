@@ -3,8 +3,14 @@
 This document outlines security procedures and general policies for the
 Waltz Open Source project as found on https://github.com/finos/waltz.
 
+  * [Responsible Disclosure](#responsible-disclosure)
   * [Reporting a Vulnerability](#reporting-a-vulnerability)
   * [Disclosure Policy](#disclosure-policy)
+
+## Responsible Disclosure
+
+As a FINOS project Waltz falls under the standard [FINOS Security Vulnerabilities Responsible Disclosure Policy](https://community.finos.org/docs/governance/software-projects/cve-responsible-disclosure/).
+
 
 ## Reporting a Vulnerability 
 
@@ -13,18 +19,7 @@ seriously. Thank you for improving the security of our open source
 software. We appreciate your efforts and responsible disclosure and will
 make every effort to acknowledge your contributions.
 
-Report security vulnerabilities by emailing the FINOS security team at:
-    
-    security@finos.com
-
-The lead maintainer will acknowledge your email within 48 hours, and will
-send a more detailed response within 72 hours indicating the next steps in 
-handling your report. After the initial reply to your report, the security
-team will endeavor to keep you informed of the progress towards a fix and
-full announcement, and may ask for additional information or guidance.
-
-Report security vulnerabilities in third-party modules to the person or 
-team maintaining the module.
+For more information on reporting a vulnerability see: [Submit a new security vulnerability](https://community.finos.org/docs/governance/software-projects/cve-responsible-disclosure/#submit-a-new-security-vulnerability)
 
 ## Disclosure Policy
 
