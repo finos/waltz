@@ -1,4 +1,5 @@
 <waltz-section icon='shield'
+               data-testid="flow-classification-rule-list"
                name="Flow Classification Rules">
 
     <div class="waltz-section-actions">
@@ -43,6 +44,7 @@
 
     <div ng-if="$ctrl.viewMode==='LIST' && $ctrl.canEdit">
         <button class="btn-link"
+                data-testid="create-rule"
                 ng-click="$ctrl.create()">
             <waltz-icon name="plus"></waltz-icon>
             Add new Flow Classification Rule
