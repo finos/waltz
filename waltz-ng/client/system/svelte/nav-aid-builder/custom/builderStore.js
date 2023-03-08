@@ -18,12 +18,14 @@ function generateUUID() { // Public Domain/MIT
     });
 }
 
+
 const initialModel = {
         leaders: [], // { person: ref, title: str }
         groups: [], // {groupId, name}
         units: [], // {unitId, name, groupId }
         people: []//  { personId, unitId, personRef }
 };
+
 
 function fixupPerson(d, prop) {
     if (!d[prop]) {
