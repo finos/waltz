@@ -1,6 +1,7 @@
 package org.finos.waltz.test_common.playwright.flow_classification_rule;
 
 import com.microsoft.playwright.Locator;
+import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.test_common.helpers.AppHelper;
 import org.finos.waltz.test_common.helpers.DataTypeHelper;
 import org.finos.waltz.test_common.playwright.BasePlaywrightIntegrationTest;
@@ -11,8 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
+import static java.lang.String.format;
 import static org.finos.waltz.common.StringUtilities.mkPath;
-import static org.finos.waltz.test_common.playwright.PlaywrightUtilities.*;
+import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
+import static org.finos.waltz.test_common.helpers.NameHelper.toName;
+import static org.finos.waltz.test_common.playwright.PlaywrightUtilities.login;
 
 public class RuleCreationTest extends BasePlaywrightIntegrationTest {
 
@@ -22,10 +27,15 @@ public class RuleCreationTest extends BasePlaywrightIntegrationTest {
     @Autowired
     private DataTypeHelper dataTypeHelper;
 
+    private EntityReference appRef = null;
 
     @BeforeEach
     public void setupAssessmentData() throws IOException {
         login(page, BASE);
+        appRef = appHelper.createNewApp(
+                mkName("FlowClassificationRule", "create"),
+                10L);
+
         page.navigate(mkPath(BASE, "data-types"));
     }
 
@@ -56,13 +66,13 @@ public class RuleCreationTest extends BasePlaywrightIntegrationTest {
         formLocator
                 .locator("#source")
                 .locator(".autocomplete-input")
-                .fill("test");
+                .fill(toName(appRef));
 
         Locator appLocator = screenshotHelper.takePageSnapshot(
                 formLocator
                         .locator("#source")
                         .locator(".autocomplete-list-item")
-                        .locator("text=Application"),
+                        .locator(format("text=%s", toName(appRef))),
                 "3_select_app.png");
 
         appLocator.click();
@@ -104,17 +114,30 @@ public class RuleCreationTest extends BasePlaywrightIntegrationTest {
                 .click();
 
         page.locator(".waltz-flow-classification-rules-table input")
-                .fill("Test Application");
+                .fill(toName(appRef));
 
         screenshotHelper.takePageSnapshot(
                 page.locator(".waltz-flow-classification-rules-table"),
                 "7_result.png");
 
-        Thread.sleep(400);
-        takeScreenshot(page, "screenshots/flow-classification-rule/a.png");
+        Thread.sleep(1000);
+
+        page.locator(".waltz-flow-classification-rules-table .waltz-entity-icon-label")
+                .first()
+                .click();
+
+        Thread.sleep(1000);
+
+        screenshotHelper.takePageSnapshot(
+                page.locator(".waltz-flow-classification-rules-table"),
+                "8_view.png");
+
+        assertThat(page.getByTestId("source")).containsText(toName(appRef));
+        assertThat(page.getByTestId("data-type")).containsText("Book Data");
+        assertThat(page.getByTestId("scope")).containsText("CEO Office");
+
 
     }
-
 
 
 }
