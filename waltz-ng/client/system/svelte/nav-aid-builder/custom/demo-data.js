@@ -1,16 +1,16 @@
 import {mkRef} from "../../../../common/entity-utils";
 
 let boss = mkRef('PERSON', 3, "Big B. Boss");
-let gil = mkRef('PERSON', 4, "Gil P");
-let gordon = mkRef('PERSON', 25, "Gordon M");
-let stefan = mkRef('PERSON', 26, "Stefan P");
-let marcus = mkRef('PERSON', 27, "Marcus H");
-let marie = mkRef('PERSON', 28, "Marie L");
+let hilma = mkRef('PERSON', 4, "Hilma K");
+let tracey = mkRef('PERSON', 25, "Tracey E");
+let andy = mkRef('PERSON', 26, "Andy W");
+let jackson = mkRef('PERSON', 27, "Jackson P");
+let mary = mkRef('PERSON', 28, "Mary C");
 
 export const demoData = {
     leaders: [
         {personId: 1, person: boss, title: "Chief Technology, Data & Innovation Officer"},
-        {personId: 2, person: gil, title: "Co Chief"}
+        {personId: 2, person: hilma, title: "Co Chief"}
     ],
     groups: [
         {groupId: 1, name: "Functions"},
@@ -24,12 +24,12 @@ export const demoData = {
         {groupId: 2, unitId: 5, name: "Corporate Bank"}
     ],
     people: [
-        {unitId: 1, personId: 11, person: gil, title: "Chief Information Officer"},
-        {unitId: 2, personId: 12, person: gordon, title: "Chief Technology Officer"},
-        {unitId: 3, personId: 13, person: marie, title: "Chief Risk Officer"},
-        {unitId: 4, personId: 14, person: marcus, title: "Co Chief Information Officer - Private Bank"},
-        {unitId: 4, personId: 15, person: stefan, title: "Co Chief Information Officer - Private Bank"},
-        {unitId: 5, personId: 16, person: marcus, title: "Co Chief Information Officer - Corporate Bank"},
-        {unitId: 5, personId: 17, person: stefan, title: "Co Chief Information Officer - Corporate Bank"}
+        {unitId: 1, personId: 11, person: hilma, title: "Chief Information Officer"},
+        {unitId: 2, personId: 12, person: tracey, title: "Chief Technology Officer"},
+        {unitId: 3, personId: 13, person: mary, title: "Chief Risk Officer"},
+        {unitId: 4, personId: 14, person: jackson, title: "Co Chief Information Officer - Private Bank"},
+        {unitId: 4, personId: 15, person: andy, title: "Co Chief Information Officer - Private Bank"},
+        {unitId: 5, personId: 16, person: jackson, title: "Co Chief Information Officer - Corporate Bank"},
+        {unitId: 5, personId: 17, person: andy, title: "Co Chief Information Officer - Corporate Bank"}
     ]
 };
