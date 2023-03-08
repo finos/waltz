@@ -5,7 +5,7 @@ import ViewLink from "../../../common/svelte/ViewLink.svelte";
 import TaxonomyNavAidBuilder from "./TaxonomyNavAidBuilder.svelte";
 import DataTypeNavAidBuilder from "./DataTypeNavAidBuilder.svelte";
 import MeasurableCategoryNavAidBuilder from "./MeasurableCategoryNavAidBuilder.svelte";
-import PersonNavAidBuilder from "./PersonNavAidBuilder.svelte";
+import PersonNavAidBuilder from "./custom/PersonNavAidBuilder.svelte";
 
 const Modes = {
     NONE: {},

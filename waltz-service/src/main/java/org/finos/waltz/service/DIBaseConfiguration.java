@@ -118,8 +118,10 @@ public class DIBaseConfiguration {
                 .set(dataSource)
                 .set(SQLDialect.valueOf(dialect))
                 .set(dslSettings)
-                .set(new SlowQueryListener(databasePerformanceQuerySlowThreshold))
-                .set(new SpringExceptionTranslationExecuteListener(new SQLStateSQLExceptionTranslator()));
+                .set(
+                    //new SlowDatabaseConnectionSimulator(2000),
+                    new SlowQueryListener(databasePerformanceQuerySlowThreshold),
+                    new SpringExceptionTranslationExecuteListener(new SQLStateSQLExceptionTranslator()));
 
         return DSL.using(configuration);
     }
