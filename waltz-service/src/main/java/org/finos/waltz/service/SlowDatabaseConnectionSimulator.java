@@ -23,6 +23,7 @@ import org.finos.waltz.common.RandomUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.jooq.ExecuteContext;
 import org.jooq.impl.DefaultExecuteListener;
+import org.jooq.lambda.Unchecked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,13 +43,9 @@ public class SlowDatabaseConnectionSimulator extends DefaultExecuteListener {
 
     @Override
     public void fetchStart(ExecuteContext ctx) {
-        try {
-            if (shouldGoSlow(ctx)) {
-                Thread.sleep(RandomUtilities.randomLongBetween(0, maxDelayInMillis));
-            }
-        } catch (InterruptedException ex) {
-            throw new RuntimeException(ex);
-        }
+        Unchecked
+            .runnable(() -> Thread.sleep(RandomUtilities.randomLongBetween(0, maxDelayInMillis)))
+            .run();
     }
 
     private Set<String> goSlowTables = SetUtilities.fromArray(
