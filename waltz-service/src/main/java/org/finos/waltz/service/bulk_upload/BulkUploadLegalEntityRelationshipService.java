@@ -5,6 +5,7 @@ import org.finos.waltz.data.EntityAliasPopulator;
 import org.finos.waltz.model.*;
 import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.assessment_rating.AssessmentRating;
+import org.finos.waltz.model.bulk_upload.BulkUploadMode;
 import org.finos.waltz.model.bulk_upload.ResolutionStatus;
 import org.finos.waltz.model.bulk_upload.ResolvedAssessmentHeaderStatus;
 import org.finos.waltz.model.bulk_upload.legal_entity_relationship.*;
@@ -14,6 +15,7 @@ import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.service.assessment_definition.AssessmentDefinitionService;
 import org.finos.waltz.service.assessment_rating.AssessmentRatingService;
 import org.finos.waltz.service.bulk_upload.TabularDataUtilities.Row;
+import org.finos.waltz.service.bulk_upload.column_parsers.ColumnParser;
 import org.finos.waltz.service.legal_entity.LegalEntityRelationshipKindService;
 import org.finos.waltz.service.legal_entity.LegalEntityRelationshipService;
 import org.finos.waltz.service.rating_scheme.RatingSchemeService;
@@ -24,6 +26,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
@@ -82,6 +85,23 @@ public class BulkUploadLegalEntityRelationshipService {
         this.assessmentRatingService = assessmentRatingService;
     }
 
+    public ResolveBulkUploadLegalEntityRelationshipResponse save(BulkUploadLegalEntityRelationshipCommand uploadCommand) {
+
+        ResolveBulkUploadLegalEntityRelationshipResponse resolvedCmd = resolve(uploadCommand);
+
+        Set<ResolvedLegalEntityRelationship> relationships = map(resolvedCmd.rows(), d -> d.legalEntityRelationship());
+        handeRelationships(relationships, resolvedCmd.uploadMode());
+
+        System.out.println("Hi");
+        return null;
+    }
+
+    private void handeRelationships(Set<ResolvedLegalEntityRelationship> rows, BulkUploadMode uploadMode) {
+//        Make sure that we add a remove column to the speadsheet (optional) spto remove need for two modes / less chance of accidetly killing everything
+
+    }
+
+
     public ResolveBulkUploadLegalEntityRelationshipResponse resolve(BulkUploadLegalEntityRelationshipCommand uploadCommand) {
 
         LegalEntityRelationshipKind relKind = legalEntityRelationshipKindService.getById(uploadCommand.legalEntityRelationshipKindId());
@@ -124,6 +144,8 @@ public class BulkUploadLegalEntityRelationshipService {
         Map<String, EntityReference> targetIdentifierToIdMap = loadTargetIdentifierToReference(rows, relationshipKind);
         Map<String, EntityReference> legalEntityIdentifierToIdMap = loadLegalEntityIdentifierToReference(rows);
 
+        Set<ColumnParser> columnParsers = map(assessmentHeaders, ColumnParser::mkColumnParser);
+
         return rows
                 .stream()
                 .map(row -> {
@@ -139,7 +161,7 @@ public class BulkUploadLegalEntityRelationshipService {
                             .map(ref -> relationshipToExistingRatingsMap.getOrDefault(ref, emptySet()))
                             .orElse(emptySet());
 
-                    Set<AssessmentCell> assessments = resolveAssessments(row, assessmentHeaders, existingRatingsForRel);
+                    Set<AssessmentCell> assessments = resolveAssessments(row, columnParsers, existingRatingsForRel);
 
                     return ImmutableResolvedUploadRow.builder()
                             .rowNumber(row.getRowNum())
@@ -186,15 +208,18 @@ public class BulkUploadLegalEntityRelationshipService {
     }
 
     // For specific DEF / RATING cols, need to check over multiple cols for single value definitions
-    private Set<AssessmentCell> assignDisallowedMultipleRatingsError(Set<AssessmentHeaderCell> resolvedAssessmentHeaders,
+    private Set<AssessmentCell> assignDisallowedMultipleRatingsError(Set<ColumnParser> columnParsers,
                                                                      Set<AssessmentCell> assessments) {
 
-        Set<Long> singleValuedDefIds = resolvedAssessmentHeaders.stream()
+        Set<AssessmentHeaderCell> headers = map(columnParsers, ColumnParser::getHeader);
+
+        Set<Long> singleValuedDefIds = headers
+                .stream()
                 .filter(h -> h.resolvedAssessmentDefinition().map(d -> d.cardinality().equals(Cardinality.ZERO_ONE)).orElse(false))
                 .map(h -> h.resolvedAssessmentDefinition().get().id().get())
                 .collect(toSet());
 
-        Map<Integer, Long> definitionIdByColIdx = indexBy(resolvedAssessmentHeaders,
+        Map<Integer, Long> definitionIdByColIdx = indexBy(headers,
                 AssessmentHeaderCell::columnId,
                 d -> d.resolvedAssessmentDefinition().map(def -> def.id().get()).orElse(null));
 
@@ -211,7 +236,9 @@ public class BulkUploadLegalEntityRelationshipService {
                 .flatMap(kv -> kv.getValue().stream())
                 .collect(toSet());
 
-        RatingResolutionError multipleRatingsDisallowedError = RatingResolutionError.mkError(RatingResolutionErrorCode.MULTIPLE_RATINGS_DISALLOWED, "There have been multiple ratings specified for a single value assessment definition");
+        RatingResolutionError multipleRatingsDisallowedError = RatingResolutionError.mkError(
+                RatingResolutionErrorCode.MULTIPLE_RATINGS_DISALLOWED,
+                "There have been multiple ratings specified for a single value assessment definition");
 
         return map(
                 assessments,
@@ -256,23 +283,19 @@ public class BulkUploadLegalEntityRelationshipService {
     }
 
     private Set<AssessmentCell> resolveAssessments(Row row,
-                                                   Set<AssessmentHeaderCell> resolvedAssessmentHeaders,
+                                                   Set<ColumnParser> columnParsers,
                                                    Collection<Tuple2<Long, Long>> existingRatingsForRel) {
 
-        Set<AssessmentCell> assessmentRatingsForRow = resolvedAssessmentHeaders
+        Set<AssessmentCell> assessmentRatingsForRow = columnParsers
                 .stream()
-                .map(header -> {
-                    String ratingValue = row.getValue(header.inputString());
-
-                    if (header.resolvedRating().isPresent() && !isEmpty(ratingValue)) {
-                        return mkResolvedRatingForRatingColumn(header, ratingValue, existingRatingsForRel);
-                    } else {
-                        return mkResolvedRatingForAssessmentDefinitionColumn(header, ratingValue, existingRatingsForRel);
-                    }
+                .map(parser -> {
+                    String cellValue = row.getValue(parser.getHeader().inputString());
+                    return parser.apply(mkSafe(cellValue), existingRatingsForRel);
                 })
+                .filter(Objects::nonNull)
                 .collect(toSet());
 
-        return assignDisallowedMultipleRatingsError(resolvedAssessmentHeaders, assessmentRatingsForRow);
+        return assignDisallowedMultipleRatingsError(columnParsers, assessmentRatingsForRow);
     }
 
     private AssessmentCell mkResolvedRatingForAssessmentDefinitionColumn(AssessmentHeaderCell header,
@@ -289,7 +312,9 @@ public class BulkUploadLegalEntityRelationshipService {
                 ";",
                 ratingString -> {
 
-                    Optional<RatingSchemeItem> rating = ofNullable(header.ratingLookupMap().get(ratingString.trim()));
+                    String lookupValue = sanitize(ratingString);
+
+                    Optional<RatingSchemeItem> rating = ofNullable(header.ratingLookupMap().get(lookupValue));
 
                     if (OptionalUtilities.isEmpty(rating)) {
                         errors.add(RatingResolutionError.mkError(RatingResolutionErrorCode.RATING_VALUE_NOT_FOUND, format("Could not identify rating value from: '%s'", ratingString)));
@@ -310,6 +335,10 @@ public class BulkUploadLegalEntityRelationshipService {
                 .columnId(header.columnId())
                 .ratings(ratings)
                 .build();
+    }
+
+    private String sanitize(String ratingString) {
+        return safeTrim(ratingString.toLowerCase());
     }
 
     private AssessmentCell mkResolvedRatingForRatingColumn(AssessmentHeaderCell header,
@@ -419,9 +448,9 @@ public class BulkUploadLegalEntityRelationshipService {
         Map<String, AssessmentDefinition> definitionsByExternalId = definitions
                 .stream()
                 .filter(d -> d.externalId().isPresent())
-                .collect(Collectors.toMap(d -> d.externalId().get().toLowerCase(), d -> d));
+                .collect(Collectors.toMap(d -> sanitize(d.externalId().get()), d -> d));
 
-        Map<String, AssessmentDefinition> definitionsByName = indexBy(definitions, d -> d.name().toLowerCase(), d -> d);
+        Map<String, AssessmentDefinition> definitionsByName = indexBy(definitions, d -> sanitize(d.name()), d -> d);
 
         Map<Long, Set<RatingSchemeItem>> ratingSchemeItemsBySchemeId = groupAndThen(
                 ratingSchemeService.getAllRatingSchemeItems(),
@@ -463,18 +492,10 @@ public class BulkUploadLegalEntityRelationshipService {
         String ratingString = safeTrim(idx(assessmentHeader, 1, null));
 
         if (isEmpty(ratingString)) {
-            return mkHeader(headerString, definition, Optional.empty(), ResolvedAssessmentHeaderStatus.HEADER_RATING_NOT_FOUND, schemeItems, colIdx);
+            return mkHeader(headerString, definition, Optional.empty(), ResolvedAssessmentHeaderStatus.HEADER_FOUND, schemeItems, colIdx);
         }
 
-        Map<String, RatingSchemeItem> ratingSchemeItemsByName = indexBy(schemeItems, NameProvider::name);
-        Map<String, RatingSchemeItem> ratingSchemeItemsByExternalId = schemeItems
-                .stream()
-                .filter(d -> d.externalId().isPresent())
-                .collect(Collectors.toMap(k -> k.externalId().get(), v -> v));
-
-        Map<String, RatingSchemeItem> ratingSchemeItemsByLookupString = merge(ratingSchemeItemsByName, ratingSchemeItemsByExternalId);
-
-        Optional<RatingSchemeItem> rating = ofNullable(ratingSchemeItemsByLookupString.get(ratingString));
+        Optional<RatingSchemeItem> rating = determineRating(schemeItems, ratingString);
 
         if (OptionalUtilities.isEmpty(rating)) {
             return mkHeader(headerString, definition, Optional.empty(), ResolvedAssessmentHeaderStatus.HEADER_RATING_NOT_FOUND, schemeItems, colIdx);
@@ -483,12 +504,32 @@ public class BulkUploadLegalEntityRelationshipService {
         return mkHeader(headerString, definition, rating, ResolvedAssessmentHeaderStatus.HEADER_FOUND, schemeItems, colIdx);
     }
 
+    private Optional<RatingSchemeItem> determineRating(Set<RatingSchemeItem> schemeItems, String ratingString) {
+
+        Map<String, RatingSchemeItem> ratingSchemeItemsByName = indexBy(schemeItems, d -> sanitize(d.name()));
+        Map<String, RatingSchemeItem> ratingSchemeItemsByCode = indexBy(schemeItems, d -> sanitize(d.rating()));
+        Map<String, RatingSchemeItem> ratingSchemeItemsByExternalId = schemeItems
+                .stream()
+                .filter(d -> d.externalId().isPresent())
+                .collect(Collectors.toMap(k -> sanitize(k.externalId().get()), v -> v));
+
+        Map<String, RatingSchemeItem> ratingSchemeItemsByLookupString = merge(
+                ratingSchemeItemsByName,
+                ratingSchemeItemsByCode,
+                ratingSchemeItemsByExternalId);
+
+        String lookupString = sanitize(ratingString);
+
+        return ofNullable(ratingSchemeItemsByLookupString.get(lookupString));
+    }
+
     private Optional<AssessmentDefinition> determineDefinition(Map<String, AssessmentDefinition> definitionsByExternalId, Map<String, AssessmentDefinition> definitionsByName, String definitionString) {
+        String lookupString = sanitize(definitionString);
         return ofNullable(
                 definitionsByExternalId
                         .getOrDefault(
-                                definitionString.toLowerCase(),
-                                definitionsByName.get(definitionString.toLowerCase())));
+                                lookupString,
+                                definitionsByName.get(lookupString)));
     }
 
 

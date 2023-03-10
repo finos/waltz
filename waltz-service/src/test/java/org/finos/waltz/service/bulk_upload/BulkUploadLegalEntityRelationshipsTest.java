@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.finos.waltz.common.CollectionUtilities.first;
 import static org.finos.waltz.common.SetUtilities.asSet;
@@ -23,6 +24,10 @@ public class BulkUploadLegalEntityRelationshipsTest {
 
     private static final String INCLUDING_EMPTY_STRING = "App Id, , Comment\n" +
             "12345, ABCD, TestComment";
+
+
+    private static final String TAB_SEPARATED = "A\tB\t\tD";
+    private static final String COMMA_SEPARATED = "A,B,,D";
 
     @Test
     public void throwsExceptionWhenNoDataProvided() {
@@ -77,6 +82,30 @@ public class BulkUploadLegalEntityRelationshipsTest {
 
         Set<String> columns = BulkUploadUtilities.getColumnValuesFromInputString(SIMPLE_TEST_STRING, 0);
         assertEquals(asSet("App Id", "12345"), columns, "Should return correct values for column offset");
+    }
+
+
+    @Test
+    public void streamRowsFromCommaSeparatedInputString() {
+
+        Set<TabularRow> rows = streamRowData(COMMA_SEPARATED).collect(Collectors.toSet());
+        assertEquals(1, rows.size(), "Should return one row");
+
+        TabularRow firstRow = rows.stream().findFirst().get();
+
+        assertEquals(4, firstRow.values().length, "Should return values for each comma separation");
+    }
+
+
+    @Test
+    public void streamRowsFromTabSeparatedInputString() {
+
+        Set<TabularRow> rows = streamRowData(TAB_SEPARATED).collect(Collectors.toSet());
+        assertEquals(1, rows.size(), "Should return one row");
+
+        TabularRow firstRow = rows.stream().findFirst().get();
+
+        assertEquals(4, firstRow.values().length, "Should return values for each tab separation");
     }
 
 }

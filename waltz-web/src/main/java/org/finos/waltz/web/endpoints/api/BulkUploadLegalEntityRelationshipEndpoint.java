@@ -70,6 +70,7 @@ public class BulkUploadLegalEntityRelationshipEndpoint implements Endpoint {
     public void register() {
 
         postForDatum(mkPath(BASE_URL, "resolve"), this::resolveRoute);
+        postForDatum(mkPath(BASE_URL, "save"), this::saveRoute);
 
     }
 
@@ -79,6 +80,15 @@ public class BulkUploadLegalEntityRelationshipEndpoint implements Endpoint {
 
         LOG.info("User: {} resolving bulk upload: {}", username, uploadCmd);
         return service.resolve(uploadCmd);
+    }
+
+
+    private ResolveBulkUploadLegalEntityRelationshipResponse saveRoute(Request request, Response response) throws IOException {
+        BulkUploadLegalEntityRelationshipCommand uploadCmd = readBody(request, BulkUploadLegalEntityRelationshipCommand.class);
+        String username = getUsername(request);
+
+        LOG.info("User: {} resolving bulk upload: {}", username, uploadCmd);
+        return service.save(uploadCmd);
     }
 
     private void ensureUserHasAdminRights(long legalEntityRelationshipKindId, String username) {

@@ -43,13 +43,14 @@ public abstract class AssessmentHeaderCell {
                                                 Set<RatingSchemeItem> ratingSchemeItems,
                                                 int columnId) {
 
-        Map<String, RatingSchemeItem> ratingSchemeItemsByName = MapUtilities.indexBy(ratingSchemeItems, d -> d.name());
+        Map<String, RatingSchemeItem> ratingSchemeItemsByName = MapUtilities.indexBy(ratingSchemeItems, d -> d.name().toLowerCase());
+        Map<String, RatingSchemeItem> ratingSchemeItemsByCode = MapUtilities.indexBy(ratingSchemeItems, d -> d.rating().toLowerCase());
         Map<String, RatingSchemeItem> ratingSchemeItemsByExternalId = ratingSchemeItems
                 .stream()
                 .filter(d -> d.externalId().isPresent())
-                .collect(toMap(d -> d.externalId().get(), v -> v));
+                .collect(toMap(d -> d.externalId().get().toLowerCase(), v -> v));
 
-        Map<String, RatingSchemeItem> ratingLookipMap = MapUtilities.merge(ratingSchemeItemsByName, ratingSchemeItemsByExternalId);
+        Map<String, RatingSchemeItem> ratingLookipMap = MapUtilities.merge(ratingSchemeItemsByName, ratingSchemeItemsByCode, ratingSchemeItemsByExternalId);
 
         return ImmutableAssessmentHeaderCell.builder()
                 .resolvedAssessmentDefinition(defn)

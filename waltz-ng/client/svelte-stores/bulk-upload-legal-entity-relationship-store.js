@@ -27,8 +27,16 @@ export function mkBulkUploadLegalEntityRelationshipStore() {
             resolveParams);
     };
 
+    const save = (saveParams) => {
+        return remote.execute(
+            "POST",
+            "api/bulk-upload-legal-entity-relationships/save",
+            saveParams);
+    };
+
     return {
-        resolve
+        resolve,
+        save
     };
 }
 

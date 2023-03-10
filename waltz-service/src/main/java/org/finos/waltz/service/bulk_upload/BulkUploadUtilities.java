@@ -26,7 +26,7 @@ public class BulkUploadUtilities {
                 .filter(StringUtilities::notEmpty)
                 .filter(r -> !r.startsWith("#"))
                 .map(r -> {
-                    String delimiters = "[,\\t|]+";
+                    String delimiters = "[,\\t|]";
                     return r.split(delimiters);
                 })
                 .map(r -> ImmutableTabularRow.builder()

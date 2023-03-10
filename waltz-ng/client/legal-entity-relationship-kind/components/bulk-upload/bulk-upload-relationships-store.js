@@ -3,7 +3,8 @@ import {writable} from "svelte/store";
 export const Modes = {
     INPUT: "INPUT",
     LOADING: "LOADING",
-    RESOLVED: "RESOLVED"
+    RESOLVED: "RESOLVED",
+    REPORT: "REPORT"
 }
 
 export const UploadModes = {

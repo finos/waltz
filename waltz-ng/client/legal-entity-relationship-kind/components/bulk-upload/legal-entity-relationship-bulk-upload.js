@@ -1,6 +1,6 @@
 import template from "./legal-entity-relationship-bulk-upload.html";
 import {initialiseData} from "../../../common";
-import BulkUploadLegalEntityRelationshipsPanel from "./BulkUploadLeagelEntityRelationshipsPanel.svelte";
+import BulkUploadLegalEntityRelationshipsPanel from "./BulkUploadLegalEntityRelationshipsPanel.svelte";
 import {resolvedRows, activeMode, Modes, resolveResponse} from "./bulk-upload-relationships-store";
 import _ from "lodash";
 
@@ -28,20 +28,20 @@ function controller($scope, serviceBroker) {
     const unsubResp = resolveResponse.subscribe((d) => {
         $scope.$applyAsync(() => {
 
-            vm.rows = _.map(d.rows, r => Object.assign(
-                {},
-                r,
-                {cellsByColumn: _.keyBy(r.assessmentRatings, d => `COL_${d.columnId}`)}));
+            // vm.rows = _.map(d.rows, r => Object.assign(
+            //     {},
+            //     r,
+            //     {cellsByColumn: _.keyBy(r.assessmentRatings, d => `COL_${d.columnId}`)}));
+            //
+            // console.log({rows: vm.rows});
+            //
+            // const assessmentColDefs = _.map(d.assessmentHeaders, d => mkAssessmentColumnDef(d));
+            //
+            // vm.columnDefs = _.concat(
+            //     relColumnDefs,
+            //     assessmentColDefs);
 
-            console.log({rows: vm.rows});
-
-            const assessmentColDefs = _.map(d.assessmentHeaders, d => mkAssessmentColumnDef(d));
-
-            vm.columnDefs = _.concat(
-                relColumnDefs,
-                assessmentColDefs);
-
-            console.log({cols: vm.columnDefs});
+            // console.log({cols: vm.columnDefs});
         });
     });
 
