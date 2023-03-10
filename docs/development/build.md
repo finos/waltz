@@ -96,7 +96,7 @@ Below are some example maven command lines.  We typically register the command a
 ```
 alias compile-postgres='mvn clean compile -P waltz-postgres,dev-postgres'
 alias compile-mssql='mvn clean compile -P waltz-mssql,dev-mssql'
-alias pkg-postgres='mvn clean package -P waltz-postrgres,dev-postgres'
+alias pkg-postgres='mvn clean package -P waltz-postgres,dev-postgres'
 alias pkg-mssql='mvn clean package -P waltz-mssql,dev-mssql'
 ```
 
