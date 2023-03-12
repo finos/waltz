@@ -46,11 +46,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.mapping;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
 import static org.finos.waltz.schema.Tables.DATABASE_USAGE;
 import static org.finos.waltz.schema.tables.DatabaseInformation.DATABASE_INFORMATION;
 import static org.finos.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
@@ -76,6 +78,21 @@ public class DatabaseInformationDao implements SearchDao<DatabaseInformation> {
                 .endOfLifeDate(record.getEndOfLifeDate())
                 .lifecycleStatus(LifecycleStatus.valueOf(record.getLifecycleStatus()))
                 .build();
+    };
+
+
+    public final static Function<DatabaseInformation, DatabaseInformationRecord> TO_RECORD_MAPPER = d -> {
+        DatabaseInformationRecord r = new DatabaseInformationRecord();
+        r.setInstanceName(d.instanceName());
+        r.setDatabaseName(d.databaseName());
+        r.setDbmsName(d.dbmsName());
+        r.setDbmsVendor(d.dbmsVendor());
+        r.setDbmsVersion(d.dbmsVersion());
+        r.setEndOfLifeDate(toSqlDate(d.endOfLifeDate()));
+        r.setExternalId(d.externalId().orElse(null));
+        r.setProvenance(d.provenance());
+        r.setLifecycleStatus(d.lifecycleStatus().name());
+        return r;
     };
 
 
@@ -144,16 +161,16 @@ public class DatabaseInformationDao implements SearchDao<DatabaseInformation> {
                 .environmentCounts(JooqUtilities.calculateStringTallies(dbInfo, environmentInner))
                 .endOfLifeStatusCounts(JooqUtilities.calculateStringTallies(dbInfo, eolStatusInner))
                 .build();
-
     }
+
 
     public DatabaseInformation getById(long id) {
         return dsl.select(DATABASE_INFORMATION.fields())
                 .from(DATABASE_INFORMATION)
                 .where(DATABASE_INFORMATION.ID.eq(id))
                 .fetchOne(DATABASE_RECORD_MAPPER);
-
     }
+
 
     public DatabaseInformation getByExternalId(String externalId) {
         return dsl.select(DATABASE_INFORMATION.fields())
@@ -175,13 +192,26 @@ public class DatabaseInformationDao implements SearchDao<DatabaseInformation> {
 
             Condition externalIdCondition = JooqUtilities.mkStartsWithTermSearch(DATABASE_INFORMATION.EXTERNAL_ID, terms);
             Condition nameCondition = JooqUtilities.mkBasicTermSearch(DATABASE_INFORMATION.DATABASE_NAME, terms);
+            Condition instanceCondition = JooqUtilities.mkBasicTermSearch(DATABASE_INFORMATION.INSTANCE_NAME, terms);
 
             return dsl
                     .select(DATABASE_INFORMATION.fields())
                     .from(DATABASE_INFORMATION)
-                    .where(externalIdCondition.or(nameCondition))
+                    .where(externalIdCondition
+                            .or(nameCondition)
+                            .or(instanceCondition))
                     .orderBy(DATABASE_INFORMATION.DATABASE_NAME)
                     .limit(options.limit())
                     .fetch(DATABASE_RECORD_MAPPER);
+    }
+
+
+    public Long createDatabase(DatabaseInformation info) {
+        DatabaseInformationRecord r = TO_RECORD_MAPPER.apply(info);
+
+        r.attach(dsl.configuration());
+        r.store();
+
+        return r.getId();
     }
 }

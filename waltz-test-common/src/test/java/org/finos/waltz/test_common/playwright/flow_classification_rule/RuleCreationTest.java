@@ -129,7 +129,7 @@ public class RuleCreationTest extends BasePlaywrightIntegrationTest {
         Thread.sleep(1000);
 
         screenshotHelper.takePageSnapshot(
-                page.locator(".waltz-flow-classification-rules-table"),
+                page.getByTestId("source"),
                 "8_view.png");
 
         assertThat(page.getByTestId("source")).containsText(toName(appRef));

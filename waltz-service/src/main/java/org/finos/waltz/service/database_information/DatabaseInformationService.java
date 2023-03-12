@@ -73,4 +73,8 @@ public class DatabaseInformationService {
     public List<DatabaseInformation> search(EntitySearchOptions options) {
         return databaseInformationDao.search(options);
     }
+
+    public Long createDatabase(DatabaseInformation info) {
+        return databaseInformationDao.createDatabase(info);
+    }
 }
