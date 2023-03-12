@@ -18,34 +18,46 @@
 
 package org.finos.waltz.data.database_information;
 
-import org.finos.waltz.schema.tables.records.DatabaseInformationRecord;
 import org.finos.waltz.data.JooqUtilities;
+import org.finos.waltz.data.SearchDao;
+import org.finos.waltz.data.SearchUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.LifecycleStatus;
 import org.finos.waltz.model.database_information.DatabaseInformation;
 import org.finos.waltz.model.database_information.DatabaseSummaryStatistics;
 import org.finos.waltz.model.database_information.ImmutableDatabaseInformation;
 import org.finos.waltz.model.database_information.ImmutableDatabaseSummaryStatistics;
-import org.jooq.*;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
+import org.finos.waltz.schema.tables.records.DatabaseInformationRecord;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.RecordMapper;
+import org.jooq.Result;
+import org.jooq.Select;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.mapping;
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.schema.Tables.DATABASE_USAGE;
 import static org.finos.waltz.schema.tables.DatabaseInformation.DATABASE_INFORMATION;
 import static org.finos.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.mapping;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository
-public class DatabaseInformationDao {
+public class DatabaseInformationDao implements SearchDao<DatabaseInformation> {
 
     private final DSLContext dsl;
 
@@ -149,5 +161,27 @@ public class DatabaseInformationDao {
                 .where(DATABASE_INFORMATION.EXTERNAL_ID.eq(externalId))
                 .fetchOne(DATABASE_RECORD_MAPPER);
 
+    }
+
+
+    @Override
+    public List<DatabaseInformation> search(EntitySearchOptions options) {
+            checkNotNull(options, "options cannot be null");
+            List<String> terms = SearchUtilities.mkTerms(options.searchQuery());
+
+            if (terms.isEmpty()) {
+                return Collections.emptyList();
+            }
+
+            Condition externalIdCondition = JooqUtilities.mkStartsWithTermSearch(DATABASE_INFORMATION.EXTERNAL_ID, terms);
+            Condition nameCondition = JooqUtilities.mkBasicTermSearch(DATABASE_INFORMATION.DATABASE_NAME, terms);
+
+            return dsl
+                    .select(DATABASE_INFORMATION.fields())
+                    .from(DATABASE_INFORMATION)
+                    .where(externalIdCondition.or(nameCondition))
+                    .orderBy(DATABASE_INFORMATION.DATABASE_NAME)
+                    .limit(options.limit())
+                    .fetch(DATABASE_RECORD_MAPPER);
     }
 }
