@@ -16,17 +16,14 @@
  *
  */
 
-import _ from "lodash";
-import {initialiseData, invokeFunction} from "../../common";
+import {initialiseData, invokeFunction, termSearch} from "../../common";
 import template from './actor-selector.html';
 
 
 const bindings = {
-    allActors: '<',
-    onSelect: '<'
+    allActors: "<",
+    onSelect: "<"
 };
-
-
 
 
 const initialState = {
@@ -39,13 +36,19 @@ function controller() {
     const vm = initialiseData(this, initialState);
 
     vm.refresh = function (query) {
-        if (!query) return;
-        const queryLc = _.lowerCase(query);
-        vm.actors = _.filter(vm.allActors, (a) => _.startsWith(_.lowerCase(a.name), queryLc));
+        if (!query) {
+            return;
+        }
+        vm.actors = termSearch(
+            vm.allActors,
+            query,
+            ["name", "externalId"]);
     };
 
     vm.select = (item) => {
-        invokeFunction(vm.onSelect, Object.assign(item, {kind: 'ACTOR'}));
+        invokeFunction(
+            vm.onSelect,
+            Object.assign({}, item, {kind: "ACTOR"}));
     };
 }
 
