@@ -2,6 +2,7 @@ package org.finos.waltz.test_common.playwright;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.playwright.APIResponse;
+import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.RequestOptions;
 import org.finos.waltz.model.EntityReference;
@@ -17,11 +18,19 @@ import static org.finos.waltz.common.StringUtilities.mkPath;
 public class PlaywrightUtilities {
 
     public static void takeScreenshot(Page page,
-                                        String path) {
+                                      String path) {
         log("Taking a screenshot: %s", path);
         page.screenshot(new Page
                 .ScreenshotOptions()
                 .setPath(Paths.get(path)));
+    }
+
+
+    public static void waitAndTakeScreenshot(Page page,
+                                             Locator locator,
+                                             String imagePath) {
+        locator.waitFor();
+        takeScreenshot(page, imagePath);
     }
 
 
