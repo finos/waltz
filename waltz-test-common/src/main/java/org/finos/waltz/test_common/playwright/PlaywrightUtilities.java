@@ -93,4 +93,16 @@ public class PlaywrightUtilities {
             appRef.name().orElse("Un-named App"),
             appRef.id());
     }
+
+
+
+    public static void startSiteSearch(Page page,
+                                       String qry) {
+        page.locator(".navbar-right")
+                .getByTestId("search-button")
+                .click();
+
+        page.locator(".wnso-search-region  input[type=search]")
+                .fill(qry);
+    }
 }

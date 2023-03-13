@@ -27,6 +27,9 @@ public class ScreenshotHelper {
 
 
     public Locator takePageSnapshot(Locator locator, String name) {
+
+        locator.waitFor();
+
         page.screenshot(new Page
                 .ScreenshotOptions()
                 .setPath(Paths.get(mkPath(basePath, name))));
