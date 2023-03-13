@@ -1,5 +1,6 @@
 package org.finos.waltz.data.legal_entity;
 
+import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -10,14 +11,21 @@ import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.common.SetUtilities.map;
+import static org.finos.waltz.common.StringUtilities.notEmpty;
+import static org.finos.waltz.data.JooqUtilities.summarizeResults;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.schema.Tables.*;
-import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 
 @Repository
 public class LegalEntityRelationshipDao {
@@ -46,6 +54,27 @@ public class LegalEntityRelationshipDao {
                 .provenance(record.getProvenance())
                 .isReadOnly(record.getIsReadonly())
                 .build();
+    };
+
+    private static final Function<LegalEntityRelationship, LegalEntityRelationshipRecord> TO_RECORD_MAPPER = d -> {
+
+        LegalEntityRelationshipRecord r = new LegalEntityRelationshipRecord();
+
+        d.id().ifPresent(r::setId);
+        r.setLegalEntityId(d.legalEntityReference().id());
+        r.setTargetId(d.targetEntityReference().id());
+        r.setTargetKind(d.targetEntityReference().kind().name());
+        r.setRelationshipKindId(d.relationshipKindId());
+        r.setExternalId(d.externalId().orElse(null));
+        r.setDescription(d.description());
+        r.setLastUpdatedAt(Timestamp.valueOf(d.lastUpdatedAt()));
+        r.setLastUpdatedBy(d.lastUpdatedBy());
+        r.setProvenance(d.provenance());
+        r.setIsReadonly(d.isReadOnly());
+
+        r.changed(LEGAL_ENTITY_RELATIONSHIP.ID, false);
+
+        return r;
     };
 
     @Autowired
@@ -78,5 +107,41 @@ public class LegalEntityRelationshipDao {
     public Set<LegalEntityRelationship> findByRelationshipKind(long relKindId) {
         Condition relationshipKindCondition = LEGAL_ENTITY_RELATIONSHIP.RELATIONSHIP_KIND_ID.eq(relKindId);
         return findByCondition(relationshipKindCondition);
+    }
+
+    public int bulkAdd(DSLContext tx, Set<LegalEntityRelationship> relationships) {
+
+        Set<LegalEntityRelationshipRecord> recordsToInsert = map(relationships, TO_RECORD_MAPPER);
+
+        int[] insertedRcs = tx.batchInsert(recordsToInsert).execute();
+
+        return summarizeResults(insertedRcs);
+    }
+
+    public int bulkUpdate(DSLContext tx, Set<LegalEntityRelationship> relationships) {
+
+        int[] updatedRcs = relationships
+                .stream()
+                .map(TO_RECORD_MAPPER)
+                .peek(r -> r.changed(LEGAL_ENTITY_RELATIONSHIP.DESCRIPTION, notEmpty(r.getDescription()))) // prevent overwriting comment
+                .collect(collectingAndThen(
+                        toSet(),
+                        tx::batchUpdate))
+                .execute();
+
+        return summarizeResults(updatedRcs);
+    }
+
+    public int bulkRemove(DSLContext tx, Set<LegalEntityRelationship> relationships) {
+
+        int[] deletedRcs = relationships
+                .stream()
+                .map(d -> tx
+                        .deleteFrom(LEGAL_ENTITY_RELATIONSHIP)
+                        .where(LEGAL_ENTITY_RELATIONSHIP.ID.eq(d.id().get())))
+                .collect(collectingAndThen(toSet(), tx::batch))
+                .execute();
+
+        return summarizeResults(deletedRcs);
     }
 }

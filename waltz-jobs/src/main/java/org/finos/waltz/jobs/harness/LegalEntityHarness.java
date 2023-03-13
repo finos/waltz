@@ -21,7 +21,6 @@ package org.finos.waltz.jobs.harness;
 import org.finos.waltz.model.bulk_upload.BulkUploadMode;
 import org.finos.waltz.model.bulk_upload.legal_entity_relationship.BulkUploadLegalEntityRelationshipCommand;
 import org.finos.waltz.model.bulk_upload.legal_entity_relationship.ImmutableBulkUploadLegalEntityRelationshipCommand;
-import org.finos.waltz.model.bulk_upload.legal_entity_relationship.ResolveBulkUploadLegalEntityRelationshipParameters;
 import org.finos.waltz.model.bulk_upload.legal_entity_relationship.ResolveBulkUploadLegalEntityRelationshipResponse;
 import org.finos.waltz.service.DIConfiguration;
 import org.finos.waltz.service.bulk_upload.BulkUploadLegalEntityRelationshipService;
@@ -41,7 +40,6 @@ public class LegalEntityHarness {
         String inputString = header + "109235-1, 1202,, CLEJ";
 
         BulkUploadLegalEntityRelationshipCommand uploadCommand = ImmutableBulkUploadLegalEntityRelationshipCommand.builder()
-                .uploadMode(BulkUploadMode.ADD_ONLY)
                 .inputString(inputString)
                 .legalEntityRelationshipKindId(1L)
                 .build();

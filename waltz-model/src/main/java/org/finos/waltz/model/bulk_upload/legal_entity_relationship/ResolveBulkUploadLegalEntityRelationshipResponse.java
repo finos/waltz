@@ -13,8 +13,6 @@ import java.util.Set;
 @JsonDeserialize(as = ImmutableResolveBulkUploadLegalEntityRelationshipResponse.class)
 public abstract class ResolveBulkUploadLegalEntityRelationshipResponse {
 
-    public abstract BulkUploadMode uploadMode();
-
     public abstract Set<ResolvedUploadRow> rows();
 
     public abstract Set<AssessmentHeaderCell> assessmentHeaders();

@@ -15,6 +15,7 @@ export const UploadModes = {
 
 export const resolveResponse = writable(null);
 export const resolvedRows = writable([]);
+export const sortedHeaders = writable([]);
 export const activeMode = writable(Modes.INPUT);
 export const uploadMode = writable(UploadModes.ADD_ONLY);
 export const inputString = writable(null);

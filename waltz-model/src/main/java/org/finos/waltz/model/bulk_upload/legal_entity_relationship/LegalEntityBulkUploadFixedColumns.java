@@ -6,4 +6,6 @@ public interface LegalEntityBulkUploadFixedColumns {
     String LEGAL_ENTITY_IDENTIFIER = "Legal Entity External Id";
     String COMMENT = "Comment";
 
+    String REMOVE_RELATIONSHIP = "Remove Relationship";
+
 }

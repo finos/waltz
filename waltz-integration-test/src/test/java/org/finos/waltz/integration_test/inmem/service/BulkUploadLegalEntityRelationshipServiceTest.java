@@ -317,7 +317,6 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
                 "A test comment string");
 
         BulkUploadLegalEntityRelationshipCommand uploadCmd = ImmutableBulkUploadLegalEntityRelationshipCommand.builder()
-                .uploadMode(BulkUploadMode.ADD_ONLY)
                 .inputString(inputString)
                 .legalEntityRelationshipKindId(leRelKindId)
                 .build();
@@ -370,7 +369,6 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
                 "A test comment string");
 
         BulkUploadLegalEntityRelationshipCommand uploadCmd = ImmutableBulkUploadLegalEntityRelationshipCommand.builder()
-                .uploadMode(BulkUploadMode.ADD_ONLY)
                 .inputString(inputString)
                 .legalEntityRelationshipKindId(leRelKindId)
                 .build();
@@ -424,7 +422,6 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
                 "TEST_GREEN");
 
         BulkUploadLegalEntityRelationshipCommand uploadCmd = ImmutableBulkUploadLegalEntityRelationshipCommand.builder()
-                .uploadMode(BulkUploadMode.ADD_ONLY)
                 .inputString(inputString)
                 .legalEntityRelationshipKindId(leRelKindId)
                 .build();
@@ -486,7 +483,6 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
                 "TEST_GREEN;TEST_RED");
 
         BulkUploadLegalEntityRelationshipCommand uploadCmd = ImmutableBulkUploadLegalEntityRelationshipCommand.builder()
-                .uploadMode(BulkUploadMode.ADD_ONLY)
                 .inputString(inputString)
                 .legalEntityRelationshipKindId(leRelKindId)
                 .build();
@@ -555,7 +551,6 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
                 "y");
 
         BulkUploadLegalEntityRelationshipCommand uploadCmd = ImmutableBulkUploadLegalEntityRelationshipCommand.builder()
-                .uploadMode(BulkUploadMode.ADD_ONLY)
                 .inputString(inputString)
                 .legalEntityRelationshipKindId(leRelKindId)
                 .build();
@@ -629,7 +624,6 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
                 assessmentComment);
 
         BulkUploadLegalEntityRelationshipCommand uploadCmd = ImmutableBulkUploadLegalEntityRelationshipCommand.builder()
-                .uploadMode(BulkUploadMode.ADD_ONLY)
                 .inputString(inputString)
                 .legalEntityRelationshipKindId(leRelKindId)
                 .build();
@@ -702,7 +696,6 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
                 assessmentComment);
 
         BulkUploadLegalEntityRelationshipCommand uploadCmd = ImmutableBulkUploadLegalEntityRelationshipCommand.builder()
-                .uploadMode(BulkUploadMode.ADD_ONLY)
                 .inputString(inputString)
                 .legalEntityRelationshipKindId(leRelKindId)
                 .build();
@@ -768,7 +761,6 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
                 assessmentComment);
 
         BulkUploadLegalEntityRelationshipCommand uploadCmd = ImmutableBulkUploadLegalEntityRelationshipCommand.builder()
-                .uploadMode(BulkUploadMode.ADD_ONLY)
                 .inputString(inputString)
                 .legalEntityRelationshipKindId(leRelKindId)
                 .build();
@@ -831,7 +823,6 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
                 assessmentComment);
 
         BulkUploadLegalEntityRelationshipCommand uploadCmd = ImmutableBulkUploadLegalEntityRelationshipCommand.builder()
-                .uploadMode(BulkUploadMode.ADD_ONLY)
                 .inputString(inputString)
                 .legalEntityRelationshipKindId(leRelKindId)
                 .build();
@@ -840,7 +831,6 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
         ResolveBulkUploadLegalEntityRelationshipResponse resolvedCommand = service.resolve(uploadCmd);
 
         Map<String, Integer> colIdByInputString = MapUtilities.indexBy(resolvedCommand.assessmentHeaders(), AssessmentHeaderCell::inputString, AssessmentHeaderCell::columnId);
-        Integer colId = colIdByInputString.get(assessmentHeader);
 
         assertEquals(1, resolvedCommand.rows().size(), "Should identify 1 row of data has been provided");
 

@@ -13,7 +13,8 @@
         resolvedRows,
         resolveResponse,
         uploadMode,
-        UploadModes
+        UploadModes,
+        sortedHeaders
     } from "./bulk-upload-relationships-store";
     import _ from "lodash";
     import Icon from "../../../common/svelte/Icon.svelte";
@@ -33,7 +34,6 @@
         const resolveParams = {
             inputString: $inputString,
             legalEntityRelationshipKindId: relationshipKind.id,
-            uploadMode: $uploadMode
         };
 
         return resolveCall = bulkUploadLegalEntityRelationshipStore.resolve(resolveParams)
@@ -41,6 +41,7 @@
                 console.log({d});
                 $resolveResponse = d.data;
                 $activeMode = Modes.RESOLVED;
+                $sortedHeaders = _.sortBy(d.data.assessmentHeaders, d => d.columnId);
                 $resolvedRows = _.sortBy(d.data.rows, d => d.rowNumber);
             })
             .catch(e => {
@@ -55,7 +56,6 @@
         const saveParams = {
             inputString: $inputString,
             legalEntityRelationshipKindId: relationshipKind.id,
-            uploadMode: $uploadMode
         };
 
         const saveCall = bulkUploadLegalEntityRelationshipStore.save(saveParams)
@@ -165,11 +165,11 @@
             </colgroup>
             <thead>
             <tr>
-                <th>Status</th>
+                <th>Operation</th>
                 <th>Target Entity</th>
                 <th>Legal Entity</th>
                 <th>Comment</th>
-                {#each $resolveResponse.assessmentHeaders as header}
+                {#each $sortedHeaders as header}
                     <th>
                         {header.inputString}
                         {#if header.status !== "HEADER_FOUND"}
@@ -182,10 +182,10 @@
             <tbody>
             {#each $resolvedRows as row}
                 {@const assessmentByColumnId = _.keyBy(row.assessmentRatings, d => d.columnId)}
-                <tr class:relationship-error={row.legalEntityRelationship.status === "ERROR"}>
+                <tr class:relationship-error={row.legalEntityRelationship.operation === "ERROR"}>
                     <td class="relationship-cell">
                         <span>
-                            {row.legalEntityRelationship.status}
+                            {row.legalEntityRelationship.operation}
                         </span>
                     </td>
                     <td class="relationship-cell">
@@ -206,7 +206,7 @@
                         style="border-right: 1px dashed #ccc">
                         {row.legalEntityRelationship.comment || ""}
                     </td>
-                    {#each $resolveResponse.assessmentHeaders as header}
+                    {#each $sortedHeaders as header}
                         {@const assessmentRating = _.get(assessmentByColumnId, header.columnId)}
                         <td class:assessment-error={_.includes(assessmentRating?.statuses, "ERROR") || header.status !== "HEADER_FOUND"}>
                             <span>

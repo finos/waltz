@@ -2,22 +2,32 @@ package org.finos.waltz.service.legal_entity;
 
 import org.finos.waltz.data.legal_entity.LegalEntityRelationshipDao;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.legal_entity.LegalEntityRelationship;
-import org.finos.waltz.service.permission.permission_checker.LegalEntityRelationshipPermissionChecker;
+import org.finos.waltz.schema.tables.records.ChangeLogRecord;
+import org.finos.waltz.service.user.UserPreferenceService;
+import org.jooq.DSLContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.SetUtilities.map;
 
 @Service
 public class LegalEntityRelationshipService {
 
     private final LegalEntityRelationshipDao legalEntityRelationshipDao;
+    private static final Logger LOG = LoggerFactory.getLogger(LegalEntityRelationshipService.class);
+
     @Autowired
-    public LegalEntityRelationshipService(LegalEntityRelationshipDao legalEntityRelationshipDao) {
+    public LegalEntityRelationshipService(LegalEntityRelationshipDao legalEntityRelationshipDao,
+                                          DSLContext dsl) {
         checkNotNull(legalEntityRelationshipDao, "legalEntityRelationshipDao cannot be null");
+
         this.legalEntityRelationshipDao = legalEntityRelationshipDao;
     }
 
@@ -36,5 +46,31 @@ public class LegalEntityRelationshipService {
 
     public Set<LegalEntityRelationship> findByRelationshipKindIdRoute(long relationshipKindId) {
         return legalEntityRelationshipDao.findByRelationshipKind(relationshipKindId);
+    }
+
+    public int bulkAdd(DSLContext tx, Set<LegalEntityRelationship> relationshipsToAdd, String username) {
+
+        mkAdditionChangeLogs(relationshipsToAdd);
+
+        return legalEntityRelationshipDao.bulkAdd(tx, relationshipsToAdd);
+    }
+
+    private void mkAdditionChangeLogs(Set<LegalEntityRelationship> relationshipsToAdd) {
+        map(relationshipsToAdd, d -> mkChangeLog(d, Operation.ADD));
+    }
+
+    private ChangeLogRecord mkChangeLog(LegalEntityRelationship relationship, Operation operation) {
+
+        return null;
+    }
+
+    public int bulkUpdate(DSLContext tx, Set<LegalEntityRelationship> relationshipsToUpdate, String username) {
+        map(relationshipsToUpdate, d -> mkChangeLog(d, Operation.UPDATE));
+        return legalEntityRelationshipDao.bulkUpdate(tx, relationshipsToUpdate);
+    }
+
+    public int bulkRemove(DSLContext tx, Set<LegalEntityRelationship> relationships, String username) {
+        map(relationships, d -> mkChangeLog(d, Operation.REMOVE));
+        return legalEntityRelationshipDao.bulkRemove(tx, relationships);
     }
 }

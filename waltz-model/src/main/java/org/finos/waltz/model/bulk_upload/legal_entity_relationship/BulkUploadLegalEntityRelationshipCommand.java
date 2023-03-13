@@ -12,8 +12,6 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutableBulkUploadLegalEntityRelationshipCommand.class)
 public abstract class BulkUploadLegalEntityRelationshipCommand implements Command {
 
-    public abstract BulkUploadMode uploadMode();
-
     public abstract long legalEntityRelationshipKindId();
 
     @Value.Redacted

@@ -4,6 +4,7 @@ package org.finos.waltz.model.bulk_upload.legal_entity_relationship;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.common.MapUtilities;
+import org.finos.waltz.model.Cardinality;
 import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.bulk_upload.ResolvedAssessmentHeaderStatus;
 import org.finos.waltz.model.rating.RatingSchemeItem;
@@ -32,6 +33,13 @@ public abstract class AssessmentHeaderCell {
     public abstract ResolvedAssessmentHeaderStatus status();
 
     public abstract Map<String, RatingSchemeItem> ratingLookupMap();
+
+    @Value.Default
+    public boolean isSingleValued() {
+        return resolvedAssessmentDefinition()
+                .map(def -> def.cardinality().equals(Cardinality.ZERO_ONE))
+                .orElse(false);
+    }
 
 
     // ----- HELPERS -----

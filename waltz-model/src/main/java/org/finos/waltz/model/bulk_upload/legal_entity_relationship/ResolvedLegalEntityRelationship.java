@@ -25,6 +25,8 @@ public abstract class ResolvedLegalEntityRelationship {
 
     public abstract ResolutionStatus status();
 
+    public abstract UploadOperation operation();
+
     public abstract Optional<EntityReference> existingRelationshipReference();
 
 }

@@ -18,9 +18,9 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.model.BulkChangeStatistics;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.bulk_upload.legal_entity_relationship.BulkUploadLegalEntityRelationshipCommand;
-import org.finos.waltz.model.bulk_upload.legal_entity_relationship.ResolveBulkUploadLegalEntityRelationshipParameters;
 import org.finos.waltz.model.bulk_upload.legal_entity_relationship.ResolveBulkUploadLegalEntityRelationshipResponse;
 import org.finos.waltz.service.bulk_upload.BulkUploadLegalEntityRelationshipService;
 import org.finos.waltz.service.permission.permission_checker.LegalEntityRelationshipPermissionChecker;
@@ -83,12 +83,12 @@ public class BulkUploadLegalEntityRelationshipEndpoint implements Endpoint {
     }
 
 
-    private ResolveBulkUploadLegalEntityRelationshipResponse saveRoute(Request request, Response response) throws IOException {
+    private BulkChangeStatistics saveRoute(Request request, Response response) throws IOException {
         BulkUploadLegalEntityRelationshipCommand uploadCmd = readBody(request, BulkUploadLegalEntityRelationshipCommand.class);
         String username = getUsername(request);
 
         LOG.info("User: {} resolving bulk upload: {}", username, uploadCmd);
-        return service.save(uploadCmd);
+        return service.save(uploadCmd, username);
     }
 
     private void ensureUserHasAdminRights(long legalEntityRelationshipKindId, String username) {
