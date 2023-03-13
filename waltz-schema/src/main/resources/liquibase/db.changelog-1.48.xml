@@ -26,4 +26,9 @@
         <tagDatabase tag="v1.47"/> <!-- tag the current db version, i.e. the last  -->
     </changeSet>
 
+    <changeSet id="20230105-6224-1"
+               author="davidwatkins73">
+        <dropTable tableName="entity_tag"/>
+    </changeSet>
+
 </databaseChangeLog>
