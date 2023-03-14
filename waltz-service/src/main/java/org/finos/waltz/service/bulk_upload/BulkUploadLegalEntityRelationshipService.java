@@ -291,8 +291,6 @@ public class BulkUploadLegalEntityRelationshipService {
         return stats;
     }
 
-//        Make sure that we add a remove column to the speadsheet (optional) spto remove need for two modes / less chance of accidetly killing everything
-
 
     private LegalEntityRelationship mkRelationship(long relKindId, ResolvedLegalEntityRelationship d, String username) {
         return ImmutableLegalEntityRelationship.builder()
@@ -676,8 +674,6 @@ public class BulkUploadLegalEntityRelationshipService {
                                 definitionsByName.get(lookupString)));
     }
 
-
-    // Pull out to immutable
 
     public void ensureUserHasAdminRights(long legalEntityRelationshipKindId, String username) {
         LegalEntityRelationshipKind relKind = legalEntityRelationshipKindService.getById(legalEntityRelationshipKindId);

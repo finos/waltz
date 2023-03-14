@@ -4,8 +4,6 @@
     import _ from "lodash";
     import Icon from "../../../common/svelte/Icon.svelte";
 
-    $: console.log({save: $saveResponse});
-
     $: relStats = $saveResponse.relationshipStats;
     $: assessmentStats = $saveResponse.assessmentStats;
 
