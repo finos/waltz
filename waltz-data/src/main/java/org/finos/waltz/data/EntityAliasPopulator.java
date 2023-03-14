@@ -99,6 +99,7 @@ public class EntityAliasPopulator {
         }
     }
 
+
     private Map<String, EntityReference> fetchApplicationAliasToReferenceMap(Set<String> aliases) {
         return dsl
                 .select(Tables.APPLICATION.ASSET_CODE, Tables.APPLICATION.ID, Tables.APPLICATION.NAME)
@@ -108,6 +109,7 @@ public class EntityAliasPopulator {
                 .stream()
                 .collect(toMap(t -> t.v1, t -> mkRef(EntityKind.APPLICATION, t.v2, t.v3), (v1, v2) -> v1));
     }
+
 
     private Map<String, Long> fetchLegalEntityAliasToIdMap(Set<String> aliases) {
         return resolveSimpleAliases(aliases, LEGAL_ENTITY, LEGAL_ENTITY.EXTERNAL_ID, LEGAL_ENTITY.ID);

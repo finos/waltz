@@ -183,18 +183,6 @@ public class AssessmentRatingDao {
     }
 
 
-//    public List<AssessmentRating> findByEntityKind(EntityKind kind) {
-//        return dsl
-//                .select(ar.fields())
-//                .select(ENTITY_NAME_FIELD)
-//                .select(ENTITY_LIFECYCLE_FIELD)
-//                .select(ENTITY_EXTID_FIELD)
-//                .from(ar)
-//                .innerJoin(ad).on(ad.ID.eq(ar.ASSESSMENT_DEFINITION_ID))
-//                .where(ar.ENTITY_KIND.eq(kind.name()))
-//                .fetch(TO_DOMAIN_MAPPER);
-//    }
-
     public List<AssessmentRating> findByEntityKind(EntityKind kind, Optional<EntityReference> qualifierReference) {
 
         Condition qualifierCondition = qualifierReference
@@ -207,7 +195,8 @@ public class AssessmentRatingDao {
                 .select(ENTITY_LIFECYCLE_FIELD)
                 .select(ENTITY_EXTID_FIELD)
                 .from(ar)
-                .innerJoin(ad).on(ad.ID.eq(ar.ASSESSMENT_DEFINITION_ID).and(qualifierCondition))
+                .innerJoin(ad).on(ad.ID.eq(ar.ASSESSMENT_DEFINITION_ID)
+                        .and(qualifierCondition))
                 .where(ar.ENTITY_KIND.eq(kind.name()))
                 .fetch(TO_DOMAIN_MAPPER);
     }

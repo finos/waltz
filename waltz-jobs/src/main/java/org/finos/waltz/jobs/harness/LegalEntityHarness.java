@@ -21,11 +21,14 @@ package org.finos.waltz.jobs.harness;
 import org.finos.waltz.model.bulk_upload.BulkUploadMode;
 import org.finos.waltz.model.bulk_upload.legal_entity_relationship.BulkUploadLegalEntityRelationshipCommand;
 import org.finos.waltz.model.bulk_upload.legal_entity_relationship.ImmutableBulkUploadLegalEntityRelationshipCommand;
+import org.finos.waltz.model.bulk_upload.legal_entity_relationship.LegalEntityBulkUploadFixedColumns;
 import org.finos.waltz.model.bulk_upload.legal_entity_relationship.ResolveBulkUploadLegalEntityRelationshipResponse;
 import org.finos.waltz.service.DIConfiguration;
 import org.finos.waltz.service.bulk_upload.BulkUploadLegalEntityRelationshipService;
 import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import static java.lang.String.format;
 
 
 public class LegalEntityHarness {
@@ -36,8 +39,8 @@ public class LegalEntityHarness {
         DSLContext dsl = ctx.getBean(DSLContext.class);
         BulkUploadLegalEntityRelationshipService service = ctx.getBean(BulkUploadLegalEntityRelationshipService.class);
 
-        String header = "nar, legal entity, comment\n";
-        String inputString = header + "109235-1, 1202,, CLEJ";
+        String header = format("%s, %s, %s\n", LegalEntityBulkUploadFixedColumns.ENTITY_IDENTIFIER, LegalEntityBulkUploadFixedColumns.LEGAL_ENTITY_IDENTIFIER, LegalEntityBulkUploadFixedColumns.COMMENT);
+        String inputString = header + "12345-1, 1234,, CLEJ";
 
         BulkUploadLegalEntityRelationshipCommand uploadCommand = ImmutableBulkUploadLegalEntityRelationshipCommand.builder()
                 .inputString(inputString)
