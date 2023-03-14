@@ -156,9 +156,8 @@ public class ChangeLogService {
 
 
     public int[] write(Collection<ChangeLog> changeLogs) {
-        return changeLogDao.write(changeLogs);
+        return changeLogDao.write(null, changeLogs);
     }
-
 
     /**
      * Given an entity ref this function will determine all changelog entries made _after_ the latest

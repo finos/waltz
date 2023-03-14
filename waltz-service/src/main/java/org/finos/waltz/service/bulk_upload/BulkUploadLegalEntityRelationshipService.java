@@ -1,10 +1,12 @@
 package org.finos.waltz.service.bulk_upload;
 
 import org.finos.waltz.common.*;
+import org.finos.waltz.common.StreamUtilities.Siphon;
 import org.finos.waltz.data.EntityAliasPopulator;
 import org.finos.waltz.model.*;
 import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.assessment_rating.AssessmentRating;
+import org.finos.waltz.model.bulk_upload.BulkUpdateMode;
 import org.finos.waltz.model.bulk_upload.ResolutionStatus;
 import org.finos.waltz.model.bulk_upload.ResolvedAssessmentHeaderStatus;
 import org.finos.waltz.model.bulk_upload.legal_entity_relationship.*;
@@ -12,6 +14,7 @@ import org.finos.waltz.model.legal_entity.ImmutableLegalEntityRelationship;
 import org.finos.waltz.model.legal_entity.LegalEntityRelationship;
 import org.finos.waltz.model.legal_entity.LegalEntityRelationshipKind;
 import org.finos.waltz.model.rating.RatingSchemeItem;
+import org.finos.waltz.schema.tables.records.AssessmentRatingRecord;
 import org.finos.waltz.service.assessment_definition.AssessmentDefinitionService;
 import org.finos.waltz.service.assessment_rating.AssessmentRatingService;
 import org.finos.waltz.service.bulk_upload.TabularDataUtilities.Row;
@@ -19,18 +22,25 @@ import org.finos.waltz.service.bulk_upload.column_parsers.ColumnParser;
 import org.finos.waltz.service.legal_entity.LegalEntityRelationshipKindService;
 import org.finos.waltz.service.legal_entity.LegalEntityRelationshipService;
 import org.finos.waltz.service.rating_scheme.RatingSchemeService;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.DeleteConditionStep;
+import org.jooq.UpdateConditionStep;
 import org.jooq.lambda.tuple.Tuple2;
+import org.jooq.lambda.tuple.Tuple3;
+import org.jooq.lambda.tuple.Tuple4;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.*;
@@ -38,12 +48,16 @@ import static org.finos.waltz.common.ArrayUtilities.idx;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.MapUtilities.*;
 import static org.finos.waltz.common.SetUtilities.*;
+import static org.finos.waltz.common.StreamUtilities.mkSiphon;
 import static org.finos.waltz.common.StringUtilities.isEmpty;
 import static org.finos.waltz.common.StringUtilities.*;
+import static org.finos.waltz.data.JooqUtilities.summarizeResults;
+import static org.finos.waltz.model.DiffResult.mkDiff;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.bulk_upload.legal_entity_relationship.AssessmentHeaderCell.mkHeader;
 import static org.finos.waltz.model.bulk_upload.legal_entity_relationship.LegalEntityRelationshipResolutionError.mkError;
 import static org.finos.waltz.model.bulk_upload.legal_entity_relationship.ResolvedReference.mkResolvedReference;
+import static org.finos.waltz.schema.Tables.ASSESSMENT_RATING;
 import static org.finos.waltz.service.bulk_upload.BulkUploadUtilities.getColumnValuesFromRows;
 import static org.finos.waltz.service.bulk_upload.TabularDataUtilities.streamData;
 import static org.finos.waltz.service.bulk_upload.column_parsers.ColumnParser.sanitize;
@@ -101,6 +115,8 @@ public class BulkUploadLegalEntityRelationshipService {
         ResolveBulkUploadLegalEntityRelationshipResponse resolvedCmd = resolve(uploadCommand);
 
         Set<ResolvedLegalEntityRelationship> relationships = map(resolvedCmd.rows(), ResolvedUploadRow::legalEntityRelationship);
+
+
         return dsl
                 .transactionResult(ctx -> {
 
@@ -108,9 +124,220 @@ public class BulkUploadLegalEntityRelationshipService {
 
                     BulkChangeStatistics relationshipStats = handeRelationships(tx, relationships, uploadCommand.legalEntityRelationshipKindId(), username);
 
+                    handleAssessments(tx,
+                            uploadCommand.legalEntityRelationshipKindId(),
+                            resolvedCmd,
+                            uploadCommand.updateMode(),
+                            username);
+
                     return relationshipStats;
 
                 });
+    }
+
+    private void handleAssessments(DSLContext tx,
+                                   long relationshipKindId,
+                                   ResolveBulkUploadLegalEntityRelationshipResponse resolvedCmd,
+                                   BulkUpdateMode updateMode,
+                                   String username) {
+
+        Map<Long, AssessmentDefinition> definitionsById = resolvedCmd
+                .assessmentHeaders()
+                .stream()
+                .map(d -> d.resolvedAssessmentDefinition().orElse(null))
+                .filter(Objects::nonNull)
+                .collect(toMap(k -> k.id().get(), v -> v, (a, b) -> a));
+
+        Map<Tuple2<EntityReference, EntityReference>, EntityReference> existingRelsToIdMap = loadExistingTargetIdAndLegalEntityIdToRelIdMap(tx, relationshipKindId);
+
+        Siphon<Tuple2<AssessmentCell, EntityReference>> noRelFoundSiphon = mkSiphon(t -> t.v2 == null);
+
+        Map<Integer, Long> definitionsByColId = indexBy(
+                resolvedCmd.assessmentHeaders(),
+                AssessmentHeaderCell::columnId,
+                d -> d.resolvedAssessmentDefinition()
+                        .flatMap(IdProvider::id)
+                        .orElse(null));
+
+        Siphon<Tuple4<Long, EntityReference, Long, String>> noDefnFoundSiphon = mkSiphon(t -> t.v1 == null);
+
+        List<Tuple2<EntityReference, Set<AssessmentCell>>> rows = resolvedCmd
+                .rows()
+                .stream()
+                .filter(d -> asSet(UploadOperation.ADD, UploadOperation.UPDATE).contains(d.legalEntityRelationship().operation()))
+                .map(r -> {
+
+                    Tuple2<EntityReference, EntityReference> lookupKey = tuple(
+                            r.legalEntityRelationship().targetEntityReference().resolvedEntityReference().orElse(null),
+                            r.legalEntityRelationship().legalEntityReference().resolvedEntityReference().orElse(null));
+
+                    return tuple(
+                            existingRelsToIdMap.get(lookupKey),
+                            r.assessmentRatings());
+                })
+                .collect(toList());
+
+        Map<Long, Set<Tuple3<Long, Long, String>>> requiredRatingsByDefnId = rows
+                .stream()
+                .flatMap(t -> t.v2
+                        .stream()
+                        .map(r -> tuple(r, t.v1)))
+                .filter(noRelFoundSiphon)
+                .flatMap(t -> t.v1.ratings()
+                        .stream()
+                        .filter(r -> r.resolvedRating().isPresent())
+                        .map(r -> tuple(
+                                definitionsByColId.get(t.v1.columnId()),
+                                t.v2,
+                                r.resolvedRating()
+                                        .flatMap(IdProvider::id)
+                                        .orElse(null),
+                                r.comment().orElse(null))))
+                .filter(noDefnFoundSiphon)
+                .collect(groupingBy(t -> t.v1, mapping(t -> tuple(t.v2.id(), t.v3, t.v4), toSet())));
+
+        if (noRelFoundSiphon.hasResults()) {
+            throw new IllegalStateException("Could not resolve the legal entity relationship for some of the assessments");
+        }
+
+        Map<Long, List<Tuple3<Long, Long, String>>> existingRatingsByDefinitionId = loadExistingAssessmentRatingsByDefnId(
+                tx,
+                resolvedCmd.assessmentHeaders(),
+                map(rows, d -> d.v1.id()));
+
+        definitionsById
+                .values()
+                .stream()
+                .map(def -> tuple(
+                        def,
+                        updateAssessmentRatings(
+                                tx,
+                                updateMode,
+                                def,
+                                fromCollection(existingRatingsByDefinitionId.getOrDefault(def.id().get(), emptyList())),
+                                requiredRatingsByDefnId.getOrDefault(def.id().get(), emptySet()),
+                                username)))
+                .forEach(t -> System.out.printf("Updated assessments for definition: %s, results: %s", t.v1.name(), t.v2));
+
+    }
+
+    private BulkChangeStatistics updateAssessmentRatings(DSLContext tx,
+                                                         BulkUpdateMode updateMode,
+                                                         AssessmentDefinition definition,
+                                                         Set<Tuple3<Long, Long, String>> existingRatings,
+                                                         Set<Tuple3<Long, Long, String>> requiredRatings,
+                                                         String username) {
+
+        DiffResult<Tuple3<Long, Long, String>> diff = mkDiff(existingRatings, requiredRatings, Tuple3::limit2, Tuple3::equals);
+
+        switch (updateMode) {
+            case ADD_ONLY:
+//                return addAssessments(tx, definition, diff, username);
+            case REPLACE:
+                return replaceAssessments(tx, definition, diff, username);
+            default:
+                throw new IllegalStateException(format("Cannot process assessment for updateMode: %s", updateMode));
+        }
+    }
+
+    private BulkChangeStatistics replaceAssessments(DSLContext tx,
+                                                    AssessmentDefinition definition,
+                                                    DiffResult<Tuple3<Long, Long, String>> diffResult,
+                                                    String username) {
+
+
+        Timestamp now = DateTimeUtilities.nowUtcTimestamp();
+
+        Collection<Tuple3<Long, Long, String>> toAdd = diffResult.otherOnly();
+        Collection<Tuple3<Long, Long, String>> toRemove = diffResult.waltzOnly();
+        Collection<Tuple3<Long, Long, String>> toUpdate = diffResult.intersection(); //comment and timestamp
+
+        Set<AssessmentRatingRecord> recordsToInsert = map(toAdd, d -> mkAssessmentRatingRecord(tx, definition.id().get(), d, now, username));
+        Set<UpdateConditionStep<AssessmentRatingRecord>> updateStatements = map(toUpdate, d -> mkUpdateAssessmentStmt(tx, definition.id().get(), d, now, username));
+        Set<DeleteConditionStep<AssessmentRatingRecord>> removalStatements = map(toRemove, d -> mkRemovalStmt(tx, definition.id().get(), d, now, username));
+
+        int[] added = tx.batchInsert(recordsToInsert).execute();
+        int[] updated = tx.batch(updateStatements).execute();
+        int[] removed = tx.batch(removalStatements).execute();
+
+        return ImmutableBulkChangeStatistics.builder()
+                .addedCount(summarizeResults(added))
+                .updatedCount(summarizeResults(updated))
+                .removedCount(summarizeResults(removed))
+                .build();
+    }
+
+    private DeleteConditionStep<AssessmentRatingRecord> mkRemovalStmt(DSLContext tx, Long defnId, Tuple3<Long, Long, String> assessmentInfo, Timestamp now, String username) {
+        Condition sameAssessmentRatingCond = mkSameAssessmentRatingCond(defnId, assessmentInfo.v1, assessmentInfo.v2);
+
+        return tx
+                .deleteFrom(ASSESSMENT_RATING)
+                .where(sameAssessmentRatingCond);
+    }
+
+    private UpdateConditionStep<AssessmentRatingRecord> mkUpdateAssessmentStmt(DSLContext tx,
+                                                                               Long defnId,
+                                                                               Tuple3<Long, Long, String> assessmentInfo,
+                                                                               Timestamp now,
+                                                                               String username) {
+        Condition sameAssessmentRatingCond = mkSameAssessmentRatingCond(defnId, assessmentInfo.v1, assessmentInfo.v2);
+        return tx
+                .update(ASSESSMENT_RATING)
+                .set(ASSESSMENT_RATING.DESCRIPTION, assessmentInfo.v3)
+                .set(ASSESSMENT_RATING.LAST_UPDATED_BY, username)
+                .set(ASSESSMENT_RATING.LAST_UPDATED_AT, now)
+                .where(sameAssessmentRatingCond);
+    }
+
+    private Condition mkSameAssessmentRatingCond(Long defnId, Long entityId, Long ratingId) {
+        return ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID.eq(defnId)
+                .and(ASSESSMENT_RATING.ENTITY_ID.eq(entityId)
+                        .and(ASSESSMENT_RATING.ENTITY_KIND.eq(EntityKind.LEGAL_ENTITY_RELATIONSHIP.name())
+                                .and(ASSESSMENT_RATING.RATING_ID.eq(ratingId))));
+    }
+
+    private AssessmentRatingRecord mkAssessmentRatingRecord(DSLContext tx,
+                                                            Long defnId,
+                                                            Tuple3<Long, Long, String> assessmentInfo,
+                                                            Timestamp now,
+                                                            String username) {
+
+        AssessmentRatingRecord r = tx.newRecord(ASSESSMENT_RATING);
+        r.setAssessmentDefinitionId(defnId);
+        r.setEntityId(assessmentInfo.v1);
+        r.setEntityKind(EntityKind.LEGAL_ENTITY_RELATIONSHIP.name());
+        r.setRatingId(assessmentInfo.v2);
+        r.setDescription(assessmentInfo.v3);
+        r.setLastUpdatedBy(username);
+        r.setLastUpdatedAt(now);
+        r.setProvenance("waltz");
+        r.setIsReadonly(false);
+
+        return r;
+    }
+
+
+    private Map<Long, List<Tuple3<Long, Long, String>>> loadExistingAssessmentRatingsByDefnId(DSLContext tx,
+                                                                                              Set<AssessmentHeaderCell> assessmentHeaders,
+                                                                                              Set<Long> inScopeRelationshipIds) {
+
+        Set<Long> definitionIds = assessmentHeaders
+                .stream()
+                .map(d -> d.resolvedAssessmentDefinition()
+                        .map(def -> def.id().get())
+                        .orElse(null))
+                .filter(Objects::nonNull)
+                .collect(toSet());
+
+        return tx
+                .select(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID, ASSESSMENT_RATING.ENTITY_ID, ASSESSMENT_RATING.RATING_ID, ASSESSMENT_RATING.DESCRIPTION)
+                .from(ASSESSMENT_RATING)
+                .where(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID.in(definitionIds)
+                        .and(ASSESSMENT_RATING.ENTITY_ID.in(inScopeRelationshipIds)))
+                .fetchGroups(
+                        d -> d.get(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID),
+                        d -> tuple(d.get(ASSESSMENT_RATING.ENTITY_ID), d.get(ASSESSMENT_RATING.RATING_ID), d.get(ASSESSMENT_RATING.DESCRIPTION)));
+
     }
 
     private BulkChangeStatistics handeRelationships(DSLContext tx, Set<ResolvedLegalEntityRelationship> relationships, long relKindId, String username) {
@@ -186,7 +413,7 @@ public class BulkUploadLegalEntityRelationshipService {
                                                 LegalEntityRelationshipKind relationshipKind,
                                                 Set<AssessmentHeaderCell> assessmentHeaders) {
 
-        Map<Tuple2<EntityReference, EntityReference>, EntityReference> existingRelToIdMap = loadExisitingRelsToIdMap(relationshipKind);
+        Map<Tuple2<EntityReference, EntityReference>, EntityReference> existingRelToIdMap = loadExistingTargetIdAndLegalEntityIdToRelIdMap(null, relationshipKind.id().get());
 
         //Rel ref -> [DefId, ratingId]
         Map<EntityReference, Collection<Tuple2<Long, Long>>> relationshipToExistingRatingsMap = loadRelationshipToExistingRatingsMap(relationshipKind);
@@ -248,8 +475,8 @@ public class BulkUploadLegalEntityRelationshipService {
                 d -> tuple(d.assessmentDefinitionId(), d.ratingId()));
     }
 
-    private Map<Tuple2<EntityReference, EntityReference>, EntityReference> loadExisitingRelsToIdMap(LegalEntityRelationshipKind relationshipKind) {
-        Set<LegalEntityRelationship> existingRelationships = legalEntityRelationshipService.findByRelationshipKind(relationshipKind.id().get());
+    private Map<Tuple2<EntityReference, EntityReference>, EntityReference> loadExistingTargetIdAndLegalEntityIdToRelIdMap(DSLContext tx, Long relationshipKindId) {
+        Set<LegalEntityRelationship> existingRelationships = legalEntityRelationshipService.findByRelationshipKindId(tx, relationshipKindId);
 
         return indexBy(existingRelationships,
                 r -> tuple(r.targetEntityReference(), r.legalEntityReference()),

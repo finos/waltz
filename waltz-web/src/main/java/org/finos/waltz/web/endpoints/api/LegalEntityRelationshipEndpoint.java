@@ -1,8 +1,6 @@
 package org.finos.waltz.web.endpoints.api;
 
 import org.finos.waltz.model.legal_entity.LegalEntityRelationship;
-import org.finos.waltz.model.legal_entity.LegalEntityRelationshipKind;
-import org.finos.waltz.service.legal_entity.LegalEntityRelationshipKindService;
 import org.finos.waltz.service.legal_entity.LegalEntityRelationshipService;
 import org.finos.waltz.web.endpoints.Endpoint;
 import org.springframework.stereotype.Service;
@@ -13,7 +11,6 @@ import java.util.Set;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.web.WebUtilities.*;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.getForDatum;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.getForList;
 
 @Service
@@ -41,7 +38,7 @@ public class LegalEntityRelationshipEndpoint implements Endpoint {
     }
 
     private Set<LegalEntityRelationship> findByRelationshipKindIdRoute(Request request, Response response) {
-        return legalEntityRelationshipService.findByRelationshipKindIdRoute(getId(request));
+        return legalEntityRelationshipService.findByRelationshipKindId(getId(request));
     }
 
     private Set<LegalEntityRelationship> findByEntityReferenceRoute(Request request, Response response) {

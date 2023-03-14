@@ -34,6 +34,7 @@ import org.finos.waltz.model.rating.RatingScheme;
 import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.permission.permission_checker.AssessmentRatingPermissionChecker;
+import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -211,7 +212,7 @@ public class AssessmentRatingService {
         createChangeLogs(assessmentDefinitionId, username, ratingsToRemove, Operation.REMOVE);
         int result = assessmentRatingDao.bulkRemove(ratingsToRemove);
 
-        return result  > 1;
+        return result > 1;
     }
 
 
@@ -311,29 +312,29 @@ public class AssessmentRatingService {
     private void createChangeLogEntryForSave(SaveAssessmentRatingCommand command,
                                              String username,
                                              AssessmentDefinition assessmentDefinition) {
-        Optional<AssessmentRating>  previousRating = assessmentRatingDao.findForEntity(command.entityReference())
-                                                                        .stream()
-                                                                        .filter(r -> r.assessmentDefinitionId() == command.assessmentDefinitionId())
-                                                                        .findAny();
+        Optional<AssessmentRating> previousRating = assessmentRatingDao.findForEntity(command.entityReference())
+                .stream()
+                .filter(r -> r.assessmentDefinitionId() == command.assessmentDefinitionId())
+                .findAny();
         Optional<RatingSchemeItem> previousRatingSchemeItem = previousRating.map(assessmentRating -> ratingSchemeDAO.getRatingSchemeItemById(assessmentRating.ratingId()));
         Optional<String> messagePostfix = previousRatingSchemeItem
                 .map(rn -> format(" from assessment %s as [%s - %s]",
-                                  assessmentDefinition.name(),
-                                  rn.name(),
-                                  previousRating.get().comment()));
+                        assessmentDefinition.name(),
+                        rn.name(),
+                        previousRating.get().comment()));
 
         ChangeLog logEntry = ImmutableChangeLog.builder()
-                                               .message(format(
-                                                       "Storing assessment %s as [%s - %s]%s",
-                                                       assessmentDefinition.name(),
-                                                       ratingSchemeDAO.getRatingSchemeItemById(command.ratingId()).name(),
-                                                       command.comment(),
-                                                       messagePostfix.orElse("")))
-                                               .parentReference(mkRef(command.entityReference().kind(), command.entityReference().id()))
-                                               .userId(username)
-                                               .severity(Severity.INFORMATION)
-                                               .operation(Operation.UPDATE)
-                                               .build();
+                .message(format(
+                        "Storing assessment %s as [%s - %s]%s",
+                        assessmentDefinition.name(),
+                        ratingSchemeDAO.getRatingSchemeItemById(command.ratingId()).name(),
+                        command.comment(),
+                        messagePostfix.orElse("")))
+                .parentReference(mkRef(command.entityReference().kind(), command.entityReference().id()))
+                .userId(username)
+                .severity(Severity.INFORMATION)
+                .operation(Operation.UPDATE)
+                .build();
 
         changeLogService.write(logEntry);
     }
@@ -428,4 +429,5 @@ public class AssessmentRatingService {
         GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, idSelectionOptions);
         return assessmentRatingDao.findRatingSummaryCounts(genericSelector, definitionIds);
     }
+
 }

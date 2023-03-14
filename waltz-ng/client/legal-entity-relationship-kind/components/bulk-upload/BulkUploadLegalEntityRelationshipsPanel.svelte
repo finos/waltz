@@ -33,6 +33,7 @@
 
         const resolveParams = {
             inputString: $inputString,
+            updateMode: $uploadMode,
             legalEntityRelationshipKindId: relationshipKind.id,
         };
 
@@ -55,17 +56,18 @@
 
         const saveParams = {
             inputString: $inputString,
+            updateMode: $uploadMode,
             legalEntityRelationshipKindId: relationshipKind.id,
         };
 
         const saveCall = bulkUploadLegalEntityRelationshipStore.save(saveParams)
             .then(d => {
                 console.log({data: d.data});
-                $uploadMode = Modes.REPORT;
+                $activeMode = Modes.REPORT;
             })
             .catch(e => {
                 displayError("Could not save rows", e);
-                $uploadMode = Modes.RESOLVED
+                $activeMode = Modes.RESOLVED
             });
 
     }
@@ -87,7 +89,13 @@
 
     }
 
-    $: console.log({resolved: $resolveResponse, mode: $activeMode, rows: $resolvedRows});
+    $: console.log({
+        resolved: $resolveResponse,
+        mode: $activeMode,
+        rows: $resolvedRows,
+        input: $inputString,
+        rel: relationshipKind
+    });
 
 </script>
 

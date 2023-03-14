@@ -16,15 +16,8 @@
   ~
   -->
 
-<waltz-svelte-component component="$ctrl.BulkUploadLegalEntityRelationshipsPanel"
+<waltz-svelte-component ng-if="$ctrl.relationshipKind"
+                        component="$ctrl.BulkUploadLegalEntityRelationshipsPanel"
                         relationship-kind="$ctrl.relationshipKind">
 
 </waltz-svelte-component>
-
-
-<!--<div ng-if="$ctrl.showGrid">-->
-<!--    <waltz-grid-with-search column-defs="$ctrl.columnDefs"-->
-<!--                            entries="$ctrl.rows"-->
-<!--                            xxsearch-fields="['searchableStr']">-->
-<!--    </waltz-grid-with-search>-->
-<!--</div>-->

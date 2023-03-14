@@ -11,3 +11,8 @@ columns are allowed:
 | Remove Relationship                    | N            | Column to indicate whether this relationship should be deleted. Takes values 'Y' or 'X'                                                                                                        | Y         | 
 | < ASSESSMENT_DEFINITION >              | N            | Can be used to populate update assessment ratings for the relationship. Supports multi valued assessments separated by ';', values are the external id, code or name of the rating scheme item | A;B       |
 | < ASSESSMENT_DEFINITION > / < RATING > | N            | Can be used to populate update assessment ratings for the relationship. Supports comments in cell, or to add rating without comment use one of 'Y' or 'X'                                      | Y         |
+
+TODO: Upload Modes
+
+We need to this differentiate beteen the style of update to perform. Add only will preserve comments and assessments not
+listed. Replace will remove any existing extraneous comments/assessments that are not mentioned in the file.

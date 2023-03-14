@@ -88,6 +88,7 @@ function controller($q, serviceBroker) {
             .all([relKindsPromise, relationshipsPromise])
             .then(([relKind, relationships]) => {
                 vm.relationshipKind = relKind;
+                console.log({relKind, ref: vm.primaryEntityRef})
 
                 vm.relationships = _.sortBy(
                     relationships,

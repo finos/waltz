@@ -1,6 +1,5 @@
 package org.finos.waltz.data.legal_entity;
 
-import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -15,12 +14,12 @@ import java.sql.Timestamp;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.common.ObjectUtilities.firstNotNull;
 import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.common.StringUtilities.notEmpty;
 import static org.finos.waltz.data.JooqUtilities.summarizeResults;
@@ -84,11 +83,14 @@ public class LegalEntityRelationshipDao {
 
     public Set<LegalEntityRelationship> findByLegalEntityId(Long legalEntityId) {
         Condition legalEntityCondition = LEGAL_ENTITY_RELATIONSHIP.LEGAL_ENTITY_ID.eq(legalEntityId);
-        return findByCondition(legalEntityCondition);
+        return findByCondition(null, legalEntityCondition);
     }
 
-    private Set<LegalEntityRelationship> findByCondition(Condition condition) {
-        return dsl
+    private Set<LegalEntityRelationship> findByCondition(DSLContext tx, Condition condition) {
+
+        DSLContext dslContext = firstNotNull(tx, dsl);
+
+        return dslContext
                 .select(LEGAL_ENTITY_RELATIONSHIP.fields())
                 .select(LEGAL_ENTITY.NAME)
                 .select(ENTITY_NAME_FIELD)
@@ -101,12 +103,12 @@ public class LegalEntityRelationshipDao {
     public Set<LegalEntityRelationship> findByEntityReference(EntityReference ref) {
         Condition targetRefCondition = LEGAL_ENTITY_RELATIONSHIP.TARGET_ID.eq(ref.id())
                 .and(LEGAL_ENTITY_RELATIONSHIP.TARGET_KIND.eq(ref.kind().name()));
-        return findByCondition(targetRefCondition);
+        return findByCondition(null, targetRefCondition);
     }
 
-    public Set<LegalEntityRelationship> findByRelationshipKind(long relKindId) {
+    public Set<LegalEntityRelationship> findByRelationshipKind(DSLContext tx, long relKindId) {
         Condition relationshipKindCondition = LEGAL_ENTITY_RELATIONSHIP.RELATIONSHIP_KIND_ID.eq(relKindId);
-        return findByCondition(relationshipKindCondition);
+        return findByCondition(tx, relationshipKindCondition);
     }
 
     public int bulkAdd(DSLContext tx, Set<LegalEntityRelationship> relationships) {

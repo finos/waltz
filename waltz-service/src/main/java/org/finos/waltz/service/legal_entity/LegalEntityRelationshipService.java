@@ -5,7 +5,6 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.legal_entity.LegalEntityRelationship;
 import org.finos.waltz.schema.tables.records.ChangeLogRecord;
-import org.finos.waltz.service.user.UserPreferenceService;
 import org.jooq.DSLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,12 +39,12 @@ public class LegalEntityRelationshipService {
         return legalEntityRelationshipDao.findByEntityReference(ref);
     }
 
-    public Set<LegalEntityRelationship> findByRelationshipKind(long relKindId) {
-        return legalEntityRelationshipDao.findByRelationshipKind(relKindId);
+    public Set<LegalEntityRelationship> findByRelationshipKindId(DSLContext tx, long relKindId) {
+        return legalEntityRelationshipDao.findByRelationshipKind(tx, relKindId);
     }
 
-    public Set<LegalEntityRelationship> findByRelationshipKindIdRoute(long relationshipKindId) {
-        return legalEntityRelationshipDao.findByRelationshipKind(relationshipKindId);
+    public Set<LegalEntityRelationship> findByRelationshipKindId(long relationshipKindId) {
+        return legalEntityRelationshipDao.findByRelationshipKind(null, relationshipKindId);
     }
 
     public int bulkAdd(DSLContext tx, Set<LegalEntityRelationship> relationshipsToAdd, String username) {
