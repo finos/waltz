@@ -18,8 +18,6 @@
 
     $: legalEntityRelationshipKind = $legalEntityRelationshipKindCall?.data;
 
-    $: console.log({legalEntityRelationshipKind});
-
 </script>
 
 

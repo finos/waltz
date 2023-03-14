@@ -19,6 +19,7 @@ import template from "./legal-entity-relationships-section.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
 import {initialiseData} from "../../../common";
+import {inputString, activeMode, Modes} from "../bulk-upload/bulk-upload-relationships-store";
 
 const bindings = {
     parentEntityRef: "<"
@@ -70,25 +71,24 @@ const initialState = {
 }
 
 
-function controller($q, serviceBroker) {
+function controller($q, $scope, serviceBroker) {
 
     const vm = initialiseData(this, initialState);
 
-    vm.$onChanges = () => {
+    function loadRelationships() {
 
         const relKindsPromise = serviceBroker
             .loadViewData(CORE_API.LegalEntityRelationshipKindStore.getById, [vm.parentEntityRef.id])
             .then(r => r.data);
 
         const relationshipsPromise = serviceBroker
-            .loadViewData(CORE_API.LegalEntityRelationshipStore.findByRelationshipKindId, [vm.parentEntityRef.id])
+            .loadViewData(CORE_API.LegalEntityRelationshipStore.findByRelationshipKindId, [vm.parentEntityRef.id], {force: true})
             .then(r => r.data);
 
         return $q
             .all([relKindsPromise, relationshipsPromise])
             .then(([relKind, relationships]) => {
                 vm.relationshipKind = relKind;
-                console.log({relKind, ref: vm.primaryEntityRef})
 
                 vm.relationships = _.sortBy(
                     relationships,
@@ -96,17 +96,31 @@ function controller($q, serviceBroker) {
             });
     }
 
+    vm.$onChanges = () => {
+        return loadRelationships();
+    }
+
     vm.bulkUpload = () => {
         vm.visibility.bulkUpload = true;
     }
 
     vm.cancelBulkUpload = () => {
+        inputString.set(null);
+        activeMode.set(Modes.INPUT);
         vm.visibility.bulkUpload = false;
+    }
+
+    vm.doneUpload = () => {
+        $scope.$applyAsync(() => {
+            vm.cancelBulkUpload();
+            loadRelationships();
+        })
     }
 }
 
 controller.$inject = [
     "$q",
+    "$scope",
     "ServiceBroker"
 ];
 

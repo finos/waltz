@@ -35,6 +35,11 @@ public class TabularDataUtilities {
 
         public String getValue(String name) {
             Integer colIdx = colIdxByName.get(name);
+
+            if (colIdx == null) {
+                return null;
+            }
+
             return idx(inputRow.values(), colIdx, null);
         }
 

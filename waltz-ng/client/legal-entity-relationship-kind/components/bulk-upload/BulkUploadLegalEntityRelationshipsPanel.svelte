@@ -12,24 +12,28 @@
         Modes,
         resolvedRows,
         resolveResponse,
+        saveResponse,
+        sortedHeaders,
         uploadMode,
         UploadModes,
-        sortedHeaders
+        anyErrors
     } from "./bulk-upload-relationships-store";
     import _ from "lodash";
+    import toasts from "../../../svelte-stores/toast-store";
+    import SaveUploadReport from "./SaveUploadReport.svelte";
+    import ResolvedUploadReport from "./ResolvedUploadReport.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
 
     export let relationshipKind;
+    export let onDone = () => console.log("Done, close and reload rels");
 
     let resolveCall;
-    let erroredHeaders;
-    let erroredRelationships;
+    let saveCall;
+    let allowSaveWithErrors = false;
 
     function verifyEntries() {
 
         $activeMode = Modes.LOADING;
-
-        console.log({is: $inputString, rel: relationshipKind, mode: $uploadMode});
 
         const resolveParams = {
             inputString: $inputString,
@@ -39,11 +43,9 @@
 
         return resolveCall = bulkUploadLegalEntityRelationshipStore.resolve(resolveParams)
             .then(d => {
-                console.log({d});
                 $resolveResponse = d.data;
                 $activeMode = Modes.RESOLVED;
-                $sortedHeaders = _.sortBy(d.data.assessmentHeaders, d => d.columnId);
-                $resolvedRows = _.sortBy(d.data.rows, d => d.rowNumber);
+                toasts.success("Resolved relationships, please review before saving");
             })
             .catch(e => {
                 displayError("Could not resolve rows", e);
@@ -54,57 +56,52 @@
 
     function saveRelationships() {
 
+        $activeMode = Modes.LOADING;
+
         const saveParams = {
             inputString: $inputString,
             updateMode: $uploadMode,
             legalEntityRelationshipKindId: relationshipKind.id,
         };
 
-        const saveCall = bulkUploadLegalEntityRelationshipStore.save(saveParams)
+        return saveCall = bulkUploadLegalEntityRelationshipStore.save(saveParams)
             .then(d => {
-                console.log({data: d.data});
+                $saveResponse = d.data;
                 $activeMode = Modes.REPORT;
+                toasts.success("Saved relationships and assessments");
             })
             .catch(e => {
                 displayError("Could not save rows", e);
-                $activeMode = Modes.RESOLVED
+                $activeMode = Modes.RESOLVED;
             });
 
     }
 
     function cancel() {
         $activeMode = Modes.INPUT;
-        console.log("Saving");
+        allowSaveWithErrors = false;
     }
 
-    $: {
-
-
-        if ($resolveResponse) {
-
-            erroredHeaders = _.filter($resolveResponse.assessmentHeaders, d => d.status !== "HEADER_FOUND");
-            erroredRelationships = _.filter($resolveResponse.rows, d => d.legalEntityRelationship.status === "ERROR");
-
-        }
-
+    function clearData() {
+        $inputString = null;
     }
 
-    $: console.log({
-        resolved: $resolveResponse,
-        mode: $activeMode,
-        rows: $resolvedRows,
-        input: $inputString,
-        rel: relationshipKind
-    });
+    function done() {
+        cancel();
+        clearData();
+        onDone();
+    }
 
 </script>
 
-<div class="help-block">
-    Please ensure that the minimum columns of 'Entity External Id' and 'Legal Entity External Id', if you wish to add a
-    'Comment' this will appear on the relationship
-</div>
-
 {#if $activeMode === Modes.INPUT}
+
+    <div class="help-block">
+        Please ensure that the minimum columns of 'Entity External Id' and 'Legal Entity External Id', if you wish to
+        add a
+        'Comment' this will appear on the relationship.
+    </div>
+
     <form on:submit|preventDefault={verifyEntries}>
         <div class="form-group">
             <label for="involvements">
@@ -149,88 +146,21 @@
     </LoadingPlaceholder>
 {:else if $activeMode === Modes.RESOLVED}
 
-    <div class="help-block">
+    <ResolvedUploadReport/>
 
-        <div>Resolved {$resolvedRows.length} rows of data.</div>
-
-        {#if !_.isEmpty(erroredHeaders)}
-            <div>There are {erroredHeaders.length} assessment header/s which could not be resolved.</div>
+    <div style="padding-bottom: 1em">
+        {#if $anyErrors && !allowSaveWithErrors}
+            <Icon name="exclamation-triangle"/>
+            There are some relationships with errors, please review the input or
+            <button class="btn btn-skinny"
+                    on:click={() => allowSaveWithErrors = true}>
+                enable save
+            </button>
+            to proceed.
+        {:else if $anyErrors}
+            <Icon name="exclamation-triangle"/>
+            There are some relationships with errors, save has been enabled.
         {/if}
-
-        {#if !_.isEmpty(erroredRelationships)}
-            <div>There are {erroredRelationships.length} relationship/s which could not be resolved.</div>
-        {/if}
-
-    </div>
-
-    <div class="waltz-scroll-region-300" style="margin-bottom: 2em">
-        <table class="table table-condensed small">
-            <colgroup>
-                <col width="10%"/>
-                <col width="15%"/>
-                <col width="15%"/>
-                <col width="20%"/>
-            </colgroup>
-            <thead>
-            <tr>
-                <th>Operation</th>
-                <th>Target Entity</th>
-                <th>Legal Entity</th>
-                <th>Comment</th>
-                {#each $sortedHeaders as header}
-                    <th>
-                        {header.inputString}
-                        {#if header.status !== "HEADER_FOUND"}
-                            <span style="color: red"><Icon name="exclamation-triangle"/></span>
-                        {/if}
-                    </th>
-                {/each}
-            </tr>
-            </thead>
-            <tbody>
-            {#each $resolvedRows as row}
-                {@const assessmentByColumnId = _.keyBy(row.assessmentRatings, d => d.columnId)}
-                <tr class:relationship-error={row.legalEntityRelationship.operation === "ERROR"}>
-                    <td class="relationship-cell">
-                        <span>
-                            {row.legalEntityRelationship.operation}
-                        </span>
-                    </td>
-                    <td class="relationship-cell">
-                        <span>
-                            {row.legalEntityRelationship.targetEntityReference.inputString}
-                            {#if _.isNil(row.legalEntityRelationship.targetEntityReference.resolvedEntityReference)}
-                                <span style="color: red"><Icon name="exclamation-triangle"/></span>
-                            {/if}
-                        </span>
-                    </td>
-                    <td class="relationship-cell">
-                        <span>{row.legalEntityRelationship.legalEntityReference.inputString}</span>
-                        {#if _.isNil(row.legalEntityRelationship.legalEntityReference.resolvedEntityReference)}
-                            <span style="color: red"><Icon name="exclamation-triangle"/></span>
-                        {/if}
-                    </td>
-                    <td class="relationship-cell"
-                        style="border-right: 1px dashed #ccc">
-                        {row.legalEntityRelationship.comment || ""}
-                    </td>
-                    {#each $sortedHeaders as header}
-                        {@const assessmentRating = _.get(assessmentByColumnId, header.columnId)}
-                        <td class:assessment-error={_.includes(assessmentRating?.statuses, "ERROR") || header.status !== "HEADER_FOUND"}>
-                            <span>
-                                {#if assessmentRating}
-                                    {assessmentRating?.inputString}
-                                    {#if _.includes(assessmentRating?.statuses, "ERROR")}
-                                        <span style="color: red"><Icon name="exclamation-triangle"/></span>
-                                    {/if}
-                                {/if}
-                            </span>
-                        </td>
-                    {/each}
-                </tr>
-            {/each}
-            </tbody>
-        </table>
     </div>
 
     <button class="btn btn-default"
@@ -239,22 +169,14 @@
     </button>
 
     <button class="btn btn-success"
+            disabled={$anyErrors && !allowSaveWithErrors}
             on:click={saveRelationships}>
         Save Relationships
     </button>
+{:else if $activeMode === Modes.REPORT}
+    <SaveUploadReport/>
+    <button class="btn btn-success"
+            on:click={done}>
+        Done
+    </button>
 {/if}
-
-
-<style>
-
-
-    .relationship-error .relationship-cell {
-        background-color: #ffcdcd;
-    }
-
-    .assessment-error {
-        /*background-color: #ffcdcd;*/
-    }
-
-
-</style>

@@ -59,7 +59,8 @@
     </div>
     <div class="col-sm-12"
          ng-if="$ctrl.visibility.bulkUpload">
-        <waltz-legal-entity-relationship-bulk-upload relationship-kind="$ctrl.relationshipKind">
+        <waltz-legal-entity-relationship-bulk-upload relationship-kind="$ctrl.relationshipKind"
+                                                     on-done="$ctrl.doneUpload">
         </waltz-legal-entity-relationship-bulk-upload>
     </div>
 </div>

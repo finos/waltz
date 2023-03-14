@@ -39,7 +39,6 @@ function controller($stateParams, historyStore, serviceBroker) {
         serviceBroker
             .loadViewData(CORE_API.LegalEntityRelationshipKindStore.getById, [vm.primaryEntityRef.id])
             .then(r => {
-                console.log({r});
                 vm.legalEntityRelKind = r.data;
                 historyStore.put(
                     vm.legalEntityRelKind.name,

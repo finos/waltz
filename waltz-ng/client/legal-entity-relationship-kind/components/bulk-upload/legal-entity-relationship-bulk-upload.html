@@ -18,6 +18,6 @@
 
 <waltz-svelte-component ng-if="$ctrl.relationshipKind"
                         component="$ctrl.BulkUploadLegalEntityRelationshipsPanel"
-                        relationship-kind="$ctrl.relationshipKind">
-
+                        relationship-kind="$ctrl.relationshipKind"
+                        on-done="$ctrl.onDone">
 </waltz-svelte-component>

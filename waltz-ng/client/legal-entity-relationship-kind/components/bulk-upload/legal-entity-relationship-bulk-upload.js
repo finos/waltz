@@ -1,12 +1,11 @@
 import template from "./legal-entity-relationship-bulk-upload.html";
 import {initialiseData} from "../../../common";
 import BulkUploadLegalEntityRelationshipsPanel from "./BulkUploadLegalEntityRelationshipsPanel.svelte";
-import {resolvedRows, activeMode, Modes, resolveResponse} from "./bulk-upload-relationships-store";
-import _ from "lodash";
 
 
 const bindings = {
-    relationshipKind: "<"
+    relationshipKind: "<",
+    onDone: "<"
 }
 
 
@@ -18,9 +17,6 @@ const initialState = {
 function controller($scope, serviceBroker) {
 
     const vm = initialiseData(this, initialState);
-
-    vm.$onChanges = () => {
-    }
 
 }
 

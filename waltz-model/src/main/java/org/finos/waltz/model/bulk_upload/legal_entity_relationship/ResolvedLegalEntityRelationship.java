@@ -23,8 +23,6 @@ public abstract class ResolvedLegalEntityRelationship {
 
     public abstract Set<LegalEntityRelationshipResolutionError> errors();
 
-    public abstract ResolutionStatus status();
-
     public abstract UploadOperation operation();
 
     public abstract Optional<EntityReference> existingRelationshipReference();
