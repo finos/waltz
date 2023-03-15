@@ -40,9 +40,9 @@
         }
     }
 
-    $: $assessmentDefinitions = $assessmentDefinitionCall?.data;
-    $: $assessmentRatings = $assessmentRatingCall?.data;
-    $: $ratingSchemes = $ratingSchemesCall?.data;
+    $: $assessmentDefinitions = $assessmentDefinitionCall?.data || [];
+    $: $assessmentRatings = $assessmentRatingCall?.data || [];
+    $: $ratingSchemes = $ratingSchemesCall?.data || [];
 
     function toggleGroup(group) {
         expansions = _.includes(expansions, group.groupName)
@@ -67,8 +67,8 @@
 
 
     $: expansions = _.isEmpty(expansions)
-            ?  _
-                .chain($favouriteAssessmentDefinitionStore[$primaryEntityReference.kind])
+            ? _
+            .chain($favouriteAssessmentDefinitionStore[$primaryEntityReference?.kind])
                 .map(d => d.definitionGroup)
                 .uniq()
                 .value()
@@ -98,7 +98,7 @@
         .orderBy([d => d.groupName === "Uncategorized", d => d.groupName])
         .value();
 
-    $: favouriteIds = _.map($favouriteAssessmentDefinitionStore[$primaryEntityReference.kind], d => d.id);
+    $: favouriteIds = _.map($favouriteAssessmentDefinitionStore[$primaryEntityReference?.kind], d => d.id);
 </script>
 
 

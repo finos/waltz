@@ -1,5 +1,6 @@
 <script>
     import Unit from "./Unit.svelte";
+
     export let group = null;
 </script>
 

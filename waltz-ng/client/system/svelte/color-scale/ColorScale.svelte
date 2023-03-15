@@ -37,8 +37,12 @@
             name="Colour Gradient">
     <div slot="breadcrumbs">
         <ol class="waltz-breadcrumbs">
-            <li><ViewLink state="main">Home</ViewLink></li>
-            <li><ViewLink state="main.system.list">System Admin</ViewLink></li>
+            <li>
+                <ViewLink state="main">Home</ViewLink>
+            </li>
+            <li>
+                <ViewLink state="main.system.list">System Admin</ViewLink>
+            </li>
             <li>Colour Graident</li>
         </ol>
     </div>

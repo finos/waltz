@@ -19,15 +19,15 @@
 
 export function store($http, BaseApiUrl) {
 
-    const BASE = `${BaseApiUrl}/legal-entity-relationship-kind`;
+    const BASE = `${BaseApiUrl}/bulk-upload-legal-entity-relationships`;
 
 
-    const findAll = () =>
-        $http.get(BASE)
+    const resolve = (cmd) =>
+        $http.post(`${BASE}/resolve`, cmd)
             .then(result => result.data);
 
     return {
-        findAll,
+        resolve
     };
 }
 
@@ -38,15 +38,15 @@ store.$inject = [
 ];
 
 
-export const serviceName = "LegalEntityRelationshipKindStore";
+export const serviceName = "BulkUploadLegalEntityRelationshipsStore";
 
 
-export const LegalEntityRelationshipKindStore_API = {
-    findAll: {
+export const BulkUploadLegalEntityRelationshipsStore_API = {
+    resolve: {
         serviceName,
-        serviceFnName: "findAll",
-        description: "executes findAll"
-    },
+        serviceFnName: "resolve",
+        description: "executes resolve"
+    }
 };
 
 

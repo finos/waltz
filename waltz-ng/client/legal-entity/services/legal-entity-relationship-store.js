@@ -27,6 +27,11 @@ export function store($http, BaseApiUrl) {
             .get(`${BASE}/legal-entity-id/${id}`)
             .then(result => result.data);
 
+    const findByRelationshipKindId = (id) =>
+        $http
+            .get(`${BASE}/relationship-kind/${id}`)
+            .then(result => result.data);
+
     const findByEntityReference = (ref) =>
         $http
             .get(`${BASE}/kind/${ref.kind}/id/${ref.id}`)
@@ -34,7 +39,8 @@ export function store($http, BaseApiUrl) {
 
     return {
         findByLegalEntityId,
-        findByEntityReference
+        findByEntityReference,
+        findByRelationshipKindId
     };
 }
 
@@ -53,6 +59,11 @@ export const LegalEntityRelationshipStore_API = {
         serviceName,
         serviceFnName: "findByLegalEntityId",
         description: "executes findByLegalEntityId"
+    },
+    findByRelationshipKindId: {
+        serviceName,
+        serviceFnName: "findByRelationshipKindId",
+        description: "executes findByRelationshipKindId"
     },
     findByEntityReference: {
         serviceName,

@@ -9,20 +9,20 @@
 
 <a href="person/id/{person.id}">
 
-<div class="navaid-leader"
-     class:primary={scheme === 'primary'}
-     class:secondary={scheme === 'secondary'}>
-    <div class="banner">
-        <div>
-            {title}
+    <div class="navaid-leader"
+         class:primary={scheme === 'primary'}
+         class:secondary={scheme === 'secondary'}>
+        <div class="banner">
+            <div>
+                {title}
+            </div>
+            <div>
+                <EntityLabel ref={person}
+                             showIcon={false}/>
+            </div>
         </div>
-        <div>
-            <EntityLabel ref={person}
-                         showIcon={false}/>
-        </div>
-    </div>
 
-</div>
+    </div>
 </a>
 <style>
     .navaid-leader {

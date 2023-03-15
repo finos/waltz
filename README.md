@@ -54,13 +54,15 @@ See [pom.xml](https://github.com/finos/waltz/blob/master/pom.xml) for a full lis
 - AngularJS 1.7
 - Svelte
 - Bootstrap 3
-- D3 
+- D3
 
-See [package.json](https://github.com/finos/waltz/blob/master/waltz-ng/package.json) for full list of javascript dependencies.
+See [package.json](https://github.com/finos/waltz/blob/master/waltz-ng/package.json) for full list of javascript
+dependencies.
 
 ## Roadmap / Releases
 
-Checkout [the project milestones](https://github.com/finos/waltz/milestones) and browse through the Todo, work in progress and done issues.
+Checkout [the project milestones](https://github.com/finos/waltz/milestones) and browse through the Todo, work in
+progress and done issues.
 
 **Provisional** dates for upcoming releases:
 
@@ -70,12 +72,12 @@ Checkout [the project milestones](https://github.com/finos/waltz/milestones) and
 | 1.49     | 30th May 2023   | tbd                        |
 | 1.50     | tbd             | tbd                        |
 
-
 ## Contributing
 
 1. Fork it (<https://github.com/finos/waltz/fork>)
 2. Create your feature branch (`git checkout -b feature/fooBar`)
-3. Read our [contribution guidelines](CONTRIBUTING.md) and [Community Code of Conduct](https://www.finos.org/code-of-conduct)
+3. Read our [contribution guidelines](CONTRIBUTING.md)
+   and [Community Code of Conduct](https://www.finos.org/code-of-conduct)
 4. Commit your changes (`git commit -am 'Add some fooBar'`)
 5. Push to the branch (`git push origin feature/fooBar`)
 6. Create a new Pull Request
