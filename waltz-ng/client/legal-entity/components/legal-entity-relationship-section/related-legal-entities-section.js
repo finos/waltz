@@ -15,7 +15,7 @@
  * See the License for the specific
  *
  */
-import template from "./legal-entity-relationship-section.html";
+import template from "./related-legal-entites-section.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
@@ -108,6 +108,6 @@ const component = {
 
 
 export default {
-    id: "waltzLegalEntityRelationshipSection",
+    id: "waltzRelatedLegalEntitiesSection",
     component
 };

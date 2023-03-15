@@ -85,7 +85,7 @@ public class StreamUtilities {
         public boolean test(T t) {
             boolean check = pred.test(t);
             if (check) results.add(t);
-            return ! check;
+            return !check;
         }
 
         public List<T> getResults() {
@@ -95,6 +95,11 @@ public class StreamUtilities {
         public Stream<T> stream() {
             return results.stream();
         }
+
+        public boolean hasResults() {
+            return !results.isEmpty();
+        }
+
     }
 
 

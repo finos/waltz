@@ -40,6 +40,7 @@ import java.util.Optional;
 import static org.finos.waltz.common.Checks.checkNotEmpty;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
+import static org.finos.waltz.common.ObjectUtilities.firstNotNull;
 import static org.finos.waltz.data.JooqUtilities.*;
 import static org.finos.waltz.schema.Tables.PERSON;
 import static org.finos.waltz.schema.tables.ChangeLog.CHANGE_LOG;
@@ -307,8 +308,10 @@ public class ChangeLogDao {
     }
 
 
-    public int[] write(Collection<ChangeLog> changeLogs) {
+    public int[] write(DSLContext tx, Collection<ChangeLog> changeLogs) {
         checkNotNull(changeLogs, "changeLogs must not be null");
+
+        DSLContext dslContext = firstNotNull(tx, dsl);
 
         Query[] queries = changeLogs
                 .stream()
@@ -322,7 +325,7 @@ public class ChangeLogDao {
                         .set(CHANGE_LOG.OPERATION, changeLog.operation().name())
                         .set(CHANGE_LOG.CREATED_AT, Timestamp.valueOf(changeLog.createdAt())))
                 .toArray(Query[]::new);
-        return dsl.batch(queries).execute();
+        return dslContext.batch(queries).execute();
     }
 
 

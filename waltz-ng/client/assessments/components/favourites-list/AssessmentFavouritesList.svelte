@@ -45,7 +45,7 @@
     $: {
         const assessmentsByDefId = _.keyBy($assessments, d => d.definition.id);
         favouriteAssessments = _
-            .chain($favouriteAssessmentDefinitionStore[$primaryEntityReference.kind])
+            .chain($favouriteAssessmentDefinitionStore[$primaryEntityReference?.kind])
             .map(def => assessmentsByDefId[def.id])
             .compact()
             .value();

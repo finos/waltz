@@ -41,9 +41,9 @@
         }
     }
 
-    $: $assessmentDefinitions = $assessmentDefinitionCall?.data;
-    $: $assessmentRatings = $assessmentRatingCall?.data;
-    $: $ratingSchemes = $ratingSchemesCall?.data;
+    $: $assessmentDefinitions = $assessmentDefinitionCall?.data || [];
+    $: $assessmentRatings = $assessmentRatingCall?.data || [];
+    $: $ratingSchemes = $ratingSchemesCall?.data || [];
 
     function toggleGroup(group) {
         noTogglingYet = false;
@@ -100,7 +100,7 @@
         .orderBy([d => d.groupName === "Uncategorized", d => d.groupName])
         .value();
 
-    $: favouriteIds = _.map($favouriteAssessmentDefinitionStore[$primaryEntityReference.kind], d => d.id);
+    $: favouriteIds = _.map($favouriteAssessmentDefinitionStore[$primaryEntityReference?.kind], d => d.id);
 </script>
 
 

@@ -37,6 +37,10 @@ public class RatingSchemeHelper {
 
 
     public Long saveRatingItem(long schemeId, String name, int position, String color, String code) {
+        return saveRatingItem(schemeId, name, position, color, code, name);
+    }
+
+    public long saveRatingItem(long schemeId, String name, int position, String color, String code, String externalId) {
         ImmutableRatingSchemeItem rating = ImmutableRatingSchemeItem.builder()
                 .name(name)
                 .description(format("%s description", name))
@@ -44,6 +48,7 @@ public class RatingSchemeHelper {
                 .position(position)
                 .color(color)
                 .rating(code)
+                .externalId(externalId)
                 .build();
 
         return ratingSchemeService.saveRatingItem(schemeId, rating);

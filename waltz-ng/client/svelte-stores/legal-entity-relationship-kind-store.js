@@ -25,7 +25,7 @@ export function mkLegalEntityRelationshipKindStore() {
 
     const getById = (id, force = false) => {
         return remote
-            .fetchViewDatum("GET", `${base}/${id}`, null, {force});
+            .fetchViewDatum("GET", `${base}/id/${id}`, null, {force});
     };
 
 
