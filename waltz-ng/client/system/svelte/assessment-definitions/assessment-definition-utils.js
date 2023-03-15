@@ -24,17 +24,18 @@ export function getRequiredFields(d) {
 }
 
 export const possibleEntityKinds = [
-    {value: "APPLICATION", name: "Application"},
-    {value: "CHANGE_INITIATIVE", name: "Change Initiative"},
-    {value: "CHANGE_SET", name: "Change Set"},
-    {value: "ENTITY_RELATIONSHIP", name: "Entity Relationship"},
-    {value: "LEGAL_ENTITY", name: "Legal Entity"},
-    {value: "LICENCE", name: "Software Licence"},
-    {value: "LOGICAL_DATA_FLOW", name: "Logical Data Flow"},
-    {value: "MEASURABLE", name: "Measurable"},
-    {value: "PHYSICAL_FLOW", name: "Physical Flow"},
-    {value: "PHYSICAL_SPECIFICATION", name: "Physical Specification"},
-    {value: "SOFTWARE_PACKAGE", name: "Software Package"}
+    {value: "APPLICATION", name: "Application", qualifierKind: null},
+    {value: "CHANGE_INITIATIVE", name: "Change Initiative", qualifierKind: null},
+    {value: "CHANGE_SET", name: "Change Set", qualifierKind: null},
+    {value: "ENTITY_RELATIONSHIP", name: "Entity Relationship", qualifierKind: null},
+    {value: "LEGAL_ENTITY", name: "Legal Entity", qualifierKind: null},
+    {value: "LEGAL_ENTITY_RELATIONSHIP", name: "Legal Entity Relationship", qualifierKind: "LEGAL_ENTITY_RELATIONSHIP_KIND"},
+    {value: "LICENCE", name: "Software Licence", qualifierKind: null},
+    {value: "LOGICAL_DATA_FLOW", name: "Logical Data Flow", needsQualifier: false},
+    {value: "MEASURABLE", name: "Measurable", qualifierKind: "MEASURABLE_CATEGORY"},
+    {value: "PHYSICAL_FLOW", name: "Physical Flow", qualifierKind: null},
+    {value: "PHYSICAL_SPECIFICATION", name: "Physical Specification", qualifierKind: null},
+    {value: "SOFTWARE_PACKAGE", name: "Software Package", qualifierKind: null}
 ];
 
 export const possibleVisibility = [
