@@ -35,14 +35,14 @@
                     <div class="col-sm-2 waltz-display-field-label">
                         Name
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 waltz-display-field-value">
                         <span ng-bind="$ctrl.app.name"></span>
                     </div>
 
                     <div class="col-sm-2 waltz-display-field-label">
                         Asset Code
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 waltz-display-field-value">
                         <waltz-asset-code-explorer application="$ctrl.app">
                         </waltz-asset-code-explorer>
                     </div>
@@ -52,13 +52,13 @@
                     <div class="col-sm-2 waltz-display-field-label">
                         Lifecycle Phase
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 waltz-display-field-value">
                         <span ng-bind="$ctrl.app.lifecyclePhase | toDisplayName:'lifecyclePhase'"></span>
                     </div>
                     <div class="col-sm-2 waltz-display-field-label">
                         Type
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 waltz-display-field-value">
                         <span ng-bind="$ctrl.app.applicationKind | toDisplayName:'applicationKind'"></span>
                     </div>
                 </div>
@@ -67,7 +67,7 @@
                     <div class="col-sm-2 waltz-display-field-label">
                         Owning Org Unit
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 waltz-display-field-value">
                         <a ng-bind='$ctrl.organisationalUnit.name'
                            ui-sref="main.org-unit.view ({ id: $ctrl.organisationalUnit.id })">
                         </a>
@@ -75,7 +75,7 @@
                     <div class="col-sm-2 waltz-display-field-label">
                         Overall Rating
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 waltz-display-field-value">
                         <waltz-rating-indicator-cell rating="$ctrl.app.overallRating | useDefaultRatingScheme:'investment' "
                                                      show-description-popup="true"
                                                      show-name="true">
@@ -155,7 +155,7 @@
                     <div class="col-sm-2 waltz-display-field-label">
                         Complexity Rating:
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 waltz-display-field-value">
                         <span ng-if="$ctrl.complexities.length > 0"
                               class='waltz-clickable-definition'
                               popover-trigger="focus"
@@ -173,7 +173,7 @@
                     <div class="col-sm-2 waltz-display-field-label">
                         Business Criticality
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 waltz-display-field-value">
                         <span ng-bind="$ctrl.app.businessCriticality | toDisplayName:'criticality'"></span>
                     </div>
                 </div>
@@ -182,7 +182,7 @@
                     <div class="col-sm-2 waltz-display-field-label">
                         Planned Retirement:
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 waltz-display-field-value">
                         <waltz-from-now ng-if="$ctrl.app.plannedRetirementDate"
                                         timestamp="$ctrl.app.plannedRetirementDate"
                                         days-only="true">
@@ -194,7 +194,7 @@
                     <div class="col-sm-2 waltz-display-field-label">
                         Actual Retirement:
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 waltz-display-field-value">
                         <waltz-from-now ng-if="$ctrl.app.actualRetirementDate"
                                         timestamp="$ctrl.app.actualRetirementDate"
                                         days-only="true">
@@ -208,7 +208,7 @@
                     <div class="col-sm-2 waltz-display-field-label">
                         Commission:
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 waltz-display-field-value">
                         <waltz-from-now ng-if="$ctrl.app.commissionDate"
                                         timestamp="$ctrl.app.commissionDate"
                                         days-only="true">
@@ -220,7 +220,7 @@
                     <div class="col-sm-2 waltz-display-field-label">
                         Provenance:
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-4 waltz-display-field-value">
                         <span ng-bind="$ctrl.app.provenance">
                             -
                         </span>
@@ -235,7 +235,7 @@
                     <div class="col-sm-2 waltz-display-field-label">
                         Description
                     </div>
-                    <div class="col-sm-10">
+                    <div class="col-sm-10 waltz-display-field-value">
                         <waltz-markdown text="$ctrl.app.description">
                         </waltz-markdown>
                     </div>
@@ -246,7 +246,7 @@
                     <div class="col-sm-2 waltz-display-field-label">
                         Application Groups
                     </div>
-                    <div class="col-sm-10">
+                    <div class="col-sm-10 waltz-display-field-value">
                         <ul class="list-unstyled list-inline">
                             <li ng-repeat="appGroup in $ctrl.appGroupsToDisplay">
                                 <waltz-entity-link entity-ref="appGroup">

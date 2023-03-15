@@ -1,4 +1,3 @@
-
 <script>
 
     import EntityLink from "../EntityLink.svelte";

@@ -27,6 +27,7 @@
     let expansions = [];
     let qry;
     let groupedAssessments;
+    let noTogglingYet = true;
 
     let assessmentDefinitionCall;
     let assessmentRatingCall;
@@ -45,6 +46,7 @@
     $: $ratingSchemes = $ratingSchemesCall?.data || [];
 
     function toggleGroup(group) {
+        noTogglingYet = false;
         expansions = _.includes(expansions, group.groupName)
             ? _.without(expansions, group.groupName)
             : _.concat(expansions, group.groupName);
@@ -66,9 +68,9 @@
     }
 
 
-    $: expansions = _.isEmpty(expansions)
-            ? _
-            .chain($favouriteAssessmentDefinitionStore[$primaryEntityReference?.kind])
+    $: expansions = _.isEmpty(expansions) && noTogglingYet
+            ?  _
+                .chain($favouriteAssessmentDefinitionStore[$primaryEntityReference.kind])
                 .map(d => d.definitionGroup)
                 .uniq()
                 .value()

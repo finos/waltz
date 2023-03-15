@@ -283,7 +283,7 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 .target(c)
                 .build();
 
-        List<LogicalFlow> noCreateCommands = lfSvc.addFlows(emptyList(), "addFlowTest");
+        Set<LogicalFlow> noCreateCommands = lfSvc.addFlows(emptyList(), "addFlowTest");
         assertEquals(emptyList(), noCreateCommands, "If no list provided returns empty list");
 
         assertThrows(
@@ -291,14 +291,14 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 () -> lfSvc.addFlows(asList(createLoopCommand, abCreateCommand), "addFlowTest"),
                 "If contains invalid flow (same src and trg) throws exception");
 
-        List<LogicalFlow> newFlows = lfSvc.addFlows(asList(abCreateCommand, baCreateCommand), "addFlowsTest");
+        Set<LogicalFlow> newFlows = lfSvc.addFlows(asList(abCreateCommand, baCreateCommand), "addFlowsTest");
         assertEquals(2, newFlows.size(), "2 valid create commands should create 2 flows");
 
         assertEquals(asSet(tuple(a, b), tuple(b, a)),
                 map(newFlows, f -> tuple(f.source(), f.target())),
                 "Source and targets in returned set match");
 
-        List<LogicalFlow> duplicatedFlows = lfSvc.addFlows(asList(bcCreateCommand, bcCreateCommand), "addFlowsTest");
+        Set<LogicalFlow> duplicatedFlows = lfSvc.addFlows(asList(bcCreateCommand, bcCreateCommand), "addFlowsTest");
         assertEquals(1,
                 duplicatedFlows.size(),
                 "multiple create commands for same source and target should not create multiple flows");
@@ -307,7 +307,7 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 map(duplicatedFlows, f -> tuple(f.source(), f.target())),
                 "multiple create commands for same source and target should not create multiple flows");
 
-        List<LogicalFlow> existingFlows = lfSvc.addFlows(asList(bcCreateCommand, abCreateCommand), "addFlowsTest");
+        Set<LogicalFlow> existingFlows = lfSvc.addFlows(asList(bcCreateCommand, abCreateCommand), "addFlowsTest");
         assertTrue(existingFlows.isEmpty(), "should not create flow if flow already exists");
     }
 

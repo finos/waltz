@@ -24,6 +24,7 @@ import org.finos.waltz.data.database_information.DatabaseInformationDao;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.database_information.DatabaseInformation;
 import org.finos.waltz.model.database_information.DatabaseSummaryStatistics;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -67,5 +68,13 @@ public class DatabaseInformationService {
     public DatabaseInformation getByExternalId(String externalId) {
         checkNotNull(externalId, " external id cannot be null");
         return databaseInformationDao.getByExternalId(externalId);
+    }
+
+    public List<DatabaseInformation> search(EntitySearchOptions options) {
+        return databaseInformationDao.search(options);
+    }
+
+    public Long createDatabase(DatabaseInformation info) {
+        return databaseInformationDao.createDatabase(info);
     }
 }

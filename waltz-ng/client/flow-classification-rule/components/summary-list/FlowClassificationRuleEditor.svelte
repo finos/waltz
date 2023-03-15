@@ -112,6 +112,7 @@
 
 
 <form autocomplete="off"
+      data-testid="flow-classification-rule-editor"
       on:submit|preventDefault={save}>
 
     {#if !workingCopy.id}

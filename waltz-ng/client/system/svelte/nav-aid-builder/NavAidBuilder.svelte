@@ -1,29 +1,29 @@
 <script>
 
-    import PageHeader from "../../../common/svelte/PageHeader.svelte";
-    import ViewLink from "../../../common/svelte/ViewLink.svelte";
-    import TaxonomyNavAidBuilder from "./TaxonomyNavAidBuilder.svelte";
-    import DataTypeNavAidBuilder from "./DataTypeNavAidBuilder.svelte";
-    import MeasurableCategoryNavAidBuilder from "./MeasurableCategoryNavAidBuilder.svelte";
-    import PersonNavAidBuilder from "./PersonNavAidBuilder.svelte";
+import PageHeader from "../../../common/svelte/PageHeader.svelte";
+import ViewLink from "../../../common/svelte/ViewLink.svelte";
+import TaxonomyNavAidBuilder from "./TaxonomyNavAidBuilder.svelte";
+import DataTypeNavAidBuilder from "./DataTypeNavAidBuilder.svelte";
+import MeasurableCategoryNavAidBuilder from "./MeasurableCategoryNavAidBuilder.svelte";
+import PersonNavAidBuilder from "./custom/PersonNavAidBuilder.svelte";
 
-    const Modes = {
-        NONE: {},
-        DATA_TYPE: {
-            component: DataTypeNavAidBuilder
-        },
-        MEASURABLE_CATEGORY: {
-            component: MeasurableCategoryNavAidBuilder
-        },
-        PERSON: {component: PersonNavAidBuilder},
-        ORG_UNIT: {component: TaxonomyNavAidBuilder}
-    };
+const Modes = {
+    NONE: {},
+    DATA_TYPE: {
+        component: DataTypeNavAidBuilder
+    },
+    MEASURABLE_CATEGORY: {
+        component: MeasurableCategoryNavAidBuilder
+    },
+    PERSON: {component: PersonNavAidBuilder},
+    ORG_UNIT: {component: TaxonomyNavAidBuilder}
+};
 
-    let mode = Modes.PERSON;
+let mode = Modes.PERSON;
 
-    function switchMode(newMode) {
-        mode = newMode;
-    }
+function switchMode(newMode) {
+    mode = newMode;
+}
 
 </script>
 
@@ -32,12 +32,8 @@
             name="Navigation Aid Builder">
     <div slot="breadcrumbs">
         <ol class="waltz-breadcrumbs">
-            <li>
-                <ViewLink state="main">Home</ViewLink>
-            </li>
-            <li>
-                <ViewLink state="main.system.list">System Admin</ViewLink>
-            </li>
+            <li><ViewLink state="main">Home</ViewLink></li>
+            <li><ViewLink state="main.system.list">System Admin</ViewLink></li>
             <li>Navigation Aid Builder</li>
         </ol>
     </div>

@@ -18,6 +18,7 @@
 
 package org.finos.waltz.service.person;
 
+import org.finos.waltz.common.CollectionUtilities;
 import org.finos.waltz.data.person.PersonDao;
 import org.finos.waltz.data.person.search.PersonSearchDao;
 import org.finos.waltz.model.EntityKind;
@@ -28,6 +29,7 @@ import org.finos.waltz.model.person.PersonKind;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -69,6 +71,14 @@ public class PersonService {
     public List<Person> findDirectsByEmployeeId(String employeeId) {
         checkNotEmpty(employeeId, "Cannot find directs without an employeeId");
         return time("PS.findDirectsByEmployeeId", () -> personDao.findDirectsByEmployeeId(employeeId));
+    }
+
+
+    public Set<Person> findDirectsForPersonIds(List<Long> personIds) {
+        if (CollectionUtilities.isEmpty(personIds)) {
+            return Collections.emptySet();
+        }
+        return time("PS.findDirectsByPersonIds", () -> personDao.findDirectsForPersonIds(personIds));
     }
 
 
@@ -120,4 +130,5 @@ public class PersonService {
     public Set<Person> findActivePeopleByEmails(Set<String> emails){
         return personDao.findActivePeopleByEmails(emails);
     }
+
 }

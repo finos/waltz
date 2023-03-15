@@ -22,7 +22,7 @@
     </waltz-filter-change-watcher>
 
     <waltz-page-header name="{{ ctrl.statistic.definition.name }}"
-                       small="Indicator"
+                       small="Statistics"
                        icon="pie-chart">
         <breadcrumbs>
             <ol class="waltz-breadcrumbs">
@@ -33,7 +33,7 @@
                        ng-bind="ctrl.selectedNavItem.name">
                     </a>
                 </li>
-                <li>Indicators</li>
+                <li>Statistics</li>
                 <li ng-bind="ctrl.statistic.definition.name"></li>
             </ol>
         </breadcrumbs>
@@ -76,7 +76,7 @@
                     <div class="col-md-12"
                          ng-if="ctrl.visibility.related">
                         <hr>
-                        <h3>Related Indicators</h3>
+                        <h3>Related Statistics</h3>
                         <waltz-related-entity-statistics-summaries definitions="ctrl.relatedDefinitions"
                                                                    parent-ref="ctrl.parentRef"
                                                                    summaries="ctrl.summaries">
@@ -121,7 +121,7 @@
                 <p class="waltz-paragraph small text-muted"
                    style="padding-top: 12px">
                     Use the navigational tree above to select a vantage point to view
-                    this indicator from.
+                    this statistic from.
                 </p>
 
                 <hr>
@@ -132,7 +132,7 @@
                                 size="lg"
                                 name="{{ 'ENTITY_STATISTIC' | toIconName:'entity' }}">
                     </waltz-icon>
-                    <span>Indicators
+                    <span>Statistics
                         <small>Selector</small>
                     </span>
                 </h4>
@@ -143,7 +143,7 @@
 
                 <p class="waltz-paragraph small text-muted"
                    style="padding-top: 12px">
-                    Use the tree above to switch to a different indicator.
+                    Use the tree above to switch to a different statistic.
                 </p>
 
             </div>

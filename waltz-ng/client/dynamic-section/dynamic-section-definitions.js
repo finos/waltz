@@ -85,7 +85,7 @@ const entityNamedNotesSection = {
 
 const entityStatisticSection = {
     componentId: "entity-statistic-section",
-    name: "Indicators",
+    name: "Statistics",
     icon: "pie-chart",
     description: "Statistics for this entity",
     id: 11,
@@ -157,7 +157,7 @@ const technologySummarySection = {
 
 const entityStatisticSummarySection = {
     componentId: "entity-statistic-summary-section",
-    name: "Indicators",
+    name: "Statistics",
     icon: "pie-chart",
     description: "Summarised statistics for apps related to this entity, can be used to drill down into history",
     id: 20

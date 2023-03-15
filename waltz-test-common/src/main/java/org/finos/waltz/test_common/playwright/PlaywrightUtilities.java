@@ -2,6 +2,7 @@ package org.finos.waltz.test_common.playwright;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.playwright.APIResponse;
+import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.RequestOptions;
 import org.finos.waltz.model.EntityReference;
@@ -22,6 +23,14 @@ public class PlaywrightUtilities {
         page.screenshot(new Page
                 .ScreenshotOptions()
                 .setPath(Paths.get(path)));
+    }
+
+
+    public static void waitAndTakeScreenshot(Page page,
+                                             Locator locator,
+                                             String imagePath) {
+        locator.waitFor();
+        takeScreenshot(page, imagePath);
     }
 
 
@@ -83,5 +92,17 @@ public class PlaywrightUtilities {
         log("App link [%s](http://localhost:8000/application/%d)",
                 appRef.name().orElse("Un-named App"),
                 appRef.id());
+    }
+
+
+
+    public static void startSiteSearch(Page page,
+                                       String qry) {
+        page.locator(".navbar-right")
+                .getByTestId("search-button")
+                .click();
+
+        page.locator(".wnso-search-region  input[type=search]")
+                .fill(qry);
     }
 }
