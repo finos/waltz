@@ -27,6 +27,7 @@
     let expansions = [];
     let qry;
     let groupedAssessments;
+    let noTogglingYet = true;
 
     let assessmentDefinitionCall;
     let assessmentRatingCall;
@@ -40,11 +41,12 @@
         }
     }
 
-    $: $assessmentDefinitions = $assessmentDefinitionCall?.data;
-    $: $assessmentRatings = $assessmentRatingCall?.data;
-    $: $ratingSchemes = $ratingSchemesCall?.data;
+    $: $assessmentDefinitions = $assessmentDefinitionCall?.data || [];
+    $: $assessmentRatings = $assessmentRatingCall?.data || [];
+    $: $ratingSchemes = $ratingSchemesCall?.data || [];
 
     function toggleGroup(group) {
+        noTogglingYet = false;
         expansions = _.includes(expansions, group.groupName)
             ? _.without(expansions, group.groupName)
             : _.concat(expansions, group.groupName);
@@ -66,7 +68,7 @@
     }
 
 
-    $: expansions = _.isEmpty(expansions)
+    $: expansions = _.isEmpty(expansions) && noTogglingYet
             ?  _
                 .chain($favouriteAssessmentDefinitionStore[$primaryEntityReference.kind])
                 .map(d => d.definitionGroup)
@@ -98,7 +100,7 @@
         .orderBy([d => d.groupName === "Uncategorized", d => d.groupName])
         .value();
 
-    $: favouriteIds = _.map($favouriteAssessmentDefinitionStore[$primaryEntityReference.kind], d => d.id);
+    $: favouriteIds = _.map($favouriteAssessmentDefinitionStore[$primaryEntityReference?.kind], d => d.id);
 </script>
 
 

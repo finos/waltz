@@ -164,4 +164,18 @@ public class ListUtilities {
     public static <X, Y> List<Tuple2<X, Y>> zip(List<X> xs, List<Y> ys) {
         return Seq.zip(xs, ys).collect(toList());
     }
+
+
+    public static <T> boolean containsDuplicates(List<T> ts) {
+        HashSet<T> seen = new HashSet<>();
+
+        for (T t : ts) {
+            boolean added = seen.add(t);
+            if (!added) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

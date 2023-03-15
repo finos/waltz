@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static java.util.Collections.emptyMap;
@@ -35,7 +36,7 @@ import static java.util.stream.Collectors.toMap;
 public class MapUtilities {
 
     public static <K, V> HashMap<K, V> newHashMap() {
-         return new HashMap<>();
+        return new HashMap<>();
     }
 
 
@@ -61,7 +62,6 @@ public class MapUtilities {
         map.put(k3, v3);
         return map;
     }
-
 
 
     public static <K, V> Map<K, V> newHashMap(K k1, V v1,
@@ -109,8 +109,8 @@ public class MapUtilities {
 
 
     public static <K, V, V2> Map<K, Collection<V2>> groupBy(Collection<V> xs,
-                                                           Function<V, K> keyFn,
-                                                           Function<V, V2> valueFn) {
+                                                            Function<V, K> keyFn,
+                                                            Function<V, V2> valueFn) {
         return groupBy(keyFn, valueFn, xs);
     }
 
@@ -154,7 +154,6 @@ public class MapUtilities {
     }
 
 
-
     public static <K, R, V> Map<K, R> indexBy(Function<V, K> keyFn,
                                               Function<V, R> valueFn,
                                               Collection<V> xs) {
@@ -165,11 +164,11 @@ public class MapUtilities {
         return xs
                 .stream()
                 .collect(
-                    HashMap::new,
-                    (acc, d) -> acc.put(
-                            keyFn.apply(d),
-                            valueFn.apply(d)),
-                    Map::putAll);
+                        HashMap::new,
+                        (acc, d) -> acc.put(
+                                keyFn.apply(d),
+                                valueFn.apply(d)),
+                        Map::putAll);
     }
 
 
@@ -287,5 +286,19 @@ public class MapUtilities {
         Map<K1, V> result = new HashMap<>();
         map1.forEach((key, value) -> result.put(key, map2.get(value)));
         return result;
+    }
+
+    /**
+     * @param maps list of maps to merge, later maps override where key is shared with earlier map
+     * @param <K>  Key of Map
+     * @param <V>  Value of Map
+     * @return new merged Map<K, V>
+     */
+    public static <K, V> Map<K, V> merge(Map<K, V>... maps) {
+        HashMap<K, V> newMap = newHashMap();
+        Stream.of(maps)
+                .forEach(newMap::putAll);
+
+        return newMap;
     }
 }

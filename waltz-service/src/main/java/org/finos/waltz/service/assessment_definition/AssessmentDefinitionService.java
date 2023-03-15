@@ -21,6 +21,7 @@ package org.finos.waltz.service.assessment_definition;
 
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.assessment_definition.AssessmentDefinitionDao;
+import org.finos.waltz.data.legal_entity.LegalEntityRelationshipDao;
 import org.finos.waltz.data.measurable.MeasurableDao;
 import org.finos.waltz.data.user.UserPreferenceDao;
 import org.finos.waltz.model.EntityKind;
@@ -53,19 +54,24 @@ public class AssessmentDefinitionService {
 
     private final AssessmentDefinitionDao assessmentDefinitionDao;
     private final MeasurableDao measurableDao;
+    private final LegalEntityRelationshipDao legalEntityRelationshipDao;
     private final UserPreferenceDao userPreferenceDao;
 
 
     @Autowired
     public AssessmentDefinitionService(AssessmentDefinitionDao assessmentDefinitionDao,
                                        MeasurableDao measurableDao,
+                                       LegalEntityRelationshipDao legalEntityRelationshipDao,
                                        UserPreferenceDao userPreferenceDao) {
+
         checkNotNull(assessmentDefinitionDao, "assessmentDefinitionDao cannot be null");
         checkNotNull(measurableDao, "measurableDao cannot be null");
         checkNotNull(userPreferenceDao, "userPreferenceDao cannot be null");
+        checkNotNull(legalEntityRelationshipDao, "legalEntityRelationshipDao cannot be null");
 
         this.measurableDao = measurableDao;
         this.assessmentDefinitionDao = assessmentDefinitionDao;
+        this.legalEntityRelationshipDao = legalEntityRelationshipDao;
         this.userPreferenceDao = userPreferenceDao;
     }
 
@@ -75,17 +81,21 @@ public class AssessmentDefinitionService {
     }
 
 
-    public List<AssessmentDefinition> findAll() {
+    public Set<AssessmentDefinition> findAll() {
         return assessmentDefinitionDao.findAll();
     }
 
 
-    public List<AssessmentDefinition> findByEntityKind(EntityKind kind) {
+    public Set<AssessmentDefinition> findByEntityKind(EntityKind kind) {
         return assessmentDefinitionDao.findByEntityKind(kind);
     }
 
 
-    public Collection<AssessmentDefinition> findByEntityReference(EntityReference entityReference) {
+    public Set<AssessmentDefinition> findByEntityKindAndQualifier(EntityKind kind, EntityReference qualifierReference) {
+        return assessmentDefinitionDao.findByEntityKindAndQualifier(kind, qualifierReference);
+    }
+
+    public Set<AssessmentDefinition> findByEntityReference(EntityReference entityReference) {
         switch (entityReference.kind()) {
             case MEASURABLE:
                 Measurable m = measurableDao.getById(entityReference.id());

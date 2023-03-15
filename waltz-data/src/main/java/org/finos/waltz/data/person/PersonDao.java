@@ -22,10 +22,12 @@ import org.finos.waltz.schema.tables.records.PersonRecord;
 import org.finos.waltz.model.person.ImmutablePerson;
 import org.finos.waltz.model.person.Person;
 import org.finos.waltz.model.person.PersonKind;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
+import org.jooq.SelectSeekStep1;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -253,6 +255,24 @@ public class PersonDao {
                 .from(USER_ROLE)
                 .innerJoin(PERSON).on(PERSON.EMAIL.eq(USER_ROLE.USER_NAME)
                         .and(PERSON.IS_REMOVED.isFalse()))
+                .fetchSet(personMapper);
+    }
+
+
+    public Set<Person> findDirectsForPersonIds(List<Long> personIds) {
+        Condition cond = PERSON.MANAGER_EMPLOYEE_ID.in(DSL
+                            .select(PERSON.EMPLOYEE_ID)
+                            .from(PERSON)
+                            .where(PERSON.ID.in(personIds)))
+                    .andNot(PERSON.IS_REMOVED);
+
+        SelectSeekStep1<Record, String> qry = dsl
+                .select(PERSON.fields())
+                .from(PERSON)
+                .where(dsl.renderInlined(cond))
+                .orderBy(PERSON.DISPLAY_NAME);
+
+        return qry
                 .fetchSet(personMapper);
     }
 }

@@ -29,6 +29,8 @@ import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.SetUtilities.*;
 import static org.finos.waltz.common.StringUtilities.safeTrim;
 import static org.finos.waltz.model.DiffResult.mkDiff;
+import static org.finos.waltz.service.bulk_upload.BulkUploadUtilities.getColumnValuesFromInputString;
+import static org.finos.waltz.service.bulk_upload.BulkUploadUtilities.streamRowData;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Service
@@ -87,7 +89,7 @@ public class BulkUploadService {
         Set<Involvement> desiredInvolvements = streamRowData(uploadCommand.inputString())
                 .map(t -> {
 
-                    String[] cells = t.v2;
+                    String[] cells = t.values();
 
                     String entityIdentifierString = safeTrim(cells[0]);
                     String personIdentifierString = safeTrim(cells[1]);
@@ -149,8 +151,8 @@ public class BulkUploadService {
         return streamRowData(resolveParams.inputString())
                 .map(t -> {
 
-                    Integer lineNumber = t.v1;
-                    String[] cells = t.v2;
+                    Integer lineNumber = t.rowNumber();
+                    String[] cells = t.values();
                     List<String> rowData = asList(cells);
 
                     if (cells.length < REQUIRED_INVOLVEMENT_COLUMNS_SIZE) {
@@ -178,34 +180,6 @@ public class BulkUploadService {
                     }
                 })
                 .collect(Collectors.toList());
-    }
-
-    private Set<String> getColumnValuesFromInputString(String inputString, int columnOffset) {
-        return streamRowData(inputString)
-                .filter(Objects::nonNull)
-                .filter(t -> !isEmpty(t.v2))
-                .filter(t -> t.v2.length > columnOffset)
-                .map(t -> {
-                    String[] cells = t.v2();
-                    String cell = cells[columnOffset];
-                    return safeTrim(cell);
-                })
-                .filter(StringUtilities::notEmpty)
-                .collect(Collectors.toSet());
-    }
-
-    private Stream<Tuple2<Integer, String[]>> streamRowData(String inputString) {
-
-        AtomicInteger lineNumber = new AtomicInteger(1);
-
-        return IOUtilities.streamLines(new ByteArrayInputStream(inputString.getBytes()))
-                .filter(StringUtilities::notEmpty)
-                .filter(r -> !r.startsWith("#"))
-                .map(r -> {
-                    String delimiters = "[,;\\t|]+";
-                    return r.split(delimiters);
-                })
-                .map(r -> tuple(lineNumber.getAndIncrement(), r));
     }
 
     private ResolveRowResponse mkErrorResponse(List<String> rowData, String errorMessage) {

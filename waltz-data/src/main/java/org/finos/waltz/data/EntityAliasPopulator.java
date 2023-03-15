@@ -20,6 +20,8 @@ package org.finos.waltz.data;
 
 import org.finos.waltz.common.FunctionUtilities;
 import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.schema.Tables;
 import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -31,6 +33,7 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toMap;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 /**
@@ -54,6 +57,8 @@ public class EntityAliasPopulator {
         switch (entityKind) {
             case APPLICATION:
                 return fetchApplicationAliasToIdMap(identifiers);
+            case LEGAL_ENTITY:
+                return fetchLegalEntityAliasToIdMap(identifiers);
             case PERSON:
                 return FunctionUtilities.time("fetch alias map people", () -> fetchPersonAliasToIdMap(identifiers));
             case CHANGE_INITIATIVE:
@@ -78,6 +83,47 @@ public class EntityAliasPopulator {
 
     private Map<String, Long> fetchApplicationAliasToIdMap(Set<String> aliases) {
         return resolveSimpleAliases(aliases, APPLICATION, APPLICATION.ASSET_CODE, APPLICATION.ID);
+    }
+
+
+    public Map<String, EntityReference> fetchEntityReferenceLookupMap(EntityKind entityKind, Set<String> identifiers) {
+        checkNotNull(entityKind, "entityKind cannot be null");
+
+        switch (entityKind) {
+            case APPLICATION:
+                return fetchApplicationAliasToReferenceMap(identifiers);
+            case LEGAL_ENTITY:
+                return fetchLegalEntityAliasToReferenceMap(identifiers);
+            default:
+                throw new IllegalArgumentException(format("Cannot find lookup map for entity reference for entity kind: %s", entityKind));
+        }
+    }
+
+
+    private Map<String, EntityReference> fetchApplicationAliasToReferenceMap(Set<String> aliases) {
+        return dsl
+                .select(Tables.APPLICATION.ASSET_CODE, Tables.APPLICATION.ID, Tables.APPLICATION.NAME)
+                .from(Tables.APPLICATION)
+                .where(Tables.APPLICATION.ASSET_CODE.in(aliases))
+                .fetchSet(r -> tuple(r.get(Tables.APPLICATION.ASSET_CODE), r.get(Tables.APPLICATION.ID), r.get(Tables.APPLICATION.NAME)))
+                .stream()
+                .collect(toMap(t -> t.v1, t -> mkRef(EntityKind.APPLICATION, t.v2, t.v3), (v1, v2) -> v1));
+    }
+
+
+    private Map<String, Long> fetchLegalEntityAliasToIdMap(Set<String> aliases) {
+        return resolveSimpleAliases(aliases, LEGAL_ENTITY, LEGAL_ENTITY.EXTERNAL_ID, LEGAL_ENTITY.ID);
+    }
+
+
+    private Map<String, EntityReference> fetchLegalEntityAliasToReferenceMap(Set<String> aliases) {
+        return dsl
+                .select(Tables.LEGAL_ENTITY.EXTERNAL_ID, Tables.LEGAL_ENTITY.ID, Tables.LEGAL_ENTITY.NAME)
+                .from(Tables.LEGAL_ENTITY)
+                .where(Tables.LEGAL_ENTITY.EXTERNAL_ID.in(aliases))
+                .fetchSet(r -> tuple(r.get(Tables.LEGAL_ENTITY.EXTERNAL_ID), r.get(Tables.LEGAL_ENTITY.ID), r.get(Tables.LEGAL_ENTITY.NAME)))
+                .stream()
+                .collect(toMap(t -> t.v1, t -> mkRef(EntityKind.LEGAL_ENTITY, t.v2, t.v3), (v1, v2) -> v1));
     }
 
 
@@ -119,7 +165,6 @@ public class EntityAliasPopulator {
                         t -> t.v2,
                         (v1, v2) -> v1));
     }
-
 
 
     private SelectConditionStep<Record2<String, Long>> mkQry(Set<String> aliases,

@@ -78,6 +78,7 @@ import History from "./history";
 import Involvement from "./involvement";
 import InvolvementKind from "./involvement-kind";
 import LegalEntity from "./legal-entity";
+import LegalEntityRelationshipKind from "./legal-entity-relationship-kind";
 import Licence from "./licence";
 import LogicalDataElement from "./logical-data-element";
 import LogicalFlow from "./logical-flow";
@@ -188,6 +189,7 @@ const dependencies = [
     Involvement(),
     InvolvementKind(),
     LegalEntity(),
+    LegalEntityRelationshipKind(),
     Licence(),
     LogicalDataElement(),
     LogicalFlow(),

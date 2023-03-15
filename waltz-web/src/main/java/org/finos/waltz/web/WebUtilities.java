@@ -18,7 +18,6 @@
 
 package org.finos.waltz.web;
 
-import org.eclipse.jetty.http.MimeTypes;
 import org.finos.waltz.common.EnumUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.common.StringUtilities;
@@ -33,6 +32,7 @@ import spark.Response;
 import spark.ResponseTransformer;
 
 import java.io.IOException;
+import java.net.URLConnection;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -55,14 +55,6 @@ public class WebUtilities {
     private static final Logger LOG = LoggerFactory.getLogger(WebUtilities.class);
 
     public static final String TYPE_JSON = "application/json";
-
-    private static final MimeTypes mimeTypes = new MimeTypes();
-
-    static {
-        mimeTypes.addMimeMapping("ttf", "application/x-font-ttf");
-    }
-
-
     public static final ResponseTransformer transformer = getJsonMapper()::writeValueAsString;
 
 
@@ -332,8 +324,10 @@ public class WebUtilities {
      * @return
      */
     public static String getMimeType(String path) {
+
         return firstNotNull(
-                mimeTypes.getMimeByExtension(path),
+                path.endsWith("ttf") ? "application/x-font-ttf" : null,
+                URLConnection.guessContentTypeFromName(path),
                 "application/octet-stream");
     }
 

@@ -85,7 +85,7 @@ const entityNamedNotesSection = {
 
 const entityStatisticSection = {
     componentId: "entity-statistic-section",
-    name: "Indicators",
+    name: "Statistics",
     icon: "pie-chart",
     description: "Statistics for this entity",
     id: 11,
@@ -157,7 +157,7 @@ const technologySummarySection = {
 
 const entityStatisticSummarySection = {
     componentId: "entity-statistic-summary-section",
-    name: "Indicators",
+    name: "Statistics",
     icon: "pie-chart",
     description: "Summarised statistics for apps related to this entity, can be used to drill down into history",
     id: 20
@@ -434,12 +434,21 @@ const legalEntitySection = {
     id: 10010,
 };
 
-const legalEntityRelationshipsSection = {
+const relatedEntitiesRelationshipsSection = {
     // svelteComponent: LegalEntityRelationshipSection,
-    componentId: "legal-entity-relationship-section",
+    componentId: "related-legal-entities-section",
     name: "Related Entities",
     icon: "link",
     description: "Relationships to other entities",
+    id: 10020,
+};
+
+const legalEntityRelationshipsSection = {
+    // svelteComponent: LegalEntityRelationshipSection,
+    componentId: "legal-entity-relationships-section",
+    name: "Relationships",
+    icon: "link",
+    description: "Relationships between legal entities and other waltz entities of this relationship kind",
     id: 10020,
 };
 
@@ -471,6 +480,7 @@ export const dynamicSections = {
     flowSpecDefinitionSection,
     involvedPeopleSection,
     legalEntitySection,
+    relatedEntitiesRelationshipsSection,
     legalEntityRelationshipsSection,
     licenceSection,
     logicalDataElementsSection,
@@ -795,6 +805,16 @@ const legalEntitySections = [
     bookmarksSection,
     entityNamedNotesSection,
     involvedPeopleSection,
+    relatedEntitiesRelationshipsSection,
+    changeLogSection
+];
+
+
+const legalEntityRelationshipKindSections = [
+    assessmentRatingSection,
+    bookmarksSection,
+    entityNamedNotesSection,
+    involvedPeopleSection,
     legalEntityRelationshipsSection,
     changeLogSection
 ];
@@ -818,6 +838,7 @@ export const dynamicSectionsByKind = {
     "main.flow-classification-rule.view": flowClassificationRuleSections,
     "main.flow-diagram.view": flowDiagramSections,
     "main.legal-entity.view": legalEntitySections,
+    "main.legal-entity-relationship-kind.view": legalEntityRelationshipKindSections,
     "main.licence.external-id": licenceSections,
     "main.licence.view": licenceSections,
     "main.logical-flow.view": logicalDataFlowSections,

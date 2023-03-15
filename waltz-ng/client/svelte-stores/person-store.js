@@ -21,15 +21,23 @@ export function mkPersonStore() {
             "GET",
             `api/person/user-id/${userId}`, null, null);
 
-  const getSelf = () => remote
+    const getSelf = () => remote
         .fetchViewDatum(
             "GET",
             "api/person/self", null, null);
+
+    const findDirectsForPersonIds = (personIds = []) => remote
+        .fetchViewData(
+            "POST",
+            `api/person/person-ids/directs`,
+            personIds,
+            []);
 
     return {
         getByEmployeeId,
         getById,
         findByUserId,
+        findDirectsForPersonIds,
         getSelf
     };
 }

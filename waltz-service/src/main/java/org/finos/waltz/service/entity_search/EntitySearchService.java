@@ -23,6 +23,7 @@ import org.finos.waltz.service.app_group.AppGroupService;
 import org.finos.waltz.service.application.ApplicationService;
 import org.finos.waltz.service.change_initiative.ChangeInitiativeService;
 import org.finos.waltz.service.data_type.DataTypeService;
+import org.finos.waltz.service.database_information.DatabaseInformationService;
 import org.finos.waltz.service.flow_diagram.FlowDiagramService;
 import org.finos.waltz.service.legal_entity.LegalEntityService;
 import org.finos.waltz.service.logical_data_element.LogicalDataElementService;
@@ -72,6 +73,7 @@ public class EntitySearchService {
     private final SoftwareCatalogService softwareCatalogService;
     private final FlowDiagramService flowDiagramService;
     private final LegalEntityService legalEntityService;
+    private final DatabaseInformationService databaseInformationService;
 
 
     @Autowired
@@ -90,7 +92,8 @@ public class EntitySearchService {
                                ServerInformationService serverInformationService,
                                SoftwareCatalogService softwareCatalogService,
                                FlowDiagramService flowDiagramService,
-                               LegalEntityService legalEntityService) {
+                               LegalEntityService legalEntityService,
+                               DatabaseInformationService databaseInformationService) {
 
         checkNotNull(dbExecutorPool, "dbExecutorPool cannot be null");
         checkNotNull(actorService, "actorService cannot be null");
@@ -108,6 +111,7 @@ public class EntitySearchService {
         checkNotNull(serverInformationService, "serverInformationService cannot be null");
         checkNotNull(softwareCatalogService, "softwareCatalogService cannot be null");
         checkNotNull(legalEntityService, "legalEntityService cannot be null");
+        checkNotNull(databaseInformationService, "databaseInformationService cannot be null");
 
         this.actorService = actorService;
         this.dbExecutorPool = dbExecutorPool;
@@ -125,6 +129,7 @@ public class EntitySearchService {
         this.serverInformationService = serverInformationService;
         this.softwareCatalogService = softwareCatalogService;
         this.legalEntityService = legalEntityService;
+        this.databaseInformationService = databaseInformationService;
     }
 
 
@@ -163,6 +168,8 @@ public class EntitySearchService {
                 return () -> changeInitiativeService.search(options);
             case DATA_TYPE:
                 return () -> dataTypeService.search(options);
+            case DATABASE:
+                return () -> databaseInformationService.search(options);
             case FLOW_DIAGRAM:
                 return () -> flowDiagramService.search(options);
             case LEGAL_ENTITY:

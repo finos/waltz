@@ -43,7 +43,7 @@ const baseState = {
 
 const listViewState = {
     url: "/list",
-    views: { "content@": SystemAdminList }
+    views: {"content@": SystemAdminList}
 };
 
 
@@ -109,25 +109,25 @@ const ratingSchemesState = {
 
 const eudaListState = {
     url: "/euda-list",
-    views: { "content@": EudaListView }
+    views: {"content@": EudaListView}
 };
 
 
 const relationshipKindsState = {
     url: "/relationship-kinds",
-    views: { "content@": RelationshipKindsView }
+    views: {"content@": RelationshipKindsView}
 };
 
 
 const colorGradientState = {
     url: "/color-gradient",
-    views: { "content@": ColorGradientView }
+    views: {"content@": ColorGradientView}
 };
 
 
 const navAidBuilderState = {
     url: "/nav-aid-builder",
-    views: { "content@": NavAidBuilderView }
+    views: {"content@": NavAidBuilderView}
 };
 
 

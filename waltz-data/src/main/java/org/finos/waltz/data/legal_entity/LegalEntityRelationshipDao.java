@@ -10,14 +10,21 @@ import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.common.ObjectUtilities.firstNotNull;
+import static org.finos.waltz.common.SetUtilities.map;
+import static org.finos.waltz.common.StringUtilities.notEmpty;
+import static org.finos.waltz.data.JooqUtilities.summarizeResults;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.schema.Tables.*;
-import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 
 @Repository
 public class LegalEntityRelationshipDao {
@@ -48,6 +55,27 @@ public class LegalEntityRelationshipDao {
                 .build();
     };
 
+    private static final Function<LegalEntityRelationship, LegalEntityRelationshipRecord> TO_RECORD_MAPPER = d -> {
+
+        LegalEntityRelationshipRecord r = new LegalEntityRelationshipRecord();
+
+        d.id().ifPresent(r::setId);
+        r.setLegalEntityId(d.legalEntityReference().id());
+        r.setTargetId(d.targetEntityReference().id());
+        r.setTargetKind(d.targetEntityReference().kind().name());
+        r.setRelationshipKindId(d.relationshipKindId());
+        r.setExternalId(d.externalId().orElse(null));
+        r.setDescription(d.description());
+        r.setLastUpdatedAt(Timestamp.valueOf(d.lastUpdatedAt()));
+        r.setLastUpdatedBy(d.lastUpdatedBy());
+        r.setProvenance(d.provenance());
+        r.setIsReadonly(d.isReadOnly());
+
+        r.changed(LEGAL_ENTITY_RELATIONSHIP.ID, false);
+
+        return r;
+    };
+
     @Autowired
     public LegalEntityRelationshipDao(DSLContext dsl) {
         this.dsl = dsl;
@@ -55,11 +83,14 @@ public class LegalEntityRelationshipDao {
 
     public Set<LegalEntityRelationship> findByLegalEntityId(Long legalEntityId) {
         Condition legalEntityCondition = LEGAL_ENTITY_RELATIONSHIP.LEGAL_ENTITY_ID.eq(legalEntityId);
-        return findByCondition(legalEntityCondition);
+        return findByCondition(null, legalEntityCondition);
     }
 
-    private Set<LegalEntityRelationship> findByCondition(Condition condition) {
-        return dsl
+    private Set<LegalEntityRelationship> findByCondition(DSLContext tx, Condition condition) {
+
+        DSLContext dslContext = firstNotNull(tx, dsl);
+
+        return dslContext
                 .select(LEGAL_ENTITY_RELATIONSHIP.fields())
                 .select(LEGAL_ENTITY.NAME)
                 .select(ENTITY_NAME_FIELD)
@@ -72,6 +103,47 @@ public class LegalEntityRelationshipDao {
     public Set<LegalEntityRelationship> findByEntityReference(EntityReference ref) {
         Condition targetRefCondition = LEGAL_ENTITY_RELATIONSHIP.TARGET_ID.eq(ref.id())
                 .and(LEGAL_ENTITY_RELATIONSHIP.TARGET_KIND.eq(ref.kind().name()));
-        return findByCondition(targetRefCondition);
+        return findByCondition(null, targetRefCondition);
+    }
+
+    public Set<LegalEntityRelationship> findByRelationshipKind(DSLContext tx, long relKindId) {
+        Condition relationshipKindCondition = LEGAL_ENTITY_RELATIONSHIP.RELATIONSHIP_KIND_ID.eq(relKindId);
+        return findByCondition(tx, relationshipKindCondition);
+    }
+
+    public int bulkAdd(DSLContext tx, Set<LegalEntityRelationship> relationships) {
+
+        Set<LegalEntityRelationshipRecord> recordsToInsert = map(relationships, TO_RECORD_MAPPER);
+
+        int[] insertedRcs = tx.batchInsert(recordsToInsert).execute();
+
+        return summarizeResults(insertedRcs);
+    }
+
+    public int bulkUpdate(DSLContext tx, Set<LegalEntityRelationship> relationships) {
+
+        int[] updatedRcs = relationships
+                .stream()
+                .map(TO_RECORD_MAPPER)
+                .peek(r -> r.changed(LEGAL_ENTITY_RELATIONSHIP.DESCRIPTION, notEmpty(r.getDescription()))) // prevent overwriting comment
+                .collect(collectingAndThen(
+                        toSet(),
+                        tx::batchUpdate))
+                .execute();
+
+        return summarizeResults(updatedRcs);
+    }
+
+    public int bulkRemove(DSLContext tx, Set<LegalEntityRelationship> relationships) {
+
+        int[] deletedRcs = relationships
+                .stream()
+                .map(d -> tx
+                        .deleteFrom(LEGAL_ENTITY_RELATIONSHIP)
+                        .where(LEGAL_ENTITY_RELATIONSHIP.ID.eq(d.id().get())))
+                .collect(collectingAndThen(toSet(), tx::batch))
+                .execute();
+
+        return summarizeResults(deletedRcs);
     }
 }

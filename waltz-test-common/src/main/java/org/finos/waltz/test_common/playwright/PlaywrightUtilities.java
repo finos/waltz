@@ -2,6 +2,7 @@ package org.finos.waltz.test_common.playwright;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.playwright.APIResponse;
+import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.RequestOptions;
 import org.finos.waltz.model.EntityReference;
@@ -17,11 +18,19 @@ import static org.finos.waltz.common.StringUtilities.mkPath;
 public class PlaywrightUtilities {
 
     public static void takeScreenshot(Page page,
-                                        String path) {
+                                      String path) {
         log("Taking a screenshot: %s", path);
         page.screenshot(new Page
                 .ScreenshotOptions()
                 .setPath(Paths.get(path)));
+    }
+
+
+    public static void waitAndTakeScreenshot(Page page,
+                                             Locator locator,
+                                             String imagePath) {
+        locator.waitFor();
+        takeScreenshot(page, imagePath);
     }
 
 
@@ -45,8 +54,8 @@ public class PlaywrightUtilities {
                 .context()
                 .request()
                 .post(
-                    mkPath(base, "authentication", "login"),
-                    requestOptions);
+                        mkPath(base, "authentication", "login"),
+                        requestOptions);
 
         HashMap<String, String> loginResult = new ObjectMapper()
                 .createParser(resp.text())
@@ -54,8 +63,8 @@ public class PlaywrightUtilities {
 
         page.context()
                 .setExtraHTTPHeaders(newHashMap(
-                    "authorization",
-                    format("Bearer %s", loginResult.get("token"))));
+                        "authorization",
+                        format("Bearer %s", loginResult.get("token"))));
     }
 
 
@@ -75,13 +84,25 @@ public class PlaywrightUtilities {
 
 
     public static void log(String msg, Object... params) {
-        System.out.printf(msg+"\n", params);
+        System.out.printf(msg + "\n", params);
     }
 
 
     public static void logAppLink(EntityReference appRef) {
         log("App link [%s](http://localhost:8000/application/%d)",
-            appRef.name().orElse("Un-named App"),
-            appRef.id());
+                appRef.name().orElse("Un-named App"),
+                appRef.id());
+    }
+
+
+
+    public static void startSiteSearch(Page page,
+                                       String qry) {
+        page.locator(".navbar-right")
+                .getByTestId("search-button")
+                .click();
+
+        page.locator(".wnso-search-region  input[type=search]")
+                .fill(qry);
     }
 }

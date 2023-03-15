@@ -39,26 +39,26 @@
 
 
 {#if $mode === Modes.DETAIL}
-    <div>
+    <div data-testid="source">
         <strong>Source:</strong>
         <EntityLink ref={$selectedClassificationRule.subjectReference}/>
     </div>
     <p class="text-muted">The source application or actor for this rule</p>
 
 
-    <div>
+    <div data-testid="data-type">
         <strong>Data Type:</strong>
         <EntityLink ref={$selectedClassificationRule.dataType}/>
     </div>
     <p class="text-muted">The data type this application / actor will provide a flow classification for</p>
 
-    <div>
+    <div data-testid="scope">
         <strong>Scope:</strong>
         <EntityLink ref={$selectedClassificationRule?.vantagePointReference}/>
     </div>
     <p class="text-muted">The selector for which this classification rule will apply to</p>
 
-    <div>
+    <div data-testid="classification">
         <strong>Classification:</strong>
         <div class="rating-indicator-block"
              style="background-color: {_.get(selected, 'classification.color', '#ccc')}">
@@ -67,7 +67,7 @@
         <p class="text-muted">{_.get(selected, 'classification.description', '-')}</p>
     </div>
 
-    <div>
+    <div data-testid="notes">
         <strong>Notes:</strong>
         <span>{selected?.description || "None provided"}</span>
         <p class="text-muted">Additional notes</p>
