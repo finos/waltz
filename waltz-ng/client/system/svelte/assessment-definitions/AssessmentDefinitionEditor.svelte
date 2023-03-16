@@ -34,7 +34,7 @@
     function save() {
         const def = Object.assign({}, $selectedDefinition);
         if (! _.includes(qualifiableKinds, $selectedDefinition.entityKind)) {
-            delete def.qualifierReference;
+            def.qualifierReference = null;
         }
         savePromise = doSave(def);
     }
