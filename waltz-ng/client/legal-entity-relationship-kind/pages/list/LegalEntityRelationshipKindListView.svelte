@@ -89,10 +89,16 @@
                                     <ul class="list-unstyled">
                                         <li>
                                             <Icon name={entity[kind.targetKind].icon}/>
-                                            - {_.get(usageStatsByKindId, [kind.id, "targetEntityCount"], 0)}</li>
+                                            - {_.get(usageStatsByKindId, [kind.id, "targetEntityCount"], 0)}
+                                        </li>
                                         <li>
                                             <Icon name={entity.LEGAL_ENTITY.icon}/>
-                                            - {_.get(usageStatsByKindId, [kind.id, "legalEntityCount"], 0)}</li>
+                                            - {_.get(usageStatsByKindId, [kind.id, "legalEntityCount"], 0)}
+                                        </li>
+                                        <li>
+                                            <Icon name={entity.LEGAL_ENTITY_RELATIONSHIP.icon}/>
+                                            - {_.get(usageStatsByKindId, [kind.id, "relationshipCount"], 0)}
+                                        </li>
                                     </ul>
                             </tr>
                         {:else}

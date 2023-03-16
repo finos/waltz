@@ -15,4 +15,6 @@ public abstract class LegalEntityRelKindStat {
 
     public abstract int legalEntityCount();
 
+    public abstract int relationshipCount();
+
 }

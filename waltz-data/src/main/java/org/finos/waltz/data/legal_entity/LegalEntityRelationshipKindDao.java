@@ -65,6 +65,7 @@ public class LegalEntityRelationshipKindDao {
 
         LegalEntityRelationship distinctLERels = LEGAL_ENTITY_RELATIONSHIP.as("leRels");
         LegalEntityRelationship distinctTargetEntityRels = LEGAL_ENTITY_RELATIONSHIP.as("teRels");
+        LegalEntityRelationship relationships = LEGAL_ENTITY_RELATIONSHIP.as("rels");
 
         Field<Integer> legalEntityCount = DSL.countDistinct(distinctLERels.LEGAL_ENTITY_ID).as("leCount");
 
@@ -82,24 +83,37 @@ public class LegalEntityRelationshipKindDao {
                 .from(distinctTargetEntityRels)
                 .groupBy(distinctTargetEntityRels.RELATIONSHIP_KIND_ID);
 
+        Field<Integer> relCount = DSL.countDistinct(relationships.ID).as("relCount");
+
+        SelectHavingStep<Record2<Long, Integer>> relationshipCountsByRelKind = DSL
+                .select(relationships.RELATIONSHIP_KIND_ID,
+                        relCount)
+                .from(relationships)
+                .groupBy(relationships.RELATIONSHIP_KIND_ID);
+
         Field<Integer> leCountField = DSL.coalesce(legalEntityCountsByRelKind.field(legalEntityCount), 0);
         Field<Integer> teCountField = DSL.coalesce(targetEntityCountsByRelKind.field(targetEntityCount), 0);
+        Field<Integer> relCountField = DSL.coalesce(relationshipCountsByRelKind.field(relCount), 0);
 
         SelectOnConditionStep<Record> qry = dsl
                 .select(LEGAL_ENTITY_RELATIONSHIP_KIND.ID)
                 .select(leCountField)
                 .select(teCountField)
+                .select(relCountField)
                 .from(LEGAL_ENTITY_RELATIONSHIP_KIND)
                 .leftJoin(legalEntityCountsByRelKind)
                 .on(LEGAL_ENTITY_RELATIONSHIP_KIND.ID.eq(legalEntityCountsByRelKind.field(distinctLERels.RELATIONSHIP_KIND_ID)))
                 .leftJoin(targetEntityCountsByRelKind)
-                .on(LEGAL_ENTITY_RELATIONSHIP_KIND.ID.eq(targetEntityCountsByRelKind.field(distinctTargetEntityRels.RELATIONSHIP_KIND_ID)));
+                .on(LEGAL_ENTITY_RELATIONSHIP_KIND.ID.eq(targetEntityCountsByRelKind.field(distinctTargetEntityRels.RELATIONSHIP_KIND_ID)))
+                .leftJoin(relationshipCountsByRelKind)
+                .on(LEGAL_ENTITY_RELATIONSHIP_KIND.ID.eq(relationshipCountsByRelKind.field(relationships.RELATIONSHIP_KIND_ID)));
 
         return qry
                 .fetchSet(r -> ImmutableLegalEntityRelKindStat.builder()
                         .relKindId(r.get(LEGAL_ENTITY_RELATIONSHIP_KIND.ID))
                         .legalEntityCount(r.get(leCountField))
                         .targetEntityCount(r.get(teCountField))
+                        .relationshipCount(r.get(relCountField))
                         .build());
     }
 }

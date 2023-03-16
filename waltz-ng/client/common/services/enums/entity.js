@@ -237,7 +237,7 @@ export const entity = {
     LEGAL_ENTITY_RELATIONSHIP: {
         key: "LEGAL_ENTITY_RELATIONSHIP",
         name: "Legal Entity Relationship",
-        icon: "building-o",
+        icon: "link",
         description: null,
         position: 1526
     },
