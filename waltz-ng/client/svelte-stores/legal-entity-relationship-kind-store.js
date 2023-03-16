@@ -17,14 +17,12 @@
  */
 
 import {remote} from "./remote";
-import {checkIsEntityRef} from "../common/checks";
 
 export function mkLegalEntityRelationshipKindStore() {
 
     const base = "api/legal-entity-relationship-kind";
 
     const getById = (id, force = false) => {
-        console.log({id})
         return remote
             .fetchViewDatum("GET", `${base}/id/${id}`, null, {force});
     };
