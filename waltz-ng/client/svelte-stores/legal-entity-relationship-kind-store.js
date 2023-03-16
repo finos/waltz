@@ -33,9 +33,16 @@ export function mkLegalEntityRelationshipKindStore() {
             .fetchViewList("GET", `${base}`, null, {force});
     };
 
+
+    const findUsageStats = (force = false) => {
+        return remote
+            .fetchViewList("GET", `${base}/stats`, null, {force});
+    };
+
     return {
         getById,
-        findAll
+        findAll,
+        findUsageStats
     };
 }
 

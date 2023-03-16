@@ -19,6 +19,7 @@ import {registerComponents, registerStores} from "../common/module-utils";
 
 import Routes from "./routes";
 import LegalEntityRelationshipKindView from "./pages/view/legal-entity-relationship-kind-view";
+import LegalEntityRelationshipKindListView from "./pages/list/legal-entity-relationship-kind-list-view";
 import LegalEntityRelationshipsSection from "./components/relationships-section/legal-entity-relationships-section";
 import LegalEntityRelationshipKindStore from "./services/legal-entity-relationship-kind-store";
 import BulkUploadLegalEntityRelationshipsStore from "./services/bulk-upload-legal-entity-relationships-store";
@@ -34,7 +35,8 @@ export default () => {
     registerComponents(module, [
         LegalEntityRelationshipKindView,
         LegalEntityRelationshipsSection,
-        LegalEntityRelationshipBulkUpload
+        LegalEntityRelationshipBulkUpload,
+        LegalEntityRelationshipKindListView
     ]);
 
     registerStores(module, [

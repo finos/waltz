@@ -1,9 +1,8 @@
 package org.finos.waltz.web.endpoints.api;
 
-import org.finos.waltz.model.legal_entity.LegalEntity;
+import org.finos.waltz.model.legal_entity.LegalEntityRelKindStat;
 import org.finos.waltz.model.legal_entity.LegalEntityRelationshipKind;
 import org.finos.waltz.service.legal_entity.LegalEntityRelationshipKindService;
-import org.finos.waltz.service.legal_entity.LegalEntityService;
 import org.finos.waltz.web.endpoints.Endpoint;
 import org.springframework.stereotype.Service;
 import spark.Request;
@@ -34,6 +33,7 @@ public class LegalEntityRelationshipKindEndpoint implements Endpoint {
 
         getForDatum(mkPath(BASE_URL, "id", ":id"), this::getByIdRoute);
         getForList(mkPath(BASE_URL), this::findAllRoute);
+        getForList(mkPath(BASE_URL, "stats"), this::findUsageStats);
     }
 
     private LegalEntityRelationshipKind getByIdRoute(Request request, Response response) {
@@ -42,6 +42,10 @@ public class LegalEntityRelationshipKindEndpoint implements Endpoint {
 
     private Set<LegalEntityRelationshipKind> findAllRoute(Request request, Response response) {
         return legalEntityRelationshipKindService.findAll();
+    }
+
+    private Set<LegalEntityRelKindStat> findUsageStats(Request request, Response response) {
+        return legalEntityRelationshipKindService.findUsageStats();
     }
 
 }
