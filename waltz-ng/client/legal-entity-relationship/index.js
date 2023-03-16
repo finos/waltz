@@ -15,30 +15,27 @@
  * See the License for the specific
  *
  */
+import {registerComponents, registerStores} from "../common/module-utils";
 
-import {remote} from "./remote";
-import {checkIsEntityRef} from "../common/checks";
-
-export function mkLegalEntityRelationshipKindStore() {
-
-    const base = "api/legal-entity-relationship-kind";
-
-    const getById = (id, force = false) => {
-        console.log({id})
-        return remote
-            .fetchViewDatum("GET", `${base}/id/${id}`, null, {force});
-    };
+import Routes from "./routes";
+import LegalEntityRelationshipView from "./pages/view/legal-entity-relationship-view";
+import LegalEntityRelationshipStore from "./services/legal-entity-relationship-store";
 
 
-    const findAll = (force = false) => {
-        return remote
-            .fetchViewList("GET", `${base}`, null, {force});
-    };
+export default () => {
 
-    return {
-        getById,
-        findAll
-    };
-}
+    const module = angular.module("waltz.legal-entity-relationship", []);
 
-export const legalEntityRelationshipKindStore = mkLegalEntityRelationshipKindStore();
+    module
+        .config(Routes);
+
+    registerComponents(module, [
+        LegalEntityRelationshipView,
+    ]);
+
+    registerStores(module, [
+        LegalEntityRelationshipStore,
+    ])
+
+    return module.name;
+};

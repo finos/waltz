@@ -809,13 +809,20 @@ const legalEntitySections = [
     changeLogSection
 ];
 
-
 const legalEntityRelationshipKindSections = [
     assessmentRatingSection,
     bookmarksSection,
     entityNamedNotesSection,
     involvedPeopleSection,
     legalEntityRelationshipsSection,
+    changeLogSection
+];
+
+const legalEntityRelationshipSections = [
+    assessmentRatingSection,
+    bookmarksSection,
+    entityNamedNotesSection,
+    involvedPeopleSection,
     changeLogSection
 ];
 
@@ -838,6 +845,7 @@ export const dynamicSectionsByKind = {
     "main.flow-classification-rule.view": flowClassificationRuleSections,
     "main.flow-diagram.view": flowDiagramSections,
     "main.legal-entity.view": legalEntitySections,
+    "main.legal-entity-relationship.view": legalEntityRelationshipSections,
     "main.legal-entity-relationship-kind.view": legalEntityRelationshipKindSections,
     "main.licence.external-id": licenceSections,
     "main.licence.view": licenceSections,

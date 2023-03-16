@@ -17,13 +17,14 @@
   -->
 <waltz-section-actions>
     <div ng-if="!$ctrl.visibility.bulkUpload">
-        <button class="btn btn-xs btn-default"
+        <button waltz-has-role="BULK_LEGAL_ENTITY_RELATIONSHIP_EDITOR"
+                class="btn btn-xs btn-default"
                 ng-click="$ctrl.bulkUpload()">
             Bulk Upload
         </button>
         <waltz-data-extract-link name="Export"
                                  styling="button"
-                                 extract="legal-entity/relationships/kind/{{$ctrl.parentEntityRef.id}}"
+                                 extract="legal-entity-relationship/relationship-kind/{{$ctrl.parentEntityRef.id}}"
                                  method="GET">
         </waltz-data-extract-link>
         <button class="btn btn-xs waltz-btn-transparent"
@@ -49,7 +50,8 @@
          ng-if="!$ctrl.visibility.bulkUpload">
         <waltz-grid-with-search ng-if="$ctrl.relationships.length > 0"
                                 entries="$ctrl.relationships"
-                                column-defs="$ctrl.columnDefs">
+                                column-defs="$ctrl.columnDefs"
+                                on-row-select="$ctrl.onRowSelect">
         </waltz-grid-with-search>
         <waltz-no-data ng-if="$ctrl.relationships.length == 0">
             <message>

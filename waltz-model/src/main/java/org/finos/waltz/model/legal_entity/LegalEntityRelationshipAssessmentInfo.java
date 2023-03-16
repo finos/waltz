@@ -16,29 +16,20 @@
  *
  */
 
-import {remote} from "./remote";
-import {checkIsEntityRef} from "../common/checks";
+package org.finos.waltz.model.legal_entity;
 
-export function mkLegalEntityRelationshipKindStore() {
-
-    const base = "api/legal-entity-relationship-kind";
-
-    const getById = (id, force = false) => {
-        console.log({id})
-        return remote
-            .fetchViewDatum("GET", `${base}/id/${id}`, null, {force});
-    };
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.rating.RatingSchemeItem;
+import org.immutables.value.Value;
 
 
-    const findAll = (force = false) => {
-        return remote
-            .fetchViewList("GET", `${base}`, null, {force});
-    };
+@Value.Immutable
+public abstract class LegalEntityRelationshipAssessmentInfo {
 
-    return {
-        getById,
-        findAll
-    };
+    public abstract Long relationshipId();
+
+    public abstract EntityReference definitionRef();
+
+    public abstract RatingSchemeItem ratingItem();
+
 }
-
-export const legalEntityRelationshipKindStore = mkLegalEntityRelationshipKindStore();

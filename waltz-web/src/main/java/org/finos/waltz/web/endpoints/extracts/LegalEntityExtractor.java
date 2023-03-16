@@ -19,10 +19,10 @@
 package org.finos.waltz.web.endpoints.extracts;
 
 import org.finos.waltz.data.InlineSelectFieldFactory;
-import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.legal_entity.LegalEntityRelationshipView;
+import org.finos.waltz.service.legal_entity.LegalEntityRelationshipService;
 import org.finos.waltz.web.WebUtilities;
 import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +34,6 @@ import static java.lang.String.format;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 import static org.finos.waltz.schema.Tables.*;
-import static org.finos.waltz.schema.tables.SoftwareUsage.SOFTWARE_USAGE;
-import static org.finos.waltz.schema.tables.SoftwareVersionLicence.SOFTWARE_VERSION_LICENCE;
 import static spark.Spark.get;
 
 
@@ -55,9 +53,15 @@ public class LegalEntityExtractor extends DirectQueryBasedDataExtractor {
                     newArrayList(EntityKind.APPLICATION))
             .as("entity_external_id");
 
+
+    private final LegalEntityRelationshipService legalEntityRelationshipService;
+
     @Autowired
-    public LegalEntityExtractor(DSLContext dsl) {
+    public LegalEntityExtractor(DSLContext dsl,
+                                LegalEntityRelationshipService legalEntityRelationshipService) {
         super(dsl);
+
+        this.legalEntityRelationshipService = legalEntityRelationshipService;
     }
 
 
@@ -159,6 +163,7 @@ public class LegalEntityExtractor extends DirectQueryBasedDataExtractor {
 
     private SelectSeekStep2<Record, String, String> getRelationshipsForRelationshipKind(Long id) {
 
+        LegalEntityRelationshipView view = legalEntityRelationshipService.getViewByRelKind(id);
         Field<String> targetEntityName = ENTITY_NAME_FIELD.as("Target Entity Name");
         Field<String> targetEntityExtId = ENTITY_EXT_ID_FIELD.as("Target Entity External Id");
 

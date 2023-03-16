@@ -16,29 +16,23 @@
  *
  */
 
-import {remote} from "./remote";
-import {checkIsEntityRef} from "../common/checks";
-
-export function mkLegalEntityRelationshipKindStore() {
-
-    const base = "api/legal-entity-relationship-kind";
-
-    const getById = (id, force = false) => {
-        console.log({id})
-        return remote
-            .fetchViewDatum("GET", `${base}/id/${id}`, null, {force});
-    };
+import LegalEntityRelationshipView from "./pages/view/legal-entity-relationship-view";
 
 
-    const findAll = (force = false) => {
-        return remote
-            .fetchViewList("GET", `${base}`, null, {force});
-    };
+const baseState = {};
 
-    return {
-        getById,
-        findAll
-    };
+const viewState = {
+    url: "legal-entity-relationship/{id:int}",
+    views: {"content@": LegalEntityRelationshipView.id}
+};
+
+function setup($stateProvider) {
+    $stateProvider
+        .state("main.legal-entity-relationship", baseState)
+        .state("main.legal-entity-relationship.view", viewState)
 }
 
-export const legalEntityRelationshipKindStore = mkLegalEntityRelationshipKindStore();
+setup.$inject = ["$stateProvider"];
+
+
+export default setup;

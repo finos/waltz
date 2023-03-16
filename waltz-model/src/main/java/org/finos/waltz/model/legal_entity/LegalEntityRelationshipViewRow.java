@@ -16,29 +16,22 @@
  *
  */
 
-import {remote} from "./remote";
-import {checkIsEntityRef} from "../common/checks";
+package org.finos.waltz.model.legal_entity;
 
-export function mkLegalEntityRelationshipKindStore() {
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.immutables.value.Value;
 
-    const base = "api/legal-entity-relationship-kind";
-
-    const getById = (id, force = false) => {
-        console.log({id})
-        return remote
-            .fetchViewDatum("GET", `${base}/id/${id}`, null, {force});
-    };
+import java.util.Set;
 
 
-    const findAll = (force = false) => {
-        return remote
-            .fetchViewList("GET", `${base}`, null, {force});
-    };
+@Value.Immutable
+@JsonSerialize(as = ImmutableLegalEntityRelationshipViewRow.class)
+@JsonDeserialize(as = ImmutableLegalEntityRelationshipViewRow.class)
+public abstract class LegalEntityRelationshipViewRow {
 
-    return {
-        getById,
-        findAll
-    };
+    public abstract LegalEntityRelationship relationship();
+
+    public abstract Set<LegalEntityRelationshipViewAssessment> assessments();
+
 }
-
-export const legalEntityRelationshipKindStore = mkLegalEntityRelationshipKindStore();

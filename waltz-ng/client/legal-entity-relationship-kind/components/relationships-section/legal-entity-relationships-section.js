@@ -25,6 +25,46 @@ const bindings = {
     parentEntityRef: "<"
 };
 
+const relationshipColDefs = [
+    {
+        field: "relationship.targetEntityReference",
+        name: "Target Entity",
+        width: "20%",
+        cellTemplate: `<div style="padding-top: 0.5em">
+                            <span>{row.entity.relationship.targetEntityReference.name}</span>
+                       </div>`
+    },
+    {
+        field: "relationship.legalEntityReference",
+        name: "Legal Entity",
+        width: "20%",
+        cellTemplate: `<div style="padding-top: 0.5em">
+                            <span>{row.entity.relationship.legalEntityReference.name}</span>
+                       </div>`
+    },
+    {
+        field: "relationship.description"
+    },
+    {
+        field: "relationship.lastUpdatedAt",
+        name: "Last Updated At",
+        width: "10%",
+        cellTemplate: `
+               <div class="ui-grid-cell-contents"
+                    style="vertical-align: baseline;">
+                    <waltz-from-now timestamp="COL_FIELD"
+                                    days-only="true">
+                    </waltz-from-now>
+                </div>`
+    },
+    {
+        field: "relationship.lastUpdatedBy",
+        name: "Last Updated By",
+        width: "10%"
+    }
+];
+
+
 const initialState = {
     relationshipKind: null,
     relationships: [],
@@ -32,46 +72,10 @@ const initialState = {
         overlay: false,
         bulkUpload: false
     },
-    columnDefs: [
-        {
-            field: "targetEntityReference",
-            name: "Target Entity",
-            width: "25%",
-            cellTemplate: `<div style="padding-top: 0.5em">
-                                <waltz-entity-link entity-ref="row.entity.targetEntityReference"></waltz-entity-link>
-                           </div>`
-        },
-        {
-            field: "legalEntityReference",
-            name: "Legal Entity",
-            width: "25%",
-            cellTemplate: `<div style="padding-top: 0.5em">
-                                <waltz-entity-link entity-ref="row.entity.legalEntityReference"></waltz-entity-link>
-                           </div>`
-        },
-        {field: "description", width: "30%"},
-        {
-            field: "lastUpdatedAt",
-            name: "Last Updated At",
-            width: "10%",
-            cellTemplate: `
-                   <div class="ui-grid-cell-contents"
-                        style="vertical-align: baseline;">
-                        <waltz-from-now timestamp="COL_FIELD"
-                                        days-only="true">
-                        </waltz-from-now>
-                    </div>`
-        },
-        {
-            field: "lastUpdatedBy",
-            name: "Last Updated By",
-            width: "10%"
-        }
-    ]
 }
 
 
-function controller($q, $scope, serviceBroker) {
+function controller($q, $scope, $state, serviceBroker) {
 
     const vm = initialiseData(this, initialState);
 
@@ -81,18 +85,55 @@ function controller($q, $scope, serviceBroker) {
             .loadViewData(CORE_API.LegalEntityRelationshipKindStore.getById, [vm.parentEntityRef.id])
             .then(r => r.data);
 
-        const relationshipsPromise = serviceBroker
-            .loadViewData(CORE_API.LegalEntityRelationshipStore.findByRelationshipKindId, [vm.parentEntityRef.id], {force: true})
+
+        const relationshipsViewPromise = serviceBroker
+            .loadViewData(CORE_API.LegalEntityRelationshipStore.getViewByRelationshipKindId, [vm.parentEntityRef.id], {force: true})
             .then(r => r.data);
 
         return $q
-            .all([relKindsPromise, relationshipsPromise])
-            .then(([relKind, relationships]) => {
+            .all([relKindsPromise, relationshipsViewPromise])
+            .then(([relKind, relationshipsView]) => {
                 vm.relationshipKind = relKind;
 
-                vm.relationships = _.sortBy(
-                    relationships,
-                    d => d.targetEntityReference.name, d => d.legalEntityReference.name);
+                const assessmentColDefs = _
+                    .chain(relationshipsView.assessmentHeaders)
+                    .sortBy(d => d.name)
+                    .map(d => ({
+                        field: `ratingsByDefId[${d.id}]`,
+                        name: d.name,
+                        width: 200,
+                        cellTemplate: `
+                           <div class="ui-grid-cell-contents"
+                                style="vertical-align: baseline;">
+                                <ul class="list-inline">
+                                <li ng-repeat="c in COL_FIELD">
+                                    <waltz-rating-indicator-cell rating="c"
+                                                                 show-description-popup="true"
+                                                                 show-name="true">
+                                    </waltz-rating-indicator-cell>
+                                </li>
+                                </ul>
+                                </span>
+                            </div>`
+                    }))
+                    .value();
+
+                vm.columnDefs = _.concat(relationshipColDefs, assessmentColDefs);
+
+                vm.relationships = _
+                    .chain(relationshipsView.rows)
+                    .map(d => Object.assign(
+                        {},
+                        d,
+                        {
+                            ratingsByDefId: _
+                                .chain(d.assessments)
+                                .keyBy(d => d.assessmentDefinitionId)
+                                .mapValues(d => _.sortBy(d.ratings, d => d.position, d => d.name))
+                                .value()
+                        }))
+                    .sortBy(d => d.relationship.targetEntityReference.name, d => d.relationship.legalEntityReference.name)
+                    .value();
             });
     }
 
@@ -116,11 +157,18 @@ function controller($q, $scope, serviceBroker) {
             loadRelationships();
         })
     }
+
+    vm.onRowSelect = (r) => {
+        $state.go(
+            "main.legal-entity-relationship.view",
+            {id: r.relationship.id});
+    }
 }
 
 controller.$inject = [
     "$q",
     "$scope",
+    "$state",
     "ServiceBroker"
 ];
 
