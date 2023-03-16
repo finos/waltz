@@ -16,6 +16,7 @@
  *
  */
 import _ from "lodash";
+import {stratify} from "d3";
 
 
 /**
@@ -129,6 +130,20 @@ export function populateParents(nodes, parentsAsRefs = true) {
 export function buildHierarchies(nodes, parentsAsRefs = true) {
     // only give back root element/s
     return _.reject(populateParents(nodes, parentsAsRefs), n => n.parent);
+}
+
+export function buildHierarchies2(nodes) {
+    console.time("stratify");
+    const withRoot = _.concat([{id: -99}], nodes);
+    const sr = stratify()
+        .parentId(d => d.id === -99 ? null : d.parentId ?? -99)
+        (withRoot);
+    const forest = _.map(sr.children, c => Object.assign(c, {parentId: null, parent: null}));
+    console.timeEnd("stratify");
+    console.log({forest})
+    return forest;
+    // return [sr];
+
 }
 
 export const reduceToSelectedNodesOnly = (nodes, selectedNodeIds = []) => {
