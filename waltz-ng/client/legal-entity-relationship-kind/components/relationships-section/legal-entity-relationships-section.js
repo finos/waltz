@@ -30,21 +30,42 @@ const relationshipColDefs = [
         field: "relationship.targetEntityReference",
         name: "Target Entity",
         width: "20%",
+        toSearchTerm: d => _.get(d, ["relationship", "targetEntityReference", "name"], ""),
         cellTemplate: `<div style="padding-top: 0.5em">
-                            <span>{row.entity.relationship.targetEntityReference.name}</span>
+                            <span ng-bind="COL_FIELD.name"></span>
+                       </div>`
+    },
+    {
+        field: "relationship.targetEntityReference",
+        name: "Target Entity External Id",
+        width: "5%",
+        toSearchTerm: d => _.get(d, ["relationship", "targetEntityReference", "externalId"], ""),
+        cellTemplate: `<div style="padding-top: 0.5em">
+                            <span ng-bind="COL_FIELD.externalId"></span>
                        </div>`
     },
     {
         field: "relationship.legalEntityReference",
         name: "Legal Entity",
         width: "20%",
+        toSearchTerm: d => _.get(d, ["relationship", "legalEntityReference", "name"], ""),
         cellTemplate: `<div style="padding-top: 0.5em">
-                            <span>{row.entity.relationship.legalEntityReference.name}</span>
+                            <span ng-bind="COL_FIELD.name"></span>
                        </div>`
     },
     {
-        field: "relationship.description"
-    },
+        field: "relationship.legalEntityReference",
+        name: "Legal Entity External Id",
+        width: "5%",
+        toSearchTerm: d => _.get(d, ["relationship", "legalEntityReference", "externalId"], ""),
+        cellTemplate: `<div style="padding-top: 0.5em">
+                            <span ng-bind="COL_FIELD.externalId"></span>
+                       </div>`
+    }
+];
+
+
+const updatedAtColDefs = [
     {
         field: "relationship.lastUpdatedAt",
         name: "Last Updated At",
@@ -62,7 +83,7 @@ const relationshipColDefs = [
         name: "Last Updated By",
         width: "10%"
     }
-];
+]
 
 
 const initialState = {
@@ -74,6 +95,14 @@ const initialState = {
     },
 }
 
+
+function mkRatingsStringSearch(header, row) {
+    const ratingsForDef = row.ratingsByDefId[header.id];
+    return _.chain(ratingsForDef)
+        .map(r => _.get(r, ["name"], ""))
+        .join(" ")
+        .value();
+}
 
 function controller($q, $scope, $state, serviceBroker) {
 
@@ -102,6 +131,7 @@ function controller($q, $scope, $state, serviceBroker) {
                         field: `ratingsByDefId[${d.id}]`,
                         name: d.name,
                         width: 200,
+                        toSearchTerm: r => mkRatingsStringSearch(d, r),
                         cellTemplate: `
                            <div class="ui-grid-cell-contents"
                                 style="vertical-align: baseline;">
@@ -118,20 +148,24 @@ function controller($q, $scope, $state, serviceBroker) {
                     }))
                     .value();
 
-                vm.columnDefs = _.concat(relationshipColDefs, assessmentColDefs);
+                vm.columnDefs = _.concat(relationshipColDefs, assessmentColDefs, updatedAtColDefs);
 
                 vm.relationships = _
                     .chain(relationshipsView.rows)
-                    .map(d => Object.assign(
-                        {},
-                        d,
-                        {
-                            ratingsByDefId: _
-                                .chain(d.assessments)
-                                .keyBy(d => d.assessmentDefinitionId)
-                                .mapValues(d => _.sortBy(d.ratings, d => d.position, d => d.name))
-                                .value()
-                        }))
+                    .map(d => {
+                        const ratingsByDefId = _
+                            .chain(d.assessments)
+                            .keyBy(d => d.assessmentDefinitionId)
+                            .mapValues(d => _.sortBy(d.ratings, d => d.position, d => d.name))
+                            .value();
+
+                        return Object.assign(
+                            {},
+                            d,
+                            {
+                                ratingsByDefId,
+                            })
+                    })
                     .sortBy(d => d.relationship.targetEntityReference.name, d => d.relationship.legalEntityReference.name)
                     .value();
             });
