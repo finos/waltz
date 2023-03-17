@@ -21,6 +21,7 @@ package org.finos.waltz.web.endpoints.extracts;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.legal_entity.LegalEntityRelationshipView;
 import org.finos.waltz.service.legal_entity.LegalEntityRelationshipService;
 import org.finos.waltz.web.WebUtilities;
@@ -126,18 +127,6 @@ public class LegalEntityExtractor extends DirectQueryBasedDataExtractor {
                     response);
         });
 
-        get(findByRelKindIdPath, (request, response) -> {
-
-            Long id = WebUtilities.getId(request);
-
-            SelectSeekStep2<Record, String, String> qry = getRelationshipsForRelationshipKind(id);
-
-            return writeExtract(
-                    "legal-entity-relationships",
-                    qry,
-                    request,
-                    response);
-        });
     }
 
     private SelectSeekStep2<Record, String, String> getRelationshipsForLegalEntity(Long id) {
@@ -160,32 +149,5 @@ public class LegalEntityExtractor extends DirectQueryBasedDataExtractor {
                 .where(dsl.renderInlined(LEGAL_ENTITY_RELATIONSHIP.LEGAL_ENTITY_ID.eq(id)))
                 .orderBy(targetEntityName, LEGAL_ENTITY_RELATIONSHIP_KIND.NAME);
     }
-
-    private SelectSeekStep2<Record, String, String> getRelationshipsForRelationshipKind(Long id) {
-
-        LegalEntityRelationshipView view = legalEntityRelationshipService.getViewByRelKind(id);
-        Field<String> targetEntityName = ENTITY_NAME_FIELD.as("Target Entity Name");
-        Field<String> targetEntityExtId = ENTITY_EXT_ID_FIELD.as("Target Entity External Id");
-
-        return dsl
-                .select(LEGAL_ENTITY_RELATIONSHIP.TARGET_ID.as("Target Entity Id"),
-                        LEGAL_ENTITY_RELATIONSHIP.TARGET_KIND.as("Target Entity Kind"))
-                .select(targetEntityName)
-                .select(targetEntityExtId)
-                .select(LEGAL_ENTITY.ID.as("Legal Entity Id"),
-                        LEGAL_ENTITY.NAME.as("Legal Entity Name"),
-                        LEGAL_ENTITY.EXTERNAL_ID.as("Legal Entity External Id"))
-                .select(LEGAL_ENTITY_RELATIONSHIP.DESCRIPTION.as("Comment"),
-                        LEGAL_ENTITY_RELATIONSHIP.LAST_UPDATED_AT.as("Last Updated At"),
-                        LEGAL_ENTITY_RELATIONSHIP.LAST_UPDATED_BY.as("Last Updated By"),
-                        LEGAL_ENTITY_RELATIONSHIP.PROVENANCE.as("Provenance"))
-                .from(LEGAL_ENTITY_RELATIONSHIP)
-                .innerJoin(LEGAL_ENTITY_RELATIONSHIP_KIND)
-                .on(LEGAL_ENTITY_RELATIONSHIP_KIND.ID.eq(LEGAL_ENTITY_RELATIONSHIP.RELATIONSHIP_KIND_ID)
-                        .and(LEGAL_ENTITY_RELATIONSHIP_KIND.TARGET_KIND.eq(LEGAL_ENTITY_RELATIONSHIP.TARGET_KIND)))
-                .innerJoin(LEGAL_ENTITY)
-                .on(LEGAL_ENTITY.ID.eq(LEGAL_ENTITY_RELATIONSHIP.LEGAL_ENTITY_ID))
-                .where(dsl.renderInlined(LEGAL_ENTITY_RELATIONSHIP.RELATIONSHIP_KIND_ID.eq(id)))
-                .orderBy(targetEntityName, LEGAL_ENTITY_RELATIONSHIP_KIND.NAME);
-    }
+    
 }

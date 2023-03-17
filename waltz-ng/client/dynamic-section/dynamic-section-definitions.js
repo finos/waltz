@@ -434,22 +434,14 @@ const legalEntitySection = {
     id: 10010,
 };
 
-const relatedEntitiesRelationshipsSection = {
-    // svelteComponent: LegalEntityRelationshipSection,
-    componentId: "related-legal-entities-section",
-    name: "Related Entities",
-    icon: "link",
-    description: "Relationships to other entities",
-    id: 10020,
-};
 
-const legalEntityRelationshipsSection = {
+const legalEntityRelationshipKindSection = {
     // svelteComponent: LegalEntityRelationshipSection,
-    componentId: "legal-entity-relationships-section",
+    componentId: "legal-entity-relationship-kind-section",
     name: "Relationships",
     icon: "link",
     description: "Relationships between legal entities and other waltz entities of this relationship kind",
-    id: 10030,
+    id: 10020,
 };
 
 
@@ -480,8 +472,7 @@ export const dynamicSections = {
     flowSpecDefinitionSection,
     involvedPeopleSection,
     legalEntitySection,
-    relatedEntitiesRelationshipsSection,
-    legalEntityRelationshipsSection,
+    legalEntityRelationshipKindSection,
     licenceSection,
     logicalDataElementsSection,
     logicalFlowsTabgroupSection,
@@ -588,6 +579,7 @@ const orgUnitSections = [
     changeSetSection,
     involvedPeopleSection,
     pack(logicalFlowsTabgroupSection, [flowClassificationRulesSection]),
+    legalEntitySection,
     orgUnitDirectMeasurableSection,
     changeLogSection
 ];
@@ -608,6 +600,7 @@ const measurableSections = [
     entityNamedNotesSection,
     involvedPeopleSection,
     pack(logicalFlowsTabgroupSection, [flowClassificationRulesSection]),
+    legalEntitySection,
     measurableRatingExplorerSection,
     relatedMeasurablesSection,
     changeLogSection
@@ -630,8 +623,9 @@ const personSections = [
     entityDiagramsSection,
     personChangeSetSection,
     personHierarchySection,
-    surveySection,
     personMeasurableInvolvementsSection,
+    legalEntitySection,
+    surveySection,
     changeLogSection
 ];
 
@@ -665,6 +659,7 @@ const appGroupSections = [
     entityNamedNotesSection,
     involvedPeopleSection,
     pack(logicalFlowsTabgroupSection, [flowClassificationRulesSection]),
+    legalEntitySection,
     relatedAppGroupsSection,
     relatedDataTypesSection,
     relatedMeasurablesSection,
@@ -805,7 +800,7 @@ const legalEntitySections = [
     bookmarksSection,
     entityNamedNotesSection,
     involvedPeopleSection,
-    relatedEntitiesRelationshipsSection,
+    legalEntitySection,
     changeLogSection
 ];
 
@@ -814,7 +809,7 @@ const legalEntityRelationshipKindSections = [
     bookmarksSection,
     entityNamedNotesSection,
     involvedPeopleSection,
-    legalEntityRelationshipsSection,
+    legalEntityRelationshipKindSection,
     changeLogSection
 ];
 

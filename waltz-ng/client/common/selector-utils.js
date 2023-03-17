@@ -27,6 +27,9 @@ export function determineDownwardsScopeForKind(kind) {
         case "CHANGE_INITIATIVE":
         case "FLOW_DIAGRAM":
         case "LICENCE":
+        case "LEGAL_ENTITY":
+        case "LEGAL_ENTITY_RELATIONSHIP":
+        case "LEGAL_ENTITY_RELATIONSHIP_KIND":
         case "LOGICAL_DATA_ELEMENT":
         case "LOGICAL_DATA_FLOW":
         case "MEASURABLE_CATEGORY":

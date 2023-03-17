@@ -1,5 +1,6 @@
 package org.finos.waltz.data.legal_entity;
 
+import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.data.rating_scheme.RatingSchemeDAO;
 import org.finos.waltz.model.EntityKind;
@@ -121,7 +122,7 @@ public class LegalEntityRelationshipDao {
                 .select(ENTITY_EXTERNAL_ID_FIELD)
                 .from(LEGAL_ENTITY_RELATIONSHIP)
                 .innerJoin(LEGAL_ENTITY).on(LEGAL_ENTITY_RELATIONSHIP.LEGAL_ENTITY_ID.eq(LEGAL_ENTITY.ID))
-                .where(condition)
+                .where(dsl.renderInlined(condition))
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
 
@@ -172,7 +173,8 @@ public class LegalEntityRelationshipDao {
         return summarizeResults(deletedRcs);
     }
 
-    public Set<LegalEntityRelationshipAssessmentInfo> getViewAssessmentsByRelKind(long relKindId) {
+    public Set<LegalEntityRelationshipAssessmentInfo> getViewAssessmentsByRelKind(long relKindId,
+                                                                                  GenericSelector genericSelector) {
 
         org.finos.waltz.schema.tables.LegalEntityRelationship ler = LEGAL_ENTITY_RELATIONSHIP.as("ler");
         org.finos.waltz.schema.tables.LegalEntity le = LEGAL_ENTITY.as("le");
@@ -192,8 +194,10 @@ public class LegalEntityRelationshipDao {
                 .innerJoin(ar).on(ler.ID.eq(ar.ENTITY_ID).and(ar.ENTITY_KIND.eq(EntityKind.LEGAL_ENTITY_RELATIONSHIP.name())))
                 .innerJoin(ad).on(ar.ASSESSMENT_DEFINITION_ID.eq(ad.ID))
                 .innerJoin(rsi).on(ar.RATING_ID.eq(rsi.ID))
-                .where(ler.RELATIONSHIP_KIND_ID.eq(relKindId))
-                .and(ad.VISIBILITY.eq(PRIMARY.name()))
+                .where(dsl.renderInlined(ler.RELATIONSHIP_KIND_ID.eq(relKindId)
+                        .and(ad.VISIBILITY.eq(PRIMARY.name())
+                                .and(ler.TARGET_ID.in(genericSelector.selector())
+                                        .and(ler.TARGET_KIND.eq(genericSelector.kind().name()))))))
                 .fetchSet(r -> ImmutableLegalEntityRelationshipAssessmentInfo
                         .builder()
                         .relationshipId(r.get(ler.ID))
@@ -202,4 +206,12 @@ public class LegalEntityRelationshipDao {
                         .build());
     }
 
+    public Set<LegalEntityRelationship> findByRelationshipKindAndTargetSelector(Long relKindId,
+                                                                                GenericSelector genericSelector) {
+        Condition condition = LEGAL_ENTITY_RELATIONSHIP.RELATIONSHIP_KIND_ID.eq(relKindId)
+                .and(LEGAL_ENTITY_RELATIONSHIP.TARGET_ID.in(genericSelector.selector())
+                        .and(LEGAL_ENTITY_RELATIONSHIP.TARGET_KIND.eq(genericSelector.kind().name())));
+
+        return findByCondition(dsl, condition);
+    }
 }

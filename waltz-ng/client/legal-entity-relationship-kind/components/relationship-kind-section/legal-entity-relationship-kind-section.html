@@ -25,7 +25,8 @@
         <waltz-data-extract-link name="Export"
                                  styling="button"
                                  extract="legal-entity-relationship/relationship-kind/{{$ctrl.parentEntityRef.id}}"
-                                 method="GET">
+                                 method="POST"
+                                 request-body="$ctrl.selectionOptions">
         </waltz-data-extract-link>
         <button class="btn btn-xs waltz-btn-transparent"
                 ng-click="$ctrl.visibility.overlay = ! $ctrl.visibility.overlay">
@@ -48,20 +49,14 @@
 <div class="row">
     <div class="col-sm-12"
          ng-if="!$ctrl.visibility.bulkUpload">
-        <waltz-grid-with-search ng-if="$ctrl.relationships.length > 0"
-                                entries="$ctrl.relationships"
-                                column-defs="$ctrl.columnDefs"
-                                on-row-select="$ctrl.onRowSelect">
-        </waltz-grid-with-search>
-        <waltz-no-data ng-if="$ctrl.relationships.length == 0">
-            <message>
-                No <span ng-bind="$ctrl.relationshipKind.name || 'Unknown'"></span> relationships exist
-            </message>
-        </waltz-no-data>
+        <waltz-legal-entity-relationships-view-grid ng-if="$ctrl.parentEntityRef"
+                                                    parent-entity-ref="$ctrl.parentEntityRef"
+                                                    relationship-kind-id="$ctrl.parentEntityRef.id">
+        </waltz-legal-entity-relationships-view-grid>
     </div>
     <div class="col-sm-12"
          ng-if="$ctrl.visibility.bulkUpload">
-        <waltz-legal-entity-relationship-bulk-upload relationship-kind="$ctrl.relationshipKind"
+        <waltz-legal-entity-relationship-bulk-upload relationship-kind-id="$ctrl.parentEntityRef.id"
                                                      on-done="$ctrl.doneUpload">
         </waltz-legal-entity-relationship-bulk-upload>
     </div>

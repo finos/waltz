@@ -19,9 +19,6 @@ import {registerComponents, registerStores} from "../common/module-utils";
 
 import Routes from "./routes";
 import LegalEntityView from "./pages/view/legal-entity-view";
-import LegalEntitySection from "./components/legal-entity-section/legal-entity-section";
-import RelatedLegalEntitiesSection
-    from "./components/related-legal-entities-section/related-legal-entities-section";
 import LegalEntityStore from "./services/legal-entity-store";
 
 
@@ -34,8 +31,6 @@ export default () => {
 
     registerComponents(module, [
         LegalEntityView,
-        LegalEntitySection,
-        RelatedLegalEntitiesSection,
     ]);
 
     registerStores(module, [

@@ -16,8 +16,14 @@
   ~
   -->
 
-<waltz-svelte-component ng-if="$ctrl.relationshipKindId"
-                        component="$ctrl.BulkUploadLegalEntityRelationshipsPanel"
-                        relationship-kind-id="$ctrl.relationshipKindId"
-                        on-done="$ctrl.onDone">
-</waltz-svelte-component>
+<waltz-grid-with-search ng-if="$ctrl.relationships.length > 0"
+                        entries="$ctrl.relationships"
+                        column-defs="$ctrl.columnDefs"
+                        on-row-select="$ctrl.onRowSelect">
+</waltz-grid-with-search>
+<waltz-no-data ng-if="$ctrl.relationships.length === 0">
+    <message>
+        No <span ng-bind="$ctrl.relationshipKind.name || 'Unknown'"></span> relationships exist
+    </message>
+</waltz-no-data>
+

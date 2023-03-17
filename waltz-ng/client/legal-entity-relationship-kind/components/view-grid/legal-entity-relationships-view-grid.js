@@ -15,14 +15,15 @@
  * See the License for the specific
  *
  */
-import template from "./legal-entity-relationships-section.html";
+import template from "./legal-entity-relationships-view-grid.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
 import {initialiseData} from "../../../common";
-import {inputString, activeMode, Modes} from "../bulk-upload/bulk-upload-relationships-store";
+import {mkSelectionOptions} from "../../../common/selector-utils";
 
 const bindings = {
-    parentEntityRef: "<"
+    parentEntityRef: "<",
+    relationshipKindId: "<"
 };
 
 const relationshipColDefs = [
@@ -111,12 +112,14 @@ function controller($q, $scope, $state, serviceBroker) {
     function loadRelationships() {
 
         const relKindsPromise = serviceBroker
-            .loadViewData(CORE_API.LegalEntityRelationshipKindStore.getById, [vm.parentEntityRef.id])
+            .loadViewData(CORE_API.LegalEntityRelationshipKindStore.getById, [vm.relationshipKindId])
             .then(r => r.data);
 
 
         const relationshipsViewPromise = serviceBroker
-            .loadViewData(CORE_API.LegalEntityRelationshipStore.getViewByRelationshipKindId, [vm.parentEntityRef.id], {force: true})
+            .loadViewData(CORE_API.LegalEntityRelationshipStore.getViewByRelationshipKindId,
+                [vm.relationshipKindId, mkSelectionOptions(vm.parentEntityRef)],
+                {force: true})
             .then(r => r.data);
 
         return $q
@@ -175,16 +178,6 @@ function controller($q, $scope, $state, serviceBroker) {
         return loadRelationships();
     }
 
-    vm.bulkUpload = () => {
-        vm.visibility.bulkUpload = true;
-    }
-
-    vm.cancelBulkUpload = () => {
-        inputString.set(null);
-        activeMode.set(Modes.INPUT);
-        vm.visibility.bulkUpload = false;
-    }
-
     vm.doneUpload = () => {
         $scope.$applyAsync(() => {
             vm.cancelBulkUpload();
@@ -215,6 +208,6 @@ const component = {
 
 
 export default {
-    id: "waltzLegalEntityRelationshipsSection",
+    id: "waltzLegalEntityRelationshipsViewGrid",
     component
 };

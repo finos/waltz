@@ -25,16 +25,15 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.NameProvider;
-import org.finos.waltz.model.flow_classification_rule.FlowClassificationRuleVantagePoint;
 import org.finos.waltz.model.legal_entity.LegalEntityRelationshipView;
 import org.finos.waltz.model.legal_entity.LegalEntityRelationshipViewAssessment;
 import org.finos.waltz.model.legal_entity.LegalEntityRelationshipViewRow;
-import org.finos.waltz.model.rating.RatingScheme;
 import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.service.legal_entity.LegalEntityRelationshipService;
 import org.finos.waltz.web.WebUtilities;
-import org.jooq.*;
+import org.jooq.DSLContext;
 import org.jooq.lambda.tuple.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +46,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.*;
-import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -55,19 +53,18 @@ import static java.lang.String.format;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.CollectionUtilities.sort;
-import static org.finos.waltz.common.EnumUtilities.names;
 import static org.finos.waltz.common.ListUtilities.*;
 import static org.finos.waltz.common.MapUtilities.indexBy;
-import static org.finos.waltz.common.StringUtilities.joinUsing;
+import static org.finos.waltz.web.WebUtilities.mkPath;
 import static org.finos.waltz.web.endpoints.extracts.ExtractorUtilities.sanitizeSheetName;
 import static org.jooq.lambda.fi.util.function.CheckedConsumer.unchecked;
 import static org.jooq.lambda.tuple.Tuple.tuple;
-import static spark.Spark.get;
+import static spark.Spark.post;
 
 @Service
 public class LegalEntityRelationshipExtractor implements DataExtractor {
 
-    public static final String BASE_URL = WebUtilities.mkPath("data-extract", "legal-entity-relationship");
+    public static final String BASE_URL = mkPath("data-extract", "legal-entity-relationship");
     private final DSLContext dsl;
     private final LegalEntityRelationshipService relationshipService;
     private static final Logger LOG = LoggerFactory.getLogger(LegalEntityRelationshipExtractor.class);
@@ -83,25 +80,26 @@ public class LegalEntityRelationshipExtractor implements DataExtractor {
 
     @Override
     public void register() {
-        registerRunBasedExtract();
+        legalEntityRelationshipViewExtract();
 
     }
 
 
-    private void registerRunBasedExtract() {
-        get(WebUtilities.mkPath(BASE_URL, "relationship-kind", ":id"),
+    private void legalEntityRelationshipViewExtract() {
+        post(mkPath(BASE_URL, "relationship-kind", ":id"),
                 (request, response) -> writeReportResults(
                         response,
                         prepareRows(
                                 parseExtractFormat(request),
-                                WebUtilities.getId(request))));
+                                WebUtilities.getId(request),
+                                WebUtilities.readIdSelectionOptionsFromBody(request))));
     }
 
 
     private Tuple3<ExtractFormat, String, byte[]> prepareRows(ExtractFormat format,
-                                                              long relKindId) throws IOException {
+                                                              long relKindId, IdSelectionOptions selectionOptions) throws IOException {
 
-        LegalEntityRelationshipView relationshipsView = relationshipService.getViewByRelKind(relKindId);
+        LegalEntityRelationshipView relationshipsView = relationshipService.getViewByRelKindAndSelector(relKindId, selectionOptions);
         List<EntityReference> headers = sort(relationshipsView.assessmentHeaders(), comparing(d -> d.name().get()));
 
         List<List<Object>> reportRows = prepareReportRows(relationshipsView.rows(), headers);

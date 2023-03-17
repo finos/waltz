@@ -1,5 +1,6 @@
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.legal_entity.LegalEntityRelationship;
 import org.finos.waltz.model.legal_entity.LegalEntityRelationshipView;
 import org.finos.waltz.service.legal_entity.LegalEntityRelationshipService;
@@ -8,12 +9,12 @@ import org.springframework.stereotype.Service;
 import spark.Request;
 import spark.Response;
 
+import java.io.IOException;
 import java.util.Set;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.web.WebUtilities.*;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.getForDatum;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.getForList;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 
 @Service
 public class LegalEntityRelationshipEndpoint implements Endpoint {
@@ -33,7 +34,7 @@ public class LegalEntityRelationshipEndpoint implements Endpoint {
         getForList(mkPath(BASE_URL, "legal-entity-id", ":id"), this::findByLegalEntityIdRoute);
         getForList(mkPath(BASE_URL, "relationship-kind", ":id"), this::findByRelationshipKindIdRoute);
         getForList(mkPath(BASE_URL, "kind", ":kind", "id", ":id"), this::findByEntityReferenceRoute);
-        getForDatum(mkPath(BASE_URL, "relationship-kind", ":id", "view"), this::getViewByRelKindRoute);
+        postForDatum(mkPath(BASE_URL, "relationship-kind", ":id", "view"), this::getViewByRelKindAndSelectorRoute);
         getForDatum(mkPath(BASE_URL, "id", ":id"), this::getByIdRoute);
     }
 
@@ -53,9 +54,9 @@ public class LegalEntityRelationshipEndpoint implements Endpoint {
         return legalEntityRelationshipService.findByEntityReference(getEntityReference(request));
     }
 
-
-    private LegalEntityRelationshipView getViewByRelKindRoute(Request request, Response response) {
-        return legalEntityRelationshipService.getViewByRelKind(getId(request));
+    private LegalEntityRelationshipView getViewByRelKindAndSelectorRoute(Request request, Response response) throws IOException {
+        IdSelectionOptions idSelectionOptions = readIdSelectionOptionsFromBody(request);
+        return legalEntityRelationshipService.getViewByRelKindAndSelector(getId(request), idSelectionOptions);
     }
 
 }

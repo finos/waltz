@@ -42,9 +42,9 @@ export function store($http, BaseApiUrl) {
             .get(`${BASE}/kind/${ref.kind}/id/${ref.id}`)
             .then(result => result.data);
 
-    const getViewByRelationshipKindId = (id) =>
+    const getViewByRelationshipKindId = (id, opts) =>
         $http
-            .get(`${BASE}/relationship-kind/${id}/view`)
+            .post(`${BASE}/relationship-kind/${id}/view`, opts)
             .then(result => result.data);
 
     return {

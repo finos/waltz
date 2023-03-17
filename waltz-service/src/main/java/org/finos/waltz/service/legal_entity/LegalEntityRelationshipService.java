@@ -1,11 +1,13 @@
 package org.finos.waltz.service.legal_entity;
 
+import org.finos.waltz.data.GenericSelector;
+import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.legal_entity.LegalEntityRelationshipDao;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.legal_entity.*;
 import org.finos.waltz.schema.tables.records.ChangeLogRecord;
-import org.finos.waltz.service.assessment_rating.AssessmentRatingViewService;
 import org.jooq.DSLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,18 +30,20 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 public class LegalEntityRelationshipService {
 
     private final LegalEntityRelationshipDao legalEntityRelationshipDao;
-    private final AssessmentRatingViewService assessmentRatingViewService;
+    private final LegalEntityRelationshipKindService legalEntityRelationshipKindService;
     private static final Logger LOG = LoggerFactory.getLogger(LegalEntityRelationshipService.class);
 
+    private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
+
     @Autowired
-    public LegalEntityRelationshipService(LegalEntityRelationshipDao legalEntityRelationshipDao,
-                                          DSLContext dsl,
-                                          AssessmentRatingViewService assessmentRatingViewService) {
+    public LegalEntityRelationshipService(DSLContext dsl,
+                                          LegalEntityRelationshipDao legalEntityRelationshipDao,
+                                          LegalEntityRelationshipKindService legalEntityRelationshipKindService) {
 
         checkNotNull(legalEntityRelationshipDao, "legalEntityRelationshipDao cannot be null");
-        checkNotNull(assessmentRatingViewService, "assessmentRatingViewService cannot be null");
+        checkNotNull(legalEntityRelationshipKindService, "legalEntityRelationshipKindService cannot be null");
 
-        this.assessmentRatingViewService = assessmentRatingViewService;
+        this.legalEntityRelationshipKindService = legalEntityRelationshipKindService;
         this.legalEntityRelationshipDao = legalEntityRelationshipDao;
     }
 
@@ -90,11 +94,15 @@ public class LegalEntityRelationshipService {
         return legalEntityRelationshipDao.bulkRemove(tx, relationships);
     }
 
+    public LegalEntityRelationshipView getViewByRelKindAndSelector(long relKindId, IdSelectionOptions selectionOptions) {
 
-    public LegalEntityRelationshipView getViewByRelKind(long relKindId) {
+        LegalEntityRelationshipKind relationshipKind = legalEntityRelationshipKindService.getById(relKindId);
 
-        Set<LegalEntityRelationship> relationships = findByRelationshipKindId(relKindId);
-        Set<LegalEntityRelationshipAssessmentInfo> assessmentInfo = legalEntityRelationshipDao.getViewAssessmentsByRelKind(relKindId);
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(relationshipKind.targetKind(), selectionOptions);
+
+        Set<LegalEntityRelationship> relationships = legalEntityRelationshipDao.findByRelationshipKindAndTargetSelector(relKindId, genericSelector);
+
+        Set<LegalEntityRelationshipAssessmentInfo> assessmentInfo = legalEntityRelationshipDao.getViewAssessmentsByRelKind(relKindId, genericSelector);
 
         Set<EntityReference> headerAssessments = map(assessmentInfo, LegalEntityRelationshipAssessmentInfo::definitionRef);
 

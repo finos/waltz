@@ -18,17 +18,16 @@
 
 package org.finos.waltz.jobs.harness;
 
-import org.finos.waltz.model.bulk_upload.BulkUploadMode;
-import org.finos.waltz.model.bulk_upload.legal_entity_relationship.BulkUploadLegalEntityRelationshipCommand;
-import org.finos.waltz.model.bulk_upload.legal_entity_relationship.ImmutableBulkUploadLegalEntityRelationshipCommand;
-import org.finos.waltz.model.bulk_upload.legal_entity_relationship.LegalEntityBulkUploadFixedColumns;
-import org.finos.waltz.model.bulk_upload.legal_entity_relationship.ResolveBulkUploadLegalEntityRelationshipResponse;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.legal_entity.LegalEntityRelationshipView;
 import org.finos.waltz.service.DIConfiguration;
-import org.finos.waltz.service.bulk_upload.BulkUploadLegalEntityRelationshipService;
+import org.finos.waltz.service.legal_entity.LegalEntityRelationshipService;
 import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import static java.lang.String.format;
+import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 
 
 public class LegalEntityHarness {
@@ -37,19 +36,16 @@ public class LegalEntityHarness {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
-        BulkUploadLegalEntityRelationshipService service = ctx.getBean(BulkUploadLegalEntityRelationshipService.class);
+        LegalEntityRelationshipService service = ctx.getBean(LegalEntityRelationshipService.class);
 
-        String header = format("%s, %s, %s\n", LegalEntityBulkUploadFixedColumns.ENTITY_IDENTIFIER, LegalEntityBulkUploadFixedColumns.LEGAL_ENTITY_IDENTIFIER, LegalEntityBulkUploadFixedColumns.COMMENT);
-        String inputString = header + "12345-1, 1234,, CLEJ";
+        IdSelectionOptions relOpts = mkOpts(mkRef(EntityKind.LEGAL_ENTITY_RELATIONSHIP_KIND, 2L));
+        IdSelectionOptions appOpts = mkOpts(mkRef(EntityKind.APPLICATION, 1L));
 
-        BulkUploadLegalEntityRelationshipCommand uploadCommand = ImmutableBulkUploadLegalEntityRelationshipCommand.builder()
-                .inputString(inputString)
-                .legalEntityRelationshipKindId(1L)
-                .build();
 
-        ResolveBulkUploadLegalEntityRelationshipResponse resolvedCommand = service.resolve(uploadCommand);
+        LegalEntityRelationshipView viewByRelKindAndSelector = service.getViewByRelKindAndSelector(2L, relOpts);
 
-        System.out.println(resolvedCommand.rows().size());
+
+        System.out.println(viewByRelKindAndSelector.rows().size());
 
     }
 
