@@ -428,9 +428,9 @@ const entityAttestationSection = {
 const legalEntitySection = {
     // svelteComponent: LegalEntitySection,
     componentId: "legal-entity-section",
-    name: "Legal Entities",
+    name: "Legal Entity Relationships",
     icon: "building-o",
-    description: "Legal Entities related to this entity",
+    description: "Legal Entity relationships related to this entity",
     id: 10010,
 };
 

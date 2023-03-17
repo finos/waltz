@@ -68,12 +68,12 @@
                         </colgroup>
                         <thead>
                         <tr>
-                            <td>Name</td>
-                            <td>Description</td>
-                            <td>External Id</td>
-                            <td>Target Kind</td>
-                            <td>Cardinality</td>
-                            <td>Usage Stats</td>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>External Id</th>
+                            <th>Target Kind</th>
+                            <th>Cardinality</th>
+                            <th>Usage Stats</th>
                         </tr>
                         </thead>
                         <tbody>
