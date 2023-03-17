@@ -159,7 +159,7 @@
             to proceed.
         {:else if $anyErrors}
             <Icon name="exclamation-triangle"/>
-            There are some relationships with errors, save has been enabled.
+            There are some relationships with errors, save has been enabled. Any rows with errors will be ignored.
         {/if}
     </div>
 

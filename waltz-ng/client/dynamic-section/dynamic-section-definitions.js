@@ -449,7 +449,7 @@ const legalEntityRelationshipsSection = {
     name: "Relationships",
     icon: "link",
     description: "Relationships between legal entities and other waltz entities of this relationship kind",
-    id: 10020,
+    id: 10030,
 };
 
 

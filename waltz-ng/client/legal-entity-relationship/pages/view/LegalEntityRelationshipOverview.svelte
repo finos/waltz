@@ -12,6 +12,7 @@
     import {legalEntityRelationshipStore} from "../../../svelte-stores/legal-entity-relationship-store";
     import {legalEntityRelationshipKindStore} from "../../../svelte-stores/legal-entity-relationship-kind-store";
     import Icon from "../../../common/svelte/Icon.svelte";
+    import EntityLink from "../../../common/svelte/EntityLink.svelte";
 
 
     export let primaryEntityReference;
@@ -61,13 +62,16 @@
                 <ViewLink state="main">Home</ViewLink>
             </li>
             <li>
-                Legal Entity Relationship
+                <ViewLink state="main.legal-entity-relationship-kind.list">Legal Entity Relationship List</ViewLink>
             </li>
             <li>
-                <span>{legalEntityRelationship?.targetEntityReference?.name || "Unknown"}</span>
+                <EntityLink ref={relKind}></EntityLink>
             </li>
             <li>
-                <span>{legalEntityRelationship?.legalEntityReference?.name || "Unknown"}</span>
+                <EntityLink ref={legalEntityRelationship?.targetEntityReference}></EntityLink>
+            </li>
+            <li>
+                <EntityLink ref={legalEntityRelationship?.legalEntityReference}></EntityLink>
             </li>
         </ol>
     </div>
@@ -82,18 +86,18 @@
                 {#if legalEntityRelationship}
                     <div class="row">
                         <div class="col-sm-4">
-                            Target Entity Name
+                            Target Entity
                         </div>
                         <div class="col-sm-6">
-                            {legalEntityRelationship?.targetEntityReference?.name}
+                            <EntityLink ref={legalEntityRelationship?.targetEntityReference}></EntityLink>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm-4">
-                            Legal Entity Name
+                            Legal Entity
                         </div>
                         <div class="col-sm-6">
-                            {legalEntityRelationship?.legalEntityReference?.name}
+                            <EntityLink ref={legalEntityRelationship?.legalEntityReference}></EntityLink>
                         </div>
                     </div>
                     <div class="row">
