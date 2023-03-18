@@ -133,10 +133,14 @@ export function buildHierarchies(nodes, parentsAsRefs = true) {
 }
 
 export function buildHierarchies2(nodes) {
+
     console.time("stratify");
-    const withRoot = _.concat([{id: -99}], nodes);
+    const withRoot = _.concat([{id: -99}], nodes || []);
+    console.log({nodes, withRoot})
     const sr = stratify()
-        .parentId(d => d.id === -99 ? null : d.parentId ?? -99)
+        .parentId(d => d.id === -99
+            ? null
+            : d.parentId ?? -99)
         (withRoot);
     const forest = _.map(sr.children, c => Object.assign(c, {parentId: null, parent: null}));
     console.timeEnd("stratify");
