@@ -18,23 +18,23 @@
 import {registerComponents, registerStores} from "../common/module-utils";
 
 import Routes from "./routes";
-import LegalEntityView from "./pages/view/legal-entity-view";
-import LegalEntityStore from "./services/legal-entity-store";
+import LegalEntityRelationshipView from "./pages/view/legal-entity-relationship-view";
+import LegalEntityRelationshipStore from "./services/legal-entity-relationship-store";
 
 
 export default () => {
 
-    const module = angular.module("waltz.legal-entity", []);
+    const module = angular.module("waltz.legal-entity-relationship", []);
 
     module
         .config(Routes);
 
     registerComponents(module, [
-        LegalEntityView,
+        LegalEntityRelationshipView,
     ]);
 
     registerStores(module, [
-        LegalEntityStore,
+        LegalEntityRelationshipStore,
     ])
 
     return module.name;

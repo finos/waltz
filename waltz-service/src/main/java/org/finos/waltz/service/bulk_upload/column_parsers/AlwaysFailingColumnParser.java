@@ -6,6 +6,8 @@ import org.jooq.lambda.tuple.Tuple2;
 
 import java.util.Collection;
 
+import static org.finos.waltz.common.StringUtilities.isEmpty;
+
 public class AlwaysFailingColumnParser implements ColumnParser {
     private final AssessmentHeaderCell headerCell;
 
@@ -17,17 +19,26 @@ public class AlwaysFailingColumnParser implements ColumnParser {
     @Override
     public AssessmentCell apply(String cellValue,
                                 Collection<Tuple2<Long, Long>> existingRatings) {
-        return ImmutableAssessmentCell.builder()
-                .columnId(headerCell.columnId())
-                .inputString(cellValue)
-                .addRatings(ImmutableAssessmentCellRating
-                        .builder()
-                        .status(ResolutionStatus.ERROR)
-                        .addErrors(RatingResolutionError.mkError(
-                                RatingResolutionErrorCode.RATING_VALUE_NOT_FOUND,
-                                "Invalid column header, cannot parse cell"))
-                        .build())
-                .build();
+
+        if (isEmpty(cellValue)) {
+            return ImmutableAssessmentCell.builder()
+                    .columnId(headerCell.columnId())
+                    .inputString(cellValue)
+                    .build();
+        } else {
+            return ImmutableAssessmentCell.builder()
+                    .columnId(headerCell.columnId())
+                    .inputString(cellValue)
+                    .addRatings(ImmutableAssessmentCellRating
+                            .builder()
+                            .status(ResolutionStatus.ERROR)
+                            .addErrors(RatingResolutionError.mkError(
+                                    RatingResolutionErrorCode.RATING_VALUE_NOT_FOUND,
+                                    "Invalid column header, cannot parse cell"))
+                            .build())
+                    .build();
+        }
+
     }
 
 

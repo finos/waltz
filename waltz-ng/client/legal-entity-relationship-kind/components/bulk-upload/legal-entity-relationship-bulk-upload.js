@@ -4,7 +4,7 @@ import BulkUploadLegalEntityRelationshipsPanel from "./BulkUploadLegalEntityRela
 
 
 const bindings = {
-    relationshipKind: "<",
+    relationshipKindId: "<",
     onDone: "<"
 }
 
@@ -14,16 +14,15 @@ const initialState = {
 }
 
 
-function controller($scope, serviceBroker) {
-
+function controller() {
     const vm = initialiseData(this, initialState);
 
+    vm.$onChanges = () => {
+    };
 }
 
 
 controller.$inject = [
-    "$scope",
-    "ServiceBroker"
 ];
 
 

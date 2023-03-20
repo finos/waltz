@@ -53,6 +53,22 @@
             path: ctx => `flow-classification-rule/${ctx.id}`,
             title: "Flow Classification Rule View"
         },
+        "main.legal-entity.view": {
+            path: ctx => `legal-entity/${ctx.id}`,
+            title: "Legal Entity View"
+        },
+        "main.legal-entity-relationship.view": {
+            path: ctx => `legal-entity-relationship/${ctx.id}`,
+            title: "Legal Entity Relationship View"
+        },
+        "main.legal-entity-relationship-kind.view": {
+            path: ctx => `legal-entity-relationship-kind/${ctx.id}`,
+            title: "Legal Entity Relationship Kind View"
+        },
+        "main.legal-entity-relationship-kind.list": {
+            path: ctx => `legal-entity-relationship-kind/list`,
+            title: "Legal Entity Relationship Kind List"
+        },
         "main.logical-flow.view": {
             path: ctx => `logical-flow/${ctx.id}`,
             title: "Logical Flow View"

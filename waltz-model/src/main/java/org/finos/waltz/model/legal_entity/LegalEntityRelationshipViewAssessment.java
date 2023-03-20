@@ -15,27 +15,24 @@
  * See the License for the specific
  *
  */
-import {registerComponents, registerStores} from "../common/module-utils";
 
-import Routes from "./routes";
-import LegalEntityView from "./pages/view/legal-entity-view";
-import LegalEntityStore from "./services/legal-entity-store";
+package org.finos.waltz.model.legal_entity;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.finos.waltz.model.rating.RatingSchemeItem;
+import org.immutables.value.Value;
+
+import java.util.Set;
 
 
-export default () => {
+@Value.Immutable
+@JsonSerialize(as = ImmutableLegalEntityRelationshipViewAssessment.class)
+@JsonDeserialize(as = ImmutableLegalEntityRelationshipViewAssessment.class)
+public abstract class LegalEntityRelationshipViewAssessment {
 
-    const module = angular.module("waltz.legal-entity", []);
+    public abstract Long assessmentDefinitionId();
 
-    module
-        .config(Routes);
+    public abstract Set<RatingSchemeItem> ratings();
 
-    registerComponents(module, [
-        LegalEntityView,
-    ]);
-
-    registerStores(module, [
-        LegalEntityStore,
-    ])
-
-    return module.name;
-};
+}

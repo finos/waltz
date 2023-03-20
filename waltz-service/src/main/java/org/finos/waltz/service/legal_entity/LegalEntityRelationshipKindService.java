@@ -1,6 +1,7 @@
 package org.finos.waltz.service.legal_entity;
 
 import org.finos.waltz.data.legal_entity.LegalEntityRelationshipKindDao;
+import org.finos.waltz.model.legal_entity.LegalEntityRelKindStat;
 import org.finos.waltz.model.legal_entity.LegalEntityRelationshipKind;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,5 +27,9 @@ public class LegalEntityRelationshipKindService {
 
     public Set<LegalEntityRelationshipKind> findAll() {
         return legalEntityRelationshipKindDao.findAll();
+    }
+
+    public Set<LegalEntityRelKindStat> findUsageStats() {
+        return legalEntityRelationshipKindDao.findUsageStats();
     }
 }

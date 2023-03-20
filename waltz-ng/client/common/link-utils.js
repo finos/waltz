@@ -38,6 +38,7 @@ const stateKindTuples = [
     {kind: "FLOW_CLASSIFICATION_RULE", state: "main.flow-classification-rule.view"},
     {kind: "INVOLVEMENT_KIND", state: "main.involvement-kind.view"},
     {kind: "LEGAL_ENTITY", state: "main.legal-entity.view"},
+    {kind: "LEGAL_ENTITY_RELATIONSHIP", state: "main.legal-entity-relationship.view"},
     {kind: "LEGAL_ENTITY_RELATIONSHIP_KIND", state: "main.legal-entity-relationship-kind.view"},
     {kind: "LICENCE", state: "main.licence.view"},
     {kind: "LOGICAL_DATA_ELEMENT", state: "main.logical-data-element.view"},

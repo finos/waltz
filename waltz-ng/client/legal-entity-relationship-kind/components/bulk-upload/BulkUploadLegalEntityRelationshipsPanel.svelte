@@ -24,7 +24,7 @@
     import ResolvedUploadReport from "./ResolvedUploadReport.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
 
-    export let relationshipKind;
+    export let relationshipKindId;
     export let onDone = () => console.log("Done, close and reload rels");
 
     let resolveCall;
@@ -38,7 +38,7 @@
         const resolveParams = {
             inputString: $inputString,
             updateMode: $uploadMode,
-            legalEntityRelationshipKindId: relationshipKind.id,
+            legalEntityRelationshipKindId: relationshipKindId,
         };
 
         return resolveCall = bulkUploadLegalEntityRelationshipStore.resolve(resolveParams)
@@ -61,7 +61,7 @@
         const saveParams = {
             inputString: $inputString,
             updateMode: $uploadMode,
-            legalEntityRelationshipKindId: relationshipKind.id,
+            legalEntityRelationshipKindId: relationshipKindId,
         };
 
         return saveCall = bulkUploadLegalEntityRelationshipStore.save(saveParams)
@@ -136,7 +136,7 @@
 
         <button type="submit"
                 class="btn btn-success"
-                disabled={_.isNil($inputString) || _.isNull(relationshipKind)}>
+                disabled={_.isNil($inputString) || _.isNull(relationshipKindId)}>
             Search
         </button>
     </form>
@@ -159,7 +159,7 @@
             to proceed.
         {:else if $anyErrors}
             <Icon name="exclamation-triangle"/>
-            There are some relationships with errors, save has been enabled.
+            There are some relationships with errors, save has been enabled. Any rows with errors will be ignored.
         {/if}
     </div>
 

@@ -15,27 +15,34 @@
  * See the License for the specific
  *
  */
-import {registerComponents, registerStores} from "../common/module-utils";
+import template from "./legal-entity-relationship-kind-list-view.html";
+import {initialiseData} from "../../../common";
+import LegalEntityRelationshipKindOverview from "./LegalEntityRelationshipKindListView.svelte";
 
-import Routes from "./routes";
-import LegalEntityView from "./pages/view/legal-entity-view";
-import LegalEntityStore from "./services/legal-entity-store";
+const bindings = {};
+
+const initialState = {
+    LegalEntityRelationshipKindOverview
+}
 
 
-export default () => {
+function controller() {
 
-    const module = angular.module("waltz.legal-entity", []);
+    initialiseData(this, initialState);
 
-    module
-        .config(Routes);
+}
 
-    registerComponents(module, [
-        LegalEntityView,
-    ]);
 
-    registerStores(module, [
-        LegalEntityStore,
-    ])
+controller.$inject = [];
 
-    return module.name;
+const component = {
+    template,
+    bindings,
+    controller
+};
+
+
+export default {
+    id: "waltzLegalEntityRelationshipKindListView",
+    component
 };
