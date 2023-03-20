@@ -118,7 +118,7 @@ import {
 import {LegalEntityStore_API as LegalEntityStore} from "../../legal-entity/services/legal-entity-store";
 import {
     LegalEntityRelationshipStore_API as LegalEntityRelationshipStore
-} from "../../legal-entity/services/legal-entity-relationship-store";
+} from "../../legal-entity-relationship/services/legal-entity-relationship-store";
 import {
     LegalEntityRelationshipKindStore_API as LegalEntityRelationshipKindStore
 } from "../../legal-entity-relationship-kind/services/legal-entity-relationship-kind-store";

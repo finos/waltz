@@ -2,19 +2,21 @@ package org.finos.waltz.data.legal_entity;
 
 import org.finos.waltz.model.Cardinality;
 import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.legal_entity.ImmutableLegalEntityRelKindStat;
 import org.finos.waltz.model.legal_entity.ImmutableLegalEntityRelationshipKind;
+import org.finos.waltz.model.legal_entity.LegalEntityRelKindStat;
 import org.finos.waltz.model.legal_entity.LegalEntityRelationshipKind;
+import org.finos.waltz.schema.tables.LegalEntityRelationship;
 import org.finos.waltz.schema.tables.records.LegalEntityRelationshipKindRecord;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Set;
 
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
-import static org.finos.waltz.schema.Tables.LEGAL_ENTITY_RELATIONSHIP_KIND;
+import static org.finos.waltz.schema.Tables.*;
 
 @Repository
 public class LegalEntityRelationshipKindDao {
@@ -58,4 +60,60 @@ public class LegalEntityRelationshipKindDao {
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
 
+    public Set<LegalEntityRelKindStat> findUsageStats() {
+
+
+        LegalEntityRelationship distinctLERels = LEGAL_ENTITY_RELATIONSHIP.as("leRels");
+        LegalEntityRelationship distinctTargetEntityRels = LEGAL_ENTITY_RELATIONSHIP.as("teRels");
+        LegalEntityRelationship relationships = LEGAL_ENTITY_RELATIONSHIP.as("rels");
+
+        Field<Integer> legalEntityCount = DSL.countDistinct(distinctLERels.LEGAL_ENTITY_ID).as("leCount");
+
+        SelectHavingStep<Record2<Long, Integer>> legalEntityCountsByRelKind = DSL
+                .select(distinctLERels.RELATIONSHIP_KIND_ID,
+                        legalEntityCount)
+                .from(distinctLERels)
+                .groupBy(distinctLERels.RELATIONSHIP_KIND_ID);
+
+        Field<Integer> targetEntityCount = DSL.countDistinct(distinctTargetEntityRels.TARGET_ID).as("teCount");
+
+        SelectHavingStep<Record2<Long, Integer>> targetEntityCountsByRelKind = DSL
+                .select(distinctTargetEntityRels.RELATIONSHIP_KIND_ID,
+                        targetEntityCount)
+                .from(distinctTargetEntityRels)
+                .groupBy(distinctTargetEntityRels.RELATIONSHIP_KIND_ID);
+
+        Field<Integer> relCount = DSL.countDistinct(relationships.ID).as("relCount");
+
+        SelectHavingStep<Record2<Long, Integer>> relationshipCountsByRelKind = DSL
+                .select(relationships.RELATIONSHIP_KIND_ID,
+                        relCount)
+                .from(relationships)
+                .groupBy(relationships.RELATIONSHIP_KIND_ID);
+
+        Field<Integer> leCountField = DSL.coalesce(legalEntityCountsByRelKind.field(legalEntityCount), 0);
+        Field<Integer> teCountField = DSL.coalesce(targetEntityCountsByRelKind.field(targetEntityCount), 0);
+        Field<Integer> relCountField = DSL.coalesce(relationshipCountsByRelKind.field(relCount), 0);
+
+        SelectOnConditionStep<Record> qry = dsl
+                .select(LEGAL_ENTITY_RELATIONSHIP_KIND.ID)
+                .select(leCountField)
+                .select(teCountField)
+                .select(relCountField)
+                .from(LEGAL_ENTITY_RELATIONSHIP_KIND)
+                .leftJoin(legalEntityCountsByRelKind)
+                .on(LEGAL_ENTITY_RELATIONSHIP_KIND.ID.eq(legalEntityCountsByRelKind.field(distinctLERels.RELATIONSHIP_KIND_ID)))
+                .leftJoin(targetEntityCountsByRelKind)
+                .on(LEGAL_ENTITY_RELATIONSHIP_KIND.ID.eq(targetEntityCountsByRelKind.field(distinctTargetEntityRels.RELATIONSHIP_KIND_ID)))
+                .leftJoin(relationshipCountsByRelKind)
+                .on(LEGAL_ENTITY_RELATIONSHIP_KIND.ID.eq(relationshipCountsByRelKind.field(relationships.RELATIONSHIP_KIND_ID)));
+
+        return qry
+                .fetchSet(r -> ImmutableLegalEntityRelKindStat.builder()
+                        .relKindId(r.get(LEGAL_ENTITY_RELATIONSHIP_KIND.ID))
+                        .legalEntityCount(r.get(leCountField))
+                        .targetEntityCount(r.get(teCountField))
+                        .relationshipCount(r.get(relCountField))
+                        .build());
+    }
 }

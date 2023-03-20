@@ -17,13 +17,21 @@
  */
 
 import LegalEntityRelationshipKindView from "./pages/view/legal-entity-relationship-kind-view";
+import LegalEntityRelationshipKindListView from "./pages/list/legal-entity-relationship-kind-list-view";
 
 
-const baseState = {};
+const baseState = {
+    url: "legal-entity-relationship-kind"
+};
 
 const viewState = {
-    url: "legal-entity-relationship-kind/{id:int}",
+    url: "/{id:int}",
     views: {"content@": LegalEntityRelationshipKindView.id}
+};
+
+const listState = {
+    url: "/list",
+    views: {"content@": LegalEntityRelationshipKindListView.id}
 };
 
 
@@ -31,6 +39,7 @@ function setup($stateProvider) {
     $stateProvider
         .state("main.legal-entity-relationship-kind", baseState)
         .state("main.legal-entity-relationship-kind.view", viewState)
+        .state("main.legal-entity-relationship-kind.list", listState)
 }
 
 setup.$inject = ["$stateProvider"];

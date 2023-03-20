@@ -36,5 +36,5 @@ export const resolvedRows = derived([resolveResponse], ([$resolveResponse]) => {
 export const anyErrors = derived([resolveResponse], ([$resolveResponse]) => {
     return _.isNull($resolveResponse)
         ? false
-        : _.some($resolveResponse.rows, d => d.legalEntityRelationship.operation === "ERROR");
+        : _.some($resolveResponse.rows, d => !_.isEmpty(d.legalEntityRelationship.errors));
 });

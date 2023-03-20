@@ -31,4 +31,16 @@
         <dropTable tableName="entity_tag"/>
     </changeSet>
 
+    <changeSet id="20230315-6446-1"
+               author="woodjes">
+        <insert tableName="role">
+            <column name="key" value="BULK_LEGAL_ENTITY_RELATIONSHIP_EDITOR"/>
+            <column name="is_custom" valueBoolean="false"/>
+            <column name="name" value="Bulk Legal Entity Relationship Editor"/>
+            <column name="description"
+                    value="Can upload legal entity relationships and associated assessments in bulk"/>
+            <column name="user_selectable" valueBoolean="true"/>
+        </insert>
+    </changeSet>
+
 </databaseChangeLog>

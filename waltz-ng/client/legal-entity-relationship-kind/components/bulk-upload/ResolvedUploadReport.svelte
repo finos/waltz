@@ -3,6 +3,9 @@
     import {resolvedRows, resolveResponse, sortedHeaders} from "./bulk-upload-relationships-store";
     import _ from "lodash";
     import Icon from "../../../common/svelte/Icon.svelte";
+    import Tooltip from "../../../common/svelte/Tooltip.svelte";
+    import RowErrorTooltip from "./RowErrorTooltip.svelte";
+    import AssessmentErrorTooltip from "./AssessmentErrorTooltip.svelte";
 
 
     let erroredHeaders;
@@ -11,7 +14,29 @@
     $: {
         if ($resolveResponse) {
             erroredHeaders = _.filter($resolveResponse.assessmentHeaders, d => d.status !== "HEADER_FOUND");
-            erroredRelationships = _.filter($resolveResponse.rows, d => d.legalEntityRelationship.operation === "ERROR");
+            erroredRelationships = _.filter($resolveResponse.rows, d => !_.isEmpty(d.legalEntityRelationship.errors));
+        }
+    }
+
+    function mkErrorProps(row) {
+        return {
+            relationshipErrors: row.legalEntityRelationship.errors,
+        }
+    }
+
+    function mkAssessmentErrorProps(assessmentRating) {
+        return {
+            assessmentRating
+        }
+    }
+
+    function determineAssessmentHeaderTooltip(status) {
+        if (status === "HEADER_DEFINITION_NOT_FOUND") {
+            return "Invalid column header, definition not found ";
+        } else if (status === "HEADER_RATING_NOT_FOUND") {
+            return "Invalid column header, rating not found";
+        } else {
+            return "";
         }
     }
 
@@ -34,6 +59,7 @@
 <div class="waltz-scroll-region-300" style="margin-bottom: 2em">
     <table class="table table-condensed small">
         <colgroup>
+            <col width="5%"/>
             <col width="10%"/>
             <col width="15%"/>
             <col width="15%"/>
@@ -41,15 +67,18 @@
         </colgroup>
         <thead>
         <tr>
+            <th></th>
             <th>Operation</th>
             <th>Target Entity</th>
             <th>Legal Entity</th>
             <th>Comment</th>
             {#each $sortedHeaders as header}
-                <th>
+                <th title={determineAssessmentHeaderTooltip(header.status)}>
                     {header.inputString}
                     {#if header.status !== "HEADER_FOUND"}
-                        <span style="color: red"><Icon name="exclamation-triangle"/></span>
+                        <span style="color: red">
+                            <Icon name="exclamation-triangle"/>
+                        </span>
                     {/if}
                 </th>
             {/each}
@@ -58,11 +87,24 @@
         <tbody>
         {#each $resolvedRows as row}
             {@const assessmentByColumnId = _.keyBy(row.assessmentRatings, d => d.columnId)}
-            <tr class:relationship-error={row.legalEntityRelationship.operation === "ERROR"}>
+            <tr class:relationship-error={!_.isEmpty(row.legalEntityRelationship.errors)}>
                 <td class="relationship-cell">
-                        <span>
-                            {row.legalEntityRelationship.operation}
-                        </span>
+                    <Tooltip content={RowErrorTooltip}
+                             placement="left-start"
+                             props={mkErrorProps(row)}>
+                        <svelte:fragment slot="target">
+                                <span style="color: red">
+                                    {#if !_.isEmpty(row.legalEntityRelationship.errors)}
+                                    <Icon name="exclamation-triangle" size="lg"/>
+                                    {/if}
+                                </span>
+                        </svelte:fragment>
+                    </Tooltip>
+                </td>
+                <td class="relationship-cell">
+                                <span>
+                                    {row.legalEntityRelationship.operation}
+                                </span>
                 </td>
                 <td class="relationship-cell">
                         <span>
@@ -89,7 +131,15 @@
                             {#if assessmentRating}
                                 {assessmentRating?.inputString}
                                 {#if _.includes(assessmentRating?.statuses, "ERROR")}
-                                    <span style="color: red"><Icon name="exclamation-triangle"/></span>
+                                    <Tooltip content={AssessmentErrorTooltip}
+                                             placement="left-start"
+                                             props={mkAssessmentErrorProps(assessmentRating)}>
+                                        <svelte:fragment slot="target">
+                                            <span style="color: red">
+                                                <Icon name="exclamation-triangle"/>
+                                            </span>
+                                        </svelte:fragment>
+                                    </Tooltip>
                                 {/if}
                             {/if}
                         </span>

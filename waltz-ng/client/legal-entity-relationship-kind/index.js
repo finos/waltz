@@ -19,10 +19,14 @@ import {registerComponents, registerStores} from "../common/module-utils";
 
 import Routes from "./routes";
 import LegalEntityRelationshipKindView from "./pages/view/legal-entity-relationship-kind-view";
-import LegalEntityRelationshipsSection from "./components/relationships-section/legal-entity-relationships-section";
+import LegalEntityRelationshipKindListView from "./pages/list/legal-entity-relationship-kind-list-view";
+import LegalEntityRelationshipsSection
+    from "./components/relationship-kind-section/legal-entity-relationship-kind-section";
 import LegalEntityRelationshipKindStore from "./services/legal-entity-relationship-kind-store";
 import BulkUploadLegalEntityRelationshipsStore from "./services/bulk-upload-legal-entity-relationships-store";
 import LegalEntityRelationshipBulkUpload from "./components/bulk-upload/legal-entity-relationship-bulk-upload";
+import LegalEntityRelationshipViewGrid from "./components/view-grid/legal-entity-relationships-view-grid";
+import LegalEntityRelationshipSection from "./components/legal-entity-section/legal-entity-section";
 
 export default () => {
 
@@ -34,7 +38,10 @@ export default () => {
     registerComponents(module, [
         LegalEntityRelationshipKindView,
         LegalEntityRelationshipsSection,
-        LegalEntityRelationshipBulkUpload
+        LegalEntityRelationshipBulkUpload,
+        LegalEntityRelationshipKindListView,
+        LegalEntityRelationshipViewGrid,
+        LegalEntityRelationshipSection
     ]);
 
     registerStores(module, [

@@ -90,6 +90,10 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
                 return mkForLicence(options);
             case LOGICAL_DATA_FLOW:
                 return mkForLogicalDataFlow(options);
+            case LEGAL_ENTITY:
+                return mkForLegalEntity(options);
+            case LEGAL_ENTITY_RELATIONSHIP_KIND:
+                return mkForLegalEntityRelationshipKind(options);
             case MEASURABLE:
                 return mkForMeasurable(options);
             case SCENARIO:
@@ -119,6 +123,22 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
         }
     }
 
+    private Select<Record1<Long>> mkForLegalEntity(IdSelectionOptions options) {
+        return DSL
+                .select(LEGAL_ENTITY_RELATIONSHIP.TARGET_ID)
+                .from(LEGAL_ENTITY_RELATIONSHIP)
+                .where(LEGAL_ENTITY_RELATIONSHIP.LEGAL_ENTITY_ID.eq(options.entityReference().id())
+                        .and(LEGAL_ENTITY_RELATIONSHIP.TARGET_KIND.eq(EntityKind.APPLICATION.name())));
+    }
+
+    private Select<Record1<Long>> mkForLegalEntityRelationshipKind(IdSelectionOptions options) {
+        return DSL
+                .select(LEGAL_ENTITY_RELATIONSHIP.TARGET_ID)
+                .from(LEGAL_ENTITY_RELATIONSHIP)
+                .where(LEGAL_ENTITY_RELATIONSHIP.RELATIONSHIP_KIND_ID.eq(options.entityReference().id())
+                        .and(LEGAL_ENTITY_RELATIONSHIP.TARGET_KIND.eq(EntityKind.APPLICATION.name())));
+
+    }
 
     private Select<Record1<Long>> mkForPhysicalSpec(IdSelectionOptions options) {
         return DSL

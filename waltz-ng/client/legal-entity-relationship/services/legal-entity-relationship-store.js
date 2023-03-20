@@ -27,6 +27,11 @@ export function store($http, BaseApiUrl) {
             .get(`${BASE}/legal-entity-id/${id}`)
             .then(result => result.data);
 
+    const getById = (id) =>
+        $http
+            .get(`${BASE}/id/${id}`)
+            .then(result => result.data);
+
     const findByRelationshipKindId = (id) =>
         $http
             .get(`${BASE}/relationship-kind/${id}`)
@@ -37,10 +42,17 @@ export function store($http, BaseApiUrl) {
             .get(`${BASE}/kind/${ref.kind}/id/${ref.id}`)
             .then(result => result.data);
 
+    const getViewByRelationshipKindId = (id, opts) =>
+        $http
+            .post(`${BASE}/relationship-kind/${id}/view`, opts)
+            .then(result => result.data);
+
     return {
+        getById,
         findByLegalEntityId,
         findByEntityReference,
-        findByRelationshipKindId
+        findByRelationshipKindId,
+        getViewByRelationshipKindId
     };
 }
 
@@ -55,6 +67,11 @@ export const serviceName = "LegalEntityRelationshipStore";
 
 
 export const LegalEntityRelationshipStore_API = {
+    getById: {
+        serviceName,
+        serviceFnName: "getById",
+        description: "executes getById"
+    },
     findByLegalEntityId: {
         serviceName,
         serviceFnName: "findByLegalEntityId",
@@ -69,6 +86,11 @@ export const LegalEntityRelationshipStore_API = {
         serviceName,
         serviceFnName: "findByEntityReference",
         description: "executes findByEntityReference"
+    },
+    getViewByRelationshipKindId: {
+        serviceName,
+        serviceFnName: "getViewByRelationshipKindId",
+        description: "executes getViewByRelationshipKindId"
     },
 };
 

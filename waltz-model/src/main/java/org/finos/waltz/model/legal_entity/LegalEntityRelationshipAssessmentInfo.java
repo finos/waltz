@@ -15,27 +15,21 @@
  * See the License for the specific
  *
  */
-import {registerComponents, registerStores} from "../common/module-utils";
 
-import Routes from "./routes";
-import LegalEntityView from "./pages/view/legal-entity-view";
-import LegalEntityStore from "./services/legal-entity-store";
+package org.finos.waltz.model.legal_entity;
+
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.rating.RatingSchemeItem;
+import org.immutables.value.Value;
 
 
-export default () => {
+@Value.Immutable
+public abstract class LegalEntityRelationshipAssessmentInfo {
 
-    const module = angular.module("waltz.legal-entity", []);
+    public abstract Long relationshipId();
 
-    module
-        .config(Routes);
+    public abstract EntityReference definitionRef();
 
-    registerComponents(module, [
-        LegalEntityView,
-    ]);
+    public abstract RatingSchemeItem ratingItem();
 
-    registerStores(module, [
-        LegalEntityStore,
-    ])
-
-    return module.name;
-};
+}

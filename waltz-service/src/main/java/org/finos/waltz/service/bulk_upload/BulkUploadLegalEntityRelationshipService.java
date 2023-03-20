@@ -169,6 +169,7 @@ public class BulkUploadLegalEntityRelationshipService {
         List<Tuple2<EntityReference, Set<AssessmentCell>>> rows = resolvedCmd
                 .rows()
                 .stream()
+                .filter(d -> CollectionUtilities.isEmpty(d.legalEntityRelationship().errors()))
                 .filter(d -> asSet(UploadOperation.ADD, UploadOperation.UPDATE).contains(d.legalEntityRelationship().operation()))
                 .map(r -> {
 
@@ -266,11 +267,16 @@ public class BulkUploadLegalEntityRelationshipService {
 
     }
 
-    private BulkChangeStatistics handeRelationships(DSLContext tx, Set<ResolvedLegalEntityRelationship> relationships, long relKindId, String username) {
+    private BulkChangeStatistics handeRelationships(DSLContext tx,
+                                                    Set<ResolvedLegalEntityRelationship> relationships,
+                                                    long relKindId,
+                                                    String username) {
 
-        Set<ResolvedLegalEntityRelationship> additions = filter(relationships, r -> r.operation().equals(UploadOperation.ADD));
-        Set<ResolvedLegalEntityRelationship> updates = filter(relationships, r -> r.operation().equals(UploadOperation.UPDATE));
-        Set<ResolvedLegalEntityRelationship> removals = filter(relationships, r -> r.operation().equals(UploadOperation.REMOVE));
+        Set<ResolvedLegalEntityRelationship> validRelationships = filter(relationships, d -> CollectionUtilities.isEmpty(d.errors()));
+
+        Set<ResolvedLegalEntityRelationship> additions = filter(validRelationships, r -> r.operation().equals(UploadOperation.ADD));
+        Set<ResolvedLegalEntityRelationship> updates = filter(validRelationships, r -> r.operation().equals(UploadOperation.UPDATE));
+        Set<ResolvedLegalEntityRelationship> removals = filter(validRelationships, r -> r.operation().equals(UploadOperation.REMOVE));
 
         Set<LegalEntityRelationship> relationshipsToAdd = map(additions, d -> mkRelationship(relKindId, d, username));
         Set<LegalEntityRelationship> relationshipsToUpdate = map(updates, d -> mkRelationship(relKindId, d, username));
@@ -423,7 +429,7 @@ public class BulkUploadLegalEntityRelationshipService {
 
                     AssessmentHeaderCell header = headersByColId.get(assessmentCell.columnId());
 
-                    if (!header.isSingleValued() || !header.resolvedAssessmentDefinition().isPresent() || assessmentCell.ratings().isEmpty()) {
+                    if (!header.isSingleValued() || !header.resolvedAssessmentDefinition().isPresent() || assessmentCell.ratings().isEmpty() || isEmpty(assessmentCell.inputString())) {
                         return assessmentCell;
                     }
 
@@ -513,8 +519,7 @@ public class BulkUploadLegalEntityRelationshipService {
 
         UploadOperation action = determineAction(
                 existingRelationship.isPresent(),
-                columnIsMarked(removal),
-                errors);
+                columnIsMarked(removal));
 
         return ImmutableResolvedLegalEntityRelationship
                 .builder()
@@ -558,11 +563,8 @@ public class BulkUploadLegalEntityRelationshipService {
     }
 
     public static <T extends BulkUploadError> UploadOperation determineAction(boolean alreadyExists,
-                                                                              boolean isRemoval,
-                                                                              Set<T> errors) {
-        if (!CollectionUtilities.isEmpty(errors)) {
-            return UploadOperation.ERROR;
-        } else if (isRemoval) {
+                                                                              boolean isRemoval) {
+        if (isRemoval) {
             return UploadOperation.REMOVE;
         } else if (alreadyExists) {
             return UploadOperation.UPDATE;
@@ -672,10 +674,5 @@ public class BulkUploadLegalEntityRelationshipService {
                         .getOrDefault(
                                 lookupString,
                                 definitionsByName.get(lookupString)));
-    }
-
-
-    public void ensureUserHasAdminRights(long legalEntityRelationshipKindId, String username) {
-        LegalEntityRelationshipKind relKind = legalEntityRelationshipKindService.getById(legalEntityRelationshipKindId);
     }
 }

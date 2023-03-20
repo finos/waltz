@@ -5,6 +5,5 @@ public enum UploadOperation {
     ADD,
     UPDATE,
     REMOVE,
-    ERROR
 
 }

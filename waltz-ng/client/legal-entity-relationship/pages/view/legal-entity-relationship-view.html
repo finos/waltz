@@ -15,9 +15,14 @@
   ~ See the License for the specific
   ~
   -->
+<div>
+    <waltz-svelte-component component="$ctrl.LegalEntityRelationshipOverview"
+                            primary-entity-reference="$ctrl.primaryEntityRef">
+    </waltz-svelte-component>
 
-<waltz-svelte-component ng-if="$ctrl.relationshipKindId"
-                        component="$ctrl.BulkUploadLegalEntityRelationshipsPanel"
-                        relationship-kind-id="$ctrl.relationshipKindId"
-                        on-done="$ctrl.onDone">
-</waltz-svelte-component>
+    <br>
+
+
+    <waltz-dynamic-sections-view parent-entity-ref="$ctrl.primaryEntityRef">
+    </waltz-dynamic-sections-view>
+</div>
