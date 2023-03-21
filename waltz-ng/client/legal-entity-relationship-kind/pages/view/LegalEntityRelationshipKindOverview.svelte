@@ -29,7 +29,7 @@
                 <ViewLink state="main">Home</ViewLink>
             </li>
             <li>
-                Legal Entity Relationship Kind
+                <ViewLink state="main.legal-entity-relationship-kind.list">Legal Entity Relationship List</ViewLink>
             </li>
             <li>
                 <span>{legalEntityRelationshipKind?.name || "Unknown"}</span>

@@ -18,11 +18,13 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.common.Checks;
 import org.finos.waltz.common.FunctionUtilities;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.bulk_upload.legal_entity_relationship.BulkUploadLegalEntityRelationshipCommand;
 import org.finos.waltz.model.bulk_upload.legal_entity_relationship.ResolveBulkUploadLegalEntityRelationshipResponse;
 import org.finos.waltz.model.bulk_upload.legal_entity_relationship.SaveBulkUploadLegalEntityRelationshipResponse;
+import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.bulk_upload.BulkUploadLegalEntityRelationshipService;
 import org.finos.waltz.service.permission.permission_checker.LegalEntityRelationshipPermissionChecker;
 import org.finos.waltz.service.user.UserRoleService;
@@ -87,13 +89,16 @@ public class BulkUploadLegalEntityRelationshipEndpoint implements Endpoint {
     private SaveBulkUploadLegalEntityRelationshipResponse saveRoute(Request request, Response response) throws IOException {
         BulkUploadLegalEntityRelationshipCommand uploadCmd = readBody(request, BulkUploadLegalEntityRelationshipCommand.class);
         String username = getUsername(request);
-
+        ensureUserHasAdminRights(uploadCmd.legalEntityRelationshipKindId(), username);
         LOG.info("User: {} resolving bulk upload: {}", username, uploadCmd);
         return service.save(uploadCmd, username);
     }
 
     private void ensureUserHasAdminRights(long legalEntityRelationshipKindId, String username) {
-        Set<Operation> perms = legalEntityRelationshipPermissionChecker.findLegalEntityRelationshipPermissionsForRelationshipKind(legalEntityRelationshipKindId, username);
+
+        Checks.checkTrue(userRoleService.hasRole(username, SystemRole.BULK_LEGAL_ENTITY_RELATIONSHIP_EDITOR), "User does not have permission to perform this action");
+
+//        Set<Operation> perms = legalEntityRelationshipPermissionChecker.findLegalEntityRelationshipPermissionsForRelationshipKind(legalEntityRelationshipKindId, username);
     }
 
 }

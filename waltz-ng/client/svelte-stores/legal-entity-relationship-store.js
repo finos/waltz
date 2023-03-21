@@ -23,6 +23,11 @@ export function mkLegalEntityRelationshipStore() {
 
     const base = "api/legal-entity-relationship";
 
+    const getById = (id, force = false) => {
+        return remote
+            .fetchViewDatum("GET", `${base}/id/${id}`, null, {force});
+    };
+
     const findByLegalEntityId = (id, force = false) => {
         return remote
             .fetchViewList("GET", `${base}/legal-entity-id/${id}`, null, {force});
@@ -36,7 +41,8 @@ export function mkLegalEntityRelationshipStore() {
 
     return {
         findByLegalEntityId,
-        findByEntityReference
+        findByEntityReference,
+        getById
     };
 }
 

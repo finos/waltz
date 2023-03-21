@@ -234,6 +234,13 @@ export const entity = {
         description: null,
         position: 1525
     },
+    LEGAL_ENTITY_RELATIONSHIP: {
+        key: "LEGAL_ENTITY_RELATIONSHIP",
+        name: "Legal Entity Relationship",
+        icon: "link",
+        description: null,
+        position: 1526
+    },
     LEGAL_ENTITY_RELATIONSHIP_KIND: {
         key: "LEGAL_ENTITY_RELATIONSHIP_KIND",
         name: "Legal Entity Relationship Kind",
