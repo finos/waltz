@@ -255,6 +255,7 @@ public class PersonDao {
                 .from(USER_ROLE)
                 .innerJoin(PERSON).on(PERSON.EMAIL.eq(USER_ROLE.USER_NAME)
                         .and(PERSON.IS_REMOVED.isFalse()))
+                .where(USER_ROLE.ROLE.eq(role))
                 .fetchSet(personMapper);
     }
 
