@@ -129,11 +129,6 @@
                     <archiveClasses>true</archiveClasses>
                     <webResources>
                     </webResources>
-                    <packagingExcludes>
-                        WEB-INF/lib/jetty-*.jar,
-                        WEB-INF/lib/javax.servlet-api-*.jar,
-                        WEB-INF/lib/websocket-*.jar
-                    </packagingExcludes>
                 </configuration>
             </plugin>
             <plugin>
