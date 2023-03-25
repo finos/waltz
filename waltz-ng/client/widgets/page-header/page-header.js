@@ -41,7 +41,7 @@ function controller($document,
     const vm = initialiseData(this, initialState);
 
     vm.$onChanges = () => {
-        $document[0].title = `Waltz: ${vm.name}`;
+        document.title = `Waltz: ${vm.name}`;
     };
 
     const scrollListener = () => {
