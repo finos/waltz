@@ -38,7 +38,8 @@ function controller($stateParams) {
         };
 
         vm.section = _.find(dynamicSections, { id: $stateParams.sectionId });
-    }
+        document.title = `Waltz: ${vm.section.name}`;
+    };
 }
 
 
