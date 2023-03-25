@@ -30,6 +30,7 @@ const bindings = {
     targetEntityKind: "<?"
 };
 
+
 const initialState = {
     targetEntityKind: 'APPLICATION',
     selectedKind: null,
@@ -37,7 +38,7 @@ const initialState = {
     selectedYear: 2022,
     selectedEntity: null,
     costKinds: [],
-    costYears: [2023, 2022, 2021],
+    costYears: [],
     costInfo: [],
     exportAllowed: true,
     loading: true,
@@ -120,15 +121,6 @@ function findDefaultKind(costKinds = []) {
 }
 
 
-function mkKindToLatestYearMap(kindsAndYears) {
-    return _
-        .chain(kindsAndYears)
-        .keyBy(d => d.costKind.id)
-        .mapValues(d => _.first(d.years))
-        .value();
-}
-
-
 function mkKindToYearsMap(kindsAndYears) {
     return _
         .chain(kindsAndYears)
@@ -178,14 +170,15 @@ function controller($q, serviceBroker, uiGridConstants, settingsService) {
             .then(r => {
                 vm.costKinds = extractOrderedListOfKinds(r.data);
                 vm.yearsByKindId = mkKindToYearsMap(r.data);
-                vm.latestYearByKindId = mkKindToLatestYearMap(r.data);
                 vm.selectedKind = findDefaultKind(vm.costKinds);
+                vm.costYears = vm.yearsByKindId[vm.selectedKind.id];
+                vm.selectedYear = vm.costYears[0];
                 vm.loading = false;
             });
     }
 
     function loadSummaryForCostKind(){
-        if(vm.selectedKind){
+        if (vm.selectedKind) {
             vm.loading = true;
             return serviceBroker
                 .loadViewData(
@@ -221,7 +214,7 @@ function controller($q, serviceBroker, uiGridConstants, settingsService) {
     };
 
     vm.$onChanges = () => {
-        if (vm.selector){
+        if (vm.selector) {
             loadCostKinds()
                 .then(() => loadSummaryForCostKind())
         }
