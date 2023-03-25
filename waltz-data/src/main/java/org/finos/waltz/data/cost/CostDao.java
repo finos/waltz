@@ -112,15 +112,14 @@ public class CostDao {
 
 
     public Set<EntityCost> findTopCostsForCostKindAndSelector(long costKindId,
+                                                              int year,
                                                               GenericSelector genericSelector,
                                                               int limit){
-
-        SelectConditionStep<Record1<Integer>> latestYear = mkLatestYearSelector(costKindId, genericSelector);
 
         Condition cond = COST.ENTITY_ID.in(genericSelector.selector())
                 .and(COST.ENTITY_KIND.eq(genericSelector.kind().name()))
                 .and(COST.COST_KIND_ID.eq(costKindId))
-                .and(COST.YEAR.eq(latestYear));
+                .and(COST.YEAR.eq(year));
 
         SelectSeekStep1<Record, BigDecimal> qry = dsl
                 .select(ENTITY_NAME_FIELD)

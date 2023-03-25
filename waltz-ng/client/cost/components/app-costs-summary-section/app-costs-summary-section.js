@@ -128,6 +128,15 @@ function mkKindToLatestYearMap(kindsAndYears) {
 }
 
 
+function mkKindToYearsMap(kindsAndYears) {
+    return _
+        .chain(kindsAndYears)
+        .keyBy(d => d.costKind.id)
+        .mapValues(d => d.years)
+        .value();
+}
+
+
 function extractOrderedListOfKinds(kindsAndYears) {
     return _
         .chain(kindsAndYears)
@@ -166,8 +175,8 @@ function controller($q, serviceBroker, uiGridConstants, settingsService) {
             .loadAppData(CORE_API.CostKindStore.findBySelector,
                 [vm.targetEntityKind, vm.selector])
             .then(r => {
-                console.log({costKindData: r.data})
                 vm.costKinds = extractOrderedListOfKinds(r.data);
+                vm.yearsByKindId = mkKindToYearsMap(r.data);
                 vm.latestYearByKindId = mkKindToLatestYearMap(r.data);
                 vm.selectedKind = findDefaultKind(vm.costKinds);
                 vm.loading = false;
@@ -180,7 +189,7 @@ function controller($q, serviceBroker, uiGridConstants, settingsService) {
             return serviceBroker
                 .loadViewData(
                     CORE_API.CostStore.summariseByCostKindAndSelector,
-                    [vm.selectedKind.id, vm.targetEntityKind, vm.selector],
+                    [vm.selectedKind.id, vm.targetEntityKind, vm.selectedYear, vm.selector],
                     { force: true })
                 .then(r => {
                     vm.costKindSummary = r.data;
@@ -217,8 +226,13 @@ function controller($q, serviceBroker, uiGridConstants, settingsService) {
         }
     };
 
-    vm.refresh = () => {
-        vm.visibility.selectKind = false;
+    vm.onKindChange = () => {
+        vm.costYears = vm.yearsByKindId[vm.selectedKind.id];
+        loadSummaryForCostKind();
+        vm.onClearSelectedEntity();
+    };
+
+    vm.onYearChange = () => {
         loadSummaryForCostKind();
         vm.onClearSelectedEntity();
     };

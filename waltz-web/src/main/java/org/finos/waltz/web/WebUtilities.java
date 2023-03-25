@@ -98,6 +98,15 @@ public class WebUtilities {
     }
 
 
+    public static int getInt(Request request,
+                             String paramName) {
+        checkNotNull(request, "request must not be null");
+        checkNotNull(paramName, "paramName must not be null");
+
+        return Integer.parseInt(request.params(paramName));
+    }
+
+
     public static long getId(Request request) {
         return getLong(request, "id");
     }

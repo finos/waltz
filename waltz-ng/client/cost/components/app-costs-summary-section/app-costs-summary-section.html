@@ -65,7 +65,7 @@
                     Change Cost Kind:
                 </label>
                 <select ng-model="$ctrl.selectedKind"
-                        ng-change="$ctrl.refresh()"
+                        ng-change="$ctrl.onKindChange()"
                         ng-options="kind as kind.name for kind in $ctrl.costKinds"
                         id="selectedKind"
                         class="form-control wacss-form-control-inline">
@@ -73,11 +73,12 @@
 
                 &nbsp;
                 &nbsp;
+
                 <label for="selectedYear">
                     Change Year:
                 </label>
                 <select ng-model="$ctrl.selectedYear"
-                        ng-change="$ctrl.refresh()"
+                        ng-change="$ctrl.onYearChange()"
                         ng-options="year for year in $ctrl.costYears"
                         id="selectedYear"
                         class="form-control wacss-form-control-inline">

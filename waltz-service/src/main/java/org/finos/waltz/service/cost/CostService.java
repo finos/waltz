@@ -76,6 +76,7 @@ public class CostService {
     public EntityCostsSummary summariseByCostKindAndSelector(Long costKindId,
                                                              IdSelectionOptions selectionOptions,
                                                              EntityKind targetKind,
+                                                             int year,
                                                              int limit){
 
         GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, selectionOptions);
@@ -84,12 +85,10 @@ public class CostService {
                 "topCosts: "+selectionOptions.entityReference(),
                 () -> costDao.findTopCostsForCostKindAndSelector(
                         costKindId,
+                        year,
                         genericSelector,
                         limit));
 
-        Integer year = maybeFirst(topCosts)
-                .map(EntityCost::year)
-                .orElse(LocalDate.now().getYear());
 
         BigDecimal totalCost = time(
                 "totalCosts: "+selectionOptions.entityReference(),

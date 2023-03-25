@@ -13,11 +13,13 @@ export function store($http, BaseApiUrl) {
             .post(`${BASE}/target-kind/${targetKind}`, selectionOptions)
             .then(r => r.data);
 
-    const summariseByCostKindAndSelector = (costKindId, targetKind, selectionOptions) =>
+    const summariseByCostKindAndSelector = (costKindId,
+                                            targetKind,
+                                            year,
+                                            selectionOptions) =>
         $http
-            .post(`${BASE}/cost-kind/${costKindId}/target-kind/${targetKind}/summary`, selectionOptions)
+            .post(`${BASE}/cost-kind/${costKindId}/target-kind/${targetKind}/summary/${year}`, selectionOptions)
             .then(r => r.data);
-
 
     return {
         findByEntityReference,
