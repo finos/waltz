@@ -33,14 +33,18 @@ const initialState = {
     targetEntityKind: 'APPLICATION',
     selectedKind: null,
     selectedCost: null,
+    selectedYear: 2022,
+    selectedEntity: null,
+    costKinds: [],
+    costYears: [2023, 2022, 2021],
     costInfo: [],
+    exportAllowed: true,
+    loading: true,
     visibility: {
         selectKind: false,
         allCosts: false,
         loading: false
-    },
-    selectedEntity: null,
-    exportAllowed: true,
+    }
 };
 
 
@@ -115,19 +119,19 @@ function findDefaultKind(costKinds = []) {
 }
 
 
-function mkKindToLatestYearMap(tuples) {
+function mkKindToLatestYearMap(kindsAndYears) {
     return _
-        .chain(tuples)
-        .keyBy(d => d.v1.id)
-        .mapValues(d => d.v2)
+        .chain(kindsAndYears)
+        .keyBy(d => d.costKind.id)
+        .mapValues(d => _.first(d.years))
         .value();
 }
 
 
-function extractOrderedListOfKinds(tuples) {
+function extractOrderedListOfKinds(kindsAndYears) {
     return _
-        .chain(tuples)
-        .map(d => d.v1)
+        .chain(kindsAndYears)
+        .map(d => d.costKind)
         .orderBy(d => d.name)
         .value();
 }
@@ -157,25 +161,31 @@ function controller($q, serviceBroker, uiGridConstants, settingsService) {
     }
 
     function loadCostKinds() {
+        vm.loading = true;
         return serviceBroker
             .loadAppData(CORE_API.CostKindStore.findBySelector,
                 [vm.targetEntityKind, vm.selector])
             .then(r => {
-                // result is tuple of (v1:costKind, v2:latestYear)
+                console.log({costKindData: r.data})
                 vm.costKinds = extractOrderedListOfKinds(r.data);
                 vm.latestYearByKindId = mkKindToLatestYearMap(r.data);
                 vm.selectedKind = findDefaultKind(vm.costKinds);
+                vm.loading = false;
             });
     }
 
     function loadSummaryForCostKind(){
         if(vm.selectedKind){
+            vm.loading = true;
             return serviceBroker
                 .loadViewData(
                     CORE_API.CostStore.summariseByCostKindAndSelector,
                     [vm.selectedKind.id, vm.targetEntityKind, vm.selector],
                     { force: true })
-                .then(r => vm.costKindSummary = r.data);
+                .then(r => {
+                    vm.costKindSummary = r.data;
+                    vm.loading = false;
+                });
         }
     }
 

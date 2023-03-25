@@ -46,31 +46,44 @@
         </div>
     </div>
 
-    <div class="row" ng-if="$ctrl.costKinds.length > 0">
+    <div class="row"
+         ng-if="$ctrl.costKinds.length > 0">
         <div class="col-sm-12"
              ng-if="$ctrl.selectedKind">
-            <h4 style="min-height: 2em; vertical-align: center">
+            <h4>
                 <span ng-bind="$ctrl.targetEntityKind | toDisplayName:'entity'"></span>
                 <span ng-bind="$ctrl.selectedKind.name"></span>
                 costs -
-                <span ng-bind="$ctrl.latestYearByKindId[$ctrl.selectedKind.id]"></span>
-                :
-                <small>
-                    <a class="clickable"
-                       ng-if="!$ctrl.visibility.selectKind"
-                       ng-click="$ctrl.visibility.selectKind = true">Change cost kind
-                    </a>
-
-                    <span ng-if="$ctrl.visibility.selectKind">
-                        <select ng-model="$ctrl.selectedKind"
-                                ng-change="$ctrl.refresh()"
-                                ng-options="kind as kind.name for kind in $ctrl.costKinds"
-                                id="selectedKind"
-                                class="form-control wacss-form-control-inline">
-                        </select>
-                    </span>
-                </small>
+                <span ng-bind="$ctrl.selectedYear"></span>
+                <waltz-icon ng-if="$ctrl.loading"
+                            name="spinner"
+                            spin="true">
+                </waltz-icon>
             </h4>
+            <div>
+                <label for="selectedKind">
+                    Change Cost Kind:
+                </label>
+                <select ng-model="$ctrl.selectedKind"
+                        ng-change="$ctrl.refresh()"
+                        ng-options="kind as kind.name for kind in $ctrl.costKinds"
+                        id="selectedKind"
+                        class="form-control wacss-form-control-inline">
+                </select>
+
+                &nbsp;
+                &nbsp;
+                <label for="selectedYear">
+                    Change Year:
+                </label>
+                <select ng-model="$ctrl.selectedYear"
+                        ng-change="$ctrl.refresh()"
+                        ng-options="year for year in $ctrl.costYears"
+                        id="selectedYear"
+                        class="form-control wacss-form-control-inline">
+                </select>
+            </div>
+            <br>
         </div>
     </div>
 
