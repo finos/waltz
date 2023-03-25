@@ -40,7 +40,11 @@
         <div class="col-sm-12">
             <waltz-no-data>
                 <message>
-                    <strong>No {{$ctrl.targetEntityKind | toDisplayName:'entity'}} costs found.</strong>
+                    <strong>
+                        No
+                        <span ng-bind="$ctrl.targetEntityKind | toDisplayName:'entity'"></span>
+                        costs found
+                    </strong>
                 </message>
             </waltz-no-data>
         </div>
@@ -84,6 +88,7 @@
                         class="form-control wacss-form-control-inline">
                 </select>
             </div>
+
             <br>
         </div>
     </div>

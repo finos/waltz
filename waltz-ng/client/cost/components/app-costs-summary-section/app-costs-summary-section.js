@@ -22,6 +22,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import * as _ from "lodash";
 import {mkSelectionOptions} from "../../../common/selector-utils";
 import namedSettings from "../../../system/named-settings";
+import toastStore from "../../../svelte-stores/toast-store";
 
 
 const bindings = {
@@ -228,6 +229,12 @@ function controller($q, serviceBroker, uiGridConstants, settingsService) {
 
     vm.onKindChange = () => {
         vm.costYears = vm.yearsByKindId[vm.selectedKind.id];
+        if (! _.includes(vm.costYears, vm.selectedYear)) {
+            const replacementYear = vm.costYears[0];
+            const msg = `Setting year to ${replacementYear} as currently selected year (${vm.selectedYear}) is not available`;
+            toastStore.warning(msg);
+            vm.selectedYear = replacementYear;
+        }
         loadSummaryForCostKind();
         vm.onClearSelectedEntity();
     };
