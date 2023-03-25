@@ -17,7 +17,7 @@
  */
 import _ from "lodash";
 import "d3-selection-multi";
-import {initialiseData, isEmpty} from "../../../common";
+import {initialiseData} from "../../../common";
 import {scaleBand, scaleLinear} from "d3-scale";
 import {select} from "d3-selection";
 import {extent} from "d3-array";

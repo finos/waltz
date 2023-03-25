@@ -192,17 +192,4 @@ public class CostDao {
                         r.get(appCount) - r.get(appsWithCostsCount)));
     }
 
-
-    // -- HELPERS -------------
-
-    private SelectConditionStep<Record1<Integer>> mkLatestYearSelector(long costKindId,
-                                                                       GenericSelector genericSelector) {
-        return DSL
-                .select(DSL.max(COST.YEAR).as("latest_year"))
-                .from(COST)
-                .where(COST.COST_KIND_ID.eq(costKindId))
-                .and(COST.ENTITY_ID.in(genericSelector.selector())
-                        .and(COST.ENTITY_KIND.eq(genericSelector.kind().name())));
-    }
-
 }

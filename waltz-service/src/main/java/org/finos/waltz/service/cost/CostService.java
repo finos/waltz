@@ -37,7 +37,6 @@ import java.util.Set;
 
 import static java.util.Optional.ofNullable;
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.CollectionUtilities.maybeFirst;
 import static org.finos.waltz.common.FunctionUtilities.time;
 
 @Service
