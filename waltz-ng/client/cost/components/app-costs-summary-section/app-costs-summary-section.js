@@ -41,7 +41,6 @@ const initialState = {
     costYears: [],
     costInfo: [],
     exportAllowed: true,
-    loading: true,
     visibility: {
         selectKind: false,
         allCosts: false,
@@ -163,7 +162,7 @@ function controller($q, serviceBroker, uiGridConstants, settingsService) {
     }
 
     function loadCostKinds() {
-        vm.loading = true;
+        vm.visibility.loading = true;
         return serviceBroker
             .loadAppData(CORE_API.CostKindStore.findBySelector,
                 [vm.targetEntityKind, vm.selector])
@@ -173,13 +172,13 @@ function controller($q, serviceBroker, uiGridConstants, settingsService) {
                 vm.selectedKind = findDefaultKind(vm.costKinds);
                 vm.costYears = vm.yearsByKindId[vm.selectedKind.id];
                 vm.selectedYear = vm.costYears[0];
-                vm.loading = false;
+                vm.visibility.loading = false;
             });
     }
 
     function loadSummaryForCostKind(){
         if (vm.selectedKind) {
-            vm.loading = true;
+            vm.visibility.loading = true;
             return serviceBroker
                 .loadViewData(
                     CORE_API.CostStore.summariseByCostKindAndSelector,
@@ -187,7 +186,7 @@ function controller($q, serviceBroker, uiGridConstants, settingsService) {
                     { force: true })
                 .then(r => {
                     vm.costKindSummary = r.data;
-                    vm.loading = false;
+                    vm.visibility.loading = false;
                 });
         }
     }
@@ -197,7 +196,7 @@ function controller($q, serviceBroker, uiGridConstants, settingsService) {
         serviceBroker
             .loadViewData(
                 CORE_API.CostStore.findBySelector,
-                [vm.targetEntityKind, mkSelectionOptions(vm.parentEntityRef)])
+                [vm.targetEntityKind, vm.selectedYear, mkSelectionOptions(vm.parentEntityRef)])
             .then(r => {
                 vm.costInfo = enrichCostsWithKind(r.data, vm.costKinds);
                 vm.visibility.loading = false;
@@ -235,6 +234,9 @@ function controller($q, serviceBroker, uiGridConstants, settingsService) {
     vm.onYearChange = () => {
         loadSummaryForCostKind();
         vm.onClearSelectedEntity();
+        if (vm.visibility.allCosts) {
+            vm.loadAllCosts();
+        }
     };
 
     vm.showAllCosts = () =>  {

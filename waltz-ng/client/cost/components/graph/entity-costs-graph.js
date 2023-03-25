@@ -190,8 +190,8 @@ function controller($element, $scope, settingsService) {
     let currencyFormat = null;
 
     const refresh = () => {
-        if (isEmpty(vm.costs) || ! currencyFormat) {
-            // return;
+        if (! currencyFormat) {
+            return;
         }
 
         dimensions.graph.height = 20 + (vm.costs.length * 20);

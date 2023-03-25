@@ -33,7 +33,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Set;
 
 import static java.util.Optional.ofNullable;
@@ -65,11 +64,12 @@ public class CostService {
 
 
     public Set<EntityCost> findBySelector(IdSelectionOptions selectionOptions,
-                                          EntityKind targetKind){
+                                          EntityKind targetKind,
+                                          int year){
 
         GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, selectionOptions);
 
-        return costDao.findBySelector(genericSelector);
+        return costDao.findBySelector(genericSelector, year);
     }
 
 
