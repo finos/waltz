@@ -18,31 +18,31 @@
 
 package org.finos.waltz.data.cost;
 
+import org.finos.waltz.model.cost.CostKindWithYears;
+import org.finos.waltz.model.cost.ImmutableCostKindWithYears;
 import org.finos.waltz.schema.tables.records.CostKindRecord;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.model.cost.EntityCostKind;
 import org.finos.waltz.model.cost.ImmutableEntityCostKind;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
 import org.jooq.impl.DSL;
-import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Set;
 
+import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.schema.Tables.COST;
 import static org.finos.waltz.schema.Tables.COST_KIND;
-import static org.jooq.lambda.tuple.Tuple.tuple;
 
 
 @Repository
 public class CostKindDao {
 
-    private final DSLContext dsl;
-
-    private RecordMapper<Record, EntityCostKind> TO_COST_KIND_MAPPER = r -> {
+    private static final RecordMapper<Record, EntityCostKind> TO_COST_KIND_MAPPER = r -> {
         CostKindRecord record = r.into(COST_KIND);
         return ImmutableEntityCostKind.builder()
                 .id(record.getId())
@@ -54,30 +54,48 @@ public class CostKindDao {
     };
 
 
+    private final DSLContext dsl;
+
+
     @Autowired
     public CostKindDao(DSLContext dsl) {
         this.dsl = dsl;
     }
 
 
-    public Set<EntityCostKind> findAll(){
-        return dsl
-                .select(COST_KIND.fields())
-                .from(COST_KIND)
-                .fetchSet(TO_COST_KIND_MAPPER);
+    public Set<CostKindWithYears> findAll(){
+        return findCostKindsByCondition(DSL.trueCondition());
     }
 
 
-    public Set<Tuple2<EntityCostKind, Integer>> findCostKindsBySelector(GenericSelector genericSelector){
+    public Set<CostKindWithYears> findCostKindsBySelector(GenericSelector genericSelector) {
+
+        Condition cond = COST.ENTITY_ID.in(genericSelector.selector())
+                .and(COST.ENTITY_KIND.eq(genericSelector.kind().name()));
+
+        return findCostKindsByCondition(cond);
+    }
+
+
+    private Set<CostKindWithYears> findCostKindsByCondition(Condition cond){
         return dsl
-                .select(COST_KIND.fields())
-                .select(DSL.max(COST.YEAR))
+                .selectDistinct(COST_KIND.fields())
+                .select(COST.YEAR)
                 .from(COST_KIND)
                 .innerJoin(COST).on(COST_KIND.ID.eq(COST.COST_KIND_ID))
-                .where(COST.ENTITY_ID.in(genericSelector.selector())
-                        .and(COST.ENTITY_KIND.eq(genericSelector.kind().name())))
-                .groupBy(COST_KIND.fields())
-                .fetchSet(r -> tuple(TO_COST_KIND_MAPPER.map(r), r.get(DSL.max(COST.YEAR))));
+                .where(cond)
+                .orderBy(COST.YEAR.desc())
+                .fetchGroups(
+                        TO_COST_KIND_MAPPER,
+                        r -> r.get(COST.YEAR))
+                .entrySet()
+                .stream()
+                .map(kv -> ImmutableCostKindWithYears
+                        .builder()
+                        .costKind(kv.getKey())
+                        .years(kv.getValue())
+                        .build())
+                .collect(toSet());
     }
 
 
