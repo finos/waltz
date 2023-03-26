@@ -22,6 +22,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import * as _ from "lodash";
 import {mkSelectionOptions} from "../../../common/selector-utils";
 import namedSettings from "../../../system/named-settings";
+import toastStore from "../../../svelte-stores/toast-store";
 
 
 const bindings = {
@@ -29,18 +30,22 @@ const bindings = {
     targetEntityKind: "<?"
 };
 
+
 const initialState = {
     targetEntityKind: 'APPLICATION',
     selectedKind: null,
     selectedCost: null,
+    selectedYear: 2022,
+    selectedEntity: null,
+    costKinds: [],
+    costYears: [],
     costInfo: [],
+    exportAllowed: true,
     visibility: {
         selectKind: false,
         allCosts: false,
         loading: false
-    },
-    selectedEntity: null,
-    exportAllowed: true,
+    }
 };
 
 
@@ -115,19 +120,19 @@ function findDefaultKind(costKinds = []) {
 }
 
 
-function mkKindToLatestYearMap(tuples) {
+function mkKindToYearsMap(kindsAndYears) {
     return _
-        .chain(tuples)
-        .keyBy(d => d.v1.id)
-        .mapValues(d => d.v2)
+        .chain(kindsAndYears)
+        .keyBy(d => d.costKind.id)
+        .mapValues(d => d.years)
         .value();
 }
 
 
-function extractOrderedListOfKinds(tuples) {
+function extractOrderedListOfKinds(kindsAndYears) {
     return _
-        .chain(tuples)
-        .map(d => d.v1)
+        .chain(kindsAndYears)
+        .map(d => d.costKind)
         .orderBy(d => d.name)
         .value();
 }
@@ -157,25 +162,32 @@ function controller($q, serviceBroker, uiGridConstants, settingsService) {
     }
 
     function loadCostKinds() {
+        vm.visibility.loading = true;
         return serviceBroker
             .loadAppData(CORE_API.CostKindStore.findBySelector,
                 [vm.targetEntityKind, vm.selector])
             .then(r => {
-                // result is tuple of (v1:costKind, v2:latestYear)
                 vm.costKinds = extractOrderedListOfKinds(r.data);
-                vm.latestYearByKindId = mkKindToLatestYearMap(r.data);
+                vm.yearsByKindId = mkKindToYearsMap(r.data);
                 vm.selectedKind = findDefaultKind(vm.costKinds);
+                vm.costYears = vm.yearsByKindId[vm.selectedKind.id];
+                vm.selectedYear = vm.costYears[0];
+                vm.visibility.loading = false;
             });
     }
 
     function loadSummaryForCostKind(){
-        if(vm.selectedKind){
+        if (vm.selectedKind) {
+            vm.visibility.loading = true;
             return serviceBroker
                 .loadViewData(
                     CORE_API.CostStore.summariseByCostKindAndSelector,
-                    [vm.selectedKind.id, vm.targetEntityKind, vm.selector],
+                    [vm.selectedKind.id, vm.targetEntityKind, vm.selectedYear, vm.selector],
                     { force: true })
-                .then(r => vm.costKindSummary = r.data);
+                .then(r => {
+                    vm.costKindSummary = r.data;
+                    vm.visibility.loading = false;
+                });
         }
     }
 
@@ -184,7 +196,7 @@ function controller($q, serviceBroker, uiGridConstants, settingsService) {
         serviceBroker
             .loadViewData(
                 CORE_API.CostStore.findBySelector,
-                [vm.targetEntityKind, mkSelectionOptions(vm.parentEntityRef)])
+                [vm.targetEntityKind, vm.selectedYear, mkSelectionOptions(vm.parentEntityRef)])
             .then(r => {
                 vm.costInfo = enrichCostsWithKind(r.data, vm.costKinds);
                 vm.visibility.loading = false;
@@ -201,16 +213,30 @@ function controller($q, serviceBroker, uiGridConstants, settingsService) {
     };
 
     vm.$onChanges = () => {
-        if (vm.selector){
+        if (vm.selector) {
             loadCostKinds()
                 .then(() => loadSummaryForCostKind())
         }
     };
 
-    vm.refresh = () => {
-        vm.visibility.selectKind = false;
+    vm.onKindChange = () => {
+        vm.costYears = vm.yearsByKindId[vm.selectedKind.id];
+        if (! _.includes(vm.costYears, vm.selectedYear)) {
+            const replacementYear = vm.costYears[0];
+            const msg = `Setting year to ${replacementYear} as currently selected year (${vm.selectedYear}) is not available`;
+            toastStore.warning(msg);
+            vm.selectedYear = replacementYear;
+        }
         loadSummaryForCostKind();
         vm.onClearSelectedEntity();
+    };
+
+    vm.onYearChange = () => {
+        loadSummaryForCostKind();
+        vm.onClearSelectedEntity();
+        if (vm.visibility.allCosts) {
+            vm.loadAllCosts();
+        }
     };
 
     vm.showAllCosts = () =>  {
