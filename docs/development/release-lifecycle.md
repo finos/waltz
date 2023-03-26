@@ -1,3 +1,4 @@
+
 # Release Lifecycle
 
 This document outlines how Waltz uses version numbers and outlines the key activities to be 
@@ -25,6 +26,16 @@ Major | **x** | So far unused, reserved for major, breaking, changes
 At the start of a new release, when development commences the following should be performed (an issue for each should be created).
 
 ### Java
+
+#### Maven Project version update
+
+Use maven to update the versions of each of the waltz projects and sub-projects. 
+This can easily be achieved using a command similar to:
+
+`mvn versions:set -DnewVersion=1.46-SNAPSHOT -P waltz-postgres,env-local-pg-docker`
+
+*Note:* final versions are set when creating a release on GitHub.
+The GitHub action workflow will run a similar command with the desired (non-snapshot version).
 
 #### Java Library Updates
 
@@ -56,7 +67,11 @@ _Further Reading_
 
 ### Node
 
-##### Library Updates
+#### Node project version
+
+Simply update the `version` attribute in the `waltz-ng\package.json` file.
+
+#### Library Updates
 
 We use `npm-check` to generate a report of javascript library updates
 
@@ -69,7 +84,9 @@ _Further Reading_
 
 #### Liquibase file creation
 
-Each Waltz release should have all of it's schema changes recorded in liquibase.  Each release should have it's own liquibase file located in `waltz-data/src/main/ddl/liquibase` and called `db.changelog-x.y.xml` (where `x.y` is the version number).  This filename should then be recorded in the `db.changelog-master.xml` file.
+Each Waltz release should have all of its schema changes recorded in liquibase.
+Each release should have its own liquibase file located in `waltz-schema/src/main/resources/liquibase` and called `db.changelog-x.y.xml` (where `x.y` is the version number).
+This filename should then be recorded in the `db.changelog-master.xml` file.
 
 #### Table decomm
 
