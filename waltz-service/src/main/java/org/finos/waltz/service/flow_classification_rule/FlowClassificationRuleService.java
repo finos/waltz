@@ -200,25 +200,27 @@ public class FlowClassificationRuleService {
     }
 
 
-    public boolean fastRecalculateAllFlowRatings() {
+    public int fastRecalculateAllFlowRatings() {
         logicalFlowDecoratorDao.updateRatingsByCondition(AuthoritativenessRatingValue.NO_OPINION, DSL.trueCondition());
 
         //finds all the vantage points to apply using parent as selector
         List<FlowClassificationRuleVantagePoint> flowClassificationRuleVantagePoints = flowClassificationRuleDao
                 .findFlowClassificationRuleVantagePoints();
 
-        flowClassificationRuleVantagePoints
-                .forEach(a -> {
-                    LOG.info("Updating decorators for: {}", a);
-                    int updateCount = logicalFlowDecoratorDao.updateDecoratorsForFlowClassificationRule(a);
-                    LOG.info("Updated {} decorators for: {}", updateCount, a);
-        });
+        int updatedRuleDecorators = flowClassificationRuleVantagePoints
+                .stream()
+                .mapToInt(logicalFlowDecoratorDao::updateDecoratorsForFlowClassificationRule)
+                .sum();
 
         //overrides rating for point to point flows (must run after the above)
-        int updatedDecoratorRatings = flowClassificationRuleDao.updatePointToPointFlowClassificationRules();
-        LOG.info("Updated decorators for: {} point-to-point flows", updatedDecoratorRatings);
+        int updatedPointToPointDecorators = flowClassificationRuleDao.updatePointToPointFlowClassificationRules();
 
-        return true;
+        LOG.info(
+                "Updated decorators for: {} for general rules and {} point-to-point flows",
+                updatedRuleDecorators,
+                updatedPointToPointDecorators);
+
+        return updatedRuleDecorators + updatedPointToPointDecorators;
     }
 
 
