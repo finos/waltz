@@ -34,6 +34,7 @@ import RelationshipKindsView from "./relationship-kinds-view";
 import ReassignRecipientsView from "./reassign-recipients-view";
 import ColorGradientView from "./color-gradient-view";
 import NavAidBuilderView from "./nav-aid-builder-view";
+import VersionInfoView from "./version-info-view";
 
 
 const baseState = {
@@ -130,6 +131,11 @@ const navAidBuilderState = {
     views: {"content@": NavAidBuilderView}
 };
 
+const versionInfoState = {
+    url: "/version-info",
+    views: {"content@": VersionInfoView}
+};
+
 
 function setupRoutes($stateProvider) {
     $stateProvider
@@ -148,7 +154,8 @@ function setupRoutes($stateProvider) {
         .state("main.system.recalculate", recalculateState)
         .state("main.system.reassign-recipients", reassignRecipientsState)
         .state("main.system.color-gradient", colorGradientState)
-        .state("main.system.nav-aid-builder", navAidBuilderState);
+        .state("main.system.nav-aid-builder", navAidBuilderState)
+        .state("main.system.version-info", versionInfoState);
 }
 
 

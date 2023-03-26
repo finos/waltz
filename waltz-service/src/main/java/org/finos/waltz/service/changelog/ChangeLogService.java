@@ -45,6 +45,7 @@ import org.springframework.stereotype.Service;
 
 
 import java.sql.Date;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -146,6 +147,11 @@ public class ChangeLogService {
 
     public int write(ChangeLog changeLog) {
         return changeLogDao.write(changeLog);
+    }
+
+
+    public int[] write(Collection<ChangeLog> changeLogs) {
+        return changeLogDao.write(changeLogs);
     }
 
 
