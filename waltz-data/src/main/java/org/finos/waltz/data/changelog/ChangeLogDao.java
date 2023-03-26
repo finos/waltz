@@ -308,10 +308,8 @@ public class ChangeLogDao {
     }
 
 
-    public int[] write(DSLContext tx, Collection<ChangeLog> changeLogs) {
+    public int[] write(Collection<ChangeLog> changeLogs) {
         checkNotNull(changeLogs, "changeLogs must not be null");
-
-        DSLContext dslContext = firstNotNull(tx, dsl);
 
         Query[] queries = changeLogs
                 .stream()
@@ -325,7 +323,9 @@ public class ChangeLogDao {
                         .set(CHANGE_LOG.OPERATION, changeLog.operation().name())
                         .set(CHANGE_LOG.CREATED_AT, Timestamp.valueOf(changeLog.createdAt())))
                 .toArray(Query[]::new);
-        return dslContext.batch(queries).execute();
+        return dsl
+                .batch(queries)
+                .execute();
     }
 
 

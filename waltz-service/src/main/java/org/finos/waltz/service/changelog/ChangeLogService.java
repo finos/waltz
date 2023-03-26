@@ -18,7 +18,6 @@
 
 package org.finos.waltz.service.changelog;
 
-import org.finos.waltz.data.DBExecutorPoolInterface;
 import org.finos.waltz.data.EntityReferenceNameResolver;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
@@ -46,7 +45,6 @@ import org.springframework.stereotype.Service;
 
 
 import java.sql.Date;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -66,7 +64,6 @@ public class ChangeLogService {
 
     private final ChangeLogDao changeLogDao;
     private final ChangeLogSummariesDao changeLogSummariesDao;
-    private final DBExecutorPoolInterface dbExecutorPool;
     private final PhysicalFlowDao physicalFlowDao;
     private final LogicalFlowDao logicalFlowDao;
     private final PhysicalSpecificationDao physicalSpecificationDao;
@@ -79,7 +76,6 @@ public class ChangeLogService {
     @Autowired
     public ChangeLogService(ChangeLogDao changeLogDao,
                             ChangeLogSummariesDao changeLogSummariesDao,
-                            DBExecutorPoolInterface dbExecutorPool,
                             PhysicalFlowDao physicalFlowDao,
                             PhysicalSpecificationDao physicalSpecificationDao,
                             LogicalFlowDao logicalFlowDao,
@@ -89,7 +85,6 @@ public class ChangeLogService {
                             EntityReferenceNameResolver nameResolver) {
         checkNotNull(changeLogDao, "changeLogDao must not be null");
         checkNotNull(changeLogSummariesDao, "changeLogSummariesDao must not be null");
-        checkNotNull(dbExecutorPool, "dbExecutorPool cannot be null");
         checkNotNull(physicalFlowDao, "physicalFlowDao cannot be null");
         checkNotNull(physicalSpecificationDao, "physicalSpecificationDao cannot be null");
         checkNotNull(logicalFlowDao, "logicalFlowDao cannot be null");
@@ -99,7 +94,6 @@ public class ChangeLogService {
 
         this.changeLogDao = changeLogDao;
         this.changeLogSummariesDao = changeLogSummariesDao;
-        this.dbExecutorPool = dbExecutorPool;
         this.physicalFlowDao = physicalFlowDao;
         this.physicalSpecificationDao = physicalSpecificationDao;
         this.logicalFlowDao = logicalFlowDao;
@@ -154,10 +148,6 @@ public class ChangeLogService {
         return changeLogDao.write(changeLog);
     }
 
-
-    public int[] write(Collection<ChangeLog> changeLogs) {
-        return changeLogDao.write(null, changeLogs);
-    }
 
     /**
      * Given an entity ref this function will determine all changelog entries made _after_ the latest
@@ -272,7 +262,7 @@ public class ChangeLogService {
                         .operation(operation)
                         .build());
 
-        write(changeLogEntries);
+        changeLogDao.write(changeLogEntries);
     }
 
 
@@ -286,8 +276,8 @@ public class ChangeLogService {
         return tuple(
                 messagePreamble,
                 union(
-                        map(physicalFlows, d -> d.entityReference()),
-                        asSet(physicalSpec.entityReference())));
+                    map(physicalFlows, PhysicalFlow::entityReference),
+                    asSet(physicalSpec.entityReference())));
 
     }
 
