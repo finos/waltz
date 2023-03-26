@@ -57,7 +57,7 @@ public class ActorSearchDao implements SearchDao<Actor> {
                 .findAll()
                 .stream()
                 .filter(actor -> {
-                    String s = (actor.name() + " " + actor.description()).toLowerCase();
+                    String s = (actor.name() + " " + actor.description() + " " + actor.externalId()).toLowerCase();
                     return all(
                             terms,
                             s::contains);
