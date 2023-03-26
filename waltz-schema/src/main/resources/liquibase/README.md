@@ -2,10 +2,21 @@
 
 Waltz uses [Liquibase](http://www.liquibase.org/index.html) to manage it's schema.
 
+
+## About
+
+Liquibase is an open-source database change management tool that allows developers to manage and automate changes to database schemas.
+It provides a way to define, track, and execute changes to database structures, such as tables, columns, indexes, and constraints.
+
+Waltz uses Liquibase by defining changes XML "changelog" files which are versioned and stored alongside the application code (in `waltz-scheme\src\main\resources\liquibase`. 
+The changelog describes how to migrate the database it to newer versions, and Liquibase ensures that the changes are applied in the correct order.
+
+
 ## Authoring
 
 The changelog file follows the [best practice guidelines](http://www.liquibase.org/bestpractices.html) outlined
 on the liquibase site.
+
 
 ### Change Ids
 
@@ -17,7 +28,6 @@ For example:
 
 `20160302-102-2` can easily be read as the second change relating to issues 102 and was created on 2nd March 2016.
 Strictly speaking the date is not required, but it helps when searching for changes in a certain time range.
-
 
 
 ## Updating the database
@@ -33,6 +43,7 @@ An _alternative_ mechanism to get the files is to download and extract them from
 For example:
 ![liquibase-zips.png](liquibase-zips.png)
 
+
 ### Executing the changes using Liquibase:
 
 This approach uses Liquibase to directly modify the database.
@@ -40,6 +51,7 @@ This approach uses Liquibase to directly modify the database.
 For more information see:
 
 - Liquibase [update](https://docs.liquibase.com/commands/update/update.html) command
+
 
 #### Sample .bat file (MSSQL)
 ```
@@ -80,6 +92,7 @@ For more information see:
 
 - Liquibase [update-sql](https://docs.liquibase.com/commands/update/update-sql.html) command
 
+
 #### Sample .bat file (MSSQL)
 ```
 C:/tools/liquibase-3.5.5-bin/liquibase.bat ^
@@ -91,6 +104,7 @@ C:/tools/liquibase-3.5.5-bin/liquibase.bat ^
 --password=<password> ^
 updateSQL
 ```
+
 
 ### Sample .sh file (PostgreSQL)
 ```
