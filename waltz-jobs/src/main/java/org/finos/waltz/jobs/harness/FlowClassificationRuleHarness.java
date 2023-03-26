@@ -36,7 +36,8 @@ public class FlowClassificationRuleHarness {
 //        LogicalFlowDecoratorSummaryDao decoratorDao = ctx.getBean(LogicalFlowDecoratorSummaryDao.class);
 //        AuthoritativeSourceDao dao = ctx.getBean(AuthoritativeSourceDao.class);
 
-        boolean b = svc.fastRecalculateAllFlowRatings();
+        int updCount = svc.fastRecalculateAllFlowRatings();
+        System.out.printf("Updated %d\n", updCount);
 
 //        System.exit(-1);
     }

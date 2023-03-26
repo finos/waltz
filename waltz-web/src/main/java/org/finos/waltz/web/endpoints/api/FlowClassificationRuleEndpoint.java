@@ -165,7 +165,7 @@ public class FlowClassificationRuleEndpoint implements Endpoint {
     }
 
 
-    private boolean recalculateFlowRatingsRoute(Request request, Response response) {
+    private int recalculateFlowRatingsRoute(Request request, Response response) {
         WebUtilities.requireRole(userRoleService, request, SystemRole.ADMIN);
 
         String username = WebUtilities.getUsername(request);
