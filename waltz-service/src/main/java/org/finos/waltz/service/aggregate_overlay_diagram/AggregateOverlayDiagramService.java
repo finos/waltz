@@ -201,7 +201,8 @@ public class AggregateOverlayDiagramService {
         List<Application> applications = applicationDao.findByAppIdSelector(entityIdSelector);
         Set<CostKindWithYears> costKindsWithYears = costKindDao.findAll();
 
-        return ImmutableCostWidgetData.builder()
+        return ImmutableCostWidgetData
+                .builder()
                 .cellData(costData)
                 .measurables(measurables)
                 .applications(applications)
