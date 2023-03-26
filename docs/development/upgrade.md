@@ -98,7 +98,7 @@ Which gives output like:
 
 ### Upcoming - UI View
 
-We will provide a mechanism to verify the release number via the Waltz user interface.
+Waltz 1.48 will provide mechanism to verify the release number via the Waltz user interface.
 Issue: [#6497](https://github.com/finos/waltz/issues/6497)
 
 
