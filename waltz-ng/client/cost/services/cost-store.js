@@ -8,16 +8,18 @@ export function store($http, BaseApiUrl) {
             .get(`${BASE}/entity/kind/${ref.kind}/id/${ref.id}`)
             .then(r => r.data);
 
-    const findBySelector = (targetKind, selectionOptions) =>
+    const findBySelector = (targetKind, year, selectionOptions) =>
         $http
-            .post(`${BASE}/target-kind/${targetKind}`, selectionOptions)
+            .post(`${BASE}/target-kind/${targetKind}/year/${year}`, selectionOptions)
             .then(r => r.data);
 
-    const summariseByCostKindAndSelector = (costKindId, targetKind, selectionOptions) =>
+    const summariseByCostKindAndSelector = (costKindId,
+                                            targetKind,
+                                            year,
+                                            selectionOptions) =>
         $http
-            .post(`${BASE}/cost-kind/${costKindId}/target-kind/${targetKind}/summary`, selectionOptions)
+            .post(`${BASE}/cost-kind/${costKindId}/target-kind/${targetKind}/summary/year/${year}`, selectionOptions)
             .then(r => r.data);
-
 
     return {
         findByEntityReference,
@@ -42,7 +44,7 @@ export const CostStore_API = {
     findBySelector: {
         serviceName,
         serviceFnName: 'findBySelector',
-        description: 'executes findBySelector [targetKind, selectionOptions]'
+        description: 'executes findBySelector [targetKind, year, selectionOptions]'
     },
     summariseByCostKindAndSelector: {
         serviceName,

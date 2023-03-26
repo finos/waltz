@@ -33,12 +33,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Set;
 
 import static java.util.Optional.ofNullable;
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.CollectionUtilities.maybeFirst;
 import static org.finos.waltz.common.FunctionUtilities.time;
 
 @Service
@@ -65,17 +63,19 @@ public class CostService {
 
 
     public Set<EntityCost> findBySelector(IdSelectionOptions selectionOptions,
-                                          EntityKind targetKind){
+                                          EntityKind targetKind,
+                                          int year){
 
         GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, selectionOptions);
 
-        return costDao.findBySelector(genericSelector);
+        return costDao.findBySelector(genericSelector, year);
     }
 
 
     public EntityCostsSummary summariseByCostKindAndSelector(Long costKindId,
                                                              IdSelectionOptions selectionOptions,
                                                              EntityKind targetKind,
+                                                             int year,
                                                              int limit){
 
         GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, selectionOptions);
@@ -84,12 +84,10 @@ public class CostService {
                 "topCosts: "+selectionOptions.entityReference(),
                 () -> costDao.findTopCostsForCostKindAndSelector(
                         costKindId,
+                        year,
                         genericSelector,
                         limit));
 
-        Integer year = maybeFirst(topCosts)
-                .map(EntityCost::year)
-                .orElse(LocalDate.now().getYear());
 
         BigDecimal totalCost = time(
                 "totalCosts: "+selectionOptions.entityReference(),
