@@ -41,15 +41,8 @@ public class AssetCostHarness {
         IdSelectionOptions scott = mkOpts(mkRef(EntityKind.PERSON, 9876));
         IdSelectionOptions infra = mkOpts(mkRef(EntityKind.ORG_UNIT, 1234));
 
-        long tco = 6L;
-        long cirrus = 7L;
-//        time("tco cost summary for infra", () -> svc.summariseByCostKindAndSelector(tco, infra, EntityKind.APPLICATION, 20));
-//        time("cirrus cost summary for infra", () -> svc.summariseByCostKindAndSelector(cirrus, infra, EntityKind.APPLICATION, 20));
-////        time("cost summary for bill", () -> svc.summariseByCostKindAndSelector(tco, bill, EntityKind.APPLICATION, 20));
-//        time("tco cost summary for scott", () -> svc.summariseByCostKindAndSelector(tco, scott, EntityKind.APPLICATION, 20));
-        time("cirrus cost summary for jennifer", () -> svc.summariseByCostKindAndSelector(cirrus, jennifer, EntityKind.APPLICATION, 20));
-        time("cirrus cost summary for bill", () -> svc.summariseByCostKindAndSelector(cirrus, bill, EntityKind.APPLICATION, 20));
-        time("cirrus cost summary for scott", () -> svc.summariseByCostKindAndSelector(cirrus, scott, EntityKind.APPLICATION, 20));
+        long costKind = 7L;
+        time("cost summary for jennifer", () -> svc.summariseByCostKindAndSelector(costKind, jennifer, EntityKind.APPLICATION, 2022, 20));
 
 
     }
