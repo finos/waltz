@@ -30,6 +30,6 @@ public abstract class LegalEntityRelationshipAssessmentInfo {
 
     public abstract EntityReference definitionRef();
 
-    public abstract RatingSchemeItem ratingItem();
+    public abstract Long ratingId();
 
 }

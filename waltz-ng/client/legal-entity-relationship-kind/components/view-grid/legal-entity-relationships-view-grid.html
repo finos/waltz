@@ -16,14 +16,20 @@
   ~
   -->
 
-<waltz-grid-with-search ng-if="$ctrl.relationships.length > 0"
-                        entries="$ctrl.relationships"
-                        column-defs="$ctrl.columnDefs"
-                        on-row-select="$ctrl.onRowSelect">
-</waltz-grid-with-search>
-<waltz-no-data ng-if="$ctrl.relationships.length === 0">
-    <message>
-        No <span ng-bind="$ctrl.relationshipKind.name || 'Unknown'"></span> relationships exist
-    </message>
-</waltz-no-data>
+<waltz-loading-notification show="$ctrl.visibility.loading"
+                            style="padding-top: 54px;"
+                            name="Loading">
+</waltz-loading-notification>
+<div ng-if="!$ctrl.visibility.loading">
+    <waltz-grid-with-search ng-if="$ctrl.relationships.length > 0"
+                            entries="$ctrl.relationships"
+                            column-defs="$ctrl.columnDefs"
+                            on-row-select="$ctrl.onRowSelect">
+    </waltz-grid-with-search>
+    <waltz-no-data ng-if="$ctrl.relationships.length === 0">
+        <message>
+            No <span ng-bind="$ctrl.relationshipKind.name || 'Unknown'"></span> relationships exist
+        </message>
+    </waltz-no-data>
+</div>
 

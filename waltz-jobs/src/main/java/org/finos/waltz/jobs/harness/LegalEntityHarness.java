@@ -18,6 +18,7 @@
 
 package org.finos.waltz.jobs.harness;
 
+import org.finos.waltz.common.FunctionUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.legal_entity.LegalEntityRelationshipView;

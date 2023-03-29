@@ -19,7 +19,7 @@
  */
 
 export function store($http, BaseApiUrl) {
-    const base = BaseApiUrl + '/rating-scheme';
+    const base = BaseApiUrl + "/rating-scheme";
 
 
     function findAll() {
@@ -42,40 +42,50 @@ export function store($http, BaseApiUrl) {
         .get(`${base}/items/assessment-definition-id/${assessmentDefinitionId}`)
         .then(d => d.data);
 
+    const findAllRatingsSchemeItems = () => $http
+        .get(`${base}/items`)
+        .then(d => d.data);
+
 
     return {
         findAll,
         getById,
         findRatingsForEntityAndMeasurableCategory,
-        findRatingsSchemeItems
+        findRatingsSchemeItems,
+        findAllRatingsSchemeItems
     };
 }
 
-store.$inject = ['$http', 'BaseApiUrl'];
+store.$inject = ["$http", "BaseApiUrl"];
 
 
-export const serviceName = 'RatingSchemeStore';
+export const serviceName = "RatingSchemeStore";
 
 export const RatingSchemeStore_API = {
     findAll: {
         serviceName,
-        serviceFnName: 'findAll',
-        description: 'executes findAll'
+        serviceFnName: "findAll",
+        description: "executes findAll"
     },
     getById: {
         serviceName,
-        serviceFnName: 'getById',
-        description: 'executes getById'
+        serviceFnName: "getById",
+        description: "executes getById"
     },
     findRatingsForEntityAndMeasurableCategory: {
         serviceName,
-        serviceFnName: 'findRatingsForEntityAndMeasurableCategory',
-        description: 'returns list of rating scheme items for entity and measurable category id (ref, categoryId)'
+        serviceFnName: "findRatingsForEntityAndMeasurableCategory",
+        description: "returns list of rating scheme items for entity and measurable category id (ref, categoryId)"
     },
     findRatingsSchemeItems: {
         serviceName,
-        serviceFnName: 'findRatingsSchemeItems',
-        description: 'returns all rating scheme items for an assessment definition'
+        serviceFnName: "findRatingsSchemeItems",
+        description: "returns all rating scheme items for an assessment definition"
+    },
+    findAllRatingsSchemeItems: {
+        serviceName,
+        serviceFnName: "findAllRatingsSchemeItems",
+        description: "returns all rating scheme items"
     }
 };
 

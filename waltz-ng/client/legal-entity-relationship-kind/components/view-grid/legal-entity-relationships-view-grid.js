@@ -92,7 +92,8 @@ const initialState = {
     relationships: [],
     visibility: {
         overlay: false,
-        bulkUpload: false
+        bulkUpload: false,
+        loading: true
     },
 }
 
@@ -111,20 +112,25 @@ function controller($q, $scope, $state, serviceBroker) {
 
     function loadRelationships() {
 
-        const relKindsPromise = serviceBroker
-            .loadViewData(CORE_API.LegalEntityRelationshipKindStore.getById, [vm.relationshipKindId])
-            .then(r => r.data);
-
-
         const relationshipsViewPromise = serviceBroker
             .loadViewData(CORE_API.LegalEntityRelationshipStore.getViewByRelationshipKindId,
                 [vm.relationshipKindId, mkSelectionOptions(vm.parentEntityRef)],
                 {force: true})
             .then(r => r.data);
 
+        const relKindsPromise = serviceBroker
+            .loadViewData(CORE_API.LegalEntityRelationshipKindStore.getById, [vm.relationshipKindId])
+            .then(r => r.data);
+
+        const ratingsPromise = serviceBroker
+            .loadViewData(CORE_API.RatingSchemeStore.findAllRatingsSchemeItems)
+            .then(r => _.keyBy(r.data, d => d.id));
+
+
         return $q
-            .all([relKindsPromise, relationshipsViewPromise])
-            .then(([relKind, relationshipsView]) => {
+            .all([relKindsPromise, relationshipsViewPromise, ratingsPromise])
+            .then(([relKind, relationshipsView, ratingSchemeItemsById]) => {
+
                 vm.relationshipKind = relKind;
 
                 const assessmentColDefs = _
@@ -158,8 +164,13 @@ function controller($q, $scope, $state, serviceBroker) {
                     .map(d => {
                         const ratingsByDefId = _
                             .chain(d.assessments)
-                            .keyBy(d => d.assessmentDefinitionId)
-                            .mapValues(d => _.sortBy(d.ratings, d => d.position, d => d.name))
+                            .keyBy(r => r.assessmentDefinitionId)
+                            .mapValues(v => _
+                                .chain(v.ratingIds)
+                                .map(r => ratingSchemeItemsById[r])
+                                .filter(d => d != null)
+                                .sortBy(r => r.position, r => r.name)
+                                .value())
                             .value();
 
                         return Object.assign(
@@ -171,7 +182,8 @@ function controller($q, $scope, $state, serviceBroker) {
                     })
                     .sortBy(d => d.relationship.targetEntityReference.name, d => d.relationship.legalEntityReference.name)
                     .value();
-            });
+            })
+            .then(() => vm.visibility.loading = false);
     }
 
     vm.$onChanges = () => {
