@@ -39,7 +39,7 @@ const relationshipColDefs = [
     {
         field: "relationship.targetEntityReference",
         name: "Target Entity External Id",
-        width: "5%",
+        width: "10%",
         toSearchTerm: d => _.get(d, ["relationship", "targetEntityReference", "externalId"], ""),
         cellTemplate: `<div style="padding-top: 0.5em">
                             <span ng-bind="COL_FIELD.externalId"></span>
@@ -57,7 +57,7 @@ const relationshipColDefs = [
     {
         field: "relationship.legalEntityReference",
         name: "Legal Entity External Id",
-        width: "5%",
+        width: "10%",
         toSearchTerm: d => _.get(d, ["relationship", "legalEntityReference", "externalId"], ""),
         cellTemplate: `<div style="padding-top: 0.5em">
                             <span ng-bind="COL_FIELD.externalId"></span>
@@ -90,6 +90,7 @@ const updatedAtColDefs = [
 const initialState = {
     relationshipKind: null,
     relationships: [],
+    stats: null,
     visibility: {
         overlay: false,
         bulkUpload: false,
@@ -112,14 +113,20 @@ function controller($q, $scope, $state, serviceBroker) {
 
     function loadRelationships() {
 
-        const relationshipsViewPromise = serviceBroker
-            .loadViewData(CORE_API.LegalEntityRelationshipStore.getViewByRelationshipKindId,
-                [vm.relationshipKindId, mkSelectionOptions(vm.parentEntityRef)],
-                {force: true})
-            .then(r => r.data);
+        const selectionOptions = mkSelectionOptions(vm.parentEntityRef);
 
         const relKindsPromise = serviceBroker
             .loadViewData(CORE_API.LegalEntityRelationshipKindStore.getById, [vm.relationshipKindId])
+            .then(r => vm.relationshipKind = r.data);
+
+        const relKindStatsPromise = serviceBroker
+            .loadViewData(CORE_API.LegalEntityRelationshipKindStore.getUsageStatsForKindAndSelector, [vm.relationshipKindId, selectionOptions])
+            .then(r => vm.stats = r.data);
+
+        const relationshipsViewPromise = serviceBroker
+            .loadViewData(CORE_API.LegalEntityRelationshipStore.getViewByRelationshipKindId,
+                [vm.relationshipKindId, selectionOptions],
+                {force: true})
             .then(r => r.data);
 
         const ratingsPromise = serviceBroker
@@ -128,10 +135,8 @@ function controller($q, $scope, $state, serviceBroker) {
 
 
         return $q
-            .all([relKindsPromise, relationshipsViewPromise, ratingsPromise])
-            .then(([relKind, relationshipsView, ratingSchemeItemsById]) => {
-
-                vm.relationshipKind = relKind;
+            .all([relationshipsViewPromise, ratingsPromise])
+            .then(([relationshipsView, ratingSchemeItemsById]) => {
 
                 const assessmentColDefs = _
                     .chain(relationshipsView.assessmentHeaders)

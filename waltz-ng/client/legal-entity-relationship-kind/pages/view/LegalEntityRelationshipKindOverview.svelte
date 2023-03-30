@@ -5,6 +5,7 @@
     import {entity} from "../../../common/services/enums/entity";
     import NoData from "../../../common/svelte/NoData.svelte";
     import {legalEntityRelationshipKindStore} from "../../../svelte-stores/legal-entity-relationship-kind-store";
+    import _ from "lodash";
 
     export let primaryEntityReference;
 
@@ -39,8 +40,7 @@
 </PageHeader>
 
 
-<div class="waltz-page-summary waltz-page-summary-attach"
-     style="margin-bottom: 5em;">
+<div class="waltz-page-summary waltz-page-summary-attach">
     <div class="waltz-display-section">
         <div class="row">
             <div class="col-md-6">
@@ -74,7 +74,7 @@
                             Target Kind
                         </div>
                         <div class="col-sm-10">
-                            {legalEntityRelationshipKind?.targetKind || "-"}
+                            {_.get(entity, [legalEntityRelationshipKind?.targetKind, "name"], "-")}
                         </div>
                     </div>
                     <div class="row">

@@ -16,6 +16,34 @@
   ~
   -->
 
+<div>
+    <table class="table table-condensed small">
+        <colgroup>
+            <col width="50%">
+            <col width="50%">
+        </colgroup>
+        <thead>
+        <tr>
+            <th>Usage</th>
+            <th>Count</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><span ng-bind="$ctrl.relationshipKind.targetKind | toDisplayName:'entity'"></span></td>
+            <td><span ng-bind="$ctrl.stats.targetEntityCount"></span></td>
+        </tr>
+        <tr>
+            <td>Legal Entity</td>
+            <td><span ng-bind="$ctrl.stats.legalEntityCount"></span></td>
+        </tr>
+        <tr>
+            <td><span ng-bind="$ctrl.relationshipKind.name"></span> Relationship</td>
+            <td><span ng-bind="$ctrl.stats.relationshipCount"></span></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
 <waltz-loading-notification show="$ctrl.visibility.loading"
                             style="padding-top: 54px;"
                             name="Loading">
