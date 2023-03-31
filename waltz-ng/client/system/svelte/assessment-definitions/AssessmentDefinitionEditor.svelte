@@ -49,13 +49,17 @@
     let hasRatings = false;
     let savePromise = null;
     let ratingCall;
+    let hasMultiValuesAssessmentsCall;
+    let canEditCardinality = true;
 
     $: {
         if ($selectedDefinition.id) {
             ratingCall = assessmentRatingStore.findByDefinitionId($selectedDefinition.id);
+            hasMultiValuesAssessmentsCall = assessmentRatingStore.hasMultiValuedAssessments($selectedDefinition.id);
         }
     }
 
+    $: canEditCardinality = !$selectedDefinition.id || !$hasMultiValuesAssessmentsCall?.data; // allow edit for new categories without check
     $: ratings = $ratingCall?.data || [];
     $: possibleRatingSchemes = _.sortBy($ratingSchemesCall.data, d => d.name);
     $: measurableCategories = _.map($measurableCategoryCall?.data || [], toRef);
@@ -214,6 +218,7 @@
                     Cardinality
                 </label>
                 <select id="cardinality"
+                        disabled={!canEditCardinality}
                         bind:value={$selectedDefinition.cardinality}>
                     <option value="ZERO_ONE">
                         Zero to One
@@ -225,6 +230,11 @@
                 <div class="help-block">
                     The cardinality determines the number of ratings that can be assigned to an entity for this
                     assessment. Defaults to 'Zero to One'.
+                    {#if !canEditCardinality}
+                        <br>
+                        <Icon name="warning"/>
+                        The cardinality for this definition cannot be changed as multi-valued ratings already exist.
+                    {/if}
                 </div>
 
                 <!-- READ ONLY -->
