@@ -54,6 +54,12 @@ jobs:
         name: waltz-web-postgres.war
         path: waltz-web/target/waltz-web.war
 
+    - name: Publish mocha results
+      uses: actions/upload-artifact@v2
+      with:
+        name: mocha-test-results.txt
+        path: waltz-ng/dist/mocha-test-results.txt
+
     - name: Publish liquibase changelogs
       uses: actions/upload-artifact@v2
       with:
