@@ -295,11 +295,11 @@
             <div style="padding-bottom: 1em">
                 <strong>Description</strong>
                 <div class="small help-text">A longer description of this derived column.</div>
-                <input class="form-control"
-                       required
-                       id="columnDescription"
-                       placeholder="Description"
-                       bind:value={workingDerivedCol.columnDescription}>
+                <textarea class="form-control code"
+                          id="columnDescription"
+                          rows="2"
+                          placeholder="Enter description here"
+                          bind:value={workingDerivedCol.columnDescription}/>
             </div>
             <div style="padding-bottom: 1em">
                 <strong>Derivation Script</strong>
@@ -310,7 +310,7 @@
                           id="derivationScript"
                           rows="6"
                           placeholder="Enter script here"
-                          bind:value={workingDerivedCol.derivationScript}/> here!!
+                          bind:value={workingDerivedCol.derivationScript}/>
                 <br>
                 <Markdown text={derivedColumnHelpText}/>
             </div>
