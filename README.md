@@ -72,7 +72,7 @@ progress and done issues.
 | 1.49     | 30th May 2023   | tbd                        |
 | 1.50     | tbd             | tbd                        |
 
-For see the [releases](/finos/waltz/releases) page for historic versions.
+For see the [releases](https://github.com/finos/waltz/releases) page for historic versions.
 
 
 
