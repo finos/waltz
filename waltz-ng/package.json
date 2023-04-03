@@ -11,7 +11,7 @@
         "build-debug": "webpack --config webpack.dev.js --progress --profile",
         "dev-server": "webpack-dev-server --config webpack.dev.js --progress  --port 8000 --host 0.0.0.0",
         "postinstall": "patch-package",
-        "test": "mocha --require @babel/register test/**/*.js --reporter=json > mocha-test-results.json",
+        "test": "mocha --require @babel/register test/**/*.js --reporter=list > mocha-test-results.txt",
         "test-and-build": "npm test && webpack --config webpack.prod.js --progress --profile",
         "test-server": "BUILD_ENV=test webpack-dev-server --config webpack.config.js --progress --port 8000 --host 0.0.0.0",
         "watch": "webpack --progress --watch --colors",

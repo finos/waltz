@@ -58,7 +58,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: mocha-test-results.txt
-        path: waltz-ng/mocha-test-results.json
+        path: waltz-ng/mocha-test-results.txt
 
     - name: Publish liquibase changelogs
       uses: actions/upload-artifact@v2
