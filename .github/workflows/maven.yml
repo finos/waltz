@@ -46,7 +46,7 @@ jobs:
       run: mvn versions:set -DnewVersion=${{ github.ref_name }} -Pci,build-postgres,waltz-postgres;
 
     - name: Build with Maven
-      run: mvn -B -ntp -s .build.settings.xml -Pbuild-postgres,waltz-postgres clean package;
+      run: mvn -B -ntp -s .build.settings.xml -Pbuild-postgres,waltz-postgres clean package site;
 
     - name: Publish build
       uses: actions/upload-artifact@v2
@@ -66,9 +66,11 @@ jobs:
         name: liquibase-changelogs
         path: waltz-schema/src/main/resources/liquibase/
 
-    - name: Publish Test Report
-      if: ${{ always() }}
-      uses: scacap/action-surefire-report@v1
+    - name: Publish Java Test results
+      uses: actions/upload-artifact@v2
+      with:
+        name: surefire-results.html
+        path: target/site/surefire-report.html
 
     - name: Login to GitHub Registry
       if: ${{ github.ref_type == 'tag' }}
