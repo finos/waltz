@@ -84,7 +84,7 @@
         "git-rev-sync": "3.0.2",
         "html-loader": "4.2.0",
         "html-webpack-plugin": "5.5.0",
-        "mocha": "8.4.0",
+        "mocha": "10.2.0",
         "node-libs-browser": "2.2.1",
         "raw-loader": "4.0.2",
         "sass": "1.55.0",
