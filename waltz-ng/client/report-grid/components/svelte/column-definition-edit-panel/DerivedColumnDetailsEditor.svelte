@@ -16,7 +16,8 @@
         id: column.id,
         displayName: column.displayName,
         externalId: column.externalId,
-        derivationScript: column.derivationScript
+        derivationScript: column.derivationScript,
+        columnDescription: column.columnDescription
     }
 
     function cancelEdit() {
@@ -28,7 +29,8 @@
             id: col.id,
             displayName: col.displayName,
             externalId: col.externalId,
-            derivationScript: col.derivationScript
+            derivationScript: col.derivationScript,
+            columnDescription: col.columnDescription
         };
     }
 
@@ -56,6 +58,20 @@
             {
                 displayName: workingDisplayName,
                 displayNameChanged: workingDisplayName !== originalColumn?.displayName
+            })
+        const columnsWithoutCol = _.reject($columnDefs, d => sameColumnRef(d, column));
+        $columnDefs = _.concat(columnsWithoutCol, newColumn);
+    }
+
+    function updateColumnDescription(workingDisplayName, column) {
+        const workingColumn = _.find($columnDefs, d => sameColumnRef(d, column));
+        const originalColumn = _.find($selectedGrid.definition.derivedColumnDefinitions, d => sameColumnRef(d, column));
+        const newColumn = Object.assign(
+            {},
+            workingColumn,
+            {
+                columnDescription: workingDisplayName,
+                columnDescriptionChanged: workingDisplayName !== originalColumn?.columnDescription
             })
         const columnsWithoutCol = _.reject($columnDefs, d => sameColumnRef(d, column));
         $columnDefs = _.concat(columnsWithoutCol, newColumn);
@@ -137,7 +153,20 @@
                    bind:value={working.externalId}>
         </td>
     </tr>
-
+    <tr>
+        <td>
+            <div>Description</div>
+            <div class="small help-text">A description of this derived column</div>
+        </td>
+        <td>
+            <textarea class="form-control code"
+                      id="columnDescription"
+                      rows="2"
+                      on:change={() => updateColumnDescription(working.columnDescription, column)}
+                      placeholder="Enter description here"
+                      bind:value={working.columnDescription}/>
+        </td>
+    </tr>
     <tr>
         <td>
             <div>Derivation Script</div>

@@ -11,8 +11,6 @@
     export let onRemove = () => console.log("Removing entity")
     export let onEdit = () => console.log("Editing entity")
 
-    let lastMoved = null;
-
     function getIcon(entityKind) {
         return _.get(entity[entityKind], 'icon', "fw");
     }

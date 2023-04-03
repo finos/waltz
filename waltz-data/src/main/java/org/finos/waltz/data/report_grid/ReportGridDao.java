@@ -321,6 +321,7 @@ public class ReportGridDao {
                     record.setExternalId(derivedCol.externalId().orElse(null));
                     record.setDerivationScript(derivedCol.derivationScript());
                     record.setColumnDescription(derivedCol.columnDescription());
+
                     return record;
                 })
                 .collect(collectingAndThen(toSet(), d -> tx.batchInsert(d).execute()));

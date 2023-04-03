@@ -40,14 +40,15 @@
     let workingDerivedCol = {
         displayName: null,
         derivationScript: null,
-        externalId: null
+        columnDescription: null
     };
 
     function clearWorking() {
         workingDerivedCol = {
             displayName: null,
             derivationScript: null,
-            externalId: null
+            externalId: null,
+            columnDescription: null
         };
     }
 
@@ -95,6 +96,7 @@
             displayName: workingDerivedCol.displayName,
             externalId: workingDerivedCol.externalId,
             derivationScript: workingDerivedCol.derivationScript,
+            columnDescription: workingDerivedCol.columnDescription,
             position: 0
         };
 
@@ -157,7 +159,8 @@
                 position: d.position,
                 displayName: d.displayName,
                 derivationScript: d.derivationScript,
-                externalId: d.externalId
+                externalId: d.externalId,
+                columnDescription: d.columnDescription
             }));
 
         return reportGridStore
@@ -290,6 +293,15 @@
                        bind:value={workingDerivedCol.externalId}>
             </div>
             <div style="padding-bottom: 1em">
+                <strong>Description</strong>
+                <div class="small help-text">A longer description of this derived column.</div>
+                <input class="form-control"
+                       required
+                       id="columnDescription"
+                       placeholder="Description"
+                       bind:value={workingDerivedCol.columnDescription}>
+            </div>
+            <div style="padding-bottom: 1em">
                 <strong>Derivation Script</strong>
                 <div class="small help-text">Calculates the value to be displayed in this column.
                 </div>
@@ -298,7 +310,7 @@
                           id="derivationScript"
                           rows="6"
                           placeholder="Enter script here"
-                          bind:value={workingDerivedCol.derivationScript}/>
+                          bind:value={workingDerivedCol.derivationScript}/> here!!
                 <br>
                 <Markdown text={derivedColumnHelpText}/>
             </div>
