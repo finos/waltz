@@ -3,7 +3,7 @@
 
 name: Waltz Build (pg)
 
-on: push
+on: [push, pull_request]
 
 jobs:
   build:
