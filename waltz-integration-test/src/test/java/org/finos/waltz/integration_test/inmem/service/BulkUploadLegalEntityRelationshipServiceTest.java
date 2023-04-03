@@ -42,7 +42,6 @@ import org.finos.waltz.test_common.helpers.AppHelper;
 import org.finos.waltz.test_common.helpers.AssessmentHelper;
 import org.finos.waltz.test_common.helpers.LegalEntityHelper;
 import org.finos.waltz.test_common.helpers.RatingSchemeHelper;
-import org.junit.Ignore;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +50,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
+K
 import static java.lang.String.format;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.finos.waltz.common.CollectionUtilities.*;
