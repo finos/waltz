@@ -68,9 +68,13 @@ progress and done issues.
 
 | Release  | Date            | Summary                    |
 |----------|-----------------|----------------------------|
-| **1.48** | 28th March 2023 | Legal Entities (continued) |
+| 1.48.1   | 13th April 2023 | Patch release              |
 | 1.49     | 30th May 2023   | tbd                        |
 | 1.50     | tbd             | tbd                        |
+
+For see the [releases](./releases) page for historic versions.
+
+
 
 ## Contributing
 
