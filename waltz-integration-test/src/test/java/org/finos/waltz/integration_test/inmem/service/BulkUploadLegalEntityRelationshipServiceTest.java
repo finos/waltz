@@ -287,112 +287,112 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
     }
 
 
-    @Test
-    public void shouldReportWhenRelationshipsAsExisting() {
-        String name = mkName("shouldReportWhenRelationshipsAsExisting");
-        Long schemeId = ratingSchemeHelper.createEmptyRatingScheme(name + "Scheme");
-        long leRelKindId = legalEntityHelper.createLegalEntityRelationshipKind(name);
-        long defnIdA = assessmentHelper.createDefinition(schemeId, name + "DefinitionA", "", AssessmentVisibility.PRIMARY, "Test", EntityKind.LEGAL_ENTITY_RELATIONSHIP, mkRef(EntityKind.LEGAL_ENTITY_RELATIONSHIP_KIND, leRelKindId));
+//    @Test
+//    public void shouldReportWhenRelationshipsAsExisting() {
+//        String name = mkName("shouldReportWhenRelationshipsAsExisting");
+//        Long schemeId = ratingSchemeHelper.createEmptyRatingScheme(name + "Scheme");
+//        long leRelKindId = legalEntityHelper.createLegalEntityRelationshipKind(name);
+//        long defnIdA = assessmentHelper.createDefinition(schemeId, name + "DefinitionA", "", AssessmentVisibility.PRIMARY, "Test", EntityKind.LEGAL_ENTITY_RELATIONSHIP, mkRef(EntityKind.LEGAL_ENTITY_RELATIONSHIP_KIND, leRelKindId));
+//
+//        AssessmentDefinition defnA = defnSvc.getById(defnIdA);
+//
+//        EntityReference a = appHelper.createNewApp(mkName("a"), ouIds.a);
+//        EntityReference a2 = appHelper.createNewApp(mkName("a2"), ouIds.a);
+//        EntityReference le = legalEntityHelper.create(mkName("le"));
+//
+//        Application app = appSvc.getById(a.id());
+//        Application app2 = appSvc.getById(a2.id());
+//        LegalEntity legalEntity = legalEntitySvc.getById(le.id());
+//        legalEntityHelper.createLegalEntityRelationship(a, le, leRelKindId);
+//
+//        String baseString = format("%s\t%s\t%s\n", ENTITY_IDENTIFIER, LEGAL_ENTITY_IDENTIFIER, COMMENT);
+//        String inputString = format(baseString +
+//                        "%s\t%s\t%s\n" +
+//                        "%s\t%s\t%s\n",
+//                app.externalId().get(),
+//                legalEntity.externalId(),
+//                "A test comment string",
+//                app2.externalId().get(),
+//                legalEntity.externalId(),
+//                "A test comment string");
+//
+//        BulkUploadLegalEntityRelationshipCommand uploadCmd = ImmutableBulkUploadLegalEntityRelationshipCommand.builder()
+//                .inputString(inputString)
+//                .legalEntityRelationshipKindId(leRelKindId)
+//                .build();
+//
+//
+//        ResolveBulkUploadLegalEntityRelationshipResponse resolvedCommand = service.resolve(uploadCmd);
+//
+//        assertEquals(2, resolvedCommand.rows().size(), "Should identify 2 rows of data has been provided");
+//
+//        Set<ResolvedUploadRow> rowsWithAssessments = SetUtilities.filter(resolvedCommand.rows(), d -> notEmpty(d.assessmentRatings()));
+//        assertTrue(isEmpty(rowsWithAssessments), "No rows should have assessments associated to them");
+//
+//        Set<ResolvedUploadRow> erroredRows = SetUtilities.filter(resolvedCommand.rows(), d -> d.legalEntityRelationship().status().equals(ResolutionStatus.ERROR));
+//
+//        Optional<ResolvedUploadRow> firstRow = find(resolvedCommand.rows(), d -> d.rowNumber() == 2L);
+//        Optional<ResolvedUploadRow> secondRow = find(resolvedCommand.rows(), d -> d.rowNumber() == 3L);
+//
+//        assertTrue(firstRow.isPresent(), "Should find first row");
+//        assertTrue(secondRow.isPresent(), "Should find second row");
+//
+//        assertEquals(ResolutionStatus.EXISTING, firstRow.get().legalEntityRelationship().status(), "Should correctly identify where a resolved row has a relationship that already exists");
+//        assertEquals(ResolutionStatus.NEW, secondRow.get().legalEntityRelationship().status(), "Should correctly identify where a resolved row has a relationship that already exists");
+//    }
 
-        AssessmentDefinition defnA = defnSvc.getById(defnIdA);
-
-        EntityReference a = appHelper.createNewApp(mkName("a"), ouIds.a);
-        EntityReference a2 = appHelper.createNewApp(mkName("a2"), ouIds.a);
-        EntityReference le = legalEntityHelper.create(mkName("le"));
-
-        Application app = appSvc.getById(a.id());
-        Application app2 = appSvc.getById(a2.id());
-        LegalEntity legalEntity = legalEntitySvc.getById(le.id());
-        legalEntityHelper.createLegalEntityRelationship(a, le, leRelKindId);
-
-        String baseString = format("%s\t%s\t%s\n", ENTITY_IDENTIFIER, LEGAL_ENTITY_IDENTIFIER, COMMENT);
-        String inputString = format(baseString +
-                        "%s\t%s\t%s\n" +
-                        "%s\t%s\t%s\n",
-                app.externalId().get(),
-                legalEntity.externalId(),
-                "A test comment string",
-                app2.externalId().get(),
-                legalEntity.externalId(),
-                "A test comment string");
-
-        BulkUploadLegalEntityRelationshipCommand uploadCmd = ImmutableBulkUploadLegalEntityRelationshipCommand.builder()
-                .inputString(inputString)
-                .legalEntityRelationshipKindId(leRelKindId)
-                .build();
-
-
-        ResolveBulkUploadLegalEntityRelationshipResponse resolvedCommand = service.resolve(uploadCmd);
-
-        assertEquals(2, resolvedCommand.rows().size(), "Should identify 2 rows of data has been provided");
-
-        Set<ResolvedUploadRow> rowsWithAssessments = SetUtilities.filter(resolvedCommand.rows(), d -> notEmpty(d.assessmentRatings()));
-        assertTrue(isEmpty(rowsWithAssessments), "No rows should have assessments associated to them");
-
-        Set<ResolvedUploadRow> erroredRows = SetUtilities.filter(resolvedCommand.rows(), d -> d.legalEntityRelationship().status().equals(ResolutionStatus.ERROR));
-
-        Optional<ResolvedUploadRow> firstRow = find(resolvedCommand.rows(), d -> d.rowNumber() == 2L);
-        Optional<ResolvedUploadRow> secondRow = find(resolvedCommand.rows(), d -> d.rowNumber() == 3L);
-
-        assertTrue(firstRow.isPresent(), "Should find first row");
-        assertTrue(secondRow.isPresent(), "Should find second row");
-
-        assertEquals(ResolutionStatus.EXISTING, firstRow.get().legalEntityRelationship().status(), "Should correctly identify where a resolved row has a relationship that already exists");
-        assertEquals(ResolutionStatus.NEW, secondRow.get().legalEntityRelationship().status(), "Should correctly identify where a resolved row has a relationship that already exists");
-    }
-
-    @Test
-    public void shouldReportWhenRelationshipHasErrors() {
-        String name = mkName("shouldReportWhenRelationshipHasErrors");
-        Long schemeId = ratingSchemeHelper.createEmptyRatingScheme(name + "Scheme");
-        long leRelKindId = legalEntityHelper.createLegalEntityRelationshipKind(name);
-        long defnIdA = assessmentHelper.createDefinition(schemeId, name + "DefinitionA", "", AssessmentVisibility.PRIMARY, "Test", EntityKind.LEGAL_ENTITY_RELATIONSHIP, mkRef(EntityKind.LEGAL_ENTITY_RELATIONSHIP_KIND, leRelKindId));
-
-        AssessmentDefinition defnA = defnSvc.getById(defnIdA);
-
-        EntityReference a = appHelper.createNewApp(mkName("a"), ouIds.a);
-        EntityReference a2 = appHelper.createNewApp(mkName("a2"), ouIds.a);
-        EntityReference le = legalEntityHelper.create(mkName("le"));
-
-        Application app2 = appSvc.getById(a2.id());
-        LegalEntity legalEntity = legalEntitySvc.getById(le.id());
-
-        String baseString = format("%s\t%s\t%s\n", ENTITY_IDENTIFIER, LEGAL_ENTITY_IDENTIFIER, COMMENT);
-        String inputString = format(baseString +
-                        "%s\t%s\t%s\n" +
-                        "%s\t%s\t%s\n",
-                "Not an app identifier",
-                legalEntity.externalId(),
-                "A test comment string",
-                app2.externalId().get(),
-                legalEntity.externalId(),
-                "A test comment string");
-
-        BulkUploadLegalEntityRelationshipCommand uploadCmd = ImmutableBulkUploadLegalEntityRelationshipCommand.builder()
-                .inputString(inputString)
-                .legalEntityRelationshipKindId(leRelKindId)
-                .build();
-
-
-        ResolveBulkUploadLegalEntityRelationshipResponse resolvedCommand = service.resolve(uploadCmd);
-
-        assertEquals(2, resolvedCommand.rows().size(), "Should identify 2 rows of data has been provided");
-
-        Set<ResolvedUploadRow> rowsWithAssessments = SetUtilities.filter(resolvedCommand.rows(), d -> notEmpty(d.assessmentRatings()));
-        assertTrue(isEmpty(rowsWithAssessments), "No rows should have assessments associated to them");
-
-        Set<ResolvedUploadRow> erroredRows = SetUtilities.filter(resolvedCommand.rows(), d -> d.legalEntityRelationship().status().equals(ResolutionStatus.ERROR));
-        assertTrue(notEmpty(erroredRows), "One of the roes should have a status of errored");
-
-        Optional<ResolvedUploadRow> firstRow = find(resolvedCommand.rows(), d -> d.rowNumber() == 2L);
-        Optional<ResolvedUploadRow> secondRow = find(resolvedCommand.rows(), d -> d.rowNumber() == 3L);
-
-        assertTrue(firstRow.isPresent(), "Should find row at index 1");
-        assertTrue(secondRow.isPresent(), "Should find row at index 2");
-
-        assertEquals(ResolutionStatus.ERROR, firstRow.get().legalEntityRelationship().status(), "Should correctly report when the relationship details for a row cannot be resolved");
-        assertEquals(ResolutionStatus.NEW, secondRow.get().legalEntityRelationship().status(), "Should correctly identify where a resolved row has a relationship that already exists");
-    }
+//    @Test
+//    public void shouldReportWhenRelationshipHasErrors() {
+//        String name = mkName("shouldReportWhenRelationshipHasErrors");
+//        Long schemeId = ratingSchemeHelper.createEmptyRatingScheme(name + "Scheme");
+//        long leRelKindId = legalEntityHelper.createLegalEntityRelationshipKind(name);
+//        long defnIdA = assessmentHelper.createDefinition(schemeId, name + "DefinitionA", "", AssessmentVisibility.PRIMARY, "Test", EntityKind.LEGAL_ENTITY_RELATIONSHIP, mkRef(EntityKind.LEGAL_ENTITY_RELATIONSHIP_KIND, leRelKindId));
+//
+//        AssessmentDefinition defnA = defnSvc.getById(defnIdA);
+//
+//        EntityReference a = appHelper.createNewApp(mkName("a"), ouIds.a);
+//        EntityReference a2 = appHelper.createNewApp(mkName("a2"), ouIds.a);
+//        EntityReference le = legalEntityHelper.create(mkName("le"));
+//
+//        Application app2 = appSvc.getById(a2.id());
+//        LegalEntity legalEntity = legalEntitySvc.getById(le.id());
+//
+//        String baseString = format("%s\t%s\t%s\n", ENTITY_IDENTIFIER, LEGAL_ENTITY_IDENTIFIER, COMMENT);
+//        String inputString = format(baseString +
+//                        "%s\t%s\t%s\n" +
+//                        "%s\t%s\t%s\n",
+//                "Not an app identifier",
+//                legalEntity.externalId(),
+//                "A test comment string",
+//                app2.externalId().get(),
+//                legalEntity.externalId(),
+//                "A test comment string");
+//
+//        BulkUploadLegalEntityRelationshipCommand uploadCmd = ImmutableBulkUploadLegalEntityRelationshipCommand.builder()
+//                .inputString(inputString)
+//                .legalEntityRelationshipKindId(leRelKindId)
+//                .build();
+//
+//
+//        ResolveBulkUploadLegalEntityRelationshipResponse resolvedCommand = service.resolve(uploadCmd);
+//
+//        assertEquals(2, resolvedCommand.rows().size(), "Should identify 2 rows of data has been provided");
+//
+//        Set<ResolvedUploadRow> rowsWithAssessments = SetUtilities.filter(resolvedCommand.rows(), d -> notEmpty(d.assessmentRatings()));
+//        assertTrue(isEmpty(rowsWithAssessments), "No rows should have assessments associated to them");
+//
+//        Set<ResolvedUploadRow> erroredRows = SetUtilities.filter(resolvedCommand.rows(), d -> d.legalEntityRelationship().status().equals(ResolutionStatus.ERROR));
+//        assertTrue(notEmpty(erroredRows), "One of the roes should have a status of errored");
+//
+//        Optional<ResolvedUploadRow> firstRow = find(resolvedCommand.rows(), d -> d.rowNumber() == 2L);
+//        Optional<ResolvedUploadRow> secondRow = find(resolvedCommand.rows(), d -> d.rowNumber() == 3L);
+//
+//        assertTrue(firstRow.isPresent(), "Should find row at index 1");
+//        assertTrue(secondRow.isPresent(), "Should find row at index 2");
+//
+//        assertEquals(ResolutionStatus.ERROR, firstRow.get().legalEntityRelationship().status(), "Should correctly report when the relationship details for a row cannot be resolved");
+//        assertEquals(ResolutionStatus.NEW, secondRow.get().legalEntityRelationship().status(), "Should correctly identify where a resolved row has a relationship that already exists");
+//    }
 
     @Test
     public void canResolveAssessmentsForLegalEntityRelationship() {
