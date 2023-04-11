@@ -44,7 +44,7 @@
         "\n" +
         "\n" +
         "There are multiple ways to designate assessment ratings for a relationship:\n" +
-        "1) Use the `ASSESSMENT_DEFN_EXT_ID / RATING_EXT_ID` format in the header, this gives one column per rating outcome and can be used to provide comments per assessment rating\n" +
+        "1) Use the `ASSESSMENT_DEFN_EXT_ID / RATING_EXT_ID` format in the header, this gives one column per rating outcome and can be used to provide comments per assessment rating.\n" +
         "2) Use the `ASSESSMENT_DEFN_EXT_ID` format in the header, the values for each of the rows is then interpreted as a `;` separated list of rating codes."
 
     function verifyEntries() {
@@ -145,7 +145,7 @@
                        name="uploadMode"
                        value={UploadModes.REPLACE}>
                 Replace
-                <span> - This will replace any assessment ratings for relationships specified in the input</span>
+                <span class="text-muted"> - This will replace any assessment ratings for relationships specified in the input</span>
             </label>
         </div>
 
