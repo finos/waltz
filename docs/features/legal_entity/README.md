@@ -113,7 +113,7 @@ Select 'Save Relationships' to continue.
 
 ### Upload Summary
 
-After saving the upload preview a summary is shown
+After saving the upload preview a summary is shown.
 
 ![Upload Summary](images/upload_summary_result.png)
 
@@ -121,10 +121,12 @@ Select 'Done' to close the editor.
 
 ### Relationships Section
 
-The updates to relationships and assessments should immediately be visible in the table view
+The updates to relationships and assessments should immediately be visible in the table view.
 
 ![Assessments Table](images/le_rel_assessment_table.png)
 
-| Entity External Id | Legal Entity External Id | Comment    | Remove Relationship   |
-|--------------------|--------------------------|------------|-----------------------|
-| `ENTITY_EXT_ID`    | `LEGAL_ENTITY_EXT_ID`    | (optional) | `X` or `Y` (optional) |
+### Example Input
+
+| Entity External Id | Legal Entity External Id | Comment              | Remove Relationship   |
+|--------------------|--------------------------|----------------------|-----------------------|
+| `ENTITY_EXT_ID`    | `LEGAL_ENTITY_EXT_ID`    | `COMMENT` (optional) | `X` or `Y` (optional) |
