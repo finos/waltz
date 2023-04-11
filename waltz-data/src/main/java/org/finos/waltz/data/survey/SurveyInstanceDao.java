@@ -89,6 +89,17 @@ public class SurveyInstanceDao {
 
     private static final Condition IS_ORIGINAL_INSTANCE_CONDITION = si.ORIGINAL_INSTANCE_ID.isNull();
 
+    private static final Set<SurveyInstanceStatus> UPDATABLE_RECIPIENT_STATUSES = SetUtilities.asSet(
+            SurveyInstanceStatus.NOT_STARTED,
+            SurveyInstanceStatus.IN_PROGRESS,
+            SurveyInstanceStatus.REJECTED);
+
+    private static final Set<SurveyInstanceStatus> UPDATABLE_OWNER_STATUSES = SetUtilities.asSet(
+            SurveyInstanceStatus.NOT_STARTED,
+            SurveyInstanceStatus.IN_PROGRESS,
+            SurveyInstanceStatus.COMPLETED,
+            SurveyInstanceStatus.REJECTED);
+
     private static final RecordMapper<Record, SurveyInstance> TO_DOMAIN_MAPPER = r -> {
         SurveyInstanceRecord record = r.into(si);
         return ImmutableSurveyInstance.builder()
@@ -459,12 +470,7 @@ public class SurveyInstanceDao {
 
     public SyncRecipientsResponse getReassignRecipientsCounts() {
 
-        Set<SurveyInstanceStatus> allowedStatuses = SetUtilities.asSet(
-                SurveyInstanceStatus.NOT_STARTED,
-                SurveyInstanceStatus.IN_PROGRESS,
-                SurveyInstanceStatus.REJECTED);
-
-        CommonTableExpression<Record6<Long, Long, String, String, String, String>> inScopeSurveys = getInScopeSurveysCTE(allowedStatuses);
+        CommonTableExpression<Record6<Long, Long, String, String, String, String>> inScopeSurveys = getInScopeSurveysCTE(UPDATABLE_RECIPIENT_STATUSES);
         CommonTableExpression<Record6<Long, Long, String, Long, String, String>> requiredRecipients = getRequiredRecipientsCTE(inScopeSurveys);
         CommonTableExpression<Record6<Long, Long, String, Long, String, String>> existingRecipients = getExistingRecipientsCTE(inScopeSurveys);
         CommonTableExpression<Record6<Long, Long, String, Long, String, String>> recipientsToRemove = getMembersToRemoveCTE(existingRecipients, requiredRecipients);
@@ -496,13 +502,7 @@ public class SurveyInstanceDao {
 
     public SyncRecipientsResponse getReassignOwnersCounts() {
 
-        Set<SurveyInstanceStatus> allowedStatuses = SetUtilities.asSet(
-                SurveyInstanceStatus.NOT_STARTED,
-                SurveyInstanceStatus.IN_PROGRESS,
-                SurveyInstanceStatus.COMPLETED,
-                SurveyInstanceStatus.REJECTED);
-
-        CommonTableExpression<Record6<Long, Long, String, String, String, String>> inScopeSurveys = getInScopeSurveysCTE(allowedStatuses);
+        CommonTableExpression<Record6<Long, Long, String, String, String, String>> inScopeSurveys = getInScopeSurveysCTE(UPDATABLE_OWNER_STATUSES);
         CommonTableExpression<Record6<Long, Long, String, Long, String, String>> requiredOwners = getRequiredOwnersCTE(inScopeSurveys);
         CommonTableExpression<Record6<Long, Long, String, Long, String, String>> existingOwners = getExistingOwnersCTE(inScopeSurveys);
         CommonTableExpression<Record6<Long, Long, String, Long, String, String>> ownersToRemove = getMembersToRemoveCTE(existingOwners, requiredOwners);
@@ -534,12 +534,7 @@ public class SurveyInstanceDao {
 
     public SyncRecipientsResponse reassignRecipients() {
 
-        Set<SurveyInstanceStatus> allowedStatuses = SetUtilities.asSet(
-                SurveyInstanceStatus.NOT_STARTED,
-                SurveyInstanceStatus.IN_PROGRESS,
-                SurveyInstanceStatus.REJECTED);
-
-        CommonTableExpression<Record6<Long, Long, String, String, String, String>> inScopeSurveys = getInScopeSurveysCTE(allowedStatuses);
+        CommonTableExpression<Record6<Long, Long, String, String, String, String>> inScopeSurveys = getInScopeSurveysCTE(UPDATABLE_RECIPIENT_STATUSES);
         CommonTableExpression<Record6<Long, Long, String, Long, String, String>> requiredRecipients = getRequiredRecipientsCTE(inScopeSurveys);
         CommonTableExpression<Record6<Long, Long, String, Long, String, String>> existingRecipients = getExistingRecipientsCTE(inScopeSurveys);
         CommonTableExpression<Record6<Long, Long, String, Long, String, String>> recipientsToRemove = getMembersToRemoveCTE(existingRecipients, requiredRecipients);
@@ -575,13 +570,7 @@ public class SurveyInstanceDao {
 
     public SyncRecipientsResponse reassignOwners() {
 
-        Set<SurveyInstanceStatus> allowedStatuses = SetUtilities.asSet(
-                SurveyInstanceStatus.NOT_STARTED,
-                SurveyInstanceStatus.IN_PROGRESS,
-                SurveyInstanceStatus.COMPLETED,
-                SurveyInstanceStatus.REJECTED);
-
-        CommonTableExpression<Record6<Long, Long, String, String, String, String>> inScopeSurveys = getInScopeSurveysCTE(allowedStatuses);
+        CommonTableExpression<Record6<Long, Long, String, String, String, String>> inScopeSurveys = getInScopeSurveysCTE(UPDATABLE_OWNER_STATUSES);
         CommonTableExpression<Record6<Long, Long, String, Long, String, String>> requiredOwners = getRequiredOwnersCTE(inScopeSurveys);
         CommonTableExpression<Record6<Long, Long, String, Long, String, String>> existingOwners = getExistingOwnersCTE(inScopeSurveys);
         CommonTableExpression<Record6<Long, Long, String, Long, String, String>> ownersToRemove = getMembersToRemoveCTE(existingOwners, requiredOwners);
