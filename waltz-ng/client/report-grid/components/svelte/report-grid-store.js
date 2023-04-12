@@ -44,6 +44,10 @@ export let displayNameChanged = derived(
     columnDefs,
     ($columnDefs) => _.some($columnDefs, d => d.displayNameChanged));
 
+export let columnDescriptionChanged = derived(
+    columnDefs,
+    ($columnDefs) => _.some($columnDefs, d => d.columnDescriptionChanged));
+
 export let positionChanged = derived(
     columnDefs,
     ($columnDefs) => _.some($columnDefs, d => d.originalPosition && d.originalPosition !== d.position));
@@ -57,9 +61,9 @@ export let externalIdChanged = derived(
     ($columnDefs) => _.some($columnDefs, d => d.externalIdChanged));
 
 export let hasChanged = derived(
-    [columnsChanged, additionalColumnOptionsChanged, displayNameChanged, positionChanged, derivationScriptChanged, externalIdChanged],
-    ([$columnsChanged, $additionalColumnOptionsChanged, $displayNameChanged, $positionChanged, $derivationScriptChanged, $externalIdChanged]) => {
-        return $columnsChanged || $additionalColumnOptionsChanged || $displayNameChanged || $positionChanged || $derivationScriptChanged || $externalIdChanged;
+    [columnsChanged, additionalColumnOptionsChanged, displayNameChanged, positionChanged, derivationScriptChanged, externalIdChanged, columnDescriptionChanged],
+    ([$columnsChanged, $additionalColumnOptionsChanged, $displayNameChanged, $positionChanged, $derivationScriptChanged, $externalIdChanged, $columnDescriptionChanged]) => {
+        return $columnsChanged || $additionalColumnOptionsChanged || $displayNameChanged || $positionChanged || $derivationScriptChanged || $externalIdChanged || $columnDescriptionChanged;
     });
 
 export const tableData = derived(
