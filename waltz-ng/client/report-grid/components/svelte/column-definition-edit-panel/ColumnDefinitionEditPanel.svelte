@@ -40,14 +40,15 @@
     let workingDerivedCol = {
         displayName: null,
         derivationScript: null,
-        externalId: null
+        columnDescription: null
     };
 
     function clearWorking() {
         workingDerivedCol = {
             displayName: null,
             derivationScript: null,
-            externalId: null
+            externalId: null,
+            columnDescription: null
         };
     }
 
@@ -95,6 +96,7 @@
             displayName: workingDerivedCol.displayName,
             externalId: workingDerivedCol.externalId,
             derivationScript: workingDerivedCol.derivationScript,
+            columnDescription: workingDerivedCol.columnDescription,
             position: 0
         };
 
@@ -157,7 +159,8 @@
                 position: d.position,
                 displayName: d.displayName,
                 derivationScript: d.derivationScript,
-                externalId: d.externalId
+                externalId: d.externalId,
+                columnDescription: d.columnDescription
             }));
 
         return reportGridStore
@@ -288,6 +291,15 @@
                        id="externalId"
                        placeholder="External Id"
                        bind:value={workingDerivedCol.externalId}>
+            </div>
+            <div style="padding-bottom: 1em">
+                <strong>Description</strong>
+                <div class="small help-text">A longer description of this derived column.</div>
+                <textarea class="form-control code"
+                          id="columnDescription"
+                          rows="2"
+                          placeholder="Enter description here"
+                          bind:value={workingDerivedCol.columnDescription}/>
             </div>
             <div style="padding-bottom: 1em">
                 <strong>Derivation Script</strong>
