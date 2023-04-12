@@ -23,6 +23,7 @@
     import SaveUploadReport from "./SaveUploadReport.svelte";
     import ResolvedUploadReport from "./ResolvedUploadReport.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
+    import Markdown from "../../../common/svelte/Markdown.svelte";
 
     export let relationshipKindId;
     export let onDone = () => console.log("Done, close and reload rels");
@@ -30,6 +31,21 @@
     let resolveCall;
     let saveCall;
     let allowSaveWithErrors = false;
+
+    let helpText =
+        "Please ensure the minimum required columns of 'Entity External Id' and 'Legal Entity External Id' are populated." +
+        " You can copy and paste from an existing excel sheet or use the example layout below." +
+        " If you with to remove an assessment you must mark with an `X` or `Y` in the 'Remove Relationship' column.\n\n" +
+        "\n" +
+        "**Example Input:**\n" +
+        "| Entity External Id | Legal Entity External Id | Comment    | Remove Relationship   |\n" +
+        "|--------------------|--------------------------|------------|-----------------------|\n" +
+        "| `ENTITY_EXT_ID`    | `LEGAL_ENTITY_EXT_ID`    | `COMMENT_TEXT` (optional) | `X` or `Y` (optional) |\n" +
+        "\n" +
+        "\n" +
+        "There are multiple ways to designate assessment ratings for a relationship:\n" +
+        "1) Use the `ASSESSMENT_DEFN_EXT_ID / RATING_EXT_ID` format in the header, this gives one column per rating outcome and can be used to provide comments per assessment rating.\n" +
+        "2) Use the `ASSESSMENT_DEFN_EXT_ID` format in the header, the values for each of the rows is then interpreted as a `;` separated list of rating codes."
 
     function verifyEntries() {
 
@@ -96,41 +112,40 @@
 
 {#if $activeMode === Modes.INPUT}
 
-    <div class="help-block">
-        Please ensure that the minimum columns of 'Entity External Id' and 'Legal Entity External Id', if you wish to
-        add a
-        'Comment' this will appear on the relationship.
-    </div>
+    <Markdown text={helpText}/>
+
+    <hr>
 
     <form on:submit|preventDefault={verifyEntries}>
         <div class="form-group">
-            <label for="involvements">
-                Relationships
+            <label for="relationships">
+                Relationships Input
             </label>
-            <textarea id="involvements"
+            <textarea id="relationships"
                       class="form-control"
                       rows="6"
-                      placeholder="Please insert external identifiers and email as comma or tab separated values split by newline or pipe characters"
+                      placeholder="Please insert data as comma or tab separated values split by newline or pipe characters"
                       bind:value={$inputString}></textarea>
         </div>
 
         <div class="form-group">
             <label>
-                <input style="display: inline-block;"
+                <input xxstyle="display: inline-block;"
                        type="radio"
                        bind:group={$uploadMode}
                        name="uploadMode"
                        value={UploadModes.ADD_ONLY}>
                 Add Only
             </label>
-
+            <span class="text-muted"> - This will only add or update values for relationships and assessments specified in the input</span>
+            <br>
             <label>
-                <input style="display: inline-block;"
-                       type="radio"
+                <input type="radio"
                        bind:group={$uploadMode}
                        name="uploadMode"
                        value={UploadModes.REPLACE}>
                 Replace
+                <span class="text-muted"> - This will replace any assessment ratings for relationships specified in the input</span>
             </label>
         </div>
 

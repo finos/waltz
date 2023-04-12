@@ -392,6 +392,7 @@ public class BulkUploadLegalEntityRelationshipServiceTest extends BaseInMemoryIn
         assertEquals(ResolutionStatus.NEW, secondRow.get().legalEntityRelationship().errors(), "Should correctly identify where a resolved row has a relationship that already exists");
     }
 
+
     @Test
     public void canResolveAssessmentsForLegalEntityRelationship() {
         String name = mkName("canResolveAssessmentsForLegalEntityRelationship");

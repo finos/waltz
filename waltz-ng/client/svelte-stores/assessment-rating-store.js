@@ -72,6 +72,14 @@ export function mkAssessmentRatingStore() {
                 summaryRequest,
                 {force});
 
+    const hasMultiValuedAssessments = (defnId, force = false) =>
+        remote
+            .fetchViewDatum(
+                "GET",
+                `api/assessment-rating/definition-id/${defnId}/mva-check`,
+                null,
+                {force});
+
     return {
         findByDefinitionId,
         findForEntityReference,
@@ -83,7 +91,8 @@ export function mkAssessmentRatingStore() {
         unlock,
         updateComment,
         updateRating,
-        findSummaryCounts
+        findSummaryCounts,
+        hasMultiValuedAssessments
     };
 }
 
