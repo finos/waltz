@@ -111,8 +111,8 @@ public class LegalEntityRelationshipKindDao {
                         .build());
     }
 
-    public LegalEntityRelKindStat findUsageStatsByKindAndSelector(Long relKindId,
-                                                                  Select<Record1<Long>> relSelector) {
+    public LegalEntityRelKindStat getUsageStatsByKindAndSelector(Long relKindId,
+                                                                 Select<Record1<Long>> relSelector) {
 
         SelectHavingStep<Record2<Long, Integer>> legalEntityCountsByRelKind = mkCountSelect(
                 distinctLERels,

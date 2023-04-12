@@ -49,7 +49,7 @@ public class LegalEntityRelationshipKindEndpoint implements Endpoint {
     }
 
     private LegalEntityRelKindStat findUsageStatsByRelKindAndSelector(Request request, Response response) throws IOException {
-        return legalEntityRelationshipKindService.findUsageStatsByKindAndSelector(getId(request), readIdSelectionOptionsFromBody(request));
+        return legalEntityRelationshipKindService.getUsageStatsByKindAndSelector(getId(request), readIdSelectionOptionsFromBody(request));
     }
 
 }

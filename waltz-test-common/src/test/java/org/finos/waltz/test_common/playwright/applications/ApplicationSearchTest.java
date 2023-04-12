@@ -49,6 +49,7 @@ public class ApplicationSearchTest extends BasePlaywrightIntegrationTest {
 
         Locator resultLocator = page
                 .locator(".wnso-search-results")
+                .getByTestId("entity-name")
                 .locator(format(
                         "text=%s",
                         appRef.name().orElse("?")));
@@ -66,7 +67,8 @@ public class ApplicationSearchTest extends BasePlaywrightIntegrationTest {
         assertThat(page.locator(".wnso-search-results")).isHidden();
 
         Locator appPageTitleLocator = page
-                .locator(".waltz-display-section")
+                .locator(".waltz-page-header")
+                .getByTestId("header-small")
                 .locator(format("text=%s", appRef.name().orElse("?")));
         assertThat(appPageTitleLocator).isVisible();
 
