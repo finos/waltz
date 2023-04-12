@@ -80,17 +80,6 @@ public class AttestationPreCheckServiceTest extends BaseInMemoryIntegrationTest 
         LogicalFlow flow = lfHelper.createLogicalFlow(aRef, bRef);
         lfHelper.createLogicalFlowDecorators(flow.entityReference(), asSet(unkId));
 
-
-        aipcSvc.calcLogicalFlowPreCheckFailures(aRef);
-
-        aipcSvc.calcLogicalFlowPreCheckFailures(aRef);
-
-        aipcSvc.calcLogicalFlowPreCheckFailures(aRef);
-
-        aipcSvc.calcLogicalFlowPreCheckFailures(aRef);
-
-        aipcSvc.calcLogicalFlowPreCheckFailures(aRef);
-
         aipcSvc.calcLogicalFlowPreCheckFailures(aRef);
         List<String> aResult = aipcSvc.calcLogicalFlowPreCheckFailures(aRef);
         assertTrue(aResult.isEmpty(), "ok as unknown is outgoing");
