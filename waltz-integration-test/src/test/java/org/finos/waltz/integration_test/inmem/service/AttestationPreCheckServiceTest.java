@@ -90,7 +90,7 @@ public class AttestationPreCheckServiceTest extends BaseInMemoryIntegrationTest 
 
 
     @Test
-    public void notAllowedToAttestAttestIfDeprecatedIncomingDataTypeFlows() throws InterruptedException {
+    public void notAllowedToAttestAttestIfDeprecatedIncomingDataTypeFlows() {
         EntityReference aRef = mkNewAppRef();
         EntityReference bRef = mkNewAppRef();
 
@@ -100,7 +100,6 @@ public class AttestationPreCheckServiceTest extends BaseInMemoryIntegrationTest 
         lfHelper.createLogicalFlowDecorators(flow.entityReference(), asSet(deprecatedTypeId));
 
         List<String> aResult = aipcSvc.calcLogicalFlowPreCheckFailures(aRef);
-        System.out.println(flow);
         assertEquals(Collections.emptyList(), aResult, "should have no failure messages as deprecated is outgoing");
 
         List<String> bResult = aipcSvc.calcLogicalFlowPreCheckFailures(bRef);
