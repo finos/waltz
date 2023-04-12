@@ -46,7 +46,7 @@ Column remarks have been used to describe in further detail the purpose of each 
     - Allows users to add, update and remove legal entity relationships and assessments associated to them
     - Detailed guide can be found here:
 - Assessments
-    - Single and multi-valued assessments can be linked to legal entities, and their
+    - Single and multi-valued assessments can be linked to legal entities, and their relationships
     - Assessments marked as `PRIMARY` for legal entity relationships will be shown as part of the grid visible in the '
       Legal Entity Relationships' and 'Relationships' sections
     - Assessments against legal entity relationships can be edited via the bulk editor
