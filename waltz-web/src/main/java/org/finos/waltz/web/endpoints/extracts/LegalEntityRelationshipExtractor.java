@@ -32,6 +32,7 @@ import org.finos.waltz.model.legal_entity.LegalEntityRelationshipViewAssessment;
 import org.finos.waltz.model.legal_entity.LegalEntityRelationshipViewRow;
 import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.service.legal_entity.LegalEntityRelationshipService;
+import org.finos.waltz.service.rating_scheme.RatingSchemeService;
 import org.finos.waltz.web.WebUtilities;
 import org.jooq.DSLContext;
 import org.jooq.lambda.tuple.Tuple3;
@@ -67,14 +68,17 @@ public class LegalEntityRelationshipExtractor implements DataExtractor {
     public static final String BASE_URL = mkPath("data-extract", "legal-entity-relationship");
     private final DSLContext dsl;
     private final LegalEntityRelationshipService relationshipService;
+    private final RatingSchemeService ratingSchemeService;
     private static final Logger LOG = LoggerFactory.getLogger(LegalEntityRelationshipExtractor.class);
 
 
     @Autowired
     public LegalEntityRelationshipExtractor(DSLContext dsl,
-                                            LegalEntityRelationshipService relationshipService) {
+                                            LegalEntityRelationshipService relationshipService,
+                                            RatingSchemeService ratingSchemeService) {
         this.dsl = dsl;
         this.relationshipService = relationshipService;
+        this.ratingSchemeService = ratingSchemeService;
     }
 
 
@@ -101,8 +105,11 @@ public class LegalEntityRelationshipExtractor implements DataExtractor {
 
         LegalEntityRelationshipView relationshipsView = relationshipService.getViewByRelKindAndSelector(relKindId, selectionOptions);
         List<EntityReference> headers = sort(relationshipsView.assessmentHeaders(), comparing(d -> d.name().get()));
+        Map<Long, RatingSchemeItem> ratingSchemeItemById = indexBy(
+                ratingSchemeService.findAllRatingSchemeItems(),
+                d -> d.id().get());
 
-        List<List<Object>> reportRows = prepareReportRows(relationshipsView.rows(), headers);
+        List<List<Object>> reportRows = prepareReportRows(relationshipsView.rows(), headers, ratingSchemeItemById);
 
         return formatReport(
                 format,
@@ -110,6 +117,7 @@ public class LegalEntityRelationshipExtractor implements DataExtractor {
                 headers,
                 reportRows);
     }
+
 
 
     private Tuple3<ExtractFormat, String, byte[]> formatReport(ExtractFormat format,
@@ -245,7 +253,8 @@ public class LegalEntityRelationshipExtractor implements DataExtractor {
     }
 
 
-    private List<List<Object>> prepareReportRows(Set<LegalEntityRelationshipViewRow> rows, List<EntityReference> headers) {
+    private List<List<Object>> prepareReportRows(Set<LegalEntityRelationshipViewRow> rows,
+                                                 List<EntityReference> headers, Map<Long, RatingSchemeItem> ratingSchemeItemsById) {
 
         Comparator<RatingSchemeItem> comparator = Comparator
                 .comparingInt(RatingSchemeItem::position)
@@ -268,8 +277,10 @@ public class LegalEntityRelationshipExtractor implements DataExtractor {
                     Map<Long, String> ratingOutcomesByDefinition = indexBy(
                             row.assessments(),
                             LegalEntityRelationshipViewAssessment::assessmentDefinitionId,
-                            d -> d.ratings()
+                            d -> d.ratingIds()
                                     .stream()
+                                    .map(ratingSchemeItemsById::get)
+                                    .filter(Objects::nonNull)
                                     .sorted(comparator)
                                     .map(NameProvider::name)
                                     .collect(Collectors.joining("; ")));

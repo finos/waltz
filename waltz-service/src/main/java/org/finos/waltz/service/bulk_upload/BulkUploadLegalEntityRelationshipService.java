@@ -14,7 +14,6 @@ import org.finos.waltz.model.legal_entity.ImmutableLegalEntityRelationship;
 import org.finos.waltz.model.legal_entity.LegalEntityRelationship;
 import org.finos.waltz.model.legal_entity.LegalEntityRelationshipKind;
 import org.finos.waltz.model.rating.RatingSchemeItem;
-import org.finos.waltz.schema.tables.records.AssessmentRatingRecord;
 import org.finos.waltz.service.assessment_definition.AssessmentDefinitionService;
 import org.finos.waltz.service.assessment_rating.AssessmentRatingService;
 import org.finos.waltz.service.bulk_upload.TabularDataUtilities.Row;
@@ -23,10 +22,7 @@ import org.finos.waltz.service.bulk_upload.column_parsers.ColumnParser;
 import org.finos.waltz.service.legal_entity.LegalEntityRelationshipKindService;
 import org.finos.waltz.service.legal_entity.LegalEntityRelationshipService;
 import org.finos.waltz.service.rating_scheme.RatingSchemeService;
-import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.DeleteConditionStep;
-import org.jooq.UpdateConditionStep;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
 import org.jooq.lambda.tuple.Tuple4;
@@ -35,7 +31,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -52,7 +47,6 @@ import static org.finos.waltz.common.SetUtilities.*;
 import static org.finos.waltz.common.StreamUtilities.mkSiphon;
 import static org.finos.waltz.common.StringUtilities.isEmpty;
 import static org.finos.waltz.common.StringUtilities.*;
-import static org.finos.waltz.data.JooqUtilities.summarizeResults;
 import static org.finos.waltz.model.DiffResult.mkDiff;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.bulk_upload.legal_entity_relationship.AssessmentHeaderCell.mkHeader;
@@ -62,7 +56,6 @@ import static org.finos.waltz.schema.Tables.ASSESSMENT_RATING;
 import static org.finos.waltz.service.bulk_upload.BulkUploadUtilities.getColumnValuesFromRows;
 import static org.finos.waltz.service.bulk_upload.TabularDataUtilities.streamData;
 import static org.finos.waltz.service.bulk_upload.assessment_strategy.AssessmentStrategy.determineStrategy;
-import static org.finos.waltz.service.bulk_upload.assessment_strategy.AssessmentStrategy.mkAssessmentRatingRecord;
 import static org.finos.waltz.service.bulk_upload.column_parsers.ColumnParser.sanitize;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
@@ -597,7 +590,7 @@ public class BulkUploadLegalEntityRelationshipService {
         Map<String, AssessmentDefinition> definitionsByName = indexBy(definitions, d -> sanitize(d.name()), d -> d);
 
         Map<Long, Set<RatingSchemeItem>> ratingSchemeItemsBySchemeId = groupAndThen(
-                ratingSchemeService.getAllRatingSchemeItems(),
+                ratingSchemeService.findAllRatingSchemeItems(),
                 RatingSchemeItem::ratingSchemeId,
                 SetUtilities::fromCollection);
 
