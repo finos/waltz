@@ -268,7 +268,7 @@ public class FlowPermissionCheckerTest extends BaseInMemoryIntegrationTest {
         assertEquals(SetUtilities.asSet(Operation.ADD), specNotInvolvedInFlows, "Spec permissions should be inherited from spec owner involvement regardless of whether it is associated to a flow");
 
         LogicalFlow flowAC = flowHelper.createLogicalFlow(appA, appC);
-        physicalFlowHelper.createPhysicalFlow(flowAC.entityReference().id(), specId3, mkName(stem, "Spec is not owned by app in flow which user has perms for"));
+        physicalFlowHelper.createPhysicalFlow(flowAC.entityReference().id(), specId3, u1);
 
         Set<Operation> flowExistsInvolvingAppButSpecIsNotOwnedByIt = flowPermissionChecker.findPermissionsForDecorator(specRef3, u1);
         assertEquals(emptySet(), flowExistsInvolvingAppButSpecIsNotOwnedByIt, "No permissions should be returned if no involvement with spec even if involvement with both source and target");

@@ -20,8 +20,9 @@ package org.finos.waltz.jobs.harness;
 
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.IdSelectionOptions;
-import org.finos.waltz.model.legal_entity.LegalEntityRelationshipView;
+import org.finos.waltz.model.legal_entity.LegalEntityRelKindStat;
 import org.finos.waltz.service.DIConfiguration;
+import org.finos.waltz.service.legal_entity.LegalEntityRelationshipKindService;
 import org.finos.waltz.service.legal_entity.LegalEntityRelationshipService;
 import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -37,15 +38,17 @@ public class LegalEntityHarness {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
         LegalEntityRelationshipService service = ctx.getBean(LegalEntityRelationshipService.class);
+        LegalEntityRelationshipKindService service2 = ctx.getBean(LegalEntityRelationshipKindService.class);
 
         IdSelectionOptions relOpts = mkOpts(mkRef(EntityKind.LEGAL_ENTITY_RELATIONSHIP_KIND, 2L));
         IdSelectionOptions appOpts = mkOpts(mkRef(EntityKind.APPLICATION, 1L));
 
 
-        LegalEntityRelationshipView viewByRelKindAndSelector = service.getViewByRelKindAndSelector(2L, relOpts);
+//        LegalEntityRelationshipView viewByRelKindAndSelector = service.getViewByRelKindAndSelector(2L, relOpts);
+        LegalEntityRelKindStat viewByRelKindAndSelector = service2.findUsageStatsByKindAndSelector(2L, relOpts);
 
 
-        System.out.println(viewByRelKindAndSelector.rows().size());
+        System.out.println(viewByRelKindAndSelector.relationshipCount());
 
     }
 
