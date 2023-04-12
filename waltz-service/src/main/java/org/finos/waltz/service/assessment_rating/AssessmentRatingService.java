@@ -430,4 +430,7 @@ public class AssessmentRatingService {
         return assessmentRatingDao.findRatingSummaryCounts(genericSelector, definitionIds);
     }
 
+    public boolean hasMultiValuedAssessments(long assessmentDefinitionId) {
+        return assessmentRatingDao.hasMultiValuedAssessments(assessmentDefinitionId);
+    }
 }

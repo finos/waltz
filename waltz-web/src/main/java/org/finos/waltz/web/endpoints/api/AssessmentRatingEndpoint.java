@@ -82,6 +82,7 @@ public class AssessmentRatingEndpoint implements Endpoint {
         String findByDefinitionPath = mkPath(BASE_URL, "definition-id", ":assessmentDefinitionId");
         String findByTargetKindForRelatedSelectorPath = mkPath(BASE_URL, "target-kind", ":targetKind", "selector");
         String findSummaryCountsPath = mkPath(BASE_URL, "target-kind", ":targetKind", "summary-counts");
+        String hasMultiValuedAssessmentsPath = mkPath(BASE_URL, "definition-id", ":assessmentDefinitionId", "mva-check");
         String modifyPath = mkPath(BASE_URL, "entity", ":kind", ":id", ":assessmentDefinitionId");
         String updateCommentPath = mkPath(BASE_URL, "id", ":id", "update-comment");
         String updateRatingPath = mkPath(BASE_URL, "id", ":id", "update-rating");
@@ -97,6 +98,7 @@ public class AssessmentRatingEndpoint implements Endpoint {
         getForList(findByDefinitionPath, this::findByDefinitionIdRoute);
         postForList(findSummaryCountsPath, this::findSummaryCountsRoute);
         getForList(findRatingPermissionsPath, this::findRatingPermissionsRoute);
+        getForDatum(hasMultiValuedAssessmentsPath, this::hasMultiValuedAssessmentsRoute);
         postForList(findByTargetKindForRelatedSelectorPath, this::findByTargetKindForRelatedSelectorRoute);
         postForDatum(bulkUpdatePath, this::bulkStoreRoute);
         postForDatum(bulkRemovePath, this::bulkRemoveRoute);
@@ -151,6 +153,12 @@ public class AssessmentRatingEndpoint implements Endpoint {
                         targetKind,
                         summaryCountRequest.idSelectionOptions(),
                         summaryCountRequest.definitionIds());
+    }
+
+
+    private boolean hasMultiValuedAssessmentsRoute(Request request, Response response) throws IOException {
+        long assessmentDefinitionId = getLong(request, "assessmentDefinitionId");
+        return assessmentRatingService.hasMultiValuedAssessments(assessmentDefinitionId);
     }
 
 
