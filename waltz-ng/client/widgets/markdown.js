@@ -34,11 +34,11 @@ const initialState = {
 
 
 const template = `
-    <waltz-svelte-component ng-if="$ctrl.text"
-                            component="$ctrl.Markdown"
-                            context="$ctrl.context"
-                            text="$ctrl.text">
-    </waltz-svelte-component>`;
+        <waltz-svelte-component ng-if="$ctrl.text"
+                                component="$ctrl.Markdown"
+                                context="$ctrl.context"
+                                text="$ctrl.text">
+        </waltz-svelte-component>`;
 
 
 function controller() {

@@ -27,16 +27,24 @@
     $: questionsCall = selectedTemplate && surveyQuestionStore.findQuestionsForTemplate(selectedTemplate?.id)
     $: questions = $questionsCall?.data || [];
 
+    $: showSectionName = _.some(questions, d => !_.isEmpty(d.sectionName))
+
     $: rowData = _
         .chain(questions)
         .filter(d => selectionFilter(mkReportGridFixedColumnRef(d, "questionText")))
         .value();
 
-    const columnDefs = [
-        {field: "questionText", name: "Question", width: "40%"},
+    const sectionCols = [{field: "sectionName", name: "Section", width: "40%"}];
+
+
+    const defaultColumnDefs = [
+        {field: 'questionText', name: 'Question', width: '40%'},
         {field: "label", name: "Label", width: "40%"},
-        {field: "fieldType", name: "Type", width: "20%"},
-    ];
+        {field: "fieldType", name: "Type", width: "20%"}];
+
+    $: columnDefs = showSectionName
+        ? _.concat(sectionCols, defaultColumnDefs)
+        : defaultColumnDefs
 
     const templateColumnDefs = [
         {field: "name", name: "Survey Name", width: "40%"},
