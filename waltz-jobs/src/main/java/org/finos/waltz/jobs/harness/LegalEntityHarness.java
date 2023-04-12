@@ -41,10 +41,8 @@ public class LegalEntityHarness {
         LegalEntityRelationshipKindService service2 = ctx.getBean(LegalEntityRelationshipKindService.class);
 
         IdSelectionOptions relOpts = mkOpts(mkRef(EntityKind.LEGAL_ENTITY_RELATIONSHIP_KIND, 2L));
-        IdSelectionOptions appOpts = mkOpts(mkRef(EntityKind.APPLICATION, 1L));
 
 
-//        LegalEntityRelationshipView viewByRelKindAndSelector = service.getViewByRelKindAndSelector(2L, relOpts);
         LegalEntityRelKindStat viewByRelKindAndSelector = service2.getUsageStatsByKindAndSelector(2L, relOpts);
 
 
