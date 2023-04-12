@@ -38,10 +38,10 @@ public class LegalEntityRelationshipKindService {
         return legalEntityRelationshipKindDao.findUsageStats();
     }
 
-    public LegalEntityRelKindStat findUsageStatsByKindAndSelector(Long relKindId,
-                                                                  IdSelectionOptions opts) {
+    public LegalEntityRelKindStat getUsageStatsByKindAndSelector(Long relKindId,
+                                                                 IdSelectionOptions opts) {
 
         Select<Record1<Long>> relSelector = legalEntityRelationshipIdSelectorFactory.apply(opts);
-        return legalEntityRelationshipKindDao.findUsageStatsByKindAndSelector(relKindId, relSelector);
+        return legalEntityRelationshipKindDao.getUsageStatsByKindAndSelector(relKindId, relSelector);
     }
 }

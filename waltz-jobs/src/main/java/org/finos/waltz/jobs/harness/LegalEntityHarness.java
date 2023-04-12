@@ -45,7 +45,7 @@ public class LegalEntityHarness {
 
 
 //        LegalEntityRelationshipView viewByRelKindAndSelector = service.getViewByRelKindAndSelector(2L, relOpts);
-        LegalEntityRelKindStat viewByRelKindAndSelector = service2.findUsageStatsByKindAndSelector(2L, relOpts);
+        LegalEntityRelKindStat viewByRelKindAndSelector = service2.getUsageStatsByKindAndSelector(2L, relOpts);
 
 
         System.out.println(viewByRelKindAndSelector.relationshipCount());
