@@ -41,11 +41,11 @@ function mkColumnDefs(uiGridConstants){
             cellTemplate:`
             <div class="ui-grid-cell-contents">
                  <span ng-bind="row.entity.costKind.name"
-                 uib-popover="{{row.entity.costKind.description}}"
-                 popover-append-to-body="true"
-                 popover-placement="top"
-                 popover-popup-delay="300"
-                 popover-trigger="mouseenter">
+                       uib-popover="{{row.entity.costKind.description}}"
+                       popover-append-to-body="true"
+                       popover-placement="top"
+                       popover-popup-delay="300"
+                       popover-trigger="mouseenter">
                 </span>
             </div>`
         },{
@@ -62,8 +62,8 @@ function mkColumnDefs(uiGridConstants){
             width: '25%',
             headerCellClass: 'waltz-grid-header-right',
             cellTemplate:`
-            <div class="ui-grid-cell-contents" 
-            style="padding-right: 2em">
+            <div class="ui-grid-cell-contents"
+                 style="padding-right: 2em">
                  <span class="pull-right">
                     <waltz-currency-amount amount="COL_FIELD">
                     </waltz-currency-amount>
@@ -84,7 +84,7 @@ function controller($q, serviceBroker, uiGridConstants, settingsService) {
     function loadCostInfo() {
         const costKindPromise = serviceBroker
             .loadAppData(CORE_API.CostKindStore.findAll)
-            .then(r => r.data);
+            .then(r => _.map(r.data, d => d.costKind));
 
         const costPromise = serviceBroker
             .loadViewData(CORE_API.CostStore.findByEntityReference, [vm.parentEntityRef])
@@ -115,7 +115,6 @@ function controller($q, serviceBroker, uiGridConstants, settingsService) {
                     .flatMap((costs, k) => _.maxBy(costs, c => c.year))
                     .orderBy(d => d.year, "desc")
                     .value();
-
             });
     }
 
