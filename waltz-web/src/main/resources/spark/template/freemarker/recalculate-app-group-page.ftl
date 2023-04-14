@@ -24,7 +24,7 @@
         <div style="border: 1px solid lightgreen; border-radius: 5px; padding: 10px">
             <span style="color: lightgreen; font-size: x-large; padding-right: 0.5em">&#10004;</span>
             <span style="font-size: x-large">Successfully updated application group</span>
-            <div style="padding-top: 1em">This group now contains ${appCount} applications passing the filter criteria
+            <div style="padding-top: 1em">This group now contains ${entityCount} entities passing the filter criteria
             </div>
         </div>
     <#else>

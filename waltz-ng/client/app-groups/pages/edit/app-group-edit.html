@@ -103,31 +103,35 @@
                 </waltz-no-data>
 
                 <div ng-if="ctrl.changeInitiatives.length > 0">
-                    <table class="table table-condensed table-striped small">
-                        <thead>
-                        <tr>
-                            <th>Id</th>
-                            <th>Name</th>
-                            <th></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr ng-repeat="item in ctrl.changeInitiatives"
-                            class="waltz-visibility-parent">
-                            <td><span ng-bind="item.externalId"></span></td>
-                            <td><span ng-bind="item.name"></span></td>
-                            <td>
-                                <a ng-click="ctrl.removeChangeInitiative(item)"
-                                   href
-                                   class="waltz-visibility-child-50">
-                                    <waltz-icon name="trash"></waltz-icon>
-                                    Remove
-                                </a>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <p>There are {{ctrl.changeInitiatives.length}} change initiatives in this group</p>
 
+                    <div class="waltz-scroll-region"
+                         style="height: 530px">
+                        <table class="table table-condensed table-striped small">
+                            <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Name</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="item in ctrl.changeInitiatives"
+                                class="waltz-visibility-parent">
+                                <td><span ng-bind="item.externalId"></span></td>
+                                <td><span ng-bind="item.name"></span></td>
+                                <td>
+                                    <a ng-click="ctrl.removeChangeInitiative(item)"
+                                       href
+                                       class="waltz-visibility-child-50">
+                                        <waltz-icon name="trash"></waltz-icon>
+                                        Remove
+                                    </a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
             <div class="col-md-6">

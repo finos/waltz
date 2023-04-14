@@ -43,6 +43,7 @@ import org.finos.waltz.model.orgunit.OrganisationalUnit;
 import org.finos.waltz.service.change_initiative.ChangeInitiativeService;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.jooq.lambda.tuple.Tuple2;
+import org.jooq.lambda.tuple.Tuple3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -438,8 +439,22 @@ public class AppGroupService {
     /*
     Removes all entries from groups and repopulates with the list of appGroupEntries
      */
-    public void replaceGroupEntries(Set<Tuple2<Long, Set<AppGroupEntry>>> entriesForGroups) {
-        appGroupEntryDao.replaceGroupEntries(entriesForGroups);
+    public void replaceGroupEntries(Set<Tuple3<EntityKind, Long, Set<AppGroupEntry>>> entriesForGroups) {
+
+        Set<Tuple2<Long, Set<AppGroupEntry>>> appEntriesToUpdate = entriesForGroups
+                .stream()
+                .filter(d -> d.v1.equals(EntityKind.APPLICATION))
+                .map(Tuple3::skip1)
+                .collect(Collectors.toSet());
+
+        Set<Tuple2<Long, Set<AppGroupEntry>>> initiativeEntriesToUpdate = entriesForGroups
+                .stream()
+                .filter(d -> d.v1.equals(EntityKind.CHANGE_INITIATIVE))
+                .map(Tuple3::skip1)
+                .collect(Collectors.toSet());
+
+        appGroupEntryDao.replaceGroupApplicationEntries(appEntriesToUpdate);
+        appGroupEntryDao.replaceGroupChangeInitiativeEntries(initiativeEntriesToUpdate);
     }
 
 
