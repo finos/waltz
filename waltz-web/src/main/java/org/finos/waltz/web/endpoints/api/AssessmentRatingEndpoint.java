@@ -82,8 +82,10 @@ public class AssessmentRatingEndpoint implements Endpoint {
         String findByDefinitionPath = mkPath(BASE_URL, "definition-id", ":assessmentDefinitionId");
         String findByTargetKindForRelatedSelectorPath = mkPath(BASE_URL, "target-kind", ":targetKind", "selector");
         String findSummaryCountsPath = mkPath(BASE_URL, "target-kind", ":targetKind", "summary-counts");
+        String hasMultiValuedAssessmentsPath = mkPath(BASE_URL, "definition-id", ":assessmentDefinitionId", "mva-check");
         String modifyPath = mkPath(BASE_URL, "entity", ":kind", ":id", ":assessmentDefinitionId");
-        String updatePath = mkPath(BASE_URL, "id", ":id");
+        String updateCommentPath = mkPath(BASE_URL, "id", ":id", "update-comment");
+        String updateRatingPath = mkPath(BASE_URL, "id", ":id", "update-rating");
         String removePath = mkPath(BASE_URL, "entity", ":kind", ":id", ":assessmentDefinitionId", ":ratingId");
         String lockPath = mkPath(BASE_URL, "entity", ":kind", ":id", ":assessmentDefinitionId", ":ratingId", "lock");
         String unlockPath = mkPath(BASE_URL, "entity", ":kind", ":id", ":assessmentDefinitionId", ":ratingId", "unlock");
@@ -96,11 +98,13 @@ public class AssessmentRatingEndpoint implements Endpoint {
         getForList(findByDefinitionPath, this::findByDefinitionIdRoute);
         postForList(findSummaryCountsPath, this::findSummaryCountsRoute);
         getForList(findRatingPermissionsPath, this::findRatingPermissionsRoute);
+        getForDatum(hasMultiValuedAssessmentsPath, this::hasMultiValuedAssessmentsRoute);
         postForList(findByTargetKindForRelatedSelectorPath, this::findByTargetKindForRelatedSelectorRoute);
         postForDatum(bulkUpdatePath, this::bulkStoreRoute);
         postForDatum(bulkRemovePath, this::bulkRemoveRoute);
         postForDatum(modifyPath, this::storeRoute);
-        postForDatum(updatePath, this::updateRoute);
+        postForDatum(updateCommentPath, this::updateCommentRoute);
+        postForDatum(updateRatingPath, this::updateRatingRoute);
         putForDatum(lockPath, this::lockRoute);
         putForDatum(unlockPath, this::unlockRoute);
         deleteForDatum(removePath, this::removeRoute);
@@ -152,6 +156,12 @@ public class AssessmentRatingEndpoint implements Endpoint {
     }
 
 
+    private boolean hasMultiValuedAssessmentsRoute(Request request, Response response) throws IOException {
+        long assessmentDefinitionId = getLong(request, "assessmentDefinitionId");
+        return assessmentRatingService.hasMultiValuedAssessments(assessmentDefinitionId);
+    }
+
+
     private boolean lockRoute(Request request, Response z) throws InsufficientPrivelegeException {
         return assessmentRatingService.lock(
                 getEntityReference(request),
@@ -176,9 +186,16 @@ public class AssessmentRatingEndpoint implements Endpoint {
     }
 
 
-    private boolean updateRoute(Request request, Response z) throws IOException, InsufficientPrivelegeException {
+    private boolean updateCommentRoute(Request request, Response z) throws IOException, InsufficientPrivelegeException {
         String comment = readComment(request);
-        return assessmentRatingService.update(getId(request), comment, getUsername(request));
+        return assessmentRatingService.updateComment(getId(request), comment, getUsername(request));
+    }
+
+
+    private boolean updateRatingRoute(Request request, Response z) throws IOException, InsufficientPrivelegeException {
+        UpdateRatingCommand updateRatingCommand = readBody(request, UpdateRatingCommand.class);
+        long assessmentRatingId = getId(request);
+        return assessmentRatingService.updateRating(assessmentRatingId, updateRatingCommand, getUsername(request));
     }
 
 

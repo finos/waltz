@@ -17,9 +17,11 @@
  */
 
 import _ from "lodash";
+import Component from "./Component.svelte";
+import {writable} from "svelte/store"
 
 
-const directive = function() {
+const directive = function () {
     let comp = null;
     return {
         restrict: "E",
@@ -43,9 +45,14 @@ const directive = function() {
                     {})
                 .value();
 
-            comp = new component({
+            const props = {
+                widget: component,
+                params: writable(initialProps)
+            }
+
+            comp = new Component({
                 target: elem[0],
-                props: initialProps
+                props
             });
 
             propKeys.forEach(({p, k}) => {
@@ -55,8 +62,7 @@ const directive = function() {
                     scope.$watch(
                         p,
                         (newVal, oldVal, s) => {
-                            const upd = {[k]: newVal};
-                            comp.$set(upd);
+                            props.params.update((old) => Object.assign({}, old, {[k]: newVal}))
                         });
                 }
             });

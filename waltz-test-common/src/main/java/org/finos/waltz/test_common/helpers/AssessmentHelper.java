@@ -2,6 +2,7 @@ package org.finos.waltz.test_common.helpers;
 
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
+import org.finos.waltz.model.Cardinality;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.assessment_definition.AssessmentVisibility;
@@ -14,6 +15,8 @@ import org.finos.waltz.service.assessment_rating.AssessmentRatingService;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 import static org.finos.waltz.common.StringUtilities.isEmpty;
 import static org.finos.waltz.schema.Tables.ASSESSMENT_DEFINITION;
@@ -34,16 +37,26 @@ public class AssessmentHelper {
 
 
     public long createDefinition(long schemeId, String name, String permittedRole, AssessmentVisibility visibility, String definitionGroup) {
+        return createDefinition(schemeId, name, permittedRole, visibility, definitionGroup, EntityKind.APPLICATION, Cardinality.ZERO_ONE, Optional.empty());
+    }
+
+    public long createDefinition(long schemeId, String name, String permittedRole, AssessmentVisibility visibility, String definitionGroup, EntityKind entityKind, EntityReference qualifierRef) {
+        return createDefinition(schemeId, name, permittedRole, visibility, definitionGroup, entityKind, Cardinality.ZERO_ONE, Optional.ofNullable(qualifierRef));
+    }
+
+    public long createDefinition(long schemeId, String name, String permittedRole, AssessmentVisibility visibility, String definitionGroup, EntityKind entityKind, Cardinality cardinality, Optional<EntityReference> qualifierRef) {
 
         ImmutableAssessmentDefinition.Builder def = ImmutableAssessmentDefinition.builder()
                 .name(name)
                 .description("desc")
                 .isReadOnly(false)
                 .externalId(mkName(name))
-                .entityKind(EntityKind.APPLICATION)
+                .entityKind(entityKind)
                 .lastUpdatedBy("test")
                 .visibility(visibility)
-                .ratingSchemeId(schemeId);
+                .cardinality(cardinality)
+                .ratingSchemeId(schemeId)
+                .qualifierReference(qualifierRef);
 
         if (!isEmpty(permittedRole)) {
             def.permittedRole(permittedRole);

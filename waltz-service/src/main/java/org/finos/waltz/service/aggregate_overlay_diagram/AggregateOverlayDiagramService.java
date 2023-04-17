@@ -1,5 +1,6 @@
 package org.finos.waltz.service.aggregate_overlay_diagram;
 
+import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.aggregate_overlay_diagram.*;
@@ -14,6 +15,7 @@ import org.finos.waltz.model.aggregate_overlay_diagram.overlay.*;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.*;
 import org.finos.waltz.model.application.Application;
 import org.finos.waltz.model.complexity.ComplexityKind;
+import org.finos.waltz.model.cost.CostKindWithYears;
 import org.finos.waltz.model.cost.EntityCostKind;
 import org.finos.waltz.model.measurable.Measurable;
 import org.jooq.Record1;
@@ -197,13 +199,14 @@ public class AggregateOverlayDiagramService {
 
         List<Measurable> measurables = measurableDao.findByMeasurableIdSelector(measurableSelector);
         List<Application> applications = applicationDao.findByAppIdSelector(entityIdSelector);
-        Set<EntityCostKind> costKinds = costKindDao.findAll();
+        Set<CostKindWithYears> costKindsWithYears = costKindDao.findAll();
 
-        return ImmutableCostWidgetData.builder()
+        return ImmutableCostWidgetData
+                .builder()
                 .cellData(costData)
                 .measurables(measurables)
                 .applications(applications)
-                .costKinds(costKinds)
+                .costKinds(SetUtilities.map(costKindsWithYears, CostKindWithYears::costKind))
                 .build();
     }
 

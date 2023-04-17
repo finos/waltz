@@ -24,6 +24,7 @@ public class AppHelper {
                 .registerApp(
                         ImmutableAppRegistrationRequest.builder()
                                 .name(name)
+                                .assetCode(name)
                                 .organisationalUnitId(ouId != null ? ouId : 1L)
                                 .applicationKind(ApplicationKind.IN_HOUSE)
                                 .businessCriticality(Criticality.MEDIUM)
@@ -33,7 +34,7 @@ public class AppHelper {
                                 .build(),
                         "appHelper");
 
-        return resp.id().map(id -> mkRef(EntityKind.APPLICATION, id)).get();
+        return resp.id().map(id -> mkRef(EntityKind.APPLICATION, id, name)).get();
     }
 
 

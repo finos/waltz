@@ -51,11 +51,18 @@ export function mkAssessmentRatingStore() {
             "DELETE",
             `api/assessment-rating/entity/${ref.kind}/${ref.id}/${defnId}/${ratingId}`);
 
-    const update = (id, comment) => remote
+    const updateComment = (id, comment) => remote
         .execute(
             "POST",
-            `api/assessment-rating/id/${id}`,
+            `api/assessment-rating/id/${id}/update-comment`,
             {comment});
+
+
+    const updateRating = (id, updateCmd) => remote
+        .execute(
+            "POST",
+            `api/assessment-rating/id/${id}/update-rating`,
+            updateCmd);
 
     const findSummaryCounts = (summaryRequest, targetKind, force = false) =>
         remote
@@ -63,6 +70,14 @@ export function mkAssessmentRatingStore() {
                 "POST",
                 `api/assessment-rating/target-kind/${targetKind}/summary-counts`,
                 summaryRequest,
+                {force});
+
+    const hasMultiValuedAssessments = (defnId, force = false) =>
+        remote
+            .fetchViewDatum(
+                "GET",
+                `api/assessment-rating/definition-id/${defnId}/mva-check`,
+                null,
                 {force});
 
     return {
@@ -74,8 +89,10 @@ export function mkAssessmentRatingStore() {
         remove,
         lock,
         unlock,
-        update,
-        findSummaryCounts
+        updateComment,
+        updateRating,
+        findSummaryCounts,
+        hasMultiValuedAssessments
     };
 }
 

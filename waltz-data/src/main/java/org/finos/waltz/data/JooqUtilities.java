@@ -38,6 +38,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.*;
@@ -367,10 +368,15 @@ public class JooqUtilities {
     }
 
 
-    public static Collection<? extends Field<?>> fieldsWithout(Table<?> t, Field<?> ...excludes) {
+    public static Collection<? extends Field<?>> fieldsWithout(Table<?> t, Field<?>... excludes) {
         return minus(
                 asSet(t.fields()),
                 asSet(excludes));
+    }
+
+
+    public static int summarizeResults(int[] rcs) {
+        return IntStream.of(rcs).sum();
     }
 
 }

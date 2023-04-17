@@ -1,4 +1,4 @@
-import {remote} from "./remote";
+import {remote, remoteApp} from "./remote";
 
 
 export function mkAssessmentDefinitionStore() {
@@ -8,6 +8,7 @@ export function mkAssessmentDefinitionStore() {
             "api/assessment-definition",
             null,
             {force});
+
 
     const getById = (id, force) => remote
         .fetchViewDatum(
@@ -24,19 +25,45 @@ export function mkAssessmentDefinitionStore() {
             null,
             {force});
 
-    const save = (def) => {
 
+    const save = (def) => {
         return remote
             .execute(
                 "PUT",
-                `api/assessment-definition`,
+                "api/assessment-definition",
                 def);
-    }
+    };
+
 
     const remove = (id) => remote
         .execute(
             "DELETE",
             `api/assessment-definition/id/${id}`);
+
+
+    // --- FAVOURITES (note use of remoteApp)
+
+    const addFavourite = (defId) => remoteApp
+        .execute(
+            "PUT",
+            `api/assessment-definition/id/${defId}/favourite`,
+            null);
+
+
+    const findFavouritesForUser = (force) => remoteApp
+        .fetchViewList(
+            "GET",
+            "api/assessment-definition/favourites",
+            null,
+            {force});
+
+
+    const removeFavourite = (defId) => remoteApp
+        .execute(
+            "DELETE",
+            `api/assessment-definition/id/${defId}/favourite`,
+            null);
+
 
     return {
         loadAll,
@@ -44,6 +71,9 @@ export function mkAssessmentDefinitionStore() {
         findByEntityReference,
         save,
         remove,
+        findFavouritesForUser,
+        addFavourite,
+        removeFavourite,
     };
 }
 

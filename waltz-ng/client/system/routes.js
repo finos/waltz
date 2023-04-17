@@ -32,6 +32,9 @@ import RatingSchemesView from "./rating-schemes-view";
 import EudaListView from "./euda-list-view";
 import RelationshipKindsView from "./relationship-kinds-view";
 import ReassignRecipientsView from "./reassign-recipients-view";
+import ColorGradientView from "./color-gradient-view";
+import NavAidBuilderView from "./nav-aid-builder-view";
+import VersionInfoView from "./version-info-view";
 
 
 const baseState = {
@@ -41,7 +44,7 @@ const baseState = {
 
 const listViewState = {
     url: "/list",
-    views: { "content@": SystemAdminList }
+    views: {"content@": SystemAdminList}
 };
 
 
@@ -107,13 +110,30 @@ const ratingSchemesState = {
 
 const eudaListState = {
     url: "/euda-list",
-    views: { "content@": EudaListView }
+    views: {"content@": EudaListView}
 };
 
 
 const relationshipKindsState = {
     url: "/relationship-kinds",
-    views: { "content@": RelationshipKindsView }
+    views: {"content@": RelationshipKindsView}
+};
+
+
+const colorGradientState = {
+    url: "/color-gradient",
+    views: {"content@": ColorGradientView}
+};
+
+
+const navAidBuilderState = {
+    url: "/nav-aid-builder",
+    views: {"content@": NavAidBuilderView}
+};
+
+const versionInfoState = {
+    url: "/version-info",
+    views: {"content@": VersionInfoView}
 };
 
 
@@ -132,7 +152,10 @@ function setupRoutes($stateProvider) {
         .state("main.system.euda-list", eudaListState)
         .state("main.system.relationship-kinds", relationshipKindsState)
         .state("main.system.recalculate", recalculateState)
-        .state("main.system.reassign-recipients", reassignRecipientsState);
+        .state("main.system.reassign-recipients", reassignRecipientsState)
+        .state("main.system.color-gradient", colorGradientState)
+        .state("main.system.nav-aid-builder", navAidBuilderState)
+        .state("main.system.version-info", versionInfoState);
 }
 
 

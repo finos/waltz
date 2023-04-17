@@ -15,6 +15,7 @@ import java.util.Optional;
 @JsonDeserialize(as = ImmutableResolveBulkUploadRequestParameters.class)
 public abstract class ResolveBulkUploadRequestParameters {
 
+    @Value.Redacted
     public abstract String inputString();
 
     public abstract EntityReference targetDomain();

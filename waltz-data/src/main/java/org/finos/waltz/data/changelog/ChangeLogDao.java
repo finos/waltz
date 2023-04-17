@@ -40,6 +40,7 @@ import java.util.Optional;
 import static org.finos.waltz.common.Checks.checkNotEmpty;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
+import static org.finos.waltz.common.ObjectUtilities.firstNotNull;
 import static org.finos.waltz.data.JooqUtilities.*;
 import static org.finos.waltz.schema.Tables.PERSON;
 import static org.finos.waltz.schema.tables.ChangeLog.CHANGE_LOG;
@@ -322,7 +323,9 @@ public class ChangeLogDao {
                         .set(CHANGE_LOG.OPERATION, changeLog.operation().name())
                         .set(CHANGE_LOG.CREATED_AT, Timestamp.valueOf(changeLog.createdAt())))
                 .toArray(Query[]::new);
-        return dsl.batch(queries).execute();
+        return dsl
+                .batch(queries)
+                .execute();
     }
 
 

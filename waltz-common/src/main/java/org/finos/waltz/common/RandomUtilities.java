@@ -21,6 +21,7 @@ package org.finos.waltz.common;
 import org.jooq.lambda.tuple.Tuple2;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -136,5 +137,10 @@ public class RandomUtilities {
 
     public static boolean randomTrue(double ratio) {
         return rnd.nextDouble() < ratio;
+    }
+
+
+    public static long randomLongBetween(long low, long hi) {
+        return low + ThreadLocalRandom.current().nextLong(hi - low);
     }
 }

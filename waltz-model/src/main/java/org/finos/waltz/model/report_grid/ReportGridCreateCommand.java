@@ -23,7 +23,7 @@ public abstract class ReportGridCreateCommand implements Command {
 
     @Value.Default
     public ReportGridKind kind() {
-        return ReportGridKind.PUBLIC;
+        return ReportGridKind.PRIVATE;
     }
 
     public String toExtId() {

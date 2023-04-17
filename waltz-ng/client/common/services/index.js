@@ -117,9 +117,14 @@ export default (module) => {
 
 
     function configServiceBroker($transitions, serviceBroker) {
+        // we want to skip the clear step when first configuring the router
+        let skipClear = true;
         $transitions.onBefore({}, (transition, state, opts) => {
-
-            remote.clear();
+            if (skipClear) {
+                skipClear = false;
+            } else {
+                remote.clear();
+            }
             const promise = serviceBroker
                 .loadViewData(CORE_API.ClientCacheKeyStore.findAll)
                 .then(r => r.data)

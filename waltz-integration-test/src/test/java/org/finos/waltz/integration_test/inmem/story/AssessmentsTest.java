@@ -8,10 +8,7 @@ import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.assessment_definition.AssessmentVisibility;
 import org.finos.waltz.model.assessment_definition.ImmutableAssessmentDefinition;
-import org.finos.waltz.model.assessment_rating.AssessmentRating;
-import org.finos.waltz.model.assessment_rating.ImmutableRemoveAssessmentRatingCommand;
-import org.finos.waltz.model.assessment_rating.ImmutableSaveAssessmentRatingCommand;
-import org.finos.waltz.model.assessment_rating.SaveAssessmentRatingCommand;
+import org.finos.waltz.model.assessment_rating.*;
 import org.finos.waltz.model.rating.ImmutableRatingSchemeItem;
 import org.finos.waltz.service.assessment_definition.AssessmentDefinitionService;
 import org.finos.waltz.service.assessment_rating.AssessmentRatingService;
@@ -124,15 +121,18 @@ public class AssessmentsTest extends BaseInMemoryIntegrationTest {
                 app1,
                 Operation.ADD);
 
-        assertNotNull(find(
+        Optional<AssessmentRating> ratingCreated = find(
                 r -> r.assessmentDefinitionId() == defId && r.ratingId() == schemeDetail.y,
-                ratingService.findForEntity(app1)));
+                ratingService.findForEntity(app1));
+
+        assertTrue(ratingCreated.isPresent());
         assertTrue(ratingService.findForEntity(app2).isEmpty());
 
-        ratingService.store(
-                ImmutableSaveAssessmentRatingCommand
-                    .copyOf(cmd)
-                    .withRatingId(schemeDetail.n),
+        ratingService.updateRating(
+                ratingCreated.get().id().get(),
+                ImmutableUpdateRatingCommand.builder()
+                        .newRatingId(schemeDetail.n)
+                        .build(),
                 userWithPerms);
 
         changeLogHelper.assertChangeLogContainsAtLeastOneMatchingOperation(
@@ -155,6 +155,7 @@ public class AssessmentsTest extends BaseInMemoryIntegrationTest {
                 ImmutableRemoveAssessmentRatingCommand.builder()
                         .assessmentDefinitionId(defId)
                         .entityReference(app1)
+                        .ratingId(schemeDetail.n)
                         .lastUpdatedBy(userWithPerms)
                     .build(),
                 userWithPerms);
@@ -188,7 +189,7 @@ public class AssessmentsTest extends BaseInMemoryIntegrationTest {
                         .ratingSchemeId(schemeId)
                         .position(10)
                         .color("green")
-                        .rating('Y')
+                        .rating("Y")
                         .build());
 
         Long n = schemeService.saveRatingItem(
@@ -199,7 +200,7 @@ public class AssessmentsTest extends BaseInMemoryIntegrationTest {
                         .ratingSchemeId(schemeId)
                         .position(20)
                         .color("red")
-                        .rating('N')
+                        .rating("N")
                         .build());
 
         Long m = schemeService.saveRatingItem(
@@ -210,7 +211,7 @@ public class AssessmentsTest extends BaseInMemoryIntegrationTest {
                         .ratingSchemeId(schemeId)
                         .position(30)
                         .color("yellow")
-                        .rating('M')
+                        .rating("M")
                         .userSelectable(false)
                         .build());
 

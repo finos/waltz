@@ -31,7 +31,6 @@ import {
     prepareTableData
 } from "../svelte/report-grid-utils";
 import {displayError} from "../../../common/error-utils";
-import toasts from "../../../svelte-stores/toast-store";
 import {coalesceFns} from "../../../common/function-utils";
 
 

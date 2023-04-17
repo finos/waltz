@@ -39,7 +39,7 @@ function controller($document,
     vm.history = localStorageService
         .get("history_2") || [];
 
-    $document[0].title = "Waltz";
+    document.title = "Waltz: Home";
 
 }
 

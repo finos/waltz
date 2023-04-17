@@ -82,6 +82,6 @@ export function filterBookmarks(xs, kind, qry) {
             : () => true)
         .filter(_.isEmpty(qry)
             ? () => true
-            : b => _.join([b.title, b.url, b.description]).toLowerCase().indexOf(qry) > -1)
+            : b => _.join([b.title, " ", b.url, " ", b.description]).toLowerCase().indexOf(_.toLower(qry)) > -1)
         .value();
 }

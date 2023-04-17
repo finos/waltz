@@ -49,16 +49,17 @@
     function valueChanged(columnDefs, column) {
         const updatedColumn = _.find(columnDefs, d => sameColumnRef(d, column));
         return column.id != null //new columns cannot be reset
-            && (updatedColumn.additionalColumnOptionsChanged
-                || updatedColumn.displayNameChanged
-                || updatedColumn.externalIdChanged);
+            && (updatedColumn?.additionalColumnOptionsChanged
+                || updatedColumn?.displayNameChanged
+                || updatedColumn?.externalIdChanged);
     }
 
     function selectColumnOptions(columnOptions, column) {
+        const workingColumn = _.find($columnDefs, d => sameColumnRef(d, column));
         const originalColumn = _.find($selectedGrid.definition.fixedColumnDefinitions, d => sameColumnRef(d, column));
         const newColumn = Object.assign(
             {},
-            column,
+            workingColumn,
             {
                 additionalColumnOptions: columnOptions?.key,
                 additionalColumnOptionsChanged: columnOptions?.key !== originalColumn?.additionalColumnOptions
@@ -68,10 +69,11 @@
     }
 
     function updateDisplayName(workingDisplayName, column) {
+        const workingColumn = _.find($columnDefs, d => sameColumnRef(d, column));
         const originalColumn = _.find($selectedGrid.definition.fixedColumnDefinitions, d => sameColumnRef(d, column));
         const newColumn = Object.assign(
             {},
-            column,
+            workingColumn,
             {
                 displayName: workingDisplayName,
                 displayNameChanged: workingDisplayName !== originalColumn?.displayName
@@ -81,10 +83,11 @@
     }
 
     function updateExternalId(workingExternalId, column) {
+        const workingColumn = _.find($columnDefs, d => sameColumnRef(d, column));
         const originalColumn = _.find($selectedGrid.definition.fixedColumnDefinitions, d => sameColumnRef(d, column));
         const newColumn = Object.assign(
             {},
-            column,
+            workingColumn,
             {
                 externalId: workingExternalId,
                 externalIdChanged: workingExternalId !== originalColumn?.externalId
@@ -92,7 +95,6 @@
         const columnsWithoutCol = _.reject($columnDefs, d => sameColumnRef(d, column));
         $columnDefs = _.concat(columnsWithoutCol, newColumn);
     }
-
 
 </script>
 
@@ -136,7 +138,7 @@
     </tr>
     <tr>
         <td>
-            <div>External ID</div>
+            <div>External ID (Recommended)</div>
             <div class="small help-text">An identifier used to reference this column in derivation scripts and filter
                 notes
             </div>

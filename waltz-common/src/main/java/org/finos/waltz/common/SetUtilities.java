@@ -173,4 +173,13 @@ public class SetUtilities {
                 .orElse(ts);
     }
 
+
+    public static <T> Set<T> add(Set<T> orig, T... ts) {
+        return union(orig, asSet(ts));
+    }
+
+
+    public static <T> Set<T> remove(Set<T> orig, T... ts) {
+        return minus(orig, asSet(ts));
+    }
 }

@@ -85,7 +85,7 @@ const entityNamedNotesSection = {
 
 const entityStatisticSection = {
     componentId: "entity-statistic-section",
-    name: "Indicators",
+    name: "Statistics",
     icon: "pie-chart",
     description: "Statistics for this entity",
     id: 11,
@@ -157,7 +157,7 @@ const technologySummarySection = {
 
 const entityStatisticSummarySection = {
     componentId: "entity-statistic-summary-section",
-    name: "Indicators",
+    name: "Statistics",
     icon: "pie-chart",
     description: "Summarised statistics for apps related to this entity, can be used to drill down into history",
     id: 20
@@ -428,18 +428,19 @@ const entityAttestationSection = {
 const legalEntitySection = {
     // svelteComponent: LegalEntitySection,
     componentId: "legal-entity-section",
-    name: "Legal Entities",
+    name: "Legal Entity Relationships",
     icon: "building-o",
-    description: "Legal Entities related to this entity",
+    description: "Legal Entity relationships related to this entity",
     id: 10010,
 };
 
-const legalEntityRelationshipsSection = {
+
+const legalEntityRelationshipKindSection = {
     // svelteComponent: LegalEntityRelationshipSection,
-    componentId: "legal-entity-relationship-section",
-    name: "Related Entities",
+    componentId: "legal-entity-relationship-kind-section",
+    name: "Relationships",
     icon: "link",
-    description: "Relationships to other entities",
+    description: "Relationships between legal entities and other waltz entities of this relationship kind",
     id: 10020,
 };
 
@@ -471,7 +472,7 @@ export const dynamicSections = {
     flowSpecDefinitionSection,
     involvedPeopleSection,
     legalEntitySection,
-    legalEntityRelationshipsSection,
+    legalEntityRelationshipKindSection,
     licenceSection,
     logicalDataElementsSection,
     logicalFlowsTabgroupSection,
@@ -578,6 +579,7 @@ const orgUnitSections = [
     changeSetSection,
     involvedPeopleSection,
     pack(logicalFlowsTabgroupSection, [flowClassificationRulesSection]),
+    legalEntitySection,
     orgUnitDirectMeasurableSection,
     changeLogSection
 ];
@@ -598,6 +600,7 @@ const measurableSections = [
     entityNamedNotesSection,
     involvedPeopleSection,
     pack(logicalFlowsTabgroupSection, [flowClassificationRulesSection]),
+    legalEntitySection,
     measurableRatingExplorerSection,
     relatedMeasurablesSection,
     changeLogSection
@@ -620,8 +623,9 @@ const personSections = [
     entityDiagramsSection,
     personChangeSetSection,
     personHierarchySection,
-    surveySection,
     personMeasurableInvolvementsSection,
+    legalEntitySection,
+    surveySection,
     changeLogSection
 ];
 
@@ -655,6 +659,7 @@ const appGroupSections = [
     entityNamedNotesSection,
     involvedPeopleSection,
     pack(logicalFlowsTabgroupSection, [flowClassificationRulesSection]),
+    legalEntitySection,
     relatedAppGroupsSection,
     relatedDataTypesSection,
     relatedMeasurablesSection,
@@ -795,7 +800,24 @@ const legalEntitySections = [
     bookmarksSection,
     entityNamedNotesSection,
     involvedPeopleSection,
-    legalEntityRelationshipsSection,
+    legalEntitySection,
+    changeLogSection
+];
+
+const legalEntityRelationshipKindSections = [
+    assessmentRatingSection,
+    bookmarksSection,
+    entityNamedNotesSection,
+    involvedPeopleSection,
+    legalEntityRelationshipKindSection,
+    changeLogSection
+];
+
+const legalEntityRelationshipSections = [
+    assessmentRatingSection,
+    bookmarksSection,
+    entityNamedNotesSection,
+    involvedPeopleSection,
     changeLogSection
 ];
 
@@ -818,6 +840,8 @@ export const dynamicSectionsByKind = {
     "main.flow-classification-rule.view": flowClassificationRuleSections,
     "main.flow-diagram.view": flowDiagramSections,
     "main.legal-entity.view": legalEntitySections,
+    "main.legal-entity-relationship.view": legalEntityRelationshipSections,
+    "main.legal-entity-relationship-kind.view": legalEntityRelationshipKindSections,
     "main.licence.external-id": licenceSections,
     "main.licence.view": licenceSections,
     "main.logical-flow.view": logicalDataFlowSections,

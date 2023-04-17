@@ -18,7 +18,6 @@
 
 package org.finos.waltz.service.assessment_rating;
 
-import org.finos.waltz.common.MapUtilities;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.data.GenericSelector;
@@ -31,9 +30,11 @@ import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.assessment_rating.*;
 import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.rating.RatingScheme;
 import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.permission.permission_checker.AssessmentRatingPermissionChecker;
+import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,6 +43,7 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.model.EntityReference.mkRef;
 
@@ -85,7 +87,12 @@ public class AssessmentRatingService {
 
 
     public List<AssessmentRating> findByEntityKind(EntityKind targetKind) {
-        return assessmentRatingDao.findByEntityKind(targetKind);
+        return assessmentRatingDao.findByEntityKind(targetKind, Optional.empty());
+    }
+
+
+    public List<AssessmentRating> findByEntityKind(EntityKind targetKind, Optional<EntityReference> qualifierReference) {
+        return assessmentRatingDao.findByEntityKind(targetKind, qualifierReference);
     }
 
 
@@ -169,22 +176,32 @@ public class AssessmentRatingService {
 
         changeLogService.write(logEntry);
 
-        return assessmentRatingDao.remove(command);
+        return assessmentRatingDao.bulkRemove(command);
     }
 
 
     public boolean bulkStore(BulkAssessmentRatingCommand[] commands,
                              long assessmentDefinitionId,
                              String username) {
+
+        AssessmentDefinition defn = assessmentDefinitionDao.getById(assessmentDefinitionId);
+
         Set<AssessmentRating> ratingsToAdd = getRatingsFilterByOperation(commands, assessmentDefinitionId, username, Operation.ADD);
         int addedResult = assessmentRatingDao.add(ratingsToAdd);
         createChangeLogs(assessmentDefinitionId, username, ratingsToAdd, Operation.ADD);
 
         Set<AssessmentRating> ratingsToUpdate = getRatingsFilterByOperation(commands, assessmentDefinitionId, username, Operation.UPDATE);
-        int updateResult = assessmentRatingDao.update(ratingsToUpdate);
+
+        int updatedCommentsResult;
+
+        if (defn.cardinality().equals(Cardinality.ZERO_ONE)) {
+            updatedCommentsResult = assessmentRatingDao.bulkUpdateSingleValuedAssessments(ratingsToUpdate);
+        } else {
+            updatedCommentsResult = assessmentRatingDao.bulkUpdateMultiValuedAssessments(ratingsToUpdate);
+        }
         createChangeLogs(assessmentDefinitionId, username, ratingsToUpdate, Operation.ADD);
 
-        return addedResult + updateResult > 1;
+        return addedResult + updatedCommentsResult > 1;
     }
 
 
@@ -193,9 +210,9 @@ public class AssessmentRatingService {
                               String username) {
         Set<AssessmentRating> ratingsToRemove = getRatingsFilterByOperation(commands, assessmentDefinitionId, username, Operation.REMOVE);
         createChangeLogs(assessmentDefinitionId, username, ratingsToRemove, Operation.REMOVE);
-        int result = assessmentRatingDao.remove(ratingsToRemove);
+        int result = assessmentRatingDao.bulkRemove(ratingsToRemove);
 
-        return result  > 1;
+        return result > 1;
     }
 
 
@@ -216,7 +233,7 @@ public class AssessmentRatingService {
     }
 
 
-    public boolean update(long id, String comment, String username) throws InsufficientPrivelegeException {
+    public boolean updateComment(long id, String comment, String username) throws InsufficientPrivelegeException {
         AssessmentRating existingRating = assessmentRatingDao.getById(id);
         verifyAnyPermission(asSet(Operation.UPDATE, Operation.ADD),
                 existingRating.entityReference(),
@@ -225,6 +242,24 @@ public class AssessmentRatingService {
                 username);
         createUpdateCommentChangeLogs(id, comment, username); // do first so that comment from old rating retained
         return assessmentRatingDao.updateComment(id, comment, username);
+    }
+
+    public boolean updateRating(long assessmentRatingId, UpdateRatingCommand cmd, String username) throws InsufficientPrivelegeException {
+        AssessmentRating existingRating = assessmentRatingDao.getById(assessmentRatingId);
+        AssessmentDefinition definition = assessmentDefinitionDao.getById(existingRating.assessmentDefinitionId());
+
+        verifyAnyPermission(asSet(Operation.UPDATE, Operation.ADD),
+                existingRating.entityReference(),
+                existingRating.assessmentDefinitionId(),
+                existingRating.ratingId(),
+                username);
+
+        if (definition.cardinality().equals(Cardinality.ZERO_ONE)) {
+            createUpdateRatingChangeLogs(existingRating, definition, cmd, username); // do first so that comment from old rating retained
+            return assessmentRatingDao.updateRating(assessmentRatingId, cmd, username);
+        } else {
+            throw new IllegalArgumentException("Cannot update ratings for multi-valued assessments, you must remove the rating then add another");
+        }
     }
 
 
@@ -277,29 +312,29 @@ public class AssessmentRatingService {
     private void createChangeLogEntryForSave(SaveAssessmentRatingCommand command,
                                              String username,
                                              AssessmentDefinition assessmentDefinition) {
-        Optional<AssessmentRating>  previousRating = assessmentRatingDao.findForEntity(command.entityReference())
-                                                                        .stream()
-                                                                        .filter(r -> r.assessmentDefinitionId() == command.assessmentDefinitionId())
-                                                                        .findAny();
+        Optional<AssessmentRating> previousRating = assessmentRatingDao.findForEntity(command.entityReference())
+                .stream()
+                .filter(r -> r.assessmentDefinitionId() == command.assessmentDefinitionId())
+                .findAny();
         Optional<RatingSchemeItem> previousRatingSchemeItem = previousRating.map(assessmentRating -> ratingSchemeDAO.getRatingSchemeItemById(assessmentRating.ratingId()));
         Optional<String> messagePostfix = previousRatingSchemeItem
                 .map(rn -> format(" from assessment %s as [%s - %s]",
-                                  assessmentDefinition.name(),
-                                  rn.name(),
-                                  previousRating.get().comment()));
+                        assessmentDefinition.name(),
+                        rn.name(),
+                        previousRating.get().comment()));
 
         ChangeLog logEntry = ImmutableChangeLog.builder()
-                                               .message(format(
-                                                       "Storing assessment %s as [%s - %s]%s",
-                                                       assessmentDefinition.name(),
-                                                       ratingSchemeDAO.getRatingSchemeItemById(command.ratingId()).name(),
-                                                       command.comment(),
-                                                       messagePostfix.orElse("")))
-                                               .parentReference(mkRef(command.entityReference().kind(), command.entityReference().id()))
-                                               .userId(username)
-                                               .severity(Severity.INFORMATION)
-                                               .operation(Operation.UPDATE)
-                                               .build();
+                .message(format(
+                        "Storing assessment %s as [%s - %s]%s",
+                        assessmentDefinition.name(),
+                        ratingSchemeDAO.getRatingSchemeItemById(command.ratingId()).name(),
+                        command.comment(),
+                        messagePostfix.orElse("")))
+                .parentReference(mkRef(command.entityReference().kind(), command.entityReference().id()))
+                .userId(username)
+                .severity(Severity.INFORMATION)
+                .operation(Operation.UPDATE)
+                .build();
 
         changeLogService.write(logEntry);
     }
@@ -313,7 +348,7 @@ public class AssessmentRatingService {
         String messagePrefix = operation.equals(Operation.REMOVE) ? "Removed" : "Added";
 
         AssessmentDefinition assessmentDefinition = assessmentDefinitionDao.getById(assessmentDefinitionId);
-        Map<Long, RatingSchemeItem> ratingItems = MapUtilities.indexBy(
+        Map<Long, RatingSchemeItem> ratingItems = indexBy(
                 ratingSchemeDAO.findRatingSchemeItemsForAssessmentDefinition(assessmentDefinitionId),
                 r -> r.id().orElse(0L));
 
@@ -360,11 +395,42 @@ public class AssessmentRatingService {
         changeLogService.write(asSet(log));
     }
 
+    private void createUpdateRatingChangeLogs(AssessmentRating rating,
+                                              AssessmentDefinition definition,
+                                              UpdateRatingCommand updateRatingCommand,
+                                              String username) {
+
+        RatingScheme ratingScheme = ratingSchemeDAO.getById(definition.ratingSchemeId());
+
+        Map<Long, String> ratingsById = indexBy(ratingScheme.ratings(), d -> d.id().get(), NameProvider::name);
+
+        String oldRating = ratingsById.get(rating.ratingId());
+        String newRating = ratingsById.get(updateRatingCommand.newRatingId());
+
+        ImmutableChangeLog log = ImmutableChangeLog.builder()
+                .message(format(
+                        "Updated rating for assessment '%s', from: '%s' to '%s'",
+                        definition.name(),
+                        oldRating,
+                        newRating))
+                .parentReference(rating.entityReference())
+                .userId(username)
+                .severity(Severity.INFORMATION)
+                .operation(Operation.UPDATE)
+                .build();
+
+        changeLogService.write(asSet(log));
+    }
+
     public Set<AssessmentRatingSummaryCounts> findRatingSummaryCounts(EntityKind targetKind,
                                                                       IdSelectionOptions idSelectionOptions,
                                                                       Set<Long> definitionIds) {
 
         GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, idSelectionOptions);
         return assessmentRatingDao.findRatingSummaryCounts(genericSelector, definitionIds);
+    }
+
+    public boolean hasMultiValuedAssessments(long assessmentDefinitionId) {
+        return assessmentRatingDao.hasMultiValuedAssessments(assessmentDefinitionId);
     }
 }

@@ -11,32 +11,63 @@
         possibleEntityKinds,
         selectedDefinition
     } from "./assessment-definition-utils";
+    import {measurableCategoryStore} from "../../../svelte-stores/measurable-category-store";
+    import {legalEntityRelationshipKindStore} from "../../../svelte-stores/legal-entity-relationship-kind-store";
 
     export let doCancel;
     export let doSave;
 
-    const ratingSchemesCall = ratingSchemeStore.loadAll();
+    const qualifiableKinds = _
+        .chain(possibleEntityKinds)
+        .reject(d => _.isNil(d.qualifierKind))
+        .map(d => d.value)
+        .value();
 
-    let hasRatings = false;
-    let savePromise = null;
-
-    let ratingCall;
+    function toRef(d) {
+        return {
+            id: d.id,
+            name: d.name,
+            kind: d.kind
+        };
+    }
 
     function save() {
-        savePromise = doSave($selectedDefinition);
+        const def = Object.assign({}, $selectedDefinition);
+        if (! _.includes(qualifiableKinds, $selectedDefinition.entityKind)) {
+            def.qualifierReference = null;
+        }
+        savePromise = doSave(def);
     }
+
+    const ratingSchemesCall = ratingSchemeStore.loadAll();
+    const measurableCategoryCall = measurableCategoryStore.findAll();
+    const legalEntityRelationshipKindCall = legalEntityRelationshipKindStore.findAll();
+
+    let ratings = [];
+    let measurableCategories = [];
+    let legalEntityRelationshipKinds = [];
+    let hasRatings = false;
+    let savePromise = null;
+    let ratingCall;
+    let hasMultiValuesAssessmentsCall;
+    let canEditCardinality = true;
 
     $: {
         if ($selectedDefinition.id) {
             ratingCall = assessmentRatingStore.findByDefinitionId($selectedDefinition.id);
+            hasMultiValuesAssessmentsCall = assessmentRatingStore.hasMultiValuedAssessments($selectedDefinition.id);
         }
     }
 
-
+    $: canEditCardinality = !$selectedDefinition.id || !$hasMultiValuesAssessmentsCall?.data; // allow edit for new categories without check
     $: ratings = $ratingCall?.data || [];
-    $: hasRatings = ratings.length > 0;
     $: possibleRatingSchemes = _.sortBy($ratingSchemesCall.data, d => d.name);
+    $: measurableCategories = _.map($measurableCategoryCall?.data || [], toRef);
+    $: legalEntityRelationshipKinds = _.map($legalEntityRelationshipKindCall?.data || [], toRef);
+
+    $: hasRatings = ratings.length > 0;
     $: invalid = _.some(getRequiredFields($selectedDefinition), v => _.isNil(v));
+    $: qualifierKind = _.find(possibleEntityKinds, d => d.value === $selectedDefinition.entityKind)?.qualifierKind;
 </script>
 
 
@@ -111,8 +142,43 @@
                         <Icon name="warning"/>
                         The associated entity kind for this definition cannot be changed as ratings already exist.
                     {/if}
-
                 </div>
+
+                <!-- QUALIFIER: MEASURABLE_CATEGORY -->
+                {#if qualifierKind === "MEASURABLE_CATEGORY"}
+                    <label for="measurableCategory">
+                        Qualifier: Measurable Category
+                        <small class="text-muted">(required)</small>
+                    </label>
+                    <select id="measurableCategory"
+                            disabled={hasRatings}
+                            bind:value={$selectedDefinition.qualifierReference}>
+
+                        {#each measurableCategories as mc}
+                            <option value={mc}>
+                                {mc.name}
+                            </option>
+                        {/each}
+                    </select>
+                {/if}
+
+                <!-- QUALIFIER: LEGAL_ENTITY_RELATIONSHIP_KIND -->
+                {#if qualifierKind === "LEGAL_ENTITY_RELATIONSHIP_KIND"}
+                    <label for="legalEntityRelationshipKind">
+                        Qualifier: Legal Entity Relationship Kind
+                        <small class="text-muted">(required)</small>
+                    </label>
+                    <select id="legalEntityRelationshipKind"
+                            disabled={hasRatings}
+                            bind:value={$selectedDefinition.qualifierReference}>
+
+                        {#each legalEntityRelationshipKinds as lerk}
+                            <option value={lerk}>
+                                {lerk.name}
+                            </option>
+                        {/each}
+                    </select>
+                {/if}
 
 
                 <!-- DESCRIPTION -->
@@ -152,6 +218,7 @@
                     Cardinality
                 </label>
                 <select id="cardinality"
+                        disabled={!canEditCardinality}
                         bind:value={$selectedDefinition.cardinality}>
                     <option value="ZERO_ONE">
                         Zero to One
@@ -163,6 +230,11 @@
                 <div class="help-block">
                     The cardinality determines the number of ratings that can be assigned to an entity for this
                     assessment. Defaults to 'Zero to One'.
+                    {#if !canEditCardinality}
+                        <br>
+                        <Icon name="warning"/>
+                        The cardinality for this definition cannot be changed as multi-valued ratings already exist.
+                    {/if}
                 </div>
 
                 <!-- READ ONLY -->

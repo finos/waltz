@@ -88,39 +88,28 @@ public class CostDao {
     }
 
 
-    public Set<EntityCost> findBySelector(GenericSelector genericSelector){
-
-        SelectHavingStep<Record2<Long, Integer>> latestYearForCostKindSelector = DSL
-                .select(COST.COST_KIND_ID, DSL.max(COST.YEAR).as("latest_year"))
-                .from(COST)
-                .where(COST.ENTITY_ID.in(genericSelector.selector())
-                        .and(COST.ENTITY_KIND.eq(genericSelector.kind().name())))
-                .groupBy(COST.COST_KIND_ID);
-
-        Condition latestYearForCostKind = COST.COST_KIND_ID.eq(latestYearForCostKindSelector.field(COST.COST_KIND_ID))
-                .and(COST.YEAR.eq(latestYearForCostKindSelector.field("latest_year", Integer.class)));
-
+    public Set<EntityCost> findBySelector(GenericSelector genericSelector,
+                                          int year){
         return dsl
                 .select(ENTITY_NAME_FIELD)
                 .select(COST.fields())
                 .from(COST)
-                .innerJoin(latestYearForCostKindSelector).on(dsl.renderInlined(latestYearForCostKind))
                 .where(COST.ENTITY_ID.in(genericSelector.selector())
                         .and(COST.ENTITY_KIND.eq(genericSelector.kind().name())))
+                .and(COST.YEAR.eq(year))
                 .fetchSet(TO_COST_MAPPER);
     }
 
 
     public Set<EntityCost> findTopCostsForCostKindAndSelector(long costKindId,
+                                                              int year,
                                                               GenericSelector genericSelector,
                                                               int limit){
-
-        SelectConditionStep<Record1<Integer>> latestYear = mkLatestYearSelector(costKindId, genericSelector);
 
         Condition cond = COST.ENTITY_ID.in(genericSelector.selector())
                 .and(COST.ENTITY_KIND.eq(genericSelector.kind().name()))
                 .and(COST.COST_KIND_ID.eq(costKindId))
-                .and(COST.YEAR.eq(latestYear));
+                .and(COST.YEAR.eq(year));
 
         SelectSeekStep1<Record, BigDecimal> qry = dsl
                 .select(ENTITY_NAME_FIELD)
@@ -201,19 +190,6 @@ public class CostDao {
                 .fetchOne(r -> tuple(
                         r.get(appsWithCostsCount),
                         r.get(appCount) - r.get(appsWithCostsCount)));
-    }
-
-
-    // -- HELPERS -------------
-
-    private SelectConditionStep<Record1<Integer>> mkLatestYearSelector(long costKindId,
-                                                                       GenericSelector genericSelector) {
-        return DSL
-                .select(DSL.max(COST.YEAR).as("latest_year"))
-                .from(COST)
-                .where(COST.COST_KIND_ID.eq(costKindId))
-                .and(COST.ENTITY_ID.in(genericSelector.selector())
-                        .and(COST.ENTITY_KIND.eq(genericSelector.kind().name())));
     }
 
 }

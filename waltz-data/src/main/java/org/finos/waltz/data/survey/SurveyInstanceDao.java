@@ -19,6 +19,7 @@
 package org.finos.waltz.data.survey;
 
 import org.finos.waltz.common.CollectionUtilities;
+import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.Operation;
@@ -87,6 +88,17 @@ public class SurveyInstanceDao {
 
 
     private static final Condition IS_ORIGINAL_INSTANCE_CONDITION = si.ORIGINAL_INSTANCE_ID.isNull();
+
+    private static final Set<SurveyInstanceStatus> UPDATABLE_RECIPIENT_STATUSES = SetUtilities.asSet(
+            SurveyInstanceStatus.NOT_STARTED,
+            SurveyInstanceStatus.IN_PROGRESS,
+            SurveyInstanceStatus.REJECTED);
+
+    private static final Set<SurveyInstanceStatus> UPDATABLE_OWNER_STATUSES = SetUtilities.asSet(
+            SurveyInstanceStatus.NOT_STARTED,
+            SurveyInstanceStatus.IN_PROGRESS,
+            SurveyInstanceStatus.COMPLETED,
+            SurveyInstanceStatus.REJECTED);
 
     private static final RecordMapper<Record, SurveyInstance> TO_DOMAIN_MAPPER = r -> {
         SurveyInstanceRecord record = r.into(si);
@@ -458,7 +470,7 @@ public class SurveyInstanceDao {
 
     public SyncRecipientsResponse getReassignRecipientsCounts() {
 
-        CommonTableExpression<Record6<Long, Long, String, String, String, String>> inScopeSurveys = getInScopeSurveysCTE();
+        CommonTableExpression<Record6<Long, Long, String, String, String, String>> inScopeSurveys = getInScopeSurveysCTE(UPDATABLE_RECIPIENT_STATUSES);
         CommonTableExpression<Record6<Long, Long, String, Long, String, String>> requiredRecipients = getRequiredRecipientsCTE(inScopeSurveys);
         CommonTableExpression<Record6<Long, Long, String, Long, String, String>> existingRecipients = getExistingRecipientsCTE(inScopeSurveys);
         CommonTableExpression<Record6<Long, Long, String, Long, String, String>> recipientsToRemove = getMembersToRemoveCTE(existingRecipients, requiredRecipients);
@@ -490,7 +502,7 @@ public class SurveyInstanceDao {
 
     public SyncRecipientsResponse getReassignOwnersCounts() {
 
-        CommonTableExpression<Record6<Long, Long, String, String, String, String>> inScopeSurveys = getInScopeSurveysCTE();
+        CommonTableExpression<Record6<Long, Long, String, String, String, String>> inScopeSurveys = getInScopeSurveysCTE(UPDATABLE_OWNER_STATUSES);
         CommonTableExpression<Record6<Long, Long, String, Long, String, String>> requiredOwners = getRequiredOwnersCTE(inScopeSurveys);
         CommonTableExpression<Record6<Long, Long, String, Long, String, String>> existingOwners = getExistingOwnersCTE(inScopeSurveys);
         CommonTableExpression<Record6<Long, Long, String, Long, String, String>> ownersToRemove = getMembersToRemoveCTE(existingOwners, requiredOwners);
@@ -522,7 +534,7 @@ public class SurveyInstanceDao {
 
     public SyncRecipientsResponse reassignRecipients() {
 
-        CommonTableExpression<Record6<Long, Long, String, String, String, String>> inScopeSurveys = getInScopeSurveysCTE();
+        CommonTableExpression<Record6<Long, Long, String, String, String, String>> inScopeSurveys = getInScopeSurveysCTE(UPDATABLE_RECIPIENT_STATUSES);
         CommonTableExpression<Record6<Long, Long, String, Long, String, String>> requiredRecipients = getRequiredRecipientsCTE(inScopeSurveys);
         CommonTableExpression<Record6<Long, Long, String, Long, String, String>> existingRecipients = getExistingRecipientsCTE(inScopeSurveys);
         CommonTableExpression<Record6<Long, Long, String, Long, String, String>> recipientsToRemove = getMembersToRemoveCTE(existingRecipients, requiredRecipients);
@@ -558,7 +570,7 @@ public class SurveyInstanceDao {
 
     public SyncRecipientsResponse reassignOwners() {
 
-        CommonTableExpression<Record6<Long, Long, String, String, String, String>> inScopeSurveys = getInScopeSurveysCTE();
+        CommonTableExpression<Record6<Long, Long, String, String, String, String>> inScopeSurveys = getInScopeSurveysCTE(UPDATABLE_OWNER_STATUSES);
         CommonTableExpression<Record6<Long, Long, String, Long, String, String>> requiredOwners = getRequiredOwnersCTE(inScopeSurveys);
         CommonTableExpression<Record6<Long, Long, String, Long, String, String>> existingOwners = getExistingOwnersCTE(inScopeSurveys);
         CommonTableExpression<Record6<Long, Long, String, Long, String, String>> ownersToRemove = getMembersToRemoveCTE(existingOwners, requiredOwners);
@@ -858,7 +870,7 @@ public class SurveyInstanceDao {
                         .innerJoin(p).on(sio.PERSON_ID.eq(p.ID)));
     }
 
-    private CommonTableExpression<Record6<Long, Long, String, String, String, String>> getInScopeSurveysCTE() {
+    private CommonTableExpression<Record6<Long, Long, String, String, String, String>> getInScopeSurveysCTE(Set<SurveyInstanceStatus> allowedSurveyStatuses) {
         return DSL
                 .name("inScopeSurveys")
                 .as(DSL
@@ -867,10 +879,7 @@ public class SurveyInstanceDao {
                         .innerJoin(st).on(sr.SURVEY_TEMPLATE_ID.eq(st.ID)
                                 .and(st.STATUS.eq(ReleaseLifecycleStatus.ACTIVE.name())))
                         .innerJoin(si).on(sr.ID.eq(si.SURVEY_RUN_ID)
-                                .and(si.STATUS.in(
-                                        SurveyInstanceStatus.NOT_STARTED.name(),
-                                        SurveyInstanceStatus.IN_PROGRESS.name(),
-                                        SurveyInstanceStatus.REJECTED.name()))));
+                                .and(si.STATUS.in(allowedSurveyStatuses))));
 
     }
 

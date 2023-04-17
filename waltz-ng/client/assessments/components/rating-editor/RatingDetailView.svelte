@@ -17,6 +17,8 @@
     import Icon from "../../../common/svelte/Icon.svelte";
     import toasts from "../../../svelte-stores/toast-store";
     import {displayError} from "../../../common/error-utils";
+    import {cardinality} from "../../../common/services/enums/cardinality";
+    import EditableRatingValue from "./EditableRatingValue.svelte";
 
     export let onCancel;
     export let onRemove;
@@ -24,6 +26,9 @@
     let assessmentRatingCall;
 
     let rating;
+    let canEdit = false;
+    let canRemove = false;
+    let ratingDisablementReason = null;  // if set this will disable the rating edit functionality
 
 
     $: {
@@ -47,16 +52,6 @@
             })
             .then(onCancel);
     }
-
-    $: permissionsForRating = _.get($permissionsByRatingId, $selectedRating?.rating.id, $defaultPermission);
-
-    $: locked = _.get($selectedRating, ["rating", "isReadOnly"], false);
-
-    $: canEdit = _.includes(permissionsForRating?.operations, "UPDATE") && !locked;
-    $: canRemove = _.includes(permissionsForRating?.operations, "REMOVE") && !locked;
-    $: canLock = _.includes(permissionsForRating?.operations, "LOCK") && !locked;
-    $: canUnlock = _.includes(permissionsForRating?.operations, "LOCK") && locked;
-
 
     function onLock() {
         return assessmentRatingStore
@@ -82,7 +77,7 @@
 
     function saveComment(comment) {
         return assessmentRatingStore
-            .update($selectedRating.rating.id, comment)
+            .updateComment($selectedRating.rating.id, comment)
             .then(() => {
                 assessmentRatingCall = assessmentRatingStore.findForEntityReference($primaryEntityReference, true);
                 $assessmentRatings = $assessmentRatingCall?.data;
@@ -92,9 +87,86 @@
             .catch(e => displayError("Failed to update comment", e));
     }
 
+    function saveRating(newRating) {
+        return assessmentRatingStore
+            .updateRating($selectedRating.rating.id, {newRatingId: newRating.id})
+            .then(() => {
+                assessmentRatingCall = assessmentRatingStore.findForEntityReference($primaryEntityReference, true);
+                $assessmentRatings = $assessmentRatingCall?.data;
+                rating = newRating;
+            })
+            .then(() => toasts.success("Successfully updated rating"))
+            .catch(e => displayError("Failed to update rating", e));
+    }
+
+
+    $: permissionsForRating = _.get($permissionsByRatingId, $selectedRating?.rating.id, $defaultPermission);
+
+    $: locked = _.get($selectedRating, ["rating", "isReadOnly"], false);
+
+    $: canEdit = _.includes(permissionsForRating?.operations, "UPDATE") && !locked;
+    $: canRemove = _.includes(permissionsForRating?.operations, "REMOVE") && !locked;
+    $: canLock = _.includes(permissionsForRating?.operations, "LOCK") && !locked;
+    $: canUnlock = _.includes(permissionsForRating?.operations, "LOCK") && locked;
+
+
+    $: isMultiValuedAssessment = $selectedAssessment?.definition.cardinality === cardinality.ZERO_MANY.key
+    $: {
+          if (! canEdit) {
+              ratingDisablementReason = "You do not have permissions to edit this rating, though you may be able to remove it";
+          } else if (isMultiValuedAssessment) {
+              ratingDisablementReason = "Multi-valued ratings cannot be editied, please remove and then add the new rating";
+          } else {
+              ratingDisablementReason = null;
+          }
+    }
+
 </script>
 
-<h4>Rating Detail:</h4>
+{#if $selectedRating}
+
+    <div class="form-group">
+        <label for="rating">
+            Rating
+        </label>
+        <div id="rating">
+            <EditableRatingValue ratingItem={$selectedRating.ratingItem}
+                                 showGroup={true}
+                                 disablementReason={ratingDisablementReason}
+                                 onSave={saveRating}/>
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <div id="comment">
+            <TextEditableField text={rating.comment}
+                               label="Comment"
+                               editable={canEdit}
+                               onSave={saveComment}/>
+        </div>
+    </div>
+
+    {#if $selectedRating?.rating.isReadOnly}
+        <div class="help-block">
+            <span style="color: orange">
+                <Icon name="lock"/>
+            </span>
+            This rating is read only
+        </div>
+    {/if}
+
+
+    <div class="form-group">
+        <label for="last-update">
+            Last Updated
+        </label>
+        <div id="last-update">
+            <LastEdited entity={$selectedRating?.rating}/>
+        </div>
+    </div>
+
+{/if}
 
 <div style="padding: 1em 0">
 
@@ -130,46 +202,3 @@
 
 </div>
 
-{#if $selectedRating}
-
-    <div class="form-group">
-        <label for="rating">
-            Rating
-        </label>
-        <div id="rating">
-            <RatingIndicatorCell {...$selectedRating?.ratingItem}
-                                 showName="true"
-                                 showGroup="true"/>
-        </div>
-    </div>
-
-    <div class="form-group">
-        <label for="last-update">
-            Last Updated
-        </label>
-        <div id="last-update">
-            <LastEdited entity={$selectedRating?.rating}/>
-        </div>
-    </div>
-
-    <div class="form-group">
-        <label for="comment">
-            Comment
-        </label>
-        <div id="comment">
-            <TextEditableField text={rating.comment}
-                               editable={canEdit}
-                               onSave={saveComment}/>
-        </div>
-    </div>
-
-    {#if $selectedRating?.rating.isReadOnly}
-        <div class="help-block">
-            <span style="color: orange">
-                <Icon name="lock"/>
-            </span>
-            This rating is read only
-        </div>
-    {/if}
-
-{/if}

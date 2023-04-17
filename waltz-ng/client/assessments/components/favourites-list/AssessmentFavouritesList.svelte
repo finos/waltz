@@ -1,11 +1,7 @@
 <script>
 
     import _ from "lodash";
-    import {userPreferenceStore} from "../../../svelte-stores/user-preference-store";
-    import {onMount} from "svelte";
-    import {assessmentStores, createStores,} from "../list/assessment-rating-store";
     import Icon from "../../../common/svelte/Icon.svelte";
-    import {assessmentDefinitionStore} from "../../../svelte-stores/assessment-definition";
     import {assessmentRatingStore} from "../../../svelte-stores/assessment-rating-store";
     import {ratingSchemeStore} from "../../../svelte-stores/rating-schemes";
     import {
@@ -20,69 +16,40 @@
     import RatingIndicatorCell from "../../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
     import AssessmentDefinitionTooltipContent from "../list/AssessmentDefinitionTooltipContent.svelte";
     import NoData from "../../../common/svelte/NoData.svelte";
+    import {favouriteAssessmentDefinitionStore} from "../../../svelte-stores/favourite-assessment-definition-store";
+    import {assessmentDefinitionStore} from "../../../svelte-stores/assessment-definition";
 
 
     let elem;
     let stores = null;
-    let defaultPrimaryList;
-    let favouriteIncludedIds;
-    let favouriteExcludedIds;
-    let favouriteIds;
-    let setFromPreferences;
-    let userPreferences = null;
-    let userPreferenceCall;
     let assessmentsWithoutRatings;
     let assessmentsWithRatings;
+    let favouriteAssessments = [];
 
-    onMount(() => {
-        userPreferenceCall = userPreferenceStore.findAllForUser();
-    });
-
-    let assessmentDefinitionCall;
     let assessmentRatingCall;
+    let assessmentDefinitionCall;
     let ratingSchemesCall;
 
     $: {
         if ($primaryEntityReference) {
-            assessmentDefinitionCall = assessmentDefinitionStore.findByEntityReference($primaryEntityReference);
             assessmentRatingCall = assessmentRatingStore.findForEntityReference($primaryEntityReference, true);
             ratingSchemesCall = ratingSchemeStore.loadAll();
+            assessmentDefinitionCall = assessmentDefinitionStore.findByEntityReference($primaryEntityReference);
         }
     }
 
-    $: $assessmentDefinitions = $assessmentDefinitionCall?.data;
     $: $assessmentRatings = $assessmentRatingCall?.data;
     $: $ratingSchemes = $ratingSchemesCall?.data;
+    $: $assessmentDefinitions = $assessmentDefinitionCall?.data;
 
     $: {
-        if ($primaryEntityReference && _.isNil($assessmentStores)) {
-            $assessmentStores = createStores($primaryEntityReference.kind);
-        }
-
-        defaultPrimaryList = $assessmentStores?.defaultPrimaryList;
-        favouriteIncludedIds = $assessmentStores?.favouriteIncludedIds;
-        favouriteExcludedIds = $assessmentStores?.favouriteExcludedIds;
-        favouriteIds = $assessmentStores?.favouriteIds;
-        setFromPreferences = $assessmentStores?.setFromPreferences;
+        const assessmentsByDefId = _.keyBy($assessments, d => d.definition.id);
+        favouriteAssessments = _
+            .chain($favouriteAssessmentDefinitionStore[$primaryEntityReference?.kind])
+            .map(def => assessmentsByDefId[def.id])
+            .compact()
+            .value();
     }
-
-    $: {
-        if ($userPreferenceCall?.status === "loaded") {
-            userPreferences = $userPreferenceCall?.data;
-        }
-    }
-
-
-    $: {
-        if (userPreferences && $assessmentStores) {
-            $assessmentStores.setFromPreferences(userPreferences);
-        }
-    }
-
-    $: favouriteAssessments = _
-        .chain($assessments)
-        .filter(a => _.includes($favouriteIds, a.definition.id))
-        .value() || [];
 
     $: {
         if ($assessments) {
@@ -95,6 +62,7 @@
             assessmentsWithRatings = _.sortBy(valuePartitioned[1], d => d.definition.name);
         }
     }
+
 
     function mkRatingTooltipProps(row) {
         return {
@@ -112,7 +80,9 @@
 </script>
 
 {#if _.isEmpty(favouriteAssessments)}
-    <NoData type="info">You have no favourite assessments, please open the assessments section to add some</NoData>
+    <NoData type="info">
+        You have no favourite assessments, please open the assessments section to add some
+    </NoData>
 {:else}
     <table class="table table-hover table-condensed">
         <colgroup>
@@ -155,7 +125,9 @@
         {:else}
             <tr>
                 <td colspan="2">
-                    <NoData type="info">There are no favourite assessments with ratings</NoData>
+                    <NoData type="info">
+                        There are no favourite assessments with ratings
+                    </NoData>
                 </td>
             </tr>
         {/each}

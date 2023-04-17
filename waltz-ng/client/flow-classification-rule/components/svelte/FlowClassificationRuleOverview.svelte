@@ -8,17 +8,9 @@
     import LastEdited from "../../../common/svelte/LastEdited.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
     import _ from "lodash";
+    import {onMount} from "svelte";
 
     export let primaryEntityRef;
-
-    let rulesCall = flowClassificationRuleStore.getById(primaryEntityRef.id)
-    $: classificationRule = $rulesCall.data;
-
-    let classificationsCall = flowClassificationStore.findAll();
-    $: classifications = $classificationsCall.data;
-    $: classificationsById = _.keyBy($classificationsCall.data, d => d.id);
-
-    let datatypesCall = dataTypeStore.findAll();
 
     const unknownRating = {
         name: "? Not found ?",
@@ -26,9 +18,28 @@
         color: "#ccc"
     };
 
-    $: datatypes = $datatypesCall.data
-    $: datatypesById = _.keyBy(datatypes, d => d.id);
-    $: datatype = Object.assign({}, _.get(datatypesById, [classificationRule?.dataTypeId]), {kind: "DATA_TYPE"});
+    let datatypes = [];
+    let datatypesById = {};
+    let datatype = null;
+    let datatypeName = null;
+    let rating = null;
+
+    let datatypesCall = null;
+    let rulesCall = null;
+    let classificationsCall = null;
+
+    onMount(() => {
+        datatypesCall = dataTypeStore.findAll();
+        rulesCall = flowClassificationRuleStore.getById(primaryEntityRef.id);
+        classificationsCall = flowClassificationStore.findAll();
+    });
+
+    $: classificationRule = $rulesCall?.data;
+    $: classifications = $classificationsCall?.data || [];
+    $: datatypes = $datatypesCall?.data || [];
+
+    $: classificationsById = _.keyBy(classifications, d => d.id);
+    $: datatype = _.find(datatypes, dt => dt.id === classificationRule?.dataTypeId);
     $: datatypeName = _.get(datatype, ["name"], "Unknown");
     $: rating = _.get(classificationsById, [classificationRule?.classificationId], unknownRating);
 </script>

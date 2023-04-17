@@ -40,11 +40,15 @@ class Cache {
     }
 
     init(key, d) {
-        return this.cacheData.set(key, writable({ data: d, error: null, status: "loading" }))
+        return this.cacheData.set(key, writable({ data: d, error: null, status: "loading" }));
     }
 
     set(key, d) {
-        return this.cacheData.get(key).set({ data: d, error: null, status: "loaded" })
+        const storeValue = { data: d, error: null, status: "loaded" };
+        const existingWritable = this.cacheData.get(key);
+        return existingWritable
+            ? existingWritable.set(storeValue)
+            : this.cacheData.set(key, writable(storeValue))
     }
 
     err(key, e, d) {
@@ -108,17 +112,18 @@ const appCache = new Cache("App");
 const viewCache = new Cache("View");
 
 
-function initRemote() {
+function initRemote(cache) {
     return {
-        fetchViewList: (method, url, data, config) => _fetchData(viewCache, method, url, data, [], config),
-        fetchViewDatum: (method, url, data, config) => _fetchData(viewCache, method, url, data, null, config),
-        fetchViewData: (method, url, data, init, config) => _fetchData(viewCache, method, url, data, init, config),
-        fetchAppData: (method, url, data, init, config) => _fetchData(appCache, method, url, data, init, config),
-        fetchAppDatum: (method, url, data, config) => _fetchData(appCache, method, url, data, null, config),
-        fetchAppList: (method, url, data, config) => _fetchData(appCache, method, url, data, [], config),
+        fetchViewList: (method, url, data, config) => _fetchData(cache, method, url, data, [], config),
+        fetchViewDatum: (method, url, data, config) => _fetchData(cache, method, url, data, null, config),
+        fetchViewData: (method, url, data, init, config) => _fetchData(cache, method, url, data, init, config),
+        fetchAppData: (method, url, data, init, config) => _fetchData(cache, method, url, data, init, config),
+        fetchAppDatum: (method, url, data, config) => _fetchData(cache, method, url, data, null, config),
+        fetchAppList: (method, url, data, config) => _fetchData(cache, method, url, data, [], config),
         execute: (method, url, data) => _execute(method, url, data),
         clear: () => viewCache.clear(),
     };
 }
 
-export const remote = initRemote();
+export const remote = initRemote(viewCache);
+export const remoteApp = initRemote(appCache);

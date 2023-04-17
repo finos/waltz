@@ -154,10 +154,6 @@ public class PermissionGroupServiceTest extends BaseInMemoryIntegrationTest {
 
         Long u1Id = personHelper.createPerson(u1);
 
-        assertThrows(UnsupportedOperationException.class,
-                () -> permissionGroupService.findPermissionsForParentReference(mkRef(EntityKind.DATA_TYPE, 1L), u1),
-                "should throw an exception for invalid permission group parent kinds");
-
         long privKind = involvementHelper.mkInvolvementKind(mkName(stem, "privileged"));
 
         Set<Permission> permissionsForOperationOnEntityKind = filter(

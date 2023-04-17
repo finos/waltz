@@ -22,7 +22,7 @@ import _ from "lodash";
 export function calcWorkingTotal(enrichedAllocations = []) {
     return _.sumBy(
         enrichedAllocations,
-        d => _.result(d, ["working", "percentage"], () => console.log("Allocation has no working percentage, defaulting to 0",d) || 0));
+        d => _.result(d, ["working", "percentage"], () => console.warn("Allocation has no working percentage, defaulting to 0",d) || 0));
 }
 
 

@@ -6,8 +6,7 @@ import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.cost.CostKindDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.IdSelectionOptions;
-import org.finos.waltz.model.cost.EntityCostKind;
-import org.jooq.lambda.tuple.Tuple2;
+import org.finos.waltz.model.cost.CostKindWithYears;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,13 +26,16 @@ public class CostKindService {
     }
 
 
-    public Set<EntityCostKind> findAll(){
+    public Set<CostKindWithYears> findAll(){
         return costKindDao.findAll();
     }
 
 
-    public Set<Tuple2<EntityCostKind, Integer>> findCostKindsSelectorRoute(EntityKind targetKind, IdSelectionOptions selectionOptions) {
-        GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, selectionOptions);
+    public Set<CostKindWithYears> findCostKindsSelectorRoute(EntityKind targetKind,
+                                                             IdSelectionOptions selectionOptions) {
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(
+                targetKind,
+                selectionOptions);
         return costKindDao.findCostKindsBySelector(genericSelector);
     }
 }

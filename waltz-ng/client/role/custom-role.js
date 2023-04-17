@@ -26,7 +26,7 @@ function controller(serviceBroker) {
     const vm = this;
 
     const reload = () =>
-        serviceBroker.loadViewData(CORE_API.RoleStore.findAllRoles, [])
+        serviceBroker.loadViewData(CORE_API.RoleStore.findAllRoles, [], {force: true})
             .then(result => vm.roles = result.data);
 
     reload();
@@ -54,6 +54,9 @@ function controller(serviceBroker) {
                 () => {
                     toasts.info("Role created successfully");
                     reload();
+                    vm.roleKey = ""
+                    vm.roleName = ""
+                    vm.roleDescription = ""
                 })
             .catch(e => displayError("Failed to create role! ", e));
     };

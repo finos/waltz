@@ -18,20 +18,22 @@
 
 package org.finos.waltz.data;
 
+import org.finos.waltz.common.FunctionUtilities;
 import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.schema.Tables;
 import org.jooq.*;
-import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toMap;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 /**
@@ -42,63 +44,137 @@ public class EntityAliasPopulator {
 
     private final DSLContext dsl;
 
+
     @Autowired
     public EntityAliasPopulator(DSLContext dsl) {
         this.dsl = dsl;
     }
 
+
     public Map<String, Long> fetchEntityIdLookupMap(EntityKind entityKind, Set<String> identifiers) {
         checkNotNull(entityKind, "entityKind cannot be null");
 
-        Field<String> alias = DSL.field("alias", String.class);
-
-        SelectJoinStep<Record1<String>> aliasesTable = DSL
-                .select(alias)
-                .from(DSL.values(mkRowsFromIdentifiers(identifiers)).as("aliases", "alias"));
-
         switch (entityKind) {
             case APPLICATION:
-                return fetchApplicationAliasToIdMap(alias, aliasesTable);
+                return fetchApplicationAliasToIdMap(identifiers);
+            case LEGAL_ENTITY:
+                return fetchLegalEntityAliasToIdMap(identifiers);
             case PERSON:
-                return fetchPersonAliasToIdMap(alias, aliasesTable);
+                return FunctionUtilities.time("fetch alias map people", () -> fetchPersonAliasToIdMap(identifiers));
+            case CHANGE_INITIATIVE:
+                return FunctionUtilities.time("fetch alias map change initiatives", () -> fetchChangeInitiativeAliasToIdMap(identifiers));
+            case ORG_UNIT:
+                return FunctionUtilities.time("fetch alias map org units", () -> fetchOrgUnitAliasToIdMap(identifiers));
             default:
                 throw new IllegalArgumentException(format("Cannot find lookup map for id for entity kind: %s", entityKind));
         }
     }
 
-    private Map<String, Long> fetchApplicationAliasToIdMap(Field<String> alias, SelectJoinStep<Record1<String>> aliasesTable) {
+
+    private Map<String, Long> fetchChangeInitiativeAliasToIdMap(Set<String> aliases) {
+        return resolveSimpleAliases(aliases, CHANGE_INITIATIVE, CHANGE_INITIATIVE.EXTERNAL_ID, CHANGE_INITIATIVE.ID);
+    }
+
+
+    private Map<String, Long> fetchOrgUnitAliasToIdMap(Set<String> aliases) {
+        return resolveSimpleAliases(aliases, ORGANISATIONAL_UNIT, ORGANISATIONAL_UNIT.EXTERNAL_ID, ORGANISATIONAL_UNIT.ID);
+    }
+
+
+    private Map<String, Long> fetchApplicationAliasToIdMap(Set<String> aliases) {
+        return resolveSimpleAliases(aliases, APPLICATION, APPLICATION.ASSET_CODE, APPLICATION.ID);
+    }
+
+
+    public Map<String, EntityReference> fetchEntityReferenceLookupMap(EntityKind entityKind, Set<String> identifiers) {
+        checkNotNull(entityKind, "entityKind cannot be null");
+
+        switch (entityKind) {
+            case APPLICATION:
+                return fetchApplicationAliasToReferenceMap(identifiers);
+            case LEGAL_ENTITY:
+                return fetchLegalEntityAliasToReferenceMap(identifiers);
+            default:
+                throw new IllegalArgumentException(format("Cannot find lookup map for entity reference for entity kind: %s", entityKind));
+        }
+    }
+
+
+    private Map<String, EntityReference> fetchApplicationAliasToReferenceMap(Set<String> aliases) {
         return dsl
-                .select(aliasesTable.field(alias), Tables.APPLICATION.ID)
+                .select(Tables.APPLICATION.ASSET_CODE, Tables.APPLICATION.ID, Tables.APPLICATION.NAME)
                 .from(Tables.APPLICATION)
-                .innerJoin(aliasesTable).on(aliasesTable.field(alias).eq(Tables.APPLICATION.ASSET_CODE))
-                .fetchSet(r -> tuple(r.get(aliasesTable.field(alias)), r.get(Tables.APPLICATION.ID)))
+                .where(Tables.APPLICATION.ASSET_CODE.in(aliases))
+                .fetchSet(r -> tuple(r.get(Tables.APPLICATION.ASSET_CODE), r.get(Tables.APPLICATION.ID), r.get(Tables.APPLICATION.NAME)))
                 .stream()
-                .collect(toMap(t -> t.v1, t -> t.v2, (v1, v2) -> v1));
+                .collect(toMap(t -> t.v1, t -> mkRef(EntityKind.APPLICATION, t.v2, t.v3), (v1, v2) -> v1));
     }
 
 
-    private Map<String, Long> fetchPersonAliasToIdMap(Field<String> alias, SelectJoinStep<Record1<String>> aliasesTable) {
+    private Map<String, Long> fetchLegalEntityAliasToIdMap(Set<String> aliases) {
+        return resolveSimpleAliases(aliases, LEGAL_ENTITY, LEGAL_ENTITY.EXTERNAL_ID, LEGAL_ENTITY.ID);
+    }
 
-        Condition joinCond = aliasesTable.field(alias).equalIgnoreCase(Tables.PERSON.EMPLOYEE_ID)
-                .or(aliasesTable.field(alias).equalIgnoreCase(Tables.PERSON.EMAIL)
-                        .or(aliasesTable.field(alias).equalIgnoreCase(Tables.PERSON.DISPLAY_NAME)));
 
+    private Map<String, EntityReference> fetchLegalEntityAliasToReferenceMap(Set<String> aliases) {
         return dsl
-                .select(aliasesTable.field(alias), Tables.PERSON.ID)
-                .from(Tables.PERSON)
-                .innerJoin(aliasesTable).on(joinCond)
-                .where(Tables.PERSON.IS_REMOVED.isFalse())
-                .fetchSet(r -> tuple(r.get(aliasesTable.field(alias)), r.get(Tables.PERSON.ID)))
+                .select(Tables.LEGAL_ENTITY.EXTERNAL_ID, Tables.LEGAL_ENTITY.ID, Tables.LEGAL_ENTITY.NAME)
+                .from(Tables.LEGAL_ENTITY)
+                .where(Tables.LEGAL_ENTITY.EXTERNAL_ID.in(aliases))
+                .fetchSet(r -> tuple(r.get(Tables.LEGAL_ENTITY.EXTERNAL_ID), r.get(Tables.LEGAL_ENTITY.ID), r.get(Tables.LEGAL_ENTITY.NAME)))
+                .stream()
+                .collect(toMap(t -> t.v1, t -> mkRef(EntityKind.LEGAL_ENTITY, t.v2, t.v3), (v1, v2) -> v1));
+    }
+
+
+    private Map<String, Long> fetchPersonAliasToIdMap(Set<String> aliases) {
+
+        Condition isActive = PERSON.IS_REMOVED.isFalse();
+
+        SelectConditionStep<Record2<String, Long>> emails = mkQry(aliases, PERSON, PERSON.EMAIL, PERSON.ID)
+                .and(isActive);
+
+        SelectConditionStep<Record2<String, Long>> name = mkQry(aliases, PERSON, PERSON.DISPLAY_NAME, PERSON.ID)
+                .and(isActive);
+
+        SelectConditionStep<Record2<String, Long>> empId = mkQry(aliases, PERSON, PERSON.EMPLOYEE_ID, PERSON.ID)
+                .and(isActive);
+
+        SelectOrderByStep<Record2<String, Long>> qry = emails.union(name.union(empId));
+
+        return qry
+                .fetchSet(r -> tuple(r.get(0, String.class), r.get(PERSON.ID)))
                 .stream()
                 .collect(toMap(t -> t.v1, t -> t.v2, (v1, v2) -> v1));
     }
 
-    private Row1<String>[] mkRowsFromIdentifiers(Set<String> identifiers) {
-        return identifiers
+
+    // --- HELPERS ---
+
+    private Map<String, Long> resolveSimpleAliases(Set<String> aliases,
+                                                   Table<?> table,
+                                                   Field<String> externalIdField,
+                                                   Field<Long> idField) {
+        return mkQry(aliases, table, externalIdField, idField)
+                .fetchSet(r -> tuple(
+                        r.get(externalIdField),
+                        r.get(idField)))
                 .stream()
-                .map(d -> DSL.row(d))
-                .collect(Collectors.toSet())
-                .toArray(new Row1[0]);
+                .collect(toMap(
+                        t -> t.v1,
+                        t -> t.v2,
+                        (v1, v2) -> v1));
+    }
+
+
+    private SelectConditionStep<Record2<String, Long>> mkQry(Set<String> aliases,
+                                                             Table<?> table,
+                                                             Field<String> externalIdField,
+                                                             Field<Long> idField) {
+        return dsl
+                .select(externalIdField, idField)
+                .from(table)
+                .where(externalIdField.in(aliases));
     }
 
 }

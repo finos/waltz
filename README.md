@@ -23,10 +23,10 @@ Getting started
 
 ## Corporate Contributors
 
-Org | | Notes
---- | --- |---
-![DB Logo](https://avatars1.githubusercontent.com/u/34654027?s=30&v=4 "Deutsche Bank") | Deutsche Bank | [press release](https://www.db.com/newsroom_news/2018/deutsche-bank-takes-next-step-in-open-source-journey-en-11484.htm) 
-![NWM Logo](https://avatars2.githubusercontent.com/u/54027700?s=30&v=4 "Natwest Markets") | NatWest Markets | [press release](https://www.nwm.com/about-us/media/articles/natwest-markets-to-expand-open-source-coding)
+| Org                                                                                       |                 | Notes                                                                                                                    |
+|-------------------------------------------------------------------------------------------|-----------------|--------------------------------------------------------------------------------------------------------------------------|
+| ![DB Logo](https://avatars1.githubusercontent.com/u/34654027?s=30&v=4 "Deutsche Bank")    | Deutsche Bank   | [press release](https://www.db.com/newsroom_news/2018/deutsche-bank-takes-next-step-in-open-source-journey-en-11484.htm) |
+| ![NWM Logo](https://avatars2.githubusercontent.com/u/54027700?s=30&v=4 "NatWest Markets") | NatWest Markets | [press release](https://www.nwm.com/about-us/media/articles/natwest-markets-to-expand-open-source-coding)                |
 
 ## Technology Stack
 
@@ -50,30 +50,38 @@ See [pom.xml](https://github.com/finos/waltz/blob/master/pom.xml) for a full lis
 ### Client
 
 - Browser based
-    - IE 10+, Chrome, Safari, Firefox)
+    - IE 11+, Chrome, Safari, Firefox)
 - AngularJS 1.7
+- Svelte
 - Bootstrap 3
-- D3 
+- D3
 
-See [package.json](https://github.com/finos/waltz/blob/master/waltz-ng/package.json) for full list of javascript dependencies.
+See [package.json](https://github.com/finos/waltz/blob/master/waltz-ng/package.json) for full list of javascript
+dependencies.
 
 ## Roadmap / Releases
 
-Checkout [the project milestones](https://github.com/finos/waltz/milestones) and browse through the Todo, work in progress and done issues.
+Checkout [the project milestones](https://github.com/finos/waltz/milestones) and browse through the Todo, work in
+progress and done issues.
 
 **Provisional** dates for upcoming releases:
 
-| Release | Date              | Summary                    |
-|---------|-------------------|----------------------------|
-| 1.47    | 31st January 2023 | Legal Entities             |
-| 1.48    | 14th March 2023   | Legal Entities (continued) |
-| 1.49    | 30th May 2023     | tbd                        |
+| Release  | Date            | Summary                    |
+|----------|-----------------|----------------------------|
+| 1.48.1   | 13th April 2023 | Patch release              |
+| 1.49     | 30th May 2023   | tbd                        |
+| 1.50     | tbd             | tbd                        |
+
+See the [releases](https://github.com/finos/waltz/releases) page for historic versions.
+
+
 
 ## Contributing
 
 1. Fork it (<https://github.com/finos/waltz/fork>)
 2. Create your feature branch (`git checkout -b feature/fooBar`)
-3. Read our [contribution guidelines](.github/CONTRIBUTING.md) and [Community Code of Conduct](https://www.finos.org/code-of-conduct)
+3. Read our [contribution guidelines](CONTRIBUTING.md)
+   and [Community Code of Conduct](https://www.finos.org/code-of-conduct)
 4. Commit your changes (`git commit -am 'Add some fooBar'`)
 5. Push to the branch (`git push origin feature/fooBar`)
 6. Create a new Pull Request
@@ -96,3 +104,7 @@ Copyright (C) 2021 Waltz open source project
 Distributed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
 SPDX-License-Identifier: [Apache-2.0](https://spdx.org/licenses/Apache-2.0)
+
+## Security Reporting
+
+Please refer to the Waltz [Security Policy](SECURITY.md) page.

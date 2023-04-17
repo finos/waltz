@@ -28,10 +28,11 @@ import org.springframework.stereotype.Service;
 import spark.Request;
 import spark.Response;
 
+import java.util.List;
+
 import static org.finos.waltz.web.WebUtilities.*;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.getForDatum;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.getForList;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 
 
 @Service
@@ -47,6 +48,7 @@ public class PersonEndpoint implements Endpoint {
     private static final String GET_SELF_PATH = mkPath(BASE_URL, "self");
     private static final String GET_BY_ID = mkPath(BASE_URL, "id", ":id");
     private static final String REBUILD_HIERARCHY_PATH = mkPath(BASE_URL, "rebuild-hierarchy");
+    private static final String DIRECTS_FOR_PERSON_IDS_PATH = mkPath(BASE_URL, "person-ids", "directs");
 
     private final PersonService personService;
     private final PersonHierarchyService personHierarchyService;
@@ -73,6 +75,11 @@ public class PersonEndpoint implements Endpoint {
         getForList(DIRECTS_PATH, (request, response) -> {
             String empId = request.params("empId");
             return personService.findDirectsByEmployeeId(empId);
+        });
+
+        postForList(DIRECTS_FOR_PERSON_IDS_PATH, (request, response) -> {
+            List<Long> personIds = readIdsFromBody(request);
+            return personService.findDirectsForPersonIds(personIds);
         });
 
         getForDatum(MANAGERS_PATH, (request, response) -> {

@@ -3,7 +3,7 @@
 - [Features](features/README.md)
 - [Design](design)
 - [Development](development)
-  - [Build](development/build)
+  - [Build](development/build.md)
 - Integration
   - [Neo4J](integration/neo4j)
 

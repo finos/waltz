@@ -30,36 +30,48 @@
 
 
     <div class='waltz-page-summary waltz-page-summary-attach'>
-        <h3>
-            Roles
-        </h3>
-
+        <br>
         <div class="waltz-field-table-border">
 
-            <table class="table small">
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Key</th>
-                    <th>Custom role</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr ng-repeat="role in ctrl.roles">
-                    <td ng-bind="role.name"></td>
-                    <td>
-                        <p class="help-block"
-                           ng-bind="role.description">
-                        </p>
-                    </td>
-                    <td ng-bind="role.key"></td>
-                    <td>
-                        <input type="checkbox" disabled="true" ng-checked="role.isCustom">
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+            <form class="form-inline ng-pristine ng-valid">
+                <div class="form-group">
+                    <label>Search</label>
+                    <input type="search"
+                           class="form-control"
+                           placeholder="Filter..."
+                           ng-model="userQuery"
+                           ng-model-options="{debounce: 300}">
+                </div>
+            </form>
+
+            <hr>
+
+            <div class="waltz-scroll-region-300">
+                <table class="table table-condensed table-hover">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Key</th>
+                        <th>Custom role</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="role in ctrl.roles | filter:userQuery">
+                        <td ng-bind="role.name"></td>
+                        <td>
+                            <p class="help-block"
+                               ng-bind="role.description">
+                            </p>
+                        </td>
+                        <td ng-bind="role.key"></td>
+                        <td>
+                            <input type="checkbox" disabled="true" ng-checked="role.isCustom">
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 

@@ -19,18 +19,9 @@
 
 import template from "./playpen1.html";
 import {initialiseData} from "../../common";
-import InvolvementPicker from "../../common/svelte/entity-pickers/InvolvementPicker.svelte";
-import EntityPicker from "../../report-grid/components/svelte/pickers/EntityPicker.svelte";
-import EntitySelector from "../../report-grid/components/svelte/column-definition-edit-panel/EntitySelector.svelte";
-import TestPage
-    from "../../report-grid/components/svelte/column-definition-edit-panel/ColumnDefinitionEditPanel.svelte";
-import {mkSelectionOptions} from "../../common/selector-utils";
-import TaxonomyNavAidBuilder from "./TaxonomyNavAidBuilder.svelte";
 import {CORE_API} from "../../common/services/core-api-utils";
-import _ from "lodash";
 
 const initData = {
-    TaxonomyNavAidBuilder,
     taxonomy: []
 };
 

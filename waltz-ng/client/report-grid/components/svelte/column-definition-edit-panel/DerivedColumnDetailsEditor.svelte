@@ -16,7 +16,8 @@
         id: column.id,
         displayName: column.displayName,
         externalId: column.externalId,
-        derivationScript: column.derivationScript
+        derivationScript: column.derivationScript,
+        columnDescription: column.columnDescription
     }
 
     function cancelEdit() {
@@ -28,7 +29,8 @@
             id: col.id,
             displayName: col.displayName,
             externalId: col.externalId,
-            derivationScript: col.derivationScript
+            derivationScript: col.derivationScript,
+            columnDescription: col.columnDescription
         };
     }
 
@@ -42,16 +44,17 @@
     function valueChanged(columnDefs, column) {
         const updatedColumn = _.find(columnDefs, d => sameColumnRef(d, column));
         return column.id != null //new columns cannot be reset
-            && (updatedColumn.derivationScriptChanged
-                || updatedColumn.displayNameChanged
-                || updatedColumn.externalIdChanged);
+            && (updatedColumn?.derivationScriptChanged
+                || updatedColumn?.displayNameChanged
+                || updatedColumn?.externalIdChanged);
     }
 
     function updateDisplayName(workingDisplayName, column) {
+        const workingColumn = _.find($columnDefs, d => sameColumnRef(d, column));
         const originalColumn = _.find($selectedGrid.definition.derivedColumnDefinitions, d => sameColumnRef(d, column));
         const newColumn = Object.assign(
             {},
-            column,
+            workingColumn,
             {
                 displayName: workingDisplayName,
                 displayNameChanged: workingDisplayName !== originalColumn?.displayName
@@ -60,11 +63,26 @@
         $columnDefs = _.concat(columnsWithoutCol, newColumn);
     }
 
-    function updateExternalId(workingExternalId, column) {
+    function updateColumnDescription(workingDisplayName, column) {
+        const workingColumn = _.find($columnDefs, d => sameColumnRef(d, column));
         const originalColumn = _.find($selectedGrid.definition.derivedColumnDefinitions, d => sameColumnRef(d, column));
         const newColumn = Object.assign(
             {},
-            column,
+            workingColumn,
+            {
+                columnDescription: workingDisplayName,
+                columnDescriptionChanged: workingDisplayName !== originalColumn?.columnDescription
+            })
+        const columnsWithoutCol = _.reject($columnDefs, d => sameColumnRef(d, column));
+        $columnDefs = _.concat(columnsWithoutCol, newColumn);
+    }
+
+    function updateExternalId(workingExternalId, column) {
+        const workingColumn = _.find($columnDefs, d => sameColumnRef(d, column));
+        const originalColumn = _.find($selectedGrid.definition.derivedColumnDefinitions, d => sameColumnRef(d, column));
+        const newColumn = Object.assign(
+            {},
+            workingColumn,
             {
                 externalId: workingExternalId,
                 externalIdChanged: workingExternalId !== originalColumn?.externalId
@@ -74,10 +92,11 @@
     }
 
     function updateDerivationScript(workingScript, column) {
+        const workingColumn = _.find($columnDefs, d => sameColumnRef(d, column));
         const originalColumn = _.find($selectedGrid.definition.derivedColumnDefinitions, d => sameColumnRef(d, column));
         const newColumn = Object.assign(
             {},
-            column,
+            workingColumn,
             {
                 derivationScript: workingScript,
                 derivationScriptChanged: workingScript !== originalColumn?.derivationScript
@@ -134,7 +153,20 @@
                    bind:value={working.externalId}>
         </td>
     </tr>
-
+    <tr>
+        <td>
+            <div>Description</div>
+            <div class="small help-text">A description of this derived column</div>
+        </td>
+        <td>
+            <textarea class="form-control code"
+                      id="columnDescription"
+                      rows="2"
+                      on:change={() => updateColumnDescription(working.columnDescription, column)}
+                      placeholder="Enter description here"
+                      bind:value={working.columnDescription}/>
+        </td>
+    </tr>
     <tr>
         <td>
             <div>Derivation Script</div>

@@ -1,0 +1,63 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+<waltz-section-actions>
+    <div ng-if="!$ctrl.visibility.bulkUpload">
+        <button waltz-has-role="BULK_LEGAL_ENTITY_RELATIONSHIP_EDITOR"
+                class="btn btn-xs btn-default"
+                ng-click="$ctrl.bulkUpload()">
+            Bulk Upload
+        </button>
+        <waltz-data-extract-link name="Export"
+                                 styling="button"
+                                 extract="legal-entity-relationship/relationship-kind/{{$ctrl.parentEntityRef.id}}"
+                                 method="POST"
+                                 request-body="$ctrl.selectionOptions">
+        </waltz-data-extract-link>
+        <button class="btn btn-xs waltz-btn-transparent"
+                ng-click="$ctrl.visibility.overlay = ! $ctrl.visibility.overlay">
+            <waltz-icon name="map-signs"></waltz-icon>
+        </button>
+    </div>
+    <div ng-if="$ctrl.visibility.bulkUpload">
+        <button class="btn btn-xs btn-default"
+                ng-click="$ctrl.cancelBulkUpload()">
+            Cancel
+        </button>
+    </div>
+
+</waltz-section-actions>
+
+<waltz-source-data-overlay visible="$ctrl.visibility.overlay"
+                           entities="['LEGAL_ENTITY', 'LEGAL_ENTITY_RELATIONSHIP']">
+</waltz-source-data-overlay>
+
+<div class="row">
+    <div class="col-sm-12"
+         ng-if="!$ctrl.visibility.bulkUpload">
+        <waltz-legal-entity-relationships-view-grid ng-if="$ctrl.parentEntityRef"
+                                                    parent-entity-ref="$ctrl.parentEntityRef"
+                                                    relationship-kind-id="$ctrl.parentEntityRef.id">
+        </waltz-legal-entity-relationships-view-grid>
+    </div>
+    <div class="col-sm-12"
+         ng-if="$ctrl.visibility.bulkUpload">
+        <waltz-legal-entity-relationship-bulk-upload relationship-kind-id="$ctrl.parentEntityRef.id"
+                                                     on-done="$ctrl.doneUpload">
+        </waltz-legal-entity-relationship-bulk-upload>
+    </div>
+</div>

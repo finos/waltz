@@ -215,8 +215,11 @@
     </changeSet>
 
     <changeSet id="20230105-6359-30"
-               author="davidwatkins73">
-        <comment>6359: update natural key on assessment_rating to allow for multi-valued assessments, add new id column</comment>
+               author="davidwatkins73"
+               dbms="!h2">
+        <comment>6359: update natural key on assessment_rating to allow for multi-valued assessments, add new id
+            column
+        </comment>
         <addColumn tableName="assessment_rating">
             <column name="id"
                     type="${id.type}"
@@ -228,9 +231,28 @@
         </addColumn>
     </changeSet>
 
+
+    <changeSet id="20230210-6359-31"
+               author="woodjes"
+               dbms="h2">
+        <comment>6359: update natural key on assessment_rating to allow for multi-valued assessments, add new id
+            column
+        </comment>
+        <addColumn tableName="assessment_rating">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+            </column>
+        </addColumn>
+        <addPrimaryKey columnNames="id"
+                       constraintName="assessment_rating_pkey"
+                       tableName="assessment_rating"/>
+    </changeSet>
+
     <changeSet id="20230105-6359-40"
                author="davidwatkins73">
-        <comment>6359: update natural key on assessment_rating to allow for multi-valued assessments, add unique index</comment>
+        <comment>6359: update natural key on assessment_rating to allow for multi-valued assessments, add unique index
+        </comment>
         <addUniqueConstraint tableName="assessment_rating"
                              columnNames="entity_kind, entity_id, assessment_definition_id, rating_id"/>
     </changeSet>

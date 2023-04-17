@@ -19,12 +19,7 @@ import {registerComponents, registerStores} from "../common/module-utils";
 
 import Routes from "./routes";
 import LegalEntityView from "./pages/view/legal-entity-view";
-import LegalEntitySection from "./components/legal-entity-section/legal-entity-section";
-import LegalEntityRelationshipSection
-    from "./components/legal-entity-relationship-section/legal-entity-relationship-section";
 import LegalEntityStore from "./services/legal-entity-store";
-import LegalEntityRelationshipStore from "./services/legal-entity-relationship-store";
-import LegalEntityRelationshipKindStore from "./services/legal-entity-relationship-kind-store";
 
 
 export default () => {
@@ -36,14 +31,10 @@ export default () => {
 
     registerComponents(module, [
         LegalEntityView,
-        LegalEntitySection,
-        LegalEntityRelationshipSection
     ]);
 
     registerStores(module, [
         LegalEntityStore,
-        LegalEntityRelationshipStore,
-        LegalEntityRelationshipKindStore
     ])
 
     return module.name;

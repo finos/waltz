@@ -52,8 +52,8 @@ public class CostEndpoint implements Endpoint {
     public void register() {
 
         String findByEntityReferencePath = mkPath(BASE_URL, "entity", "kind", ":kind", "id", ":id");
-        String findBySelectorPath = mkPath(BASE_URL, "target-kind", ":kind");
-        String summariseByCostKindAndSelectorPath = mkPath(BASE_URL, "cost-kind", ":id", "target-kind", ":kind", "summary");
+        String findBySelectorPath = mkPath(BASE_URL, "target-kind", ":kind", "year", ":year");
+        String summariseByCostKindAndSelectorPath = mkPath(BASE_URL, "cost-kind", ":id", "target-kind", ":kind", "summary", "year", ":year");
 
         ListRoute<EntityCost> findByEntityReferenceRoute = (request, response) -> {
             EntityReference ref = getEntityReference(request);
@@ -63,15 +63,16 @@ public class CostEndpoint implements Endpoint {
         DatumRoute<EntityCostsSummary> summariseByCostKindAndSelectorRoute = (request, response) -> {
             IdSelectionOptions idSelectionOptions = readIdSelectionOptionsFromBody(request);
             long costKindId = getId(request);
+            int year = getInt(request, "year");
             Integer limit = getLimit(request).orElse(15);
             EntityKind targetKind = getKind(request);
-            return costService.summariseByCostKindAndSelector(costKindId, idSelectionOptions, targetKind, limit);
+            return costService.summariseByCostKindAndSelector(costKindId, idSelectionOptions, targetKind, year, limit);
         };
 
         ListRoute<EntityCost> findBySelectorRoute = (request, response) -> {
             IdSelectionOptions idSelectionOptions = readIdSelectionOptionsFromBody(request);
             EntityKind targetKind = getKind(request);
-            return costService.findBySelector(idSelectionOptions, targetKind);
+            return costService.findBySelector(idSelectionOptions, targetKind, getInt(request, "year"));
         };
 
         getForList(findByEntityReferencePath, findByEntityReferenceRoute);
