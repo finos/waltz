@@ -104,7 +104,6 @@ function controller($scope, serviceBroker, localStorageService) {
                     columnDefs.set(colDefs);
 
                     vm.allTableData = prepareTableData(vm.rawGridData);
-                    console.log({td: vm.allTableData});
                     vm.allColumnDefs = prepareColumnDefs(colDefs);
                     refresh();
                 }
