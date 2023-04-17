@@ -79,7 +79,11 @@ const extIdCol = {
     field: "subject.entityReference.externalId",
     displayName: "Ext. Id",
     width: 100,
-    pinnedLeft: true
+    pinnedLeft: true,
+    cellTemplate: `
+        <div class="waltz-grid-report-cell">
+            <div class="report-grid-cell-text" ng-bind="COL_FIELD"></div>
+        </div>`
 };
 
 const lifecyclePhaseCol = {
@@ -88,8 +92,8 @@ const lifecyclePhaseCol = {
     width: 100,
     pinnedLeft: true,
     cellTemplate: `
-        <div class="waltz-grid-report-cell"
-            <span ng-bind="COL_FIELD | toDisplayName:'lifecyclePhase'"></span>
+        <div class="waltz-grid-report-cell">
+            <div class="report-grid-cell-text" ng-bind="COL_FIELD | toDisplayName:'lifecyclePhase'"></div>
         </div>`
 };
 
@@ -147,7 +151,9 @@ export function prepareColumnDefs(colDefs) {
                              ng-style="{
                                 'background-color': COL_FIELD.color,
                                 'color': COL_FIELD.fontColor}">
-                                <waltz-currency-amount amount="COL_FIELD.value"></waltz-currency-amount>
+                                <div class="report-grid-cell-text">
+                                    <waltz-currency-amount amount="COL_FIELD.value"></waltz-currency-amount>
+                                </div>
                         </div>`
                 };
             case "COMPLEXITY_KIND":
@@ -156,10 +162,38 @@ export function prepareColumnDefs(colDefs) {
                     cellTemplate: `
                         <div class="waltz-grid-report-cell"
                              style="text-align: right"
-                             ng-bind="COL_FIELD.value"
                              ng-style="{
                                 'background-color': COL_FIELD.color,
                                 'color': COL_FIELD.fontColor}">
+                                 <div class="report-grid-cell-text"
+                                      ng-bind="COL_FIELD.value"/>
+                                 </div>
+                        </div>`
+                };
+            case "ASSESSMENT_DEFINITION":
+            case "MEASURABLE_CATEGORY":
+                return {
+                    allowSummary: true,
+                    toSearchTerm: d => _.get(d, [c.gridColumnId, "text"], ""),
+                    cellTemplate:
+                        `<div
+                              uib-popover-html="COL_FIELD.comment"
+                              popover-trigger="mouseenter"
+                              popover-enable="COL_FIELD.comment != null"
+                              popover-popup-delay="500"
+                              popover-class="waltz-popover-width-500"
+                              popover-append-to-body="true"
+                              popover-placement="left"
+                              ng-style="{
+                                'border-bottom-right-radius': COL_FIELD.comment ? '15% 50%' : 0,
+                                'background': COL_FIELD.color,
+                                'color': COL_FIELD.fontColor}">
+                                <div class="waltz-grid-report-cell">
+                                    <div ng-bind="COL_FIELD.text"
+                                         class="report-grid-cell-text"
+                                         style="background: linear-gradient(to top, rgba(255, 255, 255, 0.7) 0, rgba(255, 255, 255, 0.7) 90%, rgba(255, 255, 255, 0) 90%, rgba(255, 255, 255, 0) 100%)">
+                                    </div>
+                                </div>
                         </div>`
                 };
             default:
@@ -179,9 +213,10 @@ export function prepareColumnDefs(colDefs) {
                                 'border-bottom-right-radius': COL_FIELD.comment ? '15% 50%' : 0,
                                 'background': COL_FIELD.color,
                                 'color': COL_FIELD.fontColor}">
-                                <div class="waltz-grid-report-cell"
-                                        ng-bind="COL_FIELD.text"
-                                        style="background: linear-gradient(to top, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) 50%)">
+                                <div class="waltz-grid-report-cell">
+                                        <div class="report-grid-cell-text"
+                                             ng-bind="COL_FIELD.text">
+                                        </div>
                                 </div>
                         </div>`
                 };
@@ -341,8 +376,6 @@ function mkAttestationCell(dataCell, baseCell) {
 
 function mkRatingCell(dataCell, baseCell, ratingSchemeItemsById) {
 
-    console.log({dataCell, baseCell});
-
     const ratingSchemeItems = _.map(dataCell.ratingIdValues, d => ratingSchemeItemsById[d]);
 
     const ratingSchemeItem = _.first(ratingSchemeItems);
@@ -350,8 +383,6 @@ function mkRatingCell(dataCell, baseCell, ratingSchemeItemsById) {
     const ratingCount = _.size(ratingSchemeItems);
 
     const colorBandWidth = 100 / ratingCount;
-
-    console.log({ratingCount, colorBandWidth})
 
     const colorBands = _.map(
         ratingSchemeItems,
@@ -363,8 +394,6 @@ function mkRatingCell(dataCell, baseCell, ratingSchemeItemsById) {
         });
 
     const background = `linear-gradient(to right,  ${_.join(colorBands, ",")})`;
-
-    console.log({background});
 
     return Object.assign({}, baseCell, {
         comment: mkRatingPopoverHtml(dataCell, ratingSchemeItems),

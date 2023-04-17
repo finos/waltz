@@ -2051,7 +2051,6 @@ public class ReportGridDao {
                                 .comment("")
                                 .textValue(cellName)
                                 .options(options)
-                                .isSingleValueResponse(false)
                                 .build();
                     })
                     .collect(toSet());
