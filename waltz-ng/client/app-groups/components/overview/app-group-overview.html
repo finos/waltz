@@ -24,10 +24,12 @@
             <waltz-icon name="edit"></waltz-icon>
             Edit Group
         </a>
-        <waltz-subscription-buttons subscription-status="$ctrl.subscriptionStatus"
-                                    on-subscribe="$ctrl.onSubscribe"
-                                    on-unsubscribe="$ctrl.onUnsubscribe">
-        </waltz-subscription-buttons>
+        <span ng-hide="$ctrl.appGroup.isFavouriteGroup">
+            <waltz-subscription-buttons subscription-status="$ctrl.subscriptionStatus"
+                                        on-subscribe="$ctrl.onSubscribe"
+                                        on-unsubscribe="$ctrl.onUnsubscribe">
+            </waltz-subscription-buttons>
+        </span>
     </span>
 
     <div class="row">
