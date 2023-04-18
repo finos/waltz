@@ -2010,15 +2010,23 @@ public class ReportGridDao {
             Result<Record6<Long, Long, Long, String, String, String>> multiValueAssessmentRatings = assessmentsByCardinality.get(Cardinality.ZERO_MANY.name());
 
             Set<ReportGridCell> singleValueGridCells = map(assessmentRatings,
-                    r -> ImmutableReportGridCell.builder()
-                            .subjectId(r.get(ar.ENTITY_ID))
-                            .columnDefinitionId(assessmentIdToDefIdMap.get(r.get(ar.ASSESSMENT_DEFINITION_ID)))
-                            .ratingIdValues(asSet(r.get(ar.RATING_ID)))
-                            .textValue(r.get(rsi.NAME))
-                            .comment(r.get(ar.DESCRIPTION))
-                            .optionCode(Long.toString(r.get(ar.RATING_ID)))
-                            .optionText(r.get(rsi.NAME))
-                            .build());
+                    r -> {
+                        String ratingName = r.get(rsi.NAME);
+                        String optionCode = Long.toString(r.get(ar.RATING_ID));
+                        return ImmutableReportGridCell.builder()
+                                .subjectId(r.get(ar.ENTITY_ID))
+                                .columnDefinitionId(assessmentIdToDefIdMap.get(r.get(ar.ASSESSMENT_DEFINITION_ID)))
+                                .ratingIdValues(asSet(r.get(ar.RATING_ID)))
+                                .textValue(ratingName)
+                                .comment(r.get(ar.DESCRIPTION))
+                                .optionCode(optionCode)
+                                .optionText(ratingName)
+                                .options(asSet(ImmutableCellOption.builder()
+                                        .text(ratingName)
+                                        .code(optionCode)
+                                        .build()))
+                                .build();
+                    });
 
             Set<ReportGridCell> multiValueGridCells = isEmpty(multiValueAssessmentRatings)
                     ? emptySet()
@@ -2030,7 +2038,6 @@ public class ReportGridDao {
                     .stream()
                     .map(e -> {
 
-                        // feels like we want to have multiple outcomes
                         Collection<Tuple3<Long, String, String>> values = e.getValue();
 
                         Set<Long> ratingIds = map(values, v -> v.v1);
@@ -2044,11 +2051,17 @@ public class ReportGridDao {
                                 .code(Long.toString(v.v1))
                                 .build());
 
+                        List<Tuple2<String, String>> commentRows = values
+                                .stream()
+                                .map(t -> tuple(t.v3, t.v2))
+                                .sorted(comparing(t -> t.v2))
+                                .collect(toList());
+
                         return ImmutableReportGridCell.builder()
                                 .subjectId(e.getKey().v2)
                                 .columnDefinitionId(assessmentIdToDefIdMap.get(e.getKey().v1))
                                 .ratingIdValues(ratingIds)
-                                .comment("")
+                                .comment(toHtmlTable(ListUtilities.asList("Rating", "Comment"), commentRows))
                                 .textValue(cellName)
                                 .options(options)
                                 .build();

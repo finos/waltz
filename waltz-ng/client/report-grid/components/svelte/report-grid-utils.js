@@ -171,7 +171,7 @@ export function prepareColumnDefs(colDefs) {
                         </div>`
                 };
             case "ASSESSMENT_DEFINITION":
-            case "MEASURABLE_CATEGORY":
+            case "MEASURABLE":
                 return {
                     allowSummary: true,
                     toSearchTerm: d => _.get(d, [c.gridColumnId, "text"], ""),
@@ -240,33 +240,6 @@ export function prepareColumnDefs(colDefs) {
         .value();
 
     return _.concat([nameCol, extIdCol, lifecyclePhaseCol], additionalColumns);
-}
-
-
-function mkRatingPopoverHtml(cellData, ratingSchemeItems) {
-
-    const ratingRows = _.map(
-        ratingSchemeItems,
-        d => `<tr><td>${d.name}</td><td>${d.description}</td></tr>`);
-
-    return `
-            <div class='small'>
-                <label>Comment:</label>
-                ${cellData.comment || "-"}
-                <hr>
-                <label>Rating/s:</label>
-                <table class="table table-condensed small">
-                <thead>
-                <tr>
-                <th>Name</th>
-                <th>Description</th>
-                </tr>
-                </thead>
-                <tbody>
-                ${_.join(ratingRows, "")}
-                </tbody>
-                </table>
-            </div>`;
 }
 
 
@@ -376,31 +349,31 @@ function mkAttestationCell(dataCell, baseCell) {
 
 function mkRatingCell(dataCell, baseCell, ratingSchemeItemsById) {
 
-    const ratingSchemeItems = _.map(dataCell.ratingIdValues, d => ratingSchemeItemsById[d]);
+    const ratingSchemeItems = _
+        .chain(dataCell.ratingIdValues)
+        .map(d => ratingSchemeItemsById[d])
+        .sortBy(d => d.name)
+        .value();
 
-    const ratingSchemeItem = _.first(ratingSchemeItems);
-
-    const ratingCount = _.size(ratingSchemeItems);
-
-    const colorBandWidth = 100 / ratingCount;
+    const colorBandWidth = 100 / _.size(ratingSchemeItems);
 
     const colorBands = _.map(
         ratingSchemeItems,
         d => {
             const idx = _.indexOf(ratingSchemeItems, d);
-            // return `${d.color}`;
             return `${d.color} ${colorBandWidth * idx}% ${colorBandWidth * (idx + 1)}%`;
-            // return `${idx === 0 ? `${d.color} 0%,` : ""} ${d.color} ${idx === ratingCount -1 ? "100" : colorBandWidth * idx}%`
         });
 
     const background = `linear-gradient(to right,  ${_.join(colorBands, ",")})`;
 
-    return Object.assign({}, baseCell, {
-        comment: mkRatingPopoverHtml(dataCell, ratingSchemeItems),
-        color: background,
-        fontColor: "black",
-        text: dataCell.textValue,
-    });
+    return Object.assign(
+        {},
+        baseCell, {
+            comment: dataCell.comment,
+            color: background,
+            fontColor: "black",
+            text: dataCell.textValue,
+        });
 }
 
 export function combineColDefs(gridData) {
@@ -478,7 +451,7 @@ export function prepareTableData(gridData) {
                     text: dataCell.textValue,
                     comment: dataCell.comment,
                 });
-            case "ASSESSMENT_DEFINITION": // separate this to single and multi value cell? or sort out the co
+            case "ASSESSMENT_DEFINITION":
             case "MEASURABLE":
                 return mkRatingCell(dataCell, baseCell, ratingSchemeItemsById);
             case "REPORT_GRID_DERIVED_COLUMN_DEFINITION":
@@ -628,24 +601,15 @@ export function mkRowFilter(filters = []) {
         filtersByColumnDefinitionId,
         (filtersForCol, colId) => {
             const colOptionCode = _.get(row, [colId, "optionCode"], undefined);
+
+            //Unused as yet, to enable filtering over multi valued assessments
+            const colOptions = _.get(row, [colId, "options"], []);
+            const optionCodes = _.map(colOptions, d => d.optionCode);
+            const optionsContains = _.some(filtersForCol, f => _.includes(optionCodes, f.optionCode))
+
             return _.some(
                 filtersForCol,
-                f => colOptionCode === f.optionCode);
-        });
-}
-
-export function mkNewRowFilter(filters = []) {
-    const filtersByColumnDefinitionId = _.groupBy(
-        filters,
-        f => f.columnDefinitionId);
-
-    return row => _.every(
-        filtersByColumnDefinitionId,
-        (filtersForCol, colId) => {
-            const colOptionCodes = _.get(row, [colId, "optionCodes"], undefined);
-            return _.some(
-                filtersForCol,
-                f => _.includes(colOptionCodes, f.optionCode));
+                f => colOptionCode === f.optionCode) || optionsContains;
         });
 }
 
