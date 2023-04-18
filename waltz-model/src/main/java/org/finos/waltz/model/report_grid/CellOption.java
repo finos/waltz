@@ -22,4 +22,12 @@ public abstract class CellOption {
                 .build();
     }
 
+    public static CellOption mkCellOption(String code, String text) {
+        return ImmutableCellOption
+                .builder()
+                .text(text)
+                .code(code)
+                .build();
+    }
+
 }

@@ -365,14 +365,22 @@ function mkRatingCell(dataCell, baseCell, ratingSchemeItemsById) {
         });
 
     const background = `linear-gradient(to right,  ${_.join(colorBands, ",")})`;
+    const options = _.map(
+        dataCell.options,
+        d => {
+            const rating = ratingSchemeItemsById[Number(d.code)];
+            return Object.assign({}, d, {name: d.text, code: d.code, color: rating.color, fontColor: "black"})
+        });
 
     return Object.assign(
         {},
-        baseCell, {
+        baseCell,
+        {
             comment: dataCell.comment,
             color: background,
             fontColor: "black",
             text: dataCell.textValue,
+            options
         });
 }
 
@@ -409,7 +417,8 @@ export function prepareTableData(gridData) {
         const baseCell = {
             fontColor: "#3b3b3b",
             optionCode: dataCell.optionCode,
-            optionText: dataCell.optionText
+            optionText: dataCell.optionText,
+            options: dataCell.options
         };
 
         switch (colDef.columnEntityKind) {
@@ -538,13 +547,34 @@ export function refreshSummaries(tableData,
     const reducer = (acc, row) => {
         _.forEach(
             row,
-            (v, k) => isSummarisableProperty(k)
-                ? accInc(
-                    acc,
-                    k + "#" + v.optionCode,
-                    _.get(row, ["visible"], true),
-                    {name: v.optionText, code: v.optionCode, color: v.color, fontColor: v.fontColor})
-                : acc);
+            (v, k) => {
+
+                if (!isSummarisableProperty(k)) {
+                    return;
+                }
+
+                if (_.isEmpty(v.options)) {
+                    accInc(
+                        acc,
+                        k + "#undefined",
+                        _.get(row, ["visible"], true),
+                        {color: v.color});
+                    return acc;
+                } else {
+                    _.forEach(
+                        v.options,
+                        d => accInc(
+                            acc,
+                            k + "#" + d.code,
+                            _.get(row, ["visible"], true),
+                            {
+                                name: d.text,
+                                code: d.code,
+                                color: d.color || v.color,
+                                fontColor: v.fontColor
+                            }));
+                }
+            });
         return acc;
     };
 
@@ -554,6 +584,7 @@ export function refreshSummaries(tableData,
         .chain(tableData)
         .reduce(reducer, {})  // transform into a raw summary object for all rows
         .map((optionSummary, k) => { // convert basic prop-val/count pairs in the summary object into a list of enriched objects
+
             const [columnDefinitionId, ratingId] = _.split(k, "#");
             return Object.assign(
                 {},
@@ -600,16 +631,14 @@ export function mkRowFilter(filters = []) {
     return row => _.every(
         filtersByColumnDefinitionId,
         (filtersForCol, colId) => {
-            const colOptionCode = _.get(row, [colId, "optionCode"], undefined);
 
-            //Unused as yet, to enable filtering over multi valued assessments
+
             const colOptions = _.get(row, [colId, "options"], []);
-            const optionCodes = _.map(colOptions, d => d.optionCode);
-            const optionsContains = _.some(filtersForCol, f => _.includes(optionCodes, f.optionCode))
+            const optionCodes = _.map(colOptions, d => d.code);
+            const hasNotProvidedFilter = _.some(filtersForCol, d => _.isUndefined(d.optionCode));
 
-            return _.some(
-                filtersForCol,
-                f => colOptionCode === f.optionCode) || optionsContains;
+            return (_.isEmpty(colOptions) && hasNotProvidedFilter)
+                || _.some(filtersForCol, f => _.includes(optionCodes, f.optionCode));
         });
 }
 
