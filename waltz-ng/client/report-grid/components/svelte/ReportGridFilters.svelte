@@ -190,18 +190,34 @@
                                 {/each}
                                 </tbody>
                                 <!-- TOTAL -->
-                                <tbody>
+                                <tbody
+                                    title="Some subjects can have more than one option included in the filter, occurrence count is used to show when this differs from the row count">
+                                {#if summary.totalOccurrences !== summary.totalSubjects}
+                                    <tr>
+                                        <td>
+                                            <b>Occurrence Count</b>
+                                        </td>
+                                        <td class="text-right">
+                                            {#if summary.totalOccurrences !== summary.visibleOccurrences}
+                                            <span class="text-muted small">
+                                                ({summary.totalOccurrences})
+                                            </span>
+                                            {/if}
+                                            <span>{summary.visibleOccurrences}</span>
+                                        </td>
+                                    </tr>
+                                {/if}
                                 <tr>
                                     <td>
-                                        <b>Total</b>
+                                        <b>Row Count</b>
                                     </td>
                                     <td class="text-right">
-                                        {#if summary.total !== summary.totalVisible}
+                                        {#if summary.visibleSubjects !== summary.totalSubjects}
                                             <span class="text-muted small">
-                                                ({summary.total})
+                                                ({summary.totalSubjects})
                                             </span>
                                         {/if}
-                                        <span>{summary.totalVisible}</span>
+                                        <span>{summary.visibleSubjects}</span>
                                     </td>
                                 </tr>
                                 </tbody>

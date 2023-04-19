@@ -530,16 +530,33 @@ function isSummarisableProperty(k) {
 }
 
 
+function countDistinct(optionSummaries, mapper) {
+    return _.chain(optionSummaries)
+        .flatMap(mapper)
+        .uniq()
+        .size()
+        .value();
+}
+
 export function refreshSummaries(tableData,
                                  columnDefinitions) {
 
     // increments a pair of counters referenced by `prop` in the object `acc`
-    const accInc = (acc, prop, visible, optionInfo) => {
-        const info = _.get(acc, prop, {counts: {visible: 0, total: 0}, optionInfo});
+    const accInc = (acc, prop, visible, optionInfo, subjectId) => {
+        const info = _.get(acc, prop, {counts: {visible: 0, total: 0}, subjects: {visible: [], total: []}, optionInfo});
         info.counts.total++;
         if (visible) {
             info.counts.visible++;
         }
+
+        if (!_.includes(info.subjects.total, subjectId)) {
+            info.subjects.total = _.concat(info.subjects.total, subjectId);
+
+            if (visible) {
+                info.subjects.visible = _.concat(info.subjects.visible, subjectId);
+            }
+        }
+
         acc[prop] = info;
     };
 
@@ -553,12 +570,16 @@ export function refreshSummaries(tableData,
                     return;
                 }
 
+                const visible = _.get(row, ["visible"], true);
+                const subjectId = _.get(row, ["subject", "entityReference", "id"]);
+
                 if (_.isEmpty(v.options)) {
                     accInc(
                         acc,
                         k + "#undefined",
-                        _.get(row, ["visible"], true),
-                        {color: v.color});
+                        visible,
+                        {color: v.color},
+                        subjectId);
                     return acc;
                 } else {
                     _.forEach(
@@ -566,13 +587,14 @@ export function refreshSummaries(tableData,
                         d => accInc(
                             acc,
                             k + "#" + d.code,
-                            _.get(row, ["visible"], true),
+                            visible,
                             {
                                 name: d.text,
                                 code: d.code,
                                 color: d.color || v.color,
                                 fontColor: v.fontColor
-                            }));
+                            },
+                            subjectId));
                 }
             });
         return acc;
@@ -602,8 +624,10 @@ export function refreshSummaries(tableData,
                 [
                     c => c.optionInfo.name
                 ]),
-            total: _.sumBy(optionSummaries, c => c.counts.total),
-            totalVisible: _.sumBy(optionSummaries, c => c.counts.visible)
+            totalOccurrences: _.sumBy(optionSummaries, c => c.counts.total),
+            visibleOccurrences: _.sumBy(optionSummaries, c => c.counts.visible),
+            totalSubjects: countDistinct(optionSummaries, c => c.subjects.total),
+            visibleSubjects: countDistinct(optionSummaries, c => c.subjects.visible),
         }))
         .orderBy([  // order the summaries so they reflect the column order
             d => d.column?.position,
