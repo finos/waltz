@@ -32,6 +32,7 @@ import org.finos.waltz.model.report_grid.*;
 import org.finos.waltz.service.app_group.AppGroupService;
 import org.finos.waltz.service.entity_named_note.EntityNamedNoteService;
 import org.jooq.lambda.tuple.Tuple2;
+import org.jooq.lambda.tuple.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,9 +104,9 @@ public class ReportGridFilterViewService {
         if (gridFilterInfo == null) {
             throw new IllegalArgumentException("Cannot parse filter grid info from note text");
         } else {
-            Tuple2<Long, Set<AppGroupEntry>> appGroupIdToEntries = determineApplicationsInGroup(gridFilterInfo);
+            Tuple3<EntityKind, Long, Set<AppGroupEntry>> appGroupIdToEntries = determineApplicationsInGroup(gridFilterInfo);
             appGroupService.replaceGroupEntries(asSet(appGroupIdToEntries));
-            return appGroupIdToEntries.v2.size();
+            return appGroupIdToEntries.v3.size();
         }
     }
 
@@ -132,7 +133,7 @@ public class ReportGridFilterViewService {
         LOG.info("Loading filter info from notes");
         Set<ReportGridFilterInfo> gridInfoWithFilters = findGridInfoWithFilters();
 
-        Set<Tuple2<Long, Set<AppGroupEntry>>> appGroupToEntries = determineAppGroupEntries(gridInfoWithFilters);
+        Set<Tuple3<EntityKind, Long, Set<AppGroupEntry>>> appGroupToEntries = determineAppGroupEntries(gridInfoWithFilters);
 
         LOG.info("Populating application groups from filters");
         appGroupService.replaceGroupEntries(appGroupToEntries);
@@ -141,14 +142,14 @@ public class ReportGridFilterViewService {
     }
 
 
-    private Set<Tuple2<Long, Set<AppGroupEntry>>> determineAppGroupEntries(Set<ReportGridFilterInfo> gridInfoWithFilters) {
+    private Set<Tuple3<EntityKind, Long, Set<AppGroupEntry>>> determineAppGroupEntries(Set<ReportGridFilterInfo> gridInfoWithFilters) {
         return gridInfoWithFilters
                 .stream()
                 .map(this::determineApplicationsInGroup)
                 .collect(Collectors.toSet());
     }
 
-    private Tuple2<Long, Set<AppGroupEntry>> determineApplicationsInGroup(ReportGridFilterInfo reportGridFilterInfo) {
+    private Tuple3<EntityKind, Long, Set<AppGroupEntry>> determineApplicationsInGroup(ReportGridFilterInfo reportGridFilterInfo) {
         EntityKind subjectKind = reportGridFilterInfo.gridDefinition().subjectKind();
 
         Optional<ReportGrid> maybeGrid = reportGridService.getByIdAndSelectionOptions(
@@ -179,7 +180,7 @@ public class ReportGridFilterViewService {
                                 .isReadOnly(true)
                                 .build());
 
-                    return tuple(reportGridFilterInfo.appGroupId(), appGroupEntries);
+                    return tuple(subjectKind, reportGridFilterInfo.appGroupId(), appGroupEntries);
                 })
                 .orElseThrow(() -> new IllegalStateException("Cannot create grid instance with params" + reportGridFilterInfo));
     }
