@@ -45,6 +45,7 @@
     function removeSummary(summary) {
         // remove any filters which refer to the property used by this summary
         $filters = _.reject($filters, f => f.columnDefinitionId === summary.column.gridColumnId);
+        activeSummaries.remove(summary.column.id);
     }
 
 
@@ -154,7 +155,7 @@
                                 <EntityIcon kind={summary.column.columnEntityKind}/>
                                 <span>{getDisplayNameForColumn(summary?.column)}</span>
                                 <button class="btn btn-skinny waltz-visibility-child-30 clickable pull-right"
-                                        on:click={() => removeSummary(summary)}>
+                                        on:click={() => addOrRemoveFromActiveSummaries(summary)}>
                                     <Icon name="close"/>
                                 </button>
                             </h5>
