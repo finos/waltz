@@ -1153,8 +1153,6 @@ public class ReportGridDao {
                                 .subjectId(r.get("ref_i", Long.class))
                                 .dateTimeValue(toLocalDateTime(attAt))
                                 .comment(format("Attested by: %s", r.get("att_by", String.class)))
-                                .optionCode(option.code())
-                                .optionText(option.text())
                                 .options(asSet(option))
                                 .build();
                     });
@@ -1273,8 +1271,6 @@ public class ReportGridDao {
                 .subjectId(subjectId)
                 .columnDefinitionId(colDefId)
                 .textValue(derivedUsage.displayName())
-                .optionCode(derivedUsage.name())
-                .optionText(derivedUsage.displayName())
                 .options(asSet(mkCellOption(derivedUsage.name(), derivedUsage.displayName())))
                 .build();
     }
@@ -1938,8 +1934,6 @@ public class ReportGridDao {
                                     .subjectId(entityId)
                                     .columnDefinitionId(highIdToDefIdMap.getOrDefault(measurableId, lowIdToDefIdMap.get(measurableId)))
                                     .ratingIdValues(asSet(t.v1))
-                                    .optionCode(Long.toString(t.v1))
-                                    .optionText(t.v3)
                                     .options(asSet(mkCellOption(Long.toString(t.v1), t.v3)))
                                     .textValue(t.v3)
                                     .build())
@@ -1983,8 +1977,6 @@ public class ReportGridDao {
                             .ratingIdValues(asSet(r.get(rsi.ID)))
                             .textValue(r.get(rsi.NAME))
                             .comment(r.get(mr.DESCRIPTION))
-                            .optionText(r.get(rsi.NAME))
-                            .optionCode(Long.toString(r.get(rsi.ID)))
                             .options(asSet(mkCellOption(Long.toString(r.get(rsi.ID)), r.get(rsi.NAME))))
                         .build());
         }
@@ -2030,8 +2022,6 @@ public class ReportGridDao {
                                 .ratingIdValues(asSet(r.get(ar.RATING_ID)))
                                 .textValue(ratingName)
                                 .comment(r.get(ar.DESCRIPTION))
-                                .optionCode(optionCode)
-                                .optionText(ratingName)
                                 .options(asSet(ImmutableCellOption.builder()
                                         .text(ratingName)
                                         .code(optionCode)

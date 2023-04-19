@@ -57,16 +57,6 @@ public abstract class ReportGridCell implements CommentProvider {
     public abstract LocalDateTime dateTimeValue();
 
     @Value.Default
-    public String optionCode() {
-        return "PROVIDED";
-    }
-
-    @Value.Default
-    public String optionText() {
-        return "Provided";
-    }
-
-    @Value.Default
     public Set<CellOption> options() {
         return asSet(CellOption.defaultCellOption());
     }

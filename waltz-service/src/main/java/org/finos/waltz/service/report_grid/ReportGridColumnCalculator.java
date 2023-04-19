@@ -12,9 +12,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.MapUtilities.*;
-import static org.finos.waltz.common.SetUtilities.map;
-import static org.finos.waltz.common.SetUtilities.union;
+import static org.finos.waltz.common.SetUtilities.*;
 import static org.finos.waltz.common.StringUtilities.notEmpty;
+import static org.finos.waltz.model.report_grid.CellOption.mkCellOption;
 import static org.finos.waltz.model.utils.IdUtilities.indexById;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
@@ -144,8 +144,7 @@ public class ReportGridColumnCalculator {
                         .builder()
                         .subjectId(subject.entityReference().id())
                         .errorValue(t.v2)
-                        .optionCode("EXECUTION_ERROR")
-                        .optionText("Execution Error")
+                        .options(asSet(mkCellOption("EXECUTION_ERROR", "Execution Error")))
                         .columnDefinitionId(t.v1.gridColumnId())
                         .build())
                 .collect(toSet());
@@ -207,8 +206,7 @@ public class ReportGridColumnCalculator {
                                 .builder()
                                 .subjectId(subject.entityReference().id())
                                 .errorValue(compilationError)
-                                .optionCode("COMPILE_ERROR")
-                                .optionText("Compile Error")
+                                .options(asSet(mkCellOption("COMPILE_ERROR", "Compile Error")))
                                 .columnDefinitionId(cd.gridColumnId())
                                 .build(),
                         expr -> {
@@ -234,8 +232,7 @@ public class ReportGridColumnCalculator {
                                         .textValue(cr.value())
                                         .subjectId(subject.entityReference().id())
                                         .columnDefinitionId(cd.gridColumnId())
-                                        .optionCode(cr.optionCode())
-                                        .optionText(cr.optionText())
+                                        .options(asSet(mkCellOption(cr.optionCode(), cr.optionText())))
                                         .build();
                             }
                         });

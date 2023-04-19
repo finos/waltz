@@ -46,6 +46,7 @@ import static java.util.Collections.emptySet;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.first;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
+import static org.finos.waltz.common.CollectionUtilities.notEmpty;
 import static org.finos.waltz.common.ListUtilities.map;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.MapUtilities.indexBy;
@@ -256,9 +257,10 @@ public class ReportGridFilterViewService {
                                 map(ratings, rating -> String.valueOf(rating.rating())),
                                 map(ratings, NameProvider::name),
                                 map(ratings, rating -> rating.externalId().orElse(null)));
-                        return CollectionUtilities.notEmpty(intersection(filter.filterValues(), ratingIdentifiers));
+                        return notEmpty(intersection(filter.filterValues(), ratingIdentifiers));
                     } else {
-                        return filter.filterValues().contains(c.optionCode());
+                        Set<String> optionCodes = SetUtilities.map(c.options(), CellOption::code);
+                        return notEmpty(intersection(filter.filterValues(), optionCodes));
                     }
                 })
                 .map(ReportGridCell::subjectId)
