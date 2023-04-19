@@ -31,6 +31,7 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.entity_field_reference.EntityFieldReference;
 import org.finos.waltz.model.entity_field_reference.ImmutableEntityFieldReference;
 import org.finos.waltz.model.report_grid.*;
+import org.finos.waltz.model.survey.SurveyQuestionFieldType;
 import org.finos.waltz.model.usage_info.UsageKind;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.ChangeInitiative;
@@ -40,7 +41,6 @@ import org.finos.waltz.schema.tables.records.ReportGridFixedColumnDefinitionReco
 import org.finos.waltz.schema.tables.records.ReportGridRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
-import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
 import org.slf4j.Logger;
@@ -70,14 +70,20 @@ import static org.finos.waltz.common.DateTimeUtilities.toLocalDate;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.common.ListUtilities.asList;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
-import static org.finos.waltz.common.MapUtilities.*;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.SetUtilities.*;
-import static org.finos.waltz.common.StringUtilities.*;
+import static org.finos.waltz.common.StringUtilities.isEmpty;
+import static org.finos.waltz.common.StringUtilities.join;
+import static org.finos.waltz.common.StringUtilities.lower;
+import static org.finos.waltz.common.StringUtilities.safeTrim;
+import static org.finos.waltz.common.StringUtilities.toHtmlTable;
+import static org.finos.waltz.common.StringUtilities.toMailbox;
+import static org.finos.waltz.common.StringUtilities.upper;
 import static org.finos.waltz.common.hierarchy.HierarchyUtilities.toForest;
 import static org.finos.waltz.data.JooqUtilities.fieldsWithout;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.report_grid.CellOption.defaultCellOption;
 import static org.finos.waltz.model.report_grid.CellOption.mkCellOption;
 import static org.finos.waltz.model.survey.SurveyInstanceStatus.APPROVED;
 import static org.finos.waltz.model.survey.SurveyInstanceStatus.COMPLETED;
@@ -2212,13 +2218,37 @@ public class ReportGridDao {
 
                         List<String> listResponses = responsesByInstanceQuestionKey.getOrDefault(tuple(instanceId, questionId), emptyList());
 
+                        // if a question is not mandatory and left blank present as not provided
+                        Set<CellOption> options = isEmpty(response)
+                                ? emptySet()
+                                : asSet(determineOptionForSurveyQuestion(fieldType, response));
+
                         return ImmutableReportGridCell.builder()
                                 .subjectId(r.get(SURVEY_INSTANCE.ENTITY_ID))
                                 .columnDefinitionId(questionIdToDefIdMap.get(questionId))
                                 .textValue(determineDisplayText(fieldType, entityName, response, listResponses))
                                 .comment(r.get(SURVEY_QUESTION_RESPONSE.COMMENT))
+                                .options(options)
                                 .build();
                     });
+        }
+    }
+
+
+    private CellOption determineOptionForSurveyQuestion(String fieldType, String response) {
+
+        if (isEmpty(response)) {
+            mkCellOption("NA", "N/A");
+        }
+
+        SurveyQuestionFieldType type = SurveyQuestionFieldType.valueOf(fieldType);
+
+        switch (type) {
+            case BOOLEAN:
+            case DROPDOWN:
+                return mkCellOption(upper(response), response);
+            default:
+                return CellOption.defaultCellOption();
         }
     }
 
