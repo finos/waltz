@@ -5,7 +5,7 @@ import {amberBg, blueBg, determineForegroundColor, greenBg, greyBg, pinkBg} from
 import {scaleLinear} from "d3-scale";
 import {extent} from "d3-array";
 import {subtractYears} from "../../../common/date-utils";
-import {entity} from "../../../common/services/enums/entity";
+import {markdownToHtml} from "../../../common/markdown-utils";
 
 
 export const reportGridMember = {
@@ -376,7 +376,7 @@ function mkRatingCell(dataCell, baseCell, ratingSchemeItemsById) {
         {},
         baseCell,
         {
-            comment: dataCell.comment,
+            comment: markdownToHtml(dataCell.comment),
             color: background,
             fontColor: "black",
             text: dataCell.textValue,
