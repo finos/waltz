@@ -1,26 +1,6 @@
-<script context="module">
-    import showdown from "showdown";
-
-    showdown.extension("bootstrap-tables", () => {
-        return [{
-            type: "output",
-            regex: /<table>/g,
-            replace: "<table class='table'>",
-        }]
-    });
-
-    const converter = new showdown.Converter({extensions: ["bootstrap-tables"]});
-    converter.setFlavor("github");
-    converter.setOption("ghCodeBlocks", true);
-    converter.setOption("simplifiedAutoLink", true);
-    converter.setOption("simpleLineBreaks", true);
-    converter.setOption("strikethrough", true);
-    converter.setOption("tasklists", true);
-</script>
-
-
 <script>
     import _ from "lodash";
+    import {markdownToHtml} from "../markdown-utils";
 
     export let text = "";
     export let context = {};
@@ -32,7 +12,7 @@
                 ? markdown
                 : _.template(markdown, { variable: "ctx"})(ctx);  // creates template function then invokes with `ctx`
 
-            return converter.makeHtml(markdownText);
+            return markdownToHtml(markdownText);
         } catch (e) {
             console.log("Failed to render markdown with context", { context, markdown, e })
         }

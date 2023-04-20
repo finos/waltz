@@ -167,6 +167,13 @@ public class StringUtilities {
                 .trim();
     }
 
+    public static String upper(String value) {
+        checkNotNull(value, "value cannot be null");
+        return value
+                .toUpperCase()
+                .trim();
+    }
+
 
     public static char firstChar(String str, char dflt) {
         return mkSafe(str).length() > 0

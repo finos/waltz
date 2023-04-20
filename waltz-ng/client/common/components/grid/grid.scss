@@ -59,10 +59,7 @@
     }
 
     .waltz-grid-report-cell {
-        padding-left: 5px;
-        padding-right: 5px;
-        padding-top: 8px;
-        margin: 1px;
+        margin-bottom: 2px;
         -moz-box-sizing: border-box;
         -webkit-box-sizing: border-box;
         box-sizing: border-box;
@@ -71,7 +68,16 @@
         -o-text-overflow: ellipsis;
         text-overflow: ellipsis;
         overflow: hidden;
-        height: 100%;
         border-right: 1px solid #ddd;
+        height: 28px;
+
+        .report-grid-cell-text {
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            padding-left: 4px;
+            height: 28px;
+            background: none;
+        }
     }
 }
