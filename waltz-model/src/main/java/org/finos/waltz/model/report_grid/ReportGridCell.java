@@ -26,6 +26,9 @@ import org.immutables.value.Value;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Set;
+
+import static org.finos.waltz.common.SetUtilities.asSet;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableReportGridCell.class)
@@ -38,9 +41,7 @@ public abstract class ReportGridCell implements CommentProvider {
     public abstract long subjectId(); // y
 
 
-    @Nullable
-    public abstract Long ratingIdValue();
-
+    public abstract Set<Long> ratingIdValues();
 
     @Nullable
     public abstract BigDecimal numberValue();
@@ -56,13 +57,7 @@ public abstract class ReportGridCell implements CommentProvider {
     public abstract LocalDateTime dateTimeValue();
 
     @Value.Default
-    public String optionCode() {
-        return "PROVIDED";
+    public Set<CellOption> options() {
+        return asSet(CellOption.defaultCellOption());
     }
-
-    @Value.Default
-    public String optionText() {
-        return "Provided";
-    }
-
 }
