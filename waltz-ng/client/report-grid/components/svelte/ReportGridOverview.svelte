@@ -29,7 +29,7 @@
     let owners = [];
     let viewers = [];
 
-    $: reportGridCall = reportGridStore.findForUser(true);
+    $: reportGridCall = reportGridStore.findDefinitionsForUser(true);
     $: grids = $reportGridCall.data;
 
     $: gridMembersCall = $selectedGrid?.definition?.id && reportGridMemberStore.findByGridId($selectedGrid?.definition?.id);
@@ -56,7 +56,7 @@
             .then(r => {
                 toasts.success("Grid created successfully");
                 selectGrid(r.data, true);
-                reportGridCall = reportGridStore.findForUser(true);
+                reportGridCall = reportGridStore.findDefinitionsForUser(true);
             })
             .catch(e => toasts.error("Could not create report grid. " + e.error));
     }
@@ -73,7 +73,7 @@
             .then(r => {
                 toasts.success("Grid updated successfully")
                 selectGrid(r.data);
-                reportGridCall = reportGridStore.findForUser(true);
+                reportGridCall = reportGridStore.findDefinitionsForUser(true);
             })
             .catch(e => toasts.error("Could not update grid. " + e.error));
     }
@@ -85,7 +85,7 @@
                 toasts.success("Grid cloned successfully")
                 const grid = r.data;
                 selectGrid(grid);
-                reportGridCall = reportGridStore.findForUser(true);
+                reportGridCall = reportGridStore.findDefinitionsForUser(true);
             })
             .catch(e => toasts.error("Could not clone grid. " + e.error));
     }
@@ -97,7 +97,7 @@
             .then(r => {
                 toasts.success("Grid removed successfully")
                 selectGrid(null);
-                reportGridCall = reportGridStore.findForUser(true);
+                reportGridCall = reportGridStore.findDefinitionsForUser(true);
             })
             .catch(e => toasts.error("Could not remove grid"));
     }
@@ -197,9 +197,9 @@
                             {#if !_.isEmpty(owners)}
                                 <div class:waltz-scroll-region-150={_.size(owners) > 10}>
                                     <ul>
-                                        {#each _.orderBy(owners, d => d.userId) as owner}
+                                        {#each _.orderBy(owners, d => d.user.displayName) as owner}
                                             <li>
-                                                {owner.userId}
+                                                {owner.user.displayName}
                                             </li>
                                         {/each}
                                     </ul>
@@ -215,9 +215,9 @@
                             {#if !_.isEmpty(viewers)}
                                 <div class:waltz-scroll-region-150={_.size(viewers) > 10}>
                                     <ul>
-                                        {#each _.orderBy(viewers, d => d.userId) as viewer}
+                                        {#each _.orderBy(viewers, d => d.user.displayName) as viewer}
                                             <li>
-                                                {viewer.userId}
+                                                {viewer.user.displayName}
                                             </li>
                                         {/each}
                                     </ul>

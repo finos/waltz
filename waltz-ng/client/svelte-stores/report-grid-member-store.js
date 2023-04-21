@@ -29,11 +29,11 @@ export function mkReportGridMemberStore() {
     const updateRole = (gridId, updateRoleCommand) => remote
         .execute("POST", `api/report-grid-member/grid-id/${gridId}/update-role`, updateRoleCommand);
 
-    const deleteRole = (member) => remote
-        .execute("POST", "api/report-grid-member/delete", member);
+    const deleteRole = (cmd) => remote
+        .execute("POST", "api/report-grid-member/delete", cmd);
 
-    const create = (member) => remote
-        .execute("POST", "api/report-grid-member/create", member);
+    const create = (cmd) => remote
+        .execute("POST", "api/report-grid-member/create", cmd);
 
     return {
         findByGridId,

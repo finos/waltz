@@ -18,7 +18,6 @@
 
 package org.finos.waltz.service.report_grid;
 
-import org.finos.waltz.common.CollectionUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.report_grid.ReportGridDao;
@@ -281,7 +280,7 @@ public class ReportGridFilterViewService {
 
         Set<EntityNamedNote> filterPresetNotes = entityNamedNoteService.findByNoteTypeExtId(REPORT_GRID_APP_GROUP_CREATION_NOTE_TYPE_EXT_ID);
 
-        Set<ReportGridDefinition> grids = reportGridDao.findAll();
+        Set<ReportGridDefinition> grids = reportGridDao.findAllDefinitions();
         Map<String, ReportGridDefinition> gridsByExternalId = indexBy(grids, d -> d.externalId().get());
 
         List<Tuple2<Long, String>> appGroupIdToNoteText = map(filterPresetNotes, d -> tuple(d.entityReference().id(), d.noteText()));

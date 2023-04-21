@@ -23,16 +23,10 @@
     $: membersCall = $selectedGrid?.definition?.id && reportGridMemberStore.findByGridId($selectedGrid?.definition.id, true);
     $: members = $membersCall?.data || [];
 
-    $: peopleCall = $selectedGrid?.definition?.id && reportGridMemberStore.findPeopleByGridId($selectedGrid?.definition.id, true);
-    $: people = $peopleCall?.data || [];
 
     $: membersList = _.isEmpty(qry)
         ? members
-        : termSearch(members, qry, ["userId", "role"]);
-
-    $: enrichedMembersList = _.map(
-        membersList,
-        d => Object.assign({}, d, {person: _.find(people, p => p.email === d.userId)}));
+        : termSearch(members, qry, ["user.displayName", "role"]);
 
     function selectMember(member) {
         selectedMember = member;
@@ -40,7 +34,7 @@
 
     function editRole(member, role) {
         const updateCmd = {
-            userId: member.userId,
+            userId: member.email,
             role
         }
 
@@ -58,15 +52,13 @@
 
     function reloadMembers(){
         membersCall = reportGridMemberStore.findByGridId($selectedGrid?.definition.id, true);
-        peopleCall = reportGridMemberStore.findPeopleByGridId($selectedGrid?.definition.id, true);
     }
 
     function deleteMember(member) {
 
         const reportGridMember = {
             gridId: member.gridId,
-            userId: member.userId,
-            role: member.role
+            userId: member.user.email,
         }
 
         let deletePromise = reportGridMemberStore.deleteRole(reportGridMember);
@@ -129,12 +121,12 @@
                 </tr>
             </thead>
             <tbody>
-            {#each enrichedMembersList as member}
+            {#each membersList as member}
                 <tr class="clickable"
-                    class:selected={selectedMember?.userId === member?.userId}
+                    class:selected={selectedMember?.user.id === member?.user.id}
                     on:click={() => selectMember(member)}>
-                    <td class:memberInactive={member.person?.isRemoved}>
-                        {member.person?.displayName}
+                    <td class:memberInactive={member.user?.isRemoved}>
+                        {member.user?.displayName}
                     </td>
                     <td>
                         {reportGridMember[member.role].name}

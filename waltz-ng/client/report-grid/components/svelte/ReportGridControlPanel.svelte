@@ -39,7 +39,7 @@
 
     $: isOwned = $selectedGrid && _.includes($ownedReportIds, $selectedGrid?.definition?.id);
 
-    $: ownedGridsCall = $selectedGrid?.definition?.id && reportGridStore.findForOwner(true);
+    $: ownedGridsCall = $selectedGrid?.definition?.id && reportGridStore.findDefinitionsForOwner(true);
     $: $ownedReportIds = _.map($ownedGridsCall?.data, d => d.id);
 
 </script>

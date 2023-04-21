@@ -376,7 +376,7 @@ function mkRatingCell(dataCell, baseCell, ratingSchemeItemsById) {
         {},
         baseCell,
         {
-            comment: markdownToHtml(dataCell.comment),
+            comment: dataCell.comment,
             color: background,
             fontColor: "black",
             text: dataCell.textValue,

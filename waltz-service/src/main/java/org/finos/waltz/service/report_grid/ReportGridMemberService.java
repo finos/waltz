@@ -79,14 +79,14 @@ public class ReportGridMemberService {
     }
 
 
-    public boolean delete(ReportGridMember member, String username) throws InsufficientPrivelegeException {
-        checkIsOwner(member.gridId(), username);
-        return reportGridMemberDao.delete(member);
+    public boolean delete(ReportGridMemberDeleteCommand cmd, String username) throws InsufficientPrivelegeException {
+        checkIsOwner(cmd.gridId(), username);
+        return reportGridMemberDao.delete(cmd);
     }
 
 
-    public int create(ReportGridMember member, String username) throws InsufficientPrivelegeException {
-        checkIsOwner(member.gridId(), username);
-        return reportGridMemberDao.create(member);
+    public int create(ReportGridMemberCreateCommand cmd, String username) throws InsufficientPrivelegeException {
+        checkIsOwner(cmd.gridId(), username);
+        return reportGridMemberDao.register(cmd.gridId(), cmd.userId(), cmd.role());
     }
 }

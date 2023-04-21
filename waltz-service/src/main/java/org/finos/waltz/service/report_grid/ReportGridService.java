@@ -18,8 +18,6 @@
 
 package org.finos.waltz.service.report_grid;
 
-import org.finos.waltz.common.CollectionUtilities;
-import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.common.exception.NotFoundException;
@@ -88,18 +86,21 @@ public class ReportGridService {
     }
 
 
-    public Set<ReportGridDefinition> findAll(){
-        return reportGridDao.findAll();
+    public Set<ReportGridDefinition> findAllDefinitions() {
+        return reportGridDao.findAllDefinitions();
     }
 
-    public Optional<ReportGridDefinition> findByExternalId(String externalId){
+    public Optional<ReportGridDefinition> findByExternalId(String externalId) {
         return Optional.ofNullable(reportGridDao.getGridDefinitionByExternalId(externalId));
     }
 
-    public Set<ReportGridDefinition> findForUser(String username){
-        return reportGridDao.findForUser(username);
+    public Set<ReportGridDefinition> findGridDefinitionsForUser(String username) {
+        return reportGridDao.findGridDefinitionsForUser(username);
     }
 
+    public Set<ReportGridInfo> findGridInfoForUser(String username) {
+        return reportGridDao.findGridInfoForUser(username);
+    }
 
     public Optional<ReportGrid> getByIdAndSelectionOptions(
             long id,
@@ -134,10 +135,13 @@ public class ReportGridService {
                     .build());
         }
 
+        Set<ReportGridMember> members = reportGridMemberService.findByGridId(id);
+
         return Optional.of(ImmutableReportGrid
                 .builder()
                 .definition(definition)
                 .instance(instance)
+                .members(members)
                 .build());
     }
 
@@ -253,8 +257,8 @@ public class ReportGridService {
     }
 
 
-    public Set<ReportGridDefinition> findForOwner(String username) {
-        return reportGridDao.findForOwner(username);
+    public Set<ReportGridDefinition> findDefinitionsForOwner(String username) {
+        return reportGridDao.findDefinitionsForOwner(username);
     }
 
 
