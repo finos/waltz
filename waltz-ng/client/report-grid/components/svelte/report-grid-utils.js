@@ -177,7 +177,7 @@ export function prepareColumnDefs(colDefs) {
                     toSearchTerm: d => _.get(d, [c.gridColumnId, "text"], ""),
                     cellTemplate:
                         `<div
-                              uib-popover-html="COL_FIELD.comment"
+                              uib-popover-html="grid.appScope.markdownToHtml(COL_FIELD.comment)"
                               popover-trigger="mouseenter"
                               popover-enable="COL_FIELD.comment != null"
                               popover-popup-delay="500"
