@@ -30,8 +30,10 @@
         </a>
     </p>
 
-    <div class="row" ng-if="!$ctrl.visibility.detail">
-        <div class="col-md-6" ng-repeat="summary in $ctrl.summaries">
+    <div class="row row-mini-gutters"
+         ng-if="!$ctrl.visibility.detail">
+        <div class="col-md-6"
+             ng-repeat="summary in $ctrl.summaries">
             <waltz-pie-table data="summary.summary"
                              name="{{ summary.title }}"
                              config="$ctrl.overviewConfig">

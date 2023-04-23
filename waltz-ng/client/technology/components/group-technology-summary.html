@@ -67,17 +67,17 @@
 <script type="text/ng-template"
         id="wgts-software">
     <div style="padding:8px">
-        <div class="row"
+        <div class="row row-mini-gutters"
              style="padding-top: 8px;"
              ng-if="$ctrl.visibility.software">
-            <div class="col-sm-4">
+            <div class="col-sm-6">
                 <waltz-pie-table data="$ctrl.softwareStats.vendor"
                                  config="$ctrl.pieConfig.vendor"
                                  name="By Vendor">
                 </waltz-pie-table>
             </div>
 
-            <div class="col-sm-4">
+            <div class="col-sm-6">
                 <waltz-pie-table data="$ctrl.softwareStats.maturity"
                                  config="$ctrl.pieConfig.maturity"
                                  name="By Maturity">
@@ -119,7 +119,7 @@
 <script type="text/ng-template"
         id="wgts-servers">
     <div style="padding:8px">
-        <div class="row">
+        <div class="row row-mini-gutters">
             <div class="col-sm-4">
                 <waltz-pie-table data="$ctrl.serverStats.operatingSystem"
                                  config="$ctrl.pieConfig.operatingSystem"
@@ -142,7 +142,7 @@
                 </waltz-pie-table>
             </div>
         </div>
-        <div class="row">
+        <div class="row row-mini-gutters">
             <div class="col-sm-4">
                 <waltz-pie-table data="$ctrl.serverStats.operatingSystemEndOfLifeStatus"
                                  config="$ctrl.pieConfig.endOfLifeStatus"
@@ -172,7 +172,7 @@
 <script type="text/ng-template"
         id="wgts-databases">
     <div style="padding:8px">
-        <div class="row"
+        <div class="row row-mini-gutters"
              style="padding-top: 8px;">
 
             <div class="col-sm-4">

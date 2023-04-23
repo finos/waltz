@@ -101,3 +101,13 @@
         color: #23527c;
     }
 }
+
+.row-mini-gutters {
+    margin-right: 2px;
+    margin-left: 0px;
+}
+
+.row-mini-gutters [class*="col-"] {
+    padding-right: 6px;
+    padding-left: 6px;
+}

@@ -222,10 +222,11 @@ textarea {
 
 .waltz-display-field-label {
     color: #705f53;
+    overflow: hidden;
 }
 
 .waltz-display-field-value {
-    overflow-wrap: break-word;
+    overflow-wrap: anywhere;
 }
 
 
