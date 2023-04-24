@@ -29,6 +29,7 @@
     let selectedKind = null;
     let qry = "";
     let actions = [];
+    let status = null;
 
     const editAction = {
         icon: "pencil",
@@ -92,7 +93,7 @@
         Loading bookmarks...
     </LoadingPlaceholder>
 {:else}
-    <div class="row">
+    <div class="row row-mini-gutters">
         <div class="col-sm-3">
             <BookmarkCategoryMenu on:kindSelect={onKindSelect}
                                   bookmarkKinds={bookmarkKinds} />

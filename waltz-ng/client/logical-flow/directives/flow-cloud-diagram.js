@@ -16,13 +16,13 @@
  *
  */
 
-import {scaleLinear} from 'd3-scale';
-import {max, min} from 'd3-array';
-import template from './flow-cloud-diagram.html';
+import {scaleLinear} from "d3-scale";
+import {max, min} from "d3-array";
+import template from "./flow-cloud-diagram.html";
 
 
 const BINDINGS = {
-    stats: '<'
+    stats: "<"
 };
 
 
@@ -49,26 +49,28 @@ function updateArrows(rootElem, apps) {
         ])
         .range([0.85, 1.12]);
 
-    resizeArrow(rootElem, 'in-arrow', arrowScale(apps.inbound));
-    resizeArrow(rootElem, 'out-arrow', arrowScale(apps.outbound));
+    resizeArrow(rootElem, "in-arrow", arrowScale(apps.inbound));
+    resizeArrow(rootElem, "out-arrow", arrowScale(apps.outbound));
 }
 
 
 function updateHoverHelp(rootElem, apps, flows) {
     setHover(
         rootElem,
-        'intra-ratio',
+        "intra-ratio",
         `(#unique app connections / #apps in group) \n => ${ flows.intra } / ${ apps.intra }`);
 
     if (flows.inbound > 0) {
-        setHover(rootElem,
-            'in-ratio',
+        setHover(
+            rootElem,
+            "in-ratio",
             `(#unique app connections / #apps in group) \n => ${ flows.inbound } / ${ apps.intra }`);
     }
 
     if (flows.outbound > 0) {
-        setHover(rootElem,
-            'out-ratio',
+        setHover(
+            rootElem,
+            "out-ratio",
             `(#unique app connections / #apps in group) \n => ${ flows.outbound } / ${ apps.intra }`);
     }
 }
@@ -76,9 +78,9 @@ function updateHoverHelp(rootElem, apps, flows) {
 
 function calculateRatios(apps, flows) {
     if (! apps.intra) return {
-        inbound: 'n/a',
-        outbound: 'n/a',
-        intra: 'n/a'
+        inbound: "n/a",
+        outbound: "n/a",
+        intra: "n/a"
     };
 
     return {
@@ -92,25 +94,25 @@ function calculateRatios(apps, flows) {
 function updateRatios(rootElem, apps, flows) {
     const ratios = calculateRatios(apps, flows);
 
-    setText(rootElem, 'intra-ratio', `Intra-app connectivity ratio: ${ ratios.intra }`);
+    setText(rootElem, "intra-ratio", `Intra-app connectivity ratio: ${ ratios.intra }`);
 
     if (flows.inbound > 0) {
-        setText(rootElem, 'in-ratio', `Connectivity ratio: ${ ratios.inbound }`);
+        setText(rootElem, "in-ratio", `Connectivity ratio: ${ ratios.inbound }`);
     }
     if (flows.outbound > 0) {
-        setText(rootElem, 'out-ratio', `Connectivity ratio: ${ ratios.outbound }`);
+        setText(rootElem, "out-ratio", `Connectivity ratio: ${ ratios.outbound }`);
     }
 }
 
 
 function updateAppCounts(rootElem, apps) {
-    setText(rootElem, 'intra-count', `${ apps.intra } app/s`);
-    setText(rootElem, 'in-count', `${ apps.inbound } sending app/s`);
-    setText(rootElem, 'out-count', `${ apps.outbound } receiving app/s`);
+    setText(rootElem, "intra-count", `${ apps.intra } app/s`);
+    setText(rootElem, "in-count", `${ apps.inbound } sending app/s`);
+    setText(rootElem, "out-count", `${ apps.outbound } receiving app/s`);
 }
 
 
-function setText(root, id, text = '') {
+function setText(root, id, text = "") {
     const elem = root.getElementById(id).getElementsByTagName("text")[0];
     if (elem) {
         elem.textContent = text;
@@ -120,7 +122,7 @@ function setText(root, id, text = '') {
 }
 
 
-function setHover(root, id, text = '') {
+function setHover(root, id, text = "") {
     const elem = root.getElementById(id);
     if (elem) {
         const title =  document.createElementNS("http://www.w3.org/2000/svg","title");
@@ -141,7 +143,7 @@ function resizeArrow(root, id, scale) {
 
     const matrix = `matrix(${sx}, 0, 0, ${sy}, ${cx - sx * cx}, ${cy - sy * cy} )`;
 
-    arrow.setAttribute('transform', matrix);
+    arrow.setAttribute("transform", matrix);
 }
 
 
@@ -151,25 +153,25 @@ function controller($scope,
     const rootElem = $element[0];
 
     $scope.$watch(
-        'ctrl.stats',
+        "ctrl.stats",
         stats => {
             if (stats) updateDiagram(rootElem, stats)
         });
 }
 
 controller.$inject = [
-    '$scope',
-    '$element'
+    "$scope",
+    "$element"
 ];
 
 
 const directive = {
-    restrict: 'E',
+    restrict: "E",
     replace: true,
     template,
     scope: {},
     controller,
-    controllerAs: 'ctrl',
+    controllerAs: "ctrl",
     bindToController: BINDINGS
 };
 

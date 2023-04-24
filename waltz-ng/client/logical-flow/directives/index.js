@@ -16,12 +16,12 @@
  *
  */
 
-import FlowCloudDiagram from './flow-cloud-diagram';
+import FlowCloudDiagram from "./flow-cloud-diagram";
 
 
 export default (module) => {
 
     module
-        .directive('waltzFlowCloudDiagram', FlowCloudDiagram);
+        .directive("waltzFlowCloudDiagram", FlowCloudDiagram);
 
 };

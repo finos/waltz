@@ -22,14 +22,16 @@ import Markdown from "../common/svelte/Markdown.svelte";
 
 const bindings = {
     text: "<",
-    context: "<?"
+    context: "<?",
+    inline: "<?"
 };
 
 
 const initialState = {
     Markdown,
     context: null,
-    text: ""
+    text: "",
+    inline: false
 };
 
 
@@ -37,6 +39,7 @@ const template = `
         <waltz-svelte-component ng-if="$ctrl.text"
                                 component="$ctrl.Markdown"
                                 context="$ctrl.context"
+                                inline="$ctrl.inline"
                                 text="$ctrl.text">
         </waltz-svelte-component>`;
 
