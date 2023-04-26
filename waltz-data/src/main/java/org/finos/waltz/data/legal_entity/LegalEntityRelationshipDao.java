@@ -1,8 +1,6 @@
 package org.finos.waltz.data.legal_entity;
 
-import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.InlineSelectFieldFactory;
-import org.finos.waltz.data.rating_scheme.RatingSchemeDAO;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.legal_entity.ImmutableLegalEntityRelationship;
@@ -15,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -174,43 +173,50 @@ public class LegalEntityRelationshipDao {
     }
 
     public Set<LegalEntityRelationshipAssessmentInfo> getViewAssessmentsByRelKind(long relKindId,
-                                                                                  GenericSelector genericSelector) {
+                                                                                  Select<Record1<Long>> selector) {
 
         org.finos.waltz.schema.tables.LegalEntityRelationship ler = LEGAL_ENTITY_RELATIONSHIP.as("ler");
-        org.finos.waltz.schema.tables.LegalEntity le = LEGAL_ENTITY.as("le");
         org.finos.waltz.schema.tables.AssessmentDefinition ad = ASSESSMENT_DEFINITION.as("ad");
         org.finos.waltz.schema.tables.AssessmentRating ar = ASSESSMENT_RATING.as("ar");
-        org.finos.waltz.schema.tables.RatingSchemeItem rsi = RATING_SCHEME_ITEM.as("rsi");
 
-        Field<String> defnName = ad.NAME.as("defnName");
+        Condition condition = ler.RELATIONSHIP_KIND_ID.eq(relKindId)
+                .and(ler.ID.in(selector));
 
-        return dsl
+        Map<Long, String> primaryAssessmentDefs = dsl
+                .select(ad.ID, ad.NAME)
+                .from(ad)
+                .where(ad.VISIBILITY.eq(PRIMARY.name())
+                        .and(ad.ENTITY_KIND.eq(EntityKind.LEGAL_ENTITY_RELATIONSHIP.name())
+                                .and(ad.QUALIFIER_ID.eq(relKindId)
+                                        .and(ad.QUALIFIER_KIND.eq(EntityKind.LEGAL_ENTITY_RELATIONSHIP_KIND.name())))))
+                .fetchMap(r -> r.get(ad.ID), r -> r.get(ad.NAME));
+
+        SelectConditionStep<Record> qry = dsl
                 .select(ler.ID)
-                .select(ad.ID,
-                        defnName)
-                .select(rsi.fields())
+                .select(ar.ASSESSMENT_DEFINITION_ID,
+                        ar.RATING_ID)
                 .from(ler)
-                .innerJoin(le).on(ler.LEGAL_ENTITY_ID.eq(le.ID))
-                .innerJoin(ar).on(ler.ID.eq(ar.ENTITY_ID).and(ar.ENTITY_KIND.eq(EntityKind.LEGAL_ENTITY_RELATIONSHIP.name())))
-                .innerJoin(ad).on(ar.ASSESSMENT_DEFINITION_ID.eq(ad.ID))
-                .innerJoin(rsi).on(ar.RATING_ID.eq(rsi.ID))
-                .where(dsl.renderInlined(ler.RELATIONSHIP_KIND_ID.eq(relKindId)
-                        .and(ad.VISIBILITY.eq(PRIMARY.name())
-                                .and(ler.TARGET_ID.in(genericSelector.selector())
-                                        .and(ler.TARGET_KIND.eq(genericSelector.kind().name()))))))
+                .innerJoin(ar).on(dsl.renderInlined(ar.ASSESSMENT_DEFINITION_ID.in(primaryAssessmentDefs.keySet())
+                        .and(ar.ENTITY_KIND.eq(EntityKind.LEGAL_ENTITY_RELATIONSHIP.name())
+                                .and(ler.ID.eq(ar.ENTITY_ID)))))
+                .where(dsl.renderInlined(condition));
+
+        return qry
                 .fetchSet(r -> ImmutableLegalEntityRelationshipAssessmentInfo
                         .builder()
                         .relationshipId(r.get(ler.ID))
-                        .definitionRef(mkRef(EntityKind.ASSESSMENT_DEFINITION, r.get(ad.ID), r.get(defnName)))
-                        .ratingItem(RatingSchemeDAO.TO_ITEM_MAPPER.map(r))
+                        .definitionRef(mkRef(
+                                EntityKind.ASSESSMENT_DEFINITION,
+                                r.get(ar.ASSESSMENT_DEFINITION_ID),
+                                primaryAssessmentDefs.getOrDefault(r.get(ar.ASSESSMENT_DEFINITION_ID), "??")))
+                        .ratingId(r.get(ar.RATING_ID))
                         .build());
     }
 
     public Set<LegalEntityRelationship> findByRelationshipKindAndTargetSelector(Long relKindId,
-                                                                                GenericSelector genericSelector) {
+                                                                                Select<Record1<Long>> selector) {
         Condition condition = LEGAL_ENTITY_RELATIONSHIP.RELATIONSHIP_KIND_ID.eq(relKindId)
-                .and(LEGAL_ENTITY_RELATIONSHIP.TARGET_ID.in(genericSelector.selector())
-                        .and(LEGAL_ENTITY_RELATIONSHIP.TARGET_KIND.eq(genericSelector.kind().name())));
+                .and(LEGAL_ENTITY_RELATIONSHIP.ID.in(selector));
 
         return findByCondition(dsl, condition);
     }

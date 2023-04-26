@@ -11,8 +11,6 @@
     export let onRemove = () => console.log("Removing entity")
     export let onEdit = () => console.log("Editing entity")
 
-    let lastMoved = null;
-
     function getIcon(entityKind) {
         return _.get(entity[entityKind], 'icon', "fw");
     }
@@ -99,7 +97,15 @@
                     class="waltz-visibility-parent">
                     <td>
                         <Icon name={getIcon(column?.columnEntityKind)}/>
-                        <span>{determineColumnName(column)}</span>
+                        <span>
+                            {determineColumnName(column)}
+                            <span style={`color: ${column.externalId ? "green" : "orange"}`}
+                                  title={column.externalId
+                                            ? "This column can be used in derived columns, filter notes and exports"
+                                            : "It is highly recommended to set an external id for use in derived columns, filter notes and exports"}>
+                                <Icon name={column.externalId ? "check" : "exclamation-triangle"}/>
+                            </span>
+                        </span>
                         {#if column?.displayName}
                             <div title="This is the original name which has been overridden"
                                  class="help-block small">{mkColumnName(column)}</div>

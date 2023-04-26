@@ -533,4 +533,16 @@ public class AssessmentRatingDao {
                 })
                 .collect(toSet());
     }
+
+    public boolean hasMultiValuedAssessments(long assessmentDefinitionId) {
+        AggregateFunction<Integer> ratingCount = DSL.count(ar.RATING_ID);
+        return dsl
+                .select(ar.ENTITY_ID, ratingCount)
+                .from(ar)
+                .where(ar.ASSESSMENT_DEFINITION_ID.eq(assessmentDefinitionId))
+                .groupBy(ar.ENTITY_ID)
+                .having(ratingCount.gt(1))
+                .fetch()
+                .isNotEmpty();
+    }
 }

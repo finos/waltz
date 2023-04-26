@@ -1,14 +1,16 @@
 package org.finos.waltz.service.legal_entity;
 
-import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.legal_entity.LegalEntityRelationshipDao;
+import org.finos.waltz.data.legal_entity.LegalEntityRelationshipIdSelectorFactory;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.legal_entity.*;
 import org.finos.waltz.schema.tables.records.ChangeLogRecord;
 import org.jooq.DSLContext;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,20 +32,15 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 public class LegalEntityRelationshipService {
 
     private final LegalEntityRelationshipDao legalEntityRelationshipDao;
-    private final LegalEntityRelationshipKindService legalEntityRelationshipKindService;
     private static final Logger LOG = LoggerFactory.getLogger(LegalEntityRelationshipService.class);
 
-    private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
+    private final LegalEntityRelationshipIdSelectorFactory legalEntityRelationshipIdSelectorFactory = new LegalEntityRelationshipIdSelectorFactory();
 
     @Autowired
-    public LegalEntityRelationshipService(DSLContext dsl,
-                                          LegalEntityRelationshipDao legalEntityRelationshipDao,
-                                          LegalEntityRelationshipKindService legalEntityRelationshipKindService) {
+    public LegalEntityRelationshipService(LegalEntityRelationshipDao legalEntityRelationshipDao) {
 
         checkNotNull(legalEntityRelationshipDao, "legalEntityRelationshipDao cannot be null");
-        checkNotNull(legalEntityRelationshipKindService, "legalEntityRelationshipKindService cannot be null");
 
-        this.legalEntityRelationshipKindService = legalEntityRelationshipKindService;
         this.legalEntityRelationshipDao = legalEntityRelationshipDao;
     }
 
@@ -96,28 +93,29 @@ public class LegalEntityRelationshipService {
 
     public LegalEntityRelationshipView getViewByRelKindAndSelector(long relKindId, IdSelectionOptions selectionOptions) {
 
-        LegalEntityRelationshipKind relationshipKind = legalEntityRelationshipKindService.getById(relKindId);
+        Select<Record1<Long>> relSelector = legalEntityRelationshipIdSelectorFactory.apply(selectionOptions);
 
-        GenericSelector genericSelector = genericSelectorFactory.applyForKind(relationshipKind.targetKind(), selectionOptions);
-
-        Set<LegalEntityRelationship> relationships = legalEntityRelationshipDao.findByRelationshipKindAndTargetSelector(relKindId, genericSelector);
-
-        Set<LegalEntityRelationshipAssessmentInfo> assessmentInfo = legalEntityRelationshipDao.getViewAssessmentsByRelKind(relKindId, genericSelector);
+        Set<LegalEntityRelationship> relationships = legalEntityRelationshipDao.findByRelationshipKindAndTargetSelector(relKindId, relSelector);
+        Set<LegalEntityRelationshipAssessmentInfo> assessmentInfo = legalEntityRelationshipDao.getViewAssessmentsByRelKind(relKindId, relSelector);
 
         Set<EntityReference> headerAssessments = map(assessmentInfo, LegalEntityRelationshipAssessmentInfo::definitionRef);
 
-        Set<LegalEntityRelationshipViewRow> rows = getLegalEntityRelationshipViewRows(relationships, assessmentInfo);
+        Set<LegalEntityRelationshipViewRow> rows = mkLegalEntityRelationshipViewRows(relationships, assessmentInfo);
 
-        return ImmutableLegalEntityRelationshipView.builder()
+        return ImmutableLegalEntityRelationshipView
+                .builder()
                 .assessmentHeaders(headerAssessments)
                 .rows(rows)
                 .build();
     }
 
 
-    private Set<LegalEntityRelationshipViewRow> getLegalEntityRelationshipViewRows(Set<LegalEntityRelationship> relationships, Set<LegalEntityRelationshipAssessmentInfo> assessmentInfo) {
+    private Set<LegalEntityRelationshipViewRow> mkLegalEntityRelationshipViewRows(Set<LegalEntityRelationship> relationships,
+                                                                                  Set<LegalEntityRelationshipAssessmentInfo> assessmentInfo) {
 
-        Map<Long, Set<LegalEntityRelationshipViewAssessment>> assessmentsByRelId = groupBy(assessmentInfo, LegalEntityRelationshipAssessmentInfo::relationshipId)
+        Map<Long, Set<LegalEntityRelationshipViewAssessment>> assessmentsByRelId = groupBy(
+                assessmentInfo,
+                LegalEntityRelationshipAssessmentInfo::relationshipId)
                 .entrySet()
                 .stream()
                 .map(kv -> tuple(kv.getKey(), getAssessments(kv.getValue())))
@@ -134,12 +132,15 @@ public class LegalEntityRelationshipService {
 
     private Set<LegalEntityRelationshipViewAssessment> getAssessments(Collection<LegalEntityRelationshipAssessmentInfo> assessmentsForRel) {
 
-        return groupBy(assessmentsForRel, d -> d.definitionRef().id(), LegalEntityRelationshipAssessmentInfo::ratingItem)
+        return groupBy(
+                assessmentsForRel,
+                d -> d.definitionRef().id(),
+                LegalEntityRelationshipAssessmentInfo::ratingId)
                 .entrySet()
                 .stream()
                 .map(kv -> ImmutableLegalEntityRelationshipViewAssessment.builder()
                         .assessmentDefinitionId(kv.getKey())
-                        .ratings(kv.getValue())
+                        .ratingIds(kv.getValue())
                         .build())
                 .collect(toSet());
     }

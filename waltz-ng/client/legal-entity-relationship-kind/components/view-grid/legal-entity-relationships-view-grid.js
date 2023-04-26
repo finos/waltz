@@ -39,7 +39,7 @@ const relationshipColDefs = [
     {
         field: "relationship.targetEntityReference",
         name: "Target Entity External Id",
-        width: "5%",
+        width: "10%",
         toSearchTerm: d => _.get(d, ["relationship", "targetEntityReference", "externalId"], ""),
         cellTemplate: `<div style="padding-top: 0.5em">
                             <span ng-bind="COL_FIELD.externalId"></span>
@@ -57,7 +57,7 @@ const relationshipColDefs = [
     {
         field: "relationship.legalEntityReference",
         name: "Legal Entity External Id",
-        width: "5%",
+        width: "10%",
         toSearchTerm: d => _.get(d, ["relationship", "legalEntityReference", "externalId"], ""),
         cellTemplate: `<div style="padding-top: 0.5em">
                             <span ng-bind="COL_FIELD.externalId"></span>
@@ -90,9 +90,11 @@ const updatedAtColDefs = [
 const initialState = {
     relationshipKind: null,
     relationships: [],
+    stats: null,
     visibility: {
         overlay: false,
-        bulkUpload: false
+        bulkUpload: false,
+        loading: true
     },
 }
 
@@ -111,21 +113,30 @@ function controller($q, $scope, $state, serviceBroker) {
 
     function loadRelationships() {
 
+        const selectionOptions = mkSelectionOptions(vm.parentEntityRef);
+
         const relKindsPromise = serviceBroker
             .loadViewData(CORE_API.LegalEntityRelationshipKindStore.getById, [vm.relationshipKindId])
-            .then(r => r.data);
+            .then(r => vm.relationshipKind = r.data);
 
+        const relKindStatsPromise = serviceBroker
+            .loadViewData(CORE_API.LegalEntityRelationshipKindStore.getUsageStatsForKindAndSelector, [vm.relationshipKindId, selectionOptions])
+            .then(r => vm.stats = r.data);
 
         const relationshipsViewPromise = serviceBroker
             .loadViewData(CORE_API.LegalEntityRelationshipStore.getViewByRelationshipKindId,
-                [vm.relationshipKindId, mkSelectionOptions(vm.parentEntityRef)],
+                [vm.relationshipKindId, selectionOptions],
                 {force: true})
             .then(r => r.data);
 
+        const ratingsPromise = serviceBroker
+            .loadViewData(CORE_API.RatingSchemeStore.findAllRatingsSchemeItems)
+            .then(r => _.keyBy(r.data, d => d.id));
+
+
         return $q
-            .all([relKindsPromise, relationshipsViewPromise])
-            .then(([relKind, relationshipsView]) => {
-                vm.relationshipKind = relKind;
+            .all([relationshipsViewPromise, ratingsPromise])
+            .then(([relationshipsView, ratingSchemeItemsById]) => {
 
                 const assessmentColDefs = _
                     .chain(relationshipsView.assessmentHeaders)
@@ -158,8 +169,13 @@ function controller($q, $scope, $state, serviceBroker) {
                     .map(d => {
                         const ratingsByDefId = _
                             .chain(d.assessments)
-                            .keyBy(d => d.assessmentDefinitionId)
-                            .mapValues(d => _.sortBy(d.ratings, d => d.position, d => d.name))
+                            .keyBy(r => r.assessmentDefinitionId)
+                            .mapValues(v => _
+                                .chain(v.ratingIds)
+                                .map(r => ratingSchemeItemsById[r])
+                                .filter(d => d != null)
+                                .sortBy(r => r.position, r => r.name)
+                                .value())
                             .value();
 
                         return Object.assign(
@@ -171,7 +187,8 @@ function controller($q, $scope, $state, serviceBroker) {
                     })
                     .sortBy(d => d.relationship.targetEntityReference.name, d => d.relationship.legalEntityReference.name)
                     .value();
-            });
+            })
+            .then(() => vm.visibility.loading = false);
     }
 
     vm.$onChanges = () => {

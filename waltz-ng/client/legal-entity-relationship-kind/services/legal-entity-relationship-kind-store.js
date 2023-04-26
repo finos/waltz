@@ -30,9 +30,16 @@ export function store($http, BaseApiUrl) {
         $http.get(`${BASE}/id/${id}`)
             .then(result => result.data);
 
+    const getUsageStatsForKindAndSelector = (id, selector) => {
+        return $http
+            .post(`${BASE}/stats/relationship-kind/${id}/selector`, selector)
+            .then(result => result.data)
+    };
+
     return {
         findAll,
-        getById
+        getById,
+        getUsageStatsForKindAndSelector
     };
 }
 
@@ -56,6 +63,11 @@ export const LegalEntityRelationshipKindStore_API = {
         serviceName,
         serviceFnName: "getById",
         description: "executes getById"
+    },
+    getUsageStatsForKindAndSelector: {
+        serviceName,
+        serviceFnName: "getUsageStatsForKindAndSelector",
+        description: "executes getUsageStatsForKindAndSelector"
     }
 };
 

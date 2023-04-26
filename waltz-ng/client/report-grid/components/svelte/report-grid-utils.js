@@ -5,7 +5,7 @@ import {amberBg, blueBg, determineForegroundColor, greenBg, greyBg, pinkBg} from
 import {scaleLinear} from "d3-scale";
 import {extent} from "d3-array";
 import {subtractYears} from "../../../common/date-utils";
-import {entity} from "../../../common/services/enums/entity";
+import {markdownToHtml} from "../../../common/markdown-utils";
 
 
 export const reportGridMember = {
@@ -79,7 +79,11 @@ const extIdCol = {
     field: "subject.entityReference.externalId",
     displayName: "Ext. Id",
     width: 100,
-    pinnedLeft: true
+    pinnedLeft: true,
+    cellTemplate: `
+        <div class="waltz-grid-report-cell">
+            <div class="report-grid-cell-text" ng-bind="COL_FIELD"></div>
+        </div>`
 };
 
 const lifecyclePhaseCol = {
@@ -88,8 +92,8 @@ const lifecyclePhaseCol = {
     width: 100,
     pinnedLeft: true,
     cellTemplate: `
-        <div class="waltz-grid-report-cell"
-            <span ng-bind="COL_FIELD | toDisplayName:'lifecyclePhase'"></span>
+        <div class="waltz-grid-report-cell">
+            <div class="report-grid-cell-text" ng-bind="COL_FIELD | toDisplayName:'lifecyclePhase'"></div>
         </div>`
 };
 
@@ -147,7 +151,9 @@ export function prepareColumnDefs(colDefs) {
                              ng-style="{
                                 'background-color': COL_FIELD.color,
                                 'color': COL_FIELD.fontColor}">
-                                <waltz-currency-amount amount="COL_FIELD.value"></waltz-currency-amount>
+                                <div class="report-grid-cell-text">
+                                    <waltz-currency-amount amount="COL_FIELD.value"></waltz-currency-amount>
+                                </div>
                         </div>`
                 };
             case "COMPLEXITY_KIND":
@@ -156,19 +162,21 @@ export function prepareColumnDefs(colDefs) {
                     cellTemplate: `
                         <div class="waltz-grid-report-cell"
                              style="text-align: right"
-                             ng-bind="COL_FIELD.value"
                              ng-style="{
                                 'background-color': COL_FIELD.color,
                                 'color': COL_FIELD.fontColor}">
+                                 <div class="report-grid-cell-text"
+                                      ng-bind="COL_FIELD.value"/>
+                                 </div>
                         </div>`
                 };
-            default:
+            case "ASSESSMENT_DEFINITION":
+            case "MEASURABLE":
                 return {
                     allowSummary: true,
                     toSearchTerm: d => _.get(d, [c.gridColumnId, "text"], ""),
                     cellTemplate:
-                        `<div class="waltz-grid-report-cell"
-                              ng-bind="COL_FIELD.text"
+                        `<div
                               uib-popover-html="COL_FIELD.comment"
                               popover-trigger="mouseenter"
                               popover-enable="COL_FIELD.comment != null"
@@ -178,8 +186,38 @@ export function prepareColumnDefs(colDefs) {
                               popover-placement="left"
                               ng-style="{
                                 'border-bottom-right-radius': COL_FIELD.comment ? '15% 50%' : 0,
-                                'background-color': COL_FIELD.color,
+                                'background': COL_FIELD.color,
                                 'color': COL_FIELD.fontColor}">
+                                <div class="waltz-grid-report-cell">
+                                    <div ng-bind="COL_FIELD.text"
+                                         class="report-grid-cell-text"
+                                         style="background: linear-gradient(to top, rgba(255, 255, 255, 0.7) 0, rgba(255, 255, 255, 0.7) 90%, rgba(255, 255, 255, 0) 90%, rgba(255, 255, 255, 0) 100%)">
+                                    </div>
+                                </div>
+                        </div>`
+                };
+            default:
+                return {
+                    allowSummary: true,
+                    toSearchTerm: d => _.get(d, [c.gridColumnId, "text"], ""),
+                    cellTemplate:
+                        `<div
+                              uib-popover-html="COL_FIELD.comment"
+                              popover-trigger="mouseenter"
+                              popover-enable="COL_FIELD.comment != null"
+                              popover-popup-delay="500"
+                              popover-class="waltz-popover-width-500"
+                              popover-append-to-body="true"
+                              popover-placement="left"
+                              ng-style="{
+                                'border-bottom-right-radius': COL_FIELD.comment ? '15% 50%' : 0,
+                                'background': COL_FIELD.color,
+                                'color': COL_FIELD.fontColor}">
+                                <div class="waltz-grid-report-cell">
+                                        <div class="report-grid-cell-text"
+                                             ng-bind="COL_FIELD.text">
+                                        </div>
+                                </div>
                         </div>`
                 };
         }
@@ -202,26 +240,6 @@ export function prepareColumnDefs(colDefs) {
         .value();
 
     return _.concat([nameCol, extIdCol, lifecyclePhaseCol], additionalColumns);
-}
-
-
-function mkPopoverHtml(cellData, ratingSchemeItem) {
-    const comment = cellData.comment;
-    if (_.isEmpty(comment)) {
-        return "";
-    } else {
-        const ratingDesc = ratingSchemeItem.description === ratingSchemeItem.name
-            ? ""
-            : `<div class='help-block'>${ratingSchemeItem.description}</div>`;
-
-        return `
-            <div class='small'>
-                <label>Comment:</label> ${cellData.comment}
-                <hr>
-                <label>Rating:</label> ${ratingSchemeItem.name}
-                ${ratingDesc}
-            </div>`;
-    }
 }
 
 
@@ -329,6 +347,43 @@ function mkAttestationCell(dataCell, baseCell) {
 }
 
 
+function mkRatingCell(dataCell, baseCell, ratingSchemeItemsById) {
+
+    const ratingSchemeItems = _
+        .chain(dataCell.ratingIdValues)
+        .map(d => ratingSchemeItemsById[d])
+        .sortBy(d => d.name)
+        .value();
+
+    const colorBandWidth = 100 / _.size(ratingSchemeItems);
+
+    const colorBands = _.map(
+        ratingSchemeItems,
+        d => {
+            const idx = _.indexOf(ratingSchemeItems, d);
+            return `${d.color} ${colorBandWidth * idx}% ${colorBandWidth * (idx + 1)}%`;
+        });
+
+    const background = `linear-gradient(to right,  ${_.join(colorBands, ",")})`;
+    const options = _.map(
+        dataCell.options,
+        d => {
+            const rating = ratingSchemeItemsById[Number(d.code)];
+            return Object.assign({}, d, {name: d.text, code: d.code, color: rating.color, fontColor: "black"})
+        });
+
+    return Object.assign(
+        {},
+        baseCell,
+        {
+            comment: markdownToHtml(dataCell.comment),
+            color: background,
+            fontColor: "black",
+            text: dataCell.textValue,
+            options
+        });
+}
+
 export function combineColDefs(gridData) {
     const fixedColDefs = _.get(gridData, ["definition", "fixedColumnDefinitions"], []);
     const derivedColDefs = _.get(gridData, ["definition", "derivedColumnDefinitions"], []);
@@ -362,7 +417,8 @@ export function prepareTableData(gridData) {
         const baseCell = {
             fontColor: "#3b3b3b",
             optionCode: dataCell.optionCode,
-            optionText: dataCell.optionText
+            optionText: dataCell.optionText,
+            options: dataCell.options
         };
 
         switch (colDef.columnEntityKind) {
@@ -406,13 +462,7 @@ export function prepareTableData(gridData) {
                 });
             case "ASSESSMENT_DEFINITION":
             case "MEASURABLE":
-                const ratingSchemeItem = ratingSchemeItemsById[dataCell.ratingIdValue];
-                return Object.assign({}, baseCell, {
-                    comment: mkPopoverHtml(dataCell, ratingSchemeItem),
-                    color: ratingSchemeItem.color,
-                    fontColor: ratingSchemeItem.fontColor,
-                    text: ratingSchemeItem.name,
-                });
+                return mkRatingCell(dataCell, baseCell, ratingSchemeItemsById);
             case "REPORT_GRID_DERIVED_COLUMN_DEFINITION":
                 return Object.assign({}, baseCell, {
                     comment: dataCell.errorValue
@@ -480,16 +530,33 @@ function isSummarisableProperty(k) {
 }
 
 
+function countDistinct(optionSummaries, mapper) {
+    return _.chain(optionSummaries)
+        .flatMap(mapper)
+        .uniq()
+        .size()
+        .value();
+}
+
 export function refreshSummaries(tableData,
                                  columnDefinitions) {
 
     // increments a pair of counters referenced by `prop` in the object `acc`
-    const accInc = (acc, prop, visible, optionInfo) => {
-        const info = _.get(acc, prop, {counts: {visible: 0, total: 0}, optionInfo});
+    const accInc = (acc, prop, visible, optionInfo, subjectId) => {
+        const info = _.get(acc, prop, {counts: {visible: 0, total: 0}, subjects: {visible: [], total: []}, optionInfo});
         info.counts.total++;
         if (visible) {
             info.counts.visible++;
         }
+
+        if (!_.includes(info.subjects.total, subjectId)) {
+            info.subjects.total = _.concat(info.subjects.total, subjectId);
+
+            if (visible) {
+                info.subjects.visible = _.concat(info.subjects.visible, subjectId);
+            }
+        }
+
         acc[prop] = info;
     };
 
@@ -497,13 +564,39 @@ export function refreshSummaries(tableData,
     const reducer = (acc, row) => {
         _.forEach(
             row,
-            (v, k) => isSummarisableProperty(k)
-                ? accInc(
-                    acc,
-                    k + "#" + v.optionCode,
-                    _.get(row, ["visible"], true),
-                    {name: v.optionText, code: v.optionCode, color: v.color, fontColor: v.fontColor})
-                : acc);
+            (v, k) => {
+
+                if (!isSummarisableProperty(k)) {
+                    return;
+                }
+
+                const visible = _.get(row, ["visible"], true);
+                const subjectId = _.get(row, ["subject", "entityReference", "id"]);
+
+                if (_.isEmpty(v.options)) {
+                    accInc(
+                        acc,
+                        k + "#undefined",
+                        visible,
+                        {color: v.color},
+                        subjectId);
+                    return acc;
+                } else {
+                    _.forEach(
+                        v.options,
+                        d => accInc(
+                            acc,
+                            k + "#" + d.code,
+                            visible,
+                            {
+                                name: d.text,
+                                code: d.code,
+                                color: d.color || v.color,
+                                fontColor: v.fontColor
+                            },
+                            subjectId));
+                }
+            });
         return acc;
     };
 
@@ -513,6 +606,7 @@ export function refreshSummaries(tableData,
         .chain(tableData)
         .reduce(reducer, {})  // transform into a raw summary object for all rows
         .map((optionSummary, k) => { // convert basic prop-val/count pairs in the summary object into a list of enriched objects
+
             const [columnDefinitionId, ratingId] = _.split(k, "#");
             return Object.assign(
                 {},
@@ -530,8 +624,10 @@ export function refreshSummaries(tableData,
                 [
                     c => c.optionInfo.name
                 ]),
-            total: _.sumBy(optionSummaries, c => c.counts.total),
-            totalVisible: _.sumBy(optionSummaries, c => c.counts.visible)
+            totalOccurrences: _.sumBy(optionSummaries, c => c.counts.total),
+            visibleOccurrences: _.sumBy(optionSummaries, c => c.counts.visible),
+            totalSubjects: countDistinct(optionSummaries, c => c.subjects.total),
+            visibleSubjects: countDistinct(optionSummaries, c => c.subjects.visible),
         }))
         .orderBy([  // order the summaries so they reflect the column order
             d => d.column?.position,
@@ -559,10 +655,14 @@ export function mkRowFilter(filters = []) {
     return row => _.every(
         filtersByColumnDefinitionId,
         (filtersForCol, colId) => {
-            const colOptionCode = _.get(row, [colId, "optionCode"], undefined);
-            return _.some(
-                filtersForCol,
-                f => colOptionCode === f.optionCode);
+
+
+            const colOptions = _.get(row, [colId, "options"], []);
+            const optionCodes = _.map(colOptions, d => d.code);
+            const hasNotProvidedFilter = _.some(filtersForCol, d => _.isUndefined(d.optionCode));
+
+            return (_.isEmpty(colOptions) && hasNotProvidedFilter)
+                || _.some(filtersForCol, f => _.includes(optionCodes, f.optionCode));
         });
 }
 

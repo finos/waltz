@@ -24,6 +24,7 @@ import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.report_grid.ReportGridDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.NameProvider;
 import org.finos.waltz.model.app_group.AppGroupEntry;
 import org.finos.waltz.model.app_group.ImmutableAppGroupEntry;
 import org.finos.waltz.model.entity_named_note.EntityNamedNote;
@@ -32,6 +33,7 @@ import org.finos.waltz.model.report_grid.*;
 import org.finos.waltz.service.app_group.AppGroupService;
 import org.finos.waltz.service.entity_named_note.EntityNamedNoteService;
 import org.jooq.lambda.tuple.Tuple2;
+import org.jooq.lambda.tuple.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +47,7 @@ import static java.util.Collections.emptySet;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.first;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
+import static org.finos.waltz.common.CollectionUtilities.notEmpty;
 import static org.finos.waltz.common.ListUtilities.map;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.MapUtilities.indexBy;
@@ -103,9 +106,9 @@ public class ReportGridFilterViewService {
         if (gridFilterInfo == null) {
             throw new IllegalArgumentException("Cannot parse filter grid info from note text");
         } else {
-            Tuple2<Long, Set<AppGroupEntry>> appGroupIdToEntries = determineApplicationsInGroup(gridFilterInfo);
+            Tuple3<EntityKind, Long, Set<AppGroupEntry>> appGroupIdToEntries = determineApplicationsInGroup(gridFilterInfo);
             appGroupService.replaceGroupEntries(asSet(appGroupIdToEntries));
-            return appGroupIdToEntries.v2.size();
+            return appGroupIdToEntries.v3.size();
         }
     }
 
@@ -132,7 +135,7 @@ public class ReportGridFilterViewService {
         LOG.info("Loading filter info from notes");
         Set<ReportGridFilterInfo> gridInfoWithFilters = findGridInfoWithFilters();
 
-        Set<Tuple2<Long, Set<AppGroupEntry>>> appGroupToEntries = determineAppGroupEntries(gridInfoWithFilters);
+        Set<Tuple3<EntityKind, Long, Set<AppGroupEntry>>> appGroupToEntries = determineAppGroupEntries(gridInfoWithFilters);
 
         LOG.info("Populating application groups from filters");
         appGroupService.replaceGroupEntries(appGroupToEntries);
@@ -141,14 +144,14 @@ public class ReportGridFilterViewService {
     }
 
 
-    private Set<Tuple2<Long, Set<AppGroupEntry>>> determineAppGroupEntries(Set<ReportGridFilterInfo> gridInfoWithFilters) {
+    private Set<Tuple3<EntityKind, Long, Set<AppGroupEntry>>> determineAppGroupEntries(Set<ReportGridFilterInfo> gridInfoWithFilters) {
         return gridInfoWithFilters
                 .stream()
                 .map(this::determineApplicationsInGroup)
                 .collect(Collectors.toSet());
     }
 
-    private Tuple2<Long, Set<AppGroupEntry>> determineApplicationsInGroup(ReportGridFilterInfo reportGridFilterInfo) {
+    private Tuple3<EntityKind, Long, Set<AppGroupEntry>> determineApplicationsInGroup(ReportGridFilterInfo reportGridFilterInfo) {
         EntityKind subjectKind = reportGridFilterInfo.gridDefinition().subjectKind();
 
         Optional<ReportGrid> maybeGrid = reportGridService.getByIdAndSelectionOptions(
@@ -179,7 +182,7 @@ public class ReportGridFilterViewService {
                                 .isReadOnly(true)
                                 .build());
 
-                    return tuple(reportGridFilterInfo.appGroupId(), appGroupEntries);
+                    return tuple(subjectKind, reportGridFilterInfo.appGroupId(), appGroupEntries);
                 })
                 .orElseThrow(() -> new IllegalStateException("Cannot create grid instance with params" + reportGridFilterInfo));
     }
@@ -248,12 +251,17 @@ public class ReportGridFilterViewService {
                 .stream()
                 .filter(c -> {
                     // rating cells may want to look up on rating id / code / external id
-                    if (c.ratingIdValue() != null) {
-                        RatingSchemeItem rating = ratingSchemeItemByIdMap.get(c.ratingIdValue());
-                        Set<String> ratingIdentifiers = asSet(c.optionCode(), String.valueOf(rating.rating()), rating.name(), rating.externalId().orElse(null));
-                        return CollectionUtilities.notEmpty(intersection(filter.filterValues(), ratingIdentifiers));
+                    if (!isEmpty(c.ratingIdValues())) {
+                        Set<RatingSchemeItem> ratings = SetUtilities.map(c.ratingIdValues(), d -> ratingSchemeItemByIdMap.get(d));
+                        Set<String> ratingIdentifiers = union(
+                                map(c.options(), CellOption::code),
+                                map(ratings, rating -> String.valueOf(rating.rating())),
+                                map(ratings, NameProvider::name),
+                                map(ratings, rating -> rating.externalId().orElse(null)));
+                        return notEmpty(intersection(filter.filterValues(), ratingIdentifiers));
                     } else {
-                        return filter.filterValues().contains(c.optionCode());
+                        Set<String> optionCodes = SetUtilities.map(c.options(), CellOption::code);
+                        return notEmpty(intersection(filter.filterValues(), optionCodes));
                     }
                 })
                 .map(ReportGridCell::subjectId)

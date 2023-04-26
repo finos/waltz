@@ -24,84 +24,97 @@
             <waltz-icon name="edit"></waltz-icon>
             Edit Group
         </a>
-        <waltz-subscription-buttons subscription-status="$ctrl.subscriptionStatus"
-                                    on-subscribe="$ctrl.onSubscribe"
-                                    on-unsubscribe="$ctrl.onUnsubscribe">
-        </waltz-subscription-buttons>
+        <span ng-hide="$ctrl.appGroup.isFavouriteGroup">
+            <waltz-subscription-buttons subscription-status="$ctrl.subscriptionStatus"
+                                        on-subscribe="$ctrl.onSubscribe"
+                                        on-unsubscribe="$ctrl.onUnsubscribe">
+            </waltz-subscription-buttons>
+        </span>
     </span>
 
-    <div class="row">
-        <div class="col-sm-12">
-
-            <div  ng-if="$ctrl.appGroup">
-                <div style="font-size: larger; border-bottom: 2px dotted #eee; padding: 6px"
-                     class="waltz-paragraph">
-                    <waltz-markdown text="$ctrl.appGroup.description"></waltz-markdown>
-                </div>
-
-
-                <div class="row">
-                    <div class="col-sm-4">
-                        <waltz-apps-by-investment-pie applications="$ctrl.applications"
-                                                      class="clickable"
-                                                      waltz-jump-to="apps-section"
-                                                      size="70">
-                        </waltz-apps-by-investment-pie>
-                    </div>
-
-                    <div class="col-sm-4">
-                        <waltz-apps-by-lifecycle-phase-pie applications="$ctrl.applications"
-                                                           class="clickable"
-                                                           waltz-jump-to="apps-section"
-                                                           size="70">
-                        </waltz-apps-by-lifecycle-phase-pie>
-                    </div>
-
-                    <div class="col-sm-4">
-                        <waltz-basic-info-tile waltz-jump-to="logical-flows-tabgroup-section"
-                                               class="clickable"
-                                               icon="random"
-                                               name="Logical Data Flows">
-                            <waltz-flow-cloud-diagram
-                                width="230"
-                                height="180"
-                                stats="$ctrl.flowStats">
-                            </waltz-flow-cloud-diagram>
-                        </waltz-basic-info-tile>
-                    </div>
-
-                </div>
-                <div class="row">
-                    <div class="col-sm-4">
-                        <waltz-complexity-basic-info-tile parent-entity-ref="$ctrl.parentEntityRef"
-                                                          filters="$ctrl.filters">
-                        </waltz-complexity-basic-info-tile>
-                    </div>
-                    <div class="col-sm-4">
-                        <waltz-server-basic-info-tile parent-entity-ref="$ctrl.parentEntityRef"
-                                                      filters="$ctrl.filters">
-                        </waltz-server-basic-info-tile>
-                    </div>
-                    <div class="col-sm-4">
-                        <waltz-assessment-info-tile parent-entity-ref="$ctrl.parentEntityRef"
-                                                    filters="$ctrl.filters">
-                        </waltz-assessment-info-tile>
-                    </div>
-                </div>
+    <div ng-if="$ctrl.appGroup">
+        <div class="row"
+             ng-if="$ctrl.appGroup.externalId">
+            <div class="col-sm-3 waltz-display-field-label">
+                External Id
             </div>
-            <waltz-no-data ng-if="!$ctrl.appGroup">
-                <message>No information for this app group</message>
-            </waltz-no-data>
+            <div class="col-sm-9">
+                <span style="font-family: monospace"
+                      ng-bind="$ctrl.appGroup.externalId">
+                </span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-3 waltz-display-field-label">
+                Group Description
+            </div>
+            <div class="col-sm-9">
+                <waltz-markdown inline="true"
+                                text="$ctrl.appGroup.description">
+                </waltz-markdown>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="row row-mini-gutters">
+            <div class="col-sm-4">
+                <waltz-apps-by-investment-pie applications="$ctrl.applications"
+                                              class="clickable"
+                                              waltz-jump-to="apps-section"
+                                              size="70">
+                </waltz-apps-by-investment-pie>
+            </div>
+
+            <div class="col-sm-4">
+                <waltz-apps-by-lifecycle-phase-pie applications="$ctrl.applications"
+                                                   class="clickable"
+                                                   waltz-jump-to="apps-section"
+                                                   size="70">
+                </waltz-apps-by-lifecycle-phase-pie>
+            </div>
+
+            <div class="col-sm-4">
+                <waltz-basic-info-tile waltz-jump-to="logical-flows-tabgroup-section"
+                                       class="clickable"
+                                       icon="random"
+                                       name="Logical Data Flows">
+                    <waltz-flow-cloud-diagram stats="$ctrl.flowStats">
+                    </waltz-flow-cloud-diagram>
+                </waltz-basic-info-tile>
+            </div>
+        </div>
+
+        <div class="row row-mini-gutters">
+            <div class="col-sm-4">
+                <waltz-complexity-basic-info-tile parent-entity-ref="$ctrl.parentEntityRef"
+                                                  filters="$ctrl.filters">
+                </waltz-complexity-basic-info-tile>
+            </div>
+            <div class="col-sm-4">
+                <waltz-server-basic-info-tile parent-entity-ref="$ctrl.parentEntityRef"
+                                              filters="$ctrl.filters">
+                </waltz-server-basic-info-tile>
+            </div>
+            <div class="col-sm-4">
+                <waltz-assessment-info-tile parent-entity-ref="$ctrl.parentEntityRef"
+                                            filters="$ctrl.filters">
+                </waltz-assessment-info-tile>
+            </div>
         </div>
     </div>
+
+    <waltz-no-data ng-if="!$ctrl.appGroup">
+        <message>No information for this app group</message>
+    </waltz-no-data>
+
     <div class="small text-muted"
          ng-if="$ctrl.owners.length > 0">
-        &nbsp;
         <div class="pull-right">
             <strong>Group Owner/s:</strong>
             <span ng-repeat="owner in $ctrl.owners">
                 <span ng-bind="owner.userId"></span>
-                &nbsp;
             </span>
         </div>
     </div>

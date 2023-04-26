@@ -18,97 +18,89 @@
 
 <div class="waltz-page-summary waltz-page-summary-attach">
 
-    <div class="row">
-
-        <div class="col-sm-12 ">
-            <div ng-if="$ctrl.dataType">
-                <div class="row">
-                    <div class="col-sm-2 waltz-display-field-label">
-                        Description
-                    </div>
-                    <div class="col-sm-10 text-muted">
-                        <waltz-markdown text="$ctrl.dataType.description"
-                                        ng-if="$ctrl.dataType.description">
-                        </waltz-markdown>
-                        <span ng-if="!$ctrl.dataType.description">
-                            Description not provided
-                        </span>
-                    </div>
-                </div>
-                <hr>
-
-                <div class="container-fluid">
-
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <waltz-apps-by-investment-pie applications="$ctrl.apps"
-                                                          size="70"
-                                                          class="clickable"
-                                                          waltz-jump-to="apps-section">
-                            </waltz-apps-by-investment-pie>
-                        </div>
-
-                        <div class="col-sm-4">
-                            <waltz-apps-by-lifecycle-phase-pie applications="$ctrl.apps"
-                                                               size="70"
-                                                               class="clickable"
-                                                               waltz-jump-to="apps-section">
-                            </waltz-apps-by-lifecycle-phase-pie>
-                        </div>
-
-                        <div class="col-sm-4">
-                            <waltz-basic-info-tile waltz-jump-to="data-type-flow-section"
-                                                   class="clickable"
-                                                   icon="crosshairs"
-                                                   name="Data Type Usage">
-                                <br>
-                                <waltz-data-type-usage-stat-table stats="$ctrl.usageStats">
-                                </waltz-data-type-usage-stat-table>
-                            </waltz-basic-info-tile>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class="row no-overflow"
-                     ng-if="$ctrl.parents.length > 0 || $ctrl.dataType.children.length > 0"
-                     style="padding: 1em">
-                    <div class="col-sm-4"
-                         ng-if="$ctrl.parents.length > 0">
-                        <h4>Parent dataTypes: </h4>
-                        <ul>
-                            <li ng-repeat="parent in $ctrl.parents">
-                                <a ui-sref="main.data-type.view ({id: parent.id })"
-                                   ng-bind="parent.name">
-                                </a>
-                                <span ng-if="!$last">&raquo;</span>
-                            </li>
-                        </ul>
-
-                        <span class="text-muted small "
-                              ng-bind="$ctrl.parent.description">
-                        </span>
-                    </div>
-
-                    <div ng-if="$ctrl.dataType.children.length > 0"
-                         class="col-sm-8">
-
-                        <h4>Child dataTypes</h4>
-                        <ul>
-                            <li ng-repeat="child in $ctrl.dataType.children | orderBy:'name'">
-                                <a ui-sref="main.data-type.view ({id: child.id})"
-                                   class="clickable"
-                                   ng-bind="child.name">
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+    <div ng-if="$ctrl.dataType">
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Description
             </div>
-            <waltz-no-data ng-if="!$ctrl.dataType">
-                <message>No information for this Data Type</message>
-            </waltz-no-data>
+            <div class="col-sm-10 text-muted">
+                <waltz-markdown text="$ctrl.dataType.description"
+                                ng-if="$ctrl.dataType.description">
+                </waltz-markdown>
+                <span ng-if="!$ctrl.dataType.description">
+                    Description not provided
+                </span>
+            </div>
+        </div>
+        <hr>
+
+        <div class="row row-mini-gutters">
+            <div class="col-sm-4">
+                <waltz-apps-by-investment-pie applications="$ctrl.apps"
+                                              size="70"
+                                              class="clickable"
+                                              waltz-jump-to="apps-section">
+                </waltz-apps-by-investment-pie>
+            </div>
+
+            <div class="col-sm-4">
+                <waltz-apps-by-lifecycle-phase-pie applications="$ctrl.apps"
+                                                   size="70"
+                                                   class="clickable"
+                                                   waltz-jump-to="apps-section">
+                </waltz-apps-by-lifecycle-phase-pie>
+            </div>
+
+            <div class="col-sm-4">
+                <waltz-basic-info-tile waltz-jump-to="data-type-flow-section"
+                                       class="clickable"
+                                       icon="crosshairs"
+                                       name="Data Type Usage">
+                    <br>
+                    <waltz-data-type-usage-stat-table stats="$ctrl.usageStats">
+                    </waltz-data-type-usage-stat-table>
+                </waltz-basic-info-tile>
+            </div>
+        </div>
+
+        <div class="row no-overflow"
+             ng-if="$ctrl.parents.length > 0 || $ctrl.dataType.children.length > 0"
+             style="padding: 1em">
+            <div class="col-sm-4"
+                 ng-if="$ctrl.parents.length > 0">
+                <h4>Parent dataTypes: </h4>
+                <ul>
+                    <li ng-repeat="parent in $ctrl.parents">
+                        <a ui-sref="main.data-type.view ({id: parent.id })"
+                           ng-bind="parent.name">
+                        </a>
+                        <span ng-if="!$last">&raquo;</span>
+                    </li>
+                </ul>
+
+                <span class="text-muted small "
+                      ng-bind="$ctrl.parent.description">
+                </span>
+            </div>
+
+            <div ng-if="$ctrl.dataType.children.length > 0"
+                 class="col-sm-8">
+
+                <h4>Child dataTypes</h4>
+                <ul>
+                    <li ng-repeat="child in $ctrl.dataType.children | orderBy:'name'">
+                        <a ui-sref="main.data-type.view ({id: child.id})"
+                           class="clickable"
+                           ng-bind="child.name">
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
+
+    <waltz-no-data ng-if="!$ctrl.dataType">
+                <message>No information for this Data Type</message>
+    </waltz-no-data>
 
 </div>

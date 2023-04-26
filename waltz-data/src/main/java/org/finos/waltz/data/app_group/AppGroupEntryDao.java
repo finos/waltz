@@ -22,7 +22,10 @@ import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.app_group.AppGroupEntry;
 import org.finos.waltz.model.app_group.ImmutableAppGroupEntry;
+import org.finos.waltz.model.entity_relationship.RelationshipKind;
+import org.finos.waltz.schema.tables.EntityRelationship;
 import org.finos.waltz.schema.tables.records.ApplicationGroupEntryRecord;
+import org.finos.waltz.schema.tables.records.EntityRelationshipRecord;
 import org.jooq.DSLContext;
 import org.jooq.Query;
 import org.jooq.Record;
@@ -32,6 +35,8 @@ import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -40,6 +45,7 @@ import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.data.application.ApplicationDao.IS_ACTIVE;
+import static org.finos.waltz.schema.Tables.ENTITY_RELATIONSHIP;
 import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static org.finos.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_GROUP_ENTRY;
 
@@ -114,7 +120,7 @@ public class AppGroupEntryDao {
                 .execute();
     }
 
-    public void replaceGroupEntries(Set<Tuple2<Long, Set<AppGroupEntry>>> entriesForGroups) {
+    public void replaceGroupApplicationEntries(Set<Tuple2<Long, Set<AppGroupEntry>>> entriesForGroups) {
         Set<Long> groupIds = map(entriesForGroups, d -> d.v1);
 
         dsl.transaction(ctx -> {
@@ -135,6 +141,41 @@ public class AppGroupEntryDao {
                                 record.setIsReadonly(r.isReadOnly());
                                 record.setProvenance(r.provenance());
                                 record.setCreatedAt(DateTimeUtilities.nowUtcTimestamp());
+                                return record;
+                            }))
+                    .collect(collectingAndThen(toSet(), tx::batchInsert))
+                    .execute();
+        });
+    }
+
+    public void replaceGroupChangeInitiativeEntries(Set<Tuple2<Long, Set<AppGroupEntry>>> entriesForGroups) {
+        Set<Long> groupIds = map(entriesForGroups, d -> d.v1);
+
+        Timestamp now = DateTimeUtilities.nowUtcTimestamp();
+
+        dsl.transaction(ctx -> {
+            DSLContext tx = ctx.dsl();
+
+            tx.deleteFrom(ENTITY_RELATIONSHIP)
+                    .where(ENTITY_RELATIONSHIP.ID_A.in(groupIds)
+                            .and(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.APP_GROUP.name())
+                                    .and(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.CHANGE_INITIATIVE.name()))))
+                    .execute();
+
+            entriesForGroups
+                    .stream()
+                    .flatMap(t -> t.v2
+                            .stream()
+                            .map(r -> {
+                                EntityRelationshipRecord record = tx.newRecord(ENTITY_RELATIONSHIP);
+                                record.setIdA(t.v1);
+                                record.setKindA(EntityKind.APP_GROUP.name());
+                                record.setIdB(r.id());
+                                record.setKindB(EntityKind.CHANGE_INITIATIVE.name());
+                                record.setProvenance(r.provenance());
+                                record.setRelationship(RelationshipKind.RELATES_TO.name());
+                                record.setLastUpdatedAt(now);
+                                record.setLastUpdatedBy("admin");
                                 return record;
                             }))
                     .collect(collectingAndThen(toSet(), tx::batchInsert))

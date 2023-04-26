@@ -39,55 +39,50 @@
 
                 <hr>
 
-                <div class="container-fluid">
 
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <waltz-apps-by-investment-pie applications="$ctrl.apps"
-                                                          waltz-jump-to="apps-section"
-                                                          class="clickable"
-                                                          size="70">
-                            </waltz-apps-by-investment-pie>
-                        </div>
-
-                        <div class="col-sm-4">
-                            <waltz-apps-by-lifecycle-phase-pie applications="$ctrl.apps"
-                                                               waltz-jump-to="apps-section"
-                                                               class="clickable"
-                                                               size="70">
-                            </waltz-apps-by-lifecycle-phase-pie>
-                        </div>
-
-                        <div class="col-sm-4">
-                            <waltz-basic-info-tile waltz-jump-to="logical-flows-tabgroup-section"
-                                                   class="clickable"
-                                                   icon="random"
-                                                   name="Logical Data Flows">
-                                <waltz-flow-cloud-diagram
-                                    width="230"
-                                    height="180"
-                                    stats="$ctrl.flowStats">
-                                </waltz-flow-cloud-diagram>
-                            </waltz-basic-info-tile>
-                        </div>
+                <div class="row row-mini-gutters">
+                    <div class="col-sm-4">
+                        <waltz-apps-by-investment-pie applications="$ctrl.apps"
+                                                      waltz-jump-to="apps-section"
+                                                      class="clickable"
+                                                      size="70">
+                        </waltz-apps-by-investment-pie>
                     </div>
 
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <waltz-complexity-basic-info-tile parent-entity-ref="$ctrl.parentEntityRef"
-                                                              filters="$ctrl.filters">
-                            </waltz-complexity-basic-info-tile>
-                        </div>
-                        <div class="col-sm-4">
-                            <waltz-server-basic-info-tile parent-entity-ref="$ctrl.parentEntityRef"
+                    <div class="col-sm-4">
+                        <waltz-apps-by-lifecycle-phase-pie applications="$ctrl.apps"
+                                                           waltz-jump-to="apps-section"
+                                                           class="clickable"
+                                                           size="70">
+                        </waltz-apps-by-lifecycle-phase-pie>
+                    </div>
+
+                    <div class="col-sm-4">
+                        <waltz-basic-info-tile waltz-jump-to="logical-flows-tabgroup-section"
+                                               class="clickable"
+                                               icon="random"
+                                               name="Logical Data Flows">
+                            <waltz-flow-cloud-diagram stats="$ctrl.flowStats">
+                            </waltz-flow-cloud-diagram>
+                        </waltz-basic-info-tile>
+                    </div>
+                </div>
+
+                <div class="row row-mini-gutters">
+                    <div class="col-sm-4">
+                        <waltz-complexity-basic-info-tile parent-entity-ref="$ctrl.parentEntityRef"
                                                           filters="$ctrl.filters">
-                            </waltz-server-basic-info-tile>
-                        </div>
-                        <div class="col-sm-4">
-                            <waltz-assessment-info-tile parent-entity-ref="$ctrl.parentEntityRef"
-                                                        filters="$ctrl.filters">
-                            </waltz-assessment-info-tile>
-                        </div>
+                        </waltz-complexity-basic-info-tile>
+                    </div>
+                    <div class="col-sm-4">
+                        <waltz-server-basic-info-tile parent-entity-ref="$ctrl.parentEntityRef"
+                                                      filters="$ctrl.filters">
+                        </waltz-server-basic-info-tile>
+                    </div>
+                    <div class="col-sm-4">
+                        <waltz-assessment-info-tile parent-entity-ref="$ctrl.parentEntityRef"
+                                                    filters="$ctrl.filters">
+                        </waltz-assessment-info-tile>
                     </div>
                 </div>
 

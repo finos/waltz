@@ -138,7 +138,7 @@
     </tr>
     <tr>
         <td>
-            <div>External ID</div>
+            <div>External ID (Recommended)</div>
             <div class="small help-text">An identifier used to reference this column in derivation scripts and filter
                 notes
             </div>

@@ -40,8 +40,7 @@
     </div>
 </PageHeader>
 
-<div class="waltz-page-summary waltz-page-summary-attach"
-     style="margin-bottom: 5em;">
+<div class="waltz-page-summary waltz-page-summary-attach">
     <div class="waltz-display-section">
 
         <div class="row">

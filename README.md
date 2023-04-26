@@ -66,11 +66,15 @@ progress and done issues.
 
 **Provisional** dates for upcoming releases:
 
-| Release  | Date            | Summary                    |
-|----------|-----------------|----------------------------|
-| **1.48** | 28th March 2023 | Legal Entities (continued) |
-| 1.49     | 30th May 2023   | tbd                        |
-| 1.50     | tbd             | tbd                        |
+| Release | Date            | Summary                    |
+|---------|-----------------|----------------------------|
+| 1.49    | 30th May 2023   | tbd                        |
+| 1.50    | tbd             | tbd                        |
+| 1.51    | tbd             | tbd                        |
+
+See the [releases](https://github.com/finos/waltz/releases) page for historic versions.
+
+
 
 ## Contributing
 

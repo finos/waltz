@@ -25,11 +25,13 @@ import org.finos.waltz.common.hierarchy.Forest;
 import org.finos.waltz.common.hierarchy.Node;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.InlineSelectFieldFactory;
+import org.finos.waltz.model.Cardinality;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.entity_field_reference.EntityFieldReference;
 import org.finos.waltz.model.entity_field_reference.ImmutableEntityFieldReference;
 import org.finos.waltz.model.report_grid.*;
+import org.finos.waltz.model.survey.SurveyQuestionFieldType;
 import org.finos.waltz.model.usage_info.UsageKind;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.ChangeInitiative;
@@ -39,7 +41,6 @@ import org.finos.waltz.schema.tables.records.ReportGridFixedColumnDefinitionReco
 import org.finos.waltz.schema.tables.records.ReportGridRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
-import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
 import org.slf4j.Logger;
@@ -72,10 +73,18 @@ import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.SetUtilities.*;
-import static org.finos.waltz.common.StringUtilities.*;
+import static org.finos.waltz.common.StringUtilities.isEmpty;
+import static org.finos.waltz.common.StringUtilities.join;
+import static org.finos.waltz.common.StringUtilities.lower;
+import static org.finos.waltz.common.StringUtilities.safeTrim;
+import static org.finos.waltz.common.StringUtilities.toHtmlTable;
+import static org.finos.waltz.common.StringUtilities.toMailbox;
+import static org.finos.waltz.common.StringUtilities.upper;
 import static org.finos.waltz.common.hierarchy.HierarchyUtilities.toForest;
 import static org.finos.waltz.data.JooqUtilities.fieldsWithout;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.report_grid.CellOption.defaultCellOption;
+import static org.finos.waltz.model.report_grid.CellOption.mkCellOption;
 import static org.finos.waltz.model.survey.SurveyInstanceStatus.APPROVED;
 import static org.finos.waltz.model.survey.SurveyInstanceStatus.COMPLETED;
 import static org.finos.waltz.schema.Tables.*;
@@ -321,6 +330,7 @@ public class ReportGridDao {
                     record.setExternalId(derivedCol.externalId().orElse(null));
                     record.setDerivationScript(derivedCol.derivationScript());
                     record.setColumnDescription(derivedCol.columnDescription());
+
                     return record;
                 })
                 .collect(collectingAndThen(toSet(), d -> tx.batchInsert(d).execute()));
@@ -1135,7 +1145,7 @@ public class ReportGridDao {
 
                         Timestamp attAt = r.get("att_at", Timestamp.class);
 
-                        Tuple2<String, String> optionCodeAndText = determineOptionForAttestation(attAt);
+                        CellOption option = determineOptionForAttestation(attAt);
 
                         return ImmutableReportGridCell
                                 .builder()
@@ -1143,14 +1153,13 @@ public class ReportGridDao {
                                 .subjectId(r.get("ref_i", Long.class))
                                 .dateTimeValue(toLocalDateTime(attAt))
                                 .comment(format("Attested by: %s", r.get("att_by", String.class)))
-                                .optionCode(optionCodeAndText.v1)
-                                .optionText(optionCodeAndText.v2)
+                                .options(asSet(option))
                                 .build();
                     });
         }
     }
 
-    private Tuple2<String, String> determineOptionForAttestation(Timestamp attAt) {
+    private CellOption determineOptionForAttestation(Timestamp attAt) {
 
         LocalDateTime attestationDate = toLocalDateTime(attAt);
 
@@ -1160,15 +1169,15 @@ public class ReportGridDao {
         LocalDateTime yearAgo = DateTimeUtilities.nowUtc().minusMonths(12);
 
         if (attestationDate.isAfter(oneMonthAgo)) {
-            return tuple("<1M", "<1 Month");
+            return mkCellOption("<1M", "<1 Month");
         } else if (attestationDate.isAfter(threeMonthsAgo)) {
-            return tuple("<3M", "1-3 Months");
+            return mkCellOption("<3M", "1-3 Months");
         } else if (attestationDate.isAfter(sixMonthsAgo)) {
-            return tuple("<6M", "3-6 Months");
+            return mkCellOption("<6M", "3-6 Months");
         } else if (attestationDate.isAfter(yearAgo)) {
-            return tuple("<1Y", "6-12 Months");
+            return mkCellOption("<1Y", "6-12 Months");
         } else {
-            return tuple(">1Y", ">1 Year");
+            return mkCellOption(">1Y", ">1 Year");
         }
     }
 
@@ -1262,8 +1271,7 @@ public class ReportGridDao {
                 .subjectId(subjectId)
                 .columnDefinitionId(colDefId)
                 .textValue(derivedUsage.displayName())
-                .optionCode(derivedUsage.name())
-                .optionText(derivedUsage.displayName())
+                .options(asSet(mkCellOption(derivedUsage.name(), derivedUsage.displayName())))
                 .build();
     }
 
@@ -1925,9 +1933,9 @@ public class ReportGridDao {
                                     .builder()
                                     .subjectId(entityId)
                                     .columnDefinitionId(highIdToDefIdMap.getOrDefault(measurableId, lowIdToDefIdMap.get(measurableId)))
-                                    .ratingIdValue(t.v1)
-                                    .optionCode(Long.toString(t.v1))
-                                    .optionText(t.v3)
+                                    .ratingIdValues(asSet(t.v1))
+                                    .options(asSet(mkCellOption(Long.toString(t.v1), t.v3)))
+                                    .textValue(t.v3)
                                     .build())
                             .orElse(null);
                 })
@@ -1966,10 +1974,10 @@ public class ReportGridDao {
                     .fetchSet(r -> ImmutableReportGridCell.builder()
                             .subjectId(r.get(mr.ENTITY_ID))
                             .columnDefinitionId(measurableIdToDefIdMap.get(r.get(mr.MEASURABLE_ID)))
-                            .ratingIdValue(r.get(rsi.ID))
+                            .ratingIdValues(asSet(r.get(rsi.ID)))
+                            .textValue(r.get(rsi.NAME))
                             .comment(r.get(mr.DESCRIPTION))
-                            .optionText(r.get(rsi.NAME))
-                            .optionCode(Long.toString(r.get(rsi.ID)))
+                            .options(asSet(mkCellOption(Long.toString(r.get(rsi.ID)), r.get(rsi.NAME))))
                         .build());
         }
     }
@@ -1985,25 +1993,84 @@ public class ReportGridDao {
                     ReportGridFixedColumnDefinition::columnEntityId,
                     ReportGridFixedColumnDefinition::gridColumnId);
 
-            return dsl
+
+            Map<String, Result<Record6<Long, Long, Long, String, String, String>>> assessmentsByCardinality = dsl
                     .select(ar.ENTITY_ID,
                             ar.ASSESSMENT_DEFINITION_ID,
                             ar.RATING_ID,
                             rsi.NAME,
-                            ar.DESCRIPTION)
+                            ar.DESCRIPTION,
+                            ad.CARDINALITY)
                     .from(ar)
                     .innerJoin(rsi).on(ar.RATING_ID.eq(rsi.ID))
+                    .innerJoin(ad).on(ar.ASSESSMENT_DEFINITION_ID.eq(ad.ID))
                     .where(ar.ASSESSMENT_DEFINITION_ID.in(assessmentIdToDefIdMap.keySet())
                             .and(ar.ENTITY_KIND.eq(selector.kind().name()))
                             .and(ar.ENTITY_ID.in(selector.selector())))
-                    .fetchSet(r -> ImmutableReportGridCell.builder()
-                            .subjectId(r.get(ar.ENTITY_ID))
-                            .columnDefinitionId(assessmentIdToDefIdMap.get(r.get(ar.ASSESSMENT_DEFINITION_ID)))
-                            .ratingIdValue(r.get(ar.RATING_ID))
-                            .comment(r.get(ar.DESCRIPTION))
-                            .optionCode(Long.toString(r.get(ar.RATING_ID)))
-                            .optionText(r.get(rsi.NAME))
-                            .build());
+                    .fetchGroups(r -> r.get(ad.CARDINALITY));
+
+            Result<Record6<Long, Long, Long, String, String, String>> assessmentRatings = assessmentsByCardinality.get(Cardinality.ZERO_ONE.name());
+            Result<Record6<Long, Long, Long, String, String, String>> multiValueAssessmentRatings = assessmentsByCardinality.get(Cardinality.ZERO_MANY.name());
+
+            Set<ReportGridCell> singleValueGridCells = map(assessmentRatings,
+                    r -> {
+                        String ratingName = r.get(rsi.NAME);
+                        String optionCode = Long.toString(r.get(ar.RATING_ID));
+                        return ImmutableReportGridCell.builder()
+                                .subjectId(r.get(ar.ENTITY_ID))
+                                .columnDefinitionId(assessmentIdToDefIdMap.get(r.get(ar.ASSESSMENT_DEFINITION_ID)))
+                                .ratingIdValues(asSet(r.get(ar.RATING_ID)))
+                                .textValue(ratingName)
+                                .comment(r.get(ar.DESCRIPTION))
+                                .options(asSet(ImmutableCellOption.builder()
+                                        .text(ratingName)
+                                        .code(optionCode)
+                                        .build()))
+                                .build();
+                    });
+
+            Set<ReportGridCell> multiValueGridCells = isEmpty(multiValueAssessmentRatings)
+                    ? emptySet()
+                    : groupBy(
+                    multiValueAssessmentRatings,
+                    d -> tuple(d.get(ar.ASSESSMENT_DEFINITION_ID), d.get(ar.ENTITY_ID)),
+                    d -> tuple(d.get(ar.RATING_ID), d.get(ar.DESCRIPTION), d.get(rsi.NAME)))
+                    .entrySet()
+                    .stream()
+                    .map(e -> {
+
+                        Collection<Tuple3<Long, String, String>> values = e.getValue();
+
+                        Set<Long> ratingIds = map(values, v -> v.v1);
+                        String cellName = values
+                                .stream()
+                                .map(v -> v.v3)
+                                .sorted(Comparator.naturalOrder())
+                                .collect(joining(", "));
+
+                        Set<CellOption> options = map(values, v -> ImmutableCellOption.builder()
+                                .text(v.v3)
+                                .code(Long.toString(v.v1))
+                                .build());
+
+                        List<Tuple2<String, String>> commentRows = values
+                                .stream()
+                                .map(t -> tuple(t.v3, t.v2))
+                                .sorted(comparing(t -> t.v2))
+                                .collect(toList());
+
+                        return ImmutableReportGridCell.builder()
+                                .subjectId(e.getKey().v2)
+                                .columnDefinitionId(assessmentIdToDefIdMap.get(e.getKey().v1))
+                                .ratingIdValues(ratingIds)
+                                .comment(toHtmlTable(ListUtilities.asList("Rating", "Comment"), commentRows))
+                                .textValue(cellName)
+                                .options(options)
+                                .build();
+                    })
+                    .collect(toSet());
+
+            return union(singleValueGridCells, multiValueGridCells);
         }
     }
 
@@ -2141,13 +2208,37 @@ public class ReportGridDao {
 
                         List<String> listResponses = responsesByInstanceQuestionKey.getOrDefault(tuple(instanceId, questionId), emptyList());
 
+                        // if a question is not mandatory and left blank present as not provided
+                        Set<CellOption> options = isEmpty(response)
+                                ? emptySet()
+                                : asSet(determineOptionForSurveyQuestion(fieldType, response));
+
                         return ImmutableReportGridCell.builder()
                                 .subjectId(r.get(SURVEY_INSTANCE.ENTITY_ID))
                                 .columnDefinitionId(questionIdToDefIdMap.get(questionId))
                                 .textValue(determineDisplayText(fieldType, entityName, response, listResponses))
                                 .comment(r.get(SURVEY_QUESTION_RESPONSE.COMMENT))
+                                .options(options)
                                 .build();
                     });
+        }
+    }
+
+
+    private CellOption determineOptionForSurveyQuestion(String fieldType, String response) {
+
+        if (isEmpty(response)) {
+            mkCellOption("NA", "N/A");
+        }
+
+        SurveyQuestionFieldType type = SurveyQuestionFieldType.valueOf(fieldType);
+
+        switch (type) {
+            case BOOLEAN:
+            case DROPDOWN:
+                return mkCellOption(upper(response), response);
+            default:
+                return CellOption.defaultCellOption();
         }
     }
 

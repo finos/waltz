@@ -18,6 +18,8 @@
 
 package org.finos.waltz.service.report_grid;
 
+import org.finos.waltz.common.CollectionUtilities;
+import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.common.exception.NotFoundException;
@@ -41,6 +43,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -145,9 +148,8 @@ public class ReportGridService {
         Set<ReportGridCell> cellData = reportGridDao.findCellDataByGridId(id, genericSelector);
         Set<ReportSubject> subjects = getReportSubjects(genericSelector);
 
-        Set<RatingSchemeItem> ratingSchemeItems = ratingSchemeService.findRatingSchemeItemsByIds(map(
-                cellData,
-                ReportGridCell::ratingIdValue));
+        Set<RatingSchemeItem> ratingSchemeItems = ratingSchemeService.findRatingSchemeItemsByIds(
+                cellData.stream().flatMap(d -> d.ratingIdValues().stream()).collect(Collectors.toSet()));
 
         return ImmutableReportGridInstance
                 .builder()

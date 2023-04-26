@@ -30,18 +30,20 @@ import org.finos.waltz.test_common.helpers.DataTypeHelper;
 import org.finos.waltz.test_common.helpers.LogicalFlowHelper;
 import org.jooq.DSLContext;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
 import static org.finos.waltz.schema.tables.DataType.DATA_TYPE;
 import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
+@Disabled("Problem with H2")
 public class AttestationPreCheckServiceTest extends BaseInMemoryIntegrationTest {
 
     @Autowired
@@ -78,6 +80,7 @@ public class AttestationPreCheckServiceTest extends BaseInMemoryIntegrationTest 
         LogicalFlow flow = lfHelper.createLogicalFlow(aRef, bRef);
         lfHelper.createLogicalFlowDecorators(flow.entityReference(), asSet(unkId));
 
+        aipcSvc.calcLogicalFlowPreCheckFailures(aRef);
         List<String> aResult = aipcSvc.calcLogicalFlowPreCheckFailures(aRef);
         assertTrue(aResult.isEmpty(), "ok as unknown is outgoing");
 
@@ -97,7 +100,7 @@ public class AttestationPreCheckServiceTest extends BaseInMemoryIntegrationTest 
         lfHelper.createLogicalFlowDecorators(flow.entityReference(), asSet(deprecatedTypeId));
 
         List<String> aResult = aipcSvc.calcLogicalFlowPreCheckFailures(aRef);
-        assertTrue(aResult.isEmpty(), "ok as deprecated is outgoing");
+        assertEquals(Collections.emptyList(), aResult, "should have no failure messages as deprecated is outgoing");
 
         List<String> bResult = aipcSvc.calcLogicalFlowPreCheckFailures(bRef);
         assertFalse(bResult.isEmpty(), "should fail as deprecated is incoming");

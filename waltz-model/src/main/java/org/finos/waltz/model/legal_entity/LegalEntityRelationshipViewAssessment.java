@@ -20,7 +20,6 @@ package org.finos.waltz.model.legal_entity;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.immutables.value.Value;
 
 import java.util.Set;
@@ -33,6 +32,6 @@ public abstract class LegalEntityRelationshipViewAssessment {
 
     public abstract Long assessmentDefinitionId();
 
-    public abstract Set<RatingSchemeItem> ratings();
+    public abstract Set<Long> ratingIds();
 
 }

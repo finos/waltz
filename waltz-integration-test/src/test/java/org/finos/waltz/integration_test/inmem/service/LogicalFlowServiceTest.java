@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Set;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.ListUtilities.asList;
 import static org.finos.waltz.common.SetUtilities.asSet;
@@ -284,7 +285,7 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
                 .build();
 
         Set<LogicalFlow> noCreateCommands = lfSvc.addFlows(emptyList(), "addFlowTest");
-        assertEquals(emptyList(), noCreateCommands, "If no list provided returns empty list");
+        assertEquals(emptySet(), noCreateCommands, "If no list provided returns empty list");
 
         assertThrows(
                 IllegalArgumentException.class,

@@ -25,19 +25,15 @@
                      select="$ctrl.tabSelected('summary', 0)"
                      ng-if="$ctrl.parentEntityRef.kind !== 'DATA_TYPE'">
                 <div class="row">
-                    <div class="col-sm-4">
+                    <div class="col-sm-6">
                         <br>
-                        <waltz-flow-cloud-diagram
-                            width="300"
-                            height="300"
-                            stats="$ctrl.stats">
+                        <waltz-flow-cloud-diagram stats="$ctrl.stats">
                         </waltz-flow-cloud-diagram>
                     </div>
-                    <div class="col-sm-12 col-md-8">
-                        <waltz-logical-flows-data-type-summary-pane
-                            stats="$ctrl.stats"
-                            parent-entity-ref="$ctrl.parentEntityRef"
-                            filters="$ctrl.filters">
+                    <div class="col-sm-6">
+                        <waltz-logical-flows-data-type-summary-pane stats="$ctrl.stats"
+                                                                    parent-entity-ref="$ctrl.parentEntityRef"
+                                                                    filters="$ctrl.filters">
                         </waltz-logical-flows-data-type-summary-pane>
                     </div>
                 </div>

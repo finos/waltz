@@ -15,6 +15,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import static java.util.Collections.emptySet;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
@@ -84,7 +87,9 @@ public class AssessmentRatingPermissionCheckerTest extends BaseInMemoryIntegrati
         permissionHelper.setupPermissionGroupEntry(appA, pg.getId());
 
         AssessmentDefinitionRatingOperations noPermissionsConfigured = assessmentRatingPermissionChecker.getRatingPermissions(appA, defnId, u1);
-        assertEquals(emptySet(), noPermissionsConfigured, "If no permission group involvement returns no permissions");
+        Set<Operation> operationsAcrossAllRatings = noPermissionsConfigured.ratingOperations().stream().flatMap(d -> d.operations().stream()).collect(Collectors.toSet());
+
+        assertEquals(emptySet(), operationsAcrossAllRatings, "If no permission group involvement returns no permissions");
 
         involvementHelper.createInvolvement(u1Id, privKind, appA);
         permissionHelper.setupPermissionGroupInvolvement(

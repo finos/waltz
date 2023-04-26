@@ -30,8 +30,8 @@
     </waltz-section-actions>
     <div class="waltz-display-section">
         <div class="row">
-            <div class="col-sm-7">
-                <div class="row">
+            <div class="col-md-7">
+                <div class="row row-no-gutters">
                     <div class="col-sm-2 waltz-display-field-label">
                         Name
                     </div>
@@ -48,7 +48,7 @@
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row row-no-gutters">
                     <div class="col-sm-2 waltz-display-field-label">
                         Lifecycle Phase
                     </div>
@@ -63,7 +63,7 @@
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row row-no-gutters">
                     <div class="col-sm-2 waltz-display-field-label">
                         Owning Org Unit
                     </div>
@@ -83,7 +83,7 @@
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row row-no-gutters">
                     <div class="col-sm-2 waltz-display-field-label">
                         Aliases
                     </div>
@@ -151,9 +151,9 @@
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row row-no-gutters">
                     <div class="col-sm-2 waltz-display-field-label">
-                        Complexity Rating:
+                        Complexity Rating
                     </div>
                     <div class="col-sm-4 waltz-display-field-value">
                         <span ng-if="$ctrl.complexities.length > 0"
@@ -178,9 +178,9 @@
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row row-no-gutters">
                     <div class="col-sm-2 waltz-display-field-label">
-                        Planned Retirement:
+                        Planned Retirement
                     </div>
                     <div class="col-sm-4 waltz-display-field-value">
                         <waltz-from-now ng-if="$ctrl.app.plannedRetirementDate"
@@ -192,7 +192,7 @@
                         </span>
                     </div>
                     <div class="col-sm-2 waltz-display-field-label">
-                        Actual Retirement:
+                        Actual Retirement
                     </div>
                     <div class="col-sm-4 waltz-display-field-value">
                         <waltz-from-now ng-if="$ctrl.app.actualRetirementDate"
@@ -204,9 +204,9 @@
                         </span>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row row-no-gutters">
                     <div class="col-sm-2 waltz-display-field-label">
-                        Commission:
+                        Commission
                     </div>
                     <div class="col-sm-4 waltz-display-field-value">
                         <waltz-from-now ng-if="$ctrl.app.commissionDate"
@@ -218,7 +218,7 @@
                         </span>
                     </div>
                     <div class="col-sm-2 waltz-display-field-label">
-                        Provenance:
+                        Provenance
                     </div>
                     <div class="col-sm-4 waltz-display-field-value">
                         <span ng-bind="$ctrl.app.provenance">
@@ -231,7 +231,7 @@
                 <waltz-entity-enum parent-entity-ref="$ctrl.parentEntityRef">
                 </waltz-entity-enum>
 
-                <div class="row">
+                <div class="row row-no-gutters">
                     <div class="col-sm-2 waltz-display-field-label">
                         Description
                     </div>
@@ -241,7 +241,7 @@
                     </div>
                 </div>
 
-                <div class="row"
+                <div class="row row-no-gutters"
                      ng-if="$ctrl.appGroups.length > 0">
                     <div class="col-sm-2 waltz-display-field-label">
                         Application Groups
@@ -269,7 +269,7 @@
                 </div>
 
             </div>
-            <div class="col-sm-5">
+            <div class="col-md-5">
                 <!-- Assessment Ratings -->
                 <waltz-assessment-rating-sub-section parent-entity-ref="$ctrl.parentEntityRef">
                 </waltz-assessment-rating-sub-section>
@@ -281,7 +281,6 @@
         </div>
 
 
-        <!--  TEMPLATES -->
         <script type='text/ng-template' id='popup-app-complexity.html'>
             <div>
                 <table class="table small">
