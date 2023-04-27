@@ -19,8 +19,8 @@ import _ from "lodash";
 import {initialiseData} from "../common/index";
 import {timeFormat} from "d3-time-format";
 import template from "./survey-run-create.html";
-import {CORE_API} from "../common/services/core-api-utils";
 import {instanceCreateCommand} from "./components/survey-run-create-store";
+import {displayError} from "../common/error-utils";
 
 
 const initialState = {
@@ -137,7 +137,8 @@ function controller($document,
                         owningRole: surveyInstance.owningRole
                     };
                     instanceCreateCommand.set(instancesRecipientsCreateCommand);
-                });
+                })
+                .catch(e => displayError("Could not create survey run", e));
         }
 
 

@@ -61,7 +61,8 @@
 
             <div ng-if="$ctrl.selectedTemplate == null">
                 <div class="help-block">
-                    Select the survey template to issue
+                    Select the survey template to issue against this
+                    <span ng-bind="$ctrl.parentEntityRef.kind | toDisplayName:'entity' | lowercase "></span>.
                 </div>
                 <input type="search"
                        class="form-control"
@@ -72,19 +73,28 @@
                 <div class="waltz-scroll-region-300">
                     <table class="table table-condensed small">
                         <colgroup>
+                            <col width="5%">
                             <col width="30%">
-                            <col width="60%">
-                            <col width="10%">
+                            <col>
                         </colgroup>
                         <thead>
                         <tr>
+                            <th></th>
                             <th>Name</th>
                             <th>Description</th>
-                            <th>Owner</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr ng-repeat="template in $ctrl.filteredTemplates">
+                            <td>
+                                <waltz-entity-link tooltip-placement="left"
+                                                   entity-ref="{ kind: 'PERSON', id: template.ownerId}">
+                                </waltz-entity-link>
+                                <waltz-icon name="key"
+                                            ng-if="template.issuanceRole"
+                                            title="This template can only be issued by certain users (you are one of them). Proceed with caution.">
+                                </waltz-icon>
+                            </td>
                             <td>
                                 <a ng-click="$ctrl.onSelectTemplate(template)"
                                    class="clickable">
@@ -94,16 +104,13 @@
                             <td>
                                 <span ng-bind="template.description | truncateMiddle:100"></span>
                             </td>
-                            <td>
-                                <waltz-entity-link tooltip-placement="left"
-                                                   entity-ref="{ kind: 'PERSON', id: template.ownerId}">
-                                </waltz-entity-link>
-                            </td>
                         </tr>
                         </tbody>
                     </table>
 
                 </div>
+
+                <br>
 
                 <a ng-click="$ctrl.onDismissCreateForm()"
                    class="clickable">

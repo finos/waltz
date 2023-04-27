@@ -23,6 +23,7 @@ import template from "./survey-template-view.html";
 import {CORE_API} from "../common/services/core-api-utils";
 import {displayError} from "../common/error-utils";
 import toasts from "../svelte-stores/toast-store";
+import SystemRoles from "../user/system-roles";
 
 const initialState = {
     template: {},
@@ -31,7 +32,9 @@ const initialState = {
     issuedAndCompletedRunsEnriched: [],
     draftRuns: [],
     questions: [],
-    runCompletionRates: {}
+    runCompletionRates: {},
+    canCreateRun: false
+
 };
 
 
@@ -137,15 +140,12 @@ function controller($q,
     // template
     const templatePromise = serviceBroker
         .loadViewData(CORE_API.SurveyTemplateStore.getById, [ templateId ])
-        .then(r => {
-            const template= r.data;
-            if (template) {
-                vm.template = template;
-                return serviceBroker
-                    .loadViewData(CORE_API.PersonStore.getById, [ template.ownerId ])
-                    .then(r => vm.owner = r.data);
-            }
-        });
+        .then(r => vm.template = r.data);
+
+    const ownerPromise = templatePromise
+        .then(template => serviceBroker
+            .loadViewData(CORE_API.PersonStore.getById, [ template.ownerId ])
+            .then(r => vm.owner = r.data));
 
     // runs
     const loadRuns = () => {
@@ -157,10 +157,18 @@ function controller($q,
             .loadViewData(CORE_API.SurveyRunStore.findByTemplateId, [templateId], { force: true })
             .then(r => r.data);
 
-        $q.all([userPromise, runsPromise, templatePromise])
-            .then(([user, runsData]) => {
+        $q.all([userPromise, runsPromise, templatePromise, ownerPromise])
+            .then(([user, runsData, template, owner]) => {
 
-                vm.isOwnerOrAdmin = user.userName === vm.owner.email || _.includes(user.roles, "ADMIN");
+                const userIsAdmin = _.includes(user.roles, SystemRoles.ADMIN.key);
+                const userHasRunAdmin = _.includes(user.roles, SystemRoles.SURVEY_ADMIN.key)
+                const userHasIssuanceRole = _.isNil(template.issuanceRole) || _.includes(user.roles, template.issuanceRole);
+                const userIsTemplateOwner = user.userName === owner.email;
+                const userHasIssuanceRights = userHasIssuanceRole && userHasRunAdmin;
+                const templateIsActive = template.status === "ACTIVE";
+
+                vm.canCreateRun =  templateIsActive && ( userIsAdmin || userHasIssuanceRights);
+                vm.isOwnerOrAdmin = userIsTemplateOwner || userIsAdmin;
 
                 [vm.issuedAndCompleted, vm.draft] = _
                     .chain(runsData)

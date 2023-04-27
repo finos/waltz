@@ -12,9 +12,9 @@ public class InsufficientPrivelegeException_test {
     public void insufficientPrivelegeExceptionMessage() throws Exception {
         Throwable exception = assertThrows(InsufficientPrivelegeException.class, () -> {
             System.out.println("=======Starting Exception process=======");
-            throw new InsufficientPrivelegeException("Insuffcient Privelege");
+            throw new InsufficientPrivelegeException("Insuffcient Privilege");
         });
-        assertEquals(exception.getMessage(), "Insuffcient Privelege");
+        assertEquals(exception.getMessage(), "Insuffcient Privilege");
 
     }
 }
