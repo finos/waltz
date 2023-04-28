@@ -53,8 +53,6 @@
         return _.get(entity[gridSubjectKind], "icon", "fw");
     }
 
-    $: console.log({grids});
-
 </script>
 
 <div class="row">

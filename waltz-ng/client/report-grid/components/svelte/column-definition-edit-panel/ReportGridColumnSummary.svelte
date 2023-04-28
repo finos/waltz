@@ -56,14 +56,7 @@
             : name;
     }
 
-    $: console.log({cols: $columnDefs});
-
-
     $: cols = _.map($columnDefs, d => ({colDef: d, trackingId: JSON.stringify(_.omit(d, ["position"]))}));
-
-    // function mkColTrackingId(column) {
-    //     return JSON.stringify(_.omit(column, ["position"]));
-    // }
 
 </script>
 

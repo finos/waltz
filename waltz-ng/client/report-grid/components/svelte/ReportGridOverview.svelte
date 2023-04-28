@@ -43,8 +43,6 @@
         onGridSelect(grid, isNew);
     }
 
-    $: console.log({gridDefn: $gridDefinition});
-
     function create(grid) {
         const createCmd = {
             name: grid.name,
@@ -63,8 +61,6 @@
     }
 
     function update(grid) {
-
-        console.log({update: grid});
 
         const updateCmd = {
             name: grid.name,
@@ -87,7 +83,6 @@
             .then(r => {
                 toasts.success("Grid cloned successfully")
                 const grid = r.data;
-                console.log({grid});
                 selectGrid(grid);
             })
             .catch(e => toasts.error("Could not clone grid. " + e.error));
