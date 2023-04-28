@@ -16,40 +16,37 @@
  *
  */
 
-import template from "./welcome.html";
+export function store($http, baseUrl) {
+
+    const BASE = `${baseUrl}/uid`;
 
 
-const initialState = {
-    appGroupSubscriptions: [],
-    panels: [],
-    history: []
-};
+    const generateOne = () => {
+        return $http
+            .get(`${BASE}/generate-one`)
+            .then(result => result.data);
+    };
 
 
-function controller($document,
-                    appGroupStore) {
-
-    const vm = Object.assign(this, initialState);
-
-    appGroupStore
-        .findMyGroupSubscriptions()
-        .then(groupSubscriptions => vm.appGroupSubscriptions = groupSubscriptions);
-
-    document.title = "Waltz: Home";
-
+    return {
+        generateOne
+    };
 }
 
-controller.$inject = [
-    "$document",
-    "AppGroupStore"
+
+store.$inject = [
+    "$http",
+    "BaseApiUrl"
 ];
 
 
-const view = {
-    controller,
-    controllerAs: "ctrl",
-    template
+export const serviceName = "UIDStore";
+
+
+export const UIDStore_API = {
+    generateOne: {
+        serviceName,
+        serviceFnName: "generateOne",
+        description: "generates one UID"
+    }
 };
-
-
-export default view;
