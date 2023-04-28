@@ -91,7 +91,8 @@ public class ReportGridEndpoint implements Endpoint {
         return reportGridService
                 .getByIdAndSelectionOptions(
                         getId(req),
-                        readIdSelectionOptionsFromBody(req))
+                        readIdSelectionOptionsFromBody(req),
+                        getUsername(req))
                 .orElseThrow(() -> new NotFoundException("404", "ID not found"));
     }
 
@@ -110,20 +111,20 @@ public class ReportGridEndpoint implements Endpoint {
     }
 
 
-    public ReportGridDefinition createRoute(Request req,
-                                            Response resp) throws IOException {
+    public ReportGridInfo createRoute(Request req,
+                                      Response resp) throws IOException {
         return reportGridService.create(readBody(req, ReportGridCreateCommand.class), getUsername(req));
     }
 
 
-    public ReportGridDefinition updateRoute(Request req,
-                                            Response resp) throws IOException, InsufficientPrivelegeException {
+    public ReportGridInfo updateRoute(Request req,
+                                      Response resp) throws IOException, InsufficientPrivelegeException {
         return reportGridService.
                 update(getId(req), readBody(req, ReportGridUpdateCommand.class), getUsername(req));
     }
 
-    public ReportGridDefinition cloneRoute(Request req,
-                                           Response resp) throws IOException, InsufficientPrivelegeException {
+    public ReportGridInfo cloneRoute(Request req,
+                                     Response resp) throws IOException, InsufficientPrivelegeException {
         return reportGridService
                 .clone(getId(req), readBody(req, ReportGridUpdateCommand.class), getUsername(req));
     }

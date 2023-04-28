@@ -158,7 +158,8 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
                                                     IdSelectionOptions selectionOptions){
         return reportGridService.getByIdAndSelectionOptions(
                 gridId,
-                selectionOptions);
+                selectionOptions,
+                "extractor-user");
     }
 
 

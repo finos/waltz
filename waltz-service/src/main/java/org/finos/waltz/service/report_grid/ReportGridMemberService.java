@@ -89,4 +89,9 @@ public class ReportGridMemberService {
         checkIsOwner(cmd.gridId(), username);
         return reportGridMemberDao.register(cmd.gridId(), cmd.userId(), cmd.role());
     }
+
+    public int update(ReportGridMemberCreateCommand cmd, String username) throws InsufficientPrivelegeException {
+        checkIsOwner(cmd.gridId(), username);
+        return reportGridMemberDao.update(cmd, username);
+    }
 }

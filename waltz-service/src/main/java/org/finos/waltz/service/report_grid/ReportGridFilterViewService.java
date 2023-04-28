@@ -154,7 +154,8 @@ public class ReportGridFilterViewService {
 
         Optional<ReportGrid> maybeGrid = reportGridService.getByIdAndSelectionOptions(
                 reportGridFilterInfo.gridDefinition().id().get(),
-                reportGridFilterInfo.idSelectionOptions());
+                reportGridFilterInfo.idSelectionOptions(),
+                "filter-note-user");
 
         return maybeGrid
                 .map(grid -> {

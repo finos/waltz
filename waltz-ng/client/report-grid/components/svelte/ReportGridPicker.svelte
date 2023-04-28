@@ -6,12 +6,17 @@
     import SearchInput from "../../../common/svelte/SearchInput.svelte";
     import {termSearch} from "../../../common";
     import {truncateMiddle} from "../../../common/string-utils";
-    import {entity} from "../../../common/services/enums/entity";
+    import {gridService} from "./report-grid-service";
 
+
+    import {entity} from "../../../common/services/enums/entity";
 
     export let onGridSelect = () => "selecting grid";
     export let onCreate = () => "creating grid";
+
     export let grids = [];
+
+    const {gridDefinition} = gridService;
 
     const filters = {
         ALL: d => d,
@@ -47,6 +52,8 @@
     function determineSubjectIcon(gridSubjectKind) {
         return _.get(entity[gridSubjectKind], "icon", "fw");
     }
+
+    $: console.log({grids});
 
 </script>
 
@@ -103,7 +110,7 @@
                     </thead>
                     <tbody>
                     {#each gridList as grid}
-                        <tr class:selected={$selectedGrid?.definition.id === grid?.id}
+                        <tr class:selected={$gridDefinition?.id === grid?.gridId}
                             class="clickable"
                             on:click={() => onSelect(grid)}>
                             <td title={grid.kind === "PUBLIC" ? "Public" : "Private"}>

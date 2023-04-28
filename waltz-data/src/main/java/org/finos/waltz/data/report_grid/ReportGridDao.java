@@ -145,10 +145,11 @@ public class ReportGridDao {
     private static final RecordMapper<? super Record, ReportGridInfo> TO_GRID_INFO_MAPPER = r -> {
         ReportGridRecord record = r.into(REPORT_GRID);
 
-        EntityReference gridRef = mkRef(EntityKind.REPORT_GRID, record.getId(), record.getName(), record.getDescription(), record.getExternalId());
-
         return ImmutableReportGridInfo.builder()
-                .gridReference(gridRef)
+                .gridId(record.getId())
+                .name(record.getName())
+                .externalId(record.getExternalId())
+                .description(record.getDescription())
                 .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .provenance(record.getProvenance())
@@ -208,6 +209,10 @@ public class ReportGridDao {
 
     public ReportGridDefinition getGridDefinitionById(long id) {
         return getGridDefinitionByCondition(rg.ID.eq(id));
+    }
+
+    public ReportGridInfo getGridInfoById(long id) {
+        return getGridInfoByCondition(rg.ID.eq(id));
     }
 
 
@@ -423,6 +428,14 @@ public class ReportGridDao {
                 .from(rg)
                 .where(condition)
                 .fetchOne(r -> mkReportGridDefinition(condition, r.into(REPORT_GRID)));
+    }
+
+    private ReportGridInfo getGridInfoByCondition(Condition condition) {
+        return dsl
+                .select(rg.fields())
+                .from(rg)
+                .where(condition)
+                .fetchOne(TO_GRID_INFO_MAPPER);
     }
 
 

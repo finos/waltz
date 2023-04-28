@@ -115,5 +115,20 @@ public class ReportGridMemberDao {
                 .where(REPORT_GRID_MEMBER.GRID_ID.eq(gridId))
                 .fetchSet(PersonDao.personMapper);
     }
+
+    public int update(ReportGridMemberCreateCommand updateCommand, String username) {
+        int update = dsl
+                .update(REPORT_GRID_MEMBER)
+                .set(REPORT_GRID_MEMBER.ROLE, updateCommand.role().name())
+                .where(REPORT_GRID_MEMBER.GRID_ID.eq(updateCommand.gridId())
+                        .and(REPORT_GRID_MEMBER.USER_ID.eq(updateCommand.userId())))
+                .execute();
+
+        if (update == 1) {
+            return update;
+        } else {
+            return register(updateCommand.gridId(), updateCommand.userId(), updateCommand.role());
+        }
+    }
 }
 

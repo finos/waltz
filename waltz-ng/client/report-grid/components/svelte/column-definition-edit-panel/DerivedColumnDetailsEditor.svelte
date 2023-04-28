@@ -1,16 +1,17 @@
 <script>
     import _ from "lodash";
-    import {sameColumnRef} from "../report-grid-utils";
+    import {combineColDefs, sameColumnRef} from "../report-grid-utils";
     import Icon from "../../../../common/svelte/Icon.svelte";
-    import {columnDefs, selectedGrid} from "../report-grid-store";
     import ColumnDefinitionHeader from "./ColumnDefinitionHeader.svelte"
     import Markdown from "../../../../common/svelte/Markdown.svelte";
     import {derivedColumnHelpText} from "./column-definition-utils";
+    import {gridService} from "../report-grid-service";
 
     export let column;
     export let onCancel = () => console.log("Close");
     export let onRemove = () => console.log("Remove");
 
+    const {columnDefs, gridDefinition} = gridService;
 
     let working = {
         id: column.id,
@@ -19,6 +20,8 @@
         derivationScript: column.derivationScript,
         columnDescription: column.columnDescription
     }
+
+    $: originalCols = combineColDefs($gridDefinition);
 
     function cancelEdit() {
         onCancel();
@@ -35,74 +38,62 @@
     }
 
     function clearEdit(column) {
-        const originalColumn = _.find($selectedGrid.definition.derivedColumnDefinitions, d => sameColumnRef(d, column));
-        const columnsWithoutCol = _.reject($columnDefs, d => sameColumnRef(d, column));
-        $columnDefs = _.concat(columnsWithoutCol, originalColumn);
-        setWorkingColumn(originalColumn);
+        gridService.resetColumnDetails(column);
+        const col = _.find($columnDefs, d => sameColumnRef(d, column));
+        setWorkingColumn(col);
     }
 
-    function valueChanged(columnDefs, column) {
+    function valueChanged(originalColumnDefs, columnDefs, column) {
         const updatedColumn = _.find(columnDefs, d => sameColumnRef(d, column));
+        const originalColumn = _.find(originalColumnDefs, d => sameColumnRef(d, column));
         return column.id != null //new columns cannot be reset
-            && (updatedColumn?.derivationScriptChanged
-                || updatedColumn?.displayNameChanged
-                || updatedColumn?.externalIdChanged);
+            && !_.isEqual(updatedColumn, originalColumn);
     }
 
     function updateDisplayName(workingDisplayName, column) {
         const workingColumn = _.find($columnDefs, d => sameColumnRef(d, column));
-        const originalColumn = _.find($selectedGrid.definition.derivedColumnDefinitions, d => sameColumnRef(d, column));
         const newColumn = Object.assign(
             {},
             workingColumn,
             {
                 displayName: workingDisplayName,
-                displayNameChanged: workingDisplayName !== originalColumn?.displayName
             })
-        const columnsWithoutCol = _.reject($columnDefs, d => sameColumnRef(d, column));
-        $columnDefs = _.concat(columnsWithoutCol, newColumn);
+        gridService.updateColumnDetails(newColumn);
     }
 
     function updateColumnDescription(workingDisplayName, column) {
         const workingColumn = _.find($columnDefs, d => sameColumnRef(d, column));
-        const originalColumn = _.find($selectedGrid.definition.derivedColumnDefinitions, d => sameColumnRef(d, column));
         const newColumn = Object.assign(
             {},
             workingColumn,
             {
                 columnDescription: workingDisplayName,
-                columnDescriptionChanged: workingDisplayName !== originalColumn?.columnDescription
             })
-        const columnsWithoutCol = _.reject($columnDefs, d => sameColumnRef(d, column));
-        $columnDefs = _.concat(columnsWithoutCol, newColumn);
+        gridService.updateColumnDetails(newColumn);
+
     }
 
     function updateExternalId(workingExternalId, column) {
         const workingColumn = _.find($columnDefs, d => sameColumnRef(d, column));
-        const originalColumn = _.find($selectedGrid.definition.derivedColumnDefinitions, d => sameColumnRef(d, column));
         const newColumn = Object.assign(
             {},
             workingColumn,
             {
                 externalId: workingExternalId,
-                externalIdChanged: workingExternalId !== originalColumn?.externalId
             })
-        const columnsWithoutCol = _.reject($columnDefs, d => sameColumnRef(d, column));
-        $columnDefs = _.concat(columnsWithoutCol, newColumn);
+        gridService.updateColumnDetails(newColumn);
+
     }
 
     function updateDerivationScript(workingScript, column) {
         const workingColumn = _.find($columnDefs, d => sameColumnRef(d, column));
-        const originalColumn = _.find($selectedGrid.definition.derivedColumnDefinitions, d => sameColumnRef(d, column));
         const newColumn = Object.assign(
             {},
             workingColumn,
             {
                 derivationScript: workingScript,
-                derivationScriptChanged: workingScript !== originalColumn?.derivationScript
             })
-        const columnsWithoutCol = _.reject($columnDefs, d => sameColumnRef(d, column));
-        $columnDefs = _.concat(columnsWithoutCol, newColumn);
+        gridService.updateColumnDetails(newColumn);
     }
 
     $: {
@@ -141,7 +132,7 @@
         <td>
             <div>External ID <span class="text-danger">*</span></div>
             <div class="small help-text">An identifier used to reference this column in other derivation scripts and
-                fitler notes. This is mandatory for derived columns.
+                filter notes. This is mandatory for derived columns.
             </div>
         </td>
         <td>
@@ -194,7 +185,7 @@
 </button>
 |
 <button class="btn btn-skinny"
-        disabled={!valueChanged($columnDefs, column)}
+        disabled={!valueChanged(originalCols, $columnDefs, column)}
         on:click={() => clearEdit(column)}>
     <Icon name="ban"/>
     Clear

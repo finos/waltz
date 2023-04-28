@@ -265,8 +265,8 @@ function determineDataTypeUsageColor(usageKind) {
  * @param gridData
  * @returns {*}
  */
-function calculateCostColorScales(gridData) {
-    return calculateColorScales(gridData, "COST_KIND", "#e2f5ff", "#86e4ff");
+function calculateCostColorScales(cellData, columnDefs) {
+    return calculateColorScales(cellData, columnDefs, "COST_KIND", "#e2f5ff", "#86e4ff");
 }
 
 /**
@@ -274,8 +274,8 @@ function calculateCostColorScales(gridData) {
  * @param gridData
  * @returns {*}
  */
-function calculateComplexityColorScales(gridData) {
-    return calculateColorScales(gridData, "COMPLEXITY_KIND", "#e2efff", "#77baff");
+function calculateComplexityColorScales(cellData, columnDefs) {
+    return calculateColorScales(cellData, columnDefs, "COMPLEXITY_KIND", "#e2efff", "#77baff");
 }
 
 
@@ -287,16 +287,16 @@ function calculateComplexityColorScales(gridData) {
  * @param endColor
  * @returns {*}
  */
-function calculateColorScales(gridData, entityKind, startColor, endColor) {
+function calculateColorScales(cellData, columnDefs, entityKind, startColor, endColor) {
     const cols = _
-        .chain(gridData)
-        .get(["definition", "fixedColumnDefinitions"], [])
+        .chain(columnDefs)
+        .filter(cd => cd.kind === "REPORT_GRID_FIXED_COLUMN_DEFINITION")
         .filter(cd => cd.columnEntityKind === entityKind)
         .map(cd => cd.gridColumnId)
         .value();
 
     return _
-        .chain(gridData.instance.cellData)
+        .chain(cellData)
         .filter(d => _.includes(cols, d.columnDefinitionId))
         .groupBy(d => d.columnDefinitionId)
         .mapValues(v => scaleLinear()
@@ -384,9 +384,9 @@ function mkRatingCell(dataCell, baseCell, ratingSchemeItemsById) {
         });
 }
 
-export function combineColDefs(gridData) {
-    const fixedColDefs = _.get(gridData, ["definition", "fixedColumnDefinitions"], []);
-    const derivedColDefs = _.get(gridData, ["definition", "derivedColumnDefinitions"], []);
+export function combineColDefs(definition) {
+    const fixedColDefs = _.get(definition, ["fixedColumnDefinitions"], []);
+    const derivedColDefs = _.get(definition, ["derivedColumnDefinitions"], []);
 
     return _.orderBy(
         _.concat(fixedColDefs, derivedColDefs),
@@ -394,10 +394,14 @@ export function combineColDefs(gridData) {
 }
 
 
-export function prepareTableData(gridData) {
+export function prepareTableData(instance, columnDefs) {
+
+    if (_.isEmpty(columnDefs)) {
+        return [];
+    }
 
     const ratingSchemeItemsById = _
-        .chain(gridData.instance.ratingSchemeItems)
+        .chain(instance.ratingSchemeItems)
         .map(d => {
             const c = rgb(d.color);
             return Object.assign({}, d, {fontColor: determineForegroundColor(c.r, c.g, c.b)})
@@ -405,14 +409,18 @@ export function prepareTableData(gridData) {
         .keyBy(d => d.id)
         .value();
 
-    const colDefs = combineColDefs(gridData);
-    const colsById = _.keyBy(colDefs, cd => cd.gridColumnId);
+    const colsById = _.keyBy(columnDefs, cd => cd.gridColumnId);
 
-    const costColorScalesByColumnDefinitionId = calculateCostColorScales(gridData);
-    const complexityColorScalesByColumnDefinitionId = calculateComplexityColorScales(gridData);
+    const costColorScalesByColumnDefinitionId = calculateCostColorScales(instance.cellData, columnDefs);
+    const complexityColorScalesByColumnDefinitionId = calculateComplexityColorScales(instance.cellData, columnDefs);
 
     function mkTableCell(dataCell) {
+
         const colDef = _.get(colsById, [dataCell.columnDefinitionId]);
+
+        if (_.isNil(colDef)) {
+            return null;
+        }
 
         const baseCell = {
             fontColor: "#3b3b3b",
@@ -484,11 +492,11 @@ export function prepareTableData(gridData) {
     }
 
     const cellsBySubjectId = _.groupBy(
-        gridData.instance.cellData,
+        instance.cellData,
         d => d.subjectId);
 
     const emptyRow = _.reduce(
-        colDefs,
+        columnDefs,
         (acc, c) => {
             acc[c.gridColumnId] = unknownRating;
             return acc;
@@ -496,13 +504,17 @@ export function prepareTableData(gridData) {
         {});
 
     return _
-        .chain(gridData.instance.subjects)
+        .chain(instance.subjects)
         .map(s => {
             const rowCells = _.reduce(
                 _.get(cellsBySubjectId, [s.entityReference.id], []),
                 (acc, cell) => {
-                    acc[cell.columnDefinitionId] = mkTableCell(cell);
+                    const tableCell = mkTableCell(cell);
+                    if (!_.isNil(tableCell)) {
+                        acc[cell.columnDefinitionId] = tableCell;
+                    }
                     return acc;
+
                 },
                 {});
 
@@ -543,18 +555,10 @@ export function refreshSummaries(tableData,
 
     // increments a pair of counters referenced by `prop` in the object `acc`
     const accInc = (acc, prop, visible, optionInfo, subjectId) => {
-        const info = _.get(acc, prop, {counts: {visible: 0, total: 0}, subjects: {visible: [], total: []}, optionInfo});
+        const info = _.get(acc, prop, {counts: {visible: 0, total: 0}, optionInfo});
         info.counts.total++;
         if (visible) {
             info.counts.visible++;
-        }
-
-        if (!_.includes(info.subjects.total, subjectId)) {
-            info.subjects.total = _.concat(info.subjects.total, subjectId);
-
-            if (visible) {
-                info.subjects.visible = _.concat(info.subjects.visible, subjectId);
-            }
         }
 
         acc[prop] = info;
@@ -626,8 +630,6 @@ export function refreshSummaries(tableData,
                 ]),
             totalOccurrences: _.sumBy(optionSummaries, c => c.counts.total),
             visibleOccurrences: _.sumBy(optionSummaries, c => c.counts.visible),
-            totalSubjects: countDistinct(optionSummaries, c => c.subjects.total),
-            visibleSubjects: countDistinct(optionSummaries, c => c.subjects.visible),
         }))
         .orderBy([  // order the summaries so they reflect the column order
             d => d.column?.position,
@@ -684,6 +686,7 @@ function sameFixedColumnRefs(v1, v2) {
         && qualiKind1 === qualiKind2
         && qualiId1 === qualiId2;
 }
+
 
 function sameDerivedColumnRefs(v1, v2) {
 

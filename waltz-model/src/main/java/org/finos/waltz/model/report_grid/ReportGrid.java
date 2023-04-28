@@ -18,4 +18,9 @@ public abstract class ReportGrid {
 
     public abstract Set<ReportGridMember> members();
 
+    @Value.Default
+    public ReportGridMemberRole userRole() {
+        return ReportGridMemberRole.VIEWER;
+    }
+
 }

@@ -58,12 +58,14 @@ public class ReportGridMemberEndpoint implements Endpoint {
         String findPeopleForGridIdPath = mkPath(BASE_URL, "grid-id", ":id", "people");
         String updateUserRolePath = mkPath(BASE_URL, "grid-id", ":id", "update-role");
         String createPath = mkPath(BASE_URL, "create");
+        String updatePath = mkPath(BASE_URL, "update");
         String deletePath = mkPath(BASE_URL, "delete");
 
         getForList(findForGridIdPath, this::findForGridIdRoute);
         getForList(findPeopleForGridIdPath, this::findPeopleForGridIdRoute);
         postForList(updateUserRolePath, this::updateUserRoleRoute);
         postForDatum(createPath, this::createRoute);
+        postForDatum(updatePath, this::updateRoute);
         postForDatum(deletePath, this::deleteRoute);
     }
 
@@ -86,8 +88,15 @@ public class ReportGridMemberEndpoint implements Endpoint {
     }
 
 
+    @Deprecated
     public int createRoute(Request req, Response resp) throws IOException, InsufficientPrivelegeException {
         return reportGridMemberService.create(
+                readBody(req, ReportGridMemberCreateCommand.class),
+                getUsername(req));
+    }
+
+    public int updateRoute(Request req, Response resp) throws IOException, InsufficientPrivelegeException {
+        return reportGridMemberService.update(
                 readBody(req, ReportGridMemberCreateCommand.class),
                 getUsername(req));
     }

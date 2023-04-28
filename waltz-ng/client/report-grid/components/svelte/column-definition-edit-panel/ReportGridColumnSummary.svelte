@@ -4,47 +4,34 @@
     import Icon from "../../../../common/svelte/Icon.svelte";
     import _ from "lodash"
     import {entity} from "../../../../common/services/enums/entity";
-    import {columnDefs, lastMovedColumn, selectedColumn, selectedGrid} from "../report-grid-store";
-    import {move} from "../../../../common/list-utils";
     import {sameColumnRef} from "../report-grid-utils";
+    import {gridService} from "../report-grid-service";
+    import {flip} from "svelte/animate";
+    import {quintOut} from "svelte/easing";
 
-    export let onRemove = () => console.log("Removing entity")
-    export let onEdit = () => console.log("Editing entity")
+
+    export let onRemove = () => console.log("Removing entity");
+    export let onEdit = () => console.log("Editing entity");
+    export let selectedColumn;
+
+    const {columnDefs} = gridService;
+
+    const animationParams = {duration: 200, easing: quintOut};
 
     function getIcon(entityKind) {
         return _.get(entity[entityKind], 'icon', "fw");
     }
 
     function moveColumn(positionCount, column) {
-        const reorderedList = move($columnDefs, _.indexOf($columnDefs, column), positionCount);
-        $lastMovedColumn = column;
-        const originalColumnDefs = _.concat($selectedGrid.definition.fixedColumnDefinitions, $selectedGrid.definition.derivedColumnDefinitions);
-        $columnDefs = recalcPositions(reorderedList, originalColumnDefs);
+        gridService.moveColumn(column, positionCount);
     }
-
-    function recalcPositions(reorderedList, originalList) {
-        return _.map(reorderedList,
-            d => Object.assign(
-                {},
-                d,
-                {
-                    position: _.indexOf(reorderedList, d),
-                    originalPosition: _.findIndex(originalList, r => sameColumnRef(d, r))
-                }));
-    }
-
-    $: maxPos = _.maxBy($columnDefs, d => d.position);
 
     function moveToTop(column) {
-        const columnTail = _.reject($columnDefs, column);
-        const reorderedColumns = _.concat([column], columnTail);
-        $columnDefs = recalcPositions(reorderedColumns, $selectedGrid.definition.fixedColumnDefinitions)
+        gridService.moveColumnToStart(column);
     }
 
     function moveToBottom(column) {
-        const columnHead = _.reject($columnDefs, column);
-        const reorderedColumns = _.concat(columnHead, [column]);
-        $columnDefs = recalcPositions(reorderedColumns, $selectedGrid.definition.fixedColumnDefinitions)
+        gridService.moveColumnToEnd(column);
     }
 
     function moveUp(column) {
@@ -69,6 +56,15 @@
             : name;
     }
 
+    $: console.log({cols: $columnDefs});
+
+
+    $: cols = _.map($columnDefs, d => ({colDef: d, trackingId: JSON.stringify(_.omit(d, ["position"]))}));
+
+    // function mkColTrackingId(column) {
+    //     return JSON.stringify(_.omit(column, ["position"]));
+    // }
+
 </script>
 
 <div class="col-sm-12">
@@ -91,10 +87,11 @@
             </tr>
             </thead>
             <tbody>
-            {#each _.orderBy($columnDefs, d => d.position) as column}
-                <tr class:selected={$selectedColumn && sameColumnRef(column, $selectedColumn)}
-                    class:last-moved={$lastMovedColumn && sameColumnRef(column, $lastMovedColumn)}
-                    class="waltz-visibility-parent">
+            {#each _.orderBy(cols, d => d.colDef.position) as columnInfo (columnInfo.trackingId)}
+                {@const column = columnInfo.colDef}
+                <tr class:selected={selectedColumn && sameColumnRef(column, selectedColumn)}
+                    class="waltz-visibility-parent"
+                    animate:flip={animationParams}>
                     <td>
                         <Icon name={getIcon(column?.columnEntityKind)}/>
                         <span>
@@ -179,10 +176,6 @@
 <style>
     .selected{
         font-weight: bold;
-        background: #f3f9ff;
-    }
-
-    .last-moved{
         background: #f3f9ff;
     }
 

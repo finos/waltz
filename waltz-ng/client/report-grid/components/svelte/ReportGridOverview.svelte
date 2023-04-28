@@ -2,17 +2,18 @@
 
     import ReportGridPicker from "./ReportGridPicker.svelte";
     import NoData from "../../../common/svelte/NoData.svelte";
-    import {ownedReportIds, selectedGrid} from "./report-grid-store";
+    import {ownedReportIds} from "./report-grid-store";
     import {reportGridKinds} from "./report-grid-utils";
     import ReportGridEditor from "./ReportGridEditor.svelte";
     import ReportGridCloneConfirmation from "./ReportGridCloneConfirmation.svelte";
-    import {reportGridMemberStore} from "../../../svelte-stores/report-grid-member-store";
     import {reportGridStore} from "../../../svelte-stores/report-grid-store";
+    import {showGridSelector} from "./report-grid-ui-service";
     import toasts from "../../../svelte-stores/toast-store";
     import Icon from "../../../common/svelte/Icon.svelte";
     import _ from "lodash";
     import {entity} from "../../../common/services/enums/entity";
     import pageInfo from "../../../svelte-stores/page-navigation-store";
+    import {gridService} from "./report-grid-service";
 
     export let onGridSelect = () => console.log("selecting grid");
     export let primaryEntityRef;
@@ -28,20 +29,21 @@
     let grids = [];
     let owners = [];
     let viewers = [];
+    let workingGridDef = null;
 
-    $: reportGridCall = reportGridStore.findDefinitionsForUser(true);
+    const {gridDefinition, gridMembers, userRole} = gridService;
+
+    $: reportGridCall = reportGridStore.findInfoForUser(true);
     $: grids = $reportGridCall.data;
 
-    $: gridMembersCall = $selectedGrid?.definition?.id && reportGridMemberStore.findByGridId($selectedGrid?.definition?.id);
-
-    $: gridMembers = $gridMembersCall?.data || [];
-    $: [owners, viewers] = _.partition(gridMembers, d => d.role === 'OWNER');
+    $: [owners, viewers] = _.partition($gridMembers, d => d.role === 'OWNER');
 
     function selectGrid(grid, isNew = false) {
-        $selectedGrid = null;
         activeMode = Modes.VIEW;
         onGridSelect(grid, isNew);
     }
+
+    $: console.log({gridDefn: $gridDefinition});
 
     function create(grid) {
         const createCmd = {
@@ -56,12 +58,14 @@
             .then(r => {
                 toasts.success("Grid created successfully");
                 selectGrid(r.data, true);
-                reportGridCall = reportGridStore.findDefinitionsForUser(true);
             })
             .catch(e => toasts.error("Could not create report grid. " + e.error));
     }
 
-    function update(grid){
+    function update(grid) {
+
+        console.log({update: grid});
+
         const updateCmd = {
             name: grid.name,
             description: grid.description,
@@ -73,7 +77,6 @@
             .then(r => {
                 toasts.success("Grid updated successfully")
                 selectGrid(r.data);
-                reportGridCall = reportGridStore.findDefinitionsForUser(true);
             })
             .catch(e => toasts.error("Could not update grid. " + e.error));
     }
@@ -84,8 +87,8 @@
             .then(r => {
                 toasts.success("Grid cloned successfully")
                 const grid = r.data;
+                console.log({grid});
                 selectGrid(grid);
-                reportGridCall = reportGridStore.findDefinitionsForUser(true);
             })
             .catch(e => toasts.error("Could not clone grid. " + e.error));
     }
@@ -96,8 +99,8 @@
         Promise.resolve(rmPromise)
             .then(r => {
                 toasts.success("Grid removed successfully")
-                selectGrid(null);
-                reportGridCall = reportGridStore.findDefinitionsForUser(true);
+                gridService.reset();
+                reportGridStore.findInfoForUser(true);
             })
             .catch(e => toasts.error("Could not remove grid"));
     }
@@ -111,29 +114,30 @@
     }
 
     function createGrid() {
-
-        const workingGrid = {
+        workingGridDef = {
             name: null,
             description: null,
             externalId: null,
             kind: reportGridKinds.PRIVATE.key,
         }
+        activeMode = Modes.EDIT;
+    }
 
-        $selectedGrid = { definition: workingGrid };
-        activeMode = Modes.EDIT
+    function editGrid() {
+        workingGridDef = Object.assign({}, $gridDefinition);
+        activeMode = Modes.EDIT;
     }
 
 
     function cancel() {
         activeMode = Modes.VIEW;
-        $selectedGrid = $selectedGrid.definition.id ? $selectedGrid : null;
     }
 
     function visitPageView() {
         $pageInfo = {
             state: "main.report-grid.view",
             params: {
-                gridId: $selectedGrid.definition.id,
+                gridId: $gridDefinition.id,
                 kind: primaryEntityRef.kind,
                 id: primaryEntityRef.id
             }
@@ -143,28 +147,30 @@
 </script>
 
 <div class="row">
-    <div class="col-sm-5">
-        <ReportGridPicker grids={grids}
-                          onCreate={createGrid}
-                          onGridSelect={selectGrid}/>
-    </div>
-    <div class="col-sm-7">
+    {#if $showGridSelector}
+        <div class="col-sm-5">
+            <ReportGridPicker grids={grids}
+                              onCreate={createGrid}
+                              onGridSelect={selectGrid}/>
+        </div>
+    {/if}
+    <div class:col-sm-7={$showGridSelector}
+         class:col-sm-12={!$showGridSelector}>
 
         {#if activeMode === Modes.EDIT}
             <h4>Editing report grid:</h4>
-            <ReportGridEditor grid={$selectedGrid?.definition}
+            <ReportGridEditor grid={workingGridDef}
                               doSave={saveReportGrid}
                               doCancel={cancel}/>
         {:else if activeMode === Modes.CLONE}
-            <ReportGridCloneConfirmation grid={$selectedGrid}
-                                         doClone={clone}
+            <ReportGridCloneConfirmation doClone={clone}
                                          doCancel={cancel}/>
         {:else if activeMode === Modes.VIEW || activeMode === Modes.REMOVE}
-            {#if $selectedGrid?.definition?.id}
+            {#if $gridDefinition?.id}
                 <h4 title="Click to open in dedicated view">
                     <button on:click={() => visitPageView()}
                             class="btn btn-link">
-                        {$selectedGrid?.definition?.name}
+                        {$gridDefinition?.name}
                         <Icon name="external-link"/>
                     </button>
                 </h4>
@@ -172,24 +178,24 @@
                     <tbody>
                     <tr>
                         <td>External ID</td>
-                        <td>{$selectedGrid?.definition?.externalId || "-"}</td>
+                        <td>{$gridDefinition?.externalId || "-"}</td>
                     </tr>
                     <tr>
                         <td>Subject Kind</td>
                         <td>
-                            <Icon name={_.get(entity[$selectedGrid?.definition?.subjectKind], 'icon')}/>
-                            {_.get(entity[$selectedGrid?.definition?.subjectKind], 'name', 'Unknown Kind')}
+                            <Icon name={_.get(entity[$gridDefinition?.subjectKind], 'icon')}/>
+                            {_.get(entity[$gridDefinition?.subjectKind], 'name', 'Unknown Kind')}
                         </td>
                     </tr>
                     <tr>
                         <td>Kind</td>
                         <td>
-                            <Icon name={$selectedGrid?.definition?.kind === 'PUBLIC' ? "users" : "user-secret"}/>
-                            {_.get(reportGridKinds[$selectedGrid?.definition?.kind], 'name', 'Unknown Kind')}</td>
+                            <Icon name={$gridDefinition?.kind === 'PUBLIC' ? "users" : "user-secret"}/>
+                            {_.get(reportGridKinds[$gridDefinition?.kind], 'name', 'Unknown Kind')}</td>
                     </tr>
                     <tr id="report-grid-identifier-externalId" style="display:none;">
                         <td>externalId</td>
-                        <td>{$selectedGrid?.definition?.externalId}</td>
+                        <td>{$gridDefinition?.externalId}</td>
                     </tr>
                     <tr>
                         <td>Owners</td>
@@ -229,11 +235,11 @@
                     </tr>
                     </tbody>
                 </table>
-                <div class:text-muted={!$selectedGrid?.definition?.description}
+                <div class:text-muted={!$gridDefinition?.description}
                      style="padding-bottom: 2em;">
-                    {$selectedGrid?.definition?.description || "No description provided"}
+                    {$gridDefinition?.description || "No description provided"}
                 </div>
-                {#if _.includes($ownedReportIds, $selectedGrid.definition?.id)}
+                {#if $userRole === "OWNER"}
                     {#if activeMode === Modes.REMOVE}
                         <h4>Please confirm you would like to delete this grid?</h4>
                         <ul>
@@ -242,7 +248,7 @@
                             <li>It will be deleted across all views in Waltz (Org Units, App Groups, People etc.)</li>
                         </ul>
                         <button class="btn-danger btn btn-sm"
-                                on:click={() => remove($selectedGrid.definition)}>
+                                on:click={() => remove($gridDefinition)}>
                             Yes, delete this grid
                         </button>
                         <button class="btn-primary btn btn-sm"
@@ -252,7 +258,7 @@
                     {/if}
                     {#if activeMode === Modes.VIEW}
                         <button class="btn btn-sm btn-primary"
-                                on:click={() => activeMode = Modes.EDIT}>
+                                on:click={editGrid}>
                             <Icon name="pencil"/>
                             Edit Grid Overview
                         </button>
