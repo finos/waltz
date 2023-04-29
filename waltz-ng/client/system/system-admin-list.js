@@ -201,7 +201,6 @@ function controller(userService) {
         userService
             .whoami(true) // force
             .then(user => {
-                vm.user = user;
                 const roles = user.roles;
                 vm.sections = _
                     .chain(allSections)
