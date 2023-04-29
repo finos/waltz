@@ -26,7 +26,7 @@
 
     $: displayedRoles = _.isEmpty(qry)
         ? userSelectableRoles
-        : termSearch(userSelectableRoles, qry, ["name", "value", "description"]);
+        : termSearch(userSelectableRoles, qry, ["name", "key", "value", "description"]);
 
     function updateUserRoles() {
         const updatePromise = userStore
@@ -94,8 +94,9 @@
         <table class="table table-condensed small table-hover">
             <colgroup>
                 <col width="10%">
-                <col width="40%">
-                <col width="40%">
+                <col width="30%">
+                <col width="20%">
+                <col width="30%">
                 <col width="10%">
             </colgroup>
             <thead>
@@ -113,6 +114,7 @@
 
                 </th>
                 <th>Role</th>
+                <th>Key</th>
                 <th>Description</th>
                 <th>Custom Role</th>
             </tr>
@@ -126,6 +128,7 @@
                                checked={hasRole($userRoles, role.key)}>
                     </td>
                     <td>{role.name}</td>
+                    <td>{role.key}</td>
                     <td>{role.description || ""}</td>
                     <td>
                         <input type="checkbox"

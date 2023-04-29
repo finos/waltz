@@ -67,6 +67,11 @@ export default {
         name: "Change Set editor",
         description: "Can modify change sets"
     },
+    "EUDA_ADMIN" : {
+        key: "EUDA_ADMIN",
+        name: "EUDA Administrator",
+        description: "Can promote EUDAs to full applications"
+    },
     "LINEAGE_EDITOR" : {
         key: "LINEAGE_EDITOR",
         name: "Lineage editor",
