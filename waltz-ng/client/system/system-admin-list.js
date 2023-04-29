@@ -34,25 +34,25 @@ import template from "./system-admin-list.html";
 const userManagementOptions = [
     {
         name: "Manage Users",
-        role: "ADMIN",
+        role: "USER_ADMIN",
         description: "Register users and alter their permissions",
         state: "main.user.management",
         icon: "users"
     }, {
         name: "User Logs",
-        role: "ADMIN",
+        role: "USER_ADMIN",
         description: "See information about accessed pages and actions performed by users",
         state: "main.user.log",
         icon: "list-ul"
     }, {
         name: "Active Users",
-        role: "ADMIN",
+        role: "USER_ADMIN",
         description: "See which have been recently active",
         state: "main.user.active",
         icon: "line-chart"
     }, {
         name: "Custom Roles",
-        role: "ADMIN",
+        role: "USER_ADMIN",
         description: "View and create custom roles to manage user access",
         state: "main.role.list",
         icon: "users"
@@ -64,7 +64,7 @@ const userManagementOptions = [
 const referenceDataOptions= [
     {
         name: "Actors",
-        role: "ADMIN",
+        role: "ACTOR_ADMIN",
         description: "View and edit system actors (both internal and external)",
         state: "main.system.actors",
         icon: "diamond"
@@ -209,7 +209,8 @@ function controller(userService) {
                         name: s.name,
                         options: _.filter(
                             s.options,
-                            opt => _.includes(roles, opt.role))}))
+                            opt => _.includes(roles, "ADMIN")
+                                || _.includes(roles, opt.role))}))
                     .filter(s => !_.isEmpty(s.options))
                     .value();
             });
