@@ -97,7 +97,7 @@ public class SurveyTemplateService {
         checkNotNull(command, "command cannot be null");
 
         Person owner = personDao.getActiveByUserEmail(userName);
-        checkNotNull(owner, "userName " + userName + " cannot be resolved");
+        checkNotNull(owner, "userName " + userName + " cannot be resolved to a person record");
 
         long surveyTemplateId = surveyTemplateDao.create(ImmutableSurveyTemplate.builder()
                 .name(command.name())
@@ -178,7 +178,6 @@ public class SurveyTemplateService {
         List<SurveyQuestion> sourceQuestions = surveyQuestionDao.findForTemplate(sourceTemplateId);
 
         sourceQuestions
-                .stream()
                 .forEach(sq -> {
                     SurveyQuestion clonedQuestion = ImmutableSurveyQuestion
                             .copyOf(sq)

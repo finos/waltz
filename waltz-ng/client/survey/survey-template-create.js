@@ -18,6 +18,7 @@
 import {initialiseData} from "../common/index";
 import template from "./survey-template-create.html";
 import toasts from "../svelte-stores/toast-store";
+import {displayError} from "../common/error-utils";
 
 
 const initialState = {
@@ -43,8 +44,8 @@ function controller($state,
             .then(templateId => {
                 toasts.success("Survey template created successfully");
                 $state.go("main.survey.template.edit", {id: templateId});
-            }, () => {
-                toasts.error("Failed to create survey template, ensure that the template name is unique");
+            }, (e) => {
+                displayError("Failed to create survey template", e);
             });
     };
 }
