@@ -21,6 +21,8 @@ package org.finos.waltz.web.endpoints.api;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.model.person.Person;
 import org.finos.waltz.model.report_grid.ReportGridMember;
+import org.finos.waltz.model.report_grid.ReportGridMemberCreateCommand;
+import org.finos.waltz.model.report_grid.ReportGridMemberDeleteCommand;
 import org.finos.waltz.model.report_grid.ReportGridMemberUpdateRoleCommand;
 import org.finos.waltz.service.report_grid.ReportGridMemberService;
 import org.finos.waltz.web.endpoints.Endpoint;
@@ -56,13 +58,15 @@ public class ReportGridMemberEndpoint implements Endpoint {
         String findPeopleForGridIdPath = mkPath(BASE_URL, "grid-id", ":id", "people");
         String updateUserRolePath = mkPath(BASE_URL, "grid-id", ":id", "update-role");
         String createPath = mkPath(BASE_URL, "create");
+        String updatePath = mkPath(BASE_URL, "update");
         String deletePath = mkPath(BASE_URL, "delete");
 
         getForList(findForGridIdPath, this::findForGridIdRoute);
         getForList(findPeopleForGridIdPath, this::findPeopleForGridIdRoute);
         postForList(updateUserRolePath, this::updateUserRoleRoute);
         postForDatum(createPath, this::createRoute);
-        postForDatum(deletePath, this::delete);
+        postForDatum(updatePath, this::updateRoute);
+        postForDatum(deletePath, this::deleteRoute);
     }
 
 
@@ -84,17 +88,24 @@ public class ReportGridMemberEndpoint implements Endpoint {
     }
 
 
+    @Deprecated
     public int createRoute(Request req, Response resp) throws IOException, InsufficientPrivelegeException {
         return reportGridMemberService.create(
-                readBody(req, ReportGridMember.class),
+                readBody(req, ReportGridMemberCreateCommand.class),
+                getUsername(req));
+    }
+
+    public int updateRoute(Request req, Response resp) throws IOException, InsufficientPrivelegeException {
+        return reportGridMemberService.update(
+                readBody(req, ReportGridMemberCreateCommand.class),
                 getUsername(req));
     }
 
 
-    public boolean delete(Request req, Response resp) throws IOException, InsufficientPrivelegeException {
-        System.out.println(req);
+    public boolean deleteRoute(Request req, Response resp) throws IOException, InsufficientPrivelegeException {
+        ReportGridMemberDeleteCommand cmd = readBody(req, ReportGridMemberDeleteCommand.class);
         return reportGridMemberService.delete(
-                readBody(req, ReportGridMember.class),
+                cmd,
                 getUsername(req));
     }
 }

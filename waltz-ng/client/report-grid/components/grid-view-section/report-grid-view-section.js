@@ -19,24 +19,18 @@
 import template from "./report-grid-view-section.html";
 import {initialiseData} from "../../../common";
 import {mkSelectionOptions} from "../../../common/selector-utils";
-import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
 import ReportGridControlPanel from "../svelte/ReportGridControlPanel.svelte";
-import {activeSummaries, columnDefs, filters, selectedGrid} from "../svelte/report-grid-store";
-import {
-    combineColDefs,
-    mkLocalStorageFilterKey,
-    mkRowFilter,
-    prepareColumnDefs,
-    prepareTableData
-} from "../svelte/report-grid-utils";
+import {combineColDefs, mkLocalStorageFilterKey, prepareColumnDefs} from "../svelte/report-grid-utils";
 import {displayError} from "../../../common/error-utils";
 import {coalesceFns} from "../../../common/function-utils";
+import {gridService} from "../svelte/report-grid-service";
+import {showGridSelector} from "../svelte/report-grid-ui-service";
 
 
 const bindings = {
     parentEntityRef: "<",
-    selectedGrid: "<?"
+    selectedGridId: "<?"
 };
 
 const initData = {
@@ -49,17 +43,6 @@ const localStorageKey = "waltz-report-grid-view-section-last-id";
 function controller($scope, serviceBroker, localStorageService) {
 
     const vm = initialiseData(this, initData);
-
-    function refresh(filters = []) {
-
-        const rowFilter = mkRowFilter(filters);
-
-        const workingTableData = _.map(
-            vm.allTableData,
-            d => Object.assign({}, d, { visible: rowFilter(d) }));
-
-        vm.tableData = _.filter(workingTableData, d => d.visible);
-    }
 
     function getSummaryColumnsFromLocalStorage(gridData) {
 
@@ -82,38 +65,32 @@ function controller($scope, serviceBroker, localStorageService) {
     }
 
 
-    function loadGridData() {
-        serviceBroker
-            .loadViewData(
-                CORE_API.ReportGridStore.getViewById,
-                [vm.gridId, vm.selectionOptions], {force: true})
-            .then(r => {
-
-                const gridData = r.data;
-                vm.loading = false;
-
-                if (gridData) {
-                    vm.rawGridData = gridData;
-
-                    const summaries = getSummaryColumns(gridData);
-                    activeSummaries.set(summaries);
-
-                    selectedGrid.set(gridData);
-
-                    const colDefs = combineColDefs(gridData);
-                    columnDefs.set(colDefs);
-
-                    vm.allTableData = prepareTableData(vm.rawGridData);
-                    vm.allColumnDefs = prepareColumnDefs(colDefs);
-                    refresh();
-                }
-            })
-            .catch(e => {
-                displayError("Could not load grid data for id: " + vm.gridId, e)
-                vm.loading = false;
-            });
+    function loadGridData(selectedGridId, selectionOptions) {
+        vm.loading = true;
+        gridService.selectGrid(selectedGridId, selectionOptions)
+            .catch(e => displayError("Could not load grid data for id: " + vm.gridId, e))
+            .finally(() => vm.loading = false);
     }
 
+    const unsubTableData = gridService.tableData.subscribe((td) => {
+        $scope.$applyAsync(
+            () => {
+                vm.tableData = _.filter(td, d => d.visible);
+            })
+    });
+
+    const unsubColDefs = gridService.gridDefinition.subscribe((definition) => {
+        $scope.$applyAsync(() => {
+            vm.gridDefinition = definition;
+            const cols = combineColDefs(definition);
+            vm.allColumnDefs = prepareColumnDefs(cols);
+        })
+    });
+
+    vm.$onDestroy = () => {
+        unsubTableData();
+        unsubColDefs();
+    }
 
     vm.$onChanges = () => {
 
@@ -122,15 +99,13 @@ function controller($scope, serviceBroker, localStorageService) {
             vm.selectionOptions = mkSelectionOptions(vm.parentEntityRef);
             const lastUsedGridId = localStorageService.get(localStorageKey);
 
-            if (vm.selectedGrid) {
-                vm.gridId = vm.selectedGrid.id;
-                vm.loading = true;
-                loadGridData();
-                vm.showGridSelector = false;
+            showGridSelector.set(true);
+
+            if (!_.isNil(vm.selectedGridId)) {
+                loadGridData(vm.selectedGridId, vm.selectionOptions);
+                showGridSelector.set(false);
             } else if (lastUsedGridId) {
-                vm.gridId = lastUsedGridId;
-                vm.loading = true;
-                loadGridData();
+                loadGridData(lastUsedGridId, vm.selectionOptions);
             }
         }
     };
@@ -139,30 +114,9 @@ function controller($scope, serviceBroker, localStorageService) {
         if (!grid) {
             return;
         }
-        $scope.$applyAsync(() => {
-            localStorageService.set(localStorageKey, grid.id);
-            vm.gridId = grid.id;
-            loadGridData();
-        });
+        localStorageService.set(localStorageKey, grid.gridId);
+        loadGridData(grid.gridId, vm.selectionOptions);
     };
-
-    vm.onUpdateColumns = () => {
-        loadGridData();
-    };
-
-    filters.subscribe((f) => {
-        $scope.$applyAsync(() => {
-            if (vm.rawGridData) {
-                refresh(f)
-            }
-        });
-    })
-
-    activeSummaries.subscribe((d) => {
-        $scope.$applyAsync(() => {
-            vm.summaryCols = d;
-        });
-    })
 
 }
 

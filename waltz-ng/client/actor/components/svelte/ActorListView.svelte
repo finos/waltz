@@ -59,16 +59,16 @@
                 <div class="waltz-scroll-region-500">
                     <table class="table table-condensed">
                         <colgroup>
-                            <col width="30%"/>
-                            <col width="50%"/>
-                            <col width="10%"/>
-                            <col width="10%"/>
+                            <col width="30%">
+                            <col width="35%">
+                            <col width="10%">
+                            <col width="25%">
                         </colgroup>
                         <thead>
                         <tr>
                             <th>Name</th>
                             <th>Description</th>
-                            <th>Internal/External</th>
+                            <th>Type</th>
                             <th>External Id</th>
                         </tr>
                         </thead>
@@ -80,7 +80,7 @@
                                 </td>
                                 <td class="force-wrap">{actor.description}</td>
                                 <td>{actor.externalString}</td>
-                                <td>{actor.externalId || "-"}</td>
+                                <td class="external-id">{actor.externalId || "-"}</td>
                             </tr>
                         {/each}
                         </tbody>
@@ -99,3 +99,9 @@
         </div>
     </div>
 </div>
+
+<style>
+    .external-id {
+        font-family: monospace;
+    }
+</style>

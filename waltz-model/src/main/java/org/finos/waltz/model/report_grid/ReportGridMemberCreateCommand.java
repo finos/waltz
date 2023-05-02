@@ -7,11 +7,13 @@ import org.finos.waltz.model.command.Command;
 import org.immutables.value.Value;
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableReportGridMemberDeleteCommand.class)
-@JsonDeserialize(as = ImmutableReportGridMemberDeleteCommand.class)
-public abstract class ReportGridMemberDeleteCommand implements Command {
+@JsonSerialize(as = ImmutableReportGridMemberCreateCommand.class)
+@JsonDeserialize(as = ImmutableReportGridMemberCreateCommand.class)
+public abstract class ReportGridMemberCreateCommand implements Command {
 
     public abstract long gridId();
 
     public abstract String userId();
+
+    public abstract ReportGridMemberRole role();
 }

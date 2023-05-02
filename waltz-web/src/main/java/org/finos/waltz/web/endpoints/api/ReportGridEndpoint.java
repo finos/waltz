@@ -50,21 +50,23 @@ public class ReportGridEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        String findAllPath = mkPath(BASE_URL, "all");
-        String findForUserPath = mkPath(BASE_URL, "user");
+        String findAllDefinitionsPath = mkPath(BASE_URL, "definition", "all");
+        String findDefinitionsForUserPath = mkPath(BASE_URL, "definition", "user");
+        String findGridInfoForUserPath = mkPath(BASE_URL, "info", "user");
         String createPath = mkPath(BASE_URL, "create");
         String updatePath = mkPath(BASE_URL, "id", ":id", "update");
         String removalPath = mkPath(BASE_URL, "id", ":id");
         String clonePath = mkPath(BASE_URL, "id", ":id", "clone");
-        String findForOwnerPath = mkPath(BASE_URL, "owner");
+        String findForOwnerPath = mkPath(BASE_URL, "definition", "owner");
         String getViewByIdPath = mkPath(BASE_URL, "view", "id", ":id");
         String getDefinitionByIdPath = mkPath(BASE_URL, "definition", "id", ":id");
         String updateColumnDefsPath = mkPath(BASE_URL, "id", ":id", "column-definitions", "update");
         String findAdditionalColumnOptionsForKindPath = mkPath(BASE_URL, "additional-column-options", "kind", ":kind");
 
-        getForDatum(findAllPath, (req, resp) -> reportGridService.findAll());
-        getForList(findForUserPath, (req, resp) -> reportGridService.findForUser(getUsername(req)));
-        getForList(findForOwnerPath, this::findForOwnerRoute);
+        getForDatum(findAllDefinitionsPath, (req, resp) -> reportGridService.findAllDefinitions());
+        getForList(findDefinitionsForUserPath, (req, resp) -> reportGridService.findGridDefinitionsForUser(getUsername(req)));
+        getForList(findGridInfoForUserPath, (req, resp) -> reportGridService.findGridInfoForUser(getUsername(req)));
+        getForList(findForOwnerPath, this::findDefinitionsForOwnerRoute);
         getForList(findAdditionalColumnOptionsForKindPath, this::findAdditionalColumnOptionsForKindRoute);
         postForDatum(getViewByIdPath, this::getViewByIdRoute);
         getForDatum(getDefinitionByIdPath, this::getDefinitionByIdRoute);
@@ -89,7 +91,8 @@ public class ReportGridEndpoint implements Endpoint {
         return reportGridService
                 .getByIdAndSelectionOptions(
                         getId(req),
-                        readIdSelectionOptionsFromBody(req))
+                        readIdSelectionOptionsFromBody(req),
+                        getUsername(req))
                 .orElseThrow(() -> new NotFoundException("404", "ID not found"));
     }
 
@@ -108,28 +111,28 @@ public class ReportGridEndpoint implements Endpoint {
     }
 
 
-    public ReportGridDefinition createRoute(Request req,
-                                            Response resp) throws IOException {
+    public ReportGridInfo createRoute(Request req,
+                                      Response resp) throws IOException {
         return reportGridService.create(readBody(req, ReportGridCreateCommand.class), getUsername(req));
     }
 
 
-    public ReportGridDefinition updateRoute(Request req,
-                                            Response resp) throws IOException, InsufficientPrivelegeException {
+    public ReportGridInfo updateRoute(Request req,
+                                      Response resp) throws IOException, InsufficientPrivelegeException {
         return reportGridService.
                 update(getId(req), readBody(req, ReportGridUpdateCommand.class), getUsername(req));
     }
 
-    public ReportGridDefinition cloneRoute(Request req,
-                                           Response resp) throws IOException, InsufficientPrivelegeException {
+    public ReportGridInfo cloneRoute(Request req,
+                                     Response resp) throws IOException, InsufficientPrivelegeException {
         return reportGridService
                 .clone(getId(req), readBody(req, ReportGridUpdateCommand.class), getUsername(req));
     }
 
 
-    public Set<ReportGridDefinition> findForOwnerRoute(Request req,
-                                                       Response resp) {
-        return reportGridService.findForOwner(getUsername(req));
+    public Set<ReportGridDefinition> findDefinitionsForOwnerRoute(Request req,
+                                                                  Response resp) {
+        return reportGridService.findDefinitionsForOwner(getUsername(req));
     }
 
     public Set<AdditionalColumnOptions> findAdditionalColumnOptionsForKindRoute(Request req,

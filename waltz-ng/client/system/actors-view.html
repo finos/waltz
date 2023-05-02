@@ -183,6 +183,16 @@
                             </div>
                         </div>
 
+                        <div class="form-group">
+                            <label for="wav-ext-id">
+                                External Identifier
+                            </label>
+                            <input type="text"
+                                   id="wav-ext-id"
+                                   ng-model="$ctrl.newActor.externalId"
+                                   class="form-control input-sm">
+                        </div>
+
                         <button class="btn btn-success btn-sm"
                                 ng-if="$ctrl.creatingActor === true"
                                 ng-click="$ctrl.saveNewActor()">

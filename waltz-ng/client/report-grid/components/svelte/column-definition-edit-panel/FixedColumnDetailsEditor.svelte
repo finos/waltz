@@ -1,11 +1,11 @@
 <script>
     import DropdownPicker from "./DropdownPicker.svelte";
     import _ from "lodash";
-    import {additionalColumnOptions, sameColumnRef} from "../report-grid-utils";
+    import {additionalColumnOptions, combineColDefs, sameColumnRef} from "../report-grid-utils";
     import Icon from "../../../../common/svelte/Icon.svelte";
-    import {columnDefs, selectedGrid} from "../report-grid-store";
     import ColumnDefinitionHeader from "./ColumnDefinitionHeader.svelte";
     import {reportGridStore} from "../../../../svelte-stores/report-grid-store";
+    import {gridService} from "../report-grid-service";
 
     export let column;
     export let onCancel = () => console.log("Close");
@@ -20,11 +20,15 @@
         externalId: column.externalId,
     }
 
+    const {columnDefs, gridDefinition} = gridService;
+
     $: {
         if (column && column.id !== working.id) {
             setWorkingColumn(column);
         }
     }
+
+    $: originalCols = combineColDefs($gridDefinition);
 
     function cancelEdit() {
         onCancel();
@@ -40,60 +44,48 @@
     }
 
     function clearEdit(column) {
-        const originalColumn = _.find($selectedGrid.definition.fixedColumnDefinitions, d => sameColumnRef(d, column));
-        const columnsWithoutCol = _.reject($columnDefs, d => sameColumnRef(d, column));
-        $columnDefs = _.concat(columnsWithoutCol, originalColumn);
-        setWorkingColumn(originalColumn);
+        gridService.resetColumnDetails(column);
+        const col = _.find($columnDefs, d => sameColumnRef(d, column));
+        setWorkingColumn(col);
     }
 
-    function valueChanged(columnDefs, column) {
+    function valueChanged(originalColumns, columnDefs, column) {
         const updatedColumn = _.find(columnDefs, d => sameColumnRef(d, column));
+        const originalColumn = _.find(originalColumns, d => sameColumnRef(d, column));
         return column.id != null //new columns cannot be reset
-            && (updatedColumn?.additionalColumnOptionsChanged
-                || updatedColumn?.displayNameChanged
-                || updatedColumn?.externalIdChanged);
+            && !_.isEqual(updatedColumn, originalColumn);
     }
 
     function selectColumnOptions(columnOptions, column) {
         const workingColumn = _.find($columnDefs, d => sameColumnRef(d, column));
-        const originalColumn = _.find($selectedGrid.definition.fixedColumnDefinitions, d => sameColumnRef(d, column));
         const newColumn = Object.assign(
             {},
             workingColumn,
             {
                 additionalColumnOptions: columnOptions?.key,
-                additionalColumnOptionsChanged: columnOptions?.key !== originalColumn?.additionalColumnOptions
             })
-        const columnsWithoutCol = _.reject($columnDefs, d => sameColumnRef(d, column));
-        $columnDefs = _.concat(columnsWithoutCol, newColumn);
+        gridService.updateColumnDetails(newColumn);
     }
 
     function updateDisplayName(workingDisplayName, column) {
         const workingColumn = _.find($columnDefs, d => sameColumnRef(d, column));
-        const originalColumn = _.find($selectedGrid.definition.fixedColumnDefinitions, d => sameColumnRef(d, column));
         const newColumn = Object.assign(
             {},
             workingColumn,
             {
                 displayName: workingDisplayName,
-                displayNameChanged: workingDisplayName !== originalColumn?.displayName
             })
-        const columnsWithoutCol = _.reject($columnDefs, d => sameColumnRef(d, column));
-        $columnDefs = _.concat(columnsWithoutCol, newColumn);
+        gridService.updateColumnDetails(newColumn);
     }
 
     function updateExternalId(workingExternalId, column) {
         const workingColumn = _.find($columnDefs, d => sameColumnRef(d, column));
-        const originalColumn = _.find($selectedGrid.definition.fixedColumnDefinitions, d => sameColumnRef(d, column));
-        const newColumn = Object.assign(
-            {},
+        const newColumn = Object.assign({},
             workingColumn,
             {
                 externalId: workingExternalId,
-                externalIdChanged: workingExternalId !== originalColumn?.externalId
             })
-        const columnsWithoutCol = _.reject($columnDefs, d => sameColumnRef(d, column));
-        $columnDefs = _.concat(columnsWithoutCol, newColumn);
+        gridService.updateColumnDetails(newColumn);
     }
 
 </script>
@@ -161,7 +153,7 @@
 </button>
 |
 <button class="btn btn-skinny"
-        disabled={!valueChanged($columnDefs, column)}
+        disabled={!valueChanged(originalCols, $columnDefs, column)}
         on:click={() => clearEdit(column)}>
     <Icon name="ban"/>
     Clear

@@ -112,7 +112,8 @@ function controller($document,
         };
 
         if (surveyRun.id) {
-            surveyRunStore.update(surveyRun.id, command)
+            surveyRunStore
+                .update(surveyRun.id, command)
                 .then(() => {
                     vm.step = "RECIPIENT";
                     const instancesRecipientsCreateCommand = {
@@ -123,9 +124,11 @@ function controller($document,
                         owningRole: surveyInstance.owningRole
                     };
                     instanceCreateCommand.set(instancesRecipientsCreateCommand);
-                });
+                })
+                .catch(e => displayError("Could not update survey run", e));
         } else {
-            surveyRunStore.create(command)
+            surveyRunStore
+                .create(command)
                 .then(r => {
                     vm.surveyRun.id = r.id;
                     vm.step = "RECIPIENT";
