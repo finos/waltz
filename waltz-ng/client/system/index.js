@@ -16,30 +16,31 @@
  *
  */
 
-import angular from 'angular';
+import angular from "angular";
 
-import {registerStores} from '../common/module-utils';
+import {registerStores} from "../common/module-utils";
 import nagMessageService from "./services/nag-message-service";
-import * as  SettingsStore from "./services/settings-store";
+import * as SettingsStore from "./services/settings-store";
+import * as UIDStore from "./services/uid-store";
 import settingsService from "./services/settings-service";
 import hierarchiesStore from "./services/hierarchies-store";
 import hasSetting from "./directives/has-setting";
-import Routes from './routes';
+import Routes from "./routes";
 
 
 export default () => {
 
-    const module = angular.module('waltz.system', []);
+    const module = angular.module("waltz.system", []);
 
     module
-        .service('NagMessageService', nagMessageService)
-        .service('SettingsService', settingsService)
-        .service('HierarchiesStore', hierarchiesStore);
+        .service("NagMessageService", nagMessageService)
+        .service("SettingsService", settingsService)
+        .service("HierarchiesStore", hierarchiesStore);
 
-    registerStores(module, [ SettingsStore ]);
+    registerStores(module, [ SettingsStore, UIDStore ]);
 
     module
-        .directive('waltzHasSetting', hasSetting);
+        .directive("waltzHasSetting", hasSetting);
 
     module
         .config(Routes);
