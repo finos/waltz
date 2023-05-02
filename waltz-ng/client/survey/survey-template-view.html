@@ -94,8 +94,7 @@
                                  extract="survey-instance/template-id/{{ctrl.template.id}}?status=NOT_STARTED">
         </waltz-data-extract-link>
         <a class="btn btn-primary btn-xs"
-           waltz-has-role="SURVEY_ADMIN"
-           ng-if="ctrl.template.status === 'ACTIVE'"
+           ng-if="ctrl.canCreateRun"
            ui-sref="main.survey.run.create ({id: ctrl.template.id })">
             Create
         </a>

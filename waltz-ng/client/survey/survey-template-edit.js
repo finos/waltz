@@ -134,7 +134,8 @@ function controller($q,
                     name: vm.surveyTemplate.name,
                     description: vm.surveyTemplate.description,
                     targetEntityKind: vm.surveyTemplate.targetEntityKind,
-                    externalId: vm.surveyTemplate.externalId
+                    externalId: vm.surveyTemplate.externalId,
+                    issuanceRole: vm.surveyTemplate.issuanceRole
                 }])
             .then(() => toasts.success("Survey template updated successfully"));
     };

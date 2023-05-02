@@ -50,4 +50,7 @@ public abstract class SurveyTemplate implements IdProvider, NameProvider, Descri
     public EntityKind kind() {
         return EntityKind.SURVEY_TEMPLATE;
     }
+
+    @Nullable
+    public abstract String issuanceRole();
 }

@@ -25,7 +25,6 @@
             <span ng-bind="$ctrl.template.name"></span>
         </div>
     </div>
-    <br>
     <div class="row">
         <div class="col-sm-2 waltz-display-field-label">
             Description
@@ -35,7 +34,6 @@
             </waltz-markdown>
         </div>
     </div>
-    <br>
     <div class="row">
         <div class="col-sm-2 waltz-display-field-label">
             Owner
@@ -44,13 +42,12 @@
             <waltz-entity-link entity-ref="$ctrl.owner"></waltz-entity-link>
         </div>
         <div class="col-sm-2 waltz-display-field-label">
-            Created
+            Issuance Role
         </div>
         <div class="col-sm-4">
-            <waltz-from-now timestamp="$ctrl.template.createdAt"></waltz-from-now>
+            <span ng-bind="$ctrl.template.issuanceRole"></span>
         </div>
     </div>
-    <br>
     <div class="row">
         <div class="col-sm-2 waltz-display-field-label">
             Status
@@ -59,10 +56,18 @@
             <span ng-bind="$ctrl.template.status | toDisplayName:'releaseLifecycleStatus'"></span>
         </div>
         <div class="col-sm-2 waltz-display-field-label">
-            Exernal Id
+            External Id
         </div>
         <div class="col-sm-4">
             <span ng-bind="$ctrl.template.externalId"></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2 waltz-display-field-label">
+            Created
+        </div>
+        <div class="col-sm-4">
+            <waltz-from-now timestamp="$ctrl.template.createdAt"></waltz-from-now>
         </div>
     </div>
 
