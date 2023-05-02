@@ -21,6 +21,7 @@ import {timeFormat} from "d3-time-format";
 import template from "./survey-run-create.html";
 import {CORE_API} from "../common/services/core-api-utils";
 import {instanceCreateCommand} from "./components/survey-run-create-store";
+import {displayError} from "../common/error-utils";
 
 
 const initialState = {
@@ -112,7 +113,8 @@ function controller($document,
         };
 
         if (surveyRun.id) {
-            surveyRunStore.update(surveyRun.id, command)
+            surveyRunStore
+                .update(surveyRun.id, command)
                 .then(() => {
                     vm.step = "RECIPIENT";
                     const instancesRecipientsCreateCommand = {
@@ -123,9 +125,11 @@ function controller($document,
                         owningRole: surveyInstance.owningRole
                     };
                     instanceCreateCommand.set(instancesRecipientsCreateCommand);
-                });
+                })
+                .catch(e => displayError("Could not update survey run", e));
         } else {
-            surveyRunStore.create(command)
+            surveyRunStore
+                .create(command)
                 .then(r => {
                     vm.surveyRun.id = r.id;
                     vm.step = "RECIPIENT";
@@ -137,7 +141,8 @@ function controller($document,
                         owningRole: surveyInstance.owningRole
                     };
                     instanceCreateCommand.set(instancesRecipientsCreateCommand);
-                });
+                })
+                .catch(e => displayError("Could not save survey run", e));
         }
 
 

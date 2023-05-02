@@ -448,7 +448,7 @@ public class SurveyRunService {
 
     private Person validateUser(String userName) {
         Person owner = personDao.getActiveByUserEmail(userName);
-        checkNotNull(owner, "userName " + userName + " cannot be resolved");
+        checkNotNull(owner, "userName " + userName + " cannot be resolved to a person record");
 
         return owner;
     }
