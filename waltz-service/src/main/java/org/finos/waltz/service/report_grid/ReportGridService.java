@@ -18,8 +18,6 @@
 
 package org.finos.waltz.service.report_grid;
 
-import org.finos.waltz.common.CollectionUtilities;
-import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.common.exception.NotFoundException;
@@ -88,22 +86,26 @@ public class ReportGridService {
     }
 
 
-    public Set<ReportGridDefinition> findAll(){
-        return reportGridDao.findAll();
+    public Set<ReportGridDefinition> findAllDefinitions() {
+        return reportGridDao.findAllDefinitions();
     }
 
-    public Optional<ReportGridDefinition> findByExternalId(String externalId){
+    public Optional<ReportGridDefinition> findByExternalId(String externalId) {
         return Optional.ofNullable(reportGridDao.getGridDefinitionByExternalId(externalId));
     }
 
-    public Set<ReportGridDefinition> findForUser(String username){
-        return reportGridDao.findForUser(username);
+    public Set<ReportGridDefinition> findGridDefinitionsForUser(String username) {
+        return reportGridDao.findGridDefinitionsForUser(username);
     }
 
+    public Set<ReportGridInfo> findGridInfoForUser(String username) {
+        return reportGridDao.findGridInfoForUser(username);
+    }
 
     public Optional<ReportGrid> getByIdAndSelectionOptions(
             long id,
-            IdSelectionOptions idSelectionOptions) {
+            IdSelectionOptions idSelectionOptions,
+            String username) {
 
         // WARNING:  The grid computation is very slow if given a large person tree.
         //    Therefore we restrict it to EXACT only behaviour.
@@ -122,6 +124,15 @@ public class ReportGridService {
 
         ReportGridInstance instance = mkInstance(id, opts, targetKind);
 
+        Set<ReportGridMember> members = reportGridMemberService.findByGridId(id);
+
+        ReportGridMemberRole userRole = members
+                .stream()
+                .filter(d -> d.user().userId().equals(username))
+                .findFirst()
+                .map(ReportGridMember::role)
+                .orElse(ReportGridMemberRole.VIEWER);
+
         if (!definition.derivedColumnDefinitions().isEmpty()) {
             Set<ReportGridCell> calculatedCells = ReportGridColumnCalculator.calculate(instance, definition);
 
@@ -131,6 +142,8 @@ public class ReportGridService {
                     .instance(ImmutableReportGridInstance
                             .copyOf(instance)
                             .withCellData(SetUtilities.union(instance.cellData(), calculatedCells)))
+                    .members(members)
+                    .userRole(userRole)
                     .build());
         }
 
@@ -138,6 +151,8 @@ public class ReportGridService {
                 .builder()
                 .definition(definition)
                 .instance(instance)
+                .members(members)
+                .userRole(userRole)
                 .build());
     }
 
@@ -223,27 +238,27 @@ public class ReportGridService {
     }
 
 
-    public ReportGridDefinition create(ReportGridCreateCommand createCommand,
-                                       String username){
+    public ReportGridInfo create(ReportGridCreateCommand createCommand,
+                                 String username) {
         long gridId = reportGridDao.create(createCommand, username);
         reportGridMemberService.register(gridId, username, ReportGridMemberRole.OWNER);
-        return reportGridDao.getGridDefinitionById(gridId);
+        return reportGridDao.getGridInfoById(gridId);
     }
 
 
-    public ReportGridDefinition update(long id,
-                                       ReportGridUpdateCommand updateCommand,
-                                       String username) throws InsufficientPrivelegeException {
+    public ReportGridInfo update(long id,
+                                 ReportGridUpdateCommand updateCommand,
+                                 String username) throws InsufficientPrivelegeException {
         checkIsOwner(id, username);
-        ReportGridDefinition defn = reportGridDao.getGridDefinitionById(id);
+        ReportGridInfo defn = reportGridDao.getGridInfoById(id);
 
-        if (defn.kind() != updateCommand.kind()) {
+        if (defn.visibilityKind() != updateCommand.kind()) {
             checkTrue(userRoleService.hasRole(username, SystemRole.REPORT_GRID_ADMIN),
                     "You do not have permission to change the kind of a report grid");
         }
 
         reportGridDao.update(id, updateCommand, username);
-        return reportGridDao.getGridDefinitionById(id);
+        return reportGridDao.getGridInfoById(id);
     }
 
 
@@ -253,8 +268,8 @@ public class ReportGridService {
     }
 
 
-    public Set<ReportGridDefinition> findForOwner(String username) {
-        return reportGridDao.findForOwner(username);
+    public Set<ReportGridDefinition> findDefinitionsForOwner(String username) {
+        return reportGridDao.findDefinitionsForOwner(username);
     }
 
 
@@ -286,7 +301,7 @@ public class ReportGridService {
         return reportGridDao.getGridDefinitionByExternalId(gridExtId);
     }
 
-    public ReportGridDefinition clone(long id, ReportGridUpdateCommand updateCommand, String username) {
+    public ReportGridInfo clone(long id, ReportGridUpdateCommand updateCommand, String username) {
 
         ReportGridDefinition gridToClone = reportGridDao.getGridDefinitionById(id);
 
@@ -301,14 +316,14 @@ public class ReportGridService {
                 .kind(ReportGridKind.PRIVATE)
                 .build();
 
-        ReportGridDefinition newGrid = create(newGridCreateCommand, username);
+        ReportGridInfo newGrid = create(newGridCreateCommand, username);
 
         ImmutableReportGridColumnDefinitionsUpdateCommand updateColsCmd = ImmutableReportGridColumnDefinitionsUpdateCommand.builder()
                 .fixedColumnDefinitions(gridToClone.fixedColumnDefinitions())
                 .derivedColumnDefinitions(gridToClone.derivedColumnDefinitions())
                 .build();
 
-        newGrid.id().ifPresent(newGridId -> reportGridDao.updateColumnDefinitions(newGridId, updateColsCmd));
+        reportGridDao.updateColumnDefinitions(newGrid.gridId(), updateColsCmd);
 
         return newGrid;
     }

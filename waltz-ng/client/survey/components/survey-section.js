@@ -23,6 +23,7 @@ import {timeFormat} from "d3-time-format";
 import {displayError} from "../../common/error-utils";
 import {isSurveyTargetKind} from "../survey-utils";
 import toasts from "../../svelte-stores/toast-store";
+import SystemRoles from "../../user/system-roles";
 
 
 const initialState = {
@@ -68,12 +69,17 @@ function controller(serviceBroker, userService) {
     vm.onShowCreateForm = () => {
         vm.visibility.mode = "create";
         vm.selectedTemplate = null;
+        const userIsAdmin = _.includes(vm.user.roles, SystemRoles.ADMIN.key);
         serviceBroker
             .loadViewData(CORE_API.SurveyTemplateStore.findAll)
             .then(r => vm.templates = _
                 .chain(r.data)
                 .filter(t => t.targetEntityKind === vm.parentEntityRef.kind)
                 .filter(t => t.status === "ACTIVE")
+                .filter(t => {
+                    const userHasIssuanceRole = _.isNil(t.issuanceRole) || _.includes(vm.user.roles, t.issuanceRole);
+                    return userHasIssuanceRole || userIsAdmin;
+                })
                 .sortBy("name")
                 .value())
             .then(vm.onQueryChange);
@@ -116,12 +122,16 @@ function controller(serviceBroker, userService) {
     };
 
     vm.$onInit = () => {
-        serviceBroker.loadAppData(CORE_API.RoleStore.findAllRoles)
+        serviceBroker
+            .loadAppData(CORE_API.RoleStore.findAllRoles)
             .then(r => vm.customRoles = _.filter(r.data, d => d.isCustom === true));
 
         userService
             .whoami()
-            .then(me => vm.surveyRunForm.contactEmail = me.userName);
+            .then(user => {
+                vm.user = user;
+                vm.surveyRunForm.contactEmail = user.userName;
+            });
 
         serviceBroker
             .loadAppData(CORE_API.InvolvementKindStore.findAll, [])

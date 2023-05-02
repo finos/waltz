@@ -17,19 +17,19 @@
 </style>
 <div>
 
+    <!-- SUMMARIES -->
+    <waltz-svelte-component component="$ctrl.ReportGridControlPanel"
+                            on-grid-select="$ctrl.onGridSelect"
+                            primary-entity-ref="$ctrl.parentEntityRef">
+    </waltz-svelte-component>
+
+
     <waltz-loading-notification show="$ctrl.loading"
                                 name="Loading grid data">
     </waltz-loading-notification>
 
-    <div ng-if="!$ctrl.loading">
-        <!-- SUMMARIES -->
-        <waltz-svelte-component component="$ctrl.ReportGridControlPanel"
-                                on-grid-select="$ctrl.onGridSelect"
-                                on-save="$ctrl.onUpdateColumns" ,
-                                primary-entity-ref="$ctrl.parentEntityRef"
-                                show-grid-selector="$ctrl.showGridSelector">
-        </waltz-svelte-component>
 
+    <div ng-if="!$ctrl.loading">
         <br>
         <!-- GRID -->
         <div ng-if="$ctrl.tableData.length > 0">
@@ -42,7 +42,7 @@
             <waltz-data-extract-link name="Export grid"
                                      styling="link"
                                      filename="report.csv"
-                                     extract="report-grid/external-id/{{$ctrl.rawGridData.definition.externalId}}"
+                                     extract="report-grid/external-id/{{$ctrl.gridDefinition.externalId}}"
                                      method="POST"
                                      request-body="$ctrl.selectionOptions">
             </waltz-data-extract-link>

@@ -18,24 +18,24 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.model.DateChangeCommand;
+import org.finos.waltz.model.IdCommandResponse;
+import org.finos.waltz.model.survey.*;
+import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.survey.SurveyRunService;
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.endpoints.Endpoint;
-import org.finos.waltz.model.DateChangeCommand;
-import org.finos.waltz.model.IdCommandResponse;
-import org.finos.waltz.model.survey.*;
-import org.finos.waltz.model.user.SystemRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
 
-import static org.finos.waltz.web.WebUtilities.*;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.model.HierarchyQueryScope.EXACT;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
+import static org.finos.waltz.web.WebUtilities.*;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 
 @Service
 public class SurveyRunEndpoint implements Endpoint {
@@ -60,6 +60,7 @@ public class SurveyRunEndpoint implements Endpoint {
 
     @Override
     public void register() {
+        String createSurveyRunPath = BASE_URL;
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
         String findByTemplateIdPath = mkPath(BASE_URL, "template-id", ":id");
         String findByEntityRefPath = mkPath(BASE_URL, "entity", ":kind", ":id");
@@ -181,7 +182,7 @@ public class SurveyRunEndpoint implements Endpoint {
         getForList(findForRecipientIdPath, findForRecipientIdRoute);
         postForList(generateSurveyRunRecipientsPath, generateSurveyRunRecipientsRoute);
         getForList(surveyRunListForUserPath, surveyRunListForUserRoute);
-        postForDatum(BASE_URL, surveyRunCreateRoute);
+        postForDatum(createSurveyRunPath, surveyRunCreateRoute);
         deleteForDatum(surveyRunDeletePath, surveyRunDeleteRoute);
         putForDatum(surveyRunUpdatePath, surveyRunUpdateRoute);
         postForDatum(createSurveyRunInstancesAndRecipientsPath, createSurveyRunInstancesAndRecipientsRoute);

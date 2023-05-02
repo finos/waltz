@@ -197,6 +197,7 @@ import {
     TechnologyStatisticsService_API as TechnologyStatisticsService
 } from "../../technology/services/technology-statistics-service";
 import {ThumbnailStore_API as ThumbnailStore} from "../../thumbnail/services/thumbnail-store";
+import {UIDStore_API as UIDStore} from "../../system/services/uid-store";
 import {UserStore_API as UserStore} from "../../user/services/user-store";
 import {UserPreferenceStore_API as UserPreferenceStore} from "../../user/services/user-preference-store";
 import {RoleStore_API as RoleStore} from "../../role/services/role-store";
@@ -303,6 +304,7 @@ export const CORE_API = {
     TaxonomyManagementStore,
     TechnologyStatisticsService,
     ThumbnailStore,
+    UIDStore,
     UserStore,
     UserPreferenceStore,
     RoleStore,

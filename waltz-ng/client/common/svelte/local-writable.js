@@ -2,6 +2,14 @@ import _ from "lodash";
 import {writable} from "svelte/store";
 
 
+function getExistingValueFromLocalStore(key) {
+    try {
+        return JSON.parse(localStorage.getItem(key))
+    } catch (e) {
+        return null;
+    }
+}
+
 /**
  * Creates a writable store that persists to local storage
  *
@@ -12,11 +20,15 @@ import {writable} from "svelte/store";
 function localWritable(key, initialValue) {
     const {subscribe, set: setStore} = writable(initialValue);
 
-    set(JSON.parse(localStorage.getItem(key)) ?? initialValue);
+    set(getExistingValueFromLocalStore(key) ?? initialValue);
 
     function set(value) {
-        setStore(value);
-        writeToStorage(key, value);
+        const valToStore = _.isUndefined(value)
+            ? null
+            : value;
+
+        setStore(valToStore);
+        writeToStorage(key, valToStore);
     }
 
     function reset() {

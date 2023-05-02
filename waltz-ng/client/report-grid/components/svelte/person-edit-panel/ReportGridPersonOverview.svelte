@@ -11,14 +11,13 @@
     export let onDelete = () => console.log("deleting");
     export let onEdit = () => console.log("editing");
 
-    $: personCall = selectedMember && personStore.findByUserId(selectedMember.userId);
-    $: person = $personCall?.data;
-
     $: lastOwner = _
         .chain(members)
         .filter(d => d.role === reportGridMember.OWNER.key)
         .size()
         .value() === 1;
+
+    $: person = selectedMember?.user
 
 </script>
 
@@ -31,7 +30,7 @@
                                 <button class="btn btn-xs btn-warning"
                                         disabled={lastOwner}
                                         title={lastOwner ? "You cannot remove the last owner from a report grid" : ""}
-                                        on:click={() => onEdit(selectedMember, reportGridMember.VIEWER.key)}>
+                                        on:click={() => onEdit(selectedMember.user, reportGridMember.VIEWER.key)}>
                                     Make Viewer Only
                                 </button>
                                 <button class="btn btn-xs btn-danger"

@@ -21,6 +21,7 @@ import {initialiseData} from "../common";
 import template from "./actors-view.html";
 import {displayError} from "../common/error-utils";
 import toasts from "../svelte-stores/toast-store";
+import {CORE_API} from "../common/services/core-api-utils";
 
 
 const initialState = {
@@ -31,7 +32,8 @@ const initialState = {
 
 
 function controller($q,
-                    actorService) {
+                    actorService,
+                    serviceBroker) {
 
     const vm = initialiseData(this, initialState);
 
@@ -75,6 +77,9 @@ function controller($q,
 
     vm.startNewActor = () => {
         vm.creatingActor = true;
+        serviceBroker
+            .loadViewData(CORE_API.UIDStore.generateOne, [], {force: true})
+            .then(r => vm.newActor.externalId = r.data);
     };
 
     vm.saveNewActor = () => {
@@ -105,7 +110,8 @@ function controller($q,
 
 controller.$inject = [
     "$q",
-    "ActorService"
+    "ActorService",
+    "ServiceBroker"
 ];
 
 
