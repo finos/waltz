@@ -48,9 +48,11 @@ public class ReportGridMemberDao {
     public static final RecordMapper<Record, ReportGridMember> TO_DOMAIN_MAPPER = r -> {
         ReportGridMemberRecord record = r.into(ReportGridMemberRecord.class);
 
+        Person person = PersonDao.personMapper.map(r);
+
         return ImmutableReportGridMember.builder()
                 .gridId(record.getGridId())
-                .userId(record.getUserId())
+                .user(person)
                 .role(ReportGridMemberRole.valueOf(record.getRole()))
                 .build();
     };
@@ -58,8 +60,11 @@ public class ReportGridMemberDao {
     public Set<ReportGridMember> findByGridId(Long gridId){
         return dsl
                 .select(REPORT_GRID_MEMBER.fields())
+                .select(PERSON.fields())
                 .from(REPORT_GRID_MEMBER)
-                .where(REPORT_GRID_MEMBER.GRID_ID.eq(gridId))
+                .innerJoin(PERSON).on(PERSON.EMAIL.eq(REPORT_GRID_MEMBER.USER_ID))
+                .where(REPORT_GRID_MEMBER.GRID_ID.eq(gridId)
+                        .and(PERSON.IS_REMOVED.isFalse()))
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
 
@@ -93,23 +98,13 @@ public class ReportGridMemberDao {
     }
 
 
-    public boolean delete(ReportGridMember member){
+    public boolean delete(ReportGridMemberDeleteCommand command) {
         return dsl
                 .deleteFrom(REPORT_GRID_MEMBER)
-                .where(REPORT_GRID_MEMBER.GRID_ID.eq(member.gridId())
-                        .and(REPORT_GRID_MEMBER.USER_ID.eq(member.userId())
-                                .and(REPORT_GRID_MEMBER.ROLE.eq(member.role().name()))))
+                .where(REPORT_GRID_MEMBER.GRID_ID.eq(command.gridId())
+                        .and(REPORT_GRID_MEMBER.USER_ID.eq(command.userId())))
                 .execute() == 1;
 
-    }
-
-
-    public int create(ReportGridMember member) {
-        ReportGridMemberRecord record = dsl.newRecord(REPORT_GRID_MEMBER);
-        record.setGridId(member.gridId());
-        record.setUserId(member.userId());
-        record.setRole(member.role().name());
-        return record.insert();
     }
 
     public Set<Person> findPeopleByGridId(Long gridId) {
@@ -119,6 +114,21 @@ public class ReportGridMemberDao {
                 .innerJoin(PERSON).on(PERSON.EMAIL.eq(REPORT_GRID_MEMBER.USER_ID))
                 .where(REPORT_GRID_MEMBER.GRID_ID.eq(gridId))
                 .fetchSet(PersonDao.personMapper);
+    }
+
+    public int update(ReportGridMemberCreateCommand updateCommand, String username) {
+        int update = dsl
+                .update(REPORT_GRID_MEMBER)
+                .set(REPORT_GRID_MEMBER.ROLE, updateCommand.role().name())
+                .where(REPORT_GRID_MEMBER.GRID_ID.eq(updateCommand.gridId())
+                        .and(REPORT_GRID_MEMBER.USER_ID.eq(updateCommand.userId())))
+                .execute();
+
+        if (update == 1) {
+            return update;
+        } else {
+            return register(updateCommand.gridId(), updateCommand.userId(), updateCommand.role());
+        }
     }
 }
 

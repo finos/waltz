@@ -9,7 +9,8 @@
     import {getDisplayNameForColumn} from "./report-grid-utils";
 
     export let primaryEntityRef;
-    export let grid;
+    export let gridDefinition;
+    export let gridInstance;
     export let filters;
 
     function copyText() {
@@ -20,9 +21,9 @@
 
     let reloadLinkContent = "\n\n\nThis group will refresh overnight, <a href=\"./page/report-grid-view/recalculate/app-group-id/${ctx.ref.id}?sections=10\" target=\"_blank\">click here to refresh group now</a>"
 
-    $: allColDefinitions = _.concat(grid.definition.fixedColumnDefinitions, grid.definition.derivedColumnDefinitions);
+    $: allColDefinitions = _.concat(gridDefinition.fixedColumnDefinitions, gridDefinition.derivedColumnDefinitions);
     $: gridColumnsById = _.keyBy(allColDefinitions, d => d.gridColumnId);
-    $: ratingSchemeItemsById = _.keyBy(grid.instance.ratingSchemeItems, d => d.id);
+    $: ratingSchemeItemsById = _.keyBy(gridInstance.ratingSchemeItems, d => d.id);
     $: groupedFilters = _.groupBy(filters, d => d.columnDefinitionId);
     $: ratingColumnKinds = [entity.MEASURABLE.key, entity.ASSESSMENT_DEFINITION.key];
 
@@ -33,7 +34,7 @@
 
     $: gridContent = "| Grid Name | Grid Identifier | Vantage Point Kind | Vantage Point Id |\n" +
         "| --- | --- | --- | --- |\n" +
-        `| \`${grid.definition.name}\` | \`${grid.definition.externalId}\` | \`${primaryEntityRef.kind}\` | \`${primaryEntityRef.id}\` |\n` +
+        `| \`${gridDefinition.name}\` | \`${gridDefinition.externalId}\` | \`${primaryEntityRef.kind}\` | \`${primaryEntityRef.id}\` |\n` +
         "\n" +
         "\n" +
         "| Filter Column | Filter Operator | Value/s |\n" +

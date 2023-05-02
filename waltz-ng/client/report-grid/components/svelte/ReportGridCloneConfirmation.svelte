@@ -1,10 +1,12 @@
 <script>
 
     import _ from "lodash";
+    import {gridService} from "./report-grid-service";
 
-    export let grid;
     export let doClone;
     export let doCancel;
+
+    const {gridDefinition} = gridService;
 
     const workingCopy = {
         name: null,
@@ -16,7 +18,7 @@
 </script>
 
 
-<h4>Cloning report grid: {grid.definition.name}</h4>
+<h4>Cloning report grid: {$gridDefinition?.name}</h4>
 <ul>
     <li>Please provide a name for the new grid</li>
     <li>All columns will be copied to the newly created grid</li>
@@ -41,7 +43,7 @@
 <button class="btn btn-success btn-sm"
         title={disabled ? "You must set a name for your grid before cloning" : null}
         disabled={disabled}
-        on:click={() => doClone(grid.definition.id, workingCopy)}>
+        on:click={() => doClone($gridDefinition?.id, workingCopy)}>
     Clone
 </button>
 <button class="btn btn-primary btn btn-sm"
