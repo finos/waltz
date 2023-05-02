@@ -17,15 +17,29 @@
  */
 import {initialiseData} from "../../common/index";
 import template from "./playpen4.html";
+import {gridService} from "../../report-grid/components/svelte/report-grid-service";
+import {mkSelectionOptions} from "../../common/selector-utils";
 
 
 const initialState = {
-    parentEntityRef: { kind: "ORG_UNIT", id: 2216 }, //10524
+    parentEntityRef: {kind: "ORG_UNIT", id: 10524}, //10524
 };
 
 
 function controller($q, serviceBroker) {
-    initialiseData(this, initialState);
+    const vm = initialiseData(this, initialState);
+
+    vm.selectionOptions = mkSelectionOptions(vm.parentEntityRef);
+
+    gridService.selectGrid(3, vm.selectionOptions)
+        .then((d) => console.log("loaded grid", d));
+
+    global.gridService = gridService;
+    global.vm = vm;
+
+    gridService.gridDefinition.subscribe(d => console.log({gridDef: d}))
+    gridService.gridInstance.subscribe(d => console.log({gridInstance: d}))
+    gridService.gridMembers.subscribe(d => console.log({gridMembers: d}))
 }
 
 

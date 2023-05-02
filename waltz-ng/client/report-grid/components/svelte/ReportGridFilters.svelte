@@ -3,12 +3,13 @@
     import NoData from "../../../common/svelte/NoData.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
     import {getDisplayNameForColumn} from "./report-grid-utils";
-    import {activeSummaries, filters, selectedGrid, summaries, columnDefs} from "./report-grid-store";
     import {mkChunks} from "../../../common/list-utils";
     import EntityIcon from "../../../common/svelte/EntityIcon.svelte";
     import Popover from "../../../svelte-stores/popover-store";
     import FilterNotePopoverContent from "./FilterNotePopoverContent.svelte";
     import {entityNamedNoteTypeStore} from "../../../svelte-stores/entity-named-note-type-store";
+    import {gridService} from "./report-grid-service";
+    import {fade} from "svelte/transition";
 
     export let primaryEntityRef;
 
@@ -19,47 +20,20 @@
     let chunkedSummaryData = [];
     let namedNoteTypeCall = entityNamedNoteTypeStore.getByExternalId("WALTZ_REPORT_GRID_FILTER_PRESET");
 
+    const {filters, activeSummaries, summaries, gridDefinition, gridInstance} = gridService
+
     function isSelectedSummary(cId) {
         return _.some(
             $filters,
             f => f.summaryId === cId);
     }
 
-
     function onToggleFilter(optionSummary) {
-        if (isSelectedSummary(optionSummary.summaryId)) {
-            $filters = _.reject(
-                $filters,
-                f => f.summaryId === optionSummary.summaryId);
-        } else {
-            const newFilter = {
-                summaryId: optionSummary.summaryId,
-                columnDefinitionId: optionSummary.columnDefinitionId,
-                optionCode: optionSummary.optionInfo.code
-            };
-            $filters = _.concat($filters, [newFilter]);
-        }
+        gridService.toggleFilter(optionSummary);
     }
-
-
-    function removeSummary(summary) {
-        // remove any filters which refer to the property used by this summary
-        $filters = _.reject($filters, f => f.columnDefinitionId === summary.column.gridColumnId);
-        activeSummaries.remove(summary.column.id);
-    }
-
-
-    function addToActiveSummaries(column) {
-        activeSummaries.add(column.id);
-    }
-
 
     function addOrRemoveFromActiveSummaries(summary) {
-        if (isActive($activeSummaries, summary)) {
-            removeSummary(summary);
-        } else {
-            addToActiveSummaries(summary.column);
-        }
+        gridService.toggleSummary(summary);
     }
 
 
@@ -85,7 +59,8 @@
             {},
             {
                 primaryEntityRef,
-                grid: $selectedGrid,
+                gridDefinition: $gridDefinition,
+                gridInstance: $gridInstance,
                 filters: $filters
             });
 
@@ -149,8 +124,8 @@
         <div class="col-sm-8">
             {#each chunkedSummaryData as row}
                 <div class="row">
-                    {#each row as summary}
-                        <div class="col-sm-4">
+                    {#each row as summary (summary.column.id)}
+                        <div class="col-sm-4" transition:fade="{{duration: 200}}">
                             <h5 class="waltz-visibility-parent">
                                 <EntityIcon kind={summary.column.columnEntityKind}/>
                                 <span>{getDisplayNameForColumn(summary?.column)}</span>
@@ -191,35 +166,18 @@
                                 </tbody>
                                 <!-- TOTAL -->
                                 <tbody
-                                    title="Some subjects can have more than one option included in the filter, occurrence count is used to show when this differs from the row count">
-                                {#if summary.totalOccurrences !== summary.totalSubjects}
-                                    <tr>
-                                        <td>
-                                            <b>Occurrence Count</b>
-                                        </td>
-                                        <td class="text-right">
-                                            {#if summary.totalOccurrences !== summary.visibleOccurrences}
+                                    title="Some subjects can have more than one option included in the filter, count may differ from the number of rows">
+                                <tr>
+                                    <td>
+                                        <b>Count</b>
+                                    </td>
+                                    <td class="text-right">
                                             <span class="text-muted small">
                                                 ({summary.totalOccurrences})
                                             </span>
-                                            {/if}
-                                            <span>{summary.visibleOccurrences}</span>
-                                        </td>
+                                        <span>{summary.visibleOccurrences}</span>
+                                    </td>
                                     </tr>
-                                {/if}
-                                <tr>
-                                    <td>
-                                        <b>Row Count</b>
-                                    </td>
-                                    <td class="text-right">
-                                        {#if summary.visibleSubjects !== summary.totalSubjects}
-                                            <span class="text-muted small">
-                                                ({summary.totalSubjects})
-                                            </span>
-                                        {/if}
-                                        <span>{summary.visibleSubjects}</span>
-                                    </td>
-                                </tr>
                                 </tbody>
                             </table>
                         </div>

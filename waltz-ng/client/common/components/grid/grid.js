@@ -18,6 +18,7 @@
 
 import {initialiseData, invokeFunction} from "../../../common";
 import template from "./grid.html";
+import {markdownToHtml} from "../../markdown-utils";
 
 
 const bindings = {
@@ -43,7 +44,8 @@ const initialState = {
 };
 
 function controller(uiGridExporterConstants,
-                    uiGridExporterService) {
+                    uiGridExporterService,
+                    $scope) {
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
@@ -91,7 +93,7 @@ function controller(uiGridExporterConstants,
 
 
     vm.$onChanges = (changes) => {
-        if (! vm.gridOptions) return;
+        if (!vm.gridOptions) return;
 
         if (changes.columnDefs) {
             vm.gridOptions.columnDefs = vm.columnDefs;
@@ -100,6 +102,10 @@ function controller(uiGridExporterConstants,
         vm.gridOptions.minRowsToShow = Math.min(vm.minRowsToShow, vm.rowData.length);
         vm.gridOptions.data = vm.rowData;
     };
+
+    $scope.markdownToHtml = (str) => {
+        return markdownToHtml(str);
+    }
 
 
     vm.exportData = (fileName = "download.csv") => {
@@ -124,7 +130,8 @@ function controller(uiGridExporterConstants,
 
 controller.$inject = [
     "uiGridExporterConstants",
-    "uiGridExporterService"
+    "uiGridExporterService",
+    "$scope"
 ];
 
 

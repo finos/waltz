@@ -20,9 +20,9 @@ function store($http, baseUrl) {
 
     const BASE = `${baseUrl}/report-grid`;
 
-    const findAll = () => {
+    const findAllDefinitions = () => {
         return $http
-            .get(`${BASE}/all`)
+            .get(`${BASE}/definition/all`)
             .then(result => result.data);
     };
 
@@ -38,9 +38,8 @@ function store($http, baseUrl) {
             .then(result => result.data);
     };
 
-
     return {
-        findAll,
+        findAllDefinitions,
         getViewById,
         getDefinitionById
     };
@@ -57,9 +56,9 @@ const serviceName = "ReportGridStore";
 
 
 export const ReportGridStore_API = {
-    findAll: {
+    findAllDefinitions: {
         serviceName,
-        serviceFnName: "findAll",
+        serviceFnName: "findAllDefinitions",
         description: "find all grid definitions"
     },
     getViewById: {

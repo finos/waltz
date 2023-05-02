@@ -35,10 +35,7 @@ import org.finos.waltz.model.survey.SurveyQuestionFieldType;
 import org.finos.waltz.model.usage_info.UsageKind;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.ChangeInitiative;
-import org.finos.waltz.schema.tables.records.ReportGridColumnDefinitionRecord;
-import org.finos.waltz.schema.tables.records.ReportGridDerivedColumnDefinitionRecord;
-import org.finos.waltz.schema.tables.records.ReportGridFixedColumnDefinitionRecord;
-import org.finos.waltz.schema.tables.records.ReportGridRecord;
+import org.finos.waltz.schema.tables.records.*;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
@@ -83,7 +80,6 @@ import static org.finos.waltz.common.StringUtilities.upper;
 import static org.finos.waltz.common.hierarchy.HierarchyUtilities.toForest;
 import static org.finos.waltz.data.JooqUtilities.fieldsWithout;
 import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.finos.waltz.model.report_grid.CellOption.defaultCellOption;
 import static org.finos.waltz.model.report_grid.CellOption.mkCellOption;
 import static org.finos.waltz.model.survey.SurveyInstanceStatus.APPROVED;
 import static org.finos.waltz.model.survey.SurveyInstanceStatus.COMPLETED;
@@ -146,14 +142,30 @@ public class ReportGridDao {
             .as("entity_name");
 
 
+    private static final RecordMapper<? super Record, ReportGridInfo> TO_GRID_INFO_MAPPER = r -> {
+        ReportGridRecord record = r.into(REPORT_GRID);
+
+        return ImmutableReportGridInfo.builder()
+                .gridId(record.getId())
+                .name(record.getName())
+                .externalId(record.getExternalId())
+                .description(record.getDescription())
+                .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
+                .lastUpdatedBy(record.getLastUpdatedBy())
+                .provenance(record.getProvenance())
+                .subjectKind(EntityKind.valueOf(record.getSubjectKind()))
+                .visibilityKind(ReportGridKind.valueOf(record.getKind()))
+                .build();
+    };
+
+
     @Autowired
     public ReportGridDao(DSLContext dsl) {
         this.dsl = dsl;
     }
 
 
-
-    public Set<ReportGridDefinition> findAll(){
+    public Set<ReportGridDefinition> findAllDefinitions() {
         return dsl
                 .select(rg.fields())
                 .from(rg)
@@ -161,7 +173,7 @@ public class ReportGridDao {
     }
 
 
-    public Set<ReportGridDefinition> findForUser(String username){
+    public Set<ReportGridDefinition> findGridDefinitionsForUser(String username) {
         return dsl
                 .select(rg.fields())
                 .from(rg)
@@ -169,6 +181,17 @@ public class ReportGridDao {
                 .on(rg.ID.eq(REPORT_GRID_MEMBER.GRID_ID))
                 .where(rg.KIND.eq(ReportGridKind.PUBLIC.name()).or(REPORT_GRID_MEMBER.USER_ID.eq(username)))
                 .fetchSet(r -> mkReportGridDefinition(rgcd.REPORT_GRID_ID.eq(r.get(rg.ID)), r.into(REPORT_GRID)));
+    }
+
+    public Set<ReportGridInfo> findGridInfoForUser(String username) {
+        return dsl
+                .select(rg.fields())
+                .from(rg)
+                .leftJoin(REPORT_GRID_MEMBER)
+                .on(rg.ID.eq(REPORT_GRID_MEMBER.GRID_ID))
+                .where(rg.KIND.eq(ReportGridKind.PUBLIC.name())
+                        .or(REPORT_GRID_MEMBER.USER_ID.eq(username)))
+                .fetchSet(TO_GRID_INFO_MAPPER);
     }
 
 
@@ -186,6 +209,10 @@ public class ReportGridDao {
 
     public ReportGridDefinition getGridDefinitionById(long id) {
         return getGridDefinitionByCondition(rg.ID.eq(id));
+    }
+
+    public ReportGridInfo getGridInfoById(long id) {
+        return getGridInfoByCondition(rg.ID.eq(id));
     }
 
 
@@ -371,7 +398,7 @@ public class ReportGridDao {
     }
 
 
-    public Set<ReportGridDefinition> findForOwner(String username) {
+    public Set<ReportGridDefinition> findDefinitionsForOwner(String username) {
         Condition isOwner = REPORT_GRID_MEMBER.USER_ID.eq(username)
                 .and(REPORT_GRID_MEMBER.ROLE.eq(ReportGridMemberRole.OWNER.name()));
 
@@ -401,6 +428,14 @@ public class ReportGridDao {
                 .from(rg)
                 .where(condition)
                 .fetchOne(r -> mkReportGridDefinition(condition, r.into(REPORT_GRID)));
+    }
+
+    private ReportGridInfo getGridInfoByCondition(Condition condition) {
+        return dsl
+                .select(rg.fields())
+                .from(rg)
+                .where(condition)
+                .fetchOne(TO_GRID_INFO_MAPPER);
     }
 
 
