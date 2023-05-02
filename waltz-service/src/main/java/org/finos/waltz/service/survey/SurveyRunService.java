@@ -19,6 +19,7 @@
 package org.finos.waltz.service.survey;
 
 import org.finos.waltz.common.SetUtilities;
+import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.involvement.InvolvementDao;
@@ -120,12 +121,20 @@ public class SurveyRunService {
     }
 
 
-    public IdCommandResponse createSurveyRun(String userName, SurveyRunCreateCommand command) {
+    public IdCommandResponse createSurveyRun(String userName, SurveyRunCreateCommand command) throws InsufficientPrivelegeException {
         checkNotNull(userName, "userName cannot be null");
         checkNotNull(command, "create command cannot be null");
 
         Person owner = personDao.getActiveByUserEmail(userName);
         checkNotNull(owner, "userName " + userName + " cannot be resolved");
+
+        boolean canIssueAgainstTemplate = surveyTemplateDao.canUserIssueAgainstTemplate(
+                command.surveyTemplateId(),
+                userName);
+
+        if (! canIssueAgainstTemplate) {
+            throw new InsufficientPrivelegeException("You do not have permission to issue surveys against this template");
+        }
 
         long surveyRunId = surveyRunDao.create(owner.id().get(), command);
 

@@ -107,6 +107,7 @@ public class SurveyTemplateService {
                 .createdAt(DateTimeUtilities.nowUtc())
                 .status(ReleaseLifecycleStatus.DRAFT)
                 .externalId(command.externalId())
+                .issuanceRole(command.issuanceRole())
                 .build());
 
         changeLogService.write(

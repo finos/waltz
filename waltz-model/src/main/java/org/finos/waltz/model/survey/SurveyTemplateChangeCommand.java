@@ -30,4 +30,7 @@ import org.immutables.value.Value;
 public abstract class SurveyTemplateChangeCommand implements Command, IdProvider, NameProvider, DescriptionProvider, ExternalIdProvider {
 
     public abstract EntityKind targetEntityKind();
+
+    @Nullable
+    public abstract String issuanceRole();
 }

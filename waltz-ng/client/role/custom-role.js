@@ -35,7 +35,8 @@ function controller(serviceBroker) {
         vm.roleKey = vm.roleName
             ? vm.roleName
                 .toUpperCase()
-                .replace(/\s+/g,"_") //replacing whitespaces with _
+                .replace(/\s*&\s*/g," AND ") //replacing & with AND
+                .replace(/[\s\-]+/g,"_") //replacing whitespaces and hyphens with _
                 .replace(/\W/g, "") //Remove any non alphanumeric character
             : "";
     };

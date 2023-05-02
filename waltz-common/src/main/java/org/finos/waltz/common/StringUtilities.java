@@ -301,5 +301,17 @@ public class StringUtilities {
                 "</table>";
     }
 
+
+    /**
+     * Takes a string and returns null if the string was empty (spaces, empty string or null)
+     *
+     * @param str  the string to check
+     * @return  null iff the str was empty
+     */
+    public static String nullIfEmpty(String str) {
+        return isEmpty(str)
+                ? null
+                : str;
+    }
 }
 
