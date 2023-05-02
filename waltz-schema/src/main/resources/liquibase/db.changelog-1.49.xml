@@ -90,4 +90,15 @@
         </modifySql>
     </changeSet>
 
+    <changeSet id="20230429-6577-1"
+               author="davidwatkins73">
+        <insert tableName="role">
+            <column name="key" value="EUDA_ADMIN"/>
+            <column name="name" value="EUDA Administrator"/>
+            <column name="description" value="Users can who can promote EUDAs to full applications"/>
+            <column name="is_custom" valueBoolean="false"/>
+            <column name="user_selectable" valueBoolean="true"/>
+        </insert>
+    </changeSet>
+
 </databaseChangeLog>
