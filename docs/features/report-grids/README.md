@@ -19,7 +19,7 @@ This flexibility enables users to quickly and easily generate reports from a var
 
 Grids support a wide variety of fields related to the driving entity type, which can be either an application or a change initiative.
 
-![Field picker](images/field-picker.png)
+<img src="images/field-picker.png" height="600" alt="Field picker">
 
 After a field has been selected, the user can proceed to configure further details.
 The nature of these details may depend on the specific type of field that is being configured. For instance, the user might need to choose a particular assessment definition in order to complete the configuration.
@@ -36,7 +36,7 @@ Derived columns allows users to create new fields based on existing ones.
 Waltz uses a simple language ([JEXL](http://commons.apache.org/proper/commons-jexl/reference/syntax.html)) to evaluate expressions.
 
 
-<img src="images/derived-column-editor.png" width="920" alt="Derived column editor">
+<img src="images/derived-column-editor.png" height="700" alt="Derived column editor">
 
 #### Functions
 In addition to the core JEXL features Waltz offers the following functions and fields.
