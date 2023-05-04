@@ -52,8 +52,20 @@ In addition to the core JEXL features Waltz offers the following functions and f
 | `mkResult(value, optText, optCode)`                  | creates a value to display in the cell with a given option text and code, these options will be used for filtering | `mkResult("Important", "Important Outcome", "L1")`                                             |
 | `allCellsProvided(c1, c2...)`                        | true if _all_ of the cells provided are non-null                                                                   | `allCellsProvided(c1, c2) ? mkResult("ALL") : null`                                            |
 | `anyCellsProvided(c1, c2...)`                        | true if _any_ of the cells provided are non-null                                                                   | `anyCellsProvided(c1, c2) ? mkResult("SOME") : null`                                           |
-| `cell(c)`                                            | the Cell object associated with the given column external id (or null)                                             | `cell("LER")`                                                                                  |
+| `cell(c)`                                            | the Cell object associated with the given column external id (or null). The next table has more information about cells | `cell("LER")`                                                                                  |
 | `numToOucome(val, [b1, outcome1, b2, outcome2, ...)` | takes a numeric value a list which specifies a boundary and the outcome for any value below that boundary          | `numToOutcome(cell('CTB').numberValue(), [ 0, "Zero", 100000, "smallish", 100000000, "big" ]`) |
+
+As described above the `cell(c)` method can be used to get a row cell object.
+The row cell object has the following properties/methods.  
+
+Property/Method | Description | _Example_ usage for field types
+--- | --- | ---
+`textValue()` | optional string value | `subjectName`, surveyResponses, ...
+`numberValue()` | optional numeic values | amount, complexity, ...
+`dateTimeValue()` | optional date values | attestation dates, survey submissions, ...
+`ratingIdValue()` | used to reference the values of rating cells | assessment cells, ...
+`comment()` | optional comment for the cell value | measurable ratings, assessments, ...
+
 
 ### Filters
 
