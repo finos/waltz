@@ -2,10 +2,12 @@ package org.finos.waltz.integration_test.inmem.service;
 
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.ListUtilities;
+import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.ReleaseLifecycleStatus;
 import org.finos.waltz.model.survey.*;
 import org.finos.waltz.service.survey.SurveyInstanceService;
 import org.finos.waltz.service.survey.SurveyRunService;
@@ -50,7 +52,7 @@ public class SurveyInstanceResponseCopyTest extends BaseInMemoryIntegrationTest 
 
 
     @Test
-    public void copyResponses() {
+    public void copyResponses() throws InsufficientPrivelegeException {
 
         EntityReference a1 = appHelper.createNewApp(mkName("copyResponses"), ouIds.a);
         EntityReference a2 = appHelper.createNewApp(mkName("copyResponses"), ouIds.a);
@@ -60,6 +62,7 @@ public class SurveyInstanceResponseCopyTest extends BaseInMemoryIntegrationTest 
 
         long templateId = templateHelper.createTemplate(username, mkName("copyResponses"));
         long qId = templateHelper.addQuestion(templateId);
+        templateHelper.updateStatus(username, templateId, ReleaseLifecycleStatus.ACTIVE);
 
         long invKindId = involvementHelper.mkInvolvementKind(mkName("invKind"));
         involvementHelper.createInvolvement(personId, invKindId, a1);

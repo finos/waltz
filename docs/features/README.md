@@ -16,6 +16,7 @@ Feature | Overview
 [Organisational Units](org_units/README.md) | Organisational structure
 [Physical Flows](physical_flows/README.md) | Concrete realisations of logical flows
 [Roadmaps and Scenarios](roadmaps/README.md) | Used to describe how applications may change over time
+[Report Grids](report-grids/README.md) | Used to quickly aggregate data into a report
 [Server / Database Information](servers_and_databases/README.md) | Servers and databases associated with apps and flows
 [Surveys](surveys/README.md) | Questionnaires that can be sent to a subset of Waltz users using criteria native to Waltz
 
