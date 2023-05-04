@@ -29,7 +29,9 @@ import org.finos.waltz.schema.tables.records.SurveyTemplateRecord;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record;
+import org.jooq.Record1;
 import org.jooq.RecordMapper;
+import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -137,7 +139,8 @@ public class SurveyTemplateDao {
         checkNotNull(surveyTemplate, "surveyTemplate cannot be null");
 
         SurveyTemplateRecord record = TO_RECORD_MAPPER.apply(surveyTemplate);
-        return dsl.insertInto(SURVEY_TEMPLATE)
+        return dsl
+                .insertInto(SURVEY_TEMPLATE)
                 .set(record)
                 .returning(SURVEY_TEMPLATE.ID)
                 .fetchOne()
@@ -194,17 +197,16 @@ public class SurveyTemplateDao {
 
     public boolean canUserIssueAgainstTemplate(Long templateId,
                                                String userName) {
-        int permittedRoles = dsl
-                .fetchCount(DSL
-                    .select(USER_ROLE.ROLE)
-                    .from(SURVEY_TEMPLATE)
-                    .leftJoin(USER_ROLE)
-                    .on(USER_ROLE.ROLE.in(SURVEY_TEMPLATE.ISSUANCE_ROLE, DSL.value(SystemRole.ADMIN.name()))
-                            .and(USER_ROLE.USER_NAME.eq(userName)))
-                    .where(SURVEY_TEMPLATE.ID.eq(templateId)
-                            .and(SURVEY_TEMPLATE.STATUS.eq(ReleaseLifecycleStatus.ACTIVE.name()))
-                            .and(USER_ROLE.ROLE.isNotNull()
-                                    .or(SURVEY_TEMPLATE.ISSUANCE_ROLE.isNull()))));
-        return permittedRoles > 0;
+        SelectConditionStep<Record1<Long>> qry = DSL
+                .select(SURVEY_TEMPLATE.ID)
+                .from(SURVEY_TEMPLATE)
+                .leftJoin(USER_ROLE)
+                .on(USER_ROLE.ROLE.in(SURVEY_TEMPLATE.ISSUANCE_ROLE, DSL.value(SystemRole.ADMIN.name()))
+                        .and(USER_ROLE.USER_NAME.eq(userName)))
+                .where(SURVEY_TEMPLATE.ID.eq(templateId)
+                        .and(SURVEY_TEMPLATE.STATUS.eq(ReleaseLifecycleStatus.ACTIVE.name()))
+                        .and(USER_ROLE.ROLE.isNotNull()
+                                .or(SURVEY_TEMPLATE.ISSUANCE_ROLE.isNull())));
+        return dsl.fetchCount(qry) > 0;
     }
 }

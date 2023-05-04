@@ -18,9 +18,8 @@
 
 package org.finos.waltz.jobs.harness;
 
-import org.finos.waltz.common.DateTimeUtilities;
-import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.SetUtilities;
+import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.model.*;
 import org.finos.waltz.model.survey.*;
 import org.finos.waltz.service.DIConfiguration;
@@ -40,7 +39,7 @@ import static org.finos.waltz.common.DateTimeUtilities.toLocalDate;
 
 public class SurveyHarness {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InsufficientPrivelegeException {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         surveyRunHarness(ctx);
 //        surveyTempateHarness(ctx);
@@ -75,7 +74,7 @@ public class SurveyHarness {
     }
 
 
-    private static void surveyRunHarness(AnnotationConfigApplicationContext ctx) {
+    private static void surveyRunHarness(AnnotationConfigApplicationContext ctx) throws InsufficientPrivelegeException {
         SurveyQuestionService surveyQuestionService = ctx.getBean(SurveyQuestionService.class);
         surveyQuestionService.findForSurveyTemplate(1).forEach(System.out::println);
 

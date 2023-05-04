@@ -8,6 +8,7 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdCommandResponse;
 import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.ReleaseLifecycleStatus;
 import org.finos.waltz.model.person.Person;
 import org.finos.waltz.model.survey.*;
 import org.finos.waltz.service.survey.SurveyInstanceService;
@@ -55,7 +56,6 @@ public class SurveyRunServiceTest extends BaseInMemoryIntegrationTest {
     @Autowired
     private InvolvementHelper involvementHelper;
 
-
     @Test
     public void surveysAreIssuedToRecipientsViaInvolvementKind() throws InsufficientPrivelegeException {
         String stem = "srt_surveysAreIssuedToRecipientsViaInvolvementKind";
@@ -81,6 +81,7 @@ public class SurveyRunServiceTest extends BaseInMemoryIntegrationTest {
         Long grpId = groupHelper.createAppGroupWithAppRefs(mkName(stem, "group"), asSet(appA, appB));
 
         long tId = templateHelper.createTemplate(admin, mkName("test"));
+        templateHelper.updateStatus(u1, tId, ReleaseLifecycleStatus.ACTIVE);
 
         // remove person 2
         personHelper.updateIsRemoved(u2aId, true);

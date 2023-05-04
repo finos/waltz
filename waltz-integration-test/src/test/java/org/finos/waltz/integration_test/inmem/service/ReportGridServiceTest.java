@@ -4,10 +4,12 @@ import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.common.exception.NotFoundException;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.person.Person;
 import org.finos.waltz.model.report_grid.*;
 import org.finos.waltz.service.report_grid.ReportGridMemberService;
 import org.finos.waltz.service.report_grid.ReportGridService;
 import org.finos.waltz.test_common.helpers.InvolvementHelper;
+import org.finos.waltz.test_common.helpers.PersonHelper;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.junit.jupiter.api.Test;
@@ -39,6 +41,9 @@ public class ReportGridServiceTest extends BaseInMemoryIntegrationTest {
 
     @Autowired
     private InvolvementHelper involvementHelper;
+
+    @Autowired
+    private PersonHelper personHelper;
 
 
     @Test
@@ -82,19 +87,19 @@ public class ReportGridServiceTest extends BaseInMemoryIntegrationTest {
         Optional<ReportGridMember> maybeOwner = maybeFirst(
                 members,
                 m -> m.role() == ReportGridMemberRole.OWNER);
-        String ownerId = maybeOwner
-                .map(ReportGridMember::userId)
+        Person owner = maybeOwner
+                .map(ReportGridMember::user)
                 .orElseThrow(() -> new AssertionError("Should have an owner for a newly created grid"));
 
-        assertTrue(reportGridService.remove(grid.id().get(), ownerId),"grid should have been removed");
+        assertTrue(reportGridService.remove(grid.id().get(), owner.userId()),"grid should have been removed");
         assertTrue(reportGridMemberService.findByGridId(grid.id().get()).isEmpty(),"members should have been removed");
-        assertFalse(find(reportGridService.findAll(),
+        assertFalse(find(reportGridService.findAllDefinitions(),
                 g -> g.id().equals(grid.id())).isPresent(),
                 "cannot find grid after it's been removed");  //check it's really gone
 
         assertThrows(
                 NotFoundException.class,
-                () -> reportGridService.remove(grid.id().get(), ownerId),
+                () -> reportGridService.remove(grid.id().get(), owner.userId()),
                 "Cannot remove a report grid we have already removed");
 
         Record1<Integer> count = dsl
@@ -116,7 +121,10 @@ public class ReportGridServiceTest extends BaseInMemoryIntegrationTest {
                 .build();
 
         String admin = mkName("admin");
-        ReportGridDefinition def = reportGridService.create(cmd, admin);
+
+        personHelper.createPerson(admin);
+
+        ReportGridInfo def = reportGridService.create(cmd, admin);
 
         long invKind = involvementHelper.mkInvolvementKind(mkName("dummyInv"));
 
@@ -134,7 +142,7 @@ public class ReportGridServiceTest extends BaseInMemoryIntegrationTest {
 
 
         return reportGridService.updateColumnDefinitions(
-                def.id().get(),
+                def.gridId(),
                 colCmd,
                 admin);
     }
