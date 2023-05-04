@@ -2067,43 +2067,43 @@ public class ReportGridDao {
             Set<ReportGridCell> multiValueGridCells = isEmpty(multiValueAssessmentRatings)
                     ? emptySet()
                     : groupBy(
-                    multiValueAssessmentRatings,
-                    d -> tuple(d.get(ar.ASSESSMENT_DEFINITION_ID), d.get(ar.ENTITY_ID)),
-                    d -> tuple(d.get(ar.RATING_ID), d.get(ar.DESCRIPTION), d.get(rsi.NAME)))
-                    .entrySet()
-                    .stream()
-                    .map(e -> {
+                            multiValueAssessmentRatings,
+                            d -> tuple(d.get(ar.ASSESSMENT_DEFINITION_ID), d.get(ar.ENTITY_ID)),
+                            d -> tuple(d.get(ar.RATING_ID), d.get(ar.DESCRIPTION), d.get(rsi.NAME)))
+                        .entrySet()
+                        .stream()
+                        .map(e -> {
 
-                        Collection<Tuple3<Long, String, String>> values = e.getValue();
+                            Collection<Tuple3<Long, String, String>> values = e.getValue();
 
-                        Set<Long> ratingIds = map(values, v -> v.v1);
-                        String cellName = values
-                                .stream()
-                                .map(v -> v.v3)
-                                .sorted(Comparator.naturalOrder())
-                                .collect(joining(", "));
+                            Set<Long> ratingIds = map(values, v -> v.v1);
+                            String cellName = values
+                                    .stream()
+                                    .map(v -> v.v3)
+                                    .sorted(Comparator.naturalOrder())
+                                    .collect(joining(", "));
 
-                        Set<CellOption> options = map(values, v -> ImmutableCellOption.builder()
-                                .text(v.v3)
-                                .code(Long.toString(v.v1))
-                                .build());
+                            Set<CellOption> options = map(values, v -> ImmutableCellOption.builder()
+                                    .text(v.v3)
+                                    .code(Long.toString(v.v1))
+                                    .build());
 
-                        List<Tuple2<String, String>> commentRows = values
-                                .stream()
-                                .map(t -> tuple(t.v3, t.v2))
-                                .sorted(comparing(t -> t.v2))
-                                .collect(toList());
+                            List<Tuple2<String, String>> commentRows = values
+                                    .stream()
+                                    .map(t -> tuple(t.v3, t.v2))
+                                    .sorted(comparing(t -> t.v1))
+                                    .collect(toList());
 
-                        return ImmutableReportGridCell.builder()
-                                .subjectId(e.getKey().v2)
-                                .columnDefinitionId(assessmentIdToDefIdMap.get(e.getKey().v1))
-                                .ratingIdValues(ratingIds)
-                                .comment(toHtmlTable(ListUtilities.asList("Rating", "Comment"), commentRows))
-                                .textValue(cellName)
-                                .options(options)
-                                .build();
-                    })
-                    .collect(toSet());
+                            return ImmutableReportGridCell.builder()
+                                    .subjectId(e.getKey().v2)
+                                    .columnDefinitionId(assessmentIdToDefIdMap.get(e.getKey().v1))
+                                    .ratingIdValues(ratingIds)
+                                    .comment(toHtmlTable(ListUtilities.asList("Rating", "Comment"), commentRows))
+                                    .textValue(cellName)
+                                    .options(options)
+                                    .build();
+                        })
+                        .collect(toSet());
 
             return union(singleValueGridCells, multiValueGridCells);
         }
