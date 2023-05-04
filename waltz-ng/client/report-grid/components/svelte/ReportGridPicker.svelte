@@ -2,7 +2,6 @@
     import NoData from "../../../common/svelte/NoData.svelte";
     import _ from "lodash";
     import Icon from "../../../common/svelte/Icon.svelte";
-    import {selectedGrid} from "./report-grid-store";
     import SearchInput from "../../../common/svelte/SearchInput.svelte";
     import {termSearch} from "../../../common";
     import {truncateMiddle} from "../../../common/string-utils";

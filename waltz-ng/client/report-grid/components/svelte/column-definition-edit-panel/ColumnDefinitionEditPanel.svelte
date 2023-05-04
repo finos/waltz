@@ -8,7 +8,6 @@
     import FixedColumnDetailsEditor from "./FixedColumnDetailsEditor.svelte";
     import DerivedColumnDetailsEditor from "./DerivedColumnDetailsEditor.svelte";
     import NoData from "../../../../common/svelte/NoData.svelte";
-    import {activeSummaries, filters} from "../report-grid-store";
     import ColumnRemovalConfirmation from "./ColumnRemovalConfirmation.svelte";
     import Markdown from "../../../../common/svelte/Markdown.svelte";
     import {derivedColumnHelpText} from "./column-definition-utils";
@@ -68,8 +67,6 @@
                 toasts.success("Report grid columns updated successfully");
                 selectedColumn = null;
                 activeMode = Modes.VIEW;
-                $filters = [];
-                activeSummaries.set([]);
             })
             .catch(() => toasts.error("Unable to update report grid"));
     }

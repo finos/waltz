@@ -3,7 +3,6 @@
     import Icon from "../../../../common/svelte/Icon.svelte";
     import EntitySearchSelector from "../../../../common/svelte/EntitySearchSelector.svelte";
     import {personStore} from "../../../../svelte-stores/person-store";
-    import {selectedGrid} from "../report-grid-store";
 
     export let onCancel = () => console.log("Cancelling");
     export let onSelect = () => console.log("Selecting");
@@ -20,13 +19,13 @@
 </script>
 
 <div style="padding-bottom: 1em">
-    <strong>Adding a subscriber</strong> to grid: {$selectedGrid?.definition?.name || "unknown"}
+    Adding a subscriber to grid
 </div>
 <EntitySearchSelector entityKinds={['PERSON']}
                       on:select={selectPerson}/>
 <div class="help-block small">
     <Icon name="info-circle"/>
-    Search for a person to add as a subscriber to this grid. Once subscribed a user can be promoted to owner
+    Search for a person to add as a subscriber to this grid. Once subscribed, a user can be promoted to become an owner.
 </div>
 <br>
 {#if selectedPerson}

@@ -2,7 +2,6 @@
 
     import ReportGridPicker from "./ReportGridPicker.svelte";
     import NoData from "../../../common/svelte/NoData.svelte";
-    import {ownedReportIds} from "./report-grid-store";
     import {reportGridKinds} from "./report-grid-utils";
     import ReportGridEditor from "./ReportGridEditor.svelte";
     import ReportGridCloneConfirmation from "./ReportGridCloneConfirmation.svelte";
