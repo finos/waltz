@@ -19,7 +19,7 @@ This flexibility enables users to quickly and easily generate reports from a var
 
 Grids support a wide variety of fields related to the driving entity type, which can be either an application or a change initiative.
 
-![Field picker](images/field-picker.png)
+<img src="images/field-picker.png" height="600" alt="Field picker">
 
 After a field has been selected, the user can proceed to configure further details.
 The nature of these details may depend on the specific type of field that is being configured. For instance, the user might need to choose a particular assessment definition in order to complete the configuration.
@@ -36,7 +36,7 @@ Derived columns allows users to create new fields based on existing ones.
 Waltz uses a simple language ([JEXL](http://commons.apache.org/proper/commons-jexl/reference/syntax.html)) to evaluate expressions.
 
 
-<img src="images/derived-column-editor.png" width="920" alt="Derived column editor">
+<img src="images/derived-column-editor.png" height="700" alt="Derived column editor">
 
 #### Functions
 In addition to the core JEXL features Waltz offers the following functions and fields.
@@ -52,8 +52,20 @@ In addition to the core JEXL features Waltz offers the following functions and f
 | `mkResult(value, optText, optCode)`                  | creates a value to display in the cell with a given option text and code, these options will be used for filtering | `mkResult("Important", "Important Outcome", "L1")`                                             |
 | `allCellsProvided(c1, c2...)`                        | true if _all_ of the cells provided are non-null                                                                   | `allCellsProvided(c1, c2) ? mkResult("ALL") : null`                                            |
 | `anyCellsProvided(c1, c2...)`                        | true if _any_ of the cells provided are non-null                                                                   | `anyCellsProvided(c1, c2) ? mkResult("SOME") : null`                                           |
-| `cell(c)`                                            | the Cell object associated with the given column external id (or null)                                             | `cell("LER")`                                                                                  |
+| `cell(c)`                                            | the Cell object associated with the given column external id (or null). The next table has more information about cells | `cell("LER")`                                                                                  |
 | `numToOucome(val, [b1, outcome1, b2, outcome2, ...)` | takes a numeric value a list which specifies a boundary and the outcome for any value below that boundary          | `numToOutcome(cell('CTB').numberValue(), [ 0, "Zero", 100000, "smallish", 100000000, "big" ]`) |
+
+As described above the `cell(c)` method can be used to get a row cell object.
+The row cell object has the following properties/methods.  
+
+Property/Method | Description | _Example_ usage for field types
+--- | --- | ---
+`textValue()` | optional string value | `subjectName`, surveyResponses, ...
+`numberValue()` | optional numeic values | amount, complexity, ...
+`dateTimeValue()` | optional date values | attestation dates, survey submissions, ...
+`ratingIdValue()` | used to reference the values of rating cells | assessment cells, ...
+`comment()` | optional comment for the cell value | measurable ratings, assessments, ...
+
 
 ### Filters
 
