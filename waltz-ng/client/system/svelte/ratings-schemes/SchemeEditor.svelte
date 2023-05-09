@@ -11,7 +11,7 @@
         return [d.name, d.description];
     }
 
-    let workingCopy = _.pick(scheme, ["id", "name", "description"]);
+    let workingCopy = _.pick(scheme, ["id", "name", "externalId", "description"]);
     let savePromise = null;
 
     $: invalid = _.some(getRequiredFields(workingCopy), v => _.isEmpty(v));
@@ -42,6 +42,18 @@
                        bind:value={workingCopy.name}>
                 <div class="help-block">
                     Short name which describes this rating scheme
+                </div>
+
+                <label for="external-id">
+                    External ID
+                </label>
+                <input class="form-control"
+                       id="external-id"
+                       placeholder="External ID"
+                       bind:value={workingCopy.externalId}>
+                <div class="help-block">
+                    Optional external ID, typically used for integration with other systems.
+                    Be careful when changing this value, as it may break integrations.
                 </div>
 
                 <!-- DESCRIPTION -->
