@@ -66,11 +66,11 @@ progress and done issues.
 
 **Provisional** dates for upcoming releases:
 
-| Release | Date            | Summary                    |
-|---------|-----------------|----------------------------|
-| 1.49    | 30th May 2023   | tbd                        |
-| 1.50    | tbd             | tbd                        |
-| 1.51    | tbd             | tbd                        |
+| Release | Date            | Summary                                  |
+|---------|-----------------|------------------------------------------|
+| 1.50    | 30th May 2023   | Measurable ordering, navbar improvements |
+| 1.51    | tbd             | tbd                                      |
+| 1.52    | tbd             | tbd                                      |
 
 See the [releases](https://github.com/finos/waltz/releases) page for historic versions.
 
