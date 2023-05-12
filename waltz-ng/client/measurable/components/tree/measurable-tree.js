@@ -25,7 +25,9 @@ import {
     doSearch,
     prepareSearchNodes,
     determineExpandedNodes,
-    determineDepthLimit} from "../../../common/hierarchy-utils";
+    determineDepthLimit,
+    buildHierarchies2
+} from "../../../common/hierarchy-utils";
 import template from "./measurable-tree.html";
 
 
@@ -76,7 +78,7 @@ const recursivelySum = buildPropertySummer();
 
 
 function prepareTree(measurables = []) {
-    const hierarchy = buildHierarchies(measurables, false);
+    const hierarchy = buildHierarchies2(measurables, false);
     _.each(hierarchy, root => recursivelySum(root));
     return hierarchy;
 }

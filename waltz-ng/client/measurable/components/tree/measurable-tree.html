@@ -45,12 +45,12 @@
              tree-model="$ctrl.hierarchy"
              options="$ctrl.treeOptions"
              expanded-nodes="$ctrl.expandedNodes"
-             order-by="'-name'">
-    <span ng-class="{ 'text-muted': node.rating == null }"
+             order-by="'-data.name'">
+    <span ng-class="{ 'text-muted': node.data.rating == null }"
           class="no-overflow">
         <span ng-if="$ctrl.onSelect"
               class="clickable"
-              ng-click="$ctrl.onSelect(node)">
+              ng-click="$ctrl.onSelect(node.data)">
             <span ng-include="'wmt/measurable-node.html'"></span>
         </span>
         <a ng-if="!$ctrl.onSelect"
@@ -70,7 +70,7 @@
             'wmt-measurable-removed': node.entityLifecycleStatus === 'REMOVED',
             'wmt-measurable-pending': node.entityLifecycleStatus === 'PENDING'
           }">
-        <waltz-entity-icon-label entity-ref="node"
+        <waltz-entity-icon-label entity-ref="node.data"
                                  additional-display-data="[ { name: 'Number of apps', value: node.totalCount }]"
                                  icon-placement="none"
                                  tooltip-placement="right">
