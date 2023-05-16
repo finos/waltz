@@ -231,7 +231,7 @@ function controller($scope,
         description: `These operations introduce new elements in the taxonomy. They will
                 <strong>not</strong> result in data loss.`,
         color: "#0b8829",
-        options
+        options: [
             {
                 name: "Add Child",
                 code: "ADD_CHILD",
