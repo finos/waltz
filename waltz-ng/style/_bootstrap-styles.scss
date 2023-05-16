@@ -16,6 +16,8 @@
  *
  */
 
+@import "./_variables.scss";
+
 //
 // Dropdowns - used for the dropdown menu on top right.
 // --------------------------------------------------
@@ -33,9 +35,26 @@
     text-decoration: none;
 }
 
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+
 .dropdown-menu-items {
     border: none;
     border-top: 1px solid rgba(0, 0, 0, 0.15);
+    width: 300px;
+}
+
+.dropdown-menu > li {
+    margin: 4px;
+    @extend .no-overflow
+}
+
+.dropdown-menu > li waltz-icon {
+    @extend .text-muted;
+    @extend .small;
 }
 
 
@@ -44,6 +63,27 @@
     background-color: #f5f5f5;
 }
 
+.navbar-selected {
+
+    waltz-icon {
+        color: $waltz-yellow;
+    }
+
+    .navbar-title {
+        color: white;
+    }
+}
+
+.navbar .nav .open > a {
+
+    background-color: transparent !important; //prevents light blue background
+    @extend .navbar-selected;
+
+}
+
+.navbar-title {
+    @extend .hidden-xs, .hidden-sm, .hidden-md;
+}
 
 .tab-pane {
     border-left: 1px solid #ddd;
@@ -101,6 +141,36 @@
         color: #23527c;
     }
 }
+
+
+.btn-split {
+    padding-right: 0.2em !important;
+    display: inline-block !important;
+    margin-right: 0 !important;
+}
+
+
+.btn-split-toggle {
+    background: none;
+    border-left: 1px solid #ddd;
+    border-right: none;
+    border-top: none;
+    border-bottom: none;
+    outline: none;
+    color: #ddd;
+    transition: color 0.3s;
+    margin-left: 0 !important;
+
+    &:hover {
+        color: white;
+    }
+}
+
+
+.split-toggle-dropdown {
+    right: 0; //align with the right hand side of the toggle button
+}
+
 
 .row-mini-gutters {
     margin-right: 2px;

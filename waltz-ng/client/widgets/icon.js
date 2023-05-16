@@ -28,7 +28,7 @@ const bindings = {
 };
 
 
-const template = "<span style=\"font-size: smaller; opacity: 0.7;\"><i ng-class=\"$ctrl.classNames\"/></span>";
+const template = "<span style=\"font-size: smaller;\"><i ng-class=\"$ctrl.classNames\"/></span>";
 
 function controller() {
     const vm = this;
