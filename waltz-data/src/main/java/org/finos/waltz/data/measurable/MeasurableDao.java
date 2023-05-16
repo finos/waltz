@@ -38,7 +38,10 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
+import static org.finos.waltz.data.JooqUtilities.summarizeResults;
 import static org.finos.waltz.schema.Tables.*;
 import static org.finos.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
@@ -71,6 +74,7 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .lastUpdatedBy(r.getLastUpdatedBy())
                 .entityLifecycleStatus(readEnum(r.getEntityLifecycleStatus(), EntityLifecycleStatus.class, s -> EntityLifecycleStatus.ACTIVE))
                 .organisationalUnitId(r.getOrganisationalUnitId())
+                .position(r.getPosition())
                 .build();
     };
 
@@ -177,6 +181,7 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .set(MEASURABLE.PROVENANCE, "waltz")
                 .set(MEASURABLE.LAST_UPDATED_BY, measurable.lastUpdatedBy())
                 .set(MEASURABLE.LAST_UPDATED_AT, Timestamp.valueOf(measurable.lastUpdatedAt()))
+                .set(MEASURABLE.POSITION, measurable.position())
                 .returning(MEASURABLE.ID)
                 .fetchOne()
                 .getId();
@@ -295,4 +300,24 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
+
+    public int reorder(long categoryId,
+                       List<Long> ids,
+                       String userId) {
+
+        Timestamp now = DateTimeUtilities.nowUtcTimestamp();
+        AtomicInteger currPos = new AtomicInteger();
+
+        return summarizeResults(ids
+                .stream()
+                .map(id -> dsl
+                    .update(MEASURABLE)
+                    .set(MEASURABLE.POSITION, currPos.getAndIncrement())
+                    .set(MEASURABLE.LAST_UPDATED_BY, userId)
+                    .set(MEASURABLE.LAST_UPDATED_AT, now)
+                    .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId))
+                    .and(MEASURABLE.ID.eq(id)))
+                .collect(Collectors.collectingAndThen(Collectors.toSet(), dsl::batch))
+                .execute());
+    }
 }

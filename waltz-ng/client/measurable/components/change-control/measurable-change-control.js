@@ -23,8 +23,9 @@ import { toEntityRef } from "../../../common/entity-utils";
 import { determineColorOfSubmitButton } from "../../../common/severity-utils";
 import { buildHierarchies } from "../../../common/hierarchy-utils";
 import { displayError } from "../../../common/error-utils";
-import {getValidationErrorIfMeasurableChangeIsNotValid} from "../../measurable-change-utils";
+import { getValidationErrorIfMeasurableChangeIsNotValid } from "../../measurable-change-utils";
 import toasts from "../../../svelte-stores/toast-store";
+import ReorderMeasurables from "./ReorderMeasurables.svelte";
 
 
 const modes = {
@@ -36,6 +37,7 @@ const modes = {
 
 const bindings = {
     measurable: "<",
+    siblings: "<",
     changeDomain: "<",
     onSubmitChange: "<",
     pendingChanges: "<"
@@ -56,11 +58,14 @@ const initialState = {
     parent: null,
     root: rootNode,
     selectedOperation: null,
-    submitDisabled: true
+    submitDisabled: true,
+    ReorderMeasurables
 };
 
 
-function controller(serviceBroker,
+
+function controller($scope,
+                    serviceBroker,
                     userService) {
 
     const vm = initialiseData(this, initialState);
@@ -193,6 +198,30 @@ function controller(serviceBroker,
                     destinationId: d.destination.id,
                     destinationName: d.destination.name
                 })
+            }, {
+                name: "Reorder Siblings",
+                code: "REORDER_SIBLINGS",
+                icon: "random",
+                description: `Taxonomy items are naturally sorted alphabetically.  You may override this sorting to
+                    provide a closer alignment with the underlying domain`,
+                onChange: (newList) => {
+                    $scope.$applyAsync(() => {
+                        vm.submitDisabled = false;
+                        vm.commandParams.list = newList;
+                    });
+                },
+                onReset: () => {
+                    vm.submitDisabled = true;
+                    vm.commandParams.list = [];
+                },
+                onShow: () => {
+                    resetForm();
+                },
+                paramProcessor: (commandParams) => {
+                    return {
+                        list:  JSON.stringify(_.map(commandParams.list, d => d.id))
+                    }
+                }
             }
         ]
     };
@@ -202,7 +231,7 @@ function controller(serviceBroker,
         description: `These operations introduce new elements in the taxonomy. They will
                 <strong>not</strong> result in data loss.`,
         color: "#0b8829",
-        options: [
+        options
             {
                 name: "Add Child",
                 code: "ADD_CHILD",
@@ -323,6 +352,7 @@ function controller(serviceBroker,
 
 
 controller.$inject = [
+    "$scope",
     "ServiceBroker",
     "UserService"
 ];

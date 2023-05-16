@@ -20,6 +20,7 @@ import template from "./pending-taxonomy-changes-sub-section.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {determineColorOfSubmitButton} from "../../../common/severity-utils";
+import {displayError, mkErrorMessage} from "../../../common/error-utils";
 
 
 const bindings = {
@@ -64,6 +65,14 @@ function controller(serviceBroker) {
             .then(r => {
                 vm.preview = r.data;
                 vm.submitButtonClass = determineColorOfSubmitButton(_.map(vm.preview.impacts, "severity"));
+            })
+            .catch(e => {
+                displayError("Could not preview command", e);
+                vm.preview = {
+                    command:{},
+                    impacts: [],
+                    errorMessage: mkErrorMessage("Could not preview command", e)
+                };
             });
     };
 

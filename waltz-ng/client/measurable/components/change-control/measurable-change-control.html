@@ -107,6 +107,17 @@
 
 
 <script type="text/ng-template"
+        id="wmcc/REORDER_SIBLINGS.html">
+    <p>
+        Reordering siblings of node:
+        <kbd ng-bind="$ctrl.measurable.name"></kbd>
+    </p>
+    <div ng-include="'wmcc/_REORDER_SIBLINGS.html'">
+    </div>
+</script>
+
+
+<script type="text/ng-template"
         id="wmcc/REMOVE.html">
     <p>
         Remove node:
@@ -342,6 +353,18 @@
             </waltz-toggle>
         </div>
     </div>
+</script>
+
+<script type="text/ng-template"
+        id="wmcc/_REORDER_SIBLINGS.html">
+    <p class="help-block">
+        Drag and drop the list below, when finished click 'Submit change'.
+    </p>
+
+    <waltz-svelte-component component="$ctrl.ReorderMeasurables"
+                            list="$ctrl.siblings"
+                            on-reorder="$ctrl.selectedOperation.onChange">
+    </waltz-svelte-component>
 </script>
 
 

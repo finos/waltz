@@ -26,4 +26,65 @@
         <tagDatabase tag="v1.49"/> <!-- tag the current db version, i.e. the last  -->
     </changeSet>
 
+    <changeSet id="20230515-92-1"
+               author="davidwatkins73">
+        <addColumn tableName="measurable">
+            <column name="position"
+                    type="${int.type}"
+                    defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20230515-92-2"
+               author="davidwatkins73">
+        <setTableRemarks tableName="measurable"
+                         remarks="defines a survey template, questions and runs will refer to this"/>
+        <setColumnRemarks tableName="measurable"
+                          columnName="id"
+                          remarks="unique identifier for this measurable record within waltz"/>
+        <setColumnRemarks tableName="measurable"
+                          columnName="parent_id"
+                          remarks="the id of the parent measurable"/>
+        <setColumnRemarks tableName="measurable"
+                          columnName="concrete"
+                          remarks="indicates whether this node in the taxonomy should be viewed as abstract or concrete.  Abstract measurables are typically not usable in ratings etc."/>
+        <setColumnRemarks tableName="measurable"
+                          columnName="description"
+                          remarks="description of the measurable item, markdown supported"/>
+        <setColumnRemarks tableName="measurable"
+                          columnName="external_id"
+                          remarks="identifier this measurable is known by externally.  Should not change, unlike the name which may change."/>
+        <setColumnRemarks tableName="measurable"
+                          columnName="external_id"
+                          remarks="identifier this measurable is known by externally.  Should not change, unlike the name which may change."/>
+        <setColumnRemarks tableName="measurable"
+                          columnName="last_updated_by"
+                          remarks="the last user to update this measurable record"/>
+        <setColumnRemarks tableName="measurable"
+                          columnName="last_updated_at"
+                          remarks="the datetime this measurable record was last updated"/>
+        <setColumnRemarks tableName="measurable"
+                          columnName="provenance"
+                          remarks="origination of this measurable record"/>
+        <setColumnRemarks tableName="measurable"
+                          columnName="measurable_category_id"
+                          remarks="the category groups a set of related measurables into a single taxonomy, e.g. Process"/>
+        <setColumnRemarks tableName="measurable"
+                          columnName="external_parent_id"
+                          remarks="external identifier of this items parent node, if available"/>
+        <setColumnRemarks tableName="measurable"
+                          columnName="entity_lifecycle_status"
+                          remarks="the lifecycle state of this measurable record (one of: ACTIVE, PENDING, REMOVED)"/>
+        <setColumnRemarks tableName="measurable"
+                          columnName="position"
+                          remarks="numeric position of this measurable, overrides the natural sorting on name. Suggest these are assigned with gaps so that reorders are simpler, e.g. 10, 20, 30"/>
+        <setColumnRemarks tableName="measurable"
+                          columnName="name"
+                          remarks="the name to show for this measurable item, should be relatively short"/>
+
+    </changeSet>
+
+
 </databaseChangeLog>

@@ -21,6 +21,9 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import template from "./measurable-category-edit.html";
 import {toEntityRef} from "../../../common/entity-utils";
 import toasts from "../../../svelte-stores/toast-store";
+import {writable} from "svelte/store";
+import {setContext} from "svelte";
+import {listKey} from "../../../measurable/components/change-control/measurable-change-utils";
 
 
 const modes = {
@@ -34,6 +37,7 @@ const initialState = {
     changeDomain: null,
     measurables: [],
     selectedMeasurable: null,
+    selectedSiblings: [],
     selectedChange: null,
     recentlySelected: [],
     pendingChanges: [],
@@ -72,6 +76,7 @@ function controller($q,
     const clearSelections = () => {
         vm.selectedMeasurable = null;
         vm.selectedChange = null;
+        vm.selectedSiblings = [];
     };
 
     const reloadMeasurables = () => {
@@ -101,6 +106,11 @@ function controller($q,
         vm.mode = modes.NODE_VIEW;
         vm.recentlySelected = _.unionBy(vm.recentlySelected, [treeNode], d => d.id);
         vm.selectedMeasurable = treeNode;
+        vm.selectedSiblings = _
+            .chain(vm.measurables)
+            .filter(d => d.parentId === treeNode.parentId)
+            .orderBy([d => d.position, d => d.name])
+            .value();
     };
 
     vm.onDiscardPendingChange = (change) => {

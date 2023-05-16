@@ -45,7 +45,7 @@
              tree-model="$ctrl.hierarchy"
              options="$ctrl.treeOptions"
              expanded-nodes="$ctrl.expandedNodes"
-             order-by="'-name'">
+             order-by="['-position', '-name']">
     <span ng-class="{ 'text-muted': node.rating == null }"
           class="no-overflow">
         <span ng-if="$ctrl.onSelect"
