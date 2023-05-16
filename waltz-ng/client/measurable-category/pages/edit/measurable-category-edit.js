@@ -21,9 +21,6 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import template from "./measurable-category-edit.html";
 import {toEntityRef} from "../../../common/entity-utils";
 import toasts from "../../../svelte-stores/toast-store";
-import {writable} from "svelte/store";
-import {setContext} from "svelte";
-import {listKey} from "../../../measurable/components/change-control/measurable-change-utils";
 
 
 const modes = {
