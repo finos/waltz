@@ -18,12 +18,14 @@
 
 <ul class="nav navbar-nav navbar-right"
     style="padding-right: 20px">
-    <li>
+    <li ng-class="{'navbar-selected': $ctrl.visibility.overlay}">
         <a class="clickable"
            data-testid="search-button"
            ng-click="$ctrl.showSearch()">
             <waltz-icon size="lg" name="search"></waltz-icon>
-            Search
+            <span class="navbar-title">
+                Search
+            </span>
             <b class="caret"></b>
         </a>
     </li>
