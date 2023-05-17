@@ -60,6 +60,23 @@
         .filter(selectionFilter)
         .orderBy(d => d.name)
         .value();
+
+
+    function selectAttestation(d) {
+
+        const col = {
+
+            kind: d.kind,
+            columnEntityKind: d.columnEntityKind,
+            columnEntityId: d.columnEntityId,
+            columnQualifierKind: d.columnQualifierKind,
+            columnQualifierId: d.columnQualifierId,
+            columnName: d.columnName,
+        }
+
+        return onSelect(col);
+    }
+
 </script>
 
 <div class="help-block small">
@@ -69,4 +86,4 @@
 <br>
 <Grid columnDefs={columnDefs}
       rowData={rowData}
-      onSelectRow={onSelect}/>
+      onSelectRow={selectAttestation}/>
