@@ -20,6 +20,7 @@ package org.finos.waltz.model.taxonomy_management;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.finos.waltz.model.Nullable;
 import org.immutables.value.Value;
 
 import java.util.List;
@@ -31,4 +32,7 @@ public abstract class TaxonomyChangePreview {
 
     public abstract TaxonomyChangeCommand command();
     public abstract List<TaxonomyChangeImpact> impacts();
+
+    @Nullable
+    public abstract String errorMessage();
 }

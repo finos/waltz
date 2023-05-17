@@ -40,6 +40,7 @@ import java.util.function.Function;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.ListUtilities.isEmpty;
 import static org.finos.waltz.model.EntityReference.mkRef;
 
 
@@ -186,6 +187,30 @@ public class MeasurableService {
         return measurableDao.updateParentId(measurableId, destinationId, userId);
     }
 
+
+    public boolean reorder(long categoryId,
+                           List<Long> ids,
+                           String userId) {
+        if (isEmpty(ids)) {
+            return true;
+        }
+
+        measurableDao.reorder(
+                categoryId,
+                ids,
+                userId);
+
+        changeLogService.write(ImmutableChangeLog.builder()
+                .severity(Severity.INFORMATION)
+                .userId(userId)
+                .operation(Operation.UPDATE)
+                .parentReference(mkRef(EntityKind.MEASURABLE_CATEGORY, categoryId))
+                .createdAt(DateTimeUtilities.nowUtc())
+                .message(format("Reordered %d measurables", ids.size()))
+                .build());
+
+        return true;
+    }
 
     // --- helpers ---
 

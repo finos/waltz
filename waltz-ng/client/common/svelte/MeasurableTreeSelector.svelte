@@ -38,9 +38,10 @@
 </script>
 
 <SearchInput bind:value={qry}/>
-
-<MeasurableTreeNode {tree}
-                    {depth}
-                    {expanded}
-                    {onSelect}
-                    {onDeselect}/>
+<div style="margin-top: 0.5em;">
+    <MeasurableTreeNode {tree}
+                        {depth}
+                        {expanded}
+                        {onSelect}
+                        {onDeselect}/>
+</div>

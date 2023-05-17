@@ -21,7 +21,7 @@
              expanded-nodes="$ctrl.expandedNodes"
              options="$ctrl.treeOptions"
              on-selection="$ctrl.onSelect(node)"
-             order-by="'-name'">
+             order-by="['-position', '-name']">
         <span class="no-overflow">
             <span ng-bind="node.displayName"
                   uib-popover-template="'wrmt-popover.html'"

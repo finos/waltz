@@ -30,7 +30,7 @@
         <select id="selectedCategory"
                 bind:value={selectedCategory}
                 class="form-control">
-            {#each alignments as alignment}
+            {#each _.orderBy(alignments, [d => d.categoryReference.name]) as alignment}
                 <option value={alignment.categoryReference}>
                     {alignment.categoryReference.name}
                 </option>

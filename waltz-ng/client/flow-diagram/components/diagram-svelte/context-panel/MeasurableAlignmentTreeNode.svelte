@@ -9,7 +9,7 @@
     export let isRoot = false;
     export let applicationsByMeasurableId;
 
-    $: sortedNodes = _.orderBy(childNodes, d => d.name);
+    $: sortedNodes = _.orderBy(childNodes, [d => d.position, d => d.name]);
 
     const dispatcher = createEventDispatcher();
 
