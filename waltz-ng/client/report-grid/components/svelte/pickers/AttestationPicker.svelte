@@ -72,6 +72,8 @@
             columnQualifierKind: d.columnQualifierKind,
             columnQualifierId: d.columnQualifierId,
             columnName: d.columnName,
+            displayName: null,
+            entityFieldReference: null,
         }
 
         return onSelect(col);

@@ -662,13 +662,13 @@ public class ReportGridDao {
                 DSL.castNull(DSL.field("id", Long.class)),
                 DSL.inline(EntityKind.LOGICAL_DATA_FLOW.name()),
                 DSL.inline("Logical Flow Attestation"),
-                DSL.inline("Logical Flow Attestation"));
+                DSL.inline("Logical Flows: Last Attestation"));
 
         Row4<Long, String, String, String> pfRow = DSL.row(
                 DSL.castNull(DSL.field("id", Long.class)),
                 DSL.inline(EntityKind.PHYSICAL_FLOW.name()),
                 DSL.inline("Physical Flow Attestation"),
-                DSL.inline("Physical Flow Attestation"));
+                DSL.inline("Physical Flows: Last Attestation"));
 
         Table<Record4<Long, String, String, String>> fixed = DSL
                 .values(lfRow, pfRow)
