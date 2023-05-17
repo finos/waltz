@@ -17,23 +17,22 @@
   -->
 
 <ul class="nav navbar-nav navbar-right">
-    <li class="dropdown" uib-dropdown>
+    <li class="dropdown" uib-dropdown
+        ui-sref-active="navbar-selected">
         <a class="clickable"
            ng-click="ctrl.refreshHistory()"
            uib-dropdown-toggle>
             <waltz-icon size="lg" name="history"></waltz-icon>
-            Recent
+            <span class="navbar-title">
+                Recent
+            </span>
             <b class="caret"></b>
         </a>
         <ul class="dropdown-menu dropdown-menu-items"
             uib-dropdown-menu
-            style="width: 400px;"
             role="menu">
-            <li style="margin: 4px;"
-                class="no-overflow"
-                ng-repeat="item in ctrl.history">
-                <a class="no-overflow"
-                   ui-sref="{{ ::item.state }} (::item.stateParams)">
+            <li ng-repeat="item in ctrl.history">
+                <a ui-sref="{{ ::item.state }} (::item.stateParams)">
                     <waltz-icon class='text-muted small'
                                 fixed-width="true"
                                 name="{{ item.kind | toIconName:'entity' }}"></waltz-icon>

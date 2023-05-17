@@ -26,7 +26,6 @@ const navItems = [
     { uiSref: "main.org-unit.list", icon: "sitemap", displayName: "Org Units", id: "navbar-org-units" },
     { uiSref: "main.person", icon: "users", displayName: "People", id: "navbar-people" },
     { uiSref: "main.data-type.list", icon: "qrcode", displayName: "Data", id: "navbar-data-types" },
-    { uiSref: "main.measurable-category.index", icon: "puzzle-piece", displayName: "Other Viewpoints", id: "navbar-measurables" },
 ];
 
 
@@ -58,7 +57,6 @@ function controller(settingsService, userService) {
         .then(user => {
             vm.navItemsForRole = getNavItemsFilteredByRole(userService, user, navItems);
         });
-
 }
 
 
