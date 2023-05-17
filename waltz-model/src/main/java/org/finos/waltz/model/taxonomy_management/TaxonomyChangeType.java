@@ -22,13 +22,14 @@ public enum TaxonomyChangeType {
 
     ADD_PEER,
     ADD_CHILD,
-    REMOVE,
     DEPRECATE,
+    MOVE,
+    MERGE,
+    REMOVE,
+    REORDER_SIBLINGS,
     UPDATE_NAME,
     UPDATE_DESCRIPTION,
     UPDATE_CONCRETENESS,
-    UPDATE_EXTERNAL_ID,
-    MOVE,
-    MERGE
+    UPDATE_EXTERNAL_ID
 
 }

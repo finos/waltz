@@ -53,11 +53,11 @@
 
 <div class="waltz-scroll-region-250">
     <MeasurableAlignmentTreeNode isRoot={true}
-                        node={root}
-                        childNodes={displayedHierarchy}
-                        expanded={expanded}
-                        on:select={selectNode}
-                        {applicationsByMeasurableId}>
+                                 node={root}
+                                 childNodes={displayedHierarchy}
+                                 expanded={expanded}
+                                 on:select={selectNode}
+                                 {applicationsByMeasurableId}>
     </MeasurableAlignmentTreeNode>
 </div>
 

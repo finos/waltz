@@ -45,6 +45,15 @@
             <h4>Preview of impacts</h4>
             <waltz-taxonomy-change-command-preview preview="$ctrl.preview">
             </waltz-taxonomy-change-command-preview>
+
+            <!-- PREVIEW HAS ERRORS -->
+            <div ng-if="$ctrl.preview.errorMessage"
+                 style="margin-top: 0.5em; margin-bottom: 1em; border: 2px solid red; background-color: #fce8e8; border-radius: 2px;">
+                <div style="margin: 0.5em 1em;">
+                    <div style="font-size: large">Error</div>
+                    <span style="margin-top: 0.5em;" ng-bind="$ctrl.preview.errorMessage"></span>
+                </div>
+            </div>
         </div>
 
 
@@ -52,6 +61,7 @@
         <div ng-if="$ctrl.preview">
             <span>
                 <button class="btn btn-sm"
+                        ng-disabled="$ctrl.preview.errorMessage"
                         ng-click="$ctrl.onApplyPendingChange($ctrl.selectedPendingChange)"
                         ng-class="$ctrl.submitButtonClass">
                     Apply change now

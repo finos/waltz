@@ -18,8 +18,7 @@
 
 package org.finos.waltz.service.taxonomy_management;
 
-import org.finos.waltz.service.measurable.MeasurableService;
-import org.finos.waltz.service.measurable_rating.MeasurableRatingService;
+import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.HierarchyQueryScope;
 import org.finos.waltz.model.IdSelectionOptions;
@@ -29,12 +28,17 @@ import org.finos.waltz.model.measurable_rating.MeasurableRating;
 import org.finos.waltz.model.taxonomy_management.ImmutableTaxonomyChangeImpact;
 import org.finos.waltz.model.taxonomy_management.ImmutableTaxonomyChangePreview;
 import org.finos.waltz.model.taxonomy_management.TaxonomyChangeCommand;
+import org.finos.waltz.service.measurable.MeasurableService;
+import org.finos.waltz.service.measurable_rating.MeasurableRatingService;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.Checks.checkTrue;
+import static java.lang.String.format;
+import static org.finos.waltz.common.Checks.*;
+import static org.finos.waltz.common.SetUtilities.fromCollection;
+import static org.finos.waltz.common.SetUtilities.minus;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 
 public class TaxonomyManagementUtilities {
@@ -45,6 +49,23 @@ public class TaxonomyManagementUtilities {
         long measurableId = cmd.primaryReference().id();
         long categoryId = cmd.changeDomain().id();
         return validateMeasurableInCategory(measurableService, measurableId, categoryId);
+    }
+
+    public static void validateMeasurablesInCategory(MeasurableService measurableService,
+                                                        List<Long> ids,
+                                                        long categoryId) {
+        List<Measurable> allMeasurablesInCategory = measurableService.findByCategoryId(categoryId);
+
+        checkEmpty(
+            minus(
+                fromCollection(ids),
+                SetUtilities.map(
+                    allMeasurablesInCategory,
+                    m -> m.id().get())),
+            format(
+                "Not all measurables: (%s) in category: %d",
+                ids.toString(),
+                categoryId));
     }
 
 
