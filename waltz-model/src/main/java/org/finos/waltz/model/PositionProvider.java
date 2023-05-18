@@ -19,8 +19,13 @@
 package org.finos.waltz.model;
 
 
+import org.immutables.value.Value;
+
 public interface PositionProvider {
 
-    int position();
+    @Value.Default
+    default int position() {
+        return 0;
+    }
 
 }

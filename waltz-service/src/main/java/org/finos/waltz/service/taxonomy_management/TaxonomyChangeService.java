@@ -93,7 +93,15 @@ public class TaxonomyChangeService {
 
     public TaxonomyChangePreview previewById(long id) {
         TaxonomyChangeCommand command = taxonomyChangeDao.getDraftCommandById(id);
-        return preview(command);
+        try {
+            return preview(command);
+        } catch (Exception e) {
+            return ImmutableTaxonomyChangePreview
+                    .builder()
+                    .command(command)
+                    .errorMessage(e.getMessage())
+                    .build();
+        }
     }
 
 

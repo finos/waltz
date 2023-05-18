@@ -41,7 +41,7 @@
 {#if expanded || tree.isExpanded}
     {#if tree.children}
         <ul class:root={depth === 0}>
-            {#each tree.children as child}
+            {#each _.sortBy(tree.children, [d => d.position, d => d.name]) as child}
                 <li style="white-space: nowrap">
                     <svelte:self tree={child}
                                  depth={++depth}

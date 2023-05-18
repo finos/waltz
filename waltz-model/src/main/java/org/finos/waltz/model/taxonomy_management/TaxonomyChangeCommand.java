@@ -18,15 +18,19 @@
 
 package org.finos.waltz.model.taxonomy_management;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.*;
 import org.finos.waltz.model.command.Command;
 import org.immutables.value.Value;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.finos.waltz.common.Checks.checkTrue;
+import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.finos.waltz.common.StringUtilities.isEmpty;
 
 @Value.Immutable
@@ -97,6 +101,16 @@ public abstract class TaxonomyChangeCommand implements
     public Long paramAsLong(String key, Long dflt) {
         String strVal = params().get(key);
         return isEmpty(strVal) ? dflt : Long.valueOf(strVal);
+    }
+
+    public List<Long> paramAsLongList(String key) throws JsonProcessingException {
+        String strVal = params().get(key);
+        List<?> list = getJsonMapper().readValue(strVal, List.class);
+
+        return list
+                .stream()
+                .map(l -> Long.parseLong(l.toString()))
+                .collect(Collectors.toList());
     }
 
 
