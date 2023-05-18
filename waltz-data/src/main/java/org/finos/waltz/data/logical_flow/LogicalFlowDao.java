@@ -75,6 +75,16 @@ public class LogicalFlowDao {
             LOGICAL_FLOW.TARGET_ENTITY_KIND,
             newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
 
+    private static final Field<String> SOURCE_EXTERNAL_ID_FIELD = InlineSelectFieldFactory.mkExternalIdField(
+            LOGICAL_FLOW.SOURCE_ENTITY_ID,
+            LOGICAL_FLOW.SOURCE_ENTITY_KIND,
+            newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
+
+    private static final Field<String> TARGET_EXTERNAL_ID_FIELD = InlineSelectFieldFactory.mkExternalIdField(
+            LOGICAL_FLOW.TARGET_ENTITY_ID,
+            LOGICAL_FLOW.TARGET_ENTITY_KIND,
+            newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
+
 
     public static final RecordMapper<Record, LogicalFlow> TO_DOMAIN_MAPPER = r -> {
         LogicalFlowRecord record = r.into(LogicalFlowRecord.class);
@@ -85,11 +95,13 @@ public class LogicalFlowDao {
                         .kind(EntityKind.valueOf(record.getSourceEntityKind()))
                         .id(record.getSourceEntityId())
                         .name(ofNullable(r.getValue(SOURCE_NAME_FIELD)))
+                        .externalId(ofNullable(r.getValue(SOURCE_EXTERNAL_ID_FIELD)))
                         .build())
                 .target(ImmutableEntityReference.builder()
                         .kind(EntityKind.valueOf(record.getTargetEntityKind()))
                         .id(record.getTargetEntityId())
                         .name(ofNullable(r.getValue(TARGET_NAME_FIELD)))
+                        .externalId(ofNullable(r.getValue(TARGET_EXTERNAL_ID_FIELD)))
                         .build())
                 .entityLifecycleStatus(readEnum(record.getEntityLifecycleStatus(), EntityLifecycleStatus.class, s -> EntityLifecycleStatus.ACTIVE))
                 .lastUpdatedBy(record.getLastUpdatedBy())
@@ -413,6 +425,7 @@ public class LogicalFlowDao {
         return dsl
                 .select(LOGICAL_FLOW.fields())
                 .select(SOURCE_NAME_FIELD, TARGET_NAME_FIELD)
+                .select(SOURCE_EXTERNAL_ID_FIELD, TARGET_EXTERNAL_ID_FIELD)
                 .from(LOGICAL_FLOW);
     }
 
