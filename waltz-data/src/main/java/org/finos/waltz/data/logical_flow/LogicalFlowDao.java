@@ -81,9 +81,9 @@ public class LogicalFlowDao {
             newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
 
     private static final Field<String> TARGET_EXTERNAL_ID_FIELD = InlineSelectFieldFactory.mkExternalIdField(
-                    LOGICAL_FLOW.TARGET_ENTITY_ID,
-                    LOGICAL_FLOW.TARGET_ENTITY_KIND,
-                    newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
+            LOGICAL_FLOW.TARGET_ENTITY_ID,
+            LOGICAL_FLOW.TARGET_ENTITY_KIND,
+            newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
 
 
     public static final RecordMapper<Record, LogicalFlow> TO_DOMAIN_MAPPER = r -> {
