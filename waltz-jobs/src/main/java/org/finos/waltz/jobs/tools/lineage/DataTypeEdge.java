@@ -1,4 +1,4 @@
-package org.finos.waltz.jobs.tools.graph;
+package org.finos.waltz.jobs.tools.lineage;
 
 import org.jgrapht.graph.DefaultEdge;
 

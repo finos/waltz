@@ -1,4 +1,4 @@
-package org.finos.waltz.jobs.tools.graph;
+package org.finos.waltz.jobs.tools.lineage;
 
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.application.Application;

@@ -16,11 +16,9 @@
  *
  */
 
-package org.finos.waltz.jobs.tools.graph;
+package org.finos.waltz.jobs.tools.lineage;
 
-import org.finos.waltz.common.ListUtilities;
-import org.finos.waltz.common.MapUtilities;
-import org.finos.waltz.common.SetUtilities;
+import org.finos.waltz.common.*;
 import org.finos.waltz.data.application.ApplicationDao;
 import org.finos.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowDao;
@@ -44,13 +42,9 @@ import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.supercsv.cellprocessor.constraint.NotNull;
-import org.supercsv.cellprocessor.ift.CellProcessor;
-import org.supercsv.io.CsvListReader;
-import org.supercsv.io.ICsvListReader;
-import org.supercsv.prefs.CsvPreference;
+import org.springframework.core.io.Resource;
 
-import java.io.FileReader;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.*;
@@ -59,10 +53,12 @@ import java.util.stream.Stream;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toSet;
+import static org.finos.waltz.common.IOUtilities.getFileResource;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.MapUtilities.indexBy;
+import static org.finos.waltz.common.StringUtilities.safeTrim;
 
-public class DataFlowsBetweenApps {
+public class LineageDiscoveryReport {
 
     // these are read from inputs.csv
 //    private static Tuple2<ExternalIdValue,ExternalIdValue>[] sourceTargetCodes = new Tuple2[] {
@@ -83,14 +79,14 @@ public class DataFlowsBetweenApps {
             "Target Asset Code",
             "Non Strict Route");
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws IOException {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         LogicalFlowDao logicalFlowDao = ctx.getBean(LogicalFlowDao.class);
         LogicalFlowDecoratorDao logicalFlowDecoratorDao = ctx.getBean(LogicalFlowDecoratorDao.class);
         ApplicationDao applicationDao = ctx.getBean(ApplicationDao.class);
 
-        // read data from CSV
-        List<Tuple2<ExternalIdValue, ExternalIdValue>> sourceTargetCodes = readWithCsvListReader("C:\\Users\\User\\IdeaProjects\\waltz\\waltz-jobs\\src\\main\\java\\org\\finos\\waltz\\jobs\\tools\\graph\\input.csv");
+        // read publisher / consumer pairs from CSV
+        Set<Tuple2<ExternalIdValue, ExternalIdValue>> sourceTargetCodes = parsePublisherConsumers("lineage/publishers_consumers.csv");
         if(sourceTargetCodes.isEmpty()) {
             System.out.println("No input data");
             return;
@@ -140,7 +136,7 @@ public class DataFlowsBetweenApps {
                                                 List<Application> allApplications,
                                                 List<LogicalFlow> flows,
                                                 List<DataTypeDecorator> dataTypeDecorators,
-                                                List<Tuple2<ExternalIdValue, ExternalIdValue>> sourceTargetCodes) {
+                                                Set<Tuple2<ExternalIdValue, ExternalIdValue>> sourceTargetCodes) {
 
         List<RouteLookup> routeLookups = new ArrayList<>(sourceTargetCodes.size());
 
@@ -270,31 +266,19 @@ public class DataFlowsBetweenApps {
     }
 
 
-    private static List<Tuple2<ExternalIdValue, ExternalIdValue>> readWithCsvListReader(String filename) throws Exception {
-        final CellProcessor[] processors = new CellProcessor[] {
-                new NotNull(), // source
-                new NotNull(), // target
-        };
-
-        ICsvListReader listReader = null;
-        try {
-            listReader = new CsvListReader(new FileReader(filename), CsvPreference.STANDARD_PREFERENCE);
-
-            listReader.getHeader(true); // skip the header (can't be used with CsvListReader)
-
-            List<Tuple2<ExternalIdValue,ExternalIdValue>> tuples = new ArrayList<>();
-            List<Object> appList;
-            while( (appList = listReader.read(processors)) != null ) {
-                Tuple2<ExternalIdValue, ExternalIdValue> st = Tuple.tuple(ExternalIdValue.of(appList.get(0).toString()), ExternalIdValue.of(appList.get(1).toString()));
-                tuples.add(st);
-            }
-            return tuples;
-        }
-        finally {
-            if( listReader != null ) {
-                listReader.close();
-            }
-        }
+    private static Set<Tuple2<ExternalIdValue, ExternalIdValue>> parsePublisherConsumers(String resourcePath) throws IOException {
+        Resource resource = getFileResource(resourcePath);
+        List<String> lines = IOUtilities.readLines(resource.getInputStream());
+        Set<Tuple2<ExternalIdValue, ExternalIdValue>> tuples = lines
+                .stream()
+                .filter(StringUtilities::notEmpty)
+                .skip(1) // skip the header
+                .map(line -> line.split(","))
+                .map(arr -> Tuple.tuple(
+                        ExternalIdValue.of(safeTrim(arr[0])),
+                        ExternalIdValue.of(safeTrim(arr[1]))))
+                .collect(toSet());
+        return tuples;
     }
 
 
