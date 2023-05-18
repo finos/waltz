@@ -43,41 +43,42 @@ import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.core.io.Resource;
+import org.supercsv.io.CsvListWriter;
+import org.supercsv.prefs.CsvPreference;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.IOUtilities.getFileResource;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.StringUtilities.safeTrim;
+import static org.jooq.lambda.fi.util.function.CheckedConsumer.unchecked;
 
 public class LineageDiscoveryReport {
 
-    // these are read from inputs.csv
-//    private static Tuple2<ExternalIdValue,ExternalIdValue>[] sourceTargetCodes = new Tuple2[] {
-//        Tuple.tuple(ExternalIdValue.of("wltz-01"), ExternalIdValue.of("wltz-087")),
-//        Tuple.tuple(ExternalIdValue.of("wltz-02"), ExternalIdValue.of("wltz-087")),
-//        Tuple.tuple(ExternalIdValue.of("wltz-03"), ExternalIdValue.of("wltz-087")),
-//        Tuple.tuple(ExternalIdValue.of("wltz-053"), ExternalIdValue.of("wltz-087")),
-//        Tuple.tuple(ExternalIdValue.of("wltz-049"), ExternalIdValue.of("wltz-087")),
-//        Tuple.tuple(ExternalIdValue.of("wltz-054"), ExternalIdValue.of("wltz-087")),
-//        Tuple.tuple(ExternalIdValue.of("wltz-042"), ExternalIdValue.of("wltz-096"))
-//    };
-
 
     private static List<String> staticHeaders = newArrayList(
-            "Source",
-            "Source Asset Code",
-            "Target",
-            "Target Asset Code",
-            "Non Strict Route");
+            "Publisher",
+            "Publisher Asset Code",
+            "Consumer",
+            "Consumer Asset Code",
+            "Non-Strict Lineage",
+            "Non-Strict Hops",
+            "Strict Lineage",
+            "Strict DataType",
+            "Strict Hops",
+            "Confidence"
+    );
 
     public static void main(String[] args) throws IOException {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
@@ -98,38 +99,100 @@ public class LineageDiscoveryReport {
         List<DataTypeDecorator> allDecorators = logicalFlowDecoratorDao.findAll();
 
         List<RouteLookup> routeLookups = FindRoutes(logicalFlowDecoratorDao, allApplications, allActiveFlows, allDecorators, sourceTargetCodes);
-//        List<List<Object>> rows = prepareReportRows(routeLookups);
+        List<List<Object>> rows = prepareReportRows(routeLookups);
 
-//        byte[] excelReport = mkExcelReport("output", rows, staticHeaders);
-//        Files.write(Paths.get("output.xlsx"), excelReport);
+        byte[] excelReport = mkCSVReport(staticHeaders, rows);
+        Files.write(Paths.get("output.csv"), excelReport);
         System.out.println("Completed processing");
     }
 
 
-//    private static List<List<Object>> prepareReportRows(List<RouteLookup> routeLookups) {
-//
-//        return routeLookups
-//                .stream()
-//                .map(row -> {
-//                    ArrayList<Object> reportRow = new ArrayList<>();
-//
-//                    reportRow.add(row.sourceApp().map(a -> a.name()).orElse("Not Found"));
-//                    reportRow.add(row.source().value());
-//
-//                    reportRow.add(row.targetApp().map(a -> a.name()).orElse("Not Found"));
-//                    reportRow.add(row.target().value());
-//
-//                    Tuple2<Graph<EntityReference, DataTypeEdge>, GraphPath<EntityReference, DataTypeEdge>> nonStrict = row.nonStrictRoute().get();
-//                    if(nonStrict != null) {
-//                        reportRow.add(routeToString(nonStrict.v1, nonStrict.v2));
-//                    } else {
-//                        reportRow.add(null);
-//                    }
-//
-//                    return reportRow;
-//                })
-//                .collect(toList());
-//    }
+    private static List<List<Object>> prepareReportRows(List<RouteLookup> routeLookups) {
+
+        List<List<Object>> collect = routeLookups
+                .stream()
+                .flatMap(row -> {
+                    ArrayList<Object> reportRow = new ArrayList<>();
+
+                    // publisher
+                    reportRow.add(row.sourceApp().map(a -> a.name()).orElse("Not Found"));
+                    reportRow.add(row.source().value());
+
+                    // consumer
+                    reportRow.add(row.targetApp().map(a -> a.name()).orElse("Not Found"));
+                    reportRow.add(row.target().value());
+
+                    // non-strict
+                    Tuple2<Graph<EntityReference, DataTypeEdge>, GraphPath<EntityReference, DataTypeEdge>> nonStrict = row.nonStrictRoute().get();
+                    reportRow.add(nonStrict != null ? true : false); // non-strict route
+                    reportRow.add(nonStrict != null ? nonStrict.v2.getEdgeList().size() : "N/A"); // # non-strict hops
+
+
+                    // strict
+                    List<Tuple3<String, Graph<EntityReference, DataTypeEdge>, GraphPath<EntityReference, DataTypeEdge>>> strictRoutes = row.strictRoutes();
+
+
+                    List<ArrayList<Object>> withStrict = strictRoutes.stream().map(t -> {
+                        GraphPath<EntityReference, DataTypeEdge> sr = t.v3;
+                        String dataType = t.v1;
+
+                        ArrayList<Object> r = (ArrayList<Object>) reportRow.clone();
+                        r.add(sr != null ? true : false); // strict route
+                        r.add(dataType); // strict datatype
+                        r.add(sr != null ? sr.getEdgeList().size() : "N/A"); // # strict hops
+                        double confidence = calculateConfidence(sr, true);
+                        r.add(confidence + "%"); // confidence
+
+                        return r;
+                    }).collect(toList());
+
+                    if (withStrict.size() == 0) {
+                        // no strict routes so these are blanks
+                        reportRow.add(false); // strict route
+                        reportRow.add("N/A"); // strict datatype
+                        reportRow.add("N/A"); // # strict hops
+                        double confidence = calculateConfidence(nonStrict.v2, false);
+                        reportRow.add(confidence + "%"); // confidence
+                        return Stream.of(reportRow);
+                    } else {
+                        return withStrict.stream();
+                    }
+                })
+                .collect(toList());
+
+        return collect;
+    }
+
+
+    private static byte[] mkCSVReport(List<String> headers,
+                               List<List<Object>> reportRows) throws IOException {
+        StringWriter writer = new StringWriter();
+        CsvListWriter csvWriter = new CsvListWriter(writer, CsvPreference.EXCEL_PREFERENCE);
+
+        csvWriter.write(headers);
+        reportRows.forEach(unchecked(row -> csvWriter.write(row)));
+        csvWriter.flush();
+
+        return writer.toString().getBytes();
+    }
+
+
+    /**
+     * Naive confidence calculation
+     * if non-strict start at 50% and knock 5% off for each hop
+     * if strict start at 80%, minus 5% for each hop.  Average out extra routes
+     *  - can later add support for authorised distributors
+     * @param route
+     * @param isStrict
+     * @return
+     */
+    private static double calculateConfidence(GraphPath<EntityReference, DataTypeEdge> route,
+                                              boolean isStrict) {
+
+        double startPercentage = isStrict ? 100d : 50d;
+        int hopCount = route.getEdgeList().size();
+        return startPercentage - hopCount * 5;
+    }
 
 
     private static List<RouteLookup> FindRoutes(LogicalFlowDecoratorDao logicalFlowDecoratorDao,
@@ -221,7 +284,7 @@ public class LineageDiscoveryReport {
         List<Long> dataTypeIds = dataTypesForPair.stream()
                 .map(dtd -> dtd.decoratorEntity().id())
                 .distinct()
-                .collect(Collectors.toList());
+                .collect(toList());
 
         List<Tuple3<String, Graph<EntityReference, DataTypeEdge>, GraphPath<EntityReference, DataTypeEdge>>> foundRoutes = new ArrayList<>();
 
@@ -266,6 +329,13 @@ public class LineageDiscoveryReport {
     }
 
 
+    /**
+     * Expect csv file with two columns
+     * <source>,<target>
+     * @param resourcePath
+     * @return
+     * @throws IOException
+     */
     private static Set<Tuple2<ExternalIdValue, ExternalIdValue>> parsePublisherConsumers(String resourcePath) throws IOException {
         Resource resource = getFileResource(resourcePath);
         List<String> lines = IOUtilities.readLines(resource.getInputStream());
@@ -414,7 +484,7 @@ public class LineageDiscoveryReport {
                     .getOrDefault(f.id().get(), SetUtilities.asSet(unknownDecorator))
                     .stream()
                     .map(d -> d.decoratorEntity().name().get())
-                    .collect(Collectors.toList());
+                    .collect(toList());
 
             DataTypeEdge dataTypeEdge = new DataTypeEdge(f.id().get(), dataTypeNames);
             g.addEdge(f.source(),
