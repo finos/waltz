@@ -124,9 +124,12 @@ function _addColumn(column) {
             return cols;
         } else {
             hasDirtyColumns.set(true);
+            const maxPos = _.isEmpty(cols)
+                ? 0
+                : _.max(_.map(cols, d => d.position));
             return _.concat(
                 cols,
-                Object.assign({}, column, {position: _.size(cols)}));
+                Object.assign({}, column, {position: maxPos + 1}));
         }
     });
 }
