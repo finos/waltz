@@ -132,15 +132,19 @@ function controller($element,
 
 
     vm.$onChanges = (changes) => {
-        if(vm.visible) {
+        if (vm.visible) {
             $timeout(() => $document.on("click", documentClick), 200);
             $timeout(() => $element.on("keydown", onOverlayKeypress), 200);
-        }  else {
+        } else {
             $document.off("click", documentClick);
             $element.off("keydown", onOverlayKeypress);
         }
     };
 
+    vm.$onDestroy = () => {
+        $document.off("click", documentClick);
+        $element.off("keydown", onOverlayKeypress);
+    }
 
     vm.dismiss = () => {
         invokeFunction(vm.onDismiss);

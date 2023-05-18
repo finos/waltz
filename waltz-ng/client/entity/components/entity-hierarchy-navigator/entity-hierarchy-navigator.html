@@ -20,7 +20,7 @@
     <treecontrol class="tree-light"
                  options="$ctrl.treeOptions"
                  tree-model="$ctrl.forest"
-                 order-by="'-name'"
+                 order-by="['-position', '-name']"
                  selected-node="$ctrl.currentNode"
                  expanded-nodes="$ctrl.expandedNodes"
                  on-selection="$ctrl.handleSelection(node)">

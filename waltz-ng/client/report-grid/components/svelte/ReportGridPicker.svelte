@@ -12,45 +12,42 @@
 
     export let onGridSelect = () => "selecting grid";
     export let onCreate = () => "creating grid";
-
     export let grids = [];
-
-    const {gridDefinition} = gridService;
-
-    const filters = {
-        ALL: d => d,
-        PRIVATE: d => d.kind === 'PRIVATE',
-        PUBLIC: d => d.kind === 'PUBLIC'
-    }
-
-    let qry = "";
-
-    let filterCondition = filters.ALL;
-
-    const Modes = {
-        VIEW: "VIEW",
-        EDIT: "EDIT"
-    }
-
-    let activeMode = Modes.VIEW
 
     function onSelect(grid) {
         onGridSelect(grid);
     }
 
+    function determineSubjectIcon(gridSubjectKind) {
+        return _.get(entity[gridSubjectKind], "icon", "fw");
+    }
+
+    const Modes = {
+        VIEW: "VIEW",
+        EDIT: "EDIT"
+    };
+
+    const {gridDefinition} = gridService;
+
+    const filters = {
+        ALL: d => d,
+        PRIVATE: d => d.visibilityKind === 'PRIVATE',
+        PUBLIC: d => d.visibilityKind === 'PUBLIC'
+    };
+
+    let qry = "";
+    let filterCondition = filters.ALL;
+    let activeMode = Modes.VIEW;
+
     $: orderedGrids = _
         .chain(grids)
         .filter(filterCondition)
-        .sortBy('name')
+        .sortBy("name")
         .value();
 
     $: gridList = _.isEmpty(qry)
         ? orderedGrids
         : termSearch(orderedGrids, qry, ['name', 'description']);
-
-    function determineSubjectIcon(gridSubjectKind) {
-        return _.get(entity[gridSubjectKind], "icon", "fw");
-    }
 
 </script>
 
@@ -110,8 +107,8 @@
                         <tr class:selected={$gridDefinition?.id === grid?.gridId}
                             class="clickable"
                             on:click={() => onSelect(grid)}>
-                            <td title={grid.kind === "PUBLIC" ? "Public" : "Private"}>
-                                <Icon name={grid.kind === "PUBLIC" ? "users" : "user-secret"}/>
+                            <td title={grid.visibilityKind === "PUBLIC" ? "Public" : "Private"}>
+                                <Icon name={grid.visibilityKind === "PUBLIC" ? "users" : "user-secret"}/>
                             </td>
                             <td>
                                 <button class="btn-skinny force-wrap text-left">

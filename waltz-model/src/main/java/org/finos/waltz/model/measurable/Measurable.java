@@ -45,6 +45,7 @@ public abstract class Measurable implements
         ExternalParentIdProvider,
         LastUpdatedProvider,
         ProvenanceProvider,
+        PositionProvider,
         WaltzEntity {
 
     /**

@@ -32,16 +32,23 @@
     </div>
 
     <div class="nav-bar-collapse">
+
         <ul class="nav navbar-nav navbar-left">
-            <li ui-sref-active="active"
-                ng-repeat="item in ctrl.navItemsForRole"
+            <li ng-repeat="item in ctrl.navItemsForRole"
+                ui-sref-active="navbar-selected"
                 id="{{ item.id }}">
                 <a ui-sref="{{ item.uiSref }}">
-                    <waltz-icon size="lg" name="{{ item.icon }}"></waltz-icon>
-                    <span ng-bind="item.displayName"> </span>
+                    <waltz-icon size="lg"
+                                name="{{ item.icon }}">
+                    </waltz-icon>
+                    <span class="navbar-title"
+                          ng-bind="item.displayName">
+                    </span>
                 </a>
             </li>
         </ul>
+
+        <waltz-navbar-viewpoints></waltz-navbar-viewpoints>
 
         <waltz-navbar-profile logo-overlay-text="ctrl.logoOverlayText">
         </waltz-navbar-profile>
@@ -56,4 +63,3 @@
         </waltz-navbar-filters>
     </div>
 </nav>
-

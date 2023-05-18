@@ -48,7 +48,7 @@
                  expanded-nodes="$ctrl.expandedNodes"
                  options="$ctrl.treeOptions"
                  on-selection="$ctrl.onSelect(node)"
-                 order-by="'-measurable.name'">
+                 order-by="['-measurable.position', '-measurable.name']">
 
         <span class="waltz-visibility-parent wmrt-node">
             <span ng-style="{ opacity: node.measurable.concrete ? 1 : 0.5 }">

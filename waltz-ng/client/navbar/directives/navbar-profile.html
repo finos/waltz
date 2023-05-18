@@ -19,7 +19,8 @@
 <ul class="nav navbar-nav navbar-right waltz-navbar-profile"
     style="padding-right: 60px">
 
-    <li class="dropdown" uib-dropdown>
+    <li class="dropdown"
+        uib-dropdown>
         <!-- drop down trigger button -->
         <a class="clickable"
            uib-dropdown-toggle>
@@ -30,12 +31,13 @@
                   ng-bind="ctrl.user.userName">
             </span>
 
-            <span ng-if="ctrl.user.userName === 'anonymous'">
+            <span ng-if="ctrl.user.userName === 'anonymous'"
+                  class="navbar-title">
                 Anonymous
             </span>
 
             <span ng-if="ctrl.user.userName !== 'anonymous'">
-                Profile
+                <span class="navbar-title">Profile</span>
                 <span class="badge wnp-badge"
                       ng-if="ctrl.notificationCountTotal > 0"
                       ng-bind="ctrl.notificationCountTotal">
@@ -48,36 +50,30 @@
         <!-- drop down items -->
         <ul class="dropdown-menu dropdown-menu-items no-overflow"
             uib-dropdown-menu
-            style="width: 250px;"
             role="menu">
 
             <!-- logged in user -->
-            <li ng-if="ctrl.user.userName !== 'anonymous'"
-                style="margin: 4px"
-                class="no-overflow">
+            <li ng-if="ctrl.user.userName !== 'anonymous'">
                 <span>
                     <a ui-sref="main.profile.view ({userId: ctrl.user.userName})">
                         <waltz-icon name="user" fixed-width="true"></waltz-icon>
-                        <span ng-bind="ctrl.user.userName"></span>
+                        <span class="navbar-title" ng-bind="ctrl.user.userName"></span>
                     </a>
                 </span>
             </li>
 
             <!-- anonymous -->
-            <li ng-if="ctrl.user.userName === 'anonymous'"
-                style="margin: 4px">
+            <li ng-if="ctrl.user.userName === 'anonymous'">
                 <span>
                     <a>
                         <waltz-icon name="user" fixed-width="true"></waltz-icon>
-                        Anonymous
+                        <span class="navbar-title">Anonymous</span>
                     </a>
                 </span>
             </li>
 
             <!-- login/logout -->
-            <li ng-if="ctrl.allowDirectLogin"
-                style="margin: 4px"
-                class="no-overflow">
+            <li ng-if="ctrl.allowDirectLogin">
                 <span ng-if="ctrl.user.userName === 'anonymous'">
                     <a class="clickable"
                        ng-click="ctrl.login()">
@@ -94,9 +90,7 @@
                 </span>
             </li>
 
-            <li style="margin: 4px"
-                ui-sref-active="side-active"
-                class="no-overflow">
+            <li>
                 <span>
                     <a ui-sref="main.actor.list">
                         <waltz-icon class='text-muted small'
@@ -107,9 +101,7 @@
                 </span>
             </li>
 
-            <li style="margin: 4px"
-                ui-sref-active="side-active"
-                class="no-overflow">
+            <li>
                 <span>
                     <a ui-sref="main.attestation.instance.user">
                         <waltz-icon class='text-muted small'
@@ -124,9 +116,7 @@
                 </span>
             </li>
 
-            <li style="margin: 4px"
-                ui-sref-active="side-active"
-                class="no-overflow">
+            <li>
                 <span>
                     <a ui-sref="main.legal-entity-relationship-kind.list">
                         <waltz-icon class='text-muted small'
@@ -137,9 +127,7 @@
                 </span>
             </li>
 
-            <li style="margin: 4px"
-                ui-sref-active="side-active"
-                class="no-overflow">
+            <li>
                 <span>
                     <a ui-sref="main.licence.list">
                         <waltz-icon class='text-muted small'
@@ -150,9 +138,7 @@
                 </span>
             </li>
 
-            <li style="margin: 4px"
-                ui-sref-active="side-active"
-                class="no-overflow">
+            <li>
                 <span>
                     <a ui-sref="main.aggregate-overlay-diagram.list">
                         <waltz-icon class='text-muted small'
@@ -163,9 +149,7 @@
                 </span>
             </li>
 
-            <li style="margin: 4px"
-                ui-sref-active="side-active"
-                class="no-overflow">
+            <li>
                 <span waltz-has-role="APP_EDITOR">
                     <a ui-sref="main.app.registration">
                         <waltz-icon class='text-muted small'
@@ -176,10 +160,7 @@
                     </a>
                 </span>
             </li>
-            <li style="margin: 4px"
-                ng-if="ctrl.roadmapsEnabled"
-                ui-sref-active="side-active"
-                class="no-overflow">
+            <li ng-if="ctrl.roadmapsEnabled">
                 <span>
                     <a ui-sref="main.roadmap.list">
                         <waltz-icon class='text-muted small'
@@ -190,9 +171,7 @@
                     </a>
                 </span>
             </li>
-            <li style="margin: 4px"
-                ui-sref-active="side-active"
-                class="no-overflow">
+            <li>
                 <span>
                     <a ui-sref="main.source-data-ratings">
                         <waltz-icon class='text-muted small'
@@ -204,9 +183,7 @@
                 </span>
             </li>
 
-            <li style="margin: 4px"
-                ui-sref-active="side-active"
-                class="no-overflow">
+            <li>
                 <span>
                     <a ui-sref="main.survey.instance.user">
                         <waltz-icon class='text-muted small'
@@ -223,9 +200,7 @@
             </li>
 
 
-            <li style="margin: 4px"
-                ui-sref-active="side-active"
-                class="no-overflow">
+            <li>
                 <span ng-show="ctrl.showSysAdminMenuItem">
                     <a ui-sref="main.system.list">
                         <waltz-icon class='text-muted small'

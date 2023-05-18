@@ -244,9 +244,9 @@ public class WebUtilities {
 
 
     public static List<Long> readIdsFromBody(Request req) throws IOException {
-        List list = readBody(req, List.class);
+        List<?> list = readBody(req, List.class);
 
-        return (List<Long>) list
+        return list
                 .stream()
                 .map(l -> Long.parseLong(l.toString()))
                 .collect(Collectors.toList());

@@ -16,34 +16,36 @@
  *
  */
 
-import angular from 'angular';
+import angular from "angular";
 import {registerComponents} from "../common/module-utils";
 import NavbarFilters from "./components/navbar-filters/navbar-filters"
-import NavbarSearch from './components/navbar-search/navbar-search';
+import NavbarSearch from "./components/navbar-search/navbar-search";
 import NavFiltersOverlay from "./components/nav-filters-overlay/nav-filters-overlay";
-import NavSearchOverlay from './components/nav-search-overlay/nav-search-overlay';
-import SveltePage from './svelte-page';
+import NavSearchOverlay from "./components/nav-search-overlay/nav-search-overlay";
+import SveltePage from "./svelte-page";
+import NavbarViewpoints from "./components/nav-viewpoints/navbar-viewpoints";
 
-import Navbar from './directives/navbar';
-import NavbarRecentlyViews from './directives/navbar-recently-viewed';
-import NavbarProfile from './directives/navbar-profile';
+import Navbar from "./directives/navbar";
+import NavbarRecentlyViews from "./directives/navbar-recently-viewed";
+import NavbarProfile from "./directives/navbar-profile";
 
 
 export default () => {
 
-    const module = angular.module('waltz.navbar', []);
+    const module = angular.module("waltz.navbar", []);
 
     module
-        .directive('waltzNavbar', Navbar)
-        .directive('waltzNavbarRecentlyViewed', NavbarRecentlyViews)
-        .directive('waltzNavbarProfile', NavbarProfile);
+        .directive("waltzNavbar", Navbar)
+        .directive("waltzNavbarRecentlyViewed", NavbarRecentlyViews)
+        .directive("waltzNavbarProfile", NavbarProfile);
 
     registerComponents(module, [
         NavbarFilters,
         NavbarSearch,
         NavFiltersOverlay,
         NavSearchOverlay,
-        SveltePage
+        SveltePage,
+        NavbarViewpoints
     ]);
 
     return module.name;

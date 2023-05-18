@@ -42,7 +42,7 @@
                              expanded-nodes="tab.expandedNodes"
                              options="$ctrl.treeOptions"
                              on-selection="$ctrl.onSelect(node)"
-                             order-by="'-name'">
+                             order-by="['-position', '-name']">
                     <span style="display: inline-block; width: 90%; padding: 0; margin: 0;"
                           ng-class="{ 'text-muted': $ctrl.ratingsMap[node.id].compound.total == 0 }"
                           class="no-overflow waltz-visibility-parent">

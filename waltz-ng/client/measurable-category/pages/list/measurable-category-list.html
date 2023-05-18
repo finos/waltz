@@ -40,31 +40,6 @@
 
     <div class='waltz-page-summary-attach waltz-page-summary'>
 
-        <div class="row">
-            <div class="col-md-12">
-                <div class="waltz-tabs">
-                    <span class="wt-tab-header"
-                          ng-repeat="tab in $ctrl.categories track by tab.id"
-                          ng-class="{
-                                'wt-active' : tab.id === $ctrl.category.id,
-                                'wt-disabled' : ! $ctrl.measurablesByCategory[tab.id]
-                          }">
-                        <a ng-if="$ctrl.measurablesByCategory[tab.id]"
-                           ui-sref="main.measurable-category.list ({ id:tab.id })">
-                            <span ng-bind="tab.name">
-                            </span>
-                        </a>
-
-                        <span ng-bind="tab.name"
-                              ng-if="! $ctrl.measurablesByCategory[tab.id]">
-                        </span>
-                    </span>
-                </div>
-            </div>
-        </div>
-
-        <br>
-
         <div class="row"
              ng-if="$ctrl.diagrams.length > 0">
             <!-- DIAGRAMS -->

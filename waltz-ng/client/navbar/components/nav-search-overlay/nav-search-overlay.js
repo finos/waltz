@@ -84,16 +84,17 @@ function controller($element,
         if(vm.visible) {
             const input = $element.find("input")[0];
             input.focus();
-            $timeout(() => $document.on("mousedown", documentClick), 200);
+            $timeout(() => $document.on("click", documentClick), 200);
             $timeout(() => $element.on("keydown", onOverlayKeypress), 200);
         }  else {
-            $document.off("mousedown", documentClick);
+            $document.off("click", documentClick);
             $element.off("keydown", onOverlayKeypress);
         }
     };
 
     vm.$onDestroy = () => {
         $document.off("click", documentClick);
+        $document.off("keydown", documentClick);
     };
 
     vm.onToggleCategory = (c) => {
