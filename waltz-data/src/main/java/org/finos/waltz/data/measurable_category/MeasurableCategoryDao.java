@@ -18,6 +18,7 @@
 
 package org.finos.waltz.data.measurable_category;
 
+import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.schema.tables.records.MeasurableCategoryRecord;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
@@ -53,6 +54,7 @@ public class MeasurableCategoryDao {
                 .ratingEditorRole(r.getRatingEditorRole())
                 .constrainingAssessmentDefinitionId(Optional.ofNullable(r.getConstrainingAssessmentDefinitionId()))
                 .icon(r.getIconName())
+                .position(r.getPosition())
                 .build();
     };
 
@@ -109,7 +111,27 @@ public class MeasurableCategoryDao {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
-    public MeasurableCategory save(MeasurableCategory measurableCategory) {
-        return null;
+    public boolean save(MeasurableCategory measurableCategory, String username) {
+
+
+        MeasurableCategoryRecord record = dsl.newRecord(MEASURABLE_CATEGORY);
+        measurableCategory.id().ifPresent(record::setId);
+        record.setName(measurableCategory.name());
+        record.setDescription(measurableCategory.description());
+        record.setExternalId(measurableCategory.externalId().orElse(null));
+        record.setRatingEditorRole(measurableCategory.ratingEditorRole());
+        record.setConstrainingAssessmentDefinitionId(measurableCategory.constrainingAssessmentDefinitionId().orElse(null));
+        record.setIconName(measurableCategory.icon());
+        record.setPosition(measurableCategory.position());
+        record.setEditable(measurableCategory.editable());
+        record.setLastUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
+        record.setLastUpdatedBy(username);
+        record.setRatingSchemeId(measurableCategory.ratingSchemeId());
+
+        record.changed(MEASURABLE_CATEGORY.ID, false);
+
+        int update = record.store();
+
+        return update == 1;
     }
 }

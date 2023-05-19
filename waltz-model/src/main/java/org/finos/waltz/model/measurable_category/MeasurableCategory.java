@@ -51,7 +51,8 @@ public abstract class MeasurableCategory implements
         LastUpdatedProvider,
         EntityKindProvider,
         WaltzEntity,
-        IconProvider
+        IconProvider,
+        PositionProvider
 {
 
     @Value.Default

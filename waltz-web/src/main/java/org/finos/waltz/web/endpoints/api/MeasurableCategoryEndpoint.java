@@ -63,15 +63,15 @@ public class MeasurableCategoryEndpoint implements Endpoint {
         DatumRoute<MeasurableCategory> getByIdRoute = (request, response)
                 -> measurableCategoryService.getById(WebUtilities.getId(request));
 
-        DatumRoute<MeasurableCategory> saveRoute = (request, response) -> {
+        DatumRoute<Boolean> saveRoute = (request, response) -> {
             String username = getUsername(request);
             return measurableCategoryService
                     .save(
-                        ImmutableMeasurableCategory
-                            .copyOf(readBody(request, MeasurableCategory.class))
-                            .withLastUpdatedAt(nowUtc())
-                            .withLastUpdatedBy(username),
-                        username);
+                            ImmutableMeasurableCategory
+                                    .copyOf(readBody(request, MeasurableCategory.class))
+                                    .withLastUpdatedAt(nowUtc())
+                                    .withLastUpdatedBy(username),
+                            username);
 
         };
 

@@ -115,7 +115,7 @@ function prepareTabs(categories = [], measurables = [], ratingSchemesById = {}) 
                 expandedNodes: []
             };
         })
-        .sortBy('category.name')
+        .sortBy(d => d.category.position, d => d.category.name)
         .value();
 }
 

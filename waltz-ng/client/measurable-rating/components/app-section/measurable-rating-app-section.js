@@ -64,7 +64,7 @@ function controller($q, serviceBroker, settingsService, userService) {
         settingsService
             .findOrDefault(namedSettings.measurableRatingRoadmapsEnabled, true)
             .then(isEnabled => {
-                vm.roadmapsEnabled = !(isEnabled === 'false');
+                vm.roadmapsEnabled = !(isEnabled === "false");
             });
     }
 

@@ -65,9 +65,9 @@ public class MeasurableCategoryService {
     }
 
 
-    public MeasurableCategory save(MeasurableCategory measurableCategory, String username) {
+    public boolean save(MeasurableCategory measurableCategory, String username) {
         ensureUserHasPermission(username);
-        return measurableCategoryDao.save(measurableCategory);
+        return measurableCategoryDao.save(measurableCategory, username);
     }
 
 

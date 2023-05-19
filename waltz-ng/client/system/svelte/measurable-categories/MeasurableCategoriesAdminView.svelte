@@ -31,7 +31,6 @@
     }
 
     function onSave() {
-        console.log("save", workingCopy);
         measurableCategoryStore
             .save(workingCopy)
             .then(() => {
@@ -43,7 +42,7 @@
 
     function onEditCategory(c) {
         console.log("edit", c);
-        workingCopy = _.pick(c, ["id", "name", "externalId", "description"]);
+        workingCopy = Object.assign({}, c);
         activeMode = Modes.EDIT;
     }
 
@@ -52,7 +51,6 @@
     });
 
     $: categories = $loadCategoriesCall?.data || [];
-    $: console.log({categories, c: $loadCategoriesCall});
 
 </script>
 
@@ -109,7 +107,39 @@
                           placeholder="Description"
                           rows="3"></textarea>
                 <div class="help-block">
-                    Description of the category.  Markdown is supported.
+                    Description of the category. Markdown is supported.
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="icon">Icon Name</label>
+                <div>
+                    <input type="text"
+                           style="width: 20%; display: inline"
+                           class="form-control input-sm"
+                           id="icon"
+                           bind:value={workingCopy.icon}
+                           placeholder="Icon name e.g. cog"
+                           required>
+                    <Icon name={workingCopy.icon}/>
+                </div>
+                <div class="help-block">
+                    This is the icon associated to this category. Currently these icons are based upon the <a
+                    target="_blank" rel="noreferrer noopener" href="https://fontawesome.com/v4/icons/">FontAwesome v4
+                    icon set </a>.
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="icon">Position</label>
+                <input class="form-control"
+                       type="number"
+                       id="position"
+                       style="width: 20%"
+                       required="required"
+                       placeholder="Position for this category in tabbed sections. Default order is based upon the name of the category"
+                       bind:value={workingCopy.position}>
+                <div class="help-block">
+                    Position, used for ordering categories.
+                    Lower numbers go first, name is used as a tie breaker.
                 </div>
             </div>
             <button type="submit"
@@ -133,12 +163,12 @@
                     <tr>
                         <th style="width:20%">Name</th>
                         <th style="width:20%">External Id</th>
-                        <th style="width:10%">Usages</th>
+                        <th style="width:10%">Icon</th>
                         <th style="width:30%">Operations</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {#each termSearch(categories, qry) as category}
+                    {#each _.orderBy(termSearch(categories, qry), [d => d.position, d => d.name]) as category}
                         <tr>
                             <td>
                                 <span title={category.description}>
@@ -151,14 +181,14 @@
                                 </span>
                             </td>
                             <td>
-                                Usages
+                                <span><Icon name={category.icon}/> ({category.icon})</span>
                             </td>
                             <td>
                                 <button class="btn-link"
                                         aria-label="Edit {category.name}"
                                         on:click={() => onEditCategory(category)}>
                                     <Icon name="edit"/>
-                                    Edit Scheme
+                                    Edit Category
                                 </button>
                             </td>
                         </tr>

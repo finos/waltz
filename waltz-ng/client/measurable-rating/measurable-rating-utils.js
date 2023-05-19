@@ -192,7 +192,7 @@ export function mkTabs(ctx, includeEmpty = false) {
             };
         })
         .filter(t => t.measurables.length > 0 || includeEmpty)
-        .sortBy(tab => tab.category.name)
+        .orderBy([tab => tab.category.position, tab => tab.category.name])
         .value();
 }
 

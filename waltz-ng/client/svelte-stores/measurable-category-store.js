@@ -19,7 +19,7 @@ export function mkMeasurableCategoryStore() {
     const save = (cmd = {}) => remote
         .execute(
             "POST",
-            "api/measurable-category/save-hello",
+            "api/measurable-category/save",
             cmd);
 
     return {
