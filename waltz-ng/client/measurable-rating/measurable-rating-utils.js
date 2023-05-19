@@ -20,6 +20,7 @@ import moment from "moment";
 import {CORE_API} from "../common/services/core-api-utils";
 import {mkSelectionOptions} from "../common/selector-utils";
 import {formats} from "../common";
+import {lastViewedMeasurableCategoryKey} from "../user";
 
 
 export function loadDecommData(
@@ -133,14 +134,26 @@ export function loadAllData(
         .loadViewData(
             CORE_API.AllocationStore.findByEntity,
             [parentEntityRef],
-            { force })
+            {force})
         .then(r => ({
             allocations: r.data,
             allocationTotalsByScheme: _
                 .chain(r.data)
                 .groupBy(d => d.schemeId)
                 .mapValues(xs => _.sumBy(xs, x => x.percentage))
-                .value()}));
+                .value()
+        }));
+
+    const lastViewedCategoryPromise = serviceBroker
+        .loadAppData(CORE_API.UserPreferenceStore.findAllForUser, [], {force: true})
+        .then(r => {
+            const lastViewed = _.find(r.data, d => d.key === lastViewedMeasurableCategoryKey);
+            return {
+                lastViewedCategoryId: lastViewed
+                    ? Number(lastViewed.value)
+                    : null
+            };
+        });
 
     const decommPromise = loadDecommData(
         $q,
@@ -157,7 +170,8 @@ export function loadAllData(
             allocationsPromise,
             allocationSchemesPromise,
             decommPromise,
-            roadmapsPromise])
+            roadmapsPromise,
+            lastViewedCategoryPromise])
         .then(results => Object.assign({}, ...results));
 }
 
@@ -197,8 +211,10 @@ export function mkTabs(ctx, includeEmpty = false) {
 }
 
 
-export function determineStartingTab(tabs = []) {
-    // first with ratings, or simply first if no ratings
-    return _.find(tabs, t => t.ratings.length > 0 ) || tabs[0];
+export function determineStartingTab(tabs = [], lastViewedCategoryId) {
+    // category last viewed or first with ratings, or simply first if no ratings
+    const tabForLastCategoryViewed = _.find(tabs, t => t.category.id === lastViewedCategoryId);
+    const firstTabWithRatings = _.find(tabs, t => t.ratings.length > 0);
+    return tabForLastCategoryViewed || firstTabWithRatings || tabs[0];
 }
 

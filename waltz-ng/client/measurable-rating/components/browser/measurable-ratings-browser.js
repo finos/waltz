@@ -33,13 +33,14 @@ import template from "./measurable-ratings-browser.html";
 
 
 const bindings = {
-    measurables: '<',
-    categories: '<',
-    ratingTallies: '<',
-    onSelect: '<',
-    onSelectUnmapped: '<?',
-    onCategorySelect: '<',
-    scrollHeight: '<'
+    measurables: "<",
+    categories: "<",
+    ratingTallies: "<",
+    lastViewedCategoryId: "<?",
+    onSelect: "<",
+    onSelectUnmapped: "<?",
+    onCategorySelect: "<",
+    scrollHeight: "<"
 };
 
 
@@ -50,7 +51,7 @@ const initialState = {
     treeOptions: {
         nodeChildren: "children",
         dirSelectable: true,
-        equality: function(node1, node2) {
+        equality: function (node1, node2) {
             if (node1 && node2) {
                 return node1.id === node2.id;
             } else {
@@ -58,7 +59,7 @@ const initialState = {
             }
         }
     },
-    onSelect: (d) => console.log('wmrb: default on-select', d),
+    onSelect: (d) => console.log("wmrb: default on-select", d),
     onSelectUnmapped: null, // This will cause the 'view unmapped measurables' label not to render
     visibility: {
         tab: null
@@ -95,7 +96,7 @@ function prepareTreeData(data = []) {
 
 
 function prepareTabs(categories = [], measurables = [], ratingSchemesById = {}) {
-    const measurablesByCategory = _.groupBy(measurables, 'categoryId');
+    const measurablesByCategory = _.groupBy(measurables, "categoryId");
     return _
         .chain(categories)
         .filter(category => _.get(measurablesByCategory, category.id, []).length > 0)
@@ -103,7 +104,7 @@ function prepareTabs(categories = [], measurables = [], ratingSchemesById = {}) 
             const measurablesForCategory = measurablesByCategory[category.id];
             const treeData = prepareTreeData(measurablesForCategory);
             const maxSize = _.chain(treeData)
-                .map('totalRatings.total')
+                .map("totalRatings.total")
                 .max()
                 .value();
 
@@ -127,7 +128,7 @@ function findFirstNonEmptyTab(tabs = []) {
 
 
 function initialiseRatingTalliesMap(ratingTallies = [], measurables = []) {
-    const talliesById = _.groupBy(ratingTallies, 'id');
+    const talliesById = _.groupBy(ratingTallies, "id");
 
     const reducer = (acc, m) => {
         const talliesForMeasurable = talliesById[m.id];
@@ -146,7 +147,7 @@ function initialiseRatingTalliesMap(ratingTallies = [], measurables = []) {
 
 
 function mkRatingTalliesMap(ratingTallies = [], measurables = []) {
-    const measurablesById = _.keyBy(measurables, 'id');
+    const measurablesById = _.keyBy(measurables, "id");
     const talliesMap = initialiseRatingTalliesMap(ratingTallies, measurables);
     _.each(measurables, m => {
         const rs = talliesMap[m.id];
@@ -178,7 +179,8 @@ function controller(serviceBroker) {
             }
         } else {
             const tabs = prepareTabs(vm.categories, vm.measurables, vm.ratingSchemesById);
-            const tab = findFirstNonEmptyTab(tabs);
+            const lastViewedCategory = _.find(tabs, t => t.category.id === vm.lastViewedCategoryId);
+            const tab = lastViewedCategory || findFirstNonEmptyTab(tabs);
 
             vm.tabs = tabs;
 
@@ -188,7 +190,7 @@ function controller(serviceBroker) {
                     _.values(vm.ratingsMap),
                     r => _.get(r, ["compound", "total"], [0])));
 
-            if (! vm.visibility.tab) {
+            if (!vm.visibility.tab) {
                 // no tab selected, select the first
                 vm.visibility.tab = _.get(tab, ["category", "id"]);
                 vm.onTabChange(tab);
@@ -222,7 +224,7 @@ function controller(serviceBroker) {
 
 
 controller.$inject = [
-    'ServiceBroker'
+    "ServiceBroker"
 ];
 
 

@@ -5,7 +5,8 @@
         <a ui-sref="main.measurable-category.list ({id: $ctrl.visibleCategory.id})"
            class="btn-split">
             <waltz-icon size="lg"
-                        name="puzzle-piece">
+                        fixed-width="true"
+                        name="{{$ctrl.visibleCategory.icon}}">
             </waltz-icon>
             <span class="navbar-title"
                   ng-bind="$ctrl.visibleCategory.name"></span>
