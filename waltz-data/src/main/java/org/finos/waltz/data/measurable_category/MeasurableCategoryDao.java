@@ -52,6 +52,7 @@ public class MeasurableCategoryDao {
                 .editable(r.getEditable())
                 .ratingEditorRole(r.getRatingEditorRole())
                 .constrainingAssessmentDefinitionId(Optional.ofNullable(r.getConstrainingAssessmentDefinitionId()))
+                .icon(r.getIconName())
                 .build();
     };
 
@@ -106,5 +107,9 @@ public class MeasurableCategoryDao {
                 .from(MEASURABLE_CATEGORY)
                 .where(MEASURABLE_CATEGORY.ID.in(categoryIds))
                 .fetch(TO_DOMAIN_MAPPER);
+    }
+
+    public MeasurableCategory save(MeasurableCategory measurableCategory) {
+        return null;
     }
 }

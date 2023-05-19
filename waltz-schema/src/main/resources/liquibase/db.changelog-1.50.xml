@@ -86,5 +86,62 @@
 
     </changeSet>
 
+    <changeSet id="20230517-6590-1"
+               author="davidwatkins73">
+        <addColumn tableName="measurable_category">
+            <column name="position"
+                    type="${int.type}"
+                    defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20230517-6590-2"
+               author="davidwatkins73">
+        <addColumn tableName="measurable_category">
+            <column name="icon_name"
+                    type="${enum.type}"
+                    defaultValue="puzzle-piece">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20230517-6590-3"
+               author="davidwatkins73">
+        <setTableRemarks tableName="measurable"
+                         remarks="defines a specific entry in a measurable category (e.g. a taxonomy item)"/>
+
+        <setTableRemarks tableName="measurable_category"
+                         remarks="groups a set of measurables together to form a basic hierarchical taxonomy"/>
+        <setColumnRemarks tableName="measurable_category"
+                          columnName="id"
+                          remarks="unique identifier for this measurable_category record within waltz"/>
+        <setColumnRemarks tableName="measurable_category"
+                          columnName="name"
+                          remarks="the name to show for this measurable category, should be relatively short"/>
+        <setColumnRemarks tableName="measurable_category"
+                          columnName="external_id"
+                          remarks="identifier this measurable category is known by externally.  Should not change, unlike the name which may change."/>
+        <setColumnRemarks tableName="measurable_category"
+                          columnName="last_updated_at"
+                          remarks="the datetime this measurable record was last updated"/>
+        <setColumnRemarks tableName="measurable_category"
+                          columnName="last_updated_by"
+                          remarks="the last user to update this measurable record"/>
+        <setColumnRemarks tableName="measurable_category"
+                          columnName="rating_scheme_id"
+                          remarks="links the rating scheme which will be used when entities align to the measurables in this category (via measurable_rating)"/>
+        <setColumnRemarks tableName="measurable_category"
+                          columnName="editable"
+                          remarks="can this taxonomy be edited in the Waltz UI"/>
+        <setColumnRemarks tableName="measurable_category"
+                          columnName="rating_editor_role"
+                          remarks="limits users who cam edit this taxonomy"/>
+        <setColumnRemarks tableName="measurable_category"
+                          columnName="constraining_assessment_definition_id"
+                          remarks="if the category and assessment share a rating scheme, this can be used to limit the maximum rating that can be given to measurable ratings (in this category)"/>
+    </changeSet>
 
 </databaseChangeLog>

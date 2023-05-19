@@ -20,6 +20,9 @@ package org.finos.waltz.model;
 
 import java.util.Optional;
 
+/**
+ * Optional external id (String)
+ */
 public interface ExternalIdProvider {
 
     Optional<String> externalId();

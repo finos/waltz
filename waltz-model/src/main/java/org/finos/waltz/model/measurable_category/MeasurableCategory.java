@@ -50,12 +50,13 @@ public abstract class MeasurableCategory implements
         ExternalIdProvider,
         LastUpdatedProvider,
         EntityKindProvider,
-        WaltzEntity
+        WaltzEntity,
+        IconProvider
 {
-
 
     @Value.Default
     public EntityKind kind() { return EntityKind.MEASURABLE_CATEGORY; }
+
 
     /**
      * Indicates if the measurables in the category may be edited from within the tool.
@@ -69,6 +70,7 @@ public abstract class MeasurableCategory implements
         return false;
     }
 
+
     /**
      * @return role required for editing measurable ratings against this category
      */
@@ -76,6 +78,7 @@ public abstract class MeasurableCategory implements
     public String ratingEditorRole() {
         return SystemRole.RATING_EDITOR.name();
     }
+
 
     /**
      * A category is linked to a Rating Scheme which provides a mechanism to describe
@@ -85,6 +88,7 @@ public abstract class MeasurableCategory implements
      * @return id which links to a {@link RatingScheme}
      */
     public abstract long ratingSchemeId();
+
 
     /**
      * If provided, this assessment_definition constrains the measurable ratings

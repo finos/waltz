@@ -18,6 +18,9 @@
 
 package org.finos.waltz.model;
 
+/**
+ * name provider (required)
+ */
 public interface NameProvider {
 
     String name();

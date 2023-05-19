@@ -19,7 +19,9 @@
             <li ng-repeat="category in $ctrl.categories">
                 <a ui-sref="main.measurable-category.list ({id: category.id})"
                    ng-click="$ctrl.selectCategory(category.id)">
-                    <waltz-icon name="puzzle-piece"></waltz-icon>
+                    <waltz-icon name="{{category.icon}}"
+                                fixed-width="true">
+                    </waltz-icon>
                     <span ng-bind="category.name"></span>
                 </a>
             </li>

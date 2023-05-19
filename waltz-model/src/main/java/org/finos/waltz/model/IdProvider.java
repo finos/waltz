@@ -20,7 +20,9 @@ package org.finos.waltz.model;
 
 import java.util.Optional;
 
-
+/**
+ * Optional id (Long)
+ */
 public interface IdProvider {
 
     Optional<Long> id();

@@ -19,22 +19,29 @@
 package org.finos.waltz.service.measurable_category;
 
 import org.finos.waltz.data.measurable_category.MeasurableCategoryDao;
+import org.finos.waltz.model.exceptions.NotAuthorizedException;
 import org.finos.waltz.model.measurable_category.MeasurableCategory;
+import org.finos.waltz.model.user.SystemRole;
+import org.finos.waltz.service.user.UserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.Set;
 
+import static java.lang.String.format;
+
 @Service
 public class MeasurableCategoryService {
 
     private final MeasurableCategoryDao measurableCategoryDao;
+    private final UserRoleService userRoleService;
 
 
     @Autowired
-    public MeasurableCategoryService(MeasurableCategoryDao measurableCategoryDao) {
+    public MeasurableCategoryService(MeasurableCategoryDao measurableCategoryDao, UserRoleService userRoleService) {
         this.measurableCategoryDao = measurableCategoryDao;
+        this.userRoleService = userRoleService;
     }
 
 
@@ -58,5 +65,20 @@ public class MeasurableCategoryService {
     }
 
 
+    public MeasurableCategory save(MeasurableCategory measurableCategory, String username) {
+        ensureUserHasPermission(username);
+        return measurableCategoryDao.save(measurableCategory);
+    }
 
+
+    private void ensureUserHasPermission(String username) {
+        if (! userRoleService.hasAnyRole(
+                username,
+                SystemRole.ADMIN,
+                SystemRole.TAXONOMY_EDITOR)) {
+            throw new NotAuthorizedException(format(
+                    "User: %s does not have permission to edit measurable categories",
+                    username));
+        }
+    }
 }
