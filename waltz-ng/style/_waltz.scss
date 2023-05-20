@@ -441,3 +441,14 @@ a[disabled="disabled"] {
     color: #AAA;
     text-decoration: line-through rgba(125, 125, 125, 0.3);
 }
+
+.waltz-sticky-part {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 100px;
+}
+
+.waltz-sticky-wrapper {
+    display: flex;
+    justify-content: space-between;
+}

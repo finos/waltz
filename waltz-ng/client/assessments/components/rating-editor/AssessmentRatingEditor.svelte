@@ -35,51 +35,53 @@
 
 
 {#if $selectedAssessment}
-    <SubSection>
-        <div slot="header">
-            {$selectedAssessment?.definition.name}
-            {#if $selectedAssessment?.definition.cardinality === 'ZERO_ONE'}
+    <div class="waltz-sticky-part">
+        <SubSection>
+            <div slot="header">
+                {$selectedAssessment?.definition.name}
+                {#if $selectedAssessment?.definition.cardinality === 'ZERO_ONE'}
                 <span title="Single valued assessment. Can only have zero or one outcome">
                     <Icon name='circle'/>
                 </span>
-            {:else}
+                {:else}
                 <span title="Multi valued assessment. Can have multiple outcomes">
                     <Icon name='circle'/>
                     <Icon name='circle'/>
                     <Icon name='circle'/>
                 </span>
-            {/if}
+                {/if}
 
-        </div>
-        <div slot="content">
-            {#if $selectedAssessment?.definition.isReadOnly}
-                <p class="help-block">
+            </div>
+            <div slot="content">
+                {#if $selectedAssessment?.definition.isReadOnly}
+                    <p class="help-block">
                     <span style="color: orange">
                         <Icon name="lock"
                               size="lg"/>
                     </span>
-                    This assessment is read only
+                        This assessment is read only
+                    </p>
+                {/if}
+                <p class="help-block">
+                    <Markdown text={$selectedAssessment?.definition.description}/>
                 </p>
-            {/if}
-            <p class="help-block">
-                <Markdown text={$selectedAssessment?.definition.description}/>
-            </p>
 
-            <hr>
+                <hr>
 
-            {#if $detailPanelActiveMode === Modes.LIST}
-                <RatingListView onEdit={() => $detailPanelActiveMode = Modes.EDIT}
-                                onAdd={() => $detailPanelActiveMode = Modes.ADD}/>
-            {:else if $detailPanelActiveMode === Modes.EDIT}
-                <RatingEditView onCancel={() => $detailPanelActiveMode = Modes.LIST}
-                                onRemove={() => $detailPanelActiveMode = Modes.REMOVE}/>
-            {:else if $detailPanelActiveMode === Modes.ADD}
-                <RatingAddView onCancel={() => $detailPanelActiveMode = Modes.LIST}/>
-            {:else if $detailPanelActiveMode === Modes.REMOVE}
-                <RemoveRatingConfirmationPanel onCancel={() => $detailPanelActiveMode = Modes.LIST}/>
-            {/if}
-        </div>
-    </SubSection>
+                {#if $detailPanelActiveMode === Modes.LIST}
+                    <RatingListView onEdit={() => $detailPanelActiveMode = Modes.EDIT}
+                                    onAdd={() => $detailPanelActiveMode = Modes.ADD}/>
+                {:else if $detailPanelActiveMode === Modes.EDIT}
+                    <RatingEditView onCancel={() => $detailPanelActiveMode = Modes.LIST}
+                                    onRemove={() => $detailPanelActiveMode = Modes.REMOVE}/>
+                {:else if $detailPanelActiveMode === Modes.ADD}
+                    <RatingAddView onCancel={() => $detailPanelActiveMode = Modes.LIST}/>
+                {:else if $detailPanelActiveMode === Modes.REMOVE}
+                    <RemoveRatingConfirmationPanel onCancel={() => $detailPanelActiveMode = Modes.LIST}/>
+                {/if}
+            </div>
+        </SubSection>
+    </div>
 {:else}
     <NoData type="info">
         <Icon name="info-circle"/>
