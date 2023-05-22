@@ -18,21 +18,25 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.model.measurable_category.ImmutableMeasurableCategory;
 import org.finos.waltz.service.measurable_category.MeasurableCategoryService;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.model.measurable_category.MeasurableCategory;
 import org.finos.waltz.web.WebUtilities;
-import org.finos.waltz.web.endpoints.EndpointUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
+import static org.finos.waltz.web.WebUtilities.*;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 
 
 @Service
 public class MeasurableCategoryEndpoint implements Endpoint {
 
-    private static final String BASE_URL = WebUtilities.mkPath("api", "measurable-category");
+    private static final String BASE_URL = mkPath("api", "measurable-category");
 
     private final MeasurableCategoryService measurableCategoryService;
 
@@ -45,9 +49,10 @@ public class MeasurableCategoryEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        String findAllPath = WebUtilities.mkPath(BASE_URL, "all");
-        String getByIdPath = WebUtilities.mkPath(BASE_URL, "id", ":id");
-        String getCategoriesByDirectOrgUnitPath = WebUtilities.mkPath(BASE_URL, "direct", "org-unit", ":id");
+        String findAllPath = mkPath(BASE_URL, "all");
+        String getByIdPath = mkPath(BASE_URL, "id", ":id");
+        String getCategoriesByDirectOrgUnitPath = mkPath(BASE_URL, "direct", "org-unit", ":id");
+        String savePath = mkPath(BASE_URL, "save");
 
         ListRoute<MeasurableCategory> findAllRoute = (request, response)
                 -> measurableCategoryService.findAll();
@@ -58,9 +63,22 @@ public class MeasurableCategoryEndpoint implements Endpoint {
         DatumRoute<MeasurableCategory> getByIdRoute = (request, response)
                 -> measurableCategoryService.getById(WebUtilities.getId(request));
 
-        EndpointUtilities.getForList(findAllPath, findAllRoute);
-        EndpointUtilities.getForList(getCategoriesByDirectOrgUnitPath, findCategoriesByDirectOrgUnitRoute);
-        EndpointUtilities.getForDatum(getByIdPath, getByIdRoute);
+        DatumRoute<Boolean> saveRoute = (request, response) -> {
+            String username = getUsername(request);
+            return measurableCategoryService
+                    .save(
+                            ImmutableMeasurableCategory
+                                    .copyOf(readBody(request, MeasurableCategory.class))
+                                    .withLastUpdatedAt(nowUtc())
+                                    .withLastUpdatedBy(username),
+                            username);
+
+        };
+
+        getForList(findAllPath, findAllRoute);
+        getForList(getCategoriesByDirectOrgUnitPath, findCategoriesByDirectOrgUnitRoute);
+        getForDatum(getByIdPath, getByIdRoute);
+        postForDatum(savePath, saveRoute);
     }
 
 }

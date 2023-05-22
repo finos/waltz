@@ -24,6 +24,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import {indexRatingSchemes} from "../../../ratings/rating-utils";
 
 import template from "./measurable-ratings-browser-tree-panel.html";
+import {lastViewedMeasurableCategoryKey} from "../../../user";
 
 /**
  * @name waltz-measurable-ratings-browser-tree-panel
@@ -198,6 +199,18 @@ function loadMeasurableCategories(serviceBroker, holder) {
 }
 
 
+function loadLastViewedCategory(serviceBroker, holder) {
+    return serviceBroker
+        .loadAppData(CORE_API.UserPreferenceStore.findAllForUser, [], {force: true})
+        .then(r => {
+            const lastViewed = _.find(r.data, d => d.key === lastViewedMeasurableCategoryKey);
+            return holder.lastViewedCategoryId = lastViewed
+                ? Number(lastViewed.value)
+                : null;
+        });
+}
+
+
 function loadApps(serviceBroker, selector, holder) {
     return serviceBroker
         .loadViewData(CORE_API.ApplicationStore.findBySelector, [selector])
@@ -234,7 +247,8 @@ function controller($q, serviceBroker) {
             loadMeasurables(serviceBroker, vm.selector, vm),
             loadRatingSchemes(serviceBroker, vm),
             loadMeasurableRatings(serviceBroker, vm.selector, vm),
-            loadApps(serviceBroker, vm.selector, vm)
+            loadApps(serviceBroker, vm.selector, vm),
+            loadLastViewedCategory(serviceBroker, vm)
         ]);
     };
 

@@ -151,8 +151,10 @@
                    popover-append-to-body="true"
                    popover-placement="bottom"
                    popover-popup-delay="300"
-                   ng-repeat-end
-                   ng-bind="tab.category.name">
+                   ng-repeat-end>
+                <waltz-icon name="{{tab.category.icon}}"></waltz-icon>
+                <span ng-bind="tab.category.name">
+                </span>
             </label>
 
             <div ng-repeat="tab in $ctrl.tabs"

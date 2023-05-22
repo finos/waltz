@@ -29,7 +29,9 @@
         <label class="wt-label"
                for="{{ tab.category.id + '_' + $id}}"
                ng-repeat-end>
-            <div ng-bind="tab.category.name"></div>
+            <waltz-icon name="{{tab.category.icon}}"></waltz-icon>
+            <span ng-bind="tab.category.name">
+            </span>
         </label>
 
         <div ng-repeat="tab in $ctrl.tabs track by tab.category.id"

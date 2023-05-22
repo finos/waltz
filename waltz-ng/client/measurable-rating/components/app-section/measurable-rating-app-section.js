@@ -64,7 +64,7 @@ function controller($q, serviceBroker, settingsService, userService) {
         settingsService
             .findOrDefault(namedSettings.measurableRatingRoadmapsEnabled, true)
             .then(isEnabled => {
-                vm.roadmapsEnabled = !(isEnabled === 'false');
+                vm.roadmapsEnabled = !(isEnabled === "false");
             });
     }
 
@@ -73,10 +73,10 @@ function controller($q, serviceBroker, settingsService, userService) {
             .then((r) => {
                 Object.assign(vm, r);
                 vm.tabs = mkTabs(vm, false);
-                const firstNonEmptyTab = determineStartingTab(vm.tabs);
-                if (firstNonEmptyTab) {
-                    vm.visibility.tab = firstNonEmptyTab.category.id;
-                    vm.onTabChange(firstNonEmptyTab);
+                const startingTab = determineStartingTab(vm.tabs, vm.lastViewedCategoryId);
+                if (startingTab) {
+                    vm.visibility.tab = startingTab.category.id;
+                    vm.onTabChange(startingTab);
                 }
             });
     };

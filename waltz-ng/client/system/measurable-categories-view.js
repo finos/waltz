@@ -15,17 +15,27 @@
  * See the License for the specific
  *
  */
+import MeasurableCategoriesAdminView from "./svelte/measurable-categories/MeasurableCategoriesAdminView.svelte";
+import {initialiseData} from "../common";
 
-package org.finos.waltz.model;
 
-import org.immutables.value.Value;
+const initialState = {
+    MeasurableCategoriesAdminView
+};
 
-/**
- * Nullable description
- */
-public interface DescriptionProvider {
 
-    @Value.Auxiliary
-    @Nullable
-    String description();
+function controller() {
+
+    const vm = initialiseData(this, initialState);
 }
+
+
+controller.$inject = [];
+
+
+export default {
+    template: `<waltz-svelte-component component="$ctrl.MeasurableCategoriesAdminView"></waltz-svelte-component>`,
+    controller,
+    controllerAs: "$ctrl",
+    bindToController: true,
+};
