@@ -18,7 +18,11 @@
 
 package org.finos.waltz.model;
 
-
+/**
+ * Entity reference provider (required)
+ *
+ * Typically, a combination of name, id and kind
+ */
 public interface WaltzEntity {
 
     EntityReference entityReference();

@@ -18,6 +18,9 @@
 
 package org.finos.waltz.model;
 
+/**
+ * Entity kind provider (required)
+ */
 public interface EntityKindProvider {
 
     EntityKind kind();

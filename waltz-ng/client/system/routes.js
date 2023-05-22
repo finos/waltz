@@ -35,6 +35,7 @@ import ReassignRecipientsView from "./reassign-recipients-view";
 import ColorGradientView from "./color-gradient-view";
 import NavAidBuilderView from "./nav-aid-builder-view";
 import VersionInfoView from "./version-info-view";
+import MeasurableCategoriesView from "./measurable-categories-view";
 
 
 const baseState = {
@@ -108,6 +109,12 @@ const ratingSchemesState = {
 };
 
 
+const measurableCategoriesState = {
+    url: "/measurable-categories",
+    views: { "content@": MeasurableCategoriesView }
+};
+
+
 const eudaListState = {
     url: "/euda-list",
     views: {"content@": EudaListView}
@@ -141,20 +148,21 @@ function setupRoutes($stateProvider) {
     $stateProvider
         .state("main.system", baseState)
         .state("main.system.list", listViewState)
-        .state("main.system.settings", settingsState)
-        .state("main.system.hierarchies", hierarchiesState)
-        .state("main.system.orphans", orphansState)
         .state("main.system.actors", actorsState)
-        .state("main.system.entity-named-note-types", entityNamedNodeTypesState)
         .state("main.system.assessment-definitions", assessmentDefintionsState)
-        .state("main.system.static-panels", staticPanelsState)
-        .state("main.system.rating-schemes", ratingSchemesState)
-        .state("main.system.euda-list", eudaListState)
-        .state("main.system.relationship-kinds", relationshipKindsState)
-        .state("main.system.recalculate", recalculateState)
-        .state("main.system.reassign-recipients", reassignRecipientsState)
         .state("main.system.color-gradient", colorGradientState)
+        .state("main.system.entity-named-note-types", entityNamedNodeTypesState)
+        .state("main.system.euda-list", eudaListState)
+        .state("main.system.hierarchies", hierarchiesState)
+        .state("main.system.measurable-categories", measurableCategoriesState)
         .state("main.system.nav-aid-builder", navAidBuilderState)
+        .state("main.system.orphans", orphansState)
+        .state("main.system.rating-schemes", ratingSchemesState)
+        .state("main.system.reassign-recipients", reassignRecipientsState)
+        .state("main.system.recalculate", recalculateState)
+        .state("main.system.relationship-kinds", relationshipKindsState)
+        .state("main.system.settings", settingsState)
+        .state("main.system.static-panels", staticPanelsState)
         .state("main.system.version-info", versionInfoState);
 }
 

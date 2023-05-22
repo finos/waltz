@@ -16,9 +16,16 @@ export function mkMeasurableCategoryStore() {
             null,
             {force});
 
+    const save = (cmd = {}) => remote
+        .execute(
+            "POST",
+            "api/measurable-category/save",
+            cmd);
+
     return {
         findAll,
-        getById
+        getById,
+        save
     };
 }
 

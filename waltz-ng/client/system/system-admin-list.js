@@ -81,17 +81,23 @@ const referenceDataOptions= [
         state: "main.system.entity-named-note-types",
         icon: "sticky-note"
     }, {
+        name: "EUDA Promotion",
+        role: "EUDA_ADMIN",
+        description: "View EUDAs and promote to applications",
+        state: "main.system.euda-list",
+        icon: "table"
+    }, {
         name: "Involvement Kinds",
         role: "ADMIN",
         description: "View and edit system involvement kinds",
         state: "main.involvement-kind.list",
         icon: "id-badge"
     }, {
-        name: "Static Panels",
+        name: "Measurable Categories",
         role: "ADMIN",
-        description: "View and edit static panels",
-        state: "main.system.static-panels",
-        icon: "code"
+        description: "View and edit measurable categories",
+        state: "main.system.measurable-categories",
+        icon: "puzzle-piece"
     }, {
         name: "Rating Schemes",
         role: "ADMIN",
@@ -99,18 +105,18 @@ const referenceDataOptions= [
         state: "main.system.rating-schemes",
         icon: "puzzle-piece"
     }, {
-        name: "EUDA Promotion",
-        role: "EUDA_ADMIN",
-        description: "View EUDAs and promote to applications",
-        state: "main.system.euda-list",
-        icon: "table"
-    }, {
         name: "Relationship Kinds",
         role: "ADMIN",
         description: "View and edit relationship kinds",
         state: "main.system.relationship-kinds",
         icon: "link"
-    },
+    }, {
+        name: "Static Panels",
+        role: "ADMIN",
+        description: "View and edit static panels",
+        state: "main.system.static-panels",
+        icon: "code"
+    }
 ];
 
 

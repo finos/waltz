@@ -33,10 +33,9 @@ export function mkErrorMessage(message, e) {
 
     const possiblePaths = [
         d => _.get(d,["data", "message"]),
-        d => _.get(d, ["error"])
+        d => _.get(d, ["error"]),
+        d => fallbackReason
     ];
-
-
 
     const reason = e
         ? ": " + firstToReturn(e, possiblePaths)
@@ -56,7 +55,7 @@ export function mkErrorMessage(message, e) {
 export function displayError(message, e) {
     const msg = mkErrorMessage(message, e);
     ToastStore.error(msg);
-    console.log(msg, e);
+    console.log("displayError:", {msg, e});
     return msg;
 }
 

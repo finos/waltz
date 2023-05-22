@@ -23,6 +23,9 @@ import org.immutables.value.Value;
 
 import java.time.LocalDateTime;
 
+/**
+ * Last updated at (defaulting) and by (required)
+ */
 public interface LastUpdatedProvider {
 
     @Value.Default
