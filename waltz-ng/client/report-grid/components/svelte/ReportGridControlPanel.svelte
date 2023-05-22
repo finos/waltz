@@ -81,7 +81,6 @@
     </label>
 
     <div class="wt-tab wt-active">
-        <!-- SERVERS -->
         {#if selectedTab === 'overview'}
             <ReportGridOverview onGridSelect={handleGridSelect}
                                 {primaryEntityRef}/>

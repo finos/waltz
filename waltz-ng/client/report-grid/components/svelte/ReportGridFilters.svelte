@@ -120,7 +120,7 @@
     {/if}
 
 
-    <div class="row">
+    <div class="row waltz-sticky-wrapper">
         <div class="col-sm-8">
             {#each chunkedSummaryData as row}
                 <div class="row">
@@ -186,50 +186,51 @@
             {/each}
         </div>
         <div class="col-sm-4">
-            <h5>
-                <Icon name="filter"/>
-                Filter Picker
-            </h5>
-            <div class:waltz-scroll-region-350={_.size(availableSummaries) > 10}>
-                <table class="table table-condensed small summary-table table-hover">
-                    <tbody>
-                    {#each availableSummaries as summary}
-                        <tr on:click={() => addOrRemoveFromActiveSummaries(summary)}
-                            class="clickable waltz-visibility-parent"
-                            class:isActiveFilter={isActive($activeSummaries, summary)}>
-                            <td>
+            <div class="waltz-sticky-part">
+                <h5>
+                    <Icon name="filter"/>
+                    Filter Picker
+                </h5>
+                <div class:waltz-scroll-region-350={_.size(availableSummaries) > 10}>
+                    <table class="table table-condensed small summary-table table-hover">
+                        <tbody>
+                        {#each availableSummaries as summary}
+                            <tr on:click={() => addOrRemoveFromActiveSummaries(summary)}
+                                class="clickable waltz-visibility-parent"
+                                class:isActiveFilter={isActive($activeSummaries, summary)}>
+                                <td>
                                 <span class="waltz-visibility-child-30">
                                     <Icon name={isActive($activeSummaries, summary) ? 'check' : 'arrow-left'}/>
                                 </span>
-                                <span class="column-name">
+                                    <span class="column-name">
                                 {getDisplayNameForColumn(summary.column)}
                             </span>
-                                <ul style="display: inline-block"
-                                    class="list-inline column-values-summary">
-                                    {#each summary.optionSummaries as option}
-                                        <li title={mkOptionSummaryTitle(option)}>
-                                            <span style={`
-                                                    background-color: ${option.optionInfo.color};
-                                                    opacity: ${option.counts.visible > 0 ? 1 : 0.2};
-                                            `}/>
-                                        </li>
-                                    {/each}
-                                </ul>
-                            </td>
-                    </tr>
-                    {:else}
-                        <tr>
-                            <td>
-                                <NoData type="info">
-                                    <span>No columns available for use as filters</span>
-                                </NoData>
-                            </td>
-                        </tr>
-                    {/each}
-                    </tbody>
-                </table>
+                                    <ul style="display: inline-block"
+                                        class="list-inline column-values-summary">
+                                        {#each summary.optionSummaries as option}
+                                            <li title={mkOptionSummaryTitle(option)}>
+                                                <span style={`
+                                                        background-color: ${option.optionInfo.color};
+                                                        opacity: ${option.counts.visible > 0 ? 1 : 0.2};
+                                                `}></span>
+                                            </li>
+                                        {/each}
+                                    </ul>
+                                </td>
+                            </tr>
+                        {:else}
+                            <tr>
+                                <td>
+                                    <NoData type="info">
+                                        <span>No columns available for use as filters</span>
+                                    </NoData>
+                                </td>
+                            </tr>
+                        {/each}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-
         </div>
     </div>
 
