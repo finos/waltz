@@ -15,10 +15,16 @@
         ? _.chain(measurables)
             .filter(m => m.categoryId === selectedCategory.id)
             .thru(buildHierarchies)
+            .orderBy([d => d.position, d => d.name])
             .map(l1 => ({
                 id: l1.externalId,
                 name: l1.name,
-                rows: mkChunks(l1.children.map(l2 => ({name: l2.name, id: l2.externalId, waltzId: l2.id})), 4)
+                rows: mkChunks(_
+                        .chain(l1.children)
+                        .orderBy([d => d.position, d => d.name])
+                        .map(l2 => ({name: l2.name, id: l2.externalId, waltzId: l2.id}))
+                        .value(),
+                    4)
             }))
             .value()
         : [];
