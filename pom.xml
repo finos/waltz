@@ -103,7 +103,7 @@
         <spring.version>5.3.27</spring.version>
         <super-csv.version>2.4.0</super-csv.version>
         <surefire.version>2.22.2</surefire.version>
-        <commons-jexl3.version>3.3</commons-jexl3.version>
+        <commons-jexl3.version>3.2.1</commons-jexl3.version>
 
         <timestamp>${maven.build.timestamp}</timestamp>
         <playwright.skip>true</playwright.skip>
