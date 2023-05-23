@@ -307,6 +307,32 @@
     </changeSet>
 
     <changeSet id="20230522-6612-8"
+               author="woodjes"
+               dbms="!h2">
+        <comment>6612: Updates the report grid columns to the new inv kind</comment>
+        <sql>
+            with kind_mappings as (select involvement_kind.id old_id, new_id.id new_id, new_id.subject_kind new_kind
+                                   from involvement_kind
+                                            inner join involvement_kind new_id
+                                                       on involvement_kind.name = new_id.name and involvement_kind.id != new_id.id
+            where involvement_kind.subject_kind is null)
+                , required_updates as (
+            select distinct fcd.id, kind_mappings.new_id
+            from report_grid_fixed_column_definition fcd
+                inner join report_grid_column_definition cd
+            on fcd.grid_column_id = cd.id
+                inner join report_grid rg on cd.report_grid_id = rg.id
+                left join kind_mappings on fcd.column_entity_id = kind_mappings.old_id
+                and rg.subject_kind = kind_mappings.new_kind
+            where fcd.column_entity_kind = 'INVOLVEMENT_KIND'
+              and fcd.column_entity_id in (select old_id from kind_mappings))
+            update report_grid_fixed_column_definition
+            set column_entity_id = required_updates.new_id from required_updates
+            where report_grid_fixed_column_definition.id = required_updates.id;
+        </sql>
+    </changeSet>
+
+    <changeSet id="20230522-6612-9"
                author="woodjes">
         <comment>6612: Clean up old involvement kinds</comment>
         <delete tableName="involvement_kind">
@@ -316,7 +342,7 @@
         </delete>
     </changeSet>
 
-    <changeSet id="20230522-6612-9"
+    <changeSet id="20230522-6612-10"
                author="woodjes">
         <comment>6612: Make subject kind required</comment>
         <addNotNullConstraint tableName="involvement_kind"
@@ -324,7 +350,7 @@
                               columnDataType="${enum.type}"/>
     </changeSet>
 
-    <changeSet id="20230522-6612-10"
+    <changeSet id="20230522-6612-11"
                author="woodjes">
         <addColumn tableName="involvement_kind">
             <column name="permitted_role"
