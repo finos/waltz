@@ -167,6 +167,7 @@ function controller($q, displayNameService, descriptionService, serviceBroker, i
                 vm.allowedInvolvements = _
                     .chain(involvementKinds)
                     .filter(ik => ik.userSelectable)
+                    .filter(ik => ik.subjectKind === vm.parentEntityRef.kind)
                     .map(ik => ({ value: ik.id, name: ik.name }))
                     .value();
             });
