@@ -45,6 +45,7 @@ public class ArchitectureComplianceTest extends BaseArchitectureComplianceTest {
     @Test
     public void ensureLayersAreRespected() {
         layeredArchitecture()
+                .consideringOnlyDependenciesInLayers()
                 .layer("Web").definedBy("..web..")
                 .layer("Endpoints").definedBy("..endpoints.api..")
                 .layer("Extractors").definedBy("..endpoints.extracts..")
