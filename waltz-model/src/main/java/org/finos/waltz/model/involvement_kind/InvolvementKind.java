@@ -45,6 +45,4 @@ public abstract class InvolvementKind implements
         return true;
     }
 
-    ;
-
 }

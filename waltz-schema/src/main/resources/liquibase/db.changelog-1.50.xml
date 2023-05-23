@@ -158,7 +158,7 @@
     <changeSet id="20230522-6612-2"
                author="woodjes"
                dbms="!h2">
-        <comment>6612: Updates the subject kind value for involvement kinds only used by one entity kind, if no sages
+        <comment>6612: Updates the subject kind value for involvement kinds only used by one entity kind, if no usages
             defaults to 'APPLICATION'
         </comment>
         <sql>
