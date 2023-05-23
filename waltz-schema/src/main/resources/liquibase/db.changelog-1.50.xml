@@ -177,6 +177,18 @@
         </sql>
     </changeSet>
 
+    <changeSet id="20230522-6612-3"
+               author="woodjes">
+        <preConditions onFail="MARK_RAN">
+            <indexExists indexName="UQ__involvem__72E12F1B741599ED"
+                         tableName="involvement_kind"/>
+        </preConditions>
+        <comment>6612: drop index to allow splitting of inv kinds by subject kind</comment>
+        <dropUniqueConstraint tableName="involvement_kind"
+                              constraintName="UQ__involvem__72E12F1B741599ED"
+                              uniqueColumns="name"/>
+    </changeSet>
+
     <changeSet id="20230522-6612-4"
                author="woodjes"
                dbms="!h2">
@@ -204,18 +216,6 @@
             select *
             from to_insert;
         </sql>
-    </changeSet>
-
-    <changeSet id="20230522-6612-3"
-               author="woodjes">
-        <preConditions onFail="MARK_RAN">
-            <indexExists indexName="UQ__involvem__72E12F1B741599ED"
-                         tableName="involvement_kind"/>
-        </preConditions>
-        <comment>6612: drop index to allow splitting of inv kinds by subject kind</comment>
-        <dropUniqueConstraint tableName="involvement_kind"
-                              constraintName="UQ__involvem__72E12F1B741599ED"
-                              uniqueColumns="name"/>
     </changeSet>
 
     <changeSet id="20230522-6612-5"
