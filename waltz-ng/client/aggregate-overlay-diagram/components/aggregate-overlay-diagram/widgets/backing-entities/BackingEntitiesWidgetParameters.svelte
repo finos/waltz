@@ -7,3 +7,7 @@
     $widgetParameters = {};
     $selectedOverlay = null;
 </script>
+
+<div class="help-block">
+    The backing widget overlay has no configurable parameters
+</div>
