@@ -8,3 +8,7 @@
     $selectedOverlay = null;
 </script>
 
+
+<div class="help-block">
+    The aggregated entities overlay has no configurable parameters
+</div>
