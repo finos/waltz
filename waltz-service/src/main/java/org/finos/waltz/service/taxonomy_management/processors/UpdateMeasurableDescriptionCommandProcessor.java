@@ -34,6 +34,7 @@ import java.util.Set;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.service.taxonomy_management.TaxonomyManagementUtilities.findCurrentRatingMappings;
 
 @Service
 public class UpdateMeasurableDescriptionCommandProcessor implements TaxonomyCommandProcessor {
@@ -79,10 +80,10 @@ public class UpdateMeasurableDescriptionCommandProcessor implements TaxonomyComm
         }
 
         TaxonomyManagementUtilities.addToPreview(
-                    preview,
-                    TaxonomyManagementUtilities.findCurrentRatingMappings(measurableRatingService, cmd),
-                    Severity.INFORMATION,
-                    "Current app mappings exist to item, these may be misleading if the description change alters the meaning of this item");
+                preview,
+                findCurrentRatingMappings(measurableRatingService, cmd).size(),
+                Severity.INFORMATION,
+                "Current app mappings exist to item, these may be misleading if the description change alters the meaning of this item");
 
 
         return preview.build();

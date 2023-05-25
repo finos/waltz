@@ -113,17 +113,17 @@ public class TaxonomyManagementUtilities {
      * @return The preview builder for convenience
      */
     public static ImmutableTaxonomyChangePreview.Builder addToPreview(ImmutableTaxonomyChangePreview.Builder preview,
-                                                                      Set<EntityReference> refs,
+                                                                      int impactCount,
                                                                       Severity severity,
                                                                       String msg) {
-        return refs.isEmpty()
-            ? preview
-            : preview
+        return impactCount == 0
+                ? preview
+                : preview
                 .addImpacts(ImmutableTaxonomyChangeImpact.builder()
-                .impactedReferences(refs)
-                .description(msg)
-                .severity(severity)
-                .build());
+                        .impactCount(impactCount)
+                        .description(msg)
+                        .severity(severity)
+                        .build());
     }
 
 

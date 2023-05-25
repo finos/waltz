@@ -288,4 +288,8 @@ public class MeasurableRatingService {
     public boolean checkRatingExists(SaveMeasurableRatingCommand command) {
         return measurableRatingDao.checkRatingExists(command);
     }
+
+    public void migrateRatings(Long measurableId, Long targetMeasurableId, String userId) {
+        measurableRatingDao.migrateRatings(measurableId, targetMeasurableId, userId);
+    }
 }

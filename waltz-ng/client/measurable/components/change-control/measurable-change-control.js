@@ -271,6 +271,37 @@ function controller($scope,
         color: "#b40400",
         options: [
             {
+                name: "Merge",
+                code: "MERGE",
+                icon: "code-fork",
+                description: "Merges this item with another and all of it's children will be migrated",
+                onShow: () => {
+                    resetForm();
+                    calcPreview();
+                    vm.submitDisabled = false;
+                },
+                paramProcessor: (d) => _.isEmpty(d)
+                    ? {}
+                    : ({
+                        targetId: d.target.id,
+                        targetName: d.target.name
+                    }),
+                onChange: (target) => {
+                    if (target.id === vm.measurable.id) {
+                        toasts.warning("Cannot merge onto yourself, ignoring....");
+                        vm.commandParams.destination = null;
+                        vm.submitDisabled = true;
+                    } else if (vm.measurable.concrete && !target.concrete) {
+                        toasts.warning("Cannot migrate to a non-concrete node, ignoring....");
+                        vm.commandParams.destination = null;
+                        vm.submitDisabled = true;
+                    } else {
+                        vm.commandParams.target = target;
+                        vm.submitDisabled = false;
+                    }
+                }
+            },
+            {
                 name: "Remove",
                 code: "REMOVE",
                 icon: "trash",

@@ -18,6 +18,7 @@
 
 package org.finos.waltz.data.entity_named_note;
 
+import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.schema.tables.records.EntityNamedNoteRecord;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -137,5 +138,13 @@ public class EntityNamedNoteDao {
                 .and(ENTITY_NAMED_NOTE.ENTITY_KIND.eq(entityReference.kind().name()))
                 .and(ENTITY_NAMED_NOTE.ENTITY_ID.eq(entityReference.id()))
                 .fetchSet(TO_DOMAIN_MAPPER);
+    }
+
+    public int deleteByParentSelector(GenericSelector selector) {
+        return dsl
+                .deleteFrom(ENTITY_NAMED_NOTE)
+                .where(ENTITY_NAMED_NOTE.ENTITY_ID.in(selector.selector())
+                        .and(ENTITY_NAMED_NOTE.ENTITY_KIND.eq(selector.kind().name())))
+                .execute();
     }
 }
