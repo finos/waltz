@@ -492,35 +492,56 @@ public class MeasurableRatingDao {
         });
     }
 
+
     private SelectOrderByStep<Record2<Long, String>> selectRatingsThatCanBeModified(Long measurableId, Long targetId) {
 
-        SelectConditionStep<Record2<Long, String>> targets = DSL
-                .select(Tables.MEASURABLE_RATING.ENTITY_ID, Tables.MEASURABLE_RATING.ENTITY_KIND)
-                .from(Tables.MEASURABLE_RATING)
-                .where(Tables.MEASURABLE_RATING.MEASURABLE_ID.eq(targetId));
+        SelectConditionStep<Record2<Long, String>> targets = mkEntitySelectForMeasurable(targetId);
+        SelectConditionStep<Record2<Long, String>> migrations = mkEntitySelectForMeasurable(measurableId);
 
-        SelectConditionStep<Record2<Long, String>> migrations = DSL
+        return migrations.except(targets);
+    }
+
+    private SelectConditionStep<Record2<Long, String>> mkEntitySelectForMeasurable(Long measurableId) {
+        return DSL
                 .select(Tables.MEASURABLE_RATING.ENTITY_ID, Tables.MEASURABLE_RATING.ENTITY_KIND)
                 .from(Tables.MEASURABLE_RATING)
                 .where(Tables.MEASURABLE_RATING.MEASURABLE_ID.eq(measurableId));
+    }
 
-        return migrations.except(targets);
+    public int getSharedRatingsCount(Long measurableId, Long targetId) {
+
+        SelectConditionStep<Record2<Long, String>> targets = mkEntitySelectForMeasurable(targetId);
+        SelectConditionStep<Record2<Long, String>> migrations = mkEntitySelectForMeasurable(measurableId);
+
+        SelectOrderByStep<Record2<Long, String>> sharedRatings = migrations.intersect(targets);
+
+        return dsl.fetchCount(sharedRatings);
+    }
+
+    public int getSharedDecommsCount(Long measurableId, Long targetId) {
+
+        SelectConditionStep<Record2<Long, String>> targets = mkEntitySelectForDecomm(targetId);
+        SelectConditionStep<Record2<Long, String>> migrations = mkEntitySelectForDecomm(measurableId);
+
+        SelectOrderByStep<Record2<Long, String>> sharedDecomms = migrations.intersect(targets);
+
+        return dsl.fetchCount(sharedDecomms);
     }
 
 
     private SelectOrderByStep<Record2<Long, String>> selectDecommsThatCanBeModified(Long measurableId, Long targetId) {
 
-        SelectConditionStep<Record2<Long, String>> targets = DSL
-                .select(MEASURABLE_RATING_PLANNED_DECOMMISSION.ENTITY_ID, MEASURABLE_RATING_PLANNED_DECOMMISSION.ENTITY_KIND)
-                .from(MEASURABLE_RATING_PLANNED_DECOMMISSION)
-                .where(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_ID.eq(targetId));
+        SelectConditionStep<Record2<Long, String>> targets = mkEntitySelectForDecomm(targetId);
+        SelectConditionStep<Record2<Long, String>> migrations = mkEntitySelectForDecomm(measurableId);
 
-        SelectConditionStep<Record2<Long, String>> migrations = DSL
+        return migrations.except(targets);
+    }
+
+    private SelectConditionStep<Record2<Long, String>> mkEntitySelectForDecomm(Long measurableId) {
+        return DSL
                 .select(MEASURABLE_RATING_PLANNED_DECOMMISSION.ENTITY_ID, MEASURABLE_RATING_PLANNED_DECOMMISSION.ENTITY_KIND)
                 .from(MEASURABLE_RATING_PLANNED_DECOMMISSION)
                 .where(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_ID.eq(measurableId));
-
-        return migrations.except(targets);
     }
 
 

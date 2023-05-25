@@ -1,9 +1,6 @@
 package org.finos.waltz.service.taxonomy_management.processors;
 
-import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.IdSelectionOptions;
-import org.finos.waltz.model.Severity;
+import org.finos.waltz.model.*;
 import org.finos.waltz.model.assessment_rating.AssessmentRating;
 import org.finos.waltz.model.bookmark.Bookmark;
 import org.finos.waltz.model.entity_named_note.EntityNamedNote;
@@ -49,8 +46,6 @@ public class TaxonomyManagementHelper {
     private final MeasurableService measurableService;
     private final EntityNamedNoteService entityNamedNoteService;
     private final AssessmentRatingService assessmentRatingService;
-    private final MeasurableRatingPlannedDecommissionService measurableRatingPlannedDecommissionService;
-
 
     @Autowired
     public TaxonomyManagementHelper(BookmarkService bookmarkService,
@@ -60,8 +55,7 @@ public class TaxonomyManagementHelper {
                                     MeasurableRatingService measurableRatingService,
                                     MeasurableService measurableService,
                                     EntityNamedNoteService entityNamedNoteService,
-                                    AssessmentRatingService assessmentRatingService,
-                                    MeasurableRatingPlannedDecommissionService measurableRatingPlannedDecommissionService) {
+                                    AssessmentRatingService assessmentRatingService) {
 
         checkNotNull(bookmarkService, "bookmarkService cannot be null");
         checkNotNull(entityRelationshipService, "entityRelationshipService cannot be null");
@@ -71,7 +65,6 @@ public class TaxonomyManagementHelper {
         checkNotNull(measurableService, "measurableService cannot be null");
         checkNotNull(entityNamedNoteService, "entityNamedNoteService cannot be null");
         checkNotNull(assessmentRatingService, "assessmentRatingService cannot be null");
-        checkNotNull(measurableRatingPlannedDecommissionService, "measurableRatingPlannedDecommissionService cannot be null");
 
         this.assessmentRatingService = assessmentRatingService;
         this.bookmarkService = bookmarkService;
@@ -81,7 +74,6 @@ public class TaxonomyManagementHelper {
         this.involvementService = involvementService;
         this.measurableRatingService = measurableRatingService;
         this.measurableService = measurableService;
-        this.measurableRatingPlannedDecommissionService = measurableRatingPlannedDecommissionService;
     }
 
 
@@ -177,6 +169,46 @@ public class TaxonomyManagementHelper {
                 minus(childRefs, asSet(selectionOptions.entityReference())).size(),
                 Severity.ERROR,
                 "This node has child nodes which will also be removed");
+    }
+
+    public void previewChildNodeMigrations(ImmutableTaxonomyChangePreview.Builder preview,
+                                           IdSelectionOptions selectionOptions) {
+
+        ImmutableIdSelectionOptions hierarchySelector = ImmutableIdSelectionOptions.copyOf(selectionOptions).withScope(HierarchyQueryScope.CHILDREN);
+
+        Set<EntityReference> childRefs = map(measurableService.findByMeasurableIdSelector(hierarchySelector), Measurable::entityReference);
+
+        addToPreview(
+                preview,
+                minus(childRefs, asSet(selectionOptions.entityReference())).size(),
+                Severity.WARNING,
+                "This node has child nodes which will be migrated to the new target");
+    }
+
+    public void previewRatingMigrations(ImmutableTaxonomyChangePreview.Builder preview,
+                                        Long measurableId,
+                                        Long targetId) {
+
+        int sharedRatingsCount = measurableRatingService.getSharedRatingsCount(measurableId, targetId);
+
+        addToPreview(
+                preview,
+                sharedRatingsCount,
+                Severity.WARNING,
+                "This node has measurable ratings that cannot be migrated due to an existing rating on the target");
+    }
+
+    public void previewDecommMigrations(ImmutableTaxonomyChangePreview.Builder preview,
+                                        Long measurableId,
+                                        Long targetId) {
+
+        int sharedDecommsCount = measurableRatingService.getSharedDecommsCount(measurableId, targetId);
+
+        addToPreview(
+                preview,
+                sharedDecommsCount,
+                Severity.WARNING,
+                "This node has measurable rating planned decommission dates that cannot be migrated due to an existing decom on the target rating");
     }
 
 

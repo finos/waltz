@@ -81,6 +81,13 @@ public class MergeMeasurableCommandProcessor implements TaxonomyCommandProcessor
         taxonomyManagementHelper.previewEntityNamedNoteRemovals(previewBuilder, opts);
         taxonomyManagementHelper.previewAssessmentRemovals(previewBuilder, opts);
         taxonomyManagementHelper.previewFlowDiagramRemovals(previewBuilder, opts);
+        taxonomyManagementHelper.previewChildNodeMigrations(previewBuilder, opts);
+
+        Long target = getTarget(cmd);
+        if (target != null) {
+            taxonomyManagementHelper.previewRatingMigrations(previewBuilder, opts.entityReference().id(), target);
+            taxonomyManagementHelper.previewDecommMigrations(previewBuilder, opts.entityReference().id(), target);
+        }
 
         ImmutableTaxonomyChangePreview preview = previewBuilder.build();
 
