@@ -18,6 +18,7 @@
 
 package org.finos.waltz.service.taxonomy_management.processors;
 
+import org.finos.waltz.common.Checks;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.model.EntityKind;
@@ -97,12 +98,10 @@ public class MergeMeasurableCommandProcessor implements TaxonomyCommandProcessor
 
 
     public TaxonomyChangeCommand apply(TaxonomyChangeCommand cmd, String userId) {
+
         Measurable measurableToMerge = validate(cmd);
         Long target = getTarget(cmd);
-
-        if (target == null) {
-            throw new IllegalArgumentException("Cannot perform a merge where the target has not been identified");
-        }
+        checkNotNull(target, "Target cannot be null when migrating a measurable");
 
         String targetName = getTargetName(cmd);
         IdSelectionOptions selectionOptions = mkOpts(measurableToMerge.entityReference(), HierarchyQueryScope.EXACT); // children are migrated, do not want to delete their data
