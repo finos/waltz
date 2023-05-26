@@ -266,6 +266,44 @@
                     </p>
                 </div>
             </div>
+       </div>
+    </div>
+</script>
+
+
+<script type="text/ng-template"
+        id="wmcc/MERGE.html">
+    <p>
+        The node being merged is:
+        <kbd ng-bind="$ctrl.measurable.name"></kbd>
+    </p>
+
+    <div>
+        <div class="form-group">
+
+            <label for="wmcc.target"
+                   class="control-label">
+                Target:
+            </label>
+            <div id="wmcc.target">
+                <div ng-if="!$ctrl.commandParams.target">
+                    <waltz-measurable-tree measurables="$ctrl.tree"
+                                           on-select="$ctrl.selectedOperation.onChange">
+                    </waltz-measurable-tree>
+                </div>
+                <div ng-if="$ctrl.commandParams.target">
+                    <p>
+                        Target: <kbd ng-bind="$ctrl.commandParams.target.name"></kbd>
+                        <br>
+                        <a ng-click="$ctrl.selectedOperation.onReset()"
+                           class="clickable">
+                            Clear target
+                        </a>.
+                    </p>
+                </div>
+            </div>
+            <waltz-taxonomy-change-command-preview preview="$ctrl.preview">
+            </waltz-taxonomy-change-command-preview>
         </div>
     </div>
 </script>

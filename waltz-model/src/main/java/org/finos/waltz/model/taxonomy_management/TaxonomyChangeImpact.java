@@ -33,7 +33,9 @@ import java.util.Set;
 public abstract class TaxonomyChangeImpact implements DescriptionProvider {
 
     public abstract Severity severity();
+
     public abstract String description();
-    public abstract Set<EntityReference> impactedReferences();
+
+    public abstract int impactCount();
 
 }

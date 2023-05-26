@@ -71,13 +71,15 @@ function controller($scope,
     const vm = initialiseData(this, initialState);
 
     function mkCmd(params = {}) {
+
         const paramProcessor = vm.selectedOperation.paramProcessor || _.identity;
+        const processedParam = paramProcessor(params);
 
         return {
             changeType: vm.selectedOperation.code,
             changeDomain: toEntityRef(vm.changeDomain),
             primaryReference: toEntityRef(vm.measurable),
-            params: paramProcessor(params),
+            params: processedParam,
             createdBy: vm.userName,
             lastUpdatedBy: vm.userName
         };
@@ -88,7 +90,7 @@ function controller($scope,
     }
 
     function mkPreviewCmd() {
-        return mkCmd();
+        return mkCmd(vm.commandParams);
     }
 
     function calcPreview() {
@@ -270,6 +272,45 @@ function controller($scope,
                 should be used with care`,
         color: "#b40400",
         options: [
+            {
+                name: "Merge",
+                code: "MERGE",
+                icon: "code-fork",
+                description: "Merges this item with another and all of it's children will be migrated",
+                onShow: () => {
+                    resetForm();
+                    calcPreview();
+                },
+                paramProcessor: (d) => _.isEmpty(d)
+                    ? {}
+                    : ({
+                        targetId: d.target.id,
+                        targetName: d.target.name
+                    }),
+                onReset: () => {
+                    vm.commandParams.target = null;
+                    vm.submitDisabled = true;
+                },
+                onChange: (target) => {
+                    if (target === null) {
+                        toasts.warning("Must have selected a arget to merge, ignoring....");
+                        vm.commandParams.target = null;
+                        vm.submitDisabled = true;
+                    } else if (target.id === vm.measurable.id) {
+                        toasts.warning("Cannot merge onto yourself, ignoring....");
+                        vm.commandParams.target = null;
+                        vm.submitDisabled = true;
+                    } else if (vm.measurable.concrete && !target.concrete) {
+                        toasts.warning("Cannot migrate to a non-concrete node, ignoring....");
+                        vm.commandParams.target = null;
+                        vm.submitDisabled = true;
+                    } else {
+                        vm.commandParams.target = target;
+                        vm.submitDisabled = false;
+                        calcPreview();
+                    }
+                }
+            },
             {
                 name: "Remove",
                 code: "REMOVE",

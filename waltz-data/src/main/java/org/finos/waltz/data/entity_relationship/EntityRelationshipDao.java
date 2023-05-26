@@ -25,9 +25,12 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.ImmutableEntityReference;
 import org.finos.waltz.model.entity_relationship.*;
+import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.records.EntityRelationshipRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -48,6 +51,7 @@ import static org.finos.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSH
 @Repository
 public class EntityRelationshipDao {
 
+    private static final Logger LOG = LoggerFactory.getLogger(EntityRelationshipDao.class);
 
     private static final List<EntityKind> POSSIBLE_ENTITIES = newArrayList(
             EntityKind.APPLICATION,
@@ -318,5 +322,104 @@ public class EntityRelationshipDao {
                 .where(ENTITY_RELATIONSHIP.ID_A.eq(groupId))
                 .and(ENTITY_RELATIONSHIP.ID_B.in(changeInitiativeIds))
                 .execute();
+    }
+
+
+    public void migrateEntityRelationships(EntityReference sourceReference, EntityReference targetReference, String userId) {
+
+        dsl.transaction(ctx -> {
+
+            DSLContext tx = ctx.dsl();
+
+            LOG.info("Migrating entity relationships from source: {}/{} to target: {}/{}",
+                    sourceReference.kind().prettyName(),
+                    sourceReference.id(),
+                    targetReference.kind().prettyName(),
+                    targetReference.id());
+
+            Condition measurableIsA = Tables.ENTITY_RELATIONSHIP.ID_A.eq(sourceReference.id()).and(Tables.ENTITY_RELATIONSHIP.KIND_A.eq(sourceReference.kind().name()));
+            Condition measurableIsB = Tables.ENTITY_RELATIONSHIP.ID_B.eq(sourceReference.id()).and(Tables.ENTITY_RELATIONSHIP.KIND_B.eq(sourceReference.kind().name()));
+
+            SelectOrderByStep<Record3<Long, String, String>> allowedKindAUpdates = selectKindARelationshipsThatCanBeAdded(sourceReference, targetReference);
+
+            int kindARelsUpdated = tx
+                    .update(Tables.ENTITY_RELATIONSHIP)
+                    .set(Tables.ENTITY_RELATIONSHIP.ID_A, targetReference.id())
+                    .set(Tables.ENTITY_RELATIONSHIP.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
+                    .set(Tables.ENTITY_RELATIONSHIP.LAST_UPDATED_BY, userId)
+                    .from(allowedKindAUpdates)
+                    .where(measurableIsA)
+                    .and(Tables.ENTITY_RELATIONSHIP.KIND_B.eq(allowedKindAUpdates.field(Tables.ENTITY_RELATIONSHIP.KIND_B))
+                            .and(Tables.ENTITY_RELATIONSHIP.ID_B.eq(allowedKindAUpdates.field(Tables.ENTITY_RELATIONSHIP.ID_B))
+                                    .and(Tables.ENTITY_RELATIONSHIP.RELATIONSHIP.eq(allowedKindAUpdates.field(Tables.ENTITY_RELATIONSHIP.RELATIONSHIP)))))
+                    .execute();
+
+            SelectOrderByStep<Record3<Long, String, String>> allowedKindBUpdates = selectKindBRelationshipsThatCanBeAdded(sourceReference, targetReference);
+
+            int kindBRelsUpdated = tx
+                    .update(Tables.ENTITY_RELATIONSHIP)
+                    .set(Tables.ENTITY_RELATIONSHIP.ID_B, targetReference.id())
+                    .set(Tables.ENTITY_RELATIONSHIP.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
+                    .set(Tables.ENTITY_RELATIONSHIP.LAST_UPDATED_BY, userId)
+                    .from(allowedKindBUpdates)
+                    .where(measurableIsB)
+                    .and(Tables.ENTITY_RELATIONSHIP.KIND_A.eq(allowedKindBUpdates.field(Tables.ENTITY_RELATIONSHIP.KIND_A))
+                            .and(Tables.ENTITY_RELATIONSHIP.ID_A.eq(allowedKindBUpdates.field(Tables.ENTITY_RELATIONSHIP.ID_A))
+                                    .and(Tables.ENTITY_RELATIONSHIP.RELATIONSHIP.eq(allowedKindBUpdates.field(Tables.ENTITY_RELATIONSHIP.RELATIONSHIP)))))
+                    .execute();
+
+            int entityRelsRemoved = tx
+                    .deleteFrom(Tables.ENTITY_RELATIONSHIP)
+                    .where(measurableIsA.or(measurableIsB))
+                    .execute();
+
+            LOG.info("Migrated {} relationships from source: {}/{} to target: {}/{}",
+                    kindARelsUpdated + kindBRelsUpdated,
+                    sourceReference.kind().prettyName(),
+                    sourceReference.id(),
+                    targetReference.kind().prettyName(),
+                    targetReference.id());
+
+            LOG.info("Removed {} relationships that could not be migrated from source: {}/{} to target: {}/{} as a relationship already exists",
+                    entityRelsRemoved,
+                    sourceReference.kind().prettyName(),
+                    sourceReference.id(),
+                    targetReference.kind().prettyName(),
+                    targetReference.id());
+        });
+    }
+
+    private SelectOrderByStep<Record3<Long, String, String>> selectKindARelationshipsThatCanBeAdded(EntityReference source, EntityReference target) {
+
+        SelectConditionStep<Record3<Long, String, String>> targets = DSL
+                .select(Tables.ENTITY_RELATIONSHIP.ID_B, Tables.ENTITY_RELATIONSHIP.KIND_B, Tables.ENTITY_RELATIONSHIP.RELATIONSHIP)
+                .from(Tables.ENTITY_RELATIONSHIP)
+                .where(Tables.ENTITY_RELATIONSHIP.ID_A.eq(target.id())
+                        .and(Tables.ENTITY_RELATIONSHIP.KIND_A.eq(target.kind().name())));
+
+        SelectConditionStep<Record3<Long, String, String>> migrations = DSL
+                .select(Tables.ENTITY_RELATIONSHIP.ID_B, Tables.ENTITY_RELATIONSHIP.KIND_B, Tables.ENTITY_RELATIONSHIP.RELATIONSHIP)
+                .from(Tables.ENTITY_RELATIONSHIP)
+                .where(Tables.ENTITY_RELATIONSHIP.ID_A.eq(source.id())
+                        .and(Tables.ENTITY_RELATIONSHIP.KIND_A.eq(source.kind().name())));
+
+        return migrations.except(targets);
+    }
+
+    private SelectOrderByStep<Record3<Long, String, String>> selectKindBRelationshipsThatCanBeAdded(EntityReference source, EntityReference target) {
+
+        SelectConditionStep<Record3<Long, String, String>> targets = DSL
+                .select(Tables.ENTITY_RELATIONSHIP.ID_A, Tables.ENTITY_RELATIONSHIP.KIND_A, Tables.ENTITY_RELATIONSHIP.RELATIONSHIP)
+                .from(Tables.ENTITY_RELATIONSHIP)
+                .where(Tables.ENTITY_RELATIONSHIP.ID_B.eq(target.id())
+                        .and(Tables.ENTITY_RELATIONSHIP.KIND_B.eq(target.kind().name())));
+
+        SelectConditionStep<Record3<Long, String, String>> migrations = DSL
+                .select(Tables.ENTITY_RELATIONSHIP.ID_A, Tables.ENTITY_RELATIONSHIP.KIND_A, Tables.ENTITY_RELATIONSHIP.RELATIONSHIP)
+                .from(Tables.ENTITY_RELATIONSHIP)
+                .where(Tables.ENTITY_RELATIONSHIP.ID_B.eq(source.id())
+                        .and(Tables.ENTITY_RELATIONSHIP.KIND_B.eq(source.kind().name())));
+
+        return migrations.except(targets);
     }
 }

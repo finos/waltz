@@ -32,7 +32,6 @@ public abstract class TaxonomyChangePreview {
 
     public abstract TaxonomyChangeCommand command();
     public abstract List<TaxonomyChangeImpact> impacts();
-
     @Nullable
     public abstract String errorMessage();
 }

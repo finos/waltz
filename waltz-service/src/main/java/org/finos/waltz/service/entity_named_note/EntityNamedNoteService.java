@@ -18,13 +18,12 @@
 
 package org.finos.waltz.service.entity_named_note;
 
+import org.finos.waltz.data.GenericSelector;
+import org.finos.waltz.data.GenericSelectorFactory;
+import org.finos.waltz.model.*;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.data.entity_named_note.EntityNamedNoteDao;
 import org.finos.waltz.data.entity_named_note.EntityNamedNoteTypeDao;
-import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.Operation;
-import org.finos.waltz.model.Severity;
-import org.finos.waltz.model.UserTimestamp;
 import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.entity_named_note.EntityNamedNodeType;
@@ -44,7 +43,7 @@ public class EntityNamedNoteService {
     private final EntityNamedNoteDao entityNamedNoteDao;
     private final EntityNamedNoteTypeDao entityNamedNodeTypeDao;
     private final ChangeLogService changeLogService;
-
+    private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
 
     @Autowired
     public EntityNamedNoteService(EntityNamedNoteDao entityNamedNoteDao,
@@ -126,6 +125,12 @@ public class EntityNamedNoteService {
         }
 
         return rc;
+    }
+
+    public int deleteByNamedNoteParentSelector(IdSelectionOptions selectionOptions) {
+        GenericSelector selector = genericSelectorFactory.apply(selectionOptions);
+        return entityNamedNoteDao
+                .deleteByParentSelector(selector);
     }
 
 
