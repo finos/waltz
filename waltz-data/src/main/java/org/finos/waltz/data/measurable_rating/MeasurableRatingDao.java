@@ -18,6 +18,7 @@
 
 package org.finos.waltz.data.measurable_rating;
 
+import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.exception.NotFoundException;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.data.JooqUtilities;
@@ -400,14 +401,18 @@ public class MeasurableRatingDao {
             throw new IllegalArgumentException("Cannot migrate ratings without specifying a new target");
         }
 
-        LOG.info(
-                "Migrating ratings from measurable: {} to {}",
+        LOG.info("Migrating ratings from measurable: {} to {}",
                 measurableId,
                 targetId);
+
+        int sharedRatingCount = getSharedRatingsCount(measurableId, targetId);
+        int sharedDecomCount = getSharedDecommsCount(measurableId, targetId);
 
         dsl.transaction(ctx -> {
 
             DSLContext tx = ctx.dsl();
+
+            // RATINGS
 
             SelectOrderByStep<Record2<Long, String>> allowableMigrations = selectRatingsThatCanBeModified(measurableId, targetId);
             // Do not update the measurable where an existing mapping already exists
@@ -441,6 +446,25 @@ public class MeasurableRatingDao {
                     .select(ratingsToInsert)
                     .execute();
 
+            writeChangeLogForMerge(
+                    tx,
+                    targetId,
+                    EntityKind.MEASURABLE_RATING,
+                    Operation.UPDATE,
+                    format("Migrated %d ratings from measurable: %d to %d", migratedRatings, measurableId, targetId),
+                    userId);
+
+            writeChangeLogForMerge(
+                    tx,
+                    targetId,
+                    EntityKind.MEASURABLE_RATING,
+                    Operation.REMOVE,
+                    format("Failed to migrate %d ratings from measurable: %d to %d due to existing ratings on the target", sharedRatingCount, measurableId, targetId),
+                    userId);
+
+
+            // DECOMMS
+
             SelectOrderByStep<Record2<Long, String>> allowableDecomns = selectDecommsThatCanBeModified(measurableId, targetId);
 
             int migratedDecoms = tx
@@ -451,6 +475,26 @@ public class MeasurableRatingDao {
                             .and(MEASURABLE_RATING_PLANNED_DECOMMISSION.ENTITY_KIND.eq(allowableDecomns.field(Tables.MEASURABLE_RATING.ENTITY_KIND))
                                     .and(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_ID.eq(measurableId))))
                     .execute();
+
+            writeChangeLogForMerge(
+                    tx,
+                    targetId,
+                    EntityKind.MEASURABLE_RATING_PLANNED_DECOMMISSION,
+                    Operation.UPDATE,
+                    format("Migrated %d decomms from measurable: %d to %d", migratedRatings, measurableId, targetId),
+                    userId);
+
+            writeChangeLogForMerge(
+                    tx,
+                    targetId,
+                    EntityKind.MEASURABLE_RATING_PLANNED_DECOMMISSION,
+                    Operation.REMOVE,
+                    format("Failed to migrate %d decomms from measurable: %d to %d due to existing decomms on the target", sharedDecomCount, measurableId, targetId),
+                    userId);
+
+
+            // ALLOCATIONS
+
 
             SelectOrderByStep<Record2<Long, String>> updateableAllocs = selectAllocsThatCanBeModified(measurableId, targetId);
             SelectHavingStep<Record4<Long, Long, String, Integer>> mergableAllocs = selectAllocsToBeUpdated(measurableId, targetId);
@@ -474,6 +518,23 @@ public class MeasurableRatingDao {
                                             .and(ALLOCATION.MEASURABLE_ID.eq(targetId)))))
                     .execute();
 
+            writeChangeLogForMerge(
+                    tx,
+                    targetId,
+                    EntityKind.ALLOCATION,
+                    Operation.UPDATE,
+                    format("Migrated %d allocations from measurable: %d to %d", migratedRatings, measurableId, targetId),
+                    userId);
+
+            writeChangeLogForMerge(
+                    tx,
+                    targetId,
+                    EntityKind.ALLOCATION,
+                    Operation.REMOVE,
+                    format("Merged %d allocations from measurable: %d to %d due to an existing allocation on the target", sharedDecomCount, measurableId, targetId),
+                    userId);
+
+
             LOG.info(format("Migrated %d ratings, %d decomms, %d/%d allocations (migrated/merged) from measurable: %d to %d",
                     migratedRatings,
                     migratedDecoms,
@@ -490,6 +551,29 @@ public class MeasurableRatingDao {
             // allocations, decomms and replacements are automatically cleared up via cascade delete on fk
             LOG.info("Removed {} measurable ratings and any associated allocations, planned decommissions and replacement applications after migration", removedRatings);
         });
+    }
+
+
+    private void writeChangeLogForMerge(DSLContext tx, Long measurableId, EntityKind childKind, Operation operation, String message, String userId) {
+        tx
+                .insertInto(CHANGE_LOG)
+                .columns(CHANGE_LOG.PARENT_KIND,
+                        CHANGE_LOG.PARENT_ID,
+                        CHANGE_LOG.MESSAGE,
+                        CHANGE_LOG.USER_ID,
+                        CHANGE_LOG.SEVERITY,
+                        CHANGE_LOG.CREATED_AT,
+                        CHANGE_LOG.CHILD_KIND,
+                        CHANGE_LOG.OPERATION)
+                .values(EntityKind.MEASURABLE.name(),
+                        measurableId,
+                        message,
+                        userId,
+                        Severity.INFORMATION.name(),
+                        DateTimeUtilities.nowUtcTimestamp(),
+                        childKind.name(),
+                        operation.name())
+                .execute();
     }
 
 
