@@ -84,11 +84,10 @@ public class MergeMeasurableCommandProcessor implements TaxonomyCommandProcessor
         taxonomyManagementHelper.previewChildNodeMigrations(previewBuilder, opts);
 
         Long target = getTarget(cmd);
+
         if (target != null) {
             taxonomyManagementHelper.previewRatingMigrations(previewBuilder, opts.entityReference().id(), target);
             taxonomyManagementHelper.previewDecommMigrations(previewBuilder, opts.entityReference().id(), target);
-        } else {
-            previewBuilder.errorMessage("Target is null, cannot merge cannot be performed");
         }
 
         ImmutableTaxonomyChangePreview preview = previewBuilder.build();
