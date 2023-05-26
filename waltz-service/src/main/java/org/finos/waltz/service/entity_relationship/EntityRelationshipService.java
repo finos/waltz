@@ -114,4 +114,8 @@ public class EntityRelationshipService {
         GenericSelector selector = genericSelectorFactory.apply(selectionOptions);
         return entityRelationshipDao.deleteForGenericEntitySelector(selector);
     }
+
+    public void migrateEntityRelationships(EntityReference sourceReference, EntityReference targetReference, String userId) {
+        entityRelationshipDao.migrateEntityRelationships(sourceReference, targetReference, userId);
+    }
 }

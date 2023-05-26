@@ -34,7 +34,6 @@ import org.finos.waltz.model.rating.RatingScheme;
 import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.permission.permission_checker.AssessmentRatingPermissionChecker;
-import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -100,6 +99,13 @@ public class AssessmentRatingService {
                                                                      IdSelectionOptions selectionOptions) {
         GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, selectionOptions);
         return assessmentRatingDao.findByGenericSelector(genericSelector);
+    }
+
+
+    public int deleteByAssessmentRatingRelatedSelector(EntityKind targetKind,
+                                                       IdSelectionOptions selectionOptions) {
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, selectionOptions);
+        return assessmentRatingDao.deleteByGenericSelector(genericSelector);
     }
 
 

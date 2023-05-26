@@ -84,10 +84,10 @@ public class UpdateMeasurableNameCommandProcessor implements TaxonomyCommandProc
         }
 
         addToPreview(
-                    preview,
-                    findCurrentRatingMappings(measurableRatingService, cmd),
-                    Severity.INFORMATION,
-                    "Current app mappings exist to item, these may be misleading if the name change alters the meaning of this item");
+                preview,
+                findCurrentRatingMappings(measurableRatingService, cmd).size(),
+                Severity.INFORMATION,
+                "Current app mappings exist to item, these may be misleading if the name change alters the meaning of this item");
 
         return preview.build();
     }

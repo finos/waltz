@@ -83,7 +83,7 @@ public class UpdateMeasurableConcreteFlagCommandProcessor implements TaxonomyCom
         if (!newValue) {
             addToPreview(
                     preview,
-                    findCurrentRatingMappings(measurableRatingService, cmd),
+                    findCurrentRatingMappings(measurableRatingService, cmd).size(),
                     Severity.WARNING,
                     "Current app mappings exist to item, these will be invalid when the item becomes non-concrete");
         }

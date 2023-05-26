@@ -51,34 +51,16 @@ import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 @Service
 public class RemoveMeasurableCommandProcessor implements TaxonomyCommandProcessor {
 
-    private final BookmarkService bookmarkService;
-    private final EntityRelationshipService entityRelationshipService;
-    private final FlowDiagramEntityService flowDiagramEntityService;
-    private final InvolvementService involvementService;
-    private final MeasurableRatingService measurableRatingService;
     private final MeasurableService measurableService;
-
+    private final TaxonomyManagementHelper taxonomyManagementHelper;
 
     @Autowired
-    public RemoveMeasurableCommandProcessor(BookmarkService bookmarkService,
-                                            EntityRelationshipService entityRelationshipService,
-                                            FlowDiagramEntityService flowDiagramEntityService,
-                                            InvolvementService involvementService,
-                                            MeasurableRatingService measurableRatingService,
-                                            MeasurableService measurableService) {
-        checkNotNull(bookmarkService, "bookmarkService cannot be null");
-        checkNotNull(entityRelationshipService, "entityRelationshipService cannot be null");
-        checkNotNull(flowDiagramEntityService, "flowDiagramEntityService cannot be null");
-        checkNotNull(involvementService, "involvementService cannot be null");
-        checkNotNull(measurableRatingService, "measurableRatingService cannot be null");
+    public RemoveMeasurableCommandProcessor(MeasurableService measurableService,
+                                            TaxonomyManagementHelper taxonomyManagementHelper) {
         checkNotNull(measurableService, "measurableService cannot be null");
 
-        this.bookmarkService = bookmarkService;
-        this.entityRelationshipService = entityRelationshipService;
-        this.flowDiagramEntityService = flowDiagramEntityService;
-        this.involvementService = involvementService;
-        this.measurableRatingService = measurableRatingService;
         this.measurableService = measurableService;
+        this.taxonomyManagementHelper = taxonomyManagementHelper;
     }
 
 
@@ -106,96 +88,17 @@ public class RemoveMeasurableCommandProcessor implements TaxonomyCommandProcesso
 
         IdSelectionOptions selectionOptions = mkOpts(cmd.primaryReference(), HierarchyQueryScope.CHILDREN);
 
-        previewChildNodeRemovals(preview, selectionOptions);
-        previewAppMappingRemovals(preview, selectionOptions);
-        previewBookmarkRemovals(preview, selectionOptions);
-        previewInvolvementRemovals(preview, selectionOptions);
-        previewFlowDiagramRemovals(preview, selectionOptions);
-        previewEntityRelationships(preview, selectionOptions);
+        taxonomyManagementHelper.previewChildNodeRemovals(preview, selectionOptions);
+        taxonomyManagementHelper.previewAppMappingRemovals(preview, selectionOptions);
+        taxonomyManagementHelper.previewBookmarkRemovals(preview, selectionOptions);
+        taxonomyManagementHelper.previewInvolvementRemovals(preview, selectionOptions);
+        taxonomyManagementHelper.previewFlowDiagramRemovals(preview, selectionOptions);
+        taxonomyManagementHelper.previewEntityRelationships(preview, selectionOptions);
 
         // TODO: entitySvgDiagrams, roadmapScenarios
 
         return preview.build();
     }
-
-
-    private void previewEntityRelationships(ImmutableTaxonomyChangePreview.Builder preview,
-                                            IdSelectionOptions options) {
-        Set<EntityReference> refs = entityRelationshipService
-                .findForGenericEntitySelector(options)
-                .stream()
-                .flatMap(rel -> Stream.of(rel.a(), rel.b()))
-                .filter(ref -> !ref.equals(options.entityReference()))
-                .collect(Collectors.toSet());
-
-        addToPreview(
-                preview,
-                refs,
-                Severity.WARNING,
-                "Entity Relationships will be removed");
-    }
-
-
-    private void previewFlowDiagramRemovals(ImmutableTaxonomyChangePreview.Builder preview,
-                                            IdSelectionOptions selectionOptions) {
-
-        Set<EntityReference> refs = flowDiagramEntityService
-                .findForEntitySelector(selectionOptions)
-                .stream()
-                .map(FlowDiagramEntity::entityReference)
-                .collect(Collectors.toSet());
-
-        addToPreview(
-                preview,
-                refs,
-                Severity.WARNING,
-                "Relationships to flow diagrams will be removed");
-
-    }
-
-
-    private void previewInvolvementRemovals(ImmutableTaxonomyChangePreview.Builder preview,
-                                            IdSelectionOptions selectionOptions) {
-        addToPreview(
-                preview,
-                map(involvementService.findByGenericEntitySelector(selectionOptions), Involvement::entityReference),
-                Severity.ERROR,
-                "Involvements (links to people) associated to this item (or it's children) will be removed");
-    }
-
-
-    private void previewBookmarkRemovals(ImmutableTaxonomyChangePreview.Builder preview,
-                                         IdSelectionOptions selectionOptions) {
-        Set<Bookmark> bookmarks = bookmarkService.findByBookmarkIdSelector(selectionOptions);
-        addToPreview(
-                preview,
-                map(bookmarks, Bookmark::entityReference),
-                Severity.ERROR,
-                "Bookmarks associated to this item (or it's children) will be removed");
-    }
-
-
-    private void previewAppMappingRemovals(ImmutableTaxonomyChangePreview.Builder preview,
-                                           IdSelectionOptions selectionOptions) {
-        List<MeasurableRating> ratings = measurableRatingService.findByMeasurableIdSelector(selectionOptions);
-        addToPreview(
-                preview,
-                map(ratings, MeasurableRating::entityReference),
-                Severity.ERROR,
-                "Application ratings associated to this item (or it's children) will be removed");
-    }
-
-
-    private void previewChildNodeRemovals(ImmutableTaxonomyChangePreview.Builder preview,
-                                          IdSelectionOptions selectionOptions) {
-        Set<EntityReference> childRefs = map(measurableService.findByMeasurableIdSelector(selectionOptions), Measurable::entityReference);
-        addToPreview(
-                preview,
-                minus(childRefs, asSet(selectionOptions.entityReference())),
-                Severity.ERROR,
-                "This node has child nodes which will also be removed");
-    }
-
 
     public TaxonomyChangeCommand apply(TaxonomyChangeCommand cmd, String userId) {
         doBasicValidation(cmd);
@@ -203,13 +106,16 @@ public class RemoveMeasurableCommandProcessor implements TaxonomyCommandProcesso
 
         IdSelectionOptions selectionOptions = mkOpts(cmd.primaryReference(), HierarchyQueryScope.CHILDREN);
 
-        removeBookmarks(selectionOptions);
-        removeInvolvements(selectionOptions);
-        removeAppMappings(selectionOptions);
-        removeMeasurables(selectionOptions);
-        removeFlowDiagrams(selectionOptions);
-        removeEntityRelationshipsDiagrams(selectionOptions);
-        
+        taxonomyManagementHelper.removeBookmarks(selectionOptions);
+        taxonomyManagementHelper.removeInvolvements(selectionOptions);
+        taxonomyManagementHelper.removeAppMappings(selectionOptions);
+        taxonomyManagementHelper.removeMeasurables(selectionOptions);
+        taxonomyManagementHelper.removeFlowDiagrams(selectionOptions);
+        taxonomyManagementHelper.removeEntityRelationshipsDiagrams(selectionOptions);
+        taxonomyManagementHelper.removeAssessments(EntityKind.MEASURABLE, selectionOptions);
+        taxonomyManagementHelper.removeNamedNotes(selectionOptions);
+
+
         String message = String.format("Measurable %s has been removed", measurable.name());
         Optional<Long> measurableId = measurable.parentId().isPresent()
                 ? measurable.parentId()
@@ -218,40 +124,13 @@ public class RemoveMeasurableCommandProcessor implements TaxonomyCommandProcesso
 
         // TODO: entitySvgDiagrams, roadmapScenarios
 
-        return ImmutableTaxonomyChangeCommand.copyOf(cmd)
+        return ImmutableTaxonomyChangeCommand
+                .copyOf(cmd)
                 .withStatus(TaxonomyChangeLifecycleStatus.EXECUTED)
                 .withLastUpdatedBy(userId)
                 .withLastUpdatedAt(DateTimeUtilities.nowUtc());
     }
 
 
-    private int removeEntityRelationshipsDiagrams(IdSelectionOptions selectionOptions) {
-        return entityRelationshipService.deleteForGenericEntitySelector(selectionOptions);
-    }
-
-
-    private int removeFlowDiagrams(IdSelectionOptions selectionOptions) {
-        return flowDiagramEntityService.deleteForEntitySelector(selectionOptions);
-    }
-
-
-    private int removeMeasurables(IdSelectionOptions selectionOptions) {
-        return measurableService.deleteByIdSelector(selectionOptions);
-    }
-
-
-    private int removeAppMappings(IdSelectionOptions selectionOptions) {
-        return measurableRatingService.deleteByMeasurableIdSelector(selectionOptions);
-    }
-
-
-    private int removeInvolvements(IdSelectionOptions selectionOptions) {
-        return involvementService.deleteByGenericEntitySelector(selectionOptions);
-    }
-
-
-    private int removeBookmarks(IdSelectionOptions selectionOptions) {
-        return bookmarkService.deleteByBookmarkIdSelector(selectionOptions);
-    }
 
 }

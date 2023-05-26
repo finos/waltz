@@ -23,6 +23,7 @@ public enum EntityKind {
     ACTOR("Actor"),
     AGGREGATE_OVERLAY_DIAGRAM("Aggregate Overlay Diagram"),
     AGGREGATE_OVERLAY_DIAGRAM_INSTANCE("Aggregate Overlay Diagram Instance"),
+    ALLOCATION("Allocation"),
     ALLOCATION_SCHEME("Allocation scheme"),
     APPLICATION("Application"),
     APP_GROUP("Application group"),
