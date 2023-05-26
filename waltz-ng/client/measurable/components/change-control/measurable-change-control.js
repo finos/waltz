@@ -71,13 +71,15 @@ function controller($scope,
     const vm = initialiseData(this, initialState);
 
     function mkCmd(params = {}) {
+
         const paramProcessor = vm.selectedOperation.paramProcessor || _.identity;
+        const processedParam = paramProcessor(params);
 
         return {
             changeType: vm.selectedOperation.code,
             changeDomain: toEntityRef(vm.changeDomain),
             primaryReference: toEntityRef(vm.measurable),
-            params: paramProcessor(params),
+            params: processedParam,
             createdBy: vm.userName,
             lastUpdatedBy: vm.userName
         };
@@ -88,7 +90,7 @@ function controller($scope,
     }
 
     function mkPreviewCmd() {
-        return mkCmd();
+        return mkCmd(vm.commandParams);
     }
 
     function calcPreview() {
@@ -278,7 +280,6 @@ function controller($scope,
                 onShow: () => {
                     resetForm();
                     calcPreview();
-                    vm.submitDisabled = false;
                 },
                 paramProcessor: (d) => _.isEmpty(d)
                     ? {}
@@ -286,18 +287,27 @@ function controller($scope,
                         targetId: d.target.id,
                         targetName: d.target.name
                     }),
+                onReset: () => {
+                    vm.commandParams.target = null;
+                    vm.submitDisabled = true;
+                },
                 onChange: (target) => {
-                    if (target.id === vm.measurable.id) {
+                    if (target === null) {
+                        toasts.warning("Must have selected a arget to merge, ignoring....");
+                        vm.commandParams.target = null;
+                        vm.submitDisabled = true;
+                    } else if (target.id === vm.measurable.id) {
                         toasts.warning("Cannot merge onto yourself, ignoring....");
-                        vm.commandParams.destination = null;
+                        vm.commandParams.target = null;
                         vm.submitDisabled = true;
                     } else if (vm.measurable.concrete && !target.concrete) {
                         toasts.warning("Cannot migrate to a non-concrete node, ignoring....");
-                        vm.commandParams.destination = null;
+                        vm.commandParams.target = null;
                         vm.submitDisabled = true;
                     } else {
                         vm.commandParams.target = target;
                         vm.submitDisabled = false;
+                        calcPreview();
                     }
                 }
             },

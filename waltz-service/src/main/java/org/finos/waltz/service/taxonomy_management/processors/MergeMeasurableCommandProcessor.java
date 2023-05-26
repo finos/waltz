@@ -35,7 +35,7 @@ import java.util.Set;
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
-import static org.finos.waltz.service.taxonomy_management.TaxonomyManagementUtilities.validateMeasurableInCategory;
+import static org.finos.waltz.service.taxonomy_management.TaxonomyManagementUtilities.*;
 
 @Service
 public class MergeMeasurableCommandProcessor implements TaxonomyCommandProcessor {
@@ -87,6 +87,8 @@ public class MergeMeasurableCommandProcessor implements TaxonomyCommandProcessor
         if (target != null) {
             taxonomyManagementHelper.previewRatingMigrations(previewBuilder, opts.entityReference().id(), target);
             taxonomyManagementHelper.previewDecommMigrations(previewBuilder, opts.entityReference().id(), target);
+        } else {
+            previewBuilder.errorMessage("Target is null, cannot merge cannot be performed");
         }
 
         ImmutableTaxonomyChangePreview preview = previewBuilder.build();
@@ -138,12 +140,14 @@ public class MergeMeasurableCommandProcessor implements TaxonomyCommandProcessor
     private Measurable validate(TaxonomyChangeCommand cmd) {
         doBasicValidation(cmd);
         long categoryId = cmd.changeDomain().id();
-        Measurable m = validateMeasurableInCategory(measurableService, cmd.primaryReference().id(), categoryId);
+        Measurable measurable = validateMeasurableInCategory(measurableService, cmd.primaryReference().id(), categoryId);
         Long targetId = getTarget(cmd);
         if (targetId != null) {
-            validateMeasurableInCategory(measurableService, targetId, categoryId);
+            Measurable target = validateMeasurableInCategory(measurableService, targetId, categoryId);
+            validateTargetNotChild(measurableService, measurable, target);
+            validateConcreteMergeAllowed(measurable, target);
         }
-        return m;
+        return measurable;
     }
 
 
