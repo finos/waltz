@@ -137,9 +137,9 @@
             const approved = _.get(surveysByStatus, ["APPROVED"], [])
             const rejected = _.get(surveysByStatus, ["REJECTED"], [])
 
-            const [overdue, outstanding] = _.partition(incomplete, d => new Date(d.surveyRun.dueDate) < currentDate);
-            const [dueWeek, moreThanWeek] = _.partition(outstanding, d => new Date(d.surveyRun.dueDate) < weekFromNow);
-            const [dueMonth, future] = _.partition(moreThanWeek, d => new Date(d.surveyRun.dueDate) < monthFromNow);
+            const [overdue, outstanding] = _.partition(incomplete, d => new Date(d.surveyInstance.dueDate) < currentDate);
+            const [dueWeek, moreThanWeek] = _.partition(outstanding, d => new Date(d.surveyInstance.dueDate) < weekFromNow);
+            const [dueMonth, future] = _.partition(moreThanWeek, d => new Date(d.surveyInstance.dueDate) < monthFromNow);
 
             return {
                 template: templatesById[k],
