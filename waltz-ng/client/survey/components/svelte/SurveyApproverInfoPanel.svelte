@@ -44,6 +44,13 @@
 
     const tableHeaders = [
         {
+            cellClass: "overdue",
+            name: "Approval Overdue",
+            longName: "Approval overdue - surveys past their approval due date",
+            description: "Survey is past its approval due date within Waltz",
+            width: "20%",
+            data: d => d.approvalOverdue
+        }, {
             cellClass: "awaiting-approval",
             name: "Awaiting Approval",
             longName: "Completed surveys - awaiting approval",
@@ -52,14 +59,14 @@
             data: d => d.completed
         }, {
             cellClass: "overdue",
-            name: "Overdue",
-            longName: "Overdue surveys",
-            description: "Survey is past its submission due date within Waltz", // check approval or submission due date
+            name: "Submission Overdue",
+            longName: "Surveys for your approval which have not yet been submitted and are overdue",
+            description: "Survey is past its submission due date within Waltz",
             width: "20%",
-            data: d => d.overdue
+            data: d => d.submissionOverdue
         }, {
             cellClass: "awaiting-completion",
-            name: "Awaiting Completion",
+            name: "Awaiting Submission",
             longName: "Incomplete surveys - awaiting completion",
             description: "Surveys that will need approval once they have been submitted, this includes overdue surveys and those that have not passed their due date",
             width: "20%",
@@ -130,7 +137,8 @@
             const approved = _.get(surveysByStatus, ["APPROVED"], [])
             const rejected = _.get(surveysByStatus, ["REJECTED"], [])
 
-            const [overdue, outstanding] = _.partition(incomplete, d => new Date(d.surveyRun.dueDate) < currentDate);
+            const submissionOverdue = _.filter(incomplete, d => new Date(d.surveyInstance.dueDate) < currentDate);
+            const approvalOverdue = _.filter(completed, d => new Date(d.surveyInstance.approvalDueDate) < currentDate);
 
             return {
                 template: templatesById[k],
@@ -138,7 +146,8 @@
                 approved,
                 rejected,
                 completed,
-                overdue,
+                submissionOverdue,
+                approvalOverdue
             }})
         .orderBy(d => d.template.name)
         .value();

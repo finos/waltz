@@ -33,8 +33,13 @@
     </div>
     <br>
     <div class="row">
-        <div class="col-sm-2 waltz-display-field-label">
-            Description
+        <div class="col-sm-2">
+            <div class="waltz-display-field-label">
+                Run Description
+            </div>
+            <div class="small help-block">
+                Default description
+            </div>
         </div>
         <div class="col-sm-10">
             <waltz-markdown text="$ctrl.run.description">
@@ -45,7 +50,10 @@
         <br>
         <div class="row">
             <div class="col-sm-2 waltz-display-field-label">
-                Submission Due
+                Run Submission Due Date
+                <div class="small help-block">
+                    Default submission due date, can be overriden by instances
+                </div>
             </div>
             <div class="col-sm-4">
                 <waltz-editable-field on-save="$ctrl.updateDueDate"
@@ -56,6 +64,9 @@
             </div>
             <div class="col-sm-2 waltz-display-field-label">
                 Approval Due
+                <div class="small help-block">
+                    Default approval due date, can be overriden by instances
+                </div>
             </div>
             <div class="col-sm-4">
                 <waltz-editable-field on-save="$ctrl.updateApprovalDueDate"
