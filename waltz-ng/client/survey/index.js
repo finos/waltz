@@ -41,6 +41,7 @@ import SurveyTemplateOverview from "./components/survey-template-overview";
 import SurveyTemplateQuestionOverviewTable
     from "./components/question-overview-table/survey-template-question-overview-table";
 import SurveyQuestionStore from "./services/survey-question-store";
+import StringListInput from "./components/string-list-input/string-list-input";
 
 export default () => {
     const module = angular.module("waltz.survey", []);
@@ -51,7 +52,8 @@ export default () => {
     registerComponents(module, [
         surveySection,
         measurableMultiSelect,
-        surveyQuestionMeasurableRenderer
+        surveyQuestionMeasurableRenderer,
+        StringListInput
     ]);
 
     module
