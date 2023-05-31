@@ -1,4 +1,5 @@
 import {CORE_API} from "../common/services/core-api-utils";
+import {displayError} from "../common/error-utils";
 
 const statusActions = [
     {
@@ -80,6 +81,7 @@ export function invokeStatusAction(serviceBroker, notification, reloader, $timeo
                 .then(() => {
                     notification.success("Survey response " + verb + " successfully");
                 })
+                .catch(e => displayError("Failed to update survey status", e))
             : Promise.reject(display+ " cancelled")
 
         // PREPARE RENDERING
@@ -93,6 +95,6 @@ export function invokeStatusAction(serviceBroker, notification, reloader, $timeo
                 }
 
             })
-            .catch(err => notification.warning(err))
+            .catch(e => displayError("Failed to render survey", e))
     }
 }
