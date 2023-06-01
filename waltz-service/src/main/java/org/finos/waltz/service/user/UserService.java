@@ -20,8 +20,6 @@ package org.finos.waltz.service.user;
 
 import org.finos.waltz.service.settings.SettingsService;
 import org.finos.waltz.common.Checks;
-import org.finos.waltz.common.SetUtilities;
-import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.data.user.UserDao;
 import org.finos.waltz.data.user.UserRoleDao;
 import org.finos.waltz.model.settings.Setting;
@@ -37,6 +35,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.SetUtilities.fromCollection;
+import static org.finos.waltz.common.StringUtilities.tokenise;
 
 
 @Service
@@ -47,7 +47,7 @@ public class UserService {
     private final UserDao userDao;
     private final PasswordService passwordService;
     private final UserRoleDao userRoleDao;
-    private SettingsService settingsService;
+    private final SettingsService settingsService;
 
 
     @Autowired
@@ -75,6 +75,7 @@ public class UserService {
         return rc;
     }
 
+
     public boolean authenticate(LoginRequest request) {
         String existingHashedPassword = userDao.getPassword(request.userName());
         if (existingHashedPassword == null) {
@@ -92,9 +93,11 @@ public class UserService {
         return true;
     }
 
+
     public List<String> findAllUserNames() {
         return userDao.findAllUserNames();
     }
+
 
     public boolean resetPassword(PasswordResetRequest resetRequest, boolean validate) {
         LOG.info("Resetting password for: " + resetRequest.userName() );
@@ -110,6 +113,7 @@ public class UserService {
         String hashedPassword = passwordService.hashPassword(resetRequest.newPassword());
         return userDao.resetPassword(resetRequest.userName(), hashedPassword) == 1;
     }
+
 
     /**
      * Returns true if user is new, false if already existed
@@ -128,14 +132,16 @@ public class UserService {
         return isNewUser;
     }
 
+
     private void assignDefaultRoles(String username) {
         Checks.checkNotEmpty(username, "username cannot be empty");
         Setting setting = settingsService.getByName(SettingsService.DEFAULT_ROLES_KEY);
         if (setting != null ) {
             setting.value()
-                    .map(s -> StringUtilities.tokenise(s, ","))
-                    .ifPresent(roles -> userRoleDao.updateRoles(username, SetUtilities.fromCollection(roles)));
+                    .map(s -> tokenise(s, ","))
+                    .ifPresent(roles -> userRoleDao.updateRoles(username, fromCollection(roles)));
 
         }
     }
+
 }

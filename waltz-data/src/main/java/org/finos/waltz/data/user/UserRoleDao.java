@@ -21,10 +21,9 @@ package org.finos.waltz.data.user;
 import org.finos.waltz.model.user.ImmutableUser;
 import org.finos.waltz.model.user.User;
 import org.jooq.DSLContext;
-import org.jooq.Query;
 import org.jooq.Record2;
 import org.jooq.Result;
-import org.jooq.impl.DSL;
+import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,12 +32,13 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.*;
+import static org.finos.waltz.data.JooqUtilities.summarizeResults;
 import static org.finos.waltz.schema.tables.User.USER;
 import static org.finos.waltz.schema.tables.UserRole.USER_ROLE;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.SetUtilities.map;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 
 
 @Repository
@@ -90,35 +90,69 @@ public class UserRoleDao {
     }
 
 
-    public boolean updateRoles(String userName, Set<String> newRoles) {
-        try {
-            dsl.transaction(config -> {
-                LOG.info("Removing existing roles for: " + userName);
-                DSL.using(config)
-                        .delete(USER_ROLE)
-                        .where(USER_ROLE.USER_NAME.eq(userName))
-                        .execute();
+    public int updateRoles(String userName, Set<String> newRoles) {
+        Set<Tuple2<String, String>> updatesAsTuples = map(
+                newRoles,
+                r -> tuple(userName, r));
+        return replaceRoles(updatesAsTuples);
+    }
+    
 
-                LOG.info("Inserting roles for " + userName + " / " + newRoles) ;
-                DSLContext batcher = DSL.using(config);
-                Set<Query> inserts = map(newRoles, r -> batcher
-                        .insertInto(USER_ROLE, USER_ROLE.USER_NAME, USER_ROLE.ROLE)
-                        .values(userName, r));
+    public int addRoles(Set<Tuple2<String, String>> usersAndRolesToUpdate) {
+        return addRoles(dsl, usersAndRolesToUpdate);
+    }
 
-                batcher.batch(inserts)
-                        .execute();
-            });
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-
+    public int removeRoles(Set<Tuple2<String, String>> usersAndRolesToUpdate) {
+        return removeRoles(dsl, usersAndRolesToUpdate);
     }
 
 
-    public int deleteUser(String userName) {
-        return dsl.delete(USER_ROLE)
-                .where(USER_ROLE.USER_NAME.eq(userName))
+    public int replaceRoles(Set<Tuple2<String, String>> usersAndRolesToUpdate) {
+        Set<String> distinctUsers = map(usersAndRolesToUpdate, t -> t.v1);
+        return dsl.transactionResult(ctx -> {
+            DSLContext tx = ctx.dsl();
+            int rmRcs = tx.deleteFrom(USER_ROLE)
+                    .where(USER_ROLE.USER_NAME.in(distinctUsers))
+                    .execute();
+
+             return addRoles(tx, usersAndRolesToUpdate);
+        });
+    }
+
+
+    private int addRoles(DSLContext tx,
+                         Set<Tuple2<String, String>> usersAndRolesToUpdate) {
+        int[] rc = usersAndRolesToUpdate
+                .stream()
+                .map(t -> tx
+                        .insertInto(
+                                USER_ROLE,
+                                USER_ROLE.USER_NAME,
+                                USER_ROLE.ROLE)
+                        .values(t.v1(), t.v2())
+                        .onConflictDoNothing())
+                .collect(collectingAndThen(
+                        toList(),
+                        tx::batch))
                 .execute();
+
+        return summarizeResults(rc);
+    }
+
+
+    private int removeRoles(DSLContext tx,
+                            Set<Tuple2<String, String>> usersAndRolesToUpdate) {
+        int[] rc = usersAndRolesToUpdate
+                .stream()
+                .map(t -> tx
+                        .deleteFrom(USER_ROLE)
+                        .where(USER_ROLE.USER_NAME.eq(t.v1()))
+                        .and(USER_ROLE.ROLE.eq(t.v2())))
+                .collect(collectingAndThen(
+                        toList(),
+                        tx::batch))
+                .execute();
+
+        return summarizeResults(rc);
     }
 }

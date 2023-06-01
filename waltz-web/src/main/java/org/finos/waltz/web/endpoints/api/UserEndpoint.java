@@ -18,6 +18,7 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.model.bulk_upload.BulkUploadMode;
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.service.user.UserService;
 import org.finos.waltz.web.DatumRoute;
@@ -29,6 +30,10 @@ import org.finos.waltz.web.WebUtilities;
 import org.finos.waltz.web.endpoints.EndpointUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Request;
+
+import static org.finos.waltz.common.ListUtilities.asList;
+import static org.finos.waltz.web.WebUtilities.requireAnyRole;
 
 
 @Service
@@ -63,18 +68,45 @@ public class UserEndpoint implements Endpoint {
         String findAllPath = WebUtilities.mkPath(BASE_URL);
         String getByUserIdPath = WebUtilities.mkPath(BASE_URL, "user-id", ":userId");
 
+        String bulkUploadPreviewPath = WebUtilities.mkPath(BASE_URL, "bulk", ":mode", "preview");
+        String bulkUploadPath = WebUtilities.mkPath(BASE_URL, "bulk", ":mode", "upload");
+
 
         // -- routes
 
+        ListRoute<BulkUserOperationRowPreview> bulkUploadPreviewRoute = (request, response) -> {
+            ensureUserHasAdminRights(request);
+
+            String username = WebUtilities.getUsername(request);
+            BulkUploadMode mode = BulkUploadMode.valueOf(request.params("mode"));
+            String[] lines = request.body().split("\\R");
+            return userRoleService.bulkUploadPreview(
+                    mode,
+                    asList(lines),
+                    username);
+        };
+
+        DatumRoute<Integer> bulkUploadRoute = (request, response) -> {
+            ensureUserHasAdminRights(request);
+
+            String username = WebUtilities.getUsername(request);
+            BulkUploadMode mode = BulkUploadMode.valueOf(request.params("mode"));
+            String[] lines = request.body().split("\\R");
+            return userRoleService.bulkUpload(
+                    mode,
+                    asList(lines),
+                    username);
+        };
+
         DatumRoute<Boolean> newUserRoute = (request, response) -> {
-            WebUtilities.requireAnyRole(userRoleService, request, SystemRole.USER_ADMIN, SystemRole.ADMIN);
+            ensureUserHasAdminRights(request);
 
             UserRegistrationRequest userRegRequest = WebUtilities.readBody(request, UserRegistrationRequest.class);
             return userService.registerNewUser(userRegRequest) == 1;
         };
 
-        DatumRoute<Boolean> updateRolesRoute = (request, response) -> {
-            WebUtilities.requireAnyRole(userRoleService, request, SystemRole.USER_ADMIN, SystemRole.ADMIN);
+        DatumRoute<Integer> updateRolesRoute = (request, response) -> {
+            ensureUserHasAdminRights(request);
 
             String userName = WebUtilities.getUsername(request);
             String targetUserName = request.params("userName");
@@ -88,7 +120,7 @@ public class UserEndpoint implements Endpoint {
         };
 
         DatumRoute<Boolean> deleteUserRoute = (request, response) -> {
-            WebUtilities.requireAnyRole(userRoleService, request, SystemRole.USER_ADMIN, SystemRole.ADMIN);
+            ensureUserHasAdminRights(request);
 
             String userName = request.params("userName");
             return userService.deleteUser(userName);
@@ -115,6 +147,8 @@ public class UserEndpoint implements Endpoint {
 
         // --- register
 
+        EndpointUtilities.postForList(bulkUploadPreviewPath, bulkUploadPreviewRoute);
+        EndpointUtilities.postForDatum(bulkUploadPath, bulkUploadRoute);
         EndpointUtilities.postForDatum(newUserPath, newUserRoute);
         EndpointUtilities.postForDatum(updateRolesPath, updateRolesRoute);
         EndpointUtilities.postForDatum(resetPasswordPath, resetPasswordRoute);
@@ -124,6 +158,15 @@ public class UserEndpoint implements Endpoint {
         EndpointUtilities.getForDatum(whoAmIPath, whoAmIRoute);
         EndpointUtilities.getForDatum(getByUserIdPath, getByUserIdRoute);
         EndpointUtilities.getForList(findAllPath, findAllRoute);
+    }
+
+
+    private void ensureUserHasAdminRights(Request request) {
+        requireAnyRole(
+                userRoleService,
+                request,
+                SystemRole.USER_ADMIN,
+                SystemRole.ADMIN);
     }
 
 }

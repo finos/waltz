@@ -48,7 +48,17 @@ export function mkUserStore() {
             "POST",
             "api/user/reset-password",
             cmd);
-    }
+    };
+
+    const bulkUploadPreview = (mode, rows = []) => remote.execute(
+        "POST",
+        `api/user/bulk/${mode}/preview`,
+        rows);
+
+    const bulkUpload = (mode, rows = []) => remote.execute(
+        "POST",
+        `api/user/bulk/${mode}/upload`,
+        rows);
 
     const deleteUser = (username) => remote.execute("DELETE", `api/user/${username}`, null);
 
@@ -59,7 +69,9 @@ export function mkUserStore() {
         updateRoles,
         register,
         resetPassword,
-        deleteUser
+        deleteUser,
+        bulkUpload,
+        bulkUploadPreview
     };
 }
 
