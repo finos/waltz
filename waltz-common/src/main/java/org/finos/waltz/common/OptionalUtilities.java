@@ -18,9 +18,12 @@
 
 package org.finos.waltz.common;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -61,6 +64,15 @@ public class OptionalUtilities {
     }
 
 
+    public static <T> Set<T> toSet(Collection<Optional<T>> xs) {
+        return xs
+                .stream()
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toSet());
+    }
+
+
     /**
      * Returns true iff, `opt` is empty and val `is` null, or, `opt.get` equals `val`
      */
@@ -97,4 +109,5 @@ public class OptionalUtilities {
             return Optional.empty();
         }
     }
+
 }

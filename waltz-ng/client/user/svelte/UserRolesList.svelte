@@ -41,7 +41,6 @@
     }
 
     function selectRole(role) {
-
         let roleExists = _.includes($userRoles, role.key);
 
         $userRoles = roleExists

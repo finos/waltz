@@ -178,4 +178,28 @@ public class ListUtilities {
 
         return false;
     }
+
+
+    /**
+     * Given a list and an index returns the element at that index wrapped in an Optional.
+     * @param xs the list
+     * @param idx the index to return
+     * @return the element at the index wrapped in an Optional or Optional.empty() if the index is out of bounds
+     * @param <T> type of elements in the list
+     */
+    public static <T> Optional<T> maybeGet(List<T> xs, int idx) {
+        if (idx < 0 || idx >= xs.size()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(xs.get(idx));
+        }
+    }
+
+    /**
+     * Given a list, index and default value returns the element at that index or the default value if the index is out of bounds.
+     */
+    public static <T> T getOrDefault(List<T> xs, int idx, T defaultValue) {
+        return maybeGet(xs, idx)
+                .orElse(defaultValue);
+    }
 }
