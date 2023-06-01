@@ -112,6 +112,15 @@
         </ui-select>
     </div>
 
+
+    <!-- string list  -->
+    <div ng-switch-when="STRING_LIST">
+        <waltz-survey-string-list-input question="$ctrl.question"
+                                        responses="$ctrl.response.listResponse"
+                                        on-save-list-response="$ctrl.saveListResponse">
+        </waltz-survey-string-list-input>
+    </div>
+
     <!-- measurable multi select -->
     <div ng-switch-when="MEASURABLE_MULTI_SELECT">
         <waltz-survey-measurable-multi-select question="$ctrl.question"

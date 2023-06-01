@@ -23,6 +23,7 @@
             case "BOOLEAN":
                 return BooleanResponseRenderer;
             case "DROPDOWN_MULTI_SELECT":
+            case "STRING_LIST":
                 return DropdownMultiResponseRenderer;
             case "MEASURABLE_MULTI_SELECT":
                 return MeasurableMultiResponseRenderer;

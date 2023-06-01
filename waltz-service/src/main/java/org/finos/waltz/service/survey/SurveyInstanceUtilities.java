@@ -25,6 +25,7 @@ public class SurveyInstanceUtilities {
             case BOOLEAN:
                 return resp.booleanResponse();
             case DROPDOWN_MULTI_SELECT:
+            case STRING_LIST:
                 return resp.listResponse();
             case APPLICATION:
             case PERSON:
