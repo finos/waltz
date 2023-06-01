@@ -44,14 +44,14 @@ See [pom.xml](https://github.com/finos/waltz/blob/master/pom.xml) for a full lis
 ### Supported Databases
 
 - Postgres 
-- Microsoft SQL Server (2012+)  
+- Microsoft SQL Server (2017+)  
   - requires [JOOQ Pro license](https://www.jooq.org/download/) to build from source
 
 
 ### Client
 
 - Browser based
-    - IE 11+, Chrome, Safari, Firefox)
+  - Chrome, Safari, Firefox, Edge
 - AngularJS 1.7
 - Svelte
 - Bootstrap 3
@@ -67,11 +67,11 @@ progress and done issues.
 
 **Provisional** dates for upcoming releases:
 
-| Release | Date            | Summary                                  |
-|---------|-----------------|------------------------------------------|
-| 1.50    | 30th May 2023   | Measurable ordering, navbar improvements |
-| 1.51    | tbd             | tbd                                      |
-| 1.52    | tbd             | tbd                                      |
+| Release | Date           | Summary                                                         |
+|---------|----------------|-----------------------------------------------------------------|
+| 1.51    | 27th June 2023 | Primary ratings, involvement overhaul, report grid enhancements |
+| 1.52    | tbd            | tbd                                                             |
+| 1.53    | tbd            | tbd                                                             |
 
 See the [releases](https://github.com/finos/waltz/releases) page for historic versions.
 
@@ -100,7 +100,7 @@ Individual and organisational contributors are listed in [the contributors file]
 
 ## License
 
-Copyright (C) 2021 Waltz open source project
+Copyright (C) 2023 Waltz open source project
 
 Distributed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
