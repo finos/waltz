@@ -25,6 +25,7 @@ public enum SurveyQuestionFieldType {
     DATE,
     DROPDOWN,
     DROPDOWN_MULTI_SELECT,
+    STRING_LIST,
     MEASURABLE_MULTI_SELECT,
     NUMBER,
     PERSON,

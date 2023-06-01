@@ -18,71 +18,78 @@
 
 export const surveyQuestionFieldType = {
     APPLICATION: {
-        key: 'APPLICATION',
-        name: 'Application',
+        key: "APPLICATION",
+        name: "Application",
         icon: null,
         description: null,
         position: 10
     },
     BOOLEAN: {
-        key: 'BOOLEAN',
-        name: 'Boolean',
+        key: "BOOLEAN",
+        name: "Boolean",
         icon: null,
         description: null,
         position: 20
     },
     DATE: {
-        key: 'DATE',
-        name: 'Date',
+        key: "DATE",
+        name: "Date",
         icon: null,
         description: null,
         position: 25
     },
     DROPDOWN: {
-        key: 'DROPDOWN',
-        name: 'Dropdown',
+        key: "DROPDOWN",
+        name: "Dropdown",
         icon: null,
         description: null,
         position: 30
     },
     DROPDOWN_MULTI_SELECT: {
-        key: 'DROPDOWN_MULTI_SELECT',
-        name: 'Dropdown (Multi-Select)',
+        key: "DROPDOWN_MULTI_SELECT",
+        name: "Dropdown (Multi-Select)",
         icon: null,
         description: null,
         position: 30
     },
     MEASURABLE_MULTI_SELECT: {
-        key: 'MEASURABLE_MULTI_SELECT',
-        name: 'Measurable tree (Multi-Select)',
+        key: "MEASURABLE_MULTI_SELECT",
+        name: "Measurable tree (Multi-Select)",
         icon: null,
         description: null,
         position: 30
     },
     NUMBER: {
-        key: 'NUMBER',
-        name: 'Number',
+        key: "NUMBER",
+        name: "Number",
         icon: null,
         description: null,
         position: 40
     },
     PERSON: {
-        key: 'PERSON',
-        name: 'Person',
+        key: "PERSON",
+        name: "Person",
         icon: null,
         description: null,
         position: 50
     },
+    STRING_LIST: {
+        key: "STRING_LIST",
+        name: "String List",
+        icon: null,
+        description: null,
+        position: 55
+    },
     TEXT: {
-        key: 'TEXT',
-        name: 'Text',
+        key: "TEXT",
+        name: "Text",
         icon: null,
         description: null,
         position: 60
     },
     TEXTAREA: {
-        key: 'TEXTAREA',
-        name: 'Text Area',
+        key: "TEXTAREA",
+        name: "Text Area",
         icon: null,
         description: null,
         position: 70

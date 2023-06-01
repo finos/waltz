@@ -214,7 +214,7 @@
                         <select id="qFieldType"
                                 required
                                 class="form-control"
-                                ng-options="fieldType.value as fieldType.name for fieldType in ctrl.questionFieldTypes | orderBy:'name'"
+                                ng-options="fieldType.value as fieldType.name for fieldType in ctrl.questionFieldTypes"
                                 ng-model="ctrl.selectedQuestionInfo.question.fieldType">
                         </select>
                     </div>

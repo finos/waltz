@@ -22,6 +22,7 @@ import template from "./survey-template-edit.html";
 import {displayError} from "../common/error-utils";
 import {CORE_API} from "../common/services/core-api-utils";
 import toasts from "../svelte-stores/toast-store";
+import {surveyQuestionFieldType} from "../common/services/enums/survey-question-field-type";
 
 /*
     Note: this list of functions/operators is derived from the capabilities of BigEval and the extension methods
@@ -52,44 +53,18 @@ See the <a href="https://commons.apache.org/proper/commons-jexl/reference/syntax
 
 const initialState = {
     editingQuestion: false,
-    questionFieldTypes: [{
-        name: "Text",
-        value: "TEXT"
-    },{
-        name: "Text Area",
-        value: "TEXTAREA"
-    },{
-        name: "Number",
-        value: "NUMBER"
-    },{
-        name: "Boolean",
-        value: "BOOLEAN"
-    },{
-        name: "Date",
-        value: "DATE"
-    },{
-        name: "Dropdown",
-        value: "DROPDOWN"
-    },{
-        name: "Dropdown (Multi-Select)",
-        value: "DROPDOWN_MULTI_SELECT"
-    },{
-        name: "Measurable tree (Multi-Select)",
-        value: "MEASURABLE_MULTI_SELECT"
-    },{
-        name: "Application",
-        value: "APPLICATION"
-    },{
-        name: "Person",
-        value: "PERSON"
-    }],
+    questionFieldTypes: _
+        .chain(_.values(surveyQuestionFieldType))
+        .orderBy([d => d.position, d => d.name])
+        .map(d => ({name: d.name, value: d.key}))
+        .value(),
     selectedQuestionInfo: {},
     surveyQuestions: [],
     surveyTemplate: {},
     targetEntityKinds: [{
         name: "Application",
         value: "APPLICATION"
-    },{
+    }, {
         name: "Change Initiative",
         value: "CHANGE_INITIATIVE"
     }],
