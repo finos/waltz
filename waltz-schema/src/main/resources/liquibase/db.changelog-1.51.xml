@@ -22,7 +22,7 @@
                    logicalFilePath="db.changelog-1.51.xml">
 
     <changeSet id="v1-50-tag"
-               author="woodjes">
+               author="davidwatkins73">
         <tagDatabase tag="v1.50"/> <!-- tag the current db version, i.e. the last  -->
     </changeSet>
 
@@ -135,6 +135,5 @@
         <dropColumn tableName="survey_run"
                     columnName="owner_inv_kind_ids"/>
     </changeSet>
-
 
 </databaseChangeLog>
