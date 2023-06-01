@@ -47,6 +47,16 @@ const columnDefs = [
         cellFilter: "toDisplayName:'surveyInstanceStatus'"
     }, {
         field: "dueDate",
+        name: "Submission Due",
+        cellTemplate: `
+            <div class="ui-grid-cell-contents">
+                <waltz-from-now timestamp="COL_FIELD"
+                                days-only="true">
+                </waltz-from-now>
+            </div>`
+    }, {
+        field: "approvalDueDate",
+        name: "Approval Due",
         cellTemplate: `
             <div class="ui-grid-cell-contents">
                 <waltz-from-now timestamp="COL_FIELD"

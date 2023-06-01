@@ -37,6 +37,7 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.*;
+import static org.finos.waltz.common.CollectionUtilities.any;
 import static org.finos.waltz.common.SetUtilities.fromCollection;
 import static org.finos.waltz.common.SetUtilities.minus;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
@@ -70,8 +71,8 @@ public class TaxonomyManagementUtilities {
 
 
     public static Measurable validateMeasurableInCategory(MeasurableService measurableService,
-                                                long measurableId,
-                                                long categoryId) {
+                                                          long measurableId,
+                                                          long categoryId) {
         Measurable measurable = measurableService.getById(measurableId);
 
         checkNotNull(
@@ -90,6 +91,36 @@ public class TaxonomyManagementUtilities {
         return measurable;
     }
 
+    public static void validateTargetNotChild(MeasurableService measurableService,
+                                              Measurable measurable,
+                                              Measurable targetMeasurable) {
+
+        List<Measurable> children = measurableService.findByMeasurableIdSelector(mkOpts(
+                measurable.entityReference(),
+                HierarchyQueryScope.CHILDREN));
+
+        checkFalse(
+                any(children, d -> d.equals(targetMeasurable)),
+                format("Target measurable [%s / %d] is a child of measurable [%s / %d]",
+                        targetMeasurable.name(),
+                        targetMeasurable.id().get(),
+                        measurable.name(),
+                        measurable.id().get()));
+    }
+
+
+    public static void validateConcreteMergeAllowed(Measurable measurable,
+                                                    Measurable targetMeasurable) {
+
+        checkFalse(
+                measurable.concrete() && !targetMeasurable.concrete(),
+                format("Measurable [%s / %d] is concrete but target measurable [%s / %d] is abstract",
+                        measurable.name(),
+                        measurable.id().get(),
+                        targetMeasurable.name(),
+                        targetMeasurable.id().get()));
+    }
+
 
     public static Set<EntityReference> findCurrentRatingMappings(MeasurableRatingService measurableRatingService,
                                                                  TaxonomyChangeCommand cmd) {
@@ -106,24 +137,24 @@ public class TaxonomyManagementUtilities {
      * Optionally add an impact to the given preview and return it.
      * Whether to add the impact is determined by the presence of references.
      *
-     * @param preview The preview builder to update
-     * @param refs Set of references, if empty no impact will be added to the preview
-     * @param severity Severity of the impact
-     * @param msg Description of the impact
+     * @param preview     The preview builder to update
+     * @param impactCount Count of the records affected by this change
+     * @param severity    Severity of the impact
+     * @param msg         Description of the impact
      * @return The preview builder for convenience
      */
     public static ImmutableTaxonomyChangePreview.Builder addToPreview(ImmutableTaxonomyChangePreview.Builder preview,
-                                                                      Set<EntityReference> refs,
+                                                                      int impactCount,
                                                                       Severity severity,
                                                                       String msg) {
-        return refs.isEmpty()
-            ? preview
-            : preview
+        return impactCount == 0
+                ? preview
+                : preview
                 .addImpacts(ImmutableTaxonomyChangeImpact.builder()
-                .impactedReferences(refs)
-                .description(msg)
-                .severity(severity)
-                .build());
+                        .impactCount(impactCount)
+                        .description(msg)
+                        .severity(severity)
+                        .build());
     }
 
 

@@ -288,4 +288,16 @@ public class MeasurableRatingService {
     public boolean checkRatingExists(SaveMeasurableRatingCommand command) {
         return measurableRatingDao.checkRatingExists(command);
     }
+
+    public void migrateRatings(Long measurableId, Long targetMeasurableId, String userId) {
+        measurableRatingDao.migrateRatings(measurableId, targetMeasurableId, userId);
+    }
+
+    public int getSharedRatingsCount(Long measurableId, Long targetMeasurableId) {
+        return measurableRatingDao.getSharedRatingsCount(measurableId, targetMeasurableId);
+    }
+
+    public int getSharedDecommsCount(Long measurableId, Long targetMeasurableId) {
+        return measurableRatingDao.getSharedDecommsCount(measurableId, targetMeasurableId);
+    }
 }

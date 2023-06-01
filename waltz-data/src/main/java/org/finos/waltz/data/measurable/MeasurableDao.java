@@ -19,7 +19,6 @@
 package org.finos.waltz.data.measurable;
 
 
-import org.finos.waltz.schema.tables.records.MeasurableRecord;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.FindEntityReferencesByIdSelector;
 import org.finos.waltz.model.EntityKind;
@@ -27,6 +26,7 @@ import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.measurable.ImmutableMeasurable;
 import org.finos.waltz.model.measurable.Measurable;
+import org.finos.waltz.schema.tables.records.MeasurableRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -41,15 +41,15 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static org.finos.waltz.data.JooqUtilities.summarizeResults;
-import static org.finos.waltz.schema.Tables.*;
-import static org.finos.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
-import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
 import static java.util.Optional.ofNullable;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.EnumUtilities.readEnum;
 import static org.finos.waltz.common.StringUtilities.mkSafe;
 import static org.finos.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
+import static org.finos.waltz.data.JooqUtilities.summarizeResults;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
+import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
 
 
 @Repository
@@ -226,6 +226,31 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .set(MEASURABLE.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
                 .set(MEASURABLE.LAST_UPDATED_BY, userId)
                 .where(MEASURABLE.ID.eq(measurableId))
+                .execute() == 1;
+    }
+
+    public boolean moveChildren(Long measurableId, Long targetId, String userId) {
+
+        if (targetId == null) {
+            throw new IllegalArgumentException("Cannot move children without specifying a new target");
+        }
+
+        LOG.info("Moving children from measurable: {} to {}",
+                measurableId,
+                targetId);
+
+        Select<? extends Record1<String>> destinationExtId = DSL
+                .select(MEASURABLE.EXTERNAL_ID)
+                .from(MEASURABLE)
+                .where(MEASURABLE.ID.eq(targetId));
+
+        return dsl
+                .update(MEASURABLE)
+                .set(MEASURABLE.PARENT_ID, targetId)
+                .set(MEASURABLE.EXTERNAL_PARENT_ID, destinationExtId)
+                .set(MEASURABLE.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
+                .set(MEASURABLE.LAST_UPDATED_BY, userId)
+                .where(MEASURABLE.PARENT_ID.eq(measurableId))
                 .execute() == 1;
     }
 

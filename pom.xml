@@ -87,12 +87,12 @@
         <java.version>1.8</java.version>
         <javax.mail.version>1.4.7</javax.mail.version>
         <jbcrypt.version>0.4.3</jbcrypt.version>
-        <jgrapht.version>1.5.2</jgrapht.version>
+        <jgrapht.version>1.2.0</jgrapht.version>
         <jool.version>0.9.15</jool.version>
         <jooq.version>3.13.2</jooq.version> <!--If this changes see issue #4553 -->
         <junit.version>5.9.3</junit.version>
         <jwt.version>4.2.1</jwt.version>
-        <mockito.version>5.3.1</mockito.version>
+        <mockito.version>4.1.0</mockito.version>  <!-- 5.3.1 is 9+ -->
         <liquibase.maven.version>4.18.0</liquibase.maven.version>
         <logback.version>1.2.12</logback.version>
         <pcollections.version>4.0.1</pcollections.version>
@@ -103,7 +103,7 @@
         <spring.version>5.3.27</spring.version>
         <super-csv.version>2.4.0</super-csv.version>
         <surefire.version>2.22.2</surefire.version>
-        <commons-jexl3.version>3.3</commons-jexl3.version>
+        <commons-jexl3.version>3.2.1</commons-jexl3.version>  <!-- 3.3.0 causes evaluation issues -->
 
         <timestamp>${maven.build.timestamp}</timestamp>
         <playwright.skip>true</playwright.skip>
@@ -229,6 +229,11 @@
             <dependency>
                 <groupId>org.jgrapht</groupId>
                 <artifactId>jgrapht-core</artifactId>
+                <version>${jgrapht.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jgrapht</groupId>
+                <artifactId>jgrapht-io</artifactId>
                 <version>${jgrapht.version}</version>
             </dependency>
             <dependency>

@@ -228,6 +228,15 @@ public class AssessmentRatingDao {
     }
 
 
+    public int deleteByGenericSelector(GenericSelector genericSelector) {
+        return dsl
+                .deleteFrom(ar)
+                .where(ar.ENTITY_KIND.eq(genericSelector.kind().name()))
+                .and(ar.ENTITY_ID.in(genericSelector.selector()))
+                .execute();
+    }
+
+
     public boolean store(SaveAssessmentRatingCommand command) {
         checkNotNull(command, "command cannot be null");
         AssessmentRatingRecord record = COMMAND_TO_RECORD_MAPPER.apply(command);

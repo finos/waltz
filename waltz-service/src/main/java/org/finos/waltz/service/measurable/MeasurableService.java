@@ -249,4 +249,7 @@ public class MeasurableService {
                 .build());
     }
 
+    public boolean moveChildren(Long measurableId, Long targetMeasurableId, String userId) {
+        return measurableDao.moveChildren(measurableId, targetMeasurableId, userId);
+    }
 }
