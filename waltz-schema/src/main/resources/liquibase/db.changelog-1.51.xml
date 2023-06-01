@@ -1,0 +1,140 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="db.changelog-1.51.xml">
+
+    <changeSet id="v1-50-tag"
+               author="woodjes">
+        <tagDatabase tag="v1.50"/> <!-- tag the current db version, i.e. the last  -->
+    </changeSet>
+
+    <!-- 6637: migrate owning_inv_kinds to their own involvement_group   -->
+    <changeSet id="20230601-6637-1"
+               author="woodjes">
+        <addColumn tableName="survey_run">
+            <column name="recipient_involvement_group_id"
+                    type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20230601-6637-2"
+               author="woodjes">
+        <addColumn tableName="survey_run">
+            <column name="owner_involvement_group_id"
+                    type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <!-- 6637: migrate survey_run recipients   -->
+    <changeSet id="20230601-6637-3"
+               author="woodjes">
+        <sql>
+            insert into involvement_group (name, external_id, provenance)
+            select concat('Recipients for survey run: ', name), concat('RECIPIENTS_SURVEY_RUN_', id), 'waltz'
+            from survey_run
+            where involvement_kind_ids is not null
+              and involvement_kind_ids != '';
+        </sql>
+    </changeSet>
+
+    <changeSet id="20230601-6637-4"
+               author="woodjes">
+        <sql>
+            update survey_run
+            set recipient_involvement_group_id = (select id
+                                                  from involvement_group ig
+                                                  where ig.external_id = concat('RECIPIENTS_SURVEY_RUN_', survey_run.id))
+            where involvement_kind_ids is not null
+              and involvement_kind_ids != '';
+        </sql>
+    </changeSet>
+
+
+    <changeSet id="20230601-6637-5"
+               author="woodjes">
+        <sql>
+            insert into involvement_group_entry (involvement_group_id, involvement_kind_id)
+            select sr.recipient_involvement_group_id, ik.id
+            from survey_run sr
+                     inner join involvement_kind ik
+                                on concat(sr.involvement_kind_ids, ';') like concat('%', ik.id, ';%')
+            where involvement_kind_ids is not null
+              and involvement_kind_ids != '';
+        </sql>
+    </changeSet>
+
+    <!-- 6637: migrate survey_run owners   -->
+    <changeSet id="20230601-6637-6"
+               author="woodjes">
+        <sql>
+            insert into involvement_group (name, external_id, provenance)
+            select concat('Owners for survey run: ', name), concat('OWNERS_SURVEY_RUN_', id), 'waltz'
+            from survey_run
+            where owner_inv_kind_ids is not null
+              and owner_inv_kind_ids != '';
+        </sql>
+    </changeSet>
+
+    <changeSet id="20230601-6637-7"
+               author="woodjes">
+        <sql>
+            update survey_run
+            set owner_involvement_group_id = (select id
+                                              from involvement_group ig
+                                              where ig.external_id = concat('OWNERS_SURVEY_RUN_', survey_run.id))
+            where owner_inv_kind_ids is not null
+              and owner_inv_kind_ids != '';
+        </sql>
+    </changeSet>
+
+
+    <changeSet id="20230601-6637-8"
+               author="woodjes">
+        <sql>
+            insert into involvement_group_entry (involvement_group_id, involvement_kind_id)
+            select sr.owner_involvement_group_id, ik.id
+            from survey_run sr
+                     inner join involvement_kind ik on concat(sr.owner_inv_kind_ids, ';') like concat('%', ik.id, ';%')
+            where owner_inv_kind_ids is not null
+              and owner_inv_kind_ids != '';
+        </sql>
+    </changeSet>
+
+    <changeSet id="20230601-6637-9"
+               author="woodjes">
+        <comment>6637: migrate survey_run recipients to involvement group, drop column</comment>
+        <dropColumn tableName="survey_run"
+                    columnName="involvement_kind_ids"/>
+    </changeSet>
+
+    <changeSet id="20230601-6637-10"
+               author="woodjes">
+        <comment>6637: migrate survey_run owners to involvement group, drop column</comment>
+        <dropColumn tableName="survey_run"
+                    columnName="owner_inv_kind_ids"/>
+    </changeSet>
+
+
+</databaseChangeLog>

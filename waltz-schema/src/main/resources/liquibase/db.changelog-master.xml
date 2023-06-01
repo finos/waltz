@@ -180,4 +180,7 @@
     <include file="db.changelog-1.50.xml"
              relativeToChangelogFile="true"/>
 
+    <include file="db.changelog-1.51.xml"
+             relativeToChangelogFile="true"/>
+
 </databaseChangeLog>
