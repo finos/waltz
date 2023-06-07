@@ -284,22 +284,12 @@ public class AttestationInstanceDao {
 
     private Set<Tuple2<Long, Long>> getAttestationRunIdToInvKindId() {
         return dsl
-                .select(ATTESTATION_RUN.ID, ATTESTATION_RUN.INVOLVEMENT_KIND_IDS)
+                .select(ATTESTATION_RUN.ID, INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_KIND_ID)
                 .from(ATTESTATION_RUN)
-                .where(ATTESTATION_RUN.INVOLVEMENT_KIND_IDS.isNotNull())
-                .and(ATTESTATION_RUN.INVOLVEMENT_KIND_IDS.ne(""))
-                .fetch()
-                .stream()
-                .flatMap(r -> {
-                    Long runId = r.get(ATTESTATION_RUN.ID);
-                    String invKinds = r.get(ATTESTATION_RUN.INVOLVEMENT_KIND_IDS);
-                    return splitThenMap(
-                            invKinds,
-                            ";",
-                            d -> tuple(runId, Long.valueOf(d.trim())))
-                            .stream();
-                })
-                .collect(toSet());
+                .innerJoin(INVOLVEMENT_GROUP_ENTRY)
+                .on(ATTESTATION_RUN.RECIPIENT_INVOLVEMENT_GROUP_ID.eq(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_GROUP_ID))
+                .where(ATTESTATION_RUN.RECIPIENT_INVOLVEMENT_GROUP_ID.isNotNull())
+                .fetchSet(r -> tuple(r.get(ATTESTATION_RUN.ID), r.get(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_KIND_ID)));
     }
 
 
