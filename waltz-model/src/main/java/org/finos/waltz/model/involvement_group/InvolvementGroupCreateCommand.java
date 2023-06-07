@@ -14,6 +14,5 @@ public abstract class InvolvementGroupCreateCommand {
     public Set<Long> involvementKindIds() {
         return Collections.emptySet();
     }
-
-    ;
+    
 }
