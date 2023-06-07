@@ -15,6 +15,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.finos.waltz.common.CollectionUtilities.notEmpty;
+import static org.finos.waltz.data.JooqUtilities.summarizeResults;
 import static org.finos.waltz.schema.Tables.INVOLVEMENT_GROUP;
 import static org.finos.waltz.schema.Tables.INVOLVEMENT_GROUP_ENTRY;
 
@@ -61,7 +62,8 @@ public class InvolvementGroupDao {
                 .getId();
 
         if (invGroupId != null && notEmpty(cmd.involvementKindIds())) {
-            cmd.involvementKindIds()
+
+            int inserted = summarizeResults(cmd.involvementKindIds()
                     .stream()
                     .map(kindId -> {
                         InvolvementGroupEntryRecord entry = dsl.newRecord(INVOLVEMENT_GROUP_ENTRY);
@@ -69,7 +71,8 @@ public class InvolvementGroupDao {
                         entry.setInvolvementKindId(kindId);
                         return entry;
                     })
-                    .collect(Collectors.collectingAndThen(Collectors.toSet(), dsl::batchInsert));
+                    .collect(Collectors.collectingAndThen(Collectors.toSet(), dsl::batchInsert))
+                    .execute());
         }
 
         return invGroupId;
