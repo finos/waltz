@@ -65,6 +65,7 @@ public class InvolvementKindDao {
                 .lastUpdatedAt(DateTimeUtilities.toLocalDateTime(record.getLastUpdatedAt()))
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .userSelectable(record.getUserSelectable())
+                .subjectKind(EntityKind.valueOf(record.getSubjectKind()))
                 .build();
     };
 
@@ -77,6 +78,7 @@ public class InvolvementKindDao {
         record.setLastUpdatedAt(Timestamp.valueOf(ik.lastUpdatedAt()));
         record.setLastUpdatedBy(ik.lastUpdatedBy());
         record.setUserSelectable(ik.userSelectable());
+        record.setSubjectKind(ik.subjectKind().name());
 
         ik.externalId().ifPresent(record::setExternalId);
         ik.id().ifPresent(record::setId);
@@ -127,6 +129,7 @@ public class InvolvementKindDao {
         record.setDescription(command.description());
         record.setLastUpdatedBy(username);
         record.setLastUpdatedAt(Timestamp.valueOf(DateTimeUtilities.nowUtc()));
+        record.setSubjectKind(command.subjectKind().name());
 
         command.externalId().ifPresent(record::setExternalId);
 

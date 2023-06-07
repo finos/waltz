@@ -6,6 +6,9 @@
     import {displayError} from "../../../common/error-utils";
     import Icon from "../../../common/svelte/Icon.svelte";
     import EditInvolvementKindPanel from "./EditInvolvementKindPanel.svelte";
+    import {entity} from "../../../common/services/enums/entity";
+    import _ from "lodash";
+    import EntityIcon from "../../../common/svelte/EntityIcon.svelte";
 
     export let involvementKind;
     export let reload = () => "reloading Kind";
@@ -68,6 +71,15 @@
         </div>
         <div class="col-sm-10">
             {involvementKind?.name}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2">
+            Subject Kind
+        </div>
+        <div class="col-sm-10">
+            <EntityIcon kind={involvementKind?.subjectKind}/>
+            {_.get(entity, [involvementKind?.subjectKind, "name"], "-")}
         </div>
     </div>
     <div class="row">

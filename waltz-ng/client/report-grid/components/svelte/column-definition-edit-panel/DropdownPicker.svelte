@@ -26,9 +26,9 @@
 <div class="btn-group"
      style="width: 100%; outline: 1px solid #cccccc;">
     <div class:expanded={showDropdown}>
-        <button on:click={() => toggleDropdown()}
+        <button on:click|preventDefault={() => toggleDropdown()}
                 class="btn-skinny">
-            {#if _.isNull(selectedItem)}
+            {#if _.isNil(selectedItem)}
                 <span class="force-wrap">
                     {defaultMessage}
                 </span>
@@ -52,7 +52,7 @@
                 {#if selectedItem}
                     <li>
                         <button class="btn-plain text-muted force-wrap text-left"
-                                on:click={() => selectItem(null)}>
+                                on:click|preventDefault={() => selectItem(null)}>
                             {defaultMessage}
                         </button>
                     </li>
@@ -60,7 +60,7 @@
                 {#each items as item}
                     <li>
                         <button class="btn-skinny"
-                                on:click={() => selectItem(item)}>
+                                on:click|preventDefault={() => selectItem(item)}>
                             <span class="force-wrap">{item?.name}</span>
                         </button>
                     </li>
