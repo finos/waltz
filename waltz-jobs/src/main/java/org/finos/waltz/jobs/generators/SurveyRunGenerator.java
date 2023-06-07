@@ -21,6 +21,7 @@ package org.finos.waltz.jobs.generators;
 
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.RandomUtilities;
+import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.app_group.AppGroupDao;
 import org.finos.waltz.data.involvement_kind.InvolvementKindDao;
 import org.finos.waltz.data.person.PersonDao;
@@ -33,6 +34,7 @@ import org.finos.waltz.model.person.Person;
 import org.finos.waltz.model.survey.*;
 import org.finos.waltz.schema.tables.records.SurveyQuestionResponseRecord;
 import org.finos.waltz.schema.tables.records.SurveyRunRecord;
+import org.finos.waltz.service.involvement_group.InvolvementGroupService;
 import org.finos.waltz.service.survey.SurveyInstanceService;
 import org.finos.waltz.service.survey.SurveyQuestionService;
 import org.finos.waltz.service.survey.SurveyRunService;
@@ -98,28 +100,24 @@ public class SurveyRunGenerator implements SampleDataGenerator {
 
     private static SurveyRunRecord mkRandomSurveyRunRecord(DSLContext dsl,
                                                            List<AppGroup> appGroups,
-                                                           List<InvolvementKind> involvementKinds,
                                                            SurveyTemplate surveyTemplate,
                                                            Person owner) {
+
+
+        String surveyRunName = String.format("%s %s %s",
+                randomPick(SURVEY_RUN_PREFIXES),
+                surveyTemplate.name(),
+                SURVEY_RUN_SUFFIX);
+
         SurveyRunRecord surveyRunRecord = dsl.newRecord(SURVEY_RUN);
         surveyRunRecord.setOwnerId(owner.id().get());
         surveyRunRecord.setContactEmail(owner.email());
         surveyRunRecord.setSurveyTemplateId(surveyTemplate.id().get());
-        surveyRunRecord.setName(String.format("%s %s %s",
-                randomPick(SURVEY_RUN_PREFIXES),
-                surveyTemplate.name(),
-                SURVEY_RUN_SUFFIX));
+        surveyRunRecord.setName(surveyRunName);
         surveyRunRecord.setDescription(surveyTemplate.description());
         surveyRunRecord.setSelectorEntityKind(EntityKind.APP_GROUP.name());
         surveyRunRecord.setSelectorEntityId(appGroups.get(random.nextInt(appGroups.size())).id().get());
         surveyRunRecord.setSelectorHierarchyScope(HierarchyQueryScope.EXACT.name());
-
-        Collections.shuffle(involvementKinds, random);
-        surveyRunRecord.setInvolvementKindIds(involvementKinds.stream()
-                .limit(random.nextInt(MAX_INVOLVEMENT_KINDS_PER_RUN) + 1)
-                .map(kind -> kind.id().get().toString())
-                .collect(joining(ID_SEPARATOR)));
-
         surveyRunRecord.setIssuanceKind(randomPick(SurveyIssuanceKind.values()).name());
         LocalDate issuedOn = LocalDate.now().minusDays(random.nextInt(MAX_SURVEY_AGE_IN_DAYS));
         surveyRunRecord.setIssuedOn(java.sql.Date.valueOf(issuedOn));
@@ -216,10 +214,17 @@ public class SurveyRunGenerator implements SampleDataGenerator {
             SurveyTemplate surveyTemplate = surveyTemplates.get(random.nextInt(surveyTemplates.size()));
             Person owner = owners.get(random.nextInt(owners.size()));
 
-            SurveyRunRecord surveyRunRecord = mkRandomSurveyRunRecord(dsl, appGroups, involvementKinds, surveyTemplate, owner);
+            SurveyRunRecord surveyRunRecord = mkRandomSurveyRunRecord(dsl, appGroups, surveyTemplate, owner);
             surveyRunRecord.store();
             long surveyRunId = surveyRunRecord.getId();
             LOG.debug("Survey Run: {} / {} / {}", surveyRunRecord.getStatus(), surveyRunId, surveyRunRecord.getName());
+
+            surveyRunService
+                    .createRecipientsGroup(
+                            surveyRunId,
+                            surveyRunRecord.getName(),
+                            SetUtilities.map(involvementKinds, d -> d.id().get()),
+                            "surveyRunGenerator");
 
             ImmutableInstancesAndRecipientsCreateCommand createCmd = ImmutableInstancesAndRecipientsCreateCommand.builder()
                     .surveyRunId(surveyRunId)
