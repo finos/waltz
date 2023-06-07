@@ -27,9 +27,14 @@ import org.finos.waltz.data.person.PersonDao;
 import org.finos.waltz.data.survey.*;
 import org.finos.waltz.model.*;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.involvement_group.ImmutableInvolvementGroup;
+import org.finos.waltz.model.involvement_group.ImmutableInvolvementGroupCreateCommand;
+import org.finos.waltz.model.involvement_group.InvolvementGroup;
+import org.finos.waltz.model.involvement_group.InvolvementGroupCreateCommand;
 import org.finos.waltz.model.person.Person;
 import org.finos.waltz.model.survey.*;
 import org.finos.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.service.involvement_group.InvolvementGroupService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +44,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
@@ -49,6 +55,7 @@ import static org.finos.waltz.common.ListUtilities.map;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.SetUtilities.*;
+import static org.finos.waltz.common.StringUtilities.capitalise;
 
 @Service
 public class SurveyRunService {
@@ -62,6 +69,7 @@ public class SurveyRunService {
     private final SurveyRunDao surveyRunDao;
     private final SurveyTemplateDao surveyTemplateDao;
     private final SurveyQuestionResponseDao surveyQuestionResponseDao;
+    private final InvolvementGroupService involvementGroupService;
 
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
     private final SurveyInstanceIdSelectorFactory surveyInstanceIdSelectorFactory = new SurveyInstanceIdSelectorFactory();
@@ -76,7 +84,9 @@ public class SurveyRunService {
                             SurveyInstanceOwnerDao surveyInstanceOwnerDao,
                             SurveyRunDao surveyRunDao,
                             SurveyTemplateDao surveyTemplateDao,
-                            SurveyQuestionResponseDao surveyQuestionResponseDao) {
+                            SurveyQuestionResponseDao surveyQuestionResponseDao,
+                            InvolvementGroupService involvementGroupService) {
+
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(involvementDao, "involvementDao cannot be null");
         checkNotNull(personDao, "personDao cannot be null");
@@ -86,6 +96,7 @@ public class SurveyRunService {
         checkNotNull(surveyRunDao, "surveyRunDao cannot be null");
         checkNotNull(surveyTemplateDao, "surveyTemplateDao cannot be null");
         checkNotNull(surveyQuestionResponseDao, "surveyQuestionResponseDao cannot be null");
+        checkNotNull(involvementGroupService, "involvementGroupService cannot be null");
 
         this.changeLogService = changeLogService;
         this.involvementDao = involvementDao;
@@ -96,6 +107,7 @@ public class SurveyRunService {
         this.surveyRunDao = surveyRunDao;
         this.surveyTemplateDao = surveyTemplateDao;
         this.surveyQuestionResponseDao = surveyQuestionResponseDao;
+        this.involvementGroupService = involvementGroupService;
     }
 
 
@@ -132,11 +144,14 @@ public class SurveyRunService {
                 command.surveyTemplateId(),
                 userName);
 
-        if (! canIssueAgainstTemplate) {
+        if (!canIssueAgainstTemplate) {
             throw new InsufficientPrivelegeException("You do not have permission to issue surveys against this template");
         }
 
-        long surveyRunId = surveyRunDao.create(owner.id().get(), command);
+        long surveyRunId = surveyRunDao.create(owner.id().get(), command, Optional.empty(), Optional.empty());
+
+        createRecipientsGroup(surveyRunId, command.name(), command.involvementKindIds(), userName);
+        createOwnersGroup(surveyRunId, command.name(), command.ownerInvKindIds(), userName);
 
         // log against template
         changeLogService.write(
@@ -160,6 +175,35 @@ public class SurveyRunService {
 
         return ImmutableIdCommandResponse.builder()
                 .id(surveyRunId)
+                .build();
+    }
+
+    public void createOwnersGroup(long surveyRunId, String surveyName, Set<Long> involvementKindIds, String userName) {
+        InvolvementGroupCreateCommand ownersCmd = mkInvolvementGroupCreateCommand(surveyRunId, surveyName, SurveyInvolvementKind.OWNER, involvementKindIds);
+        long ownerInvGroupId = involvementGroupService.createGroup(ownersCmd, userName);
+        surveyRunDao.updateOwnerInvolvementGroupId(surveyRunId, ownerInvGroupId);
+    }
+
+    public void createRecipientsGroup(long surveyRunId, String surveyName, Set<Long> involvementKindIds, String userName) {
+        InvolvementGroupCreateCommand recipientsCmd = mkInvolvementGroupCreateCommand(surveyRunId, surveyName, SurveyInvolvementKind.RECIPIENT, involvementKindIds);
+        long recipientInvGroupId = involvementGroupService.createGroup(recipientsCmd, userName);
+        surveyRunDao.updateRecipientInvolvementGroupId(surveyRunId, recipientInvGroupId);
+    }
+
+    private InvolvementGroupCreateCommand mkInvolvementGroupCreateCommand(Long surveyRunId,
+                                                                          String runName,
+                                                                          SurveyInvolvementKind surveyInvolvementKind,
+                                                                          Set<Long> involvementKindIds) {
+
+        InvolvementGroup group = ImmutableInvolvementGroup.builder()
+                .name(format("%s for survey run: %s", capitalise(surveyInvolvementKind.name()), runName))
+                .externalId(format("%s_SURVEY_RUN_%d", surveyInvolvementKind.name(), surveyRunId))
+                .build();
+
+        return ImmutableInvolvementGroupCreateCommand
+                .builder()
+                .involvementGroup(group)
+                .involvementKindIds(involvementKindIds)
                 .build();
     }
 
@@ -209,7 +253,32 @@ public class SurveyRunService {
 
         validateSurveyRunUpdate(userName, surveyRunId);
 
-        return surveyRunDao.update(surveyRunId, command);
+        int updatedRun = surveyRunDao.update(surveyRunId, command);
+        updateSurveyRunInvolvements(surveyRunId, command, userName);
+
+        return updatedRun;
+    }
+
+    public void updateSurveyRunInvolvements(long surveyRunId, SurveyRunChangeCommand command, String userName) {
+        checkNotNull(userName, "userName cannot be null");
+        checkNotNull(command, "change command cannot be null");
+
+        validateSurveyRunUpdate(userName, surveyRunId);
+
+        Long ownerInvolvementGroupId = surveyRunDao.getOwnerInvolvementGroupId(surveyRunId);
+        Long recipientInvolvementGroupId = surveyRunDao.getRecipientInvolvementGroupId(surveyRunId);
+
+        if (ownerInvolvementGroupId == null) {
+            createOwnersGroup(surveyRunId, command.name(), command.ownerInvKindIds(), userName);
+        } else {
+            involvementGroupService.updateInvolvements(ownerInvolvementGroupId, command.ownerInvKindIds(), userName);
+        }
+
+        if (recipientInvolvementGroupId == null) {
+            createRecipientsGroup(surveyRunId, command.name(), command.involvementKindIds(), userName);
+        } else {
+            involvementGroupService.updateInvolvements(recipientInvolvementGroupId, command.involvementKindIds(), userName);
+        }
     }
 
 

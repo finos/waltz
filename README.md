@@ -43,15 +43,15 @@ See [pom.xml](https://github.com/finos/waltz/blob/master/pom.xml) for a full lis
 
 ### Supported Databases
 
-- Postgres 
-- Microsoft SQL Server (2017+)  
-  - requires [JOOQ Pro license](https://www.jooq.org/download/) to build from source
+- Postgres
+- Microsoft SQL Server (2017+)
+    - requires [JOOQ Pro license](https://www.jooq.org/download/) to build from source
 
 
 ### Client
 
 - Browser based
-  - Chrome, Safari, Firefox, Edge
+    - Chrome, Safari, Firefox, Edge
 - AngularJS 1.7
 - Svelte
 - Bootstrap 3

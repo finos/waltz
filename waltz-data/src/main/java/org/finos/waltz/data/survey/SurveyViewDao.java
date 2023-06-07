@@ -32,12 +32,16 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDate;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.common.SetUtilities.fromCollection;
 import static org.finos.waltz.common.StringUtilities.splitThenMap;
 import static org.finos.waltz.data.JooqUtilities.maybeReadRef;
 import static org.finos.waltz.model.EntityReference.mkRef;
@@ -59,16 +63,17 @@ public class SurveyViewDao {
             .as("qualifier_entity_name");
 
     private static final Field<String> EXTERNAL_ID_FIELD = InlineSelectFieldFactory.mkExternalIdField(
-            SURVEY_INSTANCE.ENTITY_ID,
-            SURVEY_INSTANCE.ENTITY_KIND,
-            newArrayList(EntityKind.APPLICATION, EntityKind.CHANGE_INITIATIVE))
+                    SURVEY_INSTANCE.ENTITY_ID,
+                    SURVEY_INSTANCE.ENTITY_KIND,
+                    newArrayList(EntityKind.APPLICATION, EntityKind.CHANGE_INITIATIVE))
             .as("external_id");
 
     private static final String ID_SEPARATOR = ";";
 
     private static final Condition IS_ORIGINAL_INSTANCE_CONDITION = SURVEY_INSTANCE.ORIGINAL_INSTANCE_ID.isNull();
 
-    private static final RecordMapper<Record, SurveyInstanceInfo> TO_DOMAIN_MAPPER = r -> {
+    private static SurveyInstanceInfo mkSurveyInstanceInfo(Record r, Map<Long, List<Long>> surveyInvolvementGroupKindIds) {
+
         SurveyInstanceRecord instanceRecord = r.into(SURVEY_INSTANCE);
         ImmutableSurveyInstance surveyInstance = ImmutableSurveyInstance.builder()
                 .id(instanceRecord.getId())
@@ -98,6 +103,13 @@ public class SurveyViewDao {
                 .build();
 
         SurveyRunRecord runRecord = r.into(SURVEY_RUN);
+
+        Long recipientInvolvementGroupId = runRecord.getRecipientInvolvementGroupId();
+        Long ownerInvolvementGroupId = runRecord.getOwnerInvolvementGroupId();
+
+        List<Long> recipients = surveyInvolvementGroupKindIds.getOrDefault(recipientInvolvementGroupId, emptyList());
+        List<Long> owners = surveyInvolvementGroupKindIds.getOrDefault(ownerInvolvementGroupId, emptyList());
+
         ImmutableSurveyRun run = ImmutableSurveyRun.builder()
                 .id(runRecord.getId())
                 .surveyTemplateId(runRecord.getSurveyTemplateId())
@@ -108,10 +120,8 @@ public class SurveyViewDao {
                                 EntityKind.valueOf(runRecord.getSelectorEntityKind()),
                                 runRecord.getSelectorEntityId()),
                         HierarchyQueryScope.valueOf(runRecord.getSelectorHierarchyScope())))
-                .involvementKindIds(splitThenMap(
-                        runRecord.getInvolvementKindIds(),
-                        ID_SEPARATOR,
-                        Long::valueOf))
+                .involvementKindIds(fromCollection(recipients))
+                .ownerInvKindIds(fromCollection(owners))
                 .issuedOn(ofNullable(runRecord.getIssuedOn()).map(Date::toLocalDate))
                 .dueDate(runRecord.getDueDate().toLocalDate())
                 .approvalDueDate(runRecord.getApprovalDueDate().toLocalDate())
@@ -145,6 +155,9 @@ public class SurveyViewDao {
 
 
     public SurveyInstanceInfo getById(long instanceId) {
+
+        Map<Long, List<Long>> surveyInvolvementGroupKindIds = findSurveyInvolvementGroupKindIds();
+
         return dsl
                 .select(SURVEY_INSTANCE.fields())
                 .select(SURVEY_RUN.fields())
@@ -159,11 +172,14 @@ public class SurveyViewDao {
                 .innerJoin(SURVEY_RUN).on(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(SURVEY_RUN.ID))
                 .innerJoin(SURVEY_TEMPLATE).on(SURVEY_RUN.SURVEY_TEMPLATE_ID.eq(SURVEY_TEMPLATE.ID))
                 .where(SURVEY_INSTANCE.ID.eq(instanceId))
-                .fetchOne(TO_DOMAIN_MAPPER);
+                .fetchOne(r -> mkSurveyInstanceInfo(r, surveyInvolvementGroupKindIds));
     }
 
 
     public Set<SurveyInstanceInfo> findForRecipient(long personId) {
+
+        Map<Long, List<Long>> surveyInvolvementGroupKindIds = findSurveyInvolvementGroupKindIds();
+
         return dsl
                 .select(SURVEY_INSTANCE.fields())
                 .select(SURVEY_RUN.fields())
@@ -183,7 +199,7 @@ public class SurveyViewDao {
                 .and(IS_ORIGINAL_INSTANCE_CONDITION)
                 .and(SURVEY_INSTANCE.STATUS.ne(SurveyInstanceStatus.WITHDRAWN.name()))
                 .and(SURVEY_TEMPLATE.STATUS.eq(ReleaseLifecycleStatus.ACTIVE.name()))
-                .fetchSet(TO_DOMAIN_MAPPER);
+                .fetchSet(r -> mkSurveyInstanceInfo(r, surveyInvolvementGroupKindIds));
     }
 
 
@@ -191,6 +207,8 @@ public class SurveyViewDao {
     public Set<SurveyInstanceInfo> findForOwner(Long personId) {
 
         Condition isRunOwnerOrHasOwnerInvolvement = SURVEY_INSTANCE_OWNER.PERSON_ID.eq(personId).or(SURVEY_RUN.OWNER_ID.eq(personId));
+
+        Map<Long, List<Long>> surveyInvolvementGroupKindIds = findSurveyInvolvementGroupKindIds();
 
         SelectConditionStep<Record> selectSurveysByOwningInvolvement = dsl
                 .select(SURVEY_INSTANCE.fields())
@@ -232,7 +250,7 @@ public class SurveyViewDao {
 
         return selectSurveysByOwningInvolvement
                 .union(selectSurveysByOwningRole)
-                .fetchSet(TO_DOMAIN_MAPPER);
+                .fetchSet(r -> mkSurveyInstanceInfo(r, surveyInvolvementGroupKindIds));
     }
 
 
@@ -243,5 +261,15 @@ public class SurveyViewDao {
                 .innerJoin(USER_ROLE).on(PERSON.EMAIL.eq(USER_ROLE.USER_NAME))
                 .where(PERSON.ID.eq(personId))
                 .fetchSet(r -> r.get(USER_ROLE.ROLE));
+    }
+
+    private Map<Long, List<Long>> findSurveyInvolvementGroupKindIds() {
+        return dsl
+                .select(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_GROUP_ID,
+                        INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_KIND_ID)
+                .from(INVOLVEMENT_GROUP_ENTRY)
+                .fetchGroups(
+                        r -> r.get(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_GROUP_ID),
+                        r -> r.get(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_KIND_ID));
     }
 }
