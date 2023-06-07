@@ -312,7 +312,7 @@ public class AttestationRunService {
 
         InvolvementGroup group = ImmutableInvolvementGroup.builder()
                 .name(format("Recipients for attestation run: %s", runName))
-                .externalId(format("RECIPIENTS_SURVEY_RUN_%d", runId))
+                .externalId(format("RECIPIENTS_ATTESTATION_RUN_%d", runId))
                 .build();
 
         InvolvementGroupCreateCommand recipientsCmd = ImmutableInvolvementGroupCreateCommand
