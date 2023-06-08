@@ -261,7 +261,7 @@
                                         where kind_id in (select shared_kinds.kind_id from shared_kinds)),
                  to_insert as (select ik.name,
                                       ik.description,
-                                      'admin' last_updated_by,
+                                      'admin'                                                                      last_updated_by,
                                       ik.user_selectable,
                                       requires_splitting.entity_kind,
                                       case
@@ -276,146 +276,146 @@
         </sql>
     </changeSet>
 
-    <!--    <changeSet id="20230522-6612-5"-->
-    <!--               author="woodjes"-->
-    <!--               dbms="!h2">-->
-    <!--        <comment>6612: Updates the kind id value for existing involvements to use the new kind specific to subject-->
-    <!--            kind-->
-    <!--        </comment>-->
-    <!--        <sql>-->
-    <!--            with kind_mappings as (select involvement_kind.id old_id, new_id.id new_id, new_id.subject_kind new_kind-->
-    <!--                                   from involvement_kind-->
-    <!--                                            inner join involvement_kind new_id-->
-    <!--                                                       on involvement_kind.name = new_id.name and involvement_kind.id != new_id.id-->
-    <!--            where involvement_kind.subject_kind is null)-->
-    <!--                , required_updates as (-->
-    <!--            select i.entity_kind, i.entity_id, i.kind_id, kind_mappings.new_id-->
-    <!--            from involvement i-->
-    <!--                inner join kind_mappings-->
-    <!--            on i.kind_id = kind_mappings.old_id and i.entity_kind = kind_mappings.new_kind)-->
-    <!--            update involvement-->
-    <!--            set kind_id = required_updates.new_id from required_updates-->
-    <!--            where involvement.entity_id = required_updates.entity_id-->
-    <!--              and involvement.entity_kind = required_updates.entity_kind-->
-    <!--              and involvement.kind_id = required_updates.kind_id;-->
-    <!--        </sql>-->
-    <!--    </changeSet>-->
+    <changeSet id="20230522-6612-6"
+               author="woodjes"
+               dbms="!h2">
+        <comment>6612: Updates the kind id value for existing involvements to use the new kind specific to subject
+            kind
+        </comment>
+        <sql>
+            with kind_mappings as (select involvement_kind.id old_id, new_id.id new_id, new_id.subject_kind new_kind
+                                   from involvement_kind
+                                            inner join involvement_kind new_id
+                                                       on involvement_kind.name = new_id.name and involvement_kind.id != new_id.id
+            where involvement_kind.subject_kind is null)
+                , required_updates as (
+            select i.entity_kind, i.entity_id, i.kind_id, kind_mappings.new_id
+            from involvement i
+                inner join kind_mappings
+            on i.kind_id = kind_mappings.old_id and i.entity_kind = kind_mappings.new_kind)
+            update involvement
+            set kind_id = required_updates.new_id from required_updates
+            where involvement.entity_id = required_updates.entity_id
+              and involvement.entity_kind = required_updates.entity_kind
+              and involvement.kind_id = required_updates.kind_id;
+        </sql>
+    </changeSet>
 
-    <!--    <changeSet id="20230522-6612-6"-->
-    <!--               author="woodjes"-->
-    <!--               dbms="!h2">-->
-    <!--        <comment>6612: Updates the kind id value for existing key involvements to use the new kind specific to subject-->
-    <!--            kind-->
-    <!--        </comment>-->
-    <!--        <sql>-->
-    <!--            with kind_mappings as (select involvement_kind.id old_id, new_id.id new_id, new_id.subject_kind new_kind-->
-    <!--                                   from involvement_kind-->
-    <!--                                            inner join involvement_kind new_id-->
-    <!--                                                       on involvement_kind.name = new_id.name and involvement_kind.id != new_id.id-->
-    <!--            where involvement_kind.subject_kind is null)-->
-    <!--                , default_mapping as (-->
-    <!--            select kind_mappings.old_id, min (kind_mappings.new_id) default_new_id-->
-    <!--            from kind_mappings-->
-    <!--            group by kind_mappings.old_id),-->
-    <!--                required_updates as (-->
-    <!--            select kik.involvement_kind_id, kik.entity_kind, coalesce (km.new_id, dm.default_new_id) new_kind_id-->
-    <!--            from key_involvement_kind kik-->
-    <!--                inner join default_mapping dm-->
-    <!--            on kik.involvement_kind_id = dm.old_id-->
-    <!--                left join kind_mappings km on kik.involvement_kind_id = km.old_id and kik.entity_kind = km.new_kind-->
-    <!--            where kik.involvement_kind_id in (select old_id from kind_mappings))-->
-    <!--            update key_involvement_kind-->
-    <!--            set involvement_kind_id = required_updates.new_kind_id from required_updates-->
-    <!--            where key_involvement_kind.entity_kind = required_updates.entity_kind-->
-    <!--              and key_involvement_kind.involvement_kind_id = required_updates.involvement_kind_id;-->
-    <!--        </sql>-->
-    <!--    </changeSet>-->
+    <changeSet id="20230522-6612-7"
+               author="woodjes"
+               dbms="!h2">
+        <comment>6612: Updates the kind id value for existing key involvements to use the new kind specific to subject
+            kind
+        </comment>
+        <sql>
+            with kind_mappings as (select involvement_kind.id old_id, new_id.id new_id, new_id.subject_kind new_kind
+                                   from involvement_kind
+                                            inner join involvement_kind new_id
+                                                       on involvement_kind.name = new_id.name and involvement_kind.id != new_id.id
+            where involvement_kind.subject_kind is null)
+                , default_mapping as (
+            select kind_mappings.old_id, min (kind_mappings.new_id) default_new_id
+            from kind_mappings
+            group by kind_mappings.old_id),
+                required_updates as (
+            select kik.involvement_kind_id, kik.entity_kind, coalesce (km.new_id, dm.default_new_id) new_kind_id
+            from key_involvement_kind kik
+                inner join default_mapping dm
+            on kik.involvement_kind_id = dm.old_id
+                left join kind_mappings km on kik.involvement_kind_id = km.old_id and kik.entity_kind = km.new_kind
+            where kik.involvement_kind_id in (select old_id from kind_mappings))
+            update key_involvement_kind
+            set involvement_kind_id = required_updates.new_kind_id from required_updates
+            where key_involvement_kind.entity_kind = required_updates.entity_kind
+              and key_involvement_kind.involvement_kind_id = required_updates.involvement_kind_id;
+        </sql>
+    </changeSet>
 
-    <!--    <changeSet id="20230522-6612-7"-->
-    <!--               author="woodjes"-->
-    <!--               dbms="!h2">-->
-    <!--        <comment>6612: Updates the kind id value for existing involvement group entries to use the new kind (if possible-->
-    <!--            by looking up usage in permission group involvement otherwise takes the first))-->
-    <!--        </comment>-->
-    <!--        <sql>-->
-    <!--            with kind_mappings as (select involvement_kind.id old_id, new_id.id new_id, new_id.subject_kind new_kind-->
-    <!--                                   from involvement_kind-->
-    <!--                                            inner join involvement_kind new_id-->
-    <!--                                                       on involvement_kind.name = new_id.name and involvement_kind.id !=new_id.id-->
-    <!--            where involvement_kind.subject_kind is null)-->
-    <!--                , default_mapping as (-->
-    <!--            select kind_mappings.old_id, min (kind_mappings.new_id) default_new_id-->
-    <!--            from kind_mappings-->
-    <!--            group by kind_mappings.old_id),-->
-    <!--                required_updates as (-->
-    <!--            select distinct ige.involvement_group_id, pgi.parent_kind entity_kind, ige.involvement_kind_id, coalesce (kind_mappings.new_id, dm.default_new_id) new_kind_id-->
-    <!--            from involvement_group_entry ige-->
-    <!--                inner join involvement_group ig-->
-    <!--            on ige.involvement_group_id = ig.id-->
-    <!--                inner join default_mapping dm on ige.involvement_kind_id = dm.old_id-->
-    <!--                left join permission_group_involvement pgi on ig.id = pgi.involvement_group_id-->
-    <!--                left join kind_mappings on ige.involvement_kind_id = kind_mappings.old_id-->
-    <!--                and pgi.parent_kind = kind_mappings.new_kind-->
-    <!--            where ige.involvement_kind_id in (select old_id from kind_mappings))-->
-    <!--            update involvement_group_entry-->
-    <!--            set involvement_kind_id = required_updates.new_kind_id from required_updates-->
-    <!--            where involvement_group_entry.involvement_group_id = required_updates.involvement_group_id-->
-    <!--              and involvement_group_entry.involvement_kind_id = required_updates.involvement_kind_id;-->
-    <!--        </sql>-->
-    <!--    </changeSet>-->
+    <changeSet id="20230522-6612-8"
+               author="woodjes"
+               dbms="!h2">
+        <comment>6612: Updates the kind id value for existing involvement group entries to use the new kind (if possible
+            by looking up usage in permission group involvement otherwise takes the first))
+        </comment>
+        <sql>
+            with kind_mappings as (select involvement_kind.id old_id, new_id.id new_id, new_id.subject_kind new_kind
+                                   from involvement_kind
+                                            inner join involvement_kind new_id
+                                                       on involvement_kind.name = new_id.name and involvement_kind.id !=new_id.id
+            where involvement_kind.subject_kind is null)
+                , default_mapping as (
+            select kind_mappings.old_id, min (kind_mappings.new_id) default_new_id
+            from kind_mappings
+            group by kind_mappings.old_id),
+                required_updates as (
+            select distinct ige.involvement_group_id, pgi.parent_kind entity_kind, ige.involvement_kind_id, coalesce (kind_mappings.new_id, dm.default_new_id) new_kind_id
+            from involvement_group_entry ige
+                inner join involvement_group ig
+            on ige.involvement_group_id = ig.id
+                inner join default_mapping dm on ige.involvement_kind_id = dm.old_id
+                left join permission_group_involvement pgi on ig.id = pgi.involvement_group_id
+                left join kind_mappings on ige.involvement_kind_id = kind_mappings.old_id
+                and pgi.parent_kind = kind_mappings.new_kind
+            where ige.involvement_kind_id in (select old_id from kind_mappings))
+            update involvement_group_entry
+            set involvement_kind_id = required_updates.new_kind_id from required_updates
+            where involvement_group_entry.involvement_group_id = required_updates.involvement_group_id
+              and involvement_group_entry.involvement_kind_id = required_updates.involvement_kind_id;
+        </sql>
+    </changeSet>
 
-    <!--    <changeSet id="20230522-6612-8"-->
-    <!--               author="woodjes"-->
-    <!--               dbms="!h2">-->
-    <!--        <comment>6612: Updates the report grid columns to the new inv kind</comment>-->
-    <!--        <sql>-->
-    <!--            with kind_mappings as (select involvement_kind.id old_id, new_id.id new_id, new_id.subject_kind new_kind-->
-    <!--                                   from involvement_kind-->
-    <!--                                            inner join involvement_kind new_id-->
-    <!--                                                       on involvement_kind.name = new_id.name and involvement_kind.id != new_id.id-->
-    <!--            where involvement_kind.subject_kind is null)-->
-    <!--                , required_updates as (-->
-    <!--            select distinct fcd.id, kind_mappings.new_id-->
-    <!--            from report_grid_fixed_column_definition fcd-->
-    <!--                inner join report_grid_column_definition cd-->
-    <!--            on fcd.grid_column_id = cd.id-->
-    <!--                inner join report_grid rg on cd.report_grid_id = rg.id-->
-    <!--                left join kind_mappings on fcd.column_entity_id = kind_mappings.old_id-->
-    <!--                and rg.subject_kind = kind_mappings.new_kind-->
-    <!--            where fcd.column_entity_kind = 'INVOLVEMENT_KIND'-->
-    <!--              and fcd.column_entity_id in (select old_id from kind_mappings))-->
-    <!--            update report_grid_fixed_column_definition-->
-    <!--            set column_entity_id = required_updates.new_id from required_updates-->
-    <!--            where report_grid_fixed_column_definition.id = required_updates.id;-->
-    <!--        </sql>-->
-    <!--    </changeSet>-->
+    <changeSet id="20230522-6612-9"
+               author="woodjes"
+               dbms="!h2">
+        <comment>6612: Updates the report grid columns to the new inv kind</comment>
+        <sql>
+            with kind_mappings as (select involvement_kind.id old_id, new_id.id new_id, new_id.subject_kind new_kind
+                                   from involvement_kind
+                                            inner join involvement_kind new_id
+                                                       on involvement_kind.name = new_id.name and involvement_kind.id != new_id.id
+            where involvement_kind.subject_kind is null)
+                , required_updates as (
+            select distinct fcd.id, kind_mappings.new_id
+            from report_grid_fixed_column_definition fcd
+                inner join report_grid_column_definition cd
+            on fcd.grid_column_id = cd.id
+                inner join report_grid rg on cd.report_grid_id = rg.id
+                left join kind_mappings on fcd.column_entity_id = kind_mappings.old_id
+                and rg.subject_kind = kind_mappings.new_kind
+            where fcd.column_entity_kind = 'INVOLVEMENT_KIND'
+              and fcd.column_entity_id in (select old_id from kind_mappings))
+            update report_grid_fixed_column_definition
+            set column_entity_id = required_updates.new_id from required_updates
+            where report_grid_fixed_column_definition.id = required_updates.id;
+        </sql>
+    </changeSet>
 
-    <!--    <changeSet id="20230522-6612-9"-->
-    <!--               author="woodjes">-->
-    <!--        <comment>6612: Clean up old involvement kinds</comment>-->
-    <!--        <delete tableName="involvement_kind">-->
-    <!--            <where>-->
-    <!--                subject_kind is null and id not in (select kind_id from involvement);-->
-    <!--            </where>-->
-    <!--        </delete>-->
-    <!--    </changeSet>-->
+    <changeSet id="20230522-6612-10"
+               author="woodjes">
+        <comment>6612: Clean up old involvement kinds</comment>
+        <delete tableName="involvement_kind">
+            <where>
+                subject_kind is null and id not in (select kind_id from involvement);
+            </where>
+        </delete>
+    </changeSet>
 
-    <!--    <changeSet id="20230522-6612-10"-->
-    <!--               author="woodjes">-->
-    <!--        <comment>6612: Make subject kind required</comment>-->
-    <!--        <addNotNullConstraint tableName="involvement_kind"-->
-    <!--                              columnName="subject_kind"-->
-    <!--                              columnDataType="${enum.type}"/>-->
-    <!--    </changeSet>-->
+    <changeSet id="20230522-6612-11"
+               author="woodjes">
+        <comment>6612: Make subject kind required</comment>
+        <addNotNullConstraint tableName="involvement_kind"
+                              columnName="subject_kind"
+                              columnDataType="${enum.type}"/>
+    </changeSet>
 
-    <!--    <changeSet id="20230522-6612-11"-->
-    <!--               author="woodjes">-->
-    <!--        <addColumn tableName="involvement_kind">-->
-    <!--            <column name="permitted_role"-->
-    <!--                    type="${role.type}">-->
-    <!--                <constraints nullable="true"/>-->
-    <!--            </column>-->
-    <!--        </addColumn>-->
-    <!--    </changeSet>-->
+    <changeSet id="20230522-6612-12"
+               author="woodjes">
+        <addColumn tableName="involvement_kind">
+            <column name="permitted_role"
+                    type="${role.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
 
 </databaseChangeLog>
