@@ -19,6 +19,7 @@
 package org.finos.waltz.data.survey;
 
 import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.data.involvement_group.InvolvementGroupDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.HierarchyQueryScope;
@@ -94,7 +95,7 @@ public class SurveyRunDao {
 
     public SurveyRun getById(long id) {
 
-        Map<Long, List<Long>> surveyInvolvementGroupKindIds = findSurveyInvolvementGroupKindIds();
+        Map<Long, List<Long>> surveyInvolvementGroupKindIds = InvolvementGroupDao.findAllInvolvementsByGroupId(dsl);
 
         return dsl
                 .select(SURVEY_RUN.fields())
@@ -106,7 +107,7 @@ public class SurveyRunDao {
 
     public List<SurveyRun> findForRecipient(long personId) {
 
-        Map<Long, List<Long>> surveyInvolvementGroupKindIds = findSurveyInvolvementGroupKindIds();
+        Map<Long, List<Long>> surveyInvolvementGroupKindIds = InvolvementGroupDao.findAllInvolvementsByGroupId(dsl);
 
         return dsl
                 .select(SURVEY_RUN.fields())
@@ -218,7 +219,7 @@ public class SurveyRunDao {
 
     public List<SurveyRun> findBySurveyInstanceIdSelector(Select<Record1<Long>> idSelector) {
 
-        Map<Long, List<Long>> surveyInvolvementGroupKindIds = findSurveyInvolvementGroupKindIds();
+        Map<Long, List<Long>> surveyInvolvementGroupKindIds = InvolvementGroupDao.findAllInvolvementsByGroupId(dsl);
 
         return dsl
                 .selectDistinct(SURVEY_RUN.fields())
@@ -231,7 +232,7 @@ public class SurveyRunDao {
 
     public List<SurveyRun> findByTemplateId(long templateId) {
 
-        Map<Long, List<Long>> surveyInvolvementGroupKindIds = findSurveyInvolvementGroupKindIds();
+        Map<Long, List<Long>> surveyInvolvementGroupKindIds = InvolvementGroupDao.findAllInvolvementsByGroupId(dsl);
 
         return dsl
                 .select(SURVEY_RUN.fields())
@@ -271,13 +272,6 @@ public class SurveyRunDao {
                 .set(SURVEY_RUN.RECIPIENT_INVOLVEMENT_GROUP_ID, recipientInvGroupId)
                 .where(SURVEY_RUN.ID.eq(surveyRunId))
                 .execute();
-    }
-
-    private Map<Long, List<Long>> findSurveyInvolvementGroupKindIds() {
-        return dsl
-                .select(ige.INVOLVEMENT_GROUP_ID, ige.INVOLVEMENT_KIND_ID)
-                .from(ige)
-                .fetchGroups(r -> r.get(ige.INVOLVEMENT_GROUP_ID), r -> r.get(ige.INVOLVEMENT_KIND_ID));
     }
 
 }
