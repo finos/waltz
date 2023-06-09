@@ -70,10 +70,10 @@ function store($http, baseApiUrl) {
             .then(d => d.data);
     };
 
-    const save = (ref, measurableId, rating = "Z", previousRating, description = "") => {
+    const save = (ref, measurableId, rating = "Z", previousRating, description = "", isPrimary = false) => {
         checkIsEntityRef(ref);
         return $http
-            .post(`${baseUrl}/entity/${ref.kind}/${ref.id}/measurable/${measurableId}`, { rating, previousRating, description })
+            .post(`${baseUrl}/entity/${ref.kind}/${ref.id}/measurable/${measurableId}`, { rating, previousRating, description, isPrimary })
             .then(d => d.data);
     };
 

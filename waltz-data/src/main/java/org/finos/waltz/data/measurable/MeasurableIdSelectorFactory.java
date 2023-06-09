@@ -47,6 +47,16 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
     private final OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory = new OrganisationalUnitIdSelectorFactory();
 
 
+    public static SelectConditionStep<Record1<Long>> allMeasurablesIdsInSameCategory(Long measurableId) {
+        return DSL
+                .select(MEASURABLE.ID)
+                .from(MEASURABLE)
+                .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(DSL
+                        .select(MEASURABLE.MEASURABLE_CATEGORY_ID)
+                        .from(MEASURABLE)
+                        .where(MEASURABLE.ID.eq(measurableId))));
+    }
+
     @Override
     public Select<Record1<Long>> apply(IdSelectionOptions options) {
         switch (options.entityReference().kind()) {
