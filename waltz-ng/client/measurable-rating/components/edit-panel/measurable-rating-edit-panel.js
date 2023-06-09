@@ -114,15 +114,16 @@ function controller($q,
     };
 
     const getDescription = () => _.get(vm.selected, ["rating", "description"], "");
+    const getIsPrimary = () => _.get(vm.selected, ["rating", "isPrimary"], "");
 
     const getRating = () => _.get(vm.selected, ["rating", "rating"]);
 
-    const doRatingSave = (rating, description) => {
+    const doRatingSave = (rating, description, isPrimary) => {
         const currentRating = !_.isEmpty(vm.selected.rating) ? vm.selected.rating.rating : null;
         return serviceBroker
             .execute(
                 CORE_API.MeasurableRatingStore.save,
-                [vm.parentEntityRef, vm.selected.measurable.id, rating, currentRating, description])
+                [vm.parentEntityRef, vm.selected.measurable.id, rating, currentRating, description, isPrimary])
             .then(r => { vm.ratings = r.data })
             .then(() => recalcTabs())
             .then(() => {
@@ -318,7 +319,7 @@ function controller($q,
                     vm.saveInProgress = false;
                     displayError("Could not remove measurable rating.", e);
                 })
-            : doRatingSave(r, getDescription())
+            : doRatingSave(r, getDescription(), getIsPrimary())
                 .then(() => toasts.success(`Saved: ${vm.selected.measurable.name}`))
                 .catch(e => {
                     deselectMeasurable();
@@ -356,6 +357,10 @@ function controller($q,
                     toasts.error(message);
                 });
         }
+    };
+
+    vm.onPrimaryToggle = (d) => {
+        console.log("Toggling primary", d);
     };
 
 

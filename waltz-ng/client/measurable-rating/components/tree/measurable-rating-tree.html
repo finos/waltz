@@ -76,6 +76,9 @@
                 </waltz-icon>
                 <span style="position: relative; top: -1px"
                       class="waltz-visibility-child-30">
+                    <waltz-icon name="star"
+                                ng-if="node.rating.isPrimary">
+                    </waltz-icon>
                     <waltz-icon name="lock"
                                 ng-if="node.rating.isReadOnly">
                     </waltz-icon>
@@ -126,6 +129,14 @@
                 Comment
             </div>
             <waltz-markdown text="node.rating.description"></waltz-markdown>
+        </div>
+
+        <div ng-if="node.rating.isPrimary"
+             style="border-top: 1px solid #eee; margin-top: 12px; padding-top: 4px"
+             class="text-muted">
+            <waltz-icon name="star">
+            </waltz-icon>
+            This feature has been marked as primary
         </div>
 
         <div ng-if="node.allocations.length > 0"
