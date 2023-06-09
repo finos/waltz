@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.DescriptionProvider;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.LastUpdatedProvider;
-import org.finos.waltz.model.Nullable;
 import org.finos.waltz.model.ProvenanceProvider;
 import org.immutables.value.Value;
 
@@ -43,6 +42,8 @@ public abstract class MeasurableRating implements
     @Value.Default
     public boolean isReadOnly() { return false; }
 
-    @Nullable
-    public abstract Boolean isPrimary();
+    @Value.Default
+    public boolean isPrimary() {
+        return false;
+    }
 }

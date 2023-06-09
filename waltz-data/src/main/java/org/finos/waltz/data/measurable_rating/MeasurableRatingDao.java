@@ -58,7 +58,6 @@ import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.common.SetUtilities.union;
 import static org.finos.waltz.common.StringUtilities.firstChar;
 import static org.finos.waltz.common.StringUtilities.notEmpty;
-import static org.finos.waltz.data.measurable.MeasurableIdSelectorFactory.allMeasurablesIdsInSameCategory;
 import static org.finos.waltz.schema.Tables.*;
 import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
@@ -702,33 +701,45 @@ public class MeasurableRatingDao {
                         ALLOCATION.ENTITY_KIND,
                         DSL.cast(DSL.sum(ALLOCATION.ALLOCATION_PERCENTAGE), Integer.class).as("allocation_percentage"))
                 .from(ALLOCATION)
-                .innerJoin(valuesToBeSummed).on(ALLOCATION.ALLOCATION_SCHEME_ID.eq(valuesToBeSummed.field(ALLOCATION.ALLOCATION_SCHEME_ID))
+                .innerJoin(valuesToBeSummed)
+                    .on(ALLOCATION.ALLOCATION_SCHEME_ID.eq(valuesToBeSummed.field(ALLOCATION.ALLOCATION_SCHEME_ID))
                         .and(ALLOCATION.ENTITY_KIND.eq(valuesToBeSummed.field(ALLOCATION.ENTITY_KIND))
                                 .and(ALLOCATION.ENTITY_ID.eq(valuesToBeSummed.field(ALLOCATION.ENTITY_ID)))))
                 .where(ALLOCATION.MEASURABLE_ID.in(targetId, measurableId))
                 .groupBy(ALLOCATION.ALLOCATION_SCHEME_ID, ALLOCATION.ENTITY_ID, ALLOCATION.ENTITY_KIND);
     }
 
-    /**
-     * Updates the given measurable rating to be set as primary.
-     * All other ratings for the same entity/category will be set to non-primary.
-     *
-     * @param tx  the dsl connection to use
-     * @param entityId  the entity id
-     * @param measurableId  the measurbable id
-     */
-    private void updateToPrimary(DSLContext tx, Long entityId, Long measurableId) {
-        tx.update(MEASURABLE_RATING)
-                .set(MEASURABLE_RATING.IS_PRIMARY, false)
-                .where(MEASURABLE_RATING.ENTITY_ID.eq(entityId))
-                .and(MEASURABLE_RATING.MEASURABLE_ID.eq(allMeasurablesIdsInSameCategory(measurableId)))
-                .execute();
 
-        tx.update(MEASURABLE_RATING)
-                .set(MEASURABLE_RATING.IS_PRIMARY, true)
-                .where(MEASURABLE_RATING.ENTITY_ID.eq(entityId))
-                .and(MEASURABLE_RATING.MEASURABLE_ID.eq(measurableId))
-                .execute();
+
+    public boolean saveRatingItem(EntityReference entityRef,
+                                  long measurableId,
+                                  String ratingCode,
+                                  String username) {
+        return MeasurableRatingHelper.saveRatingItem(
+                dsl,
+                entityRef,
+                measurableId,
+                ratingCode,
+                username);
     }
 
+
+    public boolean saveRatingIsPrimary(EntityReference entityRef, long measurableId, boolean isPrimary, String username) {
+        return dsl.transactionResult(ctx -> MeasurableRatingHelper.saveRatingIsPrimary(
+                ctx.dsl(),
+                entityRef,
+                measurableId,
+                isPrimary,
+                username));
+    }
+
+
+    public boolean saveRatingDescription(EntityReference entityRef, long measurableId, String description, String username) {
+        return dsl.transactionResult(ctx -> MeasurableRatingHelper.saveRatingDescription(
+                ctx.dsl(),
+                entityRef,
+                measurableId,
+                description,
+                username));
+    }
 }

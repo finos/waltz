@@ -285,11 +285,29 @@ public class MeasurableRatingService {
         return measurableRatingDao.getSharedDecommsCount(measurableId, targetMeasurableId);
     }
 
-    public Collection<MeasurableRating> saveRatingItem(EntityReference entityRef, long measurableId, String ratingCode, String username) {
-        checkRatingIsAllowable(measurableCategoryId, entityRef, ratingCode);
-        return measurableRatingDao.;
+    public boolean saveRatingItem(EntityReference entityRef,
+                                  long measurableId,
+                                  String ratingCode,
+                                  String username) {
+        long categoryId = measurableDao.getById(measurableId).categoryId();
+        checkRatingIsAllowable(categoryId, entityRef, ratingCode);
+        return measurableRatingDao.saveRatingItem(entityRef, measurableId, ratingCode, username);
     }
 
+    public boolean saveRatingIsPrimary(EntityReference entityRef,
+                                       long measurableId,
+                                       boolean isPrimary,
+                                       String username) {
+        return measurableRatingDao.saveRatingIsPrimary(entityRef, measurableId, isPrimary, username);
+    }
+
+
+    public boolean saveRatingDescription(EntityReference entityRef,
+                                         long measurableId,
+                                         String description,
+                                         String username) {
+        return measurableRatingDao.saveRatingDescription(entityRef, measurableId, description, username);
+    }
 
     // ---- HELPER -----
 
@@ -302,7 +320,16 @@ public class MeasurableRatingService {
         checkRatingIsAllowable(measurableCategory, entityReference, ratingCode);
     }
 
-    private void checkRatingIsAllowable(long measurableCategory, EntityReference entityReference, String ratingCode) {
+
+    /**
+     * Checks
+     * @param measurableCategory
+     * @param entityReference
+     * @param ratingCode
+     */
+    private void checkRatingIsAllowable(long measurableCategory,
+                                        EntityReference entityReference,
+                                        String ratingCode) {
         Boolean isRestricted = ratingSchemeService
                 .findRatingSchemeItemsForEntityAndCategory(entityReference, measurableCategory)
                 .stream()
@@ -313,5 +340,6 @@ public class MeasurableRatingService {
 
         checkFalse(isRestricted, "New rating is restricted, rating not saved");
     }
+
 
 }

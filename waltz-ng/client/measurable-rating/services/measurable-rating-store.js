@@ -70,10 +70,24 @@ function store($http, baseApiUrl) {
             .then(d => d.data);
     };
 
-    const save = (ref, measurableId, rating = "Z", previousRating, description = "", isPrimary = false) => {
+    const saveRatingItem = (ref, measurableId, rating = "Z") => {
         checkIsEntityRef(ref);
         return $http
-            .post(`${baseUrl}/entity/${ref.kind}/${ref.id}/measurable/${measurableId}`, { rating, previousRating, description, isPrimary })
+            .post(`${baseUrl}/entity/${ref.kind}/${ref.id}/measurable/${measurableId}/rating`, rating)
+            .then(d => d.data);
+    };
+
+    const saveRatingIsPrimary = (ref, measurableId, isPrimary = false) => {
+        checkIsEntityRef(ref);
+        return $http
+            .post(`${baseUrl}/entity/${ref.kind}/${ref.id}/measurable/${measurableId}/is-primary`, isPrimary)
+            .then(d => d.data);
+    };
+
+    const saveRatingDescription = (ref, measurableId, description = "") => {
+        checkIsEntityRef(ref);
+        return $http
+            .post(`${baseUrl}/entity/${ref.kind}/${ref.id}/measurable/${measurableId}/description`, description)
             .then(d => d.data);
     };
 
@@ -99,7 +113,9 @@ function store($http, baseApiUrl) {
         countByMeasurableCategory,
         statsByAppSelector,
         statsForRelatedMeasurables,
-        save,
+        saveRatingItem,
+        saveRatingIsPrimary,
+        saveRatingDescription,
         remove,
         removeByCategory
     };
@@ -148,10 +164,20 @@ export const MeasurableRatingStore_API = {
         serviceFnName: "statsForRelatedMeasurables",
         description: "return stats for related measurables"
     },
-    save: {
+    saveRatingItem: {
         serviceName,
-        serviceFnName: "save",
-        description: "saves a measurable rating (either creating it or updating it as appropriate)"
+        serviceFnName: "saveRatingItem",
+        description: "saves a measurable rating item [ref, measurableId, rating]"
+    },
+    saveRatingIsPrimary: {
+        serviceName,
+        serviceFnName: "saveRatingIsPrimary",
+        description: "saves a measurable rating primary indicator [ref, measurableId, primaryFlag]"
+    },
+    saveRatingDescription: {
+        serviceName,
+        serviceFnName: "saveRatingDescription",
+        description: "saves a measurable rating description [ref, measurableId, description]"
     },
     remove: {
         serviceName,

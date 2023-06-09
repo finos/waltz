@@ -242,7 +242,8 @@
             </div>
         </div>
 
-        <div class="row">
+        <div class="row"
+             ng-if="$ctrl.selected.rating">
             <div class="col-sm-3">
                 Primary:
             </div>
@@ -254,10 +255,6 @@
                               label-off="Not Primary"
                               on-toggle="$ctrl.onPrimaryToggle()">
                 </waltz-toggle>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-12">
                 <p class="help-block small">
                     Only one primary rating is allowed per category, selecting this will deselect any other primary ratings for this entity
                 </p>
@@ -266,6 +263,7 @@
 
         <!-- COMMENT -->
         <div class="row"
+             ng-if="$ctrl.selected.rating"
              style="padding-top: 8px;">
             <div class="col-sm-3">
                 Comments:

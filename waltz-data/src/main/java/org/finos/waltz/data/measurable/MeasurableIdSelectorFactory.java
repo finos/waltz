@@ -47,6 +47,10 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
     private final OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory = new OrganisationalUnitIdSelectorFactory();
 
 
+    /**
+     * @param measurableId  the identifier of the measurable to start from
+     * @return  a selector which gives all measurable ids that belong to the same category as the given measurable id
+     */
     public static SelectConditionStep<Record1<Long>> allMeasurablesIdsInSameCategory(Long measurableId) {
         return DSL
                 .select(MEASURABLE.ID)
