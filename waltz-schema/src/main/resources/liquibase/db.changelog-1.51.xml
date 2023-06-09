@@ -408,8 +408,17 @@
                               columnDataType="${enum.type}"/>
     </changeSet>
 
-    <changeSet id="20230522-6612-12"
+    <changeSet id="20230609-6612-12"
                author="woodjes">
+        <comment>6612: Make name unique by subject kind</comment>
+        <addUniqueConstraint tableName="involvement_kind"
+                             constraintName="idx_inv_kind_name_subject_kind_unique"
+                             columnNames="name, subject_kind"/>
+    </changeSet>
+
+    <changeSet id="20230609-6612-13"
+               author="woodjes">
+        <comment>6612: Make name unique by subject kind</comment>
         <addColumn tableName="involvement_kind">
             <column name="permitted_role"
                     type="${role.type}">

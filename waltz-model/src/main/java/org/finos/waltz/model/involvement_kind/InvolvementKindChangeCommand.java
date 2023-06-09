@@ -40,4 +40,6 @@ public abstract class InvolvementKindChangeCommand implements EntityChangeComman
 
     public abstract Optional<FieldChange<Boolean>> userSelectable();
 
+    public abstract Optional<FieldChange<String>> permittedRole();
+
 }

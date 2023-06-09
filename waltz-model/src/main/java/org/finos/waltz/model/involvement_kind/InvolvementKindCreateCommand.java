@@ -38,4 +38,7 @@ public abstract class InvolvementKindCreateCommand implements
 
     public abstract EntityKind subjectKind();
 
+    @Nullable
+    public abstract String permittedRole();
+
 }

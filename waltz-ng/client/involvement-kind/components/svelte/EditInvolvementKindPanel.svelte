@@ -13,7 +13,8 @@
         externalId: involvementKind.externalId,
         description: involvementKind.description,
         name: involvementKind.name,
-        userSelectable: involvementKind.userSelectable
+        userSelectable: involvementKind.userSelectable,
+        permittedRole: involvementKind.permittedRole
     });
 
     function cancel() {
@@ -21,10 +22,7 @@
         onCancel()
     }
 
-    $: invalidKind = _.isNull(working.name)
-        || _.isNull(working.description)
-        || _.isNull(working.externalId)
-        || _.isEmpty(working.name)
+    $: invalidKind = _.isEmpty(working.name)
         || _.isEmpty(working.description)
         || _.isEmpty(working.externalId)
 
@@ -73,6 +71,17 @@
                type="checkbox"
                checked={working.userSelectable}
                on:click={() => working.userSelectable = !working.userSelectable}>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-2">
+        Permitted Role
+    </div>
+    <div class="col-sm-10">
+        <input class="form-control"
+               id="permittedRole"
+               placeholder="Permitted Role"
+               bind:value={working.permittedRole}>
     </div>
 </div>
 <div class="row">

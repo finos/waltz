@@ -132,7 +132,7 @@ function mkCurrentInvolvements(involvements = []) {
 }
 
 
-function controller($q, displayNameService, descriptionService, serviceBroker, involvedSectionService) {
+function controller($q, displayNameService, descriptionService, serviceBroker, involvedSectionService, UserService) {
 
     const vm = initialiseData(this, initialState);
 
@@ -146,19 +146,23 @@ function controller($q, displayNameService, descriptionService, serviceBroker, i
             .loadViewData(
                 CORE_API.InvolvementStore.findBySelector,
                 [ options ],
-                { force: true })
+                {force: true})
             .then(r => r.data);
 
         const peoplePromise = serviceBroker
             .loadViewData(
                 CORE_API.InvolvementStore.findPeopleBySelector,
-                [ options ],
-                { force: true })
+                [options],
+                {force: true})
             .then(r => r.data);
 
+        const userRolesPromise = UserService
+            .whoami()
+            .then(user => user.roles);
+
         return $q
-            .all([involvementPromise, peoplePromise, kindPromise])
-            .then(([involvements = [], people = [], involvementKinds = []]) => {
+            .all([involvementPromise, peoplePromise, kindPromise, userRolesPromise])
+            .then(([involvements = [], people = [], involvementKinds = [], userRoles = []]) => {
                 const aggInvolvements = aggregatePeopleInvolvements(involvements, people);
                 vm.gridData = mkGridData(aggInvolvements, displayNameService, descriptionService);
                 vm.currentInvolvements = mkCurrentInvolvements(aggInvolvements);
@@ -168,6 +172,7 @@ function controller($q, displayNameService, descriptionService, serviceBroker, i
                     .chain(involvementKinds)
                     .filter(ik => ik.userSelectable)
                     .filter(ik => ik.subjectKind === vm.parentEntityRef.kind)
+                    .filter(ik => _.isEmpty(ik.permittedRole) || _.includes(userRoles, ik.permittedRole))
                     .map(ik => ({ value: ik.id, name: ik.name }))
                     .value();
             });
@@ -208,7 +213,8 @@ controller.$inject = [
     "DisplayNameService",
     "DescriptionService",
     "ServiceBroker",
-    "InvolvedSectionService"
+    "InvolvedSectionService",
+    "UserService"
 ];
 
 

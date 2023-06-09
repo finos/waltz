@@ -45,4 +45,6 @@ public abstract class InvolvementKind implements
         return true;
     }
 
+    @Nullable
+    public abstract String permittedRole();
 }

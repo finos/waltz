@@ -24,7 +24,9 @@
     let working = {
         name: null,
         description: null,
-        subjectKind: null
+        subjectKind: null,
+        externalId: null,
+        permittedRole: null
     }
 
     let searchStr = "";
@@ -153,7 +155,7 @@
 
             <button on:click|preventDefault={createNewInvolvementKind}
                     class="btn btn-success"
-                    disabled={working.name === null}>
+                    disabled={working.name === null || working.description == null || working.subjectKind == null}>
                 Save
             </button>
 
