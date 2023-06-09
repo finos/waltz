@@ -136,4 +136,63 @@
                     columnName="owner_inv_kind_ids"/>
     </changeSet>
 
+
+    <!-- 6637: migrate attestation involvement_kind_ids to their own involvement_group   -->
+    <changeSet id="20230607-6637-11"
+               author="woodjes">
+        <addColumn tableName="attestation_run">
+            <column name="recipient_involvement_group_id"
+                    type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <!-- 6637: migrate survey_run recipients   -->
+    <changeSet id="20230607-6637-12"
+               author="woodjes">
+        <sql>
+            insert into involvement_group (name, external_id, provenance)
+            select concat('Recipients for attestation run: ', name), concat('RECIPIENTS_ATTESTATION_RUN_', id), 'waltz'
+            from attestation_run
+            where involvement_kind_ids is not null
+              and involvement_kind_ids != '';
+        </sql>
+    </changeSet>
+
+    <changeSet id="20230607-6637-13"
+               author="woodjes">
+        <sql>
+            update attestation_run
+            set recipient_involvement_group_id = (select id
+                                                  from involvement_group ig
+                                                  where ig.external_id =
+                                                        concat('RECIPIENTS_ATTESTATION_RUN_', attestation_run.id))
+            where involvement_kind_ids is not null
+              and involvement_kind_ids != '';
+        </sql>
+    </changeSet>
+
+
+    <changeSet id="20230607-6637-14"
+               author="woodjes">
+        <sql>
+            insert into involvement_group_entry (involvement_group_id, involvement_kind_id)
+            select ar.recipient_involvement_group_id, ik.id
+            from attestation_run ar
+                     inner join involvement_kind ik
+                                on concat(ar.involvement_kind_ids, ';') like concat('%', ik.id, ';%')
+            where involvement_kind_ids is not null
+              and involvement_kind_ids != '';
+        </sql>
+    </changeSet>
+
+
+    <changeSet id="20230607-6637-15"
+               author="woodjes">
+        <comment>6637: migrate attestation_run recipients to involvement group, drop column</comment>
+        <dropColumn tableName="attestation_run"
+                    columnName="involvement_kind_ids"/>
+    </changeSet>
+
 </databaseChangeLog>

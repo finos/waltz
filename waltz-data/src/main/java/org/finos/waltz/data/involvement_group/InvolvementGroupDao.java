@@ -10,6 +10,8 @@ import org.jooq.Record;
 import org.jooq.RecordMapper;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -77,6 +79,17 @@ public class InvolvementGroupDao {
 
         return invGroupId;
     }
+
+
+    public static Map<Long, List<Long>> findAllInvolvementsByGroupId(DSLContext dsl) {
+        return dsl
+                .select(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_GROUP_ID, INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_KIND_ID)
+                .from(INVOLVEMENT_GROUP_ENTRY)
+                .fetchGroups(
+                        r -> r.get(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_GROUP_ID),
+                        r -> r.get(INVOLVEMENT_GROUP_ENTRY.INVOLVEMENT_KIND_ID));
+    }
+
 
     public void updateInvolvements(Long groupId, Set<Long> involvementKindIds) {
 
