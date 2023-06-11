@@ -89,6 +89,7 @@ function prepareColumnDefs(measurableCategory) {
     ];
 }
 
+
 function prepareUnmappedColumnDefs() {
     return [
         mkLinkGridCell("Name", "application.name", "application.id", "main.app.view"),

@@ -220,30 +220,4 @@
         <setColumnRemarks tableName="measurable_rating" columnName="is_primary" remarks="flag to indicate the measurable is the primary one for the entity in it's category" />
     </changeSet>
 
-
-    <changeSet id="20230601-6635-1"
-               author="davidwatkins73">
-        <addColumn tableName="measurable_rating">
-            <column name="is_primary"
-                    type="boolean">
-                <constraints nullable="false"/>
-            </column>
-        </addColumn>
-    </changeSet>
-
-    <changeSet id="20230601-6635-2"
-               author="davidwatkins73">
-        <setColumnRemarks tableName="measurable_rating" columnName="measurable_id" remarks="reference to the measurable being rated against the entity" />
-        <setColumnRemarks tableName="measurable_rating" columnName="entity_id" remarks="reference to the entity identifier being rated against the measurable" />
-        <setColumnRemarks tableName="measurable_rating" columnName="entity_kind" remarks="reference to the entity_kind (typically APPLICATION) being rated against the measurable" />
-        <setColumnRemarks tableName="measurable_rating" columnName="description" remarks="optional comment" />
-        <setColumnRemarks tableName="measurable_rating" columnName="last_updated_by" remarks="user that last updated the rating" />
-        <setColumnRemarks tableName="measurable_rating" columnName="provenance" remarks="where the rating came from, 'waltz' if via the ui" />
-        <setColumnRemarks tableName="measurable_rating" columnName="last_updated_at" remarks="when the rating was last updated" />
-        <setColumnRemarks tableName="measurable_rating" columnName="rating" remarks="the rating code which identifies the rating scheme item used in the rating.  This needs the measurable category to determine which scheme the code belongs to" />
-        <setColumnRemarks tableName="measurable_rating" columnName="is_readonly" remarks="flag to prevent updates via the UI" />
-        <setColumnRemarks tableName="measurable_rating" columnName="is_primary" remarks="optional flag to indicate the measurable is the primary one for the entity in it's category" />
-    </changeSet>
-
-
 </databaseChangeLog>

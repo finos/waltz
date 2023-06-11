@@ -272,7 +272,8 @@ public class MeasurableRatingDao {
 
 
     public List<MeasurableRatingTally> statsByAppSelector(Select<Record1<Long>> selector) {
-        return dsl.select(MEASURABLE_RATING.MEASURABLE_ID, MEASURABLE_RATING.RATING, DSL.count())
+        return dsl
+                .select(MEASURABLE_RATING.MEASURABLE_ID, MEASURABLE_RATING.RATING, DSL.count())
                 .from(MEASURABLE_RATING)
                 .where(dsl.renderInlined(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
                 .and(MEASURABLE_RATING.ENTITY_ID.in(selector))))
