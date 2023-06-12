@@ -232,21 +232,52 @@
     <changeSet id="20230522-6612-3"
                failOnError="false"
                author="woodjes">
-        <comment>6612: drop unique constraint to allow splitting of inv kinds by subject kind</comment>
-        <dropUniqueConstraint tableName="involvement_kind"
-                              constraintName="UQ__involvem__72E12F1B741599ED"
-                              uniqueColumns="name"/>
+        <comment>6612: create new name column to safely remove the unique constraint</comment>
+        <renameColumn tableName="involvement_kind"
+                      oldColumnName="name"
+                      newColumnName="old_name"/>
     </changeSet>
 
     <changeSet id="20230522-6612-4"
                failOnError="false"
                author="woodjes">
-        <comment>6612: drop index to allow splitting of inv kinds by subject kind</comment>
-        <dropIndex tableName="involvement_kind"
-                   indexName="UQ__involvem__72E12F1B741599ED"/>
+        <comment>6612: create new name column to safely remove the unique constraint</comment>
+        <addColumn tableName="involvement_kind">
+            <column name="name"
+                    type="${name.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
     </changeSet>
 
     <changeSet id="20230522-6612-5"
+               failOnError="false"
+               author="woodjes">
+        <comment>6612: create new name column to safely remove the unique constraint</comment>
+        <update tableName="involvement_kind">
+            <column name="name"
+                    valueComputed="old_name"/>
+        </update>
+    </changeSet>
+
+    <changeSet id="20230522-6612-6"
+               failOnError="false"
+               author="woodjes">
+        <comment>6612: create new name column to safely remove the unique constraint</comment>
+        <addNotNullConstraint tableName="involvement_kind"
+                              columnName="name"
+                              columnDataType="${name.type}"/>
+    </changeSet>
+
+    <changeSet id="20230522-6612-7"
+               failOnError="false"
+               author="woodjes">
+        <comment>6612: create new name column to safely remove the unique constraint</comment>
+        <dropColumn tableName="involvement_kind"
+                    columnName="old_name"/>
+    </changeSet>
+
+    <changeSet id="20230522-6612-8"
                author="woodjes"
                dbms="!h2">
         <comment>6612: Updates the subject kind value for involvement kinds only used by more than one entity kind
@@ -276,7 +307,7 @@
         </sql>
     </changeSet>
 
-    <changeSet id="20230522-6612-6"
+    <changeSet id="20230522-6612-9"
                author="woodjes"
                dbms="!h2">
         <comment>6612: Updates the kind id value for existing involvements to use the new kind specific to subject
@@ -301,7 +332,7 @@
         </sql>
     </changeSet>
 
-    <changeSet id="20230522-6612-7"
+    <changeSet id="20230522-6612-10"
                author="woodjes"
                dbms="!h2">
         <comment>6612: Updates the kind id value for existing key involvements to use the new kind specific to subject
@@ -331,7 +362,7 @@
         </sql>
     </changeSet>
 
-    <changeSet id="20230522-6612-8"
+    <changeSet id="20230522-6612-11"
                author="woodjes"
                dbms="!h2">
         <comment>6612: Updates the kind id value for existing involvement group entries to use the new kind (if possible
@@ -364,7 +395,7 @@
         </sql>
     </changeSet>
 
-    <changeSet id="20230522-6612-9"
+    <changeSet id="20230522-6612-12"
                author="woodjes"
                dbms="!h2">
         <comment>6612: Updates the report grid columns to the new inv kind</comment>
@@ -390,7 +421,7 @@
         </sql>
     </changeSet>
 
-    <changeSet id="20230522-6612-10"
+    <changeSet id="20230522-6612-13"
                author="woodjes">
         <comment>6612: Clean up old involvement kinds</comment>
         <delete tableName="involvement_kind">
@@ -400,7 +431,7 @@
         </delete>
     </changeSet>
 
-    <changeSet id="20230522-6612-11"
+    <changeSet id="20230522-6612-14"
                author="woodjes">
         <comment>6612: Make subject kind required</comment>
         <addNotNullConstraint tableName="involvement_kind"
@@ -408,7 +439,7 @@
                               columnDataType="${enum.type}"/>
     </changeSet>
 
-    <changeSet id="20230609-6612-12"
+    <changeSet id="20230609-6612-15"
                author="woodjes">
         <comment>6612: Make name unique by subject kind</comment>
         <addUniqueConstraint tableName="involvement_kind"
@@ -416,7 +447,7 @@
                              columnNames="name, subject_kind"/>
     </changeSet>
 
-    <changeSet id="20230609-6612-13"
+    <changeSet id="20230609-6612-16"
                author="woodjes">
         <comment>6612: Make name unique by subject kind</comment>
         <addColumn tableName="involvement_kind">
