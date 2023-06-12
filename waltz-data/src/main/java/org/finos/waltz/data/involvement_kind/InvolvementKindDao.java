@@ -109,17 +109,11 @@ public class InvolvementKindDao {
 
 
     public InvolvementKind getById(long id) {
-        InvolvementKindRecord record = dsl
+        return dsl
                 .select(INVOLVEMENT_KIND.fields())
                 .from(INVOLVEMENT_KIND)
                 .where(INVOLVEMENT_KIND.ID.eq(id))
-                .fetchOneInto(InvolvementKindRecord.class);
-
-        if(record == null) {
-            throw new NoDataFoundException("Could not find Involvement Kind record with id: " + id);
-        }
-
-        return TO_DOMAIN_MAPPER.map(record);
+                .fetchOne(TO_DOMAIN_MAPPER);
     }
 
 

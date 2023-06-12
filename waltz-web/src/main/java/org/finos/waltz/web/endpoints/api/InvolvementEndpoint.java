@@ -18,6 +18,7 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.common.Checks;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
@@ -33,6 +34,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
 
+import static java.lang.String.format;
+import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.web.WebUtilities.*;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 
@@ -125,12 +128,14 @@ public class InvolvementEndpoint implements Endpoint {
     private Boolean updateEntityInvolvement(Request request) throws java.io.IOException {
         EntityReference entityReference = getEntityReference(request);
         EntityInvolvementChangeCommand command = readBody(request, EntityInvolvementChangeCommand.class);
+
         requireEditRoleForEntity(
                 userRoleService,
                 request,
                 entityReference.kind(),
                 command.operation(),
-                EntityKind.ENTITY_NAMED_NOTE);
+                EntityKind.INVOLVEMENT);
+
         String username = getUsername(request);
 
         switch (command.operation()) {
@@ -143,5 +148,5 @@ public class InvolvementEndpoint implements Endpoint {
                         + command.operation() + " is not supported");
         }
     }
-
+    
 }
