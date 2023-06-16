@@ -38,6 +38,7 @@
              ng-class="{ 'wt-active': tab.category.id == $ctrl.visibility.tab }"
              class="wt-tab">
             <br>
+            <h1 ng-if="tab.category.allowPrimaryRatings">Primaries!</h1>
             <div ng-class="$ctrl.containerClass">
                 <treecontrol class="tree-light"
                              tree-model="tab.treeData"
