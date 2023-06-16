@@ -195,4 +195,61 @@
                     columnName="involvement_kind_ids"/>
     </changeSet>
 
+
+    <changeSet id="20230616-6633-1"
+               author="woodjes">
+        <comment>6633: add cascade delete between software version and package tables</comment>
+        <dropForeignKeyConstraint baseTableName="software_version"
+                                  constraintName="soft_version_package_spid_fk"/>
+        <addForeignKeyConstraint baseTableName="software_version"
+                                 baseColumnNames="software_package_id"
+                                 constraintName="soft_version_package_spid_fk"
+                                 referencedTableName="software_package"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="20230616-6633-2"
+               author="woodjes">
+        <comment>6633: add cascade delete between software version and package tables</comment>
+        <dropForeignKeyConstraint baseTableName="software_usage"
+                                  constraintName="soft_usage_version_fk"/>
+        <addForeignKeyConstraint baseTableName="software_usage"
+                                 baseColumnNames="software_version_id"
+                                 constraintName="soft_usage_version_fk"
+                                 referencedTableName="software_version"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="20230616-6633-3"
+               author="woodjes">
+        <comment>6633: add cascade delete between software version and package tables</comment>
+
+        <dropForeignKeyConstraint baseTableName="software_version_licence"
+                                  constraintName="svl_licence_fk"/>
+
+        <addForeignKeyConstraint baseTableName="software_version_licence"
+                                 baseColumnNames="licence_id"
+                                 constraintName="svl_licence_fk"
+                                 referencedTableName="licence"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="20230616-6633-4"
+               author="woodjes">
+        <comment>6633: add cascade delete between software version and package tables</comment>
+        <dropForeignKeyConstraint baseTableName="software_version_licence"
+                                  constraintName="svl_version_fk"/>
+
+        <addForeignKeyConstraint baseTableName="software_version_licence"
+                                 baseColumnNames="software_version_id"
+                                 constraintName="svl_version_fk"
+                                 referencedTableName="software_version"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+
 </databaseChangeLog>
