@@ -76,7 +76,6 @@ function controller($q,
                     userService) {
     const vm = initialiseData(this, initialState);
 
-
     const loadData = (force) => {
         return loadAllData($q, serviceBroker, vm.parentEntityRef, true, force)
             .then((r) => {
