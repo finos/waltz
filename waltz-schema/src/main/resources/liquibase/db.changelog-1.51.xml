@@ -481,4 +481,23 @@
         <setColumnRemarks tableName="measurable_rating" columnName="is_primary" remarks="flag to indicate the measurable is the primary one for the entity in it's category" />
     </changeSet>
 
+    <changeSet id="20230601-6635-3"
+               author="davidwatkins73">
+        <addColumn tableName="measurable_category">
+            <column name="allow_primary_ratings"
+                    defaultValueBoolean="false"
+                    type="boolean">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20230601-6635-4"
+               author="davidwatkins73">
+        <setColumnRemarks tableName="measurable_category" columnName="position" remarks="overrides the default (alphabetical) sort ordering of this category, defaults to zero, lower numbers come first" />
+        <setColumnRemarks tableName="measurable_category" columnName="icon_name" remarks="fontawesome icon name for the category, defaults to puzzle-piece" />
+        <setColumnRemarks tableName="measurable_category" columnName="allow_primary_ratings" remarks="boolean flag used to determine if the taxonomy supports marking ratings as primary for an application" />
+    </changeSet>
+
+
 </databaseChangeLog>
