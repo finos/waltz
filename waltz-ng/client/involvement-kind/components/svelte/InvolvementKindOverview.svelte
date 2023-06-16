@@ -6,6 +6,9 @@
     import {displayError} from "../../../common/error-utils";
     import Icon from "../../../common/svelte/Icon.svelte";
     import EditInvolvementKindPanel from "./EditInvolvementKindPanel.svelte";
+    import {entity} from "../../../common/services/enums/entity";
+    import _ from "lodash";
+    import EntityIcon from "../../../common/svelte/EntityIcon.svelte";
 
     export let involvementKind;
     export let reload = () => "reloading Kind";
@@ -43,7 +46,19 @@
             oldVal: initialVal.userSelectable
         };
 
-        const change = Object.assign({}, {id: initialVal.id, name, description, externalId, userSelectable});
+        const permittedRole = {
+            newVal: working.permittedRole,
+            oldVal: initialVal.permittedRole
+        };
+
+        const change = Object.assign({}, {
+            id: initialVal.id,
+            name,
+            description,
+            externalId,
+            userSelectable,
+            permittedRole
+        });
 
         return involvementKindStore
             .update(change)
@@ -72,6 +87,15 @@
     </div>
     <div class="row">
         <div class="col-sm-2">
+            Subject Kind
+        </div>
+        <div class="col-sm-10">
+            <EntityIcon kind={involvementKind?.subjectKind}/>
+            {_.get(entity, [involvementKind?.subjectKind, "name"], "-")}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2">
             Description
         </div>
         <div class="col-sm-10">
@@ -96,6 +120,14 @@
             {:else}
                 <span style="color:lightcoral"><Icon name="times"/></span>
             {/if}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2">
+            Permitted Role
+        </div>
+        <div class="col-sm-10">
+            {involvementKind?.permittedRole || "-"}
         </div>
     </div>
     <div class="row">

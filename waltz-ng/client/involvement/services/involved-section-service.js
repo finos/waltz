@@ -18,6 +18,7 @@
 
 import {mkChangeCommand} from "../involvement-utils";
 import toasts from "../../svelte-stores/toast-store";
+import {displayError} from "../../common/error-utils";
 
 function service(involvementStore) {
 
@@ -26,28 +27,19 @@ function service(involvementStore) {
         return involvementStore.changeInvolvement(
             entityRef,
             mkChangeCommand("ADD", entityInvolvement.entity, entityInvolvement.involvement))
-            .then(result => {
-                if(result) {
-                    toasts.success("Involvement added successfully");
-                } else {
-                    toasts.warning("Failed to add involvement")
-                }
-            });
+            .then(result => toasts.success("Involvement added successfully"))
+            .catch(e => displayError("Failed to add involvement", e));
     };
 
 
     const removeInvolvement = (entityRef, entityInvolvement) => {
 
-        return involvementStore.changeInvolvement(
-            entityRef,
-            mkChangeCommand("REMOVE", entityInvolvement.entity, entityInvolvement.involvement))
-            .then(result => {
-                if(result) {
-                    toasts.success("Involvement removed successfully");
-                } else {
-                    toasts.warning("Failed to remove involvement")
-                }
-            });
+        return involvementStore
+            .changeInvolvement(
+                entityRef,
+                mkChangeCommand("REMOVE", entityInvolvement.entity, entityInvolvement.involvement))
+            .then(result => toasts.success("Involvement removed successfully"))
+            .catch(e => displayError("Failed to remove involvement", e));
     };
 
 

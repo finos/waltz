@@ -135,7 +135,7 @@ function controller(serviceBroker, userService) {
 
         serviceBroker
             .loadAppData(CORE_API.InvolvementKindStore.findAll, [])
-            .then(r => vm.availibleInvolvementKinds = r.data);
+            .then(r => vm.availibleInvolvementKinds = _.filter(r.data, d => d.subjectKind === vm.parentEntityRef.kind));
 
         vm.visibility.showIssueSurveyBtn = isSurveyTargetKind(vm.parentEntityRef.kind);
     };

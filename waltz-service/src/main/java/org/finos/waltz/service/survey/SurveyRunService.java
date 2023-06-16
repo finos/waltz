@@ -45,6 +45,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
@@ -631,7 +632,7 @@ public class SurveyRunService {
                             genericSelector.selector(),
                             involvementKindIds);
 
-            return refToRecipientsByKind.get(subjectRef)
+            return refToRecipientsByKind.getOrDefault(subjectRef, emptyList())
                     .stream()
                     .map(p -> p.id().get())
                     .collect(Collectors.toSet());

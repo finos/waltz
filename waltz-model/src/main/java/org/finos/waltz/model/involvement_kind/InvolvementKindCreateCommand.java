@@ -20,10 +20,7 @@ package org.finos.waltz.model.involvement_kind;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.finos.waltz.model.DescriptionProvider;
-import org.finos.waltz.model.ExternalIdProvider;
-import org.finos.waltz.model.NameProvider;
-import org.finos.waltz.model.Nullable;
+import org.finos.waltz.model.*;
 import org.finos.waltz.model.command.Command;
 import org.immutables.value.Value;
 
@@ -38,5 +35,10 @@ public abstract class InvolvementKindCreateCommand implements
         NameProvider,
         DescriptionProvider,
         ExternalIdProvider {
+
+    public abstract EntityKind subjectKind();
+
+    @Nullable
+    public abstract String permittedRole();
 
 }
