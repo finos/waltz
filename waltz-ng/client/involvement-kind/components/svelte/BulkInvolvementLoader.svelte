@@ -1,7 +1,5 @@
 <script>
 
-    import {entity} from "../../../common/services/enums/entity";
-    import DropdownPicker from "../../../common/svelte/DropdownPicker.svelte";
     import {
         involvements,
         newInvolvements,
@@ -35,22 +33,12 @@
     let activeMode = Modes.INPUT;
     let resolveCall;
 
-    const items = [
-        entity.APPLICATION,
-        entity.CHANGE_INITIATIVE,
-        entity.ORG_UNIT
-    ];
-
-    function selectEntityKind(kind) {
-        $selectedKind = kind.key;
-    }
-
     function verifyEntries() {
 
         const resolveParams = {
             inputString: $rawInvolvements,
             targetDomain: mkRef(involvementKind.kind, involvementKind.id),
-            rowSubjectKind: $selectedKind
+            rowSubjectKind: involvementKind.subjectKind
         };
 
         return resolveCall = bulkUploadStore.resolve(resolveParams)
@@ -71,7 +59,7 @@
         const uploadParams = {
             inputString: _.join(validInvs, "\n"),
             targetDomain: mkRef(involvementKind.kind, involvementKind.id),
-            rowSubjectKind: $selectedKind,
+            rowSubjectKind: involvementKind.subjectKind,
             uploadMode: $uploadMode
         };
 
@@ -97,13 +85,7 @@
 
 {#if activeMode === Modes.INPUT}
     <h4>Upload Involvements:</h4>
-    <div style="padding: 1em 0">
-        Select the entity kind you wish to load involvements for from the dropdown picker.
-    </div>
-    <DropdownPicker {items}
-                    onSelect={selectEntityKind}
-                    defaultMessage="Select an entity kind"/>
-    <div style="padding: 3em 0 1em 0">
+    <div style="padding: 2em 0 1em 0">
         Use the text box below to provide involvements as comma or tab separated values
         e.g. external identifier, email.
     </div>
@@ -141,7 +123,7 @@
 
         <button type="submit"
                 class="btn btn-success"
-                disabled={_.isEmpty($rawInvolvements) || _.isNull($selectedKind)}>
+                disabled={_.isEmpty($rawInvolvements) || _.isNull(involvementKind.subjectKind)}>
             Search
         </button>
     </form>

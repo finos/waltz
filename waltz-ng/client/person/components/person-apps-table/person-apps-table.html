@@ -38,7 +38,7 @@
             </thead>
 
             <tbody>
-            <tr ng-repeat="role in row.entity.roles">
+            <tr ng-repeat="role in row.entity.roles track by role.id">
                 <td>
                     <div ng-bind="role.name"></div>
                 </td>

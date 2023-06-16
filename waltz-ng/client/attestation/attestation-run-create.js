@@ -100,7 +100,9 @@ function controller($state,
     involvementKindStore.findAll()
         .then(
             involvementKinds => {
-                vm.availableInvolvementKinds = involvementKinds;
+                vm.availableInvolvementKinds = _.filter(
+                    involvementKinds,
+                    d => d.subjectKind === vm.attestationRun.targetEntityKind);
             }
         );
 
