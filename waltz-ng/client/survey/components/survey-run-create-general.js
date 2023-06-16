@@ -107,9 +107,12 @@ function controller(appGroupStore, involvementKindStore, serviceBroker) {
             vm.availableAppGroups = [].concat(publicGroups, privateGroups);
         });
 
+
     involvementKindStore.findAll()
         .then(involvementKinds => {
-            vm.availableInvolvementKinds = involvementKinds;
+            vm.availableInvolvementKinds = _.filter(
+                involvementKinds,
+                d => d.subjectKind === vm.surveyTemplate.targetEntityKind);
         });
 
     vm.$onInit = () => {

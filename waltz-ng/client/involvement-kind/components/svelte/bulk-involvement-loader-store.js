@@ -9,7 +9,6 @@ export const UploadModes = {
 }
 
 export const rawInvolvements = writable("");
-export const selectedKind = writable(null);
 export const resolvedRows = writable([]);
 export const uploadMode = writable(UploadModes.ADD_ONLY);
 

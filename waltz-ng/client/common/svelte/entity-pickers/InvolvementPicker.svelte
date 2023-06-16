@@ -6,10 +6,11 @@
     import _ from "lodash";
 
     export let onSelect = () => console.log("Selecting involvement kind");
-    export let selectionFilter = () => true;
+    export let selectionFilter = () => true
+    export let subjectKindFilter = () => true;
 
     $: involvementKindCall = involvementKindStore.findAll();
-    $: involvementKinds = $involvementKindCall.data;
+    $: involvementKinds = _.filter($involvementKindCall.data, d => subjectKindFilter(d.subjectKind));
 
     $: rowData = _
         .chain(involvementKinds)
