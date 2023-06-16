@@ -113,23 +113,66 @@ function controller($q,
         }
     };
 
-    const getDescription = () => _.get(vm.selected, ["rating", "description"], "");
+    const deselectMeasurable = () => {
+        vm.saveInProgress = false;
+        vm.selected = Object.assign({}, vm.selected, { measurable: null });
+        vm.visibility = Object.assign({}, vm.visibility, {schemeOverview: true, ratingEditor: false});
+    };
+
+    const selectMeasurable = (node) => {
+        const { measurable, allocations } = node;
+        const category = vm.categoriesById[measurable.categoryId];
+        const ratingScheme = vm.ratingSchemesById[category.ratingSchemeId];
+        const hasWarnings = !_.isEmpty(allocations);
+
+        vm.selected = Object.assign({}, node, { category, hasWarnings, ratingScheme });
+        vm.visibility = Object.assign({}, vm.visibility, {schemeOverview: false, ratingEditor: true});
+    };
+
 
     const getRating = () => _.get(vm.selected, ["rating", "rating"]);
 
-    const doRatingSave = (rating, description) => {
-        const currentRating = !_.isEmpty(vm.selected.rating) ? vm.selected.rating.rating : null;
+
+    /**
+     * Generic save function
+     * @param method  the CORE_API method to invoke
+     * @param param  the param
+     * @returns {*}  promise
+     */
+    const doSave = (method, param) => {
         return serviceBroker
             .execute(
-                CORE_API.MeasurableRatingStore.save,
-                [vm.parentEntityRef, vm.selected.measurable.id, rating, currentRating, description])
-            .then(r => { vm.ratings = r.data })
-            .then(() => recalcTabs())
-            .then(() => {
+                method,
+                [vm.parentEntityRef, vm.selected.measurable.id, param])
+            .then((r) => {
+                vm.ratings = r.data;
+                recalcTabs();
                 vm.saveInProgress = false;
-                const newRating = { rating, description };
+            });
+    }
+
+    const doRatingItemSave = (rating) => {
+        return doSave(CORE_API.MeasurableRatingStore.saveRatingItem, rating)
+            .then(() => {
+                const newRating = _.merge({}, vm.selected.rating, { rating });
                 vm.selected = Object.assign({}, vm.selected, { rating: newRating });
-            })
+            });
+    };
+
+    const doRatingIsPrimarySave = (isPrimary) => {
+        return doSave(CORE_API.MeasurableRatingStore.saveRatingIsPrimary, isPrimary)
+            .then(() => {
+                const newRating = _.merge({}, vm.selected.rating, { isPrimary })
+                vm.selected = Object.assign({}, vm.selected, {rating: newRating});
+            });
+    };
+
+    const doRatingDescriptionSave = (description) => {
+        return doSave(CORE_API.MeasurableRatingStore.saveRatingDescription, description)
+            .then(() => {
+                const newRating = _.merge({}, vm.selected.rating, { description })
+                vm.selected = Object.assign({}, vm.selected, {rating: newRating});
+            });
     };
 
     const doRemove = () => {
@@ -146,23 +189,7 @@ function controller($q,
                 vm.ratings = r.data;
                 vm.selected.rating = null;
                 recalcTabs();
-            })
-    };
-
-    const deselectMeasurable = () => {
-        vm.saveInProgress = false;
-        vm.selected = Object.assign({}, vm.selected, { measurable: null });
-        vm.visibility = Object.assign({}, vm.visibility, {schemeOverview: true, ratingEditor: false});
-    };
-
-    const selectMeasurable = (node) => {
-        const { measurable, allocations } = node;
-        const category = vm.categoriesById[measurable.categoryId];
-        const ratingScheme = vm.ratingSchemesById[category.ratingSchemeId];
-        const hasWarnings = !_.isEmpty(allocations);
-
-        vm.selected = Object.assign({}, node, { category, hasWarnings, ratingScheme });
-        vm.visibility = Object.assign({}, vm.visibility, {schemeOverview: false, ratingEditor: true});
+            });
     };
 
     const reloadDecommData = () => {
@@ -318,7 +345,7 @@ function controller($q,
                     vm.saveInProgress = false;
                     displayError("Could not remove measurable rating.", e);
                 })
-            : doRatingSave(r, getDescription())
+            : doRatingItemSave(r)
                 .then(() => toasts.success(`Saved: ${vm.selected.measurable.name}`))
                 .catch(e => {
                     deselectMeasurable();
@@ -328,7 +355,7 @@ function controller($q,
     };
 
     vm.onSaveComment = (comment) => {
-        return doRatingSave(getRating(), comment)
+        return doRatingDescriptionSave(comment)
             .then(() => toasts.success(`Saved Comment for: ${vm.selected.measurable.name}`))
             .catch(e => {
                 displayError("Could not save comment for rating", e);
@@ -356,6 +383,16 @@ function controller($q,
                     toasts.error(message);
                 });
         }
+    };
+
+    vm.onPrimaryToggle = () => {
+        doRatingIsPrimarySave(! vm.selected.rating.isPrimary)
+            .then(() => toasts.success(`Saved primary indicator for: ${vm.selected.measurable.name}`))
+            .catch(e => {
+                deselectMeasurable();
+                displayError("Could not save primary indicator", e);
+                throw e;
+            });
     };
 
 

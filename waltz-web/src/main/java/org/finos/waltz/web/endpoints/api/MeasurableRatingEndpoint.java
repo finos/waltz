@@ -59,7 +59,6 @@ public class MeasurableRatingEndpoint implements Endpoint {
 
     private final MeasurableRatingService measurableRatingService;
     private final MeasurableRatingPermissionChecker measurableRatingPermissionChecker;
-    private final MeasurableService measurableService;
     private final UserRoleService userRoleService;
     private final PermissionGroupService permissionGroupService;
 
@@ -78,7 +77,6 @@ public class MeasurableRatingEndpoint implements Endpoint {
         checkNotNull(measurableRatingPermissionChecker, "measurableRatingPermissionChecker cannot be null");
 
         this.measurableRatingService = measurableRatingService;
-        this.measurableService = measurableService;
         this.permissionGroupService = permissionGroupService;
         this.measurableRatingPermissionChecker = measurableRatingPermissionChecker;
         this.userRoleService = userRoleService;
@@ -96,6 +94,10 @@ public class MeasurableRatingEndpoint implements Endpoint {
         String countByMeasurableCategoryPath = mkPath(BASE_URL, "count-by", "measurable", "category", ":id");
         String statsByAppSelectorPath = mkPath(BASE_URL, "stats-by", "app-selector");
         String statsForRelatedMeasurablePath = mkPath(BASE_URL, "related-stats", "measurable");
+
+        String saveRatingItemPath = mkPath(BASE_URL, "entity", ":kind", ":id", "measurable", ":measurableId", "rating");
+        String saveRatingDescriptionPath = mkPath(BASE_URL, "entity", ":kind", ":id", "measurable", ":measurableId", "description");
+        String saveRatingIsPrimaryPath = mkPath(BASE_URL, "entity", ":kind", ":id", "measurable", ":measurableId", "is-primary");
 
         ListRoute<MeasurableRating> findForEntityRoute = (request, response)
                 -> measurableRatingService.findForEntity(getEntityReference(request));
@@ -128,7 +130,53 @@ public class MeasurableRatingEndpoint implements Endpoint {
         getForList(countByMeasurableCategoryPath, countByMeasurableCategoryRoute);
         postForList(statsForRelatedMeasurablePath, statsForRelatedMeasurableRoute);
         postForList(statsByAppSelectorPath, statsByAppSelectorRoute);
+
+        postForList(saveRatingItemPath, this::saveRatingItemRoute);
+        postForList(saveRatingDescriptionPath, this::saveRatingDescriptionRoute);
+        postForList(saveRatingIsPrimaryPath, this::saveRatingIsPrimaryRoute);
     }
+
+
+    private Collection<MeasurableRating> saveRatingDescriptionRoute(Request request, Response response) throws InsufficientPrivelegeException {
+        EntityReference entityRef = getEntityReference(request);
+        long measurableId = getLong(request, "measurableId");
+        String description = request.body();
+        String username = getUsername(request);
+        checkHasPermissionForThisOperation(entityRef, measurableId, asSet(Operation.UPDATE), username);
+
+        measurableRatingService.saveRatingDescription(entityRef, measurableId, description, username);
+        return measurableRatingService.findForEntity(entityRef);
+    }
+
+
+    private Collection<MeasurableRating> saveRatingIsPrimaryRoute(Request request, Response response) throws InsufficientPrivelegeException {
+        EntityReference entityRef = getEntityReference(request);
+        long measurableId = getLong(request, "measurableId");
+        boolean isPrimary = Boolean.parseBoolean(request.body());
+        String username = getUsername(request);
+        checkHasPermissionForThisOperation(entityRef, measurableId, asSet(Operation.UPDATE), username);
+
+        measurableRatingService.saveRatingIsPrimary(entityRef, measurableId, isPrimary, username);
+        return measurableRatingService.findForEntity(entityRef);
+    }
+
+
+    private Collection<MeasurableRating> saveRatingItemRoute(Request request, Response response) throws InsufficientPrivelegeException {
+        EntityReference entityRef = getEntityReference(request);
+        long measurableId = getLong(request, "measurableId");
+        String ratingCode = request.body();
+        String username = getUsername(request);
+        checkHasPermissionForThisOperation(entityRef, measurableId, asSet(Operation.UPDATE), username);
+
+        measurableRatingService.saveRatingItem(
+                entityRef,
+                measurableId,
+                ratingCode,
+                username);
+
+        return measurableRatingService.findForEntity(entityRef);
+    }
+
 
     private Collection<MeasurableRating> removeCategoryRoute(Request request, Response z) {
 
@@ -152,6 +200,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
 
         return measurableRatingService.save(command, false);
     }
+
 
 
     private Collection<MeasurableRating> removeRoute(Request request, Response z) throws IOException, InsufficientPrivelegeException {

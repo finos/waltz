@@ -36,16 +36,14 @@
             <!-- EDIT SECTION -->
             <div ng-if="$ctrl.visibility.ratingEditor">
 
-                <span ng-if="$ctrl.selected.rating.isReadOnly">
-                    <div>
-                        <b style="font-weight: bolder">
-                            <waltz-icon name="lock"></waltz-icon> Locked
-                        </b>
-                        <p style="padding-top: 1em;">
-                           This rating has been marked as read only and cannot be edited
-                        </p>
-                    </div>
-                </span>
+                <div ng-if="$ctrl.selected.rating.isReadOnly">
+                    <b style="font-weight: bolder">
+                        <waltz-icon name="lock"></waltz-icon> Locked
+                    </b>
+                    <p style="padding-top: 1em;">
+                       This rating has been marked as read only and cannot be edited
+                    </p>
+                </div>
 
                 <span ng-if="!$ctrl.selected.rating.isReadOnly"
                       ng-include="'wmrep-rating-editor'">
@@ -231,10 +229,10 @@
 
         <!-- RATING -->
         <div class="row">
-            <div class="col-sm-3">
+            <div class="col-md-3">
                 Rating:
             </div>
-            <div class="col-sm-9">
+            <div class="col-md-9">
                 <waltz-rating-picker selected="$ctrl.selected.rating.rating"
                                      rating-scheme-items="$ctrl.activeTab.ratingSchemeItems"
                                      edit-disabled="$ctrl.saveInProgress"
@@ -244,13 +242,33 @@
             </div>
         </div>
 
+        <div class="row"
+             ng-if="$ctrl.selected.rating">
+            <div class="col-md-3">
+                Primary:
+            </div>
+            <div class="col-md-9">
+                <waltz-toggle icon-on="star"
+                              state="$ctrl.selected.rating.isPrimary"
+                              icon-off="star-o"
+                              label-on="Primary"
+                              label-off="Not Primary"
+                              on-toggle="$ctrl.onPrimaryToggle()">
+                </waltz-toggle>
+                <p class="help-block small">
+                    Only one primary rating is allowed per category, selecting this will deselect any other primary ratings for this entity
+                </p>
+            </div>
+        </div>
+
         <!-- COMMENT -->
         <div class="row"
+             ng-if="$ctrl.selected.rating"
              style="padding-top: 8px;">
-            <div class="col-sm-3">
+            <div class="col-md-3">
                 Comments:
             </div>
-            <div class="col-sm-9">
+            <div class="col-md-9">
                 <waltz-inline-edit-area placeholder='None'
                                         on-save="$ctrl.onSaveComment"
                                         value="$ctrl.selected.rating.description">

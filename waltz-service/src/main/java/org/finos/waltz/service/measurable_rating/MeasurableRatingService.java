@@ -268,22 +268,6 @@ public class MeasurableRatingService {
     }
 
 
-    private void checkRatingIsAllowable(SaveMeasurableRatingCommand command) {
-
-        long measurableCategory = measurableDao.getById(command.measurableId()).categoryId();
-        EntityReference entityReference = command.entityReference();
-
-        Boolean isRestricted = ratingSchemeService
-                .findRatingSchemeItemsForEntityAndCategory(entityReference, measurableCategory)
-                .stream()
-                .filter(r -> r.rating().equals(command.rating()))
-                .map(RatingSchemeItem::isRestricted)
-                .findFirst()
-                .orElse(false);
-
-        checkFalse(isRestricted, "New rating is restricted, rating not saved");
-    }
-
 
     public boolean checkRatingExists(SaveMeasurableRatingCommand command) {
         return measurableRatingDao.checkRatingExists(command);
@@ -300,4 +284,62 @@ public class MeasurableRatingService {
     public int getSharedDecommsCount(Long measurableId, Long targetMeasurableId) {
         return measurableRatingDao.getSharedDecommsCount(measurableId, targetMeasurableId);
     }
+
+    public boolean saveRatingItem(EntityReference entityRef,
+                                  long measurableId,
+                                  String ratingCode,
+                                  String username) {
+        long categoryId = measurableDao.getById(measurableId).categoryId();
+        checkRatingIsAllowable(categoryId, entityRef, ratingCode);
+        return measurableRatingDao.saveRatingItem(entityRef, measurableId, ratingCode, username);
+    }
+
+    public boolean saveRatingIsPrimary(EntityReference entityRef,
+                                       long measurableId,
+                                       boolean isPrimary,
+                                       String username) {
+        return measurableRatingDao.saveRatingIsPrimary(entityRef, measurableId, isPrimary, username);
+    }
+
+
+    public boolean saveRatingDescription(EntityReference entityRef,
+                                         long measurableId,
+                                         String description,
+                                         String username) {
+        return measurableRatingDao.saveRatingDescription(entityRef, measurableId, description, username);
+    }
+
+    // ---- HELPER -----
+
+    private void checkRatingIsAllowable(SaveMeasurableRatingCommand command) {
+
+        long measurableCategory = measurableDao.getById(command.measurableId()).categoryId();
+        EntityReference entityReference = command.entityReference();
+        String ratingCode = Character.toString(command.rating());
+
+        checkRatingIsAllowable(measurableCategory, entityReference, ratingCode);
+    }
+
+
+    /**
+     * Checks
+     * @param measurableCategory
+     * @param entityReference
+     * @param ratingCode
+     */
+    private void checkRatingIsAllowable(long measurableCategory,
+                                        EntityReference entityReference,
+                                        String ratingCode) {
+        Boolean isRestricted = ratingSchemeService
+                .findRatingSchemeItemsForEntityAndCategory(entityReference, measurableCategory)
+                .stream()
+                .filter(r -> r.rating().equals(ratingCode))
+                .map(RatingSchemeItem::isRestricted)
+                .findFirst()
+                .orElse(false);
+
+        checkFalse(isRestricted, "New rating is restricted, rating not saved");
+    }
+
+
 }
