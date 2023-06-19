@@ -148,5 +148,5 @@ public class InvolvementEndpoint implements Endpoint {
                         + command.operation() + " is not supported");
         }
     }
-    
+
 }
