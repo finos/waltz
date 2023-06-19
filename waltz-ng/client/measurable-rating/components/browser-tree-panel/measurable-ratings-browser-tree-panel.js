@@ -89,6 +89,7 @@ function prepareColumnDefs(measurableCategory) {
     ];
 }
 
+
 function prepareUnmappedColumnDefs() {
     return [
         mkLinkGridCell("Name", "application.name", "application.id", "main.app.view"),
@@ -164,7 +165,8 @@ function prepareUnmappedTableData(applications = [],
                 return {
                     application: app
                 };
-            }).sortBy("application.name")
+            })
+            .sortBy("application.name")
             .value();
 
     return tableData;
@@ -175,7 +177,7 @@ function log() {
 }
 
 
-function loadMeasurableRatings(serviceBroker, selector, holder) {
+function loadMeasurableRatingTallies(serviceBroker, selector, holder) {
     return serviceBroker
         .loadViewData(CORE_API.MeasurableRatingStore.statsByAppSelector, [selector])
         .then(r => holder.ratingTallies = r.data);
@@ -246,7 +248,7 @@ function controller($q, serviceBroker) {
             loadMeasurableCategories(serviceBroker, vm),
             loadMeasurables(serviceBroker, vm.selector, vm),
             loadRatingSchemes(serviceBroker, vm),
-            loadMeasurableRatings(serviceBroker, vm.selector, vm),
+            loadMeasurableRatingTallies(serviceBroker, vm.selector, vm),
             loadApps(serviceBroker, vm.selector, vm),
             loadLastViewedCategory(serviceBroker, vm)
         ]);
@@ -264,7 +266,7 @@ function controller($q, serviceBroker) {
 
         const promise = $q.all([
             loadApps(serviceBroker, vm.selector, vm),
-            loadMeasurableRatings(serviceBroker, vm.selector, vm),
+            loadMeasurableRatingTallies(serviceBroker, vm.selector, vm),
         ]);
 
         if(vm.visibility.ratingDetail) {

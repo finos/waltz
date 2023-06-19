@@ -30,6 +30,8 @@ import java.util.Set;
 @JsonDeserialize(as = ImmutableSelectionFilters.class)
 public abstract class SelectionFilters {
 
+    public static final SelectionFilters NO_FILTERS = ImmutableSelectionFilters.builder().build();
+
     public abstract Set<ApplicationKind> omitApplicationKinds();
 
 }
