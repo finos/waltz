@@ -145,7 +145,7 @@ function controller($q, displayNameService, descriptionService, serviceBroker, i
         const involvementPromise = serviceBroker
             .loadViewData(
                 CORE_API.InvolvementStore.findBySelector,
-                [ options ],
+                [options],
                 {force: true})
             .then(r => r.data);
 
