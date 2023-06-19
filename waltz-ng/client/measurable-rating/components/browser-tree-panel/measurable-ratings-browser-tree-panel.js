@@ -56,37 +56,59 @@ const initialState = {
     },
     selectedMeasurable: null,
     onLoadDetail: () => log("onLoadDetail"),
-    showMore: false
+    showMore: false,
+    showPrimaryOnly: false
 };
 
 
 function prepareColumnDefs(measurableCategory) {
-    return [
-        mkLinkGridCell("Name", "application.name", "application.id", "main.app.view"),
-        {
-            field: "application.assetCode",
-            name: "Asset Code",
-            width: "10%"
-        },
-        {
-            field: "rating.name",
-            name: "Rating",
-            cellTemplate: `<div class="ui-grid-cell-contents">
-                <waltz-rating-indicator-cell rating="row.entity.rating"
-                                             show-description-popup="true"
-                                             show-name="true">
-                </waltz-rating-indicator-cell></div>`,
-            width: "10%"
-        },
-        {
-            field: "measurable.name",
-            name: measurableCategory.name
-        },
-        {
-            field: "rating.description",
-            name: "Comment"
-        }
-    ];
+    const appLinkCol = mkLinkGridCell("Name", "application.name", "application.id", "main.app.view");
+
+    const assetCodeCol = {
+        field: "application.assetCode",
+        name: "Asset Code",
+        width: "10%"
+    };
+
+    const ratingSchemeItemCol = {
+        field: "ratingSchemeItem.name",
+        name: "Rating",
+        cellTemplate: `<div class="ui-grid-cell-contents">
+            <waltz-rating-indicator-cell rating="row.entity.ratingSchemeItem"
+                                         show-description-popup="true"
+                                         show-name="true">
+            </waltz-rating-indicator-cell></div>`,
+        width: "10%"
+    };
+
+    const isPrimaryCol = {
+        cellTemplate: `<div class="ui-grid-cell-contents">
+        <waltz-icon name="check" ng-show="row.entity.rating.isPrimary"></waltz-icon></div>`,
+        field: "rating.isPrimary",
+        name: "Primary?",
+        width: "10%"
+    };
+
+    const measurableNameCol = {
+        field: "measurable.name",
+        name: measurableCategory.name
+    };
+
+    const ratingDescriptionCol = {
+        field: "rating.description",
+        name: "Comment"
+    };
+
+    return _.compact([
+        appLinkCol,
+        assetCodeCol,
+        ratingSchemeItemCol,
+        measurableCategory.allowPrimaryRatings
+            ? isPrimaryCol
+            : null,
+        measurableNameCol,
+        ratingDescriptionCol
+    ]);
 }
 
 
@@ -128,10 +150,8 @@ function prepareTableData(measurable,
         .map(r => {
             return {
                 application: appsById[r.entityReference.id],
-                rating: Object.assign(
-                    {},
-                    ratingScheme.ratingsByCode[r.rating],
-                    { description: r.description}),
+                ratingSchemeItem: ratingScheme.ratingsByCode[r.rating],
+                rating: r,
                 measurable: measurablesById[r.measurableId]
             };
         })
@@ -250,7 +270,7 @@ function controller($q, serviceBroker) {
             loadRatingSchemes(serviceBroker, vm),
             loadMeasurableRatingTallies(serviceBroker, vm.selector, vm),
             loadApps(serviceBroker, vm.selector, vm),
-            loadLastViewedCategory(serviceBroker, vm)
+            loadLastViewedCategory(serviceBroker, vm),
         ]);
     };
 
@@ -360,6 +380,11 @@ function controller($q, serviceBroker) {
     };
 
     vm.toggleShow = () => vm.showMore = !vm.showMore;
+
+    vm.onTogglePrimaryOnly = (showPrimaryOnly) => {
+        console.log("onTogglePrimaryOnly", {showPrimaryOnly});
+        vm.showPrimaryOnly = showPrimaryOnly;
+    };
 }
 
 
