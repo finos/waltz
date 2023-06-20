@@ -72,7 +72,6 @@ function controller(serviceBroker) {
 
     const prepareData = () => {
         if (_.isEmpty(vm.measurables) ||
-            // _.isEmpty(vm.ratingTallies) ||
             _.isEmpty(vm.categories) ||
             _.isEmpty(vm.ratingSchemesById)) {
 
