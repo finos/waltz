@@ -23,7 +23,12 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.UserTimestamp;
-import org.finos.waltz.model.measurable_rating.*;
+import org.finos.waltz.model.measurable_rating.ImmutableRemoveMeasurableRatingCommand;
+import org.finos.waltz.model.measurable_rating.ImmutableSaveMeasurableRatingCommand;
+import org.finos.waltz.model.measurable_rating.MeasurableRating;
+import org.finos.waltz.model.measurable_rating.MeasurableRatingStatParams;
+import org.finos.waltz.model.measurable_rating.RemoveMeasurableRatingCommand;
+import org.finos.waltz.model.measurable_rating.SaveMeasurableRatingCommand;
 import org.finos.waltz.model.tally.MeasurableRatingTally;
 import org.finos.waltz.model.tally.Tally;
 import org.finos.waltz.service.measurable.MeasurableService;
@@ -31,6 +36,7 @@ import org.finos.waltz.service.measurable_rating.MeasurableRatingService;
 import org.finos.waltz.service.permission.PermissionGroupService;
 import org.finos.waltz.service.permission.permission_checker.MeasurableRatingPermissionChecker;
 import org.finos.waltz.service.user.UserRoleService;
+import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,8 +54,18 @@ import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.common.StringUtilities.firstChar;
 import static org.finos.waltz.model.EntityKind.MEASURABLE_RATING;
 import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.finos.waltz.web.WebUtilities.*;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
+import static org.finos.waltz.web.WebUtilities.getEntityReference;
+import static org.finos.waltz.web.WebUtilities.getId;
+import static org.finos.waltz.web.WebUtilities.getLong;
+import static org.finos.waltz.web.WebUtilities.getUsername;
+import static org.finos.waltz.web.WebUtilities.mkPath;
+import static org.finos.waltz.web.WebUtilities.readBody;
+import static org.finos.waltz.web.WebUtilities.readIdSelectionOptionsFromBody;
+import static org.finos.waltz.web.WebUtilities.requireRole;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.deleteForList;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.getForList;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.postForDatum;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.postForList;
 
 @Service
 public class MeasurableRatingEndpoint implements Endpoint {
@@ -93,7 +109,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
         String findByCategoryPath = mkPath(BASE_URL, "category", ":id");
         String countByMeasurableCategoryPath = mkPath(BASE_URL, "count-by", "measurable", "category", ":id");
         String statsByAppSelectorPath = mkPath(BASE_URL, "stats-by", "app-selector");
-        String statsForRelatedMeasurablePath = mkPath(BASE_URL, "related-stats", "measurable");
+        String hasImplicitlyRelatedMeasurablesPath = mkPath(BASE_URL, "implicitly-related-measurables", ":measurableId");
 
         String saveRatingItemPath = mkPath(BASE_URL, "entity", ":kind", ":id", "measurable", ":measurableId", "rating");
         String saveRatingDescriptionPath = mkPath(BASE_URL, "entity", ":kind", ":id", "measurable", ":measurableId", "description");
@@ -117,8 +133,10 @@ public class MeasurableRatingEndpoint implements Endpoint {
         ListRoute<MeasurableRatingTally> statsByAppSelectorRoute = (request, response)
                 -> measurableRatingService.statsByAppSelector(readBody(request, MeasurableRatingStatParams.class));
 
-        ListRoute<MeasurableRatingTally> statsForRelatedMeasurableRoute = (request, response)
-                -> measurableRatingService.statsForRelatedMeasurable(readIdSelectionOptionsFromBody(request));
+        DatumRoute<Boolean> hasImplicitlyRelatedMeasurablesRoute = (request, response)
+                -> measurableRatingService.hasImplicitlyRelatedMeasurables(
+                        getLong(request, "measurableId"),
+                        readIdSelectionOptionsFromBody(request));
 
         getForList(findForEntityPath, findForEntityRoute);
         postForList(findByMeasurableSelectorPath, findByMeasurableSelectorRoute);
@@ -128,7 +146,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
         deleteForList(modifyMeasurableForEntityPath, this::removeRoute);
         deleteForList(modifyCategoryForEntityPath, this::removeCategoryRoute);
         getForList(countByMeasurableCategoryPath, countByMeasurableCategoryRoute);
-        postForList(statsForRelatedMeasurablePath, statsForRelatedMeasurableRoute);
+        postForDatum(hasImplicitlyRelatedMeasurablesPath, hasImplicitlyRelatedMeasurablesRoute);
         postForList(statsByAppSelectorPath, statsByAppSelectorRoute);
 
         postForList(saveRatingItemPath, this::saveRatingItemRoute);

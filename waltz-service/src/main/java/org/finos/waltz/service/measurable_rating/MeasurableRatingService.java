@@ -215,6 +215,12 @@ public class MeasurableRatingService {
                 params.showPrimaryOnly());
     }
 
+    
+    public boolean hasImplicitlyRelatedMeasurables(long measurableId, IdSelectionOptions options) {
+        Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(options);
+        return measurableRatingDao.hasImplicitlyRelatedMeasurables(measurableId, selector);
+    }
+
 
     // -- HELPERS --
 

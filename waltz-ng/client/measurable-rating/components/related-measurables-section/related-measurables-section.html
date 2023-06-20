@@ -22,26 +22,14 @@
     <waltz-related-measurables-panel parent-entity-ref="$ctrl.parentEntityRef">
     </waltz-related-measurables-panel>
 
-    <div ng-if="$ctrl.relatedMeasurables.length > 0">
+    <div ng-if="$ctrl.hasImplicitlyRelatedMeasurables">
         <h4>Implicit Relationships</h4>
-        <p class="text-muted">
+        <p class="help-block">
             Implicit relationships are derived by looking at other viewpoints associated
             to applications aligned to this viewpoint.
         </p>
-        <div class="row"
-             ng-if="$ctrl.relatedMeasurables.length === 1">
-            <div class="col-sm-12">
-                <waltz-no-data>
-                    <message>
-                        <strong>No related viewpoints found.</strong>
-                    </message>
-                </waltz-no-data>
 
-            </div>
-        </div>
-
-        <div class="row"
-             ng-if="$ctrl.relatedMeasurables.length > 1">
+        <div class="row">
             <div class="col-sm-12">
                 <waltz-measurable-ratings-browser-tree-panel parent-entity-ref="$ctrl.parentEntityRef"
                                                              filters="$ctrl.filters">
@@ -49,11 +37,10 @@
             </div>
         </div>
 
-        <div class="row"
-             ng-if="$ctrl.relatedMeasurables.length > 1">
+        <div class="row">
             <div class="col-sm-12">
                 <br>
-                <p class="text-muted small">
+                <p class="help-block small">
                     The tree above shows correlations between this item and others.  The small barchart
                     below each tree node shows how many applications exhibit the viewpoint in addition
                     to this viewpoint.  The colors of the barchart indicated the relative rating counts.

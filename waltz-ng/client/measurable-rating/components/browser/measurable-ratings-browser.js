@@ -18,7 +18,6 @@
 
 import _ from "lodash";
 import {initialiseData, invokeFunction} from "../../../common";
-import {buildHierarchies} from "../../../common/hierarchy-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {distinctRatingCodes, indexRatingSchemes} from "../../../ratings/rating-utils";
 import template from "./measurable-ratings-browser.html";
@@ -97,14 +96,14 @@ function controller(serviceBroker) {
                 vm.ratingSchemesById);
 
             const lastViewedCategory = _.find(tabs, t => t.category.id === vm.lastViewedCategoryId);
-            const tab = lastViewedCategory || findFirstNonEmptyTab(tabs);
+            const startingTab = lastViewedCategory || findFirstNonEmptyTab(tabs);
 
             vm.tabs = tabs;
 
             if (!vm.visibility.tab) {
-                // no tab selected, select the first
-                vm.visibility.tab = _.get(tab, ["category", "id"]);
-                vm.onTabChange(tab);
+                // no startingTab selected, select the last viewed or first
+                vm.visibility.tab = _.get(startingTab, ["category", "id"]);
+                vm.onTabChange(startingTab);
             }
         }
     };
@@ -129,7 +128,11 @@ function controller(serviceBroker) {
     };
 
     vm.onTabChange = (tc) => {
-        invokeFunction(vm.onCategorySelect, tc.category);
+        if (_.isNil(tc)) {
+            // no tab available yet, do nothing
+        } else {
+            invokeFunction(vm.onCategorySelect, tc.category);
+        }
     };
 }
 
