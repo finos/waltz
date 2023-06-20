@@ -29,7 +29,7 @@
             to applications aligned to this viewpoint.
         </p>
         <div class="row"
-             ng-if="$ctrl.relatedMeasurables.length < 2">
+             ng-if="$ctrl.relatedMeasurables.length === 1">
             <div class="col-sm-12">
                 <waltz-no-data>
                     <message>
@@ -44,8 +44,7 @@
              ng-if="$ctrl.relatedMeasurables.length > 1">
             <div class="col-sm-12">
                 <waltz-measurable-ratings-browser-tree-panel parent-entity-ref="$ctrl.parentEntityRef"
-                                                             filters="$ctrl.filters"
-                                                             on-measurable-category-select="$ctrl.onCategorySelect">
+                                                             filters="$ctrl.filters">
                 </waltz-measurable-ratings-browser-tree-panel>
             </div>
         </div>

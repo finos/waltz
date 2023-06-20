@@ -73,7 +73,7 @@ function controller(serviceBroker) {
 
     const prepareData = () => {
         if (_.isEmpty(vm.measurables) ||
-            _.isEmpty(vm.ratingTallies) ||
+            // _.isEmpty(vm.ratingTallies) ||
             _.isEmpty(vm.categories) ||
             _.isEmpty(vm.ratingSchemesById)) {
 
@@ -81,14 +81,25 @@ function controller(serviceBroker) {
                 vm.ratingsMap = {};
             }
         } else {
-            const tabs = prepareTabs(vm.categories, vm.measurables, vm.ratingSchemesById);
+            vm.ratingsMap = mkRatingTalliesMap(vm.ratingTallies, vm.measurables);
+            vm.maxTotal = findMaxTotal(vm.ratingsMap);
+
+            const unusedMeasurables = _
+                .chain(vm.ratingsMap)
+                .values()
+                .filter(d => _.get(d, ["compound", "total"], 0) === 0)
+                .map(d => d.measurableId)
+                .value();
+
+            const tabs = prepareTabs(
+                vm.categories,
+                _.reject(vm.measurables, m => _.includes(unusedMeasurables, m.id)),
+                vm.ratingSchemesById);
+
             const lastViewedCategory = _.find(tabs, t => t.category.id === vm.lastViewedCategoryId);
             const tab = lastViewedCategory || findFirstNonEmptyTab(tabs);
 
             vm.tabs = tabs;
-
-            vm.ratingsMap = mkRatingTalliesMap(vm.ratingTallies, vm.measurables);
-            vm.maxTotal = findMaxTotal(vm.ratingsMap);
 
             if (!vm.visibility.tab) {
                 // no tab selected, select the first

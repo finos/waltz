@@ -18,6 +18,7 @@
 
 package org.finos.waltz.service.measurable_rating;
 
+import org.finos.waltz.model.measurable_rating.MeasurableRatingStatParams;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.rating_scheme.RatingSchemeService;
 import org.finos.waltz.common.DateTimeUtilities;
@@ -206,10 +207,12 @@ public class MeasurableRatingService {
     }
 
 
-    public List<MeasurableRatingTally> statsByAppSelector(IdSelectionOptions options) {
-        checkNotNull(options, "options cannot be null");
-        Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(options);
-        return measurableRatingDao.statsByAppSelector(selector);
+    public List<MeasurableRatingTally> statsByAppSelector(MeasurableRatingStatParams params) {
+        checkNotNull(params, "params cannot be null");
+        Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(params.options());
+        return measurableRatingDao.statsByAppSelector(
+                selector,
+                params.showPrimaryOnly());
     }
 
 

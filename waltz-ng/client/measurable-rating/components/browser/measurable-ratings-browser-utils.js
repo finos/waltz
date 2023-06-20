@@ -35,8 +35,9 @@ function initialiseRatingTalliesMap(ratingTallies = [], measurables = []) {
             : {};
 
         acc[m.id] = {
+            measurableId: m.id,
             direct: _.clone(summaryObj),
-            compound: _.clone(summaryObj),
+            compound: _.clone(summaryObj)
         };
         return acc;
     };

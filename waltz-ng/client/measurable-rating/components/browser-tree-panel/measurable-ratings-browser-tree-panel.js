@@ -39,7 +39,7 @@ import {lastViewedMeasurableCategoryKey} from "../../../user";
 const bindings = {
     filters: "<",
     parentEntityRef: "<",
-    onMeasurableCategorySelect: "<"
+    onMeasurableCategorySelect: "<?"
 };
 
 
@@ -56,6 +56,7 @@ const initialState = {
     },
     selectedMeasurable: null,
     onLoadDetail: () => log("onLoadDetail"),
+    onMeasurableCategorySelect: () => log("onMeasurableCategorySelect"),
     showMore: false,
     showPrimaryOnly: false
 };
@@ -197,9 +198,9 @@ function log() {
 }
 
 
-function loadMeasurableRatingTallies(serviceBroker, selector, holder) {
+function loadMeasurableRatingTallies(serviceBroker, params, holder) {
     return serviceBroker
-        .loadViewData(CORE_API.MeasurableRatingStore.statsByAppSelector, [selector])
+        .loadViewData(CORE_API.MeasurableRatingStore.statsByAppSelector, [params])
         .then(r => holder.ratingTallies = r.data);
 }
 
@@ -256,38 +257,29 @@ function controller($q, serviceBroker) {
     };
 
     const loadBaseData = () => {
-        vm.selector = mkSelectionOptionsWithJoiningEntity(
-            vm.parentEntityRef,
-            undefined,
-            undefined,
-            vm.filters,
-            "APPLICATION"
-        );
 
-        return $q.all([
-            loadMeasurableCategories(serviceBroker, vm),
-            loadMeasurables(serviceBroker, vm.selector, vm),
-            loadRatingSchemes(serviceBroker, vm),
-            loadMeasurableRatingTallies(serviceBroker, vm.selector, vm),
-            loadApps(serviceBroker, vm.selector, vm),
-            loadLastViewedCategory(serviceBroker, vm),
-        ]);
+        return $q
+            .all([
+                loadMeasurableCategories(serviceBroker, vm),
+                loadMeasurables(serviceBroker, vm.selector, vm),
+                loadRatingSchemes(serviceBroker, vm),
+                loadApps(serviceBroker, vm.selector, vm),
+                loadLastViewedCategory(serviceBroker, vm)
+            ])
+            .then(loadRatings);
     };
 
 
     const loadRatings = () => {
         clearDetail();
 
-        vm.selector = mkSelectionOptions(
-            vm.parentEntityRef,
-            undefined,
-            undefined,
-            vm.filters);
+        const statsParams = {
+            options: vm.selector,
+            showPrimaryOnly: vm.showPrimaryOnly
+        };
 
-        const promise = $q.all([
-            loadApps(serviceBroker, vm.selector, vm),
-            loadMeasurableRatingTallies(serviceBroker, vm.selector, vm),
-        ]);
+        const promise = loadMeasurableRatingTallies(serviceBroker, statsParams, vm);
+
 
         if(vm.visibility.ratingDetail) {
             promise.then(() => vm.onSelect(vm.selectedMeasurable));
@@ -299,21 +291,35 @@ function controller($q, serviceBroker) {
 
     const loadRatingDetail = () => {
         clearDetail();
-        return vm.measurableRatingsDetail
-            ? $q.resolve(vm.measurableRatingsDetail)
-            : serviceBroker
-                .execute(CORE_API.MeasurableRatingStore.findByAppSelector, [vm.selector])
-                .then(r => vm.measurableRatingsDetail = r.data);
+        return serviceBroker
+            .execute(CORE_API.MeasurableRatingStore.findByAppSelector, [vm.selector])
+            .then(r => {
+                const ratings = r.data;
+                vm.measurableRatingsDetail = vm.showPrimaryOnly
+                    ? _.filter(ratings, d => d.isPrimary === true)
+                    : ratings;
+                return vm.measurableRatingsDetail;
+            });
     };
 
+    function setupSelector() {
+        vm.selector = mkSelectionOptionsWithJoiningEntity(
+            vm.parentEntityRef,
+            undefined,
+            undefined,
+            vm.filters,
+            "APPLICATION"
+        );
+    }
 
     vm.$onInit = () => {
-        loadBaseData()
-            .then(() => loadRatings());
+        setupSelector();
+        loadBaseData();
     };
 
 
     vm.$onChanges = (changes) => {
+        setupSelector();
         if(vm.parentEntityRef && changes.filters) {
             loadRatings();
         }
@@ -384,6 +390,7 @@ function controller($q, serviceBroker) {
     vm.onTogglePrimaryOnly = (showPrimaryOnly) => {
         console.log("onTogglePrimaryOnly", {showPrimaryOnly});
         vm.showPrimaryOnly = showPrimaryOnly;
+        loadRatings();
     };
 }
 

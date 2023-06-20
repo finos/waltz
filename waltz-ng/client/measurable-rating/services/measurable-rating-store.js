@@ -50,10 +50,10 @@ function store($http, baseApiUrl) {
             .then(d => d.data);
     };
 
-    const statsByAppSelector = (options) => {
-        checkIsIdSelector(options);
+    const statsByAppSelector = (params) => {
+        checkIsIdSelector(params.options);
         return $http
-            .post(`${baseUrl}/stats-by/app-selector`, options)
+            .post(`${baseUrl}/stats-by/app-selector`, params)
             .then(d => d.data);
     };
 

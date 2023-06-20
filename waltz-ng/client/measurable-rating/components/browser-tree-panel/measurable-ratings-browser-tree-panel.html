@@ -31,21 +31,30 @@
 
         </div>
         <div class="col-sm-6">
-            <div ng-if="$ctrl.activeCategory" style="padding-top: 8px">
+            <div ng-if="$ctrl.activeCategory">
+                <h4>
+                    <waltz-icon name="{{$ctrl.activeCategory.icon}}"></waltz-icon>
+                    <span ng-bind="$ctrl.activeCategory.name"></span>
+                </h4>
+
                 <p class="text-muted">
                     <waltz-markdown text="$ctrl.activeCategory.description"></waltz-markdown>
                 </p>
+
                 <waltz-warning ng-if="$ctrl.activeCategory.allowPrimaryRatings">
                     <message>This category supports Primary Ratings</message>
                     <content>
-                        blah blah bah.
-                        <waltz-toggle icon-on="star"
-                                      icon-off="star-o"
-                                      label-on="Showing only primary ratings"
-                                      label-off="Showing all ratings"
-                                      state="$ctrl.showPrimaryOnly"
-                                      on-toggle="$ctrl.onTogglePrimaryOnly(!$ctrl.showPrimaryOnly)">
-                        </waltz-toggle>
+                        Use the toggle below to filter the tree to only show ratings which have been flagged as
+                        <i>Primary</i>
+                        <div style="padding-top: 1em;">
+                            <waltz-toggle icon-on="star"
+                                          icon-off="star-o"
+                                          label-on="Showing only primary ratings"
+                                          label-off="Showing all ratings"
+                                          state="$ctrl.showPrimaryOnly"
+                                          on-toggle="$ctrl.onTogglePrimaryOnly(!$ctrl.showPrimaryOnly)">
+                            </waltz-toggle>
+                        </div>
                     </content>
                 </waltz-warning>
                 <hr>

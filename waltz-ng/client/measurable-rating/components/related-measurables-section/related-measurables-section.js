@@ -68,6 +68,7 @@ function controller($q, serviceBroker) {
             return;
         }
 
+        // QUESTION: can we do this without making the full call?  Only used to hide/show implicit measurables
         const selectionOptions = mkSelectionOptions(vm.parentEntityRef);
 
         const measurablesPromise = serviceBroker
@@ -89,10 +90,6 @@ function controller($q, serviceBroker) {
             .all(promises)
             .then(() => vm.relatedMeasurables = calcRelatedMeasurables(vm.stats, vm.measurables));
 
-    };
-
-    vm.onCategorySelect = (category) => {
-        vm.activeCategory = category;
     };
 }
 
