@@ -228,7 +228,6 @@
     </changeSet>
 
     <changeSet id="20230522-6612-3"
-               failOnError="false"
                author="woodjes">
         <comment>6612: create new name column to safely remove the unique constraint</comment>
         <renameColumn tableName="involvement_kind"
@@ -237,7 +236,6 @@
     </changeSet>
 
     <changeSet id="20230522-6612-4"
-               failOnError="false"
                author="woodjes">
         <comment>6612: create new name column to safely remove the unique constraint</comment>
         <addColumn tableName="involvement_kind">
@@ -249,7 +247,6 @@
     </changeSet>
 
     <changeSet id="20230522-6612-5"
-               failOnError="false"
                author="woodjes">
         <comment>6612: create new name column to safely remove the unique constraint</comment>
         <update tableName="involvement_kind">
@@ -259,7 +256,6 @@
     </changeSet>
 
     <changeSet id="20230522-6612-6"
-               failOnError="false"
                author="woodjes">
         <comment>6612: create new name column to safely remove the unique constraint</comment>
         <addNotNullConstraint tableName="involvement_kind"
@@ -267,8 +263,21 @@
                               columnDataType="${name.type}"/>
     </changeSet>
 
+
+    <changeSet id="20230620-6612-6a"
+               author="davidwatkins73"
+               dbms="mssql">
+        <comment>6612: we do not know the unique column constraint name, therefore must use dynamic sql to remove it</comment>
+        <sql>
+            DECLARE @sql NVARCHAR(MAX)
+            select TOP 1 @sql = N'alter table involvement_kind drop constraint ['+ cc.name + N']'
+            from sys.key_constraints cc
+            WHERE cc.parent_object_id = OBJECT_ID('involvement_kind') and cc.type = 'UQ'
+            exec(@sql)
+        </sql>
+    </changeSet>
+
     <changeSet id="20230522-6612-7"
-               failOnError="false"
                author="woodjes">
         <comment>6612: create new name column to safely remove the unique constraint</comment>
         <dropColumn tableName="involvement_kind"
