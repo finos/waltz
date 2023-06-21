@@ -55,6 +55,7 @@ public class MeasurableCategoryDao {
                 .constrainingAssessmentDefinitionId(Optional.ofNullable(r.getConstrainingAssessmentDefinitionId()))
                 .icon(r.getIconName())
                 .position(r.getPosition())
+                .allowPrimaryRatings(r.getAllowPrimaryRatings())
                 .build();
     };
 
@@ -127,6 +128,7 @@ public class MeasurableCategoryDao {
         record.setLastUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
         record.setLastUpdatedBy(username);
         record.setRatingSchemeId(measurableCategory.ratingSchemeId());
+        record.setAllowPrimaryRatings(measurableCategory.allowPrimaryRatings());
 
         record.changed(MEASURABLE_CATEGORY.ID, false);
 

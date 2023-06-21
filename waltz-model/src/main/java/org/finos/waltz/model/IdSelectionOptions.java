@@ -47,7 +47,7 @@ public abstract class IdSelectionOptions {
 
     @Value.Default
     public SelectionFilters filters() {
-        return ImmutableSelectionFilters.builder().build();
+        return SelectionFilters.NO_FILTERS;
     }
 
   

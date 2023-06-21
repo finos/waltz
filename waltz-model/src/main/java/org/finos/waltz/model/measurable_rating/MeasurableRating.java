@@ -41,4 +41,9 @@ public abstract class MeasurableRating implements
 
     @Value.Default
     public boolean isReadOnly() { return false; }
+
+    @Value.Default
+    public boolean isPrimary() {
+        return false;
+    }
 }
