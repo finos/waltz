@@ -50,17 +50,17 @@ function store($http, baseApiUrl) {
             .then(d => d.data);
     };
 
-    const statsByAppSelector = (options) => {
-        checkIsIdSelector(options);
+    const statsByAppSelector = (params) => {
+        checkIsIdSelector(params.options);
         return $http
-            .post(`${baseUrl}/stats-by/app-selector`, options)
+            .post(`${baseUrl}/stats-by/app-selector`, params)
             .then(d => d.data);
     };
 
-    const statsForRelatedMeasurables = (options) => {
+    const hasImplicitlyRelatedMeasurables = (measurableId, options) => {
         checkIsIdSelector(options);
         return $http
-            .post(`${baseUrl}/related-stats/measurable`, options)
+            .post(`${baseUrl}/implicitly-related-measurables/${measurableId}`, options)
             .then(d => d.data);
     };
 
@@ -70,10 +70,24 @@ function store($http, baseApiUrl) {
             .then(d => d.data);
     };
 
-    const save = (ref, measurableId, rating = "Z", previousRating, description = "") => {
+    const saveRatingItem = (ref, measurableId, rating = "Z") => {
         checkIsEntityRef(ref);
         return $http
-            .post(`${baseUrl}/entity/${ref.kind}/${ref.id}/measurable/${measurableId}`, { rating, previousRating, description })
+            .post(`${baseUrl}/entity/${ref.kind}/${ref.id}/measurable/${measurableId}/rating`, rating)
+            .then(d => d.data);
+    };
+
+    const saveRatingIsPrimary = (ref, measurableId, isPrimary = false) => {
+        checkIsEntityRef(ref);
+        return $http
+            .post(`${baseUrl}/entity/${ref.kind}/${ref.id}/measurable/${measurableId}/is-primary`, isPrimary)
+            .then(d => d.data);
+    };
+
+    const saveRatingDescription = (ref, measurableId, description = "") => {
+        checkIsEntityRef(ref);
+        return $http
+            .post(`${baseUrl}/entity/${ref.kind}/${ref.id}/measurable/${measurableId}/description`, description)
             .then(d => d.data);
     };
 
@@ -98,8 +112,10 @@ function store($http, baseApiUrl) {
         findForEntityReference,
         countByMeasurableCategory,
         statsByAppSelector,
-        statsForRelatedMeasurables,
-        save,
+        hasImplicitlyRelatedMeasurables,
+        saveRatingItem,
+        saveRatingIsPrimary,
+        saveRatingDescription,
         remove,
         removeByCategory
     };
@@ -143,15 +159,25 @@ export const MeasurableRatingStore_API = {
         serviceFnName: "statsByAppSelector",
         description: "return measurable stats by app selector"
     },
-    statsForRelatedMeasurables: {
+    hasImplicitlyRelatedMeasurables: {
         serviceName,
-        serviceFnName: "statsForRelatedMeasurables",
-        description: "return stats for related measurables"
+        serviceFnName: "hasImplicitlyRelatedMeasurables",
+        description: "return boolean if measurable has implicitly related measurables via apps [measurableId, options]"
     },
-    save: {
+    saveRatingItem: {
         serviceName,
-        serviceFnName: "save",
-        description: "saves a measurable rating (either creating it or updating it as appropriate)"
+        serviceFnName: "saveRatingItem",
+        description: "saves a measurable rating item [ref, measurableId, rating]"
+    },
+    saveRatingIsPrimary: {
+        serviceName,
+        serviceFnName: "saveRatingIsPrimary",
+        description: "saves a measurable rating primary indicator [ref, measurableId, primaryFlag]"
+    },
+    saveRatingDescription: {
+        serviceName,
+        serviceFnName: "saveRatingDescription",
+        description: "saves a measurable rating description [ref, measurableId, description]"
     },
     remove: {
         serviceName,

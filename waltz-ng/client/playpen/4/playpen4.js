@@ -34,9 +34,6 @@ function controller($q, serviceBroker) {
     gridService.selectGrid(3, vm.selectionOptions)
         .then((d) => console.log("loaded grid", d));
 
-    global.gridService = gridService;
-    global.vm = vm;
-
     gridService.gridDefinition.subscribe(d => console.log({gridDef: d}))
     gridService.gridInstance.subscribe(d => console.log({gridInstance: d}))
     gridService.gridMembers.subscribe(d => console.log({gridMembers: d}))

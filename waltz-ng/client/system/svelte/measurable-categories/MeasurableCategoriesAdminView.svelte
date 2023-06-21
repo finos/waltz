@@ -8,6 +8,7 @@
     import Icon from "../../../common/svelte/Icon.svelte";
     import _ from "lodash";
     import {displayError} from "../../../common/error-utils";
+    import toasts from "../../../svelte-stores/toast-store";
 
     const Modes = {
         LIST: "list",
@@ -36,12 +37,12 @@
             .then(() => {
                 loadCategories();
                 onShowList();
+                toasts.info("Category saved successfully");
             })
             .catch(e => displayError("Failed to save category", e));
     }
 
     function onEditCategory(c) {
-        console.log("edit", c);
         workingCopy = Object.assign({}, c);
         activeMode = Modes.EDIT;
     }
@@ -142,7 +143,24 @@
                     Lower numbers go first, name is used as a tie breaker.
                 </div>
             </div>
-            <button type="submit"
+
+
+            <div class="form-group">
+                <label for="allow_primary_ratings">
+                    Allow Primary Ratings
+                </label>
+                <div>
+                    <input id="allow_primary_ratings"
+                           type="checkbox"
+                           bind:checked={workingCopy.allowPrimaryRatings}>
+                    <div class="help-inline">
+                        Determines whether users can select one measurable in this category to be flagged as the primary rating for the application.
+                    </div>
+                </div>
+            </div>
+
+
+             <button type="submit"
                     class="btn btn-primary">
                 Save
             </button>
@@ -161,9 +179,10 @@
                        style="table-layout: fixed">
                     <thead>
                     <tr>
-                        <th style="width:20%">Name</th>
-                        <th style="width:20%">External Id</th>
+                        <th style="width:15%">Name</th>
+                        <th style="width:15%">External Id</th>
                         <th style="width:10%">Icon</th>
+                        <th style="width:10%">Allows Primary Ratings?</th>
                         <th style="width:30%">Operations</th>
                     </tr>
                     </thead>
@@ -181,7 +200,15 @@
                                 </span>
                             </td>
                             <td>
-                                <span><Icon name={category.icon}/> ({category.icon})</span>
+                                <span>
+                                    <Icon name={category.icon}/>
+                                    ({category.icon})
+                                </span>
+                            </td>
+                            <td>
+                                <Icon name={category.allowPrimaryRatings
+                                    ? 'check'
+                                    : 'times'}/>
                             </td>
                             <td>
                                 <button class="btn-link"
@@ -209,5 +236,10 @@
 
 
 <style>
-
+    .help-inline {
+        display: inline-block;
+        margin-top: 5px;
+        margin-bottom: 10px;
+        color: #737373;
+    }
 </style>
