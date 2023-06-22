@@ -48,7 +48,7 @@ function service(involvementStore) {
                 if (successful) {
                     toasts.success("Involvement removed successfully");
                 } else {
-                    toasts.warning("Involvement was not removed, it may have already been remvoed");
+                    toasts.warning("Involvement was not removed, it may have already been removed");
                 }
             })
             .catch(e => displayError("Failed to remove involvement", e));
