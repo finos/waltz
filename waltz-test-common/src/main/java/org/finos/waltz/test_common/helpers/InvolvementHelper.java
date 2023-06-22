@@ -33,6 +33,7 @@ public class InvolvementHelper {
                 .description(name)
                 .name(name)
                 .externalId(name)
+                .subjectKind(EntityKind.APPLICATION)
                 .build();
         return involvementKindService.create(cmd, NameHelper.mkUserId("involvementHelper"));
     }
