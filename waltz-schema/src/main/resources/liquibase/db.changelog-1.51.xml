@@ -15,7 +15,6 @@
   ~ See the License for the specific
   ~
   -->
-
 <databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
@@ -195,7 +194,6 @@
                     columnName="involvement_kind_ids"/>
     </changeSet>
 
-
     <!-- 6612: add subject kind to involvement kind table -->
     <changeSet id="20230522-6612-1"
                author="woodjes">
@@ -230,7 +228,6 @@
     </changeSet>
 
     <changeSet id="20230522-6612-3"
-               failOnError="false"
                author="woodjes">
         <comment>6612: create new name column to safely remove the unique constraint</comment>
         <renameColumn tableName="involvement_kind"
@@ -239,7 +236,6 @@
     </changeSet>
 
     <changeSet id="20230522-6612-4"
-               failOnError="false"
                author="woodjes">
         <comment>6612: create new name column to safely remove the unique constraint</comment>
         <addColumn tableName="involvement_kind">
@@ -251,7 +247,6 @@
     </changeSet>
 
     <changeSet id="20230522-6612-5"
-               failOnError="false"
                author="woodjes">
         <comment>6612: create new name column to safely remove the unique constraint</comment>
         <update tableName="involvement_kind">
@@ -261,7 +256,6 @@
     </changeSet>
 
     <changeSet id="20230522-6612-6"
-               failOnError="false"
                author="woodjes">
         <comment>6612: create new name column to safely remove the unique constraint</comment>
         <addNotNullConstraint tableName="involvement_kind"
@@ -269,8 +263,23 @@
                               columnDataType="${name.type}"/>
     </changeSet>
 
+
+    <changeSet id="20230620-6612-6a"
+               author="davidwatkins73"
+               dbms="mssql">
+        <comment>6612: we do not know the unique column constraint name, therefore must use dynamic sql to remove it
+        </comment>
+        <sql>
+            DECLARE @sql NVARCHAR(MAX)
+            select TOP 1 @sql = N'alter table involvement_kind drop constraint [' + cc.name + N']'
+            from sys.key_constraints cc
+            WHERE cc.parent_object_id = OBJECT_ID('involvement_kind')
+              and cc.type = 'UQ'
+            exec (@sql)
+        </sql>
+    </changeSet>
+
     <changeSet id="20230522-6612-7"
-               failOnError="false"
                author="woodjes">
         <comment>6612: create new name column to safely remove the unique constraint</comment>
         <dropColumn tableName="involvement_kind"
@@ -457,5 +466,118 @@
             </column>
         </addColumn>
     </changeSet>
+
+
+    <changeSet id="20230616-6633-1"
+               author="woodjes">
+        <comment>6633: add cascade delete between software version and package tables</comment>
+        <dropForeignKeyConstraint baseTableName="software_version"
+                                  constraintName="soft_version_package_spid_fk"/>
+        <addForeignKeyConstraint baseTableName="software_version"
+                                 baseColumnNames="software_package_id"
+                                 constraintName="soft_version_package_spid_fk"
+                                 referencedTableName="software_package"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="20230616-6633-2"
+               author="woodjes">
+        <comment>6633: add cascade delete between software version and package tables</comment>
+        <dropForeignKeyConstraint baseTableName="software_usage"
+                                  constraintName="soft_usage_version_fk"/>
+        <addForeignKeyConstraint baseTableName="software_usage"
+                                 baseColumnNames="software_version_id"
+                                 constraintName="soft_usage_version_fk"
+                                 referencedTableName="software_version"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="20230616-6633-3"
+               author="woodjes">
+        <comment>6633: add cascade delete between software version and package tables</comment>
+
+        <dropForeignKeyConstraint baseTableName="software_version_licence"
+                                  constraintName="svl_licence_fk"/>
+
+        <addForeignKeyConstraint baseTableName="software_version_licence"
+                                 baseColumnNames="licence_id"
+                                 constraintName="svl_licence_fk"
+                                 referencedTableName="licence"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="20230616-6633-4"
+               author="woodjes">
+        <comment>6633: add cascade delete between software version and package tables</comment>
+        <dropForeignKeyConstraint baseTableName="software_version_licence"
+                                  constraintName="svl_version_fk"/>
+
+        <addForeignKeyConstraint baseTableName="software_version_licence"
+                                 baseColumnNames="software_version_id"
+                                 constraintName="svl_version_fk"
+                                 referencedTableName="software_version"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+
+    <changeSet id="20230601-6635-1"
+               author="davidwatkins73">
+        <addColumn tableName="measurable_rating">
+            <column name="is_primary"
+                    defaultValueBoolean="false"
+                    type="boolean">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20230601-6635-2"
+               author="davidwatkins73">
+        <setColumnRemarks tableName="measurable_rating" columnName="measurable_id"
+                          remarks="reference to the measurable being rated against the entity"/>
+        <setColumnRemarks tableName="measurable_rating" columnName="entity_id"
+                          remarks="reference to the entity identifier being rated against the measurable"/>
+        <setColumnRemarks tableName="measurable_rating" columnName="entity_kind"
+                          remarks="reference to the entity_kind (typically APPLICATION) being rated against the measurable"/>
+        <setColumnRemarks tableName="measurable_rating" columnName="description" remarks="optional comment"/>
+        <setColumnRemarks tableName="measurable_rating" columnName="last_updated_by"
+                          remarks="user that last updated the rating"/>
+        <setColumnRemarks tableName="measurable_rating" columnName="provenance"
+                          remarks="where the rating came from, 'waltz' if via the ui"/>
+        <setColumnRemarks tableName="measurable_rating" columnName="last_updated_at"
+                          remarks="when the rating was last updated"/>
+        <setColumnRemarks tableName="measurable_rating" columnName="rating"
+                          remarks="the rating code which identifies the rating scheme item used in the rating.  This needs the measurable category to determine which scheme the code belongs to"/>
+        <setColumnRemarks tableName="measurable_rating" columnName="is_readonly"
+                          remarks="flag to prevent updates via the UI"/>
+        <setColumnRemarks tableName="measurable_rating" columnName="is_primary"
+                          remarks="flag to indicate the measurable is the primary one for the entity in it's category"/>
+    </changeSet>
+
+    <changeSet id="20230601-6635-3"
+               author="davidwatkins73">
+        <addColumn tableName="measurable_category">
+            <column name="allow_primary_ratings"
+                    defaultValueBoolean="false"
+                    type="boolean">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20230601-6635-4"
+               author="davidwatkins73">
+        <setColumnRemarks tableName="measurable_category" columnName="position"
+                          remarks="overrides the default (alphabetical) sort ordering of this category, defaults to zero, lower numbers come first"/>
+        <setColumnRemarks tableName="measurable_category" columnName="icon_name"
+                          remarks="fontawesome icon name for the category, defaults to puzzle-piece"/>
+        <setColumnRemarks tableName="measurable_category" columnName="allow_primary_ratings"
+                          remarks="boolean flag used to determine if the taxonomy supports marking ratings as primary for an application"/>
+    </changeSet>
+
 
 </databaseChangeLog>

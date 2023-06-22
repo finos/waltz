@@ -99,6 +99,7 @@ public abstract class MeasurableCategory implements
      */
     public abstract Optional<Long> constrainingAssessmentDefinitionId();
 
+    public abstract boolean allowPrimaryRatings();
 
     public EntityReference entityReference() {
         return ImmutableEntityReference.builder()

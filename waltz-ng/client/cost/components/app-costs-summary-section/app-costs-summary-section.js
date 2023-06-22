@@ -164,7 +164,8 @@ function controller($q, serviceBroker, uiGridConstants, settingsService) {
     function loadCostKinds() {
         vm.visibility.loading = true;
         return serviceBroker
-            .loadAppData(CORE_API.CostKindStore.findBySelector,
+            .loadAppData(
+                CORE_API.CostKindStore.findBySelector,
                 [vm.targetEntityKind, vm.selector])
             .then(r => {
                 vm.costKinds = extractOrderedListOfKinds(r.data);

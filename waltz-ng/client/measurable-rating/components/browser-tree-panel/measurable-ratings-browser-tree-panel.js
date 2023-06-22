@@ -39,7 +39,7 @@ import {lastViewedMeasurableCategoryKey} from "../../../user";
 const bindings = {
     filters: "<",
     parentEntityRef: "<",
-    onMeasurableCategorySelect: "<"
+    onMeasurableCategorySelect: "<?"
 };
 
 
@@ -56,38 +56,62 @@ const initialState = {
     },
     selectedMeasurable: null,
     onLoadDetail: () => log("onLoadDetail"),
-    showMore: false
+    onMeasurableCategorySelect: () => log("onMeasurableCategorySelect"),
+    showMore: false,
+    showPrimaryOnly: false
 };
 
 
 function prepareColumnDefs(measurableCategory) {
-    return [
-        mkLinkGridCell("Name", "application.name", "application.id", "main.app.view"),
-        {
-            field: "application.assetCode",
-            name: "Asset Code",
-            width: "10%"
-        },
-        {
-            field: "rating.name",
-            name: "Rating",
-            cellTemplate: `<div class="ui-grid-cell-contents">
-                <waltz-rating-indicator-cell rating="row.entity.rating"
-                                             show-description-popup="true"
-                                             show-name="true">
-                </waltz-rating-indicator-cell></div>`,
-            width: "10%"
-        },
-        {
-            field: "measurable.name",
-            name: measurableCategory.name
-        },
-        {
-            field: "rating.description",
-            name: "Comment"
-        }
-    ];
+    const appLinkCol = mkLinkGridCell("Name", "application.name", "application.id", "main.app.view");
+
+    const assetCodeCol = {
+        field: "application.assetCode",
+        name: "Asset Code",
+        width: "10%"
+    };
+
+    const ratingSchemeItemCol = {
+        field: "ratingSchemeItem.name",
+        name: "Rating",
+        cellTemplate: `<div class="ui-grid-cell-contents">
+            <waltz-rating-indicator-cell rating="row.entity.ratingSchemeItem"
+                                         show-description-popup="true"
+                                         show-name="true">
+            </waltz-rating-indicator-cell></div>`,
+        width: "10%"
+    };
+
+    const isPrimaryCol = {
+        cellTemplate: `<div class="ui-grid-cell-contents">
+        <waltz-icon name="check" ng-show="row.entity.rating.isPrimary"></waltz-icon></div>`,
+        field: "rating.isPrimary",
+        name: "Primary?",
+        width: "10%"
+    };
+
+    const measurableNameCol = {
+        field: "measurable.name",
+        name: measurableCategory.name
+    };
+
+    const ratingDescriptionCol = {
+        field: "rating.description",
+        name: "Comment"
+    };
+
+    return _.compact([
+        appLinkCol,
+        assetCodeCol,
+        ratingSchemeItemCol,
+        measurableCategory.allowPrimaryRatings
+            ? isPrimaryCol
+            : null,
+        measurableNameCol,
+        ratingDescriptionCol
+    ]);
 }
+
 
 function prepareUnmappedColumnDefs() {
     return [
@@ -127,10 +151,8 @@ function prepareTableData(measurable,
         .map(r => {
             return {
                 application: appsById[r.entityReference.id],
-                rating: Object.assign(
-                    {},
-                    ratingScheme.ratingsByCode[r.rating],
-                    { description: r.description}),
+                ratingSchemeItem: ratingScheme.ratingsByCode[r.rating],
+                rating: r,
                 measurable: measurablesById[r.measurableId]
             };
         })
@@ -164,7 +186,8 @@ function prepareUnmappedTableData(applications = [],
                 return {
                     application: app
                 };
-            }).sortBy("application.name")
+            })
+            .sortBy("application.name")
             .value();
 
     return tableData;
@@ -175,9 +198,9 @@ function log() {
 }
 
 
-function loadMeasurableRatings(serviceBroker, selector, holder) {
+function loadMeasurableRatingTallies(serviceBroker, params, holder) {
     return serviceBroker
-        .loadViewData(CORE_API.MeasurableRatingStore.statsByAppSelector, [selector])
+        .loadViewData(CORE_API.MeasurableRatingStore.statsByAppSelector, [params])
         .then(r => holder.ratingTallies = r.data);
 }
 
@@ -234,40 +257,31 @@ function controller($q, serviceBroker) {
     };
 
     const loadBaseData = () => {
-        vm.selector = mkSelectionOptionsWithJoiningEntity(
-            vm.parentEntityRef,
-            undefined,
-            undefined,
-            vm.filters,
-            "APPLICATION"
-        );
 
-        return $q.all([
-            loadMeasurableCategories(serviceBroker, vm),
-            loadMeasurables(serviceBroker, vm.selector, vm),
-            loadRatingSchemes(serviceBroker, vm),
-            loadMeasurableRatings(serviceBroker, vm.selector, vm),
-            loadApps(serviceBroker, vm.selector, vm),
-            loadLastViewedCategory(serviceBroker, vm)
-        ]);
+        return $q
+            .all([
+                loadMeasurableCategories(serviceBroker, vm),
+                loadMeasurables(serviceBroker, vm.selector, vm),
+                loadRatingSchemes(serviceBroker, vm),
+                loadApps(serviceBroker, vm.selector, vm),
+                loadLastViewedCategory(serviceBroker, vm)
+            ])
+            .then(loadRatings);
     };
 
 
     const loadRatings = () => {
         clearDetail();
 
-        vm.selector = mkSelectionOptions(
-            vm.parentEntityRef,
-            undefined,
-            undefined,
-            vm.filters);
+        const statsParams = {
+            options: vm.selector,
+            showPrimaryOnly: vm.showPrimaryOnly
+        };
 
-        const promise = $q.all([
-            loadApps(serviceBroker, vm.selector, vm),
-            loadMeasurableRatings(serviceBroker, vm.selector, vm),
-        ]);
+        const promise = loadMeasurableRatingTallies(serviceBroker, statsParams, vm);
 
-        if(vm.visibility.ratingDetail) {
+
+        if (vm.visibility.ratingDetail) {
             promise.then(() => vm.onSelect(vm.selectedMeasurable));
         }
 
@@ -277,22 +291,36 @@ function controller($q, serviceBroker) {
 
     const loadRatingDetail = () => {
         clearDetail();
-        return vm.measurableRatingsDetail
-            ? $q.resolve(vm.measurableRatingsDetail)
-            : serviceBroker
-                .execute(CORE_API.MeasurableRatingStore.findByAppSelector, [vm.selector])
-                .then(r => vm.measurableRatingsDetail = r.data);
+        return serviceBroker
+            .execute(CORE_API.MeasurableRatingStore.findByAppSelector, [vm.selector])
+            .then(r => {
+                const ratings = r.data;
+                vm.measurableRatingsDetail = vm.showPrimaryOnly
+                    ? _.filter(ratings, d => d.isPrimary === true)
+                    : ratings;
+                return vm.measurableRatingsDetail;
+            });
     };
 
+    function setupSelector() {
+        vm.selector = mkSelectionOptionsWithJoiningEntity(
+            vm.parentEntityRef,
+            undefined,
+            undefined,
+            vm.filters,
+            "APPLICATION"
+        );
+    }
 
     vm.$onInit = () => {
-        loadBaseData()
-            .then(() => loadRatings());
+        setupSelector();
+        loadBaseData();
     };
 
 
     vm.$onChanges = (changes) => {
-        if(vm.parentEntityRef && changes.filters) {
+        setupSelector();
+        if (vm.parentEntityRef && changes.filters) {
             loadRatings();
         }
     };
@@ -358,6 +386,12 @@ function controller($q, serviceBroker) {
     };
 
     vm.toggleShow = () => vm.showMore = !vm.showMore;
+
+    vm.onTogglePrimaryOnly = (showPrimaryOnly) => {
+        console.log("onTogglePrimaryOnly", {showPrimaryOnly});
+        vm.showPrimaryOnly = showPrimaryOnly;
+        loadRatings();
+    };
 }
 
 

@@ -63,8 +63,8 @@ function controller($q,
                 vm.entityReference = toEntityRef(vm.measurable);
             })
             .then(() => serviceBroker
-                    .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
-                    .then(r => vm.measurableCategory = _.find(r.data, { id: vm.measurable.categoryId })))
+                .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
+                .then(r => vm.measurableCategory = _.find(r.data, {id: vm.measurable.categoryId})))
             .then(() => logHistory(vm.measurable, historyStore));
     };
 

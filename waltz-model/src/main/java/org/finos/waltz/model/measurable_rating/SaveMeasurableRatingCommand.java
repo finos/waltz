@@ -21,6 +21,7 @@ package org.finos.waltz.model.measurable_rating;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.DescriptionProvider;
+import org.finos.waltz.model.Nullable;
 import org.finos.waltz.model.ProvenanceProvider;
 import org.immutables.value.Value;
 
@@ -32,7 +33,11 @@ import java.util.Optional;
 public abstract class SaveMeasurableRatingCommand extends MeasurableRatingCommand implements DescriptionProvider, ProvenanceProvider {
 
     public abstract char rating();
+
     public abstract Optional<Character> previousRating();
+
+    @Nullable
+    public abstract Boolean isPrimary();
 
 }
 

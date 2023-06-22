@@ -18,10 +18,10 @@
 
 import _ from "lodash";
 import {initialiseData, invokeFunction} from "../../../common";
-import {buildHierarchies} from "../../../common/hierarchy-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {distinctRatingCodes, indexRatingSchemes} from "../../../ratings/rating-utils";
 import template from "./measurable-ratings-browser.html";
+import {findFirstNonEmptyTab, findMaxTotal, mkRatingTalliesMap, prepareTabs} from "./measurable-ratings-browser-utils";
 
 
 /**
@@ -67,110 +67,11 @@ const initialState = {
 };
 
 
-function combineRatingTallies(r1, r2) {
-    return _.mergeWith(
-        {}, r1, r2,
-        (v1, v2) => (v1 || 0) + (v2 || 0));
-}
-
-
-function toRatingsSummaryObj(ratings = []) {
-
-    const counts = _.chain(ratings)
-        .groupBy(r => r.rating)
-        .mapValues(r => {
-
-            const countsForRating = _.map(_.values(r), r => r.count);
-            return _.sum(countsForRating);
-        })
-        .value();
-
-    const total = _.sum(_.values(counts));
-    return Object.assign({}, counts, { total });
-}
-
-
-function prepareTreeData(data = []) {
-    return buildHierarchies(data, false);
-}
-
-
-function prepareTabs(categories = [], measurables = [], ratingSchemesById = {}) {
-    const measurablesByCategory = _.groupBy(measurables, "categoryId");
-    return _
-        .chain(categories)
-        .filter(category => _.get(measurablesByCategory, category.id, []).length > 0)
-        .map(category => {
-            const measurablesForCategory = measurablesByCategory[category.id];
-            const treeData = prepareTreeData(measurablesForCategory);
-            const maxSize = _.chain(treeData)
-                .map("totalRatings.total")
-                .max()
-                .value();
-
-            return {
-                category,
-                ratingScheme: ratingSchemesById[category.ratingSchemeId],
-                treeData,
-                maxSize,
-                expandedNodes: []
-            };
-        })
-        .sortBy(d => d.category.position, d => d.category.name)
-        .value();
-}
-
-
-function findFirstNonEmptyTab(tabs = []) {
-    const firstNonEmptyTab = _.find(tabs, t => t.treeData.length > 0);
-    return firstNonEmptyTab || tabs[0];
-}
-
-
-function initialiseRatingTalliesMap(ratingTallies = [], measurables = []) {
-    const talliesById = _.groupBy(ratingTallies, "id");
-
-    const reducer = (acc, m) => {
-        const talliesForMeasurable = talliesById[m.id];
-        const summaryObj = talliesForMeasurable
-            ? toRatingsSummaryObj(talliesForMeasurable)
-            : {};
-
-        acc[m.id] = {
-            direct: _.clone(summaryObj),
-            compound: _.clone(summaryObj),
-        };
-        return acc;
-    };
-    return _.reduce(measurables, reducer, {});
-}
-
-
-function mkRatingTalliesMap(ratingTallies = [], measurables = []) {
-    const measurablesById = _.keyBy(measurables, "id");
-    const talliesMap = initialiseRatingTalliesMap(ratingTallies, measurables);
-    _.each(measurables, m => {
-        const rs = talliesMap[m.id];
-
-        while (m.parentId) {
-            const parent = measurablesById[m.parentId];
-            if (! parent) break;
-            const parentRating = talliesMap[m.parentId];
-            parentRating.compound = combineRatingTallies(parentRating.compound, rs.direct);
-            m = parent;
-        }
-    });
-
-    return talliesMap;
-}
-
-
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const prepareData = () => {
         if (_.isEmpty(vm.measurables) ||
-            _.isEmpty(vm.ratingTallies) ||
             _.isEmpty(vm.categories) ||
             _.isEmpty(vm.ratingSchemesById)) {
 
@@ -178,22 +79,30 @@ function controller(serviceBroker) {
                 vm.ratingsMap = {};
             }
         } else {
-            const tabs = prepareTabs(vm.categories, vm.measurables, vm.ratingSchemesById);
+            vm.ratingsMap = mkRatingTalliesMap(vm.ratingTallies, vm.measurables);
+            vm.maxTotal = findMaxTotal(vm.ratingsMap);
+
+            const unusedMeasurables = _
+                .chain(vm.ratingsMap)
+                .values()
+                .filter(d => _.get(d, ["compound", "total"], 0) === 0)
+                .map(d => d.measurableId)
+                .value();
+
+            const tabs = prepareTabs(
+                vm.categories,
+                _.reject(vm.measurables, m => _.includes(unusedMeasurables, m.id)),
+                vm.ratingSchemesById);
+
             const lastViewedCategory = _.find(tabs, t => t.category.id === vm.lastViewedCategoryId);
-            const tab = lastViewedCategory || findFirstNonEmptyTab(tabs);
+            const startingTab = lastViewedCategory || findFirstNonEmptyTab(tabs);
 
             vm.tabs = tabs;
 
-            vm.ratingsMap = mkRatingTalliesMap(vm.ratingTallies, vm.measurables);
-            vm.maxTotal = _.max(
-                _.flatMap(
-                    _.values(vm.ratingsMap),
-                    r => _.get(r, ["compound", "total"], [0])));
-
             if (!vm.visibility.tab) {
-                // no tab selected, select the first
-                vm.visibility.tab = _.get(tab, ["category", "id"]);
-                vm.onTabChange(tab);
+                // no startingTab selected, select the last viewed or first
+                vm.visibility.tab = _.get(startingTab, ["category", "id"]);
+                vm.onTabChange(startingTab);
             }
         }
     };
@@ -218,7 +127,11 @@ function controller(serviceBroker) {
     };
 
     vm.onTabChange = (tc) => {
-        invokeFunction(vm.onCategorySelect, tc.category);
+        if (_.isNil(tc)) {
+            // no tab available yet, do nothing
+        } else {
+            invokeFunction(vm.onCategorySelect, tc.category);
+        }
     };
 }
 

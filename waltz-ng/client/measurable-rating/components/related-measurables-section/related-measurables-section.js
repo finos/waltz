@@ -16,7 +16,6 @@
  *
  */
 
-import _ from "lodash";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
@@ -35,64 +34,24 @@ const bindings = {
 };
 
 
-const initialState = {};
-
-
-function calcRelatedMeasurables(ratingTallies = [], allMeasurables = []) {
-    const relatedMeasurableIds = _.map(ratingTallies, "id");
-    const measurablesById = _.keyBy(allMeasurables, "id");
-    return _
-        .chain(allMeasurables)
-        .filter(m => _.includes(relatedMeasurableIds, m.id))
-        .reduce(
-            (acc, m) => {
-                let ptr = m;
-                while(ptr) {
-                    acc[ptr.id] = ptr;
-                    ptr = measurablesById[ptr.parentId];
-                }
-                return acc;
-            },
-            {})
-        .values()
-        .value();
-}
-
+const initialState = {
+    hasImplicitlyRelatedMeasurables: false
+};
 
 function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     vm.$onChanges = () => {
 
-        if (! vm.parentEntityRef) {
+        if (!vm.parentEntityRef) {
             return;
         }
 
         const selectionOptions = mkSelectionOptions(vm.parentEntityRef);
 
-        const measurablesPromise = serviceBroker
-            .loadAppData(CORE_API.MeasurableStore.findAll)
-            .then(r => vm.measurables = r.data);
-
-        const statsPromise = serviceBroker
-            .loadViewData(
-                CORE_API.MeasurableRatingStore.statsForRelatedMeasurables,
-                [ selectionOptions ])
-            .then(r => vm.stats = r.data);
-
-        const promises = [
-            measurablesPromise,
-            statsPromise
-        ];
-
-        $q
-            .all(promises)
-            .then(() => vm.relatedMeasurables = calcRelatedMeasurables(vm.stats, vm.measurables));
-
-    };
-
-    vm.onCategorySelect = (category) => {
-        vm.activeCategory = category;
+        serviceBroker
+            .loadAppData(CORE_API.MeasurableRatingStore.hasImplicitlyRelatedMeasurables, [vm.parentEntityRef.id, selectionOptions])
+            .then(r => vm.hasImplicitlyRelatedMeasurables = console.log(r) || r.data);
     };
 }
 

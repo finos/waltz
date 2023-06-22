@@ -146,7 +146,7 @@ public class RatingSchemeDAO {
                 .fetch(TO_ITEM_MAPPER);
     }
 
-    public RatingSchemeItem getRatingSchemeItemById(long id){
+    public RatingSchemeItem getRatingSchemeItemById(long id) {
         checkNotNull(id, "id cannot be null");
         return dsl
                 .selectFrom(RATING_SCHEME_ITEM)
@@ -155,7 +155,17 @@ public class RatingSchemeDAO {
     }
 
 
-    public List<RatingSchemeItem> findRatingSchemeItemsForEntityAndCategory(EntityReference ref, long measurableCategoryId) {
+    /**
+     * Gives a list of permissible rating items for the given entity and category.
+     * This method takes into account any constraining assessment associated to the category.
+     * If the rating is constrained the <code>isRestricted</code> flag on the returned RatingSchemeItem will be set.
+     *
+     * @param ref                  the entity being checked
+     * @param measurableCategoryId the category being checked
+     * @return list of permissible rating items for the given entity and category
+     */
+    public List<RatingSchemeItem> findRatingSchemeItemsForEntityAndCategory(EntityReference ref,
+                                                                            long measurableCategoryId) {
 
         Condition assessmentDefinitionJoinCondition = ASSESSMENT_DEFINITION.ID.eq(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID)
                 .and(ASSESSMENT_RATING.ENTITY_ID.eq(ref.id())

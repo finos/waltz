@@ -19,23 +19,45 @@
 package org.finos.waltz.web.endpoints.extracts;
 
 
-import org.finos.waltz.schema.Tables;
-import org.finos.waltz.schema.tables.*;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.schema.Tables;
+import org.finos.waltz.schema.tables.Application;
+import org.finos.waltz.schema.tables.Measurable;
+import org.finos.waltz.schema.tables.MeasurableCategory;
+import org.finos.waltz.schema.tables.MeasurableRating;
+import org.finos.waltz.schema.tables.MeasurableRatingPlannedDecommission;
+import org.finos.waltz.schema.tables.MeasurableRatingReplacement;
+import org.finos.waltz.schema.tables.OrganisationalUnit;
+import org.finos.waltz.schema.tables.RatingScheme;
+import org.finos.waltz.schema.tables.RatingSchemeItem;
 import org.finos.waltz.web.WebUtilities;
-import org.jooq.*;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.Record5;
+import org.jooq.Select;
+import org.jooq.SelectConditionStep;
+import org.jooq.SelectSeekStep1;
+import org.jooq.SelectSelectStep;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.schema.Tables.APPLICATION;
+import static org.finos.waltz.schema.Tables.MEASURABLE_RATING_PLANNED_DECOMMISSION;
+import static org.finos.waltz.schema.Tables.MEASURABLE_RATING_REPLACEMENT;
+import static org.finos.waltz.schema.Tables.RATING_SCHEME;
+import static org.finos.waltz.schema.Tables.RATING_SCHEME_ITEM;
 import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
 import static org.finos.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
 import static org.finos.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
-import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.jooq.tools.StringUtils.toCamelCase;
 import static spark.Spark.post;
 
@@ -68,13 +90,13 @@ public class MeasurableRatingExtractor extends DirectQueryBasedDataExtractor {
     public void register() {
 
         String path = WebUtilities.mkPath("data-extract", "measurable-rating", ":id");
-        registerAllocations(path);
+        registerRatingsExtract(path);
 
         String unmappedPath = WebUtilities.mkPath("data-extract", "measurable-rating", "unmapped", ":id");
-        registerUnmappedAllocations(unmappedPath);
+        registerUnmappedAllocationsExtract(unmappedPath);
     }
 
-    private void registerAllocations(String path) {
+    private void registerRatingsExtract(String path) {
         post(path, (request, response) -> {
             long categoryId = WebUtilities.getId(request);
             IdSelectionOptions selectionOpts = WebUtilities.readIdSelectionOptionsFromBody(request);
@@ -90,7 +112,11 @@ public class MeasurableRatingExtractor extends DirectQueryBasedDataExtractor {
                             app.KIND.as("App Kind"))
                     .select(rsi.NAME.as("Rating Name"),
                             rsi.CODE.as("Rating Code"))
-                    .select(mr.DESCRIPTION.as("Rating Description"),
+                    .select(DSL
+                                    .when(mc.ALLOW_PRIMARY_RATINGS.isTrue().and(mr.IS_PRIMARY.isTrue()), "Y")
+                                    .when(mc.ALLOW_PRIMARY_RATINGS.isTrue().and(mr.IS_PRIMARY.isFalse()), "N")
+                                    .otherwise("n/a").as("Is Primary"),
+                            mr.DESCRIPTION.as("Rating Description"),
                             mr.LAST_UPDATED_AT.as("Last Updated Time"),
                             mr.LAST_UPDATED_BY.as("Last Updated By"))
                     .select(mrd.PLANNED_DECOMMISSION_DATE.as("Planned Decommission Date"))
@@ -132,7 +158,7 @@ public class MeasurableRatingExtractor extends DirectQueryBasedDataExtractor {
         });
     }
 
-    private void registerUnmappedAllocations(String path) {
+    private void registerUnmappedAllocationsExtract(String path) {
         post(path, (request, response) -> {
             long categoryId = WebUtilities.getId(request);
 

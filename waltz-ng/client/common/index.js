@@ -144,9 +144,6 @@ export function initialiseData(vm, initData) {
 }
 
 
-
-
-
 const getElemHierarchy = (elem) => {
     // Set up a parent array
     const parents = [elem];
@@ -157,6 +154,7 @@ const getElemHierarchy = (elem) => {
     // Return our parent array
     return parents;
 };
+
 
 const getWaltzTagNames = (elem) => {
     if (! elem) {

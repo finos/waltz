@@ -16,8 +16,8 @@
  *
  */
 
-import { initialiseData, invokeFunction } from "../../../common";
-import { FILTER_CHANGED_EVENT } from "../../constants";
+import {initialiseData, invokeFunction} from "../../index";
+import {FILTER_CHANGED_EVENT} from "../../constants";
 
 const bindings = {
     onFiltersChanged: "<",
@@ -33,7 +33,8 @@ const initialState = {
 function controller($scope) {
     const vm = initialiseData(this, initialState);
 
-    const filterChangedListenerDeregisterFn = $scope.$on(FILTER_CHANGED_EVENT,
+    const filterChangedListenerDeregisterFn = $scope.$on(
+        FILTER_CHANGED_EVENT,
         (event, data) => {
             vm.filters = Object.assign({}, data);
             invokeFunction(vm.onFiltersChanged, vm.filters);
