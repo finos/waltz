@@ -33,6 +33,7 @@ import java.util.Optional;
 public abstract class SaveMeasurableRatingCommand extends MeasurableRatingCommand implements DescriptionProvider, ProvenanceProvider {
 
     public abstract char rating();
+
     public abstract Optional<Character> previousRating();
 
     @Nullable

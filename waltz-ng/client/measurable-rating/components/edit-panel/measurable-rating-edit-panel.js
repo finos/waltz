@@ -114,17 +114,17 @@ function controller($q,
 
     const deselectMeasurable = () => {
         vm.saveInProgress = false;
-        vm.selected = Object.assign({}, vm.selected, { measurable: null });
+        vm.selected = Object.assign({}, vm.selected, {measurable: null});
         vm.visibility = Object.assign({}, vm.visibility, {schemeOverview: true, ratingEditor: false});
     };
 
     const selectMeasurable = (node) => {
-        const { measurable, allocations } = node;
+        const {measurable, allocations} = node;
         const category = vm.categoriesById[measurable.categoryId];
         const ratingScheme = vm.ratingSchemesById[category.ratingSchemeId];
         const hasWarnings = !_.isEmpty(allocations);
 
-        vm.selected = Object.assign({}, node, { category, hasWarnings, ratingScheme });
+        vm.selected = Object.assign({}, node, {category, hasWarnings, ratingScheme});
         vm.visibility = Object.assign({}, vm.visibility, {schemeOverview: false, ratingEditor: true});
     };
 
@@ -153,15 +153,15 @@ function controller($q,
     const doRatingItemSave = (rating) => {
         return doSave(CORE_API.MeasurableRatingStore.saveRatingItem, rating)
             .then(() => {
-                const newRating = _.merge({}, vm.selected.rating, { rating });
-                vm.selected = Object.assign({}, vm.selected, { rating: newRating });
+                const newRating = _.merge({}, vm.selected.rating, {rating});
+                vm.selected = Object.assign({}, vm.selected, {rating: newRating});
             });
     };
 
     const doRatingIsPrimarySave = (isPrimary) => {
         return doSave(CORE_API.MeasurableRatingStore.saveRatingIsPrimary, isPrimary)
             .then(() => {
-                const newRating = _.merge({}, vm.selected.rating, { isPrimary })
+                const newRating = _.merge({}, vm.selected.rating, {isPrimary})
                 vm.selected = Object.assign({}, vm.selected, {rating: newRating});
             });
     };
@@ -169,13 +169,13 @@ function controller($q,
     const doRatingDescriptionSave = (description) => {
         return doSave(CORE_API.MeasurableRatingStore.saveRatingDescription, description)
             .then(() => {
-                const newRating = _.merge({}, vm.selected.rating, { description })
+                const newRating = _.merge({}, vm.selected.rating, {description})
                 vm.selected = Object.assign({}, vm.selected, {rating: newRating});
             });
     };
 
     const doRemove = () => {
-        if (! vm.selected.rating) return $q.reject();
+        if (!vm.selected.rating) return $q.reject();
 
         vm.saveInProgress = true;
 
@@ -385,7 +385,7 @@ function controller($q,
     };
 
     vm.onPrimaryToggle = () => {
-        doRatingIsPrimarySave(! vm.selected.rating.isPrimary)
+        doRatingIsPrimarySave(!vm.selected.rating.isPrimary)
             .then(() => toasts.success(`Saved primary indicator for: ${vm.selected.measurable.name}`))
             .catch(e => {
                 deselectMeasurable();

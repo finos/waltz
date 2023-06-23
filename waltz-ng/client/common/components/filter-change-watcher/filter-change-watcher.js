@@ -16,8 +16,8 @@
  *
  */
 
-import { initialiseData, invokeFunction } from "../../index";
-import { FILTER_CHANGED_EVENT } from "../../constants";
+import {initialiseData, invokeFunction} from "../../index";
+import {FILTER_CHANGED_EVENT} from "../../constants";
 
 const bindings = {
     onFiltersChanged: "<",

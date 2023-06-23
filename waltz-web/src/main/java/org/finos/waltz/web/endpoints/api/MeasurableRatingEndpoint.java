@@ -135,8 +135,8 @@ public class MeasurableRatingEndpoint implements Endpoint {
 
         DatumRoute<Boolean> hasImplicitlyRelatedMeasurablesRoute = (request, response)
                 -> measurableRatingService.hasImplicitlyRelatedMeasurables(
-                        getLong(request, "measurableId"),
-                        readIdSelectionOptionsFromBody(request));
+                getLong(request, "measurableId"),
+                readIdSelectionOptionsFromBody(request));
 
         getForList(findForEntityPath, findForEntityRoute);
         postForList(findByMeasurableSelectorPath, findByMeasurableSelectorRoute);
@@ -218,7 +218,6 @@ public class MeasurableRatingEndpoint implements Endpoint {
 
         return measurableRatingService.save(command, false);
     }
-
 
 
     private Collection<MeasurableRating> removeRoute(Request request, Response z) throws IOException, InsufficientPrivelegeException {

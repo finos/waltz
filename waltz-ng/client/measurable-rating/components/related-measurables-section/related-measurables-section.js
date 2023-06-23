@@ -43,7 +43,7 @@ function controller($q, serviceBroker) {
 
     vm.$onChanges = () => {
 
-        if (! vm.parentEntityRef) {
+        if (!vm.parentEntityRef) {
             return;
         }
 

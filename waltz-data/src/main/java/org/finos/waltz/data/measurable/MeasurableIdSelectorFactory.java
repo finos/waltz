@@ -48,8 +48,8 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
 
 
     /**
-     * @param measurableId  the identifier of the measurable to start from
-     * @return  a selector which gives all measurable ids that belong to the same category as the given measurable id
+     * @param measurableId the identifier of the measurable to start from
+     * @return a selector which gives all measurable ids that belong to the same category as the given measurable id
      */
     public static SelectConditionStep<Record1<Long>> allMeasurablesIdsInSameCategory(Long measurableId) {
         return DSL

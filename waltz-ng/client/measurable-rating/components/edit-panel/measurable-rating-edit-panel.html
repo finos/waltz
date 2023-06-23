@@ -38,10 +38,11 @@
 
                 <div ng-if="$ctrl.selected.rating.isReadOnly">
                     <b style="font-weight: bolder">
-                        <waltz-icon name="lock"></waltz-icon> Locked
+                        <waltz-icon name="lock"></waltz-icon>
+                        Locked
                     </b>
                     <p style="padding-top: 1em;">
-                       This rating has been marked as read only and cannot be edited
+                        This rating has been marked as read only and cannot be edited
                     </p>
                 </div>
 
@@ -256,7 +257,8 @@
                               on-toggle="$ctrl.onPrimaryToggle()">
                 </waltz-toggle>
                 <p class="help-block small">
-                    Only one primary rating is allowed per category, selecting this will deselect any other primary ratings for this entity
+                    Only one primary rating is allowed per category, selecting this will deselect any other primary
+                    ratings for this entity
                 </p>
             </div>
         </div>

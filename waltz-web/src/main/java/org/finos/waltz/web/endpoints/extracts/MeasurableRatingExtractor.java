@@ -113,9 +113,9 @@ public class MeasurableRatingExtractor extends DirectQueryBasedDataExtractor {
                     .select(rsi.NAME.as("Rating Name"),
                             rsi.CODE.as("Rating Code"))
                     .select(DSL
-                                .when(mc.ALLOW_PRIMARY_RATINGS.isTrue().and(mr.IS_PRIMARY.isTrue()), "Y")
-                                .when(mc.ALLOW_PRIMARY_RATINGS.isTrue().and(mr.IS_PRIMARY.isFalse()), "N")
-                                .otherwise("n/a").as("Is Primary"),
+                                    .when(mc.ALLOW_PRIMARY_RATINGS.isTrue().and(mr.IS_PRIMARY.isTrue()), "Y")
+                                    .when(mc.ALLOW_PRIMARY_RATINGS.isTrue().and(mr.IS_PRIMARY.isFalse()), "N")
+                                    .otherwise("n/a").as("Is Primary"),
                             mr.DESCRIPTION.as("Rating Description"),
                             mr.LAST_UPDATED_AT.as("Last Updated Time"),
                             mr.LAST_UPDATED_BY.as("Last Updated By"))

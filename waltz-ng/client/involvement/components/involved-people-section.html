@@ -44,6 +44,23 @@
 
     <!-- Viewer -->
     <div ng-if="$ctrl.visibility.editor === false">
+
+        <div class="help-block"
+             style="padding-bottom: 1em"
+             ng-if="$ctrl.hierarchyScope !== 'EXACT'">
+            People are related to this <span ng-bind="$ctrl.parentEntityRef.kind | toDisplayName: 'entity'"></span>
+            either directly or inherited from a parent.
+            Use the toggle to filter the view.
+            <div style="padding-top: 1em">
+                <waltz-toggle
+                    state="$ctrl.showDirectOnly"
+                    on-toggle="$ctrl.onToggleScope()"
+                    label-on="Showing direct involvements only"
+                    label-off="Showing all involvements (including inherited)">
+                </waltz-toggle>
+            </div>
+        </div>
+
         <div ng-if="$ctrl.gridData.length > 0">
             <waltz-grid-with-search column-defs="$ctrl.columnDefs"
                                     entries="$ctrl.gridData"
