@@ -141,9 +141,9 @@ public class AllocationsExtractor extends DirectQueryBasedDataExtractor {
                         MEASURABLE.EXTERNAL_ID.as("Taxonomy Item External Id"))
                 .select(MEASURABLE_RATING.RATING.as("Taxonomy Item Rating"),
                         DSL
-                            .when(MEASURABLE_CATEGORY.ALLOW_PRIMARY_RATINGS.isTrue().and(MEASURABLE_RATING.IS_PRIMARY.isTrue()), "Y")
-                            .when(MEASURABLE_CATEGORY.ALLOW_PRIMARY_RATINGS.isTrue().and(MEASURABLE_RATING.IS_PRIMARY.isFalse()), "N")
-                            .otherwise("n/a").as("Is Primary"),
+                                .when(MEASURABLE_CATEGORY.ALLOW_PRIMARY_RATINGS.isTrue().and(MEASURABLE_RATING.IS_PRIMARY.isTrue()), "Y")
+                                .when(MEASURABLE_CATEGORY.ALLOW_PRIMARY_RATINGS.isTrue().and(MEASURABLE_RATING.IS_PRIMARY.isFalse()), "N")
+                                .otherwise("n/a").as("Is Primary"),
                         MEASURABLE_RATING.DESCRIPTION.as("Taxonomy Item Rating Description"))
                 .select(RATING_SCHEME_ITEM.NAME.as("Taxonomy Item Rating Name"))
                 .select(ENTITY_HIERARCHY.LEVEL.as("Taxonomy Item Hierarchy Level"))

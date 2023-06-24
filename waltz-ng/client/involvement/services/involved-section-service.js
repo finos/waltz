@@ -27,7 +27,13 @@ function service(involvementStore) {
         return involvementStore.changeInvolvement(
             entityRef,
             mkChangeCommand("ADD", entityInvolvement.entity, entityInvolvement.involvement))
-            .then(result => toasts.success("Involvement added successfully"))
+            .then(successful => {
+                if (successful) {
+                    toasts.success("Involvement added successfully");
+                } else {
+                    toasts.warning("Involvement was not added, it may already exist");
+                }
+            })
             .catch(e => displayError("Failed to add involvement", e));
     };
 
@@ -38,7 +44,13 @@ function service(involvementStore) {
             .changeInvolvement(
                 entityRef,
                 mkChangeCommand("REMOVE", entityInvolvement.entity, entityInvolvement.involvement))
-            .then(result => toasts.success("Involvement removed successfully"))
+            .then(successful => {
+                if (successful) {
+                    toasts.success("Involvement removed successfully");
+                } else {
+                    toasts.warning("Involvement was not removed, it may have already been removed");
+                }
+            })
             .catch(e => displayError("Failed to remove involvement", e));
     };
 

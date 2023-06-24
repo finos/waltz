@@ -368,9 +368,9 @@ public class MeasurableRatingDao {
      * which map to this measurable.  This is used to provide functionality for features like: "apps that
      * do this function, also do these functions..."
      *
-     * @param measurableId  starting measurable
-     * @param selector  set of apps to consider
-     * @return  boolean indicating if there are implicitly related measurables
+     * @param measurableId starting measurable
+     * @param selector     set of apps to consider
+     * @return boolean indicating if there are implicitly related measurables
      */
     public boolean hasImplicitlyRelatedMeasurables(long measurableId, Select<Record1<Long>> selector) {
 
@@ -778,13 +778,12 @@ public class MeasurableRatingDao {
                         DSL.cast(DSL.sum(ALLOCATION.ALLOCATION_PERCENTAGE), Integer.class).as("allocation_percentage"))
                 .from(ALLOCATION)
                 .innerJoin(valuesToBeSummed)
-                    .on(ALLOCATION.ALLOCATION_SCHEME_ID.eq(valuesToBeSummed.field(ALLOCATION.ALLOCATION_SCHEME_ID))
+                .on(ALLOCATION.ALLOCATION_SCHEME_ID.eq(valuesToBeSummed.field(ALLOCATION.ALLOCATION_SCHEME_ID))
                         .and(ALLOCATION.ENTITY_KIND.eq(valuesToBeSummed.field(ALLOCATION.ENTITY_KIND))
                                 .and(ALLOCATION.ENTITY_ID.eq(valuesToBeSummed.field(ALLOCATION.ENTITY_ID)))))
                 .where(ALLOCATION.MEASURABLE_ID.in(targetId, measurableId))
                 .groupBy(ALLOCATION.ALLOCATION_SCHEME_ID, ALLOCATION.ENTITY_ID, ALLOCATION.ENTITY_KIND);
     }
-
 
 
     public boolean saveRatingItem(EntityReference entityRef,

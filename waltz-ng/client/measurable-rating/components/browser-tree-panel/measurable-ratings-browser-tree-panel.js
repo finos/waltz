@@ -281,7 +281,7 @@ function controller($q, serviceBroker) {
         const promise = loadMeasurableRatingTallies(serviceBroker, statsParams, vm);
 
 
-        if(vm.visibility.ratingDetail) {
+        if (vm.visibility.ratingDetail) {
             promise.then(() => vm.onSelect(vm.selectedMeasurable));
         }
 
@@ -320,7 +320,7 @@ function controller($q, serviceBroker) {
 
     vm.$onChanges = (changes) => {
         setupSelector();
-        if(vm.parentEntityRef && changes.filters) {
+        if (vm.parentEntityRef && changes.filters) {
             loadRatings();
         }
     };

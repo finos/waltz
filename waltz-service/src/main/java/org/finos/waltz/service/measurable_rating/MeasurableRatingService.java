@@ -215,7 +215,7 @@ public class MeasurableRatingService {
                 params.showPrimaryOnly());
     }
 
-    
+
     public boolean hasImplicitlyRelatedMeasurables(long measurableId, IdSelectionOptions options) {
         Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(options);
         return measurableRatingDao.hasImplicitlyRelatedMeasurables(measurableId, selector);
@@ -277,7 +277,6 @@ public class MeasurableRatingService {
     }
 
 
-
     public boolean checkRatingExists(SaveMeasurableRatingCommand command) {
         return measurableRatingDao.checkRatingExists(command);
     }
@@ -332,6 +331,7 @@ public class MeasurableRatingService {
 
     /**
      * Checks
+     *
      * @param measurableCategory
      * @param entityReference
      * @param ratingCode

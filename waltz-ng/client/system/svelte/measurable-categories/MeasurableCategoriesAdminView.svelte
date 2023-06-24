@@ -154,13 +154,14 @@
                            type="checkbox"
                            bind:checked={workingCopy.allowPrimaryRatings}>
                     <div class="help-inline">
-                        Determines whether users can select one measurable in this category to be flagged as the primary rating for the application.
+                        Determines whether users can select one measurable in this category to be flagged as the primary
+                        rating for the application.
                     </div>
                 </div>
             </div>
 
 
-             <button type="submit"
+            <button type="submit"
                     class="btn btn-primary">
                 Save
             </button>

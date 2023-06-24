@@ -21,7 +21,7 @@ function toRatingsSummaryObj(ratings = []) {
         .value();
 
     const total = _.sum(_.values(counts));
-    return Object.assign({}, counts, { total });
+    return Object.assign({}, counts, {total});
 }
 
 
@@ -90,7 +90,7 @@ export function mkRatingTalliesMap(ratingTallies = [], measurables = []) {
 
         while (m.parentId) {
             const parent = measurablesById[m.parentId];
-            if (! parent) break;
+            if (!parent) break;
             const parentRating = talliesMap[m.parentId];
             parentRating.compound = combineRatingTallies(parentRating.compound, rs.direct);
             m = parent;

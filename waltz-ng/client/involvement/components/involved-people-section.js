@@ -71,7 +71,9 @@ const initialState = {
     currentInvolvements: [],
     gridData: [],
     columnDefs,
-    exportGrid: () => {},
+    exportGrid: () => {
+    },
+    showDirectOnly: true,
     visibility: {
         editor: false
     }
@@ -79,7 +81,9 @@ const initialState = {
 
 
 function mkGridData(involvements = [], displayNameService, descriptionService) {
-    return _.chain(involvements)
+    return _
+        .chain(involvements)
+        .filter(inv => !_.isEmpty(inv.involvements))
         .map(inv => {
             const roles = _.map(inv.involvements, pInv => ({
                 provenance: pInv.provenance,
@@ -136,8 +140,19 @@ function controller($q, displayNameService, descriptionService, serviceBroker, i
 
     const vm = initialiseData(this, initialState);
 
+    function refreshGridData() {
+        const involvements = vm.showDirectOnly
+            ? vm.aggDirectInvolvements
+            : vm.aggInvolvements;
+
+        vm.gridData = mkGridData(involvements, displayNameService, descriptionService);
+    }
+
     const refresh = () => {
-        const options = mkSelectionOptions(vm.parentEntityRef, determineUpwardsScopeForKind(vm.parentEntityRef.kind));
+
+        vm.hierarchyScope = determineUpwardsScopeForKind(vm.parentEntityRef.kind);
+        const options = mkSelectionOptions(vm.parentEntityRef, vm.hierarchyScope);
+
         const kindPromise = serviceBroker
             .loadAppData(CORE_API.InvolvementKindStore.findAll, [])
             .then(r => r.data);
@@ -163,19 +178,22 @@ function controller($q, displayNameService, descriptionService, serviceBroker, i
         return $q
             .all([involvementPromise, peoplePromise, kindPromise, userRolesPromise])
             .then(([involvements = [], people = [], involvementKinds = [], userRoles = []]) => {
-                const aggInvolvements = aggregatePeopleInvolvements(involvements, people);
-                vm.gridData = mkGridData(aggInvolvements, displayNameService, descriptionService);
-                vm.currentInvolvements = mkCurrentInvolvements(aggInvolvements);
-                vm.involvementKinds = involvementKinds;
+
+                const directInvolvements = _.filter(involvements, d => d.entityReference.id === vm.parentEntityRef.id);
+
+                vm.aggInvolvements = aggregatePeopleInvolvements(involvements, people);
+                vm.aggDirectInvolvements = aggregatePeopleInvolvements(directInvolvements, people);
+                vm.currentInvolvements = mkCurrentInvolvements(vm.aggDirectInvolvements);
 
                 vm.allowedInvolvements = _
                     .chain(involvementKinds)
                     .filter(ik => ik.userSelectable)
                     .filter(ik => ik.subjectKind === vm.parentEntityRef.kind)
                     .filter(ik => _.isEmpty(ik.permittedRole) || _.includes(userRoles, ik.permittedRole))
-                    .map(ik => ({ value: ik.id, name: ik.name }))
+                    .map(ik => ({value: ik.id, name: ik.name}))
                     .value();
-            });
+            })
+            .then(refreshGridData);
     };
 
 
@@ -183,8 +201,6 @@ function controller($q, displayNameService, descriptionService, serviceBroker, i
         if (changes.parentEntityRef && vm.parentEntityRef) {
             refresh();
         }
-
-
     };
 
 
@@ -205,6 +221,11 @@ function controller($q, displayNameService, descriptionService, serviceBroker, i
             .removeInvolvement(vm.parentEntityRef, entityInvolvement)
             .then(refresh);
     };
+
+    vm.onToggleScope = () => {
+        vm.showDirectOnly = !vm.showDirectOnly;
+        refreshGridData();
+    }
 }
 
 

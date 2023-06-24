@@ -64,7 +64,7 @@ function controller(serviceBroker, settingsService) {
             vm.filters);
 
         serviceBroker
-            .loadViewData(CORE_API.ApplicationStore.findBySelector, [ vm.selector ])
+            .loadViewData(CORE_API.ApplicationStore.findBySelector, [vm.selector])
             .then(r => vm.hasApps = !_.isEmpty(r.data));
 
         serviceBroker
