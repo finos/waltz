@@ -23,7 +23,10 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.UserTimestamp;
-import org.finos.waltz.model.measurable_rating.*;
+import org.finos.waltz.model.measurable_rating.ImmutableRemoveMeasurableRatingCommand;
+import org.finos.waltz.model.measurable_rating.MeasurableRating;
+import org.finos.waltz.model.measurable_rating.MeasurableRatingStatParams;
+import org.finos.waltz.model.measurable_rating.RemoveMeasurableRatingCommand;
 import org.finos.waltz.model.tally.MeasurableRatingTally;
 import org.finos.waltz.model.tally.Tally;
 import org.finos.waltz.service.measurable_rating.MeasurableRatingService;
@@ -39,12 +42,10 @@ import spark.Response;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Map;
 import java.util.Set;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.SetUtilities.asSet;
-import static org.finos.waltz.common.StringUtilities.firstChar;
 import static org.finos.waltz.model.EntityKind.MEASURABLE_RATING;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.web.WebUtilities.*;
@@ -119,7 +120,6 @@ public class MeasurableRatingEndpoint implements Endpoint {
         postForList(findByMeasurableSelectorPath, findByMeasurableSelectorRoute);
         postForList(findByAppSelectorPath, findByAppSelectorRoute);
         getForList(findByCategoryPath, findByCategoryRoute);
-        postForList(modifyMeasurableForEntityPath, this::saveRoute);
         deleteForList(modifyMeasurableForEntityPath, this::removeRoute);
         deleteForList(modifyCategoryForEntityPath, this::removeCategoryRoute);
         getForList(countByMeasurableCategoryPath, countByMeasurableCategoryRoute);
@@ -184,20 +184,6 @@ public class MeasurableRatingEndpoint implements Endpoint {
     }
 
 
-    @Deprecated
-    private Collection<MeasurableRating> saveRoute(Request request, Response z) throws IOException, InsufficientPrivelegeException {
-        SaveMeasurableRatingCommand command = mkCommand(request);
-
-        Operation operation = measurableRatingService.checkRatingExists(command)
-                ? Operation.UPDATE
-                : Operation.ADD;
-
-        checkHasPermissionForThisOperation(command.entityReference(), command.measurableId(), asSet(operation), getUsername(request));
-
-        return measurableRatingService.save(command, false);
-    }
-
-
     private Collection<MeasurableRating> removeRoute(Request request, Response z) throws IOException, InsufficientPrivelegeException {
         long measurableId = getLong(request, "measurableId");
         String username = getUsername(request);
@@ -212,23 +198,6 @@ public class MeasurableRatingEndpoint implements Endpoint {
                 .build();
 
         return measurableRatingService.remove(command);
-    }
-
-
-    private SaveMeasurableRatingCommand mkCommand(Request request) throws IOException {
-        String username = getUsername(request);
-
-        Map<String, String> body = readBody(request, Map.class);
-
-        return ImmutableSaveMeasurableRatingCommand.builder()
-                .entityReference(getEntityReference(request))
-                .measurableId(getLong(request, "measurableId"))
-                .rating(firstChar(body.getOrDefault("rating", "Z"), 'Z'))
-                .previousRating(firstChar(body.getOrDefault("previousRating", "")))
-                .description(body.getOrDefault("description", ""))
-                .lastUpdate(UserTimestamp.mkForUser(username))
-                .provenance("waltz")
-                .build();
     }
 
 

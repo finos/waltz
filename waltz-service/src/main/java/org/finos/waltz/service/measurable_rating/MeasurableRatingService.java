@@ -120,41 +120,6 @@ public class MeasurableRatingService {
 
     // -- WRITE
 
-    @Deprecated
-    public Collection<MeasurableRating> save(SaveMeasurableRatingCommand command, boolean ignoreReadOnly) {
-        checkNotNull(command, "command cannot be null");
-
-        checkRatingIsAllowable(command);
-
-        Measurable measurable = measurableDao.getById(command.measurableId());
-        checkNotNull(measurable, format("Unknown measurable with id: %d", command.measurableId()));
-        checkTrue(measurable.concrete(), "Cannot rate against an abstract measurable");
-
-        Operation operationThatWasPerformed = measurableRatingDao.save(command, false);
-
-        String entityName = getEntityName(command);
-
-        String previousRatingMessage = command.previousRating().isPresent()
-                ? "from " + command.previousRating().get() : "";
-
-        writeChangeLogEntry(
-                command,
-                format("Saved: %s with a rating of: %s %s for %s",
-                        measurable.name(),
-                        command.rating(),
-                        previousRatingMessage,
-                        entityName),
-                format("Saved: %s has assigned %s with a rating of: %s %s",
-                        entityName,
-                        measurable.name(),
-                        command.rating(),
-                        previousRatingMessage),
-                operationThatWasPerformed);
-
-        return findForEntity(command.entityReference());
-    }
-
-
     /**
      * Removes all ratings for the given entity where the associated
      * measurable belongs to the given category.
@@ -196,14 +161,16 @@ public class MeasurableRatingService {
             String entityName = getEntityName(command);
 
             writeChangeLogEntry(
-                    command,
+                    command.entityReference(),
+                    measurable.entityReference(),
                     format("Removed: %s for %s",
                             measurable.name(),
                             entityName),
                     format("Removed: %s for %s",
                             entityName,
                             measurable.name()),
-                    Operation.REMOVE);
+                    Operation.REMOVE,
+                    command.lastUpdate());
 
         }
         return findForEntity(command.entityReference());
@@ -407,34 +374,6 @@ public class MeasurableRatingService {
                                                  .childKind(ratedEntity.kind())
                                                  .operation(operation)
                                                  .build());
-    }
-
-
-    @Deprecated
-    private void writeChangeLogEntry(MeasurableRatingCommand command,
-                                     String message1,
-                                     String message2,
-                                     Operation operation) {
-
-        writeChangeLogEntry(
-                command.entityReference(),
-                EntityReference.mkRef(EntityKind.MEASURABLE, command.measurableId()),
-                message1,
-                message2,
-                operation,
-                command.lastUpdate());
-    }
-
-
-
-    @Deprecated
-    private void checkRatingIsAllowable(SaveMeasurableRatingCommand command) {
-
-        long measurableCategory = measurableDao.getById(command.measurableId()).categoryId();
-        EntityReference entityReference = command.entityReference();
-        String ratingCode = Character.toString(command.rating());
-
-        checkRatingIsAllowable(measurableCategory, entityReference, ratingCode);
     }
 
 

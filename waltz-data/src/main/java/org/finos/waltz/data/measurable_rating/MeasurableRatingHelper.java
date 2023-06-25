@@ -75,12 +75,12 @@ public class MeasurableRatingHelper {
 
 
     /**
-     * @param tx
-     * @param entityRef
-     * @param measurableId
-     * @param ratingCode
-     * @param username
-     * @return
+     * @param tx  the dsl context to use
+     * @param entityRef  the entity the rating is against, usually an app
+     * @param measurableId  the measurable being rated against the entity
+     * @param ratingCode  the rating code to use
+     * @param username  who is doing the rating
+     * @return  true iff the item was saved
      */
     public static boolean saveRatingItem(DSLContext tx,
                                          EntityReference entityRef,
