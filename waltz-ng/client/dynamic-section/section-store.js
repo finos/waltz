@@ -122,7 +122,7 @@ function createActiveSectionStore() {
 
     const exitPage = () => {
         const url = window.location.origin + window.location.pathname;
-        window.history.replaceState({path: url}, "", url);
+        window.history.pushState({path: url}, "", url);
     };
 
     return {
@@ -157,17 +157,9 @@ derived(
                 .map(s => s.id)
                 .value();
 
-            const paramValue = _.join(top3SectionIds, ";");
-            const newParams = Object.assign({}, parseParams(window.location.href), {sections: paramValue});
-
-            const paramsString = new URLSearchParams(newParams).toString()
-
-            const url = window.location.origin + window.location.pathname + "?" + paramsString;
-
-            window.history.replaceState({path: url}, "", url);
             window.localStorage.setItem(mkLocalStorageKey(d.pageKind), JSON.stringify(top3SectionIds));
-
             window.localStorage.setItem("active", JSON.stringify(d))
         }
     })
     .subscribe(() => {});
+

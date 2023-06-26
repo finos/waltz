@@ -31,7 +31,7 @@
                 <waltz-icon fixed-width="true"></waltz-icon>
             </span>
 
-            <span class="no-text-select waltz-visibility-child-30">
+            <span class="small no-text-select waltz-visibility-child-30">
                 <a ng-if="!$ctrl.embedded"
                    ui-sref="embed.internal ({kind: $ctrl.parentEntityRef.kind, id: $ctrl.parentEntityRef.id, sectionId: $ctrl.section.id })">
                     <waltz-icon name="share-square-o"
@@ -46,6 +46,15 @@
                                 flip="horizontal">
                     </waltz-icon>
                 </a>
+            </span>
+
+
+            <span class="small no-text-select waltz-visibility-child-30">
+                <button ng-click="$ctrl.onShare()"
+                        class="btn-skinny"
+                        title="Copy url to clipboard for sharing">
+                    <waltz-icon name="share-nodes"></waltz-icon>
+                </button>
             </span>
 
             <span>

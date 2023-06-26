@@ -40,8 +40,10 @@ function controller($document,
                     $window) {
     const vm = initialiseData(this, initialState);
 
-    vm.$onChanges = () => {
-        document.title = `Waltz: ${vm.name}`;
+    vm.$onChanges = (c) => {
+        if (c.name && document.title.name != c.name.currentValue) {
+            document.title = `Waltz: ${c.name.currentValue}`;
+        }
     };
 
     const scrollListener = () => {
