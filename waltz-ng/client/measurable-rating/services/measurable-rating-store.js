@@ -21,7 +21,6 @@ import {checkIsEntityRef, checkIsIdSelector} from "../../common/checks";
 function store($http, baseApiUrl) {
 
     const baseUrl = `${baseApiUrl}/measurable-rating`;
-    const viewBaseUrl = `${baseApiUrl}/measurable-rating-view`;
 
     const findForEntityReference = (ref) => {
         checkIsEntityRef(ref);

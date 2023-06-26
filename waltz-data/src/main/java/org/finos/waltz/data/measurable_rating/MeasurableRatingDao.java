@@ -23,17 +23,8 @@ import org.finos.waltz.common.exception.NotFoundException;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.data.JooqUtilities;
 import org.finos.waltz.data.SelectorUtilities;
-import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.EntityLifecycleStatus;
-import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.IdSelectionOptions;
-import org.finos.waltz.model.ImmutableEntityReference;
-import org.finos.waltz.model.Operation;
-import org.finos.waltz.model.Severity;
-import org.finos.waltz.model.measurable_rating.ImmutableMeasurableRating;
-import org.finos.waltz.model.measurable_rating.MeasurableRating;
-import org.finos.waltz.model.measurable_rating.RemoveMeasurableRatingCommand;
-import org.finos.waltz.model.measurable_rating.SaveMeasurableRatingCommand;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.measurable_rating.*;
 import org.finos.waltz.model.tally.ImmutableMeasurableRatingTally;
 import org.finos.waltz.model.tally.MeasurableRatingTally;
 import org.finos.waltz.model.tally.Tally;
@@ -41,21 +32,7 @@ import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.EntityHierarchy;
 import org.finos.waltz.schema.tables.Measurable;
 import org.finos.waltz.schema.tables.records.MeasurableRatingRecord;
-import org.jooq.Condition;
-import org.jooq.DSLContext;
-import org.jooq.Field;
-import org.jooq.Record;
-import org.jooq.Record1;
-import org.jooq.Record2;
-import org.jooq.Record3;
-import org.jooq.Record4;
-import org.jooq.Record9;
-import org.jooq.RecordMapper;
-import org.jooq.Select;
-import org.jooq.SelectConditionStep;
-import org.jooq.SelectHavingStep;
-import org.jooq.SelectJoinStep;
-import org.jooq.SelectOrderByStep;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
@@ -80,12 +57,7 @@ import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.common.SetUtilities.union;
 import static org.finos.waltz.common.StringUtilities.firstChar;
 import static org.finos.waltz.common.StringUtilities.notEmpty;
-import static org.finos.waltz.schema.Tables.ALLOCATION;
-import static org.finos.waltz.schema.Tables.CHANGE_LOG;
-import static org.finos.waltz.schema.Tables.ENTITY_HIERARCHY;
-import static org.finos.waltz.schema.Tables.MEASURABLE_CATEGORY;
-import static org.finos.waltz.schema.Tables.MEASURABLE_RATING_PLANNED_DECOMMISSION;
-import static org.finos.waltz.schema.Tables.USER_ROLE;
+import static org.finos.waltz.schema.Tables.*;
 import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
 import static org.finos.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
@@ -302,7 +274,7 @@ public class MeasurableRatingDao {
                                                           boolean primaryOnly) {
         Condition cond = MEASURABLE_CATEGORY.ALLOW_PRIMARY_RATINGS.isFalse()
                 .or(primaryOnly
-                        ? MEASURABLE_RATING.IS_PRIMARY.eq(primaryOnly)
+                        ? MEASURABLE_RATING.IS_PRIMARY.isTrue()
                         : DSL.trueCondition());
 
         return dsl
@@ -314,28 +286,6 @@ public class MeasurableRatingDao {
                 .and(MEASURABLE_RATING.ENTITY_ID.in(selector))))
                 .and(cond)
                 .groupBy(MEASURABLE_RATING.MEASURABLE_ID, MEASURABLE_RATING.RATING)
-                .fetch(TO_TALLY_MAPPER);
-    }
-
-
-    public List<MeasurableRatingTally> statsForRelatedMeasurable(Select<Record1<Long>> selector) {
-        org.finos.waltz.schema.tables.MeasurableRating related = MEASURABLE_RATING.as("related");
-        org.finos.waltz.schema.tables.MeasurableRating orig = MEASURABLE_RATING.as("orig");
-
-        SelectConditionStep<Record1<Long>> relatedAppIds = DSL
-                .selectDistinct(orig.ENTITY_ID)
-                .from(orig)
-                .where(orig.MEASURABLE_ID.in(selector))
-                .and(orig.ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
-
-        return dsl
-                .select(related.MEASURABLE_ID,
-                        related.RATING,
-                        DSL.count())
-                .from(related)
-                .where(related.ENTITY_ID.in(relatedAppIds))
-                .groupBy(related.MEASURABLE_ID,
-                        related.RATING)
                 .fetch(TO_TALLY_MAPPER);
     }
 
@@ -817,4 +767,13 @@ public class MeasurableRatingDao {
                 description,
                 username));
     }
+
+
+    public MeasurableRatingChangeSummary resolveLoggingContextForRatingChange(EntityReference entityRef,
+                                                                              long measurableId,
+                                                                              String desiredRatingCode) {
+        return MeasurableRatingHelper.resolveLoggingContextForRatingChange(dsl, entityRef, measurableId, desiredRatingCode);
+    }
+
+
 }
