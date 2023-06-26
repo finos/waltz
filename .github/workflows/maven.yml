@@ -46,7 +46,7 @@ jobs:
       run: mvn versions:set -DnewVersion=${{ github.ref_name }} -Pci,build-postgres,waltz-postgres;
 
     - name: Build with Maven
-      run: mvn -Dmaven.test.failure.ignore=true -B -ntp -s .build.settings.xml -Pbuild-postgres,waltz-postgres,integration-tests clean package site;
+      run: mvn -Dmaven.test.failure.ignore=true -B -ntp -s .build.settings.xml -Pbuild-postgres,waltz-postgres,integration-tests clean test package site;
 
     - name: Publish build
       uses: actions/upload-artifact@v2
