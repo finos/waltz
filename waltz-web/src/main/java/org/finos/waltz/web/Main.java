@@ -31,6 +31,7 @@ import org.finos.waltz.common.exception.NotFoundException;
 import org.finos.waltz.common.exception.UpdateFailedException;
 import org.finos.waltz.web.endpoints.EndpointUtilities;
 import org.jooq.exception.DataAccessException;
+import org.jooq.exception.NoDataFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -42,6 +43,7 @@ import spark.Spark;
 import java.util.Map;
 import java.util.TimeZone;
 
+import static java.lang.String.format;
 import static org.finos.waltz.web.WebUtilities.reportException;
 import static org.finos.waltz.common.DateTimeUtilities.UTC;
 import static spark.Spark.*;
@@ -144,6 +146,17 @@ public class Main {
                     LOG);
         });
 
+        EndpointUtilities.addExceptionHandler(NoDataFoundException.class, (e, req, res) -> {
+            String message = "Not found exception" + e.getMessage();
+            LOG.error(message, e);
+            reportException(
+                    HttpStatus.NOT_FOUND_404,
+                    "NO_DATA",
+                    message,
+                    res,
+                    LOG);
+        });
+
         EndpointUtilities.addExceptionHandler(UpdateFailedException.class, (e, req, res) -> {
             String message = "Update failed exception:" + e.getMessage();
             LOG.error(message, e);
@@ -178,7 +191,7 @@ public class Main {
         });
 
         EndpointUtilities.addExceptionHandler(DataAccessException.class, (e, req, resp) -> {
-            String message = "Exception: " + e.getCause().getMessage();
+            String message = format("Data Access Exception: %s [%s]", e.getCause(), e.getClass().getName());
             LOG.error(message, e);
             reportException(
                     HttpStatus.BAD_REQUEST_400,

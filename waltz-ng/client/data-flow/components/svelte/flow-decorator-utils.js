@@ -1,6 +1,6 @@
 import _ from "lodash";
 
-export const colors = {
+const colors = {
     APPLICATION: {
         fill: "#eef8ff",
         stroke: "#6fbdff"
@@ -11,6 +11,11 @@ export const colors = {
     }
 };
 
+export function getNodeColors(kind) {
+    const c = colors[kind];
+
+    return c || { fill: "#ccc", stroke: "#999" };
+}
 
 export const dimensions = {
     client: {
