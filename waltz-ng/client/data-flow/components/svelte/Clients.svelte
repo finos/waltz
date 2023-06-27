@@ -11,7 +11,7 @@
         Modes,
         selectedClient
     } from "./flow-decorator-store";
-    import {colors, dimensions} from "./flow-decorator-utils"
+    import {dimensions, getNodeColors} from "./flow-decorator-utils"
     import {truncateMiddle} from "../../../common/string-utils";
 
     import _ from "lodash";
@@ -44,8 +44,8 @@
            class={mkClasses(client)}
            on:click|stopPropagation={() => selectClient(client)}
            on:keydown|stopPropagation={() => selectClient(client)}>
-            <rect stroke={colors[client.kind].stroke}
-                  fill={colors[client.kind].fill}
+            <rect stroke={getNodeColors(client.kind).stroke}
+                  fill={getNodeColors(client.kind).fill}
                   on:mouseenter={() => onMouseEnter(client)}
                   on:mouseleave={() => onMouseLeave()}
                   rx={dimensions.client.height / 2}

@@ -198,6 +198,7 @@ public class MeasurableRatingDaoTest extends BaseInMemoryIntegrationTest {
                     .provenance(PROVENANCE)
                     .lastUpdate(UserTimestamp.mkForUser(LAST_UPDATE_USER))
                     .description("test")
+                    .isPrimary(false)
                     .build(), false);
         }
     }
