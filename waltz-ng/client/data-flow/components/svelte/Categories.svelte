@@ -8,7 +8,7 @@
         parentCategory,
         startingCategory
     } from "./flow-decorator-store";
-    import {colors, dimensions} from "./flow-decorator-utils"
+    import {dimensions, getNodeColors} from "./flow-decorator-utils"
     import {truncateMiddle} from "../../../common/string-utils";
     import {symbol, symbolCircle, symbolTriangle} from "d3-shape";
     import {createEventDispatcher} from "svelte";
@@ -58,8 +58,8 @@
 
 </script>
 
-<rect fill={colors[kind].fill}
-      stroke={colors[kind].stroke}
+<rect fill={getNodeColors(kind).fill}
+      stroke={getNodeColors(kind).stroke}
       x={20}
       width={dimensions.category.width - 40}
       height={dimensions.diagram.height}>

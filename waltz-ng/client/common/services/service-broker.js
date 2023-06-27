@@ -132,7 +132,7 @@ function loadData($injector,
     })).catch(error => {
         //evict the cache entry because it's in error
         cache.delete(cacheKey);
-        console.warn(`ServiceBroker::loadData - ${serviceName}.${serviceFnName}: ${error.statusText} - ${error.data.message}`, targetParams);
+        console.warn(`ServiceBroker::loadData - ${serviceName}.${serviceFnName}: ${error.statusText} - ${error.data?.message}`, targetParams);
         throw error;
     });
     return resultPromise;
