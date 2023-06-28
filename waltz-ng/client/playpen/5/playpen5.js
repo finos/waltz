@@ -16,19 +16,17 @@
  *
  */
 import template from "./playpen5.html";
-import AssessmentRatingPicker from "../../common/svelte/AssessmentRatingPicker.svelte";
+import DiagramBuilder from "./DiagramBuilder.svelte";
 
 
 const initialState = {
-    AssessmentRatingPicker
+    DiagramBuilder
 };
 
 
 function controller() {
 
     const vm = Object.assign(this, initialState);
-
-    vm.definitionFilter = d => d.entityKind === "CHANGE_INITIATIVE";
 
 }
 
