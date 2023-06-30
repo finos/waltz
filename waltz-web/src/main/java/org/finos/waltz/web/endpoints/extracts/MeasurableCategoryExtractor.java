@@ -120,6 +120,11 @@ public class MeasurableCategoryExtractor extends DirectQueryBasedDataExtractor {
                                 .and(_m(curr).ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name())));
             }
 
+            qry.orderBy(ehAndMeasurableTablesForLevel
+                                .stream()
+                                .map(t -> _m(t).NAME.as("Level " + t.v1 + " Name"))
+                                .collect(Collectors.toList()));
+
             return writeExtract(
                     mkSuggestedFilename(categoryId),
                     qry,
