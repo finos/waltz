@@ -1,19 +1,20 @@
-import {writable} from "svelte/store";
+import {derived, writable} from "svelte/store";
+import {mkGroup} from "./diagram-builder-utils";
+import _ from "lodash";
+
 
 export let selectedGroup = writable(null);
-export let workingGroup = writable(null);
 export let editing = writable(false);
 
-export let groups = writable([]);
-export let items = writable(null);
+export let groups = writable([mkGroup("Diagram Title", 1, null)]);
 
-export const FlexDirections = {
-    COLUMN: "column",
-    ROW: "row"
-}
+export let items = writable([]);
 
-export const DefaultProps = {
-    itemHeight: 5,
-    itemWidth: 10,
-    flexDirection: FlexDirections.ROW
-}
+export let groupsWithItems = derived(
+    [groups, items],
+    ([$groups, $items]) => {
+
+        const itemsByGroupId = _.groupBy($items, d => d.groupId);
+
+        return _.map($groups, d => Object.assign({}, d, {items: _.get(itemsByGroupId, d.id, [])}));
+    });

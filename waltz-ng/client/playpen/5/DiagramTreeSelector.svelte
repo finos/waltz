@@ -1,11 +1,12 @@
 <script>
 
-    import MeasurableTreeNode from "./DiagramTreeNode.svelte";
+    import DiagramTreeNode from "./DiagramTreeNode.svelte";
     import _ from "lodash";
     import {buildHierarchies, doSearch, prepareSearchNodes} from "../../common/hierarchy-utils";
     import {sameRef} from "../../common/entity-utils";
+    import SearchInput from "../../common/svelte/SearchInput.svelte";
 
-    export let measurables;
+    export let groups;
     export let depth = 0;
     export let selected = [];
     export let onSelect = () => console.log("selecting")
@@ -31,15 +32,16 @@
         return {name:"root", hideNode: true, children: buildHierarchies(searchResult, false)}
     }
 
-    $: searchNodes = prepareSearchNodes(measurables);
+    $: searchNodes = prepareSearchNodes(groups, "title");
     $: tree = calcDisplayHierarchy(searchNodes, qry, selected);
 
 </script>
 
+<SearchInput bind:value={qry}/>
 <div style="margin-top: 0.5em;">
-    <MeasurableTreeNode {tree}
-                        {depth}
-                        {expanded}
-                        {onSelect}
-                        {onDeselect}/>
+    <DiagramTreeNode {tree}
+                     {depth}
+                     {expanded}
+                     {onSelect}
+                     {onDeselect}/>
 </div>

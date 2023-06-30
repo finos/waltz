@@ -1,42 +1,41 @@
 <script>
 
     import DiagramGroup from "./DiagramGroup.svelte";
-    import {DefaultProps} from "./diagram-builder-store";
-    import DiagramControls from "./DiagramControls.svelte";
-
+    import {groups, selectedGroup, workingGroup, groupsWithItems} from "./diagram-builder-store";
+    import DiagramControls from "./control-panel/DiagramControls.svelte";
+    import {buildHierarchies} from "../../common/hierarchy-utils";
+    import DiagramTreeSelector from "./DiagramTreeSelector.svelte";
+    import _ from "lodash";
 
     let items = [];
 
-    for (let i = 1; i < 10; i++) {
-        const newItem = {title: "Item " + i.toString(), items:[], props: DefaultProps,  id: i, parentId: 0}
-        items.push(newItem);
+    function selectGroup(group) {
+        $selectedGroup = group;
     }
 
-    let group = {
-        id: 0,
-        parentId: null,
-        title: "Diagram 1",
-        items,
-        props: DefaultProps
+    function deselectGroup() {
+        $selectedGroup = null;
     }
 
+    $: groupHierarchy  = _.first(buildHierarchies($groupsWithItems)); // take first as starting from root node
 
 </script>
 
 
-<h1>Hello there!</h1>
+<h3>Diagram Builder</h3>
+<div>
+    <div class="col-sm-6">
+        <DiagramControls/>
+    </div>
+    <div class="col-sm-6" style="border-left: 1px solid #ccc">
+        <h4>Structure</h4>
+        <DiagramTreeSelector groups={$groupsWithItems}
+                             onSelect={selectGroup}
+                             onDeselect={deselectGroup}/>
+    </div>
+</div>
 
-<DiagramControls/>
-
-<div style="height: 30em; outline: #0f0746 solid 1px">
-    <DiagramGroup {group}>
+<div class="col-sm-12" style="margin-top: 2em">
+    <DiagramGroup group={groupHierarchy}>
     </DiagramGroup>
 </div>
-
-<div>
-</div>
-
-
-<style>
-
-</style>

@@ -1,58 +1,44 @@
-<script>
-
-    import _ from "lodash";
-    import {selectedGroup, workingGroup} from "./diagram-builder-store";
-
-    export let group;
-
-    $: console.log({group, items: group.items});
-
-    let items;
-
-    function editGroup() {
-        $selectedGroup = group;
-        $workingGroup = group;
-    }
-
-    function saveGroup() {
-        console.log({sg: $selectedGroup, wg: $workingGroup});
-        group = $workingGroup;
-        $selectedGroup = null;
-        $workingGroup = null;
-    }
-
-</script>
-
 <div style="height: 100%; width: 100%">
     {#if !_.isEmpty(group.title)}
         <div class="diagram-title">
             {group.title}
-            {#if _.isNil($selectedGroup)}
-                <button class="btn btn-skinny"
-                        on:click={() => editGroup(group)}>
-                    Edit Group
-                </button>
-            {/if}
-            {#if $selectedGroup === group}
-                <button class="btn btn-skinny"
-                        on:click={() => saveGroup(group)}>
-                    Save Group
-                </button>
-            {/if}
         </div>
     {/if}
 
-    {#if !_.isEmpty(group.items)}
-        <div class={`diagram-container diagram-container-${group.props.flexDirection}`}>
-            {#each group.items as item}
+    <div class={`diagram-container diagram-container-${group.props.flexDirection}`}>
+        {#each group.children as child}
+            <div class="group">
+                <svelte:self group={child}>
+                </svelte:self>
+            </div>
+        {:else}
+            {#if group.data}
                 <div class="item">
-                    <svelte:self group={item}>
-                    </svelte:self>
+                    <EntityLink ref={group.data}/>
                 </div>
-            {/each}
-        </div>
-    {/if}
+            {/if}
+        {/each}
+        {#each group.items as item}
+            <div class="item">
+                <div class="diagram-title">
+                    {item.title}
+                </div>
+                <div>
+                    <EntityLink ref={item.data}/>
+                </div>
+            </div>
+        {/each}
+    </div>
 </div>
+
+<script>
+
+    import _ from "lodash";
+    import EntityLink from "../../common/svelte/EntityLink.svelte";
+
+    export let group;
+
+</script>
 
 
 <style>
@@ -63,17 +49,24 @@
         flex-wrap: wrap;
         justify-content: space-evenly;
         align-content: flex-start;
-        align-items: center;
         gap: 0.5em;
 
         border: 1px solid red;
         background-color: antiquewhite;
 
-        height: inherit;
+        height: fit-content;
+        min-height: 5em;
     }
 
     .diagram-container-row {
         flex-direction: row;
+        align-items: flex-start;
+    }
+
+    .diagram-container-row > .group {
+        flex: 1 1 25%; /* when rows this sets the width*/
+        height: fit-content;
+        min-height: 5em;
     }
 
     .diagram-container-row > .item {
@@ -84,6 +77,13 @@
 
     .diagram-container-column {
         flex-direction: column;
+        align-items: center;
+    }
+
+    .diagram-container-column > .group {
+        flex: 1 1 45%; /* when columns this sets the height*/
+        width: fit-content;
+        min-width: 10em;
     }
 
     .diagram-container-column > .item {
@@ -95,6 +95,13 @@
     .item {
         border: 1px solid blue;
         background-color: #d7f4fa;
+        margin: 0.5em;
+        padding: 0.25em;
+    }
+
+    .group {
+        border: 1px solid purple;
+        background-color: #eecfff;
         margin: 0.5em;
     }
 
