@@ -67,11 +67,11 @@ progress and done issues.
 
 **Provisional** dates for upcoming releases:
 
-| Release | Date           | Summary                                                         |
-|---------|----------------|-----------------------------------------------------------------|
-| 1.51    | 27th June 2023 | Primary ratings, involvement overhaul, report grid enhancements |
-| 1.52    | Mid Aug 2023            | tbd                                                             |
-| 1.53    | tbd            | tbd                                                             |
+| Release | Date           | Summary                                           |
+|---------|----------------|---------------------------------------------------|
+| 1.52    | Mid Aug 2023   | Primary ratings (cont), navigation aid generators |
+| 1.53    | tbd            | tbd                                               |
+| 1.54    | tbd            | tbd                                               |
 
 See the [releases](https://github.com/finos/waltz/releases) page for historic versions.
 
