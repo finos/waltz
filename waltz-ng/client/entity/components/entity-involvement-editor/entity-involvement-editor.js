@@ -28,7 +28,6 @@ const bindings = {
     currentInvolvements: "<",
     parentEntityRef: "<",
     targetEntityKind: "<",
-
     onAdd: "<",
     onRemove: "<"
 };
@@ -36,12 +35,14 @@ const bindings = {
 
 const initialState = {
     allowedInvolvements: [],
-    currentInvolvement: {},
+    currentInvolvement: {
+        involvement: null,
+        entity: null
+    },
     currentInvolvements: [],
     parentEntityRef: null,
     targetEntityKind: null,
     targetEntityDisplayName: null,
-
     onAdd: () => console.log("default onAdd handler for entity-involvement-editor"),
     onRemove: () => console.log("default onRemove handler for entity-involvement-editor")
 };
@@ -69,8 +70,10 @@ function controller() {
     vm.onInvolvementAdd = () => {
         const currentInvolvement = vm.currentInvolvement;
         invokeFunction(vm.onAdd, currentInvolvement)
-            .catch(e => displayError(`Could not add person with involvement`, e));
-        vm.currentInvolvement = {};
+        vm.currentInvolvement = {
+            involvement: null,
+            entity: null
+        };
     };
 
 }

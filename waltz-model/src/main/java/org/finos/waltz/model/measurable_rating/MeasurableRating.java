@@ -36,11 +36,15 @@ public abstract class MeasurableRating implements
         ProvenanceProvider {
 
     public abstract EntityReference entityReference();
+
     public abstract long measurableId();
+
     public abstract char rating();
 
     @Value.Default
-    public boolean isReadOnly() { return false; }
+    public boolean isReadOnly() {
+        return false;
+    }
 
     @Value.Default
     public boolean isPrimary() {

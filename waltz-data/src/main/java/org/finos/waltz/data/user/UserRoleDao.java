@@ -18,6 +18,7 @@
 
 package org.finos.waltz.data.user;
 
+import org.finos.waltz.model.DiffResult;
 import org.finos.waltz.model.user.ImmutableUser;
 import org.finos.waltz.model.user.User;
 import org.jooq.DSLContext;
@@ -29,15 +30,22 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.*;
-import static org.finos.waltz.data.JooqUtilities.summarizeResults;
-import static org.finos.waltz.schema.tables.User.USER;
-import static org.finos.waltz.schema.tables.UserRole.USER_ROLE;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.SetUtilities.map;
+import static org.finos.waltz.data.JooqUtilities.summarizeResults;
+import static org.finos.waltz.model.DiffResult.mkDiff;
+import static org.finos.waltz.schema.tables.User.USER;
+import static org.finos.waltz.schema.tables.UserRole.USER_ROLE;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 
@@ -122,15 +130,23 @@ public class UserRoleDao {
 
     private int addRoles(DSLContext tx,
                          Set<Tuple2<String, String>> usersAndRolesToUpdate) {
-        int[] rc = usersAndRolesToUpdate
+        Set<Tuple2<String, String>> existing = tx
+                .select(USER_ROLE.USER_NAME, USER_ROLE.ROLE)
+                .from(USER_ROLE)
+                .where(USER_ROLE.USER_NAME.in(map(usersAndRolesToUpdate, t -> t.v1)))
+                .fetchSet(r -> tuple(r.get(USER_ROLE.USER_NAME), r.get(USER_ROLE.ROLE)));
+
+        DiffResult<Tuple2<String, String>> diff = mkDiff(existing, usersAndRolesToUpdate);
+
+        int[] rc = diff
+                .otherOnly()
                 .stream()
                 .map(t -> tx
                         .insertInto(
                                 USER_ROLE,
                                 USER_ROLE.USER_NAME,
                                 USER_ROLE.ROLE)
-                        .values(t.v1(), t.v2())
-                        .onConflictDoNothing())
+                        .values(t.v1(), t.v2()))
                 .collect(collectingAndThen(
                         toList(),
                         tx::batch))

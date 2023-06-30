@@ -20,6 +20,8 @@ import template from "./dynamic-section.html";
 import {initialiseData} from "../../../common/index";
 import {kindToViewState} from "../../../common/link-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
+import toasts from "../../../svelte-stores/toast-store";
+
 import _ from "lodash";
 
 
@@ -62,6 +64,14 @@ function controller($state, serviceBroker) {
                     }
                 });
         }
+    };
+
+    vm.onShare = () => {
+        const url = new URL(window.location);
+        url.searchParams.set("sections", vm.section.id);
+
+        navigator.clipboard.writeText(url.toString())
+            .then(() => toasts.success("Copied shareable url to clipboard"));
     };
 
 }
