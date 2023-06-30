@@ -19,6 +19,7 @@
 package org.finos.waltz.web.endpoints.extracts;
 
 
+import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.schema.Tables;
@@ -94,18 +95,25 @@ public class MeasurableCategoryExtractor extends DirectQueryBasedDataExtractor {
                             Tables.MEASURABLE.as("l" + i)));
             }
 
-            List<Field<?>> fields = ehAndMeasurableTablesForLevel
+            List<Tuple3<Field<String>, Field<String>, Field<Long>>> levelFields = ehAndMeasurableTablesForLevel
                     .stream()
-                    .flatMap(t -> Stream.of(
+                    .map(t -> tuple(
                             _m(t).NAME.as("Level " + t.v1 + " Name"),
                             _m(t).EXTERNAL_ID.as("Level " + t.v1 + " External Id"),
                             _m(t).ID.as("Level " + t.v1 + " Waltz Id")))
                     .collect(Collectors.toList());
 
+            List<Field<?>> selectionFields = levelFields
+                    .stream()
+                    .flatMap(t -> Stream.of(t.v1, t.v2, t.v3))
+                    .collect(Collectors.toList());
+
+            List<Field<String>> orderingFields = ListUtilities.map(levelFields, t -> t.v1);
+
             Tuple3<Integer, EntityHierarchy, Measurable> l1 = ehAndMeasurableTablesForLevel.get(0);
 
             SelectOnConditionStep<Record> workingQry = dsl
-                    .select(fields)
+                    .select(selectionFields)
                     .from(_m(l1))
                     .innerJoin(_eh(l1))
                     .on(_eh(l1).ID.eq(_m(l1).ID)
@@ -128,10 +136,7 @@ public class MeasurableCategoryExtractor extends DirectQueryBasedDataExtractor {
             }
 
             SelectSeekStepN<Record> qry = workingQry
-                    .orderBy(ehAndMeasurableTablesForLevel
-                             .stream()
-                             .map(t -> _m(t).NAME.as("Level " + t.v1 + " Name"))
-                             .collect(Collectors.toList()));
+                    .orderBy(orderingFields);
 
             return writeExtract(
                     mkSuggestedFilename(categoryId),
