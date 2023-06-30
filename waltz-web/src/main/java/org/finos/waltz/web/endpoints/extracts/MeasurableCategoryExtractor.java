@@ -24,12 +24,12 @@ import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.EntityHierarchy;
 import org.finos.waltz.schema.tables.Measurable;
-import org.finos.waltz.web.WebUtilities;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.SelectConditionStep;
 import org.jooq.SelectOnConditionStep;
+import org.jooq.SelectSeekStepN;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple3;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +47,8 @@ import static org.finos.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
 import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
 import static org.finos.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGORY;
 import static org.finos.waltz.schema.tables.Person.PERSON;
+import static org.finos.waltz.web.WebUtilities.getId;
+import static org.finos.waltz.web.WebUtilities.mkPath;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 import static spark.Spark.get;
 
@@ -63,9 +65,9 @@ public class MeasurableCategoryExtractor extends DirectQueryBasedDataExtractor {
 
     @Override
     public void register() {
-        String flatPath = WebUtilities.mkPath("data-extract", "measurable-category", "flat", ":id");
+        String flatPath = mkPath("data-extract", "measurable-category", "flat", ":id");
         get(flatPath, (request, response) -> {
-            long categoryId = WebUtilities.getId(request);
+            long categoryId = getId(request);
 
             EntityHierarchy eh = ENTITY_HIERARCHY.as("eh");
             Measurable m = Tables.MEASURABLE.as("m");
@@ -84,7 +86,12 @@ public class MeasurableCategoryExtractor extends DirectQueryBasedDataExtractor {
             ArrayList<Tuple3<Integer, EntityHierarchy, Measurable>> ehAndMeasurableTablesForLevel = new ArrayList<>(maxLevel);
 
             for (int i = 0; i < maxLevel; i++) {
-                ehAndMeasurableTablesForLevel.add(i, tuple(i + 1, ENTITY_HIERARCHY.as("eh" + i), Tables.MEASURABLE.as("l" + i)));
+                ehAndMeasurableTablesForLevel.add(
+                        i,
+                        tuple(
+                            i + 1,
+                            ENTITY_HIERARCHY.as("eh" + i),
+                            Tables.MEASURABLE.as("l" + i)));
             }
 
             List<Field<?>> fields = ehAndMeasurableTablesForLevel
@@ -97,7 +104,7 @@ public class MeasurableCategoryExtractor extends DirectQueryBasedDataExtractor {
 
             Tuple3<Integer, EntityHierarchy, Measurable> l1 = ehAndMeasurableTablesForLevel.get(0);
 
-            SelectOnConditionStep<Record> qry = dsl
+            SelectOnConditionStep<Record> workingQry = dsl
                     .select(fields)
                     .from(_m(l1))
                     .innerJoin(_eh(l1))
@@ -110,7 +117,7 @@ public class MeasurableCategoryExtractor extends DirectQueryBasedDataExtractor {
             for (int i = 1; i < maxLevel; i++) {
                 Tuple3<Integer, EntityHierarchy, Measurable> curr = ehAndMeasurableTablesForLevel.get(i);
                 Tuple3<Integer, EntityHierarchy, Measurable> prev = ehAndMeasurableTablesForLevel.get(i - 1);
-                qry = qry
+                workingQry = workingQry
                         .leftJoin(_eh(curr))
                         .on(_eh(curr).ANCESTOR_ID.eq(_eh(prev).ID)
                                 .and(_eh(curr).KIND.eq(EntityKind.MEASURABLE.name())
@@ -120,10 +127,11 @@ public class MeasurableCategoryExtractor extends DirectQueryBasedDataExtractor {
                                 .and(_m(curr).ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name())));
             }
 
-            qry.orderBy(ehAndMeasurableTablesForLevel
-                                .stream()
-                                .map(t -> _m(t).NAME.as("Level " + t.v1 + " Name"))
-                                .collect(Collectors.toList()));
+            SelectSeekStepN<Record> qry = workingQry
+                    .orderBy(ehAndMeasurableTablesForLevel
+                             .stream()
+                             .map(t -> _m(t).NAME.as("Level " + t.v1 + " Name"))
+                             .collect(Collectors.toList()));
 
             return writeExtract(
                     mkSuggestedFilename(categoryId),
@@ -135,9 +143,9 @@ public class MeasurableCategoryExtractor extends DirectQueryBasedDataExtractor {
 
 
 
-        String parentChildPath = WebUtilities.mkPath("data-extract", "measurable-category", ":id");
+        String parentChildPath = mkPath("data-extract", "measurable-category", ":id");
         get(parentChildPath, (request, response) -> {
-            long categoryId = WebUtilities.getId(request);
+            long categoryId = getId(request);
             String suggestedFilename = mkSuggestedFilename(categoryId);
 
             SelectConditionStep<Record> data = dsl
