@@ -216,7 +216,7 @@
         <script type="text/ng-template" id="navbar/modal-login.html">
             <div class="modal-header">
                 <h3 class="modal-title">
-                    Login to Waltz
+                    Login to Waltz!
                     <small ng-bind="logoOverlayText"></small>
                 </h3>
             </div>
@@ -238,6 +238,23 @@
                                ng-model="password"
                                placeholder="password"/>
                     </div>
+                    <!-- edit here -->
+                    <div class="form-group">
+
+                        <!-- login with OAuth -->
+                        <label>Google Login</label>
+                        <a href="https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=####&redirect_uri=http://localhost:8000/api/oauth&scope=https://www.googleapis.com/auth/userinfo.email">Google Login</a>
+                    </div>
+                    <div class="form-group">
+                        <label>GitHub Login</label>
+                        <a href="https://github.com/login/oauth/authorize?client_id=c39a1ce93114bb52ab06&redirect_uri=http://localhost:8000/api/oauth&scope=user&state=939958">GitHub Login</a>
+
+
+                        <div>"/login/oauth/authorize?client_id=5b308a169444ecb85e3f&redirect_uri=https%3A%2F%2Faccount.jetbrains.com%2Foauth2%2Flogin%2Fcallback&scope=read%3Auser+user%3Aemail&state=callbackUrl%3D%26codeChallenge%3D71b9a562-0086-438a-a925-26d238ccdd88%26sessionToken%3DQ1ck4sYgpmw4gqV_rS2CkIqX-DP5_shQ0HmPdt8kHr2dkfz4N83TaxXYYCB7rqw8%26from%3D0%26provider%3D1"
+
+                        </div>
+                    </div>
+                    <!-- end edit -->
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-primary"
