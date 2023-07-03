@@ -31,10 +31,10 @@ public class OAuthEndpoint implements Endpoint{
         String OAuthPath = WebUtilities.mkPath(BASE_URL);
 
 
+        // stop this just printing info
 
-        System.out.println("Trying to register DatumRoute");
         DatumRoute<String> OAuthRoute = (request, response)
-                -> OAuthService.testFunc(request);
+                -> OAuthService.codeExchange(request);
 
 
 

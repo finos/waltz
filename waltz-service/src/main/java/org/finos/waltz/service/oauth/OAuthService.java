@@ -123,7 +123,7 @@ public class OAuthService {
     }
 
 
-    public String testFunc(Request request) throws IOException {
+    public String codeExchange(Request request) throws IOException {
 
         String code = request.queryParams("code");
         // print all the request params
