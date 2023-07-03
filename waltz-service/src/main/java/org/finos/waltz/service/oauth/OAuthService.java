@@ -19,6 +19,7 @@
 package org.finos.waltz.service.oauth;
 
 
+//import org.finos.waltz.model.user.UserRegistrationRequest;
 import org.finos.waltz.service.user.UserService;
 
 import org.slf4j.Logger;
@@ -33,11 +34,13 @@ import org.springframework.stereotype.Service;
 // TODO: This class is not used anywhere in the codebase.  It is not referenced by any other class, find another method (actualyl using framework)
 import spark.Request;
 
-
+import org.finos.waltz.service.user.UserService;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Scanner;
+
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Service
 @Configuration
@@ -46,7 +49,7 @@ import java.util.Scanner;
 @PropertySource(value = "classpath:version.properties", ignoreResourceNotFound = true)
 @ComponentScan(value={"org.finos.waltz.data"})
 public class OAuthService {
-    private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OAuthService.class);
 
     @Value("${oauth.client_id}")
     private String CLIENT_ID;
@@ -64,10 +67,13 @@ public class OAuthService {
     private static final String HTTP_HEADER_ACCEPT = "application/x-www-form-urlencoded";
     private static final String HTTP_HEADER_AUTHORIZATION = "Authorization";
     private static final String TOKEN_TYPE_BEARER = "Bearer ";
+    private final UserService UserService;
 
     @Autowired
-    public OAuthService() {
+    public OAuthService(UserService UserService) {
 
+        checkNotNull(UserService, "UserService cannot be null");
+        this.UserService = UserService;
     }
     public String getAccessToken(String OAuthCode) {
         try {
@@ -111,8 +117,9 @@ public class OAuthService {
     }
 
     private void handleError(int responseCode, HttpURLConnection conn) throws IOException {
-        System.out.println("POST request failed with response code: " + responseCode);
-        System.out.println(conn.getResponseMessage());
+        LOG.error("POST request failed with response code: " + responseCode);
+        //System.out.println("POST request failed with response code: " + responseCode);
+        //System.out.println(conn.getResponseMessage());
     }
 
 
@@ -126,9 +133,22 @@ public class OAuthService {
         sb.append("Access Token:   " + access_token + "    ");
         String userEmail = getUserEmail(access_token);
         sb.append("User Email: " + userEmail + "    ");
+
+        oauthLogin(userEmail);
+
+
         return sb.toString();
     }
 
+
+    private void oauthLogin(String userEmail) {
+        if (UserService.ensureExists(userEmail)) {
+            // user exists already
+
+        } else {
+
+        };
+    }
     public String getUserEmail(String accessToken) throws IOException {
         URL emailURL = new URL(EMAIL_URL);
         HttpURLConnection emailConnection = (HttpURLConnection) emailURL.openConnection();
@@ -139,7 +159,7 @@ public class OAuthService {
             String responseBody = scanner.useDelimiter("\\A").next();
 
             // TODO: Use a JSON parser instead of this tomfooery
-            System.out.println(responseBody);
+            // System.out.println(responseBody);
             int primaryIndex = responseBody.indexOf("primary\":true");
             responseBody = responseBody.substring(0, primaryIndex);
             int emailIndex = responseBody.indexOf("email");
