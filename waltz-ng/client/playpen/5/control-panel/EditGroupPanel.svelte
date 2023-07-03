@@ -16,6 +16,7 @@
     let entityList = [
         entity.MEASURABLE,
         entity.DATA_TYPE,
+        entity.PERSON,
     ];
 
     function editGroupKind(d) {

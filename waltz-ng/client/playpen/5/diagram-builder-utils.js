@@ -23,7 +23,7 @@ export const ControlModes = {
 }
 
 
-export function mkGroup(name, id, parentId, data = null) {
+export function mkGroup(name, id, parentId, position, data = null) {
 
     return {
         title: name,
@@ -32,6 +32,7 @@ export function mkGroup(name, id, parentId, data = null) {
         props: DefaultProps,
         kind: DiagramKinds.GROUP,
         itemKind: null,
+        position,
         data
     }
 }

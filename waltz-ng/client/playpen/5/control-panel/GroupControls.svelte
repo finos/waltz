@@ -4,6 +4,8 @@
     import {ControlModes, FlexDirections, mkGroup} from "../diagram-builder-utils";
     import EditGroupPanel from "./EditGroupPanel.svelte";
     import EditItemsPanel from "./EditItemsPanel.svelte";
+    import EntityLink from "../../../common/svelte/EntityLink.svelte";
+    import {flattenChildren} from "../../../common/hierarchy-utils";
 
     let activeMode = ControlModes.VIEW;
 
@@ -20,8 +22,17 @@
 
     function addGroup() {
         const groupNumber = _.size($groups) + 1;
-        const newGroup = mkGroup("Group " + groupNumber.toString(), groupNumber, $selectedGroup.id)
+        const newGroup = mkGroup("Group " + groupNumber.toString(), groupNumber, $selectedGroup.id, groupNumber)
         $groups = _.concat($groups, newGroup);
+    }
+
+
+    function removeGroup() {
+        const children = flattenChildren($selectedGroup);
+        const groupsToRemove = _.concat(children, $selectedGroup);
+        console.log({sg: $selectedGroup, children});
+        $groups = _.reject($groups, d => _.includes(_.map(groupsToRemove, d => d.id), d.id));
+        $selectedGroup = null;
     }
 
     function saveGroup(group) {
@@ -33,14 +44,19 @@
         $selectedGroup = updatedGroup; // might need to re find this from the hierarchy
     }
 
+
+    $: console.log({groups: $groups});
+
 </script>
 
 
+{#if $selectedGroup}
 <div class="row">
     <div class="col-md-12">
         {#if activeMode === ControlModes.VIEW}
             <h4>{$selectedGroup.title}</h4>
             <ul>
+                <li>D: {$selectedGroup.id}</li>
                 <li>Item Kind: {$selectedGroup.itemKind}</li>
                 <li>Properties:</li>
                 <li>
@@ -71,19 +87,17 @@
                     on:click={() => activeMode = ControlModes.EDIT_ITEMS}>
                 Edit Items
             </button>
+            <button class="btn btn-default"
+                    on:click={removeGroup}>
+                Remove Group
+            </button>
 
         {:else if activeMode === ControlModes.EDIT_GROUP}
             <EditGroupPanel on:save={saveGroup}
                             on:cancel={() => activeMode = ControlModes.VIEW}/>
-
         {:else if activeMode === ControlModes.EDIT_ITEMS}
-            <EditItemsPanel/>
-            <button class="btn btn-default"
-                    on:click={() => activeMode = ControlModes.VIEW}>
-                Done
-            </button>
+            <EditItemsPanel on:cancel={() => activeMode = ControlModes.VIEW}/>
         {/if}
     </div>
 </div>
-
-<br>
+{/if}
