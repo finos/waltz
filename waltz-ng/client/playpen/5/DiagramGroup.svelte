@@ -2,17 +2,12 @@
 
     import _ from "lodash";
     import EntityLink from "../../common/svelte/EntityLink.svelte";
-    import {groups, hoveredGroupId, movingGroup} from "./diagram-builder-store";
+    import {groups, hoveredGroupId, movingGroup, selectedGroup} from "./diagram-builder-store";
     import {flip} from 'svelte/animate';
     import {flattenChildren} from "../../common/hierarchy-utils";
     import toasts from "../../svelte-stores/toast-store";
 
     export let group;
-
-    function dragStart(evt, group) {
-        $movingGroup = group;
-        console.log("dragStart", {evt, group});
-    }
 
     function drop(evt, targetGroup) {
         evt.preventDefault();
@@ -20,12 +15,10 @@
         const children = flattenChildren($movingGroup);
         const childIds = _.map(children, d => d.id);
 
-        console.log({children, childIds})
         if(targetGroup.id === $movingGroup.id || _.includes(childIds, targetGroup.id)) {
             toasts.warning("Cannot move a group to itself or one of it's children");
 
         } else {
-            console.log("drop", {evt, moving: $movingGroup, targetGroup, gs: $groups});
             const moveGroup = _.find($groups, d => d.id === $movingGroup.id);
             const updatedGroup = Object.assign({}, moveGroup, {parentId: targetGroup.id})
             const withoutGroup = _.reject($groups, d => d.id === $movingGroup.id);
@@ -37,7 +30,6 @@
 
     function dropReorder(evt, targetGroup, positionOffset) {
         evt.preventDefault();
-        console.log("drop reorder", {targetGroup, group, positionOffset});
 
         const newGroupPosition = targetGroup.position + positionOffset;
 
@@ -56,37 +48,19 @@
             })
             .value();
 
-        console.log({newGroupPosition, reorderedSiblings});
-
         const workingGroups = _.reject($groups, d => d.parentId === targetGroup.parentId);
         $groups = _.concat(workingGroups, ...reorderedSiblings);
+    }
 
-        //
-        // const children = flattenChildren($movingGroup);
-        // const childIds = _.map(children, d => d.id);
-        //
-        // console.log({children, childIds})
-        // if(targetGroup.id === $movingGroup.id || _.includes(childIds, targetGroup.id)) {
-        //     toasts.warning("Cannot move a group to itself or one of it's children");
-        //
-        // } else {
-        //     console.log("drop", {evt, moving: $movingGroup, targetGroup, gs: $groups});
-        //     const moveGroup = _.find($groups, d => d.id === $movingGroup.id);
-        //     const updatedGroup = Object.assign({}, moveGroup, {parentId: targetGroup.id})
-        //     const withoutGroup = _.reject($groups, d => d.id === $movingGroup.id);
-        //     $groups = _.concat(withoutGroup, updatedGroup);
-        // }
-        // $movingGroup = null
-        // $hoveredGroupId = null;
+    function dragStart(evt, group) {
+        $movingGroup = group;
     }
 
     function dragEnter() {
-        console.log("enter")
         $hoveredGroupId = group.id;
     }
 
     function dragEnterParent() {
-        console.log("enter parent")
         $hoveredGroupId = group.parentId;
     }
 
@@ -95,13 +69,12 @@
 </script>
 
 <div style="height: 100%; width: 100%"
-     xxclass:hovered={$hoveredGroupId === group.id || $movingGroup?.id === group.id}
      draggable={true}
      on:dragstart|stopPropagation={event => dragStart(event, group)}
      ondragover="return false">
 
     <div style="display: flex; width: 100%">
-        {#if $movingGroup}
+        {#if $movingGroup && $movingGroup.parentId === group.parentId}
             <div class="reorder-box"
                  class:hovered={$hoveredGroupId === group.parentId}
                  on:dragenter|stopPropagation={dragEnterParent}
@@ -114,9 +87,12 @@
              on:drop|stopPropagation={event => drop(event, group)}>
 
             {#if !_.isEmpty(group.title)}
-                <div class="diagram-title"
+                <div class="diagram-title clickable"
                      class:hovered={$hoveredGroupId === group.id}>
-                    {group.title}
+                    <button class="btn btn-plain"
+                            on:click={() => $selectedGroup = group}>
+                        {group.title}
+                    </button>
                 </div>
             {/if}
 
@@ -139,7 +115,7 @@
         </div>
 
 
-        {#if $movingGroup}
+        {#if $movingGroup && $movingGroup.parentId === group.parentId}
             <div class="reorder-box"
                  class:hovered={$hoveredGroupId === group.parentId}
                  on:dragenter|stopPropagation={dragEnterParent}
@@ -229,6 +205,17 @@
         background-color: #000d79;
         font-weight: bolder;
         color: white;
+        padding: 0 0.5em;
+
+        &:hover {
+            background-color: lighten(#000d79, 50%);
+        }
+
+        button {
+            width: 100%;
+            outline: none !important;
+            color: white;
+        }
     }
 
     .diagram-title.hovered {
@@ -242,14 +229,12 @@
 
         &:hover {
             background-color: lighten(#f6f7ff, 20%);
-
         }
     }
 
     .reorder-box.hovered {
         &:hover {
             background-color: lighten(#f6f7ff, 20%);
-
         }
     }
 
