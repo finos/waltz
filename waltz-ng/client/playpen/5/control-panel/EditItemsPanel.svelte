@@ -11,28 +11,18 @@
     const dispatch = createEventDispatcher();
 
     function selectItem(entity) {
-        // const itemNumber = _.size($items) + 1;
-        // const newItem = mkItem(entity.name, itemNumber, $selectedGroup.id, entity)
-        // $items = _.concat($items, newItem);
-        //
+
         const groupNumber = _.size($groups) + 1;
         const newGroup = mkGroup(entity.name, groupNumber, $selectedGroup.id, groupNumber, entity)
         $groups = _.concat($groups, newGroup);
     }
 
-    function removeItem(item) {
-        // $items = _.reject($items, d => d.id === item.id);
-        $groups = _.reject($groups, d => d.id === item.id);
-    }
-
     function deselectItem(entity) {
-        // $items = _.reject($items, d => d.groupId === $selectedGroup.id && sameRef(d.data, entity));
         $groups = _.reject($groups, d => d.parentId === $selectedGroup.id && sameRef(d.data, entity));
     }
 
     $: alreadyAddedFilter = (entity) => {
         return !_.some($groups, d => d.parentId === $selectedGroup.id && d.data && sameRef(d.data, entity));
-        // !_.some($items, d => d.groupId === $selectedGroup.id && sameRef(d.data, entity))
     }
 
     function cancel() {

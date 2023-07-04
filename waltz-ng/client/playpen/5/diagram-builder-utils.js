@@ -7,8 +7,9 @@ export const DefaultProps = {
     itemHeight: 5,
     itemWidth: 10,
     flexDirection: FlexDirections.ROW,
-    groupsPerRow: 3,
-    groupsPerColumn: 3
+    showTitle: true,
+    bucketSize: 3,
+    proportion: 1
 }
 
 export const DiagramKinds = {

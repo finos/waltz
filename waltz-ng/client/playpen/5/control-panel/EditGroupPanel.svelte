@@ -2,8 +2,7 @@
 
 
     import _ from "lodash";
-    import {groups, selectedGroup} from "../diagram-builder-store";
-    import {FlexDirections, mkGroup} from "../diagram-builder-utils";
+    import {selectedGroup} from "../diagram-builder-store";
     import DropdownPicker
         from "../../../report-grid/components/svelte/column-definition-edit-panel/DropdownPicker.svelte";
     import {entity} from "../../../common/services/enums/entity";
@@ -21,18 +20,6 @@
 
     function editGroupKind(d) {
         working.itemKind = d.key;
-        console.log({gs: $groups});
-    }
-
-    function editTitle(d) {
-        const group = _.find($groups, d => d.id === $selectedGroup.id);
-
-        group.title = d?.key || null;
-
-        const withoutGroup = _.reject($groups, d => d.id === $selectedGroup.id);
-        $groups = _.concat(withoutGroup, group);
-        $selectedGroup = group;
-        console.log({gs: $groups});
     }
 
     function saveGroup() {
@@ -62,6 +49,22 @@
 <div class="help-block">
     Items in this group will be of this entity kind.
 </div>
+
+<label for="showTitle">Display Title</label>
+<input type=checkbox
+       id="showTitle"
+       bind:checked={working.props.showTitle}>
+<div class="help-block">
+    Show or hide the title of this group or item.
+</div>
+
+<label for="bucketSize">Bucket Size</label>
+<input id="bucketSize" type="range" min="1" max="5" bind:value={working.props.bucketSize}>
+
+<label for="proportion">Proportion</label>
+<input id="proportion" type="range" min="1" max="5" bind:value={working.props.proportion}>
+
+
 
 <button class="btn btn-default"
         on:click={saveGroup}>

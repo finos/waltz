@@ -24,8 +24,7 @@
             const withoutGroup = _.reject($groups, d => d.id === $movingGroup.id);
             $groups = _.concat(withoutGroup, updatedGroup);
         }
-        $movingGroup = null
-        $hoveredGroupId = null;
+        clearDrag();
     }
 
     function dropReorder(evt, targetGroup, positionOffset) {
@@ -50,6 +49,13 @@
 
         const workingGroups = _.reject($groups, d => d.parentId === targetGroup.parentId);
         $groups = _.concat(workingGroups, ...reorderedSiblings);
+        clearDrag();
+    }
+
+
+    function clearDrag() {
+        $movingGroup = null
+        $hoveredGroupId = null;
     }
 
     function dragStart(evt, group) {
@@ -66,6 +72,10 @@
 
     $: console.log({group});
 
+    $: showReorderPanels = $movingGroup
+        && $movingGroup.parentId === group.parentId
+        && $movingGroup.id !== group.id
+
 </script>
 
 <div style="height: 100%; width: 100%"
@@ -74,7 +84,7 @@
      ondragover="return false">
 
     <div style="display: flex; width: 100%">
-        {#if $movingGroup && $movingGroup.parentId === group.parentId}
+        {#if showReorderPanels}
             <div class="reorder-box"
                  class:hovered={$hoveredGroupId === group.parentId}
                  on:dragenter|stopPropagation={dragEnterParent}
@@ -86,7 +96,7 @@
              on:dragenter|stopPropagation={dragEnter}
              on:drop|stopPropagation={event => drop(event, group)}>
 
-            {#if !_.isEmpty(group.title)}
+            {#if group.props.showTitle}
                 <div class="diagram-title clickable"
                      class:hovered={$hoveredGroupId === group.id}>
                     <button class="btn btn-plain"
@@ -100,6 +110,7 @@
                  class:hovered={$hoveredGroupId === group.id}>
                 {#each _.orderBy(group.children, d => d.position) as child (child.id)}
                     <div class="group"
+                         style={`flex: ${child.props.proportion} 1 ${_.floor(100 / (group.props.bucketSize + 1))}%;`}
                          animate:flip="{{duration: 300}}">
                         <svelte:self group={child}>
                         </svelte:self>
@@ -115,7 +126,7 @@
         </div>
 
 
-        {#if $movingGroup && $movingGroup.parentId === group.parentId}
+        {#if showReorderPanels}
             <div class="reorder-box"
                  class:hovered={$hoveredGroupId === group.parentId}
                  on:dragenter|stopPropagation={dragEnterParent}
@@ -135,7 +146,6 @@
         display: flex;
         flex-wrap: wrap;
         justify-content: space-evenly;
-        align-content: flex-start;
         gap: 0.5em;
 
         border: 1px solid #000d79;
@@ -154,10 +164,11 @@
     .diagram-container-row {
         flex-direction: row;
         align-items: flex-start;
+        align-content: flex-start;
     }
 
     .diagram-container-row > .group {
-        flex: 1 1 25%; /* when rows this sets the width*/
+        //flex: 1 1 25%; /* when rows this sets the width*/
         height: fit-content;
         min-height: 5em;
     }
@@ -171,6 +182,7 @@
     .diagram-container-column {
         flex-direction: column;
         align-items: center;
+        align-content: center;
         max-height: 60em;
     }
 
@@ -219,7 +231,7 @@
     }
 
     .diagram-title.hovered {
-        background-color: lighten(#000d79, 20%);
+        background-color: lighten(#000d79, 50%);
     }
 
     .reorder-box {
@@ -233,9 +245,9 @@
     }
 
     .reorder-box.hovered {
-        &:hover {
+        //&:hover {
             background-color: lighten(#f6f7ff, 20%);
-        }
+        //}
     }
 
 </style>

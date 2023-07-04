@@ -6,18 +6,45 @@
     import EditItemsPanel from "./EditItemsPanel.svelte";
     import EntityLink from "../../../common/svelte/EntityLink.svelte";
     import {flattenChildren} from "../../../common/hierarchy-utils";
+    import GroupDetailsPanel from "./GroupDetailsPanel.svelte";
 
     let activeMode = ControlModes.VIEW;
 
     function toggleFlexDirection() {
         const group = _.find($groups, d => d.id === $selectedGroup.id);
 
-        group.props.flexDirection = group.props.flexDirection ===  FlexDirections.ROW
-            ? FlexDirections.COLUMN
-            : FlexDirections.ROW;
+        const updatedProps = Object.assign(
+            {},
+            group.props,
+            {
+                flexDirection: group.props.flexDirection === FlexDirections.ROW
+                    ? FlexDirections.COLUMN
+                    : FlexDirections.ROW
+            });
+
+        const updatedGroup = Object.assign({}, group, {props: updatedProps});
 
         const withoutGroup = _.reject($groups, d => d.id === $selectedGroup.id);
-        $groups = _.concat(withoutGroup, group);
+        $groups = _.concat(withoutGroup, updatedGroup);
+    }
+
+    function toggleItemTitleDisplay() {
+        const childGroups = _
+            .chain($groups)
+            .filter(d => d.parentId === $selectedGroup.id)
+            .map(d => {
+                const updatedProps = Object.assign({}, d.props, {showTitle: !d.props.showTitle});
+
+                return Object.assign({}, d, {props: updatedProps});
+            })
+            .value();
+
+
+        console.log({childGroups});
+
+        const withoutGroup = _.reject($groups, d => d.parentId === $selectedGroup.id);
+
+        $groups = _.concat(withoutGroup, ...childGroups);
     }
 
     function addGroup() {
@@ -26,11 +53,9 @@
         $groups = _.concat($groups, newGroup);
     }
 
-
     function removeGroup() {
         const children = flattenChildren($selectedGroup);
         const groupsToRemove = _.concat(children, $selectedGroup);
-        console.log({sg: $selectedGroup, children});
         $groups = _.reject($groups, d => _.includes(_.map(groupsToRemove, d => d.id), d.id));
         $selectedGroup = null;
     }
@@ -54,25 +79,15 @@
 <div class="row">
     <div class="col-md-12">
         {#if activeMode === ControlModes.VIEW}
-            <h4>{$selectedGroup.title}</h4>
-            <ul>
-                <li>D: {$selectedGroup.id}</li>
-                <li>Item Kind: {$selectedGroup.itemKind}</li>
-                <li>Properties:</li>
-                <li>
-                    <ul>
-                        <li>Item Height: {$selectedGroup.props.itemHeight}em</li>
-                        <li>Item Width: {$selectedGroup.props.itemWidth}em</li>
-                        <li>Alignment: {$selectedGroup.props.flexDirection}</li>
-                        <li>Groups Per Row: {$selectedGroup.props.groupsPerRow}</li>
-                        <li>Groups Per Column: {$selectedGroup.props.groupsPerColumn}</li>
-                    </ul>
-                </li>
-            </ul>
+            <GroupDetailsPanel/>
 
             <button class="btn btn-default"
                     on:click={() => toggleFlexDirection()}>
                 Toggle alignment
+            </button>
+            <button class="btn btn-default"
+                    on:click={() => toggleItemTitleDisplay()}>
+                Toggle Item Title Display
             </button>
             <button class="btn btn-default"
                     on:click={() => activeMode = ControlModes.EDIT_GROUP}>
