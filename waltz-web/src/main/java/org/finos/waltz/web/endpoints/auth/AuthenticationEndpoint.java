@@ -32,22 +32,40 @@ import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.service.user.UserService;
 import org.finos.waltz.web.WebUtilities;
 import org.finos.waltz.web.endpoints.Endpoint;
+import org.jooq.tools.json.JSONArray;
+import org.jooq.tools.json.JSONObject;
+import org.jooq.tools.json.JSONParser;
+import org.jooq.tools.json.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import spark.Filter;
 import spark.Spark;
 
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.Scanner;
 import java.util.function.Supplier;
 
 import static org.finos.waltz.common.MapUtilities.newHashMap;
+import static org.finos.waltz.web.endpoints.extracts.ExtractFormat.JSON;
 
 
 @Service
+@Configuration
+@PropertySource(value = "classpath:waltz.properties", ignoreResourceNotFound = true)
+@PropertySource(value = "file:${user.home}/.waltz/waltz.properties", ignoreResourceNotFound = true)
+@PropertySource(value = "classpath:version.properties", ignoreResourceNotFound = true)
+@ComponentScan(value={"org.finos.waltz.data"})
 public class AuthenticationEndpoint implements Endpoint {
 
     private static final String BASE_URL = WebUtilities.mkPath("authentication");
@@ -58,6 +76,13 @@ public class AuthenticationEndpoint implements Endpoint {
     private final UserRoleService userRoleService;
     private final SettingsService settingsService;
     private final Filter filter;
+
+    @Value("${oauth.token_url}")
+    private String TOKEN_URL;
+    @Value("${oauth.email_url}")
+    private String EMAIL_URL;
+    @Value("${oauth.client_secret}")
+    private String CLIENT_SECRET;
 
 
     @Autowired
@@ -133,8 +158,82 @@ public class AuthenticationEndpoint implements Endpoint {
         Spark.before(WebUtilities.mkPath("api", "*"), filter);
 
     }
+    private String[] parseCodeResponse(String RequestBody) throws ParseException {
+        // json stringify
+        JSONParser parser = new JSONParser();
+        JSONObject json = (JSONObject) parser.parse(RequestBody);
+        return new String[]{(String) json.get("code"), (String) json.get("clientId")};
 
+    }
+    private String fetchOAuthEmail(String accessToken) throws IOException, ParseException {
+        URL emailURL = new URL(EMAIL_URL);
+        HttpURLConnection emailConnection = (HttpURLConnection) emailURL.openConnection();
 
+        emailConnection.setRequestProperty("Authorization", "Bearer " + accessToken);
+
+        try (InputStream response = emailConnection.getInputStream();
+             Scanner scanner = new Scanner(response)) {
+            String responseBody = scanner.useDelimiter("\\A").next();
+
+            int primaryIndex = responseBody.indexOf("primary\":true");
+            responseBody = responseBody.substring(0, primaryIndex);
+            int emailIndex = responseBody.indexOf("email");
+            return responseBody.substring(emailIndex + 8, responseBody.length() - 3);
+
+        }
+    }
+
+    private String getAccessToken(String OAuthCode, String clientId) {
+        try {
+            URL url = new URL(TOKEN_URL);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Accept","application/json");
+            conn.setDoOutput(true);
+
+            try (OutputStream os = conn.getOutputStream()) {
+                os.write(paramBuilder(OAuthCode, clientId).getBytes());
+                os.flush();
+            }
+
+            int responseCode = conn.getResponseCode();
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                return parse_access_token(conn);
+            } else {
+                LOG.error("Error getting access token from OAuth provider");
+                System.out.println(conn.getContent());
+            }
+
+        } catch (IOException | ParseException e) {
+            // Log the exception properly, don't just print the stack trace
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private String parse_access_token(HttpURLConnection conn) throws IOException, ParseException {
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+            StringBuilder response = new StringBuilder();
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            JSONParser parser = new JSONParser();
+            JSONObject json = (JSONObject) parser.parse(response.toString());
+            return json.get("access_token").toString();
+
+        }
+    }
+
+    private String paramBuilder(String OAuthCode, String clientId){
+        StringBuilder paramBuilder = new StringBuilder();
+        paramBuilder.append("&client_id=" + clientId);
+        paramBuilder.append("&client_secret=" + CLIENT_SECRET);
+        paramBuilder.append("&code=" + OAuthCode);
+        paramBuilder.append("&redirect_uri=" + "http://localhost:8000/authentication/oauth");
+        return paramBuilder.toString();
+    }
     private AuthenticationResponse authenticate(LoginRequest loginRequest) {
         return settingsService
                 .getValue(NamedSettings.externalAuthenticationEndpointUrl)
