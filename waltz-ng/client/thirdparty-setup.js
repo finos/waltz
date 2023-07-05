@@ -34,8 +34,17 @@ function authProviderSetup($authProvider, BaseUrl) {
         clientId: "Google account"
     });
 
+
     $authProvider.github({
-        clientId: "GitHub Client ID"
+        clientId: "c39a1ce93114bb52ab06",
+        url: '/authentication/oauth',
+        authorizationEndpoint: 'https://github.com/login/oauth/authorize',
+        redirectUri: window.location.origin + "/authentication/login",
+        optionalUrlParams: ['scope'],
+        scope: ['user:email'],
+        scopeDelimiter: ' ',
+        oauthType: '2.0',
+        popupOptions: { width: 1020, height: 618 }
     });
 
     $authProvider.linkedin({

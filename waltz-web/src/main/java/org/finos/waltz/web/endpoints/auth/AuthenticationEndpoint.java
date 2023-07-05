@@ -155,6 +155,28 @@ public class AuthenticationEndpoint implements Endpoint {
             }
         }, WebUtilities.transformer);
 
+        Spark.post(WebUtilities.mkPath(BASE_URL, "oauth"), (request, response) -> {
+            //System.out.println(request.body());
+            // make call to github, get response and pack into the JWT token below
+            Algorithm algorithmHS = Algorithm.HMAC512(JWTUtilities.SECRET);
+            String[] vals =  parseCodeResponse(request.body());
+            String OAuthCode = vals[0];
+            String clientId = vals[1];
+
+            String accessToken = getAccessToken(OAuthCode, clientId );
+            String email = fetchOAuthEmail(accessToken);
+
+            String token = JWT.create()
+                    .withIssuer(JWTUtilities.ISSUER)
+                    .withSubject(email)
+                    .withArrayClaim("roles", new String[]{""})
+                    .withClaim("displayName", email)
+                    .withClaim("employeeId", "1234")
+                    .sign(algorithmHS);
+
+            return newHashMap("token", token);
+        }, WebUtilities.transformer);
+
         Spark.before(WebUtilities.mkPath("api", "*"), filter);
 
     }

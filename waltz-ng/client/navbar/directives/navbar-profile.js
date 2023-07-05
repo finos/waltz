@@ -38,7 +38,7 @@ const initialState = {
 };
 
 
-function loginController($scope, $uibModalInstance, logoOverlayText) {
+function loginController($scope, $uibModalInstance, $auth, logoOverlayText) {
     $scope.ok = () => {
         const credentials = {
             userName: $scope.username,
@@ -52,12 +52,20 @@ function loginController($scope, $uibModalInstance, logoOverlayText) {
     $scope.logoOverlayText = logoOverlayText || "";
 
     $scope.cancel = () => $uibModalInstance.dismiss("cancel");
+
+
+    $scope.authenticate = function(provider) {
+        console.log("authenticate")
+        $auth.authenticate(provider);
+
+    };
 }
 
 
 loginController.$inject = [
     "$scope",
     "$uibModalInstance",
+    "$auth",
     "logoOverlayText"
 ];
 
@@ -66,6 +74,7 @@ function controller($interval,
                     $state,
                     $uibModal,
                     $scope,
+                    $auth,
                     serviceBroker,
                     settingsService,
                     userService) {
@@ -159,6 +168,8 @@ function controller($interval,
 
     };
 
+
+
 }
 
 
@@ -167,6 +178,7 @@ controller.$inject = [
     "$state",
     "$uibModal",
     "$scope",
+    "$auth",
     "ServiceBroker",
     "SettingsService",
     "UserService"
