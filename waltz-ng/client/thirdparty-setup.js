@@ -47,16 +47,11 @@ function authProviderSetup($authProvider, BaseUrl) {
         popupOptions: { width: 1020, height: 618 }
     });
 
-    $authProvider.linkedin({
-        clientId: "LinkedIn Client ID"
-    });
-
-
     $authProvider.oauth2({
-        name: "waltz",
-        clientId: "c39a1ce93114bb52ab06",
+        name: "demo-provider",
+        clientId: "c39a1u5u514bb52ab06",
         url: '/authentication/oauth',
-        authorizationEndpoint: 'https://github.com/login/oauth/authorize',
+        authorizationEndpoint: 'https://waltz.com/login/oauth/authorize',
         redirectUri: window.location.origin + "/authentication/login",
         optionalUrlParams: ['scope'],
         scope: ['user:email'],
