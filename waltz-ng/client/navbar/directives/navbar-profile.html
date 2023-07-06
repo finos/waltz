@@ -238,19 +238,10 @@
                                ng-model="password"
                                placeholder="password"/>
                     </div>
-                    <!-- edit here -->
-                    <div class="form-group">
+                    <div>
+                        <button ng-click="authenticate('waltz')">Sign In With ####</button>
+                    </div>
 
-                        <!-- login with OAuth -->
-                        <label>Google Login</label>
-                        <a href="https://accounts.google.com/o/oauth2/auth?response_type=code&client_id=####&redirect_uri=http://localhost:8000/api/oauth&scope=https://www.googleapis.com/auth/userinfo.email">Google Login</a>
-                    </div>
-                    <div class="form-group">
-                        <label>GitHub Login</label>
-                        <a href="https://github.com/login/oauth/authorize?client_id=c39a1ce93114bb52ab06&redirect_uri=http://localhost:8000/api/oauth&scope=user&state=939958">GitHub Login</a>
-                        <!-- pull env variables for this -->
-                    </div>
-                    <!-- end edit -->
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-primary"
@@ -266,12 +257,7 @@
                     </button>
                 </div>
             </form>
-            <hr>
-            <hr>
-            <hr>
-            <hr>
-            <hr>
-            <button ng-click="authenticate('github')">Sign in with GitHub</button>
+            >
         </script>
     </li>
 
