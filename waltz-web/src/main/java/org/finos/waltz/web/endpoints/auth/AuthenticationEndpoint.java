@@ -32,7 +32,6 @@ import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.service.user.UserService;
 import org.finos.waltz.web.WebUtilities;
 import org.finos.waltz.web.endpoints.Endpoint;
-import org.jooq.tools.json.JSONArray;
 import org.jooq.tools.json.JSONObject;
 import org.jooq.tools.json.JSONParser;
 import org.jooq.tools.json.ParseException;
@@ -50,14 +49,12 @@ import spark.Spark;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.function.Supplier;
 
 import static org.finos.waltz.common.MapUtilities.newHashMap;
-import static org.finos.waltz.web.endpoints.extracts.ExtractFormat.JSON;
+
 
 
 @Service
@@ -187,7 +184,7 @@ public class AuthenticationEndpoint implements Endpoint {
         return new String[]{(String) json.get("code"), (String) json.get("clientId")};
 
     }
-    private String fetchOAuthEmail(String accessToken) throws IOException, ParseException {
+    private String fetchOAuthEmail(String accessToken) throws IOException {
         URL emailURL = new URL(EMAIL_URL);
         HttpURLConnection emailConnection = (HttpURLConnection) emailURL.openConnection();
 
@@ -223,13 +220,12 @@ public class AuthenticationEndpoint implements Endpoint {
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 return parse_access_token(conn);
             } else {
-                LOG.error("Error getting access token from OAuth provider");
-                System.out.println(conn.getContent());
+                LOG.error("Error getting access token from OAuth provider, CODE: " + responseCode);
             }
 
         } catch (IOException | ParseException e) {
             // Log the exception properly, don't just print the stack trace
-            e.printStackTrace();
+            LOG.error("Error getting access token from OAuth provider", e);
         }
         return null;
     }
@@ -249,13 +245,12 @@ public class AuthenticationEndpoint implements Endpoint {
     }
 
     private String paramBuilder(String OAuthCode, String clientId){
-        StringBuilder paramBuilder = new StringBuilder();
-        paramBuilder.append("&client_id=" + clientId);
-        paramBuilder.append("&client_secret=" + CLIENT_SECRET);
-        paramBuilder.append("&code=" + OAuthCode);
-        paramBuilder.append("&redirect_uri=" + "http://localhost:8000/authentication/oauth");
-        return paramBuilder.toString();
+        return "&client_id=" + clientId +
+                "&client_secret=" + CLIENT_SECRET +
+                "&code=" + OAuthCode +
+                "&redirect_uri=" + "http://localhost:8000/authentication/oauth";
     }
+
     private AuthenticationResponse authenticate(LoginRequest loginRequest) {
         return settingsService
                 .getValue(NamedSettings.externalAuthenticationEndpointUrl)
