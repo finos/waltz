@@ -20,7 +20,7 @@
 import template from "./playpen1.html";
 import {initialiseData} from "../../common";
 import {CORE_API} from "../../common/services/core-api-utils";
-import {sliver} from "../../common/hierarchy-utils";
+import {directLineage} from "../../common/hierarchy-utils";
 
 const initData = {
     taxonomy: []
@@ -43,7 +43,7 @@ function controller($q,
 
                 console.log({
                     taxonomy: vm.taxonomy,
-                    sliver: sliver(vm.taxonomy, 117)
+                    sliver: directLineage(vm.taxonomy, 117)
                 });
             });
 

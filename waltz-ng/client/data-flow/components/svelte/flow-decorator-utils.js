@@ -17,12 +17,6 @@ export function getNodeColors(kind) {
     return c || { fill: "#ccc", stroke: "#999" };
 }
 
-export function getNodeColors(kind) {
-    const c = colors[kind];
-
-    return c || { fill: "#ccc", stroke: "#999" };
-}
-
 
 export const dimensions = {
     client: {

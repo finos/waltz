@@ -293,7 +293,7 @@ export function determineExpandedNodes(hierarchy, maxDepth = 100) {
 
 
 /**
- * Given a list of flat nodes and a starting node id will return a 'sliver' of the
+ * Given a list of flat nodes and a starting node id will return the direct lineage of the
  * tree with all parents and children of the starting node populated.  All other
  * nodes are omitted.
  *
@@ -324,7 +324,7 @@ export function directLineage(flatNodes,
 
     // recursively populate children
     const recurse = (node) => {
-        const kids = byParentId[idFn(node)];
+        const kids = byParentId[idFn(node)] || [];
         if (kids) {
             node.children = kids;
             _.each(kids, recurse);

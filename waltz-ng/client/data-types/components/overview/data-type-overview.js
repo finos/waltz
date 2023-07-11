@@ -16,23 +16,35 @@
  *
  */
 
-import {getParents} from "../../../common/hierarchy-utils";
+import {directLineage} from "../../../common/hierarchy-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkSelectionOptions} from "../../../common/selector-utils";
-import {hierarchyQueryScope} from '../../../common/services/enums/hierarchy-query-scope';
-import {lifecycleStatus} from '../../../common/services/enums/lifecycle-status';
+import {hierarchyQueryScope} from "../../../common/services/enums/hierarchy-query-scope";
+import {lifecycleStatus} from "../../../common/services/enums/lifecycle-status";
+import DataTypeTreeNav from "./DataTypeTreeNav.svelte";
+import _ from "lodash";
 
 import template from "./data-type-overview.html";
+import {initialiseData} from "../../../common";
 
 
 const bindings = {
     filters: "<",
-    parentEntityRef: "<"
+    parentEntityRef: "<",
+};
+
+
+const initialState = {
+    DataTypeTreeNav,
+    sliver: null,
+    dataType: null,
+    apps: [],
+    usageStats: []
 };
 
 
 function controller(serviceBroker) {
-    const vm = this;
+    const vm = initialiseData(this, initialState);
 
     const loadAll = () => {
         const selector = mkSelectionOptions(
@@ -45,10 +57,9 @@ function controller(serviceBroker) {
             .loadAppData(CORE_API.DataTypeStore.findAll)
             .then(r => {
                 const dataTypes = r.data;
-                const dataTypesById = _.keyBy(dataTypes, "id");
-                const dataType = dataTypesById[vm.parentEntityRef.id];
+                const dataType = _.find(dataTypes, d => d.id === vm.parentEntityRef.id);
                 vm.dataType = dataType;
-                vm.parents = getParents(dataType, n => dataTypesById[n.parentId]);
+                vm.sliver = directLineage(dataTypes, dataType.id);
             });
 
         serviceBroker
@@ -67,7 +78,6 @@ function controller(serviceBroker) {
     vm.$onInit = () => {
         loadAll();
     };
-
 
     vm.$onChanges = (changes) => {
         if(changes.filters) {
