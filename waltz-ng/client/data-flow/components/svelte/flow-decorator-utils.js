@@ -11,7 +11,6 @@ const colors = {
     }
 };
 
-
 export function getNodeColors(kind) {
     const c = colors[kind];
 

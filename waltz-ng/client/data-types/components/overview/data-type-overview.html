@@ -63,44 +63,17 @@
             </div>
         </div>
 
-        <div class="row no-overflow"
-             ng-if="$ctrl.parents.length > 0 || $ctrl.dataType.children.length > 0"
-             style="padding: 1em">
-            <div class="col-sm-4"
-                 ng-if="$ctrl.parents.length > 0">
-                <h4>Parent dataTypes: </h4>
-                <ul>
-                    <li ng-repeat="parent in $ctrl.parents">
-                        <a ui-sref="main.data-type.view ({id: parent.id })"
-                           ng-bind="parent.name">
-                        </a>
-                        <span ng-if="!$last">&raquo;</span>
-                    </li>
-                </ul>
+        <div class="waltz-sub-section" name="Hierarchy">
+            <waltz-svelte-component component="$ctrl.DataTypeTreeNav"
+                                    node="$ctrl.sliver">
+            </waltz-svelte-component>
 
-                <span class="text-muted small "
-                      ng-bind="$ctrl.parent.description">
-                </span>
-            </div>
-
-            <div ng-if="$ctrl.dataType.children.length > 0"
-                 class="col-sm-8">
-
-                <h4>Child dataTypes</h4>
-                <ul>
-                    <li ng-repeat="child in $ctrl.dataType.children | orderBy:'name'">
-                        <a ui-sref="main.data-type.view ({id: child.id})"
-                           class="clickable"
-                           ng-bind="child.name">
-                        </a>
-                    </li>
-                </ul>
-            </div>
         </div>
+
     </div>
 
     <waltz-no-data ng-if="!$ctrl.dataType">
-                <message>No information for this Data Type</message>
+        <message>No information for this Data Type</message>
     </waltz-no-data>
 
 </div>

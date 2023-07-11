@@ -20,6 +20,7 @@
 import template from "./playpen1.html";
 import {initialiseData} from "../../common";
 import {CORE_API} from "../../common/services/core-api-utils";
+import {directLineage} from "../../common/hierarchy-utils";
 
 const initData = {
     taxonomy: []
@@ -35,16 +36,20 @@ function controller($q,
 
         serviceBroker
             .loadViewData(
-                CORE_API.DataTypeStore.findAll,
-                //CORE_API.MeasurableStore.findAll,
+                CORE_API.MeasurableStore.findAll,
                 [])
             .then(r => {
-                console.log(r);
-                vm.taxonomy = r.data; // _.filter(r.data, m => m.categoryId === 12);
-                vm.linkStem = "data-types"; // data-types or measurable
+                vm.taxonomy = _.filter(r.data, m => m.categoryId === 6);
+
+                console.log({
+                    taxonomy: vm.taxonomy,
+                    sliver: directLineage(vm.taxonomy, 117)
+                });
             });
 
     }
+
+
 
 }
 
