@@ -28,10 +28,12 @@ import org.finos.waltz.model.taxonomy_management.TaxonomyChangeCommand;
 import org.finos.waltz.model.taxonomy_management.TaxonomyChangeLifecycleStatus;
 import org.finos.waltz.model.taxonomy_management.TaxonomyChangeType;
 import org.finos.waltz.schema.tables.records.TaxonomyChangeRecord;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -159,15 +161,19 @@ public class TaxonomyChangeDao {
                 .withId(r.getId());
     }
 
-    public Collection<TaxonomyChangeCommand> findChangesByDomainAndStatus(EntityReference domain, TaxonomyChangeLifecycleStatus status) {
-        return dsl
-                .select(TAXONOMY_CHANGE.fields())
-                .select(PRIMARY_REF_NAME, CHANGE_DOMAIN_NAME)
-                .from(TAXONOMY_CHANGE)
-                .where(TAXONOMY_CHANGE.STATUS.eq(status.name()))
-                .and(TAXONOMY_CHANGE.DOMAIN_ID.eq(domain.id()))
-                .and(TAXONOMY_CHANGE.DOMAIN_KIND.eq(domain.kind().name()))
-                .fetch(TO_DOMAIN_MAPPER);
+
+    public Collection<TaxonomyChangeCommand> findChangesByDomain(EntityReference domain) {
+        return findChangesByDomainAndCondition(
+                domain,
+                DSL.trueCondition());
+    }
+
+
+    public Collection<TaxonomyChangeCommand> findChangesByDomainAndStatus(EntityReference domain,
+                                                                          TaxonomyChangeLifecycleStatus status) {
+        return findChangesByDomainAndCondition(
+                domain,
+                TAXONOMY_CHANGE.STATUS.eq(status.name()));
     }
 
 
@@ -176,4 +182,21 @@ public class TaxonomyChangeDao {
         r.update();
         return cmd;
     }
+
+
+    // -- helpers ----
+
+    private Collection<TaxonomyChangeCommand> findChangesByDomainAndCondition(EntityReference domain,
+                                                                              Condition condition) {
+        return dsl
+                .select(TAXONOMY_CHANGE.fields())
+                .select(PRIMARY_REF_NAME, CHANGE_DOMAIN_NAME)
+                .from(TAXONOMY_CHANGE)
+                .where(TAXONOMY_CHANGE.DOMAIN_ID.eq(domain.id()))
+                .and(TAXONOMY_CHANGE.DOMAIN_KIND.eq(domain.kind().name()))
+                .and(condition)
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
 }

@@ -1,0 +1,29 @@
+<waltz-no-data ng-if="$ctrl.items.length === 0">
+    <message>
+        There are no logged changes
+    </message>
+</waltz-no-data>
+
+
+<div class="help-block">
+    This section lists any formal changes against this taxonomy.
+    These changes are ones that have been defined and applied directly in Waltz.
+</div>
+
+
+<div ng-if="$ctrl.items.length > 0">
+    <waltz-grid-with-search column-defs="$ctrl.columnDefs"
+                            style="min-height: 1600px"
+                            entries="$ctrl.items">
+    </waltz-grid-with-search>
+</div>
+
+
+<div class="pull-right">
+    <waltz-data-extract-link name="Export"
+                             styling="link"
+                             extract="taxonomy-changes/all-applied/{{$ctrl.parentEntityRef.kind}}/{{$ctrl.parentEntityRef.id}}"
+                             method="GET"
+                             ng-if="$ctrl.items.length > 0">
+    </waltz-data-extract-link>
+</div>

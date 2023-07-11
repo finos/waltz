@@ -445,6 +445,15 @@ const legalEntityRelationshipKindSection = {
 };
 
 
+const taxonomyChangesSection = {
+    componentId: "taxonomy-changes-section",
+    name: "Taxonomy Changes",
+    icon: "cog",
+    description: " This section list any formal changes against this taxonomy. These changes are ones that have been defined and applied in Waltz.",
+    id: 10030,
+};
+
+
 export const dynamicSections = {
     appCostsSection,
     appCostsSummarySection,
@@ -497,6 +506,7 @@ export const dynamicSections = {
     softwarePackageVersions,
     specificationDefinitionSection,
     surveySection,
+    taxonomyChangesSection,
     technologySection,
     technologySummarySection
 };

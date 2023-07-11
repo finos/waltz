@@ -103,5 +103,12 @@
     <waltz-dynamic-section-wrapper section="$ctrl.peopleSection"
                                    parent-entity-ref="$ctrl.categoryRef">
     </waltz-dynamic-section-wrapper>
+
+    <waltz-dynamic-section-wrapper section="$ctrl.taxonomyChangesSection"
+                                   ng-if="$ctrl.category.editable"
+                                   parent-entity-ref="$ctrl.categoryRef">
+    </waltz-dynamic-section-wrapper>
+
+
 </div>
 
