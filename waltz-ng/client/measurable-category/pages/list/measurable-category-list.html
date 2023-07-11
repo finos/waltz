@@ -69,10 +69,17 @@
 
                 <hr>
 
-                <waltz-data-extract-link name="Export"
+                <waltz-data-extract-link name="Export as Parent Child"
                                          uib-popover="Exports this taxonomy and the key people associated with it"
                                          popover-trigger="mouseenter"
                                          extract="measurable-category/{{$ctrl.category.id}}"
+                                         filename="{{$ctrl.category.name}}.csv">
+                </waltz-data-extract-link>
+
+                <waltz-data-extract-link name="Export as Flattened Hierarchy"
+                                         uib-popover="Exports this taxonomy with L1, L2, L3 etc"
+                                         popover-trigger="mouseenter"
+                                         extract="measurable-category/flat/{{$ctrl.category.id}}"
                                          filename="{{$ctrl.category.name}}.csv">
                 </waltz-data-extract-link>
 

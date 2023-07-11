@@ -303,10 +303,10 @@ export function determineExpandedNodes(hierarchy, maxDepth = 100) {
  * @param parentIdFn  optional accessor for getting the parent node id (defaults to n=>n.parentId)
  * @returns {*}  node at the top of the sliver, each node may have parent and children attributes populated
  */
-export function sliver(flatNodes,
-                       nodeId,
-                       idFn = n => n.id,
-                       parentIdFn = n => n.parentId) {
+export function directLineage(flatNodes,
+                              nodeId,
+                              idFn = n => n.id,
+                              parentIdFn = n => n.parentId) {
     const byId = _.keyBy(flatNodes, idFn);
     const byParentId = _.groupBy(flatNodes, parentIdFn);
 

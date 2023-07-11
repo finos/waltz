@@ -100,7 +100,7 @@
                 {#if editing && workingSetting?.name === setting?.name}
                     <input class="form-control"
                            id="value"
-                           maxlength="255"
+                           maxlength="4000"
                            placeholder="Value for this setting"
                            bind:value={workingSetting.value}/>
                     <div style="padding-top: 1em">

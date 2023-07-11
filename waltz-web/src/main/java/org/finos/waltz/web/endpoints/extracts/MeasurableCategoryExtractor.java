@@ -19,31 +19,43 @@
 package org.finos.waltz.web.endpoints.extracts;
 
 
+import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
-import org.finos.waltz.web.WebUtilities;
+import org.finos.waltz.schema.Tables;
+import org.finos.waltz.schema.tables.EntityHierarchy;
+import org.finos.waltz.schema.tables.Measurable;
 import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.SelectConditionStep;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jooq.SelectOnConditionStep;
+import org.jooq.SelectSeekStepN;
+import org.jooq.impl.DSL;
+import org.jooq.lambda.tuple.Tuple3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.schema.Tables.ENTITY_HIERARCHY;
 import static org.finos.waltz.schema.Tables.INVOLVEMENT;
 import static org.finos.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
 import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
 import static org.finos.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGORY;
 import static org.finos.waltz.schema.tables.Person.PERSON;
-import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.web.WebUtilities.getId;
+import static org.finos.waltz.web.WebUtilities.mkPath;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 import static spark.Spark.get;
 
 
 @Service
 public class MeasurableCategoryExtractor extends DirectQueryBasedDataExtractor {
-
-    private static final Logger LOG = LoggerFactory.getLogger(MeasurableCategoryExtractor.class);
 
 
     @Autowired
@@ -54,21 +66,92 @@ public class MeasurableCategoryExtractor extends DirectQueryBasedDataExtractor {
 
     @Override
     public void register() {
+        String flatPath = mkPath("data-extract", "measurable-category", "flat", ":id");
+        get(flatPath, (request, response) -> {
+            long categoryId = getId(request);
 
-        String path = WebUtilities.mkPath("data-extract", "measurable-category", ":id");
-        get(path, (request, response) -> {
-            long categoryId = WebUtilities.getId(request);
-            String categoryName = dsl
-                    .select(MEASURABLE_CATEGORY.NAME)
-                    .from(MEASURABLE_CATEGORY)
-                    .where(MEASURABLE_CATEGORY.ID.eq(categoryId))
-                    .fetchOne(MEASURABLE_CATEGORY.NAME);
+            EntityHierarchy eh = ENTITY_HIERARCHY.as("eh");
+            Measurable m = Tables.MEASURABLE.as("m");
+            Field<Integer> maxLevelField = DSL.max(eh.LEVEL).as("maxLevel");
+            Integer maxLevel = dsl
+                    .select(maxLevelField)
+                    .from(eh)
+                    .where(eh.KIND.eq(EntityKind.MEASURABLE.name()))
+                    .and(eh.ID.in(DSL
+                            .select(m.ID)
+                            .from(m)
+                            .where(m.MEASURABLE_CATEGORY_ID.eq(categoryId))
+                            .and(m.ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name()))))
+                    .fetchOne(maxLevelField);
 
-            checkNotNull(categoryName, "category cannot be null");
-            String suggestedFilename = categoryName
-                    .replace(".", "-")
-                    .replace(" ", "-")
-                    .replace(",", "-");
+            ArrayList<Tuple3<Integer, EntityHierarchy, Measurable>> ehAndMeasurableTablesForLevel = new ArrayList<>(maxLevel);
+
+            for (int i = 0; i < maxLevel; i++) {
+                ehAndMeasurableTablesForLevel.add(
+                        i,
+                        tuple(
+                            i + 1,
+                            ENTITY_HIERARCHY.as("eh" + i),
+                            Tables.MEASURABLE.as("l" + i)));
+            }
+
+            List<Tuple3<Field<String>, Field<String>, Field<Long>>> levelFields = ehAndMeasurableTablesForLevel
+                    .stream()
+                    .map(t -> tuple(
+                            _m(t).NAME.as("Level " + t.v1 + " Name"),
+                            _m(t).EXTERNAL_ID.as("Level " + t.v1 + " External Id"),
+                            _m(t).ID.as("Level " + t.v1 + " Waltz Id")))
+                    .collect(Collectors.toList());
+
+            List<Field<?>> selectionFields = levelFields
+                    .stream()
+                    .flatMap(t -> Stream.of(t.v1, t.v2, t.v3))
+                    .collect(Collectors.toList());
+
+            List<Field<String>> orderingFields = ListUtilities.map(levelFields, t -> t.v1);
+
+            Tuple3<Integer, EntityHierarchy, Measurable> l1 = ehAndMeasurableTablesForLevel.get(0);
+
+            SelectOnConditionStep<Record> workingQry = dsl
+                    .select(selectionFields)
+                    .from(_m(l1))
+                    .innerJoin(_eh(l1))
+                    .on(_eh(l1).ID.eq(_m(l1).ID)
+                            .and(_eh(l1).KIND.eq(EntityKind.MEASURABLE.name()))
+                            .and(_eh(l1).DESCENDANT_LEVEL.eq(_lvl(l1)))
+                            .and(_m(l1).MEASURABLE_CATEGORY_ID.eq(categoryId))
+                            .and(_m(l1).ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name())));
+
+            for (int i = 1; i < maxLevel; i++) {
+                Tuple3<Integer, EntityHierarchy, Measurable> curr = ehAndMeasurableTablesForLevel.get(i);
+                Tuple3<Integer, EntityHierarchy, Measurable> prev = ehAndMeasurableTablesForLevel.get(i - 1);
+                workingQry = workingQry
+                        .leftJoin(_eh(curr))
+                        .on(_eh(curr).ANCESTOR_ID.eq(_eh(prev).ID)
+                                .and(_eh(curr).KIND.eq(EntityKind.MEASURABLE.name())
+                                        .and(_eh(curr).DESCENDANT_LEVEL.eq(_lvl(curr)))))
+                        .leftJoin(_m(curr))
+                        .on(_m(curr).ID.eq(_eh(curr).ID)
+                                .and(_m(curr).ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name())));
+            }
+
+            SelectSeekStepN<Record> qry = workingQry
+                    .orderBy(orderingFields);
+
+            return writeExtract(
+                    mkSuggestedFilename(categoryId),
+                    qry,
+                    request,
+                    response);
+        });
+
+
+
+
+        String parentChildPath = mkPath("data-extract", "measurable-category", ":id");
+        get(parentChildPath, (request, response) -> {
+            long categoryId = getId(request);
+            String suggestedFilename = mkSuggestedFilename(categoryId);
 
             SelectConditionStep<Record> data = dsl
                     .select(
@@ -103,4 +186,31 @@ public class MeasurableCategoryExtractor extends DirectQueryBasedDataExtractor {
         });
     }
 
+    private String mkSuggestedFilename(long categoryId) {
+        String categoryName = dsl
+                .select(MEASURABLE_CATEGORY.NAME)
+                .from(MEASURABLE_CATEGORY)
+                .where(MEASURABLE_CATEGORY.ID.eq(categoryId))
+                .fetchOne(MEASURABLE_CATEGORY.NAME);
+
+        checkNotNull(categoryName, "category cannot be null");
+        String suggestedFilename = categoryName
+                .replace(".", "-")
+                .replace(" ", "-")
+                .replace(",", "-");
+        return suggestedFilename;
+    }
+
+
+    private static Measurable _m(Tuple3<Integer, EntityHierarchy, Measurable> l1) {
+        return l1.v3;
+    }
+
+    private static EntityHierarchy _eh(Tuple3<Integer, EntityHierarchy, Measurable> l1) {
+        return l1.v2;
+    }
+
+    private static Integer _lvl(Tuple3<Integer, EntityHierarchy, Measurable> l1) {
+        return l1.v1;
+    }
 }

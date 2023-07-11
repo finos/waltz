@@ -19,17 +19,17 @@
 package org.finos.waltz.web;
 
 import org.eclipse.jetty.http.HttpStatus;
-import org.finos.waltz.service.DIConfiguration;
-import org.finos.waltz.service.settings.SettingsService;
-import org.finos.waltz.web.endpoints.Endpoint;
-import org.finos.waltz.web.endpoints.api.StaticResourcesEndpoint;
-import org.finos.waltz.web.endpoints.extracts.DataExtractor;
 import org.finos.waltz.common.LoggingUtilities;
 import org.finos.waltz.common.exception.DuplicateKeyException;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.common.exception.NotFoundException;
 import org.finos.waltz.common.exception.UpdateFailedException;
+import org.finos.waltz.service.DIConfiguration;
+import org.finos.waltz.service.settings.SettingsService;
+import org.finos.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.web.endpoints.EndpointUtilities;
+import org.finos.waltz.web.endpoints.api.StaticResourcesEndpoint;
+import org.finos.waltz.web.endpoints.extracts.DataExtractor;
 import org.jooq.exception.DataAccessException;
 import org.jooq.exception.NoDataFoundException;
 import org.slf4j.Logger;
@@ -46,7 +46,11 @@ import java.util.TimeZone;
 import static java.lang.String.format;
 import static org.finos.waltz.web.WebUtilities.reportException;
 import static org.finos.waltz.common.DateTimeUtilities.UTC;
-import static spark.Spark.*;
+import static org.finos.waltz.web.WebUtilities.reportException;
+import static spark.Spark.after;
+import static spark.Spark.before;
+import static spark.Spark.options;
+import static spark.Spark.port;
 
 public class Main {
 
