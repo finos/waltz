@@ -18,21 +18,28 @@
 
 package org.finos.waltz.web.endpoints.extracts;
 
-import org.finos.waltz.schema.tables.ChangeLog;
 import org.finos.waltz.data.changelog.ChangeLogDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.schema.tables.ChangeLog;
 import org.finos.waltz.web.WebUtilities;
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Record4;
+import org.jooq.Select;
+import org.jooq.SelectConditionStep;
+import org.jooq.SelectJoinStep;
+import org.jooq.SelectQuery;
+import org.jooq.SelectSeekStep1;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 
+import static java.lang.String.format;
 import static org.finos.waltz.schema.Tables.CHANGE_LOG;
 import static org.finos.waltz.schema.Tables.PERSON;
-import static java.lang.String.format;
 import static spark.Spark.get;
 import static spark.Spark.post;
 

@@ -25,7 +25,12 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.application.Application;
 import org.finos.waltz.model.involvement.Involvement;
 import org.finos.waltz.service.DIConfiguration;
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.Result;
+import org.jooq.SelectConditionStep;
+import org.jooq.SelectOrderByStep;
 import org.jooq.impl.DSL;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 

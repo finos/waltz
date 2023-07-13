@@ -18,7 +18,6 @@
 
 package org.finos.waltz.data;
 
-import org.finos.waltz.schema.tables.records.ChangeLogRecord;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.model.EndOfLifeStatus;
@@ -29,19 +28,44 @@ import org.finos.waltz.model.tally.ImmutableOrderedTally;
 import org.finos.waltz.model.tally.ImmutableTally;
 import org.finos.waltz.model.tally.OrderedTally;
 import org.finos.waltz.model.tally.Tally;
-import org.jooq.*;
+import org.finos.waltz.schema.tables.records.ChangeLogRecord;
+import org.jooq.Batch;
+import org.jooq.CommonTableExpression;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.Record2;
+import org.jooq.Record3;
+import org.jooq.RecordMapper;
+import org.jooq.SQL;
+import org.jooq.SQLDialect;
+import org.jooq.Select;
+import org.jooq.SelectHavingStep;
+import org.jooq.Table;
+import org.jooq.TableField;
+import org.jooq.TableRecord;
+import org.jooq.UpdatableRecord;
 import org.jooq.impl.DSL;
 
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.StringJoiner;
 import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.counting;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDate;
 import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;

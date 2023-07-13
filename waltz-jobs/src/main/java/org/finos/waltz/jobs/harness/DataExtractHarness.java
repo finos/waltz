@@ -27,7 +27,12 @@ import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.schema.tables.Application;
 import org.finos.waltz.schema.tables.OrganisationalUnit;
 import org.finos.waltz.service.DIConfiguration;
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.Result;
+import org.jooq.Select;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -71,21 +76,21 @@ public class DataExtractHarness {
         OrganisationalUnit targetOrgUnit = ORGANISATIONAL_UNIT.as("targetOrgUnit");
 
         Result<Record> fetch = dsl.select(LOGICAL_FLOW.fields())
-                .select(SOURCE_NAME_FIELD, TARGET_NAME_FIELD)
-                .select(sourceApp.fields())
-                .select(targetApp.fields())
-                .select(sourceOrgUnit.fields())
-                .select(targetOrgUnit.fields())
-                .select(LOGICAL_FLOW_DECORATOR.fields())
-                .from(LOGICAL_FLOW)
-                .leftJoin(sourceApp).on(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(sourceApp.ID).and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
-                .leftJoin(targetApp).on(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(targetApp.ID).and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
-                .leftJoin(sourceOrgUnit).on(sourceApp.ORGANISATIONAL_UNIT_ID.eq(sourceOrgUnit.ID))
-                .leftJoin(targetOrgUnit).on(targetApp.ORGANISATIONAL_UNIT_ID.eq(targetOrgUnit.ID))
-                .join(LOGICAL_FLOW_DECORATOR).on(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID).and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq("DATA_TYPE")))
-                .where(LOGICAL_FLOW.ID.in(flowIdSelector))
-                .and(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name()))
-                .fetch();
+                                  .select(SOURCE_NAME_FIELD, TARGET_NAME_FIELD)
+                                  .select(sourceApp.fields())
+                                  .select(targetApp.fields())
+                                  .select(sourceOrgUnit.fields())
+                                  .select(targetOrgUnit.fields())
+                                  .select(LOGICAL_FLOW_DECORATOR.fields())
+                                  .from(LOGICAL_FLOW)
+                                  .leftJoin(sourceApp).on(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(sourceApp.ID).and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
+                                  .leftJoin(targetApp).on(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(targetApp.ID).and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
+                                  .leftJoin(sourceOrgUnit).on(sourceApp.ORGANISATIONAL_UNIT_ID.eq(sourceOrgUnit.ID))
+                                  .leftJoin(targetOrgUnit).on(targetApp.ORGANISATIONAL_UNIT_ID.eq(targetOrgUnit.ID))
+                                  .join(LOGICAL_FLOW_DECORATOR).on(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID).and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq("DATA_TYPE")))
+                                  .where(LOGICAL_FLOW.ID.in(flowIdSelector))
+                                  .and(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name()))
+                                  .fetch();
 
         System.out.printf("got records: %s", fetch.size());
 

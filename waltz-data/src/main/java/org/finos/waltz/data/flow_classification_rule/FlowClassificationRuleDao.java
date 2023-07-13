@@ -18,31 +18,52 @@
 
 package org.finos.waltz.data.flow_classification_rule;
 
-import org.finos.waltz.schema.tables.Application;
-import org.finos.waltz.schema.tables.EntityHierarchy;
-import org.finos.waltz.schema.tables.records.FlowClassificationRuleRecord;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.ImmutableEntityReference;
-import org.finos.waltz.model.flow_classification_rule.*;
+import org.finos.waltz.model.flow_classification_rule.DiscouragedSource;
+import org.finos.waltz.model.flow_classification_rule.FlowClassificationRule;
+import org.finos.waltz.model.flow_classification_rule.FlowClassificationRuleCreateCommand;
+import org.finos.waltz.model.flow_classification_rule.FlowClassificationRuleUpdateCommand;
+import org.finos.waltz.model.flow_classification_rule.FlowClassificationRuleVantagePoint;
+import org.finos.waltz.model.flow_classification_rule.ImmutableDiscouragedSource;
+import org.finos.waltz.model.flow_classification_rule.ImmutableFlowClassificationRule;
+import org.finos.waltz.model.flow_classification_rule.ImmutableFlowClassificationRuleVantagePoint;
 import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
-import org.jooq.*;
+import org.finos.waltz.schema.tables.Application;
+import org.finos.waltz.schema.tables.EntityHierarchy;
+import org.finos.waltz.schema.tables.records.FlowClassificationRuleRecord;
+import org.jooq.AggregateFunction;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.Record2;
+import org.jooq.Record3;
+import org.jooq.Record8;
+import org.jooq.RecordMapper;
+import org.jooq.Result;
+import org.jooq.Select;
+import org.jooq.SelectConditionStep;
+import org.jooq.SelectOnConditionStep;
+import org.jooq.SelectSeekStep2;
+import org.jooq.SelectSeekStep3;
+import org.jooq.SelectSeekStep4;
+import org.jooq.UpdateSetMoreStep;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static org.finos.waltz.schema.Tables.FLOW_CLASSIFICATION;
-import static org.finos.waltz.schema.Tables.FLOW_CLASSIFICATION_RULE;
-import static org.finos.waltz.schema.tables.Application.APPLICATION;
-import static org.finos.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
-import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
-import static org.finos.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
-import static org.finos.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static java.util.stream.Collectors.collectingAndThen;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkTrue;
@@ -54,6 +75,13 @@ import static org.finos.waltz.common.SetUtilities.union;
 import static org.finos.waltz.data.application.ApplicationDao.IS_ACTIVE;
 import static org.finos.waltz.model.EntityLifecycleStatus.REMOVED;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.schema.Tables.FLOW_CLASSIFICATION;
+import static org.finos.waltz.schema.Tables.FLOW_CLASSIFICATION_RULE;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
+import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static org.finos.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
+import static org.finos.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 
 
 @Repository

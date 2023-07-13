@@ -23,18 +23,23 @@ import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.web.WebUtilities;
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.Select;
+import org.jooq.SelectConditionStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
 
-import static org.finos.waltz.schema.Tables.*;
-import static org.finos.waltz.schema.tables.Application.APPLICATION;
-import static org.finos.waltz.web.WebUtilities.getEntityReference;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
+import static org.finos.waltz.schema.Tables.DATABASE_INFORMATION;
+import static org.finos.waltz.schema.Tables.DATABASE_USAGE;
+import static org.finos.waltz.schema.Tables.ORGANISATIONAL_UNIT;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static spark.Spark.get;
 
 

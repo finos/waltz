@@ -20,7 +20,15 @@ package org.finos.waltz.jobs.harness;
 
 import org.finos.waltz.common.Checks;
 import org.finos.waltz.service.DIConfiguration;
-import org.jooq.*;
+import org.jooq.CommonTableExpression;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.Record2;
+import org.jooq.SelectConditionStep;
+import org.jooq.SelectOnConditionStep;
+import org.jooq.Table;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import static org.finos.waltz.schema.tables.Application.APPLICATION;

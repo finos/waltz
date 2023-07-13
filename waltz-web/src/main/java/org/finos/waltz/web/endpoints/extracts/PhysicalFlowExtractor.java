@@ -18,37 +18,46 @@
 
 package org.finos.waltz.web.endpoints.extracts;
 
-import org.finos.waltz.model.enum_value.EnumValueKind;
-import org.finos.waltz.schema.tables.EnumValue;
-import org.finos.waltz.schema.tables.PhysicalFlow;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.data.physical_flow.PhysicalFlowIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.enum_value.EnumValueKind;
+import org.finos.waltz.schema.tables.EnumValue;
+import org.finos.waltz.schema.tables.PhysicalFlow;
 import org.finos.waltz.web.WebUtilities;
-import org.jooq.*;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.Result;
+import org.jooq.Select;
+import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.finos.waltz.schema.Tables.*;
-import static org.finos.waltz.schema.tables.Application.APPLICATION;
-import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
-import static org.finos.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.ListUtilities.isEmpty;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
 import static org.finos.waltz.data.logical_flow.LogicalFlowDao.SPEC_NOT_REMOVED;
 import static org.finos.waltz.data.physical_flow.PhysicalFlowDao.PHYSICAL_FLOW_NOT_REMOVED;
+import static org.finos.waltz.schema.Tables.ENUM_VALUE;
+import static org.finos.waltz.schema.Tables.PHYSICAL_FLOW;
+import static org.finos.waltz.schema.Tables.TAG;
+import static org.finos.waltz.schema.Tables.TAG_USAGE;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static org.finos.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 import static spark.Spark.post;
 
 

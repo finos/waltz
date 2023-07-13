@@ -18,7 +18,6 @@
 
 package org.finos.waltz.data.change_initiative;
 
-import org.finos.waltz.schema.tables.records.ChangeInitiativeRecord;
 import org.finos.waltz.data.FindEntityReferencesByIdSelector;
 import org.finos.waltz.data.JooqUtilities;
 import org.finos.waltz.model.EntityKind;
@@ -27,7 +26,14 @@ import org.finos.waltz.model.application.LifecyclePhase;
 import org.finos.waltz.model.change_initiative.ChangeInitiative;
 import org.finos.waltz.model.change_initiative.ChangeInitiativeKind;
 import org.finos.waltz.model.change_initiative.ImmutableChangeInitiative;
-import org.jooq.*;
+import org.finos.waltz.schema.tables.records.ChangeInitiativeRecord;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.RecordMapper;
+import org.jooq.Select;
+import org.jooq.SelectConditionStep;
+import org.jooq.SelectOrderByStep;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -35,10 +41,10 @@ import org.springframework.stereotype.Repository;
 import java.util.Collection;
 import java.util.List;
 
-import static org.finos.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
-import static org.finos.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static java.util.Optional.ofNullable;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
+import static org.finos.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 
 @Repository
 public class ChangeInitiativeDao implements FindEntityReferencesByIdSelector {

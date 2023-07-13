@@ -8,7 +8,14 @@ import org.finos.waltz.model.legal_entity.ImmutableLegalEntityRelationshipAssess
 import org.finos.waltz.model.legal_entity.LegalEntityRelationship;
 import org.finos.waltz.model.legal_entity.LegalEntityRelationshipAssessmentInfo;
 import org.finos.waltz.schema.tables.records.LegalEntityRelationshipRecord;
-import org.jooq.*;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.RecordMapper;
+import org.jooq.Select;
+import org.jooq.SelectConditionStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -28,7 +35,10 @@ import static org.finos.waltz.common.StringUtilities.notEmpty;
 import static org.finos.waltz.data.JooqUtilities.summarizeResults;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.assessment_definition.AssessmentVisibility.PRIMARY;
-import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.Tables.ASSESSMENT_DEFINITION;
+import static org.finos.waltz.schema.Tables.ASSESSMENT_RATING;
+import static org.finos.waltz.schema.Tables.LEGAL_ENTITY;
+import static org.finos.waltz.schema.Tables.LEGAL_ENTITY_RELATIONSHIP;
 
 @Repository
 public class LegalEntityRelationshipDao {

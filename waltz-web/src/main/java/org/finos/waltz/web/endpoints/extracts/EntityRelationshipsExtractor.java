@@ -3,7 +3,13 @@ package org.finos.waltz.web.endpoints.extracts;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.web.WebUtilities;
-import org.jooq.*;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Record3;
+import org.jooq.SelectOnConditionStep;
+import org.jooq.SelectSelectStep;
+import org.jooq.Table;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,12 +19,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.common.ListUtilities.asList;
+import static org.finos.waltz.common.ListUtilities.map;
+import static org.finos.waltz.schema.Tables.INVOLVEMENT;
+import static org.finos.waltz.schema.Tables.INVOLVEMENT_KIND;
+import static org.finos.waltz.schema.Tables.PERSON;
+import static org.finos.waltz.schema.Tables.RELATIONSHIP_KIND;
 import static org.finos.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
 import static org.finos.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
-import static org.finos.waltz.common.ListUtilities.asList;
-import static org.finos.waltz.common.ListUtilities.map;
 import static spark.Spark.get;
 
 @Service
@@ -45,8 +54,8 @@ public class EntityRelationshipsExtractor extends DirectQueryBasedDataExtractor{
 
             //returns all of kindA, with kindB if exists
             SelectOnConditionStep<Record> qry = prepareCiMeasurableQuery(dsl,
-                    involvementKindsIds,
-                    condition);
+                                                                         involvementKindsIds,
+                                                                         condition);
 
             return writeExtract(
                     "ci_measurable_relationships",
