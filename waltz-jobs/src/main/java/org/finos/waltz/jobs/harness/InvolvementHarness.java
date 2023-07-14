@@ -22,7 +22,11 @@ import org.finos.waltz.data.involvement.InvolvementDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.service.DIConfiguration;
 import org.finos.waltz.service.involvement.InvolvementService;
-import org.jooq.*;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Record1;
+import org.jooq.Result;
+import org.jooq.SelectConditionStep;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import javax.sql.DataSource;

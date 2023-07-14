@@ -21,11 +21,13 @@ package org.finos.waltz.web.endpoints.extracts;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.IdSelectionOptions;
-import org.finos.waltz.model.legal_entity.LegalEntityRelationshipView;
 import org.finos.waltz.service.legal_entity.LegalEntityRelationshipService;
 import org.finos.waltz.web.WebUtilities;
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Record9;
+import org.jooq.SelectSeekStep2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,8 +35,9 @@ import java.sql.Timestamp;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
-import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
-import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.Tables.LEGAL_ENTITY;
+import static org.finos.waltz.schema.Tables.LEGAL_ENTITY_RELATIONSHIP;
+import static org.finos.waltz.schema.Tables.LEGAL_ENTITY_RELATIONSHIP_KIND;
 import static spark.Spark.get;
 
 
