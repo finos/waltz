@@ -18,18 +18,21 @@
 
 package org.finos.waltz.web.endpoints.extracts;
 
-import org.finos.waltz.schema.tables.Application;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.schema.tables.Application;
 import org.finos.waltz.web.WebUtilities;
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.SelectSeekStep3;
+import org.jooq.SelectSelectStep;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static org.finos.waltz.schema.Tables.*;
-import static org.finos.waltz.web.WebUtilities.getEntityReference;
 import static java.lang.String.format;
+import static org.finos.waltz.schema.Tables.*;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 import static spark.Spark.get;
 

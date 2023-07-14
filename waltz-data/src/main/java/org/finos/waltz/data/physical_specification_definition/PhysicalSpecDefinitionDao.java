@@ -18,12 +18,16 @@
 
 package org.finos.waltz.data.physical_specification_definition;
 
-import org.finos.waltz.schema.tables.records.PhysicalSpecDefnRecord;
 import org.finos.waltz.model.ReleaseLifecycleStatus;
 import org.finos.waltz.model.physical_specification_definition.ImmutablePhysicalSpecDefinition;
 import org.finos.waltz.model.physical_specification_definition.PhysicalSpecDefinition;
 import org.finos.waltz.model.physical_specification_definition.PhysicalSpecDefinitionType;
-import org.jooq.*;
+import org.finos.waltz.schema.tables.records.PhysicalSpecDefnRecord;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.RecordMapper;
+import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -32,9 +36,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static org.finos.waltz.schema.tables.PhysicalSpecDefn.PHYSICAL_SPEC_DEFN;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
+import static org.finos.waltz.schema.tables.PhysicalSpecDefn.PHYSICAL_SPEC_DEFN;
 
 @Repository
 public class PhysicalSpecDefinitionDao {

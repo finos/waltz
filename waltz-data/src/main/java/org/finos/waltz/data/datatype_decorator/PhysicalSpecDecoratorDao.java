@@ -18,8 +18,6 @@
 
 package org.finos.waltz.data.datatype_decorator;
 
-import org.finos.waltz.schema.Tables;
-import org.finos.waltz.schema.tables.records.PhysicalSpecDataTypeRecord;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.EntityReference;
@@ -28,7 +26,16 @@ import org.finos.waltz.model.datatype.DataTypeUsageCharacteristics;
 import org.finos.waltz.model.datatype.ImmutableDataTypeDecorator;
 import org.finos.waltz.model.datatype.ImmutableDataTypeUsageCharacteristics;
 import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
-import org.jooq.*;
+import org.finos.waltz.schema.Tables;
+import org.finos.waltz.schema.tables.records.PhysicalSpecDataTypeRecord;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.Record7;
+import org.jooq.RecordMapper;
+import org.jooq.Select;
+import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -39,9 +46,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static org.finos.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
-import static org.finos.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
-import static org.finos.waltz.schema.tables.PhysicalSpecDataType.PHYSICAL_SPEC_DATA_TYPE;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -50,6 +54,9 @@ import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.model.EntityKind.DATA_TYPE;
 import static org.finos.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
+import static org.finos.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
+import static org.finos.waltz.schema.tables.PhysicalSpecDataType.PHYSICAL_SPEC_DATA_TYPE;
 
 @Repository
 public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {

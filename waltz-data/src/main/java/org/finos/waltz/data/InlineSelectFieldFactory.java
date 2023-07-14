@@ -20,7 +20,12 @@ package org.finos.waltz.data;
 
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
-import org.jooq.*;
+import org.jooq.CaseConditionStep;
+import org.jooq.Condition;
+import org.jooq.Field;
+import org.jooq.Record1;
+import org.jooq.Select;
+import org.jooq.Table;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;

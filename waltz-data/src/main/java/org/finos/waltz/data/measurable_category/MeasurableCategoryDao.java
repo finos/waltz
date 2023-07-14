@@ -19,12 +19,16 @@
 package org.finos.waltz.data.measurable_category;
 
 import org.finos.waltz.common.DateTimeUtilities;
-import org.finos.waltz.schema.tables.records.MeasurableCategoryRecord;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.measurable_category.ImmutableMeasurableCategory;
 import org.finos.waltz.model.measurable_category.MeasurableCategory;
-import org.jooq.*;
+import org.finos.waltz.schema.tables.records.MeasurableCategoryRecord;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.RecordMapper;
+import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -33,7 +37,9 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.Tables.ENTITY_HIERARCHY;
+import static org.finos.waltz.schema.Tables.MEASURABLE;
+import static org.finos.waltz.schema.Tables.ORGANISATIONAL_UNIT;
 import static org.finos.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGORY;
 
 

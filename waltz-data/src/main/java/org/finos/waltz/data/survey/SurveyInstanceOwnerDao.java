@@ -22,9 +22,18 @@ import org.finos.waltz.data.person.PersonDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.person.Person;
-import org.finos.waltz.model.survey.*;
+import org.finos.waltz.model.survey.ImmutableSurveyInstance;
+import org.finos.waltz.model.survey.ImmutableSurveyInstanceOwner;
+import org.finos.waltz.model.survey.SurveyInstanceOwner;
+import org.finos.waltz.model.survey.SurveyInstanceOwnerCreateCommand;
+import org.finos.waltz.model.survey.SurveyInstanceStatus;
 import org.finos.waltz.schema.tables.records.SurveyInstanceOwnerRecord;
-import org.jooq.*;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.RecordMapper;
+import org.jooq.Select;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -32,7 +41,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.Tables.PERSON;
+import static org.finos.waltz.schema.Tables.SURVEY_INSTANCE;
+import static org.finos.waltz.schema.Tables.SURVEY_INSTANCE_OWNER;
 
 @Repository
 public class SurveyInstanceOwnerDao {

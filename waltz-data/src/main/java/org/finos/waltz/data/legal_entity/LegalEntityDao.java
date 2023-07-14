@@ -4,7 +4,11 @@ import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.legal_entity.ImmutableLegalEntity;
 import org.finos.waltz.model.legal_entity.LegalEntity;
 import org.finos.waltz.schema.tables.records.LegalEntityRecord;
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.RecordMapper;
+import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 

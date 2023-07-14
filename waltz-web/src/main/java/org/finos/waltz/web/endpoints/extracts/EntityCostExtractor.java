@@ -18,25 +18,31 @@
 
 package org.finos.waltz.web.endpoints.extracts;
 
-import org.finos.waltz.service.settings.SettingsService;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.service.settings.SettingsService;
 import org.finos.waltz.web.WebUtilities;
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.SelectJoinStep;
+import org.jooq.SelectSeekStep1;
+import org.jooq.SelectSeekStep2;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static org.finos.waltz.schema.Tables.COST;
-import static org.finos.waltz.schema.Tables.COST_KIND;
 import static java.lang.String.format;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.schema.Tables.COST;
+import static org.finos.waltz.schema.Tables.COST_KIND;
 import static spark.Spark.get;
 import static spark.Spark.post;
 

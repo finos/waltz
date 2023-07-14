@@ -18,15 +18,25 @@
 
 package org.finos.waltz.data.attestation;
 
-import org.finos.waltz.data.involvement_group.InvolvementGroupDao;
-import org.finos.waltz.schema.tables.records.AttestationRunRecord;
 import org.finos.waltz.data.InlineSelectFieldFactory;
+import org.finos.waltz.data.involvement_group.InvolvementGroupDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.HierarchyQueryScope;
 import org.finos.waltz.model.IdSelectionOptions;
-import org.finos.waltz.model.attestation.*;
-import org.jooq.*;
+import org.finos.waltz.model.attestation.AttestationRun;
+import org.finos.waltz.model.attestation.AttestationRunCreateCommand;
+import org.finos.waltz.model.attestation.AttestationRunResponseSummary;
+import org.finos.waltz.model.attestation.AttestationStatus;
+import org.finos.waltz.model.attestation.ImmutableAttestationRun;
+import org.finos.waltz.model.attestation.ImmutableAttestationRunResponseSummary;
+import org.finos.waltz.schema.tables.records.AttestationRunRecord;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.RecordMapper;
+import org.jooq.Select;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -38,14 +48,14 @@ import java.util.Optional;
 import java.util.Set;
 
 import static java.util.Collections.emptyList;
-import static org.finos.waltz.schema.Tables.SURVEY_RUN;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
+import static org.finos.waltz.common.DateTimeUtilities.toLocalDate;
+import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
+import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.schema.tables.AttestationInstance.ATTESTATION_INSTANCE;
 import static org.finos.waltz.schema.tables.AttestationInstanceRecipient.ATTESTATION_INSTANCE_RECIPIENT;
 import static org.finos.waltz.schema.tables.AttestationRun.ATTESTATION_RUN;
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.DateTimeUtilities.*;
-import static org.finos.waltz.common.ListUtilities.newArrayList;
-import static org.finos.waltz.common.StringUtilities.join;
 
 @Repository
 public class AttestationRunDao {

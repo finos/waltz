@@ -18,14 +18,19 @@
 
 package org.finos.waltz.data.scenario;
 
-import org.finos.waltz.schema.tables.records.ScenarioRatingItemRecord;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.scenario.ChangeScenarioCommand;
 import org.finos.waltz.model.scenario.CloneScenarioCommand;
 import org.finos.waltz.model.scenario.ImmutableScenarioRatingItem;
 import org.finos.waltz.model.scenario.ScenarioRatingItem;
-import org.jooq.*;
+import org.finos.waltz.schema.tables.records.ScenarioRatingItemRecord;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Record11;
+import org.jooq.RecordMapper;
+import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -33,10 +38,10 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.util.Collection;
 
-import static org.finos.waltz.schema.tables.Scenario.SCENARIO;
-import static org.finos.waltz.schema.tables.ScenarioRatingItem.SCENARIO_RATING_ITEM;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.data.JooqUtilities.readRef;
+import static org.finos.waltz.schema.tables.Scenario.SCENARIO;
+import static org.finos.waltz.schema.tables.ScenarioRatingItem.SCENARIO_RATING_ITEM;
 
 @Repository
 public class ScenarioRatingItemDao {

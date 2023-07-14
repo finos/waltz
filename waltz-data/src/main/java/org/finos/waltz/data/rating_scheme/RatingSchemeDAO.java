@@ -20,16 +20,31 @@ package org.finos.waltz.data.rating_scheme;
 
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.rating.*;
+import org.finos.waltz.model.rating.ImmutableRatingScheme;
+import org.finos.waltz.model.rating.ImmutableRatingSchemeItem;
+import org.finos.waltz.model.rating.ImmutableRatingSchemeItemUsageCount;
+import org.finos.waltz.model.rating.RatingScheme;
+import org.finos.waltz.model.rating.RatingSchemeItem;
+import org.finos.waltz.model.rating.RatingSchemeItemUsageCount;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.records.RatingSchemeItemRecord;
 import org.finos.waltz.schema.tables.records.RatingSchemeRecord;
-import org.jooq.*;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Record4;
+import org.jooq.RecordMapper;
+import org.jooq.SelectHavingStep;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;

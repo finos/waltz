@@ -18,15 +18,24 @@
 
 package org.finos.waltz.data.tag;
 
-import org.finos.waltz.schema.tables.records.TagRecord;
-import org.finos.waltz.schema.tables.records.TagUsageRecord;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.tag.ImmutableTag;
 import org.finos.waltz.model.tag.ImmutableTagUsage;
 import org.finos.waltz.model.tag.Tag;
 import org.finos.waltz.model.tag.TagUsage;
-import org.jooq.*;
+import org.finos.waltz.schema.tables.records.TagRecord;
+import org.finos.waltz.schema.tables.records.TagUsageRecord;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.Record2;
+import org.jooq.RecordMapper;
+import org.jooq.Select;
+import org.jooq.SelectConditionStep;
+import org.jooq.SelectJoinStep;
+import org.jooq.Table;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -35,10 +44,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.mapping;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.schema.tables.Tag.TAG;
 import static org.finos.waltz.schema.tables.TagUsage.TAG_USAGE;
-import static java.util.stream.Collectors.*;
-import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 
