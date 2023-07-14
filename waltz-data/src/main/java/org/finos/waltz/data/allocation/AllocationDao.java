@@ -18,7 +18,6 @@
 
 package org.finos.waltz.data.allocation;
 
-import org.finos.waltz.schema.tables.records.AllocationRecord;
 import org.finos.waltz.common.CollectionUtilities;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.ListUtilities;
@@ -27,7 +26,12 @@ import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.allocation.Allocation;
 import org.finos.waltz.model.allocation.ImmutableAllocation;
 import org.finos.waltz.model.allocation.MeasurablePercentageChange;
-import org.jooq.*;
+import org.finos.waltz.schema.tables.records.AllocationRecord;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Record3;
+import org.jooq.RecordMapper;
+import org.jooq.SelectConditionStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -36,9 +40,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.finos.waltz.schema.Tables.ALLOCATION;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.data.JooqUtilities.readRef;
+import static org.finos.waltz.schema.Tables.ALLOCATION;
 
 @Repository
 public class AllocationDao {

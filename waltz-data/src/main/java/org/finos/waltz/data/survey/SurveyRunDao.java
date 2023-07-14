@@ -24,9 +24,17 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.HierarchyQueryScope;
 import org.finos.waltz.model.IdSelectionOptions;
-import org.finos.waltz.model.survey.*;
+import org.finos.waltz.model.survey.ImmutableSurveyRun;
+import org.finos.waltz.model.survey.SurveyIssuanceKind;
+import org.finos.waltz.model.survey.SurveyRun;
+import org.finos.waltz.model.survey.SurveyRunChangeCommand;
+import org.finos.waltz.model.survey.SurveyRunCreateCommand;
+import org.finos.waltz.model.survey.SurveyRunStatus;
 import org.finos.waltz.schema.tables.records.SurveyRunRecord;
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -41,7 +49,10 @@ import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDate;
 import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
 import static org.finos.waltz.common.SetUtilities.fromCollection;
-import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.Tables.INVOLVEMENT_GROUP_ENTRY;
+import static org.finos.waltz.schema.Tables.SURVEY_INSTANCE;
+import static org.finos.waltz.schema.Tables.SURVEY_INSTANCE_RECIPIENT;
+import static org.finos.waltz.schema.Tables.SURVEY_RUN;
 
 @Repository
 public class SurveyRunDao {

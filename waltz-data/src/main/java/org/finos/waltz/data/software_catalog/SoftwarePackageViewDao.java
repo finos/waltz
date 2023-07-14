@@ -18,13 +18,19 @@
 
 package org.finos.waltz.data.software_catalog;
 
-import org.finos.waltz.schema.tables.records.SoftwarePackageRecord;
 import org.finos.waltz.data.JooqUtilities;
 import org.finos.waltz.model.UserTimestamp;
 import org.finos.waltz.model.software_catalog.ImmutableSoftwarePackageView;
 import org.finos.waltz.model.software_catalog.SoftwarePackageView;
 import org.finos.waltz.model.tally.Tally;
-import org.jooq.*;
+import org.finos.waltz.schema.tables.records.SoftwarePackageRecord;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.RecordMapper;
+import org.jooq.Select;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

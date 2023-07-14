@@ -18,14 +18,19 @@
 
 package org.finos.waltz.data.change_set;
 
-import org.finos.waltz.schema.tables.records.ChangeSetRecord;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.change_set.ChangeSet;
 import org.finos.waltz.model.change_set.ImmutableChangeSet;
-import org.jooq.*;
+import org.finos.waltz.schema.tables.records.ChangeSetRecord;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.RecordMapper;
+import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -35,11 +40,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static org.finos.waltz.schema.Tables.CHANGE_SET;
-import static org.finos.waltz.schema.Tables.INVOLVEMENT;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.schema.Tables.CHANGE_SET;
+import static org.finos.waltz.schema.Tables.INVOLVEMENT;
 
 
 @Repository

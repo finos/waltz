@@ -3,30 +3,26 @@ package org.finos.waltz.data.aggregate_overlay_diagram;
 
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.InlineSelectFieldFactory;
-import org.finos.waltz.data.JooqUtilities;
-import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.aggregate_overlay_diagram.*;
+import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramInstance;
+import org.finos.waltz.model.aggregate_overlay_diagram.ImmutableAggregateOverlayDiagramInstance;
+import org.finos.waltz.model.aggregate_overlay_diagram.OverlayDiagramInstanceCreateCommand;
 import org.finos.waltz.schema.tables.records.AggregateOverlayDiagramInstanceRecord;
-import org.finos.waltz.schema.tables.records.AggregateOverlayDiagramRecord;
-import org.jooq.*;
-import org.jooq.impl.DSL;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.RecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.Map;
 import java.util.Set;
 
-import static java.util.stream.Collectors.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
-import static org.finos.waltz.data.JooqUtilities.readRef;
 import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
-import static org.finos.waltz.schema.Tables.*;
-import static org.jooq.lambda.tuple.Tuple.tuple;
+import static org.finos.waltz.schema.Tables.AGGREGATE_OVERLAY_DIAGRAM_INSTANCE;
 
 @Repository
 public class AggregateOverlayDiagramInstanceDao {

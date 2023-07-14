@@ -18,9 +18,18 @@
 
 package org.finos.waltz.data.entity_statistic;
 
+import org.finos.waltz.model.entity_statistic.EntityStatisticDefinition;
+import org.finos.waltz.model.entity_statistic.ImmutableEntityStatisticDefinition;
+import org.finos.waltz.model.entity_statistic.RollupKind;
+import org.finos.waltz.model.entity_statistic.StatisticCategory;
+import org.finos.waltz.model.entity_statistic.StatisticType;
 import org.finos.waltz.schema.tables.records.EntityStatisticDefinitionRecord;
-import org.finos.waltz.model.entity_statistic.*;
-import org.jooq.*;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.RecordMapper;
+import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -29,8 +38,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static org.finos.waltz.schema.tables.EntityStatisticDefinition.ENTITY_STATISTIC_DEFINITION;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.schema.tables.EntityStatisticDefinition.ENTITY_STATISTIC_DEFINITION;
 
 @Repository
 public class EntityStatisticDefinitionDao {

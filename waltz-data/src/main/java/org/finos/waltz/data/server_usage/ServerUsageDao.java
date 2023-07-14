@@ -18,12 +18,17 @@
 
 package org.finos.waltz.data.server_usage;
 
-import org.finos.waltz.schema.tables.records.ServerUsageRecord;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.server_usage.ImmutableServerUsage;
 import org.finos.waltz.model.server_usage.ServerUsage;
-import org.jooq.*;
+import org.finos.waltz.schema.tables.records.ServerUsageRecord;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.RecordMapper;
+import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -31,10 +36,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
-import static org.finos.waltz.schema.tables.ServerUsage.SERVER_USAGE;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 import static org.finos.waltz.common.EnumUtilities.readEnum;
+import static org.finos.waltz.schema.tables.ServerUsage.SERVER_USAGE;
 
 
 @Repository

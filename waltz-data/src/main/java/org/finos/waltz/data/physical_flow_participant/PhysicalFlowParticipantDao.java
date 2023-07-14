@@ -18,7 +18,6 @@
 
 package org.finos.waltz.data.physical_flow_participant;
 
-import org.finos.waltz.schema.tables.records.PhysicalFlowParticipantRecord;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
@@ -27,7 +26,12 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.physical_flow_participant.ImmutablePhysicalFlowParticipant;
 import org.finos.waltz.model.physical_flow_participant.ParticipationKind;
 import org.finos.waltz.model.physical_flow_participant.PhysicalFlowParticipant;
-import org.jooq.*;
+import org.finos.waltz.schema.tables.records.PhysicalFlowParticipantRecord;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.RecordMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +39,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 
-import static org.finos.waltz.schema.tables.PhysicalFlowParticipant.PHYSICAL_FLOW_PARTICIPANT;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.schema.tables.PhysicalFlowParticipant.PHYSICAL_FLOW_PARTICIPANT;
 
 @Repository
 public class PhysicalFlowParticipantDao {

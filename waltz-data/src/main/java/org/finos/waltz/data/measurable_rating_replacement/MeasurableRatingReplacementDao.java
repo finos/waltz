@@ -18,7 +18,6 @@
 
 package org.finos.waltz.data.measurable_rating_replacement;
 
-import org.finos.waltz.schema.tables.records.MeasurableRatingReplacementRecord;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.data.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommissionDao;
 import org.finos.waltz.model.EntityKind;
@@ -26,7 +25,12 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.measurable_rating_replacement.ImmutableMeasurableRatingReplacement;
 import org.finos.waltz.model.measurable_rating_replacement.MeasurableRatingReplacement;
-import org.jooq.*;
+import org.finos.waltz.schema.tables.records.MeasurableRatingReplacementRecord;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.RecordMapper;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,17 +39,18 @@ import org.springframework.stereotype.Repository;
 import java.util.Date;
 import java.util.Set;
 
-import static java.util.Collections.emptySet;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
+import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
+import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
+import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.common.SetUtilities.union;
 import static org.finos.waltz.common.StringUtilities.notEmpty;
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.schema.Tables.MEASURABLE_CATEGORY;
 import static org.finos.waltz.schema.Tables.USER_ROLE;
 import static org.finos.waltz.schema.tables.MeasurableRatingPlannedDecommission.MEASURABLE_RATING_PLANNED_DECOMMISSION;
 import static org.finos.waltz.schema.tables.MeasurableRatingReplacement.MEASURABLE_RATING_REPLACEMENT;
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.DateTimeUtilities.*;
-import static org.finos.waltz.common.SetUtilities.asSet;
-import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository
@@ -68,7 +73,7 @@ public class MeasurableRatingReplacementDao {
             asSet(EntityKind.APPLICATION));
 
 
-    public static final RecordMapper<? super Record, MeasurableRatingReplacement> TO_DOMAIN_MAPPER =  record -> {
+    public static final RecordMapper<? super Record, MeasurableRatingReplacement> TO_DOMAIN_MAPPER = record -> {
 
         MeasurableRatingReplacementRecord r = record.into(MEASURABLE_RATING_REPLACEMENT);
 

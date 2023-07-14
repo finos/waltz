@@ -23,7 +23,11 @@ import org.finos.waltz.model.FieldDataType;
 import org.finos.waltz.model.logical_data_element.ImmutableLogicalDataElement;
 import org.finos.waltz.model.logical_data_element.LogicalDataElement;
 import org.finos.waltz.schema.tables.records.LogicalDataElementRecord;
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.RecordMapper;
+import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 

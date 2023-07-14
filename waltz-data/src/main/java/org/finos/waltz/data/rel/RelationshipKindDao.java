@@ -18,13 +18,18 @@
 
 package org.finos.waltz.data.rel;
 
-import org.finos.waltz.schema.tables.records.RelationshipKindRecord;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.rel.ImmutableRelationshipKind;
 import org.finos.waltz.model.rel.RelationshipKind;
 import org.finos.waltz.model.rel.UpdateRelationshipKindCommand;
-import org.jooq.*;
+import org.finos.waltz.schema.tables.records.RelationshipKindRecord;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.RecordMapper;
+import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
