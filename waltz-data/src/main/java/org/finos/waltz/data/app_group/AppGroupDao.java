@@ -18,7 +18,6 @@
 
 package org.finos.waltz.data.app_group;
 
-import org.finos.waltz.schema.tables.records.ApplicationGroupRecord;
 import org.finos.waltz.data.SearchDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -27,7 +26,15 @@ import org.finos.waltz.model.app_group.AppGroupKind;
 import org.finos.waltz.model.app_group.AppGroupMemberRole;
 import org.finos.waltz.model.app_group.ImmutableAppGroup;
 import org.finos.waltz.model.entity_search.EntitySearchOptions;
-import org.jooq.*;
+import org.finos.waltz.schema.tables.records.ApplicationGroupRecord;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.RecordMapper;
+import org.jooq.Select;
+import org.jooq.SelectConditionStep;
+import org.jooq.SelectOrderByStep;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -38,13 +45,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.finos.waltz.common.StringUtilities.mkSafe;
+import static org.finos.waltz.data.JooqUtilities.mkBasicTermSearch;
+import static org.finos.waltz.data.SearchUtilities.mkTerms;
 import static org.finos.waltz.schema.Tables.*;
 import static org.finos.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
 import static org.finos.waltz.schema.tables.ApplicationGroupMember.APPLICATION_GROUP_MEMBER;
 import static org.finos.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
-import static org.finos.waltz.common.StringUtilities.mkSafe;
-import static org.finos.waltz.data.JooqUtilities.mkBasicTermSearch;
-import static org.finos.waltz.data.SearchUtilities.mkTerms;
 
 @Repository
 public class AppGroupDao implements SearchDao<AppGroup> {

@@ -8,7 +8,12 @@ import org.finos.waltz.model.aggregate_overlay_diagram.overlay.ImmutableAttestat
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.ImmutableAttestationWidgetDatum;
 import org.finos.waltz.schema.tables.AttestationInstance;
 import org.finos.waltz.schema.tables.AttestationRun;
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.Record5;
+import org.jooq.Select;
+import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;

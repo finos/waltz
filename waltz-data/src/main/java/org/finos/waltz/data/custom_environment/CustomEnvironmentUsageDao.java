@@ -162,14 +162,12 @@ public class CustomEnvironmentUsageDao {
 
     public Set<CustomEnvironmentUsageInfo> findUsageInfoByOwningRef(EntityReference ref){
 
-        Set<CustomEnvironmentUsageInfo> customEnvironmentUsages = fetchUsageInfoQuery()
+        return fetchUsageInfoQuery()
                 .where(CUSTOM_ENVIRONMENT.OWNING_ENTITY_ID.eq(ref.id())
                         .and(CUSTOM_ENVIRONMENT.OWNING_ENTITY_KIND.eq(ref.kind().name())))
                 .and(DATABASE_INFORMATION.ID.isNotNull()
                         .or(SERVER_INFORMATION.ID.isNotNull()))
                 .fetchSet(TO_USAGE_INFO_MAPPER);
-
-        return customEnvironmentUsages;
     }
 
 

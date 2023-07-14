@@ -18,7 +18,6 @@
 
 package org.finos.waltz.data.roadmap;
 
-import org.finos.waltz.schema.tables.records.RoadmapRecord;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.scenario.ScenarioDao;
 import org.finos.waltz.model.EntityKind;
@@ -30,21 +29,29 @@ import org.finos.waltz.model.roadmap.ImmutableRoadmapAndScenarioOverview;
 import org.finos.waltz.model.roadmap.Roadmap;
 import org.finos.waltz.model.roadmap.RoadmapAndScenarioOverview;
 import org.finos.waltz.model.scenario.Scenario;
-import org.jooq.*;
+import org.finos.waltz.schema.tables.records.RoadmapRecord;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.RecordMapper;
+import org.jooq.Select;
+import org.jooq.SelectConditionStep;
+import org.jooq.SelectJoinStep;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.Comparator;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.finos.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
-import static org.finos.waltz.schema.tables.Roadmap.ROADMAP;
-import static org.finos.waltz.schema.tables.Scenario.SCENARIO;
-import static org.finos.waltz.schema.tables.ScenarioRatingItem.SCENARIO_RATING_ITEM;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
@@ -54,6 +61,10 @@ import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.common.StreamUtilities.concat;
 import static org.finos.waltz.data.InlineSelectFieldFactory.mkNameField;
 import static org.finos.waltz.data.JooqUtilities.readRef;
+import static org.finos.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
+import static org.finos.waltz.schema.tables.Roadmap.ROADMAP;
+import static org.finos.waltz.schema.tables.Scenario.SCENARIO;
+import static org.finos.waltz.schema.tables.ScenarioRatingItem.SCENARIO_RATING_ITEM;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository

@@ -18,24 +18,30 @@
 
 package org.finos.waltz.data.orgunit;
 
-import org.finos.waltz.schema.tables.records.OrganisationalUnitRecord;
 import org.finos.waltz.data.FindEntityReferencesByIdSelector;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.orgunit.ImmutableOrganisationalUnit;
 import org.finos.waltz.model.orgunit.OrganisationalUnit;
-import org.jooq.*;
+import org.finos.waltz.schema.tables.records.OrganisationalUnitRecord;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.RecordMapper;
+import org.jooq.Select;
+import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static org.finos.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
-import static org.finos.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static java.util.Optional.ofNullable;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
+import static org.finos.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
+import static org.finos.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 
 
 @Repository

@@ -1,21 +1,33 @@
 package org.finos.waltz.data.attestation;
 
 
-import org.finos.waltz.schema.tables.DataType;
-import org.finos.waltz.schema.tables.*;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.attestation.ImmutableLogicalFlowAttestationPreChecks;
 import org.finos.waltz.model.attestation.LogicalFlowAttestationPreChecks;
-import org.jooq.*;
+import org.finos.waltz.schema.tables.ApplicationGroup;
+import org.finos.waltz.schema.tables.ApplicationGroupEntry;
+import org.finos.waltz.schema.tables.DataType;
+import org.finos.waltz.schema.tables.LogicalFlow;
+import org.finos.waltz.schema.tables.LogicalFlowDecorator;
+import org.jooq.CommonTableExpression;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.Record2;
+import org.jooq.SelectOrderByStep;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import static org.finos.waltz.schema.Tables.*;
-import static org.finos.waltz.schema.tables.DataType.DATA_TYPE;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.schema.Tables.APPLICATION_GROUP;
+import static org.finos.waltz.schema.Tables.APPLICATION_GROUP_ENTRY;
+import static org.finos.waltz.schema.Tables.LOGICAL_FLOW;
+import static org.finos.waltz.schema.Tables.LOGICAL_FLOW_DECORATOR;
+import static org.finos.waltz.schema.tables.DataType.DATA_TYPE;
 
 @Repository
 public class AttestationPreCheckDao {

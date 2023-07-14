@@ -24,7 +24,14 @@ import org.finos.waltz.data.data_type.DataTypeIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.web.WebUtilities;
-import org.jooq.*;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.Result;
+import org.jooq.Select;
+import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple3;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,15 +42,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.finos.waltz.schema.Tables.*;
-import static org.finos.waltz.schema.tables.Application.APPLICATION;
-import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
-import static org.finos.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.ListUtilities.isEmpty;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.data.InlineSelectFieldFactory.mkNameField;
 import static org.finos.waltz.model.EntityLifecycleStatus.REMOVED;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static org.finos.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static spark.Spark.post;
 
 

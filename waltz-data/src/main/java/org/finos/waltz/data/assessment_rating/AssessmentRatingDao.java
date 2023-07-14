@@ -23,13 +23,37 @@ import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.InlineSelectFieldFactory;
-import org.finos.waltz.model.*;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.ImmutableEntityReference;
+import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.assessment_rating.AssessmentRating;
-import org.finos.waltz.model.assessment_rating.*;
+import org.finos.waltz.model.assessment_rating.AssessmentRatingOperations;
+import org.finos.waltz.model.assessment_rating.AssessmentRatingSummaryCounts;
+import org.finos.waltz.model.assessment_rating.ImmutableAssessmentRating;
+import org.finos.waltz.model.assessment_rating.ImmutableAssessmentRatingOperations;
+import org.finos.waltz.model.assessment_rating.ImmutableAssessmentRatingSummaryCounts;
+import org.finos.waltz.model.assessment_rating.ImmutableRatingEntityList;
+import org.finos.waltz.model.assessment_rating.RemoveAssessmentRatingCommand;
+import org.finos.waltz.model.assessment_rating.SaveAssessmentRatingCommand;
+import org.finos.waltz.model.assessment_rating.UpdateRatingCommand;
 import org.finos.waltz.model.tally.ImmutableTally;
-import org.finos.waltz.schema.tables.*;
+import org.finos.waltz.schema.tables.AssessmentDefinition;
+import org.finos.waltz.schema.tables.RatingSchemeItem;
 import org.finos.waltz.schema.tables.records.AssessmentRatingRecord;
-import org.jooq.*;
+import org.jooq.AggregateFunction;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.DeleteConditionStep;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Record5;
+import org.jooq.RecordMapper;
+import org.jooq.RecordUnmapper;
+import org.jooq.Result;
+import org.jooq.SelectConditionStep;
+import org.jooq.UpdateConditionStep;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple5;
@@ -37,7 +61,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
 import static java.util.Collections.emptySet;
@@ -49,9 +77,12 @@ import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.SetUtilities.*;
-import static org.finos.waltz.common.StringUtilities.*;
+import static org.finos.waltz.common.StringUtilities.mkSafe;
+import static org.finos.waltz.common.StringUtilities.notEmpty;
+import static org.finos.waltz.common.StringUtilities.sanitizeCharacters;
 import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.Tables.RATING_SCHEME_ITEM;
+import static org.finos.waltz.schema.Tables.USER_ROLE;
 import static org.finos.waltz.schema.tables.AssessmentDefinition.ASSESSMENT_DEFINITION;
 import static org.finos.waltz.schema.tables.AssessmentRating.ASSESSMENT_RATING;
 import static org.jooq.lambda.tuple.Tuple.tuple;
@@ -61,14 +92,9 @@ public class AssessmentRatingDao {
 
     private static final org.finos.waltz.schema.tables.AssessmentRating ar = ASSESSMENT_RATING;
     private static final AssessmentDefinition ad = ASSESSMENT_DEFINITION;
-    private static final Person p = PERSON;
-    private static final PermissionGroupInvolvement pgi = PERMISSION_GROUP_INVOLVEMENT;
-    private static final Involvement inv = INVOLVEMENT;
-    private static final InvolvementGroupEntry ige = INVOLVEMENT_GROUP_ENTRY;
-    private static final UserRole ur = USER_ROLE;
     private static final RatingSchemeItem rsi = RATING_SCHEME_ITEM;
 
-    private static boolean DEFAULT_RATING_READ_ONLY_VALUE = false;
+    private static final boolean DEFAULT_RATING_READ_ONLY_VALUE = false;
 
     private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             ar.ENTITY_ID,

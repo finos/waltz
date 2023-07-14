@@ -18,14 +18,26 @@
 
 package org.finos.waltz.data.changelog;
 
-import org.finos.waltz.model.*;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.ImmutableEntityReference;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.Severity;
 import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.tally.OrderedTally;
 import org.finos.waltz.model.tally.Tally;
 import org.finos.waltz.schema.tables.AttestationInstance;
 import org.finos.waltz.schema.tables.records.ChangeLogRecord;
-import org.jooq.*;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Query;
+import org.jooq.Record;
+import org.jooq.Record4;
+import org.jooq.RecordMapper;
+import org.jooq.SelectConditionStep;
+import org.jooq.SelectOrderByStep;
+import org.jooq.Table;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -40,7 +52,6 @@ import java.util.Optional;
 import static org.finos.waltz.common.Checks.checkNotEmpty;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
-import static org.finos.waltz.common.ObjectUtilities.firstNotNull;
 import static org.finos.waltz.data.JooqUtilities.*;
 import static org.finos.waltz.schema.Tables.PERSON;
 import static org.finos.waltz.schema.tables.ChangeLog.CHANGE_LOG;
@@ -295,13 +306,14 @@ public class ChangeLogDao {
     public int write(ChangeLog changeLog) {
         checkNotNull(changeLog, "changeLog must not be null");
 
-        return dsl.insertInto(CHANGE_LOG)
+        return dsl
+                .insertInto(CHANGE_LOG)
                 .set(CHANGE_LOG.MESSAGE, changeLog.message())
                 .set(CHANGE_LOG.PARENT_ID, changeLog.parentReference().id())
                 .set(CHANGE_LOG.PARENT_KIND, changeLog.parentReference().kind().name())
                 .set(CHANGE_LOG.USER_ID, changeLog.userId())
                 .set(CHANGE_LOG.SEVERITY, changeLog.severity().name())
-                .set(CHANGE_LOG.CHILD_KIND, changeLog.childKind().map(ck -> ck.name()).orElse(null))
+                .set(CHANGE_LOG.CHILD_KIND, changeLog.childKind().map(Enum::name).orElse(null))
                 .set(CHANGE_LOG.OPERATION, changeLog.operation().name())
                 .set(CHANGE_LOG.CREATED_AT, Timestamp.valueOf(changeLog.createdAt()))
                 .execute();
@@ -319,7 +331,7 @@ public class ChangeLogDao {
                         .set(CHANGE_LOG.PARENT_KIND, changeLog.parentReference().kind().name())
                         .set(CHANGE_LOG.USER_ID, changeLog.userId())
                         .set(CHANGE_LOG.SEVERITY, changeLog.severity().name())
-                        .set(CHANGE_LOG.CHILD_KIND, changeLog.childKind().map(ck -> ck.name()).orElse(null))
+                        .set(CHANGE_LOG.CHILD_KIND, changeLog.childKind().map(Enum::name).orElse(null))
                         .set(CHANGE_LOG.OPERATION, changeLog.operation().name())
                         .set(CHANGE_LOG.CREATED_AT, Timestamp.valueOf(changeLog.createdAt())))
                 .toArray(Query[]::new);

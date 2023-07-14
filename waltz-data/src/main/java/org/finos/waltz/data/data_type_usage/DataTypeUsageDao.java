@@ -18,7 +18,6 @@
 
 package org.finos.waltz.data.data_type_usage;
 
-import org.finos.waltz.schema.tables.records.DataTypeUsageRecord;
 import org.finos.waltz.common.MapUtilities;
 import org.finos.waltz.data.JooqUtilities;
 import org.finos.waltz.model.EntityKind;
@@ -31,7 +30,21 @@ import org.finos.waltz.model.tally.Tally;
 import org.finos.waltz.model.usage_info.ImmutableUsageInfo;
 import org.finos.waltz.model.usage_info.UsageInfo;
 import org.finos.waltz.model.usage_info.UsageKind;
-import org.jooq.*;
+import org.finos.waltz.schema.tables.records.DataTypeUsageRecord;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.Record3;
+import org.jooq.Record7;
+import org.jooq.RecordMapper;
+import org.jooq.Result;
+import org.jooq.Select;
+import org.jooq.SelectConditionStep;
+import org.jooq.SelectOrderByStep;
+import org.jooq.Table;
+import org.jooq.TableField;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -43,17 +56,17 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.StringUtilities.limit;
+import static org.finos.waltz.data.application.ApplicationDao.IS_ACTIVE;
+import static org.finos.waltz.model.EntityLifecycleStatus.REMOVED;
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.schema.tables.Actor.ACTOR;
 import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static org.finos.waltz.schema.tables.DataType.DATA_TYPE;
 import static org.finos.waltz.schema.tables.DataTypeUsage.DATA_TYPE_USAGE;
 import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static org.finos.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.StringUtilities.limit;
-import static org.finos.waltz.data.application.ApplicationDao.IS_ACTIVE;
-import static org.finos.waltz.model.EntityLifecycleStatus.REMOVED;
-import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.jooq.impl.DSL.*;
 
 @Repository
@@ -345,7 +358,8 @@ public class DataTypeUsageDao {
         SelectOrderByStep<Record3<String, Long, Long>> refsWithActiveFlowDataTypes = logicalSourcesWithDataTypes
                 .union(logicalTargetsWithDataTypes);
 
-        SelectConditionStep<Record> dataTypeUsagesThatNeedDeleting = tx.select(DATA_TYPE_USAGE.fields())
+        SelectConditionStep<Record> dataTypeUsagesThatNeedDeleting = tx
+                .select(DATA_TYPE_USAGE.fields())
                 .from(DATA_TYPE_USAGE)
                 .leftOuterJoin(refsWithActiveFlowDataTypes)
                 .on(DATA_TYPE_USAGE.ENTITY_KIND.eq(refsWithActiveFlowDataTypes.field(entityKind)))

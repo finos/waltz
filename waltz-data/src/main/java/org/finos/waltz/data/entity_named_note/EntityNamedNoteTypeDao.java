@@ -19,7 +19,11 @@
 package org.finos.waltz.data.entity_named_note;
 
 import org.finos.waltz.common.Checks;
-import org.finos.waltz.model.*;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.EntityWithOperations;
+import org.finos.waltz.model.ImmutableEntityWithOperations;
+import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.app_group.AppGroupMemberRole;
 import org.finos.waltz.model.entity_named_note.EntityNamedNodeType;
 import org.finos.waltz.model.entity_named_note.EntityNamedNoteTypeChangeCommand;
@@ -30,7 +34,11 @@ import org.finos.waltz.schema.tables.EntityNamedNote;
 import org.finos.waltz.schema.tables.EntityNamedNoteType;
 import org.finos.waltz.schema.tables.UserRole;
 import org.finos.waltz.schema.tables.records.EntityNamedNoteTypeRecord;
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.RecordMapper;
+import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;

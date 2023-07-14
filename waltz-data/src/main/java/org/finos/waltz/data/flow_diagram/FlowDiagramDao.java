@@ -18,7 +18,6 @@
 
 package org.finos.waltz.data.flow_diagram;
 
-import org.finos.waltz.schema.tables.records.FlowDiagramRecord;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.JooqUtilities;
 import org.finos.waltz.data.SearchUtilities;
@@ -27,7 +26,14 @@ import org.finos.waltz.model.NameProvider;
 import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.finos.waltz.model.flow_diagram.FlowDiagram;
 import org.finos.waltz.model.flow_diagram.ImmutableFlowDiagram;
-import org.jooq.*;
+import org.finos.waltz.schema.tables.records.FlowDiagramRecord;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.RecordMapper;
+import org.jooq.Select;
+import org.jooq.SelectQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -38,10 +44,10 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.finos.waltz.schema.tables.FlowDiagram.FLOW_DIAGRAM;
-import static org.finos.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.schema.tables.FlowDiagram.FLOW_DIAGRAM;
+import static org.finos.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
 
 @Repository
 public class FlowDiagramDao {

@@ -8,7 +8,17 @@ import org.finos.waltz.model.legal_entity.LegalEntityRelKindStat;
 import org.finos.waltz.model.legal_entity.LegalEntityRelationshipKind;
 import org.finos.waltz.schema.tables.LegalEntityRelationship;
 import org.finos.waltz.schema.tables.records.LegalEntityRelationshipKindRecord;
-import org.jooq.*;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.Record1;
+import org.jooq.Record2;
+import org.jooq.RecordMapper;
+import org.jooq.Select;
+import org.jooq.SelectConditionStep;
+import org.jooq.SelectHavingStep;
+import org.jooq.SelectOnConditionStep;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -16,7 +26,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Set;
 
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
-import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.Tables.LEGAL_ENTITY_RELATIONSHIP;
+import static org.finos.waltz.schema.Tables.LEGAL_ENTITY_RELATIONSHIP_KIND;
 
 @Repository
 public class LegalEntityRelationshipKindDao {
