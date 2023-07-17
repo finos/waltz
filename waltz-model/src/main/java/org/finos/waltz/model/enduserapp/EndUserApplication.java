@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.*;
 import org.finos.waltz.model.application.LifecyclePhase;
+import org.finos.waltz.model.physical_flow.CriticalityValue;
 import org.immutables.value.Value;
 
 @Value.Immutable
@@ -38,13 +39,8 @@ public abstract class EndUserApplication implements
     public abstract Long organisationalUnitId();
     public abstract String applicationKind();
     public abstract LifecyclePhase lifecyclePhase();
-    public abstract Criticality riskRating();
+    public abstract CriticalityValue riskRating();
     public abstract Boolean isPromoted();
-
-    @Value.Default
-    public String provenance() {
-        return "waltz";
-    }
 
     @Value.Default
     public EntityKind kind() { return EntityKind.END_USER_APPLICATION; }
