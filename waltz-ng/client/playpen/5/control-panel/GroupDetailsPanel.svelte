@@ -9,20 +9,42 @@ import Icon from "../../../common/svelte/Icon.svelte";
 
 {#if $selectedGroup}
     <h4>{$selectedGroup.title}</h4>
-    <ul>
-        <li>ID: {$selectedGroup.id}</li>
-        <li>Item Kind: {$selectedGroup.itemKind}</li>
-        <li>Properties:</li>
-        <li>
-            <ul>
-                <li>Item Height: {$selectedGroup.props.itemHeight}em</li>
-                <li>Item Width: {$selectedGroup.props.itemWidth}em</li>
-                <li>Alignment: {$selectedGroup.props.flexDirection}</li>
-                <li>Bucket Size: {$selectedGroup.props.bucketSize}</li>
-                <li>Proportion: {$selectedGroup.props.proportion}</li>
-            </ul>
-        </li>
-    </ul>
+
+    <table class="table table-condensed table-striped">
+        <colgroup>
+            <col width="20%"/>
+            <col width="80%"/>
+        </colgroup>
+        <tr>
+            <td>ID</td>
+            <td>{$selectedGroup.id}</td>
+        </tr>
+        <tr>
+            <td>Item Kind</td>
+            <td>{$selectedGroup.itemKind || "Not Specified"}</td>
+        </tr>
+        <tr>
+            <td>Alignment</td>
+            <td>{$selectedGroup.props.flexDirection}</td>
+        </tr>
+        <tr>
+            <td>Bucket Size</td>
+            <td>{$selectedGroup.props.bucketSize}</td>
+        </tr>
+        <tr>
+            <td>Proportion</td>
+            <td>{$selectedGroup.props.proportion}</td>
+        </tr>
+        <tr>
+            <td>Item Height</td>
+            <td>{$selectedGroup.props.itemHeight}em</td>
+        </tr>
+        <tr>
+            <td>Item Width</td>
+            <td>{$selectedGroup.props.itemWidth}em</td>
+        </tr>
+    </table>
+
 {:else}
     <div class="help-block">
         <Icon name="info-circle"/> Please select an item from the tree or diagram to view more detail
