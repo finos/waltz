@@ -127,6 +127,12 @@ public class TaxonomyChangeService {
     }
 
 
+    public Collection<TaxonomyChangeCommand> findAllChangesByDomain(EntityReference domain) {
+        return taxonomyChangeDao
+                .findChangesByDomain(domain);
+    }
+
+
     public TaxonomyChangeCommand applyById(long id, String userId) {
         TaxonomyChangeCommand command = taxonomyChangeDao.getDraftCommandById(id);
         verifyUserHasPermissions(userId, command.changeDomain());

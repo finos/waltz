@@ -103,6 +103,7 @@ public abstract class TaxonomyChangeCommand implements
         return isEmpty(strVal) ? dflt : Long.valueOf(strVal);
     }
 
+
     public List<Long> paramAsLongList(String key) throws JsonProcessingException {
         String strVal = params().get(key);
         List<?> list = getJsonMapper().readValue(strVal, List.class);

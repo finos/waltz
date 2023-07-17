@@ -52,6 +52,7 @@ import { surveyQuestionFieldType } from "./survey-question-field-type";
 import { surveyRunStatus } from "./survey-run-status";
 import { fieldDataType } from "./field-data-type";
 import { physicalSpecDefinitionType } from "./physical-spec-definition-type";
+import { taxonomyChangeType } from "./taxonomy-change-type";
 
 export const capabilityRating = investmentRating;
 
@@ -93,7 +94,8 @@ export const enums = {
     releaseLifecycleStatus,
     surveyRunStatus,
     surveyQuestionFieldType,
-    issuance
+    issuance,
+    taxonomyChangeType
 };
 
 

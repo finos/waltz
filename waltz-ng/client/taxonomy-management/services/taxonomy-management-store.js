@@ -28,6 +28,10 @@ function store($http, baseApiUrl) {
         .post(`${baseUrl}/pending-changes`, cmd)
         .then(d => d.data);
 
+    const findAllChangesByDomain = (domainRef) => $http
+        .get(`${baseUrl}/all/by-domain/${domainRef.kind}/${domainRef.id}`)
+        .then(d => d.data);
+
     const findPendingChangesByDomain = (domainRef) => $http
         .get(`${baseUrl}/pending-changes/by-domain/${domainRef.kind}/${domainRef.id}`)
         .then(d => d.data);
@@ -46,6 +50,7 @@ function store($http, baseApiUrl) {
 
     return {
         findPendingChangesByDomain,
+        findAllChangesByDomain,
         preview,
         previewById,
         removeById,
@@ -72,6 +77,11 @@ export const TaxonomyManagementStore_API = {
         serviceName,
         serviceFnName: "applyPendingChange",
         description: "applyPendingChange [ changeId ]"
+    },
+    findAllChangesByDomain: {
+        serviceName,
+        serviceFnName: "findAllChangesByDomain",
+        description: "findAllChangesByDomain [ domainRef ]"
     },
     findPendingChangesByDomain: {
         serviceName,

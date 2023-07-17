@@ -29,7 +29,8 @@ const initialState = {
     visibility: {
         editButton: false
     },
-    peopleSection: dynamicSections.involvedPeopleSection
+    peopleSection: dynamicSections.involvedPeopleSection,
+    taxonomyChangesSection: dynamicSections.taxonomyChangesSection
 };
 
 
