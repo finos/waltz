@@ -19,13 +19,22 @@
 
 import angular from "angular";
 import CategoryStore from "./services/measurable-category-store";
+import TaxonomyChangesSection from "./components/taxonomy-changes/taxonomy-changes-section"
+import TaxonomyChangeSummaryCell from "./components/taxonomy-change-summary-cell/taxonomy-change-summary-cell"
 import Routes from "./routes";
-import {registerStores} from "../common/module-utils";
+import {registerComponents, registerStores} from "../common/module-utils";
 
 export default () => {
     const module = angular.module("waltz.measurable-category", []);
 
     registerStores(module, [ CategoryStore ]);
+
+    registerComponents(
+        module,
+        [
+            TaxonomyChangesSection,
+            TaxonomyChangeSummaryCell
+        ]);
 
     module.config(Routes);
 
