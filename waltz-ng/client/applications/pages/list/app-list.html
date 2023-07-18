@@ -1,0 +1,10 @@
+<div ng-if="$ctrl.parentEntityRef">
+    <waltz-svelte-component component="$ctrl.AppListPageHeader">
+    </waltz-svelte-component>
+</div>
+
+<div class="waltz-page-summary waltz-page-summary-attach">
+    <waltz-report-grid-view-section parent-entity-ref="$ctrl.parentEntityRef"
+                                    selected-grid-id="$ctrl.gridId">
+    </waltz-report-grid-view-section>
+</div>

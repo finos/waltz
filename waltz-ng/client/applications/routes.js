@@ -22,10 +22,11 @@ import AppViewAssetCode from "./pages/asset-code-view/app-asset-code-view";
 import AppEdit from "./pages/edit/app-edit";
 import AppRegistration from "./pages/registration/app-registration";
 import AppView from "./pages/view/app-view";
-import {activeSections} from "../dynamic-section/section-store";
+import AppList from "./pages/list/app-list";
 
 const base = {
-    url: "application"
+    url: "application",
+    views: {"content@": AppList }
 };
 
 
