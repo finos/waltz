@@ -22,6 +22,7 @@ import org.finos.waltz.data.SelectorUtilities;
 import org.finos.waltz.data.entity_hierarchy.AbstractIdSelectorFactory;
 import org.finos.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import org.finos.waltz.model.*;
+import org.finos.waltz.model.application.LifecyclePhase;
 import org.finos.waltz.schema.tables.EntityHierarchy;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -48,6 +49,8 @@ public class ChangeInitiativeIdSelectorFactory extends AbstractIdSelectorFactory
     @Override
     protected Select<Record1<Long>> mkForOptions(IdSelectionOptions options) {
         switch (options.entityReference().kind()) {
+            case ALL:
+                return mkForAll(options);
             case ACTOR:
             case APPLICATION:
             case MEASURABLE:
@@ -121,6 +124,14 @@ public class ChangeInitiativeIdSelectorFactory extends AbstractIdSelectorFactory
     private Select<Record1<Long>> mkForChangeInitiative(IdSelectionOptions options) {
         SelectorUtilities.ensureScopeIsExact(options);
         return DSL.select(DSL.val(options.entityReference().id()));
+    }
+
+
+    private Select<Record1<Long>> mkForAll(IdSelectionOptions options) {
+        return DSL
+                .select(CHANGE_INITIATIVE.ID)
+                .from(CHANGE_INITIATIVE)
+                .where(CHANGE_INITIATIVE.LIFECYCLE_PHASE.ne(LifecyclePhase.RETIRED.name()));
     }
 
 
