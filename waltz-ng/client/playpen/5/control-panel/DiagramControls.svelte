@@ -83,12 +83,11 @@
         const updatedGroup = group.detail;
         const withoutGroup = _.reject($groups, d => d.id === updatedGroup.id);
         $groups = _.concat(withoutGroup, updatedGroup);
-        activeMode = ControlModes.VIEW;
         $selectedGroup = _.find($groups, d => d.id === $selectedGroup.id); // might need to re find this from the hierarchy
+        activeMode = ControlModes.VIEW;
         toasts.success("Saved group info");
     }
 
-    $: console.log({groups: $groups});
 
 </script>
 

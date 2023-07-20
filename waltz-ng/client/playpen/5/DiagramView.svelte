@@ -11,21 +11,10 @@
         mkItemStyle,
         mkTitleStyle
     } from "./diagram-builder-utils";
-    import pageInfo from "../../svelte-stores/page-navigation-store";
-    import {kindToViewState} from "../../common/link-utils";
     import Icon from "../../common/svelte/Icon.svelte";
+    import EntityLink from "../../common/svelte/EntityLink.svelte";
 
     export let group;
-
-    function goTo(data) {
-        $pageInfo = {
-            state: kindToViewState(data.kind),
-            params: {
-                kind: data.kind,
-                id: data.id
-            }
-        };
-    }
 
 </script>
 
@@ -35,10 +24,14 @@
             {#if group.props.showTitle}
                 <div style={mkTitleStyle(group, $hoveredGroupId)}>
                     {#if group.data}
-                        <button style="outline: none !important; width: 100%; background: none; border: none; color: inherit;"
-                                on:click={() => goTo(group.data)}>
-                            {group.title} <Icon name="external-link"/>
-                        </button>
+                        <EntityLink ref={group.data}
+                                    showIcon="false"
+                                    isSecondaryLink="true">
+                            <span>
+                                {group.title}
+                                <Icon name="external-link"/>
+                            </span>
+                        </EntityLink>
                     {:else}
                         {group.title}
                     {/if}

@@ -1,5 +1,5 @@
 import {derived, writable} from "svelte/store";
-import {mkGroup} from "./diagram-builder-utils";
+import {defaultBgColors, defaultColors, mkGroup} from "./diagram-builder-utils";
 import _ from "lodash";
 
 
@@ -10,6 +10,9 @@ export let editing = writable(false);
 export let groups = writable([initialGroup]);
 export let movingGroup = writable(null);
 export let hoveredGroupId = writable(null);
+
+export let titleColors = writable(defaultColors);
+export let backgroundColors = writable(defaultBgColors);
 
 export let groupsWithItems = derived(
     [groups],

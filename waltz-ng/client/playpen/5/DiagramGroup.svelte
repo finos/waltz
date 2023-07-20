@@ -96,8 +96,6 @@
         $hoveredGroupId = null;
     }
 
-    $: console.log({showReorderPanels, group});
-
 </script>
 
 {#if group}

@@ -39,11 +39,10 @@
 
 
     $: {
-        if (vizElem && $groups) {
+        if (vizElem && $groups && !editing) {
             // using a timeout to give innerHTML chance to be updated
             // before we copy it
             setTimeout(() => {
-                console.log("reload",  {gs: $groups});
                 html = prettyHTML(vizElem.innerHTML);
                 data = JSON.stringify($groups, "", 2);
             });

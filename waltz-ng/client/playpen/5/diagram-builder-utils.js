@@ -18,8 +18,6 @@ export const FlexDirections = {
 }
 
 export const DefaultProps = {
-    // itemHeight: 5,
-    // itemWidth: 10,
     minHeight: 5,
     minWidth: 10,
     flexDirection: FlexDirections.ROW,
@@ -28,7 +26,9 @@ export const DefaultProps = {
     bucketSize: 3,
     proportion: 1,
     titleColor: "#000d79",
-    contentColor: "#f1f1ff"
+    contentColor: "#f1f1ff",
+    contentFontSize: 0.7,
+    titleFontSize: 0.8
 }
 
 export function mkGroup(title = "Unknown", id, parentId = null, position = 0, properties = DefaultProps, data = null) {
@@ -54,7 +54,7 @@ export function mkColourProps(color) {
 export function mkGroupStyle(group, child) {
     return `
         flex: ${child.props.proportion} 1 ${_.floor(100 / (group.props.bucketSize + 1))}%;
-        margin: 0.5em;
+        margin: 0.2em;
         min-width: ${group.props.minWidth}em;
         min-height: ${group.props.minHeight}em;
         height: fit-content;
@@ -64,13 +64,14 @@ export function mkGroupStyle(group, child) {
 
 export function mkItemStyle(group) {
     return `
-        margin: 0.5em;
-        padding: 0.25em;
-        min-width: ${group.props.itemWidth}em;
-        min-height: ${group.props.itemHeight}em;
+        margin: 0.1em;
+        padding: 0.1em;
+        min-width: ${group.props.minWidth}em;
+        min-height: ${group.props.minHeight}em;
         height: fit-content;
         width: fit-content;
         ${group.props.flexDirection === FlexDirections.ROW ? "height: fit-content;" : "width: fit-content;"}
+        font-size: ${group.props.contentFontSize}em;
         `;
 }
 
@@ -95,7 +96,8 @@ export function mkTitleStyle(group, hoveredGroupId) {
         font-weight: bolder;
         padding: 0 0.5em;
         ${mkColourProps(group.props.titleColor)}
-        opacity: ${_.isNil(hoveredGroupId) || hoveredGroupId === group.id ? "1" : "0.5"}`;
+        opacity: ${_.isNil(hoveredGroupId) || hoveredGroupId === group.id ? "1;" : "0.5;"}
+        font-size: ${group.props.titleFontSize}em;`;
 }
 
 export function mkContainerStyle(group) {
@@ -103,7 +105,6 @@ export function mkContainerStyle(group) {
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
-        gap: 0.5em;
         height: fit-content;
         min-height: ${group.props.minHeight}em;
         ${mkColourProps(group.props.contentColor)}

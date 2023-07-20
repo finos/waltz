@@ -98,6 +98,13 @@ function controller(appGroupStore, involvementKindStore, serviceBroker) {
     vm.$onChanges = () => {
         if (vm.surveyTemplate) {
             vm.allowedEntityKinds = mkAllowedEntityKinds(vm.surveyTemplate.targetEntityKind);
+
+            involvementKindStore.findAll()
+                .then(involvementKinds => {
+                    vm.availableInvolvementKinds = _.filter(
+                        involvementKinds,
+                        d => d.subjectKind === vm.surveyTemplate.targetEntityKind);
+                });
         }
     };
 
@@ -107,13 +114,6 @@ function controller(appGroupStore, involvementKindStore, serviceBroker) {
             vm.availableAppGroups = [].concat(publicGroups, privateGroups);
         });
 
-
-    involvementKindStore.findAll()
-        .then(involvementKinds => {
-            vm.availableInvolvementKinds = _.filter(
-                involvementKinds,
-                d => d.subjectKind === vm.surveyTemplate.targetEntityKind);
-        });
 
     vm.$onInit = () => {
         serviceBroker.loadViewData(CORE_API.RoleStore.findAllRoles)

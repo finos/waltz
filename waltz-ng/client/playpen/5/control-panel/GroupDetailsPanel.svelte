@@ -37,11 +37,19 @@ import Icon from "../../../common/svelte/Icon.svelte";
         </tr>
         <tr>
             <td>Item Height</td>
-            <td>{$selectedGroup.props.itemHeight}em</td>
+            <td>{$selectedGroup.props.minHeight}em</td>
         </tr>
         <tr>
             <td>Item Width</td>
-            <td>{$selectedGroup.props.itemWidth}em</td>
+            <td>{$selectedGroup.props.minWidth}em</td>
+        </tr>
+        <tr>
+            <td>Title Font Size</td>
+            <td>{$selectedGroup.props.titleFontSize}em</td>
+        </tr>
+        <tr>
+            <td>Content Font Size</td>
+            <td>{$selectedGroup.props.contentFontSize}em</td>
         </tr>
     </table>
 
