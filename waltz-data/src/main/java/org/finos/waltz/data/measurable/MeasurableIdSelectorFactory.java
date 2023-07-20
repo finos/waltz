@@ -76,6 +76,7 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
                 return mkForMeasurable(options);
             case APP_GROUP:
             case PROCESS_DIAGRAM:
+            case ALL:
                 return mkViaAppSelector(options);
             case AGGREGATE_OVERLAY_DIAGRAM:
                 return mkForAggregatedEntityDiagram(options);

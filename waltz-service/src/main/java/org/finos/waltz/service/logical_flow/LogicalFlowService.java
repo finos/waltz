@@ -300,6 +300,7 @@ public class LogicalFlowService {
      */
     public LogicalFlowStatistics calculateStats(IdSelectionOptions options) {
         switch (options.entityReference().kind()) {
+            case ALL:
             case APP_GROUP:
             case CHANGE_INITIATIVE:
             case MEASURABLE:

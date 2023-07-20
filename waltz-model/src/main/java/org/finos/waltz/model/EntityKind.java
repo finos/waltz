@@ -20,6 +20,7 @@ package org.finos.waltz.model;
 
 public enum EntityKind {
 
+    ALL("All"), // when used in an entity ref the id will be ignored
     ACTOR("Actor"),
     AGGREGATE_OVERLAY_DIAGRAM("Aggregate Overlay Diagram"),
     AGGREGATE_OVERLAY_DIAGRAM_INSTANCE("Aggregate Overlay Diagram Instance"),

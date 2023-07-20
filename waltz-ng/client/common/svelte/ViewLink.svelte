@@ -10,7 +10,7 @@
 
     const routes = {
         "main": {
-            path: () => "",
+            path: () => "home",
             title: "Home page"
         },
         "main.system.list": {

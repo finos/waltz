@@ -48,6 +48,7 @@ public class ChangeUnitIdSelectorFactory implements IdSelectorFactory {
             case APPLICATION:
                 // all physical flows where the app is a source or target
                 return mkForFlowEndpoint(options);
+            case ALL:
             case APP_GROUP:
             case FLOW_DIAGRAM:
             case MEASURABLE:

@@ -1,0 +1,61 @@
+<div ng-if="$ctrl.parentEntityRef">
+    <waltz-svelte-component component="$ctrl.AppListPageHeader">
+    </waltz-svelte-component>
+</div>
+
+<div class="waltz-page-summary waltz-page-summary-attach">
+    <div class="help-block">This page contains details about all active applications</div>
+
+
+    <div class="row row-mini-gutters">
+        <div class="col-sm-4">
+            <waltz-apps-by-investment-pie applications="$ctrl.apps"
+                                          waltz-jump-to="apps-section"
+                                          class="clickable"
+                                          size="70">
+            </waltz-apps-by-investment-pie>
+        </div>
+
+        <div class="col-sm-4">
+            <waltz-apps-by-lifecycle-phase-pie applications="$ctrl.apps"
+                                               waltz-jump-to="apps-section"
+                                               class="clickable"
+                                               size="70">
+            </waltz-apps-by-lifecycle-phase-pie>
+        </div>
+
+        <div class="col-sm-4">
+            <waltz-complexity-basic-info-tile parent-entity-ref="$ctrl.parentEntityRef"
+                                              filters="$ctrl.filters">
+            </waltz-complexity-basic-info-tile>
+        </div>
+
+    </div>
+
+    <div class="row row-mini-gutters">
+        <div class="col-sm-4">
+            <waltz-server-basic-info-tile parent-entity-ref="$ctrl.parentEntityRef"
+                                          filters="$ctrl.filters">
+            </waltz-server-basic-info-tile>
+        </div>
+        <div class="col-sm-8">
+            <waltz-assessment-info-tile parent-entity-ref="$ctrl.parentEntityRef"
+                                        filters="$ctrl.filters">
+            </waltz-assessment-info-tile>
+        </div>
+    </div>
+
+
+
+</div>
+<!-- Non visual control to watch for filter changes -->
+<waltz-filter-change-watcher on-filters-changed="$ctrl.filtersChanged">
+</waltz-filter-change-watcher>
+
+
+<br>
+
+<waltz-dynamic-sections-view ng-if="$ctrl.parentEntityRef"
+                             parent-entity-ref="$ctrl.parentEntityRef"
+                             filters="$ctrl.filters">
+</waltz-dynamic-sections-view>

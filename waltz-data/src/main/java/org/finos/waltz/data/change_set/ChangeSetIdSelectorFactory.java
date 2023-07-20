@@ -44,6 +44,7 @@ public class ChangeSetIdSelectorFactory implements IdSelectorFactory {
             case CHANGE_INITIATIVE:
                 // all physical flows where the app is a source or target
                 return mkForChangeInitiative(options);
+            case ALL:
             case APPLICATION:
             case APP_GROUP:
             case FLOW_DIAGRAM:

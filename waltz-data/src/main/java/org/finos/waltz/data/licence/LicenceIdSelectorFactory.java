@@ -55,6 +55,7 @@ public class LicenceIdSelectorFactory extends AbstractIdSelectorFactory {
             case LICENCE:
                 return mkForLicence(options);
             case ACTOR:
+            case ALL:
             case APP_GROUP:
             case CHANGE_INITIATIVE:
             case FLOW_DIAGRAM:

@@ -36,8 +36,6 @@ import org.jooq.SelectConditionStep;
 import org.jooq.SelectOrderByStep;
 import org.jooq.SelectWhereStep;
 import org.jooq.impl.DSL;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.function.Function;
@@ -61,8 +59,6 @@ import static org.finos.waltz.model.HierarchyQueryScope.EXACT;
 @Service
 public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions, Select<Record1<Long>>> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ApplicationIdSelectorFactory.class);
-
     private static final DataTypeIdSelectorFactory dataTypeIdSelectorFactory = new DataTypeIdSelectorFactory();
     private static final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
     private static final OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory = new OrganisationalUnitIdSelectorFactory();
@@ -80,6 +76,8 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
         checkNotNull(options, "options cannot be null");
         EntityReference ref = options.entityReference();
         switch (ref.kind()) {
+            case ALL:
+                return mkForAll(options);
             case ACTOR:
                 return mkForActor(options);
             case APP_GROUP:
@@ -127,6 +125,16 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
             default:
                 throw new IllegalArgumentException("Cannot create selector for entity kind: " + ref.kind());
         }
+    }
+
+
+    private Select<Record1<Long>> mkForAll(IdSelectionOptions options) {
+        Condition applicationConditions = SelectorUtilities.mkApplicationConditions(options);
+
+        return DSL
+                .select(APPLICATION.ID)
+                .from(APPLICATION)
+                .where(applicationConditions);
     }
 
     private Select<Record1<Long>> mkForLegalEntity(IdSelectionOptions options) {
