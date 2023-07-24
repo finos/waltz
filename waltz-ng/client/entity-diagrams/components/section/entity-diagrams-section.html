@@ -20,6 +20,16 @@
            for="overlay">
         Overlay Diagrams
     </label>
+    <input type="radio"
+           ng-disabled="$ctrl.isDisabled($ctrl.TABS.entity)"
+           ng-value="$ctrl.TABS.entity.id"
+           ng-model="$ctrl.tab"
+           name="tab"
+           id="entity">
+    <label class="wt-label"
+           for="entity">
+        Entity Diagrams
+    </label>
 
 
     <div class="wt-tab wt-active">
@@ -28,6 +38,11 @@
         </div>
         <div ng-if="$ctrl.tab === $ctrl.TABS.overlay.id">
             <waltz-svelte-component component="$ctrl.AggregateOverlayDiagramPanel"
+                                    primary-entity-ref="$ctrl.parentEntityRef">
+            </waltz-svelte-component>
+        </div>
+        <div ng-if="$ctrl.tab === $ctrl.TABS.entity.id">
+            <waltz-svelte-component component="$ctrl.EntityDiagramPanel"
                                     primary-entity-ref="$ctrl.parentEntityRef">
             </waltz-svelte-component>
         </div>

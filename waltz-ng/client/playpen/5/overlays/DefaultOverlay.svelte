@@ -6,5 +6,6 @@
 
 </script>
 
-
-<EntityLink ref={data}/>
+<div style="align-content: center; text-align: center">
+    <EntityLink ref={data}/>
+</div>

@@ -72,6 +72,7 @@ export function mkItemStyle(group) {
         width: fit-content;
         ${group.props.flexDirection === FlexDirections.ROW ? "height: fit-content;" : "width: fit-content;"}
         font-size: ${group.props.contentFontSize}em;
+        
         `;
 }
 
