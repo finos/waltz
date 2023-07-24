@@ -16,24 +16,35 @@
  *
  */
 import template from "./playpen5.html";
-import AssessmentRatingPicker from "../../common/svelte/AssessmentRatingPicker.svelte";
+import DiagramBuilder from "./DiagramBuilder.svelte";
+import {CORE_API} from "../../common/services/core-api-utils";
+import angular from "angular";
 
 
 const initialState = {
-    AssessmentRatingPicker
+    DiagramBuilder
 };
 
 
-function controller() {
+function controller(serviceBroker) {
 
     const vm = Object.assign(this, initialState);
 
-    vm.definitionFilter = d => d.entityKind === "CHANGE_INITIATIVE";
+    serviceBroker
+        .loadAppData(
+            CORE_API.SvgDiagramStore.findByGroups,
+            [ "TEST" ])
+        .then(r => vm.diagrams = console.log(r.data) || r.data);
 
+    vm.blockProcessor = b => {
+        // b.block.onclick = () => $state.go("main.person.view", { empId: b.value });
+        // angular.element(b.block).addClass("clickable");
+    };
 }
 
 
 controller.$inject = [
+    "ServiceBroker"
 ];
 
 

@@ -19,6 +19,7 @@ import {initialiseData} from "../../../common";
 import _ from "lodash";
 import template from "./entity-diagrams-section.html";
 import AggregateOverlayDiagramPanel from "../../../aggregate-overlay-diagram/components/panel/AggregateOverlayDiagramPanel.svelte"
+import EntityDiagramPanel from "../entity-diagrams/EntityDiagramPanel.svelte";
 
 const bindings = {
     parentEntityRef: "<"
@@ -35,12 +36,18 @@ const TABS = {
         id: "overlay",
         name: "Overlay",
         disallowedKinds: ["APPLICATION", "ACTOR", "PHYSICAL_FLOW", "LOGICAL_DATA_FLOW", "PHYSICAL_SPECIFICATION"]
+    },
+    entity: {
+        id: "entity",
+        name: "Entity",
+        disallowedKinds: ["APPLICATION", "ACTOR", "PHYSICAL_FLOW", "LOGICAL_DATA_FLOW", "PHYSICAL_SPECIFICATION"]
     }
 };
 
 
 const initialState = {
     AggregateOverlayDiagramPanel,
+    EntityDiagramPanel,
     tab: null,
     TABS
 };

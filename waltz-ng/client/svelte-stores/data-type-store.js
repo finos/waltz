@@ -33,9 +33,19 @@ export function mkDataTypeStore() {
             {force})
     }
 
+    const findByParentId = (id, force = false) => {
+        return remote.fetchViewData(
+            "GET",
+            `api/data-types/parent-id/${id}`,
+            null,
+            {},
+            {force})
+    }
+
     return {
         findAll,
-        getById
+        getById,
+        findByParentId
     };
 }
 

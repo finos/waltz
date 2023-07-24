@@ -125,4 +125,7 @@ public class DataTypeService {
         }
     }
 
+    public Collection<DataType> findByParentId(long id) {
+        return dataTypeDao.findByParentId(id);
+    }
 }
