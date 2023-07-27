@@ -18,7 +18,6 @@
 
 package org.finos.waltz.service.change_initiative;
 
-import org.finos.waltz.common.LoggingUtilities;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.ImmutableGenericSelector;
 import org.finos.waltz.data.assessment_definition.AssessmentDefinitionDao;
@@ -36,13 +35,11 @@ import org.finos.waltz.model.change_initiative.ChangeInitiativeView;
 import org.finos.waltz.model.change_initiative.ImmutableChangeInitiativeView;
 import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.schema.tables.EntityHierarchy;
-import org.finos.waltz.service.DIConfiguration;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.SelectOrderByStep;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -87,7 +84,7 @@ public class ChangeInitiativeViewService {
     }
 
 
-    public ChangeInitiativeView findForEntityReference(EntityReference ref) {
+    public ChangeInitiativeView getForEntityReference(EntityReference ref) {
         Select<Record1<Long>> directCISelector = changeInitiativeIdSelectorFactory.apply(mkOpts(ref));
 
         SelectOrderByStep<Record1<Long>> indirectCISelector = DSL

@@ -51,7 +51,7 @@ public class ChangeInitiativeViewEndpoint implements Endpoint {
     public void register() {
         String findByRefPath = WebUtilities.mkPath(BASE_URL, "entity", ":kind", ":id");
 
-        DatumRoute<ChangeInitiativeView> findByRefRoute = (req, resp) -> service.findForEntityReference(
+        DatumRoute<ChangeInitiativeView> findByRefRoute = (req, resp) -> service.getForEntityReference(
                 getEntityReference(req));
 
         EndpointUtilities.getForDatum(findByRefPath, findByRefRoute);
