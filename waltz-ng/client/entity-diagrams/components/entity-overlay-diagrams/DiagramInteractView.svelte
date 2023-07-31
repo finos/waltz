@@ -1,37 +1,33 @@
 <script>
 
     import _ from "lodash";
-    import {hoveredGroupId} from "./diagram-builder-store";
+    import {diagramService, hoveredGroupId} from "./entity-diagram-store";
     import {flip} from 'svelte/animate';
     import Item from "./Item.svelte";
-    import {
-        mkContainerStyle,
-        mkContentBoxStyle,
-        mkGroupStyle,
-        mkItemStyle,
-        mkTitleStyle
-    } from "./diagram-builder-utils";
-    import Icon from "../../common/svelte/Icon.svelte";
-    import EntityLink from "../../common/svelte/EntityLink.svelte";
+    import {mkContainerStyle, mkContentBoxStyle, mkGroupStyle, mkItemStyle, mkTitleStyle} from "./entity-diagram-utils";
 
     export let group;
+    export let parentEntityRef;
+
+    const {selectedOverlay, selectedGroup, selectGroup} = diagramService;
+
+    function selectOverlayGroup() {
+        selectGroup(group);
+    }
 
 </script>
 
+{#if group}
 <div>
     <div style="display: flex">
         <div style={mkContentBoxStyle(group)}>
             {#if group.props.showTitle}
                 <div style={mkTitleStyle(group, $hoveredGroupId)}>
                     {#if group.data}
-                        <EntityLink ref={group.data}
-                                    showIcon="false"
-                                    isSecondaryLink="true">
-                            <span>
-                                {group.title}
-                                <Icon name="external-link"/>
-                            </span>
-                        </EntityLink>
+                        <button class="btn btn-plain"
+                                on:click={selectOverlayGroup}>
+                            {group.title}
+                        </button>
                     {:else}
                         {group.title}
                     {/if}
@@ -48,7 +44,7 @@
                 {:else}
                     {#if group.data}
                         <div style={mkItemStyle(group)}>
-                            <Item data={group.data}/>
+                            <Item {parentEntityRef} data={group.data}/>
                         </div>
                     {/if}
                 {/each}
@@ -56,3 +52,4 @@
         </div>
     </div>
 </div>
+{/if}

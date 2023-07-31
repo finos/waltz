@@ -22,6 +22,16 @@ export function mkOverlayDiagramStore() {
     };
 
 
+    const findByKind = (kind, force = false) => {
+        return remote
+            .fetchViewList(
+                "GET",
+                `api/aggregate-overlay-diagram/diagram-kind/${kind}`,
+                [],
+                {force});
+    };
+
+
     const findAppCountsForDiagram = (diagramId, widgetParameters, force = false) => {
         return remote
             .fetchViewList(
@@ -112,9 +122,18 @@ export function mkOverlayDiagramStore() {
                 {force});
     };
 
+    const create = (createCommand) => {
+        return remote
+            .execute(
+                "POST",
+                "api/aggregate-overlay-diagram/create",
+                createCommand);
+    };
+
     return {
         getById,
         findAll,
+        findByKind,
         findAppCountsForDiagram,
         findTargetAppCostForDiagram,
         findAttestationsForDiagram,
@@ -124,7 +143,8 @@ export function mkOverlayDiagramStore() {
         findAggregatedEntitiesForDiagram,
         findComplexitiesForDiagram,
         findPresetsForDiagram,
-        createPreset
+        createPreset,
+        create
     };
 }
 

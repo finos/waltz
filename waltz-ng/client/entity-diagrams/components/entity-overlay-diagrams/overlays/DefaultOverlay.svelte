@@ -1,6 +1,6 @@
 <script>
 
-    import EntityLink from "../../../common/svelte/EntityLink.svelte";
+    import EntityLink from "../../../../common/svelte/EntityLink.svelte";
 
     export let data;
 

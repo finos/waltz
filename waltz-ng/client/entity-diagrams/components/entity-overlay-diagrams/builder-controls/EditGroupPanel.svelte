@@ -2,12 +2,14 @@
 
 
     import _ from "lodash";
-    import {backgroundColors, groups, selectedGroup, titleColors} from "../diagram-builder-store";
+    import {diagramService} from "../entity-diagram-store";
     import {createEventDispatcher, onMount} from "svelte";
-    import ColorPicker from "../../../system/svelte/ratings-schemes/ColorPicker.svelte";
-    import {defaultBgColors, defaultColors} from "../diagram-builder-utils";
+    import ColorPicker from "../../../../system/svelte/ratings-schemes/ColorPicker.svelte";
+    import {backgroundColors, titleColors} from "../builder/diagram-builder-store";
 
     let working;
+
+    const {selectedGroup, groups} = diagramService;
 
     onMount(() => {
         working = _.cloneDeep(_.find($groups, d => d.id === $selectedGroup.id));

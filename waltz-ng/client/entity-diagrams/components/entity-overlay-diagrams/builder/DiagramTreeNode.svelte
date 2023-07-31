@@ -1,6 +1,6 @@
 <script>
 
-    import Icon from "../../common/svelte/Icon.svelte";
+    import Icon from "../../../../common/svelte/Icon.svelte";
     import _ from "lodash";
 
     export let tree;

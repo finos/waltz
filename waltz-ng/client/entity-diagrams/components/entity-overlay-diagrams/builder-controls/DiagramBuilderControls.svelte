@@ -1,12 +1,12 @@
 <script>
-    import {groups, selectedGroup} from "../diagram-builder-store";
+    import {diagramService} from "../entity-diagram-store";
     import _ from "lodash";
-    import {FlexDirections, mkGroup} from "../diagram-builder-utils";
+    import {FlexDirections, mkGroup} from "../entity-diagram-utils";
     import EditGroupPanel from "./EditGroupPanel.svelte";
     import EditItemsPanel from "./EditItemsPanel.svelte";
-    import {flattenChildren} from "../../../common/hierarchy-utils";
     import GroupDetailsPanel from "./GroupDetailsPanel.svelte";
-    import toasts from "../../../svelte-stores/toast-store";
+    import toasts from "../../../../svelte-stores/toast-store";
+    import {generateUUID} from "../../../../system/svelte/nav-aid-builder/custom/builderStore";
 
     const ControlModes = {
         VIEW: "VIEW",
@@ -15,6 +15,8 @@
     }
 
     let activeMode = ControlModes.VIEW;
+
+    const {selectedGroup, groups, addGroup, removeGroup, updateGroup, updateChildren} = diagramService;
 
     function toggleFlexDirection() {
         const group = _.find($groups, d => d.id === $selectedGroup.id);
@@ -29,9 +31,7 @@
             });
 
         const updatedGroup = Object.assign({}, group, {props: updatedProps});
-
-        const withoutGroup = _.reject($groups, d => d.id === $selectedGroup.id);
-        $groups = _.concat(withoutGroup, updatedGroup);
+        updateGroup(updatedGroup);
     }
 
     function toggleItemTitleDisplay() {
@@ -44,10 +44,7 @@
                 return Object.assign({}, d, {props: updatedProps});
             })
             .value();
-
-        const withoutGroup = _.reject($groups, d => d.parentId === $selectedGroup.id);
-
-        $groups = _.concat(withoutGroup, ...childGroups);
+        updateChildren($selectedGroup.id, childGroups);
     }
 
     function toggleItemBorderDisplay() {
@@ -60,34 +57,25 @@
                 return Object.assign({}, d, {props: updatedProps});
             })
             .value();
-
-        const withoutGroup = _.reject($groups, d => d.parentId === $selectedGroup.id);
-
-        $groups = _.concat(withoutGroup, ...childGroups);
+        updateChildren($selectedGroup.id, childGroups);
     }
 
-    function addGroup() {
+    function createGroup() {
         const groupNumber = _.size($groups) + 1;
-        const newGroup = mkGroup("Group " + groupNumber.toString(), groupNumber, $selectedGroup.id, groupNumber, $selectedGroup.props)
-        $groups = _.concat($groups, newGroup);
+        const id = generateUUID();
+        const newGroup = mkGroup("Group " + groupNumber.toString(), id, $selectedGroup.id, groupNumber, $selectedGroup.props)
+        addGroup(newGroup);
     }
 
-    function removeGroup() {
-        const children = flattenChildren($selectedGroup);
-        const groupsToRemove = _.concat(children, $selectedGroup);
-        $groups = _.reject($groups, d => _.includes(_.map(groupsToRemove, d => d.id), d.id));
-        $selectedGroup = null;
+    function remove() {
+        removeGroup($selectedGroup);
     }
 
     function saveGroup(group) {
-        const updatedGroup = group.detail;
-        const withoutGroup = _.reject($groups, d => d.id === updatedGroup.id);
-        $groups = _.concat(withoutGroup, updatedGroup);
-        $selectedGroup = _.find($groups, d => d.id === $selectedGroup.id); // might need to re find this from the hierarchy
+        updateGroup(group.detail)
         activeMode = ControlModes.VIEW;
         toasts.success("Saved group info");
     }
-
 
 </script>
 
@@ -104,7 +92,7 @@
                         Edit Group Details
                     </button>
                     <button class="btn btn-default"
-                            on:click={addGroup}>
+                            on:click={createGroup}>
                         Add Child Group
                     </button>
                     <button class="btn btn-default"
@@ -125,7 +113,7 @@
                     </button>
                     <button class="btn btn-default"
                             disabled={_.isNil($selectedGroup.parentId)}
-                            on:click={removeGroup}>
+                            on:click={remove}>
                         Remove Group
                     </button>
                 </div>

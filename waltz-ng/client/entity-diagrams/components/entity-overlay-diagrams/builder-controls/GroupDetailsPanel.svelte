@@ -1,27 +1,25 @@
 <script>
 
-import {selectedGroup} from "../diagram-builder-store";
-import Icon from "../../../common/svelte/Icon.svelte";
+    import {diagramService} from "../entity-diagram-store";
+    import Icon from "../../../../common/svelte/Icon.svelte";
+
+    const {selectedGroup} = diagramService;
+
 
 </script>
 
 
-
 {#if $selectedGroup}
     <h4>{$selectedGroup.title}</h4>
-
-    <table class="table table-condensed table-striped">
+    <table class="table table-condensed table-striped small">
         <colgroup>
-            <col width="20%"/>
-            <col width="80%"/>
+            <col width="50%"/>
+            <col width="50%"/>
         </colgroup>
+        <tbody>
         <tr>
             <td>ID</td>
             <td>{$selectedGroup.id}</td>
-        </tr>
-        <tr>
-            <td>Item Kind</td>
-            <td>{$selectedGroup.itemKind || "Not Specified"}</td>
         </tr>
         <tr>
             <td>Alignment</td>
@@ -51,6 +49,7 @@ import Icon from "../../../common/svelte/Icon.svelte";
             <td>Content Font Size</td>
             <td>{$selectedGroup.props.contentFontSize}em</td>
         </tr>
+        </tbody>
     </table>
 
 {:else}

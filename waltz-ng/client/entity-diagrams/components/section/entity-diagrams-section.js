@@ -19,7 +19,7 @@ import {initialiseData} from "../../../common";
 import _ from "lodash";
 import template from "./entity-diagrams-section.html";
 import AggregateOverlayDiagramPanel from "../../../aggregate-overlay-diagram/components/panel/AggregateOverlayDiagramPanel.svelte"
-import EntityDiagramPanel from "../entity-diagrams/EntityDiagramPanel.svelte";
+import EntityDiagramPanel from "../entity-overlay-diagrams/EntityDiagramPanel.svelte";
 
 const bindings = {
     parentEntityRef: "<"

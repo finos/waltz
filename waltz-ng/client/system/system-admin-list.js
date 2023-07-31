@@ -147,6 +147,12 @@ const utilityOptions= [
         state: "main.system.nav-aid-builder",
         icon: "picture-o"
     }, {
+        name: "Diagram Builder (WIP)",
+        role: "ADMIN",
+        description: "Allows modification of existing entity overlay diagrams or creation of new ones. These can be exported as nav aids.",
+        state: "main.system.diagram-builder",
+        icon: "picture-o"
+    }, {
         name: "Colour Gradient",
         role: "ADMIN",
         description: "Useful for creating a smooth gradient of colours. A common use-case is for smoothly differentiating between rating scheme items",

@@ -16,9 +16,8 @@
  *
  */
 import template from "./playpen5.html";
-import DiagramBuilder from "./DiagramBuilder.svelte";
+import DiagramBuilder from "../../entity-diagrams/components/entity-overlay-diagrams/builder/DiagramBuilder.svelte";
 import {CORE_API} from "../../common/services/core-api-utils";
-import angular from "angular";
 
 
 const initialState = {

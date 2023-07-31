@@ -1,18 +1,20 @@
 <script>
 
     import _ from "lodash";
-    import {groups, selectedGroup} from "../diagram-builder-store";
-    import {defaultBgColors, defaultColors, mkGroup} from "../diagram-builder-utils";
-    import EntityPicker from "../../../report-grid/components/svelte/pickers/EntityPicker.svelte";
-    import {sameRef} from "../../../common/entity-utils";
+    import {diagramService} from "../entity-diagram-store";
+    import {mkGroup} from "../entity-diagram-utils";
+    import EntityPicker from "../../../../report-grid/components/svelte/pickers/EntityPicker.svelte";
+    import {sameRef, toEntityRef} from "../../../../common/entity-utils";
     import {createEventDispatcher} from "svelte";
     import DropdownPicker
-        from "../../../report-grid/components/svelte/column-definition-edit-panel/DropdownPicker.svelte";
-    import {entity} from "../../../common/services/enums/entity";
-    import {measurableStore} from "../../../svelte-stores/measurables";
-    import {dataTypeStore} from "../../../svelte-stores/data-type-store";
-    import {personStore} from "../../../svelte-stores/person-store";
-    import ColorPicker from "../../../system/svelte/ratings-schemes/ColorPicker.svelte";
+        from "../../../../report-grid/components/svelte/column-definition-edit-panel/DropdownPicker.svelte";
+    import {entity} from "../../../../common/services/enums/entity";
+    import {measurableStore} from "../../../../svelte-stores/measurables";
+    import {dataTypeStore} from "../../../../svelte-stores/data-type-store";
+    import {personStore} from "../../../../svelte-stores/person-store";
+    import ColorPicker from "../../../../system/svelte/ratings-schemes/ColorPicker.svelte";
+    import {backgroundColors, titleColors} from "../builder/diagram-builder-store";
+    import {generateUUID} from "../../../../system/svelte/nav-aid-builder/custom/builderStore";
 
     const dispatch = createEventDispatcher();
 
@@ -33,12 +35,15 @@
 
     let working = {}
 
+    const {selectedGroup, groups, addGroup, updateChildren} = diagramService;
+
     let itemKind = _.get($selectedGroup, ["data", "kind"], null);
 
     function selectItem(entity) {
         const groupNumber = _.size($groups) + 1;
-        const newGroup = mkGroup(entity.name, groupNumber, $selectedGroup.id, groupNumber, $selectedGroup.props, entity)
-        $groups = _.concat($groups, newGroup);
+        const id = generateUUID();
+        const newGroup = mkGroup(entity.name, id, $selectedGroup.id, groupNumber, $selectedGroup.props, toEntityRef(entity))
+        addGroup(newGroup);
     }
 
     function determineStore(ref) {
@@ -80,9 +85,7 @@
             })
             .value();
 
-        const withoutGroup = _.reject($groups, d => d.parentId === $selectedGroup.id);
-
-        $groups = _.concat(withoutGroup, ...childGroups);
+        updateChildren($selectedGroup.id, childGroups);
         activeMode = EditModes.ADD;
     }
 
@@ -96,12 +99,9 @@
             })
             .value();
 
-        const withoutGroup = _.reject($groups, d => d.parentId === $selectedGroup.id);
-
-        $groups = _.concat(withoutGroup, ...childGroups);
+        updateChildren($selectedGroup.id, childGroups);
         activeMode = EditModes.ADD;
     }
-
 
     function updateTitleColor(evt) {
         working.titleColor = evt.detail;
@@ -127,7 +127,6 @@
         activeMode = EditModes.COLOR;
     }
 
-
     function cancel() {
         dispatch("cancel");
     }
@@ -139,6 +138,7 @@
     $: fetchChildrenStore = determineStore($selectedGroup.data);
     $: directChildren = $fetchChildrenStore?.data || [];
 
+    $: console.log({backgroundColors, titleColors, gs: $groups})
 
 </script>
 
@@ -159,7 +159,7 @@
                       selectionFilter={alreadyAddedFilter}/>
     {/if}
 
-    <div>
+    <div class="controls">
         <button class="btn btn-default"
                 on:click={updateSize}>
             Update Item Size
@@ -208,7 +208,7 @@
     <div id="start-color">
         <ColorPicker startColor={working.titleColor}
                      on:select={updateTitleColor}
-                     predefinedColors={defaultColors}/>
+                     predefinedColors={$titleColors}/>
     </div>
     <div class="help-block">
         Select a title color for this group from a predefined color or use the custom button to pick out a custom color.
@@ -218,7 +218,7 @@
     <div id="content-color">
         <ColorPicker startColor={working.contentColor}
                      on:select={updateContentColor}
-                     predefinedColors={defaultBgColors}/>
+                     predefinedColors={$backgroundColors}/>
     </div>
     <div class="help-block">
         Select a background colour for this group from a predefined color or use the custom button to pick out a custom color.
@@ -237,3 +237,15 @@
 
 {/if}
 
+
+<style>
+
+    .controls {
+        display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start;
+        align-items: flex-start;
+        gap: 0.5em;
+    }
+
+</style>

@@ -52,6 +52,7 @@ public enum EntityKind {
     ENTITY_HIERARCHY("Entity hierarchy"),
     ENTITY_NAMED_NOTE("Entity named note"),
     ENTITY_NAMED_NOTE_TYPE("Entity named note type"),
+    ENTITY_OVERLAY_DIAGRAM("Entity overlay diagram"),
     ENTITY_RELATIONSHIP("Entity relationship"),
     ENTITY_STATISTIC("Entity statistic"),
     EXTERNAL_IDENTIFIER("External Identifier"),

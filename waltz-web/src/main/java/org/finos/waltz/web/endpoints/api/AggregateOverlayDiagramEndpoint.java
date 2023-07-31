@@ -21,9 +21,11 @@ package org.finos.waltz.web.endpoints.api;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramInfo;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramPreset;
+import org.finos.waltz.model.aggregate_overlay_diagram.OverlayDiagramCreateCommand;
 import org.finos.waltz.model.aggregate_overlay_diagram.OverlayDiagramPresetCreateCommand;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.*;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.*;
+import org.finos.waltz.model.entity_overlay_diagram.OverlayDiagramKind;
 import org.finos.waltz.service.aggregate_overlay_diagram.AggregateOverlayDiagramService;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
@@ -35,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.web.WebUtilities.*;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
@@ -61,6 +64,7 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
 
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
         String findAllPath = mkPath(BASE_URL, "all");
+        String findByKindPath = mkPath(BASE_URL, "diagram-kind", ":kind");
         String getAppCountWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "app-count-widget");
         String getAttestationWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "attestation");
         String findTargetAppCostWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "target-app-cost-widget");
@@ -71,6 +75,7 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
         String getComplexityWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "complexity-widget");
         String findPresetsForDiagramPath = mkPath(BASE_URL, "diagram-id", ":id", "presets");
         String createPresetPath = mkPath(BASE_URL, "create-preset");
+        String createPath = mkPath(BASE_URL, "create");
 
         DatumRoute<AggregateOverlayDiagramInfo> getByIdRoute = (request, response) -> {
             return aggregateOverlayDiagramService.getById(getId(request));
@@ -79,6 +84,15 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
 
         ListRoute<AggregateOverlayDiagram> findAllRoute = (request, response) -> {
             return aggregateOverlayDiagramService.findAll();
+        };
+
+
+        ListRoute<AggregateOverlayDiagram> findByKindRoute = (request, response) -> {
+            OverlayDiagramKind overlayDiagramKind = readEnum(request,
+                    "kind",
+                    OverlayDiagramKind.class,
+                    (s) -> null);
+            return aggregateOverlayDiagramService.findByKind(overlayDiagramKind);
         };
 
 
@@ -184,10 +198,16 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
             return aggregateOverlayDiagramService.createPreset(readBody(request, OverlayDiagramPresetCreateCommand.class), getUsername(request));
         };
 
+        DatumRoute<Long> createRoute = (request, response) -> {
+            return aggregateOverlayDiagramService.create(readBody(request, OverlayDiagramCreateCommand.class), getUsername(request));
+        };
+
 
         getForDatum(getByIdPath, getByIdRoute);
         getForList(findAllPath, findAllRoute);
+        getForList(findByKindPath, findByKindRoute);
         getForDatum(getBackingEntityWidgetDataPath, getBackingEntityWidgetDataRoute);
+        postForDatum(getBackingEntityWidgetDataPath, getBackingEntityWidgetDataRoute);
         getForList(findPresetsForDiagramPath, findPresetsForDiagramRoute);
         postForDatum(getAppCountWidgetDataPath, getAppCountWidgetDataRoute);
         postForDatum(getAttestationWidgetDataPath, getAttestationWidgetDataRoute);
@@ -197,6 +217,7 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
         postForDatum(getAggregatedEntitiesWidgetDataPath, getAggregatedEntitiesWidgetDataRoute);
         postForDatum(getComplexityWidgetDataPath, getComplexityWidgetDataRoute);
         postForDatum(createPresetPath, createPresetRoute);
+        postForDatum(createPath, createRoute);
     }
 
 }

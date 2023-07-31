@@ -2,9 +2,9 @@
 
     import DiagramTreeNode from "./DiagramTreeNode.svelte";
     import _ from "lodash";
-    import {buildHierarchies, doSearch, prepareSearchNodes} from "../../common/hierarchy-utils";
-    import {sameRef} from "../../common/entity-utils";
-    import SearchInput from "../../common/svelte/SearchInput.svelte";
+    import {buildHierarchies, doSearch, prepareSearchNodes} from "../../../../common/hierarchy-utils";
+    import {sameRef} from "../../../../common/entity-utils";
+    import SearchInput from "../../../../common/svelte/SearchInput.svelte";
 
     export let groups;
     export let depth = 0;

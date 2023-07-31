@@ -1,16 +1,30 @@
 import {
     amberBgHex,
-    amberHex, blueBgHex,
-    blueHex, determineForegroundColor,
-    goldHex, greenBgHex,
-    greenHex, greyBgHex,
-    greyHex, pinkBgHex,
-    pinkHex, purpleBgHex,
-    purpleHex, redBgHex,
-    redHex, yellowBgHex,
+    amberHex,
+    blueBgHex,
+    blueHex,
+    determineForegroundColor,
+    greenBgHex,
+    greenHex,
+    greyBgHex,
+    greyHex,
+    pinkBgHex,
+    pinkHex,
+    purpleBgHex,
+    purpleHex,
+    redBgHex,
+    redHex,
+    yellowBgHex,
     yellowHex
-} from "../../common/colors";
+} from "../../../common/colors";
 import _ from "lodash";
+import {entity} from "../../../common/services/enums/entity";
+import {
+    mkAggregatedEntitiesGlobalProps
+} from "../../../aggregate-overlay-diagram/components/aggregate-overlay-diagram/aggregate-overlay-diagram-utils";
+import DefaultOverlay from "./overlays/DefaultOverlay.svelte";
+import AppCountOverlay from "./overlays/AppCountOverlay.svelte";
+import {aggregateOverlayDiagramStore} from "../../../svelte-stores/aggregate-overlay-diagram-store";
 
 export const FlexDirections = {
     COLUMN: "column",
@@ -72,7 +86,6 @@ export function mkItemStyle(group) {
         width: fit-content;
         ${group.props.flexDirection === FlexDirections.ROW ? "height: fit-content;" : "width: fit-content;"}
         font-size: ${group.props.contentFontSize}em;
-        
         `;
 }
 
@@ -126,7 +139,6 @@ export const defaultColors = [
     yellowHex
 ];
 
-
 export const defaultBgColors = [
     greyBgHex,
     greenBgHex,
@@ -137,3 +149,30 @@ export const defaultBgColors = [
     amberBgHex,
     yellowBgHex
 ];
+
+export const defaultOverlay = {
+    key: "BACKING_ENTITIES",
+    name: "Backing Entities",
+    icon: "cubes",
+    description: "Displays the underlying entities which drive the overlays on the diagram",
+    component: DefaultOverlay,
+    remoteMethod: aggregateOverlayDiagramStore.findBackingEntitiesForDiagram,
+    url: "backing-entity-widget",
+    aggregatedEntityKinds: [entity.APPLICATION.key, entity.CHANGE_INITIATIVE.key]
+};
+
+export const overlays =  [
+    {
+        key: "AGGREGATED_ENTITIES",
+        name: "Aggregated Entities",
+        icon: "pie-chart",
+        description: "Displays entities which are aggregated to populate the overlay data",
+        component: AppCountOverlay,
+        remoteMethod: aggregateOverlayDiagramStore.findAggregatedEntitiesForDiagram,
+        url: "aggregated-entities-widget",
+        mkGlobalProps: mkAggregatedEntitiesGlobalProps,
+        aggregatedEntityKinds: [entity.APPLICATION.key, entity.CHANGE_INITIATIVE.key]
+    },
+    defaultOverlay
+]
+

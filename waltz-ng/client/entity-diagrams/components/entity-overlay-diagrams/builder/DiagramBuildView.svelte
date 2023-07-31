@@ -1,11 +1,12 @@
 <script>
 
     import _ from "lodash";
-    import {groups, hoveredGroupId, movingGroup, selectedGroup} from "./diagram-builder-store";
+    import {diagramService, hoveredGroupId} from "../entity-diagram-store";
+    import {movingGroup} from "./diagram-builder-store";
     import {flip} from 'svelte/animate';
-    import {flattenChildren} from "../../common/hierarchy-utils";
-    import toasts from "../../svelte-stores/toast-store";
-    import Item from "./Item.svelte";
+    import {flattenChildren} from "../../../../common/hierarchy-utils";
+    import toasts from "../../../../svelte-stores/toast-store";
+    import Item from "../Item.svelte";
     import {
         mkContainerStyle,
         mkContentBoxStyle,
@@ -13,12 +14,14 @@
         mkItemStyle,
         mkReorderBoxStyle,
         mkTitleStyle
-    } from "./diagram-builder-utils";
+    } from "../entity-diagram-utils";
 
     export let group;
-    let timeout;
 
+    let timeout;
     let showReorderPanels = false;
+
+    const {selectedOverlay, updateGroup, updateChildren, selectedGroup, groups, selectGroup} = diagramService;
 
     function drop(evt, targetGroup) {
         evt.preventDefault();
@@ -32,8 +35,7 @@
         } else {
             const moveGroup = _.find($groups, d => d.id === $movingGroup.id);
             const updatedGroup = Object.assign({}, moveGroup, {parentId: targetGroup.id})
-            const withoutGroup = _.reject($groups, d => d.id === $movingGroup.id);
-            $groups = _.concat(withoutGroup, updatedGroup);
+            updateGroup(updatedGroup);
         }
         clearDrag();
     }
@@ -58,8 +60,9 @@
             })
             .value();
 
-        const workingGroups = _.reject($groups, d => d.parentId === targetGroup.parentId);
-        $groups = _.concat(workingGroups, ...reorderedSiblings);
+        updateChildren(targetGroup.parentId, reorderedSiblings);
+        // const workingGroups = _.reject($groups, d => d.parentId === targetGroup.parentId);
+        // $groups = _.concat(workingGroups, ...reorderedSiblings);
         clearDrag();
     }
 
@@ -96,6 +99,10 @@
         $hoveredGroupId = null;
     }
 
+    function selectOverlayGroup(group) {
+        selectGroup(group);
+    }
+
 </script>
 
 {#if group}
@@ -123,7 +130,7 @@
                      on:focus|stopPropagation={() => startHover(group.id)}
                      on:blur|stopPropagation={stopHover}>
                     <button style="outline: none !important; width: 100%; background: none; border: none; color: inherit;"
-                            on:click={() => $selectedGroup = group}>
+                            on:click={() => selectOverlayGroup(group)}>
                         {group.title}
                     </button>
                 </div>
@@ -139,7 +146,8 @@
                 {:else}
                     {#if group.data}
                         <div style={mkItemStyle(group)}>
-                            <Item data={group.data}/>
+                            <Item data={group.data}
+                                  cellId={group.id}/>
                         </div>
                     {/if}
                 {/each}
