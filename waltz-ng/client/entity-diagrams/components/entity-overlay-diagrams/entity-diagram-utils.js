@@ -23,8 +23,10 @@ import {
     mkAggregatedEntitiesGlobalProps
 } from "../../../aggregate-overlay-diagram/components/aggregate-overlay-diagram/aggregate-overlay-diagram-utils";
 import DefaultOverlay from "./overlays/DefaultOverlay.svelte";
-import AppCountOverlay from "./overlays/AppCountOverlay.svelte";
-import {aggregateOverlayDiagramStore} from "../../../svelte-stores/aggregate-overlay-diagram-store";
+import AggregatedEntitiesOverlayParameters from "./overlays/AggregatedEntitiesOverlayParameters.svelte";
+import DefaultOverlayParameters from "./overlays/DefaultOverlayParameters.svelte";
+import AggregatedEntitiesOverlayCell
+    from "../../../aggregate-overlay-diagram/components/aggregate-overlay-diagram/widgets/aggregated-entities/AggregatedEntitiesOverlayCell.svelte";
 
 export const FlexDirections = {
     COLUMN: "column",
@@ -65,9 +67,14 @@ export function mkColourProps(color) {
     color: ${determineForegroundColor(color)};`
 }
 
+function mkFlexProportion(group, child) {
+    return `flex: ${child.props.proportion} 1 ${_.floor(100 / (group.props.bucketSize + 1))}%;`;
+}
+
+
 export function mkGroupStyle(group, child) {
     return `
-        flex: ${child.props.proportion} 1 ${_.floor(100 / (group.props.bucketSize + 1))}%;
+        ${mkFlexProportion(group, child)}
         margin: 0.2em;
         min-width: ${group.props.minWidth}em;
         min-height: ${group.props.minHeight}em;
@@ -83,7 +90,6 @@ export function mkItemStyle(group) {
         min-width: ${group.props.minWidth}em;
         min-height: ${group.props.minHeight}em;
         height: fit-content;
-        width: fit-content;
         ${group.props.flexDirection === FlexDirections.ROW ? "height: fit-content;" : "width: fit-content;"}
         font-size: ${group.props.contentFontSize}em;
         `;
@@ -156,9 +162,9 @@ export const defaultOverlay = {
     icon: "cubes",
     description: "Displays the underlying entities which drive the overlays on the diagram",
     component: DefaultOverlay,
-    remoteMethod: aggregateOverlayDiagramStore.findBackingEntitiesForDiagram,
     url: "backing-entity-widget",
-    aggregatedEntityKinds: [entity.APPLICATION.key, entity.CHANGE_INITIATIVE.key]
+    aggregatedEntityKinds: [entity.APPLICATION.key, entity.CHANGE_INITIATIVE.key],
+    parameterWidget: DefaultOverlayParameters
 };
 
 export const overlays =  [
@@ -167,11 +173,11 @@ export const overlays =  [
         name: "Aggregated Entities",
         icon: "pie-chart",
         description: "Displays entities which are aggregated to populate the overlay data",
-        component: AppCountOverlay,
-        remoteMethod: aggregateOverlayDiagramStore.findAggregatedEntitiesForDiagram,
+        component: AggregatedEntitiesOverlayCell,
         url: "aggregated-entities-widget",
         mkGlobalProps: mkAggregatedEntitiesGlobalProps,
-        aggregatedEntityKinds: [entity.APPLICATION.key, entity.CHANGE_INITIATIVE.key]
+        aggregatedEntityKinds: [entity.APPLICATION.key, entity.CHANGE_INITIATIVE.key],
+        parameterWidget: AggregatedEntitiesOverlayParameters
     },
     defaultOverlay
 ]

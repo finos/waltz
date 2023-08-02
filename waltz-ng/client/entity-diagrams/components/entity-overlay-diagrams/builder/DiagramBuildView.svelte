@@ -61,8 +61,6 @@
             .value();
 
         updateChildren(targetGroup.parentId, reorderedSiblings);
-        // const workingGroups = _.reject($groups, d => d.parentId === targetGroup.parentId);
-        // $groups = _.concat(workingGroups, ...reorderedSiblings);
         clearDrag();
     }
 

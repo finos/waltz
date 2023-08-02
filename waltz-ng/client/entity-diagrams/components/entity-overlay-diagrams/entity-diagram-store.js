@@ -12,7 +12,8 @@ const selectedDiagram = writable(null);
 const groups = writable([]);
 const groupData = writable([]);
 
-// const overlayData = writable([]);
+const overlayData = writable([]);
+const overlayProperties = writable({});
 
 const selectedGroup = writable(null);
 export let hoveredGroupId = writable(null);
@@ -20,59 +21,54 @@ export let hoveredGroupId = writable(null);
 const selectedOverlay = writable(defaultOverlay);
 
 const groupsWithData = derived(
-    [groups, groupData],
-    ([$groups]) => {
-        const dataByGroupId = _.keyBy(groupData, d => d.cellId);
-        return _.chain($groups)
-            .map(g => Object.assign(g, { data: dataByGroupId[g.id] || g.data })) // lookup data or fallback to any value set on the input
+    [groups, groupData, overlayData],
+    ([$groups, $groupData, $overlayData]) => {
+        const dataByGroupId = _.keyBy($groupData, d => d.cellId);
+        return _
+            .chain($groups)
+            .map(g => Object.assign(g, { data: dataByGroupId[g.id], overlayData: $overlayData[g.id] })) // lookup data or fallback to any value set on the input
             .orderBy(d => d.position || d.id)
             .value();
     });
 
 const diagramLayout = derived([groupsWithData], ([$groupsWithData]) => _.first(buildHierarchies($groupsWithData)));
 
-const overlayData = derived(
-    [selectedDiagram, selectedOverlay, selectionOptions],
-    ([$selectedDiagram, $selectedOverlay, $selectionOptions]) => {
+function _loadOverlayData() {
 
-        if ($selectedOverlay && $selectedDiagram && $selectionOptions) {
+    const diagram = get(selectedDiagram);
+    const opts = get(selectionOptions);
+    const overlay = get(selectedOverlay);
 
-            console.log($selectedOverlay);
+    if(diagram && overlay && opts) {
+        const body = Object.assign(
+            {},
+            {
+                idSelectionOptions: opts,
+                overlayParameters: {}
+            });
 
-            const body = Object.assign(
-                {},
-                {
-                    idSelectionOptions: $selectionOptions,
-                    overlayParameters: {}
-                });
+        return $http
+            .post(`api/aggregate-overlay-diagram/diagram-id/${diagram.id}/${overlay.url}`, body)
+            .then(d => {
 
-            return $http
-                .post(`api/aggregate-overlay-diagram/diagram-id/${$selectedDiagram.id}/${$selectedOverlay.url}`, body)
-                .then(d => _.keyBy(d.data, d => d.cellId));
-        }
-    });
+                const allOverlayData = d.data;
 
-function selectOverlay(overlay, selectionOptions) {
+                const cellDataByExtId = _.keyBy(allOverlayData.cellData, d => d.cellExternalId);
 
-    // const diagram = get(selectedDiagram);
+                const props = overlay.mkGlobalProps
+                    ? overlay.mkGlobalProps(allOverlayData)
+                    : {};
 
+                overlayData.set(cellDataByExtId);
+                overlayProperties.set(props)
+            });
+    }
+}
+
+
+function selectOverlay(overlay) {
     selectedOverlay.set(overlay);
-    // console.log({diagram})
-    //
-    // const body = Object.assign(
-    //     {},
-    //     {
-    //         idSelectionOptions: selectionOptions,
-    //         overlayParameters: {}
-    //     });
-    //
-    // console.log({body, overlay, selectionOptions})
-
-    // return $selectedOverlay.remoteMethod($selectedDiagram.id, body);
-    //
-    // return $http
-    //     .post(`api/aggregate-overlay-diagram/diagram-id/${diagram.id}/${overlay.url}`, body)
-    //     .then(d => overlayData.set(d.data));
+    _loadOverlayData();
 }
 
 function saveDiagram(diagram) {
@@ -107,6 +103,7 @@ function selectDiagram(diagramId) {
             groupData.set(diagramInfo.backingEntities);
             selectedGroup.set(null);
             selectedOverlay.set(defaultOverlay);
+            _loadOverlayData();
             return d.data;
         });
 }
@@ -120,40 +117,30 @@ function uploadDiagramLayout(layoutData = []) {
 
     reset();
 
-    console.log({layoutData});
-
     const data = _
         .chain(layoutData)
         .filter(d => !_.isEmpty(d.data))
         .map(d => {
-            if(_.isEmpty(d.kind)) {
-                console.log({d});
-            } else {
-                console.log({item: d})
-            }
-
             const cellId = d.id;
             const ref = d.data.entityReference || toEntityRef(d.data);
-            console.log({cellId, ref});
             return ({cellId: cellId, entityReference: ref});
         })
         .value();
-
-    console.log("uploadDiagLayout", {data});
 
     groups.set(layoutData);
     groupData.set(data);
 }
 
 
-function addGroup(newGroup) {
+function addGroup(newGroup, data) {
     groups.update((gs) => {
         return _.concat(gs, newGroup)
     });
 
-    if(!_.isEmpty(newGroup.data)) {
+    if(!_.isEmpty(data)) {
         groupData.update((gd) => {
-            const backingEntity = Object.assign({}, {cellId: newGroup.id, entityReference: toEntityRef(newGroup.data)})
+            const ref = data.entityReference || toEntityRef(data);
+            const backingEntity = Object.assign({}, {cellId: newGroup.id, entityReference: ref})
             return _.concat(gd, backingEntity);
         });
     }
@@ -204,6 +191,7 @@ function createStores() {
         selectedOverlay: {subscribe: selectedOverlay.subscribe},
         diagramLayout: {subscribe: diagramLayout.subscribe},
         overlayData: {subscribe: overlayData.subscribe},
+        overlayProperties: {subscribe: overlayProperties.subscribe},
         selectDiagram,
         saveDiagram,
         uploadDiagramLayout,

@@ -16,23 +16,9 @@
 
     $: $selectionOptions = mkSelectionOptions(parentEntityRef);
 
-    // $: diagram  = _.first(buildHierarchies($groupsWithData)); // take first as starting from root node
-
     function selectOverlayDiagram(evt) {
-        // const sDiagram = evt.detail;
         selectDiagram(evt.detail.id);
-        // console.log({sDiagram});
-        // $selectedDiagram = sDiagram;
-        // $groups = JSON.parse(sDiagram.layoutData);
     }
-
-    // $: dataCall = $overlayDataCall;
-    // $: overlayData = $dataCall?.data;
-    $: cellDataByCellExtId = _.keyBy(
-        overlayData?.cellData,
-        d => d.cellExternalId);
-
-    $: console.log({overlayData, cellDataByCellExtId});
 
 </script>
 

@@ -1,9 +1,9 @@
 <script>
 
     import _ from "lodash";
-    import {hoveredGroupId} from "./entity-diagram-store";
+    import {diagramService, hoveredGroupId} from "./entity-diagram-store";
     import {flip} from 'svelte/animate';
-    import Item from "./Item.svelte";
+    import Item, {cellId} from "./Item.svelte";
     import {
         mkContainerStyle,
         mkContentBoxStyle,
@@ -15,7 +15,12 @@
     import EntityLink from "../../../common/svelte/EntityLink.svelte";
 
     export let group;
-    export let parentEntityRef;
+
+    const {selectedOverlay, overlayData} = diagramService;
+
+    $: cellData = _.get($overlayData, group.id);
+
+    $: children = _.filter(group.children, d => _.includes(_.keys($overlayData), d.id));
 
 </script>
 
@@ -41,16 +46,17 @@
             {/if}
 
             <div style={mkContainerStyle(group)}>
-                {#each _.orderBy(group.children, d => d.position) as child (child.id)}
-                    <div style={mkGroupStyle(group, child)}
-                         animate:flip="{{duration: 300}}">
-                        <svelte:self group={child}>
-                        </svelte:self>
-                    </div>
+                {#each _.orderBy(children, d => d.position) as child (child.id)}
+                        <div style={mkGroupStyle(group, child)}
+                             animate:flip="{{duration: 300}}">
+                                <svelte:self group={child}>
+                                </svelte:self>
+                        </div>
                 {:else}
-                    {#if group.data}
+                    {#if group.data && !_.isEmpty(cellData)}
                         <div style={mkItemStyle(group)}>
-                            <Item {parentEntityRef} data={group.data}/>
+                            <Item data={group.data}
+                                  cellId={group.id}/>
                         </div>
                     {/if}
                 {/each}

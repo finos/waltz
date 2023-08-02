@@ -12,7 +12,7 @@
 
     $: r = scaleSqrt()
         .domain([0, maxCount])
-        .range([0, height / 2 - 2]);
+        .range([0, (height / 2) - (height * 0.1)]);
 
     $: cr = r(references.length)
 
@@ -20,6 +20,7 @@
     let textHeight = 18;
 
     $: references = cellData?.aggregatedEntityReferences || [];
+
 
 </script>
 
@@ -31,7 +32,7 @@
             <circle r={cr}
                     fill="#a9e4ff"
                     stroke="#25b0ff"
-                    stroke-width="0.5"
+                    stroke-width={height * 0.05}
                     cx={width * 0.2}
                     cy={height / 2}/>
         {/if}

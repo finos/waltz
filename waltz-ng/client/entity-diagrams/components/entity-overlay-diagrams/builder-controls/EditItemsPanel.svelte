@@ -42,8 +42,8 @@
     function selectItem(entity) {
         const groupNumber = _.size($groups) + 1;
         const id = generateUUID();
-        const newGroup = mkGroup(entity.name, id, $selectedGroup.id, groupNumber, $selectedGroup.props, toEntityRef(entity))
-        addGroup(newGroup);
+        const newGroup = mkGroup(entity.name, id, $selectedGroup.id, groupNumber, $selectedGroup.props)
+        addGroup(newGroup, entity);
     }
 
     function determineStore(ref) {
@@ -66,13 +66,13 @@
     function addChildren() {
         const existingChildren = _.filter($groups, d => d.parentId === $selectedGroup.id);
         _.chain(directChildren)
-            .reject(child => _.some(existingChildren, d => sameRef(d.data, child)))
+            .reject(child => _.some(existingChildren, d => sameRef(d.data.entityReference, child)))
             .forEach(child => selectItem(child))
             .value();
     }
 
     function deselectItem(entity) {
-        $groups = _.reject($groups, d => d.parentId === $selectedGroup.id && sameRef(d.data, entity));
+        $groups = _.reject($groups, d => d.parentId === $selectedGroup.id && sameRef(d.data.entityReference, entity));
     }
 
     function updateItemSizes() {
@@ -132,10 +132,10 @@
     }
 
     $: alreadyAddedFilter = (entity) => {
-        return !_.some($groups, d => d.parentId === $selectedGroup.id && d.data && sameRef(d.data, entity));
+        return !_.some($groups, d => d.parentId === $selectedGroup.id && d.data && sameRef(d.data.entityReference, entity));
     }
 
-    $: fetchChildrenStore = determineStore($selectedGroup.data);
+    $: fetchChildrenStore = determineStore($selectedGroup.data?.entityReference);
     $: directChildren = $fetchChildrenStore?.data || [];
 
     $: console.log({backgroundColors, titleColors, gs: $groups})
