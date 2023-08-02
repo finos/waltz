@@ -17,7 +17,6 @@
     $: cr = r(references.length)
 
     let references = [];
-    let textHeight = 18;
 
     $: references = cellData?.aggregatedEntityReferences || [];
 

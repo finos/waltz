@@ -26,7 +26,7 @@ import AssessmentWidgetParameters from "./widgets/assessments/AssessmentWidgetPa
 import AssessmentOverlayCell from "./widgets/assessments/AssessmentOverlayCell.svelte";
 import AssessmentOverlayLegend from "./widgets/assessments/AssessmentOverlayLegend.svelte";
 import BackingEntitiesWidgetParameters from "./widgets/backing-entities/BackingEntitiesWidgetParameters.svelte";
-import BackingEntitiesOverlayCell from "./widgets/backing-entities/BackingEntitiesOverlayCell.svelte";
+import BackingEntitiesOverlayCell from "./widgets/backing-entities/BackingEntitiesPlainOverlayCell.svelte";
 import AggregatedEntitiesWidgetParameters
     from "./widgets/aggregated-entities/AggregatedEntitiesWidgetParameters.svelte";
 import AggregatedEntitiesOverlayCell from "./widgets/aggregated-entities/AggregatedEntitiesOverlayCell.svelte";

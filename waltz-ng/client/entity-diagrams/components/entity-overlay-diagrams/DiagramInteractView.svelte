@@ -1,7 +1,7 @@
 <script>
 
     import _ from "lodash";
-    import {diagramService, hoveredGroupId} from "./entity-diagram-store";
+    import {diagramService, hoveredGroupId, hideEmptyCells} from "./entity-diagram-store";
     import {flip} from 'svelte/animate';
     import Item from "./Item.svelte";
     import {mkContainerStyle, mkContentBoxStyle, mkGroupStyle, mkItemStyle, mkTitleStyle} from "./entity-diagram-utils";
@@ -21,9 +21,14 @@
 
     $: cellData = _.get($overlayData, group.id);
 
-    $: flattenedChildren = flattenChildren(group);
+    function hasData(child) {
+        return !_.isEmpty(child.overlayData)
+            || _.some(flattenChildren(child), d => !_.isEmpty(d.overlayData));
+    }
 
-    $: children = _.filter(group.children, child => !_.isEmpty(child.overlayData) || _.some(flattenChildren(child), d => !_.isEmpty(d.overlayData)));
+    $: children = $hideEmptyCells
+        ? _.filter(group.children, child => hasData(child))
+        : group.children;
 
 </script>
 

@@ -3,7 +3,7 @@
     import EntityLink from "../../../../common/svelte/EntityLink.svelte";
 
     export let data;
-    export let cellData;
+    // export let cellData;
 
 </script>
 

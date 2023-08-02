@@ -27,6 +27,8 @@ import AggregatedEntitiesOverlayParameters from "./overlays/AggregatedEntitiesOv
 import DefaultOverlayParameters from "./overlays/DefaultOverlayParameters.svelte";
 import AggregatedEntitiesOverlayCell
     from "../../../aggregate-overlay-diagram/components/aggregate-overlay-diagram/widgets/aggregated-entities/AggregatedEntitiesOverlayCell.svelte";
+import BackingEntitiesOverlayCell
+    from "../../../aggregate-overlay-diagram/components/aggregate-overlay-diagram/widgets/backing-entities/BackingEntitiesPlainOverlayCell.svelte";
 
 export const FlexDirections = {
     COLUMN: "column",
@@ -157,12 +159,11 @@ export const defaultBgColors = [
 ];
 
 export const defaultOverlay = {
-    key: "BACKING_ENTITIES",
-    name: "Backing Entities",
+    key: "CELL_DATA",
+    name: "Cell Data",
     icon: "cubes",
-    description: "Displays the underlying entities which drive the overlays on the diagram",
+    description: "Displays the cell data that populates the cell",
     component: DefaultOverlay,
-    url: "backing-entity-widget",
     aggregatedEntityKinds: [entity.APPLICATION.key, entity.CHANGE_INITIATIVE.key],
     parameterWidget: DefaultOverlayParameters
 };
@@ -179,6 +180,15 @@ export const overlays =  [
         aggregatedEntityKinds: [entity.APPLICATION.key, entity.CHANGE_INITIATIVE.key],
         parameterWidget: AggregatedEntitiesOverlayParameters
     },
-    defaultOverlay
+    {
+        key: "BACKING_ENTITIES",
+        name: "Backing Entities",
+        icon: "cubes",
+        description: "Displays the underlying entities which drive the overlays on the diagram",
+        component: BackingEntitiesOverlayCell,
+        url: "backing-entity-widget",
+        aggregatedEntityKinds: [entity.APPLICATION.key, entity.CHANGE_INITIATIVE.key],
+        parameterWidget: DefaultOverlayParameters
+    }
 ]
 

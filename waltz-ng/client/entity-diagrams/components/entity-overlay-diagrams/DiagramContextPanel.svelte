@@ -1,9 +1,10 @@
 <script>
 
     import {overlays} from "./entity-diagram-utils";
-    import {diagramService, selectionOptions} from "./entity-diagram-store";
+    import {diagramService, selectionOptions, hideEmptyCells} from "./entity-diagram-store";
     import Icon from "../../../common/svelte/Icon.svelte";
     import EntityLink from "../../../common/svelte/EntityLink.svelte";
+    import Toggle from "../../../common/svelte/Toggle.svelte";
 
     const ContextModes = {
         VIEW: "VIEW",
@@ -62,6 +63,11 @@
             (Change overlay)
         </button>
     </h4>
+
+    <Toggle labelOn="Hiding cells with no data"
+            labelOff="Showing all cells"
+            state={$hideEmptyCells}
+            onToggle={() => $hideEmptyCells = !$hideEmptyCells}/>
 
     <svelte:component this={$selectedOverlay.parameterWidget}/>
 

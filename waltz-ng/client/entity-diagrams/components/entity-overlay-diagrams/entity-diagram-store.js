@@ -7,6 +7,9 @@ import {buildHierarchies, flattenChildren} from "../../../common/hierarchy-utils
 import {toEntityRef} from "../../../common/entity-utils";
 
 export let selectionOptions = writable(null);
+export let hoveredGroupId = writable(null);
+export let hideEmptyCells = writable(false);
+
 const selectedDiagram = writable(null);
 
 const groups = writable([]);
@@ -16,7 +19,7 @@ const overlayData = writable([]);
 const overlayProperties = writable({});
 
 const selectedGroup = writable(null);
-export let hoveredGroupId = writable(null);
+
 
 const selectedOverlay = writable(defaultOverlay);
 
@@ -40,28 +43,36 @@ function _loadOverlayData() {
     const overlay = get(selectedOverlay);
 
     if(diagram && overlay && opts) {
-        const body = Object.assign(
-            {},
-            {
-                idSelectionOptions: opts,
-                overlayParameters: {}
-            });
 
-        return $http
-            .post(`api/aggregate-overlay-diagram/diagram-id/${diagram.id}/${overlay.url}`, body)
-            .then(d => {
+        if (_.isEmpty(overlay.url)) {
 
-                const allOverlayData = d.data;
+            overlayData.set([]);
+            overlayProperties.set({});
 
-                const cellDataByExtId = _.keyBy(allOverlayData.cellData, d => d.cellExternalId);
+        } else {
+            const body = Object.assign(
+                {},
+                {
+                    idSelectionOptions: opts,
+                    overlayParameters: {}
+                });
 
-                const props = overlay.mkGlobalProps
-                    ? overlay.mkGlobalProps(allOverlayData)
-                    : {};
+            return $http
+                .post(`api/aggregate-overlay-diagram/diagram-id/${diagram.id}/${overlay.url}`, body)
+                .then(d => {
 
-                overlayData.set(cellDataByExtId);
-                overlayProperties.set(props)
-            });
+                    const allOverlayData = d.data;
+
+                    const cellDataByExtId = _.keyBy(allOverlayData.cellData, d => d.cellExternalId);
+
+                    const props = overlay.mkGlobalProps
+                        ? overlay.mkGlobalProps(allOverlayData)
+                        : {};
+
+                    overlayData.set(cellDataByExtId);
+                    overlayProperties.set(props);
+                });
+        }
     }
 }
 
