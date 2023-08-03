@@ -5,8 +5,8 @@
 
     export let cellId;
     export let data;
-    export let height = 100;
-    export let width = 100;
+    export let height;
+    export let width;
 
     let comp;
 

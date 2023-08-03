@@ -7,12 +7,18 @@
     import DiagramInteractView from "./DiagramInteractView.svelte";
     import {mkSelectionOptions} from "../../../common/selector-utils";
     import DiagramList from "./DiagramList.svelte";
+    import {onMount} from "svelte";
+    import {overlays} from "./entity-diagram-utils";
 
     export let parentEntityRef;
 
     let diagrams = [{id: 1, name: "Test Data", description: "Test diagram for dev", layoutData: diagramLayoutData, lastUpdatedBy: "admin", lastUpdatedAt: new Date(), provenance: "test"}];
 
-    const {selectDiagram, overlayData, selectedOverlay, diagramLayout, selectedDiagram} = diagramService;
+    const {selectDiagram, overlayData, selectedOverlay, diagramLayout, selectedDiagram, selectOverlay} = diagramService;
+
+    onMount(() => {
+        selectOverlay(_.first(overlays));
+    })
 
     $: $selectionOptions = mkSelectionOptions(parentEntityRef);
 

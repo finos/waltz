@@ -20,7 +20,7 @@
 
     $: cellData = _.get($overlayData, group.id);
 
-    $: children = _.filter(group.children, d => _.includes(_.keys($overlayData), d.id));
+    $: children = group.children;
 
 </script>
 
@@ -31,7 +31,7 @@
             {#if group.props.showTitle}
                 <div style={mkTitleStyle(group, $hoveredGroupId)}>
                     {#if group.data}
-                        <EntityLink ref={group.data}
+                        <EntityLink ref={group.data.entityReference}
                                     showIcon="false"
                                     isSecondaryLink="true">
                             <span>
@@ -53,10 +53,12 @@
                                 </svelte:self>
                         </div>
                 {:else}
-                    {#if group.data && !_.isEmpty(cellData)}
+                    {#if group.data}
                         <div style={mkItemStyle(group)}>
                             <Item data={group.data}
-                                  cellId={group.id}/>
+                                  cellId={group.id}
+                                  height={group.props.minWidth / 3}
+                                  width={group.props.minWidth}/>
                         </div>
                     {/if}
                 {/each}

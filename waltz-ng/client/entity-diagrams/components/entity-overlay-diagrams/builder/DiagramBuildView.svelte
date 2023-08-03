@@ -145,7 +145,9 @@
                     {#if group.data}
                         <div style={mkItemStyle(group)}>
                             <Item data={group.data}
-                                  cellId={group.id}/>
+                                  cellId={group.id}
+                                  height={group.props.minWidth / 3}
+                                  width={group.props.minWidth}/>
                         </div>
                     {/if}
                 {/each}

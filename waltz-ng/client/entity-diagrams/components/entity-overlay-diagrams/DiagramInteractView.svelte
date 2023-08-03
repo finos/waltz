@@ -21,9 +21,10 @@
 
     $: cellData = _.get($overlayData, group.id);
 
+
     function hasData(child) {
         return !_.isEmpty(child.overlayData)
-            || _.some(flattenChildren(child), d => !_.isEmpty(d.overlayData));
+            || _.some(flattenChildren(child.children), d => !_.isEmpty(d.overlayData));
     }
 
     $: children = $hideEmptyCells
@@ -36,10 +37,10 @@
 <div>
     <div style="display: flex">
         <div style={mkContentBoxStyle(group)}>
-            {#if group.props.showTitle}
+            {#if $selectedOverlay.showTitle || group.props.showTitle}
                 <div style={mkTitleStyle(group, $hoveredGroupId)}>
                     {#if group.data}
-                        <button class="btn btn-plain"
+                        <button style="outline: none !important; width: 100%; background: none; border: none; color: inherit;"
                                 on:click={selectOverlayGroup}>
                             <Icon name={_.get(entity, [group.data.entityReference.kind, "icon"], "info-circle")}/>
                             {group.title}
@@ -58,7 +59,7 @@
                         </svelte:self>
                     </div>
                 {:else}
-                    {#if group.data && !_.isEmpty(cellData)}
+                    {#if group.data}
                         <div style={mkItemStyle(group)}
                              bind:this={itemElem}>
                             <Item data={group.data}

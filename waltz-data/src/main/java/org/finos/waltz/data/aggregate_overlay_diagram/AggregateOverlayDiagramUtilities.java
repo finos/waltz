@@ -45,10 +45,12 @@ import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.SetUtilities.fromCollection;
+import static org.finos.waltz.common.SetUtilities.union;
 import static org.finos.waltz.data.JooqUtilities.readRef;
 import static org.finos.waltz.schema.Tables.AGGREGATE_OVERLAY_DIAGRAM;
 import static org.finos.waltz.schema.Tables.AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA;
 import static org.finos.waltz.schema.Tables.APPLICATION;
+import static org.finos.waltz.schema.Tables.DATA_TYPE_USAGE;
 import static org.finos.waltz.schema.Tables.ENTITY_HIERARCHY;
 import static org.finos.waltz.schema.Tables.MEASURABLE_RATING;
 import static org.finos.waltz.schema.Tables.MEASURABLE_RATING_PLANNED_DECOMMISSION;
@@ -110,6 +112,7 @@ public class AggregateOverlayDiagramUtilities {
 
 
         Set<Long> backingMeasurableEntityIds = toMeasurableIds(cellMappings);
+        Set<Long> backingDataTypeEntityIds = toDataTypeIds(cellMappings);
 
         Map<Long, List<Long>> measurableIdToEntityIds = findMeasurableIdToAggregatedEntityIdMap(
                 dsl,
@@ -117,6 +120,12 @@ public class AggregateOverlayDiagramUtilities {
                 inScopeEntityIdSelector,
                 backingMeasurableEntityIds,
                 targetStateDate);
+
+        Map<Long, List<Long>> dataTypeIdToEntityIds = findDataTypeIdToAggregatedEntityIdMap(
+                dsl,
+                aggregatedEntityKind,
+                inScopeEntityIdSelector,
+                backingDataTypeEntityIds);
 
         Map<String, Collection<EntityReference>> cellBackingEntitiesByCellExtId = groupBy(
                 cellMappings,
@@ -138,13 +147,19 @@ public class AggregateOverlayDiagramUtilities {
 
                     //only supports measurables at the moment
                     Set<Long> measurableIds = aggregatedEntitiesByKind.getOrDefault(EntityKind.MEASURABLE, emptySet());
+                    Set<Long> dataTypeIds = aggregatedEntitiesByKind.getOrDefault(EntityKind.DATA_TYPE, emptySet());
 
-                    Set<Long> entityIds = measurableIds
+                    Set<Long> entityIdsViaMeasurable = measurableIds
                             .stream()
                             .flatMap(mID -> measurableIdToEntityIds.getOrDefault(mID, emptyList()).stream())
                             .collect(toSet());
 
-                    return tuple(cellExtId, entityIds);
+                    Set<Long> entityIdsViaDataType= dataTypeIds
+                            .stream()
+                            .flatMap(dID -> dataTypeIdToEntityIds.getOrDefault(dID, emptyList()).stream())
+                            .collect(toSet());
+
+                    return tuple(cellExtId, union(entityIdsViaMeasurable, entityIdsViaDataType));
                 })
                 .collect(toMap(k -> k.v1, k -> k.v2));
     }
@@ -155,6 +170,15 @@ public class AggregateOverlayDiagramUtilities {
                 .stream()
                 .map(Tuple2::v2)
                 .filter(d -> d.kind() == EntityKind.MEASURABLE)
+                .map(EntityReference::id)
+                .collect(toSet());
+    }
+
+    public static Set<Long> toDataTypeIds(Set<Tuple2<String, EntityReference>> cellMappings) {
+        return cellMappings
+                .stream()
+                .map(Tuple2::v2)
+                .filter(d -> d.kind() == EntityKind.DATA_TYPE)
                 .map(EntityReference::id)
                 .collect(toSet());
     }
@@ -171,6 +195,19 @@ public class AggregateOverlayDiagramUtilities {
                 return loadMeasurableToAppIdsMap(dsl, inScopeEntityIdSelector, backingEntityIds, targetStateDate);
             case CHANGE_INITIATIVE:
                 return loadMeasurableToCIIdsMap(dsl, inScopeEntityIdSelector, backingEntityIds);
+            default:
+                throw new IllegalArgumentException(format("Cannot load measurable id to entity map for entity kind: %s", aggregatedEntityKind));
+        }
+    }
+
+    private static Map<Long, List<Long>> findDataTypeIdToAggregatedEntityIdMap(DSLContext dsl,
+                                                                               EntityKind aggregatedEntityKind,
+                                                                               Select<Record1<Long>> inScopeEntityIdSelector,
+                                                                               Set<Long> backingEntityIds) {
+
+        switch (aggregatedEntityKind) {
+            case APPLICATION:
+                return loadDataTypeToAppIdsMap(dsl, inScopeEntityIdSelector, backingEntityIds);
             default:
                 throw new IllegalArgumentException(format("Cannot load measurable id to entity map for entity kind: %s", aggregatedEntityKind));
         }
@@ -223,7 +260,6 @@ public class AggregateOverlayDiagramUtilities {
                         inScopeEntityIdSelector,
                         backingEntityReferences));
     }
-
 
     private static Map<Long, List<Long>> loadMeasurableToAppIdsMapUsingTargetState(DSLContext dsl,
                                                                                    Select<Record1<Long>> inScopeEntityIdSelector,
@@ -282,5 +318,17 @@ public class AggregateOverlayDiagramUtilities {
                         .and(MEASURABLE_RATING.ENTITY_ID.in(inScopeEntityIdSelector))
                         .and(MEASURABLE_RATING.MEASURABLE_ID.in(backingEntityReferences)))
                 .fetchGroups(MEASURABLE_RATING.MEASURABLE_ID, MEASURABLE_RATING.ENTITY_ID);
+    }
+
+    private static Map<Long, List<Long>> loadDataTypeToAppIdsMap(DSLContext dsl,
+                                                                 Select<Record1<Long>> inScopeEntityIdSelector,
+                                                                 Set<Long> backingEntityReferences) {
+        return dsl
+                .selectDistinct(DATA_TYPE_USAGE.DATA_TYPE_ID, DATA_TYPE_USAGE.ENTITY_ID)
+                .from(DATA_TYPE_USAGE)
+                .where(DATA_TYPE_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                        .and(DATA_TYPE_USAGE.ENTITY_ID.in(inScopeEntityIdSelector))
+                        .and(DATA_TYPE_USAGE.DATA_TYPE_ID.in(backingEntityReferences)))
+                .fetchGroups(DATA_TYPE_USAGE.DATA_TYPE_ID, DATA_TYPE_USAGE.ENTITY_ID);
     }
 }

@@ -8,7 +8,7 @@ import {toEntityRef} from "../../../common/entity-utils";
 
 export let selectionOptions = writable(null);
 export let hoveredGroupId = writable(null);
-export let hideEmptyCells = writable(false);
+export let hideEmptyCells = writable(true);
 
 const selectedDiagram = writable(null);
 

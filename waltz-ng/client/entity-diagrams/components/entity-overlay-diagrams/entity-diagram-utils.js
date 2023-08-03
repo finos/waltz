@@ -117,9 +117,9 @@ export function mkTitleStyle(group, hoveredGroupId) {
         text-align: center;
         font-weight: bolder;
         padding: 0 0.5em;
-        ${mkColourProps(group.props.titleColor)}
+        ${mkColourProps(group.props.showTitle ? group.props.titleColor : group.props.contentColor)}
         opacity: ${_.isNil(hoveredGroupId) || hoveredGroupId === group.id ? "1;" : "0.5;"}
-        font-size: ${group.props.titleFontSize}em;`;
+        font-size: ${group.props.showTitle ? group.props.titleFontSize : group.props.contentFontSize}em;`;
 }
 
 export function mkContainerStyle(group) {
@@ -165,7 +165,8 @@ export const defaultOverlay = {
     description: "Displays the cell data that populates the cell",
     component: DefaultOverlay,
     aggregatedEntityKinds: [entity.APPLICATION.key, entity.CHANGE_INITIATIVE.key],
-    parameterWidget: DefaultOverlayParameters
+    parameterWidget: DefaultOverlayParameters,
+    showTitle: false
 };
 
 export const overlays =  [
@@ -178,7 +179,8 @@ export const overlays =  [
         url: "aggregated-entities-widget",
         mkGlobalProps: mkAggregatedEntitiesGlobalProps,
         aggregatedEntityKinds: [entity.APPLICATION.key, entity.CHANGE_INITIATIVE.key],
-        parameterWidget: AggregatedEntitiesOverlayParameters
+        parameterWidget: AggregatedEntitiesOverlayParameters,
+        showTitle: true
     },
     {
         key: "BACKING_ENTITIES",
@@ -188,7 +190,8 @@ export const overlays =  [
         component: BackingEntitiesOverlayCell,
         url: "backing-entity-widget",
         aggregatedEntityKinds: [entity.APPLICATION.key, entity.CHANGE_INITIATIVE.key],
-        parameterWidget: DefaultOverlayParameters
+        parameterWidget: DefaultOverlayParameters,
+        showTitle: false
     }
 ]
 
