@@ -122,7 +122,7 @@ public class ReportGridService {
 
         EntityKind targetKind = definition.subjectKind();
 
-        ReportGridInstance instance = mkInstance(id, opts, targetKind);
+        ReportGridInstance instance = mkInstance(id, idSelectionOptions, targetKind);
 
         Set<ReportGridMember> members = reportGridMemberService.findByGridId(id);
 
