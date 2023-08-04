@@ -18,15 +18,16 @@
 
 import angular from "angular";
 
-import {registerComponents, registerStore} from "../common/module-utils";
+import {registerComponents, registerStores} from "../common/module-utils";
 
 import changeInitiativeStore from "./services/change-initiative-store";
+import changeInitiativeViewStore from "./services/change-initiative-view-store";
 import changeInitiativeSelector from "./directives/change-initiative-selector";
+
 import BulkChangeInitiativeSelector from "./components/bulk-change-initiative-selector/bulk-change-initiative-selector";
-
 import changeInitiativeSection from "./components/change-initiative-section/change-initiative-section";
-import changeInitiativeTree from "./components/tree/change-initiative-tree";
 
+import changeInitiativeTree from "./components/tree/change-initiative-tree";
 import Routes from "./routes";
 
 
@@ -35,11 +36,14 @@ function setup() {
     module
         .config(Routes);
 
-    registerStore(module, changeInitiativeStore);
+    registerStores(module, [
+        changeInitiativeStore,
+        changeInitiativeViewStore
+    ]);
 
     module
         .directive("waltzChangeInitiativeSelector", changeInitiativeSelector);
-        
+
     registerComponents(module, [
         changeInitiativeSection,
         changeInitiativeTree,
