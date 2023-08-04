@@ -44,9 +44,8 @@ import {BookmarkStore_API as BookmarkStore} from "../../bookmarks/services/bookm
 import {
     BulkUploadLegalEntityRelationshipsStore_API as BulkUploadLegalEntityRelationshipsStore
 } from "../../legal-entity-relationship-kind/services/bulk-upload-legal-entity-relationships-store";
-import {
-    ChangeInitiativeStore_API as ChangeInitiativeStore
-} from "../../change-initiative/services/change-initiative-store";
+import {ChangeInitiativeStore_API as ChangeInitiativeStore} from "../../change-initiative/services/change-initiative-store";
+import {ChangeInitiativeViewStore_API as ChangeInitiativeViewStore} from "../../change-initiative/services/change-initiative-view-store";
 import {ChangeLogStore_API as ChangeLogStore} from "../../change-log/services/change-log-store";
 import {
     ChangeLogSummariesStore_API as ChangeLogSummariesStore
@@ -222,6 +221,7 @@ export const CORE_API = {
     BookmarkStore,
     BulkUploadLegalEntityRelationshipsStore,
     ChangeInitiativeStore,
+    ChangeInitiativeViewStore,
     ChangeLogStore,
     ChangeLogSummariesStore,
     ChangeSetStore,

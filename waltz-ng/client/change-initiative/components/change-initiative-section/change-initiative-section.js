@@ -18,17 +18,18 @@
 
 import _ from "lodash";
 
-import { CORE_API } from "../../../common/services/core-api-utils";
-import { initialiseData } from "../../../common";
-import { mkSelectionOptions } from "../../../common/selector-utils";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {initialiseData} from "../../../common";
 
 import template from "./change-initiative-section.html";
-import { changeInitiative } from "../../../common/services/enums/change-initiative";
-import { getEnumName } from "../../../common/services/enums";
+import {changeInitiative} from "../../../common/services/enums/change-initiative";
+import {getEnumName} from "../../../common/services/enums";
 import indexByKeyForType from "../../../enum-value/enum-value-utilities";
 import {isSameParentEntityRef} from "../../../common/entity-utils";
-import { fakeInitiative, fakeProgramme } from "../../change-initiative-utils";
-import { filterByAssessmentRating, mkAssessmentSummaries } from "../../../assessments/assessment-utils";
+import {fakeInitiative, fakeProgramme} from "../../change-initiative-utils";
+import {filterByAssessmentRating} from "../../../assessments/assessment-utils";
+import {nest} from "d3-collection";
+import {grey} from "../../../common/colors";
 
 const bindings = {
     parentEntityRef: "<",
@@ -67,18 +68,33 @@ const initialState = {
     },
     filterHelpText: "Select an assessment category to filter the change initiatives",
     gridOptions: {
-        columnDefs: [
-            { width: "15%", field: "kind", name: "Kind" },
-            mkRefCol("initiative"),
-            mkRefCol("programme"),
-            mkRefCol("project"),
-            { width: "25%", field: "name", name: "Name" },
-            { width: "15%", field: "lifecyclePhase", name: "Phase" }
-        ],
+        columnDefs: _.map(
+            [
+                { width: "15%", field: "kind", name: "Kind" },
+                mkRefCol("initiative"),
+                mkRefCol("programme"),
+                mkRefCol("project"),
+                { width: "25%", field: "name", name: "Name" },
+                { width: "15%", field: "lifecyclePhase", name: "Phase" }
+            ],
+            enrichWithInactiveStyling),
         data: []
     }
 };
 
+
+function calcCellClass(grid, row, col, rowRenderIndex, colRenderIndex) {
+    return row.entity.lifecyclePhase === "Retired"
+        ? "wcis-inactive-ci"
+        : "";
+}
+
+
+function enrichWithInactiveStyling(col) {
+    return Object.assign(
+        {},
+        col,
+        { cellClass: calcCellClass });}
 
 function determineHierarchy(cisById = {}, ci) {
     const none = null;
@@ -147,7 +163,67 @@ function mkTableData(changeInitiatives = [], lifecycleNamesByKey = {}) {
                 kind: changeKind
             }
         })
-        .orderBy(d => ["initiative.name", "programme.name", "project.name", "name"])
+        .orderBy(d => ["initiative.externalId", "programme.externalId", "project.externalId", "name"])
+        .value();
+}
+
+
+function mkAssessmentSummaries(definitions = [], schemeItems = [], ratings = [], total = 0) {
+    const indexedRatingSchemes = indexRatingSchemeItems(schemeItems);
+    const definitionsById = _.keyBy(definitions, d => d.id);
+
+    const nestedRatings = nest()
+        .key(d => d.assessmentDefinitionId)
+        .key(d => d.ratingId)
+        .rollup(xs => xs.length)
+        .entries(ratings);
+
+    return _
+        .chain(nestedRatings)
+        .map(d => {
+            const definition = definitionsById[Number(d.key)];
+            const assignedTotal = _.sumBy(d.values, v => v.value);
+            const values = _
+                .chain(d.values)
+                .map(v => {
+                    const propPath = [definition.ratingSchemeId, "ratingsById", v.key];
+                    const rating = _.get(indexedRatingSchemes, propPath);
+                    return Object.assign({}, v, { rating, count: v.value });
+                })
+                .concat([{
+                    key: "z",
+                    rating: {
+                        id: -1,
+                        name: "Not Provided",
+                        color: grey
+                    },
+                    count: _.max([0, total - assignedTotal])
+                }])
+                .filter(d => d.count > 0)
+                .value();
+
+            const extension = { definition, values };
+            return Object.assign({}, d , extension);
+        })
+        .orderBy(d => d.definition.name)
+        .value();
+}
+
+/**
+ * Given a flat list of rating schemes returns them indexed by their ids.  Also each scheme has
+ * an additional maps giving 'ratingsByCode' and 'ratingsById' .
+ * @param schemes
+ */
+function indexRatingSchemeItems(schemeItems = []) {
+    return _
+        .chain(schemeItems)
+        .groupBy(d => d.ratingSchemeId)
+        .map((v,k) => Object.assign({}, {
+            id: k,
+            ratingsByCode: _.keyBy(v, d => d.rating),
+            ratingsById: _.keyBy(v, d => d.id),
+        }))
+        .keyBy(d => d.id)
         .value();
 }
 
@@ -155,16 +231,8 @@ function mkTableData(changeInitiatives = [], lifecycleNamesByKey = {}) {
 function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    function init() {
-        const schemesPromise = serviceBroker
-            .loadAppData(CORE_API.RatingSchemeStore.findAll)
-            .then(r => vm.ratingSchemes = r.data);
-
-        const assessmentDefinitionsPromise = serviceBroker
-            .loadAppData(
-                CORE_API.AssessmentDefinitionStore.findByKind,
-                [ "CHANGE_INITIATIVE" ])
-            .then(r => vm.assessmentDefinitions = r.data);
+    vm.$onChanges = (changes) => {
+        const sameParent = isSameParentEntityRef(changes);
 
         const enumPromise = serviceBroker
             .loadAppData(CORE_API.EnumValueStore.findAll)
@@ -174,35 +242,25 @@ function controller($q, serviceBroker) {
                     "changeInitiativeLifecyclePhase");
             });
 
-        return $q
-            .all([schemesPromise, assessmentDefinitionsPromise, enumPromise]);
-    }
-
-
-    vm.$onChanges = (changes) => {
-        const sameParent = isSameParentEntityRef(changes);
-
         if (vm.parentEntityRef && !sameParent) {
-            const selectionOptions = mkSelectionOptions(vm.parentEntityRef);
-            const ciPromise = serviceBroker
+            const viewPromise = serviceBroker
                 .loadViewData(
-                    CORE_API.ChangeInitiativeStore.findHierarchyBySelector,
-                    [ selectionOptions ])
-                .then(r => vm.changeInitiatives = r.data);
+                    CORE_API.ChangeInitiativeViewStore.findByEntity,
+                    [vm.parentEntityRef])
+                .then(r => {
+                    const d = r.data;
+                    vm.changeInitiatives = d.changeInitiatives;
+                    vm.assessmentRatings = d.ratings;
+                    vm.ratingSchemeItems = d.ratingSchemeItems;
+                    vm.assessmentDefinitions = d.assessmentDefinitions;
+                });
 
-            const assessmentRatingsPromise = serviceBroker
-                .loadViewData(
-                    CORE_API.AssessmentRatingStore.findByTargetKindForRelatedSelector,
-                    [ "CHANGE_INITIATIVE", selectionOptions ])
-                .then(r => vm.assessmentRatings = r.data);
-
-            $q.all([init(), ciPromise, assessmentRatingsPromise])
+            $q.all([enumPromise, viewPromise])
                 .then(() => applyFilters());
         }
     };
 
     function applyFilters() {
-
         const retiredCiFilter =  vm.displayRetiredCis
             ? () => true
             : ci => ci.lifecyclePhase !== "RETIRED";
@@ -226,14 +284,13 @@ function controller($q, serviceBroker) {
 
         vm.assessmentSummaries = mkAssessmentSummaries(
             vm.assessmentDefinitions,
-            vm.ratingSchemes,
+            vm.ratingSchemeItems,
             inScopeRatings,
             inScopeCis.length);
 
         vm.gridOptions.data = mkTableData(
             relevantCis,
             vm.changeInitiativeLifecyclePhaseByKey);
-
     }
 
     vm.onSelectAssessmentRating = d => {

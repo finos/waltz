@@ -17,8 +17,6 @@
  */
 import _ from "lodash";
 import { indexRatingSchemes } from "../ratings/rating-utils";
-import { nest } from "d3-collection";
-import { grey } from "../common/colors";
 import { refToString } from "../common/entity-utils";
 import {CORE_API} from "../common/services/core-api-utils";
 import {resolveResponses} from "../common/promise-utils";
@@ -70,48 +68,6 @@ export function mkEnrichedAssessmentDefinitions(definitions = [],
 }
 
 
-export function mkAssessmentSummaries(definitions = [], schemes = [], ratings = [], total = 0) {
-    const indexedRatingSchemes = indexRatingSchemes(schemes);
-    const definitionsById = _.keyBy(definitions, d => d.id);
-
-    const nestedRatings = nest()
-        .key(d => d.assessmentDefinitionId)
-        .key(d => d.ratingId)
-        .rollup(xs => xs.length)
-        .entries(ratings);
-
-    return _
-        .chain(nestedRatings)
-        .map(d => {
-            const definition = definitionsById[Number(d.key)];
-            const assignedTotal = _.sumBy(d.values, v => v.value);
-            const values = _
-                .chain(d.values)
-                .map(v => {
-                    const propPath = [definition.ratingSchemeId, "ratingsById", v.key];
-                    const rating = _.get(indexedRatingSchemes, propPath);
-                    return Object.assign({}, v, { rating, count: v.value });
-                })
-                .concat([{
-                    key: "z",
-                    rating: {
-                        id: -1,
-                        name: "Not Provided",
-                        color: grey
-                    },
-                    count: _.max([0, total - assignedTotal])
-                }])
-                .filter(d => d.count > 0)
-                .value();
-
-            const extension = { definition, values };
-            return Object.assign({}, d , extension);
-        })
-        .orderBy(d => d.definition.name)
-        .value();
-}
-
-
 /**
  * Given a list of entities, a list of assessment ratings and a desired
  * rating will filter the list of entities accordingly
@@ -154,6 +110,7 @@ export function filterByAssessmentRating(entities = [],
  * @param $q
  * @param serviceBroker
  * @param kind
+ * @param options
  * @param primaryOnly
  * @returns {*}
  */
