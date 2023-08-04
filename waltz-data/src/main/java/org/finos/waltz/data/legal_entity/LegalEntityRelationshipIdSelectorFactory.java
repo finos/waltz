@@ -43,6 +43,7 @@ public class LegalEntityRelationshipIdSelectorFactory implements IdSelectorFacto
         switch (options.entityReference().kind()) {
             case ACTOR:
                 return mkForActor(options);
+            case ALL:
             case APPLICATION:
             case APP_GROUP:
             case MEASURABLE:

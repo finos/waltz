@@ -153,7 +153,7 @@
         <strong>Data Types</strong>
         <div ng-if="$ctrl.selected.types.length > 0" class="wsatp-data-types">
             <ul class="list-inline">
-                <li ng-repeat='type in $ctrl.selected.types'
+                <li ng-repeat="type in $ctrl.selected.types | orderBy:'name'"
                     style="padding-bottom: 2px">
                     <div style="display: inline-block; height: 1em; width: 1em; border:1px solid #ccc; border-radius: 2px;"
                          ng-style="{'background-color': $ctrl.flowClassificationsByCode[type.rating].color}">
@@ -173,7 +173,7 @@
             <hr>
             <strong>Tags</strong>
             <ul class="waltz-keyword-list small">
-                <li ng-repeat="tag in $ctrl.selected.tags"
+                <li ng-repeat="tag in $ctrl.selected.tags | orderBy:'name'"
                     class="wkl-keyword"
                     style="padding-bottom: 2px">
                     <span ng-bind="tag.name"></span>

@@ -30,7 +30,6 @@ export function sameRef(r1, r2, options = { skipChecks: false }) {
 }
 
 
-
 export function isSameParentEntityRef(changes) {
     return sameRef(
         changes.parentEntityRef.previousValue,

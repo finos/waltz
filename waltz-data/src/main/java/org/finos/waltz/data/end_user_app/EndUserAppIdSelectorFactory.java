@@ -18,6 +18,8 @@
 
 package org.finos.waltz.data.end_user_app;
 
+import org.finos.waltz.common.SetUtilities;
+import org.finos.waltz.model.application.LifecyclePhase;
 import org.finos.waltz.schema.tables.EndUserApplication;
 import org.finos.waltz.schema.tables.Involvement;
 import org.finos.waltz.schema.tables.Person;
@@ -35,6 +37,8 @@ import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
+import java.util.Set;
 import java.util.function.Function;
 
 import static org.finos.waltz.schema.tables.EndUserApplication.END_USER_APPLICATION;
@@ -52,7 +56,9 @@ public class EndUserAppIdSelectorFactory implements Function<IdSelectionOptions,
     private final OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory = new OrganisationalUnitIdSelectorFactory();
     private final Person person = PERSON.as("per");
     private final PersonHierarchy personHierarchy = PERSON_HIERARCHY.as("phier");
-
+    private final Set<String> validLifecyclePhases = SetUtilities.asSet(
+            LifecyclePhase.PRODUCTION.name(),
+            LifecyclePhase.DEVELOPMENT.name());
 
 
     @Override
@@ -81,7 +87,8 @@ public class EndUserAppIdSelectorFactory implements Function<IdSelectionOptions,
         return DSL
                 .selectDistinct(eua.ID)
                 .from(eua)
-                .where(eua.ORGANISATIONAL_UNIT_ID.in(ouSelector));
+                .where(eua.ORGANISATIONAL_UNIT_ID.in(ouSelector)
+                        .and(eua.LIFECYCLE_PHASE.in(validLifecyclePhases)));
     }
 
 
@@ -114,7 +121,8 @@ public class EndUserAppIdSelectorFactory implements Function<IdSelectionOptions,
                 .innerJoin(eua)
                 .on(eua.ID.eq(involvement.ENTITY_ID))
                 .where(involvement.ENTITY_KIND.eq(EntityKind.END_USER_APPLICATION.name()))
-                .and(involvement.EMPLOYEE_ID.eq(employeeId));
+                .and(involvement.EMPLOYEE_ID.eq(employeeId))
+                .and(eua.LIFECYCLE_PHASE.in(validLifecyclePhases));
     }
 
 
@@ -138,7 +146,8 @@ public class EndUserAppIdSelectorFactory implements Function<IdSelectionOptions,
                 .from(involvement)
                 .innerJoin(eua)
                 .on(eua.ID.eq(involvement.ENTITY_ID))
-                .where(condition);
+                .where(condition)
+                .and(eua.LIFECYCLE_PHASE.in(validLifecyclePhases));
     }
 
 

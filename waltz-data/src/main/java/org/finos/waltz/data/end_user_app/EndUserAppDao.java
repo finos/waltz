@@ -19,12 +19,13 @@
 package org.finos.waltz.data.end_user_app;
 
 import org.finos.waltz.data.JooqUtilities;
-import org.finos.waltz.model.Criticality;
 import org.finos.waltz.model.application.LifecyclePhase;
 import org.finos.waltz.model.enduserapp.EndUserApplication;
 import org.finos.waltz.model.enduserapp.ImmutableEndUserApplication;
+import org.finos.waltz.model.physical_flow.CriticalityValue;
 import org.finos.waltz.model.tally.Tally;
 import org.finos.waltz.schema.tables.records.EndUserApplicationRecord;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Record1;
@@ -42,8 +43,11 @@ import static org.finos.waltz.schema.tables.EndUserApplication.END_USER_APPLICAT
 @Repository
 public class EndUserAppDao {
 
-
     private final DSLContext dsl;
+    private static final Condition COMMON_CONDITION = END_USER_APPLICATION.IS_PROMOTED.isFalse()
+            .and(END_USER_APPLICATION.LIFECYCLE_PHASE.in(
+                    LifecyclePhase.PRODUCTION.name(),
+                    LifecyclePhase.DEVELOPMENT.name()));
 
     public static final RecordMapper<Record, EndUserApplication> TO_DOMAIN_MAPPER = r -> {
         EndUserApplicationRecord record = r.into(END_USER_APPLICATION);
@@ -55,7 +59,7 @@ public class EndUserAppDao {
                 .id(record.getId())
                 .organisationalUnitId(record.getOrganisationalUnitId())
                 .lifecyclePhase(LifecyclePhase.valueOf(record.getLifecyclePhase()))
-                .riskRating(Criticality.valueOf(record.getRiskRating()))
+                .riskRating(CriticalityValue.of(record.getRiskRating()))
                 .provenance(record.getProvenance())
                 .isPromoted(record.getIsPromoted())
                 .build();
@@ -72,7 +76,8 @@ public class EndUserAppDao {
                 dsl,
                 END_USER_APPLICATION,
                 END_USER_APPLICATION.ORGANISATIONAL_UNIT_ID,
-                END_USER_APPLICATION.IS_PROMOTED.isFalse());
+                COMMON_CONDITION
+                );
     }
 
     @Deprecated
@@ -80,7 +85,7 @@ public class EndUserAppDao {
         return dsl.select(END_USER_APPLICATION.fields())
                 .from(END_USER_APPLICATION)
                 .where(END_USER_APPLICATION.ORGANISATIONAL_UNIT_ID.in(selector)
-                        .and(END_USER_APPLICATION.IS_PROMOTED.isFalse()))
+                        .and(COMMON_CONDITION))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -89,7 +94,7 @@ public class EndUserAppDao {
         return dsl.select(END_USER_APPLICATION.fields())
                 .from(END_USER_APPLICATION)
                 .where(END_USER_APPLICATION.ID.in(selector)
-                        .and(END_USER_APPLICATION.IS_PROMOTED.isFalse()))
+                        .and(COMMON_CONDITION))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -115,7 +120,7 @@ public class EndUserAppDao {
         return dsl
                 .select(END_USER_APPLICATION.fields())
                 .from(END_USER_APPLICATION)
-                .where(END_USER_APPLICATION.IS_PROMOTED.isFalse())
+                .where(COMMON_CONDITION)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 }

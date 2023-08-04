@@ -241,6 +241,7 @@ public class DataTypeDecoratorService {
 
     private List<DataTypeDecorator> getSelectorForLogicalFlow(DataTypeDecoratorDao dao, IdSelectionOptions options) {
         switch (options.entityReference().kind()) {
+            case ALL:
             case APPLICATION:
             case APP_GROUP:
             case ORG_UNIT:

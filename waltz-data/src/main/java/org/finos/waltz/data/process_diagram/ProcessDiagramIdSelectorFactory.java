@@ -42,6 +42,7 @@ public class ProcessDiagramIdSelectorFactory implements IdSelectorFactory {
         checkNotNull(options, "options cannot be null");
         switch(options.entityReference().kind()) {
             case ACTOR:
+            case ALL:
             case APPLICATION:
             case CHANGE_INITIATIVE:
             case DATA_TYPE:

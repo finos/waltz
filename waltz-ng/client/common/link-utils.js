@@ -25,6 +25,7 @@ import {toMap} from "./map-utils";
  * @type [ {<entityKind>, <uiState>}, ... ]
  */
 const stateKindTuples = [
+    {kind: "ALL", state: "main.app"},
     {kind: "ACTOR", state: "main.actor.view"},
     {kind: "AGGREGATE_OVERLAY_DIAGRAM_INSTANCE", state: "main.aggregate-overlay-diagram.instance-view"},
     {kind: "APPLICATION", state: "main.app.view"},
