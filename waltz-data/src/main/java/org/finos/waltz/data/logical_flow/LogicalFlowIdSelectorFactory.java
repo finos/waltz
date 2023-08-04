@@ -63,6 +63,7 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
         switch (options.entityReference().kind()) {
             case ACTOR:
                 return mkForActor(options);
+            case ALL:
             case APPLICATION:
             case APP_GROUP:
             case CHANGE_INITIATIVE:

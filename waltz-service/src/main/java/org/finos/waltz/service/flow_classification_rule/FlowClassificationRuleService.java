@@ -262,13 +262,12 @@ public class FlowClassificationRuleService {
                 customSelectionCriteria = LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(dataTypeSelector.selector())
                     .and(FlowClassificationRuleDao.SUPPLIER_APP.KIND.notIn(options.filters().omitApplicationKinds()));
                 break;
-
             case ORG_UNIT:
                 GenericSelector orgUnitSelector = genericSelectorFactory.apply(options);
                 customSelectionCriteria = FlowClassificationRuleDao.CONSUMER_APP.ORGANISATIONAL_UNIT_ID.in(orgUnitSelector.selector())
                     .and(FlowClassificationRuleDao.SUPPLIER_APP.KIND.notIn(options.filters().omitApplicationKinds()));
                 break;
-
+            case ALL:
             case APP_GROUP:
             case FLOW_DIAGRAM:
             case MEASURABLE:
@@ -299,6 +298,7 @@ public class FlowClassificationRuleService {
                 customSelectionCriteria = Tables.FLOW_CLASSIFICATION_RULE.DATA_TYPE_ID.in(dataTypeSelector.selector())
                         .and(FlowClassificationRuleDao.SUPPLIER_APP.KIND.notIn(options.filters().omitApplicationKinds()));
                 break;
+            case ALL:
             case APP_GROUP:
             case FLOW_DIAGRAM:
             case MEASURABLE:

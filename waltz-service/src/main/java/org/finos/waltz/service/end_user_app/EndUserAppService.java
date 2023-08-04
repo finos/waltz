@@ -25,6 +25,7 @@ import org.finos.waltz.data.end_user_app.EndUserAppDao;
 import org.finos.waltz.data.end_user_app.EndUserAppIdSelectorFactory;
 import org.finos.waltz.data.involvement.InvolvementDao;
 import org.finos.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
+import org.finos.waltz.model.Criticality;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.Operation;
@@ -92,7 +93,7 @@ public class EndUserAppService {
 
 
     public Collection<Tally<Long>> countByOrgUnitId() {
-        return time("EUAS.countByOrgUnitId", () -> endUserAppDao.countByOrganisationalUnit());
+        return time("EUAS.countByOrgUnitId", endUserAppDao::countByOrganisationalUnit);
     }
 
 
@@ -177,7 +178,7 @@ public class EndUserAppService {
                     .name(euda.name())
                     .applicationKind(ApplicationKind.EUC)
                     .assetCode(String.valueOf(euda.id().get()))
-                    .businessCriticality(euda.riskRating())
+                    .businessCriticality(Criticality.valueOf(euda.riskRating().value()))
                     .description(euda.description() + "<br>["+ euda.applicationKind() + "]")
                     .lifecyclePhase(euda.lifecyclePhase())
                     .organisationalUnitId(euda.organisationalUnitId())

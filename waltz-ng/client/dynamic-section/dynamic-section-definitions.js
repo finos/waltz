@@ -676,6 +676,29 @@ const appGroupSections = [
     changeLogSection
 ];
 
+const appListSections = [
+    pack(appsSection,
+         [
+             appCostsSummarySection,
+             appComplexitySummarySection,
+             attestationSummarySection,
+             entityStatisticSummarySection,
+             measurableRatingsBrowserSection,
+             reportGridViewSection,
+             technologySummarySection
+         ]),
+    bookmarksSection,
+    entityDiagramsSection,
+    changeInitiativeSection,
+    changeSetSection,
+    entityNamedNotesSection,
+    pack(logicalFlowsTabgroupSection, [flowClassificationRulesSection]),
+    legalEntitySection,
+    relatedDataTypesSection,
+    relatedMeasurablesSection,
+    changeLogSection
+];
+
 const scenarioSections = [
     pack(appsSection,
          [
@@ -838,6 +861,7 @@ export const dynamicSectionsByKind = {
     "main.app.asset-code": appSections,
     "main.app.external-id": appSections,
     "main.app.view": appSections,
+    "main.app": appListSections,
     "main.change-initiative.external-id": changeInitiativeSections,
     "main.change-initiative.view": changeInitiativeSections,
     "main.change-set.view": changeSetSections,

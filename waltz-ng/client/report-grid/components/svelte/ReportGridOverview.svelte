@@ -161,13 +161,15 @@
                                          doCancel={cancel}/>
         {:else if activeMode === Modes.VIEW || activeMode === Modes.REMOVE}
             {#if $gridDefinition?.id}
-                <h4 title="Click to open in dedicated view">
-                    <button on:click={() => visitPageView()}
-                            class="btn btn-link">
-                        {$gridDefinition?.name}
-                        <Icon name="external-link"/>
-                    </button>
-                </h4>
+                {#if primaryEntityRef.kind !== "ALL"}
+                    <h4 title="Click to open in dedicated view">
+                        <button on:click={() => visitPageView()}
+                                class="btn btn-link">
+                            {$gridDefinition?.name}
+                            <Icon name="external-link"/>
+                        </button>
+                    </h4>
+                {/if}
                 <table class="table table-condensed small">
                     <tbody>
                     <tr>
