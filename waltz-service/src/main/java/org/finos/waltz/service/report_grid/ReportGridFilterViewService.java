@@ -327,9 +327,9 @@ public class ReportGridFilterViewService {
     private IdSelectionOptions mkSelectionOptionsFromGridInfoRow(List<String> gridInfo) {
         String vantagePointKind = gridInfo.get(2);
         String vantagePointId = gridInfo.get(3);
-        return modifySelectionOptionsForGrid(mkOpts(mkRef(
+        return mkOpts(mkRef(
                 EntityKind.valueOf(vantagePointKind),
-                Long.parseLong(vantagePointId))));
+                Long.parseLong(vantagePointId)));
     }
 
 
