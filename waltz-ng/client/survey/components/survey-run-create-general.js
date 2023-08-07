@@ -57,6 +57,7 @@ const initialState = {
         "ORG_UNIT": [exactScope, childrenScope],
         "MEASURABLE": [exactScope, childrenScope]
     },
+    availableInvolvementKinds: [],
     surveyRun: {
         selectorEntity: null,
         dueDate: null,
@@ -98,6 +99,13 @@ function controller(appGroupStore, involvementKindStore, serviceBroker) {
     vm.$onChanges = () => {
         if (vm.surveyTemplate) {
             vm.allowedEntityKinds = mkAllowedEntityKinds(vm.surveyTemplate.targetEntityKind);
+            involvementKindStore
+                .findAll()
+                .then(involvementKinds => vm.availableInvolvementKinds = _
+                    .filter(
+                        involvementKinds,
+                        d => d.subjectKind === vm.surveyTemplate.targetEntityKind));
+
         }
     };
 
@@ -105,14 +113,6 @@ function controller(appGroupStore, involvementKindStore, serviceBroker) {
         .all([appGroupStore.findPublicGroups(), appGroupStore.findPrivateGroups()])
         .then(([publicGroups = [], privateGroups = []]) => {
             vm.availableAppGroups = [].concat(publicGroups, privateGroups);
-        });
-
-
-    involvementKindStore.findAll()
-        .then(involvementKinds => {
-            vm.availableInvolvementKinds = _.filter(
-                involvementKinds,
-                d => d.subjectKind === vm.surveyTemplate.targetEntityKind);
         });
 
     vm.$onInit = () => {

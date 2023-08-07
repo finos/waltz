@@ -49,16 +49,13 @@ function controller(serviceBroker) {
                 .execute(
                     CORE_API.TaxonomyManagementStore.findAllChangesByDomain,
                     [vm.parentEntityRef])
-                .then(r => {
-                    vm.items = _
-                        .chain(r.data)
-                        .filter(d => d.status === "EXECUTED")
-                        .orderBy(
-                            [d => d.lastUpdatedAt, d => d.createdAt],
-                            ["desc", "desc"])
-                        .value();
-                    console.log(vm.items)
-                });
+                .then(r => vm.items = _
+                    .chain(r.data)
+                    .filter(d => d.status === "EXECUTED")
+                    .orderBy(
+                        [d => d.lastUpdatedAt, d => d.createdAt],
+                        ["desc", "desc"])
+                    .value());
 
         }
     };
