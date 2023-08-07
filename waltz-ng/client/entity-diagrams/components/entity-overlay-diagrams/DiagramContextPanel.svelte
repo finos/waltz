@@ -5,6 +5,10 @@
     import Icon from "../../../common/svelte/Icon.svelte";
     import EntityLink from "../../../common/svelte/EntityLink.svelte";
     import Toggle from "../../../common/svelte/Toggle.svelte";
+    import Item from "./Item.svelte";
+    import {
+        RenderModes
+    } from "../../../aggregate-overlay-diagram/components/aggregate-overlay-diagram/aggregate-overlay-diagram-utils";
 
     const ContextModes = {
         VIEW: "VIEW",
@@ -96,10 +100,23 @@
 
 {#if $selectedGroup}
     <hr>
-    {$selectedGroup.title}
-    {#if $selectedGroup.data}
-        <div>
-            <EntityLink ref={$selectedGroup.data.entityReference}/>
+
+    <div>
+        {#if $selectedGroup.data}
+            {$selectedGroup.title} (<EntityLink ref={$selectedGroup.data.entityReference}/>)
+        {:else }
+            {$selectedGroup.title}
+        {/if}
+    </div>
+
+    {#if $selectedGroup.overlayData}
+        <div class="waltz-scroll-region-350"
+             style="margin-top: 1em">
+            <Item data={$selectedGroup.data}
+                  cellId={$selectedGroup.id}
+                  height={$selectedGroup.props.minWidth / 3}
+                  width={$selectedGroup.props.minWidth}
+                  renderMode={RenderModes.FOCUSED}/>
         </div>
     {:else}
         <div class="help-block">No data has been linked to this group</div>

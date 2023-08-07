@@ -11,8 +11,6 @@
 
     export let group;
 
-    let itemElem;
-
     const {selectedOverlay, selectedGroup, selectGroup, overlayData} = diagramService;
 
     function selectOverlayGroup() {
@@ -60,8 +58,7 @@
                     </div>
                 {:else}
                     {#if group.data}
-                        <div style={mkItemStyle(group)}
-                             bind:this={itemElem}>
+                        <div style={mkItemStyle(group)}>
                             <Item data={group.data}
                                   cellId={group.id}
                                   height={group.props.minWidth / 3}

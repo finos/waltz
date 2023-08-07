@@ -7,6 +7,7 @@
     export let data;
     export let height;
     export let width;
+    export let renderMode;
 
     let comp;
 
@@ -26,6 +27,7 @@
                   {data}
                   {height}
                   {width}
+                  {renderMode}
                   {...$overlayProperties}
 
 />
