@@ -19,17 +19,15 @@ const overlayData = writable([]);
 const overlayProperties = writable({});
 
 const selectedGroup = writable(null);
-
-
-const selectedOverlay = writable(defaultOverlay);
+const selectedOverlay = writable(null);
 
 const groupsWithData = derived(
-    [groups, groupData, overlayData],
-    ([$groups, $groupData, $overlayData]) => {
+    [groups, groupData],
+    ([$groups, $groupData]) => {
         const dataByGroupId = _.keyBy($groupData, d => d.cellId);
         return _
             .chain($groups)
-            .map(g => Object.assign(g, { data: dataByGroupId[g.id], overlayData: $overlayData[g.id] })) // lookup data or fallback to any value set on the input
+            .map(g => Object.assign(g, { data: dataByGroupId[g.id] })) // lookup data or fallback to any value set on the input
             .orderBy(d => d.position || d.id)
             .value();
     });
@@ -113,7 +111,6 @@ function selectDiagram(diagramId) {
             groups.set(JSON.parse(diagramInfo.diagram.layoutData));
             groupData.set(diagramInfo.backingEntities);
             selectedGroup.set(null);
-            selectedOverlay.set(defaultOverlay);
             _loadOverlayData();
             return d.data;
         });
@@ -187,7 +184,7 @@ function reset() {
     groups.set([]);
     groupData.set([]);
     selectedGroup.set(null);
-    selectedOverlay.set(defaultOverlay);
+    selectedOverlay.set(null);
 }
 
 

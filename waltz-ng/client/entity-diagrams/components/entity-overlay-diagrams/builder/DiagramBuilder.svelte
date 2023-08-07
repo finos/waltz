@@ -32,7 +32,18 @@
     let dataInput = false;
     let workingData = "";
 
-    const {selectDiagram, saveDiagram, reset, selectedDiagram, selectedGroup, groupData, groups, groupsWithData, diagramLayout, uploadDiagramLayout, selectGroup} = diagramService;
+    const {
+        selectDiagram,
+        saveDiagram,
+        reset,
+        selectedDiagram,
+        selectedGroup,
+        groups,
+        groupsWithData,
+        diagramLayout,
+        uploadDiagramLayout,
+        selectGroup,
+    } = diagramService;
 
     let BuilderModes = {
         PICKER: "PICKER",
@@ -59,11 +70,17 @@
     function uploadLayout() {
         const gs = JSON.parse(workingData);
 
-        const providedGroups = _.map(gs, d => mkGroup(d.title, d.id, d.parentId, d.position, d.props, d.data ? toEntityRef(d.data) : null));
+        const providedGroups = _.map(gs, d => {
+
+            const data = d.data
+                ? d.data.entityReference || toEntityRef(d.data)
+                : null;
+
+            return mkGroup(d.title, d.id, d.parentId, d.position, d.props, data)
+        });
 
         const roots = buildHierarchies(providedGroups);
 
-        console.log({roots})
         if (_.size(roots) === 1) {
             uploadDiagramLayout(providedGroups);
             toasts.success("Diagram populated from data");
@@ -139,16 +156,6 @@
             });
         }
     }
-
-    // $: dataCall = $overlayDataCall;
-    // $: overlayData = $dataCall?.data;
-    // $: cellDataByCellExtId = _.keyBy(
-    //     overlayData?.cellData,
-    //     d => d.cellExternalId);
-    //
-    // $: console.log({overlayData, cellDataByCellExtId});
-
-    $: console.log({groupData: $selectedDiagram, data: $groupData});
 
 </script>
 

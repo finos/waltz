@@ -19,15 +19,17 @@
 
     $: cellData = _.get($overlayData, group.id);
 
-
-    function hasData(child) {
-        return !_.isEmpty(child.overlayData)
-            || _.some(flattenChildren(child.children), d => !_.isEmpty(d.overlayData));
+    function hasData(node, dataById) {
+        const childHasData = !_.isEmpty(dataById[node.id]);
+        const childrenHaveData = _.some(flattenChildren(node), child => !_.isEmpty(dataById[child.id]));
+        return childHasData || childrenHaveData;
     }
 
-    $: children = $hideEmptyCells
-        ? _.filter(group.children, child => hasData(child))
+    $: children = $hideEmptyCells && $selectedOverlay
+        ? _.filter(group.children, child => hasData(child, $overlayData))
         : group.children;
+
+    $: overlayRequiresTitle = group.data && $selectedOverlay?.showTitle;
 
 </script>
 
@@ -35,7 +37,7 @@
 <div>
     <div style="display: flex">
         <div style={mkContentBoxStyle(group)}>
-            {#if $selectedOverlay.showTitle || group.props.showTitle}
+            {#if overlayRequiresTitle || group.props.showTitle}
                 <div style={mkTitleStyle(group, $hoveredGroupId)}>
                     {#if group.data}
                         <button style="outline: none !important; width: 100%; background: none; border: none; color: inherit;"

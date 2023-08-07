@@ -3,7 +3,7 @@
     import {diagramLayoutData} from "./test-data/layout-data";
     import _ from "lodash";
     import {diagramService, selectionOptions} from "./entity-diagram-store";
-    import DiagramContextPanel from "./DiagramContextPanel.svelte";
+    import DiagramContextPanel from "./context-panel/DiagramContextPanel.svelte";
     import DiagramInteractView from "./DiagramInteractView.svelte";
     import {mkSelectionOptions} from "../../../common/selector-utils";
     import DiagramList from "./DiagramList.svelte";
@@ -15,10 +15,6 @@
     let diagrams = [{id: 1, name: "Test Data", description: "Test diagram for dev", layoutData: diagramLayoutData, lastUpdatedBy: "admin", lastUpdatedAt: new Date(), provenance: "test"}];
 
     const {selectDiagram, overlayData, selectedOverlay, diagramLayout, selectedDiagram, selectOverlay} = diagramService;
-
-    onMount(() => {
-        selectOverlay(_.first(overlays));
-    })
 
     $: $selectionOptions = mkSelectionOptions(parentEntityRef);
 

@@ -2,6 +2,7 @@
 
     import {diagramService} from "./entity-diagram-store";
     import _ from "lodash";
+    import {defaultOverlay} from "./entity-diagram-utils";
 
     export let cellId;
     export let data;
@@ -15,12 +16,11 @@
 
     $: cellData = _.get($overlayData, cellId);
 
-    $: comp = $selectedOverlay.component;
-
-    $: console.log({So: $selectedOverlay, cellData, od: $overlayData, op: $overlayProperties});
+    $: comp = $selectedOverlay
+        ? $selectedOverlay.component
+        : defaultOverlay.component;
 
 </script>
-
 
 <svelte:component this={comp}
                   {cellData}
@@ -28,6 +28,4 @@
                   {height}
                   {width}
                   {renderMode}
-                  {...$overlayProperties}
-
-/>
+                  {...$overlayProperties}/>

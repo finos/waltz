@@ -13,8 +13,6 @@
         dispatch("select", diagram);
     }
 
-    $: console.log({diagrams})
-
 </script>
 
 
