@@ -59,6 +59,14 @@
                     label-off="Showing all involvements (including inherited)">
                 </waltz-toggle>
             </div>
+            <div style="padding-top: 1em">
+                <waltz-toggle
+                    state="$ctrl.showRemovedPeople"
+                    on-toggle="$ctrl.onHiddenPeople()"
+                    label-on="Hide removed people"
+                    label-off="Show removed people">
+                </waltz-toggle>
+            </div>
         </div>
 
         <div ng-if="$ctrl.gridData.length > 0">

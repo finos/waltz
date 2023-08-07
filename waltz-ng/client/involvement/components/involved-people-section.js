@@ -76,7 +76,8 @@ const initialState = {
     showDirectOnly: true,
     visibility: {
         editor: false
-    }
+    },
+    showRemovedPeople: false
 };
 
 
@@ -145,7 +146,10 @@ function controller($q, displayNameService, descriptionService, serviceBroker, i
             ? vm.aggDirectInvolvements
             : vm.aggInvolvements;
 
-        vm.gridData = mkGridData(involvements, displayNameService, descriptionService);
+        const updatedGridData = mkGridData(involvements, displayNameService, descriptionService);
+        vm.gridData = vm.showRemovedPeople ?
+            updatedGridData:
+            updatedGridData.filter( d =>  d.person.isRemoved === vm.showRemovedPeople);
     }
 
     const refresh = () => {
@@ -224,6 +228,10 @@ function controller($q, displayNameService, descriptionService, serviceBroker, i
 
     vm.onToggleScope = () => {
         vm.showDirectOnly = !vm.showDirectOnly;
+        refreshGridData();
+    }
+    vm.onHiddenPeople= ()=>{
+        vm.showRemovedPeople = !vm.showRemovedPeople;
         refreshGridData();
     }
 }
