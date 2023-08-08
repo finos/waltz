@@ -3,6 +3,8 @@
     import {createEventDispatcher} from "svelte";
     import {aggregateOverlayDiagramStore} from "../../../svelte-stores/aggregate-overlay-diagram-store";
     import {overlayDiagramKind} from "../../../common/services/enums/overlay-diagram-kind";
+    import {entity} from "../../../common/services/enums/entity";
+    import _ from "lodash";
 
     const dispatch = createEventDispatcher();
 
@@ -30,7 +32,7 @@
             class="clickable">
             <td>{diagram.name}</td>
             <td>{diagram.description || '-'}</td>
-            <td>{diagram.aggregatedEntityKind}</td>
+            <td>{_.get(entity, [diagram.aggregatedEntityKind, "name"], "Unknown")}</td>
         </tr>
     {:else}
         <tr>

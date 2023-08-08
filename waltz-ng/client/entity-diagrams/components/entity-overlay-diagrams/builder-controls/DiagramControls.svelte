@@ -1,5 +1,5 @@
 <script>
-    import {createInitialGroup} from "../builder/diagram-builder-store";
+    import {createInitialGroup, diagramMode, DiagramModes} from "../builder/diagram-builder-store";
     import toasts from "../../../../svelte-stores/toast-store";
     import {displayError} from "../../../../common/error-utils";
     import _ from "lodash";
@@ -9,16 +9,18 @@
     import {mkGroup} from "../entity-diagram-utils";
     import {buildHierarchies} from "../../../../common/hierarchy-utils";
     import {diagramService} from "../entity-diagram-store";
-    import {diagramMode, DiagramModes} from "../builder/diagram-builder-store";
     import EditDiagramDetailsPanel from "../builder/EditDiagramDetailsPanel.svelte";
     import UpdateDiagramConfirmationPanel from "../builder/UpdateDiagramConfirmationPanel.svelte";
     import Toggle from "../../../../common/svelte/Toggle.svelte";
+    import RemoveDiagramConfirmationPanel from "../builder/RemoveDiagramConfirmationPanel.svelte";
+    import {releaseLifecycleStatus} from "../../../../common/services/enums/release-lifecycle-status";
 
     let BuilderModes = {
         PICKER: "PICKER",
         EDIT: "EDIT",
         CREATE: "CREATE",
-        UPDATE: "UPDATE"
+        UPDATE: "UPDATE",
+        REMOVE: "REMOVE"
     }
 
     let dataInput = false;
@@ -35,6 +37,7 @@
         selectedGroup,
         groups,
         uploadDiagramLayout,
+        updateDiagramStatus,
     } = diagramService;
 
 
@@ -78,9 +81,14 @@
     }
 
     function update() {
-        const diagram = _.pick($selectedDiagram, ["id", "name", "description", "diagramKind", "aggregatedEntityKind"]);
-        doSaveDiagram(diagram);
+        doSaveDiagram($selectedDiagram);
     }
+
+
+    function editDiagramDetails() {
+        activeMode = BuilderModes.CREATE;
+    }
+
 
     function confirmSave() {
         if ($selectedDiagram) {
@@ -130,6 +138,14 @@
         }
     }
 
+    function updateStatus(newStatus) {
+        updateDiagramStatus($selectedDiagram.id, newStatus.key)
+            .then(() => toasts.success(`Successfully updated status to: ${newStatus.name}`))
+            .catch(e => displayError(`Unable to update status to: ${newStatus.name}`, e));
+    }
+
+    $: console.log({sd: $selectedDiagram});
+
 </script>
 
 
@@ -172,18 +188,15 @@
 
         {#if $selectedDiagram}
             <h4>
-                Editing Layout for: {$selectedDiagram.name}
+                {$selectedDiagram.name}
             </h4>
         {:else}
             <h4>
-                Editing Layout
+                Editing Diagram Layout
             </h4>
         {/if}
-        <div class="help-block">
-            <Icon name="info-circle"/> Use the controls below to modify the layout of this diagram.
-        </div>
 
-        <div>
+        <div style="padding-top: 1em">
             <Toggle labelOn="Editing Diagram"
                     labelOff="Viewing Diagram"
                     state={$diagramMode === DiagramModes.EDIT}
@@ -193,17 +206,53 @@
             </div>
         </div>
 
-        <button class="btn btn-default"
-                on:click={confirmSave}>
-            Save Diagram
-        </button>
-        <button class="btn btn-default"
-                on:click={confirmSave}>
-            Edit Diagram Details
-        </button>
-        <button class="btn btn-default"
-                on:click={cancelEditLayout}>
-            Back to Diagram Picker
-        </button>
+        <div class="controls">
+
+            <button class="btn btn-default"
+                    on:click={confirmSave}>
+                Save Diagram
+            </button>
+            <button class="btn btn-default"
+                    on:click={editDiagramDetails}>
+                Edit Details
+            </button>
+            {#if $selectedDiagram}
+                {#if $selectedDiagram?.status !== releaseLifecycleStatus.ACTIVE.key}
+                    <button class="btn btn-default"
+                            on:click={() => updateStatus(releaseLifecycleStatus.ACTIVE)}>
+                        Mark Active
+                    </button>
+                {/if}
+                {#if $selectedDiagram?.status !== releaseLifecycleStatus.DRAFT.key}
+                    <button class="btn btn-default"
+                            on:click={() => updateStatus(releaseLifecycleStatus.DRAFT)}>
+                        Revert to Draft
+                    </button>
+                {/if}
+                {#if $selectedDiagram?.status !== releaseLifecycleStatus.OBSOLETE.key}
+                <button class="btn btn-default"
+                        on:click={() => updateStatus(releaseLifecycleStatus.OBSOLETE)}>
+                    Mark Obsolete
+                </button>
+                {/if}
+            {/if}
+            <button class="btn btn-default"
+                    on:click={cancelEditLayout}>
+                Back to Diagram Picker
+            </button>
+        </div>
     {/if}
 </div>
+
+
+<style>
+
+    .controls {
+        display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start;
+        align-items: flex-start;
+        gap: 0.5em;
+    }
+
+</style>

@@ -4,14 +4,20 @@
         from "../../../../report-grid/components/svelte/column-definition-edit-panel/DropdownPicker.svelte";
     import _ from "lodash";
     import {entity} from "../../../../common/services/enums/entity";
+    import {diagramService} from "../entity-diagram-store";
 
     const dispatch = createEventDispatcher();
 
-    let working = {
+    const {selectedDiagram} = diagramService;
+
+    let aggregateEntityKinds = [entity.APPLICATION, entity.CHANGE_INITIATIVE];
+
+    let working = Object.assign({
         name: null,
         description: null,
         aggregatedEntityKind: entity.APPLICATION.key,
-    }
+    },
+    $selectedDiagram)
 
     function cancel() {
         dispatch("cancel");
@@ -20,6 +26,12 @@
     function save() {
         dispatch("save", working);
     }
+
+    function selectEntityKind(kind) {
+        working.aggregatedEntityKind = kind.key;
+    }
+
+    $: selectedKind = _.find(aggregateEntityKinds, d => d.key === working.aggregatedEntityKind);
 
 </script>
 
@@ -45,10 +57,10 @@
         Description of this diagram
     </div>
 
-    <DropdownPicker items={[entity.APPLICATION, entity.CHANGE_INITIATIVE]}
-                    onSelect={(d) => working.aggregatedEntityKind = d.detail}
+    <DropdownPicker items={aggregateEntityKinds}
+                    onSelect={selectEntityKind}
                     defaultMessage="Select additional column options"
-                    selectedItem={entity[working.aggregatedEntityKind]}/>
+                    selectedItem={selectedKind}/>
     <div class="help-block">
         Entity kind aggregated as part of overlay data
     </div>

@@ -3,6 +3,7 @@ package org.finos.waltz.data.aggregate_overlay_diagram;
 
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.ReleaseLifecycleStatus;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
 import org.finos.waltz.model.aggregate_overlay_diagram.BackingEntity;
 import org.finos.waltz.model.aggregate_overlay_diagram.ImmutableAggregateOverlayDiagram;
@@ -77,6 +78,7 @@ public class AggregateOverlayDiagramUtilities {
                 .provenance(record.getProvenance())
                 .aggregatedEntityKind(EntityKind.valueOf(record.getAggregatedEntityKind()))
                 .diagramKind(OverlayDiagramKind.valueOf(record.getDiagramKind()))
+                .status(ReleaseLifecycleStatus.valueOf(record.getStatus()))
                 .build();
     };
 

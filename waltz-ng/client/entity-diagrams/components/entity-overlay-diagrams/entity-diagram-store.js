@@ -82,14 +82,22 @@ function selectOverlay(overlay) {
     _loadOverlayData();
 }
 
+function updateDiagramStatus(diagramId, newStatus) {
+    return $http
+        .post(`api/aggregate-overlay-diagram/id/${diagramId}`, { newStatus })
+        .then(() => selectDiagram(diagramId));
+}
+
 function saveDiagram(diagram) {
 
     const layoutData = JSON.stringify(get(groups));
     const backingEntities = get(groupData);
 
+    const diagramInfo = _.pick(diagram, ["id", "name", "description", "diagramKind", "aggregatedEntityKind"]);
+
     const createCmd = Object.assign(
         {},
-        diagram,
+        diagramInfo,
         {
             layoutData,
             backingEntities,
@@ -204,6 +212,7 @@ function createStores() {
         overlayProperties: {subscribe: overlayProperties.subscribe},
         selectDiagram,
         saveDiagram,
+        updateDiagramStatus,
         uploadDiagramLayout,
         selectGroup,
         addGroup,

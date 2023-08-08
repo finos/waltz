@@ -4,13 +4,12 @@ import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.data.JooqUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.actor.Actor;
+import org.finos.waltz.model.ReleaseLifecycleStatusChangeCommand;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
 import org.finos.waltz.model.aggregate_overlay_diagram.BackingEntity;
 import org.finos.waltz.model.aggregate_overlay_diagram.ImmutableBackingEntity;
 import org.finos.waltz.model.aggregate_overlay_diagram.OverlayDiagramCreateCommand;
 import org.finos.waltz.model.entity_overlay_diagram.OverlayDiagramKind;
-import org.finos.waltz.schema.tables.records.ActorRecord;
 import org.finos.waltz.schema.tables.records.AggregateOverlayDiagramCellDataRecord;
 import org.finos.waltz.schema.tables.records.AggregateOverlayDiagramRecord;
 import org.jooq.DSLContext;
@@ -18,9 +17,7 @@ import org.jooq.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Timestamp;
 import java.util.Set;
-import java.util.function.Function;
 
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.SetUtilities.map;
@@ -142,4 +139,11 @@ public class AggregateOverlayDiagramDao {
         return record.getId();
     }
 
+    public Boolean updateStatus(long diagramId, ReleaseLifecycleStatusChangeCommand changeStatusCmd) {
+        return dsl
+                .update(AGGREGATE_OVERLAY_DIAGRAM)
+                .set(AGGREGATE_OVERLAY_DIAGRAM.STATUS, changeStatusCmd.newStatus().name())
+                .where(AGGREGATE_OVERLAY_DIAGRAM.ID.eq(diagramId))
+                .execute() == 1;
+    }
 }

@@ -25,97 +25,6 @@
         <tagDatabase tag="v1.52"/> <!-- tag the current db version, i.e. the last  -->
     </changeSet>
 
-
-<!--    <changeSet id="20230724-6688-1"-->
-<!--               author="woodjes">-->
-<!--        <comment>6001: create entity_overlay_diagram table</comment>-->
-<!--        <createTable tableName="entity_overlay_diagram">-->
-<!--            <column name="id"-->
-<!--                    type="${id.type}"-->
-<!--                    autoIncrement="true">-->
-<!--                <constraints nullable="false"-->
-<!--                             primaryKey="true"-->
-<!--                             primaryKeyName="entity_overlay_diagram_pkey"/>-->
-<!--            </column>-->
-<!--            <column name="name"-->
-<!--                    type="${name.type}">-->
-<!--                <constraints nullable="false"/>-->
-<!--            </column>-->
-<!--            <column name="description"-->
-<!--                    type="${description.type}">-->
-<!--                <constraints nullable="true"/>-->
-<!--            </column>-->
-<!--            <column name="diagram_kind"-->
-<!--                    type="${enum.type}">-->
-<!--                <constraints nullable="false"/>-->
-<!--            </column>-->
-<!--            <column name="aggregated_entity_kind"-->
-<!--                    type="${enum.type}"-->
-<!--                    defaultValue="APPLICATION">-->
-<!--                <constraints nullable="false"/>-->
-<!--            </column>-->
-<!--            <column name="layout_data"-->
-<!--                    type="${clob.type}">-->
-<!--                <constraints nullable="false"/>-->
-<!--            </column>-->
-<!--            <column name="last_updated_at"-->
-<!--                    type="TIMESTAMP"-->
-<!--                    defaultValueComputed="${now.value}">-->
-<!--                <constraints nullable="false"/>-->
-<!--            </column>-->
-<!--            <column name="last_updated_by"-->
-<!--                    type="${name.type}">-->
-<!--                <constraints nullable="false"/>-->
-<!--            </column>-->
-<!--            <column name="provenance"-->
-<!--                    type="${provenance.type}"-->
-<!--                    defaultValue="waltz">-->
-<!--                <constraints nullable="false"/>-->
-<!--            </column>-->
-<!--        </createTable>-->
-<!--    </changeSet>-->
-
-<!--    <changeSet id="20230724-6688-2"-->
-<!--               author="woodjes">-->
-<!--        <comment>6688: create entity_overlay_diagram_cell_data table</comment>-->
-<!--        <createTable tableName="entity_overlay_diagram_cell_data">-->
-<!--            <column name="id"-->
-<!--                    type="${id.type}"-->
-<!--                    autoIncrement="true">-->
-<!--                <constraints nullable="false"-->
-<!--                             primaryKey="true"-->
-<!--                             primaryKeyName="entity_overlay_diagram_group_data_pkey"/>-->
-<!--            </column>-->
-<!--            <column name="diagram_id"-->
-<!--                    type="${id.type}">-->
-<!--                <constraints nullable="false"/>-->
-<!--            </column>-->
-<!--            <column name="group_id"-->
-<!--                    type="${id.type}">-->
-<!--                <constraints nullable="false"/>-->
-<!--            </column>-->
-<!--            <column name="related_entity_kind"-->
-<!--                    type="${enum.type}">-->
-<!--                <constraints nullable="false"/>-->
-<!--            </column>-->
-<!--            <column name="related_entity_id"-->
-<!--                    type="${id.type}">-->
-<!--                <constraints nullable="false"/>-->
-<!--            </column>-->
-<!--        </createTable>-->
-<!--    </changeSet>-->
-
-<!--    <changeSet id="20230724-6688-3"-->
-<!--               author="woodjes">-->
-<!--        <comment>6688: create entity_overlay_diagram_cell_data table</comment>-->
-<!--        <addForeignKeyConstraint constraintName="entity_overlay_diag_cell_data_fk"-->
-<!--                                 baseTableName="entity_overlay_diagram_cell_data"-->
-<!--                                 baseColumnNames="diagram_id"-->
-<!--                                 referencedTableName="entity_overlay_diagram"-->
-<!--                                 referencedColumnNames="id"-->
-<!--                                 onDelete="CASCADE"/>-->
-<!--    </changeSet>-->
-
     <changeSet id="20230724-6688-1"
                author="woodjes">
         <comment>6688: add diagram kind to aggregate_overlay_diagram</comment>
@@ -135,6 +44,18 @@
                       newColumnName="layout_data"
                       oldColumnName="svg"
                       tableName="aggregate_overlay_diagram"/>
+    </changeSet>
+
+    <changeSet id="20230724-6688-3"
+               author="woodjes">
+        <comment>6688: add status to aggregate_overlay_diagram</comment>
+        <addColumn tableName="aggregate_overlay_diagram">
+            <column name="status"
+                    type="${enum.type}"
+                    defaultValue="DRAFT">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
     </changeSet>
 
 </databaseChangeLog>

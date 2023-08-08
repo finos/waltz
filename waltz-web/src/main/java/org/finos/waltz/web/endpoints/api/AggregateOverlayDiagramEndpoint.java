@@ -18,6 +18,7 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.model.ReleaseLifecycleStatusChangeCommand;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramInfo;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramPreset;
@@ -76,6 +77,7 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
         String findPresetsForDiagramPath = mkPath(BASE_URL, "diagram-id", ":id", "presets");
         String createPresetPath = mkPath(BASE_URL, "create-preset");
         String createPath = mkPath(BASE_URL, "create");
+        String updateStatusPath = mkPath(BASE_URL, "id", ":id");
 
         DatumRoute<AggregateOverlayDiagramInfo> getByIdRoute = (request, response) -> {
             return aggregateOverlayDiagramService.getById(getId(request));
@@ -202,6 +204,11 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
             return aggregateOverlayDiagramService.create(readBody(request, OverlayDiagramCreateCommand.class), getUsername(request));
         };
 
+        DatumRoute<Boolean> updateStatusRoute = (request, response) -> aggregateOverlayDiagramService
+                    .updateStatus(
+                            getId(request),
+                            readBody(request, ReleaseLifecycleStatusChangeCommand.class),
+                            getUsername(request));
 
         getForDatum(getByIdPath, getByIdRoute);
         getForList(findAllPath, findAllRoute);
@@ -218,6 +225,7 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
         postForDatum(getComplexityWidgetDataPath, getComplexityWidgetDataRoute);
         postForDatum(createPresetPath, createPresetRoute);
         postForDatum(createPath, createRoute);
+        postForDatum(updateStatusPath, updateStatusRoute);
     }
 
 }

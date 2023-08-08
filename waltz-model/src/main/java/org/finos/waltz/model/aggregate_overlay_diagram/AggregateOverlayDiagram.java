@@ -17,6 +17,8 @@ public abstract class AggregateOverlayDiagram implements IdProvider, NameProvide
 
     public abstract OverlayDiagramKind diagramKind();
 
+    public abstract ReleaseLifecycleStatus status();
+
     @Value.Default
     public EntityKind kind() {
         return EntityKind.AGGREGATE_OVERLAY_DIAGRAM;

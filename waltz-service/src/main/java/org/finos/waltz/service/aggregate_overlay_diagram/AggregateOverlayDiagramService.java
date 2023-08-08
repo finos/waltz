@@ -11,13 +11,13 @@ import org.finos.waltz.data.cost.CostKindDao;
 import org.finos.waltz.data.measurable.MeasurableDao;
 import org.finos.waltz.model.AssessmentBasedSelectionFilter;
 import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.ReleaseLifecycleStatusChangeCommand;
 import org.finos.waltz.model.aggregate_overlay_diagram.*;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.*;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.*;
 import org.finos.waltz.model.application.Application;
 import org.finos.waltz.model.complexity.ComplexityKind;
 import org.finos.waltz.model.cost.CostKindWithYears;
-import org.finos.waltz.model.cost.EntityCostKind;
 import org.finos.waltz.model.entity_overlay_diagram.OverlayDiagramKind;
 import org.finos.waltz.model.measurable.Measurable;
 import org.jooq.Record1;
@@ -311,5 +311,10 @@ public class AggregateOverlayDiagramService {
         Long diagramId = aggregateOverlayDiagramDao.save(createCmd, username);
         aggregateOverlayDiagramDao.updateBackingEntities(diagramId, createCmd.backingEntities());
         return diagramId;
+    }
+
+    public Boolean updateStatus(long diagramId, ReleaseLifecycleStatusChangeCommand changeStatusCmd, String username) {
+        return aggregateOverlayDiagramDao
+                .updateStatus(diagramId, changeStatusCmd);
     }
 }

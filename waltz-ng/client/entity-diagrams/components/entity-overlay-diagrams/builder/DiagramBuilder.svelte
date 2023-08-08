@@ -11,8 +11,7 @@
     import PageHeader from "../../../../common/svelte/PageHeader.svelte";
     import ViewLink from "../../../../common/svelte/ViewLink.svelte";
     import GroupControls from "../builder-controls/GroupControls.svelte";
-
-    let items = [];
+    import _ from "lodash";
 
     let html = "";
     let data = "";
@@ -38,7 +37,8 @@
 
 
     $: {
-        if (vizElem && $groups) {
+        if (vizElem && $groups && $diagramMode === DiagramModes.VIEW) {
+            console.log("setting html and data", {gs: $groups, vizElem});
             // using a timeout to give innerHTML chance to be updated
             // before we copy it
             setTimeout(() => {
@@ -68,12 +68,12 @@
     <div class="row">
 
         <div class="col-sm-12">
-            <DiagramControls></DiagramControls>
+            <DiagramControls/>
             <hr>
         </div>
 
 
-        {#if $selectedDiagram}
+        {#if $diagramLayout}
             <div style="padding-top: 1em">
                 <div class="col-sm-8"
                      bind:this={vizElem}>
