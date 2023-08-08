@@ -17,8 +17,6 @@
         selectGroup(group);
     }
 
-    $: cellData = _.get($overlayData, group.id);
-
     function hasData(node, dataById) {
         const childHasData = !_.isEmpty(dataById[node.id]);
         const childrenHaveData = _.some(flattenChildren(node), child => !_.isEmpty(dataById[child.id]));
@@ -31,23 +29,44 @@
 
     $: overlayRequiresTitle = group.data && $selectedOverlay?.showTitle;
 
+    $: cellData = _.get($overlayData, group.id);
+
+    $: childKinds = _
+        .chain(flattenChildren(group))
+        .filter(d => !_.isEmpty(d.data))
+        .map(d => d.data.entityReference.kind)
+        .compact()
+        .uniq()
+        .value();
+
 </script>
 
 {#if group}
 <div>
     <div style="display: flex">
         <div style={mkContentBoxStyle(group)}>
-            {#if overlayRequiresTitle || group.props.showTitle}
+            {#if group.props.showTitle}
                 <div style={mkTitleStyle(group, $hoveredGroupId)}>
-                    {#if group.data}
-                        <button style="outline: none !important; width: 100%; background: none; border: none; color: inherit;"
-                                on:click={selectOverlayGroup}>
+                    <button style="outline: none !important; width: 100%; background: none; border: none; color: inherit;"
+                            on:click={selectOverlayGroup}>
+                        {#if group.data}
                             <Icon name={_.get(entity, [group.data.entityReference.kind, "icon"], "info-circle")}/>
-                            {group.title}
-                        </button>
-                    {:else}
+                        {:else}
+                            {#each childKinds as childKind}
+                                <span style="opacity: 0.5">
+                                    <Icon name={_.get(entity, [childKind, "icon"], "info-circle")}/>
+                                </span>
+                            {/each}
+                        {/if}
                         {group.title}
-                    {/if}
+                    </button>
+                </div>
+            {:else if overlayRequiresTitle}
+                <div style={mkTitleStyle(group, $hoveredGroupId)}>
+                    <button style="outline: none !important; width: 100%; background: none; border: none; color: inherit;"
+                            on:click={selectOverlayGroup}>
+                        {group.title}
+                    </button>
                 </div>
             {/if}
 

@@ -6,7 +6,7 @@
 
     const dispatch = createEventDispatcher();
 
-    const diagramsCall = aggregateOverlayDiagramStore.findByKind(overlayDiagramKind.WALTZ_ENTITY_OVERLAY.key);
+    const diagramsCall = aggregateOverlayDiagramStore.findByKind(overlayDiagramKind.WALTZ_ENTITY_OVERLAY.key, true);
     $: diagrams = $diagramsCall.data || [];
 
     function selectDiagram(diagram) {

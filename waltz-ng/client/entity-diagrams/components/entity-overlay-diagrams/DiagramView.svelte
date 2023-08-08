@@ -18,9 +18,9 @@
 
     const {selectedOverlay, overlayData} = diagramService;
 
-    $: cellData = _.get($overlayData, group.id);
+    $: cellData = _.get($overlayData, group?.id);
 
-    $: children = group.children;
+    $: children = group?.children || [];
 
 </script>
 

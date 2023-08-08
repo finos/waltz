@@ -8,7 +8,6 @@
     import {diagramService} from "../entity-diagram-store";
     import Icon from "../../../../common/svelte/Icon.svelte";
 
-
     const {selectedGroup, overlayData} = diagramService;
 
     $: cellData = $overlayData[$selectedGroup?.id];
@@ -27,20 +26,16 @@
         {/if}
     </div>
 
-    {#if cellData}
-        <div class="waltz-scroll-region-350"
-             style="margin-top: 1em">
-            <Item data={$selectedGroup.data}
-                  cellId={$selectedGroup.id}
-                  height={$selectedGroup.props.minWidth / 3}
-                  width={$selectedGroup.props.minWidth}
-                  renderMode={RenderModes.FOCUSED}/>
-        </div>
-    {:else}
-        <div class="help-block">
-            <Icon name="info-circle"/> No data has been linked to this group
-        </div>
-    {/if}
+
+
+    <div class="waltz-scroll-region-250"
+         style="margin-top: 1em">
+        <Item data={$selectedGroup.data}
+              cellId={$selectedGroup.id}
+              height={$selectedGroup.props.minWidth / 3}
+              width={$selectedGroup.props.minWidth}
+              renderMode={RenderModes.FOCUSED}/>
+    </div>
 
 {:else}
     <div class="help-block">

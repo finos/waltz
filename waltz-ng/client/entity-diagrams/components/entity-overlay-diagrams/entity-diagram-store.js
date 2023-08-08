@@ -5,6 +5,8 @@ import {$http} from "../../../common/WaltzHttp";
 import {overlayDiagramKind} from "../../../common/services/enums/overlay-diagram-kind";
 import {buildHierarchies, flattenChildren} from "../../../common/hierarchy-utils";
 import {toEntityRef} from "../../../common/entity-utils";
+import {entity} from "../../../common/services/enums/entity";
+import {group} from "./DiagramInteractView.svelte";
 
 export let selectionOptions = writable(null);
 export let hoveredGroupId = writable(null);
