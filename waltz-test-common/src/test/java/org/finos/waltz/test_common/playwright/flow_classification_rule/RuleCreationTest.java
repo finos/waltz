@@ -53,7 +53,7 @@ public class RuleCreationTest extends BasePlaywrightIntegrationTest {
 
         screenshotHelper.takePageSnapshot(
                 listLocator,
-                "1_show_list.png");
+                "show_list.png");
 
         listLocator
                 .getByTestId("create-rule")
@@ -61,7 +61,7 @@ public class RuleCreationTest extends BasePlaywrightIntegrationTest {
 
         Locator formLocator = screenshotHelper.takePageSnapshot(
                 page.getByTestId("flow-classification-rule-editor"),
-                "2_create_rule.png");
+                "create_rule.png");
 
         formLocator
                 .locator("#source")
@@ -73,7 +73,7 @@ public class RuleCreationTest extends BasePlaywrightIntegrationTest {
                         .locator("#source")
                         .locator(".autocomplete-list-item")
                         .locator(format("text=%s", toName(appRef))),
-                "3_select_app.png");
+                "select_app.png");
 
         appLocator.click();
 
@@ -82,7 +82,7 @@ public class RuleCreationTest extends BasePlaywrightIntegrationTest {
                     formLocator
                         .locator("#datatype")
                         .locator("text=Book Data"),
-                    "4_select_datatype.png")
+                    "select_datatype.png")
                 .click();
 
         formLocator
@@ -96,7 +96,7 @@ public class RuleCreationTest extends BasePlaywrightIntegrationTest {
                             .locator("#scope")
                             .locator(".autocomplete-list-item")
                             .locator("text=CEO Office"),
-                    "5_select_scope.png")
+                    "select_scope.png")
                 .click();
 
         Locator ratingLocator = formLocator
@@ -107,7 +107,7 @@ public class RuleCreationTest extends BasePlaywrightIntegrationTest {
 
         screenshotHelper.takePageSnapshot(
                 ratingLocator,
-                "6_select_rating.png");
+                "select_rating.png");
 
         formLocator
                 .locator("button[type=submit]")
@@ -118,7 +118,7 @@ public class RuleCreationTest extends BasePlaywrightIntegrationTest {
 
         screenshotHelper.takePageSnapshot(
                 page.locator(".waltz-flow-classification-rules-table"),
-                "7_result.png");
+                "result.png");
 
         Thread.sleep(1000);
 
@@ -130,7 +130,7 @@ public class RuleCreationTest extends BasePlaywrightIntegrationTest {
 
         screenshotHelper.takePageSnapshot(
                 page.getByTestId("source"),
-                "8_view.png");
+                "view.png");
 
         assertThat(page.getByTestId("source")).containsText(toName(appRef));
         assertThat(page.getByTestId("data-type")).containsText("Book Data");
