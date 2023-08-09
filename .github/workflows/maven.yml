@@ -72,11 +72,6 @@ jobs:
         name: surefire-results.html
         path: target/site/surefire-report.html
   
-    - name: Publish Test Report
-      if: success() || failure()
-      uses: scacap/action-surefire-report@v1
-
-
     - name: Login to GitHub Registry
       if: ${{ github.ref_type == 'tag' }}
       uses: docker/login-action@v1
