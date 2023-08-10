@@ -43,7 +43,7 @@ function controller() {
         {
             field: "message",
             name: "Message",
-            width: "70%",
+            width: "64%",
             cellTemplate: `
                 <div class='ui-grid-cell-contents'>
                     <span uib-popover='{{COL_FIELD}}'
@@ -71,6 +71,20 @@ function controller() {
             name: "Timestamp",
             width: "10%",
             cellTemplate: "<div class='ui-grid-cell-contents'><waltz-from-now timestamp='COL_FIELD'></waltz-from-now></div>"
+        },
+        {
+            name: "Ref",
+            width: "6%",
+            cellTemplate: `
+                <div class='ui-grid-cell-contents'
+                     ng-if="row.entity.childKind && row.entity.childId"
+                     style="align-content: center">
+                    <waltz-entity-link entity-ref="{kind: row.entity.childKind, id: row.entity.childId}"
+                                       tooltip-placement="left"
+                                       icon-placement="left"
+                                       is-secondary-link="false">
+                    </waltz-entity-link>
+                </div>`
         }
     ];
 
