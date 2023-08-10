@@ -20,7 +20,8 @@ import {
 import _ from "lodash";
 import {entity} from "../../../common/services/enums/entity";
 import {
-    mkAggregatedEntitiesGlobalProps
+    mkAggregatedEntitiesGlobalProps,
+    mkAssessmentOverlayGlobalProps
 } from "../../../aggregate-overlay-diagram/components/aggregate-overlay-diagram/aggregate-overlay-diagram-utils";
 import DefaultOverlay from "./overlays/DefaultOverlay.svelte";
 import AggregatedEntitiesOverlayParameters from "./overlays/AggregatedEntitiesOverlayParameters.svelte";
@@ -29,6 +30,12 @@ import AggregatedEntitiesOverlayCell
     from "../../../aggregate-overlay-diagram/components/aggregate-overlay-diagram/widgets/aggregated-entities/AggregatedEntitiesOverlayCell.svelte";
 import BackingEntitiesOverlayCell
     from "../../../aggregate-overlay-diagram/components/aggregate-overlay-diagram/widgets/backing-entities/BackingEntitiesPlainOverlayCell.svelte";
+import {
+    resetParameters as resetAssessmentParameters
+} from "../../../aggregate-overlay-diagram/components/aggregate-overlay-diagram/widgets/assessments/AssessmentWidgetParameters.svelte";
+import AssessmentOverlayParameters from "./overlays/assessment/AssessmentOverlayParameters.svelte";
+import AssessmentOverlay from "./overlays/assessment/AssessmentOverlay.svelte";
+import AssessmentOverlayLegendDetail from "./overlays/assessment/AssessmentOverlayLegendDetail.svelte";
 
 export const FlexDirections = {
     COLUMN: "column",
@@ -192,6 +199,20 @@ export const overlays =  [
         aggregatedEntityKinds: [entity.APPLICATION.key, entity.CHANGE_INITIATIVE.key],
         parameterWidget: DefaultOverlayParameters,
         showTitle: false
+    },
+    {
+        key: "ASSESSMENTS",
+        name: "Assessments",
+        icon: "puzzle-piece",
+        description: "Allows user to select an assessment to overlay on the diagram",
+        component: AssessmentOverlay,
+        url: "app-assessment-widget",
+        mkGlobalProps: mkAssessmentOverlayGlobalProps,
+        resetParameters: resetAssessmentParameters,
+        aggregatedEntityKinds: [entity.APPLICATION.key, entity.CHANGE_INITIATIVE.key],
+        parameterWidget: AssessmentOverlayParameters,
+        legend: AssessmentOverlayLegendDetail,
+        showTitle: true
     }
 ]
 

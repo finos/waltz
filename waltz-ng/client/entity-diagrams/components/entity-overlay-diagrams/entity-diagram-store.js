@@ -19,6 +19,7 @@ const groupData = writable([]);
 
 const overlayData = writable([]);
 const overlayProperties = writable({});
+const overlayParameters = writable(null);
 
 const selectedGroup = writable(null);
 const selectedOverlay = writable(null);
@@ -41,8 +42,9 @@ function _loadOverlayData() {
     const diagram = get(selectedDiagram);
     const opts = get(selectionOptions);
     const overlay = get(selectedOverlay);
+    const params = get(overlayParameters);
 
-    if(diagram && overlay && opts) {
+    if(diagram && overlay && opts && params) {
 
         if (_.isEmpty(overlay.url)) {
 
@@ -54,7 +56,7 @@ function _loadOverlayData() {
                 {},
                 {
                     idSelectionOptions: opts,
-                    overlayParameters: {}
+                    overlayParameters: params
                 });
 
             return $http
@@ -76,9 +78,15 @@ function _loadOverlayData() {
     }
 }
 
+function updateOverlayParameters(params) {
+    overlayParameters.set(params);
+    _loadOverlayData();
+}
+
 
 function selectOverlay(overlay) {
     selectedOverlay.set(overlay);
+    overlayParameters.set(null);
     _loadOverlayData();
 }
 
@@ -195,6 +203,7 @@ function reset() {
     groupData.set([]);
     selectedGroup.set(null);
     selectedOverlay.set(null);
+    overlayParameters.set(null);
 }
 
 
@@ -210,6 +219,7 @@ function createStores() {
         diagramLayout: {subscribe: diagramLayout.subscribe},
         overlayData: {subscribe: overlayData.subscribe},
         overlayProperties: {subscribe: overlayProperties.subscribe},
+        overlayParameters: {subscribe: overlayParameters.subscribe},
         selectDiagram,
         saveDiagram,
         updateDiagramStatus,
@@ -220,6 +230,7 @@ function createStores() {
         updateGroup,
         updateChildren,
         selectOverlay,
+        updateOverlayParameters,
         reset,
     };
 }

@@ -1,5 +1,15 @@
 <script>
 
+
+    import {diagramService} from "../entity-diagram-store";
+    import {onMount} from "svelte";
+
+    const {updateOverlayParameters} = diagramService;
+
+    onMount(() => {
+        updateOverlayParameters({});
+    })
+
 </script>
 
 <div>

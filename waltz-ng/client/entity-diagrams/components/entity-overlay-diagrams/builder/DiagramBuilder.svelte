@@ -11,7 +11,6 @@
     import PageHeader from "../../../../common/svelte/PageHeader.svelte";
     import ViewLink from "../../../../common/svelte/ViewLink.svelte";
     import GroupControls from "../builder-controls/GroupControls.svelte";
-    import _ from "lodash";
 
     let html = "";
     let data = "";
@@ -35,10 +34,8 @@
         selectOverlayGroup(null);
     }
 
-
     $: {
         if (vizElem && $groups && $diagramMode === DiagramModes.VIEW) {
-            console.log("setting html and data", {gs: $groups, vizElem});
             // using a timeout to give innerHTML chance to be updated
             // before we copy it
             setTimeout(() => {

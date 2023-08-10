@@ -26,8 +26,6 @@
         {/if}
     </div>
 
-
-
     <div class="waltz-scroll-region-250"
          style="margin-top: 1em">
         <Item data={$selectedGroup.data}

@@ -12,8 +12,9 @@
     import EditDiagramDetailsPanel from "../builder/EditDiagramDetailsPanel.svelte";
     import UpdateDiagramConfirmationPanel from "../builder/UpdateDiagramConfirmationPanel.svelte";
     import Toggle from "../../../../common/svelte/Toggle.svelte";
-    import RemoveDiagramConfirmationPanel from "../builder/RemoveDiagramConfirmationPanel.svelte";
     import {releaseLifecycleStatus} from "../../../../common/services/enums/release-lifecycle-status";
+    import {aggregateOverlayDiagramStore} from "../../../../svelte-stores/aggregate-overlay-diagram-store";
+    import {overlayDiagramKind} from "../../../../common/services/enums/overlay-diagram-kind";
 
     let BuilderModes = {
         PICKER: "PICKER",
@@ -40,12 +41,13 @@
         updateDiagramStatus,
     } = diagramService;
 
+    const diagramsCall = aggregateOverlayDiagramStore.findByKind(overlayDiagramKind.WALTZ_ENTITY_OVERLAY.key, true);
+    $: diagrams = $diagramsCall.data || [];
 
     function selectOverlayDiagram(evt) {
         selectDiagram(evt.detail.id);
         activeMode = BuilderModes.EDIT;
     }
-
 
     function createNewDiagram() {
         uploadDiagramLayout([createInitialGroup()]);
@@ -144,8 +146,6 @@
             .catch(e => displayError(`Unable to update status to: ${newStatus.name}`, e));
     }
 
-    $: console.log({sd: $selectedDiagram});
-
 </script>
 
 
@@ -158,7 +158,8 @@
         </div>
 
         {#if !dataInput}
-            <DiagramList on:select={selectOverlayDiagram}>
+            <DiagramList {diagrams}
+                         on:select={selectOverlayDiagram}>
             </DiagramList>
             <button class="btn btn-default" on:click={createNewDiagram}>Create new Diagram</button>
             <button class="btn btn-default" on:click={editData}>Import from Layout Data</button>
@@ -190,13 +191,33 @@
             <h4>
                 {$selectedDiagram.name}
             </h4>
+            <table class="table table-condensed small">
+                <colgroup>
+                    <col width="20%"/>
+                    <col width="80%"/>
+                </colgroup>
+                <tbody>
+                    <tr>
+                        <td>Description</td>
+                        <td>{$selectedDiagram.description || "-"}</td>
+                    </tr>
+                    <tr>
+                        <td>Aggregated Kind</td>
+                        <td>{$selectedDiagram.aggregatedEntityKind}</td>
+                    </tr>
+                    <tr>
+                        <td>Status</td>
+                        <td>{$selectedDiagram.status}</td>
+                    </tr>
+                </tbody>
+            </table>
         {:else}
             <h4>
                 Editing Diagram Layout
             </h4>
         {/if}
 
-        <div style="padding-top: 1em">
+        <div>
             <Toggle labelOn="Editing Diagram"
                     labelOff="Viewing Diagram"
                     state={$diagramMode === DiagramModes.EDIT}

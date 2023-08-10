@@ -5,10 +5,17 @@
     import DiagramInteractView from "./DiagramInteractView.svelte";
     import {mkSelectionOptions} from "../../../common/selector-utils";
     import DiagramList from "./DiagramList.svelte";
+    import {aggregateOverlayDiagramStore} from "../../../svelte-stores/aggregate-overlay-diagram-store";
+    import {overlayDiagramKind} from "../../../common/services/enums/overlay-diagram-kind";
+    import {releaseLifecycleStatus} from "../../../common/services/enums/release-lifecycle-status";
+    import _ from "lodash";
 
     export let parentEntityRef;
 
     const {selectDiagram, overlayData, selectedOverlay, diagramLayout, selectedDiagram} = diagramService;
+
+    const diagramsCall = aggregateOverlayDiagramStore.findByKind(overlayDiagramKind.WALTZ_ENTITY_OVERLAY.key, true);
+    $: diagrams = _.filter($diagramsCall.data, d => d.status === releaseLifecycleStatus.ACTIVE.key) || [];
 
     $: $selectionOptions = mkSelectionOptions(parentEntityRef);
 
@@ -30,7 +37,8 @@
         </div>
     {:else}
         <div class="col-sm-12">
-            <DiagramList on:select={selectOverlayDiagram}/>
+            <DiagramList {diagrams}
+                         on:select={selectOverlayDiagram}/>
         </div>
     {/if}
 </div>

@@ -1,77 +1,77 @@
-<script context="module">
-    import {writable} from "svelte/store";
-
-    const selectedDefinition = writable(null);
-    const useTargetDate = writable(false);
-    const sliderVal = writable(0);
-    const mode = writable("BAR");
-
-    export function resetParameters() {
-        mode.set("BAR");
-        selectedDefinition.set(null);
-        useTargetDate.set(false);
-        sliderVal.set(0);
-    }
-
-</script>
-
 <script>
-    import AssessmentDefinitionPicker
-        from "../../../../../common/svelte/entity-pickers/AssessmentDefinitionPicker.svelte";
-    import {getContext} from "svelte";
-    import {assessmentRenderMode, Modes} from "./store";
+    import AssessmentDefinitionPicker from "../../../../../common/svelte/entity-pickers/AssessmentDefinitionPicker.svelte";
     import moment from "moment";
     import {timeFormat} from "d3-time-format";
     import DescriptionFade from "../../../../../common/svelte/DescriptionFade.svelte";
+    import {assessmentRenderMode, AssessmentRenderModes} from "../overlay-store";
+    import {diagramService} from "../../entity-diagram-store";
 
-    const selectedOverlay = getContext("selectedOverlay");
-    const selectedDiagram = getContext("selectedDiagram");
-    const widgetParameters = getContext("widgetParameters");
+    const {
+        reset,
+        selectedDiagram,
+        selectedGroup,
+        groups,
+        overlayParameters,
+        selectedOverlay,
+        updateOverlayParameters,
+    } = diagramService;
+
+
+    let selectedDefinition;
+    let useTargetDate = false;
+    let sliderVal = 0;
+    let mode = "BAR";
 
     const fmt = timeFormat("%Y-%m-%d");
 
     function load(assessmentDef, targetDate) {
+        console.log({assessmentDef, targetDate})
         if (assessmentDef) {
-            $widgetParameters = {
+            const params = {
                 assessmentDefinitionId: assessmentDef.id,
                 targetDate
             };
 
-            $selectedOverlay = null;
+            updateOverlayParameters(params);
         }
     }
 
-    $: targetDate = $useTargetDate
-        ? moment().set("date", 1).add($sliderVal, "months")
+    $: targetDate = useTargetDate
+        ? moment().set("date", 1).add(sliderVal, "months")
         : null;
 
-    $: $assessmentRenderMode = Modes[$mode];
+    $: $assessmentRenderMode = AssessmentRenderModes[mode];
+
 
     $: {
-        load($selectedDefinition, targetDate);
+        load(selectedDefinition, targetDate);
     }
+
+
+    $: console.log({selectedDefinition, o: $selectedOverlay, op: $overlayParameters, mode, arm: $assessmentRenderMode, AssessmentRenderModes});
+
 </script>
 
-{#if $selectedDefinition}
+{#if selectedDefinition}
     <h5>
-        {$selectedDefinition.name}
+        {selectedDefinition.name}
         <button class="btn btn-skinny"
-                on:click={() => $selectedDefinition = null}>
+                on:click={() => selectedDefinition = null}>
             (Change assessment)
         </button>
     </h5>
 
     <div class="help-block">
-        <DescriptionFade text={$selectedDefinition.description}/>
+        <DescriptionFade text={selectedDefinition.description}/>
     </div>
 
 {:else}
-    <AssessmentDefinitionPicker onSelect={ad => $selectedDefinition = ad}
+    <AssessmentDefinitionPicker onSelect={ad => selectedDefinition = ad}
                                 selectionFilter={ad => ad.entityKind === $selectedDiagram.aggregatedEntityKind}/>
 {/if}
 
 
-{#if $selectedDefinition}
+{#if selectedDefinition}
     <br>
 
     <h4>Rendering Mode</h4>
@@ -81,7 +81,7 @@
     <label>
         <input style="display: inline-block;"
                type="radio"
-               bind:group={$mode}
+               bind:group={mode}
                name="assessmentRenderMode"
                value={"BAR"}>
         Bar Chart
@@ -90,7 +90,7 @@
     <label>
         <input style="display: inline-block;"
                type="radio"
-               bind:group={$mode}
+               bind:group={mode}
                name="assessmentRenderMode"
                value={"BOX"}>
         Box Chart
@@ -105,7 +105,7 @@
     </p>
     <label>
         <input type="checkbox"
-               bind:checked={$useTargetDate}>
+               bind:checked={useTargetDate}>
         Use target date?
     </label>
 
@@ -114,8 +114,8 @@
            type="range"
            min="0"
            max="120"
-           disabled={!$useTargetDate}
-           bind:value={$sliderVal}>
+           disabled={!useTargetDate}
+           bind:value={sliderVal}>
     <span>
         {targetDate
             ? fmt(targetDate)

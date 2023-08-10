@@ -28,21 +28,25 @@
 
 {#if overlayMode === OverlayModes.VIEW && $selectedOverlay}
 
-        <h4>
-            <Icon name={$selectedOverlay.icon}/>
-            {$selectedOverlay.name}
-            <button class="btn btn-skinny small"
-                    on:click={() => overlayMode = OverlayModes.PICKER}>
-                (Change overlay)
-            </button>
-        </h4>
+    <h4>
+        <Icon name={$selectedOverlay.icon}/>
+        {$selectedOverlay.name}
+        <button class="btn btn-skinny small"
+                on:click={() => overlayMode = OverlayModes.PICKER}>
+            (Change overlay)
+        </button>
+    </h4>
 
-        <Toggle labelOn="Hiding cells with no data"
-                labelOff="Showing all cells"
-                state={$hideEmptyCells}
-                onToggle={() => $hideEmptyCells = !$hideEmptyCells}/>
+    <Toggle labelOn="Hiding cells with no data"
+            labelOff="Showing all cells"
+            state={$hideEmptyCells}
+            onToggle={() => $hideEmptyCells = !$hideEmptyCells}/>
 
-        <svelte:component this={$selectedOverlay.parameterWidget}/>
+    <svelte:component this={$selectedOverlay.parameterWidget}/>
+
+    {#if $selectedOverlay.legend}
+        <svelte:component this={$selectedOverlay.legend}/>
+    {/if}
 
 
 {:else if overlayMode === OverlayModes.PICKER || _.isEmpty($selectedOverlay)}

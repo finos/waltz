@@ -1,15 +1,13 @@
 <script>
 
     import {createEventDispatcher} from "svelte";
-    import {aggregateOverlayDiagramStore} from "../../../svelte-stores/aggregate-overlay-diagram-store";
-    import {overlayDiagramKind} from "../../../common/services/enums/overlay-diagram-kind";
     import {entity} from "../../../common/services/enums/entity";
     import _ from "lodash";
+    import NoData from "../../../common/svelte/NoData.svelte";
+
+    export let diagrams = [];
 
     const dispatch = createEventDispatcher();
-
-    const diagramsCall = aggregateOverlayDiagramStore.findByKind(overlayDiagramKind.WALTZ_ENTITY_OVERLAY.key, true);
-    $: diagrams = $diagramsCall.data || [];
 
     function selectDiagram(diagram) {
         dispatch("select", diagram);
@@ -36,7 +34,9 @@
         </tr>
     {:else}
         <tr>
-            <td colspan="2">There are no entity overlay diagrams</td>
+            <td colspan="3">
+                <NoData type="info">There are no entity overlay diagrams</NoData>
+            </td>
         </tr>
     {/each}
     </tbody>

@@ -309,7 +309,13 @@ export function mkAssessmentOverlayGlobalProps(data) {
         .max()
         .value();
 
-    return {maxCount};
+    const maxRatings = _
+        .chain(data.cellData)
+        .map(d => _.size(d.counts))
+        .max()
+        .value();
+
+    return {maxCount, maxRatings};
 }
 
 
