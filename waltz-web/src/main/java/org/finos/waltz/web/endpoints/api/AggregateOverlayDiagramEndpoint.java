@@ -74,6 +74,7 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
         String getAggregatedEntitiesWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "aggregated-entities-widget");
         String getBackingEntityWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "backing-entity-widget");
         String getComplexityWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "complexity-widget");
+        String getApplicationChangeWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "app-change-widget");
         String findPresetsForDiagramPath = mkPath(BASE_URL, "diagram-id", ":id", "presets");
         String createPresetPath = mkPath(BASE_URL, "create-preset");
         String createPath = mkPath(BASE_URL, "create");
@@ -184,6 +185,17 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
         };
 
 
+        DatumRoute<ApplicationChangeWidgetData> getApplicationChangeWidgetDataRoute = (request, response) -> {
+            OverlayDiagramWidgetInfo<AppChangeWidgetParameters> widgetParameters = readBody(request, OverlayDiagramAppChangeWidgetInfo.class, null);
+
+            return aggregateOverlayDiagramService
+                    .getApplicationChangeWidgetData(
+                            getId(request),
+                            widgetParameters.idSelectionOptions(),
+                            widgetParameters.overlayParameters());
+        };
+
+
         DatumRoute<BackingEntityWidgetData> getBackingEntityWidgetDataRoute = (request, response) -> {
             long diagramId = getId(request);
             return aggregateOverlayDiagramService.getBackingEntityWidgetData(diagramId);
@@ -223,6 +235,7 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
         postForDatum(getAppAssessmentWidgetDataPath, getAppAssessmentWidgetDataRoute);
         postForDatum(getAggregatedEntitiesWidgetDataPath, getAggregatedEntitiesWidgetDataRoute);
         postForDatum(getComplexityWidgetDataPath, getComplexityWidgetDataRoute);
+        postForDatum(getApplicationChangeWidgetDataPath, getApplicationChangeWidgetDataRoute);
         postForDatum(createPresetPath, createPresetRoute);
         postForDatum(createPath, createRoute);
         postForDatum(updateStatusPath, updateStatusRoute);

@@ -25,7 +25,6 @@
     const fmt = timeFormat("%Y-%m-%d");
 
     function load(assessmentDef, targetDate) {
-        console.log({assessmentDef, targetDate})
         if (assessmentDef) {
             const params = {
                 assessmentDefinitionId: assessmentDef.id,
@@ -46,9 +45,6 @@
     $: {
         load(selectedDefinition, targetDate);
     }
-
-
-    $: console.log({selectedDefinition, o: $selectedOverlay, op: $overlayParameters, mode, arm: $assessmentRenderMode, AssessmentRenderModes});
 
 </script>
 

@@ -186,7 +186,7 @@ public class AggregateOverlayDiagramUtilities {
     }
 
 
-    private static Map<Long, List<Long>> findMeasurableIdToAggregatedEntityIdMap(DSLContext dsl,
+    public static Map<Long, List<Long>> findMeasurableIdToAggregatedEntityIdMap(DSLContext dsl,
                                                                                  EntityKind aggregatedEntityKind,
                                                                                  Select<Record1<Long>> inScopeEntityIdSelector,
                                                                                  Set<Long> backingEntityIds,
@@ -247,7 +247,7 @@ public class AggregateOverlayDiagramUtilities {
     }
 
 
-    private static Map<Long, List<Long>> loadMeasurableToAppIdsMap(DSLContext dsl,
+    public static Map<Long, List<Long>> loadMeasurableToAppIdsMap(DSLContext dsl,
                                                                    Select<Record1<Long>> inScopeEntityIdSelector,
                                                                    Set<Long> backingEntityReferences,
                                                                    Optional<LocalDate> targetStateDate) {

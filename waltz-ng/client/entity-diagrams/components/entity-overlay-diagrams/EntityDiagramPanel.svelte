@@ -25,7 +25,7 @@
 
 </script>
 
-<div class="row">
+<div class="row waltz-sticky-wrapper">
     {#if $selectedDiagram}
         <div class="col-sm-8">
             <DiagramInteractView group={$diagramLayout}
@@ -33,7 +33,9 @@
             </DiagramInteractView>
         </div>
         <div class="col-sm-4">
-            <DiagramContextPanel/>
+            <div class="waltz-sticky-part">
+                <DiagramContextPanel/>
+            </div>
         </div>
     {:else}
         <div class="col-sm-12">

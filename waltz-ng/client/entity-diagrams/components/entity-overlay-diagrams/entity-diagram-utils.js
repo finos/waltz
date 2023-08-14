@@ -20,7 +20,7 @@ import {
 import _ from "lodash";
 import {entity} from "../../../common/services/enums/entity";
 import {
-    mkAggregatedEntitiesGlobalProps,
+    mkAggregatedEntitiesGlobalProps, mkAppChangesOverlayGlobalProps,
     mkAssessmentOverlayGlobalProps
 } from "../../../aggregate-overlay-diagram/components/aggregate-overlay-diagram/aggregate-overlay-diagram-utils";
 import DefaultOverlay from "./overlays/DefaultOverlay.svelte";
@@ -36,6 +36,8 @@ import {
 import AssessmentOverlayParameters from "./overlays/assessment/AssessmentOverlayParameters.svelte";
 import AssessmentOverlay from "./overlays/assessment/AssessmentOverlay.svelte";
 import AssessmentOverlayLegendDetail from "./overlays/assessment/AssessmentOverlayLegendDetail.svelte";
+import ApplicationChangesOverlay from "./overlays/ApplicationChangesOverlay.svelte";
+import ApplicationChangesOverlayParameters from "./overlays/ApplicationChangesOverlayParameters.svelte";
 
 export const FlexDirections = {
     COLUMN: "column",
@@ -212,6 +214,19 @@ export const overlays =  [
         aggregatedEntityKinds: [entity.APPLICATION.key, entity.CHANGE_INITIATIVE.key],
         parameterWidget: AssessmentOverlayParameters,
         legend: AssessmentOverlayLegendDetail,
+        showTitle: true
+    },
+    {
+        key: "APPLICATION_CHANGE",
+        name: "Application Change",
+        icon: "desktop",
+        description: "Displays the incoming and outgoing applications based upon app retirements, rating decomms and replacements",
+        component: ApplicationChangesOverlay,
+        url: "app-change-widget",
+        mkGlobalProps: mkAppChangesOverlayGlobalProps,
+        resetParameters: resetAssessmentParameters,
+        aggregatedEntityKinds: [entity.APPLICATION.key],
+        parameterWidget: ApplicationChangesOverlayParameters,
         showTitle: true
     }
 ]

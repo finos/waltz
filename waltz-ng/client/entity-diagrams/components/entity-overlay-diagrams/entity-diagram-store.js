@@ -37,12 +37,22 @@ const groupsWithData = derived(
 
 const diagramLayout = derived([groupsWithData], ([$groupsWithData]) => _.first(buildHierarchies($groupsWithData)));
 
+const visibleOverlayGroupIds = derived([groups], ([$groups]) => {
+    const parents = _.map($groups, g => g.parentId);
+    return _
+        .chain($groups)
+        .filter(g => !_.includes(parents, g.id))
+        .map(d => d.id)
+        .value();
+})
+
 function _loadOverlayData() {
 
     const diagram = get(selectedDiagram);
     const opts = get(selectionOptions);
     const overlay = get(selectedOverlay);
     const params = get(overlayParameters);
+    const visGroupIds = get(visibleOverlayGroupIds);
 
     if(diagram && overlay && opts && params) {
 
@@ -65,10 +75,14 @@ function _loadOverlayData() {
 
                     const allOverlayData = d.data;
 
+
+                    console.log({allOverlayData, visGroupIds});
+
                     const cellDataByExtId = _.keyBy(allOverlayData.cellData, d => d.cellExternalId);
+                    const visibleOverlayData = _.filter(allOverlayData.cellData, d => _.includes(visGroupIds, d.cellExternalId));
 
                     const props = overlay.mkGlobalProps
-                        ? overlay.mkGlobalProps(allOverlayData)
+                        ? overlay.mkGlobalProps({cellData: visibleOverlayData})
                         : {};
 
                     overlayData.set(cellDataByExtId);

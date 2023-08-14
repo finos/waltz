@@ -301,6 +301,7 @@ export function mkAggregatedEntitiesGlobalProps(data) {
 
 
 export function mkAssessmentOverlayGlobalProps(data) {
+
     const maxCount = _
         .chain(data.cellData)
         .map(d => d.counts)
@@ -316,6 +317,28 @@ export function mkAssessmentOverlayGlobalProps(data) {
         .value();
 
     return {maxCount, maxRatings};
+}
+
+export function mkAppChangesOverlayGlobalProps(data) {
+
+    console.log({data})
+
+    const maxInboundCount = _
+        .chain(data.cellData)
+        .filter()
+        .flatMap(d => d.inboundCounts)
+        .map(d => d.count)
+        .max()
+        .value();
+
+    const maxOutboundCount = _
+        .chain(data.cellData)
+        .flatMap(d => d.outboundCounts)
+        .map(d => d.count)
+        .max()
+        .value();
+
+    return {maxInboundCount, maxOutboundCount};
 }
 
 

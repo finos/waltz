@@ -45,6 +45,7 @@ public class AggregateOverlayDiagramService {
     private final AssessmentRatingWidgetDao appAssessmentWidgetDao;
     private final BackingEntityWidgetDao backingEntityWidgetDao;
     private final AggregatedEntitiesWidgetDao aggregatedEntitiesWidgetDao;
+    private final AppChangesWidgetDao appChangesWidgetDao;
     private final AggregateOverlayDiagramPresetDao aggregateOverlayDiagramPresetDao;
     private final MeasurableDao measurableDao;
     private final ApplicationDao applicationDao;
@@ -63,6 +64,7 @@ public class AggregateOverlayDiagramService {
                                           BackingEntityWidgetDao backingEntityWidgetDao,
                                           AppCostWidgetDao appCostWidgetDao,
                                           AggregatedEntitiesWidgetDao aggregatedEntitiesWidgetDao,
+                                          AppChangesWidgetDao appChangesWidgetDao,
                                           AggregateOverlayDiagramPresetDao aggregateOverlayDiagramPresetDao,
                                           MeasurableDao measurableDao,
                                           ApplicationDao applicationDao,
@@ -78,6 +80,7 @@ public class AggregateOverlayDiagramService {
         this.appAssessmentWidgetDao = appAssessmentWidgetDao;
         this.backingEntityWidgetDao = backingEntityWidgetDao;
         this.aggregatedEntitiesWidgetDao = aggregatedEntitiesWidgetDao;
+        this.appChangesWidgetDao = appChangesWidgetDao;
         this.aggregateOverlayDiagramPresetDao = aggregateOverlayDiagramPresetDao;
         this.measurableDao = measurableDao;
         this.applicationDao = applicationDao;
@@ -316,5 +319,24 @@ public class AggregateOverlayDiagramService {
     public Boolean updateStatus(long diagramId, ReleaseLifecycleStatusChangeCommand changeStatusCmd, String username) {
         return aggregateOverlayDiagramDao
                 .updateStatus(diagramId, changeStatusCmd);
+    }
+
+    public ApplicationChangeWidgetData getApplicationChangeWidgetData(long diagramId,
+                                                                      IdSelectionOptions idSelectionOptions,
+                                                                      AppChangeWidgetParameters overlayParameters) {
+
+        AggregateOverlayDiagram diagram = aggregateOverlayDiagramDao.getById(diagramId);
+
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(diagram.aggregatedEntityKind(), idSelectionOptions);
+
+        Set<ApplicationChangeWidgetDatum> widgetData = appChangesWidgetDao.findWidgetData(
+                diagramId,
+                genericSelector.selector(),
+                Optional.of(overlayParameters.targetDate()));
+
+        return ImmutableApplicationChangeWidgetData
+                .builder()
+                .cellData(widgetData)
+                .build();
     }
 }

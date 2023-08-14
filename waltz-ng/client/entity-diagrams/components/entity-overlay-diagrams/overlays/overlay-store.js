@@ -6,3 +6,5 @@ export const AssessmentRenderModes = {
 };
 
 export const assessmentRenderMode = writable(AssessmentRenderModes.BOX);
+
+export const appChangeAdditionalYears = writable(5);
