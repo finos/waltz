@@ -19,6 +19,7 @@
 package org.finos.waltz.service.app_group;
 
 import org.finos.waltz.common.Checks;
+import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.data.app_group.AppGroupDao;
 import org.finos.waltz.data.app_group.AppGroupEntryDao;
@@ -27,11 +28,20 @@ import org.finos.waltz.data.app_group.AppGroupOrganisationalUnitDao;
 import org.finos.waltz.data.application.ApplicationDao;
 import org.finos.waltz.data.entity_relationship.EntityRelationshipDao;
 import org.finos.waltz.data.orgunit.OrganisationalUnitDao;
+import org.finos.waltz.model.DiffResult;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.ImmutableEntityReference;
 import org.finos.waltz.model.Operation;
-import org.finos.waltz.model.app_group.*;
+import org.finos.waltz.model.Severity;
+import org.finos.waltz.model.app_group.AppGroup;
+import org.finos.waltz.model.app_group.AppGroupDetail;
+import org.finos.waltz.model.app_group.AppGroupEntry;
+import org.finos.waltz.model.app_group.AppGroupKind;
+import org.finos.waltz.model.app_group.AppGroupMember;
+import org.finos.waltz.model.app_group.AppGroupMemberRole;
+import org.finos.waltz.model.app_group.ImmutableAppGroup;
+import org.finos.waltz.model.app_group.ImmutableAppGroupDetail;
 import org.finos.waltz.model.application.Application;
 import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
@@ -44,20 +54,33 @@ import org.finos.waltz.service.change_initiative.ChangeInitiativeService;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.append;
 import static org.finos.waltz.common.MapUtilities.indexBy;
+import static org.finos.waltz.data.JooqUtilities.summarizeResults;
+import static org.finos.waltz.model.DiffResult.mkDiff;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Service
 public class AppGroupService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(AppGroupService.class);
 
     private final AppGroupDao appGroupDao;
     private final AppGroupMemberDao appGroupMemberDao;
@@ -461,6 +484,59 @@ public class AppGroupService {
 
         appGroupEntryDao.replaceGroupApplicationEntries(appEntriesToUpdate);
         appGroupEntryDao.replaceGroupChangeInitiativeEntries(initiativeEntriesToUpdate);
+    }
+
+
+    public void synchGroupEntries(Set<Tuple3<EntityKind, Long, Set<EntityReference>>> entriesForGroups, String userId) {
+        Set<Long> groupIds = SetUtilities.map(entriesForGroups, Tuple3::v2);
+        Map<Long, List<EntityReference>> existingEntitiesByGroupId = appGroupEntryDao.fetchEntitiesForGroups(groupIds);
+
+        Set<Tuple2<Long, EntityReference>> removals = new HashSet<>();
+        Set<Tuple2<Long, EntityReference>> additions = new HashSet<>();
+        entriesForGroups
+                .forEach(t -> {
+                    Set<EntityReference> relevantExistingEntities = SetUtilities.filter(
+                            existingEntitiesByGroupId.get(t.v2),
+                            d -> d.kind() == t.v1);
+                    DiffResult<EntityReference> diff = mkDiff(relevantExistingEntities, t.v3);
+                    removals.addAll(SetUtilities.map(
+                            diff.waltzOnly(),
+                            d -> tuple(t.v2, d)));
+                    additions.addAll(SetUtilities.map(
+                            diff.otherOnly(),
+                            d -> tuple(t.v2, d)));
+                });
+
+        LOG.debug("Additions: {}, Removals: {}", additions.size(), removals.size());
+
+        appGroupDao.processAdditionsAndRemovals(additions, removals, userId);
+
+        int changeLogCount = summarizeResults(Stream
+                .concat(additions.stream().map(t -> t.concat(Operation.ADD)),
+                        removals.stream().map(t -> t.concat(Operation.REMOVE)))
+                .map(t -> (ChangeLog) ImmutableChangeLog
+                        .builder()
+                        .message(format(t.v3 == Operation.ADD
+                                        ? "%s: '%s' added to group"
+                                        : "%s: '%s' removed from group",
+                                t.v2.kind().prettyName(),
+                                t.v2.name().orElse("(id:" + t.v2.id() + ")")))
+                        .operation(t.v3)
+                        .parentReference(mkRef(EntityKind.APP_GROUP, t.v1))
+                        .childKind(t.v2.kind())
+                        .childId(t.v2.id())
+                        .userId(userId)
+                        .severity(Severity.INFORMATION)
+                        .build())
+                .collect(Collectors.collectingAndThen(
+                        Collectors.toSet(),
+                        changeLogService::write)));
+
+        LOG.info(
+                "Synchronized groups: {} additions, {} removals, {} change log entries created",
+                additions.size(),
+                removals.size(),
+                changeLogCount);
     }
 
 
