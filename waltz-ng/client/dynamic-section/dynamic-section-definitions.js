@@ -647,6 +647,7 @@ const dataTypeSections = [
     entityNamedNotesSection,
     involvedPeopleSection,
     logicalDataElementsSection,
+    reportGridViewSection,
     pack(logicalFlowsTabgroupSection, [flowClassificationRulesSection]),
     changeLogSection
 ];

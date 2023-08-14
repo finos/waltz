@@ -25,4 +25,18 @@
         <tagDatabase tag="v1.52"/> <!-- tag the current db version, i.e. the last  -->
     </changeSet>
 
+    <changeSet id="20230810-6693-1"
+               author="davidwatkins73">
+        <comment>6693: Add (optional) child id to change log</comment>
+        <addColumn tableName="change_log">
+            <column name="child_id"
+                    type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <setColumnRemarks tableName="change_log"
+                          columnName="child_id"
+                          remarks="optional id of the child reference associated to this change log entry" />
+    </changeSet>
+
 </databaseChangeLog>
