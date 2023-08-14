@@ -58,7 +58,9 @@ public class ReportGridPageEndpoint implements Endpoint {
             model.put("appGroupId", String.valueOf(appGroupId));
 
             try {
-                int entityCount = reportGridFilterViewService.recalculateAppGroupFromNoteText(appGroupId);
+                int entityCount = reportGridFilterViewService.recalculateAppGroupFromNoteText(
+                        appGroupId,
+                        "admin");
                 model.put("success", true);
                 model.put("entityCount", entityCount);
             } catch (IllegalArgumentException e) {

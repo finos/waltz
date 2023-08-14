@@ -21,17 +21,23 @@ package org.finos.waltz.service.physical_specification;
 import org.finos.waltz.data.physical_specification.PhysicalSpecificationDao;
 import org.finos.waltz.data.physical_specification.PhysicalSpecificationIdSelectorFactory;
 import org.finos.waltz.data.physical_specification.search.PhysicalSpecificationSearchDao;
-import org.finos.waltz.model.*;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.SetAttributeCommand;
+import org.finos.waltz.model.Severity;
 import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.command.CommandResponse;
 import org.finos.waltz.model.command.ImmutableCommandResponse;
 import org.finos.waltz.model.entity_search.EntitySearchOptions;
-import org.finos.waltz.model.physical_specification.*;
-import org.finos.waltz.model.user.SystemRole;
+import org.finos.waltz.model.physical_specification.DataFormatKindValue;
+import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
+import org.finos.waltz.model.physical_specification.PhysicalSpecification;
+import org.finos.waltz.model.physical_specification.PhysicalSpecificationDeleteCommand;
 import org.finos.waltz.service.changelog.ChangeLogService;
-import org.finos.waltz.service.user.UserRoleService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,10 +50,8 @@ import java.util.Set;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptySet;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
-import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
 import static org.finos.waltz.model.EntityReference.mkRef;
 
@@ -58,25 +62,21 @@ public class PhysicalSpecificationService {
     private final ChangeLogService changeLogService;
     private final PhysicalSpecificationDao specificationDao;
     private final PhysicalSpecificationSearchDao specificationSearchDao;
-    private final UserRoleService userRoleService;
     private final PhysicalSpecificationIdSelectorFactory idSelectorFactory = new PhysicalSpecificationIdSelectorFactory();
 
 
     @Autowired
     public PhysicalSpecificationService(ChangeLogService changeLogService,
                                         PhysicalSpecificationDao specificationDao,
-                                        PhysicalSpecificationSearchDao specificationSearchDao,
-                                        UserRoleService userRoleService)
+                                        PhysicalSpecificationSearchDao specificationSearchDao)
     {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(specificationDao, "specificationDao cannot be null");
         checkNotNull(specificationSearchDao, "specificationSearchDao cannot be null");
-        checkNotNull(userRoleService, "userRoleService cannot be null");
 
         this.changeLogService = changeLogService;
         this.specificationDao = specificationDao;
         this.specificationSearchDao = specificationSearchDao;
-        this.userRoleService = userRoleService;
     }
 
 

@@ -130,6 +130,7 @@ public class ChangeInitiativeService {
                 .parentReference(mkRef(CHANGE_INITIATIVE, changeInitiativeId))
                 .userId(username)
                 .childKind(command.entityReference().kind())
+                .childId(command.entityReference().id())
                 .severity(Severity.INFORMATION)
                 .operation(Operation.ADD)
                 .build();
@@ -154,6 +155,7 @@ public class ChangeInitiativeService {
                 .parentReference(mkRef(CHANGE_INITIATIVE, changeInitiativeId))
                 .userId(username)
                 .childKind(command.entityReference().kind())
+                .childId(command.entityReference().id())
                 .severity(Severity.INFORMATION)
                 .operation(Operation.REMOVE)
                 .build();

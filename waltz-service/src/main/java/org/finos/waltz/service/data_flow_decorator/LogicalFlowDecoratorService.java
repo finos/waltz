@@ -226,6 +226,7 @@ public class LogicalFlowDecoratorService {
                         flow.target().name().orElse(Long.toString(flow.target().id())),
                         message))
                 .childKind(EntityKind.LOGICAL_DATA_FLOW)
+                .childId(flow.id())
                 .operation(Operation.UPDATE)
                 .build();
 

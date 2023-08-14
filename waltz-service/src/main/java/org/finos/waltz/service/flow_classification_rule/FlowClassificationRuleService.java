@@ -461,6 +461,7 @@ public class FlowClassificationRuleService {
                 .userId(username)
                 .parentReference(parentRef)
                 .childKind(EntityKind.FLOW_CLASSIFICATION_RULE)
+                .childId(classificationRuleId)
                 .operation(operation)
                 .build();
 
