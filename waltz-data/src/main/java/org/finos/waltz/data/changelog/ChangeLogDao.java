@@ -76,6 +76,7 @@ public class ChangeLogDao {
                 .severity(Severity.valueOf(record.getSeverity()))
                 .parentReference(parentRef)
                 .childKind(Optional.ofNullable(record.getChildKind()).map(EntityKind::valueOf))
+                .childId(Optional.ofNullable(record.getChildId()))
                 .operation(Operation.valueOf(record.getOperation()))
                 .createdAt(record.getCreatedAt().toLocalDateTime())
                 .build();
@@ -314,6 +315,7 @@ public class ChangeLogDao {
                 .set(CHANGE_LOG.USER_ID, changeLog.userId())
                 .set(CHANGE_LOG.SEVERITY, changeLog.severity().name())
                 .set(CHANGE_LOG.CHILD_KIND, changeLog.childKind().map(Enum::name).orElse(null))
+                .set(CHANGE_LOG.CHILD_ID, changeLog.childId().orElse(null))
                 .set(CHANGE_LOG.OPERATION, changeLog.operation().name())
                 .set(CHANGE_LOG.CREATED_AT, Timestamp.valueOf(changeLog.createdAt()))
                 .execute();
@@ -332,6 +334,7 @@ public class ChangeLogDao {
                         .set(CHANGE_LOG.USER_ID, changeLog.userId())
                         .set(CHANGE_LOG.SEVERITY, changeLog.severity().name())
                         .set(CHANGE_LOG.CHILD_KIND, changeLog.childKind().map(Enum::name).orElse(null))
+                        .set(CHANGE_LOG.CHILD_ID, changeLog.childId().orElse(null))
                         .set(CHANGE_LOG.OPERATION, changeLog.operation().name())
                         .set(CHANGE_LOG.CREATED_AT, Timestamp.valueOf(changeLog.createdAt())))
                 .toArray(Query[]::new);

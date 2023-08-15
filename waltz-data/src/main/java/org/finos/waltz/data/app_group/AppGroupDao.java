@@ -36,6 +36,7 @@ import org.jooq.Select;
 import org.jooq.SelectConditionStep;
 import org.jooq.SelectOrderByStep;
 import org.jooq.impl.DSL;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -48,7 +49,11 @@ import java.util.stream.Collectors;
 import static org.finos.waltz.common.StringUtilities.mkSafe;
 import static org.finos.waltz.data.JooqUtilities.mkBasicTermSearch;
 import static org.finos.waltz.data.SearchUtilities.mkTerms;
-import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.Tables.APPLICATION;
+import static org.finos.waltz.schema.Tables.APPLICATION_GROUP_ENTRY;
+import static org.finos.waltz.schema.Tables.APPLICATION_GROUP_OU_ENTRY;
+import static org.finos.waltz.schema.Tables.ENTITY_HIERARCHY;
+import static org.finos.waltz.schema.Tables.ENTITY_RELATIONSHIP;
 import static org.finos.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
 import static org.finos.waltz.schema.tables.ApplicationGroupMember.APPLICATION_GROUP_MEMBER;
 import static org.finos.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
@@ -190,15 +195,6 @@ public class AppGroupDao implements SearchDao<AppGroup> {
     }
 
 
-    private List<AppGroup> findAppGroupsBySelectorId(SelectConditionStep<Record1<Long>> groupIds) {
-        return dsl.select(APPLICATION_GROUP.fields())
-                .from(APPLICATION_GROUP)
-                .where(APPLICATION_GROUP.ID.in(groupIds))
-                .and(notRemoved)
-                .fetch(TO_DOMAIN);
-    }
-
-
     public List<AppGroup> findPublicGroups() {
         return dsl.select(APPLICATION_GROUP.fields())
                 .from(APPLICATION_GROUP)
@@ -282,6 +278,24 @@ public class AppGroupDao implements SearchDao<AppGroup> {
     }
 
 
+    /**
+     * Adds and removes app group entries in bulk.
+     * @param additions  [tuple2{groupId, ref}]
+     * @param removals  [tuple2{groupId, ref}]
+     * @param userId  user id to set as the createdBy user
+     * @return number of records added + removed
+     */
+    public int processAdditionsAndRemovals(Set<Tuple2<Long, EntityReference>> additions,
+                                            Set<Tuple2<Long, EntityReference>> removals,
+                                            String userId) {
+        return AppGroupHelper.processAdditionsAndRemovals(
+                dsl,
+                additions,
+                removals,
+                userId);
+    }
+
+
     public Set<AppGroup> findByIds(String user, List<Long> ids) {
         return dsl.select(APPLICATION_GROUP.fields())
                 .from(APPLICATION_GROUP)
@@ -298,6 +312,8 @@ public class AppGroupDao implements SearchDao<AppGroup> {
     }
 
 
+    // helpers
+
     private SelectConditionStep<Record1<Long>> findGroupsOwnedByUser(String userId) {
         return DSL
                 .select(APPLICATION_GROUP_MEMBER.GROUP_ID)
@@ -307,4 +323,13 @@ public class AppGroupDao implements SearchDao<AppGroup> {
                 .where(APPLICATION_GROUP_MEMBER.USER_ID.eq(userId)
                         .and(APPLICATION_GROUP_MEMBER.ROLE.eq(AppGroupMemberRole.OWNER.name())));
     }
+
+    private List<AppGroup> findAppGroupsBySelectorId(SelectConditionStep<Record1<Long>> groupIds) {
+        return dsl.select(APPLICATION_GROUP.fields())
+                .from(APPLICATION_GROUP)
+                .where(APPLICATION_GROUP.ID.in(groupIds))
+                .and(notRemoved)
+                .fetch(TO_DOMAIN);
+    }
+
 }

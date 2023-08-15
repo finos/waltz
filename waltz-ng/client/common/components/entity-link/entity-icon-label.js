@@ -91,17 +91,14 @@ const entityLoaders = {
         method: CORE_API.FlowClassificationRuleStore.getById,
         mkProps: (rule) => ([
             {
-                name: "Application",
-                value: _.get(rule, ["applicationReference", "name"], "?")
+                name: "Type",
+                value: "Flow Classification Rule"
             }, {
-                name: "Datatype Code",
-                value: rule.dataType || "?"
+                name: "Application",
+                value: _.get(rule, ["subjectReference", "name"], "?")
             }, {
                 name: "Scope",
-                value: rule.parentReference?.name || "?"
-            }, {
-                name: "Rating",
-                value: rule.rating || "?"
+                value: _.get(rule, ["vantagePointReference", "name"], "?")
             }
         ])
     },

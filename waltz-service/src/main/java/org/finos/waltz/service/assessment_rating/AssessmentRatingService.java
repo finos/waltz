@@ -176,6 +176,7 @@ public class AssessmentRatingService {
                         command.entityReference().id()))
                 .userId(username)
                 .childKind(command.entityReference().kind())
+                .childId(command.entityReference().id())
                 .severity(Severity.INFORMATION)
                 .operation(Operation.REMOVE)
                 .build();

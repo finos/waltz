@@ -19,6 +19,7 @@
 package org.finos.waltz.service.app_group;
 
 import org.finos.waltz.common.Checks;
+import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.data.app_group.AppGroupDao;
 import org.finos.waltz.data.app_group.AppGroupEntryDao;
@@ -27,11 +28,20 @@ import org.finos.waltz.data.app_group.AppGroupOrganisationalUnitDao;
 import org.finos.waltz.data.application.ApplicationDao;
 import org.finos.waltz.data.entity_relationship.EntityRelationshipDao;
 import org.finos.waltz.data.orgunit.OrganisationalUnitDao;
+import org.finos.waltz.model.DiffResult;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.ImmutableEntityReference;
 import org.finos.waltz.model.Operation;
-import org.finos.waltz.model.app_group.*;
+import org.finos.waltz.model.Severity;
+import org.finos.waltz.model.app_group.AppGroup;
+import org.finos.waltz.model.app_group.AppGroupDetail;
+import org.finos.waltz.model.app_group.AppGroupEntry;
+import org.finos.waltz.model.app_group.AppGroupKind;
+import org.finos.waltz.model.app_group.AppGroupMember;
+import org.finos.waltz.model.app_group.AppGroupMemberRole;
+import org.finos.waltz.model.app_group.ImmutableAppGroup;
+import org.finos.waltz.model.app_group.ImmutableAppGroupDetail;
 import org.finos.waltz.model.application.Application;
 import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
@@ -44,20 +54,33 @@ import org.finos.waltz.service.change_initiative.ChangeInitiativeService;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.append;
 import static org.finos.waltz.common.MapUtilities.indexBy;
+import static org.finos.waltz.data.JooqUtilities.summarizeResults;
+import static org.finos.waltz.model.DiffResult.mkDiff;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Service
 public class AppGroupService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(AppGroupService.class);
 
     private final AppGroupDao appGroupDao;
     private final AppGroupMemberDao appGroupMemberDao;
@@ -171,6 +194,7 @@ public class AppGroupService {
                     userId,
                     "Subscribed to group " + group.name(),
                     EntityKind.PERSON,
+                    null,
                     Operation.ADD);
             appGroupMemberDao.register(groupId, userId);
         }
@@ -182,6 +206,7 @@ public class AppGroupService {
                 userId,
                 "Unsubscribed from group" + appGroupDao.getGroup(groupId).name(),
                 EntityKind.PERSON,
+                null,
                 Operation.REMOVE);
         appGroupMemberDao.unregister(groupId, userId);
     }
@@ -191,7 +216,7 @@ public class AppGroupService {
         verifyUserCanUpdateGroup(userId, groupId);
         appGroupDao.deleteGroup(groupId);
         entityRelationshipDao.removeAnyInvolving(mkRef(EntityKind.APP_GROUP, groupId));
-        audit(groupId, userId, format("Removed group %d", groupId), null, Operation.REMOVE);
+        audit(groupId, userId, format("Removed group %d", groupId), null, null, Operation.REMOVE);
         return findGroupSubscriptionsForUser(userId);
     }
 
@@ -203,7 +228,7 @@ public class AppGroupService {
         Application app = applicationDao.getById(applicationId);
         if (app != null) {
             appGroupEntryDao.addApplication(groupId, applicationId);
-            audit(groupId, userId, format("Added application %s to group", app.name()), EntityKind.APPLICATION, Operation.ADD);
+            audit(groupId, userId, format("Added application %s to group", app.name()), EntityKind.APPLICATION, applicationId, Operation.ADD);
         }
 
         return appGroupEntryDao.findEntriesForGroup(groupId);
@@ -228,6 +253,7 @@ public class AppGroupService {
                             .userId(userId)
                             .parentReference(entityReference)
                             .childKind(EntityKind.APPLICATION)
+                            .childId(app.id())
                             .operation(Operation.ADD)
                             .build())
                 .collect(Collectors.toList());
@@ -259,6 +285,7 @@ public class AppGroupService {
                         ? app.name()
                         : applicationId),
                 EntityKind.APPLICATION,
+                applicationId,
                 Operation.REMOVE);
         return appGroupEntryDao.findEntriesForGroup(groupId);
     }
@@ -269,7 +296,7 @@ public class AppGroupService {
         OrganisationalUnit orgUnit = organisationalUnitDao.getById(orgUnitId);
         if (orgUnit != null) {
             appGroupOrganisationalUnitDao.addOrgUnit(groupId, orgUnitId);
-            audit(groupId, userId, format("Added application %s to group", orgUnit.name()), EntityKind.ORG_UNIT, Operation.ADD);
+            audit(groupId, userId, format("Added application %s to group", orgUnit.name()), EntityKind.ORG_UNIT, orgUnitId, Operation.ADD);
         }
         return appGroupOrganisationalUnitDao.getEntriesForGroup(groupId);
     }
@@ -278,7 +305,7 @@ public class AppGroupService {
         verifyUserCanUpdateGroup(userId, groupId);
         appGroupOrganisationalUnitDao.removeOrgUnit(groupId, orgUnitId);
         OrganisationalUnit ou = organisationalUnitDao.getById(orgUnitId);
-        audit(groupId, userId, format("Removed application %s from group", ou != null ? ou.name() : orgUnitId), EntityKind.ORG_UNIT, Operation.REMOVE);
+        audit(groupId, userId, format("Removed application %s from group", ou != null ? ou.name() : orgUnitId), EntityKind.ORG_UNIT, orgUnitId, Operation.REMOVE);
         return appGroupOrganisationalUnitDao.getEntriesForGroup(groupId);
     }
     public List<AppGroupEntry> removeApplications(String userId, long groupId, List<Long> applicationIds) throws InsufficientPrivelegeException {
@@ -305,7 +332,7 @@ public class AppGroupService {
 
     public int addOwner(String userId, long groupId, String ownerId) throws InsufficientPrivelegeException {
         verifyUserCanUpdateGroup(userId, groupId);
-        audit(groupId, userId, format("Added owner %s to group %d", ownerId, groupId), EntityKind.PERSON, Operation.ADD);
+        audit(groupId, userId, format("Added owner %s to group %d", ownerId, groupId), EntityKind.PERSON, null, Operation.ADD);
         return appGroupMemberDao.register(groupId, ownerId, AppGroupMemberRole.OWNER);
     }
 
@@ -314,7 +341,7 @@ public class AppGroupService {
         verifyUserCanUpdateGroup(userId, groupId);
         boolean result = appGroupMemberDao.unregister(groupId, ownerToRemoveId);
         subscribe(ownerToRemoveId, groupId);
-        audit(groupId, userId, format("Removed owner %s from group %d", ownerToRemoveId, groupId), EntityKind.PERSON, Operation.REMOVE);
+        audit(groupId, userId, format("Removed owner %s from group %d", ownerToRemoveId, groupId), EntityKind.PERSON, null, Operation.REMOVE);
         return result;
     }
 
@@ -327,7 +354,7 @@ public class AppGroupService {
     public AppGroupDetail updateOverview(String userId, AppGroup appGroup) throws InsufficientPrivelegeException {
         verifyUserCanUpdateGroup(userId, appGroup.id().get());
         appGroupDao.update(appGroup);
-        audit(appGroup.id().get(), userId, "Updated group overview", null, Operation.UPDATE);
+        audit(appGroup.id().get(), userId, "Updated group overview", null, null, Operation.UPDATE);
         return getGroupDetailById(appGroup.id().get());
     }
 
@@ -341,7 +368,7 @@ public class AppGroupService {
 
         appGroupMemberDao.register(groupId, userId, AppGroupMemberRole.OWNER);
 
-        audit(groupId, userId, "Created group", null, Operation.ADD);
+        audit(groupId, userId, "Created group", null, null, Operation.ADD);
 
 
         return groupId;
@@ -368,6 +395,7 @@ public class AppGroupService {
                 username,
                 format("Associated change initiative: %d", changeInitiativeId),
                 EntityKind.CHANGE_INITIATIVE,
+                changeInitiativeId,
                 Operation.ADD);
 
         return changeInitiativeService.findEntriesForAppGroup(groupId);
@@ -387,6 +415,7 @@ public class AppGroupService {
                 username,
                 format("Removed associated change initiative: %d", changeInitiativeId),
                 EntityKind.CHANGE_INITIATIVE,
+                changeInitiativeId,
                 Operation.REMOVE);
 
         return changeInitiativeService.findEntriesForAppGroup(groupId);
@@ -458,6 +487,59 @@ public class AppGroupService {
     }
 
 
+    public void synchGroupEntries(Set<Tuple3<EntityKind, Long, Set<EntityReference>>> entriesForGroups, String userId) {
+        Set<Long> groupIds = SetUtilities.map(entriesForGroups, Tuple3::v2);
+        Map<Long, List<EntityReference>> existingEntitiesByGroupId = appGroupEntryDao.fetchEntitiesForGroups(groupIds);
+
+        Set<Tuple2<Long, EntityReference>> removals = new HashSet<>();
+        Set<Tuple2<Long, EntityReference>> additions = new HashSet<>();
+        entriesForGroups
+                .forEach(t -> {
+                    Set<EntityReference> relevantExistingEntities = SetUtilities.filter(
+                            existingEntitiesByGroupId.get(t.v2),
+                            d -> d.kind() == t.v1);
+                    DiffResult<EntityReference> diff = mkDiff(relevantExistingEntities, t.v3);
+                    removals.addAll(SetUtilities.map(
+                            diff.waltzOnly(),
+                            d -> tuple(t.v2, d)));
+                    additions.addAll(SetUtilities.map(
+                            diff.otherOnly(),
+                            d -> tuple(t.v2, d)));
+                });
+
+        LOG.debug("Additions: {}, Removals: {}", additions.size(), removals.size());
+
+        appGroupDao.processAdditionsAndRemovals(additions, removals, userId);
+
+        int changeLogCount = summarizeResults(Stream
+                .concat(additions.stream().map(t -> t.concat(Operation.ADD)),
+                        removals.stream().map(t -> t.concat(Operation.REMOVE)))
+                .map(t -> (ChangeLog) ImmutableChangeLog
+                        .builder()
+                        .message(format(t.v3 == Operation.ADD
+                                        ? "%s: '%s' added to group"
+                                        : "%s: '%s' removed from group",
+                                t.v2.kind().prettyName(),
+                                t.v2.name().orElse("(id:" + t.v2.id() + ")")))
+                        .operation(t.v3)
+                        .parentReference(mkRef(EntityKind.APP_GROUP, t.v1))
+                        .childKind(t.v2.kind())
+                        .childId(t.v2.id())
+                        .userId(userId)
+                        .severity(Severity.INFORMATION)
+                        .build())
+                .collect(Collectors.collectingAndThen(
+                        Collectors.toSet(),
+                        changeLogService::write)));
+
+        LOG.info(
+                "Synchronized groups: {} additions, {} removals, {} change log entries created",
+                additions.size(),
+                removals.size(),
+                changeLogCount);
+    }
+
+
     public void verifyUserCanUpdateGroup(String userId, long groupId) throws InsufficientPrivelegeException {
         if (!appGroupMemberDao.canUpdate(groupId, userId)) {
             throw new InsufficientPrivelegeException(userId + " cannot update group: " + groupId);
@@ -486,12 +568,13 @@ public class AppGroupService {
     }
 
 
-    private void audit(long groupId, String userId, String message, EntityKind childKind, Operation operation) {
+    private void audit(long groupId, String userId, String message, EntityKind childKind, Long childId, Operation operation) {
         changeLogService.write(ImmutableChangeLog.builder()
                 .message(message)
                 .userId(userId)
                 .parentReference(ImmutableEntityReference.builder().id(groupId).kind(EntityKind.APP_GROUP).build())
                 .childKind(Optional.ofNullable(childKind))
+                .childId(Optional.ofNullable(childId))
                 .operation(operation)
                 .build());
     }
