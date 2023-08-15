@@ -54,5 +54,6 @@ public abstract class ApplicationChangeWidgetDatum implements CellExternalIdProv
 
 
     public abstract Set<AppChangeEntry> applicationChanges();
+    public abstract int currentAppCount();
 
 }

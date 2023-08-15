@@ -45,6 +45,7 @@ import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.SetUtilities.fromCollection;
 import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.common.SetUtilities.union;
+import static org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramUtilities.loadCellExtIdToAggregatedEntities;
 import static org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramUtilities.loadExpandedCellMappingsForDiagram;
 import static org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramUtilities.loadMeasurableToAppIdsMap;
 import static org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramUtilities.toMeasurableIds;
@@ -76,6 +77,13 @@ public class AppChangesWidgetDao {
 
         Set<Tuple2<String, EntityReference>> cellWithBackingEntities = loadExpandedCellMappingsForDiagram(dsl, diagramId);
 
+        Map<String, Set<Long>> cellExtIdsToAggregatedEntities = loadCellExtIdToAggregatedEntities(
+                dsl,
+                cellWithBackingEntities,
+                EntityKind.APPLICATION,
+                inScopeEntityIdSelector,
+                targetMaxDate);
+
         Set<Long> backingMeasurableEntityIds = toMeasurableIds(cellWithBackingEntities);
 
         Map<Long, List<Long>> measurableIdToEntityIds = loadMeasurableToAppIdsMap(
@@ -106,6 +114,8 @@ public class AppChangesWidgetDao {
                             .collect(groupingBy(
                                     EntityReference::kind,
                                     mapping(EntityReference::id, toSet())));
+
+                    Set<Long> aggregatedEntities = cellExtIdsToAggregatedEntities.getOrDefault(cellExtId, emptySet());
 
                     //only supports measurables at the moment
                     Set<Long> measurableIds = backingEntitiesByKind.getOrDefault(EntityKind.MEASURABLE, emptySet());
@@ -158,8 +168,10 @@ public class AppChangesWidgetDao {
                     return ImmutableApplicationChangeWidgetDatum.builder()
                             .cellExternalId(cellExtId)
                             .applicationChanges(appChangeInfo)
+                            .currentAppCount(aggregatedEntities.size())
                             .build();
                 })
+                .filter(d -> d.applicationChanges().size() > 0)
                 .collect(toSet());
     }
 
