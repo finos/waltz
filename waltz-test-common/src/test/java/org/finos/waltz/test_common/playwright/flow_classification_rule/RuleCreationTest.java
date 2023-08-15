@@ -45,7 +45,7 @@ public class RuleCreationTest extends BasePlaywrightIntegrationTest {
 
         ScreenshotHelper screenshotHelper = new ScreenshotHelper(
                 page,
-                "screenshots/flow-classification-rule/create");
+                "flow-classification-rule/create");
 
         Locator listLocator = page.getByTestId("flow-classification-rule-list");
 

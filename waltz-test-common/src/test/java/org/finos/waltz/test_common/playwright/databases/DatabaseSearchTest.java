@@ -42,7 +42,7 @@ public class DatabaseSearchTest extends BasePlaywrightIntegrationTest {
     public void exactSearch() {
         ScreenshotHelper screenshotHelper = new ScreenshotHelper(
                 page,
-                "screenshots/databases/search");
+                "databases/search");
 
         startSiteSearch(
                 page,

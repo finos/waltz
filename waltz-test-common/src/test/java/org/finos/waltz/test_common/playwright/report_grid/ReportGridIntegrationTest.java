@@ -49,11 +49,11 @@ public class ReportGridIntegrationTest extends BasePlaywrightIntegrationTest {
 
 
     @Test
-    public void createGrid() throws InsufficientPrivelegeException {
+    public void createGrid() throws InsufficientPrivelegeException, IOException {
         String name = mkName("report-grid-create-grid");
         ScreenshotHelper screenshotHelper = new ScreenshotHelper(
                 page,
-                "screenshots/report-grid/create-grid");
+                "report-grid/create-grid");
 
         EntityReference appRef1 = appHelper.createNewApp(mkName("rg-app1"), 10L);
         EntityReference appRef2 = appHelper.createNewApp(mkName("rg-app2"), 10L);
@@ -96,6 +96,8 @@ public class ReportGridIntegrationTest extends BasePlaywrightIntegrationTest {
         screenshotHelper.takeElemSnapshot(grid, "grid_data.png");
         assertThat(grid.locator("div.ui-grid-cell").getByTestId("entity-name").getByText(appRef1.name().get())).isVisible();
         assertThat(grid.locator("div.ui-grid-cell").getByTestId("entity-name").getByText(appRef2.name().get())).isVisible();
+
+        screenshotHelper.prepareDocumentation();
     }
 
 

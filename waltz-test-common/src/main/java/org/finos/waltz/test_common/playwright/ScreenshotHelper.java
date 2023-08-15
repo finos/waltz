@@ -2,14 +2,21 @@ package org.finos.waltz.test_common.playwright;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
-import org.finos.waltz.common.StringUtilities;
+import org.finos.waltz.common.IOUtilities;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 import static java.lang.String.format;
 import static org.finos.waltz.common.StringUtilities.mkPath;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ScreenshotHelper {
 
@@ -18,6 +25,7 @@ public class ScreenshotHelper {
 
     private final Page page;
     private final String basePath;
+    private final Map<String, String> filenameMap = new HashMap<>();
 
     public ScreenshotHelper(Page page, String basePath) {
         this.page = page;
@@ -28,7 +36,7 @@ public class ScreenshotHelper {
     public Locator takeElemSnapshot(Locator locator, String name) {
         if (! paused) {
             Locator.ScreenshotOptions options = new Locator.ScreenshotOptions()
-                    .setPath(mkPath(name));
+                    .setPath(mkNameWithStep(name));
 
             locator.screenshot(options);
         }
@@ -39,7 +47,7 @@ public class ScreenshotHelper {
     public Page takePageSnapshot(Page page, String name) {
         if (! paused) {
             Page.ScreenshotOptions options = new Page.ScreenshotOptions()
-                    .setPath(mkPath(name));
+                    .setPath(mkNameWithStep(name));
 
             page.screenshot(options);
         }
@@ -55,7 +63,7 @@ public class ScreenshotHelper {
         if (! paused) {
             Page.ScreenshotOptions options = new Page
                     .ScreenshotOptions()
-                    .setPath(mkPath(name));
+                    .setPath(mkNameWithStep(name));
 
             page.screenshot(options);
         }
@@ -78,11 +86,34 @@ public class ScreenshotHelper {
 
     // -- HELPER ---
 
-    private Path mkPath(String name) {
-        return Paths.get(StringUtilities.mkPath(
+    private Path mkNameWithStep(String name) {
+        String nameWithStep = format("%d_%s", counter.incrementAndGet(), name);
+        filenameMap.put(name, nameWithStep);
+        return Paths.get(mkPath(
+                "screenshots",
                 basePath,
-                format("%d_%s", counter.incrementAndGet(), name)));
+                nameWithStep));
     }
 
 
+    public void prepareDocumentation() throws IOException {
+        String templatePath = mkPath(basePath, "template.md");
+        InputStream templateStream = this.getClass().getClassLoader().getResourceAsStream(templatePath);
+
+        assertNotNull(templateStream, String.format("Could not find template on classpath: %s", templatePath));
+
+        String templateStr = IOUtilities.readAsString(templateStream);
+        for (Map.Entry<String, String> entry : filenameMap.entrySet()) {
+            templateStr = templateStr.replaceAll(
+                    format("\\{\\{%s\\}\\}", entry.getKey()),
+                    format("![%s](%s \"%s\")", entry.getKey(), entry.getValue(), entry.getKey()));
+        }
+
+        System.out.println(templateStr);
+
+        String outputPath = mkPath("screenshots", basePath, "README.md");
+        FileWriter fw = new FileWriter(outputPath);
+        fw.write(templateStr);
+        fw.close();
+    }
 }

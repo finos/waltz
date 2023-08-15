@@ -77,6 +77,7 @@
     </div>
     <div class="col-sm-3">
         <button class="btn btn-success"
+                data-testid="submit-new-user-btn"
                 on:click={() => registerUser()}
                 disabled={disabled}>
             Register
