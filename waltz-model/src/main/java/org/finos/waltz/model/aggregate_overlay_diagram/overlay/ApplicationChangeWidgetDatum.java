@@ -52,8 +52,24 @@ public abstract class ApplicationChangeWidgetDatum implements CellExternalIdProv
                 .collect(Collectors.toSet());
     }
 
+    @Value.Derived
+    public int totalOutboundCount() {
+        return outboundCounts()
+                .stream()
+                .mapToInt(DateChangeInformation::count)
+                .sum();
+    }
+
+    @Value.Derived
+    public int totalInboundCount() {
+        return inboundCounts()
+                .stream()
+                .mapToInt(DateChangeInformation::count)
+                .sum();
+    }
 
     public abstract Set<AppChangeEntry> applicationChanges();
     public abstract int currentAppCount();
+
 
 }

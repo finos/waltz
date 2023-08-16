@@ -1,6 +1,6 @@
 <script>
 
-    import {scaleBand, scaleLinear, scalePow, scaleSqrt, scaleThreshold} from "d3-scale";
+    import {scaleBand, scaleLinear, scaleOrdinal, scalePow, scaleSqrt, scaleThreshold} from "d3-scale";
     import {axisBottom, axisLeft, axisRight} from "d3-axis";
     import _ from "lodash";
     import {appChangeAdditionalYears} from "./overlay-store";
@@ -8,6 +8,8 @@
     import {
         RenderModes
     } from "../../../../aggregate-overlay-diagram/components/aggregate-overlay-diagram/aggregate-overlay-diagram-utils";
+    import {schemeOrRd, schemeBuGn} from "d3";
+    import {reverse} from "../../../../common/list-utils";
 
 
     export let cellData = [];
@@ -20,54 +22,63 @@
 
     let svgElem;
 
-    const appCountProportion = 0.1
-    const axisProportion = renderMode === RenderModes.FOCUSED ? 0.05 : 0;
-    const graphProportion = 1 - axisProportion - appCountProportion;
+    const appCountProportion = renderMode === RenderModes.FOCUSED ? 0.1 : 0.25;
+    const axisProportion = renderMode === RenderModes.FOCUSED ? 0.1 : 0;
+    const paddingProportion = renderMode === RenderModes.FOCUSED ? 0.1 : 0;
+    const graphHeightProportion = 1 - (axisProportion + appCountProportion + paddingProportion * 2);
+    const graphWidthProportion = 1 - axisProportion;
 
     const minYear = new Date().getFullYear();
     $: futureYear = getFutureYear($appChangeAdditionalYears)
-    $: years = getYears(minYear, futureYear);
+
+    $: maxYear = futureYear - 1; // Date picker selects up to the 1st of the next year, only need up to the end of the previous year included
+    $: years = getIncrements(minYear, maxYear) || [];
 
     function getFutureYear(additionalYears) {
         const currentYear = new Date().getFullYear();
-        const futureYear = currentYear + additionalYears;
-        console.log({currentYear, additionalYears, futureYear});
-        return futureYear;
+        return currentYear + additionalYears;
     }
 
-    function getYears(currentYear, endYear) {
-        let yearArray = [];
-        let currentDate = currentYear;
-        while (currentDate <= endYear) {
-            yearArray.push(Number(currentDate));
-            currentDate = currentDate + 1;
+    function getIncrements(current, end) {
+        let incrementArray = [];
+        let currentIncrement = current;
+        while (currentIncrement <= end) {
+            incrementArray.push(Number(currentIncrement));
+            currentIncrement = currentIncrement + 1;
         }
-        return yearArray;
+        return incrementArray;
     }
 
-    $: maxYear = futureYear;
+    $: console.log({minYear, futureYear, years});
 
-    $: console.log({minYear, maxYear, futureYear, years});
-
-    $: quarters = 4 + ($appChangeAdditionalYears * 4);
+    $: quarters = _.size(years) * 4;
 
     $: barWidth = width / (quarters);
 
-    $: inboundColorScale = scaleLinear()
-        .domain([minYear, futureYear -1])
-        .range(["#009d37", "#e2fc6f"]);
+    $: requiredColoursCount = _.min([9, _.max([5, _.size(years)])]);
 
-    $: outboundColorScale = scaleLinear()
-        .domain([minYear, futureYear -1])
-        .range(["#b74c11", "#fce265"]);
+    $: outboundColors = reverse(schemeOrRd[requiredColoursCount]);
+    $: inboundColors = reverse(schemeBuGn[requiredColoursCount]);
+
+    $: inboundColorScale = scaleOrdinal()
+        .domain(_.map(years, d => d.toString())) //years)
+        .range(inboundColors);
+
+    $: outboundColorScale = scaleOrdinal()
+        .domain(_.map(years, d => d.toString())) //years)
+        .range(outboundColors);
+
+    $: inboundColorScale.unknown(_.last(inboundColors));
+    $: outboundColorScale.unknown(_.last(outboundColors));
 
     $: countScale = scaleSqrt()
         .domain([countScaleMin, countScaleMax])
-        .range([height, 0])
+        .range([height * graphHeightProportion, 0])
+
 
     $: yearScale = scaleBand()
         .domain(years)
-        .range([0, width * graphProportion]);
+        .range([0, width * graphWidthProportion]);
 
     $: yAxis = axisLeft(countScale)
         .tickSizeInner(0)
@@ -75,24 +86,15 @@
         .tickSizeOuter(height * 0.01)
         .tickPadding(height * 0.01);
 
-    $: columnScale = scaleLinear()
-        .domain([1, quarters])
-        .range([0, width * graphProportion])
+    $: columnScale = scaleBand()
+        .domain(getIncrements(1, quarters))
+        .range([0, width * graphWidthProportion]);
 
-    $: {
-        const svg = select(svgElem);
-
-        svg.selectAll("text")
-            .style("font-size", height * 0.1)
-    }
-
-    $: cellMaxOutbound = _.maxBy(cellData.outboundCounts, d => d.count);
-    $: cellMaxInbound = _.maxBy(cellData.inboundCounts, d => d.count);
+    $: cellMaxOutbound = !_.isEmpty(cellData) ? _.maxBy(cellData.outboundCounts, d => d.count) : 0;
+    $: cellMaxInbound = !_.isEmpty(cellData) ? _.maxBy(cellData.inboundCounts, d => d.count) : 0;
 
     $: countScaleMin = _.max([maxOutboundCount, _.get(cellMaxOutbound, "count", 0)]) * -1;
     $: countScaleMax = _.max([maxInboundCount,  _.get(cellMaxInbound, "count", 0)]);
-
-    // $: console.log({maxOutbound: cellMaxOutbound?.count, maxInbound: cellMaxInbound?.count, maxInboundCount, maxOutboundCount, countScaleMin, countScaleMax});
 
     function mkTitle(quarter, count) {
         return `${quarter.quarterName} ${quarter.year}: ${count} applications`
@@ -107,19 +109,20 @@
              bind:this={svgElem}
              style="background: white">
             <g>
-                <text transform={`translate(${width * appCountProportion / 2} ${height / 2})`}
+                <text transform={`translate(${width * graphWidthProportion / 2} ${height - (height * appCountProportion / 2)})`}
                       text-anchor="middle"
+                      font-size={height * appCountProportion}
                       dominant-baseline="middle">
-                    {cellData.currentAppCount || 0}
+                    # Apps: {cellData?.currentAppCount || 0} (+{cellData?.totalInboundCount} / -{cellData?.totalOutboundCount})
                 </text>
             </g>
-            <g transform={`translate(${width * appCountProportion} 0)`}>
+            <g>
                 {#if cellData.outboundCounts}
                     <g class="outbound">
                         {#each cellData.outboundCounts as outboundCount}
                             <rect x={columnScale(outboundCount.quarter.additionalQuarters)}
                                   y={countScale(0)}
-                                  width={width / quarters}
+                                  width={yearScale.bandwidth() / 4}
                                   height={countScale(outboundCount.count * -1) - countScale(0)}
                                   fill={outboundColorScale(outboundCount.quarter.year)}>
                                 <title>{mkTitle(outboundCount.quarter, outboundCount.count)}</title>
@@ -132,7 +135,7 @@
                         {#each cellData.inboundCounts as inboundCount}
                             <rect x={columnScale(inboundCount.quarter.additionalQuarters)}
                                   y={countScale(inboundCount.count)}
-                                  width={width / quarters}
+                                  width={yearScale.bandwidth() / 4}
                                   height={countScale(0) - countScale(inboundCount.count)}
                                   fill={inboundColorScale(inboundCount.quarter.year)}>
                                 <title>{mkTitle(inboundCount.quarter, inboundCount.count)}</title>
@@ -143,20 +146,21 @@
                 <g class="midline">
                     <line x1={0}
                           y1={countScale(0)}
-                          x2={width}
+                          x2={width * graphWidthProportion}
                           y2={countScale(0)}
-                          stroke="white"
+                          stroke="#ccc"
                           stroke-width={height * 0.01}
-                          opacity="0.5"/>
+                          opacity="0.8"/>
                 </g>
             </g>
             <g>
                 {#if renderMode === RenderModes.FOCUSED}
-                    <g transform={`translate(${width * appCountProportion} 0)`}>
+                    <g>
                         {#each years as year}
-                            <text transform={`translate(${yearScale(year) + yearScale.bandwidth() / 2}, ${height})`}
+                            <text transform={`translate(${yearScale(year) + yearScale.bandwidth() / 2} ${height * graphHeightProportion + height * paddingProportion + (height * axisProportion / 2)})`}
                                   text-anchor="middle"
-                                  dominant-baseline="auto">
+                                  font-size={height * axisProportion}
+                                  dominant-baseline="middle">
                                 {year}
                             </text>
                         {/each}
@@ -164,16 +168,19 @@
                     <g>
                         <text transform={`translate(${width}, ${countScale(countScaleMax)})`}
                               text-anchor="end"
+                              font-size={height * axisProportion}
                               dominant-baseline="hanging">
                             {countScaleMax}
                         </text>
                         <text transform={`translate(${width}, ${countScale(countScaleMin)})`}
                               text-anchor="end"
+                              font-size={height * axisProportion}
                               dominant-baseline="auto">
                             {countScaleMin}
                         </text>
                         <text transform={`translate(${width}, ${countScale(0)})`}
                               text-anchor="end"
+                              font-size={height * axisProportion}
                               dominant-baseline="middle">
                             {0}
                         </text>

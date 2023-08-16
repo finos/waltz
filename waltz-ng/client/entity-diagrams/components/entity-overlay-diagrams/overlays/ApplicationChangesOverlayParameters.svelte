@@ -31,19 +31,19 @@
 
     const debouncedOnSelect = _.debounce(onSelect, 500);
 
-    $: futureDate = moment().set({"date": 1, "month": 1}).add($appChangeAdditionalYears, "years");
+    $: futureDate = moment().set({"date": 1, "month": 0}).add($appChangeAdditionalYears, "years");
     $: debouncedOnSelect(futureDate);
 
 </script>
 
 <div class="content">
 
-    <label for="future-date">Projected application changes for:</label>
+    <label for="future-date">Projected application changes until:</label>
     <span>{fmt(futureDate)}</span>
 
     <input id="future-date"
            type="range"
-           min="0"
+           min="1"
            max="10"
            bind:value={$appChangeAdditionalYears}>
 

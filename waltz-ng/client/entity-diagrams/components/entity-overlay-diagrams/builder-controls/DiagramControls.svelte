@@ -41,7 +41,7 @@
         updateDiagramStatus,
     } = diagramService;
 
-    const diagramsCall = aggregateOverlayDiagramStore.findByKind(overlayDiagramKind.WALTZ_ENTITY_OVERLAY.key, true);
+    let diagramsCall = aggregateOverlayDiagramStore.findByKind(overlayDiagramKind.WALTZ_ENTITY_OVERLAY.key);
     $: diagrams = $diagramsCall.data || [];
 
     function selectOverlayDiagram(evt) {
@@ -72,6 +72,7 @@
         return saveDiagram(diagram)
             .then(() => {
                 toasts.success("Successfully saved diagram");
+                diagramsCall = aggregateOverlayDiagramStore.findByKind(overlayDiagramKind.WALTZ_ENTITY_OVERLAY.key, true)
                 activeMode = BuilderModes.PICKER;
             })
             .catch(e => displayError("Couldn't save diagram", e))
@@ -130,6 +131,7 @@
         }
         dataInput = false;
         workingData = "";
+        activeMode = BuilderModes.EDIT;
     }
 
     function toggleDiagramMode() {
