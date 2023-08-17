@@ -1,12 +1,5 @@
 <script>
 
-    // export let cellData = [];
-    // export let maxCount = 0;
-    // export let maxRatings = 0;
-    // export let renderMode;
-    // export let height;
-    // export let width;
-
     import {diagramService} from "../entity-diagram-store";
     import {onMount} from "svelte";
     import {timeFormat} from "d3-time-format";

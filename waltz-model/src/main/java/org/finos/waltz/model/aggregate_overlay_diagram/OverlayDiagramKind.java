@@ -1,4 +1,4 @@
-package org.finos.waltz.model.entity_overlay_diagram;
+package org.finos.waltz.model.aggregate_overlay_diagram;
 
 public enum OverlayDiagramKind {
     WALTZ_ENTITY_OVERLAY,

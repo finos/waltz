@@ -5,17 +5,13 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.ReleaseLifecycleStatus;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
-import org.finos.waltz.model.aggregate_overlay_diagram.BackingEntity;
 import org.finos.waltz.model.aggregate_overlay_diagram.ImmutableAggregateOverlayDiagram;
-import org.finos.waltz.model.entity_overlay_diagram.OverlayDiagramKind;
-import org.finos.waltz.model.rel.RelationshipKind;
+import org.finos.waltz.model.aggregate_overlay_diagram.OverlayDiagramKind;
 import org.finos.waltz.schema.tables.Application;
 import org.finos.waltz.schema.tables.MeasurableRating;
 import org.finos.waltz.schema.tables.MeasurableRatingPlannedDecommission;
 import org.finos.waltz.schema.tables.MeasurableRatingReplacement;
-import org.finos.waltz.schema.tables.records.AggregateOverlayDiagramCellDataRecord;
 import org.finos.waltz.schema.tables.records.AggregateOverlayDiagramRecord;
-import org.finos.waltz.schema.tables.records.RelationshipKindRecord;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record;
@@ -34,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
@@ -176,6 +171,7 @@ public class AggregateOverlayDiagramUtilities {
                 .collect(toSet());
     }
 
+
     public static Set<Long> toDataTypeIds(Set<Tuple2<String, EntityReference>> cellMappings) {
         return cellMappings
                 .stream()
@@ -201,6 +197,7 @@ public class AggregateOverlayDiagramUtilities {
                 throw new IllegalArgumentException(format("Cannot load measurable id to entity map for entity kind: %s", aggregatedEntityKind));
         }
     }
+
 
     private static Map<Long, List<Long>> findDataTypeIdToAggregatedEntityIdMap(DSLContext dsl,
                                                                                EntityKind aggregatedEntityKind,
@@ -263,6 +260,7 @@ public class AggregateOverlayDiagramUtilities {
                         backingEntityReferences));
     }
 
+
     private static Map<Long, List<Long>> loadMeasurableToAppIdsMapUsingTargetState(DSLContext dsl,
                                                                                    Select<Record1<Long>> inScopeEntityIdSelector,
                                                                                    Set<Long> backingEntityReferences,
@@ -321,6 +319,7 @@ public class AggregateOverlayDiagramUtilities {
                         .and(MEASURABLE_RATING.MEASURABLE_ID.in(backingEntityReferences)))
                 .fetchGroups(MEASURABLE_RATING.MEASURABLE_ID, MEASURABLE_RATING.ENTITY_ID);
     }
+
 
     private static Map<Long, List<Long>> loadDataTypeToAppIdsMap(DSLContext dsl,
                                                                  Select<Record1<Long>> inScopeEntityIdSelector,

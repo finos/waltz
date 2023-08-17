@@ -1,6 +1,5 @@
 package org.finos.waltz.data.aggregate_overlay_diagram;
 
-import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.ChangeDirection;
 import org.finos.waltz.model.EntityKind;
@@ -22,7 +21,6 @@ import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
@@ -43,17 +41,16 @@ import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDate;
 import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
+import static org.finos.waltz.common.DateTimeUtilities.today;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.SetUtilities.fromCollection;
 import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.common.SetUtilities.union;
-import static org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramUtilities.loadCellExtIdToAggregatedEntities;
 import static org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramUtilities.loadExpandedCellMappingsForDiagram;
 import static org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramUtilities.loadMeasurableToAppIdsMap;
 import static org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramUtilities.toMeasurableIds;
 import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.finos.waltz.schema.Tables.COST;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository
@@ -83,7 +80,9 @@ public class AppChangesWidgetDao {
                                                             Select<Record1<Long>> inScopeEntityIdSelector,
                                                             Optional<LocalDate> targetMaxDate) {
 
-        LocalDate startOfYear = DateTimeUtilities.today().withMonth(1).withDayOfMonth(1);
+        LocalDate startOfYear = today()
+                .withMonth(1)
+                .withDayOfMonth(1);
 
         Set<Tuple2<String, EntityReference>> cellWithBackingEntities = loadExpandedCellMappingsForDiagram(dsl, diagramId);
 
@@ -95,10 +94,10 @@ public class AppChangesWidgetDao {
                 backingMeasurableEntityIds,
                 targetMaxDate);
 
-        Map<Long, Tuple3<EntityReference, LocalDate, LocalDate>> appLifecycleById = getAppLifecycleById(inScopeEntityIdSelector);
+        Map<Long, Tuple3<EntityReference, LocalDate, LocalDate>> appLifecycleInfoById = getAppLifecycleInfoById(inScopeEntityIdSelector);
 
-        Map<Long, List<Tuple2<EntityReference, LocalDate>>> uptakeForMeasurable = fetchReplacementAppInfo(inScopeEntityIdSelector, backingMeasurableEntityIds, targetMaxDate);
-        Map<Long, List<Tuple2<EntityReference, LocalDate>>> lossForMeasurable = fetchDecommissionDateInfo(inScopeEntityIdSelector, backingMeasurableEntityIds, targetMaxDate);
+        Map<Long, List<Tuple2<EntityReference, LocalDate>>> replacementAppsByMeasurable = fetchReplacementAppInfo(inScopeEntityIdSelector, backingMeasurableEntityIds, targetMaxDate);
+        Map<Long, List<Tuple2<EntityReference, LocalDate>>> decommissionedAppsByMeasurable = fetchDecommissionDateInfo(inScopeEntityIdSelector, backingMeasurableEntityIds, targetMaxDate);
 
         Map<String, Collection<EntityReference>> cellBackingEntitiesByCellExtId = groupBy(
                 cellWithBackingEntities,
@@ -131,21 +130,19 @@ public class AppChangesWidgetDao {
                             .flatMap(mID -> {
 
                                 Set<AppChangeEntry> incomingRatingChanges = map(
-                                        uptakeForMeasurable.getOrDefault(mID, emptyList()),
+                                        replacementAppsByMeasurable.getOrDefault(mID, emptyList()),
                                         r -> mkChangeEntry(r.v1, r.v2, ChangeDirection.INBOUND));
 
                                 Set<AppChangeEntry> outgoingRatingChanges = map(
-                                        lossForMeasurable.getOrDefault(mID, emptyList()),
+                                        decommissionedAppsByMeasurable.getOrDefault(mID, emptyList()),
                                         r -> mkChangeEntry(r.v1, r.v2, ChangeDirection.OUTBOUND));
 
                                 Set<AppChangeEntry> appChanges = measurableIdToEntityIds.getOrDefault(mID, emptyList())
                                         .stream()
+                                        .filter(appLifecycleInfoById::containsKey)
                                         .flatMap(appId -> {
-                                            Tuple3<EntityReference, LocalDate, LocalDate> lifecycleInfo = appLifecycleById.get(appId);
 
-                                            if (lifecycleInfo == null) {
-                                                return null;
-                                            }
+                                            Tuple3<EntityReference, LocalDate, LocalDate> lifecycleInfo = appLifecycleInfoById.get(appId);
 
                                             AppChangeEntry retirement = lifecycleInfo.v3 != null
                                                     ? mkChangeEntry(lifecycleInfo.v1, lifecycleInfo.v3, ChangeDirection.OUTBOUND)
@@ -164,7 +161,10 @@ public class AppChangesWidgetDao {
 
                                 return union(incomingRatingChanges, outgoingRatingChanges, appChanges)
                                         .stream()
-                                        .collect(toMap(k -> k, v -> v, (v1, v2) -> v1.date().isBefore(v2.date()) ? v1 : v2))
+                                        .collect(toMap(
+                                                k -> k,
+                                                v -> v,
+                                                (v1, v2) -> v1.date().isBefore(v2.date()) ? v1 : v2)) // If multiple commissions / retirements take the first
                                         .values()
                                         .stream();
                             })
@@ -177,7 +177,7 @@ public class AppChangesWidgetDao {
                             .currentAppCount(entityIdsViaMeasurable.size())
                             .build();
                 })
-                .filter(d -> d.applicationChanges().size() > 0)
+                .filter(d -> d.applicationChanges().size() > 0 || d.currentAppCount() > 0) // only filter where there are no changes and no current apps
                 .collect(toSet());
     }
 
@@ -189,7 +189,7 @@ public class AppChangesWidgetDao {
                 .build();
     }
 
-    private Map<Long, Tuple3<EntityReference, LocalDate, LocalDate>> getAppLifecycleById(Select<Record1<Long>> inScopeEntityIdSelector) {
+    private Map<Long, Tuple3<EntityReference, LocalDate, LocalDate>> getAppLifecycleInfoById(Select<Record1<Long>> inScopeEntityIdSelector) {
         Field<Timestamp> retirementDate = DSL.coalesce(a.PLANNED_RETIREMENT_DATE, a.ACTUAL_RETIREMENT_DATE);
 
         return dsl
@@ -212,7 +212,7 @@ public class AppChangesWidgetDao {
                 .map(targetDate -> mrpd.PLANNED_DECOMMISSION_DATE.le(toSqlDate(targetDate)))
                 .orElse(DSL.trueCondition());
 
-        LocalDate startOfYear = DateTimeUtilities.today()
+        LocalDate startOfYear = today()
                 .withMonth(1)
                 .withDayOfMonth(1);
 
@@ -240,7 +240,7 @@ public class AppChangesWidgetDao {
                 .map(targetDate -> mrr.PLANNED_COMMISSION_DATE.le(toSqlDate(targetDate)))
                 .orElse(DSL.trueCondition());
 
-        LocalDate startOfYear = DateTimeUtilities.today()
+        LocalDate startOfYear = today()
                 .withMonth(1)
                 .withDayOfMonth(1);
 

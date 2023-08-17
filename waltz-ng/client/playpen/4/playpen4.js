@@ -17,11 +17,9 @@
  */
 import {initialiseData} from "../../common/index";
 import template from "./playpen4.html";
-import DragAndDrop from "./DragAndDrop.svelte";
 
 
 const initialState = {
-    DragAndDrop
 };
 
 

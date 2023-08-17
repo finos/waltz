@@ -9,7 +9,7 @@ import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
 import org.finos.waltz.model.aggregate_overlay_diagram.BackingEntity;
 import org.finos.waltz.model.aggregate_overlay_diagram.ImmutableBackingEntity;
 import org.finos.waltz.model.aggregate_overlay_diagram.OverlayDiagramCreateCommand;
-import org.finos.waltz.model.entity_overlay_diagram.OverlayDiagramKind;
+import org.finos.waltz.model.aggregate_overlay_diagram.OverlayDiagramKind;
 import org.finos.waltz.schema.tables.records.AggregateOverlayDiagramCellDataRecord;
 import org.finos.waltz.schema.tables.records.AggregateOverlayDiagramRecord;
 import org.jooq.DSLContext;
@@ -63,6 +63,7 @@ public class AggregateOverlayDiagramDao {
                 .fetchSet(TO_DOMAIN_MAPPER::map);
     }
 
+
     public Set<AggregateOverlayDiagram> findByKind(OverlayDiagramKind kind) {
         return dsl
                 .select(AGGREGATE_OVERLAY_DIAGRAM.fields())
@@ -96,6 +97,8 @@ public class AggregateOverlayDiagramDao {
                             .build();
                 });
         }
+
+
         public void updateBackingEntities(Long diagramId,
                                           Set<BackingEntity> backingEntities) {
 
@@ -116,6 +119,7 @@ public class AggregateOverlayDiagramDao {
             });
     }
 
+
     private AggregateOverlayDiagramCellDataRecord mkCellDataRecord(DSLContext tx, Long diagramId, BackingEntity backingEntity) {
         AggregateOverlayDiagramCellDataRecord record = tx.newRecord(AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA);
         record.setDiagramId(diagramId);
@@ -124,6 +128,7 @@ public class AggregateOverlayDiagramDao {
         record.setRelatedEntityKind(backingEntity.entityReference().kind().name());
         return record;
     }
+
 
     public Long save(OverlayDiagramCreateCommand createCmd, String username) {
         AggregateOverlayDiagramRecord record = dsl.newRecord(AGGREGATE_OVERLAY_DIAGRAM);
@@ -138,6 +143,7 @@ public class AggregateOverlayDiagramDao {
         record.store();
         return record.getId();
     }
+
 
     public Boolean updateStatus(long diagramId, ReleaseLifecycleStatusChangeCommand changeStatusCmd) {
         return dsl

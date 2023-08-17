@@ -319,6 +319,7 @@ export function mkAssessmentOverlayGlobalProps(data) {
     return {maxCount, maxRatings};
 }
 
+
 export function mkAppChangesOverlayGlobalProps(data) {
 
     const maxInboundCount = _
