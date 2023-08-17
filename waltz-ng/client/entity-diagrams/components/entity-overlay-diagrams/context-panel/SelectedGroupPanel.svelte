@@ -27,7 +27,7 @@
     </div>
 
     <div class="waltz-scroll-region-250"
-         style="margin-top: 1em">
+         style="margin-top: 1em; overflow-y: scroll">
         <Item data={$selectedGroup.data}
               cellId={$selectedGroup.id}
               height={$selectedGroup.props.minWidth / 3}

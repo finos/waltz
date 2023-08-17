@@ -75,9 +75,6 @@ function _loadOverlayData() {
 
                     const allOverlayData = d.data;
 
-
-                    console.log({allOverlayData, visGroupIds});
-
                     const cellDataByExtId = _.keyBy(allOverlayData.cellData, d => d.cellExternalId);
                     const visibleOverlayData = _.filter(allOverlayData.cellData, d => _.includes(visGroupIds, d.cellExternalId));
 

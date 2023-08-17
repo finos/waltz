@@ -22,14 +22,14 @@ public abstract class ApplicationChangeWidgetDatum implements CellExternalIdProv
         return applicationChanges()
                 .stream()
                 .filter(e -> e.changeDirection().equals(ChangeDirection.INBOUND))
-                .map(e -> tuple(mkQuarterDetail(e.date()), e.appId()))
-                .collect(groupingBy(Tuple2::v1, Collectors.toSet()))
+                .map(e -> tuple(mkQuarterDetail(e.date()), e))
+                .collect(groupingBy(Tuple2::v1, Collectors.mapping(d -> d.v2, Collectors.toSet())))
                 .entrySet()
                 .stream()
                 .map(d -> ImmutableDateChangeInformation
                         .builder()
                         .quarter(d.getKey())
-                        .count(d.getValue().size())
+                        .changes(d.getValue())
                         .build())
                 .collect(Collectors.toSet());
     }
@@ -40,14 +40,14 @@ public abstract class ApplicationChangeWidgetDatum implements CellExternalIdProv
         return applicationChanges()
                 .stream()
                 .filter(e -> e.changeDirection().equals(ChangeDirection.OUTBOUND))
-                .map(e -> tuple(mkQuarterDetail(e.date()), e.appId()))
-                .collect(groupingBy(Tuple2::v1, Collectors.toSet()))
+                .map(e -> tuple(mkQuarterDetail(e.date()), e))
+                .collect(groupingBy(Tuple2::v1, Collectors.mapping(d -> d.v2, Collectors.toSet())))
                 .entrySet()
                 .stream()
                 .map(d -> ImmutableDateChangeInformation
                         .builder()
                         .quarter(d.getKey())
-                        .count(d.getValue().size())
+                        .changes(d.getValue())
                         .build())
                 .collect(Collectors.toSet());
     }

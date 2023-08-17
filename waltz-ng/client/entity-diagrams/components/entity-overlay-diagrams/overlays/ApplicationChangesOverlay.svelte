@@ -1,15 +1,16 @@
 <script>
 
-    import {scaleBand, scaleLinear, scaleOrdinal, scalePow, scaleSqrt, scaleThreshold} from "d3-scale";
-    import {axisBottom, axisLeft, axisRight} from "d3-axis";
+    import {scaleBand, scaleOrdinal, scaleSqrt} from "d3-scale";
+    import {axisLeft} from "d3-axis";
     import _ from "lodash";
     import {appChangeAdditionalYears} from "./overlay-store";
     import {select} from "d3-selection";
     import {
         RenderModes
     } from "../../../../aggregate-overlay-diagram/components/aggregate-overlay-diagram/aggregate-overlay-diagram-utils";
-    import {schemeOrRd, schemeBuGn} from "d3";
+    import {schemeBuGn, schemeOrRd} from "d3";
     import {reverse} from "../../../../common/list-utils";
+    import EntityLink from "../../../../common/svelte/EntityLink.svelte";
 
 
     export let cellData = [];
@@ -21,6 +22,8 @@
     export let width;
 
     let svgElem;
+    let selectedChanges = null;
+    let selectedDirection = null;
 
     const appCountProportion = renderMode === RenderModes.FOCUSED ? 0.1 : 0.25;
     const axisProportion = renderMode === RenderModes.FOCUSED ? 0.1 : 0;
@@ -31,7 +34,8 @@
     const minYear = new Date().getFullYear();
     $: futureYear = getFutureYear($appChangeAdditionalYears)
 
-    $: maxYear = futureYear - 1; // Date picker selects up to the 1st of the next year, only need up to the end of the previous year included
+    // Date picker selects up to the 1st of the next year, only need up to the end of the previous year included in graph
+    $: maxYear = futureYear - 1;
     $: years = getIncrements(minYear, maxYear) || [];
 
     function getFutureYear(additionalYears) {
@@ -49,12 +53,9 @@
         return incrementArray;
     }
 
-    $: console.log({minYear, futureYear, years});
-
     $: quarters = _.size(years) * 4;
 
-    $: barWidth = width / (quarters);
-
+    // Fix so that at short range there is still gradual change, ensure that if more years than colors the last value is taken
     $: requiredColoursCount = _.min([9, _.max([5, _.size(years)])]);
 
     $: outboundColors = reverse(schemeOrRd[requiredColoursCount]);
@@ -74,7 +75,6 @@
     $: countScale = scaleSqrt()
         .domain([countScaleMin, countScaleMax])
         .range([height * graphHeightProportion, 0])
-
 
     $: yearScale = scaleBand()
         .domain(years)
@@ -98,6 +98,16 @@
 
     function mkTitle(quarter, count) {
         return `${quarter.quarterName} ${quarter.year}: ${count} applications`
+    }
+
+    function clickChart(changeInfo, direction) {
+        if(_.isEqual(selectedChanges, changeInfo)) {
+            selectedChanges = null;
+            selectedDirection = null
+        } else {
+            selectedChanges = changeInfo;
+            selectedDirection = direction;
+        }
     }
 
 </script>
@@ -124,7 +134,18 @@
                                   y={countScale(0)}
                                   width={yearScale.bandwidth() / 4}
                                   height={countScale(outboundCount.count * -1) - countScale(0)}
-                                  fill={outboundColorScale(outboundCount.quarter.year)}>
+                                  fill={outboundColorScale(outboundCount.quarter.year)}
+                                  stroke-width="0">
+                            </rect>
+                            <rect x={columnScale(outboundCount.quarter.additionalQuarters)}
+                                  y={countScale(0)}
+                                  on:click={() => clickChart(outboundCount, "Outbound")}
+                                  on:keydown={d => clickChart(outboundCount, "Outbound")}
+                                  width={yearScale.bandwidth() / 4}
+                                  height={height * graphHeightProportion - countScale(0)}
+                                  style="pointer-events: all"
+                                  fill="none"
+                                  stroke-width="0">
                                 <title>{mkTitle(outboundCount.quarter, outboundCount.count)}</title>
                             </rect>
                         {/each}
@@ -137,7 +158,19 @@
                                   y={countScale(inboundCount.count)}
                                   width={yearScale.bandwidth() / 4}
                                   height={countScale(0) - countScale(inboundCount.count)}
-                                  fill={inboundColorScale(inboundCount.quarter.year)}>
+                                  fill={inboundColorScale(inboundCount.quarter.year)}
+                                  pointer-events="none"
+                                  stroke-width="0">
+                            </rect>
+                            <rect x={columnScale(inboundCount.quarter.additionalQuarters)}
+                                  y="0"
+                                  on:click={() => clickChart(inboundCount, "Inbound")}
+                                  on:keydown={d => clickChart(inboundCount, "Inbound")}
+                                  width={yearScale.bandwidth() / 4}
+                                  height={countScale(0)}
+                                  style="pointer-events: all; opacity: 0.3"
+                                  fill="none"
+                                  stroke-width="0">
                                 <title>{mkTitle(inboundCount.quarter, inboundCount.count)}</title>
                             </rect>
                         {/each}
@@ -189,4 +222,34 @@
             </g>
         </svg>
     </div>
+
+    {#if renderMode === RenderModes.FOCUSED}
+        {#if selectedChanges}
+            <div style="padding-top: 1em">
+                <p>Showing {selectedChanges.count} {selectedDirection} changes for {selectedChanges.quarter.quarterName} {selectedChanges.quarter.year}</p>
+                <table class="table table-condensed small">
+                    <colgroup>
+                        <col width="30%"/>
+                        <col width="70%"/>
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>App</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {#each _.orderBy(selectedChanges?.changes, d => d.date) as change}
+                            <tr>
+                                <td>{change.date}</td>
+                                <td><EntityLink ref={change.appRef}/></td>
+                            </tr>
+                        {/each}
+                    </tbody>
+                </table>
+            </div>
+        {:else }
+            <div class="help-block">Select a bar on the diagram above to see the breakdown of changes</div>
+        {/if}
+    {/if}
 </div>

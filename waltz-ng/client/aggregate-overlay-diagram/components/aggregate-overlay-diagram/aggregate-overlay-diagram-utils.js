@@ -321,8 +321,6 @@ export function mkAssessmentOverlayGlobalProps(data) {
 
 export function mkAppChangesOverlayGlobalProps(data) {
 
-    console.log({data})
-
     const maxInboundCount = _
         .chain(data.cellData)
         .filter()

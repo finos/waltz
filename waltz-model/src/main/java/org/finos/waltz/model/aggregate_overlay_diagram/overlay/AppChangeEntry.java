@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @JsonSerialize(as = ImmutableAppChangeEntry.class)
 public abstract class AppChangeEntry {
 
-    public abstract Long appId();
+    public abstract EntityReference appRef();
     public abstract ChangeDirection changeDirection();
     public abstract LocalDate date();
 
