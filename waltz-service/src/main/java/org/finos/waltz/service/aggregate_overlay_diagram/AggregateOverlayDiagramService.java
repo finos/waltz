@@ -1,5 +1,6 @@
 package org.finos.waltz.service.aggregate_overlay_diagram;
 
+import org.finos.waltz.common.Checks;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
@@ -10,13 +11,14 @@ import org.finos.waltz.data.cost.CostKindDao;
 import org.finos.waltz.data.measurable.MeasurableDao;
 import org.finos.waltz.model.AssessmentBasedSelectionFilter;
 import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.ReleaseLifecycleStatusChangeCommand;
 import org.finos.waltz.model.aggregate_overlay_diagram.*;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.*;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.*;
 import org.finos.waltz.model.application.Application;
 import org.finos.waltz.model.complexity.ComplexityKind;
 import org.finos.waltz.model.cost.CostKindWithYears;
-import org.finos.waltz.model.cost.EntityCostKind;
+import org.finos.waltz.model.entity_overlay_diagram.OverlayDiagramKind;
 import org.finos.waltz.model.measurable.Measurable;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -43,6 +45,7 @@ public class AggregateOverlayDiagramService {
     private final AssessmentRatingWidgetDao appAssessmentWidgetDao;
     private final BackingEntityWidgetDao backingEntityWidgetDao;
     private final AggregatedEntitiesWidgetDao aggregatedEntitiesWidgetDao;
+    private final AppChangesWidgetDao appChangesWidgetDao;
     private final AggregateOverlayDiagramPresetDao aggregateOverlayDiagramPresetDao;
     private final MeasurableDao measurableDao;
     private final ApplicationDao applicationDao;
@@ -61,6 +64,7 @@ public class AggregateOverlayDiagramService {
                                           BackingEntityWidgetDao backingEntityWidgetDao,
                                           AppCostWidgetDao appCostWidgetDao,
                                           AggregatedEntitiesWidgetDao aggregatedEntitiesWidgetDao,
+                                          AppChangesWidgetDao appChangesWidgetDao,
                                           AggregateOverlayDiagramPresetDao aggregateOverlayDiagramPresetDao,
                                           MeasurableDao measurableDao,
                                           ApplicationDao applicationDao,
@@ -76,6 +80,7 @@ public class AggregateOverlayDiagramService {
         this.appAssessmentWidgetDao = appAssessmentWidgetDao;
         this.backingEntityWidgetDao = backingEntityWidgetDao;
         this.aggregatedEntitiesWidgetDao = aggregatedEntitiesWidgetDao;
+        this.appChangesWidgetDao = appChangesWidgetDao;
         this.aggregateOverlayDiagramPresetDao = aggregateOverlayDiagramPresetDao;
         this.measurableDao = measurableDao;
         this.applicationDao = applicationDao;
@@ -99,6 +104,12 @@ public class AggregateOverlayDiagramService {
 
     public Set<AggregateOverlayDiagram> findAll() {
         return aggregateOverlayDiagramDao.findAll();
+    }
+
+
+    public Set<AggregateOverlayDiagram> findByKind(OverlayDiagramKind kind) {
+        Checks.checkNotNull(kind, "OverlayDiagramKind cannot be null");
+        return aggregateOverlayDiagramDao.findByKind(kind);
     }
 
 
@@ -296,6 +307,36 @@ public class AggregateOverlayDiagramService {
                 .cellData(complexityData)
                 .applications(applications)
                 .complexityKinds(complexityKinds)
+                .build();
+    }
+
+    public Long create(OverlayDiagramCreateCommand createCmd, String username) {
+        Long diagramId = aggregateOverlayDiagramDao.save(createCmd, username);
+        aggregateOverlayDiagramDao.updateBackingEntities(diagramId, createCmd.backingEntities());
+        return diagramId;
+    }
+
+    public Boolean updateStatus(long diagramId, ReleaseLifecycleStatusChangeCommand changeStatusCmd, String username) {
+        return aggregateOverlayDiagramDao
+                .updateStatus(diagramId, changeStatusCmd);
+    }
+
+    public ApplicationChangeWidgetData getApplicationChangeWidgetData(long diagramId,
+                                                                      IdSelectionOptions idSelectionOptions,
+                                                                      AppChangeWidgetParameters overlayParameters) {
+
+        AggregateOverlayDiagram diagram = aggregateOverlayDiagramDao.getById(diagramId);
+
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(diagram.aggregatedEntityKind(), idSelectionOptions);
+
+        Set<ApplicationChangeWidgetDatum> widgetData = appChangesWidgetDao.findWidgetData(
+                diagramId,
+                genericSelector.selector(),
+                Optional.of(overlayParameters.targetDate()));
+
+        return ImmutableApplicationChangeWidgetData
+                .builder()
+                .cellData(widgetData)
                 .build();
     }
 }

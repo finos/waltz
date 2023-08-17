@@ -39,4 +39,37 @@
                           remarks="optional id of the child reference associated to this change log entry" />
     </changeSet>
 
+    <changeSet id="20230724-6688-1"
+               author="woodjes">
+        <comment>6688: add diagram kind to aggregate_overlay_diagram</comment>
+        <addColumn tableName="aggregate_overlay_diagram">
+            <column name="diagram_kind"
+                    type="${enum.type}"
+                    defaultValue="WALTZ_STATIC_SVG_OVERLAY">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20230724-6688-2"
+               author="woodjes">
+        <comment>6688: add diagram kind to aggregate_overlay_diagram</comment>
+        <renameColumn columnDataType="${clob.type}"
+                      newColumnName="layout_data"
+                      oldColumnName="svg"
+                      tableName="aggregate_overlay_diagram"/>
+    </changeSet>
+
+    <changeSet id="20230724-6688-3"
+               author="woodjes">
+        <comment>6688: add status to aggregate_overlay_diagram</comment>
+        <addColumn tableName="aggregate_overlay_diagram">
+            <column name="status"
+                    type="${enum.type}"
+                    defaultValue="DRAFT">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

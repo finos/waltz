@@ -26,7 +26,7 @@ import AssessmentWidgetParameters from "./widgets/assessments/AssessmentWidgetPa
 import AssessmentOverlayCell from "./widgets/assessments/AssessmentOverlayCell.svelte";
 import AssessmentOverlayLegend from "./widgets/assessments/AssessmentOverlayLegend.svelte";
 import BackingEntitiesWidgetParameters from "./widgets/backing-entities/BackingEntitiesWidgetParameters.svelte";
-import BackingEntitiesOverlayCell from "./widgets/backing-entities/BackingEntitiesOverlayCell.svelte";
+import BackingEntitiesOverlayCell from "./widgets/backing-entities/BackingEntitiesPlainOverlayCell.svelte";
 import AggregatedEntitiesWidgetParameters
     from "./widgets/aggregated-entities/AggregatedEntitiesWidgetParameters.svelte";
 import AggregatedEntitiesOverlayCell from "./widgets/aggregated-entities/AggregatedEntitiesOverlayCell.svelte";
@@ -301,6 +301,7 @@ export function mkAggregatedEntitiesGlobalProps(data) {
 
 
 export function mkAssessmentOverlayGlobalProps(data) {
+
     const maxCount = _
         .chain(data.cellData)
         .map(d => d.counts)
@@ -309,7 +310,33 @@ export function mkAssessmentOverlayGlobalProps(data) {
         .max()
         .value();
 
-    return {maxCount};
+    const maxRatings = _
+        .chain(data.cellData)
+        .map(d => _.size(d.counts))
+        .max()
+        .value();
+
+    return {maxCount, maxRatings};
+}
+
+export function mkAppChangesOverlayGlobalProps(data) {
+
+    const maxInboundCount = _
+        .chain(data.cellData)
+        .filter()
+        .flatMap(d => d.inboundCounts)
+        .map(d => d.count)
+        .max()
+        .value();
+
+    const maxOutboundCount = _
+        .chain(data.cellData)
+        .flatMap(d => d.outboundCounts)
+        .map(d => d.count)
+        .max()
+        .value();
+
+    return {maxInboundCount, maxOutboundCount};
 }
 
 
