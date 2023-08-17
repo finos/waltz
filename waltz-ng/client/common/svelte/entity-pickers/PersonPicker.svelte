@@ -27,7 +27,7 @@
 
 <div class="help-block small">
     <Icon name="info-circle"/>
-    Select an app group using the search below.
+    Select a person using the search below.
 </div>
 <br>
 <EntitySearchSelector on:select={onSelectPerson}

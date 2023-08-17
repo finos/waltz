@@ -39,6 +39,7 @@
         groups,
         uploadDiagramLayout,
         updateDiagramStatus,
+        populateFromExistingData
     } = diagramService;
 
     let diagramsCall = aggregateOverlayDiagramStore.findByKind(overlayDiagramKind.WALTZ_ENTITY_OVERLAY.key);
@@ -50,7 +51,7 @@
     }
 
     function createNewDiagram() {
-        uploadDiagramLayout([createInitialGroup()]);
+        populateFromExistingData([createInitialGroup()]);
         activeMode = BuilderModes.EDIT;
     }
 
@@ -101,7 +102,7 @@
         }
     }
 
-    function uploadLayout() {
+    function populateLayoutFromData() {
         const gs = JSON.parse(workingData);
 
         const providedGroups = _.map(gs, d => {
@@ -116,7 +117,7 @@
         const roots = buildHierarchies(providedGroups);
 
         if (_.size(roots) === 1) {
-            uploadDiagramLayout(providedGroups);
+            populateFromExistingData(providedGroups);
             toasts.success("Diagram populated from data");
         } else {
             const initialGroup = createInitialGroup();
@@ -126,7 +127,7 @@
                 d => _.includes(topLevel, d.id)
                     ? Object.assign({}, d, {parentId: initialGroup.id})
                     : d);
-            uploadDiagramLayout(_.concat(initialGroup, childGroups));
+            populateFromExistingData(_.concat(initialGroup, childGroups));
             toasts.warning("There was not a single root to this diagram so a placeholder has been added");
         }
         dataInput = false;
@@ -163,8 +164,8 @@
             <DiagramList {diagrams}
                          on:select={selectOverlayDiagram}>
             </DiagramList>
-            <button class="btn btn-default" on:click={createNewDiagram}>Create new Diagram</button>
-            <button class="btn btn-default" on:click={editData}>Import from Layout Data</button>
+            <button class="btn btn-default" on:click={createNewDiagram}>Create new diagram</button>
+            <button class="btn btn-default" on:click={editData}>Populate from existing data</button>
         {:else}
             <div class="waltz-scroll-region-350">
                         <textarea class="form-control"
@@ -176,7 +177,7 @@
                     Input data to populate diagram
                 </div>
                 <button class="btn btn-plain"
-                        on:click={() => uploadLayout()}>
+                        on:click={() => populateLayoutFromData()}>
                     Done
                 </button>
             </div>

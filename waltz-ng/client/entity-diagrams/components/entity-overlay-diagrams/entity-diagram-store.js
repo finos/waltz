@@ -56,7 +56,7 @@ function _loadOverlayData() {
 
     if(diagram && overlay && opts && params) {
 
-        if (_.isEmpty(overlay.url)) {
+        if (_.isEmpty(overlay.urlSuffix)) {
 
             overlayData.set([]);
             overlayProperties.set({});
@@ -70,7 +70,7 @@ function _loadOverlayData() {
                 });
 
             return $http
-                .post(`api/aggregate-overlay-diagram/diagram-id/${diagram.id}/${overlay.url}`, body)
+                .post(`api/aggregate-overlay-diagram/diagram-id/${diagram.id}/${overlay.urlSuffix}`, body)
                 .then(d => {
 
                     const allOverlayData = d.data;
@@ -151,7 +151,7 @@ function selectGroup(group) {
     selectedGroup.set(group);
 }
 
-function uploadDiagramLayout(layoutData = []) {
+function populateFromExistingData(layoutData = []) {
 
     reset();
 
@@ -235,7 +235,7 @@ function createStores() {
         selectDiagram,
         saveDiagram,
         updateDiagramStatus,
-        uploadDiagramLayout,
+        populateFromExistingData,
         selectGroup,
         addGroup,
         removeGroup,
