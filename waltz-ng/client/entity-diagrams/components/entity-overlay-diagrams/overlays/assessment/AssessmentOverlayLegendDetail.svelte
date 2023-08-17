@@ -9,8 +9,7 @@
 
     $: ratings = _
         .chain(_.values($overlayData))
-        .map(d => d.counts)
-        .flatMap()
+        .flatMap(d => d.counts)
         .map(d => d.rating)
         .uniqBy(d => d.id)
         .orderBy(["position", "name"])

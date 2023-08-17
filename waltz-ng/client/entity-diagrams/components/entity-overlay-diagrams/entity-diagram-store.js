@@ -96,8 +96,9 @@ function updateOverlayParameters(params) {
 
 
 function selectOverlay(overlay) {
-    selectedOverlay.set(overlay);
     overlayParameters.set(null);
+    overlayData.set([]);
+    selectedOverlay.set(overlay);
     _loadOverlayData();
 }
 
