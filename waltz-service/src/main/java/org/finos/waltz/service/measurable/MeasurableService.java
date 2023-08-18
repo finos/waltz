@@ -87,6 +87,10 @@ public class MeasurableService {
         return measurableDao.findByCategoryId(categoryId);
     }
 
+    public List<Measurable> findByParentId(Long parentId) {
+        return measurableDao.findByParentId(parentId);
+    }
+
 
     public Map<String, Long> findExternalIdToIdMapByCategoryId(Long categoryId) {
         checkNotNull(categoryId, "categoryId cannot be null");

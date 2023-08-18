@@ -41,7 +41,6 @@
         }
     }
 
-
     $: targetDate = $useTargetDate
         ? moment().set("date", 1).add($sliderVal, "months")
         : null;

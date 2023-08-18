@@ -5,6 +5,7 @@
     import SurveyQuestionPicker from "./SurveyQuestionPicker.svelte";
     import AssessmentDefinitionPicker from "../../../../common/svelte/entity-pickers/AssessmentDefinitionPicker.svelte";
     import MeasurablePicker from "../../../../common/svelte/entity-pickers/MeasurablePicker.svelte";
+    import PersonPicker from "../../../../common/svelte/entity-pickers/PersonPicker.svelte";
     import SurveyInstanceFieldPicker from "./SurveyInstanceFieldPicker.svelte";
     import ApplicationFieldPicker from "./ApplicationFieldPicker.svelte";
     import ChangeInitiativeFieldPicker from "./ChangeInitiativeFieldPicker.svelte";
@@ -60,6 +61,8 @@
                 return MeasurableCategoryPicker;
             case "ENTITY_STATISTIC":
                 return EntityStatisticPicker;
+            case "PERSON":
+                return PersonPicker;
             default:
                 throw "Cannot find picker for kind: " + entityKind;
         }
