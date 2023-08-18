@@ -97,6 +97,7 @@
     <property name="external-id.type" value="VARCHAR(200)"></property>
     <property name="group.type" value="VARCHAR(128)"></property>
     <property name="guid.type" value="VARCHAR(64)"></property>
+    <property name="icon.type" value="VARCHAR(64)"></property>
     <property name="id.type" value="${long.type}"></property>
     <property name="id-list.type" value="VARCHAR(255)"></property>
     <property name="key.type" value="VARCHAR(120)"></property>

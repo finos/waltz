@@ -21,6 +21,7 @@ package org.finos.waltz.model.staticpanel;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.IdProvider;
+import org.finos.waltz.model.Nullable;
 import org.immutables.value.Value;
 
 @Value.Immutable
@@ -28,11 +29,12 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutableStaticPanel.class)
 public abstract class StaticPanel implements IdProvider {
 
+    @Nullable
     public abstract String title();
+    @Nullable
     public abstract String icon();
     public abstract String group();
     public abstract String content();
-
     public abstract int priority();
 
     @Value.Default
