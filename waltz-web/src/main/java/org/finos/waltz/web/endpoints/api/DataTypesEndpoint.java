@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static org.finos.waltz.web.WebUtilities.getEntityReference;
+import static org.finos.waltz.web.WebUtilities.getId;
 import static org.finos.waltz.web.WebUtilities.mkPath;
 import static org.finos.waltz.web.WebUtilities.readBody;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
@@ -57,6 +58,7 @@ public class DataTypesEndpoint implements Endpoint {
         String getDataTypeByIdPath = mkPath(BASE_URL, "id", ":id");
         String getDataTypeByCodePath = mkPath(BASE_URL, "code", ":code");
         String findSuggestedByEntityRefPath = mkPath(BASE_URL, "suggested", "entity", ":kind", ":id");
+        String findByParentIdPath = mkPath(BASE_URL, "parent-id", ":id");
 
         ListRoute<DataType> searchRoute = (request, response) ->
                 service.search(EntitySearchOptions
@@ -71,11 +73,16 @@ public class DataTypesEndpoint implements Endpoint {
         ListRoute<DataType> findSuggestedByEntityRefRoute = (req, res) ->
                 service.findSuggestedByEntityRef(getEntityReference(req));
 
+        ListRoute<DataType> findByParentIdRoute = (req, res) ->
+                service.findByParentId(getId(req));
+
+
         getForList(BASE_URL, (request, response) -> service.findAll());
         postForList(searchPath, searchRoute);
         getForDatum(getDataTypeByIdPath, getDataTypeByIdRoute);
         getForDatum(getDataTypeByCodePath, getDataTypeByCodeRoute);
         getForList(findSuggestedByEntityRefPath, findSuggestedByEntityRefRoute);
+        getForList(findByParentIdPath, findByParentIdRoute);
     }
 
 

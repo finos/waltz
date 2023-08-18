@@ -29,8 +29,13 @@
     </waltz-page-header>
 
     <waltz-section>
-        <waltz-svelte-component component="$ctrl.AssessmentRatingPicker"
-                                definition-filter="$ctrl.definitionFilter">
+        <waltz-svelte-component component="$ctrl.DiagramBuilder">
         </waltz-svelte-component>
+    </waltz-section>
+
+    <waltz-section>
+        <waltz-svg-diagrams diagrams="$ctrl.diagrams"
+                            block-processor="$ctrl.blockProcessor">
+        </waltz-svg-diagrams>
     </waltz-section>
 </div>

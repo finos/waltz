@@ -67,20 +67,6 @@ public class ActorDao {
     };
 
 
-    public static final Function<Actor, ActorRecord> TO_RECORD_MAPPER = actor -> {
-
-        ActorRecord record = new ActorRecord();
-        record.setName(actor.name());
-        record.setDescription(actor.description());
-        record.setLastUpdatedAt(Timestamp.valueOf(actor.lastUpdatedAt()));
-        record.setLastUpdatedBy(actor.lastUpdatedBy());
-        record.setIsExternal(actor.isExternal());
-        record.setProvenance(actor.provenance());
-        actor.id().ifPresent(record::setId);
-        actor.externalId().ifPresent(record::setExternalId);
-
-        return record;
-    };
 
     private static final String PROVENANCE = "waltz";
 

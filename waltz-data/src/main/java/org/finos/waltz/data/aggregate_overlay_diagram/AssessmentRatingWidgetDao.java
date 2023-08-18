@@ -1,5 +1,6 @@
 package org.finos.waltz.data.aggregate_overlay_diagram;
 
+import org.finos.waltz.common.CollectionUtilities;
 import org.finos.waltz.common.MapUtilities;
 import org.finos.waltz.data.rating_scheme.RatingSchemeDAO;
 import org.finos.waltz.model.EntityKind;
@@ -21,6 +22,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.stream.Collectors.toSet;
+import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramUtilities.*;
 import static org.finos.waltz.model.utils.IdUtilities.indexById;
@@ -68,13 +70,13 @@ public class AssessmentRatingWidgetDao {
             return Collections.emptySet();
         }
 
-        Map<Long, Long> entityToRatingMap = dsl
+        Map<Long, List<Long>> entityToRatingMap = dsl
                 .select(ar.RATING_ID, ar.ENTITY_ID)
                 .from(ar)
                 .where(ar.ASSESSMENT_DEFINITION_ID.eq(assessmentId))
                 .and(ar.ENTITY_ID.in(diagramEntityIds))
                 .and(ar.ENTITY_KIND.eq(aggregatedEntityKind.name()))
-                .fetchMap(ar.ENTITY_ID, ar.RATING_ID);
+                .fetchGroups(ar.ENTITY_ID, ar.RATING_ID);
 
         return cellExtIdsToAggregatedEntities
                 .entrySet()
@@ -85,13 +87,15 @@ public class AssessmentRatingWidgetDao {
 
                     Map<Long, AtomicInteger> counts = MapUtilities.newHashMap();
                     entityIds.forEach(id -> {
-                        Long rating = entityToRatingMap.get(id);
-                        if (rating == null) {
+                        List<Long> ratings = entityToRatingMap.get(id);
+                        if (isEmpty(ratings)) {
                             return;
                         }
-                        AtomicInteger count = counts.getOrDefault(rating, new AtomicInteger());
-                        count.incrementAndGet();
-                        counts.put(rating, count);
+                        ratings.forEach(rating -> {
+                            AtomicInteger count = counts.getOrDefault(rating, new AtomicInteger());
+                            count.incrementAndGet();
+                            counts.put(rating, count);
+                        });
                     });
 
                     if (counts.isEmpty()) {
