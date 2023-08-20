@@ -66,7 +66,7 @@ public class IOUtilities {
         checkNotNull(stream, "stream must not be null");
 
         return streamLines(stream)
-                .collect(Collectors.joining());
+                .collect(Collectors.joining("\n"));
     }
 
 

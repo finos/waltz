@@ -59,7 +59,7 @@ public class SurveyIssuanceIntegrationTest extends BasePlaywrightIntegrationTest
         String name = mkName("surveys-create-template");
         ScreenshotHelper screenshotHelper = new ScreenshotHelper(
                 page,
-                "screenshots/survey/create-template");
+                "survey/create-template");
         createSurveyTemplate(screenshotHelper, name);
         activateSurveyTemplate(screenshotHelper, name);
     }
@@ -70,7 +70,7 @@ public class SurveyIssuanceIntegrationTest extends BasePlaywrightIntegrationTest
         String name = mkName("surveys-single-issuance");
         ScreenshotHelper screenshotHelper = new ScreenshotHelper(
                 page,
-                "screenshots/survey/single-issuance");
+                "survey/single-issuance");
 
         screenshotHelper.pause();
 
@@ -111,7 +111,7 @@ public class SurveyIssuanceIntegrationTest extends BasePlaywrightIntegrationTest
         String name = mkName("surveys-run-issuance");
         ScreenshotHelper screenshotHelper = new ScreenshotHelper(
                 page,
-                "screenshots/survey/run-issuance");
+                "survey/run-issuance");
 
         screenshotHelper.pause();
 
