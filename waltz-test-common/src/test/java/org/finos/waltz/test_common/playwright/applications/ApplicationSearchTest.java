@@ -41,7 +41,7 @@ public class ApplicationSearchTest extends BasePlaywrightIntegrationTest {
     public void searchForExactMatch() {
         ScreenshotHelper screenshotHelper = new ScreenshotHelper(
                 page,
-                "screenshots/applications/search");
+                "applications/search");
 
         startSiteSearch(
                 page,
