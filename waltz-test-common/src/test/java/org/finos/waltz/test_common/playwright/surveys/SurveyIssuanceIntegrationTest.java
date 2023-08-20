@@ -12,7 +12,7 @@ import org.finos.waltz.test_common.helpers.AppHelper;
 import org.finos.waltz.test_common.helpers.InvolvementHelper;
 import org.finos.waltz.test_common.helpers.PersonHelper;
 import org.finos.waltz.test_common.playwright.BasePlaywrightIntegrationTest;
-import org.finos.waltz.test_common.playwright.ScreenshotHelper;
+import org.finos.waltz.test_common.playwright.DocumentationHelper;
 import org.finos.waltz.test_common.playwright.Section;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,78 +57,78 @@ public class SurveyIssuanceIntegrationTest extends BasePlaywrightIntegrationTest
     @Test
     public void createTemplate() {
         String name = mkName("surveys-create-template");
-        ScreenshotHelper screenshotHelper = new ScreenshotHelper(
+        DocumentationHelper documentationHelper = new DocumentationHelper(
                 page,
                 "survey/create-template");
-        createSurveyTemplate(screenshotHelper, name);
-        activateSurveyTemplate(screenshotHelper, name);
+        createSurveyTemplate(documentationHelper, name);
+        activateSurveyTemplate(documentationHelper, name);
     }
 
 
     @Test
     public void singleIssuance() {
         String name = mkName("surveys-single-issuance");
-        ScreenshotHelper screenshotHelper = new ScreenshotHelper(
+        DocumentationHelper documentationHelper = new DocumentationHelper(
                 page,
                 "survey/single-issuance");
 
-        screenshotHelper.pause();
+        documentationHelper.pause();
 
         EntityReference appRef = createAppAndInvolvements(name);
 
-        createSurveyTemplate(screenshotHelper, name);
-        activateSurveyTemplate(screenshotHelper, name);
+        createSurveyTemplate(documentationHelper, name);
+        activateSurveyTemplate(documentationHelper, name);
 
-        screenshotHelper.resume();
+        documentationHelper.resume();
 
         // navigate to app surveys and verify no
         page.navigate(mkPath(BASE, mkEmbeddedFrag(Section.APP_SURVEYS, appRef)));
-        screenshotHelper.takePageSnapshot(page, "surveys_for_app.png");
+        documentationHelper.takePageSnapshot(page, "surveys_for_app.png");
         assertThat(page.locator("waltz-no-data")).isVisible();
 
         page.locator(".waltz-section-actions .btn").getByText("Issue new survey").click();
-        screenshotHelper.takePageSnapshot(page, "issuing_single_survey.png");
+        documentationHelper.takePageSnapshot(page, "issuing_single_survey.png");
 
         page.locator("input[type=search]").fill(name);
-        screenshotHelper.takePageSnapshot(page, "searching_for_template.png");
+        documentationHelper.takePageSnapshot(page, "searching_for_template.png");
 
         page.locator("td a").getByText(name).click();
-        screenshotHelper.takePageSnapshot(page, "template_selected.png");
+        documentationHelper.takePageSnapshot(page, "template_selected.png");
 
         page.fill("input#dueDate", LocalDate.now().plusDays(10).toString());
         page.locator("#recipientInvolvementKinds option[label='" + name + "']").click();
 
-        screenshotHelper.takePageSnapshot(page, "issuance_params_filled_in.png");
+        documentationHelper.takePageSnapshot(page, "issuance_params_filled_in.png");
         page.click("form button[type=submit]");
 
         assertThat(page.locator("table td").getByText(name).first()).isVisible();
-        screenshotHelper.takePageSnapshot(page, "survey_issued.png");
+        documentationHelper.takePageSnapshot(page, "survey_issued.png");
     }
 
 
     @Test
     public void runIssuance() throws InsufficientPrivelegeException {
         String name = mkName("surveys-run-issuance");
-        ScreenshotHelper screenshotHelper = new ScreenshotHelper(
+        DocumentationHelper documentationHelper = new DocumentationHelper(
                 page,
                 "survey/run-issuance");
 
-        screenshotHelper.pause();
+        documentationHelper.pause();
 
         EntityReference appRef = createAppAndInvolvements(name);
         appGroupHelper.createAppGroupWithAppRefs(name, asSet(appRef));
 
-        createSurveyTemplate(screenshotHelper, name);
-        activateSurveyTemplate(screenshotHelper, name);
+        createSurveyTemplate(documentationHelper, name);
+        activateSurveyTemplate(documentationHelper, name);
 
-        screenshotHelper.resume();
+        documentationHelper.resume();
 
         page.navigate(mkPath(BASE, "/survey/template/list"));
-        screenshotHelper.takePageSnapshot(page, "survey_list.png");
+        documentationHelper.takePageSnapshot(page, "survey_list.png");
         page.locator("td a").getByText(name).click();
-        screenshotHelper.takePageSnapshot(page, "template-page.png");
+        documentationHelper.takePageSnapshot(page, "template-page.png");
         page.locator("waltz-section[name=Runs] .waltz-section-actions").getByText("Create").click();
-        screenshotHelper.takePageSnapshot(page, "issuance-params-empty.png");
+        documentationHelper.takePageSnapshot(page, "issuance-params-empty.png");
 
         Locator nextBtn = page.locator("button").getByText("Next");
         assertThat(nextBtn).isHidden();
@@ -139,12 +139,12 @@ public class SurveyIssuanceIntegrationTest extends BasePlaywrightIntegrationTest
         page.locator("#involvementKinds option[label=" + name + "]").click();
         searchViaUISelect(name);
 
-        screenshotHelper.takePageSnapshot(page.locator("#selectorScope"), "issuance-params-completed.png");
+        documentationHelper.takePageSnapshot(page.locator("#selectorScope"), "issuance-params-completed.png");
         assertThat(nextBtn).isVisible();
         nextBtn.click();
 
         assertThat(page.locator("h4").getByText("Recipients")).isVisible();
-        screenshotHelper.takePageSnapshot(page, "verify_issuance_plan.png");
+        documentationHelper.takePageSnapshot(page, "verify_issuance_plan.png");
 
         assertThat(page.locator("td").getByText(name).first()).isVisible();
         Locator issueBtn = page.locator("waltz-survey-run-create-recipient .btn-success").getByText("Next");
@@ -153,7 +153,7 @@ public class SurveyIssuanceIntegrationTest extends BasePlaywrightIntegrationTest
 
         assertThat(page.locator("h4").getByText("Issue Survey")).isVisible();
         assertThat(page.getByTestId("issuance-confirmation")).isVisible();
-        screenshotHelper.takePageSnapshot(page, "issued.png");
+        documentationHelper.takePageSnapshot(page, "issued.png");
 
     }
 
@@ -177,10 +177,10 @@ public class SurveyIssuanceIntegrationTest extends BasePlaywrightIntegrationTest
     }
 
 
-    private void activateSurveyTemplate(ScreenshotHelper screenshotHelper, String name) {
+    private void activateSurveyTemplate(DocumentationHelper documentationHelper, String name) {
         // navigate back to overview so we can activate the survey
         page.locator(".waltz-breadcrumbs").getByText(name).click();
-        screenshotHelper.takePageSnapshot(page, "overview_in_prep_for_marking_as_active.png");
+        documentationHelper.takePageSnapshot(page, "overview_in_prep_for_marking_as_active.png");
         Locator actionBtns = page.locator(".waltz-page-summary .waltz-section-actions .btn");
 
         actionBtns.getByText("Mark as Active").click();
@@ -189,11 +189,11 @@ public class SurveyIssuanceIntegrationTest extends BasePlaywrightIntegrationTest
         assertThat(actionBtns.getByText("Mark as Draft")).isVisible();
         assertThat(actionBtns.getByText("Clone")).isVisible();
 
-        screenshotHelper.takePageSnapshot(page, "template_is_active.png");
+        documentationHelper.takePageSnapshot(page, "template_is_active.png");
     }
 
 
-    private void createSurveyTemplate(ScreenshotHelper screenshotHelper,
+    private void createSurveyTemplate(DocumentationHelper documentationHelper,
                                       String name) {
         log("Creating survey template: %s", name);
         page.navigate(mkPath(BASE, "/survey/template/list"));
@@ -205,11 +205,11 @@ public class SurveyIssuanceIntegrationTest extends BasePlaywrightIntegrationTest
         assertThat(page.locator(".alert-warning")).isVisible();
 
         // fill in the form
-        screenshotHelper.takePageSnapshot(page, "create_new.png");
+        documentationHelper.takePageSnapshot(page, "create_new.png");
         page.fill("#name", name);
         page.fill("#externalId", mkName("TEST_SURVEY"));
         page.selectOption("#targetEntityKind", "Application");
-        screenshotHelper.takePageSnapshot(page, "create_form_filled_in.png");
+        documentationHelper.takePageSnapshot(page, "create_form_filled_in.png");
 
         // check the submit button is visible and the warning has been hidden
         assertThat(createTemplateButton).isVisible();
@@ -219,10 +219,10 @@ public class SurveyIssuanceIntegrationTest extends BasePlaywrightIntegrationTest
         createTemplateButton.click();
         Locator questionsSection = page.locator("waltz-section[name=Questions]");
         questionsSection.waitFor();
-        screenshotHelper.takeElemSnapshot(questionsSection, "ready_to_add_questions.png");
+        documentationHelper.takeElemSnapshot(questionsSection, "ready_to_add_questions.png");
 
         addQuestion(
-                screenshotHelper,
+                documentationHelper,
                 questionsSection,
                 ImmutableSurveyQuestion
                     .builder()
@@ -236,7 +236,7 @@ public class SurveyIssuanceIntegrationTest extends BasePlaywrightIntegrationTest
                 "q1");
 
         addQuestion(
-                screenshotHelper,
+                documentationHelper,
                 questionsSection,
                 ImmutableSurveyQuestion
                     .builder()
@@ -253,13 +253,13 @@ public class SurveyIssuanceIntegrationTest extends BasePlaywrightIntegrationTest
     }
 
 
-    private void addQuestion(ScreenshotHelper screenshotHelper,
+    private void addQuestion(DocumentationHelper documentationHelper,
                              Locator questionsSection,
                              SurveyQuestion question,
                              String snapshotStem) {
         // add a simple question
         questionsSection.locator(".waltz-section-actions .btn-primary").getByText("Add New").click();
-        screenshotHelper.takeElemSnapshot(questionsSection, snapshotStem + "_adding_question.png");
+        documentationHelper.takeElemSnapshot(questionsSection, snapshotStem + "_adding_question.png");
         Locator questionForm = questionsSection.locator("form[name=surveyQuestionForm]");
 
         Locator createQuestionButton = questionsSection.locator("button").getByText("Create");
@@ -270,7 +270,7 @@ public class SurveyIssuanceIntegrationTest extends BasePlaywrightIntegrationTest
                 questionForm,
                 question);
 
-        screenshotHelper.takePageSnapshot(questionsSection, snapshotStem + "_question_detail_filled_in.png");
+        documentationHelper.takePageSnapshot(questionsSection, snapshotStem + "_question_detail_filled_in.png");
         assertThat(createQuestionButton).isVisible();
         assertThat(questionForm.locator(".alert-warning")).isHidden();
         createQuestionButton.click();
