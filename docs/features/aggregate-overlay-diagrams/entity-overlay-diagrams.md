@@ -9,7 +9,6 @@ Entity Overlay Diagrams are constructed of 'group cells' which may or may not be
 The cell contents can show aggregated waltz data relating to the backing entity of the cell by selecting one of the overlays.
 
 
-
 ## Model
 
 We make use of `aggregate_overlay_diagrams` for storing entity overlay diagram data.
@@ -58,13 +57,12 @@ Example:
             "titleColor":"#1F7FE0",
             "contentColor":"#eef5fb",
             "contentFontSize":0.7,
-            "titleFontSize":0.8},
+            "titleFontSize":0.8,
             "position":1
         }
     }
 ]
 ```
-
 
 ## Features
 
@@ -72,6 +70,23 @@ Example:
 
 Available via the 'System Admin' page. Users with admin privileges can create / edit diagrams. 
 
+![img.png](entity-overlay-diagram-builder.png)
+
+The diagram builder shows the selected diagram information at the top of the page (1). You can construct diagrams without them being saved to the database, in which case this is hidden.
+The diagrams controls are at the bottom of the header (2); here you can update the lifecycle status of the diagram, rename it or save any changes to the layout below.
+
+The main section of the diagram editor is split into the rendered diagram (3) and the context panel (4). The rendered diagram gives you a preview of the structure and can be used to interact with the groups and reorder sections. 
+The context panel displays the overall structure of the diagram (useful for navigation), and once a group is selected, the edit options for the layout relating to that group. 
+
 ### Section
 
-A list of active diagrams can be selected from in the diagrams section.
+A list of active diagrams can be viewed and selected from the 'Entity Diagrams' tab (1) in the diagrams section.
+
+![img.png](entity-overlay-diagram-overlay-picker.png)
+
+The default overlay shows the backing entities for the group cells. In the context panel you can pick from the list of available overlays to populate data on the diagram relative to the vantage point you are using e.g. the current `ORG_UNIT` or `APP_GROUP`. 
+
+![img.png](entity-overlay-diagram-selected-overlay.png)
+
+Once an overlay has been picked the cell contents show the overlay (where one exists). Group cells that are not backed by data will not show an overlay. Cells with no relevant data for that overlay will also appear blank. There is the option to toggle whether to show or hide cells with empty cell contents in the context panel (2).
+By selecting a group cell on the diagram you can get an enhanced view of the overlay in the context panel (4).
