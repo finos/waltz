@@ -28,7 +28,7 @@
 
     <div class="wsp-chromeless"
          ng-if="$ctrl.renderMode === 'chromeless'">
-        <h3>
+        <h3 ng-if="$ctrl.panel.title">
             <waltz-icon name="{{ $ctrl.panel.icon }}">
             </waltz-icon>
             <span ng-bind="$ctrl.panel.title">

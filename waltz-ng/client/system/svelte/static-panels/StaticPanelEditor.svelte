@@ -11,7 +11,7 @@
 
     $: {
         const badTextFields = _.some(
-            [workingCopy.title, workingCopy.icon, workingCopy.group, workingCopy.content],
+            [workingCopy.group, workingCopy.content],
             v => _.isEmpty(v));
 
         invalid = badTextFields
@@ -67,11 +67,9 @@
             <div class="form-group">
                 <label for="title">
                     Title
-                    <small class="text-muted">(required)</small>
                 </label>
                 <input class="form-control"
                        id="title"
-                       required="required"
                        placeholder="Title"
                        bind:value={workingCopy.title}>
                 <div class="help-block">
@@ -83,7 +81,6 @@
             <div class="form-group">
                 <label for="icon">
                     Icon
-                    <small class="text-muted">(required)</small>
                 </label>
                 <input class="form-control"
                        id="icon"

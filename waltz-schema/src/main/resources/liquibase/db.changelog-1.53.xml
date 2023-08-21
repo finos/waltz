@@ -39,4 +39,22 @@
                           remarks="optional id of the child reference associated to this change log entry" />
     </changeSet>
 
+
+    <changeSet id="20230818-6710-1"
+               author="woodjes">
+        <comment>6710: Allow title and icon to be null</comment>
+        <dropNotNullConstraint columnDataType="${name.type}"
+                               columnName="title"
+                               tableName="static_panel"/>
+    </changeSet>
+
+
+    <changeSet id="20230818-6710-2"
+               author="woodjes">
+        <comment>6710: Allow title and icon to be null</comment>
+        <dropNotNullConstraint columnDataType="${icon.type}"
+                               columnName="icon"
+                               tableName="static_panel"/>
+    </changeSet>
+
 </databaseChangeLog>
