@@ -280,6 +280,7 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .from(MEASURABLE)
                 .where(MEASURABLE.PARENT_ID.eq(parentId))
                 .and(MEASURABLE.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name()))
+                .orderBy(MEASURABLE.POSITION, MEASURABLE.NAME)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 

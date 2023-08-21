@@ -74,9 +74,9 @@ public class PersonService {
     }
 
 
-    public Set<Person> findDirectsForPersonIds(List<Long> personIds) {
+    public List<Person> findDirectsForPersonIds(List<Long> personIds) {
         if (CollectionUtilities.isEmpty(personIds)) {
-            return Collections.emptySet();
+            return Collections.emptyList();
         }
         return time("PS.findDirectsByPersonIds", () -> personDao.findDirectsForPersonIds(personIds));
     }
