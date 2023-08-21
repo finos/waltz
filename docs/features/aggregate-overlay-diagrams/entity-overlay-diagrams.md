@@ -5,121 +5,73 @@
 Overlay diagrams can be used in a number of ways. Depending on the `diagram_kind` specified, the `layout_data` will be rendered differently. 
 This document will describe overlay diagrams of the kind `WALTZ_ENTITY_OVERLAY` which can be constructed using the diagram builder  by system admin and rendered on group pages in the diagram section. 
 
-Entity Overlay Diagrams can are constructed of 'group cells' which may or may not be backed by an entity e.g. a measurable, person or data type. The cell contents can be overlaid with one of
+Entity Overlay Diagrams are constructed of 'group cells' which may or may not be backed by an entity e.g. a measurable, person or data type. 
+The cell contents can show aggregated waltz data relating to the backing entity of the cell by selecting one of the overlays.
 
-HERE!
 
 
 ## Model
 
-There are 3 main tables for storing legal entity data
+We make use of `aggregate_overlay_diagrams` for storing entity overlay diagram data.
 
-- `legal_entity` - describes details of a legal entity
-- `legal_entity_relationship_kind` - describes the type of relationship between a legal entity and a target entity kind
-- `legal_entity_relationship` - links a legal entity to one or more target entities with a specified relationship kind
+- `aggregate_overlay_diagram` - captured the diagram info and layout data
+- `aggregate_overlay_diagram_Cell_data` - stores the backing entities for the diagram cells. The `cell_external_id` maps to the `id` field in the `layout data` on the diagram.
 
-Column remarks have been used to describe in further detail the purpose of each field.
-![Model](images/legal_entity_model.png)
+### Visual Concepts
+
+![img.png](entity-overlay-diagram-section-view.png)
+
+| Name          | Description                                                                                                                                                                                                                                                                                                    |
+|---------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Group Cell    | A unit drawn on the diagram as a box (1). Constructed of two parts: a title (can be hidden), and a content box. Optionally can be backed by data (2), the backing entities can be a 'PERSON', 'MEASURABLE' or 'DATA_TYPE'.                                                                                     |
+| Content Box   | Area used to display the contents of the group cell (3). If this group contains children, these child groups will be displayed in the content box (4), otherwise the cell contents will be shown. Child groups can be a mixture of groups backed by different entity kinds and groups without a backing entity |
+| Cell Contents | Data relating to the cell is shown in the cell contents. If there is no data associated to the cell then the group will appear empty (1). Otherwise the selected overlay will be shown (5), by defualt the backing entities are displayed.                                                                     |
+| Overlay       | Visual produced by aggregating information related to the backing entity of the cell at the given vantage point (5). Overlays exist for all cells backed with data (although all may not be visible as child groups are shown).                                                                           |
+
+### Layout Data
+
+A diagram is constructed of nested groups, stored as JSON in the `layout_data` field, with associated data linked to each group. Each group has the following attributes:
+
+| Name            | Description                                                                                                                                                                                                                     |
+|-----------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| id              | A GUID to uniquely identify the group                                                                                                                                                                                           |
+| parent_id       | A reference to the parent group                                                                                                                                                                                                 |
+| title           | Text to be displayed in the title bar. When adding groups with data the title is defaulted to the name of the entity added                                                                                                      |
+| properties      | Information to style the group cell. e.g. cell width, cell height, show title, show border, title color, background color etc. Defaults if not explicitly set.                                                                  |
+| data (optional) | An object containing the entity reference to the backing entity for this cell. Formally captured in the `aggregate_overlay_diagram_cell_data` but retained in the layout information in case of reconstruction from this object |                                                                      | 
+
+Example: 
+```
+[
+    {
+        "title":"Demo Diagram",
+        "id":"08e5ffb6-ee04-4809-8357-49191b0ede14",
+        "parentId":null,
+        "props": {
+            "minHeight":5,
+            "minWidth":10,
+            "flexDirection":"row",
+            "showTitle":true,
+            "showBorder":true,
+            "bucketSize":3,
+            "proportion":1,
+            "titleColor":"#1F7FE0",
+            "contentColor":"#eef5fb",
+            "contentFontSize":0.7,
+            "titleFontSize":0.8},
+            "position":1
+        }
+    }
+]
+```
+
 
 ## Features
 
-- Pages
-    - Legal Entity
-    - Legal Entity Relationship
-    - Legal Entity Relationship Kind
-    - Legal Entity Relationship Kind List
-- Sections
-    - 'Legal Entity Relationships'
-        - Displayed on: Legal Entities, Apps, Org Units, App Groups, People, Measurables
-    - 'Relationships'
-        - Displayed on: Legal Entity Relationship Kind
-- Bulk Editor
-    - Requires 'Bulk Legal Entity Relationship Editor' role
-    - Appears on the 'Relationships' Section for a Legal Entity Relationship Kind
-    - Allows users to add, update and remove legal entity relationships and assessments associated to them
-    - Detailed guide can be found here:
-- Assessments
-    - Single and multi-valued assessments can be linked to legal entities, and their relationships
-    - Assessments marked as `PRIMARY` for legal entity relationships will be shown as part of the grid visible in the '
-      Legal Entity Relationships' and 'Relationships' sections
-    - Assessments against legal entity relationships can be edited via the bulk editor
+### Builder
 
-## Bulk Editor
+Available via the 'System Admin' page. Users with admin privileges can create / edit diagrams. 
 
-Legal entity relationships can be managed in bulk via the editor screen of the 'legal entity relationship kind' page.
+### Section
 
-### Input Data
-
-The supported columns are:
-
-| Column Name                                  | Description                                                                                                                                                     | Example               |
-|----------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------|
-| Entity External Id                           | External Identifier of the entity (usually applications)                                                                                                        | `ABCD`                |
-| Legal Entity External Id                     | External Identifier of the legal entity                                                                                                                         | `1234`                |
-| Comment                                      | (Optional) Description to be added to the relationship record                                                                                                   | `Some Comment`        |
-| Remove Relationship                          | (Optional) Indicates whether to remove this relationship                                                                                                        | `X`                   |
-| `{ASSESSMENT_DEFN_EXT_ID} / {RATING_EXT_ID}` | (Optional) Assessment to decorate the relationship. Values of 'Y' or 'X' will indicate alignment, other text is treated as a comment for that assessment rating | `A different comment` |
-
-There are multiple ways to designate assessment values:
-
-1) Use the `{ASSESSMENT_DEFN_EXT_ID} / {RATING_EXT_ID}` format in the header, this gives one column per rating outcome
-   and can be used to provide comments per assessment rating
-2) Use the `{ASSESSMENT_DEFN_EXT_ID}` format in the header, the values for each of the rows is then interpreted as a `;`
-   separated list of rating codes.
-
-The editor is designed to allow copy and paste from an excel doc for easier management.
-
-There are two upload modes to select from:
-
-1) `Add Only` - This will only add or update values for relationships and assessments specified in the file
-2) `Replace` - This will replace the detail for any relationships and assessments specified in the file e.g. If the
-   target entity and legal entity details are specified but a value in an assessment column has been removed, this will
-   delete that assessment rating.
-
-Note: `Replace` will not remove a relationship, only the assessment detail, to completely remove a legal entity
-relationship place an 'X' in the 'Remove Relationship' column.
-
-Select 'Search' to continue.
-
-### Upload Preview
-
-After searching a resolve summary will be shown for the input data.
-This lists out the operation for the relationship - `ADD`, `UPDATE` or `REMOVE` - and highlights any errors with the
-input data.
-You can hover over the warning symbol for more detail on the error.
-
-Example errors:
-
-- An unrecognised Entity External Id
-- An unrecognised Legal Entity External Id
-- A command to remove a relationship that does not exist
-- An assessment column header that cannot be identified
-- An assessment rating value that cannot be identified
-- A breach of a single-valued assessment definition cardinality by defining multiple ratings
-
-You can either correct the errors in the input by selecting 'Edit Input' or select the 'enable save' button in order to
-proceed; any relationships with errors will be ignored.
-
-![Upload Preview](images/upload_preview.png)
-
-Select 'Save Relationships' to continue.
-
-### Upload Summary
-
-After saving the upload preview a summary is shown.
-
-![Upload Summary](images/upload_summary_result.png)
-
-Select 'Done' to close the editor.
-
-### Relationships Section
-
-The updates to relationships and assessments should immediately be visible in the table view.
-
-![Assessments Table](images/le_rel_assessment_table.png)
-
-### Example Input
-
-| Entity External Id | Legal Entity External Id | Comment              | Remove Relationship   |
-|--------------------|--------------------------|----------------------|-----------------------|
-| `ENTITY_EXT_ID`    | `LEGAL_ENTITY_EXT_ID`    | `COMMENT` (optional) | `X` or `Y` (optional) |
+A list of active diagrams can be selected from in the diagrams section.
