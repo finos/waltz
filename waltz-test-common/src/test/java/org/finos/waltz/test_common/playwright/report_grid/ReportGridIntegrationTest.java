@@ -11,7 +11,7 @@ import org.finos.waltz.test_common.helpers.AppHelper;
 import org.finos.waltz.test_common.helpers.AssessmentHelper;
 import org.finos.waltz.test_common.helpers.RatingSchemeHelper;
 import org.finos.waltz.test_common.playwright.BasePlaywrightIntegrationTest;
-import org.finos.waltz.test_common.playwright.ScreenshotHelper;
+import org.finos.waltz.test_common.playwright.DocumentationHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +51,7 @@ public class ReportGridIntegrationTest extends BasePlaywrightIntegrationTest {
     @Test
     public void createGrid() throws InsufficientPrivelegeException, IOException {
         String name = mkName("report-grid-create-grid");
-        ScreenshotHelper screenshotHelper = new ScreenshotHelper(
+        DocumentationHelper documentationHelper = new DocumentationHelper(
                 page,
                 "report-grid/create-grid");
 
@@ -62,42 +62,42 @@ public class ReportGridIntegrationTest extends BasePlaywrightIntegrationTest {
         Long gId = appGroupHelper.createAppGroupWithAppRefs(name, asSet(appRef1, appRef2));
 
         page.navigate(mkPath(BASE, "app-group", Long.toString(gId)));
-        screenshotHelper.takePageSnapshot(page, "new_app_group.png");
+        documentationHelper.takePageSnapshot(page, "new_app_group.png");
 
         page.locator(".sidenav button").getByText("Report Grids").click();
-        screenshotHelper.takePageSnapshot(page, "grid_section_opened.png");
+        documentationHelper.takePageSnapshot(page, "grid_section_opened.png");
 
         page.locator("a").getByTitle("Embed section").click();
-        screenshotHelper.takePageSnapshot(page, "hoisted.png");
+        documentationHelper.takePageSnapshot(page, "hoisted.png");
 
         page.locator("button").getByText("Create a new report grid").click();
-        screenshotHelper.takePageSnapshot(page, "new_grid_form.png");
+        documentationHelper.takePageSnapshot(page, "new_grid_form.png");
 
         Locator form = page.locator("form");
         form.locator("#title").fill(name);
         form.locator("#description").fill(name);
-        screenshotHelper.takeElemSnapshot(form, "completed_form.png");
+        documentationHelper.takeElemSnapshot(form, "completed_form.png");
 
         form.locator("button[type=submit]").click();
-        screenshotHelper.takePageSnapshot(page, "submitted_form.png");
+        documentationHelper.takePageSnapshot(page, "submitted_form.png");
 
-        addColumn(screenshotHelper, "Application", "Asset Kind");
-        addColumn(screenshotHelper, "Org Unit", "Name");
-        addColumn(screenshotHelper, "Org Unit", "External Id");
-        addColumn(screenshotHelper, "Cost Kind", "Application Development");
-        addColumn(screenshotHelper, "Attestation ", "Logical Flow");
-        addColumn(screenshotHelper, "Involvement Kind ", "IT Architect");
-        addColumn(screenshotHelper, "Assessment Definition", assessmentRef.name().get());
+        addColumn(documentationHelper, "Application", "Asset Kind");
+        addColumn(documentationHelper, "Org Unit", "Name");
+        addColumn(documentationHelper, "Org Unit", "External Id");
+        addColumn(documentationHelper, "Cost Kind", "Application Development");
+        addColumn(documentationHelper, "Attestation ", "Logical Flow");
+        addColumn(documentationHelper, "Involvement Kind ", "IT Architect");
+        addColumn(documentationHelper, "Assessment Definition", assessmentRef.name().get());
 
         page.locator(".btn-success").getByText("Save this Report").click();
-        screenshotHelper.takePageSnapshot(page, "saved_report.png");
+        documentationHelper.takePageSnapshot(page, "saved_report.png");
 
         Locator grid = page.locator("waltz-grid-with-search");
-        screenshotHelper.takeElemSnapshot(grid, "grid_data.png");
+        documentationHelper.takeElemSnapshot(grid, "grid_data.png");
         assertThat(grid.locator("div.ui-grid-cell").getByTestId("entity-name").getByText(appRef1.name().get())).isVisible();
         assertThat(grid.locator("div.ui-grid-cell").getByTestId("entity-name").getByText(appRef2.name().get())).isVisible();
 
-        screenshotHelper.prepareDocumentation();
+        documentationHelper.prepareDocumentation();
     }
 
 
@@ -113,16 +113,16 @@ public class ReportGridIntegrationTest extends BasePlaywrightIntegrationTest {
     }
 
 
-    private void addColumn(ScreenshotHelper screenshotHelper,
+    private void addColumn(DocumentationHelper documentationHelper,
                            String category,
                            String option) {
         Locator tab = page.locator(".wt-tab.wt-active");
         tab.locator(".btn").getByText("Select an entity kind").click();
-        screenshotHelper.takePageSnapshot(page, format("select_col_category_%s.png", category));
+        documentationHelper.takePageSnapshot(page, format("select_col_category_%s.png", category));
         page.locator(".btn-group .btn").getByText(category, new Locator.GetByTextOptions().setExact(true)).click();
-        screenshotHelper.takePageSnapshot(page, format("select_col_%s_%s.png", category, option));
+        documentationHelper.takePageSnapshot(page, format("select_col_%s_%s.png", category, option));
         page.locator("tr.clickable").getByText(option, new Locator.GetByTextOptions().setExact(true)).first().click();
-        screenshotHelper.takePageSnapshot(page, format("added_col_%s_%s.png", category, option));
+        documentationHelper.takePageSnapshot(page, format("added_col_%s_%s.png", category, option));
         tab.locator(".btn").getByText("Close").click();
     }
 
