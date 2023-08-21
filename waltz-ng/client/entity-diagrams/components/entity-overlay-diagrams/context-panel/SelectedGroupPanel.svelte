@@ -1,7 +1,7 @@
 <script>
 
     import EntityLink from "../../../../common/svelte/EntityLink.svelte";
-    import Item from "../Item.svelte";
+    import Item from "../CellContent.svelte";
     import {
         RenderModes
     } from "../../../../aggregate-overlay-diagram/components/aggregate-overlay-diagram/aggregate-overlay-diagram-utils";

@@ -27,9 +27,9 @@
 
     const appCountProportion = renderMode === RenderModes.FOCUSED ? 0.1 : 0.25;
     const axisProportion = renderMode === RenderModes.FOCUSED ? 0.1 : 0;
-    const paddingProportion = renderMode === RenderModes.FOCUSED ? 0.1 : 0;
+    const paddingProportion = renderMode === RenderModes.FOCUSED ? 0.1 : 0.05;
     const graphHeightProportion = 1 - (axisProportion + appCountProportion + paddingProportion * 2);
-    const graphWidthProportion = 1 - axisProportion;
+    const graphWidthProportion = 1 - axisProportion ;
 
     const minYear = new Date().getFullYear();
     $: futureYear = getFutureYear($appChangeAdditionalYears)

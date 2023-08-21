@@ -5,7 +5,7 @@
     import {diagramMode, DiagramModes} from "./diagram-builder-store";
     import DiagramControls from "../builder-controls/DiagramControls.svelte";
     import DiagramTreeSelector from "./DiagramTreeSelector.svelte";
-    import DiagramView from "../DiagramView.svelte";
+    import DiagramView from "../static-view/DiagramView.svelte";
     import GroupDetailsPanel from "../builder-controls/GroupDetailsPanel.svelte";
     import {prettyHTML} from "../../../../system/svelte/nav-aid-builder/nav-aid-utils";
     import PageHeader from "../../../../common/svelte/PageHeader.svelte";

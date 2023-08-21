@@ -2,7 +2,7 @@
 
     import {diagramService, selectionOptions} from "./entity-diagram-store";
     import DiagramContextPanel from "./context-panel/DiagramContextPanel.svelte";
-    import DiagramInteractView from "./DiagramInteractView.svelte";
+    import DiagramInteractView from "./interact-view/DiagramInteractView.svelte";
     import {mkSelectionOptions} from "../../../common/selector-utils";
     import DiagramList from "./DiagramList.svelte";
     import {aggregateOverlayDiagramStore} from "../../../svelte-stores/aggregate-overlay-diagram-store";
