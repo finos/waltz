@@ -115,7 +115,7 @@ function saveDiagram(diagram) {
 
     const diagramInfo = _.pick(diagram, ["id", "name", "description", "diagramKind", "aggregatedEntityKind"]);
 
-    const createCmd = Object.assign(
+    const saveCmd = Object.assign(
         {},
         diagramInfo,
         {
@@ -125,7 +125,7 @@ function saveDiagram(diagram) {
         });
 
     return $http
-        .post("api/aggregate-overlay-diagram/create", createCmd);
+        .post("api/aggregate-overlay-diagram/save", saveCmd);
 }
 
 
