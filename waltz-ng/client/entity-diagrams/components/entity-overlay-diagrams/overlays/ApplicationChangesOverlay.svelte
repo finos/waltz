@@ -4,13 +4,13 @@
     import {axisLeft} from "d3-axis";
     import _ from "lodash";
     import {appChangeAdditionalYears} from "./overlay-store";
-    import {select} from "d3-selection";
     import {
         RenderModes
     } from "../../../../aggregate-overlay-diagram/components/aggregate-overlay-diagram/aggregate-overlay-diagram-utils";
     import {schemeBuGn, schemeOrRd} from "d3";
     import {reverse} from "../../../../common/list-utils";
     import EntityLink from "../../../../common/svelte/EntityLink.svelte";
+    import {waltzFontColor, waltzLinkColor} from "../../../../common/colors";
 
 
     export let cellData = [];
@@ -21,9 +21,16 @@
     export let height;
     export let width;
 
+    const DetailModes = {
+        APP_LIST: "APP_LIST",
+        CHANGE_LIST: "CHANGE_LIST",
+        NONE: "NONE"
+    }
+
     let svgElem;
     let selectedChanges = null;
     let selectedDirection = null;
+    let activeMode = DetailModes.NONE;
 
     const appCountProportion = renderMode === RenderModes.FOCUSED ? 0.1 : 0.25;
     const axisProportion = renderMode === RenderModes.FOCUSED ? 0.1 : 0;
@@ -104,9 +111,20 @@
         if(_.isEqual(selectedChanges, changeInfo)) {
             selectedChanges = null;
             selectedDirection = null
+            activeMode = DetailModes.NONE;
         } else {
             selectedChanges = changeInfo;
             selectedDirection = direction;
+            activeMode = DetailModes.CHANGE_LIST;
+        }
+    }
+
+
+    function clickAppCount() {
+        if(activeMode === DetailModes.APP_LIST) {
+            activeMode = DetailModes.NONE;
+        } else {
+            activeMode = DetailModes.APP_LIST;
         }
     }
 
@@ -117,12 +135,25 @@
     <div>
         <svg viewBox={`0 0 ${width} ${height}`}
              bind:this={svgElem}
+             class:focused={renderMode === RenderModes.FOCUSED}
              style="background: white">
-            <g>
+            <g class="app-summary">
+                <rect x="0"
+                      y={height - (height * appCountProportion + height * paddingProportion)}
+                      on:click={() => clickAppCount()}
+                      on:keydown={() => clickAppCount()}
+                      width={width * graphWidthProportion}
+                      height={height * appCountProportion + height * paddingProportion}
+                      style="pointer-events: all; opacity: 0.3"
+                      fill="none"
+                      stroke-width="0">
+                </rect>
                 <text transform={`translate(${width * graphWidthProportion / 2} ${height - (height * appCountProportion / 2)})`}
                       text-anchor="middle"
                       font-size={height * appCountProportion}
-                      dominant-baseline="middle">
+                      fill={renderMode === RenderModes.FOCUSED ? waltzLinkColor : waltzFontColor}
+                      dominant-baseline="middle"
+                      style="pointer-events: none">
                     # Apps: {cellData?.currentAppCount || 0} (+{cellData?.totalInboundCount} / -{cellData?.totalOutboundCount})
                 </text>
             </g>
@@ -143,7 +174,7 @@
                                   on:keydown={d => clickChart(outboundCount, "Outbound")}
                                   width={yearScale.bandwidth() / 4}
                                   height={height * graphHeightProportion - countScale(0)}
-                                  style="pointer-events: all"
+                                  style="pointer-events: all; opacity: 0.3"
                                   fill="none"
                                   stroke-width="0">
                                 <title>{mkTitle(outboundCount.quarter, outboundCount.count)}</title>
@@ -199,18 +230,22 @@
                         {/each}
                     </g>
                     <g>
-                        <text transform={`translate(${width}, ${countScale(countScaleMax)})`}
-                              text-anchor="end"
-                              font-size={height * axisProportion}
-                              dominant-baseline="hanging">
-                            {countScaleMax}
-                        </text>
-                        <text transform={`translate(${width}, ${countScale(countScaleMin)})`}
-                              text-anchor="end"
-                              font-size={height * axisProportion}
-                              dominant-baseline="auto">
-                            {countScaleMin}
-                        </text>
+                        {#if !_.isEmpty(cellData.inboundCounts)}
+                            <text transform={`translate(${width}, ${countScale(countScaleMax)})`}
+                                  text-anchor="end"
+                                  font-size={height * axisProportion}
+                                  dominant-baseline="hanging">
+                                {countScaleMax}
+                            </text>
+                        {/if}
+                        {#if !_.isEmpty(cellData.outboundCounts)}
+                            <text transform={`translate(${width}, ${countScale(countScaleMin)})`}
+                                  text-anchor="end"
+                                  font-size={height * axisProportion}
+                                  dominant-baseline="auto">
+                                {countScaleMin}
+                            </text>
+                        {/if}
                         <text transform={`translate(${width}, ${countScale(0)})`}
                               text-anchor="end"
                               font-size={height * axisProportion}
@@ -224,7 +259,7 @@
     </div>
 
     {#if renderMode === RenderModes.FOCUSED}
-        {#if selectedChanges}
+        {#if activeMode === DetailModes.CHANGE_LIST}
             <div style="padding-top: 1em">
                 <p>Showing {selectedChanges.count} {selectedDirection} changes for {selectedChanges.quarter.quarterName} {selectedChanges.quarter.year}</p>
                 <table class="table table-condensed small">
@@ -248,8 +283,49 @@
                     </tbody>
                 </table>
             </div>
-        {:else }
-            <div class="help-block">Select a bar on the diagram above to see the breakdown of changes</div>
+        {:else if activeMode === DetailModes.APP_LIST}
+            <div style="padding-top: 1em">
+                <p>Showing all applications related to this group cell</p>
+                <table class="table table-condensed small">
+                    <colgroup>
+                        <col width="30%"/>
+                        <col width="70%"/>
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>App</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {#each _.orderBy(cellData?.currentApplications, d => d.name) as app}
+                            <tr>
+                                <td>{app.externalId}</td>
+                                <td><EntityLink ref={app}/></td>
+                            </tr>
+                        {/each}
+                    </tbody>
+                </table>
+            </div>
+        {:else if activeMode === DetailModes.NONE}
+            <div class="help-block">Select a bar on the diagram above to see the breakdown of changes, or select the app count to see the full list of apps currently associated</div>
         {/if}
     {/if}
 </div>
+
+
+<style type="text/css">
+
+    .focused .app-summary rect:hover {
+        fill: #ddd;
+    }
+
+    .focused .outbound rect:hover {
+        fill: #ddd;
+    }
+
+    .focused .inbound rect:hover {
+        fill: #ddd;
+    }
+
+</style>
