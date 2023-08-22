@@ -72,4 +72,232 @@
         </addColumn>
     </changeSet>
 
+
+    <!-- 6728: Add id to measurable_rating, update allocation and measurable_rating_planned_decommission tables   -->
+
+
+    <!-- 6728: drop fks from mrpd and allocation -->
+    <changeSet id="20230822-6728-1"
+               author="woodjes">
+        <comment>6728: drop fk from measurable_rating_planned_decommission</comment>
+        <dropForeignKeyConstraint baseTableName="measurable_rating_planned_decommission"
+                                  constraintName="measurable_rating_planned_decommission_fk"/>
+    </changeSet>
+
+    <changeSet id="20230822-6728-2"
+               author="woodjes">
+        <comment>6728: drop fk from allocation</comment>
+        <dropForeignKeyConstraint baseTableName="allocation"
+                                  constraintName="allocation_measurable_rating_fk"/>
+    </changeSet>
+
+    <!-- 6728: add id to measurable rating -->
+    <changeSet id="20230822-6728-3"
+               author="woodjes">
+        <comment>6728: add id to measurable_rating (drop existing)</comment>
+        <dropPrimaryKey tableName="measurable_rating"/>
+        <rollback>
+            <addPrimaryKey columnNames="entity_id, entity_kind, measurable_id"
+                           constraintName="measurable_rating_pkey"
+                           tableName="measurable_rating"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20230822-6728-4"
+               author="woodjes">
+        <comment>6728: adding id to measurable_rating create unique index from old pk</comment>
+        <createIndex indexName="idx_mr_entity_ref_m_id"
+                     tableName="measurable_rating"
+                     unique="true">
+            <column name="entity_id"/>
+            <column name="entity_kind"/>
+            <column name="measurable_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20230822-6728-5"
+               author="woodjes"
+               dbms="!h2">
+        <comment>6728: adding id to measurable_rating</comment>
+        <addColumn tableName="measurable_rating">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints primaryKey="true"
+                             primaryKeyName="measurable_rating_pkey"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20230822-6728-5"
+               author="woodjes"
+               dbms="h2">
+        <comment>6728: adding id to measurable_rating</comment>
+        <addColumn tableName="measurable_rating">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+            </column>
+        </addColumn>
+        <addPrimaryKey columnNames="id"
+                       constraintName="measurable_rating_pkey"
+                       tableName="measurable_rating"/>
+    </changeSet>
+
+
+    <!-- 6728: add measurable_rating_id to allocation -->
+
+    <changeSet id="20230822-6728-6"
+               author="woodjes">
+        <comment>6728: adding measurable_rating_id to allocation</comment>
+        <addColumn tableName="allocation">
+            <column name="measurable_rating_id"
+                    type="${id.type}">
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20230822-6728-7"
+               author="woodjes">
+        <comment>6728: adding measurable_rating_id to allocation</comment>
+        <sql>
+            update allocation
+            set measurable_rating_id = (select id
+                                        from measurable_rating mr
+                                        where mr.entity_id = allocation.entity_id
+                                          and mr.entity_kind = allocation.entity_kind
+                                          and mr.measurable_id = allocation.measurable_id);
+        </sql>
+    </changeSet>
+
+    <changeSet id="20230822-6728-8"
+               author="woodjes">
+        <comment>6728: adding measurable_rating_id to allocation</comment>
+        <addNotNullConstraint columnDataType="${id.type}"
+                              columnName="measurable_rating_id"
+                              tableName="allocation"/>
+    </changeSet>
+
+    <changeSet id="20230822-6728-9"
+               author="woodjes">
+        <comment>6728: adding foreign key to measurable_rating from allocation</comment>
+        <addForeignKeyConstraint baseTableName="allocation"
+                                 baseColumnNames="measurable_rating_id"
+                                 constraintName="allocation_measurable_rating_fk"
+                                 referencedTableName="measurable_rating"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+
+    <!-- 6728: add measurable_rating_id to measurable_rating_planned_decommission-->
+
+    <changeSet id="20230822-6728-10"
+               author="woodjes">
+        <comment>6728: adding measurable_rating_id to measurable_rating_planned_decommission</comment>
+        <addColumn tableName="measurable_rating_planned_decommission">
+            <column name="measurable_rating_id"
+                    type="${id.type}">
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20230822-6728-11"
+               author="woodjes">
+        <comment>6728: adding measurable_rating_id to measurable_rating_planned_decommission</comment>
+        <sql>
+            update measurable_rating_planned_decommission
+            set measurable_rating_id = (select id
+                                        from measurable_rating mr
+                                        where mr.entity_id = measurable_rating_planned_decommission.entity_id
+                                          and mr.entity_kind = measurable_rating_planned_decommission.entity_kind
+                                          and mr.measurable_id = measurable_rating_planned_decommission.measurable_id);
+        </sql>
+    </changeSet>
+
+    <changeSet id="20230822-6728-12"
+               author="woodjes">
+        <comment>6728: adding measurable_rating_id to measurable_rating_planned_decommission</comment>
+        <addNotNullConstraint columnDataType="${id.type}"
+                              columnName="measurable_rating_id"
+                              tableName="measurable_rating_planned_decommission"/>
+    </changeSet>
+
+    <changeSet id="20230822-6728-13"
+               author="woodjes">
+        <comment>6728: adding foreign key to measurable_rating from allocation</comment>
+        <addForeignKeyConstraint baseTableName="measurable_rating_planned_decommission"
+                                 baseColumnNames="measurable_rating_id"
+                                 constraintName="measurable_rating_planned_decommission_fk"
+                                 referencedTableName="measurable_rating"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <!-- 6728: add id to allocation -->
+
+    <changeSet id="20230822-6728-14"
+               author="woodjes">
+        <comment>6728: add id to allocation (drop existing)</comment>
+        <dropPrimaryKey tableName="allocation"/>
+        <rollback>
+            <addPrimaryKey columnNames="entity_id, entity_kind, measurable_id"
+                           constraintName="allocation_pkey"
+                           tableName="allocation"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20230822-6728-15"
+               author="woodjes"
+               dbms="!h2">
+        <comment>6728: adding id to allocation</comment>
+        <addColumn tableName="allocation">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints primaryKey="true"
+                             primaryKeyName="allocation_pkey"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20230822-6728-15"
+               author="woodjes"
+               dbms="h2">
+        <comment>6728: adding id to allocation</comment>
+        <addColumn tableName="allocation">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+            </column>
+        </addColumn>
+        <addPrimaryKey columnNames="id"
+                       constraintName="allocation_pkey"
+                       tableName="allocation"/>
+    </changeSet>
+
+    <!-- 6728: Drop entity_kind, entity_id and measurable_id cols from measurable rating decom and allocation   -->
+
+    <changeSet id="20230822-6728-16"
+               author="woodjes">
+        <comment>6728: drop entity_kind, entity_id, measurable_id from allocation</comment>
+        <dropColumn tableName="allocation"
+                    columnName="entity_kind"/>
+        <dropColumn tableName="allocation"
+                    columnName="entity_id"/>
+        <dropColumn tableName="allocation"
+                    columnName="measurable_id"/>
+    </changeSet>
+
+    <changeSet id="20230822-6728-17"
+               author="woodjes">
+        <comment>6728: drop entity_kind, entity_id, measurable_id from measurable_rating_planned_decommission</comment>
+        <dropColumn tableName="measurable_rating_planned_decommission"
+                    columnName="entity_kind"/>
+        <dropColumn tableName="measurable_rating_planned_decommission"
+                    columnName="entity_id"/>
+        <dropColumn tableName="measurable_rating_planned_decommission"
+                    columnName="measurable_id"/>
+    </changeSet>
+
 </databaseChangeLog>
