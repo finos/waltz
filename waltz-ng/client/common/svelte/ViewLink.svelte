@@ -146,8 +146,8 @@
         color: $waltz-font-color;
         font-weight: bold;
 
-      &:hover {
-        color: $waltz-link-color;
-      }
+        &:hover {
+            color: $waltz-link-color;
+        }
     }
 </style>

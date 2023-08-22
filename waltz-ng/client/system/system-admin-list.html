@@ -35,7 +35,8 @@
             <div class="col-md-12">
                 <h3 ng-bind="section.name"></h3>
 
-                <div ng-repeat="option in section.options">
+                <div ng-repeat="option in section.options"
+                     data-testid="{{option.name}}">
                     <a ui-state="option.state">
                         <waltz-icon class='text-muted'
                                     fixed-width="true"

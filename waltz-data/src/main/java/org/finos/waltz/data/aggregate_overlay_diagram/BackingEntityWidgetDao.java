@@ -28,6 +28,7 @@ public class BackingEntityWidgetDao {
                     newArrayList(
                             EntityKind.MEASURABLE,
                             EntityKind.APP_GROUP,
+                            EntityKind.DATA_TYPE,
                             EntityKind.PERSON
                     ))
             .as("entity_name");

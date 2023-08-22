@@ -11,9 +11,10 @@
     import SearchInput from "../../../common/svelte/SearchInput.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
     import {entity} from "../../../common/services/enums/entity";
+    import {overlayDiagramKind} from "../../../common/services/enums/overlay-diagram-kind";
 
 
-    let diagramsCall = aggregateOverlayDiagramStore.findAll();
+    let diagramsCall = aggregateOverlayDiagramStore.findByKind(overlayDiagramKind.WALTZ_STATIC_SVG_OVERLAY.key);
     $: diagrams = $diagramsCall?.data;
     $: diagramsById = _.keyBy(diagrams, d => d.id);
 
