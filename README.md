@@ -69,9 +69,9 @@ progress and done issues.
 
 | Release | Date           | Summary                                           |
 |---------|----------------|---------------------------------------------------|
-| 1.52    | Mid Aug 2023   | Primary ratings (cont), navigation aid generators |
-| 1.53    | tbd            | tbd                                               |
-| 1.54    | tbd            | tbd                                               |
+| 1.53    | Sept 5th 2023  | Diagrams (builder + markdown), Cost Allocations   |
+| 1.54    | Mid Oct 2023   | tbd                                               |
+| 1.55    | Late Nov 2023  | tbd                                               |
 
 See the [releases](https://github.com/finos/waltz/releases) page for historic versions.
 
