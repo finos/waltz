@@ -67,6 +67,9 @@ export const actorBg = rgb("#EDE5EE");
 
 export const darkAmber = rgb(darkAmberHex);
 
+export const waltzFontColor = "#332B23";
+export const waltzLinkColor = "#2C369D";
+
 export const ragColorScale = scaleOrdinal()
     .domain(["R", "A", "G", "Z", "X"])
     .range([red, amber, green, grey, lightGrey]);

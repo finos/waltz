@@ -83,7 +83,7 @@ function mkFlexProportion(group, child) {
 }
 
 
-export function mkGroupStyle(group, child) {
+export function mkChildGroupStyle(group, child) {
     return `
         ${mkFlexProportion(group, child)}
         margin: 0.2em;
@@ -94,16 +94,15 @@ export function mkGroupStyle(group, child) {
         ${group.props.flexDirection === FlexDirections.ROW ? "height: fit-content;" : "width: min-content;"}`;
 }
 
-export function mkItemStyle(group) {
+export function mkCellContentStyle(group) {
     return `
-        margin: 0.1em;
+        margin: 0.2em;
         padding: 0.1em;
         min-width: ${group.props.minWidth}em;
         min-height: ${group.props.minHeight}em;
         height: fit-content;
         ${group.props.flexDirection === FlexDirections.ROW ? "height: fit-content;" : "width: fit-content;"}
-        font-size: ${group.props.contentFontSize}em;
-        `;
+        font-size: ${group.props.contentFontSize}em;`;
 }
 
 export function mkReorderBoxStyle(group) {
@@ -114,7 +113,7 @@ export function mkReorderBoxStyle(group) {
         flex: 1 1 10%;`;
 }
 
-export function mkContentBoxStyle(group) {
+export function mkGroupCellStyle(group) {
     return `
         flex: 1 1 80%;
         justify-content: center;
@@ -131,7 +130,7 @@ export function mkTitleStyle(group, hoveredGroupId) {
         font-size: ${group.props.showTitle ? group.props.titleFontSize : group.props.contentFontSize}em;`;
 }
 
-export function mkContainerStyle(group) {
+export function mkContentBoxStyle(group) {
     return `
         display: flex;
         flex-wrap: wrap;
