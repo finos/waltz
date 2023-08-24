@@ -300,4 +300,7 @@
                     columnName="measurable_id"/>
     </changeSet>
 
+<!--    uniqe index on alloc scheme and rating id -->
+<!--    uniq index on mrpd rating id-->
+
 </databaseChangeLog>

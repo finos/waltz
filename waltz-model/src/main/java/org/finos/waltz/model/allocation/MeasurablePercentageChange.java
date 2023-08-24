@@ -32,7 +32,7 @@ public abstract class MeasurablePercentageChange {
 
     public abstract Operation operation();
 
-    public abstract MeasurablePercentage measurablePercentage();
+    public abstract MeasurableRatingPercentage measurablePercentage();
 
     public abstract Optional<Integer> previousPercentage();
 }

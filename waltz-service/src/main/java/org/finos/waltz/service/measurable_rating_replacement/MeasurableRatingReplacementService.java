@@ -19,8 +19,6 @@
 package org.finos.waltz.service.measurable_rating_replacement;
 
 
-import org.finos.waltz.service.changelog.ChangeLogService;
-import org.finos.waltz.service.measurable_rating.MeasurableRatingService;
 import org.finos.waltz.common.exception.UpdateFailedException;
 import org.finos.waltz.data.EntityReferenceNameResolver;
 import org.finos.waltz.data.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommissionDao;
@@ -28,8 +26,10 @@ import org.finos.waltz.data.measurable_rating_replacement.MeasurableRatingReplac
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.Operation;
-import org.finos.waltz.model.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommission;
+import org.finos.waltz.model.measurable_rating.MeasurableRating;
 import org.finos.waltz.model.measurable_rating_replacement.MeasurableRatingReplacement;
+import org.finos.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.service.measurable_rating.MeasurableRatingService;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -82,7 +82,7 @@ public class MeasurableRatingReplacementService {
         Tuple2<Operation, Boolean> operation = measurableRatingReplacementDao.save(decommId, entityReference, commissionDate, username);
 
         MeasurableRatingReplacement measurableRatingReplacement = measurableRatingReplacementDao.fetchByDecommissionIdAndEntityRef(decommId, entityReference);
-        MeasurableRatingPlannedDecommission plannedDecomm = measurableRatingPlannedDecommissionDao.getById(decommId);
+        MeasurableRating rating = measurableRatingService.getByDecommId(decommId);
 
         if(!operation.v2){
             throw new UpdateFailedException(
@@ -90,9 +90,9 @@ public class MeasurableRatingReplacementService {
                     format("Failed to store measurable rating replacement %s:%d for entity %s:%d and measurable %d",
                             measurableRatingReplacement.entityReference().kind(),
                             measurableRatingReplacement.entityReference().id(),
-                            plannedDecomm.entityReference().kind(),
-                            plannedDecomm.entityReference().id(),
-                            plannedDecomm.measurableId()));
+                            rating.entityReference().kind(),
+                            rating.entityReference().id(),
+                            rating.measurableId()));
         } else {
 
             changeLogService.writeChangeLogEntries(

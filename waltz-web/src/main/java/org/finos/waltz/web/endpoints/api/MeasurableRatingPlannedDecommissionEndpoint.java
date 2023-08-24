@@ -64,7 +64,7 @@ public class MeasurableRatingPlannedDecommissionEndpoint implements Endpoint {
 
         String findForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findForReplacingEntityPath = mkPath(BASE_URL, "replacing-entity", ":kind", ":id");
-        String savePath = mkPath(BASE_URL, "entity", ":kind", ":id", "MEASURABLE", ":measurableId");
+        String savePath = mkPath(BASE_URL, "measurable-rating", ":id");
         String removePath = mkPath(BASE_URL, "id", ":id");
 
         ListRoute<MeasurableRatingPlannedDecommission> findForEntityRoute = (request, response)
@@ -74,14 +74,12 @@ public class MeasurableRatingPlannedDecommissionEndpoint implements Endpoint {
                 -> measurableRatingPlannedDecommissionService.findForReplacingEntityRef(getEntityReference(request));
 
         DatumRoute<MeasurableRatingPlannedDecommission> saveRoute = (request, response) -> {
-            EntityReference entityRef = getEntityReference(request);
-            long measurableId = getLong(request, "measurableId");
+            long measurableRatingId = getLong(request, "id");
 
-            checkHasPermissionForThisOperation(entityRef, measurableId, asSet(Operation.ADD, Operation.UPDATE), getUsername(request));
+            checkHasPermissionForThisOperation(measurableRatingId, asSet(Operation.ADD, Operation.UPDATE), getUsername(request));
 
             return measurableRatingPlannedDecommissionService.save(
-                    entityRef,
-                    measurableId,
+                    measurableRatingId,
                     readBody(request, DateFieldChange.class),
                     getUsername(request));
         };
@@ -89,7 +87,9 @@ public class MeasurableRatingPlannedDecommissionEndpoint implements Endpoint {
         DatumRoute<Boolean> removeRoute = (request, response) -> {
             long decommissionId = getId(request);
 
-            checkHasPermissionForThisOperation(decommissionId, asSet(Operation.REMOVE), getUsername(request));
+            MeasurableRatingPlannedDecommission decomm = measurableRatingPlannedDecommissionService.getById(decommissionId);
+
+            checkHasPermissionForThisOperation(decomm.measurableRatingId(), asSet(Operation.REMOVE), getUsername(request));
 
             return measurableRatingPlannedDecommissionService.remove(decommissionId, getUsername(request));
         };
@@ -101,20 +101,11 @@ public class MeasurableRatingPlannedDecommissionEndpoint implements Endpoint {
 
     }
 
-    private void checkHasPermissionForThisOperation(Long decommId,
+    private void checkHasPermissionForThisOperation(Long ratingId,
                                                     Set<Operation> operations,
                                                     String username) throws InsufficientPrivelegeException {
 
-        MeasurableRatingPlannedDecommission decomm = measurableRatingPlannedDecommissionService.getById(decommId);
-        checkHasPermissionForThisOperation(decomm.entityReference(), decomm.measurableId(), operations, username);
-    }
-
-    private void checkHasPermissionForThisOperation(EntityReference parentRef,
-                                                    Long measurableId,
-                                                    Set<Operation> operations,
-                                                    String username) throws InsufficientPrivelegeException {
-
-        Set<Operation> perms = measurableRatingPermissionChecker.findMeasurableRatingDecommPermissions(parentRef, measurableId, username);
+        Set<Operation> perms = measurableRatingPermissionChecker.findMeasurableRatingDecommPermissions(ratingId, username);
         measurableRatingPermissionChecker.verifyAnyPerms(operations, perms, MEASURABLE_RATING_PLANNED_DECOMMISSION, username);
     }
 }

@@ -291,11 +291,7 @@ public class AggregateOverlayDiagramUtilities {
                         .eq(app.ID)
                         .and(mr.ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
                 .leftJoin(mrpd)
-                .on(mr.ENTITY_ID
-                        .eq(mrpd.ENTITY_ID)
-                        .and(mr.ENTITY_KIND
-                                .eq(mrpd.ENTITY_KIND)
-                                .and(mr.MEASURABLE_ID.eq(mrpd.MEASURABLE_ID))))
+                .on(mr.ID.eq(mrpd.MEASURABLE_RATING_ID))
                 .leftJoin(mrp)
                 .on(mrp.DECOMMISSION_ID.eq(mrpd.ID))
                 .where(mr.ENTITY_ID.in(inScopeEntityIdSelector))

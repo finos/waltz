@@ -18,32 +18,41 @@
 
 package org.finos.waltz.service.allocation;
 
-import org.finos.waltz.common.exception.InsufficientPrivelegeException;
-import org.finos.waltz.model.Operation;
-import org.finos.waltz.model.allocation_scheme.AllocationScheme;
-import org.finos.waltz.service.allocation.AllocationUtilities.ValidationResult;
-import org.finos.waltz.service.allocation_schemes.AllocationSchemeService;
-import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.common.ListUtilities;
+import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.data.EntityReferenceNameResolver;
 import org.finos.waltz.data.allocation.AllocationDao;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.allocation.Allocation;
 import org.finos.waltz.model.allocation.MeasurablePercentageChange;
+import org.finos.waltz.model.allocation_scheme.AllocationScheme;
+import org.finos.waltz.model.measurable_rating.MeasurableRating;
+import org.finos.waltz.service.allocation.AllocationUtilities.ValidationResult;
+import org.finos.waltz.service.allocation_schemes.AllocationSchemeService;
+import org.finos.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.service.measurable_rating.MeasurableRatingService;
 import org.finos.waltz.service.permission.permission_checker.AllocationPermissionChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.finos.waltz.model.EntityKind.*;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.MapUtilities.indexBy;
+import static org.finos.waltz.model.EntityKind.ALLOCATION_SCHEME;
+import static org.finos.waltz.model.EntityKind.MEASURABLE;
+import static org.finos.waltz.model.EntityKind.MEASURABLE_RATING;
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.service.allocation.AllocationUtilities.mkBasicLogEntry;
 import static org.finos.waltz.service.allocation.AllocationUtilities.validateAllocationChanges;
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.model.EntityReference.mkRef;
 
 @Service
 public class AllocationService {
@@ -53,7 +62,7 @@ public class AllocationService {
     private final AllocationDao allocationDao;
     private final ChangeLogService changeLogService;
     private final EntityReferenceNameResolver nameResolver;
-
+    private final MeasurableRatingService measurableRatingService;
     private final AllocationPermissionChecker allocationPermissionChecker;
     private final AllocationSchemeService allocationSchemeService;
 
@@ -62,6 +71,7 @@ public class AllocationService {
     public AllocationService(AllocationDao allocationDao,
                              EntityReferenceNameResolver nameResolver,
                              ChangeLogService changeLogService,
+                             MeasurableRatingService measurableRatingService,
                              AllocationPermissionChecker allocationPermissionChecker,
                              AllocationSchemeService allocationSchemeService) {
 
@@ -70,12 +80,14 @@ public class AllocationService {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(allocationPermissionChecker, "allocationPermissionChecker cannot be null");
         checkNotNull(allocationSchemeService, "allocationSchemeService cannot be null");
+        checkNotNull(measurableRatingService, "measurableRatingService cannot be null");
 
         this.allocationDao = allocationDao;
         this.changeLogService = changeLogService;
         this.allocationPermissionChecker = allocationPermissionChecker;
         this.nameResolver = nameResolver;
         this.allocationSchemeService = allocationSchemeService;
+        this.measurableRatingService = measurableRatingService;
     }
 
 
@@ -106,7 +118,7 @@ public class AllocationService {
                 changes,
                 username);
 
-        Boolean success = allocationDao.updateAllocations(ref, schemeId, changes, username);
+        Boolean success = allocationDao.updateAllocations(schemeId, changes, username);
 
         if (success) {
             writeChangeLogEntries(ref, schemeId, changes, username);
@@ -138,10 +150,21 @@ public class AllocationService {
         }
     }
 
-    private void writeChangeLogEntries(EntityReference ref, long schemeId, Collection<MeasurablePercentageChange> changes, String username) {
+    private void writeChangeLogEntries(EntityReference ref,
+                                       long schemeId,
+                                       Collection<MeasurablePercentageChange> changes,
+                                       String username) {
+
+        List<MeasurableRating> ratings = measurableRatingService.findForEntity(ref);
+
+        Map<Long, Long> measurableIdByRatingId = indexBy(
+                ratings,
+                d -> d.id().get(),
+                MeasurableRating::measurableId);
+
         List<EntityReference> refs = ListUtilities.map(
                 changes,
-                c -> mkRef(MEASURABLE, c.measurablePercentage().measurableId()));
+                c -> mkRef(MEASURABLE, c.measurablePercentage().measurableRatingId()));
 
         Map<Long, Optional<String>> measurableIdToName = nameResolver.resolve(refs)
                 .stream()
@@ -156,7 +179,12 @@ public class AllocationService {
                     .orElse("Unknown"));
 
         String msgBody = changes.stream()
-                .map(c -> describeChange(measurableIdToName, c))
+                .map(c -> {
+                    Long mId = measurableIdByRatingId.get(c.measurablePercentage().measurableRatingId());
+                    Optional<String> measurableName = measurableIdToName.get(mId);
+
+                    return describeChange(measurableName, c);
+                })
                 .collect(Collectors.joining(", "));
 
         String msg = String.format(
@@ -168,20 +196,21 @@ public class AllocationService {
     }
 
 
-    private String describeChange(Map<Long, Optional<String>> measurableIdToName,
+    private String describeChange(Optional<String> measurableName,
                                   MeasurablePercentageChange c) {
+
         switch (c.operation()) {
             case UPDATE:
             case ADD:
                 return  String.format(
                         "Set allocation for measurable '%s' to %d%% from %d%% ",
-                        measurableIdToName.get(c.measurablePercentage().measurableId()).orElse("Unknown"),
+                        measurableName.orElse("Unknown"),
                         c.measurablePercentage().percentage(),
                         c.previousPercentage().orElse(0));
             case REMOVE:
                 return String.format(
                         "Unallocated measurable '%s'",
-                        measurableIdToName.get(c.measurablePercentage().measurableId()).orElse("Unknown"));
+                        measurableName.orElse("Unknown"));
             default:
                 return "";
         }

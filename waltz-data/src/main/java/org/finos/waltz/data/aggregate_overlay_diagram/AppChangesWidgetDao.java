@@ -62,8 +62,15 @@ public class AppChangesWidgetDao {
     private static final MeasurableRatingReplacement mrr = MeasurableRatingReplacement.MEASURABLE_RATING_REPLACEMENT;
 
     private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
-                    mrpd.ENTITY_ID,
-                    mrpd.ENTITY_KIND,
+                    mr.ENTITY_ID,
+                    mr.ENTITY_KIND,
+                    newArrayList(EntityKind.APPLICATION))
+            .as("entity_name");
+
+
+    private static final Field<String> REPLACEMENT_ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
+                    mrr.ENTITY_ID,
+                    mrr.ENTITY_KIND,
                     newArrayList(EntityKind.APPLICATION))
             .as("entity_name");
 
@@ -217,20 +224,21 @@ public class AppChangesWidgetDao {
                 .withDayOfMonth(1);
 
         return dsl
-                .select(mrpd.ENTITY_ID,
-                        mrpd.MEASURABLE_ID,
+                .select(mr.ENTITY_ID,
+                        mr.MEASURABLE_ID,
                         mrpd.PLANNED_DECOMMISSION_DATE)
                 .select(ENTITY_NAME_FIELD)
                 .from(mrpd)
-                .where(mrpd.ENTITY_ID.in(inScopeEntityIdSelector)
-                        .and(mrpd.MEASURABLE_ID.in(backingMeasurableEntityIds))
-                        .and(mrpd.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .innerJoin(mr).on(mrpd.MEASURABLE_RATING_ID.eq(mr.ID))
+                .where(mr.ENTITY_ID.in(inScopeEntityIdSelector)
+                        .and(mr.MEASURABLE_ID.in(backingMeasurableEntityIds))
+                        .and(mr.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                         .and(mrpd.PLANNED_DECOMMISSION_DATE.ge(toSqlDate(startOfYear)))
                         .and(targetDateCondition))
                 .fetchGroups(
-                        r -> r.get(mrpd.MEASURABLE_ID),
+                        r -> r.get(mr.MEASURABLE_ID),
                         r -> tuple(
-                                mkRef(EntityKind.APPLICATION, r.get(mrpd.ENTITY_ID), r.get(ENTITY_NAME_FIELD)),
+                                mkRef(EntityKind.APPLICATION, r.get(mr.ENTITY_ID), r.get(ENTITY_NAME_FIELD)),
                                 toLocalDate(r.get(mrpd.PLANNED_DECOMMISSION_DATE))));
     }
 
@@ -246,21 +254,22 @@ public class AppChangesWidgetDao {
 
         return dsl
                 .select(mrr.ENTITY_ID,
-                        mrpd.MEASURABLE_ID,
+                        mr.MEASURABLE_ID,
                         mrr.PLANNED_COMMISSION_DATE)
-                .select(ENTITY_NAME_FIELD)
+                .select(REPLACEMENT_ENTITY_NAME_FIELD)
                 .from(mrr)
                 .innerJoin(mrpd)
                 .on(mrr.DECOMMISSION_ID.eq(mrpd.ID))
+                .innerJoin(mr).on(mrpd.MEASURABLE_RATING_ID.eq(mr.ID))
                 .where(mrr.ENTITY_ID.in(inScopeEntityIdSelector)
                         .and(mrr.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                        .and(mrpd.MEASURABLE_ID.in(backingMeasurableEntityIds))
+                        .and(mr.MEASURABLE_ID.in(backingMeasurableEntityIds))
                         .and(mrr.PLANNED_COMMISSION_DATE.ge(toSqlDate(startOfYear)))
                         .and(targetDateCondition))
                 .fetchGroups(
-                        r -> r.get(mrpd.MEASURABLE_ID),
+                        r -> r.get(mr.MEASURABLE_ID),
                         r -> tuple(
-                                mkRef(EntityKind.APPLICATION, r.get(mrpd.ENTITY_ID), r.get(ENTITY_NAME_FIELD)),
+                                mkRef(EntityKind.APPLICATION, r.get(mrr.ENTITY_ID), r.get(ENTITY_NAME_FIELD)),
                                 toLocalDate(r.get(mrr.PLANNED_COMMISSION_DATE))));
     }
 
