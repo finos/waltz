@@ -107,13 +107,14 @@ function controller() {
 
         const ratingsByMeasurable = _.keyBy(vm.ratings || [], "measurableId");
         const ratingSchemeItemsByCode = _.keyBy(vm.ratingSchemeItems, "rating");
-        const allocationsByMeasurable = _.groupBy(vm.allocations, d => d.measurableId);
-        const decommissionDatesByMeasurable = _.keyBy(vm.plannedDecommissions, d => d.measurableId);
+        const allocationsByMeasurableRating = _.groupBy(vm.allocations, d => d.measurableRatingId);
+        const decommissionDatesByMeasurableRating = _.keyBy(vm.plannedDecommissions, d => d.measurableRatingId);
         const replacementAppsByDecommissionId = _.groupBy(vm.replacementApps, d => d.decommissionId);
-        const replacingDecommissionsByMeasurable = _.groupBy(vm.replacingDecommissions, d => d.measurableId);
+        const replacingDecommissionsByMeasurableId = _.groupBy(vm.replacingDecommissions, d => d.measurableRating.measurableId); // This parent may not have a rating so lookup must be done via measurable
 
         const nodes = _.map(vm.measurables, m => {
             const rating = ratingsByMeasurable[m.id];
+            const decommission = _.get(decommissionDatesByMeasurableRating, [rating?.id], null);
             return {
                 id: m.id,
                 parentId: m.parentId,
@@ -121,10 +122,10 @@ function controller() {
                 measurable: m,
                 rating,
                 ratingSchemeItem: rating ? ratingSchemeItemsByCode[rating.rating] : null,
-                allocations: allocationsByMeasurable[m.id],
-                decommission: _.get(decommissionDatesByMeasurable, [m.id], null),
-                replacementApps: _.get(replacementAppsByDecommissionId, _.get(decommissionDatesByMeasurable, [m.id, "id"]), []),
-                replacingDecommissions: _.get(replacingDecommissionsByMeasurable, [m.id], [])
+                allocations: allocationsByMeasurableRating[rating?.id],
+                decommission: decommission,
+                replacementApps: _.get(replacementAppsByDecommissionId, [decommission?.id], []),
+                replacingDecommissions: _.get(replacingDecommissionsByMeasurableId, [m.id], []) // there may not be a current rating to add takeover to
             };
         });
 

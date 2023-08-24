@@ -98,12 +98,13 @@ public class MeasurableRatingDao {
     private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
                     MEASURABLE_RATING.ENTITY_ID,
                     MEASURABLE_RATING.ENTITY_KIND,
-                    newArrayList(EntityKind.values()))
+                    newArrayList(EntityKind.APPLICATION))
             .as("entity_name");
 
     private static final Field<String> ENTITY_LIFECYCLE_FIELD = InlineSelectFieldFactory.mkEntityLifecycleField(
-            MEASURABLE_RATING.ENTITY_ID,
-            MEASURABLE_RATING.ENTITY_KIND)
+                    MEASURABLE_RATING.ENTITY_ID,
+                    MEASURABLE_RATING.ENTITY_KIND,
+                    newArrayList(EntityKind.APPLICATION))
             .as("entity_lifecycle_status");
 
 

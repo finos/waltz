@@ -21,14 +21,21 @@ package org.finos.waltz.data.measurable_rating_planned_decommission;
 
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.exception.ModifyingReadOnlyRecordException;
+import org.finos.waltz.data.InlineSelectFieldFactory;
+import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.command.DateFieldChange;
+import org.finos.waltz.model.measurable_rating.ImmutableMeasurableRating;
+import org.finos.waltz.model.measurable_rating.MeasurableRating;
 import org.finos.waltz.model.measurable_rating_planned_decommission.ImmutableMeasurableRatingPlannedDecommission;
+import org.finos.waltz.model.measurable_rating_planned_decommission.ImmutableMeasurableRatingPlannedDecommissionInfo;
 import org.finos.waltz.model.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommission;
+import org.finos.waltz.model.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommissionInfo;
 import org.finos.waltz.schema.tables.records.MeasurableRatingPlannedDecommissionRecord;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
 import org.jooq.SelectOnConditionStep;
@@ -42,9 +49,12 @@ import java.util.Set;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
+import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.common.SetUtilities.union;
+import static org.finos.waltz.common.StringUtilities.firstChar;
 import static org.finos.waltz.common.StringUtilities.notEmpty;
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.schema.Tables.MEASURABLE_CATEGORY;
 import static org.finos.waltz.schema.Tables.USER_ROLE;
 import static org.finos.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
@@ -70,6 +80,11 @@ public class MeasurableRatingPlannedDecommissionDao {
                 .build();
     };
 
+    private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
+                    MEASURABLE_RATING.ENTITY_ID,
+                    MEASURABLE_RATING.ENTITY_KIND,
+                    newArrayList(EntityKind.APPLICATION))
+            .as("entity_name");
 
     private final DSLContext dsl;
 
@@ -129,15 +144,47 @@ public class MeasurableRatingPlannedDecommissionDao {
     }
 
 
-    public Collection<MeasurableRatingPlannedDecommission> findByReplacingEntityRef(EntityReference ref) {
+    public Collection<MeasurableRatingPlannedDecommissionInfo> findByReplacingEntityRef(EntityReference ref) {
         return dsl
                 .select(MEASURABLE_RATING_PLANNED_DECOMMISSION.fields())
+                .select(MEASURABLE_RATING.fields())
+                .select(ENTITY_NAME_FIELD)
                 .from(MEASURABLE_RATING_PLANNED_DECOMMISSION)
                 .innerJoin(MEASURABLE_RATING_REPLACEMENT)
                     .on(MEASURABLE_RATING_REPLACEMENT.DECOMMISSION_ID.eq(MEASURABLE_RATING_PLANNED_DECOMMISSION.ID))
+                .innerJoin(MEASURABLE_RATING).on(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_RATING_ID.eq(MEASURABLE_RATING.ID))
                 .where(MEASURABLE_RATING_REPLACEMENT.ENTITY_ID.eq(ref.id()))
                 .and(MEASURABLE_RATING_REPLACEMENT.ENTITY_KIND.eq(ref.kind().name()))
-                .fetchSet(TO_DOMAIN_MAPPER);
+                .fetchSet(r -> {
+                    MeasurableRatingPlannedDecommission decom = MeasurableRatingPlannedDecommissionDao.TO_DOMAIN_MAPPER.map(r);
+                    MeasurableRating rating = readMeasurableRating(r);
+
+                    return ImmutableMeasurableRatingPlannedDecommissionInfo.builder()
+                            .decommission(decom)
+                            .measurableRating(rating)
+                            .build();
+                });
+    }
+
+    private MeasurableRating readMeasurableRating(Record r) {
+
+        EntityReference ref = mkRef(
+                EntityKind.valueOf(r.get(MEASURABLE_RATING.ENTITY_KIND)),
+                r.get(MEASURABLE_RATING.ENTITY_ID),
+                r.get(ENTITY_NAME_FIELD));
+
+        return ImmutableMeasurableRating.builder()
+                .id(r.get(MEASURABLE_RATING.ID))
+                .entityReference(ref)
+                .description(r.get(MEASURABLE_RATING.DESCRIPTION))
+                .provenance(r.get(MEASURABLE_RATING.PROVENANCE))
+                .rating(firstChar(r.get(MEASURABLE_RATING.RATING), 'Z'))
+                .measurableId(r.get(MEASURABLE_RATING.MEASURABLE_ID))
+                .lastUpdatedAt(toLocalDateTime(r.get(MEASURABLE_RATING.LAST_UPDATED_AT)))
+                .lastUpdatedBy(r.get(MEASURABLE_RATING.LAST_UPDATED_BY))
+                .isReadOnly(r.get(MEASURABLE_RATING.IS_READONLY))
+                .isPrimary(r.get(MEASURABLE_RATING.IS_PRIMARY))
+                .build();
     }
 
 

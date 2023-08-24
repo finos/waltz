@@ -108,15 +108,15 @@
                 <tbody>
                 <tr ng-repeat="item in $ctrl.replacingDecommissions">
                     <td>
-                        <waltz-entity-link entity-ref="item.entityReference">
+                        <waltz-entity-link entity-ref="item.measurableRating.entityReference">
                         </waltz-entity-link>
                     </td>
                     <td>
-                        <span ng-bind="item.plannedDecommissionDate | date:'yyyy-MM-dd'">
+                        <span ng-bind="item.decommission.plannedDecommissionDate | date:'yyyy-MM-dd'">
                         </span>
                     </td>
                     <td>
-                        <waltz-last-updated entity="item">
+                        <waltz-last-updated entity="item.decommission">
                         </waltz-last-updated>
                     </td>
                 </tr>

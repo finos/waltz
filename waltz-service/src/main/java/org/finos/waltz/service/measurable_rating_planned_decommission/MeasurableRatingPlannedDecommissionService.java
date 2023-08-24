@@ -19,6 +19,7 @@
 package org.finos.waltz.service.measurable_rating_planned_decommission;
 
 import org.finos.waltz.model.measurable_rating.MeasurableRating;
+import org.finos.waltz.model.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommissionInfo;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.measurable_rating.MeasurableRatingService;
 import org.finos.waltz.common.exception.UpdateFailedException;
@@ -70,7 +71,7 @@ public class MeasurableRatingPlannedDecommissionService {
     }
 
 
-    public Collection<MeasurableRatingPlannedDecommission> findForReplacingEntityRef(EntityReference ref) {
+    public Collection<MeasurableRatingPlannedDecommissionInfo> findForReplacingEntityRef(EntityReference ref) {
         return measurableRatingPlannedDecommissionDao.findByReplacingEntityRef(ref);
     }
 

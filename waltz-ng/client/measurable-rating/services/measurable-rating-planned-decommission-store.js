@@ -28,8 +28,8 @@ function store($http, baseApiUrl) {
         .get(`${baseUrl}/replacing-entity/${ref.kind}/${ref.id}`)
         .then(d => d.data);
 
-    const save = (ref, measurableId, dateChange) => $http
-        .post(`${baseUrl}/entity/${ref.kind}/${ref.id}/MEASURABLE/${measurableId}`, dateChange)
+    const save = (measurableRatingId, dateChange) => $http
+        .post(`${baseUrl}/measurable-rating/${measurableRatingId}`, dateChange)
         .then(d => d.data);
 
     const remove = (id) => $http
