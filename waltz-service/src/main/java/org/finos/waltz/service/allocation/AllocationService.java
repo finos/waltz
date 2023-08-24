@@ -164,7 +164,10 @@ public class AllocationService {
 
         List<EntityReference> refs = ListUtilities.map(
                 changes,
-                c -> mkRef(MEASURABLE, c.measurablePercentage().measurableRatingId()));
+                c -> {
+                    Long measurableId = measurableIdByRatingId.get(c.measurablePercentage().measurableRatingId());
+                    return mkRef(MEASURABLE, measurableId);
+                });
 
         Map<Long, Optional<String>> measurableIdToName = nameResolver.resolve(refs)
                 .stream()
@@ -178,7 +181,8 @@ public class AllocationService {
                     .flatMap(EntityReference::name)
                     .orElse("Unknown"));
 
-        String msgBody = changes.stream()
+        String msgBody = changes
+                .stream()
                 .map(c -> {
                     Long mId = measurableIdByRatingId.get(c.measurablePercentage().measurableRatingId());
                     Optional<String> measurableName = measurableIdToName.get(mId);
