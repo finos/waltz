@@ -300,7 +300,21 @@
                     columnName="measurable_id"/>
     </changeSet>
 
-<!--    uniqe index on alloc scheme and rating id -->
-<!--    uniq index on mrpd rating id-->
+    <changeSet id="20230824-6728-18"
+               author="woodjes">
+        <comment>6728: enforce unique measurable_rating_planned_decommission per rating</comment>
+        <addUniqueConstraint tableName="measurable_rating_planned_decommission"
+                             constraintName="idx_mrpd_mr_id_unique"
+                             columnNames="measurable_rating_id"/>
+    </changeSet>
+
+    <changeSet id="20230824-6728-19"
+               author="woodjes">
+        <comment>6728: enforce unique allocation per scheme and rating</comment>
+        <addUniqueConstraint tableName="allocation"
+                             constraintName="idx_alloc_scheme_mr_id_unique"
+                             columnNames="allocation_scheme_id, measurable_rating_id"/>
+    </changeSet>
+
 
 </databaseChangeLog>
