@@ -25,6 +25,7 @@ import org.finos.waltz.data.application.ApplicationDao;
 import org.finos.waltz.data.changelog.ChangeLogDao;
 import org.finos.waltz.data.changelog.ChangeLogSummariesDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowDao;
+import org.finos.waltz.data.measurable_rating.MeasurableRatingDao;
 import org.finos.waltz.data.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommissionDao;
 import org.finos.waltz.data.measurable_rating_replacement.MeasurableRatingReplacementDao;
 import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
@@ -34,6 +35,7 @@ import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.external_identifier.ExternalIdValue;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
+import org.finos.waltz.model.measurable_rating.MeasurableRating;
 import org.finos.waltz.model.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommission;
 import org.finos.waltz.model.measurable_rating_replacement.MeasurableRatingReplacement;
 import org.finos.waltz.model.physical_flow.PhysicalFlow;
@@ -70,6 +72,7 @@ public class ChangeLogService {
     private final PhysicalSpecificationDao physicalSpecificationDao;
     private final ApplicationDao applicationDao;
     private final MeasurableRatingReplacementDao measurableRatingReplacementdao;
+    private final MeasurableRatingDao measurableRatingDao;
     private final MeasurableRatingPlannedDecommissionDao measurableRatingPlannedDecommissionDao;
     private final EntityReferenceNameResolver nameResolver;
 
@@ -82,6 +85,7 @@ public class ChangeLogService {
                             LogicalFlowDao logicalFlowDao,
                             ApplicationDao applicationDao,
                             MeasurableRatingReplacementDao measurableRatingReplacementDao,
+                            MeasurableRatingDao measurableRatingdao,
                             MeasurableRatingPlannedDecommissionDao measurableRatingPlannedDecommissionDao,
                             EntityReferenceNameResolver nameResolver) {
         checkNotNull(changeLogDao, "changeLogDao must not be null");
@@ -89,6 +93,7 @@ public class ChangeLogService {
         checkNotNull(physicalFlowDao, "physicalFlowDao cannot be null");
         checkNotNull(physicalSpecificationDao, "physicalSpecificationDao cannot be null");
         checkNotNull(logicalFlowDao, "logicalFlowDao cannot be null");
+        checkNotNull(measurableRatingdao, "measurableRatingdao cannot be null");
         checkNotNull(measurableRatingReplacementDao, "measurableRatingReplacementDao cannot be null");
         checkNotNull(measurableRatingPlannedDecommissionDao, "measurableRatingPlannedDecommissionDao cannot be null");
         checkNotNull(nameResolver, "nameResolver cannot be null");
@@ -99,6 +104,7 @@ public class ChangeLogService {
         this.physicalSpecificationDao = physicalSpecificationDao;
         this.logicalFlowDao = logicalFlowDao;
         this.applicationDao = applicationDao;
+        this.measurableRatingDao = measurableRatingdao;
         this.measurableRatingReplacementdao = measurableRatingReplacementDao;
         this.measurableRatingPlannedDecommissionDao = measurableRatingPlannedDecommissionDao;
         this.nameResolver = nameResolver;
@@ -328,8 +334,9 @@ public class ChangeLogService {
     private Tuple2<String, Set<EntityReference>> preparePreambleAndEntitiesForChangeLogs(MeasurableRatingReplacement measurableRatingReplacement) {
 
         MeasurableRatingPlannedDecommission plannedDecommission = measurableRatingPlannedDecommissionDao.getById(measurableRatingReplacement.decommissionId());
-        String measurableName = resolveName(plannedDecommission.measurableId(), MEASURABLE);
-        String originalEntityName = resolveName(plannedDecommission.entityReference().id(), plannedDecommission.entityReference().kind());
+        MeasurableRating rating = measurableRatingDao.getById(plannedDecommission.measurableRatingId());
+        String measurableName = resolveName(rating.measurableId(), MEASURABLE);
+        String originalEntityName = resolveName(rating.entityReference().id(), rating.entityReference().kind());
         String newEntityName = resolveName(measurableRatingReplacement.entityReference().id(), measurableRatingReplacement.entityReference().kind());
 
         String messagePreamble = format(
@@ -338,28 +345,29 @@ public class ChangeLogService {
                 newEntityName,
                 measurableRatingReplacement.entityReference().id(),
                 measurableName,
-                plannedDecommission.measurableId(),
+                rating.measurableId(),
                 originalEntityName,
-                plannedDecommission.entityReference().id());
+                rating.entityReference().id());
 
         return tuple(
                 messagePreamble,
-                asSet(measurableRatingReplacement.entityReference(), plannedDecommission.entityReference()));
+                asSet(measurableRatingReplacement.entityReference(), rating.entityReference()));
 
     }
 
 
     private Tuple2<String, Set<EntityReference>> preparePreambleAndEntitiesForChangeLogs(MeasurableRatingPlannedDecommission measurableRatingPlannedDecommission) {
 
+        MeasurableRating rating = measurableRatingDao.getById(measurableRatingPlannedDecommission.measurableRatingId());
         Set<MeasurableRatingReplacement> replacements = measurableRatingReplacementdao.fetchByDecommissionId(measurableRatingPlannedDecommission.id());
-        String measurableName = resolveName(measurableRatingPlannedDecommission.measurableId(), MEASURABLE);
-        EntityReference entityReference = measurableRatingPlannedDecommission.entityReference();
+        String measurableName = resolveName(rating.measurableId(), MEASURABLE);
+        EntityReference entityReference = rating.entityReference();
         String entityName = resolveName(entityReference.id(), entityReference.kind());
 
         String messagePreamble = format(
                 "Measurable Rating: %s [%d] on: %s [%s]",
                 measurableName,
-                measurableRatingPlannedDecommission.measurableId(),
+                rating.measurableId(),
                 entityName,
                 getExternalId(entityReference)
                         .map(ExternalIdValue::value)

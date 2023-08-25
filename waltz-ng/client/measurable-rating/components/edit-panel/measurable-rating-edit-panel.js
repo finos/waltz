@@ -207,7 +207,7 @@ function controller($q,
             serviceBroker
                 .execute(
                     CORE_API.MeasurableRatingPlannedDecommissionStore.save,
-                    [vm.parentEntityRef, vm.selected.measurable.id, dateChange])
+                    [vm.selected.rating.id, dateChange])
                 .then(r => {
                     const decom = Object.assign(r.data, {isValid: true});
                     vm.selected = Object.assign({}, vm.selected, {decommission: decom});

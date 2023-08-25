@@ -100,6 +100,15 @@ public class MeasurableRatingService {
     }
 
 
+    public MeasurableRating getById(long id) {
+        return measurableRatingDao.getById(id);
+    }
+
+
+    public MeasurableRating getByDecommId(long decommId) {
+        return measurableRatingDao.getByDecommId(decommId);
+    }
+
     public List<MeasurableRating> findByMeasurableIdSelector(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         Select<Record1<Long>> selector = measurableIdSelectorFactory.apply(options);

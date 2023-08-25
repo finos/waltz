@@ -56,12 +56,13 @@ public class AllocationUtilities {
 
     }
 
-    public static ValidationResult validateAllocationChanges(Collection<Allocation> currentAllocations, Collection<MeasurablePercentageChange> changes) {
+    public static ValidationResult validateAllocationChanges(Collection<Allocation> currentAllocations,
+                                                             Collection<MeasurablePercentageChange> changes) {
 
         ValidationResult result = new ValidationResult();
 
-        Set<Long> currentMeasurableIds = map(currentAllocations, Allocation::measurableId);
-        Set<Long> changedMeasurableIds = map(changes, c -> c.measurablePercentage().measurableId());
+        Set<Long> currentMeasurableRatingIds = map(currentAllocations, Allocation::measurableRatingId);
+        Set<Long> changedMeasurableRatingIds = map(changes, c -> c.measurablePercentage().measurableRatingId());
 
         int changeTotal = changes
                 .stream()
@@ -70,7 +71,7 @@ public class AllocationUtilities {
 
         int residualTotal = currentAllocations
                 .stream()
-                .filter(a -> !changedMeasurableIds.contains(a.measurableId()))
+                .filter(a -> !changedMeasurableRatingIds.contains(a.measurableRatingId()))
                 .mapToInt(Allocation::percentage)
                 .sum();
 
@@ -83,13 +84,13 @@ public class AllocationUtilities {
         boolean operationsAreValid = changes
                 .stream()
                 .allMatch(c -> {
-                    long changeMeasurableId = c.measurablePercentage().measurableId();
+                    long changeMeasurableId = c.measurablePercentage().measurableRatingId();
                     switch (c.operation()) {
                         case UPDATE:
                         case REMOVE:
-                            return currentMeasurableIds.contains(changeMeasurableId);
+                            return currentMeasurableRatingIds.contains(changeMeasurableId);
                         case ADD:
-                            return !currentMeasurableIds.contains(changeMeasurableId);
+                            return !currentMeasurableRatingIds.contains(changeMeasurableId);
                         default:
                             return false;
                     }
@@ -118,7 +119,7 @@ public class AllocationUtilities {
         return ImmutableChangeLog.builder()
                 .message(message)
                 .parentReference(ref)
-                .childKind(EntityKind.ALLOCATION_SCHEME) // ideally would be 'ALLOCATION' but that does not have an 'id'
+                .childKind(EntityKind.ALLOCATION) // ideally would be 'ALLOCATION' but that does not have an 'id'
                 .operation(Operation.UPDATE)
                 .userId(userId)
                 .severity(Severity.INFORMATION)

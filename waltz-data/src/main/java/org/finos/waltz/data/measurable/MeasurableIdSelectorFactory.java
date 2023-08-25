@@ -244,10 +244,11 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
         checkTrue(options.scope() == HierarchyQueryScope.EXACT, "Can only calculate application based selectors with exact scopes");
 
         SelectConditionStep<Record1<Long>> measurablesViaReplacements = DSL
-                .select(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_ID)
-                .from(MEASURABLE_RATING_PLANNED_DECOMMISSION)
-                .innerJoin(MEASURABLE_RATING_REPLACEMENT)
+                .select(MEASURABLE_RATING.MEASURABLE_ID)
+                .from(MEASURABLE_RATING_REPLACEMENT)
+                .innerJoin(MEASURABLE_RATING_PLANNED_DECOMMISSION)
                 .on(MEASURABLE_RATING_PLANNED_DECOMMISSION.ID.eq(MEASURABLE_RATING_REPLACEMENT.DECOMMISSION_ID))
+                .innerJoin(MEASURABLE_RATING).on(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_RATING_ID.eq(MEASURABLE_RATING.ID))
                 .where(MEASURABLE_RATING_REPLACEMENT.ENTITY_ID.eq(options.entityReference().id())
                         .and(MEASURABLE_RATING_REPLACEMENT.ENTITY_KIND.eq(options.entityReference().kind().name())));
 
