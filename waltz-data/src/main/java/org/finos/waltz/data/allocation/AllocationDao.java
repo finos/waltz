@@ -28,10 +28,10 @@ import org.finos.waltz.model.allocation.ImmutableAllocation;
 import org.finos.waltz.model.allocation.MeasurablePercentageChange;
 import org.finos.waltz.schema.tables.records.AllocationRecord;
 import org.jooq.DSLContext;
+import org.jooq.DeleteConditionStep;
 import org.jooq.Record;
-import org.jooq.Record3;
 import org.jooq.RecordMapper;
-import org.jooq.SelectConditionStep;
+import org.jooq.UpdateConditionStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -41,8 +41,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.finos.waltz.common.MapUtilities.groupBy;
-import static org.finos.waltz.data.JooqUtilities.readRef;
 import static org.finos.waltz.schema.Tables.ALLOCATION;
+import static org.finos.waltz.schema.Tables.MEASURABLE_RATING;
 
 @Repository
 public class AllocationDao {
@@ -53,9 +53,9 @@ public class AllocationDao {
     public static final RecordMapper<Record, Allocation> TO_DOMAIN_MAPPER = record -> {
         AllocationRecord allocationRecord = record.into(ALLOCATION);
         return ImmutableAllocation.builder()
+                .id(allocationRecord.getId())
                 .schemeId(allocationRecord.getAllocationSchemeId())
-                .measurableId(allocationRecord.getMeasurableId())
-                .entityReference(readRef(allocationRecord, ALLOCATION.ENTITY_KIND, ALLOCATION.ENTITY_ID))
+                .measurableRatingId(allocationRecord.getMeasurableRatingId())
                 .percentage(allocationRecord.getAllocationPercentage())
                 .lastUpdatedAt(allocationRecord.getLastUpdatedAt().toLocalDateTime())
                 .lastUpdatedBy(allocationRecord.getLastUpdatedBy())
@@ -76,8 +76,9 @@ public class AllocationDao {
         return dsl
                 .select(ALLOCATION.fields())
                 .from(ALLOCATION)
-                .where(ALLOCATION.ENTITY_KIND.eq(ref.kind().name()))
-                .and(ALLOCATION.ENTITY_ID.eq(ref.id()))
+                .innerJoin(MEASURABLE_RATING).on(ALLOCATION.MEASURABLE_RATING_ID.eq(MEASURABLE_RATING.ID))
+                .where(MEASURABLE_RATING.ENTITY_KIND.eq(ref.kind().name()))
+                .and(MEASURABLE_RATING.ENTITY_ID.eq(ref.id()))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -87,9 +88,10 @@ public class AllocationDao {
         return dsl
                 .select(ALLOCATION.fields())
                 .from(ALLOCATION)
+                .innerJoin(MEASURABLE_RATING).on(ALLOCATION.MEASURABLE_RATING_ID.eq(MEASURABLE_RATING.ID))
                 .where(ALLOCATION.ALLOCATION_SCHEME_ID.eq(schemeId))
-                .and(ALLOCATION.ENTITY_KIND.eq(ref.kind().name()))
-                .and(ALLOCATION.ENTITY_ID.eq(ref.id()))
+                .and(MEASURABLE_RATING.ENTITY_KIND.eq(ref.kind().name()))
+                .and(MEASURABLE_RATING.ENTITY_ID.eq(ref.id()))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -98,24 +100,13 @@ public class AllocationDao {
         return dsl
                 .select(ALLOCATION.fields())
                 .from(ALLOCATION)
-                .where(ALLOCATION.MEASURABLE_ID.eq(measurableId))
+                .innerJoin(MEASURABLE_RATING).on(ALLOCATION.MEASURABLE_RATING_ID.eq(MEASURABLE_RATING.ID))
+                .where(MEASURABLE_RATING.MEASURABLE_ID.eq(measurableId))
                 .and(ALLOCATION.ALLOCATION_SCHEME_ID.eq(schemeId))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
-
-    private SelectConditionStep<Record3<Long, Long, String>> findAllocationsBySchemeId(long schemeId){
-        return dsl
-                .select(ALLOCATION.MEASURABLE_ID,
-                        ALLOCATION.ENTITY_ID,
-                        ALLOCATION.ENTITY_KIND)
-                .from(ALLOCATION)
-                .where(ALLOCATION.ALLOCATION_SCHEME_ID.eq(schemeId));
-    }
-
-
-    public Boolean updateAllocations(EntityReference ref,
-                                     long scheme,
+    public Boolean updateAllocations(long scheme,
                                      Collection<MeasurablePercentageChange> changes,
                                      String username) {
 
@@ -126,28 +117,33 @@ public class AllocationDao {
         dsl.transaction(tx -> {
             DSLContext txDsl = tx.dsl();
 
-            Collection<AllocationRecord> recordsToDelete = mkRecordsFromChanges(
-                    ref,
-                    scheme,
-                    changesByOp.get(Operation.REMOVE),
-                    username);
+            Collection<MeasurablePercentageChange> toRemove = changesByOp.get(Operation.REMOVE);
+            Collection<MeasurablePercentageChange> toUpdate = changesByOp.get(Operation.UPDATE);
+            Collection<MeasurablePercentageChange> toInsert = changesByOp.get(Operation.ADD);
 
-            Collection<AllocationRecord> recordsToUpdate = mkRecordsFromChanges(
-                    ref,
+            Collection<DeleteConditionStep<AllocationRecord>> recordsToDelete = mkRemovalsFromChanges(
+                    txDsl,
                     scheme,
-                    changesByOp.get(Operation.UPDATE),
+                    toRemove);
+
+            Collection<UpdateConditionStep<AllocationRecord>> recordsToUpdate = mkUpdatesFromChanges(
+                    txDsl,
+                    scheme,
+                    toUpdate,
                     username);
 
             Collection<AllocationRecord> recordsToInsert = mkRecordsFromChanges(
-                    ref,
+                    txDsl,
                     scheme,
-                    changesByOp.get(Operation.ADD),
+                    toInsert,
                     username);
 
-            txDsl.batchDelete(recordsToDelete)
+            txDsl.batch(recordsToDelete)
                     .execute();
-            txDsl.batchUpdate(recordsToUpdate)
+
+            txDsl.batch(recordsToUpdate)
                     .execute();
+
             txDsl.batchInsert(recordsToInsert)
                     .execute();
         });
@@ -158,27 +154,70 @@ public class AllocationDao {
 
     // -- HELPERS ----
 
-    private static Collection<AllocationRecord> mkRecordsFromChanges(EntityReference ref,
-                                                                                 long scheme,
-                                                                                 Collection<MeasurablePercentageChange> changes,
-                                                                                 String username) {
+    private static Collection<AllocationRecord> mkRecordsFromChanges(DSLContext tx,
+                                                                     long scheme,
+                                                                     Collection<MeasurablePercentageChange> changes,
+                                                                     String username) {
         return CollectionUtilities.map(
                 ListUtilities.ensureNotNull(changes),
-                c -> mkRecordFromChange(ref, scheme, c, username));
+                c -> mkRecordFromChange(tx, scheme, c, username));
+    }
+
+    private static Collection<DeleteConditionStep<AllocationRecord>> mkRemovalsFromChanges(DSLContext tx,
+                                                                                           long scheme,
+                                                                                           Collection<MeasurablePercentageChange> changes) {
+        return CollectionUtilities.map(
+                ListUtilities.ensureNotNull(changes),
+                c -> mkRemovalFromChange(tx, c.measurablePercentage().measurableRatingId(), scheme));
+    }
+
+    private static Collection<UpdateConditionStep<AllocationRecord>> mkUpdatesFromChanges(DSLContext tx,
+                                                                                          long scheme,
+                                                                                          Collection<MeasurablePercentageChange> changes,
+                                                                                          String username) {
+        return CollectionUtilities.map(
+                ListUtilities.ensureNotNull(changes),
+                c -> mkUpdateFromChange(tx, scheme, c, username));
     }
 
 
-    private static AllocationRecord mkRecordFromChange(EntityReference ref, long scheme, MeasurablePercentageChange c, String username) {
-        AllocationRecord record = new AllocationRecord();
+    private static AllocationRecord mkRecordFromChange(DSLContext tx,
+                                                       long scheme,
+                                                       MeasurablePercentageChange c,
+                                                       String username) {
+        AllocationRecord record = tx.newRecord(ALLOCATION);
         record.setAllocationSchemeId(scheme);
-        record.setEntityId(ref.id());
-        record.setEntityKind(ref.kind().name());
-        record.setMeasurableId(c.measurablePercentage().measurableId());
+        record.setMeasurableRatingId(c.measurablePercentage().measurableRatingId());
         record.setAllocationPercentage(c.measurablePercentage().percentage());
         record.setLastUpdatedBy(username);
         record.setLastUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
         record.setProvenance("waltz");
         return record;
+    }
+
+
+    private static DeleteConditionStep<AllocationRecord> mkRemovalFromChange(DSLContext tx,
+                                                                             long measurableRatingId,
+                                                                             long scheme) {
+        return tx
+                .deleteFrom(ALLOCATION)
+                .where(ALLOCATION.ALLOCATION_SCHEME_ID.eq(scheme)
+                        .and(ALLOCATION.MEASURABLE_RATING_ID.eq(measurableRatingId)));
+    }
+
+
+    private static UpdateConditionStep<AllocationRecord> mkUpdateFromChange(DSLContext tx,
+                                                                            long scheme,
+                                                                            MeasurablePercentageChange c,
+                                                                            String username) {
+        return tx
+                .update(ALLOCATION)
+                .set(ALLOCATION.ALLOCATION_PERCENTAGE, c.measurablePercentage().percentage())
+                .set(ALLOCATION.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
+                .set(ALLOCATION.LAST_UPDATED_BY, username)
+                .where(ALLOCATION.ALLOCATION_SCHEME_ID.eq(scheme)
+                        .and(ALLOCATION.MEASURABLE_RATING_ID.eq(c.measurablePercentage().measurableRatingId())));
+
     }
 
 }

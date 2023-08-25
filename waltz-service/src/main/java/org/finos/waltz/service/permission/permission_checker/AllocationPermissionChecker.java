@@ -5,6 +5,7 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.EntityReferenceUtilities;
 import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.measurable_rating.MeasurableRating;
 import org.finos.waltz.model.permission_group.Permission;
 import org.finos.waltz.service.involvement.InvolvementService;
 import org.finos.waltz.service.permission.PermissionGroupService;

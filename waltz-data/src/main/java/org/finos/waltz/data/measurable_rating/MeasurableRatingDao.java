@@ -98,12 +98,13 @@ public class MeasurableRatingDao {
     private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
                     MEASURABLE_RATING.ENTITY_ID,
                     MEASURABLE_RATING.ENTITY_KIND,
-                    newArrayList(EntityKind.values()))
+                    newArrayList(EntityKind.APPLICATION))
             .as("entity_name");
 
     private static final Field<String> ENTITY_LIFECYCLE_FIELD = InlineSelectFieldFactory.mkEntityLifecycleField(
-            MEASURABLE_RATING.ENTITY_ID,
-            MEASURABLE_RATING.ENTITY_KIND)
+                    MEASURABLE_RATING.ENTITY_ID,
+                    MEASURABLE_RATING.ENTITY_KIND,
+                    newArrayList(EntityKind.APPLICATION))
             .as("entity_lifecycle_status");
 
 
@@ -118,6 +119,7 @@ public class MeasurableRatingDao {
                 .build();
 
         return ImmutableMeasurableRating.builder()
+                .id(r.getId())
                 .entityReference(ref)
                 .description(r.getDescription())
                 .provenance(r.getProvenance())
@@ -239,6 +241,23 @@ public class MeasurableRatingDao {
                 .where(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                 .and(MEASURABLE_RATING.ENTITY_ID.eq(ref.id()))
                 .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public MeasurableRating getById(long id) {
+        return mkBaseQuery()
+                .where(MEASURABLE_RATING.ID.eq(id))
+                .fetchOne(TO_DOMAIN_MAPPER);
+    }
+
+
+
+    public MeasurableRating getByDecommId(long decommId) {
+        return mkBaseQuery()
+                .innerJoin(MEASURABLE_RATING_PLANNED_DECOMMISSION)
+                .on(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_RATING_ID.eq(MEASURABLE_RATING.ID))
+                .where(MEASURABLE_RATING_PLANNED_DECOMMISSION.ID.eq(decommId))
+                .fetchOne(TO_DOMAIN_MAPPER);
     }
 
 
@@ -523,15 +542,28 @@ public class MeasurableRatingDao {
 
             // DECOMMS
 
-            SelectOrderByStep<Record2<Long, String>> allowableDecomns = selectDecommsThatCanBeModified(measurableId, targetId);
+            // all ratings that can be migrated, decomms automatically updated.
+            // Need to find the ratings that cannot be migrated, then see if there is a target decom to match
+
+            org.finos.waltz.schema.tables.MeasurableRating srcMr = MEASURABLE_RATING.as("srcMr");
+            org.finos.waltz.schema.tables.MeasurableRating trgMr = MEASURABLE_RATING.as("trgMr");
+
+            org.finos.waltz.schema.tables.MeasurableRatingPlannedDecommission srcDecom = MEASURABLE_RATING_PLANNED_DECOMMISSION.as("srcDecom");
+            org.finos.waltz.schema.tables.MeasurableRatingPlannedDecommission trgDecom = MEASURABLE_RATING_PLANNED_DECOMMISSION.as("trgDecom");
+
+            SelectConditionStep<Record2<Long, Long>> decomsToUpdate = DSL
+                    .select(srcDecom.ID, trgMr.ID)
+                    .from(srcDecom)
+                    .innerJoin(srcMr).on(srcDecom.MEASURABLE_RATING_ID.eq(srcMr.ID).and(srcMr.MEASURABLE_ID.eq(measurableId)))
+                    .innerJoin(trgMr).on(srcMr.ENTITY_KIND.eq(trgMr.ENTITY_KIND).and(srcMr.ENTITY_ID.eq(trgMr.ENTITY_ID).and(trgMr.MEASURABLE_ID.eq(targetId))))
+                    .leftJoin(trgDecom).on(trgMr.ID.eq(trgDecom.MEASURABLE_RATING_ID))
+                    .where(trgDecom.ID.isNull());
 
             int migratedDecoms = tx
                     .update(MEASURABLE_RATING_PLANNED_DECOMMISSION)
-                    .set(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_ID, targetId)
-                    .from(allowableDecomns)
-                    .where(MEASURABLE_RATING_PLANNED_DECOMMISSION.ENTITY_ID.eq(allowableDecomns.field(Tables.MEASURABLE_RATING.ENTITY_ID))
-                            .and(MEASURABLE_RATING_PLANNED_DECOMMISSION.ENTITY_KIND.eq(allowableDecomns.field(Tables.MEASURABLE_RATING.ENTITY_KIND))
-                                    .and(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_ID.eq(measurableId))))
+                    .set(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_RATING_ID, decomsToUpdate.field(trgMr.ID))
+                    .from(decomsToUpdate)
+                    .where(MEASURABLE_RATING_PLANNED_DECOMMISSION.ID.eq(decomsToUpdate.field(srcDecom.ID)))
                     .execute();
 
             if (migratedDecoms > 0) {
@@ -558,26 +590,43 @@ public class MeasurableRatingDao {
             // ALLOCATIONS
 
 
-            SelectOrderByStep<Record2<Long, String>> updateableAllocs = selectAllocsThatCanBeModified(measurableId, targetId);
-            SelectHavingStep<Record4<Long, Long, String, Integer>> mergableAllocs = selectAllocsToBeUpdated(measurableId, targetId);
+            // Either automatically moved if measurable rating was moved,
+            // Migrated if existing measurable but no allocation
+            // Aggregated is existing allocation on target measurable
 
-            int migratedAllocs = tx
-                    .update(ALLOCATION)
-                    .set(ALLOCATION.MEASURABLE_ID, targetId)
-                    .from(updateableAllocs)
-                    .where(ALLOCATION.ENTITY_ID.eq(updateableAllocs.field(ALLOCATION.ENTITY_ID))
-                            .and(ALLOCATION.ENTITY_KIND.eq(updateableAllocs.field(ALLOCATION.ENTITY_KIND))
-                                    .and(ALLOCATION.MEASURABLE_ID.eq(measurableId))))
-                    .execute();
+            org.finos.waltz.schema.tables.Allocation srcAlloc = ALLOCATION.as("srcAlloc");
+            org.finos.waltz.schema.tables.Allocation trgAlloc = ALLOCATION.as("trgAlloc");
+
+            Field<Integer> totalAlloc = srcAlloc.ALLOCATION_PERCENTAGE.add(trgAlloc.ALLOCATION_PERCENTAGE);
+
+            SelectConditionStep<Record2<Long, Integer>> allocsToUpdate = DSL
+                    .select(trgAlloc.ID, totalAlloc)
+                    .from(srcAlloc)
+                    .innerJoin(srcMr).on(srcAlloc.MEASURABLE_RATING_ID.eq(srcMr.ID).and(srcMr.MEASURABLE_ID.eq(measurableId)))
+                    .innerJoin(trgMr).on(srcMr.ENTITY_KIND.eq(trgMr.ENTITY_KIND).and(srcMr.ENTITY_ID.eq(trgMr.ENTITY_ID).and(trgMr.MEASURABLE_ID.eq(targetId))))
+                    .leftJoin(trgAlloc).on(trgMr.ID.eq(trgAlloc.MEASURABLE_RATING_ID))
+                    .where(trgAlloc.ID.isNotNull());
+
+            SelectConditionStep<Record2<Long, Integer>> allocsToMigrate = DSL
+                    .select(trgAlloc.ID, srcAlloc.ALLOCATION_PERCENTAGE)
+                    .from(srcAlloc)
+                    .innerJoin(srcMr).on(srcAlloc.MEASURABLE_RATING_ID.eq(srcMr.ID).and(srcMr.MEASURABLE_ID.eq(measurableId)))
+                    .innerJoin(trgMr).on(srcMr.ENTITY_KIND.eq(trgMr.ENTITY_KIND).and(srcMr.ENTITY_ID.eq(trgMr.ENTITY_ID).and(trgMr.MEASURABLE_ID.eq(targetId))))
+                    .leftJoin(trgAlloc).on(trgMr.ID.eq(trgAlloc.MEASURABLE_RATING_ID))
+                    .where(trgAlloc.ID.isNull());
 
             int mergedAllocs = tx
                     .update(ALLOCATION)
-                    .set(ALLOCATION.ALLOCATION_PERCENTAGE, mergableAllocs.field("allocation_percentage", Integer.class))
-                    .from(mergableAllocs)
-                    .where(ALLOCATION.ALLOCATION_SCHEME_ID.eq(mergableAllocs.field(ALLOCATION.ALLOCATION_SCHEME_ID))
-                            .and(ALLOCATION.ENTITY_ID.eq(mergableAllocs.field(ALLOCATION.ENTITY_ID))
-                                    .and(ALLOCATION.ENTITY_KIND.eq(mergableAllocs.field(ALLOCATION.ENTITY_KIND))
-                                            .and(ALLOCATION.MEASURABLE_ID.eq(targetId)))))
+                    .set(ALLOCATION.ALLOCATION_PERCENTAGE, totalAlloc)
+                    .from(allocsToUpdate)
+                    .where(ALLOCATION.ID.eq(allocsToUpdate.field(ALLOCATION.ID)))
+                    .execute();
+
+            int migratedAllocs = tx
+                    .update(ALLOCATION)
+                    .set(ALLOCATION.ALLOCATION_PERCENTAGE, allocsToMigrate.field(srcAlloc.ALLOCATION_PERCENTAGE))
+                    .from(allocsToMigrate)
+                    .where(ALLOCATION.ID.eq(allocsToMigrate.field(ALLOCATION.ID)))
                     .execute();
 
             if (migratedAllocs > 0) {
@@ -693,70 +742,12 @@ public class MeasurableRatingDao {
         return dsl.fetchCount(sharedDecomms);
     }
 
-
-    private SelectOrderByStep<Record2<Long, String>> selectDecommsThatCanBeModified(Long measurableId, Long targetId) {
-
-        SelectConditionStep<Record2<Long, String>> targets = mkEntitySelectForDecomm(targetId);
-        SelectConditionStep<Record2<Long, String>> migrations = mkEntitySelectForDecomm(measurableId);
-
-        return migrations.except(targets);
-    }
-
     private SelectConditionStep<Record2<Long, String>> mkEntitySelectForDecomm(Long measurableId) {
         return DSL
-                .select(MEASURABLE_RATING_PLANNED_DECOMMISSION.ENTITY_ID, MEASURABLE_RATING_PLANNED_DECOMMISSION.ENTITY_KIND)
+                .select(MEASURABLE_RATING.ENTITY_ID, MEASURABLE_RATING.ENTITY_KIND)
                 .from(MEASURABLE_RATING_PLANNED_DECOMMISSION)
-                .where(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_ID.eq(measurableId));
-    }
-
-
-    private SelectOrderByStep<Record2<Long, String>> selectAllocsThatCanBeModified(Long measurableId, Long targetId) {
-
-        SelectConditionStep<Record2<Long, String>> targets = DSL
-                .select(ALLOCATION.ENTITY_ID, ALLOCATION.ENTITY_KIND)
-                .from(ALLOCATION)
-                .where(ALLOCATION.MEASURABLE_ID.eq(targetId));
-
-        SelectConditionStep<Record2<Long, String>> migrations = DSL
-                .select(ALLOCATION.ENTITY_ID, ALLOCATION.ENTITY_KIND)
-                .from(ALLOCATION)
-                .where(ALLOCATION.MEASURABLE_ID.eq(measurableId));
-
-        return migrations.except(targets);
-    }
-
-    private SelectOrderByStep<Record3<Long, Long, String>> selectAllocsToBeSummed(Long measurableId, Long targetId) {
-
-        SelectConditionStep<Record3<Long, Long, String>> targets = DSL
-                .select(ALLOCATION.ALLOCATION_SCHEME_ID, ALLOCATION.ENTITY_ID, ALLOCATION.ENTITY_KIND)
-                .from(ALLOCATION)
-                .where(ALLOCATION.MEASURABLE_ID.eq(targetId));
-
-        SelectConditionStep<Record3<Long, Long, String>> migrations = DSL
-                .select(ALLOCATION.ALLOCATION_SCHEME_ID, ALLOCATION.ENTITY_ID, ALLOCATION.ENTITY_KIND)
-                .from(ALLOCATION)
-                .where(ALLOCATION.MEASURABLE_ID.eq(measurableId));
-
-        return migrations.intersect(targets);
-    }
-
-
-    private SelectHavingStep<Record4<Long, Long, String, Integer>> selectAllocsToBeUpdated(Long measurableId, Long targetId) {
-
-        SelectOrderByStep<Record3<Long, Long, String>> valuesToBeSummed = selectAllocsToBeSummed(measurableId, targetId);
-
-        return DSL
-                .select(ALLOCATION.ALLOCATION_SCHEME_ID,
-                        ALLOCATION.ENTITY_ID,
-                        ALLOCATION.ENTITY_KIND,
-                        DSL.cast(DSL.sum(ALLOCATION.ALLOCATION_PERCENTAGE), Integer.class).as("allocation_percentage"))
-                .from(ALLOCATION)
-                .innerJoin(valuesToBeSummed)
-                .on(ALLOCATION.ALLOCATION_SCHEME_ID.eq(valuesToBeSummed.field(ALLOCATION.ALLOCATION_SCHEME_ID))
-                        .and(ALLOCATION.ENTITY_KIND.eq(valuesToBeSummed.field(ALLOCATION.ENTITY_KIND))
-                                .and(ALLOCATION.ENTITY_ID.eq(valuesToBeSummed.field(ALLOCATION.ENTITY_ID)))))
-                .where(ALLOCATION.MEASURABLE_ID.in(targetId, measurableId))
-                .groupBy(ALLOCATION.ALLOCATION_SCHEME_ID, ALLOCATION.ENTITY_ID, ALLOCATION.ENTITY_KIND);
+                .innerJoin(MEASURABLE_RATING).on(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_RATING_ID.eq(MEASURABLE_RATING.ID))
+                .where(MEASURABLE_RATING.MEASURABLE_ID.eq(measurableId));
     }
 
 

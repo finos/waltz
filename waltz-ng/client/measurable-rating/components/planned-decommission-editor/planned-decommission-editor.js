@@ -19,6 +19,7 @@
 import template from "./planned-decommission-editor.html";
 import {initialiseData, invokeFunction} from "../../../common";
 import {alignDateToUTC} from "../../../common/date-utils";
+import _ from "lodash";
 
 const modes= {
     VIEW: "VIEW",
@@ -30,6 +31,7 @@ const modes= {
 
 
 const bindings = {
+    measurableRating: "<?",
     plannedDecommission: "<?",
     replacementApps: "<?",
     onSaveDecommissionDate: "<",
@@ -75,7 +77,7 @@ function controller() {
     };
 
     vm.selectionFilter = (candidate) => {
-        const isSelf = candidate.id === vm.plannedDecommission.entityReference.id;
+        const isSelf = candidate.id === vm.measurableRating.entityReference.id;
         if (isSelf) {
             return false;
         } else {

@@ -180,11 +180,9 @@ public class AllocationsExtractor extends DirectQueryBasedDataExtractor {
                 .innerJoin(MEASURABLE_CATEGORY).on(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(MEASURABLE_CATEGORY.ID))
                 .innerJoin(RATING_SCHEME_ITEM).on(MEASURABLE_CATEGORY.RATING_SCHEME_ID.eq(RATING_SCHEME_ITEM.SCHEME_ID))
                 .leftJoin(ALLOCATION_SCHEME).on(ALLOCATION_SCHEME.MEASURABLE_CATEGORY_ID.eq(MEASURABLE_CATEGORY.ID))
-                .leftJoin(ALLOCATION).on(
-                        ALLOCATION.ALLOCATION_SCHEME_ID.eq(ALLOCATION_SCHEME.ID)
-                                .and(ALLOCATION.MEASURABLE_ID.eq(MEASURABLE_RATING.MEASURABLE_ID))
-                                .and(ALLOCATION.ENTITY_ID.eq(MEASURABLE_RATING.ENTITY_ID))
-                                .and(ALLOCATION.ENTITY_KIND.eq(MEASURABLE_RATING.ENTITY_KIND)))
+                .leftJoin(ALLOCATION)
+                .on(ALLOCATION.ALLOCATION_SCHEME_ID.eq(ALLOCATION_SCHEME.ID)
+                        .and(ALLOCATION.MEASURABLE_RATING_ID.eq(MEASURABLE_RATING.ID)))
                 .where(condition);
     }
 }
