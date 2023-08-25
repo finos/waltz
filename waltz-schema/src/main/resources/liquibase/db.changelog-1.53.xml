@@ -335,4 +335,25 @@
     </changeSet>
 
 
+    <!-- CTCTOWALTZ-2845 - Add indexes to legal tables -->
+    <changeSet id="20230825-2845-1"
+               author="salekam">
+        <comment>2845: legal entity index on external id</comment>
+        <createIndex indexName="idx_legal_entity_external_id"
+                     tableName="legal_entity"
+                     unique="true">
+            <column name="external_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20230825-2845-2"
+               author="salekam">
+        <comment>2845: legal entity relationship index on (legal_entity_id, target_id, target_kind, relationship_kind_id)</comment>
+        <createIndex indexName="idx_ler_kind_id_target"
+                     tableName="legal_entity_relationship"
+                     unique="true">
+            <column name="legal_entity_id, target_id, target_kind, relationship_kind_id"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>
