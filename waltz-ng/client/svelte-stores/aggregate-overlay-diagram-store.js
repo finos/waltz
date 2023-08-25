@@ -122,12 +122,12 @@ export function mkOverlayDiagramStore() {
                 {force});
     };
 
-    const create = (createCommand) => {
+    const save = (saveCommand) => {
         return remote
             .execute(
                 "POST",
-                "api/aggregate-overlay-diagram/create",
-                createCommand);
+                "api/aggregate-overlay-diagram/save",
+                saveCommand);
     };
 
     return {
@@ -144,7 +144,7 @@ export function mkOverlayDiagramStore() {
         findComplexitiesForDiagram,
         findPresetsForDiagram,
         createPreset,
-        create
+        save
     };
 }
 

@@ -22,7 +22,7 @@ import org.finos.waltz.model.ReleaseLifecycleStatusChangeCommand;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramInfo;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramPreset;
-import org.finos.waltz.model.aggregate_overlay_diagram.OverlayDiagramCreateCommand;
+import org.finos.waltz.model.aggregate_overlay_diagram.OverlayDiagramSaveCommand;
 import org.finos.waltz.model.aggregate_overlay_diagram.OverlayDiagramKind;
 import org.finos.waltz.model.aggregate_overlay_diagram.OverlayDiagramPresetCreateCommand;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.AggregatedEntitiesWidgetData;
@@ -39,7 +39,9 @@ import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AppComplexityWidgetParameters;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AppCostWidgetParameters;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AssessmentWidgetParameters;
+import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.aggregate_overlay_diagram.AggregateOverlayDiagramService;
+import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.WebUtilities;
@@ -57,6 +59,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Request;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.web.WebUtilities.getId;
@@ -75,13 +78,17 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
     private static final String BASE_URL = WebUtilities.mkPath("api", "aggregate-overlay-diagram");
 
     private final AggregateOverlayDiagramService aggregateOverlayDiagramService;
+    private final UserRoleService userRoleService;
 
 
     @Autowired
-    public AggregateOverlayDiagramEndpoint(AggregateOverlayDiagramService aggregateOverlayDiagramService) {
+    public AggregateOverlayDiagramEndpoint(AggregateOverlayDiagramService aggregateOverlayDiagramService,
+                                           UserRoleService userRoleService) {
         checkNotNull(aggregateOverlayDiagramService, "aggregateOverlayDiagramService must not be null");
+        checkNotNull(userRoleService, "userRoleService must not be null");
 
         this.aggregateOverlayDiagramService = aggregateOverlayDiagramService;
+        this.userRoleService = userRoleService;
     }
 
 
@@ -102,7 +109,7 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
         String getApplicationChangeWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "app-change-widget");
         String findPresetsForDiagramPath = mkPath(BASE_URL, "diagram-id", ":id", "presets");
         String createPresetPath = mkPath(BASE_URL, "create-preset");
-        String createPath = mkPath(BASE_URL, "create");
+        String savePath = mkPath(BASE_URL, "save");
         String updateStatusPath = mkPath(BASE_URL, "id", ":id");
 
         DatumRoute<AggregateOverlayDiagramInfo> getByIdRoute = (request, response) -> {
@@ -237,15 +244,19 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
             return aggregateOverlayDiagramService.createPreset(readBody(request, OverlayDiagramPresetCreateCommand.class), getUsername(request));
         };
 
-        DatumRoute<Long> createRoute = (request, response) -> {
-            return aggregateOverlayDiagramService.create(readBody(request, OverlayDiagramCreateCommand.class), getUsername(request));
+        DatumRoute<Long> saveRoute = (request, response) -> {
+            ensureUserHasEditRights(request);
+            return aggregateOverlayDiagramService.save(readBody(request, OverlayDiagramSaveCommand.class), getUsername(request));
         };
 
-        DatumRoute<Boolean> updateStatusRoute = (request, response) -> aggregateOverlayDiagramService
+        DatumRoute<Boolean> updateStatusRoute = (request, response) -> {
+            ensureUserHasEditRights(request);
+            return aggregateOverlayDiagramService
                     .updateStatus(
                             getId(request),
                             readBody(request, ReleaseLifecycleStatusChangeCommand.class),
                             getUsername(request));
+        };
 
         getForDatum(getByIdPath, getByIdRoute);
         getForList(findAllPath, findAllRoute);
@@ -262,8 +273,12 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
         postForDatum(getComplexityWidgetDataPath, getComplexityWidgetDataRoute);
         postForDatum(getApplicationChangeWidgetDataPath, getApplicationChangeWidgetDataRoute);
         postForDatum(createPresetPath, createPresetRoute);
-        postForDatum(createPath, createRoute);
+        postForDatum(savePath, saveRoute);
         postForDatum(updateStatusPath, updateStatusRoute);
+    }
+
+    private void ensureUserHasEditRights(Request request) {
+        WebUtilities.requireRole(userRoleService, request, SystemRole.ADMIN);
     }
 
 }
