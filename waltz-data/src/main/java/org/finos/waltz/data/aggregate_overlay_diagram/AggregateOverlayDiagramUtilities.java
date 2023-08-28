@@ -1,7 +1,6 @@
 
 package org.finos.waltz.data.aggregate_overlay_diagram;
 
-import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.ReleaseLifecycleStatus;
@@ -43,20 +42,12 @@ import static java.util.stream.Collectors.mapping;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
-import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.SetUtilities.fromCollection;
 import static org.finos.waltz.common.SetUtilities.union;
 import static org.finos.waltz.data.JooqUtilities.readRef;
 import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.finos.waltz.schema.Tables.AGGREGATE_OVERLAY_DIAGRAM;
-import static org.finos.waltz.schema.Tables.AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA;
-import static org.finos.waltz.schema.Tables.APPLICATION;
-import static org.finos.waltz.schema.Tables.DATA_TYPE_USAGE;
-import static org.finos.waltz.schema.Tables.ENTITY_HIERARCHY;
-import static org.finos.waltz.schema.Tables.MEASURABLE_RATING;
-import static org.finos.waltz.schema.Tables.MEASURABLE_RATING_PLANNED_DECOMMISSION;
-import static org.finos.waltz.schema.Tables.MEASURABLE_RATING_REPLACEMENT;
+import static org.finos.waltz.schema.Tables.*;
 import static org.finos.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
@@ -67,12 +58,6 @@ public class AggregateOverlayDiagramUtilities {
     private static final MeasurableRatingPlannedDecommission mrpd = MEASURABLE_RATING_PLANNED_DECOMMISSION;
     private static final MeasurableRatingReplacement mrp = MEASURABLE_RATING_REPLACEMENT;
 
-
-    private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
-                    mrpd.ENTITY_ID,
-                    mrpd.ENTITY_KIND,
-                    newArrayList(EntityKind.APPLICATION, EntityKind.CHANGE_INITIATIVE))
-            .as("entity_name");
 
     protected static final RecordMapper<? super Record, ? extends AggregateOverlayDiagram> TO_DOMAIN_MAPPER = r -> {
         AggregateOverlayDiagramRecord record = r.into(AGGREGATE_OVERLAY_DIAGRAM);
