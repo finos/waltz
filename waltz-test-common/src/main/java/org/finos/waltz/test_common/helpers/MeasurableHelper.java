@@ -109,18 +109,25 @@ public class MeasurableHelper {
         ratingRecord.setLastUpdatedBy("test");
         ratingRecord.setProvenance("test");
 
+        ratingRecord.store();
+
+        // I know this is daft, however it doesn't work if we just return ratingRecord.getId() - instead it returns lastUpdatedAt in millis ?!
+
         return dsl
-                .insertInto(MEASURABLE_RATING)
-                .set(ratingRecord)
-                .onDuplicateKeyIgnore()
-                .returning(MEASURABLE_RATING.ID)
-                .fetchOne()
-                .getId();
+           .select(MEASURABLE_RATING.ID)
+           .from(MEASURABLE_RATING)
+           .where(MEASURABLE_RATING.ENTITY_ID.eq(ref.id())
+                .and(MEASURABLE_RATING.ENTITY_KIND.eq(ref.kind().name()))
+                .and(MEASURABLE_RATING.MEASURABLE_ID.eq(measurableId)))
+           .fetchOne()
+           .get(MEASURABLE_RATING.ID);
+
     }
 
 
     public long createDecomm(long ratingId) {
 
+        System.out.println("Creating decom for rating id: " + ratingId);
         MeasurableRatingPlannedDecommissionRecord decommissionRecord = dsl.newRecord(MEASURABLE_RATING_PLANNED_DECOMMISSION);
         decommissionRecord.setMeasurableRatingId(ratingId);
         decommissionRecord.setPlannedDecommissionDate(toSqlDate(nowUtcTimestamp()));
