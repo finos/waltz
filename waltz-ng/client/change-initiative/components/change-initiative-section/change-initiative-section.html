@@ -40,6 +40,19 @@
     </waltz-source-data-overlay>
 
     <div ng-if="$ctrl.changeInitiatives.length > 0">
+
+        <details>
+            <summary>Filters</summary>
+            <div>
+                <a ng-click="$ctrl.onToggleDisplayRetiredCis()"
+                   class="clickable no-text-select">
+                    <span ng-bind="$ctrl.displayRetiredCis ? 'Hide' : 'Show'"></span>
+                    phase:
+                    <span ng-bind="'RETIRED' | toDisplayName:'changeInitiativeLifecyclePhase'"></span>
+                </a>
+            </div>
+        </details>
+
         <div class="row" ng-if="$ctrl.gridOptions.data.length > 0">
             <div class="col-sm-8">
                 <waltz-grid-with-search column-defs="$ctrl.gridOptions.columnDefs"
@@ -68,15 +81,6 @@
                     </message>
                 </waltz-no-data>
             </div>
-        </div>
-        <br>
-        <div>
-            <a ng-click="$ctrl.onToggleDisplayRetiredCis()"
-               class="clickable no-text-select">
-                <span ng-bind="$ctrl.displayRetiredCis ? 'Hide' : 'Show'"></span>
-                phase:
-                <span ng-bind="'RETIRED' | toDisplayName:'changeInitiativeLifecyclePhase'"></span>
-            </a>
         </div>
     </div>
     <waltz-no-data ng-if="$ctrl.changeInitiatives.length == 0">
