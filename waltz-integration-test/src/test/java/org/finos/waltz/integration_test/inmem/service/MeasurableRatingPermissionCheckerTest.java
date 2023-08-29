@@ -142,16 +142,12 @@ public class MeasurableRatingPermissionCheckerTest extends BaseInMemoryIntegrati
         long m1 = measurableHelper.createMeasurable("m1", catId);
         long m2 = measurableHelper.createMeasurable("m2", catId);
 
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> measurableRatingPermissionChecker.findMeasurableRatingDecommPermissions(null, m1, u1),
-                "entity reference cannot be null");
+        long mrId1 = measurableHelper.createRating(appA, m1);
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> measurableRatingPermissionChecker.findMeasurableRatingDecommPermissions(appA, m1, null),
+                () -> measurableRatingPermissionChecker.findMeasurableRatingDecommPermissions(mrId1, null),
                 "username cannot be null");
-
 
         long privKind = involvementHelper.mkInvolvementKind(mkName(stem, "privileged"));
         InvolvementGroupRecord ig = permissionHelper.setupInvolvementGroup(privKind, stem);
@@ -159,7 +155,7 @@ public class MeasurableRatingPermissionCheckerTest extends BaseInMemoryIntegrati
         PermissionGroupRecord pg = permissionHelper.createGroup(stem);
         permissionHelper.setupPermissionGroupEntry(appA, pg.getId());
 
-        Set<Operation> noPermissionsConfigured = measurableRatingPermissionChecker.findMeasurableRatingDecommPermissions(appA, m1, u1);
+        Set<Operation> noPermissionsConfigured = measurableRatingPermissionChecker.findMeasurableRatingDecommPermissions(mrId1, u1);
         assertEquals(emptySet(), noPermissionsConfigured, "If no permission group involvement returns no permissions"); // created via changelog
 
         involvementHelper.createInvolvement(u1Id, privKind, appA);
@@ -171,7 +167,7 @@ public class MeasurableRatingPermissionCheckerTest extends BaseInMemoryIntegrati
                 Operation.ADD,
                 mkRef(EntityKind.MEASURABLE_CATEGORY, catId));
 
-        Set<Operation> hasOneOfEditablePermissions = measurableRatingPermissionChecker.findMeasurableRatingDecommPermissions(appA, m1, u1);
+        Set<Operation> hasOneOfEditablePermissions = measurableRatingPermissionChecker.findMeasurableRatingDecommPermissions(mrId1, u1);
         assertEquals(asSet(Operation.ADD), hasOneOfEditablePermissions, "If has given permission then returns operations for which have the required involvement");
 
         long unprivKind = involvementHelper.mkInvolvementKind(mkName(stem, "unprivileged"));
@@ -184,12 +180,13 @@ public class MeasurableRatingPermissionCheckerTest extends BaseInMemoryIntegrati
                 Operation.REMOVE,
                 mkRef(EntityKind.MEASURABLE_CATEGORY, catId));
 
-        Set<Operation> noPermsWhereNoInvKind = measurableRatingPermissionChecker.findMeasurableRatingDecommPermissions(appA, m1, u1);
+        Set<Operation> noPermsWhereNoInvKind = measurableRatingPermissionChecker.findMeasurableRatingDecommPermissions(mrId1, u1);
         assertEquals(asSet(Operation.ADD), noPermsWhereNoInvKind, "Doesn't return perms for operations where user lacks the required inv kind");
 
         EntityReference appB = appHelper.createNewApp(mkName(stem, "appB"), ouIds.b);
+        long mrId2 = measurableHelper.createRating(appB, m2);
 
-        Set<Operation> noPermissionsOnAppsNotRelatedTo = measurableRatingPermissionChecker.findMeasurableRatingDecommPermissions(appB, m2, u1);
+        Set<Operation> noPermissionsOnAppsNotRelatedTo = measurableRatingPermissionChecker.findMeasurableRatingDecommPermissions(mrId2, u1);
         assertEquals(
                 emptySet(),
                 noPermissionsOnAppsNotRelatedTo,
@@ -197,13 +194,13 @@ public class MeasurableRatingPermissionCheckerTest extends BaseInMemoryIntegrati
 
         userHelper.createUserWithRoles(u1, adminRoleName);
 
-        Set<Operation> hasOverrideRoleForCategory = measurableRatingPermissionChecker.findMeasurableRatingDecommPermissions(appA, m1, u1);
+        Set<Operation> hasOverrideRoleForCategory = measurableRatingPermissionChecker.findMeasurableRatingDecommPermissions(mrId1, u1);
         assertEquals(
                 asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE),
                 hasOverrideRoleForCategory,
                 "Returns all edit perms where user has the override role on the category");
 
-        Set<Operation> overRideRoleGivesAllEditPermsOnAnyApp = measurableRatingPermissionChecker.findMeasurableRatingDecommPermissions(appB, m2, u1);
+        Set<Operation> overRideRoleGivesAllEditPermsOnAnyApp = measurableRatingPermissionChecker.findMeasurableRatingDecommPermissions(mrId2, u1);
         assertEquals(
                 asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE),
                 overRideRoleGivesAllEditPermsOnAnyApp,
@@ -224,8 +221,8 @@ public class MeasurableRatingPermissionCheckerTest extends BaseInMemoryIntegrati
         long m1 = measurableHelper.createMeasurable("m1", catId);
         long m2 = measurableHelper.createMeasurable("m2", catId);
 
-        measurableHelper.createRating(appA, m1);
-        long decommId = measurableHelper.createDecomm(appA, m1);
+        long mrId1 = measurableHelper.createRating(appA, m1);
+        long decommId = measurableHelper.createDecomm(mrId1);
 
         assertThrows(
                 IllegalArgumentException.class,
@@ -268,8 +265,8 @@ public class MeasurableRatingPermissionCheckerTest extends BaseInMemoryIntegrati
         assertEquals(asSet(Operation.ADD), noPermsWhereNoInvKind, "Doesn't return perms for operations where user lacks the required inv kind");
 
         EntityReference appB = appHelper.createNewApp(mkName(stem, "appB"), ouIds.b);
-        measurableHelper.createRating(appB, m2);
-        long decommId2 = measurableHelper.createDecomm(appB, m2);
+        long mrId2 = measurableHelper.createRating(appB, m2);
+        long decommId2 = measurableHelper.createDecomm(mrId2);
 
         Set<Operation> noPermissionsOnApplicationsOtherThanThoseUserIsRelatedTo = measurableRatingPermissionChecker.findMeasurableRatingReplacementPermissions(decommId2, u1);
         assertEquals(
@@ -325,7 +322,8 @@ public class MeasurableRatingPermissionCheckerTest extends BaseInMemoryIntegrati
         Set<Operation> measurableRatingPermissions = measurableRatingPermissionChecker.findMeasurableRatingPermissions(appA, m1, u1);
         assertEquals(asSet(Operation.ADD), measurableRatingPermissions, "Measurable rating permissions should exist");
 
-        Set<Operation> measurableRatingDecommPermissions = measurableRatingPermissionChecker.findMeasurableRatingDecommPermissions(appA, m1, u1);
+        long mrId1 = measurableHelper.createRating(appA, m1);
+        Set<Operation> measurableRatingDecommPermissions = measurableRatingPermissionChecker.findMeasurableRatingDecommPermissions(mrId1, u1);
         assertEquals(emptySet(), measurableRatingDecommPermissions, "Measurable rating decomm permissions should not exist");
 
     }
@@ -396,12 +394,12 @@ public class MeasurableRatingPermissionCheckerTest extends BaseInMemoryIntegrati
         long catId = measurableHelper.createMeasurableCategory(mkName(stem, "decomm permission checker"), adminRoleName);
         long m1 = measurableHelper.createMeasurable("m1", catId);
 
-        measurableHelper.createRating(appA, m1);
+        long mrId1 = measurableHelper.createRating(appA, m1);
         measurableHelper.updateMeasurableReadOnly(appA, m1);
 
         userHelper.createUserWithRoles(u1, adminRoleName);
 
-        Set<Operation> readOnlyRatingsShouldNotRestrictEditingDecomms = measurableRatingPermissionChecker.findMeasurableRatingDecommPermissions(appA, m1, u1);
+        Set<Operation> readOnlyRatingsShouldNotRestrictEditingDecomms = measurableRatingPermissionChecker.findMeasurableRatingDecommPermissions(mrId1, u1);
 
         assertEquals(
                 asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE),
@@ -420,8 +418,8 @@ public class MeasurableRatingPermissionCheckerTest extends BaseInMemoryIntegrati
         long catId = measurableHelper.createMeasurableCategory(mkName(stem, "replacement permission checker"), adminRoleName);
         long m1 = measurableHelper.createMeasurable("m1", catId);
 
-        measurableHelper.createRating(appA, m1);
-        long decommId = measurableHelper.createDecomm(appA, m1);
+        long mrId1 = measurableHelper.createRating(appA, m1);
+        long decommId = measurableHelper.createDecomm(mrId1);
         measurableHelper.updateMeasurableReadOnly(appA, m1);
 
         userHelper.createUserWithRoles(u1, adminRoleName);
@@ -469,12 +467,12 @@ public class MeasurableRatingPermissionCheckerTest extends BaseInMemoryIntegrati
         long catId = measurableHelper.createMeasurableCategory(mkName(stem, "decom permission checker"), adminRoleName);
         long m1 = measurableHelper.createMeasurable("m1", catId);
 
-        measurableHelper.createRating(appA, m1);
+        long mrId1 = measurableHelper.createRating(appA, m1);
         measurableHelper.updateCategoryNotEditable(catId);
 
         userHelper.createUserWithRoles(u1, adminRoleName);
 
-        Set<Operation> nonEditableCategoryShouldStillAllowRatingsToBeEdited = measurableRatingPermissionChecker.findMeasurableRatingDecommPermissions(appA, m1, u1);
+        Set<Operation> nonEditableCategoryShouldStillAllowRatingsToBeEdited = measurableRatingPermissionChecker.findMeasurableRatingDecommPermissions(mrId1, u1);
 
         assertEquals(
                 asSet(Operation.ADD, Operation.UPDATE, Operation.REMOVE),
@@ -493,8 +491,8 @@ public class MeasurableRatingPermissionCheckerTest extends BaseInMemoryIntegrati
         long catId = measurableHelper.createMeasurableCategory(mkName(stem, "replacement permission checker"), adminRoleName);
         long m1 = measurableHelper.createMeasurable("m1", catId);
 
-        measurableHelper.createRating(appA, m1);
-        long decommId = measurableHelper.createDecomm(appA, m1);
+        long mrId1 = measurableHelper.createRating(appA, m1);
+        long decommId = measurableHelper.createDecomm(mrId1);
 
         measurableHelper.updateCategoryNotEditable(catId);
 

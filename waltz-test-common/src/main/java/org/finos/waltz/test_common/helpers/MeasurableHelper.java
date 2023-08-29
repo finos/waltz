@@ -97,7 +97,7 @@ public class MeasurableHelper {
     }
 
 
-    public void createRating(EntityReference ref, long measurableId) {
+    public long createRating(EntityReference ref, long measurableId) {
 
         MeasurableRatingRecord ratingRecord = dsl.newRecord(MEASURABLE_RATING);
         ratingRecord.setEntityId(ref.id());
@@ -114,6 +114,8 @@ public class MeasurableHelper {
                 .set(ratingRecord)
                 .onDuplicateKeyIgnore()
                 .execute();
+
+        return ratingRecord.getId();
     }
 
 
