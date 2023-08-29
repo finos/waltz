@@ -23,8 +23,12 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 import java.util.Set;
 
-import static org.finos.waltz.common.SetUtilities.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.SetUtilities.complement;
+import static org.finos.waltz.common.SetUtilities.union;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SetUtilities_complementTest {
 
