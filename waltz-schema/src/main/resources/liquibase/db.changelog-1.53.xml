@@ -352,8 +352,88 @@
         <createIndex indexName="idx_ler_kind_id_target"
                      tableName="legal_entity_relationship"
                      unique="true">
-            <column name="legal_entity_id, target_id, target_kind, relationship_kind_id"/>
+            <column name="legal_entity_id" type="${id.type}"/>
+            <column name="target_id" type="${id.type}"/>
+            <column name="target_kind" type="${enum.type}"/>
+            <column name="relationship_kind_id" type="${id.type}"/>
         </createIndex>
     </changeSet>
+
+
+    <changeSet id="20230829-6728-20"
+               author="davidwatkins73">
+        <comment>6728: add subject kind to cost kind table</comment>
+        <addColumn tableName="cost_kind">
+            <column name="subject_kind"
+                    type="${enum.type}"
+                    defaultValue="'APPLICATION'">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20230829-6728-21"
+               author="davidwatkins73">
+        <comment>6728: allocated cost definition table</comment>
+        <createTable tableName="allocated_cost_definition">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="allocated_cost_definition_pkey"/>
+            </column>
+            <column name="allocation_scheme_id" type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="source_cost_kind_id" type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="target_cost_kind_id" type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet id="20230829-6728-22"
+               author="davidwatkins73">
+        <addForeignKeyConstraint baseTableName="allocated_cost_definition"
+                                 baseColumnNames="source_cost_kind_id"
+                                 constraintName="allocated_cost_defn_source_cost_kind_fk"
+                                 referencedTableName="cost_kind"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+
+    <changeSet id="20230829-6728-23"
+               author="davidwatkins73">
+        <addForeignKeyConstraint baseTableName="allocated_cost_definition"
+                                 baseColumnNames="target_cost_kind_id"
+                                 constraintName="allocated_cost_defn_target_cost_kind_fk"
+                                 referencedTableName="cost_kind"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+
+    <changeSet id="20230829-6728-24"
+               author="davidwatkins73">
+        <addForeignKeyConstraint baseTableName="allocated_cost_definition"
+                                 baseColumnNames="allocation_scheme_id"
+                                 constraintName="allocated_cost_defn_allocation_scheme_fk"
+                                 referencedTableName="allocation_scheme"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="20230829-6728-25"
+               author="davidwatkins73">
+        <setColumnRemarks tableName="allocated_cost_definition" columnName="allocation_scheme_id" remarks="reference to the allocation scheme that will be used to split cost from the source kind onto new costs represented by the target kind" />
+        <setColumnRemarks tableName="allocated_cost_definition" columnName="source_cost_kind_id" remarks="reference to the cost kind being used as the source costs, usually a cost related to applications" />
+        <setColumnRemarks tableName="allocated_cost_definition" columnName="target_cost_kind_id" remarks="reference to the cost kind being to represent the shredded target costs, usually a cost related to measurable_ratings" />
+    </changeSet>
+
 
 </databaseChangeLog>
