@@ -109,13 +109,13 @@ public class MeasurableHelper {
         ratingRecord.setLastUpdatedBy("test");
         ratingRecord.setProvenance("test");
 
-        dsl
+        return dsl
                 .insertInto(MEASURABLE_RATING)
                 .set(ratingRecord)
                 .onDuplicateKeyIgnore()
-                .execute();
-
-        return ratingRecord.getId();
+                .returning(MEASURABLE_RATING.ID)
+                .fetchOne()
+                .getId();
     }
 
 
