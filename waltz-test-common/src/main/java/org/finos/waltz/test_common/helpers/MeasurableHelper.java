@@ -111,6 +111,8 @@ public class MeasurableHelper {
 
         ratingRecord.store();
 
+        // I know this is daft, however it doesn't work if we just return ratingRecord.getId() - instead it returns lastUpdatedAt in millis ?!
+
         return dsl
            .select(MEASURABLE_RATING.ID)
            .from(MEASURABLE_RATING)
