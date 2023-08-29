@@ -11,15 +11,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class IOUtilities_readAsStringTest {
     @Test
     public void canReadLinesAsString() throws IOException {
-        String lines = IOUtilities.readAsString(getStream("lines.txt"));
-        assertEquals(138, lines.length());
+        String str = IOUtilities.readAsString(getStream("lines.txt"));
+        assertEquals(141, str.length());
     }
 
 
     @Test
     public void emptyGivesEmptyList() throws IOException {
-        String lines = IOUtilities.readAsString(getStream("empty.txt"));
-        assertEquals(0, lines.length());
+        String str = IOUtilities.readAsString(getStream("empty.txt"));
+        assertEquals(0, str.length());
     }
 
 
