@@ -452,3 +452,15 @@ a[disabled="disabled"] {
     display: flex;
     justify-content: space-between;
 }
+
+details {
+    background: #f5f5f5;
+    border: 1px solid #eee;
+    margin-bottom: 2rem;
+    padding: .5rem 1rem;
+}
+
+details summary {
+    cursor: pointer;
+    display: list-item;
+}

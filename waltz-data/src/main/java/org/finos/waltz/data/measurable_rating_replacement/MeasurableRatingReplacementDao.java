@@ -48,6 +48,7 @@ import static org.finos.waltz.common.SetUtilities.union;
 import static org.finos.waltz.common.StringUtilities.notEmpty;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.schema.Tables.MEASURABLE_CATEGORY;
+import static org.finos.waltz.schema.Tables.MEASURABLE_RATING;
 import static org.finos.waltz.schema.Tables.USER_ROLE;
 import static org.finos.waltz.schema.tables.MeasurableRatingPlannedDecommission.MEASURABLE_RATING_PLANNED_DECOMMISSION;
 import static org.finos.waltz.schema.tables.MeasurableRatingReplacement.MEASURABLE_RATING_REPLACEMENT;
@@ -131,8 +132,10 @@ public class MeasurableRatingReplacementDao {
                 .from(MEASURABLE_RATING_REPLACEMENT)
                 .innerJoin(MEASURABLE_RATING_PLANNED_DECOMMISSION)
                 .on(MEASURABLE_RATING_PLANNED_DECOMMISSION.ID.eq(MEASURABLE_RATING_REPLACEMENT.DECOMMISSION_ID))
-                .where(MEASURABLE_RATING_PLANNED_DECOMMISSION.ENTITY_ID.eq(ref.id())
-                        .and(MEASURABLE_RATING_PLANNED_DECOMMISSION.ENTITY_KIND.eq(ref.kind().name())))
+                .innerJoin(MEASURABLE_RATING)
+                .on(MEASURABLE_RATING.ID.eq(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_RATING_ID))
+                .where(MEASURABLE_RATING.ENTITY_ID.eq(ref.id())
+                        .and(MEASURABLE_RATING.ENTITY_KIND.eq(ref.kind().name())))
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
 

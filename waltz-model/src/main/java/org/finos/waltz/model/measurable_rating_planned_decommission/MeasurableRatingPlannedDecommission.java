@@ -3,7 +3,6 @@ package org.finos.waltz.model.measurable_rating_planned_decommission;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.CreatedProvider;
-import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.LastUpdatedProvider;
 import org.immutables.value.Value;
 
@@ -17,7 +16,6 @@ public abstract class MeasurableRatingPlannedDecommission implements
         CreatedProvider {
 
     public abstract Long id();
-    public abstract EntityReference entityReference();
-    public abstract Long measurableId();
+    public abstract Long measurableRatingId();
     public abstract Date plannedDecommissionDate();
 }

@@ -7,6 +7,7 @@ import org.finos.waltz.model.ReleaseLifecycleStatus;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
 import org.finos.waltz.model.aggregate_overlay_diagram.ImmutableAggregateOverlayDiagram;
 import org.finos.waltz.model.aggregate_overlay_diagram.OverlayDiagramKind;
+import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.Application;
 import org.finos.waltz.schema.tables.MeasurableRating;
 import org.finos.waltz.schema.tables.MeasurableRatingPlannedDecommission;
@@ -20,6 +21,8 @@ import org.jooq.Record2;
 import org.jooq.RecordMapper;
 import org.jooq.Select;
 import org.jooq.SelectConditionStep;
+import org.jooq.Table;
+import org.jooq.TableField;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
 
@@ -43,14 +46,8 @@ import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.SetUtilities.fromCollection;
 import static org.finos.waltz.common.SetUtilities.union;
 import static org.finos.waltz.data.JooqUtilities.readRef;
-import static org.finos.waltz.schema.Tables.AGGREGATE_OVERLAY_DIAGRAM;
-import static org.finos.waltz.schema.Tables.AGGREGATE_OVERLAY_DIAGRAM_CELL_DATA;
-import static org.finos.waltz.schema.Tables.APPLICATION;
-import static org.finos.waltz.schema.Tables.DATA_TYPE_USAGE;
-import static org.finos.waltz.schema.Tables.ENTITY_HIERARCHY;
-import static org.finos.waltz.schema.Tables.MEASURABLE_RATING;
-import static org.finos.waltz.schema.Tables.MEASURABLE_RATING_PLANNED_DECOMMISSION;
-import static org.finos.waltz.schema.Tables.MEASURABLE_RATING_REPLACEMENT;
+import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.schema.Tables.*;
 import static org.finos.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
@@ -60,6 +57,7 @@ public class AggregateOverlayDiagramUtilities {
     private static final Application app = APPLICATION;
     private static final MeasurableRatingPlannedDecommission mrpd = MEASURABLE_RATING_PLANNED_DECOMMISSION;
     private static final MeasurableRatingReplacement mrp = MEASURABLE_RATING_REPLACEMENT;
+
 
     protected static final RecordMapper<? super Record, ? extends AggregateOverlayDiagram> TO_DOMAIN_MAPPER = r -> {
         AggregateOverlayDiagramRecord record = r.into(AGGREGATE_OVERLAY_DIAGRAM);
@@ -291,11 +289,7 @@ public class AggregateOverlayDiagramUtilities {
                         .eq(app.ID)
                         .and(mr.ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
                 .leftJoin(mrpd)
-                .on(mr.ENTITY_ID
-                        .eq(mrpd.ENTITY_ID)
-                        .and(mr.ENTITY_KIND
-                                .eq(mrpd.ENTITY_KIND)
-                                .and(mr.MEASURABLE_ID.eq(mrpd.MEASURABLE_ID))))
+                .on(mr.ID.eq(mrpd.MEASURABLE_RATING_ID))
                 .leftJoin(mrp)
                 .on(mrp.DECOMMISSION_ID.eq(mrpd.ID))
                 .where(mr.ENTITY_ID.in(inScopeEntityIdSelector))
@@ -331,5 +325,56 @@ public class AggregateOverlayDiagramUtilities {
                         .and(DATA_TYPE_USAGE.ENTITY_ID.in(inScopeEntityIdSelector))
                         .and(DATA_TYPE_USAGE.DATA_TYPE_ID.in(backingEntityReferences)))
                 .fetchGroups(DATA_TYPE_USAGE.DATA_TYPE_ID, DATA_TYPE_USAGE.ENTITY_ID);
+    }
+
+
+    public static Map<Long, EntityReference> loadEntityIdToRefMap(DSLContext dsl,
+                                                                  EntityKind aggregatedEntityKind,
+                                                                  Select<Record1<Long>> inScopeEntityIdSelector) {
+        switch (aggregatedEntityKind) {
+            case APPLICATION:
+                return loadIdToRefMap(
+                        dsl,
+                        aggregatedEntityKind,
+                        inScopeEntityIdSelector,
+                        Tables.APPLICATION,
+                        Tables.APPLICATION.ID,
+                        Tables.APPLICATION.NAME,
+                        Tables.APPLICATION.DESCRIPTION,
+                        Tables.APPLICATION.ASSET_CODE);
+            case CHANGE_INITIATIVE:
+                return loadIdToRefMap(
+                        dsl,
+                        aggregatedEntityKind,
+                        inScopeEntityIdSelector,
+                        Tables.CHANGE_INITIATIVE,
+                        Tables.CHANGE_INITIATIVE.ID,
+                        Tables.CHANGE_INITIATIVE.NAME,
+                        Tables.CHANGE_INITIATIVE.DESCRIPTION,
+                        Tables.CHANGE_INITIATIVE.EXTERNAL_ID);
+            default:
+                throw new IllegalArgumentException(format("Cannot fetch id to name map for entity kind: %s", aggregatedEntityKind));
+        }
+    }
+
+
+    private static Map<Long, EntityReference> loadIdToRefMap(DSLContext dsl,
+                                                      EntityKind kind,
+                                                      Select<Record1<Long>> inScopeEntityIdSelector,
+                                                      Table<?> table,
+                                                      TableField<? extends Record, Long> idField,
+                                                      TableField<? extends Record, String> nameField,
+                                                      TableField<? extends Record, String> descriptionField,
+                                                      TableField<? extends Record, String> externalIdField) {
+        return dsl
+                .select(idField, nameField, descriptionField, externalIdField)
+                .from(table)
+                .where(idField.in(inScopeEntityIdSelector))
+                .fetchMap(idField, r -> mkRef(
+                        kind,
+                        r.get(idField),
+                        r.get(nameField),
+                        r.get(descriptionField),
+                        r.get(externalIdField)));
     }
 }

@@ -8,7 +8,7 @@ export const DiagramModes = {
 }
 
 export function createInitialGroup() {
-    return mkGroup("Diagram Title", generateUUID(), null, 1);
+    return mkGroup("Initial Group", generateUUID(), null, 1);
 }
 
 export let movingGroup = writable(null);

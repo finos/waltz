@@ -6,12 +6,12 @@
     import {flip} from 'svelte/animate';
     import {flattenChildren} from "../../../../common/hierarchy-utils";
     import toasts from "../../../../svelte-stores/toast-store";
-    import Item from "../Item.svelte";
+    import CellContent from "../CellContent.svelte";
     import {
-        mkContainerStyle,
         mkContentBoxStyle,
-        mkGroupStyle,
-        mkItemStyle,
+        mkGroupCellStyle,
+        mkChildGroupStyle,
+        mkCellContentStyle,
         mkReorderBoxStyle,
         mkTitleStyle
     } from "../entity-diagram-utils";
@@ -117,7 +117,7 @@
             </div>
         {/if}
 
-        <div style={mkContentBoxStyle(group)}
+        <div style={mkGroupCellStyle(group)}
              on:dragenter|stopPropagation={dragEnter}
              on:drop|stopPropagation={event => drop(event, group)}>
 
@@ -134,20 +134,20 @@
                 </div>
             {/if}
 
-            <div style={mkContainerStyle(group)}>
+            <div style={mkContentBoxStyle(group)}>
                 {#each _.orderBy(group.children, d => d.position) as child (child.id)}
-                    <div style={mkGroupStyle(group, child)}
+                    <div style={mkChildGroupStyle(group, child)}
                          animate:flip="{{duration: 300}}">
                         <svelte:self group={child}>
                         </svelte:self>
                     </div>
                 {:else}
                     {#if group.data}
-                        <div style={mkItemStyle(group)}>
-                            <Item data={group.data}
-                                  cellId={group.id}
-                                  height={group.props.minWidth / 3}
-                                  width={group.props.minWidth}/>
+                        <div style={mkCellContentStyle(group)}>
+                            <CellContent data={group.data}
+                                         cellId={group.id}
+                                         height={group.props.minWidth / 3}
+                                         width={group.props.minWidth}/>
                         </div>
                     {/if}
                 {/each}

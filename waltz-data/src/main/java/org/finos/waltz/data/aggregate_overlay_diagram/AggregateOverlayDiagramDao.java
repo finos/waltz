@@ -8,7 +8,7 @@ import org.finos.waltz.model.ReleaseLifecycleStatusChangeCommand;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
 import org.finos.waltz.model.aggregate_overlay_diagram.BackingEntity;
 import org.finos.waltz.model.aggregate_overlay_diagram.ImmutableBackingEntity;
-import org.finos.waltz.model.aggregate_overlay_diagram.OverlayDiagramCreateCommand;
+import org.finos.waltz.model.aggregate_overlay_diagram.OverlayDiagramSaveCommand;
 import org.finos.waltz.model.aggregate_overlay_diagram.OverlayDiagramKind;
 import org.finos.waltz.schema.tables.records.AggregateOverlayDiagramCellDataRecord;
 import org.finos.waltz.schema.tables.records.AggregateOverlayDiagramRecord;
@@ -130,15 +130,15 @@ public class AggregateOverlayDiagramDao {
     }
 
 
-    public Long save(OverlayDiagramCreateCommand createCmd, String username) {
+    public Long save(OverlayDiagramSaveCommand saveCmd, String username) {
         AggregateOverlayDiagramRecord record = dsl.newRecord(AGGREGATE_OVERLAY_DIAGRAM);
-        record.setName(createCmd.name());
-        record.setDescription(createCmd.description());
-        record.setDiagramKind(createCmd.diagramKind().name());
-        record.setAggregatedEntityKind(createCmd.aggregatedEntityKind().name());
-        record.setLayoutData(createCmd.layoutData());
+        record.setName(saveCmd.name());
+        record.setDescription(saveCmd.description());
+        record.setDiagramKind(saveCmd.diagramKind().name());
+        record.setAggregatedEntityKind(saveCmd.aggregatedEntityKind().name());
+        record.setLayoutData(saveCmd.layoutData());
         record.setLastUpdatedBy(username);
-        createCmd.id().ifPresent(record::setId);
+        saveCmd.id().ifPresent(record::setId);
         record.changed(AGGREGATE_OVERLAY_DIAGRAM.ID, false);
         record.store();
         return record.getId();

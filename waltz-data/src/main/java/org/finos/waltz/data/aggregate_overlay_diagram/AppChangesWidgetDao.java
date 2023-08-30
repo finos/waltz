@@ -8,6 +8,7 @@ import org.finos.waltz.model.aggregate_overlay_diagram.overlay.AppChangeEntry;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.ApplicationChangeWidgetDatum;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.ImmutableAppChangeEntry;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.ImmutableApplicationChangeWidgetDatum;
+import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.Application;
 import org.finos.waltz.schema.tables.MeasurableRating;
 import org.finos.waltz.schema.tables.MeasurableRatingPlannedDecommission;
@@ -15,8 +16,11 @@ import org.finos.waltz.schema.tables.MeasurableRatingReplacement;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
+import org.jooq.Record;
 import org.jooq.Record1;
 import org.jooq.Select;
+import org.jooq.Table;
+import org.jooq.TableField;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
@@ -33,6 +37,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.groupingBy;
@@ -47,6 +52,7 @@ import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.SetUtilities.fromCollection;
 import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.common.SetUtilities.union;
+import static org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramUtilities.loadEntityIdToRefMap;
 import static org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramUtilities.loadExpandedCellMappingsForDiagram;
 import static org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramUtilities.loadMeasurableToAppIdsMap;
 import static org.finos.waltz.data.aggregate_overlay_diagram.AggregateOverlayDiagramUtilities.toMeasurableIds;
@@ -62,8 +68,15 @@ public class AppChangesWidgetDao {
     private static final MeasurableRatingReplacement mrr = MeasurableRatingReplacement.MEASURABLE_RATING_REPLACEMENT;
 
     private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
-                    mrpd.ENTITY_ID,
-                    mrpd.ENTITY_KIND,
+                    mr.ENTITY_ID,
+                    mr.ENTITY_KIND,
+                    newArrayList(EntityKind.APPLICATION))
+            .as("entity_name");
+
+
+    private static final Field<String> REPLACEMENT_ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
+                    mrr.ENTITY_ID,
+                    mrr.ENTITY_KIND,
                     newArrayList(EntityKind.APPLICATION))
             .as("entity_name");
 
@@ -92,7 +105,9 @@ public class AppChangesWidgetDao {
                 dsl,
                 inScopeEntityIdSelector,
                 backingMeasurableEntityIds,
-                targetMaxDate);
+                Optional.empty()); // Return the current set of associated entities, not those at a target date
+
+        Map<Long, EntityReference> entityIdToRefMap = loadEntityIdToRefMap(dsl, EntityKind.APPLICATION, inScopeEntityIdSelector);
 
         Map<Long, Tuple3<EntityReference, LocalDate, LocalDate>> appLifecycleInfoById = getAppLifecycleInfoById(inScopeEntityIdSelector);
 
@@ -120,9 +135,11 @@ public class AppChangesWidgetDao {
                     //only supports measurables at the moment
                     Set<Long> measurableIds = backingEntitiesByKind.getOrDefault(EntityKind.MEASURABLE, emptySet());
 
-                    Set<Long> entityIdsViaMeasurable = measurableIds
+                    Set<EntityReference> entityReferencesForCell = measurableIds
                             .stream()
                             .flatMap(mID -> measurableIdToEntityIds.getOrDefault(mID, emptyList()).stream())
+                            .map(entityId -> entityIdToRefMap.get(entityId))
+                            .filter(Objects::nonNull)
                             .collect(toSet());
 
                     Set<AppChangeEntry> appChangeInfo = measurableIds
@@ -174,7 +191,7 @@ public class AppChangesWidgetDao {
                     return ImmutableApplicationChangeWidgetDatum.builder()
                             .cellExternalId(cellExtId)
                             .applicationChanges(appChangeInfo)
-                            .currentAppCount(entityIdsViaMeasurable.size())
+                            .currentApplications(entityReferencesForCell)
                             .build();
                 })
                 .filter(d -> d.applicationChanges().size() > 0 || d.currentAppCount() > 0) // only filter where there are no changes and no current apps
@@ -217,20 +234,21 @@ public class AppChangesWidgetDao {
                 .withDayOfMonth(1);
 
         return dsl
-                .select(mrpd.ENTITY_ID,
-                        mrpd.MEASURABLE_ID,
+                .select(mr.ENTITY_ID,
+                        mr.MEASURABLE_ID,
                         mrpd.PLANNED_DECOMMISSION_DATE)
                 .select(ENTITY_NAME_FIELD)
                 .from(mrpd)
-                .where(mrpd.ENTITY_ID.in(inScopeEntityIdSelector)
-                        .and(mrpd.MEASURABLE_ID.in(backingMeasurableEntityIds))
-                        .and(mrpd.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .innerJoin(mr).on(mrpd.MEASURABLE_RATING_ID.eq(mr.ID))
+                .where(mr.ENTITY_ID.in(inScopeEntityIdSelector)
+                        .and(mr.MEASURABLE_ID.in(backingMeasurableEntityIds))
+                        .and(mr.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                         .and(mrpd.PLANNED_DECOMMISSION_DATE.ge(toSqlDate(startOfYear)))
                         .and(targetDateCondition))
                 .fetchGroups(
-                        r -> r.get(mrpd.MEASURABLE_ID),
+                        r -> r.get(mr.MEASURABLE_ID),
                         r -> tuple(
-                                mkRef(EntityKind.APPLICATION, r.get(mrpd.ENTITY_ID), r.get(ENTITY_NAME_FIELD)),
+                                mkRef(EntityKind.APPLICATION, r.get(mr.ENTITY_ID), r.get(ENTITY_NAME_FIELD)),
                                 toLocalDate(r.get(mrpd.PLANNED_DECOMMISSION_DATE))));
     }
 
@@ -246,22 +264,24 @@ public class AppChangesWidgetDao {
 
         return dsl
                 .select(mrr.ENTITY_ID,
-                        mrpd.MEASURABLE_ID,
+                        mr.MEASURABLE_ID,
                         mrr.PLANNED_COMMISSION_DATE)
-                .select(ENTITY_NAME_FIELD)
+                .select(REPLACEMENT_ENTITY_NAME_FIELD)
                 .from(mrr)
                 .innerJoin(mrpd)
                 .on(mrr.DECOMMISSION_ID.eq(mrpd.ID))
+                .innerJoin(mr).on(mrpd.MEASURABLE_RATING_ID.eq(mr.ID))
                 .where(mrr.ENTITY_ID.in(inScopeEntityIdSelector)
                         .and(mrr.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                        .and(mrpd.MEASURABLE_ID.in(backingMeasurableEntityIds))
+                        .and(mr.MEASURABLE_ID.in(backingMeasurableEntityIds))
                         .and(mrr.PLANNED_COMMISSION_DATE.ge(toSqlDate(startOfYear)))
                         .and(targetDateCondition))
                 .fetchGroups(
-                        r -> r.get(mrpd.MEASURABLE_ID),
+                        r -> r.get(mr.MEASURABLE_ID),
                         r -> tuple(
-                                mkRef(EntityKind.APPLICATION, r.get(mrpd.ENTITY_ID), r.get(ENTITY_NAME_FIELD)),
+                                mkRef(EntityKind.APPLICATION, r.get(mrr.ENTITY_ID), r.get(ENTITY_NAME_FIELD)),
                                 toLocalDate(r.get(mrr.PLANNED_COMMISSION_DATE))));
     }
+
 
 }

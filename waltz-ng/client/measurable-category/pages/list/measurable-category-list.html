@@ -40,6 +40,16 @@
 
     <div class='waltz-page-summary-attach waltz-page-summary'>
 
+        <div class="row">
+            <div class="col-sm-12">
+                <waltz-markdown text="$ctrl.category.description">
+                </waltz-markdown>
+                <waltz-static-panels render-mode="chromeless"
+                                     group-key="HOME.MEASURABLE.{{$ctrl.category.id}}">
+                </waltz-static-panels>
+            </div>
+        </div>
+
         <div class="row"
              ng-if="$ctrl.diagrams.length > 0">
             <!-- DIAGRAMS -->
@@ -53,19 +63,9 @@
 
         <div class="row">
             <!-- TREE -->
-            <div class="col-sm-7">
+            <div class="col-sm-12">
                 <waltz-measurable-tree measurables="$ctrl.measurables">
                 </waltz-measurable-tree>
-            </div>
-
-            <!-- PANELS -->
-            <div class="col-sm-5">
-                <waltz-markdown text="$ctrl.category.description">
-                </waltz-markdown>
-
-                <waltz-static-panels render-mode="chromeless"
-                                     group-key="HOME.MEASURABLE.{{$ctrl.category.id}}">
-                </waltz-static-panels>
 
                 <hr>
 

@@ -40,7 +40,6 @@
 
 </script>
 
-
 {#if !isRoot}
     <button class="btn btn-plain"
             on:click={toggleExpanded}>
@@ -55,7 +54,8 @@
             class:unknown={node.unknown}
             class:deprecated={node.deprecated}
             disabled={calcDisabled(selectionFilter, node)}
-            on:click={() => selectNode(node)}>
+            on:click={() => selectNode(node)}
+            title={node.description}>
             {#if multiSelect}
                 <Icon name={calcCheckIcon(selectionFilter, node)}/>
             {/if}
@@ -83,7 +83,8 @@
                             class:unknown={childNode.unknown}
                             class:deprecated={childNode.deprecated}
                             disabled={!nonConcreteSelectable && !childNode.concrete}
-                            on:click={() => selectNode(childNode)}>
+                            on:click={() => selectNode(childNode)}
+                            title={childNode.description}>
                         <span class="no-wrap">
                             {#if multiSelect}
                                 <Icon name={calcCheckIcon(selectionFilter, childNode)}/>

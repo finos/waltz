@@ -24,19 +24,19 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.immutables.value.Value;
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableMeasurablePercentage.class)
-@JsonDeserialize(as = ImmutableMeasurablePercentage.class)
-public abstract class MeasurablePercentage {
+@JsonSerialize(as = ImmutableMeasurableRatingPercentage.class)
+@JsonDeserialize(as = ImmutableMeasurableRatingPercentage.class)
+public abstract class MeasurableRatingPercentage {
 
     public abstract int percentage();
-    public abstract long measurableId();
+    public abstract long measurableRatingId();
 
 
-    public static MeasurablePercentage mkMeasurablePercentage(long measurableId, int percentage) {
-        return ImmutableMeasurablePercentage
+    public static MeasurableRatingPercentage mkMeasurableRatingPercentage(long measurableRatingId, int percentage) {
+        return ImmutableMeasurableRatingPercentage
                 .builder()
                 .percentage(percentage)
-                .measurableId(measurableId)
+                .measurableRatingId(measurableRatingId)
                 .build();
     }
 

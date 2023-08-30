@@ -4,7 +4,7 @@
     import {diagramService} from "../entity-diagram-store";
     import {mkGroup} from "../entity-diagram-utils";
     import EntityPicker from "../../../../report-grid/components/svelte/pickers/EntityPicker.svelte";
-    import {sameRef, toEntityRef} from "../../../../common/entity-utils";
+    import {sameRef} from "../../../../common/entity-utils";
     import {createEventDispatcher} from "svelte";
     import DropdownPicker
         from "../../../../report-grid/components/svelte/column-definition-edit-panel/DropdownPicker.svelte";
@@ -137,9 +137,6 @@
 
     $: fetchChildrenStore = determineStore($selectedGroup.data?.entityReference);
     $: directChildren = $fetchChildrenStore?.data || [];
-
-    $: console.log({backgroundColors, titleColors, gs: $groups})
-
 </script>
 
 

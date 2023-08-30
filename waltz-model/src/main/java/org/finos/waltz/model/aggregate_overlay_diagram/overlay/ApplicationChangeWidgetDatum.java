@@ -2,6 +2,7 @@ package org.finos.waltz.model.aggregate_overlay_diagram.overlay;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.ChangeDirection;
+import org.finos.waltz.model.EntityReference;
 import org.immutables.value.Value;
 import org.jooq.lambda.tuple.Tuple2;
 
@@ -68,8 +69,12 @@ public abstract class ApplicationChangeWidgetDatum implements CellExternalIdProv
                 .sum();
     }
 
-    public abstract Set<AppChangeEntry> applicationChanges();
-    public abstract int currentAppCount();
+    @Value.Derived
+    public int currentAppCount() {
+        return currentApplications().size();
+    };
 
+    public abstract Set<AppChangeEntry> applicationChanges();
+    public abstract Set<EntityReference> currentApplications();
 
 }

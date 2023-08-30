@@ -18,99 +18,25 @@
 
 import template from "./related-data-types-section.html";
 import {initialiseData} from "../../../common/index";
-import {CORE_API} from "../../../common/services/core-api-utils";
-import _ from "lodash";
-import {toEntityRef} from "../../../common/entity-utils";
-import {mkRel} from "../../../common/relationship-utils";
-import toasts from "../../../svelte-stores/toast-store";
+
+import RelatedDataTypesSection from "./RelatedDataTypesSection.svelte";
 
 const bindings = {
-    parentEntityRef: "<"
+    parentEntityRef: "<",
 };
 
 
 const initialState = {
-    visibility: {
-        picker: false
-    }
+    RelatedDataTypesSection,
 };
 
 
-function alreadyContains(relatedDataTypes = [], dt) {
-    const existingIds = _.map(relatedDataTypes, "id");
-    return _.includes(existingIds, dt.id);
+function controller() {
+    initialiseData(this, initialState);
 }
 
 
-function controller(serviceBroker) {
-
-    const vm = initialiseData(this, initialState);
-
-    function refresh() {
-        if (vm.parentEntityRef === null || vm.dataTypes === null) {
-            return;
-        }
-
-        const dataTypesById = _.keyBy(vm.dataTypes, "id");
-        serviceBroker
-            .loadViewData(
-                CORE_API.EntityRelationshipStore.findForEntity,
-                [ vm.parentEntityRef ],
-                { force: true })
-            .then(r => {
-                vm.relatedDataTypes = _
-                    .chain(r.data)
-                    .filter(rel => rel.b.kind === "DATA_TYPE")
-                    .map(rel => Object.assign({}, dataTypesById[rel.b.id], {dataTypeId: rel.b.id}))
-                    .sortBy("name")
-                    .value();
-            });
-    }
-
-    vm.$onInit = () => {
-        serviceBroker
-            .loadAppData(CORE_API.DataTypeStore.findAll)
-            .then(r => vm.dataTypes = r.data)
-            .then(refresh);
-    };
-
-    vm.$onRefresh = () => refresh();
-
-    vm.onSelectDataType = (dt) => {
-        vm.selectedDataType = dt;
-        vm.editMode = alreadyContains(vm.relatedDataTypes, vm.selectedDataType)
-            ? "REMOVE"
-            : "ADD";
-    };
-
-    vm.onAction = () => {
-        const isRemove = alreadyContains(vm.relatedDataTypes, vm.selectedDataType);
-
-        const operation = isRemove
-            ? CORE_API.EntityRelationshipStore.remove
-            : CORE_API.EntityRelationshipStore.create;
-
-        const rel = mkRel(vm.parentEntityRef, "RELATES_TO", toEntityRef(vm.selectedDataType));
-
-        serviceBroker
-            .execute(operation, [ rel ])
-            .then(() => {
-                const verb = isRemove
-                    ? "removed"
-                    : "added";
-                const msg = `Relationship to ${vm.selectedDataType.name} ${verb}`;
-                toasts.success(msg);
-                vm.selectedDataType = null;
-                refresh();
-            });
-    };
-
-
-    vm.onShowPicker = () => vm.visibility.picker = ! vm.visibility.picker;
-}
-
-
-controller.$inject= [ "ServiceBroker"];
+controller.$inject= [];
 
 
 const component = {

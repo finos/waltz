@@ -27,7 +27,7 @@ import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramIn
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramPreset;
 import org.finos.waltz.model.aggregate_overlay_diagram.BackingEntity;
 import org.finos.waltz.model.aggregate_overlay_diagram.ImmutableAggregateOverlayDiagramInfo;
-import org.finos.waltz.model.aggregate_overlay_diagram.OverlayDiagramCreateCommand;
+import org.finos.waltz.model.aggregate_overlay_diagram.OverlayDiagramSaveCommand;
 import org.finos.waltz.model.aggregate_overlay_diagram.OverlayDiagramKind;
 import org.finos.waltz.model.aggregate_overlay_diagram.OverlayDiagramPresetCreateCommand;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.AggregatedEntitiesWidgetData;
@@ -357,9 +357,9 @@ public class AggregateOverlayDiagramService {
                 .build();
     }
 
-    public Long create(OverlayDiagramCreateCommand createCmd, String username) {
-        Long diagramId = aggregateOverlayDiagramDao.save(createCmd, username);
-        aggregateOverlayDiagramDao.updateBackingEntities(diagramId, createCmd.backingEntities());
+    public Long save(OverlayDiagramSaveCommand saveCmd, String username) {
+        Long diagramId = aggregateOverlayDiagramDao.save(saveCmd, username);
+        aggregateOverlayDiagramDao.updateBackingEntities(diagramId, saveCmd.backingEntities());
         return diagramId;
     }
 

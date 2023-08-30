@@ -139,10 +139,7 @@ public class MeasurableRatingExtractor extends DirectQueryBasedDataExtractor {
                     .innerJoin(mc).on(mc.ID.eq(m.MEASURABLE_CATEGORY_ID))
                     .innerJoin(rs).on(rs.ID.eq(mc.RATING_SCHEME_ID))
                     .innerJoin(rsi).on(rsi.SCHEME_ID.eq(rs.ID))
-                    .leftJoin(mrd)
-                        .on(mrd.MEASURABLE_ID.eq(mr.MEASURABLE_ID)
-                                .and(mrd.ENTITY_ID.eq(mr.ENTITY_ID))
-                                .and(mrd.ENTITY_KIND.eq(mr.ENTITY_KIND)))
+                    .leftJoin(mrd).on(mrd.MEASURABLE_RATING_ID.eq(mr.ID))
                     .leftJoin(mrr).on(mrr.DECOMMISSION_ID.eq(mrd.ID))
                     .leftJoin(ou).on(ou.ID.eq(app.ORGANISATIONAL_UNIT_ID))
                     .where(reportConditions);

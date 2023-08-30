@@ -3,30 +3,39 @@ package org.finos.waltz.test_common.playwright;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import org.finos.waltz.common.IOUtilities;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 
 import static java.lang.String.format;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static org.finos.waltz.common.StringUtilities.mkPath;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class ScreenshotHelper {
+public class DocumentationHelper {
 
-    private AtomicInteger counter = new AtomicInteger(0);
-    private boolean paused = false;
+    private static final Logger LOG = LoggerFactory.getLogger(DocumentationHelper.class);
 
+    private final AtomicInteger counter = new AtomicInteger(0);
     private final Page page;
     private final String basePath;
     private final Map<String, String> filenameMap = new HashMap<>();
 
-    public ScreenshotHelper(Page page, String basePath) {
+    private boolean paused = false;
+
+
+    public DocumentationHelper(Page page, String basePath) {
         this.page = page;
         this.basePath = basePath;
     }
@@ -71,13 +80,15 @@ public class ScreenshotHelper {
     }
 
 
-    public ScreenshotHelper pause() {
+    public DocumentationHelper pause() {
+        LOG.debug("Pausing snapshotting");
         this.paused = true;
         return this;
     }
 
 
-    public ScreenshotHelper resume() {
+    public DocumentationHelper resume() {
+        LOG.debug("Resuming snapshotting");
         this.paused = false;
         return this;
     }
@@ -102,17 +113,48 @@ public class ScreenshotHelper {
         assertNotNull(templateStream, String.format("Could not find template on classpath: %s", templatePath));
 
         String templateStr = IOUtilities.readAsString(templateStream);
+        Set<String> requiredScreenshots = new HashSet<>();
+
         for (Map.Entry<String, String> entry : filenameMap.entrySet()) {
-            templateStr = templateStr.replaceAll(
-                    format("\\{\\{%s\\}\\}", entry.getKey()),
-                    format("![%s](%s \"%s\")", entry.getKey(), entry.getValue(), entry.getKey()));
+
+            Pattern pattern = Pattern.compile(format(
+                    "\\{\\{%s\\}\\}",
+                    entry.getKey()));
+
+            if (pattern.matcher(templateStr).find()) {
+                requiredScreenshots.add(entry.getValue());
+                templateStr = pattern
+                        .matcher(templateStr)
+                        .replaceAll(format(
+                                "![%s](%s \"%s\")",
+                                entry.getKey(),
+                                entry.getValue(),
+                                entry.getKey()));
+            }
         }
 
-        System.out.println(templateStr);
+        copyPreparedDocs(
+                templateStr,
+                requiredScreenshots);
 
-        String outputPath = mkPath("screenshots", basePath, "README.md");
-        FileWriter fw = new FileWriter(outputPath);
-        fw.write(templateStr);
-        fw.close();
+    }
+
+
+    private void copyPreparedDocs(String templateStr,
+                                  Set<String> requiredScreenshots) throws IOException {
+        Path screenshotFolder = Paths.get(mkPath("screenshots", basePath));
+        Path destFolder = Paths.get(mkPath("docs", basePath));
+        Files.createDirectories(destFolder);
+
+        for (String requiredScreenshot : requiredScreenshots) {
+            Path src = screenshotFolder.resolve(requiredScreenshot);
+            Path dest = destFolder.resolve(requiredScreenshot);
+            Files.copy(src, dest, REPLACE_EXISTING);
+        }
+
+        Path readmePath = destFolder.resolve("README.md");
+        Files.write(readmePath, templateStr.getBytes());
+
+        LOG.info("Documentation produced into: {}", destFolder.toAbsolutePath());
     }
 }

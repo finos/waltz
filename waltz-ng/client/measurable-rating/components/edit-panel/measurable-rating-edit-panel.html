@@ -280,7 +280,8 @@
 
         <!-- DECOMMISSION -->
         <div ng-if="$ctrl.selected.rating">
-            <waltz-planned-decommission-editor planned-decommission="$ctrl.selected.decommission"
+            <waltz-planned-decommission-editor measurable-rating="$ctrl.selected.rating"
+                                               planned-decommission="$ctrl.selected.decommission"
                                                replacement-apps="$ctrl.selected.replacementApps"
                                                on-save-decommission-date="$ctrl.onSaveDecommissionDate"
                                                on-remove-decommission="$ctrl.onRemoveDecommission"

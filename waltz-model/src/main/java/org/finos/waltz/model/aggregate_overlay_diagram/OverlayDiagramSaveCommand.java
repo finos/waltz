@@ -12,9 +12,9 @@ import org.immutables.value.Value;
 import java.util.Set;
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableOverlayDiagramCreateCommand.class)
-@JsonDeserialize(as = ImmutableOverlayDiagramCreateCommand.class)
-public abstract class OverlayDiagramCreateCommand implements IdProvider, NameProvider, DescriptionProvider, Command {
+@JsonSerialize(as = ImmutableOverlayDiagramSaveCommand.class)
+@JsonDeserialize(as = ImmutableOverlayDiagramSaveCommand.class)
+public abstract class OverlayDiagramSaveCommand implements IdProvider, NameProvider, DescriptionProvider, Command {
 
     public abstract String layoutData();
     public abstract EntityKind aggregatedEntityKind();

@@ -16,10 +16,8 @@
  *
  */
 import _ from "lodash";
-import moment from "moment";
 import {CORE_API} from "../common/services/core-api-utils";
 import {mkSelectionOptions} from "../common/selector-utils";
-import {formats} from "../common";
 import {lastViewedMeasurableCategoryKey} from "../user";
 
 
@@ -178,7 +176,7 @@ export function loadAllData(
 
 /**
  *
- * @param ctx - {measurables: [], allocationSchemes: [], categories: [], ratingSchemesById: {}, allocations: []}
+ * @param ctx - {measurables: [], allocationSchemes: [], categories: [], ratingSchemesById: {}, allocations: [], ratings: []}
  * @param includeEmpty
  * @returns {*}
  */

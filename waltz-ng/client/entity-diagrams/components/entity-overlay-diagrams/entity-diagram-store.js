@@ -1,12 +1,9 @@
 import {derived, get, writable} from "svelte/store";
 import _ from "lodash";
-import {defaultOverlay} from "./entity-diagram-utils";
 import {$http} from "../../../common/WaltzHttp";
 import {overlayDiagramKind} from "../../../common/services/enums/overlay-diagram-kind";
 import {buildHierarchies, flattenChildren} from "../../../common/hierarchy-utils";
 import {toEntityRef} from "../../../common/entity-utils";
-import {entity} from "../../../common/services/enums/entity";
-import {group} from "./DiagramInteractView.svelte";
 
 export let selectionOptions = writable(null);
 export let hoveredGroupId = writable(null);
@@ -115,7 +112,7 @@ function saveDiagram(diagram) {
 
     const diagramInfo = _.pick(diagram, ["id", "name", "description", "diagramKind", "aggregatedEntityKind"]);
 
-    const createCmd = Object.assign(
+    const saveCmd = Object.assign(
         {},
         diagramInfo,
         {
@@ -125,7 +122,7 @@ function saveDiagram(diagram) {
         });
 
     return $http
-        .post("api/aggregate-overlay-diagram/create", createCmd);
+        .post("api/aggregate-overlay-diagram/save", saveCmd);
 }
 
 

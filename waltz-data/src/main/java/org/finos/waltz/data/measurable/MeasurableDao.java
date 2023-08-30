@@ -280,6 +280,7 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .from(MEASURABLE)
                 .where(MEASURABLE.PARENT_ID.eq(parentId))
                 .and(MEASURABLE.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name()))
+                .orderBy(MEASURABLE.POSITION, MEASURABLE.NAME)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -302,16 +303,12 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
 
         Condition condition = mkCondition(reference);
 
-        Condition measurableToRatingJoinCondition = MEASURABLE_RATING.MEASURABLE_ID.eq(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_ID)
-                .and(MEASURABLE_RATING_PLANNED_DECOMMISSION.ENTITY_ID.eq(MEASURABLE_RATING.ENTITY_ID)
-                        .and(MEASURABLE_RATING_PLANNED_DECOMMISSION.ENTITY_KIND.eq(MEASURABLE_RATING.ENTITY_KIND)));
-
         return dsl
                 .selectDistinct(MEASURABLE_CATEGORY.RATING_EDITOR_ROLE)
                 .from(MEASURABLE_CATEGORY)
                 .innerJoin(MEASURABLE).on(MEASURABLE_CATEGORY.ID.eq(MEASURABLE.MEASURABLE_CATEGORY_ID))
                 .leftJoin(MEASURABLE_RATING).on(MEASURABLE_RATING.MEASURABLE_ID.eq(MEASURABLE.ID))
-                .leftJoin(MEASURABLE_RATING_PLANNED_DECOMMISSION).on(measurableToRatingJoinCondition)
+                .leftJoin(MEASURABLE_RATING_PLANNED_DECOMMISSION).on(MEASURABLE_RATING.ID.eq(MEASURABLE_RATING_PLANNED_DECOMMISSION.ID))
                 .where(condition)
                 .fetchOne()
                 .get(MEASURABLE_CATEGORY.RATING_EDITOR_ROLE);

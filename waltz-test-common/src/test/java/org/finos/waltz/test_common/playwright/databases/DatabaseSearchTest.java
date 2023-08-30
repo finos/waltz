@@ -4,7 +4,7 @@ import com.microsoft.playwright.Locator;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.test_common.helpers.DatabaseHelper;
 import org.finos.waltz.test_common.playwright.BasePlaywrightIntegrationTest;
-import org.finos.waltz.test_common.playwright.ScreenshotHelper;
+import org.finos.waltz.test_common.playwright.DocumentationHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ public class DatabaseSearchTest extends BasePlaywrightIntegrationTest {
 
     @Test
     public void exactSearch() {
-        ScreenshotHelper screenshotHelper = new ScreenshotHelper(
+        DocumentationHelper documentationHelper = new DocumentationHelper(
                 page,
                 "databases/search");
 
@@ -56,7 +56,7 @@ public class DatabaseSearchTest extends BasePlaywrightIntegrationTest {
 
         resultLocator.waitFor();
 
-        screenshotHelper.takePageSnapshot(
+        documentationHelper.takePageSnapshot(
                 resultLocator,
                 "after-typing.png");
 
@@ -73,6 +73,6 @@ public class DatabaseSearchTest extends BasePlaywrightIntegrationTest {
 
         assertThat(dbPageTitleLocator).isVisible();
 
-        screenshotHelper.takePageSnapshot(dbPageTitleLocator, "clicked-link.png");
+        documentationHelper.takePageSnapshot(dbPageTitleLocator, "clicked-link.png");
     }
 }
