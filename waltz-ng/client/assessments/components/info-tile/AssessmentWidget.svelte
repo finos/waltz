@@ -76,7 +76,7 @@
     }
 
     $: assessmentCounts = $assessmentSummaryCall?.data;
-    $: displayedDefinition = _.find(assessmentCounts, d => d.definitionId === selectedDefinition.id);
+    $: displayedDefinition = _.find(assessmentCounts, d => d.definitionId === selectedDefinition?.id);
     $: availableDefinitions = _.map(assessmentCounts, d => d.definitionId);
 
     $: graphData = _
