@@ -30,6 +30,7 @@ import systemRoles from "../user/system-roles";
  * @returns string  key of role
  */
 export function getEditRoleForEntityKind(kind, secondaryKind) {
+    console.log({kind, secondaryKind});
     switch (kind) {
         case "APPLICATION":
             return systemRoles.APP_EDITOR.key;
