@@ -408,7 +408,8 @@
 
 
     <changeSet id="20230829-6728-23"
-               author="davidwatkins73">
+               author="davidwatkins73"
+               dbms="!mssql">
         <addForeignKeyConstraint baseTableName="allocated_cost_definition"
                                  baseColumnNames="target_cost_kind_id"
                                  constraintName="allocated_cost_defn_target_cost_kind_fk"

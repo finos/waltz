@@ -18,6 +18,7 @@
 
 package org.finos.waltz.data.cost;
 
+import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.cost.CostKindWithYears;
 import org.finos.waltz.model.cost.ImmutableCostKindWithYears;
 import org.finos.waltz.schema.tables.records.CostKindRecord;
@@ -49,6 +50,7 @@ public class CostKindDao {
                 .name(record.getName())
                 .description(record.getDescription())
                 .externalId(record.getExternalId())
+                .subjectKind(EntityKind.valueOf(record.getSubjectKind()))
                 .isDefault(record.getIsDefault())
                 .build();
     };

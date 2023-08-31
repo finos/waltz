@@ -14,8 +14,13 @@ public abstract class MeasurableCostEntry {
 
     public abstract long measurableId();
 
+    public abstract long measurableRatingId();
+
     @Nullable
     public abstract Long costKindId();
+
+    @Nullable
+    public abstract Integer year();
 
     @Nullable
     public abstract Integer allocationPercentage();
@@ -25,6 +30,5 @@ public abstract class MeasurableCostEntry {
 
     @Nullable
     public abstract BigDecimal allocatedCost();
-
     public abstract AllocationDerivation allocationDerivation();
 }
