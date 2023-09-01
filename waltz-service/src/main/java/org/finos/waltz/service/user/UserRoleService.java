@@ -39,6 +39,7 @@ import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.model.user.UpdateRolesCommand;
 import org.finos.waltz.model.user.User;
 import org.jooq.lambda.tuple.Tuple2;
+import org.jooq.lambda.tuple.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -215,10 +216,9 @@ public class UserRoleService {
 
 
     private List<BulkUserOperationRowPreview> mkBulkOperationPreviews(List<String> lines) {
-        List<Tuple2<String, String>> parsed = parseBulkOperationLines(lines);
-
-        Set<String> distinctPeople = SetUtilities.map(parsed, Tuple2::v1);
-        Set<String> distinctRoles = SetUtilities.map(parsed, Tuple2::v2);
+        List<Tuple3<String, String, String>> parsed = parseBulkOperationLines(lines);
+        Set<String> distinctPeople = SetUtilities.map(parsed, Tuple3::v1);
+        Set<String> distinctRoles = SetUtilities.map(parsed, Tuple3::v2);
 
         Set<String> unknownPeople = minus(
                 distinctPeople,
@@ -236,29 +236,32 @@ public class UserRoleService {
                         .builder()
                         .givenUser(t.v1)
                         .givenRole(t.v2)
+                        .givenComment(t.v3)
                         .resolvedUser(unknownPeople.contains(t.v1) ? null : t.v1)
                         .resolvedRole(unknownRoles.contains(t.v2) ? null : t.v2)
+                        .resolvedComment(t.v3)
                         .build())
                 .collect(toList());
     }
 
 
     /**
-     * Expects a list of lines, each one containing a username and role.
+     * Expects a list of lines, each one containing a username, role and comment.
      * The cells may be delimited by comma or by tab.
      *
      * @param lines
-     * @return a list of tuples, each one containing a username and role
+     * @return a list of tuples, each one containing a username, role and comment
      */
-    private static List<Tuple2<String, String>> parseBulkOperationLines(List<String> lines) {
+    private static List<Tuple3<String, String, String>> parseBulkOperationLines(List<String> lines) {
         return lines
                 .stream()
                 .map(cmd -> tokenise(cmd, "(,|\\t)"))
                 .map(parts -> tuple(
                         getOrDefault(parts, 0, null),
-                        getOrDefault(parts, 1, null)))
-                .filter(t -> ! ("username".equalsIgnoreCase(t.v1) && "role".equalsIgnoreCase(t.v2))) // remove header
-                .filter(t -> ! (StringUtilities.isEmpty(t.v1) && StringUtilities.isEmpty(t.v2))) // remove empty lines
+                        getOrDefault(parts, 1, null),
+                        getOrDefault(parts, 2, null)))
+                .filter(t -> ! ("username".equalsIgnoreCase(t.v1) && "role".equalsIgnoreCase(t.v2) && "comment".equalsIgnoreCase(t.v3))) // remove header
+                .filter(t -> ! (StringUtilities.isEmpty(t.v1) && StringUtilities.isEmpty(t.v2) && StringUtilities.isEmpty(t.v3))) // remove empty lines
                 .collect(toList());
     }
 
