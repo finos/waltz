@@ -33,9 +33,7 @@ import AggregatedEntitiesOverlayCell from "./widgets/aggregated-entities/Aggrega
 import {
     resetParameters as resetComplexityParameters
 } from "../aggregate-overlay-diagram/widgets/complexities/ComplexityWidgetParameters.svelte";
-import {
-    resetParameters as resetAttestationParameters
-} from "../aggregate-overlay-diagram/widgets/attestations/store";
+import {resetParameters as resetAttestationParameters} from "../aggregate-overlay-diagram/widgets/attestations/store";
 import {
     resetParameters as resetAssessmentParameters
 } from "../aggregate-overlay-diagram/widgets/assessments/AssessmentWidgetParameters.svelte";
@@ -338,6 +336,23 @@ export function mkAppChangesOverlayGlobalProps(data) {
         .value();
 
     return {maxInboundCount, maxOutboundCount};
+}
+
+
+export function mkRatingCostOverlayGlobalProps(data) {
+
+    const maxCost = _
+        .chain(data.cellData)
+        .map(d => _.get(d, ["totalCost"], 0))
+        .max()
+        .value();
+
+    return {
+        maxCost,
+        applicationsById: _.keyBy(data.applications, d => d.id),
+        measurablesById: _.keyBy(data.measurables, d => d.id),
+        costKindsById: _.keyBy(data.costKinds, d => d.id)
+    };
 }
 
 

@@ -21,7 +21,7 @@ import _ from "lodash";
 import {entity} from "../../../common/services/enums/entity";
 import {
     mkAggregatedEntitiesGlobalProps, mkAppChangesOverlayGlobalProps,
-    mkAssessmentOverlayGlobalProps
+    mkAssessmentOverlayGlobalProps, mkRatingCostOverlayGlobalProps
 } from "../../../aggregate-overlay-diagram/components/aggregate-overlay-diagram/aggregate-overlay-diagram-utils";
 import DefaultOverlay from "./overlays/DefaultOverlay.svelte";
 import AggregatedEntitiesOverlayParameters from "./overlays/AggregatedEntitiesOverlayParameters.svelte";
@@ -38,6 +38,8 @@ import AssessmentOverlay from "./overlays/assessment/AssessmentOverlay.svelte";
 import AssessmentOverlayLegendDetail from "./overlays/assessment/AssessmentOverlayLegendDetail.svelte";
 import ApplicationChangesOverlay from "./overlays/ApplicationChangesOverlay.svelte";
 import ApplicationChangesOverlayParameters from "./overlays/ApplicationChangesOverlayParameters.svelte";
+import RatingCostOverlayParameters from "./overlays/cost/RatingCostOverlayParameters.svelte";
+import RatingCostOverlay from "./overlays/cost/RatingCostOverlay.svelte";
 
 export const FlexDirections = {
     COLUMN: "column",
@@ -223,9 +225,20 @@ export const overlays =  [
         component: ApplicationChangesOverlay,
         urlSuffix: "app-change-widget",
         mkGlobalProps: mkAppChangesOverlayGlobalProps,
-        resetParameters: resetAssessmentParameters,
         aggregatedEntityKinds: [entity.APPLICATION.key],
         parameterWidget: ApplicationChangesOverlayParameters,
+        showTitle: true
+    },
+    {
+        key: "COSTS",
+        name: "Costs",
+        icon: "money",
+        description: "Displays this years allocated costs associated to the backing entities",
+        component: RatingCostOverlay,
+        urlSuffix: "rating-cost-widget",
+        mkGlobalProps: mkRatingCostOverlayGlobalProps,
+        aggregatedEntityKinds: [entity.APPLICATION.key],
+        parameterWidget: RatingCostOverlayParameters,
         showTitle: true
     }
 ]

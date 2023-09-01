@@ -76,7 +76,7 @@ function _loadOverlayData() {
                     const visibleOverlayData = _.filter(allOverlayData.cellData, d => _.includes(visGroupIds, d.cellExternalId));
 
                     const props = overlay.mkGlobalProps
-                        ? overlay.mkGlobalProps({cellData: visibleOverlayData})
+                        ? overlay.mkGlobalProps(Object.assign({}, allOverlayData, {cellData: visibleOverlayData}))
                         : {};
 
                     overlayData.set(cellDataByExtId);
@@ -96,6 +96,7 @@ function selectOverlay(overlay) {
     overlayParameters.set(null);
     overlayData.set([]);
     selectedOverlay.set(overlay);
+    selectedGroup.set(null);
     _loadOverlayData();
 }
 

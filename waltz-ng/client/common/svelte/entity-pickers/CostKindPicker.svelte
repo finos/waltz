@@ -12,10 +12,11 @@
 
     export let onSelect = () => console.log("Selecting cost kind");
     export let selectionFilter = () => true;
+    export let subjectKind = "APPLICATION";
 
     let rowData = [];
 
-    $: costKindCall = costKindStore.findAll();
+    $: costKindCall = costKindStore.findBySubjectKind(subjectKind);
     $: costKinds = $costKindCall.data;
     $: rowData = _
         .chain(costKinds)
@@ -23,6 +24,7 @@
         .filter(selectionFilter)
         .orderBy(d => d.name)
         .value();
+
 </script>
 
 <div class="help-block small">

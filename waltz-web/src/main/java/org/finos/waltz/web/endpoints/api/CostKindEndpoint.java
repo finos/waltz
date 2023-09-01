@@ -51,8 +51,11 @@ public class CostKindEndpoint implements Endpoint {
 
         String findAllPath = mkPath(BASE_URL);
         String findCostKindsBySelectorPath = mkPath(BASE_URL, "target-kind", ":kind", "selector");
+        String findCostKindsBySubjectKindPath = mkPath(BASE_URL, "subject-kind", ":kind");
 
         ListRoute<CostKindWithYears> findAllRoute = (request, response) -> costKindService.findAll();
+        ListRoute<CostKindWithYears> findBySubjectKindRoute = (request, response) -> costKindService
+                .findCostKindsBySubjectKind(getKind(request));
 
         ListRoute<CostKindWithYears> findCostKindsBySelectorRoute = (request, response) -> {
             EntityKind targetKind = getKind(request);
@@ -62,6 +65,7 @@ public class CostKindEndpoint implements Endpoint {
 
         getForList(findAllPath, findAllRoute);
         postForList(findCostKindsBySelectorPath, findCostKindsBySelectorRoute);
+        getForList(findCostKindsBySubjectKindPath, findBySubjectKindRoute);
     }
 
 }

@@ -32,7 +32,7 @@
                                  {parentEntityRef}>
             </DiagramInteractView>
         </div>
-        <div class="col-sm-4">
+        <div class="col-sm-4" style="padding: 0">
             <div class="waltz-sticky-part">
                 <DiagramContextPanel/>
             </div>

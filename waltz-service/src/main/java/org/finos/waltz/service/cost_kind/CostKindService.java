@@ -31,6 +31,11 @@ public class CostKindService {
     }
 
 
+    public Set<CostKindWithYears> findCostKindsBySubjectKind(EntityKind kind){
+        return costKindDao.findCostKindsBySubjectKind(kind);
+    }
+
+
     public Set<CostKindWithYears> findCostKindsSelectorRoute(EntityKind targetKind,
                                                              IdSelectionOptions selectionOptions) {
         GenericSelector genericSelector = genericSelectorFactory.applyForKind(
