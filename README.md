@@ -70,8 +70,8 @@ progress and done issues.
 | Release | Date           | Summary                                           |
 |---------|----------------|---------------------------------------------------|
 | 1.53    | Sept 5th 2023  | Diagrams (builder + markdown), Cost Allocations   |
-| 1.54    | Mid Oct 2023   | tbd                                               |
-| 1.55    | Late Nov 2023  | tbd                                               |
+| 1.54    | Sept 26th 2023 | tbd                                               |
+| 1.55    | tbc  | tbd                                               |
 
 See the [releases](https://github.com/finos/waltz/releases) page for historic versions.
 
