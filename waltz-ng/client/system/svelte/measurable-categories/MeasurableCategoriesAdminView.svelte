@@ -161,6 +161,34 @@
             </div>
 
 
+            <div class="form-group">
+                <label for="editable">
+                    Editable
+                </label>
+                <div>
+                    <input id="editable"
+                           type="checkbox"
+                           bind:checked={workingCopy.editable}>
+                    <div class="help-inline">
+                        Allow the taxonomy to be edited from within Waltz using the maintenance screen.
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="editor_role">
+                    Editor Role
+                </label>
+                <div>
+                    <input id="editor_role"
+                           bind:value={workingCopy.ratingEditorRole}>
+                    <div class="help-inline">
+                        Which role is needed to edit the taxonomy
+                    </div>
+                </div>
+            </div>
+
+
             <button type="submit"
                     class="btn btn-primary">
                 Save
