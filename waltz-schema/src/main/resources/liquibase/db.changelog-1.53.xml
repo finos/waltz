@@ -408,7 +408,8 @@
 
 
     <changeSet id="20230829-6728-23"
-               author="davidwatkins73">
+               author="davidwatkins73"
+               dbms="!mssql">
         <addForeignKeyConstraint baseTableName="allocated_cost_definition"
                                  baseColumnNames="target_cost_kind_id"
                                  constraintName="allocated_cost_defn_target_cost_kind_fk"
@@ -433,6 +434,35 @@
         <setColumnRemarks tableName="allocated_cost_definition" columnName="allocation_scheme_id" remarks="reference to the allocation scheme that will be used to split cost from the source kind onto new costs represented by the target kind" />
         <setColumnRemarks tableName="allocated_cost_definition" columnName="source_cost_kind_id" remarks="reference to the cost kind being used as the source costs, usually a cost related to applications" />
         <setColumnRemarks tableName="allocated_cost_definition" columnName="target_cost_kind_id" remarks="reference to the cost kind being to represent the shredded target costs, usually a cost related to measurable_ratings" />
+    </changeSet>
+
+
+    <changeSet id="20230901-6728-26"
+               author="davidwatkins73">
+        <comment>6728: Fix the default value</comment>
+
+        <dropDefaultValue tableName="cost_kind"
+                          columnName="subject_kind"/>
+
+        <addDefaultValue tableName="cost_kind"
+                         columnName="subject_kind"
+                         defaultValue="APPLICATION"/>
+    </changeSet>
+
+    <changeSet id="20230901-6728-27"
+               author="davidwatkins73">
+        <comment>6728: Fix the default value</comment>
+        <update tableName="cost_kind">
+            <column name="subject_kind"
+                    value="APPLICATION"/>
+            <where>subject_kind like '%APPLICATION%'</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="20230901-6728-28"
+               author="davidwatkins73">
+        <comment>6728: Fix the default value</comment>
+        <setColumnRemarks tableName="cost_kind" columnName="subject_kind" remarks="the kind of subject that this cost is related to, e.g. APPLICATION, MEASURABLE_RATING, etc."/>
     </changeSet>
 
 
