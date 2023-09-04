@@ -39,7 +39,7 @@
 
     const colorScale = scaleLinear()
         .domain([0, maxCost])
-        .range(["#ffffff", "#62fa91"])
+        .range(["#ffffff", "#76fd58"])
         .clamp(true);
 
 </script>

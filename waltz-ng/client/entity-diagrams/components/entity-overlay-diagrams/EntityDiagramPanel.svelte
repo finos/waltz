@@ -9,19 +9,27 @@
     import {overlayDiagramKind} from "../../../common/services/enums/overlay-diagram-kind";
     import {releaseLifecycleStatus} from "../../../common/services/enums/release-lifecycle-status";
     import _ from "lodash";
+    import {onMount} from "svelte";
 
     export let parentEntityRef;
 
-    const {selectDiagram, overlayData, selectedOverlay, diagramLayout, selectedDiagram} = diagramService;
+    const {selectDiagram, overlayData, selectedOverlay, diagramLayout, selectedDiagram, reset} = diagramService;
 
     const diagramsCall = aggregateOverlayDiagramStore.findByKind(overlayDiagramKind.WALTZ_ENTITY_OVERLAY.key, true);
-    $: diagrams = _.filter($diagramsCall.data, d => d.status === releaseLifecycleStatus.ACTIVE.key) || [];
 
-    $: $selectionOptions = mkSelectionOptions(parentEntityRef);
+    onMount(() => {
+
+        reset();
+        $selectionOptions = mkSelectionOptions(parentEntityRef);
+    })
 
     function selectOverlayDiagram(evt) {
+
         selectDiagram(evt.detail.id);
     }
+
+
+    $: diagrams = _.filter($diagramsCall.data, d => d.status === releaseLifecycleStatus.ACTIVE.key) || [];
 
 </script>
 

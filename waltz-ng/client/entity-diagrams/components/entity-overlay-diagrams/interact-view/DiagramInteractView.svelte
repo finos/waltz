@@ -17,10 +17,14 @@
 
     export let group;
 
-    const {selectedOverlay, selectedGroup, selectGroup, overlayData} = diagramService;
+    const {selectedOverlay, selectedGroup, selectGroup, overlayData, clearSelectedGroup} = diagramService;
 
     function selectOverlayGroup() {
-        selectGroup(group);
+        if ($selectedGroup?.id === group.id) {
+            clearSelectedGroup();
+        } else {
+            selectGroup(group);
+        }
     }
 
     function hasData(node, dataById) {
@@ -86,7 +90,7 @@
                     </div>
                 {:else}
                     {#if group.data}
-                        <div style={mkCellContentStyle(group)}>
+                        <div style={mkCellContentStyle(group, $hoveredGroupId)}>
                             <CellContent data={group.data}
                                          cellId={group.id}
                                          height={group.props.minWidth / 3}

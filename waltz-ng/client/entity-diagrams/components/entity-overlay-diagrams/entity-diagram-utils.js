@@ -96,13 +96,14 @@ export function mkChildGroupStyle(group, child) {
         ${group.props.flexDirection === FlexDirections.ROW ? "height: fit-content;" : "width: min-content;"}`;
 }
 
-export function mkCellContentStyle(group) {
+export function mkCellContentStyle(group, hoveredGroupId) {
     return `
         margin: 0.2em;
         padding: 0.1em;
         min-width: ${group.props.minWidth}em;
         min-height: ${group.props.minHeight}em;
         height: fit-content;
+        opacity: ${_.isNil(hoveredGroupId) || hoveredGroupId === group.id ? "1;" : "0.5;"}
         ${group.props.flexDirection === FlexDirections.ROW ? "height: fit-content;" : "width: fit-content;"}
         font-size: ${group.props.contentFontSize}em;`;
 }

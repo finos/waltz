@@ -33,26 +33,7 @@
     </div>
 {/if}
 
-<details open={_.isEmpty($selectedOverlay) || _.isEmpty($overlayParameters)}>
-    <summary>
-        Overlay
-        {#if $selectedOverlay}
-            <span>
-                - {$selectedOverlay.name}
-            </span>
-        {/if}
-    </summary>
-    <OverlayDiagramPicker/>
-</details>
 
-<details open={!_.isEmpty($selectedGroup)}>
-    <summary>
-        Detail
-        {#if $selectedGroup}
-            <span>
-                - {$selectedGroup.title}
-            </span>
-        {/if}
-    </summary>
-    <SelectedGroupPanel/>
-</details>
+<OverlayDiagramPicker/>
+
+<SelectedGroupPanel/>

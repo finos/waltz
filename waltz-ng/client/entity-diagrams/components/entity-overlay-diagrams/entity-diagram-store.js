@@ -146,7 +146,13 @@ function selectDiagram(diagramId) {
 
 
 function selectGroup(group) {
+    hoveredGroupId.set(group?.id);
     selectedGroup.set(group);
+}
+
+function clearSelectedGroup() {
+    hoveredGroupId.set(null);
+    selectedGroup.set(null);
 }
 
 function populateFromExistingData(layoutData = []) {
@@ -235,6 +241,7 @@ function createStores() {
         updateDiagramStatus,
         populateFromExistingData,
         selectGroup,
+        clearSelectedGroup,
         addGroup,
         removeGroup,
         updateGroup,

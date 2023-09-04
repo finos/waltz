@@ -21,7 +21,7 @@
     let timeout;
     let showReorderPanels = false;
 
-    const {selectedOverlay, updateGroup, updateChildren, selectedGroup, groups, selectGroup} = diagramService;
+    const {selectedOverlay, updateGroup, updateChildren, selectedGroup, groups, selectGroup, clearSelectedGroup} = diagramService;
 
     function drop(evt, targetGroup) {
         evt.preventDefault();
@@ -98,7 +98,11 @@
     }
 
     function selectOverlayGroup(group) {
-        selectGroup(group);
+        if ($selectedGroup?.id === group.id) {
+            clearSelectedGroup();
+        } else {
+            selectGroup(group);
+        }
     }
 
 </script>
@@ -106,7 +110,10 @@
 {#if group}
 <div draggable={true}
      on:dragstart|stopPropagation={event => dragStart(event, group)}
-     ondragover="return false">
+     ondragover="return false"
+     on:click|stopPropagation={() => selectOverlayGroup(group)}
+     on:keydown|stopPropagation={() => selectOverlayGroup(group)}
+     class="clickable">
 
     <div style="display: flex">
 
@@ -143,7 +150,7 @@
                     </div>
                 {:else}
                     {#if group.data}
-                        <div style={mkCellContentStyle(group)}>
+                        <div style={mkCellContentStyle(group, $hoveredGroupId)}>
                             <CellContent data={group.data}
                                          cellId={group.id}
                                          height={group.props.minWidth / 3}
