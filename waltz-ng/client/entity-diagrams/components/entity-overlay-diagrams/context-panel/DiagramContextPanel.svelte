@@ -4,7 +4,6 @@
     import Icon from "../../../../common/svelte/Icon.svelte";
     import OverlayDiagramPicker from "./OverlayDiagramPicker.svelte";
     import SelectedGroupPanel from "./SelectedGroupPanel.svelte";
-    import _ from "lodash";
 
     const {selectedDiagram, reset, selectedGroup, selectedOverlay, overlayParameters} = diagramService;
 
