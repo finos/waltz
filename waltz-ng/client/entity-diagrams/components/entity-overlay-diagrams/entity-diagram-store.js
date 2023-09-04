@@ -146,12 +146,10 @@ function selectDiagram(diagramId) {
 
 
 function selectGroup(group) {
-    hoveredGroupId.set(group?.id);
     selectedGroup.set(group);
 }
 
 function clearSelectedGroup() {
-    hoveredGroupId.set(null);
     selectedGroup.set(null);
 }
 

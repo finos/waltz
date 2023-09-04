@@ -59,7 +59,7 @@
              on:click|stopPropagation={selectOverlayGroup}
              on:keydown|stopPropagation={selectOverlayGroup}>
             {#if group.props.showTitle}
-                <div style={mkTitleStyle(group, $hoveredGroupId)}>
+                <div style={mkTitleStyle(group, $selectedGroup?.id, $hoveredGroupId)}>
                     <button style="outline: none !important; width: 100%; background: none; border: none; color: inherit;">
                         {#if group.data}
                             <Icon name={_.get(entity, [group.data.entityReference.kind, "icon"], "info-circle")}/>
@@ -74,7 +74,7 @@
                     </button>
                 </div>
             {:else if overlayRequiresTitle}
-                <div style={mkTitleStyle(group, $hoveredGroupId)}>
+                <div style={mkTitleStyle(group, $selectedGroup?.id, $hoveredGroupId)}>
                     <button style="outline: none !important; width: 100%; background: none; border: none; color: inherit;">
                         {group.title}
                     </button>
@@ -90,7 +90,7 @@
                     </div>
                 {:else}
                     {#if group.data}
-                        <div style={mkCellContentStyle(group, $hoveredGroupId)}>
+                        <div style={mkCellContentStyle(group, $selectedGroup?.id, $hoveredGroupId)}>
                             <CellContent data={group.data}
                                          cellId={group.id}
                                          height={group.props.minWidth / 3}

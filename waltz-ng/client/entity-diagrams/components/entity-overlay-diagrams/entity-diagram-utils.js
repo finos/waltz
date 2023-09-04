@@ -96,14 +96,16 @@ export function mkChildGroupStyle(group, child) {
         ${group.props.flexDirection === FlexDirections.ROW ? "height: fit-content;" : "width: min-content;"}`;
 }
 
-export function mkCellContentStyle(group, hoveredGroupId) {
+export function mkCellContentStyle(group, selectedGroup, hoveredGroup) {
+    const isSelected = _.isNil(selectedGroup) || selectedGroup === group.id;
+    const isHovered = _.isNil(hoveredGroup) || hoveredGroup === group.id;
     return `
         margin: 0.2em;
         padding: 0.1em;
         min-width: ${group.props.minWidth}em;
         min-height: ${group.props.minHeight}em;
         height: fit-content;
-        opacity: ${_.isNil(hoveredGroupId) || hoveredGroupId === group.id ? "1;" : "0.5;"}
+        opacity: ${isSelected || isHovered? "1;" : "0.5;"}
         ${group.props.flexDirection === FlexDirections.ROW ? "height: fit-content;" : "width: fit-content;"}
         font-size: ${group.props.contentFontSize}em;`;
 }
@@ -123,13 +125,15 @@ export function mkGroupCellStyle(group) {
         border: ${group.props.showBorder ? "1px solid " + group.props.titleColor : "none"}`;
 }
 
-export function mkTitleStyle(group, hoveredGroupId) {
+export function mkTitleStyle(group, selectedGroup, hoveredGroup) {
+    const isSelected = _.isNil(selectedGroup) || selectedGroup === group.id;
+    const isHovered = _.isNil(hoveredGroup) || hoveredGroup === group.id;
     return `
         text-align: center;
         font-weight: bolder;
         padding: 0 0.5em;
         ${mkColourProps(group.props.showTitle ? group.props.titleColor : group.props.contentColor)}
-        opacity: ${_.isNil(hoveredGroupId) || hoveredGroupId === group.id ? "1;" : "0.5;"}
+        opacity: ${isSelected || isHovered? "1;" : "0.5;"}
         font-size: ${group.props.showTitle ? group.props.titleFontSize : group.props.contentFontSize}em;`;
 }
 
