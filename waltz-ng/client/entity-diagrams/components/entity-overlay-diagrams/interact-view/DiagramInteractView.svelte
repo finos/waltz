@@ -50,11 +50,13 @@
 {#if group}
 <div>
     <div style="display: flex">
-        <div style={mkGroupCellStyle(group)}>
+        <div style={mkGroupCellStyle(group)}
+             class="clickable"
+             on:click|stopPropagation={selectOverlayGroup}
+             on:keydown|stopPropagation={selectOverlayGroup}>
             {#if group.props.showTitle}
                 <div style={mkTitleStyle(group, $hoveredGroupId)}>
-                    <button style="outline: none !important; width: 100%; background: none; border: none; color: inherit;"
-                            on:click={selectOverlayGroup}>
+                    <button style="outline: none !important; width: 100%; background: none; border: none; color: inherit;">
                         {#if group.data}
                             <Icon name={_.get(entity, [group.data.entityReference.kind, "icon"], "info-circle")}/>
                         {:else}
@@ -69,8 +71,7 @@
                 </div>
             {:else if overlayRequiresTitle}
                 <div style={mkTitleStyle(group, $hoveredGroupId)}>
-                    <button style="outline: none !important; width: 100%; background: none; border: none; color: inherit;"
-                            on:click={selectOverlayGroup}>
+                    <button style="outline: none !important; width: 100%; background: none; border: none; color: inherit;">
                         {group.title}
                     </button>
                 </div>

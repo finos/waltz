@@ -44,10 +44,6 @@
 
     <svelte:component this={$selectedOverlay.parameterWidget}/>
 
-    {#if $selectedOverlay.legend}
-        <svelte:component this={$selectedOverlay.legend}/>
-    {/if}
-
 
 {:else if overlayMode === OverlayModes.PICKER || _.isEmpty($selectedOverlay)}
     <div class="help-block">

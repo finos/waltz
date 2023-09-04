@@ -22,10 +22,12 @@
 
 </script>
 
-<svelte:component this={comp}
-                  {cellData}
-                  {data}
-                  {height}
-                  {width}
-                  {renderMode}
-                  {...$overlayProperties}/>
+{#if overlayData}
+    <svelte:component this={comp}
+                      {cellData}
+                      {data}
+                      {height}
+                      {width}
+                      {renderMode}
+                      {...$overlayProperties}/>
+{/if}
