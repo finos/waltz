@@ -18,7 +18,6 @@
     const diagramsCall = aggregateOverlayDiagramStore.findByKind(overlayDiagramKind.WALTZ_ENTITY_OVERLAY.key, true);
 
     onMount(() => {
-
         reset();
         $selectionOptions = mkSelectionOptions(parentEntityRef);
     })
