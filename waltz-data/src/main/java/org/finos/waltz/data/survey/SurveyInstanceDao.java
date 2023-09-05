@@ -170,7 +170,7 @@ public class SurveyInstanceDao {
         r.setName(d.name());
         r.setApprovalDueDate(toSqlDate(d.approvalDueDate()));
         r.setIssuedOn(toSqlDate(d.issuedOn()));
-        r.changed(LEGAL_ENTITY_RELATIONSHIP.ID, false);
+        r.changed(SURVEY_INSTANCE.ID, false);
 
         return r;
     };
