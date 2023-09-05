@@ -27,6 +27,7 @@ import org.finos.waltz.model.ReleaseLifecycleStatus;
 import org.finos.waltz.model.Severity;
 import org.finos.waltz.model.attestation.ImmutableSyncRecipientsResponse;
 import org.finos.waltz.model.attestation.SyncRecipientsResponse;
+import org.finos.waltz.model.legal_entity.LegalEntityRelationship;
 import org.finos.waltz.model.survey.ImmutableSurveyInstance;
 import org.finos.waltz.model.survey.ImmutableSurveyRunCompletionRate;
 import org.finos.waltz.model.survey.SurveyInstance;
@@ -34,10 +35,7 @@ import org.finos.waltz.model.survey.SurveyInstanceCreateCommand;
 import org.finos.waltz.model.survey.SurveyInstanceStatus;
 import org.finos.waltz.model.survey.SurveyInvolvementKind;
 import org.finos.waltz.model.survey.SurveyRunCompletionRate;
-import org.finos.waltz.schema.tables.records.ChangeLogRecord;
-import org.finos.waltz.schema.tables.records.SurveyInstanceOwnerRecord;
-import org.finos.waltz.schema.tables.records.SurveyInstanceRecipientRecord;
-import org.finos.waltz.schema.tables.records.SurveyInstanceRecord;
+import org.finos.waltz.schema.tables.records.*;
 import org.jooq.CommonTableExpression;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -59,12 +57,8 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -126,7 +120,7 @@ public class SurveyInstanceDao {
             SurveyInstanceStatus.COMPLETED,
             SurveyInstanceStatus.REJECTED);
 
-    private static final RecordMapper<Record, SurveyInstance> TO_DOMAIN_MAPPER = r -> {
+    public static final RecordMapper<Record, SurveyInstance> TO_DOMAIN_MAPPER = r -> {
         SurveyInstanceRecord record = r.into(si);
         return ImmutableSurveyInstance.builder()
                 .id(record.getId())
@@ -153,6 +147,32 @@ public class SurveyInstanceDao {
                         .orElse(null))
                 .issuedOn(toLocalDate(record.getIssuedOn()))
                 .build();
+    };
+
+    private static final Function<SurveyInstance, SurveyInstanceRecord> TO_RECORD_MAPPER = d -> {
+
+        SurveyInstanceRecord r = new SurveyInstanceRecord();
+
+        d.id().ifPresent(r::setId);
+        r.setSurveyRunId(d.surveyRunId());
+        r.setEntityKind(d.surveyEntity().kind().name());
+        r.setEntityId(d.surveyEntity().id());
+        r.setStatus(d.status().name());
+        r.setSubmittedAt(Timestamp.valueOf(d.submittedAt()));
+        r.setSubmittedBy(d.submittedBy());
+        r.setDueDate(toSqlDate(d.dueDate()));
+        r.setOriginalInstanceId(d.originalInstanceId());
+        r.setApprovedAt(Timestamp.valueOf(d.approvedAt()));
+        r.setApprovedBy(d.approvedBy());
+        r.setOwningRole(d.owningRole());
+        r.setEntityQualifierId(d.qualifierEntity().id());
+        r.setEntityQualifierKind(d.qualifierEntity().kind().name());
+        r.setName(d.name());
+        r.setApprovalDueDate(toSqlDate(d.approvalDueDate()));
+        r.setIssuedOn(toSqlDate(d.issuedOn()));
+        r.changed(LEGAL_ENTITY_RELATIONSHIP.ID, false);
+
+        return r;
     };
 
     private final DSLContext dsl;
@@ -196,6 +216,20 @@ public class SurveyInstanceDao {
                 .from(si)
                 .where(si.SURVEY_RUN_ID.eq(surveyRunId))
                 .and(IS_ORIGINAL_INSTANCE_CONDITION)
+                .fetchSet(TO_DOMAIN_MAPPER);
+    }
+
+
+    public Set<SurveyInstance> findForSurveyTemplate(long templateId, SurveyInstanceStatus... statuses) {
+        Set<String> statusStrings = Arrays.stream(statuses).map(s -> s.name()).collect(toSet());
+
+        return dsl.select(si.fields())
+                .select(ENTITY_NAME_FIELD)
+                .select(EXTERNAL_ID_FIELD)
+                .from(si)
+                .join(sr).on(sr.ID.eq(si.SURVEY_RUN_ID))
+                .where(sr.SURVEY_TEMPLATE_ID.eq(templateId))
+                .and(si.STATUS.in(statusStrings))
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
 
