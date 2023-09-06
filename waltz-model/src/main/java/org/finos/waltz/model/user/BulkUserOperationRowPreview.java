@@ -21,6 +21,8 @@ public abstract class BulkUserOperationRowPreview {
 
     @Nullable
     public abstract String givenRole();
+    @Nullable
+    public abstract String givenComment();
 
     @Nullable
     public abstract String resolvedUser();
@@ -28,9 +30,11 @@ public abstract class BulkUserOperationRowPreview {
     @Nullable
     public abstract String resolvedRole();
 
+    @Nullable
+    public abstract String resolvedComment();
     @Value.Derived
     public ResolutionStatus status() {
-        return isEmpty(resolvedUser()) || isEmpty(resolvedRole())
+        return isEmpty(resolvedUser()) || isEmpty(resolvedRole()) ||  isEmpty(resolvedComment())
                 ? ResolutionStatus.ERROR
                 : ResolutionStatus.OK;
     }

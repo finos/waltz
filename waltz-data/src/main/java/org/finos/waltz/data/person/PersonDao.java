@@ -113,7 +113,11 @@ public class PersonDao {
                 .limit(1)
                 .fetchOne(personMapper);
     }
-
+    public List<String> findAllEmails(){
+        return dsl.select(PERSON.EMAIL)
+                .from(PERSON)
+                .fetch(PERSON.EMAIL);
+    }
 
     public Person getActiveByUserEmail(String email) {
         checkNotEmpty(email, "Cannot find person without a email");
