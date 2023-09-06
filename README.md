@@ -67,11 +67,11 @@ progress and done issues.
 
 **Provisional** dates for upcoming releases:
 
-| Release | Date           | Summary                                           |
-|---------|----------------|---------------------------------------------------|
-| 1.53    | Sept 5th 2023  | Diagrams (builder + markdown), Cost Allocations   |
-| 1.54    | Sept 26th 2023 | tbd                                               |
-| 1.55    | tbc  | tbd                                               |
+| Release | Date           | Summary                                     |
+|---------|----------------|---------------------------------------------|
+| 1.54    | Sept 26th 2023 | Enhanced admin features, stats improvements |
+| 1.55    | Oct 17th 2023  | tbd                                         |
+| 1.56    | Nov 7th 2023   | tbd                                         |
 
 See the [releases](https://github.com/finos/waltz/releases) page for historic versions.
 
