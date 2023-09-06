@@ -24,6 +24,8 @@ import {hierarchyQueryScope} from "../../../common/services/enums/hierarchy-quer
 import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
 
 import template from "./app-group-overview.html";
+import {displayError} from "../../../common/error-utils";
+import ToastStore from "../../../svelte-stores/toast-store";
 
 
 const bindings = {
@@ -36,6 +38,10 @@ const initialState = {
     editable: false,
     filters: {},
     isSubscribed: false,
+    visibility: {
+        aliasEditor: false,
+    },
+    aliases: ["hello", "world"]
 };
 
 
@@ -95,6 +101,12 @@ function controller($q, serviceBroker, userService) {
 
         serviceBroker
             .loadViewData(
+                CORE_API.AliasStore.getForEntity,
+                [vm.parentEntityRef])
+            .then(r => vm.aliases = r.data || []);
+
+        serviceBroker
+            .loadViewData(
                 CORE_API.LogicalFlowStore.calculateStats,
                 [ selector ])
             .then(r => vm.flowStats = r.data);
@@ -126,12 +138,34 @@ function controller($q, serviceBroker, userService) {
         loadAll();
     };
 
-
     vm.$onChanges = (changes) => {
         if(changes.filters) {
             loadAll();
         }
     };
+
+    vm.dismissAliasEditor = () => vm.visibility.aliasEditor = false;
+
+    vm.showAliasEditor = () => vm.visibility.aliasEditor = true;
+
+    vm.saveAliases = (aliases) => {
+        if (!vm.editable) {
+            ToastStore.error("Cannot update aliases due to lack of permissions");
+        } else {
+            serviceBroker
+                .execute(
+                    CORE_API.AliasStore.update,
+                    [vm.parentEntityRef, aliases])
+                .then(() => {
+                    vm.aliases = aliases;
+                    ToastStore.info("Aliases updated")
+                })
+                .catch(e => {
+                    displayError("Could not update aliases", e);
+                });
+        }
+    };
+
 }
 
 controller.$inject = [
