@@ -77,10 +77,8 @@ public class EntityAliasEndpoint implements Endpoint {
 
             List<String> aliases = readStringsFromBody(req);
             String auditMessage = String.format(
-                    "Updated alias, entity: %s, new aliases: %s, user: %s",
-                    ref,
-                    aliases,
-                    user);
+                    "Aliases have been updated to: %s",
+                    aliases);
 
             entityAliasService.updateAliases(ref, aliases);
 
