@@ -35,7 +35,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.sql.Date;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.collectingAndThen;
@@ -43,9 +48,13 @@ import static org.finos.waltz.common.CollectionUtilities.first;
 import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
 import static org.finos.waltz.common.DateTimeUtilities.today;
 import static org.finos.waltz.common.MapUtilities.groupBy;
-import static org.finos.waltz.common.RandomUtilities.*;
+import static org.finos.waltz.common.RandomUtilities.pickAndRemove;
+import static org.finos.waltz.common.RandomUtilities.randomIntBetween;
+import static org.finos.waltz.common.RandomUtilities.randomPick;
+import static org.finos.waltz.common.RandomUtilities.randomTrue;
 import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.common.SetUtilities.minus;
+import static org.finos.waltz.schema.Tables.MEASURABLE_RATING;
 import static org.finos.waltz.schema.Tables.MEASURABLE_RATING_PLANNED_DECOMMISSION;
 import static org.finos.waltz.schema.Tables.MEASURABLE_RATING_REPLACEMENT;
 
@@ -71,9 +80,7 @@ public class AppMeasurableDecommGenerator implements SampleDataGenerator {
                             .filter(e -> randomTrue(0.1))
                             .map(r -> {
                                 MeasurableRatingPlannedDecommissionRecord record = dsl.newRecord(MEASURABLE_RATING_PLANNED_DECOMMISSION);
-                                record.setEntityId(r.entityReference().id());
-                                record.setEntityKind(r.entityReference().kind().name());
-                                record.setMeasurableId(r.measurableId());
+                                record.setMeasurableRatingId(r.id().orElseThrow(() -> new IllegalStateException("Read a rating record with no id ?!")));
                                 record.setPlannedDecommissionDate(mkFutureDate());
 
                                 record.setCreatedBy("test");
@@ -94,8 +101,10 @@ public class AppMeasurableDecommGenerator implements SampleDataGenerator {
                             MeasurableRating::measurableId);
 
                     dsl
-                            .selectFrom(MEASURABLE_RATING_PLANNED_DECOMMISSION)
-                            .fetchGroups(r -> r.get(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_ID))
+                            .select()
+                            .from(MEASURABLE_RATING_PLANNED_DECOMMISSION)
+                            .innerJoin(MEASURABLE_RATING).on(MEASURABLE_RATING.ID.eq(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_RATING_ID))
+                            .fetchGroups(r -> r.get(MEASURABLE_RATING.MEASURABLE_ID))
                             .entrySet()
                             .stream()
                             .flatMap(e -> {
@@ -105,7 +114,7 @@ public class AppMeasurableDecommGenerator implements SampleDataGenerator {
 
                                 Set<Long> decommingAppIds = map(
                                         e.getValue(),
-                                        MeasurableRatingPlannedDecommissionRecord::getEntityId);
+                                        r -> r.get(MEASURABLE_RATING.ENTITY_ID));
 
                                 Set<Long> possibleReplacements = minus(
                                         appIdsForMeasurable,
@@ -126,7 +135,7 @@ public class AppMeasurableDecommGenerator implements SampleDataGenerator {
                                         .filter(r -> randomTrue(0.7))
                                         .map(r -> {
                                             MeasurableRatingReplacementRecord record = dsl.newRecord(MEASURABLE_RATING_REPLACEMENT);
-                                            record.setDecommissionId(r.getId());
+                                            record.setDecommissionId(r.get(MEASURABLE_RATING_PLANNED_DECOMMISSION.ID));
                                             record.setEntityId(randomPick(replacementAppIds));
                                             record.setEntityKind(EntityKind.APPLICATION.name());
                                             record.setPlannedCommissionDate(mkFutureDate());

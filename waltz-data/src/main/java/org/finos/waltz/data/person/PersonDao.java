@@ -260,7 +260,7 @@ public class PersonDao {
     }
 
 
-    public Set<Person> findDirectsForPersonIds(List<Long> personIds) {
+    public List<Person> findDirectsForPersonIds(List<Long> personIds) {
         Condition cond = PERSON.MANAGER_EMPLOYEE_ID.in(DSL
                             .select(PERSON.EMPLOYEE_ID)
                             .from(PERSON)
@@ -274,6 +274,6 @@ public class PersonDao {
                 .orderBy(PERSON.DISPLAY_NAME);
 
         return qry
-                .fetchSet(personMapper);
+                .fetch(personMapper);
     }
 }

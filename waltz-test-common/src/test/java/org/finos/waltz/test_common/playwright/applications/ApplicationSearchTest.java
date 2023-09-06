@@ -4,7 +4,7 @@ import com.microsoft.playwright.Locator;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.test_common.helpers.AppHelper;
 import org.finos.waltz.test_common.playwright.BasePlaywrightIntegrationTest;
-import org.finos.waltz.test_common.playwright.ScreenshotHelper;
+import org.finos.waltz.test_common.playwright.DocumentationHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,9 +39,9 @@ public class ApplicationSearchTest extends BasePlaywrightIntegrationTest {
 
     @Test
     public void searchForExactMatch() {
-        ScreenshotHelper screenshotHelper = new ScreenshotHelper(
+        DocumentationHelper documentationHelper = new DocumentationHelper(
                 page,
-                "screenshots/applications/search");
+                "applications/search");
 
         startSiteSearch(
                 page,
@@ -56,7 +56,7 @@ public class ApplicationSearchTest extends BasePlaywrightIntegrationTest {
 
         resultLocator.waitFor();
 
-        screenshotHelper.takePageSnapshot(
+        documentationHelper.takePageSnapshot(
                 resultLocator,
                 "after-typing.png");
 
@@ -72,7 +72,7 @@ public class ApplicationSearchTest extends BasePlaywrightIntegrationTest {
                 .locator(format("text=%s", appRef.name().orElse("?")));
         assertThat(appPageTitleLocator).isVisible();
 
-        screenshotHelper.takePageSnapshot(appPageTitleLocator, "clicked-link.png");
+        documentationHelper.takePageSnapshot(appPageTitleLocator, "clicked-link.png");
     }
 
 }

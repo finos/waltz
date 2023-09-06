@@ -30,6 +30,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Optional;
 
+import static org.finos.waltz.model.EntityReference.mkRef;
+
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableChangeLog.class)
@@ -40,6 +42,16 @@ public abstract class ChangeLog {
     public abstract String message();
     public abstract String userId();
     public abstract Optional<EntityKind> childKind();
+    public abstract Optional<Long> childId();
+
+
+    public Optional<EntityReference> childRef() {
+        return childKind()
+            .flatMap(kind -> childId()
+                .map(id -> mkRef(kind, id)));
+    }
+
+
     public abstract Operation operation();
 
 

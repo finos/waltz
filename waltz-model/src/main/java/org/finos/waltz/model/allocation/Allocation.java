@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.ExternalIdProvider;
+import org.finos.waltz.model.IdProvider;
 import org.finos.waltz.model.LastUpdatedProvider;
 import org.finos.waltz.model.ProvenanceProvider;
 import org.immutables.value.Value;
@@ -30,13 +31,13 @@ import org.immutables.value.Value;
 @JsonSerialize(as = ImmutableAllocation.class)
 @JsonDeserialize(as = ImmutableAllocation.class)
 public abstract class Allocation implements
+        IdProvider,
         LastUpdatedProvider,
         ProvenanceProvider,
         ExternalIdProvider {
 
     public abstract long schemeId();
-    public abstract long measurableId();
-    public abstract EntityReference entityReference();
+    public abstract Long measurableRatingId();
     public abstract int percentage();
 
 }

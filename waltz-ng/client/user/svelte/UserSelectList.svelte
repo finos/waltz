@@ -26,6 +26,7 @@
 <p>
     Use the search below to select a user and edit their roles or
     <button class="btn btn-skinny"
+            data-testid="add-user-btn"
             on:click={() => $activeMode = Modes.ADD}>
         <Icon name="plus"/> add a new user
     </button>.

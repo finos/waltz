@@ -5,7 +5,7 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.test_common.helpers.AppHelper;
 import org.finos.waltz.test_common.helpers.DataTypeHelper;
 import org.finos.waltz.test_common.playwright.BasePlaywrightIntegrationTest;
-import org.finos.waltz.test_common.playwright.ScreenshotHelper;
+import org.finos.waltz.test_common.playwright.DocumentationHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,15 +43,15 @@ public class RuleCreationTest extends BasePlaywrightIntegrationTest {
     @Test
     public void add() throws InterruptedException {
 
-        ScreenshotHelper screenshotHelper = new ScreenshotHelper(
+        DocumentationHelper documentationHelper = new DocumentationHelper(
                 page,
-                "screenshots/flow-classification-rule/create");
+                "flow-classification-rule/create");
 
         Locator listLocator = page.getByTestId("flow-classification-rule-list");
 
         listLocator.scrollIntoViewIfNeeded();
 
-        screenshotHelper.takePageSnapshot(
+        documentationHelper.takePageSnapshot(
                 listLocator,
                 "show_list.png");
 
@@ -59,7 +59,7 @@ public class RuleCreationTest extends BasePlaywrightIntegrationTest {
                 .getByTestId("create-rule")
                 .click();
 
-        Locator formLocator = screenshotHelper.takePageSnapshot(
+        Locator formLocator = documentationHelper.takePageSnapshot(
                 page.getByTestId("flow-classification-rule-editor"),
                 "create_rule.png");
 
@@ -68,7 +68,7 @@ public class RuleCreationTest extends BasePlaywrightIntegrationTest {
                 .locator(".autocomplete-input")
                 .fill(toName(appRef));
 
-        Locator appLocator = screenshotHelper.takePageSnapshot(
+        Locator appLocator = documentationHelper.takePageSnapshot(
                 formLocator
                         .locator("#source")
                         .locator(".autocomplete-list-item")
@@ -77,7 +77,7 @@ public class RuleCreationTest extends BasePlaywrightIntegrationTest {
 
         appLocator.click();
 
-        screenshotHelper
+        documentationHelper
                 .takePageSnapshot(
                     formLocator
                         .locator("#datatype")
@@ -90,7 +90,7 @@ public class RuleCreationTest extends BasePlaywrightIntegrationTest {
                 .locator(".autocomplete-input")
                 .fill("CEO");
 
-        screenshotHelper
+        documentationHelper
                 .takePageSnapshot(
                     formLocator
                             .locator("#scope")
@@ -105,7 +105,7 @@ public class RuleCreationTest extends BasePlaywrightIntegrationTest {
 
         ratingLocator.click();
 
-        screenshotHelper.takePageSnapshot(
+        documentationHelper.takePageSnapshot(
                 ratingLocator,
                 "select_rating.png");
 
@@ -116,7 +116,7 @@ public class RuleCreationTest extends BasePlaywrightIntegrationTest {
         page.locator(".waltz-flow-classification-rules-table input")
                 .fill(toName(appRef));
 
-        screenshotHelper.takePageSnapshot(
+        documentationHelper.takePageSnapshot(
                 page.locator(".waltz-flow-classification-rules-table"),
                 "result.png");
 
@@ -128,7 +128,7 @@ public class RuleCreationTest extends BasePlaywrightIntegrationTest {
 
         Thread.sleep(1000);
 
-        screenshotHelper.takePageSnapshot(
+        documentationHelper.takePageSnapshot(
                 page.getByTestId("source"),
                 "view.png");
 

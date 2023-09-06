@@ -36,6 +36,7 @@ import ColorGradientView from "./color-gradient-view";
 import NavAidBuilderView from "./nav-aid-builder-view";
 import VersionInfoView from "./version-info-view";
 import MeasurableCategoriesView from "./measurable-categories-view";
+import DiagramBuilderView from "./diagram-builder-view";
 
 
 const baseState = {
@@ -143,6 +144,11 @@ const versionInfoState = {
     views: {"content@": VersionInfoView}
 };
 
+const diagramBuilderState = {
+    url: "/diagram-builder",
+    views: {"content@": DiagramBuilderView}
+};
+
 
 function setupRoutes($stateProvider) {
     $stateProvider
@@ -151,6 +157,7 @@ function setupRoutes($stateProvider) {
         .state("main.system.actors", actorsState)
         .state("main.system.assessment-definitions", assessmentDefintionsState)
         .state("main.system.color-gradient", colorGradientState)
+        .state("main.system.diagram-builder", diagramBuilderState)
         .state("main.system.entity-named-note-types", entityNamedNodeTypesState)
         .state("main.system.euda-list", eudaListState)
         .state("main.system.hierarchies", hierarchiesState)

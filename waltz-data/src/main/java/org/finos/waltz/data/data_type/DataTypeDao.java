@@ -151,4 +151,12 @@ public class DataTypeDao implements FindEntityReferencesByIdSelector {
             .fetchSet(TO_DOMAIN);
     }
 
+    public Collection<DataType> findByParentId(long id) {
+        return dsl
+                .selectDistinct(DATA_TYPE.fields())
+                .from(DATA_TYPE)
+                .where(DATA_TYPE.PARENT_ID.eq(id))
+                .orderBy(DATA_TYPE.NAME)
+                .fetchSet(TO_DOMAIN);
+    }
 }

@@ -36,8 +36,10 @@ export const pinkHex = "#FFCFFC";
 export const pinkBgHex = "#ffe9fd";
 export const greyBgHex = "#F5F5F5";
 export const amberBgHex = "#FCF2D7";
+export const yellowBgHex = "#fefff0";
 export const greenBgHex = "#DFF1D2";
 export const redBgHex = "#F2D7D7";
+export const purpleBgHex = "#F7EEFF";
 export const blueBgHex = "#E2F0FD";
 export const darkAmberHex = "#c24000";
 
@@ -64,6 +66,9 @@ export const pinkBg = rgb(pinkBgHex);
 export const actorBg = rgb("#EDE5EE");
 
 export const darkAmber = rgb(darkAmberHex);
+
+export const waltzFontColor = "#332B23";
+export const waltzLinkColor = "#2C369D";
 
 export const ragColorScale = scaleOrdinal()
     .domain(["R", "A", "G", "Z", "X"])

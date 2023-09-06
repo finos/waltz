@@ -289,6 +289,7 @@ public class FlowDiagramService {
                                 "Added entity to diagram: %s",
                                 ref))
                         .childKind(ref.kind())
+                        .childId(ref.id())
                         .operation(Operation.ADD)
                         .build())
                 .collect(toList());
@@ -306,6 +307,7 @@ public class FlowDiagramService {
                                 "Removed entity from diagram: %s",
                                 ref))
                         .childKind(ref.kind())
+                        .childId(ref.id())
                         .operation(Operation.REMOVE)
                         .build())
                 .collect(toList());

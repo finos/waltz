@@ -18,6 +18,7 @@
     import namedSettings from "../../../system/named-settings";
     import ImageDownloadLink from "../../../common/svelte/ImageDownloadLink.svelte";
     import DescriptionFade from "../../../common/svelte/DescriptionFade.svelte";
+    import {overlayDiagramKind} from "../../../common/services/enums/overlay-diagram-kind";
 
 
     export let primaryEntityRef;
@@ -67,7 +68,7 @@
         : Modes.VIEW
 
     onMount(() => {
-        diagramsCall = aggregateOverlayDiagramStore.findAll();
+        diagramsCall = aggregateOverlayDiagramStore.findByKind(overlayDiagramKind.WALTZ_STATIC_SVG_OVERLAY.key);
         settingsCall = settingsStore.loadAll();
     });
 
@@ -181,7 +182,7 @@
 
                     <div class="row">
                         <div class="col-sm-12">
-                            <AggregateOverlayDiagram svg={$selectedDiagram?.svg}
+                            <AggregateOverlayDiagram svg={$selectedDiagram?.layoutData}
                                                      {primaryEntityRef}/>
                         </div>
                     </div>

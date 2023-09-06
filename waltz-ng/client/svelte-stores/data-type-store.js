@@ -21,21 +21,35 @@ import {remote} from "./remote";
 export function mkDataTypeStore() {
 
     const findAll = (force= false) => {
-        return remote.fetchViewList("GET", "api/data-types", null, {force})
-    }
+        return remote.fetchAppList(
+            "GET",
+            "api/data-types",
+            null,
+            {force});
+    };
 
     const getById = (id, force = false) => {
-        return remote.fetchViewData(
+        return remote.fetchAppData(
             "GET",
             `api/data-types/id/${id}`,
             null,
             {},
             {force})
-    }
+    };
+
+    const findByParentId = (id, force = false) => {
+        return remote.fetchAppData(
+            "GET",
+            `api/data-types/parent-id/${id}`,
+            null,
+            {},
+            {force})
+    };
 
     return {
         findAll,
-        getById
+        getById,
+        findByParentId
     };
 }
 

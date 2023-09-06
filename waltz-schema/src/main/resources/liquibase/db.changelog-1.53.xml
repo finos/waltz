@@ -25,4 +25,445 @@
         <tagDatabase tag="v1.52"/> <!-- tag the current db version, i.e. the last  -->
     </changeSet>
 
+    <changeSet id="20230810-6693-1"
+               author="davidwatkins73">
+        <comment>6693: Add (optional) child id to change log</comment>
+        <addColumn tableName="change_log">
+            <column name="child_id"
+                    type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <setColumnRemarks tableName="change_log"
+                          columnName="child_id"
+                          remarks="optional id of the child reference associated to this change log entry" />
+    </changeSet>
+
+    <changeSet id="20230818-6710-1"
+               author="woodjes">
+        <comment>6710: Allow title and icon to be null</comment>
+        <dropNotNullConstraint columnDataType="${name.type}"
+                               columnName="title"
+                               tableName="static_panel"/>
+    </changeSet>
+
+
+    <changeSet id="20230818-6710-2"
+               author="woodjes">
+        <comment>6710: Allow title and icon to be null</comment>
+        <dropNotNullConstraint columnDataType="${icon.type}"
+                               columnName="icon"
+                               tableName="static_panel"/>
+    </changeSet>
+      
+      
+    <changeSet id="20230724-6688-1"
+               author="woodjes">
+        <comment>6688: add diagram kind to aggregate_overlay_diagram</comment>
+        <addColumn tableName="aggregate_overlay_diagram">
+            <column name="diagram_kind"
+                    type="${enum.type}"
+                    defaultValue="WALTZ_STATIC_SVG_OVERLAY">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20230724-6688-2"
+               author="woodjes">
+        <comment>6688: add diagram kind to aggregate_overlay_diagram</comment>
+        <renameColumn columnDataType="${clob.type}"
+                      newColumnName="layout_data"
+                      oldColumnName="svg"
+                      tableName="aggregate_overlay_diagram"/>
+    </changeSet>
+
+    <changeSet id="20230724-6688-3"
+               author="woodjes">
+        <comment>6688: add status to aggregate_overlay_diagram</comment>
+        <addColumn tableName="aggregate_overlay_diagram">
+            <column name="status"
+                    type="${enum.type}"
+                    defaultValue="DRAFT">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+    <!-- 6728: Add id to measurable_rating, update allocation and measurable_rating_planned_decommission tables   -->
+
+
+    <!-- 6728: drop fks from mrpd and allocation -->
+    <changeSet id="20230822-6728-1"
+               author="woodjes">
+        <comment>6728: drop fk from measurable_rating_planned_decommission</comment>
+        <dropForeignKeyConstraint baseTableName="measurable_rating_planned_decommission"
+                                  constraintName="measurable_rating_planned_decommission_fk"/>
+    </changeSet>
+
+    <changeSet id="20230822-6728-2"
+               author="woodjes">
+        <comment>6728: drop fk from allocation</comment>
+        <dropForeignKeyConstraint baseTableName="allocation"
+                                  constraintName="allocation_measurable_rating_fk"/>
+    </changeSet>
+
+    <!-- 6728: add id to measurable rating -->
+    <changeSet id="20230822-6728-3"
+               author="woodjes">
+        <comment>6728: add id to measurable_rating (drop existing)</comment>
+        <dropPrimaryKey tableName="measurable_rating"/>
+        <rollback>
+            <addPrimaryKey columnNames="entity_id, entity_kind, measurable_id"
+                           constraintName="measurable_rating_pkey"
+                           tableName="measurable_rating"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20230822-6728-4"
+               author="woodjes">
+        <comment>6728: adding id to measurable_rating create unique index from old pk</comment>
+        <createIndex indexName="idx_mr_entity_ref_m_id"
+                     tableName="measurable_rating"
+                     unique="true">
+            <column name="entity_id"/>
+            <column name="entity_kind"/>
+            <column name="measurable_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20230822-6728-5"
+               author="woodjes"
+               dbms="!h2">
+        <comment>6728: adding id to measurable_rating</comment>
+        <addColumn tableName="measurable_rating">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints primaryKey="true"
+                             primaryKeyName="measurable_rating_pkey"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20230822-6728-5"
+               author="woodjes"
+               dbms="h2">
+        <comment>6728: adding id to measurable_rating</comment>
+        <addColumn tableName="measurable_rating">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+            </column>
+        </addColumn>
+        <addPrimaryKey columnNames="id"
+                       constraintName="measurable_rating_pkey"
+                       tableName="measurable_rating"/>
+    </changeSet>
+
+
+    <!-- 6728: add measurable_rating_id to allocation -->
+
+    <changeSet id="20230822-6728-6"
+               author="woodjes">
+        <comment>6728: adding measurable_rating_id to allocation</comment>
+        <addColumn tableName="allocation">
+            <column name="measurable_rating_id"
+                    type="${id.type}">
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20230822-6728-7"
+               author="woodjes">
+        <comment>6728: adding measurable_rating_id to allocation</comment>
+        <sql>
+            update allocation
+            set measurable_rating_id = (select id
+                                        from measurable_rating mr
+                                        where mr.entity_id = allocation.entity_id
+                                          and mr.entity_kind = allocation.entity_kind
+                                          and mr.measurable_id = allocation.measurable_id);
+        </sql>
+    </changeSet>
+
+    <changeSet id="20230822-6728-8"
+               author="woodjes">
+        <comment>6728: adding measurable_rating_id to allocation</comment>
+        <addNotNullConstraint columnDataType="${id.type}"
+                              columnName="measurable_rating_id"
+                              tableName="allocation"/>
+    </changeSet>
+
+    <changeSet id="20230822-6728-9"
+               author="woodjes">
+        <comment>6728: adding foreign key to measurable_rating from allocation</comment>
+        <addForeignKeyConstraint baseTableName="allocation"
+                                 baseColumnNames="measurable_rating_id"
+                                 constraintName="allocation_measurable_rating_fk"
+                                 referencedTableName="measurable_rating"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+
+    <!-- 6728: add measurable_rating_id to measurable_rating_planned_decommission-->
+
+    <changeSet id="20230822-6728-10"
+               author="woodjes">
+        <comment>6728: adding measurable_rating_id to measurable_rating_planned_decommission</comment>
+        <addColumn tableName="measurable_rating_planned_decommission">
+            <column name="measurable_rating_id"
+                    type="${id.type}">
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20230822-6728-11"
+               author="woodjes">
+        <comment>6728: adding measurable_rating_id to measurable_rating_planned_decommission</comment>
+        <sql>
+            update measurable_rating_planned_decommission
+            set measurable_rating_id = (select id
+                                        from measurable_rating mr
+                                        where mr.entity_id = measurable_rating_planned_decommission.entity_id
+                                          and mr.entity_kind = measurable_rating_planned_decommission.entity_kind
+                                          and mr.measurable_id = measurable_rating_planned_decommission.measurable_id);
+        </sql>
+    </changeSet>
+
+    <changeSet id="20230822-6728-12"
+               author="woodjes">
+        <comment>6728: adding measurable_rating_id to measurable_rating_planned_decommission</comment>
+        <addNotNullConstraint columnDataType="${id.type}"
+                              columnName="measurable_rating_id"
+                              tableName="measurable_rating_planned_decommission"/>
+    </changeSet>
+
+    <changeSet id="20230822-6728-13"
+               author="woodjes">
+        <comment>6728: adding foreign key to measurable_rating from allocation</comment>
+        <addForeignKeyConstraint baseTableName="measurable_rating_planned_decommission"
+                                 baseColumnNames="measurable_rating_id"
+                                 constraintName="measurable_rating_planned_decommission_fk"
+                                 referencedTableName="measurable_rating"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <!-- 6728: add id to allocation -->
+
+    <changeSet id="20230822-6728-14"
+               author="woodjes">
+        <comment>6728: add id to allocation (drop existing)</comment>
+        <dropPrimaryKey tableName="allocation"/>
+        <rollback>
+            <addPrimaryKey columnNames="entity_id, entity_kind, measurable_id"
+                           constraintName="allocation_pkey"
+                           tableName="allocation"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20230822-6728-15"
+               author="woodjes"
+               dbms="!h2">
+        <comment>6728: adding id to allocation</comment>
+        <addColumn tableName="allocation">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints primaryKey="true"
+                             primaryKeyName="allocation_pkey"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20230822-6728-15"
+               author="woodjes"
+               dbms="h2">
+        <comment>6728: adding id to allocation</comment>
+        <addColumn tableName="allocation">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+            </column>
+        </addColumn>
+        <addPrimaryKey columnNames="id"
+                       constraintName="allocation_pkey"
+                       tableName="allocation"/>
+    </changeSet>
+
+    <!-- 6728: Drop entity_kind, entity_id and measurable_id cols from measurable rating decom and allocation   -->
+
+    <changeSet id="20230822-6728-16"
+               author="woodjes">
+        <comment>6728: drop entity_kind, entity_id, measurable_id from allocation</comment>
+        <dropColumn tableName="allocation"
+                    columnName="entity_kind"/>
+        <dropColumn tableName="allocation"
+                    columnName="entity_id"/>
+        <dropColumn tableName="allocation"
+                    columnName="measurable_id"/>
+    </changeSet>
+
+    <changeSet id="20230822-6728-17"
+               author="woodjes">
+        <comment>6728: drop entity_kind, entity_id, measurable_id from measurable_rating_planned_decommission</comment>
+        <dropColumn tableName="measurable_rating_planned_decommission"
+                    columnName="entity_kind"/>
+        <dropColumn tableName="measurable_rating_planned_decommission"
+                    columnName="entity_id"/>
+        <dropColumn tableName="measurable_rating_planned_decommission"
+                    columnName="measurable_id"/>
+    </changeSet>
+
+    <changeSet id="20230824-6728-18"
+               author="woodjes">
+        <comment>6728: enforce unique measurable_rating_planned_decommission per rating</comment>
+        <addUniqueConstraint tableName="measurable_rating_planned_decommission"
+                             constraintName="idx_mrpd_mr_id_unique"
+                             columnNames="measurable_rating_id"/>
+    </changeSet>
+
+    <changeSet id="20230824-6728-19"
+               author="woodjes">
+        <comment>6728: enforce unique allocation per scheme and rating</comment>
+        <addUniqueConstraint tableName="allocation"
+                             constraintName="idx_alloc_scheme_mr_id_unique"
+                             columnNames="allocation_scheme_id, measurable_rating_id"/>
+    </changeSet>
+
+
+    <!-- CTCTOWALTZ-2845 - Add indexes to legal tables -->
+    <changeSet id="20230825-2845-1"
+               author="salekam">
+        <comment>2845: legal entity index on external id</comment>
+        <createIndex indexName="idx_legal_entity_external_id"
+                     tableName="legal_entity"
+                     unique="true">
+            <column name="external_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20230825-2845-2"
+               author="salekam">
+        <comment>2845: legal entity relationship index on (legal_entity_id, target_id, target_kind, relationship_kind_id)</comment>
+        <createIndex indexName="idx_ler_kind_id_target"
+                     tableName="legal_entity_relationship"
+                     unique="true">
+            <column name="legal_entity_id" type="${id.type}"/>
+            <column name="target_id" type="${id.type}"/>
+            <column name="target_kind" type="${enum.type}"/>
+            <column name="relationship_kind_id" type="${id.type}"/>
+        </createIndex>
+    </changeSet>
+
+
+    <changeSet id="20230829-6728-20"
+               author="davidwatkins73">
+        <comment>6728: add subject kind to cost kind table</comment>
+        <addColumn tableName="cost_kind">
+            <column name="subject_kind"
+                    type="${enum.type}"
+                    defaultValue="'APPLICATION'">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20230829-6728-21"
+               author="davidwatkins73">
+        <comment>6728: allocated cost definition table</comment>
+        <createTable tableName="allocated_cost_definition">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="allocated_cost_definition_pkey"/>
+            </column>
+            <column name="allocation_scheme_id" type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="source_cost_kind_id" type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="target_cost_kind_id" type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet id="20230829-6728-22"
+               author="davidwatkins73">
+        <addForeignKeyConstraint baseTableName="allocated_cost_definition"
+                                 baseColumnNames="source_cost_kind_id"
+                                 constraintName="allocated_cost_defn_source_cost_kind_fk"
+                                 referencedTableName="cost_kind"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+
+    <changeSet id="20230829-6728-23"
+               author="davidwatkins73"
+               dbms="!mssql">
+        <addForeignKeyConstraint baseTableName="allocated_cost_definition"
+                                 baseColumnNames="target_cost_kind_id"
+                                 constraintName="allocated_cost_defn_target_cost_kind_fk"
+                                 referencedTableName="cost_kind"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+
+    <changeSet id="20230829-6728-24"
+               author="davidwatkins73">
+        <addForeignKeyConstraint baseTableName="allocated_cost_definition"
+                                 baseColumnNames="allocation_scheme_id"
+                                 constraintName="allocated_cost_defn_allocation_scheme_fk"
+                                 referencedTableName="allocation_scheme"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="20230829-6728-25"
+               author="davidwatkins73">
+        <setColumnRemarks tableName="allocated_cost_definition" columnName="allocation_scheme_id" remarks="reference to the allocation scheme that will be used to split cost from the source kind onto new costs represented by the target kind" />
+        <setColumnRemarks tableName="allocated_cost_definition" columnName="source_cost_kind_id" remarks="reference to the cost kind being used as the source costs, usually a cost related to applications" />
+        <setColumnRemarks tableName="allocated_cost_definition" columnName="target_cost_kind_id" remarks="reference to the cost kind being to represent the shredded target costs, usually a cost related to measurable_ratings" />
+    </changeSet>
+
+
+    <changeSet id="20230901-6728-26"
+               author="davidwatkins73">
+        <comment>6728: Fix the default value</comment>
+
+        <dropDefaultValue tableName="cost_kind"
+                          columnName="subject_kind"/>
+
+        <addDefaultValue tableName="cost_kind"
+                         columnName="subject_kind"
+                         defaultValue="APPLICATION"/>
+    </changeSet>
+
+    <changeSet id="20230901-6728-27"
+               author="davidwatkins73">
+        <comment>6728: Fix the default value</comment>
+        <update tableName="cost_kind">
+            <column name="subject_kind"
+                    value="APPLICATION"/>
+            <where>subject_kind like '%APPLICATION%'</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="20230901-6728-28"
+               author="davidwatkins73">
+        <comment>6728: Fix the default value</comment>
+        <setColumnRemarks tableName="cost_kind" columnName="subject_kind" remarks="the kind of subject that this cost is related to, e.g. APPLICATION, MEASURABLE_RATING, etc."/>
+    </changeSet>
+
+
 </databaseChangeLog>

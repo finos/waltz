@@ -11,6 +11,7 @@
     import {userStore} from "../../../svelte-stores/user-store";
     import roles from "../../../user/system-roles";
     import {mkPlaceholderPanelData} from "./static-panel-utils";
+    import {truncate} from "../../../common/string-utils";
 
     let panelList = [];
     let qry = "";
@@ -98,7 +99,13 @@
                                     {panel.group}
                                 {/if}
                             </td>
-                            <td>{panel.title}</td>
+                            <td>
+                                {#if !_.isEmpty(panel.title)}
+                                    {panel.title}
+                                {:else}
+                                    <i>{truncate(panel.content, 50)}</i>
+                                {/if}
+                            </td>
                             <td>
                                 <Icon name={panel.icon}/>
                                 {panel.icon}

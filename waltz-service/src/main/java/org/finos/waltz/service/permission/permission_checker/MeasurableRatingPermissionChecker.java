@@ -5,10 +5,9 @@ import org.finos.waltz.data.measurable_rating_planned_decommission.MeasurableRat
 import org.finos.waltz.data.measurable_rating_replacement.MeasurableRatingReplacementDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.EntityReferenceUtilities;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.measurable.Measurable;
-import org.finos.waltz.model.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommission;
+import org.finos.waltz.model.measurable_rating.MeasurableRating;
 import org.finos.waltz.model.permission_group.Permission;
 import org.finos.waltz.service.involvement.InvolvementService;
 import org.finos.waltz.service.measurable.MeasurableService;
@@ -22,6 +21,7 @@ import java.util.stream.Collectors;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.EntityReferenceUtilities.sameRef;
 
 @Service
 public class MeasurableRatingPermissionChecker implements PermissionChecker {
@@ -58,19 +58,20 @@ public class MeasurableRatingPermissionChecker implements PermissionChecker {
         this.involvementService = involvementService;
     }
 
-    public Set<Operation> findMeasurableRatingDecommPermissions(EntityReference entityReference,
-                                                                long measurableId,
+    public Set<Operation> findMeasurableRatingDecommPermissions(long ratingId,
                                                                 String username) {
 
-        Set<Long> invsForUser = involvementService.findExistingInvolvementKindIdsForUser(entityReference, username);
-        Measurable measurable = measurableService.getById(measurableId);
+        MeasurableRating rating = measurableRatingDao.getById(ratingId);
+
+        Set<Long> invsForUser = involvementService.findExistingInvolvementKindIdsForUser(rating.entityReference(), username);
+        Measurable measurable = measurableService.getById(rating.measurableId());
 
         Set<Operation> operationsForEntityAssessment = permissionGroupService
-                .findPermissionsForParentReference(entityReference, username)
+                .findPermissionsForParentReference(rating.entityReference(), username)
                 .stream()
                 .filter(p -> p.subjectKind().equals(EntityKind.MEASURABLE_RATING_PLANNED_DECOMMISSION)
-                        && p.parentKind().equals(entityReference.kind())
-                        && EntityReferenceUtilities.sameRef(p.qualifierReference(), mkRef(EntityKind.MEASURABLE_CATEGORY, measurable.categoryId())))
+                        && p.parentKind().equals(rating.entityReference().kind())
+                        && sameRef(p.qualifierReference(), mkRef(EntityKind.MEASURABLE_CATEGORY, measurable.categoryId())))
                 .filter(p -> p.requiredInvolvementsResult().isAllowed(invsForUser))
                 .map(Permission::operation)
                 .collect(Collectors.toSet());
@@ -94,7 +95,7 @@ public class MeasurableRatingPermissionChecker implements PermissionChecker {
                 .stream()
                 .filter(p -> p.subjectKind().equals(EntityKind.MEASURABLE_RATING)
                         && p.parentKind().equals(entityReference.kind())
-                        && EntityReferenceUtilities.sameRef(p.qualifierReference(), mkRef(EntityKind.MEASURABLE_CATEGORY, measurable.categoryId())))
+                        && sameRef(p.qualifierReference(), mkRef(EntityKind.MEASURABLE_CATEGORY, measurable.categoryId())))
                 .filter(p -> p.requiredInvolvementsResult().isAllowed(invsForUser))
                 .map(Permission::operation)
                 .collect(Collectors.toSet());
@@ -110,17 +111,17 @@ public class MeasurableRatingPermissionChecker implements PermissionChecker {
     public Set<Operation> findMeasurableRatingReplacementPermissions(long decommId,
                                                                      String username) {
 
-        MeasurableRatingPlannedDecommission decomm = measurableRatingPlannedDecommissionService.getById(decommId);
+        MeasurableRating rating = measurableRatingDao.getByDecommId(decommId);
 
-        Set<Long> invsForUser = involvementService.findExistingInvolvementKindIdsForUser(decomm.entityReference(), username);
-        Measurable measurable = measurableService.getById(decomm.measurableId());
+        Set<Long> invsForUser = involvementService.findExistingInvolvementKindIdsForUser(rating.entityReference(), username);
+        Measurable measurable = measurableService.getById(rating.measurableId());
 
         Set<Operation> operationsForEntityAssessment = permissionGroupService
-                .findPermissionsForParentReference(decomm.entityReference(), username)
+                .findPermissionsForParentReference(rating.entityReference(), username)
                 .stream()
                 .filter(p -> p.subjectKind().equals(EntityKind.MEASURABLE_RATING_REPLACEMENT)
-                        && p.parentKind().equals(decomm.entityReference().kind())
-                        && EntityReferenceUtilities.sameRef(p.qualifierReference(), mkRef(EntityKind.MEASURABLE_CATEGORY, measurable.categoryId())))
+                        && p.parentKind().equals(rating.entityReference().kind())
+                        && sameRef(p.qualifierReference(), mkRef(EntityKind.MEASURABLE_CATEGORY, measurable.categoryId())))
                 .filter(p -> p.requiredInvolvementsResult().isAllowed(invsForUser))
                 .map(Permission::operation)
                 .collect(Collectors.toSet());

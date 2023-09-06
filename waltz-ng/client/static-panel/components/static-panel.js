@@ -15,15 +15,20 @@
  * See the License for the specific
  *
  */
-import template from './static-panel.html';
+import template from "./static-panel.html";
+import {initialiseData} from "../../common";
 
 const bindings = {
-    panel: '<',
-    renderMode: '<' // section | chromeless | minimal-border
+    panel: "<",
+    renderMode: "<?" // section | chromeless | minimal-border
 };
 
+const initialState = {
+    renderMode: "section"
+};
 
 function controller() {
+    initialiseData(this, initialState);
 }
 
 
