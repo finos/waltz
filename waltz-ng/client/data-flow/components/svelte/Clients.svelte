@@ -42,6 +42,7 @@
     {#each $displayedClients as client}
         <g transform={`translate(0, ${$clientScale(client.id)})`}
            class={mkClasses(client)}
+           role="button"
            on:click|stopPropagation={() => selectClient(client)}
            on:keydown|stopPropagation={() => selectClient(client)}>
             <rect stroke={getNodeColors(client.kind).stroke}

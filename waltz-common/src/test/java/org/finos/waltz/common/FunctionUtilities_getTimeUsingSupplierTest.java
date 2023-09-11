@@ -28,33 +28,59 @@ public class FunctionUtilities_getTimeUsingSupplierTest {
 
     @Test
     public void timeChecksHowLongAFunctionRunsFor() {
-        String result = FunctionUtilities.time("foo", Unchecked.supplier(() -> {
-            Thread.sleep(500);
-            return "a";
-        }));
+        String result = FunctionUtilities.time(
+                "foo",
+                Unchecked.supplier(() -> {
+                    Thread.sleep(500);
+                    return "a";
+                }));
         assertEquals("a", result);
     }
+
 
     @Test
     public void timeWithFuncRunningForZeroSec() {
-        String result = FunctionUtilities.time("foo", Unchecked.supplier(() -> { Thread.sleep(0); return "a"; }));
+        String result = FunctionUtilities.time(
+                "foo",
+                Unchecked.supplier(() -> {
+                    Thread.sleep(0);
+                    return "a";
+                }));
         assertEquals("a", result);
     }
+
 
     @Test
     public void timeDurationOfFuncRunningForNegSec() throws IllegalArgumentException{
-        FunctionUtilities.time("foo", Unchecked.supplier(() -> { Thread.sleep(-1); return "a"; }));
+        FunctionUtilities.time(
+                "foo",
+                Unchecked.supplier(() -> {
+                    Thread.sleep(-1);
+                    return "a";
+                }));
     }
+
 
     @Test
     public void timeDurationForFuncRunningWithEmptyName(){
-        String result = FunctionUtilities.time("", Unchecked.supplier(() -> { Thread.sleep(500); return "a"; }));
+        String result = FunctionUtilities.time(
+                "",
+                Unchecked.supplier(() -> {
+                    Thread.sleep(500);
+                    return "a";
+                }));
         assertEquals("a", result);
     }
 
+
     @Test
     public void timeDurationForFuncRunningWithNullName(){
-        String result = FunctionUtilities.time(null, Unchecked.supplier(() -> { Thread.sleep(500); return "a"; }));
+        String result = FunctionUtilities.time(
+                null,
+                Unchecked.supplier(() -> {
+                    Thread.sleep(500);
+                    return "a";
+                }));
         assertEquals("a", result);
     }
 }

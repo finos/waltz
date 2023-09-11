@@ -66,7 +66,7 @@
             title: "Legal Entity Relationship Kind View"
         },
         "main.legal-entity-relationship-kind.list": {
-            path: ctx => `legal-entity-relationship-kind/list`,
+            path: () => `legal-entity-relationship-kind/list`,
             title: "Legal Entity Relationship Kind List"
         },
         "main.logical-flow.view": {
@@ -110,7 +110,7 @@
             title: "Survey Edit"
         },
         "main.involvement-kind.list": {
-            path: ctx => `involvement-kind/list`,
+            path: () => `involvement-kind/list`,
             title: "Involvement Kind List"
         },
         "main.involvement-kind.view": {

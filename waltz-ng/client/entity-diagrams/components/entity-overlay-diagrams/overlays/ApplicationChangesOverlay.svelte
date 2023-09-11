@@ -140,6 +140,7 @@
             <g class="app-summary">
                 <rect x="0"
                       y={height - (height * appCountProportion + height * paddingProportion)}
+                      role="button"
                       on:click={() => clickAppCount()}
                       on:keydown={() => clickAppCount()}
                       width={width * graphWidthProportion}
@@ -170,6 +171,7 @@
                             </rect>
                             <rect x={columnScale(outboundCount.quarter.additionalQuarters)}
                                   y={countScale(0)}
+                                  role="button"
                                   on:click={() => clickChart(outboundCount, "Outbound")}
                                   on:keydown={d => clickChart(outboundCount, "Outbound")}
                                   width={yearScale.bandwidth() / 4}
@@ -195,6 +197,7 @@
                             </rect>
                             <rect x={columnScale(inboundCount.quarter.additionalQuarters)}
                                   y="0"
+                                  role="button"
                                   on:click={() => clickChart(inboundCount, "Inbound")}
                                   on:keydown={d => clickChart(inboundCount, "Inbound")}
                                   width={yearScale.bandwidth() / 4}
