@@ -66,6 +66,7 @@
                     <last ng-if="$ctrl.editable">
                         <span class="small">
                             <a ng-click="$ctrl.showAliasEditor()"
+                               data-testid="edit-aliases"
                                class="clickable">
                                 update
                             </a>
@@ -76,6 +77,7 @@
                             No aliases defined
                             <a class="clickable"
                                ng-if="$ctrl.editable"
+                               data-testid="edit-aliases"
                                ng-click="$ctrl.showAliasEditor()">
                                 , add one.
                             </a>

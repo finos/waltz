@@ -15,6 +15,7 @@ import static org.finos.waltz.common.LoggingUtilities.configureLogging;
 public abstract class BasePlaywrightTest {
 
     protected static final String BASE = "http://localhost:8000";
+    protected static final String HIGHLIGHT_ELEM_SCRIPT = "d => d.style.border = '2px solid red'";
 
     protected static Playwright playwright;
     protected static Browser browser;

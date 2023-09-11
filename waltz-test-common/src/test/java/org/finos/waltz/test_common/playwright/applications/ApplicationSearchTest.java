@@ -5,6 +5,7 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.test_common.helpers.AppHelper;
 import org.finos.waltz.test_common.playwright.BasePlaywrightIntegrationTest;
 import org.finos.waltz.test_common.playwright.DocumentationHelper;
+import org.finos.waltz.test_common.playwright.SearchHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,6 @@ import static java.lang.String.format;
 import static org.finos.waltz.common.StringUtilities.mkPath;
 import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
 import static org.finos.waltz.test_common.playwright.PlaywrightUtilities.login;
-import static org.finos.waltz.test_common.playwright.PlaywrightUtilities.startSiteSearch;
 
 public class ApplicationSearchTest extends BasePlaywrightIntegrationTest {
 
@@ -43,33 +43,23 @@ public class ApplicationSearchTest extends BasePlaywrightIntegrationTest {
                 page,
                 "applications/search");
 
-        startSiteSearch(
-                page,
-                appRef.name().orElse("??"));
+        SearchHelper searchHelper = new SearchHelper(page);
+        searchHelper.search(appRef.name().orElse("??"));
 
-        Locator resultLocator = page
-                .locator(".wnso-search-results")
-                .getByTestId("entity-name")
-                .locator(format(
-                        "text=%s",
-                        appRef.name().orElse("?")));
 
-        resultLocator.waitFor();
+        Locator result = searchHelper.waitForResult(appRef.name().orElse("?"));
 
         documentationHelper.takePageSnapshot(
-                resultLocator,
+                result,
                 "after-typing.png");
 
-        resultLocator
-                .click();
-
-        // wait for search panel to be removed
-        assertThat(page.locator(".wnso-search-results")).isHidden();
+        searchHelper.click(result);
 
         Locator appPageTitleLocator = page
                 .locator(".waltz-page-header")
                 .getByTestId("header-small")
                 .locator(format("text=%s", appRef.name().orElse("?")));
+
         assertThat(appPageTitleLocator).isVisible();
 
         documentationHelper.takePageSnapshot(appPageTitleLocator, "clicked-link.png");

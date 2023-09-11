@@ -2,9 +2,11 @@ package org.finos.waltz.test_common.helpers;
 
 import org.finos.waltz.common.CollectionUtilities;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
+import org.finos.waltz.data.app_group.AppGroupMemberDao;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.app_group.AppGroup;
 import org.finos.waltz.model.app_group.AppGroupKind;
+import org.finos.waltz.model.app_group.AppGroupMemberRole;
 import org.finos.waltz.model.app_group.ImmutableAppGroup;
 import org.finos.waltz.service.app_group.AppGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,9 @@ public class AppGroupHelper {
 
     @Autowired
     private AppGroupService appGroupService;
+
+    @Autowired
+    private AppGroupMemberDao appGroupMemberDao;
 
     public Long createAppGroupWithAppRefs(String groupName, Collection<EntityReference> appRefs) throws InsufficientPrivelegeException {
         Collection<Long> appIds = CollectionUtilities.map(appRefs, EntityReference::id);
@@ -43,4 +48,11 @@ public class AppGroupHelper {
         return gId;
     }
 
+
+    public void addOwner(Long groupId, String userId) {
+        appGroupMemberDao.register(
+                groupId,
+                userId,
+                AppGroupMemberRole.OWNER);
+    }
 }

@@ -21,8 +21,6 @@ import static org.finos.waltz.test_common.playwright.PlaywrightUtilities.mkEmbed
 
 public class MeasurableRatingTests extends BasePlaywrightIntegrationTest {
 
-    public static final String HIGHLIGHT_ELEM_SCRIPT = "d => d.style.border = '2px solid red'";
-
     @Autowired
     private AppHelper appHelper;
 
