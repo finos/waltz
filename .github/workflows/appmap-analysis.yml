@@ -1,0 +1,64 @@
+# This workflow will build a Java project with Maven
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+
+name: AppMap Analysis
+
+on: 
+  pull_request:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:11
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: waltz
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready 
+          --health-interval 10s 
+          --health-timeout 5s 
+          --health-retries 5
+
+    steps:     
+    - uses: actions/checkout@v4
+
+    - name: Set up JDK 8
+      uses: actions/setup-java@v3
+      with:
+        java-version: '8'
+        distribution: 'adopt'
+
+    - name: Cache Maven packages    
+      uses: actions/cache@v1
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-m2
+        restore-keys: ${{ runner.os }}-m2
+
+    - name: Build with Maven
+      run: mvn -Dmaven.test.failure.ignore=true -B -ntp -s .build.settings.xml -Pbuild-postgres,waltz-postgres,integration-tests clean test;
+
+    - name: Publish mocha results
+      uses: actions/upload-artifact@v2
+      with:
+        name: mocha-test-results.txt
+        path: waltz-ng/mocha-test-results.txt
+
+    - name: Publish liquibase changelogs
+      uses: actions/upload-artifact@v2
+      with:
+        name: liquibase-changelogs
+        path: waltz-schema/src/main/resources/liquibase/
+
+    - name: Publish Java Test results
+      uses: actions/upload-artifact@v2
+      with:
+        name: surefire-results.html
+        path: target/site/surefire-report.html
