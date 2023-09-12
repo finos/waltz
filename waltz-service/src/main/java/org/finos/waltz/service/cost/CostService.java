@@ -18,40 +18,63 @@
 
 package org.finos.waltz.service.cost;
 
+import org.finos.waltz.common.ArrayUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.ListUtilities;
+import org.finos.waltz.common.MapUtilities;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
+import org.finos.waltz.data.cost.AllocatedCostDefinitionDao;
 import org.finos.waltz.data.cost.CostDao;
 import org.finos.waltz.data.cost.CostKindDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.cost.AllocatedCostDefinition;
+import org.finos.waltz.model.cost.CostKindWithYears;
 import org.finos.waltz.model.cost.EntityCost;
 import org.finos.waltz.model.cost.EntityCostsSummary;
 import org.finos.waltz.model.cost.ImmutableEntityCostsSummary;
 import org.jooq.lambda.tuple.Tuple2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import static java.lang.String.format;
+import static java.util.Comparator.comparingInt;
 import static java.util.Optional.ofNullable;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.FunctionUtilities.time;
+import static org.finos.waltz.common.MapUtilities.indexBy;
 
 @Service
 public class CostService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(CostService.class);
     private final CostDao costDao;
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
     private final CostKindDao costKindDao;
+    private final AllocatedCostDefinitionDao allocatedCostDefinitionDao;
 
 
     @Autowired
-    CostService(CostDao costDao, CostKindDao costKindDao){
+    CostService(CostDao costDao,
+                CostKindDao costKindDao,
+                AllocatedCostDefinitionDao allocatedCostDefinitionDao){
+
+        checkNotNull(allocatedCostDefinitionDao, "allocatedCostDefinitionDao must not be null");
         checkNotNull(costDao, "costDao must not be null");
         checkNotNull(costKindDao, "costKindDao must not be null");
 
+        this.allocatedCostDefinitionDao = allocatedCostDefinitionDao;
         this.costKindDao = costKindDao;
         this.costDao = costDao;
     }
@@ -112,6 +135,38 @@ public class CostService {
                 .mappedCount(mappedAndMissingCounts.v1)
                 .missingCount(mappedAndMissingCounts.v2)
                 .build();
+    }
+
+    public void populateAllocatedCosts() {
+
+        Set<AllocatedCostDefinition> allocatedCostDefinitions = allocatedCostDefinitionDao.findAll();
+        Map<Long, CostKindWithYears> costKindsById = indexBy(costKindDao.findAll(), d -> d.costKind().id().get());
+
+        allocatedCostDefinitions
+                .forEach(defn -> {
+
+                    CostKindWithYears sourceKind = costKindsById.get(defn.sourceCostKind().id());
+                    CostKindWithYears targetKind = costKindsById.get(defn.targetCostKind().id());
+
+                    Integer maxYear = sourceKind.years()
+                            .stream()
+                            .max(comparingInt(k -> k))
+                            .orElse(DateTimeUtilities.today().getYear()); // Take the most recent year costs are for
+
+                    LOG.info(format("Allocating %s costs on %s to %s costs on %s using allocation scheme %s",
+                            defn.sourceCostKind().name().orElse("Unknown"),
+                            sourceKind.costKind().subjectKind(),
+                            defn.targetCostKind().name().orElse("Unknown"),
+                            targetKind.costKind().subjectKind(),
+                            defn.allocationScheme().name().orElse("Unknown")));
+
+                    allocateCostsByDefinition(defn, maxYear);
+
+                });
+    }
+
+    public void allocateCostsByDefinition(AllocatedCostDefinition defn, Integer year) {
+        allocatedCostDefinitionDao.allocateCostsByDefinition(defn, year);
     }
 
 }

@@ -18,6 +18,7 @@
 
 package org.finos.waltz.data.cost;
 
+import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.cost.CostKindWithYears;
 import org.finos.waltz.model.cost.ImmutableCostKindWithYears;
 import org.finos.waltz.schema.tables.records.CostKindRecord;
@@ -32,9 +33,12 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
+import static org.finos.waltz.common.ListUtilities.filter;
 import static org.finos.waltz.schema.Tables.COST;
 import static org.finos.waltz.schema.Tables.COST_KIND;
 
@@ -49,6 +53,7 @@ public class CostKindDao {
                 .name(record.getName())
                 .description(record.getDescription())
                 .externalId(record.getExternalId())
+                .subjectKind(EntityKind.valueOf(record.getSubjectKind()))
                 .isDefault(record.getIsDefault())
                 .build();
     };
@@ -82,7 +87,7 @@ public class CostKindDao {
                 .selectDistinct(COST_KIND.fields())
                 .select(COST.YEAR)
                 .from(COST_KIND)
-                .innerJoin(COST).on(COST_KIND.ID.eq(COST.COST_KIND_ID))
+                .leftJoin(COST).on(COST_KIND.ID.eq(COST.COST_KIND_ID))
                 .where(cond)
                 .orderBy(COST.YEAR.desc())
                 .fetchGroups(
@@ -90,11 +95,14 @@ public class CostKindDao {
                         r -> r.get(COST.YEAR))
                 .entrySet()
                 .stream()
-                .map(kv -> ImmutableCostKindWithYears
-                        .builder()
-                        .costKind(kv.getKey())
-                        .years(kv.getValue())
-                        .build())
+                .map(kv -> {
+                    List<Integer> years = filter(Objects::nonNull, kv.getValue());
+                    return ImmutableCostKindWithYears
+                            .builder()
+                            .costKind(kv.getKey())
+                            .years(years)
+                            .build();
+                })
                 .collect(toSet());
     }
 
