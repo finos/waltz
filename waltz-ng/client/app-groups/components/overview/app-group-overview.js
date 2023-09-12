@@ -41,7 +41,7 @@ const initialState = {
     visibility: {
         aliasEditor: false,
     },
-    aliases: ["hello", "world"]
+    aliases: []
 };
 
 
