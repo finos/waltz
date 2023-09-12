@@ -18,15 +18,9 @@
 
 package org.finos.waltz.jobs.harness;
 
-import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.service.DIConfiguration;
 import org.finos.waltz.service.cost.CostService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import static org.finos.waltz.common.FunctionUtilities.time;
-import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 
 
 public class AssetCostHarness {
@@ -36,14 +30,9 @@ public class AssetCostHarness {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         CostService svc = ctx.getBean(CostService.class);
 
-        IdSelectionOptions bill = mkOpts(mkRef(EntityKind.PERSON, 1234));
-        IdSelectionOptions jennifer = mkOpts(mkRef(EntityKind.PERSON, 5678));
-        IdSelectionOptions scott = mkOpts(mkRef(EntityKind.PERSON, 9876));
-        IdSelectionOptions infra = mkOpts(mkRef(EntityKind.ORG_UNIT, 1234));
+        svc.populateAllocatedCosts();
 
-        long costKind = 7L;
-        time("cost summary for jennifer", () -> svc.summariseByCostKindAndSelector(costKind, jennifer, EntityKind.APPLICATION, 2022, 20));
-
+        System.out.println("done!");
 
     }
 

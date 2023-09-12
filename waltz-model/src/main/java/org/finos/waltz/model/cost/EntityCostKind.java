@@ -30,6 +30,7 @@ import org.immutables.value.Value;
 public abstract class EntityCostKind implements IdProvider, NameProvider, DescriptionProvider, ExternalIdProvider, EntityKindProvider {
 
     public abstract boolean isDefault();
+    public abstract EntityKind subjectKind();
 
     @Value.Default
     public EntityKind kind() { return EntityKind.COST_KIND; }
