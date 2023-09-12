@@ -122,7 +122,6 @@ function controller($state, serviceBroker) {
         loadAppGroups();
     };
 
-
     vm.showAliasEditor = () => vm.visibility.aliasEditor = true;
     vm.showTagEditor = () => vm.visibility.tagEditor = true;
 
