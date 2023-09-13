@@ -334,10 +334,14 @@ public class SurveyInstanceDao {
     }
 
 
-    public void clearApproved(long instanceId) {
-        dsl.update(si)
+    public void refreshSurveyInfo(long instanceId) {
+        dsl
+                .update(si)
                 .set(si.APPROVED_AT, (Timestamp) null)
                 .set(si.APPROVED_BY, (String) null)
+                .set(si.SUBMITTED_AT, (Timestamp) null)
+                .set(si.SUBMITTED_BY, (String) null)
+                .set(si.ISSUED_ON, toSqlDate(nowUtcTimestamp())) //update the issued on to the current date
                 .where(si.ID.eq(instanceId))
                 .execute();
     }

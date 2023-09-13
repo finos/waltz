@@ -264,7 +264,7 @@ public class SurveyInstanceService {
                 // if survey is being sent back, store current responses as a version
                 long versionedInstanceId = surveyInstanceDao.createPreviousVersion(surveyInstance);
                 surveyQuestionResponseDao.cloneResponses(surveyInstance.id().get(), versionedInstanceId);
-                surveyInstanceDao.clearApproved(instanceId);
+                surveyInstanceDao.refreshSurveyInfo(instanceId);
                 // intended drop thru'
             default:
                 nbupdates = surveyInstanceDao.updateStatus(instanceId, newStatus);
