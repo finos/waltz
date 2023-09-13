@@ -42,11 +42,14 @@ export function mkSurveyInstanceStore() {
     const findPreviousVersions = (originalId) => remote
         .fetchViewList("GET", `api/survey-instance/id/${originalId}/previous-versions`);
 
-
     const findVersions = (originalId, force = false) => remote
         .fetchViewList("GET", `api/survey-instance/id/${originalId}/versions`, null, {force});
 
+    const findByRecipientId = (personId, force = false) => remote
+        .fetchViewList("GET", `api/survey-instance/recipient/id/${personId}`, null, {force});
 
+    const findByEntityReference = (ref, force = false) => remote
+        .fetchViewList("GET", `api/survey-instance/entity/${ref.kind}/${ref.id}`, null, {force});
 
     const updateStatus = (id, command) => remote
         .execute("PUT",`api/survey-instance/${id}/status`, command);
@@ -111,6 +114,8 @@ export function mkSurveyInstanceStore() {
         findResponses,
         findPreviousVersions,
         findVersions,
+        findByRecipientId,
+        findByEntityReference,
         getPermissions,
         updateStatus,
         updateSubmissionDueDate,

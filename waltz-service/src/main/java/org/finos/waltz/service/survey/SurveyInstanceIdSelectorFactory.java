@@ -49,10 +49,8 @@ public class SurveyInstanceIdSelectorFactory implements IdSelectorFactory {
             case APPLICATION:
             case CHANGE_INITIATIVE:
                 return mkForNonHierarchicalEntity(ref, options.scope());
-
             case ORG_UNIT:
                 return mkForOrgUnit(ref, options.scope());
-
             default:
                 throw new IllegalArgumentException("Cannot create selector for entity kind: " + ref.kind());
         }
