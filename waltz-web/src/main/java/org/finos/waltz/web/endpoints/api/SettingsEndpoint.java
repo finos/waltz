@@ -61,6 +61,7 @@ public class SettingsEndpoint implements Endpoint {
         String findAllPath = mkPath(BASE_URL);
         String getByNamePath = mkPath(BASE_URL, "name", ":name");
         String updateValuePath = mkPath(BASE_URL, "update");
+        String createValuePath = mkPath(BASE_URL, "create");
 
 
         ListRoute<Setting> findAllRoute = (request, response) -> {
@@ -81,10 +82,17 @@ public class SettingsEndpoint implements Endpoint {
             return settingsService.update(updateCommand);
         };
 
+        DatumRoute<Integer> createRoute = (request, response) -> {
+            requireRole(userRoleService, request, SystemRole.ADMIN);
+            Setting setting = readBody(request, Setting.class);
+            return settingsService.create(setting);
+        };
+
 
         getForList(findAllPath, findAllRoute);
         getForDatum(getByNamePath, getByNameRoute);
         postForDatum(updateValuePath, updateValueRoute);
+        postForDatum(createValuePath, createRoute);
     }
 
 

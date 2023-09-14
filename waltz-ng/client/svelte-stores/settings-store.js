@@ -35,9 +35,17 @@ export function mkSettingsStore() {
             updateCmd)
 
 
+    const create = (createCmd) => remote
+        .execute(
+            "POST",
+            "api/settings/create",
+            createCmd)
+
+
     return {
         loadAll,
-        update
+        update,
+        create
     };
 }
 

@@ -94,4 +94,8 @@ public class SettingsService {
     public int update(UpdateSettingsCommand cmd) {
         return settingsDao.update(cmd);
     }
+
+    public Integer create(Setting setting) {
+        return settingsDao.create(setting);
+    }
 }

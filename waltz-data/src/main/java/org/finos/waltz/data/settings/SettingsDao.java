@@ -96,4 +96,15 @@ public class SettingsDao {
                 .execute();
 
     }
+
+    public int create(Setting setting) {
+        SettingsRecord record = dsl.newRecord(SETTINGS);
+        record.setName(setting.name());
+        record.setDescription(setting.description());
+        record.setRestricted(setting.restricted());
+
+        setting.value().ifPresent(record::setValue);
+
+        return record.store();
+    }
 }
