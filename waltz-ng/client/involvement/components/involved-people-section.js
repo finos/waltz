@@ -50,11 +50,6 @@ const columnDefs = [
     {
         field: "rolesDisplayName",
         displayName: "Roles",
-        sortingAlgorithm: (a, b) => {
-            const aNames = _.join(_.map(a, "displayName"));
-            const bNames = _.join(_.map(b, "displayName"));
-            return aNames.localeCompare(bNames);
-        },
         cellTemplate: `
                 <div class="ui-grid-cell-contents">
                     <span ng-bind="COL_FIELD"
@@ -95,6 +90,7 @@ function mkGridData(involvements = [], displayNameService, descriptionService) {
             const rolesDisplayName = _
                 .chain(roles)
                 .map("displayName")
+                .sort()
                 .join(", ")
                 .value();
 

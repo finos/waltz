@@ -140,7 +140,7 @@
             </thead>
 
             <tbody>
-                <tr ng-repeat="role in row.entity.roles">
+                <tr ng-repeat="role in row.entity.roles | orderBy:'displayName'">
                     <td>
                         <div ng-bind="role.displayName"></div>
                         <div class="small text-muted" ng-bind="role.provenance"></div>
