@@ -66,7 +66,6 @@ import static org.jooq.lambda.fi.util.function.CheckedConsumer.unchecked;
 
 public class LineageDiscoveryReport {
 
-
     private static List<String> staticHeaders = newArrayList(
             "Publisher",
             "Publisher Asset Code",
@@ -124,8 +123,8 @@ public class LineageDiscoveryReport {
 
                     // non-strict
                     Tuple2<Graph<EntityReference, DataTypeEdge>, GraphPath<EntityReference, DataTypeEdge>> nonStrict = row.nonStrictRoute().get();
-                    reportRow.add(nonStrict != null ? true : false); // non-strict route
-                    reportRow.add(nonStrict != null ? nonStrict.v2.getEdgeList().size() : "N/A"); // # non-strict hops
+                    reportRow.add(nonStrict != null && nonStrict.v2 != null ? true : false); // non-strict route
+                    reportRow.add(nonStrict != null && nonStrict.v2 != null ? nonStrict.v2.getEdgeList().size() : "N/A"); // # non-strict hops
 
 
                     // strict
@@ -188,7 +187,9 @@ public class LineageDiscoveryReport {
      */
     private static double calculateConfidence(GraphPath<EntityReference, DataTypeEdge> route,
                                               boolean isStrict) {
-
+        if(route == null) {
+            return 100d;
+        }
         double startPercentage = isStrict ? 100d : 50d;
         int hopCount = route.getEdgeList().size();
         return startPercentage - hopCount * 5;
@@ -364,7 +365,7 @@ public class LineageDiscoveryReport {
 
         GraphPath<EntityReference, DataTypeEdge> route = findShortestPath(graph, sourceApp.entityReference(), targetApp.entityReference());
         if(route == null) {
-            Writer writer = generateDotGraph(graph);
+            //Writer writer = generateDotGraph(graph);
             return null;
         }
 
