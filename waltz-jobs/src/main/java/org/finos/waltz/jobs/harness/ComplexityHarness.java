@@ -16,17 +16,26 @@
  *
  */
 
-package org.finos.waltz.model.settings;
+package org.finos.waltz.jobs.harness;
 
-import org.finos.waltz.model.scheduled_job.JobKey;
+import org.finos.waltz.service.DIConfiguration;
+import org.finos.waltz.service.complexity.ComplexityService;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import static java.lang.String.format;
 
-public interface NamedSettings {
-    String authenticationFilter = "server.authentication.filter";
-    String headerBasedAuthenticationFilterParam = "server.authentication.filter.headerbased.param";
-    String externalAuthenticationEndpointUrl = "server.authentication.external.endpoint.url";
-    static String mkScheduledJobParamSetting(JobKey jobKey) {
-        return format("job.%s.params", jobKey.name());
+public class ComplexityHarness {
+
+    public static void main(String[] args) {
+
+        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
+
+        ComplexityService svc = ctx.getBean(ComplexityService.class);
+
+        svc.populateMeasurableComplexities();
+
+        System.out.println("done");
+
     }
+
+
 }
