@@ -28,7 +28,7 @@ public class SurveyTemplateMigrate {
     private static final Logger LOG = LoggerFactory.getLogger(SurveyTemplateMigrate.class);
     private static final long OLD_TEMPLATE_ID = 111;
     private static final long NEW_TEMPLATE_ID = 183;
-    private static final long NEW_RUN_ID = 48082;
+    private static final long NEW_RUN_ID = 48082; // note: this will need updating
 
 
     public static void main(String[] args) {
@@ -40,6 +40,7 @@ public class SurveyTemplateMigrate {
         LOG.info("Got {} survey instances from existing template id [{}]", oldSurveyInstances.size(), OLD_TEMPLATE_ID);
 
         // survey instance ids for items to NOT migrate
+        // note - these will need updating
         Set<Long> exceptionsToNotMigrate = SetUtilities.asSet(110279L, 109550L,  110325L,  109789L,  108233L,  110311L,  110310L,  110315L,  108131L,  110308L,  110314L,  107042L,  109420L,  110307L,  110312L,  106656L,  105630L,  110306L,  110380L);
 
         Set<SurveyInstance> toMigrate = oldSurveyInstances.stream()
