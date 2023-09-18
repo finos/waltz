@@ -55,7 +55,8 @@
             <g transform={`translate(${determineColumn(idx) * dimensions.month.width}, ${determineRow(idx) * dimensions.month.height})`}>
 
                 <g on:click={() => onSelectMonth(_.map(monthData.days, d => d.date))}
-                   on:keydown={() => onSelectMonth(_.map(monthData.days, d => d.date))}>
+                   on:keydown={() => onSelectMonth(_.map(monthData.days, d => d.date))}
+                   role="button">
                     <title>{format(monthData?.startDate)}</title>
 
                     <rect width={dimensions.month.width}
