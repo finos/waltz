@@ -15,8 +15,7 @@
  * See the License for the specific
  *
  */
-import template from "./settings-view.html";
-import SettingsPanel from "./svelte/settings/SettingsPanel.svelte";
+import SettingsPanel from "./svelte/settings/SettingsAdminView.svelte";
 import {initialiseData} from "../common";
 
 const initialState = {
@@ -30,7 +29,7 @@ function controller() {
 }
 
 export default {
-    template,
+    template: `<waltz-svelte-component component="$ctrl.SettingsPanel"></waltz-svelte-component>`,
     controller,
     controllerAs: "$ctrl",
     bindToController: true,
