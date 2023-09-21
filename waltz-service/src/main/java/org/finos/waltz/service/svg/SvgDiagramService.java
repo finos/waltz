@@ -32,6 +32,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
 
@@ -86,4 +87,18 @@ public class SvgDiagramService {
         return SvgUtilities.convertVisioSvg(key, svgStr);
     }
 
+
+    public Set<SvgDiagram> findAll() {
+        return svgDiagramDao.findAll();
+    }
+
+
+    public Boolean remove(long id) {
+        return svgDiagramDao.remove(id);
+    }
+
+
+    public Boolean save(SvgDiagram diagram) {
+        return svgDiagramDao.save(diagram);
+    }
 }
