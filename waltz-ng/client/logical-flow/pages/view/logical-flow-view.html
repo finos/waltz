@@ -45,7 +45,7 @@
     <div class="waltz-page-summary waltz-page-summary-attach">
         <div ng-if="ctrl.logicalFlow"
              ng-class="{
-                'ws-inactive': ctrl.logicalFlow.entityLifecycleStatus ==='REMOVED',
+                'ws-inactive': ctrl.logicalFlow.entityLifecycleStatus ==='REMOVED' || ctrl.logicalFlow.isRemoved,
                 'ws-draft': ctrl.logicalFlow.entityLifecycleStatus ==='PENDING',
              }">
             <div class="row">
