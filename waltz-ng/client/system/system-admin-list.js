@@ -99,6 +99,12 @@ const referenceDataOptions= [
         state: "main.system.measurable-categories",
         icon: "puzzle-piece"
     }, {
+        name: "Navigation Aids",
+        role: "ADMIN",
+        description: "View and edit nav aids",
+        state: "main.system.nav-aids",
+        icon: "picture-o"
+    }, {
         name: "Rating Schemes",
         role: "ADMIN",
         description: "View and edit rating schemes",

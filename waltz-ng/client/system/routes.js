@@ -37,6 +37,7 @@ import NavAidBuilderView from "./nav-aid-builder-view";
 import VersionInfoView from "./version-info-view";
 import MeasurableCategoriesView from "./measurable-categories-view";
 import DiagramBuilderView from "./diagram-builder-view";
+import NavAidAdminView from "./nav-aids-view";
 
 
 const baseState = {
@@ -139,6 +140,11 @@ const navAidBuilderState = {
     views: {"content@": NavAidBuilderView}
 };
 
+const navAidAdminState = {
+    url: "/nav-aids",
+    views: {"content@": NavAidAdminView}
+};
+
 const versionInfoState = {
     url: "/version-info",
     views: {"content@": VersionInfoView}
@@ -162,6 +168,7 @@ function setupRoutes($stateProvider) {
         .state("main.system.euda-list", eudaListState)
         .state("main.system.hierarchies", hierarchiesState)
         .state("main.system.measurable-categories", measurableCategoriesState)
+        .state("main.system.nav-aids", navAidAdminState)
         .state("main.system.nav-aid-builder", navAidBuilderState)
         .state("main.system.orphans", orphansState)
         .state("main.system.rating-schemes", ratingSchemesState)
