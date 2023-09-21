@@ -261,10 +261,12 @@ public class SurveyInstanceDao {
     public int updateStatus(long instanceId, SurveyInstanceStatus newStatus) {
         checkNotNull(newStatus, "newStatus cannot be null");
 
-        return dsl.update(si)
+        return dsl
+                .update(si)
                 .set(si.STATUS, newStatus.name())
                 .where(si.STATUS.notEqual(newStatus.name())
-                        .and(si.ID.eq(instanceId)))
+                        .and(si.ID.eq(instanceId))
+                        .and(si.ORIGINAL_INSTANCE_ID.isNull()))
                 .execute();
     }
 
@@ -311,13 +313,19 @@ public class SurveyInstanceDao {
     }
 
 
-    public int updateSubmitted(long instanceId, String userName) {
+    public int markSubmitted(long instanceId, String userName) {
         checkNotNull(userName, "userName cannot be null");
 
-        return dsl.update(si)
+        return dsl
+                .update(si)
+                .set(si.STATUS, SurveyInstanceStatus.COMPLETED.name())
                 .set(si.SUBMITTED_AT, Timestamp.valueOf(nowUtc()))
                 .set(si.SUBMITTED_BY, userName)
-                .where(si.ID.eq(instanceId))
+                .where(si.ID.eq(instanceId)
+                        .and(si.ORIGINAL_INSTANCE_ID.isNull())
+                        .and(si.STATUS.in(
+                                SurveyInstanceStatus.NOT_STARTED.name(),
+                                SurveyInstanceStatus.IN_PROGRESS.name())))
                 .execute();
     }
 
@@ -325,24 +333,33 @@ public class SurveyInstanceDao {
     public int markApproved(long instanceId, String userName) {
         checkNotNull(userName, "userName cannot be null");
 
-        return dsl.update(si)
+        return dsl
+                .update(si)
                 .set(si.APPROVED_AT, Timestamp.valueOf(nowUtc()))
                 .set(si.APPROVED_BY, userName)
                 .set(si.STATUS, SurveyInstanceStatus.APPROVED.name())
-                .where(si.ID.eq(instanceId))
+                .where(si.ID.eq(instanceId)
+                        .and(si.ORIGINAL_INSTANCE_ID.isNull())
+                        .and(si.STATUS.eq(SurveyInstanceStatus.COMPLETED.name())))
                 .execute();
     }
 
 
-    public void refreshSurveyInfo(long instanceId) {
-        dsl
+    public int reopenSurvey(long instanceId) {
+        return dsl
                 .update(si)
+                .set(si.STATUS, SurveyInstanceStatus.IN_PROGRESS.name())
                 .set(si.APPROVED_AT, (Timestamp) null)
                 .set(si.APPROVED_BY, (String) null)
                 .set(si.SUBMITTED_AT, (Timestamp) null)
                 .set(si.SUBMITTED_BY, (String) null)
                 .set(si.ISSUED_ON, toSqlDate(nowUtcTimestamp())) //update the issued on to the current date
-                .where(si.ID.eq(instanceId))
+                .where(si.ID.eq(instanceId)
+                        .and(si.ORIGINAL_INSTANCE_ID.isNull())
+                        .and(si.STATUS.in(
+                                SurveyInstanceStatus.APPROVED.name(),
+                                SurveyInstanceStatus.REJECTED.name(),
+                                SurveyInstanceStatus.WITHDRAWN.name())))
                 .execute();
     }
 
