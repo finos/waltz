@@ -25,4 +25,12 @@
         <tagDatabase tag="v1.53"/> <!-- tag the current db version, i.e. the last  -->
     </changeSet>
 
+    <changeSet id="20230907-6746-1"
+               author="woodjes">
+        <comment>6746: update size of change initiative name column</comment>
+        <modifyDataType tableName="change_initiative"
+                        columnName="name"
+                        newDataType="${name.type}" />
+    </changeSet>
+
 </databaseChangeLog>
