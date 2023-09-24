@@ -43,10 +43,32 @@
 
 
     <div class="waltz-page-summary waltz-page-summary-attach">
+        <waltz-section-actions>
+            <button ng-if="ctrl.canRestore"
+                    class="btn btn-xs btn-primary"
+                    uib-popover="Restore this flow, any physical flows that were active when this logical flow was removed will also be restored"
+                    popover-append-to-body="true"
+                    popover-popup-delay="300"
+                    popover-placement="bottom"
+                    popover-trigger="mouseenter"
+                    ng-click="ctrl.restoreFlow()">
+                Restore
+            </button>
+            <button ng-if="ctrl.canRemove"
+                    class="btn btn-xs btn-danger"
+                    uib-popover="Remove this flow, any physical flows that are attached to the flow will also be removed"
+                    popover-append-to-body="true"
+                    popover-popup-delay="300"
+                    popover-placement="bottom"
+                    popover-trigger="mouseenter"
+                    ng-click="ctrl.removeFlow()">
+                Remove
+            </button>
+        </waltz-section-actions>
         <div ng-if="ctrl.logicalFlow"
              ng-class="{
-                'ws-inactive': ctrl.logicalFlow.entityLifecycleStatus ==='REMOVED' || ctrl.logicalFlow.isRemoved,
-                'ws-draft': ctrl.logicalFlow.entityLifecycleStatus ==='PENDING',
+                'ws-inactive': ctrl.isRemoved,
+                'ws-draft': ctrl.isDraft
              }">
             <div class="row">
                 <div class="col-md-6">
@@ -93,8 +115,8 @@
         <waltz-no-data ng-if="!ctrl.logicalFlow">
             <message>No information for this logical flow</message>
         </waltz-no-data>
-
     </div>
+
     <div ng-if="ctrl.logicalFlow">
         <br>
 

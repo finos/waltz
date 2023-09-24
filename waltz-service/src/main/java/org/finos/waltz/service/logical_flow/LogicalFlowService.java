@@ -18,7 +18,6 @@
 
 package org.finos.waltz.service.logical_flow;
 
-import org.finos.waltz.common.FunctionUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.DBExecutorPoolInterface;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
@@ -27,12 +26,25 @@ import org.finos.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import org.finos.waltz.data.logical_flow.LogicalFlowStatsDao;
-import org.finos.waltz.model.*;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.HierarchyQueryScope;
+import org.finos.waltz.model.IdProvider;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.Severity;
+import org.finos.waltz.model.UserTimestamp;
 import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.datatype.DataType;
 import org.finos.waltz.model.datatype.ImmutableDataTypeDecorator;
-import org.finos.waltz.model.logical_flow.*;
+import org.finos.waltz.model.logical_flow.AddLogicalFlowCommand;
+import org.finos.waltz.model.logical_flow.ImmutableLogicalFlow;
+import org.finos.waltz.model.logical_flow.ImmutableLogicalFlowGraphSummary;
+import org.finos.waltz.model.logical_flow.ImmutableLogicalFlowStatistics;
+import org.finos.waltz.model.logical_flow.LogicalFlow;
+import org.finos.waltz.model.logical_flow.LogicalFlowGraphSummary;
+import org.finos.waltz.model.logical_flow.LogicalFlowMeasures;
+import org.finos.waltz.model.logical_flow.LogicalFlowStatistics;
 import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
 import org.finos.waltz.model.tally.TallyPack;
 import org.finos.waltz.service.changelog.ChangeLogService;
@@ -67,7 +79,10 @@ import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
-import static org.finos.waltz.common.SetUtilities.*;
+import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.SetUtilities.fromCollection;
+import static org.finos.waltz.common.SetUtilities.hasIntersection;
+import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.model.EntityKind.DATA_TYPE;
 import static org.finos.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
 import static org.finos.waltz.model.EntityReference.mkRef;
@@ -321,16 +336,13 @@ public class LogicalFlowService {
         Select<Record1<Long>> appIdSelector = appIdSelectorFactory.apply(options);
 
         Future<List<TallyPack<String>>> dataTypeCounts = dbExecutorPool.submit(() ->
-                FunctionUtilities.time("DFS.dataTypes",
-                    () -> logicalFlowStatsDao.tallyDataTypesByAppIdSelector(appIdSelector)));
+                logicalFlowStatsDao.tallyDataTypesByAppIdSelector(appIdSelector));
 
         Future<LogicalFlowMeasures> appCounts = dbExecutorPool.submit(() ->
-                FunctionUtilities.time("DFS.appCounts",
-                    () -> logicalFlowStatsDao.countDistinctAppInvolvementByAppIdSelector(appIdSelector)));
+                logicalFlowStatsDao.countDistinctAppInvolvementByAppIdSelector(appIdSelector));
 
         Future<LogicalFlowMeasures> flowCounts = dbExecutorPool.submit(() ->
-                FunctionUtilities.time("DFS.flowCounts",
-                    () -> logicalFlowStatsDao.countDistinctFlowInvolvementByAppIdSelector(appIdSelector)));
+                logicalFlowStatsDao.countDistinctFlowInvolvementByAppIdSelector(appIdSelector));
 
         Supplier<ImmutableLogicalFlowStatistics> statSupplier = Unchecked.supplier(() -> ImmutableLogicalFlowStatistics.builder()
                 .dataTypeCounts(dataTypeCounts.get())
