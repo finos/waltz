@@ -21,8 +21,11 @@ package org.finos.waltz.service.survey;
 
 import org.finos.waltz.data.person.PersonDao;
 import org.finos.waltz.data.survey.SurveyViewDao;
+import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.person.Person;
 import org.finos.waltz.model.survey.*;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +33,9 @@ import java.util.Set;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.SetUtilities.union;
+import static org.finos.waltz.model.HierarchyQueryScope.EXACT;
+import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 
 @Service
 public class SurveyInstanceViewService {
@@ -37,6 +43,8 @@ public class SurveyInstanceViewService {
     private final PersonDao personDao;
     private final SurveyViewDao surveyViewDao;
     private final SurveyInstanceEvaluator instanceEvaluator;
+
+    private final SurveyInstanceIdSelectorFactory surveyInstanceIdSelectorFactory = new SurveyInstanceIdSelectorFactory();
 
 
     @Autowired
@@ -56,6 +64,19 @@ public class SurveyInstanceViewService {
 
     public SurveyInstanceInfo getInfoById(long instanceId) {
         return surveyViewDao.getById(instanceId);
+    }
+
+
+    public Set<SurveyInstanceInfo> findByEntityReference(EntityReference ref) {
+        Select<Record1<Long>> selector = surveyInstanceIdSelectorFactory.apply(mkOpts(ref, EXACT));
+        return surveyViewDao.findBySurveyInstanceIdSelector(selector);
+    }
+
+
+    public Set<SurveyInstanceInfo> findByPersonId(long personId) {
+        Set<SurveyInstanceInfo> surveysOwned = surveyViewDao.findForOwner(personId);
+        Set<SurveyInstanceInfo> surveysAssigned = surveyViewDao.findForRecipient(personId);
+        return union(surveysOwned, surveysAssigned);
     }
 
 

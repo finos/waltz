@@ -459,8 +459,9 @@
 
     <!-- SURVEY INSTANCE LIST -->
     <div ng-if="$ctrl.visibility.mode == 'list'">
-        <waltz-survey-instance-list parent-entity-ref="$ctrl.parentEntityRef">
-        </waltz-survey-instance-list>
+        <waltz-svelte-component component="$ctrl.SurveyInstanceList"
+                                primary-entity-ref="$ctrl.parentEntityRef">
+        </waltz-svelte-component>
     </div>
 
 

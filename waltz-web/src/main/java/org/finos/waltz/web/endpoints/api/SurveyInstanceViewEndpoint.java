@@ -52,6 +52,8 @@ public class SurveyInstanceViewEndpoint implements Endpoint {
     @Override
     public void register() {
         String findForUserPath = mkPath(BASE_URL, "user");
+        String findForEntityReferencePath = mkPath(BASE_URL, "entity", ":kind", ":id");
+        String findForPersonIdPath = mkPath(BASE_URL, "person", "id", ":id");
         String getInfoByIdPath = mkPath(BASE_URL, "id", ":id");
         String getFormDetailsByIdPath = mkPath(BASE_URL, "form-details", ":id");
 
@@ -61,7 +63,15 @@ public class SurveyInstanceViewEndpoint implements Endpoint {
         ListRoute<SurveyInstanceUserInvolvement> findForUserRoute =
                 (req, res) -> surveyInstanceViewService.findForUser(getUsername(req));
 
+        ListRoute<SurveyInstanceInfo> findForPersonIdRoute =
+                (req, res) -> surveyInstanceViewService.findByPersonId(getId(req));
+
+        ListRoute<SurveyInstanceInfo> findForEntityReferenceRoute =
+                (req, res) -> surveyInstanceViewService.findByEntityReference(getEntityReference(req));
+
         getForList(findForUserPath, findForUserRoute);
+        getForList(findForEntityReferencePath, findForEntityReferenceRoute);
+        getForList(findForPersonIdPath, findForPersonIdRoute);
         getForDatum(getInfoByIdPath, getInfoByIdRoute);
         getForDatum(getFormDetailsByIdPath, getFormDetailsByIdRoute);
     }

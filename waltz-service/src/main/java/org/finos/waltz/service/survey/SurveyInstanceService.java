@@ -22,7 +22,11 @@ package org.finos.waltz.service.survey;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.person.PersonDao;
-import org.finos.waltz.data.survey.*;
+import org.finos.waltz.data.survey.SurveyInstanceDao;
+import org.finos.waltz.data.survey.SurveyInstanceOwnerDao;
+import org.finos.waltz.data.survey.SurveyInstanceRecipientDao;
+import org.finos.waltz.data.survey.SurveyQuestionResponseDao;
+import org.finos.waltz.data.survey.SurveyRunDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
@@ -30,7 +34,24 @@ import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.attestation.SyncRecipientsResponse;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.person.Person;
-import org.finos.waltz.model.survey.*;
+import org.finos.waltz.model.survey.CopySurveyResponsesCommand;
+import org.finos.waltz.model.survey.ImmutableSurveyInstancePermissions;
+import org.finos.waltz.model.survey.ImmutableSurveyInstanceQuestionResponse;
+import org.finos.waltz.model.survey.ImmutableSurveyInstanceStatusChangeCommand;
+import org.finos.waltz.model.survey.SurveyInstance;
+import org.finos.waltz.model.survey.SurveyInstanceAction;
+import org.finos.waltz.model.survey.SurveyInstanceActionCompletionRequirement;
+import org.finos.waltz.model.survey.SurveyInstanceFormDetails;
+import org.finos.waltz.model.survey.SurveyInstanceOwnerCreateCommand;
+import org.finos.waltz.model.survey.SurveyInstancePermissions;
+import org.finos.waltz.model.survey.SurveyInstanceQuestionResponse;
+import org.finos.waltz.model.survey.SurveyInstanceRecipientCreateCommand;
+import org.finos.waltz.model.survey.SurveyInstanceStateMachine;
+import org.finos.waltz.model.survey.SurveyInstanceStatus;
+import org.finos.waltz.model.survey.SurveyInstanceStatusChangeCommand;
+import org.finos.waltz.model.survey.SurveyQuestion;
+import org.finos.waltz.model.survey.SurveyQuestionResponse;
+import org.finos.waltz.model.survey.SurveyRun;
 import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.model.utils.IdUtilities;
 import org.finos.waltz.service.changelog.ChangeLogService;
@@ -41,11 +62,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
-import static org.finos.waltz.common.Checks.*;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkTrue;
+import static org.finos.waltz.common.Checks.fail;
 import static org.finos.waltz.common.CollectionUtilities.find;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.StringUtilities.isEmpty;
@@ -233,14 +260,23 @@ public class SurveyInstanceService {
     }
 
 
-    public SurveyInstanceStatus updateStatus(String userName, long instanceId, SurveyInstanceStatusChangeCommand command) {
+    public SurveyInstanceStatus updateStatus(String userName,
+                                             long instanceId,
+                                             SurveyInstanceStatusChangeCommand command) {
+
         checkNotNull(command, "command cannot be null");
 
         SurveyInstance surveyInstance = surveyInstanceDao.getById(instanceId);
-        checkTrue(surveyInstance.originalInstanceId() == null, "You cannot change the status of Approved/Rejected surveys");
+        checkTrue(surveyInstance.originalInstanceId() == null, "You can only update the status of the most recent version of a survey");
 
         SurveyInstancePermissions permissions = getPermissions(userName, instanceId);
-        SurveyInstanceStatus newStatus = simple(surveyInstance.status()).process(command.action(), permissions, surveyInstance);
+
+        //This checks that the command is an allowable transition and that you have the required permissions
+        SurveyInstanceStatus newStatus = simple(surveyInstance.status())
+                .process(
+                        command.action(),
+                        permissions,
+                        surveyInstance);
 
         if (command.action().getCompletionRequirement() == SurveyInstanceActionCompletionRequirement.REQUIRE_FULL_COMPLETION) {
             // abort if missing any mandatory questions
@@ -256,26 +292,29 @@ public class SurveyInstanceService {
         }
 
         int nbupdates = 0;
+
         switch (command.action()) {
             case APPROVING:
+                checkTrue(newStatus.equals(SurveyInstanceStatus.APPROVED), "The resolved new status for APPROVING should be 'APPROVED', resolved to: " + newStatus);
                 nbupdates = surveyInstanceDao.markApproved(instanceId, userName);
                 break;
+            case SUBMITTING:
+                checkTrue(newStatus.equals(SurveyInstanceStatus.COMPLETED), "The resolved new status for SUBMITTING should be 'COMPLETED', resolved to: " + newStatus);
+                removeUnnecessaryResponses(instanceId);
+                nbupdates = surveyInstanceDao.markSubmitted(instanceId, userName);
+                break;
             case REOPENING:
+                checkTrue(newStatus.equals(SurveyInstanceStatus.IN_PROGRESS), "The resolved new status for REOPENING should be 'IN_PROGRESS', resolved to: " + newStatus);
                 // if survey is being sent back, store current responses as a version
                 long versionedInstanceId = surveyInstanceDao.createPreviousVersion(surveyInstance);
                 surveyQuestionResponseDao.cloneResponses(surveyInstance.id().get(), versionedInstanceId);
-                surveyInstanceDao.clearApproved(instanceId);
-                // intended drop thru'
+                nbupdates = surveyInstanceDao.reopenSurvey(instanceId);
+                break;
             default:
                 nbupdates = surveyInstanceDao.updateStatus(instanceId, newStatus);
         }
 
         if (nbupdates > 0) {
-            if (newStatus == SurveyInstanceStatus.COMPLETED) {
-                surveyInstanceDao.updateSubmitted(instanceId, userName);
-                removeUnnecessaryResponses(instanceId);
-            }
-
             changeLogService.write(
                     ImmutableChangeLog.builder()
                             .operation(Operation.UPDATE)
