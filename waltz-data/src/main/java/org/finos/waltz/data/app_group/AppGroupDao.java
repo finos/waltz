@@ -20,14 +20,12 @@ package org.finos.waltz.data.app_group;
 
 import org.finos.waltz.data.JooqUtilities;
 import org.finos.waltz.data.SearchDao;
-import org.finos.waltz.data.application.ApplicationDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.app_group.AppGroup;
 import org.finos.waltz.model.app_group.AppGroupKind;
 import org.finos.waltz.model.app_group.AppGroupMemberRole;
 import org.finos.waltz.model.app_group.ImmutableAppGroup;
-import org.finos.waltz.model.application.Application;
 import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.finos.waltz.schema.tables.records.ApplicationGroupRecord;
 import org.jooq.Condition;
@@ -47,7 +45,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static org.finos.waltz.common.StringUtilities.mkSafe;
@@ -243,7 +240,7 @@ public class AppGroupDao implements SearchDao<AppGroup> {
                     .and(nameCondition));
 
         SelectConditionStep<Record> publicGroupsViaAlias = dsl
-                .selectDistinct(APPLICATION_GROUP.fields())
+                .select(APPLICATION_GROUP.fields())
                 .from(APPLICATION_GROUP)
                 .innerJoin(ENTITY_ALIAS)
                 .on(ENTITY_ALIAS.ID.eq(APPLICATION_GROUP.ID))
@@ -251,17 +248,19 @@ public class AppGroupDao implements SearchDao<AppGroup> {
                 .and(aliasCondition);
 
         SelectConditionStep<Record> privateGroupsViaAlias = dsl
-                .selectDistinct(APPLICATION_GROUP.fields())
+                .select(APPLICATION_GROUP.fields())
                 .from(APPLICATION_GROUP)
                 .innerJoin(ENTITY_ALIAS)
                 .on(ENTITY_ALIAS.ID.eq(APPLICATION_GROUP.ID))
                 .where(privateGroupCondition)
                 .and(aliasCondition);
 
-        return privateGroups
+        Select<Record> searchQry = privateGroups
                 .unionAll(publicGroups)
                 .unionAll(privateGroupsViaAlias)
-                .unionAll(publicGroupsViaAlias)
+                .unionAll(publicGroupsViaAlias);
+
+        return searchQry
                 .fetch(TO_DOMAIN)
                 .stream()
                 .limit(options.limit())

@@ -52,7 +52,6 @@ import java.util.List;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.FunctionUtilities.time;
 import static org.finos.waltz.common.ListUtilities.map;
 import static org.finos.waltz.model.EntityKind.APPLICATION;
 import static org.finos.waltz.model.EntityReference.mkRef;
@@ -88,19 +87,19 @@ public class EndUserAppService {
     public List<EndUserApplication> findByOrganisationalUnitSelector(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         Select<Record1<Long>> selector = orgUnitIdSelectorFactory.apply(options);
-        return time("EUAS.findByOrganisationalUnitSelector", () -> endUserAppDao.findByOrganisationalUnitSelector(selector));
+        return endUserAppDao.findByOrganisationalUnitSelector(selector);
     }
 
 
     public Collection<Tally<Long>> countByOrgUnitId() {
-        return time("EUAS.countByOrgUnitId", endUserAppDao::countByOrganisationalUnit);
+        return endUserAppDao.countByOrganisationalUnit();
     }
 
 
     public List<EndUserApplication> findBySelector(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         Select<Record1<Long>> selector = endUserAppIdSelectorFactory.apply(options);
-        return time("EUAS.findBySelector", () -> endUserAppDao.findBySelector(selector));
+        return endUserAppDao.findBySelector(selector);
     }
 
     public EndUserApplication getById(Long id) {

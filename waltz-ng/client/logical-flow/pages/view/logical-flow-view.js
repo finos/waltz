@@ -22,49 +22,23 @@ import {initialiseData} from "../../../common/index";
 import template from "./logical-flow-view.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import toasts from "../../../svelte-stores/toast-store";
+import _ from "lodash";
 
 
 const initialState = {
     logicalFlow: null,
+    isDraft: false,
+    isRemoved: false,
+    canEdit: false,
+    canRestore: false,
+    canRemove: false
 };
 
 
-function mkHistoryObj(flow) {
-    return {
-        name: `${flow.source.name} to ${flow.target.name}`,
-        kind: "LOGICAL_DATA_FLOW",
-        state: "main.logical-flow.view",
-        stateParams: { id: flow.id }
-    };
-}
-
-
-function removeFromHistory(historyStore, flow) {
-    if (! flow) { return; }
-
-    const historyObj = mkHistoryObj(flow);
-
-    historyStore.remove(
-        historyObj.name,
-        historyObj.kind,
-        historyObj.state,
-        historyObj.stateParams);
-}
-
-
-function navigateToLastView($state, historyStore) {
-    const lastHistoryItem = historyStore.getAll()[0];
-    if (lastHistoryItem) {
-        $state.go(lastHistoryItem.state, lastHistoryItem.stateParams);
-    } else {
-        $state.go("main.home");
-    }
-}
-
-
-function controller($state,
+function controller($q,
+                    $state,
                     $stateParams,
-                    historyStore,
+                    $window,
                     serviceBroker)
 {
     const vm = initialiseData(this, initialState);
@@ -78,49 +52,84 @@ function controller($state,
 
         // -- LOAD ---
 
-        serviceBroker
+        const flowPromise = serviceBroker
             .loadViewData(
                 CORE_API.LogicalFlowStore.getById,
                 [ flowId ])
             .then(r => vm.logicalFlow = r.data);
 
+        const permissionPromise = serviceBroker
+            .loadViewData(
+                CORE_API.LogicalFlowStore.findPermissionsForParentRef,
+                [vm.entityReference])
+            .then(r => {
+                vm.canEdit = _.some(r.data, d => _.includes(["ADD", "UPDATE", "REMOVE"], d));
+            });
+
+        $q.all([flowPromise, permissionPromise]).then(() => {
+            vm.isDraft = vm.logicalFlow.entityLifecycleStatus === "PENDING";
+            vm.isRemoved = vm.logicalFlow.entityLifecycleStatus === "REMOVED" || vm.logicalFlow.isRemoved;
+            vm.canRemove = vm.canEdit && !vm.isRemoved;
+            vm.canRestore = vm.canEdit && vm.isRemoved;
+        });
+
     };
 
-    const deleteLogicalFlow = () => {
+    const removeLogicalFlow = () => {
         return serviceBroker
             .execute(CORE_API.LogicalFlowStore.removeFlow, [vm.logicalFlow.id])
             .then(r => {
                 if (r.data > 0) {
-                    toasts.success(`Logical Flow between ${vm.logicalFlow.source.name} and ${vm.logicalFlow.target.name} deleted`);
+                    toasts.success(`Logical Flow between ${vm.logicalFlow.source.name} and ${vm.logicalFlow.target.name} removed`);
                 } else {
                     toasts.error(r.message);
                 }
-                navigateToLastView($state, historyStore);
+                $window.location.reload();
             });
     };
 
-    const handleDeleteFlowResponse = (response) => {
+    const restoreLogicalFlow = () => {
+        return serviceBroker
+            .execute(CORE_API.LogicalFlowStore.restoreFlow, [vm.logicalFlow.id])
+            .then(r => {
+                if (r.data > 0) {
+                    toasts.success(`Logical Flow between ${vm.logicalFlow.source.name} and ${vm.logicalFlow.target.name} has been restored`);
+                } else {
+                    toasts.error(r.message);
+                }
+                $window.location.reload();
+            });
+    };
+
+    const handleRemoveFlowResponse = (response) => {
         if (response > 0) {
-            toasts.success("Logical flow deleted");
-            removeFromHistory(historyStore, vm.logicalFlow);
+            toasts.success("Logical flow removed");
         } else {
             toasts.error(response.message);
         }
     };
 
-    vm.deleteFlow = () => {
-        if (confirm("Are you sure you want to delete this flow ?")) {
-            deleteLogicalFlow()
-                .then(r => handleDeleteFlowResponse(r.data));
+    vm.removeFlow = () => {
+        if (confirm("Are you sure you want to remove this flow ?")) {
+            removeLogicalFlow()
+                .then(r => handleRemoveFlowResponse(r.data));
+        }
+    };
+
+    vm.restoreFlow = () => {
+        if (confirm("Are you sure you want to restore this flow ?")) {
+            console.log("restoring", vm.logicalFlow);
+            restoreLogicalFlow();
         }
     };
 }
 
 
 controller.$inject = [
+    "$q",
     "$state",
     "$stateParams",
-    "HistoryStore",
+    "$window",
     "ServiceBroker"
 ];
 

@@ -18,7 +18,6 @@
 
 package org.finos.waltz.data.svg;
 
-import org.finos.waltz.common.FunctionUtilities;
 import org.finos.waltz.model.svg.ImmutableSvgDiagram;
 import org.finos.waltz.model.svg.SvgDiagram;
 import org.finos.waltz.schema.tables.records.SvgDiagramRecord;
@@ -40,7 +39,7 @@ public class SvgDiagramDao {
     private final DSLContext dsl;
 
 
-    private static RecordMapper<Record, SvgDiagram> svgMapper = r -> {
+    private static final RecordMapper<Record, SvgDiagram> SVG_MAPPER = r -> {
         SvgDiagramRecord record = r.into(SVG_DIAGRAM);
         return ImmutableSvgDiagram.builder()
                 .id(record.getId())
@@ -67,16 +66,17 @@ public class SvgDiagramDao {
         return dsl.select()
                 .from(SVG_DIAGRAM)
                 .where(SVG_DIAGRAM.ID.eq(id))
-                .fetchOne(svgMapper);
+                .fetchOne(SVG_MAPPER);
     }
 
 
     public List<SvgDiagram> findByGroups(String[] groups) {
-        return FunctionUtilities.time("SDD.findByGroups", () -> dsl.select()
+        return dsl
+                .select()
                 .from(SVG_DIAGRAM)
                 .where(SVG_DIAGRAM.GROUP.in(groups))
                 .orderBy(SVG_DIAGRAM.PRIORITY.asc())
-                .fetch(svgMapper));
+                .fetch(SVG_MAPPER);
     }
 
 
@@ -84,7 +84,7 @@ public class SvgDiagramDao {
         return dsl
                 .select(SVG_DIAGRAM.fields())
                 .from(SVG_DIAGRAM)
-                .fetchSet(svgMapper);
+                .fetchSet(SVG_MAPPER);
     }
 
 
