@@ -25,7 +25,11 @@ import org.finos.waltz.model.UserTimestamp;
 import org.finos.waltz.model.command.CommandOutcome;
 import org.finos.waltz.model.command.CommandResponse;
 import org.finos.waltz.model.command.ImmutableCommandResponse;
-import org.finos.waltz.model.involvement_kind.*;
+import org.finos.waltz.model.involvement_kind.ImmutableInvolvementKindChangeCommand;
+import org.finos.waltz.model.involvement_kind.InvolvementKind;
+import org.finos.waltz.model.involvement_kind.InvolvementKindChangeCommand;
+import org.finos.waltz.model.involvement_kind.InvolvementKindCreateCommand;
+import org.finos.waltz.model.involvement_kind.InvolvementKindUsageStat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +37,6 @@ import java.util.List;
 import java.util.Set;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.FunctionUtilities.time;
 
 @Service
 public class InvolvementKindService {
@@ -61,8 +64,7 @@ public class InvolvementKindService {
 
     public List<InvolvementKind> findKeyInvolvementKindsByEntityKind(EntityKind entityKind) {
         checkNotNull(entityKind, "entityKind cannot be null");
-        return time("IKS.findKeyInvolvementKindsByEntityKind",
-                () -> involvementKindDao.findKeyInvolvementKindsByEntityKind(entityKind));
+        return involvementKindDao.findKeyInvolvementKindsByEntityKind(entityKind);
     }
 
 

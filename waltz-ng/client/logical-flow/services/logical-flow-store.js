@@ -86,6 +86,10 @@ export function store($http, BaseApiUrl) {
         .delete(`${BASE}/${id}`)
         .then(r => r.data);
 
+    const restoreFlow = (id) => $http
+        .put(`${BASE}/${id}/restore`)
+        .then(r => r.data);
+
     const addFlow = (addFlowCmd) => $http
         .post(`${BASE}`, addFlowCmd)
         .then(r => r.data);
@@ -119,6 +123,7 @@ export function store($http, BaseApiUrl) {
         calculateStats,
         countByDataType,
         removeFlow,
+        restoreFlow,
         getById,
         addFlow,
         addFlows,
@@ -182,6 +187,11 @@ export const LogicalFlowStore_API = {
         serviceName,
         serviceFnName: "removeFlow",
         description: "removes a single logical flow"
+    },
+    restoreFlow: {
+        serviceName,
+        serviceFnName: "restoreFlow",
+        description: "restore a single logical flow"
     },
     getById: {
         serviceName,
