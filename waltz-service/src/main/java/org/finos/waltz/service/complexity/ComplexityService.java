@@ -131,7 +131,7 @@ public class ComplexityService {
                             MeasurableComplexityDetail[] details = mapper.readValue(paramString, MeasurableComplexityDetail[].class);
                             return ListUtilities.asList(details);
                         } catch (IOException e) {
-                            throw new RuntimeException("Unable to parse parameter from settings value", e);
+                            throw new IllegalArgumentException("Unable to parse parameter from settings value", e);
                         }
                     })
                     .orElse(emptyList());
