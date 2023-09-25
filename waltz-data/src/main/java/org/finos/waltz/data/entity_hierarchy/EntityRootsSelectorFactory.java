@@ -20,29 +20,43 @@ package org.finos.waltz.data.entity_hierarchy;
 
 import org.finos.waltz.schema.tables.EntityHierarchy;
 import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.schema.tables.Person;
+import org.finos.waltz.schema.tables.PersonHierarchy;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
 
 import java.util.function.Function;
 
+import static org.finos.waltz.schema.Tables.PERSON;
 import static org.finos.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
+import static org.finos.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
 
 
 public class EntityRootsSelectorFactory implements Function<EntityKind, Select<Record1<Long>>> {
 
     private static final EntityHierarchy eh = ENTITY_HIERARCHY;
-
+    private static final PersonHierarchy ph = PERSON_HIERARCHY;
+    private static final Person p = PERSON;
 
 
     @Override
     public Select<Record1<Long>> apply(EntityKind entityKind) {
-        return DSL
+        if (entityKind == EntityKind.PERSON) {
+            return DSL
+                    .select(p.ID)
+                    .from(p)
+                    .where(p.MANAGER_EMPLOYEE_ID.isNull())
+                    .and(p.IS_REMOVED.isFalse());
+        } else {
+            return DSL
                 .select(eh.ID)
                 .from(eh)
                 .where(eh.LEVEL.eq(1)
-                        .and(eh.ID.eq(eh.ANCESTOR_ID)
-                                .and(eh.KIND.eq(entityKind.name()))));
+                    .and(eh.ID.eq(eh.ANCESTOR_ID)
+                        .and(eh.KIND.eq(entityKind.name()))));
+        }
+
     }
 
 }

@@ -18,6 +18,8 @@
 
 package org.finos.waltz.data.person;
 
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.schema.tables.records.PersonRecord;
 import org.finos.waltz.model.person.ImmutablePerson;
 import org.finos.waltz.model.person.Person;
@@ -26,7 +28,9 @@ import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record;
+import org.jooq.Record1;
 import org.jooq.RecordMapper;
+import org.jooq.Select;
 import org.jooq.SelectSeekStep1;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -40,6 +44,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.schema.Tables.USER_ROLE;
 import static org.finos.waltz.schema.tables.AttestationInstanceRecipient.ATTESTATION_INSTANCE_RECIPIENT;
 import static org.finos.waltz.schema.tables.Person.PERSON;
@@ -280,4 +285,17 @@ public class PersonDao {
         return qry
                 .fetch(personMapper);
     }
+
+
+    public List<EntityReference> findByPersonIdSelectorAsEntityReference(Select<Record1<Long>> selector) {
+        return dsl
+                .select(PERSON.DISPLAY_NAME, PERSON.ID)
+                .from(PERSON)
+                .where(PERSON.ID.in(selector))
+                .fetch(r -> mkRef(
+                        EntityKind.PERSON,
+                        r.get(PERSON.ID),
+                        r.get(PERSON.DISPLAY_NAME)));
+    }
+
 }

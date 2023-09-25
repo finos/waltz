@@ -18,6 +18,7 @@
 
 package org.finos.waltz.service.entity_hierarchy;
 
+import org.finos.waltz.data.person.PersonDao;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.service.person_hierarchy.PersonHierarchyService;
 import org.finos.waltz.common.ListUtilities;
@@ -71,6 +72,7 @@ public class EntityHierarchyService {
     private final MeasurableDao measurableDao;
     private final OrganisationalUnitDao organisationalUnitDao;
     private final PersonHierarchyService personHierarchyService;
+    private final PersonDao personDao;
 
     @Autowired
     public EntityHierarchyService(DSLContext dsl,
@@ -78,9 +80,10 @@ public class EntityHierarchyService {
                                   DataTypeDao dataTypeDao,
                                   EntityHierarchyDao entityHierarchyDao,
                                   EntityStatisticDao entityStatisticDao,
-                                  MeasurableDao measurableDao, 
+                                  MeasurableDao measurableDao,
                                   OrganisationalUnitDao organisationalUnitDao,
-                                  PersonHierarchyService personHierarchyService) {
+                                  PersonHierarchyService personHierarchyService,
+                                  PersonDao personDao) {
 
         checkNotNull(dsl, "dsl cannot be null");
         checkNotNull(changeInitiativeDao, "changeInitiativeDao cannot be null");
@@ -90,6 +93,7 @@ public class EntityHierarchyService {
         checkNotNull(measurableDao, "measurableDao cannot be null");
         checkNotNull(organisationalUnitDao, "organisationalUnitDao cannot be null");
         checkNotNull(personHierarchyService, "personHierarchyService cannot be null");
+        checkNotNull(personDao, "personDao cannot be null");
 
         this.dsl = dsl;
         this.changeInitiativeDao = changeInitiativeDao;
@@ -99,6 +103,7 @@ public class EntityHierarchyService {
         this.measurableDao = measurableDao;
         this.organisationalUnitDao = organisationalUnitDao;
         this.personHierarchyService = personHierarchyService;
+        this.personDao = personDao;
     }
 
 
@@ -137,7 +142,7 @@ public class EntityHierarchyService {
             case ORG_UNIT:
                 return organisationalUnitDao.findByIdSelectorAsEntityReference(selector);
             case PERSON:
-                return Collections.emptyList();
+                return personDao.findByPersonIdSelectorAsEntityReference(selector);
             default:
                 throw new IllegalArgumentException("Cannot create selector for entity kind: " + kind);
         }
