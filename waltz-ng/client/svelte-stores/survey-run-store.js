@@ -16,22 +16,20 @@
  *
  */
 
-package org.finos.waltz.model.survey;
+import {remote} from "./remote";
 
+export function mkSurveyRunStore() {
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.finos.waltz.model.EntityReference;
-import org.immutables.value.Value;
+    const findByRecipientId = (personId, force = false) => remote
+        .fetchViewList("GET", `api/survey-run/recipient/id/${personId}`, null, {force});
 
-@Value.Immutable
-@JsonSerialize(as = ImmutableSurveyInstanceInfo.class)
-@JsonDeserialize(as = ImmutableSurveyInstanceInfo.class)
-public abstract class SurveyInstanceInfo {
+    const findByEntityReference = (ref, force = false) => remote
+        .fetchViewList("GET", `api/survey-run/entity/${ref.kind}/${ref.id}`, null, {force});
 
-    public abstract SurveyInstance surveyInstance();
-    public abstract SurveyRun surveyRun();
-    public abstract EntityReference surveyTemplateRef();
-    public abstract Integer historicalVersionsCount();
-
+    return {
+        findByRecipientId,
+        findByEntityReference
+    };
 }
+
+export const surveyRunStore = mkSurveyRunStore();

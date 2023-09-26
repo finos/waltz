@@ -26,6 +26,13 @@ export function mkSurveyInstanceViewStore() {
     const getFormDetailsById = (id, force = false) => remote
         .fetchViewDatum("GET", `api/survey-instance-view/form-details/${id}`, null, {force});
 
+    const findByPersonId = (personId, force = false) => remote
+        .fetchViewList("GET", `api/survey-instance-view/person/id/${personId}`, null, {force});
+
+    const findByEntityReference = (ref, force = false) => remote
+        .fetchViewList("GET", `api/survey-instance-view/entity/${ref.kind}/${ref.id}`, null, {force});
+
+
     const findForUser = (force = false) => remote
         .fetchViewList(
             "GET",
@@ -36,7 +43,9 @@ export function mkSurveyInstanceViewStore() {
     return {
         findForUser,
         getFormDetailsById,
-        getInfoById
+        getInfoById,
+        findByPersonId,
+        findByEntityReference
     };
 }
 
