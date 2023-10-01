@@ -41,21 +41,19 @@ const initialState = {
         selectorEntityKind: "APP_GROUP",
         selectorScope: "EXACT"
     },
-    availableAttestedKinds: [ "LOGICAL_DATA_FLOW", "PHYSICAL_FLOW", "MEASURABLE_CATEGORY"],
-    targetEntityKinds: [{
-        name: "Application",
-        value: "APPLICATION"
-    }],
-    allowedEntityKinds: [{
-        value: "APP_GROUP",
-        name: "Application Group"
-    },{
-        value: "ORG_UNIT",
-        name: "Org Unit"
-    },{
-        value: "MEASURABLE",
-        name: "Measurable"
-    }],
+    availableAttestedKinds: [
+        "LOGICAL_DATA_FLOW",
+        "PHYSICAL_FLOW",
+        "MEASURABLE_CATEGORY"
+    ],
+    targetEntityKinds: [
+        {name: "Application", value: "APPLICATION"}
+    ],
+    allowedEntityKinds: [
+        {value: "APP_GROUP", name: "Application Group"},
+        {value: "ORG_UNIT", name: "Org Unit"},
+        {value: "MEASURABLE", name: "Measurable"}
+    ],
     allowedScopes: {
         "APP_GROUP": [exactScope],
         "CHANGE_INITIATIVE": [exactScope],
@@ -85,8 +83,7 @@ function mkCreateCommand(attestationRun){
         attestedEntityKind: attestationRun.attestedEntityKind,
         attestedEntityId: attestationRun.attestedEntityId,
         involvementKindIds: involvementKindIds,
-        dueDate: moment(attestationRun.dueDate).format(formats.parseDateOnly),
-        sendEmailNotifications: attestationRun.sendEmailNotifications
+        dueDate: moment(attestationRun.dueDate).format(formats.parseDateOnly)
     };
 }
 

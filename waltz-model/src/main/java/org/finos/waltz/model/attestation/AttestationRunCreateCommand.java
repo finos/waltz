@@ -51,9 +51,4 @@ public abstract class AttestationRunCreateCommand implements
         return LocalDate.now();
     }
     public abstract LocalDate dueDate();
-
-    @Value.Default
-    public boolean sendEmailNotifications(){
-        return false;
-    }
 }
