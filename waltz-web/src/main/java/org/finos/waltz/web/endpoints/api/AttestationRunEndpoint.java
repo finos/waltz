@@ -19,6 +19,7 @@
 package org.finos.waltz.web.endpoints.api;
 
 
+import org.finos.waltz.model.attestation.AttestationRunRecipient;
 import org.finos.waltz.service.attestation.AttestationRunService;
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.DatumRoute;
@@ -67,6 +68,7 @@ public class AttestationRunEndpoint implements Endpoint {
         String findBySelectorPath = mkPath(BASE_URL, "selector");
         String findResponseSummariesPath = mkPath(BASE_URL, "summary", "response");
         String getCreateSummaryPath = mkPath(BASE_URL, "create-summary");
+        String findRecipientsPath = mkPath(BASE_URL, "id", ":id", "recipients");
 
 
         DatumRoute<AttestationRun> getByIdRoute = (req, res) ->
@@ -103,6 +105,9 @@ public class AttestationRunEndpoint implements Endpoint {
                             readCreateCommand(req));
         };
 
+        ListRoute<AttestationRunRecipient> findRunRecipientsRoute= (req, res) ->
+                attestationRunService.findRunRecipients(getId(req));
+
         getForDatum(getByIdPath, getByIdRoute);
         getForList(findAllPath, findAllRoute);
         getForList(findByEntityRefPath, findByEntityRefRoute);
@@ -111,6 +116,7 @@ public class AttestationRunEndpoint implements Endpoint {
         postForList(findBySelectorPath, findBySelectorRoute);
         postForDatum(BASE_URL, attestationRunCreateRoute);
         postForDatum(getCreateSummaryPath, getCreateSummaryRoute);
+        getForList(findRecipientsPath, findRunRecipientsRoute);
     }
 
 

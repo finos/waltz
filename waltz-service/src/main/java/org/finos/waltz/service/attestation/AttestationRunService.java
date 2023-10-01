@@ -36,6 +36,7 @@ import org.finos.waltz.model.attestation.AttestationInstance;
 import org.finos.waltz.model.attestation.AttestationInstanceRecipient;
 import org.finos.waltz.model.attestation.AttestationRun;
 import org.finos.waltz.model.attestation.AttestationRunCreateCommand;
+import org.finos.waltz.model.attestation.AttestationRunRecipient;
 import org.finos.waltz.model.attestation.AttestationRunResponseSummary;
 import org.finos.waltz.model.attestation.ImmutableAttestationCreateSummary;
 import org.finos.waltz.model.attestation.ImmutableAttestationInstance;
@@ -331,5 +332,10 @@ public class AttestationRunService {
 
         long recipientInvGroupId = involvementGroupService.createGroup(recipientsCmd, userName);
         attestationRunDao.updateRecipientInvolvementGroupId(runId, recipientInvGroupId);
+    }
+
+
+    public Set<AttestationRunRecipient> findRunRecipients(long runId) {
+        return attestationRunDao.findRunRecipients(runId);
     }
 }

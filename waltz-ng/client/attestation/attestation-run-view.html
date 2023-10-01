@@ -37,11 +37,20 @@
     <br>
 
     <waltz-section name="Instances">
+
+        <waltz-section-actions>
+            <a class="btn btn-xs btn-primary"
+               href="{{ctrl.reminderLink}}">
+                <waltz-icon name="envelope-o"></waltz-icon>
+                Generate email reminder
+            </a>
+        </waltz-section-actions>
+
         <div class="row">
             <div class="col-sm-9">
                 <waltz-grid-with-search scope-provider="ctrl"
-                                        column-defs="ctrl.columnDefs"
-                                        entries="ctrl.tableData"
+                                        column-defs="ctrl.instanceColumnDefs"
+                                        entries="ctrl.instanceTableData"
                                         search-placeholder-text="Search">
                 </waltz-grid-with-search>
             </div>
@@ -70,6 +79,7 @@
                 </div>
             </div>
         </div>
+
     </waltz-section>
 
 </div>
