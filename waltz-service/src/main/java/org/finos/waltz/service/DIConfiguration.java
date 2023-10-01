@@ -55,12 +55,6 @@ import static org.finos.waltz.common.StringUtilities.mkSafe;
 public class DIConfiguration implements SchedulingConfigurer {
 
 
-    @Value("${smtpHost:#{null}}")
-    private String smtpHost;
-
-    @Value("${smtpPort:25}")
-    private int smtpPort;
-
     // -- BUILD ---
 
     @Value("${build.pom:dev}")
