@@ -32,8 +32,9 @@ const initialState = {
     recipients: null,
     instances: [],
     selectedInstance: null,
-    columnDefs: [],
-    tableData: []
+    instanceColumnDefs: [],
+    instanceTableData: [],
+    reminderLink: ""
 };
 
 
@@ -71,7 +72,7 @@ const ratingCellTemplate = `
     </div>`;
 
 
-function prepareColumnDefs() {
+function prepareInstanceColumnDefs() {
     return [
         mkEntityLinkGridCell("Subject", "parentEntity"),
         {
@@ -108,17 +109,26 @@ function controller($q,
     const vm = initialiseData(this, initialState);
     const id = $stateParams.id;
 
-    vm.columnDefs = prepareColumnDefs();
+    vm.instanceColumnDefs = prepareInstanceColumnDefs();
 
     const loadData = () => {
         $q.all([
             serviceBroker.loadViewData(CORE_API.AttestationRunStore.getById, [id]),
-            serviceBroker.loadViewData(CORE_API.AttestationInstanceStore.findByRunId, [id])
-        ]).then(([runResult, instancesResult]) => {
+            serviceBroker.loadViewData(CORE_API.AttestationInstanceStore.findByRunId, [id]),
+            serviceBroker.loadViewData(CORE_API.AttestationRunStore.findRecipientsByRunId, [id])
+        ]).then(([runResult, instancesResult, recipientsResult]) => {
             vm.run = runResult.data;
             vm.instances = mkInstancesWithRagRating(vm.run, instancesResult.data);
-            vm.tableData = vm.instances;
+            vm.instanceTableData = vm.instances;
 
+            const recipients = _
+                .chain(recipientsResult.data)
+                .filter(d => d.pendingCount > 0)
+                .map(d => d.userId)
+                .join(",")
+                .value();
+
+            vm.reminderLink = `mailto:?bcc=${recipients}&subject=Attestation%20Reminder&body=Please%20complete%20your%20attestation%20for%20${vm.run.name}`;
         });
     };
 

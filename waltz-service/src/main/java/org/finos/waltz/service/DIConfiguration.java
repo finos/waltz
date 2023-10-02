@@ -18,21 +18,22 @@
 
 package org.finos.waltz.service;
 
-import org.finos.waltz.service.email.DummyJavaMailSender;
-import org.finos.waltz.service.jmx.PersonMaintenance;
-import org.finos.waltz.service.person_hierarchy.PersonHierarchyService;
 import org.finos.waltz.model.ImmutableWaltzVersionInfo;
 import org.finos.waltz.model.WaltzVersionInfo;
 import org.finos.waltz.model.settings.ImmutableSetting;
 import org.finos.waltz.model.settings.Setting;
+import org.finos.waltz.service.jmx.PersonMaintenance;
+import org.finos.waltz.service.person_hierarchy.PersonHierarchyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableMBeanExport;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.jndi.JndiPropertySource;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
@@ -53,12 +54,6 @@ import static org.finos.waltz.common.StringUtilities.mkSafe;
 @ComponentScan(value={"org.finos.waltz"})
 public class DIConfiguration implements SchedulingConfigurer {
 
-
-    @Value("${smtpHost:#{null}}")
-    private String smtpHost;
-
-    @Value("${smtpPort:25}")
-    private int smtpPort;
 
     // -- BUILD ---
 
@@ -116,19 +111,6 @@ public class DIConfiguration implements SchedulingConfigurer {
     @Autowired
     public PersonMaintenance personMaintenance(PersonHierarchyService personHierarchyService) {
         return new PersonMaintenance(personHierarchyService);
-    }
-
-
-    @Bean
-    public JavaMailSender mailSender() {
-        if (smtpHost == null) {
-            return new DummyJavaMailSender();
-        } else {
-            JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-            mailSender.setHost(smtpHost);
-            mailSender.setPort(smtpPort);
-            return mailSender;
-        }
     }
 
 

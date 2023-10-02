@@ -16,23 +16,23 @@
  *
  */
 
-package org.finos.waltz.jobs.harness;
+package org.finos.waltz.model.attestation;
 
-import org.finos.waltz.service.DIConfiguration;
-import org.finos.waltz.service.email.WaltzEmailer;
-import org.jooq.tools.json.ParseException;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.finos.waltz.model.IdProvider;
+import org.immutables.value.Value;
 
+@Value.Immutable
+@JsonSerialize(as = ImmutableAttestationRunRecipient.class)
+public abstract class AttestationRunRecipient implements IdProvider {
 
-public class EmailNotificationHarness {
+    public abstract long pendingCount();
+    public abstract long completedCount();
 
-    public static void main(String[] args) throws ParseException {
-
-        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
-
-        WaltzEmailer emailer = ctx.getBean(WaltzEmailer.class);
-
-        emailer.sendEmail("test", "this is a body", new String[] { "kamran.saleem@db.com"});
+    @Value.Default
+    public long totalCount() {
+        return pendingCount() + completedCount();
     }
 
+    public abstract String userId();
 }

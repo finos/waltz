@@ -70,6 +70,12 @@ function store($http, baseApiUrl) {
             .then(r => r.data);
     };
 
+    const findRecipientsByRunId = (id) => {
+        return $http
+            .get(`${base}/id/${id}/recipients`)
+            .then(result => result.data);
+    };
+
     return {
         getCreateSummary,
         create,
@@ -78,60 +84,66 @@ function store($http, baseApiUrl) {
         findByRecipient,
         findResponseSummaries,
         findByEntityRef,
+        findRecipientsByRunId,
         findBySelector
     };
 }
 
 
 store.$inject = [
-    '$http',
-    'BaseApiUrl'
+    "$http",
+    "BaseApiUrl"
 ];
 
 
-const serviceName = 'AttestationRunStore';
+const serviceName = "AttestationRunStore";
 
 
 export const AttestationRunStore_API = {
     getCreateSummary: {
         serviceName,
-        serviceFnName: 'getCreateSummary',
-        description: 'get create summary when creating an attestation run'
+        serviceFnName: "getCreateSummary",
+        description: "get create summary when creating an attestation run"
     },
     create: {
         serviceName,
-        serviceFnName: 'create',
-        description: 'create an attestation run'
+        serviceFnName: "create",
+        description: "create an attestation run"
     },
     getById: {
         serviceName,
-        serviceFnName: 'getById',
-        description: 'attestation run by id'
+        serviceFnName: "getById",
+        description: "attestation run by id"
     },
     findAll: {
         serviceName,
-        serviceFnName: 'findAll',
-        description: 'all attestation runs'
+        serviceFnName: "findAll",
+        description: "all attestation runs"
     },
     findByRecipient: {
         serviceName,
-        serviceFnName: 'findByRecipient',
-        description: 'attestation runs for recipient'
+        serviceFnName: "findByRecipient",
+        description: "attestation runs for recipient"
     },
     findResponseSummaries: {
         serviceName,
-        serviceFnName: 'findResponseSummaries',
-        description: 'attestation run response summaries'
+        serviceFnName: "findResponseSummaries",
+        description: "attestation run response summaries"
     },
     findByEntityRef: {
         serviceName,
-        serviceFnName: 'findByEntityRef',
-        description: 'find runs for an entity'
+        serviceFnName: "findByEntityRef",
+        description: "find runs for an entity"
     },
     findBySelector: {
         serviceName,
         serviceFnName: "findBySelector",
         description: "find runs for the given selector options"
+    },
+    findRecipientsByRunId: {
+        serviceName,
+        serviceFnName: "findRecipientsByRunId",
+        description: "find recipients by a run id"
     }
 };
 
