@@ -24,7 +24,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.eclipse.jetty.http.MimeTypes;
+import org.finos.waltz.web.MimeTypes;
 import org.jooq.DSLContext;
 import org.jooq.JSONFormat;
 import org.jooq.Result;
@@ -85,7 +85,7 @@ public abstract class DirectQueryBasedDataExtractor implements DataExtractor {
 
     private String writeAsJson(Select<?> qry,
                                Response response) {
-        response.type(MimeTypes.Type.APPLICATION_JSON_UTF_8.name());
+        response.type(MimeTypes.APPLICATION_JSON_UTF_8);
         return query(dsl, qry)
                 .formatJSON(new JSONFormat()
                         .header(false)
@@ -171,7 +171,7 @@ public abstract class DirectQueryBasedDataExtractor implements DataExtractor {
                               Select<?> qry,
                               Response response) {
         String csv = qry.fetch().formatCSV();
-        response.type(MimeTypes.Type.TEXT_PLAIN.name());
+        response.type(MimeTypes.TEXT_PLAIN);
         response.header("Content-disposition", "attachment; filename=" + suggestedFilenameStem + ".csv");
         return csv;
     }

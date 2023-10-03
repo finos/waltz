@@ -18,7 +18,6 @@
 
 package org.finos.waltz.web;
 
-import org.eclipse.jetty.http.HttpStatus;
 import org.finos.waltz.common.LoggingUtilities;
 import org.finos.waltz.common.exception.DuplicateKeyException;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
@@ -44,7 +43,6 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import static java.lang.String.format;
-import static org.finos.waltz.web.WebUtilities.reportException;
 import static org.finos.waltz.common.DateTimeUtilities.UTC;
 import static org.finos.waltz.web.WebUtilities.reportException;
 import static spark.Spark.after;
@@ -78,7 +76,7 @@ public class Main {
 
     private void startHttpServer() {
         String listenPortStr = System.getProperty("waltz.port", "8443");
-        boolean sslEnabled = Boolean.valueOf(System.getProperty("waltz.ssl.enabled", "false"));
+        boolean sslEnabled = Boolean.parseBoolean(System.getProperty("waltz.ssl.enabled", "false"));
 
         String home = System.getProperty("user.home");
 
