@@ -21,184 +21,178 @@ import {initialiseData} from "../../common";
 
 import template from "./involved-people-section.html";
 import {CORE_API} from "../../common/services/core-api-utils";
-import {aggregatePeopleInvolvements} from "../involvement-utils";
-import {determineUpwardsScopeForKind, mkSelectionOptions} from "../../common/selector-utils";
 import {entityLifecycleStatus as EntityLifecycleStatus} from "../../common/services/enums/entity-lifecycle-status";
+import {isHierarchicalKind} from "../../common/selector-utils";
 
 
 const bindings = {
     parentEntityRef: "<",
 };
 
-const columnDefs = [
-    {
-        field: "person.displayName",
-        displayName: "Name",
-        cellTemplate: `
-                <div class="ui-grid-cell-contents">
-                    <waltz-entity-link entity-ref="row.entity.personRef"
-                                       tooltip-placement="right"
-                                       icon-placement="none"></waltz-entity-link>
-                    -
-                    <a href="mailto:{{row.entity.person.email}}">
-                        <waltz-icon name="envelope-o"></waltz-icon>
-                    </a>
-                </div>`
-    },
-    { field: "person.title", displayName: "Title" },
-    { field: "person.officePhone", displayName: "Telephone" },
-    {
-        field: "rolesDisplayName",
-        displayName: "Roles",
-        cellTemplate: `
-                <div class="ui-grid-cell-contents">
-                    <span ng-bind="COL_FIELD"
-                          uib-popover-template="'wips/roles-popup.html'"
-                          popover-trigger="mouseenter"
-                          popover-append-to-body="true">
-                    </span>
-                </div>`
-    }
-];
+const entityColDef = {
+    displayName: "Entity",
+    field: "involvement",
+    cellTemplate: `
+        <div class="ui-grid-cell-contents">
+            <waltz-icon fixed-width="true"
+                        title="{{row.entity.directionTooltip}}"
+                        name="{{row.entity.directionIcon}}">
+            </waltz-icon>
+            <waltz-entity-link entity-ref="row.entity.involvement.entityReference"
+                               tooltip-placement="right"
+                               icon-placement="none">
+            </waltz-entity-link>
+        </div>`
+};
+
+const personColDef = {
+    field: "person.displayName",
+    displayName: "Name",
+    cellTemplate: `
+        <div class="ui-grid-cell-contents">
+            <waltz-entity-link entity-ref="row.entity.person"
+                               tooltip-placement="right"
+                               icon-placement="none">
+            </waltz-entity-link>
+            -
+            <a href="mailto:{{row.entity.person.email}}">
+                <waltz-icon name="envelope-o"></waltz-icon>
+            </a>
+        </div>`
+};
+
+
+function mkColumnDefs(isHierarchical = false) {
+    return _.compact([
+        isHierarchical ? entityColDef : null,
+        personColDef,
+        {field: "person.title", displayName: "Title"},
+        {field: "person.officePhone", displayName: "Telephone"},
+        {field: "involvementKind.name", displayName: "Role"}
+    ]);
+}
+
 
 const initialState = {
     allowedInvolvements: [],
     currentInvolvements: [],
+    rawGridData: [],
     gridData: [],
-    columnDefs,
-    exportGrid: () => {
-    },
-    showDirectOnly: true,
+    columnDefs: [],
     visibility: {
         editor: false
     },
+    isHierarchical: false,
+    showDirectOnly: false,
     showRemovedPeople: false
 };
 
 
-function mkGridData(involvements = [], displayNameService, descriptionService) {
+function mkGridData(raw) {
     return _
-        .chain(involvements)
-        .filter(inv => !_.isEmpty(inv.involvements))
-        .map(inv => {
-            const roles = _.map(inv.involvements, pInv => ({
-                provenance: pInv.provenance,
-                displayName: displayNameService.lookup("involvementKind", pInv.kindId),
-                description: descriptionService.lookup("involvementKind", pInv.kindId)
-            }));
+        .chain(raw)
+        .flatMap(
+            (xs, key) => _.map(
+                xs,
+                x => {
+                    const direction = toDirection(key);
+                    const directionIcon = toDirectionIcon(direction);
+                    const directionTooltip = toDirectionTooltip(direction);
 
-            const rolesDisplayName = _
-                .chain(roles)
-                .map("displayName")
-                .sort()
-                .join(", ")
-                .value();
+                    const person = Object.assign(
+                        {},
+                        x.person,
+                        {
+                            entityLifecycleStatus: x.person.isRemoved ? EntityLifecycleStatus.REMOVED.key : EntityLifecycleStatus.ACTIVE.key
+                        });
 
-            return {
-                person: inv.person,
-                personRef: mkEntityRef(inv.person),
-                roles,
-                rolesDisplayName
-            };
-        })
-        .sortBy("person.displayName")
+                    const additionalProps = {
+                        direction,
+                        directionIcon,
+                        directionTooltip,
+                        person
+                    };
+
+                    return Object.assign({}, x, additionalProps);
+                }))
+        .filter()
         .value();
 }
 
 
-function mkEntityRef(person) {
-    if (person) {
-        return {
-            id: person.id,
-            name: person.displayName,
-            kind: "PERSON",
-            entityLifecycleStatus: person.isRemoved ? EntityLifecycleStatus.REMOVED.key : EntityLifecycleStatus.ACTIVE.key
-        };
+function toDirection(key) {
+    switch (key) {
+        case "descendents":
+            return "DESCENDENT";
+        case "ancestors":
+            return "ANCESTOR";
+        default:
+            return "EXACT";
     }
-    return person;
 }
 
 
-function mkCurrentInvolvements(involvements = []) {
-    return _.flatMap(
-        involvements,
-        i => {
-            const personEntityRef = mkEntityRef(i.person);
-            return _.map(i.involvements, inv => ({
-                entity: personEntityRef,
-                involvement: +inv.kindId,
-                isReadOnly: inv.isReadOnly
-            }));
-        });
+function toDirectionIcon(dir) {
+    switch (dir) {
+        case "DESCENDENT":
+            return "arrow-turn-down";
+        case "ANCESTOR":
+            return "arrow-turn-up";
+        default:
+            return "equals";
+    }
 }
 
+function toDirectionTooltip(dir) {
+    switch (dir) {
+        case "DESCENDENT":
+            return "Inherited from a descendant entity at a lower level";
+        case "ANCESTOR":
+            return "Inherited from a ancestor entity at a higher level";
+        default:
+            return "Directly linked to this entity";
+    }
+}
 
-function controller($q, displayNameService, descriptionService, serviceBroker, involvedSectionService, UserService) {
+function controller($q, displayNameService, descriptionService, serviceBroker, involvedSectionService) {
 
     const vm = initialiseData(this, initialState);
 
-    function refreshGridData() {
-        const involvements = vm.showDirectOnly
-            ? vm.aggDirectInvolvements
-            : vm.aggInvolvements;
 
-        const updatedGridData = mkGridData(involvements, displayNameService, descriptionService);
-        vm.gridData = vm.showRemovedPeople ?
-            updatedGridData:
-            updatedGridData.filter( d =>  d.person.isRemoved === vm.showRemovedPeople);
-    }
+    const applyFilters = () => {
+        vm.gridData = _
+            .chain(vm.rawGridData)
+            .filter(d => vm.showRemovedPeople
+                ? true
+                : !d.person.isRemoved)
+            .filter(d => vm.showDirectOnly
+                ? d.direction === "EXACT"
+                : true)
+            .value();
+    };
 
     const refresh = () => {
-
-        vm.hierarchyScope = determineUpwardsScopeForKind(vm.parentEntityRef.kind);
-        const options = mkSelectionOptions(vm.parentEntityRef, vm.hierarchyScope);
-
-        const kindPromise = serviceBroker
-            .loadAppData(CORE_API.InvolvementKindStore.findAll, [])
-            .then(r => r.data);
-
-        const involvementPromise = serviceBroker
-            .loadViewData(
-                CORE_API.InvolvementStore.findBySelector,
-                [options],
+        serviceBroker
+            .loadAppData(
+                CORE_API.InvolvementViewService.findAllInvolvementsForEntityByDirection,
+                [vm.parentEntityRef],
                 {force: true})
-            .then(r => r.data);
-
-        const peoplePromise = serviceBroker
-            .loadViewData(
-                CORE_API.InvolvementStore.findPeopleBySelector,
-                [options],
-                {force: true})
-            .then(r => r.data);
-
-        const userRolesPromise = UserService
-            .whoami()
-            .then(user => user.roles);
-
-        return $q
-            .all([involvementPromise, peoplePromise, kindPromise, userRolesPromise])
-            .then(([involvements = [], people = [], involvementKinds = [], userRoles = []]) => {
-
-                const directInvolvements = _.filter(involvements, d => d.entityReference.id === vm.parentEntityRef.id);
-
-                vm.aggInvolvements = aggregatePeopleInvolvements(involvements, people);
-                vm.aggDirectInvolvements = aggregatePeopleInvolvements(directInvolvements, people);
-                vm.currentInvolvements = mkCurrentInvolvements(vm.aggDirectInvolvements);
-
-                vm.allowedInvolvements = _
-                    .chain(involvementKinds)
-                    .filter(ik => ik.userSelectable)
-                    .filter(ik => ik.subjectKind === vm.parentEntityRef.kind)
-                    .filter(ik => _.isEmpty(ik.permittedRole) || _.includes(userRoles, ik.permittedRole))
-                    .map(ik => ({value: ik.id, name: ik.name}))
+            .then(r => {
+                vm.rawGridData = mkGridData(r.data);
+                vm.currentInvolvements = _
+                    .chain(vm.rawGridData)
+                    .filter(d => d.direction === "EXACT")
                     .value();
-            })
-            .then(refreshGridData);
+                applyFilters();
+                console.log({raw: vm.rawGridData, curr: vm.currentInvolvements})
+            });
     };
 
 
     vm.$onChanges = (changes) => {
         if (changes.parentEntityRef && vm.parentEntityRef) {
+            vm.isHierarchical = isHierarchicalKind(vm.parentEntityRef.kind);
+            vm.columnDefs = mkColumnDefs(vm.isHierarchical);
             refresh();
         }
     };
@@ -216,20 +210,21 @@ function controller($q, displayNameService, descriptionService, serviceBroker, i
     };
 
 
-    vm.onRemove = (entityInvolvement) => {
+    vm.onRemove = (involvementDetail) => {
         return involvedSectionService
-            .removeInvolvement(vm.parentEntityRef, entityInvolvement)
+            .removeInvolvement(vm.parentEntityRef, involvementDetail)
             .then(refresh);
     };
 
     vm.onToggleScope = () => {
         vm.showDirectOnly = !vm.showDirectOnly;
-        refreshGridData();
-    }
+        applyFilters();
+    };
+
     vm.onHiddenPeople= ()=>{
         vm.showRemovedPeople = !vm.showRemovedPeople;
-        refreshGridData();
-    }
+        applyFilters();
+    };
 }
 
 
@@ -238,8 +233,7 @@ controller.$inject = [
     "DisplayNameService",
     "DescriptionService",
     "ServiceBroker",
-    "InvolvedSectionService",
-    "UserService"
+    "InvolvedSectionService"
 ];
 
 

@@ -19,6 +19,25 @@
 
 import {checkIsEntityRef} from "./checks";
 
+/**
+ * Returns true if the entity kind is hierarchical (has parents/children)
+ *
+ * @param kind  the entity kind in question (e.g. 'APPLICATION', 'ORG_UNIT')
+ * @returns {boolean}  true iff the entity `kind` is hierarchical
+ */
+export function isHierarchicalKind(kind) {
+    switch (kind) {
+        case "CHANGE_INITIATIVE":
+        case "DATA_TYPE":
+        case "ORG_UNIT":
+        case "PERSON":
+        case "MEASURABLE":
+            return true;
+        default:
+            return false;
+    }
+}
+
 export function determineDownwardsScopeForKind(kind) {
     switch (kind) {
         case "ACTOR":
