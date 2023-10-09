@@ -20,14 +20,17 @@ package org.finos.waltz.data;
 
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.common.StringUtilities;
+import org.finos.waltz.model.CommonTableFields;
 import org.finos.waltz.model.EndOfLifeStatus;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.ImmutableCommonTableFields;
 import org.finos.waltz.model.ImmutableEntityReference;
 import org.finos.waltz.model.tally.ImmutableOrderedTally;
 import org.finos.waltz.model.tally.ImmutableTally;
 import org.finos.waltz.model.tally.OrderedTally;
 import org.finos.waltz.model.tally.Tally;
+import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.records.ChangeLogRecord;
 import org.jooq.Batch;
 import org.jooq.CommonTableExpression;
@@ -403,4 +406,90 @@ public class JooqUtilities {
         return IntStream.of(rcs).sum();
     }
 
+
+
+
+    public static CommonTableFields<?> determineCommonTableFields(EntityKind kind) {
+        switch (kind) {
+            case APPLICATION:
+                return ImmutableCommonTableFields
+                        .builder()
+                        .entityKind(EntityKind.APPLICATION)
+                        .table(Tables.APPLICATION)
+                        .idField(Tables.APPLICATION.ID)
+                        .parentIdField(null)
+                        .nameField(Tables.APPLICATION.NAME)
+                        .descriptionField(Tables.APPLICATION.DESCRIPTION)
+                        .externalIdField(Tables.APPLICATION.ASSET_CODE)
+                        .build();
+            case ACTOR:
+                return ImmutableCommonTableFields
+                        .builder()
+                        .entityKind(EntityKind.ACTOR)
+                        .table(Tables.ACTOR)
+                        .idField(Tables.ACTOR.ID)
+                        .parentIdField(null)
+                        .nameField(Tables.ACTOR.NAME)
+                        .descriptionField(Tables.ACTOR.DESCRIPTION)
+                        .externalIdField(Tables.ACTOR.EXTERNAL_ID)
+                        .build();
+            case CHANGE_INITIATIVE:
+                return ImmutableCommonTableFields
+                        .builder()
+                        .entityKind(EntityKind.CHANGE_INITIATIVE)
+                        .table(Tables.CHANGE_INITIATIVE)
+                        .idField(Tables.CHANGE_INITIATIVE.ID)
+                        .parentIdField(Tables.CHANGE_INITIATIVE.PARENT_ID)
+                        .nameField(Tables.CHANGE_INITIATIVE.NAME)
+                        .descriptionField(Tables.CHANGE_INITIATIVE.DESCRIPTION)
+                        .externalIdField(Tables.CHANGE_INITIATIVE.EXTERNAL_ID)
+                        .build();
+            case DATA_TYPE:
+                return ImmutableCommonTableFields
+                        .builder()
+                        .entityKind(EntityKind.DATA_TYPE)
+                        .table(Tables.DATA_TYPE)
+                        .idField(Tables.DATA_TYPE.ID)
+                        .parentIdField(Tables.DATA_TYPE.PARENT_ID)
+                        .nameField(Tables.DATA_TYPE.NAME)
+                        .descriptionField(Tables.DATA_TYPE.DESCRIPTION)
+                        .externalIdField(Tables.DATA_TYPE.CODE)
+                        .build();
+            case MEASURABLE:
+                return ImmutableCommonTableFields
+                        .builder()
+                        .entityKind(EntityKind.MEASURABLE)
+                        .table(Tables.MEASURABLE)
+                        .idField(Tables.MEASURABLE.ID)
+                        .parentIdField(Tables.MEASURABLE.PARENT_ID)
+                        .nameField(Tables.MEASURABLE.NAME)
+                        .descriptionField(Tables.MEASURABLE.DESCRIPTION)
+                        .externalIdField(Tables.MEASURABLE.EXTERNAL_ID)
+                        .build();
+            case MEASURABLE_CATEGORY:
+                return ImmutableCommonTableFields
+                        .builder()
+                        .entityKind(EntityKind.MEASURABLE_CATEGORY)
+                        .table(Tables.MEASURABLE_CATEGORY)
+                        .idField(Tables.MEASURABLE_CATEGORY.ID)
+                        .parentIdField(null)
+                        .nameField(Tables.MEASURABLE_CATEGORY.NAME)
+                        .descriptionField(Tables.MEASURABLE_CATEGORY.DESCRIPTION)
+                        .externalIdField(Tables.MEASURABLE_CATEGORY.EXTERNAL_ID)
+                        .build();
+            case ORG_UNIT:
+                return ImmutableCommonTableFields
+                        .builder()
+                        .entityKind(EntityKind.ORG_UNIT)
+                        .table(Tables.ORGANISATIONAL_UNIT)
+                        .idField(Tables.ORGANISATIONAL_UNIT.ID)
+                        .parentIdField(Tables.ORGANISATIONAL_UNIT.PARENT_ID)
+                        .nameField(Tables.ORGANISATIONAL_UNIT.NAME)
+                        .descriptionField(Tables.ORGANISATIONAL_UNIT.DESCRIPTION)
+                        .externalIdField(Tables.ORGANISATIONAL_UNIT.EXTERNAL_ID)
+                        .build();
+            default:
+                throw new UnsupportedOperationException("Cannot determine table fields for entity kind:" + kind);
+        }
+    }
 }

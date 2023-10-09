@@ -30,7 +30,8 @@ const bindings = {
     limit: "<?",
     onSelect: "<",
     required: "<?",
-    selectionFilter: "<?"
+    selectionFilter: "<?",
+    placeholder: "@?"
 };
 
 
@@ -40,7 +41,8 @@ const initialState = {
     entityKinds: [],
     required: false,
     selectionFilter: (x) => true,
-    entityLifecycleStatuses: ["ACTIVE", "PENDING", "REMOVED"]
+    entityLifecycleStatuses: ["ACTIVE", "PENDING", "REMOVED"],
+    placeholder: "Search..."
 };
 
 

@@ -23,7 +23,15 @@ export function mkInvolvementViewStore() {
     const findKeyInvolvementsForEntity = (ref, force = false) => remote
         .fetchViewData(
             "GET",
-            `api/involvement-view/entity/kind/${ref.kind}/id/${ref.id}`,
+            `api/involvement-view/entity/kind/${ref.kind}/id/${ref.id}/key`,
+            null,
+            [],
+            {force});
+
+    const findAllInvolvementsForEntityByDirection = (ref, force = false) => remote
+        .fetchViewData(
+            "GET",
+            `api/involvement-view/entity/kind/${ref.kind}/id/${ref.id}/all-by-direction`,
             null,
             [],
             {force});
@@ -38,7 +46,8 @@ export function mkInvolvementViewStore() {
 
     return {
         findKeyInvolvementsForEntity,
-        findInvolvementsByKindAndEntityKind
+        findInvolvementsByKindAndEntityKind,
+        findAllInvolvementsForEntityByDirection
     };
 }
 
