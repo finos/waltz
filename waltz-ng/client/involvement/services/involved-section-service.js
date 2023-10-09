@@ -19,6 +19,7 @@
 import {mkChangeCommand} from "../involvement-utils";
 import toasts from "../../svelte-stores/toast-store";
 import {displayError} from "../../common/error-utils";
+import {toEntityRef} from "../../common/entity-utils";
 
 function service(involvementStore) {
 
@@ -38,15 +39,15 @@ function service(involvementStore) {
     };
 
 
-    const removeInvolvement = (entityRef, entityInvolvement) => {
+    const removeInvolvement = (entityRef, involvementDetail) => {
 
         return involvementStore
             .changeInvolvement(
                 entityRef,
-                mkChangeCommand("REMOVE", entityInvolvement.entity, entityInvolvement.involvement))
+                mkChangeCommand("REMOVE", toEntityRef(involvementDetail.person), involvementDetail.involvementKind.id))
             .then(successful => {
                 if (successful) {
-                    toasts.success("Involvement removed successfully");
+                    toasts.success(`Involvement (${involvementDetail.person.displayName} / ${involvementDetail.involvementKind.name}) removed successfully`);
                 } else {
                     toasts.warning("Involvement was not removed, it may have already been removed");
                 }

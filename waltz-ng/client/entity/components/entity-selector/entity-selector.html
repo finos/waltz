@@ -24,7 +24,7 @@
                theme="bootstrap"
                ng-required="$ctrl.required">
 
-        <ui-select-match placeholder="Search..."
+        <ui-select-match placeholder="{{$ctrl.placeholder}}"
                          allow-clear="{{$ctrl.clearable}}">
             <waltz-icon fixed-width="true"
                         ng-if="$ctrl.entityKinds.length > 1"

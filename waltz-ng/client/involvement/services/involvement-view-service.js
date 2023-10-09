@@ -6,8 +6,13 @@ export function store($http, BaseApiUrl) {
         .get(`${BASE}/employee/${employeeId}`)
         .then(result => result.data);
 
+    const findAllInvolvementsForEntityByDirection = (ref) => $http
+        .get(`${BASE}/entity/kind/${ref.kind}/id/${ref.id}/all-by-direction`)
+        .then(result => result.data);
+
     return {
-        findAllInvolvementsByEmployeeId
+        findAllInvolvementsByEmployeeId,
+        findAllInvolvementsForEntityByDirection
     };
 }
 
@@ -25,6 +30,11 @@ export const InvolvementViewService_API = {
         serviceName,
         serviceFnName: "findAllInvolvementsByEmployeeId",
         description: "find all direct and inherited involvements with person for employeeId"
+    },
+    findAllInvolvementsForEntityByDirection: {
+        serviceName,
+        serviceFnName: "findAllInvolvementsForEntityByDirection",
+        description: "find all direct, ancestor and descendent involvements for an entity"
     }
 };
 

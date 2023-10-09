@@ -20,16 +20,8 @@
     <div class="col-md-6">
         <div ng-if="$ctrl.currentInvolvements.length > 0">
 
-            <p class="waltz-paragraph">
-                Current
-                <span ng-bind="$ctrl.targetEntityDisplayName"></span>
-                and their relation to
-                <waltz-entity-icon-label entity-ref="$ctrl.parentEntityRef"></waltz-entity-icon-label>.
-            </p>
-            <p class="waltz-paragraph text-muted">
-                Please use the search field to the right to locate
-                <span ng-bind="$ctrl.targetEntityDisplayName"></span>
-                to create a involvement.
+            <p class="help-block">
+                Please use the search field to the right to locate people to create a involvement.
             </p>
 
             <div class="waltz-scroll-region" style="height: 530px">
@@ -38,29 +30,29 @@
                     <tr>
                         <th>Person</th>
                         <th>Involvement</th>
-                        <th></th>
+                        <th>Operation</th>
                     </tr>
                     </thead>
-                    <tr ng-repeat="rel in $ctrl.currentInvolvements | orderBy:'entity.name'"
+                    <tr ng-repeat="rel in $ctrl.currentInvolvements | orderBy:'[person.displayName,involvementKind.name]'"
                         class="waltz-visibility-parent">
 
                         <td>
-                            <waltz-entity-link entity-ref="rel.entity">
+                            <waltz-entity-link entity-ref="rel.person">
                             </waltz-entity-link>
                         </td>
                         <td>
-                            <span ng-bind="rel.involvement | toDisplayName:'involvementKind'">
+                            <span ng-bind="rel.involvementKind.name">
                             </span>
                         </td>
                         <td>
-                            <span ng-if="!rel.isReadOnly">
+                            <span ng-if="!rel.involvement.isReadOnly">
                                 <a ng-click="$ctrl.onRemove(rel)"
                                    class="clickable">
                                     Remove
                                 </a>
                             </span>
                             <span class="waltz-visibility-child-50"
-                                ng-if="rel.isReadOnly">
+                                ng-if="rel.involvement.isReadOnly">
                                 Read only
                                 <waltz-icon name="lock">
                                 </waltz-icon>
@@ -90,23 +82,30 @@
 
         <br />
 
-        <waltz-entity-selector on-select="$ctrl.onEntitySelect"
-                               current-selection="$ctrl.currentInvolvement.entity"
-                               entity-kinds="[$ctrl.targetEntityKind]"
-                               entity-lifecycle-statuses='["ACTIVE"]'>
-        </waltz-entity-selector>
+        <label style="width: 100%">
+            Person:
+            <waltz-entity-selector on-select="$ctrl.onEntitySelect"
+                                   current-selection="$ctrl.currentInvolvement.entity"
+                                   entity-kinds="['PERSON']"
+                                   entity-lifecycle-statuses="['ACTIVE']"
+                                   placeholder="Search for person....">
+            </waltz-entity-selector>
+        </label>
 
         <br />
 
-        <select ng-model="$ctrl.currentInvolvement.involvement"
-                required
-                ng-options="rel.value as rel.name for rel in $ctrl.allowedInvolvements | orderBy:'name'"
-                class="form-control">
-        </select>
+        <label>
+            Involvement:
+            <select ng-model="$ctrl.currentInvolvement.involvement"
+                    required
+                    ng-options="rel.value as rel.name for rel in $ctrl.allowedInvolvements | orderBy:'name'"
+                    class="form-control">
+            </select>
+        </label>
 
         <br />
 
-        <button class="btn btn-info btn-small"
+        <button class="btn btn-primary btn-small"
                 ng-disabled="!$ctrl.isCurrentInvolvementValid()"
                 ng-click="$ctrl.onInvolvementAdd()">
             Add
