@@ -8,28 +8,21 @@
     import {
         getRequiredFields,
         possibleVisibility,
-        possibleEntityKinds,
+        possibleAssessmentKinds,
         selectedDefinition
     } from "./assessment-definition-utils";
     import {measurableCategoryStore} from "../../../svelte-stores/measurable-category-store";
     import {legalEntityRelationshipKindStore} from "../../../svelte-stores/legal-entity-relationship-kind-store";
+    import {toEntityRef} from "../../../common/entity-utils";
 
     export let doCancel;
     export let doSave;
 
     const qualifiableKinds = _
-        .chain(possibleEntityKinds)
+        .chain(possibleAssessmentKinds)
         .reject(d => _.isNil(d.qualifierKind))
         .map(d => d.value)
         .value();
-
-    function toRef(d) {
-        return {
-            id: d.id,
-            name: d.name,
-            kind: d.kind
-        };
-    }
 
     function save() {
         const def = Object.assign({}, $selectedDefinition);
@@ -62,12 +55,12 @@
     $: canEditCardinality = !$selectedDefinition.id || !$hasMultiValuesAssessmentsCall?.data; // allow edit for new categories without check
     $: ratings = $ratingCall?.data || [];
     $: possibleRatingSchemes = _.sortBy($ratingSchemesCall.data, d => d.name);
-    $: measurableCategories = _.map($measurableCategoryCall?.data || [], toRef);
-    $: legalEntityRelationshipKinds = _.map($legalEntityRelationshipKindCall?.data || [], toRef);
+    $: measurableCategories = _.map($measurableCategoryCall?.data || [], toEntityRef);
+    $: legalEntityRelationshipKinds = _.map($legalEntityRelationshipKindCall?.data || [], toEntityRef);
 
     $: hasRatings = ratings.length > 0;
     $: invalid = _.some(getRequiredFields($selectedDefinition), v => _.isNil(v));
-    $: qualifierKind = _.find(possibleEntityKinds, d => d.value === $selectedDefinition.entityKind)?.qualifierKind;
+    $: qualifierKind = _.find(possibleAssessmentKinds, d => d.value === $selectedDefinition.entityKind)?.qualifierKind;
 </script>
 
 
@@ -129,7 +122,7 @@
                         disabled={hasRatings}
                         bind:value={$selectedDefinition.entityKind}>
 
-                    {#each possibleEntityKinds as k}
+                    {#each possibleAssessmentKinds as k}
                         <option value={k.value}>
                             {k.name}
                         </option>

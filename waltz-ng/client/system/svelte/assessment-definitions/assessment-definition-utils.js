@@ -23,10 +23,12 @@ export function getRequiredFields(d) {
     return [d.name, d.entityKind, d.description];
 }
 
-export const possibleEntityKinds = [
+export const possibleAssessmentKinds = [
     {value: "APPLICATION", name: "Application", qualifierKind: null},
     {value: "CHANGE_INITIATIVE", name: "Change Initiative", qualifierKind: null},
     {value: "CHANGE_SET", name: "Change Set", qualifierKind: null},
+    {value: "LOGICAL_DATA_FLOW_DATA_TYPE_DECORATOR", name: "Logical Flow Data Type Decorator", qualifierKind: null},
+    {value: "PHYSICAL_SPEC_DATA_TYPE_DECORATOR", name: "Physical Spec Data Type Decorator", qualifierKind: null},
     {value: "ENTITY_RELATIONSHIP", name: "Entity Relationship", qualifierKind: null},
     {value: "LEGAL_ENTITY", name: "Legal Entity", qualifierKind: null},
     {value: "LEGAL_ENTITY_RELATIONSHIP", name: "Legal Entity Relationship", qualifierKind: "LEGAL_ENTITY_RELATIONSHIP_KIND"},

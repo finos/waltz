@@ -1,4 +1,5 @@
 <script>
+    import _ from "lodash";
     import PageHeader from "../../../common/svelte/PageHeader.svelte";
     import ViewLink from "../../../common/svelte/ViewLink.svelte";
     import EntityIcon from "../../../common/svelte/EntityIcon.svelte";
@@ -14,6 +15,7 @@
     import RatingSchemePreviewBar from "../ratings-schemes/ItemPreviewBar.svelte";
     import {selectedDefinition} from "./assessment-definition-utils";
     import {onMount} from "svelte";
+    import {entity} from "../../../common/services/enums/entity";
 
 
     const definitionsCall = assessmentDefinitionStore.loadAll();
@@ -174,7 +176,7 @@
                         </td>
                         <td>
                             <EntityIcon kind={def.entityKind}/>
-                            {def.entityKind}
+                            {_.get(entity, [def.entityKind, "name"], def.entityKind)}
                         </td>
                         <td>
                             <button class="btn-link"
