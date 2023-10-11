@@ -16,56 +16,64 @@
   ~
   -->
 
-<div>
-    <div class="row">
-        <div class="col-sm-2">
-            <label>
-                Name
-            </label>
-        </div>
-        <div class="col-sm-6">
+<div class="row">
+    <div class="col-md-7">
+        <div class="row">
+            <div class="col-sm-2">
+                <label>
+                    Name
+                </label>
+            </div>
+            <div class="col-sm-6">
             <span ng-bind="$ctrl.actor.name">
             </span>
+            </div>
         </div>
-    </div>
 
-    <div class="row">
-        <div class="col-sm-2">
-            <label>
-                Description
-            </label>
+        <div class="row">
+            <div class="col-sm-2">
+                <label>
+                    Description
+                </label>
+            </div>
+            <div class="col-sm-10">
+                <waltz-svelte-component component="$ctrl.Markdown"
+                                        text="$ctrl.actor.description">
+                </waltz-svelte-component>
+            </div>
         </div>
-        <div class="col-sm-10">
-            <waltz-svelte-component component="$ctrl.Markdown"
-                                    text="$ctrl.actor.description">
-            </waltz-svelte-component>
-        </div>
-    </div>
 
-    <div class="row">
-        <div class="col-sm-2">
-            <label>
-                External Id
-            </label>
-        </div>
-        <div class="col-sm-10">
+        <div class="row">
+            <div class="col-sm-2">
+                <label>
+                    External Id
+                </label>
+            </div>
+            <div class="col-sm-10">
             <span style="font-family: monospace"
                   ng-bind="$ctrl.actor.externalId || '-'">
             </span>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-sm-2">
+                <label>
+                    Provenance
+                </label>
+            </div>
+            <div class="col-sm-10">
+            <span ng-bind="$ctrl.actor.provenance">
+            </span>
+            </div>
         </div>
     </div>
 
-
-    <div class="row">
-        <div class="col-sm-2">
-            <label>
-                Provenance
-            </label>
-        </div>
-        <div class="col-sm-10">
-            <span ng-bind="$ctrl.actor.provenance">
-            </span>
-        </div>
+    <div class="col-md-5">
+        <!-- Assessment Ratings -->
+        <waltz-assessment-rating-sub-section parent-entity-ref="$ctrl.parentEntityRef">
+        </waltz-assessment-rating-sub-section>
     </div>
 
 </div>

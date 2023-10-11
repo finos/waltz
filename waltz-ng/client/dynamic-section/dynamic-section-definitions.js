@@ -540,6 +540,7 @@ const appSections = [
 
 const actorSections = [
     appsSection,
+    assessmentRatingSection,
     bookmarksSection,
     changeInitiativeSection,
     dataFlowSection,
