@@ -30,6 +30,7 @@ import org.finos.waltz.common.hierarchy.Node;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.Cardinality;
+import org.finos.waltz.model.CommonTableFields;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.entity_field_reference.EntityFieldReference;
@@ -129,6 +130,7 @@ import static org.finos.waltz.common.StringUtilities.toHtmlTable;
 import static org.finos.waltz.common.StringUtilities.toMailbox;
 import static org.finos.waltz.common.StringUtilities.upper;
 import static org.finos.waltz.common.hierarchy.HierarchyUtilities.toForest;
+import static org.finos.waltz.data.JooqUtilities.determineCommonTableFields;
 import static org.finos.waltz.data.JooqUtilities.fieldsWithout;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.report_grid.CellOption.mkCellOption;
@@ -180,7 +182,7 @@ public class ReportGridDao {
     private final org.finos.waltz.schema.tables.AttestationRun att_r = ATTESTATION_RUN.as("attr");
     private final org.finos.waltz.schema.tables.OrganisationalUnit ou = ORGANISATIONAL_UNIT.as("ou");
     private final org.finos.waltz.schema.tables.TagUsage tu = TAG_USAGE.as("tu");
-    private final org.finos.waltz.schema.tables.Tag t = TAG.as("t");
+    private final org.finos.waltz.schema.tables.Tag tag = TAG.as("t");
 
     private final org.finos.waltz.schema.tables.EntityAlias ea = ENTITY_ALIAS.as("ea");
     private final org.finos.waltz.schema.tables.EntityStatisticValue esv = ENTITY_STATISTIC_VALUE.as("esv");
@@ -493,107 +495,55 @@ public class ReportGridDao {
     private List<ReportGridFixedColumnDefinition> getFixedColumnDefinitions(Condition condition) {
 
         SelectConditionStep<Record7<Long, String, String, String, String, String, String>> measurableColumns = mkSupplementalColumnDefinitionQuery(
-                EntityKind.MEASURABLE,
-                m,
-                m.ID,
-                m.NAME,
-                m.DESCRIPTION,
+                determineCommonTableFields(EntityKind.MEASURABLE, "m"),
                 condition);
 
         SelectConditionStep<Record7<Long, String, String, String, String, String, String>> assessmentDefinitionColumns = mkSupplementalColumnDefinitionQuery(
-                EntityKind.ASSESSMENT_DEFINITION,
-                ad,
-                ad.ID,
-                ad.NAME,
-                ad.DESCRIPTION,
+                determineCommonTableFields(EntityKind.ASSESSMENT_DEFINITION, "ad"),
                 condition);
 
         SelectConditionStep<Record7<Long, String, String, String, String, String, String>> costKindColumns = mkSupplementalColumnDefinitionQuery(
-                EntityKind.COST_KIND,
-                ck,
-                ck.ID,
-                ck.NAME,
-                ck.DESCRIPTION,
+                determineCommonTableFields(EntityKind.COST_KIND, "ck"),
                 condition);
 
         SelectConditionStep<Record7<Long, String, String, String, String, String, String>> complexityKindColumns = mkSupplementalColumnDefinitionQuery(
-                EntityKind.COMPLEXITY_KIND,
-                cxk,
-                cxk.ID,
-                cxk.NAME,
-                cxk.DESCRIPTION,
+                determineCommonTableFields(EntityKind.COMPLEXITY_KIND, "cxk"),
                 condition);
 
         SelectConditionStep<Record7<Long, String, String, String, String, String, String>> involvementKindColumns = mkSupplementalColumnDefinitionQuery(
-                EntityKind.INVOLVEMENT_KIND,
-                ik,
-                ik.ID,
-                ik.NAME,
-                ik.DESCRIPTION,
+                determineCommonTableFields(EntityKind.INVOLVEMENT_KIND, "ik"),
                 condition);
 
         SelectConditionStep<Record7<Long, String, String, String, String, String, String>> surveyQuestionColumns = mkSupplementalColumnDefinitionQuery(
-                EntityKind.SURVEY_QUESTION,
-                sq,
-                sq.ID,
-                sq.QUESTION_TEXT,
-                sq.HELP_TEXT,
+                determineCommonTableFields(EntityKind.SURVEY_QUESTION, "sq"),
                 condition);
 
         SelectConditionStep<Record7<Long, String, String, String, String, String, String>> appGroupColumns = mkSupplementalColumnDefinitionQuery(
-                EntityKind.APP_GROUP,
-                ag,
-                ag.ID,
-                ag.NAME,
-                ag.DESCRIPTION,
+                determineCommonTableFields(EntityKind.APP_GROUP, "ag"),
                 condition);
 
         SelectConditionStep<Record7<Long, String, String, String, String, String, String>> surveyMetaColumns = mkSupplementalColumnDefinitionQuery(
-                EntityKind.SURVEY_TEMPLATE,
-                st,
-                st.ID,
-                st.NAME,
-                st.DESCRIPTION,
+                determineCommonTableFields(EntityKind.SURVEY_TEMPLATE, "st"),
                 condition);
 
         SelectConditionStep<Record7<Long, String, String, String, String, String, String>> applicationMetaColumns = mkSupplementalColumnDefinitionQuery(
-                EntityKind.APPLICATION,
-                a,
-                a.ID,
-                a.NAME,
-                a.DESCRIPTION,
+                determineCommonTableFields(EntityKind.APPLICATION, "a"),
                 condition);
 
         SelectConditionStep<Record7<Long, String, String, String, String, String, String>> changeInitiativeMetaColumns = mkSupplementalColumnDefinitionQuery(
-                EntityKind.CHANGE_INITIATIVE,
-                ci,
-                ci.ID,
-                ci.NAME,
-                ci.DESCRIPTION,
+                determineCommonTableFields(EntityKind.CHANGE_INITIATIVE, "ci"),
                 condition);
 
         SelectConditionStep<Record7<Long, String, String, String, String, String, String>> orgUnitMetaColumns = mkSupplementalColumnDefinitionQuery(
-                EntityKind.ORG_UNIT,
-                ou,
-                ou.ID,
-                ou.NAME,
-                ou.DESCRIPTION,
+                determineCommonTableFields(EntityKind.ORG_UNIT, "ou"),
                 condition);
 
         SelectConditionStep<Record7<Long, String, String, String, String, String, String>> dataTypeColumns = mkSupplementalColumnDefinitionQuery(
-                EntityKind.DATA_TYPE,
-                dt,
-                dt.ID,
-                dt.NAME,
-                dt.DESCRIPTION,
+                determineCommonTableFields(EntityKind.DATA_TYPE, "dt"),
                 condition);
 
         SelectConditionStep<Record7<Long, String, String, String, String, String, String>> entityStatisticColumns = mkSupplementalColumnDefinitionQuery(
-                EntityKind.ENTITY_STATISTIC,
-                esd,
-                esd.ID,
-                esd.NAME,
-                esd.DESCRIPTION,
+                determineCommonTableFields(EntityKind.ENTITY_STATISTIC, "esd"),
                 condition);
 
         SelectConditionStep<Record7<Long, String, String, String, String, String, String>> tagColumns = mkEntityDescriptorColumnDefinitionQry(
@@ -677,6 +627,7 @@ public class ReportGridDao {
                             .build();
                 });
     }
+
 
 
     private List<ReportGridDerivedColumnDefinition> getDerivedColumnDefinitions(Condition condition) {
@@ -765,14 +716,10 @@ public class ReportGridDao {
      * 6) entity field desc,
      * 7) entity field name,
      */
-    private SelectConditionStep<Record7<Long, String, String, String, String, String, String>> mkSupplementalColumnDefinitionQuery(EntityKind entityKind,
-                                                                                                                                   Table<?> t,
-                                                                                                                                   TableField<? extends Record, Long> idField,
-                                                                                                                                   TableField<? extends Record, String> nameField,
-                                                                                                                                   TableField<? extends Record, String> descriptionField,
+    private SelectConditionStep<Record7<Long, String, String, String, String, String, String>> mkSupplementalColumnDefinitionQuery(CommonTableFields<?> tableFields,
                                                                                                                                    Condition reportCondition) {
-        Field<String> name = DSL.coalesce(nameField, DSL.val(entityKind.prettyName())).as("name");
-        Field<String> desc = descriptionField.as("desc");
+        Field<String> name = DSL.coalesce(tableFields.nameField(), DSL.val(tableFields.entityKind().prettyName())).as("name");
+        Field<String> desc = tableFields.descriptionField().as("desc");
 
         return dsl
                 .select(rgfcd.GRID_COLUMN_ID,
@@ -785,16 +732,19 @@ public class ReportGridDao {
                 .from(rgfcd)
                 .innerJoin(rgcd).on(rgfcd.GRID_COLUMN_ID.eq(rgcd.ID))
                 .innerJoin(rg).on(rg.ID.eq(rgcd.REPORT_GRID_ID))
-                .leftJoin(t).on(idField.eq(rgfcd.COLUMN_ENTITY_ID).and(rgfcd.COLUMN_ENTITY_KIND.eq(entityKind.name())))
+                .leftJoin(tableFields.table()).on(tableFields.idField().eq(rgfcd.COLUMN_ENTITY_ID).and(rgfcd.COLUMN_ENTITY_KIND.eq(tableFields.entityKind().name())))
                 .leftJoin(efr).on(rgfcd.ENTITY_FIELD_REFERENCE_ID.eq(efr.ID))
                 .where(reportCondition)
-                .and(rgfcd.COLUMN_ENTITY_KIND.eq(entityKind.name()));
+                .and(rgfcd.COLUMN_ENTITY_KIND.eq(tableFields.entityKind().name()));
     }
+
 
 
     private SelectConditionStep<Record7<Long, String, String, String, String, String, String>> mkMeasurableHierarchyColumnDefinitionQuery(Condition reportCondition) {
         Condition hasQualifier = rgfcd.COLUMN_QUALIFIER_ID.isNotNull();
-        Field<String> nameField = DSL.when(hasQualifier, DSL.concat(mc.NAME, DSL.val("/"), m.NAME)).otherwise(mc.NAME).as("name");
+        Field<String> nameField = DSL
+                .when(hasQualifier, DSL.concat(mc.NAME, DSL.val("/"), m.NAME))
+                .otherwise(mc.NAME).as("name");
 
         return dsl
                 .select(rgfcd.GRID_COLUMN_ID,
@@ -813,6 +763,7 @@ public class ReportGridDao {
                 .leftJoin(efr).on(rgfcd.ENTITY_FIELD_REFERENCE_ID.eq(efr.ID))
                 .where(reportCondition);
     }
+
 
     private SelectConditionStep<Record7<Long, String, String, String, String, String, String>> mkEntityDescriptorColumnDefinitionQry(EntityKind entityKind,
                                                                                                                                      String columnName,
@@ -1799,16 +1750,16 @@ public class ReportGridDao {
             return tagsColumn
                     .map(columnId -> SetUtilities.<ReportGridCell>fromCollection(dsl
                             .select(tu.ENTITY_ID,
-                                    t.NAME)
+                                    tag.NAME)
                             .from(tu)
-                            .innerJoin(t).on(t.ID.eq(tu.TAG_ID).and(t.TARGET_KIND.eq(tu.ENTITY_KIND)))
+                            .innerJoin(tag).on(tag.ID.eq(tu.TAG_ID).and(tag.TARGET_KIND.eq(tu.ENTITY_KIND)))
                             .where(tu.ENTITY_KIND.eq(selector.kind().name()))
                             .and(tu.ENTITY_ID.in(selector.selector()))
                             .fetchSet(r -> ImmutableReportGridCell
                                     .builder()
                                     .subjectId(r.get(tu.ENTITY_ID))
                                     .columnDefinitionId(columnId)
-                                    .textValue(r.get(t.NAME))
+                                    .textValue(r.get(tag.NAME))
                                     .build())
                             // we now convert to a map so we can merge text values of cells with the same coordinates (appId, entId)
                             .stream()
