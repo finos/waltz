@@ -24,6 +24,7 @@ export function getRequiredFields(d) {
 }
 
 export const possibleAssessmentKinds = [
+    {value: "ACTOR", name: "Actor", qualifierKind: null},
     {value: "APPLICATION", name: "Application", qualifierKind: null},
     {value: "CHANGE_INITIATIVE", name: "Change Initiative", qualifierKind: null},
     {value: "CHANGE_SET", name: "Change Set", qualifierKind: null},

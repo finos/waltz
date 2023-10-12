@@ -36,7 +36,7 @@ function controller() {
 
     vm.$onChanges = (changes) => {
         if (vm.actor) {
-            vm.entityRef = {
+            vm.parentEntityRef = {
                 kind: "ACTOR",
                 id: vm.actor.id
             };
