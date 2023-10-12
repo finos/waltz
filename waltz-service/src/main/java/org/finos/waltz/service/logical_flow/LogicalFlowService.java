@@ -26,6 +26,8 @@ import org.finos.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import org.finos.waltz.data.logical_flow.LogicalFlowStatsDao;
+import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
+import org.finos.waltz.data.physical_flow.PhysicalFlowIdSelectorFactory;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.HierarchyQueryScope;
 import org.finos.waltz.model.IdProvider;
@@ -50,6 +52,7 @@ import org.finos.waltz.model.logical_flow.LogicalFlowGraphSummary;
 import org.finos.waltz.model.logical_flow.LogicalFlowMeasures;
 import org.finos.waltz.model.logical_flow.LogicalFlowStatistics;
 import org.finos.waltz.model.logical_flow.LogicalFlowView;
+import org.finos.waltz.model.physical_flow.PhysicalFlow;
 import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
 import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.model.tally.TallyPack;
@@ -117,10 +120,12 @@ public class LogicalFlowService {
     private final AssessmentRatingService assessmentRatingService;
     private final AssessmentDefinitionService assessmentDefinitionService;
 
+    private final PhysicalFlowDao physicalFlowDao;
     private final RatingSchemeService ratingSchemeService;
     private final ApplicationIdSelectorFactory appIdSelectorFactory = new ApplicationIdSelectorFactory();
     private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory = new LogicalFlowIdSelectorFactory();
     private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory = new DataTypeIdSelectorFactory();
+    private final PhysicalFlowIdSelectorFactory physicalFlowIdSelectorFactory = new PhysicalFlowIdSelectorFactory();
 
 
     @Autowired
@@ -136,6 +141,7 @@ public class LogicalFlowService {
                               FlowPermissionChecker flowPermissionChecker,
                               AssessmentRatingService assessmentRatingService,
                               AssessmentDefinitionService assessmentDefinitionService,
+                              PhysicalFlowDao physicalFlowDao,
                               RatingSchemeService ratingSchemeService) {
 
         checkNotNull(assessmentDefinitionService, "assessmentDefinitionService cannot be null");
@@ -149,6 +155,7 @@ public class LogicalFlowService {
         checkNotNull(logicalFlowStatsDao, "logicalFlowStatsDao cannot be null");
         checkNotNull(involvementService, "involvementService cannot be null");
         checkNotNull(permissionGroupService, "permissionGroupService cannot be null");
+        checkNotNull(physicalFlowDao, "physicalFlowDao cannot be null");
         checkNotNull(flowPermissionChecker, "flowPermissionChecker cannot be null");
         checkNotNull(ratingSchemeService, "ratingSchemeService cannot be null");
 
@@ -156,13 +163,14 @@ public class LogicalFlowService {
         this.assessmentRatingService = assessmentRatingService;
         this.changeLogService = changeLogService;
         this.dataTypeService = dataTypeService;
-        this.flowPermissionChecker = flowPermissionChecker;
         this.dataTypeUsageService = dataTypeUsageService;
         this.dbExecutorPool = dbExecutorPool;
+        this.flowPermissionChecker = flowPermissionChecker;
+        this.involvementService = involvementService;
         this.logicalFlowDao = logicalFlowDao;
         this.logicalFlowStatsDao = logicalFlowStatsDao;
         this.logicalFlowDecoratorDao = logicalFlowDecoratorDao;
-        this.involvementService = involvementService;
+        this.physicalFlowDao = physicalFlowDao;
         this.permissionGroupService = permissionGroupService;
         this.ratingSchemeService = ratingSchemeService;
     }
@@ -493,12 +501,16 @@ public class LogicalFlowService {
         Set<Long> uniqueRatingIds = map(logicalFlowAssessmentRatings, AssessmentRating::ratingId);
         Set<RatingSchemeItem> ratings = ratingSchemeService.findRatingSchemeItemsByIds(uniqueRatingIds);
 
+        Select<Record1<Long>> physFlowSelector = physicalFlowIdSelectorFactory.apply(idSelectionOptions);
+        Collection<PhysicalFlow> physicalFlows = physicalFlowDao.findBySelector(physFlowSelector);
+
         return ImmutableLogicalFlowView.builder()
                 .flows(fromCollection(logicalFlows))
                 .flowRatings(logicalFlowAssessmentRatings)
                 .primaryAssessmentDefinitions(primaryDefs)
                 .ratingSchemeItems(ratings)
                 .dataTypeDecorators(flowDecorators)
+                .physicalFlows(physicalFlows)
                 .build();
     }
 }

@@ -15,20 +15,97 @@
   ~ See the License for the specific
   ~
   -->
-<waltz-loading-notification show="$ctrl.visibility.loading"
-                            style="padding-top: 54px;"
-                            name="Loading">
-</waltz-loading-notification>
-<div ng-if="!$ctrl.visibility.loading">
-    <waltz-grid-with-search ng-if="$ctrl.rows.length > 0"
-                            entries="$ctrl.rows"
-                            column-defs="$ctrl.columnDefs"
-                            on-row-select="$ctrl.onRowSelect">
-    </waltz-grid-with-search>
-    <waltz-no-data ng-if="$ctrl.relationships.length === 0">
-        <message>
-            No flows exist
-        </message>
-    </waltz-no-data>
+
+<div class="row">
+    <div class="col-sm-8">
+        <waltz-loading-notification show="$ctrl.visibility.loading"
+                                    style="padding-top: 54px;"
+                                    name="Loading">
+        </waltz-loading-notification>
+        <div ng-if="!$ctrl.visibility.loading">
+
+            <h4>Logical Flows</h4>
+
+            <waltz-grid-with-search ng-if="$ctrl.rows.length > 0"
+                                    entries="$ctrl.rows"
+                                    column-defs="$ctrl.columnDefs"
+                                    on-row-select="$ctrl.onRowSelect">
+            </waltz-grid-with-search>
+            <waltz-no-data ng-if="$ctrl.rows.length === 0">
+                <message>
+                    No logical flows exist
+                </message>
+            </waltz-no-data>
+
+            <h4 style="padding-top: 2em">
+                Physical Flows
+                <span class="small">
+                    (
+                    <span ng-if="$ctrl.physicalRows.length !== $ctrl.allPhysicalFlows.length">
+                        <span ng-bind="$ctrl.physicalRows.length"></span>
+                        <span> / </span>
+                    </span>
+                    <span ng-bind="$ctrl.allPhysicalFlows.length"></span>
+                    )
+                </span>
+            </h4>
+
+            <waltz-grid-with-search ng-if="$ctrl.allPhysicalFlows.length > 0"
+                                    entries="$ctrl.physicalRows"
+                                    search-control-min-rows="1"
+                                    column-defs="$ctrl.physicalFlowColDefs">
+            </waltz-grid-with-search>
+            <waltz-no-data ng-if="$ctrl.allPhysicalFlows.length === 0">
+                <message>
+                    No physical flows exist
+                </message>
+            </waltz-no-data>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="help-block"
+             ng-if="!$ctrl.selectedFlow">
+            <waltz-icon name="info-circle"></waltz-icon>
+            Select a logical flow from the grid to filter the physical flows
+        </div>
+        <div ng-if="$ctrl.selectedFlow">
+            <span>
+                <h4>
+                    <waltz-entity-link entity-ref="$ctrl.selectedFlow.source"></waltz-entity-link>
+                    &raquo
+                    <waltz-entity-link entity-ref="$ctrl.selectedFlow.target"></waltz-entity-link>
+                    <button class="btn btn-skinny btn-xs"
+                            ng-click="$ctrl.onClearSelect()">
+                        Clear
+                    </button>
+                </h4>
+            </span>
+
+            <ul class="list-inline">
+                <li ng-repeat="type in $ctrl.selectedFlow.dataTypes | orderBy:'decoratorEntity.name'"
+                    style="padding-bottom: 2px">
+                    <div style="display: inline-block; height: 1em; width: 1em; border:1px solid #ccc; border-radius: 2px;"
+                         ng-style="{'background-color': $ctrl.flowClassificationsByCode[type.rating].color}">
+                    </div>
+                    <waltz-entity-link entity-ref="type.decoratorEntity"
+                                       icon-placement="none">
+                    </waltz-entity-link>
+                </li>
+            </ul>
+        </div>
+    </div>
 </div>
 
+<script type="text/ng-template"
+        id="wlfvg-data-type-popover.html">
+    <div>
+        <ul class="list-unstyled">
+            <li ng-repeat="type in row.entity.dataTypes | orderBy:'decoratorEntity.name'"
+                style="padding-bottom: 2px">
+                <waltz-entity-link entity-ref="type.decoratorEntity"
+                                   icon-placement="none">
+                </waltz-entity-link>
+            </li>
+        </ul>
+    </div>
+</script>

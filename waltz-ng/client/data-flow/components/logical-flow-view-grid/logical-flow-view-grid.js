@@ -29,7 +29,7 @@ const flowColDefs = [
     {
         field: "source",
         name: "Source Entity",
-        width: "20%",
+        width: "15%",
         toSearchTerm: d => _.get(d, ["source", "name"], ""),
         cellTemplate: `<div style="padding-top: 0.5em">
                             <span ng-bind="COL_FIELD.name"></span>
@@ -47,7 +47,7 @@ const flowColDefs = [
     {
         field: "target",
         name: "Target Entity",
-        width: "20%",
+        width: "15%",
         toSearchTerm: d => _.get(d, ["target", "name"], ""),
         cellTemplate: `<div style="padding-top: 0.5em">
                             <span ng-bind="COL_FIELD.name"></span>
@@ -63,12 +63,124 @@ const flowColDefs = [
                        </div>`
     },
     {
-        field: "dataTypes",
+        field: "dataTypeString",
         name: "DataTypes",
         width: "10%",
-        toSearchTerm: d => _.get(d, ["dataTypes"], ""),
+        toSearchTerm: d => _.get(d, ["dataTypeString"], ""),
         cellTemplate: `<div style="padding-top: 0.5em">
                             <span ng-bind="COL_FIELD"></span>
+                       </div>`
+    },
+    {
+        field: "dataTypeString",
+        name: "DataTypes",
+        width: "15%",
+        toSearchTerm: d => _.get(d, ["dataTypeString"], ""),
+        cellTemplate: `<div style="padding-top: 0.5em"
+                              uib-popover-template="'wlfvg-data-type-popover.html'"
+                              popover-placement="top"
+                              popover-trigger="mouseenter"
+                              popover-popup-delay="300"
+                              popover-class="waltz-popover-width-500"
+                              popover-append-to-body="true">
+                            <span ng-bind="COL_FIELD | truncate:20"></span>
+                       </div>`
+    },
+    {
+        field: "physicalFlows",
+        name: "Physical Flow Count",
+        width: "10%",
+        cellTemplate: `<div style="padding-top: 0.5em; padding-right: 0.5em"
+                            class="pull-right">
+                            <span ng-bind="COL_FIELD.length"></span>
+                       </div>`
+    }
+];
+
+
+const physicalFlowColDefs = [
+    {
+        field: "source",
+        name: "Source Entity",
+        width: "15%",
+        toSearchTerm: d => _.get(d, ["source", "name"], ""),
+        cellTemplate: `<div style="padding-top: 0.5em">
+                            <span ng-bind="COL_FIELD.name"></span>
+                       </div>`
+    },
+    {
+        field: "source",
+        name: "Source Entity External Id",
+        width: "10%",
+        toSearchTerm: d => _.get(d, ["source", "externalId"], ""),
+        cellTemplate: `<div style="padding-top: 0.5em">
+                            <span ng-bind="COL_FIELD.externalId"></span>
+                       </div>`
+    },
+    {
+        field: "target",
+        name: "Target Entity",
+        width: "15%",
+        toSearchTerm: d => _.get(d, ["target", "name"], ""),
+        cellTemplate: `<div style="padding-top: 0.5em">
+                            <span ng-bind="COL_FIELD.name"></span>
+                       </div>`
+    },
+    {
+        field: "target",
+        name: "Target Entity External Id",
+        width: "10%",
+        toSearchTerm: d => _.get(d, ["target", "externalId"], ""),
+        cellTemplate: `<div style="padding-top: 0.5em">
+                            <span ng-bind="COL_FIELD.externalId"></span>
+                       </div>`
+    },
+    {
+        field: "name",
+        name: "Name",
+        width: "10%",
+        cellTemplate: `<div style="padding-top: 0.5em">
+                            <span ng-bind="COL_FIELD"></span>
+                       </div>`
+    },
+    {
+        field: "externalId",
+        name: "External Id",
+        width: "10%",
+        cellTemplate: `<div style="padding-top: 0.5em">
+                            <span ng-bind="COL_FIELD"></span>
+                       </div>`
+    },
+    {
+        field: "criticality",
+        name: "Criticality",
+        width: "10%",
+        cellTemplate: `<div style="padding-top: 0.5em">
+                            <waltz-enum-value type="'physicalFlowCriticality'"
+                                          key="COL_FIELD"
+                                          show-icon="false"
+                                          show-popover="false">
+                            </waltz-enum-value>
+                       </div>`
+    },
+    {
+        field: "frequency",
+        name: "Frequency",
+        width: "10%",
+        cellTemplate: `<div style="padding-top: 0.5em">
+                            <waltz-enum-value type="'Frequency'"
+                                          key="COL_FIELD"
+                                          show-icon="false"
+                                          show-popover="false">
+                            </waltz-enum-value>
+                       </div>`
+    },
+    {
+        field: "transport",
+        name: "Transport Kind",
+        width: "10%",
+        cellTemplate: `<div style="padding-top: 0.5em">
+                           <span ng-bind="COL_FIELD | toDisplayName:'TransportKind'"></span>
                        </div>`
     }
 ];
@@ -101,6 +213,8 @@ const initialState = {
     visibility: {
         loading: true
     },
+    selectedFlow: null,
+    physicalFlowColDefs
 }
 
 
@@ -116,6 +230,10 @@ function controller($q, $scope, $state, serviceBroker) {
 
     const vm = initialiseData(this, initialState);
 
+    serviceBroker
+        .loadViewData(CORE_API.FlowClassificationStore.findAll)
+        .then(r => vm.flowClassificationsByCode = _.keyBy(r.data, d => d.code));
+
     function loadFlows() {
 
         const selectionOptions = mkSelectionOptions(vm.parentEntityRef);
@@ -124,7 +242,7 @@ function controller($q, $scope, $state, serviceBroker) {
             .loadViewData(CORE_API.LogicalFlowStore.getViewForSelector,
                           [selectionOptions],
                           {force: true})
-            .then(r => console.log({view: r.data}) || r.data);
+            .then(r => r.data);
 
         return $q
             .all([logicalFlowViewPromise])
@@ -133,6 +251,7 @@ function controller($q, $scope, $state, serviceBroker) {
                 const ratingsByFlowId = _.groupBy(logicalFlowView.flowRatings, d => d.entityReference.id);
                 const ratingSchemeItemsById = _.keyBy(logicalFlowView.ratingSchemeItems, d => d.id);
                 const decoratorsByFlowId = _.groupBy(logicalFlowView.dataTypeDecorators, d => d.dataFlowId);
+                const physicalsByLogicalFlowId = _.groupBy(logicalFlowView.physicalFlows, d => d.logicalFlowId);
 
                 const assessmentColDefs = _
                     .chain(logicalFlowView.primaryAssessmentDefinitions)
@@ -158,8 +277,6 @@ function controller($q, $scope, $state, serviceBroker) {
                     }))
                     .value();
 
-                console.log({assessmentColDefs});
-
                 vm.columnDefs = _.concat(flowColDefs, assessmentColDefs, updatedAtColDefs);
 
                 vm.rows = _
@@ -168,12 +285,12 @@ function controller($q, $scope, $state, serviceBroker) {
 
                         const assessmentRatingsForFlow = _.get(ratingsByFlowId, d.id, []);
 
-                        const dataTypesForFlow = _.get(decoratorsByFlowId, d.id, []);
+                        const dataTypes = _.get(decoratorsByFlowId, d.id, []);
 
-                        console.log({decoratorsByFlowId, dataTypesForFlow});
+                        const physicalFlows = _.get(physicalsByLogicalFlowId, d.id, []);
 
-                        const dataTypes = _
-                            .chain(dataTypesForFlow)
+                        const dataTypeString = _
+                            .chain(dataTypes)
                             .map(d => d.decoratorEntity.name)
                             .join(", ")
                             .value();
@@ -194,13 +311,20 @@ function controller($q, $scope, $state, serviceBroker) {
                             d,
                             {
                                 ratingsByDefId,
-                                dataTypes
+                                dataTypes,
+                                dataTypeString,
+                                physicalFlows
                             })
                     })
                     .sortBy(d => d.target.name, d => d.source.name)
                     .value();
 
-                console.log({rows: vm.rows});
+                vm.allPhysicalFlows = _
+                    .chain(vm.rows)
+                    .flatMap(r => _.map(r.physicalFlows, d => Object.assign({}, d, {source: r.source, target: r.target})))
+                    .value();
+
+                vm.physicalRows = vm.allPhysicalFlows;
             })
             .then(() => vm.visibility.loading = false);
     }
@@ -213,6 +337,15 @@ function controller($q, $scope, $state, serviceBroker) {
 
     vm.onRowSelect = (r) => {
 
+        if(!_.isNil(r)){
+            vm.selectedFlow = r;
+            vm.physicalRows = _.filter(vm.allPhysicalFlows, d => d.logicalFlowId === r?.id);
+        }
+    }
+
+    vm.onClearSelect = () => {
+        vm.selectedFlow = null;
+        vm.physicalRows = vm.allPhysicalFlows;
     }
 }
 

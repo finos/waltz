@@ -20,12 +20,10 @@ package org.finos.waltz.model.logical_flow;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.finos.waltz.model.EntityLifecycleStatus;
-import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.assessment_rating.AssessmentRating;
-import org.finos.waltz.model.datatype.DataType;
 import org.finos.waltz.model.datatype.DataTypeDecorator;
+import org.finos.waltz.model.physical_flow.PhysicalFlow;
 import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.immutables.value.Value;
 
@@ -46,5 +44,7 @@ public abstract class LogicalFlowView {
     public abstract Set<RatingSchemeItem> ratingSchemeItems();
 
     public abstract Set<DataTypeDecorator> dataTypeDecorators();
+
+    public abstract Set<PhysicalFlow> physicalFlows();
 
 }
