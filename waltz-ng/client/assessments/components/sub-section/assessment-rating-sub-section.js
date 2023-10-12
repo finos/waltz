@@ -25,7 +25,7 @@ import {resolveResponses} from "../../../common/promise-utils";
 
 
 const bindings = {
-    parentEntityRef: "<"
+    parentEntityRef: "<?"
 };
 
 const initialState = {
@@ -72,9 +72,11 @@ function controller($q, serviceBroker) {
     };
 
 
-    vm.$onInit = () => {
-        loadAll();
-        vm.useExternalEditorPage = _.includes(["CHANGE_UNIT"], vm.parentEntityRef.kind);
+    vm.$onChanges = () => {
+        if (vm.parentEntityRef) {
+            loadAll();
+            vm.useExternalEditorPage = _.includes(["CHANGE_UNIT"], vm.parentEntityRef.kind);
+        }
     };
 
 
