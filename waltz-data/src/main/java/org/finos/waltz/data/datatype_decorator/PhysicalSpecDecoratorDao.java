@@ -44,6 +44,7 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
 import static java.lang.String.format;
@@ -142,7 +143,7 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
 
 
     @Override
-    public List<DataTypeDecorator> findByFlowIds(Collection<Long> flowIds) {
+    public Set<DataTypeDecorator> findByFlowIds(Collection<Long> flowIds) {
         throw new UnsupportedOperationException("method not supported for " + PHYSICAL_SPECIFICATION.prettyName());
     }
 
@@ -193,6 +194,12 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
                             .isRemovable(true)
                             .build();
                 });
+    }
+
+
+    @Override
+    public Set<DataTypeDecorator> findByLogicalFlowIdSelector(Select<Record1<Long>> flowIdSelector) {
+        throw new UnsupportedOperationException("method not supported for " + PHYSICAL_SPECIFICATION.prettyName());
     }
 
 

@@ -69,6 +69,13 @@ export function store($http, BaseApiUrl) {
     };
 
 
+    const getViewForSelector = (selector) => {
+        return $http
+            .post(`${BASE}/view`, selector)
+            .then(result => result.data);
+    };
+
+
     // --- STATS ---
     const calculateStats = (options) => {
         checkIsIdSelector(options);
@@ -120,6 +127,7 @@ export function store($http, BaseApiUrl) {
         findByEntityReference,
         findBySourceAndTargetEntityReferences,
         findUpstreamFlowsForEntityReferences,
+        getViewForSelector,
         calculateStats,
         countByDataType,
         removeFlow,
@@ -172,6 +180,11 @@ export const LogicalFlowStore_API = {
         serviceName,
         serviceFnName: "findUpstreamFlowsForEntityReferences",
         description: "findUpstreamFlowsForEntityReferences - given a list of entity reference returns all flows feeding any of those apps"
+    },
+    getViewForSelector: {
+        serviceName,
+        serviceFnName: "getViewForSelector",
+        description: "getViewForSelector - given a selector returns flow information and associated primary assessments"
     },
     calculateStats: {
         serviceName,

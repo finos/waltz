@@ -33,25 +33,34 @@ import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.Severity;
 import org.finos.waltz.model.UserTimestamp;
+import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
+import org.finos.waltz.model.assessment_rating.AssessmentRating;
 import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.datatype.DataType;
+import org.finos.waltz.model.datatype.DataTypeDecorator;
 import org.finos.waltz.model.datatype.ImmutableDataTypeDecorator;
 import org.finos.waltz.model.logical_flow.AddLogicalFlowCommand;
 import org.finos.waltz.model.logical_flow.ImmutableLogicalFlow;
 import org.finos.waltz.model.logical_flow.ImmutableLogicalFlowGraphSummary;
 import org.finos.waltz.model.logical_flow.ImmutableLogicalFlowStatistics;
+import org.finos.waltz.model.logical_flow.ImmutableLogicalFlowView;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.model.logical_flow.LogicalFlowGraphSummary;
 import org.finos.waltz.model.logical_flow.LogicalFlowMeasures;
 import org.finos.waltz.model.logical_flow.LogicalFlowStatistics;
+import org.finos.waltz.model.logical_flow.LogicalFlowView;
 import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
+import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.model.tally.TallyPack;
+import org.finos.waltz.service.assessment_definition.AssessmentDefinitionService;
+import org.finos.waltz.service.assessment_rating.AssessmentRatingService;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.data_type.DataTypeService;
 import org.finos.waltz.service.involvement.InvolvementService;
 import org.finos.waltz.service.permission.PermissionGroupService;
 import org.finos.waltz.service.permission.permission_checker.FlowPermissionChecker;
+import org.finos.waltz.service.rating_scheme.RatingSchemeService;
 import org.finos.waltz.service.usage_info.DataTypeUsageService;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -105,6 +114,10 @@ public class LogicalFlowService {
     private final PermissionGroupService permissionGroupService;
     private final FlowPermissionChecker flowPermissionChecker;
 
+    private final AssessmentRatingService assessmentRatingService;
+    private final AssessmentDefinitionService assessmentDefinitionService;
+
+    private final RatingSchemeService ratingSchemeService;
     private final ApplicationIdSelectorFactory appIdSelectorFactory = new ApplicationIdSelectorFactory();
     private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory = new LogicalFlowIdSelectorFactory();
     private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory = new DataTypeIdSelectorFactory();
@@ -120,8 +133,13 @@ public class LogicalFlowService {
                               LogicalFlowDecoratorDao logicalFlowDecoratorDao,
                               InvolvementService involvementService,
                               PermissionGroupService permissionGroupService,
-                              FlowPermissionChecker flowPermissionChecker) {
+                              FlowPermissionChecker flowPermissionChecker,
+                              AssessmentRatingService assessmentRatingService,
+                              AssessmentDefinitionService assessmentDefinitionService,
+                              RatingSchemeService ratingSchemeService) {
 
+        checkNotNull(assessmentDefinitionService, "assessmentDefinitionService cannot be null");
+        checkNotNull(assessmentRatingService, "assessmentRatingService cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(dbExecutorPool, "dbExecutorPool cannot be null");
         checkNotNull(dataTypeService, "dataTypeService cannot be null");
@@ -132,7 +150,10 @@ public class LogicalFlowService {
         checkNotNull(involvementService, "involvementService cannot be null");
         checkNotNull(permissionGroupService, "permissionGroupService cannot be null");
         checkNotNull(flowPermissionChecker, "flowPermissionChecker cannot be null");
+        checkNotNull(ratingSchemeService, "ratingSchemeService cannot be null");
 
+        this.assessmentDefinitionService = assessmentDefinitionService;
+        this.assessmentRatingService = assessmentRatingService;
         this.changeLogService = changeLogService;
         this.dataTypeService = dataTypeService;
         this.flowPermissionChecker = flowPermissionChecker;
@@ -143,6 +164,7 @@ public class LogicalFlowService {
         this.logicalFlowDecoratorDao = logicalFlowDecoratorDao;
         this.involvementService = involvementService;
         this.permissionGroupService = permissionGroupService;
+        this.ratingSchemeService = ratingSchemeService;
     }
 
 
@@ -455,5 +477,28 @@ public class LogicalFlowService {
                 .map(EntityReference::name)
                 .map(Optional::get)
                 .collect(Collectors.joining(", "));
+    }
+
+    public LogicalFlowView getFlowView(IdSelectionOptions idSelectionOptions) {
+
+        Select<Record1<Long>> flowSelector = logicalFlowIdSelectorFactory.apply(idSelectionOptions);
+        List<LogicalFlow> logicalFlows = logicalFlowDao.findBySelector(flowSelector);
+
+        Set<DataTypeDecorator> flowDecorators = logicalFlowDecoratorDao.findByLogicalFlowIdSelector(flowSelector);
+
+        List<AssessmentRating> logicalFlowAssessmentRatings = assessmentRatingService.findByTargetKindForRelatedSelector(LOGICAL_DATA_FLOW, idSelectionOptions);
+
+        Set<AssessmentDefinition> primaryDefs = assessmentDefinitionService.findByPrimaryDefinitionsForKind(LOGICAL_DATA_FLOW, Optional.empty());
+
+        Set<Long> uniqueRatingIds = map(logicalFlowAssessmentRatings, AssessmentRating::ratingId);
+        Set<RatingSchemeItem> ratings = ratingSchemeService.findRatingSchemeItemsByIds(uniqueRatingIds);
+
+        return ImmutableLogicalFlowView.builder()
+                .flows(fromCollection(logicalFlows))
+                .flowRatings(logicalFlowAssessmentRatings)
+                .primaryAssessmentDefinitions(primaryDefs)
+                .ratingSchemeItems(ratings)
+                .dataTypeDecorators(flowDecorators)
+                .build();
     }
 }

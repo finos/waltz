@@ -37,6 +37,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -105,6 +106,11 @@ public class AssessmentDefinitionService {
             default:
                 return findByEntityKind(entityReference.kind());
         }
+    }
+
+
+    public Set<AssessmentDefinition> findByPrimaryDefinitionsForKind(EntityKind entityKind, Optional<EntityReference> qualifierReference) {
+        return assessmentDefinitionDao.findPrimaryDefinitionsForKind(entityKind, qualifierReference);
     }
 
 

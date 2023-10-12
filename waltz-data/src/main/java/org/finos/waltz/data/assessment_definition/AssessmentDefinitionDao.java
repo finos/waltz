@@ -198,4 +198,19 @@ public class AssessmentDefinitionDao {
                 .or(nonExcludedPrimaries)
                 .fetchSet(TO_DOMAIN);
     }
+
+
+    public Set<AssessmentDefinition> findPrimaryDefinitionsForKind(EntityKind entityKind, Optional<EntityReference> qualifierRef) {
+
+        Condition qualifierCondition = qualifierRef
+                .map(ref -> ASSESSMENT_DEFINITION.QUALIFIER_KIND.eq(ref.kind().name())
+                        .and(ASSESSMENT_DEFINITION.QUALIFIER_ID.eq(ref.id())))
+                .orElse(DSL.trueCondition());
+
+        Condition defnCondition = ASSESSMENT_DEFINITION.VISIBILITY.eq(AssessmentVisibility.PRIMARY.name())
+                .and(ASSESSMENT_DEFINITION.ENTITY_KIND.eq(entityKind.name())
+                        .and(qualifierCondition));
+
+        return findByCondition(defnCondition);
+    }
 }

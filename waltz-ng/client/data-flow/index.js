@@ -23,6 +23,7 @@ import {registerComponents} from "../common/module-utils";
 import ApplicationFlowSummaryGraph from "./components/application-flow-summary-graph/application-flow-summary-graph";
 import ApplicationFlowSummaryPane from "./components/application-flow-summary-pane/application-flow-summary-pane";
 import DataFlowSection from "./components/data-flow-section/data-flow-section";
+import LogicalFlowViewGrid from "./components/logical-flow-view-grid/logical-flow-view-grid";
 
 
 function setup() {
@@ -33,7 +34,8 @@ function setup() {
         [
             ApplicationFlowSummaryGraph,
             ApplicationFlowSummaryPane,
-            DataFlowSection ]);
+            DataFlowSection,
+            LogicalFlowViewGrid]);
 
     return module.name;
 }
