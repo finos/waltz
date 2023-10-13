@@ -16,8 +16,9 @@
   ~
   -->
 
-<div class="row">
-    <div class="col-sm-8">
+<div class="flow-detail" style="width: 100%">
+    <div class="flow-detail-table"
+         xxng-style="{width: $ctrl.selectedFlow ? '60%' : '100%'}">
         <waltz-loading-notification show="$ctrl.visibility.loading"
                                     style="padding-top: 54px;"
                                     name="Loading">
@@ -36,6 +37,12 @@
                     No logical flows exist
                 </message>
             </waltz-no-data>
+            <waltz-data-extract-link name="All"
+                                     styling="link"
+                                     extract="logical-flow-view"
+                                     request-body="$ctrl.selectionOptions"
+                                     method="POST">
+            </waltz-data-extract-link>
 
             <h4 style="padding-top: 2em">
                 Physical Flows
@@ -60,10 +67,33 @@
                     No physical flows exist
                 </message>
             </waltz-no-data>
+
+            <div class="waltz-sub-section-controls">
+                <waltz-data-extract-link name="Produces"
+                                         styling="link"
+                                         extract="physical-flows/produces/{{$ctrl.parentEntityRef.kind}}/{{$ctrl.parentEntityRef.id}}"
+                                         method="POST">
+                </waltz-data-extract-link>
+                <span> | </span>
+                <waltz-data-extract-link name="Consumes"
+                                         styling="link"
+                                         extract="physical-flows/consumes/{{$ctrl.parentEntityRef.kind}}/{{$ctrl.parentEntityRef.id}}"
+                                         method="POST">
+                </waltz-data-extract-link>
+                <span> | </span>
+                <waltz-data-extract-link name="All"
+                                         styling="link"
+                                         extract="physical-flows/all/{{$ctrl.parentEntityRef.kind}}/{{$ctrl.parentEntityRef.id}}"
+                                         method="POST">
+                </waltz-data-extract-link>
+                <span class="text-muted"> Download Physical Flows :  </span>
+            </div>
         </div>
     </div>
-    <div class="col-sm-4">
-        <div class="help-block"
+    <div class="flow-detail-panel"
+         ng-if="$ctrl.selectedFlow"
+         xxng-style="{width: $ctrl.selectedFlow ? '40%' : '0%'}">
+    <div class="help-block"
              ng-if="!$ctrl.selectedFlow">
             <waltz-icon name="info-circle"></waltz-icon>
             Select a logical flow from the grid to filter the physical flows
@@ -109,3 +139,22 @@
         </ul>
     </div>
 </script>
+
+
+<style>
+
+    .flow-detail {
+        display: flex;
+        gap: 10px;
+    }
+
+    .flow-detail-table {
+        width: 70%;
+        flex: 1 1 50%
+    }
+
+    .flow-detail-panel {
+        width: 30%;
+    }
+
+</style>

@@ -186,27 +186,6 @@ const physicalFlowColDefs = [
 ];
 
 
-const updatedAtColDefs = [
-    {
-        field: "lastUpdatedAt",
-        name: "Last Updated At",
-        width: "10%",
-        cellTemplate: `
-               <div class="ui-grid-cell-contents"
-                    style="vertical-align: baseline;">
-                    <waltz-from-now timestamp="COL_FIELD"
-                                    days-only="true">
-                    </waltz-from-now>
-                </div>`
-    },
-    {
-        field: "lastUpdatedBy",
-        name: "Last Updated By",
-        width: "10%"
-    }
-]
-
-
 const initialState = {
     rows: [],
     stats: null,
@@ -214,7 +193,8 @@ const initialState = {
         loading: true
     },
     selectedFlow: null,
-    physicalFlowColDefs
+    physicalFlowColDefs,
+    selectionOptions: null
 }
 
 
@@ -236,11 +216,9 @@ function controller($q, $scope, $state, serviceBroker) {
 
     function loadFlows() {
 
-        const selectionOptions = mkSelectionOptions(vm.parentEntityRef);
-
         const logicalFlowViewPromise = serviceBroker
             .loadViewData(CORE_API.LogicalFlowStore.getViewForSelector,
-                          [selectionOptions],
+                          [vm.selectionOptions],
                           {force: true})
             .then(r => r.data);
 
@@ -277,7 +255,7 @@ function controller($q, $scope, $state, serviceBroker) {
                     }))
                     .value();
 
-                vm.columnDefs = _.concat(flowColDefs, assessmentColDefs, updatedAtColDefs);
+                vm.columnDefs = _.concat(flowColDefs, assessmentColDefs);
 
                 vm.rows = _
                     .chain(logicalFlowView.flows)
@@ -331,6 +309,7 @@ function controller($q, $scope, $state, serviceBroker) {
 
     vm.$onChanges = () => {
         if (vm.parentEntityRef) {
+            vm.selectionOptions = mkSelectionOptions(vm.parentEntityRef);
             loadFlows();
         }
     }
