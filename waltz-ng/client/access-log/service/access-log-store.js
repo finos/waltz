@@ -28,7 +28,7 @@ export function store($http, BaseApiUrl) {
             : params;
 
         return $http
-            .post(`${BASE}/${state}`, paramStr)
+            .post(`${BASE}/${encodeURI(state)}`, paramStr)
             .then(r => r.data);
     };
 
