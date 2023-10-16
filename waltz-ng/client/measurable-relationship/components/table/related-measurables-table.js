@@ -21,12 +21,12 @@ import _ from "lodash";
 import template from "./related-measurables-table.html";
 import {initialiseData} from "../../../common/index";
 import {sameRef} from "../../../common/entity-utils";
-import {downloadTextFile} from "../../../common/file-utils";
 import {mkEntityLinkGridCell} from "../../../common/grid-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 const bindings = {
+    parentEntityRef: "<",
     rows: "<",
     onRowSelect: "<",
     selectedRow: "<"
@@ -64,33 +64,6 @@ const initialState = {
 };
 
 
-function mkExportData(rows = [], relKindsByCode) {
-    const columnNames = [[
-        "From",
-        "From type",
-        "To",
-        "To type",
-        "Relationship Kind",
-        "Description",
-        "Last Updated At",
-        "Last Updated By"
-    ]];
-
-    const exportData = _.map(rows, r => [
-        r.a.name,
-        r.a.type,
-        r.b.name,
-        r.b.type,
-        _.get(relKindsByCode, r.relationship.relationship).name,
-        r.relationship.description,
-        r.relationship.lastUpdatedAt,
-        r.relationship.lastUpdatedBy
-    ]);
-
-    return columnNames.concat(exportData);
-}
-
-
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
@@ -104,7 +77,8 @@ function controller(serviceBroker) {
 
             const relatedKindsString =  _.join(relatedKinds, ", ");
 
-            return Object.assign({},
+            return Object.assign(
+                {},
                 {
                     a: r.a,
                     b: r.b,
@@ -133,15 +107,11 @@ function controller(serviceBroker) {
     };
 
     vm.$onChanges = (c) => {
-        if (c.rows && vm.relationshipKindsByCode){
-           vm.loadData();
+        if (c.rows && vm.relationshipKindsByCode) {
+            vm.loadData();
         }
     };
 
-    vm.export = () => {
-        const data = mkExportData(vm.rows, vm.relationshipKindsByCode);
-        downloadTextFile(data, ",", "related_viewpoints.csv");
-    };
 }
 
 

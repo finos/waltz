@@ -119,7 +119,7 @@ public class InvolvementViewService {
     }
 
 
-    public InvolvementDetailByDirectionResults findAllInvolvements(EntityReference ref) {
+    public InvolvementDetailByDirectionResults getAllInvolvements(EntityReference ref) {
         Map<HierarchyDirection, ? extends Collection<InvolvementDetail>> byDirection = involvementViewDao.findAllInvolvements(ref);
 
         return ImmutableInvolvementDetailByDirectionResults

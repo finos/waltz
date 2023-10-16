@@ -69,7 +69,7 @@ public class InvolvementViewEndpoint implements Endpoint {
                 involvementViewService.findByKindIdAndEntityKind(getId(request), getKind(request));
 
         DatumRoute<InvolvementDetailByDirectionResults> findAllInvolvementsForEntityRoute = (request, response) ->
-                involvementViewService.findAllInvolvements(getEntityReference(request));
+                involvementViewService.getAllInvolvements(getEntityReference(request));
 
         getForList(findAllByEmployeeIdPath, findAllByEmployeeIdRoute);
         getForList(findKeyInvolvementsForEntityPath, findKeyInvolvementsForEntityRoute);
