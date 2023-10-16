@@ -272,24 +272,6 @@
             </div>
         </div>
 
-        <div class="wt-tab wt-active"
-             ng-if="$ctrl.activeTab.id === 'PHYSICAL'">
-
-            <div class="waltz-panel-content"
-                 ng-if="$ctrl.activeMode === 'VIEW'">
-                <br>
-                <waltz-physical-data-section specifications="$ctrl.physicalSpecifications"
-                                             logical-flows="$ctrl.logicalFlows"
-                                             primary-ref="$ctrl.parentEntityRef"
-                                             physical-flows="$ctrl.physicalFlows">
-                </waltz-physical-data-section>
-            </div>
-
-            <div ng-if="$ctrl.activeMode === 'BULK'">
-                <waltz-bulk-physical-flow-loader-wizard>
-                </waltz-bulk-physical-flow-loader-wizard>
-            </div>
-        </div>
 
         <div class="wt-tab wt-active"
              ng-if="$ctrl.activeTab.id === 'FLOW_CLASSIFICATION_RULES'">
@@ -298,7 +280,7 @@
         </div>
 
         <div class="wt-tab wt-active"
-             ng-if="$ctrl.activeTab.id === 'LOGICAL_FLOW_DETAIL'">
+             ng-if="$ctrl.activeTab.id === 'FLOW_DETAIL'">
             <waltz-logical-flow-view-grid parent-entity-ref="$ctrl.parentEntityRef">
             </waltz-logical-flow-view-grid>
         </div>
