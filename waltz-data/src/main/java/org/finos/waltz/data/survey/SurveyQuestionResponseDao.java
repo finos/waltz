@@ -44,6 +44,7 @@ import org.jooq.Select;
 import org.jooq.SelectConditionStep;
 import org.jooq.Table;
 import org.jooq.impl.DSL;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -87,7 +88,12 @@ public class SurveyQuestionResponseDao {
     private static final Field<String> entityNameField = InlineSelectFieldFactory.mkNameField(
             SURVEY_QUESTION_RESPONSE.ENTITY_RESPONSE_ID,
             SURVEY_QUESTION_RESPONSE.ENTITY_RESPONSE_KIND,
-            newArrayList(EntityKind.APPLICATION, EntityKind.PERSON));
+            newArrayList(EntityKind.APPLICATION, EntityKind.PERSON, EntityKind.LEGAL_ENTITY));
+
+    private static final Field<String> EXTERNAL_ID_FIELD = InlineSelectFieldFactory.mkExternalIdField(
+                    SURVEY_QUESTION_LIST_RESPONSE.ENTITY_ID,
+                    SURVEY_QUESTION_LIST_RESPONSE.ENTITY_KIND,
+                    newArrayList(EntityKind.values()));
 
     private static final RecordMapper<Record, SurveyInstanceQuestionResponse> TO_DOMAIN_MAPPER = r -> {
         SurveyQuestionResponseRecord record = r.into(SURVEY_QUESTION_RESPONSE);
@@ -130,26 +136,30 @@ public class SurveyQuestionResponseDao {
 
     public List<SurveyInstanceQuestionResponse> findForInstance(long surveyInstanceId) {
         // fetch list responses
-        List<SurveyQuestionListResponseRecord> listResponses = dsl
+        List<Tuple2<SurveyQuestionListResponseRecord, String>> listResponses = dsl
                 .select(SURVEY_QUESTION_LIST_RESPONSE.fields())
+                .select(EXTERNAL_ID_FIELD)
                 .from(SURVEY_QUESTION_LIST_RESPONSE)
                 .where(SURVEY_QUESTION_LIST_RESPONSE.SURVEY_INSTANCE_ID.eq(surveyInstanceId))
                 .orderBy(SURVEY_QUESTION_LIST_RESPONSE.POSITION)
-                .fetch(r -> r.into(SURVEY_QUESTION_LIST_RESPONSE));
+                .fetch()
+                .map(r -> tuple(r.into(SURVEY_QUESTION_LIST_RESPONSE), r.getValue(EXTERNAL_ID_FIELD)));
 
         Map<Long, List<EntityReference>> entityListResponsesByQuestionId = listResponses
                 .stream()
-                .filter(d -> d.getEntityKind() != null)
-                .map(d -> tuple(d.getQuestionId(), mkRef(
-                        EntityKind.valueOf(d.getEntityKind()),
-                        d.getEntityId(),
-                        d.getResponse())))
+                .filter(d -> d.v1.getEntityKind() != null)
+                .map(d -> tuple(d.v1.getQuestionId(), mkRef(
+                        EntityKind.valueOf(d.v1.getEntityKind()),
+                        d.v1.getEntityId(),
+                        d.v1.getResponse(),
+                        null,
+                        d.v2)))
                 .collect(groupingBy(d -> d.v1, mapping(t -> t.v2, toList())));
 
         Map<Long, List<String>> stringListResponsesByQuestionId = listResponses
                 .stream()
-                .filter(d -> d.getEntityKind() == null)
-                .map(d -> tuple(d.getQuestionId(),d.getResponse()))
+                .filter(d -> d.v1.getEntityKind() == null)
+                .map(d -> tuple(d.v1.getQuestionId(),d.v1.getResponse()))
                 .collect(groupingBy(
                         d -> d.v1,
                         mapping(t -> t.v2, toList())));
@@ -167,8 +177,8 @@ public class SurveyQuestionResponseDao {
                 .map(r -> ImmutableSurveyInstanceQuestionResponse
                         .copyOf(r)
                         .withQuestionResponse(ImmutableSurveyQuestionResponse.copyOf(r.questionResponse())
-                        .withListResponse(ofNullable(stringListResponsesByQuestionId.get(r.questionResponse().questionId())))
-                        .withEntityListResponse(ofNullable(entityListResponsesByQuestionId.get(r.questionResponse().questionId())))))
+                                .withListResponse(ofNullable(stringListResponsesByQuestionId.get(r.questionResponse().questionId())))
+                                .withEntityListResponse(ofNullable(entityListResponsesByQuestionId.get(r.questionResponse().questionId())))))
                 .collect(toList());
     }
 

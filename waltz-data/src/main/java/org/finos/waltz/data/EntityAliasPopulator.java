@@ -43,6 +43,7 @@ import static org.finos.waltz.schema.Tables.CHANGE_INITIATIVE;
 import static org.finos.waltz.schema.Tables.LEGAL_ENTITY;
 import static org.finos.waltz.schema.Tables.ORGANISATIONAL_UNIT;
 import static org.finos.waltz.schema.Tables.PERSON;
+import static org.finos.waltz.schema.Tables.PHYSICAL_SPECIFICATION;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 /**

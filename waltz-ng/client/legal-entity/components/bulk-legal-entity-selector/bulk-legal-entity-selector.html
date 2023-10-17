@@ -1,0 +1,201 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
+<div class="waltz-bulk-legal-entity-selector">
+
+    <waltz-loading-notification show="$ctrl.visibility.loading"
+                                name="Searching">
+    </waltz-loading-notification>
+
+
+    <div ng-if="$ctrl.visibility.editor">
+        <textarea rows="8"
+                  cols="95"
+                  style="width:100%;"
+                  placeholder="Please insert legal entity identifiers separated by newline, comma, semi-colon or pipe characters"
+                  ng-model="$ctrl.bulkEntriesString"
+                  ng-model-options="{debounce: 300}"
+                  ng-change="$ctrl.bulkEntriesChanged()"
+                  ng-required="$ctrl.required">
+        </textarea>
+    </div>
+
+
+    <!-- Results -->
+    <div ng-if="!$ctrl.visibility.editor && !$ctrl.visibility.loading"
+         ng-class="{
+            'wbles-draft': $ctrl.isDirty,
+        }">
+
+        <!-- Summary -->
+        <div>
+            <h4>Summary</h4>
+            <div ng-if="!$ctrl.searchSummary.notFound && !$ctrl.isDirty"
+                  class="text-success">
+                <waltz-icon name="check"></waltz-icon>
+                No changes found
+            </div>
+
+            <div ng-if="!$ctrl.searchSummary.notFound && $ctrl.isDirty"
+                 class="text-warning">
+                <waltz-icon name="check"></waltz-icon>
+                All identifiers found, please save changes
+            </div>
+
+            <div ng-if="$ctrl.searchSummary.notFound > 0"
+                  class="text-danger">
+                <waltz-icon name="exclamation-triangle"></waltz-icon>
+                <span ng-bind="$ctrl.searchSummary.notFound" ></span>
+                identifier<span ng-if="$ctrl.searchSummary.notFound > 1">s</span>
+                <a class="clickable wbas-inline-link"
+                   ng-click="$ctrl.toggleNotFound()">
+                    not found
+                </a>.
+
+                Please review below and
+                <a class="clickable wbles-inline-link"
+                   ng-click="$ctrl.visibility.editor = true">
+                    correct
+                </a>.
+
+                <a class="clickable"
+                   ng-if="$ctrl.showNotFoundOnly"
+                   ng-click="$ctrl.toggleNotFound()">
+                    show all
+                </a>
+            </div>
+
+            <div ng-if="$ctrl.searchSummary.removedEntityCount > 0"
+                 class="text-warning">
+                <waltz-icon name="exclamation-triangle"></waltz-icon>
+                Note, this list contains:
+                <span ng-bind="$ctrl.searchSummary.removedEntityCount"></span>
+                entities which are no longer active.
+            </div>
+
+        </div>
+
+        <br>
+
+        <!-- Results -->
+        <div ng-class="{'waltz-scroll-region-250': $ctrl.filteredSearchResults.length > 15 }">
+
+            <table class="table table-condensed small">
+                <thead>
+                    <tr>
+                        <th>Identifier</th>
+                        <th>Legal Entity</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="result in $ctrl.filteredSearchResults"
+                        ng-class="{
+                                    'text-danger': !result.entityRef,
+                                    'bg-danger': !result.entityRef,
+                                    'bg-warning': result.action === 'ADD',
+                                  }">
+                        <td>
+                            <span ng-bind="result.identifier">
+                            </span>
+                        </td>
+                        <td>
+                            <waltz-entity-link ng-if="result.entityRef"
+                                               entity-ref="result.entityRef">
+                            </waltz-entity-link>
+                            <span ng-if="!result.entityRef"
+                                  class="text-danger bg-danger">
+                                Not found
+                            </span>
+                        </td>
+                        <td>
+                            <span ng-bind="result.action | toDisplayName:'action'"></span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+
+        <div ng-if="$ctrl.isDirty"
+             class="waltz-fade-if">
+            <br>
+
+            The following legal entities are not in the replacement list of identifiers and will be removed
+
+            <div ng-if="$ctrl.removedResults.length === 0"
+                 class="text-warning">
+                No legal entities will be removed.
+            </div>
+
+            <div ng-if="$ctrl.removedResults.length > 0"
+                 ng-class="{'waltz-scroll-region-250': $ctrl.removedResults.length > 15 }">
+
+                <table class="table table-condensed small">
+                    <thead>
+                    <tr>
+                        <th>Legal Entity</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="result in $ctrl.removedResults"
+                        class="bg-warning">
+                        <td>
+                            <waltz-entity-link entity-ref="result.entityRef">
+                            </waltz-entity-link>
+                        </td>
+                        <td>
+                            <span ng-bind="result.action | toDisplayName:'action'"></span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+
+    <div ng-if="!$ctrl.visibility.loading"
+         style="padding-top: 5px">
+
+        <span class="pull-right">
+            <button ng-if="$ctrl.visibility.editor"
+                    class="btn btn-xs btn-primary"
+                    ng-click="$ctrl.resolve()">
+                Search
+            </button>
+
+            <button ng-if="!$ctrl.visibility.editor"
+                    ng-disabled="!$ctrl.isDirty || $ctrl.searchSummary.notFound"
+                    class="btn btn-xs btn-success"
+                    ng-click="$ctrl.save()">
+                Save
+            </button>
+            <a ng-if="!$ctrl.visibility.editor"
+               class="clickable"
+               ng-click="$ctrl.visibility.editor = true">
+                Back
+            </a>
+        </span>
+    </div>
+
+</div>
