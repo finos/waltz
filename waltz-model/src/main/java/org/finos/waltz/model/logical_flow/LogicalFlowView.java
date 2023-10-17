@@ -24,6 +24,7 @@ import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.assessment_rating.AssessmentRating;
 import org.finos.waltz.model.datatype.DataTypeDecorator;
 import org.finos.waltz.model.physical_flow.PhysicalFlow;
+import org.finos.waltz.model.physical_specification.PhysicalSpecification;
 import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.immutables.value.Value;
 
@@ -46,5 +47,7 @@ public abstract class LogicalFlowView {
     public abstract Set<DataTypeDecorator> dataTypeDecorators();
 
     public abstract Set<PhysicalFlow> physicalFlows();
+
+    public abstract Set<PhysicalSpecification> physicalSpecifications();
 
 }

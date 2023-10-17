@@ -195,6 +195,9 @@ const initialState = {
         loading: true
     },
     selectedFlow: null,
+    selectedPhysicalFlow: null,
+    logicalFlowUrl: null,
+    physicalFlowUrl: null,
     physicalFlowColDefs,
     selectionOptions: null,
     physicalFlowsByDirection: {
@@ -253,7 +256,13 @@ function controller($q, $scope, $state, serviceBroker) {
                 const ratingsByFlowId = _.groupBy(logicalFlowView.flowRatings, d => d.entityReference.id);
                 const ratingSchemeItemsById = _.keyBy(logicalFlowView.ratingSchemeItems, d => d.id);
                 const decoratorsByFlowId = _.groupBy(logicalFlowView.dataTypeDecorators, d => d.dataFlowId);
-                const physicalsByLogicalFlowId = _.groupBy(logicalFlowView.physicalFlows, d => d.logicalFlowId);
+                const specsById = _.keyBy(logicalFlowView.physicalSpecifications, d => d.id);
+
+                const physicalsByLogicalFlowId = _
+                    .chain(logicalFlowView.physicalFlows)
+                    .map(d => Object.assign({}, d, { physicalSpecification: _.get(specsById, d.specificationId)}))
+                    .groupBy(d => d.logicalFlowId)
+                    .value();
 
                 const dataTypes = _
                     .chain(logicalFlowView.dataTypeDecorators, d => d.decoratorEntity)
@@ -299,9 +308,7 @@ function controller($q, $scope, $state, serviceBroker) {
                     .map(d => {
 
                         const assessmentRatingsForFlow = _.get(ratingsByFlowId, d.id, []);
-
                         const dataTypes = _.get(decoratorsByFlowId, d.id, []);
-
                         const physicalFlows = _.get(physicalsByLogicalFlowId, d.id, []);
 
                         const dataTypeString = _
@@ -357,15 +364,26 @@ function controller($q, $scope, $state, serviceBroker) {
         }
     }
 
-    vm.onRowSelect = (r) => {
+    vm.onLogicalRowSelect = (r) => {
         if(!_.isNil(r)){
             vm.selectedFlow = r;
+            vm.logicalFlowUrl = $state.href("main.logical-flow.view", { id: vm.selectedFlow.id });
             vm.physicalRows = _.filter(vm.physicalFlowsByDirection.ALL, d => d.logicalFlowId === r?.id);
+        }
+    }
+
+    vm.onPhysicalRowSelect = (r) => {
+        if(!_.isNil(r)){
+            vm.selectedPhysicalFlow = r;
+            vm.physicalFlowUrl = $state.href("main.physical-flow.view", { id: vm.selectedPhysicalFlow.id });
         }
     }
 
     vm.onClearSelect = () => {
         vm.selectedFlow = null;
+        vm.selectedPhysicalFlow = null;
+        vm.logicalFlowUrl = null;
+        vm.physicallFlowUrl = null;
         vm.physicalRows = vm.physicalFlowsByDirection.ALL;
     }
 
@@ -399,10 +417,6 @@ function controller($q, $scope, $state, serviceBroker) {
 
     vm.hasRatings = (ratingByDefnId) => {
         return !_.isEmpty(ratingByDefnId);
-    }
-
-    vm.flowUrl = () => {
-        return $state.href("main.logical-flow.view", { id: vm.selectedFlow.id });
     }
 }
 

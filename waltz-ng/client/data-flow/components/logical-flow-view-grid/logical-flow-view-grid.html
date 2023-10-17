@@ -69,7 +69,7 @@
             <waltz-grid-with-search ng-if="$ctrl.logicalRows.length > 0"
                                     entries="$ctrl.logicalRows"
                                     column-defs="$ctrl.columnDefs"
-                                    on-row-select="$ctrl.onRowSelect">
+                                    on-row-select="$ctrl.onLogicalRowSelect">
             </waltz-grid-with-search>
             <waltz-no-data ng-if="$ctrl.logicalRows.length === 0">
                 <message>
@@ -135,7 +135,8 @@
             <waltz-grid-with-search ng-if="$ctrl.physicalFlowsByDirection.ALL.length > 0"
                                     entries="$ctrl.physicalRows"
                                     search-control-min-rows="1"
-                                    column-defs="$ctrl.physicalFlowColDefs">
+                                    column-defs="$ctrl.physicalFlowColDefs"
+                                    on-row-select="$ctrl.onPhysicalRowSelect">
             </waltz-grid-with-search>
             <waltz-no-data ng-if="$ctrl.physicalFlowsByDirection.ALL.length === 0">
                 <message>
@@ -169,7 +170,7 @@
          ng-if="$ctrl.selectedFlow">
 
         <h4>
-            <a href="$ctrl.flowUrl()">
+            <a href="{{$ctrl.logicalFlowUrl}}">
                 <span>
                     Logical Flow
                     <waltz-icon name="{{$ctrl.selectedFlow.source.kind | toIconName:'entity' }}"></waltz-icon>
@@ -186,7 +187,7 @@
         <table class="table table-condensed small">
             <tbody>
                 <tr>
-                    <td>Source</td>
+                    <td style="width: 20%">Source</td>
                     <td><waltz-entity-link entity-ref="$ctrl.selectedFlow.source" is-secondary-link="true"></waltz-entity-link></td>
                 </tr>
                 <tr>
@@ -243,6 +244,66 @@
                 </tbody>
             </table>
         </div>
+    </div>
+    <div class="flow-detail-panel"
+         ng-if="$ctrl.selectedPhysicalFlow">
+        <h4>
+            <a href="{{$ctrl.physicalFlowUrl}}">
+                <span>
+                    Physical Flow
+                    <waltz-icon name="{{$ctrl.selectedPhysicalFlow.source.kind | toIconName:'entity' }}"></waltz-icon>
+                    <waltz-icon name="arrow-right"></waltz-icon>
+                    <waltz-icon name="{{$ctrl.selectedPhysicalFlow.target.kind | toIconName:'entity'}}"></waltz-icon>
+                </span>
+            </a>
+            <button class="btn btn-skinny btn-xs"
+                    ng-click="$ctrl.onClearSelect()">
+                Clear
+            </button>
+        </h4>
+
+        <div class="help-block"
+             ng-if="$ctrl.selectedPhysicalFlow.description">
+            <span ng-bind="$ctrl.selectedPhysicalFlow.description"></span>
+        </div>
+
+        <table class="table table-condensed small">
+            <tbody>
+            <tr>
+                <td style="width: 20%">Source</td>
+                <td><waltz-entity-link entity-ref="$ctrl.selectedPhysicalFlow.source" is-secondary-link="true"></waltz-entity-link></td>
+            </tr>
+            <tr>
+                <td>Target</td>
+                <td><waltz-entity-link entity-ref="$ctrl.selectedPhysicalFlow.target" is-secondary-link="true"></waltz-entity-link></td>
+            </tr>
+            <tr>
+                <td>External Id</td>
+                <td><span ng-bind="$ctrl.selectedPhysicalFlow.externalId"></span></td>
+            </tr>
+            <tr>
+                <td>Specification</td>
+                <td><waltz-entity-link entity-ref="$ctrl.selectedPhysicalFlow.physicalSpecification" is-secondary-link="true"></waltz-entity-link></td>
+            </tr>
+            <tr>
+                <td>Specification Format</td>
+                <td>
+                    <waltz-enum-value type="'DataFormatKind'"
+                                      key="$ctrl.selectedPhysicalFlow.physicalSpecification.format"
+                                      show-icon="false"
+                                      show-popover="false">
+                </waltz-enum-value>
+<!--                    {{$ctrl.selectedPhysicalFlow.physicalSpecification.format || "-"}}-->
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="small">
+            <waltz-last-updated entity="$ctrl.selectedPhysicalFlow"></waltz-last-updated>
+        </div>
+
+        <pre ng-bind="$ctrl.selectedPhysicalFlow"></pre>
     </div>
 </div>
 
