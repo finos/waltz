@@ -22,6 +22,7 @@ import {initialiseData} from "../../../common";
 import {mkSelectionOptions} from "../../../common/selector-utils";
 import {sameRef} from "../../../common/entity-utils";
 import {reduceToSelectedNodesOnly} from "../../../common/hierarchy-utils";
+import {containsAny} from "../../../common/list-utils";
 
 const bindings = {
     parentEntityRef: "<",
@@ -200,12 +201,20 @@ const initialState = {
     physicalFlowUrl: null,
     physicalFlowColDefs,
     selectionOptions: null,
+    logicalFlowsByDirection: {
+        ALL: [],
+        UPSTREAM: [],
+        DOWNSTREAM: []
+    },
     physicalFlowsByDirection: {
         ALL: [],
         UPSTREAM: [],
         DOWNSTREAM: []
     },
-    filteredDataTypes: []
+    filteredDataTypes: [],
+    filteredRatings: [],
+    selectedLogicalFlowFilter: "ALL",
+    selectedPhysicalFlowFilter: "ALL"
 }
 
 
@@ -217,12 +226,18 @@ function mkRatingsStringSearch(header, row) {
         .value();
 }
 
-function filterFlowOnDataTypes(flows, dataTypes) {
+
+function filterFlowOnDataTypes(flows, dataTypes = [], ratings = []) {
     return _.filter(
         flows,
         d => {
             const dtIds = _.map(d.dataTypes, d => d.dataTypeId);
-            return _.some(dataTypes, dt => _.includes(dtIds, dt));
+
+            const hasFilteredDt = _.some(dataTypes, dt => _.includes(dtIds, dt));
+            const noRatingFilters = _.isEmpty(ratings);
+            const hasFilteredRating = containsAny(ratings, d.assessmentRatings);
+
+            return hasFilteredDt && (noRatingFilters || hasFilteredRating);
         })
 }
 
@@ -275,6 +290,21 @@ function controller($q, $scope, $state, serviceBroker) {
                 vm.dataTypes = reduceToSelectedNodesOnly(allDataTypes, vm.filteredDataTypes);
                 vm.definitionsById = _.keyBy(logicalFlowView.primaryAssessmentDefinitions, d => d.id);
 
+                const ratingsByDefinitionId = _.chain(logicalFlowView.flowRatings)
+                    .groupBy(r => r.assessmentDefinitionId)
+                    .mapValues(v => _
+                        .chain(v)
+                        .map(r => ratingSchemeItemsById[r.ratingId])
+                        .filter(d => d != null)
+                        .uniq()
+                        .sortBy(r => r.position, r => r.name)
+                        .value())
+                    .value();
+
+                vm.assessmentFilters = _.map(
+                    logicalFlowView.primaryAssessmentDefinitions,
+                    d => Object.assign({}, { definition: d, ratings: _.get(ratingsByDefinitionId, d.id, [])}));
+
                 vm.disableNode = (node) => !_.includes(_.map(dataTypes, dt => dt.dataTypeId), node.id);
 
                 const assessmentColDefs = _
@@ -303,7 +333,7 @@ function controller($q, $scope, $state, serviceBroker) {
 
                 vm.columnDefs = _.concat(flowColDefs, assessmentColDefs);
 
-                vm.allLogicalFlows = _
+                const allLogicalFlows = _
                     .chain(logicalFlowView.flows)
                     .map(d => {
 
@@ -311,9 +341,14 @@ function controller($q, $scope, $state, serviceBroker) {
                         const dataTypes = _.get(decoratorsByFlowId, d.id, []);
                         const physicalFlows = _.get(physicalsByLogicalFlowId, d.id, []);
 
+                        const assessmentRatings = _.map(
+                            assessmentRatingsForFlow,
+                                d => ({ definitionId : d.assessmentDefinitionId, ratingId: d.ratingId}));
+
                         const dataTypeString = _
                             .chain(dataTypes)
                             .map(d => d.decoratorEntity.name)
+                            .orderBy(d => d)
                             .join(", ")
                             .value();
 
@@ -335,14 +370,15 @@ function controller($q, $scope, $state, serviceBroker) {
                                 ratingsByDefId,
                                 dataTypes,
                                 dataTypeString,
-                                physicalFlows
+                                physicalFlows,
+                                assessmentRatings
                             })
                     })
                     .sortBy(d => d.target.name, d => d.source.name)
                     .value();
 
                 const allPhysicalFlows = _
-                    .chain(vm.allLogicalFlows)
+                    .chain(allLogicalFlows)
                     .flatMap(r => _.map(r.physicalFlows, d => Object.assign({}, d, {source: r.source, target: r.target})))
                     .value();
 
@@ -350,8 +386,12 @@ function controller($q, $scope, $state, serviceBroker) {
                 vm.physicalFlowsByDirection.DOWNSTREAM = _.filter(allPhysicalFlows, d => sameRef(d.source, vm.parentEntityRef));
                 vm.physicalFlowsByDirection.ALL = allPhysicalFlows;
 
+                vm.logicalFlowsByDirection.UPSTREAM = _.filter(allLogicalFlows, d => sameRef(d.target, vm.parentEntityRef));
+                vm.logicalFlowsByDirection.DOWNSTREAM = _.filter(allLogicalFlows, d => sameRef(d.source, vm.parentEntityRef));
+                vm.logicalFlowsByDirection.ALL = allLogicalFlows;
+
                 vm.physicalRows = vm.physicalFlowsByDirection.ALL;
-                vm.logicalRows = vm.allLogicalFlows;
+                vm.logicalRows = vm.logicalFlowsByDirection.ALL;
 
             })
             .then(() => vm.visibility.loading = false);
@@ -366,6 +406,7 @@ function controller($q, $scope, $state, serviceBroker) {
 
     vm.onLogicalRowSelect = (r) => {
         if(!_.isNil(r)){
+            vm.selectedPhysicalFlow = null;
             vm.selectedFlow = r;
             vm.logicalFlowUrl = $state.href("main.logical-flow.view", { id: vm.selectedFlow.id });
             vm.physicalRows = _.filter(vm.physicalFlowsByDirection.ALL, d => d.logicalFlowId === r?.id);
@@ -374,6 +415,7 @@ function controller($q, $scope, $state, serviceBroker) {
 
     vm.onPhysicalRowSelect = (r) => {
         if(!_.isNil(r)){
+            vm.selectedFlow = null;
             vm.selectedPhysicalFlow = r;
             vm.physicalFlowUrl = $state.href("main.physical-flow.view", { id: vm.selectedPhysicalFlow.id });
         }
@@ -383,40 +425,80 @@ function controller($q, $scope, $state, serviceBroker) {
         vm.selectedFlow = null;
         vm.selectedPhysicalFlow = null;
         vm.logicalFlowUrl = null;
-        vm.physicallFlowUrl = null;
+        vm.physicalFlowUrl = null;
+        vm.selectedLogicalFlowFilter = "ALL";
+        vm.selectedPhysicalFlowFilter = "ALL";
+        vm.logicalRows = vm.logicalFlowsByDirection.ALL;
         vm.physicalRows = vm.physicalFlowsByDirection.ALL;
     }
 
+    vm.filterLogicalFlows = (direction) => {
+        vm.onClearSelect();
+        vm.selectedLogicalFlowFilter = direction;
+        vm.logicalRows = vm.logicalFlowsByDirection[direction];
+    }
+
     vm.filterPhysicalFlows = (direction) => {
+        vm.onClearSelect();
+        vm.selectedPhysicalFlowFilter = direction;
         vm.physicalRows = vm.physicalFlowsByDirection[direction];
     }
 
-    function refreshFlows() {
-        vm.logicalRows = filterFlowOnDataTypes(vm.allLogicalFlows, vm.filteredDataTypes);
+    function refreshLogicalFlows() {
+        vm.logicalRows = filterFlowOnDataTypes(vm.logicalFlowsByDirection.ALL, vm.filteredDataTypes, vm.filteredRatings);
     }
 
     vm.onSelectDataType = (dt) => {
         vm.filteredDataTypes = _.concat(vm.filteredDataTypes, dt);
-        refreshFlows();
+        refreshLogicalFlows();
     }
 
     vm.onDeselectDataType = (dt) => {
         vm.filteredDataTypes = _.without(vm.filteredDataTypes, dt);
-        refreshFlows();
+        refreshLogicalFlows();
     }
 
     vm.clearAllDataTypes = () => {
         vm.filteredDataTypes = [];
-        refreshFlows();
+        refreshLogicalFlows();
     }
 
     vm.addAllDataTypes = () => {
         vm.filteredDataTypes = _.map(vm.mappedDataTypes, d => d.dataTypeId);
-        refreshFlows();
+        refreshLogicalFlows();
     }
 
     vm.hasRatings = (ratingByDefnId) => {
         return !_.isEmpty(ratingByDefnId);
+    }
+
+    vm.selectRating = (definitionId, ratingId) => {
+
+        const ratingInfo = {
+            definitionId,
+            ratingId
+        }
+
+        if (_.some(vm.filteredRatings, r => _.isEqual(r, ratingInfo))) {
+            vm.filteredRatings = _.filter(vm.filteredRatings, d => !_.isEqual(d, ratingInfo));
+            refreshLogicalFlows();
+        } else {
+            vm.filteredRatings = _.concat(vm.filteredRatings, ratingInfo);
+            refreshLogicalFlows();
+        }
+    }
+
+    vm.filtersForDefinition = (defnId) => {
+        return _.some(vm.filteredRatings, r => r.definitionId === defnId);
+    }
+
+    vm.filterSelected = (defnId, ratingId) => {
+        return _.some(vm.filteredRatings, r => r.definitionId === defnId && r.ratingId === ratingId);
+    }
+
+    vm.clearFiltersForDefinition = (defnId) => {
+        vm.filteredRatings = _.filter(vm.filteredRatings, d => d.definitionId !== defnId);
+        refreshLogicalFlows();
     }
 }
 
