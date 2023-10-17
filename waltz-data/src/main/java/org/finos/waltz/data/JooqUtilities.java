@@ -67,7 +67,6 @@ import org.jooq.TableField;
 import org.jooq.TableRecord;
 import org.jooq.UpdatableRecord;
 import org.jooq.impl.DSL;
-import sun.tools.jconsole.Tab;
 
 import java.sql.Date;
 import java.sql.Timestamp;
