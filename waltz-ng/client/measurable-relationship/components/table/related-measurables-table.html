@@ -24,15 +24,13 @@
                          search-placeholder-text="Search relationships...">
 </waltz-grid-with-search>
 
-<!-- Export -->
-<a ng-click="$ctrl.export()"
-   ng-if="!$ctrl.selectedRow"
-   class="clickable pull-right"
-   style="text-decoration: none;"
-   role="button">
-    <waltz-icon name="download"></waltz-icon>
-    Export
-</a>
+
+<waltz-data-extract-link name="Download all relationships"
+                         class="pull-right"
+                         styling="link"
+                         extract="entity-relationships/kind/{{$ctrl.parentEntityRef.kind}}/id/{{$ctrl.parentEntityRef.id}}"
+                         method="GET">
+</waltz-data-extract-link>
 
 
 <script type="text/ng-template"

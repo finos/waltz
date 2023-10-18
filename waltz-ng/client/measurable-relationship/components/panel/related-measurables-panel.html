@@ -98,6 +98,7 @@
             <!-- TABLE DETAIL MODE -->
             <span ng-if="$ctrl.visibility.detailMode === 'table'">
                 <waltz-related-measurables-table rows="$ctrl.gridData"
+                                                 parent-entity-ref="$ctrl.parentEntityRef"
                                                  on-row-select="$ctrl.selectRow"
                                                  selected-row="$ctrl.selectedRow">
                 </waltz-related-measurables-table>
