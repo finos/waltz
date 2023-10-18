@@ -1,7 +1,10 @@
 package org.finos.waltz.service.involvement;
 
 
+import org.finos.waltz.common.SetUtilities;
+import org.finos.waltz.data.involvement.InvolvementViewDao;
 import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.HierarchyDirection;
 import org.finos.waltz.service.involvement_kind.InvolvementKindService;
 import org.finos.waltz.service.person.PersonService;
 import org.finos.waltz.model.EntityReference;
@@ -24,15 +27,18 @@ public class InvolvementViewService {
     private final InvolvementService involvementService;
     private final InvolvementKindService involvementKindService;
     private final PersonService personService;
+    private final InvolvementViewDao involvementViewDao;
 
     @Autowired
     public InvolvementViewService(InvolvementService involvementService,
                                   InvolvementKindService involvementKindService,
-                                  PersonService personService){
+                                  PersonService personService,
+                                  InvolvementViewDao involvementViewDao) {
 
         this.involvementService = involvementService;
         this.involvementKindService = involvementKindService;
         this.personService = personService;
+        this.involvementViewDao = involvementViewDao;
     }
 
 
@@ -49,7 +55,9 @@ public class InvolvementViewService {
                 .map(d -> {
                     Person person = peopleByEmployeeId.getOrDefault(d.employeeId(), null);
 
-                    if (person == null) {return null;}
+                    if (person == null) {
+                        return null;
+                    }
 
                     return mkInvolvementViewItem(d, person);
                 })
@@ -79,14 +87,16 @@ public class InvolvementViewService {
     }
 
 
-    private InvolvementViewItem mkInvolvementViewItem(Involvement involvement, Person person) {
+    private InvolvementViewItem mkInvolvementViewItem(Involvement involvement,
+                                                      Person person) {
         return ImmutableInvolvementViewItem.builder()
                 .involvement(involvement)
                 .person(person)
                 .build();
     }
 
-    public Set<InvolvementViewItem> findByKindIdAndEntityKind(long id, EntityKind kind) {
+    public Set<InvolvementViewItem> findByKindIdAndEntityKind(long id,
+                                                              EntityKind kind) {
         Set<Involvement> involvements = involvementService.findByKindIdAndEntityKind(id, kind);
 
         Set<String> employeeIds = map(involvements, Involvement::employeeId);
@@ -107,4 +117,17 @@ public class InvolvementViewService {
                 .filter(Objects::nonNull)
                 .collect(toSet());
     }
+
+
+    public InvolvementDetailByDirectionResults findAllInvolvements(EntityReference ref) {
+        Map<HierarchyDirection, ? extends Collection<InvolvementDetail>> byDirection = involvementViewDao.findAllInvolvements(ref);
+
+        return ImmutableInvolvementDetailByDirectionResults
+                .builder()
+                .ancestors(SetUtilities.fromCollection(byDirection.get(HierarchyDirection.ANCESTOR)))
+                .descendents(SetUtilities.fromCollection(byDirection.get(HierarchyDirection.DESCENDENT)))
+                .exact(SetUtilities.fromCollection(byDirection.get(HierarchyDirection.EXACT)))
+                .build();
+    }
+
 }

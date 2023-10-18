@@ -264,7 +264,7 @@ textarea {
     border: 1px solid #ccc;
     font-size: x-small;
     margin: auto;
-    padding: 0 3px 0 3px;
+    padding: 0 3px;
 }
 
 
@@ -316,7 +316,7 @@ textarea {
 
 .waltz-detail-callout {
     background-color: lighten($waltz-background-color, 0.5);
-    padding: 0 6px 4px 6px;
+    padding: 0 6px 4px;
     border-radius: 3px;
     border: 1px solid $waltz-border-color-lighter;
     @include waltz-box-shadow();
@@ -419,7 +419,7 @@ a.subtle-link:hover {
         width: 10px;
 
         :first-of-type(span) {
-            padding: 5px 5px;
+            padding: 5px;
         }
     }
 }

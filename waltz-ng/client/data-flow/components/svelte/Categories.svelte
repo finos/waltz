@@ -70,6 +70,7 @@
     <g transform={`translate(0, ${$categoryScale(category.id)})`}
        class="no-text-select category">
         <rect class="pill"
+              role="button"
               on:mouseenter={() => onMouseEnter(category)}
               on:mouseleave={() => onMouseLeave()}
               rx={dimensions.category.height / 2}
@@ -84,6 +85,7 @@
             <g transform={mkTranslateStr(downNavigationOffset)}
                class="navigation-control">
                 <path d={symbol().type(symbolCircle).size(500)()}
+                      role="button"
                       on:click|stopPropagation={() => navigateToCategory(category)}
                       on:keydown|stopPropagation={() => navigateToCategory(category)}
                       class="clickable navigation-circle">
@@ -99,6 +101,7 @@
             <g transform={mkTranslateStr(upNavigationOffset)}
                class="navigation-control">
                 <path d={symbol().type(symbolCircle).size(500)()}
+                      role="button"
                       on:click|stopPropagation={() => navigateToCategory($parentCategory)}
                       on:keydown|stopPropagation={() => navigateToCategory($parentCategory)}
                       class="clickable navigation-circle">

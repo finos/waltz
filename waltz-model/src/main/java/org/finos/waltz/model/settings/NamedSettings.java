@@ -18,8 +18,15 @@
 
 package org.finos.waltz.model.settings;
 
+import org.finos.waltz.model.scheduled_job.JobKey;
+
+import static java.lang.String.format;
+
 public interface NamedSettings {
     String authenticationFilter = "server.authentication.filter";
     String headerBasedAuthenticationFilterParam = "server.authentication.filter.headerbased.param";
     String externalAuthenticationEndpointUrl = "server.authentication.external.endpoint.url";
+    static String mkScheduledJobParamSetting(JobKey jobKey) {
+        return format("job.%s.params", jobKey.name());
+    }
 }

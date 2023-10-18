@@ -152,7 +152,8 @@ public class PhysicalFlowGenerator implements SampleDataGenerator {
         log(String.format("--- saving records: count: %s", flowBatch.size()));
         dsl.batchInsert(flowBatch).execute();
         flowBatch.clear();
-        log("---done");   return null;
+        log("---done");
+        return null;
     }
 
 

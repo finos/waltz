@@ -49,23 +49,23 @@ export function store($http, BaseApiUrl) {
 
 
 store.$inject = [
-    '$http',
-    'BaseApiUrl'
+    "$http",
+    "BaseApiUrl"
 ];
 
 
-export const serviceName = 'AliasStore';
+export const serviceName = "AliasStore";
 
 
 export const AliasStore_API = {
     update: {
         serviceName,
-        serviceFnName: 'update',
-        description: 'executes update'
+        serviceFnName: "update",
+        description: "executes update"
     },
     getForEntity: {
         serviceName,
-        serviceFnName: 'getForEntity',
-        description: 'executes getForEntity'
+        serviceFnName: "getForEntity",
+        description: "executes getForEntity"
     }
 };

@@ -24,7 +24,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.eclipse.jetty.http.MimeTypes;
+import org.finos.waltz.web.MimeTypes;
 import org.jooq.DSLContext;
 import org.jooq.JSONFormat;
 import org.jooq.Result;
@@ -40,7 +40,6 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.FunctionUtilities.time;
 
 
 public abstract class DirectQueryBasedDataExtractor implements DataExtractor {
@@ -86,7 +85,7 @@ public abstract class DirectQueryBasedDataExtractor implements DataExtractor {
 
     private String writeAsJson(Select<?> qry,
                                Response response) {
-        response.type(MimeTypes.Type.APPLICATION_JSON_UTF_8.name());
+        response.type(MimeTypes.APPLICATION_JSON_UTF_8);
         return query(dsl, qry)
                 .formatJSON(new JSONFormat()
                         .header(false)
@@ -97,7 +96,7 @@ public abstract class DirectQueryBasedDataExtractor implements DataExtractor {
     private Result<?> query(DSLContext dslContext, Select<?> qry){
         return dslContext == null
                 ? qry.fetch()
-                : time("fetch", () -> dslContext.fetch(dslContext.renderInlined(qry)));
+                : dslContext.fetch(dslContext.renderInlined(qry));
     }
 
 
@@ -109,24 +108,22 @@ public abstract class DirectQueryBasedDataExtractor implements DataExtractor {
         SXSSFWorkbook workbook = new SXSSFWorkbook(2000);
 
         for (Tuple2<String, Select<?>> sheetDef : sheetDefinitions) {
-            time("preparing excel sheet: " + sheetDef.v1, () -> {
-                SXSSFSheet sheet = workbook.createSheet(ExtractorUtilities.sanitizeSheetName(sheetDef.v1));
-                writeExcelHeader(sheetDef.v2, sheet);
-                time("writing body", () -> writeExcelBody(sheetDef.v2, sheet, dsl));
+            SXSSFSheet sheet = workbook.createSheet(ExtractorUtilities.sanitizeSheetName(sheetDef.v1));
+            writeExcelHeader(sheetDef.v2, sheet);
+            writeExcelBody(sheetDef.v2, sheet, dsl);
 
-                int endFilterColumnIndex = sheetDef.v2.fields().length == 0
-                        ? 0
-                        : sheetDef.v2.fields().length - 1;
+            int endFilterColumnIndex = sheetDef.v2.fields().length == 0
+                    ? 0
+                    : sheetDef.v2.fields().length - 1;
 
-                sheet.setAutoFilter(new CellRangeAddress(0, 0, 0, endFilterColumnIndex));
-                sheet.createFreezePane(0, 1);
-            });
+            sheet.setAutoFilter(new CellRangeAddress(0, 0, 0, endFilterColumnIndex));
+            sheet.createFreezePane(0, 1);
         }
 
-        return time("writing excel", Unchecked.supplier(() -> writeExcelToResponse(
+        return Unchecked.supplier(() -> writeExcelToResponse(
                 suggestedFilenameStem,
                 response,
-                workbook)));
+                workbook));
     }
 
 
@@ -174,7 +171,7 @@ public abstract class DirectQueryBasedDataExtractor implements DataExtractor {
                               Select<?> qry,
                               Response response) {
         String csv = qry.fetch().formatCSV();
-        response.type(MimeTypes.Type.TEXT_PLAIN.name());
+        response.type(MimeTypes.TEXT_PLAIN);
         response.header("Content-disposition", "attachment; filename=" + suggestedFilenameStem + ".csv");
         return csv;
     }
@@ -184,23 +181,22 @@ public abstract class DirectQueryBasedDataExtractor implements DataExtractor {
                                        SXSSFSheet sheet,
                                        DSLContext dsl) {
         AtomicInteger rowCounter = new AtomicInteger(1);
+
         Result<?> records = dsl == null
                 ? qry.fetch()
-                : time("fetch", () -> dsl.fetch(dsl.renderInlined(qry)));
+                : dsl.fetch(dsl.renderInlined(qry));
 
-        time("record chomper", () -> {
-            int colCount = qry.fields().length;
-            records.forEach(r -> {
-                int rowNum = rowCounter.getAndIncrement();
-                Row row = sheet.createRow(rowNum);
-                for (int col = 0; col < colCount; col++) {
-                    Cell cell = row.createCell(col);
-                    Object val = r.get(col);
-                    if (val != null) {
-                        cell.setCellValue(val.toString());
-                    }
+        int colCount = qry.fields().length;
+        records.forEach(r -> {
+            int rowNum = rowCounter.getAndIncrement();
+            Row row = sheet.createRow(rowNum);
+            for (int col = 0; col < colCount; col++) {
+                Cell cell = row.createCell(col);
+                Object val = r.get(col);
+                if (val != null) {
+                    cell.setCellValue(val.toString());
                 }
-            });
+            }
         });
     }
 

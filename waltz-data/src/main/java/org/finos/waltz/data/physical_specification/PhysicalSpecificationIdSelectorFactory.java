@@ -92,7 +92,6 @@ public class PhysicalSpecificationIdSelectorFactory implements IdSelectorFactory
                 .innerJoin(LOGICAL_FLOW).on(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID))
                 .where(isSourceOrTarget)
                 .and(lifecycleCondition);
-        ;
 
         SelectConditionStep<Record1<Long>> specsOwnedByApp = DSL
                 .select(PHYSICAL_SPECIFICATION.ID)

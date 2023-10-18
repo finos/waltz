@@ -29,7 +29,7 @@ public class BookmarkCreationAndRemovalIntegrationTest extends BasePlaywrightInt
 
 
     @BeforeEach
-    public void setupAssessmentData() throws IOException {
+    public void setupBookmarkData() throws IOException {
         appRef = appHelper.createNewApp(
                 mkName("test_app_bookmarks"),
                 10L);
@@ -43,7 +43,7 @@ public class BookmarkCreationAndRemovalIntegrationTest extends BasePlaywrightInt
 
 
     @Test
-    public void addAndRemoveAssessment() {
+    public void addAndRemoveBookmark() {
         createBookmark("Test bookmark");
         removeBookmark();
     }

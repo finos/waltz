@@ -31,7 +31,7 @@
 
     <groupId>org.finos</groupId>
     <artifactId>waltz</artifactId>
-    <version>1.53-SNAPSHOT</version>
+    <version>1.55-SNAPSHOT</version>
     <modules>
         <module>waltz-common</module>
         <module>waltz-model</module>
@@ -107,6 +107,7 @@
 
         <timestamp>${maven.build.timestamp}</timestamp>
         <playwright.skip>true</playwright.skip>
+        <jetty.version>9.4.48.v20220622</jetty.version>
     </properties>
 
 
@@ -132,6 +133,27 @@
                 <groupId>com.sparkjava</groupId>
                 <artifactId>spark-template-freemarker</artifactId>
                 <version>${spark-freemarker.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-util</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-io</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-webapp</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-server</artifactId>
+                <version>${jetty.version}</version>
             </dependency>
 
             <!-- json -->

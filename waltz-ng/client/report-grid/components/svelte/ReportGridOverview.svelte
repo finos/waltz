@@ -91,12 +91,12 @@
 
         let rmPromise = reportGridStore.remove(grid.id);
         Promise.resolve(rmPromise)
-            .then(r => {
+            .then(() => {
                 toasts.success("Grid removed successfully")
                 gridService.reset();
                 reportGridStore.findInfoForUser(true);
             })
-            .catch(e => toasts.error("Could not remove grid"));
+            .catch(e => toasts.error("Could not remove grid. " + e.error));
     }
 
     function saveReportGrid(grid) {

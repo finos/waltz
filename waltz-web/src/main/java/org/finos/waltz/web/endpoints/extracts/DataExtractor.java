@@ -1,6 +1,6 @@
 package org.finos.waltz.web.endpoints.extracts;
 
-import org.eclipse.jetty.http.MimeTypes;
+import org.finos.waltz.web.MimeTypes;
 import org.jooq.lambda.tuple.Tuple3;
 import spark.Request;
 import spark.Response;
@@ -42,11 +42,11 @@ public interface DataExtractor {
 
         switch (reportResult.v1) {
             case CSV:
-                response.type(MimeTypes.Type.TEXT_PLAIN.name());
+                response.type(MimeTypes.TEXT_PLAIN);
                 response.header("Content-disposition", "attachment; filename=" + templateName + ".csv");
                 break;
             case JSON:
-                httpResponse.setHeader("Content-Type", MimeTypes.Type.APPLICATION_JSON_UTF_8.name());
+                httpResponse.setHeader("Content-Type", MimeTypes.APPLICATION_JSON_UTF_8);
                 break;
             case XLSX:
                 httpResponse.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");

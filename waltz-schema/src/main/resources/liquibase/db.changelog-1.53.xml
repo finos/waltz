@@ -437,4 +437,33 @@
     </changeSet>
 
 
+    <changeSet id="20230901-6728-26"
+               author="davidwatkins73">
+        <comment>6728: Fix the default value</comment>
+
+        <dropDefaultValue tableName="cost_kind"
+                          columnName="subject_kind"/>
+
+        <addDefaultValue tableName="cost_kind"
+                         columnName="subject_kind"
+                         defaultValue="APPLICATION"/>
+    </changeSet>
+
+    <changeSet id="20230901-6728-27"
+               author="davidwatkins73">
+        <comment>6728: Fix the default value</comment>
+        <update tableName="cost_kind">
+            <column name="subject_kind"
+                    value="APPLICATION"/>
+            <where>subject_kind like '%APPLICATION%'</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="20230901-6728-28"
+               author="davidwatkins73">
+        <comment>6728: Fix the default value</comment>
+        <setColumnRemarks tableName="cost_kind" columnName="subject_kind" remarks="the kind of subject that this cost is related to, e.g. APPLICATION, MEASURABLE_RATING, etc."/>
+    </changeSet>
+
+
 </databaseChangeLog>

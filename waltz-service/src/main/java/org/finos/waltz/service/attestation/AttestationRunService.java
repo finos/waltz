@@ -19,19 +19,33 @@
 package org.finos.waltz.service.attestation;
 
 
-import org.finos.waltz.model.involvement_group.ImmutableInvolvementGroup;
-import org.finos.waltz.model.involvement_group.ImmutableInvolvementGroupCreateCommand;
-import org.finos.waltz.model.involvement_group.InvolvementGroup;
-import org.finos.waltz.model.involvement_group.InvolvementGroupCreateCommand;
-import org.finos.waltz.service.email.EmailService;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.attestation.AttestationInstanceDao;
 import org.finos.waltz.data.attestation.AttestationInstanceRecipientDao;
 import org.finos.waltz.data.attestation.AttestationRunDao;
 import org.finos.waltz.data.involvement.InvolvementDao;
-import org.finos.waltz.model.*;
-import org.finos.waltz.model.attestation.*;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdCommandResponse;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.ImmutableIdCommandResponse;
+import org.finos.waltz.model.attestation.AttestEntityCommand;
+import org.finos.waltz.model.attestation.AttestationCreateSummary;
+import org.finos.waltz.model.attestation.AttestationInstance;
+import org.finos.waltz.model.attestation.AttestationInstanceRecipient;
+import org.finos.waltz.model.attestation.AttestationRun;
+import org.finos.waltz.model.attestation.AttestationRunCreateCommand;
+import org.finos.waltz.model.attestation.AttestationRunRecipient;
+import org.finos.waltz.model.attestation.AttestationRunResponseSummary;
+import org.finos.waltz.model.attestation.ImmutableAttestationCreateSummary;
+import org.finos.waltz.model.attestation.ImmutableAttestationInstance;
+import org.finos.waltz.model.attestation.ImmutableAttestationInstanceRecipient;
+import org.finos.waltz.model.attestation.ImmutableAttestationRunCreateCommand;
+import org.finos.waltz.model.involvement_group.ImmutableInvolvementGroup;
+import org.finos.waltz.model.involvement_group.ImmutableInvolvementGroupCreateCommand;
+import org.finos.waltz.model.involvement_group.InvolvementGroup;
+import org.finos.waltz.model.involvement_group.InvolvementGroupCreateCommand;
 import org.finos.waltz.model.person.Person;
 import org.finos.waltz.service.involvement_group.InvolvementGroupService;
 import org.jooq.Record1;
@@ -40,7 +54,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.groupingBy;
@@ -49,7 +67,6 @@ import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.asList;
 import static org.finos.waltz.common.ListUtilities.isEmpty;
 import static org.finos.waltz.common.SetUtilities.asSet;
-import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 import static org.finos.waltz.model.attestation.AttestationStatus.ISSUED;
 import static org.finos.waltz.model.attestation.AttestationStatus.ISSUING;
@@ -61,7 +78,6 @@ public class AttestationRunService {
     private final AttestationInstanceDao attestationInstanceDao;
     private final AttestationInstanceRecipientDao attestationInstanceRecipientDao;
     private final AttestationRunDao attestationRunDao;
-    private final EmailService emailService;
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
     private final InvolvementDao involvementDao;
     private final InvolvementGroupService involvementGroupService;
@@ -70,19 +86,16 @@ public class AttestationRunService {
     public AttestationRunService(AttestationInstanceDao attestationInstanceDao,
                                  AttestationInstanceRecipientDao attestationInstanceRecipientDao,
                                  AttestationRunDao attestationRunDao,
-                                 EmailService emailService,
                                  InvolvementDao involvementDao, InvolvementGroupService involvementGroupService) {
         checkNotNull(attestationInstanceRecipientDao, "attestationInstanceRecipientDao cannot be null");
         checkNotNull(attestationInstanceDao, "attestationInstanceDao cannot be null");
         checkNotNull(attestationRunDao, "attestationRunDao cannot be null");
-        checkNotNull(emailService, "emailService cannot be null");
         checkNotNull(involvementDao, "involvementDao cannot be null");
         checkNotNull(involvementGroupService, "involvementGroupService cannot be null");
 
         this.attestationInstanceDao = attestationInstanceDao;
         this.attestationInstanceRecipientDao = attestationInstanceRecipientDao;
         this.attestationRunDao = attestationRunDao;
-        this.emailService = emailService;
         this.involvementDao = involvementDao;
         this.involvementGroupService = involvementGroupService;
     }
@@ -160,10 +173,6 @@ public class AttestationRunService {
 
         // store
         createAttestationInstancesAndRecipients(instanceRecipients);
-
-        if (command.sendEmailNotifications()){
-            emailService.sendEmailNotification(mkRef(EntityKind.ATTESTATION_RUN, runId));
-        }
 
         return ImmutableIdCommandResponse.builder()
                 .id(runId)
@@ -323,5 +332,10 @@ public class AttestationRunService {
 
         long recipientInvGroupId = involvementGroupService.createGroup(recipientsCmd, userName);
         attestationRunDao.updateRecipientInvolvementGroupId(runId, recipientInvGroupId);
+    }
+
+
+    public Set<AttestationRunRecipient> findRunRecipients(long runId) {
+        return attestationRunDao.findRunRecipients(runId);
     }
 }

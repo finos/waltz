@@ -82,7 +82,6 @@ public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
                 .addInvolvementKindIds(invId)
                 .name("basicRunCreation Name")
                 .description("basicRunCreation Desc")
-                .sendEmailNotifications(false)
                 .build();
 
         String user = mkUserId("ast");
@@ -118,13 +117,12 @@ public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
                 .addInvolvementKindIds(invId)
                 .name(mkName("basicRetrieval"))
                 .description("basicRetrieval Desc")
-                .sendEmailNotifications(false)
                 .build();
 
         String user = mkUserId("ast");
         long pId = personHelper.createPerson(mkName("basicRetrieval"));
         involvementHelper.createInvolvement(pId, invId, appRef);
-        IdCommandResponse response = arSvc.create(user, cmd);
+        arSvc.create(user, cmd);
         arSvc.issueInstancesForPendingRuns();
 
         System.out.println("-------------");
@@ -179,7 +177,6 @@ public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
                 .addInvolvementKindIds(invId)
                 .name("runCreationPreview Name")
                 .description("runCreationPreview Desc")
-                .sendEmailNotifications(false)
                 .build();
 
         AttestationCreateSummary summary = arSvc.getCreateSummary(cmd);

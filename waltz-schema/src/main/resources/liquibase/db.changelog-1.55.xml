@@ -15,20 +15,14 @@
   ~ See the License for the specific
   ~
   -->
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="db.changelog-1.55.xml">
 
-<div>
-    <waltz-page-header icon="cog" name="Settings">
-        <breadcrumbs>
-            <ol class="waltz-breadcrumbs">
-                <li><a ui-sref="main">Home</a></li>
-                <li><a ui-sref="main.system.list">System Admin</a></li>
-                <li>Settings</li>
-            </ol>
-        </breadcrumbs>
-    </waltz-page-header>
+    <changeSet id="v1-54-tag"
+               author="davidwatkins73">
+        <tagDatabase tag="v1.54"/> <!-- tag the current db version, i.e. the last  -->
+    </changeSet>
 
-    <div class="waltz-page-summary waltz-page-summary-attach">
-        <waltz-svelte-component component="$ctrl.SettingsPanel">
-        </waltz-svelte-component>
-    </div>
-</div>
+</databaseChangeLog>

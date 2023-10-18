@@ -46,13 +46,50 @@
         </div>
 
         <div class="row">
-            <div class="col-sm-3 waltz-display-field-label">
+            <div class="col-sm-2 waltz-display-field-label">
                 Group Description
             </div>
-            <div class="col-sm-9">
+            <div class="col-sm-10">
                 <waltz-markdown inline="true"
                                 text="$ctrl.appGroup.description">
                 </waltz-markdown>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Aliases
+            </div>
+            <div class="col-sm-10 waltz-alias-list">
+                <waltz-keyword-list ng-if="!$ctrl.visibility.aliasEditor"
+                                    keywords="$ctrl.aliases">
+                    <last ng-if="$ctrl.editable">
+                        <span class="small">
+                            <a ng-click="$ctrl.showAliasEditor()"
+                               data-testid="edit-aliases"
+                               class="clickable">
+                                update
+                            </a>
+                        </span>
+                    </last>
+                    <empty>
+                        <i class="text-muted">
+                            No aliases defined
+                            <a class="clickable"
+                               ng-if="$ctrl.editable"
+                               data-testid="edit-aliases"
+                               ng-click="$ctrl.showAliasEditor()">
+                                , add one.
+                            </a>
+                        </i>
+                    </empty>
+                </waltz-keyword-list>
+
+                <waltz-keyword-edit ng-if="$ctrl.visibility.aliasEditor"
+                                    keywords="$ctrl.aliases"
+                                    on-save="$ctrl.saveAliases"
+                                    on-cancel="$ctrl.dismissAliasEditor">
+                </waltz-keyword-edit>
             </div>
         </div>
 

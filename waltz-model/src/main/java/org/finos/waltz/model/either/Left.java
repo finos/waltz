@@ -14,6 +14,12 @@ abstract class Left<L, R> extends Either<L, R> {
     @Override
     public abstract L left();
 
-    public boolean isRight() { return false; };
-    public boolean isLeft() { return true; };
+    public boolean isRight() {
+        return false;
+    }
+
+
+    public boolean isLeft() {
+        return true;
+    }
 }

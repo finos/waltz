@@ -42,6 +42,7 @@
             <div class="col-md-12">
                 <waltz-section-actions>
                     <button waltz-has-role="{{ctrl.definition.permittedRole}}"
+                            ng-if="ctrl.allowBulkEditing"
                             class="btn btn-xs btn-primary"
                             ui-sref="main.assessment-definition.edit ({id: ctrl.definition.id})">
                         Bulk Edit

@@ -78,7 +78,10 @@
             <div>
                 <h4>
                     Active Users
-                    <small>in the last <span ng-bind="ctrl.selectedDuration"></span> minutes</small>
+                    <small>
+                        in the last <span ng-bind="ctrl.selectedDuration"></span> minutes
+                        (# <span ng-bind="ctrl.activeUsers.length"></span>)
+                    </small>
                 </h4>
 
                 <div ng-if="ctrl.activeUsers.length > 0" class="waltz-user-log-scroll">

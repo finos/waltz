@@ -18,10 +18,7 @@
 
 package org.finos.waltz.service.cost;
 
-import org.finos.waltz.common.ArrayUtilities;
 import org.finos.waltz.common.DateTimeUtilities;
-import org.finos.waltz.common.ListUtilities;
-import org.finos.waltz.common.MapUtilities;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.cost.AllocatedCostDefinitionDao;
@@ -42,17 +39,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Comparator;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Comparator.comparingInt;
 import static java.util.Optional.ofNullable;
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.FunctionUtilities.time;
 import static org.finos.waltz.common.MapUtilities.indexBy;
 
 @Service
@@ -103,28 +96,25 @@ public class CostService {
 
         GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, selectionOptions);
 
-        Set<EntityCost> topCosts = time(
-                "topCosts: "+selectionOptions.entityReference(),
-                () -> costDao.findTopCostsForCostKindAndSelector(
+        Set<EntityCost> topCosts = costDao
+                .findTopCostsForCostKindAndSelector(
                         costKindId,
                         year,
                         genericSelector,
-                        limit));
+                        limit);
 
 
-        BigDecimal totalCost = time(
-                "totalCosts: "+selectionOptions.entityReference(),
-                () -> costDao.getTotalForKindAndYearBySelector(
+        BigDecimal totalCost = costDao
+                .getTotalForKindAndYearBySelector(
                         costKindId,
                         year,
-                        genericSelector));
+                        genericSelector);
 
-        Tuple2<Integer, Integer> mappedAndMissingCounts = time(
-                "missingCosts: "+selectionOptions.entityReference(),
-                () -> costDao.getMappedAndMissingCountsForKindAndYearBySelector(
+        Tuple2<Integer, Integer> mappedAndMissingCounts = costDao
+                .getMappedAndMissingCountsForKindAndYearBySelector(
                         costKindId,
                         year,
-                        genericSelector));
+                        genericSelector);
 
         return ImmutableEntityCostsSummary
                 .builder()

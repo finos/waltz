@@ -71,7 +71,7 @@
             $rainbowTipProportion = 0.35;
 
             selectAll(`.arc.showing.highlight`)
-                .each(function(d, i){
+                .each(function() {
                     const elem = select(this);
                     const arcId = elem.attr("data-arc-id");
                     const isLinear = elem.attr("linear");
@@ -79,7 +79,7 @@
                 });
         } else {
             selectAll(`.arc.showing.highlight`)
-                .each(function(d, i){
+                .each(function() {
                     const elem = select(this);
                     const arcId = elem.attr("data-arc-id");
                     const isLinear = elem.attr("linear");
@@ -146,10 +146,10 @@
         <!-- DYNAMIC -->
         <linearGradient id={`dynamic_grad_${def.defId}`} gradientUnits="objectBoundingBox">
             {#each reverse(def.colorStops) as colorStop}
-                <stop stop-color={colorStop.color} offset={(0 + $rainbowTipProportion) - colorStop.offsetEnd * $rainbowTipProportion}/>
-                <stop stop-color={colorStop.color} offset={(0 + $rainbowTipProportion) - colorStop.offsetStart * $rainbowTipProportion}/>
+                <stop stop-color={colorStop.color} offset={($rainbowTipProportion) - colorStop.offsetEnd * $rainbowTipProportion}/>
+                <stop stop-color={colorStop.color} offset={($rainbowTipProportion) - colorStop.offsetStart * $rainbowTipProportion}/>
             {/each}
-            <stop stop-color={def.color} offset={0 + $rainbowTipProportion}/> <!-- middle of bar is solid color -->
+            <stop stop-color={def.color} offset={$rainbowTipProportion}/> <!-- middle of bar is solid color -->
             <stop stop-color={def.color} offset={1 - $rainbowTipProportion}/> <!-- rainbow tip - main color - rainbow tip -->
             {#each def.colorStops as colorStop}
                 <stop stop-color={colorStop.color} offset={(1 - $rainbowTipProportion) + colorStop.offsetStart * $rainbowTipProportion}/>
@@ -158,8 +158,8 @@
         </linearGradient>
         <linearGradient id={`dynamic_linear_grad_${def.defId}`} gradientUnits="userSpaceOnUse">
             {#each reverse(def.colorStops) as colorStop}
-                <stop stop-color={colorStop.color} offset={(0 + $rainbowTipProportion + 0.08) - colorStop.offsetEnd * ($rainbowTipProportion + 0.08)}/>
-                <stop stop-color={colorStop.color} offset={(0 + $rainbowTipProportion + 0.08) - colorStop.offsetStart * ($rainbowTipProportion + 0.08)}/>
+                <stop stop-color={colorStop.color} offset={($rainbowTipProportion + 0.08) - colorStop.offsetEnd * ($rainbowTipProportion + 0.08)}/>
+                <stop stop-color={colorStop.color} offset={($rainbowTipProportion + 0.08) - colorStop.offsetStart * ($rainbowTipProportion + 0.08)}/>
             {/each}
             <stop stop-color={def.color} offset={0 + $rainbowTipProportion + 0.1}/> <!-- middle of bar is solid color -->
             <stop stop-color={def.color} offset={1 - $rainbowTipProportion - 0.1}/> <!-- rainbow tip - main color - rainbow tip -->

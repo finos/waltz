@@ -18,6 +18,7 @@
 
 package org.finos.waltz.data.app_group;
 
+import org.finos.waltz.data.JooqUtilities;
 import org.finos.waltz.data.SearchDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -56,6 +57,7 @@ import static org.finos.waltz.schema.Tables.ENTITY_HIERARCHY;
 import static org.finos.waltz.schema.Tables.ENTITY_RELATIONSHIP;
 import static org.finos.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
 import static org.finos.waltz.schema.tables.ApplicationGroupMember.APPLICATION_GROUP_MEMBER;
+import static org.finos.waltz.schema.tables.EntityAlias.ENTITY_ALIAS;
 import static org.finos.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 
 @Repository
@@ -213,26 +215,52 @@ public class AppGroupDao implements SearchDao<AppGroup> {
         }
 
         Condition nameCondition = mkBasicTermSearch(APPLICATION_GROUP.NAME, terms);
+        Condition aliasCondition = ENTITY_ALIAS.KIND.eq(EntityKind.APP_GROUP.name())
+                .and(JooqUtilities.mkBasicTermSearch(ENTITY_ALIAS.ALIAS, terms));
+
+        Condition publicGroupCondition = APPLICATION_GROUP.KIND.eq(AppGroupKind.PUBLIC.name())
+                .and(notRemoved);
+
+        Select<Record1<Long>> userGroupIds = findGroupsOwnedByUser(options.userId());
+
+        Condition privateGroupCondition = APPLICATION_GROUP.ID.in(userGroupIds)
+                .and(APPLICATION_GROUP.KIND.eq(AppGroupKind.PRIVATE.name()))
+                .and(notRemoved);
 
         Select<Record> publicGroups = dsl
                 .select(APPLICATION_GROUP.fields())
                 .from(APPLICATION_GROUP)
-                .where(APPLICATION_GROUP.KIND.eq(AppGroupKind.PUBLIC.name())
-                    .and(nameCondition))
-                    .and(notRemoved);
-
-        Select<Record1<Long>> userGroupIds = findGroupsOwnedByUser(options.userId());
+                .where(publicGroupCondition
+                        .and(nameCondition));
 
         Select<Record> privateGroups = dsl
                 .select(APPLICATION_GROUP.fields())
                 .from(APPLICATION_GROUP)
-                .where(APPLICATION_GROUP.ID.in(userGroupIds)
-                    .and(APPLICATION_GROUP.KIND.eq(AppGroupKind.PRIVATE.name()))
-                    .and(nameCondition))
-                    .and(notRemoved);
+                .where(privateGroupCondition
+                    .and(nameCondition));
 
-        return privateGroups
+        SelectConditionStep<Record> publicGroupsViaAlias = dsl
+                .select(APPLICATION_GROUP.fields())
+                .from(APPLICATION_GROUP)
+                .innerJoin(ENTITY_ALIAS)
+                .on(ENTITY_ALIAS.ID.eq(APPLICATION_GROUP.ID))
+                .where(publicGroupCondition)
+                .and(aliasCondition);
+
+        SelectConditionStep<Record> privateGroupsViaAlias = dsl
+                .select(APPLICATION_GROUP.fields())
+                .from(APPLICATION_GROUP)
+                .innerJoin(ENTITY_ALIAS)
+                .on(ENTITY_ALIAS.ID.eq(APPLICATION_GROUP.ID))
+                .where(privateGroupCondition)
+                .and(aliasCondition);
+
+        Select<Record> searchQry = privateGroups
                 .unionAll(publicGroups)
+                .unionAll(privateGroupsViaAlias)
+                .unionAll(publicGroupsViaAlias);
+
+        return searchQry
                 .fetch(TO_DOMAIN)
                 .stream()
                 .limit(options.limit())

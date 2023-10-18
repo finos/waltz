@@ -19,21 +19,16 @@
 package org.finos.waltz.web.endpoints.extracts;
 
 
-import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
+import org.finos.waltz.data.involvement.InvolvementViewDao;
 import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.HierarchyQueryScope;
-import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.web.WebUtilities;
 import org.jooq.DSLContext;
-import org.jooq.Record5;
-import org.jooq.SelectSeekStep1;
+import org.jooq.Record;
+import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static org.finos.waltz.schema.Tables.*;
-import static org.finos.waltz.web.WebUtilities.getEntityReference;
-import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 import static spark.Spark.post;
 
 
@@ -52,29 +47,16 @@ public class PeopleExtractor extends DirectQueryBasedDataExtractor {
 
     @Override
     public void register() {
-        registerExtractForApp( WebUtilities.mkPath("data-extract", "people", "entity", ":kind", ":id"));
+        registerExtractForEntity( WebUtilities.mkPath("data-extract", "people", "entity", ":kind", ":id"));
     }
 
 
-    private void registerExtractForApp(String path) {
+    private void registerExtractForEntity(String path) {
         post(path, (request, response) -> {
 
             EntityReference entityRef = WebUtilities.getEntityReference(request);
-            IdSelectionOptions selectionOptions = mkOpts(entityRef, HierarchyQueryScope.determineUpwardsScopeForKind(entityRef.kind()));
-            GenericSelector selector = genericSelectorFactory.apply(selectionOptions);
 
-            SelectSeekStep1<Record5<String, String, String, String, String>, String> qry = dsl
-                    .select(PERSON.DISPLAY_NAME.as("Name"),
-                            PERSON.TITLE.as("Title"),
-                            PERSON.OFFICE_PHONE.as("Telephone"),
-                            PERSON.EMAIL.as("Email"),
-                            INVOLVEMENT_KIND.NAME.as("Role"))
-                    .from(PERSON)
-                    .innerJoin(INVOLVEMENT).on(INVOLVEMENT.EMPLOYEE_ID.eq(PERSON.EMPLOYEE_ID))
-                    .innerJoin(INVOLVEMENT_KIND).on(INVOLVEMENT_KIND.ID.eq(INVOLVEMENT.KIND_ID))
-                    .where(INVOLVEMENT.ENTITY_ID.in(selector.selector())
-                            .and(INVOLVEMENT.ENTITY_KIND.eq(selector.kind().name())))
-                    .orderBy(PERSON.DISPLAY_NAME);
+            Select<Record> qry = InvolvementViewDao.mkInvolvementExtractorQuery(dsl, entityRef);
 
             return writeExtract(
                     "involved_people",

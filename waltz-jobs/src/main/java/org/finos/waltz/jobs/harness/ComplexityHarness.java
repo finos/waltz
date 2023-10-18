@@ -19,20 +19,23 @@
 package org.finos.waltz.jobs.harness;
 
 import org.finos.waltz.service.DIConfiguration;
-import org.finos.waltz.service.email.WaltzEmailer;
-import org.jooq.tools.json.ParseException;
+import org.finos.waltz.service.complexity.ComplexityService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 
-public class EmailNotificationHarness {
+public class ComplexityHarness {
 
-    public static void main(String[] args) throws ParseException {
+    public static void main(String[] args) {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
-        WaltzEmailer emailer = ctx.getBean(WaltzEmailer.class);
+        ComplexityService svc = ctx.getBean(ComplexityService.class);
 
-        emailer.sendEmail("test", "this is a body", new String[] { "kamran.saleem@db.com"});
+        svc.populateMeasurableComplexities();
+
+        System.out.println("done");
+
     }
+
 
 }

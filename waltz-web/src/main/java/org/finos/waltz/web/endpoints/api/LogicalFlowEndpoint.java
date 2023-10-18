@@ -98,6 +98,7 @@ public class LogicalFlowEndpoint implements Endpoint {
         String findUpstreamFlowsForEntityReferencesPath = mkPath(BASE_URL, "find-upstream-flows");
         String getByIdPath = mkPath(BASE_URL, ":id");
         String removeFlowPath = mkPath(BASE_URL, ":id");
+        String restoreFlowPath = mkPath(BASE_URL, ":id", "restore");
         String cleanupOrphansPath = mkPath(BASE_URL, "cleanup-orphans");
         String cleanupSelfReferencesPath = mkPath(BASE_URL, "cleanup-self-references");
         String addFlowPath = mkPath(BASE_URL);
@@ -161,6 +162,7 @@ public class LogicalFlowEndpoint implements Endpoint {
         deleteForDatum(removeFlowPath, this::removeFlowRoute);
         postForDatum(addFlowPath, this::addFlowRoute);
         postForList(addFlowsPath, this::addFlowsRoute);
+        putForDatum(restoreFlowPath, this::restoreFlowRoute);
     }
 
 
@@ -236,6 +238,18 @@ public class LogicalFlowEndpoint implements Endpoint {
         LOG.info("User: {} removing logical flow: {}", username, flowId);
 
         return logicalFlowService.removeFlow(flowId, username);
+    }
+
+
+    private boolean restoreFlowRoute(Request request, Response response) {
+
+        long flowId = getId(request);
+        String username = getUsername(request);
+        ensureUserHasEditRights(flowId, username);
+
+        LOG.info("User: {} restoring logical flow: {}", username, flowId);
+
+        return logicalFlowService.restoreFlow(flowId, username);
     }
 
 

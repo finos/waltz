@@ -104,7 +104,7 @@
                 <div class="row">
                     <div class="col-md-7">
                         <textarea id="row-data"
-                                  placeholder="username, role"
+                                  placeholder="username, role, comment"
                                   bind:value={rowData}
                                   cols="120"
                                   class="form-control"
@@ -112,15 +112,15 @@
                     </div>
                     <div class="col-md-5">
                         <div class="help-block">
-                            Each row should reflect a user/role combination, using either commas or tabs as delimiters.
+                            Each row should reflect a user/role/comment combination, using either commas or tabs as delimiters.
                             For example:
                         </div>
 
                         <pre style="white-space: pre-line">
-                            username, role
-                            test.user@somewhere.com, BOOKMARK_EDITOR
-                            test.user@somewhere.com, ADMIN
-                            another.user@somewhere.com, ADMIN
+                            username, role, comment
+                            test.user@somewhere.com, BOOKMARK_EDITOR, comment
+                            test.user@somewhere.com, ADMIN, comment
+                            another.user@somewhere.com, ADMIN, comment
                         </pre>
 
                     </div>
@@ -168,12 +168,15 @@
                 <tr>
                     <th>Username</th>
                     <th>Role</th>
+                    <th>Comment</th>
                 </tr>
                 </thead>
                 <tbody>
                 {#each preview as row}
                     {@const okUser = !_.isNil(row.resolvedUser)}
                     {@const okRole = !_.isNil(row.resolvedRole)}
+                    {@const okComment = !_.isNil(row.resolvedComment)}
+
                     <tr>
                         <td class:danger={!okUser}
                             class:success={okUser}>
@@ -184,6 +187,11 @@
                             class:success={okRole}>
                             {row.givenRole}
                             <Icon name={okRole ? "check" : "exclamation-triangle"}/>
+                        </td>
+                        <td class:danger={!okComment}
+                            class:success={okComment}>
+                            {row.givenComment}
+                            <Icon name={okComment ? "check" : "exclamation-triangle"}/>
                         </td>
                     </tr>
                 {/each}

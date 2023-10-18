@@ -18,6 +18,7 @@
 
 package org.finos.waltz.data.attestation;
 
+import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.data.involvement_group.InvolvementGroupDao;
 import org.finos.waltz.model.EntityKind;
@@ -26,22 +27,27 @@ import org.finos.waltz.model.HierarchyQueryScope;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.attestation.AttestationRun;
 import org.finos.waltz.model.attestation.AttestationRunCreateCommand;
+import org.finos.waltz.model.attestation.AttestationRunRecipient;
 import org.finos.waltz.model.attestation.AttestationRunResponseSummary;
 import org.finos.waltz.model.attestation.AttestationStatus;
 import org.finos.waltz.model.attestation.ImmutableAttestationRun;
+import org.finos.waltz.model.attestation.ImmutableAttestationRunRecipient;
 import org.finos.waltz.model.attestation.ImmutableAttestationRunResponseSummary;
 import org.finos.waltz.schema.tables.records.AttestationRunRecord;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.Record1;
+import org.jooq.Record3;
 import org.jooq.RecordMapper;
 import org.jooq.Select;
+import org.jooq.SelectHavingStep;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -80,7 +86,6 @@ public class AttestationRunDao {
             .when(ATTESTATION_INSTANCE.ATTESTED_BY.isNull(), DSL.val(1))
             .otherwise(DSL.val(0))).as("Pending");
 
-    private static final String ID_SEPARATOR = ";";
 
     private static AttestationRun mkAttestationRun(Record r, Map<Long, List<Long>> attestationInvolvementGroupKindIds) {
 
@@ -188,7 +193,8 @@ public class AttestationRunDao {
 
         Map<Long, List<Long>> involvementsByGroupId = InvolvementGroupDao.findAllInvolvementsByGroupId(dsl);
 
-        return dsl.select(ATTESTATION_RUN.fields())
+        return dsl
+                .select(ATTESTATION_RUN.fields())
                 .select(ENTITY_NAME_FIELD)
                 .select(ATTESTED_ENTITY_NAME_FIELD)
                 .from(ATTESTATION_RUN)
@@ -289,13 +295,6 @@ public class AttestationRunDao {
         }
     }
 
-    public Long getRecipientInvolvementGroupId(long attestationRunId) {
-        return dsl
-                .select(ATTESTATION_RUN.RECIPIENT_INVOLVEMENT_GROUP_ID)
-                .from(ATTESTATION_RUN)
-                .where(ATTESTATION_RUN.ID.eq(attestationRunId))
-                .fetchOne(ATTESTATION_RUN.RECIPIENT_INVOLVEMENT_GROUP_ID);
-    }
 
     public int updateRecipientInvolvementGroupId(long attestationRunId, Long recipientInvGroupId) {
         return dsl
@@ -304,4 +303,58 @@ public class AttestationRunDao {
                 .where(ATTESTATION_RUN.ID.eq(attestationRunId))
                 .execute();
     }
+
+
+    public Set<AttestationRunRecipient> findRunRecipients(long runId) {
+
+        Field<Boolean> isPendingField = DSL
+            .nvl2(
+                ATTESTATION_INSTANCE.ATTESTED_AT,
+                DSL.value(false),
+                DSL.value(true))
+            .as("isPending");
+
+        SelectHavingStep<Record3<String, Boolean, Integer>> qry = dsl
+                .select(ATTESTATION_INSTANCE_RECIPIENT.USER_ID,
+                        isPendingField,
+                        DSL.count())
+                .from(ATTESTATION_RUN)
+                .innerJoin(ATTESTATION_INSTANCE)
+                .on(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID.eq(ATTESTATION_RUN.ID))
+                .innerJoin(ATTESTATION_INSTANCE_RECIPIENT)
+                .on(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID.eq(ATTESTATION_INSTANCE.ID))
+                .where(ATTESTATION_RUN.ID.eq(runId))
+                .groupBy(ATTESTATION_INSTANCE_RECIPIENT.USER_ID, isPendingField);
+
+        Map<String, ImmutableAttestationRunRecipient> recipientsByUserId = new HashMap<>();
+
+        qry.fetch().forEach(r -> {
+            String userId = r.get(ATTESTATION_INSTANCE_RECIPIENT.USER_ID);
+            boolean isPending = r.get(isPendingField);
+            int count = r.get(DSL.count());
+
+            ImmutableAttestationRunRecipient recipient = recipientsByUserId.getOrDefault(
+                    userId,
+                    ImmutableAttestationRunRecipient.builder()
+                        .userId(userId)
+                        .pendingCount(0)
+                        .completedCount(0)
+                        .build());
+
+            if (isPending) {
+                recipient = ImmutableAttestationRunRecipient
+                        .copyOf(recipient)
+                        .withPendingCount(count);
+            } else {
+                recipient = ImmutableAttestationRunRecipient
+                        .copyOf(recipient)
+                        .withCompletedCount(count);
+            }
+
+            recipientsByUserId.put(userId, recipient);
+        });
+
+        return SetUtilities.fromCollection(recipientsByUserId.values());
+    }
+
 }

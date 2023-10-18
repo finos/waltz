@@ -18,27 +18,24 @@
 
 package org.finos.waltz.service.user;
 
-import org.finos.waltz.data.role.RoleDao;
-import org.finos.waltz.data.user.UserDao;
-import org.finos.waltz.model.bulk_upload.BulkUploadMode;
-import org.finos.waltz.model.role.Role;
-import org.finos.waltz.model.user.BulkUserOperationRowPreview;
-import org.finos.waltz.model.user.ImmutableBulkUserOperationRowPreview;
-import org.finos.waltz.service.changelog.ChangeLogService;
-import org.finos.waltz.service.person.PersonService;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.common.StringUtilities;
+import org.finos.waltz.data.person.PersonDao;
+import org.finos.waltz.data.role.RoleDao;
 import org.finos.waltz.data.user.UserRoleDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.Severity;
+import org.finos.waltz.model.bulk_upload.BulkUploadMode;
+import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.person.Person;
-import org.finos.waltz.model.user.ImmutableUser;
-import org.finos.waltz.model.user.SystemRole;
-import org.finos.waltz.model.user.UpdateRolesCommand;
-import org.finos.waltz.model.user.User;
+import org.finos.waltz.model.role.Role;
+import org.finos.waltz.model.user.*;
+import org.finos.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.service.person.PersonService;
 import org.jooq.lambda.tuple.Tuple2;
+import org.jooq.lambda.tuple.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,10 +45,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.CollectionUtilities.sort;
@@ -76,9 +73,8 @@ public class UserRoleService {
     private static final Logger LOG = LoggerFactory.getLogger(UserRoleService.class);
 
     private final UserRoleDao userRoleDao;
-    private final UserDao userDao;
     private final RoleDao roleDao;
-
+    private final PersonDao personDao;
     private final ChangeLogService changeLogService;
 
     private final PersonService personService;
@@ -86,21 +82,20 @@ public class UserRoleService {
 
     @Autowired
     public UserRoleService(UserRoleDao userRoleDao,
-                           UserDao userDao,
                            RoleDao roleDao,
-                           ChangeLogService changeLogService,
+                           PersonDao personDao, ChangeLogService changeLogService,
                            PersonService personService) {
+        checkNotNull(personDao, "personDao must not be null");
         checkNotNull(userRoleDao, "userRoleDao must not be null");
-        checkNotNull(userDao, "userDao must not be null");
         checkNotNull(roleDao, "roleDao must not be null");
         checkNotNull(changeLogService, "changeLogService must not be null");
         checkNotNull(personService, "personService must not be null");
 
         this.userRoleDao = userRoleDao;
-        this.userDao = userDao;
         this.roleDao = roleDao;
         this.changeLogService = changeLogService;
         this.personService = personService;
+        this.personDao = personDao;
     }
 
 
@@ -195,34 +190,63 @@ public class UserRoleService {
             return 0;
         }
 
-        Set<Tuple2<String, String>> usersAndRolesToUpdate = mkBulkOperationPreviews(lines)
+        Set<Tuple3<String, String,String>> usersAndRolesToUpdate = mkBulkOperationPreviews(lines)
                 .stream()
                 .filter(p -> p.status() == BulkUserOperationRowPreview.ResolutionStatus.OK)
-                .map(d -> tuple(d.resolvedUser(), d.resolvedRole()))
-                .collect(Collectors.toSet());
+                .map(d -> tuple(d.resolvedUser(), d.resolvedRole(),d.resolvedComment()))
+                .collect(toSet());
+
+        handleBulkChangelog(usersAndRolesToUpdate,username);
+        
+        Set<Tuple2<String, String>> usernamesAndRoles = usersAndRolesToUpdate.stream().map(t -> tuple(t.v1, t.v2)).collect(toSet());
 
         switch (mode) {
             case ADD_ONLY:
-                return userRoleDao.addRoles(usersAndRolesToUpdate);
+                return userRoleDao.addRoles(usernamesAndRoles);
             case REMOVE_ONLY:
-                return userRoleDao.removeRoles(usersAndRolesToUpdate);
+                return userRoleDao.removeRoles(usernamesAndRoles);
             case REPLACE:
-                return userRoleDao.replaceRoles(usersAndRolesToUpdate);
+                return userRoleDao.replaceRoles(usernamesAndRoles);
             default:
                 throw new UnsupportedOperationException("Unsupported mode: " + mode);
         }
     }
 
+    private void handleBulkChangelog(Set<Tuple3<String, String, String>> xs, String username) {
+        Set<ChangeLog> changeLog = xs.stream().map(t -> {
+           Person person = personService.getPersonByUserId(t.v1);
+                return ImmutableChangeLog.builder()
+                        .parentReference(mkRef(EntityKind.PERSON,person.id().get() ))
+                        .severity(Severity.INFORMATION)
+                        .userId(username)
+                        .message(format(
+                                "Role for %s updated to %s.  Comment: %s",
+                                t.v1,
+                                t.v2,
+                                StringUtilities.ifEmpty(t.v3, "none")))
+                        .childKind(Optional.empty())
+                        .operation(Operation.UPDATE)
+                        .build();
+            }).collect(toSet());
+
+        changeLogService.write(changeLog);
+
+    }
+
+
+
+
+
 
     private List<BulkUserOperationRowPreview> mkBulkOperationPreviews(List<String> lines) {
-        List<Tuple2<String, String>> parsed = parseBulkOperationLines(lines);
+        List<Tuple3<String, String, String>> parsed = parseBulkOperationLines(lines);
+        Set<String> distinctPeople = SetUtilities.map(parsed, Tuple3::v1);
+        Set<String> distinctRoles = SetUtilities.map(parsed, Tuple3::v2);
 
-        Set<String> distinctPeople = SetUtilities.map(parsed, Tuple2::v1);
-        Set<String> distinctRoles = SetUtilities.map(parsed, Tuple2::v2);
-
+        //Checks for person.emails
         Set<String> unknownPeople = minus(
                 distinctPeople,
-                fromCollection(userDao.findAllUserNames()));
+                fromCollection(personDao.findAllEmails()));
 
         Set<String> unknownRoles = minus(
                 distinctRoles,
@@ -236,29 +260,32 @@ public class UserRoleService {
                         .builder()
                         .givenUser(t.v1)
                         .givenRole(t.v2)
+                        .givenComment(t.v3)
                         .resolvedUser(unknownPeople.contains(t.v1) ? null : t.v1)
                         .resolvedRole(unknownRoles.contains(t.v2) ? null : t.v2)
+                        .resolvedComment(t.v3)
                         .build())
                 .collect(toList());
     }
 
 
     /**
-     * Expects a list of lines, each one containing a username and role.
+     * Expects a list of lines, each one containing a username, role and comment.
      * The cells may be delimited by comma or by tab.
      *
      * @param lines
-     * @return a list of tuples, each one containing a username and role
+     * @return a list of tuples, each one containing a username, role and comment
      */
-    private static List<Tuple2<String, String>> parseBulkOperationLines(List<String> lines) {
+    private static List<Tuple3<String, String, String>> parseBulkOperationLines(List<String> lines) {
         return lines
                 .stream()
                 .map(cmd -> tokenise(cmd, "(,|\\t)"))
                 .map(parts -> tuple(
                         getOrDefault(parts, 0, null),
-                        getOrDefault(parts, 1, null)))
-                .filter(t -> ! ("username".equalsIgnoreCase(t.v1) && "role".equalsIgnoreCase(t.v2))) // remove header
-                .filter(t -> ! (StringUtilities.isEmpty(t.v1) && StringUtilities.isEmpty(t.v2))) // remove empty lines
+                        getOrDefault(parts, 1, null),
+                        getOrDefault(parts, 2, null)))
+                .filter(t -> ! ("username".equalsIgnoreCase(t.v1) && "role".equalsIgnoreCase(t.v2) && "comment".equalsIgnoreCase(t.v3))) // remove header
+                .filter(t -> ! (StringUtilities.isEmpty(t.v1) && StringUtilities.isEmpty(t.v2) && StringUtilities.isEmpty(t.v3))) // remove empty lines
                 .collect(toList());
     }
 

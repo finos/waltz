@@ -35,7 +35,6 @@ import java.util.List;
 
 import static java.util.Collections.emptyList;
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.FunctionUtilities.time;
 import static org.finos.waltz.common.StringUtilities.isEmpty;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
@@ -81,7 +80,7 @@ public class OrganisationalUnitService {
 
 
     public List<OrganisationalUnit> findByIds(Long... ids) {
-        return time("OUS.findActiveByFlowIds", () -> dao.findByIds(ids));
+        return dao.findByIds(ids);
     }
 
 

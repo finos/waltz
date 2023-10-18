@@ -32,5 +32,6 @@ public abstract class SurveyInstanceInfo {
     public abstract SurveyInstance surveyInstance();
     public abstract SurveyRun surveyRun();
     public abstract EntityReference surveyTemplateRef();
+    public abstract Integer historicalVersionsCount();
 
 }

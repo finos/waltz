@@ -59,12 +59,14 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -74,12 +76,25 @@ import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.map;
-import static org.finos.waltz.common.DateTimeUtilities.*;
+import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
+import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
+import static org.finos.waltz.common.DateTimeUtilities.toLocalDate;
+import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
+import static org.finos.waltz.common.DateTimeUtilities.today;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.StringUtilities.lower;
 import static org.finos.waltz.data.JooqUtilities.maybeReadRef;
 import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.Tables.CHANGE_LOG;
+import static org.finos.waltz.schema.Tables.INVOLVEMENT;
+import static org.finos.waltz.schema.Tables.INVOLVEMENT_GROUP_ENTRY;
+import static org.finos.waltz.schema.Tables.INVOLVEMENT_KIND;
+import static org.finos.waltz.schema.Tables.PERSON;
+import static org.finos.waltz.schema.Tables.SURVEY_INSTANCE;
+import static org.finos.waltz.schema.Tables.SURVEY_INSTANCE_OWNER;
+import static org.finos.waltz.schema.Tables.SURVEY_INSTANCE_RECIPIENT;
+import static org.finos.waltz.schema.Tables.SURVEY_RUN;
+import static org.finos.waltz.schema.Tables.SURVEY_TEMPLATE;
 import static org.finos.waltz.schema.tables.InvolvementGroup.INVOLVEMENT_GROUP;
 
 @Repository
@@ -126,7 +141,7 @@ public class SurveyInstanceDao {
             SurveyInstanceStatus.COMPLETED,
             SurveyInstanceStatus.REJECTED);
 
-    private static final RecordMapper<Record, SurveyInstance> TO_DOMAIN_MAPPER = r -> {
+    public static final RecordMapper<Record, SurveyInstance> TO_DOMAIN_MAPPER = r -> {
         SurveyInstanceRecord record = r.into(si);
         return ImmutableSurveyInstance.builder()
                 .id(record.getId())
@@ -153,6 +168,32 @@ public class SurveyInstanceDao {
                         .orElse(null))
                 .issuedOn(toLocalDate(record.getIssuedOn()))
                 .build();
+    };
+
+    private static final Function<SurveyInstance, SurveyInstanceRecord> TO_RECORD_MAPPER = d -> {
+
+        SurveyInstanceRecord r = new SurveyInstanceRecord();
+
+        d.id().ifPresent(r::setId);
+        r.setSurveyRunId(d.surveyRunId());
+        r.setEntityKind(d.surveyEntity().kind().name());
+        r.setEntityId(d.surveyEntity().id());
+        r.setStatus(d.status().name());
+        r.setSubmittedAt(Timestamp.valueOf(d.submittedAt()));
+        r.setSubmittedBy(d.submittedBy());
+        r.setDueDate(toSqlDate(d.dueDate()));
+        r.setOriginalInstanceId(d.originalInstanceId());
+        r.setApprovedAt(Timestamp.valueOf(d.approvedAt()));
+        r.setApprovedBy(d.approvedBy());
+        r.setOwningRole(d.owningRole());
+        r.setEntityQualifierId(d.qualifierEntity().id());
+        r.setEntityQualifierKind(d.qualifierEntity().kind().name());
+        r.setName(d.name());
+        r.setApprovalDueDate(toSqlDate(d.approvalDueDate()));
+        r.setIssuedOn(toSqlDate(d.issuedOn()));
+        r.changed(SURVEY_INSTANCE.ID, false);
+
+        return r;
     };
 
     private final DSLContext dsl;
@@ -196,6 +237,20 @@ public class SurveyInstanceDao {
                 .from(si)
                 .where(si.SURVEY_RUN_ID.eq(surveyRunId))
                 .and(IS_ORIGINAL_INSTANCE_CONDITION)
+                .fetchSet(TO_DOMAIN_MAPPER);
+    }
+
+
+    public Set<SurveyInstance> findForSurveyTemplate(long templateId, SurveyInstanceStatus... statuses) {
+        Set<String> statusStrings = Arrays.stream(statuses).map(s -> s.name()).collect(toSet());
+
+        return dsl.select(si.fields())
+                .select(ENTITY_NAME_FIELD)
+                .select(EXTERNAL_ID_FIELD)
+                .from(si)
+                .join(sr).on(sr.ID.eq(si.SURVEY_RUN_ID))
+                .where(sr.SURVEY_TEMPLATE_ID.eq(templateId))
+                .and(si.STATUS.in(statusStrings))
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
 
@@ -261,10 +316,12 @@ public class SurveyInstanceDao {
     public int updateStatus(long instanceId, SurveyInstanceStatus newStatus) {
         checkNotNull(newStatus, "newStatus cannot be null");
 
-        return dsl.update(si)
+        return dsl
+                .update(si)
                 .set(si.STATUS, newStatus.name())
                 .where(si.STATUS.notEqual(newStatus.name())
-                        .and(si.ID.eq(instanceId)))
+                        .and(si.ID.eq(instanceId))
+                        .and(si.ORIGINAL_INSTANCE_ID.isNull()))
                 .execute();
     }
 
@@ -311,13 +368,19 @@ public class SurveyInstanceDao {
     }
 
 
-    public int updateSubmitted(long instanceId, String userName) {
+    public int markSubmitted(long instanceId, String userName) {
         checkNotNull(userName, "userName cannot be null");
 
-        return dsl.update(si)
+        return dsl
+                .update(si)
+                .set(si.STATUS, SurveyInstanceStatus.COMPLETED.name())
                 .set(si.SUBMITTED_AT, Timestamp.valueOf(nowUtc()))
                 .set(si.SUBMITTED_BY, userName)
-                .where(si.ID.eq(instanceId))
+                .where(si.ID.eq(instanceId)
+                        .and(si.ORIGINAL_INSTANCE_ID.isNull())
+                        .and(si.STATUS.in(
+                                SurveyInstanceStatus.NOT_STARTED.name(),
+                                SurveyInstanceStatus.IN_PROGRESS.name())))
                 .execute();
     }
 
@@ -325,20 +388,33 @@ public class SurveyInstanceDao {
     public int markApproved(long instanceId, String userName) {
         checkNotNull(userName, "userName cannot be null");
 
-        return dsl.update(si)
+        return dsl
+                .update(si)
                 .set(si.APPROVED_AT, Timestamp.valueOf(nowUtc()))
                 .set(si.APPROVED_BY, userName)
                 .set(si.STATUS, SurveyInstanceStatus.APPROVED.name())
-                .where(si.ID.eq(instanceId))
+                .where(si.ID.eq(instanceId)
+                        .and(si.ORIGINAL_INSTANCE_ID.isNull())
+                        .and(si.STATUS.eq(SurveyInstanceStatus.COMPLETED.name())))
                 .execute();
     }
 
 
-    public void clearApproved(long instanceId) {
-        dsl.update(si)
+    public int reopenSurvey(long instanceId) {
+        return dsl
+                .update(si)
+                .set(si.STATUS, SurveyInstanceStatus.IN_PROGRESS.name())
                 .set(si.APPROVED_AT, (Timestamp) null)
                 .set(si.APPROVED_BY, (String) null)
-                .where(si.ID.eq(instanceId))
+                .set(si.SUBMITTED_AT, (Timestamp) null)
+                .set(si.SUBMITTED_BY, (String) null)
+                .set(si.ISSUED_ON, toSqlDate(nowUtcTimestamp())) //update the issued on to the current date
+                .where(si.ID.eq(instanceId)
+                        .and(si.ORIGINAL_INSTANCE_ID.isNull())
+                        .and(si.STATUS.in(
+                                SurveyInstanceStatus.APPROVED.name(),
+                                SurveyInstanceStatus.REJECTED.name(),
+                                SurveyInstanceStatus.WITHDRAWN.name())))
                 .execute();
     }
 

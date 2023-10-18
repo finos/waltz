@@ -177,7 +177,8 @@ public class InvolvementDao {
 
 
     public List<Person> findPeopleByEntityReference(EntityReference ref) {
-        return dsl.selectDistinct(PERSON.fields())
+        return dsl
+                .selectDistinct(PERSON.fields())
                 .from(PERSON)
                 .innerJoin(INVOLVEMENT)
                 .on(INVOLVEMENT.ENTITY_ID.eq(ref.id()))

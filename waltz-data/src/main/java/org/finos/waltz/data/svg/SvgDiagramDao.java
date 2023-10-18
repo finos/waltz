@@ -18,10 +18,9 @@
 
 package org.finos.waltz.data.svg;
 
-import org.finos.waltz.schema.tables.records.SvgDiagramRecord;
-import org.finos.waltz.common.FunctionUtilities;
 import org.finos.waltz.model.svg.ImmutableSvgDiagram;
 import org.finos.waltz.model.svg.SvgDiagram;
+import org.finos.waltz.schema.tables.records.SvgDiagramRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
@@ -29,9 +28,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
-import static org.finos.waltz.schema.tables.SvgDiagram.SVG_DIAGRAM;
 import static org.finos.waltz.common.StringUtilities.mkSafe;
+import static org.finos.waltz.schema.tables.SvgDiagram.SVG_DIAGRAM;
 
 @Repository
 public class SvgDiagramDao {
@@ -39,7 +39,7 @@ public class SvgDiagramDao {
     private final DSLContext dsl;
 
 
-    private static RecordMapper<Record, SvgDiagram> svgMapper = r -> {
+    private static final RecordMapper<Record, SvgDiagram> SVG_MAPPER = r -> {
         SvgDiagramRecord record = r.into(SVG_DIAGRAM);
         return ImmutableSvgDiagram.builder()
                 .id(record.getId())
@@ -66,16 +66,55 @@ public class SvgDiagramDao {
         return dsl.select()
                 .from(SVG_DIAGRAM)
                 .where(SVG_DIAGRAM.ID.eq(id))
-                .fetchOne(svgMapper);
+                .fetchOne(SVG_MAPPER);
     }
 
 
     public List<SvgDiagram> findByGroups(String[] groups) {
-        return FunctionUtilities.time("SDD.findByGroups", () -> dsl.select()
+        return dsl
+                .select()
                 .from(SVG_DIAGRAM)
                 .where(SVG_DIAGRAM.GROUP.in(groups))
                 .orderBy(SVG_DIAGRAM.PRIORITY.asc())
-                .fetch(svgMapper));
+                .fetch(SVG_MAPPER);
     }
 
+
+    public Set<SvgDiagram> findAll() {
+        return dsl
+                .select(SVG_DIAGRAM.fields())
+                .from(SVG_DIAGRAM)
+                .fetchSet(SVG_MAPPER);
+    }
+
+
+    public Boolean remove(long id) {
+        return dsl
+                .deleteFrom(SVG_DIAGRAM)
+                .where(SVG_DIAGRAM.ID.eq(id))
+                .execute() == 1;
+    }
+
+
+    public Boolean save(SvgDiagram diagram) {
+
+        SvgDiagramRecord record = dsl.newRecord(SVG_DIAGRAM);
+        record.setName(diagram.name());
+        record.setGroup(diagram.group());
+        record.setDescription(diagram.description());
+        record.setSvg(diagram.svg());
+        record.setKeyProperty(diagram.keyProperty());
+        record.setProduct(diagram.product());
+        record.setPriority(diagram.priority());
+        record.setDisplayHeightPercent(diagram.displayHeightPercent());
+        record.setDisplayWidthPercent(diagram.displayWidthPercent());
+
+        diagram.id().ifPresent(id -> {
+            record.setId(id);
+            record.changed(SVG_DIAGRAM.ID, false);
+        });
+
+        int store = record.store();
+        return store == 1;
+    }
 }

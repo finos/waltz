@@ -46,7 +46,7 @@
     <div ng-if="$ctrl.visibility.editor === false">
 
 
-        <div ng-if="$ctrl.gridData.length > 0">
+        <div ng-if="$ctrl.rawGridData.length > 0">
 
             <details>
                 <summary>
@@ -56,17 +56,16 @@
                      style="padding-bottom: 1em">
 
                     <div style="padding-top: 1em"
-                         ng-if="$ctrl.hierarchyScope !== 'EXACT'">
+                         ng-if="$ctrl.isHierarchical">
                         <waltz-toggle
                             state="$ctrl.showDirectOnly"
                             on-toggle="$ctrl.onToggleScope()"
-                            label-on="Showing direct involvements only"
-                            label-off="Showing all involvements (including inherited)">
+                            label-on="Currently showing direct involvements only"
+                            label-off="Currently showing all involvements (including ancestors and descendents)">
                         </waltz-toggle>
-                        <div>
+                        <div class="help-block">
                             People are related to this <span ng-bind="$ctrl.parentEntityRef.kind | toDisplayName: 'entity'"></span>
-                            either directly or inherited from a parent.
-                            Use the toggle to filter the view.
+                            either directly, inherited from a parent or taken from a child relationship.
                         </div>
 
                     </div>
@@ -75,29 +74,32 @@
                         <waltz-toggle
                             state="$ctrl.showRemovedPeople"
                             on-toggle="$ctrl.onHiddenPeople()"
-                            label-on="Hide removed people"
-                            label-off="Show removed people">
+                            label-on="Currently showing people no longer with the organisation"
+                            label-off="Currently showing only active people">
                         </waltz-toggle>
+                        <div class="help-block">
+                            Shows or hides people who may have left the organisation.
+                        </div>
                     </div>
                 </div>
 
             </details>
+        </div>
 
+
+        <waltz-no-data ng-if="$ctrl.gridData.length == 0">
+            <message>
+                No involvement records found
+            </message>
+        </waltz-no-data>
+
+        <div ng-if="$ctrl.gridData.length > 0">
             <waltz-grid-with-search column-defs="$ctrl.columnDefs"
                                     entries="$ctrl.gridData"
                                     search-placeholder-text="Search people...">
             </waltz-grid-with-search>
         </div>
 
-
-        <waltz-no-data ng-if="$ctrl.gridData.length == 0">
-            <message>
-                <strong>
-                    No people
-                </strong>
-                have been associated.
-            </message>
-        </waltz-no-data>
     </div>
 
 
@@ -105,7 +107,7 @@
     <waltz-entity-involvement-editor ng-if="$ctrl.visibility.editor === true"
                                      parent-entity-ref="$ctrl.parentEntityRef"
                                      current-involvements="$ctrl.currentInvolvements"
-                                     target-entity-kind="'PERSON'"
+                                     target-entity-kind="$ctrl.parentEntityRef.kind"
                                      allowed-involvements="$ctrl.allowedInvolvements"
                                      on-add="$ctrl.onAdd"
                                      on-remove="$ctrl.onRemove">
@@ -114,7 +116,7 @@
     <br>
     <!-- Exporter -->
     <div align="right"
-         ng-if="$ctrl.currentInvolvements != 0">
+         ng-if="$ctrl.rawGridData.length > 0">
         <waltz-data-extract-link name="Download involved people"
                                  styling="link"
                                  filename="involvedPeople.csv"
@@ -126,30 +128,3 @@
 
 </div>
 
-
-<!-- ROLES DETAIL POPUP -->
-<script type="text/ng-template"
-        id="wips/roles-popup.html">
-    <div>
-        <table class="table table-condensed small table-hover">
-            <thead>
-            <tr>
-                <th>Role</th>
-                <th>Description</th>
-            </tr>
-            </thead>
-
-            <tbody>
-                <tr ng-repeat="role in row.entity.roles">
-                    <td>
-                        <div ng-bind="role.displayName"></div>
-                        <div class="small text-muted" ng-bind="role.provenance"></div>
-                    </td>
-                    <td>
-                        <span ng-bind="role.description"></span>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</script>

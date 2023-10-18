@@ -54,31 +54,23 @@ export function stringToRef(s) {
 
 
 export function toEntityRef(obj, kind = obj.kind) {
-
-    const ref = {
+    return {
         id: obj.id,
         kind,
         name: obj.name,
         description: obj.description,
         entityLifecycleStatus: obj.entityLifecycleStatus
     };
-
-    checkIsEntityRef(ref);
-
-    return ref;
 }
 
 
 export function mkRef(kind, id, name, description) {
-    const ref = {
+    return {
         kind,
         id,
         name,
         description
     };
-
-    checkIsEntityRef(ref);
-    return ref;
 }
 
 

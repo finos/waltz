@@ -24,6 +24,7 @@ import {displayError} from "../../common/error-utils";
 import {isSurveyTargetKind} from "../survey-utils";
 import toasts from "../../svelte-stores/toast-store";
 import SystemRoles from "../../user/system-roles";
+import SurveyInstanceList from "./svelte/SurveyInstanceList.svelte";
 
 
 const initialState = {
@@ -43,7 +44,8 @@ const initialState = {
         recipientInvolvementKinds: [],
         ownerInvolvementKinds: []
     },
-    templateQuery: ""
+    templateQuery: "",
+    SurveyInstanceList
 };
 
 

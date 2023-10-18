@@ -19,8 +19,6 @@
 package org.finos.waltz.web.endpoints.api;
 
 import org.finos.waltz.common.Checks;
-import org.finos.waltz.common.FunctionUtilities;
-import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.bulk_upload.legal_entity_relationship.BulkUploadLegalEntityRelationshipCommand;
 import org.finos.waltz.model.bulk_upload.legal_entity_relationship.ResolveBulkUploadLegalEntityRelationshipResponse;
 import org.finos.waltz.model.bulk_upload.legal_entity_relationship.SaveBulkUploadLegalEntityRelationshipResponse;
@@ -38,10 +36,11 @@ import spark.Request;
 import spark.Response;
 
 import java.io.IOException;
-import java.util.Set;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.web.WebUtilities.*;
+import static org.finos.waltz.web.WebUtilities.getUsername;
+import static org.finos.waltz.web.WebUtilities.mkPath;
+import static org.finos.waltz.web.WebUtilities.readBody;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.postForDatum;
 
 @Service
@@ -82,7 +81,7 @@ public class BulkUploadLegalEntityRelationshipEndpoint implements Endpoint {
         String username = getUsername(request);
 
         LOG.info("User: {} resolving bulk upload: {}", username, uploadCmd);
-        return FunctionUtilities.time("resolve", () -> service.resolve(uploadCmd));
+        return service.resolve(uploadCmd);
     }
 
 

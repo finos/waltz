@@ -206,7 +206,7 @@ public class ChangeLogService {
                                       Operation operation) {
         Tuple2<String, Set<EntityReference>> t = preparePreambleAndEntitiesForChangeLogs(logicalFlow);
         String message = format("%s: %s", t.v1, postamble);
-        writeChangeLogEntries(t.v2, message, operation, LOGICAL_DATA_FLOW, userId);
+        writeChangeLogEntries(t.v2, message, operation, logicalFlow.entityReference(), userId);
     }
 
 
@@ -216,7 +216,7 @@ public class ChangeLogService {
                                       Operation operation) {
         Tuple2<String, Set<EntityReference>> t = preparePreambleAndEntitiesForChangeLogs(physicalFlow);
         String message = format("%s: %s", t.v1, postamble);
-        writeChangeLogEntries(t.v2, message, operation, PHYSICAL_FLOW, userId);
+        writeChangeLogEntries(t.v2, message, operation, physicalFlow.entityReference(), userId);
     }
 
 
@@ -226,7 +226,7 @@ public class ChangeLogService {
                                       Operation operation) {
         Tuple2<String, Set<EntityReference>> t = preparePreambleAndEntitiesForChangeLogs(physicalSpec);
         String message = format("%s: %s", t.v1, postamble);
-        writeChangeLogEntries(t.v2, message, operation, PHYSICAL_FLOW, userId);
+        writeChangeLogEntries(t.v2, message, operation, physicalSpec.entityReference(), userId);
     }
 
     public void writeChangeLogEntries(MeasurableRatingReplacement measurableRatingReplacement,
@@ -271,6 +271,28 @@ public class ChangeLogService {
                         .severity(Severity.INFORMATION)
                         .userId(userId)
                         .childKind(childKind)
+                        .operation(operation)
+                        .build());
+
+        changeLogDao.write(changeLogEntries);
+    }
+
+
+    private void writeChangeLogEntries(Set<EntityReference> refs,
+                                       String message,
+                                       Operation operation,
+                                       EntityReference childRef,
+                                       String userId) {
+        Set<ChangeLog> changeLogEntries = map(
+                refs,
+                r -> ImmutableChangeLog
+                        .builder()
+                        .parentReference(r)
+                        .message(message)
+                        .severity(Severity.INFORMATION)
+                        .userId(userId)
+                        .childKind(childRef.kind())
+                        .childId(childRef.id())
                         .operation(operation)
                         .build());
 
