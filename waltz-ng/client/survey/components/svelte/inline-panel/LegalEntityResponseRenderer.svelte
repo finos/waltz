@@ -11,7 +11,7 @@
 <table class="table table-condensed small">
     <thead>
     <tr>
-        <th>Identifier</th>
+        <th style="width: 6em">Identifier</th>
         <th>Legal Entity</th>
     </tr>
     </thead>
