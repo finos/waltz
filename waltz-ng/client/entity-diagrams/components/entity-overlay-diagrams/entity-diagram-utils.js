@@ -30,9 +30,6 @@ import AggregatedEntitiesOverlayCell
     from "../../../aggregate-overlay-diagram/components/aggregate-overlay-diagram/widgets/aggregated-entities/AggregatedEntitiesOverlayCell.svelte";
 import BackingEntitiesOverlayCell
     from "../../../aggregate-overlay-diagram/components/aggregate-overlay-diagram/widgets/backing-entities/BackingEntitiesPlainOverlayCell.svelte";
-import {
-    resetParameters as resetAssessmentParameters
-} from "../../../aggregate-overlay-diagram/components/aggregate-overlay-diagram/widgets/assessments/AssessmentWidgetParameters.svelte";
 import AssessmentOverlayParameters from "./overlays/assessment/AssessmentOverlayParameters.svelte";
 import AssessmentOverlay from "./overlays/assessment/AssessmentOverlay.svelte";
 import AssessmentOverlayLegendDetail from "./overlays/assessment/AssessmentOverlayLegendDetail.svelte";
@@ -216,7 +213,6 @@ export const overlays =  [
         component: AssessmentOverlay,
         urlSuffix: "app-assessment-widget",
         mkGlobalProps: mkAssessmentOverlayGlobalProps,
-        resetParameters: resetAssessmentParameters,
         aggregatedEntityKinds: [entity.APPLICATION.key, entity.CHANGE_INITIATIVE.key],
         parameterWidget: AssessmentOverlayParameters,
         legend: AssessmentOverlayLegendDetail,
