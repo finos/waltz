@@ -46,7 +46,6 @@ import org.finos.waltz.schema.tables.MeasurableCategory;
 import org.finos.waltz.schema.tables.OrganisationalUnit;
 import org.finos.waltz.schema.tables.SurveyQuestion;
 import org.finos.waltz.schema.tables.SurveyTemplate;
-import org.finos.waltz.schema.tables.records.ApplicationRecord;
 import org.finos.waltz.schema.tables.records.ChangeLogRecord;
 import org.jooq.Batch;
 import org.jooq.CommonTableExpression;

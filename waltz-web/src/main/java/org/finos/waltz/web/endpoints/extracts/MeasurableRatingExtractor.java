@@ -40,7 +40,7 @@ import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.Record1;
-import org.jooq.Record5;
+import org.jooq.Record6;
 import org.jooq.Select;
 import org.jooq.SelectConditionStep;
 import org.jooq.SelectSeekStep1;
@@ -50,11 +50,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static org.finos.waltz.common.SetUtilities.asSet;
-import static org.finos.waltz.schema.Tables.APPLICATION;
-import static org.finos.waltz.schema.Tables.MEASURABLE_RATING_PLANNED_DECOMMISSION;
-import static org.finos.waltz.schema.Tables.MEASURABLE_RATING_REPLACEMENT;
-import static org.finos.waltz.schema.Tables.RATING_SCHEME;
-import static org.finos.waltz.schema.Tables.RATING_SCHEME_ITEM;
+import static org.finos.waltz.schema.Tables.*;
 import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
 import static org.finos.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
 import static org.finos.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
@@ -123,7 +119,8 @@ public class MeasurableRatingExtractor extends DirectQueryBasedDataExtractor {
                     .select(replacementAppName.as("Replacement App Name"),
                             replacementAppExtId.as("Replacement External Id"),
                             mrr.PLANNED_COMMISSION_DATE.as("Replacement Commission Date"))
-                    .select(ou.NAME.as("Org Unit Name"));
+                    .select(ou.NAME.as("Org Unit Name"))
+                    .select(app.LIFECYCLE_PHASE.as("Lifecycle Phase"));
 
             Condition reportConditions = app.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name())
                     .and(m.MEASURABLE_CATEGORY_ID.eq(categoryId))
@@ -170,19 +167,25 @@ public class MeasurableRatingExtractor extends DirectQueryBasedDataExtractor {
                     .where(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
                             .and(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId)));
 
-            SelectSeekStep1<Record5<String, String, Long, String, String>, String> qry = dsl
+            SelectSeekStep1<Record6<String, String, Long, String, String, String>, String> qry = dsl
                     .selectDistinct(app.NAME.as("App Name"),
                             app.ASSET_CODE.as("App Code"),
                             app.ID.as("App Waltz Id"),
                             app.KIND.as("App Kind"),
-                            ou.NAME.as("Org Unit Name"))
+                            ou.NAME.as("Org Unit Name"),
+                            app.LIFECYCLE_PHASE.as("Lifecycle Phase"))
                     .from(app)
                     .leftJoin(ou).on(ou.ID.eq(app.ORGANISATIONAL_UNIT_ID))
                     .where(app.ID.in(appIds))
                     .and(app.ID.notIn(appIdsAssignedToAnyMeasurableInTheCategory))
                     .orderBy(app.NAME);
 
-            String categoryName = dsl.select(mc.NAME).from(mc).where(mc.ID.eq(categoryId)).fetchOne(mc.NAME);
+            String categoryName = dsl
+                    .select(mc.NAME)
+                    .from(mc)
+                    .where(mc.ID.eq(categoryId))
+                    .fetchOne(mc.NAME);
+
             String suggestedFilename = toCamelCase(categoryName) + "-Unmapped-Applications";
 
             return writeExtract(

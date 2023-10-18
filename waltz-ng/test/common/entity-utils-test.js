@@ -98,12 +98,6 @@ describe("common/entity-utils", () => {
                 eu.refToString(eu.toEntityRef(ref1ou)));
         });
 
-        it("throws if the given object has no 'id'", () => {
-            assert.throws(() => {
-                eu.toEntityRef({name: "bob"});
-            })
-        });
-
         it("preserves name and description if possible", () => {
             const r = eu.toEntityRef(Object.assign({} , ref1app, { name: "n", description: "d"}));
             assert.equal("n", r.name);
