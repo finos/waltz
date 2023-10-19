@@ -4,6 +4,7 @@ import org.finos.waltz.data.legal_entity.LegalEntityDao;
 import org.finos.waltz.data.legal_entity.LegalEntityIdSelectorFactory;
 import org.finos.waltz.data.legal_entity.search.LegalEntitySearchDao;
 import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.change_initiative.ChangeInitiative;
 import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.finos.waltz.model.legal_entity.LegalEntity;
 import org.jooq.Record1;
@@ -47,5 +48,9 @@ public class LegalEntityService {
     public Set<LegalEntity> findBySelector(IdSelectionOptions selectionOptions) {
         Select<Record1<Long>> selector = legalEntityIdSelectorFactory.apply(selectionOptions);
         return legalEntityDao.findBySelector(selector);
+    }
+
+    public Collection<LegalEntity> findAll() {
+        return legalEntityDao.findAll();
     }
 }
