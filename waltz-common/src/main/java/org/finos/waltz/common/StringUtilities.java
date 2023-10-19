@@ -313,5 +313,19 @@ public class StringUtilities {
                 ? null
                 : str;
     }
+
+
+    public static boolean isDefined(String str) {
+        return str != null && str.trim().length() > 0;
+    }
+
+
+    public static Optional<String> firstNonNull(String... xs) {
+        return Stream
+                .of(xs)
+                .filter(x -> isDefined(x))
+                .findFirst();
+    }
+
 }
 

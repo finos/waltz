@@ -21,48 +21,68 @@ import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.common.exception.NotFoundException;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.IdSelectionOptions;
-import org.finos.waltz.model.NameProvider;
 import org.finos.waltz.model.rating.RatingSchemeItem;
-import org.finos.waltz.model.report_grid.*;
+import org.finos.waltz.model.report_grid.ReportGrid;
+import org.finos.waltz.model.report_grid.ReportGridCell;
+import org.finos.waltz.model.report_grid.ReportGridDefinition;
+import org.finos.waltz.model.report_grid.ReportGridDerivedColumnDefinition;
+import org.finos.waltz.model.report_grid.ReportGridFixedColumnDefinition;
+import org.finos.waltz.model.report_grid.ReportGridInstance;
+import org.finos.waltz.model.report_grid.ReportSubject;
 import org.finos.waltz.service.report_grid.ReportGridService;
 import org.finos.waltz.service.settings.SettingsService;
 import org.finos.waltz.service.survey.SurveyQuestionService;
 import org.finos.waltz.web.WebException;
-import org.finos.waltz.web.WebUtilities;
 import org.finos.waltz.web.endpoints.extracts.reportgrid.DynamicCommaSeperatedValueFormatter;
 import org.finos.waltz.web.endpoints.extracts.reportgrid.DynamicExcelFormatter;
 import org.finos.waltz.web.endpoints.extracts.reportgrid.DynamicJSONFormatter;
+import org.finos.waltz.web.json.ImmutableReportGridColumnJSON;
+import org.finos.waltz.web.json.ImmutableReportGridDefinitionJSON;
+import org.finos.waltz.web.json.ReportGridDefinitionJSON;
+import org.finos.waltz.web.json.ReportGridDefinitionJSON.ReportGridColumnJSON;
 import org.jooq.lambda.Unchecked;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Request;
+import spark.Response;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.LongFunction;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static java.util.Comparator.comparingLong;
 import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.ListUtilities.map;
-import static org.finos.waltz.common.MapUtilities.*;
+import static org.finos.waltz.common.MapUtilities.groupBy;
+import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.SetUtilities.union;
+import static org.finos.waltz.common.StringUtilities.firstNonNull;
 import static org.finos.waltz.common.StringUtilities.mkSafe;
 import static org.finos.waltz.model.utils.IdUtilities.indexById;
 import static org.finos.waltz.service.report_grid.ReportGridColumnCalculator.calculate;
+import static org.finos.waltz.web.WebUtilities.mkPath;
 import static org.finos.waltz.web.WebUtilities.readIdSelectionOptionsFromBody;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.getForDatum;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 import static spark.Spark.post;
 
 @Service
 public class ReportGridExtractor implements SupportsJsonExtraction {
 
-    private static final String BASE_URL = WebUtilities.mkPath("data-extract", "report-grid");
+    private static final String BASE_URL = mkPath("data-extract", "report-grid");
 
     private final DynamicCommaSeperatedValueFormatter dynamicCommaSeperatedValueFormatter;
     private final DynamicExcelFormatter dynamicExcelFormatter;
@@ -91,46 +111,117 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
 
     @Override
     public void register() {
-        registerGridViewExtractByExternalId();
+        getForDatum(mkPath(BASE_URL, "external-id", ":externalId", "definition"), this::handleReportGridDefinitionByExternalId);
+        post(mkPath(BASE_URL, "external-id", ":externalId"), this::handleReportGridByExternalId);
     }
 
 
-    private void registerGridViewExtractByExternalId() {
-        post(WebUtilities.mkPath(BASE_URL, "external-id", ":externalId"),
-                (request, response) -> {
-                    String externalId = request.params("externalId");
-                    IdSelectionOptions selectionOptions = readIdSelectionOptionsFromBody(request);
+    private ReportGridDefinitionJSON handleReportGridDefinitionByExternalId(Request request,
+                                                                            Response response) {
+        String externalId = request.params("externalId");
 
-                    Optional<ReportGridDefinition> definition =
-                            reportGridService.findByExternalId(externalId);
+        return reportGridService
+                .findByExternalId(externalId)
+                .map(defn -> {
+                    List<ReportGridColumnJSON> columns = Stream
+                            .concat(
+                                defn.fixedColumnDefinitions()
+                                    .stream()
+                                    .map(c -> ImmutableReportGridColumnJSON
+                                            .builder()
+                                            .name(determineColumnName(c))
+                                            .description(c.columnDescription())
+                                            .id(c.gridColumnId())
+                                            .position(c.position())
+                                            .build()),
+                                defn.derivedColumnDefinitions()
+                                    .stream()
+                                    .map(c -> ImmutableReportGridColumnJSON
+                                            .builder()
+                                            .name(determineColumnName(c))
+                                            .description(c.columnDescription())
+                                            .id(c.gridColumnId())
+                                            .position(c.position())
+                                            .build()))
+                            .sorted(Comparator.comparingInt(ImmutableReportGridColumnJSON::position))
+                            .collect(toList());
 
-                    return definition
-                            .map(def-> {
-                                try {
-                                    long reportGridIdentifier = def
-                                            .id()
-                                            .orElseThrow(() -> new IllegalArgumentException("Report Grid Definition found but it has no internal identifier"));
+                    return ImmutableReportGridDefinitionJSON
+                            .builder()
+                            .name(defn.name())
+                            .externalId(defn.externalId().orElse("?"))
+                            .id(defn.id().get())
+                            .description(defn.description())
+                            .subjectKind(defn.subjectKind())
+                            .columns(columns)
+                            .build();
+                })
+                .orElseThrow(() -> new NotFoundException(
+                        "REPORT_GRID_NOT_FOUND",
+                        "Grid: [%s] not found",
+                        externalId));
+    }
 
-                                    return findReportGridById(reportGridIdentifier, selectionOptions)
-                                            .map(Unchecked.function(reportGrid -> prepareReport(
-                                                    reportGrid,
-                                                    parseExtractFormat(request),
-                                                    selectionOptions)))
-                                            .map(Unchecked.function(report -> writeReportResults(
-                                                    response,
-                                                    report)))
-                                            .orElseThrow(() -> notFoundException.apply(reportGridIdentifier));
 
-                                } catch(UncheckedIOException e) {
-                                    throw new WebException("REPORT_GRID_RENDER_ERROR", mkSafe(e.getMessage()), e);
-                                }
-                            })
-                            .orElseThrow(() -> new NotFoundException(
-                                "MISSING_GRID",
-                                String.format(
-                                        "Report Grid GUID (%s) not found",
-                                        externalId)));
-                });
+    private String determineColumnName(ReportGridDerivedColumnDefinition c) {
+        return firstNonNull(
+                c.externalId().orElse(null),
+                c.displayName())
+            .orElse("?");
+    }
+
+
+    private String determineColumnName(ReportGridFixedColumnDefinition fc) {
+        Optional<String> entityFieldName = Optional
+                .ofNullable(fc.entityFieldReference())
+                .flatMap(efr -> firstNonNull(
+                    efr.displayName(),
+                    efr.fieldName()));
+
+        return firstNonNull(
+                fc.externalId().orElse(null),
+                fc.displayName(),
+                fc.columnName() + entityFieldName
+                        .map(n -> " / " + n)
+                        .orElse(""))
+            .orElse("?");
+    }
+
+
+    private Object handleReportGridByExternalId(Request request,
+                                                Response response) throws IOException {
+        String externalId = request.params("externalId");
+        IdSelectionOptions selectionOptions = readIdSelectionOptionsFromBody(request);
+
+        Optional<ReportGridDefinition> definition =
+                reportGridService.findByExternalId(externalId);
+
+        return definition
+                .map(def-> {
+                    try {
+                        long reportGridIdentifier = def
+                                .id()
+                                .orElseThrow(() -> new IllegalArgumentException("Report Grid Definition found but it has no internal identifier"));
+
+                        return findReportGridById(reportGridIdentifier, selectionOptions)
+                                .map(Unchecked.function(reportGrid -> prepareReport(
+                                        reportGrid,
+                                        parseExtractFormat(request),
+                                        selectionOptions)))
+                                .map(Unchecked.function(report -> writeReportResults(
+                                        response,
+                                        report)))
+                                .orElseThrow(() -> notFoundException.apply(reportGridIdentifier));
+
+                    } catch(UncheckedIOException e) {
+                        throw new WebException("REPORT_GRID_RENDER_ERROR", mkSafe(e.getMessage()), e);
+                    }
+                })
+                .orElseThrow(() -> new NotFoundException(
+                        "MISSING_GRID",
+                        String.format(
+                                "Report Grid GUID (%s) not found",
+                                externalId)));
     }
 
 
