@@ -1,4 +1,4 @@
-/*
+/*!
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
@@ -16,20 +16,31 @@
  *
  */
 
-package org.finos.waltz.model.survey;
+.waltz-bulk-legal-entity-selector {
 
-public enum SurveyQuestionFieldType {
+    .wbles-inline-link {
+        color: inherit;
+        text-decoration-line: underline;
+        text-decoration-style: dotted;
+    }
 
-    APPLICATION,
-    BOOLEAN,
-    DATE,
-    DROPDOWN,
-    DROPDOWN_MULTI_SELECT,
-    STRING_LIST,
-    LEGAL_ENTITY,
-    MEASURABLE_MULTI_SELECT,
-    NUMBER,
-    PERSON,
-    TEXT,
-    TEXTAREA
+    .wbles-draft:after {
+        content:"DRAFT";
+        z-index: 1000;
+
+        position:absolute;
+        top: 2em;
+        left: 40%;
+        transform: rotate(-45deg);
+
+        font-family:Arial,sans-serif;
+        font-size:60px;
+
+        color: red;
+        border:solid 4px red;
+        border-radius:5px;
+        opacity:0.1;
+        text-shadow: 0 0 2px red;
+        box-shadow: 0 0 2px red;
+    }
 }

@@ -52,12 +52,19 @@ export const surveyQuestionFieldType = {
         description: null,
         position: 30
     },
+    LEGAL_ENTITY: {
+        key: "LEGAL_ENTITY",
+        name: "Legal Entity",
+        icon: null,
+        description: null,
+        position: 30
+    },
     MEASURABLE_MULTI_SELECT: {
         key: "MEASURABLE_MULTI_SELECT",
         name: "Measurable tree (Multi-Select)",
         icon: null,
         description: null,
-        position: 30
+        position: 35
     },
     NUMBER: {
         key: "NUMBER",

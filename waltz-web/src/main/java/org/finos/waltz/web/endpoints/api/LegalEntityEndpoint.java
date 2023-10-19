@@ -8,6 +8,7 @@ import spark.Request;
 import spark.Response;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Set;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -31,6 +32,7 @@ public class LegalEntityEndpoint implements Endpoint {
     public void register() {
 
         getForDatum(mkPath(BASE_URL, "id", ":id"), this::getByIdRoute);
+        getForDatum(mkPath(BASE_URL, "all"), this::findAll);
         postForList(mkPath(BASE_URL, "selector"), this::findBySelectorRoute);
     }
 
@@ -40,6 +42,10 @@ public class LegalEntityEndpoint implements Endpoint {
 
     private Set<LegalEntity> findBySelectorRoute(Request request, Response response) throws IOException {
         return legalEntityService.findBySelector(readIdSelectionOptionsFromBody(request));
+    }
+
+    private Collection<LegalEntity> findAll(Request request, Response response) throws IOException {
+        return legalEntityService.findAll();
     }
 
 }

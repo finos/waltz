@@ -7,6 +7,7 @@
     import BooleanResponseRenderer from "./BooleanResponseRenderer.svelte";
     import DropdownMultiResponseRenderer from "./DropdownMultiResponseRenderer.svelte";
     import MeasurableMultiResponseRenderer from "./MeasurableMultiResponseRenderer.svelte";
+    import LegalEntityResponseRenderer from "./LegalEntityResponseRenderer.svelte";
 
     export let response;
     export let question;
@@ -27,6 +28,8 @@
                 return DropdownMultiResponseRenderer;
             case "MEASURABLE_MULTI_SELECT":
                 return MeasurableMultiResponseRenderer;
+            case "LEGAL_ENTITY":
+                return LegalEntityResponseRenderer;
             case "DROPDOWN":
             case "TEXTAREA":
             case "TEXT":
@@ -37,7 +40,6 @@
     }
 
     $: comp = determineResponseRender(question);
-
 </script>
 
 

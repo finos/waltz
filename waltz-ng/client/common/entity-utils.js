@@ -58,6 +58,7 @@ export function toEntityRef(obj, kind = obj.kind) {
         id: obj.id,
         kind,
         name: obj.name,
+        externalId: obj.externalId,
         description: obj.description,
         entityLifecycleStatus: obj.entityLifecycleStatus
     };

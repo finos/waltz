@@ -151,6 +151,14 @@
                            entity-kinds="['PERSON']">
     </waltz-entity-selector>
 
+    <!-- legal entity multi picker -->
+    <waltz-bulk-legal-entity-selector ng-switch-when="LEGAL_ENTITY"
+                                      item-id="$ctrl.question.id"
+                                      required="$ctrl.question.isMandatory"
+                                      existing-refs="$ctrl.response.entityListResponse"
+                                      on-save="$ctrl.saveEntityListResponse">
+    </waltz-bulk-legal-entity-selector>
+
     <!-- comment -->
     <waltz-editable-field ng-if="$ctrl.question.allowComment"
                           field-type="textarea"

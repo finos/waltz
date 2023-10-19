@@ -20,6 +20,7 @@ import {registerComponents, registerStores} from "../common/module-utils";
 import Routes from "./routes";
 import LegalEntityView from "./pages/view/legal-entity-view";
 import LegalEntityStore from "./services/legal-entity-store";
+import BulkLegalEntitySelector from "./components/bulk-legal-entity-selector/bulk-legal-entity-selector";
 
 
 export default () => {
@@ -31,6 +32,7 @@ export default () => {
 
     registerComponents(module, [
         LegalEntityView,
+        BulkLegalEntitySelector
     ]);
 
     registerStores(module, [
