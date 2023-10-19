@@ -20,7 +20,9 @@ package org.finos.waltz.web.endpoints.api;
 
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.logical_flow.LogicalFlowView;
 import org.finos.waltz.service.permission.permission_checker.FlowPermissionChecker;
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.finos.waltz.service.user.UserRoleService;
@@ -104,6 +106,7 @@ public class LogicalFlowEndpoint implements Endpoint {
         String addFlowPath = mkPath(BASE_URL);
         String addFlowsPath = mkPath(BASE_URL, "list");
         String getFlowGraphSummaryPath = mkPath(BASE_URL, "entity", ":kind", ":id", "data-type", ":dtId", "graph-summary");
+        String getFlowViewPath = mkPath(BASE_URL, "view");
 
         ListRoute<LogicalFlow> getByEntityRef = (request, response)
                 -> logicalFlowService.findByEntityReference(getEntityReference(request));
@@ -146,6 +149,11 @@ public class LogicalFlowEndpoint implements Endpoint {
             return logicalFlowService.getFlowInfoByDirection(getEntityReference(request), dtId);
         };
 
+        DatumRoute<LogicalFlowView> getFlowViewRoute = (request, response) -> {
+            IdSelectionOptions idSelectionOptions = readIdSelectionOptionsFromBody(request);
+            return logicalFlowService.getFlowView(idSelectionOptions);
+        };
+
         getForDatum(cleanupOrphansPath, this::cleanupOrphansRoute);
         getForDatum(cleanupSelfReferencesPath, this::cleanupSelfReferencingFlowsRoute);
         getForList(findByEntityPath, getByEntityRef);
@@ -163,6 +171,7 @@ public class LogicalFlowEndpoint implements Endpoint {
         postForDatum(addFlowPath, this::addFlowRoute);
         postForList(addFlowsPath, this::addFlowsRoute);
         putForDatum(restoreFlowPath, this::restoreFlowRoute);
+        postForDatum(getFlowViewPath, getFlowViewRoute);
     }
 
 

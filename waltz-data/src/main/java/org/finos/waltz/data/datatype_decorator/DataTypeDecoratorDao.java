@@ -28,6 +28,7 @@ import org.jooq.Select;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public abstract class DataTypeDecoratorDao {
 
@@ -43,7 +44,7 @@ public abstract class DataTypeDecoratorDao {
     public abstract List<DataTypeDecorator> findByDataTypeIdSelector(Select<Record1<Long>> dataTypeIdSelector);
 
     //only implemented for logical flows
-    public abstract List<DataTypeDecorator> findByFlowIds(Collection<Long> flowIds);
+    public abstract Set<DataTypeDecorator> findByFlowIds(Collection<Long> flowIds);
 
     public abstract int[] addDecorators(Collection<DataTypeDecorator> dataTypeDecorators);
 
@@ -51,4 +52,5 @@ public abstract class DataTypeDecoratorDao {
 
     public abstract List<DataTypeUsageCharacteristics> findDatatypeUsageCharacteristics(EntityReference ref);
 
+    public abstract Set<DataTypeDecorator> findByLogicalFlowIdSelector(Select<Record1<Long>> flowIdSelector);
 }
