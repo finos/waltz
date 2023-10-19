@@ -30,6 +30,17 @@ export function containsAll(xs = [], ys = []) {
 
 
 /**
+ *
+ * @param xs
+ * @param ys
+ * @returns boolean - `true` iff all elements of `ys` occur in `xs`, works for objects
+ */
+export function containsAny(xs = [], ys = []) {
+    return _.some(ys, y => _.some(xs, x => _.isEqual(y, x)));
+}
+
+
+/**
  * given an array of numbers (xs) returns the cumulative counts. E.g.
  *
  * ```

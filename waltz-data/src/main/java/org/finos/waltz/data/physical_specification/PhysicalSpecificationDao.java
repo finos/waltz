@@ -165,9 +165,9 @@ public class PhysicalSpecificationDao {
     }
 
 
-    public List<PhysicalSpecification> findBySelector(Select<Record1<Long>> selector) {
+    public Set<PhysicalSpecification> findBySelector(Select<Record1<Long>> selector) {
         return basicSelectByCondition(PHYSICAL_SPECIFICATION.ID.in(selector))
-                .fetch(TO_DOMAIN_MAPPER);
+                .fetchSet(TO_DOMAIN_MAPPER);
     }
 
 

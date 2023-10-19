@@ -252,7 +252,7 @@
                     {#if survey.surveyInstance.approvedAt}
                         <DateTime relative={false}
                                   formatStr="yyyy-MM-DD"
-                                  dateTime={survey.surveyInstance.submittedAt}/>
+                                  dateTime={survey.surveyInstance.approvedAt}/>
                         / {survey.surveyInstance.approvedBy}
                     {:else}
                         -

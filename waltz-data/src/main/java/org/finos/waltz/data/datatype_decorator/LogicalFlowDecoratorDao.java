@@ -171,11 +171,24 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
                 .fetch(TO_DECORATOR_MAPPER);
     }
 
+
+    /**
+     * Deprecated - use findByLogicalFlowIdSelector instead
+     */
     @Override
-    public List<DataTypeDecorator> findByFlowIds(Collection<Long> flowIds) {
+    @Deprecated
+    public Set<DataTypeDecorator> findByFlowIds(Collection<Long> flowIds) {
         checkNotNull(flowIds, "flowIds cannot be null");
 
         Condition condition = LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.in(flowIds);
+
+        return findByCondition(condition);
+    }
+
+
+    @Override
+    public Set<DataTypeDecorator> findByLogicalFlowIdSelector(Select<Record1<Long>> flowIdSelector) {
+        Condition condition = LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.in(flowIdSelector);
 
         return findByCondition(condition);
     }
@@ -356,6 +369,7 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
                 });
     }
 
+
     public int updateRatingsByCondition(AuthoritativenessRatingValue rating, Condition condition) {
         return dsl
                 .update(LOGICAL_FLOW_DECORATOR)
@@ -367,13 +381,13 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
 
     // --- HELPERS ---
 
-    private List<DataTypeDecorator> findByCondition(Condition condition) {
+    private Set<DataTypeDecorator> findByCondition(Condition condition) {
         return dsl
                 .select(LOGICAL_FLOW_DECORATOR.fields())
                 .select(ENTITY_NAME_FIELD)
                 .from(LOGICAL_FLOW_DECORATOR)
                 .where(dsl.renderInlined(condition))
-                .fetch(TO_DECORATOR_MAPPER);
+                .fetchSet(TO_DECORATOR_MAPPER);
     }
 
 }

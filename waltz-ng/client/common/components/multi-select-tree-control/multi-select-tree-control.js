@@ -163,7 +163,7 @@ function controller() {
         vm.expandedNodes = termStr.length === 0
             ? expandSelectedNodes(vm.items, vm.expandedItemIds) // reset tree to 'normal' state
             : determineExpandedNodes(  // expand results, taking precautions to not expand too many nodes
-                m.hierarchy,
+                vm.hierarchy,
                 determineDepthLimit(matchingNodes.length));
     };
 

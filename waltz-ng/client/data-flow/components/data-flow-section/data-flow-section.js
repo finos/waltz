@@ -37,7 +37,7 @@ const bindings = {
 const tabs = [
     {id: "SUMMARY", name: "Logical Flows"},
     {id: "LOGICAL_FLOW_SCROLL", name: "Logical Flows (Beta View)"},
-    {id: "PHYSICAL", name: "Physical Flow Detail"},
+    {id: "FLOW_DETAIL", name: "Flow Detail"},
     {id: "FLOW_CLASSIFICATION_RULES", name: "Flow Classification Rules"}
 ];
 
