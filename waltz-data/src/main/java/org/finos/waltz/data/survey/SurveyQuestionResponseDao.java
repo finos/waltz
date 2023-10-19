@@ -148,12 +148,13 @@ public class SurveyQuestionResponseDao {
         Map<Long, List<EntityReference>> entityListResponsesByQuestionId = listResponses
                 .stream()
                 .filter(d -> d.v1.getEntityKind() != null)
-                .map(d -> tuple(d.v1.getQuestionId(), mkRef(
-                        EntityKind.valueOf(d.v1.getEntityKind()),
-                        d.v1.getEntityId(),
-                        d.v1.getResponse(),
-                        null,
-                        d.v2)))
+                .map(d -> tuple(
+                        d.v1.getQuestionId(),
+                        mkRef(EntityKind.valueOf(d.v1.getEntityKind()),
+                              d.v1.getEntityId(),
+                              d.v1.getResponse(),
+                              null,
+                              d.v2)))
                 .collect(groupingBy(d -> d.v1, mapping(t -> t.v2, toList())));
 
         Map<Long, List<String>> stringListResponsesByQuestionId = listResponses

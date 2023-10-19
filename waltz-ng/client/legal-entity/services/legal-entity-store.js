@@ -33,14 +33,14 @@ export function store($http, BaseApiUrl) {
         return $http
             .get(`${BASE}/all`)
             .then(result => result.data);
-    }
+    };
 
     const findBySelector = (selector, force = false) => {
         checkIsIdSelector(selector);
         return $http
             .post(`${BASE}/selector`, selector)
             .then(result => result.data);
-    }
+    };
 
     return {
         getById,

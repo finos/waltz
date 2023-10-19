@@ -27,8 +27,8 @@ import {action} from "../../../common/services/enums/action";
 
 
 const bindings = {
-    existingRefs: '<',
-    onSave: '<',
+    existingRefs: "<",
+    onSave: "<",
     itemId: "<?", // ctx
     required: "<?"
 };
@@ -49,7 +49,7 @@ const initialState = {
     isDirty: false,
 
 
-    onSave: (entityRefs) => console.log('default onSave handler for bulk-legal-entity-selector: ', entityRefs)
+    onSave: (entityRefs) => console.log("default onSave handler for bulk-legal-entity-selector: ", entityRefs)
 };
 
 
@@ -58,7 +58,7 @@ function mkSummary(searchResults = []) {
         total: searchResults.length,
         removedEntityCount: _
             .chain(searchResults)
-            .filter(r => _.get(r, ["entityRef", "entityLifecycleStatus"]) === 'REMOVED')
+            .filter(r => _.get(r, ["entityRef", "entityLifecycleStatus"]) === "REMOVED")
             .size()
             .value()
     };
@@ -80,22 +80,22 @@ function determineAction(existingRef, searchedRef) {
     if (!searchedRef) return;
 
     if (!existingRef) {
-        return 'ADD';
+        return "ADD";
     } else if (sameRef(existingRef, searchedRef)) {
-        return 'NO_CHANGE';
+        return "NO_CHANGE";
     }
 }
 
 
 function findMatched(legalEntities = [], identifiers = [], existingRefs = []) {
-    const lesByExternalId = _.keyBy(legalEntities, 'externalId');
-    const existingRefsById = _.keyBy(existingRefs, 'id');
+    const lesByExternalId = _.keyBy(legalEntities, "externalId");
+    const existingRefsById = _.keyBy(existingRefs, "id");
 
     return _
         .chain(identifiers)
         .map(identifier => {
             const le = lesByExternalId[identifier];
-            const entityRef = le ? toEntityRef(le, 'LEGAL_ENTITY') : null;
+            const entityRef = le ? toEntityRef(le, "LEGAL_ENTITY") : null;
 
             return {
                 identifier,
@@ -113,7 +113,7 @@ function controller(serviceBroker) {
     vm.$onChanges = (changes) => {
         if (vm.existingRefs) {
             vm.bulkEntriesString = _.chain(vm.existingRefs)
-                .map('externalId')
+                .map("externalId")
                 .join('\n')
                 .value();
 
@@ -184,7 +184,7 @@ function controller(serviceBroker) {
 
 
 controller.$inject = [
-    'ServiceBroker'
+    "ServiceBroker"
 ];
 
 
@@ -197,5 +197,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzBulkLegalEntitySelector'
+    id: "waltzBulkLegalEntitySelector"
 };
