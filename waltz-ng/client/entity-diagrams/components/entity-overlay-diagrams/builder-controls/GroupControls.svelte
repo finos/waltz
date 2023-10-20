@@ -7,11 +7,14 @@
     import GroupDetailsPanel from "./GroupDetailsPanel.svelte";
     import toasts from "../../../../svelte-stores/toast-store";
     import {generateUUID} from "../../../../system/svelte/nav-aid-builder/custom/builderStore";
+    import AddItemsPanel from "./AddItemsPanel.svelte";
+    import Icon from "../../../../common/svelte/Icon.svelte";
 
     const ControlModes = {
         VIEW: "VIEW",
         EDIT_GROUP: "EDIT_GROUP",
         EDIT_ITEMS: "EDIT_ITEMS",
+        ADD_ITEMS: "ADD_ITEMS",
     }
 
     let activeMode = ControlModes.VIEW;
@@ -60,13 +63,6 @@
         updateChildren($selectedGroup.id, childGroups);
     }
 
-    function createGroup() {
-        const groupNumber = _.size($groups) + 1;
-        const id = generateUUID();
-        const newGroup = mkGroup("Group " + groupNumber.toString(), id, $selectedGroup.id, groupNumber, $selectedGroup.props)
-        addGroup(newGroup);
-    }
-
     function remove() {
         removeGroup($selectedGroup);
     }
@@ -84,7 +80,13 @@
     <div class="row">
         <div class="col-md-12">
             {#if activeMode === ControlModes.VIEW}
+
                 <GroupDetailsPanel/>
+
+                <div class="help-block">
+                    <Icon name="info-circle"/> Use the controls below to update the group details, add items to appear within the selected group,
+                    or update the details in bulk for the children of the selected group.
+                </div>
 
                 <div class="controls">
                     <button class="btn btn-default"
@@ -92,24 +94,16 @@
                         Edit Group Details
                     </button>
                     <button class="btn btn-default"
-                            on:click={createGroup}>
-                        Add Child Group
+                            on:click={() => activeMode = ControlModes.ADD_ITEMS}>
+                        Add Item
                     </button>
                     <button class="btn btn-default"
                             on:click={() => activeMode = ControlModes.EDIT_ITEMS}>
-                        Edit Items
+                        Edit Item Details
                     </button>
                     <button class="btn btn-default"
                             on:click={() => toggleFlexDirection()}>
                         Toggle Alignment
-                    </button>
-                    <button class="btn btn-default"
-                            on:click={() => toggleItemTitleDisplay()}>
-                        Toggle Item Title Display
-                    </button>
-                    <button class="btn btn-default"
-                            on:click={() => toggleItemBorderDisplay()}>
-                        Toggle Item Border Display
                     </button>
                     <button class="btn btn-default"
                             disabled={_.isNil($selectedGroup.parentId)}
@@ -121,13 +115,15 @@
             {:else if activeMode === ControlModes.EDIT_GROUP}
                 <EditGroupPanel on:save={saveGroup}
                                 on:cancel={() => activeMode = ControlModes.VIEW}/>
+            {:else if activeMode === ControlModes.ADD_ITEMS}
+                <AddItemsPanel on:cancel={() => activeMode = ControlModes.VIEW}/>
             {:else if activeMode === ControlModes.EDIT_ITEMS}
                 <EditItemsPanel on:cancel={() => activeMode = ControlModes.VIEW}/>
             {/if}
         </div>
     </div>
 {:else}
-    <div class="help-block">Select an item or group from the diagram or tree to get modify it</div>
+    <div class="help-block">Select an item or group from the diagram or tree to modify it</div>
 {/if}
 
 

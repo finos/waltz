@@ -14,12 +14,14 @@ import org.finos.waltz.data.aggregate_overlay_diagram.AssessmentRatingWidgetDao;
 import org.finos.waltz.data.aggregate_overlay_diagram.AttestationWidgetDao;
 import org.finos.waltz.data.aggregate_overlay_diagram.BackingEntityWidgetDao;
 import org.finos.waltz.data.aggregate_overlay_diagram.ComplexityWidgetDao;
+import org.finos.waltz.data.aggregate_overlay_diagram.RatingCostWidgetDao;
 import org.finos.waltz.data.aggregate_overlay_diagram.TargetAppCostWidgetDao;
 import org.finos.waltz.data.application.ApplicationDao;
 import org.finos.waltz.data.complexity.ComplexityKindDao;
 import org.finos.waltz.data.cost.CostKindDao;
 import org.finos.waltz.data.measurable.MeasurableDao;
 import org.finos.waltz.model.AssessmentBasedSelectionFilter;
+import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.ReleaseLifecycleStatusChangeCommand;
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagram;
@@ -62,6 +64,7 @@ import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AppCountWidgetParameters;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AssessmentWidgetParameters;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AttestationWidgetParameters;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.RatingCostWidgetParameters;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.TargetAppCostWidgetParameters;
 import org.finos.waltz.model.application.Application;
 import org.finos.waltz.model.complexity.ComplexityKind;
@@ -89,6 +92,7 @@ public class AggregateOverlayDiagramService {
     private final AppCountWidgetDao appCountWidgetDao;
     private final TargetAppCostWidgetDao targetAppCostWidgetDao;
     private final AppCostWidgetDao appCostWidgetDao;
+    private final RatingCostWidgetDao ratingCostWidgetDao;
     private final AssessmentRatingWidgetDao appAssessmentWidgetDao;
     private final BackingEntityWidgetDao backingEntityWidgetDao;
     private final AggregatedEntitiesWidgetDao aggregatedEntitiesWidgetDao;
@@ -107,7 +111,7 @@ public class AggregateOverlayDiagramService {
     public AggregateOverlayDiagramService(AggregateOverlayDiagramDao aggregateOverlayDiagramDao,
                                           AppCountWidgetDao appCountWidgetDao,
                                           TargetAppCostWidgetDao targetAppCostWidgetDao,
-                                          AssessmentRatingWidgetDao appAssessmentWidgetDao,
+                                          RatingCostWidgetDao ratingCostWidgetDao, AssessmentRatingWidgetDao appAssessmentWidgetDao,
                                           BackingEntityWidgetDao backingEntityWidgetDao,
                                           AppCostWidgetDao appCostWidgetDao,
                                           AggregatedEntitiesWidgetDao aggregatedEntitiesWidgetDao,
@@ -123,6 +127,7 @@ public class AggregateOverlayDiagramService {
         this.aggregateOverlayDiagramDao = aggregateOverlayDiagramDao;
         this.appCountWidgetDao = appCountWidgetDao;
         this.targetAppCostWidgetDao = targetAppCostWidgetDao;
+        this.ratingCostWidgetDao = ratingCostWidgetDao;
         this.appCostWidgetDao = appCostWidgetDao;
         this.appAssessmentWidgetDao = appAssessmentWidgetDao;
         this.backingEntityWidgetDao = backingEntityWidgetDao;
@@ -258,6 +263,48 @@ public class AggregateOverlayDiagramService {
         List<Measurable> measurables = measurableDao.findByMeasurableIdSelector(measurableSelector);
         List<Application> applications = applicationDao.findByAppIdSelector(entityIdSelector);
         Set<CostKindWithYears> costKindsWithYears = costKindDao.findAll();
+
+        return ImmutableCostWidgetData
+                .builder()
+                .cellData(costData)
+                .measurables(measurables)
+                .applications(applications)
+                .costKinds(SetUtilities.map(costKindsWithYears, CostKindWithYears::costKind))
+                .build();
+    }
+
+
+    public CostWidgetData getRatingCostWidgetData(Long diagramId,
+                                                  Set<AssessmentBasedSelectionFilter> filterParams,
+                                                  IdSelectionOptions appSelectionOptions,
+                                                  RatingCostWidgetParameters costWidgetParameters) {
+
+        AggregateOverlayDiagram diagram = aggregateOverlayDiagramDao.getById(diagramId);
+
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(diagram.aggregatedEntityKind(), appSelectionOptions);
+        Select<Record1<Long>> entityIdSelector = applyFiltersToSelector(genericSelector, filterParams);
+
+        Set<CostWidgetDatum> costData = ratingCostWidgetDao.findWidgetData(
+                diagramId,
+                costWidgetParameters.costKindIds(),
+                entityIdSelector);
+
+        Set<Long> measurableIds = costData
+                .stream()
+                .flatMap(d -> d
+                        .measurableCosts()
+                        .stream())
+                .map(MeasurableCostEntry::measurableId)
+                .collect(Collectors.toSet());
+
+        Select<Record1<Long>> measurableSelector = DSL
+                .select(MEASURABLE.ID)
+                .from(MEASURABLE)
+                .where(MEASURABLE.ID.in(measurableIds));
+
+        List<Measurable> measurables = measurableDao.findByMeasurableIdSelector(measurableSelector);
+        List<Application> applications = applicationDao.findByAppIdSelector(entityIdSelector);
+        Set<CostKindWithYears> costKindsWithYears = costKindDao.findCostKindsBySubjectKind(EntityKind.MEASURABLE_RATING);
 
         return ImmutableCostWidgetData
                 .builder()

@@ -54,7 +54,7 @@
                         </div>
                 {:else}
                     {#if group.data}
-                        <div style={mkCellContentStyle(group)}>
+                        <div style={mkCellContentStyle(group, $hoveredGroupId)}>
                             <CellContent data={group.data}
                                          cellId={group.id}
                                          height={group.props.minWidth / 3}

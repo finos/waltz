@@ -17,10 +17,14 @@
 
     export let group;
 
-    const {selectedOverlay, selectedGroup, selectGroup, overlayData} = diagramService;
+    const {selectedOverlay, selectedGroup, selectGroup, overlayData, clearSelectedGroup} = diagramService;
 
     function selectOverlayGroup() {
-        selectGroup(group);
+        if ($selectedGroup?.id === group.id) {
+            clearSelectedGroup();
+        } else {
+            selectGroup(group);
+        }
     }
 
     function hasData(node, dataById) {
@@ -50,11 +54,13 @@
 {#if group}
 <div>
     <div style="display: flex">
-        <div style={mkGroupCellStyle(group)}>
+        <div style={mkGroupCellStyle(group)}
+             class="clickable"
+             on:click|stopPropagation={selectOverlayGroup}
+             on:keydown|stopPropagation={selectOverlayGroup}>
             {#if group.props.showTitle}
-                <div style={mkTitleStyle(group, $hoveredGroupId)}>
-                    <button style="outline: none !important; width: 100%; background: none; border: none; color: inherit;"
-                            on:click={selectOverlayGroup}>
+                <div style={mkTitleStyle(group, $selectedGroup?.id, $hoveredGroupId)}>
+                    <button style="outline: none !important; width: 100%; background: none; border: none; color: inherit;">
                         {#if group.data}
                             <Icon name={_.get(entity, [group.data.entityReference.kind, "icon"], "info-circle")}/>
                         {:else}
@@ -68,9 +74,8 @@
                     </button>
                 </div>
             {:else if overlayRequiresTitle}
-                <div style={mkTitleStyle(group, $hoveredGroupId)}>
-                    <button style="outline: none !important; width: 100%; background: none; border: none; color: inherit;"
-                            on:click={selectOverlayGroup}>
+                <div style={mkTitleStyle(group, $selectedGroup?.id, $hoveredGroupId)}>
+                    <button style="outline: none !important; width: 100%; background: none; border: none; color: inherit;">
                         {group.title}
                     </button>
                 </div>
@@ -85,7 +90,7 @@
                     </div>
                 {:else}
                     {#if group.data}
-                        <div style={mkCellContentStyle(group)}>
+                        <div style={mkCellContentStyle(group, $selectedGroup?.id, $hoveredGroupId)}>
                             <CellContent data={group.data}
                                          cellId={group.id}
                                          height={group.props.minWidth / 3}

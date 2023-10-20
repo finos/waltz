@@ -59,6 +59,15 @@ export function mkOverlayDiagramStore() {
                 {force});
     };
 
+    const findRatingCostForDiagram = (diagramId, widgetParameters, force = false) => {
+        return remote
+            .fetchViewList(
+                "POST",
+                `api/aggregate-overlay-diagram/diagram-id/${diagramId}/rating-cost-widget`,
+                widgetParameters,
+                {force});
+    };
+
     const findAppAssessmentsForDiagram = (diagramId, widgetParameters, force = false) => {
         return remote
             .fetchViewList(
@@ -138,6 +147,7 @@ export function mkOverlayDiagramStore() {
         findTargetAppCostForDiagram,
         findAttestationsForDiagram,
         findAppCostForDiagram,
+        findRatingCostForDiagram,
         findAppAssessmentsForDiagram,
         findBackingEntitiesForDiagram,
         findAggregatedEntitiesForDiagram,

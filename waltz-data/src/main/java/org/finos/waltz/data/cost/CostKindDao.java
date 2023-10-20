@@ -73,6 +73,11 @@ public class CostKindDao {
     }
 
 
+    public Set<CostKindWithYears> findCostKindsBySubjectKind(EntityKind kind){
+        return findCostKindsByCondition(COST_KIND.SUBJECT_KIND.eq(kind.name()));
+    }
+
+
     public Set<CostKindWithYears> findCostKindsBySelector(GenericSelector genericSelector) {
 
         Condition cond = COST.ENTITY_ID.in(genericSelector.selector())

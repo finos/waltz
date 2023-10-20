@@ -155,7 +155,7 @@
                       fill={renderMode === RenderModes.FOCUSED ? waltzLinkColor : waltzFontColor}
                       dominant-baseline="middle"
                       style="pointer-events: none">
-                    # Apps: {cellData?.currentAppCount || 0} (+{cellData?.totalInboundCount} / -{cellData?.totalOutboundCount})
+                    # Apps: {cellData?.currentAppCount || 0} (+{cellData?.totalInboundCount || 0} / -{cellData?.totalOutboundCount || 0})
                 </text>
             </g>
             <g>

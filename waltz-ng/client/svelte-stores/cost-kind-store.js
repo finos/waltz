@@ -27,8 +27,16 @@ export function mkCostKindStore() {
             null,
             {force});
 
+    const findBySubjectKind = (subjectKind, force = false) => remote
+        .fetchViewList(
+            "GET",
+            `api/cost-kind/subject-kind/${subjectKind}`,
+            null,
+            {force});
+
     return {
-        findAll
+        findAll,
+        findBySubjectKind
     };
 }
 
