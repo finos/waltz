@@ -181,9 +181,9 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
         return firstNonNull(
                 fc.externalId().orElse(null),
                 fc.displayName(),
-                fc.columnName() + entityFieldName
-                        .map(n -> " / " + n)
-                        .orElse(""))
+                entityFieldName
+                        .map(n -> n + " / " + fc.columnName())
+                        .orElse(fc.columnName()))
             .orElse("?");
     }
 
