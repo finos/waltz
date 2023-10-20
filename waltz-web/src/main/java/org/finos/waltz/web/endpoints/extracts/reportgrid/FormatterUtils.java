@@ -18,6 +18,7 @@
 package org.finos.waltz.web.endpoints.extracts.reportgrid;
 
 import org.finos.waltz.common.ListUtilities;
+import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.model.entity_field_reference.EntityFieldReference;
 import org.finos.waltz.model.report_grid.ReportGridDerivedColumnDefinition;
 import org.finos.waltz.model.report_grid.ReportGridFixedColumnDefinition;
@@ -99,7 +100,7 @@ public class FormatterUtils {
     }
 
     public String getColumnName(ReportGridFixedColumnDefinition column) {
-        if (column.displayName() != null) {
+        if (StringUtilities.isDefined(column.displayName())) {
             return column.displayName();
         } else {
             String fieldName = Optional
