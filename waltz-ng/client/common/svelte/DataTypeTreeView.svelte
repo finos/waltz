@@ -1,17 +1,21 @@
 <script>
     import {dataTypeStore} from "../../svelte-stores/data-type-store";
-    import {buildHierarchies, doSearch, prepareSearchNodes} from "../hierarchy-utils";
+    import {buildHierarchies, doSearch, prepareSearchNodes, reduceToSelectedNodesOnly} from "../hierarchy-utils";
     import DataTypeTreeNode from "./DataTypeTreeNode.svelte";
     import SearchInput from "./SearchInput.svelte";
     import _ from "lodash";
 
-    export let multiSelect = false;
-    export let nonConcreteSelectable = true;
     export let selectionFilter = () => true;
+    export let dataTypeIds = [];
     export let expanded = true;
 
     const root = {name: "Root", isExpanded: true};
 
+    let dataTypesCall = dataTypeStore.findAll();
+
+    let qry = "";
+    let searchNodes = [];
+    let dataTypes = [];
 
     function calcDisplayHierarchy(nodes, query) {
         const searchResult = _.map(
@@ -25,27 +29,24 @@
         return buildHierarchies(searchResult, false);
     }
 
-    let dataTypesCall = dataTypeStore.findAll();
-    let qry = "";
-    let searchNodes = [];
-    let dataTypes = [];
-
     $: dataTypes = $dataTypesCall.data;
-    $: searchNodes = prepareSearchNodes(dataTypes);
+
+    $: requiredNodes = reduceToSelectedNodesOnly(dataTypes, dataTypeIds);
+    $: searchNodes = prepareSearchNodes(requiredNodes);
+
     $: displayedHierarchy = calcDisplayHierarchy(searchNodes, qry);
 
 </script>
 
 <SearchInput bind:value={qry}/>
 
-<div class="waltz-scroll-region-350">
-    <DataTypeTreeNode {multiSelect}
-                      {selectionFilter}
-                      {nonConcreteSelectable}
+<div style="padding-top: 1em">
+    <DataTypeTreeNode {selectionFilter}
                       isRoot={true}
                       node={root}
                       childNodes={displayedHierarchy}
                       {expanded}
+                      nonConcreteSelectable={false}
                       on:select/>
 </div>
 

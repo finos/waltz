@@ -52,8 +52,8 @@ export function mkDataTypeDecoratorStore() {
 
     const save = (ref, command) => remote
         .execute("POST",
-            `api/data-type-decorator/save/entity/${ref.kind}/${ref.id}`,
-            command);
+                 `api/data-type-decorator/save/entity/${ref.kind}/${ref.id}`,
+                 command);
 
     return {
         findByFlowIds,
