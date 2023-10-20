@@ -39,6 +39,7 @@ public abstract class DataTypeDecoratorDao {
                                                                    Optional<EntityKind> entityKind);
 
     public abstract List<DataTypeDecorator> findByAppIdSelector(Select<Record1<Long>> appIdSelector);
+    public abstract List<DataTypeDecorator> findByFlowIdSelector(Select<Record1<Long>> flowIdSelector);
 
     public abstract List<DataTypeDecorator> findByDataTypeIdSelector(Select<Record1<Long>> dataTypeIdSelector);
 

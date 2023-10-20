@@ -22,6 +22,7 @@ import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.datatype_decorator.DataTypeDecoratorDao;
 import org.finos.waltz.data.datatype_decorator.DataTypeDecoratorDaoSelectorFactory;
 import org.finos.waltz.data.logical_flow.LogicalFlowDao;
+import org.finos.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import org.finos.waltz.data.physical_specification.PhysicalSpecificationDao;
 import org.finos.waltz.model.*;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
@@ -66,6 +67,7 @@ public class DataTypeDecoratorService {
     private final DataTypeUsageService dataTypeUsageService;
     private final DataTypeService dataTypeService;
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
+    private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory = new LogicalFlowIdSelectorFactory();
     private final PhysicalSpecificationDao physicalSpecificationDao;
     private final PhysicalSpecificationService physicalSpecificationService;
 
@@ -258,6 +260,8 @@ public class DataTypeDecoratorService {
             case DATA_TYPE:
                 return dao.findByDataTypeIdSelector(
                         genericSelectorFactory.applyForKind(DATA_TYPE, options).selector());
+            case LOGICAL_DATA_FLOW:
+                return dao.findByFlowIdSelector(logicalFlowIdSelectorFactory.apply(options));
             default:
                 throw new UnsupportedOperationException("Cannot find decorators for selector kind: " + options.entityReference().kind());
         }
