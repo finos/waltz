@@ -15,64 +15,47 @@
     import ColorPicker from "../../../../system/svelte/ratings-schemes/ColorPicker.svelte";
     import {backgroundColors, titleColors} from "../builder/diagram-builder-store";
     import {generateUUID} from "../../../../system/svelte/nav-aid-builder/custom/builderStore";
+    import Icon from "../../../../common/svelte/Icon.svelte";
 
     const dispatch = createEventDispatcher();
 
-    const entityList = [
-        entity.MEASURABLE,
-        entity.DATA_TYPE,
-        entity.PERSON,
-    ];
-
     const EditModes = {
-        ADD: "ADD",
+        VIEW: "VIEW",
         SIZE: "SIZE",
         COLOR: "COLOR"
     }
 
-    let activeMode = EditModes.ADD;
+    let activeMode = EditModes.VIEW;
     let editingItemSize = false;
 
     let working = {}
 
     const {selectedGroup, groups, addGroup, updateChildren} = diagramService;
 
-    let itemKind = _.get($selectedGroup, ["data", "kind"], null);
+    function toggleItemTitleDisplay() {
+        const childGroups = _
+            .chain($groups)
+            .filter(d => d.parentId === $selectedGroup.id)
+            .map(d => {
+                const updatedProps = Object.assign({}, d.props, {showTitle: !d.props.showTitle});
 
-    function selectItem(entity) {
-        const groupNumber = _.size($groups) + 1;
-        const id = generateUUID();
-        const newGroup = mkGroup(entity.name, id, $selectedGroup.id, groupNumber, $selectedGroup.props)
-        addGroup(newGroup, entity);
-    }
-
-    function determineStore(ref) {
-        if (_.isEmpty(ref)) {
-            console.log(`Cannot load children where the parent doesn't have data associated`);
-        } else {
-            switch (ref.kind) {
-                case entity.MEASURABLE.key:
-                    return measurableStore.findByParentId(ref.id);
-                case entity.DATA_TYPE.key:
-                    return dataTypeStore.findByParentId(ref.id);
-                case entity.PERSON.key:
-                    return personStore.findDirectsForPersonIds([ref.id]);
-                default:
-                    console.log(`Cannot load children for entity kind: ${ref.kind}`);
-            }
-        }
-    }
-
-    function addChildren() {
-        const existingChildren = _.filter($groups, d => d.parentId === $selectedGroup.id);
-        _.chain(directChildren)
-            .reject(child => _.some(existingChildren, d => sameRef(d.data.entityReference, child)))
-            .forEach(child => selectItem(child))
+                return Object.assign({}, d, {props: updatedProps});
+            })
             .value();
+        updateChildren($selectedGroup.id, childGroups);
     }
 
-    function deselectItem(entity) {
-        $groups = _.reject($groups, d => d.parentId === $selectedGroup.id && sameRef(d.data.entityReference, entity));
+    function toggleItemBorderDisplay() {
+        const childGroups = _
+            .chain($groups)
+            .filter(d => d.parentId === $selectedGroup.id)
+            .map(d => {
+                const updatedProps = Object.assign({}, d.props, {showBorder: !d.props.showBorder});
+
+                return Object.assign({}, d, {props: updatedProps});
+            })
+            .value();
+        updateChildren($selectedGroup.id, childGroups);
     }
 
     function updateItemSizes() {
@@ -135,28 +118,22 @@
         return !_.some($groups, d => d.parentId === $selectedGroup.id && d.data && sameRef(d.data.entityReference, entity));
     }
 
-    $: fetchChildrenStore = determineStore($selectedGroup.data?.entityReference);
-    $: directChildren = $fetchChildrenStore?.data || [];
 </script>
 
 
-{#if activeMode === EditModes.ADD}
-    <DropdownPicker items={entityList}
-                    onSelect={(item) => itemKind = item.key}
-                    defaultMessage="Select an item kind for this group"
-                    selectedItem={_.find(entityList, d => d.key === itemKind)}/>
+{#if activeMode === EditModes.VIEW}
     <div class="help-block">
-        Pick a type of entity to add or remove from this group, by default it will be the kind of the parent.
+        <Icon name="info-circle"/> Use the controls below to update the properties of the direct children of this group.
     </div>
-
-    {#if itemKind}
-        <EntityPicker entityKind={itemKind}
-                      onSelect={selectItem}
-                      onDeselect={deselectItem}
-                      selectionFilter={alreadyAddedFilter}/>
-    {/if}
-
     <div class="controls">
+        <button class="btn btn-default"
+                on:click={() => toggleItemTitleDisplay()}>
+            Toggle Title Display
+        </button>
+        <button class="btn btn-default"
+                on:click={() => toggleItemBorderDisplay()}>
+            Toggle Border Display
+        </button>
         <button class="btn btn-default"
                 on:click={updateSize}>
             Update Item Size
@@ -164,10 +141,6 @@
         <button class="btn btn-default"
                 on:click={updateColors}>
             Update Item Colors
-        </button>
-        <button class="btn btn-default"
-                on:click={addChildren}>
-            Add Direct Children
         </button>
         <button class="btn btn-default"
                 on:click={cancel}>
@@ -180,7 +153,7 @@
     <label for="item-width">Item Width: {working.minWidth}</label>
     <input id="item-width" type="range" min="2" max="20" bind:value={working.minWidth}>
     <div class="help-block">
-        This will override the minimum width of all items in this group. Defaults to minimum width of its parent.
+        This will override the minimum width of all children of this group. Defaults to minimum width of its parent.
     </div>
     <label for="item-height">Item Height: {working.minHeight}</label>
     <input id="item-height" type="range" min="2" max="20" bind:value={working.minHeight}>

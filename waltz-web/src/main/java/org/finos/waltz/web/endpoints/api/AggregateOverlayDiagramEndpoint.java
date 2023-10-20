@@ -39,6 +39,7 @@ import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AppComplexityWidgetParameters;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AppCostWidgetParameters;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.AssessmentWidgetParameters;
+import org.finos.waltz.model.aggregate_overlay_diagram.overlay.widget_parameters.RatingCostWidgetParameters;
 import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.aggregate_overlay_diagram.AggregateOverlayDiagramService;
 import org.finos.waltz.service.user.UserRoleService;
@@ -53,6 +54,7 @@ import org.finos.waltz.web.json.OverlayDiagramAppCostWidgetInfo;
 import org.finos.waltz.web.json.OverlayDiagramAppCountWidgetInfo;
 import org.finos.waltz.web.json.OverlayDiagramAssessmentWidgetInfo;
 import org.finos.waltz.web.json.OverlayDiagramAttestationWidgetInfo;
+import org.finos.waltz.web.json.OverlayDiagramRatingCostWidgetInfo;
 import org.finos.waltz.web.json.OverlayDiagramTargetAppCostWidgetInfo;
 import org.finos.waltz.web.json.OverlayDiagramWidgetInfo;
 import org.slf4j.Logger;
@@ -102,6 +104,7 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
         String getAttestationWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "attestation");
         String findTargetAppCostWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "target-app-cost-widget");
         String getAppCostWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "app-cost-widget");
+        String getRatingCostWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "rating-cost-widget");
         String getAppAssessmentWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "app-assessment-widget");
         String getAggregatedEntitiesWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "aggregated-entities-widget");
         String getBackingEntityWidgetDataPath = mkPath(BASE_URL, "diagram-id", ":id", "backing-entity-widget");
@@ -178,6 +181,18 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
                             appCostWidgetParameters.assessmentBasedSelectionFilters(),
                             appCostWidgetParameters.idSelectionOptions(),
                             appCostWidgetParameters.overlayParameters());
+        };
+
+
+        DatumRoute<CostWidgetData> getRatingCostWidgetDataRoute = (request, response) -> {
+            OverlayDiagramWidgetInfo<RatingCostWidgetParameters> costWidgetParameters = readBody(request, OverlayDiagramRatingCostWidgetInfo.class);
+
+            return aggregateOverlayDiagramService
+                    .getRatingCostWidgetData(
+                            getId(request),
+                            costWidgetParameters.assessmentBasedSelectionFilters(),
+                            costWidgetParameters.idSelectionOptions(),
+                            costWidgetParameters.overlayParameters());
         };
 
 
@@ -268,6 +283,7 @@ public class AggregateOverlayDiagramEndpoint implements Endpoint {
         postForDatum(getAttestationWidgetDataPath, getAttestationWidgetDataRoute);
         postForDatum(findTargetAppCostWidgetDataPath, findTargetAppCostWidgetDataRoute);
         postForDatum(getAppCostWidgetDataPath, getAppCostWidgetDataRoute);
+        postForDatum(getRatingCostWidgetDataPath, getRatingCostWidgetDataRoute);
         postForDatum(getAppAssessmentWidgetDataPath, getAppAssessmentWidgetDataRoute);
         postForDatum(getAggregatedEntitiesWidgetDataPath, getAggregatedEntitiesWidgetDataRoute);
         postForDatum(getComplexityWidgetDataPath, getComplexityWidgetDataRoute);

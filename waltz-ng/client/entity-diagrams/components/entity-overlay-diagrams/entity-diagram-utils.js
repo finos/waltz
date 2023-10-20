@@ -21,7 +21,7 @@ import _ from "lodash";
 import {entity} from "../../../common/services/enums/entity";
 import {
     mkAggregatedEntitiesGlobalProps, mkAppChangesOverlayGlobalProps,
-    mkAssessmentOverlayGlobalProps
+    mkAssessmentOverlayGlobalProps, mkRatingCostOverlayGlobalProps
 } from "../../../aggregate-overlay-diagram/components/aggregate-overlay-diagram/aggregate-overlay-diagram-utils";
 import DefaultOverlay from "./overlays/DefaultOverlay.svelte";
 import AggregatedEntitiesOverlayParameters from "./overlays/AggregatedEntitiesOverlayParameters.svelte";
@@ -30,14 +30,13 @@ import AggregatedEntitiesOverlayCell
     from "../../../aggregate-overlay-diagram/components/aggregate-overlay-diagram/widgets/aggregated-entities/AggregatedEntitiesOverlayCell.svelte";
 import BackingEntitiesOverlayCell
     from "../../../aggregate-overlay-diagram/components/aggregate-overlay-diagram/widgets/backing-entities/BackingEntitiesPlainOverlayCell.svelte";
-import {
-    resetParameters as resetAssessmentParameters
-} from "../../../aggregate-overlay-diagram/components/aggregate-overlay-diagram/widgets/assessments/AssessmentWidgetParameters.svelte";
 import AssessmentOverlayParameters from "./overlays/assessment/AssessmentOverlayParameters.svelte";
 import AssessmentOverlay from "./overlays/assessment/AssessmentOverlay.svelte";
 import AssessmentOverlayLegendDetail from "./overlays/assessment/AssessmentOverlayLegendDetail.svelte";
 import ApplicationChangesOverlay from "./overlays/ApplicationChangesOverlay.svelte";
 import ApplicationChangesOverlayParameters from "./overlays/ApplicationChangesOverlayParameters.svelte";
+import RatingCostOverlayParameters from "./overlays/cost/RatingCostOverlayParameters.svelte";
+import RatingCostOverlay from "./overlays/cost/RatingCostOverlay.svelte";
 
 export const FlexDirections = {
     COLUMN: "column",
@@ -94,13 +93,16 @@ export function mkChildGroupStyle(group, child) {
         ${group.props.flexDirection === FlexDirections.ROW ? "height: fit-content;" : "width: min-content;"}`;
 }
 
-export function mkCellContentStyle(group) {
+export function mkCellContentStyle(group, selectedGroup, hoveredGroup) {
+    const notSelected = !_.isNil(selectedGroup) && selectedGroup !== group.id;
+    const notHovered = !_.isNil(hoveredGroup) && hoveredGroup !== group.id;
     return `
         margin: 0.2em;
         padding: 0.1em;
         min-width: ${group.props.minWidth}em;
         min-height: ${group.props.minHeight}em;
         height: fit-content;
+        opacity: ${notSelected || notHovered ? "0.5;" : "1;"}
         ${group.props.flexDirection === FlexDirections.ROW ? "height: fit-content;" : "width: fit-content;"}
         font-size: ${group.props.contentFontSize}em;`;
 }
@@ -120,13 +122,15 @@ export function mkGroupCellStyle(group) {
         border: ${group.props.showBorder ? "1px solid " + group.props.titleColor : "none"}`;
 }
 
-export function mkTitleStyle(group, hoveredGroupId) {
+export function mkTitleStyle(group, selectedGroup, hoveredGroup) {
+    const notSelected = !_.isNil(selectedGroup) && selectedGroup !== group.id;
+    const notHovered = !_.isNil(hoveredGroup) && hoveredGroup !== group.id;
     return `
         text-align: center;
         font-weight: bolder;
         padding: 0 0.5em;
         ${mkColourProps(group.props.showTitle ? group.props.titleColor : group.props.contentColor)}
-        opacity: ${_.isNil(hoveredGroupId) || hoveredGroupId === group.id ? "1;" : "0.5;"}
+        opacity: ${notSelected || notHovered ? "0.5;" : "1;"}
         font-size: ${group.props.showTitle ? group.props.titleFontSize : group.props.contentFontSize}em;`;
 }
 
@@ -209,7 +213,6 @@ export const overlays =  [
         component: AssessmentOverlay,
         urlSuffix: "app-assessment-widget",
         mkGlobalProps: mkAssessmentOverlayGlobalProps,
-        resetParameters: resetAssessmentParameters,
         aggregatedEntityKinds: [entity.APPLICATION.key, entity.CHANGE_INITIATIVE.key],
         parameterWidget: AssessmentOverlayParameters,
         legend: AssessmentOverlayLegendDetail,
@@ -223,9 +226,20 @@ export const overlays =  [
         component: ApplicationChangesOverlay,
         urlSuffix: "app-change-widget",
         mkGlobalProps: mkAppChangesOverlayGlobalProps,
-        resetParameters: resetAssessmentParameters,
         aggregatedEntityKinds: [entity.APPLICATION.key],
         parameterWidget: ApplicationChangesOverlayParameters,
+        showTitle: true
+    },
+    {
+        key: "COSTS",
+        name: "Costs",
+        icon: "money",
+        description: "Displays this years allocated costs associated to the backing entities",
+        component: RatingCostOverlay,
+        urlSuffix: "rating-cost-widget",
+        mkGlobalProps: mkRatingCostOverlayGlobalProps,
+        aggregatedEntityKinds: [entity.APPLICATION.key],
+        parameterWidget: RatingCostOverlayParameters,
         showTitle: true
     }
 ]

@@ -21,7 +21,7 @@
     let timeout;
     let showReorderPanels = false;
 
-    const {selectedOverlay, updateGroup, updateChildren, selectedGroup, groups, selectGroup} = diagramService;
+    const {selectedOverlay, updateGroup, updateChildren, selectedGroup, groups, selectGroup, clearSelectedGroup} = diagramService;
 
     function drop(evt, targetGroup) {
         evt.preventDefault();
@@ -98,7 +98,11 @@
     }
 
     function selectOverlayGroup(group) {
-        selectGroup(group);
+        if ($selectedGroup?.id === group.id) {
+            clearSelectedGroup();
+        } else {
+            selectGroup(group);
+        }
     }
 
 </script>
@@ -106,7 +110,11 @@
 {#if group}
 <div draggable={true}
      on:dragstart|stopPropagation={event => dragStart(event, group)}
-     ondragover="return false">
+     on:drop|stopPropagation={clearDrag}
+     ondragover="return false"
+     on:click|stopPropagation={() => selectOverlayGroup(group)}
+     on:keydown|stopPropagation={() => selectOverlayGroup(group)}
+     class="clickable">
 
     <div style="display: flex">
 
@@ -122,13 +130,8 @@
              on:drop|stopPropagation={event => drop(event, group)}>
 
             {#if group.props.showTitle}
-                <div style={mkTitleStyle(group, $hoveredGroupId)}
-                     on:mouseover|stopPropagation={() => startHover(group.id)}
-                     on:mouseout={stopHover}
-                     on:focus|stopPropagation={() => startHover(group.id)}
-                     on:blur|stopPropagation={stopHover}>
-                    <button style="outline: none !important; width: 100%; background: none; border: none; color: inherit;"
-                            on:click={() => selectOverlayGroup(group)}>
+                <div style={mkTitleStyle(group, $selectedGroup?.id, $hoveredGroupId)}>
+                    <button style="outline: none !important; width: 100%; background: none; border: none; color: inherit;">
                         {group.title}
                     </button>
                 </div>
@@ -143,7 +146,7 @@
                     </div>
                 {:else}
                     {#if group.data}
-                        <div style={mkCellContentStyle(group)}>
+                        <div style={mkCellContentStyle(group, $selectedGroup?.id, $hoveredGroupId)}>
                             <CellContent data={group.data}
                                          cellId={group.id}
                                          height={group.props.minWidth / 3}
