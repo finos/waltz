@@ -8,6 +8,7 @@
     import Icon from "../../../common/svelte/Icon.svelte";
     import {displayError} from "../../../common/error-utils";
     import toasts from "../../../svelte-stores/toast-store";
+    import {logicalFlowStore} from "../../../svelte-stores/logical-flow-store";
 
 
     export let primaryEntityReference;
@@ -23,24 +24,11 @@
     let selectionOptions;
     let relatedDataTypesCall;
     let selectedDataType;
+    let permissionsCall;
 
     let workingDataTypes = [];
-    let  addedDataTypeIds = [];
+    let addedDataTypeIds = [];
     let removedDataTypeIds = [];
-
-    $: {
-        if (primaryEntityReference) {
-            selectionOptions = mkSelectionOptions(primaryEntityReference);
-            relatedDataTypesCall = dataTypeDecoratorStore.findBySelector(primaryEntityReference.kind, selectionOptions);
-        }
-    }
-
-    $: dataTypeDecorators = $relatedDataTypesCall?.data || [];
-    $: dataTypes = _.map(dataTypeDecorators, d => d.dataTypeId)
-
-    $: descoratorsByDataTypeId = _.keyBy(dataTypeDecorators, d => d.dataTypeId);
-
-    $:  selectionFilter = (d) => !_.includes(workingDataTypes, d.id);
 
     function onSelect(evt) {
         selectedDataType = evt.detail;
@@ -82,14 +70,29 @@
             .catch(e => displayError("Could not save data type changes", e));
     }
 
+    $: {
+        if (primaryEntityReference) {
+            selectionOptions = mkSelectionOptions(primaryEntityReference);
+            relatedDataTypesCall = dataTypeDecoratorStore.findBySelector(primaryEntityReference.kind, selectionOptions);
+            permissionsCall = logicalFlowStore.findPermissionsForFlow(primaryEntityReference?.id);
+        }
+    }
+
+    $: dataTypeDecorators = $relatedDataTypesCall?.data || [];
+    $: dataTypes = _.map(dataTypeDecorators, d => d.dataTypeId)
+
+    $: decoratorsByDataTypeId = _.keyBy(dataTypeDecorators, d => d.dataTypeId);
+
+    $: selectionFilter = (d) => !_.includes(workingDataTypes, d.id);
+
     $: addedDataTypeIds = _.without(workingDataTypes, ...dataTypes);
     $: removedDataTypeIds = _.without(dataTypes, ...workingDataTypes);
 
+    $: permissions = $permissionsCall?.data || [];
+    $: hasEditPermission = _.some(permissions, d => _.includes(["ADD", "UPDATE", "REMOVE"], d));
 
 </script>
 
-
-<h4>Overview</h4>
 
 <div class="row">
     {#if activeMode === Modes.VIEW}
@@ -99,6 +102,8 @@
                               expanded={true}/>
             <div style="padding-top: 1em">
                 <button class="btn btn-skinny"
+                        title={!hasEditPermission ? "You do not have permission to edit logical flows and associated data types" : ""}
+                        disabled={!hasEditPermission}
                         on:click={edit}>
                     <Icon name="pencil"/>Edit
                 </button>
@@ -124,6 +129,8 @@
                                   on:select={toggleDataType}/>
             <div style="padding-top: 1em">
                 <button class="btn btn-skinny"
+                        title={_.isEmpty(workingDataTypes) ? "At least one data type must be associated to this flow" : ""}
+                        disabled={_.isEmpty(workingDataTypes)}
                         on:click={save}>
                     <Icon name="floppy-o"/>Save
                 </button>

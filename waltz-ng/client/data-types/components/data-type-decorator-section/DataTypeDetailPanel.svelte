@@ -11,6 +11,7 @@
     import EntityLink from "../../../common/svelte/EntityLink.svelte";
     import {dataTypeStore} from "../../../svelte-stores/data-type-store";
     import {containsAny} from "../../../common/list-utils";
+    import NoData from "../../../common/svelte/NoData.svelte";
 
     export let primaryEntityReference;
 
@@ -70,6 +71,7 @@
 
     $: classifications = $flowClassificationsCall?.data || [];
     $: classificationsById = _.keyBy(classifications, d => d.id);
+    $: classificationsByCode = _.keyBy(classifications, d => d.code);
 
     $: dataTypes = $dataTypesCall?.data || [];
     $: dataTypesById = _.keyBy(dataTypes, d => d.id);
@@ -102,9 +104,11 @@
                     .value())
                 .value();
 
-            assessmentFilters = _.map(
-                viewData.primaryAssessmentDefinitions,
-                d => Object.assign({}, { definition: d, ratings: _.get(assessmentRatingsByDefinitionId, d.id, [])}));
+            assessmentFilters = _
+                .chain(viewData.primaryAssessmentDefinitions)
+                .map(d => Object.assign({}, { definition: d, ratings: _.get(assessmentRatingsByDefinitionId, d.id, [])}))
+                .filter(d => !_.isEmpty(d.ratings))
+                .value();
 
             tableData = _
                 .chain(viewData.dataTypeDecorators)
@@ -131,91 +135,97 @@
         ? filteredData
         : termSearch(filteredData, qry, ["decoratorEntity.name", "rating"]);
 
-    $: classificationForSelected = _.get(classificationsById, selectedDecorator?.flowClassificationRule?.classificationId);
+    $: classificationForSelected = _.get(classificationsByCode, selectedDecorator?.rating);
 
 </script>
 
 <div class="decorator-detail">
     <div class="decorator-detail-table">
-        <h4>Data Type Decorators</h4>
+        {#if !_.isEmpty(tableData)}
+            <details>
+                <summary>
+                    Filters
+                </summary>
 
-        <details>
-            <summary>
-                Filters
-            </summary>
-
-            <div class="help-block"
-                 style="padding-top: 1em">Use the assessment ratings to filter the logical flow decorators. Only ratings aligned to a data type decorator can be filtered upon</div>
-            <div style="display: flex; gap: 1em">
-                <div style="flex: 1 1 30%">
-                    {#each assessmentFilters as assessment}
-                        <table class="table table-condensed">
-                            <thead>
-                            <tr>
-                                <th>{assessment?.definition?.name}
-                                    <span>
+                <div class="help-block"
+                     style="padding-top: 1em">Use the assessment ratings to filter the logical flow decorators. Only ratings aligned to a data type decorator can be filtered upon</div>
+                <div style="display: flex; gap: 1em">
+                    <div style="flex: 1 1 30%">
+                        {#each assessmentFilters as assessment}
+                            <table class="table table-condensed">
+                                <thead>
+                                <tr>
+                                    <th>{assessment?.definition?.name}
+                                        <span>
                                             <button class="btn btn-skinny"
                                                     on:click={() => clearFiltersForDefinition(assessment.definition.id)}>
                                                 Clear
                                             </button>
                                         </span>
-                                </th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {#each assessment?.ratings as rating}
-                                <tr class="clickable"
-                                    class:selected={_.some(filteredAssessments, r => _.isEqual(r, { definitionId: assessment.definition.id, ratingId: rating.id}))}
-                                    on:click={() => selectRating(assessment.definition.id, rating.id)}>
-                                    <td>
-                                        <RatingIndicatorCell {...rating}/>
-                                    </td>
+                                    </th>
                                 </tr>
-                            {/each}
-                            </tbody>
-                        </table>
-                    {/each}
-                </div>
-            </div>
-        </details>
-
-        <div>
-            <SearchInput bind:value={qry}/>
-        </div>
-        <table class="table table-condensed"
-               style="margin-top: 1em">
-            <thead>
-            <tr>
-                <th>Data Type</th>
-                <th>Flow Classification Rule</th>
-                {#each viewData?.primaryAssessmentDefinitions  || [] as defn}
-                    <th>{defn.name}</th>
-                {/each}
-            </tr>
-            </thead>
-            <tbody>
-            {#each visibleRows as decorator}
-                {@const classification = _.get(classificationsById, decorator.flowClassificationRule?.classificationId)}
-                <tr on:click={() => selectDecorator(decorator)}
-                    class="clickable">
-                    <td>{decorator.decoratorEntity.name}</td>
-                    <td>
-                        <RatingIndicatorCell {...classification}/>
-                    </td>
-                    {#each _.get(viewData, "primaryAssessmentDefinitions", []) as defn}
-                        {@const assessmentRatings = _.get(decorator.ratingsByDefnId, [defn.id], [])}
-                        <td>
-                            <div class="rating-col">
-                                {#each assessmentRatings as rating}
-                                    <RatingIndicatorCell {...rating.rating}/>
+                                </thead>
+                                <tbody>
+                                {#each assessment?.ratings as rating}
+                                    <tr class="clickable"
+                                        class:selected={_.some(filteredAssessments, r => _.isEqual(r, { definitionId: assessment.definition.id, ratingId: rating.id}))}
+                                        on:click={() => selectRating(assessment.definition.id, rating.id)}>
+                                        <td>
+                                            <RatingIndicatorCell {...rating}/>
+                                        </td>
+                                    </tr>
                                 {/each}
-                            </div>
-                        </td>
+                                </tbody>
+                            </table>
+                        {:else}
+                            <NoData type="info">No decorators have been given a rating for a primary assessment</NoData>
+                        {/each}
+                    </div>
+                </div>
+            </details>
+
+            <div>
+                <SearchInput bind:value={qry}/>
+            </div>
+            <table class="table table-condensed"
+                   style="margin-top: 1em">
+                <thead>
+                <tr>
+                    <th>Data Type</th>
+                    <th>Flow Classification Rule</th>
+                    {#each viewData?.primaryAssessmentDefinitions  || [] as defn}
+                        <th>{defn.name}</th>
                     {/each}
                 </tr>
-            {/each}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                {#each visibleRows as decorator}
+                    {@const classification = _.get(classificationsByCode, decorator.rating)}
+                    <tr on:click={() => selectDecorator(decorator)}
+                        class="clickable">
+                        <td>{decorator.decoratorEntity.name}</td>
+                        <td>
+                            {#if !_.isEmpty(classification)}
+                                <RatingIndicatorCell {...classification}/>
+                            {/if}
+                        </td>
+                        {#each _.get(viewData, "primaryAssessmentDefinitions", []) as defn}
+                            {@const assessmentRatings = _.get(decorator.ratingsByDefnId, [defn.id], [])}
+                            <td>
+                                <div class="rating-col">
+                                    {#each assessmentRatings as rating}
+                                        <RatingIndicatorCell {...rating.rating}/>
+                                    {/each}
+                                </div>
+                            </td>
+                        {/each}
+                    </tr>
+                {/each}
+                </tbody>
+            </table>
+        {:else}
+            <NoData>There are no data type decorators associated to this flow</NoData>
+        {/if}
     </div>
     {#if selectedDecorator}
         <div class="decorator-detail-panel">
@@ -225,71 +235,75 @@
                         entity={selectedDecorator}/>
 
             <div style="padding-top: 2em">
-                <strong>Flow Classification Rule</strong>
-                <table class="table table-condensed small">
-                    <tbody>
-                        <tr>
-                            <td>Source</td>
-                            <td>
-                                <EntityLink ref={selectedDecorator.flowClassificationRule.subjectReference}/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Scope</td>
-                            <td>
-                                <EntityLink ref={selectedDecorator.flowClassificationRule.vantagePointReference}/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Data Type</td>
-                            <td><EntityLink ref={_.get(dataTypesById, selectedDecorator.flowClassificationRule.dataTypeId)}/></td>
-                        </tr>
-                        <tr>
-                            <td>Classification</td>
-                            <td>
-                                <RatingIndicatorCell {...classificationForSelected}/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="2">
-                                <button class="btn btn-skinny" on:click={() => goToRule(selectedDecorator.flowClassificationRule)}>
-                                    Visit page
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                {#if selectedDecorator.flowClassificationRule}
+                    <strong>Flow Classification Rule</strong>
+                    <table class="table table-condensed small">
+                        <tbody>
+                            <tr>
+                                <td>Source</td>
+                                <td>
+                                    <EntityLink ref={selectedDecorator.flowClassificationRule.subjectReference}/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Scope</td>
+                                <td>
+                                    <EntityLink ref={selectedDecorator.flowClassificationRule.vantagePointReference}/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Data Type</td>
+                                <td><EntityLink ref={_.get(dataTypesById, selectedDecorator.flowClassificationRule.dataTypeId)}/></td>
+                            </tr>
+                            <tr>
+                                <td>Classification</td>
+                                <td>
+                                    <RatingIndicatorCell {...classificationForSelected}/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <button class="btn btn-skinny" on:click={() => goToRule(selectedDecorator.flowClassificationRule)}>
+                                        Visit page
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                {/if}
             </div>
 
             <div>
-                <strong>Assessments</strong>
-                <table class="table table-condensed small">
-                    <thead>
-                    <tr>
-                        <td>Definition</td>
-                        <td>Ratings</td>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {#each _.keys(selectedDecorator.ratingsByDefnId) as defnId}
-                        {@const ratings = _.get(selectedDecorator.ratingsByDefnId, defnId, [])}
+                {#if !_.isEmpty(selectedDecorator.ratingsByDefnId)}
+                    <strong>Assessments</strong>
+                    <table class="table table-condensed small">
+                        <thead>
                         <tr>
-                            <td>
-                                {_.get(definitionsById, [defnId, "name"], "Unknown")}
-                            </td>
-                            <td>
-                                <ul class="list-inline">
-                                    {#each ratings as assessmentRating}
-                                        <li>
-                                            <RatingIndicatorCell {...assessmentRating.rating}/>
-                                        </li>
-                                    {/each}
-                                </ul>
-                            </td>
+                            <td>Definition</td>
+                            <td>Ratings</td>
                         </tr>
-                    {/each}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                        {#each _.keys(selectedDecorator.ratingsByDefnId) as defnId}
+                            {@const ratings = _.get(selectedDecorator.ratingsByDefnId, defnId, [])}
+                            <tr>
+                                <td>
+                                    {_.get(definitionsById, [defnId, "name"], "Unknown")}
+                                </td>
+                                <td>
+                                    <ul class="list-inline">
+                                        {#each ratings as assessmentRating}
+                                            <li>
+                                                <RatingIndicatorCell {...assessmentRating.rating}/>
+                                            </li>
+                                        {/each}
+                                    </ul>
+                                </td>
+                            </tr>
+                        {/each}
+                        </tbody>
+                    </table>
+                {/if}
             </div>
         </div>
     {/if}

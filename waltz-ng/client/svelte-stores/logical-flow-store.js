@@ -59,6 +59,16 @@ export function mkLogicalFlowStore() {
                 {force: force});
     }
 
+    const findPermissionsForFlow = (flowId, force = false) => {
+        return remote
+            .fetchViewList(
+                "GET",
+                `api/logical-flow/id/${flowId}/permissions`,
+                null,
+                {},
+                {force: force});
+    }
+
 
     const addFlow = (command) => {
         return remote
@@ -75,7 +85,8 @@ export function mkLogicalFlowStore() {
         getFlowGraphSummary,
         getById,
         addFlow,
-        findEditableFlowIdsForParentReference
+        findEditableFlowIdsForParentReference,
+        findPermissionsForFlow
     };
 }
 

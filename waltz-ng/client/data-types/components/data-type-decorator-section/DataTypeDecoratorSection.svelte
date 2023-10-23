@@ -29,7 +29,7 @@
            id="{Tabs.DATA_TYPES}">
     <label class="wt-label"
            for="{Tabs.DATA_TYPES}">
-        <span>Data Types</span>
+        <span>Overview</span>
     </label>
 
     <input type="radio"
