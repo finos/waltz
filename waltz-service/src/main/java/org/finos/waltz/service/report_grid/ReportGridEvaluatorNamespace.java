@@ -1,19 +1,25 @@
 package org.finos.waltz.service.report_grid;
 
 import org.finos.waltz.common.Checks;
+import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.model.report_grid.ReportGridCell;
 import org.finos.waltz.model.report_grid.ReportGridDefinition;
+import sun.plugin.dom.exception.InvalidStateException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static java.lang.String.format;
 import static org.finos.waltz.common.ArrayUtilities.isEmpty;
 import static org.finos.waltz.common.SetUtilities.*;
 import static org.finos.waltz.common.StringUtilities.lower;
@@ -23,6 +29,7 @@ import static org.finos.waltz.service.report_grid.ReportGridUtilities.mkOptionCo
 public class ReportGridEvaluatorNamespace {
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
 
     private final ReportGridDefinition definition;
     private Map<String, Object> ctx = new HashMap<>();
@@ -124,6 +131,92 @@ public class ReportGridEvaluatorNamespace {
         return ratio.equals(BigDecimal.ZERO)
                 ? null
                 : ratio.multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP);
+    }
+
+
+    public boolean isAfterToday(String cellExtId) {
+        LocalDate today = DateTimeUtilities.today();
+        ReportGridCell reportGridCell = getReportGridCell(cellExtId);
+        LocalDate dateVal = getLocalDate(reportGridCell);
+        return dateVal.isAfter(today);
+    }
+
+
+    public boolean isBeforeToday(String cellExtId) {
+        LocalDate today = DateTimeUtilities.today();
+        ReportGridCell reportGridCell = getReportGridCell(cellExtId);
+        LocalDate dateVal = getLocalDate(reportGridCell);
+        return dateVal.isBefore(today);
+    }
+
+
+    public int compareDateCells(String cellExtIdA, String cellExtIdB) {
+        ReportGridCell reportGridCellA = getReportGridCell(cellExtIdA);
+        ReportGridCell reportGridCellB = getReportGridCell(cellExtIdB);
+        LocalDate dateValA = getLocalDate(reportGridCellA);
+        LocalDate dateValB = getLocalDate(reportGridCellB);
+        return dateValA.compareTo(dateValB);
+    }
+
+
+    public int compareToToday(String cellExtId) {
+        ReportGridCell reportGridCell = getReportGridCell(cellExtId);
+        LocalDate dateVal = getLocalDate(reportGridCell);
+        return dateVal.compareTo(DateTimeUtilities.today());
+    }
+
+
+    public int compareToDate(String cellExtId, String dateStr) {
+        ReportGridCell reportGridCell = getReportGridCell(cellExtId);
+        LocalDate dateVal = getLocalDate(reportGridCell);
+        LocalDate comparisonDate = parseLocalDatefromString(dateStr);
+        return dateVal.compareTo(comparisonDate);
+    }
+
+
+    public boolean betweenDates(String cellExtId, String dateStrA, String dateStrB) {
+        ReportGridCell reportGridCell = getReportGridCell(cellExtId);
+        LocalDate dateVal = getLocalDate(reportGridCell);
+        LocalDate dateA = parseLocalDatefromString(dateStrA);
+        LocalDate dateB = parseLocalDatefromString(dateStrB);
+
+        if (dateVal.isAfter(dateA) && dateVal.isBefore(dateB)) {
+            return true;
+        } else if (dateVal.isBefore(dateA) && dateVal.isAfter(dateB)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    private ReportGridCell getReportGridCell(String cellExtId) {
+        Object cellValue = cell(cellExtId);
+        if (cellValue instanceof ReportGridCell) {
+            return (ReportGridCell) cellValue;
+        } else {
+            throw new InvalidStateException("Cannot parse report grid cell from extId: " + cellExtId);
+        }
+    }
+
+
+    private LocalDate getLocalDate(ReportGridCell cell) {
+        LocalDateTime dateTime = cell.dateTimeValue();
+        if (dateTime != null){
+            return dateTime.toLocalDate();
+        } else {
+            String textVal = cell.textValue();
+            return parseLocalDatefromString(textVal);
+        }
+    }
+
+
+    public static LocalDate parseLocalDatefromString(String dateTimeString) {
+        try {
+            return LocalDate.parse(dateTimeString, DATE_FORMATTER);
+        } catch (DateTimeParseException dtpe) {
+            throw new IllegalArgumentException(format("Could not parse date from report grid cell value: %s", dateTimeString), dtpe);
+        }
     }
 
 

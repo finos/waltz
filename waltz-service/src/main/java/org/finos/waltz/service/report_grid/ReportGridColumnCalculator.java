@@ -1,18 +1,38 @@
 package org.finos.waltz.service.report_grid;
 
-import org.apache.commons.jexl3.*;
+import org.apache.commons.jexl3.JexlBuilder;
+import org.apache.commons.jexl3.JexlEngine;
+import org.apache.commons.jexl3.JexlException;
+import org.apache.commons.jexl3.JexlScript;
+import org.apache.commons.jexl3.MapContext;
+import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.model.either.Either;
 import org.finos.waltz.model.rating.RatingSchemeItem;
-import org.finos.waltz.model.report_grid.*;
+import org.finos.waltz.model.report_grid.ImmutableReportGridCell;
+import org.finos.waltz.model.report_grid.ReportGridCell;
+import org.finos.waltz.model.report_grid.ReportGridDefinition;
+import org.finos.waltz.model.report_grid.ReportGridDerivedColumnDefinition;
+import org.finos.waltz.model.report_grid.ReportGridFixedColumnDefinition;
+import org.finos.waltz.model.report_grid.ReportGridInstance;
+import org.finos.waltz.model.report_grid.ReportSubject;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toSet;
-import static org.finos.waltz.common.MapUtilities.*;
-import static org.finos.waltz.common.SetUtilities.*;
+import static org.finos.waltz.common.MapUtilities.groupBy;
+import static org.finos.waltz.common.MapUtilities.indexBy;
+import static org.finos.waltz.common.MapUtilities.newHashMap;
+import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.SetUtilities.map;
+import static org.finos.waltz.common.SetUtilities.union;
 import static org.finos.waltz.common.StringUtilities.notEmpty;
 import static org.finos.waltz.model.report_grid.CellOption.mkCellOption;
 import static org.finos.waltz.model.utils.IdUtilities.indexById;
@@ -189,6 +209,7 @@ public class ReportGridColumnCalculator {
         ctx.put("subjectName", subject.entityReference().name().orElse(null));
         ctx.put("subjectLifecyclePhase", subject.lifecyclePhase().name());
         ctx.put("subjectExternalId", subject.entityReference().externalId().orElse(null));
+        ctx.put("today", DateTimeUtilities.today());
 
         return ctx;
     }
@@ -215,7 +236,8 @@ public class ReportGridColumnCalculator {
                                     "subjectId", subject.entityReference().id(),
                                     "subjectExternalId", subject.entityReference().externalId().orElse(""),
                                     "subjectName", subject.entityReference().name().orElse(""),
-                                    "subjectLifecyclePhase", subject.lifecyclePhase().name()));
+                                    "subjectLifecyclePhase", subject.lifecyclePhase().name(),
+                                    "today", DateTimeUtilities.today()));
 
                             Object result = expr.execute(mapContext);
 
