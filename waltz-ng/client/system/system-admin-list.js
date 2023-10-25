@@ -93,6 +93,12 @@ const referenceDataOptions= [
         state: "main.involvement-kind.list",
         icon: "id-badge"
     }, {
+        name: "Licences",
+        role: "ADMIN",
+        description: "View and edit licences",
+        state: "main.system.licences",
+        icon: "id-card-o"
+    }, {
         name: "Measurable Categories",
         role: "ADMIN",
         description: "View and edit measurable categories",
