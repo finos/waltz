@@ -34,7 +34,6 @@ import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultDirectedGraph;
-import org.jgrapht.io.DOTExporter;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
@@ -48,7 +47,6 @@ import org.supercsv.prefs.CsvPreference;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -66,7 +64,7 @@ import static org.jooq.lambda.fi.util.function.CheckedConsumer.unchecked;
 
 public class LineageDiscoveryReport {
 
-    private static List<String> staticHeaders = newArrayList(
+    private static final List<String> staticHeaders = newArrayList(
             "Publisher",
             "Publisher Asset Code",
             "Consumer",
@@ -426,17 +424,6 @@ public class LineageDiscoveryReport {
                     target.externalId().orElse(""));
         });
         System.out.println("-------------------------------");
-    }
-
-
-    private static Writer generateDotGraph(Graph<EntityReference, DataTypeEdge> graph) {
-        DOTExporter<EntityReference, DataTypeEdge> exporter = new DOTExporter<>(
-                v -> String.valueOf(v.id()),
-                v -> v.name().get() + " (" + v.externalId().get() + ")",
-                v -> v.getDataTypes() + " (" + v.getFlowId() + ")");
-        Writer writer = new StringWriter();
-        exporter.exportGraph(graph, writer);
-        return writer;
     }
 
 
