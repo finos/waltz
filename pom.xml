@@ -94,7 +94,7 @@
         <jwt.version>4.3.0</jwt.version>
         <mockito.version>4.11.0</mockito.version>  <!-- 5.3.1 is 9+ -->
         <liquibase.maven.version>4.18.0</liquibase.maven.version>
-        <logback.version>1.2.12</logback.version>
+        <logback.version>1.2.12</logback.version> <!-- 1.4.x needs 9+ -->
         <pcollections.version>4.0.1</pcollections.version>
         <poi.version>5.2.4</poi.version>
         <slf4j.version>1.7.36</slf4j.version>
