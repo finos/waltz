@@ -83,6 +83,7 @@ public class ReportGridEvaluatorNamespace {
                 .anyMatch(d -> true);
     }
 
+
     public boolean allCellsProvided(String... cellExtIds) {
         checkAllCellsExist(cellExtIds);
 
@@ -92,11 +93,13 @@ public class ReportGridEvaluatorNamespace {
                 .allMatch(c -> Objects.nonNull(c) && !hasErrors(c));
     }
 
+
     public boolean hasLifecyclePhase(String... lifecyclePhases) {
         String lifecyclePhase = (String) ctx.get("subjectLifecyclePhase");
         return Stream.of(lifecyclePhases)
                 .anyMatch(s -> Objects.nonNull(s) && s.equalsIgnoreCase(lower(lifecyclePhase)));
     }
+
 
     public boolean hasExternalId(String... externalIds) {
         String extId = (String) ctx.get("subjectExternalId");
@@ -109,6 +112,7 @@ public class ReportGridEvaluatorNamespace {
         return Stream.of(names)
                 .anyMatch(s -> Objects.nonNull(s) && s.equalsIgnoreCase(lower(name)));
     }
+
 
     public boolean hasId(Long... ids) {
         Long id = (Long) ctx.get("subjectId");
@@ -139,6 +143,22 @@ public class ReportGridEvaluatorNamespace {
         ReportGridCell reportGridCell = getReportGridCell(cellExtId);
         LocalDate dateVal = getLocalDate(reportGridCell);
         return dateVal.isAfter(today);
+    }
+
+
+    public CellResult isAfter(String cellExtId, String dateStr, String pass, String fail) {
+        ReportGridCell reportGridCell = getReportGridCell(cellExtId);
+        LocalDate dateVal = getLocalDate(reportGridCell);
+        LocalDate comparisonDate = parseLocalDatefromString(dateStr);
+        return dateVal.isAfter(comparisonDate) ? mkResult(pass) : mkResult(fail);
+    }
+
+
+    public CellResult isBefore(String cellExtId, String dateStr, String pass, String fail) {
+        ReportGridCell reportGridCell = getReportGridCell(cellExtId);
+        LocalDate dateVal = getLocalDate(reportGridCell);
+        LocalDate comparisonDate = parseLocalDatefromString(dateStr);
+        return dateVal.isBefore(comparisonDate) ? mkResult(pass) : mkResult(fail);
     }
 
 
@@ -174,6 +194,16 @@ public class ReportGridEvaluatorNamespace {
     }
 
 
+    public CellResult compareToDate(String cellExtId, String dateStr, String before, String equal, String after) {
+        int comparison = compareToDate(cellExtId, dateStr);
+        return comparison == 0
+                ? mkResult(equal)
+                : comparison < 0
+                    ? mkResult(before)
+                    : mkResult(after);
+    }
+
+
     public boolean betweenDates(String cellExtId, String dateStrA, String dateStrB) {
         ReportGridCell reportGridCell = getReportGridCell(cellExtId);
         LocalDate dateVal = getLocalDate(reportGridCell);
@@ -187,6 +217,13 @@ public class ReportGridEvaluatorNamespace {
         } else {
             return false;
         }
+    }
+
+
+    public CellResult betweenDates(String cellExtId, String dateStrA, String dateStrB, String pass, String fail) {
+        return betweenDates(cellExtId, dateStrA, dateStrB)
+                ? mkResult(pass)
+                : mkResult(fail);
     }
 
 
@@ -226,7 +263,9 @@ public class ReportGridEvaluatorNamespace {
 
 
     public CellResult mkResult(String value) {
-        return CellResult.mkResult(value, value, mkOptionCode(value));
+        return value == null
+                ? null
+                : CellResult.mkResult(value, value, mkOptionCode(value));
     }
 
 
