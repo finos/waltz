@@ -135,6 +135,11 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
         throw new UnsupportedOperationException("method not supported for " + PHYSICAL_SPECIFICATION.prettyName());
     }
 
+    @Override
+    public Set<DataTypeDecorator> findByFlowIdSelector(Select<Record1<Long>> flowIdSelector) {
+        throw new UnsupportedOperationException("method not supported for " + PHYSICAL_SPECIFICATION.prettyName());
+    }
+
 
     @Override
     public List<DataTypeDecorator> findByDataTypeIdSelector(Select<Record1<Long>> dataTypeIdSelector) {

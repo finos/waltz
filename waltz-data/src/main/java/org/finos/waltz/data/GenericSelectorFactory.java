@@ -25,6 +25,7 @@ import org.finos.waltz.data.change_unit.ChangeUnitIdSelectorFactory;
 import org.finos.waltz.data.data_type.DataTypeIdSelectorFactory;
 import org.finos.waltz.data.flow_diagram.FlowDiagramIdSelectorFactory;
 import org.finos.waltz.data.licence.LicenceIdSelectorFactory;
+import org.finos.waltz.data.logical_flow.LogicalFlowDecoratorIdSelectorFactory;
 import org.finos.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import org.finos.waltz.data.measurable.MeasurableIdSelectorFactory;
 import org.finos.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
@@ -47,6 +48,7 @@ public class GenericSelectorFactory {
     private final FlowDiagramIdSelectorFactory flowDiagramIdSelectorFactory = new FlowDiagramIdSelectorFactory();
     private final LicenceIdSelectorFactory licenceIdSelectorFactory = new LicenceIdSelectorFactory();
     private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory = new LogicalFlowIdSelectorFactory();
+    private final LogicalFlowDecoratorIdSelectorFactory logicalFlowDecoratorIdSelectorFactory = new LogicalFlowDecoratorIdSelectorFactory();
     private final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
     private final OrganisationalUnitIdSelectorFactory organisationalUnitIdSelectorFactory = new OrganisationalUnitIdSelectorFactory();
     private final AttestationIdSelectorFactory attestationIdSelectorFactory = new AttestationIdSelectorFactory();
@@ -115,6 +117,8 @@ public class GenericSelectorFactory {
                 return licenceIdSelectorFactory.apply(selectionOptions);
             case LOGICAL_DATA_FLOW:
                 return logicalFlowIdSelectorFactory.apply(selectionOptions);
+            case LOGICAL_DATA_FLOW_DATA_TYPE_DECORATOR:
+                return logicalFlowDecoratorIdSelectorFactory.apply(selectionOptions);
             case MEASURABLE:
                 return measurableIdSelectorFactory.apply(selectionOptions);
             case ORG_UNIT:

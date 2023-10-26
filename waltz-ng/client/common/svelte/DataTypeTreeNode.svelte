@@ -73,6 +73,7 @@
                                  node={childNode}
                                  {selectionFilter}
                                  {nonConcreteSelectable}
+                                 {expanded}
                                  childNodes={childNode.children}/>
                 {:else}
                     <Icon size="lg"

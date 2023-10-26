@@ -28,6 +28,7 @@ import DataTypeOverview from './components/overview/data-type-overview';
 import DataTypeFlowSection from './components/flow-section/data-type-flow-section';
 import DataTypeOriginators from './components/originators/data-type-originators';
 import RelatedDataTypesSection from './components/related-data-types-section/related-data-types-section';
+import DataTypesDecoratorSection from './components/data-type-decorator-section/data-type-decorator-section';
 import Routes from './routes';
 import DataTypeViewData from './services/data-type-view-data';
 
@@ -45,7 +46,8 @@ export default () => {
         DataTypeUsagePanel,
         DataTypeUsageSelector,
         DataTypeUsageTree,
-        RelatedDataTypesSection
+        RelatedDataTypesSection,
+        DataTypesDecoratorSection
     ]);
 
     module

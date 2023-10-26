@@ -449,8 +449,17 @@ const taxonomyChangesSection = {
     componentId: "taxonomy-changes-section",
     name: "Taxonomy Changes",
     icon: "cog",
-    description: " This section list any formal changes against this taxonomy. These changes are ones that have been defined and applied in Waltz.",
+    description: " This section lists any formal changes against this taxonomy. These changes are ones that have been defined and applied in Waltz.",
     id: 10030,
+};
+
+
+const dataTypeDecoratorSection = {
+    componentId: "data-type-decorator-section",
+    name: "Data Types",
+    icon: "qrcode",
+    description: "Data Types decorating this entity",
+    id: 10040,
 };
 
 
@@ -470,6 +479,7 @@ export const dynamicSections = {
     companionAppRulesSection,
     companionDataTypeRulesSection,
     dataFlowSection,
+    dataTypeDecoratorSection,
     dataTypeFlowSection,
     dataTypeOriginatorsSection,
     entityAttestationSection,
@@ -764,6 +774,7 @@ const physicalFlowSections = [
 const logicalDataFlowSections = [
     assessmentRatingSection,
     bookmarksSection,
+    dataTypeDecoratorSection,
     entityDiagramsSection,
     entityNamedNotesSection,
     physicalFlowSection,

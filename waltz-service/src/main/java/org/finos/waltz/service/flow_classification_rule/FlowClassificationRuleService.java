@@ -491,4 +491,8 @@ public class FlowClassificationRuleService {
     public Collection<FlowClassificationRule> findCompanionDataTypeRules(long ruleId) {
         return flowClassificationRuleDao.findCompanionDataTypeRules(ruleId);
     }
+
+    public Set<FlowClassificationRule> findAppliedClassificationRulesForFlow(Long logicalFlowId) {
+        return flowClassificationRuleDao.findAppliedClassificationRulesForFlow(logicalFlowId);
+    }
 }
