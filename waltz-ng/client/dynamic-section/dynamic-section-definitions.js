@@ -834,6 +834,7 @@ const databaseSections = [
 ];
 
 const flowClassificationRuleSections = [
+    assessmentRatingSection,
     bookmarksSection,
     companionAppRulesSection,
     companionDataTypeRulesSection,

@@ -5,7 +5,6 @@ import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.model.report_grid.ReportGridCell;
 import org.finos.waltz.model.report_grid.ReportGridDefinition;
-import sun.plugin.dom.exception.InvalidStateException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -232,7 +231,7 @@ public class ReportGridEvaluatorNamespace {
         if (cellValue instanceof ReportGridCell) {
             return (ReportGridCell) cellValue;
         } else {
-            throw new InvalidStateException("Cannot parse report grid cell from extId: " + cellExtId);
+            throw new IllegalStateException("Cannot parse report grid cell from extId: " + cellExtId);
         }
     }
 
