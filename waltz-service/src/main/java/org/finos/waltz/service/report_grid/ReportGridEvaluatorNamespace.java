@@ -146,7 +146,7 @@ public class ReportGridEvaluatorNamespace {
     }
 
 
-    public CellResult isAfter(String cellExtId, String dateStr, String pass, String fail) {
+    public CellResult after(String cellExtId, String dateStr, String pass, String fail) {
         ReportGridCell reportGridCell = getReportGridCell(cellExtId);
         LocalDate dateVal = getLocalDate(reportGridCell);
         LocalDate comparisonDate = parseLocalDatefromString(dateStr);
@@ -154,7 +154,7 @@ public class ReportGridEvaluatorNamespace {
     }
 
 
-    public CellResult isBefore(String cellExtId, String dateStr, String pass, String fail) {
+    public CellResult before(String cellExtId, String dateStr, String pass, String fail) {
         ReportGridCell reportGridCell = getReportGridCell(cellExtId);
         LocalDate dateVal = getLocalDate(reportGridCell);
         LocalDate comparisonDate = parseLocalDatefromString(dateStr);
@@ -194,7 +194,7 @@ public class ReportGridEvaluatorNamespace {
     }
 
 
-    public CellResult compareToDate(String cellExtId, String dateStr, String before, String equal, String after) {
+    public CellResult dateCompare(String cellExtId, String dateStr, String before, String equal, String after) {
         int comparison = compareToDate(cellExtId, dateStr);
         return comparison == 0
                 ? mkResult(equal)
@@ -204,7 +204,7 @@ public class ReportGridEvaluatorNamespace {
     }
 
 
-    public boolean betweenDates(String cellExtId, String dateStrA, String dateStrB) {
+    public boolean isBetweenDates(String cellExtId, String dateStrA, String dateStrB) {
         ReportGridCell reportGridCell = getReportGridCell(cellExtId);
         LocalDate dateVal = getLocalDate(reportGridCell);
         LocalDate dateA = parseLocalDatefromString(dateStrA);
@@ -221,7 +221,7 @@ public class ReportGridEvaluatorNamespace {
 
 
     public CellResult betweenDates(String cellExtId, String dateStrA, String dateStrB, String pass, String fail) {
-        return betweenDates(cellExtId, dateStrA, dateStrB)
+        return isBetweenDates(cellExtId, dateStrA, dateStrB)
                 ? mkResult(pass)
                 : mkResult(fail);
     }
