@@ -50,15 +50,25 @@ export function mkDataTypeDecoratorStore() {
             {force});
 
 
+    const getViewForParentRef = (ref, force = false) => remote
+        .fetchViewData(
+            "GET",
+            `api/data-type-decorator/entity/${ref.kind}/${ref.id}/view`,
+            null,
+            null,
+            {force});
+
+
     const save = (ref, command) => remote
         .execute("POST",
-            `api/data-type-decorator/save/entity/${ref.kind}/${ref.id}`,
-            command);
+                 `api/data-type-decorator/save/entity/${ref.kind}/${ref.id}`,
+                 command);
 
     return {
         findByFlowIds,
         findDatatypeUsageCharacteristics,
         findBySelector,
+        getViewForParentRef,
         save
     };
 }

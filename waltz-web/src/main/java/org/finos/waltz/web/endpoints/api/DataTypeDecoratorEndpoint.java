@@ -25,10 +25,11 @@ import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.datatype.DataType;
 import org.finos.waltz.model.datatype.DataTypeDecorator;
 import org.finos.waltz.model.datatype.DataTypeUsageCharacteristics;
+import org.finos.waltz.model.logical_flow.DataTypeDecoratorView;
 import org.finos.waltz.service.data_type.DataTypeDecoratorService;
 import org.finos.waltz.service.data_type.DataTypeService;
 import org.finos.waltz.service.permission.permission_checker.FlowPermissionChecker;
-import org.finos.waltz.service.logical_flow.LogicalFlowService;
+import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.WebUtilities;
 import org.finos.waltz.web.action.UpdateDataTypeDecoratorAction;
@@ -43,10 +44,6 @@ import java.util.Set;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.Checks.checkTrue;
-import static org.finos.waltz.common.CollectionUtilities.notEmpty;
-import static org.finos.waltz.common.SetUtilities.asSet;
-import static org.finos.waltz.common.SetUtilities.intersection;
 import static org.finos.waltz.web.WebUtilities.*;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 
@@ -84,6 +81,7 @@ public class DataTypeDecoratorEndpoint implements Endpoint {
         String updateDataTypesPath = mkPath(BASE_URL, "save", "entity", ":kind", ":id");
         String findDatatypeUsageCharacteristicsPath = mkPath(BASE_URL, "entity", ":kind", ":id", "usage-characteristics");
         String findPermissionsPath = mkPath(BASE_URL, "entity", ":kind", ":id", "permissions");
+        String findDecoratorViewPath = mkPath(BASE_URL, "entity", ":kind", ":id", "view");
 
         ListRoute<DataTypeDecorator> findByEntityReferenceRoute = (req, res) ->
                 dataTypeDecoratorService.findByEntityId(getEntityReference(req));
@@ -109,6 +107,9 @@ public class DataTypeDecoratorEndpoint implements Endpoint {
         ListRoute<Operation> findPermissionsRoute = (req, res) ->
                 flowPermissionChecker.findPermissionsForDecorator(getEntityReference(req), getUsername(req));
 
+        DatumRoute<DataTypeDecoratorView> findDecoratorViewRoute = (req, res) ->
+                dataTypeDecoratorService.getDecoratorView(getEntityReference(req));
+
         getForList(findByEntityReference, findByEntityReferenceRoute);
         getForList(findSuggestedByEntityRefPath, findSuggestedByEntityRefRoute);
         getForList(findDatatypeUsageCharacteristicsPath, findDatatypeUsageCharacteristicsRoute);
@@ -116,6 +117,7 @@ public class DataTypeDecoratorEndpoint implements Endpoint {
         postForList(findBySelectorPath, findBySelectorRoute);
         postForList(findByFlowIdsAndKindPath, findByFlowIdsAndKindRoute);
         postForDatum(updateDataTypesPath, this::updateDataTypesRoute);
+        getForDatum(findDecoratorViewPath, findDecoratorViewRoute);
     }
 
 

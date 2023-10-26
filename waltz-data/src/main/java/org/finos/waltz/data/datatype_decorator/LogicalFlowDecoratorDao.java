@@ -185,6 +185,12 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
         return findByCondition(condition);
     }
 
+    public Set<DataTypeDecorator> findByFlowIdSelector(Select<Record1<Long>> flowIdSelector) {
+
+        Condition condition = LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.in(flowIdSelector);
+
+        return findByCondition(condition);
+    }
 
     @Override
     public Set<DataTypeDecorator> findByLogicalFlowIdSelector(Select<Record1<Long>> flowIdSelector) {

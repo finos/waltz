@@ -22,20 +22,31 @@ import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.datatype_decorator.DataTypeDecoratorDao;
 import org.finos.waltz.data.datatype_decorator.DataTypeDecoratorDaoSelectorFactory;
 import org.finos.waltz.data.logical_flow.LogicalFlowDao;
+import org.finos.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import org.finos.waltz.data.physical_specification.PhysicalSpecificationDao;
 import org.finos.waltz.model.*;
+import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
+import org.finos.waltz.model.assessment_rating.AssessmentRating;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.datatype.DataTypeDecorator;
 import org.finos.waltz.model.datatype.DataTypeUsageCharacteristics;
 import org.finos.waltz.model.datatype.ImmutableDataTypeDecorator;
+import org.finos.waltz.model.flow_classification_rule.FlowClassificationRule;
+import org.finos.waltz.model.logical_flow.DataTypeDecoratorView;
+import org.finos.waltz.model.logical_flow.ImmutableDataTypeDecoratorView;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
 import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
+import org.finos.waltz.model.rating.RatingSchemeItem;
+import org.finos.waltz.service.assessment_definition.AssessmentDefinitionService;
+import org.finos.waltz.service.assessment_rating.AssessmentRatingService;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.data_flow_decorator.LogicalFlowDecoratorRatingsCalculator;
 import org.finos.waltz.service.data_flow_decorator.LogicalFlowDecoratorService;
+import org.finos.waltz.service.flow_classification_rule.FlowClassificationRuleService;
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.finos.waltz.service.physical_specification.PhysicalSpecificationService;
+import org.finos.waltz.service.rating_scheme.RatingSchemeService;
 import org.finos.waltz.service.usage_info.DataTypeUsageService;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -51,6 +62,7 @@ import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.*;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.model.EntityKind.*;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
@@ -66,9 +78,14 @@ public class DataTypeDecoratorService {
     private final DataTypeUsageService dataTypeUsageService;
     private final DataTypeService dataTypeService;
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
+    private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory = new LogicalFlowIdSelectorFactory();
     private final PhysicalSpecificationDao physicalSpecificationDao;
     private final PhysicalSpecificationService physicalSpecificationService;
+    private final AssessmentRatingService assessmentRatingService;
+    private final AssessmentDefinitionService assessmentDefinitionService;
+    private final RatingSchemeService ratingSchemeService;
 
+    private final FlowClassificationRuleService flowClassificationRuleService;
 
     @Autowired
     public DataTypeDecoratorService(ChangeLogService changeLogService,
@@ -80,20 +97,33 @@ public class DataTypeDecoratorService {
                                     DataTypeUsageService dataTypeUsageService,
                                     DataTypeService dataTypeService,
                                     PhysicalSpecificationDao physicalSpecificationDao,
-                                    PhysicalSpecificationService physicalSpecificationService) {
+                                    PhysicalSpecificationService physicalSpecificationService,
+                                    AssessmentRatingService assessmentRatingService,
+                                    AssessmentDefinitionService assessmentDefinitionService,
+                                    RatingSchemeService ratingSchemeService,
+                                    FlowClassificationRuleService flowClassificationRuleService) {
+
+        checkNotNull(assessmentDefinitionService, "assessmentDefinitionService cannot be null");
+        checkNotNull(assessmentRatingService, "assessmentRatingService cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
+        checkNotNull(flowClassificationRuleService, "flowClassificationRuleService cannot be null");
         checkNotNull(logicalFlowDecoratorService, "logicalFlowDecoratorService cannot be null");
         checkNotNull(physicalSpecificationService, "physicalSpecificationService cannot be null");
+        checkNotNull(ratingSchemeService, "ratingSchemeService cannot be null");
 
+        this.assessmentDefinitionService = assessmentDefinitionService;
+        this.assessmentRatingService = assessmentRatingService;
         this.changeLogService = changeLogService;
+        this.dataTypeDecoratorDaoSelectorFactory = dataTypeDecoratorDaoSelectorFactory;
+        this.dataTypeService = dataTypeService;
+        this.dataTypeUsageService = dataTypeUsageService;
+        this.flowClassificationRuleService = flowClassificationRuleService;
         this.logicalFlowDao = logicalFlowDao;
         this.logicalFlowService = logicalFlowService;
-        this.ratingsCalculator = ratingsCalculator;
-        this.dataTypeUsageService = dataTypeUsageService;
-        this.dataTypeService = dataTypeService;
-        this.dataTypeDecoratorDaoSelectorFactory = dataTypeDecoratorDaoSelectorFactory;
         this.physicalSpecificationDao = physicalSpecificationDao;
         this.physicalSpecificationService = physicalSpecificationService;
+        this.ratingsCalculator = ratingsCalculator;
+        this.ratingSchemeService = ratingSchemeService;
     }
 
 
@@ -133,7 +163,7 @@ public class DataTypeDecoratorService {
     }
 
 
-    public List<DataTypeDecorator> findByEntityIdSelector(
+    public Collection<DataTypeDecorator> findByEntityIdSelector(
             EntityKind entityKind,
             IdSelectionOptions selectionOptions) {
         checkNotNull(selectionOptions, "selectionOptions cannot be null");
@@ -239,7 +269,7 @@ public class DataTypeDecoratorService {
     }
 
 
-    private List<DataTypeDecorator> getSelectorForLogicalFlow(DataTypeDecoratorDao dao, IdSelectionOptions options) {
+    private Collection<DataTypeDecorator> getSelectorForLogicalFlow(DataTypeDecoratorDao dao, IdSelectionOptions options) {
         switch (options.entityReference().kind()) {
             case ALL:
             case APPLICATION:
@@ -258,6 +288,8 @@ public class DataTypeDecoratorService {
             case DATA_TYPE:
                 return dao.findByDataTypeIdSelector(
                         genericSelectorFactory.applyForKind(DATA_TYPE, options).selector());
+            case LOGICAL_DATA_FLOW:
+                return dao.findByFlowIdSelector(logicalFlowIdSelectorFactory.apply(options));
             default:
                 throw new UnsupportedOperationException("Cannot find decorators for selector kind: " + options.entityReference().kind());
         }
@@ -341,6 +373,48 @@ public class DataTypeDecoratorService {
         return dataTypeDecoratorDaoSelectorFactory
                 .getDao(ref.kind())
                 .findDatatypeUsageCharacteristics(ref);
+    }
+
+
+    /**
+     * Given a entity (e.g. logical flow or physical specification) produces a view of decorators and related assessments
+     * @param parentEntityRef the reference of the parent page
+     * @return DataTypeDecoratorView
+     */
+    public DataTypeDecoratorView getDecoratorView(EntityReference parentEntityRef) {
+
+        DataTypeDecoratorDao dao = dataTypeDecoratorDaoSelectorFactory.getDao(parentEntityRef.kind());
+        EntityKind decoratorKind = getDecoratorKind(parentEntityRef.kind());
+
+        List<DataTypeDecorator> decorators = dao.findByEntityId(parentEntityRef.id());
+
+        List<AssessmentRating> decoratorAssessmentRatings = assessmentRatingService.findByTargetKindForRelatedSelector(decoratorKind, mkOpts(parentEntityRef));
+
+        Set<AssessmentDefinition> primaryDefs = assessmentDefinitionService.findByPrimaryDefinitionsForKind(EntityKind.LOGICAL_DATA_FLOW_DATA_TYPE_DECORATOR, Optional.empty());
+
+        Set<Long> uniqueRatingIds = map(decoratorAssessmentRatings, AssessmentRating::ratingId);
+        Set<RatingSchemeItem> ratings = ratingSchemeService.findRatingSchemeItemsByIds(uniqueRatingIds);
+
+        Set<FlowClassificationRule> flowClassificationRules = flowClassificationRuleService.findAppliedClassificationRulesForFlow(parentEntityRef.id());
+
+        return ImmutableDataTypeDecoratorView.builder()
+                .dataTypeDecorators(decorators)
+                .decoratorRatings(decoratorAssessmentRatings)
+                .primaryAssessmentDefinitions(primaryDefs)
+                .ratingSchemeItems(ratings)
+                .flowClassificationRules(flowClassificationRules)
+                .build();
+    }
+
+    private EntityKind getDecoratorKind(EntityKind entityKind) {
+        switch (entityKind) {
+            case PHYSICAL_SPECIFICATION:
+                return EntityKind.PHYSICAL_SPEC_DATA_TYPE_DECORATOR;
+            case LOGICAL_DATA_FLOW:
+                return EntityKind.LOGICAL_DATA_FLOW_DATA_TYPE_DECORATOR;
+            default:
+                throw new IllegalArgumentException("Cannot determine decorator entity kind for parent entity kind: " + entityKind);
+        }
     }
 
 }

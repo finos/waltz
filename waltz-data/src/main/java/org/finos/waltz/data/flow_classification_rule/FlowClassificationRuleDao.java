@@ -601,4 +601,12 @@ public class FlowClassificationRuleDao {
                         .and(FLOW_CLASSIFICATION_RULE.ID.ne(ruleId)))
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
+
+
+    public Set<FlowClassificationRule> findAppliedClassificationRulesForFlow(Long logicalFlowId) {
+        return baseSelect()
+                .innerJoin(LOGICAL_FLOW_DECORATOR).on(LOGICAL_FLOW_DECORATOR.FLOW_CLASSIFICATION_RULE_ID.eq(FLOW_CLASSIFICATION_RULE.ID))
+                .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(logicalFlowId))
+                .fetchSet(TO_DOMAIN_MAPPER);
+    }
 }
