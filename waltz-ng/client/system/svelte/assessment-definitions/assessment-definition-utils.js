@@ -31,6 +31,7 @@ export const possibleAssessmentKinds = [
     {value: "LOGICAL_DATA_FLOW_DATA_TYPE_DECORATOR", name: "Logical Flow Data Type Decorator", qualifierKind: null},
     {value: "PHYSICAL_SPEC_DATA_TYPE_DECORATOR", name: "Physical Spec Data Type Decorator", qualifierKind: null},
     {value: "ENTITY_RELATIONSHIP", name: "Entity Relationship", qualifierKind: null},
+    {value: "FLOW_CLASSIFICATION_RULE", name: "Flow Classification Rule", qualifierKind: null},
     {value: "LEGAL_ENTITY", name: "Legal Entity", qualifierKind: null},
     {value: "LEGAL_ENTITY_RELATIONSHIP", name: "Legal Entity Relationship", qualifierKind: "LEGAL_ENTITY_RELATIONSHIP_KIND"},
     {value: "LICENCE", name: "Software Licence", qualifierKind: null},
