@@ -29,8 +29,22 @@ export function mkLicenceStore() {
     };
 
 
+    const save = (cmd) => {
+        return remote
+            .execute("POST", `${base}/save`, cmd);
+    };
+
+
+    const remove = (id) => {
+        return remote
+            .execute("DELETE", `${base}/id/${id}`);
+    };
+
+
     return {
         findAll,
+        save,
+        remove
     };
 }
 
