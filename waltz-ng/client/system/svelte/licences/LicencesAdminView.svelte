@@ -12,6 +12,7 @@
     import {displayError} from "../../../common/error-utils";
     import toasts from "../../../svelte-stores/toast-store";
     import RemoveLicencePanel from "./RemoveLicencePanel.svelte";
+    import NoData from "../../../common/svelte/NoData.svelte";
 
 
     const Modes = {
@@ -126,6 +127,8 @@
                                 </span>
                             </td>
                         </tr>
+                    {:else}
+                        <NoData>There are no licences, use the section below to add one</NoData>
                     {/each}
                 </tbody>
             </table>
