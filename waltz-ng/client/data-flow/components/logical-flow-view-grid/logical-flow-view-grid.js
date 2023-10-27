@@ -301,9 +301,11 @@ function controller($q, $scope, $state, serviceBroker) {
                         .value())
                     .value();
 
-                vm.assessmentFilters = _.map(
-                    logicalFlowView.primaryAssessmentDefinitions,
-                    d => Object.assign({}, { definition: d, ratings: _.get(ratingsByDefinitionId, d.id, [])}));
+                vm.assessmentFilters = _
+                    .chain(logicalFlowView.primaryAssessmentDefinitions)
+                    .map(d => Object.assign({}, { definition: d, ratings: _.get(ratingsByDefinitionId, d.id, [])}))
+                    .filter(d => !_.isEmpty(d.ratings))
+                    .value();
 
                 vm.disableNode = (node) => !_.includes(_.map(dataTypes, dt => dt.dataTypeId), node.id);
 

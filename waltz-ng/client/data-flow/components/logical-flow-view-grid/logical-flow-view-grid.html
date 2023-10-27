@@ -36,49 +36,60 @@
                 </span>
             </h4>
 
-            <details>
-                <summary>
-                    Filters
-                </summary>
+            <div ng-if="$ctrl.logicalFlowsByDirection.ALL.length == 0">
+                <waltz-no-data>
+                    <message>
+                        <strong>
+                            No logical flows found
+                        </strong>
+                    </message>
+                </waltz-no-data>
+            </div>
 
-                <div style="display: flex; padding-top: 1em">
-                    <button type="button"
+            <div ng-if="$ctrl.logicalFlowsByDirection.ALL.length > 0">
+                <details>
+                    <summary>
+                        Filters
+                    </summary>
+
+                    <div style="display: flex; padding-top: 1em">
+                        <button type="button"
+                                class="btn btn-default"
+                                uib-btn-radio="'ALL'"
+                                ng-disabled="$ctrl.logicalFlowsByDirection.ALL.length === 0"
+                                ng-model="$ctrl.selectedLogicalFlowFilter"
+                                ng-click="$ctrl.filterLogicalFlows('ALL')">
+                            All
+                        </button>
+                        <button
+                            type="button"
                             class="btn btn-default"
-                            uib-btn-radio="'ALL'"
-                            ng-disabled="$ctrl.logicalFlowsByDirection.ALL.length === 0"
+                            uib-btn-radio="'UPSTREAM'"
+                            ng-disabled="$ctrl.logicalFlowsByDirection.DOWNSTREAM.length === 0"
                             ng-model="$ctrl.selectedLogicalFlowFilter"
-                            ng-click="$ctrl.filterLogicalFlows('ALL')">
-                        All
-                    </button>
-                    <button
-                        type="button"
-                        class="btn btn-default"
-                        uib-btn-radio="'UPSTREAM'"
-                        ng-disabled="$ctrl.logicalFlowsByDirection.DOWNSTREAM.length === 0"
-                        ng-model="$ctrl.selectedLogicalFlowFilter"
-                        ng-click="$ctrl.filterLogicalFlows('UPSTREAM')">
-                        Consumes
-                    </button>
-                    <button
-                        type="button"
-                        class="btn btn-default"
-                        uib-btn-radio="'DOWNSTREAM'"
-                        ng-disabled="$ctrl.logicalFlowsByDirection.UPSTREAM.length === 0"
-                        ng-model="$ctrl.selectedLogicalFlowFilter"
-                        ng-click="$ctrl.filterLogicalFlows('DOWNSTREAM')">
-                        Produces
-                    </button>
-                </div>
+                            ng-click="$ctrl.filterLogicalFlows('UPSTREAM')">
+                            Consumes
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-default"
+                            uib-btn-radio="'DOWNSTREAM'"
+                            ng-disabled="$ctrl.logicalFlowsByDirection.UPSTREAM.length === 0"
+                            ng-model="$ctrl.selectedLogicalFlowFilter"
+                            ng-click="$ctrl.filterLogicalFlows('DOWNSTREAM')">
+                            Produces
+                        </button>
+                    </div>
 
-                <div class="help-block" style="padding-top: 1em">Use the data type tree to filter the logical flows. Only data types mapped to a flow can be filtered upon</div>
-                <waltz-multi-select-tree-control items="$ctrl.dataTypes"
-                                                 on-check="$ctrl.onSelectDataType"
-                                                 on-uncheck="$ctrl.onDeselectDataType"
-                                                 checked-item-ids="$ctrl.filteredDataTypes"
-                                                 disable-predicate="$ctrl.disableNode">
-                </waltz-multi-select-tree-control>
+                    <div class="help-block" style="padding-top: 1em">Use the data type tree to filter the logical flows. Only data types mapped to a flow can be filtered upon</div>
+                    <waltz-multi-select-tree-control items="$ctrl.dataTypes"
+                                                     on-check="$ctrl.onSelectDataType"
+                                                     on-uncheck="$ctrl.onDeselectDataType"
+                                                     checked-item-ids="$ctrl.filteredDataTypes"
+                                                     disable-predicate="$ctrl.disableNode">
+                    </waltz-multi-select-tree-control>
 
-                <span>
+                    <span>
                     <button class="btn btn-skinny"
                             ng-disabled="$ctrl.filteredDataTypes.length === 0"
                             ng-click="$ctrl.clearAllDataTypes()">
@@ -92,61 +103,61 @@
                     </button>
                 </span>
 
-                <div class="help-block"
-                     style="padding-top: 1em">Use the assessment ratings to filter the logical flows. Only ratings aligned flow can be filtered upon</div>
-                <div style="display: flex; gap: 1em">
-                    <div ng-repeat="assessment in $ctrl.assessmentFilters"
-                         style="flex: 1 1 30%">
-                        <table class="table table-condensed">
-                            <thead>
-                            <tr>
-                                <th>{{assessment.definition.name}}
-                                    <span>
+                    <div ng-if="$ctrl.assessmentFilters.length > 0">
+
+                        <div class="help-block"
+                             style="padding-top: 1em">Use the assessment ratings to filter the logical flows. Only ratings aligned flow can be filtered upon</div>
+                        <div style="display: flex; gap: 1em">
+                            <div ng-repeat="assessment in $ctrl.assessmentFilters"
+                                 style="flex: 1 1 30%">
+                                <table class="table table-condensed">
+                                    <thead>
+                                    <tr>
+                                        <th>{{assessment.definition.name}}
+                                            <span>
                                         <button class="btn btn-skinny"
                                                 ng-if="$ctrl.filtersForDefinition(assessment.definition.id)"
                                                 ng-click="$ctrl.clearFiltersForDefinition(assessment.definition.id)">
                                             Clear
                                         </button>
                                     </span>
-                                </th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr ng-repeat="rating in assessment.ratings"
-                                class="clickable"
-                                ng-style="{'background-color': $ctrl.filterSelected(assessment.definition.id, rating.id) ? 'white' : none}"
-                                ng-click="$ctrl.selectRating(assessment.definition.id, rating.id)">
-                                <td>
-                                    <waltz-rating-indicator-cell rating="rating"
-                                                                 show-description-popup="true"
-                                                                 show-name="true">
-                                    </waltz-rating-indicator-cell>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="rating in assessment.ratings"
+                                        class="clickable"
+                                        ng-style="{'background-color': $ctrl.filterSelected(assessment.definition.id, rating.id) ? 'white' : none}"
+                                        ng-click="$ctrl.selectRating(assessment.definition.id, rating.id)">
+                                        <td>
+                                            <waltz-rating-indicator-cell rating="rating"
+                                                                         show-description-popup="true"
+                                                                         show-name="true">
+                                            </waltz-rating-indicator-cell>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
                     </div>
-                </div>
 
+                </details>
 
-            </details>
+                <waltz-grid-with-search ng-if="$ctrl.logicalFlowsByDirection.ALL.length > 0"
+                                        entries="$ctrl.logicalRows"
+                                        column-defs="$ctrl.columnDefs"
+                                        on-row-select="$ctrl.onLogicalRowSelect">
+                </waltz-grid-with-search>
+                <waltz-data-extract-link name="Logical Flows"
+                                         styling="link"
+                                         extract="logical-flow-view"
+                                         request-body="$ctrl.selectionOptions"
+                                         method="POST">
+                </waltz-data-extract-link>
+            </div>
 
-            <waltz-grid-with-search ng-if="$ctrl.logicalFlowsByDirection.ALL.length > 0"
-                                    entries="$ctrl.logicalRows"
-                                    column-defs="$ctrl.columnDefs"
-                                    on-row-select="$ctrl.onLogicalRowSelect">
-            </waltz-grid-with-search>
-            <waltz-no-data ng-if="$ctrl.logicalFlowsByDirection.ALL.length === 0">
-                <message>
-                    No logical flows exist
-                </message>
-            </waltz-no-data>
-            <waltz-data-extract-link name="Logical Flows"
-                                     styling="link"
-                                     extract="logical-flow-view"
-                                     request-body="$ctrl.selectionOptions"
-                                     method="POST">
-            </waltz-data-extract-link>
 
             <h4 style="padding-top: 2em">
                 Physical Flows
@@ -161,73 +172,80 @@
                 </span>
             </h4>
 
-            <details>
-                <summary>
-                    Filters
-                </summary>
+            <div ng-if="$ctrl.physicalFlowsByDirection.ALL.length == 0">
+                <waltz-no-data>
+                    <message>
+                        <strong>
+                            No physical flows found
+                        </strong>
+                    </message>
+                </waltz-no-data>
+            </div>
 
-                <div style="display: flex; padding-top: 1em">
-                    <button type="button"
+            <div ng-if="$ctrl.physicalFlowsByDirection.ALL.length > 0">
+
+                <details>
+                    <summary>
+                        Filters
+                    </summary>
+
+                    <div style="display: flex; padding-top: 1em">
+                        <button type="button"
+                                class="btn btn-default"
+                                uib-btn-radio="'ALL'"
+                                ng-disabled="$ctrl.physicalFlowsByDirection.ALL.length === 0"
+                                ng-model="$ctrl.selectedPhysicalFlowFilter"
+                                ng-click="$ctrl.filterPhysicalFlows('ALL')">
+                            All
+                        </button>
+                        <button
+                            type="button"
                             class="btn btn-default"
-                            uib-btn-radio="'ALL'"
-                            ng-disabled="$ctrl.physicalFlowsByDirection.ALL.length === 0"
+                            uib-btn-radio="'UPSTREAM'"
+                            ng-disabled="$ctrl.physicalFlowsByDirection.DOWNSTREAM.length === 0"
                             ng-model="$ctrl.selectedPhysicalFlowFilter"
-                            ng-click="$ctrl.filterPhysicalFlows('ALL')">
-                        All
-                    </button>
-                    <button
-                        type="button"
-                        class="btn btn-default"
-                        uib-btn-radio="'UPSTREAM'"
-                        ng-disabled="$ctrl.physicalFlowsByDirection.DOWNSTREAM.length === 0"
-                        ng-model="$ctrl.selectedPhysicalFlowFilter"
-                        ng-click="$ctrl.filterPhysicalFlows('UPSTREAM')">
-                        Consumes
-                    </button>
-                    <button
-                        type="button"
-                        class="btn btn-default"
-                        uib-btn-radio="'DOWNSTREAM'"
-                        ng-disabled="$ctrl.physicalFlowsByDirection.UPSTREAM.length === 0"
-                        ng-model="$ctrl.selectedPhysicalFlowFilter"
-                        ng-click="$ctrl.filterPhysicalFlows('DOWNSTREAM')">
-                        Produces
-                    </button>
+                            ng-click="$ctrl.filterPhysicalFlows('UPSTREAM')">
+                            Consumes
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-default"
+                            uib-btn-radio="'DOWNSTREAM'"
+                            ng-disabled="$ctrl.physicalFlowsByDirection.UPSTREAM.length === 0"
+                            ng-model="$ctrl.selectedPhysicalFlowFilter"
+                            ng-click="$ctrl.filterPhysicalFlows('DOWNSTREAM')">
+                            Produces
+                        </button>
+                    </div>
+
+                </details>
+
+                <waltz-grid-with-search ng-if="$ctrl.physicalFlowsByDirection.ALL.length > 0"
+                                        entries="$ctrl.physicalRows"
+                                        search-control-min-rows="1"
+                                        column-defs="$ctrl.physicalFlowColDefs"
+                                        on-row-select="$ctrl.onPhysicalRowSelect">
+                </waltz-grid-with-search>
+
+                <div>
+                    <waltz-data-extract-link name="All Physical Flows"
+                                             styling="link"
+                                             extract="physical-flows/all/{{$ctrl.parentEntityRef.kind}}/{{$ctrl.parentEntityRef.id}}"
+                                             method="POST">
+                    </waltz-data-extract-link>
+                    <span> | </span>
+                    <waltz-data-extract-link name="Consumes"
+                                             styling="link"
+                                             extract="physical-flows/consumes/{{$ctrl.parentEntityRef.kind}}/{{$ctrl.parentEntityRef.id}}"
+                                             method="POST">
+                    </waltz-data-extract-link>
+                    <span> | </span>
+                    <waltz-data-extract-link name="Produces"
+                                             styling="link"
+                                             extract="physical-flows/produces/{{$ctrl.parentEntityRef.kind}}/{{$ctrl.parentEntityRef.id}}"
+                                             method="POST">
+                    </waltz-data-extract-link>
                 </div>
-
-            </details>
-
-            <waltz-grid-with-search ng-if="$ctrl.physicalFlowsByDirection.ALL.length > 0"
-                                    entries="$ctrl.physicalRows"
-                                    search-control-min-rows="1"
-                                    column-defs="$ctrl.physicalFlowColDefs"
-                                    on-row-select="$ctrl.onPhysicalRowSelect">
-            </waltz-grid-with-search>
-            <waltz-no-data ng-if="$ctrl.physicalFlowsByDirection.ALL.length === 0">
-                <message>
-                    No physical flows exist
-                </message>
-            </waltz-no-data>
-
-            <div>
-                <waltz-data-extract-link name="All Physical Flows"
-                                         styling="link"
-                                         extract="physical-flows/all/{{$ctrl.parentEntityRef.kind}}/{{$ctrl.parentEntityRef.id}}"
-                                         method="POST">
-                </waltz-data-extract-link>
-                <span> | </span>
-                <waltz-data-extract-link name="Consumes"
-                                         styling="link"
-                                         extract="physical-flows/consumes/{{$ctrl.parentEntityRef.kind}}/{{$ctrl.parentEntityRef.id}}"
-                                         method="POST">
-                </waltz-data-extract-link>
-                <span> | </span>
-                <waltz-data-extract-link name="Produces"
-                                         styling="link"
-                                         extract="physical-flows/produces/{{$ctrl.parentEntityRef.kind}}/{{$ctrl.parentEntityRef.id}}"
-                                         method="POST">
-                </waltz-data-extract-link>
-<!--                <span class="text-muted"> Download Physical Flows :  </span>-->
             </div>
         </div>
     </div>
