@@ -128,7 +128,11 @@
                             </td>
                         </tr>
                     {:else}
-                        <NoData>There are no licences, use the section below to add one</NoData>
+                        <tr>
+                            <td colspan="5">
+                                <NoData>There are no licences, use the section below to add one</NoData>
+                            </td>
+                        </tr>
                     {/each}
                 </tbody>
             </table>
