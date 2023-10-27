@@ -142,47 +142,50 @@
 <div class="decorator-detail">
     <div class="decorator-detail-table">
         {#if !_.isEmpty(tableData)}
-            <details>
-                <summary>
-                    Filters
-                </summary>
 
-                <div class="help-block"
-                     style="padding-top: 1em">Use the assessment ratings to filter the logical flow decorators. Only ratings aligned to a data type decorator can be filtered upon</div>
-                <div style="display: flex; gap: 1em">
-                    <div style="flex: 1 1 30%">
-                        {#each assessmentFilters as assessment}
-                            <table class="table table-condensed">
-                                <thead>
-                                <tr>
-                                    <th>{assessment?.definition?.name}
-                                        <span>
-                                            <button class="btn btn-skinny"
-                                                    on:click={() => clearFiltersForDefinition(assessment.definition.id)}>
-                                                Clear
-                                            </button>
-                                        </span>
-                                    </th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {#each assessment?.ratings as rating}
-                                    <tr class="clickable"
-                                        class:selected={_.some(filteredAssessments, r => _.isEqual(r, { definitionId: assessment.definition.id, ratingId: rating.id}))}
-                                        on:click={() => selectRating(assessment.definition.id, rating.id)}>
-                                        <td>
-                                            <RatingIndicatorCell {...rating}/>
-                                        </td>
+            {#if !_.isEmpty(assessmentFilters)}
+                <details>
+                    <summary>
+                        Filters
+                    </summary>
+
+                    <div class="help-block"
+                         style="padding-top: 1em">Use the assessment ratings to filter the logical flow decorators. Only ratings aligned to a data type decorator can be filtered upon</div>
+                    <div style="display: flex; gap: 1em">
+                        <div style="flex: 1 1 30%">
+                            {#each assessmentFilters as assessment}
+                                <table class="table table-condensed">
+                                    <thead>
+                                    <tr>
+                                        <th>{assessment?.definition?.name}
+                                            <span>
+                                                <button class="btn btn-skinny"
+                                                        on:click={() => clearFiltersForDefinition(assessment.definition.id)}>
+                                                    Clear
+                                                </button>
+                                            </span>
+                                        </th>
                                     </tr>
-                                {/each}
-                                </tbody>
-                            </table>
-                        {:else}
-                            <NoData type="info">No decorators have been given a rating for a primary assessment</NoData>
-                        {/each}
+                                    </thead>
+                                    <tbody>
+                                    {#each assessment?.ratings as rating}
+                                        <tr class="clickable"
+                                            class:selected={_.some(filteredAssessments, r => _.isEqual(r, { definitionId: assessment.definition.id, ratingId: rating.id}))}
+                                            on:click={() => selectRating(assessment.definition.id, rating.id)}>
+                                            <td>
+                                                <RatingIndicatorCell {...rating}/>
+                                            </td>
+                                        </tr>
+                                    {/each}
+                                    </tbody>
+                                </table>
+                            {:else}
+                                <NoData type="info">No decorators have been given a rating for a primary assessment</NoData>
+                            {/each}
+                        </div>
                     </div>
-                </div>
-            </details>
+                </details>
+            {/if}
 
             <div>
                 <SearchInput bind:value={qry}/>
