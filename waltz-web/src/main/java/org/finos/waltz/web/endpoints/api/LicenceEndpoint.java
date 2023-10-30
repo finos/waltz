@@ -18,11 +18,14 @@
 
 package org.finos.waltz.web.endpoints.api;
 
-import org.finos.waltz.service.licence.LicenceService;
-import org.finos.waltz.web.WebUtilities;
-import org.finos.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.licence.Licence;
+import org.finos.waltz.model.licence.SaveLicenceCommand;
+import org.finos.waltz.model.user.SystemRole;
+import org.finos.waltz.service.licence.LicenceService;
+import org.finos.waltz.service.user.UserRoleService;
+import org.finos.waltz.web.WebUtilities;
+import org.finos.waltz.web.endpoints.Endpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,10 +36,17 @@ import spark.Response;
 import java.io.IOException;
 import java.util.List;
 
-import static org.finos.waltz.web.WebUtilities.getId;
-import static org.finos.waltz.web.WebUtilities.mkPath;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkTrue;
+import static org.finos.waltz.web.WebUtilities.getId;
+import static org.finos.waltz.web.WebUtilities.getUsername;
+import static org.finos.waltz.web.WebUtilities.mkPath;
+import static org.finos.waltz.web.WebUtilities.readBody;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.deleteForDatum;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.getForDatum;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.getForList;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.postForDatum;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.postForList;
 
 
 @Service
@@ -46,11 +56,16 @@ public class LicenceEndpoint implements Endpoint {
 
     private final LicenceService service;
 
+    private final UserRoleService userRoleService;
+
 
     @Autowired
-    public LicenceEndpoint(LicenceService service) {
+    public LicenceEndpoint(LicenceService service,
+                           UserRoleService userRoleService) {
         checkNotNull(service, "service cannot be null");
+        checkNotNull(userRoleService, "userRoleService cannot be null");
         this.service = service;
+        this.userRoleService = userRoleService;
     }
 
 
@@ -63,6 +78,8 @@ public class LicenceEndpoint implements Endpoint {
         getForDatum(mkPath(BASE_URL, "external-id", ":externalId"), this::getByExternalIdRoute );
         getForList(mkPath(BASE_URL, "count", "application"), (request, response) -> service.countApplications());
         postForList(mkPath(BASE_URL, "selector"), this::findBySelectorRoute);
+        postForDatum(mkPath(BASE_URL, "save"), this::saveRoute);
+        deleteForDatum(mkPath(BASE_URL, "id", ":id"), this::removeRoute);
     }
 
 
@@ -81,5 +98,25 @@ public class LicenceEndpoint implements Endpoint {
     private  List<Licence> findBySelectorRoute(Request request, Response response) throws IOException {
         IdSelectionOptions options = WebUtilities.readIdSelectionOptionsFromBody(request);
         return service.findBySelector(options);
+    }
+
+    private boolean saveRoute(Request request, Response response) throws IOException {
+        SaveLicenceCommand cmd = readBody(request, SaveLicenceCommand.class);
+        String username = getUsername(request);
+        checkHasEditPermissions(username);
+        return service.save(cmd, username);
+    }
+
+    private boolean removeRoute(Request request, Response response) throws IOException {
+        long licenceId = getId(request);
+        String username = getUsername(request);
+        checkHasEditPermissions(username);
+        return service.remove(licenceId, getUsername(request));
+    }
+
+    private void checkHasEditPermissions(String username) {
+        checkTrue(
+                userRoleService.hasRole(username, SystemRole.ADMIN),
+                "User does not have the required permissions to edit licences");
     }
 }
