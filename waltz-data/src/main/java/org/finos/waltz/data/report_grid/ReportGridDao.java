@@ -1562,7 +1562,7 @@ public class ReportGridDao {
                             SURVEY_INSTANCE.APPROVAL_DUE_DATE,
                             SURVEY_INSTANCE.ENTITY_ID,
                             SURVEY_INSTANCE.ENTITY_KIND,
-                            SURVEY_RUN.ISSUED_ON,
+                            SURVEY_INSTANCE.ISSUED_ON,
                             SURVEY_INSTANCE.NAME.as("instance_name"),
                             SURVEY_RUN.NAME.as("run_name"))
                     .select(SURVEY_RUN.SURVEY_TEMPLATE_ID)
