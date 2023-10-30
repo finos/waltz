@@ -35,6 +35,7 @@ import ReassignRecipientsView from "./reassign-recipients-view";
 import ColorGradientView from "./color-gradient-view";
 import NavAidBuilderView from "./nav-aid-builder-view";
 import VersionInfoView from "./version-info-view";
+import LicencesAdminView from "./licences-view";
 import MeasurableCategoriesView from "./measurable-categories-view";
 import DiagramBuilderView from "./diagram-builder-view";
 import NavAidAdminView from "./nav-aids-view";
@@ -111,6 +112,12 @@ const ratingSchemesState = {
 };
 
 
+const licencesState = {
+    url: "/licences",
+    views: { "content@": LicencesAdminView }
+};
+
+
 const measurableCategoriesState = {
     url: "/measurable-categories",
     views: { "content@": MeasurableCategoriesView }
@@ -167,6 +174,7 @@ function setupRoutes($stateProvider) {
         .state("main.system.entity-named-note-types", entityNamedNodeTypesState)
         .state("main.system.euda-list", eudaListState)
         .state("main.system.hierarchies", hierarchiesState)
+        .state("main.system.licences", licencesState)
         .state("main.system.measurable-categories", measurableCategoriesState)
         .state("main.system.nav-aids", navAidAdminState)
         .state("main.system.nav-aid-builder", navAidBuilderState)

@@ -23,6 +23,7 @@ import org.finos.waltz.data.licence.LicenceDao;
 import org.finos.waltz.data.licence.LicenceIdSelectorFactory;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.licence.Licence;
+import org.finos.waltz.model.licence.SaveLicenceCommand;
 import org.finos.waltz.model.tally.Tally;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -71,5 +72,13 @@ public class LicenceService {
 
     public List<Tally<Long>> countApplications() {
         return licenceDao.countApplications();
+    }
+
+    public boolean save(SaveLicenceCommand cmd, String username) {
+        return licenceDao.save(cmd, username);
+    }
+
+    public boolean remove(long licenceId, String username) {
+        return licenceDao.remove(licenceId);
     }
 }
