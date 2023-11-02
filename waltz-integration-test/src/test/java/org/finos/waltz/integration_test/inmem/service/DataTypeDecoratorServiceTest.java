@@ -208,27 +208,27 @@ public class DataTypeDecoratorServiceTest extends BaseInMemoryIntegrationTest {
                 () -> dtdSvc.findByEntityIdSelector(EntityKind.APPLICATION, appOpts),
                 "If not logical flow kind or physical spec kind should throw exception");
 
-        List<DataTypeDecorator> selectorForLfWhereNoDecorators = dtdSvc.findByEntityIdSelector(EntityKind.LOGICAL_DATA_FLOW, appOpts);
-        assertEquals(emptyList(), selectorForLfWhereNoDecorators, "If no flows and decorators for selector returns empty list");
+        Collection<DataTypeDecorator> selectorForLfWhereNoDecorators = dtdSvc.findByEntityIdSelector(EntityKind.LOGICAL_DATA_FLOW, appOpts);
+        assertTrue(selectorForLfWhereNoDecorators.isEmpty(), "If no flows and decorators for selector returns empty list");
 
         LogicalFlow flow = lfHelper.createLogicalFlow(a, b);
         Long dtId = dataTypeHelper.createDataType("findByEntityIdSelector");
         Long dtId2 = dataTypeHelper.createDataType("findByEntityIdSelector2");
         dtdSvc.updateDecorators(username, flow.entityReference(), asSet(dtId, dtId2), emptySet());
 
-        List<DataTypeDecorator> selectorWithDecorators = dtdSvc.findByEntityIdSelector(EntityKind.LOGICAL_DATA_FLOW, appOpts);
+        Collection<DataTypeDecorator> selectorWithDecorators = dtdSvc.findByEntityIdSelector(EntityKind.LOGICAL_DATA_FLOW, appOpts);
         assertEquals(asSet(dtId, dtId2), map(selectorWithDecorators, DataTypeDecorator::dataTypeId), "Returns all data types for flow selector");
 
         IdSelectionOptions flowOpts = mkOpts(flow.entityReference());
-        List<DataTypeDecorator> selectorForPsWhereNoDecorators = dtdSvc.findByEntityIdSelector(EntityKind.PHYSICAL_SPECIFICATION, flowOpts);
-        assertEquals(emptyList(), selectorForPsWhereNoDecorators, "If no flows and decorators for selector returns empty list");
+        Collection<DataTypeDecorator> selectorForPsWhereNoDecorators = dtdSvc.findByEntityIdSelector(EntityKind.PHYSICAL_SPECIFICATION, flowOpts);
+        assertTrue(selectorForPsWhereNoDecorators.isEmpty(), "If no flows and decorators for selector returns empty list");
 
         Long psId = psHelper.createPhysicalSpec(a, "findByEntityIdSelector");
         EntityReference specRef = mkRef(EntityKind.PHYSICAL_SPECIFICATION, psId);
 
         pfHelper.createPhysicalFlow(flow.entityReference().id(), psId, "findByEntityIdSelector");
         dtdSvc.updateDecorators(username, specRef, asSet(dtId, dtId2), emptySet());
-        List<DataTypeDecorator> selectorForPs = dtdSvc.findByEntityIdSelector(EntityKind.PHYSICAL_SPECIFICATION, flowOpts);
+        Collection<DataTypeDecorator> selectorForPs = dtdSvc.findByEntityIdSelector(EntityKind.PHYSICAL_SPECIFICATION, flowOpts);
         assertEquals(asSet(dtId, dtId2), map(selectorForPs, DataTypeDecorator::dataTypeId), "Returns all data types for spec selector");
     }
 
