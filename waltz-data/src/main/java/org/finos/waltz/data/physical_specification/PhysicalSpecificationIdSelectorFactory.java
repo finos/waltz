@@ -49,8 +49,9 @@ public class PhysicalSpecificationIdSelectorFactory implements IdSelectorFactory
     public Select<Record1<Long>> apply(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         switch(options.entityReference().kind()) {
+            case ACTOR:
             case APPLICATION:
-                return mkForApplication(options);
+                return mkForApplicationOrActor(options);
             case PHYSICAL_FLOW:
                 return mkForPhysicalFlow(options);
             case LOGICAL_DATA_ELEMENT:
@@ -71,7 +72,7 @@ public class PhysicalSpecificationIdSelectorFactory implements IdSelectorFactory
     }
 
 
-    private Select<Record1<Long>> mkForApplication(IdSelectionOptions options) {
+    private Select<Record1<Long>> mkForApplicationOrActor(IdSelectionOptions options) {
         SelectorUtilities.ensureScopeIsExact(options);
 
         Condition lifecycleCondition = options.entityLifecycleStatuses().contains(EntityLifecycleStatus.REMOVED)
