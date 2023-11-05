@@ -140,11 +140,10 @@ const physicalFlowColDefs = [
                        </div>`
     },
     {
-        field: "name",
         name: "Name",
         width: "10%",
         cellTemplate: `<div style="padding-top: 0.5em">
-                            <span ng-bind="COL_FIELD"></span>
+                            <span ng-bind="row.entity.name || row.entity.physicalSpecification.name"></span>
                        </div>`
     },
     {
@@ -239,7 +238,7 @@ function filterFlowOnDataTypes(flows, dataTypes = [], ratings = []) {
             const hasFilteredRating = containsAny(ratings, d.assessmentRatings);
 
             return hasFilteredDt && (noRatingFilters || hasFilteredRating);
-        })
+        });
 }
 
 function controller($q, $scope, $state, serviceBroker) {
@@ -395,6 +394,8 @@ function controller($q, $scope, $state, serviceBroker) {
 
                 vm.physicalRows = vm.physicalFlowsByDirection.ALL;
                 vm.logicalRows = vm.logicalFlowsByDirection.ALL;
+
+                console.log(vm);
 
             })
             .then(() => vm.visibility.loading = false);
