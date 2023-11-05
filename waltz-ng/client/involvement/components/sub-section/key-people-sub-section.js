@@ -20,7 +20,6 @@ import { initialiseData } from "../../../common";
 
 import template from "./key-people-sub-section.html";
 import { CORE_API } from "../../../common/services/core-api-utils";
-import { aggregatePeopleByKeyInvolvementKind } from "../../involvement-utils";
 
 const bindings = {
     parentEntityRef: "<",
@@ -35,28 +34,17 @@ function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const refresh = () => {
-        const involvementPromise = serviceBroker
-            .loadViewData(
-                CORE_API.InvolvementStore.findByEntityReference,
-                [ vm.parentEntityRef ])
-            .then(r => r.data);
-
-        const peoplePromise = serviceBroker
-            .loadViewData(
-                CORE_API.InvolvementStore.findPeopleByEntityReference,
-                [ vm.parentEntityRef ])
-            .then(r => r.data);
-
-        const keyInvolvementsPromise = serviceBroker
-            .loadViewData(
-                CORE_API.InvolvementKindStore.findKeyInvolvementKindsByEntityKind,
-                [ vm.parentEntityRef.kind ])
-            .then(r => r.data);
-
-        $q.all([involvementPromise, peoplePromise, keyInvolvementsPromise])
-            .then(([involvements = [], people = [], keyInvolvementKinds = []]) => {
-                vm.keyPeople = aggregatePeopleByKeyInvolvementKind(involvements, people, keyInvolvementKinds);
-            });
+        return serviceBroker
+            .loadViewData(CORE_API.InvolvementViewService.findKeyInvolvementsForEntity, [vm.parentEntityRef])
+            .then(r => r.data)
+            .then(keyInvolvements => vm.keyPeople = _
+                .chain(keyInvolvements)
+                .groupBy(d => d.involvementKind.name)
+                .map((v, k) => ({
+                    roleName: k,
+                    persons: _.map(v, d => d.person)
+                }))
+                .value());
     };
 
     vm.$onChanges = () => {

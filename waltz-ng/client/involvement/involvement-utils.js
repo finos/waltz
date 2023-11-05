@@ -16,53 +16,7 @@
  *
  */
 
-import _ from "lodash";
 
-
-export function aggregatePeopleInvolvements(involvements = [], people = []) {
-    const involvementsByPerson = _
-        .chain(involvements)
-        .groupBy('employeeId')
-        .mapValues(xs => _  // dedupe involvement kinds for person
-            .chain(xs)
-            .map(x => ({
-                kindId: x.kindId,
-                provenance: x.provenance,
-                isReadOnly: x.isReadOnly
-            }))
-            .uniqBy(d => d.kindId)
-            .value()
-        )
-        .value();
-
-    return _
-        .chain(people)
-        .map(person => ({person, involvements: involvementsByPerson[person.employeeId]}))
-        .uniqBy(i => i.person.id)
-        .value();
-}
-
-
-export function aggregatePeopleByKeyInvolvementKind(involvements, people, keyInvolvementKinds = []) {
-    const peopleById = _.keyBy(people, "employeeId");
-
-    const aggregatePeopleByInvolvementKind = _
-        .chain(involvements)
-        .map(inv => ({
-            person: peopleById[inv.employeeId],
-            involvement: ({kindId: inv.kindId})
-        }))
-        .groupBy(inv => inv.involvement.kindId)
-        .value();
-
-    return _.chain(keyInvolvementKinds)
-        .map(kind => ({
-            roleName: kind.name,
-            persons: aggregatePeopleByInvolvementKind[kind.id]
-        }))
-        .sortBy("roleName")
-        .value();
-}
 
 export function mkChangeCommand(operation, personEntityRef, involvementKindId) {
     return {
