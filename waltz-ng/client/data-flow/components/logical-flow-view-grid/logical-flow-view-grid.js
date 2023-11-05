@@ -394,9 +394,6 @@ function controller($q, $scope, $state, serviceBroker) {
 
                 vm.physicalRows = vm.physicalFlowsByDirection.ALL;
                 vm.logicalRows = vm.logicalFlowsByDirection.ALL;
-
-                console.log(vm);
-
             })
             .then(() => vm.visibility.loading = false);
     }
@@ -406,7 +403,7 @@ function controller($q, $scope, $state, serviceBroker) {
             vm.selectionOptions = mkSelectionOptions(vm.parentEntityRef);
             loadFlows();
         }
-    }
+    };
 
     vm.onLogicalRowSelect = (r) => {
         if (vm.selectedFlow === r || _.isNil(r)) {
