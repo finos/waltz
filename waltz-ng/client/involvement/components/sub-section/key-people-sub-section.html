@@ -36,8 +36,8 @@
                             <td>
                                 <div>
                                     <span ng-repeat="p in item.persons">
-                                        <waltz-entity-link entity-ref="p.person"></waltz-entity-link> -
-                                        <a ng-href="mailto:{{p.person.email}}">
+                                        <waltz-entity-link entity-ref="p"></waltz-entity-link> -
+                                        <a ng-href="mailto:{{p.email}}">
                                             <waltz-icon name="envelope-o"></waltz-icon>
                                         </a>
                                         <span ng-show="!$last">, </span>

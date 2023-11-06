@@ -5,6 +5,7 @@ import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.involvement.InvolvementViewDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.HierarchyDirection;
+import org.finos.waltz.model.utils.IdUtilities;
 import org.finos.waltz.service.involvement_kind.InvolvementKindService;
 import org.finos.waltz.service.person.PersonService;
 import org.finos.waltz.model.EntityReference;
@@ -69,7 +70,7 @@ public class InvolvementViewService {
     public Set<InvolvementDetail> findKeyInvolvementsForEntity(EntityReference ref) {
 
         List<InvolvementKind> keyInvolvements = involvementKindService.findKeyInvolvementKindsByEntityKind(ref.kind());
-        Map<Long, InvolvementKind> keyInvKindsById = indexBy(keyInvolvements, d -> d.id().get());
+        Map<Long, InvolvementKind> keyInvKindsById = IdUtilities.indexByOptionalId(keyInvolvements);
 
         List<Involvement> involvements = involvementService.findByEntityReference(ref);
         List<Person> people = involvementService.findPeopleByEntityReference(ref);
@@ -83,6 +84,7 @@ public class InvolvementViewService {
                         .involvementKind(keyInvKindsById.get(d.kindId()))
                         .person(peopleByEmployeeId.get(d.employeeId()))
                         .build())
+                .filter(d -> ! d.person().isRemoved())
                 .collect(Collectors.toSet());
     }
 
