@@ -82,13 +82,13 @@
 
         <!-- Edit Physical Split button -->
         <div style="display: inline-block"
-             ng-if="$ctrl.canEdit && $ctrl.activeTab.id === 'PHYSICAL' && !$ctrl.isAnyEditorVisible()">
+             ng-if="$ctrl.canEdit && $ctrl.activeTab.id === 'FLOW_DETAIL' && !$ctrl.isAnyEditorVisible()">
             <div class="btn-group"
                  uib-dropdown>
 
                 <a class="btn btn-xs btn-primary"
                    ui-sref="main.physical-flow.registration ($ctrl.parentEntityRef)">
-                    Edit
+                    Register Physical Flow
                 </a>
                 <button type="button"
                         waltz-has-role="BULK_FLOW_EDITOR"

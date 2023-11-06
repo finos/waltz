@@ -256,16 +256,15 @@
 
         <div class="waltz-sticky-part">
             <h4>
-                <a href="{{$ctrl.logicalFlowUrl}}">
                 <span>
                     Logical Flow
                     <waltz-icon name="{{$ctrl.selectedFlow.source.kind | toIconName:'entity' }}"></waltz-icon>
                     <waltz-icon name="arrow-right"></waltz-icon>
                     <waltz-icon name="{{$ctrl.selectedFlow.target.kind | toIconName:'entity'}}"></waltz-icon>
                 </span>
-                </a>
                 <button class="btn btn-skinny btn-xs"
                         ng-click="$ctrl.onClearSelect()">
+                    <waltz-icon name="times"></waltz-icon>
                     Clear
                 </button>
             </h4>
@@ -273,7 +272,19 @@
             <table class="table table-condensed small">
                 <tbody>
                 <tr>
-                    <td style="width: 20%">Source</td>
+                    <td style="width: 20%">Name</td>
+                    <td>
+                        <waltz-entity-link tooltip-placement="below"
+                                           entity-ref="{
+                                                kind: 'LOGICAL_DATA_FLOW',
+                                                id: $ctrl.selectedFlow.id,
+                                                name: 'Logical Flow'
+                                            }">
+                        </waltz-entity-link>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Source</td>
                     <td><waltz-entity-link entity-ref="$ctrl.selectedFlow.source" is-secondary-link="true"></waltz-entity-link></td>
                 </tr>
                 <tr>
@@ -336,29 +347,38 @@
          ng-if="$ctrl.selectedPhysicalFlow">
         <div class="waltz-sticky-part">
             <h4>
-                <a href="{{$ctrl.physicalFlowUrl}}">
                 <span>
                     Physical Flow
                     <waltz-icon name="{{$ctrl.selectedPhysicalFlow.source.kind | toIconName:'entity' }}"></waltz-icon>
                     <waltz-icon name="arrow-right"></waltz-icon>
                     <waltz-icon name="{{$ctrl.selectedPhysicalFlow.target.kind | toIconName:'entity'}}"></waltz-icon>
                 </span>
-                </a>
                 <button class="btn btn-skinny btn-xs"
                         ng-click="$ctrl.onClearSelect()">
+                    <waltz-icon name="times"></waltz-icon>
                     Clear
                 </button>
             </h4>
 
-            <div class="help-block"
-                 ng-if="$ctrl.selectedPhysicalFlow.description">
-                <span ng-bind="$ctrl.selectedPhysicalFlow.description"></span>
-            </div>
 
             <table class="table table-condensed small">
                 <tbody>
                 <tr>
-                    <td style="width: 20%">Source</td>
+                    <td style="width: 20%">Name</td>
+                    <td>
+                        <waltz-entity-link popover-delay="1000"
+                                           tooltip-placement="bottom"
+                                           entity-ref="{
+                                                kind: 'PHYSICAL_FLOW',
+                                                id: $ctrl.selectedPhysicalFlow.id,
+                                                name: $ctrl.selectedPhysicalFlow.name || $ctrl.selectedPhysicalFlow.physicalSpecification.name || 'unnamed'
+                                            }">
+                        </waltz-entity-link>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td>Source</td>
                     <td><waltz-entity-link entity-ref="$ctrl.selectedPhysicalFlow.source" is-secondary-link="true"></waltz-entity-link></td>
                 </tr>
                 <tr>
@@ -381,6 +401,12 @@
                                           show-icon="false"
                                           show-popover="false">
                         </waltz-enum-value>
+                    </td>
+                </tr>
+                <tr ng-if="$ctrl.selectedPhysicalFlow.description">
+                    <td>Description</td>
+                    <td>
+                        <span ng-bind="$ctrl.selectedPhysicalFlow.description"></span>
                     </td>
                 </tr>
                 </tbody>
@@ -423,6 +449,7 @@
     .flow-detail-panel {
         width: 30%;
         padding-left: 1em;
+        word-wrap: anywhere;
     }
 
 </style>
