@@ -28,10 +28,10 @@
     let filteredAssessments = [];
 
     function selectDecorator(decorator) {
-        if (_.isEmpty(selectedDecorator)) {
-            selectedDecorator = decorator;
-        } else {
+        if (!_.isEmpty(selectedDecorator) && _.isEqual(selectedDecorator, decorator)) {
             selectedDecorator = null;
+        } else {
+            selectedDecorator = decorator;
         }
     }
 
@@ -200,8 +200,8 @@
                        style="margin-top: 1em">
                     <thead>
                         <tr>
-                            <th nowrap="nowrap">Data Type</th>
-                            <th nowrap="nowrap">Flow Classification Rule</th>
+                            <th nowrap="nowrap" style="width: 20em">Data Type</th>
+                            <th nowrap="nowrap" style="width: 20em">Flow Classification Rule</th>
                             {#each viewData?.primaryAssessmentDefinitions  || [] as defn}
                                 <th>{defn.name}</th>
                             {/each}
