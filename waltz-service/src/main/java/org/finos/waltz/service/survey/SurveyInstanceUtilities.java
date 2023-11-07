@@ -31,6 +31,7 @@ public class SurveyInstanceUtilities {
             case PERSON:
                 return resp.entityResponse();
             case MEASURABLE_MULTI_SELECT:
+            case LEGAL_ENTITY:
                 return resp.entityListResponse();
             default:
                 return Optional.empty();
