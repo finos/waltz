@@ -600,7 +600,7 @@ public class JooqUtilities {
                 SurveyTemplate st = alias == null ? Tables.SURVEY_TEMPLATE : Tables.SURVEY_TEMPLATE.as(alias);
                 return ImmutableCommonTableFields
                         .builder()
-                        .entityKind(EntityKind.SURVEY_QUESTION)
+                        .entityKind(EntityKind.SURVEY_TEMPLATE)
                         .table(st)
                         .idField(st.ID)
                         .parentIdField(null)
