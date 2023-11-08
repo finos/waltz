@@ -28,6 +28,7 @@ import FlowClassificationLegend
     from "../../../flow-classification-rule/components/svelte/FlowClassificationLegend.svelte";
 import LogicalFlowScrollPanel from "../svelte/FlowDecoratorExplorerPanel.svelte"
 import {lastViewedFlowTabKey} from "../../../user";
+import FlowDetailPanel from "../svelte/flow-detail-tab/FlowDetailPanel.svelte"
 
 const bindings = {
     parentEntityRef: "<",
@@ -38,6 +39,7 @@ const tabs = [
     {id: "SUMMARY", name: "Logical Flows"},
     {id: "LOGICAL_FLOW_SCROLL", name: "Logical Flows (Beta View)"},
     {id: "FLOW_DETAIL", name: "Flow Detail"},
+    {id: "FLOW_DETAIL_SVELTE", name: "Flow Detail Svelte"},
     {id: "FLOW_CLASSIFICATION_RULES", name: "Flow Classification Rules"}
 ];
 
@@ -48,6 +50,7 @@ const modes = {
 }
 
 const initialState = {
+    FlowDetailPanel,
     FlowClassificationLegend,
     LogicalFlowScrollPanel,
     activeTab: null,

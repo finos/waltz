@@ -1,0 +1,116 @@
+<script>
+
+    import SearchInput from "../../../../common/svelte/SearchInput.svelte";
+    import {termSearch} from "../../../../common";
+    import _ from "lodash";
+    import {enumValueStore} from "../../../../svelte-stores/enum-value-store";
+    import {nestEnums} from "../../../../common/svelte/enum-utils";
+    import {
+        toCriticalityName,
+        toFrequencyKindName,
+        toTransportKindName
+    } from "../../../../physical-flows/svelte/physical-flow-registration-utils";
+    import {selectedPhysicalFlow} from "./flow-details-store";
+
+    export let physicalFlows;
+
+    let qry;
+    let visibleFlows;
+    let enumsCall = enumValueStore.load();
+    let nestedEnums;
+
+    $: nestedEnums = nestEnums($enumsCall.data);
+
+    $: visibleFlows = _.isEmpty(qry)
+        ? physicalFlows
+        : termSearch(
+            physicalFlows,
+            qry,
+            [
+                "logicalFlow.source.name",
+                "logicalFlow.source.externalId",
+                "logicalFlow.target.name",
+                "logicalFlow.target.externalId"
+            ]);
+
+
+    function selectPhysicalFlow(flow) {
+        $selectedPhysicalFlow = flow;
+    }
+
+    $: console.log({physicalFlows});
+
+</script>
+
+
+<div>
+    <SearchInput bind:value={qry}/>
+</div>
+<div class="table-container"
+     class:waltz-scroll-region-350={_.size(physicalFlows) > 10}>
+    <table class="table table-condensed"
+           style="margin-top: 1em">
+        <thead>
+        <tr>
+            <th nowrap="nowrap" style="width: 20em">Source</th>
+            <th nowrap="nowrap" style="width: 20em">Source External ID</th>
+            <th nowrap="nowrap" style="width: 20em">Target</th>
+            <th nowrap="nowrap" style="width: 20em">Target External ID</th>
+            <th nowrap="nowrap" style="width: 20em; max-width: 20em">Name</th>
+            <th nowrap="nowrap" style="width: 20em">External ID</th>
+            <th nowrap="nowrap" style="width: 20em">Criticality</th>
+            <th nowrap="nowrap" style="width: 20em">Frequency</th>
+            <th nowrap="nowrap" style="width: 20em">Transport Kind</th>
+        </tr>
+        </thead>
+        <tbody>
+        {#each visibleFlows as flow}
+            <tr class="clickable"
+                on:click={() => selectPhysicalFlow(flow)}>
+                <td>
+                    {flow.logicalFlow.source.name}
+                </td>
+                <td>
+                    {flow.logicalFlow.source.externalId}
+                </td>
+                <td>
+                    {flow.logicalFlow.target.name}
+                </td>
+                <td>
+                    {flow.logicalFlow.target.externalId}
+                </td>
+                <td>
+                    {flow.physicalFlow.name || flow.specification.name}
+                </td>
+                <td>
+                    {flow.physicalFlow.externalId || ""}
+                </td>
+                <td>
+                    {toCriticalityName(nestedEnums, flow.physicalFlow.criticality)}
+                </td>
+                <td>
+                    {toFrequencyKindName(nestedEnums, flow.physicalFlow.frequency)}
+                </td>
+                <td>
+                    {toTransportKindName(nestedEnums, flow.physicalFlow.transport)}
+                </td>
+            </tr>
+        {/each}
+        </tbody>
+    </table>
+</div>
+
+
+<style>
+
+    table {
+        display: table;
+        white-space: nowrap;
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+
+</style>

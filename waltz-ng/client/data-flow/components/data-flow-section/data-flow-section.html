@@ -285,6 +285,14 @@
             </waltz-logical-flow-view-grid>
         </div>
 
+
+        <div class="wt-tab wt-active"
+             ng-if="$ctrl.activeTab.id === 'FLOW_DETAIL_SVELTE'">
+            <waltz-svelte-component parent-entity-ref="$ctrl.parentEntityRef"
+                                    component="$ctrl.FlowDetailPanel">
+            </waltz-svelte-component>
+        </div>
+
         <div class="wt-tab wt-active"
              ng-if="$ctrl.activeTab.id === 'LOGICAL_FLOW_SCROLL'">
             <div ng-if="!isEmpty($ctrl.parentEntityRef.id)">
