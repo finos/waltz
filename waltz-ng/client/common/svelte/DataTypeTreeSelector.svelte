@@ -1,6 +1,6 @@
 <script>
     import {dataTypeStore} from "../../svelte-stores/data-type-store";
-    import {buildHierarchies, doSearch, prepareSearchNodes} from "../hierarchy-utils";
+    import {buildHierarchies, doSearch, prepareSearchNodes, reduceToSelectedNodesOnly} from "../hierarchy-utils";
     import DataTypeTreeNode from "./DataTypeTreeNode.svelte";
     import SearchInput from "./SearchInput.svelte";
     import _ from "lodash";
@@ -9,6 +9,7 @@
     export let nonConcreteSelectable = true;
     export let selectionFilter = () => true;
     export let expanded = true;
+    export let dataTypeIds = [];
 
     const root = {name: "Root", isExpanded: true};
 
@@ -31,7 +32,10 @@
     let dataTypes = [];
 
     $: dataTypes = $dataTypesCall.data;
-    $: searchNodes = prepareSearchNodes(dataTypes);
+    $: requiredNodes = _.isEmpty(dataTypeIds)
+        ? dataTypes
+        : reduceToSelectedNodesOnly(dataTypes, dataTypeIds);
+    $: searchNodes = prepareSearchNodes(requiredNodes);
     $: displayedHierarchy = calcDisplayHierarchy(searchNodes, qry);
 
 </script>

@@ -72,6 +72,10 @@ export function mkDefinitionFilterId(definitionId) {
     return `ASSESSMENT_DEFINITION_${definitionId}`;
 }
 
+export function mkDataTypeFilterId() {
+    return "DATA_TYPE";
+}
+
 export function mkAssessmentFilter(filterId, newRatings) {
     return {
         id: filterId,
@@ -79,6 +83,16 @@ export function mkAssessmentFilter(filterId, newRatings) {
         test: (r) => _.isEmpty(newRatings)
             ? x => true
             : _.some(newRatings, x => _.some(r.assessmentRatings, d => _.isEqual(x, d)))
+    };
+}
+
+export function mkDataTypeFilter(filterId, dataTypes) {
+    return {
+        id: filterId,
+        dataTypes,
+        test: (r) => _.isEmpty(dataTypes)
+            ? x => true
+            : _.some(r.dataTypesForLogicalFlow, x => _.every(dataTypes, d => !_.isEqual(d, x.decoratorEntity.id)))
     };
 }
 

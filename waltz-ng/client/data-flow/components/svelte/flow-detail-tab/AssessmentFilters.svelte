@@ -56,7 +56,7 @@ Use the assessment ratings to filter the logical flows. Only ratings aligned to 
 <div style="display: flex; gap: 1em">
     {#each assessmentFilters as assessment}
         <div style="flex: 1 1 30%">
-            <table class="table table-condensed">
+            <table class="table table-condensed table">
                 <thead>
                 <tr>
                     <th>{assessment?.definition?.name}

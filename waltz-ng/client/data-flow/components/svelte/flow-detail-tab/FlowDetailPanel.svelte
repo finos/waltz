@@ -11,6 +11,7 @@
     import {mkAssessmentFilters, mkFlowDetails, mkLogicalFromFlowDetails} from "./flow-detail-utils";
     import SelectedFlowDetail from "./SelectedFlowDetail.svelte";
     import AssessmentFilters from "./AssessmentFilters.svelte";
+    import DataTypeFilters from "./DataTypeFilters.svelte";
 
     export let parentEntityRef;
 
@@ -94,6 +95,8 @@
                 </summary>
 
                 <AssessmentFilters {assessmentFilters}/>
+
+                <DataTypeFilters dataTypes={dataTypes}/>
 
             </details>
         {/if}
