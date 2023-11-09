@@ -67,3 +67,21 @@ export function mkAssessmentFilters(flowView) {
         .filter(d => !_.isEmpty(d.ratings))
         .value();
 }
+
+export function mkDefinitionFilterId(definitionId) {
+    return `ASSESSMENT_DEFINITION_${definitionId}`;
+}
+
+export function mkAssessmentFilter(filterId, newRatings) {
+    return {
+        id: filterId,
+        ratings: newRatings,
+        test: (r) => _.isEmpty(newRatings)
+            ? x => true
+            : _.some(newRatings, x => _.some(r.assessmentRatings, d => _.isEqual(x, d)))
+    };
+}
+
+export function mkLogicalFromFlowDetails(d) {
+    return _.pick(d, ["logicalFlow", "ratingsByDefId", "dataTypesForLogicalFlow", "assessmentRatings"]);
+}

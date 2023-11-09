@@ -19,6 +19,7 @@
 import {remote} from "./remote";
 
 export function mkEnumValueStore() {
+
     const load = (force = false) => remote
         .fetchAppList("GET", "api/enum-value", null, {force});
 

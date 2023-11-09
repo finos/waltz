@@ -10,7 +10,8 @@
         toFrequencyKindName,
         toTransportKindName
     } from "../../../../physical-flows/svelte/physical-flow-registration-utils";
-    import {selectedPhysicalFlow} from "./flow-details-store";
+    import {selectedPhysicalFlow, selectedLogicalFlow} from "./flow-details-store";
+    import {mkLogicalFromFlowDetails} from "./flow-detail-utils";
 
     export let physicalFlows;
 
@@ -36,9 +37,8 @@
 
     function selectPhysicalFlow(flow) {
         $selectedPhysicalFlow = flow;
+        $selectedLogicalFlow = mkLogicalFromFlowDetails(flow);
     }
-
-    $: console.log({physicalFlows});
 
 </script>
 
@@ -48,7 +48,7 @@
 </div>
 <div class="table-container"
      class:waltz-scroll-region-350={_.size(physicalFlows) > 10}>
-    <table class="table table-condensed"
+    <table class="table table-condensed small"
            style="margin-top: 1em">
         <thead>
         <tr>

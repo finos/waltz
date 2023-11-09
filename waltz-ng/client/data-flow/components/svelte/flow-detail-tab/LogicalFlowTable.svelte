@@ -4,7 +4,7 @@
     import {termSearch} from "../../../../common";
     import RatingIndicatorCell from "../../../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
     import _ from "lodash";
-    import {selectedLogicalFlow} from "./flow-details-store";
+    import {selectedLogicalFlow, selectedPhysicalFlow} from "./flow-details-store";
 
     export let logicalFlows;
     export let assessments;
@@ -24,8 +24,6 @@
                 "logicalFlow.target.externalId"
             ]);
 
-    $: console.log({logicalFlows, assessments});
-
     function mkDataTypeString(dataTypes) {
         return _
             .chain(dataTypes)
@@ -37,6 +35,7 @@
 
     function selectLogicalFlow(flow) {
         $selectedLogicalFlow = flow;
+        $selectedPhysicalFlow = null;
     }
 
 </script>
@@ -47,7 +46,7 @@
 </div>
 <div class="table-container"
      class:waltz-scroll-region-350={_.size(logicalFlows) > 10}>
-    <table class="table table-condensed"
+    <table class="table table-condensed small"
            style="margin-top: 1em">
         <thead>
         <tr>
@@ -77,7 +76,7 @@
                 <td>
                     {flow.logicalFlow.target.externalId}
                 </td>
-                <td>
+                <td class="force-wrap">
                     {mkDataTypeString(flow.dataTypesForLogicalFlow)}
                 </td>
                 {#each assessments as defn}
@@ -112,5 +111,6 @@
         display: flex;
         gap: 1em;
     }
+
 
 </style>
