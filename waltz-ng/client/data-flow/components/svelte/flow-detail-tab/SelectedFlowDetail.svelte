@@ -169,7 +169,7 @@
             </tr>
             <tr>
                 <td>External Id</td>
-                <td>{$selectedPhysicalFlow.physicalFlow.externalId}</td>
+                <td>{$selectedPhysicalFlow.physicalFlow.externalId || "-"}</td>
             </tr>
             <tr>
                 <td>Specification</td>

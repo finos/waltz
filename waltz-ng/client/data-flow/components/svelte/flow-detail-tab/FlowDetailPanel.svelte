@@ -6,13 +6,14 @@
     import _ from "lodash";
     import {reduceToSelectedNodesOnly} from "../../../../common/hierarchy-utils";
     import LogicalFlowTable from "./LogicalFlowTable.svelte";
-    import {filters, selectedLogicalFlow, selectedPhysicalFlow} from "./flow-details-store";
+    import {filters, resetFlowDetailsStore, selectedLogicalFlow, selectedPhysicalFlow} from "./flow-details-store";
     import PhysicalFlowTable from "./PhysicalFlowTable.svelte";
     import {mkAssessmentFilters, mkFlowDetails, mkLogicalFromFlowDetails} from "./flow-detail-utils";
     import SelectedFlowDetail from "./SelectedFlowDetail.svelte";
     import AssessmentFilters from "./AssessmentFilters.svelte";
     import DataTypeFilters from "./DataTypeFilters.svelte";
     import InboundOutboundFilters from "./InboundOutboundFilters.svelte";
+    import {onMount} from "svelte";
 
     export let parentEntityRef;
 
@@ -34,6 +35,7 @@
         }
     }
 
+    onMount(() => resetFlowDetailsStore());
 
     let dataTypesCall = dataTypeStore.findAll();
     $: allDataTypes = $dataTypesCall?.data;
