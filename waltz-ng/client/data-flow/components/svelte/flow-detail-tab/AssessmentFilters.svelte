@@ -3,7 +3,7 @@
 
     import {mkAssessmentFilter, mkDefinitionFilterId} from "./flow-detail-utils";
     import _ from "lodash";
-    import {filters} from "./flow-details-store";
+    import {filters, updateFilters} from "./flow-details-store";
     import RatingIndicatorCell from "../../../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
     import NoData from "../../../../common/svelte/NoData.svelte";
 
@@ -27,11 +27,9 @@
             ? _.filter(existingRatings, d => !_.isEqual(d, ratingInfo))
             : _.concat(existingRatings, [ratingInfo]);
 
-        const withoutFilter = _.reject($filters, d => d.id === filterId);
-
         const newFilter = mkAssessmentFilter(filterId, newRatings)
 
-        $filters = _.concat(withoutFilter, newFilter);
+        updateFilters(filterId, newFilter);
 
     }
 

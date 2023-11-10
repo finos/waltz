@@ -12,6 +12,7 @@
     import SelectedFlowDetail from "./SelectedFlowDetail.svelte";
     import AssessmentFilters from "./AssessmentFilters.svelte";
     import DataTypeFilters from "./DataTypeFilters.svelte";
+    import InboundOutboundFilters from "./InboundOutboundFilters.svelte";
 
     export let parentEntityRef;
 
@@ -57,7 +58,7 @@
 
             assessmentFilters = mkAssessmentFilters(flowView);
 
-            allFlows = mkFlowDetails(flowView);
+            allFlows = mkFlowDetails(flowView, parentEntityRef);
         }
     }
 
@@ -92,11 +93,18 @@
             <details>
                 <summary>
                     Filters
+                    {#if !_.isEmpty($filters)}
+                        <button class="btn btn-skinny">
+                            Clear All
+                        </button>
+                    {/if}
                 </summary>
+
+                <InboundOutboundFilters/>
 
                 <AssessmentFilters {assessmentFilters}/>
 
-                <DataTypeFilters dataTypes={dataTypes}/>
+                <DataTypeFilters {dataTypes}/>
 
             </details>
         {/if}

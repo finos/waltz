@@ -1,9 +1,9 @@
 <script>
 
 
-    import {mkAssessmentFilter, mkDataTypeFilter, mkDataTypeFilterId} from "./flow-detail-utils";
+    import {mkDataTypeFilter, mkDataTypeFilterId} from "./flow-detail-utils";
     import _ from "lodash";
-    import {filters} from "./flow-details-store";
+    import {filters, updateFilters} from "./flow-details-store";
     import DataTypeTreeSelector from "../../../../common/svelte/DataTypeTreeSelector.svelte";
     import {flattenChildren} from "../../../../common/hierarchy-utils";
 
@@ -11,25 +11,13 @@
 
     $: dataTypeIds = _.map(dataTypes, d => d.id);
 
-    $: selectionFilter = (d) => {
-        console.log({d})
-        const dtFilter = _.find($filters, d => d.id = mkDataTypeFilterId());
-        const filteredDataTypes = _.get(dtFilter, ["dataTypes"], []);
-        return _.isEmpty(filteredDataTypes) || !_.includes(filteredDataTypes, d.id);
-    }
-
     function selectDataType(evt) {
 
-        console.log({evt});
-
         const filterId = mkDataTypeFilterId();
-
         const dataType = evt.detail;
 
         const children = flattenChildren(dataType, [dataType]);
         const dataTypesToToggle = _.map(children, d => d.id);
-
-        console.log({children});
 
         const existingFilter = _.find($filters, f => f.id === filterId);
 
@@ -41,14 +29,9 @@
             ? _.without(existingDataTypes, ...dataTypesToToggle)
             : _.uniq(_.concat(existingDataTypes, dataTypesToToggle));
 
-        console.log({dataTypeId, existingDataTypes, newDataTypes, inc: _.includes(existingDataTypes, dataTypeId)})
-
-        const withoutFilter = _.reject($filters, d => d.id === filterId);
-
         const newFilter = mkDataTypeFilter(filterId, newDataTypes);
 
-        $filters = _.concat(withoutFilter, newFilter);
-
+        return updateFilters(filterId, newFilter)
     }
 
     function clearFilters() {
@@ -63,11 +46,11 @@
         $filters = _.concat(withoutFilter, newFilter);
     }
 
-    function mkSelectionFilter(filters) {
-        const dtFilter = _.find(filters, d => d.id = mkDataTypeFilterId());
-        const filteredDataTypes = _.get(dtFilter, ["dataTypes"], []);
-        console.log({filteredDataTypes});
-        return d => _.includes(filteredDataTypes, d.id);
+    $: dtFilter = _.find($filters, d => d.id === mkDataTypeFilterId());
+    $: filteredDataTypes = _.get(dtFilter, ["dataTypes"], []);
+
+    $: selectionFilter = (x) => {
+        return _.includes(filteredDataTypes, x.id);
     }
 
 
@@ -81,7 +64,7 @@ Use the data types to filter the logical flows. Selecting a datatype will add or
                       expanded={true}
                       dataTypeIds={dataTypeIds}
                       nonConcreteSelectable={true}
-                      selectionFilter={mkSelectionFilter($filters)}
+                      selectionFilter={selectionFilter}
                       on:select={selectDataType}/>
 
 <div style="padding-top: 1em">
@@ -93,7 +76,7 @@ Use the data types to filter the logical flows. Selecting a datatype will add or
     <button class="btn btn-skinny"
             on:click={clearFilters}>
         Select All
-</button>
+    </button>
 </div>
 
 <style>

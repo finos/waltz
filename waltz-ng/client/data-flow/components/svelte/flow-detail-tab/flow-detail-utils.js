@@ -1,6 +1,22 @@
 import _ from "lodash";
+import {sameRef} from "../../../../common/entity-utils";
 
-export function mkFlowDetails(flowView) {
+
+export const Directions = {
+    INBOUND: "INBOUND",
+    OUTBOUND: "OUTBOUND",
+    ALL: "ALL"
+}
+
+function determineDirection(flow, parentEntityRef) {
+    if (sameRef(flow.target, parentEntityRef)) {
+        return Directions.INBOUND;
+    } else {
+        return Directions.OUTBOUND;
+    }
+}
+
+export function mkFlowDetails(flowView, parentEntityRef) {
 
     const ratingsByFlowId = _.groupBy(flowView.flowRatings, d => d.entityReference.id);
     const ratingSchemeItemsById = _.keyBy(flowView.ratingSchemeItems, d => d.id);
@@ -32,13 +48,16 @@ export function mkFlowDetails(flowView) {
                     .value())
                 .value();
 
+            const direction = determineDirection(logicalFlow, parentEntityRef);
+
             return {
                 logicalFlow,
                 ratingsByDefId,
                 dataTypesForLogicalFlow,
                 physicalFlow: d,
                 specification,
-                assessmentRatings
+                assessmentRatings,
+                direction
             };
         })
         .sortBy(d => d.logicalFlow.target.name, d => d.logicalFlow.source.name)
@@ -76,19 +95,23 @@ export function mkDataTypeFilterId() {
     return "DATA_TYPE";
 }
 
-export function mkAssessmentFilter(filterId, newRatings) {
+export function mkDirectionFilterId() {
+    return "FLOW_DIRECTION";
+}
+
+export function mkAssessmentFilter(id, ratings) {
     return {
-        id: filterId,
-        ratings: newRatings,
-        test: (r) => _.isEmpty(newRatings)
+        id,
+        ratings,
+        test: (r) => _.isEmpty(ratings)
             ? x => true
-            : _.some(newRatings, x => _.some(r.assessmentRatings, d => _.isEqual(x, d)))
+            : _.some(ratings, x => _.some(r.assessmentRatings, d => _.isEqual(x, d)))
     };
 }
 
-export function mkDataTypeFilter(filterId, dataTypes) {
+export function mkDataTypeFilter(id, dataTypes) {
     return {
-        id: filterId,
+        id,
         dataTypes,
         test: (r) => _.isEmpty(dataTypes)
             ? x => true
@@ -96,6 +119,17 @@ export function mkDataTypeFilter(filterId, dataTypes) {
     };
 }
 
+export function mkDirectionFilter(id, direction) {
+    return {
+        id,
+        direction,
+        test: (r) => direction === Directions.ALL
+            ? true
+            : _.isEqual(r.direction, direction)
+    };
+}
+
+
 export function mkLogicalFromFlowDetails(d) {
-    return _.pick(d, ["logicalFlow", "ratingsByDefId", "dataTypesForLogicalFlow", "assessmentRatings"]);
+    return _.pick(d, ["logicalFlow", "ratingsByDefId", "dataTypesForLogicalFlow", "assessmentRatings", "direction"]);
 }
