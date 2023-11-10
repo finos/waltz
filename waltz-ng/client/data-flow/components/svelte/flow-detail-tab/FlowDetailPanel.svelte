@@ -66,7 +66,6 @@
         return _
             .chain(allFlows)
             .map(d => Object.assign(d, {visible: _.every(filters, f => f.test(d))}))
-            // .filter(d => _.every(filters, f => f.test(d)))
             .value();
     }
 
@@ -79,8 +78,6 @@
         .value();
 
     $: logicalFlowPrimaryAssessments = _.get(flowView, "primaryAssessmentDefinitions", []);
-
-    $: console.log({filters: $filters});
 
 </script>
 

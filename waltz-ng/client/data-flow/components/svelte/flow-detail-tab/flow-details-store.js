@@ -1,4 +1,4 @@
-import {writable, get} from "svelte/store";
+import {writable} from "svelte/store";
 import _ from "lodash";
 
 export let filters = writable([]);
