@@ -63,10 +63,10 @@
     }
 
     function filterFlows(allFlows, filters) {
-
         return _
             .chain(allFlows)
-            .filter(d => _.every(filters, f => f.test(d)))
+            .map(d => Object.assign(d, {visible: _.every(filters, f => f.test(d))}))
+            // .filter(d => _.every(filters, f => f.test(d)))
             .value();
     }
 
@@ -91,29 +91,46 @@
 
         {#if !_.isEmpty(assessmentFilters)}
             <details>
+
                 <summary>
                     Filters
                     {#if !_.isEmpty($filters)}
-                        <button class="btn btn-skinny">
+                        <button class="btn btn-skinny"
+                                on:click={() => $filters = []}>
                             Clear All
                         </button>
                     {/if}
                 </summary>
 
-                <InboundOutboundFilters/>
+                <details class="filter-set" style="margin-top: 1em">
+                    <summary>
+                        Flow Direction
+                    </summary>
+                    <InboundOutboundFilters/>
+                </details>
 
-                <AssessmentFilters {assessmentFilters}/>
+                <details class="filter-set">
+                    <summary>
+                        Data Types
+                    </summary>
+                    <DataTypeFilters {dataTypes}/>
+                </details>
 
-                <DataTypeFilters {dataTypes}/>
-
+                <details class="filter-set">
+                    <summary>
+                        Assessments
+                    </summary>
+                    <AssessmentFilters {assessmentFilters}/>
+                </details>
             </details>
         {/if}
 
-        <h4>Logical Flows</h4>
         <LogicalFlowTable {logicalFlows}
                           assessments={logicalFlowPrimaryAssessments}/>
 
-        <h4 style="margin-top: 2em">Physical Flows</h4>
+        <br>
+        <br>
+
         <PhysicalFlowTable physicalFlows={filteredFlows}/>
 
     </div>
@@ -139,6 +156,10 @@
     .flow-detail-table {
         width: 70%;
         flex: 1 1 50%
+    }
+
+    .filter-set {
+        background-color: white;
     }
 
 </style>

@@ -131,5 +131,5 @@ export function mkDirectionFilter(id, direction) {
 
 
 export function mkLogicalFromFlowDetails(d) {
-    return _.pick(d, ["logicalFlow", "ratingsByDefId", "dataTypesForLogicalFlow", "assessmentRatings", "direction"]);
+    return _.pick(d, ["logicalFlow", "ratingsByDefId", "dataTypesForLogicalFlow", "assessmentRatings", "direction", "visible"]);
 }

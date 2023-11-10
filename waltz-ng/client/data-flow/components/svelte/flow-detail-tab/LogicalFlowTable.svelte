@@ -6,16 +6,17 @@
     import _ from "lodash";
     import {selectedLogicalFlow, selectedPhysicalFlow} from "./flow-details-store";
 
-    export let logicalFlows;
+    export let logicalFlows = [];
     export let assessments;
 
     let qry;
-    let visibleFlows;
 
-    $: visibleFlows = _.isEmpty(qry)
-        ? logicalFlows
+    $: visibleFlows = _.filter(logicalFlows, d => d.visible);
+
+    $: flowList = _.isEmpty(qry)
+        ? visibleFlows
         : termSearch(
-            logicalFlows,
+            visibleFlows,
             qry,
             [
                 "logicalFlow.source.name",
@@ -40,6 +41,17 @@
 
 </script>
 
+<h4>
+    Logical Flows
+    <span class="small">
+        (
+        {#if _.size(flowList) !== _.size(logicalFlows)}
+            {_.size(flowList)} /
+        {/if}
+        {_.size(logicalFlows)}
+        )
+    </span>
+</h4>
 
 <div>
     <SearchInput bind:value={qry}/>
@@ -61,7 +73,7 @@
         </tr>
         </thead>
         <tbody>
-        {#each visibleFlows as flow}
+        {#each flowList as flow}
             <tr class="clickable"
                 on:click={() => selectLogicalFlow(flow)}>
                 <td>

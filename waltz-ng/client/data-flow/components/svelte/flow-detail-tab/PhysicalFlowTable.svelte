@@ -22,10 +22,12 @@
 
     $: nestedEnums = nestEnums($enumsCall.data);
 
-    $: visibleFlows = _.isEmpty(qry)
-        ? physicalFlows
+    $: visibleFlows = _.filter(physicalFlows, d => d.visible);
+
+    $: flowList = _.isEmpty(qry)
+        ? visibleFlows
         : termSearch(
-            physicalFlows,
+            visibleFlows,
             qry,
             [
                 "logicalFlow.source.name",
@@ -42,6 +44,18 @@
 
 </script>
 
+
+<h4>
+    Physical Flows
+    <span class="small">
+        (
+        {#if _.size(flowList) !== _.size(physicalFlows)}
+            {_.size(flowList)} /
+        {/if}
+        {_.size(physicalFlows)}
+        )
+    </span>
+</h4>
 
 <div>
     <SearchInput bind:value={qry}/>
@@ -64,7 +78,7 @@
         </tr>
         </thead>
         <tbody>
-        {#each visibleFlows as flow}
+        {#each flowList as flow}
             <tr class="clickable"
                 on:click={() => selectPhysicalFlow(flow)}>
                 <td>

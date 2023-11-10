@@ -49,7 +49,7 @@
 
 <div class="help-block"
  style="padding-top: 1em">
-Use the assessment ratings to filter the logical flows. Only ratings aligned to a flow can be filtered upon
+Use the assessment ratings to filter the logical flows. Only ratings aligned to a flow can be filtered upon.
 </div>
 <div style="display: flex; gap: 1em">
     {#each assessmentFilters as assessment}
@@ -88,7 +88,7 @@ Use the assessment ratings to filter the logical flows. Only ratings aligned to 
 <style>
 
     .selected {
-        background-color: #fff;
+        background-color: #eee;
     }
 
 </style>
