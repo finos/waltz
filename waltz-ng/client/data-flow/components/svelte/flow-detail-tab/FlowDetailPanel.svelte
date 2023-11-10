@@ -124,10 +124,7 @@
 
         <LogicalFlowTable {logicalFlows}
                           assessments={logicalFlowPrimaryAssessments}/>
-
         <br>
-        <br>
-
         <PhysicalFlowTable physicalFlows={filteredFlows}/>
 
     </div>

@@ -5,6 +5,9 @@
     import RatingIndicatorCell from "../../../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
     import _ from "lodash";
     import {selectedLogicalFlow, selectedPhysicalFlow} from "./flow-details-store";
+    import {truncate} from "../../../../common/string-utils";
+    import Tooltip from "../../../../common/svelte/Tooltip.svelte";
+    import DataTypeTooltipContent from "./DataTypeTooltipContent.svelte";
 
     export let logicalFlows = [];
     export let assessments;
@@ -37,6 +40,12 @@
     function selectLogicalFlow(flow) {
         $selectedLogicalFlow = flow;
         $selectedPhysicalFlow = null;
+    }
+
+    function mkDataTypeTooltipProps(row) {
+        return {
+            decorators: row.dataTypesForLogicalFlow
+        }
     }
 
 </script>
@@ -88,8 +97,13 @@
                 <td>
                     {flow.logicalFlow.target.externalId}
                 </td>
-                <td class="force-wrap">
-                    {mkDataTypeString(flow.dataTypesForLogicalFlow)}
+                <td>
+                    <Tooltip content={DataTypeTooltipContent}
+                             props={mkDataTypeTooltipProps(flow)}>
+                        <svelte:fragment slot="target">
+                            <span>{truncate(mkDataTypeString(flow.dataTypesForLogicalFlow), 30)}</span>
+                        </svelte:fragment>
+                    </Tooltip>
                 </td>
                 {#each assessments as defn}
                     {@const assessmentRatingsForFlow = _.get(flow.ratingsByDefId, defn.id, [])}

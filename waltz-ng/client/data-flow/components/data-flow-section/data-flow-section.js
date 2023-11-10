@@ -39,7 +39,6 @@ const tabs = [
     {id: "SUMMARY", name: "Logical Flows"},
     {id: "LOGICAL_FLOW_SCROLL", name: "Logical Flows (Beta View)"},
     {id: "FLOW_DETAIL", name: "Flow Detail"},
-    {id: "FLOW_DETAIL_SVELTE", name: "Flow Detail Svelte"},
     {id: "FLOW_CLASSIFICATION_RULES", name: "Flow Classification Rules"}
 ];
 

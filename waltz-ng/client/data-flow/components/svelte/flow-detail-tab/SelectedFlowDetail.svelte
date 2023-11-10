@@ -8,7 +8,10 @@
     import RatingIndicatorCell from "../../../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
     import {flowClassificationStore} from "../../../../svelte-stores/flow-classification-store";
     import _ from "lodash";
-    import {toDataFormatKindName} from "../../../../physical-flows/svelte/physical-flow-registration-utils";
+    import {
+        toCriticalityName,
+        toDataFormatKindName, toFrequencyKindName, toTransportKindName
+    } from "../../../../physical-flows/svelte/physical-flow-registration-utils";
     import {enumValueStore} from "../../../../svelte-stores/enum-value-store";
     import {nestEnums} from "../../../../common/svelte/enum-utils";
 
@@ -179,6 +182,31 @@
                 <td>Specification Format</td>
                 <td>
                     {toDataFormatKindName(nestedEnums, $selectedPhysicalFlow.specification.format)}
+                </td>
+            </tr>
+            <tr>
+            <tr>
+                <td>Criticality</td>
+                <td>
+                    {toCriticalityName(nestedEnums, $selectedPhysicalFlow.physicalFlow.criticality)}
+                </td>
+            </tr>
+            <tr>
+                <td>Frequency</td>
+                <td>
+                    {toFrequencyKindName(nestedEnums, $selectedPhysicalFlow.physicalFlow.frequency)}
+                </td>
+            </tr>
+            <tr>
+                <td>Transport Kind</td>
+                <td>
+                    {toTransportKindName(nestedEnums, $selectedPhysicalFlow.physicalFlow.transport)}
+                </td>
+            </tr>
+            <tr>
+                <td>Basis Offset</td>
+                <td>
+                    {$selectedPhysicalFlow.physicalFlow.basisOffset}
                 </td>
             </tr>
             {#if $selectedPhysicalFlow.physicalFlow.description}
