@@ -100,6 +100,11 @@ export function store($http, root) {
             .get(`${BASE}/cleanup-orphans`)
             .then(r => r.data);
 
+    const view = (selector) =>
+        $http
+            .post(`${BASE}/view`, selector)
+            .then(r => r.data);
+
     return {
         calculateConsumersForDataTypeIdSelector,
         findByReference,
@@ -112,7 +117,8 @@ export function store($http, root) {
         remove,
         findDiscouragedSources,
         findFlowClassificationRulesBySelector,
-        cleanupOrphans
+        cleanupOrphans,
+        view
     };
 
 }
@@ -187,4 +193,9 @@ export const FlowClassificationRuleStore_API = {
         serviceFnName: "cleanupOrphans",
         description: "cleanupOrphans"
     },
+    view: {
+        serviceName,
+        serviceFnName: "view",
+        description: "gets all rules as a view object"
+    }
 };

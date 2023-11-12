@@ -5,6 +5,8 @@ import FlowClassificationRuleDetail from "./FlowClassificationRuleDetail.svelte"
 import FlowClassificationRuleEditor from "./FlowClassificationRuleEditor.svelte";
 import {mode, selectedClassificationRule} from "./editingFlowClassificationRulesState";
 import roles from "../../../user/system-roles";
+import {mkRef} from "../../../common/entity-utils";
+import {mkSelectionOptions} from "../../../common/selector-utils";
 
 const bindings = {}
 
@@ -12,15 +14,19 @@ const initialState = {
     viewMode: "LIST",
     FlowClassificationRuleDetail,
     FlowClassificationRuleEditor,
-    canEdit: false
+    canEdit: false,
+    view: null
 };
 
 function controller(serviceBroker, userService, $scope){
 
     const loadFlowClassificationRules = ()  => {
         serviceBroker
-            .loadViewData(CORE_API.FlowClassificationRuleStore.findAll, [], {force: true})
-            .then(r => vm.classificationRules = r.data);
+            .loadViewData(
+                CORE_API.FlowClassificationRuleStore.view,
+                [mkSelectionOptions(mkRef("ALL", 1))],
+                {force: true})
+            .then(r => vm.flowClassificationRules = r.data);
     };
 
     const vm = initialiseData(this, initialState);

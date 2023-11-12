@@ -133,8 +133,8 @@ function controller(serviceBroker) {
 
         serviceBroker
             .loadViewData(
-                CORE_API.FlowClassificationRuleStore.findByApp,
-                [ vm.parentEntityRef.id ], {force: true})
+                CORE_API.FlowClassificationRuleStore.view,
+                [ mkSelectionOptions(vm.parentEntityRef) ], {force: true})
             .then(r => {
                 vm.flowClassificationRules = r.data;
             });

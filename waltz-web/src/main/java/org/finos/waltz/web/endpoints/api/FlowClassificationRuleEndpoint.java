@@ -19,7 +19,9 @@
 package org.finos.waltz.web.endpoints.api;
 
 
+import org.finos.waltz.model.flow_classification_rule.FlowClassificationRuleView;
 import org.finos.waltz.service.flow_classification_rule.FlowClassificationRuleService;
+import org.finos.waltz.service.flow_classification_rule.FlowClassificationRuleViewService;
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
@@ -47,26 +49,32 @@ import java.util.List;
 import java.util.Map;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.web.WebUtilities.mkPath;
+import static org.finos.waltz.web.WebUtilities.readIdSelectionOptionsFromBody;
 
 
 @Service
 public class FlowClassificationRuleEndpoint implements Endpoint {
 
     private static final Logger LOG = LoggerFactory.getLogger(FlowClassificationRuleEndpoint.class);
-    private static final String BASE_URL = WebUtilities.mkPath("api", "flow-classification-rule");
+    private static final String BASE_URL = mkPath("api", "flow-classification-rule");
 
     private final FlowClassificationRuleService flowClassificationRuleService;
     private final UserRoleService userRoleService;
+    private final FlowClassificationRuleViewService flowClassificationRuleViewService;
 
 
     @Autowired
     public FlowClassificationRuleEndpoint(FlowClassificationRuleService flowClassificationRuleService,
-                                          UserRoleService userRoleService) {
+                                          UserRoleService userRoleService,
+                                          FlowClassificationRuleViewService flowClassificationRuleViewService) {
         checkNotNull(flowClassificationRuleService, "flowClassificationRuleService must not be null");
+        checkNotNull(flowClassificationRuleViewService, "flowClassificationRuleViewService must not be null");
         checkNotNull(userRoleService, "userRoleService cannot be null");
 
         this.flowClassificationRuleService = flowClassificationRuleService;
         this.userRoleService = userRoleService;
+        this.flowClassificationRuleViewService = flowClassificationRuleViewService;
     }
 
 
@@ -75,17 +83,18 @@ public class FlowClassificationRuleEndpoint implements Endpoint {
 
         // -- PATHS
 
-        String recalculateFlowRatingsPath = WebUtilities.mkPath(BASE_URL, "recalculate-flow-ratings");
-        String findDiscouragedSourcesPath = WebUtilities.mkPath(BASE_URL, "discouraged");
-        String findFlowClassificationRulesBySelectorPath = WebUtilities.mkPath(BASE_URL, "selector");
-        String calculateConsumersForDataTypeIdSelectorPath = WebUtilities.mkPath(BASE_URL, "data-type", "consumers");
-        String findByEntityReferencePath = WebUtilities.mkPath(BASE_URL, "entity-ref", ":kind", ":id");
-        String findByApplicationIdPath = WebUtilities.mkPath(BASE_URL, "app", ":id");
-        String findCompanionEntityRulesPath = WebUtilities.mkPath(BASE_URL, "companion-rules", "entity", "id", ":id");
-        String findCompanionDataTypeRulesPath = WebUtilities.mkPath(BASE_URL, "companion-rules", "data-type", "id", ":id");
-        String getByIdPath = WebUtilities.mkPath(BASE_URL, "id", ":id");
-        String deletePath = WebUtilities.mkPath(BASE_URL, "id", ":id");
-        String cleanupOrphansPath = WebUtilities.mkPath(BASE_URL, "cleanup-orphans");
+        String recalculateFlowRatingsPath = mkPath(BASE_URL, "recalculate-flow-ratings");
+        String findDiscouragedSourcesPath = mkPath(BASE_URL, "discouraged");
+        String findFlowClassificationRulesBySelectorPath = mkPath(BASE_URL, "selector");
+        String calculateConsumersForDataTypeIdSelectorPath = mkPath(BASE_URL, "data-type", "consumers");
+        String findByEntityReferencePath = mkPath(BASE_URL, "entity-ref", ":kind", ":id");
+        String findByApplicationIdPath = mkPath(BASE_URL, "app", ":id");
+        String findCompanionEntityRulesPath = mkPath(BASE_URL, "companion-rules", "entity", "id", ":id");
+        String findCompanionDataTypeRulesPath = mkPath(BASE_URL, "companion-rules", "data-type", "id", ":id");
+        String getByIdPath = mkPath(BASE_URL, "id", ":id");
+        String deletePath = mkPath(BASE_URL, "id", ":id");
+        String cleanupOrphansPath = mkPath(BASE_URL, "cleanup-orphans");
+        String getViewForSelectorPath = mkPath(BASE_URL, "view");
 
 
         // -- ROUTES
@@ -97,10 +106,10 @@ public class FlowClassificationRuleEndpoint implements Endpoint {
                 -> flowClassificationRuleService.findByApplicationId(WebUtilities.getId(request));
 
         ListRoute<DiscouragedSource> findDiscouragedSourcesRoute = (request, response)
-                -> flowClassificationRuleService.findDiscouragedSources(WebUtilities.readIdSelectionOptionsFromBody(request));
+                -> flowClassificationRuleService.findDiscouragedSources(readIdSelectionOptionsFromBody(request));
 
         ListRoute<FlowClassificationRule> findFlowClassificationRulesBySelectorRoute = (request, response)
-                -> flowClassificationRuleService.findClassificationRules(WebUtilities.readIdSelectionOptionsFromBody(request));
+                -> flowClassificationRuleService.findClassificationRules(readIdSelectionOptionsFromBody(request));
 
         ListRoute<FlowClassificationRule> findAllRoute = (request, response)
                 -> flowClassificationRuleService.findAll();
@@ -113,6 +122,9 @@ public class FlowClassificationRuleEndpoint implements Endpoint {
 
         DatumRoute<FlowClassificationRule> getByIdRoute = (request, response)
                 -> flowClassificationRuleService.getById(WebUtilities.getId(request));
+        
+        DatumRoute<FlowClassificationRuleView> getViewForSelectorRoute = (request, response)
+                -> flowClassificationRuleViewService.getViewForSelector(readIdSelectionOptionsFromBody(request));
 
         EndpointUtilities.getForDatum(recalculateFlowRatingsPath, this::recalculateFlowRatingsRoute);
         EndpointUtilities.getForDatum(cleanupOrphansPath, this::cleanupOrphansRoute);
@@ -122,12 +134,13 @@ public class FlowClassificationRuleEndpoint implements Endpoint {
         EndpointUtilities.getForList(findByEntityReferencePath, findByEntityReferenceRoute);
         EndpointUtilities.getForList(findByApplicationIdPath, findByApplicationIdRoute);
         EndpointUtilities.postForList(findFlowClassificationRulesBySelectorPath, findFlowClassificationRulesBySelectorRoute);
-        EndpointUtilities.getForList(BASE_URL, findAllRoute);
         EndpointUtilities.getForList(findCompanionEntityRulesPath, findCompanionEntityRulesRoute);
         EndpointUtilities.getForList(findCompanionDataTypeRulesPath, findCompanionDataTypeRulesRoute);
+        EndpointUtilities.postForDatum(getViewForSelectorPath, getViewForSelectorRoute);
+        EndpointUtilities.getForList(BASE_URL, findAllRoute);
         EndpointUtilities.putForDatum(BASE_URL, this::updateRoute);
-        EndpointUtilities.deleteForDatum(deletePath, this::deleteRoute);
         EndpointUtilities.postForDatum(BASE_URL, this::insertRoute);
+        EndpointUtilities.deleteForDatum(deletePath, this::deleteRoute);
     }
 
 
@@ -179,7 +192,7 @@ public class FlowClassificationRuleEndpoint implements Endpoint {
             Request request,
             Response response) throws IOException {
 
-        IdSelectionOptions options = WebUtilities.readIdSelectionOptionsFromBody(request);
+        IdSelectionOptions options = readIdSelectionOptionsFromBody(request);
 
         Map<EntityReference, Collection<EntityReference>> result = flowClassificationRuleService
                 .calculateConsumersForDataTypeIdSelector(options);

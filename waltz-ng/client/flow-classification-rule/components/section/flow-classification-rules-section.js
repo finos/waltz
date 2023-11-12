@@ -93,13 +93,12 @@ function controller(serviceBroker) {
 
     const loadFlowClassificationRules = () => {
         vm.selectionOptions = mkSelector();
-        const selector = mkSelector();
         serviceBroker
             .loadViewData(
-                CORE_API.FlowClassificationRuleStore.findFlowClassificationRulesBySelector,
-                [selector])
+                CORE_API.FlowClassificationRuleStore.view,
+                [vm.selectionOptions])
             .then(r => {
-                vm.classificationRules = r.data;
+                vm.classificationRules =  r.data;
             });
     };
 

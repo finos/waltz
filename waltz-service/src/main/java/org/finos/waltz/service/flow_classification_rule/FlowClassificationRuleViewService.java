@@ -3,9 +3,9 @@ package org.finos.waltz.service.flow_classification_rule;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.assessment_definition.AssessmentDefinitionDao;
 import org.finos.waltz.data.assessment_rating.AssessmentRatingDao;
-import org.finos.waltz.data.flow_classification_rule.FlowClassificationRuleDao;
 import org.finos.waltz.data.rating_scheme.RatingSchemeDAO;
 import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.assessment_rating.AssessmentRating;
 import org.finos.waltz.model.flow_classification_rule.FlowClassificationRule;
@@ -23,23 +23,25 @@ import java.util.stream.Collectors;
 @Service
 public class FlowClassificationRuleViewService {
 
-    private final FlowClassificationRuleDao flowClassificationRuleDao;
+    private final FlowClassificationRuleService flowClassificationRuleService;
     private final AssessmentDefinitionDao assessmentDefinitionDao;
     private final AssessmentRatingDao assessmentRatingDao;
     private final RatingSchemeDAO ratingSchemeDAO;
 
 
-    public FlowClassificationRuleViewService(FlowClassificationRuleDao flowClassificationRuleDao,
-                                             AssessmentDefinitionDao assessmentDefinitionDao, AssessmentRatingDao assessmentRatingDao, RatingSchemeDAO ratingSchemeDAO) {
-        this.flowClassificationRuleDao = flowClassificationRuleDao;
+    public FlowClassificationRuleViewService(FlowClassificationRuleService flowClassificationRuleService,
+                                             AssessmentDefinitionDao assessmentDefinitionDao,
+                                             AssessmentRatingDao assessmentRatingDao,
+                                             RatingSchemeDAO ratingSchemeDAO) {
+        this.flowClassificationRuleService = flowClassificationRuleService;
         this.assessmentDefinitionDao = assessmentDefinitionDao;
         this.assessmentRatingDao = assessmentRatingDao;
         this.ratingSchemeDAO = ratingSchemeDAO;
     }
 
 
-    public FlowClassificationRuleView findAll() {
-        List<FlowClassificationRule> allRules = flowClassificationRuleDao.findAll();
+    public FlowClassificationRuleView getViewForSelector(IdSelectionOptions opts) {
+        Set<FlowClassificationRule> allRules = flowClassificationRuleService.findClassificationRules(opts);
 
         Set<AssessmentDefinition> primaryAssessmentDefinition = assessmentDefinitionDao
                 .findPrimaryDefinitionsForKind(
@@ -56,7 +58,10 @@ public class FlowClassificationRuleViewService {
                 .filter(r -> primaryDefIds.contains(r.assessmentDefinitionId()))
                 .collect(Collectors.toSet());
 
-        Set<Long> ratingSchemeItemIds = SetUtilities.map(assessmentRatings, AssessmentRating::ratingId);
+        Set<Long> ratingSchemeItemIds = SetUtilities.map(
+                assessmentRatings,
+                AssessmentRating::ratingId);
+
         Set<RatingSchemeItem> ratingSchemeItems = ratingSchemeDAO.findRatingSchemeItemsByIds(ratingSchemeItemIds);
 
         return ImmutableFlowClassificationRuleView
@@ -67,4 +72,5 @@ public class FlowClassificationRuleViewService {
                 .ratingSchemeItems(ratingSchemeItems)
                 .build();
     }
+
 }
