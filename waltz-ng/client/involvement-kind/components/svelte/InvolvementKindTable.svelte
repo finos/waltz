@@ -40,7 +40,8 @@
         entity.MEASURABLE_CATEGORY,
         entity.APP_GROUP,
         entity.DATA_TYPE,
-        entity.END_USER_APPLICATION
+        entity.END_USER_APPLICATION,
+        entity.PHYSICAL_FLOW
     ];
 
     $: involvementStatCall = involvementKindStore.findUsageStats();
