@@ -17,14 +17,14 @@
     </waltz-static-panels>
     <br>
 
-    <div ng-if="$ctrl.viewMode==='LIST'">
-        <waltz-flow-classification-rules-table rules="$ctrl.classificationRules"
+    <div ng-if="$ctrl.viewMode === 'LIST'">
+        <waltz-flow-classification-rules-table rules="$ctrl.flowClassificationRules"
                                                on-select="$ctrl.onSelectRule">
         </waltz-flow-classification-rules-table>
     </div>
 
 
-    <div ng-if="$ctrl.viewMode==='DETAIL'">
+    <div ng-if="$ctrl.viewMode === 'DETAIL'">
         <waltz-svelte-component component="$ctrl.FlowClassificationRuleDetail"
                                 primary-entity-ref="$ctrl.parentEntityRef"
                                 can-edit="$ctrl.canEdit"

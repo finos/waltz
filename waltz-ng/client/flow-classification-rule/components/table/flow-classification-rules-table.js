@@ -25,7 +25,7 @@ import template from "./flow-classification-rules-table.html";
 
 const bindings = {
     parentEntityRef: "<",
-    rules: "<",
+    rules: "<?",
     onSelect: "<?"
 };
 
@@ -45,7 +45,7 @@ function shouldShowConsumers(parentRef) {
 }
 
 
-function mkColumnDefs(parentRef) {
+function mkColumnDefs(parentRef, assessmentDefinitions = []) {
     const consumerCell = shouldShowConsumers(parentRef)
         ? {
             field: "consumers",
@@ -103,12 +103,28 @@ function mkColumnDefs(parentRef) {
             </div>`
     };
 
+    const definitionCells = _.map(assessmentDefinitions, def => {
+        return {
+            field: `assessmentRatings.${def.id}`,
+            displayName: def.name,
+            toSearchTerm: d => _.get(d, ["assessmentRatings", def.id, "ratingSchemeItem", "name"], ""),
+            cellTemplate: `
+                <div class="ui-grid-cell-contents" ng-style="{'background-color': COL_FIELD.ratingSchemeItem.color}">
+                    <span ng-bind="COL_FIELD.ratingSchemeItem.name"
+                          title="{{COL_FIELD.rating.comment}}">
+                    </span>
+                </div>
+            `
+        };
+    });
+
     return _.compact([
         mkEntityLabelGridCell("Data Type", "dataType", "none", "right"),
         mkEntityLabelGridCell("Scope", "vantagePointReference", "left"),
         mkEntityLabelGridCell("Subject", "subjectReference", "left", "right"),
         consumerCell,
         classificationCell,
+        ...definitionCells,
         notesCell
     ]);
 }
@@ -142,8 +158,14 @@ function controller($q, $state, serviceBroker) {
     function mkGridData() {
         const dataTypesById = _.keyBy(vm.dataTypes, "id");
 
-        vm.columnDefs = mkColumnDefs(vm.parentEntityRef);
-        vm.gridData = _.map(vm.rules, d => {
+        const ratingSchemeItemsById = _.keyBy(vm.rules.ratingSchemeItems, d => d.id);
+        const ratingsByEntityId = _.chain(vm.rules.assessmentRatings)
+            .map(r => Object.assign({}, {rating: r, ratingSchemeItem: ratingSchemeItemsById[r.ratingId]}))
+            .groupBy(d => d.rating.entityReference.id)
+            .value();
+
+        vm.columnDefs = mkColumnDefs(vm.parentEntityRef, vm.rules.primaryAssessmentDefinitions);
+        vm.gridData = _.map(vm.rules.flowClassificationRules, d => {
             return {
                 id: d.id,
                 subjectReference: d.subjectReference,
@@ -153,7 +175,8 @@ function controller($q, $state, serviceBroker) {
                 description: d.description,
                 classification: vm.classificationsById[d.classificationId],
                 consumers: vm.consumersByAuthSourceId[d.id] || [],
-                isReadonly: d.isReadonly
+                isReadonly: d.isReadonly,
+                assessmentRatings: _.keyBy(ratingsByEntityId[d.id] || [], r => r.rating.assessmentDefinitionId)
             };
         });
     }
@@ -181,10 +204,6 @@ function controller($q, $state, serviceBroker) {
             .then(mkGridData);
     }
 
-    vm.$onInit = () => {
-        loadAll();
-    };
-
     vm.$onChanges = () => {
         if(vm.rules) {
             loadAll();
@@ -194,8 +213,6 @@ function controller($q, $state, serviceBroker) {
     vm.onSelect = (d) => $state.go(
         "main.flow-classification-rule.view",
         { id: d.id });
-
-
 }
 
 
