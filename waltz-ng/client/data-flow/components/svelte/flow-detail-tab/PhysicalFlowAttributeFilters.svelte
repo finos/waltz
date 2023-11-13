@@ -12,15 +12,24 @@
     import _ from "lodash";
     import {filters, updateFilters} from "./flow-details-store";
     import {enumValueStore} from "../../../../svelte-stores/enum-value-store";
+    import NoData from "../../../../common/svelte/NoData.svelte";
 
     export let flows = [];
     export let criticalities = [];
 
     let enumsCall = enumValueStore.load();
 
-    $: usedFrequencies = _.uniq(_.map(flows, d => d.physicalFlow.frequency));
-    $: usedCriticalities = _.uniq(_.map(flows, d => d.physicalFlow.criticality));
-    $: usedTransport = _.uniq(_.map(flows, d => d.physicalFlow.transport));
+    function mapOverPhysicals(flows, attr) {
+        return _.chain(flows)
+            .map(d => _.get(d, ["physicalFlow", attr]))
+            .uniq()
+            .compact()
+            .value();
+    }
+
+    $: usedFrequencies = mapOverPhysicals(flows, "frequency");
+    $: usedCriticalities = mapOverPhysicals(flows, "criticality");
+    $: usedTransport = mapOverPhysicals(flows, "transport");
 
     $: criticalities = _
         .chain($enumsCall.data)
@@ -153,6 +162,12 @@ Use the physical flow attributes to filter the flows. Both logical and physical 
                         <span>{criticality.name}</span>
                     </td>
                 </tr>
+            {:else}
+                <tr>
+                    <td>
+                        <NoData type="info">There are no physical flow criticalities to filter over.</NoData>
+                    </td>
+                </tr>
             {/each}
             </tbody>
         </table>
@@ -179,6 +194,12 @@ Use the physical flow attributes to filter the flows. Both logical and physical 
                         <span>{frequency.name}</span>
                     </td>
                 </tr>
+            {:else}
+                <tr>
+                    <td>
+                        <NoData type="info">There are no physical flow frequencies to filter over.</NoData>
+                    </td>
+                </tr>
             {/each}
             </tbody>
         </table>
@@ -203,6 +224,12 @@ Use the physical flow attributes to filter the flows. Both logical and physical 
                     on:click={() => selectTransportKind(transportKind.key)}>
                     <td>
                         <span>{transportKind.name}</span>
+                    </td>
+                </tr>
+            {:else}
+                <tr>
+                    <td>
+                        <NoData type="info">There are no physical flow transport kinds to filter over.</NoData>
                     </td>
                 </tr>
             {/each}

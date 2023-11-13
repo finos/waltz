@@ -8,6 +8,7 @@
     import {truncate} from "../../../../common/string-utils";
     import Tooltip from "../../../../common/svelte/Tooltip.svelte";
     import DataTypeTooltipContent from "./DataTypeTooltipContent.svelte";
+    import NoData from "../../../../common/svelte/NoData.svelte";
 
     export let logicalFlows = [];
     export let assessments;
@@ -115,6 +116,12 @@
                         </div>
                     </td>
                 {/each}
+            </tr>
+        {:else}
+            <tr>
+                <td colspan={5 + _.size(assessments)}>
+                    <NoData type="info">There are no logical flows to show, these may have been filtered.</NoData>
+                </td>
             </tr>
         {/each}
         </tbody>

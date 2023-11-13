@@ -74,6 +74,8 @@
 
     $: filteredFlows = filterFlows(allFlows, $filters);
 
+    $: physicalFlows = _.filter(filteredFlows, d => !_.isEmpty(d.physicalFlow));
+
     $: logicalFlows = _
         .chain(filteredFlows)
         .map(d => mkLogicalFromFlowDetails(d))
@@ -125,14 +127,14 @@
                 <summary>
                     Physical Flow
                 </summary>
-                <PhysicalFlowAttributeFilters flows={filteredFlows}/>
+                <PhysicalFlowAttributeFilters flows={physicalFlows}/>
             </details>
         </details>
 
         <LogicalFlowTable {logicalFlows}
                           assessments={logicalFlowPrimaryAssessments}/>
         <br>
-        <PhysicalFlowTable physicalFlows={filteredFlows}/>
+        <PhysicalFlowTable {physicalFlows}/>
 
     </div>
     {#if $selectedLogicalFlow || $selectedPhysicalFlow}

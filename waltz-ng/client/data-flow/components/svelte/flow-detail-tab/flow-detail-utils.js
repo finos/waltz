@@ -23,15 +23,24 @@ export function mkFlowDetails(flowView, parentEntityRef) {
     const decoratorsByFlowId = _.groupBy(flowView.dataTypeDecorators, d => d.dataFlowId);
     const specsById = _.keyBy(flowView.physicalSpecifications, d => d.id);
     const logicalFlowsById = _.keyBy(flowView.flows, d => d.id);
+    const physicalFlowsByLogicalFlowId = _.groupBy(flowView.physicalFlows, d => d.logicalFlowId);
 
     return _
-        .chain(flowView.physicalFlows)
-        .map(d => {
+        .chain(flowView.flows)
+        .flatMap(d => {
+            const physicalFlows = _.get(physicalFlowsByLogicalFlowId, d.id, []);
+            return _.isEmpty(physicalFlows)
+                ? [{logicalFlow: d, physicalFlow: null}]
+                : _.map(physicalFlows, p => ({logicalFlow: d, physicalFlow: p}))
+        })
+        .map(t => {
 
-            const logicalFlow = _.get(logicalFlowsById, d.logicalFlowId);
-            const assessmentRatingsForLogicalFlow = _.get(ratingsByFlowId, d.logicalFlowId, []);
-            const dataTypesForLogicalFlow = _.get(decoratorsByFlowId, d.logicalFlowId, []);
-            const specification = _.get(specsById, d.specificationId);
+            const logicalFlow = t.logicalFlow;
+            const physicalFlow = t.physicalFlow;
+
+            const assessmentRatingsForLogicalFlow = _.get(ratingsByFlowId, logicalFlow.id, []);
+            const dataTypesForLogicalFlow = _.get(decoratorsByFlowId, logicalFlow.id, []);
+            const specification = _.get(specsById, physicalFlow?.specificationId);
 
             const assessmentRatings = _.map(
                 assessmentRatingsForLogicalFlow,
@@ -54,7 +63,7 @@ export function mkFlowDetails(flowView, parentEntityRef) {
                 logicalFlow,
                 ratingsByDefId,
                 dataTypesForLogicalFlow,
-                physicalFlow: d,
+                physicalFlow,
                 specification,
                 assessmentRatings,
                 direction
@@ -127,7 +136,7 @@ export function mkCriticalityFilter(id, criticalities) {
         criticalities,
         test: (r) => _.isEmpty(criticalities)
             ? x => true
-            : _.includes(criticalities, r.physicalFlow.criticality)
+            : _.includes(criticalities, r.physicalFlow?.criticality)
     };
 }
 
@@ -137,7 +146,7 @@ export function mkFrequencyFilter(id, frequencies) {
         frequencies,
         test: (r) => _.isEmpty(frequencies)
             ? x => true
-            : _.includes(frequencies, r.physicalFlow.frequency)
+            : _.includes(frequencies, r.physicalFlow?.frequency)
     };
 }
 
@@ -147,7 +156,7 @@ export function mkTransportKindFilter(id, transportKinds) {
         transportKinds,
         test: (r) => _.isEmpty(transportKinds)
             ? x => true
-            : _.includes(transportKinds, r.physicalFlow.transport)
+            : _.includes(transportKinds, r.physicalFlow?.transport)
     };
 }
 
