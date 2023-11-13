@@ -134,6 +134,11 @@
         return _.includes(filteredTransportKinds, transportKind);
     }
 
+    $: hasCriticalityFilter = _.some($filters, d => d.id !== mkCriticalityFilterId());
+    $: hasFrequencyFilter = _.some($filters, d => d.id !== mkFrequencyFilterId());
+    $: hasTransportKindFilter = _.some($filters, d => d.id !== mkTransportKindFilterId());
+
+
 </script>
 
 <div class="help-block"
@@ -146,10 +151,12 @@ Use the physical flow attributes to filter the flows. Both logical and physical 
             <thead>
             <tr>
                 <th>Criticality
+                    {#if hasCriticalityFilter}
                     <button class="btn btn-skinny"
                             on:click={clearCriticalityFilter}>
                         Clear
                     </button>
+                    {/if}
                 </th>
             </tr>
             </thead>
@@ -178,10 +185,12 @@ Use the physical flow attributes to filter the flows. Both logical and physical 
             <tr>
                 <th>
                     Frequency
+                    {#if hasFrequencyFilter}
                     <button class="btn btn-skinny"
                             on:click={clearFrequencyFilter}>
                         Clear
                     </button>
+                    {/if}
                 </th>
             </tr>
             </thead>
@@ -210,10 +219,12 @@ Use the physical flow attributes to filter the flows. Both logical and physical 
             <tr>
                 <th>
                     Transport Kind
+                    {#if hasTransportKindFilter}
                     <button class="btn btn-skinny"
                             on:click={clearTransportKindFilter}>
                         Clear
                     </button>
+                    {/if}
                 </th>
             </tr>
             </thead>

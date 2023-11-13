@@ -2,6 +2,13 @@ import _ from "lodash";
 import {sameRef} from "../../../../common/entity-utils";
 
 
+export const FilterKinds = {
+    DIRECTION: "DIRECTION",
+    DATA_TYPE: "DATA_TYPE",
+    ASSESSMENT: "ASSESSMENT",
+    PHYSICAL_FLOW_ATTRIBUTE: "PHYSICAL_FLOW_ATTRIBUTE"
+}
+
 export const Directions = {
     INBOUND: "INBOUND",
     OUTBOUND: "OUTBOUND",
@@ -123,6 +130,7 @@ export function mkDirectionFilterId() {
 export function mkAssessmentFilter(id, ratings) {
     return {
         id,
+        kind: FilterKinds.ASSESSMENT,
         ratings,
         test: (r) => _.isEmpty(ratings)
             ? x => true
@@ -133,6 +141,7 @@ export function mkAssessmentFilter(id, ratings) {
 export function mkCriticalityFilter(id, criticalities) {
     return {
         id,
+        kind: FilterKinds.PHYSICAL_FLOW_ATTRIBUTE,
         criticalities,
         test: (r) => _.isEmpty(criticalities)
             ? x => true
@@ -143,6 +152,7 @@ export function mkCriticalityFilter(id, criticalities) {
 export function mkFrequencyFilter(id, frequencies) {
     return {
         id,
+        kind: FilterKinds.PHYSICAL_FLOW_ATTRIBUTE,
         frequencies,
         test: (r) => _.isEmpty(frequencies)
             ? x => true
@@ -153,6 +163,7 @@ export function mkFrequencyFilter(id, frequencies) {
 export function mkTransportKindFilter(id, transportKinds) {
     return {
         id,
+        kind: FilterKinds.PHYSICAL_FLOW_ATTRIBUTE,
         transportKinds,
         test: (r) => _.isEmpty(transportKinds)
             ? x => true
@@ -163,6 +174,7 @@ export function mkTransportKindFilter(id, transportKinds) {
 export function mkDataTypeFilter(id, dataTypes) {
     return {
         id,
+        kind: FilterKinds.DATA_TYPE,
         dataTypes,
         test: (r) => _.isEmpty(dataTypes)
             ? x => true
@@ -173,6 +185,7 @@ export function mkDataTypeFilter(id, dataTypes) {
 export function mkDirectionFilter(id, direction) {
     return {
         id,
+        kind: FilterKinds.DIRECTION,
         direction,
         test: (r) => direction === Directions.ALL
             ? true

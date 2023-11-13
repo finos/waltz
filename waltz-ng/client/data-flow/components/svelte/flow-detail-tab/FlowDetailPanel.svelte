@@ -8,13 +8,20 @@
     import LogicalFlowTable from "./LogicalFlowTable.svelte";
     import {filters, resetFlowDetailsStore, selectedLogicalFlow, selectedPhysicalFlow} from "./flow-details-store";
     import PhysicalFlowTable from "./PhysicalFlowTable.svelte";
-    import {mkAssessmentFilters, mkFlowDetails, mkLogicalFromFlowDetails} from "./flow-detail-utils";
+    import {
+        Directions,
+        FilterKinds,
+        mkAssessmentFilters,
+        mkFlowDetails,
+        mkLogicalFromFlowDetails
+    } from "./flow-detail-utils";
     import SelectedFlowDetail from "./SelectedFlowDetail.svelte";
     import AssessmentFilters from "./AssessmentFilters.svelte";
     import DataTypeFilters from "./DataTypeFilters.svelte";
     import InboundOutboundFilters from "./InboundOutboundFilters.svelte";
     import {onMount} from "svelte";
     import PhysicalFlowAttributeFilters from "./PhysicalFlowAttributeFilters.svelte";
+    import Icon from "../../../../common/svelte/Icon.svelte";
 
     export let parentEntityRef;
 
@@ -105,6 +112,12 @@
             <details class="filter-set" style="margin-top: 1em">
                 <summary>
                     Flow Direction
+                    {#if _.some($filters, d => d.kind === FilterKinds.DIRECTION) && _.find($filters, d => d.kind === FilterKinds.DIRECTION).direction !== Directions.ALL}
+                        <span style="color: darkorange"
+                              title="Flows have been filtered by direction">
+                            <Icon name="exclamation-circle"/>
+                        </span>
+                    {/if}
                 </summary>
                 <InboundOutboundFilters/>
             </details>
@@ -112,6 +125,12 @@
             <details class="filter-set">
                 <summary>
                     Data Types
+                    {#if _.some($filters, d => d.kind === FilterKinds.DATA_TYPE)}
+                        <span style="color: darkorange"
+                              title="Data type filters have been applied">
+                            <Icon name="exclamation-circle"/>
+                        </span>
+                    {/if}
                 </summary>
                 <DataTypeFilters {dataTypes}/>
             </details>
@@ -119,6 +138,12 @@
             <details class="filter-set">
                 <summary>
                     Assessments
+                    {#if _.some($filters, d => d.kind === FilterKinds.ASSESSMENT)}
+                        <span style="color: darkorange"
+                              title="Assessment filters have been applied">
+                            <Icon name="exclamation-circle"/>
+                        </span>
+                    {/if}
                 </summary>
                 <AssessmentFilters {assessmentFilters}/>
             </details>
@@ -126,6 +151,12 @@
             <details class="filter-set">
                 <summary>
                     Physical Flow
+                    {#if _.some($filters, d => d.kind === FilterKinds.PHYSICAL_FLOW_ATTRIBUTE)}
+                        <span style="color: darkorange"
+                              title="Physical flow attribute filters have been applied">
+                            <Icon name="exclamation-circle"/>
+                        </span>
+                    {/if}
                 </summary>
                 <PhysicalFlowAttributeFilters flows={physicalFlows}/>
             </details>
@@ -162,7 +193,7 @@
     }
 
     .filter-set {
-        background-color: white;
+        background-color: #fafafa;
     }
 
 </style>
