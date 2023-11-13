@@ -281,8 +281,9 @@
 
         <div class="wt-tab wt-active"
              ng-if="$ctrl.activeTab.id === 'FLOW_DETAIL'">
-            <waltz-logical-flow-view-grid parent-entity-ref="$ctrl.parentEntityRef">
-            </waltz-logical-flow-view-grid>
+            <waltz-svelte-component parent-entity-ref="$ctrl.parentEntityRef"
+                                    component="$ctrl.FlowDetailPanel">
+            </waltz-svelte-component>
         </div>
 
         <div class="wt-tab wt-active"
