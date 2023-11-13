@@ -87,6 +87,18 @@ export function mkAssessmentFilters(flowView) {
         .value();
 }
 
+export function mkCriticalityFilterId() {
+    return "PHYSICAL_FLOW_CRITICALITY";
+}
+
+export function mkFrequencyFilterId() {
+    return "PHYSICAL_FLOW_FREQUENCY";
+}
+
+export function mkTransportKindFilterId() {
+    return "PHYSICAL_FLOW_TRANSPORT_KIND";
+}
+
 export function mkDefinitionFilterId(definitionId) {
     return `ASSESSMENT_DEFINITION_${definitionId}`;
 }
@@ -106,6 +118,36 @@ export function mkAssessmentFilter(id, ratings) {
         test: (r) => _.isEmpty(ratings)
             ? x => true
             : _.some(ratings, x => _.some(r.assessmentRatings, d => _.isEqual(x, d)))
+    };
+}
+
+export function mkCriticalityFilter(id, criticalities) {
+    return {
+        id,
+        criticalities,
+        test: (r) => _.isEmpty(criticalities)
+            ? x => true
+            : _.includes(criticalities, r.physicalFlow.criticality)
+    };
+}
+
+export function mkFrequencyFilter(id, frequencies) {
+    return {
+        id,
+        frequencies,
+        test: (r) => _.isEmpty(frequencies)
+            ? x => true
+            : _.includes(frequencies, r.physicalFlow.frequency)
+    };
+}
+
+export function mkTransportKindFilter(id, transportKinds) {
+    return {
+        id,
+        transportKinds,
+        test: (r) => _.isEmpty(transportKinds)
+            ? x => true
+            : _.includes(transportKinds, r.physicalFlow.transport)
     };
 }
 

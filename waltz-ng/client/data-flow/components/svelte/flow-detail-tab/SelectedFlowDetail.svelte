@@ -175,7 +175,7 @@
                                 <li>
                                     <button class="btn btn-skinny"
                                             on:click={() => goToPhysicalFlowEdit($selectedLogicalFlow)}>
-                                        Add physical flow
+                                        <Icon name="plus"/> Add physical flow
                                     </button>
                                 </li>
                             </ul>

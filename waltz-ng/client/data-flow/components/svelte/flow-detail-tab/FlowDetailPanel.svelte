@@ -14,6 +14,7 @@
     import DataTypeFilters from "./DataTypeFilters.svelte";
     import InboundOutboundFilters from "./InboundOutboundFilters.svelte";
     import {onMount} from "svelte";
+    import PhysicalFlowAttributeFilters from "./PhysicalFlowAttributeFilters.svelte";
 
     export let parentEntityRef;
 
@@ -87,42 +88,46 @@
 
 <div class="flow-detail-panel">
     <div class="flow-detail-table">
+        <details>
 
-        {#if !_.isEmpty(assessmentFilters)}
-            <details>
+            <summary>
+                Filters
+                {#if !_.isEmpty($filters)}
+                    <button class="btn btn-skinny"
+                            on:click={() => $filters = []}>
+                        Clear All
+                    </button>
+                {/if}
+            </summary>
 
+            <details class="filter-set" style="margin-top: 1em">
                 <summary>
-                    Filters
-                    {#if !_.isEmpty($filters)}
-                        <button class="btn btn-skinny"
-                                on:click={() => $filters = []}>
-                            Clear All
-                        </button>
-                    {/if}
+                    Flow Direction
                 </summary>
-
-                <details class="filter-set" style="margin-top: 1em">
-                    <summary>
-                        Flow Direction
-                    </summary>
-                    <InboundOutboundFilters/>
-                </details>
-
-                <details class="filter-set">
-                    <summary>
-                        Data Types
-                    </summary>
-                    <DataTypeFilters {dataTypes}/>
-                </details>
-
-                <details class="filter-set">
-                    <summary>
-                        Assessments
-                    </summary>
-                    <AssessmentFilters {assessmentFilters}/>
-                </details>
+                <InboundOutboundFilters/>
             </details>
-        {/if}
+
+            <details class="filter-set">
+                <summary>
+                    Data Types
+                </summary>
+                <DataTypeFilters {dataTypes}/>
+            </details>
+
+            <details class="filter-set">
+                <summary>
+                    Assessments
+                </summary>
+                <AssessmentFilters {assessmentFilters}/>
+            </details>
+
+            <details class="filter-set">
+                <summary>
+                    Physical Flow
+                </summary>
+                <PhysicalFlowAttributeFilters flows={filteredFlows}/>
+            </details>
+        </details>
 
         <LogicalFlowTable {logicalFlows}
                           assessments={logicalFlowPrimaryAssessments}/>
