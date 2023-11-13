@@ -22,12 +22,12 @@ back to `<home>/.waltz/waltz.properties` for options, should look something like
 
 # Running
 
-## Without container (using uber jar)
+## Without container (using uber jar / jar with dependencies)
 
 Launch the server with
 
     $> cd waltz-web/target
-    $> java -cp uber-waltz-web-1.0-SNAPSHOT.jar Main
+    $> java -cp waltz-web-jar-with-dependencies.jar Main
 
 
 ## With container (i.e. Tomcat)
@@ -36,7 +36,7 @@ Deploy the war file in:
 
     waltz-web/target/waltz-web.war
 
-Ensure `waltz.properties` and and overridden `logback.xml` file
+Ensure `waltz.properties` and overridden `logback.xml` file
 are available (typically on the classpath).
 
 ## Both
