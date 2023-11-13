@@ -179,7 +179,6 @@ function controller($q, $state, serviceBroker) {
                 assessmentRatings: _.keyBy(ratingsByEntityId[d.id] || [], r => r.rating.assessmentDefinitionId)
             };
         });
-        console.log(vm.gridData[14])
     }
 
 
