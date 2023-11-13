@@ -111,7 +111,7 @@
 
             <details class="filter-set" style="margin-top: 1em">
                 <summary>
-                    Flow Direction
+                    <Icon name="random"/> Flow Direction
                     {#if _.some($filters, d => d.kind === FilterKinds.DIRECTION) && _.find($filters, d => d.kind === FilterKinds.DIRECTION).direction !== Directions.ALL}
                         <span style="color: darkorange"
                               title="Flows have been filtered by direction">
@@ -124,7 +124,7 @@
 
             <details class="filter-set">
                 <summary>
-                    Data Types
+                    <Icon name="qrcode"/> Data Types
                     {#if _.some($filters, d => d.kind === FilterKinds.DATA_TYPE)}
                         <span style="color: darkorange"
                               title="Data type filters have been applied">
@@ -137,7 +137,7 @@
 
             <details class="filter-set">
                 <summary>
-                    Assessments
+                    <Icon name="puzzle-piece"/> Assessments
                     {#if _.some($filters, d => d.kind === FilterKinds.ASSESSMENT)}
                         <span style="color: darkorange"
                               title="Assessment filters have been applied">
@@ -150,7 +150,7 @@
 
             <details class="filter-set">
                 <summary>
-                    Physical Flow
+                    <Icon name="asterisk"/> Physical Flow
                     {#if _.some($filters, d => d.kind === FilterKinds.PHYSICAL_FLOW_ATTRIBUTE)}
                         <span style="color: darkorange"
                               title="Physical flow attribute filters have been applied">

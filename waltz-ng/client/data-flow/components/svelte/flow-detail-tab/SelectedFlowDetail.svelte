@@ -61,6 +61,24 @@
         };
     }
 
+    function goToLogicalFlowPage(flow) {
+        $pageInfo = {
+            state: "main.logical-flow.view",
+            params: {
+                id: flow.logicalFlow.id
+            }
+        }
+    }
+
+    function goToPhysicalFlowPage(flow) {
+        $pageInfo = {
+            state: "main.physical-flow.view",
+            params: {
+                id: flow.physicalFlow.id
+            }
+        }
+    }
+
 </script>
 
 
@@ -68,7 +86,7 @@
 
     <div class="row">
         <div class="col-md-12">
-            <button class="btn btn-skinny detail-controls"
+            <button class="btn btn-skinny pull-right"
                     on:click={() => clearSelected()}>
                 <span class="pull-right">
                     <Icon name="times"/>
@@ -177,6 +195,15 @@
                                             on:click={() => goToPhysicalFlowEdit($selectedLogicalFlow)}>
                                         <Icon name="plus"/> Add physical flow
                                     </button>
+                                    <div class="help-block small"><Icon name="info-circle"/> This will open the flow registration page</div>
+                                </li>
+                                <li>
+                                    <div>To remove this logical flow or edit it's data types
+                                        <button class="btn btn-skinny"
+                                                on:click={() => goToLogicalFlowPage($selectedLogicalFlow)}>
+                                            visit the logical flow page
+                                        </button>
+                                    </div>
                                 </li>
                             </ul>
                         </div>
@@ -258,18 +285,22 @@
                 <div class="small">
                     <LastEdited entity={$selectedPhysicalFlow.physicalFlow}/>
                 </div>
+                <br>
+                {#if hasEditPermission}
+                    <div>
+                        <ul class="list-unstyled">
+                            <li>
+                                <div>To remove this physical flow or edit it's attributes
+                                    <button class="btn btn-skinny"
+                                            on:click={() => goToPhysicalFlowPage($selectedPhysicalFlow)}>
+                                        visit the physical flow page
+                                    </button>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                {/if}
             {/if}
         </div>
     </div>
 </div>
-
-<style>
-
-    .detail-controls {
-        padding: 0.5rem;
-        width: 100%;
-        background-color: #eee;
-        border: 1px solid #eee;
-    }
-
-</style>

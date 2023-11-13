@@ -134,9 +134,9 @@
         return _.includes(filteredTransportKinds, transportKind);
     }
 
-    $: hasCriticalityFilter = _.some($filters, d => d.id !== mkCriticalityFilterId());
-    $: hasFrequencyFilter = _.some($filters, d => d.id !== mkFrequencyFilterId());
-    $: hasTransportKindFilter = _.some($filters, d => d.id !== mkTransportKindFilterId());
+    $: hasCriticalityFilter = _.some($filters, d => d.id === mkCriticalityFilterId());
+    $: hasFrequencyFilter = _.some($filters, d => d.id === mkFrequencyFilterId());
+    $: hasTransportKindFilter = _.some($filters, d => d.id === mkTransportKindFilterId());
 
 
 </script>
