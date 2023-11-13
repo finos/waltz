@@ -59,6 +59,17 @@ export function mkLogicalFlowStore() {
                 {force: force});
     }
 
+
+    const getViewForSelector = (selector, force = false) => {
+        return remote
+            .fetchViewData(
+                "POST",
+                "api/logical-flow/view",
+                selector,
+                null,
+                {force});
+    }
+
     const findPermissionsForFlow = (flowId, force = false) => {
         return remote
             .fetchViewList(
@@ -86,7 +97,8 @@ export function mkLogicalFlowStore() {
         getById,
         addFlow,
         findEditableFlowIdsForParentReference,
-        findPermissionsForFlow
+        findPermissionsForFlow,
+        getViewForSelector
     };
 }
 
