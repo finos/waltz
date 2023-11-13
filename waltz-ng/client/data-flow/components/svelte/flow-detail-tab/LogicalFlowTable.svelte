@@ -134,10 +134,18 @@
     table {
         display: table;
         white-space: nowrap;
+        position: relative;
+    }
+
+    th {
+        position: sticky;
+        top: 0;
+        background: white;
     }
 
     .table-container {
         overflow-x: auto;
+        padding-top: 0;
     }
 
     .rating-col {
