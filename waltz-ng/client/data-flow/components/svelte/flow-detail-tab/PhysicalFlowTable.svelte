@@ -128,6 +128,7 @@
         display: table;
         white-space: nowrap;
         position: relative;
+        border-collapse: separate;
     }
 
     th {
