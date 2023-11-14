@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -45,6 +46,7 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.StringUtilities.joinUsing;
+import static org.finos.waltz.model.utils.IdUtilities.indexById;
 import static spark.Spark.post;
 
 
@@ -111,7 +113,7 @@ public class LogicalFlowViewExtractor extends CustomDataExtractor {
         Map<Long, Collection<DataTypeDecorator>> dataTypesByFlowId = MapUtilities.groupBy(viewData.dataTypeDecorators(), d -> d.dataFlowId());
         Map<Long, Collection<PhysicalFlow>> physicalsByLogicalFlowId = MapUtilities.groupBy(viewData.physicalFlows(), PhysicalFlow::logicalFlowId);
         Map<Long, Collection<AssessmentRating>> ratingsByFlowId = MapUtilities.groupBy(viewData.flowRatings(), d -> d.entityReference().id());
-        Map<Object, RatingSchemeItem> ratingSchemeItemsById = MapUtilities.indexBy(viewData.ratingSchemeItems(), d -> d.id());
+        Map<Long, RatingSchemeItem> ratingSchemeItemsById = indexById(viewData.ratingSchemeItems());
 
         return viewData
                 .flows()
@@ -137,9 +139,9 @@ public class LogicalFlowViewExtractor extends CustomDataExtractor {
 
                     viewData.primaryAssessmentDefinitions()
                             .stream()
-                            .sorted()
+                            .sorted(Comparator.comparing(NameProvider::name))
                             .forEach(defn -> {
-                                String ratingsStrForDefn = ratingsByDefnId.getOrDefault(defn.id(), Collections.emptySet())
+                                String ratingsStrForDefn = ratingsByDefnId.getOrDefault(defn.id().get(), Collections.emptySet())
                                         .stream()
                                         .map(d -> ratingSchemeItemsById.getOrDefault(d.ratingId(), null))
                                         .filter(Objects::nonNull)

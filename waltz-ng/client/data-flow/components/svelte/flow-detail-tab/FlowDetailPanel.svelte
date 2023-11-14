@@ -22,6 +22,7 @@
     import {onMount} from "svelte";
     import PhysicalFlowAttributeFilters from "./PhysicalFlowAttributeFilters.svelte";
     import Icon from "../../../../common/svelte/Icon.svelte";
+    import DataExtractLink from "../../../../common/svelte/DataExtractLink.svelte";
 
     export let parentEntityRef;
 
@@ -166,6 +167,23 @@
                           assessments={logicalFlowPrimaryAssessments}/>
         <br>
         <PhysicalFlowTable {physicalFlows}/>
+
+        <div style="padding-top: 1em" class="pull-right">
+            <span>
+                <DataExtractLink name="Export Logical Flow Details"
+                                 filename="Logical Flows"
+                                 extractUrl="logical-flow-view"
+                                 method="POST"
+                                 requestBody={selectionOptions}
+                                 styling="link"/>
+                |
+                <DataExtractLink name="Export Physical Flow Details"
+                                 filename="Physical Flows"
+                                 extractUrl={`physical-flows/all/${parentEntityRef.kind}/${parentEntityRef.id}`}
+                                 method="POST"
+                                 styling="link"/>
+            </span>
+        </div>
 
     </div>
     {#if $selectedLogicalFlow || $selectedPhysicalFlow}
