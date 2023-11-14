@@ -187,27 +187,32 @@
                         </div>
                     {/if}
 
-                    {#if hasEditPermission}
-                        <div>
-                            <ul class="list-unstyled">
+                    <div class="actions">
+                        <ul>
+                            {#if hasEditPermission}
                                 <li>
-                                    <button class="btn btn-skinny"
-                                            on:click={() => goToPhysicalFlowEdit($selectedLogicalFlow)}>
-                                        <Icon name="plus"/> Add physical flow
-                                    </button>
-                                    <div class="help-block small"><Icon name="info-circle"/> This will open the flow registration page</div>
-                                </li>
-                                <li>
-                                    <div>To remove this logical flow or edit it's data types
+                                    <span>
                                         <button class="btn btn-skinny"
-                                                on:click={() => goToLogicalFlowPage($selectedLogicalFlow)}>
-                                            visit the logical flow page
+                                                on:click={() => goToPhysicalFlowEdit($selectedLogicalFlow)}>
+                                            Add physical flow
                                         </button>
-                                    </div>
+                                        <span class="text-muted">This will open the flow registration page</span>
+                                    </span>
                                 </li>
-                            </ul>
-                        </div>
-                    {/if}
+                            {/if}
+                            <li>
+                                <span>
+                                    <button class="btn btn-skinny"
+                                            on:click={() => goToLogicalFlowPage($selectedLogicalFlow)}>
+                                        Visit the logical flow page
+                                    </button>
+                                    {#if hasEditPermission}
+                                        <span class="text-muted">To remove the flow or edit it's data types</span>
+                                    {/if}
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             {/if}
             {#if $selectedPhysicalFlow}
@@ -286,21 +291,33 @@
                     <LastEdited entity={$selectedPhysicalFlow.physicalFlow}/>
                 </div>
                 <br>
-                {#if hasEditPermission}
-                    <div>
-                        <ul class="list-unstyled">
-                            <li>
-                                <div>To remove this physical flow or edit it's attributes
-                                    <button class="btn btn-skinny"
-                                            on:click={() => goToPhysicalFlowPage($selectedPhysicalFlow)}>
-                                        visit the physical flow page
-                                    </button>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                {/if}
+                <div class="actions">
+                    <ul>
+                        <li>
+                            <span>
+                                <button class="btn btn-skinny"
+                                        on:click={() => goToPhysicalFlowPage($selectedPhysicalFlow)}>
+                                    Visit the physical flow page
+                                </button>
+                                {#if hasEditPermission}
+                                    <span class="text-muted">To remove the flow or edit it's attributes</span>
+                                {/if}
+                            </span>
+                        </li>
+                    </ul>
+                </div>
             {/if}
         </div>
     </div>
 </div>
+
+<style>
+
+    .actions {
+        border: 1px solid #eee;
+        background: #f5f5f5;
+        border-radius: 2px;
+        padding-top: 0.5em;
+    }
+
+</style>
