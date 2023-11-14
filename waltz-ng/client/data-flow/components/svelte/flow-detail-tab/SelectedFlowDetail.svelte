@@ -61,6 +61,24 @@
         };
     }
 
+    function goToLogicalFlowPage(flow) {
+        $pageInfo = {
+            state: "main.logical-flow.view",
+            params: {
+                id: flow.logicalFlow.id
+            }
+        }
+    }
+
+    function goToPhysicalFlowPage(flow) {
+        $pageInfo = {
+            state: "main.physical-flow.view",
+            params: {
+                id: flow.physicalFlow.id
+            }
+        }
+    }
+
 </script>
 
 
@@ -68,7 +86,7 @@
 
     <div class="row">
         <div class="col-md-12">
-            <button class="btn btn-skinny detail-controls"
+            <button class="btn btn-skinny pull-right"
                     on:click={() => clearSelected()}>
                 <span class="pull-right">
                     <Icon name="times"/>
@@ -169,18 +187,32 @@
                         </div>
                     {/if}
 
-                    {#if hasEditPermission}
-                        <div>
-                            <ul class="list-unstyled">
+                    <div class="actions">
+                        <ul>
+                            {#if hasEditPermission}
                                 <li>
-                                    <button class="btn btn-skinny"
-                                            on:click={() => goToPhysicalFlowEdit($selectedLogicalFlow)}>
-                                        <Icon name="plus"/> Add physical flow
-                                    </button>
+                                    <span>
+                                        <button class="btn btn-skinny"
+                                                on:click={() => goToPhysicalFlowEdit($selectedLogicalFlow)}>
+                                            Add physical flow
+                                        </button>
+                                        <span class="text-muted">This will open the flow registration page</span>
+                                    </span>
                                 </li>
-                            </ul>
-                        </div>
-                    {/if}
+                            {/if}
+                            <li>
+                                <span>
+                                    <button class="btn btn-skinny"
+                                            on:click={() => goToLogicalFlowPage($selectedLogicalFlow)}>
+                                        Visit the logical flow page
+                                    </button>
+                                    {#if hasEditPermission}
+                                        <span class="text-muted">To remove the flow or edit it's data types</span>
+                                    {/if}
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             {/if}
             {#if $selectedPhysicalFlow}
@@ -258,6 +290,22 @@
                 <div class="small">
                     <LastEdited entity={$selectedPhysicalFlow.physicalFlow}/>
                 </div>
+                <br>
+                <div class="actions">
+                    <ul>
+                        <li>
+                            <span>
+                                <button class="btn btn-skinny"
+                                        on:click={() => goToPhysicalFlowPage($selectedPhysicalFlow)}>
+                                    Visit the physical flow page
+                                </button>
+                                {#if hasEditPermission}
+                                    <span class="text-muted">To remove the flow or edit it's attributes</span>
+                                {/if}
+                            </span>
+                        </li>
+                    </ul>
+                </div>
             {/if}
         </div>
     </div>
@@ -265,11 +313,11 @@
 
 <style>
 
-    .detail-controls {
-        padding: 0.5rem;
-        width: 100%;
-        background-color: #eee;
+    .actions {
         border: 1px solid #eee;
+        background: #f5f5f5;
+        border-radius: 2px;
+        padding-top: 0.5em;
     }
 
 </style>
