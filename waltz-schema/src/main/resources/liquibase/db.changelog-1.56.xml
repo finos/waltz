@@ -25,4 +25,70 @@
         <tagDatabase tag="v1.55"/> <!-- tag the current db version, i.e. the last  -->
     </changeSet>
 
+    <changeSet id="20231117-6860-1"
+               author="woodjes">
+        <comment>6860: create survey_instance_action_queue table</comment>
+        <createTable tableName="survey_instance_action_queue">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="survey_instance_action_queue_pkey"/>
+            </column>
+            <column name="action"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="survey_instance_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="action_params"
+                    type="${config-value.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="initial_state"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="submitted_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="submitted_by"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="actioned_at"
+                    type="TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+            <column name="status"
+                    type="${enum.type}"
+                    defaultValue="PENDING">
+                <constraints nullable="false"/>
+            </column>
+            <column name="message"
+                    type="${longvarchar.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="provenance"
+                    type="${provenance.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20231117-6860-2"
+               author="woodjes">
+        <comment>6860: create survey_instance_action_queue table</comment>
+        <addForeignKeyConstraint baseTableName="survey_instance_action_queue"
+                                 baseColumnNames="survey_instance_id"
+                                 constraintName="si_action_queue_si_id_fk"
+                                 referencedTableName="survey_instance"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
 </databaseChangeLog>
