@@ -12,6 +12,7 @@
     } from "../../../../physical-flows/svelte/physical-flow-registration-utils";
     import {selectedPhysicalFlow, selectedLogicalFlow} from "./flow-details-store";
     import {mkLogicalFromFlowDetails} from "./flow-detail-utils";
+    import NoData from "../../../../common/svelte/NoData.svelte";
 
     export let physicalFlows;
 
@@ -109,6 +110,12 @@
                     {toTransportKindName(nestedEnums, flow.physicalFlow.transport)}
                 </td>
             </tr>
+        {:else}
+            <tr>
+                <td colspan="9">
+                    <NoData type="info">There are no physical flows to show, these may have been filtered.</NoData>
+                </td>
+            </tr>
         {/each}
         </tbody>
     </table>
@@ -120,10 +127,19 @@
     table {
         display: table;
         white-space: nowrap;
+        position: relative;
+        border-collapse: separate;
+    }
+
+    th {
+        position: sticky;
+        top: 0;
+        background: white;
     }
 
     .table-container {
         overflow-x: auto;
+        padding-top: 0;
     }
 
 

@@ -8,13 +8,21 @@
     import LogicalFlowTable from "./LogicalFlowTable.svelte";
     import {filters, resetFlowDetailsStore, selectedLogicalFlow, selectedPhysicalFlow} from "./flow-details-store";
     import PhysicalFlowTable from "./PhysicalFlowTable.svelte";
-    import {mkAssessmentFilters, mkFlowDetails, mkLogicalFromFlowDetails} from "./flow-detail-utils";
+    import {
+        Directions,
+        FilterKinds,
+        mkAssessmentFilters,
+        mkFlowDetails,
+        mkLogicalFromFlowDetails
+    } from "./flow-detail-utils";
     import SelectedFlowDetail from "./SelectedFlowDetail.svelte";
     import AssessmentFilters from "./AssessmentFilters.svelte";
     import DataTypeFilters from "./DataTypeFilters.svelte";
     import InboundOutboundFilters from "./InboundOutboundFilters.svelte";
     import {onMount} from "svelte";
     import PhysicalFlowAttributeFilters from "./PhysicalFlowAttributeFilters.svelte";
+    import Icon from "../../../../common/svelte/Icon.svelte";
+    import DataExtractLink from "../../../../common/svelte/DataExtractLink.svelte";
 
     export let parentEntityRef;
 
@@ -74,6 +82,8 @@
 
     $: filteredFlows = filterFlows(allFlows, $filters);
 
+    $: physicalFlows = _.filter(filteredFlows, d => !_.isEmpty(d.physicalFlow));
+
     $: logicalFlows = _
         .chain(filteredFlows)
         .map(d => mkLogicalFromFlowDetails(d))
@@ -102,37 +112,78 @@
 
             <details class="filter-set" style="margin-top: 1em">
                 <summary>
-                    Flow Direction
+                    <Icon name="random"/> Flow Direction
+                    {#if _.some($filters, d => d.kind === FilterKinds.DIRECTION) && _.find($filters, d => d.kind === FilterKinds.DIRECTION).direction !== Directions.ALL}
+                        <span style="color: darkorange"
+                              title="Flows have been filtered by direction">
+                            <Icon name="exclamation-circle"/>
+                        </span>
+                    {/if}
                 </summary>
                 <InboundOutboundFilters/>
             </details>
 
             <details class="filter-set">
                 <summary>
-                    Data Types
+                    <Icon name="qrcode"/> Data Types
+                    {#if _.some($filters, d => d.kind === FilterKinds.DATA_TYPE)}
+                        <span style="color: darkorange"
+                              title="Data type filters have been applied">
+                            <Icon name="exclamation-circle"/>
+                        </span>
+                    {/if}
                 </summary>
                 <DataTypeFilters {dataTypes}/>
             </details>
 
             <details class="filter-set">
                 <summary>
-                    Assessments
+                    <Icon name="puzzle-piece"/> Assessments
+                    {#if _.some($filters, d => d.kind === FilterKinds.ASSESSMENT)}
+                        <span style="color: darkorange"
+                              title="Assessment filters have been applied">
+                            <Icon name="exclamation-circle"/>
+                        </span>
+                    {/if}
                 </summary>
                 <AssessmentFilters {assessmentFilters}/>
             </details>
 
             <details class="filter-set">
                 <summary>
-                    Physical Flow
+                    <Icon name="asterisk"/> Physical Flow
+                    {#if _.some($filters, d => d.kind === FilterKinds.PHYSICAL_FLOW_ATTRIBUTE)}
+                        <span style="color: darkorange"
+                              title="Physical flow attribute filters have been applied">
+                            <Icon name="exclamation-circle"/>
+                        </span>
+                    {/if}
                 </summary>
-                <PhysicalFlowAttributeFilters flows={filteredFlows}/>
+                <PhysicalFlowAttributeFilters flows={physicalFlows}/>
             </details>
         </details>
 
         <LogicalFlowTable {logicalFlows}
                           assessments={logicalFlowPrimaryAssessments}/>
         <br>
-        <PhysicalFlowTable physicalFlows={filteredFlows}/>
+        <PhysicalFlowTable {physicalFlows}/>
+
+        <div style="padding-top: 1em" class="pull-right">
+            <span>
+                <DataExtractLink name="Export Logical Flow Details"
+                                 filename="Logical Flows"
+                                 extractUrl="logical-flow-view"
+                                 method="POST"
+                                 requestBody={selectionOptions}
+                                 styling="link"/>
+                |
+                <DataExtractLink name="Export Physical Flow Details"
+                                 filename="Physical Flows"
+                                 extractUrl={`physical-flows/all/${parentEntityRef.kind}/${parentEntityRef.id}`}
+                                 method="POST"
+                                 styling="link"/>
+            </span>
+        </div>
 
     </div>
     {#if $selectedLogicalFlow || $selectedPhysicalFlow}
@@ -160,7 +211,7 @@
     }
 
     .filter-set {
-        background-color: white;
+        background-color: #fafafa;
     }
 
 </style>
