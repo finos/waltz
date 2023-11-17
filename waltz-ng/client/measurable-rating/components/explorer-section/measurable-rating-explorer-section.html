@@ -68,8 +68,8 @@
                 <waltz-data-extract-link name="Export"
                                          styling="link"
                                          filename="ratings.csv"
-                                         extract="allocations/measurable-category/{{$ctrl.measurableCategory.id}}"
-                                         method="POST"
+                                         extract="allocations/measurable/{{$ctrl.parentEntityRef.id}}"
+                                         method="GET"
                                          request-body="$ctrl.selector">
                 </waltz-data-extract-link>
             </div>
