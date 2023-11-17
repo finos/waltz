@@ -70,7 +70,7 @@
                     defaultValue="PENDING">
                 <constraints nullable="false"/>
             </column>
-            <column name="error_message"
+            <column name="message"
                     type="${longvarchar.type}">
                 <constraints nullable="true"/>
             </column>
