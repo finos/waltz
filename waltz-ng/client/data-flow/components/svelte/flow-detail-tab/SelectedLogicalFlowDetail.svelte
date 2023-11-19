@@ -138,10 +138,12 @@
     </table>
 {/if}
 
-<div class="actions small">
-    <menu>
-        {#if hasEditPermission}
-            <li>
+<div class="small">
+    <details>
+        <summary>Actions</summary>
+        <menu>
+            {#if hasEditPermission}
+                <li>
                 <span>
                     <button class="btn btn-skinny"
                             on:click={() => goToPhysicalFlowEdit(flow)}>
@@ -151,9 +153,9 @@
                         This will open the flow registration page
                     </span>
                 </span>
-            </li>
-        {/if}
-        <li>
+                </li>
+            {/if}
+            <li>
             <span>
                 <button class="btn btn-skinny"
                         on:click={() => goToLogicalFlowPage(flow)}>
@@ -165,19 +167,13 @@
                     </span>
                 {/if}
             </span>
-        </li>
-    </menu>
+            </li>
+        </menu>
+    </details>
 </div>
 
 
 <style>
-    .actions {
-        border: 1px solid #eee;
-        background: #f5f5f5;
-        border-radius: 2px;
-        padding-top: 0.5em;
-    }
-
     .rating-indicator-block {
         display: inline-block;
         width: 1.1em;
