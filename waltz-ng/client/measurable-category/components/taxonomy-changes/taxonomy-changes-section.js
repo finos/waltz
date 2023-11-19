@@ -59,6 +59,8 @@ function determineValue(change) {
             return `To: ${params.destinationName}`;
         case "MERGE":
             return `Into: ${params.targetName}`;
+        case "REORDER_SIBLINGS":
+            return params.listAsNames;
         default:
             return "-";
     }
@@ -67,7 +69,13 @@ function determineValue(change) {
 
 function determineOriginalValue(change) {
     const params = change.params;
-    return params.originalValue || "-";
+    const orig = params.originalValue || "-";
+    switch (change.changeType) {
+        case "MOVE":
+            return `From: ${orig}`;
+        default:
+            return orig;
+    }
 }
 
 

@@ -130,7 +130,8 @@ function controller($scope,
                 },
                 onChange: () => {
                     vm.submitDisabled = vm.commandParams.name === vm.measurable.name;
-                }
+                },
+                paramProcessor: (d) => Object.assign(d, {originalValue: vm.measurable.name})
             }, {
                 name: "Description",
                 code: "UPDATE_DESCRIPTION",
@@ -143,7 +144,8 @@ function controller($scope,
                 },
                 onChange: () => {
                     vm.submitDisabled = vm.commandParams.description === vm.measurable.description;
-                }
+                },
+                paramProcessor: (d) => Object.assign(d, {originalValue: vm.measurable.description})
             }, {
                 name: "Concrete",
                 code: "UPDATE_CONCRETENESS",
@@ -157,7 +159,8 @@ function controller($scope,
                     resetForm({ concrete: !vm.measurable.concrete });
                     vm.submitDisabled = false;
                     calcPreview();
-                }
+                },
+                paramProcessor: (d) => Object.assign(d, {originalValue: vm.measurable.concrete})
             }, {
                 name: "External Id",
                 code: "UPDATE_EXTERNAL_ID",
@@ -171,7 +174,8 @@ function controller($scope,
                 },
                 onChange: () => {
                     vm.submitDisabled = vm.commandParams.externalId === vm.measurable.externalId;
-                }
+                },
+                paramProcessor: (d) => Object.assign(d, {originalValue: vm.measurable.externalId})
             }, {
                 name: "Move",
                 code: "MOVE",
@@ -197,6 +201,7 @@ function controller($scope,
                     resetForm();
                 },
                 paramProcessor: (d) => ({
+                    originalValue: vm.parent.name,
                     destinationId: d.destination.id,
                     destinationName: d.destination.name
                 })
@@ -221,7 +226,9 @@ function controller($scope,
                 },
                 paramProcessor: (commandParams) => {
                     return {
-                        list:  JSON.stringify(_.map(commandParams.list, d => d.id))
+                        originalValue: JSON.stringify(_.map(vm.siblings, d => d.name)),
+                        list: JSON.stringify(_.map(commandParams.list, d => d.id)),
+                        listAsNames: JSON.stringify(_.map(commandParams.list, d => d.name))
                     }
                 }
             }
