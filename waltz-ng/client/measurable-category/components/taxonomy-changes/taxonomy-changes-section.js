@@ -15,13 +15,11 @@ const initialState = {
         },
         mkEntityLinkGridCell("Entity", "primaryReference", "none", "right"),
         {
-            field: "params",
-            displayName: "Parameters",
-            cellTemplate: `
-                <div class="ui-grid-cell-contents">
-                    <waltz-taxonomy-change-summary-cell change="row.entity">
-                    </waltz-taxonomy-change-summary-cell>
-                </div>`
+            field: "value",
+            displayName: "Value"
+        }, {
+            field: "originalValue",
+            displayName: "Original Value"
         }, {
             field: "lastUpdatedBy",
             displayName: "Updated By",
@@ -29,7 +27,11 @@ const initialState = {
         }, {
             field: "lastUpdatedAt",
             displayName: "Updated At",
-            cellTemplate: "<div class=\"ui-grid-cell-contents\"><waltz-from-now timestamp=\"COL_FIELD\"></waltz-from-now></div>"
+            cellTemplate: `
+                <div class="ui-grid-cell-contents">
+                    <waltz-from-now timestamp="COL_FIELD">
+                    </waltz-from-now>
+                </div>`
         }
     ]
 };
@@ -38,6 +40,44 @@ const initialState = {
 const bindings = {
     parentEntityRef: "<"
 };
+
+
+function determineValue(change) {
+    const params = change.params;
+    switch (change.changeType) {
+        case "ADD_CHILD":
+            return params.name;
+        case "UPDATE_NAME":
+            return params.name;
+        case "UPDATE_DESCRIPTION":
+            return params.description;
+        case "UPDATE_CONCRETENESS":
+            return params.concrete;
+        case "UPDATE_EXTERNAL_ID":
+            return params.externalId;
+        case "MOVE":
+            return `To: ${params.destinationName}`;
+        case "MERGE":
+            return `Into: ${params.targetName}`;
+        default:
+            return "-";
+    }
+}
+
+
+function determineOriginalValue(change) {
+    const params = change.params;
+    return params.originalValue || "-";
+}
+
+
+function mkValueAndOriginalValueProps(change) {
+
+    return {
+        value: determineValue(change),
+        originalValue: determineOriginalValue(change)
+    };
+}
 
 
 function controller(serviceBroker) {
@@ -49,14 +89,24 @@ function controller(serviceBroker) {
                 .execute(
                     CORE_API.TaxonomyManagementStore.findAllChangesByDomain,
                     [vm.parentEntityRef])
-                .then(r => vm.items = _
+                .then(r => vm.items = console.log(r.data) || _
                     .chain(r.data)
                     .filter(d => d.status === "EXECUTED")
+                    .map(d => {
+                        return Object.assign(
+                            {
+                                changeType: d.changeType,
+                                primaryReference: d.primaryReference,
+                                lastUpdatedBy: d.lastUpdatedBy,
+                                lastUpdatedAt: d.lastUpdatedAt,
+                                params: d.params
+                            },
+                            mkValueAndOriginalValueProps(d));
+                    })
                     .orderBy(
                         [d => d.lastUpdatedAt, d => d.createdAt],
                         ["desc", "desc"])
                     .value());
-
         }
     };
 }
