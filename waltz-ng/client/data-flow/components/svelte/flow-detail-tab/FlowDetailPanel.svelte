@@ -15,7 +15,7 @@
         mkFlowDetails,
         mkLogicalFromFlowDetails
     } from "./flow-detail-utils";
-    import SelectedFlowDetail from "./SelectedFlowDetail.svelte";
+    import SelectedFlowDetail from "./SelectedFlowDetailPanel.svelte";
     import AssessmentFilters from "./AssessmentFilters.svelte";
     import DataTypeFilters from "./DataTypeFilters.svelte";
     import InboundOutboundFilters from "./InboundOutboundFilters.svelte";
@@ -198,6 +198,7 @@
     .flow-detail-context-panel {
         width: 30%;
         padding-left: 1em;
+        border-left: 1px solid #eee;
     }
 
     .flow-detail-panel {
