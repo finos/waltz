@@ -40,6 +40,11 @@ public class SurveyInstanceActionQueueService {
         this.dslContext = dslContext;
     }
 
+    /**
+     * Looks for any 'PENDING' actions in the survey_instance_action_queue and attempts to run them in order of submission time to the queue.
+     * In case of error or a precondition failure a message is saved to the action in the table.
+     * A transaction is created for each action and all changes will be rolled back if an error occurs during runtime.
+     */
     public void performActions() {
 
         List<SurveyInstanceActionQueueItem> pendingActions = surveyInstanceActionQueueDao.findPendingActions();
@@ -93,23 +98,30 @@ public class SurveyInstanceActionQueueService {
 
                             try {
 
-                                SurveyInstanceStatus surveyInstanceStatus = surveyInstanceService.updateStatus(
-                                        Optional.of(tx),
-                                        username,
-                                        action.surveyInstanceId(),
-                                        updateCmd);
+                                // We need a new transaction here so that any changes get rolled back; we do not fail the overall
+                                // action transaction as that resets the action to 'PENDING' and would lose the error message
 
-                                String msg = format("Successfully updated survey instance id: %d with action: %s, new status is: %s",
-                                        action.surveyInstanceId(),
-                                        action.action().name(),
-                                        surveyInstanceStatus.name());
+                                tx.transaction(actionCtx -> {
+                                    DSLContext actionTx = actionCtx.dsl();
+                                    SurveyInstanceStatus surveyInstanceStatus = surveyInstanceService.updateStatus(
+                                            Optional.of(actionTx),
+                                            username,
+                                            action.surveyInstanceId(),
+                                            updateCmd);
 
-                                LOG.info(msg);
-                                surveyInstanceActionQueueDao.updateActionStatus(
-                                        tx,
-                                        actionId,
-                                        SurveyInstanceActionStatus.SUCCESS,
-                                        null);
+                                    String msg = format("Successfully updated survey instance id: %d with action: %s, new status is: %s",
+                                            action.surveyInstanceId(),
+                                            action.action().name(),
+                                            surveyInstanceStatus.name());
+
+                                    LOG.info(msg);
+                                    surveyInstanceActionQueueDao.updateActionStatus(
+                                            tx,
+                                            actionId,
+                                            SurveyInstanceActionStatus.SUCCESS,
+                                            null);
+                                });
+
 
                             } catch (Exception e) {
 
