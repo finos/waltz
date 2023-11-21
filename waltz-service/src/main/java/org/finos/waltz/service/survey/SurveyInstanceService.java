@@ -56,6 +56,7 @@ import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.model.utils.IdUtilities;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.user.UserRoleService;
+import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +67,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import static java.lang.String.format;
@@ -75,6 +77,7 @@ import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.common.Checks.fail;
 import static org.finos.waltz.common.CollectionUtilities.find;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
+import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.common.StringUtilities.isEmpty;
 import static org.finos.waltz.common.StringUtilities.joinUsing;
 import static org.finos.waltz.model.survey.SurveyInstanceStateMachineFactory.simple;
@@ -260,7 +263,16 @@ public class SurveyInstanceService {
     }
 
 
-    public SurveyInstanceStatus updateStatus(String userName,
+    /**
+     * Uupdates a survey instance using a StatusChangeCommand. If a DSLContext is provided it will use this otherwise will use the DSLContext within the DAO.
+     * @param tx optional DSLContext to use as part of a transaction
+     * @param userName the user to submit the status change
+     * @param instanceId the id of the survey being updated
+     * @param command the action details
+     * @return the updated survey instance
+     */
+    public SurveyInstanceStatus updateStatus(Optional<DSLContext> tx,
+                                             String userName,
                                              long instanceId,
                                              SurveyInstanceStatusChangeCommand command) {
 
@@ -283,7 +295,7 @@ public class SurveyInstanceService {
             SurveyInstanceFormDetails formDetails = instanceViewService.getFormDetailsById(instanceId);
             if (! formDetails.missingMandatoryQuestionIds().isEmpty()) {
                 Map<Long, SurveyQuestion> questionsById = indexByOptionalId(formDetails.activeQuestions());
-                Set<SurveyQuestion> missingMandatoryQuestions = SetUtilities.map(formDetails.missingMandatoryQuestionIds(), questionsById::get);
+                Set<SurveyQuestion> missingMandatoryQuestions = map(formDetails.missingMandatoryQuestionIds(), questionsById::get);
                 fail("Some questions are missing, namely: %s", joinUsing(
                         missingMandatoryQuestions,
                         SurveyQuestion::questionText,
@@ -296,26 +308,27 @@ public class SurveyInstanceService {
         switch (command.action()) {
             case APPROVING:
                 checkTrue(newStatus.equals(SurveyInstanceStatus.APPROVED), "The resolved new status for APPROVING should be 'APPROVED', resolved to: " + newStatus);
-                nbupdates = surveyInstanceDao.markApproved(instanceId, userName);
+                nbupdates = surveyInstanceDao.markApproved(tx, instanceId, userName);
                 break;
             case SUBMITTING:
                 checkTrue(newStatus.equals(SurveyInstanceStatus.COMPLETED), "The resolved new status for SUBMITTING should be 'COMPLETED', resolved to: " + newStatus);
-                removeUnnecessaryResponses(instanceId);
-                nbupdates = surveyInstanceDao.markSubmitted(instanceId, userName);
+                removeUnnecessaryResponses(tx, instanceId);
+                nbupdates = surveyInstanceDao.markSubmitted(tx, instanceId, userName);
                 break;
             case REOPENING:
                 checkTrue(newStatus.equals(SurveyInstanceStatus.IN_PROGRESS), "The resolved new status for REOPENING should be 'IN_PROGRESS', resolved to: " + newStatus);
                 // if survey is being sent back, store current responses as a version
-                long versionedInstanceId = surveyInstanceDao.createPreviousVersion(surveyInstance);
-                surveyQuestionResponseDao.cloneResponses(surveyInstance.id().get(), versionedInstanceId);
-                nbupdates = surveyInstanceDao.reopenSurvey(instanceId);
+                long versionedInstanceId = surveyInstanceDao.createPreviousVersion(tx, surveyInstance);
+                surveyQuestionResponseDao.cloneResponses(tx, surveyInstance.id().get(), versionedInstanceId);
+                nbupdates = surveyInstanceDao.reopenSurvey(tx, instanceId);
                 break;
             default:
-                nbupdates = surveyInstanceDao.updateStatus(instanceId, newStatus);
+                nbupdates = surveyInstanceDao.updateStatus(tx, instanceId, newStatus);
         }
 
         if (nbupdates > 0) {
             changeLogService.write(
+                    tx,
                     ImmutableChangeLog.builder()
                             .operation(Operation.UPDATE)
                             .userId(userName)
@@ -329,7 +342,7 @@ public class SurveyInstanceService {
     }
 
 
-    protected int removeUnnecessaryResponses(long instanceId) {
+    protected int removeUnnecessaryResponses(Optional<DSLContext> tx, long instanceId) {
         List<SurveyQuestion> availableQuestions = surveyQuestionService.findForSurveyInstance(instanceId);
         List<SurveyInstanceQuestionResponse> questionResponses = surveyQuestionResponseDao.findForInstance(instanceId);
         Set<Long> availableQuestionIds = IdUtilities.toIds(availableQuestions);
@@ -342,7 +355,7 @@ public class SurveyInstanceService {
         }
 
         if (!toRemove.isEmpty()) {
-            return surveyQuestionResponseDao.deletePreviousResponse(toRemove);
+            return surveyQuestionResponseDao.deletePreviousResponse(tx, toRemove);
         } else {
             return 0;
         }
@@ -529,6 +542,7 @@ public class SurveyInstanceService {
 
 
     public SurveyInstancePermissions getPermissions(String userName, Long instanceId) {
+
         Person person = personDao.getActiveByUserEmail(userName);
         SurveyInstance instance = surveyInstanceDao.getById(instanceId);
         SurveyRun run = surveyRunDao.getById(instance.surveyRunId());
@@ -598,6 +612,7 @@ public class SurveyInstanceService {
                 .forEach(trgInstanceId -> {
 
                     updateStatus(
+                            Optional.empty(),
                             username,
                             trgInstanceId,
                             ImmutableSurveyInstanceStatusChangeCommand.builder()

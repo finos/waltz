@@ -34,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.model.HierarchyQueryScope.EXACT;
@@ -161,6 +162,7 @@ public class SurveyInstanceEndpoint implements Endpoint {
 
             // set status to in progress
             surveyInstanceService.updateStatus(
+                    Optional.empty(),
                     userName,
                     instanceId,
                     ImmutableSurveyInstanceStatusChangeCommand.builder()
@@ -191,6 +193,7 @@ public class SurveyInstanceEndpoint implements Endpoint {
                     SurveyInstanceStatusChangeCommand command = readBody(req, SurveyInstanceStatusChangeCommand.class);
 
                     return surveyInstanceService.updateStatus(
+                            Optional.empty(),
                             getUsername(req),
                             getId(req),
                             command

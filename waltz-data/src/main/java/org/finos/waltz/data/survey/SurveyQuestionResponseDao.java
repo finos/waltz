@@ -184,8 +184,11 @@ public class SurveyQuestionResponseDao {
     }
 
 
-    public int deletePreviousResponse(List<SurveyInstanceQuestionResponse> previousResponses) {
+    public int deletePreviousResponse(Optional<DSLContext> tx, List<SurveyInstanceQuestionResponse> previousResponses) {
         checkNotNull(previousResponses, "responses cannot be null");
+
+        DSLContext dslContext = tx.orElse(dsl);
+
         if (!previousResponses.isEmpty()) {
             Set<Long> instanceIds = map(
                     previousResponses,
@@ -198,13 +201,13 @@ public class SurveyQuestionResponseDao {
                     previousResponses,
                     qr -> qr.questionResponse().questionId());
 
-            int rmSingleCount = dsl
+            int rmSingleCount = dslContext
                     .deleteFrom(Tables.SURVEY_QUESTION_RESPONSE)
                     .where(SURVEY_QUESTION_RESPONSE.SURVEY_INSTANCE_ID.eq(instanceId))
                     .and(SURVEY_QUESTION_RESPONSE.QUESTION_ID.in(previousResponseIds))
                     .execute();
 
-            int rmListCount = dsl
+            int rmListCount = dslContext
                     .deleteFrom(SURVEY_QUESTION_LIST_RESPONSE)
                     .where(SURVEY_QUESTION_LIST_RESPONSE.SURVEY_INSTANCE_ID.eq(instanceId))
                     .and(SURVEY_QUESTION_LIST_RESPONSE.QUESTION_ID.in(previousResponseIds))
@@ -328,8 +331,11 @@ public class SurveyQuestionResponseDao {
     }
 
 
-    public void cloneResponses(long sourceSurveyInstanceId, long targetSurveyInstanceId) {
-        List<SurveyQuestionResponseRecord> responseRecords = dsl
+    public void cloneResponses(Optional<DSLContext> tx, long sourceSurveyInstanceId, long targetSurveyInstanceId) {
+
+        DSLContext dslContext = tx.orElse(dsl);
+
+        List<SurveyQuestionResponseRecord> responseRecords = dslContext
                 .select(SURVEY_QUESTION_RESPONSE.fields())
                 .select(entityNameField)
                 .from(SURVEY_QUESTION_RESPONSE)
@@ -343,7 +349,7 @@ public class SurveyQuestionResponseDao {
                 })
                 .collect(toList());
 
-        List<SurveyQuestionListResponseRecord> listResponseRecords = dsl
+        List<SurveyQuestionListResponseRecord> listResponseRecords = dslContext
                 .select(SURVEY_QUESTION_LIST_RESPONSE.fields())
                 .from(SURVEY_QUESTION_LIST_RESPONSE)
                 .where(SURVEY_QUESTION_LIST_RESPONSE.SURVEY_INSTANCE_ID.eq(sourceSurveyInstanceId))
@@ -356,7 +362,7 @@ public class SurveyQuestionResponseDao {
                 })
                 .collect(toList());
 
-        dsl.transaction(configuration -> {
+        dslContext.transaction(configuration -> {
             DSLContext txDsl = DSL.using(configuration);
 
             txDsl.batchInsert(responseRecords)

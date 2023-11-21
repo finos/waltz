@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -69,7 +70,7 @@ public class SurveyTemplateMigrate {
             LOG.info("Added recipients to new survey instance [id: {}]", newSiId);
 
             // withdraw the old one
-            siDao.updateStatus(si.id().get(), WITHDRAWN);
+            siDao.updateStatus(Optional.empty(), si.id().get(), WITHDRAWN);
             LOG.info("Old survey instance [id: {}] withdrawn", si.id().get());
         }
 

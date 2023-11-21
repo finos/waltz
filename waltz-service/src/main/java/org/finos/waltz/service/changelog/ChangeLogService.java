@@ -41,6 +41,7 @@ import org.finos.waltz.model.measurable_rating_replacement.MeasurableRatingRepla
 import org.finos.waltz.model.physical_flow.PhysicalFlow;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
 import org.finos.waltz.model.tally.DateTally;
+import org.jooq.DSLContext;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -152,7 +153,12 @@ public class ChangeLogService {
 
 
     public int write(ChangeLog changeLog) {
-        return changeLogDao.write(changeLog);
+        return changeLogDao.write(Optional.empty(), changeLog);
+    }
+
+
+    public int write(Optional<DSLContext> tx, ChangeLog changeLog) {
+        return changeLogDao.write(tx, changeLog);
     }
 
 
