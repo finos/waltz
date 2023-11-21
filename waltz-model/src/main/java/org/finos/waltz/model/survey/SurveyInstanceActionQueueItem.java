@@ -5,14 +5,14 @@ import org.finos.waltz.model.Nullable;
 import org.immutables.value.Value;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Value.Immutable
 public abstract class SurveyInstanceActionQueueItem implements IdProvider {
 
     public abstract SurveyInstanceAction action();
     public abstract Long surveyInstanceId();
-    @Nullable
-    public abstract String actionParams();
+    public abstract Optional<SurveyInstanceActionParams> actionParams();
     public abstract SurveyInstanceStatus initialState();
     public abstract LocalDateTime submittedAt();
     public abstract String submittedBy();

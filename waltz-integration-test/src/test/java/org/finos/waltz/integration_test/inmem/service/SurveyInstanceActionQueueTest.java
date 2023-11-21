@@ -1,13 +1,17 @@
 package org.finos.waltz.integration_test.inmem.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.JacksonUtilities;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.ReleaseLifecycleStatus;
+import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.survey.ImmutableInstancesAndRecipientsCreateCommand;
+import org.finos.waltz.model.survey.ImmutableSurveyInstanceActionParams;
 import org.finos.waltz.model.survey.ImmutableSurveyQuestionResponse;
 import org.finos.waltz.model.survey.ImmutableSurveyRunCreateCommand;
 import org.finos.waltz.model.survey.InstancesAndRecipientsCreateCommand;
@@ -18,6 +22,7 @@ import org.finos.waltz.model.survey.SurveyInstanceActionStatus;
 import org.finos.waltz.model.survey.SurveyInstanceStatus;
 import org.finos.waltz.model.survey.SurveyIssuanceKind;
 import org.finos.waltz.model.survey.SurveyQuestionResponse;
+import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.survey.SurveyInstanceActionQueueService;
 import org.finos.waltz.service.survey.SurveyInstanceService;
 import org.finos.waltz.service.survey.SurveyRunService;
@@ -32,17 +37,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
-import static java.lang.String.format;
 import static java.util.Collections.emptySet;
+import static org.finos.waltz.common.CollectionUtilities.any;
 import static org.finos.waltz.common.CollectionUtilities.find;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDate;
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
 
 @Service
 public class SurveyInstanceActionQueueTest extends BaseInMemoryIntegrationTest {
+
+    public static final String REASON_TEXT = "test reason to capture";
 
     @Autowired
     private AppHelper appHelper;
@@ -67,6 +76,9 @@ public class SurveyInstanceActionQueueTest extends BaseInMemoryIntegrationTest {
 
     @Autowired
     private InvolvementHelper involvementHelper;
+
+    @Autowired
+    private ChangeLogService changeLogService;
 
     @Test
     public void processActionsCanSubmitSurveys() throws InsufficientPrivelegeException {
@@ -306,7 +318,7 @@ public class SurveyInstanceActionQueueTest extends BaseInMemoryIntegrationTest {
         Assertions.assertEquals(SurveyInstanceActionStatus.SUCCESS, submit.status());
 
         // Approve
-        Long approvalId = actionQueueHelper.addActionToQueue(instance.id().get(), SurveyInstanceAction.APPROVING, "reason", SurveyInstanceStatus.COMPLETED, username);
+        Long approvalId = actionQueueHelper.addActionToQueue(instance.id().get(), SurveyInstanceAction.APPROVING, null, SurveyInstanceStatus.COMPLETED, username);
         actionQueueService.performActions();
 
         SurveyInstance postApproval = instanceService.getById(instance.id().get());
@@ -314,6 +326,42 @@ public class SurveyInstanceActionQueueTest extends BaseInMemoryIntegrationTest {
 
         SurveyInstanceActionQueueItem approval = actionQueueService.getById(approvalId);
         Assertions.assertEquals(SurveyInstanceActionStatus.SUCCESS, approval.status());
+    }
+
+
+    @Test
+    public void processActionsAbleToParseReasonFromAction() throws InsufficientPrivelegeException {
+        String username = mkName("reason");
+        SurveyInstance instance = setupSurvey("reason", username);
+
+        actionQueueHelper.addActionToQueue(instance.id().get(), SurveyInstanceAction.SUBMITTING, null, SurveyInstanceStatus.NOT_STARTED, username);
+
+        ImmutableSurveyInstanceActionParams reasonParams = ImmutableSurveyInstanceActionParams
+                .builder()
+                .reason(REASON_TEXT)
+                .build();
+
+        String reason = mkReasonString(reasonParams);
+
+        Long approvalId = actionQueueHelper.addActionToQueue(instance.id().get(), SurveyInstanceAction.APPROVING, reason, SurveyInstanceStatus.COMPLETED, username);
+        actionQueueService.performActions();
+
+        SurveyInstance postApproval = instanceService.getById(instance.id().get());
+        Assertions.assertEquals(SurveyInstanceStatus.APPROVED, postApproval.status(), "Action should be marked 'approved'");
+
+        SurveyInstanceActionQueueItem approval = actionQueueService.getById(approvalId);
+        Assertions.assertEquals(SurveyInstanceActionStatus.SUCCESS, approval.status());
+
+        List<ChangeLog> changeLogs = changeLogService.findByParentReference(mkRef(EntityKind.SURVEY_INSTANCE, postApproval.id().get()), Optional.empty(), Optional.empty());
+        Assertions.assertTrue(any(changeLogs, d -> d.message().contains(REASON_TEXT)), "Reason should be captured in the change log");
+    }
+
+    private String mkReasonString(ImmutableSurveyInstanceActionParams reason) {
+        try {
+            return JacksonUtilities.getJsonMapper().writeValueAsString(reason);
+        } catch (JsonProcessingException e) {
+            return null;
+        }
     }
 
 
@@ -335,7 +383,7 @@ public class SurveyInstanceActionQueueTest extends BaseInMemoryIntegrationTest {
         long invKindId = involvementHelper.mkInvolvementKind(mkName("invKind"));
         involvementHelper.createInvolvement(personId, invKindId, a1);
 
-        ImmutableSurveyRunCreateCommand runCmd = mkRunCommand(templateId, EntityReference.mkRef(EntityKind.ORG_UNIT, ouIds.a), invKindId);
+        ImmutableSurveyRunCreateCommand runCmd = mkRunCommand(templateId, mkRef(EntityKind.ORG_UNIT, ouIds.a), invKindId);
         Long runId = runService.createSurveyRun(username, runCmd).id().get();
 
         InstancesAndRecipientsCreateCommand createCmd = mkInstancesRecipCreateCmd(runId);

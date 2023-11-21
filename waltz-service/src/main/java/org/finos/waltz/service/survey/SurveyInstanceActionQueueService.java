@@ -4,6 +4,7 @@ import org.finos.waltz.common.Checks;
 import org.finos.waltz.data.survey.SurveyInstanceActionQueueDao;
 import org.finos.waltz.model.survey.ImmutableSurveyInstanceStatusChangeCommand;
 import org.finos.waltz.model.survey.SurveyInstance;
+import org.finos.waltz.model.survey.SurveyInstanceActionParams;
 import org.finos.waltz.model.survey.SurveyInstanceActionQueueItem;
 import org.finos.waltz.model.survey.SurveyInstanceActionStatus;
 import org.finos.waltz.model.survey.SurveyInstanceStatus;
@@ -25,6 +26,7 @@ public class SurveyInstanceActionQueueService {
     private final SurveyInstanceActionQueueDao surveyInstanceActionQueueDao;
     private final SurveyInstanceService surveyInstanceService;
     private final DSLContext dslContext;
+
 
     @Autowired
     SurveyInstanceActionQueueService(SurveyInstanceActionQueueDao surveyInstanceActionQueueDao,
@@ -90,10 +92,11 @@ public class SurveyInstanceActionQueueService {
 
                             String username = action.submittedBy();
 
+                            Optional<String> reason = action.actionParams().map(SurveyInstanceActionParams::reason).orElse(Optional.empty());
                             ImmutableSurveyInstanceStatusChangeCommand updateCmd = ImmutableSurveyInstanceStatusChangeCommand
                                     .builder()
                                     .action(action.action())
-                                    .reason(Optional.ofNullable(action.actionParams()))
+                                    .reason(reason)
                                     .build();
 
                             try {

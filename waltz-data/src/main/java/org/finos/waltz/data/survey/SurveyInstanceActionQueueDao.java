@@ -1,8 +1,11 @@
 package org.finos.waltz.data.survey;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.model.survey.ImmutableSurveyInstanceActionQueueItem;
 import org.finos.waltz.model.survey.SurveyInstanceAction;
+import org.finos.waltz.model.survey.SurveyInstanceActionParams;
 import org.finos.waltz.model.survey.SurveyInstanceActionQueueItem;
 import org.finos.waltz.model.survey.SurveyInstanceActionStatus;
 import org.finos.waltz.model.survey.SurveyInstanceStatus;
@@ -19,9 +22,11 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
+import static org.finos.waltz.common.JacksonUtilities.getJsonMapper;
 import static org.finos.waltz.schema.Tables.SURVEY_INSTANCE_ACTION_QUEUE;
 
 @Repository
@@ -30,12 +35,16 @@ public class SurveyInstanceActionQueueDao {
     private final DSLContext dsl;
 
     public static final RecordMapper<Record, SurveyInstanceActionQueueItem> TO_DOMAIN_MAPPER = r -> {
+
         SurveyInstanceActionQueueRecord record = r.into(SURVEY_INSTANCE_ACTION_QUEUE);
+
+        Optional<SurveyInstanceActionParams> surveyInstanceActionParams = readParams(getJsonMapper(), record.getActionParams());
+
         return ImmutableSurveyInstanceActionQueueItem.builder()
                 .id(record.getId())
                 .action(SurveyInstanceAction.valueOf(record.getAction()))
                 .surveyInstanceId(record.getSurveyInstanceId())
-                .actionParams(record.getActionParams())
+                .actionParams(surveyInstanceActionParams)
                 .initialState(SurveyInstanceStatus.valueOf(record.getInitialState()))
                 .submittedAt(DateTimeUtilities.toLocalDateTime(record.getSubmittedAt()))
                 .submittedBy(record.getSubmittedBy())
@@ -45,6 +54,19 @@ public class SurveyInstanceActionQueueDao {
                 .provenance(record.getProvenance())
                 .build();
     };
+
+
+    private static Optional<SurveyInstanceActionParams> readParams(ObjectMapper jsonMapper, String actionParams) {
+        if(actionParams == null) {
+            return Optional.empty();
+        } else {
+            try {
+                return Optional.ofNullable(jsonMapper.readValue(actionParams, SurveyInstanceActionParams.class));
+            } catch (JsonProcessingException e) {
+                return Optional.empty();
+            }
+        }
+    }
 
 
     @Autowired
