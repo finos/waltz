@@ -97,7 +97,7 @@ function controller(serviceBroker) {
                 .execute(
                     CORE_API.TaxonomyManagementStore.findAllChangesByDomain,
                     [vm.parentEntityRef])
-                .then(r => vm.items = console.log(r.data) || _
+                .then(r => vm.items = _
                     .chain(r.data)
                     .filter(d => d.status === "EXECUTED")
                     .map(d => {
