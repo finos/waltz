@@ -184,7 +184,6 @@ function controller($q, displayNameService, descriptionService, serviceBroker, i
                     .filter(d => d.direction === "EXACT")
                     .value();
                 applyFilters();
-                console.log({raw: vm.rawGridData, curr: vm.currentInvolvements})
             });
     };
 

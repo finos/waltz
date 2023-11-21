@@ -20,7 +20,6 @@
 import angular from "angular";
 import CategoryStore from "./services/measurable-category-store";
 import TaxonomyChangesSection from "./components/taxonomy-changes/taxonomy-changes-section"
-import TaxonomyChangeSummaryCell from "./components/taxonomy-change-summary-cell/taxonomy-change-summary-cell"
 import Routes from "./routes";
 import {registerComponents, registerStores} from "../common/module-utils";
 
@@ -32,8 +31,7 @@ export default () => {
     registerComponents(
         module,
         [
-            TaxonomyChangesSection,
-            TaxonomyChangeSummaryCell
+            TaxonomyChangesSection
         ]);
 
     module.config(Routes);
