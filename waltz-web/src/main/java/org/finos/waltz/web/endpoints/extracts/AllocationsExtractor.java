@@ -28,14 +28,25 @@ import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Record1;
 import org.jooq.Record2;
-import org.jooq.Select;
 import org.jooq.SelectConditionStep;
 import org.jooq.SelectSelectStep;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static org.finos.waltz.schema.Tables.*;
+import java.util.Optional;
+
+import static org.finos.waltz.schema.Tables.ALLOCATION;
+import static org.finos.waltz.schema.Tables.ALLOCATION_SCHEME;
+import static org.finos.waltz.schema.Tables.APPLICATION;
+import static org.finos.waltz.schema.Tables.ENTITY_HIERARCHY;
+import static org.finos.waltz.schema.Tables.MEASURABLE;
+import static org.finos.waltz.schema.Tables.MEASURABLE_CATEGORY;
+import static org.finos.waltz.schema.Tables.MEASURABLE_RATING;
+import static org.finos.waltz.schema.Tables.ORGANISATIONAL_UNIT;
+import static org.finos.waltz.schema.Tables.RATING_SCHEME_ITEM;
+import static org.finos.waltz.web.WebUtilities.mkPath;
+import static spark.Spark.get;
 import static spark.Spark.post;
 
 
@@ -54,9 +65,10 @@ public class AllocationsExtractor extends DirectQueryBasedDataExtractor {
 
     @Override
     public void register() {
-        registerExtractForAll( WebUtilities.mkPath("data-extract", "allocations", "all"));
-        registerExtractForCategory( WebUtilities.mkPath("data-extract", "allocations", "measurable-category", ":measurableCategoryId"));
-        registerExtractForScheme( WebUtilities.mkPath("data-extract", "allocations", "allocation-scheme", ":schemeId"));
+        registerExtractForAll(mkPath("data-extract", "allocations", "all"));
+        registerExtractForCategory(mkPath("data-extract", "allocations", "measurable-category", ":measurableCategoryId"));
+        registerExtractForMeasurable(mkPath("data-extract", "allocations", "measurable", ":id"));
+        registerExtractForScheme(mkPath("data-extract", "allocations", "allocation-scheme", ":schemeId"));
     }
 
 
@@ -65,10 +77,38 @@ public class AllocationsExtractor extends DirectQueryBasedDataExtractor {
             IdSelectionOptions idSelectionOptions = WebUtilities.readIdSelectionOptionsFromBody(request);
             SelectConditionStep<Record> qry = prepareQuery(
                     DSL.trueCondition(),
-                    idSelectionOptions);
+                    Optional.of(idSelectionOptions));
 
             return writeExtract(
                     "all_allocations",
+                    qry,
+                    request,
+                    response);
+        });
+    }
+
+
+    private void registerExtractForMeasurable(String path) {
+        get(path, (request, response) -> {
+
+            long measurableId = WebUtilities.getId(request);
+
+            Record1<String> fileName = dsl
+                    .select(DSL.concat(MEASURABLE.NAME, "_all_allocations"))
+                    .from(MEASURABLE)
+                    .where(MEASURABLE.ID.eq(measurableId))
+                    .fetchOne();
+
+            SelectConditionStep<Record> qry = prepareQuery(
+                    MEASURABLE.ID.in(DSL
+                            .select(ENTITY_HIERARCHY.ID)
+                            .from(ENTITY_HIERARCHY)
+                            .where(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name())
+                                    .and(ENTITY_HIERARCHY.ANCESTOR_ID.eq(measurableId)))),
+                    Optional.empty());
+
+            return writeExtract(
+                    fileName.value1(),
                     qry,
                     request,
                     response);
@@ -91,7 +131,7 @@ public class AllocationsExtractor extends DirectQueryBasedDataExtractor {
 
             SelectConditionStep<Record> qry = prepareQuery(
                     MEASURABLE.MEASURABLE_CATEGORY_ID.eq(measurableCategoryId),
-                    applicationIdSelectionOptions);
+                    Optional.of(applicationIdSelectionOptions));
 
             return writeExtract(
                     fileName.value1(),
@@ -118,7 +158,7 @@ public class AllocationsExtractor extends DirectQueryBasedDataExtractor {
 
             SelectConditionStep<Record> qry = prepareQuery(
                     ALLOCATION_SCHEME.ID.eq(schemeId),
-                    applicationIdSelectionOptions);
+                    Optional.of(applicationIdSelectionOptions));
 
             String filename = fileNameInfoRow.value1() + "_" + fileNameInfoRow.value2();
 
@@ -134,8 +174,7 @@ public class AllocationsExtractor extends DirectQueryBasedDataExtractor {
     // -- HELPER ----
 
     private SelectConditionStep<Record> prepareQuery(Condition additionalCondition,
-                                                     IdSelectionOptions idSelectionOptions) {
-        Select<Record1<Long>> appSelector = applicationIdSelectorFactory.apply(idSelectionOptions);
+                                                     Optional<IdSelectionOptions> idSelectionOptions) {
         SelectSelectStep<Record> reportColumns = dsl
                 .select(APPLICATION.NAME.as("Application Name"),
                         APPLICATION.ID.as("Application Waltz Id"),
@@ -162,8 +201,13 @@ public class AllocationsExtractor extends DirectQueryBasedDataExtractor {
                         DSL.coalesce(ALLOCATION.LAST_UPDATED_BY, "").as("Allocation Last Updated By"),
                         DSL.coalesce(ALLOCATION.PROVENANCE, "").as("Allocation Provenance"));
 
-        Condition condition = MEASURABLE_RATING.ENTITY_ID.in(appSelector)
-                .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+        Condition appCondition = idSelectionOptions
+                .map(applicationIdSelectorFactory)
+                .map(selector -> MEASURABLE_RATING.ENTITY_ID.in(selector)
+                        .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
+                .orElse(DSL.trueCondition());
+
+        Condition condition = appCondition
                 .and(ENTITY_HIERARCHY.ID.eq(ENTITY_HIERARCHY.ANCESTOR_ID))
                 .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name()))
                 .and(ENTITY_HIERARCHY.ID.eq(MEASURABLE_RATING.MEASURABLE_ID))
