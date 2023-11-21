@@ -14,9 +14,9 @@
         $pageInfo = {
             state: "main.physical-flow.registration",
             params: {
-                targetLogicalFlowId: flow.logicalFlow.id,
-                kind: flow.direction === Directions.INBOUND ? flow.logicalFlow.target.kind : flow.logicalFlow.source.kind,
-                id: flow.direction === Directions.INBOUND ? flow.logicalFlow.target.id : flow.logicalFlow.source.id
+                targetLogicalFlowId: flow.id,
+                kind: flow.direction === Directions.INBOUND ? flow.target.kind : flow.source.kind,
+                id: flow.direction === Directions.INBOUND ? flow.target.id : flow.source.id
             }
         };
     }
@@ -25,12 +25,12 @@
         $pageInfo = {
             state: "main.logical-flow.view",
             params: {
-                id: flow.logicalFlow.id
+                id: flow.id
             }
         }
     }
 
-    export let assessmentDefinitions = [];
+    export let assessmentDefinitions;
 
     let flowClassificationCall = flowClassificationStore.findAll();
     let permissionsCall = null;
@@ -138,39 +138,33 @@
     </table>
 {/if}
 
-<div class="small">
-    <details>
-        <summary>Actions</summary>
-        <menu>
-            {#if hasEditPermission}
-                <li>
-                <span>
-                    <button class="btn btn-skinny"
-                            on:click={() => goToPhysicalFlowEdit(flow)}>
-                        Add physical flow
-                    </button>
-                    <span class="help-block">
-                        This will open the flow registration page
-                    </span>
-                </span>
-                </li>
-            {/if}
+<details>
+    <summary>Actions</summary>
+    <menu>
+        {#if hasEditPermission}
             <li>
-            <span>
                 <button class="btn btn-skinny"
-                        on:click={() => goToLogicalFlowPage(flow)}>
-                    Visit the logical flow page
+                        on:click={() => goToPhysicalFlowEdit(flow)}>
+                    Add physical flow
                 </button>
-                {#if hasEditPermission}
-                    <span class="help-block">
-                        To remove the flow or edit it's data types
-                    </span>
-                {/if}
-            </span>
+                <span class="help-block">
+                    This will open the flow registration page
+                </span>
             </li>
-        </menu>
-    </details>
-</div>
+        {/if}
+        <li>
+            <button class="btn btn-skinny"
+                    on:click={() => goToLogicalFlowPage(flow)}>
+                Visit the logical flow page
+            </button>
+            {#if hasEditPermission}
+                <span class="help-block">
+                    To remove the flow or edit it's data types
+                </span>
+            {/if}
+        </li>
+    </menu>
+</details>
 
 
 <style>
@@ -182,5 +176,13 @@
         border-radius: 2px;
         position: relative;
         top: 2px;
+    }
+
+    menu {
+        padding-left: 1em;
+    }
+
+    menu li {
+        list-style: none;
     }
 </style>

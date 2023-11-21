@@ -32,7 +32,7 @@
         <div class="col-md-12">
 
             {#if $selectedLogicalFlow}
-                <SelectedLogicalFlowDetail assessment-definitions={assessmentDefinitions}/>
+                <SelectedLogicalFlowDetail {assessmentDefinitions}/>
             {/if}
 
             {#if $selectedPhysicalFlow}

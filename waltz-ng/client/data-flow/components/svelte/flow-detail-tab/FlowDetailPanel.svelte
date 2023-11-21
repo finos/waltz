@@ -15,7 +15,7 @@
         mkFlowDetails,
         mkLogicalFromFlowDetails
     } from "./flow-detail-utils";
-    import SelectedFlowDetail from "./SelectedFlowDetailPanel.svelte";
+    import SelectedFlowDetailPanel from "./SelectedFlowDetailPanel.svelte";
     import AssessmentFilters from "./AssessmentFilters.svelte";
     import DataTypeFilters from "./DataTypeFilters.svelte";
     import InboundOutboundFilters from "./InboundOutboundFilters.svelte";
@@ -188,7 +188,7 @@
     </div>
     {#if $selectedLogicalFlow || $selectedPhysicalFlow}
         <div class="flow-detail-context-panel">
-            <SelectedFlowDetail assessmentDefinitions={logicalFlowPrimaryAssessments}/>
+            <SelectedFlowDetailPanel assessmentDefinitions={logicalFlowPrimaryAssessments}/>
         </div>
     {/if}
 </div>

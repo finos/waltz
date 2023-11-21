@@ -115,28 +115,28 @@
 
 <br>
 
-<div class="actions">
+<details>
+    <summary>Actions</summary>
     <menu>
         <li>
-            <span>
-                <button class="btn btn-skinny"
-                        on:click={() => goToPhysicalFlowPage($selectedPhysicalFlow)}>
-                    Visit the physical flow page
-                </button>
-                {#if hasEditPermission}
-                    <span class="text-muted">To remove the flow or edit it's attributes</span>
-                {/if}
-            </span>
+            <button class="btn btn-skinny"
+                    on:click={() => goToPhysicalFlowPage($selectedPhysicalFlow)}>
+                Visit the physical flow page
+            </button>
+            {#if hasEditPermission}
+                <span class="help-block">To remove the flow or edit it's attributes</span>
+            {/if}
         </li>
     </menu>
-</div>
+</details>
 
 
 <style>
-    .actions {
-        border: 1px solid #eee;
-        background: #f5f5f5;
-        border-radius: 2px;
-        padding-top: 0.5em;
+    menu {
+        padding-left: 1em;
+    }
+
+    menu li {
+        list-style: none;
     }
 </style>
