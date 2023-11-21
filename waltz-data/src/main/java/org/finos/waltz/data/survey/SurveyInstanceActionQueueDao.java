@@ -61,7 +61,7 @@ public class SurveyInstanceActionQueueDao {
     }
 
 
-    public SurveyInstanceActionQueueItem getById(Long id) {
+    public SurveyInstanceActionQueueItem getById(long id) {
         Condition idCondition = SURVEY_INSTANCE_ACTION_QUEUE.ID.eq(id);
         return mkSelectByCondition(dsl, idCondition)
                 .fetchOne(TO_DOMAIN_MAPPER);

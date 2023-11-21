@@ -142,7 +142,15 @@ public class SurveyInstanceActionQueueService {
                     });
 
                 });
+    }
 
+
+    public List<SurveyInstanceActionQueueItem> findPendingActions() {
+        return surveyInstanceActionQueueDao.findPendingActions();
+    }
+
+    public SurveyInstanceActionQueueItem getById(long id) {
+        return surveyInstanceActionQueueDao.getById(id);
     }
 
 }

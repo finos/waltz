@@ -62,6 +62,20 @@ public class SurveyTemplateHelper {
         return surveyQuestionService.create(question);
     }
 
+    public long addMandatoryQuestion(long templateId) {
+
+        SurveyQuestion question = ImmutableSurveyQuestion
+                .builder()
+                .fieldType(SurveyQuestionFieldType.TEXT)
+                .sectionName("section")
+                .questionText("question")
+                .surveyTemplateId(templateId)
+                .isMandatory(true)
+                .build();
+
+        return surveyQuestionService.create(question);
+    }
+
     public void deleteAllSurveyTemplate() {
         dsl.deleteFrom(SURVEY_QUESTION_RESPONSE).execute();
         dsl.deleteFrom(SURVEY_QUESTION).execute();
