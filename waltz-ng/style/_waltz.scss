@@ -457,8 +457,9 @@ a[disabled="disabled"] {
 details {
     background: #f5f5f5;
     border: 1px solid #eee;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
     padding: .5rem 1rem;
+    border-radius: 5px;
 }
 
 details summary {
