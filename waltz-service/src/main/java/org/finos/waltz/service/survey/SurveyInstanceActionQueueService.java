@@ -1,14 +1,19 @@
 package org.finos.waltz.service.survey;
 
 import org.finos.waltz.common.Checks;
-import org.finos.waltz.common.CollectionUtilities;
 import org.finos.waltz.data.survey.SurveyInstanceActionQueueDao;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.Severity;
+import org.finos.waltz.model.changelog.ChangeLog;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.survey.ImmutableSurveyInstanceStatusChangeCommand;
 import org.finos.waltz.model.survey.SurveyInstance;
 import org.finos.waltz.model.survey.SurveyInstanceActionParams;
 import org.finos.waltz.model.survey.SurveyInstanceActionQueueItem;
 import org.finos.waltz.model.survey.SurveyInstanceActionStatus;
 import org.finos.waltz.model.survey.SurveyInstanceStatus;
+import org.finos.waltz.service.changelog.ChangeLogService;
 import org.jooq.DSLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.lang.String.format;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 @Service
 public class SurveyInstanceActionQueueService {
@@ -27,20 +33,25 @@ public class SurveyInstanceActionQueueService {
     private static final Logger LOG = LoggerFactory.getLogger(SurveyInstanceActionQueueService.class);
     private final SurveyInstanceActionQueueDao surveyInstanceActionQueueDao;
     private final SurveyInstanceService surveyInstanceService;
+
+    private final ChangeLogService changeLogService;
     private final DSLContext dslContext;
 
 
     @Autowired
     SurveyInstanceActionQueueService(SurveyInstanceActionQueueDao surveyInstanceActionQueueDao,
                                      SurveyInstanceService surveyInstanceService,
+                                     ChangeLogService changeLogService,
                                      DSLContext dslContext) {
 
         Checks.checkNotNull(surveyInstanceActionQueueDao, "surveyInstanceActionQueueDao cannot be null");
         Checks.checkNotNull(surveyInstanceService, "surveyInstanceService cannot be null");
+        Checks.checkNotNull(changeLogService, "changeLogService cannot be null");
         Checks.checkNotNull(dslContext, "dslContext cannot be null");
 
         this.surveyInstanceActionQueueDao = surveyInstanceActionQueueDao;
         this.surveyInstanceService = surveyInstanceService;
+        this.changeLogService = changeLogService;
         this.dslContext = dslContext;
     }
 
@@ -68,27 +79,35 @@ public class SurveyInstanceActionQueueService {
 
                         if (instance == null) {
 
-                            String msg = format("Could not find survey instance with id: %d to apply action: %s", action.surveyInstanceId(), action.action().name());
+                            String msg = format("Failed to apply queued action: %s. Could not find survey instance with id: %d", action.action().name(), action.surveyInstanceId());
+
                             LOG.info(msg);
                             surveyInstanceActionQueueDao.updateActionStatus(
                                     tx,
                                     actionId,
                                     SurveyInstanceActionStatus.PRECONDITION_FAILURE,
                                     msg);
+
+                            ChangeLog changeLog = mkChangelogForAction(tx, action, msg);
+                            changeLogService.write(Optional.of(tx), changeLog);
 
                         } else if (instance.status() != action.initialState()) {
 
-                            String msg = format("Initial state of survey instance with id: %d is not as expected: %s and is actually %s, will not apply action: %s",
+                            String msg = format("Failed to apply queued action: %s. Initial state of survey instance with id: %d is not as expected: %s and is actually %s",
+                                    action.action().name(),
                                     action.surveyInstanceId(),
                                     action.initialState().name(),
-                                    instance.status().name(),
-                                    action.action().name());
+                                    instance.status().name());
+
                             LOG.info(msg);
                             surveyInstanceActionQueueDao.updateActionStatus(
                                     tx,
                                     actionId,
                                     SurveyInstanceActionStatus.PRECONDITION_FAILURE,
                                     msg);
+
+                            ChangeLog changeLog = mkChangelogForAction(tx, action, msg);
+                            changeLogService.write(Optional.of(tx), changeLog);
 
                         } else {
 
@@ -119,8 +138,7 @@ public class SurveyInstanceActionQueueService {
                                             action.surveyInstanceId(),
                                             updateCmd);
 
-                                    String msg = format("Successfully updated survey instance id: %d with action: %s, new status is: %s",
-                                            action.surveyInstanceId(),
+                                    String msg = format("Successfully applied queued action: %s. New status is: %s",
                                             action.action().name(),
                                             surveyInstanceStatus.name());
 
@@ -130,14 +148,17 @@ public class SurveyInstanceActionQueueService {
                                             actionId,
                                             SurveyInstanceActionStatus.SUCCESS,
                                             null);
+
+                                    ChangeLog changeLog = mkChangelogForAction(tx, action, msg);
+                                    changeLogService.write(Optional.of(tx), changeLog);
                                 });
 
 
                             } catch (Exception e) {
 
-                                String msg = format("Error when updating survey instance id: %d with action: %s. %s",
-                                        action.surveyInstanceId(),
+                                String msg = format("Failed to apply queued action: %s. Error when updating survey instance id: %d, %s",
                                         action.action().name(),
+                                        action.surveyInstanceId(),
                                         e.getMessage());
 
                                 LOG.error(msg);
@@ -146,12 +167,27 @@ public class SurveyInstanceActionQueueService {
                                         actionId,
                                         SurveyInstanceActionStatus.EXECUTION_FAILURE,
                                         msg);
+
+                                ChangeLog changeLog = mkChangelogForAction(tx, action, msg);
+                                changeLogService.write(Optional.of(tx), changeLog);
                             }
                         }
 
                     });
 
                 });
+    }
+
+
+    private ChangeLog mkChangelogForAction(DSLContext tx, SurveyInstanceActionQueueItem action, String msg) {
+        return ImmutableChangeLog
+                .builder()
+                .message(msg)
+                .userId(action.submittedBy())
+                .parentReference(mkRef(EntityKind.SURVEY_INSTANCE, action.surveyInstanceId()))
+                .operation(Operation.UPDATE)
+                .severity(Severity.INFORMATION)
+                .build();
     }
 
 
