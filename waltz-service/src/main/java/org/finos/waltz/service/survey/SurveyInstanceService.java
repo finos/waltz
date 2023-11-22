@@ -264,7 +264,7 @@ public class SurveyInstanceService {
 
 
     /**
-     * Uupdates a survey instance using a StatusChangeCommand. If a DSLContext is provided it will use this otherwise will use the DSLContext within the DAO.
+     * Updates a survey instance using a StatusChangeCommand. If a DSLContext is provided it will use this otherwise will use the DSLContext within the DAO.
      * @param tx optional DSLContext to use as part of a transaction
      * @param userName the user to submit the status change
      * @param instanceId the id of the survey being updated
@@ -319,8 +319,12 @@ public class SurveyInstanceService {
                 checkTrue(newStatus.equals(SurveyInstanceStatus.IN_PROGRESS), "The resolved new status for REOPENING should be 'IN_PROGRESS', resolved to: " + newStatus);
                 // if survey is being sent back, store current responses as a version
                 long versionedInstanceId = surveyInstanceDao.createPreviousVersion(tx, surveyInstance);
-                surveyQuestionResponseDao.cloneResponses(tx, surveyInstance.id().get(), versionedInstanceId);
-                nbupdates = surveyInstanceDao.reopenSurvey(tx, instanceId);
+                surveyQuestionResponseDao.cloneResponses(tx, instanceId, versionedInstanceId);
+                nbupdates = surveyInstanceDao.reopenSurvey(
+                        tx,
+                        instanceId,
+                        command.newDueDate().orElse(surveyInstance.dueDate()),
+                        command.newApprovalDueDate().orElse(surveyInstance.approvalDueDate()));
                 break;
             default:
                 nbupdates = surveyInstanceDao.updateStatus(tx, instanceId, newStatus);
@@ -544,16 +548,24 @@ public class SurveyInstanceService {
     public SurveyInstancePermissions getPermissions(String userName, Long instanceId) {
 
         Person person = personDao.getActiveByUserEmail(userName);
+
         SurveyInstance instance = surveyInstanceDao.getById(instanceId);
         SurveyRun run = surveyRunDao.getById(instance.surveyRunId());
 
         boolean isAdmin = userRoleService.hasRole(userName, SystemRole.SURVEY_ADMIN);
-        boolean isParticipant = surveyInstanceRecipientDao.isPersonInstanceRecipient(person.id().get(), instanceId);
-        boolean isOwner = person.id()
+
+        boolean isParticipant = person != null && person.id()
+                .map(pid -> surveyInstanceRecipientDao.isPersonInstanceRecipient(pid, instanceId))
+                .orElse(false);
+
+        boolean isOwner = person != null && person.id()
                 .map(pid -> surveyInstanceOwnerDao.isPersonInstanceOwner(pid, instanceId) || Objects.equals(run.ownerId(), pid))
                 .orElse(false);
-        boolean hasOwningRole = userRoleService.hasRole(person.email(), instance.owningRole());
+
+        boolean hasOwningRole = userRoleService.hasRole(userName, instance.owningRole());
+
         boolean isLatest = instance.originalInstanceId() == null;
+
         boolean editableStatus = instance.status() == SurveyInstanceStatus.NOT_STARTED || instance.status() == SurveyInstanceStatus.IN_PROGRESS;
 
         return ImmutableSurveyInstancePermissions.builder()

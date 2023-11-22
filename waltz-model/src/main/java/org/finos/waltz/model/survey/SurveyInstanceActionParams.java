@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.immutables.value.Value;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Value.Immutable
@@ -12,5 +13,7 @@ import java.util.Optional;
 public abstract class SurveyInstanceActionParams {
 
     public abstract Optional<String> reason();
+    public abstract Optional<LocalDate> newDueDate();
+    public abstract Optional<LocalDate> newApprovalDueDate();
 
 }

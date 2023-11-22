@@ -1,6 +1,7 @@
 package org.finos.waltz.service.survey;
 
 import org.finos.waltz.common.Checks;
+import org.finos.waltz.common.CollectionUtilities;
 import org.finos.waltz.data.survey.SurveyInstanceActionQueueDao;
 import org.finos.waltz.model.survey.ImmutableSurveyInstanceStatusChangeCommand;
 import org.finos.waltz.model.survey.SurveyInstance;
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -92,11 +94,16 @@ public class SurveyInstanceActionQueueService {
 
                             String username = action.submittedBy();
 
-                            Optional<String> reason = action.actionParams().map(SurveyInstanceActionParams::reason).orElse(Optional.empty());
+                            Optional<String> reason = action.actionParams().flatMap(SurveyInstanceActionParams::reason);
+                            Optional<LocalDate> dueDate = action.actionParams().flatMap(SurveyInstanceActionParams::newDueDate);
+                            Optional<LocalDate> approvalDueDate = action.actionParams().flatMap(SurveyInstanceActionParams::newApprovalDueDate);
+
                             ImmutableSurveyInstanceStatusChangeCommand updateCmd = ImmutableSurveyInstanceStatusChangeCommand
                                     .builder()
                                     .action(action.action())
                                     .reason(reason)
+                                    .newDueDate(dueDate)
+                                    .newApprovalDueDate(approvalDueDate)
                                     .build();
 
                             try {

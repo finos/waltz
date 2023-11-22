@@ -17,6 +17,7 @@ import org.finos.waltz.model.survey.ImmutableSurveyRunCreateCommand;
 import org.finos.waltz.model.survey.InstancesAndRecipientsCreateCommand;
 import org.finos.waltz.model.survey.SurveyInstance;
 import org.finos.waltz.model.survey.SurveyInstanceAction;
+import org.finos.waltz.model.survey.SurveyInstanceActionParams;
 import org.finos.waltz.model.survey.SurveyInstanceActionQueueItem;
 import org.finos.waltz.model.survey.SurveyInstanceActionStatus;
 import org.finos.waltz.model.survey.SurveyInstanceStatus;
@@ -356,7 +357,7 @@ public class SurveyInstanceActionQueueTest extends BaseInMemoryIntegrationTest {
         Assertions.assertTrue(any(changeLogs, d -> d.message().contains(REASON_TEXT)), "Reason should be captured in the change log");
     }
 
-    private String mkReasonString(ImmutableSurveyInstanceActionParams reason) {
+    private String mkReasonString(SurveyInstanceActionParams reason) {
         try {
             return JacksonUtilities.getJsonMapper().writeValueAsString(reason);
         } catch (JsonProcessingException e) {

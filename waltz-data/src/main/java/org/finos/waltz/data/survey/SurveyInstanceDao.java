@@ -400,8 +400,13 @@ public class SurveyInstanceDao {
                 .execute();
     }
 
-    public int reopenSurvey(Optional<DSLContext> tx, long instanceId) {
+    public int reopenSurvey(Optional<DSLContext> tx,
+                            long instanceId,
+                            LocalDate dueDate,
+                            LocalDate approvalDueDate) {
+
         DSLContext dslContext = tx.orElse(dsl);
+
         return dslContext
                 .update(si)
                 .set(si.STATUS, SurveyInstanceStatus.IN_PROGRESS.name())
@@ -410,6 +415,8 @@ public class SurveyInstanceDao {
                 .set(si.SUBMITTED_AT, (Timestamp) null)
                 .set(si.SUBMITTED_BY, (String) null)
                 .set(si.ISSUED_ON, toSqlDate(nowUtcTimestamp())) //update the issued on to the current date
+                .set(si.DUE_DATE, toSqlDate(dueDate))
+                .set(si.APPROVAL_DUE_DATE, toSqlDate(approvalDueDate))
                 .where(si.ID.eq(instanceId)
                         .and(si.ORIGINAL_INSTANCE_ID.isNull())
                         .and(si.STATUS.in(
