@@ -41,6 +41,24 @@ function authProviderSetup($authProvider, BaseUrl) {
     $authProvider.linkedin({
         clientId: "LinkedIn Client ID"
     });
+
+    $authProvider.oauth2({
+        name: 'oauthprovider',
+        clientId: 'Waltz',
+        url: 'authentication/oauth',
+        authorizationEndpoint: '',
+        redirectUri: '',
+        optionalUrlParams: ['scope', 'save_consent', 'csrf', 'code_challenge', 'code_challenge_method'],
+        scope: ['userid+email+profile+roles'],
+        scopeDelimiter: ' ',
+        saveConsent: '',
+        csrf: '',
+        codeChallenge: '',
+        codeChallengeMethod: 'S256',
+        oauthType: '2.0',
+        responseType: 'code',
+        popupOptions: { width: 600, height: 500 }
+    });
 }
 
 authProviderSetup.$inject = [

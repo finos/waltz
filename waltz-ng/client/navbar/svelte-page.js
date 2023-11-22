@@ -6,8 +6,9 @@ import ToastStore from "../svelte-stores/toast-store"
 import Popover from "../common/svelte/popover/Popover.svelte";
 import {isIE} from "../common/browser-utils";
 
-function controller($scope, $timeout, settingsService, $rootScope) {
+function controller($scope, $timeout, settingsService, $rootScope, $auth) {
     const vm = this;
+    $scope.isAuthFailed = false;
 
     vm.Sidebar = Sidebar;
     vm.Toasts = Toasts;
@@ -27,6 +28,10 @@ function controller($scope, $timeout, settingsService, $rootScope) {
         unsubVisible();
     };
 
+    $scope.isAuthenticated = function() {
+        return $auth.isAuthenticated();
+    }
+
 
     vm.$onInit = () => {
         if (isIE()) {
@@ -43,7 +48,8 @@ controller.$inject = [
     "$scope",
     "$timeout",
     "SettingsService",
-    "$rootScope"
+    "$rootScope",
+    "$auth"
 ];
 
 const component = {
