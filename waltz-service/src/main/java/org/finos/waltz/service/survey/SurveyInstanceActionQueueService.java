@@ -93,7 +93,7 @@ public class SurveyInstanceActionQueueService {
 
                         } else if (instance.status() != action.initialState()) {
 
-                            String msg = format("Failed to apply queued action: %s. Initial state of survey instance with id: %d is not as expected: %s and is actually %s",
+                            String msg = format("Failed to apply queued action: %s to survey: %d. Initial state of survey is not as expected: %s and is actually %s",
                                     action.action().name(),
                                     action.surveyInstanceId(),
                                     action.initialState().name(),
@@ -138,8 +138,9 @@ public class SurveyInstanceActionQueueService {
                                             action.surveyInstanceId(),
                                             updateCmd);
 
-                                    String msg = format("Successfully applied queued action: %s. New status is: %s",
+                                    String msg = format("Successfully applied queued action: %s to survey: %d. New status is: %s",
                                             action.action().name(),
+                                            action.surveyInstanceId(),
                                             surveyInstanceStatus.name());
 
                                     LOG.info(msg);
@@ -156,7 +157,7 @@ public class SurveyInstanceActionQueueService {
 
                             } catch (Exception e) {
 
-                                String msg = format("Failed to apply queued action: %s. Error when updating survey instance id: %d, %s",
+                                String msg = format("Failed to apply queued action: %s to survey: %d. Error when updating: %s",
                                         action.action().name(),
                                         action.surveyInstanceId(),
                                         e.getMessage());
