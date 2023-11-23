@@ -12,6 +12,7 @@
     import pageInfo from "../../../../svelte-stores/page-navigation-store";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import {logicalFlowStore} from "../../../../svelte-stores/logical-flow-store";
+    import DescriptionFade from "../../../../common/svelte/DescriptionFade.svelte";
 
     function goToPhysicalFlowPage(flow) {
         $pageInfo = {
@@ -34,6 +35,7 @@
     $: logicalFlow = $selectedPhysicalFlow.logicalFlow;
     $: physicalFlow = $selectedPhysicalFlow.physicalFlow;
     $: specification = $selectedPhysicalFlow.specification;
+    $: dataTypesForSpecification = $selectedPhysicalFlow.dataTypesForSpecification;
 
     $: ref = {
         id: physicalFlow.id,
@@ -72,6 +74,19 @@
         </td>
     </tr>
     <tr>
+        <td>Data Types</td>
+        <td>
+            <ul class="list-inline">
+                {#each _.chain(dataTypesForSpecification).map(d => d.decoratorEntity).sort(d => d.name).uniq().value() as dt}
+                    <li>
+                        <EntityLink showIcon={false}
+                                    ref={dt}/>
+                    </li>
+                {/each}
+            </ul>
+        </td>
+    </tr>
+    <tr>
         <td>Specification Format</td>
         <td>
             {toDataFormatKindName(nestedEnums, specification.format)}
@@ -106,7 +121,8 @@
         <tr>
             <td>Description</td>
             <td>
-                {physicalFlow.description}
+                <DescriptionFade expanderAlignment={"right"}
+                                 text={physicalFlow.description}/>
             </td>
         </tr>
     {/if}

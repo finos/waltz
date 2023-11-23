@@ -1,11 +1,11 @@
 <script>
 
 
-    import {mkDataTypeFilter, mkDataTypeFilterId} from "./flow-detail-utils";
+    import {mkDataTypeFilter, mkDataTypeFilterId} from "./filter-utils";
     import _ from "lodash";
-    import {filters, updateFilters} from "./flow-details-store";
-    import DataTypeTreeSelector from "../../../../common/svelte/DataTypeTreeSelector.svelte";
-    import {flattenChildren} from "../../../../common/hierarchy-utils";
+    import {filters, updateFilters} from "../flow-details-store";
+    import DataTypeTreeSelector from "../../../../../common/svelte/DataTypeTreeSelector.svelte";
+    import {flattenChildren} from "../../../../../common/hierarchy-utils";
 
     export let dataTypes = [];
 

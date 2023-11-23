@@ -21,6 +21,7 @@
                 content: "loading",
                 arrow: true,
                 interactive: true,
+                appendTo: document.body,
                 trigger: 'mouseenter click',
                 theme: "light-border",
                 placement,

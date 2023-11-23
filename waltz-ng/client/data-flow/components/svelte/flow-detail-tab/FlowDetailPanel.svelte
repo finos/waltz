@@ -10,17 +10,17 @@
     import PhysicalFlowTable from "./PhysicalFlowTable.svelte";
     import {
         Directions,
-        FilterKinds,
-        mkAssessmentFilters,
         mkFlowDetails,
-        mkLogicalFromFlowDetails
-    } from "./flow-detail-utils";
+        mkLogicalFromFlowDetails} from "./flow-detail-utils";
+    import {
+        FilterKinds,
+        mkAssessmentFilters} from "./filters/filter-utils";
     import SelectedFlowDetailPanel from "./SelectedFlowDetailPanel.svelte";
-    import AssessmentFilters from "./AssessmentFilters.svelte";
-    import DataTypeFilters from "./DataTypeFilters.svelte";
-    import InboundOutboundFilters from "./InboundOutboundFilters.svelte";
+    import AssessmentFilters from "./filters/AssessmentFilters.svelte";
+    import DataTypeFilters from "./filters/DataTypeFilters.svelte";
+    import InboundOutboundFilters from "./filters/InboundOutboundFilters.svelte";
     import {onMount} from "svelte";
-    import PhysicalFlowAttributeFilters from "./PhysicalFlowAttributeFilters.svelte";
+    import PhysicalFlowAttributeFilters from "./filters/PhysicalFlowAttributeFilters.svelte";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import DataExtractLink from "../../../../common/svelte/DataExtractLink.svelte";
 
@@ -32,7 +32,6 @@
     let mappedDataTypes = [];
     let assessmentFilters = [];
     let dataTypes = [];
-    let disableNodeFn = () => false;
     let allFlows = [];
     let physicalFlows = [];
     let logicalFlows = [];
@@ -51,7 +50,6 @@
 
     $: flowView = $flowViewCall?.data;
 
-
     $: {
         if (flowView && allDataTypes) {
 
@@ -64,8 +62,6 @@
             const mappedDataTypeIds = _.map(mappedDataTypes, d => d.dataTypeId);
 
             dataTypes = reduceToSelectedNodesOnly(allDataTypes, mappedDataTypeIds);
-
-            disableNodeFn = (node) => !_.includes(_.map(dataTypes, dt => dt.dataTypeId), node.id);
 
             assessmentFilters = mkAssessmentFilters(flowView);
 

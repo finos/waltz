@@ -1,8 +1,9 @@
 <script>
 
-    import {Directions, mkDirectionFilter, mkDirectionFilterId} from "./flow-detail-utils";
+    import {Directions} from "../flow-detail-utils";
+    import {mkDirectionFilter, mkDirectionFilterId} from "./filter-utils";
     import _ from "lodash";
-    import {filters, updateFilters} from "./flow-details-store";
+    import {filters, updateFilters} from "../flow-details-store";
 
     function selectDirection(direction) {
         const filterId = mkDirectionFilterId();

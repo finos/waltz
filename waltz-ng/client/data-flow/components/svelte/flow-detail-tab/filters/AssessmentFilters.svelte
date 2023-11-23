@@ -1,11 +1,11 @@
 <script>
 
 
-    import {mkAssessmentFilter, mkDefinitionFilterId} from "./flow-detail-utils";
+    import {mkAssessmentFilter, mkDefinitionFilterId} from "./filter-utils";
     import _ from "lodash";
-    import {filters, updateFilters} from "./flow-details-store";
-    import RatingIndicatorCell from "../../../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
-    import NoData from "../../../../common/svelte/NoData.svelte";
+    import {filters, updateFilters} from "../flow-details-store";
+    import RatingIndicatorCell from "../../../../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
+    import NoData from "../../../../../common/svelte/NoData.svelte";
 
 
     export let assessmentFilters = [];

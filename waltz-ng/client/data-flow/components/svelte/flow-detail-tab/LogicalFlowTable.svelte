@@ -4,7 +4,7 @@
     import {termSearch} from "../../../../common";
     import RatingIndicatorCell from "../../../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
     import _ from "lodash";
-    import {selectedLogicalFlow, selectedPhysicalFlow} from "./flow-details-store";
+    import {filters, selectedLogicalFlow, selectedPhysicalFlow, updateFilters} from "./flow-details-store";
     import {truncate} from "../../../../common/string-utils";
     import Tooltip from "../../../../common/svelte/Tooltip.svelte";
     import DataTypeTooltipContent from "./DataTypeTooltipContent.svelte";
@@ -14,6 +14,62 @@
     export let assessments;
 
     let qry;
+    let selectionLatchOpen = true;
+
+    function isSameFlow(a, b) {
+        const aId = _.get(a, ["logicalFlow", "id"]);
+        const bId = _.get(b, ["logicalFlow", "id"]);
+        return aId === bId;
+    }
+
+    function mkDataTypeString(dataTypes) {
+        return _
+            .chain(dataTypes)
+            .map(d => d.decoratorEntity.name)
+            .orderBy(d => d)
+            .join(", ")
+            .value();
+    }
+
+    function selectLogicalFlow(flow) {
+
+        const addFilter = () => {
+            const lfId = flow.logicalFlow.id;
+            updateFilters(
+                "SELECTED_LOGICAL",
+                {
+                    id: "SELECTED_LOGICAL",
+                    test: (r) => r.logicalFlow.id === lfId
+                });
+        };
+
+        const removeFilter = () => {
+            $filters = _.reject($filters, d => d.id === "SELECTED_LOGICAL");
+        };
+
+        if (isSameFlow($selectedLogicalFlow, flow)) {
+            if ($selectedPhysicalFlow && selectionLatchOpen) {
+                selectionLatchOpen = false;
+                addFilter();
+            } else {
+                $selectedLogicalFlow = null;
+                $selectedPhysicalFlow = null;
+                selectionLatchOpen = true;
+                removeFilter();
+            }
+        } else {
+            selectionLatchOpen = true;
+            $selectedLogicalFlow = flow;
+            $selectedPhysicalFlow = null;
+            addFilter()
+        }
+    }
+
+    function mkDataTypeTooltipProps(row) {
+        return {
+            decorators: row.dataTypesForLogicalFlow
+        };
+    }
 
     $: visibleFlows = _.filter(logicalFlows, d => d.visible);
 
@@ -28,26 +84,6 @@
                 "logicalFlow.target.name",
                 "logicalFlow.target.externalId"
             ]);
-
-    function mkDataTypeString(dataTypes) {
-        return _
-            .chain(dataTypes)
-            .map(d => d.decoratorEntity.name)
-            .orderBy(d => d)
-            .join(", ")
-            .value();
-    }
-
-    function selectLogicalFlow(flow) {
-        $selectedLogicalFlow = flow;
-        $selectedPhysicalFlow = null;
-    }
-
-    function mkDataTypeTooltipProps(row) {
-        return {
-            decorators: row.dataTypesForLogicalFlow
-        }
-    }
 
 </script>
 
@@ -73,9 +109,9 @@
         <thead>
         <tr>
             <th nowrap="nowrap" style="width: 20em">Source</th>
-            <th nowrap="nowrap" style="width: 20em">Source External ID</th>
+            <th nowrap="nowrap" style="width: 20em">Src Ext ID</th>
             <th nowrap="nowrap" style="width: 20em">Target</th>
-            <th nowrap="nowrap" style="width: 20em">Target External ID</th>
+            <th nowrap="nowrap" style="width: 20em">Target Ext ID</th>
             <th nowrap="nowrap" style="width: 20em; max-width: 20em">Data Types</th>
             {#each assessments as defn}
                 <th nowrap="nowrap" style="width: 20em">{defn.name}</th>
@@ -85,6 +121,7 @@
         <tbody>
         {#each flowList as flow}
             <tr class="clickable"
+                class:selected={isSameFlow($selectedLogicalFlow, flow)}
                 on:click={() => selectLogicalFlow(flow)}>
                 <td>
                     {flow.logicalFlow.source.name}
@@ -130,6 +167,10 @@
 
 
 <style>
+
+    .selected {
+        background: #eefaee;
+    }
 
     table {
         display: table;

@@ -8,11 +8,11 @@
         mkFrequencyFilterId,
         mkTransportKindFilter,
         mkTransportKindFilterId
-    } from "./flow-detail-utils";
+    } from "./filter-utils";
     import _ from "lodash";
-    import {filters, updateFilters} from "./flow-details-store";
-    import {enumValueStore} from "../../../../svelte-stores/enum-value-store";
-    import NoData from "../../../../common/svelte/NoData.svelte";
+    import {filters, updateFilters} from "../flow-details-store";
+    import {enumValueStore} from "../../../../../svelte-stores/enum-value-store";
+    import NoData from "../../../../../common/svelte/NoData.svelte";
 
     export let flows = [];
     export let criticalities = [];

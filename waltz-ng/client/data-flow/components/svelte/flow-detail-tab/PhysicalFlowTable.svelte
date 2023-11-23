@@ -13,8 +13,36 @@
     import {selectedPhysicalFlow, selectedLogicalFlow} from "./flow-details-store";
     import {mkLogicalFromFlowDetails} from "./flow-detail-utils";
     import NoData from "../../../../common/svelte/NoData.svelte";
+    import DataTypeTooltipContent from "./DataTypeTooltipContent.svelte";
+    import {truncate} from "../../../../common/string-utils";
+    import Tooltip from "../../../../common/svelte/Tooltip.svelte";
 
     export let physicalFlows;
+
+    function selectPhysicalFlow(flow) {
+        if ($selectedPhysicalFlow === flow) {
+            $selectedPhysicalFlow = null;
+        } else {
+            $selectedPhysicalFlow = flow;
+            $selectedLogicalFlow = mkLogicalFromFlowDetails(flow);
+        }
+    }
+
+    function mkDataTypeTooltipProps(row) {
+        return {
+            decorators: row.dataTypesForSpecification
+        }
+    }
+
+    function mkDataTypeString(dataTypes) {
+        return _
+            .chain(dataTypes)
+            .map(d => d.decoratorEntity.name)
+            .orderBy(d => d)
+            .join(", ")
+            .value();
+    }
+
 
     let qry;
     let visibleFlows;
@@ -37,11 +65,6 @@
                 "logicalFlow.target.externalId"
             ]);
 
-
-    function selectPhysicalFlow(flow) {
-        $selectedPhysicalFlow = flow;
-        $selectedLogicalFlow = mkLogicalFromFlowDetails(flow);
-    }
 
 </script>
 
@@ -68,11 +91,12 @@
         <thead>
         <tr>
             <th nowrap="nowrap" style="width: 20em">Source</th>
-            <th nowrap="nowrap" style="width: 20em">Source External ID</th>
+            <th nowrap="nowrap" style="width: 20em">Src Ext ID</th>
             <th nowrap="nowrap" style="width: 20em">Target</th>
-            <th nowrap="nowrap" style="width: 20em">Target External ID</th>
+            <th nowrap="nowrap" style="width: 20em">Target Ext ID</th>
             <th nowrap="nowrap" style="width: 20em; max-width: 20em">Name</th>
             <th nowrap="nowrap" style="width: 20em">External ID</th>
+            <th nowrap="nowrap" style="width: 20em">Data Types</th>
             <th nowrap="nowrap" style="width: 20em">Criticality</th>
             <th nowrap="nowrap" style="width: 20em">Frequency</th>
             <th nowrap="nowrap" style="width: 20em">Transport Kind</th>
@@ -81,6 +105,7 @@
         <tbody>
         {#each flowList as flow}
             <tr class="clickable"
+                class:selected={$selectedPhysicalFlow === flow}
                 on:click={() => selectPhysicalFlow(flow)}>
                 <td>
                     {flow.logicalFlow.source.name}
@@ -99,6 +124,14 @@
                 </td>
                 <td>
                     {flow.physicalFlow.externalId || ""}
+                </td>
+                <td>
+                    <Tooltip content={DataTypeTooltipContent}
+                             props={mkDataTypeTooltipProps(flow)}>
+                        <svelte:fragment slot="target">
+                            <span>{truncate(mkDataTypeString(flow.dataTypesForSpecification), 30)}</span>
+                        </svelte:fragment>
+                    </Tooltip>
                 </td>
                 <td>
                     {toCriticalityName(nestedEnums, flow.physicalFlow.criticality)}
@@ -124,6 +157,9 @@
 
 <style>
 
+    .selected {
+        background: #eefaee;
+    }
     table {
         display: table;
         white-space: nowrap;

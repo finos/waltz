@@ -23,6 +23,7 @@ import org.finos.waltz.data.DBExecutorPoolInterface;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.data.data_type.DataTypeIdSelectorFactory;
 import org.finos.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
+import org.finos.waltz.data.datatype_decorator.PhysicalSpecDecoratorDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import org.finos.waltz.data.logical_flow.LogicalFlowStatsDao;
@@ -116,9 +117,8 @@ public class LogicalFlowService {
     private final LogicalFlowDao logicalFlowDao;
     private final LogicalFlowStatsDao logicalFlowStatsDao;
     private final LogicalFlowDecoratorDao logicalFlowDecoratorDao;
-    private final InvolvementService involvementService;
-    private final PermissionGroupService permissionGroupService;
     private final FlowPermissionChecker flowPermissionChecker;
+    private final PhysicalSpecDecoratorDao physicalSpecDecoratorDao;
 
     private final AssessmentRatingService assessmentRatingService;
     private final AssessmentDefinitionService assessmentDefinitionService;
@@ -141,9 +141,8 @@ public class LogicalFlowService {
                               LogicalFlowDao logicalFlowDao,
                               LogicalFlowStatsDao logicalFlowStatsDao,
                               LogicalFlowDecoratorDao logicalFlowDecoratorDao,
-                              InvolvementService involvementService,
-                              PermissionGroupService permissionGroupService,
                               FlowPermissionChecker flowPermissionChecker,
+                              PhysicalSpecDecoratorDao physicalSpecDecoratorDao,
                               AssessmentRatingService assessmentRatingService,
                               AssessmentDefinitionService assessmentDefinitionService,
                               PhysicalFlowDao physicalFlowDao,
@@ -159,10 +158,9 @@ public class LogicalFlowService {
         checkNotNull(logicalFlowDao, "logicalFlowDao must not be null");
         checkNotNull(logicalFlowDecoratorDao, "logicalFlowDataTypeDecoratorDao cannot be null");
         checkNotNull(logicalFlowStatsDao, "logicalFlowStatsDao cannot be null");
-        checkNotNull(involvementService, "involvementService cannot be null");
-        checkNotNull(permissionGroupService, "permissionGroupService cannot be null");
         checkNotNull(physicalFlowDao, "physicalFlowDao cannot be null");
         checkNotNull(physicalSpecificationDao, "physicalSpecificationDao cannot be null");
+        checkNotNull(physicalSpecDecoratorDao, "physicalSpecDecoratorDao cannot be null");
         checkNotNull(flowPermissionChecker, "flowPermissionChecker cannot be null");
         checkNotNull(ratingSchemeService, "ratingSchemeService cannot be null");
 
@@ -173,13 +171,12 @@ public class LogicalFlowService {
         this.dataTypeUsageService = dataTypeUsageService;
         this.dbExecutorPool = dbExecutorPool;
         this.flowPermissionChecker = flowPermissionChecker;
-        this.involvementService = involvementService;
         this.logicalFlowDao = logicalFlowDao;
         this.logicalFlowStatsDao = logicalFlowStatsDao;
         this.logicalFlowDecoratorDao = logicalFlowDecoratorDao;
         this.physicalFlowDao = physicalFlowDao;
         this.physicalSpecificationDao = physicalSpecificationDao;
-        this.permissionGroupService = permissionGroupService;
+        this.physicalSpecDecoratorDao = physicalSpecDecoratorDao;
         this.ratingSchemeService = ratingSchemeService;
     }
 
@@ -500,7 +497,7 @@ public class LogicalFlowService {
         Select<Record1<Long>> flowSelector = logicalFlowIdSelectorFactory.apply(idSelectionOptions);
         List<LogicalFlow> logicalFlows = logicalFlowDao.findBySelector(flowSelector);
 
-        Set<DataTypeDecorator> flowDecorators = logicalFlowDecoratorDao.findByLogicalFlowIdSelector(flowSelector);
+        Set<DataTypeDecorator> logicalFlowDecorators = logicalFlowDecoratorDao.findByLogicalFlowIdSelector(flowSelector);
 
         List<AssessmentRating> logicalFlowAssessmentRatings = assessmentRatingService.findByTargetKindForRelatedSelector(LOGICAL_DATA_FLOW, idSelectionOptions);
 
@@ -514,13 +511,14 @@ public class LogicalFlowService {
 
         Select<Record1<Long>> physSpecSelector = physicalSpecificationIdSelectorFactory.apply(idSelectionOptions);
         Set<PhysicalSpecification> specs = physicalSpecificationDao.findBySelector(physSpecSelector);
+        List<DataTypeDecorator> specDecorators = physicalSpecDecoratorDao.findByEntityIdSelector(physSpecSelector, Optional.empty());
 
         return ImmutableLogicalFlowView.builder()
                 .flows(fromCollection(logicalFlows))
                 .flowRatings(logicalFlowAssessmentRatings)
                 .primaryAssessmentDefinitions(primaryDefs)
                 .ratingSchemeItems(ratings)
-                .dataTypeDecorators(flowDecorators)
+                .dataTypeDecorators(SetUtilities.union(logicalFlowDecorators, specDecorators))
                 .physicalFlows(physicalFlows)
                 .physicalSpecifications(specs)
                 .build();
