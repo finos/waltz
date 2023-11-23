@@ -142,6 +142,7 @@
         position: sticky;
         top: 0;
         background: white;
+        z-index: 1;
     }
 
     .table-container {
