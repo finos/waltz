@@ -70,7 +70,7 @@ public class SurveyInstanceActionQueueDao {
 
 
     @Autowired
-    SurveyInstanceActionQueueDao(DSLContext dsl) {
+    public SurveyInstanceActionQueueDao(DSLContext dsl) {
         this.dsl = dsl;
     }
 

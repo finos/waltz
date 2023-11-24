@@ -33,13 +33,12 @@ public class SurveyInstanceActionQueueService {
     private static final Logger LOG = LoggerFactory.getLogger(SurveyInstanceActionQueueService.class);
     private final SurveyInstanceActionQueueDao surveyInstanceActionQueueDao;
     private final SurveyInstanceService surveyInstanceService;
-
     private final ChangeLogService changeLogService;
     private final DSLContext dslContext;
 
 
     @Autowired
-    SurveyInstanceActionQueueService(SurveyInstanceActionQueueDao surveyInstanceActionQueueDao,
+    public SurveyInstanceActionQueueService(SurveyInstanceActionQueueDao surveyInstanceActionQueueDao,
                                      SurveyInstanceService surveyInstanceService,
                                      ChangeLogService changeLogService,
                                      DSLContext dslContext) {

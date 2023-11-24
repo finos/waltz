@@ -29,9 +29,9 @@ import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramIn
 import org.finos.waltz.model.aggregate_overlay_diagram.AggregateOverlayDiagramPreset;
 import org.finos.waltz.model.aggregate_overlay_diagram.BackingEntity;
 import org.finos.waltz.model.aggregate_overlay_diagram.ImmutableAggregateOverlayDiagramInfo;
-import org.finos.waltz.model.aggregate_overlay_diagram.OverlayDiagramSaveCommand;
 import org.finos.waltz.model.aggregate_overlay_diagram.OverlayDiagramKind;
 import org.finos.waltz.model.aggregate_overlay_diagram.OverlayDiagramPresetCreateCommand;
+import org.finos.waltz.model.aggregate_overlay_diagram.OverlayDiagramSaveCommand;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.AggregatedEntitiesWidgetData;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.AggregatedEntitiesWidgetDatum;
 import org.finos.waltz.model.aggregate_overlay_diagram.overlay.ApplicationChangeWidgetData;
@@ -111,7 +111,8 @@ public class AggregateOverlayDiagramService {
     public AggregateOverlayDiagramService(AggregateOverlayDiagramDao aggregateOverlayDiagramDao,
                                           AppCountWidgetDao appCountWidgetDao,
                                           TargetAppCostWidgetDao targetAppCostWidgetDao,
-                                          RatingCostWidgetDao ratingCostWidgetDao, AssessmentRatingWidgetDao appAssessmentWidgetDao,
+                                          RatingCostWidgetDao ratingCostWidgetDao,
+                                          AssessmentRatingWidgetDao appAssessmentWidgetDao,
                                           BackingEntityWidgetDao backingEntityWidgetDao,
                                           AppCostWidgetDao appCostWidgetDao,
                                           AggregatedEntitiesWidgetDao aggregatedEntitiesWidgetDao,
