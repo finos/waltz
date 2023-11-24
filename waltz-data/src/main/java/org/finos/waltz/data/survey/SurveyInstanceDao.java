@@ -274,10 +274,12 @@ public class SurveyInstanceDao {
     }
 
 
-    public long createPreviousVersion(SurveyInstance currentInstance) {
+    public long createPreviousVersion(Optional<DSLContext> tx, SurveyInstance currentInstance) {
         checkNotNull(currentInstance, "currentInstance cannot be null");
 
-        SurveyInstanceRecord record = dsl.newRecord(si);
+        DSLContext dslContext = tx.orElse(dsl);
+
+        SurveyInstanceRecord record = dslContext.newRecord(si);
         record.setSurveyRunId(currentInstance.surveyRunId());
         record.setEntityKind(currentInstance.surveyEntity().kind().name());
         record.setEntityId(currentInstance.surveyEntity().id());
@@ -313,10 +315,10 @@ public class SurveyInstanceDao {
     }
 
 
-    public int updateStatus(long instanceId, SurveyInstanceStatus newStatus) {
+    public int updateStatus(Optional<DSLContext> tx, long instanceId, SurveyInstanceStatus newStatus) {
         checkNotNull(newStatus, "newStatus cannot be null");
-
-        return dsl
+        DSLContext dslContext = tx.orElse(dsl);
+        return dslContext
                 .update(si)
                 .set(si.STATUS, newStatus.name())
                 .where(si.STATUS.notEqual(newStatus.name())
@@ -367,11 +369,10 @@ public class SurveyInstanceDao {
                 .execute();
     }
 
-
-    public int markSubmitted(long instanceId, String userName) {
+    public int markSubmitted(Optional<DSLContext> tx, long instanceId, String userName) {
         checkNotNull(userName, "userName cannot be null");
-
-        return dsl
+        DSLContext dslContext = tx.orElse(dsl);
+        return dslContext
                 .update(si)
                 .set(si.STATUS, SurveyInstanceStatus.COMPLETED.name())
                 .set(si.SUBMITTED_AT, Timestamp.valueOf(nowUtc()))
@@ -385,10 +386,10 @@ public class SurveyInstanceDao {
     }
 
 
-    public int markApproved(long instanceId, String userName) {
+    public int markApproved(Optional<DSLContext> tx, long instanceId, String userName) {
         checkNotNull(userName, "userName cannot be null");
-
-        return dsl
+        DSLContext dslContext = tx.orElse(dsl);
+        return dslContext
                 .update(si)
                 .set(si.APPROVED_AT, Timestamp.valueOf(nowUtc()))
                 .set(si.APPROVED_BY, userName)
@@ -399,9 +400,14 @@ public class SurveyInstanceDao {
                 .execute();
     }
 
+    public int reopenSurvey(Optional<DSLContext> tx,
+                            long instanceId,
+                            LocalDate dueDate,
+                            LocalDate approvalDueDate) {
 
-    public int reopenSurvey(long instanceId) {
-        return dsl
+        DSLContext dslContext = tx.orElse(dsl);
+
+        return dslContext
                 .update(si)
                 .set(si.STATUS, SurveyInstanceStatus.IN_PROGRESS.name())
                 .set(si.APPROVED_AT, (Timestamp) null)
@@ -409,6 +415,8 @@ public class SurveyInstanceDao {
                 .set(si.SUBMITTED_AT, (Timestamp) null)
                 .set(si.SUBMITTED_BY, (String) null)
                 .set(si.ISSUED_ON, toSqlDate(nowUtcTimestamp())) //update the issued on to the current date
+                .set(si.DUE_DATE, toSqlDate(dueDate))
+                .set(si.APPROVAL_DUE_DATE, toSqlDate(approvalDueDate))
                 .where(si.ID.eq(instanceId)
                         .and(si.ORIGINAL_INSTANCE_ID.isNull())
                         .and(si.STATUS.in(

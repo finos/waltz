@@ -32,6 +32,7 @@ import org.finos.waltz.service.flow_classification_rule.FlowClassificationRuleSe
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.finos.waltz.service.physical_specification_data_type.PhysicalSpecDataTypeService;
 import org.finos.waltz.service.report_grid.ReportGridFilterViewService;
+import org.finos.waltz.service.survey.SurveyInstanceActionQueueService;
 import org.finos.waltz.service.survey.SurveyInstanceService;
 import org.finos.waltz.service.usage_info.DataTypeUsageService;
 import org.slf4j.Logger;
@@ -64,7 +65,7 @@ public class ScheduledJobService {
 
     private final ReportGridFilterViewService reportGridFilterViewService;
     private final CostService costService;
-
+    private final SurveyInstanceActionQueueService surveyInstanceActionQueueService;
     private final ComplexityService complexityService;
 
 
@@ -79,7 +80,9 @@ public class ScheduledJobService {
                                PhysicalSpecDataTypeService physicalSpecDataTypeService,
                                ReportGridFilterViewService reportGridFilterViewService,
                                ScheduledJobDao scheduledJobDao,
+                               SurveyInstanceActionQueueService surveyInstanceActionQueueService,
                                SurveyInstanceService surveyInstanceService) {
+
 
         checkNotNull(attestationRunService, "attestationRunService cannot be null");
         checkNotNull(complexityService, "complexityService cannot be null");
@@ -90,6 +93,7 @@ public class ScheduledJobService {
         checkNotNull(physicalSpecDataTypeService, "physicalSpecDataTypeService cannot be null");
         checkNotNull(reportGridFilterViewService, "reportGridFilterViewService cannot be null");
         checkNotNull(scheduledJobDao, "scheduledJobDao cannot be null");
+        checkNotNull(surveyInstanceActionQueueService, "surveyInstanceActionQueueService cannot be null");
         checkNotNull(surveyInstanceService, "surveyInstanceService cannot be null");
 
         this.attestationRunService = attestationRunService;
@@ -102,6 +106,7 @@ public class ScheduledJobService {
         this.physicalSpecDataTypeService = physicalSpecDataTypeService;
         this.reportGridFilterViewService = reportGridFilterViewService;
         this.scheduledJobDao = scheduledJobDao;
+        this.surveyInstanceActionQueueService = surveyInstanceActionQueueService;
         this.surveyInstanceService = surveyInstanceService;
     }
 
@@ -158,6 +163,9 @@ public class ScheduledJobService {
 
         runIfNeeded(JobKey.COMPLEXITY_REBUILD_MEASURABLE,
                 (jk) -> complexityService.populateMeasurableComplexities());
+
+        surveyInstanceActionQueueService.performActions();
+
     }
 
 

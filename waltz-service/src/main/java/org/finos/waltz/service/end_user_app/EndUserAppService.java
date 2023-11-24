@@ -49,6 +49,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -124,7 +125,7 @@ public class EndUserAppService {
 
         migrateEudaInvolvements(id, appRegistrationResponse);
 
-        changeLogDao.write(mkChangeLog(appRegistrationResponse, comment, username));
+        changeLogDao.write(Optional.empty(), mkChangeLog(appRegistrationResponse, comment, username));
 
         return appRegistrationResponse;
     }

@@ -296,9 +296,9 @@ public class DataTypeDecoratorService {
     }
 
 
-    public Collection<DataTypeDecorator> findByFlowIds(Collection<Long> ids, EntityKind entityKind) {
+    public Set<DataTypeDecorator> findByFlowIds(Collection<Long> ids, EntityKind entityKind) {
         if (isEmpty(ids)) {
-            return Collections.emptyList();
+            return Collections.emptySet();
         }
         return dataTypeDecoratorDaoSelectorFactory
                 .getDao(entityKind)

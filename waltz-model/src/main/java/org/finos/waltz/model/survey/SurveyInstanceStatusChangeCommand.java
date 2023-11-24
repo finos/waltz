@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.command.Command;
 import org.immutables.value.Value;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Value.Immutable
@@ -32,7 +33,8 @@ import java.util.Optional;
 public abstract class SurveyInstanceStatusChangeCommand implements Command {
 
     public abstract SurveyInstanceAction action();
-
     public abstract Optional<String> reason();
+    public abstract Optional<LocalDate> newDueDate();
+    public abstract Optional<LocalDate> newApprovalDueDate();
 
 }
