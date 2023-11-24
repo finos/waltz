@@ -18,17 +18,17 @@
 
 package org.finos.waltz.web.endpoints.api;
 
-import org.finos.waltz.service.data_flow_decorator.LogicalFlowDecoratorService;
-import org.finos.waltz.service.data_type.DataTypeDecoratorService;
-import org.finos.waltz.service.user.UserRoleService;
-import org.finos.waltz.web.ListRoute;
-import org.finos.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.data_flow_decorator.DecoratorRatingSummary;
 import org.finos.waltz.model.data_flow_decorator.LogicalFlowDecoratorStat;
 import org.finos.waltz.model.data_flow_decorator.UpdateDataFlowDecoratorsAction;
 import org.finos.waltz.model.datatype.DataTypeDecorator;
 import org.finos.waltz.model.user.SystemRole;
+import org.finos.waltz.service.data_flow_decorator.LogicalFlowDecoratorService;
+import org.finos.waltz.service.data_type.DataTypeDecoratorService;
+import org.finos.waltz.service.user.UserRoleService;
+import org.finos.waltz.web.ListRoute;
+import org.finos.waltz.web.endpoints.Endpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,15 +38,19 @@ import spark.Response;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
-import static org.finos.waltz.web.WebUtilities.*;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.getForList;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.postForList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.map;
 import static org.finos.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
+import static org.finos.waltz.web.WebUtilities.getUsername;
+import static org.finos.waltz.web.WebUtilities.mkPath;
+import static org.finos.waltz.web.WebUtilities.readBody;
+import static org.finos.waltz.web.WebUtilities.readIdSelectionOptionsFromBody;
+import static org.finos.waltz.web.WebUtilities.requireRole;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.getForList;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.postForList;
 
 
 @Service
@@ -118,14 +122,14 @@ public class LogicalFlowDecoratorStatsEndpoint implements Endpoint {
     }
 
 
-    private Collection<DataTypeDecorator> updateDecoratorsBatchRoute(Request request, Response response) throws IOException {
+    private Set<DataTypeDecorator> updateDecoratorsBatchRoute(Request request, Response response) throws IOException {
         requireRole(userRoleService, request, SystemRole.BULK_FLOW_EDITOR);
 
         String user = getUsername(request);
         List<UpdateDataFlowDecoratorsAction> actions = Arrays.asList(readBody(request, UpdateDataFlowDecoratorsAction[].class));
 
         logicalFlowDecoratorService.addDecoratorsBatch(actions, user);
-        return dataTypeDecoratorService.findByFlowIds(map(actions, a -> a.flowId()), LOGICAL_DATA_FLOW);
+        return dataTypeDecoratorService.findByFlowIds(map(actions, UpdateDataFlowDecoratorsAction::flowId), LOGICAL_DATA_FLOW);
     }
 
 }

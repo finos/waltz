@@ -304,10 +304,11 @@ public class ChangeLogDao {
     }
 
 
-    public int write(ChangeLog changeLog) {
+    public int write(Optional<DSLContext> tx, ChangeLog changeLog) {
         checkNotNull(changeLog, "changeLog must not be null");
+        DSLContext dslContext = tx.orElse(dsl);
 
-        return dsl
+        return dslContext
                 .insertInto(CHANGE_LOG)
                 .set(CHANGE_LOG.MESSAGE, changeLog.message())
                 .set(CHANGE_LOG.PARENT_ID, changeLog.parentReference().id())
