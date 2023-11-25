@@ -1,14 +1,17 @@
 <script>
-    import {selectedLogicalFlow, selectedPhysicalFlow} from "./flow-details-store";
+    import {filters, selectedLogicalFlow, selectedPhysicalFlow} from "./flow-details-store";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import SelectedLogicalFlowDetail from "./SelectedLogicalFlowDetail.svelte";
     import SelectedPhysicalFlowDetail from "./SelectedPhysicalFlowDetail.svelte";
+    import _ from "lodash";
 
     export let assessmentDefinitions = [];
+    export let flowClassifications = [];
 
     function clearSelected() {
         $selectedPhysicalFlow = null;
         $selectedLogicalFlow = null;
+        $filters = _.reject($filters, d => d.id === "SELECTED_LOGICAL")
     }
 
 </script>
@@ -32,7 +35,8 @@
         <div class="col-md-12">
 
             {#if $selectedLogicalFlow}
-                <SelectedLogicalFlowDetail {assessmentDefinitions}/>
+                <SelectedLogicalFlowDetail {flowClassifications}
+                                           {assessmentDefinitions}/>
             {/if}
 
             {#if $selectedPhysicalFlow}

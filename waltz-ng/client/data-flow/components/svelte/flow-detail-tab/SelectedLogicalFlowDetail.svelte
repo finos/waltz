@@ -6,9 +6,9 @@
     import Icon from "../../../../common/svelte/Icon.svelte";
     import pageInfo from "../../../../svelte-stores/page-navigation-store";
     import {Directions} from "./flow-detail-utils";
-    import {flowClassificationStore} from "../../../../svelte-stores/flow-classification-store";
     import RatingIndicatorCell from "../../../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
     import {logicalFlowStore} from "../../../../svelte-stores/logical-flow-store";
+    import DataTypeMiniTable from "./DataTypeMiniTable.svelte";
 
     function goToPhysicalFlowEdit(flow) {
         $pageInfo = {
@@ -30,19 +30,17 @@
         }
     }
 
-    export let assessmentDefinitions;
+    export let flowClassifications = [];
+    export let assessmentDefinitions = [];
 
-    let flowClassificationCall = flowClassificationStore.findAll();
     let permissionsCall = null;
     let hasEditPermission = false;
     let assessmentDefinitionsById = {};
-    let flowClassifications = [];
     let flowClassificationsByCode = {};
 
     $: permissionsCall = logicalFlowStore.findPermissionsForFlow($selectedLogicalFlow?.logicalFlow.id);
     $: permissions = $permissionsCall?.data;
     $: hasEditPermission = _.some(permissions, d => _.includes(["ADD", "UPDATE", "REMOVE"], d));
-    $: flowClassifications = $flowClassificationCall?.data;
     $: flowClassificationsByCode = _.keyBy(flowClassifications, d => d.code);
     $: assessmentDefinitionsById = _.keyBy(assessmentDefinitions, d => d.id);
     $: flow = $selectedLogicalFlow.logicalFlow;
@@ -90,18 +88,8 @@
     <tr>
         <td>Data Types</td>
         <td>
-            <ul class="list-inline">
-                {#each _.sortBy(dataTypes, d => d.decoratorEntity.name) as type}
-                    <li style="padding-bottom: 2px">
-                        <div class="rating-indicator-block"
-                             style={`background-color: ${flowClassificationsByCode[type.rating]?.color}`}>
-                        </div>
-                        <EntityLink ref={type.decoratorEntity}
-                                    showIcon={false}>
-                        </EntityLink>
-                    </li>
-                {/each}
-            </ul>
+            <DataTypeMiniTable decorators={dataTypes}
+                               {flowClassifications}/>
         </td>
     </tr>
     </tbody>
@@ -168,16 +156,6 @@
 
 
 <style>
-    .rating-indicator-block {
-        display: inline-block;
-        width: 1.1em;
-        height: 1.1em;
-        border: 1px solid #aaa;
-        border-radius: 2px;
-        position: relative;
-        top: 2px;
-    }
-
     menu {
         padding-left: 1em;
     }

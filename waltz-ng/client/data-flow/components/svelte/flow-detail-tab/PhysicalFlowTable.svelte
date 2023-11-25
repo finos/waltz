@@ -13,11 +13,12 @@
     import {selectedPhysicalFlow, selectedLogicalFlow} from "./flow-details-store";
     import {mkLogicalFromFlowDetails} from "./flow-detail-utils";
     import NoData from "../../../../common/svelte/NoData.svelte";
-    import DataTypeTooltipContent from "./DataTypeTooltipContent.svelte";
+    import DataTypeTooltipContent from "./DataTypeMiniTable.svelte";
     import {truncate} from "../../../../common/string-utils";
     import Tooltip from "../../../../common/svelte/Tooltip.svelte";
 
-    export let physicalFlows;
+    export let physicalFlows = [];
+    export let flowClassifications = [];
 
     function selectPhysicalFlow(flow) {
         if ($selectedPhysicalFlow === flow) {
@@ -29,9 +30,27 @@
     }
 
     function mkDataTypeTooltipProps(row) {
+        row.dataTypesForSpecification;
+
+        const ratingByDataTypeId = _.reduce(
+            row.dataTypesForLogicalFlow,
+            (acc, d) => {
+                acc[d.decoratorEntity.id] = d.rating;
+                return acc;
+            },
+            {});
+
+        const decorators = _.map(
+            row.dataTypesForSpecification,
+            d => Object.assign(
+                {},
+                d,
+                { rating: ratingByDataTypeId[d.decoratorEntity?.id] }));
+
         return {
-            decorators: row.dataTypesForSpecification
-        }
+            decorators,
+            flowClassifications
+        };
     }
 
     function mkDataTypeString(dataTypes) {
@@ -42,7 +61,6 @@
             .join(", ")
             .value();
     }
-
 
     let qry;
     let visibleFlows;
@@ -64,8 +82,6 @@
                 "logicalFlow.target.name",
                 "logicalFlow.target.externalId"
             ]);
-
-
 </script>
 
 
@@ -86,7 +102,7 @@
 </div>
 <div class="table-container"
      class:waltz-scroll-region-350={_.size(physicalFlows) > 10}>
-    <table class="table table-condensed small"
+    <table class="table table-condensed small table-hover"
            style="margin-top: 1em">
         <thead>
         <tr>
@@ -127,6 +143,7 @@
                 </td>
                 <td>
                     <Tooltip content={DataTypeTooltipContent}
+                             trigger={"mouseenter"}
                              props={mkDataTypeTooltipProps(flow)}>
                         <svelte:fragment slot="target">
                             <span>{truncate(mkDataTypeString(flow.dataTypesForSpecification), 30)}</span>

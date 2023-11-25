@@ -23,6 +23,8 @@
     import PhysicalFlowAttributeFilters from "./filters/PhysicalFlowAttributeFilters.svelte";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import DataExtractLink from "../../../../common/svelte/DataExtractLink.svelte";
+    import FlowClassificationFilters from "./filters/FlowClassificationFilters.svelte";
+    import {flowClassificationStore} from "../../../../svelte-stores/flow-classification-store";
 
     export let parentEntityRef;
 
@@ -35,6 +37,9 @@
     let allFlows = [];
     let physicalFlows = [];
     let logicalFlows = [];
+    let flowClassificationCall = flowClassificationStore.findAll();
+
+    $: flowClassifications = $flowClassificationCall?.data;
 
     $: {
         if (parentEntityRef) {
@@ -108,7 +113,7 @@
 
             <details class="filter-set" style="margin-top: 1em">
                 <summary>
-                    <Icon name="random"/> Flow Direction
+                    <Icon name="random"/> Flow Direction & Classification
                     {#if _.some($filters, d => d.kind === FilterKinds.DIRECTION) && _.find($filters, d => d.kind === FilterKinds.DIRECTION).direction !== Directions.ALL}
                         <span style="color: darkorange"
                               title="Flows have been filtered by direction">
@@ -117,6 +122,7 @@
                     {/if}
                 </summary>
                 <InboundOutboundFilters/>
+                <FlowClassificationFilters/>
             </details>
 
             <details class="filter-set">
@@ -160,9 +166,11 @@
         </details>
 
         <LogicalFlowTable {logicalFlows}
+                          {flowClassifications}
                           assessments={logicalFlowPrimaryAssessments}/>
         <br>
-        <PhysicalFlowTable {physicalFlows}/>
+        <PhysicalFlowTable {physicalFlows}
+                           {flowClassifications}/>
 
         <div style="padding-top: 1em" class="pull-right">
             <span>
@@ -184,7 +192,8 @@
     </div>
     {#if $selectedLogicalFlow || $selectedPhysicalFlow}
         <div class="flow-detail-context-panel">
-            <SelectedFlowDetailPanel assessmentDefinitions={logicalFlowPrimaryAssessments}/>
+            <SelectedFlowDetailPanel flowClassifications={flowClassifications}
+                                     assessmentDefinitions={logicalFlowPrimaryAssessments}/>
         </div>
     {/if}
 </div>

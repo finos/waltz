@@ -7,10 +7,11 @@
     import {filters, selectedLogicalFlow, selectedPhysicalFlow, updateFilters} from "./flow-details-store";
     import {truncate} from "../../../../common/string-utils";
     import Tooltip from "../../../../common/svelte/Tooltip.svelte";
-    import DataTypeTooltipContent from "./DataTypeTooltipContent.svelte";
+    import DataTypeTooltipContent from "./DataTypeMiniTable.svelte";
     import NoData from "../../../../common/svelte/NoData.svelte";
 
     export let logicalFlows = [];
+    export let flowClassifications = [];
     export let assessments;
 
     let qry;
@@ -67,7 +68,8 @@
 
     function mkDataTypeTooltipProps(row) {
         return {
-            decorators: row.dataTypesForLogicalFlow
+            decorators: row.dataTypesForLogicalFlow,
+            flowClassifications
         };
     }
 
@@ -102,9 +104,10 @@
 <div>
     <SearchInput bind:value={qry}/>
 </div>
+
 <div class="table-container"
      class:waltz-scroll-region-350={_.size(logicalFlows) > 10}>
-    <table class="table table-condensed small"
+    <table class="table table-condensed small table-hover"
            style="margin-top: 1em">
         <thead>
         <tr>
@@ -137,6 +140,7 @@
                 </td>
                 <td>
                     <Tooltip content={DataTypeTooltipContent}
+                             trigger={"mouseenter"}
                              props={mkDataTypeTooltipProps(flow)}>
                         <svelte:fragment slot="target">
                             <span>{truncate(mkDataTypeString(flow.dataTypesForLogicalFlow), 30)}</span>

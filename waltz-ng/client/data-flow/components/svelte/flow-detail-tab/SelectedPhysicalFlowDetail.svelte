@@ -13,6 +13,7 @@
     import Icon from "../../../../common/svelte/Icon.svelte";
     import {logicalFlowStore} from "../../../../svelte-stores/logical-flow-store";
     import DescriptionFade from "../../../../common/svelte/DescriptionFade.svelte";
+    import DataTypeMiniTable from "./DataTypeMiniTable.svelte";
 
     function goToPhysicalFlowPage(flow) {
         $pageInfo = {
@@ -22,6 +23,8 @@
             }
         }
     }
+
+    export let flowClassifications = [];
 
     let enumsCall = enumValueStore.load();
     let permissionsCall = null;
@@ -76,14 +79,8 @@
     <tr>
         <td>Data Types</td>
         <td>
-            <ul class="list-inline">
-                {#each _.chain(dataTypesForSpecification).map(d => d.decoratorEntity).sort(d => d.name).uniq().value() as dt}
-                    <li>
-                        <EntityLink showIcon={false}
-                                    ref={dt}/>
-                    </li>
-                {/each}
-            </ul>
+            <DataTypeMiniTable decorators={dataTypesForSpecification}
+                               {flowClassifications}/>
         </td>
     </tr>
     <tr>
