@@ -12,9 +12,18 @@ export const FilterKinds = {
 export function mkAssessmentFilters(flowView) {
 
     const ratingSchemeItemsById = _.keyBy(flowView.ratingSchemeItems, d => d.id);
+    const definitions = _.compact(_.concat(
+        flowView.logicalFlowAssessmentDefinitions,
+        flowView.physicalFlowAssessmentDefinitions,
+        flowView.physicalSpecificationAssessmentDefinitions));
+
+    const ratings = _.compact(_.concat(
+        flowView.logicalFlowRatings,
+        flowView.physicalFlowRatings,
+        flowView.physicalSpecificationRatings));
 
     const ratingsByDefinitionId = _
-        .chain(flowView.flowRatings)
+        .chain(ratings)
         .groupBy(r => r.assessmentDefinitionId)
         .mapValues(v => _
             .chain(v)
@@ -26,7 +35,7 @@ export function mkAssessmentFilters(flowView) {
         .value();
 
     return _
-        .chain(flowView.primaryAssessmentDefinitions)
+        .chain(definitions)
         .map(d => Object.assign({}, {definition: d, ratings: _.get(ratingsByDefinitionId, d.id, [])}))
         .filter(d => !_.isEmpty(d.ratings))
         .value();
@@ -56,14 +65,18 @@ export function mkDirectionFilterId() {
     return "FLOW_DIRECTION";
 }
 
-export function mkAssessmentFilter(id, ratings) {
+export function mkAssessmentFilter(id, desiredRatings) {
     return {
         id,
         kind: FilterKinds.ASSESSMENT,
-        ratings,
-        test: (r) => _.isEmpty(ratings)
+        ratings: desiredRatings,
+        test: (flowRow) => _.isEmpty(desiredRatings)
             ? x => true
-            : _.some(ratings, x => _.some(r.assessmentRatings, d => _.isEqual(x, d)))
+            : _.some(
+                desiredRatings,
+                desiredRating => _.some(
+                    flowRow.allRatings,
+                    flowRating => _.isEqual(desiredRating.ratingId, flowRating.ratingId)))
     };
 }
 

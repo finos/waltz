@@ -9,6 +9,7 @@
     import RatingIndicatorCell from "../../../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
     import {logicalFlowStore} from "../../../../svelte-stores/logical-flow-store";
     import DataTypeMiniTable from "./DataTypeMiniTable.svelte";
+    import AssessmentsTable from "./widgets/AssessmentsTable.svelte";
 
     function goToPhysicalFlowEdit(flow) {
         $pageInfo = {
@@ -45,7 +46,7 @@
     $: assessmentDefinitionsById = _.keyBy(assessmentDefinitions, d => d.id);
     $: flow = $selectedLogicalFlow.logicalFlow;
     $: dataTypes = $selectedLogicalFlow.dataTypesForLogicalFlow;
-    $: ratingsByDefId = $selectedLogicalFlow.ratingsByDefId;
+    $: logicalFlowRatingsByDefId = $selectedLogicalFlow.logicalFlowRatingsByDefId;
     $: ref = {
         id:flow.id,
         name: "Logical Flow",
@@ -96,34 +97,9 @@
 </table>
 
 
-{#if !_.isEmpty(ratingsByDefId)}
-    <table class="table table-condensed small">
-        <thead>
-        <tr>
-            <th>Assessment</th>
-            <th>Rating</th>
-        </tr>
-        </thead>
-        <tbody>
-        {#each _.keys(ratingsByDefId) as defnId}
-            {@const ratings = _.get(ratingsByDefId, defnId, [])}
-            <tr>
-                <td>
-                    {_.get(assessmentDefinitionsById, [defnId, "name"], "Unknown")}
-                </td>
-                <td>
-                    <ul class="list-inline">
-                        {#each ratings as rating}
-                            <li>
-                                <RatingIndicatorCell {...rating}/>
-                            </li>
-                        {/each}
-                    </ul>
-                </td>
-            </tr>
-        {/each}
-        </tbody>
-    </table>
+{#if !_.isEmpty(logicalFlowRatingsByDefId)}
+    <AssessmentsTable ratingsByDefId={logicalFlowRatingsByDefId}
+                      {assessmentDefinitionsById}/>
 {/if}
 
 <details>

@@ -41,7 +41,7 @@
 
             {#if $selectedPhysicalFlow}
                 <hr>
-                <SelectedPhysicalFlowDetail />
+                <SelectedPhysicalFlowDetail {assessmentDefinitions}/>
             {/if}
         </div>
     </div>

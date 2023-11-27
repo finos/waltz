@@ -11,21 +11,23 @@
         toTransportKindName
     } from "../../../../physical-flows/svelte/physical-flow-registration-utils";
     import {selectedPhysicalFlow, selectedLogicalFlow} from "./flow-details-store";
-    import {mkLogicalFromFlowDetails} from "./flow-detail-utils";
     import NoData from "../../../../common/svelte/NoData.svelte";
     import DataTypeTooltipContent from "./DataTypeMiniTable.svelte";
     import {truncate} from "../../../../common/string-utils";
     import Tooltip from "../../../../common/svelte/Tooltip.svelte";
+    import RatingIndicatorCell from "../../../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
+    import EntityIcon from "../../../../common/svelte/EntityIcon.svelte";
 
     export let physicalFlows = [];
     export let flowClassifications = [];
+    export let assessmentDefinitions = [];
 
     function selectPhysicalFlow(flow) {
         if ($selectedPhysicalFlow === flow) {
             $selectedPhysicalFlow = null;
         } else {
             $selectedPhysicalFlow = flow;
-            $selectedLogicalFlow = mkLogicalFromFlowDetails(flow);
+            $selectedLogicalFlow = flow;
         }
     }
 
@@ -82,6 +84,11 @@
                 "logicalFlow.target.name",
                 "logicalFlow.target.externalId"
             ]);
+
+    $: defs = _.filter(
+        assessmentDefinitions,
+        d => d.entityKind === 'PHYSICAL_FLOW' || d.entityKind === 'PHYSICAL_SPECIFICATION');
+
 </script>
 
 
@@ -116,10 +123,18 @@
             <th nowrap="nowrap" style="width: 20em">Criticality</th>
             <th nowrap="nowrap" style="width: 20em">Frequency</th>
             <th nowrap="nowrap" style="width: 20em">Transport Kind</th>
+            {#each defs as defn}
+                <th nowrap="nowrap" style="width: 20em">
+                    <EntityIcon kind={defn.entityKind}/>
+                    {defn.name}
+                </th>
+            {/each}
         </tr>
         </thead>
         <tbody>
         {#each flowList as flow}
+            {@const ratingsForFlowByDefId = _.merge(flow.physicalSpecRatingsByDefId, flow.physicalFlowRatingsByDefId)}
+
             <tr class="clickable"
                 class:selected={$selectedPhysicalFlow === flow}
                 on:click={() => selectPhysicalFlow(flow)}>
@@ -159,10 +174,21 @@
                 <td>
                     {toTransportKindName(nestedEnums, flow.physicalFlow.transport)}
                 </td>
+                {#each defs as defn}
+                    {@const assessmentRatingsForFlow = _.get(ratingsForFlowByDefId, defn.id, [])}
+                    <td>
+                        <div class="rating-col">
+                            {#each assessmentRatingsForFlow as rating}
+                                <RatingIndicatorCell {...rating}/>
+                            {/each}
+                        </div>
+                    </td>
+                {/each}
+
             </tr>
         {:else}
             <tr>
-                <td colspan="9">
+                <td colspan={9 + _.size(defs)}>
                     <NoData type="info">There are no physical flows to show, these may have been filtered.</NoData>
                 </td>
             </tr>
@@ -173,10 +199,10 @@
 
 
 <style>
-
     .selected {
-        background: #eefaee;
+        background: #eefaee !important;
     }
+
     table {
         display: table;
         white-space: nowrap;
@@ -188,6 +214,7 @@
         position: sticky;
         top: 0;
         background: white;
+        z-index: 1;
     }
 
     .table-container {
@@ -195,5 +222,9 @@
         padding-top: 0;
     }
 
+    .rating-col {
+        display: flex;
+        gap: 1em;
+    }
 
 </style>

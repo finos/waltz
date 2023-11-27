@@ -29,6 +29,7 @@ import org.finos.waltz.data.logical_flow.LogicalFlowDecoratorIdSelectorFactory;
 import org.finos.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import org.finos.waltz.data.measurable.MeasurableIdSelectorFactory;
 import org.finos.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
+import org.finos.waltz.data.physical_flow.PhysicalFlowIdSelectorFactory;
 import org.finos.waltz.data.physical_specification.PhysicalSpecificationIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.HierarchyQueryScope;
@@ -53,6 +54,7 @@ public class GenericSelectorFactory {
     private final OrganisationalUnitIdSelectorFactory organisationalUnitIdSelectorFactory = new OrganisationalUnitIdSelectorFactory();
     private final AttestationIdSelectorFactory attestationIdSelectorFactory = new AttestationIdSelectorFactory();
     private final PhysicalSpecificationIdSelectorFactory specificationIdSelectorFactory = new PhysicalSpecificationIdSelectorFactory();
+    private final PhysicalFlowIdSelectorFactory physicalFlowIdSelectorFactory = new PhysicalFlowIdSelectorFactory();
 
 
     public GenericSelector apply(IdSelectionOptions selectionOptions) {
@@ -125,6 +127,8 @@ public class GenericSelectorFactory {
                 return organisationalUnitIdSelectorFactory.apply(selectionOptions);
             case ATTESTATION:
                 return attestationIdSelectorFactory.apply(selectionOptions);
+            case PHYSICAL_FLOW:
+                return physicalFlowIdSelectorFactory.apply(selectionOptions);
             case PHYSICAL_SPECIFICATION:
                 return specificationIdSelectorFactory.apply(selectionOptions);
             //todo: (KS) Add support for Person

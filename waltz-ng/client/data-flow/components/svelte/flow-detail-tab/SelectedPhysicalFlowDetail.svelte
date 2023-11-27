@@ -14,6 +14,7 @@
     import {logicalFlowStore} from "../../../../svelte-stores/logical-flow-store";
     import DescriptionFade from "../../../../common/svelte/DescriptionFade.svelte";
     import DataTypeMiniTable from "./DataTypeMiniTable.svelte";
+    import AssessmentsTable from "./widgets/AssessmentsTable.svelte";
 
     function goToPhysicalFlowPage(flow) {
         $pageInfo = {
@@ -25,6 +26,7 @@
     }
 
     export let flowClassifications = [];
+    export let assessmentDefinitions = [];
 
     let enumsCall = enumValueStore.load();
     let permissionsCall = null;
@@ -39,6 +41,10 @@
     $: physicalFlow = $selectedPhysicalFlow.physicalFlow;
     $: specification = $selectedPhysicalFlow.specification;
     $: dataTypesForSpecification = $selectedPhysicalFlow.dataTypesForSpecification;
+    $: assessmentDefinitionsById = _.keyBy(assessmentDefinitions, d => d.id);
+    $: ratingsByDefId = _.merge(
+        $selectedLogicalFlow.physicalFlowRatingsByDefId,
+        $selectedLogicalFlow.physicalSpecRatingsByDefId);
 
     $: ref = {
         id: physicalFlow.id,
@@ -126,7 +132,11 @@
     </tbody>
 </table>
 
-<br>
+
+{#if !_.isEmpty(ratingsByDefId)}
+    <AssessmentsTable {ratingsByDefId}
+                      {assessmentDefinitionsById}/>
+{/if}
 
 <details>
     <summary>Actions</summary>

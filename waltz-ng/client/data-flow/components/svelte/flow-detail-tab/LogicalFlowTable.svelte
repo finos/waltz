@@ -1,5 +1,4 @@
 <script>
-
     import SearchInput from "../../../../common/svelte/SearchInput.svelte";
     import {termSearch} from "../../../../common";
     import RatingIndicatorCell from "../../../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
@@ -12,10 +11,11 @@
 
     export let logicalFlows = [];
     export let flowClassifications = [];
-    export let assessments;
+    export let assessmentDefinitions = [];
 
     let qry;
     let selectionLatchOpen = true;
+    let defs = [];
 
     function isSameFlow(a, b) {
         const aId = _.get(a, ["logicalFlow", "id"]);
@@ -87,6 +87,9 @@
                 "logicalFlow.target.externalId"
             ]);
 
+    $: defs = _.filter(
+        assessmentDefinitions,
+        d => d.entityKind === 'LOGICAL_DATA_FLOW');
 </script>
 
 <h4>
@@ -116,7 +119,7 @@
             <th nowrap="nowrap" style="width: 20em">Target</th>
             <th nowrap="nowrap" style="width: 20em">Target Ext ID</th>
             <th nowrap="nowrap" style="width: 20em; max-width: 20em">Data Types</th>
-            {#each assessments as defn}
+            {#each defs as defn}
                 <th nowrap="nowrap" style="width: 20em">{defn.name}</th>
             {/each}
         </tr>
@@ -147,8 +150,8 @@
                         </svelte:fragment>
                     </Tooltip>
                 </td>
-                {#each assessments as defn}
-                    {@const assessmentRatingsForFlow = _.get(flow.ratingsByDefId, defn.id, [])}
+                {#each defs as defn}
+                    {@const assessmentRatingsForFlow = _.get(flow.logicalFlowRatingsByDefId, defn.id, [])}
                     <td>
                         <div class="rating-col">
                             {#each assessmentRatingsForFlow as rating}
@@ -160,7 +163,7 @@
             </tr>
         {:else}
             <tr>
-                <td colspan={5 + _.size(assessments)}>
+                <td colspan={5 + _.size(defs)}>
                     <NoData type="info">There are no logical flows to show, these may have been filtered.</NoData>
                 </td>
             </tr>
@@ -171,9 +174,8 @@
 
 
 <style>
-
     .selected {
-        background: #eefaee;
+        background: #eefaee !important;
     }
 
     table {
@@ -199,6 +201,4 @@
         display: flex;
         gap: 1em;
     }
-
-
 </style>
