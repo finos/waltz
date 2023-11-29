@@ -82,8 +82,6 @@
             flowViewCall = logicalFlowStore.getViewForSelector(selectionOptions);
         }
     }
-
-    $: console.log({filterFlows, physicalFlows, logicalFlows})
 </script>
 
 
