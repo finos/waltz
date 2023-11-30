@@ -11,10 +11,58 @@
         toTransportKindName
     } from "../../../../physical-flows/svelte/physical-flow-registration-utils";
     import {selectedPhysicalFlow, selectedLogicalFlow} from "./flow-details-store";
-    import {mkLogicalFromFlowDetails} from "./flow-detail-utils";
     import NoData from "../../../../common/svelte/NoData.svelte";
+    import DataTypeTooltipContent from "./DataTypeMiniTable.svelte";
+    import {truncate} from "../../../../common/string-utils";
+    import Tooltip from "../../../../common/svelte/Tooltip.svelte";
+    import RatingIndicatorCell from "../../../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
+    import EntityIcon from "../../../../common/svelte/EntityIcon.svelte";
 
-    export let physicalFlows;
+    export let physicalFlows = [];
+    export let flowClassifications = [];
+    export let assessmentDefinitions = [];
+
+    function selectPhysicalFlow(flow) {
+        if ($selectedPhysicalFlow === flow) {
+            $selectedPhysicalFlow = null;
+        } else {
+            $selectedPhysicalFlow = flow;
+            $selectedLogicalFlow = flow;
+        }
+    }
+
+    function mkDataTypeTooltipProps(row) {
+        row.dataTypesForSpecification;
+
+        const ratingByDataTypeId = _.reduce(
+            row.dataTypesForLogicalFlow,
+            (acc, d) => {
+                acc[d.decoratorEntity.id] = d.rating;
+                return acc;
+            },
+            {});
+
+        const decorators = _.map(
+            row.dataTypesForSpecification,
+            d => Object.assign(
+                {},
+                d,
+                { rating: ratingByDataTypeId[d.decoratorEntity?.id] }));
+
+        return {
+            decorators,
+            flowClassifications
+        };
+    }
+
+    function mkDataTypeString(dataTypes) {
+        return _
+            .chain(dataTypes)
+            .map(d => d.decoratorEntity.name)
+            .orderBy(d => d)
+            .join(", ")
+            .value();
+    }
 
     let qry;
     let visibleFlows;
@@ -37,11 +85,9 @@
                 "logicalFlow.target.externalId"
             ]);
 
-
-    function selectPhysicalFlow(flow) {
-        $selectedPhysicalFlow = flow;
-        $selectedLogicalFlow = mkLogicalFromFlowDetails(flow);
-    }
+    $: defs = _.filter(
+        assessmentDefinitions,
+        d => d.entityKind === 'PHYSICAL_FLOW' || d.entityKind === 'PHYSICAL_SPECIFICATION');
 
 </script>
 
@@ -63,24 +109,34 @@
 </div>
 <div class="table-container"
      class:waltz-scroll-region-350={_.size(physicalFlows) > 10}>
-    <table class="table table-condensed small"
+    <table class="table table-condensed small table-hover"
            style="margin-top: 1em">
         <thead>
         <tr>
             <th nowrap="nowrap" style="width: 20em">Source</th>
-            <th nowrap="nowrap" style="width: 20em">Source External ID</th>
+            <th nowrap="nowrap" style="width: 20em">Src Ext ID</th>
             <th nowrap="nowrap" style="width: 20em">Target</th>
-            <th nowrap="nowrap" style="width: 20em">Target External ID</th>
+            <th nowrap="nowrap" style="width: 20em">Target Ext ID</th>
             <th nowrap="nowrap" style="width: 20em; max-width: 20em">Name</th>
             <th nowrap="nowrap" style="width: 20em">External ID</th>
+            <th nowrap="nowrap" style="width: 20em">Data Types</th>
             <th nowrap="nowrap" style="width: 20em">Criticality</th>
             <th nowrap="nowrap" style="width: 20em">Frequency</th>
             <th nowrap="nowrap" style="width: 20em">Transport Kind</th>
+            {#each defs as defn}
+                <th nowrap="nowrap" style="width: 20em">
+                    <EntityIcon kind={defn.entityKind}/>
+                    {defn.name}
+                </th>
+            {/each}
         </tr>
         </thead>
         <tbody>
         {#each flowList as flow}
+            {@const ratingsForFlowByDefId = _.merge(flow.physicalSpecRatingsByDefId, flow.physicalFlowRatingsByDefId)}
+
             <tr class="clickable"
+                class:selected={$selectedPhysicalFlow === flow}
                 on:click={() => selectPhysicalFlow(flow)}>
                 <td>
                     {flow.logicalFlow.source.name}
@@ -101,6 +157,15 @@
                     {flow.physicalFlow.externalId || ""}
                 </td>
                 <td>
+                    <Tooltip content={DataTypeTooltipContent}
+                             trigger={"mouseenter"}
+                             props={mkDataTypeTooltipProps(flow)}>
+                        <svelte:fragment slot="target">
+                            <span>{truncate(mkDataTypeString(flow.dataTypesForSpecification), 30)}</span>
+                        </svelte:fragment>
+                    </Tooltip>
+                </td>
+                <td>
                     {toCriticalityName(nestedEnums, flow.physicalFlow.criticality)}
                 </td>
                 <td>
@@ -109,10 +174,21 @@
                 <td>
                     {toTransportKindName(nestedEnums, flow.physicalFlow.transport)}
                 </td>
+                {#each defs as defn}
+                    {@const assessmentRatingsForFlow = _.get(ratingsForFlowByDefId, defn.id, [])}
+                    <td>
+                        <div class="rating-col">
+                            {#each assessmentRatingsForFlow as rating}
+                                <RatingIndicatorCell {...rating}/>
+                            {/each}
+                        </div>
+                    </td>
+                {/each}
+
             </tr>
         {:else}
             <tr>
-                <td colspan="9">
+                <td colspan={9 + _.size(defs)}>
                     <NoData type="info">There are no physical flows to show, these may have been filtered.</NoData>
                 </td>
             </tr>
@@ -123,6 +199,9 @@
 
 
 <style>
+    .selected {
+        background: #eefaee !important;
+    }
 
     table {
         display: table;
@@ -135,6 +214,7 @@
         position: sticky;
         top: 0;
         background: white;
+        z-index: 1;
     }
 
     .table-container {
@@ -142,5 +222,9 @@
         padding-top: 0;
     }
 
+    .rating-col {
+        display: flex;
+        gap: 1em;
+    }
 
 </style>

@@ -1,12 +1,10 @@
 <script>
-
-
-    import {mkAssessmentFilter, mkDefinitionFilterId} from "./flow-detail-utils";
+    import {mkAssessmentFilter, mkDefinitionFilterId} from "./filter-utils";
     import _ from "lodash";
-    import {filters, updateFilters} from "./flow-details-store";
-    import RatingIndicatorCell from "../../../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
-    import NoData from "../../../../common/svelte/NoData.svelte";
-
+    import {filters, updateFilters} from "../flow-details-store";
+    import RatingIndicatorCell from "../../../../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
+    import NoData from "../../../../../common/svelte/NoData.svelte";
+    import EntityIcon from "../../../../../common/svelte/EntityIcon.svelte";
 
     export let assessmentFilters = [];
 
@@ -49,21 +47,21 @@
 
 <div class="help-block"
  style="padding-top: 1em">
-Use the assessment ratings to filter the logical flows. Only ratings aligned to a flow can be filtered upon.
+    Use the assessment ratings to filter the logical flows. Only ratings aligned to a flow can be filtered upon.
 </div>
-<div style="display: flex; gap: 1em">
+<div style="display: flex; gap: 1em;">
     {#each assessmentFilters as assessment}
         <div style="flex: 1 1 30%">
-            <table class="table table-condensed table">
+            <table class="table table-condensed table small table-hover">
                 <thead>
                 <tr>
-                    <th>{assessment?.definition?.name}
-                        <span>
-                            <button class="btn btn-skinny"
-                                    on:click={() => clearFiltersForDefinition(assessment?.definition.id)}>
-                                Clear
-                            </button>
-                        </span>
+                    <th>
+                        <EntityIcon kind={assessment?.definition?.entityKind}/>
+                        {assessment?.definition?.name}
+                        <button class="btn btn-skinny"
+                                on:click={() => clearFiltersForDefinition(assessment?.definition.id)}>
+                            Clear
+                        </button>
                     </th>
                 </tr>
                 </thead>
@@ -88,7 +86,7 @@ Use the assessment ratings to filter the logical flows. Only ratings aligned to 
 <style>
 
     .selected {
-        background-color: #eee;
+        background-color: #eefaee !important;
     }
 
 </style>

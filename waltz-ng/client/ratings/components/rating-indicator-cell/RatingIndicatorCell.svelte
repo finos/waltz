@@ -28,12 +28,13 @@
 
 <style>
     .cell {
-        top: 4px;
         display: inline-block;
-        width: 1em;
-        height: 1em;
-        border: 1px solid;
+        width: 1.1em;
+        height: 1.1em;
+        border: 1px solid #aaa;
         border-radius: 2px;
+        position: relative;
+        top: 2px;
     }
 
     .name {

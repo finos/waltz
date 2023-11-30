@@ -5,6 +5,7 @@
 
     export let text = "";
     export let context = {};
+    export let expanderAlignment = "center"; // left | center (default) | right
 
     let expanded = false;
 
@@ -17,7 +18,7 @@
     <Markdown {text} {context}/>
 </div>
 {#if hasLongDescription}
-    <div class="expander">
+    <div class="expander" style:text-align={expanderAlignment}>
         <button class="btn btn-skinny small"
                 on:click={() => expanded = !expanded}>
             {expanded ? "Show less" : "Show more"}

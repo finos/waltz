@@ -36,18 +36,28 @@ import java.util.Set;
 @JsonDeserialize(as = ImmutableLogicalFlowView.class)
 public abstract class LogicalFlowView {
 
-    public abstract Set<LogicalFlow> flows();
-
-    public abstract Set<AssessmentRating> flowRatings();
-
-    public abstract Set<AssessmentDefinition> primaryAssessmentDefinitions();
-
-    public abstract Set<RatingSchemeItem> ratingSchemeItems();
-
-    public abstract Set<DataTypeDecorator> dataTypeDecorators();
+    public abstract Set<LogicalFlow> logicalFlows();
 
     public abstract Set<PhysicalFlow> physicalFlows();
 
     public abstract Set<PhysicalSpecification> physicalSpecifications();
+
+    public abstract Set<RatingSchemeItem> ratingSchemeItems();
+
+    public abstract Set<DataTypeDecorator> logicalFlowDataTypeDecorators();
+
+    public abstract Set<DataTypeDecorator> physicalSpecificationDataTypeDecorators();
+
+    public abstract Set<AssessmentDefinition> logicalFlowAssessmentDefinitions();
+
+    public abstract Set<AssessmentDefinition> physicalFlowAssessmentDefinitions();
+
+    public abstract Set<AssessmentDefinition> physicalSpecificationAssessmentDefinitions();
+
+    public abstract Set<AssessmentRating> logicalFlowRatings();
+
+    public abstract Set<AssessmentRating> physicalFlowRatings();
+
+    public abstract Set<AssessmentRating> physicalSpecificationRatings();
 
 }

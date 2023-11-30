@@ -52,9 +52,8 @@ import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
-import static org.finos.waltz.model.EntityKind.DATA_TYPE;
-import static org.finos.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.schema.Tables.DATA_TYPE;
 import static org.finos.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static org.finos.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static org.finos.waltz.schema.tables.PhysicalSpecDataType.PHYSICAL_SPEC_DATA_TYPE;
@@ -65,8 +64,8 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
     public static final RecordMapper<? super Record, DataTypeDecorator> TO_DOMAIN_MAPPER = r -> {
         PhysicalSpecDataTypeRecord record = r.into(PHYSICAL_SPEC_DATA_TYPE);
         return ImmutableDataTypeDecorator.builder()
-                .decoratorEntity(mkRef(DATA_TYPE, record.getDataTypeId()))
-                .entityReference(mkRef(PHYSICAL_SPECIFICATION,record.getSpecificationId()))
+                .decoratorEntity(mkRef(EntityKind.DATA_TYPE, record.getDataTypeId(), r.get(DATA_TYPE.NAME)))
+                .entityReference(mkRef(EntityKind.PHYSICAL_SPECIFICATION,record.getSpecificationId()))
                 .provenance(record.getProvenance())
                 .lastUpdatedAt(toLocalDateTime(record.getLastUpdatedAt()))
                 .lastUpdatedBy(record.getLastUpdatedBy())
@@ -102,7 +101,9 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
     public DataTypeDecorator getByEntityIdAndDataTypeId(long specId, long dataTypeId) {
         return dsl
                 .select(PHYSICAL_SPEC_DATA_TYPE.fields())
+                .select(DATA_TYPE.NAME)
                 .from(PHYSICAL_SPEC_DATA_TYPE)
+                .innerJoin(DATA_TYPE).on(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID.eq(DATA_TYPE.ID))
                 .where(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID.eq(specId))
                 .and(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID.eq(dataTypeId))
                 .fetchOne(TO_DOMAIN_MAPPER);
@@ -113,7 +114,9 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
     public List<DataTypeDecorator> findByEntityId(long specId) {
         return dsl
                 .select(PHYSICAL_SPEC_DATA_TYPE.fields())
+                .select(DATA_TYPE.NAME)
                 .from(PHYSICAL_SPEC_DATA_TYPE)
+                .innerJoin(DATA_TYPE).on(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID.eq(DATA_TYPE.ID))
                 .where(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID.eq(specId))
                 .fetch(TO_DOMAIN_MAPPER);
     }
@@ -124,7 +127,9 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
                                                           Optional<EntityKind> entityKind) {
         return dsl
                 .select(PHYSICAL_SPEC_DATA_TYPE.fields())
+                .select(DATA_TYPE.NAME)
                 .from(PHYSICAL_SPEC_DATA_TYPE)
+                .innerJoin(DATA_TYPE).on(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID.eq(DATA_TYPE.ID))
                 .where(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID.in(specIdSelector))
                 .fetch(TO_DOMAIN_MAPPER);
     }
@@ -132,24 +137,23 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
 
     @Override
     public List<DataTypeDecorator> findByAppIdSelector(Select<Record1<Long>> appIdSelector) {
-        throw new UnsupportedOperationException("method not supported for " + PHYSICAL_SPECIFICATION.prettyName());
+        throw new UnsupportedOperationException("method not supported for " + EntityKind.PHYSICAL_SPECIFICATION.prettyName());
     }
 
     @Override
     public Set<DataTypeDecorator> findByFlowIdSelector(Select<Record1<Long>> flowIdSelector) {
-        throw new UnsupportedOperationException("method not supported for " + PHYSICAL_SPECIFICATION.prettyName());
+        throw new UnsupportedOperationException("method not supported for " + EntityKind.PHYSICAL_SPECIFICATION.prettyName());
     }
-
 
     @Override
     public List<DataTypeDecorator> findByDataTypeIdSelector(Select<Record1<Long>> dataTypeIdSelector) {
-        throw new UnsupportedOperationException("method not supported for " + PHYSICAL_SPECIFICATION.prettyName());
+        throw new UnsupportedOperationException("method not supported for " + EntityKind.PHYSICAL_SPECIFICATION.prettyName());
     }
 
 
     @Override
     public Set<DataTypeDecorator> findByFlowIds(Collection<Long> flowIds) {
-        throw new UnsupportedOperationException("method not supported for " + PHYSICAL_SPECIFICATION.prettyName());
+        throw new UnsupportedOperationException("method not supported for " + EntityKind.PHYSICAL_SPECIFICATION.prettyName());
     }
 
 
@@ -204,7 +208,7 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
 
     @Override
     public Set<DataTypeDecorator> findByLogicalFlowIdSelector(Select<Record1<Long>> flowIdSelector) {
-        throw new UnsupportedOperationException("method not supported for " + PHYSICAL_SPECIFICATION.prettyName());
+        throw new UnsupportedOperationException("method not supported for " + EntityKind.PHYSICAL_SPECIFICATION.prettyName());
     }
 
 
@@ -234,17 +238,17 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
         SelectConditionStep<Record7<Long, String, Long, String, String, Timestamp, String>> qry = DSL
                 .selectDistinct(
                         PHYSICAL_FLOW.LOGICAL_FLOW_ID,
-                        DSL.val(DATA_TYPE.name()),
+                        DSL.val(EntityKind.DATA_TYPE.name()),
                         PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID,
                         DSL.val(AuthoritativenessRatingValue.NO_OPINION.value()),
                         DSL.val("waltz"),
                         DSL.val(Timestamp.valueOf(nowUtc())),
                         DSL.val("admin"))
                 .from(PHYSICAL_SPEC_DATA_TYPE)
-                .innerJoin(Tables.DATA_TYPE)
-                .on(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID.eq(Tables.DATA_TYPE.ID)
-                        .and(Tables.DATA_TYPE.UNKNOWN.isFalse()
-                                .and(Tables.DATA_TYPE.DEPRECATED.isFalse())))
+                .innerJoin(DATA_TYPE)
+                .on(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID.eq(DATA_TYPE.ID)
+                        .and(DATA_TYPE.UNKNOWN.isFalse()
+                                .and(DATA_TYPE.DEPRECATED.isFalse())))
                 .innerJoin(Tables.PHYSICAL_SPECIFICATION)
                 .on(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID.eq(Tables.PHYSICAL_SPECIFICATION.ID)
                         .and(Tables.PHYSICAL_SPECIFICATION.IS_REMOVED.isFalse()))
@@ -259,7 +263,7 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
                 .leftJoin(LOGICAL_FLOW_DECORATOR)
                 .on(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(Tables.LOGICAL_FLOW.ID)
                         .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.eq(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID))
-                        .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(DATA_TYPE.name())))
+                        .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())))
                 .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.isNull());
 
         return dsl

@@ -94,7 +94,7 @@ public class LogicalFlowViewExtractor extends CustomDataExtractor {
                 "Data Types",
                 "Physical Flow Count");
 
-        List<String> assessmentHeaders = flowView.primaryAssessmentDefinitions()
+        List<String> assessmentHeaders = flowView.logicalFlowAssessmentDefinitions()
                 .stream()
                 .map(d -> d.name())
                 .sorted()
@@ -110,18 +110,18 @@ public class LogicalFlowViewExtractor extends CustomDataExtractor {
 
     private List<List<Object>> prepareReportRows(LogicalFlowView viewData) {
 
-        Map<Long, Collection<DataTypeDecorator>> dataTypesByFlowId = MapUtilities.groupBy(viewData.dataTypeDecorators(), d -> d.dataFlowId());
+        Map<Long, Collection<DataTypeDecorator>> logicalFlowDataTypesByFlowId = MapUtilities.groupBy(viewData.logicalFlowDataTypeDecorators(), DataTypeDecorator::dataFlowId);
         Map<Long, Collection<PhysicalFlow>> physicalsByLogicalFlowId = MapUtilities.groupBy(viewData.physicalFlows(), PhysicalFlow::logicalFlowId);
-        Map<Long, Collection<AssessmentRating>> ratingsByFlowId = MapUtilities.groupBy(viewData.flowRatings(), d -> d.entityReference().id());
+        Map<Long, Collection<AssessmentRating>> ratingsByFlowId = MapUtilities.groupBy(viewData.logicalFlowRatings(), d -> d.entityReference().id());
         Map<Long, RatingSchemeItem> ratingSchemeItemsById = indexById(viewData.ratingSchemeItems());
 
         return viewData
-                .flows()
+                .logicalFlows()
                 .stream()
                 .map(row -> {
                     ArrayList<Object> reportRow = new ArrayList<>();
 
-                    Collection<DataTypeDecorator> decorators = dataTypesByFlowId.getOrDefault(row.entityReference().id(), Collections.emptySet());
+                    Collection<DataTypeDecorator> decorators = logicalFlowDataTypesByFlowId.getOrDefault(row.entityReference().id(), Collections.emptySet());
                     String dataTypeString = joinUsing(decorators, d -> d.decoratorEntity().name().orElseGet(() -> "?"), ", ");
 
                     Map<Long, Collection<AssessmentRating>> ratingsByDefnId = MapUtilities.groupBy(
@@ -137,7 +137,7 @@ public class LogicalFlowViewExtractor extends CustomDataExtractor {
                     reportRow.add(dataTypeString);
                     reportRow.add(physicals.size());
 
-                    viewData.primaryAssessmentDefinitions()
+                    viewData.logicalFlowAssessmentDefinitions()
                             .stream()
                             .sorted(Comparator.comparing(NameProvider::name))
                             .forEach(defn -> {

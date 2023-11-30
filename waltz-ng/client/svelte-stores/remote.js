@@ -18,7 +18,7 @@
 
 import {$http} from "../common/WaltzHttp";
 import stringify from "json-stable-stringify";
-import {writable} from "svelte/store";
+import {get as rawGet, writable} from "svelte/store";
 
 
 class Cache {
@@ -29,6 +29,10 @@ class Cache {
 
     clear() {
         this.cacheData.clear();
+    }
+
+    delete(key) {
+        this.cacheData.delete(key);
     }
 
     get(key) {
@@ -85,7 +89,6 @@ function mkKey(method, url, data) {
 function _fetchData(cache, method, url, data, init = [], config = { force: false }) {
     const key = mkKey(method, url, data);
     const forcing = _.get(config, ["force"], false);
-
     const invokeFetch = () => mkPromise(method, url, data)
         .then(r => cache.set(key, r.data))
         .catch(e => cache.err(key, e, init));
@@ -93,6 +96,11 @@ function _fetchData(cache, method, url, data, init = [], config = { force: false
     if (cache.has(key)) {
         if (forcing) {
             invokeFetch();
+        } else {
+            const existingValue = cache.get(key);
+            setTimeout(() => {
+                cache.set(key, rawGet(existingValue).data);
+            }, 0)
         }
     } else {
         cache.init(key, init);

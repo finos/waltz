@@ -41,3 +41,9 @@
         </span>
     {/if}
 {/if}
+
+<style>
+    button {
+        font-size: inherit;
+    }
+</style>

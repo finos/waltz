@@ -10,6 +10,7 @@
 
     export let content;
     export let props;
+    export let trigger = "mouseenter click";
     export let placement = "top";
     export let delay = [300, 100];
 
@@ -21,7 +22,8 @@
                 content: "loading",
                 arrow: true,
                 interactive: true,
-                trigger: 'mouseenter click',
+                appendTo: document.body,
+                trigger,
                 theme: "light-border",
                 placement,
                 delay,
