@@ -72,7 +72,7 @@
                 </span>
                 <waltz-icon name="exclamation-triangle"
                             ng-if="node.ratingSchemeItem.isRestricted"
-                            style="color: red; position: relative; top: -1px">
+                            style="color: #efc155; position: relative; top: -1px">
                 </waltz-icon>
                 <span style="position: relative; top: -1px"
                       class="waltz-visibility-child-30">
@@ -184,7 +184,9 @@
              class="text-muted">
             <waltz-icon name="exclamation-triangle">
             </waltz-icon>
-            This rating is in breach of the constraining assessment
+            This rating is in breach of the constraining assessment.
+            It has a 'higher' rating than the overall
+            {{node.rating.entityReference.kind | toDisplayName:'entity'}}.
         </div>
     </div>
 </script>
