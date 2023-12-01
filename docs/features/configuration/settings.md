@@ -35,6 +35,12 @@ Group of settings which control how waltz handles authentication/authorization
 * ```web.authentication```
   * ```waltz``` - indicates that waltz is handling authentication, the login panel will be displayed
   * ```sso``` - authentication is done elsewhere, do not show the login panel
+* ```oauth.provider.name``` <-- optional
+  * this is the name of the oauth2 provider set up in thirdparty-setup.js
+  * By default this is `null`
+* ```oauth.disable.anonymous``` <-- optional
+  * ```true``` - this will prevent users from viewing Waltz if they are not authenticated via ```sso```
+  * ```false``` - [default] this allows Anonymous browsing
 * ```server.authentication.filter```
   * ```<classname>``` - the name of the class which injects the user object into incoming requests.
     By default this is ```JWTAuthenticationFilter```, options are:

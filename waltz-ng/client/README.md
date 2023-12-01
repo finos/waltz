@@ -54,69 +54,37 @@ Exception Handling - if there is an issue with the "satellizer_token" (ex. faile
 
 
 
-## (Optional) Implementation: svelte-page.html
+## Implementation: svelte-page.html
 
-**Summary:** (Optional) Add conditional logic to block the page from rendering if the user isn't Authenticated. Some organizations may want to allow for Anonymous browsing for all, but this option would add another layer of protection. 
+**Summary:** Add conditional logic to block the page from rendering if the user isn't Authenticated. Some organizations may want to allow for Anonymous browsing for all, but this option would add another layer of protection. 
 
-**Setup:** In conjuction with changes to `svelte-page.js`, you can create flags/functions to check if 1) Authentication Failed and 2) User Authenticated Successfully
+**Setup:** This logic can be enabled via setting ```oauth.disable.anonymous``` to ```true``` (see [settings](../../docs/features/configuration/settings.md)).
 
-Example definitions:
-
-	isAuthenticated()
-		True: user has been Authenticated successfully via a thirdparty OAuth provider
-		False: Authentication was not successful
-		(Default) undefined: function has not executed yet
-		
-	isAuthFailed
-		True: Authentication was attempted and failed
-		(Default) False: Authentication attempt not yet initiated or still in progress (success or failure not yet determined)
-		
-		
-Then you can wrap the entire Header and Content section in a `<div>` and then add two conditional messages to display Authentication progress/status...
-
-	<div ng-if="isAuthenticated()">
-		<!-- Header -->
-		<div ui-view="header">
-		
-			<!-- original source code continues here -->
-	
-			</main>
-		</div>
-	</div>
-	<div ng-if="!isAuthenticated() && !isAuthFailed">
-		<h2>Authenticating user...</h2>	
-	</div>
-	<div ng-if="!isAuthenticated() && isAuthFailed">
-		<h2>Authentication Failed</h2>	
-		<h3>Contact your Waltz System Administrator for more information</h3>	
-	</div>
 	
 
 
 ## Implementation: svelte-page.js
 
-**Summary:** This section calls the satellizer implementation of the OAuth Provider and attempts to authenticate the user. Conditional logic will set flags to indicate authentication status.
+**Summary:** This section can call the satellizer implementation of the OAuth Provider and attempts to authenticate the user. Conditional logic will set flags to indicate authentication status.
 
-**Setup:** Some elements have been added to support this function, but other elements need to be added in if ```sso``` through a thirdparty OAuth provider is the desired outcome. 
+**Setup:** There are the configurations that can be setup (see also [settings](../../docs/features/configuration/settings.md)).
+
+* Waltz Login
+	* ```web.authentication``` = ```waltz```
+	* ```oauth.provider.name```  <-- do not add to Settings
+	* ```oauth.disable.anonymous``` <-- do not add to Settings
+* SSO (Externally Managed)
+	* ```web.authentication``` = ```sso```
+	* ```oauth.provider.name``` <-- do not add to Settings
+	* ```oauth.disable.anonymous``` <-- do not add to Settings
+* SSO (thirdparty integration with satellizer)
+	* ```web.authentication``` = ```sso```
+	* ```oauth.provider.name``` needs to match the 'name' you provide in thirdparty-setup.js
+	* ```oauth.disable.anonymous``` can be set to ```true`` (blocks anonymous browsing) or ```false``` (allows anonymous browsing) or left out of Settings (allows anonymous browsing)
+
+This can be enabled via setting ```oauth.disable.anonymous``` to ```true``` (see [settings](../../docs/features/configuration/settings.md)).
 
 
-*IMPORTANT:* Some of the required changes may not be compatible with ```waltz``` as the ```web.authentication``` method. Therefore, they are not included in the Waltz release. Provided below is a sample to be added within the `vm.$onInit` lifecycle hook if ```sso``` is enabled. This will initiate the OAuth process via the `$auth.authenticate("oauthprovider")` call:
-
-	// try to authenticate with OAuth Provider
-	if (!$auth.isAuthenticated()){
-		$auth.authenticate("oauthprovider")
-		.then(function(response){
-			console.log("authentication through oauthprovider - Successful");
-			window.location.reload();
-		})
-		.catch(function(response){
-			console.log("authentication through oauthprovider - FAILED");
-			$scope.isAuthFailed = true;
-			return false;
-		});
-	}
-
-* Note: "oauthprovider" in the snippet above needs to match the 'name' you provide in thirdparty-setup.js
 
 
 ## (Optional) Implementation: remote.js
