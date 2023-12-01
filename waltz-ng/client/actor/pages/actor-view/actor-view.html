@@ -20,7 +20,7 @@
 
     <!-- HEADER -->
     <waltz-page-header name="{{ ctrl.actor.name }}"
-                       small="Actor"
+                       small="{{ ctrl.actor.externalId || 'Actor'}}"
                        icon="user-circle">
         <breadcrumbs>
             <ol class="waltz-breadcrumbs">
