@@ -19,6 +19,8 @@
 
 export default {
     authentication: "web.authentication",
+    oauthProviderName: "oauth.provider.name",
+    oauthDisableAnonymous: "oauth.disable.anonymous",
     devExtEnabled: "web.devext.enabled",
     httpHeaderPrefix: "web.devext.http.header.",
     betaEnvironment: "web.beta",
