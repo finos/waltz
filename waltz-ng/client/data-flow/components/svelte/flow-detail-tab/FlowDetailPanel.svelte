@@ -8,7 +8,7 @@
     import {filters, resetFlowDetailsStore, selectedLogicalFlow, selectedPhysicalFlow} from "./flow-details-store";
     import PhysicalFlowTable from "./PhysicalFlowTable.svelte";
     import {mkFlowDetails} from "./flow-detail-utils";
-    import {mkAssessmentFilters} from "./filters/filter-utils";
+    import {getAssessmentFilters} from "./filters/filter-utils";
     import SelectedFlowDetailPanel from "./SelectedFlowDetailPanel.svelte";
     import {onMount} from "svelte";
     import DataExtractLink from "../../../../common/svelte/DataExtractLink.svelte";
@@ -18,7 +18,6 @@
     export let parentEntityRef;
 
     function filterFlows(allFlows, filters) {
-        console.log("ff", {allFlows, filters})
         return _
             .chain(allFlows)
             .map(d => Object.assign(d, {visible: _.every(filters, f => f.test(d))}))
@@ -35,6 +34,8 @@
     let mappedDataTypes = [];
     let assessmentFilters = [];
     let dataTypes = [];
+    let allDataTypes = [];
+    let flowClassifications = [];
     let allFlows = [];
     let physicalFlows = [];
     let logicalFlows = [];
@@ -71,7 +72,7 @@
 
             const mappedDataTypeIds = _.map(mappedDataTypes, d => d.dataTypeId);
             dataTypes = reduceToSelectedNodesOnly(allDataTypes, mappedDataTypeIds);
-            assessmentFilters = mkAssessmentFilters(flowView);
+            assessmentFilters = getAssessmentFilters(flowView);
             allFlows = mkFlowDetails(flowView, parentEntityRef);
         }
     }
@@ -89,6 +90,7 @@
     <div class="flow-detail-table">
         <FlowDetailFilters {dataTypes}
                            {assessmentFilters}
+                           {flowClassifications}
                            {physicalFlows}/>
 
         <LogicalFlowTable {logicalFlows}
