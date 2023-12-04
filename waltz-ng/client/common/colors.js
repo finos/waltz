@@ -27,6 +27,7 @@ export const greyHex = "#939393";
 export const lightGreyHex = "#D1D1D1";
 export const blueHex = "#1F7FE0";
 export const greenHex = "#5BB65D";
+export const vibrantGreenHex = "#43f545";
 export const yellowHex = "#E0E314";
 export const goldHex = "#B7A61F";
 export const amberHex = "#D9923F";
@@ -49,6 +50,7 @@ export const grey = rgb(greyHex);
 export const lightGrey = rgb(lightGreyHex);
 export const blue = rgb(blueHex);
 export const green = rgb(greenHex);
+export const vibrantGreen = rgb(vibrantGreenHex);
 export const yellow = rgb(yellowHex);
 export const gold = rgb(goldHex);
 export const amber = rgb(amberHex);
@@ -172,9 +174,23 @@ const variableColorList = [
             "END_OF_LIFE",
             "NON PAAS",
             "HIGH RISK",
-            "HIGH"
+            "HIGH",
+            "WORSE - FAILURE RATE",
+            "WORSE - CHANGE LEAD TIME",
+            "LOW - RELEASE FREQ",
+            "WORSE - TIME TO RESTORE"
         ]
-    }, {
+    },
+    {
+        color: vibrantGreen,
+        keys: [
+            "NONE - FAILURE RATE",
+            "ELITE - CHANGE LEAD TIME",
+            "ELITE - RELEASE FREQ",
+            "MINOR - TIME TO RESTORE"
+        ]
+    },
+    {
         color: green,
         keys: [
             "YES",
@@ -194,7 +210,18 @@ const variableColorList = [
             "NOT_END_OF_LIFE",
             "PAAS",
             "LOW RISK",
-            "LOW"
+            "LOW",
+            "LOW - FAILURE RATE",
+            "HIGH - RELEASE FREQ",
+            "LOW - TIME TO RESTORE",
+            "GOOD - CHANGE LEAD TIME"
+        ]
+    }, {
+        color: yellow,
+        keys: [
+            "MEDIUM - FAILURE RATE",
+            "MEDIUM - CHANGE LEAD TIME",
+            "MEDIUM - RELEASE FREQ",
         ]
     }, {
         color: amber,
@@ -213,7 +240,9 @@ const variableColorList = [
             "OKAY",
             "PREPROD",
             "MEDIUM RISK",
-            "MEDIUM"
+            "MEDIUM",
+            "HIGH - FAILURE RATE",
+            "POOR - TIME TO RESTORE"
         ]
     }, {
         color: blue,
