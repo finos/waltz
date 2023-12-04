@@ -20,8 +20,6 @@ package org.finos.waltz.service.flow_classification_rule;
 
 import org.finos.waltz.data.flow_classification_rule.FlowClassificationDao;
 import org.finos.waltz.model.flow_classification.FlowClassification;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,8 +30,6 @@ import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Service
 public class FlowClassificationService {
-
-    private static final Logger LOG = LoggerFactory.getLogger(FlowClassificationService.class);
 
     private final FlowClassificationDao flowClassificationDao;
 

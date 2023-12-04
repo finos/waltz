@@ -42,17 +42,13 @@ public class FlowClassificationEndpoint implements Endpoint {
     private static final String BASE_URL = WebUtilities.mkPath("api", "flow-classification");
 
     private final FlowClassificationService flowClassificationService;
-    private final UserRoleService userRoleService;
 
 
     @Autowired
-    public FlowClassificationEndpoint(FlowClassificationService flowClassificationService,
-                                      UserRoleService userRoleService) {
+    public FlowClassificationEndpoint(FlowClassificationService flowClassificationService) {
         checkNotNull(flowClassificationService, "flowClassificationService must not be null");
-        checkNotNull(userRoleService, "userRoleService cannot be null");
 
         this.flowClassificationService = flowClassificationService;
-        this.userRoleService = userRoleService;
     }
 
 

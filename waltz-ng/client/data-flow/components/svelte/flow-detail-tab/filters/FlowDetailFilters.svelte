@@ -8,10 +8,16 @@ import AssessmentFilters from "./AssessmentFilters.svelte";
 import InboundOutboundFilters from "./InboundOutboundFilters.svelte";
 import PhysicalFlowAttributeFilters from "./PhysicalFlowAttributeFilters.svelte";
 import DataTypeFilters from "./DataTypeFilters.svelte";
+import FlowClassificationFilters from "./FlowClassificationFilters.svelte";
 
 export let dataTypes = [];
 export let assessmentFilters = [];
 export let physicalFlows = [];
+export let flowClassifications = [];
+
+
+$: classificationFilter = _.find($filters, d => d.kind === FilterKinds.FLOW_CLASSIFICATION);
+$: directionFilter = _.find($filters, d => d.kind === FilterKinds.DIRECTION);
 
 </script>
 
@@ -28,8 +34,8 @@ export let physicalFlows = [];
 
     <details class="filter-set" style="margin-top: 1em">
         <summary>
-            <Icon name="random"/> Flow Direction & Classification
-            {#if _.some($filters, d => d.kind === FilterKinds.DIRECTION) && _.find($filters, d => d.kind === FilterKinds.DIRECTION).direction !== Directions.ALL}
+            <Icon name="random"/> Flow Direction
+            {#if !_.isEqual(_.get(directionFilter, ["direction"], Directions.ALL), Directions.ALL)}
                 <span style="color: darkorange"
                       title="Flows have been filtered by direction">
                     <Icon name="exclamation-circle"/>
@@ -37,6 +43,19 @@ export let physicalFlows = [];
             {/if}
         </summary>
         <InboundOutboundFilters/>
+    </details>
+
+    <details class="filter-set" style="margin-top: 1em">
+        <summary>
+            <Icon name="shield"/> Flow Classification
+            {#if !_.isEmpty(_.get(classificationFilter, ["classifications"], []))}
+                <span style="color: darkorange"
+                      title="Flows have been filtered by classification">
+                    <Icon name="exclamation-circle"/>
+                </span>
+            {/if}
+        </summary>
+        <FlowClassificationFilters {flowClassifications}/>
     </details>
 
     <details class="filter-set">

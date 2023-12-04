@@ -6,10 +6,11 @@ export const FilterKinds = {
     DATA_TYPE: "DATA_TYPE",
     ASSESSMENT: "ASSESSMENT",
     PHYSICAL_FLOW_ATTRIBUTE: "PHYSICAL_FLOW_ATTRIBUTE",
-    SELECTED_LOGICAL: "SELECTED_LOGICAL"
+    SELECTED_LOGICAL: "SELECTED_LOGICAL",
+    FLOW_CLASSIFICATION: "FLOW_CLASSIFICATION"
 }
 
-export function mkAssessmentFilters(flowView) {
+export function getAssessmentFilters(flowView) {
 
     const ratingSchemeItemsById = _.keyBy(flowView.ratingSchemeItems, d => d.id);
     const definitions = _.compact(_.concat(
@@ -55,6 +56,10 @@ export function mkTransportKindFilterId() {
 
 export function mkDefinitionFilterId(definitionId) {
     return `ASSESSMENT_DEFINITION_${definitionId}`;
+}
+
+export function mkClassificationFilterId() {
+    return `FLOW_CLASSIFICATION`;
 }
 
 export function mkDataTypeFilterId() {
@@ -133,4 +138,19 @@ export function mkDirectionFilter(id, direction) {
             ? true
             : _.isEqual(r.direction, direction)
     };
+}
+
+export function mkClassificationFilter(id, desiredClassificationRatings = []) {
+    return {
+        id,
+        kind: FilterKinds.FLOW_CLASSIFICATION,
+        classifications: desiredClassificationRatings,
+        test: flowRow => _.isEmpty(desiredClassificationRatings)
+            ? true
+            : _.some(
+                flowRow.dataTypesForLogicalFlow,
+                x => _.some(
+                    desiredClassificationRatings,
+                    d => _.isEqual(d, x.rating)))
+    }
 }
