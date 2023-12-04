@@ -151,7 +151,7 @@
                     {flow.logicalFlow.target.externalId}
                 </td>
                 <td>
-                    {flow.physicalFlow.name || flow.specification.name}
+                    {flow.physicalFlow.name || flow.specification?.name || ""}
                 </td>
                 <td>
                     {flow.physicalFlow.externalId || ""}
