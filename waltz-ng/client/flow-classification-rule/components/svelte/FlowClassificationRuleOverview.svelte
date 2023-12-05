@@ -14,6 +14,7 @@
     import SubSection from "../../../common/svelte/SubSection.svelte";
     import {activeSections} from "../../../dynamic-section/section-store";
     import {dynamicSections} from "../../../dynamic-section/dynamic-section-definitions";
+    import Markdown from "../../../common/svelte/Markdown.svelte";
 
     export let primaryEntityRef;
 
@@ -135,7 +136,7 @@
                             Description:
                         </div>
                         <div class="col-sm-8">
-                            {classificationRule?.description || "-"}
+                            <Markdown text={classificationRule?.description || "-"}/>
                         </div>
                     </div>
 
