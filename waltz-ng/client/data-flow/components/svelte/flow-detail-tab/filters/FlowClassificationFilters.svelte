@@ -52,7 +52,7 @@
     Filters the flows based upon their classification ratings.
 </div>
 <div style="display: flex; padding-top: 1em;  padding-bottom: 1em">
-    <table class="table table-condensed table table-hover">
+    <table class="table table-condensed table small table-hover">
         <thead>
         <tr>
             <th>
