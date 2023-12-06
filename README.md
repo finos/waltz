@@ -67,11 +67,10 @@ progress and done issues.
 
 **Provisional** dates for upcoming releases:
 
-| Release | Date           | Summary                                     |
-|---------|----------------|---------------------------------------------|
-| 1.54    | Sept 26th 2023 | Enhanced admin features, stats improvements |
-| 1.55    | Oct 17th 2023  | tbd                                         |
-| 1.56    | Nov 7th 2023   | tbd                                         |
+| Release | Date          | Provisional Change Summary                            |
+|---------|---------------|-------------------------------------------------------|
+| 1.57    | Jan 16th 2024 | Primary Ratings, Entity Stats, Measurable Rating page |
+| 1.58    | Feb 13th 2024 | tbd                                                   |
 
 See the [releases](https://github.com/finos/waltz/releases) page for historic versions.
 
