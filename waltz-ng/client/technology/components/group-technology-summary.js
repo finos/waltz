@@ -39,8 +39,7 @@ const initialState = {
     environmentDescription: "",
     licenseGridCols:  [
         mkLinkGridCell("Name", "name", "id", "main.licence.view"),
-        {field: "externalId", displayName: "External Id"},
-        {field: "approvalStatus", displayName: "Approval Status", cellFilter: "toDisplayName:'ApprovalStatus'"},
+        {field: "externalId", displayName: "External Id"}
     ],
     visibility: {
         servers: false,

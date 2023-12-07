@@ -25,4 +25,27 @@
         <tagDatabase tag="v1.56"/> <!-- tag the current db version, i.e. the last  -->
     </changeSet>
 
+    <changeSet id="20231207-6033-1"
+               author="woodjes">
+        <comment>6033: increase survey predicate column size</comment>
+        <modifyDataType columnName="inclusion_predicate"
+                        newDataType="${long-expression.type}"
+                        tableName="survey_question" />
+    </changeSet>
+
+    <changeSet id="20231207-5254-1"
+               author="woodjes">
+        <comment>5254: add unique constraint to cost on entity, type and year</comment>
+        <addUniqueConstraint columnNames="cost_kind_id, entity_kind, entity_id, year"
+                             constraintName="idx_cost_entity_year_kind_unique"
+                             tableName="cost"/>
+    </changeSet>
+
+    <changeSet id="20231207-6825-1"
+               author="woodjes">
+        <comment>6825: remove approval_status field from licence</comment>
+        <dropColumn tableName="licence"
+                    columnName="approval_status" />
+    </changeSet>
+
 </databaseChangeLog>

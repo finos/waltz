@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.licence.LicenceDao;
-import org.finos.waltz.model.ApprovalStatus;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.schema.tables.records.BookmarkRecord;
 import org.finos.waltz.schema.tables.records.LicenceRecord;
@@ -101,7 +100,6 @@ public class SpdxLicenceImporter {
                     record.setName(l.name());
                     record.setExternalId(l.licenseId());
                     record.setProvenance(PROVENANCE);
-                    record.setApprovalStatus(ApprovalStatus.PENDING_APPROVAL.name());
                     record.setCreatedAt(now);
                     record.setCreatedBy("admin");
                     record.setLastUpdatedAt(now);
