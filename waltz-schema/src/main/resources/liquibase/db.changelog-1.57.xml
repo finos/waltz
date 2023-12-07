@@ -48,4 +48,16 @@
                     columnName="approval_status" />
     </changeSet>
 
+    <changeSet id="20231207-6069-1"
+               author="woodjes">
+        <comment>6069: add is_readonly to physical specification</comment>
+        <addColumn tableName="physical_specification">
+            <column name="is_readonly"
+                    type="boolean"
+                    defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

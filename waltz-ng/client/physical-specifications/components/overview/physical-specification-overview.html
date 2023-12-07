@@ -133,6 +133,17 @@
                         <span ng-bind="$ctrl.specification.provenance"></span>
                     </div>
                 </div>
+
+                <div class="row"
+                     ng-if="$ctrl.specification.isReadOnly">
+                    <div class="col-sm-4 waltz-display-field-label">
+                        Read Only
+                    </div>
+                    <div class="col-sm-8">
+                        <waltz-icon name="lock"></waltz-icon>
+                        <span>This specification is marked read only and cannot be edited</span>
+                    </div>
+                </div>
             </div>
         </div>
 
