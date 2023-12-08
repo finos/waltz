@@ -56,7 +56,6 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 import static org.finos.waltz.common.Checks.checkFalse;
@@ -75,7 +74,12 @@ import static org.finos.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DE
 import static org.finos.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static org.finos.waltz.schema.tables.PhysicalSpecDataType.PHYSICAL_SPEC_DATA_TYPE;
 import static org.finos.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
-import static org.jooq.impl.DSL.*;
+import static org.jooq.impl.DSL.concat;
+import static org.jooq.impl.DSL.count;
+import static org.jooq.impl.DSL.exists;
+import static org.jooq.impl.DSL.notExists;
+import static org.jooq.impl.DSL.select;
+import static org.jooq.impl.DSL.val;
 
 @Repository
 public class PhysicalSpecificationDao {
@@ -110,6 +114,7 @@ public class PhysicalSpecificationDao {
                 .provenance(record.getProvenance())
                 .isRemoved(record.getIsRemoved())
                 .created(UserTimestamp.mkForUser(record.getCreatedBy(), record.getCreatedAt()))
+                .isReadOnly(record.getIsReadonly())
                 .build();
     };
 
@@ -219,6 +224,7 @@ public class PhysicalSpecificationDao {
 
         record.setCreatedAt(specification.created().get().atTimestamp());
         record.setCreatedBy(specification.created().get().by());
+        record.setIsReadonly(specification.isReadOnly());
 
         record.store();
         return record.getId();
@@ -241,7 +247,8 @@ public class PhysicalSpecificationDao {
         return dsl
                 .update(PHYSICAL_SPECIFICATION)
                 .set(PHYSICAL_SPECIFICATION.EXTERNAL_ID, externalId)
-                .where(PHYSICAL_SPECIFICATION.ID.eq(specificationId))
+                .where(PHYSICAL_SPECIFICATION.ID.eq(specificationId)
+                        .and(PHYSICAL_SPECIFICATION.IS_READONLY.isFalse()))
                 .execute();
     }
 
@@ -258,7 +265,8 @@ public class PhysicalSpecificationDao {
         return dsl
                 .update(PHYSICAL_SPECIFICATION)
                 .set(PHYSICAL_SPECIFICATION.IS_REMOVED, false)
-                .where(PHYSICAL_SPECIFICATION.ID.eq(specificationId))
+                .where(PHYSICAL_SPECIFICATION.ID.eq(specificationId)
+                        .and(PHYSICAL_SPECIFICATION.IS_READONLY.isFalse()))
                 .execute();
     }
 
@@ -401,7 +409,8 @@ public class PhysicalSpecificationDao {
         return dsl
                 .update(PHYSICAL_SPECIFICATION)
                 .set(PHYSICAL_SPECIFICATION.FORMAT, format.value())
-                .where(PHYSICAL_SPECIFICATION.ID.eq(specId))
+                .where(PHYSICAL_SPECIFICATION.ID.eq(specId)
+                        .and(PHYSICAL_SPECIFICATION.IS_READONLY.isFalse()))
                 .execute();
     }
 
@@ -410,7 +419,8 @@ public class PhysicalSpecificationDao {
         return dsl
                 .update(PHYSICAL_SPECIFICATION)
                 .set(PHYSICAL_SPECIFICATION.DESCRIPTION, description)
-                .where(PHYSICAL_SPECIFICATION.ID.eq(specId))
+                .where(PHYSICAL_SPECIFICATION.ID.eq(specId)
+                        .and(PHYSICAL_SPECIFICATION.IS_READONLY.isFalse()))
                 .execute();
     }
 

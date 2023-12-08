@@ -105,6 +105,16 @@
                     </span>
                 </div>
             </div>
+            <div class="row"
+                 ng-if="ctrl.logicalFlow.isReadOnly">
+                <div class="col-sm-1 waltz-display-field-label">
+                    Read Only
+                </div>
+                <div class="col-sm-11">
+                    <waltz-icon name="lock"></waltz-icon>
+                    <span>This flow is marked read only and cannot be edited</span>
+                </div>
+            </div>
             <div class="small text-muted"
                  ng-if="ctrl.logicalFlow.lastUpdatedBy && ctrl.logicalFlow.lastUpdatedAt && ctrl.logicalFlow">
                 Last updated by
