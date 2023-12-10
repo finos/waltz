@@ -27,7 +27,6 @@ Changes are required, unless specifically labeled as 'Optional' or 'Optional, bu
 
 **Setup:** This logic can be enabled via setting ```oauth.disable.anonymous``` to ```true``` (see [settings](../../docs/features/configuration/settings.md)).
 
-	
 
 ## Implementation: svelte-page.js
 
