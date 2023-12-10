@@ -6,14 +6,11 @@
 
 The following document outlines *a* solution for integrating OAuth Single Sign-On. It may not be applicable for integrating to all OAuth providers.
 
-Some of the changes are integrated into the Waltz release and are fully-compatible with either ```waltz``` or ```sso``` as the ```web.authentication``` method (see [settings](../../docs/features/configuration/settings.md)).
-Other options need to be integrated to your build of Waltz once you have committed to ```sso```. Guidance for those changes is provided below.
+All changes are integrated into the Waltz release and are fully-compatible with either ```waltz``` or ```sso``` as the ```web.authentication``` method (see [settings](../../docs/features/configuration/settings.md)).
 
 With this implementation, the users *should* get created automatically. You may want to also assign default user roles via the 'Settings' database table or overrides (see [settings](../../docs/features/configuration/settings.md)).
 
 ## Impacted files
-
-Changes are required, unless specifically labeled as 'Optional' or 'Optional, but recommended'
 
 * waltz-ng/client/navbar/[svelte-page.html](./navbar/svelte-page.html)
 * waltz-ng/client/navbar/[svelte-page.js](./navbar/svelte-page.js)
