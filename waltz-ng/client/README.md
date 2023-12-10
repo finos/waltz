@@ -15,43 +15,10 @@ With this implementation, the users *should* get created automatically. You may 
 
 Changes are required, unless specifically labeled as 'Optional' or 'Optional, but recommended'
 
-* waltz-ng/client/common/[WaltzHttp.js](./common/WaltzHttp.js)
 * waltz-ng/client/navbar/[svelte-page.html](./navbar/svelte-page.html)
 * waltz-ng/client/navbar/[svelte-page.js](./navbar/svelte-page.js)
-* waltz-ng/client/svelte-stores/[remote.js](./svelte-stores/remote.js)
 * waltz-ng/client/[thirdparty-setup.js](./thirdparty-setup.js)
 * waltz-web/src/main/java/org/finos/waltz/web/endpoints/auth/[AuthenticationEndpoint.java](../../waltz-web/src/main/java/org/finos/waltz/web/endpoints/auth/AuthenticationEndpoint.java)
-
-
-## (Optional)  Implementation: WaltzHttp.js
-
-**Summary:** (Optional, but recommended) There are 4 functions in this file that should be modified to enable exception handling for the token:
-* function get(url)
-* function post(url, body) 
-* function put(url, body)
-* function _delete(url)
-
-Exception Handling - if there is an issue with the "satellizer_token" (ex. failed signature verification, malformed json, etc), then revoke the token and reload the page.
-
-**Setup:** Replace the `.then(handleResponse);` line with exception handling block. The snipped below should be implemented for all 4 functions.
-
-	function get(url) {
-		const requestOptions = {
-			method: "GET",
-			headers
-		};
-		return fetch(url, requestOptions)
-			.then(handleResponse)
-			.catch(e =>{
-				if(e.error && (e.error.includes('SignatureVerificationException')
-					|| e.error.includes('JWTDecodeException'))){
-					localStorage.removeItem("satellizer_token");
-					window.location.reload();					
-				}
-				throw e;	
-			});
-	}
-
 
 
 ## Implementation: svelte-page.html
@@ -61,7 +28,6 @@ Exception Handling - if there is an issue with the "satellizer_token" (ex. faile
 **Setup:** This logic can be enabled via setting ```oauth.disable.anonymous``` to ```true``` (see [settings](../../docs/features/configuration/settings.md)).
 
 	
-
 
 ## Implementation: svelte-page.js
 
@@ -83,47 +49,6 @@ Exception Handling - if there is an issue with the "satellizer_token" (ex. faile
 	* ```oauth.disable.anonymous``` can be set to ```true`` (blocks anonymous browsing) or ```false``` (allows anonymous browsing) or left out of Settings (allows anonymous browsing)
 
 This can be enabled via setting ```oauth.disable.anonymous``` to ```true``` (see [settings](../../docs/features/configuration/settings.md)).
-
-
-
-
-## (Optional) Implementation: remote.js
-
-**Summary:** (Optional, but recommended) There is 1 function in this file that should be modified to enhance exception handling for the token:
-* function _fetchData(cache, method, url, data, init = [], config = { force: false })
-
-Exception Handling - if there is an issue with the "satellizer_token" (ex. failed signature verification, malformed json, etc), then revoke the token and reload the page.
-
-**Setup:** Replace the `.catch(e => cache.err(key, e, init));` line with exception handling block. The snipped below should be implemented for the fetchData function.
-
-
-	function _fetchData(cache, method, url, data, init = [], config = { force: false }) {
-		const key = mkKey(method, url, data);
-		const forcing = _.get(config, ["force"], false);
-
-		const invokeFetch = () => mkPromise(method, url, data)
-			.then(r => cache.set(key, r.data))
-			.catch(e => { cache.err(key, e, init))
-					if(e.error && (e.error.includes('SignatureVerificationException')
-					|| e.error.includes('JWTDecodeException')
-					|| e.error.includes('invalid_token'))){
-						localStorage.removeItem("satellizer_token");
-						window.location.reload();						
-					}			
-			}
-
-		if (cache.has(key)) {
-			if (forcing) {
-				invokeFetch();
-			}
-		} else {
-			cache.init(key, init);
-			invokeFetch();
-		}
-
-		return cache.get(key);
-	}
-
 
 
 ## Implementation: thirdparty-setup.js
