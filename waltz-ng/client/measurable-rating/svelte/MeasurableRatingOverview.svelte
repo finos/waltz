@@ -10,6 +10,7 @@
     import {dynamicSections} from "../../dynamic-section/dynamic-section-definitions";
     import RatingIndicatorCell from "../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
     import _ from "lodash";
+    import Icon from "../../common/svelte/Icon.svelte";
 
     export let primaryEntityReference;
 
@@ -23,6 +24,9 @@
     }
 
     $: view = $measurableRatingCall?.data;
+
+    $: allocations = view?.allocations || [];
+    $: allocationsBySchemeId = _.keyBy(view?.allocations, d => d.schemeId);
 
 </script>
 
@@ -78,7 +82,53 @@
                     {/if}
                 </div>
             </div>
-            {#if view?.decommission}
+            <div class="row">
+                <div class="col-sm-6 waltz-display-field-label">
+                    Primary
+                </div>
+                <div class="col-sm-6">
+                    {#if view?.measurableRating.isPrimary}
+                        <Icon name="star"/> Primary
+                    {:else}
+                        Not primary
+                    {/if}
+                </div>
+            </div>
+            {#if !_.isEmpty(view?.allocationSchemes)}
+                <div class="row">
+                    <div class="col-sm-6 waltz-display-field-label">
+                        Allocation
+                    </div>
+                    <div class="col-sm-6">
+                        <table class="table table-condensed small">
+                            <thead>
+                            <tr>
+                                <th>Scheme</th>
+                                <th>Allocation</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                {#each view?.allocationSchemes as scheme}
+                                    {@const alloc = _.get(allocationsBySchemeId, scheme.id)}
+                                    <td>
+                                        {scheme.name}
+                                    </td>
+                                    <td>
+                                        {#if _.isEmpty(alloc)}
+                                            <i>Unallocated</i>
+                                        {:else}
+                                            {`${alloc.percentage}%`}
+                                        {/if}
+                                    </td>
+                                {/each}
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {/if}
+            {#if !_.isEmpty(view?.decommission)}
                 <div class="row">
                     <div class="col-sm-6 waltz-display-field-label">
                         Decommission Date

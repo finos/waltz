@@ -108,6 +108,11 @@ public class AllocationService {
     }
 
 
+    public Set<Allocation> findByMeasurableRatingId(long measurableRatingId){
+        return allocationDao.findByMeasurableRatingId(measurableRatingId);
+    }
+
+
     public Boolean updateAllocations(EntityReference ref,
                                      long schemeId,
                                      Collection<MeasurablePercentageChange> changes,

@@ -39,6 +39,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.schema.Tables.ALLOCATION;
@@ -220,6 +221,13 @@ public class AllocationDao {
 
     }
 
+    public Set<Allocation> findByMeasurableRatingId(long measurableRatingId) {
+        return dsl
+                .select(ALLOCATION.fields())
+                .from(ALLOCATION)
+                .where(ALLOCATION.MEASURABLE_RATING_ID.eq(measurableRatingId))
+                .fetchSet(TO_DOMAIN_MAPPER);
+    }
 }
 
 

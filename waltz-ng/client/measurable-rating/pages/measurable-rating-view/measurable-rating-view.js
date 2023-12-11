@@ -24,6 +24,11 @@ function controller($stateParams, historyStore, serviceBroker) {
 
     const ratingId = $stateParams.id;
 
+    vm.parentEntityRef = {
+        id: ratingId,
+        kind: "MEASURABLE_RATING",
+    };
+
     serviceBroker
         .loadViewData(
             CORE_API.MeasurableRatingStore.getViewById,
@@ -31,11 +36,11 @@ function controller($stateParams, historyStore, serviceBroker) {
         .then(r => {
             const view = r.data;
 
-            vm.parentEntityRef = {
-                id: ratingId,
-                kind: "MEASURABLE_RATING",
-                name: `Measurable Rating: ${_.get(view, ["measurable", "name"], "Unknown measurable")} for ${view?.measurableRating.entityReference.name}`
-            };
+            vm.parentEntityRef = Object.assign(
+                {},
+                vm.parentEntityRef,
+                {name: `Measurable Rating: ${_.get(view, ["measurable", "name"], "Unknown measurable")} for ${view?.measurableRating.entityReference.name}`
+            });
 
             addToHistory(historyStore, vm.parentEntityRef);
         });

@@ -41,22 +41,36 @@
             <div>
                 <div style="font-weight: bolder">
                     <a class='clickable'
+                       title="View measurable rating in a dedicated page"
                        ui-sref="main.measurable-rating.view ({ id: $ctrl.selected.rating.id })">
-                        <span ng-bind="$ctrl.selected.rating.id"></span>
-                    </a>
-                </div>
-
-                <div style="font-weight: bolder">
-                    <a class='clickable'
-                       ui-sref="main.measurable.view ({ id: $ctrl.selected.measurable.id })">
                         <span ng-bind="$ctrl.selected.measurable.name"></span>
                     </a>
                 </div>
 
-                <div ng-if="$ctrl.selected.measurable.description">
-                    <waltz-markdown style="font-weight: lighter;"
-                                    text="$ctrl.selected.measurable.description">
-                    </waltz-markdown>
+                <hr>
+
+                <div class="row" style="padding-bottom: 0.2em">
+                    <div class="col-sm-2 waltz-display-field-label">
+                        Taxonomy Item:
+                    </div>
+                    <div class="col-sm-10">
+                        <waltz-entity-link entity-ref="$ctrl.selected.measurable"
+                                           is-secondary-link="true"
+                                           show-external-id="true">
+                        </waltz-entity-link>
+                    </div>
+                </div>
+
+                <div class="row"
+                     ng-if="$ctrl.selected.measurable.description">
+                    <div class="col-sm-2 waltz-display-field-label">
+                        Description:
+                    </div>
+                    <div class="col-sm-10">
+                        <waltz-markdown style="font-weight: lighter;"
+                                        text="$ctrl.selected.measurable.description">
+                        </waltz-markdown>
+                    </div>
                     <br>
                 </div>
 
