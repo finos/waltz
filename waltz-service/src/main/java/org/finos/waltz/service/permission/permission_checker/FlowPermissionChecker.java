@@ -97,7 +97,11 @@ public class FlowPermissionChecker implements PermissionChecker {
 
         PhysicalSpecification specification = physicalSpecificationDao.getById(specId);
 
-        return findSpecPermissionsForParentEntity(specification.owningEntity(), username);
+        if (specification.isReadOnly()) {
+            return emptySet();
+        } else {
+            return findSpecPermissionsForParentEntity(specification.owningEntity(), username);
+        }
     }
 
 

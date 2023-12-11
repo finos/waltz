@@ -23,6 +23,7 @@ import template from "./logical-flow-view.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import toasts from "../../../svelte-stores/toast-store";
 import _ from "lodash";
+import {displayError} from "../../../common/error-utils";
 
 
 const initialState = {
@@ -60,8 +61,8 @@ function controller($q,
 
         const permissionPromise = serviceBroker
             .loadViewData(
-                CORE_API.LogicalFlowStore.findPermissionsForParentRef,
-                [vm.entityReference])
+                CORE_API.LogicalFlowStore.findPermissionsForFlow,
+                [ flowId ])
             .then(r => {
                 vm.canEdit = _.some(r.data, d => _.includes(["ADD", "UPDATE", "REMOVE"], d));
             });
@@ -69,6 +70,7 @@ function controller($q,
         $q.all([flowPromise, permissionPromise]).then(() => {
             vm.isDraft = vm.logicalFlow.entityLifecycleStatus === "PENDING";
             vm.isRemoved = vm.logicalFlow.entityLifecycleStatus === "REMOVED" || vm.logicalFlow.isRemoved;
+            vm.isReadOnly = vm.logicalFlow.isReadOnly;
             vm.canRemove = vm.canEdit && !vm.isRemoved;
             vm.canRestore = vm.canEdit && vm.isRemoved;
         });
@@ -85,7 +87,8 @@ function controller($q,
                     toasts.error(r.message);
                 }
                 $window.location.reload();
-            });
+            })
+            .catch(e => displayError("Unable to remove flow", e));
     };
 
     const restoreLogicalFlow = () => {
@@ -98,7 +101,8 @@ function controller($q,
                     toasts.error(r.message);
                 }
                 $window.location.reload();
-            });
+            })
+            .catch(e => displayError("Unable to restore flow", e));
     };
 
     const handleRemoveFlowResponse = (response) => {

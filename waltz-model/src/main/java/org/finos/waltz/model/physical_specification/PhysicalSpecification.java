@@ -43,7 +43,8 @@ public abstract class PhysicalSpecification implements
         ProvenanceProvider,
         LastUpdatedProvider,
         WaltzEntity,
-        EntityKindProvider {
+        EntityKindProvider,
+        IsReadOnlyProvider {
 
     public abstract EntityReference owningEntity();
 

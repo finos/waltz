@@ -94,6 +94,7 @@
     <property name="email.type" value="VARCHAR(255)"></property>
     <property name="enum.type" value="VARCHAR(64)"></property>
     <property name="expression.type" value="VARCHAR(500)"></property>
+    <property name="long-expression.type" value="${longvarchar.type}"></property>
     <property name="external-id.type" value="VARCHAR(200)"></property>
     <property name="group.type" value="VARCHAR(128)"></property>
     <property name="guid.type" value="VARCHAR(64)"></property>
