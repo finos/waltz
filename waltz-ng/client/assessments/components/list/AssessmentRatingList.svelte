@@ -70,7 +70,7 @@
 
     $: expansions = _.isEmpty(expansions) && noTogglingYet
             ?  _
-                .chain($favouriteAssessmentDefinitionStore[$primaryEntityReference.kind])
+                .chain($favouriteAssessmentDefinitionStore[$primaryEntityReference?.kind])
                 .map(d => d.definitionGroup)
                 .uniq()
                 .value()

@@ -122,4 +122,9 @@ public class MeasurableRatingReplacementService {
     public String getRequiredRatingEditRole(EntityReference ref) {
         return measurableRatingService.getRequiredRatingEditRole(ref);
     }
+
+
+    public Set<MeasurableRatingReplacement> getByDecommId(Long decommId) {
+        return measurableRatingReplacementDao.fetchByDecommissionId(decommId);
+    }
 }

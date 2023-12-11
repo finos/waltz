@@ -41,6 +41,13 @@
             <div>
                 <div style="font-weight: bolder">
                     <a class='clickable'
+                       ui-sref="main.measurable-rating.view ({ id: $ctrl.selected.rating.id })">
+                        <span ng-bind="$ctrl.selected.rating.id"></span>
+                    </a>
+                </div>
+
+                <div style="font-weight: bolder">
+                    <a class='clickable'
                        ui-sref="main.measurable.view ({ id: $ctrl.selected.measurable.id })">
                         <span ng-bind="$ctrl.selected.measurable.name"></span>
                     </a>

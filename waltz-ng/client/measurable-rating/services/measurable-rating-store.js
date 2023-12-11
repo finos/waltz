@@ -22,6 +22,18 @@ function store($http, baseApiUrl) {
 
     const baseUrl = `${baseApiUrl}/measurable-rating`;
 
+    const getById = (id) => {
+        return $http
+            .get(`${baseUrl}/id/${id}`)
+            .then(d => d.data);
+    };
+
+    const getViewById = (id) => {
+        return $http
+            .get(`${baseUrl}/id/${id}/view`)
+            .then(d => d.data);
+    };
+
     const findForEntityReference = (ref) => {
         checkIsEntityRef(ref);
         return $http
@@ -105,6 +117,8 @@ function store($http, baseApiUrl) {
     };
 
     return {
+        getById,
+        getViewById,
         findByMeasurableSelector,
         findByAppSelector,
         findByCategory,
@@ -128,6 +142,16 @@ const serviceName = "MeasurableRatingStore";
 
 
 export const MeasurableRatingStore_API = {
+    getById: {
+        serviceName,
+        serviceFnName: "getById",
+        description: "finds measurable rating by id"
+    },
+    getViewById: {
+        serviceName,
+        serviceFnName: "getViewById",
+        description: "finds measurable rating, with measurable, decom, and replacement details by id"
+    },
     findByMeasurableSelector: {
         serviceName,
         serviceFnName: "findByMeasurableSelector",

@@ -272,4 +272,11 @@ public class MeasurableRatingPlannedDecommissionDao {
             return operationsForEntityAssessment;
         }
     }
+
+
+    public MeasurableRatingPlannedDecommission getByMeasurableRatingId(Long ratingId) {
+        return mkBaseQry()
+                .where(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_RATING_ID.eq(ratingId))
+                .fetchOne(TO_DOMAIN_MAPPER);
+    }
 }

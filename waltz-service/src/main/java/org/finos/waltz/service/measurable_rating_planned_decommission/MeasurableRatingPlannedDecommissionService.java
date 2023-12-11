@@ -140,4 +140,9 @@ public class MeasurableRatingPlannedDecommissionService {
         return measurableRatingPlannedDecommissionDao.getById(decommId);
     }
 
+
+    public MeasurableRatingPlannedDecommission getByMeasurableRatingId(Long ratingId) {
+        return measurableRatingPlannedDecommissionDao.getByMeasurableRatingId(ratingId);
+    }
+
 }
