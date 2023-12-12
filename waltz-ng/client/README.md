@@ -34,27 +34,24 @@ With this implementation, the users *should* get created automatically. You may 
 * Waltz Login
 	* ```web.authentication``` = ```waltz```
 	* ```oauth.provider.name```  <-- do not add to Settings
+    * ```oauth.provider.details```  <-- do not add to Settings
 	* ```oauth.disable.anonymous``` <-- do not add to Settings
 * SSO (Externally Managed)
 	* ```web.authentication``` = ```sso```
 	* ```oauth.provider.name``` <-- do not add to Settings
+    * ```oauth.provider.details```  <-- do not add to Settings
 	* ```oauth.disable.anonymous``` <-- do not add to Settings
 * SSO (thirdparty integration with satellizer)
 	* ```web.authentication``` = ```sso```
-	* ```oauth.provider.name``` needs to match the 'name' you provide in thirdparty-setup.js
+    * ```oauth.provider.details```  = JSON containing thirdparty OAuth Provider details  
+	* ```oauth.provider.name``` needs to match the 'name' you provide in `oauth.provider.details`
 	* ```oauth.disable.anonymous``` can be set to ```true`` (blocks anonymous browsing) or ```false``` (allows anonymous browsing) or left out of Settings (allows anonymous browsing)
 
-This can be enabled via setting ```oauth.disable.anonymous``` to ```true``` (see [settings](../../docs/features/configuration/settings.md)).
+Provided below is the framework for an implementation of a thirdparty OAuth Provider. Requirements and therefore, implementations, will vary based on your organizational setup.
 
+Ex. include this in the Settings table for ```oauth.provider.details```
 
-## Implementation: thirdparty-setup.js
-
-**Summary:** This file defines the structure of the requests between Waltz and the thirdparty OAuth Provider. It's recommended that you setup the requests externally and confirm that they work before directly trying to integrate into Waltz.
-
-
-**Setup:** Provided below is the framework for an implementation of a thirdparty OAuth Provider. Requirements and therefore, implementations, will vary based on your organizational setup.
-
-    $authProvider.oauth2({
+    {
         name: 'oauthprovider',
         clientId: 'Waltz',
         url: 'authentication/oauth',
@@ -70,7 +67,7 @@ This can be enabled via setting ```oauth.disable.anonymous``` to ```true``` (see
         oauthType: '2.0',
         responseType: 'code',
         popupOptions: { width: 600, height: 500 }
-    });
+    }
 
 Notes and Tips:
 * A Postman collection could be provided to define and verify all of the header and body requirements for each OAuth request - recreate that format within the requests in Waltz
@@ -90,3 +87,4 @@ Notes and Tips:
 * A Postman collection could be provided to define and verify all of the header and body requirements for each OAuth request - recreate that format within the requests in Waltz
 * The `url: 'authentication/oauth'` in thirdparty-setup.js should match the name of the endpoint configured here `Spark.post(WebUtilities.mkPath(BASE_URL, "oauth"), (request, response) -> {`
 * Additional user information may be accessible via your external thirdparty OAuth Provider. This implementation can be expanded to request, parse and utilize that info as needed
+* paramBuilder and getAccessToken are configured for generic thirdparty OAuth Providers and should work for most imoplementations

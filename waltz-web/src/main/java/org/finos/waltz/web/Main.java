@@ -118,7 +118,7 @@ public class Main {
 
             Optional<String> OauthProviderDetails = Optional.of(settingsService
                     .getValue(OAUTH_PROVIDER_DETAILS)
-                    .orElse("{name : null"));
+                    .orElse("{name : null}"));
 
             return "const oauthdetails = " + OauthProviderDetails.get() + ";";
         });
