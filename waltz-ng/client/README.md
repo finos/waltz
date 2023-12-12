@@ -43,7 +43,7 @@ With this implementation, the users *should* get created automatically. You may 
 	* ```oauth.disable.anonymous``` <-- do not add to Settings
 * SSO (thirdparty integration with satellizer)
 	* ```web.authentication``` = ```sso```
-    * ```oauth.provider.details```  = JSON containing thirdparty OAuth Provider details  
+    * ```oauth.provider.details```  = object containing thirdparty OAuth Provider details  
 	* ```oauth.provider.name``` needs to match the 'name' you provide in `oauth.provider.details`
 	* ```oauth.disable.anonymous``` can be set to ```true`` (blocks anonymous browsing) or ```false``` (allows anonymous browsing) or left out of Settings (allows anonymous browsing)
 
