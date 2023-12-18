@@ -25,6 +25,8 @@ import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.UserTimestamp;
 import org.finos.waltz.model.measurable_rating.ImmutableRemoveMeasurableRatingCommand;
 import org.finos.waltz.model.measurable_rating.MeasurableRating;
+import org.finos.waltz.model.measurable_rating.MeasurableRatingAppView;
+import org.finos.waltz.model.measurable_rating.MeasurableRatingCategoryView;
 import org.finos.waltz.model.measurable_rating.MeasurableRatingStatParams;
 import org.finos.waltz.model.measurable_rating.MeasurableRatingView;
 import org.finos.waltz.model.measurable_rating.RemoveMeasurableRatingCommand;
@@ -36,6 +38,7 @@ import org.finos.waltz.service.permission.permission_checker.MeasurableRatingPer
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
+import org.finos.waltz.web.WebUtilities;
 import org.finos.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -89,6 +92,8 @@ public class MeasurableRatingEndpoint implements Endpoint {
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
         String getViewByIdPath = mkPath(BASE_URL, "id", ":id", "view");
         String findForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
+        String getViewForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id", "view");
+        String getViewForEntityAndCategoryPath = mkPath(BASE_URL, "entity", ":kind", ":id", "category", ":categoryId", "view");
         String modifyMeasurableForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id", "measurable", ":measurableId");
         String modifyCategoryForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id", "category", ":categoryId");
         String findByMeasurableSelectorPath = mkPath(BASE_URL, "measurable-selector");
@@ -107,6 +112,14 @@ public class MeasurableRatingEndpoint implements Endpoint {
 
         DatumRoute<MeasurableRatingView> getViewByIdRoute = (request, response)
                 -> measurableRatingViewService.getViewById(getId(request));
+
+        DatumRoute<MeasurableRatingAppView> getViewForEntityRoute = (request, response)
+                -> measurableRatingViewService.getViewForApp(getEntityReference(request));
+
+        DatumRoute<MeasurableRatingCategoryView> getViewForEntityAndCategoryRoute = (request, response) -> {
+            long categoryId = getLong(request, "categoryId");
+            return measurableRatingViewService.getViewForAppAndCategory(getEntityReference(request), categoryId);
+        };
 
         ListRoute<MeasurableRating> findForEntityRoute = (request, response)
                 -> measurableRatingService.findForEntity(getEntityReference(request));
@@ -134,6 +147,8 @@ public class MeasurableRatingEndpoint implements Endpoint {
         getForDatum(getByIdPath, getByIdRoute);
         getForDatum(getViewByIdPath, getViewByIdRoute);
         getForList(findForEntityPath, findForEntityRoute);
+        getForDatum(getViewForEntityPath, getViewForEntityRoute);
+        getForDatum(getViewForEntityAndCategoryPath, getViewForEntityAndCategoryRoute);
         postForList(findByMeasurableSelectorPath, findByMeasurableSelectorRoute);
         postForList(findByAppSelectorPath, findByAppSelectorRoute);
         getForList(findByCategoryPath, findByCategoryRoute);

@@ -19,6 +19,7 @@ import _ from "lodash";
 import {CORE_API} from "../common/services/core-api-utils";
 import {mkSelectionOptions} from "../common/selector-utils";
 import {lastViewedMeasurableCategoryKey} from "../user";
+import {reduceToSelectedNodesOnly} from "../common/hierarchy-utils";
 
 
 export function loadDecommData(
@@ -89,58 +90,47 @@ export function loadAllData(
     allMeasurables = false,
     force = false) {
 
-    const allocationSchemesPromise = serviceBroker
-        .loadAppData(CORE_API.AllocationSchemeStore.findAll)
-        .then(r => ({allocationSchemes: r.data}));
 
-    const ratingSchemesPromise = serviceBroker
-        .loadAppData(CORE_API.RatingSchemeStore.findAll)
-        .then(r => ({ratingSchemesById: _.keyBy(r.data, "id")}));
-
-    const categoriesPromise = serviceBroker
-        .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
-        .then(r => ({
-            categories: r.data,
-            categoriesById: _.keyBy(r.data, d => d.id)
-        }));
-
-    const roadmapsPromise = serviceBroker
+    const ratingsPromise2 = serviceBroker
         .loadViewData(
-            CORE_API.RoadmapStore.findRoadmapsAndScenariosByRatedEntity,
-            [ parentEntityRef])
-        .then(r => ({roadmapReferences: r.data}));
+            CORE_API.MeasurableRatingStore.getViewForEntityAndCategory,
+            [ parentEntityRef, 33 ],
+            { force })
+        .then(r => {
 
-    // if we are in edit mode we will be loading all measurables, otherwise just the needed measurables
-    const measurablesCall = allMeasurables
-        ? serviceBroker.loadAppData(CORE_API.MeasurableStore.findAll)
-        : serviceBroker.loadViewData(
-            CORE_API.MeasurableStore.findMeasurablesBySelector,
-            [mkSelectionOptions(parentEntityRef)],
-            { force });
-
-    const measurablesPromise = measurablesCall
-        .then(r => ({measurables: r.data}));
+            const view = r.data;
+            console.log({view});
+        });
 
     const ratingsPromise = serviceBroker
         .loadViewData(
-            CORE_API.MeasurableRatingStore.findForEntityReference,
+            CORE_API.MeasurableRatingStore.getViewForEntity,
             [ parentEntityRef ],
             { force })
-        .then(r => ({ratings: r.data}));
+        .then(r => {
 
-    const allocationsPromise = serviceBroker
-        .loadViewData(
-            CORE_API.AllocationStore.findByEntity,
-            [parentEntityRef],
-            {force})
-        .then(r => ({
-            allocations: r.data,
-            allocationTotalsByScheme: _
-                .chain(r.data)
+            const view = r.data;
+
+            const allocationTotalsByScheme =  _
+                .chain(view.allocations)
                 .groupBy(d => d.schemeId)
                 .mapValues(xs => _.sumBy(xs, x => x.percentage))
-                .value()
-        }));
+                .value();
+
+            const ratingSchemeItemsById =  _
+                .chain(view.ratingSchemes)
+                .flatMap(d => d.ratings)
+                .keyBy(d => d.id)
+                .value();
+
+            return Object.assign(view, {
+                allocationTotalsByScheme,
+                categoriesById: _.keyBy(view.categories, d => d.id),
+                ratingSchemesById: _.keyBy(view.ratingSchemes, d => d.id),
+                ratings: view.measurableRatings,
+                ratingSchemeItemsById
+            });
+        });
 
     const lastViewedCategoryPromise = serviceBroker
         .loadAppData(CORE_API.UserPreferenceStore.findAllForUser, [], {force: true})
@@ -153,26 +143,59 @@ export function loadAllData(
             };
         });
 
-    const decommPromise = loadDecommData(
-        $q,
-        serviceBroker,
-        parentEntityRef,
-        force);
-
     return $q
         .all([
-            measurablesPromise,
-            ratingSchemesPromise,
             ratingsPromise,
-            categoriesPromise,
-            allocationsPromise,
-            allocationSchemesPromise,
-            decommPromise,
-            roadmapsPromise,
-            lastViewedCategoryPromise])
+            lastViewedCategoryPromise
+        ])
         .then(results => Object.assign({}, ...results));
 }
 
+
+function prepareTabForCategory(category,
+                               ratingsForCategory = [],
+                               measurablesForCategory = [],
+                               allocationSchemesForCategory = [],
+                               allocationsForCategory = [],
+                               assessmentDefinitionsForCategory = [],
+                               assessmentRatingsForCategory = [],
+                               decommsForCategory = [],
+                               replacementsForCategory = [],
+                               ratingSchemesById,
+                               ratingSchemeItemsById,
+                               showAllMeasurables = true) {
+
+    const ratedMeasurables = _.map(ratingsForCategory, d => d.measurableId);
+    const ratingScheme = ratingSchemesById[category.ratingSchemeId];
+    const ratingSchemeItemsByCode = _.keyBy(ratingScheme.ratings, d => d.rating);
+
+    const measurables = showAllMeasurables
+        ? measurablesForCategory
+        : reduceToSelectedNodesOnly(measurablesForCategory, ratedMeasurables);
+
+    const ratings = _
+        .chain(ratingsForCategory)
+        .map(r => Object.assign(r, {ratingSchemeItem: ratingSchemeItemsByCode[r.rating]}))
+        .value();
+
+    const assessmentRatings = _
+        .chain(assessmentRatingsForCategory)
+        .map(r => Object.assign(r, {ratingSchemeItem: ratingSchemeItemsById[r.ratingId]}))
+        .value();
+
+    return {
+        category,
+        ratingScheme,
+        measurables,
+        ratings,
+        allocationSchemes: allocationSchemesForCategory,
+        allocations: allocationsForCategory,
+        assessmentDefinitions: assessmentDefinitionsForCategory,
+        assessmentRatings,
+        plannedDecommissions: decommsForCategory,
+        plannedReplacements: replacementsForCategory
+    };
+}
 
 /**
  *
@@ -180,32 +203,83 @@ export function loadAllData(
  * @param includeEmpty
  * @returns {*}
  */
-export function mkTabs(ctx, includeEmpty = false) {
+export function mkTabs(ctx, includeEmpty = false, showAllMeasurables = false) {
 
     const measurablesByCategory = _.groupBy(ctx.measurables, d => d.categoryId);
     const allocationSchemesByCategory = _.groupBy(ctx.allocationSchemes, d => d.measurableCategoryId);
+    const ratingSchemesById = _.keyBy(ctx.ratingSchemes, d => d.id);
 
     return _
         .chain(ctx.categories)
         .map(category => {
+
             const measurablesForCategory = measurablesByCategory[category.id] || [];
             const measurableIds = _.map(measurablesForCategory, d => d.id);
-            const ratingsForCategory = _.filter(
-                ctx.ratings,
-                r => _.includes(measurableIds, r.measurableId));
-            const ratingScheme = ctx.ratingSchemesById[category.ratingSchemeId];
-            return {
+            console.log({measurablesForCategory});
+
+
+            const ratingsForCategory = _.filter(ctx.ratings, d => _.includes(measurableIds, d.measurableId));
+            const ratingIds = _.map(ratingsForCategory, d => d.id);
+
+            const definitionsForCategory = _.filter(
+                ctx.assessmentDefinitions,
+                r => r.qualifierReference.id === category.id);
+
+            const decommsForCategory = _.filter(
+                ctx.plannedDecommissions || [],
+                r => _.includes(ratingIds, r.measurableRatingId));
+
+            const decommIds = _.map(decommsForCategory, d => d.id);
+
+            const replacementsForCategory = _.filter(
+                ctx.plannedReplacements || [],
+                r => _.includes(decommIds, r.decommissionId));
+
+            const allocationSchemesForCategory = _.get(allocationSchemesByCategory, [category.id], []);
+
+            const assessmentRatingsForCategory = _
+                .chain(ctx.assessmentRatings || [])
+                .filter(r => _.includes(ratingIds, r.entityReference.id))
+                .value();
+
+            return prepareTabForCategory(
                 category,
-                ratingScheme,
-                measurables: measurablesForCategory,
-                ratings: ratingsForCategory,
-                allocationSchemes: allocationSchemesByCategory[category.id] || [],
-                allocations: ctx.allocations
-            };
+                ratingsForCategory,
+                measurablesForCategory,
+                allocationSchemesForCategory,
+                ctx.allocations,
+                definitionsForCategory,
+                assessmentRatingsForCategory,
+                decommsForCategory,
+                replacementsForCategory,
+                ratingSchemesById,
+                ctx.ratingSchemeItemsById,
+                showAllMeasurables);
+
         })
         .filter(t => t.measurables.length > 0 || includeEmpty)
         .orderBy([tab => tab.category.position, tab => tab.category.name])
         .value();
+}
+
+export function mkTab(ctx, includeEmpty = false, showAllMeasurables = false) {
+
+    console.log(ctx);
+
+    // return prepareTabForCategory(
+    //     ctx.category,
+    //     ratingsForCategory,
+    //     measurablesForCategory,
+    //     allocationSchemesForCategory,
+    //     ctx.allocations,
+    //     definitionsForCategory,
+    //     assessmentRatingsForCategory,
+    //     decommsForCategory,
+    //     replacementsForCategory,
+    //     ratingSchemesById,
+    //     ctx.ratingSchemeItemsById,
+    //     showAllMeasurables);
+
 }
 
 

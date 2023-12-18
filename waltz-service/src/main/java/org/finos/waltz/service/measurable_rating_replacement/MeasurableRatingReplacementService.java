@@ -73,6 +73,10 @@ public class MeasurableRatingReplacementService {
         return measurableRatingReplacementDao.fetchByEntityRef(ref);
     }
 
+    public Collection<MeasurableRatingReplacement> fetchByEntityRefAndCategory(EntityReference ref, long categoryId){
+        return measurableRatingReplacementDao.fetchByEntityRefAndCategory(ref, categoryId);
+    }
+
 
     public Set<MeasurableRatingReplacement> save(long decommId,
                                                  EntityReference entityReference,

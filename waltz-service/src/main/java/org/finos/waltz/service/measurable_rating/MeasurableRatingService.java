@@ -101,6 +101,12 @@ public class MeasurableRatingService {
     }
 
 
+    public List<MeasurableRating> findForEntityAndCategory(EntityReference ref, long categoryId) {
+        checkNotNull(ref, "ref cannot be null");
+        return measurableRatingDao.findForEntityAndCategory(ref, categoryId);
+    }
+
+
     public MeasurableRating getById(long id) {
         return measurableRatingDao.getById(id);
     }

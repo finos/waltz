@@ -5,6 +5,7 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.Nullable;
 import org.finos.waltz.model.allocation.Allocation;
 import org.finos.waltz.model.allocation_scheme.AllocationScheme;
+import org.finos.waltz.model.assessment_rating.AssessmentRating;
 import org.finos.waltz.model.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommission;
 import org.finos.waltz.model.measurable_rating_replacement.MeasurableRatingReplacement;
 import org.finos.waltz.model.rating.RatingSchemeItem;
@@ -33,5 +34,4 @@ public abstract class MeasurableRatingView {
     public abstract Set<Allocation> allocations();
 
     public abstract List<AllocationScheme> allocationSchemes();
-
 }

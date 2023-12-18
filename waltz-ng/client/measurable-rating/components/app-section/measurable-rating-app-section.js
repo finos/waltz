@@ -20,7 +20,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
 
 import template from "./measurable-rating-app-section.html";
-import {determineStartingTab, loadAllData, mkTabs} from "../../measurable-rating-utils";
+import {determineStartingTab, loadAllData, mkTab, mkTabs} from "../../measurable-rating-utils";
 import namedSettings from "../../../system/named-settings";
 import {entity} from "../../../common/services/enums/entity";
 import {editOperations} from "../../../common/services/enums/operation";
@@ -69,6 +69,18 @@ function controller($q, serviceBroker, settingsService, userService) {
     }
 
     const loadData = (force = false) => {
+
+        if (vm.parentEntityRef){
+            serviceBroker
+                .loadViewData(
+                    CORE_API.MeasurableCategoryStore.findPopulatedCategoriesForRef,
+                    [vm.parentEntityRef])
+                .then(d => {
+                    vm.visibleCats = d.data;
+                    console.log({cats: vm.visibleCats});
+                });
+        }
+
         return loadAllData($q, serviceBroker, vm.parentEntityRef, false, force)
             .then((r) => {
                 Object.assign(vm, r);
@@ -76,8 +88,9 @@ function controller($q, serviceBroker, settingsService, userService) {
                 const startingTab = determineStartingTab(vm.tabs, vm.lastViewedCategoryId);
                 if (startingTab) {
                     vm.visibility.tab = startingTab.category.id;
-                    vm.onTabChange(startingTab);
+                    vm.onTabChange(vm.lastViewedCategoryId);
                 }
+                console.log({tabs: vm.tabs});
             });
     };
 
@@ -152,14 +165,25 @@ function controller($q, serviceBroker, settingsService, userService) {
         hideAllocationScheme();
     };
 
-    vm.onTabChange = (tab) => {
+    vm.onTabChange = (categoryId) => {
+        console.log({categoryId});
         hideAllocationScheme();
 
         serviceBroker
             .loadViewData(
-                CORE_API.RatingSchemeStore.findRatingsForEntityAndMeasurableCategory,
-                [vm.parentEntityRef, tab.category.id])
-            .then(r => tab.ratingSchemeItems = r.data)
+                CORE_API.MeasurableRatingStore.getViewForEntityAndCategory,
+                [vm.parentEntityRef, categoryId])
+            .then(r => {
+                const tab = r.data;
+                mkTab()
+                console.log({tab});
+            });
+
+        // serviceBroker
+        //     .loadViewData(
+        //         CORE_API.RatingSchemeStore.findRatingsForEntityAndMeasurableCategory,
+        //         [vm.parentEntityRef, categoryId])
+        //     .then(r => tab.ratingSchemeItems = r.data)
     };
 
 }

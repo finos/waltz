@@ -18,6 +18,8 @@
 import _ from "lodash";
 import {initialiseData} from "../../../common";
 import template from "./measurable-rating-panel.html";
+import MeasurableRatingTable from "../../svelte/MeasurableRatingTable.svelte";
+import {selectedMeasurable} from "./measurable-rating-panel-store";
 
 /**
  * @name waltz-measurable-rating-panel
@@ -40,7 +42,9 @@ const bindings = {
     plannedDecommissions: "<?",
     replacingDecommissions: "<?",
     replacementApps: "<?",
-    application: "<"
+    application: "<",
+    assessmentDefinitions: "<?",
+    assessmentRatings: "<?",
 };
 
 
@@ -48,7 +52,11 @@ const initialState = {
     selected: null,
     plannedDecommissions: [],
     replacingDecommissions: [],
-    replacementApps: []
+    replacementApps: [],
+    assessmentRatings: [],
+    assessmentDefinitions: [],
+    showTreeView: false,
+    MeasurableRatingTable
 };
 
 
@@ -59,7 +67,7 @@ function enrichAllocationsWithScheme(node, allocationSchemesById) {
 }
 
 
-function controller() {
+function controller($scope) {
     const vm = this;
 
     vm.$onInit = () => initialiseData(vm, initialState);
@@ -70,13 +78,27 @@ function controller() {
     };
 
     vm.onSelect = (node) => {
-        vm.selected = node;
-        vm.selected.allocations = enrichAllocationsWithScheme(node, vm.allocationSchemesById)
+        if (vm.selected && vm.selected.rating.id === node.rating.id) {
+            selectedMeasurable.set(null);
+        } else {
+            const selectedNode = Object.assign({}, node, {allocations: enrichAllocationsWithScheme(node, vm.allocationSchemesById)});
+            selectedMeasurable.set(selectedNode);
+        }
     }
+
+    vm.onToggleView = () => {
+        vm.showTreeView = !vm.showTreeView
+    }
+
+    selectedMeasurable.subscribe(selected => {
+        $scope.$applyAsync(() => {
+            vm.selected = selected;
+        })
+    })
 }
 
 
-controller.$inject = [];
+controller.$inject = ["$scope"];
 
 
 const component = {

@@ -21,6 +21,7 @@ package org.finos.waltz.data.measurable_category;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.measurable_category.ImmutableMeasurableCategory;
 import org.finos.waltz.model.measurable_category.MeasurableCategory;
 import org.finos.waltz.schema.tables.records.MeasurableCategoryRecord;
@@ -39,6 +40,9 @@ import java.util.Set;
 
 import static org.finos.waltz.schema.Tables.ENTITY_HIERARCHY;
 import static org.finos.waltz.schema.Tables.MEASURABLE;
+import static org.finos.waltz.schema.Tables.MEASURABLE_RATING;
+import static org.finos.waltz.schema.Tables.MEASURABLE_RATING_PLANNED_DECOMMISSION;
+import static org.finos.waltz.schema.Tables.MEASURABLE_RATING_REPLACEMENT;
 import static org.finos.waltz.schema.Tables.ORGANISATIONAL_UNIT;
 import static org.finos.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGORY;
 
@@ -141,5 +145,29 @@ public class MeasurableCategoryDao {
         int update = record.store();
 
         return update == 1;
+    }
+
+    public Set<MeasurableCategory> findPopulatedCategoriesForRef(EntityReference ref) {
+
+        SelectConditionStep<Record> ratedMeasurables = dsl
+                .select(MEASURABLE_CATEGORY.fields())
+                .from(MEASURABLE_CATEGORY)
+                .innerJoin(MEASURABLE).on(MEASURABLE_CATEGORY.ID.eq(MEASURABLE.MEASURABLE_CATEGORY_ID))
+                .innerJoin(MEASURABLE_RATING).on(MEASURABLE.ID.eq(MEASURABLE_RATING.MEASURABLE_ID))
+                .where(MEASURABLE_RATING.ENTITY_ID.eq(ref.id())
+                        .and(MEASURABLE_RATING.ENTITY_KIND.eq(ref.kind().name())));
+
+        SelectConditionStep<Record> replacingMeasurables = dsl
+                .select(MEASURABLE_CATEGORY.fields())
+                .from(MEASURABLE_CATEGORY)
+                .innerJoin(MEASURABLE).on(MEASURABLE_CATEGORY.ID.eq(MEASURABLE.MEASURABLE_CATEGORY_ID))
+                .innerJoin(MEASURABLE_RATING).on(MEASURABLE.ID.eq(MEASURABLE_RATING.MEASURABLE_ID))
+                .innerJoin(MEASURABLE_RATING_PLANNED_DECOMMISSION).on(MEASURABLE_RATING.ID.eq(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_RATING_ID))
+                .innerJoin(MEASURABLE_RATING_REPLACEMENT).on(MEASURABLE_RATING_PLANNED_DECOMMISSION.ID.eq(MEASURABLE_RATING_REPLACEMENT.DECOMMISSION_ID))
+                .where(MEASURABLE_RATING_REPLACEMENT.ENTITY_ID.eq(ref.id())
+                        .and(MEASURABLE_RATING_REPLACEMENT.ENTITY_KIND.eq(ref.kind().name())));
+
+        return ratedMeasurables.union(replacingMeasurables)
+                .fetchSet(TO_DOMAIN_MAPPER);
     }
 }

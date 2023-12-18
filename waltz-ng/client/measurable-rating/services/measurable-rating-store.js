@@ -41,6 +41,18 @@ function store($http, baseApiUrl) {
             .then(d => d.data);
     };
 
+    const getViewForEntity = (ref) => {
+        return $http
+            .get(`${baseUrl}/entity/${ref.kind}/${ref.id}/view`)
+            .then(d => d.data);
+    };
+
+    const getViewForEntityAndCategory = (ref, categoryId) => {
+        return $http
+            .get(`${baseUrl}/entity/${ref.kind}/${ref.id}/category/${categoryId}/view`)
+            .then(d => d.data);
+    };
+
     const findByCategory = (id) => {
         return $http
             .get(`${baseUrl}/category/${id}`)
@@ -119,6 +131,8 @@ function store($http, baseApiUrl) {
     return {
         getById,
         getViewById,
+        getViewForEntity,
+        getViewForEntityAndCategory,
         findByMeasurableSelector,
         findByAppSelector,
         findByCategory,
@@ -151,6 +165,16 @@ export const MeasurableRatingStore_API = {
         serviceName,
         serviceFnName: "getViewById",
         description: "finds measurable rating, with measurable, decom, and replacement details by id"
+    },
+    getViewForEntity: {
+        serviceName,
+        serviceFnName: "getViewForEntity",
+        description: "finds all details related to the measurable ratings for an entity"
+    },
+    getViewForEntityAndCategory: {
+        serviceName,
+        serviceFnName: "getViewForEntityAndCategory",
+        description: "finds all details related to the measurable ratings for an entity and category"
     },
     findByMeasurableSelector: {
         serviceName,

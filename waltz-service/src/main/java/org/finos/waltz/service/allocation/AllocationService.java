@@ -95,6 +95,10 @@ public class AllocationService {
         return allocationDao.findByEntity(ref);
     }
 
+    public Collection<Allocation> findByEntityAndCategory(EntityReference ref, long categoryId) {
+        return allocationDao.findByEntityAndCategory(ref, categoryId);
+    }
+
 
     public List<Allocation> findByEntityAndScheme(EntityReference ref,
                                                   long schemeId) {

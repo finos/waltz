@@ -55,6 +55,7 @@ import static org.finos.waltz.common.SetUtilities.union;
 import static org.finos.waltz.common.StringUtilities.firstChar;
 import static org.finos.waltz.common.StringUtilities.notEmpty;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.schema.Tables.MEASURABLE;
 import static org.finos.waltz.schema.Tables.MEASURABLE_CATEGORY;
 import static org.finos.waltz.schema.Tables.USER_ROLE;
 import static org.finos.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
@@ -139,6 +140,15 @@ public class MeasurableRatingPlannedDecommissionDao {
 
     public Set<MeasurableRatingPlannedDecommission> findByEntityRef(EntityReference ref){
         return mkBaseQry()
+                .where(mkRatingRefCondition(ref))
+                .fetchSet(TO_DOMAIN_MAPPER);
+    }
+
+
+    public Set<MeasurableRatingPlannedDecommission> findByEntityRefAndCategory(EntityReference ref, long categoryId){
+        return mkBaseQry()
+                .innerJoin(MEASURABLE).on(MEASURABLE_RATING.MEASURABLE_ID.eq(MEASURABLE.ID)
+                        .and(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId)))
                 .where(mkRatingRefCondition(ref))
                 .fetchSet(TO_DOMAIN_MAPPER);
     }

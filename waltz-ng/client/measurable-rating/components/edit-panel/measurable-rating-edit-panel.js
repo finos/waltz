@@ -95,7 +95,7 @@ function controller($q,
     const recalcTabs = function () {
         const hasNoRatings = vm.ratings.length === 0;
         const showAllCategories = hasNoRatings || vm.visibility.showAllCategories;
-        const allTabs = mkTabs(vm, showAllCategories);
+        const allTabs = mkTabs(vm, showAllCategories, true);
         vm.tabs = _.filter(
             allTabs,
             t => {

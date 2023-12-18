@@ -19,6 +19,7 @@
 package org.finos.waltz.service.measurable_category;
 
 import org.finos.waltz.data.measurable_category.MeasurableCategoryDao;
+import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.exceptions.NotAuthorizedException;
 import org.finos.waltz.model.measurable_category.MeasurableCategory;
 import org.finos.waltz.model.user.SystemRole;
@@ -62,6 +63,12 @@ public class MeasurableCategoryService {
 
     public Set<MeasurableCategory> findByExternalId(String externalId) {
         return measurableCategoryDao.findByExternalId(externalId);
+    }
+
+
+    public Set<MeasurableCategory> findPopulatedCategoriesForRef(EntityReference ref) {
+        return measurableCategoryDao
+                .findPopulatedCategoriesForRef(ref);
     }
 
 

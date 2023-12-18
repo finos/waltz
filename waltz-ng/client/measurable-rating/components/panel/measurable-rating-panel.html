@@ -17,18 +17,42 @@
   -->
 
 <div class="row">
-    <div class="col-sm-6">
-        <waltz-measurable-rating-tree ratings="$ctrl.ratings"
-                                      rating-scheme-items="$ctrl.ratingSchemeItems"
-                                      on-select="$ctrl.onSelect"
-                                      allocations="$ctrl.allocations"
-                                      measurables="$ctrl.measurables"
-                                      planned-decommissions="$ctrl.plannedDecommissions"
-                                      replacing-decommissions="$ctrl.replacingDecommissions"
-                                      replacement-apps="$ctrl.replacementApps">
-        </waltz-measurable-rating-tree>
+    <div class="col-sm-8">
+        <waltz-toggle class="pull-right"
+                      state="$ctrl.showTreeView"
+                      on-toggle="$ctrl.onToggleView()"
+                      label-on="Tree View"
+                      label-off="Table View">
+        </waltz-toggle>
+        <div class="help-block small">Use the toggle to switch between tree and table view</div>
+        <div ng-if="$ctrl.showTreeView">
+            <waltz-measurable-rating-tree ratings="$ctrl.ratings"
+                                          rating-scheme-items="$ctrl.ratingSchemeItems"
+                                          on-select="$ctrl.onSelect"
+                                          allocations="$ctrl.allocations"
+                                          measurables="$ctrl.measurables"
+                                          planned-decommissions="$ctrl.plannedDecommissions"
+                                          replacing-decommissions="$ctrl.replacingDecommissions"
+                                          replacement-apps="$ctrl.replacementApps">
+            </waltz-measurable-rating-tree>
+        </div>
+        <div ng-if="!$ctrl.showTreeView">
+            <waltz-svelte-component component="$ctrl.MeasurableRatingTable"
+                                    ratings="$ctrl.ratings"
+                                    on-select="$ctrl.onSelect"
+                                    allocations="$ctrl.allocations"
+                                    allocation-schemes="$ctrl.allocationSchemes"
+                                    measurables="$ctrl.measurables"
+                                    planned-decommissions="$ctrl.plannedDecommissions"
+                                    replacing-decommissions="$ctrl.replacingDecommissions"
+                                    replacement-apps="$ctrl.replacementApps"
+                                    assessment-definitions="$ctrl.assessmentDefinitions"
+                                    assessment-ratings="$ctrl.assessmentRatings">
+            </waltz-svelte-component>
+        </div>
+
     </div>
-    <div class="col-sm-6"
+    <div class="col-sm-4"
          style="border-left: 1px solid #eee">
 
         <div ng-if="$ctrl.selected == null"
@@ -83,7 +107,7 @@
                             Rating:
                         </div>
                         <div class="col-sm-10">
-                            <waltz-rating-indicator-cell rating="$ctrl.selected.ratingSchemeItem"
+                            <waltz-rating-indicator-cell rating="$ctrl.selected.rating.ratingSchemeItem"
                                                          show-description-popup="true"
                                                          show-name="true">
                             </waltz-rating-indicator-cell>
