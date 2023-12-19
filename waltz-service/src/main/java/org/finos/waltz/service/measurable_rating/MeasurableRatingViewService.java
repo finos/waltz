@@ -3,18 +3,15 @@ package org.finos.waltz.service.measurable_rating;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.allocation.Allocation;
 import org.finos.waltz.model.allocation_scheme.AllocationScheme;
 import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.assessment_rating.AssessmentRating;
 import org.finos.waltz.model.measurable.Measurable;
 import org.finos.waltz.model.measurable_category.MeasurableCategory;
-import org.finos.waltz.model.measurable_rating.ImmutableMeasurableRatingAppView;
 import org.finos.waltz.model.measurable_rating.ImmutableMeasurableRatingCategoryView;
 import org.finos.waltz.model.measurable_rating.ImmutableMeasurableRatingView;
 import org.finos.waltz.model.measurable_rating.MeasurableRating;
-import org.finos.waltz.model.measurable_rating.MeasurableRatingAppView;
 import org.finos.waltz.model.measurable_rating.MeasurableRatingCategoryView;
 import org.finos.waltz.model.measurable_rating.MeasurableRatingView;
 import org.finos.waltz.model.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommission;
@@ -40,7 +37,6 @@ import java.util.Set;
 
 import static java.util.Collections.emptyList;
 import static org.finos.waltz.common.MapUtilities.indexBy;
-import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 
 @Service
 public class MeasurableRatingViewService {
@@ -128,33 +124,6 @@ public class MeasurableRatingViewService {
                     .build();
         }
 
-    }
-
-    public MeasurableRatingAppView getViewForApp(EntityReference ref) {
-
-        List<MeasurableRating> ratings = measurableRatingService.findForEntity(ref);
-        List<Measurable> measurables = measurableService.findAll();
-        Collection<MeasurableCategory> categories = measurableCategoryService.findAll();
-        List<AllocationScheme> allocSchemes = allocationSchemeService.findAll();
-        Collection<Allocation> allocs = allocationService.findByEntity(ref);
-        Set<AssessmentDefinition> defs = assessmentDefinitionService.findByEntityKind(EntityKind.MEASURABLE_RATING);
-        List<AssessmentRating> assessments = assessmentRatingService.findByEntityKind(EntityKind.MEASURABLE_RATING);
-        Collection<RatingScheme> ratingSchemes = ratingSchemeService.findAll();
-        Collection<MeasurableRatingPlannedDecommission> decomms = measurableRatingPlannedDecommissionService.findForEntityRef(ref);
-        Collection<MeasurableRatingReplacement> replacements = measurableRatingReplacementService.findForEntityRef(ref);
-
-        return ImmutableMeasurableRatingAppView.builder()
-                .measurableRatings(ratings)
-                .measurables(measurables)
-                .categories(categories)
-                .allocationSchemes(allocSchemes)
-                .allocations(allocs)
-                .plannedDecommissions(decomms)
-                .plannedReplacements(replacements)
-                .assessmentDefinitions(defs)
-                .assessmentRatings(assessments)
-                .ratingSchemes(ratingSchemes)
-                .build();
     }
 
     public MeasurableRatingCategoryView getViewForAppAndCategory(EntityReference ref, long categoryId) {
