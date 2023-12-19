@@ -104,6 +104,7 @@
     $: defs = _.filter(
         assessmentDefinitions,
         d => d.entityKind === 'LOGICAL_DATA_FLOW');
+
 </script>
 
 <h4>
@@ -128,7 +129,7 @@
            style="margin-top: 1em">
         <thead>
         <tr>
-            <th nowrap="nowrap" style="width: 1em"></th>
+            <th nowrap="nowrap" style="width: 2em"></th>
             <th nowrap="nowrap" style="width: 20em">Source</th>
             <th nowrap="nowrap" style="width: 20em">Src Ext ID</th>
             <th nowrap="nowrap" style="width: 20em">Target</th>
@@ -150,6 +151,12 @@
                         <Icon fixedWidth={true}
                               name={flowCountToIcon(flow.physicalCount)}/>
                     </span>
+                    {#if flow.logicalFlow.isReadOnly}
+                        <span style="color: grey"
+                              title={`Flow has been marked as readonly (provenance: ${flow.logicalFlow.provenance}, last updated by: ${flow.logicalFlow.lastUpdatedBy})`}>
+                            <Icon name="lock"/>
+                        </span>
+                    {/if}
                 </td>
                 <td>
                     {flow.logicalFlow.source.name}

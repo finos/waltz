@@ -24,6 +24,10 @@
             .value();
     }
 
+    function onReload() {
+        logicalFlowStore.getViewForSelector(selectionOptions, true);
+    }
+
     let selectionOptions;
 
     let flowViewCall = null;
@@ -127,7 +131,8 @@
     </div>
     {#if $selectedLogicalFlow || $selectedPhysicalFlow}
         <div class="flow-detail-context-panel">
-            <SelectedFlowDetailPanel flowClassifications={flowClassifications}
+            <SelectedFlowDetailPanel on:reload={onReload}
+                                     flowClassifications={flowClassifications}
                                      assessmentDefinitions={allAssessmentDefinitions}/>
         </div>
     {/if}
