@@ -34,6 +34,7 @@ import {selectedMeasurable} from "./measurable-rating-panel-store";
 
 
 const bindings = {
+    category: "<",
     allocations: "<",
     allocationSchemes: "<",
     measurables: "<",
@@ -92,6 +93,7 @@ function controller($scope) {
 
     selectedMeasurable.subscribe(selected => {
         $scope.$applyAsync(() => {
+            console.log({selected});
             vm.selected = selected;
         })
     })

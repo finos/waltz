@@ -24,7 +24,6 @@
                       label-on="Tree View"
                       label-off="Table View">
         </waltz-toggle>
-        <div class="help-block small">Use the toggle to switch between tree and table view</div>
         <div ng-if="$ctrl.showTreeView">
             <waltz-measurable-rating-tree ratings="$ctrl.ratings"
                                           rating-scheme-items="$ctrl.ratingSchemeItems"
@@ -38,6 +37,7 @@
         </div>
         <div ng-if="!$ctrl.showTreeView">
             <waltz-svelte-component component="$ctrl.MeasurableRatingTable"
+                                    category="$ctrl.category"
                                     ratings="$ctrl.ratings"
                                     on-select="$ctrl.onSelect"
                                     allocations="$ctrl.allocations"

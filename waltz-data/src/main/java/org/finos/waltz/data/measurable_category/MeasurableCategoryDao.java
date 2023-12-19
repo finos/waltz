@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -147,7 +148,7 @@ public class MeasurableCategoryDao {
         return update == 1;
     }
 
-    public Set<MeasurableCategory> findPopulatedCategoriesForRef(EntityReference ref) {
+    public List<MeasurableCategory> findPopulatedCategoriesForRef(EntityReference ref) {
 
         SelectConditionStep<Record> ratedMeasurables = dsl
                 .select(MEASURABLE_CATEGORY.fields())
@@ -168,6 +169,7 @@ public class MeasurableCategoryDao {
                         .and(MEASURABLE_RATING_REPLACEMENT.ENTITY_KIND.eq(ref.kind().name())));
 
         return ratedMeasurables.union(replacingMeasurables)
-                .fetchSet(TO_DOMAIN_MAPPER);
+                .orderBy(MEASURABLE_CATEGORY.POSITION, MEASURABLE_CATEGORY.NAME)
+                .fetch(TO_DOMAIN_MAPPER);
     }
 }

@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import static java.lang.String.format;
@@ -66,7 +67,7 @@ public class MeasurableCategoryService {
     }
 
 
-    public Set<MeasurableCategory> findPopulatedCategoriesForRef(EntityReference ref) {
+    public List<MeasurableCategory> findPopulatedCategoriesForRef(EntityReference ref) {
         return measurableCategoryDao
                 .findPopulatedCategoriesForRef(ref);
     }

@@ -11,6 +11,7 @@
     import ReplacementAppMiniTable from "./ReplacementAppMiniTable.svelte";
     import {selectedMeasurable} from "../components/panel/measurable-rating-panel-store";
 
+    export let category;
     export let ratings = [];
     export let measurables = [];
     export let allocationSchemes = [];
@@ -81,9 +82,6 @@
                 "rating.ratingSchemeItem.name"
             ]);
 
-
-    $: console.log({selected: $selectedMeasurable, plannedDecommissions, replacementApps});
-
 </script>
 
 
@@ -110,7 +108,9 @@
            style="margin-top: 1em">
         <thead>
         <tr>
-            <th nowrap="nowrap"></th>
+            {#if category.allowPrimaryRatings}
+                <th nowrap="nowrap">Primary</th>
+            {/if}
             <th nowrap="nowrap" style="width: 20em">Measurable</th>
             <th nowrap="nowrap" style="width: 20em">Measurable Ext ID</th>
             <th nowrap="nowrap" style="width: 20em">Rating</th>
@@ -133,11 +133,13 @@
             <tr class="clickable"
                 class:selected={$selectedMeasurable?.rating.id === rating.rating.id}
                 on:click={() => onSelect(rating)}>
-                <td>
-                    {#if rating.rating.isPrimary}
-                        <Icon name="star" title="This is the primary rating"/>
-                    {/if}
-                </td>
+                {#if category.allowPrimaryRatings}
+                    <td>
+                        {#if rating.rating.isPrimary}
+                            <Icon name="star" title="This is the primary rating"/>
+                        {/if}
+                    </td>
+                {/if}
                 <td>
                     {_.get(rating, ["measurable", "name"], "Unknown")}
                 </td>
@@ -184,7 +186,7 @@
             </tr>
         {:else}
             <tr>
-                <td colspan={5 + _.size(assessmentDefinitions)}>
+                <td colspan={5 + _.size(assessmentDefinitions) + _.size(allocationSchemes) + (category.allowPrimaryRatings ? 1 : 0)}>
                     <NoData type="info">There are no ratings to show, these may have been filtered.</NoData>
                 </td>
             </tr>

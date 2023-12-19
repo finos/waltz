@@ -20,11 +20,12 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
 
 import template from "./measurable-rating-app-section.html";
-import {determineStartingTab, loadAllData, mkTab, mkTabs} from "../../measurable-rating-utils";
+import {determineStartingTab, loadAllData, mkTab} from "../../measurable-rating-utils";
 import namedSettings from "../../../system/named-settings";
 import {entity} from "../../../common/services/enums/entity";
 import {editOperations} from "../../../common/services/enums/operation";
 import roles from "../../../user/system-roles";
+import {selectedMeasurable} from "../panel/measurable-rating-panel-store";
 
 
 /**
@@ -69,29 +70,18 @@ function controller($q, serviceBroker, settingsService, userService) {
     }
 
     const loadData = (force = false) => {
-
         if (vm.parentEntityRef){
-            serviceBroker
-                .loadViewData(
-                    CORE_API.MeasurableCategoryStore.findPopulatedCategoriesForRef,
-                    [vm.parentEntityRef])
-                .then(d => {
-                    vm.visibleCats = d.data;
-                    console.log({cats: vm.visibleCats});
+            return loadAllData($q, serviceBroker, vm.parentEntityRef, false, force)
+                .then(r => {
+                    Object.assign(vm, r);
+                    vm.tabs = vm.categories;
+                    const startingTab = determineStartingTab(vm.tabs, vm.activeTab, vm.lastViewedCategoryId);
+                    if (startingTab) {
+                        vm.visibility.tab = startingTab.id;
+                        vm.onTabChange(startingTab.id, force);
+                    }
                 });
         }
-
-        return loadAllData($q, serviceBroker, vm.parentEntityRef, false, force)
-            .then((r) => {
-                Object.assign(vm, r);
-                vm.tabs = mkTabs(vm, false);
-                const startingTab = determineStartingTab(vm.tabs, vm.lastViewedCategoryId);
-                if (startingTab) {
-                    vm.visibility.tab = startingTab.category.id;
-                    vm.onTabChange(vm.lastViewedCategoryId);
-                }
-                console.log({tabs: vm.tabs});
-            });
     };
 
     vm.$onInit = () => {
@@ -134,7 +124,6 @@ function controller($q, serviceBroker, settingsService, userService) {
             hideAllocationScheme();
         } else {
             vm.activeAllocationScheme = scheme;
-            vm.activeTab = _.find(vm.tabs, tab => tab.category.id === vm.activeAllocationScheme.measurableCategoryId);
         }
     };
 
@@ -145,14 +134,7 @@ function controller($q, serviceBroker, settingsService, userService) {
             .execute(
                 CORE_API.AllocationStore.updateAllocations,
                 [vm.parentEntityRef, vm.activeAllocationScheme.id, changes])
-            .then(r => {
-                loadAllData($q, serviceBroker, vm.parentEntityRef, false, true)
-                    .then(r => {
-                        Object.assign(vm, r);
-                        mkTabs(vm);
-                    });
-                return r.data;
-            });
+            .then(r => loadData(true));
     };
 
     vm.onViewRatings = () => {
@@ -162,28 +144,22 @@ function controller($q, serviceBroker, settingsService, userService) {
 
     vm.onEditRatings = () => {
         vm.visibility.editor = true;
+        loadData(true);
         hideAllocationScheme();
     };
 
-    vm.onTabChange = (categoryId) => {
-        console.log({categoryId});
+    vm.onTabChange = (categoryId, force = false) => {
+        selectedMeasurable.set(null);
         hideAllocationScheme();
-
         serviceBroker
             .loadViewData(
                 CORE_API.MeasurableRatingStore.getViewForEntityAndCategory,
-                [vm.parentEntityRef, categoryId])
+                [vm.parentEntityRef, categoryId],
+                {force})
             .then(r => {
                 const tab = r.data;
-                mkTab()
-                console.log({tab});
+                vm.activeTab = mkTab(tab);
             });
-
-        // serviceBroker
-        //     .loadViewData(
-        //         CORE_API.RatingSchemeStore.findRatingsForEntityAndMeasurableCategory,
-        //         [vm.parentEntityRef, categoryId])
-        //     .then(r => tab.ratingSchemeItems = r.data)
     };
 
 }

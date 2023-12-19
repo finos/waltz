@@ -76,25 +76,26 @@
         id="wmrep-main-tabs">
     <div class="waltz-tabs">
         <!-- TAB HEADERS -->
-        <input ng-repeat-start="tab in $ctrl.tabs track by tab.category.id"
+        <input ng-repeat-start="tab in $ctrl.tabs track by tab.id"
                type="radio"
-               ng-change="$ctrl.onTabChange()"
-               ng-model="$ctrl.activeTab"
-               ng-value="tab"
-               ng-disabled="! tab.measurables"
+               ng-change="$ctrl.onTabChange(tab.id)"
+               ng-model="$ctrl.visibility.tab"
+               ng-value="tab.id"
                name="measurable_rating_edit"
-               id="{{ tab.category.id + '_' + $id }}">
+               id="{{ tab.id + '_' + $id }}">
         <label class="wt-label"
-               for="{{ tab.category.id + '_' + $id }}"
+               for="{{ tab.id + '_' + $id }}"
                ng-repeat-end>
-            <span ng-bind="tab.category.name"
-                  ng-class="{ italics: tab.ratings.length == 0 }">
+            <span ng-bind="tab.name"
+                  xxng-class="{ italics: tab.length == 0 }">
             </span>
-            <span ng-show='tab.ratings.length > 0'
-                  class="small text-muted">
-                -
-                <span ng-bind="tab.ratings.length"></span>
-            </span>
+
+<!--            EDIT THIS FOR RATING COUNT -->
+<!--            <span ng-show='tab.ratings.length > 0'-->
+<!--                  class="small text-muted">-->
+<!--                - -->
+<!--                <span ng-bind="tab.ratings.length"></span>-->
+<!--            </span>-->
         </label>
 
         <!-- SHOW ALL CATEGORIES -->
@@ -131,9 +132,9 @@
                                       on-keypress="$ctrl.onKeypress"
                                       scroll-height="600"
                                       on-select="$ctrl.onMeasurableSelect"
-                                      planned-decommissions="$ctrl.plannedDecommissions"
-                                      replacing-decommissions="$ctrl.replacingDecommissions"
-                                      replacement-apps="$ctrl.replacementApps">
+                                      planned-decommissions="$ctrl.activeTab.plannedDecommissions"
+                                      replacing-decommissions="$ctrl.activeTab.replacingDecommissions"
+                                      replacement-apps="$ctrl.activeTab.plannedReplacements">
         </waltz-measurable-rating-tree>
     </div>
 
