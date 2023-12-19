@@ -121,8 +121,7 @@
                     <strong>No ratings</strong>
                     available for this entity.
                 </p>
-<!--                NEED TO CHANE HERE!!! -->
-                <p waltz-has-role="RATING_EDITOR">
+                <p ng-if="$ctrl.hasEditPermissions">
                     <a class="clickable"
                        ng-if="$ctrl.visibility.editor === false"
                        ng-click="$ctrl.visibility.editor = true">
@@ -138,22 +137,22 @@
     <div ng-if="$ctrl.tabs.length > 0">
         <div class="waltz-tabs">
             <input type="radio"
-                   ng-repeat-start="tab in $ctrl.tabs track by tab.id"
+                   ng-repeat-start="tab in $ctrl.tabs track by tab.category.id"
                    ng-model="$ctrl.visibility.tab"
-                   ng-value="tab.id"
-                   ng-change="$ctrl.onTabChange(tab.id)"
+                   ng-value="tab.category.id"
+                   ng-change="$ctrl.onTabChange(tab.category.id)"
                    name="measurable_rating"
-                   id="{{ tab.id + '_' +$id}}">
+                   id="{{ tab.category.id + '_' +$id}}">
             <label class="wt-label"
-                   for="{{ tab.id + '_' +$id}}"
+                   for="{{ tab.category.id + '_' +$id}}"
                    uib-popover-template="'wmras-tab-popover.html'"
                    popover-trigger="mouseenter"
                    popover-append-to-body="true"
                    popover-placement="bottom"
                    popover-popup-delay="300"
                    ng-repeat-end>
-                <waltz-icon name="{{tab.icon}}"></waltz-icon>
-                <span ng-bind="tab.name">
+                <waltz-icon name="{{tab.category.icon}}"></waltz-icon>
+                <span ng-bind="tab.category.name">
                 </span>
             </label>
 
@@ -170,8 +169,18 @@
 <script type="text/ng-template"
         id="wmras-tab-content">
     <br>
-    <!-- RATING TREE -->
+
     <div class="row">
+        <div class="col-sm-12">
+            <waltz-loading-notification show="$ctrl.visibility.loading"
+                                        style="padding-top: 54px;"
+                                        name="Loading">
+            </waltz-loading-notification>
+        </div>
+    </div>
+
+    <!-- RATING TREE -->
+    <div class="row" ng-show="!$ctrl.visibility.loading">
         <div class="col-sm-12">
             <waltz-measurable-rating-panel category="$ctrl.activeTab.category"
                                            measurables="$ctrl.activeTab.measurables"

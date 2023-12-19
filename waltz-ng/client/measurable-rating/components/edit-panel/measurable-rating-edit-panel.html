@@ -76,26 +76,26 @@
         id="wmrep-main-tabs">
     <div class="waltz-tabs">
         <!-- TAB HEADERS -->
-        <input ng-repeat-start="tab in $ctrl.tabs track by tab.id"
+        <input ng-repeat-start="tab in $ctrl.tabs track by tab.category.id"
                type="radio"
-               ng-change="$ctrl.onTabChange(tab.id)"
+               ng-change="$ctrl.onTabChange(tab.category.id)"
                ng-model="$ctrl.visibility.tab"
-               ng-value="tab.id"
+               ng-value="tab.category.id"
                name="measurable_rating_edit"
-               id="{{ tab.id + '_' + $id }}">
+               id="{{ tab.category.id + '_' + $id }}">
         <label class="wt-label"
-               for="{{ tab.id + '_' + $id }}"
+               for="{{ tab.category.id + '_' + $id }}"
                ng-repeat-end>
-            <span ng-bind="tab.name"
-                  xxng-class="{ italics: tab.length == 0 }">
+            <span ng-bind="tab.category.name"
+                  ng-class="{ italics: tab.length == 0 }">
             </span>
 
-<!--            EDIT THIS FOR RATING COUNT -->
-<!--            <span ng-show='tab.ratings.length > 0'-->
-<!--                  class="small text-muted">-->
-<!--                - -->
-<!--                <span ng-bind="tab.ratings.length"></span>-->
-<!--            </span>-->
+<!--            EDIT THIS FOR RATING COUNT-->
+            <span ng-show='tab.ratingCount > 0'
+                  class="small text-muted">
+                -
+                <span ng-bind="tab.ratingCount"></span>
+            </span>
         </label>
 
         <!-- SHOW ALL CATEGORIES -->
@@ -124,8 +124,16 @@
 <!-- TAB CONTENT -->
 <script type="text/ng-template"
         id="wmrep-tab-content">
+
+
     <div style="padding-top: 6px">
-        <waltz-measurable-rating-tree ratings="$ctrl.activeTab.ratings"
+        <waltz-loading-notification show="$ctrl.visibility.loading"
+                                    style="padding-top: 54px;"
+                                    name="Loading">
+        </waltz-loading-notification>
+
+        <waltz-measurable-rating-tree ng-show="!$ctrl.visibility.loading"
+                                      ratings="$ctrl.activeTab.ratings"
                                       allocations="$ctrl.activeTab.allocations"
                                       rating-scheme-items="$ctrl.activeTab.ratingSchemeItems"
                                       measurables="$ctrl.activeTab.measurables"

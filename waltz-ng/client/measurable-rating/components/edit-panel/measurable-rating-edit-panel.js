@@ -20,7 +20,7 @@ import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
 import {kindToViewState} from "../../../common/link-utils";
-import {loadAllData, loadDecommData, mkTab} from "../../measurable-rating-utils";
+import {determineEditableCategories, loadAllData, loadDecommData, mkTab} from "../../measurable-rating-utils";
 import {mkRatingsKeyHandler} from "../../../ratings/rating-utils";
 
 import template from "./measurable-rating-edit-panel.html";
@@ -63,7 +63,8 @@ const initialState = {
         instructions: true,
         schemeOverview: false,
         showAllCategories: false,
-        tab: null
+        tab: null,
+        loading: false
     }
 };
 
@@ -74,33 +75,29 @@ function controller($q,
                     userService) {
     const vm = initialiseData(this, initialState);
 
-    const loadData = (allMeasurables, force) => {
-        return loadAllData($q, serviceBroker, vm.parentEntityRef, allMeasurables, force)
-            .then((r) => {
-                Object.assign(vm, r);
+    const loadData = (force) => {
+        return loadAllData($q, serviceBroker, vm.parentEntityRef, force)
+            .then(r => Object.assign(vm, r))
+            .then(() => {
 
-                const allCategories = _.filter(
-                    vm.categories,
-                    t => {
-                        const hasRole = _.includes(vm.userRoles, t.ratingEditorRole);
-                        const editableCategoryForUser = _.includes(vm.editableCategoriesForUser, t.id);
-                        const isEditableCategory = t.editable;
-                        return isEditableCategory && (hasRole || editableCategoryForUser);
-                    });
+                const editableCategories = _.filter(vm.categories, d => _.includes(vm.editableCategoryIds, d.category.id));
 
-                vm.tabs = allCategories;
+                // Need to filer on the empty categories here
+                vm.tabs = vm.visibility.showAllCategories
+                    ? editableCategories
+                    : _.filter(editableCategories, d => d.ratingCount > 0);
 
-                vm.categoriesById = _.keyBy(vm.categories, d => d.id);
-                vm.hasHiddenTabs = vm.categories.length !== vm.tabs.length;
+                vm.categoriesById = _.keyBy(vm.categories, d => d.category.id);
+                vm.hasHiddenTabs = editableCategories.length !== vm.tabs.length;
 
-                const startingCat = _.find(vm.tabs, t => t.id === vm.startingCategoryId);
+                const startingCat = _.find(vm.tabs, t => t.category.id === vm.startingCategoryId);
 
                 const startingCategory = _.isEmpty(startingCat)
                     ? vm.tabs[0]
                     : startingCat;
 
-                vm.visibility.tab = startingCategory.id;
-                recalcTabs(startingCategory.id);
+                vm.visibility.tab = startingCategory.category.id;
+                recalcTabs(startingCategory.category.id);
 
             })
     };
@@ -217,22 +214,24 @@ function controller($q,
 
     vm.$onInit = () => {
 
-        serviceBroker
-            .loadViewData(CORE_API.PermissionGroupStore.findForParentEntityRef, [vm.parentEntityRef])
-            .then(r => {
-                const permissions = r.data;
-                vm.editableCategoriesForUser = _
-                    .chain(permissions)
-                    .filter(d => d.subjectKind === entity.MEASURABLE_RATING.key && _.includes(editOperations, d.operation) && d.qualifierReference.kind === entity.MEASURABLE_CATEGORY.key)
-                    .map(d => d.qualifierReference.id)
-                    .uniq()
-                    .value()
-            })
+        const allCategoriesPromise = serviceBroker
+            .loadViewData(CORE_API.MeasurableCategoryStore.findAll)
+            .then(r => r.data);
 
-        userService
+        const permissionsPromise = serviceBroker
+            .loadViewData(CORE_API.PermissionGroupStore.findForParentEntityRef, [vm.parentEntityRef])
+            .then(r => r.data);
+
+        const userRolesPromise = userService
             .whoami()
-            .then(user => vm.userRoles = user.roles)
-            .then(() => loadData(true));
+            .then(user => user.roles);
+
+        $q.all([allCategoriesPromise, permissionsPromise, userRolesPromise])
+            .then(([categories, permissions, userRoles]) =>{
+                const editableCategories = determineEditableCategories(categories, permissions, userRoles);
+                vm.editableCategoryIds = _.map(editableCategories, d => d.id);
+            })
+            .then(() => loadData())
 
         vm.backUrl = $state
             .href(
@@ -399,6 +398,7 @@ function controller($q,
     };
 
     vm.reloadTabInfo = (categoryId, force = false) => {
+        vm.visibility.loading = true;
         return serviceBroker
             .loadViewData(
                 CORE_API.MeasurableRatingStore.getViewForEntityAndCategory,
@@ -412,12 +412,13 @@ function controller($q,
                     vm.activeTab.ratingSchemeItems,
                     vm.onRatingSelect,
                     vm.doCancel);
-            });
+            })
+            .then(() => vm.visibility.loading = false);
     };
 
     vm.onShowAllTabs = () => {
         vm.visibility.showAllCategories = true;
-        recalcTabs(vm.activeTab.category.id);
+        loadData();
     };
 
 }

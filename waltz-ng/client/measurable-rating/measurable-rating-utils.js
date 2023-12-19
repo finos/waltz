@@ -20,6 +20,8 @@ import {CORE_API} from "../common/services/core-api-utils";
 import {mkSelectionOptions} from "../common/selector-utils";
 import {lastViewedMeasurableCategoryKey} from "../user";
 import {reduceToSelectedNodesOnly} from "../common/hierarchy-utils";
+import {entity} from "../common/services/enums/entity";
+import {editOperations} from "../common/services/enums/operation";
 
 
 export function loadDecommData(
@@ -87,14 +89,9 @@ export function loadAllData(
     $q,
     serviceBroker,
     parentEntityRef,
-    allMeasurables = false,
     force = false) {
 
-    const categoriesPromise = allMeasurables
-        ? serviceBroker
-            .loadViewData(CORE_API.MeasurableCategoryStore.findAll)
-            .then(r => ({ categories: r.data}))
-        : serviceBroker
+    const categoriesPromise = serviceBroker
             .loadViewData(
                 CORE_API.MeasurableCategoryStore.findPopulatedCategoriesForRef,
                 [parentEntityRef],
@@ -196,8 +193,28 @@ export function mkTab(ctx, showAllMeasurables = false) {
 
 export function determineStartingTab(categories = [], activeTab, lastViewedCategoryId) {
     // category last viewed or first with ratings, or simply first if no ratings
-    const tabForLastCategoryViewed = _.find(categories, t => t.id === lastViewedCategoryId);
-    const tabForActive = _.find(categories, t => t.id === activeTab?.category.id);
+    const tabForLastCategoryViewed = _.find(categories, t => t.category.id === lastViewedCategoryId);
+    const tabForActive = _.find(categories, t => t.category.id === activeTab?.category.id);
     return tabForActive || tabForLastCategoryViewed || categories[0];
 }
 
+
+export function determineEditableCategories(categories, permissions, userRoles) {
+    const editableCategoriesForUser = _
+        .chain(permissions)
+        .filter(d => d.subjectKind === entity.MEASURABLE_RATING.key
+            && _.includes(editOperations, d.operation)
+            && d.qualifierReference.kind === entity.MEASURABLE_CATEGORY.key)
+        .map(d => d.qualifierReference.id)
+        .uniq()
+        .value();
+
+    return _.filter(
+        categories,
+        t => {
+            const hasRole = _.includes(userRoles, t.ratingEditorRole);
+            const editableCategoryForUser = _.includes(editableCategoriesForUser, t.id);
+            const isEditableCategory = t.editable;
+            return isEditableCategory && (hasRole || editableCategoryForUser);
+        });
+}

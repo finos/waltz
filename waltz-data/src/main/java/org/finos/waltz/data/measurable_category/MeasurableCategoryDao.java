@@ -28,17 +28,20 @@ import org.finos.waltz.schema.tables.records.MeasurableCategoryRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Record1;
+import org.jooq.Record2;
 import org.jooq.RecordMapper;
+import org.jooq.Result;
 import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.finos.waltz.common.MapUtilities.countBy;
 import static org.finos.waltz.schema.Tables.ENTITY_HIERARCHY;
 import static org.finos.waltz.schema.Tables.MEASURABLE;
 import static org.finos.waltz.schema.Tables.MEASURABLE_RATING;
@@ -148,28 +151,32 @@ public class MeasurableCategoryDao {
         return update == 1;
     }
 
-    public List<MeasurableCategory> findPopulatedCategoriesForRef(EntityReference ref) {
+    public Map<Long, Long> findRatingCountsByCategoryId(EntityReference ref) {
 
-        SelectConditionStep<Record> ratedMeasurables = dsl
-                .select(MEASURABLE_CATEGORY.fields())
+        SelectConditionStep<Record2<Long, Long>> ratedMeasurables = dsl
+                .select(MEASURABLE_CATEGORY.ID, MEASURABLE_RATING.ID)
                 .from(MEASURABLE_CATEGORY)
-                .innerJoin(MEASURABLE).on(MEASURABLE_CATEGORY.ID.eq(MEASURABLE.MEASURABLE_CATEGORY_ID))
+                .innerJoin(MEASURABLE).on(MEASURABLE_CATEGORY.ID.eq(MEASURABLE.MEASURABLE_CATEGORY_ID)
+                        .and(MEASURABLE.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name())))
                 .innerJoin(MEASURABLE_RATING).on(MEASURABLE.ID.eq(MEASURABLE_RATING.MEASURABLE_ID))
                 .where(MEASURABLE_RATING.ENTITY_ID.eq(ref.id())
                         .and(MEASURABLE_RATING.ENTITY_KIND.eq(ref.kind().name())));
 
-        SelectConditionStep<Record> replacingMeasurables = dsl
-                .select(MEASURABLE_CATEGORY.fields())
+        SelectConditionStep<Record2<Long, Long>> replacingMeasurables = dsl
+                .select(MEASURABLE_CATEGORY.ID, MEASURABLE_RATING.ID)
                 .from(MEASURABLE_CATEGORY)
-                .innerJoin(MEASURABLE).on(MEASURABLE_CATEGORY.ID.eq(MEASURABLE.MEASURABLE_CATEGORY_ID))
+                .innerJoin(MEASURABLE).on(MEASURABLE_CATEGORY.ID.eq(MEASURABLE.MEASURABLE_CATEGORY_ID)
+                        .and(MEASURABLE.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name())))
                 .innerJoin(MEASURABLE_RATING).on(MEASURABLE.ID.eq(MEASURABLE_RATING.MEASURABLE_ID))
                 .innerJoin(MEASURABLE_RATING_PLANNED_DECOMMISSION).on(MEASURABLE_RATING.ID.eq(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_RATING_ID))
                 .innerJoin(MEASURABLE_RATING_REPLACEMENT).on(MEASURABLE_RATING_PLANNED_DECOMMISSION.ID.eq(MEASURABLE_RATING_REPLACEMENT.DECOMMISSION_ID))
                 .where(MEASURABLE_RATING_REPLACEMENT.ENTITY_ID.eq(ref.id())
                         .and(MEASURABLE_RATING_REPLACEMENT.ENTITY_KIND.eq(ref.kind().name())));
 
-        return ratedMeasurables.union(replacingMeasurables)
-                .orderBy(MEASURABLE_CATEGORY.POSITION, MEASURABLE_CATEGORY.NAME)
-                .fetch(TO_DOMAIN_MAPPER);
+        Result<Record2<Long, Long>> ratingsForCategory = ratedMeasurables
+                .union(replacingMeasurables)
+                .fetch();
+
+        return countBy(r -> r.get(MEASURABLE_CATEGORY.ID), ratingsForCategory);
     }
 }
