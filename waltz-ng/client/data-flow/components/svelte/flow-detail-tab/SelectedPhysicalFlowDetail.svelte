@@ -169,7 +169,7 @@
     <summary>Actions</summary>
     <menu>
         {#if actionSectionState === ActionSectionStates.LIST }
-            {#if hasRemovePermission}
+            {#if hasRemovePermission && ! physicalFlow.isReadOnly}
                 <li>
                     <button class="btn btn-skinny btn-danger"
                             on:click={() => actionSectionState = ActionSectionStates.REMOVAL_CONFIRMATION}>

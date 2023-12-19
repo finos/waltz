@@ -17,6 +17,7 @@
     import Tooltip from "../../../../common/svelte/Tooltip.svelte";
     import RatingIndicatorCell from "../../../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
     import EntityIcon from "../../../../common/svelte/EntityIcon.svelte";
+    import Icon from "../../../../common/svelte/Icon.svelte";
 
     export let physicalFlows = [];
     export let flowClassifications = [];
@@ -122,6 +123,7 @@
            style="margin-top: 1em">
         <thead>
         <tr>
+            <th nowrap="nowrap" style="width: 1em"></th>
             <th nowrap="nowrap" style="width: 20em">Source</th>
             <th nowrap="nowrap" style="width: 20em">Src Ext ID</th>
             <th nowrap="nowrap" style="width: 20em">Target</th>
@@ -147,6 +149,15 @@
             <tr class="clickable"
                 class:selected={$selectedPhysicalFlow === flow}
                 on:click={() => selectPhysicalFlow(flow)}>
+                <td>
+                    {#if flow.physicalFlow.isReadOnly}
+                        <span style="color: grey"
+                              title={`Flow has been marked as readonly (provenance: ${flow.physicalFlow.provenance}, last updated by: ${flow.physicalFlow.lastUpdatedBy})`}>
+                            <Icon name="lock"
+                                  fixed-width="true"/>
+                        </span>
+                    {/if}
+                </td>
                 <td>
                     {flow.logicalFlow.source.name}
                 </td>
