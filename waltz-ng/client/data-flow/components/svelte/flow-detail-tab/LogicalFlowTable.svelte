@@ -81,10 +81,12 @@
             visibleFlows,
             qry,
             [
-                "logicalFlow.source.name",
-                "logicalFlow.source.externalId",
-                "logicalFlow.target.name",
-                "logicalFlow.target.externalId"
+                (f) => _.get(f.logicalFlow.source, ["name"], ""),
+                (f) => _.get(f.logicalFlow.source, ["externalId"], ""),
+                (f) => _.get(f.logicalFlow.target, ["name"], ""),
+                (f) => _.get(f.logicalFlow.target, ["externalId"], ""),
+                (f) => _.chain(f.logicalFlowRatingsByDefId).values().flatten().map(d => d.name).join(" ").value(),
+                (f) => _.chain(f.dataTypesForLogicalFlow).map(d => _.get(d, ["decoratorEntity", "name"])).join(" ").value()
             ]);
 
     $: defs = _.filter(

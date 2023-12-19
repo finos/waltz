@@ -79,10 +79,19 @@
             visibleFlows,
             qry,
             [
-                "logicalFlow.source.name",
-                "logicalFlow.source.externalId",
-                "logicalFlow.target.name",
-                "logicalFlow.target.externalId"
+                (f) => _.get(f.logicalFlow.source, ["name"], ""),
+                (f) => _.get(f.logicalFlow.source, ["externalId"], ""),
+                (f) => _.get(f.logicalFlow.target, ["name"], ""),
+                (f) => _.get(f.logicalFlow.target, ["externalId"], ""),
+                (f) => _.get(f.physicalFlow, ["name"], ""),
+                (f) => _.get(f.physicalFlow, ["externalId"], ""),
+                (f) => _.get(f.physicalFlow, ["frequency"], ""),
+                (f) => _.get(f.physicalFlow, ["transport"], ""),
+                (f) => _.get(f.physicalFlow, ["criticality"], ""),
+                (f) => _.get(f.specification, ["name"], ""),
+                (f) => _.chain(f.physicalFlowRatingsByDefId).values().flatten().map(d => d.name).join(" ").value(),
+                (f) => _.chain(f.physicalSpecRatingsByDefId).values().flatten().map(d => d.name).join(" ").value(),
+                (f) => _.chain(f.dataTypesForSpecification).map(d => _.get(d, ["decoratorEntity", "name"])).join(" ").value()
             ]);
 
     $: defs = _.filter(
