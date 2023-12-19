@@ -59,7 +59,12 @@
 
     $: logicalFlows = _
         .chain(filteredFlows)
-        .uniqBy(d => d.logicalFlow.id)
+        .groupBy(d => d.logicalFlow.id)
+        .map((v, k) => {
+            const lf = _.first(v);
+            const physicalCount = lf.physicalFlow ? v.length : 0;
+            return Object.assign(lf, { physicalCount });
+        })
         .value();
 
     $: {

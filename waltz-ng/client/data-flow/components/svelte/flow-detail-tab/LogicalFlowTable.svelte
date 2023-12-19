@@ -8,6 +8,7 @@
     import Tooltip from "../../../../common/svelte/Tooltip.svelte";
     import DataTypeTooltipContent from "./DataTypeMiniTable.svelte";
     import NoData from "../../../../common/svelte/NoData.svelte";
+    import Icon from "../../../../common/svelte/Icon.svelte";
 
     export let logicalFlows = [];
     export let flowClassifications = [];
@@ -73,6 +74,17 @@
         };
     }
 
+    function flowCountToIcon(flowCount) {
+        switch (flowCount) {
+            case 0:
+                return "";
+            case 1:
+                return "file-o";
+            default:
+                return "folder-o";
+        }
+    }
+
     $: visibleFlows = _.filter(logicalFlows, d => d.visible);
 
     $: flowList = _.isEmpty(qry)
@@ -116,6 +128,7 @@
            style="margin-top: 1em">
         <thead>
         <tr>
+            <th nowrap="nowrap" style="width: 1em"></th>
             <th nowrap="nowrap" style="width: 20em">Source</th>
             <th nowrap="nowrap" style="width: 20em">Src Ext ID</th>
             <th nowrap="nowrap" style="width: 20em">Target</th>
@@ -131,6 +144,13 @@
             <tr class="clickable"
                 class:selected={isSameFlow($selectedLogicalFlow, flow)}
                 on:click={() => selectLogicalFlow(flow)}>
+                <td>
+                    <span style="color: grey"
+                          title={`Associated physical flows: ${flow.physicalCount}`}>
+                        <Icon fixedWidth={true}
+                              name={flowCountToIcon(flow.physicalCount)}/>
+                    </span>
+                </td>
                 <td>
                     {flow.logicalFlow.source.name}
                 </td>
