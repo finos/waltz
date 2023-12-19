@@ -93,7 +93,6 @@ function controller($scope) {
 
     selectedMeasurable.subscribe(selected => {
         $scope.$applyAsync(() => {
-            console.log({selected});
             vm.selected = selected;
         })
     })

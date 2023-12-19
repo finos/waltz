@@ -158,7 +158,8 @@
             </label>
 
             <div ng-if="$ctrl.activeTab"
-                 ng-include="'wmras-tab-content'"></div>
+                 ng-include="'wmras-tab-content'">
+            </div>
         </div>
     </div>
 
@@ -211,7 +212,7 @@
                 :
 
                 <span class="small text-muted">
-                    <span ng-bind="$ctrl.allocationTotalsByScheme[scheme.id] || 0"></span> % allocated
+                    <span ng-bind="$ctrl.activeTab.allocationTotalsByScheme[scheme.id] || 0"></span> % allocated
                 </span>
 
                 <span ng-if="!$last">&nbsp;|&nbsp;</span>

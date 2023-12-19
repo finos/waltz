@@ -155,10 +155,8 @@ function prepareTabForCategory(category,
     const allocationTotalsByScheme = _
         .chain(allocationsForCategory)
         .groupBy(d => d.schemeId)
-        .mapValues(d => console.log({d}) || _.sumBy(d, a => a.percentage))
+        .mapValues(d => _.sumBy(d, a => a.percentage))
         .value()
-
-    console.log({allocationsForCategory, allocationTotalsByScheme});
 
     return {
         category,
@@ -176,7 +174,7 @@ function prepareTabForCategory(category,
     };
 }
 
-export function mkTab(ctx, includeEmpty = false, showAllMeasurables = false) {
+export function mkTab(ctx, showAllMeasurables = false) {
 
     const ratingSchemesById = _.keyBy(ctx.ratingSchemes, d => d.id);
 

@@ -406,9 +406,8 @@ function controller($q,
                 {force})
             .then(r => {
                 const tab = r.data;
-                vm.activeTab = mkTab(tab, true, true);
+                vm.activeTab = mkTab(tab, true);
 
-                console.log({at: vm.activeTab});
                 vm.onKeypress = mkRatingsKeyHandler(
                     vm.activeTab.ratingSchemeItems,
                     vm.onRatingSelect,

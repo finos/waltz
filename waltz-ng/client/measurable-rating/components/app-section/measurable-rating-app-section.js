@@ -134,7 +134,10 @@ function controller($q, serviceBroker, settingsService, userService) {
             .execute(
                 CORE_API.AllocationStore.updateAllocations,
                 [vm.parentEntityRef, vm.activeAllocationScheme.id, changes])
-            .then(r => loadData(true));
+            .then(r => {
+                loadData(true);
+                return r.data;
+            });
     };
 
     vm.onViewRatings = () => {
