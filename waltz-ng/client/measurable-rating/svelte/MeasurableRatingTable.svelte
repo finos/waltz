@@ -131,7 +131,7 @@
         <tbody>
         {#each ratingsList as rating}
             <tr class="clickable"
-                class:selected={$selectedMeasurable?.rating.id === rating.rating.id}
+                class:selected={$selectedMeasurable?.rating?.id === rating.rating.id}
                 on:click={() => onSelect(rating)}>
                 {#if category.allowPrimaryRatings}
                     <td>

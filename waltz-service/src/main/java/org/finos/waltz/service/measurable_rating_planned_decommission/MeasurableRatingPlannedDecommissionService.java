@@ -80,6 +80,10 @@ public class MeasurableRatingPlannedDecommissionService {
         return measurableRatingPlannedDecommissionDao.findByReplacingEntityRef(ref);
     }
 
+    public Collection<MeasurableRatingPlannedDecommissionInfo> findForReplacingEntityRefAndCategory(EntityReference ref, long categoryId) {
+        return measurableRatingPlannedDecommissionDao.findForReplacingEntityRefAndCategory(ref, categoryId);
+    }
+
 
     public MeasurableRatingPlannedDecommission save(long measurableRatingId,
                                                     DateFieldChange dateChange,

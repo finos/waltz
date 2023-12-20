@@ -15,6 +15,7 @@ import org.finos.waltz.model.measurable_rating.MeasurableRating;
 import org.finos.waltz.model.measurable_rating.MeasurableRatingCategoryView;
 import org.finos.waltz.model.measurable_rating.MeasurableRatingView;
 import org.finos.waltz.model.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommission;
+import org.finos.waltz.model.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommissionInfo;
 import org.finos.waltz.model.measurable_rating_replacement.MeasurableRatingReplacement;
 import org.finos.waltz.model.rating.RatingScheme;
 import org.finos.waltz.model.rating.RatingSchemeItem;
@@ -144,6 +145,7 @@ public class MeasurableRatingViewService {
         Collection<RatingScheme> ratingSchemes = ratingSchemeService.findAll();
         Collection<MeasurableRatingPlannedDecommission> decomms = measurableRatingPlannedDecommissionService.findForEntityRefAndCategory(ref, categoryId);
         Collection<MeasurableRatingReplacement> replacements = measurableRatingReplacementService.fetchByEntityRefAndCategory(ref, categoryId);
+        Collection<MeasurableRatingPlannedDecommissionInfo> replacingDecoms = measurableRatingPlannedDecommissionService.findForReplacingEntityRefAndCategory(ref, categoryId);
 
         return ImmutableMeasurableRatingCategoryView.builder()
                 .ratings(ratings)
@@ -153,6 +155,7 @@ public class MeasurableRatingViewService {
                 .allocations(allocs)
                 .plannedDecommissions(decomms)
                 .plannedReplacements(replacements)
+                .replacingDecommissions(replacingDecoms)
                 .assessmentDefinitions(defs)
                 .assessmentRatings(assessments)
                 .ratingSchemes(ratingSchemes)

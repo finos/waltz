@@ -79,7 +79,7 @@ function controller($scope) {
     };
 
     vm.onSelect = (node) => {
-        if (vm.selected && vm.selected.rating.id === node.rating.id) {
+        if (vm.selected && vm.selected?.measurable?.id === node.measurable.id) {
             selectedMeasurable.set(null);
         } else {
             const selectedNode = Object.assign({}, node, {allocations: enrichAllocationsWithScheme(node, vm.allocationSchemesById)});

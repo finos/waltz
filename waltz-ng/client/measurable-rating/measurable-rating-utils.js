@@ -127,17 +127,22 @@ function prepareTabForCategory(category,
                                assessmentRatingsForCategory = [],
                                decommsForCategory = [],
                                replacementsForCategory = [],
+                               replacingDecommissionsForCategory = [],
                                ratingSchemesById,
                                ratingSchemeItemsById,
                                showAllMeasurables = true) {
 
     const ratedMeasurables = _.map(ratingsForCategory, d => d.measurableId);
+    const replacingMeasurables = _.map(replacingDecommissionsForCategory, d => d.measurableRating.measurableId);
+
+    const requiredMeasurables = _.concat(ratedMeasurables, replacingMeasurables);
+
     const ratingScheme = ratingSchemesById[category.ratingSchemeId];
     const ratingSchemeItemsByCode = _.keyBy(ratingScheme.ratings, d => d.rating);
 
     const measurables = showAllMeasurables
         ? measurablesForCategory
-        : reduceToSelectedNodesOnly(measurablesForCategory, ratedMeasurables);
+        : reduceToSelectedNodesOnly(measurablesForCategory, requiredMeasurables);
 
     const ratings = _
         .chain(ratingsForCategory)
@@ -166,6 +171,7 @@ function prepareTabForCategory(category,
         assessmentRatings,
         plannedDecommissions: decommsForCategory,
         plannedReplacements: replacementsForCategory,
+        replacingDecommissions: replacingDecommissionsForCategory,
         ratingSchemeItems: ratingScheme.ratings,
         allocationTotalsByScheme
     };
@@ -185,6 +191,7 @@ export function mkTab(ctx, showAllMeasurables = false) {
         ctx.assessmentRatings,
         ctx.plannedDecommissions,
         ctx.plannedReplacements,
+        ctx.replacingDecommissions,
         ratingSchemesById,
         ctx.ratingSchemeItemsById,
         showAllMeasurables);

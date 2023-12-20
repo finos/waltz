@@ -176,6 +176,31 @@ public class MeasurableRatingPlannedDecommissionDao {
                 });
     }
 
+
+    public Collection<MeasurableRatingPlannedDecommissionInfo> findForReplacingEntityRefAndCategory(EntityReference ref, Long categoryId) {
+        return dsl
+                .select(MEASURABLE_RATING_PLANNED_DECOMMISSION.fields())
+                .select(MEASURABLE_RATING.fields())
+                .select(ENTITY_NAME_FIELD)
+                .from(MEASURABLE_RATING_PLANNED_DECOMMISSION)
+                .innerJoin(MEASURABLE_RATING_REPLACEMENT)
+                    .on(MEASURABLE_RATING_REPLACEMENT.DECOMMISSION_ID.eq(MEASURABLE_RATING_PLANNED_DECOMMISSION.ID))
+                .innerJoin(MEASURABLE_RATING).on(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_RATING_ID.eq(MEASURABLE_RATING.ID))
+                .innerJoin(MEASURABLE).on(MEASURABLE_RATING.MEASURABLE_ID.eq(MEASURABLE.ID)
+                        .and(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId)))
+                .where(MEASURABLE_RATING_REPLACEMENT.ENTITY_ID.eq(ref.id()))
+                .and(MEASURABLE_RATING_REPLACEMENT.ENTITY_KIND.eq(ref.kind().name()))
+                .fetchSet(r -> {
+                    MeasurableRatingPlannedDecommission decom = MeasurableRatingPlannedDecommissionDao.TO_DOMAIN_MAPPER.map(r);
+                    MeasurableRating rating = readMeasurableRating(r);
+
+                    return ImmutableMeasurableRatingPlannedDecommissionInfo.builder()
+                            .decommission(decom)
+                            .measurableRating(rating)
+                            .build();
+                });
+    }
+
     private MeasurableRating readMeasurableRating(Record r) {
 
         EntityReference ref = mkRef(
