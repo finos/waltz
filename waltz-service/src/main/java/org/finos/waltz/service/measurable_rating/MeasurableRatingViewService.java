@@ -8,6 +8,7 @@ import org.finos.waltz.model.allocation_scheme.AllocationScheme;
 import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.assessment_rating.AssessmentRating;
 import org.finos.waltz.model.measurable.Measurable;
+import org.finos.waltz.model.measurable.MeasurableHierarchy;
 import org.finos.waltz.model.measurable_category.MeasurableCategory;
 import org.finos.waltz.model.measurable_rating.ImmutableMeasurableRatingCategoryView;
 import org.finos.waltz.model.measurable_rating.ImmutableMeasurableRatingView;
@@ -145,7 +146,9 @@ public class MeasurableRatingViewService {
         Collection<RatingScheme> ratingSchemes = ratingSchemeService.findAll();
         Collection<MeasurableRatingPlannedDecommission> decomms = measurableRatingPlannedDecommissionService.findForEntityRefAndCategory(ref, categoryId);
         Collection<MeasurableRatingReplacement> replacements = measurableRatingReplacementService.fetchByEntityRefAndCategory(ref, categoryId);
-        Collection<MeasurableRatingPlannedDecommissionInfo> replacingDecoms = measurableRatingPlannedDecommissionService.findForReplacingEntityRefAndCategory(ref, categoryId);
+        Collection<MeasurableRatingPlannedDecommissionInfo> replacingDecomms = measurableRatingPlannedDecommissionService.findForReplacingEntityRefAndCategory(ref, categoryId);
+
+        Set<MeasurableHierarchy> hierarchyForCategory = measurableService.findHierarchyForCategory(categoryId);
 
         return ImmutableMeasurableRatingCategoryView.builder()
                 .ratings(ratings)
@@ -155,10 +158,11 @@ public class MeasurableRatingViewService {
                 .allocations(allocs)
                 .plannedDecommissions(decomms)
                 .plannedReplacements(replacements)
-                .replacingDecommissions(replacingDecoms)
+                .replacingDecommissions(replacingDecomms)
                 .assessmentDefinitions(defs)
                 .assessmentRatings(assessments)
                 .ratingSchemes(ratingSchemes)
+                .measurableHierarchy(hierarchyForCategory)
                 .build();
     }
 }

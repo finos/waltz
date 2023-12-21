@@ -6,6 +6,7 @@ import org.finos.waltz.model.allocation_scheme.AllocationScheme;
 import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.assessment_rating.AssessmentRating;
 import org.finos.waltz.model.measurable.Measurable;
+import org.finos.waltz.model.measurable.MeasurableHierarchy;
 import org.finos.waltz.model.measurable_category.MeasurableCategory;
 import org.finos.waltz.model.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommission;
 import org.finos.waltz.model.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommissionInfo;
@@ -44,6 +45,8 @@ public abstract class MeasurableRatingCategoryView {
     public abstract Set<MeasurableRatingPlannedDecommissionInfo> replacingDecommissions();
 
     public abstract Set<MeasurableRatingReplacement> plannedReplacements();
+
+    public abstract Set<MeasurableHierarchy> measurableHierarchy();
 
 
     @Value.Derived

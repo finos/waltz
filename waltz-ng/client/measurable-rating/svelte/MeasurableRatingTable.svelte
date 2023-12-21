@@ -20,6 +20,7 @@
     export let assessmentRatings = [];
     export let plannedDecommissions = [];
     export let replacementApps = [];
+    export let measurableHierarchyById;
     export let onSelect = (d) => console.log("selecting", d)
 
     let qry;
@@ -44,6 +45,8 @@
             const allocationsBySchemeId = _.keyBy(allocations, d => d.schemeId);
 
             const measurable = measurablesById[d.measurableId];
+            const hierarchy = _.get(measurableHierarchyById, [measurable?.id, "parents"], []);
+            const parentsByLevel = _.keyBy(hierarchy, d => d.level);
 
             const decommission = decommsByRatingId[d.id];
             const replacements = _.get(replacementAppsByDecommId, decommission?.id, []);
@@ -59,6 +62,7 @@
                 {
                     rating: d,
                     measurable,
+                    parentsByLevel,
                     allocations,
                     assessmentsByDefId,
                     allocationsBySchemeId,
@@ -69,6 +73,14 @@
         })
         .orderBy(d => d.measurable.name)
         .value();
+
+    $: maxDepthOfTree = _
+        .chain(enrichedMeasurables)
+        .flatMap(d => _.keys(d.parentsByLevel))
+        .max()
+        .value();
+
+    $: parentArr = _.map([...Array(_.toNumber(maxDepthOfTree)).keys()], d => d + 1);
 
     $: ratingsList = _.isEmpty(qry)
         ? enrichedMeasurables
@@ -111,7 +123,9 @@
             {#if category.allowPrimaryRatings}
                 <th nowrap="nowrap">Primary</th>
             {/if}
-            <th nowrap="nowrap" style="width: 20em">Measurable</th>
+            {#each parentArr as parent}
+                <th nowrap="nowrap" style="width: 20em">{`${category.name} Lvl ${parent}`}</th>
+            {/each}
             <th nowrap="nowrap" style="width: 20em">Measurable Ext ID</th>
             <th nowrap="nowrap" style="width: 20em">Rating</th>
             {#each allocationSchemes as scheme}
@@ -140,9 +154,12 @@
                         {/if}
                     </td>
                 {/if}
-                <td>
-                    {_.get(rating, ["measurable", "name"], "Unknown")}
-                </td>
+                {#each parentArr as parentLvl}
+                    {@const parent = _.get(rating.parentsByLevel, [parentLvl])}
+                    <td>
+                        {_.get(parent, ["parentReference", "name"], "-")}
+                    </td>
+                {/each}
                 <td>
                     {_.get(rating, ["measurable", "externalId"], "Unknown")}
                 </td>

@@ -130,6 +130,7 @@ function prepareTabForCategory(category,
                                replacingDecommissionsForCategory = [],
                                ratingSchemesById,
                                ratingSchemeItemsById,
+                               measurableHierarchy,
                                showAllMeasurables = true) {
 
     const ratedMeasurables = _.map(ratingsForCategory, d => d.measurableId);
@@ -139,6 +140,8 @@ function prepareTabForCategory(category,
 
     const ratingScheme = ratingSchemesById[category.ratingSchemeId];
     const ratingSchemeItemsByCode = _.keyBy(ratingScheme.ratings, d => d.rating);
+
+    const measurableHierarchyById = _.keyBy(measurableHierarchy, d => d.measurableId);
 
     const measurables = showAllMeasurables
         ? measurablesForCategory
@@ -173,7 +176,8 @@ function prepareTabForCategory(category,
         plannedReplacements: replacementsForCategory,
         replacingDecommissions: replacingDecommissionsForCategory,
         ratingSchemeItems: ratingScheme.ratings,
-        allocationTotalsByScheme
+        allocationTotalsByScheme,
+        measurableHierarchyById
     };
 }
 
@@ -194,6 +198,7 @@ export function mkTab(ctx, showAllMeasurables = false) {
         ctx.replacingDecommissions,
         ratingSchemesById,
         ctx.ratingSchemeItemsById,
+        ctx.measurableHierarchy,
         showAllMeasurables);
 
 }

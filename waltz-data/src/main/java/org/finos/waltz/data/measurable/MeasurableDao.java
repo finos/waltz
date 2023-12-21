@@ -25,7 +25,10 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.measurable.ImmutableMeasurable;
+import org.finos.waltz.model.measurable.ImmutableMeasurableHierarchy;
+import org.finos.waltz.model.measurable.ImmutableMeasurableHierarchyAlignment;
 import org.finos.waltz.model.measurable.Measurable;
+import org.finos.waltz.model.measurable.MeasurableHierarchy;
 import org.finos.waltz.schema.tables.records.MeasurableRecord;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -45,6 +48,7 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -54,6 +58,7 @@ import static org.finos.waltz.common.EnumUtilities.readEnum;
 import static org.finos.waltz.common.StringUtilities.mkSafe;
 import static org.finos.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
 import static org.finos.waltz.data.JooqUtilities.summarizeResults;
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.schema.Tables.MEASURABLE_CATEGORY;
 import static org.finos.waltz.schema.Tables.MEASURABLE_RATING;
 import static org.finos.waltz.schema.Tables.MEASURABLE_RATING_PLANNED_DECOMMISSION;
@@ -360,5 +365,35 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                     .and(MEASURABLE.ID.eq(id)))
                 .collect(Collectors.collectingAndThen(Collectors.toSet(), dsl::batch))
                 .execute());
+    }
+
+    public Set<MeasurableHierarchy> findHierarchyForCategory(long categoryId) {
+        org.finos.waltz.schema.tables.Measurable m = MEASURABLE;
+        org.finos.waltz.schema.tables.Measurable parent = MEASURABLE.as("parent");
+        return dsl
+                .select(m.ID, parent.ID, parent.NAME, ENTITY_HIERARCHY.LEVEL)
+                .from(m)
+                .innerJoin(ENTITY_HIERARCHY).on(m.ID.eq(ENTITY_HIERARCHY.ID)
+                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name())))
+                .innerJoin(parent).on(ENTITY_HIERARCHY.ANCESTOR_ID.eq(parent.ID))
+                .where(m.MEASURABLE_CATEGORY_ID.eq(categoryId))
+                .fetchGroups(
+                        r -> r.get(m.ID),
+                        r -> ImmutableMeasurableHierarchyAlignment
+                                .builder()
+                                .parentReference(mkRef(
+                                        EntityKind.MEASURABLE,
+                                        r.get(parent.ID),
+                                        r.get(parent.NAME)))
+                                .level(r.get(ENTITY_HIERARCHY.LEVEL))
+                                .build())
+                .entrySet()
+                .stream()
+                .map(r -> ImmutableMeasurableHierarchy
+                        .builder()
+                        .measurableId(r.getKey())
+                        .parents(r.getValue())
+                        .build())
+                .collect(Collectors.toSet());
     }
 }

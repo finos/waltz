@@ -46,6 +46,7 @@ const bindings = {
     application: "<",
     assessmentDefinitions: "<?",
     assessmentRatings: "<?",
+    measurableHierarchyById: "<?"
 };
 
 
