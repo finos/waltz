@@ -87,10 +87,6 @@ function controller($q, serviceBroker, settingsService, userService) {
 
         determineIfRoadmapsAreEnabled();
 
-        loadData()
-            .then(() => serviceBroker.loadViewData(CORE_API.ApplicationStore.getById, [vm.parentEntityRef.id])
-                .then(r => vm.application = r.data));
-
         const permissionsPromise = serviceBroker
             .loadViewData(CORE_API.PermissionGroupStore.findForParentEntityRef, [vm.parentEntityRef])
             .then(r => r.data);
@@ -108,7 +104,8 @@ function controller($q, serviceBroker, settingsService, userService) {
             .then(([permissions, userRoles, allCategories]) => {
                 const editableCategories = determineEditableCategories(allCategories, permissions, userRoles);
                 vm.hasEditPermissions = !_.isEmpty(editableCategories);
-            });
+            })
+            .then(() => loadData());
     }
 
 
@@ -159,7 +156,7 @@ function controller($q, serviceBroker, settingsService, userService) {
                 {force})
             .then(r => {
                 const tab = r.data;
-                vm.activeTab = mkTab(tab);
+                vm.activeTab = mkTab(tab, vm.application);
             })
             .then(() => {
                 vm.visibility.loading = false;

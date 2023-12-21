@@ -91,6 +91,10 @@ export function loadAllData(
     parentEntityRef,
     force = false) {
 
+    const applicationPromise = serviceBroker
+        .loadViewData(CORE_API.ApplicationStore.getById, [parentEntityRef.id])
+        .then(r => ({ application: r.data}));
+
     const categoriesPromise = serviceBroker
             .loadViewData(
                 CORE_API.MeasurableCategoryStore.findPopulatedCategoriesForRef,
@@ -111,6 +115,7 @@ export function loadAllData(
 
     return $q
         .all([
+            applicationPromise,
             categoriesPromise,
             lastViewedCategoryPromise
         ])
@@ -131,6 +136,7 @@ function prepareTabForCategory(category,
                                ratingSchemesById,
                                ratingSchemeItemsById,
                                measurableHierarchy,
+                               application,
                                showAllMeasurables = true) {
 
     const ratedMeasurables = _.map(ratingsForCategory, d => d.measurableId);
@@ -161,7 +167,24 @@ function prepareTabForCategory(category,
         .chain(allocationsForCategory)
         .groupBy(d => d.schemeId)
         .mapValues(d => _.sumBy(d, a => a.percentage))
-        .value()
+        .value();
+
+    const plannedDecomms = _.isNull(application.plannedRetirementDate)
+        ? _.map(decommsForCategory, d => Object.assign({}, d, { isValid: true}))
+        : _.map(decommsForCategory, d => {
+
+            const decomDate = new Date(d.plannedDecommissionDate);
+            const appRetirementDate = new Date(application.plannedRetirementDate);
+
+            const sameDate = appRetirementDate.getFullYear() === decomDate.getFullYear()
+                && appRetirementDate.getMonth() === decomDate.getMonth()
+                && appRetirementDate.getDate() === decomDate.getDate();
+
+            const isValid = appRetirementDate > decomDate || sameDate;
+
+            return Object.assign({}, d, {isValid: isValid})
+        });
+
 
     return {
         category,
@@ -172,7 +195,7 @@ function prepareTabForCategory(category,
         allocations: allocationsForCategory,
         assessmentDefinitions: assessmentDefinitionsForCategory,
         assessmentRatings,
-        plannedDecommissions: decommsForCategory,
+        plannedDecommissions: plannedDecomms,
         plannedReplacements: replacementsForCategory,
         replacingDecommissions: replacingDecommissionsForCategory,
         ratingSchemeItems: ratingScheme.ratings,
@@ -181,7 +204,7 @@ function prepareTabForCategory(category,
     };
 }
 
-export function mkTab(ctx, showAllMeasurables = false) {
+export function mkTab(ctx, application, showAllMeasurables = false) {
 
     const ratingSchemesById = _.keyBy(ctx.ratingSchemes, d => d.id);
 
@@ -199,6 +222,7 @@ export function mkTab(ctx, showAllMeasurables = false) {
         ratingSchemesById,
         ctx.ratingSchemeItemsById,
         ctx.measurableHierarchy,
+        application,
         showAllMeasurables);
 
 }

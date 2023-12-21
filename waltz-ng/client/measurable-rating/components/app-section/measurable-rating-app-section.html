@@ -76,7 +76,7 @@
                                                      extract="measurable-rating-view/entity/{{$ctrl.parentEntityRef.kind}}/{{$ctrl.parentEntityRef.id}}/category-id/{{$ctrl.activeTab.category.id}}"
                                                      method="GET">
                             </waltz-data-extract-link>
-                            |
+                            <span ng-if="$ctrl.hasEditPermissions">|</span>
                         </span>
                     </div>
                 </content>

@@ -57,10 +57,10 @@
                 .value();
 
             const decommission = decommsByRatingId[d.id];
-            const replacements = _.get(replacementAppsByDecommId, decommission?.id, []);
+            const replacementApps = _.get(replacementAppsByDecommId, decommission?.id, []);
 
             const replacementAppString = _
-                .chain(replacements)
+                .chain(replacementApps)
                 .map(d => d.entityReference.name)
                 .join(", ")
                 .value();
@@ -80,7 +80,7 @@
                     assessmentsByDefId,
                     allocationsBySchemeId,
                     decommission,
-                    replacements,
+                    replacementApps,
                     replacementAppString,
                     assessmentOutcomeString
                 })
@@ -107,7 +107,7 @@
         return {
             rating: rating.rating,
             plannedDecommission: rating.decommission,
-            replacementApps: rating.replacements,
+            replacementApps: rating.replacementApps,
             allocations: rating.allocations
         }
     }
@@ -173,7 +173,7 @@
                                 <Icon name="fw"/>
                             {/if}
                             {#if !_.isEmpty(rating.decommission)}
-                                {#if !_.isEmpty(rating.replacements)}
+                                {#if !_.isEmpty(rating.replacementApps)}
                                     <Icon name="hand-o-right"/>
                                 {:else}
                                     <Icon name="hand-paper-o"/>
@@ -227,7 +227,7 @@
                     <td>
                         <Tooltip content={ReplacementAppMiniTable}
                                  trigger={"mouseenter"}
-                                 props={{replacementApps: rating.replacements}}>
+                                 props={{replacementApps: rating.replacementApps}}>
                             <svelte:fragment slot="target">
                                 <span>{truncate(rating.replacementAppString, 30)}</span>
                             </svelte:fragment>
