@@ -57,8 +57,8 @@
                         </div>
                     </div>
 
-                    <span ng-if="$ctrl.hasEditPermissions">
-                        <div class="waltz-sub-section-controls">
+                    <div class="waltz-sub-section-controls">
+                        <span ng-if="$ctrl.hasEditPermissions">
                             <a ng-if="$ctrl.visibility.editor === false"
                                ng-click="$ctrl.onEditRatings()"
                                class="clickable">
@@ -69,8 +69,16 @@
                                class="clickable">
                                 View
                             </a>
-                        </div>
-                    </span>
+                        </span>
+                        <span ng-if="$ctrl.visibility.editor === false">
+                            <waltz-data-extract-link name="Export ratings"
+                                                     styling="link"
+                                                     extract="measurable-rating-view/entity/{{$ctrl.parentEntityRef.kind}}/{{$ctrl.parentEntityRef.id}}/category-id/{{$ctrl.activeTab.category.id}}"
+                                                     method="GET">
+                            </waltz-data-extract-link>
+                            |
+                        </span>
+                    </div>
                 </content>
             </waltz-sub-section>
         </div>

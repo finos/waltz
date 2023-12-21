@@ -6,10 +6,12 @@
     import RatingIndicatorCell from "../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
     import NoData from "../../common/svelte/NoData.svelte";
     import Icon from "../../common/svelte/Icon.svelte";
-    import {truncate} from "../../common/string-utils";
+    import {truncate, truncateMiddle} from "../../common/string-utils";
     import Tooltip from "../../common/svelte/Tooltip.svelte";
     import ReplacementAppMiniTable from "./ReplacementAppMiniTable.svelte";
     import {selectedMeasurable} from "../components/panel/measurable-rating-panel-store";
+    import AssessmentRatingsMiniTable from "./AssessmentRatingsMiniTable.svelte";
+    import MeasurableRatingViewIconTooltip from "./MeasurableRatingViewIconTooltip.svelte";
 
     export let category;
     export let ratings = [];
@@ -46,7 +48,13 @@
 
             const measurable = measurablesById[d.measurableId];
             const hierarchy = _.get(measurableHierarchyById, [measurable?.id, "parents"], []);
-            const parentsByLevel = _.keyBy(hierarchy, d => d.level);
+
+            const path = _
+                .chain(hierarchy)
+                .orderBy(d => d.level)
+                .map(d => d.parentReference.name)
+                .join(" / ")
+                .value();
 
             const decommission = decommsByRatingId[d.id];
             const replacements = _.get(replacementAppsByDecommId, decommission?.id, []);
@@ -57,30 +65,28 @@
                 .join(", ")
                 .value();
 
+            const assessmentOutcomeString = _.chain(assessments)
+                .map(d => d.ratingSchemeItem.name)
+                .join(", ")
+                .value();
+
             return Object.assign(
                 {},
                 {
                     rating: d,
                     measurable,
-                    parentsByLevel,
+                    hierarchyPath: path,
                     allocations,
                     assessmentsByDefId,
                     allocationsBySchemeId,
                     decommission,
                     replacements,
-                    replacementAppString
+                    replacementAppString,
+                    assessmentOutcomeString
                 })
         })
         .orderBy(d => d.measurable.name)
         .value();
-
-    $: maxDepthOfTree = _
-        .chain(enrichedMeasurables)
-        .flatMap(d => _.keys(d.parentsByLevel))
-        .max()
-        .value();
-
-    $: parentArr = _.map([...Array(_.toNumber(maxDepthOfTree)).keys()], d => d + 1);
 
     $: ratingsList = _.isEmpty(qry)
         ? enrichedMeasurables
@@ -91,8 +97,20 @@
                 "rating.rating",
                 "measurable.externalId",
                 "measurable.name",
-                "rating.ratingSchemeItem.name"
+                "rating.ratingSchemeItem.name",
+                "hierarchyPath",
+                "replacementAppString",
+                "assessmentOutcomeString"
             ]);
+
+    function mkTooltipProps(rating) {
+        return {
+            rating: rating.rating,
+            plannedDecommission: rating.decommission,
+            replacementApps: rating.replacements,
+            allocations: rating.allocations
+        }
+    }
 
 </script>
 
@@ -120,14 +138,11 @@
            style="margin-top: 1em">
         <thead>
         <tr>
-            {#if category.allowPrimaryRatings}
-                <th nowrap="nowrap">Primary</th>
-            {/if}
-            {#each parentArr as parent}
-                <th nowrap="nowrap" style="width: 20em">{`${category.name} Lvl ${parent}`}</th>
-            {/each}
-            <th nowrap="nowrap" style="width: 20em">Measurable Ext ID</th>
+            <th nowrap="nowrap"></th>
+            <th nowrap="nowrap" style="width: 20em">Taxonomy Item</th>
+            <th nowrap="nowrap" style="width: 20em">Taxonomy Item Ext ID</th>
             <th nowrap="nowrap" style="width: 20em">Rating</th>
+            <th nowrap="nowrap" style="width: 20em">Taxonomy Path</th>
             {#each allocationSchemes as scheme}
                 <th nowrap="nowrap" style="width: 20em">{scheme.name}</th>
             {/each}
@@ -147,24 +162,53 @@
             <tr class="clickable"
                 class:selected={$selectedMeasurable?.rating?.id === rating.rating.id}
                 on:click={() => onSelect(rating)}>
-                {#if category.allowPrimaryRatings}
-                    <td>
-                        {#if rating.rating.isPrimary}
-                            <Icon name="star" title="This is the primary rating"/>
-                        {/if}
-                    </td>
-                {/if}
-                {#each parentArr as parentLvl}
-                    {@const parent = _.get(rating.parentsByLevel, [parentLvl])}
-                    <td>
-                        {_.get(parent, ["parentReference", "name"], "-")}
-                    </td>
-                {/each}
                 <td>
-                    {_.get(rating, ["measurable", "externalId"], "Unknown")}
+                    <Tooltip content={MeasurableRatingViewIconTooltip}
+                             trigger={"mouseenter"}
+                             props={mkTooltipProps(rating)}>
+                        <svelte:fragment slot="target">
+                            {#if rating.rating.isPrimary}
+                                <Icon name="star"/>
+                            {:else}
+                                <Icon name="fw"/>
+                            {/if}
+                            {#if !_.isEmpty(rating.decommission)}
+                                {#if !_.isEmpty(rating.replacements)}
+                                    <Icon name="hand-o-right"/>
+                                {:else}
+                                    <Icon name="hand-paper-o"/>
+                                {/if}
+                            {:else}
+                                <Icon name="fw"/>
+                            {/if}
+                            {#if !_.isEmpty(rating.allocations)}
+                                <Icon name="pie-chart"/>
+                            {:else}
+                                <Icon name="fw"/>
+                            {/if}
+                            {#if rating.rating.isReadOnly}
+                                <Icon name="lock"/>
+                            {:else}
+                                <Icon name="fw"/>
+                            {/if}
+                        </svelte:fragment>
+                    </Tooltip>
+                </td>
+                <td>
+                    {_.get(rating, ["measurable", "name"], "Unknown")}
+                </td>
+                <td>
+                    <span title={_.get(rating, ["measurable", "externalId"], null)}>
+                        {truncateMiddle(_.get(rating, ["measurable", "externalId"], "Unknown"), 30)}
+                    </span>
                 </td>
                 <td>
                     <RatingIndicatorCell {...rating.rating.ratingSchemeItem}/>
+                </td>
+                <td>
+                    <span title={_.get(rating, ["hierarchyPath"], null)}>
+                        {truncateMiddle(_.get(rating, ["hierarchyPath"], "-"), 30)}
+                    </span>
                 </td>
                 {#each allocationSchemes as scheme}
                     {@const allocation = _.get(rating.allocationsBySchemeId, [scheme.id])}
@@ -183,7 +227,7 @@
                     <td>
                         <Tooltip content={ReplacementAppMiniTable}
                                  trigger={"mouseenter"}
-                                 props={{replacementApps}}>
+                                 props={{replacementApps: rating.replacements}}>
                             <svelte:fragment slot="target">
                                 <span>{truncate(rating.replacementAppString, 30)}</span>
                             </svelte:fragment>
@@ -193,11 +237,20 @@
                 {#each assessmentDefinitions as defn}
                     {@const assessmentRatingsForDefn = _.get(rating.assessmentsByDefId, defn.id, [])}
                     <td>
-                        <div class="rating-col">
-                            {#each assessmentRatingsForDefn as assessment}
-                                <RatingIndicatorCell {...assessment.ratingSchemeItem}/>
-                            {/each}
-                        </div>
+                        <Tooltip content={AssessmentRatingsMiniTable}
+                                  trigger={"mouseenter"}
+                                  props={{assessmentRatings: assessmentRatingsForDefn}}>
+                            <svelte:fragment slot="target">
+                                <div class="rating-col">
+                                    {#each _.take(assessmentRatingsForDefn, 3) as assessment}
+                                        <RatingIndicatorCell {...assessment.ratingSchemeItem}/>
+                                    {/each}
+                                    {#if _.size(assessmentRatingsForDefn) > 3}
+                                        <span>...</span>
+                                    {/if}
+                                </div>
+                            </svelte:fragment>
+                        </Tooltip>
                     </td>
                 {/each}
             </tr>
