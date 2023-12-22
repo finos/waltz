@@ -109,7 +109,7 @@ public class MeasurableRatingViewService {
 
             Set<MeasurableRatingReplacement> replacementApps = decomm == null
                     ? Collections.emptySet()
-                    : measurableRatingReplacementService.getByDecommId(decomm.id());
+                    : measurableRatingReplacementService.findByDecommId(decomm.id());
 
             List<AllocationScheme> schemes = allocationSchemeService.findByCategoryId(measurable.categoryId());
 

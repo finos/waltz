@@ -128,7 +128,7 @@ public class MeasurableRatingReplacementService {
     }
 
 
-    public Set<MeasurableRatingReplacement> getByDecommId(Long decommId) {
+    public Set<MeasurableRatingReplacement> findByDecommId(Long decommId) {
         return measurableRatingReplacementDao.fetchByDecommissionId(decommId);
     }
 }
