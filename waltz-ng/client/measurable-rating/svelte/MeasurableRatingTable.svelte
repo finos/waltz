@@ -12,6 +12,7 @@
     import {selectedMeasurable} from "../components/panel/measurable-rating-panel-store";
     import AssessmentRatingsMiniTable from "./AssessmentRatingsMiniTable.svelte";
     import MeasurableRatingViewIconTooltip from "./MeasurableRatingViewIconTooltip.svelte";
+    import MeasurableHierarchyTooltip from "./MeasurableHierarchyTooltip.svelte";
 
     export let category;
     export let ratings = [];
@@ -82,7 +83,8 @@
                     decommission,
                     replacementApps,
                     replacementAppString,
-                    assessmentOutcomeString
+                    assessmentOutcomeString,
+                    measurableHierarchy: hierarchy
                 })
         })
         .orderBy(d => d.measurable.name)
@@ -206,9 +208,13 @@
                     <RatingIndicatorCell {...rating.rating.ratingSchemeItem}/>
                 </td>
                 <td>
-                    <span title={_.get(rating, ["hierarchyPath"], null)}>
-                        {truncateMiddle(_.get(rating, ["hierarchyPath"], "-"), 30)}
-                    </span>
+                    <Tooltip content={MeasurableHierarchyTooltip}
+                             trigger={"mouseenter"}
+                             props={{measurableHierarchy: rating.measurableHierarchy}}>
+                        <svelte:fragment slot="target">
+                            {truncateMiddle(_.get(rating, ["hierarchyPath"], "-"), 30)}
+                        </svelte:fragment>
+                    </Tooltip>
                 </td>
                 {#each allocationSchemes as scheme}
                     {@const allocation = _.get(rating.allocationsBySchemeId, [scheme.id])}
