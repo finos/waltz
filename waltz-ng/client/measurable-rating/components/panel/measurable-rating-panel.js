@@ -57,7 +57,7 @@ const initialState = {
     replacementApps: [],
     assessmentRatings: [],
     assessmentDefinitions: [],
-    showTreeView: false,
+    showTreeView: true,
     MeasurableRatingTable
 };
 

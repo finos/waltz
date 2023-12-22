@@ -20,15 +20,13 @@ import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
 import {kindToViewState} from "../../../common/link-utils";
-import {determineEditableCategories, loadAllData, loadDecommData, mkTab} from "../../measurable-rating-utils";
+import {determineEditableCategories, loadAllData, mkTab} from "../../measurable-rating-utils";
 import {mkRatingsKeyHandler} from "../../../ratings/rating-utils";
 
 import template from "./measurable-rating-edit-panel.html";
 import {displayError} from "../../../common/error-utils";
 import {alignDateToUTC} from "../../../common/date-utils";
 import toasts from "../../../svelte-stores/toast-store";
-import {entity} from "../../../common/services/enums/entity";
-import {editOperations} from "../../../common/services/enums/operation";
 
 const bindings = {
     parentEntityRef: "<",
