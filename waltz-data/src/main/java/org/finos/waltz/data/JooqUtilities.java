@@ -577,7 +577,7 @@ public class JooqUtilities {
                 MeasurableRating mr = alias == null ? Tables.MEASURABLE_RATING : Tables.MEASURABLE_RATING.as(alias);
                 return ImmutableCommonTableFields
                         .builder()
-                        .entityKind(EntityKind.MEASURABLE_CATEGORY)
+                        .entityKind(EntityKind.MEASURABLE_RATING)
                         .table(mr)
                         .idField(mr.ID)
                         .parentIdField(null)
