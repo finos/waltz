@@ -64,8 +64,8 @@
     $: permissionsCall = logicalFlowStore.findPermissionsForFlow($selectedLogicalFlow?.logicalFlow.id);
     $: permissions = $permissionsCall?.data;
     $: hasAddPermission = _.includes(permissions, "ADD");
-    $: hasUpdatePermission = _.includes(permissions, "ADD");
-    $: hasRemovePermission = _.includes(permissions, "ADD");
+    $: hasUpdatePermission = _.includes(permissions, "UPDATE");
+    $: hasRemovePermission = _.includes(permissions, "REMOVE");
     $: flowClassificationsByCode = _.keyBy(flowClassifications, d => d.code);
     $: assessmentDefinitionsById = _.keyBy(assessmentDefinitions, d => d.id);
     $: flow = $selectedLogicalFlow.logicalFlow;

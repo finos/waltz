@@ -60,8 +60,8 @@
     $: permissionsCall = logicalFlowStore.findPermissionsForFlow($selectedLogicalFlow?.logicalFlow.id);
     $: permissions = $permissionsCall?.data;
     $: hasAddPermission = _.includes(permissions, "ADD");
-    $: hasRemovePermission = _.includes(permissions, "ADD");
-    $: hasUpdatePermission = _.includes(permissions, "ADD");
+    $: hasUpdatePermission = _.includes(permissions, "UPDATE");
+    $: hasRemovePermission = _.includes(permissions, "REMOVE");
 
     $: nestedEnums = nestEnums($enumsCall.data);
     $: logicalFlow = $selectedPhysicalFlow.logicalFlow;
