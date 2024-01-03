@@ -1659,11 +1659,14 @@ public class ReportGridDao {
                                         return null;
                                     }
 
+                                    CellOption option = determineOptionForSurveyInstance(fieldRef.fieldName(), textValue);
+
                                     return ImmutableReportGridCell
                                             .builder()
                                             .subjectId(surveyRecord.get(SURVEY_INSTANCE.ENTITY_ID))
                                             .columnDefinitionId(templateAndFieldRefToDefIdMap.get(tuple(templateId, fieldRef.id().get()))) // FIX
                                             .textValue(textValue)
+                                            .options(asSet(option))
                                             .build();
                                 });
                     })
@@ -1671,6 +1674,7 @@ public class ReportGridDao {
                     .collect(toSet());
         }
     }
+
 
 
     private Set<ReportGridCell> fetchOrgUnitFieldReferenceData(GenericSelector selector,
@@ -2307,9 +2311,7 @@ public class ReportGridDao {
                         List<String> listResponses = responsesByInstanceQuestionKey.getOrDefault(tuple(instanceId, questionId), emptyList());
 
                         // if a question is not mandatory and left blank present as not provided
-                        Set<CellOption> options = isEmpty(response)
-                                ? emptySet()
-                                : asSet(determineOptionForSurveyQuestion(fieldType, response));
+                        Set<CellOption> options = asSet(determineOptionForSurveyQuestion(fieldType, entityName, response, listResponses));
 
                         return ImmutableReportGridCell.builder()
                                 .subjectId(r.get(SURVEY_INSTANCE.ENTITY_ID))
@@ -2340,10 +2342,13 @@ public class ReportGridDao {
     }
 
 
-    private CellOption determineOptionForSurveyQuestion(String fieldType, String response) {
+    private CellOption determineOptionForSurveyQuestion(String fieldType,
+                                                        String response,
+                                                        String entityName,
+                                                        List<String> listResponses) {
 
-        if (isEmpty(response)) {
-            mkCellOption("NA", "N/A");
+        if (isEmpty(response) && isEmpty(entityName) && isEmpty(listResponses)) {
+            return mkCellOption("NA", "N/A");
         }
 
         SurveyQuestionFieldType type = SurveyQuestionFieldType.valueOf(fieldType);
@@ -2354,6 +2359,16 @@ public class ReportGridDao {
                 return mkCellOption(upper(response), response);
             default:
                 return CellOption.defaultCellOption();
+        }
+    }
+
+    private CellOption determineOptionForSurveyInstance(String fieldName, String textValue) {
+
+        if (fieldName.equalsIgnoreCase("status")) {
+            SurveyInstanceStatus status = SurveyInstanceStatus.valueOf(textValue);
+            return mkCellOption(status.name(), status.prettyName());
+        } else {
+            return CellOption.defaultCellOption();
         }
     }
 
