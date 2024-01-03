@@ -63,7 +63,6 @@ import org.finos.waltz.schema.tables.records.ReportGridColumnDefinitionRecord;
 import org.finos.waltz.schema.tables.records.ReportGridDerivedColumnDefinitionRecord;
 import org.finos.waltz.schema.tables.records.ReportGridFixedColumnDefinitionRecord;
 import org.finos.waltz.schema.tables.records.ReportGridRecord;
-import org.finos.waltz.schema.tables.records.SurveyInstanceRecord;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.DataType;
@@ -112,7 +111,6 @@ import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Comparator.comparing;
-import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.collectingAndThen;
@@ -890,7 +888,6 @@ public class ReportGridDao {
                     .map(d -> tuple(d, fieldReferencesById.get(d.entityFieldReference().id().get())))
                     .collect(groupingBy(t -> t.v2.entityKind(), toSet()));
 
-
             
             return union(
                     fetchAssessmentData(genericSelector, colsByKind.get(EntityKind.ASSESSMENT_DEFINITION)),
@@ -902,8 +899,7 @@ public class ReportGridDao {
                             measurableColumnsByRollupKind.getOrDefault(AdditionalColumnOptions.PICK_HIGHEST, emptySet()),
                             measurableColumnsByRollupKind.getOrDefault(AdditionalColumnOptions.PICK_LOWEST, emptySet())),
                     fetchExactMeasurableData(genericSelector, measurableColumnsByRollupKind.get(AdditionalColumnOptions.NONE)),
-                    fetchSurveyQuestionResponseData(genericSelector,
-                            surveyQuestionColsBySurveyStatusOptions.get(AdditionalColumnOptions.NONE)),
+                    fetchSurveyQuestionResponseData(genericSelector, colsByKind.get(EntityKind.SURVEY_QUESTION)),
                     fetchSurveyTemplateResponseData(genericSelector, colsByKind.get(EntityKind.SURVEY_TEMPLATE)),
                     fetchAppGroupData(genericSelector, colsByKind.get(EntityKind.APP_GROUP)),
                     fetchApplicationFieldReferenceData(genericSelector, fieldRefColsByKind.get(EntityKind.APPLICATION)),
@@ -1594,13 +1590,18 @@ public class ReportGridDao {
                     r -> r.v1.columnEntityId(),
                     v -> v.v2);
 
+            Map<AdditionalColumnOptions, Collection<Long>> templateIdsByColOptions = groupBy(
+                    surveyInstanceInfo,
+                    d -> d.v1.additionalColumnOptions(),
+                    d -> d.v1.columnEntityId());
+
             Set<Long> surveyTemplateIds = fieldReferencesByTemplateId.keySet();
 
             Field<Long> latestInstance = DSL
                     .firstValue(SURVEY_INSTANCE.ID)
                     .over()
                     .partitionBy(SURVEY_INSTANCE.ENTITY_ID, SURVEY_INSTANCE.ENTITY_KIND, SURVEY_RUN.SURVEY_TEMPLATE_ID)
-                    .orderBy(SURVEY_INSTANCE.ISSUED_ON.desc())
+                    .orderBy(SURVEY_INSTANCE.ISSUED_ON.desc(), SURVEY_INSTANCE.SUBMITTED_AT.desc())
                     .as("latest_instance");
 
             Table<Record> surveyInfo = dsl
@@ -1621,10 +1622,11 @@ public class ReportGridDao {
                     .select(SURVEY_RUN.SURVEY_TEMPLATE_ID)
                     .from(SURVEY_INSTANCE)
                     .innerJoin(SURVEY_RUN).on(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(SURVEY_RUN.ID))
-                    .where(SURVEY_INSTANCE.ENTITY_ID.in(selector.selector())
-                            .and(SURVEY_INSTANCE.ENTITY_KIND.eq(selector.kind().name())
-                                    .and(SURVEY_RUN.SURVEY_TEMPLATE_ID.in(surveyTemplateIds)
-                                            .and(SURVEY_INSTANCE.ORIGINAL_INSTANCE_ID.isNull()))))
+                    .where(determineInstanceStatusCondition(SURVEY_RUN.SURVEY_TEMPLATE_ID, SURVEY_INSTANCE, templateIdsByColOptions)
+                            .and(SURVEY_INSTANCE.ENTITY_ID.in(selector.selector())
+                                .and(SURVEY_INSTANCE.ENTITY_KIND.eq(selector.kind().name())
+                                        .and(SURVEY_RUN.SURVEY_TEMPLATE_ID.in(surveyTemplateIds)
+                                                .and(SURVEY_INSTANCE.ORIGINAL_INSTANCE_ID.isNull())))))
                     .asTable();
 
 
@@ -2241,7 +2243,7 @@ public class ReportGridDao {
                     .firstValue(SURVEY_INSTANCE.ID)
                     .over()
                     .partitionBy(SURVEY_INSTANCE.ENTITY_ID, SURVEY_INSTANCE.ENTITY_KIND, SURVEY_QUESTION.ID)
-                    .orderBy(SURVEY_INSTANCE.ISSUED_ON.desc())
+                    .orderBy(SURVEY_INSTANCE.ISSUED_ON.desc(), SURVEY_INSTANCE.SUBMITTED_AT.desc())
                     .as("latest_instance");
 
             Table<Record> responsesWithQuestionTypeAndEntity = dsl
@@ -2266,10 +2268,11 @@ public class ReportGridDao {
                     .on(SURVEY_QUESTION_RESPONSE.SURVEY_INSTANCE_ID.eq(SURVEY_INSTANCE.ID))
                     .innerJoin(SURVEY_QUESTION)
                     .on(SURVEY_QUESTION.ID.eq(SURVEY_QUESTION_RESPONSE.QUESTION_ID))
-                    .where(determineInstanceStatusCondition(SURVEY_INSTANCE.ID, SURVEY_INSTANCE, questionIdsByColOptions)
+                    .where(determineInstanceStatusCondition(SURVEY_QUESTION.ID, SURVEY_INSTANCE, questionIdsByColOptions)
                             .and(SURVEY_QUESTION.ID.in(questionIdToDefIdMap.keySet()))
                             .and(SURVEY_INSTANCE.ENTITY_ID.in(selector.selector()))
-                            .and(SURVEY_INSTANCE.ENTITY_KIND.eq(selector.kind().name())))
+                            .and(SURVEY_INSTANCE.ENTITY_KIND.eq(selector.kind().name()))
+                            .and(SURVEY_INSTANCE.ORIGINAL_INSTANCE_ID.isNull()))
                     .asTable();
 
 
@@ -2319,19 +2322,21 @@ public class ReportGridDao {
         }
     }
 
-    private Condition determineInstanceStatusCondition(TableField<SurveyInstanceRecord, Long> idField,
+    private Condition determineInstanceStatusCondition(TableField<? extends Record, Long> idField,
                                                        SurveyInstance surveyInstance,
-                                                       Map<AdditionalColumnOptions, Collection<Long>> colOptionsByQuestionId) {
+                                                       Map<AdditionalColumnOptions, Collection<Long>> colOptionsById) {
 
-        Collection<Long> questionsWithCompletedAndApprovedOnly = colOptionsByQuestionId.getOrDefault(AdditionalColumnOptions.COMPLETED_AND_APPROVED_ONLY, emptySet());
-        Collection<Long> questionsExcludingWithdrawn = colOptionsByQuestionId.getOrDefault(AdditionalColumnOptions.EXCLUDE_WITHDRAWN, emptySet());
+        Collection<Long> questionsWithCompletedAndApprovedOnly = colOptionsById.getOrDefault(AdditionalColumnOptions.COMPLETED_AND_APPROVED_ONLY, emptySet());
+        Collection<Long> questionsExcludingWithdrawn = colOptionsById.getOrDefault(AdditionalColumnOptions.EXCLUDE_WITHDRAWN, emptySet());
+        Collection<Long> allStatuses = colOptionsById.getOrDefault(AdditionalColumnOptions.NONE, emptySet());
 
         Condition completedApprovedCondition = idField.in(questionsWithCompletedAndApprovedOnly).and(surveyInstance.STATUS.in(asSet(SurveyInstanceStatus.COMPLETED.name(), SurveyInstanceStatus.APPROVED.name())));
-        Condition excludeWithdrawnCondition = idField.in(questionsExcludingWithdrawn).and(surveyInstance.STATUS.in(asSet(SurveyInstanceStatus.COMPLETED.name(), SurveyInstanceStatus.APPROVED.name())));
+        Condition excludeWithdrawnCondition = idField.in(questionsExcludingWithdrawn).and(surveyInstance.STATUS.ne(SurveyInstanceStatus.WITHDRAWN.name()));
+        Condition allStatusesCondition = idField.in(allStatuses);
 
         return completedApprovedCondition
                 .or(excludeWithdrawnCondition)
-                .or(DSL.trueCondition());
+                .or(allStatusesCondition);
     }
 
 
