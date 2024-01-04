@@ -38,18 +38,18 @@ export const applicationKind = {
         description: "Applications which are completely external to the organization",
         position: 30
     },
-    IN_HOUSE: {
-        key: "IN_HOUSE",
-        name: "In House",
-        icon: null,
-        description: "Applications which have been developed internally",
-        position: 40
-    },
     EXTERNALLY_HOSTED: {
         key: "EXTERNALLY_HOSTED",
         name: "Externally Hosted",
         icon: null,
         description: "Applications which are hosted externally, typically SaaS solutions",
+        position: 40
+    },
+    IN_HOUSE: {
+        key: "IN_HOUSE",
+        name: "In House",
+        icon: null,
+        description: "Applications which have been developed internally",
         position: 50
     },
     INTERNALLY_HOSTED: {
@@ -66,32 +66,11 @@ export const applicationKind = {
         description: "Applications developed by a third party",
         position: 70
     },
-    INTERNAL_FACING: {
-        key: "INTERNAL_FACING",
-        name: "Internal Facing",
-        icon: null,
-        description: "Applications that are Internal facing only",
-        position: 80
-    },
-    EXTERNAL_FACING: {
-        key: "EXTERNAL_FACING",
-        name: "External Facing",
-        icon: null,
-        description: "Applications that are External facing only",
-        position: 81
-    },
-    INTERNAL_AND_EXTERNAL: {
-        key: "INTERNAL_AND_EXTERNAL_FACING",
-        name: "Internal and External Facing",
-        icon: null,
-        description: "Applications that are both Internal and External facing",
-        position: 82
-    },
     UNKNOWN: {
         key: "UNKNOWN",
         name: "Unknown",
         icon: null,
         description: "Applications of an unknown type",
-        position: 90
+        position: 99
     }
 };
