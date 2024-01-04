@@ -105,23 +105,19 @@ function mkColumnDefs() {
             width: "8%",
             cellTemplate:
                 `
-                <div class="ui-grid-cell-contents">
-                    <button ng-click="grid.appScope.deleteRun(row.entity.surveyRun)"
-                       ng-if="row.entity.isRunOwnedByLoggedInUser || row.entity.isTemplateOwnerOrAdmin"
-                       uib-popover="Delete this Survey Run"
-                       popover-placement="left"
-                       popover-trigger="mouseenter"
-                       class="btn btn-xs btn-danger waltz-visibility-child-30">
-                        <waltz-icon name="trash-o"></waltz-icon>
-                    </button>
+                <div class="ui-grid-cell-contents" style="padding: 2px; display: flex; gap: 5px">
                     <button ng-click="grid.appScope.withdrawOpenSurveys(row.entity.surveyRun)"
                             ng-disabled="!row.entity.hasOpenSurveys"
                             ng-if="row.entity.isRunOwnedByLoggedInUser || row.entity.hasAdminRights"
-                            uib-popover="Withdraw all open instances ('Not Started' and 'In Progress')"
-                            popover-placement="left"
-                            popover-trigger="mouseenter"
-                            class="btn btn-xs btn-warning waltz-visibility-child-30">
+                            title="Withdraw all open instances ('Not Started' and 'In Progress')"
+                            class="btn btn-xs btn-warning waltz-visibility-child-30 small">
                         <waltz-icon name="wpforms"></waltz-icon>
+                    </button>
+                    <button ng-click="grid.appScope.deleteRun(row.entity.surveyRun)"
+                           ng-if="row.entity.isRunOwnedByLoggedInUser || row.entity.isTemplateOwnerOrAdmin"
+                           title="Delete this Survey Run"
+                           class="btn btn-xs btn-danger waltz-visibility-child-30">
+                            <waltz-icon name="trash-o"></waltz-icon>
                     </button>
                 </div>
                 `
