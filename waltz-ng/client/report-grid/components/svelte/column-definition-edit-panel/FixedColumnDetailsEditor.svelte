@@ -11,7 +11,8 @@
     export let onCancel = () => console.log("Close");
     export let onRemove = () => console.log("Remove");
 
-    $: columnOptionsCall = reportGridStore.findAdditionalColumnOptionsForKind(column.columnEntityKind);
+    $: optionsKind = !_.isEmpty(column.entityFieldReference) ? column.entityFieldReference.entityKind : column.columnEntityKind
+    $: columnOptionsCall = reportGridStore.findAdditionalColumnOptionsForKind(optionsKind);
     $: allowedColumnOptions = _.map($columnOptionsCall?.data, d => additionalColumnOptions[d]) || [additionalColumnOptions.NONE];
 
     let working = {

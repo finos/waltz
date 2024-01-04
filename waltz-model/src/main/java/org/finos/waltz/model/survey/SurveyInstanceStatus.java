@@ -20,10 +20,21 @@ package org.finos.waltz.model.survey;
 
 public enum SurveyInstanceStatus {
 
-    NOT_STARTED,
-    IN_PROGRESS,
-    COMPLETED,
-    REJECTED,
-    WITHDRAWN,
-    APPROVED
+    NOT_STARTED("Not Started"),
+    IN_PROGRESS("In Progress"),
+    COMPLETED("Completed"),
+    REJECTED("Rejected"),
+    WITHDRAWN("Withdrawn"),
+    APPROVED("Approved");
+
+    private final String prettyName;
+
+
+    SurveyInstanceStatus(String prettyName){
+
+        this.prettyName = prettyName;
+
+    }
+
+    public String prettyName(){ return prettyName; }
 }
