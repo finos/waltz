@@ -37,6 +37,15 @@
             </a>
         </waltz-section-actions>
 
+        <waltz-search-control on-query="ctrl.doSearch"
+                              min-characters='2'
+                              delay="200"
+                              placeholder-text="Search Survey Templates">
+        </waltz-search-control>
+
+        <br>
+        <br>
+
         <div ng-repeat="group in ctrl.groupedTemplates track by group.key">
             <br ng-if="!$first">
             <h4>
