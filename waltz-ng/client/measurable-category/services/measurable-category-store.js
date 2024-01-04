@@ -35,10 +35,16 @@ function store($http, baseApiUrl) {
         .then(d => d.data);
 
 
+    const findPopulatedCategoriesForRef = (ref) => $http
+        .get(`${baseUrl}/entity/${ref.kind}/${ref.id}`)
+        .then(d => d.data);
+
+
     return {
         findAll,
         getById,
-        findCategoriesByDirectOrgUnit
+        findCategoriesByDirectOrgUnit,
+        findPopulatedCategoriesForRef
     };
 
 }
@@ -68,5 +74,10 @@ export const MeasurableCategoryStore_API = {
         serviceName,
         serviceFnName: "findCategoriesByDirectOrgUnit",
         description: "retrieves list of category ids with measurables directly related to org unit"
+    },
+    findPopulatedCategoriesForRef: {
+        serviceName,
+        serviceFnName: "findPopulatedCategoriesForRef",
+        description: "retrieves list of categories which have at least one measurable rating or are planned to replace a rating"
     }
 };

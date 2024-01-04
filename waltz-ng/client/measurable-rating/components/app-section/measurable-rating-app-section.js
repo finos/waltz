@@ -20,11 +20,9 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
 
 import template from "./measurable-rating-app-section.html";
-import {determineStartingTab, loadAllData, mkTabs} from "../../measurable-rating-utils";
+import {determineEditableCategories, determineStartingTab, loadAllData, mkTab} from "../../measurable-rating-utils";
 import namedSettings from "../../../system/named-settings";
-import {entity} from "../../../common/services/enums/entity";
-import {editOperations} from "../../../common/services/enums/operation";
-import roles from "../../../user/system-roles";
+import {selectedMeasurable} from "../panel/measurable-rating-panel-store";
 
 
 /**
@@ -49,7 +47,8 @@ const initialState = {
     visibility: {
         editor: false,
         overlay: false,
-        tab: null
+        tab: null,
+        loading: false
     },
     byCategory: {},
     activeAllocationScheme: null,
@@ -69,46 +68,44 @@ function controller($q, serviceBroker, settingsService, userService) {
     }
 
     const loadData = (force = false) => {
-        return loadAllData($q, serviceBroker, vm.parentEntityRef, false, force)
-            .then((r) => {
-                Object.assign(vm, r);
-                vm.tabs = mkTabs(vm, false);
-                const startingTab = determineStartingTab(vm.tabs, vm.lastViewedCategoryId);
-                if (startingTab) {
-                    vm.visibility.tab = startingTab.category.id;
-                    vm.onTabChange(startingTab);
-                }
-            });
+        if (vm.parentEntityRef){
+            return loadAllData($q, serviceBroker, vm.parentEntityRef, force)
+                .then(r => Object.assign(vm, r))
+                .then(() => {
+                    vm.tabs = _.filter(vm.categories, d => d.ratingCount > 0);
+
+                    const startingTab = determineStartingTab(vm.tabs, vm.activeTab, vm.lastViewedCategoryId);
+                    if (startingTab) {
+                        vm.visibility.tab = startingTab.category.id;
+                        vm.onTabChange(startingTab.category.id, force);
+                    }
+                });
+        }
     };
 
     vm.$onInit = () => {
+
         determineIfRoadmapsAreEnabled();
-        loadData()
-            .then(() => serviceBroker.loadViewData(CORE_API.ApplicationStore.getById, [vm.parentEntityRef.id])
-                .then(r => vm.application = r.data));
 
         const permissionsPromise = serviceBroker
             .loadViewData(CORE_API.PermissionGroupStore.findForParentEntityRef, [vm.parentEntityRef])
             .then(r => r.data);
 
-        const involvementsPromise = serviceBroker
-            .loadViewData(CORE_API.InvolvementStore.findExistingInvolvementKindIdsForUser, [vm.parentEntityRef])
-            .then(r => r.data);
-
         const userRolePromise = userService
             .whoami()
-            .then(user => userService.hasRole(user, roles.RATING_EDITOR));
-        $q
-            .all([permissionsPromise, involvementsPromise, userRolePromise])
-            .then(([permissions, involvements, hasEditRole]) => {
+            .then(user => vm.userRoles = user.roles);
 
-                vm.hasEditPermissions = !_
-                    .chain(permissions)
-                    .filter(d => d.subjectKind === entity.MEASURABLE_RATING.key && _.includes(editOperations, d.operation) && d.qualifierReference.kind === entity.MEASURABLE_CATEGORY.key)
-                    .filter(d => d.requiredInvolvementsResult.areAllUsersAllowed || !_.isEmpty(_.intersection(d.requiredInvolvementsResult.requiredInvolvementKindIds, involvements)))
-                    .isEmpty()
-                    .value() || hasEditRole;
-            });
+        const allCategoriesPromise = serviceBroker
+            .loadViewData(CORE_API.MeasurableCategoryStore.findAll)
+            .then(r => r.data);
+
+        $q
+            .all([permissionsPromise, userRolePromise, allCategoriesPromise])
+            .then(([permissions, userRoles, allCategories]) => {
+                const editableCategories = determineEditableCategories(allCategories, permissions, userRoles);
+                vm.hasEditPermissions = !_.isEmpty(editableCategories);
+            })
+            .then(() => loadData());
     }
 
 
@@ -121,7 +118,6 @@ function controller($q, serviceBroker, settingsService, userService) {
             hideAllocationScheme();
         } else {
             vm.activeAllocationScheme = scheme;
-            vm.activeTab = _.find(vm.tabs, tab => tab.category.id === vm.activeAllocationScheme.measurableCategoryId);
         }
     };
 
@@ -133,11 +129,7 @@ function controller($q, serviceBroker, settingsService, userService) {
                 CORE_API.AllocationStore.updateAllocations,
                 [vm.parentEntityRef, vm.activeAllocationScheme.id, changes])
             .then(r => {
-                loadAllData($q, serviceBroker, vm.parentEntityRef, false, true)
-                    .then(r => {
-                        Object.assign(vm, r);
-                        mkTabs(vm);
-                    });
+                loadData(true);
                 return r.data;
             });
     };
@@ -149,17 +141,26 @@ function controller($q, serviceBroker, settingsService, userService) {
 
     vm.onEditRatings = () => {
         vm.visibility.editor = true;
+        loadData(true);
         hideAllocationScheme();
     };
 
-    vm.onTabChange = (tab) => {
+    vm.onTabChange = (categoryId, force = false) => {
+        vm.visibility.loading = true;
+        selectedMeasurable.set(null);
         hideAllocationScheme();
-
         serviceBroker
             .loadViewData(
-                CORE_API.RatingSchemeStore.findRatingsForEntityAndMeasurableCategory,
-                [vm.parentEntityRef, tab.category.id])
-            .then(r => tab.ratingSchemeItems = r.data)
+                CORE_API.MeasurableRatingStore.getViewForEntityAndCategory,
+                [vm.parentEntityRef, categoryId],
+                {force})
+            .then(r => {
+                const tab = r.data;
+                vm.activeTab = mkTab(tab, vm.application);
+            })
+            .then(() => {
+                vm.visibility.loading = false;
+            });
     };
 
 }
