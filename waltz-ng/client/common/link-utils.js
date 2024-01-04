@@ -46,6 +46,7 @@ const stateKindTuples = [
     {kind: "LOGICAL_DATA_FLOW", state: "main.logical-flow.view"},
     {kind: "MEASURABLE", state: "main.measurable.view"},
     {kind: "MEASURABLE_CATEGORY", state: "main.measurable-category.view"},
+    {kind: "MEASURABLE_RATING", state: "main.measurable-rating.view"},
     {kind: "ORG_UNIT", state: "main.org-unit.view"},
     {kind: "PERSON", state: "main.person.id"},
     {kind: "PROCESS", state: "main.process.view"},

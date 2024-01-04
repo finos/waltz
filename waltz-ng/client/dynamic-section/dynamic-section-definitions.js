@@ -628,6 +628,16 @@ const measurableSections = [
     changeLogSection
 ];
 
+
+const measurableRatingSections = [
+    bookmarksSection,
+    assessmentRatingSection,
+    entityNamedNotesSection,
+    involvedPeopleSection,
+    changeLogSection
+];
+
+
 const personSections = [
     bookmarksSection,
     changeInitiativeSection,
@@ -895,6 +905,7 @@ export const dynamicSectionsByKind = {
     "main.licence.view": licenceSections,
     "main.logical-flow.view": logicalDataFlowSections,
     "main.measurable.view": measurableSections,
+    "main.measurable-rating.view": measurableRatingSections,
     "main.org-unit.view": orgUnitSections,
     "main.person.id": personSections,
     "main.person.userId": personSections,

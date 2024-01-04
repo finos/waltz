@@ -18,6 +18,7 @@
 
 package org.finos.waltz.service.measurable;
 
+import org.finos.waltz.model.measurable.MeasurableHierarchy;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.StringUtilities;
@@ -255,5 +256,9 @@ public class MeasurableService {
 
     public boolean moveChildren(Long measurableId, Long targetMeasurableId, String userId) {
         return measurableDao.moveChildren(measurableId, targetMeasurableId, userId);
+    }
+
+    public Set<MeasurableHierarchy> findHierarchyForCategory(long categoryId) {
+        return measurableDao.findHierarchyForCategory(categoryId);
     }
 }

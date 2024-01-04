@@ -73,6 +73,10 @@ public class MeasurableRatingReplacementService {
         return measurableRatingReplacementDao.fetchByEntityRef(ref);
     }
 
+    public Collection<MeasurableRatingReplacement> fetchByEntityRefAndCategory(EntityReference ref, long categoryId){
+        return measurableRatingReplacementDao.fetchByEntityRefAndCategory(ref, categoryId);
+    }
+
 
     public Set<MeasurableRatingReplacement> save(long decommId,
                                                  EntityReference entityReference,
@@ -121,5 +125,10 @@ public class MeasurableRatingReplacementService {
 
     public String getRequiredRatingEditRole(EntityReference ref) {
         return measurableRatingService.getRequiredRatingEditRole(ref);
+    }
+
+
+    public Set<MeasurableRatingReplacement> findByDecommId(Long decommId) {
+        return measurableRatingReplacementDao.fetchByDecommissionId(decommId);
     }
 }

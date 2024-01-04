@@ -16,15 +16,26 @@
  *
  */
 
+import MeasurableRatingView from "../measurable-rating/pages/measurable-rating-view/measurable-rating-view";
+
 const baseState = {};
 
 
+const viewState = {
+    url: "measurable-rating/{id:int}",
+    views: {
+        "content@": MeasurableRatingView
+    }
+
+};
+
 function setup($stateProvider) {
     $stateProvider
-        .state('main.measurable-rating', baseState);
+        .state("main.measurable-rating", baseState)
+        .state("main.measurable-rating.view", viewState);
 }
 
-setup.$inject = ['$stateProvider'];
+setup.$inject = ["$stateProvider"];
 
 
 export default setup;
