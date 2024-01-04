@@ -149,6 +149,13 @@ function store($http, baseApiUrl) {
             .then(result => result.data);
     };
 
+    const withdrawOpenSurveysForRun = (surveyRunId) => {
+        return $http
+            .post(`${base}/run/${surveyRunId}/withdraw-open`)
+            .then(result => result.data);
+    };
+
+
     return {
         getById,
         getPermissions,
@@ -170,7 +177,8 @@ function store($http, baseApiUrl) {
         addOwner,
         deleteOwner,
         markApproved,
-        reportProblemWithQuestionResponse
+        reportProblemWithQuestionResponse,
+        withdrawOpenSurveysForRun
     };
 }
 
@@ -294,6 +302,11 @@ export const SurveyInstanceStore_API = {
         serviceName,
         serviceFnName: "reportProblemWithQuestionResponse",
         description: "creates change log entry for survey instance"
+    },
+    withdrawOpenSurveysForRun: {
+        serviceName,
+        serviceFnName: "withdrawOpenSurveysForRun",
+        description: "withdraws all open (in progress / not started) survey instances in a run"
     }
 };
 

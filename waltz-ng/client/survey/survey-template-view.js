@@ -106,14 +106,23 @@ function mkColumnDefs() {
             cellTemplate:
                 `
                 <div class="ui-grid-cell-contents">
-                    <a ng-click="grid.appScope.deleteRun(row.entity.surveyRun)"
-                       ng-if="row.entity.isRunOwnedByLoggedInUser"
+                    <button ng-click="grid.appScope.deleteRun(row.entity.surveyRun)"
+                       ng-if="row.entity.isRunOwnedByLoggedInUser || row.entity.isTemplateOwnerOrAdmin"
                        uib-popover="Delete this Survey Run"
                        popover-placement="left"
                        popover-trigger="mouseenter"
                        class="btn btn-xs btn-danger waltz-visibility-child-30">
                         <waltz-icon name="trash-o"></waltz-icon>
-                    </a>
+                    </button>
+                    <button ng-click="grid.appScope.withdrawOpenSurveys(row.entity.surveyRun)"
+                            ng-disabled="!row.entity.hasOpenSurveys"
+                            ng-if="row.entity.isRunOwnedByLoggedInUser || row.entity.hasAdminRights"
+                            uib-popover="Withdraw all open instances ('Not Started' and 'In Progress')"
+                            popover-placement="left"
+                            popover-trigger="mouseenter"
+                            class="btn btn-xs btn-warning waltz-visibility-child-30">
+                        <waltz-icon name="wpforms"></waltz-icon>
+                    </button>
                 </div>
                 `
         }
@@ -178,6 +187,8 @@ function controller($q,
                         d.isRunOwnedByLoggedInUser = d.owner
                             ? (_.toLower(d.owner.email) === _.toLower(user.userName))
                             : false;
+                        d.hasAdminRights = userIsTemplateOwner || userIsAdmin || userHasIssuanceRights
+                        d.hasOpenSurveys = stats.inProgressCount > 0 || stats.notStartedCount > 0
                         return d;
                     })
                     .partition(d => d.surveyRun.status !== "DRAFT")
@@ -266,6 +277,21 @@ function controller($q,
                 })
                 .catch(e => {
                     displayError("Survey template could not be deleted", e);
+                });
+        }
+    }
+
+    vm.withdrawOpenSurveys = (surveyRun) => {
+        console.log({surveyRun});
+        if(confirm(`Are you sure you want withdraw all open surveys for this survey run: ${surveyRun.name}?`)){
+            serviceBroker
+                .execute(CORE_API.SurveyInstanceStore.withdrawOpenSurveysForRun, [surveyRun.id])
+                .then(() => {
+                    toasts.warning("Not started and In progress survey runs have been withdrawn");
+                    loadRuns();
+                })
+                .catch(e => {
+                    displayError("Could not withdraw open survey runs", e);
                 });
         }
     }

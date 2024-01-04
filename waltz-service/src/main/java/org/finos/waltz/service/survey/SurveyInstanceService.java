@@ -20,13 +20,13 @@ package org.finos.waltz.service.survey;
 
 
 import org.finos.waltz.common.DateTimeUtilities;
-import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.person.PersonDao;
 import org.finos.waltz.data.survey.SurveyInstanceDao;
 import org.finos.waltz.data.survey.SurveyInstanceOwnerDao;
 import org.finos.waltz.data.survey.SurveyInstanceRecipientDao;
 import org.finos.waltz.data.survey.SurveyQuestionResponseDao;
 import org.finos.waltz.data.survey.SurveyRunDao;
+import org.finos.waltz.data.survey.SurveyTemplateDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
@@ -52,6 +52,7 @@ import org.finos.waltz.model.survey.SurveyInstanceStatusChangeCommand;
 import org.finos.waltz.model.survey.SurveyQuestion;
 import org.finos.waltz.model.survey.SurveyQuestionResponse;
 import org.finos.waltz.model.survey.SurveyRun;
+import org.finos.waltz.model.survey.SurveyTemplate;
 import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.model.utils.IdUtilities;
 import org.finos.waltz.service.changelog.ChangeLogService;
@@ -59,6 +60,8 @@ import org.finos.waltz.service.user.UserRoleService;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Select;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -77,6 +80,7 @@ import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.common.Checks.fail;
 import static org.finos.waltz.common.CollectionUtilities.find;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
+import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.common.StringUtilities.isEmpty;
 import static org.finos.waltz.common.StringUtilities.joinUsing;
@@ -86,6 +90,7 @@ import static org.finos.waltz.model.utils.IdUtilities.indexByOptionalId;
 @Service
 public class SurveyInstanceService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(SurveyInstanceService.class);
     private final ChangeLogService changeLogService;
     private final PersonDao personDao;
     private final SurveyInstanceDao surveyInstanceDao;
@@ -97,6 +102,7 @@ public class SurveyInstanceService {
     private final UserRoleService userRoleService;
     private final SurveyQuestionService surveyQuestionService;
     private final SurveyInstanceViewService instanceViewService;
+    private final SurveyTemplateDao surveyTemplateDao;
 
 
     @Autowired
@@ -109,7 +115,8 @@ public class SurveyInstanceService {
                                  SurveyRunDao surveyRunDao,
                                  UserRoleService userRoleService,
                                  SurveyInstanceViewService instanceViewService,
-                                 SurveyQuestionService surveyQuestionService) {
+                                 SurveyQuestionService surveyQuestionService,
+                                 SurveyTemplateDao surveyTemplateDao) {
 
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(personDao, "personDao cannot be null");
@@ -121,6 +128,7 @@ public class SurveyInstanceService {
         checkNotNull(userRoleService, "userRoleService cannot be null");
         checkNotNull(instanceViewService, "instanceViewService cannot be null");
         checkNotNull(surveyQuestionService, "surveyQuestionService cannot be null");
+        checkNotNull(surveyTemplateDao, "surveyTemplateDao cannot be null");
 
         this.changeLogService = changeLogService;
         this.personDao = personDao;
@@ -132,6 +140,7 @@ public class SurveyInstanceService {
         this.userRoleService = userRoleService;
         this.instanceViewService = instanceViewService;
         this.surveyQuestionService = surveyQuestionService;
+        this.surveyTemplateDao = surveyTemplateDao;
     }
 
 
@@ -551,8 +560,9 @@ public class SurveyInstanceService {
 
         SurveyInstance instance = surveyInstanceDao.getById(instanceId);
         SurveyRun run = surveyRunDao.getById(instance.surveyRunId());
+        SurveyTemplate template = surveyTemplateDao.getById(run.surveyTemplateId());
 
-        boolean isAdmin = userRoleService.hasRole(userName, SystemRole.SURVEY_ADMIN);
+        boolean isAdmin = userRoleService.hasAnyRole(userName, SystemRole.SURVEY_ADMIN, SystemRole.ADMIN);
 
         boolean isParticipant = person != null && person.id()
                 .map(pid -> surveyInstanceRecipientDao.isPersonInstanceRecipient(pid, instanceId))
@@ -562,7 +572,7 @@ public class SurveyInstanceService {
                 .map(pid -> surveyInstanceOwnerDao.isPersonInstanceOwner(pid, instanceId) || Objects.equals(run.ownerId(), pid))
                 .orElse(false);
 
-        boolean hasOwningRole = userRoleService.hasRole(userName, instance.owningRole());
+        boolean hasOwningRole = userRoleService.hasAnyRole(userName, asSet(instance.owningRole(), template.issuanceRole()));
 
         boolean isLatest = instance.originalInstanceId() == null;
 
@@ -656,5 +666,31 @@ public class SurveyInstanceService {
             return personDao
                     .findActivePeopleByUserRole(surveyInstance.owningRole());
         }
+    }
+
+
+    public Integer withdrawOpenSurveysForRun(long runId, String username) {
+        Set<SurveyInstance> instancesForRun = findForSurveyRun(runId);
+        return instancesForRun
+                .stream()
+                .map(instance -> {
+
+                    ImmutableSurveyInstanceStatusChangeCommand cmd = ImmutableSurveyInstanceStatusChangeCommand
+                            .builder()
+                            .action(SurveyInstanceAction.WITHDRAWING)
+                            .reason("Withdrawing all open surveys for this run")
+                            .build();
+
+                    try {
+                        SurveyInstanceStatus surveyInstanceStatus = updateStatus(Optional.empty(), username, instance.id().get(), cmd);
+                        return 1;
+                    } catch (IllegalArgumentException e) {
+                        LOG.error("Unable to mark survey instance {} as 'WITHDRAWN'. Error: {}", instance.id().get(), e);
+                        return 0;
+                    }
+
+                })
+                .mapToInt(d -> d)
+                .sum();
     }
 }
