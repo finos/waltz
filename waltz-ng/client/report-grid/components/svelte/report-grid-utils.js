@@ -52,8 +52,16 @@ export const additionalColumnOptions = {
         key: "ROLLUP",
         name: "Rollup",
 
+    },
+    COMPLETED_AND_APPROVED_ONLY: {
+        key: "COMPLETED_AND_APPROVED_ONLY",
+        name: "Completed and Approved Only",
+    },
+    EXCLUDE_WITHDRAWN: {
+        key: "EXCLUDE_WITHDRAWN",
+        name: "Exclude Withdrawn",
     }
-};
+}
 
 
 export function determineDefaultColumnOptions(columnEntityKind) {

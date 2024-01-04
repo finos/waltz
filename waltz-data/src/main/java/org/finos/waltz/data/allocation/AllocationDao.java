@@ -39,9 +39,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.schema.Tables.ALLOCATION;
+import static org.finos.waltz.schema.Tables.MEASURABLE;
 import static org.finos.waltz.schema.Tables.MEASURABLE_RATING;
 
 @Repository
@@ -77,6 +79,18 @@ public class AllocationDao {
                 .select(ALLOCATION.fields())
                 .from(ALLOCATION)
                 .innerJoin(MEASURABLE_RATING).on(ALLOCATION.MEASURABLE_RATING_ID.eq(MEASURABLE_RATING.ID))
+                .where(MEASURABLE_RATING.ENTITY_KIND.eq(ref.kind().name()))
+                .and(MEASURABLE_RATING.ENTITY_ID.eq(ref.id()))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+    public List<Allocation> findByEntityAndCategory(EntityReference ref, long categoryId) {
+        return dsl
+                .select(ALLOCATION.fields())
+                .from(ALLOCATION)
+                .innerJoin(MEASURABLE_RATING).on(ALLOCATION.MEASURABLE_RATING_ID.eq(MEASURABLE_RATING.ID))
+                .innerJoin(MEASURABLE).on(MEASURABLE_RATING.MEASURABLE_ID.eq(MEASURABLE.ID)
+                        .and(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId)))
                 .where(MEASURABLE_RATING.ENTITY_KIND.eq(ref.kind().name()))
                 .and(MEASURABLE_RATING.ENTITY_ID.eq(ref.id()))
                 .fetch(TO_DOMAIN_MAPPER);
@@ -220,6 +234,13 @@ public class AllocationDao {
 
     }
 
+    public Set<Allocation> findByMeasurableRatingId(long measurableRatingId) {
+        return dsl
+                .select(ALLOCATION.fields())
+                .from(ALLOCATION)
+                .where(ALLOCATION.MEASURABLE_RATING_ID.eq(measurableRatingId))
+                .fetchSet(TO_DOMAIN_MAPPER);
+    }
 }
 
 

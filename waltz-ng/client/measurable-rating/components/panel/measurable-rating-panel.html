@@ -17,18 +17,43 @@
   -->
 
 <div class="row">
-    <div class="col-sm-6">
-        <waltz-measurable-rating-tree ratings="$ctrl.ratings"
-                                      rating-scheme-items="$ctrl.ratingSchemeItems"
-                                      on-select="$ctrl.onSelect"
-                                      allocations="$ctrl.allocations"
-                                      measurables="$ctrl.measurables"
-                                      planned-decommissions="$ctrl.plannedDecommissions"
-                                      replacing-decommissions="$ctrl.replacingDecommissions"
-                                      replacement-apps="$ctrl.replacementApps">
-        </waltz-measurable-rating-tree>
+    <div class="col-sm-8">
+        <waltz-toggle class="pull-right"
+                      state="$ctrl.showTreeView"
+                      on-toggle="$ctrl.onToggleView()"
+                      label-on="Tree View"
+                      label-off="Table View">
+        </waltz-toggle>
+        <div ng-if="$ctrl.showTreeView">
+            <waltz-measurable-rating-tree ratings="$ctrl.ratings"
+                                          rating-scheme-items="$ctrl.ratingSchemeItems"
+                                          on-select="$ctrl.onSelect"
+                                          allocations="$ctrl.allocations"
+                                          measurables="$ctrl.measurables"
+                                          planned-decommissions="$ctrl.plannedDecommissions"
+                                          replacing-decommissions="$ctrl.replacingDecommissions"
+                                          replacement-apps="$ctrl.replacementApps">
+            </waltz-measurable-rating-tree>
+        </div>
+        <div ng-if="!$ctrl.showTreeView">
+            <waltz-svelte-component component="$ctrl.MeasurableRatingTable"
+                                    category="$ctrl.category"
+                                    ratings="$ctrl.ratings"
+                                    on-select="$ctrl.onSelect"
+                                    allocations="$ctrl.allocations"
+                                    allocation-schemes="$ctrl.allocationSchemes"
+                                    measurables="$ctrl.measurables"
+                                    planned-decommissions="$ctrl.plannedDecommissions"
+                                    replacing-decommissions="$ctrl.replacingDecommissions"
+                                    replacement-apps="$ctrl.replacementApps"
+                                    assessment-definitions="$ctrl.assessmentDefinitions"
+                                    assessment-ratings="$ctrl.assessmentRatings"
+                                    measurable-hierarchy-by-id="$ctrl.measurableHierarchyById">
+            </waltz-svelte-component>
+        </div>
+
     </div>
-    <div class="col-sm-6"
+    <div class="col-sm-4"
          style="border-left: 1px solid #eee">
 
         <div ng-if="$ctrl.selected == null"
@@ -41,15 +66,36 @@
             <div>
                 <div style="font-weight: bolder">
                     <a class='clickable'
-                       ui-sref="main.measurable.view ({ id: $ctrl.selected.measurable.id })">
+                       title="View measurable rating in a dedicated page"
+                       ui-sref="main.measurable-rating.view ({ id: $ctrl.selected.rating.id })">
                         <span ng-bind="$ctrl.selected.measurable.name"></span>
                     </a>
                 </div>
 
-                <div ng-if="$ctrl.selected.measurable.description">
-                    <waltz-markdown style="font-weight: lighter;"
-                                    text="$ctrl.selected.measurable.description">
-                    </waltz-markdown>
+                <hr>
+
+                <div class="row" style="padding-bottom: 0.2em">
+                    <div class="col-sm-2 waltz-display-field-label">
+                        Taxonomy Item:
+                    </div>
+                    <div class="col-sm-10">
+                        <waltz-entity-link entity-ref="$ctrl.selected.measurable"
+                                           is-secondary-link="true"
+                                           show-external-id="true">
+                        </waltz-entity-link>
+                    </div>
+                </div>
+
+                <div class="row"
+                     ng-if="$ctrl.selected.measurable.description">
+                    <div class="col-sm-2 waltz-display-field-label">
+                        Description:
+                    </div>
+                    <div class="col-sm-10">
+                        <waltz-markdown style="font-weight: lighter;"
+                                        text="$ctrl.selected.measurable.description">
+                        </waltz-markdown>
+                    </div>
                     <br>
                 </div>
 
@@ -62,7 +108,7 @@
                             Rating:
                         </div>
                         <div class="col-sm-10">
-                            <waltz-rating-indicator-cell rating="$ctrl.selected.ratingSchemeItem"
+                            <waltz-rating-indicator-cell rating="$ctrl.selected.rating.ratingSchemeItem"
                                                          show-description-popup="true"
                                                          show-name="true">
                             </waltz-rating-indicator-cell>

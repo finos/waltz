@@ -25,11 +25,14 @@ import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.UserTimestamp;
 import org.finos.waltz.model.measurable_rating.ImmutableRemoveMeasurableRatingCommand;
 import org.finos.waltz.model.measurable_rating.MeasurableRating;
+import org.finos.waltz.model.measurable_rating.MeasurableRatingCategoryView;
 import org.finos.waltz.model.measurable_rating.MeasurableRatingStatParams;
+import org.finos.waltz.model.measurable_rating.MeasurableRatingView;
 import org.finos.waltz.model.measurable_rating.RemoveMeasurableRatingCommand;
 import org.finos.waltz.model.tally.MeasurableRatingTally;
 import org.finos.waltz.model.tally.Tally;
 import org.finos.waltz.service.measurable_rating.MeasurableRatingService;
+import org.finos.waltz.service.measurable_rating.MeasurableRatingViewService;
 import org.finos.waltz.service.permission.permission_checker.MeasurableRatingPermissionChecker;
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.DatumRoute;
@@ -48,8 +51,19 @@ import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.model.EntityKind.MEASURABLE_RATING;
 import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.finos.waltz.web.WebUtilities.*;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
+import static org.finos.waltz.web.WebUtilities.getEntityReference;
+import static org.finos.waltz.web.WebUtilities.getId;
+import static org.finos.waltz.web.WebUtilities.getLong;
+import static org.finos.waltz.web.WebUtilities.getUsername;
+import static org.finos.waltz.web.WebUtilities.mkPath;
+import static org.finos.waltz.web.WebUtilities.readBody;
+import static org.finos.waltz.web.WebUtilities.readIdSelectionOptionsFromBody;
+import static org.finos.waltz.web.WebUtilities.requireRole;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.deleteForList;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.getForDatum;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.getForList;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.postForDatum;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.postForList;
 
 @Service
 public class MeasurableRatingEndpoint implements Endpoint {
@@ -58,28 +72,36 @@ public class MeasurableRatingEndpoint implements Endpoint {
 
 
     private final MeasurableRatingService measurableRatingService;
+    private final MeasurableRatingViewService measurableRatingViewService;
     private final MeasurableRatingPermissionChecker measurableRatingPermissionChecker;
     private final UserRoleService userRoleService;
 
 
     @Autowired
     public MeasurableRatingEndpoint(MeasurableRatingService measurableRatingService,
+                                    MeasurableRatingViewService measurableRatingViewService,
                                     MeasurableRatingPermissionChecker measurableRatingPermissionChecker,
                                     UserRoleService userRoleService) {
 
         checkNotNull(measurableRatingService, "measurableRatingService cannot be null");
         checkNotNull(userRoleService, "userRoleService cannot be null");
+        checkNotNull(measurableRatingViewService, "measurableRatingViewService cannot be null");
         checkNotNull(measurableRatingPermissionChecker, "measurableRatingPermissionChecker cannot be null");
 
         this.measurableRatingService = measurableRatingService;
         this.measurableRatingPermissionChecker = measurableRatingPermissionChecker;
+        this.measurableRatingViewService = measurableRatingViewService;
         this.userRoleService = userRoleService;
     }
 
 
     @Override
     public void register() {
+
+        String getByIdPath = mkPath(BASE_URL, "id", ":id");
+        String getViewByIdPath = mkPath(BASE_URL, "id", ":id", "view");
         String findForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
+        String getViewForEntityAndCategoryPath = mkPath(BASE_URL, "entity", ":kind", ":id", "category", ":categoryId", "view");
         String modifyMeasurableForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id", "measurable", ":measurableId");
         String modifyCategoryForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id", "category", ":categoryId");
         String findByMeasurableSelectorPath = mkPath(BASE_URL, "measurable-selector");
@@ -92,6 +114,17 @@ public class MeasurableRatingEndpoint implements Endpoint {
         String saveRatingItemPath = mkPath(BASE_URL, "entity", ":kind", ":id", "measurable", ":measurableId", "rating");
         String saveRatingDescriptionPath = mkPath(BASE_URL, "entity", ":kind", ":id", "measurable", ":measurableId", "description");
         String saveRatingIsPrimaryPath = mkPath(BASE_URL, "entity", ":kind", ":id", "measurable", ":measurableId", "is-primary");
+
+        DatumRoute<MeasurableRating> getByIdRoute = (request, response)
+                -> measurableRatingService.getById(getId(request));
+
+        DatumRoute<MeasurableRatingView> getViewByIdRoute = (request, response)
+                -> measurableRatingViewService.getViewById(getId(request));
+
+        DatumRoute<MeasurableRatingCategoryView> getViewForEntityAndCategoryRoute = (request, response) -> {
+            long categoryId = getLong(request, "categoryId");
+            return measurableRatingViewService.getViewForAppAndCategory(getEntityReference(request), categoryId);
+        };
 
         ListRoute<MeasurableRating> findForEntityRoute = (request, response)
                 -> measurableRatingService.findForEntity(getEntityReference(request));
@@ -116,7 +149,10 @@ public class MeasurableRatingEndpoint implements Endpoint {
                 getLong(request, "measurableId"),
                 readIdSelectionOptionsFromBody(request));
 
+        getForDatum(getByIdPath, getByIdRoute);
+        getForDatum(getViewByIdPath, getViewByIdRoute);
         getForList(findForEntityPath, findForEntityRoute);
+        getForDatum(getViewForEntityAndCategoryPath, getViewForEntityAndCategoryRoute);
         postForList(findByMeasurableSelectorPath, findByMeasurableSelectorRoute);
         postForList(findByAppSelectorPath, findByAppSelectorRoute);
         getForList(findByCategoryPath, findByCategoryRoute);

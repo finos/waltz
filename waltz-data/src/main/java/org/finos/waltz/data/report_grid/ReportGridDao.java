@@ -53,10 +53,12 @@ import org.finos.waltz.model.report_grid.ReportGridInfo;
 import org.finos.waltz.model.report_grid.ReportGridKind;
 import org.finos.waltz.model.report_grid.ReportGridMemberRole;
 import org.finos.waltz.model.report_grid.ReportGridUpdateCommand;
+import org.finos.waltz.model.survey.SurveyInstanceStatus;
 import org.finos.waltz.model.survey.SurveyQuestionFieldType;
 import org.finos.waltz.model.usage_info.UsageKind;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.ChangeInitiative;
+import org.finos.waltz.schema.tables.SurveyInstance;
 import org.finos.waltz.schema.tables.records.ReportGridColumnDefinitionRecord;
 import org.finos.waltz.schema.tables.records.ReportGridDerivedColumnDefinitionRecord;
 import org.finos.waltz.schema.tables.records.ReportGridFixedColumnDefinitionRecord;
@@ -80,6 +82,7 @@ import org.jooq.SelectHavingStep;
 import org.jooq.SelectJoinStep;
 import org.jooq.SelectOrderByStep;
 import org.jooq.Table;
+import org.jooq.TableField;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
@@ -138,8 +141,6 @@ import static org.finos.waltz.data.JooqUtilities.determineCommonTableFields;
 import static org.finos.waltz.data.JooqUtilities.fieldsWithout;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.report_grid.CellOption.mkCellOption;
-import static org.finos.waltz.model.survey.SurveyInstanceStatus.APPROVED;
-import static org.finos.waltz.model.survey.SurveyInstanceStatus.COMPLETED;
 import static org.finos.waltz.schema.Tables.APPLICATION;
 import static org.finos.waltz.schema.Tables.APPLICATION_GROUP;
 import static org.finos.waltz.schema.Tables.APPLICATION_GROUP_ENTRY;
@@ -861,6 +862,10 @@ public class ReportGridDao {
                     colsByKind.getOrDefault(EntityKind.DATA_TYPE, emptySet()),
                     d -> d.additionalColumnOptions() == AdditionalColumnOptions.NONE);
 
+            Map<AdditionalColumnOptions, Collection<ReportGridFixedColumnDefinition>> surveyQuestionColsBySurveyStatusOptions = groupBy(
+                    colsByKind.getOrDefault(EntityKind.SURVEY_QUESTION, emptySet()),
+                    d -> d.additionalColumnOptions());
+
 
             // FIELD REF COL DEFS
 
@@ -883,7 +888,7 @@ public class ReportGridDao {
                     .map(d -> tuple(d, fieldReferencesById.get(d.entityFieldReference().id().get())))
                     .collect(groupingBy(t -> t.v2.entityKind(), toSet()));
 
-
+            
             return union(
                     fetchAssessmentData(genericSelector, colsByKind.get(EntityKind.ASSESSMENT_DEFINITION)),
                     fetchInvolvementData(genericSelector, colsByKind.get(EntityKind.INVOLVEMENT_KIND)),
@@ -1570,6 +1575,7 @@ public class ReportGridDao {
 
     private Set<ReportGridCell> fetchSurveyFieldReferenceData(GenericSelector selector,
                                                               Set<Tuple2<ReportGridFixedColumnDefinition, EntityFieldReference>> surveyInstanceInfo) {
+
         if (isEmpty(surveyInstanceInfo)) {
             return emptySet();
         } else {
@@ -1584,14 +1590,18 @@ public class ReportGridDao {
                     r -> r.v1.columnEntityId(),
                     v -> v.v2);
 
-            Set<Long> surveyTemplateIds = fieldReferencesByTemplateId.keySet();
+            Map<AdditionalColumnOptions, Collection<Long>> templateIdsByColOptions = groupBy(
+                    surveyInstanceInfo,
+                    d -> d.v1.additionalColumnOptions(),
+                    d -> d.v1.columnEntityId());
 
+            Set<Long> surveyTemplateIds = fieldReferencesByTemplateId.keySet();
 
             Field<Long> latestInstance = DSL
                     .firstValue(SURVEY_INSTANCE.ID)
                     .over()
                     .partitionBy(SURVEY_INSTANCE.ENTITY_ID, SURVEY_INSTANCE.ENTITY_KIND, SURVEY_RUN.SURVEY_TEMPLATE_ID)
-                    .orderBy(SURVEY_INSTANCE.SUBMITTED_AT.desc().nullsLast())
+                    .orderBy(SURVEY_INSTANCE.ISSUED_ON.desc(), SURVEY_INSTANCE.SUBMITTED_AT.desc())
                     .as("latest_instance");
 
             Table<Record> surveyInfo = dsl
@@ -1612,10 +1622,11 @@ public class ReportGridDao {
                     .select(SURVEY_RUN.SURVEY_TEMPLATE_ID)
                     .from(SURVEY_INSTANCE)
                     .innerJoin(SURVEY_RUN).on(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(SURVEY_RUN.ID))
-                    .where(SURVEY_INSTANCE.ENTITY_ID.in(selector.selector())
-                            .and(SURVEY_INSTANCE.ENTITY_KIND.eq(selector.kind().name())
-                                    .and(SURVEY_RUN.SURVEY_TEMPLATE_ID.in(surveyTemplateIds)
-                                            .and(SURVEY_INSTANCE.ORIGINAL_INSTANCE_ID.isNull()))))
+                    .where(determineInstanceStatusCondition(SURVEY_RUN.SURVEY_TEMPLATE_ID, SURVEY_INSTANCE, templateIdsByColOptions)
+                            .and(SURVEY_INSTANCE.ENTITY_ID.in(selector.selector())
+                                .and(SURVEY_INSTANCE.ENTITY_KIND.eq(selector.kind().name())
+                                        .and(SURVEY_RUN.SURVEY_TEMPLATE_ID.in(surveyTemplateIds)
+                                                .and(SURVEY_INSTANCE.ORIGINAL_INSTANCE_ID.isNull())))))
                     .asTable();
 
 
@@ -1648,11 +1659,14 @@ public class ReportGridDao {
                                         return null;
                                     }
 
+                                    CellOption option = determineOptionForSurveyInstance(fieldRef.fieldName(), textValue);
+
                                     return ImmutableReportGridCell
                                             .builder()
                                             .subjectId(surveyRecord.get(SURVEY_INSTANCE.ENTITY_ID))
                                             .columnDefinitionId(templateAndFieldRefToDefIdMap.get(tuple(templateId, fieldRef.id().get()))) // FIX
                                             .textValue(textValue)
+                                            .options(asSet(option))
                                             .build();
                                 });
                     })
@@ -1660,6 +1674,7 @@ public class ReportGridDao {
                     .collect(toSet());
         }
     }
+
 
 
     private Set<ReportGridCell> fetchOrgUnitFieldReferenceData(GenericSelector selector,
@@ -2223,11 +2238,16 @@ public class ReportGridDao {
                     ReportGridFixedColumnDefinition::columnEntityId,
                     ReportGridFixedColumnDefinition::gridColumnId);
 
+            Map<AdditionalColumnOptions, Collection<Long>> questionIdsByColOptions = groupBy(
+                    cols,
+                    ReportGridFixedColumnDefinition::additionalColumnOptions,
+                    ReportGridFixedColumnDefinition::columnEntityId);
+
             Field<Long> latestInstance = DSL
                     .firstValue(SURVEY_INSTANCE.ID)
                     .over()
                     .partitionBy(SURVEY_INSTANCE.ENTITY_ID, SURVEY_INSTANCE.ENTITY_KIND, SURVEY_QUESTION.ID)
-                    .orderBy(SURVEY_INSTANCE.SUBMITTED_AT.desc().nullsLast())
+                    .orderBy(SURVEY_INSTANCE.ISSUED_ON.desc(), SURVEY_INSTANCE.SUBMITTED_AT.desc())
                     .as("latest_instance");
 
             Table<Record> responsesWithQuestionTypeAndEntity = dsl
@@ -2252,10 +2272,11 @@ public class ReportGridDao {
                     .on(SURVEY_QUESTION_RESPONSE.SURVEY_INSTANCE_ID.eq(SURVEY_INSTANCE.ID))
                     .innerJoin(SURVEY_QUESTION)
                     .on(SURVEY_QUESTION.ID.eq(SURVEY_QUESTION_RESPONSE.QUESTION_ID))
-                    .where(SURVEY_INSTANCE.STATUS.in(APPROVED.name(), COMPLETED.name())
+                    .where(determineInstanceStatusCondition(SURVEY_QUESTION.ID, SURVEY_INSTANCE, questionIdsByColOptions)
                             .and(SURVEY_QUESTION.ID.in(questionIdToDefIdMap.keySet()))
                             .and(SURVEY_INSTANCE.ENTITY_ID.in(selector.selector()))
-                            .and(SURVEY_INSTANCE.ENTITY_KIND.eq(selector.kind().name())))
+                            .and(SURVEY_INSTANCE.ENTITY_KIND.eq(selector.kind().name()))
+                            .and(SURVEY_INSTANCE.ORIGINAL_INSTANCE_ID.isNull()))
                     .asTable();
 
 
@@ -2290,9 +2311,7 @@ public class ReportGridDao {
                         List<String> listResponses = responsesByInstanceQuestionKey.getOrDefault(tuple(instanceId, questionId), emptyList());
 
                         // if a question is not mandatory and left blank present as not provided
-                        Set<CellOption> options = isEmpty(response)
-                                ? emptySet()
-                                : asSet(determineOptionForSurveyQuestion(fieldType, response));
+                        Set<CellOption> options = asSet(determineOptionForSurveyQuestion(fieldType, entityName, response, listResponses));
 
                         return ImmutableReportGridCell.builder()
                                 .subjectId(r.get(SURVEY_INSTANCE.ENTITY_ID))
@@ -2305,11 +2324,31 @@ public class ReportGridDao {
         }
     }
 
+    private Condition determineInstanceStatusCondition(TableField<? extends Record, Long> idField,
+                                                       SurveyInstance surveyInstance,
+                                                       Map<AdditionalColumnOptions, Collection<Long>> colOptionsById) {
 
-    private CellOption determineOptionForSurveyQuestion(String fieldType, String response) {
+        Collection<Long> questionsWithCompletedAndApprovedOnly = colOptionsById.getOrDefault(AdditionalColumnOptions.COMPLETED_AND_APPROVED_ONLY, emptySet());
+        Collection<Long> questionsExcludingWithdrawn = colOptionsById.getOrDefault(AdditionalColumnOptions.EXCLUDE_WITHDRAWN, emptySet());
+        Collection<Long> allStatuses = colOptionsById.getOrDefault(AdditionalColumnOptions.NONE, emptySet());
 
-        if (isEmpty(response)) {
-            mkCellOption("NA", "N/A");
+        Condition completedApprovedCondition = idField.in(questionsWithCompletedAndApprovedOnly).and(surveyInstance.STATUS.in(asSet(SurveyInstanceStatus.COMPLETED.name(), SurveyInstanceStatus.APPROVED.name())));
+        Condition excludeWithdrawnCondition = idField.in(questionsExcludingWithdrawn).and(surveyInstance.STATUS.ne(SurveyInstanceStatus.WITHDRAWN.name()));
+        Condition allStatusesCondition = idField.in(allStatuses);
+
+        return completedApprovedCondition
+                .or(excludeWithdrawnCondition)
+                .or(allStatusesCondition);
+    }
+
+
+    private CellOption determineOptionForSurveyQuestion(String fieldType,
+                                                        String response,
+                                                        String entityName,
+                                                        List<String> listResponses) {
+
+        if (isEmpty(response) && isEmpty(entityName) && isEmpty(listResponses)) {
+            return mkCellOption("NA", "N/A");
         }
 
         SurveyQuestionFieldType type = SurveyQuestionFieldType.valueOf(fieldType);
@@ -2320,6 +2359,16 @@ public class ReportGridDao {
                 return mkCellOption(upper(response), response);
             default:
                 return CellOption.defaultCellOption();
+        }
+    }
+
+    private CellOption determineOptionForSurveyInstance(String fieldName, String textValue) {
+
+        if (fieldName.equalsIgnoreCase("status")) {
+            SurveyInstanceStatus status = SurveyInstanceStatus.valueOf(textValue);
+            return mkCellOption(status.name(), status.prettyName());
+        } else {
+            return CellOption.defaultCellOption();
         }
     }
 

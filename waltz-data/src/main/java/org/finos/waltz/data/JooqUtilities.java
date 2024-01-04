@@ -43,6 +43,7 @@ import org.finos.waltz.schema.tables.EntityStatisticDefinition;
 import org.finos.waltz.schema.tables.InvolvementKind;
 import org.finos.waltz.schema.tables.Measurable;
 import org.finos.waltz.schema.tables.MeasurableCategory;
+import org.finos.waltz.schema.tables.MeasurableRating;
 import org.finos.waltz.schema.tables.OrganisationalUnit;
 import org.finos.waltz.schema.tables.SurveyQuestion;
 import org.finos.waltz.schema.tables.SurveyTemplate;
@@ -571,6 +572,18 @@ public class JooqUtilities {
                         .nameField(mc.NAME)
                         .descriptionField(mc.DESCRIPTION)
                         .externalIdField(mc.EXTERNAL_ID)
+                        .build();
+            case MEASURABLE_RATING:
+                MeasurableRating mr = alias == null ? Tables.MEASURABLE_RATING : Tables.MEASURABLE_RATING.as(alias);
+                return ImmutableCommonTableFields
+                        .builder()
+                        .entityKind(EntityKind.MEASURABLE_RATING)
+                        .table(mr)
+                        .idField(mr.ID)
+                        .parentIdField(null)
+                        .nameField(null)
+                        .descriptionField(mr.DESCRIPTION)
+                        .externalIdField(null)
                         .build();
             case ORG_UNIT:
                 OrganisationalUnit ou = alias == null ? Tables.ORGANISATIONAL_UNIT : Tables.ORGANISATIONAL_UNIT.as(alias);

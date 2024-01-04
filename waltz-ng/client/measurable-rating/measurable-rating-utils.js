@@ -19,128 +19,27 @@ import _ from "lodash";
 import {CORE_API} from "../common/services/core-api-utils";
 import {mkSelectionOptions} from "../common/selector-utils";
 import {lastViewedMeasurableCategoryKey} from "../user";
-
-
-export function loadDecommData(
-    $q,
-    serviceBroker,
-    parentEntityRef,
-    force = false) {
-
-    const replacementAppPromise = serviceBroker
-        .loadViewData(
-            CORE_API.MeasurableRatingReplacementStore.findForEntityRef,
-            [parentEntityRef],
-            {force})
-        .then(r => ({replacementApps: r.data}));
-
-    const decommissionDatePromise = serviceBroker
-        .loadViewData(
-            CORE_API.MeasurableRatingPlannedDecommissionStore.findForEntityRef,
-            [parentEntityRef],
-            {force})
-        .then(r => r.data);
-
-    const replacingDecomms = serviceBroker
-        .loadViewData(
-            CORE_API.MeasurableRatingPlannedDecommissionStore.findForReplacingEntityRef,
-            [parentEntityRef])
-        .then(r => ({replacingDecommissions: r.data}));
-
-    const parentApplication = serviceBroker.loadViewData(CORE_API.ApplicationStore.getById, [parentEntityRef.id])
-        .then(r => r.data);
-
-    return $q
-        .all([replacementAppPromise, decommissionDatePromise, replacingDecomms, parentApplication])
-        .then(([replacementApps, decommissionDates, replacingDecoms, parentApplication]) => {
-
-            const appRetirementDate = new Date(parentApplication.plannedRetirementDate);
-
-            const plannedDecomms = (_.isNull(parentApplication.plannedRetirementDate))
-                ? _.map(decommissionDates, d => Object.assign({}, d, { isValid: true}))
-                : _.map(decommissionDates,d => {
-
-                    const decomDate = new Date(d.plannedDecommissionDate);
-
-                    const sameDate = appRetirementDate.getFullYear() === decomDate.getFullYear()
-                        && appRetirementDate.getMonth() === decomDate.getMonth()
-                        && appRetirementDate.getDate() === decomDate.getDate();
-
-                    const isValid = appRetirementDate > decomDate || sameDate;
-
-                    return Object.assign({}, d, { isValid: isValid})
-                });
-
-            return Object.assign({},
-                                 replacementApps,
-                                 replacingDecoms,
-                                 {plannedDecommissions: plannedDecomms});
-        });
-}
-
-
-
+import {reduceToSelectedNodesOnly} from "../common/hierarchy-utils";
+import {entity} from "../common/services/enums/entity";
+import {editOperations} from "../common/services/enums/operation";
 
 
 export function loadAllData(
     $q,
     serviceBroker,
     parentEntityRef,
-    allMeasurables = false,
     force = false) {
 
-    const allocationSchemesPromise = serviceBroker
-        .loadAppData(CORE_API.AllocationSchemeStore.findAll)
-        .then(r => ({allocationSchemes: r.data}));
-
-    const ratingSchemesPromise = serviceBroker
-        .loadAppData(CORE_API.RatingSchemeStore.findAll)
-        .then(r => ({ratingSchemesById: _.keyBy(r.data, "id")}));
+    const applicationPromise = serviceBroker
+        .loadViewData(CORE_API.ApplicationStore.getById, [parentEntityRef.id])
+        .then(r => ({ application: r.data}));
 
     const categoriesPromise = serviceBroker
-        .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
-        .then(r => ({
-            categories: r.data,
-            categoriesById: _.keyBy(r.data, d => d.id)
-        }));
-
-    const roadmapsPromise = serviceBroker
-        .loadViewData(
-            CORE_API.RoadmapStore.findRoadmapsAndScenariosByRatedEntity,
-            [ parentEntityRef])
-        .then(r => ({roadmapReferences: r.data}));
-
-    // if we are in edit mode we will be loading all measurables, otherwise just the needed measurables
-    const measurablesCall = allMeasurables
-        ? serviceBroker.loadAppData(CORE_API.MeasurableStore.findAll)
-        : serviceBroker.loadViewData(
-            CORE_API.MeasurableStore.findMeasurablesBySelector,
-            [mkSelectionOptions(parentEntityRef)],
-            { force });
-
-    const measurablesPromise = measurablesCall
-        .then(r => ({measurables: r.data}));
-
-    const ratingsPromise = serviceBroker
-        .loadViewData(
-            CORE_API.MeasurableRatingStore.findForEntityReference,
-            [ parentEntityRef ],
-            { force })
-        .then(r => ({ratings: r.data}));
-
-    const allocationsPromise = serviceBroker
-        .loadViewData(
-            CORE_API.AllocationStore.findByEntity,
-            [parentEntityRef],
-            {force})
-        .then(r => ({
-            allocations: r.data,
-            allocationTotalsByScheme: _
-                .chain(r.data)
-                .groupBy(d => d.schemeId)
-                .mapValues(xs => _.sumBy(xs, x => x.percentage))
-                .value()
-        }));
+            .loadViewData(
+                CORE_API.MeasurableCategoryStore.findPopulatedCategoriesForRef,
+                [parentEntityRef],
+                {force})
+            .then(r => ({ categories: r.data}));
 
     const lastViewedCategoryPromise = serviceBroker
         .loadAppData(CORE_API.UserPreferenceStore.findAllForUser, [], {force: true})
@@ -153,66 +52,144 @@ export function loadAllData(
             };
         });
 
-    const decommPromise = loadDecommData(
-        $q,
-        serviceBroker,
-        parentEntityRef,
-        force);
-
     return $q
         .all([
-            measurablesPromise,
-            ratingSchemesPromise,
-            ratingsPromise,
+            applicationPromise,
             categoriesPromise,
-            allocationsPromise,
-            allocationSchemesPromise,
-            decommPromise,
-            roadmapsPromise,
-            lastViewedCategoryPromise])
+            lastViewedCategoryPromise
+        ])
         .then(results => Object.assign({}, ...results));
 }
 
 
-/**
- *
- * @param ctx - {measurables: [], allocationSchemes: [], categories: [], ratingSchemesById: {}, allocations: [], ratings: []}
- * @param includeEmpty
- * @returns {*}
- */
-export function mkTabs(ctx, includeEmpty = false) {
+function prepareTabForCategory(category,
+                               ratingsForCategory = [],
+                               measurablesForCategory = [],
+                               allocationSchemesForCategory = [],
+                               allocationsForCategory = [],
+                               assessmentDefinitionsForCategory = [],
+                               assessmentRatingsForCategory = [],
+                               decommsForCategory = [],
+                               replacementsForCategory = [],
+                               replacingDecommissionsForCategory = [],
+                               ratingSchemesById,
+                               ratingSchemeItemsById,
+                               measurableHierarchy,
+                               application,
+                               showAllMeasurables = true) {
 
-    const measurablesByCategory = _.groupBy(ctx.measurables, d => d.categoryId);
-    const allocationSchemesByCategory = _.groupBy(ctx.allocationSchemes, d => d.measurableCategoryId);
+    const ratedMeasurables = _.map(ratingsForCategory, d => d.measurableId);
+    const replacingMeasurables = _.map(replacingDecommissionsForCategory, d => d.measurableRating.measurableId);
 
-    return _
-        .chain(ctx.categories)
-        .map(category => {
-            const measurablesForCategory = measurablesByCategory[category.id] || [];
-            const measurableIds = _.map(measurablesForCategory, d => d.id);
-            const ratingsForCategory = _.filter(
-                ctx.ratings,
-                r => _.includes(measurableIds, r.measurableId));
-            const ratingScheme = ctx.ratingSchemesById[category.ratingSchemeId];
-            return {
-                category,
-                ratingScheme,
-                measurables: measurablesForCategory,
-                ratings: ratingsForCategory,
-                allocationSchemes: allocationSchemesByCategory[category.id] || [],
-                allocations: ctx.allocations
-            };
-        })
-        .filter(t => t.measurables.length > 0 || includeEmpty)
-        .orderBy([tab => tab.category.position, tab => tab.category.name])
+    const requiredMeasurables = _.concat(ratedMeasurables, replacingMeasurables);
+
+    const ratingScheme = ratingSchemesById[category.ratingSchemeId];
+    const ratingSchemeItemsByCode = _.keyBy(ratingScheme.ratings, d => d.rating);
+
+    const measurableHierarchyById = _.keyBy(measurableHierarchy, d => d.measurableId);
+
+    const measurables = showAllMeasurables
+        ? measurablesForCategory
+        : reduceToSelectedNodesOnly(measurablesForCategory, requiredMeasurables);
+
+    const ratings = _
+        .chain(ratingsForCategory)
+        .map(r => Object.assign(r, {ratingSchemeItem: ratingSchemeItemsByCode[r.rating]}))
         .value();
+
+    const assessmentRatings = _
+        .chain(assessmentRatingsForCategory)
+        .map(r => Object.assign(r, {ratingSchemeItem: ratingSchemeItemsById[r.ratingId]}))
+        .value();
+
+    const allocationTotalsByScheme = _
+        .chain(allocationsForCategory)
+        .groupBy(d => d.schemeId)
+        .mapValues(d => _.sumBy(d, a => a.percentage))
+        .value();
+
+    const plannedDecomms = _.isNull(application.plannedRetirementDate)
+        ? _.map(decommsForCategory, d => Object.assign({}, d, { isValid: true}))
+        : _.map(decommsForCategory, d => {
+
+            const decomDate = new Date(d.plannedDecommissionDate);
+            const appRetirementDate = new Date(application.plannedRetirementDate);
+
+            const sameDate = appRetirementDate.getFullYear() === decomDate.getFullYear()
+                && appRetirementDate.getMonth() === decomDate.getMonth()
+                && appRetirementDate.getDate() === decomDate.getDate();
+
+            const isValid = appRetirementDate > decomDate || sameDate;
+
+            return Object.assign({}, d, {isValid: isValid})
+        });
+
+
+    return {
+        category,
+        ratingScheme,
+        measurables,
+        ratings,
+        allocationSchemes: allocationSchemesForCategory,
+        allocations: allocationsForCategory,
+        assessmentDefinitions: assessmentDefinitionsForCategory,
+        assessmentRatings,
+        plannedDecommissions: plannedDecomms,
+        plannedReplacements: replacementsForCategory,
+        replacingDecommissions: replacingDecommissionsForCategory,
+        ratingSchemeItems: ratingScheme.ratings,
+        allocationTotalsByScheme,
+        measurableHierarchyById
+    };
 }
 
+export function mkTab(ctx, application, showAllMeasurables = false) {
 
-export function determineStartingTab(tabs = [], lastViewedCategoryId) {
+    const ratingSchemesById = _.keyBy(ctx.ratingSchemes, d => d.id);
+
+    return prepareTabForCategory(
+        ctx.category,
+        ctx.ratings,
+        ctx.measurables,
+        ctx.allocationSchemes,
+        ctx.allocations,
+        ctx.assessmentDefinitions,
+        ctx.assessmentRatings,
+        ctx.plannedDecommissions,
+        ctx.plannedReplacements,
+        ctx.replacingDecommissions,
+        ratingSchemesById,
+        ctx.ratingSchemeItemsById,
+        ctx.measurableHierarchy,
+        application,
+        showAllMeasurables);
+
+}
+
+export function determineStartingTab(categories = [], activeTab, lastViewedCategoryId) {
     // category last viewed or first with ratings, or simply first if no ratings
-    const tabForLastCategoryViewed = _.find(tabs, t => t.category.id === lastViewedCategoryId);
-    const firstTabWithRatings = _.find(tabs, t => t.ratings.length > 0);
-    return tabForLastCategoryViewed || firstTabWithRatings || tabs[0];
+    const tabForLastCategoryViewed = _.find(categories, t => t.category.id === lastViewedCategoryId);
+    const tabForActive = _.find(categories, t => t.category.id === activeTab?.category.id);
+    return tabForActive || tabForLastCategoryViewed || categories[0];
 }
 
+
+export function determineEditableCategories(categories, permissions, userRoles) {
+    const editableCategoriesForUser = _
+        .chain(permissions)
+        .filter(d => d.subjectKind === entity.MEASURABLE_RATING.key
+            && _.includes(editOperations, d.operation)
+            && d.qualifierReference.kind === entity.MEASURABLE_CATEGORY.key)
+        .map(d => d.qualifierReference.id)
+        .uniq()
+        .value();
+
+    return _.filter(
+        categories,
+        t => {
+            const hasRole = _.includes(userRoles, t.ratingEditorRole);
+            const editableCategoryForUser = _.includes(editableCategoriesForUser, t.id);
+            const isEditableCategory = t.editable;
+            return isEditableCategory && (hasRole || editableCategoryForUser);
+        });
+}
