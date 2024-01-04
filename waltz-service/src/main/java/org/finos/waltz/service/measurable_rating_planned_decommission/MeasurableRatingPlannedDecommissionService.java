@@ -71,8 +71,17 @@ public class MeasurableRatingPlannedDecommissionService {
     }
 
 
+    public Collection<MeasurableRatingPlannedDecommission> findForEntityRefAndCategory(EntityReference ref, long categoryId) {
+        return measurableRatingPlannedDecommissionDao.findByEntityRefAndCategory(ref, categoryId);
+    }
+
+
     public Collection<MeasurableRatingPlannedDecommissionInfo> findForReplacingEntityRef(EntityReference ref) {
         return measurableRatingPlannedDecommissionDao.findByReplacingEntityRef(ref);
+    }
+
+    public Collection<MeasurableRatingPlannedDecommissionInfo> findForReplacingEntityRefAndCategory(EntityReference ref, long categoryId) {
+        return measurableRatingPlannedDecommissionDao.findForReplacingEntityRefAndCategory(ref, categoryId);
     }
 
 
@@ -138,6 +147,11 @@ public class MeasurableRatingPlannedDecommissionService {
 
     public MeasurableRatingPlannedDecommission getById(Long decommId) {
         return measurableRatingPlannedDecommissionDao.getById(decommId);
+    }
+
+
+    public MeasurableRatingPlannedDecommission getByMeasurableRatingId(Long ratingId) {
+        return measurableRatingPlannedDecommissionDao.getByMeasurableRatingId(ratingId);
     }
 
 }

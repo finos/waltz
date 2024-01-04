@@ -37,6 +37,7 @@ export const possibleAssessmentKinds = [
     {value: "LICENCE", name: "Software Licence", qualifierKind: null},
     {value: "LOGICAL_DATA_FLOW", name: "Logical Data Flow", needsQualifier: false},
     {value: "MEASURABLE", name: "Measurable", qualifierKind: "MEASURABLE_CATEGORY"},
+    {value: "MEASURABLE_RATING", name: "Measurable Rating", qualifierKind: "MEASURABLE_CATEGORY"},
     {value: "PHYSICAL_FLOW", name: "Physical Flow", qualifierKind: null},
     {value: "PHYSICAL_SPECIFICATION", name: "Physical Specification", qualifierKind: null},
     {value: "SOFTWARE_PACKAGE", name: "Software Package", qualifierKind: null}

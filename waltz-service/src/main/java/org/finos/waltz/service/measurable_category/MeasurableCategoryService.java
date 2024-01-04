@@ -19,15 +19,22 @@
 package org.finos.waltz.service.measurable_category;
 
 import org.finos.waltz.data.measurable_category.MeasurableCategoryDao;
+import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.exceptions.NotAuthorizedException;
+import org.finos.waltz.model.measurable_category.ImmutableMeasurableCategoryView;
 import org.finos.waltz.model.measurable_category.MeasurableCategory;
+import org.finos.waltz.model.measurable_category.MeasurableCategoryView;
 import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.user.UserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
@@ -62,6 +69,24 @@ public class MeasurableCategoryService {
 
     public Set<MeasurableCategory> findByExternalId(String externalId) {
         return measurableCategoryDao.findByExternalId(externalId);
+    }
+
+
+    public List<MeasurableCategoryView> findPopulatedCategoriesForRef(EntityReference ref) {
+        Collection<MeasurableCategory> allCategories = measurableCategoryDao.findAll();
+
+        Map<Long, Long> ratingCountsByCategoryId = measurableCategoryDao
+                .findRatingCountsByCategoryId(ref);
+
+        return allCategories
+                .stream()
+                .map(category -> ImmutableMeasurableCategoryView
+                        .builder()
+                        .category(category)
+                        .ratingCount(ratingCountsByCategoryId.getOrDefault(category.id().get(), 0L))
+                        .build())
+                .sorted(Comparator.comparing(d -> d.category().name()))
+                .collect(Collectors.toList());
     }
 
 

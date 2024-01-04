@@ -95,6 +95,10 @@ public class AllocationService {
         return allocationDao.findByEntity(ref);
     }
 
+    public Collection<Allocation> findByEntityAndCategory(EntityReference ref, long categoryId) {
+        return allocationDao.findByEntityAndCategory(ref, categoryId);
+    }
+
 
     public List<Allocation> findByEntityAndScheme(EntityReference ref,
                                                   long schemeId) {
@@ -105,6 +109,11 @@ public class AllocationService {
     public List<Allocation> findByMeasurableAndScheme(long measurableId,
                                                       long schemeId){
         return allocationDao.findByMeasurableIdAndScheme(measurableId, schemeId);
+    }
+
+
+    public Set<Allocation> findByMeasurableRatingId(long measurableRatingId){
+        return allocationDao.findByMeasurableRatingId(measurableRatingId);
     }
 
 

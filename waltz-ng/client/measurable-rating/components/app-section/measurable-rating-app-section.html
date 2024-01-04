@@ -41,12 +41,12 @@
                         <!-- EDITOR -->
                         <div ng-if="$ctrl.visibility.editor">
                             <waltz-measurable-rating-edit-panel parent-entity-ref="$ctrl.parentEntityRef"
-                                                                allocations="$ctrl.allocations"
-                                                                allocation-schemes="$ctrl.allocationSchemes"
+                                                                allocations="$ctrl.activeTab.allocations"
+                                                                allocation-schemes="$ctrl.activeTab.allocationSchemes"
                                                                 starting-category-id="$ctrl.visibility.tab"
-                                                                planned-decommissions="$ctrl.plannedDecommissions"
-                                                                replacing-decommissions="$ctrl.replacingDecommissions"
-                                                                replacement-apps="$ctrl.replacementApps"
+                                                                planned-decommissions="$ctrl.activeTab.plannedDecommissions"
+                                                                replacing-decommissions="$ctrl.activeTab.replacingDecommissions"
+                                                                replacement-apps="$ctrl.activeTab.replacementApps"
                                                                 application="$ctrl.application">
                             </waltz-measurable-rating-edit-panel>
                         </div>
@@ -57,8 +57,8 @@
                         </div>
                     </div>
 
-                    <span ng-if="$ctrl.hasEditPermissions">
-                        <div class="waltz-sub-section-controls">
+                    <div class="waltz-sub-section-controls">
+                        <span ng-if="$ctrl.hasEditPermissions">
                             <a ng-if="$ctrl.visibility.editor === false"
                                ng-click="$ctrl.onEditRatings()"
                                class="clickable">
@@ -69,8 +69,16 @@
                                class="clickable">
                                 View
                             </a>
-                        </div>
-                    </span>
+                        </span>
+                        <span ng-if="$ctrl.visibility.editor === false">
+                            <waltz-data-extract-link name="Export ratings"
+                                                     styling="link"
+                                                     extract="measurable-rating-view/entity/{{$ctrl.parentEntityRef.kind}}/{{$ctrl.parentEntityRef.id}}/category-id/{{$ctrl.activeTab.category.id}}"
+                                                     method="GET">
+                            </waltz-data-extract-link>
+                            <span ng-if="$ctrl.hasEditPermissions">|</span>
+                        </span>
+                    </div>
                 </content>
             </waltz-sub-section>
         </div>
@@ -84,7 +92,7 @@
             <waltz-allocation-entity-sub-section entity-reference="$ctrl.parentEntityRef"
                                                  scheme="$ctrl.activeAllocationScheme"
                                                  measurable-category="$ctrl.activeTab.category"
-                                                 allocations="$ctrl.allocations"
+                                                 allocations="$ctrl.activeTab.allocations"
                                                  on-save="$ctrl.onSaveAllocations"
                                                  on-dismiss="$ctrl.onDismissAllocations"
                                                  can-edit="$ctrl.hasEditPermissions">
@@ -114,14 +122,14 @@
 <script type="text/ng-template"
         id="wmras-ratings-view">
     <!-- NO DATA -->
-    <div ng-if="$ctrl.measurables.length == 0">
+    <div ng-if="$ctrl.tabs.length == 0">
         <waltz-no-data>
             <message>
                 <p>
                     <strong>No ratings</strong>
                     available for this entity.
                 </p>
-                <p waltz-has-role="RATING_EDITOR">
+                <p ng-if="$ctrl.hasEditPermissions">
                     <a class="clickable"
                        ng-if="$ctrl.visibility.editor === false"
                        ng-click="$ctrl.visibility.editor = true">
@@ -134,14 +142,13 @@
     </div>
 
     <!-- SOME DATA -->
-    <div ng-if="$ctrl.measurables.length > 0">
+    <div ng-if="$ctrl.tabs.length > 0">
         <div class="waltz-tabs">
             <input type="radio"
-                   ng-repeat-start="tab in $ctrl.tabs"
+                   ng-repeat-start="tab in $ctrl.tabs track by tab.category.id"
                    ng-model="$ctrl.visibility.tab"
                    ng-value="tab.category.id"
-                   ng-disabled="tab.measurables.length === 0"
-                   ng-change="$ctrl.onTabChange(tab)"
+                   ng-change="$ctrl.onTabChange(tab.category.id)"
                    name="measurable_rating"
                    id="{{ tab.category.id + '_' +$id}}">
             <label class="wt-label"
@@ -157,13 +164,12 @@
                 </span>
             </label>
 
-            <div ng-repeat="tab in $ctrl.tabs"
-                 ng-class="{ 'wt-active': tab.category.id == $ctrl.visibility.tab }"
-                 class="wt-tab">
-                <div ng-include="'wmras-tab-content'"></div>
+            <div ng-if="$ctrl.activeTab"
+                 ng-include="'wmras-tab-content'">
             </div>
         </div>
     </div>
+
 </script>
 
 
@@ -171,29 +177,44 @@
 <script type="text/ng-template"
         id="wmras-tab-content">
     <br>
-    <!-- RATING TREE -->
+
     <div class="row">
         <div class="col-sm-12">
-            <waltz-measurable-rating-panel measurables="tab.measurables"
-                                           ratings="tab.ratings"
-                                           rating-scheme-items="tab.ratingSchemeItems"
-                                           allocations="$ctrl.allocations"
-                                           allocation-schemes="tab.allocationSchemes"
-                                           planned-decommissions="$ctrl.plannedDecommissions"
-                                           replacing-decommissions="$ctrl.replacingDecommissions"
-                                           replacement-apps="$ctrl.replacementApps"
-                                           application="$ctrl.application">
+            <waltz-loading-notification show="$ctrl.visibility.loading"
+                                        style="padding-top: 54px;"
+                                        name="Loading">
+            </waltz-loading-notification>
+        </div>
+    </div>
+
+    <!-- RATING TREE -->
+    <div class="row" ng-show="!$ctrl.visibility.loading">
+        <div class="col-sm-12">
+            <waltz-measurable-rating-panel category="$ctrl.activeTab.category"
+                                           measurables="$ctrl.activeTab.measurables"
+                                           ratings="$ctrl.activeTab.ratings"
+                                           rating-scheme-items="$ctrl.activeTab.ratingSchemeItems"
+                                           allocations="$ctrl.activeTab.allocations"
+                                           allocation-schemes="$ctrl.activeTab.allocationSchemes"
+                                           planned-decommissions="$ctrl.activeTab.plannedDecommissions"
+                                           replacing-decommissions="$ctrl.activeTab.replacingDecommissions"
+                                           replacement-apps="$ctrl.activeTab.plannedReplacements"
+                                           application="$ctrl.application"
+                                           assessment-definitions="$ctrl.activeTab.assessmentDefinitions"
+                                           assessment-ratings="$ctrl.activeTab.assessmentRatings"
+                                           rating-schemes="$ctrl.ratingSchemes"
+                                           measurable-hierarchy-by-id="$ctrl.activeTab.measurableHierarchyById">
             </waltz-measurable-rating-panel>
         </div>
     </div>
 
     <!-- ALLOCATION SCHEMES -->
     <div class="row"
-         ng-if="tab.allocationSchemes.length > 0">
+         ng-if="$ctrl.activeTab.allocationSchemes.length > 0">
         <br>
         <div class="col-sm-12">
             <span class="waltz-display-field-label">Allocations:</span>
-            <span ng-repeat="scheme in tab.allocationSchemes">
+            <span ng-repeat="scheme in $ctrl.activeTab.allocationSchemes">
                 <a class="clickable"
                    ng-click="$ctrl.onShowAllocationScheme(scheme)">
                     &nbsp;
@@ -209,7 +230,7 @@
                 :
 
                 <span class="small text-muted">
-                    <span ng-bind="$ctrl.allocationTotalsByScheme[scheme.id] || 0"></span> % allocated
+                    <span ng-bind="$ctrl.activeTab.allocationTotalsByScheme[scheme.id] || 0"></span> % allocated
                 </span>
 
                 <span ng-if="!$last">&nbsp;|&nbsp;</span>
@@ -224,11 +245,11 @@
 <script type="text/ng-template"
         id="wmras-tab-popover.html">
     <div class="small">
-        <strong ng-bind="tab.category.name">
+        <strong ng-bind="$ctrl.activeTab.category.name">
         </strong>
         <div>
             <hr>
-            <waltz-markdown text="tab.category.description">
+            <waltz-markdown text="$ctrl.activeTab.category.description">
             </waltz-markdown>
         </div>
     </div>

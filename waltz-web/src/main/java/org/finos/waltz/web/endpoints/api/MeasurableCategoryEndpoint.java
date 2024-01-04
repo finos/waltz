@@ -19,6 +19,7 @@
 package org.finos.waltz.web.endpoints.api;
 
 import org.finos.waltz.model.measurable_category.ImmutableMeasurableCategory;
+import org.finos.waltz.model.measurable_category.MeasurableCategoryView;
 import org.finos.waltz.service.measurable_category.MeasurableCategoryService;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
@@ -52,6 +53,7 @@ public class MeasurableCategoryEndpoint implements Endpoint {
         String findAllPath = mkPath(BASE_URL, "all");
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
         String getCategoriesByDirectOrgUnitPath = mkPath(BASE_URL, "direct", "org-unit", ":id");
+        String findPopulatedCategoriesForRefPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String savePath = mkPath(BASE_URL, "save");
 
         ListRoute<MeasurableCategory> findAllRoute = (request, response)
@@ -59,6 +61,9 @@ public class MeasurableCategoryEndpoint implements Endpoint {
 
         ListRoute<MeasurableCategory> findCategoriesByDirectOrgUnitRoute = (request, response)
                 -> measurableCategoryService.findCategoriesByDirectOrgUnit(WebUtilities.getId(request));
+
+        ListRoute<MeasurableCategoryView> findPopulatedCategoriesForRefRoute = (request, response)
+                -> measurableCategoryService.findPopulatedCategoriesForRef(getEntityReference(request));
 
         DatumRoute<MeasurableCategory> getByIdRoute = (request, response)
                 -> measurableCategoryService.getById(WebUtilities.getId(request));
@@ -77,6 +82,7 @@ public class MeasurableCategoryEndpoint implements Endpoint {
 
         getForList(findAllPath, findAllRoute);
         getForList(getCategoriesByDirectOrgUnitPath, findCategoriesByDirectOrgUnitRoute);
+        getForList(findPopulatedCategoriesForRefPath, findPopulatedCategoriesForRefRoute);
         getForDatum(getByIdPath, getByIdRoute);
         postForDatum(savePath, saveRoute);
     }
