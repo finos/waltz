@@ -15,6 +15,18 @@
     import DescriptionFade from "../../../../common/svelte/DescriptionFade.svelte";
     import DataTypeMiniTable from "./DataTypeMiniTable.svelte";
     import AssessmentsTable from "./widgets/AssessmentsTable.svelte";
+    import {createEventDispatcher} from "svelte";
+    import EntityLabel from "../../../../common/svelte/EntityLabel.svelte";
+    import toastStore from "../../../../svelte-stores/toast-store";
+    import {physicalFlowStore} from "../../../../svelte-stores/physical-flow-store";
+
+    const ActionSectionStates = {
+        LIST: "LIST",
+        REMOVAL_CONFIRMATION: "REMOVAL_CONFIRMATION"
+    };
+
+    const dispatch = createEventDispatcher();
+
 
     function goToPhysicalFlowPage(flow) {
         $pageInfo = {
@@ -25,16 +37,31 @@
         }
     }
 
+    function doRemove(flow) {
+        physicalFlowStore
+            .removeFlow(flow.id)
+            .then(() => {
+                toastStore.info("Physical Flow removed, reloading");
+                dispatch("reload");
+                dispatch("clearSelected");
+            });
+    }
+
     export let flowClassifications = [];
     export let assessmentDefinitions = [];
 
     let enumsCall = enumValueStore.load();
     let permissionsCall = null;
-    let hasEditPermission = false;
+    let hasAddPermission = false;
+    let hasUpdatePermission = false;
+    let hasRemovePermission = false;
+    let actionSectionState = ActionSectionStates.LIST;
 
     $: permissionsCall = logicalFlowStore.findPermissionsForFlow($selectedLogicalFlow?.logicalFlow.id);
     $: permissions = $permissionsCall?.data;
-    $: hasEditPermission = _.some(permissions, d => _.includes(["ADD", "UPDATE", "REMOVE"], d));
+    $: hasAddPermission = _.includes(permissions, "ADD");
+    $: hasUpdatePermission = _.includes(permissions, "UPDATE");
+    $: hasRemovePermission = _.includes(permissions, "REMOVE");
 
     $: nestedEnums = nestEnums($enumsCall.data);
     $: logicalFlow = $selectedPhysicalFlow.logicalFlow;
@@ -141,15 +168,59 @@
 <details>
     <summary>Actions</summary>
     <menu>
-        <li>
-            <button class="btn btn-skinny"
-                    on:click={() => goToPhysicalFlowPage($selectedPhysicalFlow)}>
-                Visit the physical flow page
-            </button>
-            {#if hasEditPermission}
-                <span class="help-block">To remove the flow or edit it's attributes</span>
+        {#if actionSectionState === ActionSectionStates.LIST }
+            {#if hasRemovePermission && ! physicalFlow.isReadOnly}
+                <li>
+                    <button class="btn btn-skinny btn-danger"
+                            on:click={() => actionSectionState = ActionSectionStates.REMOVAL_CONFIRMATION}>
+                        <Icon name="trash"/>
+                        Remove physical flow
+                    </button>
+                    <p class="help-block small">
+                        This will remove the physical flow.
+                        Note: removed flows may be restored via the link in the changelog.
+                    </p>
+                </li>
             {/if}
-        </li>
+            <li>
+                <button class="btn btn-skinny"
+                        on:click={() => goToPhysicalFlowPage($selectedPhysicalFlow)}>
+                    <Icon name="qrcode"/>
+                    Visit the physical flow page
+                </button>
+                {#if hasUpdatePermission}
+                    <span class="help-block small">
+                        To edit the flow attributes
+                    </span>
+                {/if}
+            </li>
+        {/if}
+        {#if actionSectionState === ActionSectionStates.REMOVAL_CONFIRMATION }
+            <div class="removal-box">
+                <h4>Removal Confirmation:</h4>
+                <p>
+                    Are you sure you want to remove this physical flow ?
+                </p>
+                <p>
+                    Flow: <b><EntityLabel {ref}/></b>
+                </p>
+                <p>
+                    <EntityLabel ref={logicalFlow.source}/>
+                    <Icon name="arrow-right"/>
+                    <EntityLabel ref={logicalFlow.target}/>
+                </p>
+
+                <button class="btn btn-skinny"
+                        on:click={() => doRemove(physicalFlow)}>
+                    <Icon name="trash"/>
+                    Remove
+                </button>
+                <button class="btn btn-skinny"
+                        on:click={() => actionSectionState = ActionSectionStates.LIST}>
+                    Cancel
+                </button>
+            </div>
+        {/if}
     </menu>
 </details>
 
@@ -161,5 +232,18 @@
 
     menu li {
         list-style: none;
+    }
+
+
+    .removal-box{
+        border-width: 1px;
+        border-style: solid;
+        border-color: #d93f44;
+        background-color: #fae9ee;
+        padding-left: 2em;
+        padding-right: 2em;
+        padding-bottom: 1.5em;
+        padding-top: 1.5em;
+        border-radius: 2px;
     }
 </style>

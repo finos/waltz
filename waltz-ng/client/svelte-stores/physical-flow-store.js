@@ -46,10 +46,21 @@ export function mkPhysicalFlowStore() {
                 cmd);
     };
 
+
+    const removeFlow = (flowId) => {
+        return remote
+            .execute(
+                "DELETE",
+                `api/physical-flow/${flowId}`,
+                null);
+    };
+
+
     return {
         findBySelector,
         findUnderlyingPhysicalFlows,
-        create
+        create,
+        removeFlow
     };
 }
 

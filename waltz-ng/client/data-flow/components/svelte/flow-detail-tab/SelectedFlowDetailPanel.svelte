@@ -36,12 +36,16 @@
 
             {#if $selectedLogicalFlow}
                 <SelectedLogicalFlowDetail {flowClassifications}
-                                           {assessmentDefinitions}/>
+                                           {assessmentDefinitions}
+                                           on:reload
+                                           on:clearSelected={clearSelected}/>
             {/if}
 
             {#if $selectedPhysicalFlow}
                 <hr>
-                <SelectedPhysicalFlowDetail {assessmentDefinitions}/>
+                <SelectedPhysicalFlowDetail {assessmentDefinitions}
+                                            on:reload
+                                            on:clearSelected={clearSelected}/>
             {/if}
         </div>
     </div>
