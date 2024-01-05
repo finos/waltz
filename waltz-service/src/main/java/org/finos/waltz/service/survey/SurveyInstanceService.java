@@ -31,6 +31,7 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.ReleaseLifecycleStatus;
 import org.finos.waltz.model.attestation.SyncRecipientsResponse;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.person.Person;
@@ -562,7 +563,13 @@ public class SurveyInstanceService {
         SurveyRun run = surveyRunDao.getById(instance.surveyRunId());
         SurveyTemplate template = surveyTemplateDao.getById(run.surveyTemplateId());
 
-        boolean isAdmin = userRoleService.hasAnyRole(userName, SystemRole.SURVEY_ADMIN, SystemRole.ADMIN);
+        boolean isAdmin = userRoleService
+                .hasAnyRole(
+                        userName,
+                        asSet(
+                                SystemRole.SURVEY_ADMIN.name(), // admin across all surveys
+                                SystemRole.ADMIN.name(),
+                                template.issuanceRole())); // admin for this template?
 
         boolean isParticipant = person != null && person.id()
                 .map(pid -> surveyInstanceRecipientDao.isPersonInstanceRecipient(pid, instanceId))
@@ -572,7 +579,7 @@ public class SurveyInstanceService {
                 .map(pid -> surveyInstanceOwnerDao.isPersonInstanceOwner(pid, instanceId) || Objects.equals(run.ownerId(), pid))
                 .orElse(false);
 
-        boolean hasOwningRole = userRoleService.hasAnyRole(userName, asSet(instance.owningRole(), template.issuanceRole()));
+        boolean hasOwningRole = userRoleService.hasRole(userName, instance.owningRole());
 
         boolean isLatest = instance.originalInstanceId() == null;
 
@@ -668,10 +675,15 @@ public class SurveyInstanceService {
         }
     }
 
-
+    /**
+     * Attempts to withdraw all open surveys for this run. e.g. those that are 'NOT_STARTED' or 'IN_PROGRESS'
+     * @param runId the survey run the instances fall under
+     * @param username the user issuing the command
+     * @return the number of surveys withdrawn
+     */
     public Integer withdrawOpenSurveysForRun(long runId, String username) {
-        Set<SurveyInstance> instancesForRun = findForSurveyRun(runId);
-        return instancesForRun
+        return surveyInstanceDao
+                .findForSurveyRun(runId, SurveyInstanceStatus.NOT_STARTED, SurveyInstanceStatus.IN_PROGRESS)
                 .stream()
                 .map(instance -> {
 
@@ -683,6 +695,40 @@ public class SurveyInstanceService {
 
                     try {
                         SurveyInstanceStatus surveyInstanceStatus = updateStatus(Optional.empty(), username, instance.id().get(), cmd);
+                        return 1;
+                    } catch (IllegalArgumentException e) {
+                        LOG.error("Unable to mark survey instance {} as 'WITHDRAWN'. Error: {}", instance.id().get(), e);
+                        return 0;
+                    }
+
+                })
+                .mapToInt(d -> d)
+                .sum();
+    }
+
+    /**
+     * Attempts to withdraw all open surveys for this template. e.g. those that are 'NOT_STARTED' or 'IN_PROGRESS'
+     * @param templateId the template the instances fall under
+     * @param username the user issuing the command
+     * @return the number of surveys withdrawn
+     */
+    public Integer withdrawOpenSurveysForTemplate(long templateId, String username) {
+        SurveyTemplate template = surveyTemplateDao.getById(templateId);
+
+        checkTrue(template.status().equals(ReleaseLifecycleStatus.OBSOLETE), "Instances can only be withdrawn for obsolete templates");
+
+        return  surveyInstanceDao.findForSurveyTemplate(templateId, SurveyInstanceStatus.NOT_STARTED, SurveyInstanceStatus.IN_PROGRESS)
+                .stream()
+                .map(instance -> {
+
+                    ImmutableSurveyInstanceStatusChangeCommand cmd = ImmutableSurveyInstanceStatusChangeCommand
+                            .builder()
+                            .action(SurveyInstanceAction.WITHDRAWING)
+                            .reason("Withdrawing all open surveys for this template")
+                            .build();
+
+                    try {
+                        updateStatus(Optional.empty(), username, instance.id().get(), cmd);
                         return 1;
                     } catch (IllegalArgumentException e) {
                         LOG.error("Unable to mark survey instance {} as 'WITHDRAWN'. Error: {}", instance.id().get(), e);

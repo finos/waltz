@@ -37,6 +37,13 @@
            ui-sref="main.survey.template.edit ({id: ctrl.template.id })">
             Edit
         </a>
+        <button class="btn btn-warning btn-xs"
+                waltz-has-role="SURVEY_ADMIN"
+                ng-disabled="!ctrl.hasOpenSurveys"
+                ng-if="ctrl.template.status === 'OBSOLETE'"
+                ng-click="ctrl.withdrawOpenSurveysForTemplate(ctrl.template)">
+            Withdraw all Open Surveys
+        </button>
         <a class="btn btn-primary btn-xs"
            waltz-has-role="SURVEY_TEMPLATE_ADMIN"
            ng-click="ctrl.cloneTemplate()">

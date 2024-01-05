@@ -189,6 +189,8 @@ function controller($q,
                     })
                     .partition(d => d.surveyRun.status !== "DRAFT")
                     .value();
+
+                vm.hasOpenSurveys = _.some(vm.issuedAndCompleted, d => d.hasOpenSurveys);
             });
     };
 
@@ -278,12 +280,25 @@ function controller($q,
     }
 
     vm.withdrawOpenSurveys = (surveyRun) => {
-        console.log({surveyRun});
         if(confirm(`Are you sure you want withdraw all open surveys for this survey run: ${surveyRun.name}?`)){
             serviceBroker
                 .execute(CORE_API.SurveyInstanceStore.withdrawOpenSurveysForRun, [surveyRun.id])
-                .then(() => {
-                    toasts.warning("Not started and In progress survey runs have been withdrawn");
+                .then(r => {
+                    toasts.warning(`${r.data} 'Not started' and 'In progress' survey runs have been withdrawn`);
+                    loadRuns();
+                })
+                .catch(e => {
+                    displayError("Could not withdraw open survey runs", e);
+                });
+        }
+    }
+
+    vm.withdrawOpenSurveysForTemplate = (surveyTemplate) => {
+        if(confirm(`Are you sure you want withdraw all open surveys for this template: ${surveyTemplate.name}?`)){
+            serviceBroker
+                .execute(CORE_API.SurveyInstanceStore.withdrawOpenSurveysForTemplate, [surveyTemplate.id])
+                .then(r => {
+                    toasts.warning(`${r.data} 'Not started' and 'In progress' survey runs have been withdrawn`);
                     loadRuns();
                 })
                 .catch(e => {

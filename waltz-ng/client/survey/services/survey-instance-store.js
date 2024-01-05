@@ -156,6 +156,13 @@ function store($http, baseApiUrl) {
     };
 
 
+    const withdrawOpenSurveysForTemplate = (surveyTemplateId) => {
+        return $http
+            .post(`${base}/template/${surveyTemplateId}/withdraw-open`)
+            .then(result => result.data);
+    };
+
+
     return {
         getById,
         getPermissions,
@@ -178,7 +185,8 @@ function store($http, baseApiUrl) {
         deleteOwner,
         markApproved,
         reportProblemWithQuestionResponse,
-        withdrawOpenSurveysForRun
+        withdrawOpenSurveysForRun,
+        withdrawOpenSurveysForTemplate
     };
 }
 
@@ -307,6 +315,11 @@ export const SurveyInstanceStore_API = {
         serviceName,
         serviceFnName: "withdrawOpenSurveysForRun",
         description: "withdraws all open (in progress / not started) survey instances in a run"
+    },
+    withdrawOpenSurveysForTemplate: {
+        serviceName,
+        serviceFnName: "withdrawOpenSurveysForTemplate",
+        description: "withdraws all open (in progress / not started) survey instances for this template"
     }
 };
 
