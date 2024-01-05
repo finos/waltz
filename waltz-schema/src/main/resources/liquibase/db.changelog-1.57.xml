@@ -60,4 +60,13 @@
         </addColumn>
     </changeSet>
 
+
+    <changeSet id="20240105-6927-1"
+               author="davidwatkins74">
+        <comment>6927: Software_Version table: increase the version column size</comment>
+        <modifyDataType columnName="version"
+                        newDataType="VARCHAR(200)"
+                        tableName="software_version" />
+    </changeSet>
+
 </databaseChangeLog>
