@@ -31,7 +31,6 @@ import org.finos.waltz.model.report_grid.ReportGridInstance;
 import org.finos.waltz.model.report_grid.ReportSubject;
 import org.finos.waltz.service.report_grid.ReportGridService;
 import org.finos.waltz.service.settings.SettingsService;
-import org.finos.waltz.service.survey.SurveyQuestionService;
 import org.finos.waltz.web.WebException;
 import org.finos.waltz.web.endpoints.extracts.reportgrid.DynamicCommaSeperatedValueFormatter;
 import org.finos.waltz.web.endpoints.extracts.reportgrid.DynamicExcelFormatter;
@@ -76,8 +75,8 @@ import static org.finos.waltz.service.report_grid.ReportGridColumnCalculator.cal
 import static org.finos.waltz.web.WebUtilities.mkPath;
 import static org.finos.waltz.web.WebUtilities.readIdSelectionOptionsFromBody;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.getForDatum;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.postForDatum;
 import static org.jooq.lambda.tuple.Tuple.tuple;
-import static spark.Spark.post;
 
 @Service
 public class ReportGridExtractor implements SupportsJsonExtraction {
@@ -88,7 +87,6 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
     private final DynamicExcelFormatter dynamicExcelFormatter;
     private final DynamicJSONFormatter dynamicJSONFormatter;
     private final ReportGridService reportGridService;
-    private final SurveyQuestionService surveyQuestionService;
     private final SettingsService settingsService;
 
 
@@ -97,14 +95,12 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
                                DynamicExcelFormatter dynamicExcelFormatter,
                                DynamicJSONFormatter dynamicJSONFormatter,
                                ReportGridService reportGridService,
-                               SurveyQuestionService surveyQuestionService,
                                SettingsService settingsService) {
 
         this.dynamicCommaSeperatedValueFormatter = dynamicCommaSeperatedValueFormatter;
         this.dynamicExcelFormatter = dynamicExcelFormatter;
         this.dynamicJSONFormatter = dynamicJSONFormatter;
         this.reportGridService = reportGridService;
-        this.surveyQuestionService = surveyQuestionService;
         this.settingsService = settingsService;
     }
 
@@ -112,7 +108,7 @@ public class ReportGridExtractor implements SupportsJsonExtraction {
     @Override
     public void register() {
         getForDatum(mkPath(BASE_URL, "external-id", ":externalId", "definition"), this::handleReportGridDefinitionByExternalId);
-        post(mkPath(BASE_URL, "external-id", ":externalId"), this::handleReportGridByExternalId);
+        postForDatum(mkPath(BASE_URL, "external-id", ":externalId"), this::handleReportGridByExternalId);
     }
 
 

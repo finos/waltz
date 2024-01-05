@@ -8,6 +8,7 @@
     import Tooltip from "../../../../common/svelte/Tooltip.svelte";
     import DataTypeTooltipContent from "./DataTypeMiniTable.svelte";
     import NoData from "../../../../common/svelte/NoData.svelte";
+    import Icon from "../../../../common/svelte/Icon.svelte";
 
     export let logicalFlows = [];
     export let flowClassifications = [];
@@ -73,6 +74,17 @@
         };
     }
 
+    function flowCountToIcon(flowCount) {
+        switch (flowCount) {
+            case 0:
+                return "";
+            case 1:
+                return "file-o";
+            default:
+                return "folder-o";
+        }
+    }
+
     $: visibleFlows = _.filter(logicalFlows, d => d.visible);
 
     $: flowList = _.isEmpty(qry)
@@ -81,15 +93,18 @@
             visibleFlows,
             qry,
             [
-                "logicalFlow.source.name",
-                "logicalFlow.source.externalId",
-                "logicalFlow.target.name",
-                "logicalFlow.target.externalId"
+                (f) => _.get(f.logicalFlow.source, ["name"], ""),
+                (f) => _.get(f.logicalFlow.source, ["externalId"], ""),
+                (f) => _.get(f.logicalFlow.target, ["name"], ""),
+                (f) => _.get(f.logicalFlow.target, ["externalId"], ""),
+                (f) => _.chain(f.logicalFlowRatingsByDefId).values().flatten().map(d => d.name).join(" ").value(),
+                (f) => _.chain(f.dataTypesForLogicalFlow).map(d => _.get(d, ["decoratorEntity", "name"])).join(" ").value()
             ]);
 
     $: defs = _.filter(
         assessmentDefinitions,
         d => d.entityKind === 'LOGICAL_DATA_FLOW');
+
 </script>
 
 <h4>
@@ -114,6 +129,7 @@
            style="margin-top: 1em">
         <thead>
         <tr>
+            <th nowrap="nowrap" style="width: 2em"></th>
             <th nowrap="nowrap" style="width: 20em">Source</th>
             <th nowrap="nowrap" style="width: 20em">Src Ext ID</th>
             <th nowrap="nowrap" style="width: 20em">Target</th>
@@ -129,6 +145,19 @@
             <tr class="clickable"
                 class:selected={isSameFlow($selectedLogicalFlow, flow)}
                 on:click={() => selectLogicalFlow(flow)}>
+                <td>
+                    <span style="color: grey"
+                          title={`Associated physical flows: ${flow.physicalCount}`}>
+                        <Icon fixedWidth={true}
+                              name={flowCountToIcon(flow.physicalCount)}/>
+                    </span>
+                    {#if flow.logicalFlow.isReadOnly}
+                        <span style="color: grey"
+                              title={`Flow has been marked as readonly (provenance: ${flow.logicalFlow.provenance}, last updated by: ${flow.logicalFlow.lastUpdatedBy})`}>
+                            <Icon name="lock"/>
+                        </span>
+                    {/if}
+                </td>
                 <td>
                     {flow.logicalFlow.source.name}
                 </td>
