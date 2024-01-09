@@ -8,7 +8,7 @@
     export let format = null;
     export let name = "Export";
     export let method = "GET";
-    export let styling = "button";
+    export let styling = "button";  // button || link
     export let filename = "extract";
     export let requestBody = null;
     export let extractUrl;

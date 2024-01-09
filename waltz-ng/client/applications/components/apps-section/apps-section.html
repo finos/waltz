@@ -36,29 +36,9 @@
                                entities="['APPLICATION', 'END_USER_APPLICATION']">
     </waltz-source-data-overlay>
 
-    <uib-tabset ng-if="$ctrl.combinedCount > 0">
-        <uib-tab heading="Summary"
-                 select="$ctrl.onTabSelect('SUMMARY')">
-            <waltz-app-summary apps="$ctrl.apps"
-                               end-user-apps="$ctrl.endUserApps">
-            </waltz-app-summary>
-        </uib-tab>
+    <waltz-svelte-component component="$ctrl.AppsViewGrid"
+                            selector-options="$ctrl.selectorOptions">
+    </waltz-svelte-component>
 
-        <uib-tab select="$ctrl.onTabSelect('DETAIL')"
-                 heading="Applications">
-            <br>
-            <div ng-if="$ctrl.visibility.tab == 'DETAIL'">
-                <waltz-app-table applications="$ctrl.combinedApps">
-                </waltz-app-table>
-            </div>
-        </uib-tab>
-    </uib-tabset>
-
-    <waltz-no-data ng-if="$ctrl.combinedCount == 0">
-        <message>
-            There are <strong>no application </strong>
-            associations.
-        </message>
-    </waltz-no-data>
 </div>
 

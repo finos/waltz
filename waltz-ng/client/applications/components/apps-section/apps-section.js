@@ -16,14 +16,11 @@
  *
  */
 
-import _ from "lodash";
 import {initialiseData} from "../../../common";
-import {mkSelectionOptions} from "../../../common/selector-utils";
-import {CORE_API} from "../../../common/services/core-api-utils";
-import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
-
 import template from "./apps-section.html";
-
+import AppsViewGrid from "../apps-view-grid/AppsViewGrid.svelte";
+import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
+import {mkSelectionOptions} from "../../../common/selector-utils";
 
 const bindings = {
     parentEntityRef: "<",
@@ -32,83 +29,28 @@ const bindings = {
 
 
 const initialState = {
-    apps: [],
-    endUserApps: [],
-    combinedCount: 0,
+    AppsViewGrid,
     visibility:{
         tab: "SUMMARY"
     }
 };
 
 
-const DEFAULT_APP_SETTINGS = {
-    management: "End User",
-    kind: "EUC",
-    overallRating: "Z"
-};
 
-
-function combine(apps = [], endUserApps = []) {
-    return _.concat(apps, endUserApps);
-}
-
-
-function controller(serviceBroker) {
+function controller() {
     const vm = initialiseData(this, initialState);
 
-    const refresh = () => {
-        vm.combinedCount = _.size(vm.apps) + _.size(vm.endUserApps);
-    };
-
-    const loadAll = () => {
-        vm.selectorOptions = mkSelectionOptions(
-            vm.parentEntityRef,
-            undefined,
-            [entityLifecycleStatus.ACTIVE.key],
-            vm.filters);
-
-        serviceBroker
-            .loadViewData(CORE_API.ApplicationStore.findBySelector, [vm.selectorOptions])
-            .then(r => r.data)
-            .then(apps => vm.apps = _.map(
-                apps,
-                a => Object.assign({}, a, {management: "IT"})))
-            .then(refresh);
-
-        if (vm.parentEntityRef.kind === "ORG_UNIT") {
-            serviceBroker
-                .loadViewData(CORE_API.EndUserAppStore.findBySelector, [vm.selectorOptions])
-                .then(r => r.data)
-                .then(endUserApps => vm.endUserApps = _.map(
-                    endUserApps,
-                    a => Object.assign({}, a, DEFAULT_APP_SETTINGS, { platform: a.applicationKind })))
-                .then(refresh);
-        }
-    };
-
-
-    vm.$onInit = () => {
-        loadAll();
-    };
-
     vm.$onChanges = (changes) => {
-        if(changes.filters) {
-            loadAll();
+        if(changes.filters || changes.parentEntityRef) {
+            vm.selectorOptions = mkSelectionOptions(
+                vm.parentEntityRef,
+                undefined,
+                [entityLifecycleStatus.ACTIVE.key],
+                vm.filters);
         }
     };
 
-    vm.onTabSelect = (tabName) => {
-        vm.visibility.tab = tabName;
-        if (tabName === "DETAIL") {
-            vm.combinedApps = combine(vm.apps, vm.endUserApps);
-        }
-    };
 }
-
-
-controller.$inject = [
-    "ServiceBroker"
-];
 
 
 const component = {

@@ -20,6 +20,7 @@ package org.finos.waltz.data.measurable_rating;
 
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.exception.NotFoundException;
+import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.data.JooqUtilities;
 import org.finos.waltz.data.SelectorUtilities;
@@ -49,7 +50,6 @@ import org.jooq.Record;
 import org.jooq.Record1;
 import org.jooq.Record2;
 import org.jooq.Record3;
-import org.jooq.Record4;
 import org.jooq.Record9;
 import org.jooq.RecordMapper;
 import org.jooq.Select;
@@ -81,7 +81,12 @@ import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.common.SetUtilities.union;
 import static org.finos.waltz.common.StringUtilities.firstChar;
 import static org.finos.waltz.common.StringUtilities.notEmpty;
-import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.Tables.ALLOCATION;
+import static org.finos.waltz.schema.Tables.CHANGE_LOG;
+import static org.finos.waltz.schema.Tables.ENTITY_HIERARCHY;
+import static org.finos.waltz.schema.Tables.MEASURABLE_CATEGORY;
+import static org.finos.waltz.schema.Tables.MEASURABLE_RATING_PLANNED_DECOMMISSION;
+import static org.finos.waltz.schema.Tables.USER_ROLE;
 import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
 import static org.finos.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
@@ -791,4 +796,11 @@ public class MeasurableRatingDao {
     }
 
 
+    public Set<MeasurableRating> findPrimaryRatingsForGenericSelector(GenericSelector selector) {
+        return mkBaseQuery()
+                .where(MEASURABLE_RATING.ENTITY_KIND.eq(selector.kind().name())
+                        .and(MEASURABLE_RATING.ENTITY_ID.in(selector.selector()))
+                        .and(MEASURABLE_RATING.IS_PRIMARY.isTrue()))
+                .fetchSet(TO_DOMAIN_MAPPER);
+    }
 }
