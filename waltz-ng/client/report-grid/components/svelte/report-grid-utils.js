@@ -748,7 +748,11 @@ export function mkReportGridFixedColumnRef(d, nameProvider = "name") {
  * @param qualifierEntity - a qualifier if the column entity is ambiguous e.g. for measurables specify the category
  * @returns {{entityFieldReference, columnEntityKind, kind: string, displayName: null, columnEntityId: null, columnName}}
  */
-export function mkReportGridEntityFieldReferenceColumnRef(fieldRef, entity, qualifierEntity, displayName = null) {
+export function mkReportGridEntityFieldReferenceColumnRef(fieldRef,
+                                                          entity,
+                                                          qualifierEntity,
+                                                          displayName = null,
+                                                          additionalColumnOptions = additionalColumnOptions.NONE) {
     return Object.assign(
         {},
         {
@@ -759,7 +763,8 @@ export function mkReportGridEntityFieldReferenceColumnRef(fieldRef, entity, qual
             columnName: entity.name,
             columnQualifierKind: qualifierEntity ? qualifierEntity.kind : null,
             columnQualifierId: qualifierEntity ? qualifierEntity.id : null,
-            displayName: displayName
+            displayName: displayName,
+            additionalColumnOptions: additionalColumnOptions
         });
 }
 
@@ -780,7 +785,7 @@ export function mkMeasurableColumn(selectedCategory, measurable) {
 }
 
 
-export function mkPrimaryMeasurableFieldColumn(selectedCategory) {
+export function mkPrimaryMeasurableFieldColumn(fieldReference, selectedCategory) {
     return Object.assign(
         {},
         {
@@ -788,7 +793,7 @@ export function mkPrimaryMeasurableFieldColumn(selectedCategory) {
             columnEntityId: "MEASURABLE",
             columnEntityKind: null,
             additionalColumnOptions: additionalColumnOptions.PRIMARY.key,
-            entityFieldReference: null,
+            entityFieldReference: fieldReference,
             columnQualifierKind: "MEASURABLE_CATEGORY",
             columnQualifierId: selectedCategory.id,
             columnName: `${selectedCategory.name}/Primary Rating`,

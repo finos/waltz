@@ -3,7 +3,7 @@
     import {buildHierarchies} from "../../../../common/hierarchy-utils";
     import {measurableCategoryStore} from "../../../../svelte-stores/measurable-category-store";
     import {mkSelectionOptions} from "../../../../common/selector-utils";
-    import {mkReportGridEntityFieldReferenceColumnRef} from "../report-grid-utils";
+    import {additionalColumnOptions, mkReportGridEntityFieldReferenceColumnRef} from "../report-grid-utils";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import MeasurableTreeSelector from "../../../../common/svelte/MeasurableTreeSelector.svelte";
     import Grid from "../../../../common/svelte/Grid.svelte";
@@ -71,7 +71,7 @@
     $: rowData = _
         .chain(entityFieldReferences)
         .filter(d => d.entityKind === "MEASURABLE")
-        .map(d => mkReportGridEntityFieldReferenceColumnRef(d, entity.MEASURABLE, selectedCategory, `Primary Rating ${d.displayName}`))
+        .map(d => mkReportGridEntityFieldReferenceColumnRef(d, entity.MEASURABLE, selectedCategory, `Primary Rating ${d.displayName}`, additionalColumnOptions.PRIMARY))
         .filter(selectionFilter)
         .orderBy(d => d.entityFieldReference.displayName)
         .value();

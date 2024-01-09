@@ -862,11 +862,6 @@ public class ReportGridDao {
                     colsByKind.getOrDefault(EntityKind.DATA_TYPE, emptySet()),
                     d -> d.additionalColumnOptions() == AdditionalColumnOptions.NONE);
 
-            Map<AdditionalColumnOptions, Collection<ReportGridFixedColumnDefinition>> surveyQuestionColsBySurveyStatusOptions = groupBy(
-                    colsByKind.getOrDefault(EntityKind.SURVEY_QUESTION, emptySet()),
-                    d -> d.additionalColumnOptions());
-
-
             // FIELD REF COL DEFS
 
             Map<Long, EntityFieldReference> fieldReferencesById = dsl
