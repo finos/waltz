@@ -894,6 +894,7 @@ public class ReportGridDao {
                             measurableColumnsByRollupKind.getOrDefault(AdditionalColumnOptions.PICK_HIGHEST, emptySet()),
                             measurableColumnsByRollupKind.getOrDefault(AdditionalColumnOptions.PICK_LOWEST, emptySet())),
                     fetchExactMeasurableData(genericSelector, measurableColumnsByRollupKind.get(AdditionalColumnOptions.NONE)),
+                    fetchPrimaryMeasurableData(genericSelector, measurableColumnsByRollupKind.get(AdditionalColumnOptions.PRIMARY)),
                     fetchSurveyQuestionResponseData(genericSelector, colsByKind.get(EntityKind.SURVEY_QUESTION)),
                     fetchSurveyTemplateResponseData(genericSelector, colsByKind.get(EntityKind.SURVEY_TEMPLATE)),
                     fetchAppGroupData(genericSelector, colsByKind.get(EntityKind.APP_GROUP)),
@@ -2132,6 +2133,45 @@ public class ReportGridDao {
                     .where(mr.MEASURABLE_ID.in(measurableIdToDefIdMap.keySet()))
                     .and(mr.ENTITY_ID.in(selector.selector()))
                     .and(mr.ENTITY_KIND.eq(selector.kind().name()));
+
+            return dsl
+                    .resultQuery(dsl.renderInlined(qry))
+                    .fetchSet(r -> ImmutableReportGridCell.builder()
+                            .subjectId(r.get(mr.ENTITY_ID))
+                            .columnDefinitionId(measurableIdToDefIdMap.get(r.get(mr.MEASURABLE_ID)))
+                            .ratingIdValues(asSet(r.get(rsi.ID)))
+                            .textValue(r.get(rsi.NAME))
+                            .comment(r.get(mr.DESCRIPTION))
+                            .options(asSet(mkCellOption(Long.toString(r.get(rsi.ID)), r.get(rsi.NAME))))
+                        .build());
+        }
+    }
+
+    private Set<ReportGridCell> fetchPrimaryMeasurableData(GenericSelector selector,
+                                                           Collection<ReportGridFixedColumnDefinition> cols) {
+
+        if (isEmpty(cols)) {
+            return emptySet();
+        } else {
+            Map<Long, Long> measurableIdToDefIdMap = indexBy(
+                    cols,
+                    ReportGridFixedColumnDefinition::columnEntityId,
+                    ReportGridFixedColumnDefinition::gridColumnId);
+
+            SelectConditionStep<Record5<Long, Long, Long, String, String>> qry = dsl
+                    .select(mr.ENTITY_ID,
+                            mr.MEASURABLE_ID,
+                            rsi.ID,
+                            rsi.NAME,
+                            mr.DESCRIPTION)
+                    .from(mr)
+                    .innerJoin(m).on(m.ID.eq(mr.MEASURABLE_ID))
+                    .innerJoin(mc).on(mc.ID.eq(m.MEASURABLE_CATEGORY_ID))
+                    .innerJoin(rsi).on(rsi.CODE.eq(mr.RATING)).and(rsi.SCHEME_ID.eq(mc.RATING_SCHEME_ID))
+                    .where(mr.MEASURABLE_ID.in(measurableIdToDefIdMap.keySet()))
+                    .and(mr.ENTITY_ID.in(selector.selector()))
+                    .and(mr.ENTITY_KIND.eq(selector.kind().name()))
+                    .and(mr.IS_PRIMARY.isTrue());
 
             return dsl
                     .resultQuery(dsl.renderInlined(qry))
