@@ -17,7 +17,8 @@ public enum AdditionalColumnOptions {
     PICK_LOWEST(asSet(EntityKind.MEASURABLE)),
     ROLLUP(asSet(EntityKind.DATA_TYPE)),
     COMPLETED_AND_APPROVED_ONLY(asSet(EntityKind.SURVEY_INSTANCE, EntityKind.SURVEY_QUESTION)),
-    EXCLUDE_WITHDRAWN(asSet(EntityKind.SURVEY_INSTANCE, EntityKind.SURVEY_QUESTION));
+    EXCLUDE_WITHDRAWN(asSet(EntityKind.SURVEY_INSTANCE, EntityKind.SURVEY_QUESTION)),
+    PRIMARY(asSet(EntityKind.MEASURABLE_CATEGORY));
 
     private final Set<EntityKind> allowedKinds;
 

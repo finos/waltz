@@ -5,7 +5,6 @@ import {amberBg, blueBg, determineForegroundColor, greenBg, greyBg, pinkBg} from
 import {scaleLinear} from "d3-scale";
 import {extent} from "d3-array";
 import {subtractYears} from "../../../common/date-utils";
-import {markdownToHtml} from "../../../common/markdown-utils";
 
 
 export const reportGridMember = {
@@ -60,6 +59,10 @@ export const additionalColumnOptions = {
     EXCLUDE_WITHDRAWN: {
         key: "EXCLUDE_WITHDRAWN",
         name: "Exclude Withdrawn",
+    },
+    PRIMARY: {
+        key: "PRIMARY",
+        name: "Primary",
     }
 }
 
@@ -742,9 +745,10 @@ export function mkReportGridFixedColumnRef(d, nameProvider = "name") {
  *
  * @param fieldRef
  * @param entity - taken from entity.js
+ * @param qualifierEntity - a qualifier if the column entity is ambiguous e.g. for measurables specify the category
  * @returns {{entityFieldReference, columnEntityKind, kind: string, displayName: null, columnEntityId: null, columnName}}
  */
-export function mkReportGridEntityFieldReferenceColumnRef(fieldRef, entity) {
+export function mkReportGridEntityFieldReferenceColumnRef(fieldRef, entity, qualifierEntity, displayName = null) {
     return Object.assign(
         {},
         {
@@ -753,7 +757,9 @@ export function mkReportGridEntityFieldReferenceColumnRef(fieldRef, entity) {
             columnEntityKind: entity.key,
             entityFieldReference: fieldRef,
             columnName: entity.name,
-            displayName: null
+            columnQualifierKind: qualifierEntity ? qualifierEntity.kind : null,
+            columnQualifierId: qualifierEntity ? qualifierEntity.id : null,
+            displayName: displayName
         });
 }
 
@@ -769,6 +775,40 @@ export function mkMeasurableColumn(selectedCategory, measurable) {
             columnQualifierKind: "MEASURABLE",
             columnQualifierId: measurable.id,
             columnName: `${selectedCategory.name}/${measurable.name}`,
+            displayName: null
+        });
+}
+
+
+export function mkPrimaryMeasurableFieldColumn(selectedCategory) {
+    return Object.assign(
+        {},
+        {
+            kind: "REPORT_GRID_FIXED_COLUMN_DEFINITION",
+            columnEntityId: "MEASURABLE",
+            columnEntityKind: null,
+            additionalColumnOptions: additionalColumnOptions.PRIMARY.key,
+            entityFieldReference: null,
+            columnQualifierKind: "MEASURABLE_CATEGORY",
+            columnQualifierId: selectedCategory.id,
+            columnName: `${selectedCategory.name}/Primary Rating`,
+            displayName: null
+        });
+}
+
+
+export function mkMeasurableCategoryColumn(selectedCategory) {
+    return Object.assign(
+        {},
+        {
+            kind: "REPORT_GRID_FIXED_COLUMN_DEFINITION",
+            columnEntityId: selectedCategory.id,
+            columnEntityKind: "MEASURABLE_CATEGORY",
+            additionalColumnOptions: additionalColumnOptions.NONE.key,
+            entityFieldReference: null,
+            columnQualifierKind: null,
+            columnQualifierId: null,
+            columnName: `${selectedCategory.name}`,
             displayName: null
         });
 }

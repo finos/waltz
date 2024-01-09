@@ -9,7 +9,6 @@
     import {tabs} from "./report-grid-ui-service";
 
     export let onGridSelect = () => console.log("selecting grid");
-    export let onSave = () => console.log("Saved report grid");
     export let primaryEntityRef;
 
     const {gridDefinition, userRole} = gridService;
@@ -88,8 +87,7 @@
             <ReportGridFilters {primaryEntityRef}/>
         {:else if selectedTab === 'columns'}
             <ColumnDefinitionEditPanel gridId={$gridDefinition?.id}
-                                       columnDefs={$gridDefinition?.columnDefinitions}
-                                       onSave={onSave}/>
+                                       columnDefs={$gridDefinition?.columnDefinitions}/>
         {:else if selectedTab === 'people'}
             <ReportGridPersonEditPanel/>
         {/if}

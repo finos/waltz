@@ -91,7 +91,7 @@ function addFixedColumn(d) {
 
     const extras = {
         kind: "REPORT_GRID_FIXED_COLUMN_DEFINITION",
-        additionalColumnOptions: determineDefaultColumnOptions(columnEntityKind).key
+        additionalColumnOptions: d.additionalColumnOptions || determineDefaultColumnOptions(columnEntityKind).key
     };
 
     const column = Object.assign({}, d, extras);
