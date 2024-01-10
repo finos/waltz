@@ -18,16 +18,21 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.ImmutableEntityReference;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.Severity;
+import org.finos.waltz.model.application.ApplicationsView;
 import org.finos.waltz.service.application.ApplicationService;
+import org.finos.waltz.service.application.ApplicationViewService;
 import org.finos.waltz.service.changelog.ChangeLogService;
-import org.finos.waltz.service.tag.TagService;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.WebUtilities;
 import org.finos.waltz.web.action.AppChangeAction;
 import org.finos.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.common.ListUtilities;
-import org.finos.waltz.model.*;
 import org.finos.waltz.model.application.AppRegistrationRequest;
 import org.finos.waltz.model.application.AppRegistrationResponse;
 import org.finos.waltz.model.application.Application;
@@ -44,10 +49,18 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static org.finos.waltz.web.WebUtilities.*;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 import static java.lang.Long.parseLong;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.web.WebUtilities.getId;
+import static org.finos.waltz.web.WebUtilities.getUsername;
+import static org.finos.waltz.web.WebUtilities.mkPath;
+import static org.finos.waltz.web.WebUtilities.readBody;
+import static org.finos.waltz.web.WebUtilities.readIdSelectionOptionsFromBody;
+import static org.finos.waltz.web.WebUtilities.readIdsFromBody;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.getForDatum;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.getForList;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.postForDatum;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.postForList;
 
 
 @Service
@@ -59,16 +72,17 @@ public class ApplicationEndpoint implements Endpoint {
     private static final String BASE_URL = mkPath("api", "app");
 
     private final ApplicationService appService;
+    private final ApplicationViewService appViewService;
     private final ChangeLogService changeLogService;
 
 
     @Autowired
     public ApplicationEndpoint(ApplicationService appService,
                                ChangeLogService changeLogService,
-                               TagService tagService) {
+                               ApplicationViewService appViewService) {
+        this.appViewService = appViewService;
         checkNotNull(appService, "appService must not be null");
         checkNotNull(changeLogService, "changeLogService must not be null");
-        checkNotNull(tagService, "appTagService cannot be null");
 
         this.appService = appService;
         this.changeLogService = changeLogService;
@@ -181,6 +195,8 @@ public class ApplicationEndpoint implements Endpoint {
         ListRoute<Application> findByAssetCodeRoute = (request, response)
                 -> appService.findByAssetCode(ExternalIdValue.of(request.splat()[0]));
 
+        DatumRoute<ApplicationsView> getViewBySelectorRoute = (request, response)
+                -> appViewService.getViewBySelector(readIdSelectionOptionsFromBody(request));
 
         getForList(mkPath(BASE_URL, "search", ":query"), searchRoute);
         getForList(mkPath(BASE_URL, "count-by", "org-unit"), tallyByOrgUnitRoute);
@@ -192,6 +208,8 @@ public class ApplicationEndpoint implements Endpoint {
         postForList(mkPath(BASE_URL, "selector"), findBySelectorRoute);
         getForList(mkPath(BASE_URL, "asset-code", "*"), findByAssetCodeRoute);
         getForList(mkPath(BASE_URL, "external-id", "*"), findByAssetCodeRoute);
+        postForDatum(mkPath(BASE_URL, "view", "selector"), getViewBySelectorRoute);
+
     }
 
 }

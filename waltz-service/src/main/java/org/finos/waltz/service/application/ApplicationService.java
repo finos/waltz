@@ -18,7 +18,6 @@
 
 package org.finos.waltz.service.application;
 
-import org.finos.waltz.service.tag.TagService;
 import org.finos.waltz.data.application.ApplicationDao;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.data.application.search.ApplicationSearchDao;
@@ -34,6 +33,7 @@ import org.finos.waltz.model.application.AssetCodeRelationshipKind;
 import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.finos.waltz.model.external_identifier.ExternalIdValue;
 import org.finos.waltz.model.tally.Tally;
+import org.finos.waltz.service.tag.TagService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;

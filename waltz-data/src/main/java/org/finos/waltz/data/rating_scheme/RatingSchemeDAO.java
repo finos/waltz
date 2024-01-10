@@ -208,6 +208,14 @@ public class RatingSchemeDAO {
     }
 
 
+    public Set<RatingSchemeItem> findRatingSchemeItemsForSchemeIds(Set<Long> schemeIds) {
+        return dsl
+                .selectFrom(RATING_SCHEME_ITEM)
+                .where(RATING_SCHEME_ITEM.SCHEME_ID.in(schemeIds))
+                .fetchSet(TO_ITEM_MAPPER);
+    }
+
+
     public Boolean save(RatingScheme scheme) {
         RatingSchemeRecord r = dsl.newRecord(RATING_SCHEME);
         r.setName(scheme.name());
@@ -323,6 +331,5 @@ public class RatingSchemeDAO {
                         .count(res.get(3, Integer.class))
                         .build());
     }
-
 
 }
