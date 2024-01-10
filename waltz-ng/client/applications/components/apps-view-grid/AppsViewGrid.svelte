@@ -13,7 +13,8 @@
 
     const options = {
         enableCellNavigation: false,
-        enableColumnReorder: false
+        enableColumnReorder: false,
+        frozenColumn: 1
     };
 
     function initGrid(elem) {
@@ -30,7 +31,6 @@
     let viewData = [];
     let orgUnitsById = {};
     let columns = baseColumns;
-    let wibble = 0;
 
     let appViewCall = null;
     let orgUnitCall = orgUnitStore.loadAll();
@@ -40,7 +40,7 @@
     let searchStr = "";
 
     onMount(() => {
-        wibble++;
+        viewData = [];
         appViewCall = applicationStore.getViewBySelector(selectorOptions)
     });
 
@@ -70,12 +70,11 @@
 {#if !_.isEmpty(viewData)}
     <SearchInput bind:value={searchStr}/>
 
-    {#key wibble}
-        <div class="slick-container"
-             style="width:100%;height:500px;"
-             bind:this={elem}>
-        </div>
-    {/key}
+    <div class="slick-container"
+         style="width:100%;height:500px;"
+         bind:this={elem}>
+    </div>
+
     <div class="small help-block">
         Showing {viewData.length} applications
     </div>

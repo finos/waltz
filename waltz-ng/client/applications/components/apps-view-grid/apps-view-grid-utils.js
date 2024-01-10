@@ -17,10 +17,18 @@ export const baseColumns = [
         width: 180,
         formatter: mkEntityLinkFormatter(null, false),
         sortFn: (a, b) => cmp(a?.application.name, b?.application.name)
-    },
-    {id: "assetCode", name: "Asset Code", field: "application_assetCode", sortable:  true},
-    {id: "kind", name: "Kind", field: "application_applicationKind", sortable:  true, formatter: mkApplicationKindFormatter()},
-    {
+    }, {
+        id: "assetCode",
+        name: "Asset Code",
+        field: "application_assetCode",
+        sortable:  true
+    }, {
+        id: "kind",
+        name: "Kind",
+        field: "application_applicationKind",
+        sortable:  true,
+        formatter: mkApplicationKindFormatter()
+    }, {
         id: "orgUnit",
         name: "Org Unit",
         field: "organisationalUnit",
@@ -28,8 +36,14 @@ export const baseColumns = [
         width: 180,
         formatter: mkEntityLinkFormatter(null, false),
         sortFn: (a, b) => cmp(a?.organisationalUnit.name, b?.organisationalUnit.name)
-    },
-    {id: "lifecyclePhase", name: "Lifecycle Phase", field: "application_lifecyclePhase", width: 90, sortable:  true, formatter: mkLifecyclePhaseFormatter() }
+    }, {
+        id: "lifecyclePhase",
+        name: "Lifecycle Phase",
+        field: "application_lifecyclePhase",
+        width: 90,
+        sortable:  true,
+        formatter: mkLifecyclePhaseFormatter()
+    }
 ];
 
 

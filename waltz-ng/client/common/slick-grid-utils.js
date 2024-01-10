@@ -66,7 +66,6 @@ function mkRatingSchemeItemFormatter(labelProvider = v => v?.ratingSchemeItem.na
 }
 
 
-
 function mkRatingSchemeItemsFormatter(labelProvider = v => v?.ratingSchemeItem.name) {
     return (row, cell, values) => {
         return _
@@ -88,7 +87,7 @@ function mkRatingSchemeItemsFormatter(labelProvider = v => v?.ratingSchemeItem.n
 }
 
 
-export function mkAssessmentAndCategoryColumns(assessmentDefs, categories) {
+export function mkAssessmentAndCategoryColumns(assessmentDefs = [], categories = []) {
     const assessmentCols = _
         .chain(assessmentDefs)
         .sortBy(d => d.name)
@@ -100,6 +99,7 @@ export function mkAssessmentAndCategoryColumns(assessmentDefs, categories) {
                 field,
                 sortable: true,
                 formatter: mkRatingSchemeItemsFormatter(),
+                width: 130,
                 sortFn: (a, b) => cmp(
                     _.get(a, [field, 0, "ratingSchemeItem", "name"], ""),
                     _.get(b, [field, 0, "ratingSchemeItem", "name"], ""))
