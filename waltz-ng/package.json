@@ -65,6 +65,7 @@
         "patch-package": "6.4.7",
         "satellizer": "0.15.5",
         "showdown": "^2.1.0",
+        "slickgrid": "^5.7.0",
         "svelte-flatpickr": "3.2.6",
         "tippy.js": "^6.3.7",
         "ui-select": "0.19.8",

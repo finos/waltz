@@ -580,4 +580,16 @@ public class AssessmentRatingDao {
                 .fetch()
                 .isNotEmpty();
     }
+
+
+    public Set<AssessmentRating> findBySelectorForDefinitions(GenericSelector genericSelector,
+                                                              Set<Long> defIds) {
+        return dsl
+                .select(ar.fields())
+                .from(ar)
+                .where(ar.ENTITY_KIND.eq(genericSelector.kind().name())
+                        .and(ar.ENTITY_ID.in(genericSelector.selector()))
+                        .and(ar.ASSESSMENT_DEFINITION_ID.in(defIds)))
+                .fetchSet(TO_DOMAIN_MAPPER);
+    }
 }
