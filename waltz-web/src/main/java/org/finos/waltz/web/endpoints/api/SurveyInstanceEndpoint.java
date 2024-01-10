@@ -91,6 +91,8 @@ public class SurveyInstanceEndpoint implements Endpoint {
         String deleteOwnerPath = mkPath(BASE_URL, ":id", "owner", ":personId");
         String reportProblemWithQuestionResponsePath = mkPath(BASE_URL, ":id", "response", ":questionId", "problem");
         String copyResponsesPath = mkPath(BASE_URL, ":id", "copy-responses");
+        String withdrawOpenSurveysForRunPath = mkPath(BASE_URL, "run", ":id", "withdraw-open");
+        String withdrawOpenSurveysForTemplatePath = mkPath(BASE_URL, "template", ":id", "withdraw-open");
 
         DatumRoute<SurveyInstance> getByIdRoute =
                 (req, res) -> surveyInstanceService.getById(getId(req));
@@ -252,6 +254,17 @@ public class SurveyInstanceEndpoint implements Endpoint {
                         getId(req),
                         getLong(req, "personId"));
 
+        DatumRoute<Integer> withdrawOpenSurveysForRunRoute =
+                (req, res) -> surveyInstanceService
+                        .withdrawOpenSurveysForRun(
+                                getId(req),
+                                getUsername(req));
+
+        DatumRoute<Integer> withdrawOpenSurveysForTemplateRoute =
+                (req, res) -> surveyInstanceService
+                        .withdrawOpenSurveysForTemplate(
+                                getId(req),
+                                getUsername(req));
 
         getForDatum(getByIdPath, getByIdRoute);
         getForDatum(getPermissionsPath, getPermissionsRoute);
@@ -279,6 +292,8 @@ public class SurveyInstanceEndpoint implements Endpoint {
         deleteForDatum(deleteOwnerPath, deleteOwnerRoute);
         postForDatum(reportProblemWithQuestionResponsePath, reportProblemWithQuestionResponseRoute);
         postForDatum(copyResponsesPath, copyResponsesRoute);
+        postForDatum(withdrawOpenSurveysForRunPath, withdrawOpenSurveysForRunRoute);
+        postForDatum(withdrawOpenSurveysForTemplatePath, withdrawOpenSurveysForTemplateRoute);
     }
 
 }
