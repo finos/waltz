@@ -21,7 +21,6 @@ package org.finos.waltz.service.application;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.application.ApplicationDao;
-import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.data.assessment_definition.AssessmentDefinitionDao;
 import org.finos.waltz.data.assessment_rating.AssessmentRatingDao;
 import org.finos.waltz.data.measurable.MeasurableDao;
@@ -58,9 +57,9 @@ import static org.finos.waltz.schema.Tables.MEASURABLE;
 @Service
 public class ApplicationViewService {
 
+    private static final GenericSelectorFactory GENERIC_SELECTOR_FACTORY = new GenericSelectorFactory();
 
     private final ApplicationDao applicationDao;
-    private final ApplicationIdSelectorFactory appIdSelectorFactory = new ApplicationIdSelectorFactory();
     private final AssessmentRatingDao assessmentRatingDao;
     private final AssessmentDefinitionDao assessmentDefinitionDao;
     private final RatingSchemeDAO ratingSchemeDAO;
@@ -88,7 +87,7 @@ public class ApplicationViewService {
 
     public ApplicationsView getViewBySelector(IdSelectionOptions selectionOptions) {
 
-        GenericSelector genericSelector = new GenericSelectorFactory().applyForKind(EntityKind.APPLICATION, selectionOptions);
+        GenericSelector genericSelector = GENERIC_SELECTOR_FACTORY.applyForKind(EntityKind.APPLICATION, selectionOptions);
         List<Application> apps = applicationDao.findByAppIdSelector(genericSelector.selector());
 
         Set<AssessmentDefinition> primaryAssessmentDefs = assessmentDefinitionDao
