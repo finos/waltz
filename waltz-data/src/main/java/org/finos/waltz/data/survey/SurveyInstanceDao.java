@@ -241,6 +241,20 @@ public class SurveyInstanceDao {
     }
 
 
+    public Set<SurveyInstance> findForSurveyRun(long surveyRunId, SurveyInstanceStatus... statuses) {
+        Set<String> statusStrings = Arrays.stream(statuses).map(s -> s.name()).collect(toSet());
+
+        return dsl.select(si.fields())
+                .select(ENTITY_NAME_FIELD)
+                .select(EXTERNAL_ID_FIELD)
+                .from(si)
+                .where(si.SURVEY_RUN_ID.eq(surveyRunId))
+                .and(IS_ORIGINAL_INSTANCE_CONDITION)
+                .and(si.STATUS.in(statusStrings))
+                .fetchSet(TO_DOMAIN_MAPPER);
+    }
+
+
     public Set<SurveyInstance> findForSurveyTemplate(long templateId, SurveyInstanceStatus... statuses) {
         Set<String> statusStrings = Arrays.stream(statuses).map(s -> s.name()).collect(toSet());
 

@@ -105,15 +105,20 @@ function mkColumnDefs() {
             width: "8%",
             cellTemplate:
                 `
-                <div class="ui-grid-cell-contents">
-                    <a ng-click="grid.appScope.deleteRun(row.entity.surveyRun)"
-                       ng-if="row.entity.isRunOwnedByLoggedInUser"
-                       uib-popover="Delete this Survey Run"
-                       popover-placement="left"
-                       popover-trigger="mouseenter"
-                       class="btn btn-xs btn-danger waltz-visibility-child-30">
-                        <waltz-icon name="trash-o"></waltz-icon>
-                    </a>
+                <div class="ui-grid-cell-contents" style="padding: 2px; display: flex; gap: 5px">
+                    <button ng-click="grid.appScope.withdrawOpenSurveys(row.entity.surveyRun)"
+                            ng-disabled="!row.entity.hasOpenSurveys"
+                            ng-if="row.entity.isRunOwnedByLoggedInUser || row.entity.hasAdminRights"
+                            title="Withdraw all open instances ('Not Started' and 'In Progress')"
+                            class="btn btn-xs btn-warning waltz-visibility-child-30 small">
+                        <waltz-icon name="wpforms"></waltz-icon>
+                    </button>
+                    <button ng-click="grid.appScope.deleteRun(row.entity.surveyRun)"
+                           ng-if="row.entity.isRunOwnedByLoggedInUser || row.entity.isTemplateOwnerOrAdmin"
+                           title="Delete this Survey Run"
+                           class="btn btn-xs btn-danger waltz-visibility-child-30">
+                            <waltz-icon name="trash-o"></waltz-icon>
+                    </button>
                 </div>
                 `
         }
@@ -178,10 +183,14 @@ function controller($q,
                         d.isRunOwnedByLoggedInUser = d.owner
                             ? (_.toLower(d.owner.email) === _.toLower(user.userName))
                             : false;
+                        d.hasAdminRights = userIsTemplateOwner || userIsAdmin || userHasIssuanceRights
+                        d.hasOpenSurveys = stats.inProgressCount > 0 || stats.notStartedCount > 0
                         return d;
                     })
                     .partition(d => d.surveyRun.status !== "DRAFT")
                     .value();
+
+                vm.hasOpenSurveys = _.some(vm.issuedAndCompleted, d => d.hasOpenSurveys);
             });
     };
 
@@ -266,6 +275,34 @@ function controller($q,
                 })
                 .catch(e => {
                     displayError("Survey template could not be deleted", e);
+                });
+        }
+    }
+
+    vm.withdrawOpenSurveys = (surveyRun) => {
+        if(confirm(`Are you sure you want withdraw all open surveys for this survey run: ${surveyRun.name}?`)){
+            serviceBroker
+                .execute(CORE_API.SurveyInstanceStore.withdrawOpenSurveysForRun, [surveyRun.id])
+                .then(r => {
+                    toasts.warning(`${r.data} 'Not started' and 'In progress' survey runs have been withdrawn`);
+                    loadRuns();
+                })
+                .catch(e => {
+                    displayError("Could not withdraw open survey runs", e);
+                });
+        }
+    }
+
+    vm.withdrawOpenSurveysForTemplate = (surveyTemplate) => {
+        if(confirm(`Are you sure you want withdraw all open surveys for this template: ${surveyTemplate.name}?`)){
+            serviceBroker
+                .execute(CORE_API.SurveyInstanceStore.withdrawOpenSurveysForTemplate, [surveyTemplate.id])
+                .then(r => {
+                    toasts.warning(`${r.data} 'Not started' and 'In progress' survey runs have been withdrawn`);
+                    loadRuns();
+                })
+                .catch(e => {
+                    displayError("Could not withdraw open survey runs", e);
                 });
         }
     }
