@@ -21,7 +21,7 @@ import _ from "lodash";
 
 import template from "./physical-flow-view.html";
 import {CORE_API} from "../common/services/core-api-utils";
-import {toEntityRef} from "../common/entity-utils";
+import {toEntityRefWithKind} from "../common/entity-utils";
 import toasts from "../svelte-stores/toast-store";
 import {displayError} from "../common/error-utils";
 
@@ -148,7 +148,7 @@ function controller($q,
                     [physicalFlow.specificationId]))
             .then(r => {
                 vm.specification = r.data;
-                vm.specificationReference = toEntityRef(r.data, "PHYSICAL_SPECIFICATION");
+                vm.specificationReference = toEntityRefWithKind(r.data, "PHYSICAL_SPECIFICATION");
                 addToHistory(historyStore, vm.physicalFlow, vm.specification);
             });
     };

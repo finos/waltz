@@ -23,6 +23,7 @@ import template from "./measurable-rating-app-section.html";
 import {determineEditableCategories, determineStartingTab, loadAllData, mkTab} from "../../measurable-rating-utils";
 import namedSettings from "../../../system/named-settings";
 import {selectedMeasurable} from "../panel/measurable-rating-panel-store";
+import {mkSelectionOptions} from "../../../common/selector-utils";
 
 
 /**
@@ -151,14 +152,11 @@ function controller($q, serviceBroker, settingsService, userService) {
         hideAllocationScheme();
         serviceBroker
             .loadViewData(
-                CORE_API.MeasurableRatingStore.getViewForEntityAndCategory,
-                [vm.parentEntityRef, categoryId],
+                CORE_API.MeasurableRatingStore.getViewByCategoryAndAppSelector,
+                [categoryId, mkSelectionOptions(vm.parentEntityRef)],
                 {force})
             .then(r => {
-                const tab = r.data;
-                vm.activeTab = mkTab(tab, vm.application);
-            })
-            .then(() => {
+                vm.activeTab = mkTab(r.data, vm.application);
                 vm.visibility.loading = false;
             });
     };

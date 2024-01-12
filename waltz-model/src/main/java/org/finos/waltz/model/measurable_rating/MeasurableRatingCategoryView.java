@@ -3,6 +3,8 @@ package org.finos.waltz.model.measurable_rating;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.allocation.Allocation;
 import org.finos.waltz.model.allocation_scheme.AllocationScheme;
+import org.finos.waltz.model.application.AssessmentsView;
+import org.finos.waltz.model.application.MeasurableRatingsView;
 import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.assessment_rating.AssessmentRating;
 import org.finos.waltz.model.measurable.Measurable;
@@ -22,51 +24,13 @@ import static java.util.stream.Collectors.toMap;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableMeasurableRatingCategoryView.class)
-public abstract class MeasurableRatingCategoryView {
+public interface MeasurableRatingCategoryView {
 
-    public abstract MeasurableCategory category();
+    AllocationsView allocations();
 
-    public abstract Set<RatingScheme> ratingSchemes();
+    AssessmentsView primaryAssessments();
 
-    public abstract Set<Measurable> measurables();
+    DecommissionsView decommissions();
 
-    public abstract Set<MeasurableRating> ratings();
-
-    public abstract Set<AllocationScheme> allocationSchemes();
-
-    public abstract Set<Allocation> allocations();
-
-    public abstract Set<AssessmentDefinition> assessmentDefinitions();
-
-    public abstract Set<AssessmentRating> assessmentRatings();
-
-    public abstract Set<MeasurableRatingPlannedDecommission> plannedDecommissions();
-
-    public abstract Set<MeasurableRatingPlannedDecommissionInfo> replacingDecommissions();
-
-    public abstract Set<MeasurableRatingReplacement> plannedReplacements();
-
-    public abstract Set<MeasurableHierarchy> measurableHierarchy();
-
-
-    @Value.Derived
-    public Map<Long, RatingSchemeItem> ratingSchemeItemsById() {
-        return ratingSchemes()
-                .stream()
-                .flatMap(d -> d.ratings().stream())
-                .collect(toMap(
-                        d -> d.id().get(),
-                        d -> d));
-    }
-
-    @Value.Derived
-    public Map<String, RatingSchemeItem> ratingSchemeItemsByCode() {
-        return ratingSchemes()
-                .stream()
-                .filter(d -> category().ratingSchemeId() == d.id().get())
-                .flatMap(d -> d.ratings().stream())
-                .collect(toMap(
-                        RatingSchemeItem::rating,
-                        d -> d));
-    }
+    MeasurableRatingsView measurableRatings();
 }

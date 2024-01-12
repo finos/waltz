@@ -30,7 +30,9 @@ import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record;
+import org.jooq.Record1;
 import org.jooq.RecordMapper;
+import org.jooq.Select;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -140,7 +142,7 @@ public class MeasurableRatingReplacementDao {
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
 
-    public Set<MeasurableRatingReplacement> fetchByEntityRefAndCategory(EntityReference ref, long categoryId){
+    public Set<MeasurableRatingReplacement> findForCategoryAndSelector(Select<Record1<Long>> appIdSelector, long categoryId){
         return dsl
                 .select(MEASURABLE_RATING_REPLACEMENT.fields())
                 .select(NAME_FIELD)
@@ -151,8 +153,8 @@ public class MeasurableRatingReplacementDao {
                 .on(MEASURABLE_RATING.ID.eq(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_RATING_ID))
                 .innerJoin(MEASURABLE).on(MEASURABLE_RATING.MEASURABLE_ID.eq(MEASURABLE.ID)
                         .and(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId)))
-                .where(MEASURABLE_RATING.ENTITY_ID.eq(ref.id())
-                        .and(MEASURABLE_RATING.ENTITY_KIND.eq(ref.kind().name())))
+                .where(MEASURABLE_RATING.ENTITY_ID.in(appIdSelector)
+                        .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
 

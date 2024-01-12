@@ -1,4 +1,5 @@
 <script>
+
     import {SlickGrid} from "slickgrid";
     import {onMount} from "svelte";
     import _ from "lodash";

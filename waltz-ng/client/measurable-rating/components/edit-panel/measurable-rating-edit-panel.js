@@ -27,6 +27,7 @@ import template from "./measurable-rating-edit-panel.html";
 import {displayError} from "../../../common/error-utils";
 import {alignDateToUTC} from "../../../common/date-utils";
 import toasts from "../../../svelte-stores/toast-store";
+import {mkSelectionOptions} from "../../../common/selector-utils";
 
 const bindings = {
     parentEntityRef: "<",
@@ -399,12 +400,12 @@ function controller($q,
         vm.visibility.loading = true;
         return serviceBroker
             .loadViewData(
-                CORE_API.MeasurableRatingStore.getViewForEntityAndCategory,
-                [vm.parentEntityRef, categoryId],
+                CORE_API.MeasurableRatingStore.getViewByCategoryAndAppSelector,
+                [categoryId, mkSelectionOptions(vm.parentEntityRef)],
                 {force})
             .then(r => {
-                const tab = r.data;
-                vm.activeTab = mkTab(tab, true);
+                const viewData = r.data;
+                vm.activeTab = mkTab(viewData, vm.application,true);
 
                 vm.onKeypress = mkRatingsKeyHandler(
                     vm.activeTab.ratingSchemeItems,

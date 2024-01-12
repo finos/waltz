@@ -19,7 +19,7 @@
 import {initialiseData} from "../../../common";
 
 import template from "./data-type-view.html";
-import {toEntityRef} from "../../../common/entity-utils";
+import {toEntityRefWithKind} from "../../../common/entity-utils";
 
 
 
@@ -36,7 +36,7 @@ function controller(dataType,
     const vm = initialiseData(this, initialState);
 
     if(dataType) {
-        vm.entityRef = toEntityRef(dataType, "DATA_TYPE");
+        vm.entityRef = toEntityRefWithKind(dataType);
         vm.dataType = dataType;
 
         // -- BOOT ---

@@ -18,7 +18,7 @@
 import template from "./physical-flow-overview.html";
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {toEntityRef} from "../../../common/entity-utils";
+import {toEntityRefWithKind} from "../../../common/entity-utils";
 import {truncate} from "../../../common/string-utils";
 
 
@@ -56,7 +56,7 @@ function controller(serviceBroker) {
                     [physicalFlow.specificationId]))
             .then(r => {
                 vm.specification = r.data;
-                vm.specificationReference = toEntityRef(r.data, "PHYSICAL_SPECIFICATION");
+                vm.specificationReference = toEntityRefWithKind(r.data, "PHYSICAL_SPECIFICATION");
             });
 
         serviceBroker

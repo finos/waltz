@@ -23,19 +23,19 @@ import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.assessment_definition.AssessmentDefinitionDao;
 import org.finos.waltz.data.legal_entity.LegalEntityRelationshipDao;
 import org.finos.waltz.data.measurable.MeasurableDao;
+import org.finos.waltz.data.measurable_rating.MeasurableRatingDao;
 import org.finos.waltz.data.user.UserPreferenceDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.measurable.Measurable;
+import org.finos.waltz.model.measurable_rating.MeasurableRating;
 import org.finos.waltz.model.user.UserPreference;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -55,6 +55,7 @@ public class AssessmentDefinitionService {
 
     private final AssessmentDefinitionDao assessmentDefinitionDao;
     private final MeasurableDao measurableDao;
+    private final MeasurableRatingDao measurableRatingDao;
     private final LegalEntityRelationshipDao legalEntityRelationshipDao;
     private final UserPreferenceDao userPreferenceDao;
 
@@ -62,15 +63,18 @@ public class AssessmentDefinitionService {
     @Autowired
     public AssessmentDefinitionService(AssessmentDefinitionDao assessmentDefinitionDao,
                                        MeasurableDao measurableDao,
+                                       MeasurableRatingDao measurableRatingDao,
                                        LegalEntityRelationshipDao legalEntityRelationshipDao,
                                        UserPreferenceDao userPreferenceDao) {
 
         checkNotNull(assessmentDefinitionDao, "assessmentDefinitionDao cannot be null");
         checkNotNull(measurableDao, "measurableDao cannot be null");
+        checkNotNull(measurableRatingDao, "measurableRatingDao cannot be null");
         checkNotNull(userPreferenceDao, "userPreferenceDao cannot be null");
         checkNotNull(legalEntityRelationshipDao, "legalEntityRelationshipDao cannot be null");
 
         this.measurableDao = measurableDao;
+        this.measurableRatingDao = measurableRatingDao;
         this.assessmentDefinitionDao = assessmentDefinitionDao;
         this.legalEntityRelationshipDao = legalEntityRelationshipDao;
         this.userPreferenceDao = userPreferenceDao;
@@ -96,6 +100,7 @@ public class AssessmentDefinitionService {
         return assessmentDefinitionDao.findByEntityKindAndQualifier(kind, qualifierReference);
     }
 
+
     public Set<AssessmentDefinition> findByEntityReference(EntityReference entityReference) {
         switch (entityReference.kind()) {
             case MEASURABLE:
@@ -103,6 +108,12 @@ public class AssessmentDefinitionService {
                 return assessmentDefinitionDao.findByEntityKindAndQualifier(
                         entityReference.kind(),
                         mkRef(EntityKind.MEASURABLE_CATEGORY, m.categoryId()));
+            case MEASURABLE_RATING:
+                MeasurableRating measurableRating = measurableRatingDao.getById(entityReference.id());
+                Measurable m2 = measurableDao.getById(measurableRating.measurableId());
+                return assessmentDefinitionDao.findByEntityKindAndQualifier(
+                        entityReference.kind(),
+                        mkRef(EntityKind.MEASURABLE_CATEGORY, m2.categoryId()));
             default:
                 return findByEntityKind(entityReference.kind());
         }

@@ -20,12 +20,18 @@ package org.finos.waltz.web.endpoints.extracts;
 
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.NameProvider;
 import org.finos.waltz.model.allocation.Allocation;
+import org.finos.waltz.model.application.AssessmentsView;
+import org.finos.waltz.model.application.MeasurableRatingsView;
 import org.finos.waltz.model.assessment_rating.AssessmentRating;
 import org.finos.waltz.model.measurable.Measurable;
 import org.finos.waltz.model.measurable.MeasurableHierarchy;
 import org.finos.waltz.model.measurable.MeasurableHierarchyAlignment;
+import org.finos.waltz.model.measurable_category.MeasurableCategory;
+import org.finos.waltz.model.measurable_rating.AllocationsView;
+import org.finos.waltz.model.measurable_rating.DecommissionsView;
 import org.finos.waltz.model.measurable_rating.MeasurableRating;
 import org.finos.waltz.model.measurable_rating.MeasurableRatingCategoryView;
 import org.finos.waltz.model.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommission;
@@ -50,9 +56,11 @@ import java.util.Set;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static org.finos.waltz.common.CollectionUtilities.first;
 import static org.finos.waltz.common.CollectionUtilities.notEmpty;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.MapUtilities.indexBy;
+import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 import static org.finos.waltz.model.utils.IdUtilities.indexById;
 import static org.finos.waltz.web.WebUtilities.mkPath;
 import static spark.Spark.get;
@@ -96,14 +104,16 @@ public class MeasurableRatingViewExtractor extends CustomDataExtractor {
                                                                ExtractFormat format,
                                                                String reportName) throws IOException {
 
-        MeasurableRatingCategoryView ratingView = measurableRatingViewService.getViewForAppAndCategory(parentRef, categoryId);
+        IdSelectionOptions idSelectionOptions = mkOpts(parentRef);
+        MeasurableRatingCategoryView view = measurableRatingViewService.getViewForCategoryAndSelector(idSelectionOptions, categoryId);
 
-        Map<Long, MeasurableHierarchy> hierarchyByMeasurableId = indexBy(ratingView.measurableHierarchy(), MeasurableHierarchy::measurableId);
-        Integer maxDepthOfTree = getMaxDepthOfTree(ratingView.ratings(), hierarchyByMeasurableId);
+        MeasurableRatingsView measurableRatingsView = view.measurableRatings();
+        Map<Long, MeasurableHierarchy> hierarchyByMeasurableId = indexBy(measurableRatingsView.measurableHierarchy(), MeasurableHierarchy::measurableId);
+        Integer maxDepthOfTree = getMaxDepthOfTree(measurableRatingsView.measurableRatings(), hierarchyByMeasurableId);
 
-        List<List<Object>> reportRows = prepareReportRows(ratingView, maxDepthOfTree, hierarchyByMeasurableId);
+        List<List<Object>> reportRows = prepareReportRows(view, maxDepthOfTree, hierarchyByMeasurableId);
 
-        List<String> headers = prepareHeaders(ratingView, maxDepthOfTree);
+        List<String> headers = prepareHeaders(view, maxDepthOfTree);
 
         return formatReport(
                 format,
@@ -113,10 +123,18 @@ public class MeasurableRatingViewExtractor extends CustomDataExtractor {
         );
     }
 
-    private List<String> prepareHeaders(MeasurableRatingCategoryView ratingView, Integer maxDepthOfTree) {
+    private List<String> prepareHeaders(MeasurableRatingCategoryView view, Integer maxDepthOfTree) {
         ArrayList<String> headerRow = new ArrayList<>();
 
-        String categoryName = ratingView.category().name();
+        MeasurableRatingsView measurableRatingsView = view.measurableRatings();
+        AllocationsView allocationsView = view.allocations();
+        DecommissionsView decommissionsView = view.decommissions();
+        AssessmentsView assessmentsView = view.primaryAssessments();
+
+        Set<MeasurableCategory> measurableCategories = measurableRatingsView.measurableCategories();
+        MeasurableCategory measurableCategory = first(measurableCategories);
+
+        String categoryName = measurableCategory.name();
 
         headerRow.add("Primary?");
 
@@ -130,20 +148,21 @@ public class MeasurableRatingViewExtractor extends CustomDataExtractor {
         headerRow.add("Measurable External ID");
         headerRow.add("Rating");
 
-        ratingView.allocationSchemes()
+        allocationsView
+                .allocationSchemes()
                 .stream()
                 .sorted(Comparator.comparing(NameProvider::name))
                 .forEach(scheme -> headerRow.add(scheme.name()));
 
-        if (notEmpty(ratingView.plannedDecommissions())) {
+        if (notEmpty(decommissionsView.plannedDecommissions())) {
             headerRow.add("Planned Decommission Date");
         }
 
-        if (notEmpty(ratingView.plannedReplacements())) {
+        if (notEmpty(decommissionsView.plannedReplacements())) {
             headerRow.add("Replacement Applications");
         }
 
-        ratingView
+        assessmentsView
                 .assessmentDefinitions()
                 .stream()
                 .sorted(Comparator.comparing(NameProvider::name))
@@ -152,26 +171,34 @@ public class MeasurableRatingViewExtractor extends CustomDataExtractor {
         return headerRow;
     }
 
-    private List<List<Object>> prepareReportRows(MeasurableRatingCategoryView viewData,
+    private List<List<Object>> prepareReportRows(MeasurableRatingCategoryView view,
                                                  Integer maxDepthOfTree,
                                                  Map<Long, MeasurableHierarchy> hierarchyByMeasurableId) {
 
-        Map<Long, Measurable> measurablesById = indexById(viewData.measurables());
-        Map<Long, Collection<Allocation>> allocationsByRatingId = groupBy(viewData.allocations(), Allocation::measurableRatingId);
-        Map<String, RatingSchemeItem> ratingsByCode = viewData.ratingSchemeItemsByCode();
+        MeasurableRatingsView measurableRatingsView = view.measurableRatings();
+        AllocationsView allocationsView = view.allocations();
+        DecommissionsView decommissionsView = view.decommissions();
+        AssessmentsView assessmentsView = view.primaryAssessments();
+
+        Map<Long, Measurable> measurablesById = indexById(measurableRatingsView.measurables());
+        Map<Long, Collection<Allocation>> allocationsByRatingId = groupBy(allocationsView.allocations(), Allocation::measurableRatingId);
+        Map<String, RatingSchemeItem> ratingsByCode = indexBy(measurableRatingsView.ratingSchemeItems(), RatingSchemeItem::rating);
+
         Map<Long, MeasurableRatingPlannedDecommission> plannedDecommsByRatingId = indexBy(
-                viewData.plannedDecommissions(),
+                decommissionsView.plannedDecommissions(),
                 MeasurableRatingPlannedDecommission::measurableRatingId);
+
         Map<Long, Collection<String>> replacementsByDecommId = groupBy(
-                viewData.plannedReplacements(),
+                decommissionsView.plannedReplacements(),
                 MeasurableRatingReplacement::decommissionId,
                 d -> d.entityReference().name().get());
+
         Map<Long, Collection<AssessmentRating>> assessmentsByRatingId = groupBy(
-                viewData.assessmentRatings(),
+                assessmentsView.assessmentRatings(),
                 d -> d.entityReference().id());
 
-        return viewData
-                .ratings()
+        return measurableRatingsView
+                .measurableRatings()
                 .stream()
                 .map(row -> {
 
@@ -204,7 +231,8 @@ public class MeasurableRatingViewExtractor extends CustomDataExtractor {
                     reportRow.add(measurable.entityReference().externalId());
                     reportRow.add(rating.name());
 
-                    viewData.allocationSchemes()
+                    allocationsView
+                            .allocationSchemes()
                             .stream()
                             .sorted(Comparator.comparing(NameProvider::name))
                             .forEach(scheme -> {
@@ -217,14 +245,14 @@ public class MeasurableRatingViewExtractor extends CustomDataExtractor {
 
                     MeasurableRatingPlannedDecommission decomm = plannedDecommsByRatingId.get(row.id().get());
 
-                    if (notEmpty(viewData.plannedDecommissions())){
+                    if (notEmpty(decommissionsView.plannedDecommissions())){
                         String decommString = Optional.ofNullable(decomm)
                                 .map(d -> String.valueOf(d.plannedDecommissionDate()))
                                 .orElse(null);
                         reportRow.add(decommString);
                     }
 
-                    if (notEmpty(viewData.plannedReplacements())){
+                    if (notEmpty(decommissionsView.plannedReplacements())){
                         Collection<String> replacements = Optional.ofNullable(decomm)
                                 .map(d -> replacementsByDecommId.getOrDefault(d.id(), Collections.emptyList()))
                                 .orElse(Collections.emptyList());
@@ -235,9 +263,10 @@ public class MeasurableRatingViewExtractor extends CustomDataExtractor {
 
                     Map<Long, RatingSchemeItem> ratingsByDefinitionId = indexBy(assessmentRatings,
                             AssessmentRating::assessmentDefinitionId,
-                            d -> viewData.ratingSchemeItemsById().get(d.ratingId()));
+                            d -> assessmentsView.ratingSchemeItemsById().get(d.ratingId()));
 
-                    viewData.assessmentDefinitions()
+                    assessmentsView
+                            .assessmentDefinitions()
                             .stream()
                             .sorted(Comparator.comparing(NameProvider::name))
                             .forEach(d -> {

@@ -30,6 +30,8 @@ import org.finos.waltz.model.measurable_rating.MeasurableRating;
 import org.finos.waltz.model.measurable_rating_replacement.MeasurableRatingReplacement;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.measurable_rating.MeasurableRatingService;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -73,8 +75,8 @@ public class MeasurableRatingReplacementService {
         return measurableRatingReplacementDao.fetchByEntityRef(ref);
     }
 
-    public Collection<MeasurableRatingReplacement> fetchByEntityRefAndCategory(EntityReference ref, long categoryId){
-        return measurableRatingReplacementDao.fetchByEntityRefAndCategory(ref, categoryId);
+    public Collection<MeasurableRatingReplacement> findForCategoryAndSelector(Select<Record1<Long>> appIdSelector, long categoryId){
+        return measurableRatingReplacementDao.findForCategoryAndSelector(appIdSelector, categoryId);
     }
 
 

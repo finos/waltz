@@ -24,7 +24,6 @@ import template from "./physical-specification-view.html";
 import {CORE_API} from "../common/services/core-api-utils";
 import toasts from "../svelte-stores/toast-store";
 import {displayError} from "../common/error-utils";
-import {toEntityRef} from "../common/entity-utils";
 
 
 const initialState = {

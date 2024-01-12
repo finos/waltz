@@ -38,7 +38,6 @@ import org.finos.waltz.model.measurable_rating.MeasurableRating;
 import org.finos.waltz.model.measurable_rating.MeasurableRatingChangeSummary;
 import org.finos.waltz.model.measurable_rating.MeasurableRatingCommand;
 import org.finos.waltz.model.measurable_rating.MeasurableRatingStatParams;
-import org.finos.waltz.model.measurable_rating.MeasurableRatingView;
 import org.finos.waltz.model.measurable_rating.RemoveMeasurableRatingCommand;
 import org.finos.waltz.model.measurable_rating.SaveMeasurableRatingCommand;
 import org.finos.waltz.model.rating.RatingSchemeItem;
@@ -101,9 +100,8 @@ public class MeasurableRatingService {
     }
 
 
-    public List<MeasurableRating> findForEntityAndCategory(EntityReference ref, long categoryId) {
-        checkNotNull(ref, "ref cannot be null");
-        return measurableRatingDao.findForEntityAndCategory(ref, categoryId);
+    public List<MeasurableRating> findForCategoryAndSelector(Select<Record1<Long>> appIds, long categoryId) {
+        return measurableRatingDao.findForCategoryAndSelector(appIds, categoryId);
     }
 
 

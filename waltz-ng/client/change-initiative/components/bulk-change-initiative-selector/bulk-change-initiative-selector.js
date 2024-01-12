@@ -77,8 +77,8 @@ function findMatchedApps(changeInitiatives = [], identifiers = [], existingRefs 
 
     const newAndExistingApps = _.chain(identifiers)
         .map(identifier => {
-            const app = ciByExternalId[identifier];
-            const entityRef = app ? toEntityRef(app, 'CHANGE_INITIATIVE') : null;
+            const ci = ciByExternalId[identifier];
+            const entityRef = ci ? toEntityRef(ci) : null;
 
             return {
                 identifier,

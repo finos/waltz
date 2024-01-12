@@ -302,6 +302,23 @@ function controller($q, serviceBroker) {
             });
     };
 
+
+    const loadNewRatingDetail = () => {
+        // clearDetail();
+        console.log({selected: vm.selectedMeasurable})
+        return serviceBroker
+            .execute(CORE_API.MeasurableRatingStore.getViewByCategoryAndAppSelector,
+                     [vm.selectedMeasurable.measurableCategoryId, vm.selector])
+            .then(r => {
+                const ratings = r.data;
+                console.log({ratings});
+                vm.measurableRatingsDetail = vm.showPrimaryOnly
+                    ? _.filter(ratings, d => d.isPrimary === true)
+                    : ratings;
+                return vm.measurableRatingsDetail;
+            });
+    };
+
     function setupSelector() {
         vm.selector = mkSelectionOptionsWithJoiningEntity(
             vm.parentEntityRef,
