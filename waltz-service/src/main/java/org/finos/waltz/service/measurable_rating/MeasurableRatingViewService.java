@@ -153,6 +153,8 @@ public class MeasurableRatingViewService {
 
         GenericSelector appSelector = GENERIC_SELECTOR_FACTORY.applyForKind(EntityKind.APPLICATION, idSelectionOptions);
 
+        List<Application> applications = applicationService.findByAppIdSelector(idSelectionOptions);
+
         MeasurableCategory category = measurableCategoryService.getById(categoryId);
         List<MeasurableRating> ratings = measurableRatingService.findForCategoryAndSelector(appSelector.selector(), categoryId);
         List<Measurable> measurables = measurableService.findByCategoryId(categoryId);
@@ -204,6 +206,7 @@ public class MeasurableRatingViewService {
                 .build();
 
         return ImmutableMeasurableRatingCategoryView.builder()
+                .applications(applications)
                 .measurableRatings(ratingsView)
                 .allocations(allocationsView)
                 .primaryAssessments(assessmentsView)

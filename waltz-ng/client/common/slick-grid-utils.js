@@ -92,9 +92,9 @@ export function mkAssessmentAndCategoryColumns(assessmentDefs = [], categories =
         .chain(assessmentDefs)
         .sortBy(d => d.name)
         .map(d => {
-            const field = "assessment_definition/" + d.externalId;
+            const field = "assessment_definition/" + d.id;
             return {
-                id: d.externalId,
+                id: d.id,
                 name: d.name,
                 field,
                 sortable: true,
@@ -111,9 +111,9 @@ export function mkAssessmentAndCategoryColumns(assessmentDefs = [], categories =
         .chain(categories)
         .sortBy(d => d.name)
         .map(d => {
-            const field = "measurable_category/" + d.externalId;
+            const field = "measurable_category/" + d.id;
             return {
-                id: d.externalId,
+                id: d.id,
                 name: d.name,
                 width: 150,
                 field,

@@ -10,39 +10,22 @@ import _ from "lodash";
 
 export const baseColumns = [
     {
-        id: "name",
-        name: "Name",
+        id: "application_name",
+        name: "Application",
         field: "application",
         sortable:  true,
         width: 180,
         formatter: mkEntityLinkFormatter(null, false),
         sortFn: (a, b) => cmp(a?.application.name, b?.application.name)
-    }, {
-        id: "assetCode",
-        name: "Asset Code",
-        field: "application_assetCode",
-        sortable:  true
-    }, {
-        id: "kind",
-        name: "Kind",
-        field: "application_applicationKind",
+    },
+    {
+        id: "measurable_name",
+        name: "Taxonomy Item",
+        field: "measurable",
         sortable:  true,
-        formatter: mkApplicationKindFormatter()
-    }, {
-        id: "orgUnit",
-        name: "Org Unit",
-        field: "organisationalUnit",
-        sortable: true,
         width: 180,
         formatter: mkEntityLinkFormatter(null, false),
-        sortFn: (a, b) => cmp(a?.organisationalUnit.name, b?.organisationalUnit.name)
-    }, {
-        id: "lifecyclePhase",
-        name: "Lifecycle Phase",
-        field: "application_lifecyclePhase",
-        width: 90,
-        sortable:  true,
-        formatter: mkLifecyclePhaseFormatter()
+        sortFn: (a, b) => cmp(a?.measurable.name, b?.measurable.name)
     }
 ];
 
@@ -86,6 +69,7 @@ export function mkColumnDefs(primaryAssessments, primaryRatings) {
 export function mkGridData(applications, primaryAssessments, primaryRatings, orgUnitsById) {
     const measurableRatingsByAppId = _.groupBy(primaryRatings.measurableRatings, d => d.entityReference.id);
     const measurablesById = _.keyBy(primaryRatings.measurables, d => d.id);
+    const applicationsById = _.keyBy(applications, d => d.id);
     const measurableCategoriesById = _.keyBy(primaryRatings.measurableCategories, d => d.id);
     const measurableRatingsSchemeItemsByCategoryThenCode = _
         .chain(primaryRatings.measurableCategories)
@@ -98,36 +82,19 @@ export function mkGridData(applications, primaryAssessments, primaryRatings, org
             },
             {})
             .value();
-    const assessmentRatingsByAppId = _.groupBy(primaryAssessments.assessmentRatings, d => d.entityReference.id);
+    const assessmentRatingsByEntityId = _.groupBy(primaryAssessments.assessmentRatings, d => d.entityReference.id);
     const assessmentDefinitionsById = _.keyBy(primaryAssessments.assessmentDefinitions, d => d.id);
     const assessmentRatingsSchemeItemsById = _.keyBy(primaryAssessments.ratingSchemeItems, d => d.id);
 
     return _
-        .chain(applications)
-        .map(app => {
-            const base = {
-                application: app,
-                application_assetCode: app.assetCode,
-                application_applicationKind: app.applicationKind,
-                application_lifecyclePhase: app.lifecyclePhase,
-                organisationalUnit: orgUnitsById[app.organisationalUnitId],
-            };
-            const measurableRatings = measurableRatingsByAppId[app.id] || [];
-            const assessmentRatings = assessmentRatingsByAppId[app.id] || [];
-            const primaryMeasurableCells = _
-                .chain(measurableRatings)
-                .map(mr => {
-                    const measurable = measurablesById[mr.measurableId];
-                    const measurableCategory = measurableCategoriesById[measurable.categoryId];
-                    const ratingSchemeItem = _.get(measurableRatingsSchemeItemsByCategoryThenCode, [measurableCategory.id, mr.rating]);
-                    return {
-                        measurable,
-                        measurableCategory,
-                        ratingSchemeItem
-                    };
-                })
-                .reduce((acc, d) => {acc['measurable_category/'+d.measurableCategory.id] = d; return acc;}, {})
-                .value();
+        .chain(primaryRatings.measurableRatings)
+        .map(rating => {
+            const assessmentRatings = assessmentRatingsByEntityId[rating.id] || [];
+            const measurable = measurablesById[rating.measurableId];
+            const application = applicationsById[rating.entityReference.id];
+
+            const ratingSchemeItemsByCode = _.get(measurableRatingsSchemeItemsByCategoryThenCode, [measurable?.measurableCategoryId], {});
+            const ratingSchemeItem = ratingSchemeItemsByCode[rating.rating];
 
             const primaryAssessmentCells = _
                 .chain(assessmentRatings)
@@ -152,7 +119,7 @@ export function mkGridData(applications, primaryAssessments, primaryRatings, org
                 )
                 .value();
 
-             return _.merge(base, primaryMeasurableCells, primaryAssessmentCells);
+             return _.merge({measurable, application, ratingSchemeItem}, primaryAssessmentCells);
         })
         .value();
 

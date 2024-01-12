@@ -3,6 +3,7 @@ package org.finos.waltz.model.measurable_rating;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.allocation.Allocation;
 import org.finos.waltz.model.allocation_scheme.AllocationScheme;
+import org.finos.waltz.model.application.Application;
 import org.finos.waltz.model.application.AssessmentsView;
 import org.finos.waltz.model.application.MeasurableRatingsView;
 import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
@@ -25,6 +26,8 @@ import static java.util.stream.Collectors.toMap;
 @Value.Immutable
 @JsonSerialize(as = ImmutableMeasurableRatingCategoryView.class)
 public interface MeasurableRatingCategoryView {
+
+    Set<Application> applications();
 
     AllocationsView allocations();
 
