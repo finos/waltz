@@ -23,6 +23,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.finos.waltz.common.IOUtilities;
+import org.finos.waltz.model.authentication.OAuthConfiguration;
 import org.finos.waltz.model.settings.NamedSettings;
 import org.finos.waltz.model.user.AuthenticationResponse;
 import org.finos.waltz.model.user.ImmutableAuthenticationResponse;
@@ -38,30 +39,23 @@ import org.jooq.tools.json.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import spark.Filter;
 import spark.Spark;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Optional;
-import java.util.Scanner;
 import java.util.function.Supplier;
 
 import static org.finos.waltz.common.MapUtilities.newHashMap;
 
 
 @Service
-@Configuration
-@PropertySource(value = "classpath:waltz.properties", ignoreResourceNotFound = true)
-@PropertySource(value = "file:${user.home}/.waltz/waltz.properties", ignoreResourceNotFound = true)
-@PropertySource(value = "classpath:version.properties", ignoreResourceNotFound = true)
-@ComponentScan(value={"org.finos.waltz.data"})
 public class AuthenticationEndpoint implements Endpoint {
 
     private static final String BASE_URL = WebUtilities.mkPath("authentication");
@@ -72,21 +66,14 @@ public class AuthenticationEndpoint implements Endpoint {
     private final UserRoleService userRoleService;
     private final SettingsService settingsService;
     private final Filter filter;
+    private final OAuthConfiguration oauthConfiguration;
 
-
-    @Value("${oauth.token_url}")
-    private String TOKEN_URL;
-    @Value("${oauth.userinfo_url}")
-    private String USERINFO_URL;
-    @Value("${oauth.code_verifier}")
-    private String CODE_VERIFIER;
-    @Value("${oauth.redirect_uri}")
-    private String REDIRECT_URI;
 
     @Autowired
     public AuthenticationEndpoint(UserService userService,
                                   UserRoleService userRoleService,
-                                  SettingsService settingsService) {
+                                  SettingsService settingsService,
+                                  OAuthConfiguration oauthConfiguration) {
         this.userService = userService;
         this.userRoleService = userRoleService;
         this.settingsService = settingsService;
@@ -95,6 +82,8 @@ public class AuthenticationEndpoint implements Endpoint {
                 .getValue(NamedSettings.authenticationFilter)
                 .flatMap(this::instantiateFilter)
                 .orElseGet(createDefaultFilter());
+
+        this.oauthConfiguration = oauthConfiguration;
     }
 
 
@@ -138,7 +127,6 @@ public class AuthenticationEndpoint implements Endpoint {
                         .getUserRoles(authResponse.waltzUserName())
                         .toArray(new String[0]);
 
-                // LOG.info("login via waltz for:" login.userName());
                 String token = JWT.create()
                         .withIssuer(JWTUtilities.ISSUER)
                         .withSubject(authResponse.waltzUserName())
@@ -158,10 +146,10 @@ public class AuthenticationEndpoint implements Endpoint {
             // parse code response after successful authorization
             Algorithm algorithmHS = Algorithm.HMAC512(JWTUtilities.SECRET);
             String[] vals =  parseCodeResponse(request.body());
-            String OAuthCode = vals[0];
+            String oauthCode = vals[0];
             String clientId = vals[1];
 
-            String accessToken = getAccessToken(OAuthCode, clientId);
+            String accessToken = getAccessToken(oauthCode, clientId);
             JSONObject json = fetchOAuthUserInfo(accessToken);
 
             // parse user info from json object
@@ -199,7 +187,7 @@ public class AuthenticationEndpoint implements Endpoint {
     }
 
     private JSONObject fetchOAuthUserInfo(String accessToken) throws IOException, ParseException {
-        URL userinfoURL = new URL(USERINFO_URL);
+        URL userinfoURL = new URL(oauthConfiguration.userInfoUrl());
         HttpURLConnection emailConnection = (HttpURLConnection) userinfoURL.openConnection();
         emailConnection.setRequestMethod("POST");
         emailConnection.setRequestProperty("Authorization", "Bearer " + accessToken);
@@ -208,7 +196,7 @@ public class AuthenticationEndpoint implements Endpoint {
 
     private String getAccessToken(String OAuthCode, String clientId) {
         try {
-            URL url = new URL(TOKEN_URL);
+            URL url = new URL(oauthConfiguration.tokenUrl());
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Accept","application/json");
@@ -219,8 +207,7 @@ public class AuthenticationEndpoint implements Endpoint {
                 os.write(paramBuilder(OAuthCode, clientId).getBytes());
                 os.flush();
             } catch (IOException e) {
-                e.printStackTrace();
-                LOG.info("IOException on conn.getOutputStream(): " + e.getMessage());
+                LOG.info("IOException on conn.getOutputStream(): " + e.getMessage(), e);
             }
 
             int responseCode = conn.getResponseCode();
@@ -268,9 +255,9 @@ public class AuthenticationEndpoint implements Endpoint {
     private String paramBuilder(String OAuthCode, String clientId){
         return  "&grant_type=authorization_code" +
                 "&code=" + OAuthCode +
-                "&redirect_uri=" + REDIRECT_URI +
+                "&redirect_uri=" + oauthConfiguration.redirectUri() +
                 "&client_id=" + clientId +
-                "&client_verifier=" + CODE_VERIFIER;
+                "&client_verifier=" + oauthConfiguration.codeVerifier();
     }
 
     private AuthenticationResponse authenticate(LoginRequest loginRequest) {
