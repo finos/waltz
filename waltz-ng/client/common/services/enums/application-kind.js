@@ -65,5 +65,12 @@ export const applicationKind = {
         icon: null,
         description: "Applications developed by a third party",
         position: 70
+    },
+    UNKNOWN: {
+        key: "UNKNOWN",
+        name: "Unknown",
+        icon: null,
+        description: "Applications of an unknown type",
+        position: 99
     }
 };
