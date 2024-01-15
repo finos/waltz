@@ -23,6 +23,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.finos.waltz.common.IOUtilities;
+import org.finos.waltz.model.authentication.OAuthConfiguration;
 import org.finos.waltz.model.settings.NamedSettings;
 import org.finos.waltz.model.user.AuthenticationResponse;
 import org.finos.waltz.model.user.ImmutableAuthenticationResponse;
@@ -32,6 +33,9 @@ import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.service.user.UserService;
 import org.finos.waltz.web.WebUtilities;
 import org.finos.waltz.web.endpoints.Endpoint;
+import org.jooq.tools.json.JSONObject;
+import org.jooq.tools.json.JSONParser;
+import org.jooq.tools.json.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +43,10 @@ import org.springframework.stereotype.Service;
 import spark.Filter;
 import spark.Spark;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Optional;
@@ -58,12 +66,14 @@ public class AuthenticationEndpoint implements Endpoint {
     private final UserRoleService userRoleService;
     private final SettingsService settingsService;
     private final Filter filter;
+    private final OAuthConfiguration oauthConfiguration;
 
 
     @Autowired
     public AuthenticationEndpoint(UserService userService,
                                   UserRoleService userRoleService,
-                                  SettingsService settingsService) {
+                                  SettingsService settingsService,
+                                  OAuthConfiguration oauthConfiguration) {
         this.userService = userService;
         this.userRoleService = userRoleService;
         this.settingsService = settingsService;
@@ -72,6 +82,8 @@ public class AuthenticationEndpoint implements Endpoint {
                 .getValue(NamedSettings.authenticationFilter)
                 .flatMap(this::instantiateFilter)
                 .orElseGet(createDefaultFilter());
+
+        this.oauthConfiguration = oauthConfiguration;
     }
 
 
@@ -130,10 +142,123 @@ public class AuthenticationEndpoint implements Endpoint {
             }
         }, WebUtilities.transformer);
 
+        Spark.post(WebUtilities.mkPath(BASE_URL, "oauth"), (request, response) -> {
+            // parse code response after successful authorization
+            Algorithm algorithmHS = Algorithm.HMAC512(JWTUtilities.SECRET);
+            String[] vals =  parseCodeResponse(request.body());
+            String oauthCode = vals[0];
+            String clientId = vals[1];
+
+            String accessToken = getAccessToken(oauthCode, clientId);
+            JSONObject json = fetchOAuthUserInfo(accessToken);
+
+            // parse user info from json object
+            String email = json.get("email").toString().toLowerCase();
+            String subname = json.get("subname").toString();
+            String name = json.get("name").toString();
+
+            String[] roles = userRoleService
+                    .getUserRoles(email)
+                    .toArray(new String[0]);
+
+            LOG.info("login via sso for: email:" + email);
+
+            String token = JWT.create()
+                    .withIssuer(JWTUtilities.ISSUER)
+                    .withSubject("email")
+                    .withArrayClaim("roles", roles)
+                    .withClaim("displayName", name)
+                    .withClaim("employeeId", subname)
+                    .sign(algorithmHS);
+
+            return newHashMap("token", token);
+        }, WebUtilities.transformer);
+
         Spark.before(WebUtilities.mkPath("api", "*"), filter);
 
     }
 
+    private String[] parseCodeResponse(String RequestBody) throws ParseException {
+        // json stringify
+        JSONParser parser = new JSONParser();
+        JSONObject json = (JSONObject) parser.parse(RequestBody);
+        return new String[]{(String) json.get("code"), (String) json.get("clientId")};
+
+    }
+
+    private JSONObject fetchOAuthUserInfo(String accessToken) throws IOException, ParseException {
+        URL userinfoURL = new URL(oauthConfiguration.userInfoUrl());
+        HttpURLConnection emailConnection = (HttpURLConnection) userinfoURL.openConnection();
+        emailConnection.setRequestMethod("POST");
+        emailConnection.setRequestProperty("Authorization", "Bearer " + accessToken);
+        return parseUserInfo(emailConnection);
+    }
+
+    private String getAccessToken(String OAuthCode, String clientId) {
+        try {
+            URL url = new URL(oauthConfiguration.tokenUrl());
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Accept","application/json");
+            conn.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
+            conn.setDoOutput(true);
+
+            try (OutputStream os = conn.getOutputStream()) {
+                os.write(paramBuilder(OAuthCode, clientId).getBytes());
+                os.flush();
+            } catch (IOException e) {
+                LOG.info("IOException on conn.getOutputStream(): " + e.getMessage(), e);
+            }
+
+            int responseCode = conn.getResponseCode();
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                return parseAccessToken(conn);
+            } else {
+                LOG.error("HttpURLConnection: Error getting access token from OAuth provider, CODE: " + responseCode);
+            }
+
+        } catch (IOException | ParseException e) {
+            LOG.error("Error getting access token from OAuth provider", e);
+        }
+        return null;
+    }
+
+    private String parseAccessToken(HttpURLConnection conn) throws IOException, ParseException {
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+            StringBuilder response = new StringBuilder();
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            JSONParser parser = new JSONParser();
+            JSONObject json = (JSONObject) parser.parse(response.toString());
+            return json.get("access_token").toString();
+
+        }
+    }
+
+    private JSONObject parseUserInfo(HttpURLConnection conn) throws IOException, ParseException {
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+            StringBuilder response = new StringBuilder();
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            JSONParser parser = new JSONParser();
+            JSONObject json = (JSONObject) parser.parse(response.toString());
+            return json;
+
+        }
+    }
+
+    private String paramBuilder(String OAuthCode, String clientId){
+        return  "&grant_type=authorization_code" +
+                "&code=" + OAuthCode +
+                "&redirect_uri=" + oauthConfiguration.redirectUri() +
+                "&client_id=" + clientId +
+                "&client_verifier=" + oauthConfiguration.codeVerifier();
+    }
 
     private AuthenticationResponse authenticate(LoginRequest loginRequest) {
         return settingsService

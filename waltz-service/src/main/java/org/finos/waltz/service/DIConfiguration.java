@@ -20,6 +20,8 @@ package org.finos.waltz.service;
 
 import org.finos.waltz.model.ImmutableWaltzVersionInfo;
 import org.finos.waltz.model.WaltzVersionInfo;
+import org.finos.waltz.model.authentication.ImmutableOAuthConfiguration;
+import org.finos.waltz.model.authentication.OAuthConfiguration;
 import org.finos.waltz.model.settings.ImmutableSetting;
 import org.finos.waltz.model.settings.Setting;
 import org.finos.waltz.service.jmx.PersonMaintenance;
@@ -69,12 +71,36 @@ public class DIConfiguration implements SchedulingConfigurer {
     @Value("${settings.override:#{null}}")
     private String settingsOverrideStr;
 
+    @Value("${oauth.token_url:oauth.token_url config option not provided")
+    private String oauthTokenUrl;
+
+    @Value("${oauth.userinfo_url:oauth.token_url config option not provided}")
+    private String oauthUserInfoUrl;
+
+    @Value("${oauth.code_verifier:oauth.token_url config option not provided}")
+    private String oauthCodeVerifier;
+
+    @Value("${oauth.redirect_uri:oauth.token_url config option not provided}")
+    private String oauthRedirectUri;
+
     @Bean
     public WaltzVersionInfo waltzBuildInfo() {
         return ImmutableWaltzVersionInfo.builder()
                 .timestamp(buildDate)
                 .pomVersion(buildPom)
                 .revision(buildRevision)
+                .build();
+    }
+
+
+    @Bean
+    public OAuthConfiguration oauthConfiguration() {
+        return ImmutableOAuthConfiguration
+                .builder()
+                .tokenUrl(oauthTokenUrl)
+                .userInfoUrl(oauthUserInfoUrl)
+                .codeVerifier(oauthCodeVerifier)
+                .redirectUri(oauthRedirectUri)
                 .build();
     }
 
