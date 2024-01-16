@@ -1,5 +1,6 @@
 import {
-    mkApplicationKindFormatter, mkAssessmentAndCategoryColumns,
+    mkAllocationColumns,
+    mkApplicationKindFormatter, mkPrimaryAssessmentAndCategoryColumns, mkDecommissionColumns,
     mkEntityLinkFormatter,
     mkLifecyclePhaseFormatter
 } from "../../../common/slick-grid-utils";
@@ -57,44 +58,72 @@ export function doGridSearch(data = [], searchStr) {
 }
 
 
-export function mkColumnDefs(primaryAssessments, primaryRatings) {
+export function mkColumnDefs(measurableRatings, primaryAssessments, primaryRatings, allocations, decommissions) {
     return _.concat(
         baseColumns,
-        mkAssessmentAndCategoryColumns(
-            primaryAssessments.assessmentDefinitions,
-            primaryRatings.measurableCategories));
+        mkPrimaryAssessmentAndCategoryColumns(primaryAssessments.assessmentDefinitions, primaryRatings.measurableCategories),
+        mkAllocationColumns(allocations.allocationSchemes),
+        mkDecommissionColumns(decommissions.plannedDecommissions, decommissions.plannedReplacements, decommissions.replacingDecommissions));
 }
 
 
-export function mkGridData(applications, primaryAssessments, primaryRatings, orgUnitsById) {
-    const measurableRatingsByAppId = _.groupBy(primaryRatings.measurableRatings, d => d.entityReference.id);
-    const measurablesById = _.keyBy(primaryRatings.measurables, d => d.id);
+export function mkGridData(applications, measurableRatings, primaryAssessments, primaryRatings, allocationsView, decommsView) {
+    const measurablesById = _.keyBy(measurableRatings.measurables, d => d.id);
     const applicationsById = _.keyBy(applications, d => d.id);
-    const measurableCategoriesById = _.keyBy(primaryRatings.measurableCategories, d => d.id);
     const measurableRatingsSchemeItemsByCategoryThenCode = _
-        .chain(primaryRatings.measurableCategories)
+        .chain(measurableRatings.measurableCategories)
         .reduce(
             (acc, mc) => {
                 acc[mc.id] = _.keyBy(
-                    _.filter(primaryRatings.ratingSchemeItems, rsi => rsi.ratingSchemeId === mc.ratingSchemeId),
+                    _.filter(measurableRatings.ratingSchemeItems, rsi => rsi.ratingSchemeId === mc.ratingSchemeId),
                     rsi => rsi.rating);
                 return acc;
             },
             {})
             .value();
+    const primaryRatingsSchemeItemsByCategoryThenCode = _
+        .chain(primaryRatings.measurableCategories)
+        .reduce(
+            (acc, mc) => {
+                acc[mc.id] = _.keyBy(
+                    _.filter(measurableRatings.ratingSchemeItems, rsi => rsi.ratingSchemeId === mc.ratingSchemeId),
+                    rsi => rsi.rating);
+                return acc;
+            },
+            {})
+            .value();
+
     const assessmentRatingsByEntityId = _.groupBy(primaryAssessments.assessmentRatings, d => d.entityReference.id);
     const assessmentDefinitionsById = _.keyBy(primaryAssessments.assessmentDefinitions, d => d.id);
     const assessmentRatingsSchemeItemsById = _.keyBy(primaryAssessments.ratingSchemeItems, d => d.id);
 
+    const allocationsByRatingId = _.groupBy(allocationsView.allocations, d => d.measurableRatingId);
+
+    const decommsByRatingId = _.keyBy(decommsView.plannedDecommissions, d => d.measurableRatingId);
+    const replacementsByDecommId = _.groupBy(decommsView.plannedReplacements, d => d.decommissionId);
+
+    const primaryRatingsByEntityId = _.groupBy(primaryRatings.measurableRatings, d => d.entityReference.id);
+    const primaryCategoriesById = _.keyBy(primaryRatings.measurableCategories, d => d.id);
+    const primaryMeasurablesById =_.keyBy(primaryRatings.measurables, d => d.id);
+
     return _
-        .chain(primaryRatings.measurableRatings)
+        .chain(measurableRatings.measurableRatings)
         .map(rating => {
             const assessmentRatings = assessmentRatingsByEntityId[rating.id] || [];
+            const primaryRatings = primaryRatingsByEntityId[rating.entityReference.id] || [];
             const measurable = measurablesById[rating.measurableId];
             const application = applicationsById[rating.entityReference.id];
 
             const ratingSchemeItemsByCode = _.get(measurableRatingsSchemeItemsByCategoryThenCode, [measurable?.measurableCategoryId], {});
             const ratingSchemeItem = ratingSchemeItemsByCode[rating.rating];
+            const allocationsByRating = allocationsByRatingId[rating.id];
+            const plannedDecommission = decommsByRatingId[rating.id];
+            const replacementApplications = _.get(replacementsByDecommId, plannedDecommission?.id, []);
+
+            const allocationCells = _
+                .chain(allocationsByRating)
+                .reduce((acc, d) => {acc['allocation_scheme/'+d.schemeId] = d; return acc;}, {})
+                .value();
 
             const primaryAssessmentCells = _
                 .chain(assessmentRatings)
@@ -119,7 +148,30 @@ export function mkGridData(applications, primaryAssessments, primaryRatings, org
                 )
                 .value();
 
-             return _.merge({measurable, application, ratingSchemeItem}, primaryAssessmentCells);
+            const primaryMeasurableCells = _
+                .chain(primaryRatings)
+                .map(mr => {
+                    const measurable = primaryMeasurablesById[mr.measurableId];
+                    const measurableCategory = primaryCategoriesById[measurable.categoryId];
+                    const ratingSchemeItem = _.get(primaryRatingsSchemeItemsByCategoryThenCode, [measurableCategory.id, mr.rating]);
+                    return {
+                        measurable,
+                        measurableCategory,
+                        ratingSchemeItem
+                    };
+                })
+                .reduce((acc, d) => {acc['measurable_category/'+d.measurableCategory.id] = d; return acc;}, {})
+                .value();
+
+            return _.merge({
+                 measurable,
+                 application,
+                 ratingSchemeItem,
+                 plannedDecommission,
+                 replacementApplications},
+                 primaryAssessmentCells,
+                 primaryMeasurableCells,
+                 allocationCells);
         })
         .value();
 

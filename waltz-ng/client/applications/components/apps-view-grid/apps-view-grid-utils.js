@@ -1,5 +1,6 @@
 import {
-    mkApplicationKindFormatter, mkAssessmentAndCategoryColumns,
+    mkApplicationKindFormatter,
+    mkPrimaryAssessmentAndCategoryColumns,
     mkEntityLinkFormatter,
     mkLifecyclePhaseFormatter
 } from "../../../common/slick-grid-utils";
@@ -77,9 +78,7 @@ export function doGridSearch(data = [], searchStr) {
 export function mkColumnDefs(primaryAssessments, primaryRatings) {
     return _.concat(
         baseColumns,
-        mkAssessmentAndCategoryColumns(
-            primaryAssessments.assessmentDefinitions,
-            primaryRatings.measurableCategories));
+        mkPrimaryAssessmentAndCategoryColumns(primaryAssessments.assessmentDefinitions, primaryRatings.measurableCategories));
 }
 
 

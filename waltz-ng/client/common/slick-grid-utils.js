@@ -1,7 +1,8 @@
-import {cmp} from "./sort-utils";
+import {cmp, compareDates} from "./sort-utils";
 import EntityLink from "./svelte/EntityLink.svelte";
 import {applicationKind} from "./services/enums/application-kind";
 import {lifecyclePhase} from "./services/enums/lifecycle-phase";
+import _ from "lodash";
 
 
 export function mkSortFn(sortCol, sortAsc = true) {
@@ -51,6 +52,37 @@ export function mkLifecyclePhaseFormatter(valueProvider) {
 }
 
 
+export function mkAllocationFormatter(labelProvider = v => v?.percentage) {
+    return (row, cell, value) => {
+        const label = labelProvider(value);
+        return _.isEmpty(value) ? `<span>-</span>` : `<span>${label}%</span>`;
+    };
+}
+
+
+export function mkDecommFormatter(labelProvider = v => v?.plannedDecommissionDate) {
+    return (row, cell, value) => {
+        const label = labelProvider(value);
+        return _.isEmpty(label) ? null : `<span>${label}</span>`;
+    };
+}
+
+
+export function mkReplacementAppsFormatter(labelProvider = v => v?.entityReference.name) {
+    return (row, cell, values) => {
+        return _
+            .chain(values)
+            .orderBy(value => labelProvider(value))
+            .map(value => {
+                const label = labelProvider(value) || "";
+                return `<span>${label}</span>`;
+            })
+            .join("<span>, </span>")
+            .value();
+    }
+}
+
+
 function mkRatingSchemeItemFormatter(labelProvider = v => v?.ratingSchemeItem.name) {
     return (row, cell, value) => {
         const ratingSchemeItem = _.get(value, ["ratingSchemeItem"]);
@@ -87,7 +119,7 @@ function mkRatingSchemeItemsFormatter(labelProvider = v => v?.ratingSchemeItem.n
 }
 
 
-export function mkAssessmentAndCategoryColumns(assessmentDefs = [], categories = []) {
+export function mkPrimaryAssessmentAndCategoryColumns(assessmentDefs = [], categories = []) {
     const assessmentCols = _
         .chain(assessmentDefs)
         .sortBy(d => d.name)
@@ -114,7 +146,7 @@ export function mkAssessmentAndCategoryColumns(assessmentDefs = [], categories =
             const field = "measurable_category/" + d.id;
             return {
                 id: d.id,
-                name: d.name,
+                name: `Primary ${d.name}`,
                 width: 150,
                 field,
                 sortable: true,
@@ -129,4 +161,70 @@ export function mkAssessmentAndCategoryColumns(assessmentDefs = [], categories =
     return _.concat(
         categoryCols,
         assessmentCols);
+}
+
+
+export function mkAllocationColumns(allocationSchemes = []) {
+    return _
+        .chain(allocationSchemes)
+        .sortBy(d => d.name)
+        .map(d => {
+            const field = "allocation_scheme/" + d.id;
+            return {
+                id: d.id,
+                name: d.name,
+                field,
+                sortable: true,
+                formatter: mkAllocationFormatter(),
+                width: 130,
+                sortFn: (a, b) => {
+                    const v1 = _.get(a, [field, "percentage"], null);
+                    const v2 = _.get(b, [field, "percentage"], null);
+                    if(!_.isEmpty(v1) && _.isEmpty(v2)) {
+                        return 1;
+                    } else if (_.isEmpty(v1) && !_.isEmpty(v2)) {
+                        return -1;
+                    } else {
+                        return cmp(v1, v2);
+                    }
+                }
+            };
+        })
+        .value();
+}
+
+
+export function mkDecommissionColumns(plannedDecommissions = [], plannedReplacements = [], replacingDecommissions = []) {
+
+    const decomColumns = [];
+
+    if (!_.isEmpty(plannedDecommissions)) {
+        const plannedDecomCol = {
+            id: "planned_decommission_date",
+            name:"Planned Decommission date",
+            width: 150,
+            field: "plannedDecommission",
+            sortable: true,
+            formatter: mkDecommFormatter(),
+            sortFn: (a, b) => {
+                const d1 = _.get(a, ["plannedDecommission", "plannedDecommissionDate"], null)
+                const d2 = _.get(b, ["plannedDecommission", "plannedDecommissionDate"], null)
+                return compareDates(d1, d2);
+            }
+        }
+        decomColumns.push(plannedDecomCol);
+    }
+
+    if(!_.isEmpty(plannedReplacements)) {
+        const plannedReplacementCol = {
+            id: "replacement_applications",
+            name:"Replacement Applications",
+            width: 150,
+            field: "replacementApplications",
+            sortable: false,
+            formatter: mkReplacementAppsFormatter(),
+        }
+        decomColumns.push(plannedReplacementCol);
+    }
+    return decomColumns;
 }

@@ -20,6 +20,7 @@ package org.finos.waltz.service.measurable_rating;
 
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.EntityReferenceNameResolver;
+import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.data.measurable.MeasurableDao;
 import org.finos.waltz.data.measurable.MeasurableIdSelectorFactory;
@@ -53,6 +54,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.*;
@@ -423,5 +425,9 @@ public class MeasurableRatingService {
         return nameAndCode == null
                 ? "-"
                 : format("%s [%s]", nameAndCode.v1, nameAndCode.v2);
+    }
+
+    public Set<MeasurableRating> findPrimaryRatingsForGenericSelector(GenericSelector genericSelector) {
+        return measurableRatingDao.findPrimaryRatingsForGenericSelector(genericSelector);
     }
 }

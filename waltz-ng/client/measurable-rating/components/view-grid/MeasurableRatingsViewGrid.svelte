@@ -11,11 +11,12 @@
     import NoData from "../../../common/svelte/NoData.svelte";
     import {measurableRatingStore} from "../../../svelte-stores/measurable-rating-store";
     import {selectedMeasurable} from "./measurable-rating-view-store";
+    import LoadingPlaceholder from "../../../common/svelte/LoadingPlaceholder.svelte";
 
     const options = {
         enableCellNavigation: false,
         enableColumnReorder: false,
-        frozenColumn: 1
+        frozenColumn: 0
     };
 
     function initGrid(elem) {
@@ -42,12 +43,10 @@
     });
 
     $: {
-        if (!_.isEmpty($selectedMeasurable) && selectionOptions){
-            viewCall = measurableRatingStore.getViewByCategoryAndSelector($selectedMeasurable.categoryId, selectionOptions)
+        if (!_.isEmpty($selectedMeasurable) && selectionOptions) {
+            viewCall = measurableRatingStore.getViewByCategoryAndSelector($selectedMeasurable.categoryId, selectionOptions, true)
         }
     }
-
-    $: console.log({selectedMeasurable: $selectedMeasurable, selectionOptions, viewCall});
 
     $: {
         const data  = doGridSearch(viewData, searchStr);
@@ -60,9 +59,9 @@
     $: {
         if (!_.isEmpty(viewCall) && !_.isEmpty($viewCall?.data)) {
             console.log({data: $viewCall?.data});
-            const {applications, primaryAssessments, measurableRatings, allocations} = $viewCall.data;
-            columns = mkColumnDefs(primaryAssessments, measurableRatings);
-            viewData = mkGridData(applications, primaryAssessments, measurableRatings);
+            const {applications, primaryAssessments, primaryRatings, measurableRatings, allocations, decommissions} = $viewCall.data;
+            columns = mkColumnDefs(measurableRatings, primaryAssessments, primaryRatings, allocations, decommissions);
+            viewData = mkGridData(applications, measurableRatings, primaryAssessments, primaryRatings, allocations, decommissions);
             console.log({columns, viewData});
         }
 
@@ -70,10 +69,15 @@
             initGrid(elem);
         }
     }
+
 </script>
 
-<h4>Another grid!!!</h4>
-<!--{#if !_.isEmpty(viewData)}-->
+{#if ($viewCall?.status === 'loading')}
+    <LoadingPlaceholder>
+        Loading...
+    </LoadingPlaceholder>
+{/if}
+{#if !_.isEmpty(viewData)}
     <SearchInput bind:value={searchStr}/>
 
     <div class="slick-container"
@@ -92,9 +96,9 @@
                          requestBody={selectionOptions}
                          styling="link"/>
     </div>
-<!--{:else}-->
-<!--    <NoData>No applications</NoData>-->
-<!--{/if}-->
+{:else}
+    <NoData>No ratings</NoData>
+{/if}
 
 <style type="text/scss">
     @import "slickgrid/dist/styles/css/slick-alpine-theme.css";

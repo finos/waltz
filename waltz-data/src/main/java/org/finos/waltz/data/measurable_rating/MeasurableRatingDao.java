@@ -250,12 +250,16 @@ public class MeasurableRatingDao {
 
 
     public List<MeasurableRating> findForCategoryAndSelector(Select<Record1<Long>> appIdSelector, long categoryId) {
-        return mkBaseQuery()
+        SelectConditionStep<Record> qry = mkBaseQuery()
                 .innerJoin(MEASURABLE).on(MEASURABLE_RATING.MEASURABLE_ID.eq(MEASURABLE.ID)
                         .and(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId)))
-                .where(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                .and(MEASURABLE_RATING.ENTITY_ID.in(appIdSelector))
-                .fetch(TO_DOMAIN_MAPPER);
+                .where(dsl.renderInlined(
+                        MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                                .and(MEASURABLE_RATING.ENTITY_ID.in(appIdSelector))));
+
+        System.out.println(qry);
+
+        return qry.fetch(TO_DOMAIN_MAPPER);
     }
 
     public MeasurableRating getById(long id) {
@@ -807,9 +811,9 @@ public class MeasurableRatingDao {
 
     public Set<MeasurableRating> findPrimaryRatingsForGenericSelector(GenericSelector selector) {
         return mkBaseQuery()
-                .where(MEASURABLE_RATING.ENTITY_KIND.eq(selector.kind().name())
+                .where(dsl.renderInlined(MEASURABLE_RATING.ENTITY_KIND.eq(selector.kind().name())
                         .and(MEASURABLE_RATING.ENTITY_ID.in(selector.selector()))
-                        .and(MEASURABLE_RATING.IS_PRIMARY.isTrue()))
+                        .and(MEASURABLE_RATING.IS_PRIMARY.isTrue())))
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
 }

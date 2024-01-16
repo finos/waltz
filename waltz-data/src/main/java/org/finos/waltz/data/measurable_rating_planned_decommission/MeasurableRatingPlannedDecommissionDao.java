@@ -151,7 +151,7 @@ public class MeasurableRatingPlannedDecommissionDao {
         return mkBaseQry()
                 .innerJoin(MEASURABLE).on(MEASURABLE_RATING.MEASURABLE_ID.eq(MEASURABLE.ID)
                         .and(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId)))
-                .where(MEASURABLE_RATING.ENTITY_ID.in(appIdSelector))
+                .where(dsl.renderInlined(MEASURABLE_RATING.ENTITY_ID.in(appIdSelector)))
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
 

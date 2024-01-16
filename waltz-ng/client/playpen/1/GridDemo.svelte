@@ -7,7 +7,7 @@
     import {
         mkEntityLinkFormatter,
         mkSortFn,
-        mkAssessmentAndCategoryColumns,
+        mkPrimaryAssessmentAndCategoryColumns,
         mkApplicationKindFormatter,
         mkLifecyclePhaseFormatter
     } from "../../common/slick-grid-utils";
@@ -116,9 +116,7 @@
 
             columns = _.concat(
                 baseColumns,
-                mkAssessmentAndCategoryColumns(
-                    primaryAssessments.assessmentDefinitions,
-                    primaryRatings.measurableCategories));
+                mkPrimaryAssessmentAndCategoryColumns(primaryAssessments.assessmentDefinitions, primaryRatings.measurableCategories));
 
             viewData = _
                 .chain(applications)

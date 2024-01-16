@@ -18,6 +18,7 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.common.FunctionUtilities;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -49,6 +50,7 @@ import java.util.Collection;
 import java.util.Set;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.FunctionUtilities.time;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.model.EntityKind.MEASURABLE_RATING;
 import static org.finos.waltz.model.EntityReference.mkRef;
@@ -134,7 +136,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
         DatumRoute<MeasurableRatingCategoryView> getViewByCategoryAndAppSelectorRoute = (request, response) -> {
             IdSelectionOptions idSelectionOptions = readIdSelectionOptionsFromBody(request);
             long categoryId = getId(request);
-            return measurableRatingViewService.getViewForCategoryAndSelector(idSelectionOptions, categoryId);
+            return time("viewForCatAndSelector", () -> measurableRatingViewService.getViewForCategoryAndSelector(idSelectionOptions, categoryId));
         };
 
         ListRoute<MeasurableRating> findByCategoryRoute = (request, response)

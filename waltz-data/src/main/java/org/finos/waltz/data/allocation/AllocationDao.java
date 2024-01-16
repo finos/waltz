@@ -94,8 +94,8 @@ public class AllocationDao {
                 .innerJoin(MEASURABLE_RATING).on(ALLOCATION.MEASURABLE_RATING_ID.eq(MEASURABLE_RATING.ID))
                 .innerJoin(MEASURABLE).on(MEASURABLE_RATING.MEASURABLE_ID.eq(MEASURABLE.ID)
                         .and(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId)))
-                .where(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
-                        .and(MEASURABLE_RATING.ENTITY_ID.in(appIdSelector)))
+                .where(dsl.renderInlined(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                        .and(MEASURABLE_RATING.ENTITY_ID.in(appIdSelector))))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 

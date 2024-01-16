@@ -337,44 +337,14 @@ function controller($q, $scope, serviceBroker) {
     };
 
     vm.onSelect = (measurable) => {
-
-        console.log({select: measurable});
-
         selectedMeasurable.set(measurable);
     };
 
     selectedMeasurable.subscribe(measurable => {
         $scope.$applyAsync(() => {
-            console.log({measurable})
-
             if (!_.isEmpty(measurable)) {
-
-                vm.visibility.ratingDetail = false;
-                vm.visibility.loading = true;
-                vm.tableData = null;
-
                 vm.selectedMeasurable = measurable;
-                const promise = loadRatingDetail();
-                const category = _.find(vm.measurableCategories, ({ id: measurable.categoryId }));
-                const ratingScheme = vm.ratingSchemesById[category.ratingSchemeId];
-
-                vm.columnDefs = prepareColumnDefs(category);
-                if (_.isFunction(_.get(promise, "then"))) {
-                    promise
-                        .then(ratings => vm.tableData = prepareTableData(
-                            measurable,
-                            ratingScheme,
-                            vm.applications,
-                            ratings,
-                            vm.measurablesById))
-                        .then(() => {
-                            vm.visibility.loading = false;
-                            vm.visibility.ratingDetail = true;
-                        });
-                } else {
-                    log("was expecting promise, got: ", promise);
-                    vm.visibility.loading = false;
-                }
+                vm.visibility.ratingDetail = true;
             }
         })
     })
@@ -400,7 +370,6 @@ function controller($q, $scope, serviceBroker) {
         clearDetail();
         vm.activeCategory = c;
         vm.onMeasurableCategorySelect(c);
-        console.log({c})
     };
 
     vm.toggleShow = () => vm.showMore = !vm.showMore;

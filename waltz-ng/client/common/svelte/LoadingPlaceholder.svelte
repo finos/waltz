@@ -3,8 +3,8 @@
 </script>
 
 <h3 class="text-muted">
-    <Icon name="circle-o-notch"
-          spin="true"/>
+    <Icon name="sync"
+          spin={true}/>
     <slot>
         Loading ...
     </slot>

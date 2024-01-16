@@ -36,4 +36,6 @@ public interface MeasurableRatingCategoryView {
     DecommissionsView decommissions();
 
     MeasurableRatingsView measurableRatings();
+
+    MeasurableRatingsView primaryRatings();
 }
