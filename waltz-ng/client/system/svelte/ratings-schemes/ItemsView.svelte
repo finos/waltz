@@ -97,15 +97,17 @@
 {/if}
 
 {#if activeMode === Modes.LIST}
-    <table class="table table-striped table-hover table-condensed">
+    <table class="table table-striped table-hover table-condensed small">
         <thead>
         <tr>
             <th width="20%"><i>Group</i></th>
             <th width="25%">Rating</th>
             <th width="5%">Code</th>
+            <th width="10%">Req. Comment</th>
+
             <th width="10%">Color</th>
-            <th width="15%">Usages</th>
-            <th width="25%">Operations</th>
+            <th width="10%">Usages</th>
+            <th width="20%">Operations</th>
         </tr>
         </thead>
         <tbody>
@@ -114,6 +116,11 @@
                 <td>{rating.ratingGroup || '-'}</td>
                 <td>{rating.name}</td>
                 <td>{rating.rating}</td>
+                <td>
+                    {#if rating.requiresComment}
+                        <Icon name="check"/>
+                    {/if}
+                </td>
                 <td>
                     <div class="rating-square"
                          style="background-color: {rating.color}">
@@ -142,13 +149,13 @@
             </tr>
         {:else}
             <tr>
-                <td colspan="5">No ratings yet</td>
+                <td colspan="7">No ratings yet</td>
             </tr>
         {/each}
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="5">
+                <td colspan="7">
                     <button class="btn-link"
                             on:click={mkNew}>
                         <Icon name="plus"/>

@@ -145,6 +145,27 @@
         </div>
 
 
+        <!-- REQUIRES COMMENT -->
+        <label for="requiresComment">
+            Requires Comment ?
+        </label>
+        <input type=checkbox
+               id="requiresComment"
+               bind:checked={workingCopy.requiresComment}>
+        <span class="text-muted">
+            {#if workingCopy.requiresComment}
+                Yes, user must supply a comment when selecting this item
+                <Icon name="lock"/>
+            {:else}
+                No, users may omit providing a comment when selecting this item
+                <Icon name="unlock"/>
+            {/if}
+        </span>
+        <div class="help-block">
+            Determines if the user <i>must</i> supply a comment when selecting this item.
+        </div>
+
+
         <!-- COLOR -->
         <label for="color-picker">Color</label>
         <div id="color-picker">
