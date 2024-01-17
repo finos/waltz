@@ -165,7 +165,7 @@ public class AuthenticationEndpoint implements Endpoint {
 
             String token = JWT.create()
                     .withIssuer(JWTUtilities.ISSUER)
-                    .withSubject("email")
+                    .withSubject(email)
                     .withArrayClaim("roles", roles)
                     .withClaim("displayName", name)
                     .withClaim("employeeId", subname)
