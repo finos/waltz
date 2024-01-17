@@ -69,4 +69,20 @@
                         tableName="software_version" />
     </changeSet>
 
+
+    <changeSet id="20240117-6708-2"
+               author="davidwatkins73">
+        <comment>6708: Allow assessments to require mandatory comments</comment>
+        <addColumn tableName="rating_scheme_item">
+            <column name="requires_comment"
+                    type="boolean"
+                    defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <setColumnRemarks tableName="rating_scheme_item"
+                          columnName="requires_comment"
+                          remarks="Indicates if the user must provide a comment when setting this option. Only valid if the assessment/item is not-readonly and is user-selectable"/>
+    </changeSet>
+
 </databaseChangeLog>
