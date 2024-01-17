@@ -253,11 +253,11 @@ public class AuthenticationEndpoint implements Endpoint {
     }
 
     private String paramBuilder(String OAuthCode, String clientId){
-        return  "&grant_type=authorization_code" +
+        return  "grant_type=authorization_code" +
                 "&code=" + OAuthCode +
                 "&redirect_uri=" + oauthConfiguration.redirectUri() +
                 "&client_id=" + clientId +
-                "&client_verifier=" + oauthConfiguration.codeVerifier();
+                "&code_verifier=" + oauthConfiguration.codeVerifier();
     }
 
     private AuthenticationResponse authenticate(LoginRequest loginRequest) {

@@ -71,16 +71,16 @@ public class DIConfiguration implements SchedulingConfigurer {
     @Value("${settings.override:#{null}}")
     private String settingsOverrideStr;
 
-    @Value("${oauth.token_url:oauth.token_url config option not provided")
+    @Value("${oauth.token_url:oauth.token_url config option not provided}")
     private String oauthTokenUrl;
 
-    @Value("${oauth.userinfo_url:oauth.token_url config option not provided}")
+    @Value("${oauth.userinfo_url:oauth.userinfo_url config option not provided}")
     private String oauthUserInfoUrl;
 
-    @Value("${oauth.code_verifier:oauth.token_url config option not provided}")
+    @Value("${oauth.code_verifier:oauth.code_verifier config option not provided}")
     private String oauthCodeVerifier;
 
-    @Value("${oauth.redirect_uri:oauth.token_url config option not provided}")
+    @Value("${oauth.redirect_uri:oauth.redirect_uri config option not provided}")
     private String oauthRedirectUri;
 
     @Bean
