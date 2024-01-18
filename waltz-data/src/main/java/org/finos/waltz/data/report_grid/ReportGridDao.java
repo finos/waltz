@@ -862,11 +862,6 @@ public class ReportGridDao {
                     colsByKind.getOrDefault(EntityKind.DATA_TYPE, emptySet()),
                     d -> d.additionalColumnOptions() == AdditionalColumnOptions.NONE);
 
-            Map<AdditionalColumnOptions, Collection<ReportGridFixedColumnDefinition>> surveyQuestionColsBySurveyStatusOptions = groupBy(
-                    colsByKind.getOrDefault(EntityKind.SURVEY_QUESTION, emptySet()),
-                    d -> d.additionalColumnOptions());
-
-
             // FIELD REF COL DEFS
 
             Map<Long, EntityFieldReference> fieldReferencesById = dsl
@@ -899,6 +894,7 @@ public class ReportGridDao {
                             measurableColumnsByRollupKind.getOrDefault(AdditionalColumnOptions.PICK_HIGHEST, emptySet()),
                             measurableColumnsByRollupKind.getOrDefault(AdditionalColumnOptions.PICK_LOWEST, emptySet())),
                     fetchExactMeasurableData(genericSelector, measurableColumnsByRollupKind.get(AdditionalColumnOptions.NONE)),
+                    fetchPrimaryMeasurableData(genericSelector, measurableColumnsByRollupKind.get(AdditionalColumnOptions.PRIMARY)),
                     fetchSurveyQuestionResponseData(genericSelector, colsByKind.get(EntityKind.SURVEY_QUESTION)),
                     fetchSurveyTemplateResponseData(genericSelector, colsByKind.get(EntityKind.SURVEY_TEMPLATE)),
                     fetchAppGroupData(genericSelector, colsByKind.get(EntityKind.APP_GROUP)),
@@ -909,6 +905,7 @@ public class ReportGridDao {
                     fetchChangeInitiativeFieldReferenceData(genericSelector, fieldRefColsByKind.get(EntityKind.CHANGE_INITIATIVE)),
                     fetchAttestationData(genericSelector, colsByKind.get(EntityKind.ATTESTATION)),
                     fetchOrgUnitFieldReferenceData(genericSelector, fieldRefColsByKind.get(EntityKind.ORG_UNIT)),
+                    fetchPrimaryMeasurableFieldReferenceData(genericSelector, fieldRefColsByKind.get(EntityKind.MEASURABLE)),
                     fetchTagData(genericSelector, colsByKind.get(EntityKind.TAG)),
                     fetchAliasData(genericSelector, colsByKind.get(EntityKind.ENTITY_ALIAS)),
                     fetchMeasurableHierarchyData(genericSelector, colsByKind.get(EntityKind.MEASURABLE_CATEGORY)),
@@ -1049,7 +1046,6 @@ public class ReportGridDao {
                     .from(mr)
                     .where(mr.ENTITY_ID.in(genericSelector.selector()))
                     .and(mr.ENTITY_KIND.eq(genericSelector.kind().name()));
-
 
             return colIdsByCategoryIdAndQualifierId
                     .entrySet()
@@ -1743,6 +1739,79 @@ public class ReportGridDao {
                 : changeInitiativeOrgUnitQuery;
     }
 
+    private Set<ReportGridCell> fetchPrimaryMeasurableFieldReferenceData(GenericSelector selector,
+                                                                         Set<Tuple2<ReportGridFixedColumnDefinition, EntityFieldReference>> requiredMeasurableColumns) {
+
+        if (isEmpty(requiredMeasurableColumns)) {
+            return emptySet();
+        } else {
+
+            Map<Long, Map<String, Long>> fieldRefColumnsByCategoryId = requiredMeasurableColumns
+                    .stream()
+                    .filter(d -> d.v1.columnQualifierKind().equals(EntityKind.MEASURABLE_CATEGORY))
+                    .collect(groupingBy(k -> k.v1.columnQualifierId(), toMap(d -> d.v2.fieldName(), d -> d.v1.gridColumnId())));
+
+            SelectConditionStep<Record> qry = getPrimaryMeasurableSelectQuery(selector, fieldRefColumnsByCategoryId.keySet());
+
+            return qry
+                    .fetch()
+                    .stream()
+                    .flatMap(measurableInfo -> {
+
+                        Long categoryId = measurableInfo.get(MEASURABLE.MEASURABLE_CATEGORY_ID);
+                        Long ratingId = measurableInfo.get("ratingId", Long.class);
+                        String ratingName = measurableInfo.get("ratingName", String.class);
+
+                        Map<String, Long> fieldRefToColId = fieldRefColumnsByCategoryId.get(categoryId);
+
+                        return fieldRefToColId
+                                .entrySet()
+                                .stream()
+                                .map(e -> {
+
+                                    String fieldName = e.getKey();
+                                    Long colId = e.getValue();
+
+                                    Field<?> field = MEASURABLE.field(fieldName);
+                                    Object rawValue = measurableInfo.get(field);
+
+                                    if (rawValue == null) {
+                                        return null;
+                                    }
+
+                                    return ImmutableReportGridCell
+                                            .builder()
+                                            .subjectId(measurableInfo.get("entityId", Long.class))
+                                            .columnDefinitionId(colId)
+                                            .textValue(String.valueOf(rawValue))
+                                            .ratingIdValues(asSet(ratingId))
+                                            .options(asSet(mkCellOption(Long.toString(ratingId), ratingName)))
+                                            .build();
+                                });
+                    })
+                    .filter(Objects::nonNull)
+                    .collect(toSet());
+        }
+    }
+
+    private SelectConditionStep<Record> getPrimaryMeasurableSelectQuery(GenericSelector selector, Set<Long> categoryIds) {
+
+        return dsl
+                .select(MEASURABLE.fields())
+                .select(MEASURABLE_RATING.ENTITY_ID.as("entityId"))
+                .select(MEASURABLE.MEASURABLE_CATEGORY_ID)
+                .select(RATING_SCHEME_ITEM.ID.as("ratingId"))
+                .select(RATING_SCHEME_ITEM.NAME.as("ratingName"))
+                .from(MEASURABLE)
+                .innerJoin(MEASURABLE_RATING).on(MEASURABLE.ID.eq(MEASURABLE_RATING.MEASURABLE_ID))
+                .innerJoin(MEASURABLE_CATEGORY).on(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(MEASURABLE_CATEGORY.ID))
+                .innerJoin(RATING_SCHEME_ITEM).on(MEASURABLE_RATING.RATING.eq(RATING_SCHEME_ITEM.CODE)
+                        .and(RATING_SCHEME_ITEM.SCHEME_ID.eq(MEASURABLE_CATEGORY.RATING_SCHEME_ID)))
+                .where(MEASURABLE_RATING.IS_PRIMARY.isTrue()
+                        .and(MEASURABLE.MEASURABLE_CATEGORY_ID.in(categoryIds)
+                            .and(MEASURABLE_RATING.ENTITY_ID.in(selector.selector())
+                                    .and(MEASURABLE_RATING.ENTITY_KIND.eq(selector.kind().name())))));
+    }
 
     private Set<ReportGridCell> fetchInvolvementData(GenericSelector selector,
                                                      Collection<ReportGridFixedColumnDefinition> cols) {
@@ -2064,6 +2133,45 @@ public class ReportGridDao {
                     .where(mr.MEASURABLE_ID.in(measurableIdToDefIdMap.keySet()))
                     .and(mr.ENTITY_ID.in(selector.selector()))
                     .and(mr.ENTITY_KIND.eq(selector.kind().name()));
+
+            return dsl
+                    .resultQuery(dsl.renderInlined(qry))
+                    .fetchSet(r -> ImmutableReportGridCell.builder()
+                            .subjectId(r.get(mr.ENTITY_ID))
+                            .columnDefinitionId(measurableIdToDefIdMap.get(r.get(mr.MEASURABLE_ID)))
+                            .ratingIdValues(asSet(r.get(rsi.ID)))
+                            .textValue(r.get(rsi.NAME))
+                            .comment(r.get(mr.DESCRIPTION))
+                            .options(asSet(mkCellOption(Long.toString(r.get(rsi.ID)), r.get(rsi.NAME))))
+                        .build());
+        }
+    }
+
+    private Set<ReportGridCell> fetchPrimaryMeasurableData(GenericSelector selector,
+                                                           Collection<ReportGridFixedColumnDefinition> cols) {
+
+        if (isEmpty(cols)) {
+            return emptySet();
+        } else {
+            Map<Long, Long> measurableIdToDefIdMap = indexBy(
+                    cols,
+                    ReportGridFixedColumnDefinition::columnEntityId,
+                    ReportGridFixedColumnDefinition::gridColumnId);
+
+            SelectConditionStep<Record5<Long, Long, Long, String, String>> qry = dsl
+                    .select(mr.ENTITY_ID,
+                            mr.MEASURABLE_ID,
+                            rsi.ID,
+                            rsi.NAME,
+                            mr.DESCRIPTION)
+                    .from(mr)
+                    .innerJoin(m).on(m.ID.eq(mr.MEASURABLE_ID))
+                    .innerJoin(mc).on(mc.ID.eq(m.MEASURABLE_CATEGORY_ID))
+                    .innerJoin(rsi).on(rsi.CODE.eq(mr.RATING)).and(rsi.SCHEME_ID.eq(mc.RATING_SCHEME_ID))
+                    .where(mr.MEASURABLE_ID.in(measurableIdToDefIdMap.keySet()))
+                    .and(mr.ENTITY_ID.in(selector.selector()))
+                    .and(mr.ENTITY_KIND.eq(selector.kind().name()))
+                    .and(mr.IS_PRIMARY.isTrue());
 
             return dsl
                     .resultQuery(dsl.renderInlined(qry))

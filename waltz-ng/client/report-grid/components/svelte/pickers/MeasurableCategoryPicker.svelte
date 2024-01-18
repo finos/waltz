@@ -8,7 +8,7 @@
     import {mkSelectionOptions} from "../../../../common/selector-utils";
     import {buildHierarchies} from "../../../../common/hierarchy-utils";
     import MeasurableTreeSelector from "../../../../common/svelte/MeasurableTreeSelector.svelte";
-    import {mkMeasurableColumn, mkReportGridFixedColumnRef} from "../report-grid-utils";
+    import {mkMeasurableCategoryColumn, mkMeasurableColumn} from "../report-grid-utils";
 
     export let onSelect = () => console.log("Selecting measurable");
     export let onDeselect = () => console.log("Deselecting measurable");
@@ -45,11 +45,12 @@
     }
 
     function selectAllForCategory() {
-        const notSelected = selectionFilter(selectedCategory);
+        const col = mkMeasurableCategoryColumn(selectedCategory);
+        const notSelected = selectionFilter(col);
         if (notSelected) {
-            onSelect(selectedCategory);
+            onSelect(col);
         } else {
-            onDeselect(selectedCategory);
+            onDeselect(col);
         }
     }
 
@@ -67,17 +68,22 @@
             </button>.
         </span>
     </div>
-    <p>Measurables for category: <strong>{selectedCategory.name}</strong></p>
-    <MeasurableTreeSelector {measurables}
-                            {selected}
-                            onSelect={m => onSelect(mkMeasurableColumn(selectedCategory, m))}
-                            onDeselect={m => onDeselect(mkMeasurableColumn(selectedCategory, m))}/>
-    <button class="btn btn-skinny"
-            on:click={selectAllForCategory}>
-        <Icon name={selectionFilter(selectedCategory) ? "square-o": "check-square-o"}/>
-        Show all mappings to this category
-    </button>
-
+    <div style="padding-top: 1em;">
+        <button class="btn btn-skinny"
+                on:click={selectAllForCategory}>
+            <Icon name={selectionFilter(mkMeasurableCategoryColumn(selectedCategory)) ? "square-o": "check-square-o"}/>
+            Show all mappings to this category
+        </button>
+        <div class="text-muted">This will populate a cell with a list of all mappings for this taxonomy. The hover over can be used to see the full hierarchy.</div>
+    </div>
+    <div style="padding-top: 1em;">
+        <p>Measurables for category: <strong>{selectedCategory.name}</strong></p>
+        <MeasurableTreeSelector {measurables}
+                                {selected}
+                                onSelect={m => onSelect(mkMeasurableColumn(selectedCategory, m))}
+                                onDeselect={m => onDeselect(mkMeasurableColumn(selectedCategory, m))}/>
+        <div class="text-muted">Selecting an item in the taxonomy will add a cell with a list of all mappings to that item or one of it's children. Each selection adds a new column.</div>
+    </div>
 {:else}
     <div class="help-block small">
         <Icon name="info-circle"/>

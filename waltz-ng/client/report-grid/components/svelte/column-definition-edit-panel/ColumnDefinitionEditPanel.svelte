@@ -15,7 +15,6 @@
 
 
     export let gridId;
-    export let onSave = () => console.log("Saved report grid");
 
     const {columnDefs, hasDirtyColumns, gridDefinition} = gridService;
 
@@ -63,7 +62,6 @@
     function saveColumnDefs() {
         gridService.saveColumns()
             .then(() => {
-                onSave();
                 toasts.success("Report grid columns updated successfully");
                 selectedColumn = null;
                 activeMode = Modes.VIEW;
