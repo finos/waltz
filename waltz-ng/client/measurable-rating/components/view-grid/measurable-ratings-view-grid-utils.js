@@ -71,7 +71,7 @@ export function doGridSearch(data = [], searchStr) {
 
 export function mkColumnDefs(measurableRatings, primaryAssessments, primaryRatings, allocations, decommissions) {
     return _.concat(
-        mkSummaryColumn(),
+        mkSummaryColumn(measurableRatings, allocations, decommissions),
         baseColumns,
         mkAllocationColumns(allocations.allocationSchemes),
         mkPrimaryAssessmentAndCategoryColumns(primaryAssessments.assessmentDefinitions, primaryRatings.measurableCategories),
@@ -79,45 +79,74 @@ export function mkColumnDefs(measurableRatings, primaryAssessments, primaryRatin
 }
 
 
-export function mkSummaryFormatter() {
+export function mkSummaryFormatter(hasAnyPrimaries, hasAnyAllocations, hasAnyDecomms) {
     return (row, cell, value, colDef, dataCtx) => {
+
+        const summaries = [];
+
         const isPrimary = _.get(dataCtx, ["measurableRating", "isPrimary"], false);
         const hasAllocations = _.get(dataCtx, ["hasAllocations"], false);
         const hasReplacements = !_.isEmpty(_.get(dataCtx, ["replacementApplications"], []));
         const hasPlannedDecom = !_.isEmpty(_.get(dataCtx, ["plannedDecommission"], null));
-        const primaryIcon = isPrimary
-            ? `<span class="text-muted" style="padding-right: 2px"><i class="small fa fa-fw fa-star-o"></i></span>`
-            : `<span class="text-muted" style="padding-right: 2px"><i class="small fa fa-fw"></i></span>`;
+        if (hasAnyPrimaries) {
+            const primaryIcon = isPrimary
+                ? `<span class="text-muted" style="padding-right: 2px"><i class="small fa fa-fw fa-star-o"></i></span>`
+                : `<span class="text-muted" style="padding-right: 2px"><i class="small fa fa-fw"></i></span>`;
 
-        const allocationIcon = hasAllocations
-            ? `<span class="text-muted" style="padding-right: 2px"><i class="small fa fa-fw fa-pie-chart"></i></span>`
-            : `<span class="text-muted" style="padding-right: 2px"><i class="small fa fa-fw"></i></span>`;
+            summaries.push(primaryIcon);
+        }
 
-        const decomIcon = hasReplacements
-            ? `<span class="text-muted" style="padding-right: 2px"><i class="small fa fa-fw fa-handshake-o"></i></span>`
-            : hasPlannedDecom
-                ? `<span class="text-muted" style="padding-right: 2px"><i class="small fa fa-fw fa-hand-o-right"></i></span>`
-                : `<span class="text-muted" style="padding-right: 2px"><i class="small fa fa-fw fa-fw"></i></span>`;
+        if (hasAnyAllocations) {
+            const allocationIcon = hasAllocations
+                ? `<span class="text-muted" style="padding-right: 2px"><i class="small fa fa-fw fa-pie-chart"></i></span>`
+                : `<span class="text-muted" style="padding-right: 2px"><i class="small fa fa-fw"></i></span>`;
+            summaries.push(allocationIcon);
+        }
 
-        return primaryIcon + allocationIcon + decomIcon;
+        if(hasAnyDecomms) {
+            const decomIcon = hasReplacements
+                ? `<span class="text-muted" style="padding-right: 2px"><i class="small fa fa-fw fa-handshake-o"></i></span>`
+                : hasPlannedDecom
+                    ? `<span class="text-muted" style="padding-right: 2px"><i class="small fa fa-fw fa-hand-o-right"></i></span>`
+                    : `<span class="text-muted" style="padding-right: 2px"><i class="small fa fa-fw fa-fw"></i></span>`;
+            summaries.push(decomIcon)
+        }
+
+        return _.join(summaries, "");
     };
 }
 
 
-export function mkSummaryColumn() {
-    return {
-        id: "summary_col",
-        name: "",
-        field: null,
-        sortable: false,
-        width: 80,
-        resizable:true,
-        formatter: mkSummaryFormatter()
-    };
+export function mkSummaryColumn(measurableView, allocationsView, decomsView) {
+
+    const hasAnyAllocations = !_.isEmpty(allocationsView.allocations);
+    const hasAnyPrimaryRatings = !_.isEmpty(_.filter(measurableView.measurableRatings, d => d.isPrimary));
+    const hasAnyDecomInfo = !_.isEmpty(decomsView.plannedDecommissions);
+
+    if (!hasAnyPrimaryRatings && !hasAnyAllocations && !hasAnyDecomInfo){
+        return {
+            id: "summary_col",
+            name: "",
+            field: null,
+            sortable: false,
+            maxWidth: 0,
+            width: 0,
+            resizable: false,
+        };
+    } else {
+        return {
+            id: "summary_col",
+            name: "",
+            field: null,
+            sortable: false,
+            resizable: true,
+            formatter: mkSummaryFormatter(hasAnyPrimaryRatings, hasAnyAllocations, hasAnyDecomInfo)
+        };
+    }
 }
 
 
-export function mkGridData(applications, measurableRatings, primaryAssessments, primaryRatings, allocationsView, decommsView) {
+export function mkGridData(applications, measurableRatings, primaryAssessments, primaryRatings, allocationsView, decommsView, showPrimaryOnly) {
     const measurablesById = _.keyBy(measurableRatings.measurables, d => d.id);
     const applicationsById = _.keyBy(applications, d => d.id);
 
@@ -139,6 +168,7 @@ export function mkGridData(applications, measurableRatings, primaryAssessments, 
 
     return _
         .chain(measurableRatings.measurableRatings)
+        .filter(d => showPrimaryOnly ? d.isPrimary : true)
         .map(rating => {
             const assessmentRatings = assessmentRatingsByEntityId[rating.id] || [];
             const primaryRatings = primaryRatingsByEntityId[rating.entityReference.id] || [];

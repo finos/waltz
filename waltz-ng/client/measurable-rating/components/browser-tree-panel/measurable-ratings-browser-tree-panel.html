@@ -60,12 +60,9 @@
                 <hr>
             </div>
 
-            <waltz-svelte-component component="$ctrl.MeasurableRatingsViewGrid"
-                                    selection-options="$ctrl.selectionOptions">
-            </waltz-svelte-component>
-
-            <div ng-if="$ctrl.visibility.ratingDetail && $ctrl.tableData"
+            <div ng-if="$ctrl.visibility.ratingDetail"
                  class="waltz-fade-if">
+
                 <strong>
                     <div ng-if="$ctrl.selectedMeasurable.id">
                         <a ng-bind="$ctrl.selectedMeasurable.name"
@@ -95,22 +92,14 @@
                         Show less
                     </a>
                 </div>
-                <br>
 
-                <waltz-grid-with-search class="wmrbtp-grid-tall"
-                                        ng-if="$ctrl.tableData.length > 0"
-                                        column-defs="$ctrl.columnDefs"
-                                        entries="$ctrl.tableData">
-                </waltz-grid-with-search>
-
-                <waltz-no-data ng-if="$ctrl.tableData.length == 0">
-                    <message>
-                        No Applications found
-                    </message>
-                </waltz-no-data>
+                <waltz-svelte-component component="$ctrl.MeasurableRatingsViewGrid"
+                                        selection-options="$ctrl.selectionOptions">
+                </waltz-svelte-component>
 
             </div>
         </div>
+
     </div>
 
 </div>

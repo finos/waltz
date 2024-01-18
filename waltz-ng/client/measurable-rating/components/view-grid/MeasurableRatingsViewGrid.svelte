@@ -2,7 +2,7 @@
 
     import {onMount} from "svelte";
     import _ from "lodash";
-    import {SlickGrid} from "slickgrid";
+    import {GridAutosizeColsMode, SlickGrid} from "slickgrid";
 
     import SearchInput from "../../../common/svelte/SearchInput.svelte";
     import {mkSortFn} from "../../../common/slick-grid-utils";
@@ -10,17 +10,18 @@
     import DataExtractLink from "../../../common/svelte/DataExtractLink.svelte";
     import NoData from "../../../common/svelte/NoData.svelte";
     import {measurableRatingStore} from "../../../svelte-stores/measurable-rating-store";
-    import {selectedMeasurable} from "./measurable-rating-view-store";
+    import {selectedMeasurable, showPrimaryOnly} from "./measurable-rating-view-store";
     import LoadingPlaceholder from "../../../common/svelte/LoadingPlaceholder.svelte";
 
     const options = {
         enableCellNavigation: false,
         enableColumnReorder: false,
-        frozenColumn: 0,
+        autosizeColsMode: GridAutosizeColsMode.FitColsToViewport,
+        frozenColumn: 1,
+        viewportSwitchToScrollModeWidthPercent: 120,
     };
 
     function initGrid(elem) {
-        console.log({columns});
         grid = new SlickGrid(elem, [], columns, options);
         grid.onSort.subscribe((e, args) => {
             const sortCol = args.sortCol;
@@ -59,11 +60,9 @@
 
     $: {
         if (!_.isEmpty(viewCall) && !_.isEmpty($viewCall?.data)) {
-            console.log({data: $viewCall?.data});
             const {applications, primaryAssessments, primaryRatings, measurableRatings, allocations, decommissions} = $viewCall.data;
             columns = mkColumnDefs(measurableRatings, primaryAssessments, primaryRatings, allocations, decommissions);
-            viewData = mkGridData(applications, measurableRatings, primaryAssessments, primaryRatings, allocations, decommissions);
-            console.log({columns, viewData});
+            viewData = mkGridData(applications, measurableRatings, primaryAssessments, primaryRatings, allocations, decommissions, $showPrimaryOnly);
         }
 
         if (elem) {
@@ -78,25 +77,28 @@
         Loading...
     </LoadingPlaceholder>
 {/if}
-{#if !_.isEmpty(viewData)}
-    <SearchInput bind:value={searchStr}/>
 
-    <div class="slick-container"
-         style="width:100%;height:500px;"
-         bind:this={elem}>
-    </div>
+{#if $viewCall?.status === 'loaded'}
+    {#if !_.isEmpty(viewData)}
+        <SearchInput bind:value={searchStr}/>
 
-    <div class="small help-block">
-        Showing {viewData.length} ratings
-    </div>
-    <div class="small" style="display: inline-block">
-        <DataExtractLink name="Export Apps"
-                         filename="applications"
-                         extractUrl={`measurable-rating-view/category/${selectedMeasurable.categoryId}/selector`}
-                         method="POST"
-                         requestBody={selectionOptions}
-                         styling="link"/>
-    </div>
-{:else}
-    <NoData>No ratings</NoData>
+        <div class="slick-container"
+             style="width:100%;height:500px;"
+             bind:this={elem}>
+        </div>
+
+        <div class="small help-block">
+            Showing {viewData.length} ratings
+        </div>
+        <div class="small" style="display: inline-block">
+            <DataExtractLink name="Export Apps"
+                             filename="applications"
+                             extractUrl={`measurable-rating-view/category/${selectedMeasurable.categoryId}/selector`}
+                             method="POST"
+                             requestBody={selectionOptions}
+                             styling="link"/>
+        </div>
+    {:else}
+        <NoData>No ratings</NoData>
+    {/if}
 {/if}

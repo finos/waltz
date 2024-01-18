@@ -26,7 +26,7 @@ import MeasurableRatingsViewGrid from "../view-grid/MeasurableRatingsViewGrid.sv
 
 import template from "./measurable-ratings-browser-tree-panel.html";
 import {lastViewedMeasurableCategoryKey} from "../../../user";
-import {selectedMeasurable} from "../view-grid/measurable-rating-view-store";
+import {selectedMeasurable, showPrimaryOnly} from "../view-grid/measurable-rating-view-store";
 
 /**
  * @name waltz-measurable-ratings-browser-tree-panel
@@ -65,57 +65,6 @@ const initialState = {
 };
 
 
-function prepareColumnDefs(measurableCategory) {
-    const appLinkCol = mkLinkGridCell("Name", "application.name", "application.id", "main.app.view");
-
-    const assetCodeCol = {
-        field: "application.assetCode",
-        name: "Asset Code",
-        width: "10%"
-    };
-
-    const ratingSchemeItemCol = {
-        field: "ratingSchemeItem.name",
-        name: "Rating",
-        cellTemplate: `<div class="ui-grid-cell-contents">
-            <waltz-rating-indicator-cell rating="row.entity.ratingSchemeItem"
-                                         show-description-popup="true"
-                                         show-name="true">
-            </waltz-rating-indicator-cell></div>`,
-        width: "10%"
-    };
-
-    const isPrimaryCol = {
-        cellTemplate: `<div class="ui-grid-cell-contents">
-        <waltz-icon name="check" ng-show="row.entity.rating.isPrimary"></waltz-icon></div>`,
-        field: "rating.isPrimary",
-        name: "Primary?",
-        width: "10%"
-    };
-
-    const measurableNameCol = {
-        field: "measurable.name",
-        name: measurableCategory.name
-    };
-
-    const ratingDescriptionCol = {
-        field: "rating.description",
-        name: "Comment"
-    };
-
-    return _.compact([
-        appLinkCol,
-        assetCodeCol,
-        ratingSchemeItemCol,
-        measurableCategory.allowPrimaryRatings
-            ? isPrimaryCol
-            : null,
-        measurableNameCol,
-        ratingDescriptionCol
-    ]);
-}
-
-
 function prepareUnmappedColumnDefs() {
     return [
         mkLinkGridCell("Name", "application.name", "application.id", "main.app.view"),
@@ -125,43 +74,6 @@ function prepareUnmappedColumnDefs() {
             width: "50%"
         }
     ];
-}
-
-
-function findChildIds(measurable) {
-    const recurse = (acc, n) => {
-        acc.push(n.id);
-        _.each(n.children, c => recurse(acc, c));
-        return acc;
-    };
-
-    return recurse([], measurable);
-}
-
-
-function prepareTableData(measurable,
-                          ratingScheme = {},
-                          applications = [],
-                          ratings = [],
-                          measurablesById = {}) {
-
-    const appsById = _.keyBy(applications, "id");
-    const relevantMeasurableIds = findChildIds(measurable);
-
-    const data = _
-        .chain(ratings)
-        .filter(r => _.includes(relevantMeasurableIds, r.measurableId))
-        .map(r => {
-            return {
-                application: appsById[r.entityReference.id],
-                ratingSchemeItem: ratingScheme.ratingsByCode[r.rating],
-                rating: r,
-                measurable: measurablesById[r.measurableId]
-            };
-        })
-        .value();
-
-    return _.sortBy(data, "application.name");
 }
 
 
@@ -260,7 +172,6 @@ function controller($q, $scope, serviceBroker) {
     };
 
     const loadBaseData = () => {
-
         return $q
             .all([
                 loadMeasurableCategories(serviceBroker, vm),
@@ -282,7 +193,6 @@ function controller($q, $scope, serviceBroker) {
         };
 
         const promise = loadMeasurableRatingTallies(serviceBroker, statsParams, vm);
-
 
         if (vm.visibility.ratingDetail) {
             promise.then(() => vm.onSelect(vm.selectedMeasurable));
@@ -374,11 +284,16 @@ function controller($q, $scope, serviceBroker) {
 
     vm.toggleShow = () => vm.showMore = !vm.showMore;
 
-    vm.onTogglePrimaryOnly = (showPrimaryOnly) => {
-        console.log("onTogglePrimaryOnly", {showPrimaryOnly});
-        vm.showPrimaryOnly = showPrimaryOnly;
-        loadRatings();
+    vm.onTogglePrimaryOnly = (primaryOnly) => {
+        showPrimaryOnly.set(primaryOnly);
     };
+
+    showPrimaryOnly.subscribe(showPrimaryOnly => {
+        $scope.$applyAsync(() => {
+            vm.showPrimaryOnly = showPrimaryOnly;
+            loadRatings();
+        })
+    })
 }
 
 
