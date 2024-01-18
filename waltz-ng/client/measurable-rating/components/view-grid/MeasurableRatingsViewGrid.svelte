@@ -1,8 +1,8 @@
 <script>
 
-    import {SlickGrid} from "slickgrid";
     import {onMount} from "svelte";
     import _ from "lodash";
+    import {SlickGrid} from "slickgrid";
 
     import SearchInput from "../../../common/svelte/SearchInput.svelte";
     import {mkSortFn} from "../../../common/slick-grid-utils";
@@ -16,10 +16,11 @@
     const options = {
         enableCellNavigation: false,
         enableColumnReorder: false,
-        frozenColumn: 0
+        frozenColumn: 0,
     };
 
     function initGrid(elem) {
+        console.log({columns});
         grid = new SlickGrid(elem, [], columns, options);
         grid.onSort.subscribe((e, args) => {
             const sortCol = args.sortCol;
@@ -99,7 +100,3 @@
 {:else}
     <NoData>No ratings</NoData>
 {/if}
-
-<style type="text/scss">
-    @import "slickgrid/dist/styles/css/slick-alpine-theme.css";
-</style>

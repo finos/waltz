@@ -86,6 +86,7 @@ import static org.finos.waltz.schema.Tables.CHANGE_LOG;
 import static org.finos.waltz.schema.Tables.ENTITY_HIERARCHY;
 import static org.finos.waltz.schema.Tables.MEASURABLE_CATEGORY;
 import static org.finos.waltz.schema.Tables.MEASURABLE_RATING_PLANNED_DECOMMISSION;
+import static org.finos.waltz.schema.Tables.RATING_SCHEME_ITEM;
 import static org.finos.waltz.schema.Tables.USER_ROLE;
 import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
@@ -123,6 +124,8 @@ public class MeasurableRatingDao {
                 .entityLifecycleStatus(readEnum(record.get(ENTITY_LIFECYCLE_FIELD), EntityLifecycleStatus.class, (s) -> EntityLifecycleStatus.REMOVED))
                 .build();
 
+        Long ratingId = record.get(RATING_SCHEME_ITEM.ID);
+
         return ImmutableMeasurableRating.builder()
                 .id(r.getId())
                 .entityReference(ref)
@@ -134,6 +137,7 @@ public class MeasurableRatingDao {
                 .lastUpdatedBy(r.getLastUpdatedBy())
                 .isReadOnly(r.getIsReadonly())
                 .isPrimary(r.getIsPrimary())
+                .ratingId(ratingId)
                 .build();
     };
 
@@ -250,16 +254,11 @@ public class MeasurableRatingDao {
 
 
     public List<MeasurableRating> findForCategoryAndSelector(Select<Record1<Long>> appIdSelector, long categoryId) {
-        SelectConditionStep<Record> qry = mkBaseQuery()
-                .innerJoin(MEASURABLE).on(MEASURABLE_RATING.MEASURABLE_ID.eq(MEASURABLE.ID)
-                        .and(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId)))
-                .where(dsl.renderInlined(
-                        MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
-                                .and(MEASURABLE_RATING.ENTITY_ID.in(appIdSelector))));
-
-        System.out.println(qry);
-
-        return qry.fetch(TO_DOMAIN_MAPPER);
+        return mkExtendedBaseQuery()
+                .where(dsl.renderInlined(MEASURABLE_CATEGORY.ID.eq(categoryId)
+                                .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                                        .and(MEASURABLE_RATING.ENTITY_ID.in(appIdSelector)))))
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
     public MeasurableRating getById(long id) {
@@ -422,6 +421,20 @@ public class MeasurableRatingDao {
                 .select(ENTITY_NAME_FIELD)
                 .select(ENTITY_LIFECYCLE_FIELD)
                 .from(MEASURABLE_RATING);
+    }
+
+
+    private SelectJoinStep<Record> mkExtendedBaseQuery() {
+        return dsl
+                .select(MEASURABLE_RATING.fields())
+                .select(ENTITY_NAME_FIELD)
+                .select(ENTITY_LIFECYCLE_FIELD)
+                .select(RATING_SCHEME_ITEM.ID)
+                .from(MEASURABLE_RATING)
+                .innerJoin(MEASURABLE).on(MEASURABLE_RATING.MEASURABLE_ID.eq(MEASURABLE.ID))
+                .innerJoin(MEASURABLE_CATEGORY).on(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(MEASURABLE_CATEGORY.ID))
+                .innerJoin(RATING_SCHEME_ITEM).on(MEASURABLE_RATING.RATING.eq(RATING_SCHEME_ITEM.CODE)
+                        .and(MEASURABLE_CATEGORY.RATING_SCHEME_ID.eq(RATING_SCHEME_ITEM.SCHEME_ID)));
     }
 
 
@@ -810,7 +823,7 @@ public class MeasurableRatingDao {
 
 
     public Set<MeasurableRating> findPrimaryRatingsForGenericSelector(GenericSelector selector) {
-        return mkBaseQuery()
+        return mkExtendedBaseQuery()
                 .where(dsl.renderInlined(MEASURABLE_RATING.ENTITY_KIND.eq(selector.kind().name())
                         .and(MEASURABLE_RATING.ENTITY_ID.in(selector.selector()))
                         .and(MEASURABLE_RATING.IS_PRIMARY.isTrue())))

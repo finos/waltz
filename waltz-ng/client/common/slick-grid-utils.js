@@ -72,7 +72,7 @@ export function mkReplacementAppsFormatter(labelProvider = v => v?.entityReferen
     return (row, cell, values) => {
         return _
             .chain(values)
-            .orderBy(value => labelProvider(value))
+            .orderBy(value => _.toLower(labelProvider(value)))
             .map(value => {
                 const label = labelProvider(value) || "";
                 return `<span>${label}</span>`;
@@ -83,22 +83,7 @@ export function mkReplacementAppsFormatter(labelProvider = v => v?.entityReferen
 }
 
 
-function mkRatingSchemeItemFormatter(labelProvider = v => v?.ratingSchemeItem.name) {
-    return (row, cell, value) => {
-        const ratingSchemeItem = _.get(value, ["ratingSchemeItem"]);
-        const label = labelProvider(value) || "";
-        const style = ratingSchemeItem
-            ? `border-left: solid 2px ${ratingSchemeItem.color}; padding-left: 0.2em;`
-            : '';
-        return `
-            <div style='${style}'>
-                ${label}
-            </div>`;
-    };
-}
-
-
-function mkRatingSchemeItemsFormatter(labelProvider = v => v?.ratingSchemeItem.name) {
+export function mkRatingSchemeItemsFormatter(labelProvider = v => v?.ratingSchemeItem.name) {
     return (row, cell, values) => {
         return _
             .chain(values)
@@ -115,6 +100,22 @@ function mkRatingSchemeItemsFormatter(labelProvider = v => v?.ratingSchemeItem.n
             })
             .join(" ")
             .value();
+    };
+}
+
+
+export function mkRatingSchemeItemFormatter(labelProvider = v => v?.ratingSchemeItem.name,
+                                            ratingProvider = v => v?.ratingSchemeItem) {
+    return (row, cell, value) => {
+        const rating = ratingProvider(value);
+        const label = labelProvider(value) || "";
+        const style = rating
+            ? `border-left: solid 2px ${rating.color}; padding-left: 0.2em;`
+            : '';
+        return `
+            <span style='${style}'>
+                ${label}
+            </span>`;
     };
 }
 

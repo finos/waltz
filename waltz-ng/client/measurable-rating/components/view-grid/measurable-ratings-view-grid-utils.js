@@ -1,8 +1,9 @@
 import {
     mkAllocationColumns,
-    mkApplicationKindFormatter, mkPrimaryAssessmentAndCategoryColumns, mkDecommissionColumns,
+    mkDecommissionColumns,
     mkEntityLinkFormatter,
-    mkLifecyclePhaseFormatter
+    mkPrimaryAssessmentAndCategoryColumns,
+    mkRatingSchemeItemFormatter,
 } from "../../../common/slick-grid-utils";
 import {cmp} from "../../../common/sort-utils";
 import {termSearch} from "../../../common";
@@ -27,6 +28,15 @@ export const baseColumns = [
         width: 180,
         formatter: mkEntityLinkFormatter(null, false),
         sortFn: (a, b) => cmp(a?.measurable.name, b?.measurable.name)
+    },
+    {
+        id: "measurable_rating",
+        name: "Rating",
+        field: "ratingSchemeItem",
+        sortable:  true,
+        width: 180,
+        formatter: mkRatingSchemeItemFormatter(d => d.name, d => d),
+        sortFn: (a, b) => cmp(a?.ratingSchemeItem.name, b?.ratingSchemeItem.name)
     }
 ];
 
@@ -38,9 +48,10 @@ export function doGridSearch(data = [], searchStr) {
         [
             "application.name",
             "application.assetCode",
-            "application.lifecyclePhase",
-            "application.applicationKind",
-            "organisationalUnit.name",
+            "measurable.name",
+            "measurable.externalId",
+            "ratingSchemeItem.name",
+            "replacementAppsString",
             d => _
                 .chain(_.keys(d))
                 .filter(k => k.startsWith("measurable_category"))
@@ -60,38 +71,58 @@ export function doGridSearch(data = [], searchStr) {
 
 export function mkColumnDefs(measurableRatings, primaryAssessments, primaryRatings, allocations, decommissions) {
     return _.concat(
+        mkSummaryColumn(),
         baseColumns,
-        mkPrimaryAssessmentAndCategoryColumns(primaryAssessments.assessmentDefinitions, primaryRatings.measurableCategories),
         mkAllocationColumns(allocations.allocationSchemes),
+        mkPrimaryAssessmentAndCategoryColumns(primaryAssessments.assessmentDefinitions, primaryRatings.measurableCategories),
         mkDecommissionColumns(decommissions.plannedDecommissions, decommissions.plannedReplacements, decommissions.replacingDecommissions));
+}
+
+
+export function mkSummaryFormatter() {
+    return (row, cell, value, colDef, dataCtx) => {
+        const isPrimary = _.get(dataCtx, ["measurableRating", "isPrimary"], false);
+        const hasAllocations = _.get(dataCtx, ["hasAllocations"], false);
+        const hasReplacements = !_.isEmpty(_.get(dataCtx, ["replacementApplications"], []));
+        const hasPlannedDecom = !_.isEmpty(_.get(dataCtx, ["plannedDecommission"], null));
+        const primaryIcon = isPrimary
+            ? `<span class="text-muted" style="padding-right: 2px"><i class="small fa fa-fw fa-star-o"></i></span>`
+            : `<span class="text-muted" style="padding-right: 2px"><i class="small fa fa-fw"></i></span>`;
+
+        const allocationIcon = hasAllocations
+            ? `<span class="text-muted" style="padding-right: 2px"><i class="small fa fa-fw fa-pie-chart"></i></span>`
+            : `<span class="text-muted" style="padding-right: 2px"><i class="small fa fa-fw"></i></span>`;
+
+        const decomIcon = hasReplacements
+            ? `<span class="text-muted" style="padding-right: 2px"><i class="small fa fa-fw fa-handshake-o"></i></span>`
+            : hasPlannedDecom
+                ? `<span class="text-muted" style="padding-right: 2px"><i class="small fa fa-fw fa-hand-o-right"></i></span>`
+                : `<span class="text-muted" style="padding-right: 2px"><i class="small fa fa-fw fa-fw"></i></span>`;
+
+        return primaryIcon + allocationIcon + decomIcon;
+    };
+}
+
+
+export function mkSummaryColumn() {
+    return {
+        id: "summary_col",
+        name: "",
+        field: null,
+        sortable: false,
+        width: 80,
+        resizable:true,
+        formatter: mkSummaryFormatter()
+    };
 }
 
 
 export function mkGridData(applications, measurableRatings, primaryAssessments, primaryRatings, allocationsView, decommsView) {
     const measurablesById = _.keyBy(measurableRatings.measurables, d => d.id);
     const applicationsById = _.keyBy(applications, d => d.id);
-    const measurableRatingsSchemeItemsByCategoryThenCode = _
-        .chain(measurableRatings.measurableCategories)
-        .reduce(
-            (acc, mc) => {
-                acc[mc.id] = _.keyBy(
-                    _.filter(measurableRatings.ratingSchemeItems, rsi => rsi.ratingSchemeId === mc.ratingSchemeId),
-                    rsi => rsi.rating);
-                return acc;
-            },
-            {})
-            .value();
-    const primaryRatingsSchemeItemsByCategoryThenCode = _
-        .chain(primaryRatings.measurableCategories)
-        .reduce(
-            (acc, mc) => {
-                acc[mc.id] = _.keyBy(
-                    _.filter(measurableRatings.ratingSchemeItems, rsi => rsi.ratingSchemeId === mc.ratingSchemeId),
-                    rsi => rsi.rating);
-                return acc;
-            },
-            {})
-            .value();
+
+    const measurableRatingsSchemeItemsById = _.keyBy(measurableRatings.ratingSchemeItems, d => d.id);
+    const primaryRatingsSchemeItemsById = _.keyBy(primaryRatings.ratingSchemeItems, d => d.id);
 
     const assessmentRatingsByEntityId = _.groupBy(primaryAssessments.assessmentRatings, d => d.entityReference.id);
     const assessmentDefinitionsById = _.keyBy(primaryAssessments.assessmentDefinitions, d => d.id);
@@ -114,11 +145,16 @@ export function mkGridData(applications, measurableRatings, primaryAssessments, 
             const measurable = measurablesById[rating.measurableId];
             const application = applicationsById[rating.entityReference.id];
 
-            const ratingSchemeItemsByCode = _.get(measurableRatingsSchemeItemsByCategoryThenCode, [measurable?.measurableCategoryId], {});
-            const ratingSchemeItem = ratingSchemeItemsByCode[rating.rating];
+            const ratingSchemeItem = measurableRatingsSchemeItemsById[rating.ratingId];
             const allocationsByRating = allocationsByRatingId[rating.id];
             const plannedDecommission = decommsByRatingId[rating.id];
             const replacementApplications = _.get(replacementsByDecommId, plannedDecommission?.id, []);
+
+            const replacementAppsString = _
+                .chain(replacementApplications)
+                .map(d => d.entityReference.name)
+                .join(" ")
+                .value();
 
             const allocationCells = _
                 .chain(allocationsByRating)
@@ -153,7 +189,7 @@ export function mkGridData(applications, measurableRatings, primaryAssessments, 
                 .map(mr => {
                     const measurable = primaryMeasurablesById[mr.measurableId];
                     const measurableCategory = primaryCategoriesById[measurable.categoryId];
-                    const ratingSchemeItem = _.get(primaryRatingsSchemeItemsByCategoryThenCode, [measurableCategory.id, mr.rating]);
+                    const ratingSchemeItem = primaryRatingsSchemeItemsById[mr.ratingId];
                     return {
                         measurable,
                         measurableCategory,
@@ -163,15 +199,20 @@ export function mkGridData(applications, measurableRatings, primaryAssessments, 
                 .reduce((acc, d) => {acc['measurable_category/'+d.measurableCategory.id] = d; return acc;}, {})
                 .value();
 
-            return _.merge({
-                 measurable,
-                 application,
-                 ratingSchemeItem,
-                 plannedDecommission,
-                 replacementApplications},
-                 primaryAssessmentCells,
-                 primaryMeasurableCells,
-                 allocationCells);
+            return _.merge(
+                {
+                    measurable,
+                    application,
+                    measurableRating: rating,
+                    ratingSchemeItem,
+                    plannedDecommission,
+                    replacementApplications,
+                    hasAllocations: !_.isEmpty(allocationsByRating),
+                    replacementAppsString
+                },
+                primaryAssessmentCells,
+                primaryMeasurableCells,
+                allocationCells);
         })
         .value();
 
