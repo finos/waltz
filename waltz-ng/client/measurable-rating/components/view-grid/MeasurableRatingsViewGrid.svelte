@@ -16,9 +16,7 @@
     const options = {
         enableCellNavigation: false,
         enableColumnReorder: false,
-        autosizeColsMode: GridAutosizeColsMode.FitColsToViewport,
         frozenColumn: 1,
-        viewportSwitchToScrollModeWidthPercent: 120,
     };
 
     function initGrid(elem) {
