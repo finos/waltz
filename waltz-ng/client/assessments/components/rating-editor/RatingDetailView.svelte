@@ -19,6 +19,7 @@
     import {displayError} from "../../../common/error-utils";
     import {cardinality} from "../../../common/services/enums/cardinality";
     import EditableRatingValue from "./EditableRatingValue.svelte";
+    import Markdown from "../../../common/svelte/Markdown.svelte";
 
     export let onCancel;
     export let onRemove;
@@ -134,6 +135,9 @@
                                  showGroup={true}
                                  disablementReason={ratingDisablementReason}
                                  onSave={saveRating}/>
+            <div class="help-block">
+                <Markdown text={$selectedRating.ratingItem.description}/>
+            </div>
         </div>
     </div>
 
@@ -142,6 +146,7 @@
         <div id="comment">
             <TextEditableField text={rating.comment}
                                label="Comment"
+                               mandatory={$selectedRating.ratingItem.requiresComment}
                                editable={canEdit}
                                onSave={saveComment}/>
         </div>
