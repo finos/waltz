@@ -21,17 +21,18 @@ const appNameCol = {
 };
 
 const appAssetCode = {
-    id: "application_name",
+    id: "application_asst_code",
     name: "Asset Code",
     field: "application",
     sortable:  true,
     width: 180,
     formatter: mkExternalIdFormatter(d => d.assetCode),
-    sortFn: (a, b) => cmp(a?.application.name, b?.application.name)
+    sortFn: (a, b) => cmp(a?.application.assetCode, b?.application.assetCode)
 };
 
 export const baseColumns = [
     appNameCol,
+    appAssetCode,
     {
         id: "measurable_name",
         name: "Taxonomy Item",

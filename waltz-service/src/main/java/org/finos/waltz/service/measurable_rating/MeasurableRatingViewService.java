@@ -166,7 +166,8 @@ public class MeasurableRatingViewService {
 
     }
 
-    public MeasurableRatingCategoryView getViewForCategoryAndSelector(IdSelectionOptions idSelectionOptions, long categoryId) {
+    public MeasurableRatingCategoryView getViewForCategoryAndSelector(IdSelectionOptions idSelectionOptions,
+                                                                      long categoryId) {
 
         GenericSelector appSelector = GENERIC_SELECTOR_FACTORY.applyForKind(EntityKind.APPLICATION, idSelectionOptions);
 

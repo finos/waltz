@@ -37,10 +37,18 @@
     let elem = null;
     let grid;
     let searchStr = "";
+    let viewParams;
 
     onMount(() => {
         viewData = [];
     });
+
+    $: {
+        viewParams = {
+            idSelectionOptions: selectionOptions,
+            parentMeasurableId: $selectedMeasurable?.id
+        }
+    }
 
     $: {
         if (!_.isEmpty($selectedCategory) && selectionOptions) {
@@ -90,11 +98,11 @@
             Showing {viewData.length} ratings
         </div>
         <div class="small" style="display: inline-block">
-            <DataExtractLink name="Export Apps"
-                             filename="applications"
-                             extractUrl={`measurable-rating-view/category/${selectedMeasurable.categoryId}/selector`}
+            <DataExtractLink name="Export ratings"
+                             filename={`${$selectedCategory.name} ratings`}
+                             extractUrl={`measurable-rating-view/category-id/${$selectedCategory.id}`}
                              method="POST"
-                             requestBody={selectionOptions}
+                             requestBody={viewParams}
                              styling="link"/>
         </div>
     {:else}

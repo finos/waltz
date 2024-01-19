@@ -86,6 +86,12 @@ function controller($q, serviceBroker, settingsService, userService) {
 
     vm.$onInit = () => {
 
+        vm.selectionOptions = mkSelectionOptions(vm.parentEntityRef);
+
+        vm.extractParams = {
+            idSelectionOptions: vm.selectionOptions
+        };
+
         determineIfRoadmapsAreEnabled();
 
         const permissionsPromise = serviceBroker

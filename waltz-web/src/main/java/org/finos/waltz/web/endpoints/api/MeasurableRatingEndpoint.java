@@ -18,7 +18,6 @@
 
 package org.finos.waltz.web.endpoints.api;
 
-import org.finos.waltz.common.FunctionUtilities;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
