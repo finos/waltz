@@ -135,8 +135,6 @@ function prepareTabForCategory(measurableRatingsView,
 
 export function mkTab(ctx, application, showAllMeasurables = false) {
 
-    console.log({ctx});
-
     return prepareTabForCategory(
         ctx.measurableRatings,
         ctx.allocations,

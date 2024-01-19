@@ -93,7 +93,7 @@ export function mkColumnDefs(measurableRatings, primaryAssessments, primaryRatin
 
 
 
-export function mkUnmappedColumnDefs(measurableRatings, primaryAssessments, primaryRatings, allocations, decommissions) {
+export function mkUnmappedColumnDefs() {
     return _.concat(
         appNameCol,
         appAssetCode
