@@ -19,25 +19,12 @@
 package org.finos.waltz.data.logical_flow;
 
 import org.finos.waltz.data.InlineSelectFieldFactory;
-import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.EntityLifecycleStatus;
-import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.ImmutableEntityReference;
-import org.finos.waltz.model.Operation;
-import org.finos.waltz.model.UserTimestamp;
+import org.finos.waltz.model.*;
 import org.finos.waltz.model.logical_flow.ImmutableLogicalFlow;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.schema.tables.records.LogicalFlowRecord;
-import org.jooq.Condition;
-import org.jooq.DSLContext;
-import org.jooq.Field;
-import org.jooq.Record;
-import org.jooq.Record1;
-import org.jooq.RecordMapper;
-import org.jooq.Select;
-import org.jooq.SelectJoinStep;
-import org.jooq.UpdateConditionStep;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
@@ -46,12 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
@@ -109,6 +91,7 @@ public class LogicalFlowDao {
 
         return ImmutableLogicalFlow.builder()
                 .id(record.getId())
+                .externalId(Optional.ofNullable(record.getExternalId()))
                 .source(ImmutableEntityReference.builder()
                         .kind(EntityKind.valueOf(record.getSourceEntityKind()))
                         .id(record.getSourceEntityId())
