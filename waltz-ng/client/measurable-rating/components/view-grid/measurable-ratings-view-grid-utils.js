@@ -1,7 +1,7 @@
 import {
     mkAllocationColumns,
     mkDecommissionColumns,
-    mkEntityLinkFormatter,
+    mkEntityLinkFormatter, mkExternalIdFormatter,
     mkPrimaryAssessmentAndCategoryColumns,
     mkRatingSchemeItemFormatter,
 } from "../../../common/slick-grid-utils";
@@ -10,16 +10,28 @@ import {termSearch} from "../../../common";
 import _ from "lodash";
 
 
+const appNameCol = {
+    id: "application_name",
+    name: "Application",
+    field: "application",
+    sortable:  true,
+    width: 180,
+    formatter: mkEntityLinkFormatter(null, false),
+    sortFn: (a, b) => cmp(a?.application.name, b?.application.name)
+};
+
+const appAssetCode = {
+    id: "application_name",
+    name: "Asset Code",
+    field: "application",
+    sortable:  true,
+    width: 180,
+    formatter: mkExternalIdFormatter(d => d.assetCode),
+    sortFn: (a, b) => cmp(a?.application.name, b?.application.name)
+};
+
 export const baseColumns = [
-    {
-        id: "application_name",
-        name: "Application",
-        field: "application",
-        sortable:  true,
-        width: 180,
-        formatter: mkEntityLinkFormatter(null, false),
-        sortFn: (a, b) => cmp(a?.application.name, b?.application.name)
-    },
+    appNameCol,
     {
         id: "measurable_name",
         name: "Taxonomy Item",
@@ -76,6 +88,15 @@ export function mkColumnDefs(measurableRatings, primaryAssessments, primaryRatin
         mkAllocationColumns(allocations.allocationSchemes),
         mkPrimaryAssessmentAndCategoryColumns(primaryAssessments.assessmentDefinitions, primaryRatings.measurableCategories),
         mkDecommissionColumns(decommissions.plannedDecommissions, decommissions.plannedReplacements, decommissions.replacingDecommissions));
+}
+
+
+
+export function mkUnmappedColumnDefs(measurableRatings, primaryAssessments, primaryRatings, allocations, decommissions) {
+    return _.concat(
+        appNameCol,
+        appAssetCode
+    )
 }
 
 
@@ -147,6 +168,7 @@ export function mkSummaryColumn(measurableView, allocationsView, decomsView) {
 
 
 export function mkGridData(applications, measurableRatings, primaryAssessments, primaryRatings, allocationsView, decommsView, showPrimaryOnly) {
+
     const measurablesById = _.keyBy(measurableRatings.measurables, d => d.id);
     const applicationsById = _.keyBy(applications, d => d.id);
 
@@ -165,6 +187,8 @@ export function mkGridData(applications, measurableRatings, primaryAssessments, 
     const primaryRatingsByEntityId = _.groupBy(primaryRatings.measurableRatings, d => d.entityReference.id);
     const primaryCategoriesById = _.keyBy(primaryRatings.measurableCategories, d => d.id);
     const primaryMeasurablesById =_.keyBy(primaryRatings.measurables, d => d.id);
+
+    const hierarchyForMeasurable = _.keyBy(measurableRatings.measurableHierarchy, d => d.measurableId);
 
     return _
         .chain(measurableRatings.measurableRatings)
@@ -229,6 +253,9 @@ export function mkGridData(applications, measurableRatings, primaryAssessments, 
                 .reduce((acc, d) => {acc['measurable_category/'+d.measurableCategory.id] = d; return acc;}, {})
                 .value();
 
+            const hierarchy = hierarchyForMeasurable[measurable.id];
+            const parentIds = _.map(hierarchy.parents, d => d.parentReference.id);
+
             return _.merge(
                 {
                     measurable,
@@ -238,7 +265,8 @@ export function mkGridData(applications, measurableRatings, primaryAssessments, 
                     plannedDecommission,
                     replacementApplications,
                     hasAllocations: !_.isEmpty(allocationsByRating),
-                    replacementAppsString
+                    replacementAppsString,
+                    parentIds
                 },
                 primaryAssessmentCells,
                 primaryMeasurableCells,
@@ -246,4 +274,42 @@ export function mkGridData(applications, measurableRatings, primaryAssessments, 
         })
         .value();
 
+}
+
+
+export function mkUnmappedGridData(applications, measurableRatings, category) {
+    return prepareUnmappedTableData(applications, measurableRatings.measurableRatings, measurableRatings.measurables, category)
+}
+
+
+
+export function prepareUnmappedTableData(applications = [],
+                                          ratings = [],
+                                          measurables = [],
+                                          categoryId) {
+
+    const measurableIdsOfACategory =
+        _.chain(measurables)
+            .filter(m => m.categoryId === categoryId)
+            .map(m => m.id)
+            .value();
+
+    const appIdsWithMeasurable =
+        _.chain(ratings)
+            .filter(r => measurableIdsOfACategory.includes(r.measurableId))
+            .map(r => r.entityReference.id)
+            .value();
+
+    const tableData =
+        _.chain(applications)
+            .filter(a => !appIdsWithMeasurable.includes(a.id))
+            .map(app => {
+                return {
+                    application: app
+                };
+            })
+            .sortBy("application.name")
+            .value();
+
+    return tableData;
 }

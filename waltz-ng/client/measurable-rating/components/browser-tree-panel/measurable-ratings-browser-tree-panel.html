@@ -93,7 +93,13 @@
                     </a>
                 </div>
 
-                <waltz-svelte-component component="$ctrl.MeasurableRatingsViewGrid"
+                <waltz-svelte-component ng-if="!$ctrl.showUnmapped"
+                                        component="$ctrl.MeasurableRatingsViewGrid"
+                                        selection-options="$ctrl.selectionOptions">
+                </waltz-svelte-component>
+
+                <waltz-svelte-component ng-if="$ctrl.showUnmapped"
+                                        component="$ctrl.UnmappedMeasurablesViewGrid"
                                         selection-options="$ctrl.selectionOptions">
                 </waltz-svelte-component>
 

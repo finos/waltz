@@ -6,17 +6,21 @@
 
     import SearchInput from "../../../common/svelte/SearchInput.svelte";
     import {mkSortFn} from "../../../common/slick-grid-utils";
-    import {baseColumns, doGridSearch, mkColumnDefs, mkGridData} from "./measurable-ratings-view-grid-utils";
-    import DataExtractLink from "../../../common/svelte/DataExtractLink.svelte";
+    import {
+        baseColumns,
+        doGridSearch,
+        mkUnmappedColumnDefs,
+        mkUnmappedGridData
+    } from "./measurable-ratings-view-grid-utils";
     import NoData from "../../../common/svelte/NoData.svelte";
     import {measurableRatingStore} from "../../../svelte-stores/measurable-rating-store";
-    import {selectedCategory, selectedMeasurable, showPrimaryOnly} from "./measurable-rating-view-store";
+    import {selectedCategory} from "./measurable-rating-view-store";
     import LoadingPlaceholder from "../../../common/svelte/LoadingPlaceholder.svelte";
 
     const options = {
         enableCellNavigation: false,
         enableColumnReorder: false,
-        frozenColumn: 1,
+        forceFitColumns: true
     };
 
     function initGrid(elem) {
@@ -58,10 +62,9 @@
 
     $: {
         if (!_.isEmpty(viewCall) && !_.isEmpty($viewCall?.data)) {
-            const {applications, primaryAssessments, primaryRatings, measurableRatings, allocations, decommissions} = $viewCall.data;
-            columns = mkColumnDefs(measurableRatings, primaryAssessments, primaryRatings, allocations, decommissions);
-            const gridData = mkGridData(applications, measurableRatings, primaryAssessments, primaryRatings, allocations, decommissions, $showPrimaryOnly);
-            viewData = _.filter(gridData, d => _.includes(d.parentIds, $selectedMeasurable?.id));
+            const {applications, measurableRatings} = $viewCall.data;
+            columns = mkUnmappedColumnDefs();
+            viewData = mkUnmappedGridData(applications, measurableRatings, $selectedCategory.id);
         }
 
         if (elem) {
@@ -87,17 +90,9 @@
         </div>
 
         <div class="small help-block">
-            Showing {viewData.length} ratings
-        </div>
-        <div class="small" style="display: inline-block">
-            <DataExtractLink name="Export Apps"
-                             filename="applications"
-                             extractUrl={`measurable-rating-view/category/${selectedMeasurable.categoryId}/selector`}
-                             method="POST"
-                             requestBody={selectionOptions}
-                             styling="link"/>
+            Showing {viewData.length} applications
         </div>
     {:else}
-        <NoData>No ratings</NoData>
+        <NoData>No unmapped applications</NoData>
     {/if}
 {/if}

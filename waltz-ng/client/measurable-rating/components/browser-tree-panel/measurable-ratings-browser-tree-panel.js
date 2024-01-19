@@ -18,7 +18,6 @@
 
 import _ from "lodash";
 import {initialiseData} from "../../../common";
-import {mkLinkGridCell} from "../../../common/grid-utils";
 import {mkSelectionOptionsWithJoiningEntity} from "../../../common/selector-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {indexRatingSchemes} from "../../../ratings/rating-utils";
@@ -26,7 +25,13 @@ import MeasurableRatingsViewGrid from "../view-grid/MeasurableRatingsViewGrid.sv
 
 import template from "./measurable-ratings-browser-tree-panel.html";
 import {lastViewedMeasurableCategoryKey} from "../../../user";
-import {selectedMeasurable, showPrimaryOnly} from "../view-grid/measurable-rating-view-store";
+import {
+    selectedCategory,
+    selectedMeasurable,
+    showPrimaryOnly,
+    showUnmapped
+} from "../view-grid/measurable-rating-view-store";
+import UnmappedMeasurablesViewGrid from "../view-grid/UnmappedMeasurablesViewGrid.svelte";
 
 /**
  * @name waltz-measurable-ratings-browser-tree-panel
@@ -41,7 +46,7 @@ import {selectedMeasurable, showPrimaryOnly} from "../view-grid/measurable-ratin
 const bindings = {
     filters: "<",
     parentEntityRef: "<",
-    onMeasurableCategorySelect: "<?"
+    onMeasurableCategorySelect: "<?",
 };
 
 
@@ -61,52 +66,11 @@ const initialState = {
     onMeasurableCategorySelect: () => log("onMeasurableCategorySelect"),
     showMore: false,
     showPrimaryOnly: false,
-    MeasurableRatingsViewGrid
+    showUnmapped: false,
+    MeasurableRatingsViewGrid,
+    UnmappedMeasurablesViewGrid
 };
 
-
-function prepareUnmappedColumnDefs() {
-    return [
-        mkLinkGridCell("Name", "application.name", "application.id", "main.app.view"),
-        {
-            field: "application.assetCode",
-            name: "Asset Code",
-            width: "50%"
-        }
-    ];
-}
-
-
-function prepareUnmappedTableData(applications = [],
-                                  ratings = [],
-                                  measurables = [],
-                                  categoryId) {
-
-    const measurableIdsOfACategory =
-        _.chain(measurables)
-            .filter(m => m.categoryId === categoryId)
-            .map(m => m.id)
-            .value();
-
-    const appIdsWithMeasurable =
-        _.chain(ratings)
-            .filter(r => measurableIdsOfACategory.includes(r.measurableId))
-            .map(r => r.entityReference.id)
-            .value();
-
-    const tableData =
-        _.chain(applications)
-            .filter(a => !appIdsWithMeasurable.includes(a.id))
-            .map(app => {
-                return {
-                    application: app
-                };
-            })
-            .sortBy("application.name")
-            .value();
-
-    return tableData;
-}
 
 function log() {
     console.log("wmrbs::", arguments);
@@ -202,19 +166,6 @@ function controller($q, $scope, serviceBroker) {
     };
 
 
-    const loadRatingDetail = () => {
-        clearDetail();
-        return serviceBroker
-            .execute(CORE_API.MeasurableRatingStore.findByAppSelector, [vm.selectionOptions])
-            .then(r => {
-                const ratings = r.data;
-                vm.measurableRatingsDetail = vm.showPrimaryOnly
-                    ? _.filter(ratings, d => d.isPrimary === true)
-                    : ratings;
-                return vm.measurableRatingsDetail;
-            });
-    };
-
     function setupSelector() {
         vm.selectionOptions = mkSelectionOptionsWithJoiningEntity(
             vm.parentEntityRef,
@@ -238,16 +189,24 @@ function controller($q, $scope, serviceBroker) {
         }
     };
 
-    vm.onSelectUnmapped = (categoryId) => {
+    vm.onSelectUnmapped = () => {
+        showUnmapped.set(true);
         vm.selectedMeasurable = {
             name: "Unmapped Applications",
             description: "Display applications which do not have any associated measurable rating for this category."
         };
-        loadUnmappedApplications(vm.measurables, categoryId);
     };
+
+    showUnmapped.subscribe(d => {
+        $scope.$applyAsync(() => {
+            vm.showUnmapped = d;
+            vm.visibility.ratingDetail = true;
+        })
+    })
 
     vm.onSelect = (measurable) => {
         selectedMeasurable.set(measurable);
+        showUnmapped.set(false);
     };
 
     selectedMeasurable.subscribe(measurable => {
@@ -259,26 +218,12 @@ function controller($q, $scope, serviceBroker) {
         })
     })
 
-    const loadUnmappedApplications = (measurables, measurableCategoryId) => {
-        vm.columnDefs = prepareUnmappedColumnDefs();
-
-        loadRatingDetail()
-            .then(ratings => vm.tableData = prepareUnmappedTableData(
-                vm.applications,
-                ratings,
-                measurables,
-                measurableCategoryId))
-            .then(() => {
-                vm.visibility.loading = false;
-                vm.visibility.ratingDetail = true;
-            });
-    };
-
-
     vm.onCategorySelect = (c) => {
         vm.visibility.ratingDetail = false;
         clearDetail();
         vm.activeCategory = c;
+        selectedCategory.set(c);
+        showUnmapped.set(false);
         vm.onMeasurableCategorySelect(c);
     };
 

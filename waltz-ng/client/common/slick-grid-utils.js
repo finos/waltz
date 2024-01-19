@@ -31,6 +31,14 @@ export function mkEntityLinkFormatter(valueProvider, showIcon = true) {
 }
 
 
+export function mkExternalIdFormatter(valueProvider = d => d.externalId) {
+    return (row, cell, value, colDef, dataCtx) => {
+        const extId = valueProvider(value, dataCtx);
+        return `<span>${extId}</span>`;
+    }
+}
+
+
 export function mkEnumFormatter(valueProvider, enums) {
 
     return (row, cell, value, colDef, dataCtx) => {
