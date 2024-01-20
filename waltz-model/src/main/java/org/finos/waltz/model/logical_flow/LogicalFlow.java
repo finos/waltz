@@ -31,6 +31,7 @@ public abstract class LogicalFlow implements
         CreatedUserTimestampProvider,
         EntityLifecycleStatusProvider,
         IdProvider,
+        ExternalIdProvider,
         ProvenanceProvider,
         LastUpdatedProvider,
         LastAttestedProvider,
