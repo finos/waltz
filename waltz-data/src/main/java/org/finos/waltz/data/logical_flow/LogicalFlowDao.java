@@ -109,7 +109,6 @@ public class LogicalFlowDao {
 
         return ImmutableLogicalFlow.builder()
                 .id(record.getId())
-                .externalId(Optional.ofNullable(record.getExternalId()))
                 .source(ImmutableEntityReference.builder()
                         .kind(EntityKind.valueOf(record.getSourceEntityKind()))
                         .id(record.getSourceEntityId())
