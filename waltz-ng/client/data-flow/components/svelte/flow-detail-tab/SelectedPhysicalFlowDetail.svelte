@@ -75,7 +75,7 @@
 
     $: ref = {
         id: physicalFlow.id,
-        name: physicalFlow.name || specification.name,
+        name: _.get(physicalFlow, "name") || _.get(specification, "name") || "??",
         kind: "PHYSICAL_FLOW"
     };
 </script>
@@ -119,7 +119,7 @@
     <tr>
         <td>Specification Format</td>
         <td>
-            {toDataFormatKindName(nestedEnums, specification.format)}
+            {toDataFormatKindName(nestedEnums, specification?.format)}
         </td>
     </tr>
     <tr>
