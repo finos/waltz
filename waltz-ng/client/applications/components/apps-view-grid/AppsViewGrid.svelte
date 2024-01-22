@@ -89,7 +89,3 @@
 {:else}
     <NoData>No applications</NoData>
 {/if}
-
-<style type="text/scss">
-    @import "slickgrid/dist/styles/css/slick-alpine-theme.css";
-</style>
