@@ -51,4 +51,9 @@ public abstract class RatingSchemeItem implements
     @Nullable
     public abstract String ratingGroup();
 
+    @Value.Default
+    public boolean requiresComment() {
+        return false;
+    }
+
 }

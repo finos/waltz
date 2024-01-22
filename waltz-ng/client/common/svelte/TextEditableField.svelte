@@ -10,6 +10,7 @@
     export let onSave = (text) => console.log("Text to save", {text});
     export let editable;
     export let label;
+    export let mandatory = false;
 
     let workingText;
     let savePromise
@@ -37,52 +38,64 @@
         savePromise
             .then(() => activeMode = Modes.VIEW);
     }
-
 </script>
 
-
-{#if activeMode === Modes.VIEW}
-    {#if !_.isEmpty(label)}
-        <label for="text">
-            {label}
-        </label>
-        {#if editable}
-            <button class="btn btn-skinny"
+<span class="waltz-visibility-parent">
+    {#if activeMode === Modes.VIEW}
+        {#if !_.isEmpty(label)}
+            <label for="text">
+                {label} {#if mandatory}*{/if}
+            </label>
+            {#if editable}
+                <button class="btn btn-skinny waltz-visibility-child-50"
+                        on:click={editText}>
+                    <Icon name="pencil"/>
+                    Edit
+                </button>
+            {/if}
+        {/if}
+        <div id="text">
+            <Markdown {text}/>
+        </div>
+        {#if mandatory}
+            <div class="help-block">
+                A comment is mandatory
+            </div>
+        {/if}
+        {#if _.isEmpty(label) && editable}
+            <button class="btn btn-skinny waltz-visibility-child-50"
                     on:click={editText}>
                 <Icon name="pencil"/>
                 Edit
             </button>
         {/if}
-    {/if}
-    <div id="text">
-        <Markdown {text}/>
-    </div>
-    {#if _.isEmpty(label) && editable}
+    {:else if activeMode === Modes.EDIT}
+        {#if !_.isEmpty(label)}
+            <label for="text">
+                {label} {#if mandatory}*{/if}
+            </label>
+        {/if}
+        <textarea class="form-control"
+                  rows="5"
+                  required={mandatory}
+                  bind:value={workingText}></textarea>
+        {#if mandatory}
+            <div class="help-block">
+                A comment is mandatory
+            </div>
+        {/if}
         <button class="btn btn-skinny"
-                on:click={editText}>
-            <Icon name="pencil"/>
-            Edit
+                disabled={mandatory && _.isEmpty(_.trim(workingText))}
+                on:click={save}>
+            <Icon name="floppy-o"/>
+            Save
         </button>
+        <button class="btn btn-skinny"
+                on:click={() => activeMode = Modes.VIEW}>
+            <Icon name="times"/>
+            Cancel
+        </button>
+    {:else if activeMode === Modes.SAVING}
+        <SavingPlaceholder/>
     {/if}
-{:else if activeMode === Modes.EDIT}
-    {#if !_.isEmpty(label)}
-        <label for="text">
-            {label}
-        </label>
-    {/if}
-    <textarea class="form-control"
-              rows="5"
-              bind:value={workingText}/>
-    <button class="btn btn-skinny"
-            on:click={save}>
-        <Icon name="floppy-o"/>
-        Save
-    </button>
-    <button class="btn btn-skinny"
-            on:click={() => activeMode = Modes.VIEW}>
-        <Icon name="times"/>
-        Cancel
-    </button>
-{:else if activeMode === Modes.SAVING}
-    <SavingPlaceholder/>
-{/if}
+</span>

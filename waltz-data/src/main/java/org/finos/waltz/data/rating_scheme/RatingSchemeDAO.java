@@ -71,7 +71,8 @@ public class RatingSchemeDAO {
 
         RatingSchemeItemRecord r = record.into(RATING_SCHEME_ITEM);
 
-        ImmutableRatingSchemeItem.Builder builder = ImmutableRatingSchemeItem.builder()
+        ImmutableRatingSchemeItem.Builder builder = ImmutableRatingSchemeItem
+                .builder()
                 .id(r.getId())
                 .ratingSchemeId(r.getSchemeId())
                 .name(r.getName())
@@ -81,7 +82,8 @@ public class RatingSchemeDAO {
                 .position(r.getPosition())
                 .description(r.getDescription())
                 .externalId(ofNullable(r.getExternalId()))
-                .ratingGroup(r.getRatingGroup());
+                .ratingGroup(r.getRatingGroup())
+                .requiresComment(r.getRequiresComment());
 
 
         if (record.field(IS_RESTRICTED_FIELD) != null){
@@ -245,6 +247,7 @@ public class RatingSchemeDAO {
         r.setPosition(item.position());
         r.setUserSelectable(item.userSelectable());
         r.setRatingGroup(item.ratingGroup());
+        r.setRequiresComment(item.requiresComment());
 
         item.externalId().ifPresent(r::setExternalId);
 
