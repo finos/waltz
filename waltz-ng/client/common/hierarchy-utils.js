@@ -307,8 +307,9 @@ export function directLineage(flatNodes,
                               nodeId,
                               idFn = n => n.id,
                               parentIdFn = n => n.parentId) {
-    const byId = _.keyBy(flatNodes, idFn);
-    const byParentId = _.groupBy(flatNodes, parentIdFn);
+    const cleanFlatNodes = _.map(flatNodes, n => Object.assign({}, n, {children: []}))
+    const byId = _.keyBy(cleanFlatNodes, idFn);
+    const byParentId = _.groupBy(cleanFlatNodes, parentIdFn);
 
     const start = byId[nodeId];
 
