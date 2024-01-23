@@ -93,9 +93,18 @@ import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
-import static org.finos.waltz.common.SetUtilities.*;
-import static org.finos.waltz.model.EntityKind.*;
+import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.SetUtilities.filter;
+import static org.finos.waltz.common.SetUtilities.fromCollection;
+import static org.finos.waltz.common.SetUtilities.hasIntersection;
+import static org.finos.waltz.common.SetUtilities.map;
+import static org.finos.waltz.common.SetUtilities.union;
+import static org.finos.waltz.model.EntityKind.DATA_TYPE;
+import static org.finos.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
+import static org.finos.waltz.model.EntityKind.PHYSICAL_FLOW;
+import static org.finos.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.utils.IdUtilities.toIds;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 
@@ -502,9 +511,13 @@ public class LogicalFlowService {
         Set<AssessmentDefinition> physicalFlowAssessmentDefs = assessmentDefinitionService.findByPrimaryDefinitionsForKind(PHYSICAL_FLOW, Optional.empty());
         Set<AssessmentDefinition> physicalSpecAssessmentDefs = assessmentDefinitionService.findByPrimaryDefinitionsForKind(PHYSICAL_SPECIFICATION, Optional.empty());
 
-        List<AssessmentRating> logicalFlowAssessmentRatings = assessmentRatingService.findByTargetKindForRelatedSelector(LOGICAL_DATA_FLOW, idSelectionOptions);
-        List<AssessmentRating> physicalFlowAssessmentRatings = assessmentRatingService.findByTargetKindForRelatedSelector(PHYSICAL_FLOW, idSelectionOptions);
-        List<AssessmentRating> physicalSpecAssessmentRatings = assessmentRatingService.findByTargetKindForRelatedSelector(PHYSICAL_SPECIFICATION, idSelectionOptions);
+        List<AssessmentRating> lfRatings = assessmentRatingService.findByTargetKindForRelatedSelector(LOGICAL_DATA_FLOW, idSelectionOptions);
+        List<AssessmentRating> pfRatings = assessmentRatingService.findByTargetKindForRelatedSelector(PHYSICAL_FLOW, idSelectionOptions);
+        List<AssessmentRating> psRatings = assessmentRatingService.findByTargetKindForRelatedSelector(PHYSICAL_SPECIFICATION, idSelectionOptions);
+
+        Set<AssessmentRating> logicalFlowAssessmentRatings = filter(lfRatings, d -> toIds(logicalFlowAssessmentDefs).contains(d.assessmentDefinitionId()));
+        Set<AssessmentRating> physicalFlowAssessmentRatings = filter(pfRatings, d -> toIds(physicalFlowAssessmentDefs).contains(d.assessmentDefinitionId()));
+        Set<AssessmentRating> physicalSpecAssessmentRatings = filter(psRatings, d -> toIds(physicalSpecAssessmentDefs).contains(d.assessmentDefinitionId()));
 
         Set<RatingSchemeItem> ratingSchemeItems = ratingSchemeService.findRatingSchemeItemsByIds(
             map(

@@ -1,10 +1,10 @@
 <script>
-import _ from "lodash";
-import RatingIndicatorCell from "../../../../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
-import EntityIcon from "../../../../../common/svelte/EntityIcon.svelte";
+    import _ from "lodash";
+    import RatingIndicatorCell from "../../../../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
+    import EntityIcon from "../../../../../common/svelte/EntityIcon.svelte";
 
-export let ratingsByDefId = {};
-export let assessmentDefinitionsById = {};
+    export let ratingsByDefId = {};
+    export let assessmentDefinitionsById = {};
 
 </script>
 
