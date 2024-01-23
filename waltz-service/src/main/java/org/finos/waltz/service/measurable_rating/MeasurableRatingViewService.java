@@ -1,8 +1,5 @@
 package org.finos.waltz.service.measurable_rating;
 
-import org.finos.waltz.common.CollectionUtilities;
-import org.finos.waltz.common.ListUtilities;
-import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.measurable.MeasurableDao;
@@ -14,7 +11,6 @@ import org.finos.waltz.model.allocation_scheme.AllocationScheme;
 import org.finos.waltz.model.application.Application;
 import org.finos.waltz.model.application.ImmutableAssessmentsView;
 import org.finos.waltz.model.application.ImmutableMeasurableRatingsView;
-import org.finos.waltz.model.application.MeasurableRatingsView;
 import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.assessment_definition.AssessmentVisibility;
 import org.finos.waltz.model.assessment_rating.AssessmentRating;
@@ -32,7 +28,6 @@ import org.finos.waltz.model.measurable_rating_planned_decommission.MeasurableRa
 import org.finos.waltz.model.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommissionInfo;
 import org.finos.waltz.model.measurable_rating_replacement.MeasurableRatingReplacement;
 import org.finos.waltz.model.rating.RatingSchemeItem;
-import org.finos.waltz.model.utils.IdUtilities;
 import org.finos.waltz.service.allocation.AllocationService;
 import org.finos.waltz.service.allocation_schemes.AllocationSchemeService;
 import org.finos.waltz.service.application.ApplicationService;
@@ -58,10 +53,11 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static org.finos.waltz.common.CollectionUtilities.find;
-import static org.finos.waltz.common.FunctionUtilities.time;
 import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.SetUtilities.filter;
 import static org.finos.waltz.common.SetUtilities.map;
+import static org.finos.waltz.model.utils.IdUtilities.toIds;
 import static org.finos.waltz.schema.Tables.MEASURABLE;
 
 @Service
@@ -182,7 +178,7 @@ public class MeasurableRatingViewService {
         List<AllocationScheme> allocSchemes = allocationSchemeService.findByCategoryId(categoryId);
         Collection<Allocation> allocs = allocationService.findForCategoryAndSelector(appSelector.selector(), categoryId);
 
-        Set<AssessmentDefinition> defs = SetUtilities.filter(
+        Set<AssessmentDefinition> defs = filter(
                 assessmentDefinitionService.findByEntityKind(EntityKind.MEASURABLE_RATING),
                 d -> d.visibility().equals(AssessmentVisibility.PRIMARY)
                         && d.qualifierReference()
@@ -195,6 +191,7 @@ public class MeasurableRatingViewService {
         Collection<MeasurableRatingPlannedDecommission> decomms = measurableRatingPlannedDecommissionService.findForCategoryAndSelector(appSelector.selector(), categoryId);
         Collection<MeasurableRatingReplacement> replacements = measurableRatingReplacementService.findForCategoryAndSelector(appSelector.selector(), categoryId);
         Collection<MeasurableRatingPlannedDecommissionInfo> replacingDecomms = measurableRatingPlannedDecommissionService.findForReplacingEntitySelectorAndCategory(appSelector.selector(), categoryId);
+        Set<AssessmentRating> assessmentRatings = filter(assessments, d -> toIds(defs).contains(d.assessmentDefinitionId()));
 
         Set<MeasurableHierarchy> hierarchyForCategory = measurableService.findHierarchyForCategory(categoryId);
 
@@ -225,7 +222,7 @@ public class MeasurableRatingViewService {
 
         ImmutableAssessmentsView assessmentsView = ImmutableAssessmentsView
                 .builder()
-                .assessmentRatings(assessments)
+                .assessmentRatings(assessmentRatings)
                 .assessmentDefinitions(defs)
                 .ratingSchemeItems(assessmentRatingSchemeItems)
                 .build();
