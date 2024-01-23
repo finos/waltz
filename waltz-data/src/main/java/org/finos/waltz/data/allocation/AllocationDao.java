@@ -21,6 +21,7 @@ package org.finos.waltz.data.allocation;
 import org.finos.waltz.common.CollectionUtilities;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.ListUtilities;
+import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.allocation.Allocation;
@@ -30,7 +31,9 @@ import org.finos.waltz.schema.tables.records.AllocationRecord;
 import org.jooq.DSLContext;
 import org.jooq.DeleteConditionStep;
 import org.jooq.Record;
+import org.jooq.Record1;
 import org.jooq.RecordMapper;
+import org.jooq.Select;
 import org.jooq.UpdateConditionStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -84,15 +87,15 @@ public class AllocationDao {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
-    public List<Allocation> findByEntityAndCategory(EntityReference ref, long categoryId) {
+    public List<Allocation> findForCategoryAndSelector(Select<Record1<Long>> appIdSelector, long categoryId) {
         return dsl
                 .select(ALLOCATION.fields())
                 .from(ALLOCATION)
                 .innerJoin(MEASURABLE_RATING).on(ALLOCATION.MEASURABLE_RATING_ID.eq(MEASURABLE_RATING.ID))
                 .innerJoin(MEASURABLE).on(MEASURABLE_RATING.MEASURABLE_ID.eq(MEASURABLE.ID)
                         .and(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId)))
-                .where(MEASURABLE_RATING.ENTITY_KIND.eq(ref.kind().name()))
-                .and(MEASURABLE_RATING.ENTITY_ID.eq(ref.id()))
+                .where(dsl.renderInlined(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                        .and(MEASURABLE_RATING.ENTITY_ID.in(appIdSelector))))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 

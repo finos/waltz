@@ -24,6 +24,7 @@ import org.finos.waltz.model.DescriptionProvider;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdProvider;
 import org.finos.waltz.model.LastUpdatedProvider;
+import org.finos.waltz.model.Nullable;
 import org.finos.waltz.model.ProvenanceProvider;
 import org.immutables.value.Value;
 
@@ -52,4 +53,8 @@ public abstract class MeasurableRating implements
     public boolean isPrimary() {
         return false;
     }
+
+    // The aim is to move to ratingId long term and remove the 'code' column
+    @Nullable
+    public abstract Long ratingId();
 }

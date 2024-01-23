@@ -73,8 +73,9 @@
                         <span ng-if="$ctrl.visibility.editor === false">
                             <waltz-data-extract-link name="Export ratings"
                                                      styling="link"
-                                                     extract="measurable-rating-view/entity/{{$ctrl.parentEntityRef.kind}}/{{$ctrl.parentEntityRef.id}}/category-id/{{$ctrl.activeTab.category.id}}"
-                                                     method="GET">
+                                                     extract="measurable-rating-view/category-id/{{$ctrl.activeTab.category.id}}"
+                                                     request-body="$ctrl.extractParams"
+                                                     method="POST">
                             </waltz-data-extract-link>
                             <span ng-if="$ctrl.hasEditPermissions">|</span>
                         </span>
@@ -202,7 +203,6 @@
                                            application="$ctrl.application"
                                            assessment-definitions="$ctrl.activeTab.assessmentDefinitions"
                                            assessment-ratings="$ctrl.activeTab.assessmentRatings"
-                                           rating-schemes="$ctrl.ratingSchemes"
                                            measurable-hierarchy-by-id="$ctrl.activeTab.measurableHierarchyById">
             </waltz-measurable-rating-panel>
         </div>

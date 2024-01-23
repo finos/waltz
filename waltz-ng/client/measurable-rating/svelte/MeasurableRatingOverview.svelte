@@ -11,11 +11,11 @@
     import RatingIndicatorCell from "../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
     import _ from "lodash";
     import Icon from "../../common/svelte/Icon.svelte";
+    import DescriptionFade from "../../common/svelte/DescriptionFade.svelte";
 
     export let primaryEntityReference;
 
     let measurableRatingCall;
-
 
     $: {
         if (primaryEntityReference) {
@@ -24,10 +24,8 @@
     }
 
     $: view = $measurableRatingCall?.data;
-
     $: allocations = view?.allocations || [];
     $: allocationsBySchemeId = _.keyBy(view?.allocations, d => d.schemeId);
-
 </script>
 
 
@@ -38,7 +36,7 @@
             <li><ViewLink state="main">Home</ViewLink></li>
             <li>Measurable Rating</li>
             {#if view}
-                <li><EntityLink ref={view?.measurableRating.entityReference}/></li>
+                <li><EntityLink ref={view?.application}/></li>
                 <li><EntityLink ref={view?.measurable}/></li>
             {/if}
         </ol>
@@ -50,30 +48,38 @@
     <div class="row">
         <div class="col-md-6">
             <div class="row">
-                <div class="col-sm-6 waltz-display-field-label">
+                <div class="col-sm-4 waltz-display-field-label">
                     Entity
                 </div>
-                <div class="col-sm-6">
-                    <EntityLink ref={view?.measurableRating.entityReference}/>
+                <div class="col-sm-8">
+                    <EntityLink ref={view?.application}/>
+                    <div class="help-block">
+                        <DescriptionFade text={view?.application.description}
+                                         expanderAlignment="right"/>
+                    </div>
                 </div>
             </div>
             <div class="row">
-                <div class="col-sm-6 waltz-display-field-label">
+                <div class="col-sm-4 waltz-display-field-label">
                     Measurable
                 </div>
-                <div class="col-sm-6">
+                <div class="col-sm-8">
                     {#if view?.measurable}
                         <EntityLink ref={view?.measurable}/>
+                        <div class="help-block">
+                            <DescriptionFade text={view?.measurable.description}
+                                             expanderAlignment="right"/>
+                        </div>
                     {:else}
                         Unknown
                     {/if}
                 </div>
             </div>
             <div class="row">
-                <div class="col-sm-6 waltz-display-field-label">
+                <div class="col-sm-4 waltz-display-field-label">
                     Rating
                 </div>
-                <div class="col-sm-6">
+                <div class="col-sm-8">
                     {#if view?.rating}
                         <RatingIndicatorCell {...view?.rating}
                                              showName="true"/>
@@ -83,10 +89,21 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-sm-6 waltz-display-field-label">
+                <div class="col-sm-4 waltz-display-field-label">
+                    Comment
+                </div>
+                <div class="col-sm-8">
+                    <div>
+                        <DescriptionFade text={view?.measurableRating.description}
+                                         expanderAlignment="right"/>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-4 waltz-display-field-label">
                     Primary
                 </div>
-                <div class="col-sm-6">
+                <div class="col-sm-8">
                     {#if view?.measurableRating.isPrimary}
                         <Icon name="star"/> Primary
                     {:else}
@@ -96,10 +113,10 @@
             </div>
             {#if !_.isEmpty(view?.allocationSchemes)}
                 <div class="row">
-                    <div class="col-sm-6 waltz-display-field-label">
+                    <div class="col-sm-4 waltz-display-field-label">
                         Allocation
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-8">
                         <table class="table table-condensed small">
                             <thead>
                             <tr>
@@ -130,20 +147,20 @@
             {/if}
             {#if !_.isEmpty(view?.decommission)}
                 <div class="row">
-                    <div class="col-sm-6 waltz-display-field-label">
+                    <div class="col-sm-4 waltz-display-field-label">
                         Decommission Date
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-8">
                         {view?.decommission.plannedDecommissionDate}
                     </div>
                 </div>
             {/if}
             {#if !_.isEmpty(view?.replacements)}
                 <div class="row">
-                    <div class="col-sm-6 waltz-display-field-label">
+                    <div class="col-sm-4 waltz-display-field-label">
                         Replacement Applications
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-8">
                         <table class="table table-condensed small">
                             <thead>
                             <tr>

@@ -33,6 +33,8 @@ import org.finos.waltz.service.allocation_schemes.AllocationSchemeService;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.measurable_rating.MeasurableRatingService;
 import org.finos.waltz.service.permission.permission_checker.AllocationPermissionChecker;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,8 +97,8 @@ public class AllocationService {
         return allocationDao.findByEntity(ref);
     }
 
-    public Collection<Allocation> findByEntityAndCategory(EntityReference ref, long categoryId) {
-        return allocationDao.findByEntityAndCategory(ref, categoryId);
+    public Collection<Allocation> findForCategoryAndSelector(Select<Record1<Long>> appIdSelector, long categoryId) {
+        return allocationDao.findForCategoryAndSelector(appIdSelector, categoryId);
     }
 
 

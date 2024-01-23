@@ -19,7 +19,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
 import _ from "lodash";
 import template from "./linked-diagrams-panel.html";
-import {refToString, toEntityRef} from "../../../common/entity-utils";
+import {refToString, toEntityRef, toEntityRefWithKind} from "../../../common/entity-utils";
 import {determineIfCreateAllowed} from "../../../flow-diagram/flow-diagram-utils";
 import {displayError} from "../../../common/error-utils";
 import {kindToViewState} from "../../../common/link-utils";
@@ -82,7 +82,7 @@ function combineDiagrams(flowDiagrams = [],
     const convertSvgDiagramFn = d => {
         return {
             id: `ENTITY_SVG_DIAGRAM/${d.id}`,
-            ref: toEntityRef(d, "ENTITY_SVG_DIAGRAM"),
+            ref: toEntityRefWithKind(d, "ENTITY_SVG_DIAGRAM"),
             type: "Generic",
             name: d.name,
             icon: "picture-o",

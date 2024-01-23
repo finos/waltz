@@ -18,7 +18,7 @@
 
 import template from "./flow-spec-definition-section.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {toEntityRef} from "../../../common/entity-utils";
+import {toEntityRefWithKind} from "../../../common/entity-utils";
 import {initialiseData} from "../../../common";
 import _ from "lodash";
 import toasts from "../../../svelte-stores/toast-store";
@@ -130,7 +130,7 @@ function controller($q, serviceBroker) {
                     [physicalFlow.specificationId]))
             .then(r => {
                 vm.specification = r.data;
-                vm.specificationReference = toEntityRef(r.data, "PHYSICAL_SPECIFICATION");
+                vm.specificationReference = toEntityRefWithKind(r.data, "PHYSICAL_SPECIFICATION");
             });
 
         specPromise

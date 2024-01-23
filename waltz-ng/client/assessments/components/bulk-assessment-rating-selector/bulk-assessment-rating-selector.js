@@ -106,10 +106,11 @@ function findMatchedApps(definition, apps = [], identifiers = [], existingRefs =
     return _.chain(identifiers)
         .map(identifier => {
             const app = appsByAssetCode[identifier.appIdentifier];
-            const selectedRating = _.find(ratingItems,
+            const selectedRating = _.find(
+                ratingItems,
                 item => item.name === identifier.rating
                     || item.rating === _.toUpper(identifier.rating));
-            const entityRef = app ? toEntityRef(app, "APPLICATION") : null;
+            const entityRef = app ? toEntityRef(app) : null;
             const searchEntity = Object.assign({}, {
                 entityRef: entityRef,
                 rating: selectedRating,

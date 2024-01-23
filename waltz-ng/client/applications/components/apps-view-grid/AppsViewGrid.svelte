@@ -1,4 +1,5 @@
 <script>
+
     import {SlickGrid} from "slickgrid";
     import {onMount} from "svelte";
     import _ from "lodash";
@@ -89,7 +90,3 @@
 {:else}
     <NoData>No applications</NoData>
 {/if}
-
-<style type="text/scss">
-    @import "slickgrid/dist/styles/css/slick-alpine-theme.css";
-</style>

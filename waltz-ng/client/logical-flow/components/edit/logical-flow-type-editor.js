@@ -18,7 +18,7 @@
 
 import _ from "lodash";
 import template from "./logical-flow-type-editor.html";
-import {toEntityRef} from "../../../common/entity-utils";
+import {toEntityRefWithKind} from "../../../common/entity-utils";
 import toasts from "../../../svelte-stores/toast-store";
 
 
@@ -46,7 +46,7 @@ function controller() {
     const vm = _.defaultsDeep(this, initialState);
 
     const refresh = () => {
-        vm.logicalFlowEntityRef = toEntityRef(vm.flow, "LOGICAL_DATA_FLOW");
+        vm.logicalFlowEntityRef = toEntityRefWithKind(vm.flow, "LOGICAL_DATA_FLOW");
     };
 
     vm.$onInit = () => {

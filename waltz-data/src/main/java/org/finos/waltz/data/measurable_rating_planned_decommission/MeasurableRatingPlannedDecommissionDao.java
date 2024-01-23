@@ -37,7 +37,9 @@ import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record;
+import org.jooq.Record1;
 import org.jooq.RecordMapper;
+import org.jooq.Select;
 import org.jooq.SelectOnConditionStep;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -145,11 +147,11 @@ public class MeasurableRatingPlannedDecommissionDao {
     }
 
 
-    public Set<MeasurableRatingPlannedDecommission> findByEntityRefAndCategory(EntityReference ref, long categoryId){
+    public Set<MeasurableRatingPlannedDecommission> findForCategoryAndSelector(Select<Record1<Long>> appIdSelector, long categoryId){
         return mkBaseQry()
                 .innerJoin(MEASURABLE).on(MEASURABLE_RATING.MEASURABLE_ID.eq(MEASURABLE.ID)
                         .and(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId)))
-                .where(mkRatingRefCondition(ref))
+                .where(dsl.renderInlined(MEASURABLE_RATING.ENTITY_ID.in(appIdSelector)))
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
 
@@ -177,7 +179,7 @@ public class MeasurableRatingPlannedDecommissionDao {
     }
 
 
-    public Collection<MeasurableRatingPlannedDecommissionInfo> findForReplacingEntityRefAndCategory(EntityReference ref, Long categoryId) {
+    public Collection<MeasurableRatingPlannedDecommissionInfo> findForReplacingEntitySelectorAndCategory(Select<Record1<Long>> appIdSelector, Long categoryId) {
         return dsl
                 .select(MEASURABLE_RATING_PLANNED_DECOMMISSION.fields())
                 .select(MEASURABLE_RATING.fields())
@@ -188,8 +190,8 @@ public class MeasurableRatingPlannedDecommissionDao {
                 .innerJoin(MEASURABLE_RATING).on(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_RATING_ID.eq(MEASURABLE_RATING.ID))
                 .innerJoin(MEASURABLE).on(MEASURABLE_RATING.MEASURABLE_ID.eq(MEASURABLE.ID)
                         .and(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId)))
-                .where(MEASURABLE_RATING_REPLACEMENT.ENTITY_ID.eq(ref.id()))
-                .and(MEASURABLE_RATING_REPLACEMENT.ENTITY_KIND.eq(ref.kind().name()))
+                .where(MEASURABLE_RATING_REPLACEMENT.ENTITY_ID.in(appIdSelector))
+                .and(MEASURABLE_RATING_REPLACEMENT.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                 .fetchSet(r -> {
                     MeasurableRatingPlannedDecommission decom = MeasurableRatingPlannedDecommissionDao.TO_DOMAIN_MAPPER.map(r);
                     MeasurableRating rating = readMeasurableRating(r);

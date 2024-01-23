@@ -1,11 +1,11 @@
 package org.finos.waltz.model.measurable_rating;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.Nullable;
 import org.finos.waltz.model.allocation.Allocation;
 import org.finos.waltz.model.allocation_scheme.AllocationScheme;
-import org.finos.waltz.model.assessment_rating.AssessmentRating;
+import org.finos.waltz.model.application.Application;
+import org.finos.waltz.model.measurable.Measurable;
 import org.finos.waltz.model.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommission;
 import org.finos.waltz.model.measurable_rating_replacement.MeasurableRatingReplacement;
 import org.finos.waltz.model.rating.RatingSchemeItem;
@@ -21,7 +21,10 @@ public abstract class MeasurableRatingView {
     public abstract MeasurableRating measurableRating();
 
     @Nullable
-    public abstract EntityReference measurable();
+    public abstract Measurable measurable();
+
+    @Nullable
+    public abstract Application application();
 
     @Nullable
     public abstract RatingSchemeItem rating();

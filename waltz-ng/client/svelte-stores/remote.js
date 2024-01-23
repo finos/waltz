@@ -48,7 +48,15 @@ class Cache {
     }
 
     set(key, d) {
-        const storeValue = { data: d, error: null, status: "loaded" };
+        return this._setWithStatus(key, d, "loaded");
+    }
+
+    clearForKey(key, d) {
+        return this._setWithStatus(key, d, "loading");
+    }
+
+    _setWithStatus(key, d, status) {
+        const storeValue = { data: d, error: null, status };
         const existingWritable = this.cacheData.get(key);
         return existingWritable
             ? existingWritable.set(storeValue)
@@ -89,12 +97,15 @@ function mkKey(method, url, data) {
 function _fetchData(cache, method, url, data, init = [], config = { force: false }) {
     const key = mkKey(method, url, data);
     const forcing = _.get(config, ["force"], false);
-    const invokeFetch = () => mkPromise(method, url, data)
-        .then(r => cache.set(key, r.data))
-        .catch(e => cache.err(key, e, init));
+    const invokeFetch = () => {
+        return mkPromise(method, url, data)
+            .then(r => cache.set(key, r.data))
+            .catch(e => cache.err(key, e, init));
+    }
 
     if (cache.has(key)) {
         if (forcing) {
+            cache.clearForKey(key, init);
             invokeFetch();
         } else {
             const existingValue = cache.get(key);
