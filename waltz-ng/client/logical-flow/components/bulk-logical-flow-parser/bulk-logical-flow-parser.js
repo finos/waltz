@@ -20,7 +20,7 @@ import _ from "lodash";
 import {nest} from "d3-collection";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
-import {refToString, sameRef, toEntityRef} from "../../../common/entity-utils";
+import {refToString, sameRef, toEntityRefWithKind} from "../../../common/entity-utils";
 import {invokeFunction} from "../../../common/index";
 import {downloadTextFile} from "../../../common/file-utils";
 
@@ -58,7 +58,7 @@ function resolveEntityRef(entitiesByIdentifier = {}, kind, identifier) {
         .trim()
         .value();
     const app = entitiesByIdentifier[search];
-    const entityRef = app ? toEntityRef(app, kind) : null;
+    const entityRef = app ? toEntityRefWithKind(app, kind) : null;
 
     return {
         identifier,

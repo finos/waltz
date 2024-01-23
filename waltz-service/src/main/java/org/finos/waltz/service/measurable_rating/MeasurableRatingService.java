@@ -20,6 +20,7 @@ package org.finos.waltz.service.measurable_rating;
 
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.EntityReferenceNameResolver;
+import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.data.measurable.MeasurableDao;
 import org.finos.waltz.data.measurable.MeasurableIdSelectorFactory;
@@ -38,7 +39,6 @@ import org.finos.waltz.model.measurable_rating.MeasurableRating;
 import org.finos.waltz.model.measurable_rating.MeasurableRatingChangeSummary;
 import org.finos.waltz.model.measurable_rating.MeasurableRatingCommand;
 import org.finos.waltz.model.measurable_rating.MeasurableRatingStatParams;
-import org.finos.waltz.model.measurable_rating.MeasurableRatingView;
 import org.finos.waltz.model.measurable_rating.RemoveMeasurableRatingCommand;
 import org.finos.waltz.model.measurable_rating.SaveMeasurableRatingCommand;
 import org.finos.waltz.model.rating.RatingSchemeItem;
@@ -54,6 +54,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.*;
@@ -101,9 +102,8 @@ public class MeasurableRatingService {
     }
 
 
-    public List<MeasurableRating> findForEntityAndCategory(EntityReference ref, long categoryId) {
-        checkNotNull(ref, "ref cannot be null");
-        return measurableRatingDao.findForEntityAndCategory(ref, categoryId);
+    public List<MeasurableRating> findForCategoryAndSelector(Select<Record1<Long>> appIds, long categoryId) {
+        return measurableRatingDao.findForCategoryAndSelector(appIds, categoryId);
     }
 
 
@@ -425,5 +425,9 @@ public class MeasurableRatingService {
         return nameAndCode == null
                 ? "-"
                 : format("%s [%s]", nameAndCode.v1, nameAndCode.v2);
+    }
+
+    public Set<MeasurableRating> findPrimaryRatingsForGenericSelector(GenericSelector genericSelector) {
+        return measurableRatingDao.findPrimaryRatingsForGenericSelector(genericSelector);
     }
 }

@@ -1,5 +1,6 @@
 import {
-    mkApplicationKindFormatter, mkAssessmentAndCategoryColumns,
+    mkApplicationKindFormatter,
+    mkPrimaryAssessmentAndCategoryColumns,
     mkEntityLinkFormatter,
     mkLifecyclePhaseFormatter
 } from "../../../common/slick-grid-utils";
@@ -77,9 +78,7 @@ export function doGridSearch(data = [], searchStr) {
 export function mkColumnDefs(primaryAssessments, primaryRatings) {
     return _.concat(
         baseColumns,
-        mkAssessmentAndCategoryColumns(
-            primaryAssessments.assessmentDefinitions,
-            primaryRatings.measurableCategories));
+        mkPrimaryAssessmentAndCategoryColumns(primaryAssessments.assessmentDefinitions, primaryRatings.measurableCategories));
 }
 
 
@@ -126,7 +125,7 @@ export function mkGridData(applications, primaryAssessments, primaryRatings, org
                         ratingSchemeItem
                     };
                 })
-                .reduce((acc, d) => {acc['measurable_category/'+d.measurableCategory.externalId] = d; return acc;}, {})
+                .reduce((acc, d) => {acc['measurable_category/'+d.measurableCategory.id] = d; return acc;}, {})
                 .value();
 
             const primaryAssessmentCells = _
@@ -142,7 +141,7 @@ export function mkGridData(applications, primaryAssessments, primaryRatings, org
                 })
                 .reduce(
                     (acc, d) => {
-                        const key = 'assessment_definition/'+d.assessmentDefinition.externalId;
+                        const key = 'assessment_definition/'+d.assessmentDefinition.id;
                         const values = acc[key] || [];
                         values.push(d);
                         acc[key] = values;

@@ -55,8 +55,8 @@
     $: canEditCardinality = !$selectedDefinition.id || !$hasMultiValuesAssessmentsCall?.data; // allow edit for new categories without check
     $: ratings = $ratingCall?.data || [];
     $: possibleRatingSchemes = _.sortBy($ratingSchemesCall.data, d => d.name);
-    $: measurableCategories = _.map($measurableCategoryCall?.data || [], toEntityRef);
-    $: legalEntityRelationshipKinds = _.map($legalEntityRelationshipKindCall?.data || [], toEntityRef);
+    $: measurableCategories = _.map($measurableCategoryCall?.data || [], d => toEntityRef(d));
+    $: legalEntityRelationshipKinds = _.map($legalEntityRelationshipKindCall?.data || [], d => toEntityRef(d));
 
     $: hasRatings = ratings.length > 0;
     $: invalid = _.some(getRequiredFields($selectedDefinition), v => _.isNil(v));

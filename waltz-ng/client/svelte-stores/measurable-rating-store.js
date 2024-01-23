@@ -25,10 +25,19 @@ export function mkMeasurableRelationshipStore() {
             "api/measurable-rating/app-selector",
             options);
 
+    const getViewByCategoryAndSelector = (categoryId, options, force = false) => remote
+        .fetchViewData(
+            "POST",
+            `api/measurable-rating/category/${categoryId}/view`,
+            options,
+            null,
+            {force});
+
     return {
         findByApplicationSelector,
         getById,
-        getViewById
+        getViewById,
+        getViewByCategoryAndSelector
     };
 }
 

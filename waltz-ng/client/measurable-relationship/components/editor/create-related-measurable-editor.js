@@ -20,7 +20,7 @@ import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {availableRelationshipKinds} from "./related-measurable-editor-utils";
 import {doSearch, prepareSearchNodes} from "../../../common/hierarchy-utils";
-import {refToString, toEntityRef} from "../../../common/entity-utils";
+import {refToString, toEntityRefWithKind} from "../../../common/entity-utils";
 
 import template from "./create-related-measurable-editor.html";
 import {displayError} from "../../../common/error-utils";
@@ -187,7 +187,7 @@ function controller(serviceBroker) {
     vm.onItemCheck = (node) => {
 
         const selected = vm.measurablesById[node];
-        vm.form.counterpart = toEntityRef(selected, "MEASURABLE");
+        vm.form.counterpart = toEntityRefWithKind(selected, "MEASURABLE");
 
         save(vm.form)
             .then(loadRelationships)

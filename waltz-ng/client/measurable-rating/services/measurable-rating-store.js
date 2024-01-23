@@ -47,9 +47,9 @@ function store($http, baseApiUrl) {
             .then(d => d.data);
     };
 
-    const getViewForEntityAndCategory = (ref, categoryId) => {
+    const getViewByCategoryAndAppSelector = (categoryId, selector) => {
         return $http
-            .get(`${baseUrl}/entity/${ref.kind}/${ref.id}/category/${categoryId}/view`)
+            .post(`${baseUrl}/category/${categoryId}/view`, selector)
             .then(d => d.data);
     };
 
@@ -132,7 +132,7 @@ function store($http, baseApiUrl) {
         getById,
         getViewById,
         getViewForEntity,
-        getViewForEntityAndCategory,
+        getViewByCategoryAndAppSelector,
         findByMeasurableSelector,
         findByAppSelector,
         findByCategory,
@@ -171,11 +171,6 @@ export const MeasurableRatingStore_API = {
         serviceFnName: "getViewForEntity",
         description: "finds all details related to the measurable ratings for an entity"
     },
-    getViewForEntityAndCategory: {
-        serviceName,
-        serviceFnName: "getViewForEntityAndCategory",
-        description: "finds all details related to the measurable ratings for an entity and category"
-    },
     findByMeasurableSelector: {
         serviceName,
         serviceFnName: "findByMeasurableSelector",
@@ -185,6 +180,11 @@ export const MeasurableRatingStore_API = {
         serviceName,
         serviceFnName: "findByAppSelector",
         description: "finds measurables by app selector"
+    },
+    getViewByCategoryAndAppSelector: {
+        serviceName,
+        serviceFnName: "getViewByCategoryAndAppSelector",
+        description: "finds measurable ratings and primary assessments for ratings using an app id selector limited to a category"
     },
     findByCategory: {
         serviceName,

@@ -62,55 +62,46 @@ export function loadAllData(
 }
 
 
-function prepareTabForCategory(category,
-                               ratingsForCategory = [],
-                               measurablesForCategory = [],
-                               allocationSchemesForCategory = [],
-                               allocationsForCategory = [],
-                               assessmentDefinitionsForCategory = [],
-                               assessmentRatingsForCategory = [],
-                               decommsForCategory = [],
-                               replacementsForCategory = [],
-                               replacingDecommissionsForCategory = [],
-                               ratingSchemesById,
-                               ratingSchemeItemsById,
-                               measurableHierarchy,
+function prepareTabForCategory(measurableRatingsView,
+                               allocationsView,
+                               decommissionsView,
+                               assessmentsView,
                                application,
                                showAllMeasurables = true) {
 
-    const ratedMeasurables = _.map(ratingsForCategory, d => d.measurableId);
-    const replacingMeasurables = _.map(replacingDecommissionsForCategory, d => d.measurableRating.measurableId);
+    const ratedMeasurables = _.map(measurableRatingsView.measurableRatings, d => d.measurableId);
+    const replacingMeasurables = _.map(decommissionsView.replacingDecommissions, d => d.measurableRating.measurableId);
 
     const requiredMeasurables = _.concat(ratedMeasurables, replacingMeasurables);
 
-    const ratingScheme = ratingSchemesById[category.ratingSchemeId];
-    const ratingSchemeItemsByCode = _.keyBy(ratingScheme.ratings, d => d.rating);
+    const measurableRatingSchemeItemsByCode = _.keyBy(measurableRatingsView.ratingSchemeItems, d => d.rating);
+    const assessmentRatingSchemeItemsById = _.keyBy(assessmentsView.ratingSchemeItems, d => d.id);
 
-    const measurableHierarchyById = _.keyBy(measurableHierarchy, d => d.measurableId);
+    const measurableHierarchyById = _.keyBy(measurableRatingsView.measurableHierarchy, d => d.measurableId);
 
     const measurables = showAllMeasurables
-        ? measurablesForCategory
-        : reduceToSelectedNodesOnly(measurablesForCategory, requiredMeasurables);
+        ? measurableRatingsView.measurables
+        : reduceToSelectedNodesOnly(measurableRatingsView.measurables, requiredMeasurables);
 
     const ratings = _
-        .chain(ratingsForCategory)
-        .map(r => Object.assign(r, {ratingSchemeItem: ratingSchemeItemsByCode[r.rating]}))
+        .chain(measurableRatingsView.measurableRatings)
+        .map(r => Object.assign(r, {ratingSchemeItem: measurableRatingSchemeItemsByCode[r.rating]}))
         .value();
 
     const assessmentRatings = _
-        .chain(assessmentRatingsForCategory)
-        .map(r => Object.assign(r, {ratingSchemeItem: ratingSchemeItemsById[r.ratingId]}))
+        .chain(assessmentsView.assessmentRatings)
+        .map(r => Object.assign(r, {ratingSchemeItem: assessmentRatingSchemeItemsById[r.ratingId]}))
         .value();
 
     const allocationTotalsByScheme = _
-        .chain(allocationsForCategory)
+        .chain(allocationsView.allocations)
         .groupBy(d => d.schemeId)
         .mapValues(d => _.sumBy(d, a => a.percentage))
         .value();
 
     const plannedDecomms = _.isNull(application.plannedRetirementDate)
-        ? _.map(decommsForCategory, d => Object.assign({}, d, { isValid: true}))
-        : _.map(decommsForCategory, d => {
+        ? _.map(decommissionsView.plannedDecommissions, d => Object.assign({}, d, { isValid: true}))
+        : _.map(decommissionsView.plannedDecommissions, d => {
 
             const decomDate = new Date(d.plannedDecommissionDate);
             const appRetirementDate = new Date(application.plannedRetirementDate);
@@ -126,18 +117,17 @@ function prepareTabForCategory(category,
 
 
     return {
-        category,
-        ratingScheme,
+        category: _.head(measurableRatingsView.measurableCategories),
         measurables,
         ratings,
-        allocationSchemes: allocationSchemesForCategory,
-        allocations: allocationsForCategory,
-        assessmentDefinitions: assessmentDefinitionsForCategory,
+        allocationSchemes: allocationsView.allocationSchemes,
+        allocations: allocationsView.allocations,
+        assessmentDefinitions: assessmentsView.assessmentDefinitions,
         assessmentRatings,
         plannedDecommissions: plannedDecomms,
-        plannedReplacements: replacementsForCategory,
-        replacingDecommissions: replacingDecommissionsForCategory,
-        ratingSchemeItems: ratingScheme.ratings,
+        plannedReplacements: decommissionsView.plannedReplacements,
+        replacingDecommissions: decommissionsView.replacingDecommissions,
+        ratingSchemeItems: measurableRatingsView.ratingSchemeItems,
         allocationTotalsByScheme,
         measurableHierarchyById
     };
@@ -145,22 +135,11 @@ function prepareTabForCategory(category,
 
 export function mkTab(ctx, application, showAllMeasurables = false) {
 
-    const ratingSchemesById = _.keyBy(ctx.ratingSchemes, d => d.id);
-
     return prepareTabForCategory(
-        ctx.category,
-        ctx.ratings,
-        ctx.measurables,
-        ctx.allocationSchemes,
+        ctx.measurableRatings,
         ctx.allocations,
-        ctx.assessmentDefinitions,
-        ctx.assessmentRatings,
-        ctx.plannedDecommissions,
-        ctx.plannedReplacements,
-        ctx.replacingDecommissions,
-        ratingSchemesById,
-        ctx.ratingSchemeItemsById,
-        ctx.measurableHierarchy,
+        ctx.decommissions,
+        ctx.primaryAssessments,
         application,
         showAllMeasurables);
 

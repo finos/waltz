@@ -33,7 +33,7 @@
         <h2>
             <Icon name={icon}/>
 
-            <span>{truncateMiddle(name, 50)}</span>
+            <span title={name}>{truncateMiddle(name, 70)}</span>
             <small>{small}</small>
 
             <slot name="actions"/>

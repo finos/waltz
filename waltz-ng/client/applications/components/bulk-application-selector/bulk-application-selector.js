@@ -95,7 +95,7 @@ function findMatchedApps(apps = [], identifiers = [], existingRefs = []) {
         .chain(identifiers)
         .map(identifier => {
             const app = appsByAssetCode[identifier];
-            const entityRef = app ? toEntityRef(app, 'APPLICATION') : null;
+            const entityRef = app ? toEntityRef(app) : null;
 
             return {
                 identifier,
