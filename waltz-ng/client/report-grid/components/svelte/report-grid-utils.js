@@ -86,6 +86,7 @@ const nameCol = mkEntityLinkGridCell(
     "right",
     {pinnedLeft: true, width: 200});
 
+
 const extIdCol = {
     field: "subject.entityReference.externalId",
     displayName: "Ext. Id",
@@ -96,6 +97,7 @@ const extIdCol = {
             <div class="report-grid-cell-text" ng-bind="COL_FIELD"></div>
         </div>`
 };
+
 
 const lifecyclePhaseCol = {
     field: "subject.lifecyclePhase",
@@ -118,6 +120,7 @@ const unknownRating = {
     position: 0
 };
 
+
 function getFixedColumnName(column) {
     let entityFieldName = _.get(column, ["entityFieldReference", "displayName"], null);
 
@@ -130,6 +133,7 @@ function getFixedColumnName(column) {
         .value();
 }
 
+
 export function getColumnName(column) {
     switch (column.kind) {
         case "REPORT_GRID_FIXED_COLUMN_DEFINITION":
@@ -139,6 +143,7 @@ export function getColumnName(column) {
             throw `Cannot determine name for unknown column kind: ${column.kind}`;
     }
 }
+
 
 export function getDisplayNameForColumn(c) {
     if (c.displayName != null) {
@@ -280,6 +285,7 @@ function calculateCostColorScales(cellData, columnDefs) {
     return calculateColorScales(cellData, columnDefs, "COST_KIND", "#e2f5ff", "#86e4ff");
 }
 
+
 /**
  * Returns a map of color scales keyed by their column id's
  * @param gridData
@@ -315,6 +321,7 @@ function calculateColorScales(cellData, columnDefs, entityKind, startColor, endC
             .range([startColor, endColor]))
         .value();
 }
+
 
 const attestationColorScale = scaleLinear()
     .domain([subtractYears(1), new Date()])
@@ -394,6 +401,7 @@ function mkRatingCell(dataCell, baseCell, ratingSchemeItemsById) {
             options
         });
 }
+
 
 export function combineColDefs(definition) {
     const fixedColDefs = _.get(definition, ["fixedColumnDefinitions"], []);
@@ -561,6 +569,7 @@ function countDistinct(optionSummaries, mapper) {
         .value();
 }
 
+
 export function refreshSummaries(tableData,
                                  columnDefinitions) {
 
@@ -707,6 +716,7 @@ function sameDerivedColumnRefs(v1, v2) {
     return name1 === name2;
 }
 
+
 export function sameColumnRef(v1, v2) {
     if (!v1 || !v2) return false;
 
@@ -727,6 +737,7 @@ export function sameColumnRef(v1, v2) {
 export function mkLocalStorageFilterKey(gridId) {
     return `waltz-report-grid-${gridId}-active-summaries`
 }
+
 
 export function mkReportGridFixedColumnRef(d, nameProvider = "name") {
     return Object.assign(
@@ -752,7 +763,7 @@ export function mkReportGridEntityFieldReferenceColumnRef(fieldRef,
                                                           entity,
                                                           qualifierEntity,
                                                           displayName = null,
-                                                          additionalColumnOptions = additionalColumnOptions.NONE) {
+                                                          additionalColOpts = additionalColumnOptions.NONE) {
     return Object.assign(
         {},
         {
@@ -764,7 +775,7 @@ export function mkReportGridEntityFieldReferenceColumnRef(fieldRef,
             columnQualifierKind: qualifierEntity ? qualifierEntity.kind : null,
             columnQualifierId: qualifierEntity ? qualifierEntity.id : null,
             displayName: displayName,
-            additionalColumnOptions: additionalColumnOptions
+            additionalColumnOptions: additionalColOpts.key
         });
 }
 
@@ -780,23 +791,6 @@ export function mkMeasurableColumn(selectedCategory, measurable) {
             columnQualifierKind: "MEASURABLE",
             columnQualifierId: measurable.id,
             columnName: `${selectedCategory.name}/${measurable.name}`,
-            displayName: null
-        });
-}
-
-
-export function mkPrimaryMeasurableFieldColumn(fieldReference, selectedCategory) {
-    return Object.assign(
-        {},
-        {
-            kind: "REPORT_GRID_FIXED_COLUMN_DEFINITION",
-            columnEntityId: "MEASURABLE",
-            columnEntityKind: null,
-            additionalColumnOptions: additionalColumnOptions.PRIMARY.key,
-            entityFieldReference: fieldReference,
-            columnQualifierKind: "MEASURABLE_CATEGORY",
-            columnQualifierId: selectedCategory.id,
-            columnName: `${selectedCategory.name}/Primary Rating`,
             displayName: null
         });
 }
