@@ -43,6 +43,7 @@ import org.jooq.RecordMapper;
 import org.jooq.Select;
 import org.jooq.SelectHavingStep;
 import org.jooq.impl.DSL;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -52,6 +53,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -62,6 +64,7 @@ import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.schema.tables.AttestationInstance.ATTESTATION_INSTANCE;
 import static org.finos.waltz.schema.tables.AttestationInstanceRecipient.ATTESTATION_INSTANCE_RECIPIENT;
 import static org.finos.waltz.schema.tables.AttestationRun.ATTESTATION_RUN;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository
 public class AttestationRunDao {
@@ -308,51 +311,55 @@ public class AttestationRunDao {
     public Set<AttestationRunRecipient> findRunRecipients(long runId) {
 
         Field<Boolean> isPendingField = DSL
-            .nvl2(
-                ATTESTATION_INSTANCE.ATTESTED_AT,
-                DSL.value(false),
-                DSL.value(true))
-            .as("isPending");
+                .when(ATTESTATION_INSTANCE.ATTESTED_AT.isNull(), DSL.value(false))
+                .otherwise(DSL.value(true));
 
-        SelectHavingStep<Record3<String, Boolean, Integer>> qry = dsl
+        SelectHavingStep<Record3<String, Boolean, Long>> qry = dsl
                 .select(ATTESTATION_INSTANCE_RECIPIENT.USER_ID,
-                        isPendingField,
-                        DSL.count())
+                        isPendingField.as("is_pending_field"),
+                        ATTESTATION_INSTANCE.ID)
                 .from(ATTESTATION_RUN)
                 .innerJoin(ATTESTATION_INSTANCE)
                 .on(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID.eq(ATTESTATION_RUN.ID))
                 .innerJoin(ATTESTATION_INSTANCE_RECIPIENT)
                 .on(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID.eq(ATTESTATION_INSTANCE.ID))
-                .where(ATTESTATION_RUN.ID.eq(runId))
-                .groupBy(ATTESTATION_INSTANCE_RECIPIENT.USER_ID, isPendingField);
+                .where(ATTESTATION_RUN.ID.eq(runId));
 
         Map<String, ImmutableAttestationRunRecipient> recipientsByUserId = new HashMap<>();
 
-        qry.fetch().forEach(r -> {
-            String userId = r.get(ATTESTATION_INSTANCE_RECIPIENT.USER_ID);
-            boolean isPending = r.get(isPendingField);
-            int count = r.get(DSL.count());
+        Map<Tuple2<String, Boolean>, Long> attestationInfo = qry
+                .fetchSet(r -> r)
+                .stream()
+                .collect(Collectors.groupingBy(
+                        r -> tuple(r.get(ATTESTATION_INSTANCE_RECIPIENT.USER_ID), r.get("is_pending_field", Boolean.class)),
+                        Collectors.counting()));
 
-            ImmutableAttestationRunRecipient recipient = recipientsByUserId.getOrDefault(
-                    userId,
-                    ImmutableAttestationRunRecipient.builder()
-                        .userId(userId)
-                        .pendingCount(0)
-                        .completedCount(0)
-                        .build());
+        attestationInfo
+                .forEach((key, value) -> {
+                    String userId = key.v1;
+                    boolean isPending = key.v2;
+                    long count = value;
 
-            if (isPending) {
-                recipient = ImmutableAttestationRunRecipient
-                        .copyOf(recipient)
-                        .withPendingCount(count);
-            } else {
-                recipient = ImmutableAttestationRunRecipient
-                        .copyOf(recipient)
-                        .withCompletedCount(count);
-            }
+                    ImmutableAttestationRunRecipient recipient = recipientsByUserId.getOrDefault(
+                            userId,
+                            ImmutableAttestationRunRecipient.builder()
+                                    .userId(userId)
+                                    .pendingCount(0)
+                                    .completedCount(0)
+                                    .build());
 
-            recipientsByUserId.put(userId, recipient);
-        });
+                    if (isPending) {
+                        recipient = ImmutableAttestationRunRecipient
+                                .copyOf(recipient)
+                                .withPendingCount(count);
+                    } else {
+                        recipient = ImmutableAttestationRunRecipient
+                                .copyOf(recipient)
+                                .withCompletedCount(count);
+                    }
+
+                    recipientsByUserId.put(userId, recipient);
+                });
 
         return SetUtilities.fromCollection(recipientsByUserId.values());
     }
