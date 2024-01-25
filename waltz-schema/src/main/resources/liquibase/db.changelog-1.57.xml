@@ -85,4 +85,20 @@
                           remarks="Indicates if the user must provide a comment when setting this option. Only valid if the assessment/item is not-readonly and is user-selectable"/>
     </changeSet>
 
+    <changeSet id="20240124-6961-1"
+               author="davidwatkins73">
+        <insert tableName="entity_field_reference">
+            <column name="entity_kind" value="MEASURABLE"/>
+            <column name="field_name" value="name"/>
+            <column name="display_name" value="Name"/>
+            <column name="description" value="Name of the viewpoint item"/>
+        </insert>
+        <insert tableName="entity_field_reference">
+            <column name="entity_kind" value="MEASURABLE"/>
+            <column name="field_name" value="external_id"/>
+            <column name="display_name" value="External Id"/>
+            <column name="description" value="External Identifier of the viewpoint item"/>
+        </insert>
+    </changeSet>
+
 </databaseChangeLog>
