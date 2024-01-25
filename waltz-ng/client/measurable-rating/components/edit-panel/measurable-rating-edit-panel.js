@@ -145,7 +145,7 @@ function controller($q,
     const doRatingItemSave = (rating) => {
         return doSave(CORE_API.MeasurableRatingStore.saveRatingItem, rating)
             .then(() => {
-                const newRating = _.merge({}, vm.selected.rating, {rating});
+                const newRating = _.find(vm.ratings, d => d.measurableId === vm.selected.measurable.id)
                 vm.selected = Object.assign({}, vm.selected, {rating: newRating});
             });
     };
@@ -179,6 +179,8 @@ function controller($q,
                 vm.saveInProgress = false;
                 vm.ratings = r.data;
                 vm.selected.rating = null;
+                vm.selected.decommission = null;
+                vm.selected.replacementApps = [];
                 recalcTabs(vm.selected.measurable.categoryId);
             });
     };
