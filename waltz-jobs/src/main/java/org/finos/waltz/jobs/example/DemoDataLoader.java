@@ -112,16 +112,22 @@ public class DemoDataLoader {
             processDataTypes(waltz, workbook.getSheet("data-types"), now);
             processDataFlows(waltz, workbook.getSheet("flows"), now);
 
-            LOG.debug("Rebuilding categories");
-            hierarchyService.buildFor(EntityKind.ORG_UNIT);
-            hierarchyService.buildFor(EntityKind.MEASURABLE);
-            hierarchyService.buildFor(EntityKind.PERSON);
+            rebuildHierarchies();
 
 
             throw new RuntimeException("rolling back, comment this line if you really want to do this!");
         });
 
         LOG.debug("Done");
+    }
+
+
+    private void rebuildHierarchies() {
+        LOG.debug("Rebuilding hierarchies");
+        hierarchyService.buildFor(EntityKind.ORG_UNIT);
+        hierarchyService.buildFor(EntityKind.MEASURABLE);
+        hierarchyService.buildFor(EntityKind.PERSON);
+        hierarchyService.buildFor(EntityKind.DATA_TYPE);
     }
 
 
