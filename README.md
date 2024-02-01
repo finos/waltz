@@ -69,8 +69,8 @@ progress and done issues.
 
 | Release | Date          | Provisional Change Summary                            |
 |---------|---------------|-------------------------------------------------------|
-| 1.57    | Jan 16th 2024 | Primary Ratings, Entity Stats, Measurable Rating page |
 | 1.58    | Feb 13th 2024 | tbd                                                   |
+| 1.59    | tbd           | tbd                                                   |
 
 See the [releases](https://github.com/finos/waltz/releases) page for historic versions.
 
