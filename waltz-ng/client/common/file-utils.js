@@ -51,13 +51,11 @@ export function downloadFile(rawContent,
                              format = "CSV") {
 
     const doc = document;
-    const a = doc.createElement("a");
     const strMimeType = determineMimeType(format);
     const fileContent = format === "JSON"
         ? JSON.stringify(rawContent, " ", 2)
         : rawContent;
 
-    let rawFile;
 
     // IE10+
     if (navigator.msSaveBlob) {
@@ -83,22 +81,9 @@ export function downloadFile(rawContent,
         return true;
     }
 
-    //html5 A[download]
-    if ("download" in a) {
-        const blob = new Blob(
-            [fileContent],
-            {type: strMimeType}
-        );
-        rawFile = URL.createObjectURL(blob);
-        a.setAttribute("download", fileName);
-    } else {
-        rawFile = "data:" + strMimeType + "," + encodeURIComponent(fileContent);
-        a.setAttribute("target", "_blank");
-    }
-
-    a.href = rawFile;
-    a.setAttribute("style", "display:none;");
+    const a = createDownloadAnchorTag(doc, fileName, fileContent, strMimeType);
     doc.body.appendChild(a);
+
     setTimeout(function() {
         if (a.click) {
             a.click();
@@ -113,3 +98,24 @@ export function downloadFile(rawContent,
     }, 100);
 }
 
+
+function createDownloadAnchorTag(doc, fileName, fileContent, strMimeType) {
+    const a = doc.createElement("a");
+
+    //html5 A[download]
+    if ("download" in a) {
+        const blob = new Blob(
+            [fileContent],
+            {type: strMimeType}
+        );
+        a.href = URL.createObjectURL(blob);
+        a.setAttribute("download", fileName);
+        a.setAttribute("style", "display:none;");
+        return a;
+    } else {
+        a.href = "data:" + strMimeType + "," + encodeURIComponent(fileContent);
+        a.setAttribute("target", "_blank");
+        a.setAttribute("style", "display:none;");
+        return a;
+    }
+}
