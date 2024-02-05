@@ -36,6 +36,8 @@ function determineMimeType(format) {
             return "application/octet-stream;charset=utf-8";
         case "XLSX":
             return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+        case "JSON":
+            return "application/json";
         case "SVG":
             return "image/svg+xml";
         default:
@@ -44,11 +46,17 @@ function determineMimeType(format) {
 }
 
 
-export function downloadFile(fileContent, fileName = 'download.csv', format = "CSV") {
+export function downloadFile(rawContent,
+                             fileName = "download.csv",
+                             format = "CSV") {
 
     const doc = document;
     const a = doc.createElement("a");
     const strMimeType = determineMimeType(format);
+    const fileContent = format === "JSON"
+        ? JSON.stringify(rawContent, " ", 2)
+        : rawContent;
+
     let rawFile;
 
     // IE10+
@@ -62,42 +70,42 @@ export function downloadFile(fileContent, fileName = 'download.csv', format = "C
     }
 
     if (isIE()) {
-        const frame = doc.createElement('iframe');
+        const frame = doc.createElement("iframe");
         document.body.appendChild(frame);
 
-        frame.contentWindow.document.open('text/html', 'replace');
+        frame.contentWindow.document.open("text/html", "replace");
         frame.contentWindow.document.write(fileContent);
         frame.contentWindow.document.close();
         frame.contentWindow.focus();
-        frame.contentWindow.document.execCommand('SaveAs', true, fileName);
+        frame.contentWindow.document.execCommand("SaveAs", true, fileName);
 
         document.body.removeChild(frame);
         return true;
     }
 
     //html5 A[download]
-    if ('download' in a) {
+    if ("download" in a) {
         const blob = new Blob(
             [fileContent],
             {type: strMimeType}
         );
         rawFile = URL.createObjectURL(blob);
-        a.setAttribute('download', fileName);
+        a.setAttribute("download", fileName);
     } else {
-        rawFile = 'data:' + strMimeType + ',' + encodeURIComponent(fileContent);
-        a.setAttribute('target', '_blank');
+        rawFile = "data:" + strMimeType + "," + encodeURIComponent(fileContent);
+        a.setAttribute("target", "_blank");
     }
 
     a.href = rawFile;
-    a.setAttribute('style', 'display:none;');
+    a.setAttribute("style", "display:none;");
     doc.body.appendChild(a);
     setTimeout(function() {
         if (a.click) {
             a.click();
             // Workaround for Safari 5
         } else if (document.createEvent) {
-            const eventObj = document.createEvent('MouseEvents');
-            eventObj.initEvent('click', true, true);
+            const eventObj = document.createEvent("MouseEvents");
+            eventObj.initEvent("click", true, true);
             a.dispatchEvent(eventObj);
         }
         doc.body.removeChild(a);
