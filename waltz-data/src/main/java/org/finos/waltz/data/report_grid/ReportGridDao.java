@@ -2451,8 +2451,8 @@ public class ReportGridDao {
 
 
     private CellOption determineOptionForSurveyQuestion(String fieldType,
-                                                        String response,
                                                         String entityName,
+                                                        String response,
                                                         List<String> listResponses) {
 
         if (isEmpty(response) && isEmpty(entityName) && isEmpty(listResponses)) {
