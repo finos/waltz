@@ -81,6 +81,9 @@
     <property name="false.value" value="false" dbms="postgresql"></property>
     <property name="false.value" value="false" dbms="h2"></property>
 
+    <property name="uuid.function" value="gen_random_uuid()" dbms="postgresql"/>
+    <property name="uuid.function" value="NEWID()" dbms="mssql"/>
+    <property name="uuid.function" value="random_uuid()" dbms="h2"/>
 
     <!-- COLUMN NAME OVERRIDES (to support reserved words in col name) -->
     <property name="key.col" value="[key]" dbms="mssql"/>
