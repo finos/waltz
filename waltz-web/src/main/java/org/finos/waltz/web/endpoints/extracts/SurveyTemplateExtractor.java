@@ -18,7 +18,6 @@
 
 package org.finos.waltz.web.endpoints.extracts;
 
-import org.finos.waltz.common.LoggingUtilities;
 import org.finos.waltz.data.person.PersonDao;
 import org.finos.waltz.data.survey.SurveyQuestionDao;
 import org.finos.waltz.data.survey.SurveyQuestionDropdownEntryDao;
@@ -27,19 +26,17 @@ import org.finos.waltz.model.person.Person;
 import org.finos.waltz.model.survey.SurveyQuestion;
 import org.finos.waltz.model.survey.SurveyQuestionDropdownEntry;
 import org.finos.waltz.model.survey.SurveyTemplate;
-import org.finos.waltz.service.DIConfiguration;
-import org.finos.waltz.web.json.survey_template_exchange.ImmutableSurveyDropdownEntryModel;
-import org.finos.waltz.web.json.survey_template_exchange.ImmutableSurveyQuestionModel;
-import org.finos.waltz.web.json.survey_template_exchange.ImmutableSurveyTemplateExchange;
-import org.finos.waltz.web.json.survey_template_exchange.ImmutableSurveyTemplateModel;
-import org.finos.waltz.web.json.survey_template_exchange.SurveyDropdownEntryModel;
-import org.finos.waltz.web.json.survey_template_exchange.SurveyQuestionModel;
-import org.finos.waltz.web.json.survey_template_exchange.SurveyTemplateExchange;
-import org.finos.waltz.web.json.survey_template_exchange.SurveyTemplateModel;
+import org.finos.waltz.model.survey_template_exchange.ImmutableSurveyDropdownEntryModel;
+import org.finos.waltz.model.survey_template_exchange.ImmutableSurveyQuestionModel;
+import org.finos.waltz.model.survey_template_exchange.ImmutableSurveyTemplateExchange;
+import org.finos.waltz.model.survey_template_exchange.ImmutableSurveyTemplateModel;
+import org.finos.waltz.model.survey_template_exchange.SurveyDropdownEntryModel;
+import org.finos.waltz.model.survey_template_exchange.SurveyQuestionModel;
+import org.finos.waltz.model.survey_template_exchange.SurveyTemplateExchange;
+import org.finos.waltz.model.survey_template_exchange.SurveyTemplateModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -49,9 +46,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.finos.waltz.common.MapUtilities.groupBy;
-import static org.finos.waltz.schema.Tables.MEASURABLE_CATEGORY;
-import static org.finos.waltz.schema.Tables.PERSON;
-import static org.finos.waltz.schema.tables.SurveyTemplate.SURVEY_TEMPLATE;
 import static org.finos.waltz.web.WebUtilities.getId;
 import static org.finos.waltz.web.WebUtilities.mkPath;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.getForDatum;
@@ -61,9 +55,6 @@ public class SurveyTemplateExtractor implements DataExtractor {
 
     private static final Logger LOG = LoggerFactory.getLogger(SurveyTemplateExtractor.class);
     private static final String BASE_URL = mkPath("data-extract", "survey-template");
-    private static final org.finos.waltz.schema.tables.SurveyTemplate st = SURVEY_TEMPLATE.as("st");
-    private static final org.finos.waltz.schema.tables.Person p = PERSON.as("p");
-    private static final org.finos.waltz.schema.tables.MeasurableCategory mc = MEASURABLE_CATEGORY.as("mc");
 
 
     private final SurveyQuestionDao questionDao;
@@ -93,7 +84,9 @@ public class SurveyTemplateExtractor implements DataExtractor {
     private void registerTemplateExtract() {
         getForDatum(
             mkPath(BASE_URL, "template-id", ":id"),
-            (request, response) -> prepareExtractModel(getId(request)));
+            (request, response) -> prepareExtractModel(
+                    getId(request)));
+
     }
 
 
@@ -150,16 +143,4 @@ public class SurveyTemplateExtractor implements DataExtractor {
                 .questions(questionModels)
                 .build();
     }
-
-
-    public static void main(String[] args) {
-        LoggingUtilities.configureLogging();
-        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
-
-        SurveyTemplateExtractor extractor = ctx.getBean(SurveyTemplateExtractor.class);
-        SurveyTemplateExchange kitchenSink = extractor.prepareExtractModel(116L);
-        System.out.println(kitchenSink);
-
-    }
-
 }

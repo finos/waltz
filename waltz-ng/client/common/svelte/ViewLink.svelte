@@ -116,6 +116,10 @@
         "main.involvement-kind.view": {
             path: ctx => `involvement-kind/${ctx.id}`,
             title: "Involvement Kind View"
+        },
+        "main.survey.template.list": {
+            path: () => `survey/template/list`,
+            title: "Survey Templates"
         }
     };
 

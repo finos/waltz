@@ -1,4 +1,4 @@
-package org.finos.waltz.web.json.survey_template_exchange;
+package org.finos.waltz.model.survey_template_exchange;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
