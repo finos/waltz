@@ -25,6 +25,7 @@
     </changeSet>
 
     <changeSet id="20240119-6944-1"
+               dbms="postgresql"
                author="OscarGreen03">
         <comment>6944: add external_id to logical_flow table</comment>
         <addColumn tableName="logical_flow">
@@ -34,4 +35,48 @@
             </column>
         </addColumn>
     </changeSet>
+
+    <changeSet id="20240205-6944-2"
+               dbms="!postgresql"
+               author="woodjes">
+        <comment>6944: adding external id to logical_flow</comment>
+        <addColumn tableName="logical_flow">
+            <column name="external_id"
+                    type="${external-id.type}"
+                    defaultValueComputed="CONCAT('LF:', ${uuid.function})">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20240205-6944-3"
+               dbms="postgresql"
+               author="woodjes">
+        <comment>6944: adding default value to logical_flow</comment>
+        <update tableName="logical_flow">
+            <column name="external_id"
+                    value="CONCAT('LF:', ${uuid.function})"
+                    type="${external-id.type}"/>
+            <where>'external_id' is null</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="20240205-6944-4"
+               dbms="postgresql"
+               author="woodjes">
+        <comment>6944: adding default value to logical_flow</comment>
+        <addNotNullConstraint tableName="logical_flow"
+                               columnName="external_id"
+                               columnDataType="${external-id.type}"/>
+    </changeSet>
+
+    <changeSet id="20240205-6944-5"
+               dbms="!postgresql"
+               author="woodjes">
+        <comment>6944: add unique constraint to logical flow ext id</comment>
+        <addUniqueConstraint tableName="logical_flow"
+                             constraintName="idx_lf_ext_id_unique"
+                             columnNames="external_id"/>
+    </changeSet>
+
 </databaseChangeLog>
