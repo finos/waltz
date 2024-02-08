@@ -55,9 +55,9 @@
         <comment>6944: adding default value to logical_flow</comment>
         <update tableName="logical_flow">
             <column name="external_id"
-                    value="CONCAT('LF:', ${uuid.function})"
+                    valueComputed="CONCAT('LF:', ${uuid.function})"
                     type="${external-id.type}"/>
-            <where>'external_id' is null</where>
+            <where>external_id is NULL</where>
         </update>
     </changeSet>
 
