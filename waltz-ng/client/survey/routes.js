@@ -22,6 +22,7 @@ import SurveyInstanceResponseView from './survey-instance-response-view';
 import SurveyInstanceResponseEdit from './survey-instance-response-edit';
 import SurveyTemplateList from './survey-template-list';
 import SurveyTemplateCreate from './survey-template-create';
+import SurveyTemplateImport from './survey-template-import';
 import SurveyTemplateEdit from './survey-template-edit';
 import SurveyTemplateView from './survey-template-view';
 
@@ -100,6 +101,12 @@ const templateCreateState = {
 };
 
 
+const templateImportState = {
+    url: '/import',
+    views: {"content@": SurveyTemplateImport.id}
+};
+
+
 const templateEditState = {
     url: '/{id:int}/edit',
     views: {'content@': SurveyTemplateEdit}
@@ -127,6 +134,7 @@ function setup($stateProvider) {
         .state('main.survey.template', templateBaseState)
         .state('main.survey.template.list', templateListState)
         .state('main.survey.template.create', templateCreateState)
+        .state('main.survey.template.import', templateImportState)
         .state('main.survey.template.edit', templateEditState)
         .state('main.survey.template.view', templateViewState);
 

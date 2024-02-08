@@ -39,10 +39,17 @@ export function mkSurveyTemplateStore() {
         [],
         {force});
 
+    const importFromJSON = (json, force = false) => remote.execute(
+        "POST",
+        `api/survey-template/json-import`,
+        json,
+        {force});
+
     return {
         findAll,
         findByOwner,
-        getByQuestionId
+        getByQuestionId,
+        importFromJSON
     };
 }
 

@@ -36,6 +36,8 @@ function determineMimeType(format) {
             return "application/octet-stream;charset=utf-8";
         case "XLSX":
             return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+        case "JSON":
+            return "application/json";
         case "SVG":
             return "image/svg+xml";
         default:
@@ -44,12 +46,16 @@ function determineMimeType(format) {
 }
 
 
-export function downloadFile(fileContent, fileName = 'download.csv', format = "CSV") {
+export function downloadFile(rawContent,
+                             fileName = "download.csv",
+                             format = "CSV") {
 
     const doc = document;
-    const a = doc.createElement("a");
     const strMimeType = determineMimeType(format);
-    let rawFile;
+    const fileContent = format === "JSON"
+        ? JSON.stringify(rawContent, " ", 2)
+        : rawContent;
+
 
     // IE10+
     if (navigator.msSaveBlob) {
@@ -62,42 +68,29 @@ export function downloadFile(fileContent, fileName = 'download.csv', format = "C
     }
 
     if (isIE()) {
-        const frame = doc.createElement('iframe');
+        const frame = doc.createElement("iframe");
         document.body.appendChild(frame);
 
-        frame.contentWindow.document.open('text/html', 'replace');
+        frame.contentWindow.document.open("text/html", "replace");
         frame.contentWindow.document.write(fileContent);
         frame.contentWindow.document.close();
         frame.contentWindow.focus();
-        frame.contentWindow.document.execCommand('SaveAs', true, fileName);
+        frame.contentWindow.document.execCommand("SaveAs", true, fileName);
 
         document.body.removeChild(frame);
         return true;
     }
 
-    //html5 A[download]
-    if ('download' in a) {
-        const blob = new Blob(
-            [fileContent],
-            {type: strMimeType}
-        );
-        rawFile = URL.createObjectURL(blob);
-        a.setAttribute('download', fileName);
-    } else {
-        rawFile = 'data:' + strMimeType + ',' + encodeURIComponent(fileContent);
-        a.setAttribute('target', '_blank');
-    }
-
-    a.href = rawFile;
-    a.setAttribute('style', 'display:none;');
+    const a = createDownloadAnchorTag(doc, fileName, fileContent, strMimeType);
     doc.body.appendChild(a);
+
     setTimeout(function() {
         if (a.click) {
             a.click();
             // Workaround for Safari 5
         } else if (document.createEvent) {
-            const eventObj = document.createEvent('MouseEvents');
-            eventObj.initEvent('click', true, true);
+            const eventObj = document.createEvent("MouseEvents");
+            eventObj.initEvent("click", true, true);
             a.dispatchEvent(eventObj);
         }
         doc.body.removeChild(a);
@@ -105,3 +98,24 @@ export function downloadFile(fileContent, fileName = 'download.csv', format = "C
     }, 100);
 }
 
+
+function createDownloadAnchorTag(doc, fileName, fileContent, strMimeType) {
+    const a = doc.createElement("a");
+
+    //html5 A[download]
+    if ("download" in a) {
+        const blob = new Blob(
+            [fileContent],
+            {type: strMimeType}
+        );
+        a.href = URL.createObjectURL(blob);
+        a.setAttribute("download", fileName);
+        a.setAttribute("style", "display:none;");
+        return a;
+    } else {
+        a.href = "data:" + strMimeType + "," + encodeURIComponent(fileContent);
+        a.setAttribute("target", "_blank");
+        a.setAttribute("style", "display:none;");
+        return a;
+    }
+}

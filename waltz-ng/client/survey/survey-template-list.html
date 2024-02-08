@@ -35,6 +35,11 @@
                ui-sref="main.survey.template.create">
                 Create New
             </a>
+            <a class="btn btn-info btn-xs"
+               waltz-has-role="SURVEY_TEMPLATE_ADMIN"
+               ui-sref="main.survey.template.import">
+                Import from JSON
+            </a>
         </waltz-section-actions>
 
         <waltz-search-control on-query="ctrl.doSearch"
