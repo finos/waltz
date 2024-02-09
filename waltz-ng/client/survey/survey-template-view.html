@@ -75,6 +75,13 @@
            ng-click="ctrl.markTemplateAsObsolete()">
             Mark as Obsolete
         </a>
+        <waltz-data-extract-link name="Export Template"
+                                 styling="button"
+                                 filename="template-{{ctrl.template.name}}.json"
+                                 extract="survey-template/template-id/{{ctrl.template.id}}"
+                                 format="JSON"
+                                 method="GET">
+        </waltz-data-extract-link>
     </waltz-section-actions>
 
     <waltz-survey-template-overview template="ctrl.template"

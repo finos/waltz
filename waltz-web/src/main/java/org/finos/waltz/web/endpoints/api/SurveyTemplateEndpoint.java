@@ -22,6 +22,7 @@ import org.finos.waltz.model.ReleaseLifecycleStatusChangeCommand;
 import org.finos.waltz.model.person.Person;
 import org.finos.waltz.model.survey.SurveyTemplate;
 import org.finos.waltz.model.survey.SurveyTemplateChangeCommand;
+import org.finos.waltz.model.survey_template_exchange.SurveyTemplateExchange;
 import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.person.PersonService;
 import org.finos.waltz.service.survey.SurveyTemplateService;
@@ -35,8 +36,15 @@ import org.springframework.stereotype.Service;
 import spark.Request;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.web.WebUtilities.*;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
+import static org.finos.waltz.web.WebUtilities.getId;
+import static org.finos.waltz.web.WebUtilities.getUsername;
+import static org.finos.waltz.web.WebUtilities.mkPath;
+import static org.finos.waltz.web.WebUtilities.readBody;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.deleteForDatum;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.getForDatum;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.getForList;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.postForDatum;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.putForDatum;
 
 @Service
 public class SurveyTemplateEndpoint implements Endpoint {
@@ -134,6 +142,16 @@ public class SurveyTemplateEndpoint implements Endpoint {
         putForDatum(BASE_URL, updateRoute);
         putForDatum(updateStatusPath, updateStatusRoute);
         deleteForDatum(mkPath(BASE_URL, ":id"), deleteRoute);
+
+
+        postForDatum(
+                mkPath(BASE_URL, "json-import"),
+                (request, response) -> {
+                    ensureUserHasAdminRights(request);
+                    return surveyTemplateService.importTemplateFromJSON(
+                            getUsername(request),
+                            readBody(request, SurveyTemplateExchange.class));
+                });
     }
 
 
@@ -162,4 +180,5 @@ public class SurveyTemplateEndpoint implements Endpoint {
                     }
                 });
     }
+
 }

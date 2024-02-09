@@ -88,7 +88,7 @@ public class SurveyQuestionDropdownEntryDao {
     }
 
 
-    public void saveEntries(long questionId, Collection<SurveyQuestionDropdownEntry> entries) {
+    public void saveEntries(long questionId, Collection<? extends SurveyQuestionDropdownEntry> entries) {
         checkNotNull(entries, "entries cannot be null");
 
         dsl.transaction(config -> {
