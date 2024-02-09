@@ -21,7 +21,7 @@
 
 <div>
     <RatingIndicatorCell {...ratingSchemeItem}
-                         showName="true"/>
+                         showName={true}/>
     <div>
         {ratingSchemeItem.description}
     </div>

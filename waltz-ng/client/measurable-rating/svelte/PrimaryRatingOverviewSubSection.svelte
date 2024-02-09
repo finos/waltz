@@ -81,7 +81,7 @@
                                      props={mkRatingTooltipProps(rating)}>
                                 <svelte:fragment slot="target">
                                     <RatingIndicatorCell {...rating.ratingSchemeItem}
-                                                         showName="false"/>
+                                                         showName={false}/>
                                     {_.get(rating, ["measurable", "name"], "Unknown Measurable")}
                                 </svelte:fragment>
                             </Tooltip>
