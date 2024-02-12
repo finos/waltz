@@ -19,11 +19,14 @@
 package org.finos.waltz.web.endpoints.api;
 
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
+import org.finos.waltz.data.GenericSelector;
+import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.UserTimestamp;
+import org.finos.waltz.model.application.MeasurableRatingsView;
 import org.finos.waltz.model.measurable_rating.ImmutableRemoveMeasurableRatingCommand;
 import org.finos.waltz.model.measurable_rating.MeasurableRating;
 import org.finos.waltz.model.measurable_rating.MeasurableRatingCategoryView;
@@ -104,6 +107,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
         String getViewByIdPath = mkPath(BASE_URL, "id", ":id", "view");
         String findForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String getViewForCategoryAndAppSelectorPath = mkPath(BASE_URL, "category", ":id", "view");
+        String getPrimaryRatingsViewForAppSelectorPath = mkPath(BASE_URL, "primary-ratings", "view");
         String modifyMeasurableForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id", "measurable", ":measurableId");
         String modifyCategoryForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id", "category", ":categoryId");
         String findByMeasurableSelectorPath = mkPath(BASE_URL, "measurable-selector");
@@ -138,6 +142,13 @@ public class MeasurableRatingEndpoint implements Endpoint {
             return time("viewForCatAndSelector", () -> measurableRatingViewService.getViewForCategoryAndSelector(idSelectionOptions, categoryId));
         };
 
+        DatumRoute<MeasurableRatingsView> getPrimaryRatingsViewForAppSelectorRoute = (request, response) -> {
+            IdSelectionOptions idSelectionOptions = readIdSelectionOptionsFromBody(request);
+            GenericSelectorFactory selectorFactory = new GenericSelectorFactory();
+            GenericSelector genericSelector = selectorFactory.apply(idSelectionOptions);
+            return measurableRatingViewService.getPrimaryRatingsView(genericSelector);
+        };
+
         ListRoute<MeasurableRating> findByCategoryRoute = (request, response)
                 -> measurableRatingService.findByCategory(getId(request));
 
@@ -168,6 +179,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
         postForList(saveRatingDescriptionPath, this::saveRatingDescriptionRoute);
         postForList(saveRatingIsPrimaryPath, this::saveRatingIsPrimaryRoute);
         postForDatum(getViewForCategoryAndAppSelectorPath, getViewByCategoryAndAppSelectorRoute);
+        postForDatum(getPrimaryRatingsViewForAppSelectorPath, getPrimaryRatingsViewForAppSelectorRoute);
     }
 
 
