@@ -52,7 +52,6 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
-import static org.finos.waltz.common.CollectionUtilities.find;
 import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.common.SetUtilities.filter;
@@ -168,10 +167,12 @@ public class MeasurableRatingViewService {
         GenericSelector appSelector = GENERIC_SELECTOR_FACTORY.applyForKind(EntityKind.APPLICATION, idSelectionOptions);
 
         List<Application> applications = applicationService.findByAppIdSelector(idSelectionOptions);
-        Collection<MeasurableCategory> allCategories = measurableCategoryService.findAll();
 
-        MeasurableCategory category = find(allCategories, d -> d.id().get() == categoryId)
-                .orElseThrow(() -> new IllegalArgumentException(format("Cannot find category with id: %s", categoryId)));
+        MeasurableCategory category = measurableCategoryService.getById(categoryId);
+
+        if(category == null) {
+            throw new IllegalArgumentException(format("Cannot find category with id: %s", categoryId));
+        }
 
         List<MeasurableRating> ratings = measurableRatingService.findForCategoryAndSelector(appSelector.selector(), categoryId);
         List<Measurable> measurables = measurableService.findByCategoryId(categoryId);
@@ -195,21 +196,7 @@ public class MeasurableRatingViewService {
 
         Set<MeasurableHierarchy> hierarchyForCategory = measurableService.findHierarchyForCategory(categoryId);
 
-        Set<MeasurableCategory> primaryCategories = allCategories
-                .stream()
-                .filter(MeasurableCategory::allowPrimaryRatings)
-                .collect(Collectors.toSet());
-
-        Set<MeasurableRating> primaryMeasurableRatings = measurableRatingService.findPrimaryRatingsForGenericSelector(appSelector);
-        List<Measurable> primaryMeasurables = measurableDao.findByMeasurableIdSelector(mkMeasurableIdSelector(primaryMeasurableRatings));
-        Set<RatingSchemeItem> primaryRatingSchemeItems = ratingSchemeDAO.findRatingSchemeItemsForSchemeIds(map(primaryCategories, MeasurableCategory::ratingSchemeId));
-
-        ImmutableMeasurableRatingsView primaryRatingsView = ImmutableMeasurableRatingsView.builder()
-                .measurableRatings(primaryMeasurableRatings)
-                .measurables(primaryMeasurables)
-                .measurableCategories(primaryCategories)
-                .ratingSchemeItems(primaryRatingSchemeItems)
-                .build();
+        ImmutableMeasurableRatingsView primaryRatingsView = getPrimaryRatingsView(appSelector);
 
         ImmutableMeasurableRatingsView ratingsView = ImmutableMeasurableRatingsView
                 .builder()
@@ -249,6 +236,26 @@ public class MeasurableRatingViewService {
                 .primaryRatings(primaryRatingsView)
                 .build();
     }
+
+    public ImmutableMeasurableRatingsView getPrimaryRatingsView(GenericSelector appSelector) {
+
+        Set<MeasurableCategory> primaryCategories = measurableCategoryService.findAll()
+                .stream()
+                .filter(MeasurableCategory::allowPrimaryRatings)
+                .collect(Collectors.toSet());
+
+        Set<MeasurableRating> primaryMeasurableRatings = measurableRatingService.findPrimaryRatingsForGenericSelector(appSelector);
+        List<Measurable> primaryMeasurables = measurableDao.findByMeasurableIdSelector(mkMeasurableIdSelector(primaryMeasurableRatings));
+        Set<RatingSchemeItem> primaryRatingSchemeItems = ratingSchemeDAO.findRatingSchemeItemsForSchemeIds(map(primaryCategories, MeasurableCategory::ratingSchemeId));
+
+        return ImmutableMeasurableRatingsView.builder()
+                .measurableRatings(primaryMeasurableRatings)
+                .measurables(primaryMeasurables)
+                .measurableCategories(primaryCategories)
+                .ratingSchemeItems(primaryRatingSchemeItems)
+                .build();
+    }
+
 
     private SelectConditionStep<Record1<Long>> mkMeasurableIdSelector(Set<MeasurableRating> primaryMeasurableRatings) {
         return DSL

@@ -33,11 +33,20 @@ export function mkMeasurableRelationshipStore() {
             null,
             {force});
 
+    const getPrimaryRatingsViewBySelector = (options, force = false) => remote
+        .fetchViewData(
+            "POST",
+            "api/measurable-rating/primary-ratings/view",
+            options,
+            null,
+            {force});
+
     return {
         findByApplicationSelector,
         getById,
         getViewById,
-        getViewByCategoryAndSelector
+        getViewByCategoryAndSelector,
+        getPrimaryRatingsViewBySelector
     };
 }
 

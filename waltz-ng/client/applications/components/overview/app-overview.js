@@ -25,6 +25,7 @@ import template from "./app-overview.html";
 import {displayError} from "../../../common/error-utils";
 import {enrichComplexitiesWithKind, findDefaultComplexityKind} from "../../../complexity/services/complexity-utilities";
 import {mkSelectionOptions} from "../../../common/selector-utils";
+import PrimaryRatingOverviewSubSection from "../../../measurable-rating/svelte/PrimaryRatingOverviewSubSection.svelte";
 
 const bindings = {
     parentEntityRef: "<"
@@ -43,7 +44,8 @@ const initialState = {
         aliasEditor: false,
         tagEditor: false
     },
-    showAllAppGroups: false
+    showAllAppGroups: false,
+    PrimaryRatingOverviewSubSection
 };
 
 
