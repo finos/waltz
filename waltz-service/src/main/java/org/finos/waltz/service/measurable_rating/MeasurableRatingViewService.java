@@ -9,14 +9,18 @@ import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.allocation.Allocation;
 import org.finos.waltz.model.allocation_scheme.AllocationScheme;
 import org.finos.waltz.model.application.Application;
+import org.finos.waltz.model.application.AssessmentsView;
 import org.finos.waltz.model.application.ImmutableAssessmentsView;
 import org.finos.waltz.model.application.ImmutableMeasurableRatingsView;
+import org.finos.waltz.model.application.MeasurableRatingsView;
 import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.assessment_definition.AssessmentVisibility;
 import org.finos.waltz.model.assessment_rating.AssessmentRating;
 import org.finos.waltz.model.measurable.Measurable;
 import org.finos.waltz.model.measurable.MeasurableHierarchy;
 import org.finos.waltz.model.measurable_category.MeasurableCategory;
+import org.finos.waltz.model.measurable_rating.AllocationsView;
+import org.finos.waltz.model.measurable_rating.DecommissionsView;
 import org.finos.waltz.model.measurable_rating.ImmutableAllocationsView;
 import org.finos.waltz.model.measurable_rating.ImmutableDecommissionsView;
 import org.finos.waltz.model.measurable_rating.ImmutableMeasurableRatingCategoryView;
@@ -196,9 +200,9 @@ public class MeasurableRatingViewService {
 
         Set<MeasurableHierarchy> hierarchyForCategory = measurableService.findHierarchyForCategory(categoryId);
 
-        ImmutableMeasurableRatingsView primaryRatingsView = getPrimaryRatingsView(appSelector);
+        MeasurableRatingsView primaryRatingsView = getPrimaryRatingsView(appSelector);
 
-        ImmutableMeasurableRatingsView ratingsView = ImmutableMeasurableRatingsView
+        MeasurableRatingsView ratingsView = ImmutableMeasurableRatingsView
                 .builder()
                 .measurableRatings(ratings)
                 .measurables(measurables)
@@ -207,20 +211,20 @@ public class MeasurableRatingViewService {
                 .ratingSchemeItems(measurableRatingSchemeItems)
                 .build();
 
-        ImmutableAssessmentsView assessmentsView = ImmutableAssessmentsView
+        AssessmentsView assessmentsView = ImmutableAssessmentsView
                 .builder()
                 .assessmentRatings(assessmentRatings)
                 .assessmentDefinitions(defs)
                 .ratingSchemeItems(assessmentRatingSchemeItems)
                 .build();
 
-        ImmutableAllocationsView allocationsView = ImmutableAllocationsView
+        AllocationsView allocationsView = ImmutableAllocationsView
                 .builder()
                 .allocations(allocs)
                 .allocationSchemes(allocSchemes)
                 .build();
 
-        ImmutableDecommissionsView decommissionView = ImmutableDecommissionsView
+        DecommissionsView decommissionView = ImmutableDecommissionsView
                 .builder()
                 .plannedDecommissions(decomms)
                 .plannedReplacements(replacements)
@@ -237,7 +241,8 @@ public class MeasurableRatingViewService {
                 .build();
     }
 
-    public ImmutableMeasurableRatingsView getPrimaryRatingsView(GenericSelector appSelector) {
+
+    private MeasurableRatingsView getPrimaryRatingsView(GenericSelector appSelector) {
 
         Set<MeasurableCategory> primaryCategories = measurableCategoryService.findAll()
                 .stream()
@@ -264,5 +269,12 @@ public class MeasurableRatingViewService {
                 .where(MEASURABLE.ID.in(map(
                         primaryMeasurableRatings,
                         MeasurableRating::measurableId)));
+    }
+
+
+    public MeasurableRatingsView getPrimaryRatingsView(IdSelectionOptions idSelectionOptions) {
+        GenericSelectorFactory selectorFactory = new GenericSelectorFactory();
+        GenericSelector genericSelector = selectorFactory.apply(idSelectionOptions);
+        return getPrimaryRatingsView(genericSelector);
     }
 }
