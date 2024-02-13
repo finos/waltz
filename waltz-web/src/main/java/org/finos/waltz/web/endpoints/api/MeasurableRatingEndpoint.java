@@ -144,9 +144,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
 
         DatumRoute<MeasurableRatingsView> getPrimaryRatingsViewForAppSelectorRoute = (request, response) -> {
             IdSelectionOptions idSelectionOptions = readIdSelectionOptionsFromBody(request);
-            GenericSelectorFactory selectorFactory = new GenericSelectorFactory();
-            GenericSelector genericSelector = selectorFactory.apply(idSelectionOptions);
-            return measurableRatingViewService.getPrimaryRatingsView(genericSelector);
+            return measurableRatingViewService.getPrimaryRatingsView(idSelectionOptions);
         };
 
         ListRoute<MeasurableRating> findByCategoryRoute = (request, response)

@@ -80,11 +80,16 @@ function controller($q,
             .then(() => {
 
                 const editableCategories = _.filter(vm.categories, d => _.includes(vm.editableCategoryIds, d.category.id));
+                const categoriesWithRatings = _.filter(editableCategories, d => d.ratingCount > 0);
 
-                // Need to filer on the empty categories here
+                if (_.isEmpty(categoriesWithRatings)) {
+                    vm.visibility.showAllCategories = true;
+                }
+
+                // Need to filter on the empty categories here
                 vm.tabs = vm.visibility.showAllCategories
                     ? editableCategories
-                    : _.filter(editableCategories, d => d.ratingCount > 0);
+                    : categoriesWithRatings;
 
                 vm.categoriesById = _.keyBy(vm.categories, d => d.category.id);
                 vm.hasHiddenTabs = editableCategories.length !== vm.tabs.length;
@@ -95,8 +100,10 @@ function controller($q,
                     ? vm.tabs[0]
                     : startingCat;
 
-                vm.visibility.tab = startingCategory.category.id;
-                recalcTabs(startingCategory.category.id);
+                if (startingCategory) {
+                    vm.visibility.tab = startingCategory.category.id;
+                    recalcTabs(startingCategory.category.id);
+                }
 
             })
     };
