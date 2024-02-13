@@ -131,8 +131,11 @@ public class MeasurableRatingViewService {
                     .rating(null)
                     .decommission(null)
                     .replacements(emptyList())
+                    .category(null)
                     .build();
         } else {
+
+            MeasurableCategory category = measurableCategoryService.getById(measurable.categoryId());
 
             List<RatingSchemeItem> ratingSchemeItems = ratingSchemeService.findRatingSchemeItemsForEntityAndCategory(
                     measurableRating.entityReference(),
@@ -160,6 +163,7 @@ public class MeasurableRatingViewService {
                     .replacements(replacementApps)
                     .allocations(allocations)
                     .allocationSchemes(schemes)
+                    .category(category)
                     .build();
         }
 
