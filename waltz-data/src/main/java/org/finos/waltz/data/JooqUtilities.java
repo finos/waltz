@@ -31,22 +31,7 @@ import org.finos.waltz.model.tally.ImmutableTally;
 import org.finos.waltz.model.tally.OrderedTally;
 import org.finos.waltz.model.tally.Tally;
 import org.finos.waltz.schema.Tables;
-import org.finos.waltz.schema.tables.Actor;
-import org.finos.waltz.schema.tables.Application;
-import org.finos.waltz.schema.tables.ApplicationGroup;
-import org.finos.waltz.schema.tables.AssessmentDefinition;
-import org.finos.waltz.schema.tables.ChangeInitiative;
-import org.finos.waltz.schema.tables.ComplexityKind;
-import org.finos.waltz.schema.tables.CostKind;
-import org.finos.waltz.schema.tables.DataType;
-import org.finos.waltz.schema.tables.EntityStatisticDefinition;
-import org.finos.waltz.schema.tables.InvolvementKind;
-import org.finos.waltz.schema.tables.Measurable;
-import org.finos.waltz.schema.tables.MeasurableCategory;
-import org.finos.waltz.schema.tables.MeasurableRating;
-import org.finos.waltz.schema.tables.OrganisationalUnit;
-import org.finos.waltz.schema.tables.SurveyQuestion;
-import org.finos.waltz.schema.tables.SurveyTemplate;
+import org.finos.waltz.schema.tables.*;
 import org.finos.waltz.schema.tables.records.ChangeLogRecord;
 import org.jooq.Batch;
 import org.jooq.CommonTableExpression;
@@ -620,6 +605,18 @@ public class JooqUtilities {
                         .nameField(st.NAME)
                         .descriptionField(st.DESCRIPTION)
                         .externalIdField(st.EXTERNAL_ID)
+                        .build();
+            case PHYSICAL_FLOW:
+                PhysicalFlow pf = alias == null ? Tables.PHYSICAL_FLOW : Tables.PHYSICAL_FLOW.as(alias);
+                return ImmutableCommonTableFields
+                        .builder()
+                        .entityKind(EntityKind.PHYSICAL_FLOW)
+                        .table(pf)
+                        .idField(pf.ID)
+                        .parentIdField(null)
+                        .nameField(pf.NAME)
+                        .descriptionField(pf.DESCRIPTION)
+                        .externalIdField(pf.EXTERNAL_ID)
                         .build();
             default:
                 throw new UnsupportedOperationException("Cannot determine table fields for entity kind:" + kind);
