@@ -16,6 +16,7 @@ Getting started
  - [Docker](docker/README.md)
 
 ---
+[![FINOS Hosted Platform - Waltz Demo](https://img.shields.io/badge/FINOS%20Hosted%20Platform-Waltz%20Demo-blue)](https://demo.waltz.finos.org/)
 [![postgres build](https://github.com/finos/waltz/actions/workflows/maven.yml/badge.svg)](https://github.com/finos/waltz/actions)
 [![Latest Version](https://badgers.space/github/release/finos/waltz)](https://github.com/finos/waltz/releases)
 [![Language Grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/khartec/waltz.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/khartec/waltz/context:javascript) 
