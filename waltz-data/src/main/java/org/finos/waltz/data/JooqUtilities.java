@@ -45,6 +45,7 @@ import org.finos.waltz.schema.tables.Measurable;
 import org.finos.waltz.schema.tables.MeasurableCategory;
 import org.finos.waltz.schema.tables.MeasurableRating;
 import org.finos.waltz.schema.tables.OrganisationalUnit;
+import org.finos.waltz.schema.tables.PhysicalFlow;
 import org.finos.waltz.schema.tables.SurveyQuestion;
 import org.finos.waltz.schema.tables.SurveyTemplate;
 import org.finos.waltz.schema.tables.records.ChangeLogRecord;
@@ -620,6 +621,18 @@ public class JooqUtilities {
                         .nameField(st.NAME)
                         .descriptionField(st.DESCRIPTION)
                         .externalIdField(st.EXTERNAL_ID)
+                        .build();
+            case PHYSICAL_FLOW:
+                PhysicalFlow pf = alias == null ? Tables.PHYSICAL_FLOW : Tables.PHYSICAL_FLOW.as(alias);
+                return ImmutableCommonTableFields
+                        .builder()
+                        .entityKind(EntityKind.PHYSICAL_FLOW)
+                        .table(pf)
+                        .idField(pf.ID)
+                        .parentIdField(null)
+                        .nameField(pf.NAME)
+                        .descriptionField(pf.DESCRIPTION)
+                        .externalIdField(pf.EXTERNAL_ID)
                         .build();
             default:
                 throw new UnsupportedOperationException("Cannot determine table fields for entity kind:" + kind);
