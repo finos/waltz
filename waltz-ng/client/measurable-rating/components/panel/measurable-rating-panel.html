@@ -70,7 +70,7 @@
                        ng-if="$ctrl.selected.rating"
                        title="View measurable rating in a dedicated page"
                        ui-sref="main.measurable-rating.view ({ id: $ctrl.selected.rating.id })">
-                        <span ng-bind="$ctrl.selected.measurable.name"></span>
+                        <waltz-icon name="puzzle-piece"></waltz-icon> <span ng-bind="$ctrl.selected.measurable.name"></span>
                     </a>
                     <!-- just show the measurable name if the clicked item has no associated rating -->
                     <span ng-if="!$ctrl.selected.rating"
@@ -86,7 +86,8 @@
                     <div class="col-sm-9">
                         <waltz-entity-link entity-ref="$ctrl.selected.measurable"
                                            is-secondary-link="true"
-                                           show-external-id="true">
+                                           show-external-id="true"
+                                           icon-placement="none">
                         </waltz-entity-link>
                     </div>
                 </div>
