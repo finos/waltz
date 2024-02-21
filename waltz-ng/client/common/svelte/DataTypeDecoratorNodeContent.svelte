@@ -30,8 +30,7 @@
                 class:unknown={node.unknown}
                 class:deprecated={node.deprecated}
                 disabled={isDisabled}
-                on:click={() => selectNode(node)}
-                title={node.description}>
+                on:click={() => selectNode(node)}>
             {#if multiSelect}
                 <Icon name={isChecked ? "square-o" : "checked-square-o}"}/>
             {/if}
