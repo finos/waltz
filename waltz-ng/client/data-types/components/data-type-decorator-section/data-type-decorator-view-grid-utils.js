@@ -1,0 +1,160 @@
+import _ from "lodash";
+import {
+    mkLastUpdatedFormatter,
+    mkNameFormatter,
+    mkPrimaryAssessmentAndCategoryColumns,
+    mkRatingSchemeItemFormatter,
+    mkReadOnlyFormatter
+} from "../../../common/slick-grid-utils";
+import {cmp, compareDates} from "../../../common/sort-utils";
+import {FilterKinds} from "../../../data-flow/components/svelte/flow-detail-tab/filters/filter-utils";
+import {mkDefinitionKey, prepareAssessmentsView, prepareFlowClassificationsView} from "../../../common/view-grid-utils";
+
+const baseColumns = [
+    {
+        id: "read_only",
+        name: "",
+        field: "isReadonly",
+        width: 60,
+        sortable:  false,
+        formatter: mkReadOnlyFormatter(),
+        sortFn: (a, b) => cmp(a?.decoratorEntity.name, b?.decoratorEntity.name)
+    },
+    {
+        id: "data_type",
+        name: "Data Type",
+        field: "decoratorEntity",
+        sortable:  true,
+        formatter: mkNameFormatter(),
+        sortFn: (a, b) => cmp(a?.decoratorEntity.name, b?.decoratorEntity.name)
+    },
+    {
+        id: "flow_classification_rating",
+        name: "Flow Classification",
+        field: "flowClassification",
+        sortable:  true,
+        width: 180,
+        formatter: mkRatingSchemeItemFormatter(d => d.name, d => d),
+        sortFn: (a, b) => cmp(a?.flowClassification.name, b?.flowClassification.name)
+    }
+];
+
+
+const lastUpdatedAndProvenanceColumns = [
+    {
+        id: "last_updated_by",
+        name: "Last Updated By",
+        field: "lastUpdatedBy",
+        sortable:  true,
+        width: 180,
+        sortFn: (a, b) => cmp(a?.decoratorEntity.name, b?.decoratorEntity.name)
+    },
+    {
+        id: "last_updated_at",
+        name: "Last Updated At",
+        field: "lastUpdatedAt",
+        sortable:  true,
+        width: 180,
+        formatter: mkLastUpdatedFormatter(),
+        sortFn: (a, b) => compareDates(a?.lastUpdatedAt, b?.lastUpdatedAt)
+    },
+    {
+        id: "provenance",
+        name: "Provenance",
+        field: "provenance",
+        width: 180,
+        sortable:  true,
+        sortFn: (a, b) => cmp(a?.provenance, b?.provenance)
+    }
+];
+
+
+export function prepareData($viewData) {
+
+    const enrichedPrimaryAssessments = prepareAssessmentsView($viewData.primaryAssessments);
+    const assessmentRatingsByDecoratorId = _.groupBy(enrichedPrimaryAssessments, d => d.assessmentRating.entityReference.id);
+
+    const enrichedClassificationRules = prepareFlowClassificationsView($viewData.flowClassificationRules);
+    const flowClassificationRulesById = _.keyBy(enrichedClassificationRules, d => d.flowClassificationRule.id);
+    const classificationsByCode = _.keyBy($viewData.classifications, d => d.code);
+
+    return _
+        .chain($viewData.dataTypeDecorators)
+        .map(d => {
+
+            const ratingsForDecorator = _.get(assessmentRatingsByDecoratorId, d.id, []);
+            const flowClassification = _.get(classificationsByCode, d.rating);
+
+            const ratingsByDefnId = _
+                .chain(ratingsForDecorator)
+                .reduce((acc, d) => {
+                        const key = mkDefinitionKey(d.assessmentDefinition);
+                        const values = acc[key] || [];
+                        values.push(d);
+                        acc[key] = values;
+                        return acc;
+                    },
+                    {})
+                .value();
+
+            const flowClassificationRule = _.get(flowClassificationRulesById, d.flowClassificationRuleId);
+
+            return Object.assign(
+                {},
+                d,
+                {
+                    ...ratingsByDefnId,
+                    flowClassification,
+                    flowClassificationRule,
+                    assessmentRatings: ratingsForDecorator
+            });
+        })
+        .value();
+}
+
+
+export function mkColumns(assessmentDefinitions = []) {
+    return _.concat(
+        baseColumns,
+        mkPrimaryAssessmentAndCategoryColumns(assessmentDefinitions, []),
+        lastUpdatedAndProvenanceColumns);
+}
+
+
+export function getAssessmentViewFilters(assessmentsView) {
+
+    const ratingSchemeItemsById = _.keyBy(assessmentsView.ratingSchemeItems, d => d.id);
+
+    const ratingsByDefinitionId = _
+        .chain(assessmentsView.assessmentRatings)
+        .groupBy(r => r.assessmentDefinitionId)
+        .mapValues(v => _
+            .chain(v)
+            .map(r => ratingSchemeItemsById[r.ratingId])
+            .filter(d => d != null)
+            .uniq()
+            .sortBy(r => r.position, r => r.name)
+            .value())
+        .value();
+
+    return _
+        .chain(assessmentsView.assessmentDefinitions)
+        .map(d => Object.assign({}, {definition: d, ratings: _.get(ratingsByDefinitionId, d.id, [])}))
+        .filter(d => !_.isEmpty(d.ratings))
+        .value();
+}
+
+export function mkClassificationViewFilter(id, desiredClassificationRatings = []) {
+    return {
+        id,
+        kind: FilterKinds.FLOW_CLASSIFICATION,
+        classifications: desiredClassificationRatings,
+        test: flowRow => _.isEmpty(desiredClassificationRatings)
+            ? true
+            : _.some(
+                flowRow.dataTypesForLogicalFlow,
+                x => _.some(
+                    desiredClassificationRatings,
+                    d => _.isEqual(d, x.rating)))
+    }
+}

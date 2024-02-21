@@ -1,13 +1,14 @@
 <script>
     import {dataTypeStore} from "../../svelte-stores/data-type-store";
     import {buildHierarchies, doSearch, prepareSearchNodes, reduceToSelectedNodesOnly} from "../hierarchy-utils";
-    import DataTypeTreeNode from "./DataTypeTreeNode.svelte";
+    import DataTypeDecoratorTreeNode from "./DataTypeDecoratorTreeNode.svelte";
     import SearchInput from "./SearchInput.svelte";
     import _ from "lodash";
 
     export let selectionFilter = () => true;
-    export let dataTypeIds = [];
+    export let decorators = [];
     export let expanded = true;
+    export let nonConcreteSelectable = false;
 
     const root = {name: "Root", isExpanded: true};
 
@@ -15,7 +16,6 @@
 
     let qry = "";
     let searchNodes = [];
-    let dataTypes = [];
 
     function calcDisplayHierarchy(nodes, query) {
         const searchResult = _.map(
@@ -29,9 +29,13 @@
         return buildHierarchies(searchResult, false);
     }
 
-    $: dataTypes = $dataTypesCall.data;
+    $: decoratorsByDataTypeId = _.keyBy(decorators, d => d.dataTypeId);
 
-    $: requiredNodes = reduceToSelectedNodesOnly(dataTypes, dataTypeIds);
+    $: allDataTypes = _.map(
+        $dataTypesCall.data,
+        d => Object.assign({}, d, {decorator: _.get(decoratorsByDataTypeId, d.id)}));
+
+    $: requiredNodes = reduceToSelectedNodesOnly(allDataTypes, _.keys(decoratorsByDataTypeId));
     $: searchNodes = prepareSearchNodes(requiredNodes);
 
     $: displayedHierarchy = calcDisplayHierarchy(searchNodes, qry);
@@ -41,12 +45,12 @@
 <SearchInput bind:value={qry}/>
 
 <div style="padding-top: 1em">
-    <DataTypeTreeNode {selectionFilter}
-                      isRoot={true}
-                      node={root}
-                      childNodes={displayedHierarchy}
-                      {expanded}
-                      nonConcreteSelectable={false}
-                      on:select/>
+    <DataTypeDecoratorTreeNode {selectionFilter}
+                               isRoot={true}
+                               node={root}
+                               childNodes={displayedHierarchy}
+                               {expanded}
+                               {nonConcreteSelectable}
+                               on:select/>
 </div>
 
