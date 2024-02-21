@@ -57,7 +57,7 @@
 
 
     $:{
-        if ($enrichedDecorators) {
+        if ($enrichedDecorators && $viewData) {
 
             if (elem) {
                 initGrid(elem);

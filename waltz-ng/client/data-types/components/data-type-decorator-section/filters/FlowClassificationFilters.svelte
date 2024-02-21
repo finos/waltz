@@ -85,7 +85,7 @@
         </tr>
         {:else}
             <tr>
-                <td>
+                <td colspan="2">
                     <NoData type="info">There are no classifications to filter over</NoData>
                 </td>
             </tr>
