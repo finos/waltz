@@ -46,7 +46,7 @@
         </div>
 
         <div>
-            {#if $selectedDecorator.flowClassificationRule}
+            {#if $selectedDecorator.flowClassificationRule && $selectedDecorator.rating !== 'DISCOURAGED'}
                 <strong>Flow Classification Rule</strong>
                 <FlowClassificationRuleViewTable {...$selectedDecorator.flowClassificationRule}/>
                 <div class="help-block small"><Icon name="info-circle"/>This is the rule that has driven the classification of the flow</div>
