@@ -26,6 +26,7 @@
     $: view = $measurableRatingCall?.data;
     $: allocations = view?.allocations || [];
     $: allocationsBySchemeId = _.keyBy(view?.allocations, d => d.schemeId);
+
 </script>
 
 
@@ -57,6 +58,18 @@
                         <DescriptionFade text={view?.application.description}
                                          expanderAlignment="right"/>
                     </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-4 waltz-display-field-label">
+                    Category
+                </div>
+                <div class="col-sm-8">
+                    {#if view?.category}
+                        <Icon name={view?.category.icon}/> {view?.category.name}
+                    {:else}
+                        Unknown
+                    {/if}
                 </div>
             </div>
             <div class="row">
