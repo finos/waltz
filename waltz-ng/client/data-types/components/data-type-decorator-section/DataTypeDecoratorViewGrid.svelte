@@ -60,7 +60,6 @@
         if ($enrichedDecorators) {
 
             if (elem) {
-
                 initGrid(elem);
             }
 
@@ -90,7 +89,7 @@
     {#if !_.isEmpty(tableData)}
 
         <FlowDecoratorFilters assessmentsView={$viewData.primaryAssessments}
-                              classificationsView={$viewData.classifications}/>
+                              classifications={$viewData.classifications}/>
 
         <div>
             <SearchInput bind:value={qry}/>

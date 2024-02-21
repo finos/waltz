@@ -33,9 +33,8 @@
     function onSelect(evt) {
         const dataType = evt.detail;
         const decorator = _.get(decoratorsByDataTypeId, dataType.id);
-        $selectedDecorator = decorator
-        $selectedDataType = dataType
-        console.log({evt, decorator, dataType});
+        $selectedDecorator = decorator;
+        $selectedDataType = dataType;
     }
 
     function cancelEdit() {
@@ -63,7 +62,7 @@
             entityReference: primaryEntityReference,
             addedDataTypeIds,
             removedDataTypeIds,
-        }
+        };
 
         dataTypeDecoratorStore.save(primaryEntityReference, cmd)
             .then(() => {
@@ -83,7 +82,7 @@
     }
 
     $: dataTypeDecorators = $enrichedDecorators || [];
-    $: dataTypes = _.map(dataTypeDecorators, d => d.dataTypeId)
+    $: dataTypes = _.map(dataTypeDecorators, d => d.dataTypeId);
 
     $: decoratorsByDataTypeId = _.keyBy(dataTypeDecorators, d => d.dataTypeId);
 

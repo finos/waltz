@@ -55,6 +55,9 @@
                     state={activeMode === Modes.TREE}
                     onToggle={toggleView}/>
         </div>
+        <div>
+            These are the data types currently aligned to this logical flow. You can toggle between a tabular and tree view of this information. Select a data type to see more information.
+        </div>
         <br>
         <div>
             {#if activeMode === Modes.TREE}

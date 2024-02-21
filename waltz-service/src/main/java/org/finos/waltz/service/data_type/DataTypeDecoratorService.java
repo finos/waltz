@@ -73,6 +73,7 @@ import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.CollectionUtilities.notEmpty;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.common.SetUtilities.filter;
 import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.model.EntityKind.ACTOR;
 import static org.finos.waltz.model.EntityKind.APPLICATION;
@@ -406,7 +407,10 @@ public class DataTypeDecoratorService {
         Set<DataType> dataTypes = dataTypeService.findByIdSelector(selectionOptions);
         AssessmentsView assessmentsView = assessmentRatingService.getPrimaryAssessmentsViewForKindAndSelector(LOGICAL_DATA_FLOW_DATA_TYPE_DECORATOR, selectionOptions);
         FlowClassificationRulesView classificationRulesView = flowClassificationRuleService.getFlowClassificationsViewForFlow(parentEntityRef.id());
-        Set<FlowClassification> classifications = flowClassificationService.findAll();
+        Set<AuthoritativenessRatingValue> ratings = map(decorators, d -> d.rating().orElse(null));
+        Set<FlowClassification> classifications = filter(
+                flowClassificationService.findAll(),
+                d -> ratings.contains(AuthoritativenessRatingValue.ofNullable(d.code()).orElse(null)));
 
         return ImmutableDataTypeDecoratorView.builder()
                 .dataTypeDecorators(decorators)

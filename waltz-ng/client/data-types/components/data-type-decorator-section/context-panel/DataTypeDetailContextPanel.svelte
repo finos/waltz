@@ -49,7 +49,7 @@
             {#if $selectedDecorator.flowClassificationRule}
                 <strong>Flow Classification Rule</strong>
                 <FlowClassificationRuleViewTable {...$selectedDecorator.flowClassificationRule}/>
-                <div class="help-block small"><Icon name="info-circle"/>This is the flow classification rule driving the classification of the flow</div>
+                <div class="help-block small"><Icon name="info-circle"/>This is the rule that has driven the classification of the flow</div>
             {/if}
         </div>
 

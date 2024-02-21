@@ -7,7 +7,6 @@ import {
     mkReadOnlyFormatter
 } from "../../../common/slick-grid-utils";
 import {cmp, compareDates} from "../../../common/sort-utils";
-import {FilterKinds} from "../../../data-flow/components/svelte/flow-detail-tab/filters/filter-utils";
 import {mkDefinitionKey, prepareAssessmentsView, prepareFlowClassificationsView} from "../../../common/view-grid-utils";
 
 const baseColumns = [
@@ -25,6 +24,7 @@ const baseColumns = [
         name: "Data Type",
         field: "decoratorEntity",
         sortable:  true,
+        width: 180,
         formatter: mkNameFormatter(),
         sortFn: (a, b) => cmp(a?.decoratorEntity.name, b?.decoratorEntity.name)
     },
@@ -142,19 +142,4 @@ export function getAssessmentViewFilters(assessmentsView) {
         .map(d => Object.assign({}, {definition: d, ratings: _.get(ratingsByDefinitionId, d.id, [])}))
         .filter(d => !_.isEmpty(d.ratings))
         .value();
-}
-
-export function mkClassificationViewFilter(id, desiredClassificationRatings = []) {
-    return {
-        id,
-        kind: FilterKinds.FLOW_CLASSIFICATION,
-        classifications: desiredClassificationRatings,
-        test: flowRow => _.isEmpty(desiredClassificationRatings)
-            ? true
-            : _.some(
-                flowRow.dataTypesForLogicalFlow,
-                x => _.some(
-                    desiredClassificationRatings,
-                    d => _.isEqual(d, x.rating)))
-    }
 }

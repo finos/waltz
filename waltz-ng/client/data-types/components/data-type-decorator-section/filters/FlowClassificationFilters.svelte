@@ -8,6 +8,7 @@
     import RatingIndicatorCell from "../../../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
     import {mkClassificationViewFilter} from "../../../../common/view-grid-utils";
     import {updateFilters} from "../data-type-decorator-section-store";
+    import NoData from "../../../../common/svelte/NoData.svelte";
 
     export let classifications = [];
     export let filters;
@@ -82,6 +83,12 @@
                 {fc.description}
             </td>
         </tr>
+        {:else}
+            <tr>
+                <td>
+                    <NoData type="info">There are no classifications to filter over</NoData>
+                </td>
+            </tr>
         {/each}
         </tbody>
     </table>
