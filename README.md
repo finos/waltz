@@ -68,10 +68,10 @@ progress and done issues.
 
 **Provisional** dates for upcoming releases:
 
-| Release | Date          | Provisional Change Summary                            |
-|---------|---------------|-------------------------------------------------------|
-| 1.58    | Feb 13th 2024 | tbd                                                   |
-| 1.59    | tbd           | tbd                                                   |
+| Release | Date          | Provisional Change Summary                                            |
+|---------|---------------|-----------------------------------------------------------------------|
+| 1.58.1  | Feb 27th 2024 | Minor fixes                                                           |
+| 1.59    | Mar 26th 2024 | Flow classification rules for aggregator apps (not just distributors) |
 
 See the [releases](https://github.com/finos/waltz/releases) page for historic versions.
 
