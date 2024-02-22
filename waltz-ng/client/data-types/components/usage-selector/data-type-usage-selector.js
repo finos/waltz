@@ -112,6 +112,8 @@ function controller($q, serviceBroker) {
         vm.visibleDataTypes = vm.showAllDataTypes
             ? vm.enrichedDataTypes
             : reduceToSelectedNodesOnly(vm.enrichedDataTypes, suggestedAndSelectedTypes);
+
+        return vm.enrichedDataTypes;
     };
 
     const doSave = () => {
@@ -149,7 +151,9 @@ function controller($q, serviceBroker) {
         let dt = vm.enrichedDataTypesById[id];
         while (dt) {
             const parent = vm.enrichedDataTypesById[dt.parentId];
-            if (_.get(parent, ["dataType", "concrete"], true) === false) {
+            const parentIsAbstract = _.get(parent, ["dataType", "concrete"], true) === false;
+            const parentIsRemovable = _.get(parent, ["usage", "isRemovable"], false) === true;
+            if (parentIsAbstract && parentIsRemovable) {
                 vm.typeUnchecked(parent.id, parent);
             }
             dt = parent;
@@ -181,7 +185,7 @@ function controller($q, serviceBroker) {
                 vm.used = usage;
                 vm.suggestedDataTypes = suggestions;
                 vm.onDirty(false);
-                postLoadActions(usage, suggestions);
+                return postLoadActions(usage, suggestions);
             });
     };
 
