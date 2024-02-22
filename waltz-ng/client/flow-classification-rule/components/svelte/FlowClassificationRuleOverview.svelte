@@ -15,6 +15,7 @@
     import {activeSections} from "../../../dynamic-section/section-store";
     import {dynamicSections} from "../../../dynamic-section/dynamic-section-definitions";
     import Markdown from "../../../common/svelte/Markdown.svelte";
+    import {primaryEntityReference} from "../../../assessments/components/rating-editor/rating-store";
 
     export let primaryEntityRef;
 
@@ -48,6 +49,9 @@
     $: datatype = _.find(datatypes, dt => dt.id === classificationRule?.dataTypeId);
     $: datatypeName = _.get(datatype, ["name"], "Unknown");
     $: rating = _.get(classificationsById, [classificationRule?.classificationId], unknownRating);
+
+    $: $primaryEntityReference = primaryEntityRef;
+
 </script>
 
 {#if classificationRule}

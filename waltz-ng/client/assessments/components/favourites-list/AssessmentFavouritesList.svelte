@@ -20,8 +20,6 @@
     import {assessmentDefinitionStore} from "../../../svelte-stores/assessment-definition";
 
 
-    let elem;
-    let stores = null;
     let assessmentsWithoutRatings;
     let assessmentsWithRatings;
     let favouriteAssessments = [];
