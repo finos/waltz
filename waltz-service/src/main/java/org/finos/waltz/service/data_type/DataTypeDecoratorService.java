@@ -24,26 +24,32 @@ import org.finos.waltz.data.datatype_decorator.DataTypeDecoratorDaoSelectorFacto
 import org.finos.waltz.data.logical_flow.LogicalFlowDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import org.finos.waltz.data.physical_specification.PhysicalSpecificationDao;
-import org.finos.waltz.model.*;
-import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
-import org.finos.waltz.model.assessment_rating.AssessmentRating;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.HierarchyQueryScope;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.Severity;
+import org.finos.waltz.model.application.AssessmentsView;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.datatype.DataType;
 import org.finos.waltz.model.datatype.DataTypeDecorator;
 import org.finos.waltz.model.datatype.DataTypeUsageCharacteristics;
 import org.finos.waltz.model.datatype.ImmutableDataTypeDecorator;
-import org.finos.waltz.model.flow_classification_rule.FlowClassificationRule;
+import org.finos.waltz.model.flow_classification.FlowClassification;
 import org.finos.waltz.model.logical_flow.DataTypeDecoratorView;
+import org.finos.waltz.model.logical_flow.FlowClassificationRulesView;
 import org.finos.waltz.model.logical_flow.ImmutableDataTypeDecoratorView;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
 import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
-import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.service.assessment_definition.AssessmentDefinitionService;
 import org.finos.waltz.service.assessment_rating.AssessmentRatingService;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.data_flow_decorator.LogicalFlowDecoratorRatingsCalculator;
 import org.finos.waltz.service.data_flow_decorator.LogicalFlowDecoratorService;
 import org.finos.waltz.service.flow_classification_rule.FlowClassificationRuleService;
+import org.finos.waltz.service.flow_classification_rule.FlowClassificationService;
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.finos.waltz.service.physical_specification.PhysicalSpecificationService;
 import org.finos.waltz.service.rating_scheme.RatingSchemeService;
@@ -54,16 +60,27 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.CollectionUtilities.*;
+import static org.finos.waltz.common.CollectionUtilities.isEmpty;
+import static org.finos.waltz.common.CollectionUtilities.notEmpty;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.common.SetUtilities.filter;
 import static org.finos.waltz.common.SetUtilities.map;
-import static org.finos.waltz.model.EntityKind.*;
+import static org.finos.waltz.model.EntityKind.ACTOR;
+import static org.finos.waltz.model.EntityKind.APPLICATION;
+import static org.finos.waltz.model.EntityKind.DATA_TYPE;
+import static org.finos.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
+import static org.finos.waltz.model.EntityKind.LOGICAL_DATA_FLOW_DATA_TYPE_DECORATOR;
+import static org.finos.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 
@@ -82,8 +99,7 @@ public class DataTypeDecoratorService {
     private final PhysicalSpecificationDao physicalSpecificationDao;
     private final PhysicalSpecificationService physicalSpecificationService;
     private final AssessmentRatingService assessmentRatingService;
-    private final AssessmentDefinitionService assessmentDefinitionService;
-    private final RatingSchemeService ratingSchemeService;
+    private final FlowClassificationService flowClassificationService;
 
     private final FlowClassificationRuleService flowClassificationRuleService;
 
@@ -101,29 +117,30 @@ public class DataTypeDecoratorService {
                                     AssessmentRatingService assessmentRatingService,
                                     AssessmentDefinitionService assessmentDefinitionService,
                                     RatingSchemeService ratingSchemeService,
+                                    FlowClassificationService flowClassificationService,
                                     FlowClassificationRuleService flowClassificationRuleService) {
 
         checkNotNull(assessmentDefinitionService, "assessmentDefinitionService cannot be null");
         checkNotNull(assessmentRatingService, "assessmentRatingService cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
+        checkNotNull(flowClassificationService, "flowClassificationService cannot be null");
         checkNotNull(flowClassificationRuleService, "flowClassificationRuleService cannot be null");
         checkNotNull(logicalFlowDecoratorService, "logicalFlowDecoratorService cannot be null");
         checkNotNull(physicalSpecificationService, "physicalSpecificationService cannot be null");
         checkNotNull(ratingSchemeService, "ratingSchemeService cannot be null");
 
-        this.assessmentDefinitionService = assessmentDefinitionService;
         this.assessmentRatingService = assessmentRatingService;
         this.changeLogService = changeLogService;
         this.dataTypeDecoratorDaoSelectorFactory = dataTypeDecoratorDaoSelectorFactory;
         this.dataTypeService = dataTypeService;
         this.dataTypeUsageService = dataTypeUsageService;
+        this.flowClassificationService = flowClassificationService;
         this.flowClassificationRuleService = flowClassificationRuleService;
         this.logicalFlowDao = logicalFlowDao;
         this.logicalFlowService = logicalFlowService;
         this.physicalSpecificationDao = physicalSpecificationDao;
         this.physicalSpecificationService = physicalSpecificationService;
         this.ratingsCalculator = ratingsCalculator;
-        this.ratingSchemeService = ratingSchemeService;
     }
 
 
@@ -383,26 +400,24 @@ public class DataTypeDecoratorService {
      */
     public DataTypeDecoratorView getDecoratorView(EntityReference parentEntityRef) {
 
+        IdSelectionOptions selectionOptions = mkOpts(parentEntityRef);
         DataTypeDecoratorDao dao = dataTypeDecoratorDaoSelectorFactory.getDao(parentEntityRef.kind());
-        EntityKind decoratorKind = getDecoratorKind(parentEntityRef.kind());
 
         List<DataTypeDecorator> decorators = dao.findByEntityId(parentEntityRef.id());
-
-        List<AssessmentRating> decoratorAssessmentRatings = assessmentRatingService.findByTargetKindForRelatedSelector(decoratorKind, mkOpts(parentEntityRef));
-
-        Set<AssessmentDefinition> primaryDefs = assessmentDefinitionService.findByPrimaryDefinitionsForKind(EntityKind.LOGICAL_DATA_FLOW_DATA_TYPE_DECORATOR, Optional.empty());
-
-        Set<Long> uniqueRatingIds = map(decoratorAssessmentRatings, AssessmentRating::ratingId);
-        Set<RatingSchemeItem> ratings = ratingSchemeService.findRatingSchemeItemsByIds(uniqueRatingIds);
-
-        Set<FlowClassificationRule> flowClassificationRules = flowClassificationRuleService.findAppliedClassificationRulesForFlow(parentEntityRef.id());
+        Set<DataType> dataTypes = dataTypeService.findByIdSelector(selectionOptions);
+        AssessmentsView assessmentsView = assessmentRatingService.getPrimaryAssessmentsViewForKindAndSelector(LOGICAL_DATA_FLOW_DATA_TYPE_DECORATOR, selectionOptions);
+        FlowClassificationRulesView classificationRulesView = flowClassificationRuleService.getFlowClassificationsViewForFlow(parentEntityRef.id());
+        Set<AuthoritativenessRatingValue> ratings = map(decorators, d -> d.rating().orElse(null));
+        Set<FlowClassification> classifications = filter(
+                flowClassificationService.findAll(),
+                d -> ratings.contains(AuthoritativenessRatingValue.ofNullable(d.code()).orElse(null)));
 
         return ImmutableDataTypeDecoratorView.builder()
                 .dataTypeDecorators(decorators)
-                .decoratorRatings(decoratorAssessmentRatings)
-                .primaryAssessmentDefinitions(primaryDefs)
-                .ratingSchemeItems(ratings)
-                .flowClassificationRules(flowClassificationRules)
+                .dataTypes(dataTypes)
+                .classifications(classifications)
+                .primaryAssessments(assessmentsView)
+                .flowClassificationRules(classificationRulesView)
                 .build();
     }
 

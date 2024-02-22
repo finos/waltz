@@ -413,7 +413,7 @@ export function combineColDefs(definition) {
 }
 
 
-export function prepareTableData(instance, columnDefs) {
+export function prepareData(instance, columnDefs) {
 
     if (_.isEmpty(columnDefs)) {
         return [];

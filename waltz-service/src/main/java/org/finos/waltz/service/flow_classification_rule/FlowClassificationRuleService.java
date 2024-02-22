@@ -18,6 +18,9 @@
 
 package org.finos.waltz.service.flow_classification_rule;
 
+import org.finos.waltz.model.logical_flow.FlowClassificationRulesView;
+import org.finos.waltz.model.logical_flow.ImmutableFlowClassificationRulesView;
+import org.finos.waltz.model.logical_flow.ImmutableFlowClassificationsView;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.common.exception.NotFoundException;
@@ -53,6 +56,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -500,5 +504,20 @@ public class FlowClassificationRuleService {
 
     public Set<FlowClassificationRule> findAppliedClassificationRulesForFlow(Long logicalFlowId) {
         return flowClassificationRuleDao.findAppliedClassificationRulesForFlow(logicalFlowId);
+    }
+
+    public FlowClassificationRulesView getFlowClassificationsViewForFlow(long flowId) {
+
+        Set<FlowClassificationRule> flowClassificationRules = findAppliedClassificationRulesForFlow(flowId);
+        Set<FlowClassification> classifications = flowClassificationDao.findByIds(map(flowClassificationRules, FlowClassificationRule::classificationId));
+
+        List<DataType> dataTypes = dataTypeDao.findByIds(map(flowClassificationRules, FlowClassificationRule::dataTypeId));
+
+        return ImmutableFlowClassificationRulesView
+                .builder()
+                .flowClassificationRules(flowClassificationRules)
+                .flowClassifications(classifications)
+                .dataTypes(dataTypes)
+                .build();
     }
 }

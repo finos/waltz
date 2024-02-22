@@ -40,7 +40,8 @@ function controller($q,
                     $state,
                     $stateParams,
                     $window,
-                    serviceBroker)
+                    serviceBroker,
+                    historyStore)
 {
     const vm = initialiseData(this, initialState);
 
@@ -57,7 +58,17 @@ function controller($q,
             .loadViewData(
                 CORE_API.LogicalFlowStore.getById,
                 [ flowId ])
-            .then(r => vm.logicalFlow = r.data);
+            .then(r => vm.logicalFlow = r.data)
+
+
+        flowPromise
+            .then(r => {
+                historyStore.put(
+                    `Logical Flow: ${vm.logicalFlow.source.name} to ${vm.logicalFlow.target.name}`,
+                    "LOGICAL_DATA_FLOW",
+                    "main.logical-flow.view",
+                    { id: flowId });
+            });
 
         const permissionPromise = serviceBroker
             .loadViewData(
@@ -134,7 +145,8 @@ controller.$inject = [
     "$state",
     "$stateParams",
     "$window",
-    "ServiceBroker"
+    "ServiceBroker",
+    "HistoryStore"
 ];
 
 

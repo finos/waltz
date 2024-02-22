@@ -5,7 +5,7 @@ import {
     combineColDefs,
     determineDefaultColumnOptions,
     mkRowFilter,
-    prepareTableData,
+    prepareData,
     refreshSummaries,
     sameColumnRef
 } from "./report-grid-utils";
@@ -38,7 +38,7 @@ function selectGrid(gridId, opts) {
             columnDefs.set(cols);
             userRole.set(d.data.userRole);
             hasDirtyColumns.set(false);
-            preparedTableData.set(prepareTableData(d.data.instance, cols));
+            preparedTableData.set(prepareData(d.data.instance, cols));
             return d.data;
         });
 }
