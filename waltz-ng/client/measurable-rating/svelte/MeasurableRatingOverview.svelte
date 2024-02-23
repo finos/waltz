@@ -12,6 +12,7 @@
     import _ from "lodash";
     import Icon from "../../common/svelte/Icon.svelte";
     import DescriptionFade from "../../common/svelte/DescriptionFade.svelte";
+    import {primaryEntityReference as primaryRef} from "../../assessments/components/rating-editor/rating-store";
 
     export let primaryEntityReference;
 
@@ -26,7 +27,7 @@
     $: view = $measurableRatingCall?.data;
     $: allocations = view?.allocations || [];
     $: allocationsBySchemeId = _.keyBy(view?.allocations, d => d.schemeId);
-
+    $: $primaryRef = primaryEntityReference;
 </script>
 
 
