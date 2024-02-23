@@ -17,7 +17,6 @@
   -->
 
 <div>
-
     <waltz-page-header name="Playpen"
                        small="1"
                        icon="rocket">
@@ -28,11 +27,19 @@
     </waltz-page-header>
 
 
-    <div class="row">
-        <div class="col-md-3">
-            <waltz-svelte-component component="$ctrl.DataTypeTreeSelector" selection-filter="$ctrl.filter">
+    <div class="row" >
+        <div class="col-md-12">
+            <button ng-click="$ctrl.visible = !$ctrl.visible">Toggle Both</button>
+            <button ng-click="$ctrl.counter = $ctrl.counter + 1">Inc {{$ctrl.counter}}</button>
+            <div ng-if="$ctrl.visible">
+                <waltz-svelte-component component="$ctrl.Unaware" u="$ctrl.u" counter="$ctrl.counter">
 
-            </waltz-svelte-component>
+                </waltz-svelte-component>
+                <waltz-svelte-component component="$ctrl.Parent" p="$ctrl.p"  counter="$ctrl.counter">
+
+                </waltz-svelte-component>
+            </div>
+
         </div>
     </div>
 
