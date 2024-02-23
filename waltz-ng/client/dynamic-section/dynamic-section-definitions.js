@@ -16,6 +16,7 @@
  *
  */
 import BookmarkPanel from "../bookmarks/svelte/BookmarkPanel.svelte";
+import InvolvementsSection from "../involvement-kind/components/svelte/InvolvementsSection.svelte";
 
 
 const appsSection = {
@@ -462,6 +463,15 @@ const dataTypeDecoratorSection = {
     id: 10040,
 };
 
+const involvementsSection = {
+    svelteComponent: InvolvementsSection,
+    componentId: "involvements-section",
+    name: "Involvements",
+    icon: "users",
+    description: "Involvements for this involvement kind",
+    id: 10050,
+};
+
 
 export const dynamicSections = {
     appCostsSection,
@@ -490,6 +500,7 @@ export const dynamicSections = {
     entityStatisticSummarySection,
     flowSpecDefinitionSection,
     involvedPeopleSection,
+    involvementsSection,
     legalEntitySection,
     legalEntityRelationshipKindSection,
     licenceSection,
@@ -753,6 +764,15 @@ const flowDiagramSections = [
     changeLogSection
 ];
 
+
+const involvementKindSections = [
+    assessmentRatingSection,
+    bookmarksSection,
+    entityNamedNotesSection,
+    involvementsSection,
+    changeLogSection
+];
+
 const processDiagramSections = [
     pack(appsSection,
          [
@@ -898,6 +918,7 @@ export const dynamicSectionsByKind = {
     "main.entity-relationship.view": entityRelationshipSections,
     "main.flow-classification-rule.view": flowClassificationRuleSections,
     "main.flow-diagram.view": flowDiagramSections,
+    "main.involvement-kind.view": involvementKindSections,
     "main.legal-entity.view": legalEntitySections,
     "main.legal-entity-relationship.view": legalEntityRelationshipSections,
     "main.legal-entity-relationship-kind.view": legalEntityRelationshipKindSections,
