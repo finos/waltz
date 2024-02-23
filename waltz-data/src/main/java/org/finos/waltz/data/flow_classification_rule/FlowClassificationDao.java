@@ -77,6 +77,15 @@ public class FlowClassificationDao {
     }
 
 
+    public Set<FlowClassification> findByIds(Set<Long> classificationRuleIds) {
+        return dsl
+                .select(FLOW_CLASSIFICATION.fields())
+                .from(FLOW_CLASSIFICATION)
+                .where(FLOW_CLASSIFICATION.ID.in(classificationRuleIds))
+                .fetchSet(TO_DOMAIN_MAPPER);
+    }
+
+
     public int remove(long id) {
         return dsl
                 .delete(FLOW_CLASSIFICATION)

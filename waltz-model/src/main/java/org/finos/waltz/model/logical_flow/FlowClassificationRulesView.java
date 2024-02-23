@@ -20,23 +20,21 @@ package org.finos.waltz.model.logical_flow;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.finos.waltz.model.application.AssessmentsView;
 import org.finos.waltz.model.datatype.DataType;
-import org.finos.waltz.model.datatype.DataTypeDecorator;
 import org.finos.waltz.model.flow_classification.FlowClassification;
+import org.finos.waltz.model.flow_classification_rule.FlowClassificationRule;
 import org.immutables.value.Value;
 
 import java.util.Set;
 
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableDataTypeDecoratorView.class)
-@JsonDeserialize(as = ImmutableDataTypeDecoratorView.class)
-public interface DataTypeDecoratorView {
-    Set<DataTypeDecorator> dataTypeDecorators();
+@JsonSerialize(as = ImmutableFlowClassificationRulesView.class)
+@JsonDeserialize(as = ImmutableFlowClassificationRulesView.class)
+public interface FlowClassificationRulesView {
+
+    Set<FlowClassificationRule> flowClassificationRules();
+    Set<FlowClassification> flowClassifications();
     Set<DataType> dataTypes();
-    Set<FlowClassification> classifications();
-    AssessmentsView primaryAssessments();
-    FlowClassificationRulesView flowClassificationRules();
 
 }

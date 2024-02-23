@@ -98,6 +98,17 @@ public class DataTypeDao implements FindEntityReferencesByIdSelector {
     }
 
 
+    public Set<DataType> findByIdSelector(Select<Record1<Long>> selector) {
+        checkNotNull(selector, "selector cannot be null");
+
+        return dsl
+                .select(DATA_TYPE.asterisk())
+                .from(DATA_TYPE)
+                .where(DATA_TYPE.ID.in(selector))
+                .fetchSet(TO_DOMAIN);
+    }
+
+
     public DataType getByCode(String code) {
         checkNotEmpty(code, "Code cannot be null/empty");
         return dsl

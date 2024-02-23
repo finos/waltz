@@ -2,6 +2,8 @@
     import _ from "lodash";
     import Icon from "./Icon.svelte";
     import {createEventDispatcher} from "svelte";
+    import RatingIndicatorCell from "../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
+    import DataTypeDecoratorNodeContent from "./DataTypeDecoratorNodeContent.svelte";
 
     export let selectionFilter = () => true;
     export let multiSelect = false;
@@ -23,12 +25,10 @@
         dispatcher("select", selectedNode);
     }
 
-    function calcCheckIcon(filterFn, n) {
+    function calcChecked(filterFn, n) {
         const isUnchecked = filterFn(n);
 
-        return isUnchecked
-            ? 'square-o'
-            : 'check-square-o';
+        return !isUnchecked;
     }
 
     function calcDisabled(filterFn, n) {
@@ -48,19 +48,11 @@
                         ? "caret-down fw"
                         : "caret-right fw"}/>
     </button>
-    <button class="btn btn-plain"
-            class:concrete={node.concrete}
-            class:abstract={!node.concrete}
-            class:unknown={node.unknown}
-            class:deprecated={node.deprecated}
-            disabled={calcDisabled(selectionFilter, node)}
-            on:click={() => selectNode(node)}
-            title={node.description}>
-            {#if multiSelect}
-                <Icon name={calcCheckIcon(selectionFilter, node)}/>
-            {/if}
-            {node.name}
-    </button>
+    <DataTypeDecoratorNodeContent {node}
+                                  {multiSelect}
+                                  isDisabled={calcDisabled(selectionFilter, node)}
+                                  isChecked={calcChecked(selectionFilter, node)}
+                                  {selectNode}/>
 {/if}
 
 {#if expanded || node.isExpanded}
@@ -78,27 +70,11 @@
                 {:else}
                     <Icon size="lg"
                           name="fw"/>
-                    <button class="btn btn-plain"
-                            class:concrete={childNode.concrete}
-                            class:abstract={!childNode.concrete}
-                            class:unknown={childNode.unknown}
-                            class:deprecated={childNode.deprecated}
-                            disabled={!nonConcreteSelectable && !childNode.concrete}
-                            on:click={() => selectNode(childNode)}
-                            title={childNode.description}>
-                        <span class="no-wrap">
-                            {#if multiSelect}
-                                <Icon name={calcCheckIcon(selectionFilter, childNode)}/>
-                            {/if}
-                            {childNode.name}
-                            {#if childNode.deprecated}
-                                <span class="deprecated">
-                                    (Deprecated)
-                                </span>
-                            {/if}
-                        </span>
-
-                    </button>
+                    <DataTypeDecoratorNodeContent node={childNode}
+                                                  {multiSelect}
+                                                  isDisabled={calcDisabled(selectionFilter, childNode)}
+                                                  isChecked={calcChecked(selectionFilter, childNode)}
+                                                  {selectNode}/>
                 {/if}
             </li>
         {/each}
@@ -106,28 +82,10 @@
 {/if}
 
 <style>
-
-    .concrete {
-    }
-
-    .abstract {
-        font-style: italic;
-    }
-
-    .deprecated {
-        color: red;
-    }
-
-    .unknown {
-        color: gray;
-    }
-
     ul {
         padding: 0.2em 0 0 0.5em;
         margin: 0 0 0 0.5em;
         list-style: none;
         border-left: 1px solid #eee;
     }
-
-
 </style>

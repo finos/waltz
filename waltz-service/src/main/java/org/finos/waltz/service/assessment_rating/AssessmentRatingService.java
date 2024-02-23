@@ -26,6 +26,8 @@ import org.finos.waltz.data.assessment_definition.AssessmentDefinitionDao;
 import org.finos.waltz.data.assessment_rating.AssessmentRatingDao;
 import org.finos.waltz.data.rating_scheme.RatingSchemeDAO;
 import org.finos.waltz.model.*;
+import org.finos.waltz.model.application.AssessmentsView;
+import org.finos.waltz.model.application.ImmutableAssessmentsView;
 import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.model.assessment_rating.*;
 import org.finos.waltz.model.changelog.ChangeLog;
@@ -44,7 +46,9 @@ import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.utils.IdUtilities.toIds;
 
 @Service
 public class AssessmentRatingService {
@@ -439,5 +443,35 @@ public class AssessmentRatingService {
 
     public boolean hasMultiValuedAssessments(long assessmentDefinitionId) {
         return assessmentRatingDao.hasMultiValuedAssessments(assessmentDefinitionId);
+    }
+
+    public Set<AssessmentRating> findBySelectorForDefinitions(GenericSelector genericSelector,
+                                                              Set<Long> defIds) {
+        return assessmentRatingDao.findBySelectorForDefinitions(genericSelector, defIds);
+    }
+
+
+    public AssessmentsView getPrimaryAssessmentsViewForKindAndSelector(EntityKind entityKind, IdSelectionOptions opts) {
+
+        Set<AssessmentDefinition> primaryAssessmentDefs = assessmentDefinitionDao
+                .findPrimaryDefinitionsForKind(
+                        EntityKind.LOGICAL_DATA_FLOW_DATA_TYPE_DECORATOR,
+                        Optional.empty());
+
+        GenericSelector selector = genericSelectorFactory.applyForKind(entityKind, opts);
+
+        Set<AssessmentRating> assessmentRatings = findBySelectorForDefinitions(
+                selector,
+                toIds(primaryAssessmentDefs));
+
+        Set<RatingSchemeItem> assessmentRatingSchemeItems = ratingSchemeDAO.findRatingSchemeItemsByIds(
+                map(assessmentRatings, AssessmentRating::ratingId));
+
+        return ImmutableAssessmentsView
+                .builder()
+                .assessmentDefinitions(primaryAssessmentDefs)
+                .assessmentRatings(assessmentRatings)
+                .ratingSchemeItems(assessmentRatingSchemeItems)
+                .build();
     }
 }

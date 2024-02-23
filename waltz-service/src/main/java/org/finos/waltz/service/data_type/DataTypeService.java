@@ -19,11 +19,13 @@
 package org.finos.waltz.service.data_type;
 
 import org.finos.waltz.data.data_type.DataTypeDao;
+import org.finos.waltz.data.data_type.DataTypeIdSelectorFactory;
 import org.finos.waltz.data.data_type.search.DataTypeSearchDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.datatype.DataType;
 import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.jooq.Record1;
@@ -83,6 +85,12 @@ public class DataTypeService {
 
     public List<EntityReference> findByIdSelector(Select<Record1<Long>> selector) {
         return dataTypeDao.findByIdSelectorAsEntityReference(selector);
+    }
+
+    public Set<DataType> findByIdSelector(IdSelectionOptions options) {
+        DataTypeIdSelectorFactory dataTypeIdSelectorFactory = new DataTypeIdSelectorFactory();
+        Select<Record1<Long>> selector = dataTypeIdSelectorFactory.apply(options);
+        return dataTypeDao.findByIdSelector(selector);
     }
 
 
