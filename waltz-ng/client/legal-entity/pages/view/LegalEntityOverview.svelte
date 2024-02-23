@@ -10,6 +10,7 @@
     import SubSection from "../../../common/svelte/SubSection.svelte";
     import {activeSections, availableSections} from "../../../dynamic-section/section-store";
     import _ from "lodash";
+    import {primaryEntityReference as primaryRef} from "../../../assessments/components/rating-editor/rating-store";
 
     export let primaryEntityReference;
 
@@ -22,6 +23,7 @@
     }
 
     $: legalEntity = $legalEntityCall?.data;
+    $: $primaryRef = primaryEntityReference;
 
     function openAssessmentsSection() {
 
