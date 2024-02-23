@@ -20,7 +20,6 @@ package org.finos.waltz.service.flow_classification_rule;
 
 import org.finos.waltz.model.logical_flow.FlowClassificationRulesView;
 import org.finos.waltz.model.logical_flow.ImmutableFlowClassificationRulesView;
-import org.finos.waltz.model.logical_flow.ImmutableFlowClassificationsView;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.common.exception.NotFoundException;
