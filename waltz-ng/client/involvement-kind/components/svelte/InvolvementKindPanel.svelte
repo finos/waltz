@@ -3,30 +3,22 @@
     import {involvementKindStore} from "../../../svelte-stores/involvement-kind-store";
     import ViewLink from "../../../common/svelte/ViewLink.svelte";
     import PageHeader from "../../../common/svelte/PageHeader.svelte";
-    import InvolvementListPanel from "./InvolvementListPanel.svelte";
     import InvolvementKindOverview from "./InvolvementKindOverview.svelte";
-    import BulkInvolvementLoader from "./BulkInvolvementLoader.svelte";
+    import AssessmentFavouritesList
+        from "../../../assessments/components/favourites-list/AssessmentFavouritesList.svelte";
+    import {activeSections} from "../../../dynamic-section/section-store";
+    import {dynamicSections} from "../../../dynamic-section/dynamic-section-definitions";
+    import SubSection from "../../../common/svelte/SubSection.svelte";
 
     export let parentEntityRef;
 
-    const Modes = {
-        VIEW: "VIEW",
-        BULK_UPLOAD: "BULK_UPLOAD"
-    }
-
-    let activeMode = Modes.VIEW;
+    let involvementKindCall;
 
     $: involvementKindCall = involvementKindStore.getById(parentEntityRef.id);
     $: involvementKind = $involvementKindCall?.data;
 
-
     function reload(id) {
         involvementKindCall = involvementKindStore.getById(id, true);
-    }
-
-    function bulkUpdate() {
-        activeMode = Modes.VIEW;
-        return reload(parentEntityRef.id)
     }
 
 </script>
@@ -54,47 +46,28 @@
 
 <div class="waltz-page-summary waltz-page-summary-attach">
     <div class="waltz-display-section">
-        <InvolvementKindOverview {involvementKind} {reload}/>
-    </div>
-</div>
-
-<br>
-
-<div class="waltz-section">
-
-    <div class="waltz-section-header">
-        <div class="waltz-section-header-title">
-            Involvements
-        </div>
-    </div>
-
-    <div class="container-fluid waltz-section-body">
-
-        <div class="waltz-section-actions">
-            {#if activeMode === Modes.VIEW}
-                <button class="btn btn-xs btn-default"
-                        on:click={() => activeMode = Modes.BULK_UPLOAD}>
-                    Bulk Insert
-                </button>
-            {:else}
-                <button class="btn btn-xs btn-default"
-                        on:click={() => activeMode = Modes.VIEW}>
-                    Cancel
-                </button>
-            {/if}
-        </div>
-
         <div class="row">
-            <div class="col-sm-12">
-                {#if activeMode === Modes.VIEW}
-                    <InvolvementListPanel {involvementKind}/>
-                {:else if activeMode === Modes.BULK_UPLOAD}
-                    <BulkInvolvementLoader {involvementKind}
-                                           onSave={bulkUpdate}/>
-                {/if}
+            <div class="col-md-6">
+                <InvolvementKindOverview {involvementKind} {reload}/>
+            </div>
+            <div class="col-md-6">
+                <SubSection>
+                    <div slot="header">
+                        Assessments
+                    </div>
+                    <div slot="content">
+                        <AssessmentFavouritesList/>
+                    </div>
+                    <div slot="controls">
+                        <div style="float: right; padding-top: 1px">
+                            <button class="btn-link"
+                                    on:click={() =>  activeSections.add(dynamicSections.assessmentRatingSection)}>
+                                More
+                            </button>
+                        </div>
+                    </div>
+                </SubSection>
             </div>
         </div>
     </div>
-
-
 </div>
