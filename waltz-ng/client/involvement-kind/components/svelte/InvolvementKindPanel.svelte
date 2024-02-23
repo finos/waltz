@@ -9,6 +9,7 @@
     import {activeSections} from "../../../dynamic-section/section-store";
     import {dynamicSections} from "../../../dynamic-section/dynamic-section-definitions";
     import SubSection from "../../../common/svelte/SubSection.svelte";
+    import {primaryEntityReference as primaryRef} from "../../../assessments/components/rating-editor/rating-store";
 
     export let parentEntityRef;
 
@@ -16,6 +17,7 @@
 
     $: involvementKindCall = involvementKindStore.getById(parentEntityRef.id);
     $: involvementKind = $involvementKindCall?.data;
+    $: $primaryRef = parentEntityRef;
 
     function reload(id) {
         involvementKindCall = involvementKindStore.getById(id, true);

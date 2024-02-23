@@ -12,6 +12,8 @@
         selectedDataType
     } from "./data-type-decorator-section-store";
     import {prepareData} from "./data-type-decorator-view-grid-utils";
+    import {onDestroy, onMount} from "svelte";
+    import localWritable from "../../../common/svelte/local-writable";
 
     const Modes = {
         TREE: "TREE",
@@ -20,16 +22,29 @@
 
     export let primaryEntityRef;
 
-    let activeMode = Modes.TREE;
+    let activeMode = localWritable('waltz.DataTypeDecoratorSection.activeMode', Modes.TREE);
     let viewCall;
 
     function toggleView() {
-        if (activeMode === Modes.TREE) {
-            activeMode = Modes.TABLE;
+        if ($activeMode === Modes.TREE) {
+            $activeMode = Modes.TABLE;
         } else {
-            activeMode = Modes.TREE;
+            $activeMode = Modes.TREE;
         }
     }
+
+    function clearSelections() {
+        $selectedDataType = null;
+        $selectedDecorator = null;
+    }
+
+    onMount(() => {
+        clearSelections();
+    });
+
+    onDestroy(() => {
+        clearSelections();
+    });
 
     $: {
         if (primaryEntityRef) {
@@ -49,20 +64,19 @@
 
 <div class="decorator-section">
     <div class="decorator-table">
-        <div class="pull-right" style="display: block">
-            <Toggle labelOn="Tree View"
-                    labelOff="Table View"
-                    state={activeMode === Modes.TREE}
-                    onToggle={toggleView}/>
-        </div>
         <div>
             These are the data types currently aligned to this logical flow. You can toggle between a tabular and tree view of this information. Select a data type to see more information.
+            <br>
+            <Toggle labelOn="Tree View"
+                    labelOff="Table View"
+                    state={$activeMode === Modes.TREE}
+                    onToggle={toggleView}/>
         </div>
         <br>
         <div>
-            {#if activeMode === Modes.TREE}
+            {#if $activeMode === Modes.TREE}
                 <DataTypeOverviewPanel primaryEntityReference={primaryEntityRef}/>
-            {:else if activeMode === Modes.TABLE}
+            {:else if $activeMode === Modes.TABLE}
                 <DataTypeDecoratorViewGrid/>
             {/if}
         </div>
