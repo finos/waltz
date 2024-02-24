@@ -19,7 +19,7 @@ import _ from "lodash";
 import moment from "moment";
 import {notEmpty} from "../../common";
 import {mkEntityLinkGridCell, mkLinkGridCell} from "../../common/grid-utils";
-import template from './entity-statistic-detail-table.html';
+import template from "./entity-statistic-detail-table.html";
 
 
 /**
@@ -32,47 +32,47 @@ import template from './entity-statistic-detail-table.html';
  **/
 
 const bindings = {
-    applications: '<',
-    filterOutcome: '<',
-    lastUpdatedAt: '<',
-    orgUnits: '<',
-    statisticDefinition: '<',
-    statisticValues: '<'
+    applications: "<",
+    filterOutcome: "<",
+    lastUpdatedAt: "<",
+    orgUnits: "<",
+    statisticDefinition: "<",
+    statisticValues: "<"
 };
 
 
-const exportTimestampFormat = 'YYYY-MM-DD_HHmmss';
+const exportTimestampFormat = "YYYY-MM-DD_HHmmss";
 
 
 const appNameCell = Object.assign(
-    mkEntityLinkGridCell('Application', 'entity', 'none'),
-    { sort: { direction: 'asc' } }
+    mkEntityLinkGridCell("Application", "entity", "none"),
+    { sort: { direction: "asc" } }
 );
 
 
 const outcomeCell = (uiGridConstants) => {
     return {
-        field: 'outcome',
+        field: "outcome",
         filter: {
             term: null,
             condition: uiGridConstants.filter.EXACT
         }
-    }
+    };
 };
 
 
 const assetCodeCell = {
-    field: 'application.assetCode',
-    displayName: 'Asset Code'
+    field: "application.assetCode",
+    displayName: "Asset Code"
 };
 
 
 const valueCell = (uiGridConstants, statisticDefinition) => {
     return {
-        field: 'value',
-        type: (statisticDefinition && statisticDefinition.type === 'NUMERIC')
-            ? 'number'
-            : 'string',
+        field: "value",
+        type: (statisticDefinition && statisticDefinition.type === "NUMERIC")
+            ? "number"
+            : "string",
         filter: {
             term: null,
             condition: uiGridConstants.filter.EXACT
@@ -82,31 +82,31 @@ const valueCell = (uiGridConstants, statisticDefinition) => {
 
 
 const reasonCell = {
-    field: 'reason'
+    field: "reason"
 };
 
 
 const orgUnitCell = mkLinkGridCell(
-    'Org Unit',
-    'orgUnit.name',
-    'orgUnit.id',
-    'main.org-unit.view');
+    "Owning Org Unit",
+    "orgUnit.name",
+    "orgUnit.id",
+    "main.org-unit.view");
 
 
 const dateCell = {
-    field: 'createdAt',
-    displayName: 'Last Updated',
+    field: "createdAt",
+    displayName: "Last Updated",
     enableFiltering: false,
     visible: false,
-    cellTemplate: '<div class="ui-grid-cell-contents">\n     <waltz-from-now timestamp="COL_FIELD"></waltz-from-now>\n</div>'
+    cellTemplate: "<div class=\"ui-grid-cell-contents\">\n     <waltz-from-now timestamp=\"COL_FIELD\"></waltz-from-now>\n</div>"
 };
 
 
 function mkGridData(statisticValues = [],
                     applications = [],
                     orgUnits = []) {
-    const appsById = _.keyBy(applications, 'id');
-    const orgUnitsById = _.keyBy(orgUnits, 'id');
+    const appsById = _.keyBy(applications, "id");
+    const orgUnitsById = _.keyBy(orgUnits, "id");
 
     return _.map(statisticValues, sv => {
         const app = appsById[sv.entity.id];
@@ -175,7 +175,7 @@ function controller($animate,
         const grid = vm.gridApi.grid;
         const rowVisibility = uiGridExporterConstants.ALL;
         const colVisibility = uiGridExporterConstants.ALL;
-        const exportDataSeparator = ',';
+        const exportDataSeparator = ",";
         const statName = vm.statisticDefinition.name;
         const timestamp = moment().format(exportTimestampFormat);
         const fileName = `${statName}_${timestamp}.csv`;
@@ -206,10 +206,10 @@ function controller($animate,
 
 
 controller.$inject = [
-    '$animate',
-    'uiGridConstants',
-    'uiGridExporterConstants',
-    'uiGridExporterService'
+    "$animate",
+    "uiGridConstants",
+    "uiGridExporterConstants",
+    "uiGridExporterService"
 ];
 
 
