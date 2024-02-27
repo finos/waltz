@@ -80,6 +80,7 @@ public class PhysicalFlowDao {
         PhysicalFlowRecord record = r.into(PHYSICAL_FLOW);
         return ImmutablePhysicalFlow.builder()
                 .id(record.getId())
+                .name(Optional.ofNullable(record.getName()).orElse(""))
                 .provenance(record.getProvenance())
                 .specificationId(record.getSpecificationId())
                 .basisOffset(record.getBasisOffset())
