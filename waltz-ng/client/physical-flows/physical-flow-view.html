@@ -21,7 +21,7 @@
     <!-- HEADER -->
     <waltz-page-header name="{{ ctrl.physicalFlow.name || ctrl.specification.name }}"
                        small="{{ ctrl.logicalFlow.source.name }} {{ ctrl.logicalFlow ? '&rarr;' : '' }} {{ ctrl.logicalFlow.target.name }}"
-                       icon="qrcode">
+                       icon="{{ctrl.physicalFlow.kind | toIconName:'entity'}}">
         <breadcrumbs>
             <ol class="waltz-breadcrumbs">
                 <li><a ui-sref="main">Home</a></li>

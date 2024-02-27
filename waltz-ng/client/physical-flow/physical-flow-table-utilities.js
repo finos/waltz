@@ -22,8 +22,8 @@ import {CORE_API} from "../common/services/core-api-utils";
 
 
 export const columnDef = {
-    name: mkLinkGridCell("Name", "physicalFlow.name", "physicalFlow.id", "main.physical-flow.view"),
-    specName: mkLinkGridCell("Specification Name", "specification.name", "specification.id", "main.physical-specification.view"),
+    name: mkEntityLinkGridCell("Physical Flow Name", "physicalFlow"),
+    specName: mkEntityLinkGridCell("Specification Name", "specification"),
     extId: {field: "physicalFlow.externalId", displayName: "Ext. Id"},
     format: {field: "specification.format", displayName: "Format", cellFilter: "toDisplayName:\"DataFormatKind\""},
     transport: {
