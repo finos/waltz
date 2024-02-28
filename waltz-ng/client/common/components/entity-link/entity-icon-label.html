@@ -12,11 +12,14 @@
     </waltz-icon>
 
     <span data-testid="entity-name"
-          ng-bind="$ctrl.entityRef.name"
           ng-class="{
             'weil-entity-removed': $ctrl.entityRef.entityLifecycleStatus === 'REMOVED',
             'weil-entity-pending': $ctrl.entityRef.entityLifecycleStatus === 'PENDING'
           }">
+        <span ng-bind="$ctrl.entityRef.name"
+              ng-if="$ctrl.entityRef.name">
+        </span>
+        <span ng-if="!$ctrl.entityRef.name">-</span>
     </span>
 
     <span data-testid="entity-external-id"

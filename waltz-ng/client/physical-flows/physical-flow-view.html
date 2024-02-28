@@ -19,9 +19,9 @@
 <div class="container-fluid">
 
     <!-- HEADER -->
-    <waltz-page-header name="{{ ctrl.specification.name }}"
+    <waltz-page-header name="{{ ctrl.physicalFlow.name || ctrl.specification.name }}"
                        small="{{ ctrl.logicalFlow.source.name }} {{ ctrl.logicalFlow ? '&rarr;' : '' }} {{ ctrl.logicalFlow.target.name }}"
-                       icon="qrcode">
+                       icon="{{ctrl.physicalFlow.kind | toIconName:'entity'}}">
         <breadcrumbs>
             <ol class="waltz-breadcrumbs">
                 <li><a ui-sref="main">Home</a></li>
@@ -35,7 +35,7 @@
                     </waltz-entity-link>
                 </li>
                 <li ng-if="!ctrl.logicalFlow">physical Flow</li>
-                <li ng-bind="ctrl.specification.name | truncateMiddle:50"></li>
+                <li ng-bind="(ctrl.physicalFlow.name || ctrl.specification.name) | truncateMiddle:50"></li>
             </ol>
         </breadcrumbs>
     </waltz-page-header>

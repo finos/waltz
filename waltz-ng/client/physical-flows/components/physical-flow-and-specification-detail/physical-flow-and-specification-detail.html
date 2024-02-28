@@ -17,59 +17,30 @@
   -->
 
 <!--SPECIFICATION-->
-<div class="row">
-    <div class="col-md-12">
-        <table class="waltz-field-table small">
-            <colgroup>
-                <col width="30%">
-                <col width="70%">
-            </colgroup>
-            <tbody>
-            <tr>
-                <td class="wft-label">
-                    <span>Specification Name:</span>
-                </td>
-                <td>
-                    <waltz-entity-link entity-ref="{
-                                id: $ctrl.specification.id,
-                                kind:'PHYSICAL_SPECIFICATION',
-                                name: $ctrl.specification.name
-                            }">
-                    </waltz-entity-link>
-                </td>
-            </tr>
-            <tr>
-                <td class="wft-label">
-                    <span>Specification Description:</span>
-                </td>
-                <td>
-                    <span ng-bind="$ctrl.specification.description"></span>
-                </td>
-            </tr>
-            <tr>
-                <td class="wft-label">
-                    <span>Format:</span>
-                </td>
-                <td>
-                    <span ng-bind="$ctrl.specification.format | toDisplayName:'DataFormatKind'"></span>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<hr>
 
 <!-- FLOW -->
-<div class="small">
+<fieldset class="small" style="padding-bottom: 1em">
+
+    <legend style="font-size: medium">
+        Physical Flow
+    </legend>
+
 
     <!-- FREQUENCY -->
     <div class="row">
-        <div class="col-sm-2 waltz-display-field-label">
-            Frequency:
+        <div class="col-sm-3 waltz-display-field-label">
+            Name
         </div>
-        <div class="col-sm-10">
+        <div class="col-sm-9">
+            <span ng-bind="$ctrl.physicalFlow.name"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-3 waltz-display-field-label">
+            Frequency
+        </div>
+        <div class="col-sm-9">
             <span ng-bind="$ctrl.physicalFlow.frequency | toDisplayName:'Frequency'"></span>
         </div>
     </div>
@@ -78,26 +49,26 @@
 
     <!-- BASIS OFFSET -->
     <div class="row">
-        <div class="col-sm-2 waltz-display-field-label">
-            Basis Offset:
+        <div class="col-sm-3 waltz-display-field-label">
+            Basis Offset
         </div>
-        <div class="col-sm-10">
-            <span uib-popover="Offset basis refers to the age of the data. T (or 0) is the same day, +1 is one day old etc."
-                    popover-trigger="mouseenter"
-                    popover-append-to-body="true"
-                    popover-placement="top">
-                <span ng-bind="$ctrl.physicalFlow.basisOffset | toBasisOffset"></span>
-            </span>
+        <div class="col-sm-9">
+        <span uib-popover="Offset basis refers to the age of the data. T (or 0) is the same day, +1 is one day old etc."
+              popover-trigger="mouseenter"
+              popover-append-to-body="true"
+              popover-placement="top">
+            <span ng-bind="$ctrl.physicalFlow.basisOffset | toBasisOffset"></span>
+        </span>
         </div>
     </div>
 
 
     <!-- TAGS -->
     <div class="row">
-        <div class="col-sm-2 waltz-display-field-label">
-            Tags:
+        <div class="col-sm-3 waltz-display-field-label">
+            Tags
         </div>
-        <div class="col-sm-10">
+        <div class="col-sm-9">
             <waltz-tag-list keywords="$ctrl.tags">
                 <empty>
                     <i class="text-muted">
@@ -114,36 +85,24 @@
     </waltz-entity-enum>
 
 
-    <!-- DESC -->
-    <div class="row" ng-if="$ctrl.physicalFlow.description">
-        <div class="col-sm-2 waltz-display-field-label">
-            Description
-        </div>
-        <div class="col-sm-10">
-            <waltz-markdown text="$ctrl.physicalFlow.description">
-            </waltz-markdown>
-        </div>
-    </div>
-
-
     <!-- EXT ID -->
     <div class="row">
-        <div class="col-sm-2 waltz-display-field-label">
+        <div class="col-sm-3 waltz-display-field-label">
             External Identifier
         </div>
-        <div class="col-sm-10">
-            <span ng-bind="$ctrl.physicalFlow.externalId">
-            </span>
+        <div class="col-sm-9">
+        <span ng-bind="$ctrl.physicalFlow.externalId">
+        </span>
         </div>
     </div>
 
 
     <!-- ADDITIONAL EXT IDs -->
     <div class="row">
-        <div class="col-sm-2 waltz-display-field-label">
-            Additional External Id
+        <div class="col-sm-3 waltz-display-field-label">
+            Additional External Ids
         </div>
-        <div class="col-sm-10">
+        <div class="col-sm-9">
             <waltz-external-identifier-editor-table physical-flow="$ctrl.physicalFlow"
                                                     editable=false>
             </waltz-external-identifier-editor-table>
@@ -152,13 +111,64 @@
 
     <!--PROVENANCE-->
     <div class="row">
-        <div class="col-sm-2 waltz-display-field-label">
+        <div class="col-sm-3 waltz-display-field-label">
             Provenance
         </div>
-        <div class="col-sm-10">
-            <span ng-bind="$ctrl.physicalFlow.provenance">
-            </span>
+        <div class="col-sm-9">
+        <span ng-bind="$ctrl.physicalFlow.provenance">
+        </span>
         </div>
     </div>
 
-</div>
+    <!-- DESC -->
+    <div class="row" ng-if="$ctrl.physicalFlow.description">
+        <div class="col-sm-3 waltz-display-field-label">
+            Description
+        </div>
+        <div class="col-sm-9">
+            <div>
+                <waltz-markdown text="$ctrl.physicalFlow.description">
+                </waltz-markdown>
+            </div>
+        </div>
+    </div>
+</fieldset>
+
+<fieldset class="small">
+
+    <legend style="font-size: medium">
+        Physical Specification
+    </legend>
+
+    <div class="row">
+        <div class="col-sm-3 waltz-display-field-label">
+            Name
+        </div>
+        <div class="col-sm-9">
+            <waltz-entity-link entity-ref="{
+                                id: $ctrl.specification.id,
+                                kind:'PHYSICAL_SPECIFICATION',
+                                name: $ctrl.specification.name
+                            }">
+            </waltz-entity-link>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-3 waltz-display-field-label">
+            Format
+        </div>
+        <div class="col-sm-9">
+            <span ng-bind="$ctrl.specification.format | toDisplayName:'DataFormatKind'"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-3 waltz-display-field-label">
+            Description
+        </div>
+        <div class="col-sm-9">
+            <waltz-markdown text="$ctrl.specification.description"></waltz-markdown>
+        </div>
+    </div>
+</fieldset>

@@ -342,7 +342,7 @@ export const entity = {
     PHYSICAL_FLOW: {
         key: "PHYSICAL_FLOW",
         name: "Physical Flow",
-        icon: "qrcode",
+        icon: "arrows-turn-to-dots",
         description: null,
         position: 2200
     },

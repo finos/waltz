@@ -37,6 +37,7 @@ import java.util.Optional;
 @JsonDeserialize(as = ImmutablePhysicalFlow.class)
 public abstract class PhysicalFlow implements
         IdProvider,
+        NameProvider,
         IsRemovedProvider,
         CreatedUserTimestampProvider,
         DescriptionProvider,

@@ -130,7 +130,12 @@ export function mkLinkGridCell(columnHeading,
         cellTemplate: `
             <div class="ui-grid-cell-contents">
                 <a ui-sref="${linkNavViewName} ({ id: row.entity.${linkIdField} })"
+                    ng-if="COL_FIELD"
                    ng-bind="COL_FIELD">
+                </a>
+                <a ui-sref="${linkNavViewName} ({ id: row.entity.${linkIdField} })"
+                    ng-if="!COL_FIELD">
+                    -
                 </a>
             </div>`
     });
