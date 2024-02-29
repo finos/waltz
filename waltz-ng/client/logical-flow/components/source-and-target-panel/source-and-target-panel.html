@@ -201,6 +201,7 @@
                 <thead>
                 <tr>
                     <th>Name</th>
+                    <th>Specification</th>
                     <th>Format</th>
                     <th>Transport</th>
                     <th>Frequency</th>
@@ -210,13 +211,19 @@
                 <tr ng-repeat="pf in $ctrl.selected.physicalFlows">
                     <td>
                         <a ui-sref="main.physical-flow.view ({ id: pf.id })">
-                            <span ng-bind="pf.specification.name"></span>
+                            <span ng-bind="pf.name" ng-if="pf.name"></span>
+                            <span ng-if="!pf.name"><waltz-icon name="arrows-turn-to-dots"></waltz-icon> - </span>
                         </a>
                         &nbsp;
                         <waltz-icon name="hourglass-2"
                                     ng-if="$ctrl.selected.changeUnitsByPhysicalFlowId[pf.id]"
                                     uib-tooltip="Changes planned for this physical flow">
                         </waltz-icon>
+                    </td>
+                    <td>
+                        <a ui-sref="main.physical-specification.view ({ id: pf.specification.id })">
+                            <span ng-bind="pf.specification.name"></span>
+                        </a>
                     </td>
                     <td>
                         <waltz-enum-value type="'DataFormatKind'"

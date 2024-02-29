@@ -23,7 +23,7 @@ showdown.extension("bootstrap-tables", () => {
     return [{
         type: "output",
         regex: /<table>/g,
-        replace: "<table class='table'>",
+        replace: "<table class='table table-condensed table-striped small'>",
     }]
 });
 
