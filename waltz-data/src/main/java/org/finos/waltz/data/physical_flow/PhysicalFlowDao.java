@@ -80,7 +80,7 @@ public class PhysicalFlowDao {
         PhysicalFlowRecord record = r.into(PHYSICAL_FLOW);
         return ImmutablePhysicalFlow.builder()
                 .id(record.getId())
-                .name(Optional.ofNullable(record.getName()).orElse(""))
+                .name(record.getName())
                 .provenance(record.getProvenance())
                 .specificationId(record.getSpecificationId())
                 .basisOffset(record.getBasisOffset())
@@ -197,7 +197,12 @@ public class PhysicalFlowDao {
 
     public List<PhysicalFlow> findByAttributesAndSpecification(PhysicalFlow flow) {
 
+        Condition nameCondition = flow.name() == null
+                ? PHYSICAL_FLOW.NAME.isNull()
+                :PHYSICAL_FLOW.NAME.eq(flow.name());
+
         Condition sameFlow = PHYSICAL_FLOW.SPECIFICATION_ID.eq(flow.specificationId())
+                .and(nameCondition)
                 .and(PHYSICAL_FLOW.BASIS_OFFSET.eq(flow.basisOffset()))
                 .and(PHYSICAL_FLOW.FREQUENCY.eq(flow.frequency().value()))
                 .and(PHYSICAL_FLOW.TRANSPORT.eq(flow.transport().value()))
@@ -302,6 +307,7 @@ public class PhysicalFlowDao {
         PhysicalFlowRecord record = dsl.newRecord(PHYSICAL_FLOW);
         record.setLogicalFlowId(flow.logicalFlowId());
 
+        record.setName(flow.name());
         record.setFrequency(flow.frequency().value());
         record.setTransport(flow.transport().value());
         record.setBasisOffset(flow.basisOffset());

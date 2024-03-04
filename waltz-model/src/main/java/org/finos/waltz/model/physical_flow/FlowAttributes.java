@@ -20,9 +20,9 @@ package org.finos.waltz.model.physical_flow;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.finos.waltz.model.Criticality;
 import org.finos.waltz.model.DescriptionProvider;
 import org.finos.waltz.model.ExternalIdProvider;
+import org.finos.waltz.model.Nullable;
 import org.immutables.value.Value;
 
 @Value.Immutable
@@ -30,6 +30,8 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutableFlowAttributes.class)
 public abstract class FlowAttributes implements DescriptionProvider, ExternalIdProvider {
 
+    @Nullable
+    public abstract String name();
     public abstract TransportKindValue transport();
 
     public abstract FrequencyKindValue frequency();

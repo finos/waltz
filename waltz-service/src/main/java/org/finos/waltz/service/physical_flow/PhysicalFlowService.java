@@ -233,6 +233,7 @@ public class PhysicalFlowService {
 
         ImmutablePhysicalFlow.Builder flowBuilder = ImmutablePhysicalFlow.builder()
                 .specificationId(specId)
+                .name(command.flowAttributes().name())
                 .basisOffset(command.flowAttributes().basisOffset())
                 .frequency(command.flowAttributes().frequency())
                 .transport(command.flowAttributes().transport())
