@@ -35,6 +35,7 @@
 
         } else {
             workingCopy = {
+                name: null,
                 transport: null,
                 frequency: null,
                 criticality: null,
@@ -54,6 +55,7 @@
         $physicalFlow = Object.assign(
             {},
             {
+                name: workingCopy.name,
                 transport: workingCopy.transport,
                 frequency: workingCopy.frequency,
                 basisOffset,
@@ -106,6 +108,8 @@
                 <div>Selected Characteristics:</div>
                 <ul>
                     <li>
+                        Name: <span class:text-muted={!$physicalFlow.name}>{$physicalFlow.name || "Not provided"}</span></li>
+                    <li>
                         Transport: {toTransportKindName($nestedEnums, $physicalFlow.transport)}</li>
                     <li>
                         Frequency: {toFrequencyKindName($nestedEnums, $physicalFlow.frequency)}</li>
@@ -136,6 +140,18 @@
         {:else}
             <form autocomplete="off"
                   on:submit|preventDefault={save}>
+
+                <div class="form-group">
+                    <label for="name">
+                        Name
+                    </label>
+                    <input class="form-control"
+                           id="name"
+                           bind:value={workingCopy.name}/>
+                </div>
+                <div class="help-block">
+                    Name to describe this physical flow.
+                </div>
 
                 <EnumSelect options={transportKinds}
                             bind:value={workingCopy.transport}

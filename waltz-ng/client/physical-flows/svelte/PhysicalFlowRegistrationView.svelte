@@ -67,6 +67,7 @@
         }
 
         const flowAttributes = {
+            name: $physicalFlow.name,
             transport: $physicalFlow.transport,
             frequency: $physicalFlow.frequency,
             basisOffset: $physicalFlow.basisOffset,
