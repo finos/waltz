@@ -31,7 +31,7 @@
 
     <groupId>org.finos</groupId>
     <artifactId>waltz</artifactId>
-    <version>1.58.1-SNAPSHOT</version>
+    <version>1.58.2-SNAPSHOT</version>
     <modules>
         <module>waltz-common</module>
         <module>waltz-model</module>
