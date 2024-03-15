@@ -1,0 +1,83 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="db.changelog-1.59.xml">
+    <changeSet id="v1-59-tag"
+               author="woodjes">
+        <tagDatabase tag="v1.58"/> <!-- tag the current db version, i.e. the last  -->
+    </changeSet>
+
+    <changeSet id="20240315-7032-1"
+               author="woodjes">
+        <comment>7032: add direction to flow_classification table</comment>
+        <addColumn tableName="flow_classification">
+            <column name="direction"
+                    type="${enum.type}"
+                    defaultValue="INBOUND">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20240315-7032-2"
+               author="woodjes">
+        <comment>7032: add default message to flow_classification table</comment>
+        <addColumn tableName="flow_classification">
+            <column name="default_message"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="flow_classification">
+            <column name="message_severity"
+                    type="${enum.type}"
+                    defaultValue="INFORMATION">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20240315-7032-3"
+               author="woodjes">
+        <comment>7032: add default message to flow_classification_rule</comment>
+        <addColumn tableName="flow_classification_rule">
+            <column name="message"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="flow_classification_rule">
+            <column name="message_severity"
+                    type="${enum.type}"
+                    defaultValue="INFORMATION">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20240315-7032-4"
+               author="woodjes">
+        <comment>7032: make data_type_id on flow_classification_rule nullable</comment>
+        <dropNotNullConstraint columnDataType="${id.type}"
+                               columnName="data_type_id"
+                               tableName="flow_classification_rule"/>
+    </changeSet>
+
+</databaseChangeLog>
