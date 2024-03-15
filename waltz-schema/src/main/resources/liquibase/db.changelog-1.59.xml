@@ -30,7 +30,7 @@
         <addColumn tableName="flow_classification">
             <column name="direction"
                     type="${enum.type}"
-                    defaultValue="INBOUND">
+                    defaultValue="OUTBOUND">
                 <constraints nullable="false"/>
             </column>
         </addColumn>
@@ -67,7 +67,7 @@
             <column name="message_severity"
                     type="${enum.type}"
                     defaultValue="INFORMATION">
-                <constraints nullable="true"/>
+                <constraints nullable="false"/>
             </column>
         </addColumn>
     </changeSet>
@@ -78,6 +78,26 @@
         <dropNotNullConstraint columnDataType="${id.type}"
                                columnName="data_type_id"
                                tableName="flow_classification_rule"/>
+    </changeSet>
+
+    <changeSet id="20240315-7032-5"
+               author="woodjes">
+        <setColumnRemarks tableName="flow_classification"
+                          columnName="default_message"
+                          remarks="optional message, if provided this will be shown to users against flows labelled with this classification. Can be overrider per rule."/>
+        <setColumnRemarks tableName="flow_classification"
+                          columnName="message_severity"
+                          remarks="Severity for styling the display of the message shown against flows. Can be overriden by the rule"/>
+    </changeSet>
+
+    <changeSet id="20240315-7032-7"
+               author="woodjes">
+        <setColumnRemarks tableName="flow_classification_rule"
+                          columnName="message"
+                          remarks="optional message, if provided this will be shown to users against flows which have ratings determined by this rule"/>
+        <setColumnRemarks tableName="flow_classification"
+                          columnName="message_severity"
+                          remarks="Severity for styling the display of the message shown against flows which have ratings determined by this rule"/>
     </changeSet>
 
 </databaseChangeLog>
