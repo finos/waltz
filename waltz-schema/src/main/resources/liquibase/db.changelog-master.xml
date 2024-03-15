@@ -204,4 +204,7 @@
     <include file="db.changelog-1.58.xml"
                 relativeToChangelogFile="true"/>
 
+    <include file="db.changelog-1.59.xml"
+                relativeToChangelogFile="true"/>
+
 </databaseChangeLog>
