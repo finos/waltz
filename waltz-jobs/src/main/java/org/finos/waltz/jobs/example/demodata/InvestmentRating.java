@@ -1,4 +1,4 @@
-package org.finos.waltz.jobs.example;
+package org.finos.waltz.jobs.example.demodata;
 
 public enum InvestmentRating {
         INVEST("Invest", "I", "green"),
@@ -17,4 +17,9 @@ public enum InvestmentRating {
             this.code = code;
             this.color = color;
         }
+
+
+    public String code() {
+        return code;
     }
+}
