@@ -143,6 +143,8 @@
         border-bottom: 1px solid #ddd;
         background-color: #fafafa;
         background: linear-gradient(90deg, #fafafa 0%, rgba(255,255,255,1) 100%);
+        padding-top: 0.5em;
+        padding-bottom: 0.3em;
     }
 
     .sub-question-label {
