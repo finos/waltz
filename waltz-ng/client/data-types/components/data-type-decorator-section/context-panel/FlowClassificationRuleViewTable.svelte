@@ -41,7 +41,11 @@
     <tr>
         <td>Data Type</td>
         <td>
-            <EntityLink ref={dataType}/>
+            {#if dataType}
+                <EntityLink ref={dataType}/>
+            {:else}
+                -
+            {/if}
         </td>
     </tr>
     <tr>

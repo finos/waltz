@@ -40,6 +40,8 @@ import org.finos.waltz.schema.tables.ComplexityKind;
 import org.finos.waltz.schema.tables.CostKind;
 import org.finos.waltz.schema.tables.DataType;
 import org.finos.waltz.schema.tables.EntityStatisticDefinition;
+import org.finos.waltz.schema.tables.FlowClassification;
+import org.finos.waltz.schema.tables.FlowClassificationRule;
 import org.finos.waltz.schema.tables.InvolvementKind;
 import org.finos.waltz.schema.tables.Measurable;
 import org.finos.waltz.schema.tables.MeasurableCategory;
@@ -537,6 +539,30 @@ public class JooqUtilities {
                         .nameField(esd.NAME)
                         .descriptionField(esd.DESCRIPTION)
                         .externalIdField(esd.EXTERNAL_ID)
+                        .build();
+            case FLOW_CLASSIFICATION_RULE:
+                    FlowClassificationRule fcr = alias == null ? Tables.FLOW_CLASSIFICATION_RULE : Tables.FLOW_CLASSIFICATION_RULE.as(alias);
+                    return ImmutableCommonTableFields
+                        .builder()
+                        .entityKind(EntityKind.FLOW_CLASSIFICATION_RULE)
+                        .table(fcr)
+                        .idField(fcr.ID)
+                        .parentIdField(null)
+                        .nameField(null)
+                        .descriptionField(null)
+                        .externalIdField(null)
+                        .build();
+            case FLOW_CLASSIFICATION:
+                    FlowClassification fc = alias == null ? Tables.FLOW_CLASSIFICATION : Tables.FLOW_CLASSIFICATION.as(alias);
+                    return ImmutableCommonTableFields
+                        .builder()
+                        .entityKind(EntityKind.FLOW_CLASSIFICATION)
+                        .table(fc)
+                        .idField(fc.ID)
+                        .parentIdField(null)
+                        .nameField(fc.NAME)
+                        .descriptionField(fc.DESCRIPTION)
+                        .externalIdField(fc.CODE)
                         .build();
             case INVOLVEMENT_KIND:
                 InvolvementKind ik = alias == null ? Tables.INVOLVEMENT_KIND : Tables.INVOLVEMENT_KIND.as(alias);

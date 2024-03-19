@@ -18,6 +18,8 @@
 
 package org.finos.waltz.data.flow_classification_rule;
 
+import org.finos.waltz.model.FlowDirection;
+import org.finos.waltz.model.Severity;
 import org.finos.waltz.schema.tables.records.FlowClassificationRecord;
 import org.finos.waltz.model.flow_classification.FlowClassification;
 import org.finos.waltz.model.flow_classification.ImmutableFlowClassification;
@@ -49,6 +51,9 @@ public class FlowClassificationDao {
                 .position(record.getPosition())
                 .isCustom(record.getIsCustom())
                 .userSelectable(record.getUserSelectable())
+                .direction(FlowDirection.valueOf(record.getDirection()))
+                .defaultMessage(record.getDefaultMessage())
+                .messageSeverity(Severity.valueOf(record.getMessageSeverity()))
                 .build();
     };
 

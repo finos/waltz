@@ -42,6 +42,7 @@ public abstract class FlowClassificationRule implements
 
     public abstract EntityReference vantagePointReference();
 
+    @Nullable
     public abstract Long dataTypeId();
 
     public abstract Long classificationId();
@@ -59,6 +60,14 @@ public abstract class FlowClassificationRule implements
     @Value.Default
     public boolean isReadonly() {
         return false;
+    }
+
+    @Nullable
+    public abstract String message();
+
+    @Value.Default
+    public Severity messageSeverity() {
+        return Severity.INFORMATION;
     }
 
 

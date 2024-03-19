@@ -16,6 +16,7 @@
     import {dynamicSections} from "../../../dynamic-section/dynamic-section-definitions";
     import Markdown from "../../../common/svelte/Markdown.svelte";
     import {primaryEntityReference} from "../../../assessments/components/rating-editor/rating-store";
+    import {flowDirection} from "../../../common/services/enums/flow-direction";
 
     export let primaryEntityRef;
 
@@ -27,8 +28,8 @@
 
     let datatypes = [];
     let datatypesById = {};
-    let datatype = null;
-    let datatypeName = null;
+    let dataType = null;
+    let dataTypeName = null;
     let rating = null;
 
     let datatypesCall = null;
@@ -46,8 +47,8 @@
     $: datatypes = $datatypesCall?.data || [];
 
     $: classificationsById = _.keyBy(classifications, d => d.id);
-    $: datatype = _.find(datatypes, dt => dt.id === classificationRule?.dataTypeId);
-    $: datatypeName = _.get(datatype, ["name"], "Unknown");
+    $: dataType = _.find(datatypes, dt => dt.id === classificationRule?.dataTypeId);
+    $: dataTypeName = _.get(dataType, ["name"], "Unknown");
     $: rating = _.get(classificationsById, [classificationRule?.classificationId], unknownRating);
 
     $: $primaryEntityReference = primaryEntityRef;
@@ -57,7 +58,7 @@
 {#if classificationRule}
     <PageHeader icon="shield"
                 name={`Flow Classification Rule: ${classificationRule?.subjectReference?.name}`}
-                small={datatypeName}>
+                small={dataTypeName}>
         <div slot="breadcrumbs">
             <ol class="waltz-breadcrumbs">
                 <li><ViewLink state="main">Home</ViewLink></li>
@@ -65,7 +66,13 @@
                 <li>
                     <EntityLink ref={classificationRule?.subjectReference}/>
                 </li>
-                <li><EntityLink ref={datatype}/></li>
+                <li>
+                    {#if dataType}
+                        <EntityLink ref={dataType}/>
+                    {:else}
+                        -
+                    {/if}
+                </li>
             </ol>
         </div>
     </PageHeader>
@@ -89,13 +96,23 @@
                         </div>
                     </div>
 
-
                     <div class="row">
                         <div class="col-sm-4 waltz-display-field-label">
                             Rating Description:
                         </div>
                         <div class="col-sm-8">
                             {rating?.description || "-"}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-4 waltz-display-field-label">
+                            Direction:
+                        </div>
+                        <div class="col-sm-8">
+                            <span>
+                                {_.get(flowDirection, [rating?.direction, "name"], "Unknown")}
+                            </span>
                         </div>
                     </div>
 
@@ -113,7 +130,11 @@
                             Datatype:
                         </div>
                         <div class="col-sm-8">
-                            <EntityLink ref={datatype}/>
+                            {#if dataType}
+                                <EntityLink ref={dataType}/>
+                            {:else}
+                                -
+                            {/if}
                         </div>
                     </div>
 
@@ -122,7 +143,7 @@
                             Datatype Description:
                         </div>
                         <div class="col-sm-8">
-                            {datatype?.description || "-"}
+                            {dataType?.description || "-"}
                         </div>
                     </div>
 
