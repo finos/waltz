@@ -18,6 +18,18 @@ public abstract class FlowClassification implements IdProvider, NameProvider, De
     public abstract boolean userSelectable();
 
     @Value.Default
+    public FlowDirection direction() {
+        return FlowDirection.INBOUND;
+    }
+
+    @Nullable
+    public abstract String defaultMessage();
+
+    @Value.Default
+    public Severity messageSeverity() {
+        return Severity.INFORMATION;
+    }
+    @Value.Default
     public EntityKind kind() {
         return EntityKind.FLOW_CLASSIFICATION_RULE;
     }

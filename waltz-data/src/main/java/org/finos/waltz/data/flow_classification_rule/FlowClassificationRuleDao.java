@@ -22,6 +22,7 @@ import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.ImmutableEntityReference;
+import org.finos.waltz.model.Severity;
 import org.finos.waltz.model.flow_classification_rule.DiscouragedSource;
 import org.finos.waltz.model.flow_classification_rule.FlowClassificationRule;
 import org.finos.waltz.model.flow_classification_rule.FlowClassificationRuleCreateCommand;
@@ -160,6 +161,8 @@ public class FlowClassificationRuleDao {
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .externalId(Optional.ofNullable(record.getExternalId()))
                 .isReadonly(record.getIsReadonly())
+                .message(record.getMessage())
+                .messageSeverity(Severity.valueOf(record.getMessageSeverity()))
                 .build();
     };
 
