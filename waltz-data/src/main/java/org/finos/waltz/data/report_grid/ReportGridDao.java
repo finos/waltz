@@ -2284,18 +2284,18 @@ public class ReportGridDao {
         if (isEmpty(cols)) {
             return emptySet();
         } else {
-            Map<Long, Long> statisticDefinitionIdToColIdMap = indexBy(
+            Map<Long, ReportGridFixedColumnDefinition> statisticDefinitionIdToColMap = indexBy(
                     cols,
-                    ReportGridFixedColumnDefinition::columnEntityId,
-                    ReportGridFixedColumnDefinition::gridColumnId);
+                    ReportGridFixedColumnDefinition::columnEntityId);
 
             return dsl
                     .select(esv.ENTITY_ID,
                             esv.STATISTIC_ID,
                             esv.OUTCOME,
+                            esv.VALUE,
                             esv.REASON)
                     .from(esv)
-                    .where(esv.STATISTIC_ID.in(statisticDefinitionIdToColIdMap.keySet())
+                    .where(esv.STATISTIC_ID.in(statisticDefinitionIdToColMap.keySet())
                             .and(esv.CURRENT.eq(true))
                             .and(esv.ENTITY_KIND.eq(selector.kind().name()))
                             .and(esv.ENTITY_ID.in(selector.selector())))
@@ -2303,31 +2303,43 @@ public class ReportGridDao {
                     .fetchGroups(
                             r -> tuple(
                                     r.get(esv.ENTITY_ID),
-                                    statisticDefinitionIdToColIdMap.get(r.get(esv.STATISTIC_ID))),
+                                    statisticDefinitionIdToColMap.get(r.get(esv.STATISTIC_ID))),
                             r -> tuple(
                                     r.get(esv.OUTCOME),
+                                    r.get(esv.VALUE),
                                     r.get(esv.REASON)))
                     .entrySet()
                     .stream()
                     .map(kv -> {
+                        Tuple2<Long, ReportGridFixedColumnDefinition> cellKey = kv.getKey();
+                        List<Tuple3<String, String, String>> cellValues = kv.getValue();
 
-                        String outcomeString = kv.getValue()
+                        String outcomeString = cellValues
                                 .stream()
-                                .map(t -> t.v1)
-                                .sorted(comparing(StringUtilities::lower))
+                                .sorted(comparing(t -> StringUtilities.lower(t.v1)))
+                                .map(t -> {
+                                    AdditionalColumnOptions opts = cellKey.v2.additionalColumnOptions();
+                                    if (opts == AdditionalColumnOptions.VALUES_ONLY) {
+                                        return t.v2;
+                                    } else if (opts == AdditionalColumnOptions.VALUES_AND_OUTCOMES) {
+                                        return String.format("%s = %s", t.v1, t.v2);
+                                    } else {
+                                        return t.v1;
+                                    }
+                                })
                                 .collect(joining("; "));
 
-                        List<Tuple2<String, String>> rowsInComment = CollectionUtilities.sort(
-                                kv.getValue(),
+                        List<Tuple3<String, String, String>> rowsInComment = CollectionUtilities.sort(
+                                cellValues,
                                 comparing(t -> lower(safeTrim(t.v1))));
 
                         return ImmutableReportGridCell
                                 .builder()
-                                .subjectId(kv.getKey().v1)
-                                .columnDefinitionId(kv.getKey().v2)
+                                .subjectId(cellKey.v1)
+                                .columnDefinitionId(cellKey.v2.gridColumnId())
                                 .textValue(outcomeString)
                                 .comment(toHtmlTable(
-                                        asList("Outcome", "Reason"),
+                                        asList("Outcome", "Value", "Reason"),
                                         rowsInComment))
                                 .build();
                     })
