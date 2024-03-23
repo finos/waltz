@@ -21,7 +21,9 @@ package org.finos.waltz.service.licence;
 
 import org.finos.waltz.data.licence.LicenceDao;
 import org.finos.waltz.data.licence.LicenceIdSelectorFactory;
+import org.finos.waltz.data.licence.search.LicenceSearchDao;
 import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.finos.waltz.model.licence.Licence;
 import org.finos.waltz.model.licence.SaveLicenceCommand;
 import org.finos.waltz.model.tally.Tally;
@@ -30,6 +32,7 @@ import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -38,13 +41,17 @@ import static org.finos.waltz.common.Checks.checkNotNull;
 public class LicenceService {
 
     private final LicenceDao licenceDao;
+    private final LicenceSearchDao licenceSearchDao;
     private final LicenceIdSelectorFactory licenceIdSelectorFactory = new LicenceIdSelectorFactory();
 
 
     @Autowired
-    public LicenceService(LicenceDao licenceDao) {
+    public LicenceService(LicenceDao licenceDao,
+                          LicenceSearchDao licenceSearchDao) {
         checkNotNull(licenceDao, "licenceDao cannot be null");
+        checkNotNull(licenceSearchDao, "licenceSearchDao cannot be null");
         this.licenceDao = licenceDao;
+        this.licenceSearchDao = licenceSearchDao;
     }
 
 
@@ -80,5 +87,9 @@ public class LicenceService {
 
     public boolean remove(long licenceId, String username) {
         return licenceDao.remove(licenceId);
+    }
+
+    public Collection<Licence> search(EntitySearchOptions options) {
+        return licenceSearchDao.search(options);
     }
 }

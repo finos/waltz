@@ -26,6 +26,7 @@ import org.finos.waltz.service.data_type.DataTypeService;
 import org.finos.waltz.service.database_information.DatabaseInformationService;
 import org.finos.waltz.service.flow_diagram.FlowDiagramService;
 import org.finos.waltz.service.legal_entity.LegalEntityService;
+import org.finos.waltz.service.licence.LicenceService;
 import org.finos.waltz.service.logical_data_element.LogicalDataElementService;
 import org.finos.waltz.service.measurable.MeasurableService;
 import org.finos.waltz.service.orgunit.OrganisationalUnitService;
@@ -74,6 +75,7 @@ public class EntitySearchService {
     private final FlowDiagramService flowDiagramService;
     private final LegalEntityService legalEntityService;
     private final DatabaseInformationService databaseInformationService;
+    private final LicenceService licenceService;
 
 
     @Autowired
@@ -93,7 +95,8 @@ public class EntitySearchService {
                                SoftwareCatalogService softwareCatalogService,
                                FlowDiagramService flowDiagramService,
                                LegalEntityService legalEntityService,
-                               DatabaseInformationService databaseInformationService) {
+                               DatabaseInformationService databaseInformationService,
+                               LicenceService licenceService) {
 
         checkNotNull(dbExecutorPool, "dbExecutorPool cannot be null");
         checkNotNull(actorService, "actorService cannot be null");
@@ -112,6 +115,7 @@ public class EntitySearchService {
         checkNotNull(softwareCatalogService, "softwareCatalogService cannot be null");
         checkNotNull(legalEntityService, "legalEntityService cannot be null");
         checkNotNull(databaseInformationService, "databaseInformationService cannot be null");
+        checkNotNull(licenceService, "licenceService cannot be null");
 
         this.actorService = actorService;
         this.dbExecutorPool = dbExecutorPool;
@@ -130,6 +134,7 @@ public class EntitySearchService {
         this.softwareCatalogService = softwareCatalogService;
         this.legalEntityService = legalEntityService;
         this.databaseInformationService = databaseInformationService;
+        this.licenceService = licenceService;
     }
 
 
@@ -174,6 +179,8 @@ public class EntitySearchService {
                 return () -> flowDiagramService.search(options);
             case LEGAL_ENTITY:
                 return () -> legalEntityService.search(options);
+            case LICENCE:
+                return () -> licenceService.search(options);
             case LOGICAL_DATA_ELEMENT:
                 return () -> logicalDataElementService.search(options);
             case MEASURABLE:

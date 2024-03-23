@@ -195,11 +195,23 @@ public class ListUtilities {
         }
     }
 
+
     /**
      * Given a list, index and default value returns the element at that index or the default value if the index is out of bounds.
      */
     public static <T> T getOrDefault(List<T> xs, int idx, T defaultValue) {
         return maybeGet(xs, idx)
                 .orElse(defaultValue);
+    }
+
+
+    /**
+     * Returns a list of distinct values from a given list
+     * @param ts  a list of T's with possible duplicates
+     * @return  distinct values in <code>ts</code>
+     * @param <T>
+     */
+    public static <T> List<T> distinct(List<T> ts) {
+        return ts.stream().distinct().collect(toList());
     }
 }
