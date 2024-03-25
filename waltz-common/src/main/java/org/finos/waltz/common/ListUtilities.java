@@ -24,6 +24,7 @@ import org.jooq.lambda.tuple.Tuple2;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -202,4 +203,15 @@ public class ListUtilities {
         return maybeGet(xs, idx)
                 .orElse(defaultValue);
     }
+
+
+    public static <X> List<X> take(Collection<X> xs,
+                                   int amount) {
+        return ListUtilities
+                .ensureNotNull(xs)
+                .stream()
+                .limit(amount)
+                .collect(Collectors.toList());
+    }
+
 }
