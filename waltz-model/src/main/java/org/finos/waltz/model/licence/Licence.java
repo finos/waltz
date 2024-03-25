@@ -34,5 +34,16 @@ public abstract class Licence implements
         ExternalIdProvider,
         CreatedUserTimestampProvider,
         LastUpdatedUserTimestampProvider,
-        ProvenanceProvider {
+        ProvenanceProvider,
+        WaltzEntity {
+
+    @Override
+    public EntityReference entityReference() {
+        return EntityReference.mkRef(
+                EntityKind.LICENCE,
+                id().get(),
+                name(),
+                description(),
+                externalId().orElse(""));
+    }
 }
