@@ -100,4 +100,27 @@
                           remarks="Severity for styling the display of the message shown against flows which have ratings determined by this rule"/>
     </changeSet>
 
+    <changeSet id="20240320-7032-1"
+               author="davidwatkins73">
+        <comment>7032: adding inbound_flow_classification_rule_id column to logical flow decorator</comment>
+        <addColumn tableName="logical_flow_decorator">
+            <column name="inbound_flow_classification_rule_id"
+                    type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <!-- adding an fk with an onDelete=set null  cascade caused a problem -->
+
+    <changeSet id="20240320-7032-3"
+               author="davidwatkins73">
+        <setColumnRemarks tableName="logical_flow_decorator"
+                          columnName="flow_classification_rule_id"
+                          remarks="optional link to an outbound flow classification rule for this flow decorator"/>
+        <setColumnRemarks tableName="logical_flow_decorator"
+                          columnName="inbound_flow_classification_rule_id"
+                          remarks="optional link to an inbound flow classification rule for this flow decorator"/>
+    </changeSet>
+
 </databaseChangeLog>
