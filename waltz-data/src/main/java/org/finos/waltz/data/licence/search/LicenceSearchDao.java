@@ -2,19 +2,15 @@ package org.finos.waltz.data.licence.search;
 
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.data.SearchDao;
-import org.finos.waltz.data.legal_entity.LegalEntityDao;
 import org.finos.waltz.data.licence.LicenceDao;
 import org.finos.waltz.model.entity_search.EntitySearchOptions;
-import org.finos.waltz.model.legal_entity.LegalEntity;
 import org.finos.waltz.model.licence.Licence;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeSet;
 
 import static java.util.Collections.emptyList;
 import static org.finos.waltz.common.ListUtilities.concat;
@@ -23,7 +19,7 @@ import static org.finos.waltz.data.JooqUtilities.mkStartsWithTermSearch;
 import static org.finos.waltz.data.SearchUtilities.mkTerms;
 import static org.finos.waltz.schema.Tables.LICENCE;
 
-@Service
+@Repository
 public class LicenceSearchDao implements SearchDao<Licence> {
 
     private final DSLContext dsl;
