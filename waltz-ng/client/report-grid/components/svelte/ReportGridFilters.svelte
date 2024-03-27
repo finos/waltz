@@ -199,12 +199,12 @@
                                 class="clickable waltz-visibility-parent"
                                 class:isActiveFilter={isActive($activeSummaries, summary)}>
                                 <td>
-                                <span class="waltz-visibility-child-30">
-                                    <Icon name={isActive($activeSummaries, summary) ? 'check' : 'arrow-left'}/>
-                                </span>
+                                    <span class="waltz-visibility-child-30">
+                                        <Icon name={isActive($activeSummaries, summary) ? 'check' : 'arrow-left'}/>
+                                    </span>
                                     <span class="column-name">
-                                {getDisplayNameForColumn(summary.column)}
-                            </span>
+                                        {getDisplayNameForColumn(summary.column)}
+                                    </span>
                                     <ul style="display: inline-block"
                                         class="list-inline column-values-summary">
                                         {#each summary.optionSummaries as option}

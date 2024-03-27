@@ -95,7 +95,7 @@ public class FlowClassificationCalculator {
                 vantageRef);
 
         IdSelectionOptions selectorOptions = mkOpts(vantageRef);
-        Select<Record1<Long>> selector = appIdSelectorFactory.apply(selectorOptions);
+        Select<Record1<Long>> appSelector = appIdSelectorFactory.apply(selectorOptions);
         Set<Long> dataTypeDescendents = entityHierarchyDao
                 .findDesendents(dataType.entityReference())
                 .stream()
@@ -103,7 +103,7 @@ public class FlowClassificationCalculator {
                 .collect(Collectors.toSet());
 
         Collection<DataTypeDecorator> impactedDecorators = logicalFlowDecoratorDao
-                .findByEntityIdSelector(selector, Optional.of(EntityKind.APPLICATION))
+                .findByEntityIdSelector(appSelector, Optional.of(EntityKind.APPLICATION))
                 .stream()
                 .filter(decorator -> dataTypeDescendents.contains(decorator.decoratorEntity().id()))
                 .collect(toList());

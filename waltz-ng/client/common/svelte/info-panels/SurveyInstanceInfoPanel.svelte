@@ -82,6 +82,10 @@
                 <td width="50%">{survey.surveyRun?.name}</td>
             </tr>
             <tr>
+                <td width="50%">Survey Contact</td>
+                <td width="50%">{survey.surveyRun?.contactEmail}</td>
+            </tr>
+            <tr>
                 <td width="50%">Subject</td>
                 <td width="50%">
                     <EntityLink ref={survey.surveyInstance?.surveyEntity}/>

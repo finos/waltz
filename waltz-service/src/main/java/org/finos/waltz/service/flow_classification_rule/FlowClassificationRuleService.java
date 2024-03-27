@@ -155,7 +155,7 @@ public class FlowClassificationRuleService {
         }
 
         logInsert(classificationRuleId, command, username);
-        flowClassificationRuleDao.updatePointToPointFlowClassificationRules();
+        flowClassificationRuleDao.updatePointToPointFlowClassificationRules(FlowDirection.OUTBOUND);
 
         return classificationRuleId;
     }
@@ -208,7 +208,7 @@ public class FlowClassificationRuleService {
 
         //finds all the vantage points to apply using parent as selector
         List<FlowClassificationRuleVantagePoint> flowClassificationRuleVantagePoints = flowClassificationRuleDao
-                .findFlowClassificationRuleVantagePoints();
+                .findFlowClassificationRuleVantagePoints(FlowDirection.OUTBOUND);
 
         int updatedRuleDecorators = flowClassificationRuleVantagePoints
                 .stream()
@@ -216,7 +216,7 @@ public class FlowClassificationRuleService {
                 .sum();
 
         //overrides rating for point to point flows (must run after the above)
-        int updatedPointToPointDecorators = flowClassificationRuleDao.updatePointToPointFlowClassificationRules();
+        int updatedPointToPointDecorators = flowClassificationRuleDao.updatePointToPointFlowClassificationRules(FlowDirection.OUTBOUND);
 
         LOG.info(
                 "Updated decorators for: {} for general rules and {} point-to-point flows",

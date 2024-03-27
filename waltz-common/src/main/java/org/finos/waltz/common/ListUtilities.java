@@ -24,6 +24,7 @@ import org.jooq.lambda.tuple.Tuple2;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -195,11 +196,34 @@ public class ListUtilities {
         }
     }
 
+
     /**
      * Given a list, index and default value returns the element at that index or the default value if the index is out of bounds.
      */
     public static <T> T getOrDefault(List<T> xs, int idx, T defaultValue) {
         return maybeGet(xs, idx)
                 .orElse(defaultValue);
+    }
+
+
+    public static <X> List<X> take(Collection<X> xs,
+                                   int amount) {
+        return ListUtilities
+                .ensureNotNull(xs)
+                .stream()
+                .limit(amount)
+                .collect(Collectors.toList());
+    }
+
+
+
+    /**
+     * Returns a list of distinct values from a given list
+     * @param ts  a list of T's with possible duplicates
+     * @return  distinct values in <code>ts</code>
+     * @param <T>
+     */
+    public static <T> List<T> distinct(List<T> ts) {
+        return ts.stream().distinct().collect(toList());
     }
 }

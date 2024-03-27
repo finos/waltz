@@ -21,6 +21,7 @@ package org.finos.waltz.data.flow_classification_rule;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.FlowDirection;
 import org.finos.waltz.model.ImmutableEntityReference;
 import org.finos.waltz.model.Severity;
 import org.finos.waltz.model.flow_classification_rule.DiscouragedSource;
@@ -372,7 +373,12 @@ public class FlowClassificationRuleDao {
     }
 
 
-    public List<FlowClassificationRuleVantagePoint> findFlowClassificationRuleVantagePoints() {
+    public List<FlowClassificationRuleVantagePoint> findFlowClassificationRuleVantagePoints(FlowDirection direction) {
+        return findFlowClassificationRuleVantagePoints(FLOW_CLASSIFICATION.DIRECTION.eq(direction.name()));
+    }
+
+
+    private List<FlowClassificationRuleVantagePoint> findFlowClassificationRuleVantagePoints(Condition condition) {
         SelectSeekStep4<Record8<Long, Integer, Long, Integer, Long, String, String, Long>, Integer, Integer, Long, Long> select = dsl
                 .select(targetOrgUnitId,
                         declaredOrgUnitLevel,
@@ -394,6 +400,7 @@ public class FlowClassificationRuleDao {
                         .and(ehDataType.KIND.eq(EntityKind.DATA_TYPE.name()))
                         .and(ehDataType.ID.eq(ehDataType.ANCESTOR_ID)))
                 .innerJoin(FLOW_CLASSIFICATION).on(FLOW_CLASSIFICATION_RULE.FLOW_CLASSIFICATION_ID.eq(FLOW_CLASSIFICATION.ID))
+                .where(condition)
                 .orderBy(
                         ehOrgUnit.LEVEL.desc(),
                         ehDataType.LEVEL.desc(),
@@ -533,7 +540,7 @@ public class FlowClassificationRuleDao {
     }
 
 
-    public int updatePointToPointFlowClassificationRules() {
+    public int updatePointToPointFlowClassificationRules(FlowDirection direction) {
 
         Condition logicalFlowTargetIsAuthSourceParent = FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID.eq(LOGICAL_FLOW.SOURCE_ENTITY_ID)
                 .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_KIND)
@@ -558,7 +565,7 @@ public class FlowClassificationRuleDao {
                         .and(level.ID.eq(level.ANCESTOR_ID)
                         .and(level.KIND.eq(EntityKind.DATA_TYPE.name()))))
                 .innerJoin(FLOW_CLASSIFICATION).on(FLOW_CLASSIFICATION_RULE.FLOW_CLASSIFICATION_ID.eq(FLOW_CLASSIFICATION.ID))
-                .where(FLOW_CLASSIFICATION.CODE.ne(LOGICAL_FLOW_DECORATOR.RATING))
+                .where(FLOW_CLASSIFICATION.CODE.ne(LOGICAL_FLOW_DECORATOR.RATING).and(FLOW_CLASSIFICATION.DIRECTION.eq(direction.name())))
                 .orderBy(level.LEVEL)
                 .fetch()
                 .stream()
