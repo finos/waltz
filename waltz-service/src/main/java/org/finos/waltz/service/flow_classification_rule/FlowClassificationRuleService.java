@@ -18,10 +18,7 @@
 
 package org.finos.waltz.service.flow_classification_rule;
 
-import org.finos.waltz.model.logical_flow.FlowClassificationRulesView;
-import org.finos.waltz.model.logical_flow.ImmutableFlowClassificationRulesView;
-import org.finos.waltz.schema.Tables;
-import org.finos.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.exception.NotFoundException;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
@@ -34,17 +31,34 @@ import org.finos.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
 import org.finos.waltz.data.flow_classification_rule.FlowClassificationDao;
 import org.finos.waltz.data.flow_classification_rule.FlowClassificationRuleDao;
 import org.finos.waltz.data.orgunit.OrganisationalUnitDao;
-import org.finos.waltz.model.*;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.FlowDirection;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.Severity;
 import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.datatype.DataType;
+import org.finos.waltz.model.datatype.FlowDataType;
 import org.finos.waltz.model.flow_classification.FlowClassification;
-import org.finos.waltz.model.flow_classification_rule.*;
-import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
+import org.finos.waltz.model.flow_classification_rule.DiscouragedSource;
+import org.finos.waltz.model.flow_classification_rule.FlowClassificationRule;
+import org.finos.waltz.model.flow_classification_rule.FlowClassificationRuleCreateCommand;
+import org.finos.waltz.model.flow_classification_rule.FlowClassificationRuleUpdateCommand;
+import org.finos.waltz.model.flow_classification_rule.FlowClassificationRuleVantagePoint;
+import org.finos.waltz.model.logical_flow.FlowClassificationRulesView;
+import org.finos.waltz.model.logical_flow.ImmutableFlowClassificationRulesView;
+import org.finos.waltz.schema.Tables;
+import org.finos.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
+import org.finos.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.jooq.Condition;
 import org.jooq.Record1;
 import org.jooq.Select;
+import org.jooq.UpdateConditionStep;
 import org.jooq.impl.DSL;
+import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,13 +69,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.finos.waltz.common.SetUtilities.map;
-import static org.finos.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.MapUtilities.indexBy;
+import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.model.EntityKind.ACTOR;
 import static org.finos.waltz.model.EntityKind.ORG_UNIT;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
+import static org.finos.waltz.service.flow_classification_rule.FlowClassificationRuleUtilities.applyVantagePoints;
+import static org.finos.waltz.service.flow_classification_rule.FlowClassificationRuleUtilities.mkInboundRuleUpdateStmts;
+import static org.finos.waltz.service.flow_classification_rule.FlowClassificationRuleUtilities.mkOutboundRuleUpdateStmts;
 
 
 @Service
@@ -69,15 +87,17 @@ public class FlowClassificationRuleService {
 
     private static final Logger LOG = LoggerFactory.getLogger(FlowClassificationRuleService.class);
 
-    private final FlowClassificationRuleDao flowClassificationRuleDao;
-    private final FlowClassificationDao flowClassificationDao;
-    private final DataTypeDao dataTypeDao;
-    private final OrganisationalUnitDao organisationalUnitDao;
-    private final ApplicationDao applicationDao;
     private final ActorDao actorDao;
-    private final FlowClassificationCalculator ratingCalculator;
+    private final ApplicationDao applicationDao;
     private final ChangeLogService changeLogService;
+    private final DataTypeDao dataTypeDao;
+    private final EntityHierarchyService entityHierarchyService;
+    private final FlowClassificationCalculator ratingCalculator;
+    private final FlowClassificationDao flowClassificationDao;
+    private final FlowClassificationRuleDao flowClassificationRuleDao;
     private final LogicalFlowDecoratorDao logicalFlowDecoratorDao;
+    private final OrganisationalUnitDao organisationalUnitDao;
+
     private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory = new DataTypeIdSelectorFactory();
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
@@ -92,6 +112,7 @@ public class FlowClassificationRuleService {
                                          ActorDao actorDao,
                                          FlowClassificationCalculator ratingCalculator,
                                          ChangeLogService changeLogService,
+                                         EntityHierarchyService entityHierarchyService,
                                          LogicalFlowDecoratorDao logicalFlowDecoratorDao) {
         checkNotNull(flowClassificationRuleDao, "flowClassificationRuleDao must not be null");
         checkNotNull(flowClassificationDao, "flowClassificationDao must not be null");
@@ -102,16 +123,18 @@ public class FlowClassificationRuleService {
         checkNotNull(ratingCalculator, "ratingCalculator cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(logicalFlowDecoratorDao, "logicalFlowDecoratorDao cannot be null");
+        checkNotNull(entityHierarchyService, "entityHierarchyService cannot be null");
 
+        this.actorDao = actorDao;
+        this.applicationDao = applicationDao;
+        this.changeLogService = changeLogService;
+        this.dataTypeDao = dataTypeDao;
+        this.entityHierarchyService = entityHierarchyService;
         this.flowClassificationRuleDao = flowClassificationRuleDao;
         this.flowClassificationDao = flowClassificationDao;
-        this.dataTypeDao = dataTypeDao;
-        this.organisationalUnitDao = organisationalUnitDao;
-        this.applicationDao = applicationDao;
-        this.actorDao = actorDao;
-        this.ratingCalculator = ratingCalculator;
-        this.changeLogService = changeLogService;
         this.logicalFlowDecoratorDao = logicalFlowDecoratorDao;
+        this.organisationalUnitDao = organisationalUnitDao;
+        this.ratingCalculator = ratingCalculator;
     }
 
 
@@ -194,7 +217,7 @@ public class FlowClassificationRuleService {
 
     @Deprecated
     public boolean recalculateAllFlowRatings() {
-        logicalFlowDecoratorDao.updateRatingsByCondition(AuthoritativenessRatingValue.NO_OPINION, DSL.trueCondition());
+        logicalFlowDecoratorDao.resetRatingsAndFlowClassificationRulesCondition(DSL.trueCondition());
         findAll().forEach(
                 classificationRule -> ratingCalculator.update(
                         classificationRule.dataTypeId(),
@@ -203,8 +226,8 @@ public class FlowClassificationRuleService {
     }
 
 
-    public int fastRecalculateAllFlowRatings() {
-        logicalFlowDecoratorDao.updateRatingsByCondition(AuthoritativenessRatingValue.NO_OPINION, DSL.trueCondition());
+    public int fastRecalculateAllFlowRatingsOld() {
+        logicalFlowDecoratorDao.resetRatingsAndFlowClassificationRulesCondition(DSL.trueCondition());
 
         //finds all the vantage points to apply using parent as selector
         List<FlowClassificationRuleVantagePoint> flowClassificationRuleVantagePoints = flowClassificationRuleDao
@@ -216,7 +239,7 @@ public class FlowClassificationRuleService {
                 .sum();
 
         //overrides rating for point to point flows (must run after the above)
-        int updatedPointToPointDecorators = flowClassificationRuleDao.updatePointToPointFlowClassificationRules(FlowDirection.OUTBOUND);
+        int updatedPointToPointDecorators = 0; //flowClassificationRuleDao.updatePointToPointFlowClassificationRules(FlowDirection.OUTBOUND);
 
         LOG.info(
                 "Updated decorators for: {} for general rules and {} point-to-point flows",
@@ -226,6 +249,46 @@ public class FlowClassificationRuleService {
         return updatedRuleDecorators + updatedPointToPointDecorators;
     }
 
+    public void fastRecalculateAllFlowRatings() {
+
+        logicalFlowDecoratorDao.resetRatingsAndFlowClassificationRulesCondition(DSL.trueCondition());
+
+        LOG.debug("Loading rule vantage points");
+
+        List<FlowClassificationRuleVantagePoint> inboundRuleVantagePoints = flowClassificationRuleDao.findFlowClassificationRuleVantagePoints(FlowDirection.INBOUND);
+        List<FlowClassificationRuleVantagePoint> outboundRuleVantagePoints = flowClassificationRuleDao.findFlowClassificationRuleVantagePoints(FlowDirection.OUTBOUND);
+
+        Map<Long, String> inboundRatingCodeByRuleId = indexBy(inboundRuleVantagePoints, FlowClassificationRuleVantagePoint::ruleId, FlowClassificationRuleVantagePoint::classificationCode);
+        Map<Long, String> outboundRatingCodeByRuleId = indexBy(outboundRuleVantagePoints, FlowClassificationRuleVantagePoint::ruleId, FlowClassificationRuleVantagePoint::classificationCode);
+
+        Set<FlowDataType> population = logicalFlowDecoratorDao.fetchFlowDataTypePopulation();
+
+        LOG.debug(
+                "Loaded: {} inbound and {} outbound vantage point rules, and a population of: {} flows with datatypes",
+                inboundRuleVantagePoints.size(),
+                outboundRuleVantagePoints.size(),
+                population.size());
+
+        LOG.debug("Loading hierarchies");
+        List<Tuple2<Long, Long>> ouHierarchy = entityHierarchyService.fetchHierarchyForKind(EntityKind.ORG_UNIT);
+        List<Tuple2<Long, Long>> dtHierarchy = entityHierarchyService.fetchHierarchyForKind(EntityKind.DATA_TYPE);
+
+        LOG.debug("Applying rules to population");
+        Map<Long, Tuple2<Long, FlowClassificationRuleUtilities.MatchOutcome>> lfdIdToOutboundRuleIdMap = applyVantagePoints(FlowDirection.OUTBOUND, outboundRuleVantagePoints, population, ouHierarchy, dtHierarchy);
+        Map<Long, Tuple2<Long, FlowClassificationRuleUtilities.MatchOutcome>> lfdIdToInboundRuleIdMap = applyVantagePoints(FlowDirection.INBOUND, inboundRuleVantagePoints, population, ouHierarchy, dtHierarchy);
+
+        List<UpdateConditionStep<LogicalFlowDecoratorRecord>> outboundRulesToUpdate = mkOutboundRuleUpdateStmts(outboundRatingCodeByRuleId, lfdIdToOutboundRuleIdMap);
+        List<UpdateConditionStep<LogicalFlowDecoratorRecord>> inboundRulesToUpdate = mkInboundRuleUpdateStmts(inboundRatingCodeByRuleId, lfdIdToInboundRuleIdMap);
+
+        LOG.debug("Preparing to update {} logical flow decorators with a source outbound rating classification", outboundRulesToUpdate);
+        LOG.debug("Preparing to update {} logical flow decorators with a target inbound rating classification", inboundRulesToUpdate);
+
+        List<UpdateConditionStep<LogicalFlowDecoratorRecord>> updateStmts = ListUtilities.concat(outboundRulesToUpdate, inboundRulesToUpdate);
+
+        int updatedRecords = flowClassificationRuleDao.updateDecoratorsWithClassifications(updateStmts);
+
+        LOG.debug("Updated {} logical flow decorators with a classification", updatedRecords);
+    }
 
     public Map<EntityReference, Collection<EntityReference>> calculateConsumersForDataTypeIdSelector(IdSelectionOptions options) {
         Select<Record1<Long>> selector = dataTypeIdSelectorFactory.apply(options);

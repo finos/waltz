@@ -36,6 +36,7 @@ import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
 import org.finos.waltz.schema.tables.Application;
 import org.finos.waltz.schema.tables.EntityHierarchy;
 import org.finos.waltz.schema.tables.records.FlowClassificationRuleRecord;
+import org.finos.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
 import org.jooq.AggregateFunction;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -53,6 +54,7 @@ import org.jooq.SelectOnConditionStep;
 import org.jooq.SelectSeekStep2;
 import org.jooq.SelectSeekStep3;
 import org.jooq.SelectSeekStep4;
+import org.jooq.UpdateConditionStep;
 import org.jooq.UpdateSetMoreStep;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -618,5 +620,9 @@ public class FlowClassificationRuleDao {
                 .innerJoin(LOGICAL_FLOW_DECORATOR).on(LOGICAL_FLOW_DECORATOR.FLOW_CLASSIFICATION_RULE_ID.eq(FLOW_CLASSIFICATION_RULE.ID))
                 .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(logicalFlowId))
                 .fetchSet(TO_DOMAIN_MAPPER);
+    }
+
+    public int updateDecoratorsWithClassifications(List<UpdateConditionStep<LogicalFlowDecoratorRecord>> updateStmts) {
+        return IntStream.of(dsl.batch(updateStmts).execute()).sum();
     }
 }

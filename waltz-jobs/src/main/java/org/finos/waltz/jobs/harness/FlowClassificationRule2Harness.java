@@ -19,9 +19,9 @@
 package org.finos.waltz.jobs.harness;
 
 import org.finos.waltz.common.FunctionUtilities;
+import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.LoggingUtilities;
-import org.finos.waltz.common.MapUtilities;
-import org.finos.waltz.common.SetUtilities;
+import org.finos.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
 import org.finos.waltz.data.flow_classification_rule.FlowClassificationRuleDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
@@ -29,15 +29,19 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.FlowDirection;
 import org.finos.waltz.model.Nullable;
 import org.finos.waltz.model.flow_classification_rule.FlowClassificationRuleVantagePoint;
+import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.Application;
 import org.finos.waltz.schema.tables.EntityHierarchy;
 import org.finos.waltz.schema.tables.LogicalFlow;
 import org.finos.waltz.schema.tables.LogicalFlowDecorator;
+import org.finos.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
 import org.finos.waltz.service.DIConfiguration;
 import org.finos.waltz.service.flow_classification_rule.FlowClassificationRuleService;
 import org.immutables.value.Value;
 import org.jooq.DSLContext;
+import org.jooq.UpdateConditionStep;
+import org.jooq.impl.DSL;
 import org.jooq.lambda.function.Function4;
 import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
@@ -47,10 +51,14 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.data.JooqUtilities.readRef;
+import static org.finos.waltz.model.rating._AuthoritativenessRatingValue.DISCOURAGED;
+import static org.finos.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 
@@ -87,20 +95,28 @@ public class FlowClassificationRule2Harness {
 
         FlowClassificationRuleService svc = ctx.getBean(FlowClassificationRuleService.class);
         FlowClassificationRuleDao dao = ctx.getBean(FlowClassificationRuleDao.class);
+        LogicalFlowDecoratorDao decoratorDao = ctx.getBean(LogicalFlowDecoratorDao.class);
 
-        FunctionUtilities.time("doIt", () -> doIt(dsl, dao));
+//        FunctionUtilities.time("doIt", () -> doIt(dsl, dao, decoratorDao));
+        FunctionUtilities.time("fast recalc", () -> svc.fastRecalculateAllFlowRatings());
 
 //        System.exit(-1);
     }
 
 
     private static void doIt(DSLContext dsl,
-                             FlowClassificationRuleDao dao) {
+                             FlowClassificationRuleDao dao,
+                             LogicalFlowDecoratorDao decoratorDao) {
+
+        decoratorDao.resetRatingsAndFlowClassificationRulesCondition(DSL.trueCondition());
+
         LOG.debug("Loading rule vantage points");
 
         List<FlowClassificationRuleVantagePoint> inboundRuleVantagePoints = dao.findFlowClassificationRuleVantagePoints(FlowDirection.INBOUND);
         List<FlowClassificationRuleVantagePoint> outboundRuleVantagePoints = dao.findFlowClassificationRuleVantagePoints(FlowDirection.OUTBOUND);
 
+        Map<Long, String> inboundRatingCodeByRuleId = indexBy(inboundRuleVantagePoints, FlowClassificationRuleVantagePoint::ruleId, FlowClassificationRuleVantagePoint::classificationCode);
+        Map<Long, String> outboundRatingCodeByRuleId = indexBy(outboundRuleVantagePoints, FlowClassificationRuleVantagePoint::ruleId, FlowClassificationRuleVantagePoint::classificationCode);
 
 //        take(allRuleVantagePoints, 10).forEach(System.out::println);
 
@@ -117,19 +133,75 @@ public class FlowClassificationRule2Harness {
         LOG.debug("Loading hierarchies");
         List<Tuple2<Long, Long>> ouHierarchy = fetchHierarchy(dsl, EntityKind.ORG_UNIT);
         List<Tuple2<Long, Long>> dtHierarchy = fetchHierarchy(dsl, EntityKind.DATA_TYPE);
-//
-//        System.out.println(findChildren(ouHierarchy, 10186L));
-//        System.out.println(findChildren(dtHierarchy, 33100L));
 
         LOG.debug("Applying rules to population");
         Map<Long, Tuple2<Long, MatchOutcome>> lfdIdToOutboundRuleIdMap = applyVantagePoints(FlowDirection.OUTBOUND, outboundRuleVantagePoints, population, ouHierarchy, dtHierarchy);
         Map<Long, Tuple2<Long, MatchOutcome>> lfdIdToInboundRuleIdMap = applyVantagePoints(FlowDirection.INBOUND, inboundRuleVantagePoints, population, ouHierarchy, dtHierarchy);
+//
+//        System.out.println("Curr");
+//        MapUtilities.countBy(FlowDataType::outboundRuleId, SetUtilities.filter(population, p -> p.outboundRuleId() != null)).entrySet().stream().sorted(Map.Entry.comparingByKey()).limit(20).forEach(System.out::println);
+//        System.out.println("Future");
+//        MapUtilities.countBy(Map.Entry::getValue, lfdIdToOutboundRuleIdMap.entrySet()).entrySet().stream().sorted(Map.Entry.comparingByKey()).limit(20).forEach(System.out::println);
 
-        System.out.println("Curr");
-        MapUtilities.countBy(FlowDataType::outboundRuleId, SetUtilities.filter(population, p -> p.outboundRuleId() != null)).entrySet().stream().sorted(Map.Entry.comparingByKey()).limit(20).forEach(System.out::println);
-        System.out.println("Future");
-        MapUtilities.countBy(Map.Entry::getValue, lfdIdToOutboundRuleIdMap.entrySet()).entrySet().stream().sorted(Map.Entry.comparingByKey()).limit(20).forEach(System.out::println);
+        List<UpdateConditionStep<LogicalFlowDecoratorRecord>> outboundRulesToUpdate = mkOutboundRuleUpdateStmts(dsl, outboundRatingCodeByRuleId, lfdIdToOutboundRuleIdMap);
+        List<UpdateConditionStep<LogicalFlowDecoratorRecord>> inboundRulesToUpdate = mkInboundRuleUpdateStmts(dsl, inboundRatingCodeByRuleId, lfdIdToInboundRuleIdMap);
 
+        List<UpdateConditionStep<LogicalFlowDecoratorRecord>> updates = ListUtilities.concat(outboundRulesToUpdate, inboundRulesToUpdate);
+
+        dsl.batch(updates).execute();
+    }
+
+    private static List<UpdateConditionStep<LogicalFlowDecoratorRecord>> mkOutboundRuleUpdateStmts(DSLContext dsl,
+                                                                                                   Map<Long, String> outboundRatingCodeByRuleId,
+                                                                                                   Map<Long, Tuple2<Long, MatchOutcome>> lfdIdToOutboundRuleIdMap) {
+        return lfdIdToOutboundRuleIdMap
+                .entrySet()
+                .stream()
+                .map(kv -> {
+
+                    Tuple2<Long, MatchOutcome> ruleAndMatchOutcome = kv.getValue();
+
+                    Long ruleId = ruleAndMatchOutcome.v1();
+                    String ratingCode = outboundRatingCodeByRuleId.get(ruleId);
+
+                    AuthoritativenessRatingValue ratingValue = MatchOutcome.POSITIVE_MATCH.equals(ruleAndMatchOutcome.v2)
+                            ? AuthoritativenessRatingValue.of(ratingCode)
+                            : DISCOURAGED;
+
+                    return dsl
+                            .update(LOGICAL_FLOW_DECORATOR)
+                            .set(LOGICAL_FLOW_DECORATOR.RATING, ratingValue.value())
+                            .set(LOGICAL_FLOW_DECORATOR.FLOW_CLASSIFICATION_RULE_ID, ruleId)
+                            .where(LOGICAL_FLOW_DECORATOR.ID.eq(kv.getKey()));
+                })
+                .collect(Collectors.toList());
+    }
+
+    private static List<UpdateConditionStep<LogicalFlowDecoratorRecord>> mkInboundRuleUpdateStmts(DSLContext dsl,
+                                                                                                 Map<Long, String> inboundRatingCodeByRuleId,
+                                                                                                 Map<Long, Tuple2<Long, MatchOutcome>> lfdIdToInboundRuleIdMap) {
+        return lfdIdToInboundRuleIdMap
+                .entrySet()
+                .stream()
+                .map(kv -> {
+
+                    Tuple2<Long, MatchOutcome> ruleAndMatchOutcome = kv.getValue();
+
+                    Long ruleId = ruleAndMatchOutcome.v1();
+                    String ratingCode = inboundRatingCodeByRuleId.get(ruleId);
+
+                    if (MatchOutcome.POSITIVE_MATCH.equals(ruleAndMatchOutcome.v2)) {
+                        return dsl
+                                .update(LOGICAL_FLOW_DECORATOR)
+                                .set(LOGICAL_FLOW_DECORATOR.TARGET_INBOUND_RATING, AuthoritativenessRatingValue.of(ratingCode).value())
+                                .set(LOGICAL_FLOW_DECORATOR.INBOUND_FLOW_CLASSIFICATION_RULE_ID, ruleId)
+                                .where(LOGICAL_FLOW_DECORATOR.ID.eq(kv.getKey()));
+                    } else {
+                        return null; // For inbound rules we don't want to automatically discourage flows that are not covered
+                    }
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
 
