@@ -259,7 +259,8 @@ public class DataTypeDecoratorService {
                             dtId,
                             Optional.of(AuthoritativenessRatingValue.NO_OPINION)));
             LogicalFlow flow = logicalFlowDao.getByFlowId(entityReference.id());
-            boolean requiresRating = flow.source().kind() == APPLICATION && flow.target().kind() == APPLICATION;
+//            boolean requiresRating = flow.source().kind() == APPLICATION && flow.target().kind() == APPLICATION;
+            boolean requiresRating = true;
 
             return requiresRating
                     ? ratingsCalculator.calculate(decorators)

@@ -73,6 +73,7 @@ import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
+import static org.finos.waltz.common.ListUtilities.asList;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.SetUtilities.union;
@@ -349,7 +350,24 @@ public class FlowClassificationRuleDao {
     }
 
 
-    public List<FlowClassificationRuleVantagePoint> findExpandedFlowClassificationRuleVantagePoints(FlowDirection direction, Set<Long> orgIds) {
+    public List<FlowClassificationRuleVantagePoint> findExpandedFlowClassificationRuleVantagePoints(FlowDirection direction,
+                                                                                                    Set<Long> orgVantagePointIds,
+                                                                                                    Set<Long> appVantagePointIds,
+                                                                                                    Set<Long> actorVantagePointIds) {
+
+        Condition appVantagePointCondition = FLOW_CLASSIFICATION_RULE.PARENT_KIND.eq(EntityKind.APPLICATION.name())
+                .and(FLOW_CLASSIFICATION_RULE.PARENT_ID.in(appVantagePointIds));
+
+        Condition actorVantagePointCondition = FLOW_CLASSIFICATION_RULE.PARENT_KIND.eq(EntityKind.ACTOR.name())
+                .and(FLOW_CLASSIFICATION_RULE.PARENT_ID.in(actorVantagePointIds));
+
+        Condition orgUnitVantagePointCondition = FLOW_CLASSIFICATION_RULE.PARENT_KIND.eq(EntityKind.ORG_UNIT.name())
+                .and(ehOrgUnit.ID.in(orgVantagePointIds));
+
+        Condition vantagePointCondition = appVantagePointCondition
+                .or(actorVantagePointCondition)
+                .or(orgUnitVantagePointCondition);
+
         SelectSeekStep5<Record9<Long, String, Integer, Long, Integer, Long, String, String, Long>, String, Integer, Integer, Long, Long> select = dsl
                 .select(vantagePointId,
                         FLOW_CLASSIFICATION_RULE.PARENT_KIND,
@@ -361,14 +379,17 @@ public class FlowClassificationRuleDao {
                         FLOW_CLASSIFICATION.CODE,
                         FLOW_CLASSIFICATION_RULE.ID)
                 .from(FLOW_CLASSIFICATION_RULE)
-                .innerJoin(ehOrgUnit)
-                    .on(ehOrgUnit.ANCESTOR_ID.eq(FLOW_CLASSIFICATION_RULE.PARENT_ID).and(ehOrgUnit.KIND.eq(EntityKind.ORG_UNIT.name())))
+                .leftJoin(ehOrgUnit)
+                    .on(ehOrgUnit.ANCESTOR_ID.eq(FLOW_CLASSIFICATION_RULE.PARENT_ID)
+                            .and(ehOrgUnit.KIND.eq(EntityKind.ORG_UNIT.name())
+                                    .and(FLOW_CLASSIFICATION_RULE.PARENT_KIND.eq(EntityKind.ORG_UNIT.name()))))
                 .innerJoin(declaredDataType)
                     .on(declaredDataType.ID.eq(FLOW_CLASSIFICATION_RULE.DATA_TYPE_ID))
                 .innerJoin(ehDataType)
                     .on(ehDataType.ANCESTOR_ID.eq(declaredDataType.ID).and(ehDataType.KIND.eq(EntityKind.DATA_TYPE.name())))
                 .innerJoin(FLOW_CLASSIFICATION).on(FLOW_CLASSIFICATION_RULE.FLOW_CLASSIFICATION_ID.eq(FLOW_CLASSIFICATION.ID))
-                .where(FLOW_CLASSIFICATION.DIRECTION.eq(direction.name()).and(ehOrgUnit.ID.in(orgIds)))
+                .where(FLOW_CLASSIFICATION.DIRECTION.eq(direction.name())
+                        .and(vantagePointCondition))
                 .orderBy(
                         FLOW_CLASSIFICATION_RULE.PARENT_KIND,
                         ehOrgUnit.LEVEL.desc(),
@@ -376,6 +397,7 @@ public class FlowClassificationRuleDao {
                         ehOrgUnit.ID,
                         ehDataType.ID);
 
+        System.out.println(select);
         return select
                 .fetch(TO_VANTAGE_MAPPER);
     }

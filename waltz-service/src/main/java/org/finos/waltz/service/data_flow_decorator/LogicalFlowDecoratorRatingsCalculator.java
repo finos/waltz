@@ -47,7 +47,6 @@ import java.util.stream.Collectors;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.filter;
-import static org.finos.waltz.common.ListUtilities.isEmpty;
 import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.model.utils.IdUtilities.indexById;
 
@@ -86,28 +85,32 @@ public class LogicalFlowDecoratorRatingsCalculator {
     }
 
 
-    public Collection<DataTypeDecorator>  calculate(Collection<DataTypeDecorator> decorators) {
+    public Collection<DataTypeDecorator> calculate(Collection<DataTypeDecorator> decorators) {
+
+        List<LogicalFlow> logicalFlows = loadFlows(decorators);
 
         List<LogicalFlow> appToAppFlows = filter(
                 IS_APP_TO_APP_FLOW,
-                loadFlows(decorators));
+                logicalFlows);
 
-        if (isEmpty(appToAppFlows)) return Collections.emptyList();
+//        if (isEmpty(appToAppFlows)) return Collections.emptyList();
 
         List<Application> targetApps = loadTargetApplications(appToAppFlows);
         List<Application> sourceApps = loadSourceApplications(appToAppFlows);
 
-        Map<Long, LogicalFlow> flowsById = indexById(appToAppFlows);
         Map<Long, Application> targetAppsById = indexById(targetApps);
         Map<Long, Application> sourceAppsById = indexById(sourceApps);
 
-        FlowClassificationRuleResolver outboundResolver = createResolver(FlowDirection.OUTBOUND, targetApps);
-        FlowClassificationRuleResolver inboundResolver = createResolver(FlowDirection.INBOUND, sourceApps);
+        Map<Long, LogicalFlow> flowsById = indexById(logicalFlows);
+
+        FlowClassificationRuleResolver outboundResolver = createResolver(FlowDirection.OUTBOUND, logicalFlows, targetApps);
+        FlowClassificationRuleResolver inboundResolver = createResolver(FlowDirection.INBOUND, logicalFlows, sourceApps);
 
         return decorators
                 .stream()
                 .filter(d -> flowsById.containsKey(d.dataFlowId()))
                 .map(decorator -> {
+                    DataTypeDecorator d = decorator;
                     try {
                         if (decorator.decoratorEntity().kind() != EntityKind.DATA_TYPE) {
                             return decorator;
@@ -117,11 +120,13 @@ public class LogicalFlowDecoratorRatingsCalculator {
                             EntityReference sourceVantagePoint = lookupVantagePoint(sourceAppsById, flow.source());
                             Tuple2<AuthoritativenessRatingValue, Optional<Long>> sourceOutboundClassification = lookupClassification(
                                     targetVantagePoint,
+                                    flow.target(),
                                     flow.source(),
                                     outboundResolver,
                                     decorator);
                             Tuple2<AuthoritativenessRatingValue, Optional<Long>> targetInboundClassification = lookupClassification(
                                     sourceVantagePoint,
+                                    flow.source(),
                                     flow.target(),
                                     inboundResolver,
                                     decorator);
@@ -167,22 +172,43 @@ public class LogicalFlowDecoratorRatingsCalculator {
     }
 
 
-    private FlowClassificationRuleResolver createResolver(FlowDirection direction, Collection<Application> apps) {
+    private FlowClassificationRuleResolver createResolver(FlowDirection direction,
+                                                          List<LogicalFlow> logicalFlows,
+                                                          Collection<Application> apps) {
+
+        Set<EntityReference> vantagePointEntityLookups = map(
+                logicalFlows,
+                d -> direction.equals(FlowDirection.OUTBOUND) ? d.target() : d.source());
+
+        Set<Long> appVantagePoints = getVantagePointIdsForKind(vantagePointEntityLookups, EntityKind.APPLICATION);
+        Set<Long> actorVantagePoints = getVantagePointIdsForKind(vantagePointEntityLookups, EntityKind.ACTOR);
+
+        // apps are targets for the rule
         Set<Long> orgIds = map(apps, OrganisationalUnitIdProvider::organisationalUnitId);
 
         // this brings back many expanded vantage points
         List<FlowClassificationRuleVantagePoint> flowClassificationRuleVantagePoints =
-                flowClassificationRuleDao.findExpandedFlowClassificationRuleVantagePoints(direction, orgIds);
+                flowClassificationRuleDao.findExpandedFlowClassificationRuleVantagePoints(direction, orgIds, appVantagePoints, actorVantagePoints);
 
         return new FlowClassificationRuleResolver(direction, flowClassificationRuleVantagePoints);
     }
 
+    private Set<Long> getVantagePointIdsForKind(Set<EntityReference> vantagePointEntityLookups, EntityKind entityKind) {
+        return vantagePointEntityLookups
+                .stream()
+                .filter(d -> d.kind().equals(entityKind))
+                .map(EntityReference::id)
+                .collect(Collectors.toSet());
+    }
 
-    private Tuple2<AuthoritativenessRatingValue, Optional<Long>> lookupClassification(EntityReference vantagePoint,
+
+    private Tuple2<AuthoritativenessRatingValue, Optional<Long>> lookupClassification(EntityReference vantagePointOrgUnit,
+                                                                                      EntityReference vantagePointEntity,
                                                                                       EntityReference subject,
                                                                                       FlowClassificationRuleResolver resolver,
                                                                                       DataTypeDecorator decorator) {
-        return resolver.resolve(vantagePoint, subject, decorator.decoratorEntity().id());
+
+        return resolver.resolve(vantagePointOrgUnit, vantagePointEntity, subject, decorator.decoratorEntity().id());
     }
 
 //
@@ -202,13 +228,18 @@ public class LogicalFlowDecoratorRatingsCalculator {
 //    }
 
 
-    private EntityReference lookupVantagePoint(Map<Long, Application> appsById, EntityReference lookupApp) {
-        Application targetApp = appsById.get(lookupApp.id());
-        long targetOrgUnitId = targetApp.organisationalUnitId();
+    // Vantage point needs to be included in lookup of both point to point flows and org unit flows. So need ot pass in the app and then offer both the OU and App lookup
+    private EntityReference lookupVantagePoint(Map<Long, Application> appsById, EntityReference lookupEntity) {
+        Application app = appsById.get(lookupEntity.id());
 
-        return EntityReference.mkRef(
-                EntityKind.ORG_UNIT,
-                targetOrgUnitId);
+        if (app != null) {
+            long targetOrgUnitId = app.organisationalUnitId();
+            return EntityReference.mkRef(
+                    EntityKind.ORG_UNIT,
+                    targetOrgUnitId);
+        } else {
+            return null;
+        }
     }
 
 
