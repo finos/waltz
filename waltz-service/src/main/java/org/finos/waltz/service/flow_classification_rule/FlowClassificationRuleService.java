@@ -249,7 +249,7 @@ public class FlowClassificationRuleService {
         return updatedRuleDecorators + updatedPointToPointDecorators;
     }
 
-    public void fastRecalculateAllFlowRatings() {
+    public int fastRecalculateAllFlowRatings() {
 
         logicalFlowDecoratorDao.resetRatingsAndFlowClassificationRulesCondition(DSL.trueCondition());
 
@@ -286,8 +286,9 @@ public class FlowClassificationRuleService {
         List<UpdateConditionStep<LogicalFlowDecoratorRecord>> updateStmts = ListUtilities.concat(outboundRulesToUpdate, inboundRulesToUpdate);
 
         int updatedRecords = flowClassificationRuleDao.updateDecoratorsWithClassifications(updateStmts);
-
         LOG.debug("Updated {} logical flow decorators with a classification", updatedRecords);
+
+        return updatedRecords;
     }
 
     public Map<EntityReference, Collection<EntityReference>> calculateConsumersForDataTypeIdSelector(IdSelectionOptions options) {

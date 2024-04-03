@@ -1,6 +1,7 @@
 package org.finos.waltz.service.flow_classification_rule;
 
 import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.FlowDirection;
 import org.finos.waltz.model.datatype.FlowDataType;
 import org.finos.waltz.model.flow_classification_rule.FlowClassificationRuleVantagePoint;
@@ -88,7 +89,6 @@ public class FlowClassificationRuleUtilities {
         Map<Long, Tuple2<Long, MatchOutcome>> lfdIdToRuleAndOutcomeMap = new HashMap<>();
         ruleVantagePoints
                 .stream()
-                .filter(rvp -> rvp.vantagePoint().kind() == EntityKind.ORG_UNIT)
                 .forEach(rvp -> {
                     Set<Long> childOUs = findChildren(ouHierarchy, rvp.vantagePoint().id());
                     Set<Long> childDTs = findChildren(dtHierarchy, rvp.dataType().id());
@@ -125,20 +125,31 @@ public class FlowClassificationRuleUtilities {
         Function4<FlowClassificationRuleVantagePoint,  Set<Long>,  Set<Long>, FlowDataType, MatchOutcome> inboundMatcher =
                 (rvp, childOUs, childDTs, p) -> {
                     boolean subjectMatches = p.target().equals(rvp.subjectReference());
-                    boolean dtAndOuMatches = childDTs.contains(p.dtId()) && rvp.vantagePoint().kind() == EntityKind.ORG_UNIT && p.sourceOuId() != null && childOUs.contains(p.sourceOuId());
+                    boolean scopeMatches = checkScopeMatches(rvp, childOUs, p.source(), p.sourceOuId());
+                    boolean dtAndOuMatches = childDTs.contains(p.dtId()) && scopeMatches;
                     return determineOutcome(subjectMatches, dtAndOuMatches);
                 };
 
         Function4<FlowClassificationRuleVantagePoint,  Set<Long>,  Set<Long>, FlowDataType, MatchOutcome> outboundMatcher =
                 (rvp, childOUs, childDTs, p) -> {
                     boolean subjectMatches = p.source().equals(rvp.subjectReference());
-                    boolean dtAndOuMatches = childDTs.contains(p.dtId()) && rvp.vantagePoint().kind() == EntityKind.ORG_UNIT && p.targetOuId() != null && childOUs.contains(p.targetOuId());
+                    boolean scopeMatches = checkScopeMatches(rvp, childOUs, p.target(), p.targetOuId());
+                    boolean dtAndOuMatches = childDTs.contains(p.dtId()) && scopeMatches;
                     return determineOutcome(subjectMatches, dtAndOuMatches);
                 };
 
         return direction == FlowDirection.INBOUND
                 ? inboundMatcher
                 : outboundMatcher;
+    }
+
+    private static boolean checkScopeMatches(FlowClassificationRuleVantagePoint rvp, Set<Long> childOUs, EntityReference scopeEntity, Long scopeEntityOuId) {
+        if (rvp.vantagePoint().kind() == EntityKind.ORG_UNIT) {
+            return scopeEntityOuId != null && childOUs.contains(scopeEntityOuId);
+        } else {
+            // point-to-point flows e.g. ACTOR or APPLICATION
+            return scopeEntity.equals(rvp.vantagePoint());
+        }
     }
 
 

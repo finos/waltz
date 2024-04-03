@@ -218,6 +218,7 @@ public class FlowClassificationRule2Harness {
                 .stream()
                 .filter(rvp -> rvp.vantagePoint().kind() == EntityKind.ORG_UNIT)
                 .forEach(rvp -> {
+
                     Set<Long> childOUs = findChildren(ouHierarchy, rvp.vantagePoint().id());
                     Set<Long> childDTs = findChildren(dtHierarchy, rvp.dataType().id());
                     population.forEach(p -> {
@@ -226,6 +227,7 @@ public class FlowClassificationRule2Harness {
                             return; // skip, already got a good match
                         }
                         MatchOutcome outcome = matcher.apply(rvp, childOUs, childDTs, p);
+
                         if (outcome == MatchOutcome.NOT_APPLICABLE) {
                             // skip
                         } else if (currentRuleAndOutcome == null) {

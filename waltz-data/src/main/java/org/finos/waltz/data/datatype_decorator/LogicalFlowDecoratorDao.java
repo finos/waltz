@@ -411,8 +411,14 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
     public Set<FlowDataType> fetchFlowDataTypePopulation() {
         return dsl
                 .select(lf.ID,
-                        lfd.ID, lfd.DECORATOR_ENTITY_ID, lfd.INBOUND_FLOW_CLASSIFICATION_RULE_ID, lfd.FLOW_CLASSIFICATION_RULE_ID,
-                        lf.SOURCE_ENTITY_ID, lf.SOURCE_ENTITY_KIND, lf.TARGET_ENTITY_ID, lf.TARGET_ENTITY_KIND,
+                        lfd.ID,
+                        lfd.DECORATOR_ENTITY_ID,
+                        lfd.INBOUND_FLOW_CLASSIFICATION_RULE_ID,
+                        lfd.FLOW_CLASSIFICATION_RULE_ID,
+                        lf.SOURCE_ENTITY_ID,
+                        lf.SOURCE_ENTITY_KIND,
+                        lf.TARGET_ENTITY_ID,
+                        lf.TARGET_ENTITY_KIND,
                         srcApp.ORGANISATIONAL_UNIT_ID,
                         targetApp.ORGANISATIONAL_UNIT_ID)
                 .from(lf)
