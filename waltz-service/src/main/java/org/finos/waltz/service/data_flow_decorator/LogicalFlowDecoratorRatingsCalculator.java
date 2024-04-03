@@ -89,14 +89,8 @@ public class LogicalFlowDecoratorRatingsCalculator {
 
         List<LogicalFlow> logicalFlows = loadFlows(decorators);
 
-        List<LogicalFlow> appToAppFlows = filter(
-                IS_APP_TO_APP_FLOW,
-                logicalFlows);
-
-//        if (isEmpty(appToAppFlows)) return Collections.emptyList();
-
-        List<Application> targetApps = loadTargetApplications(appToAppFlows);
-        List<Application> sourceApps = loadSourceApplications(appToAppFlows);
+        List<Application> targetApps = loadTargetApplications(logicalFlows);
+        List<Application> sourceApps = loadSourceApplications(logicalFlows);
 
         Map<Long, Application> targetAppsById = indexById(targetApps);
         Map<Long, Application> sourceAppsById = indexById(sourceApps);
@@ -110,7 +104,6 @@ public class LogicalFlowDecoratorRatingsCalculator {
                 .stream()
                 .filter(d -> flowsById.containsKey(d.dataFlowId()))
                 .map(decorator -> {
-                    DataTypeDecorator d = decorator;
                     try {
                         if (decorator.decoratorEntity().kind() != EntityKind.DATA_TYPE) {
                             return decorator;
@@ -148,18 +141,22 @@ public class LogicalFlowDecoratorRatingsCalculator {
 
 
     private List<Application> loadTargetApplications(List<LogicalFlow> flows) {
-        Set<Long> targetApplicationIds = map(
-                flows,
-                df -> df.target().id());
+        Set<Long> targetApplicationIds = flows
+                .stream()
+                .filter(df -> df.target().kind().equals(EntityKind.APPLICATION))
+                .map(df -> df.target().id())
+                .collect(Collectors.toSet());
 
         return applicationService
                 .findByIds(targetApplicationIds);
     }
 
     private List<Application> loadSourceApplications(List<LogicalFlow> flows) {
-        Set<Long> sourceApplicationIds = map(
-                flows,
-                df -> df.source().id());
+        Set<Long> sourceApplicationIds = flows
+                .stream()
+                .filter(df -> df.source().kind().equals(EntityKind.APPLICATION))
+                .map(df -> df.source().id())
+                .collect(Collectors.toSet());
 
         return applicationService
                 .findByIds(sourceApplicationIds);
