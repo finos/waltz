@@ -208,22 +208,6 @@ public class LogicalFlowDecoratorRatingsCalculator {
         return resolver.resolve(vantagePointOrgUnit, vantagePointEntity, subject, decorator.decoratorEntity().id());
     }
 
-//
-//    private Optional<Long> lookupFlowClassificationRule(Map<Long, DataType> typesById,
-//                                                        Map<Long, LogicalFlow> flowsById,
-//                                                        Map<Long, Application> targetAppsById,
-//                                                        FlowClassificationRuleResolver resolver,
-//                                                        DataTypeDecorator decorator) {
-//        LogicalFlow flow = flowsById.get(decorator.dataFlowId());
-//        EntityReference vantagePoint = lookupVantagePoint(targetAppsById, flow);
-//        EntityReference source = flow.source();
-//
-//        Optional<FlowClassificationRuleVantagePoint> flowClassificationRuleVantagePoint = resolver.resolveAuthSource(vantagePoint, source, decorator.dataTypeId());
-//
-//        return flowClassificationRuleVantagePoint
-//                .map(FlowClassificationRuleVantagePoint::ruleId);
-//    }
-
 
     // Vantage point needs to be included in lookup of both point to point flows and org unit flows. So need ot pass in the app and then offer both the OU and App lookup
     private EntityReference lookupVantagePoint(Map<Long, Application> appsById, EntityReference lookupEntity) {
@@ -238,12 +222,5 @@ public class LogicalFlowDecoratorRatingsCalculator {
             return null;
         }
     }
-
-
-    private String lookupDataTypeCode(Map<Long, DataType> typesById, DataTypeDecorator decorator) {
-        long dataTypeId = decorator.decoratorEntity().id();
-        return typesById.get(dataTypeId).code();
-    }
-
 
 }

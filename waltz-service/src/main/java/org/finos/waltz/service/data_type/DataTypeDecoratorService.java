@@ -202,8 +202,10 @@ public class DataTypeDecoratorService {
         checkNotNull(userName, "userName cannot be null");
         checkNotNull(dataTypeIds, "dataTypeIds cannot be null");
 
-        Collection<DataTypeDecorator> dataTypeDecorators
-                = mkDecorators(userName, entityReference, dataTypeIds);
+        Collection<DataTypeDecorator> dataTypeDecorators = mkDecorators(
+                userName,
+                entityReference,
+                dataTypeIds);
 
         int[] result = dataTypeDecoratorDaoSelectorFactory
                 .getDao(entityReference.kind())
@@ -258,17 +260,10 @@ public class DataTypeDecoratorService {
                             entityReference,
                             dtId,
                             Optional.of(AuthoritativenessRatingValue.NO_OPINION)));
-            LogicalFlow flow = logicalFlowDao.getByFlowId(entityReference.id());
-//            boolean requiresRating = flow.source().kind() == APPLICATION && flow.target().kind() == APPLICATION;
-            boolean requiresRating = true;
-
-            return requiresRating
-                    ? ratingsCalculator.calculate(decorators)
-                    : decorators;
+            return ratingsCalculator.calculate(decorators);
         }
 
-        return map(dataTypeIds,
-                dtId -> mkDecorator(userName, entityReference, dtId, Optional.empty()));
+        return map(dataTypeIds, dtId -> mkDecorator(userName, entityReference, dtId, Optional.empty()));
     }
 
 
