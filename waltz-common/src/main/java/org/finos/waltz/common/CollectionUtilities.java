@@ -18,13 +18,16 @@
 
 package org.finos.waltz.common;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import static org.finos.waltz.common.Checks.checkNotEmpty;
 
 
 public class CollectionUtilities {
@@ -241,6 +244,5 @@ public class CollectionUtilities {
         }
         return acc;
     }
-
 
 }
