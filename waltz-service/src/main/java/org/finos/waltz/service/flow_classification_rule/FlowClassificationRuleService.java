@@ -18,7 +18,6 @@
 
 package org.finos.waltz.service.flow_classification_rule;
 
-import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.exception.NotFoundException;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
@@ -30,7 +29,9 @@ import org.finos.waltz.data.data_type.DataTypeIdSelectorFactory;
 import org.finos.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
 import org.finos.waltz.data.flow_classification_rule.FlowClassificationDao;
 import org.finos.waltz.data.flow_classification_rule.FlowClassificationRuleDao;
+import org.finos.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import org.finos.waltz.data.orgunit.OrganisationalUnitDao;
+import org.finos.waltz.model.DiffResult;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.FlowDirection;
@@ -49,6 +50,7 @@ import org.finos.waltz.model.flow_classification_rule.FlowClassificationRuleUpda
 import org.finos.waltz.model.flow_classification_rule.FlowClassificationRuleVantagePoint;
 import org.finos.waltz.model.logical_flow.FlowClassificationRulesView;
 import org.finos.waltz.model.logical_flow.ImmutableFlowClassificationRulesView;
+import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
 import org.finos.waltz.service.changelog.ChangeLogService;
@@ -59,6 +61,7 @@ import org.jooq.Select;
 import org.jooq.UpdateConditionStep;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
+import org.jooq.lambda.tuple.Tuple5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,19 +70,24 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.FunctionUtilities.time;
 import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.SetUtilities.map;
+import static org.finos.waltz.model.DiffResult.mkDiff;
 import static org.finos.waltz.model.EntityKind.ACTOR;
 import static org.finos.waltz.model.EntityKind.ORG_UNIT;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.rating._AuthoritativenessRatingValue.DISCOURAGED;
+import static org.finos.waltz.model.rating._AuthoritativenessRatingValue.NO_OPINION;
 import static org.finos.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static org.finos.waltz.service.flow_classification_rule.FlowClassificationRuleUtilities.applyVantagePoints;
-import static org.finos.waltz.service.flow_classification_rule.FlowClassificationRuleUtilities.mkInboundRuleUpdateStmts;
-import static org.finos.waltz.service.flow_classification_rule.FlowClassificationRuleUtilities.mkOutboundRuleUpdateStmts;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 
 
 @Service
@@ -98,6 +106,7 @@ public class FlowClassificationRuleService {
     private final LogicalFlowDecoratorDao logicalFlowDecoratorDao;
     private final OrganisationalUnitDao organisationalUnitDao;
 
+    private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory = new LogicalFlowIdSelectorFactory();
     private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory = new DataTypeIdSelectorFactory();
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
@@ -249,19 +258,29 @@ public class FlowClassificationRuleService {
         return updatedRuleDecorators + updatedPointToPointDecorators;
     }
 
-    public int fastRecalculateAllFlowRatings() {
 
-        logicalFlowDecoratorDao.resetRatingsAndFlowClassificationRulesCondition(DSL.trueCondition());
+    public int recalculateFlowRatingsForSelector(IdSelectionOptions options) {
+        Select<Record1<Long>> flowSelector = logicalFlowIdSelectorFactory.apply(options);
+        Set<FlowDataType> population = logicalFlowDecoratorDao.fetchFlowDataTypePopulationForFlowSelector(flowSelector);
+        return recalculateRatingsForPopulation(population);
+    }
+
+    public int fastRecalculateAllFlowRatings() {
+        LOG.debug("Loading decorator population points");
+        Set<FlowDataType> population = logicalFlowDecoratorDao.fetchFlowDataTypePopulation(DSL.trueCondition());
+
+        return recalculateRatingsForPopulation(population);
+    }
+
+    private int recalculateRatingsForPopulation(Set<FlowDataType> population) {
 
         LOG.debug("Loading rule vantage points");
-
         List<FlowClassificationRuleVantagePoint> inboundRuleVantagePoints = flowClassificationRuleDao.findFlowClassificationRuleVantagePoints(FlowDirection.INBOUND);
         List<FlowClassificationRuleVantagePoint> outboundRuleVantagePoints = flowClassificationRuleDao.findFlowClassificationRuleVantagePoints(FlowDirection.OUTBOUND);
 
         Map<Long, String> inboundRatingCodeByRuleId = indexBy(inboundRuleVantagePoints, FlowClassificationRuleVantagePoint::ruleId, FlowClassificationRuleVantagePoint::classificationCode);
         Map<Long, String> outboundRatingCodeByRuleId = indexBy(outboundRuleVantagePoints, FlowClassificationRuleVantagePoint::ruleId, FlowClassificationRuleVantagePoint::classificationCode);
 
-        Set<FlowDataType> population = logicalFlowDecoratorDao.fetchFlowDataTypePopulation();
 
         LOG.debug(
                 "Loaded: {} inbound and {} outbound vantage point rules, and a population of: {} flows with datatypes",
@@ -274,21 +293,80 @@ public class FlowClassificationRuleService {
         List<Tuple2<Long, Long>> dtHierarchy = entityHierarchyService.fetchHierarchyForKind(EntityKind.DATA_TYPE);
 
         LOG.debug("Applying rules to population");
-        Map<Long, Tuple2<Long, FlowClassificationRuleUtilities.MatchOutcome>> lfdIdToOutboundRuleIdMap = applyVantagePoints(FlowDirection.OUTBOUND, outboundRuleVantagePoints, population, ouHierarchy, dtHierarchy);
-        Map<Long, Tuple2<Long, FlowClassificationRuleUtilities.MatchOutcome>> lfdIdToInboundRuleIdMap = applyVantagePoints(FlowDirection.INBOUND, inboundRuleVantagePoints, population, ouHierarchy, dtHierarchy);
+        Map<Long, Tuple2<Long, FlowClassificationRuleUtilities.MatchOutcome>> lfdIdToOutboundRuleIdMap = time("inbound vps", () -> applyVantagePoints(FlowDirection.OUTBOUND, outboundRuleVantagePoints, population, ouHierarchy, dtHierarchy));
+        Map<Long, Tuple2<Long, FlowClassificationRuleUtilities.MatchOutcome>> lfdIdToInboundRuleIdMap = time("outbound vps", () -> applyVantagePoints(FlowDirection.INBOUND, inboundRuleVantagePoints, population, ouHierarchy, dtHierarchy));
 
-        List<UpdateConditionStep<LogicalFlowDecoratorRecord>> outboundRulesToUpdate = mkOutboundRuleUpdateStmts(outboundRatingCodeByRuleId, lfdIdToOutboundRuleIdMap);
-        List<UpdateConditionStep<LogicalFlowDecoratorRecord>> inboundRulesToUpdate = mkInboundRuleUpdateStmts(inboundRatingCodeByRuleId, lfdIdToInboundRuleIdMap);
+        LOG.debug("Calculating diff");
+        Set<Tuple5<Long, AuthoritativenessRatingValue, AuthoritativenessRatingValue, Long, Long>> existingDecoratorRatingInfo = map(
+                population,
+                d -> tuple(d.lfdId(), d.sourceOutboundRating(), d.targetInboundRating(), d.outboundRuleId(), d.inboundRuleId()));
 
-        LOG.debug("Preparing to update {} logical flow decorators with a source outbound rating classification", outboundRulesToUpdate);
-        LOG.debug("Preparing to update {} logical flow decorators with a target inbound rating classification", inboundRulesToUpdate);
+        Set<Tuple5<Long, AuthoritativenessRatingValue, AuthoritativenessRatingValue, Long, Long>> requiredDecoratorRatingInfo = mkRequiredDecoratorRatingInfo(
+                population,
+                outboundRatingCodeByRuleId,
+                inboundRatingCodeByRuleId,
+                lfdIdToOutboundRuleIdMap,
+                lfdIdToInboundRuleIdMap);
 
-        List<UpdateConditionStep<LogicalFlowDecoratorRecord>> updateStmts = ListUtilities.concat(outboundRulesToUpdate, inboundRulesToUpdate);
+
+        DiffResult<Tuple5<Long, AuthoritativenessRatingValue, AuthoritativenessRatingValue, Long, Long>> decoratorRatingDiff = mkDiff(
+                existingDecoratorRatingInfo,
+                requiredDecoratorRatingInfo,
+                d -> d.v1,
+                (newRecord, existingRecord) -> {
+                    boolean sameOutboundFcr = (newRecord.v4 == null && existingRecord.v4 == null) || Objects.equals(newRecord.v4, existingRecord.v4);
+                    boolean sameInboundFcr = (newRecord.v5 == null && existingRecord.v5 == null) || Objects.equals(newRecord.v5, existingRecord.v5);
+                    boolean sameOutboundRating = newRecord.v2.value().equals(existingRecord.v2.value());
+                    boolean sameInboundRating = newRecord.v3.value().equals(existingRecord.v3.value());
+                    return sameOutboundRating && sameInboundRating && sameOutboundFcr && sameInboundFcr;
+                });
+
+        LOG.debug("Preparing to update {} logical flow decorators with new rating classifications", decoratorRatingDiff.differingIntersection().size());
+        Set<UpdateConditionStep<LogicalFlowDecoratorRecord>> updateStmts = map(
+                decoratorRatingDiff.differingIntersection(),
+                d -> DSL
+                        .update(LOGICAL_FLOW_DECORATOR)
+                        .set(LOGICAL_FLOW_DECORATOR.RATING, d.v2.value())
+                        .set(LOGICAL_FLOW_DECORATOR.TARGET_INBOUND_RATING, d.v3.value())
+                        .set(LOGICAL_FLOW_DECORATOR.FLOW_CLASSIFICATION_RULE_ID, d.v4)
+                        .set(LOGICAL_FLOW_DECORATOR.INBOUND_FLOW_CLASSIFICATION_RULE_ID, d.v5)
+                        .where(LOGICAL_FLOW_DECORATOR.ID.eq(d.v1)));
 
         int updatedRecords = flowClassificationRuleDao.updateDecoratorsWithClassifications(updateStmts);
         LOG.debug("Updated {} logical flow decorators with a classification", updatedRecords);
 
         return updatedRecords;
+    }
+
+    private Set<Tuple5<Long, AuthoritativenessRatingValue, AuthoritativenessRatingValue, Long, Long>> mkRequiredDecoratorRatingInfo(Set<FlowDataType> population,
+                                                                                                                                    Map<Long, String> outboundRatingCodeByRuleId,
+                                                                                                                                    Map<Long, String> inboundRatingCodeByRuleId,
+                                                                                                                                    Map<Long, Tuple2<Long, FlowClassificationRuleUtilities.MatchOutcome>> lfdIdToOutboundRuleIdMap,
+                                                                                                                                    Map<Long, Tuple2<Long, FlowClassificationRuleUtilities.MatchOutcome>> lfdIdToInboundRuleIdMap) {
+
+        Tuple2<Long, FlowClassificationRuleUtilities.MatchOutcome> defaultOutcome = tuple(null, FlowClassificationRuleUtilities.MatchOutcome.NOT_APPLICABLE);
+
+        return population
+                .stream()
+                .filter(d -> lfdIdToInboundRuleIdMap.containsKey(d.lfdId()) || lfdIdToOutboundRuleIdMap.containsKey(d.lfdId()))
+                .map(d -> {
+                    Tuple2<Long, FlowClassificationRuleUtilities.MatchOutcome> outboundFlowRating = lfdIdToOutboundRuleIdMap.getOrDefault(d.lfdId(), defaultOutcome);
+                    Tuple2<Long, FlowClassificationRuleUtilities.MatchOutcome> inboundFlowRating = lfdIdToInboundRuleIdMap.getOrDefault(d.lfdId(), defaultOutcome);
+
+                    String outboundRatingCode = outboundRatingCodeByRuleId.get(outboundFlowRating.v1);
+                    String inboundRatingCode = inboundRatingCodeByRuleId.get(inboundFlowRating.v1);
+
+                    AuthoritativenessRatingValue outboundRating = FlowClassificationRuleUtilities.MatchOutcome.POSITIVE_MATCH.equals(outboundFlowRating.v2)
+                            ? AuthoritativenessRatingValue.of(outboundRatingCode)
+                            : DISCOURAGED;
+
+                    AuthoritativenessRatingValue inboundRating = FlowClassificationRuleUtilities.MatchOutcome.POSITIVE_MATCH.equals(inboundFlowRating.v2)
+                            ? AuthoritativenessRatingValue.of(inboundRatingCode)
+                            : NO_OPINION;
+
+                    return tuple(d.lfdId(), outboundRating, inboundRating, outboundFlowRating.v1, inboundFlowRating.v1);
+                })
+                .collect(Collectors.toSet());
     }
 
     public Map<EntityReference, Collection<EntityReference>> calculateConsumersForDataTypeIdSelector(IdSelectionOptions options) {

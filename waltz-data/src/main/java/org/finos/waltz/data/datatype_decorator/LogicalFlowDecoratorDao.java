@@ -407,8 +407,12 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
                 .execute();
     }
 
+    public Set<FlowDataType> fetchFlowDataTypePopulationForFlowSelector(Select<Record1<Long>> flowSelector) {
+        Condition lfSelectorCondition = lf.ID.in(flowSelector);
+        return fetchFlowDataTypePopulation(lfSelectorCondition);
+    }
 
-    public Set<FlowDataType> fetchFlowDataTypePopulation() {
+    public Set<FlowDataType> fetchFlowDataTypePopulation(Condition condition) {
         return dsl
                 .select(lf.ID,
                         lfd.ID,
@@ -420,13 +424,16 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
                         lf.TARGET_ENTITY_ID,
                         lf.TARGET_ENTITY_KIND,
                         srcApp.ORGANISATIONAL_UNIT_ID,
-                        targetApp.ORGANISATIONAL_UNIT_ID)
+                        targetApp.ORGANISATIONAL_UNIT_ID,
+                        lfd.RATING,
+                        lfd.TARGET_INBOUND_RATING)
                 .from(lf)
                 .innerJoin(lfd).on(lfd.LOGICAL_FLOW_ID.eq(lf.ID).and(lfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())))
                 .leftJoin(srcApp).on(srcApp.ID.eq(lf.SOURCE_ENTITY_ID).and(lf.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
                 .leftJoin(targetApp).on(targetApp.ID.eq(lf.TARGET_ENTITY_ID).and(lf.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
                 .where(lf.IS_REMOVED.isFalse()
                         .and(lf.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name())))
+                .and(condition)
                 .fetchSet(r -> ImmutableFlowDataType
                         .builder()
                         .lfdId(r.get(lfd.ID))
@@ -438,6 +445,8 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
                         .outboundRuleId(r.get(lfd.FLOW_CLASSIFICATION_RULE_ID))
                         .sourceOuId(r.get(srcApp.ORGANISATIONAL_UNIT_ID))
                         .targetOuId(r.get(targetApp.ORGANISATIONAL_UNIT_ID))
+                        .sourceOutboundRating(AuthoritativenessRatingValue.of(r.get(lfd.RATING)))
+                        .targetInboundRating(AuthoritativenessRatingValue.of(r.get(lfd.TARGET_INBOUND_RATING)))
                         .build());
     }
 

@@ -54,6 +54,7 @@ import org.jooq.SelectConditionStep;
 import org.jooq.SelectOnConditionStep;
 import org.jooq.SelectSeekStep2;
 import org.jooq.SelectSeekStep5;
+import org.jooq.SelectSeekStep6;
 import org.jooq.UpdateConditionStep;
 import org.jooq.UpdateSetMoreStep;
 import org.jooq.impl.DSL;
@@ -73,7 +74,6 @@ import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
-import static org.finos.waltz.common.ListUtilities.asList;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.SetUtilities.union;
@@ -409,7 +409,7 @@ public class FlowClassificationRuleDao {
 
 
     private List<FlowClassificationRuleVantagePoint> findFlowClassificationRuleVantagePoints(Condition condition) {
-        SelectSeekStep5<Record9<Long, String, Integer, Long, Integer, Long, String, String, Long>, String, Integer, Integer, Long, Long> select = dsl
+        SelectSeekStep6<Record9<Long, String, Integer, Long, Integer, Long, String, String, Long>, String, Integer, Integer, Long, Long, Long> select = dsl
                 .select(vantagePointId,
                         FLOW_CLASSIFICATION_RULE.PARENT_KIND,
                         vantagePointLevel,
@@ -434,13 +434,12 @@ public class FlowClassificationRuleDao {
                 .where(condition)
                 .orderBy(
                         FLOW_CLASSIFICATION_RULE.PARENT_KIND, //ACTOR, APPLICATION, ORG_UNIT
-                        vantagePointLevel,
+                        vantagePointLevel.desc(),
                         ehDataType.LEVEL.desc(),
                         vantagePointId,
-                        ehDataType.ID
+                        ehDataType.ID,
+                        FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID
                 );
-
-        System.out.println(select);
 
         return select.fetch(TO_VANTAGE_MAPPER);
     }
@@ -655,7 +654,7 @@ public class FlowClassificationRuleDao {
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
 
-    public int updateDecoratorsWithClassifications(List<UpdateConditionStep<LogicalFlowDecoratorRecord>> updateStmts) {
+    public int updateDecoratorsWithClassifications(Set<UpdateConditionStep<LogicalFlowDecoratorRecord>> updateStmts) {
         return IntStream.of(dsl.batch(updateStmts).execute()).sum();
     }
 }

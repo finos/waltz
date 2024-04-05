@@ -207,12 +207,18 @@ public class DataTypeDecoratorService {
                 entityReference,
                 dataTypeIds);
 
-        int[] result = dataTypeDecoratorDaoSelectorFactory
-                .getDao(entityReference.kind())
-                .addDecorators(dataTypeDecorators);
+        DataTypeDecoratorDao dao = dataTypeDecoratorDaoSelectorFactory
+                .getDao(entityReference.kind());
+
+        // This must execute first so that the decorators exist
+        int[] result = dao.addDecorators(dataTypeDecorators);
 
         audit(format("Added data types: %s", dataTypeIds.toString()),
                 entityReference, userName);
+
+        if (entityReference.kind().equals(LOGICAL_DATA_FLOW)) {
+            int rulesUpdated = flowClassificationRuleService.recalculateFlowRatingsForSelector(mkOpts(entityReference));
+        }
 
         recalculateDataTypeUsageForApplications(entityReference);
 
@@ -252,18 +258,11 @@ public class DataTypeDecoratorService {
     private Collection<DataTypeDecorator> mkDecorators(String userName,
                                                        EntityReference entityReference,
                                                        Set<Long> dataTypeIds) {
-
-        if(LOGICAL_DATA_FLOW.equals(entityReference.kind())) {
-            Collection<DataTypeDecorator> decorators = map(dataTypeIds,
-                    dtId -> mkDecorator(
-                            userName,
-                            entityReference,
-                            dtId,
-                            Optional.of(AuthoritativenessRatingValue.NO_OPINION)));
-            return ratingsCalculator.calculate(decorators);
-        }
-
-        return map(dataTypeIds, dtId -> mkDecorator(userName, entityReference, dtId, Optional.empty()));
+        return map(dataTypeIds, dtId -> mkDecorator(
+                userName,
+                entityReference,
+                dtId,
+                Optional.empty()));
     }
 
 

@@ -20,22 +20,24 @@ package org.finos.waltz.service.flow_classification_rule;
 
 
 import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.FlowDirection;
 import org.finos.waltz.model.ImmutableEntityReference;
 import org.finos.waltz.model.flow_classification_rule.FlowClassificationRuleVantagePoint;
 import org.finos.waltz.model.flow_classification_rule.ImmutableFlowClassificationRuleVantagePoint;
 import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
+import org.jooq.lambda.tuple.Tuple2;
 import org.junit.jupiter.api.Test;
-
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.service.flow_classification_rule.FlowClassificationRuleResolver.getMostSpecificRanked;
-import static org.finos.waltz.common.ListUtilities.newArrayList;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FlowClassificationRuleResolverTest {
 
@@ -50,16 +52,21 @@ public class FlowClassificationRuleResolverTest {
             .id(200L)
             .build();
 
+    private final ImmutableEntityReference targetApp = ImmutableEntityReference.builder()
+            .kind(EntityKind.APPLICATION)
+            .id(300L)
+            .build();
+
 
     @Test
     public void whenResolveWithMissingVantagePointThenReturnsNoOpinion() {
 
         List<FlowClassificationRuleVantagePoint> vantagePoints = new ArrayList<>();
-        FlowClassificationRuleResolver flowClassificationRuleResolver = new FlowClassificationRuleResolver(vantagePoints);
+        FlowClassificationRuleResolver flowClassificationRuleResolver = new FlowClassificationRuleResolver(FlowDirection.OUTBOUND, vantagePoints);
 
-        AuthoritativenessRatingValue rating = flowClassificationRuleResolver.resolve(vantagePoint, sourceApp, 20L);
+        Tuple2<AuthoritativenessRatingValue, Optional<Long>> rating = flowClassificationRuleResolver.resolve(vantagePoint, targetApp, sourceApp, 20L);
 
-        assertEquals(AuthoritativenessRatingValue.NO_OPINION, rating);
+        assertEquals(AuthoritativenessRatingValue.NO_OPINION, rating.v1);
     }
 
 
@@ -77,11 +84,11 @@ public class FlowClassificationRuleResolverTest {
                 .ruleId(1L)
                 .build());
 
-        FlowClassificationRuleResolver flowClassificationRuleResolver = new FlowClassificationRuleResolver(vantagePoints);
+        FlowClassificationRuleResolver flowClassificationRuleResolver = new FlowClassificationRuleResolver(FlowDirection.OUTBOUND, vantagePoints);
 
-        AuthoritativenessRatingValue rating = flowClassificationRuleResolver.resolve(vantagePoint, sourceApp, 20L);
+        Tuple2<AuthoritativenessRatingValue, Optional<Long>> rating = flowClassificationRuleResolver.resolve(vantagePoint, targetApp, sourceApp, 20L);
 
-        assertEquals(AuthoritativenessRatingValue.NO_OPINION, rating);
+        assertEquals(AuthoritativenessRatingValue.NO_OPINION, rating.v1);
     }
 
 
@@ -100,11 +107,11 @@ public class FlowClassificationRuleResolverTest {
                 .ruleId(1L)
                 .build());
 
-        FlowClassificationRuleResolver flowClassificationRuleResolver = new FlowClassificationRuleResolver(vantagePoints);
+        FlowClassificationRuleResolver flowClassificationRuleResolver = new FlowClassificationRuleResolver(FlowDirection.OUTBOUND, vantagePoints);
 
-        AuthoritativenessRatingValue rating = flowClassificationRuleResolver.resolve(vantagePoint, sourceApp, 20L);
+        Tuple2<AuthoritativenessRatingValue, Optional<Long>> rating = flowClassificationRuleResolver.resolve(vantagePoint, targetApp, sourceApp, 20L);
 
-        assertEquals(AuthoritativenessRatingValue.DISCOURAGED, rating);
+        assertEquals(AuthoritativenessRatingValue.DISCOURAGED, rating.v1);
     }
 
 
@@ -134,11 +141,11 @@ public class FlowClassificationRuleResolverTest {
                 .ruleId(1L)
                 .build());
 
-        FlowClassificationRuleResolver flowClassificationRuleResolver = new FlowClassificationRuleResolver(vantagePoints);
+        FlowClassificationRuleResolver flowClassificationRuleResolver = new FlowClassificationRuleResolver(FlowDirection.OUTBOUND, vantagePoints);
 
-        AuthoritativenessRatingValue rating = flowClassificationRuleResolver.resolve(vantagePoint, sourceApp, 20L);
+        Tuple2<AuthoritativenessRatingValue, Optional<Long>> rating = flowClassificationRuleResolver.resolve(vantagePoint, targetApp, sourceApp, 20L);
 
-        assertEquals(AuthoritativenessRatingValue.of("SECONDARY"), rating);
+        assertEquals(AuthoritativenessRatingValue.of("SECONDARY"), rating.v1);
 
     }
 

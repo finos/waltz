@@ -39,6 +39,7 @@ import org.finos.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
 import org.finos.waltz.service.DIConfiguration;
 import org.finos.waltz.service.flow_classification_rule.FlowClassificationRuleService;
 import org.immutables.value.Value;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.UpdateConditionStep;
 import org.jooq.impl.DSL;
@@ -55,6 +56,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.finos.waltz.common.FunctionUtilities.time;
 import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.data.JooqUtilities.readRef;
 import static org.finos.waltz.model.rating._AuthoritativenessRatingValue.DISCOURAGED;
@@ -97,7 +99,7 @@ public class FlowClassificationRule2Harness {
         FlowClassificationRuleDao dao = ctx.getBean(FlowClassificationRuleDao.class);
         LogicalFlowDecoratorDao decoratorDao = ctx.getBean(LogicalFlowDecoratorDao.class);
 
-//        FunctionUtilities.time("doIt", () -> doIt(dsl, dao, decoratorDao));
+//        time("doIt", () -> doIt(dsl, dao, decoratorDao));
         FunctionUtilities.time("fast recalc", () -> svc.fastRecalculateAllFlowRatings());
 
 //        System.exit(-1);
@@ -108,19 +110,23 @@ public class FlowClassificationRule2Harness {
                              FlowClassificationRuleDao dao,
                              LogicalFlowDecoratorDao decoratorDao) {
 
-        decoratorDao.resetRatingsAndFlowClassificationRulesCondition(DSL.trueCondition());
+//        decoratorDao.resetRatingsAndFlowClassificationRulesCondition(DSL.trueCondition());
 
         LOG.debug("Loading rule vantage points");
 
-        List<FlowClassificationRuleVantagePoint> inboundRuleVantagePoints = dao.findFlowClassificationRuleVantagePoints(FlowDirection.INBOUND);
-        List<FlowClassificationRuleVantagePoint> outboundRuleVantagePoints = dao.findFlowClassificationRuleVantagePoints(FlowDirection.OUTBOUND);
+        List<FlowClassificationRuleVantagePoint> inboundRuleVantagePoints = time(
+                "fetch inbound vantage points",
+                () -> dao.findFlowClassificationRuleVantagePoints(FlowDirection.INBOUND));
+        List<FlowClassificationRuleVantagePoint> outboundRuleVantagePoints = time(
+                "fetch outbound vantage points",
+                () -> dao.findFlowClassificationRuleVantagePoints(FlowDirection.OUTBOUND));
 
         Map<Long, String> inboundRatingCodeByRuleId = indexBy(inboundRuleVantagePoints, FlowClassificationRuleVantagePoint::ruleId, FlowClassificationRuleVantagePoint::classificationCode);
         Map<Long, String> outboundRatingCodeByRuleId = indexBy(outboundRuleVantagePoints, FlowClassificationRuleVantagePoint::ruleId, FlowClassificationRuleVantagePoint::classificationCode);
 
 //        take(allRuleVantagePoints, 10).forEach(System.out::println);
 
-        Set<FlowDataType> population = fetchFlowDataTypePopulation(dsl);
+        Set<FlowDataType> population = time("fetch population", () -> fetchFlowDataTypePopulation(dsl, DSL.trueCondition()));
 
         LOG.debug(
                 "Loaded: {} inbound and {} outbound vantage point rules, and a population of: {} flows with datatypes",
@@ -135,8 +141,12 @@ public class FlowClassificationRule2Harness {
         List<Tuple2<Long, Long>> dtHierarchy = fetchHierarchy(dsl, EntityKind.DATA_TYPE);
 
         LOG.debug("Applying rules to population");
-        Map<Long, Tuple2<Long, MatchOutcome>> lfdIdToOutboundRuleIdMap = applyVantagePoints(FlowDirection.OUTBOUND, outboundRuleVantagePoints, population, ouHierarchy, dtHierarchy);
-        Map<Long, Tuple2<Long, MatchOutcome>> lfdIdToInboundRuleIdMap = applyVantagePoints(FlowDirection.INBOUND, inboundRuleVantagePoints, population, ouHierarchy, dtHierarchy);
+        Map<Long, Tuple2<Long, MatchOutcome>> lfdIdToOutboundRuleIdMap = time(
+                "apply outbound rules",
+                () -> applyVantagePoints(FlowDirection.OUTBOUND, outboundRuleVantagePoints, population, ouHierarchy, dtHierarchy));
+        Map<Long, Tuple2<Long, MatchOutcome>> lfdIdToInboundRuleIdMap = time(
+                "apply inbound rules",
+                () -> applyVantagePoints(FlowDirection.INBOUND, inboundRuleVantagePoints, population, ouHierarchy, dtHierarchy));
 //
 //        System.out.println("Curr");
 //        MapUtilities.countBy(FlowDataType::outboundRuleId, SetUtilities.filter(population, p -> p.outboundRuleId() != null)).entrySet().stream().sorted(Map.Entry.comparingByKey()).limit(20).forEach(System.out::println);
@@ -291,7 +301,7 @@ public class FlowClassificationRule2Harness {
 
 
 
-    private static Set<FlowDataType> fetchFlowDataTypePopulation(DSLContext dsl) {
+    private static Set<FlowDataType> fetchFlowDataTypePopulation(DSLContext dsl, Condition condition) {
         LOG.debug("Loading population");
         return dsl
                 .select(lf.ID,
@@ -305,6 +315,7 @@ public class FlowClassificationRule2Harness {
                 .leftJoin(targetApp).on(targetApp.ID.eq(lf.TARGET_ENTITY_ID).and(lf.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
                 .where(lf.IS_REMOVED.isFalse()
                     .and(lf.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name())))
+                .and(condition)
                 .fetchSet(r -> ImmutableFlowDataType
                         .builder()
                         .lfdId(r.get(lfd.ID))
