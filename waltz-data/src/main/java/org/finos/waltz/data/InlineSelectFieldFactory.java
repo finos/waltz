@@ -18,32 +18,23 @@
 
 package org.finos.waltz.data;
 
+import org.finos.waltz.common.SetUtilities;
+import org.finos.waltz.model.CommonTableFields;
 import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.EntityLifecycleStatus;
 import org.jooq.CaseConditionStep;
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.Record1;
-import org.jooq.Select;
-import org.jooq.Table;
+import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
-import org.jooq.lambda.tuple.Tuple3;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
 
-import static org.finos.waltz.schema.Tables.*;
-import static org.finos.waltz.schema.tables.Actor.ACTOR;
-import static org.finos.waltz.schema.tables.Application.APPLICATION;
-import static org.finos.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
-import static org.finos.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
-import static org.finos.waltz.schema.tables.DataType.DATA_TYPE;
-import static org.finos.waltz.schema.tables.EndUserApplication.END_USER_APPLICATION;
-import static org.finos.waltz.schema.tables.EntityStatisticDefinition.ENTITY_STATISTIC_DEFINITION;
-import static org.finos.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGORY;
-import static org.finos.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
-import static org.finos.waltz.schema.tables.Person.PERSON;
-import static org.finos.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.jooq.impl.DSL.val;
@@ -51,17 +42,80 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 
 public class InlineSelectFieldFactory {
 
+    private static final Set<EntityKind> DEFAULT_LIFECYCLE_ENTITIES = SetUtilities.asSet(
+            EntityKind.ACTOR,
+            EntityKind.APPLICATION,
+            EntityKind.CHANGE_INITIATIVE,
+            EntityKind.DATA_TYPE,
+            EntityKind.LEGAL_ENTITY,
+            EntityKind.LOGICAL_DATA_ELEMENT,
+            EntityKind.LOGICAL_DATA_FLOW,
+            EntityKind.MEASURABLE,
+            EntityKind.PHYSICAL_FLOW);
+
+    private static final Set<EntityKind> DEFAULT_EXTERNAL_ID_ENTITIES = SetUtilities.asSet(
+            EntityKind.ACTOR,
+            EntityKind.APPLICATION,
+            EntityKind.CHANGE_INITIATIVE,
+            EntityKind.CHANGE_SET,
+            EntityKind.DATA_TYPE,
+            EntityKind.END_USER_APPLICATION,
+            EntityKind.LOGICAL_DATA_FLOW,
+            EntityKind.LEGAL_ENTITY,
+            EntityKind.MEASURABLE,
+            EntityKind.MEASURABLE_CATEGORY,
+            EntityKind.PERSON,
+            EntityKind.PHYSICAL_FLOW,
+            EntityKind.PHYSICAL_SPECIFICATION,
+            EntityKind.SERVER,
+            EntityKind.SOFTWARE);
+
+    private static final Set<EntityKind> DEFAULT_NAME_ENTITIES = SetUtilities.asSet(
+            EntityKind.ACTOR,
+            EntityKind.ALLOCATION_SCHEME,
+            EntityKind.APPLICATION,
+            EntityKind.APP_GROUP,
+            EntityKind.CHANGE_INITIATIVE,
+            EntityKind.CHANGE_SET,
+            EntityKind.DATA_TYPE,
+            EntityKind.END_USER_APPLICATION,
+            EntityKind.ENTITY_RELATIONSHIP,
+            EntityKind.ENTITY_STATISTIC,
+            EntityKind.FLOW_CLASSIFICATION_RULE,
+            EntityKind.FLOW_DIAGRAM,
+            EntityKind.INVOLVEMENT_KIND,
+            EntityKind.LEGAL_ENTITY,
+            EntityKind.LEGAL_ENTITY_RELATIONSHIP,
+            EntityKind.LICENCE,
+            EntityKind.LOGICAL_DATA_FLOW,
+            EntityKind.MEASURABLE,
+            EntityKind.MEASURABLE_RATING,
+            EntityKind.MEASURABLE_CATEGORY,
+            EntityKind.ORG_UNIT,
+            EntityKind.PERSON,
+            EntityKind.PHYSICAL_FLOW,
+            EntityKind.PHYSICAL_SPECIFICATION,
+            EntityKind.SERVER,
+            EntityKind.SOFTWARE);
+
     // --- Name
 
     public static Field<String> mkNameField(Field<Long> idCompareField,
                                             Field<String> kindCompareField,
                                             Collection<EntityKind> searchEntityKinds) {
-        return NAME_RESOLVER.mkField(idCompareField, kindCompareField, searchEntityKinds);
+        return mkField(
+                idCompareField,
+                kindCompareField,
+                searchEntityKinds,
+                CommonTableFields::nameField);
     }
 
     public static Field<String> mkNameField(Field<Long> idCompareField,
                                             Field<String> kindCompareField) {
-        return NAME_RESOLVER.mkField(idCompareField, kindCompareField, NAME_RESOLVER.getSupportedEntityKinds());
+        return mkNameField(
+                idCompareField,
+                kindCompareField,
+                DEFAULT_NAME_ENTITIES);
     }
 
 
@@ -70,12 +124,19 @@ public class InlineSelectFieldFactory {
     public static Field<String> mkExternalIdField(Field<Long> idCompareField,
                                                   Field<String> kindCompareField,
                                                   Collection<EntityKind> searchEntityKinds) {
-        return EXTERNAL_ID_RESOLVER.mkField(idCompareField, kindCompareField, searchEntityKinds);
+        return mkField(
+                idCompareField,
+                kindCompareField,
+                searchEntityKinds,
+                CommonTableFields::externalIdField);
     }
 
     public static Field<String> mkExternalIdField(Field<Long> idCompareField,
                                                   Field<String> kindCompareField) {
-        return EXTERNAL_ID_RESOLVER.mkField(idCompareField, kindCompareField, EXTERNAL_ID_RESOLVER.getSupportedEntityKinds());
+        return mkExternalIdField(
+                idCompareField,
+                kindCompareField,
+                DEFAULT_EXTERNAL_ID_ENTITIES);
     }
 
 
@@ -84,92 +145,22 @@ public class InlineSelectFieldFactory {
     public static Field<String> mkEntityLifecycleField(Field<Long> idCompareField,
                                                   Field<String> kindCompareField,
                                                   Collection<EntityKind> searchEntityKinds) {
-        return LIFECYCLE_RESOLVER.mkField(idCompareField, kindCompareField, searchEntityKinds);
+        return mkField(
+                idCompareField,
+                kindCompareField,
+                searchEntityKinds,
+                CommonTableFields::lifecycleField);
     }
 
     public static Field<String> mkEntityLifecycleField(Field<Long> idCompareField,
                                                   Field<String> kindCompareField) {
-        return LIFECYCLE_RESOLVER.mkField(idCompareField, kindCompareField, LIFECYCLE_RESOLVER.getSupportedEntityKinds());
+        return mkEntityLifecycleField(
+                idCompareField,
+                kindCompareField,
+                DEFAULT_LIFECYCLE_ENTITIES);
     }
 
 
-    // --- Internals ----------------------
-
-    private static final InlineSelectFieldFactory NAME_RESOLVER = new InlineSelectFieldFactory(mkNameFieldMappings());
-    private static final InlineSelectFieldFactory EXTERNAL_ID_RESOLVER = new InlineSelectFieldFactory(mkExternalIdMappings());
-    private static final InlineSelectFieldFactory LIFECYCLE_RESOLVER = new InlineSelectFieldFactory(mkLifecycleFieldMappings());
-
-    private static Map<EntityKind, Tuple3<Table, Field<Long>, Field<String>>> mkNameFieldMappings() {
-        Map<EntityKind, Tuple3<Table, Field<Long>, Field<String>>> mappings = new HashMap<>();
-        mappings.put(EntityKind.ACTOR, tuple(ACTOR, ACTOR.ID, ACTOR.NAME));
-        mappings.put(EntityKind.ALLOCATION_SCHEME, tuple(ALLOCATION_SCHEME, ALLOCATION_SCHEME.ID, ALLOCATION_SCHEME.NAME));
-        mappings.put(EntityKind.APPLICATION, tuple(APPLICATION, APPLICATION.ID, APPLICATION.NAME));
-        mappings.put(EntityKind.APP_GROUP, tuple(APPLICATION_GROUP, APPLICATION_GROUP.ID, APPLICATION_GROUP.NAME));
-        mappings.put(EntityKind.CHANGE_INITIATIVE, tuple(CHANGE_INITIATIVE, CHANGE_INITIATIVE.ID, CHANGE_INITIATIVE.NAME));
-        mappings.put(EntityKind.CHANGE_SET, tuple(CHANGE_SET, CHANGE_SET.ID, CHANGE_SET.NAME));
-        mappings.put(EntityKind.DATA_TYPE, tuple(DATA_TYPE, DATA_TYPE.ID, DATA_TYPE.NAME));
-        mappings.put(EntityKind.END_USER_APPLICATION, tuple(END_USER_APPLICATION, END_USER_APPLICATION.ID, END_USER_APPLICATION.NAME));
-        mappings.put(EntityKind.ENTITY_RELATIONSHIP, tuple(ENTITY_RELATIONSHIP, ENTITY_RELATIONSHIP.ID, DSL.val("Entity Relationship")));
-        mappings.put(EntityKind.ENTITY_STATISTIC, tuple(ENTITY_STATISTIC_DEFINITION, ENTITY_STATISTIC_DEFINITION.ID, ENTITY_STATISTIC_DEFINITION.NAME));
-        mappings.put(EntityKind.FLOW_CLASSIFICATION_RULE, tuple(FLOW_CLASSIFICATION_RULE, FLOW_CLASSIFICATION_RULE.ID, DSL.val("Flow Classification Rule")));
-        mappings.put(EntityKind.FLOW_DIAGRAM, tuple(FLOW_DIAGRAM, FLOW_DIAGRAM.ID, FLOW_DIAGRAM.NAME));
-        mappings.put(EntityKind.INVOLVEMENT_KIND, tuple(INVOLVEMENT_KIND, INVOLVEMENT_KIND.ID, INVOLVEMENT_KIND.NAME));
-        mappings.put(EntityKind.LEGAL_ENTITY, tuple(LEGAL_ENTITY, LEGAL_ENTITY.ID, LEGAL_ENTITY.NAME));
-        mappings.put(EntityKind.LEGAL_ENTITY_RELATIONSHIP, tuple(LEGAL_ENTITY_RELATIONSHIP, LEGAL_ENTITY_RELATIONSHIP.ID, DSL.val("Legal Entity Relationship")));
-        mappings.put(EntityKind.LICENCE, tuple(LICENCE, LICENCE.ID, LICENCE.NAME));
-        mappings.put(EntityKind.LOGICAL_DATA_FLOW, tuple(LOGICAL_FLOW, LOGICAL_FLOW.ID, DSL.val("Logical Flow")));
-        mappings.put(EntityKind.MEASURABLE, tuple(MEASURABLE, MEASURABLE.ID, MEASURABLE.NAME));
-        mappings.put(EntityKind.MEASURABLE_RATING, tuple(MEASURABLE_RATING, MEASURABLE_RATING.ID, DSL.val("Measurable Rating")));
-        mappings.put(EntityKind.MEASURABLE_CATEGORY, tuple(MEASURABLE_CATEGORY, MEASURABLE_CATEGORY.ID, MEASURABLE_CATEGORY.NAME));
-        mappings.put(EntityKind.ORG_UNIT, tuple(ORGANISATIONAL_UNIT, ORGANISATIONAL_UNIT.ID, ORGANISATIONAL_UNIT.NAME));
-        mappings.put(EntityKind.PERSON, tuple(PERSON, PERSON.ID, PERSON.DISPLAY_NAME));
-        mappings.put(EntityKind.PHYSICAL_FLOW, tuple(PHYSICAL_FLOW, PHYSICAL_FLOW.ID, DSL.val("Physical Flow")));
-        mappings.put(EntityKind.PHYSICAL_SPECIFICATION, tuple(PHYSICAL_SPECIFICATION, PHYSICAL_SPECIFICATION.ID, PHYSICAL_SPECIFICATION.NAME));
-        mappings.put(EntityKind.SERVER, tuple(SERVER_INFORMATION, SERVER_INFORMATION.ID, SERVER_INFORMATION.HOSTNAME));
-        mappings.put(EntityKind.SOFTWARE, tuple(SOFTWARE_PACKAGE, SOFTWARE_PACKAGE.ID, SOFTWARE_PACKAGE.NAME));
-        return mappings;
-    }
-
-    private static Map<EntityKind, Tuple3<Table, Field<Long>, Field<String>>> mkLifecycleFieldMappings() {
-        Map<EntityKind, Tuple3<Table, Field<Long>, Field<String>>> mappings = new HashMap<>();
-        mappings.put(EntityKind.ACTOR, tuple(ACTOR, ACTOR.ID, DSL.val(EntityLifecycleStatus.ACTIVE.name())));
-        mappings.put(EntityKind.APPLICATION, tuple(APPLICATION, APPLICATION.ID, APPLICATION.ENTITY_LIFECYCLE_STATUS));
-        mappings.put(EntityKind.CHANGE_INITIATIVE, tuple(CHANGE_INITIATIVE, CHANGE_INITIATIVE.ID, DSL.val(EntityLifecycleStatus.ACTIVE.name())));
-        mappings.put(EntityKind.DATA_TYPE, tuple(DATA_TYPE, DATA_TYPE.ID, DSL.val(EntityLifecycleStatus.ACTIVE.name())));
-        mappings.put(EntityKind.LEGAL_ENTITY, tuple(LEGAL_ENTITY, LEGAL_ENTITY.ID, LEGAL_ENTITY.ENTITY_LIFECYCLE_STATUS));
-        mappings.put(EntityKind.LOGICAL_DATA_ELEMENT, tuple(LOGICAL_DATA_ELEMENT, LOGICAL_DATA_ELEMENT.ID, LOGICAL_DATA_ELEMENT.ENTITY_LIFECYCLE_STATUS));
-        mappings.put(EntityKind.LOGICAL_DATA_FLOW, tuple(LOGICAL_FLOW, LOGICAL_FLOW.ID, LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS));
-        mappings.put(EntityKind.MEASURABLE, tuple(MEASURABLE, MEASURABLE.ID, MEASURABLE.ENTITY_LIFECYCLE_STATUS));
-        mappings.put(EntityKind.PHYSICAL_FLOW, tuple(PHYSICAL_FLOW, PHYSICAL_FLOW.ID, PHYSICAL_FLOW.ENTITY_LIFECYCLE_STATUS));
-        return mappings;
-    }
-
-    private static Map<EntityKind,Tuple3<Table,Field<Long>,Field<String>>> mkExternalIdMappings() {
-        Map<EntityKind, Tuple3<Table, Field<Long>, Field<String>>> mappings = new HashMap<>();
-        mappings.put(EntityKind.ACTOR, tuple(ACTOR, ACTOR.ID, ACTOR.EXTERNAL_ID));
-        mappings.put(EntityKind.APPLICATION, tuple(APPLICATION, APPLICATION.ID, APPLICATION.ASSET_CODE));
-        mappings.put(EntityKind.CHANGE_INITIATIVE, tuple(CHANGE_INITIATIVE, CHANGE_INITIATIVE.ID, CHANGE_INITIATIVE.EXTERNAL_ID));
-        mappings.put(EntityKind.CHANGE_SET, tuple(CHANGE_SET, CHANGE_SET.ID, CHANGE_SET.EXTERNAL_ID));
-        mappings.put(EntityKind.DATA_TYPE, tuple(DATA_TYPE, DATA_TYPE.ID, DATA_TYPE.CODE));
-        mappings.put(EntityKind.END_USER_APPLICATION, tuple(END_USER_APPLICATION, END_USER_APPLICATION.ID, END_USER_APPLICATION.EXTERNAL_ID));
-        mappings.put(EntityKind.LOGICAL_DATA_FLOW, tuple(LOGICAL_FLOW, LOGICAL_FLOW.ID, LOGICAL_FLOW.EXTERNAL_ID));
-        mappings.put(EntityKind.LEGAL_ENTITY, tuple(LEGAL_ENTITY, LEGAL_ENTITY.ID, LEGAL_ENTITY.EXTERNAL_ID));
-        mappings.put(EntityKind.MEASURABLE, tuple(MEASURABLE, MEASURABLE.ID, MEASURABLE.EXTERNAL_ID));
-        mappings.put(EntityKind.MEASURABLE_CATEGORY, tuple(MEASURABLE_CATEGORY, MEASURABLE_CATEGORY.ID, MEASURABLE_CATEGORY.EXTERNAL_ID));
-        mappings.put(EntityKind.PERSON, tuple(PERSON, PERSON.ID, PERSON.EMPLOYEE_ID));
-        mappings.put(EntityKind.PHYSICAL_FLOW, tuple(PHYSICAL_FLOW, PHYSICAL_FLOW.ID, PHYSICAL_FLOW.EXTERNAL_ID));
-        mappings.put(EntityKind.PHYSICAL_SPECIFICATION, tuple(PHYSICAL_SPECIFICATION, PHYSICAL_SPECIFICATION.ID, PHYSICAL_SPECIFICATION.EXTERNAL_ID));
-        mappings.put(EntityKind.SERVER, tuple(SERVER_INFORMATION, SERVER_INFORMATION.ID, SERVER_INFORMATION.EXTERNAL_ID));
-        mappings.put(EntityKind.SOFTWARE, tuple(SOFTWARE_PACKAGE, SOFTWARE_PACKAGE.ID, SOFTWARE_PACKAGE.EXTERNAL_ID));
-        return mappings;
-    }
-
-    private final Map<EntityKind, Tuple3<Table, Field<Long>, Field<String>>> mappings;
-
-    private InlineSelectFieldFactory(Map<EntityKind, Tuple3<Table, Field<Long>, Field<String>>> mappings) {
-        checkNotNull(mappings, "mappings cannot be null");
-        this.mappings = mappings;
-    }
 
     /**
      * Creates a derived field to fetch entity names, given fields to compare id and kinds
@@ -221,25 +212,31 @@ public class InlineSelectFieldFactory {
      * @param searchEntityKinds list of expected entity kinds in the @kindCompareField
      * @return {@code CASE} field to fetch entity name for each record
      */
-    private Field<String> mkField(Field<Long> idCompareField,
-                                        Field<String> kindCompareField,
-                                        Collection<EntityKind> searchEntityKinds) {
+    private static Field<String> mkField(Field<Long> idCompareField,
+                                         Field<String> kindCompareField,
+                                         Collection<EntityKind> searchEntityKinds,
+                                         Function<CommonTableFields<?>, Field<String>> targetFieldResolver) {
         checkNotNull(idCompareField, "idCompareField cannot be null");
         checkNotNull(kindCompareField, "kindCompareField cannot be null");
         checkNotNull(searchEntityKinds, "searchEntityKinds cannot be null");
 
-        // create case condition and corresponding select statement pairs
-        List<Tuple2<Condition, Select<Record1<String>>>> caseSteps = mappings.entrySet().stream()
-                .filter(e -> searchEntityKinds.contains(e.getKey()))
-                .map(e -> tuple(kindCompareField.eq(val(e.getKey().name())),
-                        mkFieldSelect(e.getValue(), idCompareField)))
+        List<Tuple2<Condition, SelectConditionStep<Record1<String>>>> caseSteps = searchEntityKinds
+                .stream()
+                .map(JooqUtilities::determineCommonTableFields)
+                .map(ctf -> tuple(
+                        kindCompareField.eq(val(ctf.entityKind().name())),
+                        DSL.select(Optional
+                                        .ofNullable(targetFieldResolver.apply(ctf))
+                                        .orElse(CommonTableFields.NA_FIELD_VAL))
+                                .from(ctf.table())
+                                .where(ctf.idField().eq(idCompareField))))
                 .collect(toList());
 
         // form the where condition field
         // jOOQ doesn't seem to allow creation of case statements
         // through a clean factory method, hence this logic
         CaseConditionStep<String> caseField = null;
-        for (Tuple2<Condition, Select<Record1<String>>> caseStep : caseSteps) {
+        for (Tuple2<Condition, SelectConditionStep<Record1<String>>> caseStep : caseSteps) {
             if (caseField == null) {
                 caseField = DSL.when(caseStep.v1(), caseStep.v2());
             } else {
@@ -250,37 +247,4 @@ public class InlineSelectFieldFactory {
         return caseField;
     }
 
-
-    /**
-     * Similar to the three arg version except this one tries all supported entities.
-     * As such there is a minor performance penalty - but gives maximum flexibility.
-     * @param idCompareField
-     * @param kindCompareField
-     * @return
-     */
-    private Field<String> mkField(Field<Long> idCompareField,
-                                                  Field<String> kindCompareField) {
-        return mkField(idCompareField, kindCompareField, getSupportedEntityKinds());
-    }
-
-
-    private Select<Record1<String>> mkFieldSelect(Tuple3<Table, Field<Long>, Field<String>> mapping,
-                                                        Field<Long> idCompareField) {
-        // form the query to fetch entity names
-        //
-        // v1: entity table
-        // v3: name field in the entity table
-        // v2: id field in the entity table
-        //
-        // eg: select name from application where id = entity_statistic_value.entity_id
-        //
-        return DSL.select(mapping.v3())
-                .from(mapping.v1())
-                .where(mapping.v2().eq(idCompareField));
-    }
-
-
-    private Set<EntityKind> getSupportedEntityKinds() {
-        return mappings.keySet();
-    }
 }

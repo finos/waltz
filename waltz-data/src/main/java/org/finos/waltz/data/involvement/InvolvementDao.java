@@ -51,9 +51,12 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.mapping;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.schema.Tables.CHANGE_INITIATIVE;
 import static org.finos.waltz.schema.Tables.END_USER_APPLICATION;
 import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
@@ -69,8 +72,7 @@ public class InvolvementDao {
     private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory
             .mkNameField(
                     INVOLVEMENT.ENTITY_ID,
-                    INVOLVEMENT.ENTITY_KIND,
-                    newArrayList(EntityKind.values()))
+                    INVOLVEMENT.ENTITY_KIND)
             .as("entity_name");
 
     private final RecordMapper<Record, Involvement> TO_MODEL_MAPPER = r -> {
