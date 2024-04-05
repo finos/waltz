@@ -29,6 +29,7 @@ import java.util.function.Function;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.head;
+import static org.finos.waltz.common.CollectionUtilities.maybe;
 import static org.finos.waltz.common.CollectionUtilities.sort;
 import static org.finos.waltz.common.MapUtilities.groupAndThen;
 import static org.finos.waltz.common.MapUtilities.isEmpty;
@@ -128,9 +129,9 @@ public class FlowClassificationRuleResolver {
 
         Optional<Long> discouragedRule = determineDefaultRuleId(dataTypeGroup);
 
-        Optional<Long> flowClassificationRule = maybeRule
-                .map(FlowClassificationRuleVantagePoint::ruleId)
-                .flatMap(d -> discouragedRule);
+        Optional<Long> flowClassificationRule = maybeRule.isPresent()
+                ? maybeRule.map(FlowClassificationRuleVantagePoint::ruleId)
+                : discouragedRule;
 
         return tuple(ratingValue, flowClassificationRule);
     }
