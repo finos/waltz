@@ -286,7 +286,7 @@ Waltz is released under the [Apache 2.0 Licence](https://github.com/finos/waltz?
 
 ---------
 
-## Technical Details
+## <a name='stack'></a> Technical Details
 
 ### Frontend
 
@@ -381,9 +381,9 @@ Security   Model (Ability to leverage Channel Secure / AD-ENT   authentication /
 Data Sensitivity | Database level encryption;   planned for increased finer-grained entitlements for sensitive data
 **System integrations** |
 CMDB | ServiceNow (planned   bi-directional) ; Collibra Cloud (planned)
-iGrafx / BizzDesign / any   other notable vendors |
+iGrafx / BizzDesign / any   other notable vendors | No integrations planned
 API (What standard APIs are   available for the package?) | ServiceNow (planned   bi-directional; integrated into checkpoints to trigger notifications of an   application / architecture sunrise gate) ; Collibra Cloud (planned)
-Stack | Database - Postgresql ; JooQ   (transformation layer/ DSL);     Java (v8+>>11/17); JooQ; immutables library; Spark API DSL >>   javelin >> springboot. Liquidbase
+Stack | see (#stack)
 Open Source / Non-proprietary   technologies | OpenSource since inception   (2016); Apache public license 2
 Which   components of the system change as a result of any business functionality   changes? | 2 types of releases; major   version release monthly and coincide with database change; minor patch releases as needed
 How are   modifications to the application made (business logic and/or data   structures)? |
