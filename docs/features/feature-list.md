@@ -383,7 +383,7 @@ Data Sensitivity | Database level encryption;   planned for increased finer-grai
 CMDB | ServiceNow (planned   bi-directional) ; Collibra Cloud (planned)
 iGrafx / BizzDesign / any   other notable vendors | No integrations planned
 API (What standard APIs are   available for the package?) | ServiceNow (planned   bi-directional; integrated into checkpoints to trigger notifications of an   application / architecture sunrise gate) ; Collibra Cloud (planned)
-Stack | see (#stack)
+Stack | see [tech stack](#stack)
 Open Source / Non-proprietary   technologies | OpenSource since inception   (2016); Apache public license 2
 Which   components of the system change as a result of any business functionality   changes? | 2 types of releases; major   version release monthly and coincide with database change; minor patch releases as needed
 How are   modifications to the application made (business logic and/or data   structures)? |
