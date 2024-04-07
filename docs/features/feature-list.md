@@ -252,22 +252,24 @@ _Integration with service now to provide controls around dq and enforce regular 
 
 ## NFR
 
-### Security
+### <a name='nfr-security'></a> Security
 
 SSL for browser/server comms.
 SSO or OAuth (community developed) integration for authentication.
 Basic role permissions and/or a granular permission framework based on person involvements to entities (e.g. restrict application editing to only the _domain architect_ and _IT owner_).
 Database encryption as per jdbc driver support.
 
-### Standards
+### <a name='nfr-standards'></a> Standards
 Application uses standard web technology.
 Accessibility is a focus for future development and is part of the reason for moving to Svelte where the framework helps to ensure accessibility is addressed.
 
-### Testing
+### <a name='nfr-testing'></a> Testing
 A mixture of unit testing (junit and mocha) and integration testing (also junit, with playwright) is used.
+Architecture tests (layering etc) are performed using [ArchUnit](https://www.archunit.org/).
+
 Increasing coverage is a focus for upcoming releases.
 
-### Capacity
+### <a name='nfr-capacity'></a> Capacity
 Waltz is happily serving several hundred users per day, out of a total user base of tens of thousands.
 The Waltz instance has information on over 5K applications and a similar number of change initiatives. There are many more dataflows, surveys, and assessments managed by Waltz.
 Several of the taxonomies stretch to thousands of nodes with many more related mappings.
@@ -276,10 +278,10 @@ This is all served by a load balanced pair of Tomcat servers with on a shared JV
 The (SQLServer) database has 8GB of memory.
 
 
-### Releases
+### <a name='nfr-releases'></a> Releases
 Waltz typically has a major release, requiring a Liquibase scheme migration, every month or two.  Patch releases are more frequent and produced as required.  All releases are available via the [Waltz GitHub releases page](https://github.com/finos/waltz/releases)
 
-### Licence
+### <a name='nfr-licence'></a> Licence
 Waltz is released under the [Apache 2.0 Licence](https://github.com/finos/waltz?tab=Apache-2.0-1-ov-file#readme) and is part of the FINOS foundation.
 
 ---------
@@ -374,10 +376,10 @@ Analytics / Reporting | ReportGrid   (API-enabled) ; ability to select various d
 **Data** |
 Data Model | OLTP model; Flows of data-types;   hierarchical model; leveraging Collibra model; can accommodate for   migrations
 **User Interface** |
-American Disability Act | Angular (v1.8); migration to   Svelte; modular sections managed by   Javascript;
-Security   Model (Ability to leverage Channel Secure / AD-ENT   authentication / entitlement services) | SSO enabled; Auth enabled;   open-source contributions from community of users
-Data Sensitivity | Database level encryption;   planned for finer-grained entitlements for sensitive data
-System integrations |
+American Disability Act | see [standards](#nfr-standards)
+Security   Model (Ability to leverage Channel Secure / AD-ENT   authentication / entitlement services) | see [security](#nfr-security) 
+Data Sensitivity | Database level encryption;   planned for increased finer-grained entitlements for sensitive data
+**System integrations** |
 CMDB | ServiceNow (planned   bi-directional) ; Collibra Cloud (planned)
 iGrafx / BizzDesign / any   other notable vendors |
 API (What standard APIs are   available for the package?) | ServiceNow (planned   bi-directional; integrated into checkpoints to trigger notifications of an   application / architecture sunrise gate) ; Collibra Cloud (planned)
