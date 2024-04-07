@@ -72,20 +72,37 @@ Assessments are versatile and have been used for a wide range of purposes includ
 ## Taxonomies and Taxonomy Mappings
 
 Organizations can create multiple _Taxonomies_ in Waltz.
-Commonly these will be similar to:
+Each taxonomy is a hierarchical collection of related elements. 
+Examples of these taxonomies are:
 
-- Business Function
-- Capability
-- Process
-- Regulation
-- SDLC Compliance
+- Business Functions
+- Capabilities
+- Processes
+- Regulations
+- Agile Tribes
 - Records
 
-- Portfolio Management
-- App rationalisation
-- Functional decomms and roadmaps
-- Extensions (e.g. assessments)
-- Costs and Allocations
+### Portfolio Management
+Organizations can describe and document their application portfolio using _mappings_ to these taxonomies.
+Each mapping has an associated _rating_, typically a buy-sell-hold indicator, but the _rating scheme_ can be customised.
+
+The mappings may also be flagged as _primary_ for an application, which allows for more contextual information to be presented when lists of apps are shown elsewhere in Waltz.
+
+### Roadmaps
+Decommission and commission information can be associated with each mapping, allowing detailed roadmaps, shwoing how the portfolio will change over time, to be sourced from the captured data.
+
+### Allocations
+The mappings may have allocation percentages associated to them, this is commonly used to allow a breakdown of costs per capability for applications (and then aggregated across collections of applications).
+
+### Rating Assessments
+Finally, we recently added the ability to add assessments to ratings.
+This supports a more nuanced view of the applications, for example we could add product and location assessments to capability ratings indicating what types of financial products and in what location are being handled by a specific application capability.
+
+### Application Rationalisation
+Once the application portfolio has been mapped against a consistent set of taxonomies it becomes simple to see high-level opportunities for app consolidation/rationalisation by viewing all applications which are associated to a taxonomy item.
+These views are aggregated if higher level items in the taxomomy are selected.
+
+The rating assessments, mentioned above, will provide increased 
 
 --------
 
