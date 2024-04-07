@@ -373,7 +373,6 @@ Diagramming | Flow-diagrams based on   underlying metadata (constrained diagram 
 Analytics / Reporting | ReportGrid   (API-enabled) ; ability to select various data   dimensions /cross-reference (meta-data) and develop derived columns that can   be leveraged to showcase a portfolio's dispositions. Ability to regex for   terms to enhance dispositions based on keyword look-ups. Plans to be leveraged by other product   reporting tools (e.g., Tableau, Apache Superset, etc)
 **Data** |
 Data Model | OLTP model; Flows of data-types;   hierarchical model; leveraging Collibra model; can accommodate for   migrations
- |
 **User Interface** |
 American Disability Act | Angular (v1.8); migration to   Svelte; modular sections managed by   Javascript;
 Security   Model (Ability to leverage Channel Secure / AD-ENT   authentication / entitlement services) | SSO enabled; Auth enabled;   open-source contributions from community of users
