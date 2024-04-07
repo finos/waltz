@@ -1,4 +1,3 @@
-Original file from Wells Fargo.  They want an open source view of Waltz features and capabilities
 
 
 Capability   / Feature | Waltz                                                                                                                                                                                                                                                                                                                                                                            | More                                                            
@@ -67,7 +66,8 @@ Assessments are versatile and have been used for a wide range of purposes includ
   - SDLC compliance indicators
   - Recovery time objectives
 - Categorized _Bookmarks_ allow for a standardized way of collecting a common set of links to additional information resources about the application
-- _Taxonomy Mappings_, which are further discussed below
+- _Taxonomy Mappings_, which are further [discussed below](#taxonomies)
+- _Technology_: servers, and databases can be associated to apps. In addition OSS library components can be linked ([discussed below](#oss-usage))  
 
 --------
 
@@ -206,25 +206,52 @@ Typically several assessments will be attached to licences indicating their suit
 
 --------
 
-## Aggregate views
+##  <a name='aggregate-views'></a> Aggregate views
 
-These views are aggregated if higher level items in the taxonomy are selected.
-
-### Vantage points
-
-- By taxonomy
-- By people
-- By data type
-- By org unit
-- By diagram
-- By arbitrary group
+The features we have discussed so far are mostly concerned with single entities (apps, change initiatives).
+Waltz has comprehensive support for viewing the organizations portfolio by many different _vantage points_ - simply a term we use to represent any element which can be used to group the portfolio.
+Vantage points are often hierarchical and Waltz will accordingly show an aggregated view.
 
 ### Views
 
-- Flows
-- Attestations
+Waltz supports many aggregated views.
+Some of the most common and useful views are listed below:
+
 - Taxonomies
-- Report grids
+  - From a vantage point Waltz can aggregate across all taxonomies.  This can be used to show how apps that are linked ato a _Payments_ capability (the vantage point) may be related to the process taxonomy (the view)
+- Flows
+  - The applications in a vantage point can be used to produce an aggregate view of the related data flows.  This view can either be _intra_ flows (only flows between nodes in the vantage point), _outbound_ (flows 'leaving' the vantage point), _inbound_ (flows coming into the vantage point), or _all_
+  - The flows are scored against the flow classification rules giving a quick and easy way to see how well the given vantage point is aligning to 'right sourcing' rules
+- Attestations
+  - Waltz supports attestation of data sets (e.g. taxonomy mappings or flows). Vantage points allow users to see what portion of the included applications have a recent or overdue attestations
+- Costs
+  - For a given vantage point users can quickly see which applications are the most costly according to whatever cost data has been associated with apps (e.g. Support costs, Infra costs)
+
+#### <a name='report-grids'></a> Report grids
+
+Report grids are a very powerful mechanism which allow any user to simply build self-service reports from Waltz.
+A large proportion of the Waltz data set can be included into a report grid (e.g. taxonomies, data types, assessments, people, costs, survey responses).
+Derived columns can be set up which compute additional data points.
+
+Once defined, a grid can be used across all vantage points and shared with other users or made public to all users.
+
+Report grids have been widely used for both ad-hoc and systematic data analysis, supporting several key processes in organisations.
+The contents of a report grid can be exported via APIs and a custom (though currently not open-sourced) wrapper was developed to expose grids via the [OData](https://www.odata.org/) protocol so they could be wired into Tableau reports.
+
+### <a name='vantage-points'></a> Typical vantage points
+
+- By taxonomy
+  - Any of the taxonomies can be used and the vantage point is constructed of all applications with any mappings to the taxonomy item (or any of it's children)
+- By people
+  - Using the person involvements to applications and change initiaitives allows Waltz to show a custom view for that person, which included all of their direct and indirect reports. This allows is especially useful for quick comparisons across divisional leads.
+- By org unit
+  - A very common aggregate view is to use the organisational units to view details on the apps which belong to various departments
+- By data type
+  - The data type hierarchy can be used by aggregating apps based on data flows which reference the data types 
+- By diagram
+  - Diagrams in Waltz are often broken down into a '_Bill-of-Materials (BoM)_'. Waltz can use this BoM as the source for the aggregate views.
+- By arbitrary group
+  - A very popular feature is to allow users (or automated processes) to create custom groups of apps (and change initiatives).  These groups are non-hierarchical but are very flexible.  We periodically review 'structured' sets of groups to see if there is an underlying taxonomy that needs to be surfaced.
 
 
 #### Bank on a Page
@@ -239,12 +266,19 @@ Waltz has the ability to visualize capability/taxonomy for a specific function (
 Waltz ships with **no** _out of the box_ integrations.
 Integration is typically done via periodic batch jobs which load data into the Waltz database.
 
-Users have integrated with systems such as Collibra, Solidatus, Service Now, Apptio, Sparx Enterprise Architect and more.
+Users have integrated with systems such as [Collibra](https://www.collibra.com/us/en), [Solidatus](https://www.solidatus.com/), [Service Now](https://www.servicenow.com/uk/), [Apptio](https://www.apptio.com/), [Sparx Enterprise Architect](https://sparxsystems.com/products/ea/) and more.
 We are hoping to offer standardised integrations in the future, with Collibra (Cloud) being the likely first offering.
+
+Specific examples are: 
+- using Collibra for providing the Data classes and authority statements.
+- using Sparx for the process taxonomy
+- using Service now for CMDB information
+
 
 ### Software Development Lifecycle (SDLC)
 
 _Integration with service now to provide controls around dq and enforce regular attestations_
+
 
 
 ---------
@@ -264,6 +298,11 @@ Several of the taxonomies stretch to thousands of nodes with many more related m
 
 This is all served by a load balanced pair of Tomcat servers with on a shared JVM of just 2GB.
 The (SQLServer) database has 8GB of memory.
+
+
+### Releases
+
+Waltz typically has a major release, requiring a Liquibase scheme migration, every month or two.  Patch releases are more frequent and produced as required.  All releases are available via the [Waltz GitHub releases page](https://github.com/finos/waltz/releases)
 
 ---------
 
@@ -291,8 +330,9 @@ Major libraries / frameworks being used:
 
 ### Database
 
+- Schema management: Waltz uses [Liquibase](https://www.liquibase.com/) to ensure accurate and easy scheme migrations 
 - Production databases: [MSSQL](https://www.microsoft.com/en-gb/sql-server/), [Postgres](https://www.postgresql.org/)
-  - If MSSQL is chosen and you wish to actively work on the Waltz code base a commercial jOOQ licence is required.  jOOQ is free for free databases, but not for commercial databases 
+  - If MSSQL is chosen, and you wish to actively work on the Waltz code base a commercial jOOQ licence is required.  jOOQ is free for free databases, but not for commercial databases 
 - Test databases: [H2](https://www.h2database.com/html/main.html)
 
 ### Deployment options
@@ -300,9 +340,6 @@ Major libraries / frameworks being used:
 - Web container, e.g. [Tomcat](https://tomcat.apache.org/)
 - Standalone JAR
 - [Docker](https://www.docker.com/) image
-
-### Notes
-
 
 
 ---------
