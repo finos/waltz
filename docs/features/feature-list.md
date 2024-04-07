@@ -1,47 +1,47 @@
 Original file from Wells Fargo.  They want an open source view of Waltz features and capabilities
 
 
-Capability   / Feature | Waltz
--- | --
+Capability   / Feature | Waltz                                                                                                                                                                                                                                                                                                                                                                            | More                                                            
+-- |----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------
 Enterprise Architecture   Management | 
 Standards | 
 Patterns | 
-Authoritative Source | [Auth sources, including heritage flows](#data-classifications)
-Authoritative Consumers | Ability to identify who should   be the authoritative consumers for a given dataset (bi-directional   relationships for data consumption)
-Manage Architectures | x 
+Authoritative Source | Ability to disposition for a   given data type - what is the authoritative source for the data; can   accommodate for heritage scenarios                                                                                                                                                                                                                                         | [Auth sources, including heritage flows](#data-classifications) 
+Authoritative Consumers | Ability to identify who should   be the authoritative consumers for a given dataset (bi-directional   relationships for data consumption)                                                                                                                                                                                                                                        
+Manage Architectures | x                                                                                                                                                                                                                                                                                                                                                                                
 Models | 
-Assessments | x
-Portfolio Management | x
-Application Rationalization | x 
-Roadmaps (application,   products) | x
-Functional   commissions/de-commissions | Ability to show when   capabilities start/stop within a portfolio
-Lifecycle Mappings | x
-Data Lineage | Logical flows captured (point to   point with data-type metadata via integration method) with   visualization/mapping abilities.     Significant maturity planned.
-Bank / Architecture on a Page | Ability to visualize   capability/taxonomy for a specific function (e.g., operations, CIO-specific   views) - and overlay various metadata   (costs, regions, locations, etc. ) with roadmap/timeline to show   volatilities/projections. Dynamically generated vantage points.
-Data Products | Data-based reference view of   underlying datamodels for application portfolio for consumption and usage   purposes.
-Cost allocations - Taxonomies | Ability to demarcate the   percentage of costs (shredding) for the purposes of planning/budgeting of a   given function. Application may be performing multiple capabilities and needs   to have appropriate allocations for each functional usage
-Application Ratings based on   Capability | Application may have a   legal-hold; supports a given capability and assigning a rating. Providing a   more nuanced/detailed view of what an application is doing specifically   within the capability.
-Supply Chain / Contract   Management | Taxonomy of contracts; associate   application with capability/service and with a contract - providing pivot   views of a vendor-relationship what are all the applications linked to it.
-Investment Planning | Built-in to the ratings   function/service/capability. Provide a ratings-item which details the   strategic / attribute alignment. Providing driving alignment views for a   given application.
-Analytics / Ad-hoc | x
-Diagramming | Flow-diagrams based on   underlying metadata (constrained diagram - upstream/downstream graphs). Plans   to link with Archie - leverage reference data with Archie.      Ability to incorporate Archie / Sparx / BPM diagrams into Waltz and   leveraged for overlay purposes (Bank/Architecture on a Page).
-Analytics / Reporting | ReportGrid   (API-enabled) ; ability to select various data   dimensions /cross-reference (meta-data) and develop derived columns that can   be leveraged to showcase a portfolio's dispositions. Ability to regex for   terms to enhance dispositions based on keyword look-ups. Plans to be leveraged by other product   reporting tools (e.g., Tableau, Apache Superset, etc)
+Assessments | Assessements can be associated to most entities in Waltz  |                                                                 | 
+Portfolio Management | x                                                                                                                                                                                                                                                                                                                                                                                
+Application Rationalization | x                                                                                                                                                                                                                                                                                                                                                                                
+Roadmaps (application,   products) | x                                                                                                                                                                                                                                                                                                                                                                                
+Functional   commissions/de-commissions | Ability to show when   capabilities start/stop within a portfolio                                                                                                                                                                                                                                                                                                                
+Lifecycle Mappings | x                                                                                                                                                                                                                                                                                                                                                                                
+Data Lineage | Logical flows captured (point to   point with data-type metadata via integration method) with   visualization/mapping abilities.     Significant maturity planned.                                                                                                                                                                                                               
+Bank / Architecture on a Page | Ability to visualize   capability/taxonomy for a specific function (e.g., operations, CIO-specific   views) - and overlay various metadata   (costs, regions, locations, etc. ) with roadmap/timeline to show   volatilities/projections. Dynamically generated vantage points.                                                                                                  
+Data Products | Data-based reference view of   underlying datamodels for application portfolio for consumption and usage   purposes.                                                                                                                                                                                                                                                             
+Cost allocations - Taxonomies | Ability to demarcate the   percentage of costs (shredding) for the purposes of planning/budgeting of a   given function. Application may be performing multiple capabilities and needs   to have appropriate allocations for each functional usage                                                                                                                               
+Application Ratings based on   Capability | Application may have a   legal-hold; supports a given capability and assigning a rating. Providing a   more nuanced/detailed view of what an application is doing specifically   within the capability.                                                                                                                                                                          
+Supply Chain / Contract   Management | Taxonomy of contracts; associate   application with capability/service and with a contract - providing pivot   views of a vendor-relationship what are all the applications linked to it.                                                                                                                                                                                        
+Investment Planning | Built-in to the ratings   function/service/capability. Provide a ratings-item which details the   strategic / attribute alignment. Providing driving alignment views for a   given application.                                                                                                                                                                                  
+Analytics / Ad-hoc | x                                                                                                                                                                                                                                                                                                                                                                                
+Diagramming | Flow-diagrams based on   underlying metadata (constrained diagram - upstream/downstream graphs). Plans   to link with Archie - leverage reference data with Archie.      Ability to incorporate Archie / Sparx / BPM diagrams into Waltz and   leveraged for overlay purposes (Bank/Architecture on a Page).                                                                     
+Analytics / Reporting | ReportGrid   (API-enabled) ; ability to select various data   dimensions /cross-reference (meta-data) and develop derived columns that can   be leveraged to showcase a portfolio's dispositions. Ability to regex for   terms to enhance dispositions based on keyword look-ups. Plans to be leveraged by other product   reporting tools (e.g., Tableau, Apache Superset, etc) 
  | 
  | 
 Data | 
-Data Model | OLTP model; Flows of data-types;   hierarchical model; leveraging Collibra model; can accommodate for   migrations
+Data Model | OLTP model; Flows of data-types;   hierarchical model; leveraging Collibra model; can accommodate for   migrations                                                                                                                                                                                                                                                               
  | 
 User Interface | 
-American Disability Act | Angular (v1.8); migration to   Svelte; modular sections managed by   Javascript;
-Security   Model (Ability to leverage Channel Secure / AD-ENT   authentication / entitlement services) | SSO enabled; Auth enabled;   open-source contributions from community of users
-Data Sensitivity | Database level encryption;   planned for finer-grained entitlements for sensitive data
+American Disability Act | Angular (v1.8); migration to   Svelte; modular sections managed by   Javascript;                                                                                                                                                                                                                                                                                                 
+Security   Model (Ability to leverage Channel Secure / AD-ENT   authentication / entitlement services) | SSO enabled; Auth enabled;   open-source contributions from community of users                                                                                                                                                                                                                                                                                                   
+Data Sensitivity | Database level encryption;   planned for finer-grained entitlements for sensitive data                                                                                                                                                                                                                                                                                           
 System integrations | 
-CMDB | ServiceNow (planned   bi-directional) ; Collibra Cloud (planned)
+CMDB | ServiceNow (planned   bi-directional) ; Collibra Cloud (planned)                                                                                                                                                                                                                                                                                                                 
 iGrafx / BizzDesign / any   other notable vendors | 
-API (What standard APIs are   available for the package?) | ServiceNow (planned   bi-directional; integrated into checkpoints to trigger notifications of an   application / architecture sunrise gate) ; Collibra Cloud (planned)
-Stack | Database - Postgresql ; JooQ   (transformation layer/ DSL);     Java (v8+>>11/17); JooQ; immutables library; Spark API DSL >>   javelin >> springboot. Liquidbase
-Open Source / Non-proprietary   technologies | OpenSource since inception   (2016); Apache public license 2
-Which   components of the system change as a result of any business functionality   changes? | 2 types of releases; major   version release monthly and coincide with database change; minor patch releases as needed
+API (What standard APIs are   available for the package?) | ServiceNow (planned   bi-directional; integrated into checkpoints to trigger notifications of an   application / architecture sunrise gate) ; Collibra Cloud (planned)                                                                                                                                                                                                           
+Stack | Database - Postgresql ; JooQ   (transformation layer/ DSL);     Java (v8+>>11/17); JooQ; immutables library; Spark API DSL >>   javelin >> springboot. Liquidbase                                                                                                                                                                                                                
+Open Source / Non-proprietary   technologies | OpenSource since inception   (2016); Apache public license 2                                                                                                                                                                                                                                                                                                                     
+Which   components of the system change as a result of any business functionality   changes? | 2 types of releases; major   version release monthly and coincide with database change; minor patch releases as needed                                                                                                                                                                                                                                                           
 How are   modifications to the application made (business logic and/or data   structures)? | 
 Cost / Licensing |
 
@@ -188,14 +188,21 @@ It is common to use change initiatives, surveys and assessments in conjunction t
 
 --------
 
-## OSS 
+##  <a name='oss'></a> OSS 
 
-### Library Usage tracking - OSS Risk
+Waltz is used to track consumption of open source in applications across an organisation.
+
+###  <a name='oss-usage'></a> Library Usage tracking - OSS Risk
+
+You can associate applications with their dependencies (down to the version level) we can quickly cross-reference with any of the other Waltz data points to see how libraries are used.  This association is done via external processes, such as custom integration with the [_XRay_](https://jfrog.com/solution-sheet/jfrog-xray/) tool from [_JFrog_](https://jfrog.com/).
 
 
+###  <a name='oss-licences'></a> OSS Licence tracking - Licence Risk
 
-### OSS Licence tracking - Licence Risk
+Waltz also allows for OSS licences to be imported (there is a sample loader and an admin ui to support ad-hoc additions).
+OSS licences are linked to the software licences mentioned above and are therefore transitively associated to applications.
 
+Typically several assessments will be attached to licences indicating their suitability for use under specific conditions (internal, public-web, client side installation, etc).
 
 --------
 
@@ -249,40 +256,54 @@ _Integration with service now to provide controls around dq and enforce regular 
 
 ### Standards
 
+### Capacity
+
+Waltz is happily serving several hundred users per day, out of a total user base of tens of thousands.
+The Waltz instance has information on over 5K applications and a similar number of change initiatives. There are many more dataflows, surveys, and assessments managed by Waltz.
+Several of the taxonomies stretch to thousands of nodes with many more related mappings.
+
+This is all served by a load balanced pair of Tomcat servers with on a shared JVM of just 2GB.
+The (SQLServer) database has 8GB of memory.
+
 ---------
 
-## Technical Specs
+## Technical Details
 
 ### Frontend
 
 Major libraries / frameworks being used:
 
-- Svelte, a lightweight performant framework being used in Waltz to replace the legacy AngularJS code
-- D3 for data visualization
-- Lodash for data manipulation
-- Slickgrid for large tables, being used to replace UI-Grid (AngularJS based grid library)
-- Sass, CSS pre-processor
-- Webpack, build framework
-- Mocha, unit testing
+- [Svelte](https://svelte.dev/), a lightweight performant framework being used in Waltz to replace the legacy [AngularJS](https://angularjs.org/) code
+- [D3](https://d3js.org/) for data visualization
+- [Lodash](https://lodash.com/) for data manipulation
+- [Slickgrid](https://slickgrid.net/) for large tables, being used to replace [UI-Grid](http://ui-grid.info/) (AngularJS based grid library)
+- [Sass](https://sass-lang.com/), CSS pre-processor
+- [Webpack](https://webpack.js.org/), build framework
+- [Mocha](https://mochajs.org/), unit testing
 
 ### Server
 
-- Java, currently supporting 8, but shortly moving to JDK 11 and then 17
-- Spring framework for auto-wiring components
-- Spark Java, a lightweight framework for creating REST endpoints
-- jOOQ, a java DSL for writing and executing database queries
-- Immutables for domain objects
+- [Java](https://www.java.com/en/), currently supporting 8, but shortly moving to JDK 11 and then 17
+- [Spring framework](https://spring.io/projects/spring-framework) for auto-wiring components
+- [Spark Java](http://sparkjava.com/), a lightweight framework for creating REST endpoints
+- [jOOQ](https://www.jooq.org/), a java DSL for writing and executing database queries
+- [Immutables](https://immutables.github.io/) for domain objects
 
 ### Database
 
-- Production databases: MSSQL, Postgres
-- Test databases: H2
+- Production databases: [MSSQL](https://www.microsoft.com/en-gb/sql-server/), [Postgres](https://www.postgresql.org/)
+  - If MSSQL is chosen and you wish to actively work on the Waltz code base a commercial jOOQ licence is required.  jOOQ is free for free databases, but not for commercial databases 
+- Test databases: [H2](https://www.h2database.com/html/main.html)
 
 ### Deployment options
 
-- Web container, e.g. Tomcat
+- Web container, e.g. [Tomcat](https://tomcat.apache.org/)
 - Standalone JAR
-- Docker image
+- [Docker](https://www.docker.com/) image
+
+### Notes
+
+
 
 ---------
 
