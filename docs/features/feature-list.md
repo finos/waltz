@@ -6,16 +6,16 @@ Capability   / Feature | Waltz
 Enterprise Architecture   Management | 
 Standards | 
 Patterns | 
-Authoritative Source | Ability to disposition for a   given capability - what is the authoritative source for the data; can   accommodate for heritage scenarios.
+Authoritative Source | [Auth sources, including heritage flows](#data-classifications)
 Authoritative Consumers | Ability to identify who should   be the authoritative consumers for a given dataset (bi-directional   relationships for data consumption)
-Manage Architectures | 
+Manage Architectures | x 
 Models | 
-Assessments | 
-Portfolio Management | 
-Application Rationalization | 
-Roadmaps (application,   products) | 
+Assessments | x
+Portfolio Management | x
+Application Rationalization | x 
+Roadmaps (application,   products) | x
 Functional   commissions/de-commissions | Ability to show when   capabilities start/stop within a portfolio
-Lifecycle Mappings | 
+Lifecycle Mappings | x
 Data Lineage | Logical flows captured (point to   point with data-type metadata via integration method) with   visualization/mapping abilities.     Significant maturity planned.
 Bank / Architecture on a Page | Ability to visualize   capability/taxonomy for a specific function (e.g., operations, CIO-specific   views) - and overlay various metadata   (costs, regions, locations, etc. ) with roadmap/timeline to show   volatilities/projections. Dynamically generated vantage points.
 Data Products | Data-based reference view of   underlying datamodels for application portfolio for consumption and usage   purposes.
@@ -23,7 +23,7 @@ Cost allocations - Taxonomies | Ability to demarcate the   percentage of costs (
 Application Ratings based on   Capability | Application may have a   legal-hold; supports a given capability and assigning a rating. Providing a   more nuanced/detailed view of what an application is doing specifically   within the capability.
 Supply Chain / Contract   Management | Taxonomy of contracts; associate   application with capability/service and with a contract - providing pivot   views of a vendor-relationship what are all the applications linked to it.
 Investment Planning | Built-in to the ratings   function/service/capability. Provide a ratings-item which details the   strategic / attribute alignment. Providing driving alignment views for a   given application.
-Analytics / Ad-hoc | 
+Analytics / Ad-hoc | x
 Diagramming | Flow-diagrams based on   underlying metadata (constrained diagram - upstream/downstream graphs). Plans   to link with Archie - leverage reference data with Archie.      Ability to incorporate Archie / Sparx / BPM diagrams into Waltz and   leveraged for overlay purposes (Bank/Architecture on a Page).
 Analytics / Reporting | ReportGrid   (API-enabled) ; ability to select various data   dimensions /cross-reference (meta-data) and develop derived columns that can   be leveraged to showcase a portfolio's dispositions. Ability to regex for   terms to enhance dispositions based on keyword look-ups. Plans to be leveraged by other product   reporting tools (e.g., Tableau, Apache Superset, etc)
  | 
@@ -46,13 +46,13 @@ How are   modifications to the application made (business logic and/or data   st
 Cost / Licensing |
 
 
-## Applications
+## <a name='apps'></a> Applications
 
 One of the primary entities in Waltz is the _Application_.
 Applications have some basic properties such _name_, _type_, and _description_. 
 Additional properties include _lifecycle_ indicators (status, dates) and _organizational ownership_ information.
 
-### Extensions
+### <a name='app-extensions'></a> Extensions
 
 As with other entities in Waltz, applications can be enriched with additional data points:
 
@@ -69,7 +69,9 @@ Assessments are versatile and have been used for a wide range of purposes includ
 - Categorized _Bookmarks_ allow for a standardized way of collecting a common set of links to additional information resources about the application
 - _Taxonomy Mappings_, which are further discussed below
 
-## Taxonomies and Taxonomy Mappings
+--------
+
+## <a name='taxonomies'></a> Taxonomies and Taxonomy Mappings
 
 Organizations can create multiple _Taxonomies_ in Waltz.
 Each taxonomy is a hierarchical collection of related elements. 
@@ -79,41 +81,40 @@ Examples of these taxonomies are:
 - Capabilities
 - Processes
 - Regulations
-- Agile Tribes
+- Agile Domains and Tribes
 - Records
 
-### Portfolio Management
+### <a name='portfolio-management'></a> Portfolio Management
+
 Organizations can describe and document their application portfolio using _mappings_ to these taxonomies.
 Each mapping has an associated _rating_, typically a buy-sell-hold indicator, but the _rating scheme_ can be customised.
 
 The mappings may also be flagged as _primary_ for an application, which allows for more contextual information to be presented when lists of apps are shown elsewhere in Waltz.
 
-### Roadmaps
-Decommission and commission information can be associated with each mapping, allowing detailed roadmaps, shwoing how the portfolio will change over time, to be sourced from the captured data.
+### <a name='roadmaps'></a> Roadmaps
+Decommission and commission information can be associated with each mapping, allowing detailed roadmaps, showing how the portfolio will change over time, to be sourced from the captured data.
 
-### Allocations
+### <a name='allocations'></a> Allocations
 The mappings may have allocation percentages associated to them, this is commonly used to allow a breakdown of costs per capability for applications (and then aggregated across collections of applications).
 
-### Rating Assessments
+### <a name='taxonomy-rating-assessments'></a> Rating Assessments
 Finally, we recently added the ability to add assessments to ratings.
 This supports a more nuanced view of the applications, for example we could add product and location assessments to capability ratings indicating what types of financial products and in what location are being handled by a specific application capability.
 
-### Application Rationalisation
+### <a name='app-rationalisation'></a> Application Rationalisation
 Once the application portfolio has been mapped against a consistent set of taxonomies it becomes simple to see high-level opportunities for app consolidation/rationalisation by viewing all applications which are associated to a taxonomy item.
-These views are aggregated if higher level items in the taxomomy are selected.
 
-The rating assessments, mentioned above, will provide increased 
 
 --------
 
-## Data Management Features
+## <a name='data'></a> Data Management Features
 
-### Data Types
+### <a name='data-types'></a> Data Types
 
 Waltz supports a hierarchical taxonomy of data types.
 Each type may be declared as `concrete` indicating it is sufficiently granular to be used when documenting flows.
 
-### Data Flows
+### <a name='data-flows'></a> Data Flows
 
 Logical flows (generic) and physical flows (specific descriptions of flows) can be captured and linked to data types.
 
@@ -125,7 +126,11 @@ The Waltz UI allows flows to be maintained and has functionality to do more adva
 
 Flows and their data types can be attested by either a named set of users or users specifically associated (via a specific role) with the source or target applications.
 
-### Lineage
+Physical flows provide more detail about specific data flows.
+They can be linked to a specification which provides field level detail with optional linkage to a data dictionary.
+Specifications can be shared and are often used to represent standardised data schemas within an organisation.
+
+### <a name='lineage'></a> Lineage
 
 Waltz has rudimentary support for describing lineage using _Flow Diagrams_, these diagrams are created using a _constrained editor_ which only allows registered flows to be used.
 
@@ -135,26 +140,68 @@ The diagrams allow for overlaying and filtering, for example you could overlay a
 For more detailed and comprehensive support for lineage we commonly use the data in Waltz with systems such as _Solidatus_.
 Alternatively, the information can be exported into a graph database for further analysis using custom tooling.
 
-### Flow Classifications
+### <a name='data-classifications'></a> Flow Classifications
 
 Rules can be created to capture concepts such as _Authority Statements_.
 Each rule defines a source, data type, consumer set, and outcome.
-For example: '_BookMgr_ (source) is an _Authoritative Source_ (outcome) of _Book Data_ (data type) for the _Investment Bank_ (consumer set)'.
+For example: '_BookMgr_ (source) is an _Authoritative Source_ (outcome) of _Book Data_ (data type) for the _Investment Bank_ (consumer set)'.  
 
 Defining these rules allows them to be captured and applied to the data flow model to measure 'right sourcing' within an organisation.
 
-### Data Assessments and other extensions
+By defining tight (sometimes singular apps) as the consumer set Waltz can allow for concepts such as '_Heritage_' flows - those that are non-authoritative but allowed for legacy reasons. 
+
+### <a name='data-assessments'></a> Data Assessments and other extensions
 
 Flows, data types, and related entities can use the standard Waltz enrichment mechanisms.
 Particularly useful are assessments, bookmarks, and links to entities such as people (e.g. _Data Owners_) and groups.
 
 --------
 
-## Surveys
+## <a name='surveys'></a> Surveys
+
+Waltz provides a survey feature which is deeply integrated into the Waltz data model.
+Surveys can be designed and issued against applications (or change initiatives) matching a set of criteria and assigned to users via their involvement to the application.
+
+For example a survey could be issued to all applications which perform any payment related capability and be assigned to the business analysts and business owners of the relevant apps.
+
+### <a name='survey-lifecycle'></a> Survey Lifecycle
+
+Surveys have a basic lifecycle support with an optional approval step once the survey is completed.
+It is common for custom code to perform additional tasks through the survey lifecycle. 
+Via custom code survey creation may be triggered via an external event.
+It is also common for an assessment to be set upon survey approval, for example a survey pertaining to '_Cloud Onboarding_' may result in a '_Cloud Migration Recommendation_' assessment to be assigned.
+
+### <a name='survey-templates'></a> Survey templates and predicates
+
+The surveys themselves can be quite sophisticated and reference Waltz model elements (taxonomies, people etc).
+The questions can be shown/hidden by predicates which are either based on other answers in the survey, or they may be predicated on environmental attributes related to the application (e.g. only show a question if the application has a '_High Criticality Rating_'). 
+
+
+--------
+
+## <a name='ci'></a> Change Initiatives
+
+Change Initiatives are used to capture change programmes and projects in an organization.
+They can be associated with applications, people and other Waltz entities.
+It is common to use change initiatives, surveys and assessments in conjunction to perform '_Architectural governance_' over the organizations change programmes.
+
+
+--------
+
+## OSS 
+
+### Library Usage tracking - OSS Risk
+
+
+
+### OSS Licence tracking - Licence Risk
+
 
 --------
 
 ## Aggregate views
+
+These views are aggregated if higher level items in the taxonomy are selected.
 
 ### Vantage points
 
@@ -169,14 +216,13 @@ Particularly useful are assessments, bookmarks, and links to entities such as pe
 
 - Flows
 - Attestations
-- Taxonimies
+- Taxonomies
 - Report grids
 
 
 #### Bank on a Page
 
 Waltz has the ability to visualize capability/taxonomy for a specific function (e.g., operations, CIO-specific views) - and overlay various metadata (costs, regions, locations, etc. ) with roadmap/timeline to show volatilities/projections. Dynamically generated vantage points.
-
 
 
 --------
@@ -187,7 +233,21 @@ Waltz ships with **no** _out of the box_ integrations.
 Integration is typically done via periodic batch jobs which load data into the Waltz database.
 
 Users have integrated with systems such as Collibra, Solidatus, Service Now, Apptio, Sparx Enterprise Architect and more.
-We are hoping to offer standardised intgerations in the future, with Collibra (Cloud) being the likely first offering. 
+We are hoping to offer standardised integrations in the future, with Collibra (Cloud) being the likely first offering.
+
+### Software Development Lifecycle (SDLC)
+
+_Integration with service now to provide controls around dq and enforce regular attestations_
+
+
+---------
+
+
+## NFR
+
+### Security
+
+### Standards
 
 ---------
 
@@ -207,7 +267,7 @@ Major libraries / frameworks being used:
 
 ### Server
 
-- Java, currently supporting 8, but shortly moving to JDK 11 or 17 (tbc)
+- Java, currently supporting 8, but shortly moving to JDK 11 and then 17
 - Spring framework for auto-wiring components
 - Spark Java, a lightweight framework for creating REST endpoints
 - jOOQ, a java DSL for writing and executing database queries
@@ -220,6 +280,23 @@ Major libraries / frameworks being used:
 
 ### Deployment options
 
-- Webcontainer, e.g. Tomcat
+- Web container, e.g. Tomcat
 - Standalone JAR
 - Docker image
+
+---------
+
+# Current Development Themes 
+
+## 2024
+
+Currently, the main focus for 2024 is to improve support around data flows and lineage.
+This will include extending flow classification rules to include 'authoritative consumers', adding a request based model to flow modifications and registration, and improved support for linking EUDAs to flows.
+
+In addition to flows, we expect to look at tools to boost data quality, specifically by allowing organizations to set up correlation rules between taxonomies.
+An evaluator would evaluate the rules and raise potential issues where data does not '_look right_'.
+For instance a rule could be set up to say that the '_KYC_' capability expects to see '_Person_' related data and be involved in one or more of a set of processes.
+
+Another theme is around the Bank on a Page feature set.
+This may involve closer integration with other reporting tools (Tableau, Superset) or we may pursue more custom visualisations.
+We also intend to investigate how to integrate more closely with tools such as Archi and other open source diagramming tools.
