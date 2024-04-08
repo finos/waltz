@@ -34,8 +34,8 @@ public abstract class EndUserApplication implements
         DescriptionProvider,
         ExternalIdProvider,
         NameProvider,
-        ProvenanceProvider {
-
+        ProvenanceProvider,
+        WaltzEntity {
     public abstract Long organisationalUnitId();
     public abstract String applicationKind();
     public abstract LifecyclePhase lifecyclePhase();
@@ -45,11 +45,12 @@ public abstract class EndUserApplication implements
     @Value.Default
     public EntityKind kind() { return EntityKind.END_USER_APPLICATION; }
 
-    public EntityReference toEntityReference() {
+    public EntityReference entityReference() {
         return ImmutableEntityReference.builder()
                 .kind(EntityKind.END_USER_APPLICATION)
                 .id(id().get())
                 .name(name())
+                .description(description())
                 .build();
     }
 }
