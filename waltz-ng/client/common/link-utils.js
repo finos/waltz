@@ -33,6 +33,7 @@ const stateKindTuples = [
     {kind: "CHANGE_INITIATIVE", state: "main.change-initiative.view"},
     {kind: "CHANGE_SET", state: "main.change-set.view"},
     {kind: "DATA_TYPE", state: "main.data-type.view"},
+    {kind: "END_USER_APPLICATION", state: "main.end-user-application.view"},
     {kind: "ENTITY_RELATIONSHIP", state: "main.entity-relationship.view"},
     {kind: "ENTITY_STATISTIC", state: "main.entity-statistic.view"},
     {kind: "FLOW_DIAGRAM", state: "main.flow-diagram.view"},

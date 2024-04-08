@@ -8,24 +8,23 @@ const initialState = {
 };
 
 
-const addToHistory = (historyStore, rating) => {
-    if (! rating) { return; }
+const addToHistory = (historyStore, ref) => {
+    if (! ref) { return; }
     historyStore.put(
-        rating.name,
+        ref.name,
         "END_USER_APPLICATION",
-        "main.end-user-application-view.view",
-        { id: rating.id });
+        "main.end-user-application.view",
+        { id: ref.id });
 };
 
 
 function controller($stateParams, historyStore, serviceBroker) {
 
-    console.log("EndUserApp ng controller")
     const vm = initialiseData(this, initialState);
 
     const endUserAppId = $stateParams.id;
 
-    vm.parentEntityRef = null;
+    vm.parentEntityRef = { id: endUserAppId, kind: "END_USER_APPLICATION" };
 
     serviceBroker
         .loadViewData(
@@ -33,7 +32,7 @@ function controller($stateParams, historyStore, serviceBroker) {
             [endUserAppId])
         .then(r => {
             const endUserApp = r.data;
-            vm.parentEntityRef = endUserApp;
+            vm.parentEntityRef = Object.assign({}, vm.parentEntityRef, endUserApp);
             addToHistory(historyStore, vm.parentEntityRef);
         });
 }

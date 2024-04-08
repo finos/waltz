@@ -30,7 +30,6 @@ const viewState = {
 };
 
 function setup($stateProvider) {
-    console.log("registering euda routes")
     $stateProvider
         .state("main.end-user-application", baseState)
         .state("main.end-user-application.view", viewState);
