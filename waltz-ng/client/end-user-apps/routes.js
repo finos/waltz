@@ -16,19 +16,27 @@
  *
  */
 
-import angular from "angular";
-import * as endUserAppStore from "./services/end-user-app-store";
-import {registerStore} from "../common/module-utils";
-import Routes from "./routes";
+import EndUserApplicationView from "./pages/end-user-application-view";
 
-export default () => {
+const baseState = {};
 
-    const module = angular.module("waltz.end.user.apps", []);
 
-    module
-        .config(Routes);
+const viewState = {
+    url: "end-user-application/id/{id:int}",
+    views: {
+        "content@": EndUserApplicationView
+    }
 
-    registerStore(module, endUserAppStore);
-
-    return module.name;
 };
+
+function setup($stateProvider) {
+    console.log("registering euda routes")
+    $stateProvider
+        .state("main.end-user-application", baseState)
+        .state("main.end-user-application.view", viewState);
+}
+
+setup.$inject = ["$stateProvider"];
+
+
+export default setup;
