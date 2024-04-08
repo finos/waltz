@@ -1,7 +1,6 @@
 <script>
     import PageHeader from "../../common/svelte/PageHeader.svelte";
     import ViewLink from "../../common/svelte/ViewLink.svelte";
-    import Markdown from "../../common/svelte/Markdown.svelte";
     import AssessmentFavouritesList from "../../assessments/components/favourites-list/AssessmentFavouritesList.svelte";
     import {primaryEntityReference as primaryRef} from "../../assessments/components/rating-editor/rating-store";
     import {dynamicSections} from "../../dynamic-section/dynamic-section-definitions";
@@ -10,19 +9,32 @@
     import {orgUnitStore} from "../../svelte-stores/org-unit-store";
     import EntityLink from "../../common/svelte/EntityLink.svelte";
     import DescriptionFade from "../../common/svelte/DescriptionFade.svelte";
+    import {applicationStore} from "../../svelte-stores/application-store";
+    import Icon from "../../common/svelte/Icon.svelte";
 
     export let primaryEntityReference;
 
     let orgUnitCall;
+    let promotedAppCall;
+
+    let promotedApp = null;
+    let orgUnit = null;
 
     $: {
         if (primaryEntityReference?.organisationalUnitId) {
             orgUnitCall = orgUnitStore.getById(primaryEntityReference.organisationalUnitId);
         }
+
+        if (primaryEntityReference?.isPromoted) {
+            promotedAppCall = applicationStore.findByExternalId(primaryEntityReference.externalId);
+        }
     }
 
     $: $primaryRef = primaryEntityReference;  // hack to reset the assessment subsection
     $: orgUnit = $orgUnitCall?.data;
+    $: promotedApp = _.find($promotedAppCall?.data || [], { applicationKind: 'EUC' });
+
+    $: console.log({promotedApp})
 </script>
 
 <svelte:head>
@@ -44,6 +56,18 @@
 
 
     <div class="waltz-page-summary waltz-page-summary-attach">
+        {#if promotedApp}
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert alert-warning">
+                        <Icon name="exclamation-triangle"/>
+                        This End User Application has been converted to a full Waltz application record.
+                        <br>
+                        See: <EntityLink ref={promotedApp}/>
+                    </div>
+                </div>
+            </div>
+        {/if}
         <div class="row">
             <div class="col-md-6">
                 <div class="row">
@@ -52,6 +76,14 @@
                     </div>
                     <div class="col-sm-8">
                         {primaryEntityReference.name}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4 waltz-display-field-label">
+                        External Id
+                    </div>
+                    <div class="col-sm-8">
+                        {primaryEntityReference.externalId}
                     </div>
                 </div>
                 <div class="row">
@@ -67,7 +99,7 @@
                         Kind
                     </div>
                     <div class="col-sm-8">
-                        {primaryEntityReference.kind}
+                        {primaryEntityReference.applicationKind}
                     </div>
                 </div>
                 <div class="row">

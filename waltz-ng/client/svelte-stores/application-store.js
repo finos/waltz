@@ -36,10 +36,16 @@ export function mkApplicationStore() {
         .fetchViewDatum("POST", "api/app/view/selector", selector);
 
 
+    const findByExternalId = (extId) => remote
+        .fetchViewList("GET", `api/app/external-id/${extId}`, null );
+
+
+
     return {
         getById,
         update,
         registerApp,
+        findByExternalId,
         findBySelector,
         getViewBySelector
     };
