@@ -33,8 +33,6 @@
     $: $primaryRef = primaryEntityReference;  // hack to reset the assessment subsection
     $: orgUnit = $orgUnitCall?.data;
     $: promotedApp = _.find($promotedAppCall?.data || [], { applicationKind: 'EUC' });
-
-    $: console.log({promotedApp})
 </script>
 
 <svelte:head>
