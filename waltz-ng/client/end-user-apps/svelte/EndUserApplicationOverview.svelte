@@ -9,6 +9,7 @@
     import SubSection from "../../common/svelte/SubSection.svelte";
     import {orgUnitStore} from "../../svelte-stores/org-unit-store";
     import EntityLink from "../../common/svelte/EntityLink.svelte";
+    import DescriptionFade from "../../common/svelte/DescriptionFade.svelte";
 
     export let primaryEntityReference;
 
@@ -30,7 +31,7 @@
 
 {#if primaryEntityReference}
 
-    <PageHeader icon="puzzle-piece"
+    <PageHeader icon="table"
                 name={primaryEntityReference.name || "End User Application"}>
         <div slot="breadcrumbs">
             <ol class="waltz-breadcrumbs">
@@ -90,7 +91,8 @@
                         Description
                     </div>
                     <div class="col-sm-8">
-                        <Markdown text={primaryEntityReference.description}/>
+                        <DescriptionFade expanderAlignment="left"
+                                         text={primaryEntityReference.description}/>
                     </div>
                 </div>
             </div>
