@@ -147,11 +147,11 @@ public class EntityHierarchyDao {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
-    public List<Tuple2<Long, Long>> fetchHierarchyForKind(EntityKind kind) {
+    public List<EntityHierarchyItem> fetchHierarchyForKind(EntityKind kind) {
         return dsl
-                .select(eh.ID, eh.ANCESTOR_ID)
+                .select(eh.fields())
                 .from(eh)
                 .where(eh.KIND.eq(kind.name()))
-                .fetch(r -> tuple(r.get(eh.ID), r.get(eh.ANCESTOR_ID)));
+                .fetch(TO_DOMAIN_MAPPER);
     }
 }

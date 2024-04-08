@@ -33,7 +33,9 @@ import org.finos.waltz.data.orgunit.OrganisationalUnitDao;
 import org.finos.waltz.data.person.PersonDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.entity_hierarchy.EntityHierarchy;
 import org.finos.waltz.model.entity_hierarchy.EntityHierarchyItem;
+import org.finos.waltz.model.entity_hierarchy.ImmutableEntityHierarchy;
 import org.finos.waltz.model.entity_hierarchy.ImmutableEntityHierarchyItem;
 import org.finos.waltz.model.tally.ImmutableTally;
 import org.finos.waltz.model.tally.Tally;
@@ -275,8 +277,11 @@ public class EntityHierarchyService {
         }
     }
 
-    public List<Tuple2<Long, Long>> fetchHierarchyForKind(EntityKind kind) {
-        return entityHierarchyDao.fetchHierarchyForKind(kind);
+    public EntityHierarchy fetchHierarchyForKind(EntityKind kind) {
+        return ImmutableEntityHierarchy
+                .builder()
+                .hierarchyItems(entityHierarchyDao.fetchHierarchyForKind(kind))
+                .build();
     }
 
 }

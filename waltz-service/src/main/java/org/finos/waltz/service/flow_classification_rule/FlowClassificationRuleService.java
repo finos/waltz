@@ -42,6 +42,7 @@ import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.datatype.DataType;
 import org.finos.waltz.model.datatype.FlowDataType;
+import org.finos.waltz.model.entity_hierarchy.EntityHierarchy;
 import org.finos.waltz.model.flow_classification.FlowClassification;
 import org.finos.waltz.model.flow_classification_rule.DiscouragedSource;
 import org.finos.waltz.model.flow_classification_rule.FlowClassificationRule;
@@ -289,8 +290,8 @@ public class FlowClassificationRuleService {
                 population.size());
 
         LOG.debug("Loading hierarchies");
-        List<Tuple2<Long, Long>> ouHierarchy = entityHierarchyService.fetchHierarchyForKind(EntityKind.ORG_UNIT);
-        List<Tuple2<Long, Long>> dtHierarchy = entityHierarchyService.fetchHierarchyForKind(EntityKind.DATA_TYPE);
+        EntityHierarchy ouHierarchy = entityHierarchyService.fetchHierarchyForKind(ORG_UNIT);
+        EntityHierarchy dtHierarchy = entityHierarchyService.fetchHierarchyForKind(EntityKind.DATA_TYPE);
 
         LOG.debug("Applying rules to population");
         Map<Long, Tuple2<Long, FlowClassificationRuleUtilities.MatchOutcome>> lfdIdToOutboundRuleIdMap = time("inbound vps", () -> applyVantagePoints(FlowDirection.OUTBOUND, outboundRuleVantagePoints, population, ouHierarchy, dtHierarchy));

@@ -4,6 +4,7 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.FlowDirection;
 import org.finos.waltz.model.datatype.FlowDataType;
+import org.finos.waltz.model.entity_hierarchy.EntityHierarchy;
 import org.finos.waltz.model.flow_classification_rule.FlowClassificationRuleVantagePoint;
 import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
 import org.finos.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
@@ -81,8 +82,8 @@ public class FlowClassificationRuleUtilities {
     protected static Map<Long, Tuple2<Long, MatchOutcome>> applyVantagePoints(FlowDirection direction,
                                                                               List<FlowClassificationRuleVantagePoint> ruleVantagePoints,
                                                                               Set<FlowDataType> population,
-                                                                              List<Tuple2<Long, Long>> ouHierarchy,
-                                                                              List<Tuple2<Long, Long>> dtHierarchy) {
+                                                                              EntityHierarchy ouHierarchy,
+                                                                              EntityHierarchy dtHierarchy) {
 
         Function4<FlowClassificationRuleVantagePoint, Set<Long>, Set<Long>, FlowDataType, MatchOutcome> matcher = determineMatcherFn(direction);
 
@@ -90,8 +91,8 @@ public class FlowClassificationRuleUtilities {
         ruleVantagePoints
                 .stream()
                 .forEach(rvp -> {
-                    Set<Long> childOUs = findChildren(ouHierarchy, rvp.vantagePoint().id());
-                    Set<Long> childDTs = findChildren(dtHierarchy, rvp.dataType().id());
+                    Set<Long> childOUs = ouHierarchy.findChildren(rvp.vantagePoint().id());
+                    Set<Long> childDTs = dtHierarchy.findChildren(rvp.dataType().id());
                     population.forEach(p -> {
                         Tuple2<Long, MatchOutcome> currentRuleAndOutcome = lfdIdToRuleAndOutcomeMap.get(p.lfdId());
                         if (currentRuleAndOutcome != null && currentRuleAndOutcome.v2 == MatchOutcome.POSITIVE_MATCH) {
@@ -162,16 +163,6 @@ public class FlowClassificationRuleUtilities {
         } else {
             return MatchOutcome.NOT_APPLICABLE;
         }
-    }
-
-
-    public static Set<Long> findChildren(List<Tuple2<Long, Long>> hierarchy,
-                                          long parentId) {
-        return hierarchy
-                .stream()
-                .filter(t -> t.v2 == parentId)
-                .map(t -> t.v1)
-                .collect(Collectors.toSet());
     }
 
 }
