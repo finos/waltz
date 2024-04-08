@@ -61,7 +61,7 @@
                 <div class="col-md-12">
                     <div class="alert alert-warning">
                         <Icon name="exclamation-triangle"/>
-                        This End User Application has been converted to a full Waltz application record.
+                        This End User Application record has been converted to a full Application record.
                         <br>
                         See: <EntityLink ref={promotedApp}/>
                     </div>
