@@ -38,12 +38,17 @@ export function store($http, baseUrl) {
         .get(`${BASE}`)
         .then(result => result.data);
 
+    const getById = (id) => $http
+        .get(`${BASE}/id/${id}`)
+        .then(result => result.data);
+
 
     return {
         findBySelector,
         countByOrganisationalUnit,
         promoteToApplication,
-        findAll
+        findAll,
+        getById
     };
 }
 
@@ -73,6 +78,11 @@ export const EndUserAppStore_API = {
         serviceName,
         serviceFnName: 'findAll',
         description: 'returns all EUDAs that are not promoted'
+    },
+    getById: {
+        serviceName,
+        serviceFnName: 'getById',
+        description: 'returns specific EUDA based on id'
     }
 };
 

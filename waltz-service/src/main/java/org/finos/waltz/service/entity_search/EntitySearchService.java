@@ -24,6 +24,7 @@ import org.finos.waltz.service.application.ApplicationService;
 import org.finos.waltz.service.change_initiative.ChangeInitiativeService;
 import org.finos.waltz.service.data_type.DataTypeService;
 import org.finos.waltz.service.database_information.DatabaseInformationService;
+import org.finos.waltz.service.end_user_app.EndUserAppService;
 import org.finos.waltz.service.flow_diagram.FlowDiagramService;
 import org.finos.waltz.service.legal_entity.LegalEntityService;
 import org.finos.waltz.service.licence.LicenceService;
@@ -65,6 +66,7 @@ public class EntitySearchService {
     private final ChangeInitiativeService changeInitiativeService;
     private final LogicalDataElementService logicalDataElementService;
     private final DataTypeService dataTypeService;
+    private final EndUserAppService endUserAppService;
     private final MeasurableService measurableService;
     private final OrganisationalUnitService organisationalUnitService;
     private final PersonService personService;
@@ -86,6 +88,7 @@ public class EntitySearchService {
                                ChangeInitiativeService changeInitiativeService,
                                LogicalDataElementService logicalDataElementService,
                                DataTypeService dataTypeService,
+                               EndUserAppService endUserAppService,
                                MeasurableService measurableService,
                                OrganisationalUnitService organisationalUnitService,
                                PersonService personService,
@@ -104,6 +107,7 @@ public class EntitySearchService {
         checkNotNull(appGroupService, "appGroupService cannot be null");
         checkNotNull(changeInitiativeService, "changeInitiativeService cannot be null");
         checkNotNull(dataTypeService, "dataTypeService cannot be null");
+        checkNotNull(endUserAppService, "endUserAppService cannot be null");
         checkNotNull(flowDiagramService, "flowDiagramService cannot be null");
         checkNotNull(logicalDataElementService, "logicalDataElementService cannot be null");
         checkNotNull(measurableService, "measurableService cannot be null");
@@ -125,6 +129,7 @@ public class EntitySearchService {
         this.dataTypeService = dataTypeService;
         this.flowDiagramService = flowDiagramService;
         this.logicalDataElementService = logicalDataElementService;
+        this.endUserAppService = endUserAppService;
         this.measurableService = measurableService;
         this.organisationalUnitService = organisationalUnitService;
         this.personService = personService;
@@ -175,6 +180,8 @@ public class EntitySearchService {
                 return () -> dataTypeService.search(options);
             case DATABASE:
                 return () -> databaseInformationService.search(options);
+            case END_USER_APPLICATION:
+                return () -> endUserAppService.search(options);
             case FLOW_DIAGRAM:
                 return () -> flowDiagramService.search(options);
             case LEGAL_ENTITY:
