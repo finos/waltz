@@ -2,6 +2,7 @@
     import ViewLink from "./ViewLink.svelte";
     import EntityLabel from "./EntityLabel.svelte";
     import {kindToViewState} from "../link-utils";
+    import _ from "lodash";
 
     /**
      * Entity Link takes an entity ref
@@ -22,11 +23,11 @@
 
     $: {
         try {
-            state = ref
-                ? kindToViewState(ref.kind)
-                : null;
+            state = _.isEmpty(ref)
+                ? null
+                : kindToViewState(ref.kind);
         } catch(e){
-            console.error(e);
+            console.error(e, "bad ref?", ref);
         }
     }
 

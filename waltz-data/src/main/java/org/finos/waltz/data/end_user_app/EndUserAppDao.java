@@ -22,6 +22,7 @@ import org.finos.waltz.data.JooqUtilities;
 import org.finos.waltz.model.application.LifecyclePhase;
 import org.finos.waltz.model.enduserapp.EndUserApplication;
 import org.finos.waltz.model.enduserapp.ImmutableEndUserApplication;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.finos.waltz.model.physical_flow.CriticalityValue;
 import org.finos.waltz.model.tally.Tally;
 import org.finos.waltz.schema.tables.records.EndUserApplicationRecord;
@@ -34,6 +35,7 @@ import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 
 import static java.util.Optional.ofNullable;
@@ -123,4 +125,5 @@ public class EndUserAppDao {
                 .where(COMMON_CONDITION)
                 .fetch(TO_DOMAIN_MAPPER);
     }
+
 }

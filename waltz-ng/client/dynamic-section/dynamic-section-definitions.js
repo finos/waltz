@@ -899,6 +899,16 @@ const legalEntityRelationshipSections = [
     changeLogSection
 ];
 
+const endUserApplicationSections = [
+    assessmentRatingSection,
+    bookmarksSection,
+    entityNamedNotesSection,
+    involvedPeopleSection,
+    dataFlowSection,
+    entityDiagramsSection,
+    changeLogSection
+];
+
 
 export const dynamicSectionsByKind = {
     "main.actor.view": actorSections,
@@ -916,6 +926,7 @@ export const dynamicSectionsByKind = {
     "main.database.external-id": databaseSections,
     "main.database.view": databaseSections,
     "main.entity-relationship.view": entityRelationshipSections,
+    "main.end-user-application.view": endUserApplicationSections,
     "main.flow-classification-rule.view": flowClassificationRuleSections,
     "main.flow-diagram.view": flowDiagramSections,
     "main.involvement-kind.view": involvementKindSections,

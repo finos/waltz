@@ -17,12 +17,16 @@
  */
 
 import {remote} from "./remote";
+import {toEntityRef} from "../common/entity-utils";
 
 
 function stripExtraneousFields(bookmark) {
-    return _.pick(
-        bookmark,
-        ["id", "bookmarkKind", "url", "title", "isRestricted", "parent", "description", "lastUpdatedBy"]);
+    const simplifiedBookmark = _.pick(bookmark, ["id", "bookmarkKind", "url", "title", "isRestricted", "parent", "description", "lastUpdatedBy"]);
+    const simplifiedParent = {parent: toEntityRef(bookmark.parent)};
+    return Object.assign(
+        {},
+        simplifiedBookmark,
+        simplifiedParent);
 }
 
 
