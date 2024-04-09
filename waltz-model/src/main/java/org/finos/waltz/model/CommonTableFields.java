@@ -2,13 +2,18 @@ package org.finos.waltz.model;
 
 import org.immutables.value.Value;
 import org.jooq.Condition;
+import org.jooq.Field;
+import org.jooq.Param;
 import org.jooq.Record;
 import org.jooq.Table;
-import org.jooq.TableField;
 import org.jooq.impl.DSL;
 
 @Value.Immutable
 public interface CommonTableFields<T extends Record> {
+
+    Param<String> NA_FIELD_VAL = DSL.val("n/a");
+    Param<String> ALWAYS_ACTIVE_FIELD_VAL = DSL.val(EntityLifecycleStatus.ACTIVE.name());
+
     EntityKind entityKind();
 
     default boolean hierarchical() {
@@ -17,19 +22,22 @@ public interface CommonTableFields<T extends Record> {
 
     Table<? extends T> table();
 
-    TableField<? extends T, Long> idField();
+    Field<Long> idField();
 
     @Nullable
-    TableField<? extends T, String> nameField();
+    Field<String> nameField();
 
     @Nullable
-    TableField<? extends T, String> descriptionField();
+    Field<String> descriptionField();
 
     @Nullable
-    TableField<? extends T, Long> parentIdField();
+    Field<Long> parentIdField();
 
     @Nullable
-    TableField<? extends T, String> externalIdField();
+    Field<String> externalIdField();
+
+    @Value.Default
+    default Field<String> lifecycleField() { return ALWAYS_ACTIVE_FIELD_VAL; };
 
     @Value.Default
     default Condition isActiveCondition() {

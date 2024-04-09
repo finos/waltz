@@ -60,7 +60,6 @@ import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDate;
 import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
-import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.schema.tables.AttestationInstance.ATTESTATION_INSTANCE;
 import static org.finos.waltz.schema.tables.AttestationInstanceRecipient.ATTESTATION_INSTANCE_RECIPIENT;
 import static org.finos.waltz.schema.tables.AttestationRun.ATTESTATION_RUN;
@@ -71,14 +70,12 @@ public class AttestationRunDao {
 
     private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             ATTESTATION_RUN.SELECTOR_ENTITY_ID,
-            ATTESTATION_RUN.SELECTOR_ENTITY_KIND,
-            newArrayList(EntityKind.values()))
+            ATTESTATION_RUN.SELECTOR_ENTITY_KIND)
             .as("entity_name");
 
     private static final Field<String> ATTESTED_ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             ATTESTATION_RUN.ATTESTED_ENTITY_ID,
-            ATTESTATION_RUN.ATTESTED_ENTITY_KIND,
-            newArrayList(EntityKind.values()))
+            ATTESTATION_RUN.ATTESTED_ENTITY_KIND)
             .as("attested_entity_name");
 
     private static final Field<BigDecimal> COMPLETE_SUM = DSL.sum(DSL
