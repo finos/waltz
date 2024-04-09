@@ -25,10 +25,16 @@ import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.datatype.DataTypeDecorator;
 import org.finos.waltz.model.datatype.DataTypeUsageCharacteristics;
+import org.finos.waltz.model.datatype.FlowDataType;
 import org.finos.waltz.model.datatype.ImmutableDataTypeDecorator;
 import org.finos.waltz.model.datatype.ImmutableDataTypeUsageCharacteristics;
+import org.finos.waltz.model.datatype.ImmutableFlowDataType;
 import org.finos.waltz.model.flow_classification_rule.FlowClassificationRuleVantagePoint;
 import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
+import org.finos.waltz.schema.Tables;
+import org.finos.waltz.schema.tables.Application;
+import org.finos.waltz.schema.tables.EntityHierarchy;
+import org.finos.waltz.schema.tables.LogicalFlow;
 import org.finos.waltz.schema.tables.LogicalFlowDecorator;
 import org.finos.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
 import org.jooq.Condition;
@@ -57,6 +63,7 @@ import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.data.JooqUtilities.readRef;
 import static org.finos.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
 import static org.finos.waltz.model.EntityKind.DATA_TYPE;
 import static org.finos.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
@@ -71,6 +78,12 @@ import static org.finos.waltz.schema.tables.PhysicalSpecDataType.PHYSICAL_SPEC_D
 
 @Repository
 public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
+
+    private static final LogicalFlow lf = Tables.LOGICAL_FLOW;
+    private static final LogicalFlowDecorator lfd = Tables.LOGICAL_FLOW_DECORATOR;
+    private static final Application srcApp = Tables.APPLICATION.as("srcApp");
+    private static final Application targetApp = Tables.APPLICATION.as("targetApp");
+    private static final EntityHierarchy eh = Tables.ENTITY_HIERARCHY;
 
     private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID,
@@ -382,6 +395,59 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
                 .set(LOGICAL_FLOW_DECORATOR.RATING, rating.value())
                 .where(condition)
                 .execute();
+    }
+
+    public int resetRatingsAndFlowClassificationRulesCondition(Condition condition) {
+        return dsl
+                .update(LOGICAL_FLOW_DECORATOR)
+                .set(LOGICAL_FLOW_DECORATOR.RATING, AuthoritativenessRatingValue.NO_OPINION.value())
+                .setNull(LOGICAL_FLOW_DECORATOR.FLOW_CLASSIFICATION_RULE_ID)
+                .setNull(LOGICAL_FLOW_DECORATOR.INBOUND_FLOW_CLASSIFICATION_RULE_ID)
+                .where(condition)
+                .execute();
+    }
+
+    public Set<FlowDataType> fetchFlowDataTypePopulationForFlowSelector(Select<Record1<Long>> flowSelector) {
+        Condition lfSelectorCondition = lf.ID.in(flowSelector);
+        return fetchFlowDataTypePopulation(lfSelectorCondition);
+    }
+
+    public Set<FlowDataType> fetchFlowDataTypePopulation(Condition condition) {
+        return dsl
+                .select(lf.ID,
+                        lfd.ID,
+                        lfd.DECORATOR_ENTITY_ID,
+                        lfd.INBOUND_FLOW_CLASSIFICATION_RULE_ID,
+                        lfd.FLOW_CLASSIFICATION_RULE_ID,
+                        lf.SOURCE_ENTITY_ID,
+                        lf.SOURCE_ENTITY_KIND,
+                        lf.TARGET_ENTITY_ID,
+                        lf.TARGET_ENTITY_KIND,
+                        srcApp.ORGANISATIONAL_UNIT_ID,
+                        targetApp.ORGANISATIONAL_UNIT_ID,
+                        lfd.RATING,
+                        lfd.TARGET_INBOUND_RATING)
+                .from(lf)
+                .innerJoin(lfd).on(lfd.LOGICAL_FLOW_ID.eq(lf.ID).and(lfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())))
+                .leftJoin(srcApp).on(srcApp.ID.eq(lf.SOURCE_ENTITY_ID).and(lf.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
+                .leftJoin(targetApp).on(targetApp.ID.eq(lf.TARGET_ENTITY_ID).and(lf.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
+                .where(lf.IS_REMOVED.isFalse()
+                        .and(lf.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name())))
+                .and(condition)
+                .fetchSet(r -> ImmutableFlowDataType
+                        .builder()
+                        .lfdId(r.get(lfd.ID))
+                        .dtId(r.get(lfd.DECORATOR_ENTITY_ID))
+                        .lfId(r.get(lf.ID))
+                        .source(readRef(r, lf.SOURCE_ENTITY_KIND, lf.SOURCE_ENTITY_ID))
+                        .target(readRef(r, lf.TARGET_ENTITY_KIND, lf.TARGET_ENTITY_ID))
+                        .inboundRuleId(r.get(lfd.INBOUND_FLOW_CLASSIFICATION_RULE_ID))
+                        .outboundRuleId(r.get(lfd.FLOW_CLASSIFICATION_RULE_ID))
+                        .sourceOuId(r.get(srcApp.ORGANISATIONAL_UNIT_ID))
+                        .targetOuId(r.get(targetApp.ORGANISATIONAL_UNIT_ID))
+                        .sourceOutboundRating(AuthoritativenessRatingValue.of(r.get(lfd.RATING)))
+                        .targetInboundRating(AuthoritativenessRatingValue.of(r.get(lfd.TARGET_INBOUND_RATING)))
+                        .build());
     }
 
 

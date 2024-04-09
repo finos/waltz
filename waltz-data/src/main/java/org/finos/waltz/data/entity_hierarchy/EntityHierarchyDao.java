@@ -31,6 +31,7 @@ import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
 import org.jooq.impl.DSL;
+import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,7 @@ import java.util.function.Function;
 import static org.finos.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.map;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository
 public class EntityHierarchyDao {
@@ -145,4 +147,11 @@ public class EntityHierarchyDao {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
+    public List<EntityHierarchyItem> fetchHierarchyForKind(EntityKind kind) {
+        return dsl
+                .select(eh.fields())
+                .from(eh)
+                .where(eh.KIND.eq(kind.name()))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
 }

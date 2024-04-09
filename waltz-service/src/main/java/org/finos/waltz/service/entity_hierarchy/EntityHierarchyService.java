@@ -18,9 +18,6 @@
 
 package org.finos.waltz.service.entity_hierarchy;
 
-import org.finos.waltz.data.person.PersonDao;
-import org.finos.waltz.schema.Tables;
-import org.finos.waltz.service.person_hierarchy.PersonHierarchyService;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.hierarchy.FlatNode;
 import org.finos.waltz.common.hierarchy.Forest;
@@ -33,12 +30,17 @@ import org.finos.waltz.data.entity_hierarchy.EntityRootsSelectorFactory;
 import org.finos.waltz.data.entity_statistic.EntityStatisticDao;
 import org.finos.waltz.data.measurable.MeasurableDao;
 import org.finos.waltz.data.orgunit.OrganisationalUnitDao;
+import org.finos.waltz.data.person.PersonDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.entity_hierarchy.EntityHierarchy;
 import org.finos.waltz.model.entity_hierarchy.EntityHierarchyItem;
+import org.finos.waltz.model.entity_hierarchy.ImmutableEntityHierarchy;
 import org.finos.waltz.model.entity_hierarchy.ImmutableEntityHierarchyItem;
 import org.finos.waltz.model.tally.ImmutableTally;
 import org.finos.waltz.model.tally.Tally;
+import org.finos.waltz.schema.Tables;
+import org.finos.waltz.service.person_hierarchy.PersonHierarchyService;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
@@ -46,18 +48,22 @@ import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.Table;
 import org.jooq.impl.DSL;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.finos.waltz.schema.Tables.ENTITY_HIERARCHY;
-import static org.finos.waltz.schema.Tables.MEASURABLE;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.model.EntityKind.PERSON;
+import static org.finos.waltz.schema.Tables.ENTITY_HIERARCHY;
+import static org.finos.waltz.schema.Tables.MEASURABLE;
 import static org.jooq.impl.DSL.select;
 
 @Service
@@ -269,6 +275,13 @@ public class EntityHierarchyService {
             default:
                 throw new IllegalArgumentException("Cannot determine hierarchy table for kind: "+kind);
         }
+    }
+
+    public EntityHierarchy fetchHierarchyForKind(EntityKind kind) {
+        return ImmutableEntityHierarchy
+                .builder()
+                .hierarchyItems(entityHierarchyDao.fetchHierarchyForKind(kind))
+                .build();
     }
 
 }
