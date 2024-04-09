@@ -4,7 +4,9 @@ import {initialiseData} from "../../common";
 import {CORE_API} from "../../common/services/core-api-utils";
 
 const initialState = {
-    EndUserApplicationOverview
+    EndUserApplicationOverview,
+    parentEntityRef: null,
+    endUserApplication: null
 };
 
 
@@ -31,9 +33,8 @@ function controller($stateParams, historyStore, serviceBroker) {
             CORE_API.EndUserAppStore.getById,
             [endUserAppId])
         .then(r => {
-            const endUserApp = r.data;
-            vm.parentEntityRef = Object.assign({}, vm.parentEntityRef, endUserApp);
-            addToHistory(historyStore, vm.parentEntityRef);
+            vm.endUserApplication = r.data;
+            addToHistory(historyStore, vm.endUserApplication);
         });
 }
 
@@ -47,7 +48,7 @@ controller.$inject = [
 const template = `
     <div>
         <waltz-svelte-component component="$ctrl.EndUserApplicationOverview"
-                                primary-entity-reference="$ctrl.parentEntityRef">
+                                end-user-application="$ctrl.endUserApplication">
         </waltz-svelte-component>
 
         <br>

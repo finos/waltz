@@ -12,7 +12,7 @@
     import {applicationStore} from "../../svelte-stores/application-store";
     import Icon from "../../common/svelte/Icon.svelte";
 
-    export let primaryEntityReference;
+    export let endUserApplication;
 
     let orgUnitCall;
     let promotedAppCall;
@@ -21,33 +21,35 @@
     let orgUnit = null;
 
     $: {
-        if (primaryEntityReference?.organisationalUnitId) {
-            orgUnitCall = orgUnitStore.getById(primaryEntityReference.organisationalUnitId);
+        if (endUserApplication?.organisationalUnitId) {
+            orgUnitCall = orgUnitStore.getById(endUserApplication.organisationalUnitId);
         }
 
-        if (primaryEntityReference?.isPromoted) {
-            promotedAppCall = applicationStore.findByExternalId(primaryEntityReference.externalId);
+        if (endUserApplication?.isPromoted) {
+            promotedAppCall = applicationStore.findByExternalId(endUserApplication.externalId);
         }
     }
 
-    $: $primaryRef = primaryEntityReference;  // hack to reset the assessment subsection
+    $: $primaryRef = endUserApplication;  // hack to reset the assessment subsection
     $: orgUnit = $orgUnitCall?.data;
     $: promotedApp = _.find($promotedAppCall?.data || [], { applicationKind: 'EUC' });
 </script>
 
+
 <svelte:head>
-    <title>Waltz: {primaryEntityReference?.name} - End User Application</title>
+    <title>Waltz: {endUserApplication?.name} - End User Application</title>
 </svelte:head>
 
-{#if primaryEntityReference}
+
+{#if endUserApplication}
 
     <PageHeader icon="table"
-                name={primaryEntityReference.name || "End User Application"}>
+                name={endUserApplication.name || "End User Application"}>
         <div slot="breadcrumbs">
             <ol class="waltz-breadcrumbs">
                 <li><ViewLink state="main">Home</ViewLink></li>
                 <li>End User Application</li>
-                <li>{primaryEntityReference.name}</li>
+                <li>{endUserApplication.name}</li>
             </ol>
         </div>
     </PageHeader>
@@ -73,7 +75,7 @@
                         Name
                     </div>
                     <div class="col-sm-8">
-                        {primaryEntityReference.name}
+                        {endUserApplication.name}
                     </div>
                 </div>
                 <div class="row">
@@ -81,7 +83,7 @@
                         External Id
                     </div>
                     <div class="col-sm-8">
-                        {primaryEntityReference.externalId}
+                        {endUserApplication.externalId}
                     </div>
                 </div>
                 <div class="row">
@@ -97,7 +99,7 @@
                         Kind
                     </div>
                     <div class="col-sm-8">
-                        {primaryEntityReference.applicationKind}
+                        {endUserApplication.applicationKind}
                     </div>
                 </div>
                 <div class="row">
@@ -105,7 +107,7 @@
                         Lifecycle Phase
                     </div>
                     <div class="col-sm-8">
-                        {primaryEntityReference.lifecyclePhase}
+                        {endUserApplication.lifecyclePhase}
                     </div>
                 </div>
                 <div class="row">
@@ -113,7 +115,7 @@
                         Risk Rating
                     </div>
                     <div class="col-sm-8">
-                        {primaryEntityReference.riskRating}
+                        {endUserApplication.riskRating}
                     </div>
                 </div>
                 <div class="row">
@@ -122,7 +124,7 @@
                     </div>
                     <div class="col-sm-8">
                         <DescriptionFade expanderAlignment="left"
-                                         text={primaryEntityReference.description}/>
+                                         text={endUserApplication.description}/>
                     </div>
                 </div>
             </div>
@@ -137,7 +139,7 @@
                     <div slot="controls">
                         <div style="float: right; padding-top: 1px">
                             <button class="btn-link"
-                                    on:click={() =>  activeSections.add(dynamicSections.assessmentRatingSection)}>
+                                    on:click={() => activeSections.add(dynamicSections.assessmentRatingSection)}>
                                 More
                             </button>
                         </div>
@@ -146,5 +148,4 @@
             </div>
         </div>
     </div>
-
 {/if}
