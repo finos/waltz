@@ -45,6 +45,7 @@ import java.util.Map;
 import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.ListUtilities.isEmpty;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.data.InlineSelectFieldFactory.mkExternalIdField;
 import static org.finos.waltz.data.InlineSelectFieldFactory.mkNameField;
 import static org.finos.waltz.model.EntityLifecycleStatus.REMOVED;
 import static org.finos.waltz.schema.Tables.*;
@@ -63,6 +64,16 @@ public class LogicalFlowExtractor extends CustomDataExtractor {
             newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
 
     private static final Field<String> TARGET_NAME_FIELD = mkNameField(
+            LOGICAL_FLOW.TARGET_ENTITY_ID,
+            LOGICAL_FLOW.TARGET_ENTITY_KIND,
+            newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
+
+    private static final Field<String> SOURCE_EXT_ID_FIELD = mkExternalIdField(
+            LOGICAL_FLOW.SOURCE_ENTITY_ID,
+            LOGICAL_FLOW.SOURCE_ENTITY_KIND,
+            newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
+
+    private static final Field<String> TARGET_EXT_ID_FIELD = mkExternalIdField(
             LOGICAL_FLOW.TARGET_ENTITY_ID,
             LOGICAL_FLOW.TARGET_ENTITY_KIND,
             newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
@@ -115,25 +126,22 @@ public class LogicalFlowExtractor extends CustomDataExtractor {
         Field<Long> sourceFlowId = LOGICAL_FLOW.ID.as("sourceFlowId");
         Field<Long> targetFlowId = LOGICAL_FLOW.ID.as("targetFlowId");
 
-        Select<Record1<Long>> sourceAppFlows = DSL.select(sourceFlowId)
+        Select<Record1<Long>> sourceAppFlows = DSL
+                .select(sourceFlowId)
                 .from(LOGICAL_FLOW)
                 .innerJoin(APPLICATION)
                     .on(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(APPLICATION.ID))
                 .where(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                 .and(APPLICATION.ID.in(appIdSelector));
 
-        Select<Record1<Long>> targetAppFlows = DSL.select(targetFlowId)
+        Select<Record1<Long>> targetAppFlows = DSL
+                .select(targetFlowId)
                 .from(LOGICAL_FLOW)
                 .innerJoin(APPLICATION)
                     .on(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(APPLICATION.ID))
                 .where(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                 .and(APPLICATION.ID.in(appIdSelector));
 
-        Field<String> sourceAssetCodeField = DSL
-                .when(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()),
-                        DSL.select(APPLICATION.ASSET_CODE)
-                                .from(APPLICATION)
-                                .where(APPLICATION.ID.eq(LOGICAL_FLOW.SOURCE_ENTITY_ID)));
 
         Field<String> sourceOrgUnitNameField = DSL
                 .when(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()),
@@ -142,12 +150,6 @@ public class LogicalFlowExtractor extends CustomDataExtractor {
                                 .innerJoin(ORGANISATIONAL_UNIT)
                                     .on(ORGANISATIONAL_UNIT.ID.eq(APPLICATION.ORGANISATIONAL_UNIT_ID))
                                 .where(APPLICATION.ID.eq(LOGICAL_FLOW.SOURCE_ENTITY_ID)));
-
-        Field<String> targetAssetCodeField = DSL
-                .when(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()),
-                        DSL.select(APPLICATION.ASSET_CODE)
-                                .from(APPLICATION)
-                                .where(APPLICATION.ID.eq(LOGICAL_FLOW.TARGET_ENTITY_ID)));
 
         Field<String> targetOrgUnitNameField = DSL
                 .when(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()),
@@ -159,10 +161,10 @@ public class LogicalFlowExtractor extends CustomDataExtractor {
 
         return dsl
                 .select(SOURCE_NAME_FIELD.as("Source"),
-                        sourceAssetCodeField.as("Source Asset Code"),
+                        SOURCE_EXT_ID_FIELD.as("Source Asset Code"),
                         sourceOrgUnitNameField.as("Source Org Unit"))
                 .select(TARGET_NAME_FIELD.as("Target"),
-                        targetAssetCodeField.as("Target Asset Code"),
+                        TARGET_EXT_ID_FIELD.as("Target Asset Code"),
                         targetOrgUnitNameField.as("Target Org Unit"))
                 .select(DATA_TYPE.NAME.as("Data Type"))
                 .select(ENUM_VALUE.DISPLAY_NAME.as("Authoritativeness"))

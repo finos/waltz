@@ -74,9 +74,12 @@ import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
-import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.MapUtilities.groupBy;
-import static org.finos.waltz.common.SetUtilities.*;
+import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.SetUtilities.intersection;
+import static org.finos.waltz.common.SetUtilities.map;
+import static org.finos.waltz.common.SetUtilities.maybeAdd;
+import static org.finos.waltz.common.SetUtilities.union;
 import static org.finos.waltz.common.StringUtilities.mkSafe;
 import static org.finos.waltz.common.StringUtilities.notEmpty;
 import static org.finos.waltz.common.StringUtilities.sanitizeCharacters;
@@ -98,18 +101,15 @@ public class AssessmentRatingDao {
 
     private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             ar.ENTITY_ID,
-            ar.ENTITY_KIND,
-            newArrayList(EntityKind.values())).as("entity_name");
+            ar.ENTITY_KIND).as("entity_name");
 
     private static final Field<String> ENTITY_LIFECYCLE_FIELD = InlineSelectFieldFactory.mkEntityLifecycleField(
             ar.ENTITY_ID,
-            ar.ENTITY_KIND,
-            newArrayList(EntityKind.values())).as("entity_lifecycle_status");
+            ar.ENTITY_KIND).as("entity_lifecycle_status");
 
     private static final Field<String> ENTITY_EXTID_FIELD = InlineSelectFieldFactory.mkExternalIdField(
             ar.ENTITY_ID,
-            ar.ENTITY_KIND,
-            newArrayList(EntityKind.values())).as("entity_external_id");
+            ar.ENTITY_KIND).as("entity_external_id");
 
     private static final RecordMapper<? super Record, AssessmentRating> TO_DOMAIN_MAPPER = r -> {
         AssessmentRatingRecord record = r.into(ar);

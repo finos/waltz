@@ -81,7 +81,6 @@ import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDate;
 import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
 import static org.finos.waltz.common.DateTimeUtilities.today;
-import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.StringUtilities.lower;
 import static org.finos.waltz.data.JooqUtilities.maybeReadRef;
 import static org.finos.waltz.model.EntityReference.mkRef;
@@ -116,15 +115,13 @@ public class SurveyInstanceDao {
     private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory
             .mkNameField(
                     si.ENTITY_ID,
-                    si.ENTITY_KIND,
-                    newArrayList(EntityKind.values()))
+                    si.ENTITY_KIND)
             .as("entity_name");
 
     private static final Field<String> EXTERNAL_ID_FIELD = InlineSelectFieldFactory
             .mkExternalIdField(
                     si.ENTITY_ID,
-                    si.ENTITY_KIND,
-                    newArrayList(EntityKind.values()))
+                    si.ENTITY_KIND)
             .as("external_id");
 
 

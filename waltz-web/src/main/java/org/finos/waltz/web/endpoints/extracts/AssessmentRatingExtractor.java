@@ -20,7 +20,6 @@ package org.finos.waltz.web.endpoints.extracts;
 
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.data.assessment_definition.AssessmentDefinitionDao;
-import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.finos.waltz.web.WebUtilities;
 import org.jooq.DSLContext;
@@ -34,8 +33,9 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 
-import static org.finos.waltz.common.SetUtilities.asSet;
-import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.Tables.ASSESSMENT_DEFINITION;
+import static org.finos.waltz.schema.Tables.ASSESSMENT_RATING;
+import static org.finos.waltz.schema.Tables.RATING_SCHEME_ITEM;
 import static spark.Spark.post;
 
 
@@ -46,18 +46,15 @@ public class AssessmentRatingExtractor extends DirectQueryBasedDataExtractor {
 
     private final Field<String> entityNameField = InlineSelectFieldFactory.mkNameField(
             ASSESSMENT_RATING.ENTITY_ID,
-            ASSESSMENT_RATING.ENTITY_KIND,
-            asSet(EntityKind.values()));
+            ASSESSMENT_RATING.ENTITY_KIND);
 
     private final Field<String> entityExtIdField = InlineSelectFieldFactory.mkExternalIdField(
             ASSESSMENT_RATING.ENTITY_ID,
-            ASSESSMENT_RATING.ENTITY_KIND,
-            asSet(EntityKind.values()));
+            ASSESSMENT_RATING.ENTITY_KIND);
 
     private final Field<String> entityLifecycleField = InlineSelectFieldFactory.mkEntityLifecycleField(
             ASSESSMENT_RATING.ENTITY_ID,
-            ASSESSMENT_RATING.ENTITY_KIND,
-            asSet(EntityKind.values()));
+            ASSESSMENT_RATING.ENTITY_KIND);
 
     private final AssessmentDefinitionDao assessmentDefinitionDao;
 

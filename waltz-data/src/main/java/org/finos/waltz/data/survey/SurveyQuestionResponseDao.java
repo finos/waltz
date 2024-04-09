@@ -92,8 +92,7 @@ public class SurveyQuestionResponseDao {
 
     private static final Field<String> EXTERNAL_ID_FIELD = InlineSelectFieldFactory.mkExternalIdField(
                     SURVEY_QUESTION_LIST_RESPONSE.ENTITY_ID,
-                    SURVEY_QUESTION_LIST_RESPONSE.ENTITY_KIND,
-                    newArrayList(EntityKind.values()));
+                    SURVEY_QUESTION_LIST_RESPONSE.ENTITY_KIND);
 
     private static final RecordMapper<Record, SurveyInstanceQuestionResponse> TO_DOMAIN_MAPPER = r -> {
         SurveyQuestionResponseRecord record = r.into(SURVEY_QUESTION_RESPONSE);
