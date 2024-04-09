@@ -152,7 +152,7 @@
                                       entityKinds={['ORG_UNIT', 'ACTOR', 'APPLICATION']}>
                 </EntitySearchSelector>
             </div>
-            <p class="text-muted">Start typing to select the selector for which this flow classification rule will apply to</p>
+            <p class="text-muted">Start typing to select the selector for which this flow classification rule will apply to. This could be an organisational unit, application or actor.</p>
         </div>
     {:else }
 

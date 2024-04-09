@@ -41,8 +41,10 @@ public abstract class DataTypeDecorator implements
     public abstract EntityReference decoratorEntity();
 
     public abstract Optional<AuthoritativenessRatingValue> rating();
+    public abstract Optional<AuthoritativenessRatingValue> targetInboundRating();
 
     public abstract Optional<Long> flowClassificationRuleId();
+    public abstract Optional<Long> inboundFlowClassificationRuleId();
 
     @Value.Derived
     public long dataTypeId() { return decoratorEntity().id(); }
