@@ -44,6 +44,7 @@ export function determineDownwardsScopeForKind(kind) {
         case "APPLICATION":
         case "APP_GROUP":
         case "CHANGE_INITIATIVE":
+        case "END_USER_APPLICATION":
         case "FLOW_DIAGRAM":
         case "LICENCE":
         case "LEGAL_ENTITY":

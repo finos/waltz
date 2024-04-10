@@ -75,7 +75,6 @@ import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.SetUtilities.filter;
 import static org.finos.waltz.common.SetUtilities.map;
-import static org.finos.waltz.model.EntityKind.ACTOR;
 import static org.finos.waltz.model.EntityKind.APPLICATION;
 import static org.finos.waltz.model.EntityKind.DATA_TYPE;
 import static org.finos.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
@@ -294,9 +293,10 @@ public class DataTypeDecoratorService {
                 return dao.findByAppIdSelector(
                         genericSelectorFactory.applyForKind(APPLICATION, options).selector());
             case ACTOR:
+            case END_USER_APPLICATION:
                 return dao.findByEntityIdSelector(
                         DSL.select(DSL.val(options.entityReference().id())),
-                        Optional.of(ACTOR));
+                        Optional.of(options.entityReference().kind()));
             case DATA_TYPE:
                 return dao.findByDataTypeIdSelector(
                         genericSelectorFactory.applyForKind(DATA_TYPE, options).selector());

@@ -446,6 +446,7 @@ public class FlowClassificationRuleService {
                 break;
             case APPLICATION:
             case ACTOR:
+            case END_USER_APPLICATION:
                 customSelectionCriteria = Tables.FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_KIND.eq(options.entityReference().kind().name())
                         .and(Tables.FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID.eq(options.entityReference().id()))
                         .and(FlowClassificationRuleDao.SUPPLIER_APP.KIND.notIn(options.filters().omitApplicationKinds()));

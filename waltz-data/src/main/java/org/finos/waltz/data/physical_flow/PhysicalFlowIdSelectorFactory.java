@@ -63,6 +63,7 @@ public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
             case APPLICATION:
             case ACTOR:
             case APP_GROUP:
+            case END_USER_APPLICATION:
             case CHANGE_INITIATIVE:
             case MEASURABLE:
             case ORG_UNIT:

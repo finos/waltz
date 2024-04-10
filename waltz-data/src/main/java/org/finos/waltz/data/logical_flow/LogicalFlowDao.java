@@ -85,23 +85,23 @@ public class LogicalFlowDao {
     private static final Field<String> SOURCE_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             LOGICAL_FLOW.SOURCE_ENTITY_ID,
             LOGICAL_FLOW.SOURCE_ENTITY_KIND,
-            newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
+            newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR, EntityKind.END_USER_APPLICATION));
 
 
     private static final Field<String> TARGET_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             LOGICAL_FLOW.TARGET_ENTITY_ID,
             LOGICAL_FLOW.TARGET_ENTITY_KIND,
-            newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
+            newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR, EntityKind.END_USER_APPLICATION));
 
     private static final Field<String> SOURCE_EXTERNAL_ID_FIELD = InlineSelectFieldFactory.mkExternalIdField(
             LOGICAL_FLOW.SOURCE_ENTITY_ID,
             LOGICAL_FLOW.SOURCE_ENTITY_KIND,
-            newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
+            newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR, EntityKind.END_USER_APPLICATION));
 
     private static final Field<String> TARGET_EXTERNAL_ID_FIELD = InlineSelectFieldFactory.mkExternalIdField(
             LOGICAL_FLOW.TARGET_ENTITY_ID,
             LOGICAL_FLOW.TARGET_ENTITY_KIND,
-            newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
+            newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR, EntityKind.END_USER_APPLICATION));
 
 
     public static final RecordMapper<Record, LogicalFlow> TO_DOMAIN_MAPPER = r -> {
