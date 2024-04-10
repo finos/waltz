@@ -21,6 +21,7 @@ package org.finos.waltz.data.datatype_decorator;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.datatype.DataTypeDecorator;
+import org.finos.waltz.model.datatype.DataTypeDecoratorRatingCharacteristics;
 import org.finos.waltz.model.datatype.DataTypeUsageCharacteristics;
 import org.jooq.Record1;
 import org.jooq.Select;

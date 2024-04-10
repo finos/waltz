@@ -25,6 +25,9 @@
     let selectionOptions;
     let relatedDataTypesCall;
     let permissionsCall;
+    let flowCall;
+    let ratingCharacteristicsCall;
+    let usageCharacteristicsCall;
 
     let workingDataTypes = [];
     let addedDataTypeIds = [];
@@ -78,11 +81,31 @@
             selectionOptions = mkSelectionOptions(primaryEntityReference);
             relatedDataTypesCall = dataTypeDecoratorStore.findBySelector(primaryEntityReference.kind, selectionOptions);
             permissionsCall = logicalFlowStore.findPermissionsForFlow(primaryEntityReference?.id);
+            flowCall = logicalFlowStore.getById(primaryEntityReference.id);
         }
     }
 
+    $: {
+        if (logicalFlow){
+
+            console.log({logicalFlow});
+
+            const cmd = {
+                source: logicalFlow.source,
+                target: logicalFlow.target
+            }
+
+            console.log({cmd})
+            usageCharacteristicsCall = dataTypeDecoratorStore.findDatatypeUsageCharacteristics(logicalFlow);
+            ratingCharacteristicsCall = dataTypeDecoratorStore.findDataTypeRatingCharacteristics(cmd);
+        }
+    }
+
+    $: logicalFlow = $flowCall?.data;
     $: dataTypeDecorators = $enrichedDecorators || [];
     $: dataTypes = _.map(dataTypeDecorators, d => d.dataTypeId);
+    $: ratingCharacteristics = $ratingCharacteristicsCall?.data;
+    $: usageCharacteristics = $usageCharacteristicsCall?.data;
 
     $: decoratorsByDataTypeId = _.keyBy(dataTypeDecorators, d => d.dataTypeId);
 
@@ -93,6 +116,8 @@
 
     $: permissions = $permissionsCall?.data || [];
     $: hasEditPermission = _.some(permissions, d => _.includes(["ADD", "UPDATE", "REMOVE"], d));
+
+    $: console.log({ratingCharacteristics, usageCharacteristics});
 
 </script>
 
@@ -119,7 +144,9 @@
                                   expanded={true}
                                   nonConcreteSelectable={false}
                                   selectionFilter={selectionFilter}
-                                  on:select={toggleDataType}/>
+                                  on:select={toggleDataType}
+                                  {ratingCharacteristics}
+                                  {usageCharacteristics}/>
             <div style="padding-top: 1em">
                 <button class="btn btn-skinny"
                         title={_.isEmpty(workingDataTypes) ? "At least one data type must be associated to this flow" : ""}

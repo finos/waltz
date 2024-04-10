@@ -32,6 +32,16 @@ export function mkDataTypeDecoratorStore() {
             {force})
     };
 
+    // ONLY FOR LOGICAL FLOWS
+    const findDataTypeRatingCharacteristics = (cmd, force = false) => {
+        return remote.fetchViewData(
+            "POST",
+            "api/data-type-decorator/rating-characteristics",
+            cmd,
+            [],
+            {force})
+    }
+
     const findDatatypeUsageCharacteristics = (ref, force = false) => remote
         .fetchViewData(
             "GET",
@@ -68,6 +78,7 @@ export function mkDataTypeDecoratorStore() {
         findByFlowIds,
         findDatatypeUsageCharacteristics,
         findBySelector,
+        findDataTypeRatingCharacteristics,
         getViewForParentRef,
         save
     };

@@ -2,6 +2,7 @@
     import _ from "lodash";
     import Icon from "./Icon.svelte";
     import {createEventDispatcher} from "svelte";
+    import RatingIndicatorCell from "../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
 
     export let selectionFilter = () => true;
     export let multiSelect = false;
@@ -61,6 +62,14 @@
             {/if}
             {node.name}
     </button>
+    {#if node.sourceOutboundRating}
+        <RatingIndicatorCell {...node.sourceOutboundRating}
+                             showName={false}/>
+    {/if}
+    {#if node.targetInboundRating}
+        <RatingIndicatorCell {...node.targetInboundRating}
+                             showName={false}/>
+    {/if}
 {/if}
 
 {#if expanded || node.isExpanded}
@@ -97,8 +106,15 @@
                                 </span>
                             {/if}
                         </span>
-
                     </button>
+                    {#if childNode.sourceOutboundRating}
+                        <RatingIndicatorCell {...childNode.sourceOutboundRating}
+                                             showName={false}/>
+                    {/if}
+                    {#if childNode.targetInboundRating}
+                        <RatingIndicatorCell {...childNode.targetInboundRating}
+                                             showName={false}/>
+                    {/if}
                 {/if}
             </li>
         {/each}

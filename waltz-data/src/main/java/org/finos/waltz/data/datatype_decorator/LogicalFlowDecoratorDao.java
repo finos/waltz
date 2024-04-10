@@ -24,12 +24,12 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.datatype.DataTypeDecorator;
+import org.finos.waltz.model.datatype.DataTypeDecoratorRatingCharacteristics;
 import org.finos.waltz.model.datatype.DataTypeUsageCharacteristics;
 import org.finos.waltz.model.datatype.FlowDataType;
 import org.finos.waltz.model.datatype.ImmutableDataTypeDecorator;
 import org.finos.waltz.model.datatype.ImmutableDataTypeUsageCharacteristics;
 import org.finos.waltz.model.datatype.ImmutableFlowDataType;
-import org.finos.waltz.model.flow_classification_rule.FlowClassificationRuleVantagePoint;
 import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.Application;
@@ -45,15 +45,13 @@ import org.jooq.Record;
 import org.jooq.Record1;
 import org.jooq.RecordMapper;
 import org.jooq.Select;
-import org.jooq.SelectConditionStep;
-import org.jooq.Update;
 import org.jooq.impl.DSL;
-import org.jooq.lambda.function.Function2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -69,8 +67,6 @@ import static org.finos.waltz.model.EntityKind.DATA_TYPE;
 import static org.finos.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.schema.Tables.PHYSICAL_FLOW;
-import static org.finos.waltz.schema.tables.Application.APPLICATION;
-import static org.finos.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static org.finos.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static org.finos.waltz.schema.tables.PhysicalSpecDataType.PHYSICAL_SPEC_DATA_TYPE;
@@ -78,7 +74,6 @@ import static org.finos.waltz.schema.tables.PhysicalSpecDataType.PHYSICAL_SPEC_D
 
 @Repository
 public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
-
     private static final LogicalFlow lf = Tables.LOGICAL_FLOW;
     private static final LogicalFlowDecorator lfd = Tables.LOGICAL_FLOW_DECORATOR;
     private static final Application srcApp = Tables.APPLICATION.as("srcApp");
@@ -293,61 +288,6 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
         return dsl.batchUpdate(records).execute();
     }
 
-
-    public int updateDecoratorsForFlowClassificationRule(FlowClassificationRuleVantagePoint flowClassificationRuleVantagePoint) {
-        LogicalFlowDecorator lfd = LOGICAL_FLOW_DECORATOR.as("lfd");
-
-        EntityReference vantagePoint = flowClassificationRuleVantagePoint.vantagePoint();
-        EntityReference subjectReference = flowClassificationRuleVantagePoint.subjectReference();
-        EntityReference dataType = flowClassificationRuleVantagePoint.dataType();
-        String classificationCode = flowClassificationRuleVantagePoint.classificationCode();
-
-        SelectConditionStep<Record1<Long>> orgUnitSubselect = DSL
-                .select(ENTITY_HIERARCHY.ID)
-                .from(ENTITY_HIERARCHY)
-                .where(ENTITY_HIERARCHY.KIND.eq(vantagePoint.kind().name()))
-                .and(ENTITY_HIERARCHY.ANCESTOR_ID.eq(vantagePoint.id()));
-
-        SelectConditionStep<Record1<Long>> dataTypeSubselect = DSL
-                .select(ENTITY_HIERARCHY.ID)
-                .from(ENTITY_HIERARCHY)
-                .where(ENTITY_HIERARCHY.KIND.eq(DATA_TYPE.name()))
-                .and(ENTITY_HIERARCHY.ANCESTOR_ID.eq(dataType.id()));
-
-        Condition usingFlowClassificationRule = LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(subjectReference.id()).and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(subjectReference.kind().name()));
-        Condition notUsingFlowClassificationRule = LOGICAL_FLOW.SOURCE_ENTITY_ID.ne(subjectReference.id()).or(LOGICAL_FLOW.SOURCE_ENTITY_KIND.ne(subjectReference.kind().name()));
-
-        Function2<Condition, String, Update<LogicalFlowDecoratorRecord>> mkQuery = (subjectScopingCondition, ratingName) -> dsl
-                .update(LOGICAL_FLOW_DECORATOR)
-                .set(LOGICAL_FLOW_DECORATOR.RATING, ratingName)
-                .set(LOGICAL_FLOW_DECORATOR.FLOW_CLASSIFICATION_RULE_ID, flowClassificationRuleVantagePoint.ruleId())
-                .where(LOGICAL_FLOW_DECORATOR.ID.in(
-                        DSL.select(lfd.ID)
-                                .from(lfd)
-                                .innerJoin(LOGICAL_FLOW).on(LOGICAL_FLOW.ID.eq(lfd.LOGICAL_FLOW_ID))
-                                .innerJoin(APPLICATION)
-                                .on(APPLICATION.ID.eq(LOGICAL_FLOW.TARGET_ENTITY_ID)
-                                        .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
-                                .where(subjectScopingCondition
-                                        .and(APPLICATION.ORGANISATIONAL_UNIT_ID.in(orgUnitSubselect))
-                                        .and(lfd.DECORATOR_ENTITY_KIND.eq(DATA_TYPE.name()))
-                                        .and(lfd.DECORATOR_ENTITY_ID.in(dataTypeSubselect))
-                                        .and(lfd.RATING.in(
-                                                AuthoritativenessRatingValue.NO_OPINION.value(),
-                                                AuthoritativenessRatingValue.DISCOURAGED.value())))));
-
-        Update<LogicalFlowDecoratorRecord> updateAuthSources = mkQuery.apply(
-                usingFlowClassificationRule,
-                classificationCode);
-
-        Update<LogicalFlowDecoratorRecord> updateNonAuthSources = mkQuery.apply(
-                notUsingFlowClassificationRule,
-                AuthoritativenessRatingValue.DISCOURAGED.value());
-
-        int authSourceUpdateCount = updateAuthSources.execute();
-        int nonAuthSourceUpdateCount = updateNonAuthSources.execute();
-        return authSourceUpdateCount + nonAuthSourceUpdateCount;
-    }
 
 
     @Override
