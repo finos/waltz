@@ -45,11 +45,7 @@
     let flowGraphSummaryCall = logicalFlowStore.getFlowGraphSummary(primaryEntityRef, null);
     let flowClassificationCall = flowClassificationStore.findAll()
     let physicalFlowCall = physicalFlowStore.findBySelector(mkSelectionOptions(primaryEntityRef, "EXACT"));
-    // let entityCall = primaryEntityRef.kind === 'APPLICATION'
-    //     ? applicationStore.getById(primaryEntityRef.id)
-    //     : actorStore.getById(primaryEntityRef.id);
     let entityCall = loadSvelteEntity(primaryEntityRef);
-
 
     let breadcrumbs = [];
     let additionalBreadcrumbs = [];
