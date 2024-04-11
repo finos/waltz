@@ -49,6 +49,10 @@
             path: ctx => `flow-diagram/${ctx.id}`,
             title: "Flow Diagram View"
         },
+        "main.end-user-application.view": {
+            path: ctx => `end-user-application/id/${ctx.id}`,
+            title: "End User Application View"
+        },
         "main.flow-classification-rule.view": {
             path: ctx => `flow-classification-rule/${ctx.id}`,
             title: "Flow Classification Rule View"

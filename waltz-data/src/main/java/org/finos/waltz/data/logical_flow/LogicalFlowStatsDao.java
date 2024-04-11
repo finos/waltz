@@ -76,6 +76,7 @@ public class LogicalFlowStatsDao {
     private static final org.finos.waltz.schema.tables.LogicalFlowDecorator lfd = LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR.as("lfd");
     private static final Application counterpart_app = APPLICATION.as("counterpart_app");
     private static final Actor counterpart_actor = ACTOR.as("counterpart_actor");
+    private static final EndUserApplication counterpart_euc = END_USER_APPLICATION.as("counterpart_euc");
     private static final DataType rollup_dt = Tables.DATA_TYPE.as("rollup_dt");
     private static final DataType actual_dt = Tables.DATA_TYPE.as("actual_dt");
 
@@ -256,8 +257,10 @@ public class LogicalFlowStatsDao {
 
         Condition sourceAppCondition = lf.SOURCE_ENTITY_ID.eq(counterpart_app.ID).and(lf.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
         Condition sourceActorCondition = lf.SOURCE_ENTITY_ID.eq(counterpart_actor.ID).and(lf.SOURCE_ENTITY_KIND.eq(EntityKind.ACTOR.name()));
+        Condition sourceEucCondition = lf.SOURCE_ENTITY_ID.eq(counterpart_euc.ID).and(lf.SOURCE_ENTITY_KIND.eq(EntityKind.END_USER_APPLICATION.name()));
         Condition targetAppCondition = lf.TARGET_ENTITY_ID.eq(counterpart_app.ID).and(lf.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
         Condition targetActorCondition = lf.TARGET_ENTITY_ID.eq(counterpart_actor.ID).and(lf.TARGET_ENTITY_KIND.eq(EntityKind.ACTOR.name()));
+        Condition targetEucCondition = lf.TARGET_ENTITY_ID.eq(counterpart_euc.ID).and(lf.TARGET_ENTITY_KIND.eq(EntityKind.END_USER_APPLICATION.name()));
 
         Condition dataTypeCondition = datatypeId == null ? rollup_dt.PARENT_ID.isNull() : rollup_dt.PARENT_ID.eq(datatypeId);
 
@@ -267,6 +270,7 @@ public class LogicalFlowStatsDao {
         SelectConditionStep<Record11<Long, Long, String, Long, Long, String, String, Long, String, String, String>> sourceQry = mkDirectionalQuery(
                 sourceAppCondition,
                 sourceActorCondition,
+                sourceEucCondition,
                 dataTypeCondition,
                 isDownstream,
                 INBOUND);
@@ -274,6 +278,7 @@ public class LogicalFlowStatsDao {
         SelectConditionStep<Record11<Long, Long, String, Long, Long, String, String, Long, String, String, String>> targetQry = mkDirectionalQuery(
                 targetAppCondition,
                 targetActorCondition,
+                targetEucCondition,
                 dataTypeCondition,
                 isUpstream,
                 OUTBOUND);
@@ -315,6 +320,7 @@ public class LogicalFlowStatsDao {
 
     private SelectConditionStep<Record11<Long, Long, String, Long, Long, String, String, Long, String, String, String>> mkDirectionalQuery(Condition appDirectionCondition,
                                                                                                                                            Condition actorDirectionCondition,
+                                                                                                                                           Condition eucDirectionCondition,
                                                                                                                                            Condition dataTypeCondition,
                                                                                                                                            Condition parentDirection,
                                                                                                                                            FlowDirection direction) {
@@ -326,10 +332,13 @@ public class LogicalFlowStatsDao {
                         FLOW_CLASSIFICATION.ID,
                         actual_dt.ID,
                         actual_dt.NAME,
-                        DSL.when(counterpart_app.ID.isNotNull(), DSL.val("APPLICATION")).otherwise(DSL.val("ACTOR")).as("counterpart_kind"),
-                        DSL.coalesce(counterpart_app.ID, counterpart_actor.ID).as("counterpart_id"),
+                        DSL.when(counterpart_app.ID.isNotNull(), DSL.val(EntityKind.APPLICATION.name()))
+                            .when(counterpart_actor.ID.isNotNull(), DSL.val(EntityKind.ACTOR.name()))
+                            .when(counterpart_euc.ID.isNotNull(), DSL.val(EntityKind.END_USER_APPLICATION.name()))
+                            .as("counterpart_kind"),
+                        DSL.coalesce(counterpart_app.ID, counterpart_actor.ID, counterpart_euc.ID).as("counterpart_id"),
                         lf.ENTITY_LIFECYCLE_STATUS,
-                        DSL.coalesce(counterpart_app.NAME, counterpart_actor.NAME).as("counterpart_name"),
+                        DSL.coalesce(counterpart_app.NAME, counterpart_actor.NAME, counterpart_euc.NAME).as("counterpart_name"),
                         DSL.val(direction.name()).as("direction"))
                 .from(lf)
                 .innerJoin(lfd).on(lf.ID.eq(lfd.LOGICAL_FLOW_ID))
@@ -341,6 +350,7 @@ public class LogicalFlowStatsDao {
                 .innerJoin(FLOW_CLASSIFICATION).on(lfd.RATING.eq(FLOW_CLASSIFICATION.CODE))
                 .leftJoin(counterpart_app).on(appDirectionCondition)
                 .leftJoin(counterpart_actor).on(actorDirectionCondition)
+                .leftJoin(counterpart_euc).on(eucDirectionCondition)
                 .where(NOT_REMOVED)
                 .and(dataTypeCondition)
                 .and(parentDirection);

@@ -18,6 +18,7 @@
 
 package org.finos.waltz.service.data_type;
 
+import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.datatype_decorator.DataTypeDecoratorDao;
 import org.finos.waltz.data.datatype_decorator.DataTypeDecoratorDaoSelectorFactory;
@@ -290,8 +291,10 @@ public class DataTypeDecoratorService {
             case MEASURABLE:
             case SCENARIO:
             case CHANGE_INITIATIVE:
-                return dao.findByAppIdSelector(
-                        genericSelectorFactory.applyForKind(APPLICATION, options).selector());
+                GenericSelector genericSelector = genericSelectorFactory.applyForKind(APPLICATION, options);
+                return dao.findByEntityIdSelector(
+                        genericSelector.selector(),
+                        Optional.of(genericSelector.kind()));
             case ACTOR:
             case END_USER_APPLICATION:
                 return dao.findByEntityIdSelector(
