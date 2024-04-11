@@ -27,6 +27,7 @@ import org.jooq.lambda.tuple.Tuple2;
 import java.util.*;
 import java.util.function.Function;
 
+import static java.util.Collections.emptyMap;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.head;
 import static org.finos.waltz.common.CollectionUtilities.maybe;
@@ -95,8 +96,8 @@ public class FlowClassificationRuleResolver {
                                                                         Long dataTypeId) {
 
         //Attempt lookup for rule based upon both org unit and direct rule, prioritise direct lookup as more specific rule
-        Map<Long, Map<EntityReference, Optional<FlowClassificationRuleVantagePoint>>> vpGroup = byVantagePointThenDataTypeThenSubject.get(vantagePointOrgUnit);
-        Map<Long, Map<EntityReference, Optional<FlowClassificationRuleVantagePoint>>> vpEntity = byVantagePointThenDataTypeThenSubject.get(vantagePointEntity);
+        Map<Long, Map<EntityReference, Optional<FlowClassificationRuleVantagePoint>>> vpGroup = byVantagePointThenDataTypeThenSubject.getOrDefault(vantagePointOrgUnit, emptyMap());
+        Map<Long, Map<EntityReference, Optional<FlowClassificationRuleVantagePoint>>> vpEntity = byVantagePointThenDataTypeThenSubject.getOrDefault(vantagePointEntity, emptyMap());
 
         // if a match cannot be found for the ou and the dt then no opinion, if a match can be found for these but the subject application
         // doesn't match then the rating should be discouraged
@@ -105,8 +106,8 @@ public class FlowClassificationRuleResolver {
             return tuple(AuthoritativenessRatingValue.NO_OPINION, Optional.empty());
         }
 
-        Map<EntityReference, Optional<FlowClassificationRuleVantagePoint>> dtEntity = vpEntity.get(dataTypeId);
-        Map<EntityReference, Optional<FlowClassificationRuleVantagePoint>> dataTypeGroup = vpGroup.get(dataTypeId);
+        Map<EntityReference, Optional<FlowClassificationRuleVantagePoint>> dtEntity = vpEntity.getOrDefault(dataTypeId, emptyMap());
+        Map<EntityReference, Optional<FlowClassificationRuleVantagePoint>> dataTypeGroup = vpGroup.getOrDefault(dataTypeId, emptyMap());
 
         if(isEmpty(dataTypeGroup) && isEmpty(dtEntity)) {
             return tuple(AuthoritativenessRatingValue.NO_OPINION, Optional.empty());

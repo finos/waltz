@@ -37,10 +37,15 @@
     $: dataTypes = $dataTypesCall.data;
 
     $: enrichedDataTypes = _.map(dataTypes, d => {
-        const ratingCharacteristics = _.get(ratingCharacteristicsByDatatypeId, d.id);
-        const sourceOutboundRating = _.get(classificationsByCode, ratingCharacteristics?.sourceOutboundRating);
-        const targetInboundRating = _.get(classificationsByCode, ratingCharacteristics?.targetInboundRating);
-        return Object.assign({}, d, {sourceOutboundRating, targetInboundRating})
+        const ucs = _.get(usageCharacteristicsByDatatypeId, d.id);
+        const rcs = _.get(ratingCharacteristicsByDatatypeId, d.id);
+
+        if (rcs){
+            rcs.sourceOutboundClassification = _.get(classificationsByCode, rcs?.sourceOutboundRating);
+            rcs.targetInboundClassification = _.get(classificationsByCode, rcs?.targetInboundRating);
+        }
+
+        return Object.assign({}, d, {ratingCharacteristics: rcs, usageCharacteristics: ucs})
     })
 
     $: classifications = $classificationsCall?.data || [];
@@ -52,8 +57,7 @@
     $: displayedHierarchy = calcDisplayHierarchy(searchNodes, qry);
 
     $: ratingCharacteristicsByDatatypeId = _.keyBy(ratingCharacteristics, d => d.dataTypeId);
-
-    $: console.log({ratingCharacteristics, displayedHierarchy, usageCharacteristics});
+    $: usageCharacteristicsByDatatypeId = _.keyBy(usageCharacteristics, d => d.dataTypeId);
 
 </script>
 

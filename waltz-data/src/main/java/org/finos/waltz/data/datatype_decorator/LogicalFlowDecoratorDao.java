@@ -102,6 +102,7 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .isReadonly(record.getIsReadonly())
                 .flowClassificationRuleId(Optional.ofNullable(record.getFlowClassificationRuleId()))
+                .inboundFlowClassificationRuleId(Optional.ofNullable(record.getInboundFlowClassificationRuleId()))
                 .build();
     };
 

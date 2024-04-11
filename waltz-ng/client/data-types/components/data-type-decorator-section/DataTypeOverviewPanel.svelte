@@ -86,7 +86,7 @@
     }
 
     $: {
-        if (logicalFlow){
+        if (!_.isEmpty(logicalFlow)){
 
             console.log({logicalFlow});
 
@@ -117,7 +117,6 @@
     $: permissions = $permissionsCall?.data || [];
     $: hasEditPermission = _.some(permissions, d => _.includes(["ADD", "UPDATE", "REMOVE"], d));
 
-    $: console.log({ratingCharacteristics, usageCharacteristics});
 
 </script>
 
