@@ -25,7 +25,7 @@
         cancel();
     }
 
-    const nodeKinds = ["APPLICATION", "ACTOR"];
+    const nodeKinds = ["APPLICATION", "ACTOR", "END_USER_APPLICATION"];
 
 
     $: isNode = _.includes(nodeKinds, selected.entityReference.kind);
