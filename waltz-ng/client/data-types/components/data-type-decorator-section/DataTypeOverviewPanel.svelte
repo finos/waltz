@@ -9,7 +9,7 @@
     import {displayError} from "../../../common/error-utils";
     import toasts from "../../../svelte-stores/toast-store";
     import {logicalFlowStore} from "../../../svelte-stores/logical-flow-store";
-    import {enrichedDecorators, selectedDecorator, selectedDataType} from "./data-type-decorator-section-store"
+    import {enrichedDecorators, selectedDataType, selectedDecorator} from "./data-type-decorator-section-store"
 
 
     export let primaryEntityReference;
@@ -35,8 +35,7 @@
 
     function onSelect(evt) {
         const dataType = evt.detail;
-        const decorator = _.get(decoratorsByDataTypeId, dataType.id);
-        $selectedDecorator = decorator;
+        $selectedDecorator = _.get(decoratorsByDataTypeId, dataType.id);
         $selectedDataType = dataType;
     }
 
@@ -88,14 +87,11 @@
     $: {
         if (!_.isEmpty(logicalFlow)){
 
-            console.log({logicalFlow});
-
             const cmd = {
                 source: logicalFlow.source,
                 target: logicalFlow.target
             }
 
-            console.log({cmd})
             usageCharacteristicsCall = dataTypeDecoratorStore.findDatatypeUsageCharacteristics(logicalFlow);
             ratingCharacteristicsCall = dataTypeDecoratorStore.findDataTypeRatingCharacteristics(cmd);
         }
@@ -116,7 +112,6 @@
 
     $: permissions = $permissionsCall?.data || [];
     $: hasEditPermission = _.some(permissions, d => _.includes(["ADD", "UPDATE", "REMOVE"], d));
-
 
 </script>
 
