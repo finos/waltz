@@ -29,7 +29,7 @@ public class SurveyInstanceStateMachineFactory {
         simpleTransitions.add(COMPLETED, SurveyInstanceStateTransition.transition(APPROVING, APPROVED, isAdminOrOwner));
         simpleTransitions.add(COMPLETED, SurveyInstanceStateTransition.transition(REJECTING, REJECTED, isAdminOrOwner));
 
-        simpleTransitions.add(APPROVED, SurveyInstanceStateTransition.transition(REOPENING, IN_PROGRESS, isAdminOrOwnerOrParticipant));
+        simpleTransitions.add(APPROVED, SurveyInstanceStateTransition.transition(REOPENING, IN_PROGRESS, isAdminOrOwner));
 
         simpleTransitions.add(REJECTED, SurveyInstanceStateTransition.transition(WITHDRAWING, WITHDRAWN, isAdminOrOwner));
         simpleTransitions.add(REJECTED, SurveyInstanceStateTransition.transition(REOPENING, IN_PROGRESS, isAdminOrOwnerOrParticipant));
