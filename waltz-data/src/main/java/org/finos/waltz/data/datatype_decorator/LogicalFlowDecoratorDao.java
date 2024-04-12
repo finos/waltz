@@ -24,7 +24,6 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.datatype.DataTypeDecorator;
-import org.finos.waltz.model.datatype.DataTypeDecoratorRatingCharacteristics;
 import org.finos.waltz.model.datatype.DataTypeUsageCharacteristics;
 import org.finos.waltz.model.datatype.FlowDataType;
 import org.finos.waltz.model.datatype.ImmutableDataTypeDecorator;
@@ -51,7 +50,6 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
