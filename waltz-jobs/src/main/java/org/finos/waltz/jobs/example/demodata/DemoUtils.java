@@ -70,4 +70,16 @@ public class DemoUtils {
                 .fetchMap(dt.CODE, dt.ID);
     }
 
+
+    public static String toExtId(String str) {
+        return str
+                .toLowerCase()
+                .replace(" ", "_")
+                .replace("\"", "")
+                .replace("\'", "")
+                .replace("(", "")
+                .replace(")", "")
+                .replace("\t", " ");
+    }
+
 }
