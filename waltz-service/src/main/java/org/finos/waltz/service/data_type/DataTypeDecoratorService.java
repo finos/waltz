@@ -35,6 +35,7 @@ import org.finos.waltz.model.application.AssessmentsView;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.datatype.DataType;
 import org.finos.waltz.model.datatype.DataTypeDecorator;
+import org.finos.waltz.model.datatype.DataTypeDecoratorRatingCharacteristics;
 import org.finos.waltz.model.datatype.DataTypeUsageCharacteristics;
 import org.finos.waltz.model.datatype.ImmutableDataTypeDecorator;
 import org.finos.waltz.model.flow_classification.FlowClassification;
@@ -428,6 +429,17 @@ public class DataTypeDecoratorService {
             default:
                 throw new IllegalArgumentException("Cannot determine decorator entity kind for parent entity kind: " + entityKind);
         }
+    }
+
+    public Set<DataTypeDecoratorRatingCharacteristics> findDatatypeUsageCharacteristicsForSourceAndTarget(EntityReference source,
+                                                                                                          EntityReference target) {
+        return findDatatypeUsageCharacteristicsForSourceAndTarget(source, target, Optional.empty());
+    }
+
+    public Set<DataTypeDecoratorRatingCharacteristics> findDatatypeUsageCharacteristicsForSourceAndTarget(EntityReference source,
+                                                                                                          EntityReference target,
+                                                                                                          Optional<Collection<Long>> dataTypeIds) {
+        return ratingsCalculator.calculate(source, target, dataTypeIds);
     }
 
 }

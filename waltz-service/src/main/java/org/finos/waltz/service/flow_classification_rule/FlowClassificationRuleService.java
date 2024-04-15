@@ -224,42 +224,6 @@ public class FlowClassificationRuleService {
         return flowClassificationRuleDao.findAll();
     }
 
-
-    @Deprecated
-    public boolean recalculateAllFlowRatings() {
-        logicalFlowDecoratorDao.resetRatingsAndFlowClassificationRulesCondition(DSL.trueCondition());
-        findAll().forEach(
-                classificationRule -> ratingCalculator.update(
-                        classificationRule.dataTypeId(),
-                        classificationRule.vantagePointReference()));
-        return true;
-    }
-
-
-    public int fastRecalculateAllFlowRatingsOld() {
-        logicalFlowDecoratorDao.resetRatingsAndFlowClassificationRulesCondition(DSL.trueCondition());
-
-        //finds all the vantage points to apply using parent as selector
-        List<FlowClassificationRuleVantagePoint> flowClassificationRuleVantagePoints = flowClassificationRuleDao
-                .findFlowClassificationRuleVantagePoints(FlowDirection.OUTBOUND);
-
-        int updatedRuleDecorators = flowClassificationRuleVantagePoints
-                .stream()
-                .mapToInt(logicalFlowDecoratorDao::updateDecoratorsForFlowClassificationRule)
-                .sum();
-
-        //overrides rating for point to point flows (must run after the above)
-        int updatedPointToPointDecorators = 0; //flowClassificationRuleDao.updatePointToPointFlowClassificationRules(FlowDirection.OUTBOUND);
-
-        LOG.info(
-                "Updated decorators for: {} for general rules and {} point-to-point flows",
-                updatedRuleDecorators,
-                updatedPointToPointDecorators);
-
-        return updatedRuleDecorators + updatedPointToPointDecorators;
-    }
-
-
     public int recalculateFlowRatingsForSelector(IdSelectionOptions options) {
         Select<Record1<Long>> flowSelector = logicalFlowIdSelectorFactory.apply(options);
         Set<FlowDataType> population = logicalFlowDecoratorDao.fetchFlowDataTypePopulationForFlowSelector(flowSelector);
