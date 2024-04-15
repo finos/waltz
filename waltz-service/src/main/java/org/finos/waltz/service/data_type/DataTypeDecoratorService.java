@@ -18,6 +18,7 @@
 
 package org.finos.waltz.service.data_type;
 
+import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.datatype_decorator.DataTypeDecoratorDao;
 import org.finos.waltz.data.datatype_decorator.DataTypeDecoratorDaoSelectorFactory;
@@ -75,7 +76,6 @@ import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.SetUtilities.filter;
 import static org.finos.waltz.common.SetUtilities.map;
-import static org.finos.waltz.model.EntityKind.ACTOR;
 import static org.finos.waltz.model.EntityKind.APPLICATION;
 import static org.finos.waltz.model.EntityKind.DATA_TYPE;
 import static org.finos.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
@@ -291,12 +291,15 @@ public class DataTypeDecoratorService {
             case MEASURABLE:
             case SCENARIO:
             case CHANGE_INITIATIVE:
-                return dao.findByAppIdSelector(
-                        genericSelectorFactory.applyForKind(APPLICATION, options).selector());
+                GenericSelector genericSelector = genericSelectorFactory.applyForKind(APPLICATION, options);
+                return dao.findByEntityIdSelector(
+                        genericSelector.selector(),
+                        Optional.of(genericSelector.kind()));
             case ACTOR:
+            case END_USER_APPLICATION:
                 return dao.findByEntityIdSelector(
                         DSL.select(DSL.val(options.entityReference().id())),
-                        Optional.of(ACTOR));
+                        Optional.of(options.entityReference().kind()));
             case DATA_TYPE:
                 return dao.findByDataTypeIdSelector(
                         genericSelectorFactory.applyForKind(DATA_TYPE, options).selector());

@@ -42,6 +42,8 @@ public class ProcessDiagramIdSelectorFactory implements IdSelectorFactory {
         checkNotNull(options, "options cannot be null");
         switch(options.entityReference().kind()) {
             case ACTOR:
+            case END_USER_APPLICATION:
+                return mkForSpecificEntity(options);
             case ALL:
             case APPLICATION:
             case CHANGE_INITIATIVE:
@@ -55,6 +57,18 @@ public class ProcessDiagramIdSelectorFactory implements IdSelectorFactory {
             default:
                 throw new UnsupportedOperationException("Cannot create process diagram selector from options: "+options);
         }
+    }
+
+
+    private Select<Record1<Long>> mkForSpecificEntity(IdSelectionOptions options) {
+
+        return DSL
+                .select(PROCESS_DIAGRAM_ENTITY.DIAGRAM_ID)
+                .from(PROCESS_DIAGRAM_ENTITY)
+                .innerJoin(MEASURABLE_RATING).on(PROCESS_DIAGRAM_ENTITY.ENTITY_ID.eq(MEASURABLE_RATING.MEASURABLE_ID)
+                        .and(PROCESS_DIAGRAM_ENTITY.ENTITY_KIND.eq(EntityKind.MEASURABLE.name())))
+                .where(MEASURABLE_RATING.ENTITY_ID.eq(options.entityReference().id())
+                        .and(MEASURABLE_RATING.ENTITY_KIND.eq(options.entityReference().kind().name())));
     }
 
 

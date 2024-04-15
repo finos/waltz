@@ -3,22 +3,17 @@
     import {Directions} from "./panel-utils";
     import {createEventDispatcher} from "svelte";
     import {toGraphId} from "../../../flow-diagram-utils";
-    import {applicationStore} from "../../../../svelte-stores/application-store";
-    import {actorStore} from "../../../../svelte-stores/actor-store";
     import EntityLink from "../../../../common/svelte/EntityLink.svelte";
     import AddAnnotationSubPanel from "./AddAnnotationSubPanel.svelte";
     import model from "../store/model";
     import Icon from "../../../../common/svelte/Icon.svelte";
+    import {loadSvelteEntity} from "../../../../common/entity-utils";
 
     export let selected;
     export let canEdit;
     const dispatch = createEventDispatcher();
 
-    $: isApp = selected.kind === 'APPLICATION';
-
-    $: nodeCall = (isApp)
-        ? applicationStore.getById(selected.id)
-        : actorStore.getById(selected.id);
+    $: nodeCall = selected && loadSvelteEntity(selected);
 
     $: node = $nodeCall.data;
 
@@ -50,7 +45,7 @@
     </strong>
 </div>
 <br>
-{#if activeMode === Modes.VIEW}
+{#if activeMode === Modes.VIEW && node}
     <div class="help-block">
         <p>{node.assetCode || node.externalId || "No external identifier"}</p>
         {node.description}
