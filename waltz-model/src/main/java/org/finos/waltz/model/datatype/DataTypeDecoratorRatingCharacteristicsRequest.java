@@ -21,10 +21,7 @@ package org.finos.waltz.model.datatype;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
 import org.immutables.value.Value;
-
-import java.util.Optional;
 
 /**
  * Data Type decorator usage stats
@@ -36,5 +33,4 @@ public abstract class DataTypeDecoratorRatingCharacteristicsRequest {
         public abstract EntityReference source();
         public abstract EntityReference target();
 
-        public abstract Optional<Long> dataTypeIds();
 }

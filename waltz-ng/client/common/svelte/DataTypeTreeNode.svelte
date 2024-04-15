@@ -43,9 +43,7 @@
     }
 
     function mkTooltipProps(node) {
-        return {
-            ...node
-        }
+        return node;
     }
 
 </script>
