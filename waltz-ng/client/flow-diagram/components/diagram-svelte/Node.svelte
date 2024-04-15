@@ -43,6 +43,7 @@
     const shapes = {
         ACTOR: (widthHint = 100) => Object.assign({}, mkTrapezoidShape(widthHint), {icon: "\uf2be"}, {svgIcon: getSymbol("user")}), // user-circle-o
         APPLICATION: (widthHint = 100) => Object.assign({}, mkRectShape(widthHint), {icon: "\uf108"}, {svgIcon: getSymbol("desktop")}),  // desktop
+        END_USER_APPLICATION: (widthHint = 100) => Object.assign({}, mkRectShape(widthHint), {icon: "\uf109"}), // laptop
         EUC: (widthHint = 100) => Object.assign({}, mkRectShape(widthHint), {icon: "\uf109"}), // laptop
         DEFAULT: (widthHint = 100) => Object.assign({}, mkRectShape(widthHint), {icon: "\uf096"})
     };
@@ -68,14 +69,14 @@
     $: associatedGroups = _.filter(groups, g => _.includes(g.data.applicationIds, node.data.id));
 
     $: classes = [
-        "wfd-node",
-        $overlay.appliedOverlay && !_.includes(associatedGroups, $overlay.appliedOverlay)
-            ? "wfd-not-active"
-            : "wfd-active",
-        $selectedNode && toGraphId($selectedNode) === node.id
-            ? 'wfd-selected-node'
-            : ''
-    ].join(" ");
+            "wfd-node",
+            $overlay.appliedOverlay && !_.includes(associatedGroups, $overlay.appliedOverlay)
+                ? "wfd-not-active"
+                : "wfd-active",
+            $selectedNode && toGraphId($selectedNode) === node.id
+                ? 'wfd-selected-node'
+                : '']
+        .join(" ");
 
     $: nodeStyling = determineStylingBasedUponLifecycle(node.data.entityLifecycleStatus);
 

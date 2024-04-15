@@ -63,21 +63,21 @@ public class FlowDiagramEntityDao {
             EntityKind.ACTOR,
             EntityKind.CHANGE_INITIATIVE,
             EntityKind.DATA_TYPE,
+            EntityKind.END_USER_APPLICATION,
             EntityKind.LOGICAL_DATA_FLOW,
             EntityKind.MEASURABLE,
             EntityKind.PHYSICAL_FLOW);
 
-    private static Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
+    private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             fde.ENTITY_ID,
             fde.ENTITY_KIND,
             POSSIBLE_ENTITY_KINDS);
 
 
-    private static Field<String> ENTITY_LIFECYCLE_PHASE_FIELD = InlineSelectFieldFactory.mkEntityLifecycleField(
+    private static final Field<String> ENTITY_LIFECYCLE_PHASE_FIELD = InlineSelectFieldFactory.mkEntityLifecycleField(
             fde.ENTITY_ID,
             fde.ENTITY_KIND,
             POSSIBLE_ENTITY_KINDS);
-
 
 
     private static final RecordMapper<Record, FlowDiagramEntity> TO_DOMAIN_MAPPER = r -> {

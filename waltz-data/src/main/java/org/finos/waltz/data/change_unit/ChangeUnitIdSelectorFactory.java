@@ -46,7 +46,8 @@ public class ChangeUnitIdSelectorFactory implements IdSelectorFactory {
         switch(options.entityReference().kind()) {
             case ACTOR:
             case APPLICATION:
-                // all physical flows where the app is a source or target
+            case END_USER_APPLICATION:
+                // all physical flows where the node is a source or target
                 return mkForFlowEndpoint(options);
             case ALL:
             case APP_GROUP:

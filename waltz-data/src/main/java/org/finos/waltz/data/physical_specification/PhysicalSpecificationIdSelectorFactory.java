@@ -51,7 +51,8 @@ public class PhysicalSpecificationIdSelectorFactory implements IdSelectorFactory
         switch(options.entityReference().kind()) {
             case ACTOR:
             case APPLICATION:
-                return mkForApplicationOrActor(options);
+            case END_USER_APPLICATION:
+                return mkForSpecificNode(options);
             case PHYSICAL_FLOW:
                 return mkForPhysicalFlow(options);
             case LOGICAL_DATA_ELEMENT:
@@ -72,7 +73,7 @@ public class PhysicalSpecificationIdSelectorFactory implements IdSelectorFactory
     }
 
 
-    private Select<Record1<Long>> mkForApplicationOrActor(IdSelectionOptions options) {
+    private Select<Record1<Long>> mkForSpecificNode(IdSelectionOptions options) {
         SelectorUtilities.ensureScopeIsExact(options);
 
         Condition lifecycleCondition = options.entityLifecycleStatuses().contains(EntityLifecycleStatus.REMOVED)

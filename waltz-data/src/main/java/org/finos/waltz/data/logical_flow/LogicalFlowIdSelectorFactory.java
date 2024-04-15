@@ -18,6 +18,7 @@
 
 package org.finos.waltz.data.logical_flow;
 
+import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.schema.tables.Application;
 import org.finos.waltz.data.IdSelectorFactory;
 import org.finos.waltz.data.SelectorUtilities;
@@ -62,7 +63,8 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
         checkNotNull(options, "options cannot be null");
         switch (options.entityReference().kind()) {
             case ACTOR:
-                return mkForActor(options);
+            case END_USER_APPLICATION:
+                return mkForSpecificNode(options);
             case ALL:
             case APPLICATION:
             case APP_GROUP:
@@ -93,14 +95,16 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
         }
     }
 
-    private Select<Record1<Long>> mkForActor(IdSelectionOptions options) {
+
+    private Select<Record1<Long>> mkForSpecificNode(IdSelectionOptions options) {
         SelectorUtilities.ensureScopeIsExact(options);
+        EntityReference ref = options.entityReference();
 
-        Condition sourceCondition = LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(options.entityReference().id())
-                .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.ACTOR.name()));
+        Condition sourceCondition = LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(ref.id())
+                .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(ref.kind().name()));
 
-        Condition targetCondition = LOGICAL_FLOW.TARGET_ENTITY_ID.eq(options.entityReference().id())
-                .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.ACTOR.name()));
+        Condition targetCondition = LOGICAL_FLOW.TARGET_ENTITY_ID.eq(ref.id())
+                .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(ref.kind().name()));
 
         return DSL
                 .select(LOGICAL_FLOW.ID)

@@ -20,6 +20,9 @@
 import _ from "lodash";
 import {checkIsEntityRef} from "./checks";
 import {CORE_API} from "./services/core-api-utils";
+import {applicationStore} from "../svelte-stores/application-store";
+import {actorStore} from "../svelte-stores/actor-store";
+import {endUserApplicationStore} from "../svelte-stores/end-user-application-store";
 
 export function sameRef(r1, r2, options = { skipChecks: false }) {
     if (! options.skipChecks) {
@@ -137,6 +140,20 @@ export function loadEntity(serviceBroker, entityRef) {
         .then(r => getEntityFromData(entityRef.kind, r.data));
 }
 
+
+export function loadSvelteEntity(entityRef, force = false) {
+    const id = entityRef.id;
+    switch (entityRef.kind) {
+        case "APPLICATION":
+            return applicationStore.getById(id, force);
+        case "ACTOR":
+            return actorStore.getById(id, force);
+        case "END_USER_APPLICATION":
+            return endUserApplicationStore.getById(id, force);
+        default:
+            throw "Don't know how to load entity for kind: " + entityRef.kind;
+    }
+}
 
 export function loadByExtId(serviceBroker, kind, extId) {
     try {

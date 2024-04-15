@@ -40,7 +40,7 @@ function restoreDiagram(
 
     // nodes
     _.chain(entityNodes)
-        .filter(ent => _.includes(["APPLICATION", "ACTOR"], ent.entityReference.kind))
+        .filter(ent => _.includes(["APPLICATION", "ACTOR", "END_USER_APPLICATION"], ent.entityReference.kind))
         .forEach(ent => newModel.addNode(toGraphNode(ent.entityReference)))
         .value();
 

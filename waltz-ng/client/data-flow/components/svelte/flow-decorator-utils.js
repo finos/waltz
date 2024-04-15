@@ -8,6 +8,10 @@ const colors = {
     ACTOR: {
         fill: "#f0e9ff",
         stroke: "#9f75fd"
+    },
+    END_USER_APPLICATION: {
+        fill: "#fff0e9",
+        stroke: "#fd9575"
     }
 };
 
