@@ -9,7 +9,7 @@
     import {displayError} from "../../../common/error-utils";
     import toasts from "../../../svelte-stores/toast-store";
     import {logicalFlowStore} from "../../../svelte-stores/logical-flow-store";
-    import {enrichedDecorators, selectedDecorator, selectedDataType} from "./data-type-decorator-section-store"
+    import {enrichedDecorators, selectedDataType, selectedDecorator} from "./data-type-decorator-section-store"
 
 
     export let primaryEntityReference;
@@ -25,6 +25,9 @@
     let selectionOptions;
     let relatedDataTypesCall;
     let permissionsCall;
+    let flowCall;
+    let ratingCharacteristicsCall;
+    let usageCharacteristicsCall;
 
     let workingDataTypes = [];
     let addedDataTypeIds = [];
@@ -32,8 +35,7 @@
 
     function onSelect(evt) {
         const dataType = evt.detail;
-        const decorator = _.get(decoratorsByDataTypeId, dataType.id);
-        $selectedDecorator = decorator;
+        $selectedDecorator = _.get(decoratorsByDataTypeId, dataType.id);
         $selectedDataType = dataType;
     }
 
@@ -78,11 +80,28 @@
             selectionOptions = mkSelectionOptions(primaryEntityReference);
             relatedDataTypesCall = dataTypeDecoratorStore.findBySelector(primaryEntityReference.kind, selectionOptions);
             permissionsCall = logicalFlowStore.findPermissionsForFlow(primaryEntityReference?.id);
+            flowCall = logicalFlowStore.getById(primaryEntityReference.id);
         }
     }
 
+    $: {
+        if (!_.isEmpty(logicalFlow)){
+
+            const cmd = {
+                source: logicalFlow.source,
+                target: logicalFlow.target
+            }
+
+            usageCharacteristicsCall = dataTypeDecoratorStore.findDatatypeUsageCharacteristics(logicalFlow);
+            ratingCharacteristicsCall = dataTypeDecoratorStore.findDataTypeRatingCharacteristics(cmd);
+        }
+    }
+
+    $: logicalFlow = $flowCall?.data;
     $: dataTypeDecorators = $enrichedDecorators || [];
     $: dataTypes = _.map(dataTypeDecorators, d => d.dataTypeId);
+    $: ratingCharacteristics = $ratingCharacteristicsCall?.data;
+    $: usageCharacteristics = $usageCharacteristicsCall?.data;
 
     $: decoratorsByDataTypeId = _.keyBy(dataTypeDecorators, d => d.dataTypeId);
 
@@ -119,7 +138,9 @@
                                   expanded={true}
                                   nonConcreteSelectable={false}
                                   selectionFilter={selectionFilter}
-                                  on:select={toggleDataType}/>
+                                  on:select={toggleDataType}
+                                  {ratingCharacteristics}
+                                  {usageCharacteristics}/>
             <div style="padding-top: 1em">
                 <button class="btn btn-skinny"
                         title={_.isEmpty(workingDataTypes) ? "At least one data type must be associated to this flow" : ""}

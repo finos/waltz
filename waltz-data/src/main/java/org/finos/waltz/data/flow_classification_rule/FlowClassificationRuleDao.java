@@ -397,7 +397,6 @@ public class FlowClassificationRuleDao {
                         ehOrgUnit.ID,
                         ehDataType.ID);
 
-        System.out.println(select);
         return select
                 .fetch(TO_VANTAGE_MAPPER);
     }

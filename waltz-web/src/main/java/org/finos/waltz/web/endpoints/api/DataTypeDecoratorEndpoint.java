@@ -24,6 +24,8 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.datatype.DataType;
 import org.finos.waltz.model.datatype.DataTypeDecorator;
+import org.finos.waltz.model.datatype.DataTypeDecoratorRatingCharacteristics;
+import org.finos.waltz.model.datatype.DataTypeDecoratorRatingCharacteristicsRequest;
 import org.finos.waltz.model.datatype.DataTypeUsageCharacteristics;
 import org.finos.waltz.model.logical_flow.DataTypeDecoratorView;
 import org.finos.waltz.service.data_type.DataTypeDecoratorService;
@@ -82,6 +84,7 @@ public class DataTypeDecoratorEndpoint implements Endpoint {
         String findDatatypeUsageCharacteristicsPath = mkPath(BASE_URL, "entity", ":kind", ":id", "usage-characteristics");
         String findPermissionsPath = mkPath(BASE_URL, "entity", ":kind", ":id", "permissions");
         String findDecoratorViewPath = mkPath(BASE_URL, "entity", ":kind", ":id", "view");
+        String findDatatypeRatingCharacteristicsForSourceAndTargetPath = mkPath(BASE_URL, "rating-characteristics");
 
         ListRoute<DataTypeDecorator> findByEntityReferenceRoute = (req, res) ->
                 dataTypeDecoratorService.findByEntityId(getEntityReference(req));
@@ -110,6 +113,11 @@ public class DataTypeDecoratorEndpoint implements Endpoint {
         DatumRoute<DataTypeDecoratorView> findDecoratorViewRoute = (req, res) ->
                 dataTypeDecoratorService.getDecoratorView(getEntityReference(req));
 
+        ListRoute<DataTypeDecoratorRatingCharacteristics> findDatatypeRatingCharacteristicsForSourceAndTargetRoute = (req, res) -> {
+            DataTypeDecoratorRatingCharacteristicsRequest request = readBody(req, DataTypeDecoratorRatingCharacteristicsRequest.class);
+            return dataTypeDecoratorService.findDatatypeUsageCharacteristicsForSourceAndTarget(request.source(), request.target());
+        };
+
         getForList(findByEntityReference, findByEntityReferenceRoute);
         getForList(findSuggestedByEntityRefPath, findSuggestedByEntityRefRoute);
         getForList(findDatatypeUsageCharacteristicsPath, findDatatypeUsageCharacteristicsRoute);
@@ -117,6 +125,7 @@ public class DataTypeDecoratorEndpoint implements Endpoint {
         postForList(findBySelectorPath, findBySelectorRoute);
         postForList(findByFlowIdsAndKindPath, findByFlowIdsAndKindRoute);
         postForDatum(updateDataTypesPath, this::updateDataTypesRoute);
+        postForList(findDatatypeRatingCharacteristicsForSourceAndTargetPath, findDatatypeRatingCharacteristicsForSourceAndTargetRoute);
         getForDatum(findDecoratorViewPath, findDecoratorViewRoute);
     }
 
