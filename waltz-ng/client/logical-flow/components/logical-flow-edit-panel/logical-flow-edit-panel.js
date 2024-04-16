@@ -368,34 +368,20 @@ function controller($element,
             .then(() => toasts.success("Data usage updated"));
     };
 
-    const addSource = (kind, entity) => {
-        const counterpartRef = { id: entity.id, kind, name: entity.name };
+    vm.addSource = (entity) => {
+        console.log({entity});
+        const counterpartRef = { id: entity.id, kind: entity.kind, name: entity.name };
         if (notifyIllegalFlow(toasts, vm.parentEntityRef, counterpartRef)) return;
         addFlow(mkNewFlow(counterpartRef, vm.parentEntityRef))
             .then(() => selectSource(counterpartRef));
     };
 
-    const addTarget = (kind, entity) => {
-        const counterpartRef = { id: entity.id, kind, name: entity.name };
+    vm.addTarget = (entity) => {
+        console.log({entity});
+        const counterpartRef = { id: entity.id, kind: entity.kind, name: entity.name };
         if (notifyIllegalFlow(toasts, vm.parentEntityRef, counterpartRef)) return;
         addFlow(mkNewFlow(vm.parentEntityRef, counterpartRef))
             .then(() => selectTarget(counterpartRef));
-    };
-
-    vm.addSourceApplication = (srcApp) => {
-        addSource("APPLICATION", srcApp);
-    };
-
-    vm.addSourceActor = (actor) => {
-        addSource("ACTOR", actor);
-    };
-
-    vm.addTargetApplication = (targetApp) => {
-        addTarget("APPLICATION", targetApp);
-    };
-
-    vm.addTargetActor = (actor) => {
-        addTarget("ACTOR", actor);
     };
 
     vm.setDirtyChange = (dirty) => {

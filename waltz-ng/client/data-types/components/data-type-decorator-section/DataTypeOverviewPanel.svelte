@@ -119,10 +119,14 @@
 <div class="row">
     {#if activeMode === Modes.VIEW}
         <div class="col-sm-12">
-            <DataTypeDecoratorTreeView decorators={dataTypeDecorators}
-                                       on:select={onSelect}
-                                       nonConcreteSelectable={true}
-                                       expanded={true}/>
+            <DataTypeTreeSelector multiSelect={false}
+                                  expanded={true}
+                                  dataTypeIds={dataTypes}
+                                  nonConcreteSelectable={false}
+                                  selectionFilter={selectionFilter}
+                                  on:select={onSelect}
+                                  {ratingCharacteristics}
+                                  {usageCharacteristics}/>
             <div style="padding-top: 1em">
                 <button class="btn btn-skinny"
                         title={!hasEditPermission ? "You do not have permission to edit logical flows and associated data types" : ""}

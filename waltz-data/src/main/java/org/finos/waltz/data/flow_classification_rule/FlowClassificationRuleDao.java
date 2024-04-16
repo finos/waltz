@@ -647,9 +647,14 @@ public class FlowClassificationRuleDao {
 
 
     public Set<FlowClassificationRule> findAppliedClassificationRulesForFlow(Long logicalFlowId) {
-        return baseSelect()
+        SelectConditionStep<Record> outboundRules = baseSelect()
                 .innerJoin(LOGICAL_FLOW_DECORATOR).on(LOGICAL_FLOW_DECORATOR.FLOW_CLASSIFICATION_RULE_ID.eq(FLOW_CLASSIFICATION_RULE.ID))
-                .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(logicalFlowId))
+                .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(logicalFlowId));
+        SelectConditionStep<Record> inboundRules = baseSelect()
+                .innerJoin(LOGICAL_FLOW_DECORATOR).on(LOGICAL_FLOW_DECORATOR.INBOUND_FLOW_CLASSIFICATION_RULE_ID.eq(FLOW_CLASSIFICATION_RULE.ID))
+                .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(logicalFlowId));
+        return outboundRules
+                .union(inboundRules)
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
 

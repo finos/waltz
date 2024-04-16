@@ -25,23 +25,14 @@
             <li>Playpen</li>
         </ol>
     </waltz-page-header>
-
-
-    <div class="row" >
-        <div class="col-md-12">
-            <button ng-click="$ctrl.visible = !$ctrl.visible">Toggle Both</button>
-            <button ng-click="$ctrl.counter = $ctrl.counter + 1">Inc {{$ctrl.counter}}</button>
-            <div ng-if="$ctrl.visible">
-                <waltz-svelte-component component="$ctrl.Unaware" u="$ctrl.u" counter="$ctrl.counter">
-
-                </waltz-svelte-component>
-                <waltz-svelte-component component="$ctrl.Parent" p="$ctrl.p"  counter="$ctrl.counter">
-
+    <waltz-section>
+        <div class="row" >
+            <div class="col-md-12">
+                <waltz-svelte-component component="$ctrl.CounterpartPicker">
                 </waltz-svelte-component>
             </div>
-
         </div>
-    </div>
+    </waltz-section>
 
 
 

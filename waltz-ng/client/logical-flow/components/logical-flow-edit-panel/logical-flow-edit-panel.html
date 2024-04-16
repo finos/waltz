@@ -85,9 +85,7 @@
 
                 <div ng-if="$ctrl.mode === 'addSource'"
                      class="waltz-fade-if">
-                    <waltz-logical-flow-counterpart-selector all-actors="$ctrl.allActors"
-                                                             on-add-application="$ctrl.addSourceApplication"
-                                                             on-add-actor="$ctrl.addSourceActor"
+                    <waltz-logical-flow-counterpart-selector on-select="$ctrl.addSource"
                                                              on-cancel="$ctrl.cancel">
                         <heading>
                             <waltz-icon name="arrow-down"></waltz-icon>
@@ -104,9 +102,7 @@
 
                 <div ng-if="$ctrl.mode === 'addTarget'"
                      class="waltz-fade-if">
-                    <waltz-logical-flow-counterpart-selector all-actors="$ctrl.allActors"
-                                                             on-add-application="$ctrl.addTargetApplication"
-                                                             on-add-actor="$ctrl.addTargetActor"
+                    <waltz-logical-flow-counterpart-selector on-select="$ctrl.addTarget"
                                                              on-cancel="$ctrl.cancel">
                         <heading>
                             <waltz-icon name="arrow-down"></waltz-icon>

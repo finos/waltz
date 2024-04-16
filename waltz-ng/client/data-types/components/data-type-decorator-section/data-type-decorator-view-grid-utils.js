@@ -29,13 +29,22 @@ const baseColumns = [
         sortFn: (a, b) => cmp(a?.decoratorEntity.name, b?.decoratorEntity.name)
     },
     {
-        id: "flow_classification_rating",
-        name: "Flow Classification",
-        field: "flowClassification",
+        id: "source_outbound_classification",
+        name: "Source Outbound Classification",
+        field: "sourceOutboundClassification",
         sortable:  true,
         width: 180,
         formatter: mkRatingSchemeItemFormatter(d => d.name, d => d),
-        sortFn: (a, b) => cmp(a?.flowClassification.name, b?.flowClassification.name)
+        sortFn: (a, b) => cmp(a?.sourceOutboundClassification.name, b?.sourceOutboundClassification.name)
+    },
+    {
+        id: "target_inbound_classification",
+        name: "Target Inbound Classification",
+        field: "targetInboundClassification",
+        sortable:  true,
+        width: 180,
+        formatter: mkRatingSchemeItemFormatter(d => d.name, d => d),
+        sortFn: (a, b) => cmp(a?.targetInboundClassification.name, b?.targetInboundClassification.name)
     }
 ];
 
@@ -78,12 +87,15 @@ export function prepareData($viewData) {
     const flowClassificationRulesById = _.keyBy(enrichedClassificationRules, d => d.flowClassificationRule.id);
     const classificationsByCode = _.keyBy($viewData.classifications, d => d.code);
 
+    console.log({$viewData});
+
     return _
         .chain($viewData.dataTypeDecorators)
         .map(d => {
 
             const ratingsForDecorator = _.get(assessmentRatingsByDecoratorId, d.id, []);
-            const flowClassification = _.get(classificationsByCode, d.rating);
+            const sourceOutboundClassification = _.get(classificationsByCode, d.rating);
+            const targetInboundClassification = _.get(classificationsByCode, d.targetInboundRating);
 
             const ratingsByDefnId = _
                 .chain(ratingsForDecorator)
@@ -97,15 +109,18 @@ export function prepareData($viewData) {
                     {})
                 .value();
 
-            const flowClassificationRule = _.get(flowClassificationRulesById, d.flowClassificationRuleId);
+            const sourceOutboundRule = _.get(flowClassificationRulesById, d.flowClassificationRuleId);
+            const targetInboundRule = _.get(flowClassificationRulesById, d.inboundFlowClassificationRuleId);
 
             return Object.assign(
                 {},
                 d,
                 {
                     ...ratingsByDefnId,
-                    flowClassification,
-                    flowClassificationRule,
+                    sourceOutboundClassification,
+                    targetInboundClassification,
+                    sourceOutboundRule,
+                    targetInboundRule,
                     assessmentRatings: ratingsForDecorator
             });
         })

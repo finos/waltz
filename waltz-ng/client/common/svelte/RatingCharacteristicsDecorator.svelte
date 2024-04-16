@@ -11,11 +11,23 @@
 <span>
     <span class="waltz-visibility-parent">
         <span class:waltz-visibility-child-30={!hasDecorator}>
-            <RatingIndicatorCell {...ratingCharacteristics.sourceOutboundClassification} showName={false}/>
+            {#if ratingCharacteristics.sourceOutboundRating === 'NO_OPINION'}
+                <span style={`color: ${ratingCharacteristics.sourceOutboundClassification.color}`}>
+                    <Icon size="xl" name="square-o"/>
+                </span>
+            {:else}
+                <RatingIndicatorCell {...ratingCharacteristics.sourceOutboundClassification} showName={false}/>
+            {/if}
             <Icon style="vertical-align: middle"
                   name="long-arrow-right"
                   size="xl"/>
-            <RatingIndicatorCell {...ratingCharacteristics.targetInboundClassification} showName={false}/>
+            {#if ratingCharacteristics.targetInboundRating === 'NO_OPINION'}
+                <span style={`color: ${ratingCharacteristics.targetInboundClassification.color}`}>
+                    <Icon size="xl" name="square-o"/>
+                </span>
+            {:else}
+                <RatingIndicatorCell {...ratingCharacteristics.targetInboundClassification} showName={false}/>
+            {/if}
         </span>
     </span>
 </span>

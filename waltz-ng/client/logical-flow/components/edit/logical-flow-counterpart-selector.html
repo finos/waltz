@@ -18,45 +18,14 @@
 
 <h4 ng-transclude="heading"></h4>
 
-
-<div ng-if="$ctrl.visibility.addingApplication">
-    <waltz-basic-app-selector on-add="$ctrl.onAddApplication"
-                              on-cancel="$ctrl.onCancel">
-    </waltz-basic-app-selector>
-
     <div ng-transclude="help"
          class="small waltz-paragraph text-muted">
     </div>
 
-    <div class="waltz-paragraph">
-        <waltz-icon name="{{ $ctrl.actorIcon }}"></waltz-icon>
+    <waltz-svelte-component component="$ctrl.CounterpartPicker"
+                            on-select="$ctrl.onSelect">
+    </waltz-svelte-component>
 
-        Select an
-        <a class="clickable"
-           ng-click="$ctrl.showAddActor(true)">
-            actor
-        </a>
-        instead.
-    </div>
-</div>
-
-
-<div ng-if="!$ctrl.visibility.addingApplication">
-    <waltz-basic-actor-selector all-actors='$ctrl.allActors'
-                                on-add="$ctrl.onAddActor"
-                                on-cancel="$ctrl.onCancel">
-    </waltz-basic-actor-selector>
-
-
-    <div class="waltz-paragraph">
-        <waltz-icon name="{{ $ctrl.applicationIcon }}"></waltz-icon>
-        Select an
-        <a class="clickable"
-           ng-click="$ctrl.showAddActor(false)">
-            application
-        </a>
-        instead.
-    </div>
 </div>
 
 

@@ -95,6 +95,7 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
                         record.getDecoratorEntityId(),
                         r.get(ENTITY_NAME_FIELD)))
                 .rating(AuthoritativenessRatingValue.ofNullable(record.getRating()))
+                .targetInboundRating(AuthoritativenessRatingValue.of(record.getTargetInboundRating()))
                 .provenance(record.getProvenance())
                 .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
                 .lastUpdatedBy(record.getLastUpdatedBy())

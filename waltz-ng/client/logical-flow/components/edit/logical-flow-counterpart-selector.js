@@ -16,9 +16,10 @@
  *
  */
 
-import {initialiseData} from '../../../common';
-import {entity} from '../../../common/services/enums/entity'
-import template from './logical-flow-counterpart-selector.html';
+import {initialiseData} from "../../../common";
+import {entity} from "../../../common/services/enums/entity"
+import template from "./logical-flow-counterpart-selector.html";
+import CounterpartPicker from "./svelte/CounterpartPicker.svelte"
 
 
 /**
@@ -30,25 +31,19 @@ import template from './logical-flow-counterpart-selector.html';
 
 
 const bindings = {
-    allActors: '<',
-    onAddApplication: '<',
-    onAddActor: '<',
-    onCancel: '<',
+    onSelect: "<",
+    onCancel: "<",
 };
 
 
 const transclude = {
-    help: 'help',
-    heading: 'heading'
+    help: "help",
+    heading: "heading"
 };
 
 
 const initialState = {
-    actorIcon: entity.ACTOR.icon,
-    applicationIcon: entity.APPLICATION.icon,
-    visibility: {
-        addingApplication: true,
-    }
+    CounterpartPicker
 };
 
 
@@ -60,11 +55,6 @@ function controller() {
     vm.$onChanges = (c) => {
 
     };
-
-    vm.showAddActor = (visible = true) => {
-        vm.visibility.addingApplication = !visible;
-    };
-
 }
 
 

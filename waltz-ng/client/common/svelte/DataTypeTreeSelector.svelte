@@ -13,6 +13,7 @@
     export let dataTypeIds = [];
     export let ratingCharacteristics = [];
     export let usageCharacteristics = [];
+    export let showSearch = true;
 
     const root = {name: "Root", isExpanded: true};
 
@@ -61,9 +62,11 @@
 
 </script>
 
-<SearchInput bind:value={qry}/>
+{#if showSearch}
+    <SearchInput bind:value={qry}/>
+{/if}
 
-<div class="waltz-scroll-region-350">
+<div class:waltz-scroll-region-350={showSearch}>
     <DataTypeTreeNode {multiSelect}
                       {selectionFilter}
                       {nonConcreteSelectable}

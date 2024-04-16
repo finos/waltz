@@ -65,9 +65,11 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -406,7 +408,13 @@ public class DataTypeDecoratorService {
         Set<DataType> dataTypes = dataTypeService.findByIdSelector(selectionOptions);
         AssessmentsView assessmentsView = assessmentRatingService.getPrimaryAssessmentsViewForKindAndSelector(LOGICAL_DATA_FLOW_DATA_TYPE_DECORATOR, selectionOptions);
         FlowClassificationRulesView classificationRulesView = flowClassificationRuleService.getFlowClassificationsViewForFlow(parentEntityRef.id());
-        Set<AuthoritativenessRatingValue> ratings = map(decorators, d -> d.rating().orElse(null));
+
+        Set<AuthoritativenessRatingValue> ratings = decorators
+                .stream()
+                .flatMap(d -> Stream.of(d.rating().orElse(null), d.targetInboundRating().orElse(null)))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
         Set<FlowClassification> classifications = filter(
                 flowClassificationService.findAll(),
                 d -> ratings.contains(AuthoritativenessRatingValue.ofNullable(d.code()).orElse(null)));
