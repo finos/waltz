@@ -87,8 +87,6 @@ export function prepareData($viewData) {
     const flowClassificationRulesById = _.keyBy(enrichedClassificationRules, d => d.flowClassificationRule.id);
     const classificationsByCode = _.keyBy($viewData.classifications, d => d.code);
 
-    console.log({$viewData});
-
     return _
         .chain($viewData.dataTypeDecorators)
         .map(d => {

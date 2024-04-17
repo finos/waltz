@@ -4,12 +4,18 @@
     import {dataTypeDecoratorStore} from "../../../svelte-stores/data-type-decorator-store";
     import {mkSelectionOptions} from "../../../common/selector-utils";
     import _ from "lodash";
-    import DataTypeDecoratorTreeView from "../../../common/svelte/DataTypeDecoratorTreeView.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
     import {displayError} from "../../../common/error-utils";
     import toasts from "../../../svelte-stores/toast-store";
     import {logicalFlowStore} from "../../../svelte-stores/logical-flow-store";
-    import {enrichedDecorators, selectedDataType, selectedDecorator} from "./data-type-decorator-section-store"
+    import {
+        enrichedDecorators,
+        selectedDataType,
+        selectedDecorator,
+        viewData
+    } from "./data-type-decorator-section-store"
+    import {dataTypeStore} from "../../../svelte-stores/data-type-store";
+    import SavingPlaceholder from "../../../common/svelte/SavingPlaceholder.svelte";
 
 
     export let primaryEntityReference;
@@ -23,15 +29,19 @@
 
     let activeMode = Modes.VIEW;
     let selectionOptions;
-    let relatedDataTypesCall;
     let permissionsCall;
     let flowCall;
+    let viewCall;
     let ratingCharacteristicsCall;
     let usageCharacteristicsCall;
+    let suggestedDataTypesCall;
+    let showSuggested = true;
+    let saving = false;
 
     let workingDataTypes = [];
     let addedDataTypeIds = [];
     let removedDataTypeIds = [];
+    let suggestedDataTypes = [];
 
     function onSelect(evt) {
         const dataType = evt.detail;
@@ -60,6 +70,8 @@
 
     function save() {
 
+        saving = true;
+
         const cmd = {
             entityReference: primaryEntityReference,
             addedDataTypeIds,
@@ -68,9 +80,10 @@
 
         dataTypeDecoratorStore.save(primaryEntityReference, cmd)
             .then(() => {
+                saving = false;
                 toasts.success("Successfully saved data types");
-                relatedDataTypesCall = dataTypeDecoratorStore.findBySelector(primaryEntityReference.kind, selectionOptions, true);
                 activeMode = Modes.VIEW;
+                viewCall = dataTypeDecoratorStore.getViewForParentRef(primaryEntityReference, true);
             })
             .catch(e => displayError("Could not save data type changes", e));
     }
@@ -78,11 +91,13 @@
     $: {
         if (primaryEntityReference) {
             selectionOptions = mkSelectionOptions(primaryEntityReference);
-            relatedDataTypesCall = dataTypeDecoratorStore.findBySelector(primaryEntityReference.kind, selectionOptions);
             permissionsCall = logicalFlowStore.findPermissionsForFlow(primaryEntityReference?.id);
             flowCall = logicalFlowStore.getById(primaryEntityReference.id);
+            viewCall = dataTypeDecoratorStore.getViewForParentRef(primaryEntityReference);
         }
     }
+
+
 
     $: {
         if (!_.isEmpty(logicalFlow)){
@@ -94,14 +109,17 @@
 
             usageCharacteristicsCall = dataTypeDecoratorStore.findDatatypeUsageCharacteristics(logicalFlow);
             ratingCharacteristicsCall = dataTypeDecoratorStore.findDataTypeRatingCharacteristics(cmd);
+            suggestedDataTypesCall = dataTypeStore.findSuggestedByRef(logicalFlow);
         }
     }
 
+    $: $viewData = $viewCall?.data;
     $: logicalFlow = $flowCall?.data;
     $: dataTypeDecorators = $enrichedDecorators || [];
     $: dataTypes = _.map(dataTypeDecorators, d => d.dataTypeId);
     $: ratingCharacteristics = $ratingCharacteristicsCall?.data;
     $: usageCharacteristics = $usageCharacteristicsCall?.data;
+    $: suggestedDataTypes = _.map($suggestedDataTypesCall?.data, d => d.id);
 
     $: decoratorsByDataTypeId = _.keyBy(dataTypeDecorators, d => d.dataTypeId);
 
@@ -138,17 +156,36 @@
         </div>
     {:else if activeMode === Modes.EDIT}
         <div class="col-sm-12">
-            <DataTypeTreeSelector multiSelect={true}
-                                  expanded={true}
-                                  nonConcreteSelectable={false}
-                                  selectionFilter={selectionFilter}
-                                  on:select={toggleDataType}
-                                  {ratingCharacteristics}
-                                  {usageCharacteristics}/>
+            {#if showSuggested}
+                <DataTypeTreeSelector multiSelect={true}
+                                      expanded={true}
+                                      nonConcreteSelectable={false}
+                                      selectionFilter={selectionFilter}
+                                      on:select={toggleDataType}
+                                      dataTypeIds={suggestedDataTypes}
+                                      {ratingCharacteristics}
+                                      {usageCharacteristics}/>
+                <div class="help-block">
+                    This is a filtered list of data types showing only those currently related to the upstream entity, alternatively you can
+                    <strong><button class="btn btn-skinny" on:click={() => showSuggested = false}>show all data types</button></strong>
+                </div>
+                {:else }
+                    <DataTypeTreeSelector multiSelect={true}
+                                          expanded={true}
+                                          nonConcreteSelectable={false}
+                                          selectionFilter={selectionFilter}
+                                          on:select={toggleDataType}
+                                          {ratingCharacteristics}
+                                          {usageCharacteristics}/>
+                <div class="help-block">
+                    Currently showing all data types, for a filtered view
+                    <strong><button class="btn btn-skinny" on:click={() => showSuggested = true}>show selected data types only</button></strong>
+                </div>
+            {/if}
             <div style="padding-top: 1em">
                 <button class="btn btn-skinny"
                         title={_.isEmpty(workingDataTypes) ? "At least one data type must be associated to this flow" : ""}
-                        disabled={_.isEmpty(workingDataTypes)}
+                        disabled={_.isEmpty(workingDataTypes) || saving}
                         on:click={save}>
                     <Icon name="floppy-o"/>Save
                 </button>
@@ -157,6 +194,11 @@
                         on:click={cancelEdit}>
                     <Icon name="ban"/>Cancel
                 </button>
+                {#if saving}
+                    <span>
+                        <SavingPlaceholder/>
+                    </span>
+                {/if}
             </div>
         </div>
     {/if}

@@ -126,16 +126,16 @@ public class FlowClassificationRuleUtilities {
         Function4<FlowClassificationRuleVantagePoint,  Set<Long>,  Set<Long>, FlowDataType, MatchOutcome> inboundMatcher =
                 (rvp, childOUs, childDTs, p) -> {
                     boolean subjectMatches = p.target().equals(rvp.subjectReference());
-                    boolean scopeMatches = checkScopeMatches(rvp, childOUs, p.source(), p.sourceOuId());
-                    boolean dtAndOuMatches = childDTs.contains(p.dtId()) && scopeMatches;
+                    boolean dtMatches = childDTs.contains(p.dtId());
+                    boolean dtAndOuMatches = dtMatches && checkScopeMatches(rvp, childOUs, p.source(), p.sourceOuId());
                     return determineOutcome(subjectMatches, dtAndOuMatches);
                 };
 
         Function4<FlowClassificationRuleVantagePoint,  Set<Long>,  Set<Long>, FlowDataType, MatchOutcome> outboundMatcher =
                 (rvp, childOUs, childDTs, p) -> {
                     boolean subjectMatches = p.source().equals(rvp.subjectReference());
-                    boolean scopeMatches = checkScopeMatches(rvp, childOUs, p.target(), p.targetOuId());
-                    boolean dtAndOuMatches = childDTs.contains(p.dtId()) && scopeMatches;
+                    boolean dtMatches = childDTs.contains(p.dtId());
+                    boolean dtAndOuMatches = dtMatches && checkScopeMatches(rvp, childOUs, p.target(), p.targetOuId());
                     return determineOutcome(subjectMatches, dtAndOuMatches);
                 };
 
@@ -144,7 +144,9 @@ public class FlowClassificationRuleUtilities {
                 : outboundMatcher;
     }
 
-    private static boolean checkScopeMatches(FlowClassificationRuleVantagePoint rvp, Set<Long> childOUs, EntityReference scopeEntity, Long scopeEntityOuId) {
+    private static boolean checkScopeMatches(FlowClassificationRuleVantagePoint rvp,
+                                             Set<Long> childOUs,
+                                             EntityReference scopeEntity, Long scopeEntityOuId) {
         if (rvp.vantagePoint().kind() == EntityKind.ORG_UNIT) {
             return scopeEntityOuId != null && childOUs.contains(scopeEntityOuId);
         } else {

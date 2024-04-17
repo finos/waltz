@@ -18,6 +18,7 @@
 
 package org.finos.waltz.service.flow_classification_rule;
 
+import org.finos.waltz.common.FunctionUtilities;
 import org.finos.waltz.common.exception.NotFoundException;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
@@ -69,6 +70,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -226,8 +228,8 @@ public class FlowClassificationRuleService {
 
     public int recalculateFlowRatingsForSelector(IdSelectionOptions options) {
         Select<Record1<Long>> flowSelector = logicalFlowIdSelectorFactory.apply(options);
-        Set<FlowDataType> population = logicalFlowDecoratorDao.fetchFlowDataTypePopulationForFlowSelector(flowSelector);
-        return recalculateRatingsForPopulation(population);
+        Set<FlowDataType> population = FunctionUtilities.time("find population",  ()-> logicalFlowDecoratorDao.fetchFlowDataTypePopulationForFlowSelector(flowSelector));
+        return FunctionUtilities.time("do recalculate",  ()-> recalculateRatingsForPopulation(population));
     }
 
     public int fastRecalculateAllFlowRatings() {

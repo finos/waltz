@@ -115,7 +115,7 @@ public class DataTypeDecoratorEndpoint implements Endpoint {
 
         ListRoute<DataTypeDecoratorRatingCharacteristics> findDatatypeRatingCharacteristicsForSourceAndTargetRoute = (req, res) -> {
             DataTypeDecoratorRatingCharacteristicsRequest request = readBody(req, DataTypeDecoratorRatingCharacteristicsRequest.class);
-            return dataTypeDecoratorService.findDatatypeUsageCharacteristicsForSourceAndTarget(request.source(), request.target());
+            return dataTypeDecoratorService.findDatatypeRatingCharacteristicsForSourceAndTarget(request.source(), request.target());
         };
 
         getForList(findByEntityReference, findByEntityReferenceRoute);

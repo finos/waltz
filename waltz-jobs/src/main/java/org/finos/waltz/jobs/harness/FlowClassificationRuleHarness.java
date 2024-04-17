@@ -52,7 +52,6 @@ public class FlowClassificationRuleHarness {
         Set<DataTypeDecoratorRatingCharacteristics> calculated = calc.calculate(waltz, apptio, Optional.empty());
         System.out.printf("Calculated %d\n", calculated.size());
 
-        System.out.println(calculated);
 //        System.exit(-1);
     }
 

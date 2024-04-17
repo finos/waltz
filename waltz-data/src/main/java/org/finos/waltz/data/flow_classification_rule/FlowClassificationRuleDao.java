@@ -104,13 +104,8 @@ public class FlowClassificationRuleDao {
     private final static EntityHierarchy ehOrgUnit = ENTITY_HIERARCHY.as("ehOrgUnit");
     private final static EntityHierarchy ehDataType = ENTITY_HIERARCHY.as("ehDataType");
     private final static org.finos.waltz.schema.tables.DataType declaredDataType = org.finos.waltz.schema.tables.DataType.DATA_TYPE.as("declaredDataType");
-    private final static org.finos.waltz.schema.tables.DataType impliedDataType = org.finos.waltz.schema.tables.DataType.DATA_TYPE.as("impliedDataType");
-
-    private final static Field<Long> declaredOrgUnitId = ehOrgUnit.ID.as("declaredOrgUnitId");
     public static final Field<Long> vantagePointId = DSL.coalesce(ehOrgUnit.ID, FLOW_CLASSIFICATION_RULE.PARENT_ID);
-    private final static Field<Integer> declaredOrgUnitLevel = ehOrgUnit.LEVEL.as("declaredOrgUnitLevel");
     public static final Field<Integer> vantagePointLevel = DSL.coalesce(ehOrgUnit.LEVEL, 0).as("parentLevel");
-    private final static Field<Long> declaredDataTypeId = ehDataType.ID.as("declaredDataTypeId");
     private final static Field<Integer> declaredDataTypeLevel = ehDataType.LEVEL.as("declaredDataTypeLevel");
 
     private static final Field<String> PARENT_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
@@ -379,17 +374,17 @@ public class FlowClassificationRuleDao {
                         FLOW_CLASSIFICATION.CODE,
                         FLOW_CLASSIFICATION_RULE.ID)
                 .from(FLOW_CLASSIFICATION_RULE)
-                .leftJoin(ehOrgUnit)
-                    .on(ehOrgUnit.ANCESTOR_ID.eq(FLOW_CLASSIFICATION_RULE.PARENT_ID)
-                            .and(ehOrgUnit.KIND.eq(EntityKind.ORG_UNIT.name())
-                                    .and(FLOW_CLASSIFICATION_RULE.PARENT_KIND.eq(EntityKind.ORG_UNIT.name()))))
+                .innerJoin(FLOW_CLASSIFICATION).on(FLOW_CLASSIFICATION.DIRECTION.eq(direction.name())
+                        .and(FLOW_CLASSIFICATION_RULE.FLOW_CLASSIFICATION_ID.eq(FLOW_CLASSIFICATION.ID)))
                 .innerJoin(declaredDataType)
                     .on(declaredDataType.ID.eq(FLOW_CLASSIFICATION_RULE.DATA_TYPE_ID))
                 .innerJoin(ehDataType)
-                    .on(ehDataType.ANCESTOR_ID.eq(declaredDataType.ID).and(ehDataType.KIND.eq(EntityKind.DATA_TYPE.name())))
-                .innerJoin(FLOW_CLASSIFICATION).on(FLOW_CLASSIFICATION_RULE.FLOW_CLASSIFICATION_ID.eq(FLOW_CLASSIFICATION.ID))
-                .where(FLOW_CLASSIFICATION.DIRECTION.eq(direction.name())
-                        .and(vantagePointCondition))
+                    .on(ehDataType.KIND.eq(EntityKind.DATA_TYPE.name()).and(ehDataType.ANCESTOR_ID.eq(declaredDataType.ID)))
+                .leftJoin(ehOrgUnit)
+                .on(FLOW_CLASSIFICATION_RULE.PARENT_KIND.eq(EntityKind.ORG_UNIT.name())
+                        .and(ehOrgUnit.KIND.eq(EntityKind.ORG_UNIT.name())
+                                .and(ehOrgUnit.ANCESTOR_ID.eq(FLOW_CLASSIFICATION_RULE.PARENT_ID))))
+                .where(vantagePointCondition)
                 .orderBy(
                         FLOW_CLASSIFICATION_RULE.PARENT_KIND,
                         ehOrgUnit.LEVEL.desc(),
