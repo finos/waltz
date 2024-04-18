@@ -24,6 +24,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import toasts from "../../../svelte-stores/toast-store";
 import _ from "lodash";
 import {displayError} from "../../../common/error-utils";
+import AlignedDataTypesList from "../../components/aligned-data-types-list/AlignedDataTypesList.svelte";
 
 
 const initialState = {
@@ -32,7 +33,8 @@ const initialState = {
     isRemoved: false,
     canEdit: false,
     canRestore: false,
-    canRemove: false
+    canRemove: false,
+    AlignedDataTypesList
 };
 
 

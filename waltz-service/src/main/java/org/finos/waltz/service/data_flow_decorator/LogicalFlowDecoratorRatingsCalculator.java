@@ -18,6 +18,7 @@
 
 package org.finos.waltz.service.data_flow_decorator;
 
+import org.finos.waltz.common.FunctionUtilities;
 import org.finos.waltz.data.flow_classification_rule.FlowClassificationRuleDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowDao;
 import org.finos.waltz.model.EntityKind;
@@ -159,10 +160,11 @@ public class LogicalFlowDecoratorRatingsCalculator {
         Set<Long> targetOrgIds = !isEmpty(targetApp) ? asSet(targetApp.organisationalUnitId()) : Collections.emptySet();
         Set<Long> sourceOrgIds = !isEmpty(sourceApp) ? asSet(sourceApp.organisationalUnitId()) : Collections.emptySet();
 
+        Collection<Long> dtIds = dataTypeIds.orElseGet(() -> toIds(dataTypeService.findAll()));
+
         FlowClassificationRuleResolver outboundResolver = time("out res", () -> createResolver(FlowDirection.OUTBOUND, asSet(target), targetOrgIds));
         FlowClassificationRuleResolver inboundResolver = time("in res", () -> createResolver(FlowDirection.INBOUND, asSet(source), sourceOrgIds));
 
-        Collection<Long> dtIds = dataTypeIds.orElseGet(() -> toIds(dataTypeService.findAll()));
 
         return time("total dts", () -> dtIds
                 .stream()
@@ -231,9 +233,11 @@ public class LogicalFlowDecoratorRatingsCalculator {
 
         // this brings back many expanded vantage points
         List<FlowClassificationRuleVantagePoint> flowClassificationRuleVantagePoints =
-                flowClassificationRuleDao.findExpandedFlowClassificationRuleVantagePoints(direction, vantagePointOrgUnitIdLookups, appVantagePoints, actorVantagePoints);
+                FunctionUtilities.time("do find expanded",
+                        () -> flowClassificationRuleDao
+                                .findExpandedFlowClassificationRuleVantagePoints(direction, vantagePointOrgUnitIdLookups, appVantagePoints, actorVantagePoints));
 
-        return new FlowClassificationRuleResolver(direction, flowClassificationRuleVantagePoints);
+        return FunctionUtilities.time("mk resolver", () -> new FlowClassificationRuleResolver(direction, flowClassificationRuleVantagePoints));
     }
 
     private Set<Long> getVantagePointIdsForKind(Set<EntityReference> vantagePointEntityLookups, EntityKind entityKind) {

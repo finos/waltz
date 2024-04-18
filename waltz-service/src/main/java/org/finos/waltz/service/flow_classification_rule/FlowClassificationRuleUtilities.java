@@ -6,77 +6,34 @@ import org.finos.waltz.model.FlowDirection;
 import org.finos.waltz.model.datatype.FlowDataType;
 import org.finos.waltz.model.entity_hierarchy.EntityHierarchy;
 import org.finos.waltz.model.flow_classification_rule.FlowClassificationRuleVantagePoint;
-import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
-import org.finos.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
-import org.jooq.UpdateConditionStep;
-import org.jooq.impl.DSL;
 import org.jooq.lambda.function.Function4;
 import org.jooq.lambda.tuple.Tuple2;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.finos.waltz.model.rating._AuthoritativenessRatingValue.DISCOURAGED;
-import static org.finos.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 public class FlowClassificationRuleUtilities {
 
-
-    protected static List<UpdateConditionStep<LogicalFlowDecoratorRecord>> mkOutboundRuleUpdateStmts(Map<Long, String> outboundRatingCodeByRuleId,
-                                                                                                     Map<Long, Tuple2<Long, MatchOutcome>> lfdIdToOutboundRuleIdMap) {
-        return lfdIdToOutboundRuleIdMap
-                .entrySet()
-                .stream()
-                .map(kv -> {
-
-                    Tuple2<Long, MatchOutcome> ruleAndMatchOutcome = kv.getValue();
-
-                    Long ruleId = ruleAndMatchOutcome.v1();
-                    String ratingCode = outboundRatingCodeByRuleId.get(ruleId);
-
-                    AuthoritativenessRatingValue ratingValue = MatchOutcome.POSITIVE_MATCH.equals(ruleAndMatchOutcome.v2)
-                            ? AuthoritativenessRatingValue.of(ratingCode)
-                            : DISCOURAGED;
-
-                    return DSL
-                            .update(LOGICAL_FLOW_DECORATOR)
-                            .set(LOGICAL_FLOW_DECORATOR.RATING, ratingValue.value())
-                            .set(LOGICAL_FLOW_DECORATOR.FLOW_CLASSIFICATION_RULE_ID, ruleId)
-                            .where(LOGICAL_FLOW_DECORATOR.ID.eq(kv.getKey()));
-                })
-                .collect(Collectors.toList());
-    }
-
-    protected static List<UpdateConditionStep<LogicalFlowDecoratorRecord>> mkInboundRuleUpdateStmts(Map<Long, String> inboundRatingCodeByRuleId,
-                                                                                                  Map<Long, Tuple2<Long, MatchOutcome>> lfdIdToInboundRuleIdMap) {
-        return lfdIdToInboundRuleIdMap
-                .entrySet()
-                .stream()
-                .map(kv -> {
-
-                    Tuple2<Long, MatchOutcome> ruleAndMatchOutcome = kv.getValue();
-
-                    Long ruleId = ruleAndMatchOutcome.v1();
-                    String ratingCode = inboundRatingCodeByRuleId.get(ruleId);
-
-                    if (MatchOutcome.POSITIVE_MATCH.equals(ruleAndMatchOutcome.v2)) {
-                        return DSL
-                                .update(LOGICAL_FLOW_DECORATOR)
-                                .set(LOGICAL_FLOW_DECORATOR.TARGET_INBOUND_RATING, AuthoritativenessRatingValue.of(ratingCode).value())
-                                .set(LOGICAL_FLOW_DECORATOR.INBOUND_FLOW_CLASSIFICATION_RULE_ID, ruleId)
-                                .where(LOGICAL_FLOW_DECORATOR.ID.eq(kv.getKey()));
-                    } else {
-                        return null; // For inbound rules we don't want to automatically discourage flows that are not covered
-                    }
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-    }
+    private static final Function<FlowClassificationRuleVantagePoint, String> kindComparator = d -> d.vantagePoint().kind().name();
+    private static final Function<FlowClassificationRuleVantagePoint, Integer> vantageComparator = FlowClassificationRuleVantagePoint::vantagePointRank;
+    private static final Function<FlowClassificationRuleVantagePoint, Integer> dataTypeComparator = FlowClassificationRuleVantagePoint::dataTypeRank;
+    private static final Function<FlowClassificationRuleVantagePoint, Long> vantagePointIdComparator = d -> d.vantagePoint().id();
+    private static final Function<FlowClassificationRuleVantagePoint, Long> dataTypeIdComparator = d -> d.dataType().id();
+    private static final Function<FlowClassificationRuleVantagePoint, Long> subjectIdComparator = d -> d.subjectReference().id();
+    public static final Comparator<FlowClassificationRuleVantagePoint> flowClassificationRuleVantagePointComparator = Comparator
+            .comparing(kindComparator)
+            .thenComparing(vantageComparator).reversed()
+            .thenComparing(dataTypeComparator).reversed()
+            .thenComparing(vantagePointIdComparator)
+            .thenComparing(dataTypeIdComparator)
+            .thenComparing(subjectIdComparator);
 
 
     protected static Map<Long, Tuple2<Long, MatchOutcome>> applyVantagePoints(FlowDirection direction,
@@ -88,8 +45,18 @@ public class FlowClassificationRuleUtilities {
         Function4<FlowClassificationRuleVantagePoint, Set<Long>, Set<Long>, FlowDataType, MatchOutcome> matcher = determineMatcherFn(direction);
 
         Map<Long, Tuple2<Long, MatchOutcome>> lfdIdToRuleAndOutcomeMap = new HashMap<>();
-        ruleVantagePoints
+
+        Set<Long> ruleDataTypes = population
                 .stream()
+                .flatMap(d -> dtHierarchy.findAncestors(d.dtId()).stream())
+                .collect(Collectors.toSet());
+
+        Set<FlowClassificationRuleVantagePoint> filteredRules = ruleVantagePoints
+                .stream()
+                .filter(rvp -> ruleDataTypes.contains(rvp.dataType().id()))
+                .collect(Collectors.toSet());
+
+        filteredRules
                 .forEach(rvp -> {
                     Set<Long> childOUs = ouHierarchy.findChildren(rvp.vantagePoint().id());
                     Set<Long> childDTs = dtHierarchy.findChildren(rvp.dataType().id());
