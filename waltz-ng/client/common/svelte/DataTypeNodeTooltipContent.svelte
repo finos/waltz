@@ -3,6 +3,7 @@
     import Icon from "./Icon.svelte";
     import RatingIndicatorCell from "../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
     import _ from "lodash";
+    import DescriptionFade from "./DescriptionFade.svelte";
 
     export let name;
     export let description;
@@ -21,7 +22,7 @@
 </div>
 <div class="row">
     <div class="col-sm-12">
-        {description}
+        <DescriptionFade text={description}/>
     </div>
 </div>
 {#if !_.isEmpty(ratingCharacteristics)}
@@ -29,25 +30,25 @@
 {/if}
 {#if ratingCharacteristics}
     <div class="row">
-        <div class="col-sm-4">Source Outbound Rating:</div>
+        <div class="col-sm-4">Producer Rating:</div>
         <div class="col-sm-8">
             <RatingIndicatorCell {...ratingCharacteristics.sourceOutboundClassification} showName={true}/>
         </div>
     </div>
     <div class="row">
         <div class="col-sm-12 help-block small">
-            This describes the rating of the data flow looking at outbound flow classification rules from the upstream entity.
+            This indicates the rating of the flow according whether this source entity is authorised to distribute this data type
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-4">Target Inbound Rating:</div>
+        <div class="col-sm-4">Consumer Rating:</div>
         <div class="col-sm-8">
             <RatingIndicatorCell {...ratingCharacteristics.targetInboundClassification} showName={true}/>
         </div>
     </div>
     <div class="row">
         <div class="col-sm-12 help-block small">
-            This describes the rating of the data flow looking at inbound flow classification rules for the downstream target entity.
+            This rating expresses whether the target entity has a preference for or against this type of data being sent to it
         </div>
     </div>
 {/if}

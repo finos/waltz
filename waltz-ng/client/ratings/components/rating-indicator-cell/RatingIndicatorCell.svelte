@@ -7,6 +7,7 @@
     export let description;
     export let showName = true;
     export let showGroup = false;
+    export let size = "xl";
 
 </script>
 
@@ -15,10 +16,10 @@
     <div style="display: inline-block"
          class="stack-box fa-stack">
         <span style={`color: ${color}`}>
-            <Icon size="xl" stack="1x" name="square"/>
+            <Icon {size} stack="1x" name="square"/>
         </span>
         <span style="color: #aaa">
-            <Icon size="xl" stack="1x" name="square-o"/>
+            <Icon {size} stack="1x" name="square-o"/>
         </span>
     </div>
     <span>
