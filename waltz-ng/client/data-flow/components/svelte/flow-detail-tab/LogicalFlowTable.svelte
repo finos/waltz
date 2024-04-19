@@ -5,11 +5,17 @@
     import {filters, selectedLogicalFlow, selectedPhysicalFlow, updateFilters} from "./flow-details-store";
     import {SlickGrid, SlickRowSelectionModel} from "slickgrid";
     import {mkSortFn} from "../../../../common/slick-grid-utils";
-    import {baseLogicalFlowColumns, mkAssessmentColumns, mkDataTypeTooltipTable, showDataTypeTooltip} from "./flow-detail-utils";
+    import {baseLogicalFlowColumns, mkAssessmentColumns, showDataTypeTooltip} from "./flow-detail-utils";
 
     export let logicalFlows = [];
     export let flowClassifications = [];
     export let assessmentDefinitions = [];
+
+    const gridOptions = {
+        enableCellNavigation: false,
+        enableColumnReorder: false,
+        frozenColumn: 4
+    };
 
     let elem = null;
     let grid;
@@ -23,17 +29,6 @@
         const bId = _.get(b, ["logicalFlow", "id"]);
         return aId === bId;
     }
-
-    function mkDataTypeString(dataTypes) {
-        return _
-            .chain(dataTypes)
-            .map(d => d.decoratorEntity.name)
-            .orderBy(d => d)
-            .join(", ")
-            .value();
-    }
-
-    $: flowClassificationsByCode = _.keyBy(flowClassifications, d => d.code);
 
     function selectLogicalFlow(flow) {
 
@@ -69,53 +64,9 @@
         }
     }
 
-    function mkDataTypeTooltipProps(row) {
-        return {
-            decorators: row.dataTypesForLogicalFlow,
-            flowClassifications
-        };
-    }
-
-    function flowCountToIcon(flowCount) {
-        switch (flowCount) {
-            case 0:
-                return "";
-            case 1:
-                return "file-o";
-            default:
-                return "folder-o";
-        }
-    }
-
-    $: visibleFlows = _.filter(logicalFlows, d => d.visible);
-
-    $: flowList = _.isEmpty(qry)
-        ? visibleFlows
-        : termSearch(
-            visibleFlows,
-            qry,
-            [
-                (f) => _.get(f.logicalFlow.source, ["name"], ""),
-                (f) => _.get(f.logicalFlow.source, ["externalId"], ""),
-                (f) => _.get(f.logicalFlow.target, ["name"], ""),
-                (f) => _.get(f.logicalFlow.target, ["externalId"], ""),
-                (f) => _.chain(f.logicalFlowRatingsByDefId).values().flatten().map(d => d.name).join(" ").value(),
-                (f) => _.chain(f.dataTypesForLogicalFlow).map(d => _.get(d, ["decoratorEntity", "name"])).join(" ").value()
-            ]);
-
-    $: defs = _.filter(
-        assessmentDefinitions,
-        d => d.entityKind === 'LOGICAL_DATA_FLOW');
-
-    const options = {
-        enableCellNavigation: false,
-        enableColumnReorder: false,
-        frozenColumn: 4
-    };
-
     function initGrid(elem) {
         let columns = _.concat(baseLogicalFlowColumns, mkAssessmentColumns(defs));
-        grid = new SlickGrid(elem, [], columns, options);
+        grid = new SlickGrid(elem, [], columns, gridOptions);
         grid.setSelectionModel(new SlickRowSelectionModel());
         grid.onSort.subscribe((e, args) => {
             const sortCol = args.sortCol;
@@ -138,6 +89,29 @@
         grid.data = flowList;
         grid.invalidate()
     }
+
+    $: flowClassificationsByCode = _.keyBy(flowClassifications, d => d.code);
+
+    $: visibleFlows = _.filter(logicalFlows, d => d.visible);
+
+    $: flowList = _.isEmpty(qry)
+        ? visibleFlows
+        : termSearch(
+            visibleFlows,
+            qry,
+            [
+                (f) => _.get(f.logicalFlow.source, ["name"], ""),
+                (f) => _.get(f.logicalFlow.source, ["externalId"], ""),
+                (f) => _.get(f.logicalFlow.target, ["name"], ""),
+                (f) => _.get(f.logicalFlow.target, ["externalId"], ""),
+                (f) => _.chain(f.logicalFlowRatingsByDefId).values().flatten().map(d => d.name).join(" ").value(),
+                (f) => _.chain(f.dataTypesForLogicalFlow).map(d => _.get(d, ["decoratorEntity", "name"])).join(" ").value()
+            ]);
+
+    $: defs = _.filter(
+        assessmentDefinitions,
+        d => d.entityKind === 'LOGICAL_DATA_FLOW');
+
 
     $: {
         if (elem && !_.isEmpty(flowList)) {

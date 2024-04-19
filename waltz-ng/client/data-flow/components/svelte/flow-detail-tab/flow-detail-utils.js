@@ -103,11 +103,13 @@ export const baseLogicalFlowColumns = [
         formatter: (row, cell, value, colDef, dataCtx) => {
             switch (value) {
                 case 0:
-                    return "<i class='fa fa-fw'/>"
+                    return "<i class='fa fa-fw'/>";
                 case 1:
-                    return "<i class='fa fa-fw fa-file-o'/>"
+                    return `<i title='1 associated physical flow'
+                               class='fa fa-fw fa-file-o'/>`;
                 default:
-                    return "<i class='fa fa-fw fa-folder-o'/>"
+                    return `<i title='${value} associated physical flows'
+                               class='fa fa-fw fa-folder-o'/>`;
             }
         },
         sortFn: (a, b) => cmp(a?.logicalFlow.source.name, b?.logicalFlow.source.name)
