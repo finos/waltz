@@ -18,8 +18,6 @@
         $selectedDataType = null;
     }
 
-    $: console.log({sd: $selectedDecorator, sdt: $selectedDataType});
-
 </script>
 
 <div>

@@ -398,6 +398,8 @@ function controller($element,
     vm.onSelectDataType = (dt) => {
         vm.dataTypeInfo = dt;
     }
+
+    vm.selectionFilter = (d) => !_.includes(workingDataTypes, d.id);
 }
 
 

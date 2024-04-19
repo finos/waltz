@@ -14,8 +14,8 @@
         selectedDecorator,
         viewData
     } from "./data-type-decorator-section-store"
-    import {dataTypeStore} from "../../../svelte-stores/data-type-store";
     import SavingPlaceholder from "../../../common/svelte/SavingPlaceholder.svelte";
+    import SuggestedDataTypeTreeSelector from "./SuggestedDataTypeTreeSelector.svelte";
 
 
     export let primaryEntityReference;
@@ -34,14 +34,11 @@
     let viewCall;
     let ratingCharacteristicsCall;
     let usageCharacteristicsCall;
-    let suggestedDataTypesCall;
-    let showSuggested = true;
     let saving = false;
 
     let workingDataTypes = [];
     let addedDataTypeIds = [];
     let removedDataTypeIds = [];
-    let suggestedDataTypes = [];
 
     function onSelect(evt) {
         const dataType = evt.detail;
@@ -98,7 +95,6 @@
     }
 
 
-
     $: {
         if (!_.isEmpty(logicalFlow)){
 
@@ -109,7 +105,6 @@
 
             usageCharacteristicsCall = dataTypeDecoratorStore.findDatatypeUsageCharacteristics(logicalFlow);
             ratingCharacteristicsCall = dataTypeDecoratorStore.findDataTypeRatingCharacteristics(cmd);
-            suggestedDataTypesCall = dataTypeStore.findSuggestedByRef(logicalFlow);
         }
     }
 
@@ -119,7 +114,6 @@
     $: dataTypes = _.map(dataTypeDecorators, d => d.dataTypeId);
     $: ratingCharacteristics = $ratingCharacteristicsCall?.data;
     $: usageCharacteristics = $usageCharacteristicsCall?.data;
-    $: suggestedDataTypes = _.map($suggestedDataTypesCall?.data, d => d.id);
 
     $: decoratorsByDataTypeId = _.keyBy(dataTypeDecorators, d => d.dataTypeId);
 
@@ -156,32 +150,11 @@
         </div>
     {:else if activeMode === Modes.EDIT}
         <div class="col-sm-12">
-            {#if showSuggested}
-                <DataTypeTreeSelector multiSelect={true}
-                                      expanded={true}
-                                      nonConcreteSelectable={false}
-                                      selectionFilter={selectionFilter}
-                                      on:select={toggleDataType}
-                                      dataTypeIds={suggestedDataTypes}
-                                      {ratingCharacteristics}
-                                      {usageCharacteristics}/>
-                <div class="help-block">
-                    This is a filtered list of data types showing only those currently related to the upstream entity, alternatively you can
-                    <strong><button class="btn btn-skinny" on:click={() => showSuggested = false}>show all data types</button></strong>
-                </div>
-                {:else }
-                    <DataTypeTreeSelector multiSelect={true}
-                                          expanded={true}
-                                          nonConcreteSelectable={false}
-                                          selectionFilter={selectionFilter}
-                                          on:select={toggleDataType}
-                                          {ratingCharacteristics}
-                                          {usageCharacteristics}/>
-                <div class="help-block">
-                    Currently showing all data types, for a filtered view
-                    <strong><button class="btn btn-skinny" on:click={() => showSuggested = true}>show selected data types only</button></strong>
-                </div>
-            {/if}
+            <SuggestedDataTypeTreeSelector {logicalFlow}
+                                           selectionFilter={selectionFilter}
+                                           onSelect={toggleDataType}
+                                           {ratingCharacteristics}
+                                           {usageCharacteristics}/>
             <div style="padding-top: 1em">
                 <button class="btn btn-skinny"
                         title={_.isEmpty(workingDataTypes) ? "At least one data type must be associated to this flow" : ""}

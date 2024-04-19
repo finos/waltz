@@ -7,7 +7,7 @@
 
 </script>
 
-<div style="display: inline-block; width: 12px;">
+<div style="display: inline-block; width: 10px;">
     <svg width="100%"
          height="100%"
          preserveAspectRatio="xMidYMin"
