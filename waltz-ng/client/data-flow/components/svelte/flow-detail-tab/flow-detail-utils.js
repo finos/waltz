@@ -2,6 +2,10 @@ import _ from "lodash";
 import {sameRef} from "../../../../common/entity-utils";
 import {cmp} from "../../../../common/sort-utils";
 import tippy from "tippy.js";
+import {
+    toCriticalityName,
+    toFrequencyKindName, toTransportKindName
+} from "../../../../physical-flows/svelte/physical-flow-registration-utils";
 
 export const Directions = {
     INBOUND: "INBOUND",
@@ -93,61 +97,105 @@ export function mkFlowDetails(flowView, parentEntityRef) {
         .value();
 }
 
-export const baseLogicalFlowColumns = [
-    {
-        id: "phys_flow_indicator",
-        name: "",
-        field: "physicalCount",
-        sortable:  true,
-        width: 16,
-        formatter: (row, cell, value, colDef, dataCtx) => {
-            switch (value) {
-                case 0:
-                    return "<i class='fa fa-fw'/>";
-                case 1:
-                    return `<i title='1 associated physical flow'
-                               class='fa fa-fw fa-file-o'/>`;
-                default:
-                    return `<i title='${value} associated physical flows'
-                               class='fa fa-fw fa-folder-o'/>`;
-            }
-        },
-        sortFn: (a, b) => cmp(a?.logicalFlow.source.name, b?.logicalFlow.source.name)
-    }, {
-        id: "source_name",
-        name: "Source",
-        field: "logicalFlow",
-        sortable:  true,
-        width: 150,
-        formatter: (row, cell, value, colDef, dataCtx) => value.source.name,
-        sortFn: (a, b) => cmp(a?.logicalFlow.source.name, b?.logicalFlow.source.name)
-    }, {
-        id: "source_ext_id",
-        name: "Src Ext Id",
-        field: "logicalFlow",
-        sortable:  true,
-        formatter: (row, cell, value, colDef, dataCtx) => value.source.externalId,
-        sortFn: (a, b) => cmp(a?.logicalFlow.source.externalId, b?.logicalFlow.source.externalId)
-    }, {
-        id: "target_name",
-        name: "Target",
-        field: "logicalFlow",
-        sortable:  true,
-        width: 150,
-        formatter: (row, cell, value, colDef, dataCtx) => value.target.name,
-        sortFn: (a, b) => cmp(a?.logicalFlow.target.name, b?.logicalFlow.target.name)
-    }, {
-        id: "target_ext_id",
-        name: "Trg Ext Id",
-        field: "logicalFlow",
-        sortable:  true,
-        formatter: (row, cell, value, colDef, dataCtx) => value.target.externalId,
-        sortFn: (a, b) => cmp(a?.logicalFlow.target.externalId, b?.logicalFlow.target.externalId)
-    }, {
+const sourceNameCol = {
+    id: "source_name",
+    name: "Source",
+    field: "logicalFlow",
+    sortable:  true,
+    width: 150,
+    formatter: (row, cell, value, colDef, dataCtx) => value.source.name,
+    sortFn: (a, b) => cmp(a?.logicalFlow.source.name, b?.logicalFlow.source.name)
+};
+
+const sourceExtIdCol = {
+    id: "source_ext_id",
+    name: "Src Ext Id",
+    field: "logicalFlow",
+    sortable:  true,
+    formatter: (row, cell, value, colDef, dataCtx) => value.source.externalId,
+    sortFn: (a, b) => cmp(a?.logicalFlow.source.externalId, b?.logicalFlow.source.externalId)
+};
+
+const targetNameCol = {
+    id: "target_name",
+    name: "Target",
+    field: "logicalFlow",
+    sortable:  true,
+    width: 150,
+    formatter: (row, cell, value, colDef, dataCtx) => value.target.name,
+    sortFn: (a, b) => cmp(a?.logicalFlow.target.name, b?.logicalFlow.target.name)
+};
+
+const targetExtIdCol = {
+    id: "target_ext_id",
+    name: "Trg Ext Id",
+    field: "logicalFlow",
+    sortable:  true,
+    formatter: (row, cell, value, colDef, dataCtx) => value.target.externalId,
+    sortFn: (a, b) => cmp(a?.logicalFlow.target.externalId, b?.logicalFlow.target.externalId)
+};
+
+
+const physicalNameCol = {
+    id: "physical_name",
+    name: "Name",
+    sortable: true,
+    width: 170,
+    formatter: (row, cell, value, colDef, dataCtx) => dataCtx.physicalFlow.name || dataCtx.specification?.name || ""
+};
+
+const physicalExtIdCol = {
+    id: "physical_ext_id",
+    name: "Ext Id",
+    sortable: true,
+    field: "physicalFlow",
+    width: 170,
+    formatter: (row, cell, value, colDef, dataCtx) => value.externalId || ""
+};
+
+
+function mkCriticalityCol(nestedEnums) {
+    return {
+        id: "criticality",
+        name: "Criticality",
+        field: "physicalFlow",
+        sortable: false,
+        width: 120,
+        formatter: (row, cell, value, colDef, dataCtx) => toCriticalityName(nestedEnums, value.criticality)
+    };
+}
+
+
+function mkFrequencyCol(nestedEnums) {
+    return {
+        id: "frequency",
+        name: "Frequency",
+        field: "physicalFlow",
+        sortable: false,
+        width: 120,
+        formatter: (row, cell, value, colDef, dataCtx) => toFrequencyKindName(nestedEnums, value.frequency)
+    };
+}
+
+
+function mkTransportCol(nestedEnums) {
+    return {
+        id: "transport",
+        name: "Transport",
+        field: "physicalFlow",
+        sortable: false,
+        width: 120,
+        formatter: (row, cell, value, colDef, dataCtx) => toTransportKindName(nestedEnums, value.transport)
+    };
+}
+
+
+function mkDataTypesCol(fieldName) {
+    return {
         id: "data_types",
         name: "Data Types",
-        field: "dataTypesForLogicalFlow",
-        sortable:  false,
+        field: fieldName,
+        sortable: false,
         width: 170,
         formatter: (row, cell, value, colDef, dataCtx) => _
             .chain(value)
@@ -155,11 +203,33 @@ export const baseLogicalFlowColumns = [
             .sort()
             .join(", ")
             .value()
-    }
-];
+    };
+}
 
 
-export function mkAssessmentColumns(defs) {
+const physicalFlowIndicatorCol = {
+    id: "phys_flow_indicator",
+    name: "",
+    field: "physicalCount",
+    sortable:  true,
+    width: 16,
+    formatter: (row, cell, value, colDef, dataCtx) => {
+        switch (value) {
+            case 0:
+                return "<i class='fa fa-fw'/>";
+            case 1:
+                return `<i title='1 associated physical flow'
+                           class='fa fa-fw fa-file-o'/>`;
+            default:
+                return `<i title='${value} associated physical flows'
+                           class='fa fa-fw fa-folder-o'/>`;
+        }
+    },
+    sortFn: (a, b) => cmp(a?.logicalFlow.source.name, b?.logicalFlow.source.name)
+};
+
+
+function mkLogicalFlowAssessmentColumns(defs) {
     return _.map(defs, d => {
         return {
             id: "assessment_definition/" + d.id,
@@ -179,8 +249,63 @@ export function mkAssessmentColumns(defs) {
 }
 
 
+function mkPhysicalFlowAssessmentColumns(defs) {
+    return _.map(defs, d => {
+        return {
+            id: "assessment_definition/" + d.id,
+            assessmentDefinitionId: d.id,
+            name: d.name,
+            sortable: false,
+            width: 120,
+            formatter: (row, cell, value, colDef, dataCtx) => {
+                const ratingsByDefId = _.merge(dataCtx.physicalSpecRatingsByDefId, dataCtx.physicalFlowRatingsByDefId);
+                return _
+                    .chain(ratingsByDefId)
+                    .get(colDef.assessmentDefinitionId, [])
+                    .map(d => `<span title='${d.description}' style="border-left: solid 2px ${d.color}; padding-left: 0.2em">${d.name}</span>`)
+                    .join(", ")
+                    .value()
+            }
+        }
+    });
+}
 
-export function mkDataTypeTooltipTable(rowData, flowClassificationsByCode = {}) {
+
+export function mkLogicalFlowTableColumns(defs = []) {
+    return _.concat(
+        [
+            physicalFlowIndicatorCol,
+            sourceNameCol,
+            sourceExtIdCol,
+            targetNameCol,
+            targetExtIdCol,
+            mkDataTypesCol("dataTypesForLogicalFlow")
+        ],
+        mkLogicalFlowAssessmentColumns(defs));
+}
+
+
+export function mkPhysicalFlowTableColumns(defs = [], nestedEnums = {}) {
+    return _.concat(
+        [
+            sourceNameCol,
+            sourceExtIdCol,
+            targetNameCol,
+            targetExtIdCol,
+            physicalNameCol,
+            physicalExtIdCol,
+            mkDataTypesCol("dataTypesForSpecification"),
+            mkCriticalityCol(nestedEnums),
+            mkFrequencyCol(nestedEnums),
+            mkTransportCol(nestedEnums)
+        ],
+        mkPhysicalFlowAssessmentColumns(defs));
+}
+
+
+
+
+function mkDataTypeTooltipTable(dataTypes, flowClassificationsByCode = null) {
     const mkRatingIcon = (color) => color
         ? `<div class="rating-icon"
                     style='
@@ -204,7 +329,7 @@ export function mkDataTypeTooltipTable(rowData, flowClassificationsByCode = {}) 
     };
 
     const rows = _
-        .chain(rowData.dataTypesForLogicalFlow)
+        .chain(dataTypes)
         .map(d => ({name: d.decoratorEntity.name, outboundRatingCode: d.rating, inboundRatingCode: d.targetInboundRating}))
         .map(d => `
                 <tr>
@@ -229,9 +354,11 @@ export function mkDataTypeTooltipTable(rowData, flowClassificationsByCode = {}) 
 }
 
 
-export function showDataTypeTooltip(cellElem, rowData, flowClassificationsByCode) {
+export function showDataTypeTooltip(cellElem, dataTypes, flowClassificationsByCode = null) {
     const tippyConfig = {
-        content: mkDataTypeTooltipTable(rowData, flowClassificationsByCode),
+        content: mkDataTypeTooltipTable(
+            dataTypes,
+            flowClassificationsByCode),
         delay: [300, 100],
         interactive: true,
         allowHTML: true,

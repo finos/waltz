@@ -5,7 +5,8 @@
     import {filters, selectedLogicalFlow, selectedPhysicalFlow, updateFilters} from "./flow-details-store";
     import {SlickGrid, SlickRowSelectionModel} from "slickgrid";
     import {mkSortFn} from "../../../../common/slick-grid-utils";
-    import {baseLogicalFlowColumns, mkAssessmentColumns, showDataTypeTooltip} from "./flow-detail-utils";
+    import {mkLogicalFlowTableColumns, showDataTypeTooltip
+    } from "./flow-detail-utils";
 
     export let logicalFlows = [];
     export let flowClassifications = [];
@@ -65,7 +66,7 @@
     }
 
     function initGrid(elem) {
-        let columns = _.concat(baseLogicalFlowColumns, mkAssessmentColumns(defs));
+        let columns = mkLogicalFlowTableColumns(defs);
         grid = new SlickGrid(elem, [], columns, gridOptions);
         grid.setSelectionModel(new SlickRowSelectionModel());
         grid.onSort.subscribe((e, args) => {
@@ -81,7 +82,7 @@
             if (columnDef.id === 'data_types') {
                 const rowData = flowList[cell.row];
                 const cellElem = e.target;
-                showDataTypeTooltip(cellElem, rowData, flowClassificationsByCode);
+                showDataTypeTooltip(cellElem, rowData.dataTypesForLogicalFlow, flowClassificationsByCode);
             }
         });
         grid.onClick.subscribe((a,b) => selectLogicalFlow(flowList[b.row]))
@@ -121,7 +122,12 @@
 
     $: {
         if (grid) {
-            grid.setSelectedRows([_.indexOf(flowList, $selectedLogicalFlow)]);
+            if (flowList && $selectedLogicalFlow) {
+                const rowIdx = _.chain(flowList).map(f => f.logicalFlow).indexOf($selectedLogicalFlow.logicalFlow).value();
+                grid.setSelectedRows([rowIdx]);
+            } else {
+                grid.setSelectedRows([]);
+            }
         }
     }
 
@@ -142,7 +148,6 @@
 <div>
     <SearchInput bind:value={qry}/>
 </div>
-
 
 <div class="slick-container"
      style="width:100%;height:500px;"
