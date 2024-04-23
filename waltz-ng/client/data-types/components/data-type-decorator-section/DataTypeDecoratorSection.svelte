@@ -5,13 +5,7 @@
     import Toggle from "../../../common/svelte/Toggle.svelte";
     import DataTypeDecoratorViewGrid from "./DataTypeDecoratorViewGrid.svelte";
     import {dataTypeDecoratorStore} from "../../../svelte-stores/data-type-decorator-store";
-    import {
-        selectedDecorator,
-        viewData,
-        enrichedDecorators,
-        selectedDataType
-    } from "./data-type-decorator-section-store";
-    import {prepareData} from "./data-type-decorator-view-grid-utils";
+    import {selectedDataType, selectedDecorator, viewData} from "./data-type-decorator-section-store";
     import {onDestroy, onMount} from "svelte";
     import localWritable from "../../../common/svelte/local-writable";
 
@@ -53,12 +47,6 @@
     }
 
     $: $viewData = $viewCall?.data;
-
-    $: {
-        if ($viewData) {
-            $enrichedDecorators = prepareData($viewData);
-        }
-    }
 
 </script>
 

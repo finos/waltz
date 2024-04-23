@@ -18,48 +18,52 @@
 
 package org.finos.waltz.service.data_flow_decorator;
 
-import org.finos.waltz.model.FlowDirection;
-import org.finos.waltz.model.OrganisationalUnitIdProvider;
-import org.finos.waltz.model.datatype.DataType;
-import org.finos.waltz.model.datatype.DataTypeDecoratorRatingCharacteristics;
-import org.finos.waltz.model.datatype.ImmutableDataTypeDecoratorRatingCharacteristics;
-import org.finos.waltz.service.application.ApplicationService;
-import org.finos.waltz.service.data_type.DataTypeService;
-import org.finos.waltz.service.flow_classification_rule.FlowClassificationRuleResolver;
+import org.finos.waltz.common.FunctionUtilities;
 import org.finos.waltz.data.flow_classification_rule.FlowClassificationRuleDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.FlowDirection;
+import org.finos.waltz.model.OrganisationalUnitIdProvider;
 import org.finos.waltz.model.application.Application;
 import org.finos.waltz.model.datatype.DataTypeDecorator;
+import org.finos.waltz.model.datatype.DataTypeDecoratorRatingCharacteristics;
 import org.finos.waltz.model.datatype.ImmutableDataTypeDecorator;
+import org.finos.waltz.model.datatype.ImmutableDataTypeDecoratorRatingCharacteristics;
 import org.finos.waltz.model.flow_classification_rule.FlowClassificationRuleVantagePoint;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
+import org.finos.waltz.service.application.ApplicationService;
+import org.finos.waltz.service.data_type.DataTypeService;
+import org.finos.waltz.service.flow_classification_rule.FlowClassificationRuleResolver;
 import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.function.Predicate;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.FunctionUtilities.time;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.utils.IdUtilities.indexById;
+import static org.finos.waltz.model.utils.IdUtilities.toIds;
+import static org.springframework.util.ObjectUtils.isEmpty;
 
 @Service
 public class LogicalFlowDecoratorRatingsCalculator {
 
     private static final Logger LOG = LoggerFactory.getLogger(LogicalFlowDecoratorRatingsCalculator.class);
-    private static final Predicate<LogicalFlow> IS_APP_TO_APP_FLOW = f ->
-                f.target().kind() == EntityKind.APPLICATION &&
-                f.source().kind() == EntityKind.APPLICATION;
-
     private final ApplicationService applicationService;
     private final FlowClassificationRuleDao flowClassificationRuleDao;
     private final LogicalFlowDao logicalFlowDao;
@@ -147,27 +151,28 @@ public class LogicalFlowDecoratorRatingsCalculator {
                                                                  EntityReference target,
                                                                  Optional<Collection<Long>> dataTypeIds) {
 
-        Application sourceApp = applicationService.getById(source.id());
-        Application targetApp = applicationService.getById(target.id());
 
-        Set<Long> targetOrgIds = asSet(targetApp.organisationalUnitId());
-        Set<Long> sourceOrgIds = asSet(sourceApp.organisationalUnitId());
+        boolean sourceIsApp = source.kind().equals(EntityKind.APPLICATION);
+        boolean targetIsApp = target.kind().equals(EntityKind.APPLICATION);
+        Application sourceApp = sourceIsApp ? applicationService.getById(source.id()) : null;
+        Application targetApp = targetIsApp ? applicationService.getById(target.id()) : null;
 
-        FlowClassificationRuleResolver outboundResolver = createResolver(FlowDirection.OUTBOUND, asSet(target), targetOrgIds);
-        FlowClassificationRuleResolver inboundResolver = createResolver(FlowDirection.INBOUND, asSet(source), sourceOrgIds);
+        Set<Long> targetOrgIds = !isEmpty(targetApp) ? asSet(targetApp.organisationalUnitId()) : Collections.emptySet();
+        Set<Long> sourceOrgIds = !isEmpty(sourceApp) ? asSet(sourceApp.organisationalUnitId()) : Collections.emptySet();
 
-        Collection<Long> dtIds = dataTypeIds.orElseGet(() -> {
-            List<DataType> allDataTypes = dataTypeService.findAll();
-            return map(allDataTypes, dt -> dt.id().get());
-        });
+        Collection<Long> dtIds = dataTypeIds.orElseGet(() -> toIds(dataTypeService.findAll()));
 
-        return dtIds
+        FlowClassificationRuleResolver outboundResolver = time("out res", () -> createResolver(FlowDirection.OUTBOUND, asSet(target), targetOrgIds));
+        FlowClassificationRuleResolver inboundResolver = time("in res", () -> createResolver(FlowDirection.INBOUND, asSet(source), sourceOrgIds));
+
+
+        return time("total dts", () -> dtIds
                 .stream()
                 .map(dtId -> {
 
                     try {
-                        EntityReference targetOu = mkRef(EntityKind.ORG_UNIT, targetApp.organisationalUnitId());
-                        EntityReference sourceOu = mkRef(EntityKind.ORG_UNIT, sourceApp.organisationalUnitId());
+                        EntityReference targetOu = targetIsApp ? mkRef(EntityKind.ORG_UNIT, targetApp.organisationalUnitId()) : null;
+                        EntityReference sourceOu = sourceIsApp ? mkRef(EntityKind.ORG_UNIT, sourceApp.organisationalUnitId()) : null;
                         Tuple2<AuthoritativenessRatingValue, Optional<Long>> outboundRatingAndRule = outboundResolver.resolve(targetOu, target, source, dtId);
                         Tuple2<AuthoritativenessRatingValue, Optional<Long>> inboundRatingAndRule = inboundResolver.resolve(sourceOu, source, target, dtId);
                         return ImmutableDataTypeDecoratorRatingCharacteristics
@@ -185,7 +190,7 @@ public class LogicalFlowDecoratorRatingsCalculator {
 
                 })
                 .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toSet()));
     }
 
 
@@ -228,9 +233,11 @@ public class LogicalFlowDecoratorRatingsCalculator {
 
         // this brings back many expanded vantage points
         List<FlowClassificationRuleVantagePoint> flowClassificationRuleVantagePoints =
-                flowClassificationRuleDao.findExpandedFlowClassificationRuleVantagePoints(direction, vantagePointOrgUnitIdLookups, appVantagePoints, actorVantagePoints);
+                FunctionUtilities.time("do find expanded",
+                        () -> flowClassificationRuleDao
+                                .findExpandedFlowClassificationRuleVantagePoints(direction, vantagePointOrgUnitIdLookups, appVantagePoints, actorVantagePoints));
 
-        return new FlowClassificationRuleResolver(direction, flowClassificationRuleVantagePoints);
+        return FunctionUtilities.time("mk resolver", () -> new FlowClassificationRuleResolver(direction, flowClassificationRuleVantagePoints));
     }
 
     private Set<Long> getVantagePointIdsForKind(Set<EntityReference> vantagePointEntityLookups, EntityKind entityKind) {

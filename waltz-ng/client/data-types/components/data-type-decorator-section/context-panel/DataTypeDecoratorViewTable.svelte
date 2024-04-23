@@ -22,9 +22,15 @@
         </td>
     </tr>
     <tr>
-        <td>Classification</td>
+        <td>Source Outbound Classification</td>
         <td>
-            <RatingIndicatorCell {...decorator.flowClassification}/>
+            <RatingIndicatorCell {...decorator.sourceOutboundClassification}/>
+        </td>
+    </tr>
+    <tr>
+        <td>Target Inbound Classification</td>
+        <td>
+            <RatingIndicatorCell {...decorator.targetInboundClassification}/>
         </td>
     </tr>
     <tr>

@@ -46,10 +46,18 @@
         </div>
 
         <div>
-            {#if $selectedDecorator.flowClassificationRule && $selectedDecorator.rating !== 'DISCOURAGED'}
-                <strong>Flow Classification Rule</strong>
-                <FlowClassificationRuleViewTable {...$selectedDecorator.flowClassificationRule}/>
-                <div class="help-block small"><Icon name="info-circle"/>This is the rule that has driven the classification of the flow</div>
+            {#if $selectedDecorator.sourceOutboundRule && $selectedDecorator.rating !== 'DISCOURAGED'}
+                <strong>Source Outbound Classification Rule</strong>
+                <FlowClassificationRuleViewTable {...$selectedDecorator.sourceOutboundRule}/>
+                <div class="help-block small"><Icon name="info-circle"/>This is the rule where the source has driven the classification of the flow</div>
+            {/if}
+        </div>
+
+        <div>
+            {#if $selectedDecorator.targetInboundRule}
+                <strong>Target Inbound Classification Rule</strong>
+                <FlowClassificationRuleViewTable {...$selectedDecorator.targetInboundRule}/>
+                <div class="help-block small"><Icon name="info-circle"/>This is the rule where the target has driven the classification of the flow</div>
             {/if}
         </div>
 

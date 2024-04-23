@@ -19,17 +19,10 @@
 
 import template from "./playpen1.html";
 import {initialiseData} from "../../common";
-import Parent from "./Parent.svelte";
-import Unaware from "./Unaware.svelte";
+import CounterpartPicker from "../../logical-flow/components/edit/svelte/CounterpartPicker.svelte"
 
 const initData = {
-    Parent,
-    Unaware,
-    p: "ParentParam",
-    u: "UnawareParam",
-    visible: true,
-    counter: 1
-
+    CounterpartPicker
 };
 
 
@@ -43,7 +36,7 @@ function controller($q,
     }
 }
 
-controller.$inject = ["$q", "ServiceBroker", "UserService"];
+controller.$inject = ["$q", "ServiceBroker"];
 
 const view = {
     template,

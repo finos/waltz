@@ -24,16 +24,20 @@ import org.finos.waltz.model.flow_classification_rule.FlowClassificationRuleVant
 import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
 import org.jooq.lambda.tuple.Tuple2;
 
-import java.util.*;
-import java.util.function.Function;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyMap;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.head;
-import static org.finos.waltz.common.CollectionUtilities.maybe;
 import static org.finos.waltz.common.CollectionUtilities.sort;
 import static org.finos.waltz.common.MapUtilities.groupAndThen;
 import static org.finos.waltz.common.MapUtilities.isEmpty;
+import static org.finos.waltz.service.flow_classification_rule.FlowClassificationRuleUtilities.flowClassificationRuleVantagePointComparator;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 
@@ -41,20 +45,6 @@ public class FlowClassificationRuleResolver {
 
     private final Map<EntityReference, Map<Long, Map<EntityReference, Optional<FlowClassificationRuleVantagePoint>>>> byVantagePointThenDataTypeThenSubject;
     private final FlowDirection direction;
-
-    private final Function<FlowClassificationRuleVantagePoint, String> kindComparator = d -> d.vantagePoint().kind().name();
-    private final Function<FlowClassificationRuleVantagePoint, Integer> vantageComparator = FlowClassificationRuleVantagePoint::vantagePointRank;
-    private final Function<FlowClassificationRuleVantagePoint, Integer> dataTypeComparator = FlowClassificationRuleVantagePoint::dataTypeRank;
-    private final Function<FlowClassificationRuleVantagePoint, Long> vantagePointIdComparator = d -> d.vantagePoint().id();
-    private final Function<FlowClassificationRuleVantagePoint, Long> dataTypeIdComparator = d -> d.dataType().id();
-    private final Function<FlowClassificationRuleVantagePoint, Long> subjectIdComparator = d -> d.subjectReference().id();
-    private final Comparator<FlowClassificationRuleVantagePoint> flowClassificationRuleVantagePointComparator = Comparator
-            .comparing(kindComparator)
-            .thenComparing(vantageComparator).reversed()
-            .thenComparing(dataTypeComparator).reversed()
-            .thenComparing(vantagePointIdComparator)
-            .thenComparing(dataTypeIdComparator)
-            .thenComparing(subjectIdComparator);
 
 
     /**
@@ -65,9 +55,14 @@ public class FlowClassificationRuleResolver {
     public FlowClassificationRuleResolver(FlowDirection direction, List<FlowClassificationRuleVantagePoint> flowClassificationVantagePoints) {
         checkNotNull(flowClassificationVantagePoints, "flowClassificationVantagePoints cannot be null");
 
+        List<FlowClassificationRuleVantagePoint> orderedRvps = flowClassificationVantagePoints
+                .stream()
+                .sorted(flowClassificationRuleVantagePointComparator)
+                .collect(Collectors.toList());
+
         byVantagePointThenDataTypeThenSubject =
                 groupAndThen(
-                        flowClassificationVantagePoints,
+                        orderedRvps,
                         FlowClassificationRuleVantagePoint::vantagePoint,
                         byVps -> groupAndThen(
                                 byVps,

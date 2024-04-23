@@ -90,7 +90,7 @@
 {/if}
 
 {#if expanded || node.isExpanded}
-    <ul>
+    <ul class:root={isRoot}>
         {#each sortedNodes as childNode}
             <li>
                 {#if childNode.children.length > 0}
@@ -177,6 +177,12 @@
         margin: 0 0 0 0.5em;
         list-style: none;
         border-left: 1px solid #eee;
+    }
+
+    .root {
+        border-left: none;
+        padding-left: 0;
+        margin-left: 0;
     }
 
 
