@@ -25,6 +25,7 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.FlowDirection;
 import org.finos.waltz.model.OrganisationalUnitIdProvider;
+import org.finos.waltz.model.Severity;
 import org.finos.waltz.model.application.Application;
 import org.finos.waltz.model.datatype.DataTypeDecorator;
 import org.finos.waltz.model.datatype.DataTypeDecoratorRatingCharacteristics;
@@ -119,13 +120,13 @@ public class LogicalFlowDecoratorRatingsCalculator {
                             LogicalFlow flow = flowsById.get(decorator.dataFlowId());
                             EntityReference targetVantagePoint = lookupVantagePoint(targetAppsById, flow.target());
                             EntityReference sourceVantagePoint = lookupVantagePoint(sourceAppsById, flow.source());
-                            Tuple2<AuthoritativenessRatingValue, Optional<Long>> sourceOutboundClassification = lookupClassification(
+                            Tuple2<AuthoritativenessRatingValue, Optional<FlowClassificationRuleVantagePoint>> sourceOutboundClassification = lookupClassification(
                                     targetVantagePoint,
                                     flow.target(),
                                     flow.source(),
                                     outboundResolver,
                                     decorator);
-                            Tuple2<AuthoritativenessRatingValue, Optional<Long>> targetInboundClassification = lookupClassification(
+                            Tuple2<AuthoritativenessRatingValue, Optional<FlowClassificationRuleVantagePoint>> targetInboundClassification = lookupClassification(
                                     sourceVantagePoint,
                                     flow.source(),
                                     flow.target(),
@@ -134,9 +135,9 @@ public class LogicalFlowDecoratorRatingsCalculator {
                             return ImmutableDataTypeDecorator
                                     .copyOf(decorator)
                                     .withRating(sourceOutboundClassification.v1)
-                                    .withFlowClassificationRuleId(sourceOutboundClassification.v2)
+                                    .withFlowClassificationRuleId(sourceOutboundClassification.v2.map(FlowClassificationRuleVantagePoint::ruleId))
                                     .withTargetInboundRating(targetInboundClassification.v1)
-                                    .withInboundFlowClassificationRuleId(targetInboundClassification.v2);
+                                    .withInboundFlowClassificationRuleId(targetInboundClassification.v2.map(FlowClassificationRuleVantagePoint::ruleId));
                         }
                     } catch (Exception e) {
                         LOG.warn("Failed to calculate rating for decorator: {}, reason: {}", decorator, e.getMessage());
@@ -173,8 +174,8 @@ public class LogicalFlowDecoratorRatingsCalculator {
                     try {
                         EntityReference targetOu = targetIsApp ? mkRef(EntityKind.ORG_UNIT, targetApp.organisationalUnitId()) : null;
                         EntityReference sourceOu = sourceIsApp ? mkRef(EntityKind.ORG_UNIT, sourceApp.organisationalUnitId()) : null;
-                        Tuple2<AuthoritativenessRatingValue, Optional<Long>> outboundRatingAndRule = outboundResolver.resolve(targetOu, target, source, dtId);
-                        Tuple2<AuthoritativenessRatingValue, Optional<Long>> inboundRatingAndRule = inboundResolver.resolve(sourceOu, source, target, dtId);
+                        Tuple2<AuthoritativenessRatingValue, Optional<FlowClassificationRuleVantagePoint>> outboundRatingAndRule = outboundResolver.resolve(targetOu, target, source, dtId);
+                        Tuple2<AuthoritativenessRatingValue, Optional<FlowClassificationRuleVantagePoint>> inboundRatingAndRule = inboundResolver.resolve(sourceOu, source, target, dtId);
                         return ImmutableDataTypeDecoratorRatingCharacteristics
                                 .builder()
                                 .source(source)
@@ -182,6 +183,10 @@ public class LogicalFlowDecoratorRatingsCalculator {
                                 .dataTypeId(dtId)
                                 .sourceOutboundRating(outboundRatingAndRule.v1)
                                 .targetInboundRating(inboundRatingAndRule.v1)
+                                .inboundMessage(inboundRatingAndRule.v2.map(FlowClassificationRuleVantagePoint::message).orElse(null))
+                                .inboundMessageSeverity(inboundRatingAndRule.v2.map(FlowClassificationRuleVantagePoint::messageSeverity).orElse(Severity.INFORMATION))
+                                .outboundMessage(outboundRatingAndRule.v2.map(FlowClassificationRuleVantagePoint::message).orElse(null))
+                                .outboundMessageSeverity(outboundRatingAndRule.v2.map(FlowClassificationRuleVantagePoint::messageSeverity).orElse(Severity.INFORMATION))
                                 .build();
                     } catch (Exception e) {
                         LOG.warn("Failed to calculate rating for source: {} and target: {}, reason: {}", source, target, e.getMessage());
@@ -249,11 +254,11 @@ public class LogicalFlowDecoratorRatingsCalculator {
     }
 
 
-    private Tuple2<AuthoritativenessRatingValue, Optional<Long>> lookupClassification(EntityReference vantagePointOrgUnit,
-                                                                                      EntityReference vantagePointEntity,
-                                                                                      EntityReference subject,
-                                                                                      FlowClassificationRuleResolver resolver,
-                                                                                      DataTypeDecorator decorator) {
+    private Tuple2<AuthoritativenessRatingValue, Optional<FlowClassificationRuleVantagePoint>> lookupClassification(EntityReference vantagePointOrgUnit,
+                                                                                                                    EntityReference vantagePointEntity,
+                                                                                                                    EntityReference subject,
+                                                                                                                    FlowClassificationRuleResolver resolver,
+                                                                                                                    DataTypeDecorator decorator) {
 
         return resolver.resolve(vantagePointOrgUnit, vantagePointEntity, subject, decorator.decoratorEntity().id());
     }

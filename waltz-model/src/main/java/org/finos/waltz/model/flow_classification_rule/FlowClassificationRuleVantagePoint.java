@@ -21,6 +21,8 @@ package org.finos.waltz.model.flow_classification_rule;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.Nullable;
+import org.finos.waltz.model.Severity;
 import org.immutables.value.Value;
 
 
@@ -38,5 +40,12 @@ public abstract class FlowClassificationRuleVantagePoint {
 
     public abstract Long ruleId();
     public abstract String classificationCode();
+    @Nullable
+    public abstract String message();
+
+    @Value.Default
+    public Severity messageSeverity() {
+        return Severity.INFORMATION;
+    };
 
 }

@@ -44,9 +44,9 @@ import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.Record1;
+import org.jooq.Record11;
 import org.jooq.Record2;
 import org.jooq.Record3;
-import org.jooq.Record9;
 import org.jooq.RecordMapper;
 import org.jooq.Result;
 import org.jooq.Select;
@@ -173,6 +173,8 @@ public class FlowClassificationRuleDao {
             .dataType(mkRef(EntityKind.DATA_TYPE, r.get(ehDataType.ID)))
             .dataTypeRank(r.get(ehDataType.LEVEL))
             .ruleId(r.get(FLOW_CLASSIFICATION_RULE.ID))
+            .message(r.get(FLOW_CLASSIFICATION_RULE.MESSAGE))
+            .messageSeverity(Severity.valueOf(r.get(FLOW_CLASSIFICATION_RULE.MESSAGE_SEVERITY)))
             .build();
 
 
@@ -359,7 +361,7 @@ public class FlowClassificationRuleDao {
                 .or(actorVantagePointCondition)
                 .or(orgUnitVantagePointCondition);
 
-        SelectConditionStep<Record9<Long, String, Integer, Long, Integer, Long, String, String, Long>> select = dsl
+        SelectConditionStep<Record11<Long, String, Integer, Long, Integer, Long, String, String, Long, String, String>> select = dsl
                 .select(vantagePointId,
                         FLOW_CLASSIFICATION_RULE.PARENT_KIND,
                         vantagePointLevel,
@@ -368,7 +370,9 @@ public class FlowClassificationRuleDao {
                         FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID,
                         FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_KIND,
                         FLOW_CLASSIFICATION.CODE,
-                        FLOW_CLASSIFICATION_RULE.ID)
+                        FLOW_CLASSIFICATION_RULE.ID,
+                        FLOW_CLASSIFICATION_RULE.MESSAGE,
+                        FLOW_CLASSIFICATION_RULE.MESSAGE_SEVERITY)
                 .from(FLOW_CLASSIFICATION_RULE)
                 .innerJoin(FLOW_CLASSIFICATION).on(FLOW_CLASSIFICATION.DIRECTION.eq(direction.name())
                         .and(FLOW_CLASSIFICATION_RULE.FLOW_CLASSIFICATION_ID.eq(FLOW_CLASSIFICATION.ID)))
@@ -392,7 +396,7 @@ public class FlowClassificationRuleDao {
 
 
     private List<FlowClassificationRuleVantagePoint> findFlowClassificationRuleVantagePoints(Condition condition) {
-        SelectSeekStep6<Record9<Long, String, Integer, Long, Integer, Long, String, String, Long>, String, Integer, Integer, Long, Long, Long> select = dsl
+        SelectSeekStep6<Record11<Long, String, Integer, Long, Integer, Long, String, String, Long, String, String>, String, Integer, Integer, Long, Long, Long> select = dsl
                 .select(vantagePointId,
                         FLOW_CLASSIFICATION_RULE.PARENT_KIND,
                         vantagePointLevel,
@@ -401,7 +405,9 @@ public class FlowClassificationRuleDao {
                         FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID,
                         FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_KIND,
                         FLOW_CLASSIFICATION.CODE,
-                        FLOW_CLASSIFICATION_RULE.ID)
+                        FLOW_CLASSIFICATION_RULE.ID,
+                        FLOW_CLASSIFICATION_RULE.MESSAGE,
+                        FLOW_CLASSIFICATION_RULE.MESSAGE_SEVERITY)
                 .from(FLOW_CLASSIFICATION_RULE)
                 .leftJoin(ehOrgUnit)
                 .on(ehOrgUnit.ANCESTOR_ID.eq(FLOW_CLASSIFICATION_RULE.PARENT_ID)
