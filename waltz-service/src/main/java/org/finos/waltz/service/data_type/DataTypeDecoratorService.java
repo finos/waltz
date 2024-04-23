@@ -18,6 +18,7 @@
 
 package org.finos.waltz.service.data_type;
 
+import org.finos.waltz.common.FunctionUtilities;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.datatype_decorator.DataTypeDecoratorDao;
@@ -65,9 +66,11 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -156,13 +159,13 @@ public class DataTypeDecoratorService {
         String currentDataTypeNames = getAssociatedDatatypeNamesAsCsv(entityReference);
 
         if (notEmpty(dataTypeIdsToAdd)) {
-            addDecorators(userName, entityReference, dataTypeIdsToAdd);
+            FunctionUtilities.time("add",  () -> addDecorators(userName, entityReference, dataTypeIdsToAdd));
         }
         if (notEmpty(dataTypeIdsToRemove)) {
-            removeDataTypeDecorator(userName, entityReference, dataTypeIdsToRemove);
+            FunctionUtilities.time("remove",  () -> removeDataTypeDecorator(userName, entityReference, dataTypeIdsToRemove));
         }
 
-        auditEntityDataTypeChanges(userName, entityReference, currentDataTypeNames);
+        FunctionUtilities.time("audit",  ()-> auditEntityDataTypeChanges(userName, entityReference, currentDataTypeNames));
         return true;
     }
 
@@ -203,25 +206,25 @@ public class DataTypeDecoratorService {
         checkNotNull(userName, "userName cannot be null");
         checkNotNull(dataTypeIds, "dataTypeIds cannot be null");
 
-        Collection<DataTypeDecorator> dataTypeDecorators = mkDecorators(
+        Collection<DataTypeDecorator> dataTypeDecorators = FunctionUtilities.time("mkDecorators",  ()-> mkDecorators(
                 userName,
                 entityReference,
-                dataTypeIds);
+                dataTypeIds));
 
         DataTypeDecoratorDao dao = dataTypeDecoratorDaoSelectorFactory
                 .getDao(entityReference.kind());
 
         // This must execute first so that the decorators exist
-        int[] result = dao.addDecorators(dataTypeDecorators);
+        int[] result = FunctionUtilities.time("addDEcs",  ()->dao.addDecorators(dataTypeDecorators));
 
         audit(format("Added data types: %s", dataTypeIds.toString()),
                 entityReference, userName);
 
         if (entityReference.kind().equals(LOGICAL_DATA_FLOW)) {
-            int rulesUpdated = flowClassificationRuleService.recalculateFlowRatingsForSelector(mkOpts(entityReference));
+            int rulesUpdated = FunctionUtilities.time("recalc ratings",  () -> flowClassificationRuleService.recalculateFlowRatingsForSelector(mkOpts(entityReference)));
         }
 
-        recalculateDataTypeUsageForApplications(entityReference);
+        FunctionUtilities.time("recalc usage",  ()->recalculateDataTypeUsageForApplications(entityReference));
 
         if (PHYSICAL_SPECIFICATION.equals(entityReference.kind())) {
             physicalSpecificationService.propagateDataTypesToLogicalFlows(userName, entityReference.id());
@@ -406,7 +409,13 @@ public class DataTypeDecoratorService {
         Set<DataType> dataTypes = dataTypeService.findByIdSelector(selectionOptions);
         AssessmentsView assessmentsView = assessmentRatingService.getPrimaryAssessmentsViewForKindAndSelector(LOGICAL_DATA_FLOW_DATA_TYPE_DECORATOR, selectionOptions);
         FlowClassificationRulesView classificationRulesView = flowClassificationRuleService.getFlowClassificationsViewForFlow(parentEntityRef.id());
-        Set<AuthoritativenessRatingValue> ratings = map(decorators, d -> d.rating().orElse(null));
+
+        Set<AuthoritativenessRatingValue> ratings = decorators
+                .stream()
+                .flatMap(d -> Stream.of(d.rating().orElse(null), d.targetInboundRating().orElse(null)))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
         Set<FlowClassification> classifications = filter(
                 flowClassificationService.findAll(),
                 d -> ratings.contains(AuthoritativenessRatingValue.ofNullable(d.code()).orElse(null)));
@@ -431,14 +440,14 @@ public class DataTypeDecoratorService {
         }
     }
 
-    public Set<DataTypeDecoratorRatingCharacteristics> findDatatypeUsageCharacteristicsForSourceAndTarget(EntityReference source,
-                                                                                                          EntityReference target) {
-        return findDatatypeUsageCharacteristicsForSourceAndTarget(source, target, Optional.empty());
+    public Set<DataTypeDecoratorRatingCharacteristics> findDatatypeRatingCharacteristicsForSourceAndTarget(EntityReference source,
+                                                                                                           EntityReference target) {
+        return findDatatypeRatingCharacteristicsForSourceAndTarget(source, target, Optional.empty());
     }
 
-    public Set<DataTypeDecoratorRatingCharacteristics> findDatatypeUsageCharacteristicsForSourceAndTarget(EntityReference source,
-                                                                                                          EntityReference target,
-                                                                                                          Optional<Collection<Long>> dataTypeIds) {
+    public Set<DataTypeDecoratorRatingCharacteristics> findDatatypeRatingCharacteristicsForSourceAndTarget(EntityReference source,
+                                                                                                           EntityReference target,
+                                                                                                           Optional<Collection<Long>> dataTypeIds) {
         return ratingsCalculator.calculate(source, target, dataTypeIds);
     }
 

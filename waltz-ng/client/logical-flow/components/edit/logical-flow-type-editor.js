@@ -20,6 +20,9 @@ import _ from "lodash";
 import template from "./logical-flow-type-editor.html";
 import {toEntityRefWithKind} from "../../../common/entity-utils";
 import toasts from "../../../svelte-stores/toast-store";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {loadUsageData} from "../../../data-types/data-type-utils";
+import FlowDataTypeEditor from "./svelte/FlowDataTypeEditor.svelte";
 
 
 const bindings = {
@@ -37,7 +40,8 @@ const initialState = {
     onDelete: (x) => console.log("lfte: default onDelete()", x),
     onReload: (x) => console.log("lfte: default onReload()", x),
     onCancel: (x) => console.log("lfte: default onCancel()", x),
-    onSelect: (x) => console.log("lfte: default onSelect()", x)
+    onSelect: (x) => console.log("lfte: default onSelect()", x),
+    FlowDataTypeEditor
 };
 
 
@@ -57,29 +61,8 @@ function controller() {
         refresh();
     };
 
-    vm.onDirty = (dirtyFlag) => {
-        vm.isDirty = dirtyFlag;
-    };
-
-    vm.registerSaveFn = (saveFn) => {
-        vm.save = saveFn;
-    };
-
     vm.delete = () => vm.onDelete(vm.flow);
     vm.cancel = () => vm.onCancel();
-
-    vm.onSave = () => {
-        if (vm.save) {
-            vm.save()
-                .then(() => {
-                    toasts.success("Data types updated successfully");
-                    vm.cancel(); //clear edit session
-                    vm.onReload();
-                });
-        } else {
-            console.log("onSave - no impl");
-        }
-    };
 }
 
 

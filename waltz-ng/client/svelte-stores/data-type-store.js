@@ -46,10 +46,19 @@ export function mkDataTypeStore() {
             {force})
     };
 
+    const findSuggestedByRef = (ref, force = false) => {
+        return remote.fetchViewList(
+            "GET",
+            `api/data-types/suggested/entity/${ref.kind}/${ref.id}`,
+            null,
+            {force});
+    }
+
     return {
         findAll,
         getById,
-        findByParentId
+        findByParentId,
+        findSuggestedByRef
     };
 }
 

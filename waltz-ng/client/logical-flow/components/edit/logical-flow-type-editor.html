@@ -27,29 +27,20 @@
                 <waltz-entity-icon-label entity-ref="$ctrl.flow.target"></waltz-entity-icon-label>
             </h4>
 
-            <waltz-data-type-usage-selector parent-entity-ref="$ctrl.logicalFlowEntityRef"
-                                            parent-flow="$ctrl.logicalFlowEntityRef"
-                                            on-dirty="$ctrl.onDirty"
-                                            on-register-save="$ctrl.registerSaveFn"
-                                            on-select="$ctrl.onSelect">
-            </waltz-data-type-usage-selector>
+            <waltz-svelte-component component="$ctrl.FlowDataTypeEditor"
+                                    primary-entity-reference="$ctrl.logicalFlowEntityRef"
+                                    on-select="$ctrl.onSelect"
+                                    on-cancel="$ctrl.onCancel"
+                                    on-reload="$ctrl.onReload"
+                                    on-delete="$ctrl.onDelete">
+            </waltz-svelte-component>
 
             <!-- ACTIONS -->
             <div class="pull-right">
-                <button class="btn btn-success"
-                        ng-disabled="! $ctrl.isDirty"
-                        data-ux="logical-flow-type-editor-apply"
-                        ng-click="$ctrl.onSave()">
-                    Apply
-                </button>
                 <button class="btn btn-danger"
                         ng-click="$ctrl.delete()">
                     Delete
                 </button>
-                <a href
-                   ng-click="$ctrl.cancel()">
-                    Cancel
-                </a>
             </div>
 
         </div>

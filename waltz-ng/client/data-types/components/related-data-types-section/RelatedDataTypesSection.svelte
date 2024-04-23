@@ -118,11 +118,11 @@
     {:else}
         <div class="row">
             <div class="col-md-7">
-                <DataTypeTreeNode isRoot={true}
-                                  node={root}
-                                  childNodes={viewHierarchy}
-                                  expanded={selected}
-                                  on:select={onFocus}/>
+                <DataTypeTreeSelector multiSelect={true}
+                                      nonConcreteSelectable={false}
+                                      selectionFilter={selectionFilter}
+                                      dataTypeIds={selected}
+                                      on:select={onSelect}/>
             </div>
             <div class="col-md-5">
                 {#if focusedType}

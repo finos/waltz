@@ -31,4 +31,5 @@
               localFiltering={false}
               {placeholder}
               {showClear}
+              className="waltz-search-input"
               bind:selectedItem={selectedItem} />
