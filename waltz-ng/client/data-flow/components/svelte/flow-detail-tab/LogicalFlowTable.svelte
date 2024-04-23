@@ -115,7 +115,7 @@
 
 
     $: {
-        if (elem && !_.isEmpty(flowList)) {
+        if (elem && !_.isNil(flowList)) {
             initGrid(elem);
         }
     }

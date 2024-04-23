@@ -16,7 +16,6 @@
 
 
     export let physicalFlows = [];
-    export let flowClassifications = [];
     export let assessmentDefinitions = [];
 
 
@@ -103,7 +102,7 @@
             d.entityKind === EntityKinds.PHYSICAL_SPECIFICATION.key);
 
     $: {
-        if (elem && !_.isEmpty(flowList) && nestedEnums) {
+        if (elem && !_.isNil(flowList) && nestedEnums) {
             initGrid(elem, nestedEnums);
         }
     }

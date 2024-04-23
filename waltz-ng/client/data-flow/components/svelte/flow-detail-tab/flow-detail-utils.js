@@ -6,12 +6,19 @@ import {
     toCriticalityName,
     toFrequencyKindName, toTransportKindName
 } from "../../../../physical-flows/svelte/physical-flow-registration-utils";
+import {entity as EntityKind} from "../../../../common/services/enums/entity";
 
 export const Directions = {
     INBOUND: "INBOUND",
     OUTBOUND: "OUTBOUND",
     ALL: "ALL"
-}
+};
+
+export const FlowNodeTypes = [
+    EntityKind.ACTOR,
+    EntityKind.APPLICATION,
+    EntityKind.END_USER_APPLICATION
+];
 
 function determineDirection(flow, parentEntityRef) {
     if (sameRef(flow.target, parentEntityRef)) {

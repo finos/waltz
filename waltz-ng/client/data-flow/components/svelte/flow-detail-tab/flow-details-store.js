@@ -9,7 +9,13 @@ export function updateFilters(id, newFilter) {
     return filters.update(filtersList => {
         const withoutFilter = _.reject(filtersList, d => d.id === id);
         return _.concat(withoutFilter, newFilter);
-    })
+    });
+}
+
+export function removeFilter(id) {
+    return filters.update(filtersList => {
+        return _.reject(filtersList, d => d.id === id);
+    });
 }
 
 
