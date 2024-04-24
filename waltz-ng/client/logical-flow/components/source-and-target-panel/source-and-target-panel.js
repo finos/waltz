@@ -41,7 +41,8 @@ const bindings = {
     decorators: "<",
     physicalFlows: "<",
     physicalSpecifications: "<",
-    tags: "<"
+    tags: "<",
+    ratingDirection: "<"
 };
 
 
@@ -222,7 +223,14 @@ function controller($element,
 
     vm.$onInit = () => {
         loadFlowClassificationRatings(serviceBroker)
-            .then(r => vm.flowClassificationsByCode = _.keyBy(r, d => d.code));
+            .then(r => {
+                vm.flowClassifications = r;
+                vm.flowClassificationsByCode = _
+                    .chain(r)
+                    .filter(d => d.direction === vm.ratingDirection)
+                    .keyBy( d => d.code)
+                    .value();
+            });
 
         serviceBroker
             .loadViewData(CORE_API.DataTypeStore.findAll)
@@ -234,7 +242,14 @@ function controller($element,
     vm.$onChanges = (changes) => {
 
         loadFlowClassificationRatings(serviceBroker)
-            .then(r => vm.flowClassificationsByCode = _.keyBy(r, d => d.code));
+            .then(r => {
+                vm.flowClassifications = r;
+                vm.flowClassificationsByCode = _
+                    .chain(r)
+                    .filter(d => d.direction === vm.ratingDirection)
+                    .keyBy(d => d.code)
+                    .value();
+            });
 
         if (changes.logicalFlows || changes.decorators) {
             vm.resetNodeAndTypeFilter();

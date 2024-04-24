@@ -160,7 +160,22 @@
 
             <div ng-if="$ctrl.activeMode === 'EDIT'">
                 <h4>Edit Logical Data Flows</h4>
-                <waltz-logical-flow-edit-panel parent-entity-ref="$ctrl.parentEntityRef">
+
+                <waltz-logical-flow-edit-panel parent-entity-ref="$ctrl.parentEntityRef"
+                                               rating-direction="$ctrl.visibility.ratingDirection">
+                    <legend style="font-size: inherit; border-bottom: none">
+                        <waltz-toggle state="$ctrl.visibility.ratingDirection === 'OUTBOUND'"
+                                      on-toggle="$ctrl.onToggleRatingDirection()"
+                                      label-on="Showing producer flow ratings"
+                                      label-off="Showing consumer flow ratings">
+                        </waltz-toggle>
+
+                        <div class="help-block">
+                            <waltz-svelte-component component="$ctrl.FlowClassificationLegend"
+                                                    rating-direction="$ctrl.visibility.ratingDirection">
+                            </waltz-svelte-component>
+                        </div>
+                    </legend>
                 </waltz-logical-flow-edit-panel>
             </div>
 
@@ -194,7 +209,6 @@
                 <!-- SOURCE AND TARGET GRAPH -->
                 <div class="row">
                     <div class="col-md-12">
-                        <strong>Logical Flows</strong>
                         <waltz-no-data ng-if="$ctrl.logicalFlows.length == 0">
                             <message>
                                 <strong>
@@ -219,18 +233,27 @@
                                                            physical-flows="$ctrl.physicalFlows"
                                                            physical-specifications="$ctrl.physicalSpecifications"
                                                            change-units="$ctrl.changeUnits"
-                                                           tags="$ctrl.tags">
+                                                           tags="$ctrl.tags"
+                                                           rating-direction="$ctrl.visibility.ratingDirection">
                             </waltz-source-and-target-panel>
+
+                            <waltz-toggle state="$ctrl.visibility.ratingDirection === 'OUTBOUND'"
+                                          on-toggle="$ctrl.onToggleRatingDirection()"
+                                          label-on="Showing producer flow ratings"
+                                          label-off="Showing consumer flow ratings">
+                            </waltz-toggle>
+                            <p class="help-block">
+                                <waltz-svelte-component component="$ctrl.FlowClassificationLegend"
+                                                        rating-direction="$ctrl.visibility.ratingDirection">
+                                </waltz-svelte-component>
+                            </p>
 
                             <p class="help-block">
                                 This diagram shows flows categorized by data type to this application (center)
                                 from sending systems (on the left)
                                 and to the receiving system (on the right).
                             </p>
-                            <p class="help-block">
-                                Legend:
-                                <waltz-svelte-component component="$ctrl.FlowClassificationLegend"></waltz-svelte-component>
-                            </p>
+
                         </div>
                     </div>
                 </div>

@@ -26,8 +26,10 @@
                                            logical-flows="$ctrl.filteredFlowData.flows"
                                            decorators="$ctrl.filteredFlowData.decorators"
                                            tweakers="$ctrl.flowTweakers"
-                                           flow-classifications-by-code="$ctrl.flowClassificationsByCode">
+                                           flow-classifications="$ctrl.flowClassifications"
+                                           rating-direction="$ctrl.ratingDirection">
             </waltz-source-and-target-graph>
+            <div ng-transclude="legend"></div>
         </div>
     </div>
 
