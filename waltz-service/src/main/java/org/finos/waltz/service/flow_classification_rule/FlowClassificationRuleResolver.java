@@ -67,7 +67,7 @@ public class FlowClassificationRuleResolver {
                         FlowClassificationRuleVantagePoint::vantagePoint,
                         byVps -> groupAndThen(
                                 byVps,
-                                byVp -> byVp.dataType().id(),
+                                FlowClassificationRuleVantagePoint::dataTypeId,
                                 byDts -> groupAndThen(
                                         byDts,
                                         FlowClassificationRuleVantagePoint::subjectReference,
@@ -149,15 +149,11 @@ public class FlowClassificationRuleResolver {
      * @return
      */
     public static Optional<FlowClassificationRuleVantagePoint> getMostSpecificRanked(Collection<FlowClassificationRuleVantagePoint> vantagePoints) {
-
-        Comparator<FlowClassificationRuleVantagePoint> comparator = Comparator
-                .comparingInt(FlowClassificationRuleVantagePoint::vantagePointRank)
-                .thenComparingInt(FlowClassificationRuleVantagePoint::dataTypeRank);
-
+        List<FlowClassificationRuleVantagePoint> sorted = sort(
+                vantagePoints,
+                flowClassificationRuleVantagePointComparator);
         return head(
-                sort(
-                    vantagePoints,
-                    (x, y) -> comparator.compare(y, x))); //note the reversal of parameters because we want descending order
+                sorted); //note the reversal of parameters because we want descending order
     }
 
 }

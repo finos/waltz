@@ -15,25 +15,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.ToLongFunction;
 import java.util.stream.Collectors;
 
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 public class FlowClassificationRuleUtilities {
 
-    private static final Function<FlowClassificationRuleVantagePoint, String> kindComparator = d -> d.vantagePoint().kind().name();
-    private static final Function<FlowClassificationRuleVantagePoint, Integer> vantageComparator = FlowClassificationRuleVantagePoint::vantagePointRank;
-    private static final Function<FlowClassificationRuleVantagePoint, Integer> dataTypeComparator = FlowClassificationRuleVantagePoint::dataTypeRank;
-    private static final Function<FlowClassificationRuleVantagePoint, Long> vantagePointIdComparator = d -> d.vantagePoint().id();
-    private static final Function<FlowClassificationRuleVantagePoint, Long> dataTypeIdComparator = d -> d.dataType().id();
-    private static final Function<FlowClassificationRuleVantagePoint, Long> subjectIdComparator = d -> d.subjectReference().id();
+    public static final Function<FlowClassificationRuleVantagePoint, String> kindComparator = d -> d.vantagePoint().kind().name();
+    public static final Comparator<FlowClassificationRuleVantagePoint> vantageComparator = Comparator.comparingInt(FlowClassificationRuleVantagePoint::vantagePointRank).reversed();
+    public static final Comparator<FlowClassificationRuleVantagePoint> dataTypeComparator = Comparator.comparingInt(FlowClassificationRuleVantagePoint::dataTypeRank).reversed();
+    public static final ToLongFunction<FlowClassificationRuleVantagePoint> vantagePointIdComparator = d -> d.vantagePoint().id();
+    public static final ToLongFunction<FlowClassificationRuleVantagePoint> dataTypeIdComparator = FlowClassificationRuleVantagePoint::dataTypeId;
+    public static final ToLongFunction<FlowClassificationRuleVantagePoint> subjectIdComparator = d -> d.subjectReference().id();
     public static final Comparator<FlowClassificationRuleVantagePoint> flowClassificationRuleVantagePointComparator = Comparator
             .comparing(kindComparator)
-            .thenComparing(vantageComparator).reversed()
-            .thenComparing(dataTypeComparator).reversed()
-            .thenComparing(vantagePointIdComparator)
-            .thenComparing(dataTypeIdComparator)
-            .thenComparing(subjectIdComparator);
+            .thenComparing(vantageComparator)
+            .thenComparing(dataTypeComparator)
+            .thenComparingLong(vantagePointIdComparator)
+            .thenComparingLong(dataTypeIdComparator)
+            .thenComparingLong(subjectIdComparator);
 
 
     protected static Map<Long, Tuple2<Long, MatchOutcome>> applyVantagePoints(FlowDirection direction,
@@ -53,13 +54,13 @@ public class FlowClassificationRuleUtilities {
 
         Set<FlowClassificationRuleVantagePoint> filteredRules = ruleVantagePoints
                 .stream()
-                .filter(rvp -> ruleDataTypes.contains(rvp.dataType().id()))
+                .filter(rvp -> rvp.dataTypeId() == null || ruleDataTypes.contains(rvp.dataTypeId()))
                 .collect(Collectors.toSet());
 
         filteredRules
                 .forEach(rvp -> {
                     Set<Long> childOUs = ouHierarchy.findChildren(rvp.vantagePoint().id());
-                    Set<Long> childDTs = dtHierarchy.findChildren(rvp.dataType().id());
+                    Set<Long> childDTs = dtHierarchy.findChildren(rvp.dataTypeId());
                     population.forEach(p -> {
                         Tuple2<Long, MatchOutcome> currentRuleAndOutcome = lfdIdToRuleAndOutcomeMap.get(p.lfdId());
                         if (currentRuleAndOutcome != null && currentRuleAndOutcome.v2 == MatchOutcome.POSITIVE_MATCH) {
@@ -93,7 +94,7 @@ public class FlowClassificationRuleUtilities {
         Function4<FlowClassificationRuleVantagePoint,  Set<Long>,  Set<Long>, FlowDataType, MatchOutcome> inboundMatcher =
                 (rvp, childOUs, childDTs, p) -> {
                     boolean subjectMatches = p.target().equals(rvp.subjectReference());
-                    boolean dtMatches = childDTs.contains(p.dtId());
+                    boolean dtMatches = rvp.dataTypeId() == null || childDTs.contains(p.dtId());
                     boolean dtAndOuMatches = dtMatches && checkScopeMatches(rvp, childOUs, p.source(), p.sourceOuId());
                     return determineOutcome(subjectMatches, dtAndOuMatches);
                 };
@@ -101,7 +102,7 @@ public class FlowClassificationRuleUtilities {
         Function4<FlowClassificationRuleVantagePoint,  Set<Long>,  Set<Long>, FlowDataType, MatchOutcome> outboundMatcher =
                 (rvp, childOUs, childDTs, p) -> {
                     boolean subjectMatches = p.source().equals(rvp.subjectReference());
-                    boolean dtMatches = childDTs.contains(p.dtId());
+                    boolean dtMatches = rvp.dataTypeId() == null || childDTs.contains(p.dtId());
                     boolean dtAndOuMatches = dtMatches && checkScopeMatches(rvp, childOUs, p.target(), p.targetOuId());
                     return determineOutcome(subjectMatches, dtAndOuMatches);
                 };
