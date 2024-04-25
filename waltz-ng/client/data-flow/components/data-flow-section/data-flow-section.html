@@ -262,7 +262,8 @@
                 <div ng-if="$ctrl.dataTypeUsages.length > 0 || $ctrl.logicalFlows.length > 0">
                     <div class='row'>
                         <div class="col-sm-6">
-                            <waltz-application-flow-summary-pane parent-entity-ref="$ctrl.parentEntityRef">
+                            <waltz-application-flow-summary-pane parent-entity-ref="$ctrl.parentEntityRef"
+                                                                 rating-direction="$ctrl.visibility.ratingDirection">
 
                             </waltz-application-flow-summary-pane>
                         </div>

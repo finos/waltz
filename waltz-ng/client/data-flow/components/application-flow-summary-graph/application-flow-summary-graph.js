@@ -27,7 +27,8 @@ import {loadFlowClassificationRatings} from "../../../flow-classification-rule/f
 
 
 const bindings = {
-    summaryData: "<"
+    summaryData: "<",
+    ratingDirection: "<"
 };
 
 
@@ -197,12 +198,18 @@ function controller($element, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     let svg = null;
+
     const redraw = () => drawData(
         svg,
         enrichData(vm.summaryData, vm.flowClassifications),
         vm.flowClassifications);
 
-    vm.$onChanges = () => redraw();
+    vm.$onChanges = () => {
+
+        loadFlowClassificationRatings(serviceBroker)
+            .then(xs => vm.flowClassifications = _.filter(xs, d => d.direction === vm.ratingDirection))
+            .then(redraw);
+    }
 
     vm.$onInit = () => {
         const holder = $element.find("svg")[0];
@@ -214,10 +221,6 @@ function controller($element, serviceBroker) {
         drawBackground(svg);
         drawTitleBar(svg);
         drawCenterLabels(svg);
-
-        loadFlowClassificationRatings(serviceBroker)
-            .then(xs => vm.flowClassifications = xs)
-            .then(redraw);
     };
 }
 
