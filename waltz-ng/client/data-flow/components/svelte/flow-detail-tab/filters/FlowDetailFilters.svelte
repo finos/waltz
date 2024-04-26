@@ -7,8 +7,8 @@ import Icon from "../../../../../common/svelte/Icon.svelte";
 import AssessmentFilters from "./AssessmentFilters.svelte";
 import InboundOutboundFilters from "./InboundOutboundFilters.svelte";
 import PhysicalFlowAttributeFilters from "./PhysicalFlowAttributeFilters.svelte";
-import DataTypeFilters from "./DataTypeFilters.svelte";
 import FlowClassificationFilters from "./FlowClassificationFilters.svelte";
+import SourceTargetKindFilters from "./SourceTargetKindFilters.svelte";
 
 export let dataTypes = [];
 export let assessmentFilters = [];
@@ -60,15 +60,15 @@ $: directionFilter = _.find($filters, d => d.kind === FilterKinds.DIRECTION);
 
     <details class="filter-set">
         <summary>
-            <Icon name="qrcode"/> Data Types
-            {#if _.some($filters, d => d.kind === FilterKinds.DATA_TYPE)}
+            <Icon name="qrcode"/> Source / Target Types
+            {#if _.some($filters, d => d.kind === FilterKinds.NODE_KIND)}
                 <span style="color: darkorange"
-                      title="Data type filters have been applied">
+                      title="Source and/or Target type filters have been applied">
                     <Icon name="exclamation-circle"/>
                 </span>
             {/if}
         </summary>
-        <DataTypeFilters {dataTypes}/>
+        <SourceTargetKindFilters {dataTypes}/>
     </details>
 
     <details class="filter-set">

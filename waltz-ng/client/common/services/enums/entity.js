@@ -166,7 +166,7 @@ export const entity = {
     },
     END_USER_APPLICATION: {
         key: "END_USER_APPLICATION",
-        name: "End User App",
+        name: "End User Application",
         icon: "table",
         description: null,
         position: 1200

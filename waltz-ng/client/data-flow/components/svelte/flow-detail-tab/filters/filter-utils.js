@@ -7,7 +7,8 @@ export const FilterKinds = {
     ASSESSMENT: "ASSESSMENT",
     PHYSICAL_FLOW_ATTRIBUTE: "PHYSICAL_FLOW_ATTRIBUTE",
     SELECTED_LOGICAL: "SELECTED_LOGICAL",
-    FLOW_CLASSIFICATION: "FLOW_CLASSIFICATION"
+    FLOW_CLASSIFICATION: "FLOW_CLASSIFICATION",
+    NODE_KIND: "NODE_KIND"
 }
 
 export function getAssessmentFilters(flowView) {
@@ -68,6 +69,10 @@ export function mkDataTypeFilterId() {
 
 export function mkDirectionFilterId() {
     return "FLOW_DIRECTION";
+}
+
+export function mkNodeTypeFilterId() {
+    return "NODE_TYPE";
 }
 
 export function mkAssessmentFilter(id, desiredRatings) {
@@ -137,6 +142,18 @@ export function mkDirectionFilter(id, direction) {
         test: (r) => direction === Directions.ALL
             ? true
             : _.isEqual(r.direction, direction)
+    };
+}
+
+export function mkNodeTypeFilter(id, nodeTypes = []) {
+    return {
+        id,
+        kind: FilterKinds.NODE_KIND,
+        nodeTypes,
+        test: (r) => _.size(nodeTypes) === 3
+            ? true
+            : _.includes(nodeTypes, r.logicalFlow.source.kind)
+                || _.includes(nodeTypes, r.logicalFlow.target.kind)
     };
 }
 
