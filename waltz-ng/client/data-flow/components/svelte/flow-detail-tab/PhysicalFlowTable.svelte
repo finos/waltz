@@ -5,70 +5,71 @@
     import _ from "lodash";
     import {enumValueStore} from "../../../../svelte-stores/enum-value-store";
     import {nestEnums} from "../../../../common/svelte/enum-utils";
-    import {
-        toCriticalityName,
-        toFrequencyKindName,
-        toTransportKindName
-    } from "../../../../physical-flows/svelte/physical-flow-registration-utils";
     import {selectedPhysicalFlow, selectedLogicalFlow} from "./flow-details-store";
-    import NoData from "../../../../common/svelte/NoData.svelte";
-    import DataTypeTooltipContent from "./DataTypeMiniTable.svelte";
-    import {truncate} from "../../../../common/string-utils";
-    import Tooltip from "../../../../common/svelte/Tooltip.svelte";
-    import RatingIndicatorCell from "../../../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
-    import EntityIcon from "../../../../common/svelte/EntityIcon.svelte";
-    import Icon from "../../../../common/svelte/Icon.svelte";
+    import {
+        mkPhysicalFlowTableColumns,
+        showDataTypeTooltip
+    } from "./flow-detail-utils";
+    import {SlickGrid, SlickRowSelectionModel} from "slickgrid";
+    import {mkSortFn} from "../../../../common/slick-grid-utils";
+    import {entity as EntityKinds} from "../../../../common/services/enums/entity";
+
 
     export let physicalFlows = [];
-    export let flowClassifications = [];
     export let assessmentDefinitions = [];
+
+
+    function initGrid(elem, nestedEnums) {
+        let columns = mkPhysicalFlowTableColumns(defs, nestedEnums);
+
+        grid = new SlickGrid(elem, [], columns, gridOptions);
+        grid.setSelectionModel(new SlickRowSelectionModel());
+        grid.onSort.subscribe((e, args) => {
+            const sortCol = args.sortCol;
+            grid.data.sort(mkSortFn(sortCol, args.sortAsc));
+            grid.invalidate();
+        });
+        grid.onMouseEnter.subscribe(function(e, args) {
+            const cell = grid.getCellFromEvent(e);
+            if (! cell) return;
+
+            const columnDef = columns[cell.cell];
+            if (columnDef.id === 'data_types') {
+                const rowData = flowList[cell.row];
+                const cellElem = e.target;
+                showDataTypeTooltip(cellElem, rowData.dataTypesForSpecification);
+            }
+        });
+        grid.onClick.subscribe((a,b) => selectPhysicalFlow(flowList[b.row]))
+
+        grid.data = flowList;
+        grid.invalidate()
+    }
+
 
     function selectPhysicalFlow(flow) {
         if ($selectedPhysicalFlow === flow) {
             $selectedPhysicalFlow = null;
+            $selectedLogicalFlow = null;
         } else {
             $selectedPhysicalFlow = flow;
             $selectedLogicalFlow = flow;
         }
     }
 
-    function mkDataTypeTooltipProps(row) {
-        row.dataTypesForSpecification;
-
-        const ratingByDataTypeId = _.reduce(
-            row.dataTypesForLogicalFlow,
-            (acc, d) => {
-                acc[d.decoratorEntity.id] = d.rating;
-                return acc;
-            },
-            {});
-
-        const decorators = _.map(
-            row.dataTypesForSpecification,
-            d => Object.assign(
-                {},
-                d,
-                { rating: ratingByDataTypeId[d.decoratorEntity?.id] }));
-
-        return {
-            decorators,
-            flowClassifications
-        };
-    }
-
-    function mkDataTypeString(dataTypes) {
-        return _
-            .chain(dataTypes)
-            .map(d => d.decoratorEntity.name)
-            .orderBy(d => d)
-            .join(", ")
-            .value();
-    }
+    const gridOptions = {
+        enableCellNavigation: false,
+        enableColumnReorder: false,
+        frozenColumn: 3
+    };
 
     let qry;
+    let grid;
+    let elem = null;
+
     let visibleFlows;
     let enumsCall = enumValueStore.load();
-    let nestedEnums;
+    let nestedEnums = null;
 
     $: nestedEnums = nestEnums($enumsCall.data);
 
@@ -97,7 +98,20 @@
 
     $: defs = _.filter(
         assessmentDefinitions,
-        d => d.entityKind === 'PHYSICAL_FLOW' || d.entityKind === 'PHYSICAL_SPECIFICATION');
+        d => d.entityKind === EntityKinds.PHYSICAL_FLOW.key ||
+            d.entityKind === EntityKinds.PHYSICAL_SPECIFICATION.key);
+
+    $: {
+        if (elem && !_.isNil(flowList) && nestedEnums) {
+            initGrid(elem, nestedEnums);
+        }
+    }
+
+    $: {
+        if (grid) {
+            grid.setSelectedRows([_.indexOf(flowList, $selectedPhysicalFlow)]);
+        }
+    }
 
 </script>
 
@@ -117,134 +131,8 @@
 <div>
     <SearchInput bind:value={qry}/>
 </div>
-<div class="table-container"
-     class:waltz-scroll-region-350={_.size(physicalFlows) > 10}>
-    <table class="table table-condensed small table-hover"
-           style="margin-top: 1em">
-        <thead>
-        <tr>
-            <th nowrap="nowrap" style="width: 1em"></th>
-            <th nowrap="nowrap" style="width: 20em">Source</th>
-            <th nowrap="nowrap" style="width: 20em">Src Ext ID</th>
-            <th nowrap="nowrap" style="width: 20em">Target</th>
-            <th nowrap="nowrap" style="width: 20em">Target Ext ID</th>
-            <th nowrap="nowrap" style="width: 20em; max-width: 20em">Name</th>
-            <th nowrap="nowrap" style="width: 20em">External ID</th>
-            <th nowrap="nowrap" style="width: 20em">Data Types</th>
-            <th nowrap="nowrap" style="width: 20em">Criticality</th>
-            <th nowrap="nowrap" style="width: 20em">Frequency</th>
-            <th nowrap="nowrap" style="width: 20em">Transport Kind</th>
-            {#each defs as defn}
-                <th nowrap="nowrap" style="width: 20em">
-                    <EntityIcon kind={defn.entityKind}/>
-                    {defn.name}
-                </th>
-            {/each}
-        </tr>
-        </thead>
-        <tbody>
-        {#each flowList as flow}
-            {@const ratingsForFlowByDefId = _.merge(flow.physicalSpecRatingsByDefId, flow.physicalFlowRatingsByDefId)}
 
-            <tr class="clickable"
-                class:selected={$selectedPhysicalFlow === flow}
-                on:click={() => selectPhysicalFlow(flow)}>
-                <td>
-                    {#if flow.physicalFlow.isReadOnly}
-                        <span style="color: grey"
-                              title={`Flow has been marked as readonly (provenance: ${flow.physicalFlow.provenance}, last updated by: ${flow.physicalFlow.lastUpdatedBy})`}>
-                            <Icon name="lock"
-                                  fixed-width="true"/>
-                        </span>
-                    {/if}
-                </td>
-                <td>
-                    {flow.logicalFlow.source.name}
-                </td>
-                <td>
-                    {flow.logicalFlow.source.externalId}
-                </td>
-                <td>
-                    {flow.logicalFlow.target.name}
-                </td>
-                <td>
-                    {flow.logicalFlow.target.externalId}
-                </td>
-                <td>
-                    {flow.physicalFlow.name || flow.specification?.name || ""}
-                </td>
-                <td>
-                    {flow.physicalFlow.externalId || ""}
-                </td>
-                <td>
-                    <Tooltip content={DataTypeTooltipContent}
-                             trigger={"mouseenter"}
-                             props={mkDataTypeTooltipProps(flow)}>
-                        <svelte:fragment slot="target">
-                            <span>{truncate(mkDataTypeString(flow.dataTypesForSpecification), 30)}</span>
-                        </svelte:fragment>
-                    </Tooltip>
-                </td>
-                <td>
-                    {toCriticalityName(nestedEnums, flow.physicalFlow.criticality)}
-                </td>
-                <td>
-                    {toFrequencyKindName(nestedEnums, flow.physicalFlow.frequency)}
-                </td>
-                <td>
-                    {toTransportKindName(nestedEnums, flow.physicalFlow.transport)}
-                </td>
-                {#each defs as defn}
-                    {@const assessmentRatingsForFlow = _.get(ratingsForFlowByDefId, defn.id, [])}
-                    <td>
-                        <div class="rating-col">
-                            {#each assessmentRatingsForFlow as rating}
-                                <RatingIndicatorCell {...rating}/>
-                            {/each}
-                        </div>
-                    </td>
-                {/each}
-
-            </tr>
-        {:else}
-            <tr>
-                <td colspan={9 + _.size(defs)}>
-                    <NoData type="info">There are no physical flows to show, these may have been filtered.</NoData>
-                </td>
-            </tr>
-        {/each}
-        </tbody>
-    </table>
+<div class="slick-container"
+     style="width:100%;height:500px;"
+     bind:this={elem}>
 </div>
-
-
-<style>
-    .selected {
-        background: #eefaee !important;
-    }
-
-    table {
-        display: table;
-        white-space: nowrap;
-        position: relative;
-        border-collapse: separate;
-    }
-
-    th {
-        position: sticky;
-        top: 0;
-        background: white;
-        z-index: 1;
-    }
-
-    .table-container {
-        overflow-x: auto;
-        padding-top: 0;
-    }
-
-    .rating-col {
-        display: flex;
-        gap: 1em;
-    }
-
-</style>

@@ -107,7 +107,6 @@
                           assessmentDefinitions={allAssessmentDefinitions}/>
         <br>
         <PhysicalFlowTable {physicalFlows}
-                           {flowClassifications}
                            assessmentDefinitions={allAssessmentDefinitions}/>
 
         <div style="padding-top: 1em"
