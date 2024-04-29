@@ -299,6 +299,9 @@ function controller($element,
         vm.selectedDecorators = vm.selectedFlow
             ? _.filter(vm.logicalFlowDecorators, { dataFlowId: vm.selectedFlow.id })
             : [];
+        vm.selectedPhysicalFlows = vm.selectedFlow
+            ? _.filter(vm.physicalFlows, { logicalFlowId: vm.selectedFlow.id })
+            : [];
     };
 
     const selectType = (type) => {
@@ -330,6 +333,7 @@ function controller($element,
     vm.cancel = () => {
         vm.selectedCounterpart = null;
         vm.selectedDecorators = null;
+        vm.selectedPhysicalFlows = null;
         vm.selectedFlow = null;
         vm.dataTypeInfo = null;
         vm.isDirty = false;
@@ -350,13 +354,13 @@ function controller($element,
         }
     };
 
-    vm.deleteFlow = (flow) => {
-        const hasPhysicalFlow = _.some(vm.physicalFlows, { logicalFlowId: flow.id });
+    vm.deleteFlow = () => {
+        const hasPhysicalFlow = _.some(vm.physicalFlows, { logicalFlowId: vm.selectedFlow.id });
         if (!hasPhysicalFlow) {
             serviceBroker
                 .execute(
                     CORE_API.LogicalFlowStore.removeFlow,
-                    [flow.id])
+                    [vm.selectedFlow.id])
                 .then(reload)
                 .then(() => toasts.warning("Data flow removed"))
                 .catch(e => displayError("System error, please contact support", e));
@@ -376,7 +380,6 @@ function controller($element,
     };
 
     vm.addSource = (entity) => {
-        console.log({entity});
         const counterpartRef = { id: entity.id, kind: entity.kind, name: entity.name };
         if (notifyIllegalFlow(toasts, vm.parentEntityRef, counterpartRef)) return;
         addFlow(mkNewFlow(counterpartRef, vm.parentEntityRef))
@@ -384,7 +387,6 @@ function controller($element,
     };
 
     vm.addTarget = (entity) => {
-        console.log({entity});
         const counterpartRef = { id: entity.id, kind: entity.kind, name: entity.name };
         if (notifyIllegalFlow(toasts, vm.parentEntityRef, counterpartRef)) return;
         addFlow(mkNewFlow(vm.parentEntityRef, counterpartRef))
@@ -403,6 +405,7 @@ function controller($element,
     };
 
     vm.onSelectDataType = (dt) => {
+        console.log({dt})
         vm.dataTypeInfo = dt;
     }
 

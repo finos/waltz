@@ -19,7 +19,6 @@
     let permissionsCall;
     let flowCall;
     let decoratorsCall;
-    let viewCall;
     let ratingCharacteristicsCall;
     let usageCharacteristicsCall;
     let saving = false;
@@ -53,7 +52,7 @@
             .then(() => {
                 saving = false;
                 toasts.success("Successfully saved data types");
-                viewCall = dataTypeDecoratorStore.getViewForParentRef(primaryEntityReference, true);
+                decoratorsCall = dataTypeDecoratorStore.findBySelector("LOGICAL_DATA_FLOW", selectionOptions, true);
                 onReload();
             })
             .catch(e => displayError("Could not save data type changes", e));
@@ -61,6 +60,7 @@
 
     $: {
         if (primaryEntityReference) {
+            dirty = false;
             selectionOptions = mkSelectionOptions(primaryEntityReference);
             flowCall = logicalFlowStore.getById(primaryEntityReference.id);
             decoratorsCall = dataTypeDecoratorStore.findBySelector("LOGICAL_DATA_FLOW", selectionOptions);

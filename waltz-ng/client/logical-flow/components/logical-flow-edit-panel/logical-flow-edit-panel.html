@@ -131,9 +131,15 @@
                     <waltz-logical-flow-type-editor flow="$ctrl.selectedFlow"
                                                     on-delete="$ctrl.deleteFlow"
                                                     on-reload="$ctrl.onReload"
-                                                    on-cancel="$ctrl.cancel"
-                                                    on-select="$ctrl.onSelectDataType">
+                                                    on-cancel="$ctrl.cancel">
                     </waltz-logical-flow-type-editor>
+
+                    <div style="padding-top: 2em">
+                        <button class="btn btn-danger"
+                                ng-click="$ctrl.deleteFlow()">
+                            Remove this Logical Flow
+                        </button>
+                    </div>
                 </div>
 
                 <div ng-if="$ctrl.mode === 'editDataTypeUsage'"

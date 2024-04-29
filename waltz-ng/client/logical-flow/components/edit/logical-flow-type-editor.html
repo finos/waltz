@@ -29,19 +29,10 @@
 
             <waltz-svelte-component component="$ctrl.FlowDataTypeEditor"
                                     primary-entity-reference="$ctrl.logicalFlowEntityRef"
-                                    on-select="$ctrl.onSelect"
                                     on-cancel="$ctrl.onCancel"
                                     on-reload="$ctrl.onReload"
                                     on-delete="$ctrl.onDelete">
             </waltz-svelte-component>
-
-            <!-- ACTIONS -->
-            <div class="pull-right">
-                <button class="btn btn-danger"
-                        ng-click="$ctrl.delete()">
-                    Delete
-                </button>
-            </div>
 
         </div>
     </div>
