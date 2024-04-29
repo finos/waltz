@@ -30,14 +30,16 @@ import template from "./source-and-target-graph.html"
 import {amberHex} from "../../../common/colors";
 import {sidebarExpanded} from "../../../navbar/sidebar-store";
 import {getSymbol} from "../../../common/svg-icon";
+import {flowDirection as FlowDirection} from "../../../common/services/enums/flow-direction";
 
 
 const bindings = {
-    flowClassificationsByCode: "<",
+    flowClassifications: "<",
     changeUnits: "<",
     decorators: "<",
     entityRef: "<",
     logicalFlows: "<",
+    ratingDirection: "<",
     tweakers: "<"
 };
 
@@ -186,7 +188,7 @@ function prepareGraph(svg) {
 }
 
 
-function mkModel({ logicalFlows = [], decorators = [], entityRef, allTypes = []}) {
+function mkModel({ logicalFlows = [], decorators = [], entityRef, allTypes = [], ratingDirection}) {
     const logicalFlowIds = _.map(logicalFlows, "id");
     const relevantDecorators = _.filter(
         decorators,
@@ -218,13 +220,19 @@ function mkModel({ logicalFlows = [], decorators = [], entityRef, allTypes = []}
     const sourceToType = _.chain(inbound)
         .flatMap(f => _.map(
             decoratorsByFlowId[f.id] || [],
-            d => ({ from: f.source.id, to: d.decoratorEntity.id, rating: d.rating, entityLifecycleStatus: f.entityLifecycleStatus })))
+            d => {
+                const rating = ratingDirection === FlowDirection.OUTBOUND.key ? d.rating : d.targetInboundRating;
+                return { from: f.source.id, to: d.decoratorEntity.id, rating, entityLifecycleStatus: f.entityLifecycleStatus};
+            }))
         .value();
 
     const typeToTarget = _.chain(outbound)
         .flatMap(f => _.map(
             decoratorsByFlowId[f.id] || [],
-            d => ({ from: d.decoratorEntity.id, to: f.target.id, rating: d.rating, entityLifecycleStatus: f.entityLifecycleStatus })))
+            d => {
+                const rating = ratingDirection === FlowDirection.OUTBOUND.key ? d.rating : d.targetInboundRating;
+                return { from: d.decoratorEntity.id, to: f.target.id, rating, entityLifecycleStatus: f.entityLifecycleStatus }
+            }))
         .value();
 
     const types = _.chain(relevantDecorators)
@@ -278,8 +286,8 @@ function translate(elem, dx = 0, dy = 0) {
 
 function setupSizing(sections, dimensions) {
     sections.svg
-       .attr("width", dimensions.graph.width)
-       .attr("height", dimensions.graph.height);
+        .attr("width", dimensions.graph.width)
+        .attr("height", dimensions.graph.height);
 
     const sdx = dimensions.margin.left + dimensions.label.width;
     const sdy = dimensions.margin.top;
@@ -463,7 +471,7 @@ function drawLabels(section, items = [], scale, anchor = "start", tweakers) {
 }
 
 
-function drawArcs(section, model, layoutFn, flowClassificationsByCode) {
+function drawArcs(section, model, layoutFn, flowClassificationsByCode, ratingDirection) {
     const arcs = section
         .selectAll(`.${styles.ARC}`)
         .data(model, d => d.from + "-" + d.to);
@@ -601,6 +609,7 @@ function update(sections,
                 model,
                 tweakers,
                 flowClassificationsByCode) {
+
     redraw = () => update(sections, model, tweakers, flowClassificationsByCode);
 
     const dimensions = calculateDimensions(model);
@@ -648,6 +657,11 @@ function controller($element, $window, serviceBroker) {
 
         const tweakers = _.defaultsDeep(vm.tweakers, dfltTweakers);
 
+        vm.flowClassificationsByCode = _.chain(vm.flowClassifications)
+            .filter(d => d.direction === vm.ratingDirection)
+            .keyBy(d => d.code)
+            .value();
+
         serviceBroker
             .loadAppData(CORE_API.DataTypeStore.findAll)
             .then(r => {
@@ -656,7 +670,8 @@ function controller($element, $window, serviceBroker) {
                     logicalFlows: vm.logicalFlows || [],
                     decorators: vm.decorators || [],
                     entityRef: vm.entityRef,
-                    allTypes: types
+                    allTypes: types,
+                    ratingDirection: vm.ratingDirection || FlowDirection.INBOUND.key
                 };
                 const model = mkModel(data);
                 update(svgSections, model, tweakers, vm.flowClassificationsByCode);
