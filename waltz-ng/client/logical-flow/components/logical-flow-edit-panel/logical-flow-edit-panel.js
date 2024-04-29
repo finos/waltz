@@ -376,7 +376,6 @@ function controller($element,
     };
 
     vm.addSource = (entity) => {
-        console.log({entity});
         const counterpartRef = { id: entity.id, kind: entity.kind, name: entity.name };
         if (notifyIllegalFlow(toasts, vm.parentEntityRef, counterpartRef)) return;
         addFlow(mkNewFlow(counterpartRef, vm.parentEntityRef))
@@ -384,7 +383,6 @@ function controller($element,
     };
 
     vm.addTarget = (entity) => {
-        console.log({entity});
         const counterpartRef = { id: entity.id, kind: entity.kind, name: entity.name };
         if (notifyIllegalFlow(toasts, vm.parentEntityRef, counterpartRef)) return;
         addFlow(mkNewFlow(vm.parentEntityRef, counterpartRef))

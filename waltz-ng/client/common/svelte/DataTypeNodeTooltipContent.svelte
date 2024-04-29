@@ -14,19 +14,19 @@
     export let usageCharacteristics;
     export let isEditMode = false;
 
-    $: inboundMessage = ratingCharacteristics.inboundMessage
-        || ratingCharacteristics.targetInboundClassification.defaultMessage
+    $: inboundMessage = ratingCharacteristics?.inboundMessage
+        || ratingCharacteristics?.targetInboundClassification.defaultMessage
 
-    $: outboundMessage = ratingCharacteristics.outboundMessage
-        || ratingCharacteristics.sourceOutboundClassification.defaultMessage
+    $: outboundMessage = ratingCharacteristics?.outboundMessage
+        || ratingCharacteristics?.sourceOutboundClassification.defaultMessage
 
-    $: inboundSeverity = ratingCharacteristics.inboundMessage
-        ? ratingCharacteristics.inboundMessageSeverity
-        : ratingCharacteristics.targetInboundClassification.messageSeverity;
+    $: inboundSeverity = ratingCharacteristics?.inboundMessage
+        ? ratingCharacteristics?.inboundMessageSeverity
+        : ratingCharacteristics?.targetInboundClassification.messageSeverity;
 
-    $: outboundSeverity = ratingCharacteristics.outboundMessage
-        ? ratingCharacteristics.outboundMessageSeverity
-        : ratingCharacteristics.sourceOutboundClassification.messageSeverity
+    $: outboundSeverity = ratingCharacteristics?.outboundMessage
+        ? ratingCharacteristics?.outboundMessageSeverity
+        : ratingCharacteristics?.sourceOutboundClassification.messageSeverity
 
 </script>
 
