@@ -12,6 +12,12 @@ export function refCmp(a, b) {
     return cmp(a.name, b.name);
 }
 
+
+export function propCmp(a, b, path) {
+    return cmp(_.get(a, path), _.get(b, path));
+}
+
+
 export function compareDates(date1, date2) {
     if(!_.isEmpty(date1) && _.isEmpty(date2)){
         return 1;

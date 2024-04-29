@@ -23,6 +23,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.DescriptionProvider;
 import org.finos.waltz.model.IdProvider;
+import org.finos.waltz.model.Nullable;
+import org.finos.waltz.model.Severity;
 import org.finos.waltz.model.command.Command;
 import org.immutables.value.Value;
 
@@ -35,4 +37,10 @@ public abstract class FlowClassificationRuleUpdateCommand implements
         IdProvider {
 
     public abstract long classificationId();
+
+    @Nullable
+    public abstract Severity severity();
+
+    @Nullable
+    public abstract String message();
 }

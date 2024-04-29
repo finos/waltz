@@ -25,6 +25,7 @@ import {hierarchyQueryScope} from "../../../common/services/enums/hierarchy-quer
 import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
 
 import template from "./flow-classification-rules-section.html";
+import FlowClassificationRulesPanel from "../summary-list/FlowClassificationRulesPanel.svelte";
 
 const bindings = {
     filters: "<",
@@ -41,7 +42,7 @@ const allTabDefinitions = [
         name: "Flow Classification Scorecard",
         template: "wass-scorecard-tab-content"
     }, {
-        name: "Rated Sources",
+        name: "Rules",
         template: "wass-sources-tab-content"
     }, {
         name: "Discouraged Sources",
@@ -51,7 +52,7 @@ const allTabDefinitions = [
 
 
 const initialState = {
-    classificationRules: [],
+    FlowClassificationRulesPanel,
     visibility: {
         sourceDataRatingsOverlay: false,
     },
@@ -91,21 +92,9 @@ function controller(serviceBroker) {
             .then(r => vm.discouragedSources = r.data);
     };
 
-    const loadFlowClassificationRules = () => {
-        vm.selectionOptions = mkSelector();
-        serviceBroker
-            .loadViewData(
-                CORE_API.FlowClassificationRuleStore.view,
-                [vm.selectionOptions])
-            .then(r => {
-                vm.classificationRules =  r.data;
-            });
-    };
-
     vm.$onInit = () => {
         vm.tabDefinitions = mkTabDefinitionsForKind(vm.parentEntityRef.kind);
         vm.selectedTabName = _.first(vm.tabDefinitions).name;
-        loadFlowClassificationRules();
         loadDiscouragedSources();
     };
 

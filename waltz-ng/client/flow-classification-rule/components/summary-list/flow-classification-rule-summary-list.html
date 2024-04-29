@@ -15,40 +15,13 @@
     <waltz-static-panels render-mode='minimal-border'
                          group-key='SECTION.AUTH_SOURCES.ABOUT'>
     </waltz-static-panels>
+
     <br>
 
-    <div ng-if="$ctrl.viewMode === 'LIST'">
-        <waltz-flow-classification-rules-table rules="$ctrl.flowClassificationRules"
-                                               on-select="$ctrl.onSelectRule">
-        </waltz-flow-classification-rules-table>
-    </div>
-
-
-    <div ng-if="$ctrl.viewMode === 'DETAIL'">
-        <waltz-svelte-component component="$ctrl.FlowClassificationRuleDetail"
-                                primary-entity-ref="$ctrl.parentEntityRef"
-                                can-edit="$ctrl.canEdit"
-                                do-delete="$ctrl.doDelete"
-                                do-cancel="$ctrl.cancel">
+    <div class="row">
+        <waltz-svelte-component component="$ctrl.FlowClassificationRulesPanel"
+                                primary-entity-ref="{kind: 'ALL', id: 1}">
         </waltz-svelte-component>
-    </div>
-
-    <div ng-if="$ctrl.viewMode==='EDIT'">
-        <waltz-svelte-component component="$ctrl.FlowClassificationRuleEditor"
-                                primary-entity-ref="$ctrl.parentEntityRef"
-                                do-save="$ctrl.doSave"
-                                do-update="$ctrl.doUpdate"
-                                do-cancel="$ctrl.cancel">
-        </waltz-svelte-component>
-    </div>
-
-    <div ng-if="$ctrl.viewMode==='LIST' && $ctrl.canEdit">
-        <button class="btn-link"
-                data-testid="create-rule"
-                ng-click="$ctrl.create()">
-            <waltz-icon name="plus"></waltz-icon>
-            Add new Flow Classification Rule
-        </button>
     </div>
 
 </waltz-section>
