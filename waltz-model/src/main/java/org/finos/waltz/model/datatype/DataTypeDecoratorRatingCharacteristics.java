@@ -22,11 +22,12 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.Nullable;
+import org.finos.waltz.model.Severity;
 import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
 import org.immutables.value.Value;
 
 /**
- * Data Type decorator usage stats
+ * Data Type decorator rating information from classification rules
  */
 @Value.Immutable
 @JsonSerialize(as = ImmutableDataTypeDecoratorRatingCharacteristics.class)
@@ -47,5 +48,21 @@ public abstract class DataTypeDecoratorRatingCharacteristics {
         public AuthoritativenessRatingValue targetInboundRating(){
             return AuthoritativenessRatingValue.NO_OPINION;
         };
+
+        @Nullable
+        public abstract String outboundMessage();
+
+        @Value.Default
+        public Severity outboundMessageSeverity() {
+                return Severity.INFORMATION;
+        }
+
+        @Nullable
+        public abstract String inboundMessage();
+
+        @Value.Default
+        public Severity inboundMessageSeverity() {
+                return Severity.INFORMATION;
+        }
 
 }

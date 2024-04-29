@@ -32,6 +32,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyMap;
+import static java.util.Optional.ofNullable;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.head;
 import static org.finos.waltz.common.CollectionUtilities.sort;
@@ -66,7 +67,7 @@ public class FlowClassificationRuleResolver {
                         FlowClassificationRuleVantagePoint::vantagePoint,
                         byVps -> groupAndThen(
                                 byVps,
-                                byVp -> byVp.dataType().id(),
+                                FlowClassificationRuleVantagePoint::dataTypeId,
                                 byDts -> groupAndThen(
                                         byDts,
                                         FlowClassificationRuleVantagePoint::subjectReference,
@@ -79,16 +80,16 @@ public class FlowClassificationRuleResolver {
      * Given a vantage point, a supplier and a data type this method will give back
      * an authoritativeness rating.
      *
-     * @param vantagePointOrgUnit  typically the ou of the receiving app of the rule, will be null if the vantage point is an actor
+     * @param vantagePointOrgUnit typically the ou of the receiving app of the rule, will be null if the vantage point is an actor
      * @param vantagePointEntity  typically the entity on the receiving end of the rule
-     * @param subject  typically the ref of the rule provider
-     * @param dataTypeId  the data type in question
-     * @return  How this should be rated
+     * @param subject             typically the ref of the rule provider
+     * @param dataTypeId          the data type in question
+     * @return How this should be rated
      */
-    public Tuple2<AuthoritativenessRatingValue, Optional<Long>> resolve(EntityReference vantagePointOrgUnit,
-                                                                        EntityReference vantagePointEntity,
-                                                                        EntityReference subject,
-                                                                        Long dataTypeId) {
+    public Tuple2<AuthoritativenessRatingValue, Optional<FlowClassificationRuleVantagePoint>> resolve(EntityReference vantagePointOrgUnit,
+                                                                                                      EntityReference vantagePointEntity,
+                                                                                                      EntityReference subject,
+                                                                                                      Long dataTypeId) {
 
         //Attempt lookup for rule based upon both org unit and direct rule, prioritise direct lookup as more specific rule
         Map<Long, Map<EntityReference, Optional<FlowClassificationRuleVantagePoint>>> vpGroup = byVantagePointThenDataTypeThenSubject.getOrDefault(vantagePointOrgUnit, emptyMap());
@@ -124,23 +125,18 @@ public class FlowClassificationRuleResolver {
                 .map(r -> AuthoritativenessRatingValue.of(r.classificationCode()))
                 .orElse(defaultRating);
 
-        Optional<Long> discouragedRule = determineDefaultRuleId(dataTypeGroup);
+        Optional<FlowClassificationRuleVantagePoint> discouragedRule = determineDefaultRuleId(dataTypeGroup);
 
-        Optional<Long> flowClassificationRule = maybeRule.isPresent()
-                ? maybeRule.map(FlowClassificationRuleVantagePoint::ruleId)
-                : discouragedRule;
-
-        return tuple(ratingValue, flowClassificationRule);
+        return tuple(ratingValue, ofNullable(maybeRule.orElse(discouragedRule.orElse(null))));
     }
 
-    private Optional<Long> determineDefaultRuleId(Map<EntityReference, Optional<FlowClassificationRuleVantagePoint>> dataTypeGroup) {
+    private Optional<FlowClassificationRuleVantagePoint> determineDefaultRuleId(Map<EntityReference, Optional<FlowClassificationRuleVantagePoint>> dataTypeGroup) {
         return dataTypeGroup
                 .values()
                 .stream()
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .sorted(flowClassificationRuleVantagePointComparator)
-                .map(d -> d.ruleId())
                 .findFirst();
     }
 
@@ -153,15 +149,11 @@ public class FlowClassificationRuleResolver {
      * @return
      */
     public static Optional<FlowClassificationRuleVantagePoint> getMostSpecificRanked(Collection<FlowClassificationRuleVantagePoint> vantagePoints) {
-
-        Comparator<FlowClassificationRuleVantagePoint> comparator = Comparator
-                .comparingInt(FlowClassificationRuleVantagePoint::vantagePointRank)
-                .thenComparingInt(FlowClassificationRuleVantagePoint::dataTypeRank);
-
+        List<FlowClassificationRuleVantagePoint> sorted = sort(
+                vantagePoints,
+                flowClassificationRuleVantagePointComparator);
         return head(
-                sort(
-                    vantagePoints,
-                    (x, y) -> comparator.compare(y, x))); //note the reversal of parameters because we want descending order
+                sorted); //note the reversal of parameters because we want descending order
     }
 
 }

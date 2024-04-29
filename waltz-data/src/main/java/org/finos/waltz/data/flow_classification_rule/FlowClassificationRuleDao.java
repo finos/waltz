@@ -44,9 +44,9 @@ import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.Record1;
+import org.jooq.Record11;
 import org.jooq.Record2;
 import org.jooq.Record3;
-import org.jooq.Record9;
 import org.jooq.RecordMapper;
 import org.jooq.Result;
 import org.jooq.Select;
@@ -104,6 +104,7 @@ public class FlowClassificationRuleDao {
     private final static EntityHierarchy ehDataType = ENTITY_HIERARCHY.as("ehDataType");
     public static final Field<Long> vantagePointId = DSL.coalesce(ehOrgUnit.ID, FLOW_CLASSIFICATION_RULE.PARENT_ID);
     public static final Field<Integer> vantagePointLevel = DSL.coalesce(ehOrgUnit.LEVEL, 0).as("parentLevel");
+    public static final Field<Integer> dataTypeLevel = DSL.coalesce(ehDataType.LEVEL, 0).as("dataTypeLevel");
     private static final Field<String> PARENT_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             FLOW_CLASSIFICATION_RULE.PARENT_ID,
             FLOW_CLASSIFICATION_RULE.PARENT_KIND,
@@ -164,16 +165,20 @@ public class FlowClassificationRuleDao {
     };
 
 
-    private static final RecordMapper<Record, FlowClassificationRuleVantagePoint> TO_VANTAGE_MAPPER = r -> ImmutableFlowClassificationRuleVantagePoint
-            .builder()
-            .vantagePoint(mkRef(EntityKind.valueOf(r.get(FLOW_CLASSIFICATION_RULE.PARENT_KIND)), r.get(vantagePointId))) // could be child org unit
-            .vantagePointRank(r.get(vantagePointLevel))
-            .subjectReference(mkRef(EntityKind.valueOf(r.get(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_KIND)), r.get(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID)))
-            .classificationCode(r.get(FLOW_CLASSIFICATION.CODE))
-            .dataType(mkRef(EntityKind.DATA_TYPE, r.get(ehDataType.ID)))
-            .dataTypeRank(r.get(ehDataType.LEVEL))
-            .ruleId(r.get(FLOW_CLASSIFICATION_RULE.ID))
-            .build();
+    private static final RecordMapper<Record, FlowClassificationRuleVantagePoint> TO_VANTAGE_MAPPER = r -> {
+        return ImmutableFlowClassificationRuleVantagePoint
+                .builder()
+                .vantagePoint(mkRef(EntityKind.valueOf(r.get(FLOW_CLASSIFICATION_RULE.PARENT_KIND)), r.get(vantagePointId))) // could be child org unit
+                .vantagePointRank(r.get(vantagePointLevel))
+                .subjectReference(mkRef(EntityKind.valueOf(r.get(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_KIND)), r.get(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID)))
+                .classificationCode(r.get(FLOW_CLASSIFICATION.CODE))
+                .dataTypeId(r.get(ehDataType.ID))
+                .dataTypeRank(r.get(dataTypeLevel))
+                .ruleId(r.get(FLOW_CLASSIFICATION_RULE.ID))
+                .message(r.get(FLOW_CLASSIFICATION_RULE.MESSAGE))
+                .messageSeverity(Severity.valueOf(r.get(FLOW_CLASSIFICATION_RULE.MESSAGE_SEVERITY)))
+                .build();
+    };
 
 
 
@@ -359,20 +364,22 @@ public class FlowClassificationRuleDao {
                 .or(actorVantagePointCondition)
                 .or(orgUnitVantagePointCondition);
 
-        SelectConditionStep<Record9<Long, String, Integer, Long, Integer, Long, String, String, Long>> select = dsl
+        SelectConditionStep<Record11<Long, String, Integer, Long, Integer, Long, String, String, Long, String, String>> select = dsl
                 .select(vantagePointId,
                         FLOW_CLASSIFICATION_RULE.PARENT_KIND,
                         vantagePointLevel,
                         ehDataType.ID,
-                        ehDataType.LEVEL,
+                        dataTypeLevel,
                         FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID,
                         FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_KIND,
                         FLOW_CLASSIFICATION.CODE,
-                        FLOW_CLASSIFICATION_RULE.ID)
+                        FLOW_CLASSIFICATION_RULE.ID,
+                        FLOW_CLASSIFICATION_RULE.MESSAGE,
+                        FLOW_CLASSIFICATION_RULE.MESSAGE_SEVERITY)
                 .from(FLOW_CLASSIFICATION_RULE)
                 .innerJoin(FLOW_CLASSIFICATION).on(FLOW_CLASSIFICATION.DIRECTION.eq(direction.name())
                         .and(FLOW_CLASSIFICATION_RULE.FLOW_CLASSIFICATION_ID.eq(FLOW_CLASSIFICATION.ID)))
-                .innerJoin(ehDataType)
+                .leftJoin(ehDataType)
                     .on(ehDataType.KIND.eq(EntityKind.DATA_TYPE.name())
                             .and(ehDataType.ANCESTOR_ID.eq(FLOW_CLASSIFICATION_RULE.DATA_TYPE_ID)))
                 .leftJoin(ehOrgUnit)
@@ -392,25 +399,25 @@ public class FlowClassificationRuleDao {
 
 
     private List<FlowClassificationRuleVantagePoint> findFlowClassificationRuleVantagePoints(Condition condition) {
-        SelectSeekStep6<Record9<Long, String, Integer, Long, Integer, Long, String, String, Long>, String, Integer, Integer, Long, Long, Long> select = dsl
+        SelectSeekStep6<Record11<Long, String, Integer, Long, Integer, Long, String, String, Long, String, String>, String, Integer, Integer, Long, Long, Long> select = dsl
                 .select(vantagePointId,
                         FLOW_CLASSIFICATION_RULE.PARENT_KIND,
                         vantagePointLevel,
                         ehDataType.ID,
-                        ehDataType.LEVEL,
+                        dataTypeLevel,
                         FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID,
                         FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_KIND,
                         FLOW_CLASSIFICATION.CODE,
-                        FLOW_CLASSIFICATION_RULE.ID)
+                        FLOW_CLASSIFICATION_RULE.ID,
+                        FLOW_CLASSIFICATION_RULE.MESSAGE,
+                        FLOW_CLASSIFICATION_RULE.MESSAGE_SEVERITY)
                 .from(FLOW_CLASSIFICATION_RULE)
                 .leftJoin(ehOrgUnit)
                 .on(ehOrgUnit.ANCESTOR_ID.eq(FLOW_CLASSIFICATION_RULE.PARENT_ID)
                         .and(ehOrgUnit.KIND.eq(EntityKind.ORG_UNIT.name()))
                         .and(ehOrgUnit.ID.eq(ehOrgUnit.ANCESTOR_ID)))
-                .innerJoin(DataType.DATA_TYPE)
-                .on(DataType.DATA_TYPE.ID.eq(FLOW_CLASSIFICATION_RULE.DATA_TYPE_ID))
-                .innerJoin(ehDataType)
-                .on(ehDataType.ANCESTOR_ID.eq(DataType.DATA_TYPE.ID)
+                .leftJoin(ehDataType)
+                .on(ehDataType.ANCESTOR_ID.eq(FLOW_CLASSIFICATION_RULE.DATA_TYPE_ID)
                         .and(ehDataType.KIND.eq(EntityKind.DATA_TYPE.name()))
                         .and(ehDataType.ID.eq(ehDataType.ANCESTOR_ID)))
                 .innerJoin(FLOW_CLASSIFICATION).on(FLOW_CLASSIFICATION_RULE.FLOW_CLASSIFICATION_ID.eq(FLOW_CLASSIFICATION.ID))
@@ -418,7 +425,7 @@ public class FlowClassificationRuleDao {
                 .orderBy(
                         FLOW_CLASSIFICATION_RULE.PARENT_KIND, //ACTOR, APPLICATION, ORG_UNIT
                         vantagePointLevel.desc(),
-                        ehDataType.LEVEL.desc(),
+                        dataTypeLevel.desc(),
                         vantagePointId,
                         ehDataType.ID,
                         FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID
