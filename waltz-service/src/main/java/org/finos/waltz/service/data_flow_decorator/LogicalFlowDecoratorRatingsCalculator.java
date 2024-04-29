@@ -24,8 +24,8 @@ import org.finos.waltz.data.logical_flow.LogicalFlowDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.FlowDirection;
+import org.finos.waltz.model.MessageSeverity;
 import org.finos.waltz.model.OrganisationalUnitIdProvider;
-import org.finos.waltz.model.Severity;
 import org.finos.waltz.model.application.Application;
 import org.finos.waltz.model.datatype.DataTypeDecorator;
 import org.finos.waltz.model.datatype.DataTypeDecoratorRatingCharacteristics;
@@ -184,9 +184,9 @@ public class LogicalFlowDecoratorRatingsCalculator {
                                 .sourceOutboundRating(outboundRatingAndRule.v1)
                                 .targetInboundRating(inboundRatingAndRule.v1)
                                 .inboundMessage(inboundRatingAndRule.v2.map(FlowClassificationRuleVantagePoint::message).orElse(null))
-                                .inboundMessageSeverity(inboundRatingAndRule.v2.map(FlowClassificationRuleVantagePoint::messageSeverity).orElse(Severity.INFORMATION))
+                                .inboundMessageSeverity(inboundRatingAndRule.v2.map(FlowClassificationRuleVantagePoint::messageSeverity).orElse(MessageSeverity.INFORMATION))
                                 .outboundMessage(outboundRatingAndRule.v2.map(FlowClassificationRuleVantagePoint::message).orElse(null))
-                                .outboundMessageSeverity(outboundRatingAndRule.v2.map(FlowClassificationRuleVantagePoint::messageSeverity).orElse(Severity.INFORMATION))
+                                .outboundMessageSeverity(outboundRatingAndRule.v2.map(FlowClassificationRuleVantagePoint::messageSeverity).orElse(MessageSeverity.INFORMATION))
                                 .build();
                     } catch (Exception e) {
                         LOG.warn("Failed to calculate rating for source: {} and target: {}, reason: {}", source, target, e.getMessage());

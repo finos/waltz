@@ -13,6 +13,7 @@
     import Icon from "../../../common/svelte/Icon.svelte";
     import FlowClassificationRuleEditor2 from "./FlowClassificationRuleEditor2.svelte";
     import {toEntityRef} from "../../../common/entity-utils";
+    import {messageSeverity} from "../../../common/services/enums/message-severity";
 
     const PanelModes = {
         LIST: "LIST",
@@ -300,6 +301,26 @@
                     </span>
                     <p class="help-block">{_.get(selectedRule, ['classification', 'description'], '-')}</p>
                 </div>
+
+                {#if !_.isEmpty(selectedRule.message)}
+
+                    <div data-testid="message-severity">
+                        <strong>Message Severity:</strong>
+                        <span>
+                            {messageSeverity[_.get(selectedRule, ['messageSeverity'], 'NONE')].name}
+                        </span>
+                        <p class="help-block">The severity is used to decorate the message</p>
+                    </div>
+
+                    <div data-testid="message">
+                        <strong>Message:</strong>
+                        <span>
+                            {_.get(selectedRule, ['message'], '-')}
+                        </span>
+                        <p class="help-block">An optional message to give the user when the rule matches</p>
+                    </div>
+
+                {/if}
 
                 <div data-testid="notes">
                     <strong>Notes:</strong>

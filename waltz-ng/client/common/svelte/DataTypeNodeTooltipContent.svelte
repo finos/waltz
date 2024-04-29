@@ -5,7 +5,7 @@
     import _ from "lodash";
     import DescriptionFade from "./DescriptionFade.svelte";
     import NoData from "./NoData.svelte";
-    import {severity} from "../services/enums/severity";
+    import {messageSeverity} from "../services/enums/message-severity";
 
     export let name;
     export let description;
@@ -59,7 +59,7 @@
     {#if !_.isEmpty(outboundMessage)}
         <div class="row">
             <div class="col-sm-12">
-                <NoData type={_.lowerCase(_.get(severity, [outboundSeverity, "name"], "info"))}>{outboundMessage}</NoData>
+                <NoData type={_.lowerCase(_.get(messageSeverity, [outboundSeverity, "name"], "info"))}>{outboundMessage}</NoData>
             </div>
         </div>
     {/if}
@@ -77,7 +77,7 @@
     {#if !_.isEmpty(inboundMessage)}
         <div class="row">
             <div class="col-sm-12">
-                <NoData type={_.lowerCase(_.get(severity, [inboundSeverity, "name"], "info"))}>{inboundMessage}</NoData>
+                <NoData type={_.lowerCase(_.get(messageSeverity, [inboundSeverity, "name"], "info"))}>{inboundMessage}</NoData>
             </div>
         </div>
     {/if}

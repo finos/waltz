@@ -77,36 +77,40 @@ public class FlowClassificationCalculator {
 
 
     public int[] update(Long dataTypeId, EntityReference vantageRef) {
-        DataType dataType = dataTypeDao.getById(dataTypeId);
-        if (dataType == null) {
-            LOG.error("Cannot update ratings for data type id: {} for vantage point: {} as cannot find corresponding data type",
-                    dataTypeId,
-                    vantageRef);
-            return new int[0];
-        }
+        Optional<DataType> dataType = Optional.ofNullable(dataTypeId).map(dataTypeDao::getById);
         return update(dataType, vantageRef);
     }
 
 
-    private int[] update(DataType dataType, EntityReference vantageRef) {
-        LOG.debug("Updating ratings for flow classification rule - dataType name: {}, id: {}, vantage point: {}",
-                dataType.name(),
-                dataType.id().get(),
+    private int[] update(Optional<DataType> dataType, EntityReference vantageRef) {
+        String dtLoggedName = dataType
+                .map(dt -> String.format("%s, id: %d", dt.name(), dt.id().get()))
+                .orElse("All");
+
+        LOG.debug("Updating ratings for flow classification rule - dataType name: {}, vantage point: {}",
+                dtLoggedName,
                 vantageRef);
 
         IdSelectionOptions selectorOptions = mkOpts(vantageRef);
         Select<Record1<Long>> appSelector = appIdSelectorFactory.apply(selectorOptions);
-        Set<Long> dataTypeDescendents = entityHierarchyDao
-                .findDesendents(dataType.entityReference())
-                .stream()
-                .map(d -> d.id().get())
-                .collect(Collectors.toSet());
 
-        Collection<DataTypeDecorator> impactedDecorators = logicalFlowDecoratorDao
-                .findByEntityIdSelector(appSelector, Optional.of(EntityKind.APPLICATION))
-                .stream()
-                .filter(decorator -> dataTypeDescendents.contains(decorator.decoratorEntity().id()))
-                .collect(toList());
+        Collection<DataTypeDecorator> impactedDecorators = dataType
+                .map(dt -> {
+                    Set<Long> dataTypeDescendents = entityHierarchyDao
+                            .findDesendents(dt.entityReference())
+                            .stream()
+                            .map(d -> d.id().get())
+                            .collect(Collectors.toSet());
+
+                    return logicalFlowDecoratorDao
+                            .findByEntityIdSelector(appSelector, Optional.of(EntityKind.APPLICATION))
+                            .stream()
+                            .filter(decorator -> dataTypeDescendents.contains(decorator.decoratorEntity().id()))
+                            .collect(toList());
+                })
+                .orElseGet(() ->
+                        logicalFlowDecoratorDao
+                            .findByEntityIdSelector(appSelector, Optional.of(EntityKind.APPLICATION)));
 
         Collection<DataTypeDecorator> reRatedDecorators = ratingsCalculator.calculate(impactedDecorators);
 
@@ -114,10 +118,9 @@ public class FlowClassificationCalculator {
                 fromCollection(reRatedDecorators),
                 fromCollection(impactedDecorators));
 
-        LOG.debug("Need to update {} ratings due to auth source change - dataType name: {}, id: {}, parent: {}",
+        LOG.debug("Need to update {} ratings due to auth source change - dataType name: {}, parent: {}",
                 modifiedDecorators.size(),
-                dataType.name(),
-                dataType.id().get(),
+                dtLoggedName,
                 vantageRef);
 
         return updateDecorators(modifiedDecorators);

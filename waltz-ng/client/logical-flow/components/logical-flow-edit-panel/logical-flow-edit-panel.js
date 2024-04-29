@@ -383,14 +383,14 @@ function controller($element,
         const counterpartRef = { id: entity.id, kind: entity.kind, name: entity.name };
         if (notifyIllegalFlow(toasts, vm.parentEntityRef, counterpartRef)) return;
         addFlow(mkNewFlow(counterpartRef, vm.parentEntityRef))
-            .then(() => selectSource(counterpartRef));
+            .then(() => $scope.$applyAsync(() => selectSource(counterpartRef)));
     };
 
     vm.addTarget = (entity) => {
         const counterpartRef = { id: entity.id, kind: entity.kind, name: entity.name };
         if (notifyIllegalFlow(toasts, vm.parentEntityRef, counterpartRef)) return;
         addFlow(mkNewFlow(vm.parentEntityRef, counterpartRef))
-            .then(() => selectTarget(counterpartRef));
+            .then(() => $scope.$applyAsync(() => selectTarget(counterpartRef)));
     };
 
     vm.setDirtyChange = (dirty) => {
@@ -405,7 +405,6 @@ function controller($element,
     };
 
     vm.onSelectDataType = (dt) => {
-        console.log({dt})
         vm.dataTypeInfo = dt;
     }
 

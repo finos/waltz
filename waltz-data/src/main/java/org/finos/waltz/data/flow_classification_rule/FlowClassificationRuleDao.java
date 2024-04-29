@@ -23,7 +23,7 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.FlowDirection;
 import org.finos.waltz.model.ImmutableEntityReference;
-import org.finos.waltz.model.Severity;
+import org.finos.waltz.model.MessageSeverity;
 import org.finos.waltz.model.flow_classification_rule.DiscouragedSource;
 import org.finos.waltz.model.flow_classification_rule.FlowClassificationRule;
 import org.finos.waltz.model.flow_classification_rule.FlowClassificationRuleCreateCommand;
@@ -34,7 +34,6 @@ import org.finos.waltz.model.flow_classification_rule.ImmutableFlowClassificatio
 import org.finos.waltz.model.flow_classification_rule.ImmutableFlowClassificationRuleVantagePoint;
 import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
 import org.finos.waltz.schema.tables.Application;
-import org.finos.waltz.schema.tables.DataType;
 import org.finos.waltz.schema.tables.EntityHierarchy;
 import org.finos.waltz.schema.tables.records.FlowClassificationRuleRecord;
 import org.finos.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
@@ -163,7 +162,7 @@ public class FlowClassificationRuleDao {
                 .externalId(Optional.ofNullable(record.getExternalId()))
                 .isReadonly(record.getIsReadonly())
                 .message(record.getMessage())
-                .messageSeverity(Severity.valueOf(record.getMessageSeverity()))
+                .messageSeverity(MessageSeverity.valueOf(record.getMessageSeverity()))
                 .build();
     };
 
@@ -179,7 +178,7 @@ public class FlowClassificationRuleDao {
                 .dataTypeRank(r.get(dataTypeLevel))
                 .ruleId(r.get(FLOW_CLASSIFICATION_RULE.ID))
                 .message(r.get(FLOW_CLASSIFICATION_RULE.MESSAGE))
-                .messageSeverity(Severity.valueOf(r.get(FLOW_CLASSIFICATION_RULE.MESSAGE_SEVERITY)))
+                .messageSeverity(MessageSeverity.valueOf(r.get(FLOW_CLASSIFICATION_RULE.MESSAGE_SEVERITY)))
                 .build();
     };
 

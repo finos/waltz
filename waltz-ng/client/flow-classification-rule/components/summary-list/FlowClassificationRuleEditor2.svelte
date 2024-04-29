@@ -160,12 +160,12 @@
             Description to provide additional data about this rule
         </div>
 
-        <label for="severity">Severity</label>
+        <label for="severity">Message Severity</label>
         <select class="form-control"
                 id="severity"
                 bind:value={formData.severity}>
-            <option value={null}>
-                None
+            <option value="NONE">
+                None (No message)
             </option>
             <option value="INFORMATION">
                 Information
@@ -187,7 +187,7 @@
             <textarea class="form-control"
                       bind:value={formData.message}
                       id="message"
-                      required={formData.severity !== null}
+                      required={formData.severity !== "NONE"}
                       placeholder="Message"/>
             <div class="help-block">
                 Message to show when a user selects a matching data type
