@@ -90,19 +90,9 @@
         id="wass-sources-tab-content">
     <div class="waltz-panel-content">
 
-        <div ng-if="$ctrl.classificationRules.flowClassificationRules.length > 0">
-            <waltz-flow-classification-rules-table rules="$ctrl.classificationRules"
-                                                   parent-entity-ref="$ctrl.parentEntityRef">
-            </waltz-flow-classification-rules-table>
-       </div>
-
-        <waltz-no-data ng-if="$ctrl.classificationRules.length === 0">
-            <message>
-                <strong>
-                    None defined
-                </strong>
-            </message>
-        </waltz-no-data>
+        <waltz-svelte-component component="$ctrl.FlowClassificationRulesPanel"
+                                primary-entity-ref="$ctrl.parentEntityRef">
+        </waltz-svelte-component>
     </div>
 </script>
 

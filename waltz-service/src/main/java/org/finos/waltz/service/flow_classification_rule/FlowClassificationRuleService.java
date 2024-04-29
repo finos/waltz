@@ -70,10 +70,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -409,30 +409,33 @@ public class FlowClassificationRuleService {
 
         Condition customSelectionCriteria;
 
+        Condition matchesAppKinds = FlowClassificationRuleDao.SUBJECT_APP.ID.isNull()
+                .or(FlowClassificationRuleDao.SUBJECT_APP.KIND.notIn(options.filters().omitApplicationKinds()));
+
         switch(options.entityReference().kind()) {
             case ORG_UNIT:
                 GenericSelector orgUnitSelector = genericSelectorFactory.apply(options);
-                customSelectionCriteria = Tables.FLOW_CLASSIFICATION_RULE.PARENT_ID.in(orgUnitSelector.selector())
-                        .and(FlowClassificationRuleDao.SUPPLIER_APP.KIND.notIn(options.filters().omitApplicationKinds()));
+                customSelectionCriteria = Tables.ORGANISATIONAL_UNIT.ID.in(orgUnitSelector.selector())
+                        .and(matchesAppKinds);
                 break;
             case DATA_TYPE:
                 GenericSelector dataTypeSelector = genericSelectorFactory.apply(options);
                 customSelectionCriteria = Tables.FLOW_CLASSIFICATION_RULE.DATA_TYPE_ID.in(dataTypeSelector.selector())
-                        .and(FlowClassificationRuleDao.SUPPLIER_APP.KIND.notIn(options.filters().omitApplicationKinds()));
+                        .and(matchesAppKinds);
                 break;
             case APPLICATION:
             case ACTOR:
             case END_USER_APPLICATION:
                 customSelectionCriteria = Tables.FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_KIND.eq(options.entityReference().kind().name())
                         .and(Tables.FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID.eq(options.entityReference().id()))
-                        .and(FlowClassificationRuleDao.SUPPLIER_APP.KIND.notIn(options.filters().omitApplicationKinds()));
+                        .and(matchesAppKinds);
                 break;
             case ALL:
             case APP_GROUP:
             case FLOW_DIAGRAM:
             case MEASURABLE:
             case PERSON:
-                customSelectionCriteria = mkConsumerSelectionCondition(options);
+                customSelectionCriteria = mkSubjectSelectionCondition(options);
                 break;
             default:
                 throw new UnsupportedOperationException("Cannot calculate flow classification rules for ref" + options.entityReference());
@@ -450,6 +453,11 @@ public class FlowClassificationRuleService {
         return FlowClassificationRuleDao.CONSUMER_APP.ID.in(appIdSelector);
     }
 
+    private Condition mkSubjectSelectionCondition(IdSelectionOptions options) {
+        Select<Record1<Long>> appIdSelector = applicationIdSelectorFactory.apply(options);
+        return FlowClassificationRuleDao.SUBJECT_APP.ID.in(appIdSelector);
+    }
+
 
     private void logRemoval(long id, String username) {
         FlowClassificationRule rule = getById(id);
@@ -459,18 +467,17 @@ public class FlowClassificationRuleService {
         }
 
         String parentName = getParentEntityName(rule.vantagePointReference());
-        DataType dataType = dataTypeDao.getById(rule.dataTypeId());
+        Optional<DataType> dataType = Optional.ofNullable(rule.dataTypeId()).map(dataTypeDao::getById);
         EntityReference subjectRef = enrichSubjectRef(rule.subjectReference());
 
 
-        if (subjectRef != null && dataType != null && parentName != null) {
+        if (subjectRef != null && parentName != null) {
             String msg = format(
-                    "Removed the flow classification rule where %s [%s/%d] is a source for type: %s [%d] for %s: %s",
+                    "Removed the flow classification rule where %s [%s/%d] is a source for type: %s for %s: %s",
                     subjectRef.name(),
                     subjectRef.kind().name(),
                     subjectRef.id(),
-                    dataType.name(),
-                    dataType.id().get(),
+                    dataType.map(dt -> format("%s [%d]", dt.name(), dt.id().get())).orElse("All"),
                     rule.vantagePointReference().kind().prettyName(),
                     parentName);
 
@@ -488,17 +495,16 @@ public class FlowClassificationRuleService {
     private void logInsert(Long ruleId, FlowClassificationRuleCreateCommand command, String username) {
 
         String parentName = getParentEntityName(command.parentReference());
-        DataType dataType = dataTypeDao.getById(command.dataTypeId());
+        Optional<DataType> dataType = Optional.ofNullable(command.dataTypeId()).map(dataTypeDao::getById);
         EntityReference subjectRef = enrichSubjectRef(command.subjectReference());
 
-        if (subjectRef != null && dataType != null && parentName != null) {
+        if (subjectRef != null && parentName != null) {
             String msg = format(
-                    "Registered the flow classification rule with %s [%s/%d] as the source for type: %s [%d] for %s: %s",
+                    "Registered the flow classification rule with %s [%s/%d] as the source for type: %s for %s: %s",
                     subjectRef.name(),
                     subjectRef.kind().name(),
                     subjectRef.id(),
-                    dataType.name(),
-                    dataType.id().get(),
+                    dataType.map(dt -> format("%s [%d]", dt.name(), dt.id().get())).orElse("All"),
                     command.parentReference().kind().prettyName(),
                     parentName);
 
@@ -536,21 +542,20 @@ public class FlowClassificationRuleService {
         }
 
         String parentName = getParentEntityName(rule.vantagePointReference());
-        DataType dataType = dataTypeDao.getById(rule.dataTypeId());
+        Optional<DataType> dataType = Optional.ofNullable(rule.dataTypeId()).map(dtId -> dataTypeDao.getById(dtId));
         EntityReference subjectRef = enrichSubjectRef(rule.subjectReference());
 
         FlowClassification classification = flowClassificationDao.getById(command.classificationId());
 
-        if (subjectRef != null && dataType != null && parentName != null) {
+        if (subjectRef != null && parentName != null) {
 
             String msg = format(
-                    "Updated flow classification rule: %s [%s/%d] as the source, with rating: %s, for type: %s[%d], for %s: %s",
+                    "Updated flow classification rule: %s [%s/%d] as the source, with rating: %s, for type: %s, for %s: %s",
                     subjectRef.name(),
                     subjectRef.kind().name(),
                     subjectRef.id(),
                     classification.name(),
-                    dataType.name(),
-                    dataType.id().get(),
+                    dataType.map(dt -> format("%s [%d]", dt.name(), dt.id().get())).orElse("All"),
                     rule.vantagePointReference().kind().prettyName(),
                     parentName);
 
@@ -576,13 +581,13 @@ public class FlowClassificationRuleService {
     }
 
 
-    private void multiLog(String username,
-                          Long classificationRuleId,
-                          EntityReference parentRef,
-                          DataType dataType,
-                          EntityReference subjectRef,
-                          String msg,
-                          Operation operation) {
+    public void multiLog(String username,
+                         Long classificationRuleId,
+                         EntityReference parentRef,
+                         Optional<DataType> dataType,
+                         EntityReference subjectRef,
+                         String msg,
+                         Operation operation) {
 
         ChangeLog parentLog = ImmutableChangeLog.builder()
                 .message(msg)
@@ -598,18 +603,20 @@ public class FlowClassificationRuleService {
                 .copyOf(parentLog)
                 .withParentReference(subjectRef);
 
-        ChangeLog dtLog = ImmutableChangeLog
-                .copyOf(parentLog)
-                .withParentReference(dataType.entityReference());
-
         ChangeLog authLog = ImmutableChangeLog
                 .copyOf(parentLog)
                 .withParentReference(mkRef(EntityKind.FLOW_CLASSIFICATION_RULE, classificationRuleId));
 
         changeLogService.write(parentLog);
         changeLogService.write(subjectLog);
-        changeLogService.write(dtLog);
         changeLogService.write(authLog);
+
+        dataType.ifPresent(dt -> {
+            ChangeLog dtLog = ImmutableChangeLog
+                    .copyOf(parentLog)
+                    .withParentReference(dt.entityReference());
+            changeLogService.write(dtLog);
+        });
     }
 
 

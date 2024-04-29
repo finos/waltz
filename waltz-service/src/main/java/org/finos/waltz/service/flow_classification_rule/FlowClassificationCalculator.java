@@ -76,7 +76,7 @@ public class FlowClassificationCalculator {
     }
 
 
-    public int[] update(long dataTypeId, EntityReference vantageRef) {
+    public int[] update(Long dataTypeId, EntityReference vantageRef) {
         DataType dataType = dataTypeDao.getById(dataTypeId);
         if (dataType == null) {
             LOG.error("Cannot update ratings for data type id: {} for vantage point: {} as cannot find corresponding data type",
