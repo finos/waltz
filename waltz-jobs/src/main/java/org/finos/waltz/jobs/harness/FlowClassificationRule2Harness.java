@@ -230,7 +230,7 @@ public class FlowClassificationRule2Harness {
                 .forEach(rvp -> {
 
                     Set<Long> childOUs = findChildren(ouHierarchy, rvp.vantagePoint().id());
-                    Set<Long> childDTs = findChildren(dtHierarchy, rvp.dataType().id());
+                    Set<Long> childDTs = findChildren(dtHierarchy, rvp.dataTypeId());
                     population.forEach(p -> {
                         Tuple2<Long, MatchOutcome> currentRuleAndOutcome = lfdIdToRuleAndOutcomeMap.get(p.lfdId());
                         if (currentRuleAndOutcome != null && currentRuleAndOutcome.v2 == MatchOutcome.POSITIVE_MATCH) {
