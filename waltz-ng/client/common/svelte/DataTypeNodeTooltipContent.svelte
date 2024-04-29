@@ -71,7 +71,7 @@
     </div>
     <div class="row">
         <div class="col-sm-12 help-block small">
-            This rating expresses whether the target entity has a preference for or against this type of data being sent to it
+            This rating expresses whether the target entity has a preference for or against this type of data being documented against it
         </div>
     </div>
     {#if !_.isEmpty(inboundMessage)}
