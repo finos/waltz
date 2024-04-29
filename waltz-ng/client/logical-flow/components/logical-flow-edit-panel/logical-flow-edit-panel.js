@@ -32,6 +32,7 @@ import DataTypeInfoPanel from "../data-type-info-panel/DataTypeInfoPanel.svelte"
 
 const bindings = {
     parentEntityRef: "<",
+    ratingDirection: "<"
 };
 
 
@@ -119,6 +120,11 @@ function filterByType(typeId, flows = [], decorators = []) {
 }
 
 
+const transclude = {
+    legend: "legend",
+};
+
+
 function controller($element,
                     $q,
                     $scope,
@@ -148,6 +154,7 @@ function controller($element,
     vm.$onChanges = (changes) => {
         loadFlowClassificationRatings(serviceBroker)
             .then(r => {
+                vm.flowClassifications = r;
                 vm.flowClassificationsByCode = _.keyBy(r, d => d.code);
             });
 
@@ -415,6 +422,7 @@ controller.$inject = [
 const component = {
     template,
     bindings,
+    transclude,
     controller
 };
 

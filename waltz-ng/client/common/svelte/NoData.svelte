@@ -39,4 +39,15 @@
         box-shadow: 0 0 2px 0 hsla(0, 0%, 0%, 0.2);
         border-left: 4px solid rgb(245, 196, 123);
     }
+
+    .error {
+        background: #fffcfa;
+        background: linear-gradient(90deg, #fffdfa 0%, rgb(248, 229, 229) 100%);
+        color: #7d7c7b;
+        padding: 15px;
+        margin-bottom: 6px;
+        border-radius: 3px;
+        box-shadow: 0 0 2px 0 hsla(0, 0%, 0%, 0.2);
+        border-left: 4px solid rgb(245, 133, 123);
+    }
 </style>

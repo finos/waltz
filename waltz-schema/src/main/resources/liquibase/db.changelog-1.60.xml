@@ -45,4 +45,26 @@
         </addColumn>
     </changeSet>
 
+
+    <changeSet id="20240424-7036-1"
+               author="woodjes">
+        <comment>7036: add default inbound classification</comment>
+        <insert tableName="flow_classification">
+            <column name="name"
+                    value="No Opinion"/>
+            <column name="description"
+                    value="A target's rating is 'no opinion' unless an inbound flow classification rule has been applied"/>
+            <column name="code"
+                    value="NO_OPINION"/>
+            <column name="color"
+                    value="#939393"/>
+            <column name="is_custom"
+                    valueBoolean="false"/>
+            <column name="user_selectable"
+                    valueBoolean="false"/>
+            <column name="direction"
+                    value="INBOUND"/>
+        </insert>
+    </changeSet>
+
 </databaseChangeLog>

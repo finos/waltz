@@ -4,6 +4,8 @@
     import RatingIndicatorCell from "../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
     import _ from "lodash";
     import DescriptionFade from "./DescriptionFade.svelte";
+    import NoData from "./NoData.svelte";
+    import {severity} from "../services/enums/severity";
 
     export let name;
     export let description;
@@ -11,6 +13,20 @@
     export let ratingCharacteristics;
     export let usageCharacteristics;
     export let isEditMode = false;
+
+    $: inboundMessage = ratingCharacteristics.inboundMessage
+        || ratingCharacteristics.targetInboundClassification.defaultMessage
+
+    $: outboundMessage = ratingCharacteristics.outboundMessage
+        || ratingCharacteristics.sourceOutboundClassification.defaultMessage
+
+    $: inboundSeverity = ratingCharacteristics.inboundMessage
+        ? ratingCharacteristics.inboundMessageSeverity
+        : ratingCharacteristics.targetInboundClassification.messageSeverity;
+
+    $: outboundSeverity = ratingCharacteristics.outboundMessage
+        ? ratingCharacteristics.outboundMessageSeverity
+        : ratingCharacteristics.sourceOutboundClassification.messageSeverity
 
 </script>
 
@@ -40,6 +56,13 @@
             This indicates the rating of the flow according whether this source entity is authorised to distribute this data type
         </div>
     </div>
+    {#if !_.isEmpty(outboundMessage)}
+        <div class="row">
+            <div class="col-sm-12">
+                <NoData type={_.lowerCase(_.get(severity, [outboundSeverity, "name"], "info"))}>{outboundMessage}</NoData>
+            </div>
+        </div>
+    {/if}
     <div class="row">
         <div class="col-sm-4">Consumer Rating:</div>
         <div class="col-sm-8">
@@ -51,6 +74,13 @@
             This rating expresses whether the target entity has a preference for or against this type of data being sent to it
         </div>
     </div>
+    {#if !_.isEmpty(inboundMessage)}
+        <div class="row">
+            <div class="col-sm-12">
+                <NoData type={_.lowerCase(_.get(severity, [inboundSeverity, "name"], "info"))}>{inboundMessage}</NoData>
+            </div>
+        </div>
+    {/if}
 {/if}
 {#if !_.isEmpty(usageCharacteristics)}
     <hr>

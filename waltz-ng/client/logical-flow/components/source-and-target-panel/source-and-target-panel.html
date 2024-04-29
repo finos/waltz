@@ -18,11 +18,12 @@
 
 <div class="row waltz-source-and-target-panel">
     <div class="col-sm-12 waltz-visibility-parent">
-        <waltz-source-and-target-graph flow-classifications-by-code="$ctrl.flowClassificationsByCode"
+        <waltz-source-and-target-graph flow-classifications="$ctrl.flowClassifications"
                                        change-units="$ctrl.changeUnits"
                                        decorators="$ctrl.filteredFlowData.decorators"
                                        entity-ref="$ctrl.entityRef"
                                        logical-flows="$ctrl.filteredFlowData.flows"
+                                       rating-direction="$ctrl.ratingDirection"
                                        tweakers="$ctrl.tweakers">
         </waltz-source-and-target-graph>
         <div ng-if="$ctrl.filterFlags.nodeFilterApplied || $ctrl.filterFlags.typeFilterApplied || $ctrl.filterFlags.tagFilterApplied"

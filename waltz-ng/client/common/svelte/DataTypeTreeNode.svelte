@@ -39,7 +39,7 @@
         const isUnchecked = filterFn(n);
 
         return isUnchecked // should be allowed to deselect non-concrete
-            && (!nonConcreteSelectable && !n.concrete)
+            && ((!nonConcreteSelectable && !n.concrete) || n.unknown);
     }
 
     function mkTooltipProps(node) {
@@ -113,7 +113,7 @@
                                     class:abstract={!childNode.concrete}
                                     class:unknown={childNode.unknown}
                                     class:deprecated={childNode.deprecated}
-                                    disabled={!nonConcreteSelectable && !childNode.concrete}
+                                    disabled={calcDisabled(selectionFilter, childNode)}
                                     on:click={() => selectNode(childNode)}>
                                 <span class="no-wrap">
                                     {#if multiSelect}

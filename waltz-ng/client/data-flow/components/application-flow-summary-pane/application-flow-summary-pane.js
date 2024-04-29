@@ -25,15 +25,14 @@ import {categorizeDirection} from "../../../logical-flow/logical-flow-utils";
 import {nest} from "d3-collection";
 
 import template from "./application-flow-summary-pane.html";
-import {tallyBy} from "../../../common/tally-utils";
-import {color} from "d3-color";
-import indexByKeyForType from "../../../enum-value/enum-value-utilities";
 import {entity} from "../../../common/services/enums/entity";
 import {loadFlowClassificationRatings} from "../../../flow-classification-rule/flow-classification-utils";
+import {flowDirection as FlowDirection} from "../../../common/services/enums/flow-direction";
 
 
 const bindings = {
-    parentEntityRef: "<"
+    parentEntityRef: "<",
+    ratingDirection: "<"
 };
 
 
@@ -64,21 +63,24 @@ function enrichDecorators(parentEntityRef, unknownDataTypeId, logicalFlows = [],
 }
 
 
-function calcStats(enrichedDecorators = []) {
+function calcStats(enrichedDecorators = [], ratingDirection = FlowDirection.OUTBOUND.key) {
+
     const byDirectionAndMappingStatus = nest()
         .key(d => d.direction)
         .key(d => d.mappingStatus)
         .object(enrichedDecorators);
 
+    const ratingMapper = d => ratingDirection === FlowDirection.OUTBOUND.key ? d.decorator.rating : d.decorator.targetInboundRating;
+
     const byDirectionAndAuthoritativeness = nest()
         .key(d => d.direction)
-        .key(d => d.decorator.rating)
+        .key(ratingMapper)
         .object(enrichedDecorators);
 
     const chartData = nest()
         .key(d => d.direction)
         .key(d => d.mappingStatus)
-        .key(d => d.decorator.rating)
+        .key(ratingMapper)
         .rollup(xs => xs.length)
         .object(enrichedDecorators);
 
@@ -119,29 +121,23 @@ function controller($q, serviceBroker) {
                     logicalFlows,
                     decorators);
 
-                vm.stats = calcStats(vm.enrichedDecorators);
+                vm.stats = calcStats(vm.enrichedDecorators, vm.ratingDirection);
             });
-
-        const physicalFlowPromise = serviceBroker
-            .loadViewData(
-                CORE_API.PhysicalFlowStore.findByEntityReference,
-                [vm.parentEntityRef])
-            .then(r => r.data);
     };
 
-    const loadUnknownDataType = () => {
+    const loadUnknownDataTypeId = () => {
         return serviceBroker
             .loadAppData(CORE_API.DataTypeStore.findAll)
-            .then(r => findUnknownDataTypeId(r.data));
+            .then(r => console.log(r.data) || findUnknownDataTypeId(r.data));
     };
 
-
-    vm.$onInit = () => {
-        loadUnknownDataType()
-            .then(unknownDataType => reload(unknownDataType.id));
+    vm.$onChanges = () => {
+        loadUnknownDataTypeId()
+            .then(dtId => reload(dtId));
 
         loadFlowClassificationRatings(serviceBroker)
-            .then(xs => vm.flowClassificationCols = xs);
+            .then(xs => vm.flowClassificationCols = console.log({xs, rd: vm.ratingDirection})
+                || _.filter(xs, d => d.direction === vm.ratingDirection));
     }
 }
 
