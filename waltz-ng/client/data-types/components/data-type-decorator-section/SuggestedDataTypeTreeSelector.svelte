@@ -16,7 +16,7 @@
 
     $: {
         if (!_.isEmpty(logicalFlow)){
-            suggestedDataTypesCall = dataTypeStore.findSuggestedByRef(logicalFlow);
+            suggestedDataTypesCall = dataTypeStore.findSuggestedByRef(logicalFlow, true);
         }
     }
 

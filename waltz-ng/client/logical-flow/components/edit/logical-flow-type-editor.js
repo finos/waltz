@@ -19,9 +19,6 @@
 import _ from "lodash";
 import template from "./logical-flow-type-editor.html";
 import {toEntityRefWithKind} from "../../../common/entity-utils";
-import toasts from "../../../svelte-stores/toast-store";
-import {CORE_API} from "../../../common/services/core-api-utils";
-import {loadUsageData} from "../../../data-types/data-type-utils";
 import FlowDataTypeEditor from "./svelte/FlowDataTypeEditor.svelte";
 
 
