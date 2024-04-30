@@ -254,13 +254,13 @@ public class FlowClassificationRuleService {
         EntityHierarchy dtHierarchy = entityHierarchyService.fetchHierarchyForKind(EntityKind.DATA_TYPE);
 
         LOG.debug("Applying rules to population");
-        Map<Long, Tuple2<Long, FlowClassificationRuleUtilities.MatchOutcome>> lfdIdToOutboundRuleIdMap = time("inbound vps", () -> applyVantagePoints(
+        Map<Long, Tuple2<Long, FlowClassificationRuleUtilities.MatchOutcome>> lfdIdToOutboundRuleIdMap = time("outbound vps", () -> applyVantagePoints(
                 FlowDirection.OUTBOUND,
                 outboundRuleVantagePoints,
                 population,
                 ouHierarchy,
                 dtHierarchy));
-        Map<Long, Tuple2<Long, FlowClassificationRuleUtilities.MatchOutcome>> lfdIdToInboundRuleIdMap = time("outbound vps", () -> applyVantagePoints(
+        Map<Long, Tuple2<Long, FlowClassificationRuleUtilities.MatchOutcome>> lfdIdToInboundRuleIdMap = time("inbound vps", () -> applyVantagePoints(
                 FlowDirection.INBOUND,
                 inboundRuleVantagePoints,
                 population,
