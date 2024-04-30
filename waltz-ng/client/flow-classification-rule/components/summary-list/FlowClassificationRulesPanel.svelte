@@ -111,7 +111,7 @@
                 description: selectedRule.description,
                 message: selectedRule.message,
                 classification: selectedRule.classification,
-                severity: selectedRule.severity
+                severity: selectedRule.messageSeverity
             });
         actionMode = ActionModes.EDIT;
     }
@@ -126,7 +126,7 @@
         actionMode = ActionModes.BUSY;
         flowClassificationRuleStore
             .remove(selectedRule.id)
-            .then(() => onSuccess("Removed rule"))
+            .then(() => onSuccess("Removed rule, flow ratings will be refreshed on the next recalculation run"))
             .catch(e => displayError("Failed to remove rule", e));
     }
 
@@ -142,7 +142,7 @@
         actionMode = ActionModes.BUSY;
         flowClassificationRuleStore
             .update(cmd)
-            .then(() => onSuccess("Updated rule"))
+            .then(() => onSuccess("Updated rule, flow ratings will be refreshed on the next recalculation run"))
             .catch(e => displayError("Failed to update rule", e))
     }
 
@@ -160,7 +160,7 @@
         panelMode = PanelModes.BUSY;
         flowClassificationRuleStore
             .create(cmd)
-            .then(() => onSuccess("Created rule"))
+            .then(() => onSuccess("Created rule, flow ratings will be refreshed on the next recalculation run"))
             .catch(e => displayError("Failed to create rule", e))
     }
 
@@ -348,7 +348,7 @@
                                         Remove
                                     </button>
                                     <div class="help-block">
-                                        Remove this flow classification rule. Any associated flows will be recalculated
+                                        Remove this flow classification rule
                                     </div>
                                 </li>
                             </menu>
@@ -359,7 +359,7 @@
                                 <h4>Confirm Removal</h4>
                                 <p class="help-block">
                                     Remove this flow classification rule.
-                                    Any associated flows will be recalculated against the remaining set of rules.
+                                    Flow ratings will be refreshed on the next recalculation run.
                                 </p>
                                 <button class="btn btn-xs btn-warning"
                                         on:click={doRemoval}>

@@ -332,6 +332,8 @@ public class FlowClassificationRuleDao {
     }
 
 
+    /* deprecating as we need to work on improving the speed of on-demand recalcs */
+    @Deprecated
     public int clearRatingsForPointToPointFlows(FlowClassificationRule rule) {
 
         // this may wipe any lower level explicit datatype mappings but these will be restored by the nightly job

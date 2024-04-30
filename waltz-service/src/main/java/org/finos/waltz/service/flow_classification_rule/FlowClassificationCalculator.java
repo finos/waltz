@@ -46,8 +46,9 @@ import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.SetUtilities.fromCollection;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 
-
+/* deprecating as we need to work on improving the speed of on-demand recalcs */
 @Service
+@Deprecated
 public class FlowClassificationCalculator {
 
     private static final Logger LOG = LoggerFactory.getLogger(FlowClassificationCalculator.class);
@@ -76,6 +77,8 @@ public class FlowClassificationCalculator {
     }
 
 
+    /* deprecating as we need to work on improving the speed of on-demand recalcs */
+    @Deprecated
     public int[] update(Long dataTypeId, EntityReference vantageRef) {
         Optional<DataType> dataType = Optional.ofNullable(dataTypeId).map(dataTypeDao::getById);
         return update(dataType, vantageRef);

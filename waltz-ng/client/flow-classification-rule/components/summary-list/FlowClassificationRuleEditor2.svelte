@@ -19,7 +19,7 @@
     function anyMissingProps(props = []) {
         return _.some(
             props,
-            p => console.log({p, d: formData[p], v: _.isNil(formData[p])}) || _.isNil(formData[p]));
+            p => _.isNil(formData[p]));
     }
 
     function doUpdate() {
@@ -75,9 +75,6 @@
             ? anyMissingProps(["description", "subject", "vantagePoint", "classification"])
             : anyMissingProps(["description", "classification"]);
     }
-
-    $: console.log({formData, invalid, isNew})
-
 </script>
 
 {#if !_.isNil(formData)}
@@ -118,6 +115,15 @@
             </div>
             <p class="text-muted">Start typing to select the subject application, actor or end user application</p>
 
+            <label for="scope">Scope {toScopeDirection(formData.classification)}</label>
+            <div id="scope">
+                <EntitySearchSelector on:select={onSelectScope}
+                                      placeholder="Search for scope"
+                                      entityKinds={['ORG_UNIT', 'ACTOR', 'APPLICATION', 'END_USER_APPLICATION']}>
+                </EntitySearchSelector>
+            </div>
+            <p class="text-muted">Start typing to select the selector for which this flow classification rule will apply to. This could be an organisational unit, application, edn user application or actor.</p>
+
             <label for="datatype">Datatype</label>
             <div id="datatype">
                 {#if formData.dataType}
@@ -136,16 +142,6 @@
                     </div>
                 {/if}
             </div>
-
-            <label for="scope">Scope {toScopeDirection(formData.classification)}</label>
-            <div id="scope">
-                <EntitySearchSelector on:select={onSelectScope}
-                                      placeholder="Search for scope"
-                                      entityKinds={['ORG_UNIT', 'ACTOR', 'APPLICATION', 'END_USER_APPLICATION']}>
-                </EntitySearchSelector>
-            </div>
-            <p class="text-muted">Start typing to select the selector for which this flow classification rule will apply to. This could be an organisational unit, application, edn user application or actor.</p>
-
 
         {/if}
 

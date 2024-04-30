@@ -41,6 +41,10 @@
             path: ctx => `change-initiative/${ctx.id}`,
             title: "Change Initiative View"
         },
+        "main.data-type.list" : {
+            path: ctx => `data-types`,
+            title: "DataTypes"
+        },
         "main.data-type.view": {
             path: ctx => `data-types/${ctx.id}`,
             title: "DataType View"

@@ -79,7 +79,7 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
             case ALL:
                 return mkForAll(options);
             case ACTOR:
-                return mkForActor(options);
+                return mkViaFlows(options);
             case APP_GROUP:
                 return mkForAppGroup(options);
             case APPLICATION:
@@ -88,6 +88,8 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
                 return mkForEntityRelationship(options);
             case DATA_TYPE:
                 return mkForDataType(options);
+            case END_USER_APPLICATION:
+                return mkViaFlows(options);
             case FLOW_DIAGRAM:
                 return mkForFlowDiagram(options);
             case LICENCE:
@@ -327,9 +329,10 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
     }
 
 
-    public static Select<Record1<Long>> mkForActor(IdSelectionOptions options) {
+    private static Select<Record1<Long>> mkViaFlows(IdSelectionOptions options) {
         SelectorUtilities.ensureScopeIsExact(options);
-        long actorId = options.entityReference().id();
+        long entityId = options.entityReference().id();
+        EntityKind entityKind = options.entityReference().kind();
 
         Condition applicationConditions = SelectorUtilities.mkApplicationConditions(options);
 
@@ -337,17 +340,17 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
                 .select(logicalFlow.SOURCE_ENTITY_ID)
                 .from(logicalFlow)
                 .innerJoin(APPLICATION).on(APPLICATION.ID.eq(logicalFlow.SOURCE_ENTITY_ID))
-                .where(logicalFlow.TARGET_ENTITY_ID.eq(actorId)
-                        .and(logicalFlow.TARGET_ENTITY_KIND.eq(EntityKind.ACTOR.name()))
+                .where(logicalFlow.TARGET_ENTITY_ID.eq(entityId)
                         .and(logicalFlow.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                        .and(logicalFlow.TARGET_ENTITY_KIND.eq(entityKind.name()))
                         .and(logicalFlow.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name())))
                         .and(applicationConditions);
 
         Select<Record1<Long>> targetAppIds = DSL.select(logicalFlow.TARGET_ENTITY_ID)
                 .from(logicalFlow)
                 .innerJoin(APPLICATION).on(APPLICATION.ID.eq(logicalFlow.TARGET_ENTITY_ID))
-                .where(logicalFlow.SOURCE_ENTITY_ID.eq(actorId)
-                        .and(logicalFlow.SOURCE_ENTITY_KIND.eq(EntityKind.ACTOR.name()))
+                .where(logicalFlow.SOURCE_ENTITY_ID.eq(entityId)
+                        .and(logicalFlow.SOURCE_ENTITY_KIND.eq(entityKind.name()))
                         .and(logicalFlow.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                         .and(logicalFlow.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name())))
                         .and(applicationConditions);
