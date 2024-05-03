@@ -5,7 +5,8 @@
     import _ from "lodash";
     import DescriptionFade from "./DescriptionFade.svelte";
     import NoData from "./NoData.svelte";
-    import {severity} from "../services/enums/severity";
+    import {messageSeverity} from "../services/enums/message-severity";
+    import Markdown from "./Markdown.svelte";
 
     export let name;
     export let description;
@@ -14,19 +15,19 @@
     export let usageCharacteristics;
     export let isEditMode = false;
 
-    $: inboundMessage = ratingCharacteristics.inboundMessage
-        || ratingCharacteristics.targetInboundClassification.defaultMessage
+    $: inboundMessage = ratingCharacteristics?.inboundMessage
+        || ratingCharacteristics?.targetInboundClassification.defaultMessage
 
-    $: outboundMessage = ratingCharacteristics.outboundMessage
-        || ratingCharacteristics.sourceOutboundClassification.defaultMessage
+    $: outboundMessage = ratingCharacteristics?.outboundMessage
+        || ratingCharacteristics?.sourceOutboundClassification.defaultMessage
 
-    $: inboundSeverity = ratingCharacteristics.inboundMessage
-        ? ratingCharacteristics.inboundMessageSeverity
-        : ratingCharacteristics.targetInboundClassification.messageSeverity;
+    $: inboundSeverity = ratingCharacteristics?.inboundMessage
+        ? ratingCharacteristics?.inboundMessageSeverity
+        : ratingCharacteristics?.targetInboundClassification.messageSeverity;
 
-    $: outboundSeverity = ratingCharacteristics.outboundMessage
-        ? ratingCharacteristics.outboundMessageSeverity
-        : ratingCharacteristics.sourceOutboundClassification.messageSeverity
+    $: outboundSeverity = ratingCharacteristics?.outboundMessage
+        ? ratingCharacteristics?.outboundMessageSeverity
+        : ratingCharacteristics?.sourceOutboundClassification.messageSeverity
 
 </script>
 
@@ -52,14 +53,14 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-12 help-block small">
+        <div class="col-sm-12 help-block">
             This indicates the rating of the flow according whether this source entity is authorised to distribute this data type
         </div>
     </div>
     {#if !_.isEmpty(outboundMessage)}
         <div class="row">
             <div class="col-sm-12">
-                <NoData type={_.lowerCase(_.get(severity, [outboundSeverity, "name"], "info"))}>{outboundMessage}</NoData>
+                <NoData type={_.lowerCase(_.get(messageSeverity, [outboundSeverity, "name"], "info"))}>{outboundMessage}</NoData>
             </div>
         </div>
     {/if}
@@ -70,14 +71,16 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-12 help-block small">
-            This rating expresses whether the target entity has a preference for or against this type of data being sent to it
+        <div class="col-sm-12 help-block">
+            This rating expresses whether the target entity has a preference for or against this type of data being documented against it
         </div>
     </div>
     {#if !_.isEmpty(inboundMessage)}
         <div class="row">
             <div class="col-sm-12">
-                <NoData type={_.lowerCase(_.get(severity, [inboundSeverity, "name"], "info"))}>{inboundMessage}</NoData>
+                <NoData type={_.lowerCase(_.get(messageSeverity, [inboundSeverity, "name"], "info"))}>
+                    <Markdown text={inboundMessage}/>
+                </NoData>
             </div>
         </div>
     {/if}

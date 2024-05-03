@@ -28,6 +28,8 @@ import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.data.data_type.DataTypeDao;
 import org.finos.waltz.data.data_type.DataTypeIdSelectorFactory;
 import org.finos.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
+import org.finos.waltz.data.end_user_app.EndUserAppDao;
+import org.finos.waltz.data.end_user_app.EndUserAppIdSelectorFactory;
 import org.finos.waltz.data.flow_classification_rule.FlowClassificationDao;
 import org.finos.waltz.data.flow_classification_rule.FlowClassificationRuleDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
@@ -70,10 +72,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -83,7 +85,6 @@ import static org.finos.waltz.common.FunctionUtilities.time;
 import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.model.DiffResult.mkDiff;
-import static org.finos.waltz.model.EntityKind.ACTOR;
 import static org.finos.waltz.model.EntityKind.ORG_UNIT;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.rating._AuthoritativenessRatingValue.DISCOURAGED;
@@ -102,6 +103,7 @@ public class FlowClassificationRuleService {
     private final ApplicationDao applicationDao;
     private final ChangeLogService changeLogService;
     private final DataTypeDao dataTypeDao;
+    private final EndUserAppDao endUserAppDao;
     private final EntityHierarchyService entityHierarchyService;
     private final FlowClassificationCalculator ratingCalculator;
     private final FlowClassificationDao flowClassificationDao;
@@ -112,6 +114,7 @@ public class FlowClassificationRuleService {
     private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory = new LogicalFlowIdSelectorFactory();
     private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory = new DataTypeIdSelectorFactory();
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
+    private final EndUserAppIdSelectorFactory endUserAppIdSelectorFactory = new EndUserAppIdSelectorFactory();
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
 
 
@@ -125,7 +128,8 @@ public class FlowClassificationRuleService {
                                          FlowClassificationCalculator ratingCalculator,
                                          ChangeLogService changeLogService,
                                          EntityHierarchyService entityHierarchyService,
-                                         LogicalFlowDecoratorDao logicalFlowDecoratorDao) {
+                                         LogicalFlowDecoratorDao logicalFlowDecoratorDao,
+                                         EndUserAppDao endUserAppDao) {
         checkNotNull(flowClassificationRuleDao, "flowClassificationRuleDao must not be null");
         checkNotNull(flowClassificationDao, "flowClassificationDao must not be null");
         checkNotNull(actorDao, "actorDao must not be null");
@@ -136,6 +140,7 @@ public class FlowClassificationRuleService {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(logicalFlowDecoratorDao, "logicalFlowDecoratorDao cannot be null");
         checkNotNull(entityHierarchyService, "entityHierarchyService cannot be null");
+        checkNotNull(endUserAppDao, "endUserAppDao cannot be null");
 
         this.actorDao = actorDao;
         this.applicationDao = applicationDao;
@@ -147,6 +152,7 @@ public class FlowClassificationRuleService {
         this.logicalFlowDecoratorDao = logicalFlowDecoratorDao;
         this.organisationalUnitDao = organisationalUnitDao;
         this.ratingCalculator = ratingCalculator;
+        this.endUserAppDao = endUserAppDao;
     }
 
 
@@ -171,26 +177,21 @@ public class FlowClassificationRuleService {
 
 
     public int update(FlowClassificationRuleUpdateCommand command, String username) {
+        command.id().orElseThrow(() -> new IllegalArgumentException("cannot update an flow classification rule without an id"));
         int updateCount = flowClassificationRuleDao.update(command);
-        long ruleId = command
-                .id()
-                .orElseThrow(() -> new IllegalArgumentException("cannot update an flow classification rule without an id"));
-        FlowClassificationRule updatedClassificationRule = getById(ruleId);
-        ratingCalculator.update(updatedClassificationRule.dataTypeId(), updatedClassificationRule.vantagePointReference());
         logUpdate(command, username);
+
+        // TODO: need to recalc on demand (old call: FlowClassificationCalculator::update )
+
         return updateCount;
     }
 
 
     public long insert(FlowClassificationRuleCreateCommand command, String username) {
         long classificationRuleId = flowClassificationRuleDao.insert(command, username);
-
-        if (command.parentReference().kind() == ORG_UNIT) {
-            ratingCalculator.update(command.dataTypeId(), command.parentReference());
-        }
-
         logInsert(classificationRuleId, command, username);
-        flowClassificationRuleDao.updatePointToPointFlowClassificationRules(FlowDirection.OUTBOUND);
+
+        // TODO: need to recalc on demand (old call: FlowClassificationCalculator::update )
 
         return classificationRuleId;
     }
@@ -206,19 +207,11 @@ public class FlowClassificationRuleService {
 
         logRemoval(id, username);
 
-        int deletedCount = flowClassificationRuleDao.remove(id);
+        return flowClassificationRuleDao.remove(id);
 
-        //set any point-to-point overrides as no opinion first then recalculate for all rules
-        LOG.debug("Updating point-point ratings");
-        flowClassificationRuleDao.clearRatingsForPointToPointFlows(classificationRuleToDelete);
-
-        LOG.debug("Updated point-point");
-        if (classificationRuleToDelete.vantagePointReference().kind() != ACTOR) {
-            LOG.debug("Updating org unit /app flow ratings");
-            ratingCalculator.update(classificationRuleToDelete.dataTypeId(), classificationRuleToDelete.vantagePointReference());
-        }
-
-        return deletedCount;
+        // TODO: need to recalc on demand (old calls:
+        //      FlowClassificationCalculator::update,
+        //      FlowClassificationRuleDao::clearRatingsForPointToPointFlows )
     }
 
 
@@ -226,10 +219,11 @@ public class FlowClassificationRuleService {
         return flowClassificationRuleDao.findAll();
     }
 
+    /* Recalculates all flow ratings for a selector */
     public int recalculateFlowRatingsForSelector(IdSelectionOptions options) {
         Select<Record1<Long>> flowSelector = logicalFlowIdSelectorFactory.apply(options);
-        Set<FlowDataType> population = FunctionUtilities.time("find population",  ()-> logicalFlowDecoratorDao.fetchFlowDataTypePopulationForFlowSelector(flowSelector));
-        return FunctionUtilities.time("do recalculate",  ()-> recalculateRatingsForPopulation(population));
+        Set<FlowDataType> population = FunctionUtilities.time("find population",  () -> logicalFlowDecoratorDao.fetchFlowDataTypePopulationForFlowSelector(flowSelector));
+        return FunctionUtilities.time("do recalculate",  () -> recalculateRatingsForPopulation(population));
     }
 
     public int fastRecalculateAllFlowRatings() {
@@ -260,13 +254,13 @@ public class FlowClassificationRuleService {
         EntityHierarchy dtHierarchy = entityHierarchyService.fetchHierarchyForKind(EntityKind.DATA_TYPE);
 
         LOG.debug("Applying rules to population");
-        Map<Long, Tuple2<Long, FlowClassificationRuleUtilities.MatchOutcome>> lfdIdToOutboundRuleIdMap = time("inbound vps", () -> applyVantagePoints(
+        Map<Long, Tuple2<Long, FlowClassificationRuleUtilities.MatchOutcome>> lfdIdToOutboundRuleIdMap = time("outbound vps", () -> applyVantagePoints(
                 FlowDirection.OUTBOUND,
                 outboundRuleVantagePoints,
                 population,
                 ouHierarchy,
                 dtHierarchy));
-        Map<Long, Tuple2<Long, FlowClassificationRuleUtilities.MatchOutcome>> lfdIdToInboundRuleIdMap = time("outbound vps", () -> applyVantagePoints(
+        Map<Long, Tuple2<Long, FlowClassificationRuleUtilities.MatchOutcome>> lfdIdToInboundRuleIdMap = time("inbound vps", () -> applyVantagePoints(
                 FlowDirection.INBOUND,
                 inboundRuleVantagePoints,
                 population,
@@ -409,30 +403,37 @@ public class FlowClassificationRuleService {
 
         Condition customSelectionCriteria;
 
+        Condition matchesAppKinds = FlowClassificationRuleDao.SUBJECT_APP.ID.isNull()
+                .or(FlowClassificationRuleDao.SUBJECT_APP.KIND.notIn(options.filters().omitApplicationKinds()));
+
         switch(options.entityReference().kind()) {
             case ORG_UNIT:
                 GenericSelector orgUnitSelector = genericSelectorFactory.apply(options);
-                customSelectionCriteria = Tables.FLOW_CLASSIFICATION_RULE.PARENT_ID.in(orgUnitSelector.selector())
-                        .and(FlowClassificationRuleDao.SUPPLIER_APP.KIND.notIn(options.filters().omitApplicationKinds()));
+                customSelectionCriteria = Tables.ORGANISATIONAL_UNIT.ID.in(orgUnitSelector.selector())
+                        .and(matchesAppKinds);
                 break;
             case DATA_TYPE:
                 GenericSelector dataTypeSelector = genericSelectorFactory.apply(options);
                 customSelectionCriteria = Tables.FLOW_CLASSIFICATION_RULE.DATA_TYPE_ID.in(dataTypeSelector.selector())
-                        .and(FlowClassificationRuleDao.SUPPLIER_APP.KIND.notIn(options.filters().omitApplicationKinds()));
+                        .and(matchesAppKinds);
                 break;
             case APPLICATION:
             case ACTOR:
             case END_USER_APPLICATION:
                 customSelectionCriteria = Tables.FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_KIND.eq(options.entityReference().kind().name())
                         .and(Tables.FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID.eq(options.entityReference().id()))
-                        .and(FlowClassificationRuleDao.SUPPLIER_APP.KIND.notIn(options.filters().omitApplicationKinds()));
+                        .and(matchesAppKinds);
                 break;
             case ALL:
+                customSelectionCriteria = DSL.trueCondition();
+                break;
             case APP_GROUP:
             case FLOW_DIAGRAM:
             case MEASURABLE:
+                customSelectionCriteria = mkAppSubjectSelectionCondition(options);
+                break;
             case PERSON:
-                customSelectionCriteria = mkConsumerSelectionCondition(options);
+                customSelectionCriteria = mkAppSubjectSelectionCondition(options).or(mkEudaSubjectSelectionCondition(options));
                 break;
             default:
                 throw new UnsupportedOperationException("Cannot calculate flow classification rules for ref" + options.entityReference());
@@ -450,6 +451,17 @@ public class FlowClassificationRuleService {
         return FlowClassificationRuleDao.CONSUMER_APP.ID.in(appIdSelector);
     }
 
+    private Condition mkAppSubjectSelectionCondition(IdSelectionOptions options) {
+        Select<Record1<Long>> appIdSelector = applicationIdSelectorFactory.apply(options);
+        return FlowClassificationRuleDao.SUBJECT_APP.ID.in(appIdSelector);
+    }
+
+
+    private Condition mkEudaSubjectSelectionCondition(IdSelectionOptions options) {
+        Select<Record1<Long>> eudaIdSelector = endUserAppIdSelectorFactory.apply(options);
+        return FlowClassificationRuleDao.SUBJECT_EUDA.ID.in(eudaIdSelector);
+    }
+
 
     private void logRemoval(long id, String username) {
         FlowClassificationRule rule = getById(id);
@@ -459,18 +471,17 @@ public class FlowClassificationRuleService {
         }
 
         String parentName = getParentEntityName(rule.vantagePointReference());
-        DataType dataType = dataTypeDao.getById(rule.dataTypeId());
+        Optional<DataType> dataType = Optional.ofNullable(rule.dataTypeId()).map(dataTypeDao::getById);
         EntityReference subjectRef = enrichSubjectRef(rule.subjectReference());
 
 
-        if (subjectRef != null && dataType != null && parentName != null) {
+        if (subjectRef != null && parentName != null) {
             String msg = format(
-                    "Removed the flow classification rule where %s [%s/%d] is a source for type: %s [%d] for %s: %s",
+                    "Removed the flow classification rule where %s [%s/%d] is a source for type: %s for %s: %s",
                     subjectRef.name(),
                     subjectRef.kind().name(),
                     subjectRef.id(),
-                    dataType.name(),
-                    dataType.id().get(),
+                    dataType.map(dt -> format("%s [%d]", dt.name(), dt.id().get())).orElse("All"),
                     rule.vantagePointReference().kind().prettyName(),
                     parentName);
 
@@ -488,17 +499,16 @@ public class FlowClassificationRuleService {
     private void logInsert(Long ruleId, FlowClassificationRuleCreateCommand command, String username) {
 
         String parentName = getParentEntityName(command.parentReference());
-        DataType dataType = dataTypeDao.getById(command.dataTypeId());
+        Optional<DataType> dataType = Optional.ofNullable(command.dataTypeId()).map(dataTypeDao::getById);
         EntityReference subjectRef = enrichSubjectRef(command.subjectReference());
 
-        if (subjectRef != null && dataType != null && parentName != null) {
+        if (subjectRef != null && parentName != null) {
             String msg = format(
-                    "Registered the flow classification rule with %s [%s/%d] as the source for type: %s [%d] for %s: %s",
+                    "Registered the flow classification rule with %s [%s/%d] as the source for type: %s for %s: %s",
                     subjectRef.name(),
                     subjectRef.kind().name(),
                     subjectRef.id(),
-                    dataType.name(),
-                    dataType.id().get(),
+                    dataType.map(dt -> format("%s [%d]", dt.name(), dt.id().get())).orElse("All"),
                     command.parentReference().kind().prettyName(),
                     parentName);
 
@@ -522,6 +532,8 @@ public class FlowClassificationRuleService {
                 return applicationDao.getById(entityReference.id()).name();
             case ACTOR:
                 return actorDao.getById(entityReference.id()).name();
+            case END_USER_APPLICATION:
+                return endUserAppDao.getById(entityReference.id()).name();
             default:
                 throw new IllegalArgumentException(format("Cannot find name for entity kind: %s", entityReference.kind()));
         }
@@ -536,21 +548,20 @@ public class FlowClassificationRuleService {
         }
 
         String parentName = getParentEntityName(rule.vantagePointReference());
-        DataType dataType = dataTypeDao.getById(rule.dataTypeId());
+        Optional<DataType> dataType = Optional.ofNullable(rule.dataTypeId()).map(dtId -> dataTypeDao.getById(dtId));
         EntityReference subjectRef = enrichSubjectRef(rule.subjectReference());
 
         FlowClassification classification = flowClassificationDao.getById(command.classificationId());
 
-        if (subjectRef != null && dataType != null && parentName != null) {
+        if (subjectRef != null && parentName != null) {
 
             String msg = format(
-                    "Updated flow classification rule: %s [%s/%d] as the source, with rating: %s, for type: %s[%d], for %s: %s",
+                    "Updated flow classification rule: %s [%s/%d] as the source, with rating: %s, for type: %s, for %s: %s",
                     subjectRef.name(),
                     subjectRef.kind().name(),
                     subjectRef.id(),
                     classification.name(),
-                    dataType.name(),
-                    dataType.id().get(),
+                    dataType.map(dt -> format("%s [%d]", dt.name(), dt.id().get())).orElse("All"),
                     rule.vantagePointReference().kind().prettyName(),
                     parentName);
 
@@ -576,13 +587,13 @@ public class FlowClassificationRuleService {
     }
 
 
-    private void multiLog(String username,
-                          Long classificationRuleId,
-                          EntityReference parentRef,
-                          DataType dataType,
-                          EntityReference subjectRef,
-                          String msg,
-                          Operation operation) {
+    public void multiLog(String username,
+                         Long classificationRuleId,
+                         EntityReference parentRef,
+                         Optional<DataType> dataType,
+                         EntityReference subjectRef,
+                         String msg,
+                         Operation operation) {
 
         ChangeLog parentLog = ImmutableChangeLog.builder()
                 .message(msg)
@@ -598,18 +609,20 @@ public class FlowClassificationRuleService {
                 .copyOf(parentLog)
                 .withParentReference(subjectRef);
 
-        ChangeLog dtLog = ImmutableChangeLog
-                .copyOf(parentLog)
-                .withParentReference(dataType.entityReference());
-
         ChangeLog authLog = ImmutableChangeLog
                 .copyOf(parentLog)
                 .withParentReference(mkRef(EntityKind.FLOW_CLASSIFICATION_RULE, classificationRuleId));
 
         changeLogService.write(parentLog);
         changeLogService.write(subjectLog);
-        changeLogService.write(dtLog);
         changeLogService.write(authLog);
+
+        dataType.ifPresent(dt -> {
+            ChangeLog dtLog = ImmutableChangeLog
+                    .copyOf(parentLog)
+                    .withParentReference(dt.entityReference());
+            changeLogService.write(dtLog);
+        });
     }
 
 

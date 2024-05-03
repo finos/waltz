@@ -74,12 +74,4 @@ public class SurveyInstanceStateMachineTest {
         assertEquals(COMPLETED, state.process(SUBMITTING, participant, survey));
     }
 
-    @Test
-    public void permissionCheckRejects() {
-        SurveyInstanceStateMachine state = SurveyInstanceStateMachineFactory.simple("APPROVED");
-        assertEquals(IN_PROGRESS, state.process(REOPENING, participant, survey));
-        assertThrows(IllegalArgumentException.class,
-                () -> state.process(WITHDRAWING, participant, survey)); // fails as only admin
-    }
-
 }

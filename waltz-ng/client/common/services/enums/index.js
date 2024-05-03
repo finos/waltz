@@ -39,6 +39,7 @@ import { investmentRating } from "./investment-rating";
 import { issuance } from "./issuance";
 import { lifecyclePhase } from "./lifecycle-phase";
 import { lifecycleStatus } from "./lifecycle-status";
+import { messageSeverity } from "./message-severity";
 import { usageKind } from "./usage-kind";
 import { orgUnitKind } from "./org-unit-kind";
 import { participantKind } from "./participation-kind";
@@ -74,6 +75,7 @@ export const enums = {
     lifecyclePhase,
     orgUnitKind,
     severity,
+    messageSeverity,
     entity,
     changeInitiative,
     entityStatistic,

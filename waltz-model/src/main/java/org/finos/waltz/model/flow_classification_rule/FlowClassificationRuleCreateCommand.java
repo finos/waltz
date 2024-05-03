@@ -23,6 +23,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.DescriptionProvider;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.MessageSeverity;
+import org.finos.waltz.model.Nullable;
 import org.finos.waltz.model.command.Command;
 import org.immutables.value.Value;
 
@@ -31,9 +33,17 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutableFlowClassificationRuleCreateCommand.class)
 public abstract class FlowClassificationRuleCreateCommand implements Command, DescriptionProvider {
     public abstract long classificationId();
-    public abstract long dataTypeId();
+
+    @Nullable
+    public abstract Long dataTypeId();
 
     public abstract EntityReference subjectReference();
 
     public abstract EntityReference parentReference();
+
+    @Nullable
+    public abstract MessageSeverity severity();
+
+    @Nullable
+    public abstract String message();
 }

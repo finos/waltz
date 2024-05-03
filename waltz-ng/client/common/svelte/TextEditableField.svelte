@@ -54,7 +54,8 @@
                 </button>
             {/if}
         {/if}
-        <div id="text">
+        <div id="text"
+             class:waltz-scroll-region-350={_.size(text) > 1000}>
             <Markdown {text}/>
         </div>
         {#if mandatory}

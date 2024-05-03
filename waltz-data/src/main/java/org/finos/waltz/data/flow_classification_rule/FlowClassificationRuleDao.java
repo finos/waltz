@@ -23,7 +23,7 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.FlowDirection;
 import org.finos.waltz.model.ImmutableEntityReference;
-import org.finos.waltz.model.Severity;
+import org.finos.waltz.model.MessageSeverity;
 import org.finos.waltz.model.flow_classification_rule.DiscouragedSource;
 import org.finos.waltz.model.flow_classification_rule.FlowClassificationRule;
 import org.finos.waltz.model.flow_classification_rule.FlowClassificationRuleCreateCommand;
@@ -34,7 +34,6 @@ import org.finos.waltz.model.flow_classification_rule.ImmutableFlowClassificatio
 import org.finos.waltz.model.flow_classification_rule.ImmutableFlowClassificationRuleVantagePoint;
 import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
 import org.finos.waltz.schema.tables.Application;
-import org.finos.waltz.schema.tables.DataType;
 import org.finos.waltz.schema.tables.EntityHierarchy;
 import org.finos.waltz.schema.tables.records.FlowClassificationRuleRecord;
 import org.finos.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
@@ -42,6 +41,7 @@ import org.jooq.AggregateFunction;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
+import org.jooq.InsertSetMoreStep;
 import org.jooq.Record;
 import org.jooq.Record1;
 import org.jooq.Record11;
@@ -93,6 +93,8 @@ public class FlowClassificationRuleDao {
 
     public final static Application CONSUMER_APP = APPLICATION.as("consumer");
     public final static Application SUPPLIER_APP = APPLICATION.as("supplier");
+    public final static Application SUBJECT_APP = APPLICATION.as("subject_app");
+    public final static Application SUBJECT_EUDA = APPLICATION.as("subject_euda");
     public static final org.finos.waltz.schema.tables.DataType parent_dt = org.finos.waltz.schema.tables.DataType.DATA_TYPE.as("parent_dt");
     public static final org.finos.waltz.schema.tables.DataType child_dt = org.finos.waltz.schema.tables.DataType.DATA_TYPE.as("child_dt");
     public static final EntityHierarchy eh = ENTITY_HIERARCHY.as("eh");
@@ -108,12 +110,12 @@ public class FlowClassificationRuleDao {
     private static final Field<String> PARENT_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             FLOW_CLASSIFICATION_RULE.PARENT_ID,
             FLOW_CLASSIFICATION_RULE.PARENT_KIND,
-            newArrayList(EntityKind.ORG_UNIT, EntityKind.APPLICATION, EntityKind.ACTOR));
+            newArrayList(EntityKind.ORG_UNIT, EntityKind.APPLICATION, EntityKind.ACTOR, EntityKind.END_USER_APPLICATION));
 
     private static final Field<String> SUBJECT_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID,
             FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_KIND,
-            newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
+            newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR, EntityKind.END_USER_APPLICATION));
 
     private static final Condition flowNotRemoved = LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name())
             .and(LOGICAL_FLOW.IS_REMOVED.isFalse());
@@ -160,7 +162,7 @@ public class FlowClassificationRuleDao {
                 .externalId(Optional.ofNullable(record.getExternalId()))
                 .isReadonly(record.getIsReadonly())
                 .message(record.getMessage())
-                .messageSeverity(Severity.valueOf(record.getMessageSeverity()))
+                .messageSeverity(MessageSeverity.valueOf(record.getMessageSeverity()))
                 .build();
     };
 
@@ -176,7 +178,7 @@ public class FlowClassificationRuleDao {
                 .dataTypeRank(r.get(dataTypeLevel))
                 .ruleId(r.get(FLOW_CLASSIFICATION_RULE.ID))
                 .message(r.get(FLOW_CLASSIFICATION_RULE.MESSAGE))
-                .messageSeverity(Severity.valueOf(r.get(FLOW_CLASSIFICATION_RULE.MESSAGE_SEVERITY)))
+                .messageSeverity(MessageSeverity.valueOf(r.get(FLOW_CLASSIFICATION_RULE.MESSAGE_SEVERITY)))
                 .build();
     };
 
@@ -240,6 +242,11 @@ public class FlowClassificationRuleDao {
                 .set(FLOW_CLASSIFICATION_RULE.FLOW_CLASSIFICATION_ID, command.classificationId())
                 .set(FLOW_CLASSIFICATION_RULE.DESCRIPTION, command.description());
 
+        if (command.severity() != null) {
+            upd.set(FLOW_CLASSIFICATION_RULE.MESSAGE_SEVERITY, command.severity().name());
+            upd.set(FLOW_CLASSIFICATION_RULE.MESSAGE, command.message());
+        }
+
         return upd
                 .where(FLOW_CLASSIFICATION_RULE.ID.eq(command.id().get()))
                 .execute();
@@ -249,7 +256,7 @@ public class FlowClassificationRuleDao {
     public long insert(FlowClassificationRuleCreateCommand command, String username) {
         checkNotNull(command, "command cannot be null");
 
-        return dsl
+        InsertSetMoreStep<FlowClassificationRuleRecord> stmt = dsl
                 .insertInto(FLOW_CLASSIFICATION_RULE)
                 .set(FLOW_CLASSIFICATION_RULE.PARENT_KIND, command.parentReference().kind().name())
                 .set(FLOW_CLASSIFICATION_RULE.PARENT_ID, command.parentReference().id())
@@ -260,7 +267,14 @@ public class FlowClassificationRuleDao {
                 .set(FLOW_CLASSIFICATION_RULE.DESCRIPTION, command.description())
                 .set(FLOW_CLASSIFICATION_RULE.PROVENANCE, "waltz")
                 .set(FLOW_CLASSIFICATION_RULE.LAST_UPDATED_AT, nowUtcTimestamp())
-                .set(FLOW_CLASSIFICATION_RULE.LAST_UPDATED_BY, username)
+                .set(FLOW_CLASSIFICATION_RULE.LAST_UPDATED_BY, username);
+
+        if (command.severity() != null) {
+            stmt.set(FLOW_CLASSIFICATION_RULE.MESSAGE_SEVERITY, command.severity().name());
+            stmt.set(FLOW_CLASSIFICATION_RULE.MESSAGE, command.message());
+        }
+
+        return stmt
                 .returning(FLOW_CLASSIFICATION_RULE.ID)
                 .fetchOne()
                 .getId();
@@ -318,6 +332,8 @@ public class FlowClassificationRuleDao {
     }
 
 
+    /* deprecating as we need to work on improving the speed of on-demand recalcs */
+    @Deprecated
     public int clearRatingsForPointToPointFlows(FlowClassificationRule rule) {
 
         // this may wipe any lower level explicit datatype mappings but these will be restored by the nightly job
@@ -526,22 +542,10 @@ public class FlowClassificationRuleDao {
 
     public Set<FlowClassificationRule> findClassificationRules(Condition customSelectionCriteria) {
 
-        SelectConditionStep<Record1<Long>> ruleSelectorBasedOnCustomSelectionForTargetApps = DSL
-                .select(FLOW_CLASSIFICATION_RULE.ID)
-                .from(FLOW_CLASSIFICATION_RULE)
-                .innerJoin(LOGICAL_FLOW)
-                .on(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID)
-                        .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_KIND))
-                        .and(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name())
-                                .and(LOGICAL_FLOW.IS_REMOVED.isFalse())))
-                .innerJoin(CONSUMER_APP).on(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(CONSUMER_APP.ID)
-                        .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
+        SelectConditionStep<Record> qry = baseSelect()
                 .where(customSelectionCriteria);
 
-        Condition criteria = FLOW_CLASSIFICATION_RULE.ID.in(ruleSelectorBasedOnCustomSelectionForTargetApps);
-
-        return baseSelect()
-                .where(criteria)
+        return qry
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
 
@@ -554,13 +558,16 @@ public class FlowClassificationRuleDao {
                 .select(SUBJECT_NAME_FIELD)
                 .select(ORGANISATIONAL_UNIT.ID, ORGANISATIONAL_UNIT.NAME)
                 .select(FLOW_CLASSIFICATION_RULE.fields())
-                .select(SUPPLIER_APP.NAME, SUPPLIER_APP.ID)
                 .from(FLOW_CLASSIFICATION_RULE)
-                .leftJoin(SUPPLIER_APP)
-                .on(SUPPLIER_APP.ID.eq(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID)
+                .leftJoin(SUBJECT_APP)
+                .on(SUBJECT_APP.ID.eq(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID)
                         .and(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
+                .leftJoin(SUBJECT_EUDA)
+                .on(SUBJECT_EUDA.ID.eq(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_ID)
+                        .and(FLOW_CLASSIFICATION_RULE.SUBJECT_ENTITY_KIND.eq(EntityKind.END_USER_APPLICATION.name())))
                 .leftJoin(ORGANISATIONAL_UNIT)
-                .on(ORGANISATIONAL_UNIT.ID.eq(SUPPLIER_APP.ORGANISATIONAL_UNIT_ID));
+                .on(ORGANISATIONAL_UNIT.ID.eq(SUBJECT_APP.ORGANISATIONAL_UNIT_ID)
+                        .or(ORGANISATIONAL_UNIT.ID.eq(SUBJECT_EUDA.ORGANISATIONAL_UNIT_ID)));
     }
 
 

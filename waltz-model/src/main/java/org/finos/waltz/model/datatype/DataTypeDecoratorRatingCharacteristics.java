@@ -21,8 +21,8 @@ package org.finos.waltz.model.datatype;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.MessageSeverity;
 import org.finos.waltz.model.Nullable;
-import org.finos.waltz.model.Severity;
 import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
 import org.immutables.value.Value;
 
@@ -53,16 +53,16 @@ public abstract class DataTypeDecoratorRatingCharacteristics {
         public abstract String outboundMessage();
 
         @Value.Default
-        public Severity outboundMessageSeverity() {
-                return Severity.INFORMATION;
+        public MessageSeverity outboundMessageSeverity() {
+                return MessageSeverity.INFORMATION;
         }
 
         @Nullable
         public abstract String inboundMessage();
 
         @Value.Default
-        public Severity inboundMessageSeverity() {
-                return Severity.INFORMATION;
+        public MessageSeverity inboundMessageSeverity() {
+                return MessageSeverity.INFORMATION;
         }
 
 }

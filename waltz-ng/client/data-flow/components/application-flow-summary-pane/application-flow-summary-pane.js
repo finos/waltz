@@ -128,7 +128,7 @@ function controller($q, serviceBroker) {
     const loadUnknownDataTypeId = () => {
         return serviceBroker
             .loadAppData(CORE_API.DataTypeStore.findAll)
-            .then(r => console.log(r.data) || findUnknownDataTypeId(r.data));
+            .then(r => findUnknownDataTypeId(r.data));
     };
 
     vm.$onChanges = () => {
@@ -136,8 +136,7 @@ function controller($q, serviceBroker) {
             .then(dtId => reload(dtId));
 
         loadFlowClassificationRatings(serviceBroker)
-            .then(xs => vm.flowClassificationCols = console.log({xs, rd: vm.ratingDirection})
-                || _.filter(xs, d => d.direction === vm.ratingDirection));
+            .then(xs => vm.flowClassificationCols = _.filter(xs, d => d.direction === vm.ratingDirection));
     }
 }
 

@@ -47,18 +47,20 @@ const initialState = {
 };
 
 
-function controller() {
+function controller($scope, $timeout) {
     const vm = this;
 
     vm.$onInit = () => initialiseData(vm, initialState);
 
-    vm.$onChanges = (c) => {
-
-    };
+    vm.onSelectItem = (item) => {
+        $timeout(() => {
+            vm.onSelect(item);
+        }, 100);
+    }
 }
 
 
-controller.$inject = [];
+controller.$inject = ["$scope", "$timeout"];
 
 
 const component = {

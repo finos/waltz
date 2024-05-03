@@ -4,6 +4,7 @@ import {applicationKind} from "./services/enums/application-kind";
 import {lifecyclePhase} from "./services/enums/lifecycle-phase";
 import _ from "lodash";
 import {toLocalDate} from "./date-utils";
+import EntityLabel from "./svelte/EntityLabel.svelte";
 
 
 export function mkSortFn(sortCol, sortAsc = true) {
@@ -28,6 +29,26 @@ export function mkEntityLinkFormatter(valueProvider, showIcon = true) {
 
         component.$set({ref, showIcon});
         return me;
+    }
+}
+
+
+export function mkEntityLabelFormatter(valueProvider, showIcon = true, nullText = '') {
+    return (row, cell, value, colDef, dataCtx) => {
+
+        const ref = valueProvider
+            ? valueProvider(value, dataCtx)
+            : value;
+
+        if (_.isNil(ref)) {
+            return nullText;
+        } else {
+            const me = document.createElement("span");
+            const component = new EntityLabel({target: me});
+
+            component.$set({ref, showIcon});
+            return me;
+        }
     }
 }
 

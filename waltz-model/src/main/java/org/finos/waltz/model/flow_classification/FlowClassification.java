@@ -26,12 +26,12 @@ public abstract class FlowClassification implements IdProvider, NameProvider, De
     public abstract String defaultMessage();
 
     @Value.Default
-    public Severity messageSeverity() {
-        return Severity.INFORMATION;
+    public MessageSeverity messageSeverity() {
+        return MessageSeverity.INFORMATION;
     }
     @Value.Default
     public EntityKind kind() {
-        return EntityKind.FLOW_CLASSIFICATION_RULE;
+        return EntityKind.FLOW_CLASSIFICATION;
     }
 
 }

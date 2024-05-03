@@ -106,7 +106,7 @@ const flowClassificationRuleCreateCommand = {
     description: apiCheck.string.optional,
     classificationId: apiCheck.number,
     subjectReference: apiCheck.shape(entityRefShape),
-    dataTypeId: apiCheck.number,
+    dataTypeId: apiCheck.number.optional,
     parentReference: apiCheck.shape(entityRefShape)
 };
 

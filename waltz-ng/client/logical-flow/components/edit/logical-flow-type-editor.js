@@ -19,15 +19,11 @@
 import _ from "lodash";
 import template from "./logical-flow-type-editor.html";
 import {toEntityRefWithKind} from "../../../common/entity-utils";
-import toasts from "../../../svelte-stores/toast-store";
-import {CORE_API} from "../../../common/services/core-api-utils";
-import {loadUsageData} from "../../../data-types/data-type-utils";
 import FlowDataTypeEditor from "./svelte/FlowDataTypeEditor.svelte";
 
 
 const bindings = {
     flow: "<",
-    onDelete: "<",
     onReload: "<",
     onCancel: "<",
     onSelect: "<?"
@@ -37,10 +33,8 @@ const bindings = {
 const initialState = {
     flow: null,
     isDirty: false,
-    onDelete: (x) => console.log("lfte: default onDelete()", x),
     onReload: (x) => console.log("lfte: default onReload()", x),
     onCancel: (x) => console.log("lfte: default onCancel()", x),
-    onSelect: (x) => console.log("lfte: default onSelect()", x),
     FlowDataTypeEditor
 };
 
@@ -61,7 +55,6 @@ function controller() {
         refresh();
     };
 
-    vm.delete = () => vm.onDelete(vm.flow);
     vm.cancel = () => vm.onCancel();
 }
 

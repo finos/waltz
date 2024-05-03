@@ -299,8 +299,9 @@
 
         <div class="wt-tab wt-active"
              ng-if="$ctrl.activeTab.id === 'FLOW_CLASSIFICATION_RULES'">
-            <waltz-flow-classification-rules-table rules="$ctrl.flowClassificationRules">
-            </waltz-flow-classification-rules-table>
+            <waltz-svelte-component component="$ctrl.FlowClassificationRulesPanel"
+                                    primary-entity-ref="$ctrl.parentEntityRef">
+            </waltz-svelte-component>
         </div>
 
         <div class="wt-tab wt-active"
