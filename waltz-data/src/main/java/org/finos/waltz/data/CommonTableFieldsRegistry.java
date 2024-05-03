@@ -427,7 +427,7 @@ public class CommonTableFieldsRegistry {
                         .table(sq)
                         .idField(sq.ID)
                         .parentIdField(null)
-                        .nameField(sq.LABEL)
+                        .nameField(sq.QUESTION_TEXT)
                         .descriptionField(sq.HELP_TEXT)
                         .externalIdField(sq.EXTERNAL_ID)
                         .build();
