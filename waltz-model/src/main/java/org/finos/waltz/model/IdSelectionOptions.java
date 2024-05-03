@@ -91,6 +91,7 @@ public abstract class IdSelectionOptions {
             case APPLICATION:
             case APP_GROUP:
             case CHANGE_INITIATIVE:
+            case END_USER_APPLICATION:
             case FLOW_DIAGRAM:
             case LOGICAL_DATA_ELEMENT:
             case LOGICAL_DATA_FLOW:

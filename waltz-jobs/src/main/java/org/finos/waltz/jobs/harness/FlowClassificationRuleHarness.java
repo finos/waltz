@@ -19,18 +19,16 @@
 package org.finos.waltz.jobs.harness;
 
 import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.datatype.DataTypeDecoratorRatingCharacteristics;
+import org.finos.waltz.model.flow_classification_rule.FlowClassificationRule;
 import org.finos.waltz.service.DIConfiguration;
-import org.finos.waltz.service.data_flow_decorator.LogicalFlowDecoratorRatingsCalculator;
 import org.finos.waltz.service.flow_classification_rule.FlowClassificationRuleService;
 import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import java.util.Optional;
 import java.util.Set;
 
-import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 
 
 public class FlowClassificationRuleHarness {
@@ -39,18 +37,10 @@ public class FlowClassificationRuleHarness {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
-        LogicalFlowDecoratorRatingsCalculator calc = ctx.getBean(LogicalFlowDecoratorRatingsCalculator.class);
-//        AuthSourceRatingCalculator authSourceRatingCalculatorCalculator = ctx.getBean(AuthSourceRatingCalculator.class);
-//        LogicalFlowDecoratorRatingsCalculator flowCalculator = ctx.getBean(LogicalFlowDecoratorRatingsCalculator.class);
-//        LogicalFlowDecoratorSummaryDao decoratorDao = ctx.getBean(LogicalFlowDecoratorSummaryDao.class);
-//        AuthoritativeSourceDao dao = ctx.getBean(AuthoritativeSourceDao.class);
 
-        EntityReference waltz = EntityReference.mkRef(EntityKind.APPLICATION, 20506);
-        EntityReference apptio = EntityReference.mkRef(EntityKind.APPLICATION, 20023);
-
-//        Set<DataTypeDecoratorRatingCharacteristics> calculated = calc.calculate(waltz, apptio, Optional.of(asSet(58584L, 66684L)));
-        Set<DataTypeDecoratorRatingCharacteristics> calculated = calc.calculate(waltz, apptio, Optional.empty());
-        System.out.printf("Calculated %d\n", calculated.size());
+        FlowClassificationRuleService svc = ctx.getBean(FlowClassificationRuleService.class);
+        Set<FlowClassificationRule> r = svc.findClassificationRules(mkOpts(mkRef(EntityKind.ORG_UNIT, 14902L)));
+        System.out.println(r);
 
 //        System.exit(-1);
     }

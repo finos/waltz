@@ -29,6 +29,8 @@ import FlowClassificationLegend
 import LogicalFlowScrollPanel from "../svelte/FlowDecoratorExplorerPanel.svelte"
 import {lastViewedFlowTabKey} from "../../../user";
 import FlowDetailPanel from "../svelte/flow-detail-tab/FlowDetailPanel.svelte"
+import FlowClassificationRulesPanel
+    from "../../../flow-classification-rule/components/summary-list/FlowClassificationRulesPanel.svelte";
 import {flowDirection} from "../../../common/services/enums/flow-direction";
 
 const bindings = {
@@ -53,6 +55,7 @@ const initialState = {
     FlowDetailPanel,
     FlowClassificationLegend,
     LogicalFlowScrollPanel,
+    FlowClassificationRulesPanel,
     activeTab: null,
     changeUnits: [],
     dataTypeUsages: [],

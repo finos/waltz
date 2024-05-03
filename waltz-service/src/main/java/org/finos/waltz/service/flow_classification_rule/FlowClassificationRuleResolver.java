@@ -25,7 +25,6 @@ import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
 import org.jooq.lambda.tuple.Tuple2;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,6 +35,7 @@ import static java.util.Optional.ofNullable;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.head;
 import static org.finos.waltz.common.CollectionUtilities.sort;
+import static org.finos.waltz.common.ListUtilities.asList;
 import static org.finos.waltz.common.MapUtilities.groupAndThen;
 import static org.finos.waltz.common.MapUtilities.isEmpty;
 import static org.finos.waltz.service.flow_classification_rule.FlowClassificationRuleUtilities.flowClassificationRuleVantagePointComparator;
@@ -77,6 +77,22 @@ public class FlowClassificationRuleResolver {
 
 
     /**
+     * Given a collection of vantages points (maybe) return the first
+     * after sorting them in (descending) rank order.
+     *
+     * @param vantagePoints
+     * @return
+     */
+    public static Optional<FlowClassificationRuleVantagePoint> getMostSpecificRanked(Collection<FlowClassificationRuleVantagePoint> vantagePoints) {
+        List<FlowClassificationRuleVantagePoint> sorted = sort(
+                vantagePoints,
+                flowClassificationRuleVantagePointComparator);
+        return head(
+                sorted); //note the reversal of parameters because we want descending order
+    }
+
+
+    /**
      * Given a vantage point, a supplier and a data type this method will give back
      * an authoritativeness rating.
      *
@@ -102,20 +118,40 @@ public class FlowClassificationRuleResolver {
             return tuple(AuthoritativenessRatingValue.NO_OPINION, Optional.empty());
         }
 
+        Map<EntityReference, Optional<FlowClassificationRuleVantagePoint>> allDataTypeEntityRule = vpEntity.getOrDefault(null, emptyMap());
         Map<EntityReference, Optional<FlowClassificationRuleVantagePoint>> dtEntity = vpEntity.getOrDefault(dataTypeId, emptyMap());
+        Map<EntityReference, Optional<FlowClassificationRuleVantagePoint>> allDataTypeGroupRule = vpGroup.getOrDefault(null, emptyMap());
         Map<EntityReference, Optional<FlowClassificationRuleVantagePoint>> dataTypeGroup = vpGroup.getOrDefault(dataTypeId, emptyMap());
 
-        if(isEmpty(dataTypeGroup) && isEmpty(dtEntity)) {
+        if(isEmpty(dataTypeGroup) && isEmpty(dtEntity) && isEmpty(allDataTypeEntityRule) && isEmpty(allDataTypeGroupRule)) {
             return tuple(AuthoritativenessRatingValue.NO_OPINION, Optional.empty());
         }
 
-        Optional<FlowClassificationRuleVantagePoint> maybeRule =  isEmpty(dtEntity)
-                ? dataTypeGroup.getOrDefault(
-                        subject,
-                Optional.empty())
-                : dtEntity.getOrDefault(
-                        subject,
+        List<Map<EntityReference, Optional<FlowClassificationRuleVantagePoint>>> dataTypeCoverage = asList(dtEntity, dataTypeGroup, allDataTypeEntityRule, allDataTypeGroupRule);
+
+        Optional<FlowClassificationRuleVantagePoint> pointToPointRule = dtEntity.getOrDefault(
+                subject,
                 Optional.empty());
+
+        Optional<FlowClassificationRuleVantagePoint> vantagePointRule = dataTypeGroup.getOrDefault(
+                subject,
+                Optional.empty());
+
+        Optional<FlowClassificationRuleVantagePoint> allDtToPointRule = allDataTypeEntityRule.getOrDefault(
+                subject,
+                Optional.empty());
+
+        Optional<FlowClassificationRuleVantagePoint> alLDtToGroupRule = allDataTypeGroupRule.getOrDefault(
+                subject,
+                Optional.empty());
+
+        List<Optional<FlowClassificationRuleVantagePoint>> rules = asList(pointToPointRule, vantagePointRule, allDtToPointRule, alLDtToGroupRule);
+
+        Optional<FlowClassificationRuleVantagePoint> maybeRule = rules
+                .stream()
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .findFirst();
 
         AuthoritativenessRatingValue defaultRating = direction == FlowDirection.OUTBOUND
                 ? AuthoritativenessRatingValue.DISCOURAGED // at least one rule covering this scope and data type to reach this point
@@ -125,35 +161,20 @@ public class FlowClassificationRuleResolver {
                 .map(r -> AuthoritativenessRatingValue.of(r.classificationCode()))
                 .orElse(defaultRating);
 
-        Optional<FlowClassificationRuleVantagePoint> discouragedRule = determineDefaultRuleId(dataTypeGroup);
+        Optional<FlowClassificationRuleVantagePoint> discouragedRule = determineDefaultRuleId(dataTypeCoverage);
 
         return tuple(ratingValue, ofNullable(maybeRule.orElse(discouragedRule.orElse(null))));
     }
 
-    private Optional<FlowClassificationRuleVantagePoint> determineDefaultRuleId(Map<EntityReference, Optional<FlowClassificationRuleVantagePoint>> dataTypeGroup) {
-        return dataTypeGroup
-                .values()
+    private Optional<FlowClassificationRuleVantagePoint> determineDefaultRuleId(List<Map<EntityReference, Optional<FlowClassificationRuleVantagePoint>>> dtCoverageRules) {
+        return dtCoverageRules
                 .stream()
+                .flatMap(d -> d.values().stream())
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .sorted(flowClassificationRuleVantagePointComparator)
                 .findFirst();
     }
 
-
-    /**
-     * Given a collection of vantages points (maybe) return the first
-     * after sorting them in (descending) rank order.
-     *
-     * @param vantagePoints
-     * @return
-     */
-    public static Optional<FlowClassificationRuleVantagePoint> getMostSpecificRanked(Collection<FlowClassificationRuleVantagePoint> vantagePoints) {
-        List<FlowClassificationRuleVantagePoint> sorted = sort(
-                vantagePoints,
-                flowClassificationRuleVantagePointComparator);
-        return head(
-                sorted); //note the reversal of parameters because we want descending order
-    }
 
 }

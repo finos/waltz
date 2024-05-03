@@ -10,24 +10,30 @@
         from "../../../../data-types/components/data-type-decorator-section/SuggestedDataTypeTreeSelector.svelte";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import SavingPlaceholder from "../../../../common/svelte/SavingPlaceholder.svelte";
+    import {dataTypeStore} from "../../../../svelte-stores/data-type-store";
 
     export let primaryEntityReference;
     export let onCancel = () => console.log("on cancel");
     export let onReload = () => console.log("on reload");
 
+    const dataTypeCall = dataTypeStore.findAll();
+
     let selectionOptions;
     let permissionsCall;
     let flowCall;
     let decoratorsCall;
-    let viewCall;
     let ratingCharacteristicsCall;
     let usageCharacteristicsCall;
     let saving = false;
     let dirty = false;
+    let unknownDataTypeId;
 
     let workingDataTypes = [];
     let addedDataTypeIds = [];
     let removedDataTypeIds = [];
+
+    $: allDataTypes = $dataTypeCall?.data;
+    $: unknownDataTypeId = _.find(allDataTypes, dt => dt.unknown)?.id;
 
     function toggleDataType(evt) {
         dirty = true;
@@ -37,6 +43,7 @@
         } else {
             workingDataTypes = _.concat(workingDataTypes, dataType.id);
         }
+        workingDataTypes = _.without(workingDataTypes, unknownDataTypeId);
     }
 
     function save() {
@@ -53,7 +60,7 @@
             .then(() => {
                 saving = false;
                 toasts.success("Successfully saved data types");
-                viewCall = dataTypeDecoratorStore.getViewForParentRef(primaryEntityReference, true);
+                decoratorsCall = dataTypeDecoratorStore.findBySelector("LOGICAL_DATA_FLOW", selectionOptions, true);
                 onReload();
             })
             .catch(e => displayError("Could not save data type changes", e));
@@ -61,6 +68,7 @@
 
     $: {
         if (primaryEntityReference) {
+            dirty = false;
             selectionOptions = mkSelectionOptions(primaryEntityReference);
             flowCall = logicalFlowStore.getById(primaryEntityReference.id);
             decoratorsCall = dataTypeDecoratorStore.findBySelector("LOGICAL_DATA_FLOW", selectionOptions);

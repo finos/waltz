@@ -62,7 +62,7 @@
         <div slot="breadcrumbs">
             <ol class="waltz-breadcrumbs">
                 <li><ViewLink state="main">Home</ViewLink></li>
-                <li><ViewLink state="main.system.list">Flow Classification Rule</ViewLink></li>
+                <li><ViewLink state="main.data-type.list">Flow Classification Rule</ViewLink></li>
                 <li>
                     <EntityLink ref={classificationRule?.subjectReference}/>
                 </li>

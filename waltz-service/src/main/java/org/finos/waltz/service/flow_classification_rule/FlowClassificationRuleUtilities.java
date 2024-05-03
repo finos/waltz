@@ -52,10 +52,10 @@ public class FlowClassificationRuleUtilities {
                 .flatMap(d -> dtHierarchy.findAncestors(d.dtId()).stream())
                 .collect(Collectors.toSet());
 
-        Set<FlowClassificationRuleVantagePoint> filteredRules = ruleVantagePoints
+        List<FlowClassificationRuleVantagePoint> filteredRules = ruleVantagePoints
                 .stream()
                 .filter(rvp -> rvp.dataTypeId() == null || ruleDataTypes.contains(rvp.dataTypeId()))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
 
         filteredRules
                 .forEach(rvp -> {

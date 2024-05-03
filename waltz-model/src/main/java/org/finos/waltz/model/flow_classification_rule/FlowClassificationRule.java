@@ -66,8 +66,8 @@ public abstract class FlowClassificationRule implements
     public abstract String message();
 
     @Value.Default
-    public Severity messageSeverity() {
-        return Severity.INFORMATION;
+    public MessageSeverity messageSeverity() {
+        return MessageSeverity.INFORMATION;
     }
 
 
