@@ -46,7 +46,7 @@ public class AppToAssessmentLoader {
         }
 
         default String ratingExtId() {
-            return toExtId(assessmentName());
+            return toExtId(ratingName());
         }
     }
 
