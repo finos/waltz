@@ -24,6 +24,7 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.FlowDirection;
 import org.finos.waltz.model.ImmutableEntityReference;
 import org.finos.waltz.model.MessageSeverity;
+import org.finos.waltz.model.datatype.FlowDataType;
 import org.finos.waltz.model.flow_classification_rule.DiscouragedSource;
 import org.finos.waltz.model.flow_classification_rule.FlowClassificationRule;
 import org.finos.waltz.model.flow_classification_rule.FlowClassificationRuleCreateCommand;
@@ -411,6 +412,28 @@ public class FlowClassificationRuleDao {
 
     public List<FlowClassificationRuleVantagePoint> findFlowClassificationRuleVantagePoints(FlowDirection direction) {
         return findFlowClassificationRuleVantagePoints(FLOW_CLASSIFICATION.DIRECTION.eq(direction.name()));
+    }
+
+
+    public List<FlowClassificationRuleVantagePoint> findFlowClassificationRuleVantagePoints(FlowDirection direction,
+                                                                                            Set<Long> dataTypeIdsToConsider) {
+        return findFlowClassificationRuleVantagePoints(
+                FLOW_CLASSIFICATION.DIRECTION.eq(direction.name())
+                        .and(FLOW_CLASSIFICATION_RULE.DATA_TYPE_ID.in(dataTypeIdsToConsider)));
+    }
+
+
+
+    public List<FlowClassificationRuleVantagePoint> findFlowClassificationRuleVantagePoints(FlowDirection direction,
+                                                                                            org.finos.waltz.model.entity_hierarchy.EntityHierarchy dtHierarchy,
+                                                                                            Set<FlowDataType> population) {
+        Set<Long> possibleDtIds = population
+                .stream()
+                .map(FlowDataType::dtId)
+                .distinct()
+                .flatMap(dtId -> dtHierarchy.findAncestors(dtId).stream())
+                .collect(Collectors.toSet());
+        return findFlowClassificationRuleVantagePoints(direction, possibleDtIds);
     }
 
 
