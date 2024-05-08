@@ -156,9 +156,10 @@
             <ul class="list-inline">
                 <li ng-repeat="type in $ctrl.selected.types | orderBy:'name'"
                     style="padding-bottom: 2px">
-                    <div style="display: inline-block; height: 1em; width: 1em; border:1px solid #ccc; border-radius: 2px;"
-                         ng-style="{'background-color': $ctrl.flowClassificationsByCode[type.rating].color}">
-                    </div>
+                    <waltz-svelte-component component="$ctrl.FlowRatingCell"
+                                            target-inbound-classification="$ctrl.inboundClassificationsByCode[type.inboundRating]"
+                                            source-outbound-classification="$ctrl.outboundClassificationsByCode[type.rating]">
+                    </waltz-svelte-component>
                     <waltz-entity-link entity-ref="{kind: 'DATA_TYPE',
                                                     id: type.id,
                                                     name: type.name}"
