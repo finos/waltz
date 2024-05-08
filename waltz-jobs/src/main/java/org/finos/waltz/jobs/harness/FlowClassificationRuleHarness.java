@@ -62,6 +62,7 @@ public class FlowClassificationRuleHarness {
         EntityReference fdw = EntityReference.mkRef(EntityKind.APPLICATION, 16831L);
         EntityReference rftEds = EntityReference.mkRef(EntityKind.ORG_UNIT, 10526L);
         EntityReference group = EntityReference.mkRef(EntityKind.ORG_UNIT, 95L);
+        EntityReference flow = EntityReference.mkRef(EntityKind.LOGICAL_DATA_FLOW, 75503L);
 
         Select<Record1<Long>> flowSelector = mkSelector(group);
         EntityHierarchy dtHierarchy = time("loading dt hier", () -> ehSvc.fetchHierarchyForKind(EntityKind.DATA_TYPE));

@@ -322,17 +322,20 @@ public class FlowClassificationRuleService {
 
         return population
                 .stream()
-                .filter(d -> lfdIdToInboundRuleIdMap.containsKey(d.lfdId()) || lfdIdToOutboundRuleIdMap.containsKey(d.lfdId()))
                 .map(d -> {
+
+                    // If flow in scope of this population but no flow classification rules are influencing a rating we should update the decorator to the default ratings
                     Tuple2<Long, FlowClassificationRuleUtilities.MatchOutcome> outboundFlowRating = lfdIdToOutboundRuleIdMap.getOrDefault(d.lfdId(), defaultOutcome);
                     Tuple2<Long, FlowClassificationRuleUtilities.MatchOutcome> inboundFlowRating = lfdIdToInboundRuleIdMap.getOrDefault(d.lfdId(), defaultOutcome);
 
-                    String outboundRatingCode = outboundRatingCodeByRuleId.get(outboundFlowRating.v1);
-                    String inboundRatingCode = inboundRatingCodeByRuleId.get(inboundFlowRating.v1);
+                    String outboundRatingCode = outboundRatingCodeByRuleId.getOrDefault(outboundFlowRating.v1, NO_OPINION.value());
+                    String inboundRatingCode = inboundRatingCodeByRuleId.getOrDefault(inboundFlowRating.v1, NO_OPINION.value());
 
                     AuthoritativenessRatingValue outboundRating = FlowClassificationRuleUtilities.MatchOutcome.POSITIVE_MATCH.equals(outboundFlowRating.v2)
                             ? AuthoritativenessRatingValue.of(outboundRatingCode)
-                            : DISCOURAGED;
+                            :  FlowClassificationRuleUtilities.MatchOutcome.NEGATIVE_MATCH.equals(outboundFlowRating.v2)
+                                ? DISCOURAGED
+                                : NO_OPINION;
 
                     AuthoritativenessRatingValue inboundRating = FlowClassificationRuleUtilities.MatchOutcome.POSITIVE_MATCH.equals(inboundFlowRating.v2)
                             ? AuthoritativenessRatingValue.of(inboundRatingCode)
