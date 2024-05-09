@@ -63,6 +63,7 @@ public class FlowClassificationRuleHarness {
         EntityReference rftEds = EntityReference.mkRef(EntityKind.ORG_UNIT, 10526L);
         EntityReference group = EntityReference.mkRef(EntityKind.ORG_UNIT, 95L);
         EntityReference flow = EntityReference.mkRef(EntityKind.LOGICAL_DATA_FLOW, 75503L);
+        EntityReference tokyo = EntityReference.mkRef(EntityKind.END_USER_APPLICATION, 11104L);
 
         Select<Record1<Long>> flowSelector = mkSelector(group);
         EntityHierarchy dtHierarchy = time("loading dt hier", () -> ehSvc.fetchHierarchyForKind(EntityKind.DATA_TYPE));
@@ -77,6 +78,7 @@ public class FlowClassificationRuleHarness {
         List<FlowClassificationRuleVantagePoint> allRules = time("fcrDao::findRules (all)", () -> fcrDao.findFlowClassificationRuleVantagePoints(FlowDirection.OUTBOUND));
         List<FlowClassificationRuleVantagePoint> targetedDtRules = time("fcrDao::findRules (targeted - dt)", () -> fcrDao.findFlowClassificationRuleVantagePoints(FlowDirection.OUTBOUND, possibleDtIds));
         List<FlowClassificationRuleVantagePoint> targetedPopRules = time("fcrDao::findRules (targeted- pop)", () -> fcrDao.findFlowClassificationRuleVantagePoints(FlowDirection.OUTBOUND, dtHierarchy, population));
+        List<FlowClassificationRuleVantagePoint> targetedInboundPopRules = time("fcrDao::findRules (targeted- inbound pop)", () -> fcrDao.findFlowClassificationRuleVantagePoints(FlowDirection.INBOUND, dtHierarchy, population));
 
         System.out.printf(
                 "\nRules: pop:%d / dt:%d / all:%d, Population: %d, DTs: %d\n\n",

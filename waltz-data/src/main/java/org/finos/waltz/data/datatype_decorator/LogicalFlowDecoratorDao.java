@@ -32,6 +32,7 @@ import org.finos.waltz.model.datatype.ImmutableFlowDataType;
 import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.Application;
+import org.finos.waltz.schema.tables.EndUserApplication;
 import org.finos.waltz.schema.tables.EntityHierarchy;
 import org.finos.waltz.schema.tables.LogicalFlow;
 import org.finos.waltz.schema.tables.LogicalFlowDecorator;
@@ -76,6 +77,8 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
     private static final LogicalFlowDecorator lfd = Tables.LOGICAL_FLOW_DECORATOR;
     private static final Application srcApp = Tables.APPLICATION.as("srcApp");
     private static final Application targetApp = Tables.APPLICATION.as("targetApp");
+    private static final EndUserApplication srcEuda = Tables.END_USER_APPLICATION.as("srcEuda");
+    private static final EndUserApplication targetEuda = Tables.END_USER_APPLICATION.as("targetEuda");
     private static final EntityHierarchy eh = Tables.ENTITY_HIERARCHY;
 
     private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
@@ -353,6 +356,8 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
     }
 
     public Set<FlowDataType> fetchFlowDataTypePopulation(Condition condition) {
+        Field<Long> srcOU = DSL.coalesce(srcApp.ORGANISATIONAL_UNIT_ID, srcEuda.ORGANISATIONAL_UNIT_ID).as("srcOU");
+        Field<Long> targetOU = DSL.coalesce(targetApp.ORGANISATIONAL_UNIT_ID, targetEuda.ORGANISATIONAL_UNIT_ID).as("targetOU");
         return dsl
                 .select(lf.ID,
                         lfd.ID,
@@ -363,14 +368,16 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
                         lf.SOURCE_ENTITY_KIND,
                         lf.TARGET_ENTITY_ID,
                         lf.TARGET_ENTITY_KIND,
-                        srcApp.ORGANISATIONAL_UNIT_ID,
-                        targetApp.ORGANISATIONAL_UNIT_ID,
+                        srcOU,
+                        targetOU,
                         lfd.RATING,
                         lfd.TARGET_INBOUND_RATING)
                 .from(lf)
                 .innerJoin(lfd).on(lfd.LOGICAL_FLOW_ID.eq(lf.ID).and(lfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())))
                 .leftJoin(srcApp).on(srcApp.ID.eq(lf.SOURCE_ENTITY_ID).and(lf.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
                 .leftJoin(targetApp).on(targetApp.ID.eq(lf.TARGET_ENTITY_ID).and(lf.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
+                .leftJoin(srcEuda).on(srcEuda.ID.eq(lf.SOURCE_ENTITY_ID).and(lf.SOURCE_ENTITY_KIND.eq(EntityKind.END_USER_APPLICATION.name())))
+                .leftJoin(targetEuda).on(targetEuda.ID.eq(lf.TARGET_ENTITY_ID).and(lf.TARGET_ENTITY_KIND.eq(EntityKind.END_USER_APPLICATION.name())))
                 .where(lf.IS_REMOVED.isFalse()
                         .and(lf.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name())))
                 .and(condition)
@@ -383,8 +390,8 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
                         .target(readRef(r, lf.TARGET_ENTITY_KIND, lf.TARGET_ENTITY_ID))
                         .inboundRuleId(r.get(lfd.INBOUND_FLOW_CLASSIFICATION_RULE_ID))
                         .outboundRuleId(r.get(lfd.FLOW_CLASSIFICATION_RULE_ID))
-                        .sourceOuId(r.get(srcApp.ORGANISATIONAL_UNIT_ID))
-                        .targetOuId(r.get(targetApp.ORGANISATIONAL_UNIT_ID))
+                        .sourceOuId(r.get(srcOU))
+                        .targetOuId(r.get(targetOU))
                         .sourceOutboundRating(AuthoritativenessRatingValue.of(r.get(lfd.RATING)))
                         .targetInboundRating(AuthoritativenessRatingValue.of(r.get(lfd.TARGET_INBOUND_RATING)))
                         .build());

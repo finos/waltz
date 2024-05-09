@@ -419,7 +419,7 @@ public class FlowClassificationRuleDao {
                                                                                             Set<Long> dataTypeIdsToConsider) {
         return findFlowClassificationRuleVantagePoints(
                 FLOW_CLASSIFICATION.DIRECTION.eq(direction.name())
-                        .and(FLOW_CLASSIFICATION_RULE.DATA_TYPE_ID.in(dataTypeIdsToConsider)));
+                        .and(FLOW_CLASSIFICATION_RULE.DATA_TYPE_ID.in(dataTypeIdsToConsider).or(FLOW_CLASSIFICATION_RULE.DATA_TYPE_ID.isNull())));
     }
 
 

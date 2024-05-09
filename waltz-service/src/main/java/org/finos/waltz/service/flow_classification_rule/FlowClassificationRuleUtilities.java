@@ -3,6 +3,7 @@ package org.finos.waltz.service.flow_classification_rule;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.FlowDirection;
+import org.finos.waltz.model.Nullable;
 import org.finos.waltz.model.datatype.FlowDataType;
 import org.finos.waltz.model.entity_hierarchy.EntityHierarchy;
 import org.finos.waltz.model.flow_classification_rule.FlowClassificationRuleVantagePoint;
@@ -71,7 +72,6 @@ public class FlowClassificationRuleUtilities {
                 .forEach(kv -> {
 
                     BucketKey bucketKey = kv.getKey();
-                    Collection<FlowClassificationRuleVantagePoint> rvps = kv.getValue();
 
                     Set<Long> childOUs = ouHierarchy.findChildren(bucketKey.vantagePoint().id());
                     Set<Long> childDTs = dtHierarchy.findChildren(bucketKey.dataTypeId());
@@ -86,7 +86,9 @@ public class FlowClassificationRuleUtilities {
                             return; // skip, already got a good match
                         }
 
+                    //    System.out.printf("Testing bucketKey: %s against flow: %s - outcome: %s\n", bucketKey, p, bucketMatcher.test(p));
                         if (bucketMatcher.test(p)) {
+                            Collection<FlowClassificationRuleVantagePoint> rvps = kv.getValue();
                             rvps
                                 .forEach(rvp -> {
                                     Tuple2<Long, MatchOutcome> currentRuleAndOutcome = lfdIdToRuleAndOutcomeMap.get(p.lfdId());
@@ -146,9 +148,8 @@ public class FlowClassificationRuleUtilities {
                         .thenComparing(vpRankComparator.reversed())
                         .thenComparing(dtRankComparator.reversed())
                         .thenComparingLong(d -> d.vantagePoint().id())
-                        .thenComparingLong(BucketKey::dataTypeId));
+                        .thenComparingLong(d -> d.dataTypeId() == null ? Long.MAX_VALUE : d.dataTypeId()));
 
-        System.out.println(groups.size());
         return groups;
     }
 
@@ -156,6 +157,8 @@ public class FlowClassificationRuleUtilities {
     public interface BucketKey {
 
         EntityReference vantagePoint();
+
+        @Nullable
         Long dataTypeId();
 
         @Value.Auxiliary
