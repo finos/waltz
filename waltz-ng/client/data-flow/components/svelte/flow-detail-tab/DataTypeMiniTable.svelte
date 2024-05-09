@@ -7,12 +7,19 @@
     import _ from "lodash";
     import EntityLabel from "../../../../common/svelte/EntityLabel.svelte";
     import Toggle from "../../../../common/svelte/Toggle.svelte";
+    import FlowRatingCell from "../../../../common/svelte/FlowRatingCell.svelte";
+    import {flowDirection as FlowDirection} from "../../../../common/services/enums/flow-direction";
+    import RatingIndicatorCell from "../../../../ratings/components/rating-indicator-cell/RatingIndicatorCell.svelte";
 
     export let decorators = [];
     export let flowClassifications = []
 
+    let inboundClassifications;
+    let outboundClassifications;
 
-    $: flowClassificationsByCode = _.keyBy(flowClassifications, d => d.code);
+    $: [inboundClassifications, outboundClassifications] = _.partition(flowClassifications, d => d.direction === FlowDirection.INBOUND.key);
+    $: inboundClassificationsByCode = _.keyBy(inboundClassifications, d => d.code);
+    $: outboundClassificationsByCode = _.keyBy(outboundClassifications, d => d.code);
 
     $: hasRatings =  !_.isEmpty(flowClassifications)
     $: showRatings = !$hideRatings && hasRatings;
@@ -20,25 +27,39 @@
 </script>
 
 <table class="">
-    <tbody class="small">
     {#each _.orderBy(decorators, d => d.decoratorEntity.name) as type}
+        <tbody class="small">
         <tr>
-            <td>
-                <div class="rating-icon"
-                     style={`background-color: ${flowClassificationsByCode[type.rating]?.color}`}>
-                </div>
+            <td colspan="2">
+                <FlowRatingCell targetInboundClassification={inboundClassificationsByCode[type.targetInboundRating]}
+                                sourceOutboundClassification={outboundClassificationsByCode[type.rating]}/>
                 <EntityLabel ref={type.decoratorEntity}
                              showIcon={false}>
                 </EntityLabel>
             </td>
-            {#if showRatings}
-                <td>
-                    {_.get(flowClassificationsByCode, [type.rating, "name"], "-")}
-                </td>
-            {/if}
         </tr>
+        {#if showRatings}
+            <tr>
+                <td class="inline-label">
+                    Producer Rating
+                </td>
+                <td>
+                    <RatingIndicatorCell {..._.get(outboundClassificationsByCode, [type.rating])}
+                                         showName="true"/>
+                </td>
+            </tr>
+            <tr>
+                <td class="inline-label">
+                    Consumer Rating
+                </td>
+                <td>
+                    <RatingIndicatorCell {..._.get(inboundClassificationsByCode, [type.targetInboundRating])}
+                                         showName="true"/>
+                </td>
+            </tr>
+        {/if}
+        </tbody>
     {/each}
-    </tbody>
 </table>
 
 {#if hasRatings}
@@ -54,14 +75,6 @@
 
 <style>
 
-    .rating-icon {
-        display: inline-block;
-        height: 1em;
-        width: 1em;
-        border:1px solid #ccc;
-        border-radius: 2px;
-    }
-
     table {
         width: 100%;
     }
@@ -71,5 +84,9 @@
         padding-right: 0.6em;
         border-bottom: 1px solid #eee;
         vertical-align: top;
+    }
+
+    .inline-label {
+        color: #999;
     }
 </style>
