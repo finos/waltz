@@ -33,6 +33,8 @@ import {sameRef} from "../../../common/entity-utils";
 import {appLogicalFlowFilterExcludedTagIdsKey} from "../../../user";
 import {loadFlowClassificationRatings} from "../../../flow-classification-rule/flow-classification-utils";
 import ImageDownloadLink from "../../../common/svelte/ImageDownloadLink.svelte";
+import FlowRatingCell from "../../../common/svelte/FlowRatingCell.svelte"
+import {flowDirection as FlowDirection} from "../../../common/services/enums/flow-direction";
 
 const bindings = {
     entityRef: "<",
@@ -67,7 +69,8 @@ const initialState = {
     tags: [],
     flowClassificationsByCode: [],
     ImageDownloadLink,
-    diagramElem: null
+    diagramElem: null,
+    FlowRatingCell
 };
 
 
@@ -123,6 +126,7 @@ function mkTypeInfo(decorators = [], dataTypes) {
             return {
                 id: x.decoratorEntity.id,
                 rating: x.rating,
+                inboundRating: x.targetInboundRating,
                 name: _.get(dataTypes, x.decoratorEntity.id).name
             };
         }))
@@ -225,11 +229,21 @@ function controller($element,
         loadFlowClassificationRatings(serviceBroker)
             .then(r => {
                 vm.flowClassifications = r;
-                vm.flowClassificationsByCode = _
+
+                vm.inboundClassificationsByCode = _
                     .chain(r)
-                    .filter(d => d.direction === vm.ratingDirection)
-                    .keyBy( d => d.code)
+                    .filter(d => d.direction === FlowDirection.INBOUND.key)
+                    .keyBy(d => d.code)
                     .value();
+                vm.outboundClassificationsByCode = _
+                    .chain(r)
+                    .filter(d => d.direction === FlowDirection.OUTBOUND.key)
+                    .keyBy(d => d.code)
+                    .value()
+
+                vm.flowClassificationsByCode = vm.ratingDirection === FlowDirection.INBOUND.key
+                    ? vm.inboundClassificationsByCode
+                    : vm.outboundClassificationsByCode;
             });
 
         serviceBroker
