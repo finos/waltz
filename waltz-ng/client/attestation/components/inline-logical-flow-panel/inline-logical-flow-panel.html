@@ -21,15 +21,28 @@
                                    logical-flows="$ctrl.logicalFlows"
                                    decorators="$ctrl.logicalFlowDecorators"
                                    physical-flows="$ctrl.physicalFlows"
-                                   physical-specifications="$ctrl.physicalSpecifications">
+                                   physical-specifications="$ctrl.physicalSpecifications"
+                                   rating-direction="$ctrl.ratingDirection">
     </waltz-source-and-target-panel>
 
+    <waltz-toggle state="$ctrl.ratingDirection === 'OUTBOUND'"
+                  on-toggle="$ctrl.onToggleRatingDirection()"
+                  label-on="Showing producer flow ratings"
+                  label-off="Showing consumer flow ratings">
+    </waltz-toggle>
+
     <p class="text-muted small">
-        Diagram detailing the applications data types (Middle)
+        Diagram detailing the application's data types (Middle)
         from the sending system (LHS)
         to the receiving system on the (RHS).
         <span style="color: darkred">Red lines</span> indicate non-strategic flows,
         <span style="color: orange">Amber</span> indicates secondary and
         <span style="color: darkgreen">Green</span> indicates a primary system.
+    </p>
+
+    <p class="help-block">
+        <waltz-svelte-component component="$ctrl.FlowClassificationLegend"
+                                rating-direction="$ctrl.ratingDirection">
+        </waltz-svelte-component>
     </p>
 </div>
