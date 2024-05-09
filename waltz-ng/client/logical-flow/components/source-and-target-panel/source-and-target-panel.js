@@ -258,11 +258,21 @@ function controller($element,
         loadFlowClassificationRatings(serviceBroker)
             .then(r => {
                 vm.flowClassifications = r;
-                vm.flowClassificationsByCode = _
+
+                vm.inboundClassificationsByCode = _
                     .chain(r)
-                    .filter(d => d.direction === vm.ratingDirection)
+                    .filter(d => d.direction === FlowDirection.INBOUND.key)
                     .keyBy(d => d.code)
                     .value();
+                vm.outboundClassificationsByCode = _
+                    .chain(r)
+                    .filter(d => d.direction === FlowDirection.OUTBOUND.key)
+                    .keyBy(d => d.code)
+                    .value()
+
+                vm.flowClassificationsByCode = vm.ratingDirection === FlowDirection.INBOUND.key
+                    ? vm.inboundClassificationsByCode
+                    : vm.outboundClassificationsByCode;
             });
 
         if (changes.logicalFlows || changes.decorators) {
