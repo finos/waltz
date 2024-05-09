@@ -165,7 +165,7 @@
                                                     name: type.name}"
                                        icon-placement="none"
                                        tooltip-placement="top"
-                                       additional-display-data="[{name: 'Rating', value: $ctrl.flowClassificationsByCode[type.rating].name}]">
+                                       additional-display-data="[{name: 'Producer Rating', value: $ctrl.flowClassificationsByCode[type.rating].name}, {name: 'Consumer Rating', value: $ctrl.flowClassificationsByCode[type.inboundRating].name}]">
                     </waltz-entity-link>
                 </li>
             </ul>
