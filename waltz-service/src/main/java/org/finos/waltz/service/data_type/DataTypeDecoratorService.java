@@ -221,10 +221,10 @@ public class DataTypeDecoratorService {
                 entityReference, userName);
 
         if (entityReference.kind().equals(LOGICAL_DATA_FLOW)) {
-            int rulesUpdated = FunctionUtilities.time("recalc ratings",  () -> flowClassificationRuleService.recalculateFlowRatingsForSelector(mkOpts(entityReference)));
+            flowClassificationRuleService.recalculateFlowRatingsForSelector(mkOpts(entityReference));
         }
 
-        FunctionUtilities.time("recalc usage",  ()->recalculateDataTypeUsageForApplications(entityReference));
+        recalculateDataTypeUsageForApplications(entityReference);
 
         if (PHYSICAL_SPECIFICATION.equals(entityReference.kind())) {
             physicalSpecificationService.propagateDataTypesToLogicalFlows(userName, entityReference.id());

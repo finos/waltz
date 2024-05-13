@@ -16,15 +16,17 @@
  *
  */
 
-import {CORE_API} from '../../../common/services/core-api-utils';
-import {initialiseData} from '../../../common';
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {initialiseData} from "../../../common";
 
-import template from './inline-logical-flow-panel.html';
+import template from "./inline-logical-flow-panel.html";
 import {entity} from "../../../common/services/enums/entity";
+import {flowDirection, flowDirection as FlowDirection} from "../../../common/services/enums/flow-direction";
+import FlowClassificationLegend from "../../../flow-classification-rule/components/svelte/FlowClassificationLegend.svelte"
 
 
 const bindings = {
-    parentEntityRef: '<'
+    parentEntityRef: "<"
 };
 
 
@@ -32,7 +34,9 @@ const initialState = {
     logicalFlows: [],
     logicalFlowDecorators: [],
     physicalFlows: [],
-    physicalSpecifications: []
+    physicalSpecifications: [],
+    ratingDirection: FlowDirection.OUTBOUND.key,
+    FlowClassificationLegend
 };
 
 
@@ -40,10 +44,10 @@ function controller(serviceBroker) {
 
     const vm = initialiseData(this, initialState);
 
-    vm.$onInit = () => {
+    vm.$onChanges = () => {
         const selector = {
             entityReference: vm.parentEntityRef,
-            scope: 'EXACT'
+            scope: "EXACT"
         };
 
         serviceBroker
@@ -70,11 +74,20 @@ function controller(serviceBroker) {
                 [vm.parentEntityRef])
             .then(r => vm.physicalSpecifications = r.data);
     };
+
+
+    vm.onToggleRatingDirection = () => {
+        if(vm.ratingDirection === flowDirection.OUTBOUND.key) {
+            vm.ratingDirection = flowDirection.INBOUND.key;
+        } else {
+            vm.ratingDirection = flowDirection.OUTBOUND.key;
+        }
+    }
 }
 
 
 controller.$inject = [
-    'ServiceBroker'
+    "ServiceBroker"
 ];
 
 
@@ -87,5 +100,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzInlineLogicalFlowPanel'
+    id: "waltzInlineLogicalFlowPanel"
 };
