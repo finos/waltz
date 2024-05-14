@@ -233,11 +233,15 @@ public class FlowClassificationRuleService {
         return recalculateRatingsForPopulation(population);
     }
 
-    private int recalculateRatingsForPopulation(Set<FlowDataType> population) {
+    public int recalculateRatingsForPopulation(Set<FlowDataType> population) {
+
+        LOG.debug("Loading hierarchies");
+        EntityHierarchy ouHierarchy = time("loading ou hier", () -> entityHierarchyService.fetchHierarchyForKind(ORG_UNIT));
+        EntityHierarchy dtHierarchy = time("loading dt hier", () -> entityHierarchyService.fetchHierarchyForKind(EntityKind.DATA_TYPE));
 
         LOG.debug("Loading rule vantage points");
-        List<FlowClassificationRuleVantagePoint> inboundRuleVantagePoints = flowClassificationRuleDao.findFlowClassificationRuleVantagePoints(FlowDirection.INBOUND);
-        List<FlowClassificationRuleVantagePoint> outboundRuleVantagePoints = flowClassificationRuleDao.findFlowClassificationRuleVantagePoints(FlowDirection.OUTBOUND);
+        List<FlowClassificationRuleVantagePoint> inboundRuleVantagePoints = flowClassificationRuleDao.findFlowClassificationRuleVantagePoints(FlowDirection.INBOUND, dtHierarchy, population);
+        List<FlowClassificationRuleVantagePoint> outboundRuleVantagePoints = flowClassificationRuleDao.findFlowClassificationRuleVantagePoints(FlowDirection.OUTBOUND, dtHierarchy, population);
 
         Map<Long, String> inboundRatingCodeByRuleId = indexBy(inboundRuleVantagePoints, FlowClassificationRuleVantagePoint::ruleId, FlowClassificationRuleVantagePoint::classificationCode);
         Map<Long, String> outboundRatingCodeByRuleId = indexBy(outboundRuleVantagePoints, FlowClassificationRuleVantagePoint::ruleId, FlowClassificationRuleVantagePoint::classificationCode);
@@ -248,10 +252,6 @@ public class FlowClassificationRuleService {
                 inboundRuleVantagePoints.size(),
                 outboundRuleVantagePoints.size(),
                 population.size());
-
-        LOG.debug("Loading hierarchies");
-        EntityHierarchy ouHierarchy = entityHierarchyService.fetchHierarchyForKind(ORG_UNIT);
-        EntityHierarchy dtHierarchy = entityHierarchyService.fetchHierarchyForKind(EntityKind.DATA_TYPE);
 
         LOG.debug("Applying rules to population");
         Map<Long, Tuple2<Long, FlowClassificationRuleUtilities.MatchOutcome>> lfdIdToOutboundRuleIdMap = time("outbound vps", () -> applyVantagePoints(
@@ -267,29 +267,32 @@ public class FlowClassificationRuleService {
                 ouHierarchy,
                 dtHierarchy));
 
-        LOG.debug("Calculating diff");
-        Set<Tuple5<Long, AuthoritativenessRatingValue, AuthoritativenessRatingValue, Long, Long>> existingDecoratorRatingInfo = map(
-                population,
-                d -> tuple(d.lfdId(), d.sourceOutboundRating(), d.targetInboundRating(), d.outboundRuleId(), d.inboundRuleId()));
+        DiffResult<Tuple5<Long, AuthoritativenessRatingValue, AuthoritativenessRatingValue, Long, Long>> decoratorRatingDiff = time(
+                "calculating diff",
+                () -> {
+                    Set<Tuple5<Long, AuthoritativenessRatingValue, AuthoritativenessRatingValue, Long, Long>> existingDecoratorRatingInfo = map(
+                            population,
+                            d -> tuple(d.lfdId(), d.sourceOutboundRating(), d.targetInboundRating(), d.outboundRuleId(), d.inboundRuleId()));
 
-        Set<Tuple5<Long, AuthoritativenessRatingValue, AuthoritativenessRatingValue, Long, Long>> requiredDecoratorRatingInfo = mkRequiredDecoratorRatingInfo(
-                population,
-                outboundRatingCodeByRuleId,
-                inboundRatingCodeByRuleId,
-                lfdIdToOutboundRuleIdMap,
-                lfdIdToInboundRuleIdMap);
+                    Set<Tuple5<Long, AuthoritativenessRatingValue, AuthoritativenessRatingValue, Long, Long>> requiredDecoratorRatingInfo = mkRequiredDecoratorRatingInfo(
+                            population,
+                            outboundRatingCodeByRuleId,
+                            inboundRatingCodeByRuleId,
+                            lfdIdToOutboundRuleIdMap,
+                            lfdIdToInboundRuleIdMap);
 
 
-        DiffResult<Tuple5<Long, AuthoritativenessRatingValue, AuthoritativenessRatingValue, Long, Long>> decoratorRatingDiff = mkDiff(
-                existingDecoratorRatingInfo,
-                requiredDecoratorRatingInfo,
-                d -> d.v1,
-                (newRecord, existingRecord) -> {
-                    boolean sameOutboundFcr = (newRecord.v4 == null && existingRecord.v4 == null) || Objects.equals(newRecord.v4, existingRecord.v4);
-                    boolean sameInboundFcr = (newRecord.v5 == null && existingRecord.v5 == null) || Objects.equals(newRecord.v5, existingRecord.v5);
-                    boolean sameOutboundRating = newRecord.v2.value().equals(existingRecord.v2.value());
-                    boolean sameInboundRating = newRecord.v3.value().equals(existingRecord.v3.value());
-                    return sameOutboundRating && sameInboundRating && sameOutboundFcr && sameInboundFcr;
+                    return mkDiff(
+                            existingDecoratorRatingInfo,
+                            requiredDecoratorRatingInfo,
+                            d -> d.v1,
+                            (newRecord, existingRecord) -> {
+                                boolean sameOutboundFcr = (newRecord.v4 == null && existingRecord.v4 == null) || Objects.equals(newRecord.v4, existingRecord.v4);
+                                boolean sameInboundFcr = (newRecord.v5 == null && existingRecord.v5 == null) || Objects.equals(newRecord.v5, existingRecord.v5);
+                                boolean sameOutboundRating = newRecord.v2.value().equals(existingRecord.v2.value());
+                                boolean sameInboundRating = newRecord.v3.value().equals(existingRecord.v3.value());
+                                return sameOutboundRating && sameInboundRating && sameOutboundFcr && sameInboundFcr;
+                            });
                 });
 
         LOG.debug("Preparing to update {} logical flow decorators with new rating classifications", decoratorRatingDiff.differingIntersection().size());
@@ -303,7 +306,7 @@ public class FlowClassificationRuleService {
                         .set(LOGICAL_FLOW_DECORATOR.INBOUND_FLOW_CLASSIFICATION_RULE_ID, d.v5)
                         .where(LOGICAL_FLOW_DECORATOR.ID.eq(d.v1)));
 
-        int updatedRecords = flowClassificationRuleDao.updateDecoratorsWithClassifications(updateStmts);
+        int updatedRecords = time("performing updates", () -> flowClassificationRuleDao.updateDecoratorsWithClassifications(updateStmts));
         LOG.debug("Updated {} logical flow decorators with a classification", updatedRecords);
 
         return updatedRecords;
@@ -319,17 +322,20 @@ public class FlowClassificationRuleService {
 
         return population
                 .stream()
-                .filter(d -> lfdIdToInboundRuleIdMap.containsKey(d.lfdId()) || lfdIdToOutboundRuleIdMap.containsKey(d.lfdId()))
                 .map(d -> {
+
+                    // If flow in scope of this population but no flow classification rules are influencing a rating we should update the decorator to the default ratings
                     Tuple2<Long, FlowClassificationRuleUtilities.MatchOutcome> outboundFlowRating = lfdIdToOutboundRuleIdMap.getOrDefault(d.lfdId(), defaultOutcome);
                     Tuple2<Long, FlowClassificationRuleUtilities.MatchOutcome> inboundFlowRating = lfdIdToInboundRuleIdMap.getOrDefault(d.lfdId(), defaultOutcome);
 
-                    String outboundRatingCode = outboundRatingCodeByRuleId.get(outboundFlowRating.v1);
-                    String inboundRatingCode = inboundRatingCodeByRuleId.get(inboundFlowRating.v1);
+                    String outboundRatingCode = outboundRatingCodeByRuleId.getOrDefault(outboundFlowRating.v1, NO_OPINION.value());
+                    String inboundRatingCode = inboundRatingCodeByRuleId.getOrDefault(inboundFlowRating.v1, NO_OPINION.value());
 
                     AuthoritativenessRatingValue outboundRating = FlowClassificationRuleUtilities.MatchOutcome.POSITIVE_MATCH.equals(outboundFlowRating.v2)
                             ? AuthoritativenessRatingValue.of(outboundRatingCode)
-                            : DISCOURAGED;
+                            :  FlowClassificationRuleUtilities.MatchOutcome.NEGATIVE_MATCH.equals(outboundFlowRating.v2)
+                                ? DISCOURAGED
+                                : NO_OPINION;
 
                     AuthoritativenessRatingValue inboundRating = FlowClassificationRuleUtilities.MatchOutcome.POSITIVE_MATCH.equals(inboundFlowRating.v2)
                             ? AuthoritativenessRatingValue.of(inboundRatingCode)

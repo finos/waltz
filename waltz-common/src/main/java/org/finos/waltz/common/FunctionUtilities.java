@@ -66,10 +66,11 @@ public class FunctionUtilities {
         long st = System.currentTimeMillis();
 
         try {
+            LOG.info("----> begin [{}]", name);
             T r = supplier.get();
             long end = System.currentTimeMillis();
 
-            LOG.info("duration [{}]: {}", name, (end - st));
+            LOG.info("<---- end [{}], duration:{}", name, (end - st));
             return r;
         } catch (Exception e) {
             String msg = String.format("Unexpected error when timing [%s]: %s", name, e.getMessage());
