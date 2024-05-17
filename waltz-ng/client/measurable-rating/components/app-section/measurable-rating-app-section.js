@@ -60,6 +60,8 @@ const initialState = {
 function controller($q, serviceBroker, settingsService, userService) {
     const vm = initialiseData(this, initialState);
 
+    global.vm = vm;
+
     function determineIfRoadmapsAreEnabled() {
         settingsService
             .findOrDefault(namedSettings.measurableRatingRoadmapsEnabled, true)
