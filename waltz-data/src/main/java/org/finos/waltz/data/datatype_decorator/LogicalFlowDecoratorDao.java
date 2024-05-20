@@ -305,6 +305,8 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
                 .select(
                         LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID,
                         LOGICAL_FLOW_DECORATOR.IS_READONLY,
+                        LOGICAL_FLOW_DECORATOR.LAST_UPDATED_BY,
+                        LOGICAL_FLOW_DECORATOR.PROVENANCE,
                         numberOfFlowsSharingDatatype)
                 .from(LOGICAL_FLOW)
                 .innerJoin(LOGICAL_FLOW_DECORATOR).on(LOGICAL_FLOW.ID.eq(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID)
@@ -315,20 +317,56 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
                 .leftJoin(PHYSICAL_SPEC_DATA_TYPE).on(PHYSICAL_FLOW.SPECIFICATION_ID.eq(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID)
                         .and(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID.eq(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID)))
                 .where(LOGICAL_FLOW.ID.eq(ref.id()))
-                .groupBy(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID, LOGICAL_FLOW_DECORATOR.IS_READONLY)
+                .groupBy(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID, LOGICAL_FLOW_DECORATOR.IS_READONLY, LOGICAL_FLOW_DECORATOR.LAST_UPDATED_BY, LOGICAL_FLOW_DECORATOR.PROVENANCE)
                 .fetch(r -> {
                     int usageCount = r.get(numberOfFlowsSharingDatatype);
+                    boolean noUsages = usageCount == 0;
+                    boolean isReadOnly = r.get(LOGICAL_FLOW_DECORATOR.IS_READONLY);
+                    String provenance = r.get(LOGICAL_FLOW_DECORATOR.PROVENANCE);
+                    String lastUpdatedBy = r.get(LOGICAL_FLOW_DECORATOR.LAST_UPDATED_BY);
                     return ImmutableDataTypeUsageCharacteristics.builder()
                             .dataTypeId(r.get(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID))
-                            .warningMessageForViewers(usageCount == 0
-                                    ? "Warning: None of the underlying physical flows reference this data type."
-                                    : null)
-                            .warningMessageForEditors(usageCount > 0
-                                    ? format("Cannot be removed as used in %d physical flows. These must be removed first.", usageCount)
-                                    : null)
-                            .isRemovable(usageCount == 0)
+                            .warningMessageForViewers(mkViewerWarningMessage(noUsages, isReadOnly, lastUpdatedBy, provenance))
+                            .warningMessageForEditors(mkEditorWarningMessage(usageCount, isReadOnly, lastUpdatedBy, provenance))
+                            .isRemovable(noUsages && !isReadOnly)
                             .build();
                 });
+    }
+
+    private String mkEditorWarningMessage(int usageCount,
+                                          boolean isReadOnly,
+                                          String lastUpdatedBy,
+                                          String provenance) {
+
+        StringBuilder buff = new StringBuilder();
+        if (usageCount > 0 || isReadOnly) {
+            buff.append("Warning:\n");
+        }
+        if (usageCount > 0) {
+            buff.append(format("- Cannot be removed as used in %d physical flows. The data type mappings on these must be removed first\n", usageCount));
+        }
+        if (isReadOnly) {
+            buff.append(format("- Marked as readonly - <span title='last edited by / provenance' class='text-muted'>%s / %s</span>\n", lastUpdatedBy, provenance));
+        }
+        return buff.toString();
+    }
+
+
+    private String mkViewerWarningMessage(boolean noUsages,
+                                          boolean isReadOnly,
+                                          String lastUpdatedBy,
+                                          String provenance) {
+        StringBuilder buff = new StringBuilder();
+        if (noUsages || isReadOnly) {
+            buff.append("Warning:\n");
+        }
+        if (noUsages) {
+            buff.append("- None of the underlying physical flows reference this data type\n");
+        }
+        if (isReadOnly) {
+            buff.append(format("- Marked as readonly - <span title='last edited by / provenance' class='text-muted'>%s / %s</span>\n", lastUpdatedBy, provenance));
+        }
+        return buff.toString();
     }
 
 
