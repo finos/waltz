@@ -108,7 +108,7 @@
                       style="vertical-align: middle"
                       size="xl"/>
             </span>
-            {usageCharacteristics.warningMessageForEditors}
+            <Markdown inline={true} text={usageCharacteristics.warningMessageForEditors}/>
         </div>
     </div>
 {/if}
@@ -120,7 +120,7 @@
                       style="vertical-align: middle"
                       size="xl"/>
             </span>
-            {usageCharacteristics.warningMessageForViewers}
+            <Markdown inline={true} text={usageCharacteristics.warningMessageForViewers}/>
         </div>
     </div>
 {/if}
