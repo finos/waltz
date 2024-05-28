@@ -21,6 +21,7 @@ import {initialiseData} from "../../../common";
 import template from "./inline-measurable-rating-panel.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkSelectionOptions} from "../../../common/selector-utils";
+import {mkTab} from "../../../measurable-rating/measurable-rating-utils";
 
 
 const bindings = {
@@ -42,30 +43,24 @@ function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const loadData = () => {
-        const measurablesPromise = serviceBroker
-            .loadViewData(
-                CORE_API.MeasurableStore.findMeasurablesBySelector,
-                [mkSelectionOptions(vm.parentEntityRef)])
-            .then(r => r.data);
 
-        const measurableRatingsPromise = serviceBroker
+        const viewPromise = serviceBroker
             .loadViewData(
-                CORE_API.MeasurableRatingStore.findForEntityReference,
-                [vm.parentEntityRef],
+                CORE_API.MeasurableRatingStore.getViewByCategoryAndAppSelector,
+                [vm.measurableCategoryRef.id, mkSelectionOptions(vm.parentEntityRef)],
                 {force: true})
             .then(r => r.data);
 
-        const ratingsPromise = serviceBroker
+        const applicationPromise = serviceBroker
             .loadViewData(
-                CORE_API.RatingSchemeStore.findRatingsForEntityAndMeasurableCategory,
-                [vm.parentEntityRef, vm.measurableCategoryRef.id])
+                CORE_API.ApplicationStore.getById,
+                [vm.parentEntityRef.id])
             .then(r => r.data);
 
-        $q.all([measurablesPromise, measurableRatingsPromise, ratingsPromise])
-            .then(([measurables, measurableRatings, ratingSchemeItems]) => {
-                vm.measurables = _.filter(measurables, d => d.categoryId === vm.measurableCategoryRef.id);
-                vm.ratings = measurableRatings;
-                vm.ratingSchemeItems = ratingSchemeItems;
+
+        $q.all([applicationPromise, viewPromise])
+            .then(([application, viewData]) => {
+                vm.ratingInfo = mkTab(viewData, application);
             });
     };
 
