@@ -19,6 +19,7 @@
 package org.finos.waltz.service.attestation;
 
 
+import org.finos.waltz.data.EntityReferenceNameResolver;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.attestation.AttestationInstanceDao;
@@ -67,6 +68,7 @@ import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.asList;
 import static org.finos.waltz.common.ListUtilities.isEmpty;
 import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 import static org.finos.waltz.model.attestation.AttestationStatus.ISSUED;
 import static org.finos.waltz.model.attestation.AttestationStatus.ISSUING;
@@ -78,6 +80,7 @@ public class AttestationRunService {
     private final AttestationInstanceDao attestationInstanceDao;
     private final AttestationInstanceRecipientDao attestationInstanceRecipientDao;
     private final AttestationRunDao attestationRunDao;
+    private final EntityReferenceNameResolver entityReferenceNameResolver;
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
     private final InvolvementDao involvementDao;
     private final InvolvementGroupService involvementGroupService;
@@ -86,16 +89,20 @@ public class AttestationRunService {
     public AttestationRunService(AttestationInstanceDao attestationInstanceDao,
                                  AttestationInstanceRecipientDao attestationInstanceRecipientDao,
                                  AttestationRunDao attestationRunDao,
-                                 InvolvementDao involvementDao, InvolvementGroupService involvementGroupService) {
+                                 EntityReferenceNameResolver entityReferenceNameResolver,
+                                 InvolvementDao involvementDao,
+                                 InvolvementGroupService involvementGroupService) {
         checkNotNull(attestationInstanceRecipientDao, "attestationInstanceRecipientDao cannot be null");
         checkNotNull(attestationInstanceDao, "attestationInstanceDao cannot be null");
         checkNotNull(attestationRunDao, "attestationRunDao cannot be null");
+        checkNotNull(entityReferenceNameResolver, "entityReferenceNameResolver cannot be null");
         checkNotNull(involvementDao, "involvementDao cannot be null");
         checkNotNull(involvementGroupService, "involvementGroupService cannot be null");
 
         this.attestationInstanceDao = attestationInstanceDao;
         this.attestationInstanceRecipientDao = attestationInstanceRecipientDao;
         this.attestationRunDao = attestationRunDao;
+        this.entityReferenceNameResolver = entityReferenceNameResolver;
         this.involvementDao = involvementDao;
         this.involvementGroupService = involvementGroupService;
     }
@@ -279,9 +286,16 @@ public class AttestationRunService {
 
     private ImmutableAttestationRunCreateCommand mkCreateCommand(AttestEntityCommand createCommand) {
         //Note: Changing the name of this AttestationRunCreateCommand will cause the attestation-run-list to break see #5159
+
+        String description = createCommand.attestedEntityId() == null
+                ? format("Attests that all %ss are present and correct for this entity", createCommand.attestedEntityKind().prettyName())
+                : format(
+                    "Attests that all %s mappings are present and correct for this entity",
+                    resolveRefWithName(createCommand).flatMap(EntityReference::name).orElse("Unknown"));
+
         return ImmutableAttestationRunCreateCommand.builder()
                 .name("Entity Attestation")
-                .description("Attests that all flows are present and correct for this entity")
+                .description(description)
                 .targetEntityKind(EntityKind.APPLICATION)
                 .selectionOptions(mkOpts(createCommand.entityReference()))
                 .involvementKindIds(asSet())
@@ -290,6 +304,12 @@ public class AttestationRunService {
                 .issuedOn(LocalDate.now())
                 .dueDate(LocalDate.now().plusMonths(6))
                 .build();
+    }
+
+
+    private Optional<EntityReference> resolveRefWithName(AttestEntityCommand createCommand) {
+        EntityReference ref = mkRef(createCommand.attestedEntityKind(), createCommand.attestedEntityId());
+        return entityReferenceNameResolver.resolve(ref);
     }
 
 

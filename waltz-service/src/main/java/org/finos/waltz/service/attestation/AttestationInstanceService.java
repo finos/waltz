@@ -19,13 +19,28 @@
 package org.finos.waltz.service.attestation;
 
 import org.finos.waltz.common.exception.UpdateFailedException;
+import org.finos.waltz.data.EntityReferenceNameResolver;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.data.attestation.AttestationInstanceDao;
 import org.finos.waltz.data.person.PersonDao;
-import org.finos.waltz.model.*;
-import org.finos.waltz.model.attestation.*;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdCommandResponse;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.Severity;
+import org.finos.waltz.model.attestation.ApplicationAttestationInstanceInfo;
+import org.finos.waltz.model.attestation.ApplicationAttestationInstanceSummary;
+import org.finos.waltz.model.attestation.ApplicationAttestationSummaryCounts;
+import org.finos.waltz.model.attestation.ApplicationAttestationSummaryFilters;
+import org.finos.waltz.model.attestation.AttestEntityCommand;
+import org.finos.waltz.model.attestation.AttestationInstance;
+import org.finos.waltz.model.attestation.AttestationRun;
+import org.finos.waltz.model.attestation.AttestationState;
+import org.finos.waltz.model.attestation.LatestMeasurableAttestationInfo;
+import org.finos.waltz.model.attestation.SyncRecipientsResponse;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.external_identifier.ExternalIdValue;
 import org.finos.waltz.model.permission_group.CheckPermissionCommand;
@@ -47,10 +62,14 @@ import java.util.List;
 import java.util.Set;
 
 import static java.lang.String.format;
-import static org.finos.waltz.common.Checks.*;
+import static org.finos.waltz.common.Checks.checkEmpty;
+import static org.finos.waltz.common.Checks.checkNotEmpty;
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.first;
 import static org.finos.waltz.common.CollectionUtilities.notEmpty;
-import static org.finos.waltz.common.DateTimeUtilities.*;
+import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
+import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
+import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
 import static org.finos.waltz.common.StringUtilities.join;
 import static org.finos.waltz.schema.Tables.APPLICATION;
 
@@ -64,9 +83,10 @@ public class AttestationInstanceService {
     private final AttestationRunService attestationRunService;
     private final AttestationPreCheckService attestationPreCheckService;
     private final ApplicationService applicationService;
+    private final EntityReferenceNameResolver entityReferenceNameResolver;
     private final PersonDao personDao;
-    private final ChangeLogService changeLogService;
     private final PermissionGroupService permissionGroupService;
+    private final ChangeLogService changeLogService;
 
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
 
@@ -75,8 +95,10 @@ public class AttestationInstanceService {
                                       AttestationRunService attestationRunService,
                                       AttestationPreCheckService attestationPreCheckService,
                                       ApplicationService applicationService,
-                                      PersonDao personDao, ChangeLogService changeLogService,
-                                      PermissionGroupService permissionGroupService) {
+                                      EntityReferenceNameResolver entityReferenceNameResolver,
+                                      PersonDao personDao,
+                                      PermissionGroupService permissionGroupService,
+                                      ChangeLogService changeLogService) {
 
         checkNotNull(attestationInstanceDao, "attestationInstanceDao cannot be null");
         checkNotNull(attestationRunService, "attestationRunService cannot be null");
@@ -87,9 +109,10 @@ public class AttestationInstanceService {
         this.attestationRunService = attestationRunService;
         this.attestationPreCheckService = attestationPreCheckService;
         this.applicationService = applicationService;
+        this.entityReferenceNameResolver = entityReferenceNameResolver;
         this.personDao = personDao;
-        this.changeLogService = changeLogService;
         this.permissionGroupService = permissionGroupService;
+        this.changeLogService = changeLogService;
     }
 
 
@@ -121,7 +144,7 @@ public class AttestationInstanceService {
         if (success) {
             AttestationInstance instance = attestationInstanceDao.getById(instanceId);
             AttestationRun run = attestationRunService.getById(instance.attestationRunId());
-            logChange(attestedBy, instance, run.attestedEntityKind());
+            logChange(attestedBy, instance, run);
         }
         return success;
     }
@@ -163,24 +186,30 @@ public class AttestationInstanceService {
         return genericSelector.selector();
     }
 
-    private void logChange(String username, AttestationInstance instance, EntityKind attestedKind) {
+    private void logChange(String username, AttestationInstance instance, AttestationRun run) {
+
+        String attestedEntityName = run.attestedEntityRef()
+                .flatMap(entityReferenceNameResolver::resolve)
+                .map(ref -> format("%s: %s", run.attestedEntityKind().prettyName(), ref.name().orElse("Unknown")))
+                .orElse(run.attestedEntityKind().prettyName());
 
         String logMessage = EntityKind.APPLICATION.equals(instance.parentEntity().kind())
-                ? format("Attestation of %s for application %s",
-                attestedKind,
-                ExternalIdValue.orElse(
-                        applicationService
-                                .getById(instance.parentEntity().id())
-                                .assetCode(),
-                        "UNKNOWN"))
-                : format("Attestation of %s ", attestedKind);
+                ? format(
+                        "Attestation of %s for application %s",
+                        attestedEntityName,
+                        ExternalIdValue.orElse(
+                                applicationService
+                                        .getById(instance.parentEntity().id())
+                                        .assetCode(),
+                                "UNKNOWN"))
+                : format("Attestation of %s ", attestedEntityName);
 
         changeLogService.write(ImmutableChangeLog.builder()
                 .message(logMessage)
                 .parentReference(instance.parentEntity())
                 .userId(username)
                 .severity(Severity.INFORMATION)
-                .childKind(attestedKind)
+                .childKind(run.attestedEntityKind())
                 .operation(Operation.ATTEST)
                 .build());
     }
