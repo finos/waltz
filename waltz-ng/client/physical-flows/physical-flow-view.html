@@ -21,7 +21,8 @@
     <!-- HEADER -->
     <waltz-page-header name="{{ ctrl.physicalFlow.name || ctrl.specification.name }}"
                        small="{{ ctrl.logicalFlow.source.name }} {{ ctrl.logicalFlow ? '&rarr;' : '' }} {{ ctrl.logicalFlow.target.name }}"
-                       icon="{{ctrl.physicalFlow.kind | toIconName:'entity'}}">
+                       icon="{{ctrl.physicalFlow.kind | toIconName:'entity'}}"
+                       class="waltz-visibility-parent">
         <breadcrumbs>
             <ol class="waltz-breadcrumbs">
                 <li><a ui-sref="main">Home</a></li>
@@ -38,6 +39,12 @@
                 <li ng-bind="(ctrl.physicalFlow.name || ctrl.specification.name) | truncateMiddle:50"></li>
             </ol>
         </breadcrumbs>
+        <actions>
+            <button ng-click="ctrl.sharePageLink()"
+                    class="btn btn-skinny waltz-visibility-child-30">
+                <waltz-icon name="share-alt"></waltz-icon>
+            </button>
+        </actions>
     </waltz-page-header>
 
 
