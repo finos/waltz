@@ -16,15 +16,25 @@
  *
  */
 import View from "./physical-specification-view";
+import {CORE_API} from "../common/services/core-api-utils";
+import _ from "lodash";
+import toasts from "../svelte-stores/toast-store";
 
 
 const baseState = {
+    url: "physical-specification"
 };
 
 
 const viewState = {
-    url: "physical-specification/{id:int}",
+    url: "/{id:int}",
     views: {"content@": View },
+};
+
+
+const physicalSpecViewByExternalIdBouncerState = {
+    url: "/external-id/{externalId}",
+    resolve: {externalIdBouncer},
 };
 
 
@@ -32,11 +42,37 @@ function setup($stateProvider) {
 
     $stateProvider
         .state("main.physical-specification", baseState)
-        .state("main.physical-specification.view", viewState);
+        .state("main.physical-specification.view", viewState)
+        .state("main.physical-specification.external-id", physicalSpecViewByExternalIdBouncerState);
 }
 
 
+
+function externalIdBouncer($state, $stateParams, serviceBroker) {
+    const externalId = $stateParams.externalId;
+    serviceBroker
+        .loadViewData(
+            CORE_API.PhysicalSpecificationStore.findByExternalId,
+            [externalId])
+        .then(r => {
+            const specList = r.data;
+            const spec = _.head(specList);
+
+            if (_.size(specList) > 1 && spec) {
+                console.log(`Multiple physical specifications corresponding to external id: ${externalId}`);
+                toasts.warning(`Multiple physical flows specifications to external id: ${externalId}, redirecting to the first found`);
+                $state.go("main.physical-specification.view", {id: spec.id});
+            } else if(_.size(specList) === 1 && spec){
+                $state.go("main.physical-specification.view", {id: spec.id});
+            } else {
+                console.log(`Cannot find physical specification corresponding to external id: ${externalId}`);
+                toasts.error(`Cannot find physical specification with the external id: ${externalId}, redirecting to the Waltz home page`);
+            }
+        });
+}
+
 setup.$inject = ["$stateProvider"];
 
+externalIdBouncer.$inject = ["$state", "$stateParams", "ServiceBroker"];
 
 export default setup;

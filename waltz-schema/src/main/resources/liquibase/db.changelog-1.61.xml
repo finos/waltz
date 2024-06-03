@@ -44,7 +44,7 @@
         <comment>7082: adding default external id to physical_flow</comment>
         <update tableName="physical_flow">
             <column name="external_id"
-                    valueComputed="CONCAT('PF:', FORMAT(NEXT VALUE FOR physical_flow_id_seq, '000000'))"
+                    valueComputed="CONCAT('PF_', FORMAT(NEXT VALUE FOR physical_flow_id_seq, '000000'))"
                     type="${external-id.type}"/>
             <where>external_id is NULL or external_id = ''</where>
         </update>
@@ -56,7 +56,7 @@
         <comment>7082: adding default external id to physical_flow</comment>
         <addDefaultValue tableName="physical_flow"
                          columnName="external_id"
-                         defaultValueComputed="CONCAT('PF:', FORMAT(NEXT VALUE FOR physical_flow_id_seq, '000000'))"/>
+                         defaultValueComputed="CONCAT('PF_', FORMAT(NEXT VALUE FOR physical_flow_id_seq, '000000'))"/>
     </changeSet>
 
     <changeSet id="2024530-7082-4"
@@ -102,7 +102,7 @@
         <comment>7082: adding default external id to physical_specification</comment>
         <update tableName="physical_specification">
             <column name="external_id"
-                    valueComputed="CONCAT('PS:', FORMAT(NEXT VALUE FOR physical_specification_id_seq, '000000'))"
+                    valueComputed="CONCAT('PS_', FORMAT(NEXT VALUE FOR physical_specification_id_seq, '000000'))"
                     type="${external-id.type}"/>
             <where>external_id is NULL or external_id = ''</where>
         </update>
@@ -113,7 +113,7 @@
         <comment>7082: adding default external id to physical_specification</comment>
         <addDefaultValue tableName="physical_specification"
                          columnName="external_id"
-                         defaultValueComputed="CONCAT('PS:', FORMAT(NEXT VALUE FOR physical_specification_id_seq, '000000'))"/>
+                         defaultValueComputed="CONCAT('PS_', FORMAT(NEXT VALUE FOR physical_specification_id_seq, '000000'))"/>
     </changeSet>
 
     <changeSet id="2024530-7082-10"
