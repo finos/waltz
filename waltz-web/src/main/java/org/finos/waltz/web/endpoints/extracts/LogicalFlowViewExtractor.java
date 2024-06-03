@@ -91,6 +91,7 @@ public class LogicalFlowViewExtractor extends CustomDataExtractor {
                 "Source Entity External Id",
                 "Target Entity Name",
                 "Target Entity External Id",
+                "Flow External Id",
                 "Data Types",
                 "Physical Flow Count");
 
@@ -134,6 +135,7 @@ public class LogicalFlowViewExtractor extends CustomDataExtractor {
                     reportRow.add(row.source().externalId());
                     reportRow.add(row.target().name());
                     reportRow.add(row.target().externalId());
+                    reportRow.add(row.externalId().orElse(""));
                     reportRow.add(dataTypeString);
                     reportRow.add(physicals.size());
 
