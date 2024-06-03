@@ -124,4 +124,33 @@
                               columnDataType="${external-id.type}"/>
     </changeSet>
 
+
+    <changeSet id="20240603-7082-1"
+               author="woodjes">
+        <comment>7082: migrate default value for logical flow</comment>
+        <createSequence  cycle="false"
+                         incrementBy="1"
+                         maxValue="1000000"
+                         minValue="1"
+                         sequenceName="logical_flow_id_seq"
+                         startValue="1"/>
+    </changeSet>
+
+
+    <changeSet id="20240603-7082-2"
+               author="woodjes">
+        <comment>7082: migrate default value for logical flow</comment>
+        <dropDefaultValue tableName="logical_flow"
+                          columnName="external_id"/>
+    </changeSet>
+
+
+    <changeSet id="20240603-7082-3"
+               author="woodjes">
+        <comment>7082: migrate default value for logical flow</comment>
+        <addDefaultValue tableName="logical_flow"
+                         columnName="external_id"
+                         defaultValueComputed="CONCAT('LF_', FORMAT(NEXT VALUE FOR logical_flow_id_seq, '000000'))"/>
+    </changeSet>
+
 </databaseChangeLog>

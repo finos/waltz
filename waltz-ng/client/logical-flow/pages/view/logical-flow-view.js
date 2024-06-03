@@ -25,6 +25,7 @@ import toasts from "../../../svelte-stores/toast-store";
 import _ from "lodash";
 import {displayError} from "../../../common/error-utils";
 import AlignedDataTypesList from "../../components/aligned-data-types-list/AlignedDataTypesList.svelte";
+import {copyTextToClipboard} from "../../../common/browser-utils";
 
 
 const initialState = {
@@ -139,6 +140,13 @@ function controller($q,
             restoreLogicalFlow();
         }
     };
+
+    vm.sharePageLink = () => {
+        const viewUrl = $state.href("main.logical-flow.external-id", { externalId: vm.logicalFlow.externalId });
+        copyTextToClipboard(`${$window.location.origin}${viewUrl}`)
+            .then(() => toasts.success("Copied link to clipboard"))
+            .catch(e => displayError("Could not copy link to clipboard", e));
+    }
 }
 
 
