@@ -66,6 +66,7 @@ public class PhysicalFlowExtractor extends CustomDataExtractor {
     private static final List<Field<String>> SOURCE_NAME_AND_ASSET_CODE_FIELDS;
     private static final List<Field<String>> SOURCE_AND_TARGET_NAME_AND_ASSET_CODE;
     private static final PhysicalFlowIdSelectorFactory physicalFlowIdSelectorFactory = new PhysicalFlowIdSelectorFactory();
+    public static final Field<Long> PHYS_FLOW_ID = PHYSICAL_FLOW.ID.as("Waltz Id");
 
 
     private final DSLContext dsl;
@@ -227,9 +228,11 @@ public class PhysicalFlowExtractor extends CustomDataExtractor {
 
         return dsl
                 .select(
-                        PHYSICAL_FLOW.ID,
-                        PHYSICAL_SPECIFICATION.NAME.as("Name"),
-                        PHYSICAL_FLOW.EXTERNAL_ID.as("External Id"))
+                        PHYS_FLOW_ID,
+                        PHYSICAL_FLOW.NAME.as("Name"),
+                        PHYSICAL_FLOW.EXTERNAL_ID.as("External Id"),
+                        PHYSICAL_SPECIFICATION.NAME.as("Specification Name"),
+                        PHYSICAL_SPECIFICATION.EXTERNAL_ID.as("Specification External Id"))
                 .select(SOURCE_AND_TARGET_NAME_AND_ASSET_CODE)
                 .select(
                         dataFormatKindValue.DISPLAY_NAME.as("Format"),
@@ -282,7 +285,7 @@ public class PhysicalFlowExtractor extends CustomDataExtractor {
                     List<Object> reportRow = ListUtilities.map(
                             qry.getSelect(),
                             row::get);
-                    Long physicalFlowId = row.get(PHYSICAL_FLOW.ID);
+                    Long physicalFlowId = row.get(PHYS_FLOW_ID);
                     List<String> physicalFlowTags = tags.get(physicalFlowId);
                     reportRow.add(isEmpty(physicalFlowTags)
                             ? ""
