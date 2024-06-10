@@ -31,7 +31,7 @@ Find your local number: https://zoom.us/u/aeyTu3Q7E8
 
 ## Agenda
 - [ ] Convene, roll call, welcome new people (5mins)
-- [ ] Display [FINOS Antitrust Policy summary slide](https://github.com/finos/community/blob/master/governance/Compliance-Slides/Antitrust-Compliance-Slide.pdf) 
+- [ ] Display [FINOS Antitrust Policy summary slide](https://community.finos.org/Compliance-Slides/Antitrust-Compliance-Slide.pdf) 
 - [ ] Review Meeting Notices (see above)
 - [ ] Approve previous meeting minutes - https://github.com/finos/waltz/issues?q=is%3Aissue+is%3Aclosed+label%3Ameeting
 - [ ] _Add Items Here_
