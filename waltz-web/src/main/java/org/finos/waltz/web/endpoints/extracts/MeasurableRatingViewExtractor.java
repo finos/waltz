@@ -102,7 +102,7 @@ public class MeasurableRatingViewExtractor extends CustomDataExtractor {
 
             return writeReportResults(
                     response,
-                    prepareFlows(
+                    prepareRatings(
                             viewParams,
                             categoryId,
                             parseExtractFormat(request),
@@ -111,10 +111,10 @@ public class MeasurableRatingViewExtractor extends CustomDataExtractor {
     }
 
 
-    private Tuple3<ExtractFormat, String, byte[]> prepareFlows(MeasurableRatingViewParams viewParams,
-                                                               Long categoryId,
-                                                               ExtractFormat format,
-                                                               String reportName) throws IOException {
+    private Tuple3<ExtractFormat, String, byte[]> prepareRatings(MeasurableRatingViewParams viewParams,
+                                                                 Long categoryId,
+                                                                 ExtractFormat format,
+                                                                 String reportName) throws IOException {
 
         MeasurableRatingCategoryView view = measurableRatingViewService.getViewForCategoryAndSelector(viewParams.idSelectionOptions(), categoryId);
 

@@ -906,6 +906,7 @@ const endUserApplicationSections = [
     involvedPeopleSection,
     dataFlowSection,
     entityDiagramsSection,
+    measurableRatingAppSection,
     changeLogSection
 ];
 

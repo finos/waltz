@@ -120,13 +120,12 @@ public class MeasurableRatingViewService {
         MeasurableRating measurableRating = measurableRatingService.getById(id);
 
         Measurable measurable = measurableService.getById(measurableRating.measurableId());
-        Application application = applicationService.getById(measurableRating.entityReference().id());
 
         if (measurable == null) {
 
-            return ImmutableMeasurableRatingView.builder()
+            return ImmutableMeasurableRatingView
+                    .builder()
                     .measurableRating(measurableRating)
-                    .application(application)
                     .measurable(null)
                     .rating(null)
                     .decommission(null)
@@ -156,7 +155,6 @@ public class MeasurableRatingViewService {
 
             return ImmutableMeasurableRatingView.builder()
                     .measurableRating(measurableRating)
-                    .application(application)
                     .measurable(measurable)
                     .rating(rating)
                     .decommission(decomm)

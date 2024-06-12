@@ -65,6 +65,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -101,17 +102,29 @@ public class MeasurableRatingDao {
     private static final Condition APP_JOIN_CONDITION = APPLICATION.ID.eq(MEASURABLE_RATING.ENTITY_ID)
             .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
 
+    private static final ArrayList<EntityKind> SUPPORTED_ENTITY_KINDS = newArrayList(
+            EntityKind.APPLICATION,
+            EntityKind.END_USER_APPLICATION,
+            EntityKind.ACTOR,
+            EntityKind.CHANGE_INITIATIVE);
+
     private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
                     MEASURABLE_RATING.ENTITY_ID,
                     MEASURABLE_RATING.ENTITY_KIND,
-                    newArrayList(EntityKind.APPLICATION))
+                    SUPPORTED_ENTITY_KINDS)
             .as("entity_name");
 
     private static final Field<String> ENTITY_LIFECYCLE_FIELD = InlineSelectFieldFactory.mkEntityLifecycleField(
                     MEASURABLE_RATING.ENTITY_ID,
                     MEASURABLE_RATING.ENTITY_KIND,
-                    newArrayList(EntityKind.APPLICATION))
+                    SUPPORTED_ENTITY_KINDS)
             .as("entity_lifecycle_status");
+
+    private static final Field<String> ENTITY_DESCRIPTION_FIELD = InlineSelectFieldFactory.mkDescriptionField(
+                    MEASURABLE_RATING.ENTITY_ID,
+                    MEASURABLE_RATING.ENTITY_KIND,
+                    SUPPORTED_ENTITY_KINDS)
+            .as("entity_description");
 
 
     private static final RecordMapper<? super Record, MeasurableRating> TO_DOMAIN_MAPPER = record -> {
@@ -122,6 +135,7 @@ public class MeasurableRatingDao {
                 .id(r.getEntityId())
                 .name(Optional.ofNullable(record.get(ENTITY_NAME_FIELD)))
                 .entityLifecycleStatus(readEnum(record.get(ENTITY_LIFECYCLE_FIELD), EntityLifecycleStatus.class, (s) -> EntityLifecycleStatus.REMOVED))
+                .description(record.get(ENTITY_DESCRIPTION_FIELD))
                 .build();
 
         Long ratingId = record.get(RATING_SCHEME_ITEM.ID);
@@ -420,6 +434,7 @@ public class MeasurableRatingDao {
                 .select(MEASURABLE_RATING.fields())
                 .select(ENTITY_NAME_FIELD)
                 .select(ENTITY_LIFECYCLE_FIELD)
+                .select(ENTITY_DESCRIPTION_FIELD)
                 .from(MEASURABLE_RATING);
     }
 
@@ -429,6 +444,7 @@ public class MeasurableRatingDao {
                 .select(MEASURABLE_RATING.fields())
                 .select(ENTITY_NAME_FIELD)
                 .select(ENTITY_LIFECYCLE_FIELD)
+                .select(ENTITY_DESCRIPTION_FIELD)
                 .select(RATING_SCHEME_ITEM.ID)
                 .from(MEASURABLE_RATING)
                 .innerJoin(MEASURABLE).on(MEASURABLE_RATING.MEASURABLE_ID.eq(MEASURABLE.ID))
