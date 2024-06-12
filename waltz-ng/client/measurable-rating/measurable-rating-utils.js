@@ -99,23 +99,6 @@ function prepareTabForCategory(measurableRatingsView,
         .mapValues(d => _.sumBy(d, a => a.percentage))
         .value();
 
-    const plannedDecomms = _.isNull(application.plannedRetirementDate)
-        ? _.map(decommissionsView.plannedDecommissions, d => Object.assign({}, d, { isValid: true}))
-        : _.map(decommissionsView.plannedDecommissions, d => {
-
-            const decomDate = new Date(d.plannedDecommissionDate);
-            const appRetirementDate = new Date(application.plannedRetirementDate);
-
-            const sameDate = appRetirementDate.getFullYear() === decomDate.getFullYear()
-                && appRetirementDate.getMonth() === decomDate.getMonth()
-                && appRetirementDate.getDate() === decomDate.getDate();
-
-            const isValid = appRetirementDate > decomDate || sameDate;
-
-            return Object.assign({}, d, {isValid: isValid})
-        });
-
-
     return {
         category: _.head(measurableRatingsView.measurableCategories),
         measurables,
@@ -124,7 +107,7 @@ function prepareTabForCategory(measurableRatingsView,
         allocations: allocationsView.allocations,
         assessmentDefinitions: assessmentsView.assessmentDefinitions,
         assessmentRatings,
-        plannedDecommissions: plannedDecomms,
+        plannedDecommissions: decommissionsView.plannedDecommissions,
         plannedReplacements: decommissionsView.plannedReplacements,
         replacingDecommissions: decommissionsView.replacingDecommissions,
         ratingSchemeItems: measurableRatingsView.ratingSchemeItems,

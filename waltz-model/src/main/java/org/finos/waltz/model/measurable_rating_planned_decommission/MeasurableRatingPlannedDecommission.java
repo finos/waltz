@@ -4,9 +4,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.CreatedProvider;
 import org.finos.waltz.model.LastUpdatedProvider;
+import org.finos.waltz.model.Nullable;
 import org.immutables.value.Value;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Value.Immutable
 @JsonSerialize (as = ImmutableMeasurableRatingPlannedDecommission.class)
@@ -17,5 +18,13 @@ public abstract class MeasurableRatingPlannedDecommission implements
 
     public abstract Long id();
     public abstract Long measurableRatingId();
-    public abstract Date plannedDecommissionDate();
+    public abstract LocalDate plannedDecommissionDate();
+
+    @Nullable
+    public abstract LocalDate subjectDecommissionDate();
+
+    @Value.Derived
+    public boolean isValid(){
+        return subjectDecommissionDate() == null || !plannedDecommissionDate().isAfter(subjectDecommissionDate());
+    }
 }

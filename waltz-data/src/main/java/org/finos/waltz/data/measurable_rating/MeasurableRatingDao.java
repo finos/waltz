@@ -126,6 +126,12 @@ public class MeasurableRatingDao {
                     SUPPORTED_ENTITY_KINDS)
             .as("entity_description");
 
+    private static final Field<String> ENTITY_EXT_ID_FIELD = InlineSelectFieldFactory.mkExternalIdField(
+                    MEASURABLE_RATING.ENTITY_ID,
+                    MEASURABLE_RATING.ENTITY_KIND,
+                    SUPPORTED_ENTITY_KINDS)
+            .as("entity_ext_id");
+
 
     private static final RecordMapper<? super Record, MeasurableRating> TO_DOMAIN_MAPPER = record -> {
         MeasurableRatingRecord r = record.into(MEASURABLE_RATING);
@@ -136,6 +142,7 @@ public class MeasurableRatingDao {
                 .name(Optional.ofNullable(record.get(ENTITY_NAME_FIELD)))
                 .entityLifecycleStatus(readEnum(record.get(ENTITY_LIFECYCLE_FIELD), EntityLifecycleStatus.class, (s) -> EntityLifecycleStatus.REMOVED))
                 .description(record.get(ENTITY_DESCRIPTION_FIELD))
+                .externalId(Optional.ofNullable(record.get(ENTITY_EXT_ID_FIELD)))
                 .build();
 
         Long ratingId = record.get(RATING_SCHEME_ITEM.ID);
@@ -267,11 +274,23 @@ public class MeasurableRatingDao {
     }
 
 
-    public List<MeasurableRating> findForCategoryAndSelector(Select<Record1<Long>> appIdSelector, long categoryId) {
+    /*
+     * Should move to using a measurable rating id selector
+     */
+    @Deprecated
+    public List<MeasurableRating> findForCategoryAndSubjectIdSelector(Select<Record1<Long>> subjectIdSelector, long categoryId) {
         return mkExtendedBaseQuery()
                 .where(dsl.renderInlined(MEASURABLE_CATEGORY.ID.eq(categoryId)
                                 .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
-                                        .and(MEASURABLE_RATING.ENTITY_ID.in(appIdSelector)))))
+                                        .and(MEASURABLE_RATING.ENTITY_ID.in(subjectIdSelector)))))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public List<MeasurableRating> findForCategoryAndMeasurableRatingIdSelector(Select<Record1<Long>> ratingIdSelector, long categoryId) {
+        return mkExtendedBaseQuery()
+                .where(dsl.renderInlined(MEASURABLE_CATEGORY.ID.eq(categoryId)
+                                .and(MEASURABLE_RATING.ID.in(ratingIdSelector))))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -435,6 +454,7 @@ public class MeasurableRatingDao {
                 .select(ENTITY_NAME_FIELD)
                 .select(ENTITY_LIFECYCLE_FIELD)
                 .select(ENTITY_DESCRIPTION_FIELD)
+                .select(ENTITY_EXT_ID_FIELD)
                 .from(MEASURABLE_RATING);
     }
 
@@ -445,6 +465,7 @@ public class MeasurableRatingDao {
                 .select(ENTITY_NAME_FIELD)
                 .select(ENTITY_LIFECYCLE_FIELD)
                 .select(ENTITY_DESCRIPTION_FIELD)
+                .select(ENTITY_EXT_ID_FIELD)
                 .select(RATING_SCHEME_ITEM.ID)
                 .from(MEASURABLE_RATING)
                 .innerJoin(MEASURABLE).on(MEASURABLE_RATING.MEASURABLE_ID.eq(MEASURABLE.ID))
@@ -837,11 +858,22 @@ public class MeasurableRatingDao {
         return MeasurableRatingHelper.resolveLoggingContextForRatingChange(dsl, entityRef, measurableId, desiredRatingCode);
     }
 
-
+    /*
+     * Should move to using a measurable rating id selector
+     */
+    @Deprecated
     public Set<MeasurableRating> findPrimaryRatingsForGenericSelector(GenericSelector selector) {
         return mkExtendedBaseQuery()
                 .where(dsl.renderInlined(MEASURABLE_RATING.ENTITY_KIND.eq(selector.kind().name())
                         .and(MEASURABLE_RATING.ENTITY_ID.in(selector.selector()))
+                        .and(MEASURABLE_RATING.IS_PRIMARY.isTrue())))
+                .fetchSet(TO_DOMAIN_MAPPER);
+    }
+
+
+    public Set<MeasurableRating> findPrimaryRatingsForMeasurableIdSelector(Select<Record1<Long>> ratingIdSelector) {
+        return mkExtendedBaseQuery()
+                .where(dsl.renderInlined(MEASURABLE_RATING.ID.in(ratingIdSelector)
                         .and(MEASURABLE_RATING.IS_PRIMARY.isTrue())))
                 .fetchSet(TO_DOMAIN_MAPPER);
     }

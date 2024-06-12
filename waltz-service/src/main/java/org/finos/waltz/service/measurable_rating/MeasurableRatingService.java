@@ -102,8 +102,16 @@ public class MeasurableRatingService {
     }
 
 
-    public List<MeasurableRating> findForCategoryAndSelector(Select<Record1<Long>> appIds, long categoryId) {
-        return measurableRatingDao.findForCategoryAndSelector(appIds, categoryId);
+    /*
+     * Should move to using a measurable rating id selector
+     */
+    @Deprecated
+    public List<MeasurableRating> findForCategoryAndSubjectIdSelector(Select<Record1<Long>> subjectIdSelector, long categoryId) {
+        return measurableRatingDao.findForCategoryAndSubjectIdSelector(subjectIdSelector, categoryId);
+    }
+
+    public List<MeasurableRating> findForCategoryAndMeasurableRatingIdSelector(Select<Record1<Long>> ratingIdSelector, long categoryId) {
+        return measurableRatingDao.findForCategoryAndMeasurableRatingIdSelector(ratingIdSelector, categoryId);
     }
 
 
@@ -427,7 +435,15 @@ public class MeasurableRatingService {
                 : format("%s [%s]", nameAndCode.v1, nameAndCode.v2);
     }
 
-    public Set<MeasurableRating> findPrimaryRatingsForGenericSelector(GenericSelector genericSelector) {
-        return measurableRatingDao.findPrimaryRatingsForGenericSelector(genericSelector);
+    /*
+     * Should move to using a measurable rating id selector
+     */
+    @Deprecated
+    public Set<MeasurableRating> findPrimaryRatingsForGenericSelector(GenericSelector subjectIdSelector) {
+        return measurableRatingDao.findPrimaryRatingsForGenericSelector(subjectIdSelector);
+    }
+
+    public Set<MeasurableRating> findPrimaryRatingsForMeasurableIdSelector(Select<Record1<Long>> ratingIdSelector) {
+        return measurableRatingDao.findPrimaryRatingsForMeasurableIdSelector(ratingIdSelector);
     }
 }

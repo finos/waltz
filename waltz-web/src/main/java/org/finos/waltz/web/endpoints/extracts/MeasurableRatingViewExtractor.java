@@ -20,7 +20,6 @@ package org.finos.waltz.web.endpoints.extracts;
 
 import org.finos.waltz.model.NameProvider;
 import org.finos.waltz.model.allocation.Allocation;
-import org.finos.waltz.model.application.Application;
 import org.finos.waltz.model.application.AssessmentsView;
 import org.finos.waltz.model.application.MeasurableRatingsView;
 import org.finos.waltz.model.assessment_rating.AssessmentRating;
@@ -36,11 +35,9 @@ import org.finos.waltz.model.measurable_rating.MeasurableRatingViewParams;
 import org.finos.waltz.model.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommission;
 import org.finos.waltz.model.measurable_rating_replacement.MeasurableRatingReplacement;
 import org.finos.waltz.model.rating.RatingSchemeItem;
-import org.finos.waltz.model.utils.IdUtilities;
 import org.finos.waltz.service.measurable_category.MeasurableCategoryService;
 import org.finos.waltz.service.measurable_rating.MeasurableRatingViewService;
 import org.finos.waltz.web.WebUtilities;
-import org.jooq.DSLContext;
 import org.jooq.lambda.tuple.Tuple3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -78,11 +75,9 @@ public class MeasurableRatingViewExtractor extends CustomDataExtractor {
     private final MeasurableRatingViewService measurableRatingViewService;
     private final MeasurableCategoryService measurableCategoryService;
 
-    private final DSLContext dsl;
 
     @Autowired
-    public MeasurableRatingViewExtractor(DSLContext dsl, MeasurableRatingViewService measurableRatingViewService, MeasurableCategoryService measurableCategoryService) {
-        this.dsl = dsl;
+    public MeasurableRatingViewExtractor(MeasurableRatingViewService measurableRatingViewService, MeasurableCategoryService measurableCategoryService) {
         this.measurableRatingViewService = measurableRatingViewService;
         this.measurableCategoryService = measurableCategoryService;
     }
@@ -149,8 +144,8 @@ public class MeasurableRatingViewExtractor extends CustomDataExtractor {
 
         headerRow.add("Primary?");
 
-        headerRow.add("Application");
-        headerRow.add("Application Asset Code");
+        headerRow.add("Subject");
+        headerRow.add("Subject External Id");
 
         int parentLevel = 1;
         while (parentLevel < maxDepthOfTree + 1) {
@@ -198,7 +193,6 @@ public class MeasurableRatingViewExtractor extends CustomDataExtractor {
         Map<Long, Measurable> measurablesById = indexById(measurableRatingsView.measurables());
         Map<Long, Collection<Allocation>> allocationsByRatingId = groupBy(allocationsView.allocations(), Allocation::measurableRatingId);
         Map<String, RatingSchemeItem> ratingsByCode = indexBy(measurableRatingsView.ratingSchemeItems(), RatingSchemeItem::rating);
-        Map<Long, Application> appsById = IdUtilities.indexByOptionalId(view.applications());
 
         Map<Long, MeasurableRatingPlannedDecommission> plannedDecommsByRatingId = indexBy(
                 decommissionsView.plannedDecommissions(),
@@ -222,7 +216,6 @@ public class MeasurableRatingViewExtractor extends CustomDataExtractor {
                     ArrayList<Object> reportRow = new ArrayList<>();
 
                     RatingSchemeItem rating = ratingsByCode.get(String.valueOf(row.rating()));
-                    Application application = appsById.get(row.entityReference().id());
 
                     Collection<Allocation> allocs = allocationsByRatingId.getOrDefault(row.id().get(), Collections.emptySet());
                     Map<Long, Integer> allocationsBySchemeId = indexBy(allocs, Allocation::schemeId, Allocation::percentage);
@@ -239,8 +232,8 @@ public class MeasurableRatingViewExtractor extends CustomDataExtractor {
                     String primary = row.isPrimary() ? "Y" : "N";
                     reportRow.add(primary);
 
-                    reportRow.add(application.name());
-                    reportRow.add(application.assetCode());
+                    reportRow.add(row.entityReference().name().orElse("?"));
+                    reportRow.add(row.entityReference().externalId().orElse(""));
 
                     int parentLevel = 1;
                     while (parentLevel < maxDepthOfTree + 1) {
