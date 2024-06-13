@@ -155,3 +155,55 @@ export function determineEditableCategories(categories, permissions, userRoles) 
             return isEditableCategory && (hasRole || editableCategoryForUser);
         });
 }
+
+function checkPlannedDecomDateIsValid(decomDateStr, entityRetirementDateStr) {
+
+    if (_.isNil(entityRetirementDateStr)){
+        return true;
+    } else {
+        const entityDate = new Date(entityRetirementDateStr);
+        const newDecomDate = new Date(decomDateStr);
+
+        const sameDate = entityDate.getFullYear() === newDecomDate.getFullYear()
+            && entityDate.getMonth() === newDecomDate.getMonth()
+            && entityDate.getDate() === newDecomDate.getDate();
+
+        return entityDate > newDecomDate || sameDate;
+    }
+}
+
+
+
+export const DECOM_ALLOWED_STATUS = {
+    FAIL: Symbol("FAIL"),
+    PASS: Symbol("PASS"),
+    CONFIRM: Symbol("CONFIRM")
+}
+
+
+export function checkPlannedDecommIsValid(dateChange, application) {
+
+    if (_.isNil(application)) {
+        return {
+            status: DECOM_ALLOWED_STATUS.PASS,
+            message: null
+
+        }
+    } else if (application.entityLifecycleStatus === "REMOVED"){
+        return {
+            status: DECOM_ALLOWED_STATUS.FAIL,
+            message: "Decommission date cannot be set. This application is no longer active"
+        }
+    } else if (checkPlannedDecomDateIsValid(dateChange.newVal, application?.plannedRetirementDate)){
+        return {
+            status: DECOM_ALLOWED_STATUS.PASS,
+            message: null
+        }
+    } else {
+        const appDate = new Date(application.plannedRetirementDate).toDateString();
+        return {
+            status: DECOM_ALLOWED_STATUS.CONFIRM,
+            errorMsg: `This decommission date is later then the planned retirement date of the application: ${appDate}`
+        }
+    }
+}

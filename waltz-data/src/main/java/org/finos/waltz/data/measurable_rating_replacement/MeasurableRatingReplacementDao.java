@@ -174,8 +174,7 @@ public class MeasurableRatingReplacementDao {
                 .on(MEASURABLE_RATING.ID.eq(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_RATING_ID))
                 .innerJoin(MEASURABLE).on(MEASURABLE_RATING.MEASURABLE_ID.eq(MEASURABLE.ID)
                         .and(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId)))
-                .where(dsl.renderInlined(MEASURABLE_RATING.ID.in(ratingIdSelector)
-                        .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))))
+                .where(dsl.renderInlined(MEASURABLE_RATING.ID.in(ratingIdSelector)))
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
 

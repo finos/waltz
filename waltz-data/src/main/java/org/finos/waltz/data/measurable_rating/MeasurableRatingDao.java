@@ -268,7 +268,7 @@ public class MeasurableRatingDao {
     public List<MeasurableRating> findForEntity(EntityReference ref) {
         checkNotNull(ref, "ref cannot be null");
         return mkBaseQuery()
-                .where(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .where(MEASURABLE_RATING.ENTITY_KIND.eq(ref.kind().name()))
                 .and(MEASURABLE_RATING.ENTITY_ID.eq(ref.id()))
                 .fetch(TO_DOMAIN_MAPPER);
     }
