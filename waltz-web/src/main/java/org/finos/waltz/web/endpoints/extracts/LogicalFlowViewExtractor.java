@@ -24,8 +24,10 @@ import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.NameProvider;
 import org.finos.waltz.model.assessment_rating.AssessmentRating;
 import org.finos.waltz.model.datatype.DataTypeDecorator;
+import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.model.logical_flow.LogicalFlowView;
 import org.finos.waltz.model.physical_flow.PhysicalFlow;
+import org.finos.waltz.model.physical_specification.PhysicalSpecification;
 import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.finos.waltz.web.WebUtilities;
@@ -45,6 +47,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
+import static org.finos.waltz.common.ListUtilities.concat;
 import static org.finos.waltz.common.StringUtilities.joinUsing;
 import static org.finos.waltz.model.utils.IdUtilities.indexById;
 import static spark.Spark.post;
@@ -71,20 +74,31 @@ public class LogicalFlowViewExtractor extends CustomDataExtractor {
 
             return writeReportResults(
                     response,
-                    prepareFlows(
+                    prepareLogicalFlows(
                             options,
                             parseExtractFormat(request),
                             "logical-flows"));
         });
+
+        post(WebUtilities.mkPath("data-extract", "logical-flow-view", "physical-flows"), (request, response) -> {
+            IdSelectionOptions options = WebUtilities.readIdSelectionOptionsFromBody(request);
+
+            return writeReportResults(
+                    response,
+                    preparePhysicalFlows(
+                            options,
+                            parseExtractFormat(request),
+                            "physical-flows"));
+        });
     }
 
 
-    private Tuple3<ExtractFormat, String, byte[]> prepareFlows(IdSelectionOptions options, ExtractFormat format,
-                                                               String reportName) throws IOException {
+    private Tuple3<ExtractFormat, String, byte[]> prepareLogicalFlows(IdSelectionOptions options, ExtractFormat format,
+                                                                      String reportName) throws IOException {
 
         LogicalFlowView flowView = logicalFlowService.getFlowView(options);
 
-        List<List<Object>> reportRows = prepareReportRows(flowView);
+        List<List<Object>> reportRows = prepareLogicalFlowReportRows(flowView);
 
         List<String> staticHeaders = ListUtilities.asList(
                 "Source Entity Name",
@@ -105,11 +119,11 @@ public class LogicalFlowViewExtractor extends CustomDataExtractor {
                 format,
                 reportName,
                 reportRows,
-                ListUtilities.concat(staticHeaders, assessmentHeaders)
+                concat(staticHeaders, assessmentHeaders)
         );
     }
 
-    private List<List<Object>> prepareReportRows(LogicalFlowView viewData) {
+    private List<List<Object>> prepareLogicalFlowReportRows(LogicalFlowView viewData) {
 
         Map<Long, Collection<DataTypeDecorator>> logicalFlowDataTypesByFlowId = MapUtilities.groupBy(viewData.logicalFlowDataTypeDecorators(), DataTypeDecorator::dataFlowId);
         Map<Long, Collection<PhysicalFlow>> physicalsByLogicalFlowId = MapUtilities.groupBy(viewData.physicalFlows(), PhysicalFlow::logicalFlowId);
@@ -144,6 +158,124 @@ public class LogicalFlowViewExtractor extends CustomDataExtractor {
                             .sorted(Comparator.comparing(NameProvider::name))
                             .forEach(defn -> {
                                 String ratingsStrForDefn = ratingsByDefnId.getOrDefault(defn.id().get(), Collections.emptySet())
+                                        .stream()
+                                        .map(d -> ratingSchemeItemsById.getOrDefault(d.ratingId(), null))
+                                        .filter(Objects::nonNull)
+                                        .map(NameProvider::name)
+                                        .sorted()
+                                        .collect(Collectors.joining(", ")); //may have multivalued assessments
+
+                                reportRow.add(ratingsStrForDefn);
+                            });
+
+                    return reportRow;
+                })
+                .collect(toList());
+    }
+
+    private Tuple3<ExtractFormat, String, byte[]> preparePhysicalFlows(IdSelectionOptions options, ExtractFormat format,
+                                                                      String reportName) throws IOException {
+
+        LogicalFlowView flowView = logicalFlowService.getFlowView(options);
+
+        List<List<Object>> reportRows = preparePhysicalFlowReportRows(flowView);
+
+        List<String> staticHeaders = ListUtilities.asList(
+                "Source Entity Name",
+                "Source Entity External Id",
+                "Target Entity Name",
+                "Target Entity External Id",
+                "Physical Flow Name",
+                "Physical Flow External Id",
+                "Physical Specification Name",
+                "Physical Specification External Id",
+                "Data Types",
+                "Criticality",
+                "Frequency",
+                "Transport");
+
+        List<String> flowAssessmentHeaders = flowView.physicalFlowAssessmentDefinitions()
+                .stream()
+                .map(NameProvider::name)
+                .sorted()
+                .collect(toList());
+
+        List<String> specAssessmentHeaders = flowView.physicalSpecificationAssessmentDefinitions()
+                .stream()
+                .map(NameProvider::name)
+                .sorted()
+                .collect(toList());
+
+        return formatReport(
+                format,
+                reportName,
+                reportRows,
+                concat(staticHeaders, flowAssessmentHeaders, specAssessmentHeaders)
+        );
+    }
+
+    private List<List<Object>> preparePhysicalFlowReportRows(LogicalFlowView viewData) {
+
+        Map<Long, Collection<DataTypeDecorator>> physicalSpecDataTypesByFlowId = MapUtilities.groupBy(viewData.physicalSpecificationDataTypeDecorators(), d -> d.entityReference().id());
+        Map<Long, Collection<AssessmentRating>> flowRatingsByFlowId = MapUtilities.groupBy(viewData.physicalFlowRatings(), d -> d.entityReference().id());
+        Map<Long, Collection<AssessmentRating>> specRatingsBySpecId = MapUtilities.groupBy(viewData.physicalSpecificationRatings(), d -> d.entityReference().id());
+        Map<Long, RatingSchemeItem> ratingSchemeItemsById = indexById(viewData.ratingSchemeItems());
+        Map<Long, LogicalFlow> logicalFlowsById = indexById(viewData.logicalFlows());
+        Map<Long, PhysicalSpecification> specsById = indexById(viewData.physicalSpecifications());
+
+        return viewData
+                .physicalFlows()
+                .stream()
+                .map(row -> {
+                    ArrayList<Object> reportRow = new ArrayList<>();
+
+                    LogicalFlow logicalFlow = logicalFlowsById.get(row.logicalFlowId());
+                    PhysicalSpecification specification = specsById.get(row.specificationId());
+
+                    Collection<DataTypeDecorator> decorators = physicalSpecDataTypesByFlowId.getOrDefault(specification.entityReference().id(), Collections.emptySet());
+                    String dataTypeString = joinUsing(decorators, d -> d.decoratorEntity().name().orElseGet(() -> "?"), ", ");
+
+                    Map<Long, Collection<AssessmentRating>> specRatingsByDefnId = MapUtilities.groupBy(
+                            specRatingsBySpecId.getOrDefault(specification.id().get(), Collections.emptySet()),
+                            AssessmentRating::assessmentDefinitionId);
+
+                    Map<Long, Collection<AssessmentRating>> physicalFlowRatingsByDefnId = MapUtilities.groupBy(
+                            flowRatingsByFlowId.getOrDefault(row.entityReference().id(), Collections.emptySet()),
+                            AssessmentRating::assessmentDefinitionId);
+
+                    reportRow.add(logicalFlow.source().name());
+                    reportRow.add(logicalFlow.source().externalId());
+                    reportRow.add(logicalFlow.target().name());
+                    reportRow.add(logicalFlow.target().externalId());
+                    reportRow.add(row.name());
+                    reportRow.add(row.externalId().orElse(""));
+                    reportRow.add(specification.name());
+                    reportRow.add(specification.externalId().orElse(""));
+                    reportRow.add(dataTypeString);
+                    reportRow.add(row.criticality().value());
+                    reportRow.add(row.frequency().value());
+                    reportRow.add(row.transport().value());
+
+                    viewData.physicalFlowAssessmentDefinitions()
+                            .stream()
+                            .sorted(Comparator.comparing(NameProvider::name))
+                            .forEach(defn -> {
+                                String ratingsStrForDefn = physicalFlowRatingsByDefnId.getOrDefault(defn.id().get(), Collections.emptySet())
+                                        .stream()
+                                        .map(d -> ratingSchemeItemsById.getOrDefault(d.ratingId(), null))
+                                        .filter(Objects::nonNull)
+                                        .map(NameProvider::name)
+                                        .sorted()
+                                        .collect(Collectors.joining(", ")); //may have multivalued assessments
+
+                                reportRow.add(ratingsStrForDefn);
+                            });
+
+                    viewData.physicalSpecificationAssessmentDefinitions()
+                            .stream()
+                            .sorted(Comparator.comparing(NameProvider::name))
+                            .forEach(defn -> {
+                                String ratingsStrForDefn = specRatingsByDefnId.getOrDefault(defn.id().get(), Collections.emptySet())
                                         .stream()
                                         .map(d -> ratingSchemeItemsById.getOrDefault(d.ratingId(), null))
                                         .filter(Objects::nonNull)

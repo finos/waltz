@@ -121,8 +121,9 @@
                 |
                 <DataExtractLink name="Export Physical Flow Details"
                                  filename="Physical Flows"
-                                 extractUrl={`physical-flows/all/${parentEntityRef.kind}/${parentEntityRef.id}`}
+                                 extractUrl="logical-flow-view/physical-flows"
                                  method="POST"
+                                 requestBody={selectionOptions}
                                  styling="link"/>
             </span>
         </div>
