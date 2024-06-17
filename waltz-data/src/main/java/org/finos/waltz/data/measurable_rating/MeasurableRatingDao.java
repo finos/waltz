@@ -363,8 +363,8 @@ public class MeasurableRatingDao {
     }
 
 
-    public List<MeasurableRatingTally> statsByAppSelector(Select<Record1<Long>> selector,
-                                                          boolean primaryOnly) {
+    public List<MeasurableRatingTally> statsByMeasurableRatingIdSelector(Select<Record1<Long>> ratingIdSelector,
+                                                                         boolean primaryOnly) {
         Condition cond = MEASURABLE_CATEGORY.ALLOW_PRIMARY_RATINGS.isFalse()
                 .or(primaryOnly
                         ? MEASURABLE_RATING.IS_PRIMARY.isTrue()
@@ -375,9 +375,8 @@ public class MeasurableRatingDao {
                 .from(MEASURABLE_RATING)
                 .innerJoin(MEASURABLE).on(MEASURABLE.ID.eq(MEASURABLE_RATING.MEASURABLE_ID))
                 .innerJoin(MEASURABLE_CATEGORY).on(MEASURABLE_CATEGORY.ID.eq(MEASURABLE.MEASURABLE_CATEGORY_ID))
-                .where(dsl.renderInlined(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
-                .and(MEASURABLE_RATING.ENTITY_ID.in(selector))))
-                .and(cond)
+                .where(dsl.renderInlined(MEASURABLE_RATING.ID.in(ratingIdSelector)
+                        .and(cond)))
                 .groupBy(MEASURABLE_RATING.MEASURABLE_ID, MEASURABLE_RATING.RATING)
                 .fetch(TO_TALLY_MAPPER);
     }

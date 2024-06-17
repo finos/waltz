@@ -26,6 +26,7 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.MeasurableRating;
+import org.jooq.Condition;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
@@ -53,9 +54,35 @@ public class MeasurableRatingIdSelectorFactory implements Function<IdSelectionOp
             case ACTOR:
             case CHANGE_INITIATIVE:
                 return mkForDirectEntity(options);
+            case ORG_UNIT:
+            case APP_GROUP:
+            case MEASURABLE:
+            case PERSON:
+            case FLOW_DIAGRAM:
+            case PROCESS_DIAGRAM:
+            case ALL:
+                return mkForAggregateGroup(options);
             default:
                 throw new IllegalArgumentException("Cannot create selector for entity kind: " + ref.kind());
         }
+    }
+
+    private Select<Record1<Long>> mkForAggregateGroup(IdSelectionOptions options) {
+
+        Select<Record1<Long>> appSelector = applicationIdSelectorFactory.apply(options);
+        Select<Record1<Long>> eudaSelector = eudaSelectorFactory.apply(options);
+        Select<Record1<Long>> ciSelector = ciIdSelectorFactory.apply(options);
+
+        Condition appCond = mr.ENTITY_KIND.eq(EntityKind.APPLICATION.name()).and(mr.ENTITY_ID.in(appSelector));
+        Condition eudaCond = mr.ENTITY_KIND.eq(EntityKind.END_USER_APPLICATION.name()).and(mr.ENTITY_ID.in(eudaSelector));
+        Condition ciCond = mr.ENTITY_KIND.eq(EntityKind.CHANGE_INITIATIVE.name()).and(mr.ENTITY_ID.in(ciSelector));
+
+        return DSL
+                .select(mr.ID)
+                .from(mr)
+                .where(appCond
+                        .or(eudaCond)
+                        .or(ciCond));
     }
 
 

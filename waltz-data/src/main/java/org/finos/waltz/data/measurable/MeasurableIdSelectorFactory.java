@@ -19,15 +19,17 @@
 package org.finos.waltz.data.measurable;
 
 
-import org.finos.waltz.data.change_initiative.ChangeInitiativeIdSelectorFactory;
-import org.finos.waltz.schema.tables.MeasurableRating;
 import org.finos.waltz.data.IdSelectorFactory;
-import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
+import org.finos.waltz.data.change_initiative.ChangeInitiativeIdSelectorFactory;
+import org.finos.waltz.data.measurable_rating.MeasurableRatingIdSelectorFactory;
 import org.finos.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.HierarchyQueryScope;
 import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.schema.Tables;
+import org.finos.waltz.schema.tables.EntityHierarchy;
+import org.finos.waltz.schema.tables.MeasurableRating;
 import org.jooq.Condition;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -35,19 +37,28 @@ import org.jooq.SelectConditionStep;
 import org.jooq.SelectOnConditionStep;
 import org.jooq.impl.DSL;
 
-import static org.finos.waltz.schema.Tables.*;
+import static java.lang.String.format;
+import static org.finos.waltz.common.Checks.checkTrue;
+import static org.finos.waltz.data.SelectorUtilities.ensureScopeIsExact;
+import static org.finos.waltz.data.SelectorUtilities.mkApplicationConditions;
+import static org.finos.waltz.schema.Tables.CHANGE_INITIATIVE;
+import static org.finos.waltz.schema.Tables.FLOW_DIAGRAM_ENTITY;
+import static org.finos.waltz.schema.Tables.INVOLVEMENT;
+import static org.finos.waltz.schema.Tables.MEASURABLE_RATING_PLANNED_DECOMMISSION;
+import static org.finos.waltz.schema.Tables.MEASURABLE_RATING_REPLACEMENT;
+import static org.finos.waltz.schema.Tables.PERSON;
+import static org.finos.waltz.schema.Tables.PERSON_HIERARCHY;
+import static org.finos.waltz.schema.Tables.SCENARIO_AXIS_ITEM;
 import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static org.finos.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static org.finos.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
 import static org.finos.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
-import static java.lang.String.format;
-import static org.finos.waltz.common.Checks.checkTrue;
-import static org.finos.waltz.data.SelectorUtilities.ensureScopeIsExact;
-import static org.finos.waltz.data.SelectorUtilities.mkApplicationConditions;
 
 public class MeasurableIdSelectorFactory implements IdSelectorFactory {
 
+    private static final EntityHierarchy eh = Tables.ENTITY_HIERARCHY;
+    private static final MeasurableRating mr = Tables.MEASURABLE_RATING;
     private final OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory = new OrganisationalUnitIdSelectorFactory();
 
 
@@ -68,35 +79,43 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
     @Override
     public Select<Record1<Long>> apply(IdSelectionOptions options) {
         switch (options.entityReference().kind()) {
-            case PERSON:
-                return mkForPerson(options);
             case MEASURABLE_CATEGORY:
                 return mkForMeasurableCategory(options);
-            case MEASURABLE:
-                return mkForMeasurable(options);
-            case APP_GROUP:
-            case PROCESS_DIAGRAM:
-            case ALL:
-                return mkViaAppSelector(options);
             case AGGREGATE_OVERLAY_DIAGRAM:
                 return mkForAggregatedEntityDiagram(options);
-            case FLOW_DIAGRAM:
-                return mkForFlowDiagram(options);
             case SCENARIO:
                 return mkForScenario(options);
-            case ORG_UNIT:
-                return mkForOrgUnit(options);
             case ACTOR:
             case APPLICATION:
                 return mkForDirectEntityKind(options);
             case CHANGE_INITIATIVE:
                 return mkForChangeInitiative(options);
+            case ORG_UNIT:
+            case APP_GROUP:
+            case MEASURABLE:
+            case PERSON:
+            case FLOW_DIAGRAM:
+            case PROCESS_DIAGRAM:
+            case ALL:
+                return mkViaRatingSelector(options);
             default:
                 throw new UnsupportedOperationException(format(
                         "Cannot create measurable selector from kind: %s",
                         options.entityReference().kind()));
         }
     }
+
+    private Select<Record1<Long>> mkViaRatingSelector(IdSelectionOptions options) {
+        Select<Record1<Long>> mrSelector = new MeasurableRatingIdSelectorFactory().apply(options);
+        return DSL
+                .select(eh.ANCESTOR_ID)
+                .from(eh)
+                .innerJoin(mr)
+                .on(mr.MEASURABLE_ID.eq(eh.ID)
+                        .and(eh.KIND.eq(EntityKind.MEASURABLE.name())))
+                .where(mr.ID.in(mrSelector));
+    }
+
 
     private Select<Record1<Long>> mkForChangeInitiative(IdSelectionOptions options) {
 
@@ -206,38 +225,6 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
                 .and(SCENARIO_AXIS_ITEM.DOMAIN_ITEM_KIND.eq(EntityKind.MEASURABLE.name()));
     }
 
-
-    private Select<Record1<Long>> mkForOrgUnit(IdSelectionOptions options) {
-        Select<Record1<Long>> orgUnitSelector = orgUnitIdSelectorFactory.apply(options);
-        return mkBaseRatingBasedSelector()
-                .innerJoin(APPLICATION)
-                .on(APPLICATION.ORGANISATIONAL_UNIT_ID.in(orgUnitSelector)
-                        .and(MEASURABLE_RATING.ENTITY_ID.eq(APPLICATION.ID)))
-                .and(mkLifecycleCondition(options));
-    }
-
-
-    private Select<Record1<Long>> mkForAppGroup(IdSelectionOptions options) {
-        return mkViaAppSelector(options);
-    }
-
-
-    private Select<Record1<Long>> mkViaAppSelector(IdSelectionOptions options) {
-
-        ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
-        Select<Record1<Long>> validAppIds = applicationIdSelectorFactory.apply(options);
-
-        SelectConditionStep<Record1<Long>> measurableIds = DSL
-                .selectDistinct(MEASURABLE_RATING.MEASURABLE_ID)
-                .from(MEASURABLE_RATING)
-                .where(MEASURABLE_RATING.ENTITY_ID.in(validAppIds));
-
-        return DSL
-                .selectDistinct(ENTITY_HIERARCHY.ANCESTOR_ID)
-                .from(ENTITY_HIERARCHY)
-                .where(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name()))
-                .and(ENTITY_HIERARCHY.ID.in(measurableIds));
-    }
 
 
     private Select<Record1<Long>> mkForDirectEntityKind(IdSelectionOptions options) {
