@@ -19,7 +19,6 @@
 package org.finos.waltz.data.measurable_rating;
 
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
-import org.finos.waltz.data.change_initiative.ChangeInitiativeIdSelectorFactory;
 import org.finos.waltz.data.end_user_app.EndUserAppIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -35,14 +34,12 @@ import java.util.function.Function;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.data.SelectorUtilities.ensureScopeIsExact;
-import static org.finos.waltz.schema.tables.AttestationInstance.ATTESTATION_INSTANCE;
 
 public class MeasurableRatingIdSelectorFactory implements Function<IdSelectionOptions, Select<Record1<Long>>> {
 
     private static final MeasurableRating mr = Tables.MEASURABLE_RATING;
     private static final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
-    private static final ChangeInitiativeIdSelectorFactory ciIdSelectorFactory = new ChangeInitiativeIdSelectorFactory();
-    private static final EndUserAppIdSelectorFactory eudaSelectorFactory = new EndUserAppIdSelectorFactory();
+    private static final EndUserAppIdSelectorFactory eudaIdSelectorFactory = new EndUserAppIdSelectorFactory();
 
     @Override
     public Select<Record1<Long>> apply(IdSelectionOptions options) {
@@ -70,19 +67,20 @@ public class MeasurableRatingIdSelectorFactory implements Function<IdSelectionOp
     private Select<Record1<Long>> mkForAggregateGroup(IdSelectionOptions options) {
 
         Select<Record1<Long>> appSelector = applicationIdSelectorFactory.apply(options);
-        Select<Record1<Long>> eudaSelector = eudaSelectorFactory.apply(options);
-        Select<Record1<Long>> ciSelector = ciIdSelectorFactory.apply(options);
+        Select<Record1<Long>> eudaSelector = eudaIdSelectorFactory.apply(options);
 
         Condition appCond = mr.ENTITY_KIND.eq(EntityKind.APPLICATION.name()).and(mr.ENTITY_ID.in(appSelector));
         Condition eudaCond = mr.ENTITY_KIND.eq(EntityKind.END_USER_APPLICATION.name()).and(mr.ENTITY_ID.in(eudaSelector));
-        Condition ciCond = mr.ENTITY_KIND.eq(EntityKind.CHANGE_INITIATIVE.name()).and(mr.ENTITY_ID.in(ciSelector));
 
         return DSL
                 .select(mr.ID)
                 .from(mr)
-                .where(appCond
-                        .or(eudaCond)
-                        .or(ciCond));
+                .where(appCond)
+                .unionAll(DSL
+                    .select(mr.ID)
+                    .from(mr)
+                    .where(eudaCond));
+
     }
 
 
@@ -95,13 +93,4 @@ public class MeasurableRatingIdSelectorFactory implements Function<IdSelectionOp
                         .and(mr.ENTITY_ID.eq(options.entityReference().id())));
     }
 
-
-    private Select<Record1<Long>> mkForRelatedApps(IdSelectionOptions options) {
-        Select<Record1<Long>> appIds = applicationIdSelectorFactory.apply(options);
-        return DSL
-                .select(ATTESTATION_INSTANCE.ID)
-                .from(ATTESTATION_INSTANCE)
-                .where(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                .and(ATTESTATION_INSTANCE.PARENT_ENTITY_ID.in(appIds));
-    }
 }

@@ -171,8 +171,7 @@ function controller($q, $scope, serviceBroker) {
             vm.parentEntityRef,
             undefined,
             undefined,
-            vm.filters,
-            "APPLICATION"
+            vm.filters
         );
     }
 

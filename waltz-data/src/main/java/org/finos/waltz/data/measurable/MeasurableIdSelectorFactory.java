@@ -29,6 +29,7 @@ import org.finos.waltz.model.HierarchyQueryScope;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.EntityHierarchy;
+import org.finos.waltz.schema.tables.Measurable;
 import org.finos.waltz.schema.tables.MeasurableRating;
 import org.jooq.Condition;
 import org.jooq.Record1;
@@ -53,12 +54,12 @@ import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static org.finos.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static org.finos.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
-import static org.finos.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
 
 public class MeasurableIdSelectorFactory implements IdSelectorFactory {
 
-    private static final EntityHierarchy eh = Tables.ENTITY_HIERARCHY;
-    private static final MeasurableRating mr = Tables.MEASURABLE_RATING;
+    private static final MeasurableRating mr = Tables.MEASURABLE_RATING.as("mr_misf");
+    private static final Measurable m = Tables.MEASURABLE.as("m_misf");
+    private static final EntityHierarchy eh = ENTITY_HIERARCHY.as("eh_misf");
     private final OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory = new OrganisationalUnitIdSelectorFactory();
 
 
@@ -68,17 +69,19 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
      */
     public static SelectConditionStep<Record1<Long>> allMeasurablesIdsInSameCategory(Long measurableId) {
         return DSL
-                .select(MEASURABLE.ID)
-                .from(MEASURABLE)
-                .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(DSL
-                        .select(MEASURABLE.MEASURABLE_CATEGORY_ID)
-                        .from(MEASURABLE)
-                        .where(MEASURABLE.ID.eq(measurableId))));
+                .select(m.ID)
+                .from(m)
+                .where(m.MEASURABLE_CATEGORY_ID.eq(DSL
+                        .select(m.MEASURABLE_CATEGORY_ID)
+                        .from(m)
+                        .where(m.ID.eq(measurableId))));
     }
 
     @Override
     public Select<Record1<Long>> apply(IdSelectionOptions options) {
         switch (options.entityReference().kind()) {
+            case MEASURABLE:
+                return mkForMeasurable(options);
             case MEASURABLE_CATEGORY:
                 return mkForMeasurableCategory(options);
             case AGGREGATE_OVERLAY_DIAGRAM:
@@ -92,7 +95,6 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
                 return mkForChangeInitiative(options);
             case ORG_UNIT:
             case APP_GROUP:
-            case MEASURABLE:
             case PERSON:
             case FLOW_DIAGRAM:
             case PROCESS_DIAGRAM:
@@ -185,7 +187,7 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
                                         .or(INVOLVEMENT.EMPLOYEE_ID.in(reporteeIds)));
 
                         return mkBaseRatingBasedSelector()
-                                .innerJoin(APPLICATION).on(APPLICATION.ID.eq(MEASURABLE_RATING.ENTITY_ID))
+                                .innerJoin(APPLICATION).on(APPLICATION.ID.eq(mr.ENTITY_ID))
                                 .innerJoin(INVOLVEMENT).on(APPLICATION.ID.eq(INVOLVEMENT.ENTITY_ID)
                                         .and(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
                                 .where(condition)
@@ -197,9 +199,9 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
                     }
                 })
                 .orElse(DSL
-                        .selectDistinct(MEASURABLE.ID)
+                        .selectDistinct(m.ID)
                         .from(MEASURABLE)
-                        .innerJoin(INVOLVEMENT).on(MEASURABLE.ID.eq(INVOLVEMENT.ENTITY_ID)
+                        .innerJoin(INVOLVEMENT).on(m.ID.eq(INVOLVEMENT.ENTITY_ID)
                                 .and(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.MEASURABLE.name())))
                         .where(INVOLVEMENT.EMPLOYEE_ID.in(reporteeIds).or(INVOLVEMENT.EMPLOYEE_ID.eq(emp)))
                         .and(mkLifecycleCondition(options)));
@@ -209,9 +211,9 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
     private Select<Record1<Long>> mkForMeasurableCategory(IdSelectionOptions options) {
         ensureScopeIsExact(options);
         return DSL
-                .select(MEASURABLE.ID)
-                .from(MEASURABLE)
-                .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(options.entityReference().id()))
+                .select(m.ID)
+                .from(m)
+                .where(m.MEASURABLE_CATEGORY_ID.eq(options.entityReference().id()))
                 .and(mkLifecycleCondition(options));
     }
 
@@ -231,27 +233,27 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
         checkTrue(options.scope() == HierarchyQueryScope.EXACT, "Can only calculate application based selectors with exact scopes");
 
         SelectConditionStep<Record1<Long>> measurablesViaReplacements = DSL
-                .select(MEASURABLE_RATING.MEASURABLE_ID)
+                .select(mr.MEASURABLE_ID)
                 .from(MEASURABLE_RATING_REPLACEMENT)
                 .innerJoin(MEASURABLE_RATING_PLANNED_DECOMMISSION)
                 .on(MEASURABLE_RATING_PLANNED_DECOMMISSION.ID.eq(MEASURABLE_RATING_REPLACEMENT.DECOMMISSION_ID))
-                .innerJoin(MEASURABLE_RATING).on(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_RATING_ID.eq(MEASURABLE_RATING.ID))
+                .innerJoin(mr).on(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_RATING_ID.eq(mr.ID))
                 .where(MEASURABLE_RATING_REPLACEMENT.ENTITY_ID.eq(options.entityReference().id())
                         .and(MEASURABLE_RATING_REPLACEMENT.ENTITY_KIND.eq(options.entityReference().kind().name())));
 
         SelectConditionStep<Record1<Long>> measurablesViaRatings = DSL
-                .select(MEASURABLE_RATING.MEASURABLE_ID)
-                .from(MEASURABLE_RATING)
-                .where(MEASURABLE_RATING.ENTITY_ID.eq(options.entityReference().id())
-                        .and(MEASURABLE_RATING.ENTITY_KIND.eq(options.entityReference().kind().name())));
+                .select(mr.MEASURABLE_ID)
+                .from(mr)
+                .where(mr.ENTITY_ID.eq(options.entityReference().id())
+                        .and(mr.ENTITY_KIND.eq(options.entityReference().kind().name())));
 
         return DSL
-                .selectDistinct(MEASURABLE.ID)
-                .from(MEASURABLE)
-                .innerJoin(ENTITY_HIERARCHY)
-                .on(ENTITY_HIERARCHY.ANCESTOR_ID.eq(MEASURABLE.ID)
-                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name())))
-                .where(ENTITY_HIERARCHY.ID.in(measurablesViaRatings.union(measurablesViaReplacements)))
+                .selectDistinct(m.ID)
+                .from(m)
+                .innerJoin(eh)
+                .on(eh.ANCESTOR_ID.eq(m.ID)
+                        .and(eh.KIND.eq(EntityKind.MEASURABLE.name())))
+                .where(eh.ID.in(measurablesViaRatings.union(measurablesViaReplacements)))
                 .and(mkLifecycleCondition(options));
     }
 
@@ -261,15 +263,15 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
         long diagramId = options.entityReference().id();
         Select<Record1<Long>> viaAppRatings = mkBaseRatingBasedSelector()
                 .innerJoin(FLOW_DIAGRAM_ENTITY)
-                .on(FLOW_DIAGRAM_ENTITY.ENTITY_ID.eq(MEASURABLE_RATING.ENTITY_ID)
-                        .and(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(MEASURABLE_RATING.ENTITY_KIND)))
+                .on(FLOW_DIAGRAM_ENTITY.ENTITY_ID.eq(mr.ENTITY_ID)
+                        .and(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(mr.ENTITY_KIND)))
                 .where(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(diagramId))
                 .and(mkLifecycleCondition(options));
 
         Select<Record1<Long>> viaDirectRelationship = DSL
                 .select(FLOW_DIAGRAM_ENTITY.ENTITY_ID)
                 .from(FLOW_DIAGRAM_ENTITY)
-                .innerJoin(MEASURABLE).on(MEASURABLE.ID.eq(FLOW_DIAGRAM_ENTITY.ENTITY_ID))
+                .innerJoin(MEASURABLE).on(m.ID.eq(FLOW_DIAGRAM_ENTITY.ENTITY_ID))
                 .where(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(EntityKind.MEASURABLE.name()))
                 .and(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(diagramId))
                 .and(mkLifecycleCondition(options));
@@ -286,14 +288,14 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
      */
     private SelectOnConditionStep<Record1<Long>> mkBaseRatingBasedSelector() {
         return DSL
-                .selectDistinct(MEASURABLE.ID)
-                .from(MEASURABLE)
-                .innerJoin(ENTITY_HIERARCHY)
-                .on(ENTITY_HIERARCHY.ANCESTOR_ID.eq(MEASURABLE.ID))
-                .innerJoin(MEASURABLE_RATING)
-                .on(MEASURABLE_RATING.MEASURABLE_ID.eq(ENTITY_HIERARCHY.ID)
-                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name()))
-                        .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
+                .selectDistinct(m.ID)
+                .from(m)
+                .innerJoin(eh)
+                .on(eh.ANCESTOR_ID.eq(m.ID))
+                .innerJoin(mr)
+                .on(mr.MEASURABLE_ID.eq(eh.ID)
+                        .and(eh.KIND.eq(EntityKind.MEASURABLE.name()))
+                        .and(mr.ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
     }
 
 
@@ -319,7 +321,7 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
                 case CHILDREN:
                     Select<Record1<Long>> directMeasurableIds = mkForDirectMeasurable(options);
 
-                    MeasurableRating dmr = MEASURABLE_RATING.as("directMeasurableRatings");
+                    MeasurableRating dmr = mr.as("directMeasurableRatings");
 
                     SelectConditionStep<Record1<Long>> directAppIds = DSL
                             .selectDistinct(dmr.ENTITY_ID)
@@ -331,8 +333,8 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
                                     .and(dmr.ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
 
                     selector = mkBaseRatingBasedSelector()
-                            .where(MEASURABLE_RATING.ENTITY_ID.in(directAppIds)
-                            .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
+                            .where(mr.ENTITY_ID.in(directAppIds)
+                            .and(mr.ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
 
                     break;
 
@@ -349,26 +351,26 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
 
     private Select<Record1<Long>> mkForDirectMeasurable(IdSelectionOptions options) {
         Select<Record1<Long>> selector = null;
-        final Condition isMeasurable = ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name());
+        final Condition isMeasurable = eh.KIND.eq(EntityKind.MEASURABLE.name());
         switch (options.scope()) {
             case EXACT:
                 selector = DSL.select(DSL.val(options.entityReference().id()));
                 break;
             case CHILDREN:
                 selector = DSL
-                        .select(ENTITY_HIERARCHY.ID)
-                        .from(ENTITY_HIERARCHY)
-                        .innerJoin(MEASURABLE).on(MEASURABLE.ID.eq(ENTITY_HIERARCHY.ID))
-                        .where(ENTITY_HIERARCHY.ANCESTOR_ID.eq(options.entityReference().id()))
+                        .select(eh.ID)
+                        .from(eh)
+                        .innerJoin(m).on(m.ID.eq(eh.ID))
+                        .where(eh.ANCESTOR_ID.eq(options.entityReference().id()))
                         .and(isMeasurable)
                         .and(mkLifecycleCondition(options));
                 break;
             case PARENTS:
                 selector = DSL
-                        .select(ENTITY_HIERARCHY.ANCESTOR_ID)
-                        .from(ENTITY_HIERARCHY)
-                        .innerJoin(MEASURABLE).on(MEASURABLE.ID.eq(ENTITY_HIERARCHY.ANCESTOR_ID))
-                        .where(ENTITY_HIERARCHY.ID.eq(options.entityReference().id()))
+                        .select(eh.ANCESTOR_ID)
+                        .from(eh)
+                        .innerJoin(m).on(m.ID.eq(eh.ANCESTOR_ID))
+                        .where(eh.ID.eq(options.entityReference().id()))
                         .and(isMeasurable)
                         .and(mkLifecycleCondition(options));
                 break;
@@ -379,7 +381,7 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
 
 
     private Condition mkLifecycleCondition(IdSelectionOptions options) {
-        return MEASURABLE.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses());
+        return m.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses());
     }
 
 }

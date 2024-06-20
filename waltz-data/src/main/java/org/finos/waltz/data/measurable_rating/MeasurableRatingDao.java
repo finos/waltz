@@ -40,8 +40,6 @@ import org.finos.waltz.model.tally.ImmutableMeasurableRatingTally;
 import org.finos.waltz.model.tally.MeasurableRatingTally;
 import org.finos.waltz.model.tally.Tally;
 import org.finos.waltz.schema.Tables;
-import org.finos.waltz.schema.tables.EntityHierarchy;
-import org.finos.waltz.schema.tables.Measurable;
 import org.finos.waltz.schema.tables.records.MeasurableRatingRecord;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -84,7 +82,6 @@ import static org.finos.waltz.common.StringUtilities.firstChar;
 import static org.finos.waltz.common.StringUtilities.notEmpty;
 import static org.finos.waltz.schema.Tables.ALLOCATION;
 import static org.finos.waltz.schema.Tables.CHANGE_LOG;
-import static org.finos.waltz.schema.Tables.ENTITY_HIERARCHY;
 import static org.finos.waltz.schema.Tables.MEASURABLE_CATEGORY;
 import static org.finos.waltz.schema.Tables.MEASURABLE_RATING_PLANNED_DECOMMISSION;
 import static org.finos.waltz.schema.Tables.RATING_SCHEME_ITEM;
@@ -288,9 +285,10 @@ public class MeasurableRatingDao {
 
 
     public List<MeasurableRating> findForCategoryAndMeasurableRatingIdSelector(Select<Record1<Long>> ratingIdSelector, long categoryId) {
-        return mkExtendedBaseQuery()
+        SelectConditionStep<Record> q = mkExtendedBaseQuery()
                 .where(dsl.renderInlined(MEASURABLE_CATEGORY.ID.eq(categoryId)
-                                .and(MEASURABLE_RATING.ID.in(ratingIdSelector))))
+                        .and(MEASURABLE_RATING.ID.in(ratingIdSelector))));
+        return q
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -370,14 +368,16 @@ public class MeasurableRatingDao {
                         ? MEASURABLE_RATING.IS_PRIMARY.isTrue()
                         : DSL.trueCondition());
 
-        return dsl
+        SelectHavingStep<Record3<Long, String, Integer>> q = dsl
                 .select(MEASURABLE_RATING.MEASURABLE_ID, MEASURABLE_RATING.RATING, DSL.count())
                 .from(MEASURABLE_RATING)
                 .innerJoin(MEASURABLE).on(MEASURABLE.ID.eq(MEASURABLE_RATING.MEASURABLE_ID))
                 .innerJoin(MEASURABLE_CATEGORY).on(MEASURABLE_CATEGORY.ID.eq(MEASURABLE.MEASURABLE_CATEGORY_ID))
                 .where(dsl.renderInlined(MEASURABLE_RATING.ID.in(ratingIdSelector)
                         .and(cond)))
-                .groupBy(MEASURABLE_RATING.MEASURABLE_ID, MEASURABLE_RATING.RATING)
+                .groupBy(MEASURABLE_RATING.MEASURABLE_ID, MEASURABLE_RATING.RATING);
+
+        return q
                 .fetch(TO_TALLY_MAPPER);
     }
 
@@ -406,42 +406,16 @@ public class MeasurableRatingDao {
     }
 
     /**
-     * Given a measurable and a selector, will determine if any other measurables are mapped by apps
+     * Given a measurable and a ratingIdSelector, will determine if any other measurables are mapped by apps
      * which map to this measurable.  This is used to provide functionality for features like: "apps that
      * do this function, also do these functions..."
      *
      * @param measurableId starting measurable
-     * @param selector     set of apps to consider
+     * @param ratingIdSelector     set of ratingIds to consider, these will be mapped back to their entities
      * @return boolean indicating if there are implicitly related measurables
      */
-    public boolean hasImplicitlyRelatedMeasurables(long measurableId, Select<Record1<Long>> selector) {
-
-        org.finos.waltz.schema.tables.MeasurableRating mr1 = MEASURABLE_RATING.as("mr1");
-        org.finos.waltz.schema.tables.MeasurableRating mr2 = MEASURABLE_RATING.as("mr2");
-        Measurable m1 = MEASURABLE.as("m1");
-        Measurable m2 = MEASURABLE.as("m2");
-        EntityHierarchy eh = ENTITY_HIERARCHY.as("eh");
-
-        Condition appCondition = mr1.ENTITY_ID.in(selector)
-                .and(mr1.ENTITY_KIND.eq(DSL.val(EntityKind.APPLICATION.name())));
-
-        SelectConditionStep<Record> rawQry = DSL
-                .select()
-                .from(m1)
-                .innerJoin(eh).on(eh.ANCESTOR_ID.eq(m1.ID).and(eh.KIND.eq(EntityKind.MEASURABLE.name())))
-                .innerJoin(mr1).on(mr1.MEASURABLE_ID.eq(eh.ID))
-                .innerJoin(mr2).on(mr1.ENTITY_ID.eq(mr2.ENTITY_ID)
-                        .and(mr1.ENTITY_KIND.eq(mr2.ENTITY_KIND))
-                        .and(mr1.MEASURABLE_ID.ne(mr2.MEASURABLE_ID)))
-                .innerJoin(APPLICATION).on(mr1.ENTITY_ID.eq(APPLICATION.ID)
-                        .and(APPLICATION.IS_REMOVED.isFalse())
-                        .and(APPLICATION.ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name())))
-                .innerJoin(m2).on(mr2.MEASURABLE_ID.eq(m2.ID)
-                        .and(m2.ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name())))
-                .where(m1.ID.eq(measurableId)
-                        .and(appCondition));
-
-        return dsl.fetchExists(rawQry);
+    public boolean hasImplicitlyRelatedMeasurables(long measurableId, Select<Record1<Long>> ratingIdSelector) {
+        return dsl.fetchExists(ratingIdSelector);
     }
 
 
