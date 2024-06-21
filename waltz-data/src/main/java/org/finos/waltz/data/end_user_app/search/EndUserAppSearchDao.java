@@ -13,10 +13,12 @@ import java.util.List;
 
 import static java.util.Collections.emptyList;
 import static org.finos.waltz.common.ListUtilities.concat;
+import static org.finos.waltz.data.EntityLifecycleStatusUtils.convertToLifecyclePhases;
 import static org.finos.waltz.data.JooqUtilities.mkBasicTermSearch;
 import static org.finos.waltz.data.JooqUtilities.mkStartsWithTermSearch;
 import static org.finos.waltz.data.SearchUtilities.mkTerms;
 import static org.finos.waltz.schema.Tables.END_USER_APPLICATION;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
 
 
 @Repository
@@ -54,10 +56,13 @@ public class EndUserAppSearchDao implements SearchDao<EndUserApplication> {
 
 
     private List<EndUserApplication> mkQuery(Condition nameCondition, EntitySearchOptions options) {
+
+        Condition lifecycleCondition = END_USER_APPLICATION.LIFECYCLE_PHASE.in(convertToLifecyclePhases(options.entityLifecycleStatuses()));
+
         return dsl
                 .select(END_USER_APPLICATION.fields())
                 .from(END_USER_APPLICATION)
-                .where(nameCondition)
+                .where(nameCondition.and(lifecycleCondition))
                 .orderBy(END_USER_APPLICATION.NAME)
                 .limit(options.limit())
                 .fetch(EndUserAppDao.TO_DOMAIN_MAPPER);

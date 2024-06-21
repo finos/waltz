@@ -51,7 +51,7 @@ function controller($q, serviceBroker) {
 
         serviceBroker
             .loadAppData(CORE_API.MeasurableRatingStore.hasImplicitlyRelatedMeasurables, [vm.parentEntityRef.id, selectionOptions])
-            .then(r => vm.hasImplicitlyRelatedMeasurables = console.log(r) || r.data);
+            .then(r => vm.hasImplicitlyRelatedMeasurables = r.data);
     };
 }
 

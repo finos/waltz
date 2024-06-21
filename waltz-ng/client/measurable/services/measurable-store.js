@@ -40,6 +40,13 @@ function store($http, baseApiUrl) {
             .then(d => d.data);
     };
 
+    const findMeasurablesByRatingSelector = (options) => {
+        checkIsIdSelector(options);
+        return $http
+            .post(`${baseUrl}/rating-selector`, options)
+            .then(d => d.data);
+    };
+
     const findByOrgUnitId = (id) => {
         return $http
             .get(`${baseUrl}/org-unit/id/${id}`)
@@ -54,6 +61,7 @@ function store($http, baseApiUrl) {
         findAll,
         findByExternalId,
         findMeasurablesBySelector,
+        findMeasurablesByRatingSelector,
         findByOrgUnitId,
         getById,
         search
@@ -99,6 +107,11 @@ export const MeasurableStore_API = {
         serviceName,
         serviceFnName: "findMeasurablesBySelector",
         description: "executes findMeasurablesBySelector"
+    },
+    findMeasurablesByRatingSelector: {
+        serviceName,
+        serviceFnName: "findMeasurablesByRatingSelector",
+        description: "returns measurables for this selector, via it's associated ratings"
     },
     findByOrgUnitId: {
         serviceName,

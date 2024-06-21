@@ -1,7 +1,8 @@
 import {
     mkAllocationColumns,
     mkDecommissionColumns,
-    mkEntityLinkFormatter, mkExternalIdFormatter,
+    mkEntityLinkFormatter,
+    mkExternalIdFormatter,
     mkPrimaryAssessmentAndCategoryColumns,
     mkRatingSchemeItemFormatter,
 } from "../../../common/slick-grid-utils";
@@ -83,14 +84,12 @@ export function doGridSearch(data = [], searchStr) {
 
 
 export function mkColumnDefs(measurableRatings, primaryAssessments, primaryRatings, allocations, decommissions) {
-    const cols = _.concat(
+    return _.concat(
         mkSummaryColumn(measurableRatings, allocations, decommissions),
         baseColumns,
         mkAllocationColumns(allocations.allocationSchemes),
         mkPrimaryAssessmentAndCategoryColumns(primaryAssessments.assessmentDefinitions, primaryRatings.measurableCategories),
         mkDecommissionColumns(decommissions.plannedDecommissions, decommissions.plannedReplacements, decommissions.replacingDecommissions));
-    console.log({measurableRatings, primaryRatings, primaryAssessments, allocations, decommissions, cols})
-    return cols;
 }
 
 
