@@ -20,7 +20,6 @@ export function mkSortFn(sortCol, sortAsc = true) {
 
 export function mkEntityLinkFormatter(valueProvider, showIcon = true) {
     return (row, cell, value, colDef, dataCtx) => {
-        console.log("linkFormatter", {row, cell, value, colDef, dataCtx})
         const me = document.createElement("span");
         const component = new EntityLink({target: me});
 
