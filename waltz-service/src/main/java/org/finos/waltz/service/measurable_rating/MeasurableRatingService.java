@@ -331,9 +331,9 @@ public class MeasurableRatingService {
     }
 
 
-    public boolean hasImplicitlyRelatedMeasurables(long measurableId, IdSelectionOptions options) {
-        Select<Record1<Long>> selector = APPLICATION_ID_SELECTOR_FACTORY.apply(options);
-        return measurableRatingDao.hasImplicitlyRelatedMeasurables(measurableId, selector);
+    public boolean hasMeasurableRatings(IdSelectionOptions options) {
+        Select<Record1<Long>> selector = MEASURABLE_RATING_ID_SELECTOR_FACTORY.apply(options);
+        return measurableRatingDao.hasMeasurableRatings(selector);
     }
 
 

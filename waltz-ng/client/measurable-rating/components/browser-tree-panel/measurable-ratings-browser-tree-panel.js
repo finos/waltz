@@ -18,9 +18,8 @@
 
 import _ from "lodash";
 import {initialiseData} from "../../../common";
-import {mkSelectionOptions, mkSelectionOptionsWithJoiningEntity} from "../../../common/selector-utils";
+import {mkSelectionOptions} from "../../../common/selector-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {indexRatingSchemes} from "../../../ratings/rating-utils";
 import MeasurableRatingsViewGrid from "../view-grid/MeasurableRatingsViewGrid.svelte";
 
 import template from "./measurable-ratings-browser-tree-panel.html";

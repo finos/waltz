@@ -23,7 +23,9 @@ import org.finos.waltz.data.measurable.MeasurableIdSelectorFactory;
 import org.finos.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.HierarchyQueryScope;
 import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.ImmutableIdSelectionOptions;
 import org.finos.waltz.model.application.ApplicationKind;
 import org.finos.waltz.model.application.LifecyclePhase;
 import org.finos.waltz.schema.tables.EndUserApplication;
@@ -46,6 +48,7 @@ import java.util.function.Function;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.schema.Tables.MEASURABLE;
 import static org.finos.waltz.schema.Tables.MEASURABLE_RATING;
+import static org.finos.waltz.schema.Tables.ORGANISATIONAL_UNIT;
 import static org.finos.waltz.schema.tables.EndUserApplication.END_USER_APPLICATION;
 import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static org.finos.waltz.schema.tables.Person.PERSON;
@@ -78,6 +81,8 @@ public class EndUserAppIdSelectorFactory implements Function<IdSelectionOptions,
                 return mkForPerson(options);
             case MEASURABLE:
                 return mkForMeasurable(options);
+            case APP_GROUP:
+                return mkForAppGroup(options);
             default:
                 throw new IllegalArgumentException("Cannot create selector for entity kind: " + ref.kind());
         }
@@ -108,6 +113,31 @@ public class EndUserAppIdSelectorFactory implements Function<IdSelectionOptions,
                 .selectDistinct(eua.ID)
                 .from(eua)
                 .where(eua.ORGANISATIONAL_UNIT_ID.in(ouSelector)
+                        .and(eua.LIFECYCLE_PHASE.in(validLifecyclePhases)));
+    }
+
+
+    private Select<Record1<Long>> mkForAppGroup(IdSelectionOptions options) {
+
+        if (eucOmitted(options)) {
+            return mkEmptySelect();
+        }
+
+        ImmutableIdSelectionOptions orgUnitSelectorOptions = ImmutableIdSelectionOptions.copyOf(options).withScope(HierarchyQueryScope.CHILDREN);
+        Select<Record1<Long>> ouSelector = orgUnitIdSelectorFactory.apply(orgUnitSelectorOptions);
+
+        // Currently, eudas cannot be directly added to app groups, only via org units
+        SelectConditionStep<Record1<Long>> eudaIdsFromAssociatedOrgUnits = DSL
+                .select(eua.ID)
+                .from(eua)
+                .innerJoin(ORGANISATIONAL_UNIT)
+                .on(eua.ORGANISATIONAL_UNIT_ID.eq(ORGANISATIONAL_UNIT.ID))
+                .where(ORGANISATIONAL_UNIT.ID.in(ouSelector));
+
+        return DSL
+                .selectDistinct(eua.ID)
+                .from(eua)
+                .where(eua.ID.in(eudaIdsFromAssociatedOrgUnits)
                         .and(eua.LIFECYCLE_PHASE.in(validLifecyclePhases)));
     }
 

@@ -410,11 +410,10 @@ public class MeasurableRatingDao {
      * which map to this measurable.  This is used to provide functionality for features like: "apps that
      * do this function, also do these functions..."
      *
-     * @param measurableId starting measurable
      * @param ratingIdSelector     set of ratingIds to consider, these will be mapped back to their entities
      * @return boolean indicating if there are implicitly related measurables
      */
-    public boolean hasImplicitlyRelatedMeasurables(long measurableId, Select<Record1<Long>> ratingIdSelector) {
+    public boolean hasMeasurableRatings(Select<Record1<Long>> ratingIdSelector) {
         return dsl.fetchExists(ratingIdSelector);
     }
 

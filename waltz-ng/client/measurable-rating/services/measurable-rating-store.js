@@ -80,10 +80,10 @@ function store($http, baseApiUrl) {
             .then(d => d.data);
     };
 
-    const hasImplicitlyRelatedMeasurables = (measurableId, options) => {
+    const hasMeasurableRatings = (options) => {
         checkIsIdSelector(options);
         return $http
-            .post(`${baseUrl}/implicitly-related-measurables/${measurableId}`, options)
+            .post(`${baseUrl}/has-measurable-ratings`, options)
             .then(d => d.data);
     };
 
@@ -139,7 +139,7 @@ function store($http, baseApiUrl) {
         findForEntityReference,
         countByMeasurableCategory,
         statsByAppSelector,
-        hasImplicitlyRelatedMeasurables,
+        hasMeasurableRatings,
         saveRatingItem,
         saveRatingIsPrimary,
         saveRatingDescription,
@@ -206,10 +206,10 @@ export const MeasurableRatingStore_API = {
         serviceFnName: "statsByAppSelector",
         description: "return measurable stats by app selector"
     },
-    hasImplicitlyRelatedMeasurables: {
+    hasMeasurableRatings: {
         serviceName,
-        serviceFnName: "hasImplicitlyRelatedMeasurables",
-        description: "return boolean if measurable has implicitly related measurables via apps [measurableId, options]"
+        serviceFnName: "hasMeasurableRatings",
+        description: "return boolean if there are measurable ratings for this selector [options]"
     },
     saveRatingItem: {
         serviceName,
