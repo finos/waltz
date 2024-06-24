@@ -15,16 +15,15 @@
   ~ See the License for the specific
   ~
   -->
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="db.changelog-1.61.xml">
 
-<span>
-    <span ng-if="$ctrl.run.attestedEntityRef">
-        <span ng-bind="$ctrl.run.attestedEntityRef.name">
-        </span>
-        <span ng-bind="$ctrl.run.attestedEntityRef.kind | toDisplayName:'entity'">
-        </span>
-    </span>
-    <span ng-if="!$ctrl.run.attestedEntityRef && $ctrl.run.attestedEntityKind">
-        <span ng-bind="$ctrl.run.attestedEntityKind | toDisplayName:'entity'">
-        </span>s
-    </span>
-</span>
+
+    <changeSet id="v1-60-tag"
+               author="woodjes">
+        <tagDatabase tag="v1.60"/> <!-- tag the current db version, i.e. the last  -->
+    </changeSet>
+
+</databaseChangeLog>

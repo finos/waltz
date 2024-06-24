@@ -17,9 +17,19 @@
   -->
 
 <div>
-    <waltz-measurable-rating-panel measurables="$ctrl.measurables"
-                                   ratings="$ctrl.ratings"
-                                   rating-scheme-items="$ctrl.ratingSchemeItems">
+    <waltz-measurable-rating-panel category="$ctrl.ratingInfo.category"
+                                   measurables="$ctrl.ratingInfo.measurables"
+                                   ratings="$ctrl.ratingInfo.ratings"
+                                   rating-scheme-items="$ctrl.ratingInfo.ratingSchemeItems"
+                                   allocations="$ctrl.ratingInfo.allocations"
+                                   allocation-schemes="$ctrl.ratingInfo.allocationSchemes"
+                                   planned-decommissions="$ctrl.ratingInfo.plannedDecommissions"
+                                   replacing-decommissions="$ctrl.ratingInfo.replacingDecommissions"
+                                   replacement-apps="$ctrl.ratingInfo.plannedReplacements"
+                                   application="$ctrl.application"
+                                   assessment-definitions="$ctrl.ratingInfo.assessmentDefinitions"
+                                   assessment-ratings="$ctrl.ratingInfo.assessmentRatings"
+                                   measurable-hierarchy-by-id="$ctrl.ratingInfo.measurableHierarchyById">
     </waltz-measurable-rating-panel>
 
     <br>

@@ -38,12 +38,16 @@
     function calcDisabled(filterFn, n) {
         const isUnchecked = filterFn(n);
 
-        return isUnchecked // should be allowed to deselect non-concrete
+        const cannotCheck = isUnchecked // should be allowed to deselect non-concrete
             && ((!nonConcreteSelectable && !n.concrete) || n.unknown);
+
+        const cannotUncheck = ! _.get(n, ["usageCharacteristics", "isRemovable"], true);
+
+        return cannotCheck || cannotUncheck;
     }
 
     function mkTooltipProps(node) {
-        return node;
+        return Object.assign({}, node, {isEditMode: multiSelect});
     }
 
 </script>
@@ -82,6 +86,7 @@
                 {/if}
                     {#if node.usageCharacteristics}
                     <UsageCharacteristicsDecorator usageCharacteristics={node.usageCharacteristics}
+                                                   isEditMode={multiSelect}
                                                    isConcrete={node.concrete}/>
                 {/if}
             </span>
@@ -138,6 +143,7 @@
                                 {/if}
                                 {#if childNode.usageCharacteristics}
                                     <UsageCharacteristicsDecorator usageCharacteristics={childNode.usageCharacteristics}
+                                                                   isEditMode={multiSelect}
                                                                    isConcrete={childNode.concrete}/>
                                 {/if}
                             </div>
@@ -184,6 +190,5 @@
         padding-left: 0;
         margin-left: 0;
     }
-
 
 </style>

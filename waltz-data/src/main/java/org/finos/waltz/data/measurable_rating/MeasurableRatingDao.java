@@ -40,6 +40,10 @@ import org.finos.waltz.model.tally.ImmutableMeasurableRatingTally;
 import org.finos.waltz.model.tally.MeasurableRatingTally;
 import org.finos.waltz.model.tally.Tally;
 import org.finos.waltz.schema.Tables;
+import org.finos.waltz.schema.tables.EntityHierarchy;
+import org.finos.waltz.schema.tables.Measurable;
+import org.finos.waltz.schema.tables.records.AllocationRecord;
+import org.finos.waltz.schema.tables.records.MeasurableRatingPlannedDecommissionRecord;
 import org.finos.waltz.schema.tables.records.MeasurableRatingRecord;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -55,6 +59,7 @@ import org.jooq.SelectConditionStep;
 import org.jooq.SelectHavingStep;
 import org.jooq.SelectJoinStep;
 import org.jooq.SelectOrderByStep;
+import org.jooq.UpdateConditionStep;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
@@ -591,20 +596,24 @@ public class MeasurableRatingDao {
             org.finos.waltz.schema.tables.MeasurableRatingPlannedDecommission srcDecom = MEASURABLE_RATING_PLANNED_DECOMMISSION.as("srcDecom");
             org.finos.waltz.schema.tables.MeasurableRatingPlannedDecommission trgDecom = MEASURABLE_RATING_PLANNED_DECOMMISSION.as("trgDecom");
 
+            Field<Long> srcDecomId = srcDecom.ID.as("srcDecomId");
+            Field<Long> trgRatingId = trgMr.ID.as("trgRatingId");
+
             SelectConditionStep<Record2<Long, Long>> decomsToUpdate = DSL
-                    .select(srcDecom.ID, trgMr.ID)
+                    .select(srcDecomId, trgRatingId)
                     .from(srcDecom)
                     .innerJoin(srcMr).on(srcDecom.MEASURABLE_RATING_ID.eq(srcMr.ID).and(srcMr.MEASURABLE_ID.eq(measurableId)))
                     .innerJoin(trgMr).on(srcMr.ENTITY_KIND.eq(trgMr.ENTITY_KIND).and(srcMr.ENTITY_ID.eq(trgMr.ENTITY_ID).and(trgMr.MEASURABLE_ID.eq(targetId))))
                     .leftJoin(trgDecom).on(trgMr.ID.eq(trgDecom.MEASURABLE_RATING_ID))
                     .where(trgDecom.ID.isNull());
 
-            int migratedDecoms = tx
+            UpdateConditionStep<MeasurableRatingPlannedDecommissionRecord> updateDecomQry = tx
                     .update(MEASURABLE_RATING_PLANNED_DECOMMISSION)
-                    .set(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_RATING_ID, decomsToUpdate.field(trgMr.ID))
+                    .set(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_RATING_ID, decomsToUpdate.field(trgRatingId))
                     .from(decomsToUpdate)
-                    .where(MEASURABLE_RATING_PLANNED_DECOMMISSION.ID.eq(decomsToUpdate.field(srcDecom.ID)))
-                    .execute();
+                    .where(MEASURABLE_RATING_PLANNED_DECOMMISSION.ID.eq(decomsToUpdate.field(srcDecomId)));
+
+            int migratedDecoms = updateDecomQry.execute();
 
             if (migratedDecoms > 0) {
                 writeChangeLogForMerge(
@@ -637,36 +646,44 @@ public class MeasurableRatingDao {
             org.finos.waltz.schema.tables.Allocation srcAlloc = ALLOCATION.as("srcAlloc");
             org.finos.waltz.schema.tables.Allocation trgAlloc = ALLOCATION.as("trgAlloc");
 
-            Field<Integer> totalAlloc = srcAlloc.ALLOCATION_PERCENTAGE.add(trgAlloc.ALLOCATION_PERCENTAGE);
+            Field<Integer> totalAlloc = srcAlloc.ALLOCATION_PERCENTAGE.add(trgAlloc.ALLOCATION_PERCENTAGE).as("totalAlloc");
+            Field<Long> updateTargetAllocId = trgAlloc.ID.as("updateTargetAllocId");
 
             SelectConditionStep<Record2<Long, Integer>> allocsToUpdate = DSL
-                    .select(trgAlloc.ID, totalAlloc)
+                    .select(updateTargetAllocId, totalAlloc)
                     .from(srcAlloc)
                     .innerJoin(srcMr).on(srcAlloc.MEASURABLE_RATING_ID.eq(srcMr.ID).and(srcMr.MEASURABLE_ID.eq(measurableId)))
                     .innerJoin(trgMr).on(srcMr.ENTITY_KIND.eq(trgMr.ENTITY_KIND).and(srcMr.ENTITY_ID.eq(trgMr.ENTITY_ID).and(trgMr.MEASURABLE_ID.eq(targetId))))
                     .leftJoin(trgAlloc).on(trgMr.ID.eq(trgAlloc.MEASURABLE_RATING_ID))
                     .where(trgAlloc.ID.isNotNull());
 
+            Field<Long> migrateTargetAllocId = trgAlloc.ID.as("migrateTargetAllocId");
+            Field<Integer> allocPercentage = srcAlloc.ALLOCATION_PERCENTAGE.as("allocPercentage");
+
             SelectConditionStep<Record2<Long, Integer>> allocsToMigrate = DSL
-                    .select(trgAlloc.ID, srcAlloc.ALLOCATION_PERCENTAGE)
+                    .select(migrateTargetAllocId, allocPercentage)
                     .from(srcAlloc)
                     .innerJoin(srcMr).on(srcAlloc.MEASURABLE_RATING_ID.eq(srcMr.ID).and(srcMr.MEASURABLE_ID.eq(measurableId)))
                     .innerJoin(trgMr).on(srcMr.ENTITY_KIND.eq(trgMr.ENTITY_KIND).and(srcMr.ENTITY_ID.eq(trgMr.ENTITY_ID).and(trgMr.MEASURABLE_ID.eq(targetId))))
                     .leftJoin(trgAlloc).on(trgMr.ID.eq(trgAlloc.MEASURABLE_RATING_ID))
                     .where(trgAlloc.ID.isNull());
 
-            int mergedAllocs = tx
+            UpdateConditionStep<AllocationRecord> mergeAllocQry = tx
                     .update(ALLOCATION)
                     .set(ALLOCATION.ALLOCATION_PERCENTAGE, totalAlloc)
                     .from(allocsToUpdate)
-                    .where(ALLOCATION.ID.eq(allocsToUpdate.field(ALLOCATION.ID)))
+                    .where(ALLOCATION.ID.eq(allocsToUpdate.field(updateTargetAllocId)));
+
+            int mergedAllocs = mergeAllocQry
                     .execute();
 
-            int migratedAllocs = tx
+            UpdateConditionStep<AllocationRecord> updateAllocQry = tx
                     .update(ALLOCATION)
                     .set(ALLOCATION.ALLOCATION_PERCENTAGE, allocsToMigrate.field(srcAlloc.ALLOCATION_PERCENTAGE))
                     .from(allocsToMigrate)
-                    .where(ALLOCATION.ID.eq(allocsToMigrate.field(ALLOCATION.ID)))
+                    .where(ALLOCATION.ID.eq(allocsToMigrate.field(migrateTargetAllocId)));
+
+            int migratedAllocs = updateAllocQry
                     .execute();
 
             if (migratedAllocs > 0) {
