@@ -21,14 +21,15 @@ package org.finos.waltz.data;
 import org.finos.waltz.model.HierarchyQueryScope;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.application.ApplicationKind;
+import org.finos.waltz.schema.tables.Application;
 import org.jooq.Condition;
 
 import java.util.Set;
 
-import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.common.SetUtilities.minus;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
 
 public class SelectorUtilities {
 
@@ -42,12 +43,22 @@ public class SelectorUtilities {
 
     /***
      * creates a select condition taking into account application specific faces in options
+     * Defaults to an un-aliased application table
      * @param options
      * @return
      */
     public static Condition mkApplicationConditions(IdSelectionOptions options) {
+        return mkApplicationConditions(APPLICATION, options);
+    }
 
-        Condition cond = APPLICATION.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses());
+    /***
+     * creates a select condition taking into account application specific faces in options
+     * @param options
+     * @return
+     */
+    public static Condition mkApplicationConditions(Application appTable, IdSelectionOptions options) {
+
+        Condition cond = appTable.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses());
 
         if(options.filters().omitApplicationKinds().isEmpty()){
             return cond;
@@ -56,7 +67,7 @@ public class SelectorUtilities {
                     asSet(ApplicationKind.values()),
                     options.filters().omitApplicationKinds());
 
-            return cond.and(APPLICATION.KIND.in(applicationKinds));
+            return cond.and(appTable.KIND.in(applicationKinds));
         }
 
     }

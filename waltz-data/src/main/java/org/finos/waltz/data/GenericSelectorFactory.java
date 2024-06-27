@@ -29,6 +29,7 @@ import org.finos.waltz.data.logical_flow.LogicalFlowDecoratorIdSelectorFactory;
 import org.finos.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import org.finos.waltz.data.measurable.MeasurableIdSelectorFactory;
 import org.finos.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
+import org.finos.waltz.data.person.PersonIdSelectorFactory;
 import org.finos.waltz.data.physical_flow.PhysicalFlowIdSelectorFactory;
 import org.finos.waltz.data.physical_specification.PhysicalSpecificationIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;
@@ -53,6 +54,7 @@ public class GenericSelectorFactory {
     private final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
     private final OrganisationalUnitIdSelectorFactory organisationalUnitIdSelectorFactory = new OrganisationalUnitIdSelectorFactory();
     private final AttestationIdSelectorFactory attestationIdSelectorFactory = new AttestationIdSelectorFactory();
+    private final PersonIdSelectorFactory personIdSelectorFactory = new PersonIdSelectorFactory();
     private final PhysicalSpecificationIdSelectorFactory specificationIdSelectorFactory = new PhysicalSpecificationIdSelectorFactory();
     private final PhysicalFlowIdSelectorFactory physicalFlowIdSelectorFactory = new PhysicalFlowIdSelectorFactory();
 
@@ -131,7 +133,8 @@ public class GenericSelectorFactory {
                 return physicalFlowIdSelectorFactory.apply(selectionOptions);
             case PHYSICAL_SPECIFICATION:
                 return specificationIdSelectorFactory.apply(selectionOptions);
-            //todo: (KS) Add support for Person
+            case PERSON:
+                return personIdSelectorFactory.apply(selectionOptions);
             default:
                 throw new UnsupportedOperationException(String.format("Cannot make generic selector for kind: %s", kind));
         }

@@ -21,7 +21,11 @@ package org.finos.waltz.data;
 
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.LifecycleStatus;
+import org.finos.waltz.model.application.LifecyclePhase;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -33,6 +37,27 @@ public class EntityLifecycleStatusUtils {
                 || entityLifecycleStatuses.contains(EntityLifecycleStatus.PENDING));
 
         return ListUtilities.newArrayList(includedNonRemoved, includeRemoved);
+    }
+
+
+    public static List<LifecyclePhase> convertToLifecyclePhases(Collection<EntityLifecycleStatus> entityLifecycleStatuses) {
+
+        ArrayList<LifecyclePhase> lifecyclePhases = new ArrayList<>();
+
+        if (entityLifecycleStatuses.contains(EntityLifecycleStatus.ACTIVE)) {
+            lifecyclePhases.add(LifecyclePhase.DEVELOPMENT);
+            lifecyclePhases.add(LifecyclePhase.PRODUCTION);
+        }
+
+        if (entityLifecycleStatuses.contains(EntityLifecycleStatus.PENDING)) {
+            lifecyclePhases.add(LifecyclePhase.CONCEPTUAL);
+        }
+
+        if (entityLifecycleStatuses.contains(EntityLifecycleStatus.REMOVED)) {
+            lifecyclePhases.add(LifecyclePhase.RETIRED);
+        }
+
+        return lifecyclePhases;
     }
 
 }

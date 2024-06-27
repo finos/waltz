@@ -52,7 +52,7 @@
 
     $: {
         if (!_.isEmpty($selectedCategory) && selectionOptions) {
-            viewCall = measurableRatingStore.getViewByCategoryAndSelector($selectedCategory.id, selectionOptions, true)
+            viewCall = measurableRatingStore.getViewByCategoryAndSelector($selectedCategory.id, selectionOptions, false);
         }
     }
 

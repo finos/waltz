@@ -99,23 +99,6 @@ function prepareTabForCategory(measurableRatingsView,
         .mapValues(d => _.sumBy(d, a => a.percentage))
         .value();
 
-    const plannedDecomms = _.isNull(application.plannedRetirementDate)
-        ? _.map(decommissionsView.plannedDecommissions, d => Object.assign({}, d, { isValid: true}))
-        : _.map(decommissionsView.plannedDecommissions, d => {
-
-            const decomDate = new Date(d.plannedDecommissionDate);
-            const appRetirementDate = new Date(application.plannedRetirementDate);
-
-            const sameDate = appRetirementDate.getFullYear() === decomDate.getFullYear()
-                && appRetirementDate.getMonth() === decomDate.getMonth()
-                && appRetirementDate.getDate() === decomDate.getDate();
-
-            const isValid = appRetirementDate > decomDate || sameDate;
-
-            return Object.assign({}, d, {isValid: isValid})
-        });
-
-
     return {
         category: _.head(measurableRatingsView.measurableCategories),
         measurables,
@@ -124,7 +107,7 @@ function prepareTabForCategory(measurableRatingsView,
         allocations: allocationsView.allocations,
         assessmentDefinitions: assessmentsView.assessmentDefinitions,
         assessmentRatings,
-        plannedDecommissions: plannedDecomms,
+        plannedDecommissions: decommissionsView.plannedDecommissions,
         plannedReplacements: decommissionsView.plannedReplacements,
         replacingDecommissions: decommissionsView.replacingDecommissions,
         ratingSchemeItems: measurableRatingsView.ratingSchemeItems,
@@ -171,4 +154,56 @@ export function determineEditableCategories(categories, permissions, userRoles) 
             const isEditableCategory = t.editable;
             return isEditableCategory && (hasRole || editableCategoryForUser);
         });
+}
+
+function checkPlannedDecomDateIsValid(decomDateStr, entityRetirementDateStr) {
+
+    if (_.isNil(entityRetirementDateStr)){
+        return true;
+    } else {
+        const entityDate = new Date(entityRetirementDateStr);
+        const newDecomDate = new Date(decomDateStr);
+
+        const sameDate = entityDate.getFullYear() === newDecomDate.getFullYear()
+            && entityDate.getMonth() === newDecomDate.getMonth()
+            && entityDate.getDate() === newDecomDate.getDate();
+
+        return entityDate > newDecomDate || sameDate;
+    }
+}
+
+
+
+export const DECOM_ALLOWED_STATUS = {
+    FAIL: Symbol("FAIL"),
+    PASS: Symbol("PASS"),
+    CONFIRM: Symbol("CONFIRM")
+}
+
+
+export function checkPlannedDecommIsValid(dateChange, application) {
+
+    if (_.isNil(application)) {
+        return {
+            status: DECOM_ALLOWED_STATUS.PASS,
+            message: null
+
+        }
+    } else if (application.entityLifecycleStatus === "REMOVED"){
+        return {
+            status: DECOM_ALLOWED_STATUS.FAIL,
+            message: "Decommission date cannot be set. This application is no longer active"
+        }
+    } else if (checkPlannedDecomDateIsValid(dateChange.newVal, application?.plannedRetirementDate)){
+        return {
+            status: DECOM_ALLOWED_STATUS.PASS,
+            message: null
+        }
+    } else {
+        const appDate = new Date(application.plannedRetirementDate).toDateString();
+        return {
+            status: DECOM_ALLOWED_STATUS.CONFIRM,
+            errorMsg: `This decommission date is later then the planned retirement date of the application: ${appDate}`
+        }
+    }
 }

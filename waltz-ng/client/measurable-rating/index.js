@@ -24,7 +24,7 @@ import MeasurableRatingPlannedDecommissionStore from "./services/measurable-rati
 import MeasurableRatingsBrowserSection from "./components/browser-section/measurable-ratings-browser-section";
 import MeasurableRatingsBrowserTreePanel from "./components/browser-tree-panel/measurable-ratings-browser-tree-panel";
 import MeasurableRatingEditPanel from "./components/edit-panel/measurable-rating-edit-panel";
-import MeasurableRatingAppSection from "./components/app-section/measurable-rating-app-section";
+import MeasurableRatingEntitySection from "./components/entity-section/measurable-rating-entity-section";
 import MeasurableRatingExplorerSection from "./components/explorer-section/measurable-rating-explorer-section";
 import MeasurableRatingPanel from "./components/panel/measurable-rating-panel";
 import MeasurableRatingTree from "./components/tree/measurable-rating-tree";
@@ -47,7 +47,7 @@ export default () => {
         MeasurableRatingPlannedDecommissionStore]);
 
     registerComponents(module, [
-        MeasurableRatingAppSection,
+        MeasurableRatingEntitySection,
         MeasurableRatingEditPanel,
         MeasurableRatingExplorerSection,
         MeasurableRatingPanel,

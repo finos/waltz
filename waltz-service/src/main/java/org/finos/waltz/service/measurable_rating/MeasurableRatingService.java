@@ -26,6 +26,7 @@ import org.finos.waltz.data.measurable.MeasurableDao;
 import org.finos.waltz.data.measurable.MeasurableIdSelectorFactory;
 import org.finos.waltz.data.measurable_category.MeasurableCategoryDao;
 import org.finos.waltz.data.measurable_rating.MeasurableRatingDao;
+import org.finos.waltz.data.measurable_rating.MeasurableRatingIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
@@ -69,8 +70,9 @@ public class MeasurableRatingService {
     private final RatingSchemeService ratingSchemeService;
     private final EntityReferenceNameResolver entityReferenceNameResolver;
 
-    private final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
-    private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
+    private static final MeasurableIdSelectorFactory MEASURABLE_ID_SELECTOR_FACTORY = new MeasurableIdSelectorFactory();
+    private static final ApplicationIdSelectorFactory APPLICATION_ID_SELECTOR_FACTORY = new ApplicationIdSelectorFactory();
+    private static final MeasurableRatingIdSelectorFactory MEASURABLE_RATING_ID_SELECTOR_FACTORY = new MeasurableRatingIdSelectorFactory();
 
 
     @Autowired
@@ -102,8 +104,16 @@ public class MeasurableRatingService {
     }
 
 
-    public List<MeasurableRating> findForCategoryAndSelector(Select<Record1<Long>> appIds, long categoryId) {
-        return measurableRatingDao.findForCategoryAndSelector(appIds, categoryId);
+    /*
+     * Should move to using a measurable rating id selector
+     */
+    @Deprecated
+    public List<MeasurableRating> findForCategoryAndSubjectIdSelector(Select<Record1<Long>> subjectIdSelector, long categoryId) {
+        return measurableRatingDao.findForCategoryAndSubjectIdSelector(subjectIdSelector, categoryId);
+    }
+
+    public List<MeasurableRating> findForCategoryAndMeasurableRatingIdSelector(Select<Record1<Long>> ratingIdSelector, long categoryId) {
+        return measurableRatingDao.findForCategoryAndMeasurableRatingIdSelector(ratingIdSelector, categoryId);
     }
 
 
@@ -117,14 +127,14 @@ public class MeasurableRatingService {
 
     public List<MeasurableRating> findByMeasurableIdSelector(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
-        Select<Record1<Long>> selector = measurableIdSelectorFactory.apply(options);
+        Select<Record1<Long>> selector = MEASURABLE_ID_SELECTOR_FACTORY.apply(options);
         return measurableRatingDao.findByMeasurableIdSelector(selector, options);
     }
 
 
     public Collection<MeasurableRating> findByAppIdSelector(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
-        Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(options);
+        Select<Record1<Long>> selector = APPLICATION_ID_SELECTOR_FACTORY.apply(options);
         return measurableRatingDao.findByApplicationIdSelector(selector);
     }
 
@@ -193,7 +203,7 @@ public class MeasurableRatingService {
 
 
     public int deleteByMeasurableIdSelector(IdSelectionOptions selectionOptions) {
-        Select<Record1<Long>> selector = measurableIdSelectorFactory
+        Select<Record1<Long>> selector = MEASURABLE_ID_SELECTOR_FACTORY
                 .apply(selectionOptions);
         return measurableRatingDao
                 .deleteByMeasurableIdSelector(selector);
@@ -314,16 +324,16 @@ public class MeasurableRatingService {
 
     public List<MeasurableRatingTally> statsByAppSelector(MeasurableRatingStatParams params) {
         checkNotNull(params, "params cannot be null");
-        Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(params.options());
-        return measurableRatingDao.statsByAppSelector(
-                selector,
+        Select<Record1<Long>> ratingIdSelector = MEASURABLE_RATING_ID_SELECTOR_FACTORY.apply(params.options());
+        return measurableRatingDao.statsByMeasurableRatingIdSelector(
+                ratingIdSelector,
                 params.showPrimaryOnly());
     }
 
 
-    public boolean hasImplicitlyRelatedMeasurables(long measurableId, IdSelectionOptions options) {
-        Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(options);
-        return measurableRatingDao.hasImplicitlyRelatedMeasurables(measurableId, selector);
+    public boolean hasMeasurableRatings(IdSelectionOptions options) {
+        Select<Record1<Long>> selector = MEASURABLE_RATING_ID_SELECTOR_FACTORY.apply(options);
+        return measurableRatingDao.hasMeasurableRatings(selector);
     }
 
 
@@ -427,7 +437,15 @@ public class MeasurableRatingService {
                 : format("%s [%s]", nameAndCode.v1, nameAndCode.v2);
     }
 
-    public Set<MeasurableRating> findPrimaryRatingsForGenericSelector(GenericSelector genericSelector) {
-        return measurableRatingDao.findPrimaryRatingsForGenericSelector(genericSelector);
+    /*
+     * Should move to using a measurable rating id selector
+     */
+    @Deprecated
+    public Set<MeasurableRating> findPrimaryRatingsForGenericSelector(GenericSelector subjectIdSelector) {
+        return measurableRatingDao.findPrimaryRatingsForGenericSelector(subjectIdSelector);
+    }
+
+    public Set<MeasurableRating> findPrimaryRatingsForMeasurableIdSelector(Select<Record1<Long>> ratingIdSelector) {
+        return measurableRatingDao.findPrimaryRatingsForMeasurableIdSelector(ratingIdSelector);
     }
 }

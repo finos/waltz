@@ -50,8 +50,8 @@ function controller($q, serviceBroker) {
         const selectionOptions = mkSelectionOptions(vm.parentEntityRef);
 
         serviceBroker
-            .loadAppData(CORE_API.MeasurableRatingStore.hasImplicitlyRelatedMeasurables, [vm.parentEntityRef.id, selectionOptions])
-            .then(r => vm.hasImplicitlyRelatedMeasurables = console.log(r) || r.data);
+            .loadViewData(CORE_API.MeasurableRatingStore.hasMeasurableRatings, [selectionOptions])
+            .then(r => vm.hasImplicitlyRelatedMeasurables = r.data);
     };
 }
 

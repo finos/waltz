@@ -87,7 +87,11 @@ public class AllocationDao {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
-    public List<Allocation> findForCategoryAndSelector(Select<Record1<Long>> appIdSelector, long categoryId) {
+    /*
+     * Should move to using a measurable rating id selector
+     */
+    @Deprecated
+    public List<Allocation> findForCategoryAndSubjectIdSelector(Select<Record1<Long>> subjectIdSelector, long categoryId) {
         return dsl
                 .select(ALLOCATION.fields())
                 .from(ALLOCATION)
@@ -95,8 +99,20 @@ public class AllocationDao {
                 .innerJoin(MEASURABLE).on(MEASURABLE_RATING.MEASURABLE_ID.eq(MEASURABLE.ID)
                         .and(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId)))
                 .where(dsl.renderInlined(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
-                        .and(MEASURABLE_RATING.ENTITY_ID.in(appIdSelector))))
+                        .and(MEASURABLE_RATING.ENTITY_ID.in(subjectIdSelector))))
                 .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public Set<Allocation> findForCategoryAndMeasurableRatingIdSelector(Select<Record1<Long>> ratingIdSelector, long categoryId) {
+        return dsl
+                .select(ALLOCATION.fields())
+                .from(ALLOCATION)
+                .innerJoin(MEASURABLE_RATING).on(ALLOCATION.MEASURABLE_RATING_ID.eq(MEASURABLE_RATING.ID))
+                .innerJoin(MEASURABLE).on(MEASURABLE_RATING.MEASURABLE_ID.eq(MEASURABLE.ID)
+                        .and(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId)))
+                .where(dsl.renderInlined(MEASURABLE_RATING.ID.in(ratingIdSelector)))
+                .fetchSet(TO_DOMAIN_MAPPER);
     }
 
 

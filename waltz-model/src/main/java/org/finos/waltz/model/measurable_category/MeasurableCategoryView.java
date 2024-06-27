@@ -20,26 +20,12 @@ package org.finos.waltz.model.measurable_category;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.finos.waltz.model.DescriptionProvider;
-import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.EntityKindProvider;
-import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.ExternalIdProvider;
-import org.finos.waltz.model.IconProvider;
-import org.finos.waltz.model.IdProvider;
-import org.finos.waltz.model.ImmutableEntityReference;
-import org.finos.waltz.model.LastUpdatedProvider;
-import org.finos.waltz.model.NameProvider;
-import org.finos.waltz.model.PositionProvider;
-import org.finos.waltz.model.WaltzEntity;
-import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
-import org.finos.waltz.model.measurable.Measurable;
-import org.finos.waltz.model.rating.RatingScheme;
-import org.finos.waltz.model.user.SystemRole;
 import org.immutables.value.Value;
 
-import java.util.Optional;
-
+/**
+ * Used primarily to show which categories apply to an entity
+ * (e.g. when drawing tabs in the application measurable view section)
+ */
 @Value.Immutable
 @JsonSerialize(as = ImmutableMeasurableCategoryView.class)
 @JsonDeserialize(as = ImmutableMeasurableCategoryView.class)
