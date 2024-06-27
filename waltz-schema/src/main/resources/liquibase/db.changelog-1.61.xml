@@ -153,4 +153,38 @@
                          defaultValueComputed="CONCAT('LF_', FORMAT(NEXT VALUE FOR logical_flow_id_seq, '000000'))"/>
     </changeSet>
 
+    <changeSet id="20240625-7084-1"
+               author="davidwatkins73">
+        <comment>7084: Flow Classification Rules: allow multiple rules of differing directions </comment>
+        <addColumn tableName="flow_classification_rule">
+            <column name="direction"
+                    type="${enum.type}"
+                    defaultValue="OUTBOUND">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20240625-7084-2"
+               author="davidwatkins73">
+        <comment>7084: Flow Classification Rules: allow multiple rules of differing directions </comment>
+        <dropIndex tableName="flow_classification_rule"
+                   indexName="idx_fcr_scope_dt_app"/>
+    </changeSet>
+
+    <changeSet id="20240625-7084-3"
+               author="davidwatkins73">
+        <comment>7084: Flow Classification Rules: allow multiple rules of differing directions </comment>
+        <createIndex indexName="idx_fcr_scope_dt_app_dirn"
+                     tableName="flow_classification_rule"
+                     unique="true">
+            <column name="parent_kind" type="${enum.type}"/>
+            <column name="parent_id" type="${id.type}"/>
+            <column name="subject_entity_id" type="${id.type}"/>
+            <column name="subject_entity_kind" type="${enum.type}"/>
+            <column name="data_type_id" type="${id.type}"/>
+            <column name="direction" type="${enum.type}"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>
