@@ -135,6 +135,10 @@
             </a>
         </h4>
 
+        <div class="small help-block">
+            <span ng-bind="$ctrl.selected.logicalFlow.externalId"></span>
+        </div>
+
         <div>
             <a ng-click="$ctrl.focusOnEntity($ctrl.selected)"
                class="clickable">
@@ -203,7 +207,9 @@
                 <thead>
                 <tr>
                     <th>Name</th>
+                    <th>External ID</th>
                     <th>Specification</th>
+                    <th>Specification Ext ID</th>
                     <th>Format</th>
                     <th>Transport</th>
                     <th>Frequency</th>
@@ -222,10 +228,16 @@
                                     uib-tooltip="Changes planned for this physical flow">
                         </waltz-icon>
                     </td>
+                    <td title="{{pf.externalId}}">
+                        <span ng-bind="pf.externalId | truncate:15"></span>
+                    </td>
                     <td>
                         <a ui-sref="main.physical-specification.view ({ id: pf.specification.id })">
                             <span ng-bind="pf.specification.name"></span>
                         </a>
+                    </td>
+                    <td title="{{pf.specification.externalId}}">
+                        <span ng-bind="pf.specification.externalId | truncate:15"></span>
                     </td>
                     <td>
                         <waltz-enum-value type="'DataFormatKind'"

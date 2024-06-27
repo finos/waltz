@@ -90,6 +90,11 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
                 "id",
                 ":id");
 
+        String findByExternalIdPath = mkPath(
+                BASE_URL,
+                "external-id",
+                ":externalId");
+
         String deletePath = mkPath(BASE_URL,
                 ":id");
 
@@ -126,6 +131,9 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
         DatumRoute<PhysicalSpecification> getByIdRoute =
                 (request, response) -> specificationService.getById(getId(request));
 
+        ListRoute<PhysicalSpecification> findByExternalIdRoute =
+                (request, response) -> specificationService.findByExternalId(request.params("externalId"));
+
         ListRoute<Operation> findPermissionsForSpecRoute = (request, response) -> flowPermissionChecker.findPermissionsForSpec(
                 getId(request),
                 getUsername(request));
@@ -138,6 +146,7 @@ public class PhysicalSpecificationEndpoint implements Endpoint {
         postForList(searchPath, searchRoute);
         getForDatum(getByIdPath, getByIdRoute);
         getForList(findPermissionsForSpecPath, findPermissionsForSpecRoute);
+        getForList(findByExternalIdPath, findByExternalIdRoute);
         postForDatum(updateAttributePath, this::updateAttribute);
 
         deleteForDatum(deletePath, this::deleteSpecification);

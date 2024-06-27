@@ -24,6 +24,7 @@ import template from "./physical-specification-view.html";
 import {CORE_API} from "../common/services/core-api-utils";
 import toasts from "../svelte-stores/toast-store";
 import {displayError} from "../common/error-utils";
+import {copyTextToClipboard} from "../common/browser-utils";
 
 
 const initialState = {
@@ -78,6 +79,8 @@ function loadFlowDiagrams(specId, $q, flowDiagramStore, flowDiagramEntityStore) 
 
 function controller($q,
                     $stateParams,
+                    $state,
+                    $window,
                     applicationStore,
                     flowDiagramStore,
                     flowDiagramEntityStore,
@@ -165,12 +168,21 @@ function controller($q,
 
     vm.onSaveFormat = (value, ctx) => doSave("format", value);
     vm.onSaveDescription = (value, ctx) => doSave("description", value.newVal);
+
+    vm.sharePageLink = () => {
+        const viewUrl = $state.href("main.physical-specification.external-id", { externalId: vm.specification.externalId });
+        copyTextToClipboard(`${$window.location.origin}${viewUrl}`)
+            .then(() => toasts.success("Copied link to clipboard"))
+            .catch(e => displayError("Could not copy link to clipboard", e));
+    }
 }
 
 
 controller.$inject = [
     "$q",
     "$stateParams",
+    "$state",
+    "$window",
     "ApplicationStore",
     "FlowDiagramStore",
     "FlowDiagramEntityStore",
