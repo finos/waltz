@@ -113,6 +113,12 @@
         </td>
     </tr>
     <tr>
+        <td>External Id</td>
+        <td>
+            {flow.externalId}
+        </td>
+    </tr>
+    <tr>
         <td>Data Types</td>
         <td>
             <DataTypeMiniTable decorators={dataTypes}

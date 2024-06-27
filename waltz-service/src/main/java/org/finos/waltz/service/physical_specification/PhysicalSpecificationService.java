@@ -167,6 +167,11 @@ public class PhysicalSpecificationService {
         }
     }
 
+    public Collection<PhysicalSpecification> findByExternalId(String externalId) {
+        checkNotNull(externalId, "External id cannot be null");
+        return specificationDao.findByExternalId(externalId);
+    }
+
     public int updateExternalId(Long id, String sourceExtId) {
         checkNotNull(id, "Specification id cannot be null");
         checkNotNull(sourceExtId, "External id cannot be null");
@@ -222,6 +227,7 @@ public class PhysicalSpecificationService {
 
     // -- HELPERS
 
+
     private int doUpdateAttribute(SetAttributeCommand command) {
         long flowId = command.entityReference().id();
         switch(command.name()) {
@@ -236,5 +242,4 @@ public class PhysicalSpecificationService {
                 throw new UnsupportedOperationException(errMsg);
         }
     }
-
 }

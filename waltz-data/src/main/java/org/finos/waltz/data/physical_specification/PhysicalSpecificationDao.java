@@ -176,6 +176,12 @@ public class PhysicalSpecificationDao {
     }
 
 
+    public Collection<PhysicalSpecification> findByExternalId(String externalId) {
+        return basicSelectByCondition(PHYSICAL_SPECIFICATION.EXTERNAL_ID.eq(externalId))
+                .fetchSet(TO_DOMAIN_MAPPER);
+    }
+
+
     public PhysicalSpecification getByParsedFlow(PhysicalFlowParsed flow) {
 
         Condition condition = PHYSICAL_SPECIFICATION.NAME.eq(flow.name())
@@ -440,4 +446,5 @@ public class PhysicalSpecificationDao {
             return operationsForEntity;
         }
     }
+
 }

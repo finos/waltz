@@ -21,7 +21,8 @@
     <!-- HEADER -->
     <waltz-page-header name="{{ ctrl.specification.name }}"
                        small="Physical Specification"
-                       icon="file-text">
+                       icon="file-text"
+                       class="waltz-visibility-parent">
         <breadcrumbs>
             <ol class="waltz-breadcrumbs">
                 <li><a ui-sref="main">Home</a></li>
@@ -35,6 +36,13 @@
                 <li ng-bind="ctrl.specification.name"></li>
             </ol>
         </breadcrumbs>
+        <actions>
+            <button ng-click="ctrl.sharePageLink()"
+                    title="Copy url to clipboard"
+                    class="btn btn-skinny waltz-visibility-child-30">
+                <waltz-icon name="share-alt"></waltz-icon>
+            </button>
+        </actions>
     </waltz-page-header>
 
 

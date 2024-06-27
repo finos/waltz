@@ -31,6 +31,13 @@ export function store($http, baseApiUrl) {
     };
 
 
+    const findByExternalId = (externalId) => {
+        return $http
+            .get(`${base}/external-id/${externalId}`)
+            .then(r => r.data);
+    };
+
+
     const findBySelector = (options) => {
         checkIsIdSelector(options);
         return $http
@@ -73,6 +80,7 @@ export function store($http, baseApiUrl) {
         findByEntityReference,
         findBySelector,
         findByIds,
+        findByExternalId,
         getById,
         deleteById,
         search,
@@ -106,6 +114,11 @@ export const PhysicalSpecificationStore_API = {
         serviceName,
         serviceFnName: "findByIds",
         description: "executes findByIds"
+    },
+    findByExternalId: {
+        serviceName,
+        serviceFnName: "findByExternalId",
+        description: "executes findByExternalId"
     },
     getById: {
         serviceName,

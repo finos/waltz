@@ -143,6 +143,16 @@ const targetExtIdCol = {
 };
 
 
+const flowExtIdCol = {
+    id: "flow_ext_id",
+    name: "Flow Ext Id",
+    field: "logicalFlow",
+    sortable:  true,
+    formatter: (row, cell, value, colDef, dataCtx) => value.externalId,
+    sortFn: (a, b) => cmp(a?.logicalFlow.externalId, b?.logicalFlow.externalId)
+};
+
+
 const physicalNameCol = {
     id: "physical_name",
     name: "Name",
@@ -286,6 +296,7 @@ export function mkLogicalFlowTableColumns(defs = []) {
             sourceExtIdCol,
             targetNameCol,
             targetExtIdCol,
+            flowExtIdCol,
             mkDataTypesCol("dataTypesForLogicalFlow")
         ],
         mkLogicalFlowAssessmentColumns(defs));

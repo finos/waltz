@@ -17,21 +17,30 @@
  */
 
 
-const baseState = {
-};
-
-
+import {CORE_API} from "../common/services/core-api-utils";
 import PhysicalFlowView from "./physical-flow-view";
 import PhysicalFlowRegistration from "./physical-flow-registration";
+import toasts from "../svelte-stores/toast-store";
+import _ from "lodash";
+
+const baseState = {
+    url: "physical-flow"
+};
 
 const viewState = {
-    url: "physical-flow/{id:int}",
+    url: "/{id:int}",
     views: {"content@": PhysicalFlowView },
 };
 
 
+const physicalFlowViewByExternalIdBouncerState = {
+    url: "/external-id/{externalId}",
+    resolve: {externalIdBouncer},
+};
+
+
 const registrationState = {
-    url: "physical-flow/registration/{kind:string}/{id:int}?{targetLogicalFlowId:int}",
+    url: "/registration/{kind:string}/{id:int}?{targetLogicalFlowId:int}",
     views: {"content@": PhysicalFlowRegistration },
 };
 
@@ -41,11 +50,37 @@ function setup($stateProvider) {
     $stateProvider
         .state("main.physical-flow", baseState)
         .state("main.physical-flow.registration", registrationState)
-        .state("main.physical-flow.view", viewState);
+        .state("main.physical-flow.view", viewState)
+        .state("main.physical-flow.external-id", physicalFlowViewByExternalIdBouncerState);
 }
 
 
+
+function externalIdBouncer($state, $stateParams, serviceBroker) {
+    const externalId = $stateParams.externalId;
+    serviceBroker
+        .loadViewData(
+            CORE_API.PhysicalFlowStore.findByExternalId,
+            [externalId])
+        .then(r => {
+            const flowList = r.data;
+            const flow = _.head(flowList);
+
+            if (_.size(flowList) > 1 && flow) {
+                console.log(`Multiple physical flows corresponding to external id: ${externalId}`);
+                toasts.warning(`Multiple physical flows corresponding to external id: ${externalId}, redirecting to the first found`);
+                $state.go("main.physical-flow.view", {id: flow.id});
+            } else if(_.size(flowList) === 1 && flow){
+                $state.go("main.physical-flow.view", {id: flow.id});
+            } else {
+                console.log(`Cannot find physical flow corresponding to external id: ${externalId}`);
+                toasts.error(`Cannot find physical flow with the external id: ${externalId}, redirecting to the Waltz home page`);
+            }
+        });
+}
+
 setup.$inject = ["$stateProvider"];
 
+externalIdBouncer.$inject = ["$state", "$stateParams", "ServiceBroker"];
 
 export default setup;
