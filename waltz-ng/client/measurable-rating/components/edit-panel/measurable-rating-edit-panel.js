@@ -20,7 +20,12 @@ import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
 import {kindToViewState} from "../../../common/link-utils";
-import {determineEditableCategories, loadAllData, mkTab} from "../../measurable-rating-utils";
+import {
+    checkPlannedDecommIsValid, DECOM_ALLOWED_STATUS,
+    determineEditableCategories,
+    loadAllData,
+    mkTab
+} from "../../measurable-rating-utils";
 import {mkRatingsKeyHandler} from "../../../ratings/rating-utils";
 
 import template from "./measurable-rating-edit-panel.html";
@@ -35,7 +40,7 @@ const bindings = {
     plannedDecommissions: "<?",
     replacementApps: "<?",
     replacingDecommissions: "<?",
-    application: "<"
+    application: "<?"
 };
 
 
@@ -279,36 +284,21 @@ function controller($q,
             .finally(reloadDecommData);
     };
 
-    vm.checkPlannedDecomDateIsValid = (decomDate) => {
-
-        const appDate = new Date(vm.application.plannedRetirementDate);
-        const newDecomDate = new Date(decomDate);
-
-        const sameDate = appDate.getFullYear() === newDecomDate.getFullYear()
-            && appDate.getMonth() === newDecomDate.getMonth()
-            && appDate.getDate() === newDecomDate.getDate();
-
-        return appDate > newDecomDate || sameDate;
-    };
-
     vm.onSaveDecommissionDate = (dateChange) => {
+        const result = checkPlannedDecommIsValid(dateChange, vm.application);
 
-        if (vm.application.entityLifecycleStatus === "REMOVED"){
-            toasts.error("Decommission date cannot be set. This application is no longer active");
-            return;
-        }
-
-        if (_.isNull(vm.application.plannedRetirementDate) || vm.checkPlannedDecomDateIsValid(dateChange.newVal)){
+        if (result.status === DECOM_ALLOWED_STATUS.FAIL) {
+            toasts.error(result.message);
+        } else if (result.status === DECOM_ALLOWED_STATUS.PASS) {
             saveDecommissionDate(dateChange);
-
-        } else {
-            const appDate = new Date(vm.application.plannedRetirementDate).toDateString();
-
-            if (!confirm(`This decommission date is later then the planned retirement date of the application: ${appDate}. Are you sure you want to save it?`)){
+        } else if (result.status === DECOM_ALLOWED_STATUS.CONFIRM) {
+            if (confirm(`${result.message}. Are you sure you want to save it?`)) {
+                saveDecommissionDate(dateChange);
+            } else {
                 toasts.error("Decommission date was not saved");
-                return;
             }
-            saveDecommissionDate(dateChange)
+        } else {
+            toasts.warning(`[Developer message]: Did not understand decomm validity test result: ${result.status}`);
         }
     };
 
@@ -354,8 +344,10 @@ function controller($q,
                 })
                 .catch(e => {
                     displayError("Could not save rating", e);
-                    deselectMeasurable();
                     throw e;
+                })
+                .finally(() => {
+                    deselectMeasurable();
                 });
     };
 

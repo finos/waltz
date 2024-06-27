@@ -19,7 +19,7 @@ import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
 
-import template from "./measurable-rating-app-section.html";
+import template from "./measurable-rating-entity-section.html";
 import {determineEditableCategories, determineStartingTab, loadAllData, mkTab} from "../../measurable-rating-utils";
 import namedSettings from "../../../system/named-settings";
 import {selectedMeasurable} from "../panel/measurable-rating-panel-store";
@@ -188,5 +188,5 @@ const component = {
 
 export default {
     component,
-    id: "waltzMeasurableRatingAppSection"
+    id: "waltzMeasurableRatingEntitySection"
 };

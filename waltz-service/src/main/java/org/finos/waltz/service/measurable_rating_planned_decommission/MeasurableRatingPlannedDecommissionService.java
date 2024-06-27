@@ -18,6 +18,7 @@
 
 package org.finos.waltz.service.measurable_rating_planned_decommission;
 
+import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.model.measurable_rating.MeasurableRating;
 import org.finos.waltz.model.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommissionInfo;
 import org.finos.waltz.service.changelog.ChangeLogService;
@@ -73,8 +74,17 @@ public class MeasurableRatingPlannedDecommissionService {
     }
 
 
-    public Collection<MeasurableRatingPlannedDecommission> findForCategoryAndSelector(Select<Record1<Long>> appIdSelector, long categoryId) {
-        return measurableRatingPlannedDecommissionDao.findForCategoryAndSelector(appIdSelector, categoryId);
+    /*
+     * Should move to using a measurable rating id selector
+     */
+    @Deprecated
+    public Collection<MeasurableRatingPlannedDecommission> findForCategoryAndSubjectIdSelector(Select<Record1<Long>> subjectIdSelector, long categoryId) {
+        return measurableRatingPlannedDecommissionDao.findForCategoryAndSelector(subjectIdSelector, categoryId);
+    }
+
+
+   public Collection<MeasurableRatingPlannedDecommission> findForCategoryAndMeasurableRatingIdSelector(Select<Record1<Long>> ratingIdSelector, long categoryId) {
+        return measurableRatingPlannedDecommissionDao.findForCategoryAndMeasurableRatingIdSelector(ratingIdSelector, categoryId);
     }
 
 
@@ -83,8 +93,8 @@ public class MeasurableRatingPlannedDecommissionService {
     }
 
 
-    public Collection<MeasurableRatingPlannedDecommissionInfo> findForReplacingEntitySelectorAndCategory(Select<Record1<Long>> appIdSelector, long categoryId) {
-        return measurableRatingPlannedDecommissionDao.findForReplacingEntitySelectorAndCategory(appIdSelector, categoryId);
+    public Collection<MeasurableRatingPlannedDecommissionInfo> findForReplacingSubjectIdSelectorAndCategory(GenericSelector subjectIdSelector, long categoryId) {
+        return measurableRatingPlannedDecommissionDao.findForReplacingSubjectIdSelectorAndCategory(subjectIdSelector, categoryId);
     }
 
 

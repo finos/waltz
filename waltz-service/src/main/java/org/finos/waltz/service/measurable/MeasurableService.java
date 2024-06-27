@@ -18,6 +18,7 @@
 
 package org.finos.waltz.service.measurable;
 
+import org.finos.waltz.data.measurable_rating.MeasurableRatingIdSelectorFactory;
 import org.finos.waltz.model.measurable.MeasurableHierarchy;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.common.DateTimeUtilities;
@@ -50,6 +51,7 @@ public class MeasurableService {
 
     private final MeasurableDao measurableDao;
     private final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
+    private final MeasurableRatingIdSelectorFactory measurableRatingIdSelectorFactory = new MeasurableRatingIdSelectorFactory();
     private final MeasurableSearchDao measurableSearchDao;
     private final ChangeLogService changeLogService;
     private final EntityReferenceNameResolver nameResolver;
@@ -77,10 +79,23 @@ public class MeasurableService {
     }
 
 
+
     public List<Measurable> findByMeasurableIdSelector(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         Select<Record1<Long>> selector = measurableIdSelectorFactory.apply(options);
         return measurableDao.findByMeasurableIdSelector(selector);
+    }
+
+    /**
+     * Returns measurables linked to a collection of rating ids. Differs from findByMeasurableIdSelector,
+     * as always implicitly uses a joining kind, but without being restricted to a single entity kind
+     * @param options selection options for the measurable rating selector
+     * @return set of measurables
+     */
+    public Set<Measurable> findByRatingIdSelector(IdSelectionOptions options) {
+        checkNotNull(options, "options cannot be null");
+        Select<Record1<Long>> selector = measurableRatingIdSelectorFactory.apply(options);
+        return measurableDao.findByRatingIdSelector(selector);
     }
 
 

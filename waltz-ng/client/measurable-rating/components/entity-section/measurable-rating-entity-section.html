@@ -53,7 +53,7 @@
 
                         <!-- VIEW -->
                         <div ng-if="$ctrl.visibility.editor === false">
-                            <div ng-include="'wmras-ratings-view'"></div>
+                            <div ng-include="'wmres-ratings-view'"></div>
                         </div>
                     </div>
 
@@ -121,7 +121,7 @@
 
 <!-- RATINGS TABS -->
 <script type="text/ng-template"
-        id="wmras-ratings-view">
+        id="wmres-ratings-view">
     <!-- NO DATA -->
     <div ng-if="$ctrl.tabs.length == 0">
         <waltz-no-data>
@@ -154,7 +154,7 @@
                    id="{{ tab.category.id + '_' +$id}}">
             <label class="wt-label"
                    for="{{ tab.category.id + '_' +$id}}"
-                   uib-popover-template="'wmras-tab-popover.html'"
+                   uib-popover-template="'wmres-tab-popover.html'"
                    popover-trigger="mouseenter"
                    popover-append-to-body="true"
                    popover-placement="bottom"
@@ -166,7 +166,7 @@
             </label>
 
             <div ng-if="$ctrl.activeTab"
-                 ng-include="'wmras-tab-content'">
+                 ng-include="'wmres-tab-content'">
             </div>
         </div>
     </div>
@@ -176,7 +176,7 @@
 
 <!-- TAB CONTENT -->
 <script type="text/ng-template"
-        id="wmras-tab-content">
+        id="wmres-tab-content">
     <br>
 
     <div class="row">
@@ -219,7 +219,7 @@
                    ng-click="$ctrl.onShowAllocationScheme(scheme)">
                     &nbsp;
                     <span ng-bind="scheme.name"
-                          uib-popover-template="'wmras-scheme-popover.html'"
+                          uib-popover-template="'wmres-scheme-popover.html'"
                           popover-trigger="mouseenter"
                           popover-popup-delay="300"
                           popover-append-to-body="true"
@@ -243,7 +243,7 @@
 
 <!-- CATEGORY POPOVER -->
 <script type="text/ng-template"
-        id="wmras-tab-popover.html">
+        id="wmres-tab-popover.html">
     <div class="small">
         <strong ng-bind="$ctrl.activeTab.category.name">
         </strong>
@@ -258,7 +258,7 @@
 
 <!-- ALLOCATION SCHEME POPOVER -->
 <script type="text/ng-template"
-        id="wmras-scheme-popover.html">
+        id="wmres-scheme-popover.html">
     <div class="small">
         <strong ng-bind="scheme.name">
         </strong>

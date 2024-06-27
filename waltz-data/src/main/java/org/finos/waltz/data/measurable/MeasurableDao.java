@@ -133,6 +133,25 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
         return qry.fetch(TO_DOMAIN_MAPPER);
     }
 
+    /**
+     * returns measurables linked to a collection of measurable ratings, looks up the hierarchy for parents.
+     * Can be used to draw trees for a collection of ratings
+     * @param ratingIdSelector measurable rating ids
+     * @return measurables
+     */
+    public Set<Measurable> findByRatingIdSelector(Select<Record1<Long>> ratingIdSelector) {
+        checkNotNull(ratingIdSelector, "ratingIdSelector cannot be null");
+        SelectConditionStep<Record> qry = dsl
+                .select(MEASURABLE.fields())
+                .from(MEASURABLE)
+                .innerJoin(ENTITY_HIERARCHY).on(MEASURABLE.ID.eq(ENTITY_HIERARCHY.ANCESTOR_ID)
+                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name())))
+                .innerJoin(MEASURABLE_RATING).on(ENTITY_HIERARCHY.ID.eq(MEASURABLE_RATING.MEASURABLE_ID))
+                .where(dsl.renderInlined(MEASURABLE_RATING.ID.in(ratingIdSelector)));
+
+        return qry.fetchSet(TO_DOMAIN_MAPPER);
+    }
+
 
     public Measurable getById(long id) {
         return dsl

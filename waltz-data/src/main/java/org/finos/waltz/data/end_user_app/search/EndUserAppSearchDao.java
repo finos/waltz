@@ -9,10 +9,13 @@ import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static java.util.Collections.emptyList;
-import static org.finos.waltz.common.ListUtilities.concat;
+import static org.finos.waltz.common.SetUtilities.orderedUnion;
+import static org.finos.waltz.data.EntityLifecycleStatusUtils.convertToLifecyclePhases;
 import static org.finos.waltz.data.JooqUtilities.mkBasicTermSearch;
 import static org.finos.waltz.data.JooqUtilities.mkStartsWithTermSearch;
 import static org.finos.waltz.data.SearchUtilities.mkTerms;
@@ -47,17 +50,22 @@ public class EndUserAppSearchDao implements SearchDao<EndUserApplication> {
         Condition nameCondition = mkBasicTermSearch(END_USER_APPLICATION.NAME, terms);
         Condition externalIdCondition = mkStartsWithTermSearch(END_USER_APPLICATION.EXTERNAL_ID, terms);
 
-        return concat(
+        Set<EndUserApplication> orderedSet = orderedUnion(
                 mkQuery(nameCondition, options),
                 mkQuery(externalIdCondition, options));
+
+        return new ArrayList<>(orderedSet);
     }
 
 
     private List<EndUserApplication> mkQuery(Condition nameCondition, EntitySearchOptions options) {
+
+        Condition lifecycleCondition = END_USER_APPLICATION.LIFECYCLE_PHASE.in(convertToLifecyclePhases(options.entityLifecycleStatuses()));
+
         return dsl
                 .select(END_USER_APPLICATION.fields())
                 .from(END_USER_APPLICATION)
-                .where(nameCondition)
+                .where(nameCondition.and(lifecycleCondition))
                 .orderBy(END_USER_APPLICATION.NAME)
                 .limit(options.limit())
                 .fetch(EndUserAppDao.TO_DOMAIN_MAPPER);

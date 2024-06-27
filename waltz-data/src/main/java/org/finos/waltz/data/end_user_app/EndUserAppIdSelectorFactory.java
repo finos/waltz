@@ -19,16 +19,21 @@
 package org.finos.waltz.data.end_user_app;
 
 import org.finos.waltz.common.SetUtilities;
-import org.finos.waltz.model.application.LifecyclePhase;
-import org.finos.waltz.schema.tables.EndUserApplication;
-import org.finos.waltz.schema.tables.Involvement;
-import org.finos.waltz.schema.tables.Person;
-import org.finos.waltz.schema.tables.PersonHierarchy;
+import org.finos.waltz.data.measurable.MeasurableIdSelectorFactory;
 import org.finos.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.HierarchyQueryScope;
 import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.ImmutableIdSelectionOptions;
 import org.finos.waltz.model.application.ApplicationKind;
+import org.finos.waltz.model.application.LifecyclePhase;
+import org.finos.waltz.schema.tables.EndUserApplication;
+import org.finos.waltz.schema.tables.Involvement;
+import org.finos.waltz.schema.tables.Measurable;
+import org.finos.waltz.schema.tables.MeasurableRating;
+import org.finos.waltz.schema.tables.Person;
+import org.finos.waltz.schema.tables.PersonHierarchy;
 import org.jooq.Condition;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -37,15 +42,17 @@ import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
 import java.util.Set;
 import java.util.function.Function;
 
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.schema.Tables.MEASURABLE;
+import static org.finos.waltz.schema.Tables.MEASURABLE_RATING;
+import static org.finos.waltz.schema.Tables.ORGANISATIONAL_UNIT;
 import static org.finos.waltz.schema.tables.EndUserApplication.END_USER_APPLICATION;
 import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static org.finos.waltz.schema.tables.Person.PERSON;
 import static org.finos.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
-import static org.finos.waltz.common.Checks.checkNotNull;
 
 public class EndUserAppIdSelectorFactory implements Function<IdSelectionOptions, Select<Record1<Long>>>  {
 
@@ -55,6 +62,8 @@ public class EndUserAppIdSelectorFactory implements Function<IdSelectionOptions,
     private final Involvement involvement = INVOLVEMENT.as("involvement");
     private final OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory = new OrganisationalUnitIdSelectorFactory();
     private final Person person = PERSON.as("per");
+    private final Measurable m = MEASURABLE.as("m");
+    private final MeasurableRating mr = MEASURABLE_RATING.as("mr");
     private final PersonHierarchy personHierarchy = PERSON_HIERARCHY.as("phier");
     private final Set<String> validLifecyclePhases = SetUtilities.asSet(
             LifecyclePhase.PRODUCTION.name(),
@@ -70,9 +79,25 @@ public class EndUserAppIdSelectorFactory implements Function<IdSelectionOptions,
                 return mkForOrgUnit(options);
             case PERSON:
                 return mkForPerson(options);
+            case MEASURABLE:
+                return mkForMeasurable(options);
+            case APP_GROUP:
+                return mkForAppGroup(options);
             default:
                 throw new IllegalArgumentException("Cannot create selector for entity kind: " + ref.kind());
         }
+    }
+
+    private Select<Record1<Long>> mkForMeasurable(IdSelectionOptions options) {
+        Select<Record1<Long>> measurableSelector = new MeasurableIdSelectorFactory().apply(options);
+        return DSL
+                .selectDistinct(eua.ID)
+                .from(mr)
+                .innerJoin(eua)
+                .on(mr.ENTITY_KIND.eq(EntityKind.END_USER_APPLICATION.name())
+                        .and(eua.ID.eq(mr.ENTITY_ID)))
+                .where(mr.MEASURABLE_ID.in(measurableSelector))
+                .and(eua.LIFECYCLE_PHASE.in(validLifecyclePhases));
     }
 
 
@@ -88,6 +113,31 @@ public class EndUserAppIdSelectorFactory implements Function<IdSelectionOptions,
                 .selectDistinct(eua.ID)
                 .from(eua)
                 .where(eua.ORGANISATIONAL_UNIT_ID.in(ouSelector)
+                        .and(eua.LIFECYCLE_PHASE.in(validLifecyclePhases)));
+    }
+
+
+    private Select<Record1<Long>> mkForAppGroup(IdSelectionOptions options) {
+
+        if (eucOmitted(options)) {
+            return mkEmptySelect();
+        }
+
+        ImmutableIdSelectionOptions orgUnitSelectorOptions = ImmutableIdSelectionOptions.copyOf(options).withScope(HierarchyQueryScope.CHILDREN);
+        Select<Record1<Long>> ouSelector = orgUnitIdSelectorFactory.apply(orgUnitSelectorOptions);
+
+        // Currently, eudas cannot be directly added to app groups, only via org units
+        SelectConditionStep<Record1<Long>> eudaIdsFromAssociatedOrgUnits = DSL
+                .select(eua.ID)
+                .from(eua)
+                .innerJoin(ORGANISATIONAL_UNIT)
+                .on(eua.ORGANISATIONAL_UNIT_ID.eq(ORGANISATIONAL_UNIT.ID))
+                .where(ORGANISATIONAL_UNIT.ID.in(ouSelector));
+
+        return DSL
+                .selectDistinct(eua.ID)
+                .from(eua)
+                .where(eua.ID.in(eudaIdsFromAssociatedOrgUnits)
                         .and(eua.LIFECYCLE_PHASE.in(validLifecyclePhases)));
     }
 

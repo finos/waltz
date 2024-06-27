@@ -210,7 +210,7 @@ public class CommonTableFieldsRegistry {
                         .idField(fcr.ID)
                         .parentIdField(null)
                         .nameField(CommonTableFields.NA_FIELD_VAL)
-                        .descriptionField(null)
+                        .descriptionField(fcr.DESCRIPTION)
                         .externalIdField(fcr.EXTERNAL_ID)
                         .build();
             case FLOW_CLASSIFICATION:

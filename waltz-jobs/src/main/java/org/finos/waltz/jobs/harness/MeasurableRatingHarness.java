@@ -18,25 +18,64 @@
 
 package org.finos.waltz.jobs.harness;
 
-import org.finos.waltz.data.measurable_rating.MeasurableRatingDao;
-import org.finos.waltz.model.tally.Tally;
-import org.finos.waltz.service.DIConfiguration;
+import org.finos.waltz.data.measurable_rating.MeasurableRatingIdSelectorFactory;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.ImmutableIdSelectionOptions;
+import org.finos.waltz.model.measurable_rating.MeasurableRating;
+import org.finos.waltz.model.measurable_rating.MeasurableRatingCategoryView;
+import org.finos.waltz.service.DIBaseConfiguration;
+import org.finos.waltz.service.measurable.MeasurableService;
+import org.finos.waltz.service.measurable_rating.MeasurableRatingService;
+import org.finos.waltz.service.measurable_rating.MeasurableRatingViewService;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Lazy;
 
 import java.util.List;
+
+import static org.finos.waltz.common.FunctionUtilities.time;
+import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 
 
 public class MeasurableRatingHarness {
 
+    @Configuration
+    @Import(DIBaseConfiguration.class)
+    @Lazy
+    @ComponentScan("org.finos.waltz.service")
+    private interface MyCtx {
+    }
+
     public static void main(String[] args) throws ParseException {
 
-        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
+        AnnotationConfigApplicationContext ctx = time("boot", () -> new AnnotationConfigApplicationContext(MyCtx.class));
 
-        MeasurableRatingDao measurableRatingDao = ctx.getBean(MeasurableRatingDao.class);
+        MeasurableRatingService measurableRatingSvc = ctx.getBean(MeasurableRatingService.class);
+        MeasurableRatingViewService viewSvc = ctx.getBean(MeasurableRatingViewService.class);
 
-        List<Tally<Long>> tallies = measurableRatingDao.tallyByMeasurableCategoryId(1L);
-        System.out.println(tallies);
+        EntityReference ftpPricing = mkRef(EntityKind.MEASURABLE, 73668L);
+        EntityReference nH = mkRef(EntityKind.PERSON, 2677360L);
+
+        IdSelectionOptions ftpPricingOptions = mkOpts(ftpPricing);
+        IdSelectionOptions nHOptions = mkOpts(nH);
+
+        Select<Record1<Long>> selector = new MeasurableRatingIdSelectorFactory().apply(nHOptions);
+        System.out.println("\n\n\n---findForCategoryAndMeasurableRatingIdSelector----------------\n");
+        List<MeasurableRating> res = measurableRatingSvc.findForCategoryAndMeasurableRatingIdSelector(selector, 33L);
+        res.forEach(r -> System.out.printf("Ent: %d\tMeas: %d\tMR: %d\n", r.entityReference().id(), r.measurableId(), r.id().orElse(-1L)));
+
+        MeasurableRatingCategoryView view = viewSvc.getViewForCategoryAndSelector(nHOptions, 33L);
+
+        System.out.println(view.measurableRatings().measurableRatings().size());
+
     }
 
 }
