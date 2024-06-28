@@ -11,7 +11,7 @@
     import {displayError} from "../../../common/error-utils";
     import LoadingPlaceholder from "../../../common/svelte/LoadingPlaceholder.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
-    import FlowClassificationRuleEditor2 from "./FlowClassificationRuleEditor2.svelte";
+    import FlowClassificationRuleEditor from "./FlowClassificationRuleEditor.svelte";
     import {toEntityRef} from "../../../common/entity-utils";
     import {messageSeverity} from "../../../common/services/enums/message-severity";
 
@@ -254,11 +254,11 @@
             {/if} <!-- PanelModes.LIST -->
 
             {#if panelMode === PanelModes.CREATE}
-                <FlowClassificationRuleEditor2 {formData}
-                                               on:save={doCreate}
-                                               on:cancel={() => panelMode = PanelModes.LIST}
-                                               {inboundFlowClassifications}
-                                               {outboundFlowClassifications}/>
+                <FlowClassificationRuleEditor {formData}
+                                              on:save={doCreate}
+                                              on:cancel={() => panelMode = PanelModes.LIST}
+                                              {inboundFlowClassifications}
+                                              {outboundFlowClassifications}/>
             {/if} <!-- PanelModes.CREATE -->
 
             {#if panelMode === PanelModes.SELECTION}
@@ -378,11 +378,11 @@
                                 You may also configure a message (with severity) to display when users select any matching data type.
                             </p>
 
-                            <FlowClassificationRuleEditor2 {formData}
-                                                           on:save={doUpdate}
-                                                           on:cancel={() => actionMode = ActionModes.LIST}
-                                                           {inboundFlowClassifications}
-                                                           {outboundFlowClassifications}/>
+                            <FlowClassificationRuleEditor {formData}
+                                                          on:save={doUpdate}
+                                                          on:cancel={() => actionMode = ActionModes.LIST}
+                                                          {inboundFlowClassifications}
+                                                          {outboundFlowClassifications}/>
                         {/if} <!-- ActionModes.EDIT -->
 
                         {#if actionMode === ActionModes.BUSY}
