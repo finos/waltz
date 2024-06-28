@@ -56,7 +56,12 @@ public class DataTypeSearchDao implements SearchDao<DataType> {
                 .findAll()
                 .stream()
                 .filter(dataType -> {
-                    String s = (dataType.name() + " " + dataType.description()).toLowerCase();
+                    String s = String.format(
+                            "%s %s %s",
+                            dataType.name(),
+                            dataType.description(),
+                            dataType.code())
+                        .toLowerCase();
                     return all(
                             terms,
                             s::contains);
