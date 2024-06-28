@@ -20,7 +20,8 @@
 
     <!-- HEADER -->
     <waltz-page-header name="{{ ctrl.logicalFlow.source.name }} {{ ctrl.logicalFlow ? '&rarr;' : '' }} {{ ctrl.logicalFlow.target.name }}"
-                       icon="random">
+                       icon="random"
+                       class="waltz-visibility-parent">
         <breadcrumbs>
             <ol class="waltz-breadcrumbs">
                 <li><a ui-sref="main">Home</a></li>
@@ -39,6 +40,13 @@
                 </li>
             </ol>
         </breadcrumbs>
+        <actions>
+            <button ng-click="ctrl.sharePageLink()"
+                    title="Copy url to clipboard"
+                    class="btn btn-skinny waltz-visibility-child-30">
+                <waltz-icon name="share-alt"></waltz-icon>
+            </button>
+        </actions>
     </waltz-page-header>
 
 
@@ -72,6 +80,14 @@
              }">
             <div class="row">
                 <div class="col-md-6">
+                    <div class="row">
+                        <div class="waltz-display-field-label col-sm-4">
+                            External ID
+                        </div>
+                        <div class="col-sm-8">
+                            <span ng-bind="ctrl.logicalFlow.externalId"></span>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="waltz-display-field-label col-sm-4">
                             Provenance

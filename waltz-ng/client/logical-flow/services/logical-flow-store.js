@@ -27,6 +27,11 @@ export function store($http, BaseApiUrl) {
         .get(`${BASE}/${id}`)
         .then(r => r.data);
 
+
+    const getByExternalId = (externalId) => $http
+        .get(`${BASE}/external-id/${externalId}`)
+        .then(r => r.data);
+
     const findBySelector = (options) => {
         checkIsIdSelector(options);
         return $http
@@ -133,6 +138,7 @@ export function store($http, BaseApiUrl) {
         removeFlow,
         restoreFlow,
         getById,
+        getByExternalId,
         addFlow,
         addFlows,
         findPermissionsForParentRef,
@@ -210,6 +216,11 @@ export const LogicalFlowStore_API = {
         serviceName,
         serviceFnName: "getById",
         description: "retrieve a single logical flow (or null) given an id"
+    },
+    getByExternalId: {
+        serviceName,
+        serviceFnName: "getByExternalId",
+        description: "retrieve a single logical flow (or null) given an external id"
     },
     addFlow: {
         serviceName,

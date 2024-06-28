@@ -170,6 +170,13 @@ public class LogicalFlowDao {
     }
 
 
+    public LogicalFlow getByFlowExternalId(String externalId) {
+        return baseQuery()
+                .where(LOGICAL_FLOW.EXTERNAL_ID.eq(externalId))
+                .fetchOne(TO_DOMAIN_MAPPER);
+    }
+
+
     public List<LogicalFlow> findByEntityReference(EntityReference ref) {
         return baseQuery()
                 .where(isSourceOrTargetCondition(ref))
@@ -496,4 +503,5 @@ public class LogicalFlowDao {
             return operationsForFlow;
         }
     }
+
 }

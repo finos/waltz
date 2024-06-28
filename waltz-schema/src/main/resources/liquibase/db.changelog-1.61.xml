@@ -26,4 +26,165 @@
         <tagDatabase tag="v1.60"/> <!-- tag the current db version, i.e. the last  -->
     </changeSet>
 
+    <changeSet id="2024530-7082-1"
+               author="woodjes">
+        <!-- Cannot create a default value based upon another column, should use a computed column but this doesn't allow updates -->
+        <comment>7082: adding default external id to physical_flow</comment>
+        <createSequence  cycle="false"
+                         incrementBy="1"
+                         maxValue="1000000"
+                         minValue="1"
+                         sequenceName="physical_flow_id_seq"
+                         startValue="1"/>
+    </changeSet>
+
+    <changeSet id="2024530-7082-2"
+               author="woodjes">
+        <!-- Cannot create a default value based upon another column, should use a computed column but this doesn't allow updates -->
+        <comment>7082: adding default external id to physical_flow</comment>
+        <update tableName="physical_flow">
+            <column name="external_id"
+                    valueComputed="CONCAT('PF_', FORMAT(NEXT VALUE FOR physical_flow_id_seq, '000000'))"
+                    type="${external-id.type}"/>
+            <where>external_id is NULL or external_id = ''</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="2024530-7082-3"
+               author="woodjes">
+        <!-- Cannot create a default value based upon another column, should use a computed column but this doesn't allow updates -->
+        <comment>7082: adding default external id to physical_flow</comment>
+        <addDefaultValue tableName="physical_flow"
+                         columnName="external_id"
+                         defaultValueComputed="CONCAT('PF_', FORMAT(NEXT VALUE FOR physical_flow_id_seq, '000000'))"/>
+    </changeSet>
+
+    <changeSet id="2024530-7082-4"
+               author="woodjes">
+        <comment>7082: adding default external id to physical_flow</comment>
+        <dropIndex tableName="physical_flow" indexName="idx_pf_ext_id_provenance"/>
+    </changeSet>
+
+    <changeSet id="2024530-7082-5"
+               author="woodjes">
+        <!-- Cannot create a default value based upon another column, should use a computed column but this doesn't allow updates -->
+        <comment>7082: adding default external id to physical_flow</comment>
+        <addNotNullConstraint tableName="physical_flow"
+                              columnName="external_id"
+                              columnDataType="${external-id.type}"/>
+    </changeSet>
+
+    <changeSet id="2024530-7082-6"
+               author="woodjes">
+        <comment>7082: adding default external id to physical_flow</comment>
+        <createIndex tableName="physical_flow"
+                     indexName="idx_pf_ext_id_provenance">
+            <column name="external_id"
+                    type="${external-id.type}"/>
+            <column name="provenance"
+                    type="${provenance.type}"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="2024530-7082-7"
+               author="woodjes">
+        <comment>7082: adding default external id to physical_specification</comment>
+        <createSequence  cycle="false"
+                         incrementBy="1"
+                         maxValue="1000000"
+                         minValue="1"
+                         sequenceName="physical_specification_id_seq"
+                         startValue="1"/>
+    </changeSet>
+
+    <changeSet id="2024530-7082-8"
+               author="woodjes">
+        <comment>7082: adding default external id to physical_specification</comment>
+        <update tableName="physical_specification">
+            <column name="external_id"
+                    valueComputed="CONCAT('PS_', FORMAT(NEXT VALUE FOR physical_specification_id_seq, '000000'))"
+                    type="${external-id.type}"/>
+            <where>external_id is NULL or external_id = ''</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="2024530-7082-9"
+               author="woodjes">
+        <comment>7082: adding default external id to physical_specification</comment>
+        <addDefaultValue tableName="physical_specification"
+                         columnName="external_id"
+                         defaultValueComputed="CONCAT('PS_', FORMAT(NEXT VALUE FOR physical_specification_id_seq, '000000'))"/>
+    </changeSet>
+
+    <changeSet id="2024530-7082-10"
+               author="woodjes">
+        <comment>7082: adding default external id to physical_specification</comment>
+        <addNotNullConstraint tableName="physical_specification"
+                              columnName="external_id"
+                              columnDataType="${external-id.type}"/>
+    </changeSet>
+
+
+    <changeSet id="20240603-7082-1"
+               author="woodjes">
+        <comment>7082: migrate default value for logical flow</comment>
+        <createSequence  cycle="false"
+                         incrementBy="1"
+                         maxValue="1000000"
+                         minValue="1"
+                         sequenceName="logical_flow_id_seq"
+                         startValue="1"/>
+    </changeSet>
+
+
+    <changeSet id="20240603-7082-2"
+               author="woodjes">
+        <comment>7082: migrate default value for logical flow</comment>
+        <dropDefaultValue tableName="logical_flow"
+                          columnName="external_id"/>
+    </changeSet>
+
+
+    <changeSet id="20240603-7082-3"
+               author="woodjes">
+        <comment>7082: migrate default value for logical flow</comment>
+        <addDefaultValue tableName="logical_flow"
+                         columnName="external_id"
+                         defaultValueComputed="CONCAT('LF_', FORMAT(NEXT VALUE FOR logical_flow_id_seq, '000000'))"/>
+    </changeSet>
+
+    <changeSet id="20240625-7084-1"
+               author="davidwatkins73">
+        <comment>7084: Flow Classification Rules: allow multiple rules of differing directions </comment>
+        <addColumn tableName="flow_classification_rule">
+            <column name="direction"
+                    type="${enum.type}"
+                    defaultValue="OUTBOUND">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20240625-7084-2"
+               author="davidwatkins73">
+        <comment>7084: Flow Classification Rules: allow multiple rules of differing directions </comment>
+        <dropIndex tableName="flow_classification_rule"
+                   indexName="idx_fcr_scope_dt_app"/>
+    </changeSet>
+
+    <changeSet id="20240625-7084-3"
+               author="davidwatkins73">
+        <comment>7084: Flow Classification Rules: allow multiple rules of differing directions </comment>
+        <createIndex indexName="idx_fcr_scope_dt_app_dirn"
+                     tableName="flow_classification_rule"
+                     unique="true">
+            <column name="parent_kind" type="${enum.type}"/>
+            <column name="parent_id" type="${id.type}"/>
+            <column name="subject_entity_id" type="${id.type}"/>
+            <column name="subject_entity_kind" type="${enum.type}"/>
+            <column name="data_type_id" type="${id.type}"/>
+            <column name="direction" type="${enum.type}"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>

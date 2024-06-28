@@ -1,136 +1,133 @@
 <script>
     import _ from "lodash";
-
+    import {createEventDispatcher} from "svelte";
     import EntitySearchSelector from "../../../common/svelte/EntitySearchSelector.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
-    import EntityLabel from "../../../common/svelte/EntityLabel.svelte";
     import DataTypeTreeSelector from "../../../common/svelte/DataTypeTreeSelector.svelte";
-    import ToastStore from "../../../svelte-stores/toast-store"
+    export let formData;
 
-    import {mode, Modes, selectedClassificationRule} from "./editingFlowClassificationRulesState";
-    import {flowClassificationStore} from "../../../svelte-stores/flow-classification-store";
-    import {displayError} from "../../../common/error-utils";
+    const dispatch = createEventDispatcher();
 
-    export let doSave;
-    export let doUpdate;
-    export let doCancel;
+    export let inboundFlowClassifications = [];
+    export let outboundFlowClassifications = [];
 
-    let savePromise;
-    let workingCopy = Object.assign(
-        {},
-        $selectedClassificationRule,
-        {classificationId: $selectedClassificationRule.classification?.id});
+    let selectableOutboundFlowClassifications = [];
+    let selectableInboundFlowClassifications = [];
+    let isNew = formData && _.isNil(formData.id);
+    let invalid = true;
 
-    const classificationCall = flowClassificationStore.findAll();
-
-    $: classificationsById = _.keyBy($classificationCall.data, d => d.id);
-
-    function getRequiredFields(d) {
-        return [d.classificationId, d.subjectReference, d.orgUnit, d.dataType];
+    function anyMissingProps(props = []) {
+        return _.some(
+            props,
+            p => _.isNil(formData[p]));
     }
 
-    function fieldChanged(d) {
-        return d.classificationId !== $selectedClassificationRule.classification?.id
-            || d.description !== $selectedClassificationRule.description;
+    function doUpdate() {
+        dispatch("save", formData);
     }
 
-    $: invalid = (workingCopy.id)
-        ? !fieldChanged(workingCopy)
-        : _.some(getRequiredFields(workingCopy), v => _.isNil(v));
-
-    function save() {
-        if (workingCopy.id) {
-            submitUpdate()
-                .then(() => ToastStore.success("Flow classification rule updated"))
-                .catch(e => displayError("Failed to update flow classification rule", e));
-
-        } else {
-            submitCreate()
-                .then(() => ToastStore.success("Flow classification rule created"))
-                .catch(e => displayError("Failed to create new flow classification rule", e));
-        }
-    }
-
-    function submitCreate() {
-
-        const cmd = {
-            description: workingCopy.description || "",
-            classificationId: workingCopy.classificationId,
-            subjectReference: workingCopy.subjectReference,
-            dataTypeId: workingCopy.dataType.id,
-            parentReference: workingCopy.orgUnit
-        };
-
-        savePromise = doSave(cmd);
-
-        return savePromise
-    }
-
-    function submitUpdate() {
-        const cmd = {
-            description: workingCopy.description || "",
-            classificationId: workingCopy.classificationId,
-            id: workingCopy.id
-        };
-
-        $selectedClassificationRule = workingCopy;
-        savePromise = doUpdate(cmd);
-        return savePromise;
-    }
-
-    function onSelectSource(evt) {
-        workingCopy.subjectReference = evt.detail;
-    }
-
-    function onSelectDatatype(evt) {
-        workingCopy.dataType = evt.detail;
-    }
-
-    function onSelectScope(evt) {
-        workingCopy.orgUnit = evt.detail;
-    }
-
-    function cancel() {
-        if (workingCopy.id) {
-            $mode = Modes.DETAIL;
-        } else {
-            doCancel();
-        }
+    function onCancel() {
+        dispatch("cancel");
     }
 
     function clearDataType() {
-        workingCopy.dataType = null;
+        formData.dataType = null;
     }
 
-    $: classifications = _
-        .chain($classificationCall.data)
-        .filter(c => c.userSelectable || c.id === $selectedClassificationRule?.classification?.id)
-        .sortBy("position", "display_name")
-        .value();
+    function onSelectScope(evt) {
+        formData.vantagePoint = evt.detail;
+    }
 
+    function onSelectDatatype(evt) {
+        formData.dataType = evt.detail;
+    }
+
+    function onSelectSubject(evt) {
+        formData.subject = evt.detail;
+    }
+
+    function toSubjectDirection(classification = {}) {
+        switch (_.get(classification, "direction")) {
+            case "INBOUND":
+                return "(Consumer)";
+            case "OUTBOUND":
+                return "(Producer)";
+            default:
+                return "";
+        }
+    }
+
+    function toScopeDirection(classification = {}) {
+        switch (_.get(classification, "direction")) {
+            case "INBOUND":
+                return "(Producer/s)";
+            case "OUTBOUND":
+                return "(Consumer/s)";
+            default:
+                return "";
+        }
+    }
+
+    $: selectableOutboundFlowClassifications = _.filter(outboundFlowClassifications, c => c.userSelectable);
+    $: selectableInboundFlowClassifications = _.filter(inboundFlowClassifications, c => c.userSelectable);
+    $: {
+        invalid = formData && isNew
+            ? anyMissingProps(["description", "subject", "vantagePoint", "classification"])
+            : anyMissingProps(["description", "classification"]);
+    }
 </script>
 
+{#if !_.isNil(formData)}
+    <form autocomplete="off"
+          on:submit|preventDefault={doUpdate}>
 
-<form autocomplete="off"
-      data-testid="flow-classification-rule-editor"
-      on:submit|preventDefault={save}>
+        <label for="classification">Classification</label>
+        <select class="form-control"
+                id="classification"
+                bind:value={formData.classification}>
+            {#if !_.isEmpty(outboundFlowClassifications)}
+                <optgroup label="Producer Classifications">
+                    {#each selectableOutboundFlowClassifications as c}
+                        <option value={c}>
+                            {c.name}
+                        </option>
+                    {/each}
+                </optgroup>
+            {/if}
+            {#if !_.isEmpty(inboundFlowClassifications)}
+                <optgroup label="Consumer Classifications">
+                    {#each selectableInboundFlowClassifications as c}
+                        <option value={c}>
+                            {c.name}
+                        </option>
+                    {/each}
+                </optgroup>
+            {/if}
+        </select>
 
-    {#if !workingCopy.id}
-        <div class="form-group">
-            <label for="source">Source:</label>
+        {#if isNew}
+            <label for="source">Subject {toSubjectDirection(formData.classification)}</label>
             <div id="source">
-                <EntitySearchSelector on:select={onSelectSource}
-                                      placeholder="Search for source"
-                                      entityKinds={['APPLICATION', 'ACTOR']}>
+                <EntitySearchSelector on:select={onSelectSubject}
+                                      placeholder="Search for subject"
+                                      entityKinds={['APPLICATION', 'ACTOR', 'END_USER_APPLICATION']}>
                 </EntitySearchSelector>
             </div>
-            <p class="text-muted">Start typing to select the source application or actor</p>
-        </div>
-        <div class="form-group">
-            <label for="datatype">Datatype:</label>
+            <p class="text-muted">Start typing to select the subject application, actor or end user application</p>
+
+            <label for="scope">Scope {toScopeDirection(formData.classification)}</label>
+            <div id="scope">
+                <EntitySearchSelector on:select={onSelectScope}
+                                      placeholder="Search for scope"
+                                      entityKinds={['ORG_UNIT', 'ACTOR', 'APPLICATION', 'END_USER_APPLICATION']}>
+                </EntitySearchSelector>
+            </div>
+            <p class="text-muted">Start typing to select the selector for which this flow classification rule will apply to. This could be an organisational unit, application, edn user application or actor.</p>
+
+            <label for="datatype">Datatype</label>
             <div id="datatype">
-                {#if workingCopy.dataType}
-                    <span>{workingCopy.dataType.name}</span>
+                {#if formData.dataType}
+                    <span>{formData.dataType.name}</span>
                     <button class="btn-link"
                             on:click={clearDataType}>
                         <Icon name="close"/>
@@ -139,117 +136,75 @@
                         classifications</p>
                 {:else}
                     <DataTypeTreeSelector on:select={onSelectDatatype}/>
-                    <p class="text-muted">Select the datatype for which this application / actor will determine the flow
-                        classification for</p>
+                    <p class="text-muted">Select the datatype which this rule will be valid for.  All child data types are included.</p>
+                    <div class="waltz-warning">
+                        By not selecting a data type this rule will apply to <strong>all</strong> types
+                    </div>
                 {/if}
             </div>
-        </div>
-        <div class="form-group">
-            <label for="scope">Scope:</label>
-            <div id="scope">
-                <EntitySearchSelector on:select={onSelectScope}
-                                      placeholder="Search for scope"
-                                      entityKinds={['ORG_UNIT', 'ACTOR', 'APPLICATION']}>
-                </EntitySearchSelector>
-            </div>
-            <p class="text-muted">Start typing to select the selector for which this flow classification rule will apply to. This could be an organisational unit, application or actor.</p>
-        </div>
-    {:else }
 
-        <h3>
-            <EntityLabel ref={workingCopy.subjectReference}/>
-        </h3>
+        {/if}
 
-        <h4>
-            <EntityLabel ref={workingCopy.dataType}/>
-        </h4>
 
-        <div>
-            <strong>Scope:</strong>
-            <EntityLabel ref={workingCopy.vantagePointReference}/>
-        </div>
-        <p class="text-muted">The selector for applications this flow classification rule applies to</p>
-    {/if}
-
-    <label for="rating">Classification:</label>
-    <div id="rating"
-         class="form-group">
-        {#each classifications as classification}
-            <div class="radio">
-                <label>
-                    <input type=radio
-                           disabled={!classification.userSelectable}
-                           bind:group={workingCopy.classificationId}
-                           value={classification.id}>
-                    <div class="rating-indicator-block"
-                         style="background-color: {classification.color}">&nbsp;</div>
-                    {classification.name}
-                    <span class="help-block">{classification.description}</span>
-                    {#if !classification.userSelectable}
-                        <span class="help-block warning-icon">
-                            <div style="display: inline-block"><Icon name="exclamation-triangle"/></div>
-                            This classification is not user selectable
-                        </span>
-                    {/if}
-                </label>
-            </div>
-        {/each}
-        <p class="text-muted">Select an flow classification for this source</p>
-    </div>
-
-    <div class="form-group">
-        <label for="description">Notes:</label>
+        <label for="description">Description</label>
         <textarea class="form-control"
+                  bind:value={formData.description}
                   id="description"
-                  bind:value={workingCopy.description}/>
-    </div>
-    <p class="text-muted">Additional notes</p>
+                  required="true"
+                  placeholder="Description"/>
+        <div class="help-block">
+            Description to provide additional data about this rule
+        </div>
 
+        <label for="severity">Message Severity</label>
+        <select class="form-control"
+                id="severity"
+                bind:value={formData.severity}>
+            <option value="NONE">
+                None (No message)
+            </option>
+            <option value="INFORMATION">
+                Information
+            </option>
+            <option value="WARNING">
+                Warning
+            </option>
+            <option value="ERROR">
+                Error
+            </option>
+        </select>
+        <div class="help-block">
+            Optional, classification rules can display a message to users when configuring data types on flows.
+            If a severity is selected the message must be defined below.
+        </div>
 
-    <button class="btn btn-success"
-            type="submit"
-            disabled={invalid || savePromise}>
-        Save
-    </button>
-    <button class="btn-link"
-            on:click|preventDefault={cancel}>
-        Cancel
-    </button>
-</form>
-
-{#if savePromise}
-    {#await savePromise}
-        Saving...
-    {:then r}
-        Saved!
-    {:catch e}
-            <div class="alert alert-warning">
-                Failed to save flow classification rule. Reason: {e.data.message}
-                <button class="btn-link"
-                        on:click={() => savePromise = null}>
-                    <Icon name="check"/>
-                    Okay
-                </button>
+        {#if formData.severity}
+            <label for="message">Message</label>
+            <textarea class="form-control"
+                      bind:value={formData.message}
+                      id="message"
+                      required={formData.severity !== "NONE"}
+                      placeholder="Message"/>
+            <div class="help-block">
+                Message to show when a user selects a matching data type
             </div>
-    {/await}
+        {/if}
+
+
+        <button type="submit"
+                disabled={invalid}
+                class="btn btn-xs btn-success">
+            {isNew ? "Create" : "Save"}
+        </button>
+        <button class="btn btn-xs btn-primary"
+                on:click={onCancel}>
+            Cancel
+        </button>
+    </form>
 {/if}
 
-
-<style type="text/scss">
-
-  @import "../../../../style/_variables";
-
-    .rating-indicator-block {
-        display: inline-block;
-        width: 1em;
-        height: 1.1em;
-        border: 1px solid #aaa;
-        border-radius: 2px;
-        position: relative;
-        top: 2px;
-    }
-
-    .warning-icon div {
-        color: $waltz-amber
+<style>
+    form label {
+        padding-top: 0.6em;
     }
 </style>

@@ -99,6 +99,7 @@ public class LogicalFlowEndpoint implements Endpoint {
         String findPermissionsForFlowPath = mkPath(BASE_URL, "id", ":id", "permissions");
         String findUpstreamFlowsForEntityReferencesPath = mkPath(BASE_URL, "find-upstream-flows");
         String getByIdPath = mkPath(BASE_URL, ":id");
+        String getByExternalIdPath = mkPath(BASE_URL, "external-id", ":externalId");
         String removeFlowPath = mkPath(BASE_URL, ":id");
         String restoreFlowPath = mkPath(BASE_URL, ":id", "restore");
         String cleanupOrphansPath = mkPath(BASE_URL, "cleanup-orphans");
@@ -143,6 +144,9 @@ public class LogicalFlowEndpoint implements Endpoint {
         DatumRoute<LogicalFlow> getByIdRoute = (request, response)
                 -> logicalFlowService.getById(getId(request));
 
+        DatumRoute<LogicalFlow> getByExternalIdRoute = (request, response)
+                -> logicalFlowService.getByExternalId(request.params("externalId"));
+
         DatumRoute<LogicalFlowGraphSummary> getGraphSummaryRoute = (request, response) -> {
             String dtIdString = request.params("dtId");
             Long dtId = StringUtilities.parseLong(dtIdString, null);
@@ -161,6 +165,7 @@ public class LogicalFlowEndpoint implements Endpoint {
         getForList(findPermissionsForFlowPath, findPermissionsForFlowRoute);
         getForList(findEditableFlowIdsForParentReferencePath, findEditableFlowIdsForParentReferenceRoute);
         getForDatum(getByIdPath, getByIdRoute);
+        getForDatum(getByExternalIdPath, getByExternalIdRoute);
         getForDatum(getFlowGraphSummaryPath, getGraphSummaryRoute);
         postForList(findByIdsPath, findByIdsRoute);
         postForList(findUpstreamFlowsForEntityReferencesPath, findUpstreamFlowsForEntityReferencesRoute);

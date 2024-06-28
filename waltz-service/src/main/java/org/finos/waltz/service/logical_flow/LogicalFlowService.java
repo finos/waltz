@@ -211,6 +211,11 @@ public class LogicalFlowService {
     }
 
 
+    public LogicalFlow getByExternalId(String externalId) {
+        return logicalFlowDao.getByFlowExternalId(externalId);
+    }
+
+
     /**
      * Find decorators by selector. Supported desiredKinds:
      * <ul>
@@ -544,4 +549,5 @@ public class LogicalFlowService {
                 .ratingSchemeItems(ratingSchemeItems)
                 .build();
     }
+
 }

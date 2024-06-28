@@ -110,6 +110,12 @@
         </td>
     </tr>
     <tr>
+        <td>Specification External Id</td>
+        <td>
+            {specification.externalId}
+        </td>
+    </tr>
+    <tr>
         <td>Data Types</td>
         <td>
             <DataTypeMiniTable decorators={dataTypesForSpecification}
