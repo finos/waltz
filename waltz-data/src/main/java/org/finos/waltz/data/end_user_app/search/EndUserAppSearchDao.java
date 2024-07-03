@@ -1,7 +1,9 @@
 package org.finos.waltz.data.end_user_app.search;
 
+import org.finos.waltz.data.JooqUtilities;
 import org.finos.waltz.data.SearchDao;
 import org.finos.waltz.data.end_user_app.EndUserAppDao;
+import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.enduserapp.EndUserApplication;
 import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.jooq.Condition;
@@ -17,6 +19,7 @@ import static org.finos.waltz.data.JooqUtilities.mkBasicTermSearch;
 import static org.finos.waltz.data.JooqUtilities.mkStartsWithTermSearch;
 import static org.finos.waltz.data.SearchUtilities.mkTerms;
 import static org.finos.waltz.schema.Tables.END_USER_APPLICATION;
+import static org.finos.waltz.schema.tables.EntityAlias.ENTITY_ALIAS;
 
 
 @Repository
@@ -46,10 +49,28 @@ public class EndUserAppSearchDao implements SearchDao<EndUserApplication> {
 
         Condition nameCondition = mkBasicTermSearch(END_USER_APPLICATION.NAME, terms);
         Condition externalIdCondition = mkStartsWithTermSearch(END_USER_APPLICATION.EXTERNAL_ID, terms);
+        Condition aliasCondition = ENTITY_ALIAS.KIND.eq(EntityKind.END_USER_APPLICATION.name())
+                .and(JooqUtilities.mkBasicTermSearch(ENTITY_ALIAS.ALIAS, terms));
 
         return concat(
                 mkQuery(nameCondition, options),
-                mkQuery(externalIdCondition, options));
+                mkQuery(externalIdCondition, options),
+                mkAliasQuery(aliasCondition, options));
+    }
+
+
+    private List<EndUserApplication>  mkAliasQuery(Condition aliasCondition,
+                                                   EntitySearchOptions options) {
+        return dsl
+                .selectDistinct(END_USER_APPLICATION.fields())
+                .from(END_USER_APPLICATION)
+                .innerJoin(ENTITY_ALIAS)
+                .on(ENTITY_ALIAS.ID.eq(END_USER_APPLICATION.ID)
+                        .and(ENTITY_ALIAS.KIND.eq(EntityKind.END_USER_APPLICATION.name())))
+                .where(aliasCondition)
+                .orderBy(END_USER_APPLICATION.NAME)
+                .limit(options.limit())
+                .fetch(EndUserAppDao.TO_DOMAIN_MAPPER);
     }
 
 

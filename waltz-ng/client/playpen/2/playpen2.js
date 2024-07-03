@@ -23,13 +23,19 @@ import {
     symbols,
     symbolWye,
 } from "d3-shape";
-import _ from "lodash";
 import {getSymbol} from "../../common/svg-icon";
+import TagsInput from "../../common/svelte/TagsInput.svelte";
+import AliasControl from "../../common/svelte/AliasControl.svelte";
+import {initialiseData} from "../../common";
 
-const initialState = {}
+const initialState = {
+    TagsInput,
+    AliasControl
+}
 
 function controller(serviceBroker, $element) {
 
+    const vm = initialiseData(this, initialState);
 
     const svgElem = select($element.find("svg")[0]);
 
