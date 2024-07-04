@@ -11,12 +11,10 @@ import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import static java.util.Collections.emptyList;
-import static org.finos.waltz.common.SetUtilities.orderedUnion;
+import static org.finos.waltz.common.ListUtilities.concat;
 import static org.finos.waltz.data.EntityLifecycleStatusUtils.convertToLifecyclePhases;
 import static org.finos.waltz.data.JooqUtilities.mkBasicTermSearch;
 import static org.finos.waltz.data.JooqUtilities.mkStartsWithTermSearch;
