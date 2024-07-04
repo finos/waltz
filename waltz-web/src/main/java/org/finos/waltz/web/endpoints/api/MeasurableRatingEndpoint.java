@@ -19,8 +19,6 @@
 package org.finos.waltz.web.endpoints.api;
 
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
-import org.finos.waltz.data.GenericSelector;
-import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdSelectionOptions;
@@ -115,7 +113,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
         String findByCategoryPath = mkPath(BASE_URL, "category", ":id");
         String countByMeasurableCategoryPath = mkPath(BASE_URL, "count-by", "measurable", "category", ":id");
         String statsByAppSelectorPath = mkPath(BASE_URL, "stats-by", "app-selector");
-        String hasImplicitlyRelatedMeasurablesPath = mkPath(BASE_URL, "implicitly-related-measurables", ":measurableId");
+        String hasMeasurableRatingsPath = mkPath(BASE_URL, "has-measurable-ratings");
 
         String saveRatingItemPath = mkPath(BASE_URL, "entity", ":kind", ":id", "measurable", ":measurableId", "rating");
         String saveRatingDescriptionPath = mkPath(BASE_URL, "entity", ":kind", ":id", "measurable", ":measurableId", "description");
@@ -156,10 +154,8 @@ public class MeasurableRatingEndpoint implements Endpoint {
         ListRoute<MeasurableRatingTally> statsByAppSelectorRoute = (request, response)
                 -> measurableRatingService.statsByAppSelector(readBody(request, MeasurableRatingStatParams.class));
 
-        DatumRoute<Boolean> hasImplicitlyRelatedMeasurablesRoute = (request, response)
-                -> measurableRatingService.hasImplicitlyRelatedMeasurables(
-                getLong(request, "measurableId"),
-                readIdSelectionOptionsFromBody(request));
+        DatumRoute<Boolean> hasMeasurableRatingsRoute = (request, response)
+                -> measurableRatingService.hasMeasurableRatings(readIdSelectionOptionsFromBody(request));
 
         getForDatum(getByIdPath, getByIdRoute);
         getForDatum(getViewByIdPath, getViewByIdRoute);
@@ -170,7 +166,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
         deleteForList(modifyMeasurableForEntityPath, this::removeRoute);
         deleteForList(modifyCategoryForEntityPath, this::removeCategoryRoute);
         getForList(countByMeasurableCategoryPath, countByMeasurableCategoryRoute);
-        postForDatum(hasImplicitlyRelatedMeasurablesPath, hasImplicitlyRelatedMeasurablesRoute);
+        postForDatum(hasMeasurableRatingsPath, hasMeasurableRatingsRoute);
         postForList(statsByAppSelectorPath, statsByAppSelectorRoute);
 
         postForList(saveRatingItemPath, this::saveRatingItemRoute);

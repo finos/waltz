@@ -12,6 +12,7 @@
     import {termSearch} from "../../../common";
     import {countUsageStatsBy, sortItems} from "./rating-scheme-utils";
     import SchemeRemovalConfirmation from "./SchemeRemovalConfirmation.svelte";
+    import _ from "lodash";
 
 
     const Modes = {
@@ -28,6 +29,7 @@
 
     let qry;
     let activeMode = Modes.LIST;
+    let activeSchemeId = null;
     let activeScheme = null;
 
     $: ratingSchemes = _
@@ -36,13 +38,13 @@
         .value();
 
 
-    $: activeScheme = activeScheme
-        ? _.find(ratingSchemes, ({id: activeScheme.id}))
+    $: activeScheme = activeSchemeId
+        ? _.find(ratingSchemes, ({id: activeSchemeId}))
         : null;
 
 
     function onEditScheme(scheme) {
-        activeScheme = scheme;
+        activeSchemeId = scheme.id;
         activeMode = Modes.EDIT_SCHEME;
     }
 
@@ -167,7 +169,7 @@
                                    doCancel={onCancel}
                                    doRemove={doRemoveScheme}/>
 
-    {:else if activeMode === Modes.EDIT_RATINGS}
+    {:else if activeMode === Modes.EDIT_RATINGS && !_.isNil(activeScheme) }
 
         <ItemsView scheme={activeScheme}
                    ratings={sortItems(activeScheme.ratings)}

@@ -117,10 +117,10 @@ const logicalFlowsTabgroupSection = {
 };
 
 const measurableRatingAppSection = {
-    componentId: "measurable-rating-app-section",
+    componentId: "measurable-rating-entity-section",
     name: "Ratings / Roadmaps",
     icon: "puzzle-piece",
-    description: "Viewpoints linked to this application with a rating",
+    description: "Viewpoints linked to this entity with a rating",
     id: 15,
 };
 
@@ -906,6 +906,7 @@ const endUserApplicationSections = [
     involvedPeopleSection,
     dataFlowSection,
     entityDiagramsSection,
+    measurableRatingAppSection,
     changeLogSection
 ];
 

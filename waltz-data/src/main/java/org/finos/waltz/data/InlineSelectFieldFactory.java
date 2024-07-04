@@ -89,8 +89,36 @@ public class InlineSelectFieldFactory {
             EntityKind.LICENCE,
             EntityKind.LOGICAL_DATA_FLOW,
             EntityKind.MEASURABLE,
-            EntityKind.MEASURABLE_RATING,
             EntityKind.MEASURABLE_CATEGORY,
+            EntityKind.MEASURABLE_RATING,
+            EntityKind.ORG_UNIT,
+            EntityKind.PERSON,
+            EntityKind.PHYSICAL_FLOW,
+            EntityKind.PHYSICAL_SPECIFICATION,
+            EntityKind.SERVER,
+            EntityKind.SOFTWARE);
+
+    private static final Set<EntityKind> DEFAULT_DESCRIPTION_ENTITIES = SetUtilities.asSet(
+            EntityKind.ACTOR,
+            EntityKind.ALLOCATION_SCHEME,
+            EntityKind.APPLICATION,
+            EntityKind.APP_GROUP,
+            EntityKind.CHANGE_INITIATIVE,
+            EntityKind.CHANGE_SET,
+            EntityKind.DATA_TYPE,
+            EntityKind.END_USER_APPLICATION,
+            EntityKind.ENTITY_RELATIONSHIP,
+            EntityKind.ENTITY_STATISTIC,
+            EntityKind.FLOW_CLASSIFICATION_RULE,
+            EntityKind.FLOW_DIAGRAM,
+            EntityKind.INVOLVEMENT_KIND,
+            EntityKind.LEGAL_ENTITY,
+            EntityKind.LEGAL_ENTITY_RELATIONSHIP,
+            EntityKind.LICENCE,
+            EntityKind.LOGICAL_DATA_FLOW,
+            EntityKind.MEASURABLE,
+            EntityKind.MEASURABLE_CATEGORY,
+            EntityKind.MEASURABLE_RATING,
             EntityKind.ORG_UNIT,
             EntityKind.PERSON,
             EntityKind.PHYSICAL_FLOW,
@@ -112,6 +140,26 @@ public class InlineSelectFieldFactory {
 
     public static Field<String> mkNameField(Field<Long> idCompareField,
                                             Field<String> kindCompareField) {
+        return mkNameField(
+                idCompareField,
+                kindCompareField,
+                DEFAULT_NAME_ENTITIES);
+    }
+
+    // --- Description
+
+    public static Field<String> mkDescriptionField(Field<Long> idCompareField,
+                                                   Field<String> kindCompareField,
+                                                   Collection<EntityKind> searchEntityKinds) {
+        return mkField(
+                idCompareField,
+                kindCompareField,
+                searchEntityKinds,
+                CommonTableFields::descriptionField);
+    }
+
+    public static Field<String> mkDescriptionField(Field<Long> idCompareField,
+                                                   Field<String> kindCompareField) {
         return mkNameField(
                 idCompareField,
                 kindCompareField,

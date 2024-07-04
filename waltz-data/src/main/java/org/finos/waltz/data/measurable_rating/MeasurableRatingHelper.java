@@ -1,11 +1,14 @@
 package org.finos.waltz.data.measurable_rating;
 
+import org.finos.waltz.data.EntityReferenceNameResolver;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.ImmutableEntityReference;
 import org.finos.waltz.model.measurable_rating.ImmutableMeasurableRatingChangeSummary;
 import org.finos.waltz.model.measurable_rating.MeasurableRatingChangeSummary;
-import org.finos.waltz.schema.tables.*;
+import org.finos.waltz.schema.tables.Measurable;
+import org.finos.waltz.schema.tables.MeasurableCategory;
+import org.finos.waltz.schema.tables.RatingScheme;
+import org.finos.waltz.schema.tables.RatingSchemeItem;
 import org.finos.waltz.schema.tables.records.MeasurableRatingRecord;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -14,10 +17,13 @@ import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
 
+import static java.lang.String.format;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 import static org.finos.waltz.data.measurable.MeasurableIdSelectorFactory.allMeasurablesIdsInSameCategory;
 import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.Tables.MEASURABLE_CATEGORY;
+import static org.finos.waltz.schema.Tables.RATING_SCHEME;
+import static org.finos.waltz.schema.Tables.RATING_SCHEME_ITEM;
 import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
 import static org.finos.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
 import static org.jooq.lambda.tuple.Tuple.tuple;
@@ -161,24 +167,27 @@ public class MeasurableRatingHelper {
                                                                                      long measurableId,
                                                                                      String desiredRatingCode) {
 
+        EntityReferenceNameResolver refResolver = new EntityReferenceNameResolver(tx);
+
+        EntityReference refWithName = refResolver
+                .resolve(entityRef)
+                .orElseThrow(() -> new IllegalArgumentException(format("Cannot find entity kind: %s, id: %d", entityRef.kind().name(), entityRef.id())));
+
         Measurable m = MEASURABLE.as("m");
         MeasurableCategory mc = MEASURABLE_CATEGORY.as("mc");
         org.finos.waltz.schema.tables.MeasurableRating mr = MEASURABLE_RATING.as("mr");
         RatingScheme rs = RATING_SCHEME.as("rs");
         RatingSchemeItem current = RATING_SCHEME_ITEM.as("current");
         RatingSchemeItem desired = RATING_SCHEME_ITEM.as("desired");
-        Application app = APPLICATION.as("app");
 
         SelectConditionStep<Record> qry = tx
                 .select(m.NAME, m.ID)
                 .select(mc.NAME, mc.ID)
-                .select(app.NAME, app.ID)
                 .select(current.NAME, current.CODE)
                 .select(desired.NAME, desired.CODE)
                 .from(m)
                 .innerJoin(mc).on(mc.ID.eq(m.MEASURABLE_CATEGORY_ID))
                 .innerJoin(rs).on(rs.ID.eq(mc.RATING_SCHEME_ID))
-                .innerJoin(app).on(app.ID.eq(entityRef.id()))
                 .leftJoin(mr).on(mr.MEASURABLE_ID.eq(m.ID)
                                 .and(mr.ENTITY_ID.eq(entityRef.id()))
                                 .and(mr.ENTITY_KIND.eq(entityRef.kind().name())))
@@ -207,7 +216,7 @@ public class MeasurableRatingHelper {
                             .builder()
                             .measurableRef(mkRef(EntityKind.MEASURABLE, measurableId, r.get(m.NAME)))
                             .measurableCategoryRef(mkRef(EntityKind.MEASURABLE_CATEGORY, r.get(mc.ID), r.get(mc.NAME)))
-                            .entityRef(ImmutableEntityReference.copyOf(entityRef).withName(r.get(app.NAME)))
+                            .entityRef(refWithName)
                             .currentRatingNameAndCode(currentRatingNameAndCode)
                             .desiredRatingNameAndCode(desiredRatingNameAndCode)
                             .build();

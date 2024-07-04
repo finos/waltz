@@ -97,8 +97,17 @@ public class AllocationService {
         return allocationDao.findByEntity(ref);
     }
 
-    public Collection<Allocation> findForCategoryAndSelector(Select<Record1<Long>> appIdSelector, long categoryId) {
-        return allocationDao.findForCategoryAndSelector(appIdSelector, categoryId);
+
+    /*
+     * Should move to using a measurable rating id selector
+     */
+    @Deprecated
+    public Collection<Allocation> findForCategoryAndSubjectIdSelector(Select<Record1<Long>> subjectIdSelector, long categoryId) {
+        return allocationDao.findForCategoryAndSubjectIdSelector(subjectIdSelector, categoryId);
+    }
+
+    public Set<Allocation> findForCategoryAndMeasurableRatingIdSelector(Select<Record1<Long>> ratingIdSelector, long categoryId) {
+        return allocationDao.findForCategoryAndMeasurableRatingIdSelector(ratingIdSelector, categoryId);
     }
 
 

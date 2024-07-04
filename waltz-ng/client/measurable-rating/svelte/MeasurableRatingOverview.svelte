@@ -28,6 +28,7 @@
     $: allocations = view?.allocations || [];
     $: allocationsBySchemeId = _.keyBy(view?.allocations, d => d.schemeId);
     $: $primaryRef = primaryEntityReference;
+    $: subject = view?.measurableRating.entityReference;
 </script>
 
 
@@ -38,7 +39,7 @@
             <li><ViewLink state="main">Home</ViewLink></li>
             <li>Measurable Rating</li>
             {#if view}
-                <li><EntityLink ref={view?.application}/></li>
+                <li><EntityLink ref={subject}/></li>
                 <li><EntityLink ref={view?.measurable}/></li>
             {/if}
         </ol>
@@ -54,9 +55,9 @@
                     Entity
                 </div>
                 <div class="col-sm-8">
-                    <EntityLink ref={view?.application}/>
+                    <EntityLink ref={subject}/>
                     <div class="help-block">
-                        <DescriptionFade text={view?.application.description}
+                        <DescriptionFade text={subject?.description}
                                          expanderAlignment="right"/>
                     </div>
                 </div>

@@ -75,8 +75,16 @@ public class MeasurableRatingReplacementService {
         return measurableRatingReplacementDao.fetchByEntityRef(ref);
     }
 
-    public Collection<MeasurableRatingReplacement> findForCategoryAndSelector(Select<Record1<Long>> appIdSelector, long categoryId){
-        return measurableRatingReplacementDao.findForCategoryAndSelector(appIdSelector, categoryId);
+    /*
+     * Should move to using a measurable rating id selector
+     */
+    @Deprecated
+    public Collection<MeasurableRatingReplacement> findForCategoryAndSubjectIdSelector(Select<Record1<Long>> subjectIdSelector, long categoryId){
+        return measurableRatingReplacementDao.findForCategoryAndSubjectIdSelector(subjectIdSelector, categoryId);
+    }
+
+    public Set<MeasurableRatingReplacement> findForCategoryAndMeasurableRatingIdSelector(Select<Record1<Long>> ratingIdSelector, long categoryId){
+        return measurableRatingReplacementDao.findForCategoryAndMeasurableRatingIdSelector(ratingIdSelector, categoryId);
     }
 
 

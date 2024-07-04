@@ -1,7 +1,8 @@
 import {
     mkAllocationColumns,
     mkDecommissionColumns,
-    mkEntityLinkFormatter, mkExternalIdFormatter,
+    mkEntityLinkFormatter,
+    mkExternalIdFormatter,
     mkPrimaryAssessmentAndCategoryColumns,
     mkRatingSchemeItemFormatter,
 } from "../../../common/slick-grid-utils";
@@ -10,29 +11,29 @@ import {termSearch} from "../../../common";
 import _ from "lodash";
 
 
-const appNameCol = {
-    id: "application_name",
-    name: "Application",
-    field: "application",
+const subjectNameCol = {
+    id: "subject_name",
+    name: "Subject",
+    field: "measurableRating",
     sortable:  true,
     width: 180,
-    formatter: mkEntityLinkFormatter(null, false),
-    sortFn: (a, b) => cmp(a?.application.name, b?.application.name)
+    formatter: mkEntityLinkFormatter(d => d.entityReference, true),
+    sortFn: (a, b) => cmp(a?.measurableRating.entityReference.name, b?.measurableRating.entityReference.name)
 };
 
-const appAssetCode = {
-    id: "application_asst_code",
-    name: "Asset Code",
-    field: "application",
+const subjectExtId = {
+    id: "subject_ext_id",
+    name: "Subject Ext Id",
+    field: "measurableRating",
     sortable:  true,
     width: 180,
-    formatter: mkExternalIdFormatter(d => d.assetCode),
-    sortFn: (a, b) => cmp(a?.application.assetCode, b?.application.assetCode)
+    formatter: mkExternalIdFormatter(d => d.entityReference.externalId),
+    sortFn: (a, b) => cmp(a?.measurableRating.entityReference.externalId, b?.measurableRating.entityReference.externalId)
 };
 
 export const baseColumns = [
-    appNameCol,
-    appAssetCode,
+    subjectNameCol,
+    subjectExtId,
     {
         id: "measurable_name",
         name: "Taxonomy Item",
@@ -95,8 +96,8 @@ export function mkColumnDefs(measurableRatings, primaryAssessments, primaryRatin
 
 export function mkUnmappedColumnDefs() {
     return _.concat(
-        appNameCol,
-        appAssetCode
+        subjectNameCol,
+        subjectExtId
     )
 }
 

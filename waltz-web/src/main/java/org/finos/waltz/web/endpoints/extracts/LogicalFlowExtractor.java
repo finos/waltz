@@ -78,14 +78,17 @@ public class LogicalFlowExtractor extends CustomDataExtractor {
             LOGICAL_FLOW.TARGET_ENTITY_ID,
             LOGICAL_FLOW.TARGET_ENTITY_KIND,
             newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR, EntityKind.END_USER_APPLICATION));
+    public static final Field<Long> LOGICAL_FLOW_ID = LOGICAL_FLOW.ID.as("Waltz Id");
 
     private static List<String> staticHeaders = newArrayList(
+            "Waltz Id",
             "Source",
             "Source Asset Code",
             "Source Org Unit",
             "Target",
             "Target Asset Code",
             "Target Org Unit",
+            "Flow External Id",
             "Data Type",
             "Source Outbound Rating",
             "Target Inbound Rating");
@@ -148,16 +151,17 @@ public class LogicalFlowExtractor extends CustomDataExtractor {
         FlowClassification targetClassification = FLOW_CLASSIFICATION.as("targetClassification");
 
         SelectConditionStep<Record> qry = dsl
+                .select(LOGICAL_FLOW_ID)
                 .select(SOURCE_NAME_FIELD.as("Source"),
                         SOURCE_EXT_ID_FIELD.as("Source Asset Code"),
                         sourceOrgUnitNameField.as("Source Org Unit"))
                 .select(TARGET_NAME_FIELD.as("Target"),
                         TARGET_EXT_ID_FIELD.as("Target Asset Code"),
                         targetOrgUnitNameField.as("Target Org Unit"))
+                .select(LOGICAL_FLOW.EXTERNAL_ID.as("Flow External Id"))
                 .select(DATA_TYPE.NAME.as("Data Type"))
                 .select(sourceClassification.NAME.as("Source Outbound Rating"))
                 .select(targetClassification.NAME.as("Target Inbound Rating"))
-                .select(LOGICAL_FLOW.ID)
                 .from(LOGICAL_FLOW)
                 .innerJoin(LOGICAL_FLOW_DECORATOR)
                 .on(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID)
@@ -201,7 +205,7 @@ public class LogicalFlowExtractor extends CustomDataExtractor {
                     ArrayList<Object> reportRow = new ArrayList<>();
                     staticHeaders.forEach(h -> reportRow.add(row.get(h)));
 
-                    Long logicalFlowId = row.get(LOGICAL_FLOW.ID);
+                    Long logicalFlowId = row.get(LOGICAL_FLOW_ID);
                     List<String> logicalFlowTags = tags.get(logicalFlowId);
                     reportRow.add(isEmpty(logicalFlowTags)
                             ? ""

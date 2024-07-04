@@ -241,7 +241,11 @@ public class FlowClassificationRuleDao {
         UpdateSetMoreStep<FlowClassificationRuleRecord> upd = dsl
                 .update(FLOW_CLASSIFICATION_RULE)
                 .set(FLOW_CLASSIFICATION_RULE.FLOW_CLASSIFICATION_ID, command.classificationId())
-                .set(FLOW_CLASSIFICATION_RULE.DESCRIPTION, command.description());
+                .set(FLOW_CLASSIFICATION_RULE.DESCRIPTION, command.description())
+                .set(FLOW_CLASSIFICATION_RULE.DIRECTION, DSL
+                        .select(FLOW_CLASSIFICATION.DIRECTION)
+                        .from(FLOW_CLASSIFICATION)
+                        .where(FLOW_CLASSIFICATION.ID.eq(command.classificationId())));
 
         if (command.severity() != null) {
             upd.set(FLOW_CLASSIFICATION_RULE.MESSAGE_SEVERITY, command.severity().name());
@@ -268,7 +272,11 @@ public class FlowClassificationRuleDao {
                 .set(FLOW_CLASSIFICATION_RULE.DESCRIPTION, command.description())
                 .set(FLOW_CLASSIFICATION_RULE.PROVENANCE, "waltz")
                 .set(FLOW_CLASSIFICATION_RULE.LAST_UPDATED_AT, nowUtcTimestamp())
-                .set(FLOW_CLASSIFICATION_RULE.LAST_UPDATED_BY, username);
+                .set(FLOW_CLASSIFICATION_RULE.LAST_UPDATED_BY, username)
+                .set(FLOW_CLASSIFICATION_RULE.DIRECTION, DSL
+                        .select(FLOW_CLASSIFICATION.DIRECTION)
+                        .from(FLOW_CLASSIFICATION)
+                        .where(FLOW_CLASSIFICATION.ID.eq(command.classificationId())));
 
         if (command.severity() != null) {
             stmt.set(FLOW_CLASSIFICATION_RULE.MESSAGE_SEVERITY, command.severity().name());

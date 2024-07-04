@@ -31,7 +31,7 @@
             [
                 (d) => _.get(d, ["classification", "name"], ""),
                 (d) => {
-                    const direction = _.get(d, ["classification", "direction"], "")
+                    const direction = _.get(d, ["direction"], "")
                     switch (direction) {
                         case "INBOUND":
                             return "consumer";

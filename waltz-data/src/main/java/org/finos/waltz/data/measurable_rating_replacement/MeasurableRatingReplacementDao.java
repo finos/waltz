@@ -142,7 +142,11 @@ public class MeasurableRatingReplacementDao {
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
 
-    public Set<MeasurableRatingReplacement> findForCategoryAndSelector(Select<Record1<Long>> appIdSelector, long categoryId){
+    /*
+     * Should move to using a measurable rating id selector
+     */
+    @Deprecated
+    public Set<MeasurableRatingReplacement> findForCategoryAndSubjectIdSelector(Select<Record1<Long>> subjectIdSelector, long categoryId){
         return dsl
                 .select(MEASURABLE_RATING_REPLACEMENT.fields())
                 .select(NAME_FIELD)
@@ -153,8 +157,24 @@ public class MeasurableRatingReplacementDao {
                 .on(MEASURABLE_RATING.ID.eq(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_RATING_ID))
                 .innerJoin(MEASURABLE).on(MEASURABLE_RATING.MEASURABLE_ID.eq(MEASURABLE.ID)
                         .and(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId)))
-                .where(dsl.renderInlined(MEASURABLE_RATING.ENTITY_ID.in(appIdSelector)
+                .where(dsl.renderInlined(MEASURABLE_RATING.ENTITY_ID.in(subjectIdSelector)
                         .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))))
+                .fetchSet(TO_DOMAIN_MAPPER);
+    }
+
+
+    public Set<MeasurableRatingReplacement> findForCategoryAndMeasurableRatingIdSelector(Select<Record1<Long>> ratingIdSelector, long categoryId){
+        return dsl
+                .select(MEASURABLE_RATING_REPLACEMENT.fields())
+                .select(NAME_FIELD)
+                .from(MEASURABLE_RATING_REPLACEMENT)
+                .innerJoin(MEASURABLE_RATING_PLANNED_DECOMMISSION)
+                .on(MEASURABLE_RATING_PLANNED_DECOMMISSION.ID.eq(MEASURABLE_RATING_REPLACEMENT.DECOMMISSION_ID))
+                .innerJoin(MEASURABLE_RATING)
+                .on(MEASURABLE_RATING.ID.eq(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_RATING_ID))
+                .innerJoin(MEASURABLE).on(MEASURABLE_RATING.MEASURABLE_ID.eq(MEASURABLE.ID)
+                        .and(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId)))
+                .where(dsl.renderInlined(MEASURABLE_RATING.ID.in(ratingIdSelector)))
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
 
