@@ -499,12 +499,12 @@
         <profile>
             <id>dev-h2-inmem</id>
             <properties>
-                <!-- <database.url>jdbc:h2:tcp://localhost/mem:waltz;CASE_INSENSITIVE_IDENTIFIERS=TRUE</database.url>
+                <database.url>jdbc:h2:mem:waltz;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DATABASE_TO_UPPER=TRUE</database.url>
                 <database.user>sa</database.user>
-                <database.password>sa</database.password> -->
-                <database.url>jdbc:h2:file:~/data/waltz/h2/waltzdb;DATABASE_TO_UPPER=false</database.url>
-                <database.user>root</database.user>
-                <database.password></database.password>
+                <database.password>sa</database.password>
+<!--                <database.url>jdbc:h2:file:~/data/waltz/h2/waltzdb;DATABASE_TO_UPPER=false</database.url>-->
+<!--                <database.user>root</database.user>-->
+<!--                <database.password></database.password>-->
                 <database.schema>PUBLIC</database.schema>
                 <database.catalog></database.catalog>
             </properties>

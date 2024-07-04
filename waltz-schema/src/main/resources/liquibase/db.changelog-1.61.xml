@@ -39,7 +39,8 @@
     </changeSet>
 
     <changeSet id="2024530-7082-2"
-               author="woodjes">
+               author="woodjes"
+               dbms="mssql">
         <!-- Cannot create a default value based upon another column, should use a computed column but this doesn't allow updates -->
         <comment>7082: adding default external id to physical_flow</comment>
         <update tableName="physical_flow">
@@ -50,13 +51,37 @@
         </update>
     </changeSet>
 
+    <changeSet id="2024530-7082-2b"
+               author="woodjes"
+               dbms="postgresql">
+        <!-- Cannot create a default value based upon another column, should use a computed column but this doesn't allow updates -->
+        <comment>7082: adding default external id to physical_flow</comment>
+        <update tableName="physical_flow">
+            <column name="external_id"
+                    valueComputed="CONCAT('PF_', lpad(nextval('physical_flow_id_seq')::text, 6, '0'))"
+                    type="${external-id.type}"/>
+            <where>external_id is NULL or external_id = ''</where>
+        </update>
+    </changeSet>
+
     <changeSet id="2024530-7082-3"
-               author="woodjes">
+               author="woodjes"
+               dbms="mssql">
         <!-- Cannot create a default value based upon another column, should use a computed column but this doesn't allow updates -->
         <comment>7082: adding default external id to physical_flow</comment>
         <addDefaultValue tableName="physical_flow"
                          columnName="external_id"
                          defaultValueComputed="CONCAT('PF_', FORMAT(NEXT VALUE FOR physical_flow_id_seq, '000000'))"/>
+    </changeSet>
+
+    <changeSet id="2024530-7082-3b"
+               author="woodjes"
+               dbms="postgresql">
+        <!-- Cannot create a default value based upon another column, should use a computed column but this doesn't allow updates -->
+        <comment>7082: adding default external id to physical_flow</comment>
+        <addDefaultValue tableName="physical_flow"
+                         columnName="external_id"
+                         defaultValueComputed="CONCAT('PF_', lpad(nextval('physical_flow_id_seq')::text, 6, '0'))"/>
     </changeSet>
 
     <changeSet id="2024530-7082-4"
@@ -98,7 +123,8 @@
     </changeSet>
 
     <changeSet id="2024530-7082-8"
-               author="woodjes">
+               author="woodjes"
+               dbms="mssql">
         <comment>7082: adding default external id to physical_specification</comment>
         <update tableName="physical_specification">
             <column name="external_id"
@@ -108,12 +134,34 @@
         </update>
     </changeSet>
 
+    <changeSet id="2024530-7082-8b"
+               author="woodjes"
+               dbms="postgresql">
+        <comment>7082: adding default external id to physical_specification</comment>
+        <update tableName="physical_specification">
+            <column name="external_id"
+                    valueComputed="CONCAT('PS_', lpad(nextval('physical_specification_id_seq')::text, 6, '0'))"
+                    type="${external-id.type}"/>
+            <where>external_id is NULL or external_id = ''</where>
+        </update>
+    </changeSet>
+
     <changeSet id="2024530-7082-9"
-               author="woodjes">
+               author="woodjes"
+               dbms="mssql">
         <comment>7082: adding default external id to physical_specification</comment>
         <addDefaultValue tableName="physical_specification"
                          columnName="external_id"
                          defaultValueComputed="CONCAT('PS_', FORMAT(NEXT VALUE FOR physical_specification_id_seq, '000000'))"/>
+    </changeSet>
+
+    <changeSet id="2024530-7082-9b"
+               author="woodjes"
+               dbms="postgresql">
+        <comment>7082: adding default external id to physical_specification</comment>
+        <addDefaultValue tableName="physical_specification"
+                         columnName="external_id"
+                         defaultValueComputed="CONCAT('PS_', lpad(nextval('physical_specification_id_seq')::text, 6, '0'))"/>
     </changeSet>
 
     <changeSet id="2024530-7082-10"
@@ -146,11 +194,21 @@
 
 
     <changeSet id="20240603-7082-3"
-               author="woodjes">
+               author="woodjes"
+               dbms="mssql">
         <comment>7082: migrate default value for logical flow</comment>
         <addDefaultValue tableName="logical_flow"
                          columnName="external_id"
                          defaultValueComputed="CONCAT('LF_', FORMAT(NEXT VALUE FOR logical_flow_id_seq, '000000'))"/>
+    </changeSet>
+
+    <changeSet id="20240603-7082-3b"
+               author="woodjes"
+               dbms="postgresql">
+        <comment>7082: migrate default value for logical flow</comment>
+        <addDefaultValue tableName="logical_flow"
+                         columnName="external_id"
+                         defaultValueComputed="CONCAT('LF_', lpad(nextval('logical_flow_id_seq')::text, 6, '0'))"/>
     </changeSet>
 
     <changeSet id="20240625-7084-1"

@@ -21,10 +21,21 @@
                    logicalFilePath="db.changelog-1.60.xml">
 
     <changeSet id="20240328-modify-v1-1.58-tag"
-               author="woodjes">
+               author="woodjes"
+               dbms="!h2">
         <update tableName="DATABASECHANGELOG">
             <column name="id" value="v1-58-tag"/>
             <where>id='v1-59-tag'</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="20240328-modify-v1-1.58-tag-b"
+               failOnError="false"
+               author="woodjes"
+               dbms="h2">
+        <update tableName="DATABASECHANGELOG">
+            <column name="ID" value="v1-58-tag"/>
+            <where>ID='v1-59-tag'</where>
         </update>
     </changeSet>
 
