@@ -53,6 +53,7 @@
 </script>
 <main>
     <input list="tag_suggestion"
+           title="Press enter or comma to start a new entry. Ctrl+Enter saves the list"
            on:blur={pressed}
            on:keyup={pressed}
            bind:value={input}/>
@@ -60,8 +61,7 @@
     <div class="tag-list">
         {#each value as t,i}
             <span class="tag">
-                {t}
-                <a href="#del" on:click={()=>del(i)}>⨉</a>
+                {t}&nbsp;<a href="#del" on:click={()=>del(i)}>⨉</a>
             </span>
         {/each}
     </div>
@@ -94,11 +94,13 @@
         font-weight: bolder;
     }
     .tag {
+        display: inline-block;
         margin-right:0.33rem;
         padding: 0.2em;
         border-radius: 0.3em;
         background-color: #edf5fd;
         border: 1px solid #c0defa;
+        margin-bottom: 0.2em;
     }
     .tag a {text-decoration: none; color: inherit;}
 </style>

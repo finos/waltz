@@ -68,5 +68,6 @@
         border-radius: 0.3em;
         background-color: #edf5fd;
         border: 1px solid #c0defa;
+        margin-bottom: 0.2em;
     }
 </style>
