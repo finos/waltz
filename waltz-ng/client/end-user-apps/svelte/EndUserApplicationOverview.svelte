@@ -11,6 +11,7 @@
     import DescriptionFade from "../../common/svelte/DescriptionFade.svelte";
     import {applicationStore} from "../../svelte-stores/application-store";
     import Icon from "../../common/svelte/Icon.svelte";
+    import AliasControl from "../../common/svelte/AliasControl.svelte";
 
     export let endUserApplication;
 
@@ -76,6 +77,15 @@
                     </div>
                     <div class="col-sm-8">
                         {endUserApplication.name}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4 waltz-display-field-label">
+                        Aliases
+                    </div>
+                    <div class="col-sm-8">
+                        <AliasControl parentEntityReference={endUserApplication}
+                                      editable={true}/>
                     </div>
                 </div>
                 <div class="row">
