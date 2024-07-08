@@ -69,8 +69,9 @@ progress and done issues.
 **Provisional** dates for upcoming releases:
 
 | Release | Date          | Provisional Change Summary |
-|---------|---------------|----------------------------|
-| 1.61    | Jun 25th 2024 | Java 17 support            |
+|--------|---------------|----------------------------|
+| 1.61.1 | Jul 11th 2024 | Alias search, minor fixes  |
+ | 1.62   | Jul 30th 2024 | Java 11, possible move to Javalin | 
 
 See the [releases](https://github.com/finos/waltz/releases) page for historic versions.
 
