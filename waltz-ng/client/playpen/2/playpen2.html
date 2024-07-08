@@ -32,11 +32,40 @@
         </breadcrumbs>
     </waltz-page-header>
 
-    <svg width="800"
-         class="no-text-select"
-         style="border: 1px solid #eee; margin-bottom: 0"
-         height="800"
-         viewBox="0 0 100 100">
-    </svg>
+
+    <waltz-section name="Test">
+        <waltz-svelte-component component="$ctrl.AliasControl"
+                                parent-entity-reference="{id: 173070001, kind: 'APPLICATION'}"
+                                editable="true">
+        </waltz-svelte-component>
+
+
+        <hr>
+
+        World
+        <div class="small">
+            Helllo
+            <waltz-svelte-component component="$ctrl.TagsInput">
+            </waltz-svelte-component>
+        </div>
+        <hr>
+
+        <waltz-svelte-component component="$ctrl.TagsInput"
+                                value="['a', 'b']">
+        </waltz-svelte-component>
+
+
+    </waltz-section>
+
+    <waltz-section name="NFRs">
+        <svg width="800"
+             class="no-text-select"
+             style="border: 1px solid #eee; margin-bottom: 0"
+             height="800"
+             viewBox="0 0 100 100">
+        </svg>
+
+    </waltz-section>
+
 
 </div>

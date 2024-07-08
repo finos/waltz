@@ -44,6 +44,16 @@
         </div>
 
         <div class="row">
+            <div class="col-md-2"><label>Aliases</label></div>
+            <div class="col-md-10">
+                <waltz-svelte-component component="$ctrl.AliasControl"
+                                        parent-entity-reference="$ctrl.parentEntityRef"
+                                        editable="true">
+                </waltz-svelte-component>
+            </div>
+        </div>
+
+        <div class="row">
             <div class="col-sm-2">
                 <label>
                     External Id

@@ -87,33 +87,11 @@
                     <div class="col-sm-2 waltz-display-field-label">
                         Aliases
                     </div>
-                    <div class="col-sm-4 waltz-alias-list">
-                        <waltz-keyword-list ng-if="!$ctrl.visibility.aliasEditor"
-                                            keywords="$ctrl.aliases">
-                            <last>
-                                <span class="small">
-                                    <a ng-click="$ctrl.showAliasEditor()"
-                                       class="clickable">
-                                        update
-                                    </a>
-                                </span>
-                            </last>
-                            <empty>
-                                <i class="text-muted">
-                                    No aliases defined,
-                                    <a class="clickable"
-                                       ng-click="$ctrl.showAliasEditor()">
-                                        add one.
-                                    </a>
-                                </i>
-                            </empty>
-                        </waltz-keyword-list>
-
-                        <waltz-keyword-edit ng-if="$ctrl.visibility.aliasEditor"
-                                            keywords="$ctrl.aliases"
-                                            on-save="$ctrl.saveAliases"
-                                            on-cancel="$ctrl.dismissAliasEditor">
-                        </waltz-keyword-edit>
+                    <div class="col-sm-4">
+                        <waltz-svelte-component component="$ctrl.AliasControl"
+                                                parent-entity-reference="$ctrl.parentEntityRef"
+                                                editable="true">
+                        </waltz-svelte-component>
                     </div>
                     <div class="col-sm-2 waltz-display-field-label">
                         Tags
