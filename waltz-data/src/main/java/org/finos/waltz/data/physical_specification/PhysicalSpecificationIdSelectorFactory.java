@@ -59,14 +59,21 @@ public class PhysicalSpecificationIdSelectorFactory implements IdSelectorFactory
                 return mkForLogicalElement(options);
             case LOGICAL_DATA_FLOW:
                 return mkForLogicalFlow(options);
-            case FLOW_DIAGRAM:
-                return mkForFlowDiagram(options);
             case PHYSICAL_SPECIFICATION:
                 return mkForSpecification(options);
             case SERVER:
                 return mkForServer(options);
             case TAG:
                 return mkForTagBasedOnPhysicalFlowTags(options);
+            case ALL:
+            case APP_GROUP:
+            case DATA_TYPE:
+            case FLOW_DIAGRAM:
+            case ORG_UNIT:
+            case MEASURABLE:
+            case PERSON:
+            case PROCESS_DIAGRAM:
+                return mkViaPhysicalFlowSelector(options);
             default:
                 throw new UnsupportedOperationException("Cannot create physical specification selector from options: " + options);
         }
@@ -158,8 +165,7 @@ public class PhysicalSpecificationIdSelectorFactory implements IdSelectorFactory
     }
 
 
-    private Select<Record1<Long>> mkForFlowDiagram(IdSelectionOptions options) {
-        SelectorUtilities.ensureScopeIsExact(options);
+    private Select<Record1<Long>> mkViaPhysicalFlowSelector(IdSelectionOptions options) {
         Select<Record1<Long>> flowSelector = physicalFlowIdSelectorFactory.apply(options);
         Condition condition =
                 PHYSICAL_FLOW.ID.in(flowSelector)
