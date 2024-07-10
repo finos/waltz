@@ -95,7 +95,7 @@ public class PhysicalFlowDao {
                 .lastAttestedBy(Optional.ofNullable(record.getLastAttestedBy()))
                 .lastAttestedAt(Optional.ofNullable(record.getLastAttestedAt()).map(Timestamp::toLocalDateTime))
                 .isRemoved(record.getIsRemoved())
-                .externalId(Optional.ofNullable(record.getExternalId()))
+                .externalId(record.getExternalId())
                 .entityLifecycleStatus(EntityLifecycleStatus.valueOf(record.getEntityLifecycleStatus()))
                 .created(UserTimestamp.mkForUser(record.getCreatedBy(), record.getCreatedAt()))
                 .isReadOnly(record.getIsReadonly())
@@ -322,7 +322,8 @@ public class PhysicalFlowDao {
         record.setLastAttestedAt(flow.lastAttestedAt().map(Timestamp::valueOf).orElse(null));
         record.setIsRemoved(flow.isRemoved());
         record.setProvenance("waltz");
-        record.setExternalId(flow.externalId().orElse(null));
+
+        flow.externalId().ifPresent(record::setExternalId);
 
         record.setCreatedAt(flow.created().map(UserTimestamp::atTimestamp).orElse(Timestamp.valueOf(flow.lastUpdatedAt())));
         record.setCreatedBy(flow.created().map(UserTimestamp::by).orElse(flow.lastUpdatedBy()));
