@@ -22,7 +22,7 @@
     let grid;
     let qry;
     let selectionLatchOpen = true;
-    let defs = [];
+    let defs;
     let flowClassificationsByCode = {};
 
     function isSameFlow(a, b) {
@@ -86,7 +86,9 @@
             }
         });
         grid.onClick.subscribe((a,b) => selectLogicalFlow(flowList[b.row]))
+    }
 
+    function refreshGridData() {
         grid.data = flowList;
         grid.invalidate()
     }
@@ -115,8 +117,14 @@
 
 
     $: {
-        if (elem && !_.isNil(flowList)) {
+        if (elem && !_.isNil(defs)) {
             initGrid(elem);
+        }
+    }
+
+    $: {
+        if(! _.isNil(grid) && ! _.isNil(flowList)) {
+            refreshGridData();
         }
     }
 

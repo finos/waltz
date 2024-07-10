@@ -24,6 +24,7 @@ import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifec
 import template from "./logical-flows-tabgroup.html";
 import {entity} from "../../../common/services/enums/entity";
 import {loadFlowClassificationRatings} from "../../../flow-classification-rule/flow-classification-utils";
+import FlowDetailPanel from "../../../data-flow/components/svelte/flow-detail-tab/FlowDetailPanel.svelte";
 
 
 const bindings = {
@@ -37,7 +38,8 @@ const initialState = {
     visibility: {
         loadingFlows: false,
         loadingStats: false
-    }
+    },
+    FlowDetailPanel
 };
 
 function controller($q,
