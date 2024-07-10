@@ -79,6 +79,14 @@
 
             </uib-tab>
 
+            <uib-tab index="3"
+                     heading="Flow Detail (Beta)"
+                     select="$ctrl.tabSelected('flowDetail', 3)">
+                <waltz-svelte-component ng-if="$ctrl.currentTabIndex === 3"
+                                        parent-entity-ref="$ctrl.parentEntityRef"
+                                        component="$ctrl.FlowDetailPanel">
+                </waltz-svelte-component>
+            </uib-tab>
 
         </uib-tabset>
     </div>
