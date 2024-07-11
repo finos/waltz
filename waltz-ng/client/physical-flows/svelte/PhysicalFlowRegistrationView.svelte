@@ -62,7 +62,7 @@
             description: $physicalSpecification.description,
             format: $physicalSpecification.format,
             lastUpdatedBy: "waltz",
-            externalId: $physicalSpecification.externalId,
+            externalId: !_.isEmpty($physicalSpecification.externalId) ? $physicalSpecification.externalId : null,
             id: $physicalSpecification.id ? $physicalSpecification.id : null
         }
 
@@ -73,7 +73,7 @@
             basisOffset: $physicalFlow.basisOffset,
             criticality: $physicalFlow.criticality,
             description: $physicalFlow.description,
-            externalId: $physicalFlow.externalId
+            externalId: !_.isEmpty($physicalFlow.externalId) ? $physicalFlow.externalId : null
         }
 
         const command = {

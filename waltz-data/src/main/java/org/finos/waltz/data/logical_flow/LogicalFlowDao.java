@@ -109,7 +109,7 @@ public class LogicalFlowDao {
 
         return ImmutableLogicalFlow.builder()
                 .id(record.getId())
-                .externalId(Optional.ofNullable(record.getExternalId()))
+                .externalId(record.getExternalId())
                 .source(ImmutableEntityReference.builder()
                         .kind(EntityKind.valueOf(record.getSourceEntityKind()))
                         .id(record.getSourceEntityId())
@@ -151,6 +151,7 @@ public class LogicalFlowDao {
         record.setCreatedBy(flow.created().map(UserTimestamp::by).orElse(flow.lastUpdatedBy()));
         record.setIsReadonly(flow.isReadOnly());
         record.setIsRemoved(flow.isRemoved());
+        flow.externalId().ifPresent(record::setExternalId);
         return record;
     };
 
