@@ -34,7 +34,7 @@
             workingCopy = Object.assign({}, $physicalSpecification);
         } else {
             workingCopy = {
-                externalId: "",
+                externalId: null,
                 description: "",
                 format: null,
                 name: ""
