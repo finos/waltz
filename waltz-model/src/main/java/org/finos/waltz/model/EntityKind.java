@@ -60,6 +60,7 @@ public enum EntityKind {
     FLOW_CLASSIFICATION("Flow classification"),
     FLOW_DIAGRAM("Flow diagram"),
     INVOLVEMENT("Involvement"),
+    INVOLVEMENT_GROUP("Involvement Group"),
     INVOLVEMENT_KIND("Involvement kind"),
     LICENCE("Licence"),
     LEGAL_ENTITY("Legal Entity"),
@@ -107,7 +108,7 @@ public enum EntityKind {
     CAPABILITY("Capability"),  // TO BE REMOVED IN 1.5
 
     @Deprecated
-    AUTHORITATIVE_SOURCE("Authoritative source");  // TO BE REMOVED IN 1.36
+    AUTHORITATIVE_SOURCE("Authoritative source"); // TO BE REMOVED IN 1.36
 
 
     private final String prettyName;
