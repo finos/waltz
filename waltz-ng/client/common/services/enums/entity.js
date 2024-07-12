@@ -220,6 +220,13 @@ export const entity = {
         description: null,
         position: 1500
     },
+    INVOLVEMENT_GROUP: {
+        key: "INVOLVEMENT_GROUP",
+        name: "Involvement Group",
+        icon: "people-group",
+        description: null,
+        position: 1510
+    },
     INVOLVEMENT_KIND: {
         key: "INVOLVEMENT_KIND",
         name: "Involvement Kind",
@@ -317,6 +324,13 @@ export const entity = {
         icon: undefined,
         description: null,
         position: 1960
+    },
+    PERMISSION_GROUP: {
+        key: "PERMISSION_GROUP",
+        name: "Permission Group",
+        icon: "layer-group",
+        description: null,
+        position: 1970
     },
     PERSON: {
         key: "PERSON",

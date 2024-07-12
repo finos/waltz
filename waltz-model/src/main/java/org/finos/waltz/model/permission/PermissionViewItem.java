@@ -21,5 +21,7 @@ public interface PermissionViewItem {
 
     EntityReference involvementGroup();
 
+    EntityReference permissionGroup();
+
     EntityReference involvementKind();
 }

@@ -76,6 +76,7 @@ public enum EntityKind {
     MEASURABLE_RATING_REPLACEMENT("Measurable rating replacement"),
     ORG_UNIT("Organisational unit"),
     PERFORMANCE_METRIC_PACK("Performance metric pack"),
+    PERMISSION_GROUP("Permission Group"),
     PERSON("Person"),
     PHYSICAL_SPECIFICATION("Physical specification"),
     PHYSICAL_SPEC_DATA_TYPE_DECORATOR("Physical specification data type decorator"),
