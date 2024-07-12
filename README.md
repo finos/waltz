@@ -19,8 +19,6 @@ Getting started
 [![FINOS Hosted Platform - Waltz Demo](https://img.shields.io/badge/FINOS%20Hosted%20Platform-Waltz%20Demo-blue)](https://demo.waltz.finos.org/)
 [![postgres build](https://github.com/finos/waltz/actions/workflows/maven.yml/badge.svg)](https://github.com/finos/waltz/actions)
 [![Latest Version](https://badgers.space/github/release/finos/waltz)](https://github.com/finos/waltz/releases)
-[![Language Grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/khartec/waltz.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/khartec/waltz/context:javascript) 
-[![Language Grade: Java](https://img.shields.io/lgtm/grade/java/g/khartec/waltz.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/khartec/waltz/context:java)
 [![FINOS - Active](https://cdn.jsdelivr.net/gh/finos/contrib-toolbox@master/images/badge-active.svg)](https://finosfoundation.atlassian.net/wiki/display/FINOS/Active)
 
 ## Corporate Contributors
@@ -68,10 +66,9 @@ progress and done issues.
 
 **Provisional** dates for upcoming releases:
 
-| Release | Date          | Provisional Change Summary |
-|--------|---------------|----------------------------|
-| 1.61.1 | Jul 11th 2024 | Alias search, minor fixes  |
- | 1.62   | Jul 30th 2024 | Java 11, possible move to Javalin | 
+| Release | Date          | Provisional Change Summary        |
+|---------|---------------|-----------------------------------|
+| 1.62    | Jul 30th 2024 | Java 11, possible move to Javalin | 
 
 See the [releases](https://github.com/finos/waltz/releases) page for historic versions.
 
