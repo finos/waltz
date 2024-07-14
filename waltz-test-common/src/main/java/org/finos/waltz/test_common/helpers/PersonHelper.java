@@ -61,4 +61,15 @@ public class PersonHelper {
         return p.getId();
     }
 
+
+    public void updateManager(Long employee, Long manager) {
+        String mgrEmpId = dsl
+                .select(PERSON.EMPLOYEE_ID)
+                .from(PERSON)
+                .where(PERSON.ID.eq(manager))
+                .fetchOne(PERSON.EMPLOYEE_ID);
+        dsl.update(PERSON)
+                .set(PERSON.MANAGER_EMPLOYEE_ID, mgrEmpId)
+                .where(PERSON.ID.eq(employee)).execute();
+    }
 }
