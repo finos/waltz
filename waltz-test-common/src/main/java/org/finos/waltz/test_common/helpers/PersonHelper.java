@@ -70,6 +70,7 @@ public class PersonHelper {
                 .fetchOne(PERSON.EMPLOYEE_ID);
         dsl.update(PERSON)
                 .set(PERSON.MANAGER_EMPLOYEE_ID, mgrEmpId)
-                .where(PERSON.ID.eq(employee)).execute();
+                .where(PERSON.ID.eq(employee))
+                .execute();
     }
 }

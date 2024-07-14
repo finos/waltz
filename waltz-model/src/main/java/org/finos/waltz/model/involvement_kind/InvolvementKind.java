@@ -47,4 +47,9 @@ public abstract class InvolvementKind implements
 
     @Nullable
     public abstract String permittedRole();
+
+    @Value.Default
+    public boolean transitive() {
+        return true;
+    }
 }

@@ -20,10 +20,28 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
                    logicalFilePath="db.changelog-1.62.xml">
 
-
     <changeSet id="v1-61-tag"
                author="davidwatkins73">
         <tagDatabase tag="v1.61"/> <!-- tag the current db version, i.e. the last  -->
+    </changeSet>
+
+    <changeSet id="20240714-7099-1"
+               author="davidwatkins73">
+        <addColumn tableName="involvement_kind">
+            <column name="transitive"
+                    type="boolean"
+                    defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+    <changeSet id="20240714-7099-2"
+               author="davidwatkins73">
+        <setColumnRemarks tableName="involvement_kind"
+                          columnName="transitive"
+                          remarks="indicates if this involvment transitively rolls up the management chain"/>
     </changeSet>
 
 </databaseChangeLog>

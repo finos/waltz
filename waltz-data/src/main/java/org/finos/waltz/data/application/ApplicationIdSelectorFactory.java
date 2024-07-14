@@ -30,6 +30,7 @@ import org.finos.waltz.model.ImmutableIdSelectionOptions;
 import org.finos.waltz.schema.tables.Application;
 import org.finos.waltz.schema.tables.FlowDiagramEntity;
 import org.finos.waltz.schema.tables.Involvement;
+import org.finos.waltz.schema.tables.InvolvementKind;
 import org.finos.waltz.schema.tables.LogicalFlow;
 import org.finos.waltz.schema.tables.MeasurableRating;
 import org.finos.waltz.schema.tables.Person;
@@ -50,19 +51,7 @@ import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.model.EntityLifecycleStatus.REMOVED;
 import static org.finos.waltz.model.HierarchyQueryScope.EXACT;
-import static org.finos.waltz.schema.Tables.APPLICATION_GROUP_OU_ENTRY;
-import static org.finos.waltz.schema.Tables.DATABASE_USAGE;
-import static org.finos.waltz.schema.Tables.ENTITY_HIERARCHY;
-import static org.finos.waltz.schema.Tables.LEGAL_ENTITY_RELATIONSHIP;
-import static org.finos.waltz.schema.Tables.ORGANISATIONAL_UNIT;
-import static org.finos.waltz.schema.Tables.PHYSICAL_FLOW;
-import static org.finos.waltz.schema.Tables.PROCESS_DIAGRAM_ENTITY;
-import static org.finos.waltz.schema.Tables.SCENARIO_RATING_ITEM;
-import static org.finos.waltz.schema.Tables.SERVER_USAGE;
-import static org.finos.waltz.schema.Tables.SOFTWARE_USAGE;
-import static org.finos.waltz.schema.Tables.SOFTWARE_VERSION;
-import static org.finos.waltz.schema.Tables.SOFTWARE_VERSION_LICENCE;
-import static org.finos.waltz.schema.Tables.TAG_USAGE;
+import static org.finos.waltz.schema.Tables.*;
 import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static org.finos.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_GROUP_ENTRY;
 import static org.finos.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
@@ -83,6 +72,7 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
 
     private static final FlowDiagramEntity flowDiagram = FLOW_DIAGRAM_ENTITY.as("fd_aisf");
     private static final Involvement involvement = INVOLVEMENT.as("inv_aisf");
+    private static final InvolvementKind involvementKind = INVOLVEMENT_KIND.as("inv_kind_aisf");
     private static final LogicalFlow logicalFlow = LOGICAL_FLOW.as("lf_aisf");
     private static final MeasurableRating measurableRating = MEASURABLE_RATING.as("mr_aisf");
     private static final Person person = PERSON.as("p_aisf");
@@ -571,11 +561,13 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
         Condition condition = involvement.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
                 .and(involvement.EMPLOYEE_ID.eq(emp)
                         .or(involvement.EMPLOYEE_ID.in(reporteeIds)))
-                .and(applicationConditions);
+                .and(applicationConditions)
+                .and(involvementKind.TRANSITIVE.isTrue().or(involvement.EMPLOYEE_ID.eq(emp)));
 
         return DSL
                 .selectDistinct(involvement.ENTITY_ID)
                 .from(involvement)
+                .innerJoin(involvementKind).on(involvementKind.ID.eq(involvement.KIND_ID))
                 .innerJoin(app)
                     .on(app.ID.eq(involvement.ENTITY_ID))
                 .where(condition);

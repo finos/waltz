@@ -81,6 +81,7 @@ public class InvolvementKindDao {
                 .userSelectable(record.getUserSelectable())
                 .subjectKind(EntityKind.valueOf(record.getSubjectKind()))
                 .permittedRole(record.getPermittedRole())
+                .transitive(record.getTransitive())
                 .build();
     };
 
@@ -95,6 +96,7 @@ public class InvolvementKindDao {
         record.setUserSelectable(ik.userSelectable());
         record.setSubjectKind(ik.subjectKind().name());
         record.setPermittedRole(ik.permittedRole());
+        record.setTransitive(ik.transitive());
 
         ik.externalId().ifPresent(record::setExternalId);
         ik.id().ifPresent(record::setId);
@@ -174,6 +176,7 @@ public class InvolvementKindDao {
         command.externalId().ifPresent(change -> record.setExternalId(change.newVal()));
         command.userSelectable().ifPresent(change -> record.setUserSelectable(change.newVal()));
         command.permittedRole().ifPresent(change -> record.setPermittedRole(change.newVal()));
+        command.transitive().ifPresent(change -> record.setTransitive(change.newVal()));
 
         UserTimestamp lastUpdate = command.lastUpdate().orElseThrow(() -> new IllegalStateException("InvolvementChangeCommand must have a last update timestamp"));
         record.setLastUpdatedAt(Timestamp.valueOf(lastUpdate.at()));

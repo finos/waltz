@@ -3,8 +3,10 @@ package org.finos.waltz.test_common.helpers;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.command.ImmutableFieldChange;
 import org.finos.waltz.model.involvement.EntityInvolvementChangeCommand;
 import org.finos.waltz.model.involvement.ImmutableEntityInvolvementChangeCommand;
+import org.finos.waltz.model.involvement_kind.ImmutableInvolvementKindChangeCommand;
 import org.finos.waltz.model.involvement_kind.ImmutableInvolvementKindCreateCommand;
 import org.finos.waltz.model.involvement_kind.InvolvementKindCreateCommand;
 import org.finos.waltz.service.involvement.InvolvementService;
@@ -46,5 +48,19 @@ public class InvolvementHelper {
                 .operation(Operation.ADD)
                 .build();
         involvementService.addEntityInvolvement(NameHelper.mkUserId(), entity, cmd);
+    }
+
+
+    public void markAsIntransitive(long kindId) {
+        involvementKindService.update(
+                ImmutableInvolvementKindChangeCommand
+                        .builder()
+                        .id(kindId)
+                        .transitive(ImmutableFieldChange.<Boolean>builder()
+                                .oldVal(true)
+                                .newVal(false)
+                                .build())
+                        .build(),
+                "admin");
     }
 }
