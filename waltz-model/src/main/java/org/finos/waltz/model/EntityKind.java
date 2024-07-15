@@ -60,6 +60,7 @@ public enum EntityKind {
     FLOW_CLASSIFICATION("Flow classification"),
     FLOW_DIAGRAM("Flow diagram"),
     INVOLVEMENT("Involvement"),
+    INVOLVEMENT_GROUP("Involvement Group"),
     INVOLVEMENT_KIND("Involvement kind"),
     LICENCE("Licence"),
     LEGAL_ENTITY("Legal Entity"),
@@ -75,6 +76,7 @@ public enum EntityKind {
     MEASURABLE_RATING_REPLACEMENT("Measurable rating replacement"),
     ORG_UNIT("Organisational unit"),
     PERFORMANCE_METRIC_PACK("Performance metric pack"),
+    PERMISSION_GROUP("Permission Group"),
     PERSON("Person"),
     PHYSICAL_SPECIFICATION("Physical specification"),
     PHYSICAL_SPEC_DATA_TYPE_DECORATOR("Physical specification data type decorator"),
@@ -107,7 +109,7 @@ public enum EntityKind {
     CAPABILITY("Capability"),  // TO BE REMOVED IN 1.5
 
     @Deprecated
-    AUTHORITATIVE_SOURCE("Authoritative source");  // TO BE REMOVED IN 1.36
+    AUTHORITATIVE_SOURCE("Authoritative source"); // TO BE REMOVED IN 1.36
 
 
     private final String prettyName;
