@@ -26,10 +26,6 @@ $: grouped = _
     .map((v, k) => ({k, v}))
     .orderBy(d => d.k)
     .value();
-
-$: console.log({raw, grouped})
-
-
 </script>
 
 <PageHeader icon="users-rectangle"
@@ -57,6 +53,8 @@ $: console.log({raw, grouped})
     </div>
 
     <div class="row waltz-sticky-wrapper">
+
+        <!-- MAIN -->
         <div class="col-md-8">
             <table class="table table-condensed table-striped table-hover small">
                 <thead>
@@ -83,13 +81,40 @@ $: console.log({raw, grouped})
                 </tbody>
             </table>
         </div>
+
+        <!-- CONTEXT -->
         <div class="col-md-4">
-            {#if !_.isNil(selectedValues)}
+            {#if _.isNil(selectedValues)}
+                <div class="waltz-sticky-part help-block">
+                    <h4>Help</h4>
+                    <dl>
+                        <dt>Subject</dt>
+                        <dd>The subject entity kind relates to the class of entity the permission applies to.  Subsequent columns refine this selection.</dd>
+                        <dt>Qualifier</dt>
+                        <dd>The optional qualifier refines the subject kind, for instance if the subject was a Viewpoint rating the qualifier would indicate which measurable category the permissions apply to.</dd>
+                        <dt>Primary Kind</dt>
+                        <dd>The entity kind the subject/qualifier applies to/  Used when a subject entity is owned but different kinds of entity, for example a flow can be owned by applications, actors and end user applications.</dd>
+                        <dt>Operation</dt>
+                        <dd>The type of operation being performed, one of:
+                            <ul>
+                                <li>ADD - creating new entries</li>
+                                <li>REMOVE - removing existing entries</li>
+                                <li>UPDATE - updating existing entries</li>
+                                <li>ATTEST - attesting entries, only applicable for Flows and Viewpoint Ratings</li>
+                            </ul>
+                        </dd>
+                    </dl>
+                    <hr>
+                    Once you select a row you this panel will be replaced with a detail view.
+                    This view shows the permission groups, which contain involvement groups, which then contain specific involvement kinds.
+                    This sum list of involvement kinds show which users (via their involvements) can perform the operation on the specified set of entities.
+                </div>
+            {:else}
                 {@const d = selectedValues[0]}
                 {@const permissionGroups = _.chain(selectedValues).map(d => d.permissionGroup).uniqBy(d => d.id).value()}
 
                 <div class="waltz-sticky-part">
-                    Overview:
+                    <h4>Overview</h4>
 
                     <table class="table table-condensed small table-striped">
                         <tbody>
@@ -120,7 +145,7 @@ $: console.log({raw, grouped})
                         </tbody>
                     </table>
 
-                    Permission Groups:
+                    <h4>Permissions</h4>
 
                     <table class="table table-condensed table-striped small">
                         <thead>
@@ -156,6 +181,10 @@ $: console.log({raw, grouped})
 
         </div>
     </div>
-
 </div>
 
+<style>
+    dd {
+        padding-bottom: 0.6em;
+    }
+</style>
