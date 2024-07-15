@@ -2,6 +2,8 @@
 
     import _ from "lodash";
     import Icon from "../../../common/svelte/Icon.svelte";
+    import {entity} from "../../../common/services/enums/entity";
+    import EntityIcon from "../../../common/svelte/EntityIcon.svelte";
 
     export let onCancel;
     export let onSave;
@@ -14,7 +16,8 @@
         description: involvementKind.description,
         name: involvementKind.name,
         userSelectable: involvementKind.userSelectable,
-        permittedRole: involvementKind.permittedRole
+        permittedRole: involvementKind.permittedRole,
+        transitive: involvementKind.transitive
     });
 
     function cancel() {
@@ -29,73 +32,113 @@
 
 </script>
 
-<div class="row">
-    <div class="col-sm-2">
-        Name
+<form autocomplete="off"
+      on:submit|preventDefault={() => onSave(working, initialVal)}>
+    <div class="row">
+        <div class="col-sm-3">
+            Name *
+        </div>
+        <div class="col-sm-9">
+            <input class="form-control"
+                   id="name"
+                   required
+                   placeholder="Name"
+                   bind:value={working.name}>
+        </div>
     </div>
-    <div class="col-sm-10">
-        <input class="form-control"
-               id="name"
-               placeholder="Name"
-               bind:value={working.name}>
+    <div class="row">
+        <div class="col-sm-3 waltz-display-field-label">
+            Subject Kind
+        </div>
+        <div class="col-sm-9">
+            <EntityIcon kind={involvementKind?.subjectKind}/>
+            {_.get(entity, [involvementKind?.subjectKind, "name"], "-")}
+            <div class="help-block">
+                Indicates what type of entity this involvement can be attached to.
+                Note, this cannot be edited once the involvement kind has been created.
+            </div>
+        </div>
     </div>
-</div>
-<div class="row">
-    <div class="col-sm-2">
-        Description
+    <div class="row">
+        <div class="col-sm-3">
+            Description *
+        </div>
+        <div class="col-sm-9">
+            <input class="form-control"
+                   id="desc"
+                   required
+                   placeholder="Description"
+                   bind:value={working.description}>
+        </div>
     </div>
-    <div class="col-sm-10">
-        <input class="form-control"
-               id="desc"
-               placeholder="Description"
-               bind:value={working.description}>
+    <div class="row">
+        <div class="col-sm-3">
+            External Id *
+        </div>
+        <div class="col-sm-9">
+            <input class="form-control"
+                   id="extId"
+                   required
+                   placeholder="External Id"
+                   bind:value={working.externalId}>
+        </div>
     </div>
-</div>
-<div class="row">
-    <div class="col-sm-2">
-        External Id
+    <div class="row">
+        <div class="col-sm-3">
+            Transitive
+        </div>
+        <div class="col-sm-9">
+            <input id="transitive"
+                   type="checkbox"
+                   checked={working.transitive}
+                   on:click={() => working.transitive = !working.transitive}>
+            <div class="help-block">
+                Transitive involvements are used when involvements assigned to people in a managers reporting tree should also be reported against the manager.
+            </div>
+        </div>
     </div>
-    <div class="col-sm-10">
-        <input class="form-control"
-               id="extId"
-               placeholder="External Id"
-               bind:value={working.externalId}>
+    <div class="row">
+        <div class="col-sm-3">
+            User Selectable
+        </div>
+        <div class="col-sm-9">
+            <input id="userSelectable"
+                   type="checkbox"
+                   checked={working.userSelectable}
+                   on:click={() => working.userSelectable = !working.userSelectable}>
+            <div class="help-block">
+                If checked then this involvement can be set by users (subject to the permitted role restriction)
+            </div>
+        </div>
     </div>
-</div>
-<div class="row">
-    <div class="col-sm-2">
-        User Selectable
+    <div class="row">
+        <div class="col-sm-3">
+            Permitted Role
+        </div>
+        <div class="col-sm-9">
+            <input class="form-control"
+                   id="permittedRole"
+                   placeholder="Permitted Role"
+                   bind:value={working.permittedRole}>
+            <div class="help-block">
+                If set, then the editing user must have this role to assign this involvement
+            </div>
+        </div>
     </div>
-    <div class="col-sm-10">
-        <input id="userSelectable"
-               type="checkbox"
-               checked={working.userSelectable}
-               on:click={() => working.userSelectable = !working.userSelectable}>
+    <div class="row">
+        <div class="col-sm-12">
+            <button class="btn btn-skinny"
+                   type="submit"
+                    disabled={invalidKind}
+                    on:click={() => onSave(working, initialVal)}>
+                <Icon name="floppy-o"/>
+                Save
+            </button>
+            <button class="btn btn-skinny"
+                    on:click={() => cancel()}>
+                <Icon name="ban"/>
+                Cancel
+            </button>
+        </div>
     </div>
-</div>
-<div class="row">
-    <div class="col-sm-2">
-        Permitted Role
-    </div>
-    <div class="col-sm-10">
-        <input class="form-control"
-               id="permittedRole"
-               placeholder="Permitted Role"
-               bind:value={working.permittedRole}>
-    </div>
-</div>
-<div class="row">
-    <div class="col-sm-12">
-        <button class="btn btn-skinny"
-                disabled={invalidKind}
-                on:click={() => onSave(working, initialVal)}>
-            <Icon name="floppy-o"/>
-            Save
-        </button>
-        <button class="btn btn-skinny"
-                on:click={() => cancel()}>
-            <Icon name="ban"/>
-            Cancel
-        </button>
-    </div>
-</div>
+</form>
