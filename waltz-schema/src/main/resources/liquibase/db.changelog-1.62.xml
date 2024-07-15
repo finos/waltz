@@ -44,4 +44,17 @@
                           remarks="indicates if this involvment transitively rolls up the management chain"/>
     </changeSet>
 
+    <changeSet id="20240714-7099-3"
+               author="davidwatkins73">
+        <setColumnRemarks tableName="involvement_kind"
+                          columnName="subject_kind"
+                          remarks="Indicates what type of entity this involvement can be attached to"/>
+        <setColumnRemarks tableName="involvement_kind"
+                          columnName="name"
+                          remarks="Short, descriptive name for this involvement"/>
+        <setColumnRemarks tableName="involvement_kind"
+                          columnName="permitted_role"
+                          remarks="If set, then the editing user must have this role to assign this involvement"/>
+    </changeSet>
+
 </databaseChangeLog>

@@ -51,13 +51,19 @@
             oldVal: initialVal.permittedRole
         };
 
+        const transitive = {
+            newVal: working.transitive,
+            oldVal: initialVal.transitive
+        };
+
         const change = Object.assign({}, {
             id: initialVal.id,
             name,
             description,
             externalId,
             userSelectable,
-            permittedRole
+            permittedRole,
+            transitive
         });
 
         return involvementKindStore
