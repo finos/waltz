@@ -33,6 +33,7 @@ import EudaListView from "./euda-list-view";
 import RelationshipKindsView from "./relationship-kinds-view";
 import ReassignRecipientsView from "./reassign-recipients-view";
 import ColorGradientView from "./color-gradient-view";
+import PermissionsView from "./permissions-view";
 import NavAidBuilderView from "./nav-aid-builder-view";
 import VersionInfoView from "./version-info-view";
 import LicencesAdminView from "./licences-view";
@@ -162,6 +163,11 @@ const diagramBuilderState = {
     views: {"content@": DiagramBuilderView}
 };
 
+const permissionsState = {
+    url: "/permissions",
+    views: {"content@": PermissionsView}
+};
+
 
 function setupRoutes($stateProvider) {
     $stateProvider
@@ -179,6 +185,7 @@ function setupRoutes($stateProvider) {
         .state("main.system.nav-aids", navAidAdminState)
         .state("main.system.nav-aid-builder", navAidBuilderState)
         .state("main.system.orphans", orphansState)
+        .state("main.system.permissions", permissionsState)
         .state("main.system.rating-schemes", ratingSchemesState)
         .state("main.system.reassign-recipients", reassignRecipientsState)
         .state("main.system.recalculate", recalculateState)
