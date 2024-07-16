@@ -3,7 +3,6 @@ package org.finos.waltz.model.involvement_kind;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.EntityReference;
 import org.immutables.value.Value;
 
 import javax.swing.text.html.parser.Entity;
@@ -24,6 +23,6 @@ public abstract class InvolvementKindUsageStat {
 
     public abstract Set<Stat> breakdown();
 
-    public abstract EntityReference involvementKind();
+    public abstract InvolvementKind involvementKind();
 
 }

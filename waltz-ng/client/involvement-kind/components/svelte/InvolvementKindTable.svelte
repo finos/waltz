@@ -90,6 +90,7 @@
         <tr>
             <th>Involvement Kind</th>
             <th>External ID</th>
+            <th>Transitive</th>
             <th>Usage Stats By Entity (Active / Removed People)</th>
         </tr>
         </thead>
@@ -101,6 +102,9 @@
                 </td>
                 <td>
                     {statInfo.involvementKind.externalId || "-"}
+                </td>
+                <td>
+                    {statInfo.involvementKind.transitive}
                 </td>
                 <td>
                     <InvolvementBreakdown breakdownStats={statInfo.breakdown}/>

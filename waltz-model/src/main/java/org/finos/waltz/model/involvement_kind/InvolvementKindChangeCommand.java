@@ -42,4 +42,6 @@ public abstract class InvolvementKindChangeCommand implements EntityChangeComman
 
     public abstract Optional<FieldChange<String>> permittedRole();
 
+    public abstract Optional<FieldChange<Boolean>> transitive();
+
 }

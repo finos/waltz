@@ -81,6 +81,7 @@ public class InvolvementKindDao {
                 .userSelectable(record.getUserSelectable())
                 .subjectKind(EntityKind.valueOf(record.getSubjectKind()))
                 .permittedRole(record.getPermittedRole())
+                .transitive(record.getTransitive())
                 .build();
     };
 
@@ -95,6 +96,7 @@ public class InvolvementKindDao {
         record.setUserSelectable(ik.userSelectable());
         record.setSubjectKind(ik.subjectKind().name());
         record.setPermittedRole(ik.permittedRole());
+        record.setTransitive(ik.transitive());
 
         ik.externalId().ifPresent(record::setExternalId);
         ik.id().ifPresent(record::setId);
@@ -174,6 +176,7 @@ public class InvolvementKindDao {
         command.externalId().ifPresent(change -> record.setExternalId(change.newVal()));
         command.userSelectable().ifPresent(change -> record.setUserSelectable(change.newVal()));
         command.permittedRole().ifPresent(change -> record.setPermittedRole(change.newVal()));
+        command.transitive().ifPresent(change -> record.setTransitive(change.newVal()));
 
         UserTimestamp lastUpdate = command.lastUpdate().orElseThrow(() -> new IllegalStateException("InvolvementChangeCommand must have a last update timestamp"));
         record.setLastUpdatedAt(Timestamp.valueOf(lastUpdate.at()));
@@ -216,11 +219,8 @@ public class InvolvementKindDao {
 
         return dsl
                 .with(userStatsCTE)
-                .select(ik.ID,
-                        ik.NAME,
-                        ik.EXTERNAL_ID,
-                        ik.DESCRIPTION,
-                        entityKindField,
+                .select(ik.fields())
+                .select(entityKindField,
                         personIsRemovedField,
                         personCountField)
                 .from(ik)
@@ -228,12 +228,7 @@ public class InvolvementKindDao {
                 .fetch()
                 .stream()
                 .collect(groupingBy(
-                        r -> mkRef(
-                                EntityKind.INVOLVEMENT_KIND,
-                                r.get(ik.ID),
-                                r.get(ik.NAME),
-                                r.get(ik.DESCRIPTION),
-                                r.get(ik.EXTERNAL_ID)),
+                        InvolvementKindDao.TO_DOMAIN_MAPPER::map,
                         mapping(
                                 r -> r.get(entityKindField) == null
                                         ? null
@@ -267,6 +262,12 @@ public class InvolvementKindDao {
         Involvement inv = INVOLVEMENT;
         Person p = PERSON;
 
+        InvolvementKind involvementKind = dsl
+                .select(ik.fields())
+                .from(ik)
+                .where(ik.ID.eq(kindId))
+                .fetchOne(InvolvementKindDao.TO_DOMAIN_MAPPER);
+
         SelectHavingStep<Record4<Long, String, Boolean, Integer>> qry = dsl
                 .select(ik.ID, inv.ENTITY_KIND, p.IS_REMOVED, DSL.countDistinct(inv.EMPLOYEE_ID).as("person_count"))
                 .from(inv)
@@ -285,16 +286,16 @@ public class InvolvementKindDao {
                             ? null
                             : ImmutableStat
                             .builder()
-                            .entityKind(EntityKind.valueOf(entityKind))
-                            .isCountOfRemovedPeople(r.get(p.IS_REMOVED))
-                            .personCount(r.get("person_count", Integer.class))
-                            .build();
+                                .entityKind(EntityKind.valueOf(entityKind))
+                                .isCountOfRemovedPeople(r.get(p.IS_REMOVED))
+                                .personCount(r.get("person_count", Integer.class))
+                                .build();
                 })
                 .filter(Objects::nonNull)
                 .collect(toSet());
 
         return ImmutableInvolvementKindUsageStat.builder()
-                .involvementKind(mkRef(EntityKind.INVOLVEMENT_KIND, kindId))
+                .involvementKind(involvementKind)
                 .breakdown(statsForKind)
                 .build();
     }
