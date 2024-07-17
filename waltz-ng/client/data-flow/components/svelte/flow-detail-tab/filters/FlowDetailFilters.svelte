@@ -14,6 +14,7 @@ export let dataTypes = [];
 export let assessmentFilters = [];
 export let physicalFlows = [];
 export let flowClassifications = [];
+export let isAggregateView = false;
 
 
 $: classificationFilter = _.find($filters, d => d.kind === FilterKinds.FLOW_CLASSIFICATION);
@@ -32,18 +33,20 @@ $: directionFilter = _.find($filters, d => d.kind === FilterKinds.DIRECTION);
         {/if}
     </summary>
 
-    <details class="filter-set" style="margin-top: 1em">
-        <summary>
-            <Icon name="random"/> Flow Direction
-            {#if !_.isEqual(_.get(directionFilter, ["direction"], Directions.ALL), Directions.ALL)}
-                <span style="color: darkorange"
-                      title="Flows have been filtered by direction">
-                    <Icon name="exclamation-circle"/>
-                </span>
-            {/if}
-        </summary>
-        <InboundOutboundFilters/>
-    </details>
+    {#if isAggregateView === false}
+        <details class="filter-set" style="margin-top: 1em">
+            <summary>
+                <Icon name="random"/> Flow Direction
+                {#if !_.isEqual(_.get(directionFilter, ["direction"], Directions.ALL), Directions.ALL)}
+                    <span style="color: darkorange"
+                          title="Flows have been filtered by direction">
+                        <Icon name="exclamation-circle"/>
+                    </span>
+                {/if}
+            </summary>
+            <InboundOutboundFilters/>
+        </details>
+    {/if}
 
     <details class="filter-set" style="margin-top: 1em">
         <summary>
