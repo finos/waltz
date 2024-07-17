@@ -27,7 +27,7 @@
 
     $: displayedSettings  = _.isEmpty(qry)
         ? settings
-        : termSearch(settings, qry, ["name", "value", "description"])
+        : termSearch(settings, qry, ["name", "value", "description"]);
 
     $: canEdit = _.includes(user?.roles, 'ADMIN');
 
@@ -39,8 +39,9 @@
     function updateSetting() {
         const cmd = {
             name: workingSetting.name,
-            value: workingSetting.value
-        }
+            value: workingSetting.value,
+            description: workingSetting.description
+        };
 
         let updatePromise = settingsStore.update(cmd);
 
@@ -150,7 +151,26 @@
                         {/if}
                     </td>
                     <td class="text-muted">
-                        {setting.description || ""}
+                        {#if editing && workingSetting?.name === setting?.name}
+                            <input class="form-control"
+                                   id="description"
+                                   maxlength="4000"
+                                   placeholder="Description for this setting"
+                                   bind:value={workingSetting.description}/>
+                            <div style="padding-top: 1em">
+                                <button class="btn btn-success btn-xs"
+                                        disabled={workingSetting?.description === setting?.description}
+                                        on:click={() => updateSetting()}>
+                                    <Icon name="floppy-o"/> Save
+                                </button>
+                                <button class="btn btn-skinny btn-xs"
+                                        on:click={() => cancel()}>
+                                    Cancel
+                                </button>
+                            </div>
+                        {:else}
+                            {setting.description || ""}
+                        {/if}
                     </td>
                     <td>
                         {#if setting.restricted}

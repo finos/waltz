@@ -91,6 +91,7 @@ public class SettingsDao {
         return dsl
                 .update(SETTINGS)
                 .set(SETTINGS.VALUE, cmd.value())
+                .set(SETTINGS.DESCRIPTION, cmd.description())
                 .where(SETTINGS.NAME.eq(cmd.name()))
                 .and(SETTINGS.RESTRICTED.isFalse())
                 .execute();
