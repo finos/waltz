@@ -44,6 +44,17 @@
     let physicalFlows = [];
     let logicalFlows = [];
 
+    function determineIfAggregateView(ref) {
+        switch (ref.kind) {
+            case "APPLICATION":
+            case "END_USER_APPLICATION":
+            case "ACTOR":
+                return false;
+            default:
+                return true;
+        }
+    }
+
     onMount(() => {
         resetFlowDetailsStore();
         flowClassificationCall = flowClassificationStore.findAll();
@@ -92,6 +103,9 @@
             flowViewCall = logicalFlowStore.getViewForSelector(selectionOptions);
         }
     }
+
+    $: isAggregateView = parentEntityRef && determineIfAggregateView(parentEntityRef);
+
 </script>
 
 
@@ -108,7 +122,8 @@
             <FlowDetailFilters {dataTypes}
                                {assessmentFilters}
                                {flowClassifications}
-                               {physicalFlows}/>
+                               {physicalFlows}
+                               {isAggregateView}/>
 
             <LogicalFlowTable {logicalFlows}
                               {flowClassifications}
