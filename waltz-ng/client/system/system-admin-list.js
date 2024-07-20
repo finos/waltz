@@ -56,6 +56,12 @@ const userManagementOptions = [
         description: "View and create custom roles to manage user access",
         state: "main.role.list",
         icon: "users"
+    }, {
+        name: "Fine grained permissions",
+        role: "USER_ADMIN",
+        description: "View and create fine grained permissions to users",
+        state: "main.system.permissions",
+        icon: "users-rectangle"
     }
 ];
 
