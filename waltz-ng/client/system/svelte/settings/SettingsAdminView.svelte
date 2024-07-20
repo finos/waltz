@@ -27,7 +27,7 @@
 
     $: displayedSettings  = _.isEmpty(qry)
         ? settings
-        : termSearch(settings, qry, ["name", "value", "description"])
+        : termSearch(settings, qry, ["name", "value", "description"]);
 
     $: canEdit = _.includes(user?.roles, 'ADMIN');
 
@@ -39,8 +39,9 @@
     function updateSetting() {
         const cmd = {
             name: workingSetting.name,
-            value: workingSetting.value
-        }
+            value: workingSetting.value,
+            description: workingSetting.description
+        };
 
         let updatePromise = settingsStore.update(cmd);
 
@@ -123,20 +124,21 @@
             </thead>
             <tbody>
             {#each _.orderBy(displayedSettings, d => d.name) as setting}
-                <tr class:editing={editing && workingSetting?.name === setting?.name}>
-                    <td class="text-muted">
-                        {setting.name}
-                    </td>
-                    <td>
-                        {#if editing && workingSetting?.name === setting?.name}
-                            <input class="form-control"
-                                   id="value"
-                                   maxlength="4000"
-                                   placeholder="Value for this setting"
-                                   bind:value={workingSetting.value}/>
+                {#if editing && workingSetting?.name === setting?.name}
+                    <tr class="editing">
+                        <td class="text-muted">
+                            {setting.name}
+                        </td>
+                        <td>
+                            <textarea class="form-control"
+                                      id="value"
+                                      rows="1"
+                                      maxlength="4000"
+                                      placeholder="Value for this setting"
+                                      bind:value={workingSetting.value}></textarea>
                             <div style="padding-top: 1em">
                                 <button class="btn btn-success btn-xs"
-                                        disabled={workingSetting?.value === setting?.value}
+                                        disabled={workingSetting?.value === setting?.value && workingSetting?.description === setting?.description }
                                         on:click={() => updateSetting()}>
                                     <Icon name="floppy-o"/> Save
                                 </button>
@@ -145,29 +147,45 @@
                                     Cancel
                                 </button>
                             </div>
-                        {:else}
+                        </td>
+                        <td colspan="2">
+                            <textarea class="form-control"
+                                      id="description"
+                                      rows="1"
+                                      maxlength="4000"
+                                      placeholder="Description for this setting"
+                                      bind:value={workingSetting.description}></textarea>
+
+                        </td>
+                    </tr>
+                {:else}
+                     <tr>
+                        <td class="text-muted">
+                            {setting.name}
+                        </td>
+                        <td>
                             {setting.value}
-                        {/if}
-                    </td>
-                    <td class="text-muted">
-                        {setting.description || ""}
-                    </td>
-                    <td>
-                        {#if setting.restricted}
-                            <div class="text-muted"
-                                 title="This setting is restricted and cannot be edited">
-                                <Icon name="lock"/>
-                            </div>
-                        {:else }
-                            <button class="btn btn-skinny"
-                                    disabled={!canEdit || editing}
-                                    title={determineTitle(editing, canEdit)}
-                                    on:click={() => editSetting(setting)}>
-                                <Icon name="pencil"/>
-                            </button>
-                        {/if}
-                    </td>
-                </tr>
+                        </td>
+                        <td>
+                            {setting.description || ""}
+                        </td>
+                        <td>
+                            {#if setting.restricted}
+                                <div class="text-muted"
+                                     title="This setting is restricted and cannot be edited">
+                                    <Icon name="lock"/>
+                                </div>
+                            {:else }
+                                <button class="btn btn-skinny"
+                                        disabled={!canEdit || editing}
+                                        title={determineTitle(editing, canEdit)}
+                                        on:click={() => editSetting(setting)}>
+                                    <Icon name="pencil"/>
+                                </button>
+                            {/if}
+                        </td>
+                    </tr>
+                {/if}
             {:else}
                 <tr>
                     <td colspan="4">
