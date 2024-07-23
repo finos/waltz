@@ -67,6 +67,7 @@ public class InlineSelectFieldFactory {
             EntityKind.PERSON,
             EntityKind.PHYSICAL_FLOW,
             EntityKind.PHYSICAL_SPECIFICATION,
+            EntityKind.ROLE,
             EntityKind.SERVER,
             EntityKind.SOFTWARE);
 
@@ -95,6 +96,7 @@ public class InlineSelectFieldFactory {
             EntityKind.PERSON,
             EntityKind.PHYSICAL_FLOW,
             EntityKind.PHYSICAL_SPECIFICATION,
+            EntityKind.ROLE,
             EntityKind.SERVER,
             EntityKind.SOFTWARE);
 
@@ -123,6 +125,7 @@ public class InlineSelectFieldFactory {
             EntityKind.PERSON,
             EntityKind.PHYSICAL_FLOW,
             EntityKind.PHYSICAL_SPECIFICATION,
+            EntityKind.ROLE,
             EntityKind.SERVER,
             EntityKind.SOFTWARE);
 

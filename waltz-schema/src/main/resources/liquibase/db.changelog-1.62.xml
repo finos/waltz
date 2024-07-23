@@ -57,4 +57,61 @@
                           remarks="If set, then the editing user must have this role to assign this involvement"/>
     </changeSet>
 
+
+    <changeSet id="20240722-7118-1"
+               author="davidwatkins73">
+        <comment>7118: dropping the 'key' foreign key constraint to user_role</comment>
+        <dropForeignKeyConstraint baseTableName="user_role"
+                                  constraintName="user_role_role_key_fk"/>
+    </changeSet>
+
+    <changeSet id="20240722-7118-2"
+               author="davidwatkins73">
+        <comment>7118: dropping the 'key' column as the primary key </comment>
+        <dropPrimaryKey tableName="role"/>
+        <rollback>
+            <addPrimaryKey columnNames="role"
+                           constraintName="role_pkey"
+                           tableName="role"/>
+        </rollback>
+    </changeSet>
+
+
+    <changeSet id="20240722-7118-3"
+               author="davidwatkins73">
+        <comment>7118: making the 'key' column unique</comment>
+        <createIndex indexName="idx_role_key"
+                     tableName="role"
+                     unique="true">
+            <column name="key"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20240722-7118-4"
+               author="davidwatkins73"
+               dbms="!h2">
+        <comment>7118: recreate the 'key' foreign key constraint to user_role</comment>
+        <addForeignKeyConstraint baseTableName="user_role"
+                                 baseColumnNames="role"
+                                 constraintName="user_role_role_key_fk"
+                                 referencedTableName="role"
+                                 referencedColumnNames="key"
+                                 referencesUniqueColumn="true"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="20240722-7118-5"
+               author="davidwatkins73">
+        <comment>7118: adding a new 'id' column and making it the pk</comment>
+        <addColumn tableName="role">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+            </column>
+        </addColumn>
+        <addPrimaryKey columnNames="id"
+                       constraintName="role_pkey"
+                       tableName="role"/>
+    </changeSet>
+
 </databaseChangeLog>

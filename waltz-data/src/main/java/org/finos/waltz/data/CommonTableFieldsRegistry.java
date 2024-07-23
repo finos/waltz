@@ -34,6 +34,7 @@ import org.finos.waltz.schema.tables.OrganisationalUnit;
 import org.finos.waltz.schema.tables.Person;
 import org.finos.waltz.schema.tables.PhysicalFlow;
 import org.finos.waltz.schema.tables.PhysicalSpecification;
+import org.finos.waltz.schema.tables.Role;
 import org.finos.waltz.schema.tables.ServerInformation;
 import org.finos.waltz.schema.tables.SoftwarePackage;
 import org.finos.waltz.schema.tables.SurveyQuestion;
@@ -394,6 +395,18 @@ public class CommonTableFieldsRegistry {
                         .descriptionField(ps.DESCRIPTION)
                         .externalIdField(ps.EXTERNAL_ID)
                         .lifecycleField(DSL.when(ps.IS_REMOVED.isTrue(), EntityLifecycleStatus.REMOVED.name()).otherwise(EntityLifecycleStatus.ACTIVE.name()))
+                        .build();
+            case ROLE:
+                Role role = alias == null ? Tables.ROLE : Tables.ROLE.as(alias);
+                return ImmutableCommonTableFields
+                        .builder()
+                        .entityKind(EntityKind.ROLE)
+                        .table(role)
+                        .idField(role.ID)
+                        .parentIdField(null)
+                        .nameField(role.NAME)
+                        .descriptionField(role.DESCRIPTION)
+                        .externalIdField(role.KEY)
                         .build();
             case SERVER:
                 ServerInformation srv = alias == null ? Tables.SERVER_INFORMATION : Tables.SERVER_INFORMATION.as(alias);

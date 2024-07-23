@@ -32,16 +32,17 @@
     let searchStr = "";
 
     let entityList = [
+        entity.ACTOR,
+        entity.APP_GROUP,
         entity.APPLICATION,
         entity.CHANGE_INITIATIVE,
-        entity.ORG_UNIT,
-        entity.ACTOR,
-        entity.MEASURABLE,
-        entity.MEASURABLE_CATEGORY,
-        entity.APP_GROUP,
         entity.DATA_TYPE,
         entity.END_USER_APPLICATION,
-        entity.PHYSICAL_FLOW
+        entity.MEASURABLE,
+        entity.MEASURABLE_CATEGORY,
+        entity.ORG_UNIT,
+        entity.PHYSICAL_FLOW,
+        entity.ROLE
     ];
 
     $: involvementStatCall = involvementKindStore.findUsageStats();

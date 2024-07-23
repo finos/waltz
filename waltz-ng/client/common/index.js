@@ -57,6 +57,17 @@ export function randomPick(xs) {
 }
 
 
+export function simpleTermSearch(data = [], qry) {
+    if (_.isEmpty(qry)) return data;
+    if (_.isEmpty(data)) return [];
+    const terms = _.map(_.split(qry, " "), t => t.toLowerCase());
+
+    return _.filter(
+        data,
+        d => !_.isNil(d) && _.every(terms, t => d.toLowerCase().indexOf(t) > -1));
+}
+
+
 /**
  *
  * @param items - items to be searched

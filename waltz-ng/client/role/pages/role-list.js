@@ -16,17 +16,26 @@
  *
  */
 
-import {CORE_API} from "../common/services/core-api-utils";
-import template from "./custom-role.html";
-import {displayError} from "../common/error-utils";
-import toasts from "../svelte-stores/toast-store";
+import {CORE_API} from "../../common/services/core-api-utils";
+import template from "./role-list.html";
+import {displayError} from "../../common/error-utils";
+import toasts from "../../svelte-stores/toast-store";
+import RoleListPanel from "../svelte/RoleListPanel.svelte";
+import {initialiseData} from "../../common";
+
+const initialState = {
+    RoleListPanel
+};
+
+const bindings = {};
 
 
 function controller(serviceBroker) {
-    const vm = this;
+    const vm = initialiseData(this, initialState);
 
     const reload = () =>
-        serviceBroker.loadViewData(CORE_API.RoleStore.findAllRoles, [], {force: true})
+        serviceBroker
+            .loadViewData(CORE_API.RoleStore.findAllRoles, [], {force: true})
             .then(result => vm.roles = result.data);
 
     reload();
@@ -42,15 +51,14 @@ function controller(serviceBroker) {
     };
 
     vm.createRole = (roleName, description) => {
-        vm.errorMessage = null;
-        vm.successMessage = null;
-
         let payload = {
             name: roleName,
             description: description,
             key: vm.roleKey
         };
-        serviceBroker.execute(CORE_API.RoleStore.createCustomRole, [payload])
+
+        serviceBroker
+            .execute(CORE_API.RoleStore.createCustomRole, [payload])
             .then(
                 () => {
                     toasts.info("Role created successfully");
@@ -66,11 +74,14 @@ function controller(serviceBroker) {
 controller.$inject = ["ServiceBroker"];
 
 
-export default {
-    template,
+const component = {
+    bindings,
     controller,
-    controllerAs: "ctrl",
-    bindToController: true,
-    scope: {}
+    template,
 };
 
+
+export default {
+    id: "waltzRoleList",
+    component
+};

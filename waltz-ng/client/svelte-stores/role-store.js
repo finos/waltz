@@ -9,9 +9,17 @@ export function mkRoleStore() {
             [],
             {force});
 
+    const getViewById = (id, force = false) => remote
+        .fetchViewDatum(
+            "GET",
+            `api/role/view/${id}`,
+            [],
+            {force});
+
     return  {
-        findAll
-    }
+        findAll,
+        getViewById
+    };
 }
 
 export const roleStore = mkRoleStore();

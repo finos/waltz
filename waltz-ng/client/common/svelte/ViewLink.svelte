@@ -128,6 +128,14 @@
         "main.survey.template.list": {
             path: () => `survey/template/list`,
             title: "Survey Templates"
+        },
+        "main.role.list": {
+            path: () => `role/list`,
+            title: "Role List"
+        },
+        "main.role.view": {
+            path: (ctx) => `role/view/${ctx.id}`,
+            title: "Role View"
         }
     };
 

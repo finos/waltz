@@ -20,12 +20,13 @@ package org.finos.waltz.model.role;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.finos.waltz.model.IdProvider;
 import org.immutables.value.Value;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableRole.class)
 @JsonDeserialize(as = ImmutableRole.class)
-public abstract class Role {
+public abstract class Role implements IdProvider {
     public abstract String key();
     public abstract String name();
     public abstract String description();

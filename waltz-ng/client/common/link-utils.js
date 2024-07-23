@@ -61,7 +61,8 @@ const stateKindTuples = [
     {kind: "SOFTWARE", state: "main.software-package.view"},
     {kind: "SOFTWARE_VERSION", state: "main.software-version.view"}, //todo: no separate view for this (for now), just a workaround for the entity-link tooltip
     {kind: "SURVEY_INSTANCE", state: "main.survey.instance.view"},
-    {kind: "TAG", state: "main.tag.id.view"}
+    {kind: "TAG", state: "main.tag.id.view"},
+    {kind: "ROLE", state: "main.role.view"}
 ];
 
 
