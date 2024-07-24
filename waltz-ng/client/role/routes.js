@@ -16,25 +16,33 @@
  *
  */
 
-import customRoleView from "./custom-role";
+import roleListView from "./pages/role-list";
+import roleView from "./pages/role-view";
 
 const base = {
-    url: 'role'
+    url: "role"
 };
 
 
-const customRoleState = {
-    url: '/custom-role',
-    views: {'content@': customRoleView }
+const roleListState = {
+    url: "/list",
+    views: {"content@": roleListView.id }
+};
+
+
+const roleViewState = {
+    url: "/view/{id:int}",
+    views: {"content@": roleView.id }
 };
 
 function configureStates(stateProvider) {
     stateProvider
-        .state('main.role', base)
-        .state('main.role.list', customRoleState);
+        .state("main.role", base)
+        .state("main.role.list", roleListState)
+        .state("main.role.view", roleViewState);
 }
 
-configureStates.$inject = ['$stateProvider'];
+configureStates.$inject = ["$stateProvider"];
 
 
 export default configureStates;

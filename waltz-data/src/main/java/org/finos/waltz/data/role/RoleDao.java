@@ -45,10 +45,13 @@ public class RoleDao {
         this.dsl = dsl;
     }
 
-    public boolean create(RoleRecord role) {
-            int execute = dsl.insertInto(ROLE)
-                    .set(role).execute();
-            return execute > 0;
+    public Long create(RoleRecord role) {
+        return dsl
+            .insertInto(ROLE)
+            .set(role)
+            .returning(ROLE.ID)
+            .fetchOne()
+            .getId();
     }
 
     public Set<Role> findAllRoles() {
@@ -58,10 +61,21 @@ public class RoleDao {
                 .fetchSet(TO_ROLE_RECORD);
     }
 
+
+    public Role getRoleById(Long id) {
+        return dsl
+                .select(ROLE.fields())
+                .from(ROLE)
+                .where(ROLE.ID.eq(id))
+                .fetchOne(TO_ROLE_RECORD);
+    }
+
+
     private final static RecordMapper<Record, Role> TO_ROLE_RECORD = r -> {
         RoleRecord record = r.into(ROLE);
         return ImmutableRole.builder()
                 .key(record.getKey())
+                .id(record.getId())
                 .name(record.getName())
                 .description(record.getDescription())
                 .isCustom(record.getIsCustom())

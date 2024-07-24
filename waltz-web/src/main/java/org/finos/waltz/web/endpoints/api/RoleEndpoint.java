@@ -18,20 +18,25 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.model.role.Role;
+import org.finos.waltz.model.role.RoleView.RoleView;
+import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.role.RoleService;
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.DatumRoute;
+import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.endpoints.Endpoint;
-import org.finos.waltz.model.role.Role;
-import org.finos.waltz.model.user.SystemRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
-import java.util.Set;
 
-import static org.finos.waltz.web.WebUtilities.*;
+import static org.finos.waltz.web.WebUtilities.getId;
+import static org.finos.waltz.web.WebUtilities.mkPath;
+import static org.finos.waltz.web.WebUtilities.readBody;
+import static org.finos.waltz.web.WebUtilities.requireAnyRole;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.getForDatum;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.getForList;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.postForDatum;
 
 
@@ -55,11 +60,9 @@ public class RoleEndpoint implements Endpoint {
     @Override
     public void register() {
 
-        DatumRoute<Set<Role>> findAllRolesRoute = (request, response) -> {
-            return roleService.findAllRoles();
-        };
+        ListRoute<Role> findAllRolesRoute = (request, response) -> roleService.findAllRoles();
 
-        DatumRoute<Boolean> createCustomRoleRoute = (request, response) -> {
+        DatumRoute<Long> createCustomRoleRoute = (request, response) -> {
             requireAnyRole(userRoleService, request, SystemRole.USER_ADMIN, SystemRole.ADMIN);
             Map<String, String> body = (Map<String, String>) readBody(request, Map.class);
             String key = body.get("key");
@@ -68,10 +71,13 @@ public class RoleEndpoint implements Endpoint {
             return roleService.create(key, roleName, description);
         };
 
+        DatumRoute<RoleView> getRoleViewRoute = (request, response) -> roleService.getRoleView(getId(request));
+
 
         // --- register
         postForDatum(BASE_URL, createCustomRoleRoute);
-        getForDatum(BASE_URL, findAllRolesRoute);
+        getForList(BASE_URL, findAllRolesRoute);
+        getForDatum(mkPath(BASE_URL, "view", ":id"), getRoleViewRoute);
     }
 
 }

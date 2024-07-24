@@ -1,6 +1,5 @@
 package org.finos.waltz.test_common.helpers;
 
-import org.finos.waltz.model.role.Role;
 import org.finos.waltz.model.user.ImmutableUpdateRolesCommand;
 import org.finos.waltz.model.user.ImmutableUserRegistrationRequest;
 import org.finos.waltz.model.user.SystemRole;
@@ -28,14 +27,18 @@ public class UserHelper {
     @Autowired
     private RoleService roleService;
 
-    public void createRole(String role) {
-        Set<Role> allRoles = roleService.findAllRoles();
-        Set<String> roles = map(
-                allRoles,
-                Role::name);
-        if (!roles.contains(role)) {
-            roleService.create(role, role + " name", role + " desc");
-        }
+    public Long createRole(String role) {
+        return roleService
+                .findAllRoles()
+                .stream()
+                .filter(r -> r.name().equals(role))
+                .findFirst()
+                .map(r -> r.id().get())
+                .orElseGet(() -> roleService.create(
+                        role,
+                        role + " name",
+                        role + " desc"));
+
     }
 
     public void createUser(String user) {

@@ -17,19 +17,22 @@
  *
  */
 
-import angular from 'angular';
-import {registerStore} from '../common/module-utils';
-
-import roleStore from './services/role-store';
-import Routes from './routes';
+import angular from "angular";
+import {registerComponents, registerStore} from "../common/module-utils";
+import RoleView from "./pages/role-view";
+import RoleList from "./pages/role-list";
+import roleStore from "./services/role-store";
+import Routes from "./routes";
 
 
 export default () => {
-    const module = angular.module('waltz.role', []);
+    const module = angular.module("waltz.role", []);
 
     module.config(Routes);
 
     registerStore(module, roleStore);
+
+    registerComponents(module, [RoleList, RoleView]);
 
     return module.name;
 };

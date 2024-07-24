@@ -18,6 +18,11 @@
 
 package org.finos.waltz.service.role;
 
+import org.finos.waltz.common.SetUtilities;
+import org.finos.waltz.data.user.UserRoleDao;
+import org.finos.waltz.model.role.RoleView.ImmutableRoleView;
+import org.finos.waltz.model.role.RoleView.RoleView;
+import org.finos.waltz.model.user.User;
 import org.finos.waltz.schema.tables.records.RoleRecord;
 import org.finos.waltz.data.role.RoleDao;
 import org.finos.waltz.model.role.Role;
@@ -36,13 +41,16 @@ public class RoleService {
     private static final Logger LOG = LoggerFactory.getLogger(RoleService.class);
 
     private final RoleDao roleDao;
+    private final UserRoleDao userRoleDao;
 
     @Autowired
-    public RoleService(RoleDao roleDao) {
+    public RoleService(RoleDao roleDao,
+                       UserRoleDao userRoleDao) {
         this.roleDao = roleDao;
+        this.userRoleDao = userRoleDao;
     }
 
-    public boolean create(String key, String roleName, String description) {
+    public Long create(String key, String roleName, String description) {
         checkNotEmpty(roleName, "role name cannot be empty");
         checkNotEmpty(key, "key cannot be empty");
         LOG.info("creating new role: {}", roleName);
@@ -58,5 +66,16 @@ public class RoleService {
 
     public Set<Role> findAllRoles() {
        return roleDao.findAllRoles();
+    }
+
+    public RoleView getRoleView(Long id) {
+        Set<User> users = userRoleDao.findUsersForRole(id);
+        Role role = roleDao.getRoleById(id);
+
+        return ImmutableRoleView
+                .builder()
+                .role(role)
+                .users(SetUtilities.map(users, User::userName))
+                .build();
     }
 }
