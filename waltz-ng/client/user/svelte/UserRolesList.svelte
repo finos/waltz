@@ -8,6 +8,7 @@
     import {userStore} from "../../svelte-stores/user-store";
     import toasts from "../../svelte-stores/toast-store";
     import Icon from "../../common/svelte/Icon.svelte";
+    import ViewLink from "../../common/svelte/ViewLink.svelte";
 
     let qry = "";
     let comment = null;
@@ -126,7 +127,12 @@
                                on:change={() => selectRole(role)}
                                checked={hasRole($userRoles, role.key)}>
                     </td>
-                    <td>{role.name}</td>
+                    <td>
+                        <ViewLink state="main.role.view"
+                                  ctx={{id: role.id}}>
+                            {role.name}
+                        </ViewLink>
+                    </td>
                     <td>{role.key}</td>
                     <td>{role.description || ""}</td>
                     <td>

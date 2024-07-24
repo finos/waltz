@@ -18,61 +18,22 @@
 
 <div>
     <waltz-page-header icon="users"
-                       name="Custom Role">
+                       name="Roles">
         <breadcrumbs>
             <ol class="waltz-breadcrumbs">
                 <li><a ui-sref="main">Home</a></li>
                 <li><a ui-sref="main.system.list">System Admin</a></li>
-                <li>Custom Role</li>
+                <li>Roles</li>
             </ol>
         </breadcrumbs>
     </waltz-page-header>
 
 
     <div class='waltz-page-summary waltz-page-summary-attach'>
-        <br>
-        <div class="waltz-field-table-border">
 
-            <form class="form-inline ng-pristine ng-valid">
-                <div class="form-group">
-                    <label>Search</label>
-                    <input type="search"
-                           class="form-control"
-                           placeholder="Filter..."
-                           ng-model="userQuery"
-                           ng-model-options="{debounce: 300}">
-                </div>
-            </form>
-
-            <hr>
-
-            <div class="waltz-scroll-region-300">
-                <table class="table table-condensed table-hover">
-                    <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th>Key</th>
-                        <th>Custom role</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr ng-repeat="role in ctrl.roles | filter:userQuery">
-                        <td ng-bind="role.name"></td>
-                        <td>
-                            <p class="help-block"
-                               ng-bind="role.description">
-                            </p>
-                        </td>
-                        <td ng-bind="role.key"></td>
-                        <td>
-                            <input type="checkbox" disabled="true" ng-checked="role.isCustom">
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        <waltz-svelte-component component="$ctrl.RoleListPanel"
+                                roles="$ctrl.roles">
+        </waltz-svelte-component>
     </div>
 
     <br>
@@ -80,7 +41,7 @@
     <waltz-section name="Create Custom Role">
         <p>Custom roles can be used to restrict certain features in Waltz that allow dynamic role selection (i.e. allocations, assessment definitions)</p>
         <form class="form-horizontal"
-              ng-submit="ctrl.createRole(ctrl.roleName, ctrl.roleDescription)">
+              ng-submit="$ctrl.createRole($ctrl.roleName, $ctrl.roleDescription)">
             <div class="form-group">
                 <label class="col-sm-2 control-label">
                     Role Key
@@ -89,7 +50,7 @@
                     <input type="text"
                            class="form-control"
                            disabled="true"
-                           ng-model="ctrl.roleKey"
+                           ng-model="$ctrl.roleKey"
                            placeholder="Role Key preview">
                 </div>
             </div>
@@ -100,9 +61,9 @@
                 <div class="col-sm-10">
                     <input type="text"
                            class="form-control"
-                           ng-model="ctrl.roleName"
+                           ng-model="$ctrl.roleName"
                            required="true"
-                           ng-change="ctrl.transformKey()"
+                           ng-change="$ctrl.transformKey()"
                            placeholder="Role Name">
                 </div>
             </div>
@@ -114,7 +75,7 @@
                     <input type="text"
                            class="form-control"
                            required="true"
-                           ng-model="ctrl.roleDescription"
+                           ng-model="$ctrl.roleDescription"
                            placeholder="Role Description">
                 </div>
             </div>

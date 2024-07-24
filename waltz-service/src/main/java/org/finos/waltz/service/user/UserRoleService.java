@@ -127,10 +127,14 @@ public class UserRoleService {
     }
 
 
-    public List<User> findAllUsers() {
+    public Set<User> findAllUsers() {
         return userRoleDao.findAllUsers();
     }
 
+
+    public Set<User> findUsersForRole(Long roleId) {
+        return userRoleDao.findUsersForRole(roleId);
+    }
 
     public User getByUserId(String userId) {
         return ImmutableUser.builder()

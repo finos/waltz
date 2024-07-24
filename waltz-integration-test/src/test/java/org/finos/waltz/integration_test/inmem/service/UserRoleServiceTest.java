@@ -1,5 +1,6 @@
 package org.finos.waltz.integration_test.inmem.service;
 
+import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import org.finos.waltz.model.user.ImmutableUpdateRolesCommand;
 import org.finos.waltz.model.user.User;
@@ -8,11 +9,14 @@ import org.finos.waltz.test_common.helpers.UserHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Set;
+
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.util.AssertionErrors.assertEquals;
 
 public class UserRoleServiceTest extends BaseInMemoryIntegrationTest {
 
@@ -94,9 +98,33 @@ public class UserRoleServiceTest extends BaseInMemoryIntegrationTest {
         svc.updateRoles("admin", userName, addRolesCmd3);
         assertTrue(svc.hasRole(userName, asSet(role2Name)));
         assertFalse(svc.hasRole(userName, asSet(role1Name)));
-
     }
 
+    @Test
+    public void canFindAllUsersForAGivenRole() {
+        String user1Name = mkName("canFindAllUsersForAGivenRole_User1");
+        String user2Name = mkName("canFindAllUsersForAGivenRole_User2");
+        String roleName = mkName("canFindAllUsersForAGivenRole_Role1");
 
+        helper.createUser(user1Name);
+        helper.createUser(user2Name);
+        Long roleId = helper.createRole(roleName);
+
+        ImmutableUpdateRolesCommand addRolesCmd = ImmutableUpdateRolesCommand
+                .builder()
+                .roles(asSet(roleName))
+                .comment("test comment")
+                .build();
+        svc.updateRoles("admin", user1Name, addRolesCmd);
+        svc.updateRoles("admin", user2Name, addRolesCmd);
+
+        Set<User> users = svc.findUsersForRole(roleId);
+
+        assertEquals(
+                "Expect (only) user 1 and 2 to be associated to role ("+roleId+")",
+                SetUtilities.asSet(user1Name, user2Name),
+                SetUtilities.map(users, User::userName));
+
+    }
 
 }

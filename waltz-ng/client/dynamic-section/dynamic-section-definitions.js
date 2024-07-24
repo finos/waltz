@@ -910,6 +910,14 @@ const endUserApplicationSections = [
     changeLogSection
 ];
 
+const roleSections = [
+    assessmentRatingSection,
+    bookmarksSection,
+    entityNamedNotesSection,
+    involvedPeopleSection,
+    changeLogSection
+]
+
 
 export const dynamicSectionsByKind = {
     "main.actor.view": actorSections,
@@ -946,6 +954,7 @@ export const dynamicSectionsByKind = {
     "main.physical-flow.view": physicalFlowSections,
     "main.physical-specification.view": physicalSpecificationSections,
     "main.process-diagram.view": processDiagramSections,
+    "main.role.view": roleSections,
     "main.scenario.view": scenarioSections,
     "main.software-package.view": softwarePackageSections
 };

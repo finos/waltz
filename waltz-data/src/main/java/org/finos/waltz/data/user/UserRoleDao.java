@@ -21,29 +21,30 @@ package org.finos.waltz.data.user;
 import org.finos.waltz.model.DiffResult;
 import org.finos.waltz.model.user.ImmutableUser;
 import org.finos.waltz.model.user.User;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record2;
 import org.jooq.Result;
+import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashSet;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.data.JooqUtilities.summarizeResults;
 import static org.finos.waltz.model.DiffResult.mkDiff;
+import static org.finos.waltz.schema.tables.Role.ROLE;
 import static org.finos.waltz.schema.tables.User.USER;
 import static org.finos.waltz.schema.tables.UserRole.USER_ROLE;
 import static org.jooq.lambda.tuple.Tuple.tuple;
@@ -51,9 +52,6 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository
 public class UserRoleDao {
-
-
-    private static final Logger LOG = LoggerFactory.getLogger(UserRoleDao.class);
 
     private final DSLContext dsl;
 
@@ -66,35 +64,21 @@ public class UserRoleDao {
 
 
     public Set<String> getUserRoles(String userName) {
-        List<String> roles = dsl.select(USER_ROLE.ROLE)
+        return dsl
+                .select(USER_ROLE.ROLE)
                 .from(USER_ROLE)
                 .where(USER_ROLE.USER_NAME.equalIgnoreCase(userName))
-                .fetch(USER_ROLE.ROLE);
-
-        return new HashSet<String>(roles);
+                .fetchSet(USER_ROLE.ROLE);
     }
 
 
-    public List<User> findAllUsers() {
-        Result<Record2<String, String>> records = dsl.select(USER.USER_NAME, USER_ROLE.ROLE)
-                .from(USER)
-                .leftOuterJoin(USER_ROLE)
-                .on(USER.USER_NAME.eq(USER_ROLE.USER_NAME))
-                .fetch();
+    public Set<User> findAllUsers() {
+        return findUsersByCondition(DSL.trueCondition());
+    }
 
-        Map<String, List<Record2<String, String>>> byUserName = records.stream()
-                .collect(groupingBy(r -> r.getValue(USER.USER_NAME)));
 
-        return byUserName.entrySet().stream()
-                .map( entry -> ImmutableUser.builder()
-                        .userName(entry.getKey())
-                        .roles(entry.getValue()
-                                .stream()
-                                .map(record -> record.getValue(USER_ROLE.ROLE))
-                                .filter(Objects::nonNull)
-                                .collect(Collectors.toList()))
-                        .build())
-                .collect(toList());
+    public Set<User> findUsersForRole(Long roleId) {
+        return findUsersByCondition(ROLE.ID.eq(roleId));
     }
 
 
@@ -171,4 +155,34 @@ public class UserRoleDao {
 
         return summarizeResults(rc);
     }
+
+
+    private Set<User> findUsersByCondition(Condition condition) {
+        Result<Record2<String, String>> records = dsl
+                .select(USER.USER_NAME, USER_ROLE.ROLE)
+                .from(USER)
+                .innerJoin(USER_ROLE)
+                .on(USER.USER_NAME.eq(USER_ROLE.USER_NAME))
+                .innerJoin(ROLE).on(ROLE.KEY.eq(USER_ROLE.ROLE))
+                .where(condition)
+                .fetch();
+
+        Map<String, Collection<Record2<String, String>>> byUserName = groupBy(
+                records,
+                r -> r.getValue(USER.USER_NAME));
+
+        return byUserName
+                .entrySet()
+                .stream()
+                .map( entry -> ImmutableUser.builder()
+                        .userName(entry.getKey())
+                        .roles(entry.getValue()
+                                .stream()
+                                .map(record -> record.getValue(USER_ROLE.ROLE))
+                                .filter(Objects::nonNull)
+                                .collect(Collectors.toList()))
+                        .build())
+                .collect(toSet());
+    }
+
 }
