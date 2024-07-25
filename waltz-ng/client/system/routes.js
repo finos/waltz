@@ -120,9 +120,15 @@ const licencesState = {
 
 
 const measurableCategoriesState = {
-    url: "/measurable-categories",
+    url: "/measurable-category",
     views: { "content@": MeasurableCategoriesView }
 };
+
+
+// const measurableCategoryEdit = {
+//     url: "/measurable-category/{id:int}/edit",
+//     views: { "content@": MeasurableCategoryEdit }
+// };
 
 
 const eudaListState = {
@@ -181,7 +187,7 @@ function setupRoutes($stateProvider) {
         .state("main.system.euda-list", eudaListState)
         .state("main.system.hierarchies", hierarchiesState)
         .state("main.system.licences", licencesState)
-        .state("main.system.measurable-categories", measurableCategoriesState)
+        .state("main.system.measurable-category.list", measurableCategoriesState)
         .state("main.system.nav-aids", navAidAdminState)
         .state("main.system.nav-aid-builder", navAidBuilderState)
         .state("main.system.orphans", orphansState)
