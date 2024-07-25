@@ -1,43 +1,59 @@
 <script>
     import PageHeader from "../../../common/svelte/PageHeader.svelte";
     import ViewLink from "../../../common/svelte/ViewLink.svelte";
-    import SearchInput from "../../../common/svelte/SearchInput.svelte";
     import {measurableCategoryStore} from "../../../svelte-stores/measurable-category-store";
-    import {onMount} from "svelte";
-    import {termSearch} from "../../../common";
     import Icon from "../../../common/svelte/Icon.svelte";
-    import _ from "lodash";
     import {displayError} from "../../../common/error-utils";
     import toasts from "../../../svelte-stores/toast-store";
+    import {writable} from "svelte/store";
+    import pageInfo from "../../../svelte-stores/page-navigation-store";
+    import {ratingSchemeStore} from "../../../svelte-stores/rating-schemes";
+    import _ from "lodash";
 
-    export let categoryId;
+    export let id;
+    export let mode = "EDIT";
+
+    const ratingSchemesCall = ratingSchemeStore.loadAll();
+    const DEFAULT_VALUES = {
+        id: null, // we want a new category
+        position: 0,
+        lastUpdatedBy: "defaultValue",
+        icon: "cog",
+        allowPrimaryRatings: false
+    };
 
     let loadCategoryCall;
-    let workingCopy = null;
-
-    function loadCategories() {
-        loadCategoryCall = measurableCategoryStore.getById(categoryId);
-    }
+    let workingCopy = writable(null);
+    let category = null;
+    let possibleRatingSchemes = [];
 
     function onSave() {
         measurableCategoryStore
-            .save(workingCopy)
+            .save($workingCopy)
             .then(() => {
                 toasts.info("Category saved successfully");
+                $pageInfo = {
+                    state: "main.system.measurable-category.list",
+                    params: {}
+                };
             })
             .catch(e => displayError("Failed to save category", e));
     }
 
-    function onEditCategory(c) {
-        workingCopy = Object.assign({}, c);
+    $: loadCategoryCall = id && measurableCategoryStore.getById(id);
+
+    $: {
+        if (mode === "CREATE") {
+            $workingCopy = {};
+        }
     }
 
-    onMount(() => {
-        loadCategories();
-    });
+    $: {
+        category = $loadCategoryCall?.data || [];
+        $workingCopy = Object.assign({}, DEFAULT_VALUES, category);
+    }
 
-    $: categories = $loadCategoryCall?.data || [];
-
+    $: possibleRatingSchemes = _.sortBy($ratingSchemesCall.data, d => d.name);
 </script>
 
 <PageHeader icon="puzzle-piece"
@@ -46,32 +62,38 @@
         <ol class="waltz-breadcrumbs">
             <li><ViewLink state="main">Home</ViewLink></li>
             <li><ViewLink state="main.system.list">System Admin</ViewLink></li>
-            <li><ViewLink state="main.system.measurable-categories">Measurable Categories</ViewLink></li>
-            <li>Measurable Category</li>
+            <li><ViewLink state="main.system.measurable-category.list">Measurable Categories</ViewLink></li>
+            <li>{mode === 'CREATE' ? 'Create' : category?.name}</li>
         </ol>
     </div>
 </PageHeader>
 
 
 <div class="waltz-page-summary waltz-page-summary-attach">
-    <h3>Edit Category</h3>
+    {#if mode === 'CREATE'}
+        <h3>Create Category</h3>
+    {:else}
+        <h3>Edit Category</h3>
+    {/if}
+
+    {#if $workingCopy}
     <form autocomplete="off"
           on:submit|preventDefault={onSave}>
         <div class="form-group">
-            <label for="name">Name</label>
+            <label for="name" class="required">Name</label>
             <input type="text"
                    class="form-control"
                    id="name"
-                   bind:value={workingCopy.name}
+                   bind:value={$workingCopy.name}
                    placeholder="Name"
                    required>
         </div>
         <div class="form-group">
-            <label for="externalId">ExternalId</label>
+            <label for="externalId" class="required">External Id</label>
             <input type="text"
                    class="form-control"
                    id="externalId"
-                   bind:value={workingCopy.externalId}
+                   bind:value={$workingCopy.externalId}
                    placeholder="External Id"
                    required>
             <div class="help-block">
@@ -80,10 +102,27 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="description">Description</label>
+            <label for="ratingScheme" class="required">Rating Scheme</label>
+            <select id="ratingScheme"
+                    class="form-control"
+                    disabled={mode === 'EDIT'}
+                    required
+                    bind:value={$workingCopy.ratingSchemeId}>
+                {#each possibleRatingSchemes as r}
+                    <option value={r.id}>
+                        {r.name}
+                    </option>
+                {/each}
+            </select>
+            <div class="help-block">
+                The rating scheme is used to define the possible values for mappings to this taxonomy.
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="description" class="required">Description</label>
             <textarea class="form-control"
                       id="description"
-                      bind:value={workingCopy.description}
+                      bind:value={$workingCopy.description}
                       placeholder="Description"
                       rows="3"></textarea>
             <div class="help-block">
@@ -91,16 +130,16 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="icon">Icon Name</label>
+            <label for="icon" class="required">Icon Name</label>
             <div>
                 <input type="text"
                        style="width: 20%; display: inline"
                        class="form-control input-sm"
                        id="icon"
-                       bind:value={workingCopy.icon}
+                       bind:value={$workingCopy.icon}
                        placeholder="Icon name e.g. cog"
                        required>
-                <Icon name={workingCopy.icon}/>
+                <Icon name={$workingCopy.icon}/>
             </div>
             <div class="help-block">
                 This is the icon associated to this category. Currently these icons are based upon the <a
@@ -116,7 +155,7 @@
                    style="width: 20%"
                    required="required"
                    placeholder="Position for this category in tabbed sections. Default order is based upon the name of the category"
-                   bind:value={workingCopy.position}>
+                   bind:value={$workingCopy.position}>
             <div class="help-block">
                 Position, used for ordering categories.
                 Lower numbers go first, name is used as a tie breaker.
@@ -131,7 +170,7 @@
             <div>
                 <input id="allow_primary_ratings"
                        type="checkbox"
-                       bind:checked={workingCopy.allowPrimaryRatings}>
+                       bind:checked={$workingCopy.allowPrimaryRatings}>
                 <div class="help-inline">
                     Determines whether users can select one measurable in this category to be flagged as the primary
                     rating for the application.
@@ -146,7 +185,7 @@
             <div>
                 <input id="editable"
                        type="checkbox"
-                       bind:checked={workingCopy.editable}>
+                       bind:checked={$workingCopy.editable}>
                 <div class="help-inline">
                     Allow the taxonomy to be edited from within Waltz using the maintenance screen.
                 </div>
@@ -158,7 +197,7 @@
             </label>
             <div>
                 <input id="editor_role"
-                       bind:value={workingCopy.ratingEditorRole}>
+                       bind:value={$workingCopy.ratingEditorRole}>
                 <div class="help-inline">
                     Which role is needed to edit the taxonomy
                 </div>
@@ -170,12 +209,11 @@
                 class="btn btn-primary">
             Save
         </button>
-        <button type="reset"
-                class="btn btn-link"
-                on:click={onShowList}>
+        <ViewLink state="main.system.measurable-category.list">
             Cancel
-        </button>
+        </ViewLink>
     </form>
+    {/if}
 </div>
 
 
@@ -185,5 +223,10 @@
         margin-top: 5px;
         margin-bottom: 10px;
         color: #737373;
+    }
+
+    .required:after {
+        content:" *";
+        color: red;
     }
 </style>

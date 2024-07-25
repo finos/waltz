@@ -19,10 +19,7 @@
                    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
                    logicalFilePath="db.changelog-1.59.xml">
-    <changeSet id="v1-59-tag"
-               author="woodjes">
-        <tagDatabase tag="v1.58"/> <!-- tag the current db version, i.e. the last  -->
-    </changeSet>
+    <!-- 1.59 tag was removed as we inadvertently let this slip into a prod instance -->
 
     <changeSet id="20240315-7032-1"
                author="woodjes">

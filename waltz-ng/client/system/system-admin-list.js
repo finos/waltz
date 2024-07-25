@@ -108,7 +108,7 @@ const referenceDataOptions= [
         name: "Measurable Categories",
         role: "ADMIN",
         description: "View and edit measurable categories",
-        state: "main.system.measurable-categories",
+        state: "main.system.measurable-category.list",
         icon: "puzzle-piece"
     }, {
         name: "Navigation Aids",
