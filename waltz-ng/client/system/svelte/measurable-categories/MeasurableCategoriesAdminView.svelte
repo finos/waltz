@@ -206,8 +206,8 @@
                        style="table-layout: fixed">
                     <thead>
                     <tr>
-                        <th style="width:15%">Name</th>
-                        <th style="width:15%">External Id</th>
+                        <th style="width:25%">Name</th>
+                        <th style="width:25%">External Id</th>
                         <th style="width:10%">Icon</th>
                         <th style="width:10%">Allows Primary Ratings?</th>
                         <th style="width:30%">Operations</th>
@@ -222,7 +222,7 @@
                                 </span>
                             </td>
                             <td>
-                                <span>
+                                <span class="force-wrap">
                                     {category.externalId}
                                 </span>
                             </td>

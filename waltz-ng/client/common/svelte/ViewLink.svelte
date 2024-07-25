@@ -81,6 +81,14 @@
             path: ctx => `logical-flow/${ctx.id}`,
             title: "Logical Flow View"
         },
+        "main.system.measurable-category.edit": {
+            path: ctx => `system/measurable-category/edit/${ctx.id}`,
+            title: "Measurable Category"
+        },
+        "main.system.measurable-category.list": {
+            path: ctx => `system/measurable-category/list`,
+            title: "Measurable Categories"
+        },
         "main.measurable.view": {
             path: ctx => `measurable/${ctx.id}`,
             title: "Measurable View"
