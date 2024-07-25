@@ -68,7 +68,7 @@ public class MeasurableCategoryEndpoint implements Endpoint {
         DatumRoute<MeasurableCategory> getByIdRoute = (request, response)
                 -> measurableCategoryService.getById(WebUtilities.getId(request));
 
-        DatumRoute<Boolean> saveRoute = (request, response) -> {
+        DatumRoute<Long> saveRoute = (request, response) -> {
             String username = getUsername(request);
             return measurableCategoryService
                     .save(

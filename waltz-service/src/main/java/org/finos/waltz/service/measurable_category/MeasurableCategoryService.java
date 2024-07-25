@@ -19,12 +19,16 @@
 package org.finos.waltz.service.measurable_category;
 
 import org.finos.waltz.data.measurable_category.MeasurableCategoryDao;
+import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.exceptions.NotAuthorizedException;
 import org.finos.waltz.model.measurable_category.ImmutableMeasurableCategoryView;
 import org.finos.waltz.model.measurable_category.MeasurableCategory;
 import org.finos.waltz.model.measurable_category.MeasurableCategoryView;
 import org.finos.waltz.model.user.SystemRole;
+import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.user.UserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,12 +47,15 @@ public class MeasurableCategoryService {
 
     private final MeasurableCategoryDao measurableCategoryDao;
     private final UserRoleService userRoleService;
-
+    private final ChangeLogService changeLogService;
 
     @Autowired
-    public MeasurableCategoryService(MeasurableCategoryDao measurableCategoryDao, UserRoleService userRoleService) {
+    public MeasurableCategoryService(MeasurableCategoryDao measurableCategoryDao,
+                                     UserRoleService userRoleService,
+                                     ChangeLogService changeLogService) {
         this.measurableCategoryDao = measurableCategoryDao;
         this.userRoleService = userRoleService;
+        this.changeLogService = changeLogService;
     }
 
 
@@ -90,9 +97,20 @@ public class MeasurableCategoryService {
     }
 
 
-    public boolean save(MeasurableCategory measurableCategory, String username) {
+    public Long save(MeasurableCategory measurableCategory, String username) {
         ensureUserHasPermission(username);
-        return measurableCategoryDao.save(measurableCategory, username);
+        Long mcId = measurableCategoryDao.save(measurableCategory, username);
+        boolean isNew = ! measurableCategory.id().isPresent();
+
+        changeLogService.write(ImmutableChangeLog
+                .builder()
+                .operation(isNew ? Operation.ADD : Operation.UPDATE)
+                .parentReference(EntityReference.mkRef(EntityKind.MEASURABLE_CATEGORY, mcId))
+                .message(isNew ? "Measureable category created" : "Measurable category updated")
+                .userId(username)
+                .build());
+
+        return mcId;
     }
 
 
