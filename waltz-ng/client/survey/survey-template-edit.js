@@ -153,6 +153,12 @@ function controller($q,
         vm.selectedQuestionInfo = null;
     };
 
+    vm.onChangeQFieldType = () => {
+        if(vm.selectedQuestionInfo.question.fieldType !== 'MEASURABLE_MULTI_SELECT') {
+            delete vm.selectedQuestionInfo.question.qualifierEntity;
+        }
+    }
+
     vm.createQuestion = (qi) => {
 
         if(qi.question.fieldType === "MEASURABLE_MULTI_SELECT"){
