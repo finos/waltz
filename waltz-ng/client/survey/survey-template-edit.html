@@ -215,7 +215,9 @@
                                 required
                                 class="form-control"
                                 ng-options="fieldType.value as fieldType.name for fieldType in ctrl.questionFieldTypes"
-                                ng-model="ctrl.selectedQuestionInfo.question.fieldType">
+                                ng-model="ctrl.selectedQuestionInfo.question.fieldType"
+                                ng-change="ctrl.onChangeQFieldType()"
+                        >
                         </select>
                     </div>
                     <div ng-if="ctrl.selectedQuestionInfo.question.fieldType === 'DROPDOWN'
@@ -232,9 +234,9 @@
                          class="col-sm-7 col-sm-offset-2">
                         <div style="display: block; background-color: #F8F9F9; margin-top:10px; padding: 1em; border-radius: 2px; border: 1px solid #eee">
                             <select id="qCategoryId"
-                                    required
-                                    class="form-control"
-                                    ng-options="category.id as category.name for category in ctrl.measurableCategories | orderBy:'name'"
+                                required
+                                class="form-control"
+                                ng-options="category.id as category.name for category in ctrl.measurableCategories | orderBy:'name'"
                                     ng-model="ctrl.selectedQuestionInfo.question.qualifierEntity.id">
                             </select>
                             <div class='small text-muted'>
