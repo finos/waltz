@@ -15,12 +15,12 @@
  * See the License for the specific
  *
  */
-import MeasurableCategoriesAdminView from "./svelte/measurable-categories/MeasurableCategoriesAdminView.svelte";
+import MeasurableCategoryListView from "./svelte/measurable-categories/MeasurableCategoryListView.svelte";
 import {initialiseData} from "../common";
 
 
 const initialState = {
-    MeasurableCategoriesAdminView
+    MeasurableCategoryListView
 };
 
 
@@ -34,7 +34,7 @@ controller.$inject = [];
 
 
 export default {
-    template: `<waltz-svelte-component component="$ctrl.MeasurableCategoriesAdminView"></waltz-svelte-component>`,
+    template: `<waltz-svelte-component component="$ctrl.MeasurableCategoryListView"></waltz-svelte-component>`,
     controller,
     controllerAs: "$ctrl",
     bindToController: true,

@@ -122,7 +122,9 @@ public class AssessmentRatingService {
     public boolean store(SaveAssessmentRatingCommand command, String username) throws InsufficientPrivelegeException {
         verifyAnyPermission(asSet(Operation.UPDATE, Operation.ADD), command.entityReference(), command.assessmentDefinitionId(), command.ratingId(), username);
         AssessmentDefinition assessmentDefinition = assessmentDefinitionDao.getById(command.assessmentDefinitionId());
-        createChangeLogEntryForSave(command, username, assessmentDefinition);
+
+        boolean isUpdate = assessmentRatingDao.isUpdate(command);
+        createChangeLogEntryForSave(command, username, assessmentDefinition, isUpdate ? Operation.UPDATE : Operation.ADD);
 
         return assessmentRatingDao.store(command);
     }
@@ -322,7 +324,8 @@ public class AssessmentRatingService {
 
     private void createChangeLogEntryForSave(SaveAssessmentRatingCommand command,
                                              String username,
-                                             AssessmentDefinition assessmentDefinition) {
+                                             AssessmentDefinition assessmentDefinition,
+                                             Operation operation) {
         Optional<AssessmentRating> previousRating = assessmentRatingDao.findForEntity(command.entityReference())
                 .stream()
                 .filter(r -> r.assessmentDefinitionId() == command.assessmentDefinitionId())
@@ -344,7 +347,7 @@ public class AssessmentRatingService {
                 .parentReference(mkRef(command.entityReference().kind(), command.entityReference().id()))
                 .userId(username)
                 .severity(Severity.INFORMATION)
-                .operation(Operation.UPDATE)
+                .operation(operation)
                 .build();
 
         changeLogService.write(logEntry);
