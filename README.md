@@ -66,9 +66,10 @@ progress and done issues.
 
 **Provisional** dates for upcoming releases:
 
-| Release | Date          | Provisional Change Summary        |
-|---------|---------------|-----------------------------------|
-| 1.62    | Jul 30th 2024 | Java 11, possible move to Javalin | 
+| Release | Date           | Provisional Change Summary |
+|---------|----------------|----------------------------|
+| 1.63    | Aug 27th 2024  | Minor enhancements         | 
+| 1.64    | Sept 24th 2024 | TBC                        | 
 
 See the [releases](https://github.com/finos/waltz/releases) page for historic versions.
 
@@ -97,7 +98,7 @@ Individual and organisational contributors are listed in [the contributors file]
 
 ## License
 
-Copyright (C) 2023 Waltz open source project
+Copyright (C) 2024 Waltz open source project
 
 Distributed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
