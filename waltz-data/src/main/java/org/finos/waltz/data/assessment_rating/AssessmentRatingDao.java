@@ -266,19 +266,23 @@ public class AssessmentRatingDao {
     public boolean store(SaveAssessmentRatingCommand command) {
         checkNotNull(command, "command cannot be null");
         AssessmentRatingRecord record = COMMAND_TO_RECORD_MAPPER.apply(command);
+
+        return isUpdate(command)
+                ? dsl.executeUpdate(record) == 1
+                : dsl.executeInsert(record) == 1;
+    }
+
+
+    public boolean isUpdate(SaveAssessmentRatingCommand command) {
         EntityReference ref = command.entityReference();
 
-        boolean isUpdate = dsl.fetchExists(dsl
+        return dsl.fetchExists(dsl
                 .select(ar.ID)
                 .from(ar)
                 .where(ar.ENTITY_KIND.eq(ref.kind().name()))
                 .and(ar.ENTITY_ID.eq(ref.id()))
                 .and(ar.ASSESSMENT_DEFINITION_ID.eq(command.assessmentDefinitionId()))
                 .and(ar.RATING_ID.eq(command.ratingId())));
-
-        return isUpdate
-                ? dsl.executeUpdate(record) == 1
-                : dsl.executeInsert(record) == 1;
     }
 
 

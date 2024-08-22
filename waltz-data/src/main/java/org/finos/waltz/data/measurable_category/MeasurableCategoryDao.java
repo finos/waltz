@@ -126,7 +126,7 @@ public class MeasurableCategoryDao {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
-    public boolean save(MeasurableCategory measurableCategory, String username) {
+    public Long save(MeasurableCategory measurableCategory, String username) {
 
 
         MeasurableCategoryRecord record = dsl.newRecord(MEASURABLE_CATEGORY);
@@ -146,9 +146,9 @@ public class MeasurableCategoryDao {
 
         record.changed(MEASURABLE_CATEGORY.ID, false);
 
-        int update = record.store();
+        record.store();
 
-        return update == 1;
+        return record.getId();
     }
 
     public Map<Long, Long> findRatingCountsByCategoryId(EntityReference ref) {

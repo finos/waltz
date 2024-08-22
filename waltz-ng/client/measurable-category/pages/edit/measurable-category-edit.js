@@ -85,9 +85,7 @@ function controller($q,
     // -- boot
 
     vm.$onInit = () => {
-        serviceBroker
-            .loadAppData(CORE_API.MeasurableStore.findAll)
-            .then(r => vm.measurables = _.filter(r.data, m => m.categoryId === categoryId));
+        reloadMeasurables();
 
         serviceBroker
             .loadAppData(CORE_API.MeasurableCategoryStore.findAll)

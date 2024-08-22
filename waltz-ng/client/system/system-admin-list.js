@@ -106,9 +106,9 @@ const referenceDataOptions= [
         icon: "id-card-o"
     }, {
         name: "Measurable Categories",
-        role: "ADMIN",
+        role: "TAXONOMY_EDITOR",
         description: "View and edit measurable categories",
-        state: "main.system.measurable-categories",
+        state: "main.system.measurable-category.list",
         icon: "puzzle-piece"
     }, {
         name: "Navigation Aids",

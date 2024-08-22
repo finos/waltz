@@ -37,7 +37,9 @@ import PermissionsView from "./permissions-view";
 import NavAidBuilderView from "./nav-aid-builder-view";
 import VersionInfoView from "./version-info-view";
 import LicencesAdminView from "./licences-view";
-import MeasurableCategoriesView from "./measurable-categories-view";
+import MeasurableCategoryListView from "./measurable-category-list-view";
+import MeasurableCategoryEditView from "./measurable-category-edit-view";
+import MeasurableCategoryCreateView from "./measurable-category-create-view";
 import DiagramBuilderView from "./diagram-builder-view";
 import NavAidAdminView from "./nav-aids-view";
 
@@ -119,9 +121,27 @@ const licencesState = {
 };
 
 
-const measurableCategoriesState = {
-    url: "/measurable-categories",
-    views: { "content@": MeasurableCategoriesView }
+
+
+const measurableCategoryState = {
+    url: "/measurable-category",
+};
+
+const measurableCategoryListState = {
+    url: "/list",
+    views: { "content@": MeasurableCategoryListView }
+};
+
+
+const measurableCategoryCreateState = {
+    url: "/create",
+    views: { "content@": MeasurableCategoryCreateView }
+};
+
+
+const measurableCategoryEditState = {
+    url: "/id/{id:int}/edit",
+    views: { "content@": MeasurableCategoryEditView }
 };
 
 
@@ -181,7 +201,10 @@ function setupRoutes($stateProvider) {
         .state("main.system.euda-list", eudaListState)
         .state("main.system.hierarchies", hierarchiesState)
         .state("main.system.licences", licencesState)
-        .state("main.system.measurable-categories", measurableCategoriesState)
+        .state("main.system.measurable-category", measurableCategoryState)
+        .state("main.system.measurable-category.list", measurableCategoryListState)
+        .state("main.system.measurable-category.edit", measurableCategoryEditState)
+        .state("main.system.measurable-category.create", measurableCategoryCreateState)
         .state("main.system.nav-aids", navAidAdminState)
         .state("main.system.nav-aid-builder", navAidBuilderState)
         .state("main.system.orphans", orphansState)
