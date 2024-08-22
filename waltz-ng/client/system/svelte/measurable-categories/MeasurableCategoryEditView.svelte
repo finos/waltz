@@ -18,7 +18,7 @@
         id: null, // we want a new category
         position: 0,
         lastUpdatedBy: "defaultValue",
-        icon: "cog",
+        icon: "puzzle-piece",
         allowPrimaryRatings: false
     };
 
@@ -191,16 +191,16 @@
                 </div>
             </div>
         </div>
+
+
         <div class="form-group">
-            <label for="editor_role">
-                Editor Role
-            </label>
-            <div>
-                <input id="editor_role"
-                       bind:value={$workingCopy.ratingEditorRole}>
-                <div class="help-inline">
-                    Which role is needed to edit the taxonomy
-                </div>
+            <label for="editor_role">Ratings Editor Role</label>
+            <input id="editor_role"
+                   class="form-control"
+                   style="width: 20%"
+                   bind:value={$workingCopy.ratingEditorRole}>
+            <div class="help-inline">
+                The role needed by users to perform mappings against this taxonomy.
             </div>
         </div>
 

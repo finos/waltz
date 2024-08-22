@@ -17,6 +17,11 @@
         DELETE: "delete"
     };
 
+    const requiredPermissions = [  // user should have at least one of these
+        systemRoles.ADMIN.key,
+        systemRoles.TAXONOMY_EDITOR.key
+    ];
+
     const permissionsCall = userStore.load();
 
     let loadCategoriesCall;
@@ -27,7 +32,10 @@
     let hasEditPermissions = false;
 
     $: permissions = $permissionsCall?.data;
-    $: hasEditPermissions = _.includes(permissions?.roles, systemRoles.AGGREGATE_OVERLAY_DIAGRAM_EDITOR.key) || false;
+
+    $: hasEditPermissions = _.some(
+        permissions?.roles,
+        r => _.includes(requiredPermissions, r));
 
     function loadCategories() {
         loadCategoriesCall = measurableCategoryStore.findAll(true);

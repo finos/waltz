@@ -145,13 +145,6 @@ const measurableCategoryEditState = {
 };
 
 
-
-// const measurableCategoryEdit = {
-//     url: "/measurable-category/{id:int}/edit",
-//     views: { "content@": MeasurableCategoryEdit }
-// };
-
-
 const eudaListState = {
     url: "/euda-list",
     views: {"content@": EudaListView}
