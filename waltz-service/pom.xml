@@ -92,6 +92,11 @@
             <artifactId>commons-jexl3</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-csv</artifactId>
+        </dependency>
+
         <!-- TEST -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

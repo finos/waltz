@@ -26,12 +26,20 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.exceptions.NotAuthorizedException;
 import org.finos.waltz.model.measurable.Measurable;
 import org.finos.waltz.model.measurable_category.MeasurableCategory;
-import org.finos.waltz.model.taxonomy_management.*;
+import org.finos.waltz.model.taxonomy_management.BulkTaxonomyItem;
+import org.finos.waltz.model.taxonomy_management.BulkTaxonomyParseResult;
+import org.finos.waltz.model.taxonomy_management.ImmutableTaxonomyChangeCommand;
+import org.finos.waltz.model.taxonomy_management.ImmutableTaxonomyChangePreview;
+import org.finos.waltz.model.taxonomy_management.TaxonomyChangeCommand;
+import org.finos.waltz.model.taxonomy_management.TaxonomyChangeLifecycleStatus;
+import org.finos.waltz.model.taxonomy_management.TaxonomyChangePreview;
+import org.finos.waltz.model.taxonomy_management.TaxonomyChangeType;
 import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.client_cache_key.ClientCacheKeyService;
 import org.finos.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.finos.waltz.service.measurable.MeasurableService;
 import org.finos.waltz.service.measurable_category.MeasurableCategoryService;
+import org.finos.waltz.service.taxonomy_management.BulkTaxonomyItemParser.InputFormat;
 import org.finos.waltz.service.user.UserRoleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,9 +49,15 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static java.util.stream.Collectors.toMap;
-import static org.finos.waltz.common.Checks.*;
+import static org.finos.waltz.common.Checks.checkFalse;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkTrue;
+import static org.finos.waltz.common.MapUtilities.indexBy;
+import static org.finos.waltz.common.SetUtilities.union;
+import static org.finos.waltz.common.StringUtilities.limit;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Service
@@ -223,5 +237,31 @@ public class TaxonomyChangeService {
                 || command.changeType() == TaxonomyChangeType.ADD_PEER
                 || command.changeType() == TaxonomyChangeType.REMOVE
                 || command.changeType() == TaxonomyChangeType.MOVE;
+    }
+
+
+    public void bulkPreview(long categoryId,
+                            String inputStr,
+                            InputFormat format) {
+        LOG.debug(
+                "Bulk preview - category:{}, format:{}, inputStr:{}",
+                categoryId,
+                format,
+                limit(inputStr, 40));
+
+        MeasurableCategory category = measurableCategoryService.getById(categoryId);
+        checkNotNull(category, "Unknown category: %d", categoryId);
+        LOG.debug(
+                "category: {} = {}({})",
+                categoryId,
+                category.name(),
+                category.externalId());
+
+        BulkTaxonomyParseResult result = new BulkTaxonomyItemParser().parse(inputStr, format);
+        List<Measurable> existingMeasurables = measurableService.findByCategoryId(categoryId);
+        Map<String, Measurable> existingByExtId = indexBy(existingMeasurables, m -> m.externalId().orElse(null));
+        Map<String, BulkTaxonomyItem> givenByExtId = indexBy(result.parsedItems(), BulkTaxonomyItem::externalId);
+        Set<String> allExtIds = union(existingByExtId.keySet(), givenByExtId.keySet());
+
     }
 }

@@ -45,13 +45,11 @@ import static java.util.stream.Collectors.toSet;
 public class ShortestPath {
 
     private static ExternalIdValue[] sourceAssetCodes = new ExternalIdValue[] {
-            ExternalIdValue.of("assetCode1"),
-            ExternalIdValue.of("assetCode2"),
-            ExternalIdValue.of("assetCode3")
+            ExternalIdValue.of("26716-1")
     };
 
 
-    private static final ExternalIdValue targetAssetCode = ExternalIdValue.of("26877-2");
+    private static final ExternalIdValue targetAssetCode = ExternalIdValue.of("167106-1");
 
 
     public static void main(String[] args) {
