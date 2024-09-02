@@ -19,15 +19,25 @@
 package org.finos.waltz.service.taxonomy_management;
 
 import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.common.StringUtilities;
+import org.finos.waltz.common.hierarchy.FlatNode;
 import org.finos.waltz.data.taxonomy_management.TaxonomyChangeDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.bulk_upload.BulkUpdateMode;
+import org.finos.waltz.model.bulk_upload.ChangeOperation;
+import org.finos.waltz.model.bulk_upload.taxonomy.BulkTaxonomyItem;
+import org.finos.waltz.model.bulk_upload.taxonomy.BulkTaxonomyParseResult;
+import org.finos.waltz.model.bulk_upload.taxonomy.BulkTaxonomyValidatedItem;
+import org.finos.waltz.model.bulk_upload.taxonomy.BulkTaxonomyValidationResult;
+import org.finos.waltz.model.bulk_upload.taxonomy.ChangedFieldType;
+import org.finos.waltz.model.bulk_upload.taxonomy.ImmutableBulkTaxonomyValidatedItem;
+import org.finos.waltz.model.bulk_upload.taxonomy.ImmutableBulkTaxonomyValidationResult;
+import org.finos.waltz.model.bulk_upload.taxonomy.ValidationError;
 import org.finos.waltz.model.exceptions.NotAuthorizedException;
 import org.finos.waltz.model.measurable.Measurable;
 import org.finos.waltz.model.measurable_category.MeasurableCategory;
-import org.finos.waltz.model.taxonomy_management.BulkTaxonomyItem;
-import org.finos.waltz.model.taxonomy_management.BulkTaxonomyParseResult;
 import org.finos.waltz.model.taxonomy_management.ImmutableTaxonomyChangeCommand;
 import org.finos.waltz.model.taxonomy_management.ImmutableTaxonomyChangePreview;
 import org.finos.waltz.model.taxonomy_management.TaxonomyChangeCommand;
@@ -41,23 +51,34 @@ import org.finos.waltz.service.measurable.MeasurableService;
 import org.finos.waltz.service.measurable_category.MeasurableCategoryService;
 import org.finos.waltz.service.taxonomy_management.BulkTaxonomyItemParser.InputFormat;
 import org.finos.waltz.service.user.UserRoleService;
+import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.finos.waltz.common.Checks.checkFalse;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkTrue;
+import static org.finos.waltz.common.MapUtilities.countBy;
 import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.SetUtilities.union;
 import static org.finos.waltz.common.StringUtilities.limit;
+import static org.finos.waltz.common.StringUtilities.safeEq;
+import static org.finos.waltz.common.hierarchy.HierarchyUtilities.hasCycle;
+import static org.finos.waltz.common.hierarchy.HierarchyUtilities.toForest;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Service
@@ -240,9 +261,11 @@ public class TaxonomyChangeService {
     }
 
 
-    public void bulkPreview(long categoryId,
-                            String inputStr,
-                            InputFormat format) {
+    public BulkTaxonomyValidationResult bulkPreview(long categoryId,
+                                                    String inputStr,
+                                                    InputFormat format,
+                                                    BulkUpdateMode mode) {
+
         LOG.debug(
                 "Bulk preview - category:{}, format:{}, inputStr:{}",
                 categoryId,
@@ -251,6 +274,10 @@ public class TaxonomyChangeService {
 
         MeasurableCategory category = measurableCategoryService.getById(categoryId);
         checkNotNull(category, "Unknown category: %d", categoryId);
+
+        List<Measurable> existingMeasurables = measurableService.findByCategoryId(categoryId);
+        Map<String, Measurable> existingByExtId = indexBy(existingMeasurables, m -> m.externalId().orElse(null));
+
         LOG.debug(
                 "category: {} = {}({})",
                 categoryId,
@@ -258,10 +285,87 @@ public class TaxonomyChangeService {
                 category.externalId());
 
         BulkTaxonomyParseResult result = new BulkTaxonomyItemParser().parse(inputStr, format);
-        List<Measurable> existingMeasurables = measurableService.findByCategoryId(categoryId);
-        Map<String, Measurable> existingByExtId = indexBy(existingMeasurables, m -> m.externalId().orElse(null));
+
         Map<String, BulkTaxonomyItem> givenByExtId = indexBy(result.parsedItems(), BulkTaxonomyItem::externalId);
         Set<String> allExtIds = union(existingByExtId.keySet(), givenByExtId.keySet());
 
+         /*
+          Validation checks:
+
+          - unique external ids
+          - all parent external id's exist either in file or in existing taxonomy
+          - check for cycles by converting to forest
+          - do a diff to determine
+              - new
+              - removed, if mode == replace
+              - updated, match on external id
+         */
+
+        Map<String, Long> countByExtId = countBy(result.parsedItems(), BulkTaxonomyItem::externalId);
+
+        Boolean hasCycle = Stream.concat(
+                        existingMeasurables.stream().map(d -> new FlatNode<String, String>(
+                                d.externalId().orElse(null),
+                                d.externalParentId(),
+                                null)),
+                        result.parsedItems().stream().map(d -> new FlatNode<String, String>(
+                                d.externalId(),
+                                Optional.ofNullable(d.parentExternalId()),
+                                null)))
+                .collect(Collectors.collectingAndThen(toList(), xs -> hasCycle(toForest(xs))));
+
+
+        List<BulkTaxonomyValidatedItem> baa = result
+                .parsedItems()
+                .stream()
+                .map(d -> tuple(
+                        d,
+                        existingByExtId.get(d.externalId()))) // valid parent
+                .map(t -> {
+                    Tuple2<ChangeOperation, Set<ChangedFieldType>> op = determineOperation(t.v1, t.v2);
+                    boolean isUnique = countByExtId.get(t.v1.externalId()) == 1;
+                    boolean parentExists = StringUtilities.isEmpty(t.v1.parentExternalId()) || allExtIds.contains(t.v1.parentExternalId());
+                    boolean isCyclical = hasCycle;
+                    return ImmutableBulkTaxonomyValidatedItem
+                            .builder()
+                            .parsedItem(t.v1)
+                            .changedFields(op.v2)
+                            .changeOperation(op.v1)
+                            .errors(SetUtilities.compact(
+                                    isUnique ? null : ValidationError.DUPLICATE_EXT_ID,
+                                    parentExists ? null : ValidationError.PARENT_NOT_FOUND,
+                                    isCyclical ? ValidationError.CYCLE_DETECTED : null))
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        return ImmutableBulkTaxonomyValidationResult
+                .builder()
+                .plannedRemovalCount(0)
+                .validatedItems(baa)
+                .build();
+    }
+
+
+    private Tuple2<ChangeOperation, Set<ChangedFieldType>> determineOperation(BulkTaxonomyItem a,
+                                                                              Measurable b) {
+        if (b == null) {
+            return tuple(ChangeOperation.ADD, emptySet());
+        }
+
+        boolean nameMatches = safeEq(a.name(), b.name());
+        boolean descMatches = safeEq(a.description(), b.description());
+        boolean parentExtIdMatches = safeEq(a.parentExternalId(), b.externalParentId().orElse(null));
+        boolean concreteMatches = a.concrete() == b.concrete();
+
+        Set<ChangedFieldType> changedFields = new HashSet<>();
+        if (nameMatches) { changedFields.add(ChangedFieldType.NAME); }
+        if (descMatches) { changedFields.add(ChangedFieldType.DESCRIPTION); }
+        if (parentExtIdMatches) { changedFields.add(ChangedFieldType.PARENT_EXTERNAL_ID); }
+        if (concreteMatches) { changedFields.add(ChangedFieldType.CONCRETE); }
+
+        return changedFields.isEmpty()
+                ? tuple(ChangeOperation.NONE, emptySet())
+                : tuple(ChangeOperation.UPDATE, changedFields);
     }
 }

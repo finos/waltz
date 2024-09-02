@@ -5,10 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvParser;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
-import org.finos.waltz.model.taxonomy_management.BulkTaxonomyItem;
-import org.finos.waltz.model.taxonomy_management.BulkTaxonomyParseResult;
-import org.finos.waltz.model.taxonomy_management.ImmutableBulkTaxonomyParseError;
-import org.finos.waltz.model.taxonomy_management.ImmutableBulkTaxonomyParseResult;
+import org.finos.waltz.model.bulk_upload.taxonomy.BulkTaxonomyItem;
+import org.finos.waltz.model.bulk_upload.taxonomy.BulkTaxonomyParseResult;
+import org.finos.waltz.model.bulk_upload.taxonomy.ImmutableBulkTaxonomyParseError;
+import org.finos.waltz.model.bulk_upload.taxonomy.ImmutableBulkTaxonomyParseResult;
 
 import java.io.IOException;
 import java.util.List;

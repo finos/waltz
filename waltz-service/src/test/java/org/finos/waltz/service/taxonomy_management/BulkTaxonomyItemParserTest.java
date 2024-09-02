@@ -1,9 +1,9 @@
 package org.finos.waltz.service.taxonomy_management;
 
 import org.finos.waltz.common.SetUtilities;
-import org.finos.waltz.model.taxonomy_management.BulkTaxonomyItem;
-import org.finos.waltz.model.taxonomy_management.BulkTaxonomyParseResult;
-import org.finos.waltz.model.taxonomy_management.BulkTaxonomyParseResult.BulkTaxonomyParseError;
+import org.finos.waltz.model.bulk_upload.taxonomy.BulkTaxonomyItem;
+import org.finos.waltz.model.bulk_upload.taxonomy.BulkTaxonomyParseResult;
+import org.finos.waltz.model.bulk_upload.taxonomy.BulkTaxonomyParseResult.BulkTaxonomyParseError;
 import org.finos.waltz.service.taxonomy_management.BulkTaxonomyItemParser.InputFormat;
 import org.junit.jupiter.api.Test;
 

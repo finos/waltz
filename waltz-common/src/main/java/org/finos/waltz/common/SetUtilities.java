@@ -182,4 +182,8 @@ public class SetUtilities {
     public static <T> Set<T> remove(Set<T> orig, T... ts) {
         return minus(orig, asSet(ts));
     }
+
+    public static <T> Set<T> compact(T... ts) {
+        return remove(asSet(ts), (T) null);
+    }
 }

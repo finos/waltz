@@ -1,4 +1,4 @@
-package org.finos.waltz.model.taxonomy_management;
+package org.finos.waltz.model.bulk_upload.taxonomy;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonFormat;

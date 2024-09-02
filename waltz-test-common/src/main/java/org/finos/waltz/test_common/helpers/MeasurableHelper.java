@@ -16,6 +16,7 @@ import java.util.Set;
 
 import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
+import static org.finos.waltz.common.StringUtilities.mkExternalId;
 import static org.finos.waltz.schema.Tables.MEASURABLE;
 import static org.finos.waltz.schema.Tables.MEASURABLE_CATEGORY;
 import static org.finos.waltz.schema.Tables.MEASURABLE_RATING;
@@ -75,6 +76,14 @@ public class MeasurableHelper {
 
 
     public long createMeasurable(String name, long categoryId) {
+        return createMeasurable(
+                mkExternalId(name),
+                name,
+                categoryId);
+    }
+
+
+    public long createMeasurable(String externalId, String name, long categoryId) {
         return dsl
                 .select(MEASURABLE.ID)
                 .from(MEASURABLE)
@@ -87,7 +96,7 @@ public class MeasurableHelper {
                     record.setName(name);
                     record.setDescription(name);
                     record.setConcrete(true);
-                    record.setExternalId(name);
+                    record.setExternalId(externalId);
                     record.setProvenance(PROVENANCE);
                     record.setLastUpdatedBy(LAST_UPDATE_USER);
                     record.setLastUpdatedAt(nowUtcTimestamp());
