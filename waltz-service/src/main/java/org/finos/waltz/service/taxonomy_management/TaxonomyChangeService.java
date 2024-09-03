@@ -19,22 +19,10 @@
 package org.finos.waltz.service.taxonomy_management;
 
 import org.finos.waltz.common.DateTimeUtilities;
-import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.common.StringUtilities;
-import org.finos.waltz.common.hierarchy.FlatNode;
 import org.finos.waltz.data.taxonomy_management.TaxonomyChangeDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.bulk_upload.BulkUpdateMode;
-import org.finos.waltz.model.bulk_upload.ChangeOperation;
-import org.finos.waltz.model.bulk_upload.taxonomy.BulkTaxonomyItem;
-import org.finos.waltz.model.bulk_upload.taxonomy.BulkTaxonomyParseResult;
-import org.finos.waltz.model.bulk_upload.taxonomy.BulkTaxonomyValidatedItem;
-import org.finos.waltz.model.bulk_upload.taxonomy.BulkTaxonomyValidationResult;
-import org.finos.waltz.model.bulk_upload.taxonomy.ChangedFieldType;
-import org.finos.waltz.model.bulk_upload.taxonomy.ImmutableBulkTaxonomyValidatedItem;
-import org.finos.waltz.model.bulk_upload.taxonomy.ImmutableBulkTaxonomyValidationResult;
-import org.finos.waltz.model.bulk_upload.taxonomy.ValidationError;
 import org.finos.waltz.model.exceptions.NotAuthorizedException;
 import org.finos.waltz.model.measurable.Measurable;
 import org.finos.waltz.model.measurable_category.MeasurableCategory;
@@ -49,37 +37,20 @@ import org.finos.waltz.service.client_cache_key.ClientCacheKeyService;
 import org.finos.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.finos.waltz.service.measurable.MeasurableService;
 import org.finos.waltz.service.measurable_category.MeasurableCategoryService;
-import org.finos.waltz.service.taxonomy_management.BulkTaxonomyItemParser.InputFormat;
 import org.finos.waltz.service.user.UserRoleService;
-import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import static java.util.Collections.emptySet;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.finos.waltz.common.Checks.checkFalse;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkTrue;
-import static org.finos.waltz.common.MapUtilities.countBy;
-import static org.finos.waltz.common.MapUtilities.indexBy;
-import static org.finos.waltz.common.SetUtilities.union;
-import static org.finos.waltz.common.StringUtilities.limit;
-import static org.finos.waltz.common.StringUtilities.mkSafe;
-import static org.finos.waltz.common.StringUtilities.safeEq;
-import static org.finos.waltz.common.hierarchy.HierarchyUtilities.hasCycle;
-import static org.finos.waltz.common.hierarchy.HierarchyUtilities.toForest;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Service
@@ -141,7 +112,8 @@ public class TaxonomyChangeService {
     }
 
 
-    public TaxonomyChangeCommand submitDraftChange(TaxonomyChangeCommand draftCommand, String userId) {
+    public TaxonomyChangeCommand submitDraftChange(TaxonomyChangeCommand draftCommand,
+                                                   String userId) {
         verifyUserHasPermissions(userId, draftCommand.changeDomain());
         checkTrue(draftCommand.status() == TaxonomyChangeLifecycleStatus.DRAFT, "Command must be DRAFT");
 
@@ -169,7 +141,8 @@ public class TaxonomyChangeService {
     }
 
 
-    public TaxonomyChangeCommand applyById(long id, String userId) {
+    public TaxonomyChangeCommand applyById(long id,
+                                           String userId) {
         TaxonomyChangeCommand command = taxonomyChangeDao.getDraftCommandById(id);
         verifyUserHasPermissions(userId, command.changeDomain());
 
@@ -199,7 +172,8 @@ public class TaxonomyChangeService {
     }
 
 
-    public boolean removeById(long id, String userId) {
+    public boolean removeById(long id,
+                              String userId) {
         verifyUserHasPermissions(userId);
         return taxonomyChangeDao.removeById(id, userId);
     }
@@ -212,26 +186,27 @@ public class TaxonomyChangeService {
     }
 
 
-    private void verifyUserHasPermissions(String userId, EntityReference changeDomain) {
+    private void verifyUserHasPermissions(String userId,
+                                          EntityReference changeDomain) {
         verifyUserHasPermissions(userId);
 
         if (changeDomain.kind() == EntityKind.MEASURABLE_CATEGORY) {
             MeasurableCategory category = measurableCategoryService.getById(changeDomain.id());
-            if (! category.editable()) {
+            if (!category.editable()) {
                 throw new NotAuthorizedException("Unauthorised: Category is not editable");
             }
         }
     }
 
     private void verifyUserHasPermissions(String userId) {
-        if (! userRoleService.hasRole(userId, SystemRole.TAXONOMY_EDITOR.name())) {
+        if (!userRoleService.hasRole(userId, SystemRole.TAXONOMY_EDITOR.name())) {
             throw new NotAuthorizedException();
         }
     }
 
     private boolean isMoveToSameParent(TaxonomyChangeCommand command) {
         String destinationId = command.params().get("destinationId");
-        if(isMovingToANode(command, destinationId)) {
+        if (isMovingToANode(command, destinationId)) {
 
             long parentId = Long.parseLong(destinationId);
             final Measurable parent = measurableService.getById(parentId);
@@ -245,10 +220,12 @@ public class TaxonomyChangeService {
     private boolean isMoveToANodeWhichIsAlreadyAChild(TaxonomyChangeCommand command) {
         String destinationId = command.params().get("destinationId");
         return isMovingToANode(command, destinationId) &&
-             Long.parseLong(destinationId) == command.primaryReference().id();
+                Long.parseLong(destinationId) == command.primaryReference().id();
     }
 
-    private boolean isMovingToANode(TaxonomyChangeCommand command, String destinationId) {
+
+    private boolean isMovingToANode(TaxonomyChangeCommand command,
+                                    String destinationId) {
         return command.changeType().equals(TaxonomyChangeType.MOVE) &&
                 StringUtilities.notEmpty(destinationId);
     }
@@ -261,121 +238,4 @@ public class TaxonomyChangeService {
                 || command.changeType() == TaxonomyChangeType.MOVE;
     }
 
-
-    public BulkTaxonomyValidationResult bulkPreview(long categoryId,
-                                                    String inputStr,
-                                                    InputFormat format,
-                                                    BulkUpdateMode mode) {
-
-        LOG.debug(
-                "Bulk preview - category:{}, format:{}, inputStr:{}",
-                categoryId,
-                format,
-                limit(inputStr, 40));
-
-        MeasurableCategory category = measurableCategoryService.getById(categoryId);
-        checkNotNull(category, "Unknown category: %d", categoryId);
-
-        List<Measurable> existingMeasurables = measurableService.findByCategoryId(categoryId);
-        Map<String, Measurable> existingByExtId = indexBy(existingMeasurables, m -> m.externalId().orElse(null));
-
-        LOG.debug(
-                "category: {} = {}({})",
-                categoryId,
-                category.name(),
-                category.externalId());
-
-        BulkTaxonomyParseResult result = new BulkTaxonomyItemParser().parse(inputStr, format);
-
-        Map<String, BulkTaxonomyItem> givenByExtId = indexBy(result.parsedItems(), BulkTaxonomyItem::externalId);
-        Set<String> allExtIds = union(existingByExtId.keySet(), givenByExtId.keySet());
-
-         /*
-          Validation checks:
-
-          - unique external ids
-          - all parent external id's exist either in file or in existing taxonomy
-          - check for cycles by converting to forest
-          - do a diff to determine
-              - new
-              - removed, if mode == replace
-              - updated, match on external id
-         */
-
-        Map<String, Long> countByExtId = countBy(result.parsedItems(), BulkTaxonomyItem::externalId);
-
-        Boolean hasCycle = determineIfTreeHasCycle(existingMeasurables, result);
-
-        List<BulkTaxonomyValidatedItem> validatedItems = result
-                .parsedItems()
-                .stream()
-                .map(d -> tuple(
-                        d,
-                        existingByExtId.get(d.externalId())))  // => (parsedItem, existingItem?)
-                .map(t -> {
-                    Tuple2<ChangeOperation, Set<ChangedFieldType>> op = determineOperation(t.v1, t.v2);
-                    boolean isUnique = countByExtId.get(t.v1.externalId()) == 1;
-                    boolean parentExists = StringUtilities.isEmpty(t.v1.parentExternalId()) || allExtIds.contains(t.v1.parentExternalId());
-                    boolean isCyclical = hasCycle;
-                    return ImmutableBulkTaxonomyValidatedItem
-                            .builder()
-                            .parsedItem(t.v1)
-                            .changedFields(op.v2)
-                            .changeOperation(op.v1)
-                            .errors(SetUtilities.compact(
-                                    isUnique ? null : ValidationError.DUPLICATE_EXT_ID,
-                                    parentExists ? null : ValidationError.PARENT_NOT_FOUND,
-                                    isCyclical ? ValidationError.CYCLE_DETECTED : null))
-                            .build();
-                })
-                .collect(Collectors.toList());
-
-        Set<Measurable> toRemove = mode == BulkUpdateMode.ADD_ONLY
-                ? emptySet()
-                : SetUtilities.filter(existingMeasurables, m -> ! givenByExtId.containsKey(m.externalId().get()));
-
-        return ImmutableBulkTaxonomyValidationResult
-                .builder()
-                .plannedRemovals(toRemove)
-                .validatedItems(validatedItems)
-                .build();
-    }
-
-    private Boolean determineIfTreeHasCycle(List<Measurable> existingMeasurables,
-                               BulkTaxonomyParseResult result) {
-        return Stream
-                .concat(
-                        existingMeasurables.stream().map(d -> new FlatNode<String, String>(
-                                d.externalId().orElse(null),
-                                d.externalParentId(),
-                                null)),
-                        result.parsedItems().stream().map(d -> new FlatNode<String, String>(
-                                d.externalId(),
-                                Optional.ofNullable(d.parentExternalId()),
-                                null)))
-                .collect(Collectors.collectingAndThen(toList(), xs -> hasCycle(toForest(xs))));
-    }
-
-
-    private Tuple2<ChangeOperation, Set<ChangedFieldType>> determineOperation(BulkTaxonomyItem requiredItem,
-                                                                              Measurable existingItem) {
-        if (existingItem == null) {
-            return tuple(ChangeOperation.ADD, emptySet());
-        }
-
-        boolean nameMatches = safeEq(requiredItem.name(), existingItem.name());
-        boolean descMatches = safeEq(requiredItem.description(), existingItem.description());
-        boolean parentExtIdMatches = safeEq(mkSafe(requiredItem.parentExternalId()), mkSafe(existingItem.externalParentId().orElse(null)));
-        boolean concreteMatches = requiredItem.concrete() == existingItem.concrete();
-
-        Set<ChangedFieldType> changedFields = new HashSet<>();
-        if (!nameMatches) { changedFields.add(ChangedFieldType.NAME); }
-        if (!descMatches) { changedFields.add(ChangedFieldType.DESCRIPTION); }
-        if (!parentExtIdMatches) { changedFields.add(ChangedFieldType.PARENT_EXTERNAL_ID); }
-        if (!concreteMatches) { changedFields.add(ChangedFieldType.CONCRETE); }
-
-        return changedFields.isEmpty()
-                ? tuple(ChangeOperation.NONE, emptySet())
-                : tuple(ChangeOperation.UPDATE, changedFields);
-    }
 }
