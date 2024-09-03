@@ -76,6 +76,7 @@ import static org.finos.waltz.common.MapUtilities.countBy;
 import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.SetUtilities.union;
 import static org.finos.waltz.common.StringUtilities.limit;
+import static org.finos.waltz.common.StringUtilities.mkSafe;
 import static org.finos.waltz.common.StringUtilities.safeEq;
 import static org.finos.waltz.common.hierarchy.HierarchyUtilities.hasCycle;
 import static org.finos.waltz.common.hierarchy.HierarchyUtilities.toForest;
@@ -303,24 +304,14 @@ public class TaxonomyChangeService {
 
         Map<String, Long> countByExtId = countBy(result.parsedItems(), BulkTaxonomyItem::externalId);
 
-        Boolean hasCycle = Stream.concat(
-                        existingMeasurables.stream().map(d -> new FlatNode<String, String>(
-                                d.externalId().orElse(null),
-                                d.externalParentId(),
-                                null)),
-                        result.parsedItems().stream().map(d -> new FlatNode<String, String>(
-                                d.externalId(),
-                                Optional.ofNullable(d.parentExternalId()),
-                                null)))
-                .collect(Collectors.collectingAndThen(toList(), xs -> hasCycle(toForest(xs))));
+        Boolean hasCycle = determineIfTreeHasCycle(existingMeasurables, result);
 
-
-        List<BulkTaxonomyValidatedItem> baa = result
+        List<BulkTaxonomyValidatedItem> validatedItems = result
                 .parsedItems()
                 .stream()
                 .map(d -> tuple(
                         d,
-                        existingByExtId.get(d.externalId()))) // valid parent
+                        existingByExtId.get(d.externalId())))  // => (parsedItem, existingItem?)
                 .map(t -> {
                     Tuple2<ChangeOperation, Set<ChangedFieldType>> op = determineOperation(t.v1, t.v2);
                     boolean isUnique = countByExtId.get(t.v1.externalId()) == 1;
@@ -339,30 +330,49 @@ public class TaxonomyChangeService {
                 })
                 .collect(Collectors.toList());
 
+        Set<Measurable> toRemove = mode == BulkUpdateMode.ADD_ONLY
+                ? emptySet()
+                : SetUtilities.filter(existingMeasurables, m -> ! givenByExtId.containsKey(m.externalId().get()));
+
         return ImmutableBulkTaxonomyValidationResult
                 .builder()
-                .plannedRemovalCount(0)
-                .validatedItems(baa)
+                .plannedRemovals(toRemove)
+                .validatedItems(validatedItems)
                 .build();
     }
 
+    private Boolean determineIfTreeHasCycle(List<Measurable> existingMeasurables,
+                               BulkTaxonomyParseResult result) {
+        return Stream
+                .concat(
+                        existingMeasurables.stream().map(d -> new FlatNode<String, String>(
+                                d.externalId().orElse(null),
+                                d.externalParentId(),
+                                null)),
+                        result.parsedItems().stream().map(d -> new FlatNode<String, String>(
+                                d.externalId(),
+                                Optional.ofNullable(d.parentExternalId()),
+                                null)))
+                .collect(Collectors.collectingAndThen(toList(), xs -> hasCycle(toForest(xs))));
+    }
 
-    private Tuple2<ChangeOperation, Set<ChangedFieldType>> determineOperation(BulkTaxonomyItem a,
-                                                                              Measurable b) {
-        if (b == null) {
+
+    private Tuple2<ChangeOperation, Set<ChangedFieldType>> determineOperation(BulkTaxonomyItem requiredItem,
+                                                                              Measurable existingItem) {
+        if (existingItem == null) {
             return tuple(ChangeOperation.ADD, emptySet());
         }
 
-        boolean nameMatches = safeEq(a.name(), b.name());
-        boolean descMatches = safeEq(a.description(), b.description());
-        boolean parentExtIdMatches = safeEq(a.parentExternalId(), b.externalParentId().orElse(null));
-        boolean concreteMatches = a.concrete() == b.concrete();
+        boolean nameMatches = safeEq(requiredItem.name(), existingItem.name());
+        boolean descMatches = safeEq(requiredItem.description(), existingItem.description());
+        boolean parentExtIdMatches = safeEq(mkSafe(requiredItem.parentExternalId()), mkSafe(existingItem.externalParentId().orElse(null)));
+        boolean concreteMatches = requiredItem.concrete() == existingItem.concrete();
 
         Set<ChangedFieldType> changedFields = new HashSet<>();
-        if (nameMatches) { changedFields.add(ChangedFieldType.NAME); }
-        if (descMatches) { changedFields.add(ChangedFieldType.DESCRIPTION); }
-        if (parentExtIdMatches) { changedFields.add(ChangedFieldType.PARENT_EXTERNAL_ID); }
-        if (concreteMatches) { changedFields.add(ChangedFieldType.CONCRETE); }
+        if (!nameMatches) { changedFields.add(ChangedFieldType.NAME); }
+        if (!descMatches) { changedFields.add(ChangedFieldType.DESCRIPTION); }
+        if (!parentExtIdMatches) { changedFields.add(ChangedFieldType.PARENT_EXTERNAL_ID); }
+        if (!concreteMatches) { changedFields.add(ChangedFieldType.CONCRETE); }
 
         return changedFields.isEmpty()
                 ? tuple(ChangeOperation.NONE, emptySet())
