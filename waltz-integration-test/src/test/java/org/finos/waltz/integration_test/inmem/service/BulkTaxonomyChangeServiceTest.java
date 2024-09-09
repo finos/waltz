@@ -4,6 +4,8 @@ import org.finos.waltz.common.CollectionUtilities;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.bulk_upload.BulkUpdateMode;
 import org.finos.waltz.model.bulk_upload.ChangeOperation;
 import org.finos.waltz.model.bulk_upload.taxonomy.BulkTaxonomyValidatedItem;
@@ -28,6 +30,7 @@ import static org.finos.waltz.common.CollectionUtilities.find;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.ListUtilities.asList;
 import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.test_common.helpers.NameHelper.mkName;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -51,10 +54,10 @@ public class BulkTaxonomyChangeServiceTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void previewBrandNewTaxonomy() {
-        long categoryId = setupCategory();
+        EntityReference category = setupCategory();
 
         BulkTaxonomyValidationResult result = taxonomyChangeService.bulkPreview(
-                categoryId,
+                category,
                 mkSimpleTsv(),
                 BulkTaxonomyItemParser.InputFormat.CSV,
                 BulkUpdateMode.ADD_ONLY);
@@ -73,15 +76,14 @@ public class BulkTaxonomyChangeServiceTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void previewUpdates() {
-        long categoryId = setupCategory();
-        measurableHelper.createMeasurable("a1", "A1", categoryId);
+        EntityReference category = setupCategory();
+        measurableHelper.createMeasurable("a1", "A1", category.id());
 
         BulkTaxonomyValidationResult result = taxonomyChangeService.bulkPreview(
-                categoryId,
+                category,
                 mkSimpleTsv(),
                 BulkTaxonomyItemParser.InputFormat.CSV,
                 BulkUpdateMode.ADD_ONLY);
-
 
         assertNotNull(result, "Expected a result");
         assertNoErrors(result);
@@ -102,11 +104,11 @@ public class BulkTaxonomyChangeServiceTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void previewRemovalsIfModeIsReplace() {
-        long categoryId = setupCategory();
-        measurableHelper.createMeasurable("z1", "Z1", categoryId);
+        EntityReference category = setupCategory();
+        measurableHelper.createMeasurable("z1", "Z1", category.id());
 
         BulkTaxonomyValidationResult result = taxonomyChangeService.bulkPreview(
-                categoryId,
+                category,
                 mkSimpleTsv(),
                 BulkTaxonomyItemParser.InputFormat.CSV,
                 BulkUpdateMode.REPLACE);
@@ -125,12 +127,12 @@ public class BulkTaxonomyChangeServiceTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void previewMultipleRemovalsIfModeIsReplace() {
-        long categoryId = setupCategory();
-        measurableHelper.createMeasurable("z1", "Z1", categoryId);
-        measurableHelper.createMeasurable("z2", "Z2", categoryId);
+        EntityReference category = setupCategory();
+        measurableHelper.createMeasurable("z1", "Z1", category.id());
+        measurableHelper.createMeasurable("z2", "Z2", category.id());
 
         BulkTaxonomyValidationResult result = taxonomyChangeService.bulkPreview(
-                categoryId,
+                category,
                 mkSimpleTsv(),
                 BulkTaxonomyItemParser.InputFormat.CSV,
                 BulkUpdateMode.REPLACE);
@@ -149,18 +151,18 @@ public class BulkTaxonomyChangeServiceTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void applyBrandNewTaxonomy() {
-        long categoryId = setupCategory();
+        EntityReference category = setupCategory();
         String user = setupUser();
 
         BulkTaxonomyValidationResult result = taxonomyChangeService.bulkPreview(
-                categoryId,
+                category,
                 mkSimpleTsv(),
                 BulkTaxonomyItemParser.InputFormat.CSV,
                 BulkUpdateMode.ADD_ONLY);
 
-        taxonomyChangeService.applyBulk(categoryId, result, user);
+        taxonomyChangeService.applyBulk(category, result, user);
 
-        List<Measurable> storedMeasurables = measurableService.findByCategoryId(categoryId);
+        List<Measurable> storedMeasurables = measurableService.findByCategoryId(category.id());
 
         assertEquals(
             asSet("a1", "a1.1", "a1.2"),
@@ -170,19 +172,19 @@ public class BulkTaxonomyChangeServiceTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void applyUpdates() {
-        long categoryId = setupCategory();
+        EntityReference category = setupCategory();
         String user = setupUser();
-        measurableHelper.createMeasurable("a1", "A1", categoryId);
+        measurableHelper.createMeasurable("a1", "A1", category.id());
 
         BulkTaxonomyValidationResult result = taxonomyChangeService.bulkPreview(
-                categoryId,
+                category,
                 mkSimpleTsv(),
                 BulkTaxonomyItemParser.InputFormat.CSV,
                 BulkUpdateMode.ADD_ONLY);
 
-        taxonomyChangeService.applyBulk(categoryId, result, user);
+        taxonomyChangeService.applyBulk(category, result, user);
 
-        List<Measurable> storedMeasurables = measurableService.findByCategoryId(categoryId);
+        List<Measurable> storedMeasurables = measurableService.findByCategoryId(category.id());
 
         assertEquals(
                 asSet("a1", "a1.1", "a1.2"),
@@ -199,19 +201,19 @@ public class BulkTaxonomyChangeServiceTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void applyRemovalsIfModeIsReplace() {
-        long categoryId = setupCategory();
+        EntityReference category = setupCategory();
         String user = setupUser();
-        measurableHelper.createMeasurable("z1", "Z1", categoryId);
+        measurableHelper.createMeasurable("z1", "Z1", category.id());
 
         BulkTaxonomyValidationResult result = taxonomyChangeService.bulkPreview(
-                categoryId,
+                category,
                 mkSimpleTsv(),
                 BulkTaxonomyItemParser.InputFormat.CSV,
                 BulkUpdateMode.REPLACE);
 
-        taxonomyChangeService.applyBulk(categoryId, result, user);
+        taxonomyChangeService.applyBulk(category, result, user);
 
-        List<Measurable> storedMeasurables = measurableService.findByCategoryId(categoryId);
+        List<Measurable> storedMeasurables = measurableService.findByCategoryId(category.id());
         assertEquals(
                 asSet("a1", "a1.1", "a1.2"),
                 SetUtilities.map(storedMeasurables, m -> m.externalId().orElse(null)),
@@ -220,10 +222,10 @@ public class BulkTaxonomyChangeServiceTest extends BaseInMemoryIntegrationTest {
 
     // --- HELPERS -----
 
-    private long setupCategory() {
+    private EntityReference setupCategory() {
         String categoryName = mkName("TaxonomyChangeServiceTest", "category");
         long categoryId = measurableHelper.createMeasurableCategory(categoryName);
-        return categoryId;
+        return mkRef(EntityKind.MEASURABLE_CATEGORY, categoryId, categoryName);
     }
 
 

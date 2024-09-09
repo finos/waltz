@@ -21,6 +21,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import template from "./measurable-category-edit.html";
 import {toEntityRef} from "../../../common/entity-utils";
 import toasts from "../../../svelte-stores/toast-store";
+import BulkTaxonomyEditor from "../../components/bulk-taxonomy-editor/BulkTaxonomyEditor.svelte";
 
 
 const modes = {
@@ -29,6 +30,11 @@ const modes = {
     CHANGE_VIEW: "CHANGE_VIEW"
 };
 
+const tabs = {
+    INTERACTIVE_TAXONOMY: "INTERACTIVE_TAXONOMY",
+    BULK_TAXONOMY: "BULK_TAXONOMY",
+    BULK_RATING: "BULK_RATING"
+};
 
 const initialState = {
     changeDomain: null,
@@ -38,7 +44,9 @@ const initialState = {
     selectedChange: null,
     recentlySelected: [],
     pendingChanges: [],
-    mode: modes.SUMMARY
+    mode: modes.SUMMARY,
+    activeTab: tabs.BULK_TAXONOMY, // tabs.INTERACTIVE_TAXONOMY,
+    BulkTaxonomyEditor
 };
 
 

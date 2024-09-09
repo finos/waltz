@@ -22,6 +22,8 @@ import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.common.hierarchy.FlatNode;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.bulk_upload.BulkUpdateMode;
 import org.finos.waltz.model.bulk_upload.ChangeOperation;
 import org.finos.waltz.model.bulk_upload.taxonomy.BulkTaxonomyItem;
@@ -38,6 +40,7 @@ import org.finos.waltz.schema.tables.records.MeasurableRecord;
 import org.finos.waltz.service.measurable.MeasurableService;
 import org.finos.waltz.service.measurable_category.MeasurableCategoryService;
 import org.finos.waltz.service.taxonomy_management.BulkTaxonomyItemParser.InputFormat;
+import org.finos.waltz.service.user.UserRoleService;
 import org.jooq.DSLContext;
 import org.jooq.UpdateConditionStep;
 import org.jooq.UpdateSetStep;
@@ -70,6 +73,7 @@ import static org.finos.waltz.common.hierarchy.HierarchyUtilities.hasCycle;
 import static org.finos.waltz.common.hierarchy.HierarchyUtilities.toForest;
 import static org.finos.waltz.data.JooqUtilities.summarizeResults;
 import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
+import static org.finos.waltz.service.taxonomy_management.TaxonomyManagementUtilities.verifyUserHasPermissions;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Service
@@ -79,39 +83,45 @@ public class BulkTaxonomyChangeService {
 
     private final MeasurableCategoryService measurableCategoryService;
     private final MeasurableService measurableService;
+    private final UserRoleService userRoleService;
     private final DSLContext dsl;
 
 
     @Autowired
     public BulkTaxonomyChangeService(MeasurableCategoryService measurableCategoryService,
                                      MeasurableService measurableService,
+                                     UserRoleService userRoleService,
                                      DSLContext dsl) {
         this.measurableCategoryService = measurableCategoryService;
         this.measurableService = measurableService;
+        this.userRoleService = userRoleService;
         this.dsl = dsl;
     }
 
 
-    public BulkTaxonomyValidationResult bulkPreview(long categoryId,
+    public BulkTaxonomyValidationResult bulkPreview(EntityReference taxonomyRef,
                                                     String inputStr,
                                                     InputFormat format,
                                                     BulkUpdateMode mode) {
+        if (taxonomyRef.kind() != EntityKind.MEASURABLE_CATEGORY) {
+            throw new UnsupportedOperationException("Only measurable category bulk updates supported");
+        }
 
         LOG.debug(
                 "Bulk preview - category:{}, format:{}, inputStr:{}",
-                categoryId,
+                taxonomyRef,
                 format,
                 limit(inputStr, 40));
 
-        MeasurableCategory category = measurableCategoryService.getById(categoryId);
-        checkNotNull(category, "Unknown category: %d", categoryId);
+        MeasurableCategory category = measurableCategoryService.getById(taxonomyRef.id());
+        checkNotNull(category, "Unknown category: %d", taxonomyRef);
 
-        List<Measurable> existingMeasurables = measurableService.findByCategoryId(categoryId);
+        List<Measurable> existingMeasurables = measurableService.findByCategoryId(taxonomyRef.id());
         Map<String, Measurable> existingByExtId = indexBy(existingMeasurables, m -> m.externalId().orElse(null));
 
         LOG.debug(
                 "category: {} = {}({})",
-                categoryId,
+                taxonomyRef,
                 category.name(),
                 category.externalId());
 
@@ -171,10 +181,14 @@ public class BulkTaxonomyChangeService {
                 .build();
     }
 
-    public void applyBulk(long categoryId,
+
+    public int applyBulk(EntityReference taxonomyRef,
                           BulkTaxonomyValidationResult bulkRequest,
                           String userId) {
-
+        if (taxonomyRef.kind() != EntityKind.MEASURABLE_CATEGORY) {
+            throw new UnsupportedOperationException("Only measurable category bulk updates supported");
+        }
+        verifyUserHasPermissions(measurableCategoryService, userRoleService, userId, taxonomyRef);
         Timestamp now = DateTimeUtilities.nowUtcTimestamp();
 
         Set<MeasurableRecord> toAdd = bulkRequest
@@ -184,7 +198,7 @@ public class BulkTaxonomyChangeService {
                 .map(BulkTaxonomyValidatedItem::parsedItem)
                 .map(bulkTaxonomyItem -> {
                     MeasurableRecord r = new MeasurableRecord();
-                    r.setMeasurableCategoryId(categoryId);
+                    r.setMeasurableCategoryId(taxonomyRef.id());
                     r.setConcrete(bulkTaxonomyItem.concrete());
                     r.setName(bulkTaxonomyItem.name());
                     r.setExternalId(bulkTaxonomyItem.externalId());
@@ -221,13 +235,13 @@ public class BulkTaxonomyChangeService {
                     return upd
                             .set(MEASURABLE.LAST_UPDATED_AT, now)
                             .set(MEASURABLE.LAST_UPDATED_BY, userId)
-                            .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId))
+                            .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(taxonomyRef.id()))
                             .and(MEASURABLE.EXTERNAL_ID.eq(item.externalId()));
                 })
                 .collect(Collectors.toSet());
 
 
-        dsl.transaction(ctx -> {
+        return dsl.transactionResult(ctx -> {
             DSLContext tx = ctx.dsl();
             int insertCount = summarizeResults(tx.batchInsert(toAdd).execute());
             int updateCount = summarizeResults(tx.batch(updates).execute());
@@ -235,6 +249,8 @@ public class BulkTaxonomyChangeService {
                     "Inserted {} new measurables, Updated: {} existing measurables",
                     insertCount,
                     updateCount);
+
+            return updateCount + insertCount;
         });
 
     }
