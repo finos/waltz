@@ -74,11 +74,17 @@ a1.2\t a1\t A1_2\t Second child\t true`
         if (! _.isEmpty(item.errors)) {
             return "op-error";
         }
-        if (item.changeOperation === "ADD") {
-            return "op-add";
-        }
-        if (item.changeOperation === "UPDATE") {
-            return "op-update";
+        switch (item.changeOperation) {
+            case "ADD":
+                return "op-add";
+            case "UPDATE":
+                return "op-update";
+            case "NONE":
+                return "op-none";
+            case "RESTORE":
+                return "op-restore";
+            default:
+                return "op-error";
         }
     }
 
@@ -86,11 +92,17 @@ a1.2\t a1\t A1_2\t Second child\t true`
         if (! _.isEmpty(item.errors)) {
             return "Error";
         }
-        if (item.changeOperation === "ADD") {
-            return "Add";
-        }
-        if (item.changeOperation === "UPDATE") {
-            return "Update";
+        switch (item.changeOperation) {
+            case "ADD":
+                return "Add";
+            case "UPDATE":
+                return "Update";
+            case "NONE":
+                return "None";
+            case "RESTORE":
+                return "Restore";
+            default:
+                return "??" + item.changeOperation + "??";
         }
     }
 
@@ -207,16 +219,17 @@ a1.2\t a1\t A1_2\t Second child\t true`
                 <td class:cell-error={_.includes(item.errors, "DUPLICATE_EXT_ID")}>
                     {item.parsedItem.externalId}
                 </td>
-                <td class:cell-error={_.includes(item.errors, "PARENT_NOT_FOUND")}>
+                <td class:cell-error={_.includes(item.errors, "PARENT_NOT_FOUND")}
+                    class:cell-update={_.includes(item.changedFields, "PARENT_EXTERNAL_ID") && !_.includes(item.errors, "PARENT_NOT_FOUND")}>
                     {item.parsedItem.parentExternalId}
                 </td>
-                <td>
+                <td class:cell-update={_.includes(item.changedFields, "NAME")}>
                     {item.parsedItem.name}
                 </td>
-                <td>
+                <td class:cell-update={_.includes(item.changedFields, "DESCRIPTION")}>
                     {truncateMiddle(item.parsedItem.description)}
                 </td>
-                <td>
+                <td class:cell-update={_.includes(item.changedFields, "CONCRETE")}>
                     {item.parsedItem.concrete}
                 </td>
                 <td>
@@ -255,12 +268,25 @@ a1.2\t a1\t A1_2\t Second child\t true`
         background-color: #fdfdbd;
     }
 
+    .op-none {
+        background-color: #f3f3f3;
+    }
+
+    .op-restore {
+        background-color: #dcf7fc;
+    }
+
     .op-error {
         background-color: #ffccd7;
     }
 
     .cell-error {
         background-color: #ffccd7;
+    }
+
+    .cell-update {
+        background-color: #fdfdbd;
+        font-style: italic;
     }
 
 

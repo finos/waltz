@@ -22,6 +22,7 @@ public interface BulkTaxonomyItem {
     @Nullable
     String parentExternalId();
 
+    @JsonAlias({"desc"})
     @Nullable
     String description();
 

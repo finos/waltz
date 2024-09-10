@@ -94,6 +94,22 @@ class BulkTaxonomyItemParserTest {
     }
 
 
+    @Test
+    void parseIgnoresEmptyLines() {
+        BulkTaxonomyParseResult result = parser.parse(readTestFile("test-taxonomy-items-with-blanks.tsv"), InputFormat.TSV);
+        assertEquals(3, result.parsedItems().size());
+        assertNames(result.parsedItems(), "A1", "A1_1", "A1_2");
+    }
+
+
+    @Test
+    void parseIgnoresCommentedLines() {
+        BulkTaxonomyParseResult result = parser.parse(readTestFile("test-taxonomy-items-with-commented-lines.csv"), InputFormat.CSV);
+        assertEquals(3, result.parsedItems().size());
+        assertNames(result.parsedItems(), "A1", "A1_1", "A1_2");
+    }
+
+
     // -- HELPERS ------------------
 
     private void expectEmptyError(BulkTaxonomyParseResult result) {

@@ -78,7 +78,7 @@ public class TaxonomyManagementEndpoint implements Endpoint {
             InputFormat format = readEnum(req, "format", InputFormat.class, s -> InputFormat.TSV);
             BulkUpdateMode mode = readEnum(req, "mode", BulkUpdateMode.class, s -> BulkUpdateMode.ADD_ONLY);
             String body = req.body();
-            BulkTaxonomyValidationResult validationResult = bulkTaxonomyChangeService.bulkPreview(taxonomyRef, body, format, mode);
+            BulkTaxonomyValidationResult validationResult = bulkTaxonomyChangeService.previewBulk(taxonomyRef, body, format, mode);
             return bulkTaxonomyChangeService.applyBulk(taxonomyRef, validationResult, userId);
         });
     }
@@ -89,7 +89,7 @@ public class TaxonomyManagementEndpoint implements Endpoint {
             InputFormat format = readEnum(req, "format", InputFormat.class, s -> InputFormat.TSV);
             BulkUpdateMode mode = readEnum(req, "mode", BulkUpdateMode.class, s -> BulkUpdateMode.ADD_ONLY);
             String body = req.body();
-            return bulkTaxonomyChangeService.bulkPreview(taxonomyRef, body, format, mode);
+            return bulkTaxonomyChangeService.previewBulk(taxonomyRef, body, format, mode);
         });
     }
 

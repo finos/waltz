@@ -103,6 +103,13 @@ public class MeasurableService {
         return measurableDao.findByCategoryId(categoryId);
     }
 
+    /**
+     * returns all measurables for a given category which match the supplied list of statuses
+     */
+    public List<Measurable> findByCategoryId(Long categoryId, Set<EntityLifecycleStatus> statuses) {
+        return measurableDao.findByCategoryId(categoryId, statuses);
+    }
+
     public List<Measurable> findByParentId(Long parentId) {
         return measurableDao.findByParentId(parentId);
     }

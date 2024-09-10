@@ -19,10 +19,10 @@
 package org.finos.waltz.service.taxonomy_management;
 
 import org.finos.waltz.common.DateTimeUtilities;
-import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.common.hierarchy.FlatNode;
 import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.bulk_upload.BulkUpdateMode;
 import org.finos.waltz.model.bulk_upload.ChangeOperation;
@@ -65,6 +65,9 @@ import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.MapUtilities.countBy;
 import static org.finos.waltz.common.MapUtilities.indexBy;
+import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.SetUtilities.compact;
+import static org.finos.waltz.common.SetUtilities.filter;
 import static org.finos.waltz.common.SetUtilities.union;
 import static org.finos.waltz.common.StringUtilities.limit;
 import static org.finos.waltz.common.StringUtilities.mkSafe;
@@ -99,7 +102,7 @@ public class BulkTaxonomyChangeService {
     }
 
 
-    public BulkTaxonomyValidationResult bulkPreview(EntityReference taxonomyRef,
+    public BulkTaxonomyValidationResult previewBulk(EntityReference taxonomyRef,
                                                     String inputStr,
                                                     InputFormat format,
                                                     BulkUpdateMode mode) {
@@ -116,7 +119,10 @@ public class BulkTaxonomyChangeService {
         MeasurableCategory category = measurableCategoryService.getById(taxonomyRef.id());
         checkNotNull(category, "Unknown category: %d", taxonomyRef);
 
-        List<Measurable> existingMeasurables = measurableService.findByCategoryId(taxonomyRef.id());
+        List<Measurable> existingMeasurables = measurableService.findByCategoryId(
+                taxonomyRef.id(),
+                asSet(EntityLifecycleStatus.values()));
+
         Map<String, Measurable> existingByExtId = indexBy(existingMeasurables, m -> m.externalId().orElse(null));
 
         LOG.debug(
@@ -155,14 +161,15 @@ public class BulkTaxonomyChangeService {
                 .map(t -> {
                     Tuple2<ChangeOperation, Set<ChangedFieldType>> op = determineOperation(t.v1, t.v2);
                     boolean isUnique = countByExtId.get(t.v1.externalId()) == 1;
-                    boolean parentExists = StringUtilities.isEmpty(t.v1.parentExternalId()) || allExtIds.contains(t.v1.parentExternalId());
+                    boolean parentExists = StringUtilities.isEmpty(t.v1.parentExternalId())
+                            || allExtIds.contains(t.v1.parentExternalId());
                     boolean isCyclical = hasCycle;
                     return ImmutableBulkTaxonomyValidatedItem
                             .builder()
                             .parsedItem(t.v1)
                             .changedFields(op.v2)
                             .changeOperation(op.v1)
-                            .errors(SetUtilities.compact(
+                            .errors(compact(
                                     isUnique ? null : ValidationError.DUPLICATE_EXT_ID,
                                     parentExists ? null : ValidationError.PARENT_NOT_FOUND,
                                     isCyclical ? ValidationError.CYCLE_DETECTED : null))
@@ -172,7 +179,7 @@ public class BulkTaxonomyChangeService {
 
         Set<Measurable> toRemove = mode == BulkUpdateMode.ADD_ONLY
                 ? emptySet()
-                : SetUtilities.filter(existingMeasurables, m -> ! givenByExtId.containsKey(m.externalId().get()));
+                : filter(existingMeasurables, m -> ! givenByExtId.containsKey(m.externalId().get()));
 
         return ImmutableBulkTaxonomyValidationResult
                 .builder()
@@ -211,10 +218,21 @@ public class BulkTaxonomyChangeService {
                 })
                 .collect(Collectors.toSet());
 
-        Set<UpdateConditionStep<MeasurableRecord>> updates = bulkRequest
+        Set<UpdateConditionStep<MeasurableRecord>> toRestore = bulkRequest
                 .validatedItems()
                 .stream()
-                .filter(d -> d.changeOperation() == ChangeOperation.UPDATE)
+                .filter(d -> d.changeOperation() == ChangeOperation.RESTORE)
+                .map(d -> DSL
+                        .update(MEASURABLE)
+                        .set(MEASURABLE.ENTITY_LIFECYCLE_STATUS, EntityLifecycleStatus.ACTIVE.name())
+                        .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(taxonomyRef.id()))
+                        .and(MEASURABLE.EXTERNAL_ID.eq(d.parsedItem().externalId())))
+                .collect(Collectors.toSet());
+
+        Set<UpdateConditionStep<MeasurableRecord>> toUpdate = bulkRequest
+                .validatedItems()
+                .stream()
+                .filter(d -> d.changeOperation() == ChangeOperation.UPDATE  || d.changeOperation() == ChangeOperation.RESTORE)
                 .map(d -> {
                     BulkTaxonomyItem item = d.parsedItem();
                     UpdateSetStep<MeasurableRecord> upd = DSL.update(MEASURABLE);
@@ -244,13 +262,15 @@ public class BulkTaxonomyChangeService {
         return dsl.transactionResult(ctx -> {
             DSLContext tx = ctx.dsl();
             int insertCount = summarizeResults(tx.batchInsert(toAdd).execute());
-            int updateCount = summarizeResults(tx.batch(updates).execute());
+            int restoreCount = summarizeResults(tx.batch(toRestore).execute());
+            int updateCount = summarizeResults(tx.batch(toUpdate).execute());
             LOG.info(
-                    "Inserted {} new measurables, Updated: {} existing measurables",
+                    "Inserted {} new measurables, Updated: {} existing measurables, Restored: {} previously removed measurables",
                     insertCount,
-                    updateCount);
+                    updateCount,
+                    restoreCount);
 
-            return updateCount + insertCount;
+            return updateCount + insertCount + restoreCount;
         });
 
     }
@@ -279,6 +299,7 @@ public class BulkTaxonomyChangeService {
             return tuple(ChangeOperation.ADD, emptySet());
         }
 
+        boolean isRestore = existingItem.entityLifecycleStatus() != EntityLifecycleStatus.ACTIVE;
         boolean nameMatches = safeEq(requiredItem.name(), existingItem.name());
         boolean descMatches = safeEq(requiredItem.description(), existingItem.description());
         boolean parentExtIdMatches = safeEq(mkSafe(requiredItem.parentExternalId()), mkSafe(existingItem.externalParentId().orElse(null)));
@@ -290,9 +311,14 @@ public class BulkTaxonomyChangeService {
         if (!parentExtIdMatches) { changedFields.add(ChangedFieldType.PARENT_EXTERNAL_ID); }
         if (!concreteMatches) { changedFields.add(ChangedFieldType.CONCRETE); }
 
-        return changedFields.isEmpty()
-                ? tuple(ChangeOperation.NONE, emptySet())
-                : tuple(ChangeOperation.UPDATE, changedFields);
+        ChangeOperation op = isRestore
+                ? ChangeOperation.RESTORE
+                : changedFields.isEmpty()
+                    ? ChangeOperation.NONE
+                    : ChangeOperation.UPDATE;
+
+        return tuple(op, changedFields);
+
     }
 
 

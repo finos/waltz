@@ -12,6 +12,7 @@ import org.finos.waltz.model.bulk_upload.taxonomy.BulkTaxonomyValidatedItem;
 import org.finos.waltz.model.bulk_upload.taxonomy.BulkTaxonomyValidationResult;
 import org.finos.waltz.model.bulk_upload.taxonomy.ChangedFieldType;
 import org.finos.waltz.model.measurable.Measurable;
+import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.measurable.MeasurableService;
 import org.finos.waltz.service.taxonomy_management.BulkTaxonomyChangeService;
 import org.finos.waltz.service.taxonomy_management.BulkTaxonomyItemParser;
@@ -56,7 +57,7 @@ public class BulkTaxonomyChangeServiceTest extends BaseInMemoryIntegrationTest {
     public void previewBrandNewTaxonomy() {
         EntityReference category = setupCategory();
 
-        BulkTaxonomyValidationResult result = taxonomyChangeService.bulkPreview(
+        BulkTaxonomyValidationResult result = taxonomyChangeService.previewBulk(
                 category,
                 mkSimpleTsv(),
                 BulkTaxonomyItemParser.InputFormat.CSV,
@@ -79,7 +80,7 @@ public class BulkTaxonomyChangeServiceTest extends BaseInMemoryIntegrationTest {
         EntityReference category = setupCategory();
         measurableHelper.createMeasurable("a1", "A1", category.id());
 
-        BulkTaxonomyValidationResult result = taxonomyChangeService.bulkPreview(
+        BulkTaxonomyValidationResult result = taxonomyChangeService.previewBulk(
                 category,
                 mkSimpleTsv(),
                 BulkTaxonomyItemParser.InputFormat.CSV,
@@ -107,7 +108,7 @@ public class BulkTaxonomyChangeServiceTest extends BaseInMemoryIntegrationTest {
         EntityReference category = setupCategory();
         measurableHelper.createMeasurable("z1", "Z1", category.id());
 
-        BulkTaxonomyValidationResult result = taxonomyChangeService.bulkPreview(
+        BulkTaxonomyValidationResult result = taxonomyChangeService.previewBulk(
                 category,
                 mkSimpleTsv(),
                 BulkTaxonomyItemParser.InputFormat.CSV,
@@ -131,7 +132,7 @@ public class BulkTaxonomyChangeServiceTest extends BaseInMemoryIntegrationTest {
         measurableHelper.createMeasurable("z1", "Z1", category.id());
         measurableHelper.createMeasurable("z2", "Z2", category.id());
 
-        BulkTaxonomyValidationResult result = taxonomyChangeService.bulkPreview(
+        BulkTaxonomyValidationResult result = taxonomyChangeService.previewBulk(
                 category,
                 mkSimpleTsv(),
                 BulkTaxonomyItemParser.InputFormat.CSV,
@@ -154,7 +155,7 @@ public class BulkTaxonomyChangeServiceTest extends BaseInMemoryIntegrationTest {
         EntityReference category = setupCategory();
         String user = setupUser();
 
-        BulkTaxonomyValidationResult result = taxonomyChangeService.bulkPreview(
+        BulkTaxonomyValidationResult result = taxonomyChangeService.previewBulk(
                 category,
                 mkSimpleTsv(),
                 BulkTaxonomyItemParser.InputFormat.CSV,
@@ -176,7 +177,7 @@ public class BulkTaxonomyChangeServiceTest extends BaseInMemoryIntegrationTest {
         String user = setupUser();
         measurableHelper.createMeasurable("a1", "A1", category.id());
 
-        BulkTaxonomyValidationResult result = taxonomyChangeService.bulkPreview(
+        BulkTaxonomyValidationResult result = taxonomyChangeService.previewBulk(
                 category,
                 mkSimpleTsv(),
                 BulkTaxonomyItemParser.InputFormat.CSV,
@@ -205,7 +206,7 @@ public class BulkTaxonomyChangeServiceTest extends BaseInMemoryIntegrationTest {
         String user = setupUser();
         measurableHelper.createMeasurable("z1", "Z1", category.id());
 
-        BulkTaxonomyValidationResult result = taxonomyChangeService.bulkPreview(
+        BulkTaxonomyValidationResult result = taxonomyChangeService.previewBulk(
                 category,
                 mkSimpleTsv(),
                 BulkTaxonomyItemParser.InputFormat.CSV,
@@ -231,7 +232,8 @@ public class BulkTaxonomyChangeServiceTest extends BaseInMemoryIntegrationTest {
 
     private String setupUser() {
         String username = mkName("TaxonomyChangeServiceTest", "user");
-        userHelper.createUser(username);
+        userHelper.createUserWithSystemRoles(username, asSet(SystemRole.TAXONOMY_EDITOR));
+
         return username;
     }
 
