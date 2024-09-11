@@ -1,6 +1,7 @@
 package org.finos.waltz.test_common.helpers;
 
 import org.finos.waltz.common.CollectionUtilities;
+import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.measurable_category.MeasurableCategory;
 import org.finos.waltz.schema.tables.records.MeasurableCategoryRecord;
@@ -161,4 +162,11 @@ public class MeasurableHelper {
                 .execute();
     }
 
+    public int updateMeasurableLifecycleStatus(long measurableId, EntityLifecycleStatus newStatus) {
+        return dsl
+                .update(MEASURABLE)
+                .set(MEASURABLE.ENTITY_LIFECYCLE_STATUS, newStatus.name())
+                .where(MEASURABLE.ID.eq(measurableId))
+                .execute();
+    }
 }

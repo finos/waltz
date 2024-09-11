@@ -37,6 +37,7 @@ import org.finos.waltz.model.bulk_upload.taxonomy.ValidationError;
 import org.finos.waltz.model.measurable.Measurable;
 import org.finos.waltz.model.measurable_category.MeasurableCategory;
 import org.finos.waltz.schema.tables.records.MeasurableRecord;
+import org.finos.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.finos.waltz.service.measurable.MeasurableService;
 import org.finos.waltz.service.measurable_category.MeasurableCategoryService;
 import org.finos.waltz.service.taxonomy_management.BulkTaxonomyItemParser.InputFormat;
@@ -52,11 +53,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -75,7 +78,7 @@ import static org.finos.waltz.common.StringUtilities.safeEq;
 import static org.finos.waltz.common.hierarchy.HierarchyUtilities.hasCycle;
 import static org.finos.waltz.common.hierarchy.HierarchyUtilities.toForest;
 import static org.finos.waltz.data.JooqUtilities.summarizeResults;
-import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
+import static org.finos.waltz.schema.Tables.MEASURABLE;
 import static org.finos.waltz.service.taxonomy_management.TaxonomyManagementUtilities.verifyUserHasPermissions;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
@@ -87,6 +90,7 @@ public class BulkTaxonomyChangeService {
     private final MeasurableCategoryService measurableCategoryService;
     private final MeasurableService measurableService;
     private final UserRoleService userRoleService;
+    private final EntityHierarchyService entityHierarchyService;
     private final DSLContext dsl;
 
 
@@ -94,10 +98,12 @@ public class BulkTaxonomyChangeService {
     public BulkTaxonomyChangeService(MeasurableCategoryService measurableCategoryService,
                                      MeasurableService measurableService,
                                      UserRoleService userRoleService,
+                                     EntityHierarchyService entityHierarchyService,
                                      DSLContext dsl) {
         this.measurableCategoryService = measurableCategoryService;
         this.measurableService = measurableService;
         this.userRoleService = userRoleService;
+        this.entityHierarchyService = entityHierarchyService;
         this.dsl = dsl;
     }
 
@@ -223,10 +229,10 @@ public class BulkTaxonomyChangeService {
                 .stream()
                 .filter(d -> d.changeOperation() == ChangeOperation.RESTORE)
                 .map(d -> DSL
-                        .update(MEASURABLE)
-                        .set(MEASURABLE.ENTITY_LIFECYCLE_STATUS, EntityLifecycleStatus.ACTIVE.name())
-                        .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(taxonomyRef.id()))
-                        .and(MEASURABLE.EXTERNAL_ID.eq(d.parsedItem().externalId())))
+                        .update(org.finos.waltz.schema.tables.Measurable.MEASURABLE)
+                        .set(org.finos.waltz.schema.tables.Measurable.MEASURABLE.ENTITY_LIFECYCLE_STATUS, EntityLifecycleStatus.ACTIVE.name())
+                        .where(org.finos.waltz.schema.tables.Measurable.MEASURABLE.MEASURABLE_CATEGORY_ID.eq(taxonomyRef.id()))
+                        .and(org.finos.waltz.schema.tables.Measurable.MEASURABLE.EXTERNAL_ID.eq(d.parsedItem().externalId())))
                 .collect(Collectors.toSet());
 
         Set<UpdateConditionStep<MeasurableRecord>> toUpdate = bulkRequest
@@ -235,49 +241,104 @@ public class BulkTaxonomyChangeService {
                 .filter(d -> d.changeOperation() == ChangeOperation.UPDATE  || d.changeOperation() == ChangeOperation.RESTORE)
                 .map(d -> {
                     BulkTaxonomyItem item = d.parsedItem();
-                    UpdateSetStep<MeasurableRecord> upd = DSL.update(MEASURABLE);
+                    UpdateSetStep<MeasurableRecord> upd = DSL.update(org.finos.waltz.schema.tables.Measurable.MEASURABLE);
                     if (d.changedFields().contains(ChangedFieldType.NAME)) {
-                        upd = upd.set(MEASURABLE.NAME, item.name());
+                        upd = upd.set(org.finos.waltz.schema.tables.Measurable.MEASURABLE.NAME, item.name());
                     }
                     if (d.changedFields().contains(ChangedFieldType.PARENT_EXTERNAL_ID)) {
                         upd = StringUtilities.isEmpty(item.parentExternalId())
-                                ? upd.setNull(MEASURABLE.EXTERNAL_PARENT_ID)
-                                : upd.set(MEASURABLE.EXTERNAL_PARENT_ID, item.parentExternalId());
+                                ? upd.setNull(org.finos.waltz.schema.tables.Measurable.MEASURABLE.EXTERNAL_PARENT_ID)
+                                : upd.set(org.finos.waltz.schema.tables.Measurable.MEASURABLE.EXTERNAL_PARENT_ID, item.parentExternalId());
                     }
                     if (d.changedFields().contains(ChangedFieldType.DESCRIPTION)) {
-                        upd = upd.set(MEASURABLE.DESCRIPTION, item.description());
+                        upd = upd.set(org.finos.waltz.schema.tables.Measurable.MEASURABLE.DESCRIPTION, item.description());
                     }
                     if (d.changedFields().contains(ChangedFieldType.CONCRETE)) {
-                        upd = upd.set(MEASURABLE.CONCRETE, item.concrete());
+                        upd = upd.set(org.finos.waltz.schema.tables.Measurable.MEASURABLE.CONCRETE, item.concrete());
                     }
                     return upd
-                            .set(MEASURABLE.LAST_UPDATED_AT, now)
-                            .set(MEASURABLE.LAST_UPDATED_BY, userId)
-                            .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(taxonomyRef.id()))
-                            .and(MEASURABLE.EXTERNAL_ID.eq(item.externalId()));
+                            .set(org.finos.waltz.schema.tables.Measurable.MEASURABLE.LAST_UPDATED_AT, now)
+                            .set(org.finos.waltz.schema.tables.Measurable.MEASURABLE.LAST_UPDATED_BY, userId)
+                            .where(org.finos.waltz.schema.tables.Measurable.MEASURABLE.MEASURABLE_CATEGORY_ID.eq(taxonomyRef.id()))
+                            .and(org.finos.waltz.schema.tables.Measurable.MEASURABLE.EXTERNAL_ID.eq(item.externalId()));
                 })
                 .collect(Collectors.toSet());
 
 
-        return dsl.transactionResult(ctx -> {
-            DSLContext tx = ctx.dsl();
-            int insertCount = summarizeResults(tx.batchInsert(toAdd).execute());
-            int restoreCount = summarizeResults(tx.batch(toRestore).execute());
-            int updateCount = summarizeResults(tx.batch(toUpdate).execute());
-            LOG.info(
-                    "Inserted {} new measurables, Updated: {} existing measurables, Restored: {} previously removed measurables",
-                    insertCount,
-                    updateCount,
-                    restoreCount);
+        Integer changeResult = dsl
+            .transactionResult(ctx -> {
+                DSLContext tx = ctx.dsl();
+                int insertCount = summarizeResults(tx.batchInsert(toAdd).execute());
+                int restoreCount = summarizeResults(tx.batch(toRestore).execute());
+                int updateCount = summarizeResults(tx.batch(toUpdate).execute());
+                LOG.info(
+                        "Inserted {} new measurables, Updated: {} existing measurables, Restored: {} previously removed measurables",
+                        insertCount,
+                        updateCount,
+                        restoreCount);
 
-            return updateCount + insertCount + restoreCount;
-        });
+                if (requiresHierarchyRebuild(bulkRequest.validatedItems())) {
+                    int updatedParents = updateParentIdsFromExternalIds(tx, taxonomyRef.id());
+                    LOG.debug("Updated parents: {}", updatedParents);
+                }
 
+                return updateCount + insertCount + restoreCount;
+            });
+
+        if (requiresHierarchyRebuild(bulkRequest.validatedItems())) {
+            // rebuild the entity_hierarchy table for measurables
+            int entriesCreated = entityHierarchyService.buildForMeasurableByCategory(taxonomyRef.id());
+            LOG.debug("Recreated hierarchy with {} new entries", entriesCreated);
+        }
+
+        return changeResult;
     }
+
+
 
     // --- HELPERS ----
 
-    private Boolean determineIfTreeHasCycle(List<Measurable> existingMeasurables,
+    /**
+     * This is achieved by doing a self join on the measurable table to find any matching parent and updating
+     * the child parent_id with the matching parent's id
+     */
+    private int updateParentIdsFromExternalIds(DSLContext tx,
+                                               long categoryId) {
+        org.finos.waltz.schema.tables.Measurable parent = MEASURABLE.as("p");
+
+        return tx
+                .update(MEASURABLE)
+                .set(MEASURABLE.PARENT_ID, DSL
+                        .select(parent.ID)
+                        .from(parent)
+                        .where(parent.EXTERNAL_ID.eq(MEASURABLE.EXTERNAL_PARENT_ID)
+                                .and(parent.MEASURABLE_CATEGORY_ID.eq(categoryId))))
+                .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId))
+                .execute();
+    }
+
+
+    public static boolean requiresHierarchyRebuild(Collection<BulkTaxonomyValidatedItem> items) {
+        Set<ChangeOperation> opsThatNeedRebuild = asSet(
+                ChangeOperation.ADD,
+                ChangeOperation.REMOVE,
+                ChangeOperation.RESTORE);
+
+        Predicate<BulkTaxonomyValidatedItem> requiresRebuild = d -> {
+            boolean deffoNeedsRebuild = opsThatNeedRebuild.contains(d.changeOperation());
+            boolean opIsUpdate = d.changeOperation() == ChangeOperation.UPDATE;
+            boolean parentIdChanged = d.changedFields().contains(ChangedFieldType.PARENT_EXTERNAL_ID);
+
+            return deffoNeedsRebuild || (opIsUpdate && parentIdChanged);
+        };
+
+        return items
+                .stream()
+                .anyMatch(requiresRebuild);
+    }
+
+
+    private boolean determineIfTreeHasCycle(List<Measurable> existingMeasurables,
                                BulkTaxonomyParseResult result) {
         return Stream
                 .concat(

@@ -5,6 +5,7 @@ import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.bulk_upload.BulkUpdateMode;
 import org.finos.waltz.model.bulk_upload.ChangeOperation;
@@ -126,6 +127,31 @@ public class BulkTaxonomyChangeServiceTest extends BaseInMemoryIntegrationTest {
     }
 
 
+
+    @Test
+    public void previewRestorationsIfMeasurableWasPreviouslyRemoved() {
+        EntityReference category = setupCategory();
+        long a1_1_id = measurableHelper.createMeasurable("a1.1", "", category.id());
+        // set a1_1_id as removed
+        measurableHelper.updateMeasurableLifecycleStatus(a1_1_id, EntityLifecycleStatus.REMOVED);
+
+        BulkTaxonomyValidationResult result = taxonomyChangeService.previewBulk(
+                category,
+                mkSimpleTsv(),
+                BulkTaxonomyItemParser.InputFormat.CSV,
+                BulkUpdateMode.REPLACE);
+
+        assertNotNull(result, "Expected a result");
+        assertNoErrors(result);
+
+        assertExternalIdsMatch(result, asList("a1", "a1.1", "a1.2"));
+
+        assertOperation(result, "a1", ChangeOperation.ADD);
+        assertOperation(result, "a1.1", ChangeOperation.RESTORE);
+        assertOperation(result, "a1.2", ChangeOperation.ADD);
+    }
+
+
     @Test
     public void previewMultipleRemovalsIfModeIsReplace() {
         EntityReference category = setupCategory();
@@ -147,6 +173,33 @@ public class BulkTaxonomyChangeServiceTest extends BaseInMemoryIntegrationTest {
         assertOperation(result, "a1", ChangeOperation.ADD);
         assertOperation(result, "a1.1", ChangeOperation.ADD);
         assertOperation(result, "a1.2", ChangeOperation.ADD);
+    }
+
+
+
+
+    @Test
+    public void applyRestoresMeasurablesThatWerePreviouslyRemoved() {
+        String user = setupUser();
+        EntityReference category = setupCategory();
+        long a1_1_id = measurableHelper.createMeasurable("a1.1", "", category.id());
+        measurableHelper.updateMeasurableLifecycleStatus(a1_1_id, EntityLifecycleStatus.REMOVED);
+
+        BulkTaxonomyValidationResult result = taxonomyChangeService.previewBulk(
+                category,
+                mkSimpleTsv(),
+                BulkTaxonomyItemParser.InputFormat.CSV,
+                BulkUpdateMode.REPLACE);
+
+        taxonomyChangeService.applyBulk(category, result, user);
+
+        boolean isRestored = measurableService
+                .findByExternalId("a1.1")
+                .stream()
+                .filter(m -> m.categoryId() == category.id())
+                .anyMatch(m -> m.entityLifecycleStatus() == EntityLifecycleStatus.ACTIVE);
+
+        assertTrue(isRestored, "previously removed 'a1.1' node has been restored");
     }
 
 
