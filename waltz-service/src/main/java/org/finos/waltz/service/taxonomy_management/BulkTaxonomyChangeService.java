@@ -26,11 +26,13 @@ import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.bulk_upload.BulkUpdateMode;
 import org.finos.waltz.model.bulk_upload.ChangeOperation;
+import org.finos.waltz.model.bulk_upload.taxonomy.BulkTaxonomyApplyResult;
 import org.finos.waltz.model.bulk_upload.taxonomy.BulkTaxonomyItem;
 import org.finos.waltz.model.bulk_upload.taxonomy.BulkTaxonomyParseResult;
 import org.finos.waltz.model.bulk_upload.taxonomy.BulkTaxonomyValidatedItem;
 import org.finos.waltz.model.bulk_upload.taxonomy.BulkTaxonomyValidationResult;
 import org.finos.waltz.model.bulk_upload.taxonomy.ChangedFieldType;
+import org.finos.waltz.model.bulk_upload.taxonomy.ImmutableBulkTaxonomyApplyResult;
 import org.finos.waltz.model.bulk_upload.taxonomy.ImmutableBulkTaxonomyValidatedItem;
 import org.finos.waltz.model.bulk_upload.taxonomy.ImmutableBulkTaxonomyValidationResult;
 import org.finos.waltz.model.bulk_upload.taxonomy.ValidationError;
@@ -195,9 +197,9 @@ public class BulkTaxonomyChangeService {
     }
 
 
-    public int applyBulk(EntityReference taxonomyRef,
-                          BulkTaxonomyValidationResult bulkRequest,
-                          String userId) {
+    public BulkTaxonomyApplyResult applyBulk(EntityReference taxonomyRef,
+                                             BulkTaxonomyValidationResult bulkRequest,
+                                             String userId) {
         if (taxonomyRef.kind() != EntityKind.MEASURABLE_CATEGORY) {
             throw new UnsupportedOperationException("Only measurable category bulk updates supported");
         }
@@ -264,29 +266,32 @@ public class BulkTaxonomyChangeService {
                 })
                 .collect(Collectors.toSet());
 
+        boolean requiresRebuild = requiresHierarchyRebuild(bulkRequest.validatedItems());
 
-        Integer changeResult = dsl
+        BulkTaxonomyApplyResult changeResult = dsl
             .transactionResult(ctx -> {
                 DSLContext tx = ctx.dsl();
                 int insertCount = summarizeResults(tx.batchInsert(toAdd).execute());
                 int restoreCount = summarizeResults(tx.batch(toRestore).execute());
                 int updateCount = summarizeResults(tx.batch(toUpdate).execute());
-                LOG.info(
-                        "Inserted {} new measurables, Updated: {} existing measurables, Restored: {} previously removed measurables",
-                        insertCount,
-                        updateCount,
-                        restoreCount);
 
-                if (requiresHierarchyRebuild(bulkRequest.validatedItems())) {
+                if (requiresRebuild) {
                     int updatedParents = updateParentIdsFromExternalIds(tx, taxonomyRef.id());
                     LOG.debug("Updated parents: {}", updatedParents);
                 }
 
-                return updateCount + insertCount + restoreCount;
+                return ImmutableBulkTaxonomyApplyResult
+                        .builder()
+                        .recordsAdded(insertCount)
+                        .recordsUpdated(updateCount)
+                        .recordsRestored(restoreCount)
+                        .recordsRemoved(0)//TODO: add removeCount
+                        .hierarchyRebuilt(requiresRebuild)
+                        .build();
             });
 
-        if (requiresHierarchyRebuild(bulkRequest.validatedItems())) {
-            // rebuild the entity_hierarchy table for measurables
+        LOG.debug("Result of apply changes: {}", changeResult);
+        if (requiresRebuild) {
             int entriesCreated = entityHierarchyService.buildForMeasurableByCategory(taxonomyRef.id());
             LOG.debug("Recreated hierarchy with {} new entries", entriesCreated);
         }

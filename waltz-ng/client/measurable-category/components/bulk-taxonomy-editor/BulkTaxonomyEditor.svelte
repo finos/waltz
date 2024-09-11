@@ -4,6 +4,7 @@
     import {displayError} from "../../../common/error-utils";
     import LoadingPlaceholder from "../../../common/svelte/LoadingPlaceholder.svelte";
     import {truncateMiddle} from "../../../common/string-utils";
+    import Icon from "../../../common/svelte/Icon.svelte";
 
     export let primaryEntityRef;
 
@@ -34,7 +35,6 @@ a1.2\t a1\t A1_2\t Second child\t true`
 
 
     function switchMode(newMode) {
-        console.log(`Switching modes from ${mode} to ${newMode}`);
         mode = newMode;
         switch (newMode) {
             case Modes.EDIT:
@@ -62,8 +62,7 @@ a1.2\t a1\t A1_2\t Second child\t true`
         taxonomyManagementStore
             .bulkApply(primaryEntityRef, rawText)
             .then(r => {
-                console.log("Success: ", r);
-                applyData = r;
+                applyData = r.data;
                 switchMode(Modes.APPLY);
             })
             .catch(e => displayError("Could not apply taxonomy changes", e));
@@ -106,18 +105,6 @@ a1.2\t a1\t A1_2\t Second child\t true`
         }
     }
 
-
-    $: console.log({
-        primaryEntityRef,
-        sample,
-        mode,
-        uploadMode,
-        rawText,
-        previewData
-    });
-
-
-
 </script>
 
 <div class="help-block">
@@ -126,9 +113,26 @@ a1.2\t a1\t A1_2\t Second child\t true`
 
 {#if mode === Modes.EDIT}
     <details>
-        <summary>Help</summary>
+        <summary>Help <Icon name="circle-question"/></summary>
         <div class="help-block">
-            The file format should look like:
+            The bulk change format should look like:
+            <dl>
+                <dt>External Id</dt>
+                <dd>This uniquely identifies the item within the category. It should not be changed after it is set.</dd>
+
+                <dt>ParentExternalId</dt>
+                <dd>This optionally defines the external id of the parent. If this is changed, the item will be moved accordingly.</dd>
+
+                <dt>Name</dt>
+                <dd>Short descriptive name of the item</dd>
+
+                <dt>Description</dt>
+                <dd>Short description</dd>
+
+                <dt>Concrete</dt>
+                <dd>This determines if the node can be used in mappings against applications. If set to false, it implies the node is abstract and cannot be used in mappings.</dd>
+            </dl>
+            For example:
         </div>
         <pre style="white-space: pre-line">
             externalId	 parentExternalId	 name	 description	 concrete
@@ -253,6 +257,54 @@ a1.2\t a1\t A1_2\t Second child\t true`
     </button>
 {/if}
 
+{#if mode === Modes.APPLY}
+    <table class="table table-condensed table-striped">
+        <tbody>
+        <tr>
+            <td>Added Records</td>
+            <td class:positive-result={applyData.recordsAdded > 0}>
+                {applyData.recordsAdded}
+            </td>
+        </tr>
+        <tr>
+            <td>Updated Records</td>
+            <td class:positive-result={applyData.recordsUpdated > 0}>
+                {applyData.recordsUpdated}
+            </td>
+        </tr>
+        <tr>
+            <td>Removed Records</td>
+            <td class:positive-result={applyData.recordsRemoved > 0}>
+                {applyData.recordsRemoved}
+            </td>
+        </tr>
+        <tr>
+            <td>Restored Records</td>
+            <td class:positive-result={applyData.recordsRestored > 0}>
+                {applyData.recordsRestored}
+            </td>
+        </tr>
+        <tr>
+            <td>Hierarchy Rebuilt</td>
+            <td class:positive-result={applyData.hierarchyRebuilt}>
+                {applyData.hierarchyRebuilt}
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    {#if applyData.hierarchyRebuilt}
+        <p class="alert alert-warning">
+            Please note: This change has altered the hierarchy, you will need to reload this page.
+        </p>
+    {/if}
+
+    <button class="btn btn-skinny"
+        on:click={() => switchMode(Modes.EDIT)}>
+        Back to Bulk Editor
+    </button>
+
+{/if}
 
 <style>
     textarea {
@@ -287,6 +339,10 @@ a1.2\t a1\t A1_2\t Second child\t true`
     .cell-update {
         background-color: #fdfdbd;
         font-style: italic;
+    }
+
+    .positive-result {
+        background-color: #caf8ca;
     }
 
 
