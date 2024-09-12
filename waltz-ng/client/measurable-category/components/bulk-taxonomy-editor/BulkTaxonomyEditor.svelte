@@ -51,7 +51,7 @@ a1.2\t a1\t A1_2\t Second child\t true`
             .bulkPreview(primaryEntityRef, rawText)
             .then(r => {
                 previewData = r.data;
-                canApply = _.every(previewData.validatedItems, d => _.isEmpty(d.errors));
+                canApply = _.isNil(previewData.error) && _.every(previewData.validatedItems, d => _.isEmpty(d.errors));
                 switchMode(Modes.PREVIEW);
             })
             .catch(e => displayError("Could not preview taxonomy changes", e));
@@ -105,6 +105,11 @@ a1.2\t a1\t A1_2\t Second child\t true`
         }
     }
 
+    $: console.log({
+        previewData,
+        applyData
+    })
+
 </script>
 
 <div class="help-block">
@@ -115,7 +120,7 @@ a1.2\t a1\t A1_2\t Second child\t true`
     <details>
         <summary>Help <Icon name="circle-question"/></summary>
         <div class="help-block">
-            The bulk change format should look like:
+            The bulk change format should look like, column order is not important but the headers are:
             <dl>
                 <dt>External Id</dt>
                 <dd>This uniquely identifies the item within the category. It should not be changed after it is set.</dd>
@@ -140,7 +145,9 @@ a1.2\t a1\t A1_2\t Second child\t true`
             a1.1	 a1	 A1_1	 First child	 true
             a1.2	 a1	 A1_2	 Second child	 true
         </pre>
-        Note, column order is not important, but the headers are.
+        Note, removal of items should be done via the Interactive Taxonomy Editor panel.
+
+
     </details>
 
     <form autocomplete="off"
@@ -152,38 +159,6 @@ a1.2\t a1\t A1_2\t Second child\t true`
                       class="form-control"
                       rows="8"
                       bind:value={rawText}></textarea>
-
-            <div class="btn-group">
-                <div class="radio">
-                    <label>
-                        <input style="display: inline-block;"
-                               type="radio"
-                               bind:group={uploadMode}
-                               name="uploadMode"
-                               value={UploadModes.ADD}>
-                        Add Only
-                    </label>
-                    <div class="help-block">
-                        Add either update existing items or add new ones.
-                        It will <em>not</em> attempt to remove any items.
-                    </div>
-                </div>
-
-                <div class="radio">
-                    <label>
-                        <input style="display: inline-block;"
-                               type="radio"
-                               bind:group={uploadMode}
-                               name="uploadMode"
-                               value={UploadModes.REPLACE}>
-                        Replace
-                    </label>
-                    <p class="help-block">
-                        Replace will remove all items not in the given raw data.
-                        This should be used with <em>extreme</em> caution.
-                    </p>
-                </div>
-            </div>
 
             <button type="submit"
                     class="btn btn-success"
@@ -199,52 +174,61 @@ a1.2\t a1\t A1_2\t Second child\t true`
 {#if mode === Modes.LOADING}
     <LoadingPlaceholder/>
 {/if}
+
 {#if mode === Modes.PREVIEW}
-
-    <div class="preview-table small">
-        <table class="table table-condensed table-striped table">
-            <thead>
-            <tr>
-                <th>Action</th>
-                <th>External Id</th>
-                <th>Parent External Id</th>
-                <th>Name</th>
-                <th>Description</th>
-                <th>Concrete</th>
-                <th>Errors</th>
-            </tr>
-            </thead>
-            <tbody>
-            {#each previewData.validatedItems as item}
-            <tr>
-                <td class={mkItemClass(item)}>
-                    {mkOpLabel(item)}
-                </td>
-                <td class:cell-error={_.includes(item.errors, "DUPLICATE_EXT_ID")}>
-                    {item.parsedItem.externalId}
-                </td>
-                <td class:cell-error={_.includes(item.errors, "PARENT_NOT_FOUND")}
-                    class:cell-update={_.includes(item.changedFields, "PARENT_EXTERNAL_ID") && !_.includes(item.errors, "PARENT_NOT_FOUND")}>
-                    {item.parsedItem.parentExternalId}
-                </td>
-                <td class:cell-update={_.includes(item.changedFields, "NAME")}>
-                    {item.parsedItem.name}
-                </td>
-                <td class:cell-update={_.includes(item.changedFields, "DESCRIPTION")}>
-                    {truncateMiddle(item.parsedItem.description)}
-                </td>
-                <td class:cell-update={_.includes(item.changedFields, "CONCRETE")}>
-                    {item.parsedItem.concrete}
-                </td>
-                <td>
-                    {item.errors}
-                </td>
-            </tr>
-            {/each}
-            </tbody>
-        </table>
-    </div>
-
+    {#if !_.isNil(previewData.error)}
+        <div class="alert alert-danger">
+            <em>
+                Could not parse the data, see error message below.
+            </em>
+            <div style="padding-top: 0.5em"> {previewData.error.message} </div>
+        </div>
+    {/if}
+    {#if _.isNil(previewData.error)}
+        <div class="preview-table small">
+            <table class="table table-condensed table-striped table">
+                <thead>
+                <tr>
+                    <th>Action</th>
+                    <th>External Id</th>
+                    <th>Parent External Id</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Concrete</th>
+                    <th>Errors</th>
+                </tr>
+                </thead>
+                <tbody>
+                {#each previewData.validatedItems as item}
+                <tr>
+                    <td class={mkItemClass(item)}>
+                        {mkOpLabel(item)}
+                    </td>
+                    <td class:cell-error={_.includes(item.errors, "DUPLICATE_EXT_ID")}>
+                        {item.parsedItem.externalId}
+                    </td>
+                    <td class:cell-error={_.includes(item.errors, "PARENT_NOT_FOUND")}
+                        class:cell-update={_.includes(item.changedFields, "PARENT_EXTERNAL_ID") && !_.includes(item.errors, "PARENT_NOT_FOUND")}>
+                        {item.parsedItem.parentExternalId}
+                    </td>
+                    <td class:cell-update={_.includes(item.changedFields, "NAME")}>
+                        {item.parsedItem.name}
+                    </td>
+                    <td class:cell-update={_.includes(item.changedFields, "DESCRIPTION")}>
+                        {truncateMiddle(item.parsedItem.description)}
+                    </td>
+                    <td class:cell-update={_.includes(item.changedFields, "CONCRETE")}>
+                        {item.parsedItem.concrete}
+                    </td>
+                    <td>
+                        {item.errors}
+                    </td>
+                </tr>
+                {/each}
+                </tbody>
+            </table>
+        </div>
+    {/if}
     <button class="btn-skinny"
             on:click={() => switchMode(Modes.EDIT)}>
         Back
@@ -312,6 +296,9 @@ a1.2\t a1\t A1_2\t Second child\t true`
         font-family: monospace !important;
     }
 
+    dt {
+        margin-top: 0.3em;
+    }
     .op-add {
         background-color: #caf8ca;
     }

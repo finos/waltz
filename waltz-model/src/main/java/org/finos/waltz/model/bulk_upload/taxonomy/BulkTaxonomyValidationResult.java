@@ -2,6 +2,7 @@ package org.finos.waltz.model.bulk_upload.taxonomy;
 
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.finos.waltz.model.Nullable;
 import org.finos.waltz.model.measurable.Measurable;
 import org.immutables.value.Value;
 
@@ -16,4 +17,6 @@ public interface BulkTaxonomyValidationResult {
 
     Set<Measurable> plannedRemovals();
 
+    @Nullable
+    BulkTaxonomyParseResult.BulkTaxonomyParseError error();
 }

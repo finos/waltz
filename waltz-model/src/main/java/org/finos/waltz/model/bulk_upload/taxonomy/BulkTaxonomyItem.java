@@ -15,10 +15,10 @@ public interface BulkTaxonomyItem {
 
     String name();
 
-    @JsonAlias({"id", "external_id", "ext_id", "extId", "external id"})
+    @JsonAlias({"id", "external_id", "ext_id", "extId", "external id", "ext id"})
     String externalId();
 
-    @JsonAlias({"parent_id", "parent_external_id", "parent_ext_id", "parentExtId", "parent external id"})
+    @JsonAlias({"parent_id", "parent_external_id", "parent_ext_id", "parentExtId", "parent external id", "parent id", "parent ext id", "external parent id", "external_parent_id", "externalParentId"})
     @Nullable
     String parentExternalId();
 

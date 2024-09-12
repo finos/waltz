@@ -141,6 +141,13 @@ public class BulkTaxonomyChangeService {
 
         BulkTaxonomyParseResult result = new BulkTaxonomyItemParser().parse(inputStr, format);
 
+        if (result.error() != null) {
+            return ImmutableBulkTaxonomyValidationResult
+                    .builder()
+                    .error(result.error())
+                    .build();
+        }
+
         Map<String, BulkTaxonomyItem> givenByExtId = indexBy(result.parsedItems(), BulkTaxonomyItem::externalId);
         Set<String> allExtIds = union(existingByExtId.keySet(), givenByExtId.keySet());
 
