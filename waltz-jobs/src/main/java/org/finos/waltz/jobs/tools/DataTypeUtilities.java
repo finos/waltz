@@ -368,18 +368,17 @@ public class DataTypeUtilities {
     }
 
 
-
     public static void main(String[] args) throws IOException {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
-        String party = "uri.intranet.db.com/edm/C11";
-        String allocation = "uri.intranet.db.com/edm/C58";
-        String instrumentIdentifier = "uri.intranet.db.com/edm/C49";
-        String prospect = "uri.intranet.db.com/edm/C169";
-        String dealEvent = "uri.intranet.db.com/edm/C186";
-        String instrumentStatic = "uri.intranet.db.com/edm/C224";
+        String party = "DataTypeCode1";
+        String allocation = "DataTypeCode2";
+        String instrumentIdentifier = "DataTypeCode3";
+        String prospect = "DataTypeCode4";
+        String dealEvent = "DataTypeCode5";
+        String instrumentStatic = "DataTypeCode6";
 
         dsl.transaction(context -> {
             DSLContext tx = context.dsl();
