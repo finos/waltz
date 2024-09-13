@@ -28,7 +28,7 @@ a1.2\t a1\t A1_2\t Second child\t true`
 
     let mode = Modes.EDIT;
     let uploadMode = Modes.ADD_ONLY;
-    let rawText = sample;
+    let rawText = "";
     let canApply = false;
     let previewData = null;
     let applyData = null;
@@ -104,11 +104,6 @@ a1.2\t a1\t A1_2\t Second child\t true`
                 return "??" + item.changeOperation + "??";
         }
     }
-
-    $: console.log({
-        previewData,
-        applyData
-    })
 
 </script>
 

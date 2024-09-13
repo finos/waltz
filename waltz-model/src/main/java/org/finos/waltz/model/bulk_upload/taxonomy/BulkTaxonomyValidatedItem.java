@@ -1,6 +1,8 @@
 package org.finos.waltz.model.bulk_upload.taxonomy;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.Nullable;
 import org.finos.waltz.model.bulk_upload.ChangeOperation;
 import org.immutables.value.Value;
 
@@ -14,4 +16,7 @@ public interface BulkTaxonomyValidatedItem {
     ChangeOperation changeOperation();
     Set<ChangedFieldType> changedFields();
     Set<ValidationError> errors();
+
+    @Nullable
+    EntityReference existingItemReference();
 }

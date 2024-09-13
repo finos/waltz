@@ -38,7 +38,10 @@ import org.finos.waltz.model.bulk_upload.taxonomy.ImmutableBulkTaxonomyValidatio
 import org.finos.waltz.model.bulk_upload.taxonomy.ValidationError;
 import org.finos.waltz.model.measurable.Measurable;
 import org.finos.waltz.model.measurable_category.MeasurableCategory;
+import org.finos.waltz.model.taxonomy_management.TaxonomyChangeLifecycleStatus;
+import org.finos.waltz.model.taxonomy_management.TaxonomyChangeType;
 import org.finos.waltz.schema.tables.records.MeasurableRecord;
+import org.finos.waltz.schema.tables.records.TaxonomyChangeRecord;
 import org.finos.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.finos.waltz.service.measurable.MeasurableService;
 import org.finos.waltz.service.measurable_category.MeasurableCategoryService;
@@ -59,13 +62,14 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.lang.String.format;
 import static java.util.Collections.emptySet;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.MapUtilities.countBy;
@@ -184,6 +188,9 @@ public class BulkTaxonomyChangeService {
                             .parsedItem(t.v1)
                             .changedFields(op.v2)
                             .changeOperation(op.v1)
+                            .existingItemReference(ofNullable(t.v2)
+                                    .map(Measurable::entityReference)
+                                    .orElse(null))
                             .errors(compact(
                                     isUnique ? null : ValidationError.DUPLICATE_EXT_ID,
                                     parentExists ? null : ValidationError.PARENT_NOT_FOUND,
@@ -241,7 +248,7 @@ public class BulkTaxonomyChangeService {
                         .update(org.finos.waltz.schema.tables.Measurable.MEASURABLE)
                         .set(org.finos.waltz.schema.tables.Measurable.MEASURABLE.ENTITY_LIFECYCLE_STATUS, EntityLifecycleStatus.ACTIVE.name())
                         .where(org.finos.waltz.schema.tables.Measurable.MEASURABLE.MEASURABLE_CATEGORY_ID.eq(taxonomyRef.id()))
-                        .and(org.finos.waltz.schema.tables.Measurable.MEASURABLE.EXTERNAL_ID.eq(d.parsedItem().externalId())))
+                        .and(org.finos.waltz.schema.tables.Measurable.MEASURABLE.ID.eq(d.existingItemReference().id())))
                 .collect(Collectors.toSet());
 
         Set<UpdateConditionStep<MeasurableRecord>> toUpdate = bulkRequest
@@ -269,9 +276,10 @@ public class BulkTaxonomyChangeService {
                             .set(org.finos.waltz.schema.tables.Measurable.MEASURABLE.LAST_UPDATED_AT, now)
                             .set(org.finos.waltz.schema.tables.Measurable.MEASURABLE.LAST_UPDATED_BY, userId)
                             .where(org.finos.waltz.schema.tables.Measurable.MEASURABLE.MEASURABLE_CATEGORY_ID.eq(taxonomyRef.id()))
-                            .and(org.finos.waltz.schema.tables.Measurable.MEASURABLE.EXTERNAL_ID.eq(item.externalId()));
+                            .and(org.finos.waltz.schema.tables.Measurable.MEASURABLE.ID.eq(d.existingItemReference().id()));
                 })
                 .collect(Collectors.toSet());
+
 
         boolean requiresRebuild = requiresHierarchyRebuild(bulkRequest.validatedItems());
 
@@ -281,6 +289,12 @@ public class BulkTaxonomyChangeService {
                 int insertCount = summarizeResults(tx.batchInsert(toAdd).execute());
                 int restoreCount = summarizeResults(tx.batch(toRestore).execute());
                 int updateCount = summarizeResults(tx.batch(toUpdate).execute());
+
+                Set<TaxonomyChangeRecord> changeRecords = mkTaxonomyChangeRecords(tx, taxonomyRef, bulkRequest, userId);
+
+                int insertedChangeRecordCount = summarizeResults(tx.batchInsert(changeRecords).execute());
+
+                LOG.debug("Added {} new change record entries", insertedChangeRecordCount);
 
                 if (requiresRebuild) {
                     int updatedParents = updateParentIdsFromExternalIds(tx, taxonomyRef.id());
@@ -306,6 +320,121 @@ public class BulkTaxonomyChangeService {
         return changeResult;
     }
 
+
+    private Set<TaxonomyChangeRecord> mkTaxonomyChangeRecords(DSLContext tx,
+                                                              EntityReference taxonomyRef,
+                                                              BulkTaxonomyValidationResult bulkRequest,
+                                                              String user) {
+
+        Map<String, Tuple2<Long, String>> extIdToIdMap = tx
+                .select(MEASURABLE.EXTERNAL_ID, MEASURABLE.ID, MEASURABLE.NAME)
+                .from(MEASURABLE)
+                .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(taxonomyRef.id()))
+                .fetchMap(
+                        MEASURABLE.EXTERNAL_ID,
+                        r -> tuple(
+                                r.get(MEASURABLE.ID),
+                                r.get(MEASURABLE.NAME)));
+
+        return bulkRequest
+                .validatedItems()
+                .stream()
+                .flatMap(d -> toTaxonomyChangeRecords(
+                        d,
+                        taxonomyRef,
+                        extIdToIdMap.get(d.parsedItem().externalId()),
+                        extIdToIdMap.get(d.parsedItem().parentExternalId()),
+                        user))
+                .collect(Collectors.toSet());
+    }
+
+
+    private Stream<TaxonomyChangeRecord> toTaxonomyChangeRecords(BulkTaxonomyValidatedItem validatedItem,
+                                                                 EntityReference taxonomyReference,
+                                                                 Tuple2<Long, String> item,
+                                                                 Tuple2<Long, String> parent, // may be null
+                                                                 String user) {
+
+        if (validatedItem.changeOperation() == ChangeOperation.ADD) {
+
+            TaxonomyChangeRecord r = mkBaseTaxonomyChangeRecord(taxonomyReference, item.v1, user);
+            r.setChangeType(TaxonomyChangeType.BULK_ADD.name());
+            return Stream.of(r);
+
+        } else if (validatedItem.changeOperation() == ChangeOperation.RESTORE || validatedItem.changeOperation() == ChangeOperation.UPDATE) {
+
+            Stream<TaxonomyChangeRecord> fieldStream = validatedItem
+                    .changedFields()
+                    .stream()
+                    .map(f -> {
+                        TaxonomyChangeRecord r = mkBaseTaxonomyChangeRecord(taxonomyReference, item.v1, user);
+                        switch (f) {
+                            case NAME:
+                                r.setChangeType(TaxonomyChangeType.UPDATE_NAME.name());
+                                r.setParams(format(
+                                        "{ \"name\": \"%s\", \"originalValue\": \"\" }",
+                                        validatedItem.parsedItem().name()));
+                                break;
+                            case DESCRIPTION:
+                                r.setChangeType(TaxonomyChangeType.UPDATE_DESCRIPTION.name());
+                                r.setParams(format(
+                                        "{ \"description\": \"%s\", \"originalValue\": \"\" }",
+                                        validatedItem.parsedItem().description()));
+                                break;
+                            case CONCRETE:
+                                r.setChangeType(TaxonomyChangeType.UPDATE_CONCRETENESS.name());
+                                r.setParams(format(
+                                        "{ \"concrete\": \"%s\" }",
+                                        validatedItem.parsedItem().concrete()));
+                                break;
+                            case PARENT_EXTERNAL_ID:
+                                r.setChangeType(TaxonomyChangeType.MOVE.name());
+                                r.setParams(format(
+                                        "{ \"destinationId\": \"%d\", \"destinationName\": \"%s\", \"originalValue\": \"\" }",
+                                        parent == null ? 0 : parent.v1,
+                                        parent == null ? "root" : parent.v2));
+                                break;
+                            default:
+                                r.setChangeType(TaxonomyChangeType.BULK_UPDATE.name());
+                        }
+                        return r;
+                    });
+
+            return Stream.concat(
+                    validatedItem.changeOperation() == ChangeOperation.RESTORE
+                        ? Stream.of(mkRestoreRecord(taxonomyReference, item.v1, user))
+                        : Stream.empty(),
+                    fieldStream);
+
+        } else {
+            return Stream.empty();
+        }
+    }
+
+
+    private TaxonomyChangeRecord mkRestoreRecord(EntityReference taxonomyReference,
+                                                 Long itemId,
+                                                 String user) {
+        TaxonomyChangeRecord r = mkBaseTaxonomyChangeRecord(taxonomyReference, itemId, user);
+        r.setChangeType(TaxonomyChangeType.BULK_RESTORE.name());
+        return r;
+    }
+
+
+    private TaxonomyChangeRecord mkBaseTaxonomyChangeRecord(EntityReference taxonomyReference,
+                                                         Long itemId,
+                                                         String user) {
+        TaxonomyChangeRecord r = new TaxonomyChangeRecord();
+        r.setDomainKind(taxonomyReference.kind().name());
+        r.setDomainId(taxonomyReference.id());
+        r.setPrimaryReferenceKind(EntityKind.MEASURABLE.name());
+        r.setPrimaryReferenceId(itemId);
+        r.setStatus(TaxonomyChangeLifecycleStatus.EXECUTED.name());
+        r.setParams("{}");
+        r.setCreatedBy(user);
+        r.setLastUpdatedBy(user);
+        return r;
+    }
 
 
     // --- HELPERS ----
@@ -360,7 +489,7 @@ public class BulkTaxonomyChangeService {
                                 null)),
                         result.parsedItems().stream().map(d -> new FlatNode<String, String>(
                                 d.externalId(),
-                                Optional.ofNullable(d.parentExternalId()),
+                                ofNullable(d.parentExternalId()),
                                 null)))
                 .collect(Collectors.collectingAndThen(toList(), xs -> hasCycle(toForest(xs))));
     }

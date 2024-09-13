@@ -45,7 +45,7 @@ const initialState = {
     recentlySelected: [],
     pendingChanges: [],
     mode: modes.SUMMARY,
-    activeTab: tabs.BULK_TAXONOMY, // tabs.INTERACTIVE_TAXONOMY,
+    activeTab: tabs.INTERACTIVE_TAXONOMY,
     BulkTaxonomyEditor
 };
 
