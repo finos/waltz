@@ -256,7 +256,7 @@ public class StringUtilities {
                     .replaceAll("â€œ", "\"")
                     .replaceAll("â€", "\"")
                     .replaceAll("â€™", "'")
-                    .replaceAll(" ", " ");
+                    .replaceAll(" ", " ");
         }
     }
 
@@ -327,5 +327,36 @@ public class StringUtilities {
                 .findFirst();
     }
 
-}
 
+    public static boolean safeEq(String expected, String actual) {
+        if(actual == null && expected == null) {
+            return true;
+        } else if(actual == null || expected == null) {
+            return false;
+        } else {
+            return actual.equals(expected);
+        }
+    }
+
+
+    public static boolean safeEqIgnoreCase(String expected, String actual) {
+        if(actual == null && expected == null) {
+            return true;
+        } else if(actual == null || expected == null) {
+            return false;
+        } else {
+            return actual.equalsIgnoreCase(expected);
+        }
+    }
+
+
+    public static String mkExternalId(String str) {
+        return sanitizeCharacters(mkSafe(str))
+                .toUpperCase()
+                .replaceAll("&", " AND ")
+                .replaceAll("[\\s\\-(){}/\\\\,.*;]", "_")
+                .replaceAll("_+", "_");
+    }
+
+
+}
