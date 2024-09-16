@@ -16,23 +16,26 @@
  *
  */
 
-package org.finos.waltz.model.taxonomy_management;
+import {remote} from "./remote";
 
-public enum TaxonomyChangeType {
+export function mkTaxonomyManagementStore() {
 
-    ADD_PEER,
-    ADD_CHILD,
-    DEPRECATE,
-    MOVE,
-    MERGE,
-    REMOVE,
-    REORDER_SIBLINGS,
-    UPDATE_NAME,
-    UPDATE_DESCRIPTION,
-    UPDATE_CONCRETENESS,
-    UPDATE_EXTERNAL_ID,
-    BULK_ADD,
-    BULK_RESTORE,
-    BULK_UPDATE
+    const bulkPreview = (taxonomyRef, rawText) => remote
+        .execute(
+            "POST",
+            `api/taxonomy-management/bulk/preview/${taxonomyRef.kind}/${taxonomyRef.id}`,
+            rawText);
 
+    const bulkApply = (taxonomyRef, rawText) => remote
+        .execute(
+            "POST",
+            `api/taxonomy-management/bulk/apply/${taxonomyRef.kind}/${taxonomyRef.id}`,
+            rawText);
+
+    return {
+        bulkPreview,
+        bulkApply
+    };
 }
+
+export const taxonomyManagementStore = mkTaxonomyManagementStore();

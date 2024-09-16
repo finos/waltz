@@ -18,6 +18,7 @@
 
 package org.finos.waltz.jobs;
 
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -33,7 +34,8 @@ public class XlsUtilities {
 
 
     public static String strVal(Row row, int offset) {
-        return row.getCell(offset).getStringCellValue();
+        Cell cell = row.getCell(offset);
+        return cell == null ? null : cell.getStringCellValue();
     }
 
 

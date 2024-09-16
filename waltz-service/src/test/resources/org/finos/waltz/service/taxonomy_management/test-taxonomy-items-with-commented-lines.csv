@@ -1,0 +1,14 @@
+# I am a comment
+
+externalId, parentExternalId, name, description, concrete
+
+# Ignore me
+a1,, A1, Root node, false
+
+a1.1, a1, A1_1, First child, true
+
+a1.2, a1, A1_2, Second child, true
+#
+# and me!
+
+#

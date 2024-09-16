@@ -51,88 +51,139 @@
             </div>
 
             <div class="col-sm-6">
-                <div ng-show="$ctrl.mode === 'SUMMARY'">
-                    <!-- PENDING -->
-                    <waltz-sub-section name="Pending Changes">
-                        <content>
-                            <div style="padding:8px">
-                                <waltz-pending-taxonomy-changes-sub-section pending-changes="$ctrl.pendingChanges"
-                                                                            on-apply-change="$ctrl.onApplyPendingChange"
-                                                                            on-discard-change="$ctrl.onDiscardPendingChange">
-                                </waltz-pending-taxonomy-changes-sub-section>
+                <div class="waltz-tabs"
+                     style="padding-top: 1em">
+                    <!-- TAB HEADERS -->
+                    <input type="radio"
+                           ng-model="$ctrl.activeTab"
+                           value="INTERACTIVE_TAXONOMY"
+                           id="interactive_taxonomy">
+                    <label class="wt-label"
+                           for="interactive_taxonomy">
+                        <span><waltz-icon name="pencil-square-o"></waltz-icon> Interactive Taxonomy Editor</span>
+                    </label>
+
+                    <input type="radio"
+                           ng-model="$ctrl.activeTab"
+                           value="BULK_TAXONOMY"
+                           id="bulk_taxonomy">
+                    <label class="wt-label"
+                           for="bulk_taxonomy">
+                        <span><waltz-icon name="list"></waltz-icon> Bulk Taxonomy Editor</span>
+                    </label>
+
+                    <input type="radio"
+                           ng-model="$ctrl.activeTab"
+                           value="BULK_RATINGS"
+                           id="bulk_ratings">
+                    <label class="wt-label"
+                           for="bulk_ratings">
+                        <span><waltz-icon name="pencil-square-o"></waltz-icon> Bulk Rating Editor</span>
+                    </label>
+
+                    <div class="wt-tab wt-active">
+                        <div ng-if="$ctrl.activeTab === 'BULK_TAXONOMY'">
+                            <waltz-svelte-component component="$ctrl.BulkTaxonomyEditor"
+                                                    primary-entity-ref="$ctrl.category">
+                            </waltz-svelte-component>
+                        </div>
+                        <div ng-if="$ctrl.activeTab === 'BULK_RATING'">
+                            <div class="help-block">
+                                The bulk rating editor can be used to upload multiple measurable ratings against this taxonomy.
+                                The file format should look like:
                             </div>
-                        </content>
-                    </waltz-sub-section>
+                            <pre>
+                                A,B,C
+                                1,2,3
+                                5,6,7
+                            </pre>
+                        </div>
+                        <div ng-if="$ctrl.activeTab === 'INTERACTIVE_TAXONOMY'">
+                            <div ng-show="$ctrl.mode === 'SUMMARY'">
+                                <!-- PENDING -->
+                                <waltz-sub-section name="Pending Changes">
+                                    <content>
+                                        <div style="padding:8px">
+                                            <waltz-pending-taxonomy-changes-sub-section pending-changes="$ctrl.pendingChanges"
+                                                                                        on-apply-change="$ctrl.onApplyPendingChange"
+                                                                                        on-discard-change="$ctrl.onDiscardPendingChange">
+                                            </waltz-pending-taxonomy-changes-sub-section>
+                                        </div>
+                                    </content>
+                                </waltz-sub-section>
 
-                    <!-- RECENTLY-VIEWED -->
-                    <div ng-if="$ctrl.recentlySelected.length > 0">
-                        <br>
+                                <!-- RECENTLY-VIEWED -->
+                                <div ng-if="$ctrl.recentlySelected.length > 0">
+                                    <br>
 
-                        <waltz-sub-section name="Recently Viewed">
-                            <content>
-                                <div style="padding:8px">
-                                    <div class="help-block">
-                                        Recently selected nodes are shown here:
-                                    </div>
-                                    <ul class="list-unstyled small">
-                                        <li ng-repeat="recent in $ctrl.recentlySelected">
-                                            <a ng-bind="recent.name"
-                                               class="clickable"
-                                               ng-click="$ctrl.onSelect(recent)">
+                                    <waltz-sub-section name="Recently Viewed">
+                                        <content>
+                                            <div style="padding:8px">
+                                                <div class="help-block">
+                                                    Recently selected nodes are shown here:
+                                                </div>
+                                                <ul class="list-unstyled small">
+                                                    <li ng-repeat="recent in $ctrl.recentlySelected">
+                                                        <a ng-bind="recent.name"
+                                                           class="clickable"
+                                                           ng-click="$ctrl.onSelect(recent)">
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+
+                                            <div class="waltz-sub-section-controls">
+                                                <a ng-click="$ctrl.onClearRecentlyViewed()"
+                                                   class="clickable">
+                                                    Clear
+                                                </a>
+                                            </div>
+                                        </content>
+                                    </waltz-sub-section>
+                                </div>
+                            </div>
+
+                            <!-- NODE VIEW -->
+                            <div ng-if="$ctrl.mode === 'NODE_VIEW'">
+                                <waltz-sub-section name="Overview">
+                                    <content>
+                                        <div style="padding: 8px">
+                                            <waltz-measurable-info measurable="$ctrl.selectedMeasurable">
+                                            </waltz-measurable-info>
+                                        </div>
+
+                                        <div class="waltz-sub-section-controls">
+                                            <a ng-click="$ctrl.onDismissSelection()"
+                                               class="clickable">
+                                                Close
                                             </a>
-                                        </li>
-                                    </ul>
-                                </div>
+                                        </div>
+                                    </content>
+                                </waltz-sub-section>
 
-                                <div class="waltz-sub-section-controls">
-                                    <a ng-click="$ctrl.onClearRecentlyViewed()"
-                                       class="clickable">
-                                        Clear
-                                    </a>
-                                </div>
-                            </content>
-                        </waltz-sub-section>
+                                <br>
+
+                                <waltz-sub-section name="Operations">
+                                    <content>
+                                        <div style="padding:8px">
+                                            <waltz-measurable-change-control change-domain="$ctrl.category"
+                                                                             on-submit-change="$ctrl.onSubmitChange"
+                                                                             measurable="$ctrl.selectedMeasurable"
+                                                                             siblings="$ctrl.selectedSiblings"
+                                                                             pending-changes="$ctrl.pendingChanges">
+                                            </waltz-measurable-change-control>
+                                        </div>
+                                        <div class="waltz-sub-section-controls">
+                                            <a ng-click="$ctrl.onDismissSelection()"
+                                               class="clickable">
+                                                Close
+                                            </a>
+                                        </div>
+                                    </content>
+                                </waltz-sub-section>
+                            </div>
+                        </div>
                     </div>
-                </div>
-
-                <!-- NODE VIEW -->
-                <div ng-if="$ctrl.mode === 'NODE_VIEW'">
-                    <waltz-sub-section name="Overview">
-                        <content>
-                            <div style="padding: 8px">
-                                <waltz-measurable-info measurable="$ctrl.selectedMeasurable">
-                                </waltz-measurable-info>
-                            </div>
-
-                            <div class="waltz-sub-section-controls">
-                                <a ng-click="$ctrl.onDismissSelection()"
-                                   class="clickable">
-                                    Close
-                                </a>
-                            </div>
-                        </content>
-                    </waltz-sub-section>
-
-                    <br>
-
-                    <waltz-sub-section name="Operations">
-                        <content>
-                            <div style="padding:8px">
-                                <waltz-measurable-change-control change-domain="$ctrl.category"
-                                                                 on-submit-change="$ctrl.onSubmitChange"
-                                                                 measurable="$ctrl.selectedMeasurable"
-                                                                 siblings="$ctrl.selectedSiblings"
-                                                                 pending-changes="$ctrl.pendingChanges">
-                                </waltz-measurable-change-control>
-                            </div>
-                            <div class="waltz-sub-section-controls">
-                                <a ng-click="$ctrl.onDismissSelection()"
-                                   class="clickable">
-                                    Close
-                                </a>
-                            </div>
-                        </content>
-                    </waltz-sub-section>
                 </div>
             </div>
         </div>

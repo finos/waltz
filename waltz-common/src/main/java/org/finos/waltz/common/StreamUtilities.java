@@ -73,6 +73,12 @@ public class StreamUtilities {
     }
 
 
+    public static Stream<String> lines(String multiLineStr) {
+        String[] lines = multiLineStr.split("(\n|\r|\r\n)");
+        return Stream.of(lines);
+    }
+
+
     public static class Siphon<T> implements Predicate<T> {
         private final Predicate<T> pred;
         private final List<T> results = new ArrayList<>();
