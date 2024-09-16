@@ -49,25 +49,25 @@ jobs:
       run: mvn -Dmaven.test.failure.ignore=true -B -ntp -s .build.settings.xml -Pbuild-postgres,waltz-postgres,integration-tests clean package site;
 
     - name: Publish build
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: waltz-web-postgres.war
         path: waltz-web/target/waltz-web.war
 
     - name: Publish mocha results
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: mocha-test-results.txt
         path: waltz-ng/mocha-test-results.txt
 
     - name: Publish liquibase changelogs
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: liquibase-changelogs
         path: waltz-schema/src/main/resources/liquibase/
 
     - name: Publish Java Test results
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: surefire-results.html
         path: target/site/surefire-report.html
