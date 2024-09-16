@@ -1,0 +1,20 @@
+[
+  {
+    "externalId":  "a1",
+    "name":  "A1",
+    "description": "Root node",
+    "concrete": true
+  }, {
+    "externalId":  "a1.1",
+    "parentExternalId":  "a1",
+    "name":  "A1_1",
+    "description": "First child",
+    "concrete": true
+  }, {
+    "externalId":  "a1.2",
+    "parentExternalId":  "a1",
+    "name":  "A1_2",
+    "description": "Second child",
+    "concrete": true
+  }
+]

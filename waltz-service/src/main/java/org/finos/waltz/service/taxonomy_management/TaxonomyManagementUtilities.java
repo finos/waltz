@@ -19,17 +19,23 @@
 package org.finos.waltz.service.taxonomy_management;
 
 import org.finos.waltz.common.SetUtilities;
+import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.HierarchyQueryScope;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.Severity;
+import org.finos.waltz.model.exceptions.NotAuthorizedException;
 import org.finos.waltz.model.measurable.Measurable;
+import org.finos.waltz.model.measurable_category.MeasurableCategory;
 import org.finos.waltz.model.measurable_rating.MeasurableRating;
 import org.finos.waltz.model.taxonomy_management.ImmutableTaxonomyChangeImpact;
 import org.finos.waltz.model.taxonomy_management.ImmutableTaxonomyChangePreview;
 import org.finos.waltz.model.taxonomy_management.TaxonomyChangeCommand;
+import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.service.measurable.MeasurableService;
+import org.finos.waltz.service.measurable_category.MeasurableCategoryService;
 import org.finos.waltz.service.measurable_rating.MeasurableRatingService;
+import org.finos.waltz.service.user.UserRoleService;
 
 import java.util.List;
 import java.util.Set;
@@ -176,4 +182,25 @@ public class TaxonomyManagementUtilities {
     public static boolean getConcreteParam(TaxonomyChangeCommand cmd, boolean dflt) {
         return cmd.paramAsBoolean("concrete", dflt);
     }
+
+    public static void verifyUserHasPermissions(MeasurableCategoryService measurableCategoryService,
+                                         UserRoleService userRoleService,
+                                         String userId,
+                                         EntityReference changeDomain) {
+        verifyUserHasPermissions(userRoleService, userId);
+
+        if (changeDomain.kind() == EntityKind.MEASURABLE_CATEGORY) {
+            MeasurableCategory category = measurableCategoryService.getById(changeDomain.id());
+            if (!category.editable()) {
+                throw new NotAuthorizedException("Unauthorised: Category is not editable");
+            }
+        }
+    }
+
+    public static void verifyUserHasPermissions(UserRoleService userRoleService, String userId) {
+        if (!userRoleService.hasRole(userId, SystemRole.TAXONOMY_EDITOR.name())) {
+            throw new NotAuthorizedException();
+        }
+    }
+
 }

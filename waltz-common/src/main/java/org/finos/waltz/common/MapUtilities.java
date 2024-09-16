@@ -217,6 +217,11 @@ public class MapUtilities {
 
     public static <K, V> Map<K, Long> countBy(Function<V, K> keyFn,
                                               Collection<V> xs) {
+        return countBy(xs, keyFn);
+    }
+
+    public static <K, V> Map<K, Long> countBy(Collection<V> xs,
+                                              Function<V, K> keyFn) {
         if (xs == null) {
             return emptyMap();
         }

@@ -298,6 +298,16 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
     }
 
 
+    public List<Measurable> findByCategoryId(Long categoryId, Set<EntityLifecycleStatus> statuses) {
+        return dsl
+                .select(MEASURABLE.fields())
+                .from(MEASURABLE)
+                .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId))
+                .and(MEASURABLE.ENTITY_LIFECYCLE_STATUS.in(statuses))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
     public List<Measurable> findByParentId(Long parentId) {
         return dsl
                 .select(MEASURABLE.fields())

@@ -13,6 +13,27 @@ export const taxonomyChangeType = {
         description: null,
         position: 10
     },
+    BULK_ADD: {
+        key: "BULK_ADD",
+        name: "Bulk Add",
+        icon: null,
+        description: null,
+        position: 10
+    },
+    BULK_RESTORE: {
+        key: "BULK_RESTORE",
+        name: "Bulk Restore",
+        icon: null,
+        description: null,
+        position: 10
+    },
+    BULK_UPDATE: {
+        key: "BULK_UPDATE",
+        name: "Bulk Update",
+        icon: null,
+        description: null,
+        position: 10
+    },
     DEPRECATE: {
         key: "DEPRECATE",
         name: "Deprecate",
