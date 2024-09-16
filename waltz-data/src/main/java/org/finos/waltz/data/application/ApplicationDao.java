@@ -101,7 +101,8 @@ public class ApplicationDao {
 
 
     public Application getById(long id) {
-        return dsl.select()
+        return dsl
+                .select(APPLICATION.fields())
                 .from(APPLICATION)
                 .where(APPLICATION.ID.eq(id))
                 .fetchOne(TO_DOMAIN_MAPPER);
@@ -110,14 +111,15 @@ public class ApplicationDao {
 
     public List<Application> findAll() {
         return dsl
-                .select()
+                .select(APPLICATION.fields())
                 .from(APPLICATION)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
 
     public List<Application> findByIds(Collection<Long> ids) {
-        return dsl.select()
+        return dsl
+                .select(APPLICATION.fields())
                 .from(APPLICATION)
                 .where(APPLICATION.ID.in(ids))
                 .fetch(TO_DOMAIN_MAPPER);

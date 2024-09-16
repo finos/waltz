@@ -20,11 +20,16 @@ public class AppHelper {
 
 
     public EntityReference createNewApp(String name, Long ouId) {
+        return createNewApp(name, ouId, name);
+    }
+
+
+    public EntityReference createNewApp(String name, Long ouId, String assetCode) {
         AppRegistrationResponse resp = applicationSvc
                 .registerApp(
                         ImmutableAppRegistrationRequest.builder()
                                 .name(name)
-                                .assetCode(name)
+                                .assetCode(assetCode)
                                 .organisationalUnitId(ouId != null ? ouId : 1L)
                                 .applicationKind(ApplicationKind.IN_HOUSE)
                                 .businessCriticality(Criticality.MEDIUM)
