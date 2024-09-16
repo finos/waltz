@@ -68,8 +68,8 @@ progress and done issues.
 
 | Release | Date           | Provisional Change Summary |
 |---------|----------------|----------------------------|
-| 1.63    | Aug 27th 2024  | Minor enhancements         | 
-| 1.64    | Sept 24th 2024 | TBC                        | 
+| 1.64    | Sept 26th 2024 | TBC                        | 
+| 1.65    | Oct 2024       | TBC                        | 
 
 See the [releases](https://github.com/finos/waltz/releases) page for historic versions.
 
