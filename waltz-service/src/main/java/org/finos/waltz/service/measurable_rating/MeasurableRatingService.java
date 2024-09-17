@@ -476,6 +476,13 @@ public class MeasurableRatingService {
                                                             BulkMeasurableItemParser.InputFormat format,
                                                             BulkUpdateMode mode) {
 
+        BulkMeasurableRatingParseResult result = new BulkMeasurableItemParser().parse(inputStr, format);
+        if (result.error() != null) {
+            return ImmutableBulkMeasurableRatingValidationResult
+                    .builder()
+                    .error(result.error())
+                    .build();
+        }
         MeasurableCategory category = measurableCategoryService.getById(measurableRatingRef.id());
         List<Measurable> existingMeasurables = measurableService.findByCategoryId(measurableRatingRef.id());
         Map<String, Measurable>  existingByExtId = indexBy(existingMeasurables, m -> m.externalId().orElse(null));
@@ -489,8 +496,8 @@ public class MeasurableRatingService {
         Set<RatingSchemeItem> ratingSchemeItemsBySchemeIds = ratingSchemeService.findRatingSchemeItemsBySchemeIds(asSet(category.ratingSchemeId()));
         Map<String, RatingSchemeItem> ratingSchemeItemsByCode = indexBy(ratingSchemeItemsBySchemeIds, RatingSchemeItem::rating);
 
-        BulkMeasurableRatingParseResult result = new BulkMeasurableItemParser().parse(inputStr, format);
-        List<Tuple4<BulkMeasurableRatingItem, Application, Measurable, RatingSchemeItem>> resolvedEntries = result
+
+        List<Tuple5<BulkMeasurableRatingItem, Application, Measurable, RatingSchemeItem, Set<ValidationError>>> validatedEntries = result
                 .parsedItems()
                 .stream()
                 .map(d -> {
@@ -499,13 +506,33 @@ public class MeasurableRatingService {
                     RatingSchemeItem ratingSchemeItem = ratingSchemeItemsByCode.get(d.ratingCode());
                     return tuple(d, application, measurable, ratingSchemeItem);
                 })
+                .map(t -> {
+                    Set<ValidationError> validationErrors = new HashSet<>();
+                    if (t.v2 == null) {
+                        validationErrors.add(ValidationError.APPLICATION_NOT_FOUND);
+                    }
+                    if (t.v3 == null) {
+                        validationErrors.add(ValidationError.MEASURABLE_NOT_FOUND);
+                    }
+                    if (t.v4 == null) {
+                        validationErrors.add(ValidationError.RATING_NOT_FOUND);
+                    }
+                    if (t.v3 != null && !t.v3.concrete()) {
+                        validationErrors.add(ValidationError.MEASURABLE_NOT_CONCRETE);
+                    }
+                    if (t.v4 != null && !t.v4.userSelectable()) {
+                        validationErrors.add(ValidationError.RATING_NOT_USER_SELECTABLE);
+                    }
+
+                    return t.concat(validationErrors);
+                })
                 .collect(Collectors.toList());
 
-        
         Collection<MeasurableRating> existingRatings = measurableRatingDao.findByCategory(category.id().get());
         
-        List<MeasurableRating> requiredRatings = resolvedEntries
+        List<MeasurableRating> requiredRatings = validatedEntries
                 .stream()
+                .filter(t -> t.v1 != null && t.v2 != null && t.v3 != null)
                 .map(t -> ImmutableMeasurableRating
                         .builder()
                         .entityReference(t.v2.entityReference())
@@ -530,29 +557,8 @@ public class MeasurableRatingService {
         Set<Tuple2<EntityReference, Long>> toRemove = SetUtilities.map(diff.waltzOnly(), d -> tuple(d.entityReference(), d.measurableId()));
         Set<Tuple2<EntityReference, Long>> toUpdate = SetUtilities.map(diff.differingIntersection(), d -> tuple(d.entityReference(), d.measurableId()));
 
-        List<BulkMeasurableRatingValidatedItem> validatedItems = resolvedEntries
+        List<BulkMeasurableRatingValidatedItem> validatedItems = validatedEntries
                 .stream()
-                .map(t -> {
-                    Set<ValidationError> validationErrors = new HashSet<>();
-                    if (t.v2 == null) {
-                        validationErrors.add(ValidationError.APPLICATION_NOT_FOUND);
-                    }
-                    if (t.v3 == null) {
-                        validationErrors.add(ValidationError.MEASURABLE_NOT_FOUND);
-                    }
-                    if (t.v4 == null) {
-                        validationErrors.add(ValidationError.RATING_NOT_FOUND);
-                    }
-
-                    if (t.v3 != null && !t.v3.concrete()) {
-                        validationErrors.add(ValidationError.MEASURABLE_NOT_CONCRETE);
-                    }
-                    if (t.v4 != null && !t.v4.userSelectable()) {
-                        validationErrors.add(ValidationError.RATING_NOT_USER_SELECTABLE);
-                    }
-
-                    return t.concat(validationErrors);
-                })
                 .map(t -> {
                     Tuple2<EntityReference, Long> recordKey = tuple(t.v2.entityReference(), t.v3.id().get());
                     if (toAdd.contains(recordKey)) {

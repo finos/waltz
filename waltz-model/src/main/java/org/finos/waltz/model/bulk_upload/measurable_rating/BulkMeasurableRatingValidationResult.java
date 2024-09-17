@@ -2,6 +2,7 @@ package org.finos.waltz.model.bulk_upload.measurable_rating;
 
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.finos.waltz.model.Nullable;
 import org.finos.waltz.model.measurable.Measurable;
 import org.immutables.value.Value;
 
@@ -13,5 +14,8 @@ import java.util.Set;
 public interface BulkMeasurableRatingValidationResult {
 
     List<BulkMeasurableRatingValidatedItem> validatedItems();
+
+    @Nullable
+    BulkMeasurableRatingParseResult.BulkMeasurableRatingParseError error();
 
 }
