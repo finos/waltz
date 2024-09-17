@@ -20,6 +20,7 @@ import {loadDataTypes, dataTypeByCodeResolver, dataTypeByIdResolver} from "./res
 
 import HomePage from './pages/home/data-type-home';
 import ViewPage from './pages/view/data-type-view';
+import MaintainPage from './pages/maintain/data-type-maintain';
 
 
 const baseState = {
@@ -54,6 +55,12 @@ const viewState = {
     resolve: {dataType: dataTypeByIdResolver }
 };
 
+const maintainState = {
+    url: 'data-types/maintain',
+    views: {'content@': MaintainPage.id }
+};
+
+
 
 function setup($stateProvider) {
     $stateProvider
@@ -61,7 +68,8 @@ function setup($stateProvider) {
         .state('main.data-type.list', listState)
         .state('main.data-type.code', viewByCodeState)
         .state('main.data-type.external-id', viewByExternalIdState)
-        .state('main.data-type.view', viewState);
+        .state('main.data-type.view', viewState)
+        .state('main.data-type.maintain', maintainState);
 }
 
 setup.$inject = ['$stateProvider'];
