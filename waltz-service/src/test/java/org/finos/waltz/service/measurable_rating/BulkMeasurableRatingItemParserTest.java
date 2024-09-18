@@ -25,6 +25,22 @@ public class BulkMeasurableRatingItemParserTest {
         assertNarIds(result.parsedItems(), "109235-1", "109235-1", "324234-1");
     }
 
+    @Test
+    void simpleCSV() {
+        BulkMeasurableRatingParseResult result = parser.parse(readTestFile("test-measurable-rating-items.csv"), BulkMeasurableItemParser.InputFormat.CSV);
+        assertNull(result.error());
+        assertEquals(3, result.parsedItems().size());
+        assertNarIds(result.parsedItems(), "109235-1", "109235-1", "324234-1");
+    }
+
+    @Test
+    void simpleJSON() {
+        BulkMeasurableRatingParseResult result = parser.parse(readTestFile("test-measurable-rating-items.json"), BulkMeasurableItemParser.InputFormat.JSON);
+        assertNull(result.error());
+        assertEquals(3, result.parsedItems().size());
+        assertNarIds(result.parsedItems(), "109235-1", "109235-1", "324234-1");
+    }
+
     private void assertNarIds(List<BulkMeasurableRatingItem> parsedItems, String... resultNarIds) {
         Set<String> narIds = SetUtilities.map(parsedItems, BulkMeasurableRatingItem::assetCode);
         Set<String> expectedNarIds = SetUtilities.asSet(resultNarIds);
