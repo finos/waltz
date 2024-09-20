@@ -63,6 +63,7 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toSet;
+import static java.util.Optional.ofNullable;
 import static org.finos.waltz.common.Checks.*;
 import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.SetUtilities.asSet;
@@ -503,7 +504,7 @@ public class MeasurableRatingService {
                 .map(d -> {
                     Application application = allApplicationsByAssetCode.get(d.assetCode().toLowerCase());
                     Measurable measurable = existingByExtId.get(d.taxonomyExternalId());
-                    RatingSchemeItem ratingSchemeItem = ratingSchemeItemsByCode.get(d.ratingCode());
+                    RatingSchemeItem ratingSchemeItem = ratingSchemeItemsByCode.get(String.valueOf(d.ratingCode()));
                     return tuple(d, application, measurable, ratingSchemeItem);
                 })
                 .map(t -> {
@@ -529,17 +530,19 @@ public class MeasurableRatingService {
                 .collect(Collectors.toList());
 
         Collection<MeasurableRating> existingRatings = measurableRatingDao.findByCategory(category.id().get());
-        
+        //Optional<EntityReference> EntityRef = Optional.empty();
         List<MeasurableRating> requiredRatings = validatedEntries
                 .stream()
-                .filter(t -> t.v1 != null && t.v2 != null && t.v3 != null)
+                .filter(t -> t.v1 !=null && t.v2 !=null && t.v4 !=null )
                 .map(t -> ImmutableMeasurableRating
                         .builder()
                         .entityReference(t.v2.entityReference())
+                        //.entityReference("null")
                         .measurableId(t.v3.id().get())
                         .description(t.v1.comment())
                         .rating(t.v1.ratingCode())
                         .isPrimary(t.v1.isPrimary())
+                        .lastUpdatedBy("test")
                         .provenance("bulkMeasurableRatingUpdate")
                         .build())
                 .collect(Collectors.toList());
@@ -557,8 +560,10 @@ public class MeasurableRatingService {
         Set<Tuple2<EntityReference, Long>> toRemove = SetUtilities.map(diff.waltzOnly(), d -> tuple(d.entityReference(), d.measurableId()));
         Set<Tuple2<EntityReference, Long>> toUpdate = SetUtilities.map(diff.differingIntersection(), d -> tuple(d.entityReference(), d.measurableId()));
 
+
         List<BulkMeasurableRatingValidatedItem> validatedItems = validatedEntries
                 .stream()
+                //.filter(t -> t.v2 != null && t.v3 != null)
                 .map(t -> {
                     Tuple2<EntityReference, Long> recordKey = tuple(t.v2.entityReference(), t.v3.id().get());
                     if (toAdd.contains(recordKey)) {
